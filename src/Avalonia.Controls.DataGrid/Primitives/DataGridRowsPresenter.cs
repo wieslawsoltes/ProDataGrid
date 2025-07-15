@@ -11,6 +11,7 @@ using Avalonia.Controls;
 using Avalonia.Layout;
 using Avalonia.LogicalTree;
 using Avalonia.Media;
+using Avalonia.Utilities;
 
 namespace Avalonia.Controls.Primitives
 {
@@ -226,7 +227,13 @@ namespace Avalonia.Controls.Primitives
                 if (OwningGrid != null)
                 {
                     OwningGrid.UpdateHorizontalOffset(value.X);
-                    OwningGrid.SetVerticalOffset(value.Y);
+
+                    double delta = value.Y - OwningGrid.VerticalOffset;
+                    if (!MathUtilities.IsZero(delta))
+                    {
+                        OwningGrid.DisplayData.PendingVerticalScrollHeight = delta;
+                        InvalidateMeasure();
+                    }
                 }
             }
         }
