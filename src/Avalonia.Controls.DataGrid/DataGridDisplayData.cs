@@ -178,8 +178,14 @@ namespace Avalonia.Controls
             }
             else if ((_owner.GetPreviousVisibleSlot(slot) <= LastScrollingSlot) || (LastScrollingSlot == -1))
             {
-                // The row was inserted in our viewport, add it as a scrolling row
+                _realizedElements.ItemsInserted(slot, 1, _updateElementIndex);
+
+                // The row was inserted in our viewport, replace the placeholder with the element
+                _realizedElements.SetElement(slot, element, element.DesiredSize.Height);
+
+                // Track as scrolling element
                 LoadScrollingSlot(slot, element, true /*updateSlotInformation*/);
+                return;
             }
 
             _realizedElements.ItemsInserted(slot, 1, _updateElementIndex);
@@ -283,7 +289,8 @@ namespace Avalonia.Controls
                     }
                 }
 
-                _realizedElements.Add(slot, element, 0, element.DesiredSize.Height);
+                if (_realizedElements.GetElement(slot) is null)
+                    _realizedElements.SetElement(slot, element, element.DesiredSize.Height);
             }
         }
 

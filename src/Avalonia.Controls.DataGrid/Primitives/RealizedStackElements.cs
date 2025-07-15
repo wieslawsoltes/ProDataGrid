@@ -538,5 +538,32 @@ namespace Avalonia.Controls.Primitives
             _elements?.Clear();
             _sizes?.Clear();
         }
+
+        /// <summary>
+        /// Sets the realized element at the specified index.
+        /// </summary>
+        /// <param name="index">The index of the element.</param>
+        /// <param name="element">The element.</param>
+        /// <param name="sizeU">The size of the element on the primary axis.</param>
+        public void SetElement(int index, Control element, double sizeU)
+        {
+            if (Count == 0)
+            {
+                Add(index, element, 0, sizeU);
+                return;
+            }
+
+            var realizedIndex = index - FirstIndex;
+
+            if (realizedIndex >= 0 && realizedIndex < _elements!.Count)
+            {
+                _elements[realizedIndex] = element;
+                _sizes![realizedIndex] = sizeU;
+            }
+            else
+            {
+                Add(index, element, 0, sizeU);
+            }
+        }
     }
 }
