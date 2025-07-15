@@ -4,6 +4,7 @@
 // All other rights reserved.
 
 using Avalonia.Media;
+using Avalonia.Controls.Primitives;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -13,12 +14,13 @@ namespace Avalonia.Controls
     internal class DataGridDisplayData
     {
         private Stack<DataGridRow> _fullyRecycledRows; // list of Rows that have been fully recycled (Collapsed)
-        private int _headScrollingElements; // index of the row in _scrollingRows that is the first displayed row
         private DataGrid _owner;
         private Stack<DataGridRow> _recyclableRows; // list of Rows which have not been fully recycled (avoids Measure in several cases)
-        private List<Control> _scrollingElements; // circular list of displayed elements
+        private RealizedStackElements _realizedElements = new();
         private Stack<DataGridRowGroupHeader> _fullyRecycledGroupHeaders; // list of GroupHeaders that have been fully recycled (Collapsed)
         private Stack<DataGridRowGroupHeader> _recyclableGroupHeaders; // list of GroupHeaders which have not been fully recycled (avoids Measure in several cases)
+        private readonly Action<Control> _recycleElement;
+        private readonly Action<Control, int, int> _updateElementIndex;
 
         public DataGridDisplayData(DataGrid owner)
         {
@@ -28,11 +30,13 @@ namespace Avalonia.Controls
             FirstDisplayedScrollingCol = -1;
             LastTotallyDisplayedScrollingCol = -1;
 
-            _scrollingElements = new List<Control>();
             _recyclableRows = new Stack<DataGridRow>();
             _fullyRecycledRows = new Stack<DataGridRow>();
             _recyclableGroupHeaders = new Stack<DataGridRowGroupHeader>();
             _fullyRecycledGroupHeaders = new Stack<DataGridRowGroupHeader>();
+
+            _recycleElement = RecycleElement;
+            _updateElementIndex = UpdateElementIndex;
         }
 
         public int FirstDisplayedScrollingCol
@@ -61,10 +65,7 @@ namespace Avalonia.Controls
 
         public int NumDisplayedScrollingElements
         {
-            get
-            {
-                return _scrollingElements.Count;
-            }
+            get => _realizedElements.Count;
         }
 
         public int NumTotallyDisplayedScrollingElements
@@ -114,24 +115,21 @@ namespace Avalonia.Controls
             ResetSlotIndexes();
             if (recycle)
             {
-                foreach (Control element in _scrollingElements)
+                foreach (Control? element in _realizedElements.Elements)
                 {
                     if (element is DataGridRow row)
                     {
                         if (row.IsRecyclable)
-                        {
                             AddRecyclableRow(row);
-                        }
                         else
-                        {
                             row.Clip = new RectangleGeometry();
-                        }
                     }
                     else if (element is DataGridRowGroupHeader groupHeader)
                     {
                         AddRecylableRowGroupHeader(groupHeader);
                     }
                 }
+                _realizedElements.ItemsReset(_recycleElement);
             }
             else
             {
@@ -140,7 +138,7 @@ namespace Avalonia.Controls
                 _recyclableGroupHeaders.Clear();
                 _fullyRecycledGroupHeaders.Clear();
             }
-            _scrollingElements.Clear();
+            _realizedElements.ResetForReuse();
         }
 
         internal void CorrectSlotsAfterDeletion(int slot, bool wasCollapsed)
@@ -155,6 +153,7 @@ namespace Avalonia.Controls
             else if (_owner.IsSlotVisible(slot))
             {
                 UnloadScrollingElement(slot, true /*updateSlotInformation*/, true /*wasDeleted*/);
+                _realizedElements.ItemsRemoved(slot, 1, _updateElementIndex, e => _recycleElement(e));
             }
             // This cannot be an else condition because if there are 2 rows left, and you delete the first one
             // then these indexes need to be updated as well
@@ -182,13 +181,10 @@ namespace Avalonia.Controls
                 // The row was inserted in our viewport, add it as a scrolling row
                 LoadScrollingSlot(slot, element, true /*updateSlotInformation*/);
             }
+
+            _realizedElements.ItemsInserted(slot, 1, _updateElementIndex);
         }
 
-        private int GetCircularListIndex(int slot, bool wrap)
-        {
-            int index = slot - FirstScrollingSlot - _headScrollingElements - _owner.GetCollapsedSlotCount(FirstScrollingSlot, slot);
-            return wrap ? index % _scrollingElements.Count : index;
-        }
 
         internal void FullyRecycleElements()
         {
@@ -208,6 +204,8 @@ namespace Avalonia.Controls
                 Debug.Assert(!_fullyRecycledGroupHeaders.Contains(groupHeader));
                 _fullyRecycledGroupHeaders.Push(groupHeader);
             }
+
+            _realizedElements.RecycleAllElements((e, _) => _recycleElement(e));
         }
 
         internal Control GetDisplayedElement(int slot)
@@ -215,7 +213,7 @@ namespace Avalonia.Controls
             Debug.Assert(slot >= FirstScrollingSlot);
             Debug.Assert(slot <= LastScrollingSlot);
 
-            return _scrollingElements[GetCircularListIndex(slot, true /*wrap*/)];
+            return _realizedElements.GetElement(slot)!;
         }
 
         internal DataGridRow? GetDisplayedRow(int rowIndex)
@@ -232,14 +230,10 @@ namespace Avalonia.Controls
 
         internal IEnumerable<Control> GetScrollingElements(Predicate<object>? filter)
         {
-            for (int i = 0; i < _scrollingElements.Count; i++)
+            foreach (var element in _realizedElements.Elements)
             {
-                Control element = _scrollingElements[(_headScrollingElements + i) % _scrollingElements.Count];
-                if (filter == null || filter(element))
-                {
-                    // _scrollingRows is a circular list that wraps
-                    yield return element;
-                }
+                if (element is { } e && (filter is null || filter(e)))
+                    yield return e;
             }
         }
 
@@ -267,15 +261,16 @@ namespace Avalonia.Controls
         // Tracks the row at index rowIndex as a scrolling row
         internal void LoadScrollingSlot(int slot, Control element, bool updateSlotInformation)
         {
-            if (_scrollingElements.Count == 0)
+            if (_realizedElements.Count == 0)
             {
                 SetScrollingSlots(slot);
-                _scrollingElements.Add(element);
+                _realizedElements.Add(slot, element, 0, element.DesiredSize.Height);
             }
             else
             {
                 // The slot should be adjacent to the other slots being displayed
                 Debug.Assert(slot >= _owner.GetPreviousVisibleSlot(FirstScrollingSlot) && slot <= _owner.GetNextVisibleSlot(LastScrollingSlot));
+
                 if (updateSlotInformation)
                 {
                     if (slot < FirstScrollingSlot)
@@ -287,14 +282,8 @@ namespace Avalonia.Controls
                         LastScrollingSlot = _owner.GetNextVisibleSlot(LastScrollingSlot);
                     }
                 }
-                int insertIndex = GetCircularListIndex(slot, false /*wrap*/);
-                if (insertIndex > _scrollingElements.Count)
-                {
-                    // We need to wrap around from the bottom to the top of our circular list; as a result the head of the list moves forward
-                    insertIndex -= _scrollingElements.Count;
-                    _headScrollingElements++;
-                }
-                _scrollingElements.Insert(insertIndex, element);
+
+                _realizedElements.Add(slot, element, 0, element.DesiredSize.Height);
             }
         }
 
@@ -302,7 +291,7 @@ namespace Avalonia.Controls
         {
             SetScrollingSlots(-1);
             NumTotallyDisplayedScrollingElements = 0;
-            _headScrollingElements = 0;
+            _realizedElements.ResetForReuse();
         }
 
         private void SetScrollingSlots(int newValue)
@@ -315,14 +304,19 @@ namespace Avalonia.Controls
         internal void UnloadScrollingElement(int slot, bool updateSlotInformation, bool wasDeleted)
         {
             Debug.Assert(_owner.IsSlotVisible(slot));
-            int elementIndex = GetCircularListIndex(slot, false /*wrap*/);
-            if (elementIndex > _scrollingElements.Count)
+
+            if (slot == FirstScrollingSlot)
             {
-                // We need to wrap around from the top to the bottom of our circular list
-                elementIndex -= _scrollingElements.Count;
-                _headScrollingElements--;
+                _realizedElements.RecycleElementsBefore(slot + 1, (e, _) => _recycleElement(e));
             }
-            _scrollingElements.RemoveAt(elementIndex);
+            else if (slot == LastScrollingSlot)
+            {
+                _realizedElements.RecycleElementsAfter(slot - 1, (e, _) => _recycleElement(e));
+            }
+            else
+            {
+                _realizedElements.ItemsReplaced(slot, 1, e => _recycleElement(e));
+            }
 
             if (updateSlotInformation)
             {
@@ -357,5 +351,26 @@ namespace Avalonia.Controls
             }
         }
 #endif
+        private void RecycleElement(Control element)
+        {
+            if (element is DataGridRow row)
+                AddRecyclableRow(row);
+            else if (element is DataGridRowGroupHeader groupHeader)
+                AddRecylableRowGroupHeader(groupHeader);
+        }
+
+        private void UpdateElementIndex(Control element, int oldIndex, int newIndex)
+        {
+            switch (element)
+            {
+                case DataGridRow row:
+                    row.Slot = newIndex;
+                    break;
+                case DataGridRowGroupHeader groupHeader:
+                    if (groupHeader.RowGroupInfo != null)
+                        groupHeader.RowGroupInfo.Slot = newIndex;
+                    break;
+            }
+        }
     }
 }
