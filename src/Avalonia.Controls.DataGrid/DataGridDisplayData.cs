@@ -82,7 +82,8 @@ namespace Avalonia.Controls
 
         internal void AddRecyclableRow(DataGridRow row)
         {
-            Debug.Assert(!_recyclableRows.Contains(row));
+            if (_recyclableRows.Contains(row))
+                return;
             row.DetachFromDataGrid(true);
             _recyclableRows.Push(row);
         }
@@ -105,7 +106,8 @@ namespace Avalonia.Controls
 
         internal void AddRecylableRowGroupHeader(DataGridRowGroupHeader groupHeader)
         {
-            Debug.Assert(!_recyclableGroupHeaders.Contains(groupHeader));
+            if (_recyclableGroupHeaders.Contains(groupHeader))
+                return;
             groupHeader.IsRecycled = true;
             _recyclableGroupHeaders.Push(groupHeader);
         }
