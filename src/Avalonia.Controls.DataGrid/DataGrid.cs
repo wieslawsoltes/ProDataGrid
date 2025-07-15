@@ -50,7 +50,7 @@ namespace Avalonia.Controls
 #if !DATAGRID_INTERNAL
     public
 #endif
-    partial class DataGrid : TemplatedControl
+    partial class DataGrid : TemplatedControl, ILogicalScrollable
     {
         private const string DATAGRID_elementRowsPresenterName = "PART_RowsPresenter";
         private const string DATAGRID_elementColumnHeadersPresenterName = "PART_ColumnHeadersPresenter";
@@ -152,6 +152,8 @@ namespace Avalonia.Controls
         private bool _temporarilyResetCurrentCell;
         private object _uneditedValue; // Represents the original current cell value at the time it enters editing mode.
 
+        private bool _useScrollViewerScrolling;
+
         // An approximation of the sum of the heights in pixels of the scrolling rows preceding
         // the first displayed scrolling row.  Since the scrolled off rows are discarded, the grid
         // does not know their actual height. The heights used for the approximation are the ones
@@ -160,6 +162,7 @@ namespace Avalonia.Controls
         private byte _verticalScrollChangesIgnored;
         public event EventHandler<ScrollEventArgs> HorizontalScroll;
         public event EventHandler<ScrollEventArgs> VerticalScroll;
+        private event EventHandler? _scrollInvalidated;
 
         /// <summary>
         /// Identifies the CanUserReorderColumns dependency property.
@@ -1673,10 +1676,66 @@ namespace Avalonia.Controls
                 DisplayData.FirstDisplayedScrollingCol = ComputeFirstVisibleScrollingColumn();
                 // update the lastTotallyDisplayedScrollingCol
                 ComputeDisplayedColumns();
+
+                RaiseScrollInvalidated(EventArgs.Empty);
             }
         }
 
         internal ScrollBar HorizontalScrollBar => _hScrollBar;
+
+        event EventHandler? ILogicalScrollable.ScrollInvalidated
+        {
+            add => _scrollInvalidated += value;
+            remove => _scrollInvalidated -= value;
+        }
+
+        bool ILogicalScrollable.CanHorizontallyScroll { get; set; } = true;
+
+        bool ILogicalScrollable.CanVerticallyScroll { get; set; } = true;
+
+        Vector IScrollable.Offset
+        {
+            get => new Vector(HorizontalOffset, _verticalOffset);
+            set
+            {
+                UpdateHorizontalOffset(value.X);
+                SetVerticalOffset(value.Y);
+            }
+        }
+
+        bool ILogicalScrollable.IsLogicalScrollEnabled => true;
+
+        Size ILogicalScrollable.ScrollSize => new Size(16, RowHeightEstimate);
+
+        Size ILogicalScrollable.PageScrollSize => new Size(CellsWidth, CellsEstimatedHeight);
+
+        Size IScrollable.Extent => new Size(ColumnsInternal.VisibleEdgedColumnsWidth, EdgedRowsHeightCalculated);
+
+        Size IScrollable.Viewport => new Size(CellsWidth, CellsEstimatedHeight);
+
+        bool ILogicalScrollable.BringIntoView(Control target, Rect targetRect)
+        {
+            if (target == null)
+                return false;
+
+            ScrollIntoView(target.DataContext, ColumnsInternal.FirstVisibleColumn);
+            return true;
+        }
+
+        Control? ILogicalScrollable.GetControlInDirection(NavigationDirection direction, Control? from)
+        {
+            return null;
+        }
+
+        void ILogicalScrollable.RaiseScrollInvalidated(EventArgs e)
+        {
+            RaiseScrollInvalidated(e);
+        }
+
+        private void RaiseScrollInvalidated(EventArgs e)
+        {
+            _scrollInvalidated?.Invoke(this, e);
+        }
 
         internal IndexToValueTable<DataGridRowGroupInfo> RowGroupHeadersTable
         {
@@ -1689,6 +1748,8 @@ namespace Avalonia.Controls
             get;
             private set;
         }
+
+        internal bool UseScrollViewerScrolling => _useScrollViewerScrolling;
 
         internal bool InDisplayIndexAdjustments
         {
@@ -2133,6 +2194,12 @@ namespace Avalonia.Controls
         protected override void OnAttachedToVisualTree(VisualTreeAttachmentEventArgs e)
         {
             base.OnAttachedToVisualTree(e);
+
+            // Use ScrollViewer for scrolling by default
+            _useScrollViewerScrolling = true;
+            HorizontalScrollBarVisibility = ScrollBarVisibility.Disabled;
+            VerticalScrollBarVisibility = ScrollBarVisibility.Disabled;
+
             if (DataConnection.DataSource != null && !DataConnection.EventsWired)
             {
                 DataConnection.WireEvents(DataConnection.DataSource);
@@ -5725,6 +5792,8 @@ namespace Avalonia.Controls
             {
                 _vScrollBar.Value = _verticalOffset;
             }
+
+            RaiseScrollInvalidated(EventArgs.Empty);
         }
 
         private void UpdateCurrentState(Control displayedElement, int columnIndex, bool applyCellState)

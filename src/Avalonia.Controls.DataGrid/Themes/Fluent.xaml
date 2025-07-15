@@ -520,78 +520,40 @@
                   BorderBrush="{TemplateBinding BorderBrush}"
                   BorderThickness="{TemplateBinding BorderThickness}"
                   CornerRadius="{TemplateBinding CornerRadius}">
-            <Grid ColumnDefinitions="Auto,*,Auto"
-                  RowDefinitions="Auto,*,Auto,Auto"
-                  ClipToBounds="True">
-              <DataGridColumnHeader Name="PART_TopLeftCornerHeader"
-                                    Theme="{StaticResource DataGridTopLeftColumnHeader}" />
-              <DataGridColumnHeadersPresenter Name="PART_ColumnHeadersPresenter"
-                                              Grid.Column="1"
-                                              Grid.Row="0" Grid.ColumnSpan="2" />
-              <Rectangle Name="PART_ColumnHeadersAndRowsSeparator"
-                         Grid.Row="0" Grid.ColumnSpan="3" Grid.Column="0"
-                         VerticalAlignment="Bottom"
-                         Height="1"
-                         Fill="{DynamicResource DataGridGridLinesBrush}" />
-
-              <DataGridRowsPresenter Name="PART_RowsPresenter"
-                                     Grid.Row="1"
-                                     Grid.Column="0"
-                                     ScrollViewer.IsScrollInertiaEnabled="{TemplateBinding IsScrollInertiaEnabled}">
-                <DataGridRowsPresenter.GestureRecognizers>
-                  <ScrollGestureRecognizer CanHorizontallyScroll="True"
-                                           CanVerticallyScroll="True"
-                                           IsScrollInertiaEnabled="{Binding (ScrollViewer.IsScrollInertiaEnabled), ElementName=PART_RowsPresenter}" />
-                </DataGridRowsPresenter.GestureRecognizers>
-              </DataGridRowsPresenter>
-              <Rectangle Name="PART_BottomRightCorner"
-                         Fill="{DynamicResource DataGridScrollBarsSeparatorBackground}"
-                         Grid.Column="2"
-                         Grid.Row="2" />
-              <ScrollBar Name="PART_VerticalScrollbar"
-                         Orientation="Vertical"
-                         Grid.Column="2"
-                         Grid.Row="1"
-                         Width="{DynamicResource ScrollBarSize}" />
-
-              <Grid Grid.Column="1"
-                    Grid.Row="2"
-                    ColumnDefinitions="Auto,*">
-                <Rectangle Name="PART_FrozenColumnScrollBarSpacer" />
-                <ScrollBar Name="PART_HorizontalScrollbar"
-                           Grid.Column="1"
-                           Orientation="Horizontal"
-                           Height="{DynamicResource ScrollBarSize}" />
-              </Grid>
+            <Grid>
+              <ScrollViewer x:Name="PART_ScrollViewer"
+                            HorizontalScrollBarVisibility="{TemplateBinding HorizontalScrollBarVisibility}"
+                            VerticalScrollBarVisibility="{TemplateBinding VerticalScrollBarVisibility}">
+                <Grid ColumnDefinitions="Auto,*"
+                      RowDefinitions="Auto,*"
+                      ClipToBounds="True">
+                <DataGridColumnHeader Name="PART_TopLeftCornerHeader"
+                                      Theme="{StaticResource DataGridTopLeftColumnHeader}" />
+                <DataGridColumnHeadersPresenter Name="PART_ColumnHeadersPresenter"
+                                                Grid.Column="1" />
+                <DataGridRowsPresenter Name="PART_RowsPresenter"
+                                       Grid.Row="1"
+                                       Grid.ColumnSpan="2"
+                                       ScrollViewer.IsScrollInertiaEnabled="{TemplateBinding IsScrollInertiaEnabled}">
+                  <DataGridRowsPresenter.GestureRecognizers>
+                    <ScrollGestureRecognizer CanHorizontallyScroll="True"
+                                             CanVerticallyScroll="True"
+                                             IsScrollInertiaEnabled="{Binding (ScrollViewer.IsScrollInertiaEnabled), ElementName=PART_RowsPresenter}" />
+                  </DataGridRowsPresenter.GestureRecognizers>
+                </DataGridRowsPresenter>
+                </Grid>
+              </ScrollViewer>
               <Border x:Name="PART_DisabledVisualElement"
-                      Grid.ColumnSpan="3" Grid.Column="0"
-                      Grid.Row="0" Grid.RowSpan="4"
-                      IsHitTestVisible="False"
-                      HorizontalAlignment="Stretch"
-                      VerticalAlignment="Stretch"
-                      CornerRadius="2"
-                      Background="{DynamicResource DataGridDisabledVisualElementBackground}"
-                      IsVisible="{Binding !$parent[DataGrid].IsEnabled}" />
+                    IsHitTestVisible="False"
+                    HorizontalAlignment="Stretch"
+                    VerticalAlignment="Stretch"
+                    CornerRadius="2"
+                    Background="{DynamicResource DataGridDisabledVisualElementBackground}"
+                    IsVisible="{Binding !$parent[DataGrid].IsEnabled}" />
             </Grid>
           </Border>
         </ControlTemplate>
       </Setter>
-
-      <Style Selector="^:empty-columns">
-        <Style Selector="^ /template/ DataGridColumnHeader#PART_TopLeftCornerHeader">
-          <Setter Property="IsVisible" Value="False" />
-        </Style>
-        <Style Selector="^ /template/ DataGridColumnHeadersPresenter#PART_ColumnHeadersPresenter">
-          <Setter Property="IsVisible" Value="False" />
-        </Style>
-        <Style Selector="^ /template/ Rectangle#PART_ColumnHeadersAndRowsSeparator">
-          <Setter Property="IsVisible" Value="False" />
-        </Style>
-      </Style>
-      <Style Selector="^ /template/ DataGridRowsPresenter#PART_RowsPresenter">
-        <Setter Property="Grid.RowSpan" Value="2" />
-        <Setter Property="Grid.ColumnSpan" Value="3" />
-      </Style>
     </ControlTheme>
    </ResourceDictionary>
   </Styles.Resources>
