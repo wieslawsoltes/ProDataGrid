@@ -1054,14 +1054,8 @@ namespace Avalonia.Controls
 
             if (IsSlotVisible(slot))
             {
-                var element = DisplayData.GetDisplayedElement(slot);
-                if (element == null)
-                {
-                    // In case the realized elements list became out of sync,
-                    // regenerate the element for this slot.
-                    element = InsertDisplayedElement(slot, true);
-                }
-                return element.DesiredSize.Height;
+                Debug.Assert(DisplayData.GetDisplayedElement(slot) != null);
+                return DisplayData.GetDisplayedElement(slot).DesiredSize.Height;
             }
 
             Control slotElement = InsertDisplayedElement(slot, true /*updateSlotInformation*/);
@@ -1087,12 +1081,8 @@ namespace Avalonia.Controls
             Debug.Assert(slot >= 0 && slot < SlotCount);
             if (IsSlotVisible(slot))
             {
-                var element = DisplayData.GetDisplayedElement(slot);
-                if (element == null)
-                {
-                    element = InsertDisplayedElement(slot, true);
-                }
-                return element.DesiredSize.Height;
+                Debug.Assert(DisplayData.GetDisplayedElement(slot) != null);
+                return DisplayData.GetDisplayedElement(slot).DesiredSize.Height;
             }
             else
             {
@@ -2033,18 +2023,12 @@ namespace Avalonia.Controls
         private void UnloadRow(DataGridRow dataGridRow)
         {
             Debug.Assert(dataGridRow != null);
+            Debug.Assert(_rowsPresenter != null);
+            Debug.Assert(_rowsPresenter.Children.Contains(dataGridRow));
 
             if (_loadedRows.Contains(dataGridRow))
             {
                 return; // The row is still referenced, we can't release it.
-            }
-
-            // If the row isn't currently attached to the presenter then simply
-            // recycle it without further checks.
-            if (_rowsPresenter == null || !_rowsPresenter.Children.Contains(dataGridRow))
-            {
-                DisplayData.AddRecyclableRow(dataGridRow);
-                return;
             }
 
             // Raise UnloadingRow regardless of whether the row will be recycled
@@ -2057,6 +2041,7 @@ namespace Avalonia.Controls
             }
             else
             {
+                //
                 _rowsPresenter.Children.Remove(dataGridRow);
                 dataGridRow.DetachFromDataGrid(false);
             }
