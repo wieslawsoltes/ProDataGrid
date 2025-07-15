@@ -1054,8 +1054,14 @@ namespace Avalonia.Controls
 
             if (IsSlotVisible(slot))
             {
-                Debug.Assert(DisplayData.GetDisplayedElement(slot) != null);
-                return DisplayData.GetDisplayedElement(slot).DesiredSize.Height;
+                var element = DisplayData.GetDisplayedElement(slot);
+                if (element == null)
+                {
+                    // In case the realized elements list became out of sync,
+                    // regenerate the element for this slot.
+                    element = InsertDisplayedElement(slot, true);
+                }
+                return element.DesiredSize.Height;
             }
 
             Control slotElement = InsertDisplayedElement(slot, true /*updateSlotInformation*/);
