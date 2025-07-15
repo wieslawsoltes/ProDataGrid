@@ -50,7 +50,7 @@ namespace Avalonia.Controls
 #if !DATAGRID_INTERNAL
     public
 #endif
-    partial class DataGrid : TemplatedControl, ILogicalScrollable
+    partial class DataGrid : TemplatedControl
     {
         private const string DATAGRID_elementRowsPresenterName = "PART_RowsPresenter";
         private const string DATAGRID_elementColumnHeadersPresenterName = "PART_ColumnHeadersPresenter";
@@ -1683,58 +1683,10 @@ namespace Avalonia.Controls
 
         internal ScrollBar HorizontalScrollBar => _hScrollBar;
 
-        event EventHandler? ILogicalScrollable.ScrollInvalidated
-        {
-            add => _scrollInvalidated += value;
-            remove => _scrollInvalidated -= value;
-        }
-
-        bool ILogicalScrollable.CanHorizontallyScroll { get; set; } = true;
-
-        bool ILogicalScrollable.CanVerticallyScroll { get; set; } = true;
-
-        Vector IScrollable.Offset
-        {
-            get => new Vector(HorizontalOffset, _verticalOffset);
-            set
-            {
-                UpdateHorizontalOffset(value.X);
-                SetVerticalOffset(value.Y);
-            }
-        }
-
-        bool ILogicalScrollable.IsLogicalScrollEnabled => true;
-
-        Size ILogicalScrollable.ScrollSize => new Size(16, RowHeightEstimate);
-
-        Size ILogicalScrollable.PageScrollSize => new Size(CellsWidth, CellsEstimatedHeight);
-
-        Size IScrollable.Extent => new Size(ColumnsInternal.VisibleEdgedColumnsWidth, EdgedRowsHeightCalculated);
-
-        Size IScrollable.Viewport => new Size(CellsWidth, CellsEstimatedHeight);
-
-        bool ILogicalScrollable.BringIntoView(Control target, Rect targetRect)
-        {
-            if (target == null)
-                return false;
-
-            ScrollIntoView(target.DataContext, ColumnsInternal.FirstVisibleColumn);
-            return true;
-        }
-
-        Control? ILogicalScrollable.GetControlInDirection(NavigationDirection direction, Control? from)
-        {
-            return null;
-        }
-
-        void ILogicalScrollable.RaiseScrollInvalidated(EventArgs e)
-        {
-            RaiseScrollInvalidated(e);
-        }
-
         private void RaiseScrollInvalidated(EventArgs e)
         {
             _scrollInvalidated?.Invoke(this, e);
+            _rowsPresenter?.RaiseScrollInvalidated(e);
         }
 
         internal IndexToValueTable<DataGridRowGroupInfo> RowGroupHeadersTable
@@ -1807,6 +1759,8 @@ namespace Avalonia.Controls
             get;
             private set;
         }
+
+        internal double VerticalOffset => _verticalOffset;
 
         internal int NoCurrentCellChangeCount
         {
@@ -5801,7 +5755,7 @@ namespace Avalonia.Controls
             return true;
         }
 
-        private void SetVerticalOffset(double newVerticalOffset)
+        internal void SetVerticalOffset(double newVerticalOffset)
         {
             _verticalOffset = newVerticalOffset;
             if (_vScrollBar != null && !MathUtilities.AreClose(newVerticalOffset, _vScrollBar.Value))

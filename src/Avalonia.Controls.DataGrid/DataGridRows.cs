@@ -131,6 +131,8 @@ namespace Avalonia.Controls
             }
         }
 
+        internal double EdgedRowsHeightCalculatedInternal => EdgedRowsHeightCalculated;
+
         /// <summary>
         /// Clears the entire selection. Displayed rows are deselected explicitly to visualize
         /// potential transition effects

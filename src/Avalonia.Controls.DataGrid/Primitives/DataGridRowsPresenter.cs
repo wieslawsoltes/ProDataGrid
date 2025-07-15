@@ -7,6 +7,7 @@ using System;
 using System.Diagnostics;
 
 using Avalonia.Input;
+using Avalonia.Controls;
 using Avalonia.Layout;
 using Avalonia.LogicalTree;
 using Avalonia.Media;
@@ -20,9 +21,10 @@ namespace Avalonia.Controls.Primitives
 #if !DATAGRID_INTERNAL
     public
 #endif
-    sealed class DataGridRowsPresenter : Panel, IChildIndexProvider
+    sealed class DataGridRowsPresenter : Panel, IChildIndexProvider, ILogicalScrollable
     {
         private EventHandler<ChildIndexChangedEventArgs>? _childIndexChanged;
+        private event EventHandler? _scrollInvalidated;
 
         public DataGridRowsPresenter()
         {
@@ -205,6 +207,54 @@ namespace Avalonia.Controls.Primitives
                 e.Handled = e.Handled || (OwningGrid?.UpdateScroll(-e.Delta) ?? false);
             }
         }
+
+        event EventHandler? ILogicalScrollable.ScrollInvalidated
+        {
+            add => _scrollInvalidated += value;
+            remove => _scrollInvalidated -= value;
+        }
+
+        bool ILogicalScrollable.CanHorizontallyScroll { get; set; } = true;
+
+        bool ILogicalScrollable.CanVerticallyScroll { get; set; } = true;
+
+        Vector IScrollable.Offset
+        {
+            get => OwningGrid != null ? new Vector(OwningGrid.HorizontalOffset, OwningGrid.VerticalOffset) : default;
+            set
+            {
+                if (OwningGrid != null)
+                {
+                    OwningGrid.UpdateHorizontalOffset(value.X);
+                    OwningGrid.SetVerticalOffset(value.Y);
+                }
+            }
+        }
+
+        bool ILogicalScrollable.IsLogicalScrollEnabled => true;
+
+        Size ILogicalScrollable.ScrollSize => new Size(16, OwningGrid?.RowHeightEstimate ?? 0);
+
+        Size ILogicalScrollable.PageScrollSize => OwningGrid != null ? new Size(OwningGrid.CellsWidth, OwningGrid.CellsEstimatedHeight) : default;
+
+        Size IScrollable.Extent => OwningGrid != null ? new Size(OwningGrid.ColumnsInternal.VisibleEdgedColumnsWidth, OwningGrid.EdgedRowsHeightCalculatedInternal) : default;
+
+        Size IScrollable.Viewport => OwningGrid != null ? new Size(OwningGrid.CellsWidth, OwningGrid.CellsEstimatedHeight) : default;
+
+        bool ILogicalScrollable.BringIntoView(Control target, Rect targetRect)
+        {
+            if (OwningGrid is null || target is null)
+                return false;
+
+            OwningGrid.ScrollIntoView(target.DataContext, OwningGrid.ColumnsInternal.FirstVisibleColumn);
+            return true;
+        }
+
+        Control? ILogicalScrollable.GetControlInDirection(NavigationDirection direction, Control? from) => null;
+
+        void ILogicalScrollable.RaiseScrollInvalidated(EventArgs e) => _scrollInvalidated?.Invoke(this, e);
+
+        internal void RaiseScrollInvalidated(EventArgs e) => _scrollInvalidated?.Invoke(this, e);
 
 #if DEBUG
         internal void PrintChildren()
