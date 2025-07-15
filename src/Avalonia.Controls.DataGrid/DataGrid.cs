@@ -2149,12 +2149,9 @@ namespace Avalonia.Controls
         {
             base.OnAttachedToVisualTree(e);
 
-            _useScrollViewerScrolling = IsHostedInScrollViewer();
-            if (_useScrollViewerScrolling)
-            {
-                HorizontalScrollBarVisibility = ScrollBarVisibility.Disabled;
-                VerticalScrollBarVisibility = ScrollBarVisibility.Disabled;
-            }
+            _useScrollViewerScrolling = true;
+            HorizontalScrollBarVisibility = ScrollBarVisibility.Disabled;
+            VerticalScrollBarVisibility = ScrollBarVisibility.Disabled;
 
             if (DataConnection.DataSource != null && !DataConnection.EventsWired)
             {
@@ -2163,19 +2160,6 @@ namespace Avalonia.Controls
             }
         }
 
-        private bool IsHostedInScrollViewer()
-        {
-            Visual? parent = this;
-            while ((parent = parent?.GetVisualParent()) != null)
-            {
-                if (parent is ScrollViewer)
-                {
-                    return true;
-                }
-            }
-
-            return false;
-        }
 
         protected override void OnDetachedFromVisualTree(VisualTreeAttachmentEventArgs e)
         {
