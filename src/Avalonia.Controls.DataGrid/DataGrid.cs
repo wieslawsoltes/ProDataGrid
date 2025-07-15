@@ -2195,16 +2195,32 @@ namespace Avalonia.Controls
         {
             base.OnAttachedToVisualTree(e);
 
-            // Use ScrollViewer for scrolling by default
-            _useScrollViewerScrolling = true;
-            HorizontalScrollBarVisibility = ScrollBarVisibility.Disabled;
-            VerticalScrollBarVisibility = ScrollBarVisibility.Disabled;
+            _useScrollViewerScrolling = IsHostedInScrollViewer();
+            if (_useScrollViewerScrolling)
+            {
+                HorizontalScrollBarVisibility = ScrollBarVisibility.Disabled;
+                VerticalScrollBarVisibility = ScrollBarVisibility.Disabled;
+            }
 
             if (DataConnection.DataSource != null && !DataConnection.EventsWired)
             {
                 DataConnection.WireEvents(DataConnection.DataSource);
                 InitializeElements(true /*recycleRows*/);
             }
+        }
+
+        private bool IsHostedInScrollViewer()
+        {
+            Visual? parent = this;
+            while ((parent = parent?.GetVisualParent()) != null)
+            {
+                if (parent is ScrollViewer)
+                {
+                    return true;
+                }
+            }
+
+            return false;
         }
 
         protected override void OnDetachedFromVisualTree(VisualTreeAttachmentEventArgs e)
