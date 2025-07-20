@@ -559,6 +559,10 @@ namespace Avalonia.Controls
             }
 
             Size desiredSize = base.MeasureOverride(availableSize);
+            if (Slot >= 0)
+            {
+                OwningGrid.UpdateCachedRowHeight(Slot, TargetHeight);
+            }
             return desiredSize.WithWidth(Math.Max(desiredSize.Width, OwningGrid.CellsWidth));
         }
 

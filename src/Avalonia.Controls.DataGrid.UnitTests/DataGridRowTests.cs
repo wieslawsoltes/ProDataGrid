@@ -91,6 +91,27 @@ public class DataGridRowTests
     }
 
     [AvaloniaFact]
+    public void Variable_Row_Heights_Virtualize_Correctly()
+    {
+        var items = Enumerable.Range(0, 100)
+            .Select(x => new Model($"Item {x}", x % 2 == 0 ? 20 : 40)).ToList();
+
+        var style = new Style(x => x.OfType<DataGridRow>())
+        {
+            Setters = { new Setter(DataGridRow.HeightProperty, new Binding("Height")) }
+        };
+
+        var target = CreateTarget(items, [style]);
+
+        Assert.Equal(0, GetFirstRealizedRowIndex(target));
+
+        target.ScrollIntoView(items[80], target.Columns[0]);
+        target.UpdateLayout();
+
+        Assert.Equal(80, GetLastRealizedRowIndex(target));
+    }
+
+    [AvaloniaFact]
     public void DataGridRow_Bounds_Match_DataGrid_When_Header_Present()
     {
         var items = Enumerable.Range(0, 100).Select(x => new Model($"Item {x}")).ToList();
@@ -192,8 +213,13 @@ public class DataGridRowTests
 
         private bool _isSelected;
         private string _name;
+        private double _height;
 
-        public Model(string name) => _name = name;
+        public Model(string name, double height = 30)
+        {
+            _name = name;
+            _height = height;
+        }
 
         public bool IsSelected 
         {
@@ -201,10 +227,16 @@ public class DataGridRowTests
             set => SetField(ref _isSelected, value);
         }
 
-        public string Name 
-        { 
+        public string Name
+        {
             get => _name;
             set => SetField(ref _name, value);
+        }
+
+        public double Height
+        {
+            get => _height;
+            set => SetField(ref _height, value);
         }
     }
 }

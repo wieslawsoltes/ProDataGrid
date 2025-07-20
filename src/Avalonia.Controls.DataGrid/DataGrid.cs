@@ -158,6 +158,11 @@ namespace Avalonia.Controls
         // set as the rows were scrolled off.
         private double _verticalOffset;
         private byte _verticalScrollChangesIgnored;
+
+        // Stores measured heights for each slot and cumulative sums used for
+        // fast lookup of the slot at a given vertical offset.
+        private readonly List<double> _rowHeightCache = new();
+        private readonly List<double> _rowHeightAccumulated = new();
         public event EventHandler<ScrollEventArgs> HorizontalScroll;
         public event EventHandler<ScrollEventArgs> VerticalScroll;
 
@@ -1800,6 +1805,83 @@ namespace Avalonia.Controls
         {
             get;
             private set;
+        }
+
+        private void ResetRowHeightCache()
+        {
+            _rowHeightCache.Clear();
+            _rowHeightAccumulated.Clear();
+        }
+
+        private void EnsureRowHeightSlot(int slot)
+        {
+            while (_rowHeightCache.Count <= slot)
+            {
+                double estimate = RowHeightEstimate;
+                _rowHeightCache.Add(double.NaN);
+                if (_rowHeightAccumulated.Count == 0)
+                {
+                    _rowHeightAccumulated.Add(estimate);
+                }
+                else
+                {
+                    _rowHeightAccumulated.Add(_rowHeightAccumulated[_rowHeightAccumulated.Count - 1] + estimate);
+                }
+            }
+        }
+
+        internal void UpdateCachedRowHeight(int slot, double height)
+        {
+            EnsureRowHeightSlot(slot);
+            double old = double.IsNaN(_rowHeightCache[slot]) ? RowHeightEstimate : _rowHeightCache[slot];
+            double diff = height - old;
+            _rowHeightCache[slot] = height;
+            for (int i = slot; i < _rowHeightAccumulated.Count; i++)
+            {
+                _rowHeightAccumulated[i] += diff;
+            }
+        }
+
+        private void InsertRowHeightPlaceholder(int slot, bool isCollapsed)
+        {
+            double estimate = isCollapsed ? 0 : RowHeightEstimate;
+            if (slot > _rowHeightCache.Count)
+            {
+                EnsureRowHeightSlot(slot);
+            }
+            _rowHeightCache.Insert(slot, double.NaN);
+            _rowHeightAccumulated.Insert(slot, slot == 0 ? estimate : _rowHeightAccumulated[slot - 1] + estimate);
+            for (int i = slot + 1; i < _rowHeightAccumulated.Count; i++)
+            {
+                _rowHeightAccumulated[i] += estimate;
+            }
+        }
+
+        private void RemoveRowHeightAt(int slot)
+        {
+            if (slot >= _rowHeightCache.Count)
+                return;
+            double old = double.IsNaN(_rowHeightCache[slot]) ? RowHeightEstimate : _rowHeightCache[slot];
+            _rowHeightCache.RemoveAt(slot);
+            _rowHeightAccumulated.RemoveAt(slot);
+            for (int i = slot; i < _rowHeightAccumulated.Count; i++)
+            {
+                _rowHeightAccumulated[i] -= old;
+            }
+        }
+
+        internal int GetSlotFromOffset(double offset)
+        {
+            if (_rowHeightAccumulated.Count < SlotCount)
+            {
+                EnsureRowHeightSlot(SlotCount - 1);
+            }
+            int index = _rowHeightAccumulated.BinarySearch(offset);
+            if (index < 0)
+            {
+                index = ~index;
+            }
+            return Math.Max(0, Math.Min(SlotCount - 1, index));
         }
 
         internal Size? RowsPresenterAvailableSize

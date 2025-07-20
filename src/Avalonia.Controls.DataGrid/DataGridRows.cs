@@ -1220,6 +1220,15 @@ namespace Avalonia.Controls
                 element.Measure(new Size(double.PositiveInfinity, double.PositiveInfinity));
                 AvailableSlotElementRoom -= element.DesiredSize.Height;
 
+                if (row != null)
+                {
+                    UpdateCachedRowHeight(slot, row.TargetHeight);
+                }
+                else if (groupHeader != null)
+                {
+                    UpdateCachedRowHeight(slot, groupHeader.DesiredSize.Height);
+                }
+
                 if (groupHeader != null)
                 {
                     _rowGroupHeightsByLevel[groupHeader.Level] = groupHeader.DesiredSize.Height;
@@ -1260,6 +1269,7 @@ namespace Avalonia.Controls
         {
             // Start from scratch and assume that we haven't estimated any rows
             _lastEstimatedRow = -1;
+            ResetRowHeightCache();
         }
 
         private void OnAddedElement_Phase1(int slot, Control element)
@@ -1370,6 +1380,8 @@ namespace Avalonia.Controls
             RowGroupHeadersTable.InsertIndex(slotInserted);
             _selectedItems.InsertIndex(slotInserted);
 
+            InsertRowHeightPlaceholder(slotInserted, isCollapsed);
+
             if (isCollapsed)
             {
                 _collapsedSlotsTable.InsertIndexAndValue(slotInserted, false);
@@ -1394,6 +1406,8 @@ namespace Avalonia.Controls
             {
                 VisibleSlotCount--;
             }
+
+            RemoveRowHeightAt(slotDeleted);
 
             // If we're deleting the focused row, we need to clear the cached value
             if (_focusedRow != null && _focusedRow.Slot == slotDeleted)
@@ -1724,12 +1738,9 @@ namespace Avalonia.Controls
                             if (height > 2 * CellsEstimatedHeight &&
                                 (RowDetailsVisibilityMode != DataGridRowDetailsVisibilityMode.VisibleWhenSelected || RowDetailsTemplate == null))
                             {
-                                // Very large scroll occurred. Instead of determining the exact number of scrolled off rows,
-                                // let's estimate the number based on RowHeight.
+                                // Very large scroll occurred. Use the cached row heights to determine the target slot.
                                 ResetDisplayedRows();
-                                double singleRowHeightEstimate = RowHeightEstimate + (RowDetailsVisibilityMode == DataGridRowDetailsVisibilityMode.Visible ? RowDetailsHeightEstimate : 0);
-                                int scrolledToSlot = newFirstScrollingSlot + (int)(height / singleRowHeightEstimate);
-                                scrolledToSlot += _collapsedSlotsTable.GetIndexCount(newFirstScrollingSlot, newFirstScrollingSlot + scrolledToSlot);
+                                int scrolledToSlot = GetSlotFromOffset(newVerticalOffset);
                                 newFirstScrollingSlot = Math.Min(GetNextVisibleSlot(scrolledToSlot), lastVisibleSlot);
                             }
                             else
@@ -1786,18 +1797,14 @@ namespace Avalonia.Controls
                         if (height < -2 * CellsEstimatedHeight &&
                             (RowDetailsVisibilityMode != DataGridRowDetailsVisibilityMode.VisibleWhenSelected || RowDetailsTemplate == null))
                         {
-                            // Very large scroll occurred. Instead of determining the exact number of scrolled off rows,
-                            // let's estimate the number based on RowHeight.
+                            // Very large scroll occurred. Use the cached row heights to determine the target slot.
                             if (newVerticalOffset == 0)
                             {
                                 newFirstScrollingSlot = 0;
                             }
                             else
                             {
-                                double singleRowHeightEstimate = RowHeightEstimate + (RowDetailsVisibilityMode == DataGridRowDetailsVisibilityMode.Visible ? RowDetailsHeightEstimate : 0);
-                                int scrolledToSlot = newFirstScrollingSlot + (int)(height / singleRowHeightEstimate);
-                                scrolledToSlot -= _collapsedSlotsTable.GetIndexCount(scrolledToSlot, newFirstScrollingSlot);
-
+                                int scrolledToSlot = GetSlotFromOffset(newVerticalOffset);
                                 newFirstScrollingSlot = Math.Max(0, GetPreviousVisibleSlot(scrolledToSlot + 1));
                             }
                             ResetDisplayedRows();
