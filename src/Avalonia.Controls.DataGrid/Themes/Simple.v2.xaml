@@ -1,0 +1,88 @@
+<!-- Copyright (c) Wiesław Šoltés. All rights reserved. -->
+<!-- Licensed under the MIT license. See LICENSE file in the project root for details. -->
+<Styles xmlns="https://github.com/avaloniaui" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+  <Styles.Resources>
+   <ResourceDictionary>
+    <StreamGeometry x:Key="DataGridSortIconDescendingPath">M1875 1011l-787 787v-1798h-128v1798l-787 -787l-90 90l941 941l941 -941z</StreamGeometry>
+    <StreamGeometry x:Key="DataGridSortIconAscendingPath">M1965 947l-941 -941l-941 941l90 90l787 -787v1798h128v-1798l787 787z</StreamGeometry>
+    <StreamGeometry x:Key="DataGridRowGroupHeaderIconClosedPath">M515 93l930 931l-930 931l90 90l1022 -1021l-1022 -1021z</StreamGeometry>
+    <StreamGeometry x:Key="DataGridRowGroupHeaderIconOpenedPath">M109 486 19 576 1024 1581 2029 576 1939 486 1024 1401z</StreamGeometry>
+
+    <!-- 
+    ========================================
+    DataGrid v2 Template - ScrollViewer Based (Simple Theme)
+    ========================================
+    This theme uses a ScrollViewer wrapping the DataGridRowsPresenter,
+    which implements ILogicalScrollable for proper virtualization.
+    
+    Key differences from v1:
+    - PART_VerticalScrollbar and PART_HorizontalScrollbar are removed
+    - ScrollViewer handles scrollbar display automatically
+    - DataGridRowsPresenter implements ILogicalScrollable
+    - Column headers scroll separately to stay synchronized
+    - Frozen columns are handled via clipping in DataGridRowsPresenter
+    -->
+
+    <!-- DataGrid v2 Theme with ScrollViewer integration -->
+    <!-- This overrides the default DataGrid theme from Simple.xaml -->
+    <ControlTheme x:Key="{x:Type DataGrid}" TargetType="DataGrid">
+      <Setter Property="RowBackground" Value="{DynamicResource ThemeAccentBrush4}" />
+      <Setter Property="Background" Value="{DynamicResource ThemeBackgroundBrush}" />
+      <Setter Property="HeadersVisibility" Value="Column" />
+      <Setter Property="HorizontalScrollBarVisibility" Value="Auto" />
+      <Setter Property="VerticalScrollBarVisibility" Value="Auto" />
+      <Setter Property="SelectionMode" Value="Extended" />
+      <Setter Property="HorizontalGridLinesBrush" Value="{DynamicResource ThemeBorderHighColor}" />
+      <Setter Property="VerticalGridLinesBrush" Value="{DynamicResource ThemeBorderHighColor}" />
+      <Setter Property="BorderBrush" Value="{DynamicResource ThemeBorderLowColor}" />
+      <Setter Property="BorderThickness" Value="{DynamicResource ThemeBorderThickness}" />
+      <Setter Property="UseLogicalScrollable" Value="True" />
+      <Setter Property="DropLocationIndicatorTemplate">
+        <Template>
+          <Rectangle Width="2"
+                     Fill="{DynamicResource ThemeBorderHighColor}" />
+        </Template>
+      </Setter>
+      <Setter Property="Template">
+        <ControlTemplate>
+          <Border x:Name="DataGridBorder"
+                  Background="{TemplateBinding Background}"
+                  BorderBrush="{TemplateBinding BorderBrush}"
+                  BorderThickness="{TemplateBinding BorderThickness}"
+                  CornerRadius="{TemplateBinding CornerRadius}">
+            <Grid RowDefinitions="Auto,*"
+                  ClipToBounds="True">
+              
+              <!-- Column Headers Row (stays fixed at top) -->
+              <Grid Grid.Row="0" 
+                    ColumnDefinitions="Auto,*">
+                <DataGridColumnHeader Name="PART_TopLeftCornerHeader"
+                                      Width="22" />
+                <DataGridColumnHeadersPresenter Name="PART_ColumnHeadersPresenter"
+                                                Grid.Column="1" />
+              </Grid>
+              
+              <Rectangle Name="PART_ColumnHeadersAndRowsSeparator"
+                         Grid.Row="0"
+                         VerticalAlignment="Bottom"
+                         Height="1"
+                         Fill="{DynamicResource ThemeControlMidHighBrush}"
+                         StrokeThickness="1" />
+
+              <!-- ScrollViewer wrapping the RowsPresenter -->
+              <ScrollViewer Name="PART_ScrollViewer"
+                            Grid.Row="1"
+                            HorizontalScrollBarVisibility="{TemplateBinding HorizontalScrollBarVisibility}"
+                            VerticalScrollBarVisibility="{TemplateBinding VerticalScrollBarVisibility}"
+                            IsScrollInertiaEnabled="{TemplateBinding IsScrollInertiaEnabled}"
+                            AllowAutoHide="True">
+                <DataGridRowsPresenter Name="PART_RowsPresenter" />
+              </ScrollViewer>
+            </Grid>
+          </Border>
+        </ControlTemplate>
+      </Setter>
+    </ControlTheme>
+   </ResourceDictionary>
+  </Styles.Resources>
+</Styles>

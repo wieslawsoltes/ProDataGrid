@@ -43,6 +43,7 @@ namespace Avalonia.Controls
     [TemplatePart(DATAGRID_elementFrozenColumnScrollBarSpacerName, typeof(Control))]
     [TemplatePart(DATAGRID_elementHorizontalScrollbarName,         typeof(ScrollBar))]
     [TemplatePart(DATAGRID_elementRowsPresenterName,               typeof(DataGridRowsPresenter))]
+    [TemplatePart(DATAGRID_elementScrollViewerName,                typeof(ScrollViewer))]
     [TemplatePart(DATAGRID_elementTopLeftCornerHeaderName,         typeof(ContentControl))]
     [TemplatePart(DATAGRID_elementTopRightCornerHeaderName,        typeof(ContentControl))]
     [TemplatePart(DATAGRID_elementVerticalScrollbarName,           typeof(ScrollBar))]
@@ -56,6 +57,7 @@ namespace Avalonia.Controls
         private const string DATAGRID_elementColumnHeadersPresenterName = "PART_ColumnHeadersPresenter";
         private const string DATAGRID_elementFrozenColumnScrollBarSpacerName = "PART_FrozenColumnScrollBarSpacer";
         private const string DATAGRID_elementHorizontalScrollbarName = "PART_HorizontalScrollbar";
+        private const string DATAGRID_elementScrollViewerName = "PART_ScrollViewer";
         private const string DATAGRID_elementTopLeftCornerHeaderName = "PART_TopLeftCornerHeader";
         private const string DATAGRID_elementTopRightCornerHeaderName = "PART_TopRightCornerHeader";
         private const string DATAGRID_elementBottomRightCornerHeaderName = "PART_BottomRightCorner";
@@ -96,6 +98,7 @@ namespace Avalonia.Controls
         private Visual _bottomRightCorner;
         private DataGridColumnHeadersPresenter _columnHeadersPresenter;
         private DataGridRowsPresenter _rowsPresenter;
+        private ScrollViewer _scrollViewer;
         private ScrollBar _vScrollBar;
         private ScrollBar _hScrollBar;
 
@@ -578,6 +581,35 @@ namespace Avalonia.Controls
         {
             get { return GetValue(VerticalScrollBarVisibilityProperty); }
             set { SetValue(VerticalScrollBarVisibilityProperty, value); }
+        }
+
+        /// <summary>
+        /// Defines the <see cref="UseLogicalScrollable"/> property.
+        /// </summary>
+        public static readonly StyledProperty<bool> UseLogicalScrollableProperty =
+            AvaloniaProperty.Register<DataGrid, bool>(
+                nameof(UseLogicalScrollable),
+                defaultValue: false);
+
+        /// <summary>
+        /// Gets or sets a value indicating whether the DataGrid should use the new ILogicalScrollable
+        /// implementation for scrolling. When true, the DataGridRowsPresenter participates in Avalonia's
+        /// standard scroll contract. When false (default), uses the legacy custom ScrollBar handling.
+        /// </summary>
+        /// <remarks>
+        /// This property is a feature flag for gradual migration to the new scrolling architecture.
+        /// Setting this to true enables:
+        /// - Standard ScrollViewer integration via ILogicalScrollable
+        /// - Improved scroll chaining support
+        /// - Better touch/inertia scrolling behavior
+        /// - Potential future support for scroll anchoring
+        /// 
+        /// Note: Theme updates may be required for full ScrollViewer integration.
+        /// </remarks>
+        public bool UseLogicalScrollable
+        {
+            get { return GetValue(UseLogicalScrollableProperty); }
+            set { SetValue(UseLogicalScrollableProperty, value); }
         }
 
         public static readonly StyledProperty<ITemplate<Control>> DropLocationIndicatorTemplateProperty =
@@ -1676,6 +1708,15 @@ namespace Avalonia.Controls
             }
         }
 
+        /// <summary>
+        /// Gets the horizontal scroll bar. This property is deprecated.
+        /// </summary>
+        /// <remarks>
+        /// When UseLogicalScrollable is true, scrolling is handled via ILogicalScrollable
+        /// on DataGridRowsPresenter and this property may return null or an unused ScrollBar.
+        /// Use the Offset property on DataGridRowsPresenter instead.
+        /// </remarks>
+        [Obsolete("Use DataGridRowsPresenter.Offset for scroll position. This property will be removed in a future version.")]
         internal ScrollBar HorizontalScrollBar => _hScrollBar;
 
         internal IndexToValueTable<DataGridRowGroupInfo> RowGroupHeadersTable
@@ -1802,6 +1843,38 @@ namespace Avalonia.Controls
             private set;
         }
 
+        /// <summary>
+        /// Gets the calculated total height of all rows (actual and estimated) for scroll extent.
+        /// </summary>
+        internal double GetEdgedRowsHeight()
+        {
+            return EdgedRowsHeightCalculated;
+        }
+
+        /// <summary>
+        /// Gets the current vertical scroll offset.
+        /// </summary>
+        internal double GetVerticalOffset()
+        {
+            return _verticalOffset;
+        }
+
+        /// <summary>
+        /// Gets the total width of all visible frozen columns.
+        /// </summary>
+        internal double GetVisibleFrozenColumnsWidth()
+        {
+            return ColumnsInternal.GetVisibleFrozenEdgedColumnsWidth();
+        }
+
+        /// <summary>
+        /// Gets the total width of all visible scrolling (non-frozen) columns.
+        /// </summary>
+        internal double GetVisibleScrollingColumnsWidth()
+        {
+            return ColumnsInternal.VisibleEdgedColumnsWidth - ColumnsInternal.GetVisibleFrozenEdgedColumnsWidth();
+        }
+
         internal Size? RowsPresenterAvailableSize
         {
             get
@@ -1872,7 +1945,25 @@ namespace Avalonia.Controls
             }
         }
 
+        /// <summary>
+        /// Gets the vertical scroll bar. This property is deprecated.
+        /// </summary>
+        /// <remarks>
+        /// When UseLogicalScrollable is true, scrolling is handled via ILogicalScrollable
+        /// on DataGridRowsPresenter and this property may return null or an unused ScrollBar.
+        /// Use the Offset property on DataGridRowsPresenter instead.
+        /// </remarks>
+        [Obsolete("Use DataGridRowsPresenter.Offset for scroll position. This property will be removed in a future version.")]
         internal ScrollBar VerticalScrollBar => _vScrollBar;
+
+        /// <summary>
+        /// Gets the ScrollViewer used in v2 themes (when UseLogicalScrollable is true).
+        /// </summary>
+        /// <remarks>
+        /// This ScrollViewer wraps the DataGridRowsPresenter and handles scrolling via
+        /// ILogicalScrollable. Only available when using v2 theme templates.
+        /// </remarks>
+        internal ScrollViewer ScrollViewer => _scrollViewer;
 
         internal int VisibleSlotCount
         {
@@ -2519,6 +2610,9 @@ namespace Avalonia.Controls
                 InvalidateRowHeightEstimate();
                 UpdateRowDetailsHeightEstimate();
             }
+
+            // Look for the ScrollViewer (used in v2 themes with ILogicalScrollable)
+            _scrollViewer = e.NameScope.Find<ScrollViewer>(DATAGRID_elementScrollViewerName);
 
             _frozenColumnScrollBarSpacer = e.NameScope.Find<Control>(DATAGRID_elementFrozenColumnScrollBarSpacerName);
 
@@ -3913,7 +4007,7 @@ namespace Avalonia.Controls
             }
         }
 
-        private void InvalidateColumnHeadersArrange()
+        internal void InvalidateColumnHeadersArrange()
         {
             if (_columnHeadersPresenter != null)
             {

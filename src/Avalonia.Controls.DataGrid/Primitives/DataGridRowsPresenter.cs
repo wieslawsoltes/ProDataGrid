@@ -10,6 +10,7 @@ using Avalonia.Input;
 using Avalonia.Layout;
 using Avalonia.LogicalTree;
 using Avalonia.Media;
+using Avalonia.VisualTree;
 
 namespace Avalonia.Controls.Primitives
 {
@@ -17,10 +18,14 @@ namespace Avalonia.Controls.Primitives
     /// Used within the template of a <see cref="T:Avalonia.Controls.DataGrid" /> to specify the
     /// location in the control's visual tree where the rows are to be added.
     /// </summary>
+    /// <remarks>
+    /// This is a partial class. The ILogicalScrollable implementation is in 
+    /// DataGridRowsPresenter.Scrollable.cs for clean separation of concerns.
+    /// </remarks>
 #if !DATAGRID_INTERNAL
     public
 #endif
-    sealed class DataGridRowsPresenter : Panel, IChildIndexProvider
+    sealed partial class DataGridRowsPresenter : Panel, IChildIndexProvider
     {
         private EventHandler<ChildIndexChangedEventArgs>? _childIndexChanged;
 
@@ -34,6 +39,8 @@ namespace Avalonia.Controls.Primitives
             get;
             set;
         }
+
+        #region IChildIndexProvider Implementation
 
         event EventHandler<ChildIndexChangedEventArgs>? IChildIndexProvider.ChildIndexChanged
         {
@@ -63,6 +70,8 @@ namespace Avalonia.Controls.Primitives
         {
             _childIndexChanged?.Invoke(this, new ChildIndexChangedEventArgs(row, row.Index));
         }
+
+        #endregion
 
         /// <summary>
         /// Arranges the content of the <see cref="T:Avalonia.Controls.Primitives.DataGridRowsPresenter" />.
@@ -194,6 +203,25 @@ namespace Avalonia.Controls.Primitives
             OwningGrid.AvailableSlotElementRoom = availableSize.Height - totalHeight;
 
             totalHeight = Math.Max(0, totalHeight);
+
+            // Update ILogicalScrollable extent and viewport
+            // For horizontal extent, we use total column width (frozen + scrolling)
+            // The horizontal offset only affects scrolling columns, but extent includes all
+            var extentHeight = OwningGrid.GetEdgedRowsHeight();
+            var frozenColumnsWidth = OwningGrid.GetVisibleFrozenColumnsWidth();
+            var scrollingColumnsWidth = OwningGrid.GetVisibleScrollingColumnsWidth();
+            
+            // Extent includes row headers + all columns
+            var extentWidth = headerWidth + frozenColumnsWidth + scrollingColumnsWidth;
+            var newExtent = new Size(extentWidth, extentHeight);
+            
+            // Viewport is the visible area
+            var newViewport = new Size(availableSize.Width, availableSize.Height);
+            
+            UpdateScrollInfo(newExtent, newViewport);
+            
+            // Sync our offset with the DataGrid's current offset
+            SyncOffset(OwningGrid.HorizontalOffset, OwningGrid.GetVerticalOffset());
 
             return new Size(totalCellsWidth + headerWidth, totalHeight);
         }
