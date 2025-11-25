@@ -1,6 +1,6 @@
 The MIT License (MIT)
 
-Copyright (c) Wiesław Šoltés
+Copyright (c) AvaloniaUI OÜ
 All Rights Reserved
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
