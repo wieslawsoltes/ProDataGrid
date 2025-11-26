@@ -11,12 +11,6 @@ namespace Avalonia.Controls
 {
     public partial class DataGrid
     {
-        /// <summary>
-        /// Scrolls the DataGrid vertically by the specified height.
-        /// Uses a two-phase approach: calculate target first, then rebuild display.
-        /// This eliminates jitter during scroll-up with variable row heights.
-        /// </summary>
-        /// <param name="height">The scroll delta (positive = down, negative = up).</param>
         private void ScrollSlotsByHeight(double height)
         {
             Debug.Assert(DisplayData.FirstScrollingSlot >= 0);
@@ -25,14 +19,253 @@ namespace Avalonia.Controls
             _scrollingByHeight = true;
             try
             {
+                double deltaY = 0;
+                int newFirstScrollingSlot = DisplayData.FirstScrollingSlot;
+                double newVerticalOffset = _verticalOffset + height;
                 if (height > 0)
                 {
-                    ScrollSlotsByHeightDown(height);
+                    // Scrolling Down
+                    int lastVisibleSlot = GetPreviousVisibleSlot(SlotCount);
+                    if (HasLegacyVerticalScrollBar && MathUtilities.LessThanOrClose(GetLegacyVerticalScrollMaximum(), newVerticalOffset))
+                    {
+                        // We've scrolled to the bottom of the ScrollBar, automatically place the user at the very bottom
+                        // of the DataGrid.  If this produces very odd behavior, evaluate the coping strategy used by
+                        // OnRowMeasure(Size).  For most data, this should be unnoticeable.
+                        ResetDisplayedRows();
+                        UpdateDisplayedRowsFromBottom(lastVisibleSlot);
+                        newFirstScrollingSlot = DisplayData.FirstScrollingSlot;
+                    }
+                    else
+                    {
+                        deltaY = GetSlotElementHeight(newFirstScrollingSlot) - NegVerticalOffset;
+                        if (MathUtilities.LessThan(height, deltaY))
+                        {
+                            // We've merely covered up more of the same row we're on
+                            NegVerticalOffset += height;
+                        }
+                        else
+                        {
+                            // Figure out what row we've scrolled down to and update the value for NegVerticalOffset
+                            NegVerticalOffset = 0;
+                            //
+                            if (height > 2 * CellsEstimatedHeight &&
+                            (RowDetailsVisibilityMode != DataGridRowDetailsVisibilityMode.VisibleWhenSelected || RowDetailsTemplate == null))
+                            {
+                                // Very large scroll occurred. Instead of determining the exact number of scrolled off rows,
+                                // let's estimate the number based on RowHeight.
+                                ResetDisplayedRows();
+                                
+                                var estimator = RowHeightEstimator;
+                                if (estimator != null)
+                                {
+                                    // Use the estimator's slot-at-offset calculation for better accuracy
+                                    int estimatedSlot = estimator.EstimateSlotAtOffset(_verticalOffset + height, SlotCount);
+                                    newFirstScrollingSlot = Math.Min(GetNextVisibleSlot(estimatedSlot), lastVisibleSlot);
+                                }
+                                else
+                                {
+                                    double singleRowHeightEstimate = RowHeightEstimate + (RowDetailsVisibilityMode == DataGridRowDetailsVisibilityMode.Visible ? RowDetailsHeightEstimate : 0);
+                                    int scrolledToSlot = newFirstScrollingSlot + (int)(height / singleRowHeightEstimate);
+                                    scrolledToSlot += _collapsedSlotsTable.GetIndexCount(newFirstScrollingSlot, newFirstScrollingSlot + scrolledToSlot);
+                                    newFirstScrollingSlot = Math.Min(GetNextVisibleSlot(scrolledToSlot), lastVisibleSlot);
+                                }
+                            }
+                            else
+                            {
+                                while (MathUtilities.LessThanOrClose(deltaY, height))
+                                {
+                                    if (newFirstScrollingSlot < lastVisibleSlot)
+                                    {
+                                        if (IsSlotVisible(newFirstScrollingSlot))
+                                        {
+                                            // Make the top row available for reuse
+                                            RemoveDisplayedElement(newFirstScrollingSlot, false /*wasDeleted*/, true /*updateSlotInformation*/);
+                                        }
+                                        newFirstScrollingSlot = GetNextVisibleSlot(newFirstScrollingSlot);
+                                    }
+                                    else
+                                    {
+                                        // We're being told to scroll beyond the last row, ignore the extra
+                                        NegVerticalOffset = 0;
+                                        break;
+                                    }
+
+                                    double rowHeight = GetExactSlotElementHeight(newFirstScrollingSlot);
+                                    double remainingHeight = height - deltaY;
+                                    if (MathUtilities.LessThanOrClose(rowHeight, remainingHeight))
+                                    {
+                                        deltaY += rowHeight;
+                                    }
+                                    else
+                                    {
+                                        NegVerticalOffset = remainingHeight;
+                                        break;
+                                    }
+                                }
+                            }
+                        }
+                    }
                 }
                 else
                 {
-                    ScrollSlotsByHeightUp(height);
+                    // Scrolling Up
+                    if (MathUtilities.GreaterThanOrClose(height + NegVerticalOffset, 0))
+                    {
+                        // We've merely exposing more of the row we're on
+                        NegVerticalOffset += height;
+                    }
+                    else
+                    {
+                        // Figure out what row we've scrolled up to and update the value for NegVerticalOffset
+                        deltaY = -NegVerticalOffset;
+                        NegVerticalOffset = 0;
+                        //
+
+                        if (height < -2 * CellsEstimatedHeight &&
+                        (RowDetailsVisibilityMode != DataGridRowDetailsVisibilityMode.VisibleWhenSelected || RowDetailsTemplate == null))
+                        {
+                            // Very large scroll occurred. Instead of determining the exact number of scrolled off rows,
+                            // let's estimate the number based on RowHeight.
+                            if (newVerticalOffset == 0)
+                            {
+                                newFirstScrollingSlot = 0;
+                            }
+                            else
+                            {
+                                var estimator = RowHeightEstimator;
+                                if (estimator != null)
+                                {
+                                    // Use the estimator's slot-at-offset calculation for better accuracy
+                                    int estimatedSlot = estimator.EstimateSlotAtOffset(newVerticalOffset, SlotCount);
+                                    newFirstScrollingSlot = Math.Max(0, GetNextVisibleSlot(estimatedSlot - 1));
+                                }
+                                else
+                                {
+                                    double singleRowHeightEstimate = RowHeightEstimate + (RowDetailsVisibilityMode == DataGridRowDetailsVisibilityMode.Visible ? RowDetailsHeightEstimate : 0);
+                                    int scrolledToSlot = newFirstScrollingSlot + (int)(height / singleRowHeightEstimate);
+                                    scrolledToSlot -= _collapsedSlotsTable.GetIndexCount(scrolledToSlot, newFirstScrollingSlot);
+
+                                    newFirstScrollingSlot = Math.Max(0, GetPreviousVisibleSlot(scrolledToSlot + 1));
+                                }
+                            }
+                            ResetDisplayedRows();
+                        }
+                        else
+                        {
+                            int lastScrollingSlot = DisplayData.LastScrollingSlot;
+                            while (MathUtilities.GreaterThan(deltaY, height))
+                            {
+                                if (newFirstScrollingSlot > 0)
+                                {
+                                    if (IsSlotVisible(lastScrollingSlot))
+                                    {
+                                        // Make the bottom row available for reuse
+                                        RemoveDisplayedElement(lastScrollingSlot, wasDeleted: false, updateSlotInformation: true);
+                                        lastScrollingSlot = GetPreviousVisibleSlot(lastScrollingSlot);
+                                    }
+                                    newFirstScrollingSlot = GetPreviousVisibleSlot(newFirstScrollingSlot);
+                                }
+                                else
+                                {
+                                    NegVerticalOffset = 0;
+                                    break;
+                                }
+                                
+                                double rowHeight = GetExactSlotElementHeight(newFirstScrollingSlot);
+                                double remainingHeight = height - deltaY;
+                                if (MathUtilities.LessThanOrClose(rowHeight + remainingHeight, 0))
+                                {
+                                    deltaY -= rowHeight;
+                                }
+                                else
+                                {
+                                    NegVerticalOffset = rowHeight + remainingHeight;
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                    if (MathUtilities.GreaterThanOrClose(0, newVerticalOffset) && newFirstScrollingSlot != 0)
+                    {
+                        // We've scrolled to the top of the ScrollBar, automatically place the user at the very top
+                        // of the DataGrid.  If this produces very odd behavior, evaluate the RowHeight estimate.
+                        // strategy. For most data, this should be unnoticeable.
+                        ResetDisplayedRows();
+                        NegVerticalOffset = 0;
+                        UpdateDisplayedRows(0, CellsEstimatedHeight);
+                        newFirstScrollingSlot = 0;
+                    }
                 }
+
+                double firstRowHeight = GetExactSlotElementHeight(newFirstScrollingSlot);
+                if (MathUtilities.LessThan(firstRowHeight, NegVerticalOffset))
+                {
+                    // We've scrolled off more of the first row than what's possible.  This can happen
+                    // if the first row got shorter (Ex: Collapsing RowDetails) or if the user has a recycling
+                    // cleanup issue.  In this case, simply try to display the next row as the first row instead
+                    if (newFirstScrollingSlot < SlotCount - 1)
+                    {
+                        newFirstScrollingSlot = GetNextVisibleSlot(newFirstScrollingSlot);
+                        Debug.Assert(newFirstScrollingSlot != -1);
+                    }
+                    NegVerticalOffset = 0;
+                }
+
+                UpdateDisplayedRows(newFirstScrollingSlot, CellsEstimatedHeight);
+
+                double firstElementHeight = GetExactSlotElementHeight(DisplayData.FirstScrollingSlot);
+                if (MathUtilities.GreaterThan(NegVerticalOffset, firstElementHeight))
+                {
+                    int firstElementSlot = DisplayData.FirstScrollingSlot;
+                    // We filled in some rows at the top and now we have a NegVerticalOffset that's greater than the first element
+                    while (newFirstScrollingSlot > 0 && MathUtilities.GreaterThan(NegVerticalOffset, firstElementHeight))
+                    {
+                        int previousSlot = GetPreviousVisibleSlot(firstElementSlot);
+                        if (previousSlot == -1)
+                        {
+                            NegVerticalOffset = 0;
+                            _verticalOffset = 0;
+                        }
+                        else
+                        {
+                            NegVerticalOffset -= firstElementHeight;
+                            _verticalOffset = Math.Max(0, _verticalOffset - firstElementHeight);
+                            firstElementSlot = previousSlot;
+                            firstElementHeight = GetExactSlotElementHeight(firstElementSlot);
+                        }
+                    }
+                    // We could be smarter about this, but it's not common so we wouldn't gain much from optimizing here
+                    if (firstElementSlot != DisplayData.FirstScrollingSlot)
+                    {
+                        UpdateDisplayedRows(firstElementSlot, CellsEstimatedHeight);
+                    }
+                }
+
+                Debug.Assert(DisplayData.FirstScrollingSlot >= 0);
+                Debug.Assert(GetExactSlotElementHeight(DisplayData.FirstScrollingSlot) > NegVerticalOffset);
+
+                if (DisplayData.FirstScrollingSlot == 0)
+                {
+                    _verticalOffset = NegVerticalOffset;
+                }
+                else if (MathUtilities.GreaterThan(NegVerticalOffset, newVerticalOffset))
+                {
+                    // The scrolled-in row was larger than anticipated. Adjust the DataGrid so the ScrollBar thumb
+                    // can stay in the same place
+                    NegVerticalOffset = newVerticalOffset;
+                    _verticalOffset = newVerticalOffset;
+                }
+                else
+                {
+                    _verticalOffset = newVerticalOffset;
+                }
+
+                Debug.Assert(!(_verticalOffset == 0 && NegVerticalOffset == 0 && DisplayData.FirstScrollingSlot > 0));
+
+                SetVerticalOffset(_verticalOffset);
+
+                Debug.Assert(MathUtilities.GreaterThanOrClose(NegVerticalOffset, 0));
+                Debug.Assert(MathUtilities.GreaterThanOrClose(_verticalOffset, NegVerticalOffset));
             }
             finally
             {
@@ -40,382 +273,6 @@ namespace Avalonia.Controls
             }
         }
 
-        /// <summary>
-        /// Handles scroll-down operations with smooth height estimation.
-        /// </summary>
-        private void ScrollSlotsByHeightDown(double height)
-        {
-            Debug.Assert(height > 0);
-            
-            int newFirstScrollingSlot = DisplayData.FirstScrollingSlot;
-            double newVerticalOffset = _verticalOffset + height;
-            int lastVisibleSlot = GetPreviousVisibleSlot(SlotCount);
 
-            // Check if we've scrolled to the bottom of the ScrollBar
-            if (HasLegacyVerticalScrollBar && MathUtilities.LessThanOrClose(GetLegacyVerticalScrollMaximum(), newVerticalOffset))
-            {
-                ResetDisplayedRows();
-                UpdateDisplayedRowsFromBottom(lastVisibleSlot);
-                newFirstScrollingSlot = DisplayData.FirstScrollingSlot;
-                _verticalOffset = newVerticalOffset;
-                SetVerticalOffset(_verticalOffset);
-                return;
-            }
-
-            // Calculate how much of the first row remains visible
-            double firstRowHeight = GetEstimatedSlotHeight(newFirstScrollingSlot);
-            double firstRowRemaining = firstRowHeight - NegVerticalOffset;
-
-            if (MathUtilities.LessThan(height, firstRowRemaining))
-            {
-                // Just covering more of the current first row
-                NegVerticalOffset += height;
-                _verticalOffset = newVerticalOffset;
-                SetVerticalOffset(_verticalOffset);
-                return;
-            }
-
-            // For large scrolls, use estimation
-            if (height > 2 * CellsEstimatedHeight &&
-                (RowDetailsVisibilityMode != DataGridRowDetailsVisibilityMode.VisibleWhenSelected || RowDetailsTemplate == null))
-            {
-                ScrollDownLargeDistance(height, newVerticalOffset, lastVisibleSlot);
-                return;
-            }
-
-            // Small scroll - calculate target using estimates, then realize
-            ScrollDownSmallDistance(height, newVerticalOffset, lastVisibleSlot);
-        }
-
-        /// <summary>
-        /// Handles large scroll-down distances using estimation.
-        /// </summary>
-        private void ScrollDownLargeDistance(double height, double newVerticalOffset, int lastVisibleSlot)
-        {
-            ResetDisplayedRows();
-            NegVerticalOffset = 0;
-
-            var estimator = RowHeightEstimator;
-            int newFirstScrollingSlot;
-            
-            if (estimator != null)
-            {
-                int estimatedSlot = estimator.EstimateSlotAtOffset(_verticalOffset + height, SlotCount);
-                newFirstScrollingSlot = Math.Min(GetNextVisibleSlot(estimatedSlot), lastVisibleSlot);
-            }
-            else
-            {
-                double singleRowHeightEstimate = RowHeightEstimate + 
-                    (RowDetailsVisibilityMode == DataGridRowDetailsVisibilityMode.Visible ? RowDetailsHeightEstimate : 0);
-                int scrolledToSlot = DisplayData.FirstScrollingSlot + (int)(height / singleRowHeightEstimate);
-                scrolledToSlot += _collapsedSlotsTable.GetIndexCount(DisplayData.FirstScrollingSlot, DisplayData.FirstScrollingSlot + scrolledToSlot);
-                newFirstScrollingSlot = Math.Min(GetNextVisibleSlot(scrolledToSlot), lastVisibleSlot);
-            }
-
-            UpdateDisplayedRows(newFirstScrollingSlot, CellsEstimatedHeight);
-            FinalizeScrollPosition(newVerticalOffset);
-        }
-
-        /// <summary>
-        /// Handles small scroll-down distances with precise calculation.
-        /// </summary>
-        private void ScrollDownSmallDistance(double height, double newVerticalOffset, int lastVisibleSlot)
-        {
-            int newFirstScrollingSlot = DisplayData.FirstScrollingSlot;
-            double deltaY = 0;
-            double targetNegOffset = 0;
-
-            // Phase 1: Calculate target slot using estimates (no state changes)
-            double firstRowHeight = GetEstimatedSlotHeight(newFirstScrollingSlot);
-            deltaY = firstRowHeight - NegVerticalOffset;
-            
-            if (MathUtilities.LessThan(height, deltaY))
-            {
-                // Just covering more of the current first row
-                NegVerticalOffset += height;
-                _verticalOffset = newVerticalOffset;
-                SetVerticalOffset(_verticalOffset);
-                return;
-            }
-
-            // Calculate which slot we'll end up on
-            while (MathUtilities.LessThanOrClose(deltaY, height))
-            {
-                if (newFirstScrollingSlot >= lastVisibleSlot)
-                {
-                    targetNegOffset = 0;
-                    break;
-                }
-
-                newFirstScrollingSlot = GetNextVisibleSlot(newFirstScrollingSlot);
-                if (newFirstScrollingSlot < 0 || newFirstScrollingSlot > lastVisibleSlot)
-                {
-                    newFirstScrollingSlot = lastVisibleSlot;
-                    targetNegOffset = 0;
-                    break;
-                }
-
-                double rowHeight = GetEstimatedSlotHeight(newFirstScrollingSlot);
-                double remainingHeight = height - deltaY;
-                
-                if (MathUtilities.LessThanOrClose(rowHeight, remainingHeight))
-                {
-                    deltaY += rowHeight;
-                }
-                else
-                {
-                    targetNegOffset = remainingHeight;
-                    break;
-                }
-            }
-
-            // Phase 2: Remove old rows from top and realize new slot
-            while (DisplayData.FirstScrollingSlot < newFirstScrollingSlot && DisplayData.FirstScrollingSlot >= 0)
-            {
-                if (IsSlotVisible(DisplayData.FirstScrollingSlot))
-                {
-                    RemoveDisplayedElement(DisplayData.FirstScrollingSlot, false, true);
-                }
-                else
-                {
-                    break;
-                }
-            }
-
-            // Phase 3: Ensure target slot is realized
-            if (!IsSlotVisible(newFirstScrollingSlot))
-            {
-                // Need to rebuild display from target
-                ResetDisplayedRows();
-            }
-            
-            UpdateDisplayedRows(newFirstScrollingSlot, CellsEstimatedHeight);
-
-            // Phase 4: Set NegVerticalOffset based on actual height
-            double actualHeight = GetExactSlotElementHeight(DisplayData.FirstScrollingSlot);
-            NegVerticalOffset = Math.Min(targetNegOffset, Math.Max(0, actualHeight - 1));
-
-            FinalizeScrollPosition(newVerticalOffset);
-        }
-
-        /// <summary>
-        /// Handles scroll-up operations with smooth height estimation.
-        /// Uses two-phase approach: calculate target first, then rebuild display.
-        /// </summary>
-        private void ScrollSlotsByHeightUp(double height)
-        {
-            Debug.Assert(height < 0);
-            
-            double newVerticalOffset = _verticalOffset + height;
-
-            // Check if we're just exposing more of the current first row
-            if (MathUtilities.GreaterThanOrClose(height + NegVerticalOffset, 0))
-            {
-                NegVerticalOffset += height;
-                _verticalOffset = newVerticalOffset;
-                SetVerticalOffset(_verticalOffset);
-                return;
-            }
-
-            // Check if we've scrolled to the top
-            if (MathUtilities.LessThanOrClose(newVerticalOffset, 0))
-            {
-                ResetDisplayedRows();
-                NegVerticalOffset = 0;
-                UpdateDisplayedRows(0, CellsEstimatedHeight);
-                _verticalOffset = NegVerticalOffset;
-                SetVerticalOffset(_verticalOffset);
-                return;
-            }
-
-            // For large scrolls, use estimation
-            if (height < -2 * CellsEstimatedHeight &&
-                (RowDetailsVisibilityMode != DataGridRowDetailsVisibilityMode.VisibleWhenSelected || RowDetailsTemplate == null))
-            {
-                ScrollUpLargeDistance(height, newVerticalOffset);
-                return;
-            }
-
-            // Small scroll - use two-phase approach
-            ScrollUpSmallDistance(height, newVerticalOffset);
-        }
-
-        /// <summary>
-        /// Handles large scroll-up distances using estimation.
-        /// </summary>
-        private void ScrollUpLargeDistance(double height, double newVerticalOffset)
-        {
-            int newFirstScrollingSlot;
-            
-            if (newVerticalOffset <= 0)
-            {
-                newFirstScrollingSlot = 0;
-            }
-            else
-            {
-                var estimator = RowHeightEstimator;
-                if (estimator != null)
-                {
-                    int estimatedSlot = estimator.EstimateSlotAtOffset(newVerticalOffset, SlotCount);
-                    newFirstScrollingSlot = Math.Max(0, GetNextVisibleSlot(estimatedSlot - 1));
-                }
-                else
-                {
-                    double singleRowHeightEstimate = RowHeightEstimate + 
-                        (RowDetailsVisibilityMode == DataGridRowDetailsVisibilityMode.Visible ? RowDetailsHeightEstimate : 0);
-                    int scrolledToSlot = DisplayData.FirstScrollingSlot + (int)(height / singleRowHeightEstimate);
-                    scrolledToSlot -= _collapsedSlotsTable.GetIndexCount(scrolledToSlot, DisplayData.FirstScrollingSlot);
-                    newFirstScrollingSlot = Math.Max(0, GetPreviousVisibleSlot(scrolledToSlot + 1));
-                }
-            }
-            
-            ResetDisplayedRows();
-            NegVerticalOffset = 0;
-            UpdateDisplayedRows(newFirstScrollingSlot, CellsEstimatedHeight);
-            FinalizeScrollPosition(newVerticalOffset);
-        }
-
-        /// <summary>
-        /// Handles small scroll-up distances using the two-phase approach.
-        /// Phase 1: Calculate target slot using estimates (no state modifications)
-        /// Phase 2: Reset display and rebuild from target
-        /// </summary>
-        private void ScrollUpSmallDistance(double height, double newVerticalOffset)
-        {
-            int currentFirstSlot = DisplayData.FirstScrollingSlot;
-            double currentNegOffset = NegVerticalOffset;
-            
-            // Phase 1: Calculate target using estimates only
-            double remainingScroll = -(height + currentNegOffset); // Make positive
-            int targetSlot = currentFirstSlot;
-            double targetNegOffset = 0;
-
-            while (MathUtilities.GreaterThan(remainingScroll, 0) && targetSlot > 0)
-            {
-                int prevSlot = GetPreviousVisibleSlot(targetSlot);
-                if (prevSlot < 0)
-                {
-                    targetSlot = 0;
-                    targetNegOffset = 0;
-                    break;
-                }
-
-                // Use estimate - no row realization here
-                double prevHeight = GetEstimatedSlotHeight(prevSlot);
-
-                if (MathUtilities.GreaterThanOrClose(prevHeight, remainingScroll))
-                {
-                    // This slot will be partially visible
-                    targetSlot = prevSlot;
-                    targetNegOffset = prevHeight - remainingScroll;
-                    break;
-                }
-
-                remainingScroll -= prevHeight;
-                targetSlot = prevSlot;
-            }
-
-            if (targetSlot <= 0)
-            {
-                targetSlot = 0;
-                targetNegOffset = 0;
-            }
-
-            // Phase 2: Reset display and rebuild from target
-            ResetDisplayedRows();
-            UpdateDisplayedRows(targetSlot, CellsEstimatedHeight);
-
-            // Phase 3: Set NegVerticalOffset based on actual measured height
-            if (DisplayData.FirstScrollingSlot == targetSlot)
-            {
-                double actualHeight = GetExactSlotElementHeight(DisplayData.FirstScrollingSlot);
-                NegVerticalOffset = Math.Min(targetNegOffset, Math.Max(0, actualHeight - 1));
-            }
-            else
-            {
-                // Display gave us a different slot - use 0 offset
-                NegVerticalOffset = 0;
-            }
-
-            FinalizeScrollPosition(newVerticalOffset);
-        }
-
-        /// <summary>
-        /// Finalizes the scroll position after display has been updated.
-        /// Handles edge cases and ensures consistency.
-        /// </summary>
-        private void FinalizeScrollPosition(double targetVerticalOffset)
-        {
-            // Ensure first row height is valid
-            double firstRowHeight = GetExactSlotElementHeight(DisplayData.FirstScrollingSlot);
-            
-            if (MathUtilities.LessThan(firstRowHeight, NegVerticalOffset))
-            {
-                // NegVerticalOffset is larger than the row - move to next row
-                if (DisplayData.FirstScrollingSlot < SlotCount - 1)
-                {
-                    int nextSlot = GetNextVisibleSlot(DisplayData.FirstScrollingSlot);
-                    if (nextSlot >= 0)
-                    {
-                        UpdateDisplayedRows(nextSlot, CellsEstimatedHeight);
-                    }
-                }
-                NegVerticalOffset = 0;
-            }
-
-            // Handle correction for NegVerticalOffset > firstElementHeight
-            double firstElementHeight = GetExactSlotElementHeight(DisplayData.FirstScrollingSlot);
-            if (MathUtilities.GreaterThan(NegVerticalOffset, firstElementHeight))
-            {
-                int firstElementSlot = DisplayData.FirstScrollingSlot;
-                while (DisplayData.FirstScrollingSlot > 0 && MathUtilities.GreaterThan(NegVerticalOffset, firstElementHeight))
-                {
-                    int previousSlot = GetPreviousVisibleSlot(firstElementSlot);
-                    if (previousSlot == -1)
-                    {
-                        NegVerticalOffset = 0;
-                        _verticalOffset = 0;
-                        break;
-                    }
-                    else
-                    {
-                        NegVerticalOffset -= firstElementHeight;
-                        _verticalOffset = Math.Max(0, _verticalOffset - firstElementHeight);
-                        firstElementSlot = previousSlot;
-                        firstElementHeight = GetExactSlotElementHeight(firstElementSlot);
-                    }
-                }
-                if (firstElementSlot != DisplayData.FirstScrollingSlot)
-                {
-                    UpdateDisplayedRows(firstElementSlot, CellsEstimatedHeight);
-                }
-            }
-
-            Debug.Assert(DisplayData.FirstScrollingSlot >= 0);
-            Debug.Assert(GetExactSlotElementHeight(DisplayData.FirstScrollingSlot) > NegVerticalOffset);
-
-            // Calculate final vertical offset
-            if (DisplayData.FirstScrollingSlot == 0)
-            {
-                _verticalOffset = NegVerticalOffset;
-            }
-            else if (MathUtilities.GreaterThan(NegVerticalOffset, targetVerticalOffset))
-            {
-                // The scrolled-in row was larger than anticipated
-                NegVerticalOffset = targetVerticalOffset;
-                _verticalOffset = targetVerticalOffset;
-            }
-            else
-            {
-                _verticalOffset = targetVerticalOffset;
-            }
-
-            Debug.Assert(!(_verticalOffset == 0 && NegVerticalOffset == 0 && DisplayData.FirstScrollingSlot > 0));
-
-            SetVerticalOffset(_verticalOffset);
-
-            Debug.Assert(MathUtilities.GreaterThanOrClose(NegVerticalOffset, 0));
-            Debug.Assert(MathUtilities.GreaterThanOrClose(_verticalOffset, NegVerticalOffset));
-        }
     }
 }
