@@ -93,24 +93,8 @@ namespace Avalonia.Controls
         }
 
 
-        private bool ProcessAKey(KeyEventArgs e)
-        {
-            KeyboardHelper.GetMetaKeyState(this, e.KeyModifiers, out bool ctrl, out bool shift, out bool alt);
-
-            if (ctrl && !shift && !alt && SelectionMode == DataGridSelectionMode.Extended)
-            {
-                SelectAll();
-                return true;
-            }
-            return false;
-        }
 
 
-        private bool ProcessTabKey(KeyEventArgs e)
-        {
-            KeyboardHelper.GetMetaKeyState(this, e.KeyModifiers, out bool ctrl, out bool shift);
-            return ProcessTabKey(e, shift, ctrl);
-        }
 
 
         private bool ProcessTabKey(KeyEventArgs e, bool shift, bool ctrl)
@@ -223,106 +207,10 @@ namespace Avalonia.Controls
         }
 
 
-        internal bool ProcessDownKey(KeyEventArgs e)
-        {
-            KeyboardHelper.GetMetaKeyState(this, e.KeyModifiers, out bool ctrl, out bool shift);
-            return ProcessDownKeyInternal(shift, ctrl);
-        }
 
 
-        private bool ProcessDownKeyInternal(bool shift, bool ctrl)
-        {
-            DataGridColumn dataGridColumn = ColumnsInternal.FirstVisibleColumn;
-            int firstVisibleColumnIndex = (dataGridColumn == null) ? -1 : dataGridColumn.Index;
-            int lastSlot = LastVisibleSlot;
-            if (firstVisibleColumnIndex == -1 || lastSlot == -1)
-            {
-                return false;
-            }
-
-            if (WaitForLostFocus(() => ProcessDownKeyInternal(shift, ctrl)))
-            {
-                return true;
-            }
-
-            int nextSlot = -1;
-            if (CurrentSlot != -1)
-            {
-                nextSlot = GetNextVisibleSlot(CurrentSlot);
-                if (nextSlot >= SlotCount)
-                {
-                    nextSlot = -1;
-                }
-            }
-
-            _noSelectionChangeCount++;
-            try
-            {
-                int desiredSlot;
-                int columnIndex;
-                DataGridSelectionAction action;
-                if (CurrentColumnIndex == -1)
-                {
-                    desiredSlot = FirstVisibleSlot;
-                    columnIndex = firstVisibleColumnIndex;
-                    action = DataGridSelectionAction.SelectCurrent;
-                }
-                else if (ctrl)
-                {
-                    if (shift)
-                    {
-                        // Both Ctrl and Shift
-                        desiredSlot = lastSlot;
-                        columnIndex = CurrentColumnIndex;
-                        action = (SelectionMode == DataGridSelectionMode.Extended)
-                            ? DataGridSelectionAction.SelectFromAnchorToCurrent
-                            : DataGridSelectionAction.SelectCurrent;
-                    }
-                    else
-                    {
-                        // Ctrl without Shift
-                        desiredSlot = lastSlot;
-                        columnIndex = CurrentColumnIndex;
-                        action = DataGridSelectionAction.SelectCurrent;
-                    }
-                }
-                else
-                {
-                    if (nextSlot == -1)
-                    {
-                        return true;
-                    }
-                    if (shift)
-                    {
-                        // Shift without Ctrl
-                        desiredSlot = nextSlot;
-                        columnIndex = CurrentColumnIndex;
-                        action = DataGridSelectionAction.SelectFromAnchorToCurrent;
-                    }
-                    else
-                    {
-                        // Neither Ctrl nor Shift
-                        desiredSlot = nextSlot;
-                        columnIndex = CurrentColumnIndex;
-                        action = DataGridSelectionAction.SelectCurrent;
-                    }
-                }
-
-                UpdateSelectionAndCurrency(columnIndex, desiredSlot, action, scrollIntoView: true);
-            }
-            finally
-            {
-                NoSelectionChangeCount--;
-            }
-            return _successfullyUpdatedSelection;
-        }
 
 
-        internal bool ProcessUpKey(KeyEventArgs e)
-        {
-            KeyboardHelper.GetMetaKeyState(this, e.KeyModifiers, out bool ctrl, out bool shift);
-            return ProcessUpKey(shift, ctrl);
-        }
 
 
         private bool ProcessUpKey(bool shift, bool ctrl)
@@ -405,11 +293,6 @@ namespace Avalonia.Controls
         }
 
 
-        internal bool ProcessLeftKey(KeyEventArgs e)
-        {
-            KeyboardHelper.GetMetaKeyState(this, e.KeyModifiers, out bool ctrl, out bool shift);
-            return ProcessLeftKey(shift, ctrl);
-        }
 
 
         private bool ProcessLeftKey(bool shift, bool ctrl)
@@ -481,11 +364,6 @@ namespace Avalonia.Controls
         }
 
 
-        internal bool ProcessRightKey(KeyEventArgs e)
-        {
-            KeyboardHelper.GetMetaKeyState(this, e.KeyModifiers, out bool ctrl, out bool shift);
-            return ProcessRightKey(shift, ctrl);
-        }
 
 
         private bool ProcessRightKey(bool shift, bool ctrl)
@@ -558,11 +436,6 @@ namespace Avalonia.Controls
         }
 
 
-        internal bool ProcessHomeKey(KeyEventArgs e)
-        {
-            KeyboardHelper.GetMetaKeyState(this, e.KeyModifiers, out bool ctrl, out bool shift);
-            return ProcessHomeKey(shift, ctrl);
-        }
 
 
         private bool ProcessHomeKey(bool shift, bool ctrl)
@@ -604,11 +477,6 @@ namespace Avalonia.Controls
         }
 
 
-        internal bool ProcessEndKey(KeyEventArgs e)
-        {
-            KeyboardHelper.GetMetaKeyState(this, e.KeyModifiers, out bool ctrl, out bool shift);
-            return ProcessEndKey(shift, ctrl);
-        }
 
 
         private bool ProcessEndKey(bool shift, bool ctrl)
@@ -651,11 +519,6 @@ namespace Avalonia.Controls
         }
 
 
-        internal bool ProcessEnterKey(KeyEventArgs e)
-        {
-            KeyboardHelper.GetMetaKeyState(this, e.KeyModifiers, out bool ctrl, out bool shift);
-            return ProcessEnterKey(shift, ctrl);
-        }
 
 
         private bool ProcessEnterKey(bool shift, bool ctrl)
@@ -700,34 +563,8 @@ namespace Avalonia.Controls
         }
 
 
-        private bool ProcessEscapeKey()
-        {
-            if (WaitForLostFocus(() => ProcessEscapeKey()))
-            {
-                return true;
-            }
-
-            if (_editingColumnIndex != -1)
-            {
-                // Revert the potential cell editing and exit cell editing.
-                EndCellEdit(DataGridEditAction.Cancel, exitEditingMode: true, keepFocus: true, raiseEvents: true);
-                return true;
-            }
-            else if (EditingRow != null)
-            {
-                // Revert the potential row editing and exit row editing.
-                EndRowEdit(DataGridEditAction.Cancel, exitEditingMode: true, raiseEvents: true);
-                return true;
-            }
-            return false;
-        }
 
 
-        internal bool ProcessNextKey(KeyEventArgs e)
-        {
-            KeyboardHelper.GetMetaKeyState(this, e.KeyModifiers, out bool ctrl, out bool shift);
-            return ProcessNextKey(shift, ctrl);
-        }
 
 
         private bool ProcessNextKey(bool shift, bool ctrl)
@@ -784,11 +621,6 @@ namespace Avalonia.Controls
         }
 
 
-        internal bool ProcessPriorKey(KeyEventArgs e)
-        {
-            KeyboardHelper.GetMetaKeyState(this, e.KeyModifiers, out bool ctrl, out bool shift);
-            return ProcessPriorKey(shift, ctrl);
-        }
 
 
         private bool ProcessPriorKey(bool shift, bool ctrl)
@@ -846,82 +678,10 @@ namespace Avalonia.Controls
         }
 
 
-        // Ctrl Left <==> Home
-        private bool ProcessLeftMost(int firstVisibleColumnIndex, int firstVisibleSlot)
-        {
-            _noSelectionChangeCount++;
-            try
-            {
-                int desiredSlot;
-                DataGridSelectionAction action;
-                if (CurrentColumnIndex == -1)
-                {
-                    desiredSlot = firstVisibleSlot;
-                    action = DataGridSelectionAction.SelectCurrent;
-                    Debug.Assert(_selectedItems.Count == 0);
-                }
-                else
-                {
-                    desiredSlot = CurrentSlot;
-                    action = DataGridSelectionAction.None;
-                }
-
-                UpdateSelectionAndCurrency(firstVisibleColumnIndex, desiredSlot, action, scrollIntoView: true);
-            }
-            finally
-            {
-                NoSelectionChangeCount--;
-            }
-            return _successfullyUpdatedSelection;
-        }
 
 
-        // Ctrl Right <==> End
-        private bool ProcessRightMost(int lastVisibleColumnIndex, int firstVisibleSlot)
-        {
-            _noSelectionChangeCount++;
-            try
-            {
-                int desiredSlot;
-                DataGridSelectionAction action;
-                if (CurrentColumnIndex == -1)
-                {
-                    desiredSlot = firstVisibleSlot;
-                    action = DataGridSelectionAction.SelectCurrent;
-                }
-                else
-                {
-                    desiredSlot = CurrentSlot;
-                    action = DataGridSelectionAction.None;
-                }
-
-                UpdateSelectionAndCurrency(lastVisibleColumnIndex, desiredSlot, action, scrollIntoView: true);
-            }
-            finally
-            {
-                NoSelectionChangeCount--;
-            }
-            return _successfullyUpdatedSelection;
-        }
 
 
-        private bool ProcessF2Key(KeyEventArgs e)
-        {
-            KeyboardHelper.GetMetaKeyState(this, e.KeyModifiers, out bool ctrl, out bool shift);
-
-            if (!shift && !ctrl &&
-                _editingColumnIndex == -1 && CurrentColumnIndex != -1 && GetRowSelection(CurrentSlot) &&
-                !GetColumnEffectiveReadOnlyState(CurrentColumn))
-            {
-                if (ScrollSlotIntoView(CurrentColumnIndex, CurrentSlot, forCurrentCellChange: false, forceHorizontalScroll: true))
-                {
-                    BeginCellEdit(e);
-                }
-                return true;
-            }
-
-            return false;
-        }
 
 
         private void DataGrid_KeyDown(object sender, KeyEventArgs e)
@@ -951,113 +711,9 @@ namespace Avalonia.Controls
         }
 
 
-        /// <summary>
-        /// Scrolls the DataGrid according to the direction of the delta.
-        /// </summary>
-        /// <param name="e">PointerWheelEventArgs</param>
-        protected override void OnPointerWheelChanged(PointerWheelEventArgs e)
-        {
-            var delta = e.Delta;
-            
-            // KeyModifiers.Shift should scroll in horizontal direction. This does not work on every platform. 
-            // If Shift-Key is pressed and X is close to 0 we swap the Vector.
-            if (e.KeyModifiers == KeyModifiers.Shift && MathUtilities.IsZero(delta.X))
-            {
-                delta = new Vector(delta.Y, delta.X);
-            }
-            
-            if(UpdateScroll(delta * DATAGRID_mouseWheelDelta))
-            {
-                e.Handled = true;
-            }
-            else
-            {
-                e.Handled = e.Handled || !ScrollViewer.GetIsScrollChainingEnabled(this);
-            }
-        }
 
 
-        internal bool UpdateScroll(Vector delta)
-        {
-            if (IsEnabled && DisplayData.NumDisplayedScrollingElements > 0)
-            {
-                var handled = false;
-                var ignoreInvalidate = false;
-                var scrollHeight = 0d;
 
-                // Vertical scroll handling
-                if (delta.Y > 0)
-                {
-                    scrollHeight = Math.Max(-_verticalOffset, -delta.Y);
-                }
-                else if (delta.Y < 0)
-                {
-                    if (HasLegacyVerticalScrollBar && VerticalScrollBarVisibility == ScrollBarVisibility.Visible)
-                    {
-                        scrollHeight = Math.Min(Math.Max(0, GetLegacyVerticalScrollMaximum() - _verticalOffset), -delta.Y);
-                    }
-                    else
-                    {
-                        double maximum = EdgedRowsHeightCalculated - CellsEstimatedHeight;
-                        scrollHeight = Math.Min(Math.Max(0, maximum - _verticalOffset), -delta.Y);
-                    }
-                }
-
-                if (scrollHeight != 0)
-                {
-                    // Accumulate scroll height to handle rapid scroll events
-                    DisplayData.PendingVerticalScrollHeight += scrollHeight;
-                    handled = true;
-                    
-                    var eventType = scrollHeight > 0 ? ScrollEventType.SmallIncrement : ScrollEventType.SmallDecrement;
-                    VerticalScroll?.Invoke(this, new ScrollEventArgs(eventType, scrollHeight));
-                }
-
-                // Horizontal scroll handling
-                if (delta.X != 0)
-                {
-                    var horizontalOffset = HorizontalOffset - delta.X;
-                    var widthNotVisible = Math.Max(0, ColumnsInternal.VisibleEdgedColumnsWidth - CellsWidth);
-
-                    if (horizontalOffset < 0)
-                    {
-                        horizontalOffset = 0;
-                    }
-                    if (horizontalOffset > widthNotVisible)
-                    {
-                        horizontalOffset = widthNotVisible;
-                    }
-
-                    if (UpdateHorizontalOffset(horizontalOffset))
-                    {
-                        // We don't need to invalidate once again after UpdateHorizontalOffset.
-                        ignoreInvalidate = true;
-                        handled = true;
-                        
-                        var eventType = horizontalOffset > 0 ? ScrollEventType.SmallIncrement : ScrollEventType.SmallDecrement;
-                        HorizontalScroll?.Invoke(this, new ScrollEventArgs(eventType, horizontalOffset));
-                    }
-                }
-
-                if (handled)
-                {
-                    if (!ignoreInvalidate)
-                    {
-                        InvalidateRowsMeasure(invalidateIndividualElements: false);
-                    }
-                    return true;
-                }
-            }
-
-            return false;
-        }
-
-        //TODO: Ensure left button is checked for
-        internal bool UpdateStateOnMouseLeftButtonDown(PointerPressedEventArgs pointerPressedEventArgs, int columnIndex, int slot, bool allowEdit)
-        {
-            KeyboardHelper.GetMetaKeyState(this, pointerPressedEventArgs.KeyModifiers, out bool ctrl, out bool shift);
-            return UpdateStateOnMouseLeftButtonDown(pointerPressedEventArgs, columnIndex, slot, allowEdit, shift, ctrl);
-        }
 
 
         //TODO: Ensure left button is checked for
@@ -1145,12 +801,6 @@ namespace Avalonia.Controls
         }
 
 
-        //TODO: Ensure right button is checked for
-        internal bool UpdateStateOnMouseRightButtonDown(PointerPressedEventArgs pointerPressedEventArgs, int columnIndex, int slot, bool allowEdit)
-        {
-            KeyboardHelper.GetMetaKeyState(this, pointerPressedEventArgs.KeyModifiers, out bool ctrl, out bool shift);
-            return UpdateStateOnMouseRightButtonDown(pointerPressedEventArgs, columnIndex, slot, allowEdit, shift, ctrl);
-        }
 
 
         //TODO: Ensure right button is checked for
@@ -1184,19 +834,8 @@ namespace Avalonia.Controls
         }
 
 
-        //TODO: Check
-        private void DataGrid_IsEnabledChanged(AvaloniaPropertyChangedEventArgs e)
-        {
-        }
 
 
-        /// <summary>
-        /// Raises the CellPointerPressed event.
-        /// </summary>
-        internal virtual void OnCellPointerPressed(DataGridCellPointerPressedEventArgs e)
-        {
-            CellPointerPressed?.Invoke(this, e);
-        }
 
         private Control _clickedElement;
 
