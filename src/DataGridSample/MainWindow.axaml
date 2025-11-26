@@ -3,11 +3,18 @@
         xmlns:local="clr-namespace:DataGridSample"
         x:Class="DataGridSample.MainWindow"
         Title="Avalonia DataGrid"
-        Width="800"
-        Height="600"
+        Width="1000"
+        Height="700"
         WindowStartupLocation="CenterScreen">
 
-  <local:DataGridPage Margin="8" />
+  <TabControl Margin="8">
+    <TabItem Header="DataGrid Samples">
+      <local:DataGridPage />
+    </TabItem>
+    <TabItem Header="Variable Height Scrolling">
+      <local:VariableHeightPage />
+    </TabItem>
+  </TabControl>
 
 </Window>
 

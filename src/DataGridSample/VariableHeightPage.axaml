@@ -1,0 +1,124 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:local="clr-namespace:DataGridSample"
+             xmlns:models="clr-namespace:DataGridSample.Models"
+             x:Class="DataGridSample.VariableHeightPage"
+             x:DataType="local:VariableHeightPage">
+  
+  <Grid RowDefinitions="Auto,Auto,*,Auto">
+    <!-- Header -->
+    <StackPanel Orientation="Vertical" Spacing="4" Grid.Row="0" Margin="0,0,0,8">
+      <TextBlock Classes="h2" Text="Variable Row Height Scrolling Test"/>
+      <TextBlock TextWrapping="Wrap" 
+                 Text="This page tests smooth scrolling accuracy with variable row heights. Each row has a random number of lines (1-10) causing different heights."/>
+    </StackPanel>
+
+    <!-- Controls -->
+    <StackPanel Grid.Row="1" Orientation="Horizontal" Spacing="12" Margin="0,0,0,8">
+      <StackPanel Orientation="Horizontal" Spacing="4">
+        <TextBlock Text="Item Count:" VerticalAlignment="Center"/>
+        <NumericUpDown x:Name="ItemCountUpDown" 
+                       Minimum="10" 
+                       Maximum="1000000" 
+                       Value="500" 
+                       Increment="100"
+                       Width="120"/>
+      </StackPanel>
+      
+      <StackPanel Orientation="Horizontal" Spacing="4">
+        <TextBlock Text="Seed:" VerticalAlignment="Center"/>
+        <NumericUpDown x:Name="SeedUpDown" 
+                       Minimum="1" 
+                       Maximum="9999" 
+                       Value="42" 
+                       Increment="1"
+                       Width="80"/>
+      </StackPanel>
+      
+      <Button x:Name="RegenerateButton" Content="Regenerate Items"/>
+      
+      <Separator/>
+      
+      <StackPanel Orientation="Horizontal" Spacing="4">
+        <TextBlock Text="Scroll To:" VerticalAlignment="Center"/>
+        <NumericUpDown x:Name="ScrollToIndexUpDown" 
+                       Minimum="0" 
+                       Maximum="9999" 
+                       Value="0" 
+                       Increment="10"
+                       Width="100"/>
+        <Button x:Name="ScrollToButton" Content="Scroll"/>
+      </StackPanel>
+    </StackPanel>
+
+    <!-- DataGrid with variable row heights -->
+    <DataGrid x:Name="VariableHeightDataGrid" 
+              Grid.Row="2"
+              CanUserResizeColumns="True" 
+              CanUserReorderColumns="True" 
+              CanUserSortColumns="True"
+              HeadersVisibility="All"
+              IsReadOnly="True"
+              RowBackground="#08000000"
+              GridLinesVisibility="Horizontal">
+      <DataGrid.Columns>
+        <!-- Fixed width ID column -->
+        <DataGridTextColumn Header="ID" 
+                            Binding="{Binding Id}" 
+                            Width="60"
+                            x:DataType="models:VariableHeightItem"/>
+        
+        <!-- Fixed width title column -->
+        <DataGridTextColumn Header="Title" 
+                            Binding="{Binding Title}" 
+                            Width="100"
+                            x:DataType="models:VariableHeightItem"/>
+        
+        <!-- Lines count for debugging -->
+        <DataGridTextColumn Header="Lines" 
+                            Binding="{Binding LineCount}" 
+                            Width="60"
+                            x:DataType="models:VariableHeightItem"/>
+        
+        <!-- Expected height for debugging -->
+        <DataGridTextColumn Header="Est. Height" 
+                            Binding="{Binding ExpectedHeight, StringFormat='{}{0:F0}'}" 
+                            Width="80"
+                            x:DataType="models:VariableHeightItem"/>
+        
+        <!-- Variable height description column using TemplateColumn -->
+        <DataGridTemplateColumn Header="Description (Variable Height)" 
+                                Width="*"
+                                x:DataType="models:VariableHeightItem">
+          <DataGridTemplateColumn.CellTemplate>
+            <DataTemplate x:DataType="models:VariableHeightItem">
+              <Border Padding="4" Background="Transparent">
+                <TextBlock Text="{Binding Description}" 
+                           TextWrapping="Wrap"
+                           VerticalAlignment="Top"/>
+              </Border>
+            </DataTemplate>
+          </DataGridTemplateColumn.CellTemplate>
+        </DataGridTemplateColumn>
+      </DataGrid.Columns>
+      
+      <DataGrid.Styles>
+        <Style Selector="DataGridRow">
+          <Setter Property="Header" Value="{Binding $self.Index}"/>
+        </Style>
+      </DataGrid.Styles>
+    </DataGrid>
+
+    <!-- Status bar -->
+    <Border Grid.Row="3" 
+            Background="#20000000" 
+            Padding="8,4"
+            Margin="0,8,0,0">
+      <StackPanel Orientation="Horizontal" Spacing="20">
+        <TextBlock x:Name="ItemCountText" Text="Items: 0"/>
+        <TextBlock x:Name="ScrollInfoText" Text="Scroll Position: N/A"/>
+        <TextBlock x:Name="VisibleRangeText" Text="Visible Range: N/A"/>
+      </StackPanel>
+    </Border>
+  </Grid>
+</UserControl>
