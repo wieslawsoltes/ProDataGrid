@@ -3877,14 +3877,11 @@ namespace Avalonia.Controls
             }
 
             if (_bottomRightCorner != null)
-            {
-                // Show the BottomRightCorner when both scrollbars are visible.
+            {                // Show the BottomRightCorner when both scrollbars are visible.
                 _bottomRightCorner.IsVisible =
                     _hScrollBar != null && _hScrollBar.IsVisible &&
                     _vScrollBar != null && _vScrollBar.IsVisible;
             }
-
-            DisplayData.FullyRecycleElements();
         }
 
         /// <summary>
@@ -5660,7 +5657,6 @@ namespace Avalonia.Controls
                 // Unload the old editing row if it's off screen
                 EditingRow.Clip = null;
                 UnloadRow(EditingRow);
-                DisplayData.FullyRecycleElements();
             }
             EditingRow = null;
         }
@@ -5674,7 +5670,6 @@ namespace Avalonia.Controls
                 // Unload the old focused row if it's off screen
                 _focusedRow.Clip = null;
                 UnloadRow(_focusedRow);
-                DisplayData.FullyRecycleElements();
             }
             _focusedRow = null;
         }

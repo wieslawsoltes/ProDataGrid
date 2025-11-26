@@ -569,7 +569,7 @@ namespace Avalonia.Controls.Primitives
                 return;
 
             // Get or create a row from the recycling pool
-            var row = OwningGrid.DisplayData.GetUsedRow();
+            var row = OwningGrid.DisplayData.GetRecycledRow();
             if (row == null)
             {
                 // If no recycled row available, we'll let normal realization handle it
@@ -587,14 +587,14 @@ namespace Avalonia.Controls.Primitives
                     {
                         // Configure the row but keep it in recyclable state
                         // It will be properly added when it scrolls into view
-                        OwningGrid.DisplayData.AddRecyclableRow(row);
+                        OwningGrid.DisplayData.RecycleRow(row);
                     }
                 }
             }
             catch
             {
                 // If preparation fails, just recycle the row back
-                OwningGrid.DisplayData.AddRecyclableRow(row);
+                OwningGrid.DisplayData.RecycleRow(row);
             }
         }
 

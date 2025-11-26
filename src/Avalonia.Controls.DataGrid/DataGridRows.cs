@@ -1027,7 +1027,7 @@ namespace Avalonia.Controls
             DataGridRow dataGridRow = GetGeneratedRow(dataContext);
             if (dataGridRow == null)
             {
-                dataGridRow = DisplayData.GetUsedRow() ?? new DataGridRow();
+                dataGridRow = DisplayData.GetRecycledRow() ?? new DataGridRow();
                 dataGridRow.Index = rowIndex;
                 dataGridRow.Slot = slot;
                 dataGridRow.OwningGrid = this;
@@ -1558,7 +1558,7 @@ namespace Avalonia.Controls
             else if (element is DataGridRowGroupHeader groupHeader)
             {
                 OnUnloadingRowGroup(new DataGridRowGroupHeaderEventArgs(groupHeader));
-                DisplayData.AddRecylableRowGroupHeader(groupHeader);
+                DisplayData.RecycleGroupHeader(groupHeader);
             }
             else if (_rowsPresenter != null)
             {
@@ -1921,8 +1921,6 @@ namespace Avalonia.Controls
 
                 SetVerticalOffset(_verticalOffset);
 
-                DisplayData.FullyRecycleElements();
-
                 Debug.Assert(MathUtilities.GreaterThanOrClose(NegVerticalOffset, 0));
                 Debug.Assert(MathUtilities.GreaterThanOrClose(_verticalOffset, NegVerticalOffset));
             }
@@ -2043,7 +2041,7 @@ namespace Avalonia.Controls
 
             if (recycleRow)
             {
-                DisplayData.AddRecyclableRow(dataGridRow);
+                DisplayData.RecycleRow(dataGridRow);
             }
             else
             {
@@ -2764,7 +2762,7 @@ namespace Avalonia.Controls
             Debug.Assert(slot > -1);
             Debug.Assert(rowGroupInfo != null);
 
-            DataGridRowGroupHeader groupHeader = DisplayData.GetUsedGroupHeader() ?? new DataGridRowGroupHeader();
+            DataGridRowGroupHeader groupHeader = DisplayData.GetRecycledGroupHeader() ?? new DataGridRowGroupHeader();
             groupHeader.OwningGrid = this;
             groupHeader.RowGroupInfo = rowGroupInfo;
             groupHeader.DataContext = rowGroupInfo.CollectionViewGroup;

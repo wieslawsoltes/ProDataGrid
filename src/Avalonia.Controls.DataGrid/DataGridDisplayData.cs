@@ -12,153 +12,205 @@ namespace Avalonia.Controls
 {
     internal class DataGridDisplayData
     {
-        private Stack<DataGridRow> _fullyRecycledRows; // list of Rows that have been fully recycled (Collapsed)
-        private int _headScrollingElements; // index of the row in _scrollingRows that is the first displayed row
-        private DataGrid _owner;
-        private Stack<DataGridRow> _recyclableRows; // list of Rows which have not been fully recycled (avoids Measure in several cases)
-        private List<Control> _scrollingElements; // circular list of displayed elements
-        private Stack<DataGridRowGroupHeader> _fullyRecycledGroupHeaders; // list of GroupHeaders that have been fully recycled (Collapsed)
-        private Stack<DataGridRowGroupHeader> _recyclableGroupHeaders; // list of GroupHeaders which have not been fully recycled (avoids Measure in several cases)
+        private readonly Stack<DataGridRow> _recycledRows;
+        private readonly Stack<DataGridRowGroupHeader> _recycledGroupHeaders;
+        private readonly List<Control> _scrollingElements;
+        private readonly DataGrid _owner;
+        private int _headScrollingElements;
 
         public DataGridDisplayData(DataGrid owner)
         {
             _owner = owner;
+            _scrollingElements = new List<Control>();
+            _recycledRows = new Stack<DataGridRow>();
+            _recycledGroupHeaders = new Stack<DataGridRowGroupHeader>();
 
             ResetSlotIndexes();
             FirstDisplayedScrollingCol = -1;
             LastTotallyDisplayedScrollingCol = -1;
-
-            _scrollingElements = new List<Control>();
-            _recyclableRows = new Stack<DataGridRow>();
-            _fullyRecycledRows = new Stack<DataGridRow>();
-            _recyclableGroupHeaders = new Stack<DataGridRowGroupHeader>();
-            _fullyRecycledGroupHeaders = new Stack<DataGridRowGroupHeader>();
         }
 
-        public int FirstDisplayedScrollingCol
-        {
-            get;
-            set;
-        }
+        #region Properties
 
-        public int FirstScrollingSlot
-        {
-            get;
-            set;
-        }
+        public int FirstDisplayedScrollingCol { get; set; }
 
-        public int LastScrollingSlot
-        {
-            get;
-            set;
-        }
+        public int FirstScrollingSlot { get; set; }
 
-        public int LastTotallyDisplayedScrollingCol
-        {
-            get;
-            set;
-        }
+        public int LastScrollingSlot { get; set; }
 
-        public int NumDisplayedScrollingElements
-        {
-            get
-            {
-                return _scrollingElements.Count;
-            }
-        }
+        public int LastTotallyDisplayedScrollingCol { get; set; }
 
-        public int NumTotallyDisplayedScrollingElements
-        {
-            get;
-            set;
-        }
+        public int NumDisplayedScrollingElements => _scrollingElements.Count;
 
-        internal double PendingVerticalScrollHeight
-        {
-            get;
-            set;
-        }
+        public int NumTotallyDisplayedScrollingElements { get; set; }
 
-        internal void AddRecyclableRow(DataGridRow row)
+        internal double PendingVerticalScrollHeight { get; set; }
+
+        #endregion
+
+        #region Row Recycling
+
+        internal void RecycleRow(DataGridRow row)
         {
-            Debug.Assert(!_recyclableRows.Contains(row));
+            Debug.Assert(row != null);
             row.DetachFromDataGrid(true);
-            // Hide the row immediately to prevent ghost rows during scrolling
-            row.SetCurrentValue(Visual.IsVisibleProperty, false);
-            Debug.Assert(!_fullyRecycledRows.Contains(row));
-            _fullyRecycledRows.Push(row);
+            HideElement(row);
+            PushToRecyclePool(_recycledRows, row);
         }
 
-        internal DataGridRowGroupHeader? GetUsedGroupHeader()
+        internal DataGridRow? GetRecycledRow()
         {
-            // Note: _recyclableGroupHeaders should always be empty since we now add directly to _fullyRecycledGroupHeaders
-            if (_recyclableGroupHeaders.Count > 0)
-            {
-                DataGridRowGroupHeader groupHeader = _recyclableGroupHeaders.Pop();
-                groupHeader.ClearValue(Visual.IsVisibleProperty);
-                return groupHeader;
-            }
-            else if (_fullyRecycledGroupHeaders.Count > 0)
-            {
-                // For fully recycled rows, we need to set the Visibility back to Visible
-                DataGridRowGroupHeader groupHeader = _fullyRecycledGroupHeaders.Pop();
-                groupHeader.ClearValue(Visual.IsVisibleProperty);
-                return groupHeader;
-            }
-            return null;
+            return PopFromRecyclePool(_recycledRows, RestoreElementVisibility);
         }
 
-        internal void AddRecylableRowGroupHeader(DataGridRowGroupHeader groupHeader)
+        #endregion
+
+        #region Group Header Recycling
+
+        internal void RecycleGroupHeader(DataGridRowGroupHeader groupHeader)
         {
-            Debug.Assert(!_recyclableGroupHeaders.Contains(groupHeader));
+            Debug.Assert(groupHeader != null);
             groupHeader.IsRecycled = true;
-            // Hide the group header immediately to prevent ghost headers during scrolling
-            groupHeader.SetCurrentValue(Visual.IsVisibleProperty, false);
-            Debug.Assert(!_fullyRecycledGroupHeaders.Contains(groupHeader));
-            _fullyRecycledGroupHeaders.Push(groupHeader);
+            HideElement(groupHeader);
+            PushToRecyclePool(_recycledGroupHeaders, groupHeader);
         }
+
+        internal DataGridRowGroupHeader? GetRecycledGroupHeader()
+        {
+            return PopFromRecyclePool(_recycledGroupHeaders, RestoreElementVisibility);
+        }
+
+        #endregion
+
+        #region Element Management
 
         internal void ClearElements(bool recycle)
         {
             ResetSlotIndexes();
+            
             if (recycle)
             {
-                foreach (Control element in _scrollingElements)
+                RecycleAllScrollingElements();
+            }
+            else
+            {
+                _recycledRows.Clear();
+                _recycledGroupHeaders.Clear();
+            }
+            
+            _scrollingElements.Clear();
+        }
+
+        private void RecycleAllScrollingElements()
+        {
+            foreach (Control element in _scrollingElements)
+            {
+                switch (element)
                 {
-                    if (element is DataGridRow row)
-                    {
-                        // Always hide the row immediately to prevent ghost rows during fast scrolling
-                        row.SetCurrentValue(Visual.IsVisibleProperty, false);
-                        
+                    case DataGridRow row:
+                        HideElement(row);
                         if (row.IsRecyclable)
                         {
                             row.DetachFromDataGrid(true);
-                            Debug.Assert(!_fullyRecycledRows.Contains(row));
-                            _fullyRecycledRows.Push(row);
+                            PushToRecyclePool(_recycledRows, row);
                         }
                         else
                         {
                             row.Clip = new RectangleGeometry();
                         }
-                    }
-                    else if (element is DataGridRowGroupHeader groupHeader)
-                    {
-                        // Hide the group header immediately to prevent ghost headers during fast scrolling
-                        groupHeader.SetCurrentValue(Visual.IsVisibleProperty, false);
+                        break;
+                        
+                    case DataGridRowGroupHeader groupHeader:
+                        HideElement(groupHeader);
                         groupHeader.IsRecycled = true;
-                        Debug.Assert(!_fullyRecycledGroupHeaders.Contains(groupHeader));
-                        _fullyRecycledGroupHeaders.Push(groupHeader);
-                    }
+                        PushToRecyclePool(_recycledGroupHeaders, groupHeader);
+                        break;
                 }
             }
-            else
+        }
+
+        internal Control GetDisplayedElement(int slot)
+        {
+            Debug.Assert(slot >= FirstScrollingSlot);
+            Debug.Assert(slot <= LastScrollingSlot);
+            return _scrollingElements[GetCircularListIndex(slot, wrap: true)];
+        }
+
+        internal DataGridRow? GetDisplayedRow(int rowIndex)
+        {
+            return GetDisplayedElement(_owner.SlotFromRowIndex(rowIndex)) as DataGridRow;
+        }
+
+        internal IEnumerable<Control> GetScrollingElements(Predicate<object>? filter = null)
+        {
+            for (int i = 0; i < _scrollingElements.Count; i++)
             {
-                _recyclableRows.Clear();
-                _fullyRecycledRows.Clear();
-                _recyclableGroupHeaders.Clear();
-                _fullyRecycledGroupHeaders.Clear();
+                Control element = _scrollingElements[(_headScrollingElements + i) % _scrollingElements.Count];
+                if (filter == null || filter(element))
+                {
+                    yield return element;
+                }
             }
-            _scrollingElements.Clear();
+        }
+
+        internal IEnumerable<Control> GetScrollingRows()
+        {
+            return GetScrollingElements(element => element is DataGridRow);
+        }
+
+        #endregion
+
+        #region Slot Management
+
+        internal void LoadScrollingSlot(int slot, Control element, bool updateSlotInformation)
+        {
+            if (_scrollingElements.Count == 0)
+            {
+                SetScrollingSlots(slot);
+                _scrollingElements.Add(element);
+                return;
+            }
+
+            Debug.Assert(slot >= _owner.GetPreviousVisibleSlot(FirstScrollingSlot) && 
+                         slot <= _owner.GetNextVisibleSlot(LastScrollingSlot));
+            
+            if (updateSlotInformation)
+            {
+                if (slot < FirstScrollingSlot)
+                {
+                    FirstScrollingSlot = slot;
+                }
+                else
+                {
+                    LastScrollingSlot = _owner.GetNextVisibleSlot(LastScrollingSlot);
+                }
+            }
+            
+            int insertIndex = GetCircularListIndex(slot, wrap: false);
+            if (insertIndex > _scrollingElements.Count)
+            {
+                insertIndex -= _scrollingElements.Count;
+                _headScrollingElements++;
+            }
+            _scrollingElements.Insert(insertIndex, element);
+        }
+
+        internal void UnloadScrollingElement(int slot, bool updateSlotInformation, bool wasDeleted)
+        {
+            Debug.Assert(_owner.IsSlotVisible(slot));
+            
+            int elementIndex = GetCircularListIndex(slot, wrap: false);
+            if (elementIndex > _scrollingElements.Count)
+            {
+                elementIndex -= _scrollingElements.Count;
+                _headScrollingElements--;
+            }
+            _scrollingElements.RemoveAt(elementIndex);
+
+            if (updateSlotInformation)
+            {
+                UpdateSlotIndexesAfterUnload(slot, wasDeleted);
+            }
         }
 
         internal void CorrectSlotsAfterDeletion(int slot, bool wasCollapsed)
@@ -172,10 +224,9 @@ namespace Avalonia.Controls
             }
             else if (_owner.IsSlotVisible(slot))
             {
-                UnloadScrollingElement(slot, true /*updateSlotInformation*/, true /*wasDeleted*/);
+                UnloadScrollingElement(slot, updateSlotInformation: true, wasDeleted: true);
             }
-            // This cannot be an else condition because if there are 2 rows left, and you delete the first one
-            // then these indexes need to be updated as well
+            
             if (slot < FirstScrollingSlot)
             {
                 FirstScrollingSlot--;
@@ -187,136 +238,55 @@ namespace Avalonia.Controls
         {
             if (slot < FirstScrollingSlot)
             {
-                // The row was inserted above our viewport, just update our indexes
                 FirstScrollingSlot++;
                 LastScrollingSlot++;
             }
-            else if (isCollapsed && (slot <= LastScrollingSlot))
+            else if (isCollapsed && slot <= LastScrollingSlot)
             {
                 LastScrollingSlot++;
             }
-            else if ((_owner.GetPreviousVisibleSlot(slot) <= LastScrollingSlot) || (LastScrollingSlot == -1))
+            else if (_owner.GetPreviousVisibleSlot(slot) <= LastScrollingSlot || LastScrollingSlot == -1)
             {
-                // The row was inserted in our viewport, add it as a scrolling row
-                LoadScrollingSlot(slot, element, true /*updateSlotInformation*/);
+                LoadScrollingSlot(slot, element, updateSlotInformation: true);
             }
         }
 
-        private int GetCircularListIndex(int slot, bool wrap)
+        #endregion
+
+        #region Private Helpers
+
+        private static void HideElement(Control element)
         {
-            int index = slot - FirstScrollingSlot - _headScrollingElements - _owner.GetCollapsedSlotCount(FirstScrollingSlot, slot);
-            return wrap ? index % _scrollingElements.Count : index;
+            element.SetCurrentValue(Visual.IsVisibleProperty, false);
         }
 
-        internal void FullyRecycleElements()
+        private static void RestoreElementVisibility(Control element)
         {
-            // Fully recycle Recyclable rows and transfer them to Recycled rows
-            while (_recyclableRows.Count > 0)
+            element.ClearValue(Visual.IsVisibleProperty);
+        }
+
+        private static void PushToRecyclePool<T>(Stack<T> pool, T element) where T : Control
+        {
+            Debug.Assert(!pool.Contains(element));
+            pool.Push(element);
+        }
+
+        private static T? PopFromRecyclePool<T>(Stack<T> pool, Action<T>? onPop = null) where T : Control
+        {
+            if (pool.Count > 0)
             {
-                DataGridRow row = _recyclableRows.Pop();
-                row.SetCurrentValue(Visual.IsVisibleProperty, false);
-                Debug.Assert(!_fullyRecycledRows.Contains(row));
-                _fullyRecycledRows.Push(row);
-            }
-            // Fully recycle Recyclable GroupHeaders and transfer them to Recycled GroupHeaders
-            while (_recyclableGroupHeaders.Count > 0)
-            {
-                DataGridRowGroupHeader groupHeader = _recyclableGroupHeaders.Pop();
-                groupHeader.SetCurrentValue(Visual.IsVisibleProperty, false);
-                Debug.Assert(!_fullyRecycledGroupHeaders.Contains(groupHeader));
-                _fullyRecycledGroupHeaders.Push(groupHeader);
-            }
-        }
-
-        internal Control GetDisplayedElement(int slot)
-        {
-            Debug.Assert(slot >= FirstScrollingSlot);
-            Debug.Assert(slot <= LastScrollingSlot);
-
-            return _scrollingElements[GetCircularListIndex(slot, true /*wrap*/)];
-        }
-
-        internal DataGridRow? GetDisplayedRow(int rowIndex)
-        {
-
-            return GetDisplayedElement(_owner.SlotFromRowIndex(rowIndex)) as DataGridRow;
-        }
-
-        // Returns an enumeration of the displayed scrolling rows in order starting with the FirstDisplayedScrollingRow
-        internal IEnumerable<Control> GetScrollingElements()
-        {
-            return GetScrollingElements(null);
-        }
-
-        internal IEnumerable<Control> GetScrollingElements(Predicate<object>? filter)
-        {
-            for (int i = 0; i < _scrollingElements.Count; i++)
-            {
-                Control element = _scrollingElements[(_headScrollingElements + i) % _scrollingElements.Count];
-                if (filter == null || filter(element))
-                {
-                    // _scrollingRows is a circular list that wraps
-                    yield return element;
-                }
-            }
-        }
-
-        internal IEnumerable<Control> GetScrollingRows()
-        {
-            return GetScrollingElements(element => element is DataGridRow);
-        }
-
-        internal DataGridRow? GetUsedRow()
-        {
-            // Note: _recyclableRows should always be empty since we now add directly to _fullyRecycledRows
-            if (_recyclableRows.Count > 0)
-            {
-                DataGridRow row = _recyclableRows.Pop();
-                row.ClearValue(Visual.IsVisibleProperty);
-                return row;
-            }
-            else if (_fullyRecycledRows.Count > 0)
-            {
-                // For fully recycled rows, we need to set the Visibility back to Visible
-                DataGridRow row = _fullyRecycledRows.Pop();
-                row.ClearValue(Visual.IsVisibleProperty);
-                return row;
+                T element = pool.Pop();
+                onPop?.Invoke(element);
+                return element;
             }
             return null;
         }
 
-        // Tracks the row at index rowIndex as a scrolling row
-        internal void LoadScrollingSlot(int slot, Control element, bool updateSlotInformation)
+        private int GetCircularListIndex(int slot, bool wrap)
         {
-            if (_scrollingElements.Count == 0)
-            {
-                SetScrollingSlots(slot);
-                _scrollingElements.Add(element);
-            }
-            else
-            {
-                // The slot should be adjacent to the other slots being displayed
-                Debug.Assert(slot >= _owner.GetPreviousVisibleSlot(FirstScrollingSlot) && slot <= _owner.GetNextVisibleSlot(LastScrollingSlot));
-                if (updateSlotInformation)
-                {
-                    if (slot < FirstScrollingSlot)
-                    {
-                        FirstScrollingSlot = slot;
-                    }
-                    else
-                    {
-                        LastScrollingSlot = _owner.GetNextVisibleSlot(LastScrollingSlot);
-                    }
-                }
-                int insertIndex = GetCircularListIndex(slot, false /*wrap*/);
-                if (insertIndex > _scrollingElements.Count)
-                {
-                    // We need to wrap around from the bottom to the top of our circular list; as a result the head of the list moves forward
-                    insertIndex -= _scrollingElements.Count;
-                    _headScrollingElements++;
-                }
-                _scrollingElements.Insert(insertIndex, element);
-            }
+            int index = slot - FirstScrollingSlot - _headScrollingElements - 
+                        _owner.GetCollapsedSlotCount(FirstScrollingSlot, slot);
+            return wrap ? index % _scrollingElements.Count : index;
         }
 
         private void ResetSlotIndexes()
@@ -332,51 +302,45 @@ namespace Avalonia.Controls
             LastScrollingSlot = newValue;
         }
 
-        // Stops tracking the element at the given slot as a scrolling element
-        internal void UnloadScrollingElement(int slot, bool updateSlotInformation, bool wasDeleted)
+        private void UpdateSlotIndexesAfterUnload(int slot, bool wasDeleted)
         {
-            Debug.Assert(_owner.IsSlotVisible(slot));
-            int elementIndex = GetCircularListIndex(slot, false /*wrap*/);
-            if (elementIndex > _scrollingElements.Count)
+            if (slot == FirstScrollingSlot && !wasDeleted)
             {
-                // We need to wrap around from the top to the bottom of our circular list
-                elementIndex -= _scrollingElements.Count;
-                _headScrollingElements--;
+                FirstScrollingSlot = _owner.GetNextVisibleSlot(FirstScrollingSlot);
             }
-            _scrollingElements.RemoveAt(elementIndex);
-
-            if (updateSlotInformation)
+            else
             {
-                if (slot == FirstScrollingSlot && !wasDeleted)
-                {
-                    FirstScrollingSlot = _owner.GetNextVisibleSlot(FirstScrollingSlot);
-                }
-                else
-                {
-                    LastScrollingSlot = _owner.GetPreviousVisibleSlot(LastScrollingSlot);
-                }
-                if (LastScrollingSlot < FirstScrollingSlot)
-                {
-                    ResetSlotIndexes();
-                }
+                LastScrollingSlot = _owner.GetPreviousVisibleSlot(LastScrollingSlot);
+            }
+            
+            if (LastScrollingSlot < FirstScrollingSlot)
+            {
+                ResetSlotIndexes();
             }
         }
+
+        #endregion
+
+        #region Debug
 
 #if DEBUG
         internal void PrintDisplay()
         {
             foreach (Control element in GetScrollingElements())
             {
-                if (element is DataGridRow row)
+                switch (element)
                 {
-                    Debug.WriteLine(String.Format(System.Globalization.CultureInfo.InvariantCulture, "Slot: {0} Row: {1} ", row.Slot, row.Index));
-                }
-                else if (element is DataGridRowGroupHeader groupHeader)
-                {
-                    Debug.WriteLine(String.Format(System.Globalization.CultureInfo.InvariantCulture, "Slot: {0} GroupHeader: {1}", groupHeader.RowGroupInfo.Slot, groupHeader.RowGroupInfo.CollectionViewGroup.Key));
+                    case DataGridRow row:
+                        Debug.WriteLine($"Slot: {row.Slot} Row: {row.Index}");
+                        break;
+                    case DataGridRowGroupHeader groupHeader:
+                        Debug.WriteLine($"Slot: {groupHeader.RowGroupInfo.Slot} GroupHeader: {groupHeader.RowGroupInfo.CollectionViewGroup.Key}");
+                        break;
                 }
             }
         }
 #endif
+
+        #endregion
     }
 }
