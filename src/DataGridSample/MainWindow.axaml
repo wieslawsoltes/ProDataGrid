@@ -20,6 +20,9 @@
     <TabItem Header="Frozen Columns">
       <local:FrozenColumnsPage />
     </TabItem>
+    <TabItem Header="Auto Columns">
+      <local:AutoColumnsPage />
+    </TabItem>
   </TabControl>
 
 </Window>

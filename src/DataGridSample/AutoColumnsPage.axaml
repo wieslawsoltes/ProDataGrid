@@ -1,0 +1,43 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:local="clr-namespace:DataGridSample"
+             x:Class="DataGridSample.AutoColumnsPage"
+             x:DataType="local:AutoColumnsPage">
+  <Grid RowDefinitions="Auto,Auto,*" Margin="0,0,0,4">
+    <StackPanel Grid.Row="0" Orientation="Vertical" Spacing="4" Margin="0,0,0,8">
+      <TextBlock Classes="h2" Text="Auto-Generated Columns" />
+      <TextBlock TextWrapping="Wrap"
+                 Text="Columns are generated from the bound item type. Booleans become check boxes, numbers become numeric columns, and strings become text columns."/>
+    </StackPanel>
+
+    <StackPanel Grid.Row="1" Orientation="Horizontal" Spacing="12" Margin="0,0,0,8">
+      <StackPanel Orientation="Horizontal" Spacing="4">
+        <TextBlock Text="Items:" VerticalAlignment="Center"/>
+        <NumericUpDown Minimum="5"
+                       Maximum="5000"
+                       Value="{Binding ItemCount, Mode=TwoWay}"
+                       Increment="25"
+                       Width="120" />
+      </StackPanel>
+      <Button Content="Regenerate"
+              Click="OnRegenerateClick" />
+    </StackPanel>
+
+    <DataGrid Grid.Row="2"
+              ItemsSource="{Binding Items}"
+              UseLogicalScrollable="True"
+              AutoGenerateColumns="True"
+              HeadersVisibility="All"
+              CanUserResizeColumns="True"
+              CanUserReorderColumns="True"
+              CanUserSortColumns="True"
+              RowBackground="#08000000"
+              GridLinesVisibility="Horizontal">
+      <DataGrid.Styles>
+        <Style Selector="DataGridRow">
+          <Setter Property="Header" Value="{Binding $self.Index}"/>
+        </Style>
+      </DataGrid.Styles>
+    </DataGrid>
+  </Grid>
+</UserControl>
