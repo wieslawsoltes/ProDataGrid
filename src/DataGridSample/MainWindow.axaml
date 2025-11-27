@@ -17,6 +17,9 @@
     <TabItem Header="Pixel Columns">
       <local:PixelColumnsPage />
     </TabItem>
+    <TabItem Header="Frozen Columns">
+      <local:FrozenColumnsPage />
+    </TabItem>
   </TabControl>
 
 </Window>
