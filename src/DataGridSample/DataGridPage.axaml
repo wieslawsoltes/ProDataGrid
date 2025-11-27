@@ -3,8 +3,12 @@
              xmlns:local="clr-namespace:DataGridSample"
              xmlns:converters="clr-namespace:DataGridSample.Converters"
              xmlns:models="clr-namespace:DataGridSample.Models"
+             xmlns:viewModels="clr-namespace:DataGridSample.ViewModels"
              x:Class="DataGridSample.DataGridPage"
-             x:DataType="local:DataGridPage">
+             x:DataType="viewModels:DataGridPageViewModel">
+  <UserControl.DataContext>
+    <viewModels:DataGridPageViewModel/>
+  </UserControl.DataContext>
   <UserControl.Resources>
 
     <converters:GDPValueConverter x:Key="GDPConverter" />
@@ -43,7 +47,15 @@
                     Increment="10"
                     Value="200"/>
           </StackPanel>
-          <DataGrid Name="dataGrid1" Margin="12" CanUserResizeColumns="True" CanUserReorderColumns="True" CanUserSortColumns="True" HeadersVisibility="All"
+          <DataGrid x:Name="CountriesDataGrid"
+                    Margin="12"
+                    CanUserResizeColumns="True"
+                    CanUserReorderColumns="True"
+                    CanUserSortColumns="True"
+                    HeadersVisibility="All"
+                    IsReadOnly="True"
+                    ItemsSource="{Binding CountriesView}"
+                    Sorting="OnCountriesSorting"
                     RowBackground="#1000">
             <DataGrid.Styles>
               <Style Selector="DataGridRow">
@@ -86,7 +98,9 @@
         </DockPanel>
       </TabItem>
       <TabItem Header="Grouping">
-        <DataGrid Name="dataGridGrouping" Margin="12">
+        <DataGrid Margin="12"
+                  ItemsSource="{Binding GroupedCountriesView}"
+                  IsReadOnly="True">
           <DataGrid.Columns>
             <DataGridTextColumn Header="Country or Region" Binding="{Binding Name}" Width="6*" x:DataType="models:Country" />
             <DataGridTextColumn Header="Region" Binding="{Binding Region}" Width="4*" x:DataType="models:Country" />
@@ -113,8 +127,9 @@
       <TabItem x:Name="EditableTab" Header="Editable">
         <Grid RowDefinitions="*,Auto">
           <!-- Example of columns inheriting the data type from the Items source -->
-          <DataGrid Name="dataGridEdit" Margin="12" Grid.Row="0"
-                    ItemsSource="{Binding DataGrid3Source}">
+          <DataGrid Margin="12"
+                    Grid.Row="0"
+                    ItemsSource="{Binding EditablePeople}">
             <DataGrid.Columns>
               <DataGridTextColumn Header="First Name" Binding="{Binding FirstName}" Width="2*" FontSize="{Binding #FontSizeSlider.Value, Mode=OneWay}" />
               <DataGridTextColumn Header="Last" Binding="{Binding LastName}" Width="2*" FontSize="{Binding #FontSizeSlider.Value, Mode=OneWay}" />
@@ -133,7 +148,11 @@
               </DataGridTemplateColumn>
             </DataGrid.Columns>
           </DataGrid>
-          <Button Grid.Row="1" Name="btnAdd" Margin="12,0,12,12" Content="Add" HorizontalAlignment="Right" />
+          <Button Grid.Row="1"
+                  Margin="12,0,12,12"
+                  Content="Add"
+                  HorizontalAlignment="Right"
+                  Command="{Binding AddPersonCommand}" />
         </Grid>
       </TabItem>
     </TabControl>
