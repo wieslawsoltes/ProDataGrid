@@ -8,10 +8,12 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using Avalonia.Collections;
 using Avalonia.Controls.Primitives;
+using Avalonia.Controls.Templates;
 using Avalonia.Data;
 using Avalonia.Headless.XUnit;
 using Avalonia.Layout;
 using Avalonia.Markup.Xaml.Styling;
+using Avalonia.Media;
 using Avalonia.VisualTree;
 using Xunit;
 
@@ -810,6 +812,45 @@ public class DataGridScrollingTests
         return target;
     }
 
+    private static DataGrid CreateVariableHeightTarget(IList<VariableHeightModel> items, int height = 200)
+    {
+        var root = new Window
+        {
+            Width = 300,
+            Height = height,
+            Styles =
+            {
+                new StyleInclude((Uri?)null)
+                {
+                    Source = new Uri("avares://Avalonia.Controls.DataGrid/Themes/Simple.xaml")
+                },
+            }
+        };
+
+        var templateColumn = new DataGridTemplateColumn
+        {
+            Header = "Content",
+            CellTemplate = new FuncDataTemplate<VariableHeightModel>((item, _) => new TextBlock
+            {
+                Text = item.Content,
+                TextWrapping = TextWrapping.Wrap,
+                Width = 120
+            }),
+        };
+
+        var target = new DataGrid
+        {
+            Columns = { templateColumn },
+            ItemsSource = items,
+            HeadersVisibility = DataGridHeadersVisibility.Column,
+            UseLogicalScrollable = true,
+        };
+
+        root.Content = target;
+        root.Show();
+        return target;
+    }
+
     #endregion
 
     #region Ghost Row Tests
@@ -885,6 +926,53 @@ public class DataGridScrollingTests
             Assert.Equal(orderedIndices[i - 1] + 1, orderedIndices[i]);
         }
     }
+
+    #region Hit Test
+
+    [AvaloniaFact]
+    public void HitTest_Returns_Visible_Row_After_Scroll_With_Variable_Heights()
+    {
+        // Arrange - items with alternating short/long content to force varying row heights
+        var items = Enumerable.Range(0, 120)
+            .Select(i => new VariableHeightModel
+            {
+                Title = $"Item {i}",
+                Content = (i % 2 == 0) ? "short" : string.Join(' ', Enumerable.Repeat("very long wrapped content", 6))
+            })
+            .ToList();
+
+        var target = CreateVariableHeightTarget(items, height: 200);
+
+        // Scroll somewhere into the list to exercise virtualization with variable heights
+        target.ScrollIntoView(items[60], target.Columns[0]);
+        target.UpdateLayout();
+
+        // Act - pick a visible row and hit-test at its center
+        var rows = GetRows(target).OrderBy(r => r.Bounds.Top).ToList();
+        Assert.True(rows.Count >= 2);
+
+        var expectedRow = rows[1];
+        var root = (TopLevel)target.GetVisualRoot()!;
+        var testPoint = expectedRow.TranslatePoint(
+            new Point(expectedRow.Bounds.Width / 2, expectedRow.Bounds.Height / 2), root)!.Value;
+
+        DataGridRow? containingRow = null;
+        foreach (var row in rows)
+        {
+            var origin = row.TranslatePoint(new Point(0, 0), root)!.Value;
+            var rectInRoot = new Rect(origin, row.Bounds.Size);
+            if (rectInRoot.Contains(testPoint))
+            {
+                containingRow = row;
+                break;
+            }
+        }
+
+        // Assert
+        Assert.Same(expectedRow, containingRow);
+    }
+
+    #endregion
 
     #endregion
 
@@ -1197,6 +1285,12 @@ public class DataGridScrollingTests
     #endregion
 
     #region Test Model
+
+    private class VariableHeightModel
+    {
+        public string Title { get; set; } = string.Empty;
+        public string Content { get; set; } = string.Empty;
+    }
 
     private class ScrollTestModel : INotifyPropertyChanged
     {

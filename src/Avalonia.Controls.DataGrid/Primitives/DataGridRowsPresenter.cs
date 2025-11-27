@@ -197,7 +197,16 @@ namespace Avalonia.Controls.Primitives
                     }
                 }
 
-                element.Measure(new Size(double.PositiveInfinity, double.PositiveInfinity));
+                double measureWidth = availableSize.Width;
+                if (double.IsInfinity(measureWidth) || double.IsNaN(measureWidth))
+                {
+                    // Fall back to the space the grid will actually use (headers + columns + filler)
+                    measureWidth = OwningGrid.RowHeadersDesiredWidth
+                                   + OwningGrid.ColumnsInternal.VisibleEdgedColumnsWidth
+                                   + OwningGrid.ColumnsInternal.FillerColumn.FillerWidth;
+                }
+
+                element.Measure(new Size(measureWidth, double.PositiveInfinity));
 
                 if (row != null && row.HeaderCell != null)
                 {
