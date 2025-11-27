@@ -38,6 +38,17 @@
       <Button x:Name="RegenerateButton" Content="Regenerate Items"/>
       
       <Separator/>
+
+      <StackPanel Orientation="Horizontal" Spacing="4">
+        <TextBlock Text="Estimator:" VerticalAlignment="Center"/>
+        <ComboBox x:Name="EstimatorComboBox"
+                  Width="160"
+                  SelectedIndex="0">
+          <ComboBoxItem Content="Advanced"/>
+          <ComboBoxItem Content="Caching"/>
+          <ComboBoxItem Content="Default"/>
+        </ComboBox>
+      </StackPanel>
       
       <StackPanel Orientation="Horizontal" Spacing="4">
         <TextBlock Text="Scroll To:" VerticalAlignment="Center"/>

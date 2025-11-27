@@ -16,6 +16,7 @@ namespace DataGridSample
         private NumericUpDown? _itemCountUpDown;
         private NumericUpDown? _seedUpDown;
         private NumericUpDown? _scrollToIndexUpDown;
+        private ComboBox? _estimatorComboBox;
         private TextBlock? _itemCountText;
         private TextBlock? _scrollInfoText;
         private TextBlock? _visibleRangeText;
@@ -35,6 +36,7 @@ namespace DataGridSample
             _itemCountUpDown = this.FindControl<NumericUpDown>("ItemCountUpDown");
             _seedUpDown = this.FindControl<NumericUpDown>("SeedUpDown");
             _scrollToIndexUpDown = this.FindControl<NumericUpDown>("ScrollToIndexUpDown");
+            _estimatorComboBox = this.FindControl<ComboBox>("EstimatorComboBox");
             _itemCountText = this.FindControl<TextBlock>("ItemCountText");
             _scrollInfoText = this.FindControl<TextBlock>("ScrollInfoText");
             _visibleRangeText = this.FindControl<TextBlock>("VisibleRangeText");
@@ -48,9 +50,13 @@ namespace DataGridSample
             if (scrollToButton != null)
                 scrollToButton.Click += OnScrollToClick;
 
+            if (_estimatorComboBox != null)
+                _estimatorComboBox.SelectionChanged += OnEstimatorSelectionChanged;
+
             if (_dataGrid != null)
             {
                 _dataGrid.ItemsSource = _items;
+                ApplyEstimatorFromSelection();
                 
                 // Subscribe to scroll events for status updates
                 _dataGrid.PropertyChanged += (s, e) =>
@@ -122,6 +128,24 @@ namespace DataGridSample
 
             UpdateItemCountText();
             UpdateScrollInfo();
+        }
+
+        private void OnEstimatorSelectionChanged(object? sender, SelectionChangedEventArgs e)
+        {
+            ApplyEstimatorFromSelection();
+        }
+
+        private void ApplyEstimatorFromSelection()
+        {
+            if (_dataGrid == null || _estimatorComboBox?.SelectedItem is not ComboBoxItem item || item.Content is not string name)
+                return;
+
+            _dataGrid.RowHeightEstimator = name switch
+            {
+                "Caching" => new CachingRowHeightEstimator(),
+                "Default" => new DefaultRowHeightEstimator(),
+                _ => new AdvancedRowHeightEstimator(),
+            };
         }
 
         private void UpdateItemCountText()
