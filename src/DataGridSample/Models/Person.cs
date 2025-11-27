@@ -2,10 +2,11 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
+using DataGridSample.Mvvm;
 
 namespace DataGridSample.Models
 {
-    public class Person : INotifyDataErrorInfo, INotifyPropertyChanged
+    public class Person : ObservableObject, INotifyDataErrorInfo
     {
         private string _firstName = string.Empty;
         private string _lastName = string.Empty;
@@ -97,16 +98,10 @@ namespace DataGridSample.Models
         public bool HasErrors => _errorLookup.Count > 0;
 
         public event EventHandler<DataErrorsChangedEventArgs>? ErrorsChanged;
-        public event PropertyChangedEventHandler? PropertyChanged;
 
         private void OnErrorsChanged(string propertyName)
         {
             ErrorsChanged?.Invoke(this, new DataErrorsChangedEventArgs(propertyName));
-        }
-
-        private void OnPropertyChanged(string propertyName)
-        {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
 
         public IEnumerable GetErrors(string? propertyName)
