@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.ComponentModel;
+using System.Data;
 using System.Linq;
 using Avalonia.Collections;
 using Xunit;
@@ -191,5 +192,52 @@ public class DataGridCollectionViewTests
     private class Row
     {
         public int Value { get; set; }
+    }
+
+    [Fact]
+    public void AddNew_On_BindingList_Adds_Row()
+    {
+        var table = new DataTable();
+        table.Columns.Add(new DataColumn("Value", typeof(int)));
+        var view = new DataGridCollectionView(table.DefaultView);
+
+        Assert.Equal(0, table.Rows.Count);
+        var newRow = Assert.IsType<DataRowView>(view.AddNew());
+        Assert.Equal(0, table.Rows.Count);
+        newRow["Value"] = 42;
+        view.CommitNew();
+
+        var values = table.Rows.Cast<DataRow>().Select(r => (int)r["Value"]).ToArray();
+
+        Assert.Equal(new[] { 42 }, values);
+        Assert.Equal(1, view.Count);
+    }
+
+    [Fact]
+    public void BindingList_Add_Updates_View()
+    {
+        var table = new DataTable();
+        table.Columns.Add(new DataColumn("Value", typeof(int)));
+        var view = new DataGridCollectionView(table.DefaultView);
+
+        table.Rows.Add(1);
+        table.Rows.Add(2);
+
+        Assert.Equal(2, view.Count);
+        Assert.Equal(new[] { 1, 2 }, view.Cast<DataRowView>().Select(r => (int)r["Value"]).ToArray());
+    }
+
+    [Fact]
+    public void BindingList_SortDescriptions_Apply_Sort()
+    {
+        var table = new DataTable();
+        table.Columns.Add(new DataColumn("Value", typeof(int)));
+        table.Rows.Add(2);
+        table.Rows.Add(1);
+        var view = new DataGridCollectionView(table.DefaultView);
+
+        view.SortDescriptions.Add(DataGridSortDescription.FromPath("Value", ListSortDirection.Ascending));
+
+        Assert.Equal(new[] { 1, 2 }, view.Cast<DataRowView>().Select(r => (int)r["Value"]).ToArray());
     }
 }

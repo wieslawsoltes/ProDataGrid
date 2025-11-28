@@ -26,6 +26,7 @@ namespace Avalonia.Controls
         private int _backupSlotForCurrentChanged;
         private int _columnForCurrentChanged;
         private PropertyInfo[] _dataProperties;
+        private DataGridItemPropertyDescriptor[] _dataDescriptors;
         private IEnumerable _dataSource;
         private Type _dataType;
         private bool _expectingCurrentChanged;
@@ -98,6 +99,19 @@ namespace Avalonia.Controls
                     UpdateDataProperties();
                 }
                 return _dataProperties;
+            }
+        }
+
+        public DataGridItemPropertyDescriptor[] DataDescriptors
+        {
+            get
+            {
+                if (_dataDescriptors == null)
+                {
+                    UpdateDataProperties();
+                }
+
+                return _dataDescriptors;
             }
         }
 
@@ -381,6 +395,15 @@ namespace Avalonia.Controls
 
         public bool GetPropertyIsReadOnly(string propertyName)
         {
+            if (!String.IsNullOrEmpty(propertyName))
+            {
+                var descriptorReadOnly = GetDescriptorReadOnly(propertyName);
+                if (descriptorReadOnly.HasValue)
+                {
+                    return descriptorReadOnly.Value;
+                }
+            }
+
             if (DataType != null)
             {
                 if (!String.IsNullOrEmpty(propertyName))
@@ -452,6 +475,7 @@ namespace Avalonia.Controls
         internal void ClearDataProperties()
         {
             _dataProperties = null;
+            _dataDescriptors = null;
         }
 
         /// <summary>
@@ -724,6 +748,8 @@ namespace Avalonia.Controls
         {
             Type dataType = DataType;
 
+            _dataDescriptors = DataGridItemPropertyDescriptor.CreateDescriptors(_owner?.ItemsSource as IEnumerable, dataType);
+
             if (DataSource != null && dataType != null && !DataTypeIsPrimitive(dataType))
             {
                 _dataProperties = dataType.GetProperties(BindingFlags.Public | BindingFlags.Instance);
@@ -733,6 +759,42 @@ namespace Avalonia.Controls
             {
                 _dataProperties = null;
             }
+        }
+
+        private bool? GetDescriptorReadOnly(string propertyName)
+        {
+            var descriptors = DataDescriptors;
+            if (descriptors == null || descriptors.Length == 0)
+            {
+                return null;
+            }
+
+            var propertyNames = TypeHelper.SplitPropertyPath(propertyName);
+            if (propertyNames.Count == 0)
+            {
+                return null;
+            }
+
+            // Only the first segment is relevant for descriptor lookup.
+            var first = propertyNames[0];
+            first = TypeHelper.RemoveDefaultMemberName(first);
+            if (!string.IsNullOrEmpty(first) && first[0] == TypeHelper.LeftIndexerToken && first[first.Length - 1] == TypeHelper.RightIndexerToken)
+            {
+                first = first.Substring(1, first.Length - 2);
+            }
+
+            if (string.IsNullOrEmpty(first))
+            {
+                return null;
+            }
+
+            var descriptor = descriptors.FirstOrDefault(d => string.Equals(d.Name, first, StringComparison.Ordinal));
+            if (descriptor != null)
+            {
+                return descriptor.IsReadOnly || !AllowEdit || !CanEdit(descriptor.PropertyType);
+            }
+
+            return null;
         }
 
     }

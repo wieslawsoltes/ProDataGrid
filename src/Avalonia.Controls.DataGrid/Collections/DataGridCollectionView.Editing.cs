@@ -51,7 +51,24 @@ namespace Avalonia.Collections
 
             object newItem = null;
 
-            if (_itemConstructor != null)
+            if (_bindingList != null && _bindingList.AllowNew)
+            {
+                newItem = _bindingList.AddNew();
+                CurrentAddItem = newItem;
+
+                if (newItem is IEditableObject bindingEditableObject)
+                {
+                    bindingEditableObject.BeginEdit();
+                }
+
+                MoveCurrentTo(newItem);
+                return newItem;
+            }
+            else if (_bindingList != null)
+            {
+                throw new InvalidOperationException(GetOperationNotAllowedText(nameof(AddNew)));
+            }
+            else if (_itemConstructor != null)
             {
                 newItem = _itemConstructor.Invoke(null);
             }
@@ -63,7 +80,7 @@ namespace Avalonia.Collections
                 // doesn't get applied yet
                 SetFlag(CollectionViewFlags.ShouldProcessCollectionChanged, false);
 
-                if (SourceList != null)
+                if (_bindingList == null && SourceList != null)
                 {
                     SourceList.Add(newItem);
                 }
@@ -212,6 +229,31 @@ namespace Avalonia.Collections
 
             // get index of item before it is removed
             int index = IndexOf(CurrentAddItem);
+
+            if (_bindingList != null)
+            {
+                var newItem = CurrentAddItem;
+                EndAddNew(true);
+
+                if (_bindingList is ICancelAddNew cancelAddNew && index >= 0)
+                {
+                    cancelAddNew.CancelNew(index);
+                }
+                else
+                {
+                    if (index >= 0 && index < _bindingList.Count)
+                    {
+                        _bindingList.RemoveAt(index);
+                    }
+                    else
+                    {
+                        _bindingList.Remove(newItem);
+                    }
+                }
+
+                _trackingEnumerator = _sourceCollection.GetEnumerator();
+                return;
+            }
 
             // remove the new item from the underlying collection
             try
@@ -503,6 +545,13 @@ namespace Avalonia.Collections
 
             if (CurrentAddItem == null)
             {
+                return;
+            }
+
+            if (_bindingList != null)
+            {
+                EndAddNew(false);
+                _trackingEnumerator = _sourceCollection.GetEnumerator();
                 return;
             }
 

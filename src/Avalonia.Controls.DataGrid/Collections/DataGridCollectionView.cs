@@ -65,7 +65,7 @@ namespace Avalonia.Collections
 #if !DATAGRID_INTERNAL
     public
 #endif
-    sealed partial class DataGridCollectionView : IDataGridCollectionView, IDataGridEditableCollectionView, IList, INotifyPropertyChanged
+    sealed partial class DataGridCollectionView : IDataGridCollectionView, IDataGridEditableCollectionView, IList, INotifyPropertyChanged, ITypedList
     {
         /// <summary>
         /// Since there's nothing in the un-cancelable event args that is mutable,
@@ -124,6 +124,11 @@ namespace Avalonia.Collections
         /// Private accessor for the CollectionViewFlags
         /// </summary>
         private CollectionViewFlags _flags = CollectionViewFlags.ShouldProcessCollectionChanged;
+
+        /// <summary>
+        /// Optional binding list source to track ListChanged notifications and AddNew support.
+        /// </summary>
+        private IBindingList _bindingList;
 
         /// <summary>
         /// Private accessor for the Grouping data
@@ -248,10 +253,15 @@ namespace Avalonia.Collections
             // Set flag for whether the collection is empty
             SetFlag(CollectionViewFlags.CachedIsEmpty, Count == 0);
 
-            // If we implement INotifyCollectionChanged
+            // If we implement change notifications, hook them up
             if (source is INotifyCollectionChanged coll)
             {
                 coll.CollectionChanged += (_, args) => ProcessCollectionChanged(args);
+            }
+            else if (source is IBindingList bindingList)
+            {
+                _bindingList = bindingList;
+                _bindingList.ListChanged += OnBindingListChanged;
             }
             else
             {
@@ -390,7 +400,8 @@ namespace Avalonia.Collections
             get
             {
                 return !IsEditingItem &&
-                    (SourceList != null && !SourceList.IsFixedSize && CanConstructItem);
+                    (SourceList != null && !SourceList.IsFixedSize &&
+                    ((_bindingList?.AllowNew ?? false) || CanConstructItem));
             }
         }
 

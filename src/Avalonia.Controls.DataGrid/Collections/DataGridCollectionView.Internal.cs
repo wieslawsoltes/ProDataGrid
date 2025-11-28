@@ -155,6 +155,108 @@ namespace Avalonia.Collections
             }
         }
 
+        private void OnBindingListChanged(object sender, ListChangedEventArgs e)
+        {
+            if (!CheckFlag(CollectionViewFlags.ShouldProcessCollectionChanged))
+            {
+                return;
+            }
+
+            // Use Reset when we have local transformations to ensure consistency.
+            bool useReset = UsesLocalArray;
+
+            switch (e.ListChangedType)
+            {
+                case ListChangedType.Reset:
+                    ProcessCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset));
+                    return;
+                case ListChangedType.ItemAdded:
+                    if (useReset)
+                {
+                    ProcessCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset));
+                    return;
+                }
+
+                    var addedItem = GetBindingListItem(e.NewIndex);
+                    if (IndexOf(addedItem) >= 0)
+                    {
+                        return;
+                    }
+
+                    ProcessCollectionChanged(
+                        new NotifyCollectionChangedEventArgs(
+                            NotifyCollectionChangedAction.Add,
+                            addedItem,
+                            e.NewIndex));
+                    return;
+                case ListChangedType.ItemDeleted:
+                    if (useReset)
+                    {
+                        ProcessCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset));
+                        return;
+                    }
+
+                    ProcessCollectionChanged(
+                        new NotifyCollectionChangedEventArgs(
+                            NotifyCollectionChangedAction.Remove,
+                            GetBindingListItemFromSnapshot(e.NewIndex),
+                            e.NewIndex));
+                    return;
+                case ListChangedType.ItemMoved:
+                    if (useReset)
+                    {
+                        ProcessCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset));
+                        return;
+                    }
+
+                    ProcessCollectionChanged(
+                        new NotifyCollectionChangedEventArgs(
+                            NotifyCollectionChangedAction.Move,
+                            GetBindingListItem(e.NewIndex),
+                            e.NewIndex,
+                            e.OldIndex));
+                    return;
+                case ListChangedType.ItemChanged:
+                    if (useReset)
+                    {
+                        ProcessCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset));
+                        return;
+                    }
+
+                    var changedItem = GetBindingListItem(e.NewIndex);
+                    ProcessCollectionChanged(
+                        new NotifyCollectionChangedEventArgs(
+                            NotifyCollectionChangedAction.Replace,
+                            changedItem,
+                            changedItem,
+                            e.NewIndex));
+                    return;
+                default:
+                    ProcessCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset));
+                    return;
+            }
+        }
+
+        private object GetBindingListItem(int index)
+        {
+            if (_bindingList == null || index < 0 || index >= _bindingList.Count)
+            {
+                return null;
+            }
+
+            return _bindingList[index];
+        }
+
+        private object GetBindingListItemFromSnapshot(int index)
+        {
+            if (index >= 0 && index < _internalList.Count)
+            {
+                return _internalList[index];
+            }
+
+            return null;
+        }
+
         /// <summary>
         /// Helper function used to determine the type of an item
         /// </summary>
@@ -370,6 +472,16 @@ namespace Avalonia.Collections
                 throw new InvalidOperationException(GetOperationNotAllowedDuringAddOrEditText("Sorting"));
             }
 
+            bool handledByBindingList = TryApplyBindingListSort();
+            if (handledByBindingList && SortDescriptions.Count > 0)
+            {
+                SetFlag(CollectionViewFlags.IsDataSorted, true);
+            }
+            else
+            {
+                SetFlag(CollectionViewFlags.IsDataSorted, false);
+            }
+
             // we want to make sure that the data is refreshed before we try to move to a page
             // since the refresh would take care of the filtering, sorting, and grouping.
             RefreshOrDefer();
@@ -419,6 +531,71 @@ namespace Avalonia.Collections
             }
 
             return seq.ToList();
+        }
+
+        private bool TryApplyBindingListSort()
+        {
+            if (_bindingList == null || !_bindingList.SupportsSorting)
+            {
+                return false;
+            }
+
+            if (SortDescriptions.Count == 0)
+            {
+                _bindingList.RemoveSort();
+                return true;
+            }
+
+            if (SortDescriptions.Count != 1)
+            {
+                return false;
+            }
+
+            var sort = SortDescriptions[0];
+            if (string.IsNullOrEmpty(sort.PropertyPath))
+            {
+                return false;
+            }
+
+            PropertyDescriptorCollection properties = null;
+            if (_bindingList is ITypedList typedList)
+            {
+                properties = typedList.GetItemProperties(null);
+            }
+            else if (ItemType != null)
+            {
+                properties = TypeDescriptor.GetProperties(ItemType);
+            }
+            else if (_bindingList.Count > 0)
+            {
+                properties = TypeDescriptor.GetProperties(_bindingList[0]!);
+            }
+
+            var descriptor = properties?.Find(NormalizeBindingListPropertyName(sort.PropertyPath), true);
+            if (descriptor == null)
+            {
+                return false;
+            }
+
+            _bindingList.ApplySort(descriptor, sort.Direction);
+            return true;
+        }
+
+        private static string NormalizeBindingListPropertyName(string propertyPath)
+        {
+            var propertyNames = TypeHelper.SplitPropertyPath(propertyPath);
+            if (propertyNames.Count == 0)
+            {
+                return propertyPath;
+            }
+
+            var first = TypeHelper.RemoveDefaultMemberName(propertyNames[0]);
+            if (!string.IsNullOrEmpty(first) && first[0] == TypeHelper.LeftIndexerToken && first[first.Length - 1] == TypeHelper.RightIndexerToken)
+            {
+                first = first.Substring(1, first.Length - 2);
+            }
+
+            return first;
         }
 
         /// <summary>
