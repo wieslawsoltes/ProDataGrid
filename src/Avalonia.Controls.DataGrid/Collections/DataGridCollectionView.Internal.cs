@@ -224,11 +224,22 @@ namespace Avalonia.Collections
                     }
 
                     var changedItem = GetBindingListItem(e.NewIndex);
+                    var previousItem = GetBindingListItemFromSnapshot(e.NewIndex) ?? changedItem;
+
+                    if (!useReset)
+                    {
+                        if (e.NewIndex >= 0 && e.NewIndex < _internalList.Count)
+                        {
+                            _internalList[e.NewIndex] = changedItem;
+                        }
+                        return;
+                    }
+
                     ProcessCollectionChanged(
                         new NotifyCollectionChangedEventArgs(
                             NotifyCollectionChangedAction.Replace,
                             changedItem,
-                            changedItem,
+                            previousItem,
                             e.NewIndex));
                     return;
                 default:

@@ -245,9 +245,13 @@ namespace Avalonia.Collections
                     {
                         _bindingList.RemoveAt(index);
                     }
-                    else
+                    else if (_bindingList is IList list)
                     {
-                        _bindingList.Remove(newItem);
+                        var listIndex = list.IndexOf(newItem);
+                        if (listIndex >= 0)
+                        {
+                            list.RemoveAt(listIndex);
+                        }
                     }
                 }
 
