@@ -85,8 +85,6 @@ namespace Avalonia.Controls
                         newCollectionView);
                 }
 
-                UpdateSelectionModelSource();
-
                 if (DataConnection.DataSource != null)
                 {
                     // Setup the column headers
@@ -102,6 +100,8 @@ namespace Avalonia.Controls
                     }
                     DataConnection.WireEvents(DataConnection.DataSource);
                 }
+
+                UpdateSelectionModelSource();
 
                 // Wait for the current cell to be set before we raise any SelectionChanged events
                 _makeFirstDisplayedCellCurrentCellPending = true;
@@ -157,16 +157,31 @@ namespace Avalonia.Controls
                 try
                 {
                     var view = DataConnection?.CollectionView;
+                    IEnumerable? source = view;
+
+                    if (view is DataGridCollectionView paged && paged.PageSize > 0)
+                    {
+                        _pagedSelectionSource?.Dispose();
+                        _pagedSelectionSource = new DataGridSelection.DataGridPagedSelectionSource(paged);
+                        source = _pagedSelectionSource;
+                    }
+                    else
+                    {
+                        _pagedSelectionSource?.Dispose();
+                        _pagedSelectionSource = null;
+                    }
+
                     if (view != null &&
                         _selectionModelAdapter.Model.Source != null &&
-                        _selectionModelAdapter.Model.Source != view &&
+                        _selectionModelAdapter.Model.Source != source &&
+                        !ReferenceEquals(_selectionModelAdapter.Model.Source, source) &&
                         !ReferenceEquals(_selectionModelAdapter.Model.Source, view))
                     {
                         throw new InvalidOperationException(
                             "The supplied ISelectionModel already has an assigned Source but this collection is different to the Items on the control.");
                     }
 
-                    _selectionModelAdapter.Model.Source = view;
+                    _selectionModelAdapter.Model.Source = source;
                 }
                 finally
                 {
@@ -177,9 +192,18 @@ namespace Avalonia.Controls
 
         internal List<object> CaptureSelectionSnapshot()
         {
-            return _selectionModelAdapter == null && _selectedItems.Count > 0
-                ? new List<object>(_selectedItems.Cast<object>())
-                : null;
+            // Let selection model track changes itself; snapshots are only needed for legacy selection.
+            if (_selectionModelAdapter != null)
+            {
+                return null;
+            }
+
+            if (SelectedItems is { Count: > 0 })
+            {
+                return new List<object>(SelectedItems.Cast<object>());
+            }
+
+            return null;
         }
 
         internal void RestoreSelectionFromSnapshot(IReadOnlyList<object> selectedItems)
@@ -194,12 +218,13 @@ namespace Avalonia.Controls
             {
                 int firstIndex = -1;
 
+                using (_selectionModelAdapter.SelectedItemsView.SuppressNotifications())
                 using (_selectionModelAdapter.Model.BatchUpdate())
                 {
                     _selectionModelAdapter.Model.Clear();
                     foreach (object item in selectedItems)
                     {
-                        int index = DataConnection.IndexOf(item);
+                        int index = GetSelectionModelIndexOfItem(item);
                         if (index >= 0)
                         {
                             if (firstIndex == -1)
@@ -221,7 +246,7 @@ namespace Avalonia.Controls
 
                 foreach (object item in selectedItems)
                 {
-                    int index = DataConnection.IndexOf(item);
+                    int index = GetSelectionModelIndexOfItem(item);
                     if (index >= 0)
                     {
                         SetValueNoCallback(SelectedItemProperty, item);
@@ -250,7 +275,7 @@ namespace Avalonia.Controls
                 _selectionModelAdapter.Model.Clear();
                 foreach (object item in _selectedItems)
                 {
-                    int index = DataConnection.IndexOf(item);
+                    int index = GetSelectionModelIndexOfItem(item);
                     if (index >= 0)
                     {
                         _selectionModelAdapter.Model.Select(index);
@@ -330,7 +355,13 @@ namespace Avalonia.Controls
 
         internal void UpdateStateOnCurrentChanged(object currentItem, int currentPosition)
         {
-            if (currentItem == CurrentItem && currentItem == SelectedItem && currentPosition == SelectedIndex)
+            var currentSelectionIndex = currentPosition;
+            if (_selectionModelAdapter != null && TryGetPagingInfo(out _, out var pageStart))
+            {
+                currentSelectionIndex = pageStart + currentPosition;
+            }
+
+            if (currentItem == CurrentItem && currentItem == SelectedItem && currentSelectionIndex == SelectedIndex)
             {
                 // The DataGrid's CurrentItem is already up-to-date, so we don't need to do anything
                 return;
@@ -351,7 +382,7 @@ namespace Avalonia.Controls
             }
             _desiredCurrentColumnIndex = -1;
 
-            int slot = currentItem != null ? SlotFromRowIndex(currentPosition) : -1;
+            int slot = currentItem != null ? SlotFromSelectionIndex(currentSelectionIndex) : -1;
             bool currentInSelection = currentItem != null &&
                 slot >= 0 &&
                 GetRowSelection(slot);

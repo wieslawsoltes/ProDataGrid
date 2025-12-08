@@ -14,6 +14,7 @@ using System.Collections.Specialized;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
+using System.Linq;
 
 namespace Avalonia.Controls
 {
@@ -220,6 +221,7 @@ namespace Avalonia.Controls
                 _syncingSelectionModel = true;
 
                 ApplySelectionFromSelectionModel();
+                UpdateSelectionSnapshot();
             }
             finally
             {
@@ -229,61 +231,72 @@ namespace Avalonia.Controls
 
         private void ApplySelectionFromSelectionModel()
         {
-            var indexes = _selectionModelAdapter?.Model.SelectedIndexes;
-            if (_selectionModelAdapter?.Model.Source == null || indexes == null || indexes.Count == 0)
+            var previousSync = _syncingSelectionModel;
+            _syncingSelectionModel = true;
+            try
             {
+                var indexes = _selectionModelAdapter?.Model.SelectedIndexes;
+                if (_selectionModelAdapter?.Model.Source == null || indexes == null || indexes.Count == 0)
+                {
+                    ClearRowSelection(resetAnchorSlot: true);
+                    SetCurrentCellCore(-1, -1);
+                    return;
+                }
+
+                int preferredIndex = _preferredSelectionIndex >= 0
+                    ? _preferredSelectionIndex
+                    : _selectionModelAdapter.Model.SelectedIndex;
+
+                var mapped = new List<(int RowIndex, int Slot)>();
+                foreach (int rowIndex in indexes)
+                {
+                    int slot = SlotFromSelectionIndex(rowIndex);
+                    if (slot >= 0 && slot < SlotCount)
+                    {
+                        mapped.Add((rowIndex, slot));
+                    }
+                }
+
+                if (mapped.Count == 0)
+                {
+                    _preferredSelectionIndex = preferredIndex;
+                    ClearRowSelection(resetAnchorSlot: true);
+                    SetCurrentCellCore(-1, -1);
+                    return;
+                }
+
                 ClearRowSelection(resetAnchorSlot: true);
-                SetCurrentCellCore(-1, -1);
-                return;
-            }
 
-            int preferredIndex = _preferredSelectionIndex >= 0
-                ? _preferredSelectionIndex
-                : _selectionModelAdapter.Model.SelectedIndex;
-
-            var mapped = new List<(int RowIndex, int Slot)>();
-            foreach (int rowIndex in indexes)
-            {
-                int slot = SlotFromSelectionIndex(rowIndex);
-                if (slot >= 0 && slot < SlotCount)
+                int? firstSlot = null;
+                foreach (var entry in mapped)
                 {
-                    mapped.Add((rowIndex, slot));
+                    int slot = entry.Slot;
+                    int rowIndex = entry.RowIndex;
+                    if (firstSlot == null || (preferredIndex >= 0 && rowIndex == preferredIndex))
+                    {
+                        firstSlot = slot;
+                    }
+                    SetRowSelection(slot, isSelected: true, setAnchorSlot: firstSlot == slot);
                 }
-            }
 
-            if (mapped.Count == 0)
-            {
-                _preferredSelectionIndex = preferredIndex;
-                return;
-            }
-
-            ClearRowSelection(resetAnchorSlot: true);
-
-            int? firstSlot = null;
-            foreach (var entry in mapped)
-            {
-                int slot = entry.Slot;
-                int rowIndex = entry.RowIndex;
-                if (firstSlot == null || (preferredIndex >= 0 && rowIndex == preferredIndex))
+                if (firstSlot.HasValue)
                 {
-                    firstSlot = slot;
+                    int columnIndex = CurrentColumnIndex != -1 ? CurrentColumnIndex : FirstDisplayedNonFillerColumnIndex;
+                    UpdateSelectionAndCurrency(columnIndex, firstSlot.Value, DataGridSelectionAction.None, scrollIntoView: false);
                 }
-                SetRowSelection(slot, isSelected: true, setAnchorSlot: firstSlot == slot);
-            }
+                else
+                {
+                    SetCurrentCellCore(-1, -1);
+                }
 
-            if (firstSlot.HasValue)
+                _preferredSelectionIndex = -1;
+
+                RefreshVisibleSelection();
+            }
+            finally
             {
-                int columnIndex = CurrentColumnIndex != -1 ? CurrentColumnIndex : FirstDisplayedNonFillerColumnIndex;
-                UpdateSelectionAndCurrency(columnIndex, firstSlot.Value, DataGridSelectionAction.None, scrollIntoView: false);
+                _syncingSelectionModel = previousSync;
             }
-            else
-            {
-                SetCurrentCellCore(-1, -1);
-            }
-
-            _preferredSelectionIndex = -1;
-
-            RefreshVisibleSelection();
         }
 
         internal void RefreshVisibleSelection()
@@ -320,6 +333,7 @@ namespace Avalonia.Controls
             {
                 _syncingSelectionModel = true;
                 ApplySelectionFromSelectionModel();
+                UpdateSelectionSnapshot();
             }
             finally
             {
@@ -343,6 +357,57 @@ namespace Avalonia.Controls
             finally
             {
                 _syncingSelectionModel = false;
+            }
+        }
+
+        private void SelectionModel_SourceReset(object sender, EventArgs e)
+        {
+            if (_syncingSelectionModel || _selectionModelAdapter == null)
+            {
+                return;
+            }
+
+            var snapshot = _selectionModelSnapshot;
+            if (snapshot == null || snapshot.Count == 0)
+            {
+                return;
+            }
+
+            try
+            {
+                _syncingSelectionModel = true;
+                using (_selectionModelAdapter.Model.BatchUpdate())
+                {
+                    _selectionModelAdapter.Model.Clear();
+                    foreach (var item in snapshot)
+                    {
+                        int index = GetSelectionModelIndexOfItem(item);
+                        if (index >= 0)
+                        {
+                            _selectionModelAdapter.Select(index);
+                        }
+                    }
+                }
+
+                _preferredSelectionIndex = _selectionModelAdapter.Model.SelectedIndex;
+                ApplySelectionFromSelectionModel();
+                UpdateSelectionSnapshot();
+            }
+            finally
+            {
+                _syncingSelectionModel = false;
+            }
+        }
+
+        private void UpdateSelectionSnapshot()
+        {
+            if (_selectionModelAdapter != null)
+            {
+                _selectionModelSnapshot = _selectionModelAdapter.SelectedItemsView.Cast<object>().ToList();
+            }
+            else
+            {
+                _selectionModelSnapshot = null;
             }
         }
 
@@ -562,7 +627,7 @@ namespace Avalonia.Controls
                             _selectionModelAdapter.Model.Clear();
                             foreach (object item in boundItems)
                             {
-                                int index = DataConnection.IndexOf(item);
+                                int index = GetSelectionModelIndexOfItem(item);
                                 if (index >= 0)
                                 {
                                     _selectionModelAdapter.Select(index);
@@ -638,7 +703,7 @@ namespace Avalonia.Controls
                                 {
                                     foreach (object item in e.NewItems)
                                     {
-                                        int index = DataConnection.IndexOf(item);
+                                        int index = GetSelectionModelIndexOfItem(item);
                                         if (index >= 0)
                                         {
                                             _selectionModelAdapter.Select(index);
@@ -674,7 +739,7 @@ namespace Avalonia.Controls
                                 {
                                     foreach (object item in e.OldItems)
                                     {
-                                        int index = DataConnection.IndexOf(item);
+                                        int index = GetSelectionModelIndexOfItem(item);
                                         if (index >= 0)
                                         {
                                             _selectionModelAdapter.Deselect(index);
@@ -724,7 +789,7 @@ namespace Avalonia.Controls
                                 {
                                     foreach (object item in e.OldItems)
                                     {
-                                        int index = DataConnection.IndexOf(item);
+                                        int index = GetSelectionModelIndexOfItem(item);
                                         if (index >= 0)
                                         {
                                             _selectionModelAdapter.Deselect(index);
@@ -736,7 +801,7 @@ namespace Avalonia.Controls
                                 {
                                     foreach (object item in e.NewItems)
                                     {
-                                        int index = DataConnection.IndexOf(item);
+                                        int index = GetSelectionModelIndexOfItem(item);
                                         if (index >= 0)
                                         {
                                             _selectionModelAdapter.Select(index);
@@ -781,6 +846,16 @@ namespace Avalonia.Controls
         {
             if (ReferenceEquals(_selectedItemsBinding, _selectedItems))
             {
+                return;
+            }
+
+            if (_selectionModelAdapter != null)
+            {
+                _selectedItemsBinding.Clear();
+                foreach (object item in _selectionModelAdapter.SelectedItemsView)
+                {
+                    _selectedItemsBinding.Add(item);
+                }
                 return;
             }
 
@@ -889,6 +964,10 @@ namespace Avalonia.Controls
             {
                 selectedItem = CurrentItem;
             }
+            else if (_selectionModelAdapter != null && _selectionModelAdapter.Model.SelectedIndex >= 0)
+            {
+                selectedItem = _selectionModelAdapter.Model.SelectedItem;
+            }
             else if (_selectedItems.Count > 0)
             {
                 selectedItem = _selectedItems[0];
@@ -901,7 +980,7 @@ namespace Avalonia.Controls
 
             if (selectedItem != null)
             {
-                newIndex = DataConnection.IndexOf(selectedItem);
+                newIndex = GetSelectionModelIndexOfItem(selectedItem);
             }
 
             SetValueNoCallback(SelectedIndexProperty, newIndex);
@@ -1002,8 +1081,8 @@ namespace Avalonia.Controls
         {
             if (!_areHandlersSuspended)
             {
-                int rowIndex = (e.NewValue == null) ? -1 : DataConnection.IndexOf(e.NewValue);
-                if (rowIndex == -1)
+                int selectionIndex = (e.NewValue == null) ? -1 : GetSelectionModelIndexOfItem(e.NewValue);
+                if (selectionIndex == -1)
                 {
                     // If the Item is null or it's not found, clear the Selection
                     if (!CommitEdit(DataGridEditingUnit.Row, exitEditingMode: true))
@@ -1023,7 +1102,13 @@ namespace Avalonia.Controls
                 }
                 else
                 {
-                    int slot = SlotFromRowIndex(rowIndex);
+                    int slot = SlotFromSelectionIndex(selectionIndex);
+                    if (slot == -1)
+                    {
+                        SetValueNoCallback(SelectedIndexProperty, selectionIndex);
+                        _preferredSelectionIndex = selectionIndex;
+                        return;
+                    }
                     if (slot != CurrentSlot)
                     {
                         if (!CommitEdit(DataGridEditingUnit.Row, exitEditingMode: true))
@@ -1036,13 +1121,14 @@ namespace Avalonia.Controls
                         {
                             if (DataConnection.CollectionView != null)
                             {
-                                DataConnection.CollectionView.MoveCurrentToPosition(rowIndex);
+                                int moveIndex = RowIndexFromSlot(slot);
+                                DataConnection.CollectionView.MoveCurrentToPosition(moveIndex);
                             }
                         }
                     }
 
                     int oldSelectedIndex = SelectedIndex;
-                    SetValueNoCallback(SelectedIndexProperty, rowIndex);
+                    SetValueNoCallback(SelectedIndexProperty, selectionIndex);
                     try
                     {
                         _noSelectionChangeCount++;

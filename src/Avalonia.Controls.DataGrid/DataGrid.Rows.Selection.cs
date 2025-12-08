@@ -56,13 +56,20 @@ namespace Avalonia.Controls
                         int rowIndex = RowIndexFromSlot(slot);
                         if (rowIndex >= 0)
                         {
+                            var selectionIndex = GetSelectionIndexFromRowIndex(rowIndex);
                             if (isSelected)
                             {
-                                _selectionModelAdapter.Select(rowIndex);
+                                if (selectionIndex >= 0)
+                                {
+                                    _selectionModelAdapter.Select(selectionIndex);
+                                }
                             }
                             else
                             {
-                                _selectionModelAdapter.Deselect(rowIndex);
+                                if (selectionIndex >= 0)
+                                {
+                                    _selectionModelAdapter.Deselect(selectionIndex);
+                                }
                             }
                         }
                     }
@@ -160,7 +167,8 @@ namespace Avalonia.Controls
                 int rowIndex = RowIndexFromSlot(slot);
                 if (rowIndex >= 0)
                 {
-                    return _selectionModelAdapter.IsSelected(rowIndex);
+                    var selectionIndex = GetSelectionIndexFromRowIndex(rowIndex);
+                    return selectionIndex >= 0 && _selectionModelAdapter.IsSelected(selectionIndex);
                 }
             }
 
@@ -176,7 +184,8 @@ namespace Avalonia.Controls
 
             if (_selectionModelAdapter != null)
             {
-                return _selectionModelAdapter.IsSelected(rowIndex);
+                var selectionIndex = GetSelectionIndexFromRowIndex(rowIndex);
+                return selectionIndex >= 0 && _selectionModelAdapter.IsSelected(selectionIndex);
             }
 
             if (DataConnection != null)
@@ -230,13 +239,20 @@ namespace Avalonia.Controls
                             int rowIndex = RowIndexFromSlot(slot);
                             if (rowIndex >= 0)
                             {
+                                var selectionIndex = GetSelectionIndexFromRowIndex(rowIndex);
                                 if (isSelected)
                                 {
-                                    _selectionModelAdapter.Select(rowIndex);
+                                    if (selectionIndex >= 0)
+                                    {
+                                        _selectionModelAdapter.Select(selectionIndex);
+                                    }
                                 }
                                 else
                                 {
-                                    _selectionModelAdapter.Deselect(rowIndex);
+                                    if (selectionIndex >= 0)
+                                    {
+                                        _selectionModelAdapter.Deselect(selectionIndex);
+                                    }
                                 }
                             }
                         }

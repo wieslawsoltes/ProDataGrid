@@ -17,6 +17,7 @@ namespace Avalonia.Controls.DataGridSelection
     {
         private readonly ISelectionModel _model;
         private readonly List<object> _pending = new();
+        private int _suppressNotifications;
 
         public SelectedItemsView(ISelectionModel model)
         {
@@ -202,6 +203,12 @@ namespace Avalonia.Controls.DataGridSelection
             return HasSource ? _model.SelectedItems.GetEnumerator() : _pending.GetEnumerator();
         }
 
+        public IDisposable SuppressNotifications()
+        {
+            _suppressNotifications++;
+            return new ActionDisposable(() => _suppressNotifications--);
+        }
+
         private int ResolveIndex(object value)
         {
             if (_model.Source is IList list)
@@ -227,7 +234,12 @@ namespace Avalonia.Controls.DataGridSelection
 
         private void OnSelectionChanged(object sender, SelectionModelSelectionChangedEventArgs e)
         {
-            RaiseDiff(e.SelectedItems?.Cast<object?>(), e.DeselectedItems?.Cast<object?>());
+            if (_suppressNotifications > 0)
+            {
+                return;
+            }
+
+            RaiseDiff(SafeEnumerate(e.SelectedItems), SafeEnumerate(e.DeselectedItems));
         }
 
         private void OnModelPropertyChanged(object sender, PropertyChangedEventArgs e)
@@ -271,10 +283,30 @@ namespace Avalonia.Controls.DataGridSelection
         {
             var changed = false;
 
+            try
+            {
+
             if (removedItems != null)
             {
-                foreach (var item in removedItems)
+                var enumerator = removedItems.GetEnumerator();
+                while (true)
                 {
+                    bool moved;
+                    try
+                    {
+                        moved = enumerator.MoveNext();
+                    }
+                    catch (ArgumentOutOfRangeException)
+                    {
+                        break;
+                    }
+
+                    if (!moved)
+                    {
+                        break;
+                    }
+
+                    var item = enumerator.Current;
                     CollectionChanged?.Invoke(this, new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Remove, item));
                     changed = true;
                 }
@@ -282,8 +314,25 @@ namespace Avalonia.Controls.DataGridSelection
 
             if (addedItems != null)
             {
-                foreach (var item in addedItems)
+                var enumerator = addedItems.GetEnumerator();
+                while (true)
                 {
+                    bool moved;
+                    try
+                    {
+                        moved = enumerator.MoveNext();
+                    }
+                    catch (ArgumentOutOfRangeException)
+                    {
+                        break;
+                    }
+
+                    if (!moved)
+                    {
+                        break;
+                    }
+
+                    var item = enumerator.Current;
                     CollectionChanged?.Invoke(this, new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add, item));
                     changed = true;
                 }
@@ -293,6 +342,50 @@ namespace Avalonia.Controls.DataGridSelection
             {
                 PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Count)));
                 PropertyChanged?.Invoke(this, new PropertyChangedEventArgs("Item[]"));
+            }
+            }
+            catch (ArgumentOutOfRangeException)
+            {
+                // The selection model emitted an index that doesn't currently map; skip the diff.
+            }
+        }
+
+        private static IEnumerable<object?> SafeEnumerate(IEnumerable? items)
+        {
+            if (items == null)
+            {
+                yield break;
+            }
+
+            var enumerator = items.GetEnumerator();
+            while (true)
+            {
+                bool moved;
+                try
+                {
+                    moved = enumerator.MoveNext();
+                }
+                catch (ArgumentOutOfRangeException)
+                {
+                    yield break;
+                }
+
+                if (!moved)
+                {
+                    yield break;
+                }
+
+                object current;
+                try
+                {
+                    current = enumerator.Current;
+                }
+                catch (ArgumentOutOfRangeException)
+                {
+                    continue;
+                }
+
+                yield return current;
             }
         }
 
@@ -312,6 +405,22 @@ namespace Avalonia.Controls.DataGridSelection
             CollectionChanged?.Invoke(this, new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset));
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Count)));
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs("Item[]"));
+        }
+
+        private sealed class ActionDisposable : IDisposable
+        {
+            private Action _onDispose;
+
+            public ActionDisposable(Action onDispose)
+            {
+                _onDispose = onDispose ?? throw new ArgumentNullException(nameof(onDispose));
+            }
+
+            public void Dispose()
+            {
+                _onDispose?.Invoke();
+                _onDispose = null;
+            }
         }
     }
 }

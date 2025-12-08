@@ -35,7 +35,7 @@ namespace Avalonia.Controls
                     var selectedIndexes = _selectionModelAdapter.Model.SelectedIndexes;
                     for (int i = 0; i < selectedIndexes.Count; i++)
                     {
-                        int slot = SlotFromRowIndex(selectedIndexes[i]);
+                        int slot = SlotFromSelectionIndex(selectedIndexes[i]);
                         if (slot >= lowerBound && slot <= upperBound)
                         {
                             selectedCount++;

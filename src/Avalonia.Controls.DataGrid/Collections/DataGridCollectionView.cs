@@ -798,6 +798,16 @@ namespace Avalonia.Collections
         }
 
         /// <summary>
+        /// Returns the item at the specified index in the unpaged, filtered, and sorted list.
+        /// </summary>
+        internal object GetGlobalItemAt(int index) => InternalItemAt(index);
+
+        /// <summary>
+        /// Returns the index of the item in the unpaged, filtered, and sorted list, or -1 if not found.
+        /// </summary>
+        internal int GetGlobalIndexOf(object item) => InternalIndexOf(item);
+
+        /// <summary>
         /// Gets a value indicating whether this view needs to be refreshed.
         /// </summary>
         public bool NeedsRefresh

@@ -446,6 +446,11 @@ namespace Avalonia.Controls
                     return collectionView.GetItemAt(index);
                 }
 
+                if (collectionView.PageSize > 0 && index < collectionView.ItemCount)
+                {
+                    return collectionView.GetGlobalItemAt(index);
+                }
+
                 return CanAddNew && index == collectionView.Count
                     ? DataGridCollectionView.NewItemPlaceholder
                     : null;
@@ -555,7 +560,13 @@ namespace Avalonia.Controls
                     return CanAddNew ? cv.Count : -1;
                 }
 
-                return cv.IndexOf(dataItem);
+                int index = cv.IndexOf(dataItem);
+                if (index == -1 && cv.PageSize > 0)
+                {
+                    index = cv.GetGlobalIndexOf(dataItem);
+                }
+
+                return index;
             }
 
             IList list = List;
@@ -799,6 +810,12 @@ namespace Avalonia.Controls
             }
 
             List<object> selectionSnapshot = _owner.CaptureSelectionSnapshot();
+            if (_owner.Selection != null)
+            {
+                selectionSnapshot = null;
+            }
+            bool restoreSyncingSelectionModel = false;
+            bool previousSyncingSelectionModel = false;
 
             switch (e.Action)
             {
@@ -882,6 +899,9 @@ namespace Avalonia.Controls
                     throw new NotSupportedException(); // 
 
                 case NotifyCollectionChangedAction.Reset:
+                    previousSyncingSelectionModel = _owner.PushSelectionSync();
+                    restoreSyncingSelectionModel = true;
+
                     // Did the data type change during the reset?  If not, we can recycle
                     // the existing rows instead of having to clear them all.  We still need to clear our cached
                     // values for DataType and DataProperties, though, because the collection has been reset.
@@ -899,7 +919,7 @@ namespace Avalonia.Controls
                     break;
             }
 
-            if (selectionSnapshot != null)
+            if (selectionSnapshot != null && _owner.Selection == null)
             {
                 _owner.RestoreSelectionFromSnapshot(selectionSnapshot);
             }
@@ -916,6 +936,11 @@ namespace Avalonia.Controls
             else
             {
                 _owner.RefreshSelectionFromModel();
+            }
+
+            if (restoreSyncingSelectionModel)
+            {
+                _owner.PopSelectionSync(previousSyncingSelectionModel);
             }
         }
 

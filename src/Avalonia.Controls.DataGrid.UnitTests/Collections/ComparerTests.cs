@@ -174,7 +174,7 @@ public class NoStringTypeComparerTests
         sortDescription.Initialize(typeof(Item));
         result = sortDescription.OrderBy(items).ToList();
 
-        ordered = ordered.Reverse().ToArray();
+        ordered = ordered.AsEnumerable().Reverse().ToArray();
         for (int i = 0; i < ordered.Length; i++)
         {
             Assert.Equal(ordered[i], getAction(result[i]));

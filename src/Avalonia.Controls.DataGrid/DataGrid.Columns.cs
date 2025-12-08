@@ -446,7 +446,7 @@ namespace Avalonia.Controls
             if (updatedColumn.IsVisible &&
                 ColumnsInternal.VisibleColumnCount == 1 && CurrentColumnIndex == -1)
             {
-                Debug.Assert(SelectedIndex == DataConnection.IndexOf(SelectedItem));
+                Debug.Assert(SelectedIndex == GetSelectionModelIndexOfItem(SelectedItem));
                 if (SelectedIndex != -1)
                 {
                     SetAndSelectCurrentCell(updatedColumn.Index, SelectedIndex, true /*forceCurrentCellSelection*/);

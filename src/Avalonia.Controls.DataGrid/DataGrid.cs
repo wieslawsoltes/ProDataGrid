@@ -130,6 +130,8 @@ namespace Avalonia.Controls
         private IList _selectedItemsBinding;
         private INotifyCollectionChanged _selectedItemsBindingNotifications;
         private DataGridSelectionModelAdapter _selectionModelAdapter;
+        private DataGridSelection.DataGridPagedSelectionSource _pagedSelectionSource;
+        private List<object> _selectionModelSnapshot;
         private bool _syncingSelectionModel;
         private bool _syncingSelectedItems;
         private int _preferredSelectionIndex = -1;
@@ -916,6 +918,7 @@ namespace Avalonia.Controls
                 _selectionModelAdapter.Model.LostSelection += SelectionModel_LostSelection;
                 _selectionModelAdapter.Model.IndexesChanged += SelectionModel_IndexesChanged;
                 _selectionModelAdapter.Model.PropertyChanged += SelectionModel_PropertyChanged;
+                _selectionModelAdapter.Model.SourceReset += SelectionModel_SourceReset;
 
                 UpdateSelectionModelSource();
             }
@@ -965,7 +968,10 @@ namespace Avalonia.Controls
                 _selectionModelAdapter.Model.LostSelection -= SelectionModel_LostSelection;
                 _selectionModelAdapter.Model.IndexesChanged -= SelectionModel_IndexesChanged;
                 _selectionModelAdapter.Model.PropertyChanged -= SelectionModel_PropertyChanged;
+                _selectionModelAdapter.Model.SourceReset -= SelectionModel_SourceReset;
             }
+
+            _selectionModelSnapshot = null;
         }
 
         /// <summary>
@@ -989,7 +995,18 @@ namespace Avalonia.Controls
                 return -1;
             }
 
-            return RowIndexFromSlot(slot);
+            var rowIndex = RowIndexFromSlot(slot);
+            if (rowIndex < 0)
+            {
+                return -1;
+            }
+
+            if (TryGetPagingInfo(out var pagedView, out var pageStart))
+            {
+                return pageStart + rowIndex;
+            }
+
+            return rowIndex;
         }
 
         /// <summary>
@@ -998,12 +1015,88 @@ namespace Avalonia.Controls
         /// </summary>
         protected virtual int SlotFromSelectionIndex(int index)
         {
-            if (index < 0 || DataConnection == null || index >= DataConnection.Count)
+            if (index < 0 || DataConnection == null)
+            {
+                return -1;
+            }
+
+            if (TryGetPagingInfo(out var pagedView, out var pageStart))
+            {
+                var localIndex = index - pageStart;
+                if (localIndex < 0 || localIndex >= pagedView.Count)
+                {
+                    return -1;
+                }
+
+                return SlotFromRowIndex(localIndex);
+            }
+
+            if (index >= DataConnection.Count)
             {
                 return -1;
             }
 
             return SlotFromRowIndex(index);
+        }
+
+        private bool TryGetPagingInfo(out DataGridCollectionView view, out int pageStart)
+        {
+            view = DataConnection?.CollectionView as DataGridCollectionView;
+            if (view != null && view.PageSize > 0 && view.PageIndex >= 0)
+            {
+                pageStart = view.PageIndex * view.PageSize;
+                return true;
+            }
+
+            pageStart = 0;
+            return false;
+        }
+
+        private int GetSelectionModelIndexOfItem(object item)
+        {
+            if (item == null || DataConnection == null)
+            {
+                return -1;
+            }
+
+            if (DataConnection.CollectionView is DataGridCollectionView paged && paged.PageSize > 0)
+            {
+                return paged.GetGlobalIndexOf(item);
+            }
+
+            return DataConnection.IndexOf(item);
+        }
+
+        private int GetSelectionIndexFromRowIndex(int rowIndex)
+        {
+            if (rowIndex < 0)
+            {
+                return -1;
+            }
+
+            if (TryGetPagingInfo(out var pagedView, out var pageStart))
+            {
+                if (rowIndex >= pagedView.Count)
+                {
+                    return -1;
+                }
+
+                return pageStart + rowIndex;
+            }
+
+            return rowIndex;
+        }
+
+        internal bool PushSelectionSync()
+        {
+            var previous = _syncingSelectionModel;
+            _syncingSelectionModel = true;
+            return previous;
+        }
+
+        internal void PopSelectionSync(bool previous)
+        {
+            _syncingSelectionModel = previous;
         }
 
         private void RemoveDisplayedColumnHeader(DataGridColumn dataGridColumn)
