@@ -116,6 +116,9 @@
     <TabItem Header="DynamicData Filtering">
       <pages:DynamicDataFilteringPage />
     </TabItem>
+    <TabItem Header="Hierarchical Model">
+      <pages:HierarchicalSamplePage />
+    </TabItem>
   </TabControl>
 
 </Window>

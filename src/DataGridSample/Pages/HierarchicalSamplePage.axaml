@@ -1,0 +1,71 @@
+<!--
+  Copyright (c) Wiesław Šoltés. All rights reserved.
+  Licensed under the MIT license. See LICENSE file in the project root for details.
+-->
+<UserControl
+    x:Class="DataGridSample.Pages.HierarchicalSamplePage"
+    xmlns="https://github.com/avaloniaui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:viewModels="clr-namespace:DataGridSample.ViewModels"
+    d:DesignHeight="720"
+    d:DesignWidth="1100"
+    mc:Ignorable="d">
+
+  <UserControl.DataContext>
+    <viewModels:HierarchicalSampleViewModel />
+  </UserControl.DataContext>
+
+  <Grid Margin="12"
+        RowDefinitions="Auto,Auto,*"
+        ColumnDefinitions="*">
+    <StackPanel Spacing="4">
+      <TextBlock Text="Hierarchical Model (file system tree with expand/collapse)"
+                 FontWeight="Bold"
+                 FontSize="18" />
+      <TextBlock TextWrapping="Wrap"
+                 Text="This sample binds the DataGrid to the hierarchical model's flattened nodes to display a portion of your file system. Use the toggle buttons to expand or collapse nodes; virtualization clears children on collapse." />
+    </StackPanel>
+
+    <StackPanel Grid.Row="1"
+                Orientation="Horizontal"
+                Spacing="8"
+                Margin="0 8">
+      <Button Content="Expand all"
+              Command="{Binding ExpandAllCommand}" />
+      <Button Content="Collapse all"
+              Command="{Binding CollapseAllCommand}" />
+      <Button Content="Refresh root"
+              Command="{Binding RefreshRootCommand}" />
+    </StackPanel>
+
+    <DataGrid Grid.Row="2"
+              ItemsSource="{Binding Rows}"
+              AutoGenerateColumns="False"
+              HierarchicalModel="{Binding Model}"
+              HierarchicalRowsEnabled="True"
+              CanUserSortColumns="False"
+              HeadersVisibility="Column"
+              GridLinesVisibility="Horizontal"
+              SelectionMode="Single">
+      <DataGrid.Columns>
+        <DataGridHierarchicalColumn Header="Name"
+                                    Width="2*"
+                                    Binding="{Binding Item.Name}" />
+
+        <DataGridTextColumn Header="Kind"
+                            Width="120"
+                            Binding="{Binding Item.Kind}" />
+
+        <DataGridTextColumn Header="Size"
+                            Width="120"
+                            Binding="{Binding Item.Size, StringFormat=N0}" />
+
+        <DataGridTextColumn Header="Modified"
+                            Width="160"
+                            Binding="{Binding Item.Modified, StringFormat=yyyy-MM-dd HH:mm}" />
+      </DataGrid.Columns>
+    </DataGrid>
+  </Grid>
+</UserControl>
