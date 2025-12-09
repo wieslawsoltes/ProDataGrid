@@ -1,0 +1,133 @@
+<!--
+  Copyright (c) Wiesław Šoltés. All rights reserved.
+  Licensed under the MIT license. See LICENSE file in the project root for details.
+-->
+<UserControl
+    x:Class="DataGridSample.Pages.DynamicDataSortingPage"
+    xmlns="https://github.com/avaloniaui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:viewModels="clr-namespace:DataGridSample.ViewModels"
+    xmlns:sorting="clr-namespace:Avalonia.Controls.DataGridSorting;assembly=Avalonia.Controls.DataGrid"
+    d:DesignHeight="720"
+    d:DesignWidth="1100"
+    mc:Ignorable="d">
+
+  <UserControl.DataContext>
+    <viewModels:DynamicDataSortingViewModel />
+  </UserControl.DataContext>
+
+  <Grid Margin="12"
+        RowDefinitions="Auto,Auto,*"
+        ColumnDefinitions="2*,*">
+    <StackPanel Grid.ColumnSpan="2"
+                Spacing="4">
+      <TextBlock Text="DynamicData sorting with SortingModel"
+                 FontWeight="Bold"
+                 FontSize="18" />
+      <TextBlock TextWrapping="Wrap"
+                 Text="This page demonstrates driving a DynamicData pipeline from the SortingModel via a custom adapter factory. Header clicks update the model, which emits sort descriptors upstream without rewriting SortDescriptions locally." />
+    </StackPanel>
+
+    <StackPanel Grid.Row="1"
+                Grid.ColumnSpan="2"
+                Orientation="Horizontal"
+                Spacing="12"
+                Margin="0 8">
+      <CheckBox Content="Multi-sort with Shift"
+                IsChecked="{Binding MultiSortEnabled}" />
+      <StackPanel Orientation="Horizontal"
+                  Spacing="6">
+        <TextBlock VerticalAlignment="Center" Text="Cycle:" />
+        <ComboBox Width="220"
+                  SelectedItem="{Binding SortCycleMode}">
+          <sorting:SortCycleMode>AscendingDescendingNone</sorting:SortCycleMode>
+          <sorting:SortCycleMode>AscendingDescending</sorting:SortCycleMode>
+        </ComboBox>
+      </StackPanel>
+      <Button Content="Apply preset (Status then Service)"
+              Command="{Binding ApplyPresetCommand}" />
+      <Button Content="Clear sorts"
+              Command="{Binding ClearSortsCommand}" />
+    </StackPanel>
+
+    <DataGrid Grid.Row="2"
+              Grid.Column="0"
+              x:Name="Grid"
+              ItemsSource="{Binding View}"
+              AutoGenerateColumns="False"
+              SelectionMode="Extended"
+              CanUserSortColumns="True"
+              SortingModel="{Binding SortingModel}"
+              GridLinesVisibility="Horizontal">
+      <DataGrid.Columns>
+        <DataGridTextColumn Header="Service"
+                            Binding="{Binding Service}"
+                            SortMemberPath="Service"
+                            Width="*" />
+        <DataGridTextColumn Header="Status"
+                            Binding="{Binding Status}"
+                            SortMemberPath="Status"
+                            Width="140" />
+        <DataGridTextColumn Header="Region"
+                            Binding="{Binding Region}"
+                            SortMemberPath="Region"
+                            Width="140" />
+        <DataGridTextColumn Header="Started (UTC)"
+                            Binding="{Binding Started, StringFormat='{}{0:MM-dd HH:mm}'}"
+                            SortMemberPath="Started"
+                            Width="150" />
+      </DataGrid.Columns>
+    </DataGrid>
+
+    <StackPanel Grid.Row="2"
+                Grid.Column="1"
+                Margin="12 0 0 0"
+                Spacing="10">
+      <Border Padding="10" Background="#0D000000" CornerRadius="6">
+        <StackPanel Spacing="6">
+          <TextBlock Text="Sorting descriptors" FontWeight="Bold" />
+          <ItemsControl ItemsSource="{Binding DescriptorSummaries}">
+            <ItemsControl.ItemsPanel>
+              <ItemsPanelTemplate>
+                <StackPanel Orientation="Vertical" />
+              </ItemsPanelTemplate>
+            </ItemsControl.ItemsPanel>
+            <ItemsControl.ItemTemplate>
+              <DataTemplate>
+                <Border Padding="6" Margin="0 3" Background="#08000000" CornerRadius="4">
+                  <StackPanel Orientation="Horizontal" Spacing="6">
+                    <TextBlock Text="{Binding Column}" FontWeight="SemiBold" />
+                    <TextBlock Text="{Binding Direction}" />
+                    <TextBlock Text="{Binding Kind}" />
+                  </StackPanel>
+                </Border>
+              </DataTemplate>
+            </ItemsControl.ItemTemplate>
+          </ItemsControl>
+        </StackPanel>
+      </Border>
+
+      <Border Padding="10" Background="#0D000000" CornerRadius="6">
+        <StackPanel Spacing="6">
+          <TextBlock Text="Upstream sort expressions (DynamicData)" FontWeight="Bold" />
+          <ItemsControl ItemsSource="{Binding UpstreamSorts}">
+            <ItemsControl.ItemsPanel>
+              <ItemsPanelTemplate>
+                <StackPanel Orientation="Vertical" />
+              </ItemsPanelTemplate>
+            </ItemsControl.ItemsPanel>
+            <ItemsControl.ItemTemplate>
+              <DataTemplate>
+                <Border Padding="6" Margin="0 3" Background="#08000000" CornerRadius="4">
+                  <TextBlock Text="{Binding}" />
+                </Border>
+              </DataTemplate>
+            </ItemsControl.ItemTemplate>
+          </ItemsControl>
+        </StackPanel>
+      </Border>
+    </StackPanel>
+  </Grid>
+</UserControl>

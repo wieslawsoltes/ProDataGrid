@@ -107,6 +107,9 @@
     <TabItem Header="Sorting Model Playground">
       <pages:SortingModelPlaygroundPage />
     </TabItem>
+    <TabItem Header="DynamicData Sorting">
+      <pages:DynamicDataSortingPage />
+    </TabItem>
   </TabControl>
 
 </Window>

@@ -13,6 +13,7 @@
     <PackageReference Include="Avalonia.Diagnostics" />
     <PackageReference Include="Avalonia.Fonts.Inter" />
     <PackageReference Include="Avalonia.Themes.Fluent" />
+    <PackageReference Include="DynamicData" />
   </ItemGroup>
 
   <ItemGroup>
