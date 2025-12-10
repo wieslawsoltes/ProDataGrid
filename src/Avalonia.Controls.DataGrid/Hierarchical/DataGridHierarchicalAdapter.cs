@@ -98,6 +98,10 @@ namespace Avalonia.Controls.DataGridHierarchical
             _model.Sort(node, comparer, recursive);
         }
 
+        public void ExpandAll(HierarchicalNode? node = null, int? maxDepth = null) => _model.ExpandAll(node, maxDepth);
+
+        public void CollapseAll(HierarchicalNode? node = null, int? minDepth = null) => _model.CollapseAll(node, minDepth);
+
         private void OnModelFlattenedChanged(object? sender, FlattenedChangedEventArgs e)
         {
             FlattenedChanged?.Invoke(this, e);

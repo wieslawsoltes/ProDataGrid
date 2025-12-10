@@ -305,4 +305,113 @@ public class HierarchicalModelTests
         Assert.Equal(2, model.Count);
         Assert.Same(child, model.GetItem(1));
     }
+
+    [Fact]
+    public void ExpandedCount_TracksVisibleDescendants()
+    {
+        var root = new Item("root");
+        var child = new Item("child");
+        var grand = new Item("grand");
+        child.Children.Add(grand);
+        root.Children.Add(child);
+
+        var model = CreateModel();
+        model.SetRoot(root);
+
+        Assert.Equal(0, model.Root!.ExpandedCount);
+
+        model.Expand(model.Root!);
+        Assert.Equal(1, model.Root!.ExpandedCount);
+        Assert.Equal(0, model.GetNode(1).ExpandedCount);
+
+        model.Expand(model.GetNode(1));
+        Assert.Equal(2, model.Root!.ExpandedCount);
+        Assert.Equal(1, model.GetNode(1).ExpandedCount);
+
+        model.Collapse(model.GetNode(1));
+        Assert.Equal(1, model.Root!.ExpandedCount);
+        Assert.Equal(0, model.GetNode(1).ExpandedCount);
+    }
+
+    [Fact]
+    public void ExpandAll_Expands_Subtree()
+    {
+        var root = new Item("root");
+        var child = new Item("child");
+        var grand = new Item("grand");
+        child.Children.Add(grand);
+        root.Children.Add(child);
+
+        var model = CreateModel();
+        model.SetRoot(root);
+
+        model.ExpandAll();
+
+        Assert.True(model.Root!.IsExpanded);
+        Assert.True(model.GetNode(1).IsExpanded);
+        Assert.Equal(3, model.Count);
+        Assert.Equal(2, model.Root!.ExpandedCount);
+    }
+
+    [Fact]
+    public void ExpandAll_WithDepthLimit_DoesNotExpandBeyondLimit()
+    {
+        var root = new Item("root");
+        var child = new Item("child");
+        var grand = new Item("grand");
+        child.Children.Add(grand);
+        root.Children.Add(child);
+
+        var model = CreateModel();
+        model.SetRoot(root);
+
+        model.ExpandAll(maxDepth: 0);
+
+        Assert.True(model.Root!.IsExpanded);
+        Assert.False(model.GetNode(1).IsExpanded);
+        Assert.Equal(2, model.Count);
+        Assert.Equal(1, model.Root!.ExpandedCount);
+    }
+
+    [Fact]
+    public void CollapseAll_Default_CollapsesEverything()
+    {
+        var root = new Item("root");
+        var child = new Item("child");
+        var grand = new Item("grand");
+        child.Children.Add(grand);
+        root.Children.Add(child);
+
+        var model = CreateModel();
+        model.SetRoot(root);
+        model.ExpandAll();
+        Assert.Equal(3, model.Count);
+
+        model.CollapseAll();
+
+        Assert.False(model.Root!.IsExpanded);
+        Assert.Equal(1, model.Count);
+        Assert.Equal(0, model.Root!.ExpandedCount);
+    }
+
+    [Fact]
+    public void CollapseAll_FromDepth_CollapsesDescendantsOnly()
+    {
+        var root = new Item("root");
+        var child = new Item("child");
+        var grand = new Item("grand");
+        child.Children.Add(grand);
+        root.Children.Add(child);
+
+        var model = CreateModel();
+        model.SetRoot(root);
+        model.ExpandAll();
+
+        model.CollapseAll(minDepth: 1);
+
+        Assert.True(model.Root!.IsExpanded);
+        Assert.False(model.GetNode(1).IsExpanded);
+        Assert.Equal(2, model.Count);
+        Assert.Equal(1, model.Root!.ExpandedCount);
+    }
 }

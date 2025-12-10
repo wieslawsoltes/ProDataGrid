@@ -21,6 +21,7 @@ namespace Avalonia.Controls.DataGridHierarchical
         private int _level;
         private bool _isLoading;
         private Exception? _loadError;
+        private int _expandedCount;
 
         public HierarchicalNode(object item, HierarchicalNode? parent = null, int level = 0, bool isLeaf = false)
         {
@@ -85,6 +86,15 @@ namespace Avalonia.Controls.DataGridHierarchical
         {
             get => _isLoading;
             internal set => SetField(ref _isLoading, value);
+        }
+
+        /// <summary>
+        /// Gets the number of visible descendant nodes under this node (based on current expansion state).
+        /// </summary>
+        public int ExpandedCount
+        {
+            get => _expandedCount;
+            internal set => SetField(ref _expandedCount, value);
         }
 
         /// <summary>

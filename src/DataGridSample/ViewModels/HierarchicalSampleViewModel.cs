@@ -87,20 +87,12 @@ namespace DataGridSample.ViewModels
 
             ExpandAllCommand = new RelayCommand(_ =>
             {
-                // Take a snapshot to avoid modifying the flattened list while expanding.
-                foreach (var node in Model.Flattened.ToList())
-                {
-                    Model.Expand(node);
-                }
+                Model.ExpandAll();
                 OnPropertyChanged(nameof(Rows));
             });
             CollapseAllCommand = new RelayCommand(_ =>
             {
-                // Take a snapshot to avoid modifying the flattened list while collapsing.
-                foreach (var node in Model.Flattened.ToList())
-                {
-                    Model.Collapse(node);
-                }
+                Model.CollapseAll();
                 OnPropertyChanged(nameof(Rows));
             });
             RefreshRootCommand = new RelayCommand(_ =>
