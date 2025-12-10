@@ -9,6 +9,7 @@ using System.Globalization;
 using Avalonia.Collections;
 using Avalonia.Controls;
 using Avalonia.Controls.DataGridSorting;
+using Avalonia.Headless.XUnit;
 using Avalonia.Input;
 using Xunit;
 
@@ -16,7 +17,7 @@ namespace Avalonia.Controls.DataGridTests.Sorting;
 
 public class DataGridSortingAdapterTests
 {
-    [Fact]
+    [AvaloniaFact]
     public void Model_Changes_Apply_To_View_SortDescriptions()
     {
         var column = new DataGridTextColumn { SortMemberPath = "Name" };
@@ -32,7 +33,7 @@ public class DataGridSortingAdapterTests
         Assert.Equal(ListSortDirection.Ascending, sort.Direction);
     }
 
-    [Fact]
+    [AvaloniaFact]
     public void HandleHeaderClick_Supports_Multi_Sort_With_Shift()
     {
         var first = new DataGridTextColumn { SortMemberPath = "Name" };
@@ -49,7 +50,7 @@ public class DataGridSortingAdapterTests
         Assert.Equal(new[] { "Name", "Age" }, view.SortDescriptions.Select(s => s.PropertyPath).ToArray());
     }
 
-    [Fact]
+    [AvaloniaFact]
     public void HandleHeaderClick_Ctrl_Clears_Sort()
     {
         var column = new DataGridTextColumn { SortMemberPath = "Name" };
@@ -65,7 +66,7 @@ public class DataGridSortingAdapterTests
         Assert.Empty(view.SortDescriptions);
     }
 
-    [Fact]
+    [AvaloniaFact]
     public void External_View_Sorts_Synchronize_When_Model_Does_Not_Own()
     {
         var column = new DataGridTextColumn { SortMemberPath = "Name" };
@@ -84,7 +85,7 @@ public class DataGridSortingAdapterTests
         Assert.Equal(ListSortDirection.Descending, descriptor.Direction);
     }
 
-    [Fact]
+    [AvaloniaFact]
     public void External_View_Sorts_With_Duplicates_Are_Deduped()
     {
         var column = new DataGridTextColumn { SortMemberPath = "Name" };
@@ -100,7 +101,7 @@ public class DataGridSortingAdapterTests
         Assert.Equal(ListSortDirection.Ascending, descriptor.Direction);
     }
 
-    [Fact]
+    [AvaloniaFact]
     public void HandleHeaderClick_No_Path_Does_Not_Add_Descriptor()
     {
         var column = new DataGridTextColumn();
@@ -115,7 +116,7 @@ public class DataGridSortingAdapterTests
         Assert.Empty(view.SortDescriptions);
     }
 
-    [Fact]
+    [AvaloniaFact]
     public void HandleHeaderClick_Adds_Comparer_Sort()
     {
         var comparer = Comparer<object>.Create((x, y) =>
@@ -135,7 +136,7 @@ public class DataGridSortingAdapterTests
         Assert.Equal(column, descriptor.ColumnId);
     }
 
-    [Fact]
+    [AvaloniaFact]
     public void Observe_Mode_Syncs_Grouped_Paged_MultiSort_With_Culture_And_Comparer()
     {
         var culture = new CultureInfo("pl-PL");
