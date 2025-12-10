@@ -133,6 +133,8 @@ namespace Avalonia.Controls
         private bool _hierarchicalRowsEnabled;
         private int _hierarchicalRefreshSuppressionCount;
         private bool _pendingHierarchicalRefresh;
+        private IEnumerable _hierarchicalItemsSource;
+        private bool _ownsHierarchicalItemsSource;
 
         // Nth row of rows 0..N that make up the RowHeightEstimate
         private int _lastEstimatedRow;
@@ -978,6 +980,14 @@ namespace Avalonia.Controls
                 }
 
                 _hierarchicalRowsEnabled = value;
+                if (_hierarchicalRowsEnabled)
+                {
+                    EnsureHierarchicalItemsSource();
+                }
+                else
+                {
+                    DetachHierarchicalItemsSource();
+                }
                 UpdateSelectionProxy();
             }
         }
@@ -1326,6 +1336,41 @@ namespace Avalonia.Controls
             }
         }
 
+        private void EnsureHierarchicalItemsSource()
+        {
+            if (!_hierarchicalRowsEnabled || _hierarchicalModel?.ObservableFlattened == null)
+            {
+                DetachHierarchicalItemsSource();
+                return;
+            }
+
+            var source = _hierarchicalModel.Flattened;
+            var itemsSource = ItemsSource;
+
+            if (!_ownsHierarchicalItemsSource &&
+                itemsSource != null &&
+                !ReferenceEquals(itemsSource, _hierarchicalItemsSource) &&
+                !ReferenceEquals(itemsSource, source))
+            {
+                return;
+            }
+
+            _hierarchicalItemsSource = source;
+            _ownsHierarchicalItemsSource = true;
+            SetCurrentValue(ItemsSourceProperty, source);
+        }
+
+        private void DetachHierarchicalItemsSource()
+        {
+            if (_ownsHierarchicalItemsSource && ReferenceEquals(ItemsSource, _hierarchicalItemsSource))
+            {
+                SetCurrentValue(ItemsSourceProperty, null);
+            }
+
+            _hierarchicalItemsSource = null;
+            _ownsHierarchicalItemsSource = false;
+        }
+
         private void RunHierarchicalAction(Action action)
         {
             if (action == null)
@@ -1605,6 +1650,7 @@ namespace Avalonia.Controls
                 _hierarchicalAdapter = CreateHierarchicalAdapter(_hierarchicalModel);
             }
 
+            EnsureHierarchicalItemsSource();
             UpdateSelectionProxy();
             RaisePropertyChanged(HierarchicalModelProperty, oldModel, _hierarchicalModel);
         }

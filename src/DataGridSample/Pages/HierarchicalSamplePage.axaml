@@ -30,7 +30,7 @@
                  FontWeight="Bold"
                  FontSize="18" />
       <TextBlock TextWrapping="Wrap"
-                 Text="This sample binds the DataGrid to the hierarchical model's flattened nodes to display a portion of your file system. Use the toggle buttons to expand or collapse nodes; virtualization clears children on collapse." />
+                 Text="This sample displays a portion of your file system using the hierarchical model's flattened nodes, automatically bound by the DataGrid. Use the toggle buttons to expand or collapse nodes; virtualization clears children on collapse." />
     </StackPanel>
 
     <StackPanel Grid.Row="1"
@@ -46,7 +46,6 @@
     </StackPanel>
 
     <DataGrid Grid.Row="2"
-              ItemsSource="{Binding RowsView}"
               AutoGenerateColumns="False"
               HierarchicalModel="{Binding Model}"
               SortingModel="{Binding SortingModel, Mode=OneWay}"

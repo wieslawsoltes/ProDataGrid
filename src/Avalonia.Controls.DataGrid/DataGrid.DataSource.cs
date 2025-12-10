@@ -31,14 +31,34 @@ namespace Avalonia.Controls
         /// <param name="e">The event arguments.</param>
         private void OnItemsSourcePropertyChanged(AvaloniaPropertyChangedEventArgs e)
         {
+            var oldValue = (IEnumerable)e.OldValue;
+            var newItemsSource = (IEnumerable)e.NewValue;
+            var switchingFromOwnedHierarchical = ReferenceEquals(oldValue, _hierarchicalItemsSource) && _ownsHierarchicalItemsSource && !ReferenceEquals(oldValue, newItemsSource);
+
+            _ownsHierarchicalItemsSource = ReferenceEquals(newItemsSource, _hierarchicalItemsSource);
+            if (!_ownsHierarchicalItemsSource && !ReferenceEquals(newItemsSource, _hierarchicalItemsSource))
+            {
+                _hierarchicalItemsSource = null;
+            }
+
+            if (switchingFromOwnedHierarchical && _selectionModelAdapter?.Model != null)
+            {
+                _syncingSelectionModel = true;
+                try
+                {
+                    _selectionModelAdapter.Model.Source = null;
+                }
+                finally
+                {
+                    _syncingSelectionModel = false;
+                }
+            }
+
             if (!_areHandlersSuspended)
             {
                 Debug.Assert(DataConnection != null);
 
                 var oldCollectionView = DataConnection.CollectionView;
-
-                var oldValue = (IEnumerable)e.OldValue;
-                var newItemsSource = (IEnumerable)e.NewValue;
 
                 if (LoadingOrUnloadingRow)
                 {

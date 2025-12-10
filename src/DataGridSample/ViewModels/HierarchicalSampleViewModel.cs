@@ -7,8 +7,6 @@ using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.IO;
 using System.Linq;
-using Avalonia.Collections;
-using Avalonia.Controls;
 using Avalonia.Controls.DataGridHierarchical;
 using Avalonia.Controls.DataGridSorting;
 using DataGridSample.Mvvm;
@@ -88,25 +86,19 @@ namespace DataGridSample.ViewModels
             };
 
             Model = new HierarchicalModel(options);
-            var adapter = new DataGridHierarchicalAdapter(Model);
-            RowsView = new DataGridCollectionView(Model.Flattened);
-            adapter.FlattenedChanged += (_, __) => RowsView.Refresh();
             Model.SetRoot(root);
 
             ExpandAllCommand = new RelayCommand(_ =>
             {
                 Model.ExpandAll();
-                RowsView.Refresh();
             });
             CollapseAllCommand = new RelayCommand(_ =>
             {
                 Model.CollapseAll();
-                RowsView.Refresh();
             });
             RefreshRootCommand = new RelayCommand(_ =>
             {
                 Model.Refresh(Model.Root);
-                RowsView.Refresh();
             });
         }
 
@@ -115,8 +107,6 @@ namespace DataGridSample.ViewModels
         public IComparer<object> DefaultComparer => _defaultComparer;
 
         public ISortingModel SortingModel { get; }
-
-        public DataGridCollectionView RowsView { get; }
 
         public RelayCommand ExpandAllCommand { get; }
 
@@ -240,13 +230,11 @@ namespace DataGridSample.ViewModels
             if (descriptors == null || descriptors.Count == 0)
             {
                 Model.ApplySiblingComparer(_defaultComparer, recursive: true);
-                RowsView.Refresh();
                 return;
             }
 
             var comparer = BuildComparer(descriptors);
             Model.ApplySiblingComparer(comparer, recursive: true);
-            RowsView.Refresh();
         }
 
         private static IComparer<object> BuildComparer(IReadOnlyList<SortingDescriptor> descriptors)

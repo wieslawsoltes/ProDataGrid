@@ -5,6 +5,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Collections.Specialized;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Reflection;
 using System.Threading;
@@ -214,6 +215,11 @@ namespace Avalonia.Controls.DataGridHierarchical
         IReadOnlyList<HierarchicalNode> Flattened { get; }
 
         /// <summary>
+        /// Gets an observable view of the flattened nodes in display order.
+        /// </summary>
+        ReadOnlyObservableCollection<HierarchicalNode> ObservableFlattened { get; }
+
+        /// <summary>
         /// Gets the total number of visible nodes.
         /// </summary>
         int Count { get; }
@@ -373,7 +379,8 @@ namespace Avalonia.Controls.DataGridHierarchical
     /// </summary>
     public class HierarchicalModel : IHierarchicalModel
     {
-        private readonly List<HierarchicalNode> _flattened;
+        private readonly ObservableRangeCollection<HierarchicalNode> _flattened;
+        private readonly ReadOnlyObservableCollection<HierarchicalNode> _flattenedObservableView;
         private readonly IReadOnlyList<HierarchicalNode> _flattenedView;
         private readonly Dictionary<(Type, string), Func<object, object?>> _propertyPathCache;
         private readonly HashSet<HierarchicalNode> _pendingCullNodes = new();
@@ -383,8 +390,9 @@ namespace Avalonia.Controls.DataGridHierarchical
         public HierarchicalModel(HierarchicalOptions? options = null)
         {
             Options = options ?? new HierarchicalOptions();
-            _flattened = new List<HierarchicalNode>();
-            _flattenedView = _flattened.AsReadOnly();
+            _flattened = new ObservableRangeCollection<HierarchicalNode>();
+            _flattenedObservableView = new ReadOnlyObservableCollection<HierarchicalNode>(_flattened);
+            _flattenedView = new ReadOnlyListWrapper<HierarchicalNode>(_flattened);
             _propertyPathCache = new Dictionary<(Type, string), Func<object, object?>>();
         }
 
@@ -393,6 +401,8 @@ namespace Avalonia.Controls.DataGridHierarchical
         public HierarchicalNode? Root { get; private set; }
 
         public IReadOnlyList<HierarchicalNode> Flattened => _flattenedView;
+
+        public ReadOnlyObservableCollection<HierarchicalNode> ObservableFlattened => _flattenedObservableView;
 
         public int Count => _flattened.Count;
 
@@ -860,8 +870,7 @@ namespace Avalonia.Controls.DataGridHierarchical
         internal void ReplaceFlattened(IEnumerable<HierarchicalNode> nodes, bool notify = true)
         {
             var oldCount = _flattened.Count;
-            _flattened.Clear();
-            _flattened.AddRange(nodes ?? Array.Empty<HierarchicalNode>());
+            _flattened.ResetWith(nodes ?? Array.Empty<HierarchicalNode>());
 
             if (notify)
             {
@@ -1905,6 +1914,24 @@ namespace Avalonia.Controls.DataGridHierarchical
                 _onDispose?.Invoke();
                 _onDispose = null;
             }
+        }
+
+        private sealed class ReadOnlyListWrapper<T> : IReadOnlyList<T>
+        {
+            private readonly IList<T> _inner;
+
+            public ReadOnlyListWrapper(IList<T> inner)
+            {
+                _inner = inner ?? throw new ArgumentNullException(nameof(inner));
+            }
+
+            public T this[int index] => _inner[index];
+
+            public int Count => _inner.Count;
+
+            public IEnumerator<T> GetEnumerator() => _inner.GetEnumerator();
+
+            IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
         }
     }
 }

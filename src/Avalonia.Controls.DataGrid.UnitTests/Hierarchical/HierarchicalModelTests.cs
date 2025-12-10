@@ -140,6 +140,26 @@ namespace Avalonia.Controls.DataGridTests.Hierarchical;
     }
 
     [Fact]
+    public void ObservableFlattened_RaisesChange_OnExpand()
+    {
+        var model = CreateModel();
+        var root = new Item("root");
+        root.Children.Add(new Item("child"));
+        model.SetRoot(root);
+
+        NotifyCollectionChangedEventArgs? change = null;
+        ((INotifyCollectionChanged)model.ObservableFlattened).CollectionChanged += (_, e) => change = e;
+
+        model.Expand(model.Root!);
+
+        Assert.NotNull(change);
+        Assert.Equal(NotifyCollectionChangedAction.Add, change!.Action);
+        Assert.Equal(1, change.NewStartingIndex);
+        Assert.NotNull(change.NewItems);
+        Assert.Equal(1, change.NewItems!.Count);
+    }
+
+    [Fact]
     public void IndexOf_Returns_VisibleIndex()
     {
         var model = CreateModel();
