@@ -237,11 +237,11 @@ namespace Avalonia.Controls
                 }
             }
 
-            PseudoClasses.Set(":sortascending",
+            PseudoClassesHelper.Set(PseudoClasses, ":sortascending",
                 CurrentSortingState == ListSortDirection.Ascending);
-            PseudoClasses.Set(":sortdescending",
+            PseudoClassesHelper.Set(PseudoClasses, ":sortdescending",
                 CurrentSortingState == ListSortDirection.Descending);
-            PseudoClasses.Set(":filtered",
+            PseudoClassesHelper.Set(PseudoClasses, ":filtered",
                 OwningGrid?.GetFilteringDescriptorForColumn(OwningColumn) != null);
         }
 

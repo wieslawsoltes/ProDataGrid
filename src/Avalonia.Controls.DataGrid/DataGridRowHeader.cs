@@ -149,20 +149,18 @@ namespace Avalonia.Controls.Primitives
             {
                 if (OwningRow != null)
                 {
-                    PseudoClasses.Set(":invalid", !OwningRow.IsValid);
-
-                    PseudoClasses.Set(":selected", OwningRow.IsSelected);
-
-                    PseudoClasses.Set(":editing", OwningRow.IsEditing);
+                    PseudoClassesHelper.Set(PseudoClasses, ":invalid", !OwningRow.IsValid);
+                    PseudoClassesHelper.Set(PseudoClasses, ":selected", OwningRow.IsSelected);
+                    PseudoClassesHelper.Set(PseudoClasses, ":editing", OwningRow.IsEditing);
 
                     if (OwningGrid != null)
                     {
-                        PseudoClasses.Set(":current", OwningRow.Slot == OwningGrid.CurrentSlot);
+                        PseudoClassesHelper.Set(PseudoClasses, ":current", OwningRow.Slot == OwningGrid.CurrentSlot);
                     }
                 }
                 else if (OwningRowGroupHeader != null && OwningGrid != null)
                 {
-                    PseudoClasses.Set(":current", OwningRowGroupHeader.RowGroupInfo.Slot == OwningGrid.CurrentSlot);
+                    PseudoClassesHelper.Set(PseudoClasses, ":current", OwningRowGroupHeader.RowGroupInfo.Slot == OwningGrid.CurrentSlot);
                 }
             }
         }

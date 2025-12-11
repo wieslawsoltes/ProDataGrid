@@ -267,8 +267,8 @@ namespace Avalonia.Controls
 
         internal void UpdatePseudoClasses()
         {
-            PseudoClasses.Set(":empty-columns", !ColumnsInternal.GetVisibleColumns().Any());
-            PseudoClasses.Set(":empty-rows", !DataConnection.Any());
+            PseudoClassesHelper.Set(PseudoClasses, ":empty-columns", !ColumnsInternal.GetVisibleColumns().Any());
+            PseudoClassesHelper.Set(PseudoClasses, ":empty-rows", !DataConnection.Any());
         }
 
         private void OnCanUserAddRowsChanged(AvaloniaPropertyChangedEventArgs e)

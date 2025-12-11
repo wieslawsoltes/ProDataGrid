@@ -225,15 +225,11 @@ namespace Avalonia.Controls
                 return;
             }
 
-            PseudoClasses.Set(":selected", OwningRow.IsSelected);
-
-            PseudoClasses.Set(":current", IsCurrent);
-
-            PseudoClasses.Set(":edited", IsEdited);
-
-            PseudoClasses.Set(":invalid", !IsValid);
-            
-            PseudoClasses.Set(":focus", OwningGrid.IsFocused && IsCurrent);
+            PseudoClassesHelper.Set(PseudoClasses, ":selected", OwningRow.IsSelected);
+            PseudoClassesHelper.Set(PseudoClasses, ":current", IsCurrent);
+            PseudoClassesHelper.Set(PseudoClasses, ":edited", IsEdited);
+            PseudoClassesHelper.Set(PseudoClasses, ":invalid", !IsValid);
+            PseudoClassesHelper.Set(PseudoClasses, ":focus", OwningGrid.IsFocused && IsCurrent);
         }
 
         // Makes sure the right gridline has the proper stroke and visibility. If lastVisibleColumn is specified, the 

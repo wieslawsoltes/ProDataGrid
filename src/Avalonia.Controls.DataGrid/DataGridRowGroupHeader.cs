@@ -241,11 +241,11 @@ namespace Avalonia.Controls
 
         internal void UpdatePseudoClasses()
         {
-            PseudoClasses.Set(":current", IsCurrent);
+            PseudoClassesHelper.Set(PseudoClasses, ":current", IsCurrent);
 
             if (RowGroupInfo?.CollectionViewGroup != null)
             {
-                PseudoClasses.Set(":expanded", RowGroupInfo.IsVisible && RowGroupInfo.CollectionViewGroup.ItemCount > 0);
+                PseudoClassesHelper.Set(PseudoClasses, ":expanded", RowGroupInfo.IsVisible && RowGroupInfo.CollectionViewGroup.ItemCount > 0);
             }
         }
 

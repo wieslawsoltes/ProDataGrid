@@ -58,7 +58,7 @@ namespace Avalonia.Controls
             internal set
             {
                 SetAndRaise(IsValidProperty, ref _isValid, value);
-                PseudoClasses.Set(":invalid", !value);
+                PseudoClassesHelper.Set(PseudoClasses, ":invalid", !value);
             }
         }
 

@@ -651,7 +651,7 @@ namespace Avalonia.Controls
                     OwningGrid.SetRowSelection(Slot, value, false);
                 }
 
-                PseudoClasses.Set(":selected", value);
+                PseudoClassesHelper.Set(PseudoClasses, ":selected", value);
             }
 
             base.OnPropertyChanged(change);
