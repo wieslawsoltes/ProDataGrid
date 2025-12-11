@@ -202,6 +202,7 @@ namespace Avalonia.Controls
             RowDetailsVisibilityModeProperty.Changed.AddClassHandler<DataGrid>((x, e) => x.OnRowDetailsVisibilityModeChanged(e));
             AutoGenerateColumnsProperty.Changed.AddClassHandler<DataGrid>((x, e) => x.OnAutoGenerateColumnsChanged(e));
             RowHeightEstimatorProperty.Changed.AddClassHandler<DataGrid>((x, e) => x.OnRowHeightEstimatorChanged(e));
+            ColumnHeaderThemeProperty.Changed.AddClassHandler<DataGrid>((x, e) => x.OnColumnHeaderThemeChanged(e));
 
             FocusableProperty.OverrideDefaultValue<DataGrid>(true);
 
@@ -650,6 +651,27 @@ namespace Avalonia.Controls
 
             // Force refresh of displayed rows
             InvalidateMeasure();
+        }
+
+        /// <summary>
+        /// Re-applies the grid-level column header theme to realized headers that do not override it.
+        /// </summary>
+        private void OnColumnHeaderThemeChanged(AvaloniaPropertyChangedEventArgs e)
+        {
+            if (ColumnsInternal == null)
+            {
+                return;
+            }
+
+            foreach (var column in ColumnsInternal.GetVisibleColumns())
+            {
+                if (column.HeaderTheme != null || !column.HasHeaderCell)
+                {
+                    continue;
+                }
+
+                column.ApplyHeaderTheme(column.HeaderCell);
+            }
         }
 
         /// <summary>

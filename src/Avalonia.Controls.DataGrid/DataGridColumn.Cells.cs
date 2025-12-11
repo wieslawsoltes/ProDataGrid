@@ -133,10 +133,8 @@ namespace Avalonia.Controls
             };
             result[!ContentControl.ContentProperty] = this[!HeaderProperty];
             result[!ContentControl.ContentTemplateProperty] = this[!HeaderTemplateProperty];
-            if (OwningGrid.ColumnHeaderTheme is { } columnTheme)
-            {
-                result.SetValue(StyledElement.ThemeProperty, columnTheme, BindingPriority.Template);
-            }
+            result.Classes.Replace(HeaderStyleClasses);
+            ApplyHeaderTheme(result);
 
             var filterTheme = FilterTheme ?? OwningGrid?.ColumnHeaderFilterTheme;
             if (filterTheme != null)
@@ -150,6 +148,19 @@ namespace Avalonia.Controls
             result.PointerPressed += (s, e) => { HeaderPointerPressed?.Invoke(this, e); };
             result.PointerReleased += (s, e) => { HeaderPointerReleased?.Invoke(this, e); };
             return result;
+        }
+
+        internal void ApplyHeaderTheme(DataGridColumnHeader header)
+        {
+            var theme = HeaderTheme ?? OwningGrid?.ColumnHeaderTheme;
+            if (theme != null)
+            {
+                header.SetValue(StyledElement.ThemeProperty, theme, BindingPriority.Template);
+            }
+            else
+            {
+                header.ClearValue(StyledElement.ThemeProperty);
+            }
         }
 
         internal Control GenerateElementInternal(DataGridCell cell, object dataItem)
