@@ -122,6 +122,9 @@
     <TabItem Header="Selection Origin">
       <pages:SelectionOriginPage />
     </TabItem>
+    <TabItem Header="Auto-scroll">
+      <pages:AutoScrollPage />
+    </TabItem>
   </TabControl>
 
 </Window>

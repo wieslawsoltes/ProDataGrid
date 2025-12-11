@@ -8,6 +8,7 @@ using Avalonia.Collections;
 using Avalonia.Controls.Utils;
 using Avalonia.Interactivity;
 using Avalonia.Controls.Selection;
+using Avalonia.Threading;
 using System;
 using System.Collections;
 using System.Collections.Specialized;
@@ -498,6 +499,7 @@ namespace Avalonia.Controls
         internal bool UpdateSelectionAndCurrency(int columnIndex, int slot, DataGridSelectionAction action, bool scrollIntoView)
         {
             _successfullyUpdatedSelection = false;
+            bool effectiveScrollIntoView = scrollIntoView || AutoScrollToSelectedItem;
 
             _noSelectionChangeCount++;
             _noCurrentCellChangeCount++;
@@ -524,11 +526,11 @@ namespace Avalonia.Controls
                 if (DataConnection.CollectionView != null &&
                     DataConnection.CollectionView.CurrentPosition != newCurrentPosition)
                 {
-                    DataConnection.MoveCurrentTo(item, slot, columnIndex, action, scrollIntoView);
+                    DataConnection.MoveCurrentTo(item, slot, columnIndex, action, effectiveScrollIntoView);
                 }
                 else
                 {
-                    ProcessSelectionAndCurrency(columnIndex, item, slot, action, scrollIntoView);
+                    ProcessSelectionAndCurrency(columnIndex, item, slot, action, effectiveScrollIntoView);
                 }
             }
             finally
@@ -555,6 +557,10 @@ namespace Avalonia.Controls
             if (SelectionHasChanged && _noSelectionChangeCount == 0 && !_makeFirstDisplayedCellCurrentCellPending)
             {
                 CoerceSelectedItem();
+                if (AutoScrollToSelectedItem)
+                {
+                    RequestAutoScrollToSelection();
+                }
                 if (NoCurrentCellChangeCount != 0)
                 {
                     // current cell is changing, don't raise SelectionChanged until it's done
@@ -1204,6 +1210,10 @@ namespace Avalonia.Controls
                         SetValueNoCallback(SelectedIndexProperty, oldSelectedIndex);
                         SetValueNoCallback(SelectedItemProperty, e.OldValue);
                     }
+                    else
+                    {
+                        RequestAutoScrollToSelection();
+                    }
                 }
             }
         }
@@ -1220,6 +1230,134 @@ namespace Avalonia.Controls
                     SyncSelectionModelFromGridSelection();
                 }
             }
+        }
+
+        private void OnAutoScrollToSelectedItemChanged(AvaloniaPropertyChangedEventArgs e)
+        {
+            if (_areHandlersSuspended)
+            {
+                return;
+            }
+
+            if (AutoScrollToSelectedItem)
+            {
+                RequestAutoScrollToSelection();
+            }
+            else
+            {
+                _autoScrollPending = false;
+            }
+        }
+
+        private void RequestAutoScrollToSelection()
+        {
+            if (_autoScrollPending || !AutoScrollToSelectedItem)
+            {
+                return;
+            }
+
+            _autoScrollPending = true;
+
+            if (!IsAttachedToVisualTree || _rowsPresenter == null)
+            {
+                return;
+            }
+
+            ScheduleAutoScrollToSelection();
+        }
+
+        private void TryExecutePendingAutoScroll()
+        {
+            if (!_autoScrollPending || !AutoScrollToSelectedItem)
+            {
+                return;
+            }
+
+            if (!IsAttachedToVisualTree || _rowsPresenter == null)
+            {
+                return;
+            }
+
+            ScheduleAutoScrollToSelection();
+        }
+
+        private void ScheduleAutoScrollToSelection()
+        {
+            var token = ++_autoScrollRequestToken;
+            Dispatcher.UIThread.Post(_ => PerformAutoScrollToSelection(token), DispatcherPriority.Background);
+        }
+
+        private void PerformAutoScrollToSelection(int token)
+        {
+            if (token != _autoScrollRequestToken)
+            {
+                return;
+            }
+
+            _autoScrollPending = false;
+
+            if (!AutoScrollToSelectedItem || !IsAttachedToVisualTree || _rowsPresenter == null)
+            {
+                return;
+            }
+
+            if (!TryGetAutoScrollTarget(out var item, out var column))
+            {
+                return;
+            }
+
+            ScrollIntoView(item, column);
+            ComputeScrollBarsLayout();
+
+            if (UseLogicalScrollable && _rowsPresenter != null)
+            {
+                _rowsPresenter.SyncOffset(HorizontalOffset, GetVerticalOffset());
+                _rowsPresenter.RaiseScrollInvalidated(EventArgs.Empty);
+            }
+        }
+
+        private bool TryGetAutoScrollTarget(out object item, out DataGridColumn column)
+        {
+            item = null;
+            column = null;
+
+            if (DisplayData == null || ColumnsInternal == null)
+            {
+                return false;
+            }
+
+            if (CurrentSlot != -1 && GetRowSelection(CurrentSlot))
+            {
+                item = CurrentItem;
+            }
+            else
+            {
+                item = SelectedItem;
+            }
+
+            if (item == null || DataConnection == null || DataConnection.IndexOf(item) == -1)
+            {
+                return false;
+            }
+
+            column = CurrentColumn;
+
+            if (column == null || !column.IsVisible)
+            {
+                column = ColumnsInternal.FirstVisibleNonFillerColumn;
+            }
+
+            return true;
+        }
+
+        private void CancelPendingAutoScroll()
+        {
+            if (_autoScrollPending)
+            {
+                _autoScrollPending = false;
+            }
+
+            _autoScrollRequestToken++;
         }
 
     }

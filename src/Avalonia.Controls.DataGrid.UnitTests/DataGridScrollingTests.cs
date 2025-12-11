@@ -14,6 +14,7 @@ using Avalonia.Headless.XUnit;
 using Avalonia.Layout;
 using Avalonia.Markup.Xaml.Styling;
 using Avalonia.Media;
+using Avalonia.Threading;
 using Avalonia.VisualTree;
 using Xunit;
 
@@ -721,6 +722,146 @@ public class DataGridScrollingTests
             $"After scrolling, minimum visible index ({minVisibleIndex}) should be greater than initial max ({initialMaxIndex})");
     }
 
+    [AvaloniaFact]
+    public void ScrollIntoView_Realizes_Target_Row()
+    {
+        // Arrange
+        var items = Enumerable.Range(0, 300).Select(x => new ScrollTestModel($"Item {x}")).ToList();
+        var target = CreateTarget(items, height: 140);
+        target.UpdateLayout();
+        var targetItem = items[200];
+
+        // Sanity - initial viewport starts at 0
+        Assert.True(GetFirstVisibleRowIndex(target) <= 1);
+        Assert.Null(FindRowForItem(target, targetItem));
+
+        // Act
+        target.ScrollIntoView(targetItem, target.Columns[0]);
+        target.UpdateLayout();
+
+        // Assert
+        var row = FindRowForItem(target, targetItem);
+        Assert.NotNull(row);
+        Assert.Equal(200, row!.Index);
+        Assert.True(GetFirstVisibleRowIndex(target) >= 180);
+    }
+
+    [AvaloniaFact]
+    public void AutoScrollToSelectedItem_Scrolls_On_Selection()
+    {
+        // Arrange
+        var items = Enumerable.Range(0, 300).Select(x => new ScrollTestModel($"Item {x}")).ToList();
+        var target = CreateTarget(items, height: 140);
+        target.AutoScrollToSelectedItem = true;
+        target.UpdateLayout();
+        var targetItem = items[220];
+
+        // Act
+        target.SelectedItem = targetItem;
+        Dispatcher.UIThread.RunJobs();
+        target.UpdateLayout();
+
+        // Assert
+        var row = FindRowForItem(target, targetItem);
+        Assert.NotNull(row);
+        Assert.Equal(220, row!.Index);
+        Assert.True(GetFirstVisibleRowIndex(target) >= 200);
+    }
+
+    [AvaloniaFact]
+    public void AutoScrollToSelectedItem_Off_Does_Not_Scroll_On_Selection()
+    {
+        // Arrange
+        var items = Enumerable.Range(0, 300).Select(x => new ScrollTestModel($"Item {x}")).ToList();
+        var target = CreateTarget(items, height: 140);
+        target.AutoScrollToSelectedItem = false;
+        target.UpdateLayout();
+        var targetItem = items[220];
+
+        // Act
+        target.SelectedItem = targetItem;
+        Dispatcher.UIThread.RunJobs();
+        target.UpdateLayout();
+
+        // Assert - selection alone should not scroll without opt-in
+        Assert.True(GetFirstVisibleRowIndex(target) < 50);
+        Assert.Null(FindRowForItem(target, targetItem));
+    }
+
+    [AvaloniaFact]
+    public void AutoScrollToSelectedItem_Does_Not_Fight_User_Scroll()
+    {
+        // Arrange
+        var items = Enumerable.Range(0, 400).Select(x => new ScrollTestModel($"Item {x}")).ToList();
+        var target = CreateTarget(items, height: 140, useLogicalScrollable: true);
+        target.AutoScrollToSelectedItem = true;
+        target.UpdateLayout();
+
+        // Auto-scroll to a distant item
+        target.SelectedItem = items[250];
+        Dispatcher.UIThread.RunJobs();
+        target.UpdateLayout();
+
+        var presenter = GetRowsPresenter(target);
+        var offsetAfterAutoScroll = presenter.Offset.Y;
+        var firstAfterAutoScroll = GetFirstVisibleRowIndex(target);
+
+        Assert.True(offsetAfterAutoScroll > 0);
+        Assert.True(firstAfterAutoScroll > 150);
+
+        // Simulate user wheel scroll upward by adjusting offset
+        presenter.Offset = new Vector(presenter.Offset.X, Math.Max(0, presenter.Offset.Y - 60));
+        target.UpdateLayout();
+
+        var offsetAfterUser = presenter.Offset.Y;
+        var firstAfterUser = GetFirstVisibleRowIndex(target);
+
+        // Assert user scroll applies and does not get reset by auto-scroll logic
+        Assert.True(offsetAfterUser < offsetAfterAutoScroll, $"Expected offset to decrease after user scroll. Before: {offsetAfterAutoScroll}, After: {offsetAfterUser}");
+        Assert.True(firstAfterUser < firstAfterAutoScroll, $"Expected first visible row to move upward after user scroll. Before: {firstAfterAutoScroll}, After: {firstAfterUser}");
+        Assert.True(firstAfterUser > 0);
+    }
+
+    [AvaloniaFact]
+    public void AutoScrollToSelectedItem_Updates_ScrollBars()
+    {
+        // Arrange
+        var items = Enumerable.Range(0, 400).Select(x => new ScrollTestModel($"Item {x}")).ToList();
+        var target = CreateTarget(items, height: 140, useLogicalScrollable: true);
+        target.AutoScrollToSelectedItem = true;
+        target.UpdateLayout();
+        var presenter = GetRowsPresenter(target);
+        var verticalBar = target.GetSelfAndVisualDescendants().OfType<ScrollBar>().FirstOrDefault(sb => sb.Orientation == Orientation.Vertical);
+        var scrollViewer = target.GetSelfAndVisualDescendants().OfType<ScrollViewer>().FirstOrDefault();
+
+        // Sanity
+        Assert.NotNull(verticalBar);
+        var initialOffset = presenter.Offset.Y;
+        var initialBarValue = verticalBar!.Value;
+        var initialViewerOffset = scrollViewer?.Offset.Y ?? 0;
+
+        // Act
+        target.SelectedItem = items[300];
+        Dispatcher.UIThread.RunJobs();
+        target.UpdateLayout();
+
+        var offsetAfter = presenter.Offset.Y;
+        var barValueAfter = verticalBar.Value;
+        var viewerOffsetAfter = scrollViewer?.Offset.Y ?? 0;
+
+        // Assert - both logical offset and scrollbar value should advance
+        Assert.True(offsetAfter > initialOffset, $"Expected presenter offset to increase. Before: {initialOffset}, After: {offsetAfter}");
+        if (verticalBar.Maximum > 0)
+        {
+            Assert.True(barValueAfter > initialBarValue, $"Expected scrollbar value to increase. Before: {initialBarValue}, After: {barValueAfter}, Max: {verticalBar.Maximum}");
+        }
+
+        if (scrollViewer != null)
+        {
+            Assert.True(viewerOffsetAfter > initialViewerOffset, $"Expected ScrollViewer offset to increase. Before: {initialViewerOffset}, After: {viewerOffsetAfter}");
+        }
+    }
+
     #endregion
 
     #region Helper Methods
@@ -775,6 +916,18 @@ public class DataGridScrollingTests
         return target.GetSelfAndVisualDescendants()
             .OfType<DataGridRowGroupHeader>()
             .ToList();
+    }
+
+    private static int GetFirstVisibleRowIndex(DataGrid target)
+    {
+        return GetRows(target).Min(r => r.Index);
+    }
+
+    private static DataGridRow? FindRowForItem(DataGrid target, object item)
+    {
+        return target.GetSelfAndVisualDescendants()
+            .OfType<DataGridRow>()
+            .FirstOrDefault(r => ReferenceEquals(r.DataContext, item));
     }
 
     private static DataGrid CreateGroupedTarget(IList<GroupableTestModel> items, int height = 200, bool useLogicalScrollable = false)

@@ -499,6 +499,25 @@ namespace Avalonia.Controls
             set { SetValue(DropLocationIndicatorTemplateProperty, value); }
         }
 
+        /// <summary>
+        /// Gets or sets a value indicating whether the grid should automatically scroll the
+        /// selected item into view when selection changes.
+        /// </summary>
+        public static readonly StyledProperty<bool> AutoScrollToSelectedItemProperty =
+            AvaloniaProperty.Register<DataGrid, bool>(
+                nameof(AutoScrollToSelectedItem),
+                defaultValue: false);
+
+        /// <summary>
+        /// Gets or sets whether the grid automatically scrolls to the selected item when selection
+        /// changes.
+        /// </summary>
+        public bool AutoScrollToSelectedItem
+        {
+            get { return GetValue(AutoScrollToSelectedItemProperty); }
+            set { SetValue(AutoScrollToSelectedItemProperty, value); }
+        }
+
         private int _selectedIndex = -1;
         private object _selectedItem;
 

@@ -24,6 +24,11 @@ namespace Avalonia.Controls
         /// <param name="e">PointerWheelEventArgs</param>
         protected override void OnPointerWheelChanged(PointerWheelEventArgs e)
         {
+            if (AutoScrollToSelectedItem)
+            {
+                CancelPendingAutoScroll();
+            }
+
             if (!UseLogicalScrollable)
             {
                 base.OnPointerWheelChanged(e);

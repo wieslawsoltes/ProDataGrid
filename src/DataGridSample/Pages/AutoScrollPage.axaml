@@ -1,0 +1,47 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:local="clr-namespace:DataGridSample"
+             xmlns:viewModels="clr-namespace:DataGridSample.ViewModels"
+             x:Class="DataGridSample.Pages.AutoScrollPage"
+             x:DataType="viewModels:AutoScrollViewModel">
+  <UserControl.DataContext>
+    <viewModels:AutoScrollViewModel/>
+  </UserControl.DataContext>
+
+  <Grid RowDefinitions="Auto,Auto,*" ColumnDefinitions="*,Auto" Margin="8">
+    <StackPanel Grid.Row="0" Grid.ColumnSpan="2" Spacing="4">
+      <TextBlock Classes="h2">Auto-scroll to selection</TextBlock>
+      <TextBlock Text="Toggle auto-scroll and select items programmatically to see the grid scroll into view."
+                 TextWrapping="Wrap"/>
+    </StackPanel>
+
+    <StackPanel Grid.Row="1" Grid.Column="0" Orientation="Horizontal" Spacing="8">
+      <CheckBox Content="Auto-scroll to selection"
+                IsChecked="{Binding #AutoScrollGrid.AutoScrollToSelectedItem, Mode=TwoWay}"/>
+      <Button Content="Select last item" Command="{Binding SelectLastCommand}"/>
+      <Button Content="Select first item" Command="{Binding SelectFirstCommand}"/>
+      <Button Content="Select random item" Command="{Binding SelectRandomCommand}"/>
+    </StackPanel>
+
+    <TextBlock Grid.Row="1" Grid.Column="1"
+               VerticalAlignment="Center"
+               Text="{Binding Status}"
+               TextWrapping="Wrap"/>
+
+    <DataGrid x:Name="AutoScrollGrid"
+              Grid.Row="2"
+              Grid.ColumnSpan="2"
+              ItemsSource="{Binding Items}"
+              SelectedItem="{Binding SelectedItem, Mode=TwoWay}"
+              AutoScrollToSelectedItem="True"
+              HeadersVisibility="All"
+              UseLogicalScrollable="True"
+              Margin="0,8,0,0">
+      <DataGrid.Columns>
+        <DataGridTextColumn Header="Index" Binding="{Binding Index}" Width="80"/>
+        <DataGridTextColumn Header="Name" Binding="{Binding Name}" Width="2*"/>
+        <DataGridTextColumn Header="Description" Binding="{Binding Description}" Width="3*"/>
+      </DataGrid.Columns>
+    </DataGrid>
+  </Grid>
+</UserControl>

@@ -159,6 +159,8 @@ namespace Avalonia.Controls
         private bool _syncingSelectedItems;
         private int _preferredSelectionIndex = -1;
         private IDataGridSelectionModelFactory _selectionModelFactory;
+        private bool _autoScrollPending;
+        private int _autoScrollRequestToken;
 
         // An approximation of the sum of the heights in pixels of the scrolling rows preceding
         // the first displayed scrolling row.  Since the scrolled off rows are discarded, the grid
@@ -193,6 +195,7 @@ namespace Avalonia.Controls
             VerticalGridLinesBrushProperty.Changed.AddClassHandler<DataGrid>((x, e) => x.OnVerticalGridLinesBrushChanged(e));
             SelectedIndexProperty.Changed.AddClassHandler<DataGrid>((x, e) => x.OnSelectedIndexChanged(e));
             SelectedItemProperty.Changed.AddClassHandler<DataGrid>((x, e) => x.OnSelectedItemChanged(e));
+            AutoScrollToSelectedItemProperty.Changed.AddClassHandler<DataGrid>((x, e) => x.OnAutoScrollToSelectedItemChanged(e));
             IsEnabledProperty.Changed.AddClassHandler<DataGrid>((x, e) => x.DataGrid_IsEnabledChanged(e));
             AreRowGroupHeadersFrozenProperty.Changed.AddClassHandler<DataGrid>((x, e) => x.OnAreRowGroupHeadersFrozenChanged(e));
             RowDetailsTemplateProperty.Changed.AddClassHandler<DataGrid>((x, e) => x.OnRowDetailsTemplateChanged(e));

@@ -87,6 +87,8 @@ namespace Avalonia.Controls
             EnsureTopLeftCornerHeader(); // EnsureTopLeftCornerHeader checks for a null _topLeftCornerHeader;
             _topRightCornerHeader = e.NameScope.Find<ContentControl>(DATAGRID_elementTopRightCornerHeaderName);
             _bottomRightCorner = e.NameScope.Find<Visual>(DATAGRID_elementBottomRightCornerHeaderName);
+
+            TryExecutePendingAutoScroll();
         }
 
 
@@ -98,6 +100,8 @@ namespace Avalonia.Controls
                 DataConnection.WireEvents(DataConnection.DataSource);
                 InitializeElements(true /*recycleRows*/);
             }
+
+            TryExecutePendingAutoScroll();
         }
 
 

@@ -115,6 +115,15 @@ DataGrid exposes a `Selection` property (`ISelectionModel`) so you can plug in y
 - You can share the same `SelectionModel<T>` with other controls (e.g., `ListBox Selection="{Binding MySelectionModel}"`) to keep selection in sync.
 - `SelectedItems` binding still works; when `Selection` is set, it reflects the model’s selection and updates it when the binding changes.
 
+### Auto-scroll to selection
+
+Turn on `AutoScrollToSelectedItem` to keep the current selection in view without handling `SelectionChanged` manually:
+
+```xml
+<DataGrid ItemsSource="{Binding Items}"
+          AutoScrollToSelectedItem="True" />
+```
+
 ## Package Rename
 
 This package has been renamed from `Avalonia.Controls.DataGrid` to `ProDataGrid`.
