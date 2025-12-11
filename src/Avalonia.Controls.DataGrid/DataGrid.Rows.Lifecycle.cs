@@ -355,6 +355,8 @@ namespace Avalonia.Controls
 
             if (_rowsPresenter != null)
             {
+                _rowsPresenter.ClearAnchorCandidates();
+
                 foreach (Control element in _rowsPresenter.Children)
                 {
                     if (element is DataGridRow row)

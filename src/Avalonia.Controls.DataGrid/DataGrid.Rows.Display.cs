@@ -258,6 +258,8 @@ namespace Avalonia.Controls
 
         private void RemoveDisplayedElement(Control element, int slot, bool wasDeleted, bool updateSlotInformation)
         {
+            _rowsPresenter?.UnregisterAnchorCandidate(element);
+
             if (element is DataGridRow dataGridRow)
             {
                 // Always hide the row immediately to prevent ghost rows during scrolling

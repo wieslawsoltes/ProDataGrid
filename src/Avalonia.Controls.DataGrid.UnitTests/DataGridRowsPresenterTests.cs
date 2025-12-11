@@ -2,10 +2,15 @@
 // Licensed under the MIT license. See LICENSE file in the project root for details.
 
 using System;
+using System.Linq;
+using Avalonia.Controls;
 using Avalonia.Controls.Primitives;
 using Avalonia.Input;
 using Avalonia.Layout;
 using Avalonia.Headless.XUnit;
+using Avalonia.Data;
+using Avalonia.Markup.Xaml.Styling;
+using Avalonia.VisualTree;
 using Xunit;
 
 namespace Avalonia.Controls.DataGridTests
@@ -472,6 +477,52 @@ namespace Avalonia.Controls.DataGridTests
 
             // Act & Assert - should not throw
             anchorProvider.UnregisterAnchorCandidate(row);
+        }
+
+        [AvaloniaFact]
+        public void CurrentAnchor_Tracks_First_Displayed_Row()
+        {
+            var items = new[] { 1, 2, 3, 4, 5 };
+
+            var root = new Window
+            {
+                Width = 400,
+                Height = 300,
+                Styles =
+                {
+                    new StyleInclude((Uri?)null)
+                    {
+                        Source = new Uri("avares://Avalonia.Controls.DataGrid/Themes/Simple.xaml")
+                    },
+                    new StyleInclude((Uri?)null)
+                    {
+                        Source = new Uri("avares://Avalonia.Controls.DataGrid/Themes/Simple.v2.xaml")
+                    },
+                }
+            };
+
+            var grid = new DataGrid
+            {
+                UseLogicalScrollable = true,
+                AutoGenerateColumns = false,
+                ItemsSource = items
+            };
+
+            grid.Columns.Add(new DataGridTextColumn
+            {
+                Header = "Value",
+                Binding = new Binding(".")
+            });
+
+            root.Content = grid;
+            root.Show();
+
+            grid.UpdateLayout();
+
+            var presenter = grid.GetVisualDescendants().OfType<DataGridRowsPresenter>().FirstOrDefault();
+
+            Assert.NotNull(presenter);
+            Assert.IsType<DataGridRow>(presenter!.CurrentAnchor);
         }
 
         #endregion

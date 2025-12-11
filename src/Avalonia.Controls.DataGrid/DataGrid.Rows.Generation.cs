@@ -189,6 +189,15 @@ namespace Avalonia.Controls
                     }
                 }
 
+                if (row != null)
+                {
+                    _rowsPresenter.RegisterAnchorCandidate(row);
+                }
+                else if (groupHeader != null)
+                {
+                    _rowsPresenter.RegisterAnchorCandidate(groupHeader);
+                }
+
                 // Measure the element and update AvailableRowRoom
                 element.Measure(new Size(double.PositiveInfinity, double.PositiveInfinity));
                 AvailableSlotElementRoom -= element.DesiredSize.Height;
