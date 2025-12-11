@@ -217,30 +217,19 @@ namespace Avalonia.Collections
                             e.OldIndex));
                     return;
                 case ListChangedType.ItemChanged:
-                    if (useReset)
+                    var changedItem = GetBindingListItem(e.NewIndex);
+                    if (e.NewIndex >= 0 && e.NewIndex < _internalList.Count)
+                    {
+                        _internalList[e.NewIndex] = changedItem;
+                    }
+
+                    // DataView (DataTable.DefaultView) surfaces item changes via INotifyPropertyChanged,
+                    // so raising collection notifications here causes duplicate row generation. For other
+                    // IBindingList sources we still need to notify listeners.
+                    if (_bindingList is not System.Data.DataView)
                     {
                         ProcessCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset));
-                        return;
                     }
-
-                    var changedItem = GetBindingListItem(e.NewIndex);
-                    var previousItem = GetBindingListItemFromSnapshot(e.NewIndex) ?? changedItem;
-
-                    if (!useReset)
-                    {
-                        if (e.NewIndex >= 0 && e.NewIndex < _internalList.Count)
-                        {
-                            _internalList[e.NewIndex] = changedItem;
-                        }
-                        return;
-                    }
-
-                    ProcessCollectionChanged(
-                        new NotifyCollectionChangedEventArgs(
-                            NotifyCollectionChangedAction.Replace,
-                            changedItem,
-                            previousItem,
-                            e.NewIndex));
                     return;
                 default:
                     ProcessCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset));

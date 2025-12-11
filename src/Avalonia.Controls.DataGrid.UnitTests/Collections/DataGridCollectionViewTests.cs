@@ -240,4 +240,43 @@ public class DataGridCollectionViewTests
 
         Assert.Equal(new[] { 1, 2 }, view.Cast<DataRowView>().Select(r => (int)r["Value"]).ToArray());
     }
+
+    [Fact]
+    public void BindingList_ItemChanged_Raises_Remove_Then_Add()
+    {
+        var source = new BindingList<int> { 1 };
+        var view = new DataGridCollectionView(source);
+
+        var changes = new List<NotifyCollectionChangedEventArgs>();
+        view.CollectionChanged += (_, e) => changes.Add(e);
+
+        source[0] = 42;
+
+        Assert.NotEmpty(changes);
+        if (changes.Count == 1)
+        {
+            Assert.Equal(NotifyCollectionChangedAction.Reset, changes[0].Action);
+        }
+        else
+        {
+            Assert.Collection(
+                changes,
+                e =>
+                {
+                    Assert.Equal(NotifyCollectionChangedAction.Remove, e.Action);
+                    Assert.Equal(0, e.OldStartingIndex);
+                    var oldItems = Assert.IsAssignableFrom<IList>(e.OldItems);
+                    Assert.Single(oldItems);
+                },
+                e =>
+                {
+                    Assert.Equal(NotifyCollectionChangedAction.Add, e.Action);
+                    Assert.Equal(0, e.NewStartingIndex);
+                    var newItems = Assert.IsAssignableFrom<IList>(e.NewItems);
+                    Assert.Single(newItems);
+                });
+        }
+
+        Assert.Equal(42, (int)view[0]);
+    }
 }
