@@ -20,6 +20,7 @@ using Avalonia.Layout;
 using Avalonia.Markup.Xaml.MarkupExtensions;
 using Avalonia.Styling;
 using Avalonia.VisualTree;
+using System.Collections.Specialized;
 
 namespace Avalonia.Controls
 {
@@ -41,9 +42,11 @@ namespace Avalonia.Controls
         private Control _editingElement;
         private ICellEditBinding _editBinding;
         private IBinding _clipboardContentBinding;
+        private ControlTheme _headerTheme;
         private ControlTheme _cellTheme;
         private ControlTheme _filterTheme;
         private Classes _cellStyleClasses;
+        private Classes _headerStyleClasses;
         private bool _setWidthInternalNoCallback;
         private bool _showFilterButton;
         private FlyoutBase _filterFlyout;
@@ -448,6 +451,47 @@ namespace Avalonia.Controls
         }
 
         public Classes CellStyleClasses => _cellStyleClasses ??= new();
+
+        public Classes HeaderStyleClasses => _headerStyleClasses ??= CreateHeaderStyleClasses();
+
+        private Classes CreateHeaderStyleClasses()
+        {
+            var classes = new Classes();
+            classes.CollectionChanged += HeaderStyleClassesChanged;
+            return classes;
+        }
+
+        /// <summary>
+        ///    Backing field for HeaderTheme property.
+        /// </summary>
+        public static readonly DirectProperty<DataGridColumn, ControlTheme> HeaderThemeProperty =
+            AvaloniaProperty.RegisterDirect<DataGridColumn, ControlTheme>(
+                nameof(HeaderTheme),
+                o => o.HeaderTheme,
+                (o, v) => o.HeaderTheme = v);
+
+        /// <summary>
+        ///    Gets or sets the <see cref="DataGridColumnHeader"/> theme for this column. Overrides <see cref="DataGrid.ColumnHeaderTheme"/>.
+        /// </summary>
+        public ControlTheme HeaderTheme
+        {
+            get { return _headerTheme; }
+            set
+            {
+                if (SetAndRaise(HeaderThemeProperty, ref _headerTheme, value) && _headerCell != null)
+                {
+                    ApplyHeaderTheme(_headerCell);
+                }
+            }
+        }
+
+        private void HeaderStyleClassesChanged(object sender, NotifyCollectionChangedEventArgs e)
+        {
+            if (_headerCell != null)
+            {
+                _headerCell.Classes.Replace(HeaderStyleClasses);
+            }
+        }
 
         /// <summary>
         ///    Backing field for CellTheme property.

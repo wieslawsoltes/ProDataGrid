@@ -1,0 +1,150 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:viewModels="clr-namespace:DataGridSample.ViewModels"
+             x:Class="DataGridSample.Pages.StylingShowcasePage"
+             x:DataType="viewModels:StylingShowcaseViewModel">
+  <UserControl.DataContext>
+    <viewModels:StylingShowcaseViewModel/>
+  </UserControl.DataContext>
+
+  <UserControl.Resources>
+    <!-- Grid-level themes -->
+    <ControlTheme x:Key="ShowcaseRowTheme"
+                  TargetType="DataGridRow"
+                  BasedOn="{StaticResource {x:Type DataGridRow}}">
+      <Setter Property="Background" Value="#0E263238" />
+      <Setter Property="BorderBrush" Value="#FF4FC3F7" />
+      <Setter Property="BorderThickness" Value="0,0,0,1" />
+    </ControlTheme>
+
+    <ControlTheme x:Key="ShowcaseCellTheme"
+                  TargetType="DataGridCell"
+                  BasedOn="{StaticResource {x:Type DataGridCell}}">
+      <Setter Property="Padding" Value="10,6" />
+    </ControlTheme>
+
+    <ControlTheme x:Key="ShowcaseHeaderTheme"
+                  TargetType="DataGridColumnHeader"
+                  BasedOn="{StaticResource {x:Type DataGridColumnHeader}}">
+      <Setter Property="Background" Value="#FF102027" />
+      <Setter Property="Foreground" Value="#FFE0F7FA" />
+      <Setter Property="BorderBrush" Value="#FF4FC3F7" />
+      <Setter Property="BorderThickness" Value="0,0,0,1" />
+      <Setter Property="Padding" Value="10,8" />
+    </ControlTheme>
+
+    <ControlTheme x:Key="ShowcaseHeaderFilterTheme"
+                  TargetType="Button"
+                  BasedOn="{StaticResource {x:Type Button}}">
+      <Setter Property="Background" Value="#FF4FC3F7" />
+      <Setter Property="Foreground" Value="#FF102027" />
+      <Setter Property="CornerRadius" Value="3" />
+    </ControlTheme>
+
+    <ControlTheme x:Key="ShowcaseRowGroupTheme"
+                  TargetType="DataGridRowGroupHeader"
+                  BasedOn="{StaticResource {x:Type DataGridRowGroupHeader}}">
+      <Setter Property="Background" Value="#FF1E3A47" />
+      <Setter Property="Foreground" Value="#FFE0F2F1" />
+      <Setter Property="BorderBrush" Value="#FF4DB6AC" />
+      <Setter Property="BorderThickness" Value="0,0,0,1" />
+      <Setter Property="Padding" Value="12,8" />
+      <Setter Property="FontWeight" Value="SemiBold" />
+    </ControlTheme>
+
+    <!-- Column-level themes -->
+    <ControlTheme x:Key="HighlightHeaderTheme"
+                  TargetType="DataGridColumnHeader"
+                  BasedOn="{StaticResource {x:Type DataGridColumnHeader}}">
+      <Setter Property="Background" Value="#FF263238" />
+      <Setter Property="Foreground" Value="#FFFFF9C4" />
+      <Setter Property="BorderBrush" Value="#FFFFEB3B" />
+      <Setter Property="BorderThickness" Value="0,0,0,3" />
+      <Setter Property="Padding" Value="10,8" />
+      <Setter Property="FontWeight" Value="SemiBold" />
+    </ControlTheme>
+
+    <ControlTheme x:Key="HighlightCellTheme"
+                  TargetType="DataGridCell"
+                  BasedOn="{StaticResource {x:Type DataGridCell}}">
+      <Setter Property="Background" Value="#112196F3" />
+      <Setter Property="BorderBrush" Value="#FF2196F3" />
+      <Setter Property="BorderThickness" Value="0,1,0,0" />
+    </ControlTheme>
+
+  </UserControl.Resources>
+
+  <!-- Shared styles driven by Classes / HeaderStyleClasses / CellStyleClasses -->
+  <UserControl.Styles>
+    <Style Selector="DataGridColumnHeader.accent-border">
+      <Setter Property="BorderBrush" Value="#FF7C4DFF" />
+      <Setter Property="BorderThickness" Value="0,0,0,3" />
+    </Style>
+    <Style Selector="DataGridColumnHeader.pill">
+      <Setter Property="CornerRadius" Value="8" />
+      <Setter Property="Padding" Value="14,8" />
+    </Style>
+    <Style Selector="DataGridColumnHeader.strong-text">
+      <Setter Property="FontWeight" Value="Bold" />
+      <Setter Property="Foreground" Value="#FFFFF176" />
+    </Style>
+
+    <Style Selector="DataGridCell.numeric">
+      <Setter Property="HorizontalContentAlignment" Value="Right" />
+      <Setter Property="FontFamily" Value="Menlo, Consolas, 'Cascadia Code', monospace" />
+    </Style>
+    <Style Selector="DataGridCell.emphasis">
+      <Setter Property="FontWeight" Value="SemiBold" />
+      <Setter Property="Foreground" Value="#FF0D47A1" />
+      <Setter Property="Background" Value="#FFDCEFFF" />
+      <Setter Property="BorderBrush" Value="#FF90CAF9" />
+      <Setter Property="BorderThickness" Value="0,0,0,1" />
+    </Style>
+  </UserControl.Styles>
+
+  <Grid RowDefinitions="Auto,Auto,*" Margin="12">
+    <StackPanel Grid.Row="0" Spacing="6">
+      <TextBlock Classes="h2">Styling &amp; Theming Showcase</TextBlock>
+      <TextBlock Text="Demonstrates grid-level themes, column overrides, and class-based styling for headers, rows, and cells."
+                 TextWrapping="Wrap" />
+    </StackPanel>
+
+    <StackPanel Grid.Row="1" Orientation="Vertical" Spacing="2">
+      <TextBlock Text="Grid-level: RowTheme, RowGroupTheme, CellTheme, ColumnHeaderTheme, ColumnHeaderFilterTheme" />
+      <TextBlock Text="Column-level: HeaderTheme, HeaderStyleClasses, CellTheme, CellStyleClasses, ShowFilterButton" />
+      <TextBlock Text="Classes: accent-border, pill, strong-text, numeric, emphasis" />
+    </StackPanel>
+
+    <DataGrid Grid.Row="2"
+              Margin="0,8,0,0"
+              ItemsSource="{Binding Countries}"
+              HeadersVisibility="All"
+              ColumnHeaderTheme="{StaticResource ShowcaseHeaderTheme}"
+              ColumnHeaderFilterTheme="{StaticResource ShowcaseHeaderFilterTheme}"
+              RowTheme="{StaticResource ShowcaseRowTheme}"
+              RowGroupTheme="{StaticResource ShowcaseRowGroupTheme}"
+              CellTheme="{StaticResource ShowcaseCellTheme}"
+              AutoScrollToSelectedItem="True"
+              CanUserReorderColumns="True"
+              CanUserResizeColumns="True"
+              SelectionMode="Extended">
+      <DataGrid.Columns>
+        <DataGridTextColumn Header="Country" Binding="{Binding Name}" Width="3*"
+                            HeaderStyleClasses="pill"
+                            CellStyleClasses="emphasis" />
+        <DataGridTextColumn Header="Region" Binding="{Binding Region}" Width="2*"
+                            HeaderStyleClasses="accent-border strong-text"
+                            ShowFilterButton="True" />
+        <DataGridTextColumn Header="Population" Binding="{Binding Population}" Width="2*"
+                            HeaderStyleClasses="accent-border"
+                            CellStyleClasses="numeric" />
+        <DataGridTextColumn Header="GDP (USD)" Binding="{Binding GDP}" Width="2*"
+                            HeaderTheme="{StaticResource HighlightHeaderTheme}"
+                            CellTheme="{StaticResource HighlightCellTheme}"
+                            HeaderStyleClasses="strong-text"
+                            CellStyleClasses="numeric emphasis"
+                            ShowFilterButton="True" />
+      </DataGrid.Columns>
+    </DataGrid>
+  </Grid>
+</UserControl>

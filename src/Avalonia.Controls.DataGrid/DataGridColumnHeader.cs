@@ -60,6 +60,7 @@ namespace Avalonia.Controls
         private static DataGridColumn _dragColumn;
         private static double _frozenColumnsWidth;
         private static Lazy<Cursor> _resizeCursor = new Lazy<Cursor>(() => new Cursor(StandardCursorType.SizeWestEast));
+        private DataGridColumn _owningColumn;
 
         public static readonly StyledProperty<IBrush> SeparatorBrushProperty =
             AvaloniaProperty.Register<DataGridColumnHeader, IBrush>(nameof(SeparatorBrush));
@@ -74,6 +75,12 @@ namespace Avalonia.Controls
             AvaloniaProperty.Register<DataGridColumnHeader, bool>(
                 nameof(AreSeparatorsVisible),
                 defaultValue: true);
+
+        public static readonly DirectProperty<DataGridColumnHeader, DataGridColumn> OwningColumnProperty =
+            AvaloniaProperty.RegisterDirect<DataGridColumnHeader, DataGridColumn>(
+                nameof(OwningColumn),
+                o => o.OwningColumn,
+                (o, v) => o.OwningColumn = v);
 
         public static readonly StyledProperty<ControlTheme> FilterThemeProperty =
             AvaloniaProperty.Register<DataGridColumnHeader, ControlTheme>(nameof(FilterTheme));
@@ -173,10 +180,10 @@ namespace Avalonia.Controls
             }
         }
 
-        internal DataGridColumn OwningColumn
+        public DataGridColumn OwningColumn
         {
-            get;
-            set;
+            get => _owningColumn;
+            internal set => SetAndRaise(OwningColumnProperty, ref _owningColumn, value);
         }
         internal DataGrid OwningGrid => OwningColumn?.OwningGrid;
 
@@ -710,7 +717,12 @@ namespace Avalonia.Controls
                 IsEnabled = false,
                 Content = GetDragIndicatorContent(Content, ContentTemplate)
             };
-            if (OwningGrid.ColumnHeaderTheme is { } columnHeaderTheme)
+            if (OwningColumn != null)
+            {
+                OwningColumn.ApplyHeaderTheme(dragIndicator);
+                dragIndicator.Classes.Replace(OwningColumn.HeaderStyleClasses);
+            }
+            else if (OwningGrid?.ColumnHeaderTheme is { } columnHeaderTheme)
             {
                 dragIndicator.SetValue(ThemeProperty, columnHeaderTheme, BindingPriority.Template);
             }
