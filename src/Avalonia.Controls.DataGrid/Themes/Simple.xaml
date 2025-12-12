@@ -197,7 +197,8 @@
                     ColumnDefinitions="*,Auto">
                 <ContentPresenter x:Name="PART_ContentPresenter"
                                   Content="{TemplateBinding Content}"
-                                  ContentTemplate="{TemplateBinding ContentTemplate}" />
+                                  ContentTemplate="{TemplateBinding ContentTemplate}"
+                                  VerticalAlignment="{TemplateBinding VerticalContentAlignment}" />
 
                 <StackPanel Grid.Column="1"
                             Orientation="Horizontal"
