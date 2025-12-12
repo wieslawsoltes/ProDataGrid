@@ -31,7 +31,7 @@ namespace Avalonia.Controls
     [TemplatePart(DATAGRIDROW_elementDetails,        typeof(DataGridDetailsPresenter))]
     [TemplatePart(DATAGRIDROW_elementRoot,           typeof(Panel))]
     [TemplatePart(DATAGRIDROW_elementRowHeader,      typeof(DataGridRowHeader))]
-    [PseudoClasses(":selected", ":editing", ":invalid")]
+    [PseudoClasses(":selected", ":editing", ":invalid", ":current")]
 #if !DATAGRID_INTERNAL
     public
 #endif

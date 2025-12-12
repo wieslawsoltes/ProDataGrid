@@ -139,6 +139,14 @@ namespace Avalonia.Controls
             }
         }
 
+        internal void UpdateCurrentPseudoClass()
+        {
+            var isCurrent = OwningGrid != null
+                            && Slot != -1
+                            && OwningGrid.CurrentSlot == Slot;
+            PseudoClassesHelper.Set(PseudoClasses, ":current", isCurrent);
+        }
+
         internal void ApplyState(bool? isSelectedOverride = null)
         {
             if (RootElement != null && OwningGrid != null && IsVisible)
@@ -147,6 +155,7 @@ namespace Avalonia.Controls
                 IsSelected = isSelected;
                 PseudoClassesHelper.Set(PseudoClasses, ":editing", IsEditing);
                 PseudoClassesHelper.Set(PseudoClasses, ":invalid", !IsValid);
+                UpdateCurrentPseudoClass();
                 ApplyHeaderStatus();
             }
         }
@@ -176,6 +185,7 @@ namespace Avalonia.Controls
             }
 
             Slot = -1;
+            UpdateCurrentPseudoClass();
         }
 
         internal void InvalidateCellsIndex()

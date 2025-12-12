@@ -202,6 +202,8 @@ namespace Avalonia.Controls
         {
             if (displayedElement is DataGridRow row)
             {
+                row.UpdateCurrentPseudoClass();
+
                 if (AreRowHeadersVisible)
                 {
                     row.ApplyHeaderStatus();

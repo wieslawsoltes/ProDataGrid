@@ -125,6 +125,9 @@
     <TabItem Header="Auto-scroll">
       <pages:AutoScrollPage />
     </TabItem>
+    <TabItem Header="Current Row Styling">
+      <pages:CurrentRowPseudoClassPage />
+    </TabItem>
     <TabItem Header="Styling &amp; Themes">
       <pages:StylingShowcasePage />
     </TabItem>

@@ -1,0 +1,63 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:viewModels="clr-namespace:DataGridSample.ViewModels"
+             x:Class="DataGridSample.Pages.CurrentRowPseudoClassPage"
+             x:DataType="viewModels:CurrentRowPseudoClassViewModel">
+  <UserControl.DataContext>
+    <viewModels:CurrentRowPseudoClassViewModel />
+  </UserControl.DataContext>
+
+  <UserControl.Styles>
+    <Style Selector="DataGridRow:current">
+      <Setter Property="Background" Value="#FFE3F2FD" />
+      <Setter Property="BorderBrush" Value="#FF64B5F6" />
+      <Setter Property="BorderThickness" Value="0,0,0,2" />
+      <Setter Property="FontWeight" Value="SemiBold" />
+      <Setter Property="Foreground" Value="#FF0D47A1" />
+    </Style>
+  </UserControl.Styles>
+
+  <Grid RowDefinitions="Auto,Auto,*" Margin="12">
+    <StackPanel Grid.Row="0" Spacing="6">
+      <TextBlock Classes="h2">Current Row Styling (:current)</TextBlock>
+      <TextBlock Text="DataGridRow now exposes a :current pseudo class (parity with TreeDataGrid/DataGridCell) so you can style the active row without code-behind."
+                 TextWrapping="Wrap" />
+    </StackPanel>
+
+    <Border Grid.Row="1"
+            Margin="0,8,0,12"
+            Background="#0D64B5F6"
+            BorderBrush="#3364B5F6"
+            BorderThickness="1"
+            CornerRadius="6"
+            Padding="10">
+      <StackPanel Spacing="6">
+        <TextBlock Text="Try clicking rows or using Up/Down keys. The :current style follows the grid's current item (SelectedItem/CurrentCell)."
+                   TextWrapping="Wrap" />
+        <TextBlock>
+          <Run Text="Current selection: " />
+          <Run Text="{Binding SelectedPerson.Name, FallbackValue=none}" FontWeight="SemiBold" />
+          <Run Text=" · " />
+          <Run Text="{Binding SelectedPerson.Team, FallbackValue=—}" />
+          <Run Text=" / " />
+          <Run Text="{Binding SelectedPerson.Role, FallbackValue=—}" />
+        </TextBlock>
+      </StackPanel>
+    </Border>
+
+    <DataGrid Grid.Row="2"
+              ItemsSource="{Binding People}"
+              SelectedItem="{Binding SelectedPerson, Mode=TwoWay}"
+              AutoScrollToSelectedItem="True"
+              HeadersVisibility="All"
+              CanUserReorderColumns="True"
+              CanUserResizeColumns="True"
+              SelectionMode="Extended">
+      <DataGrid.Columns>
+        <DataGridTextColumn Header="Name" Binding="{Binding Name}" Width="3*" />
+        <DataGridTextColumn Header="Team" Binding="{Binding Team}" Width="2*" />
+        <DataGridTextColumn Header="Role" Binding="{Binding Role}" Width="2*" />
+      </DataGrid.Columns>
+    </DataGrid>
+  </Grid>
+</UserControl>
