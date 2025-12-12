@@ -83,6 +83,9 @@
     <TabItem Header="Scroll Snap &amp; Details">
       <local:ScrollInteractionsPage />
     </TabItem>
+    <TabItem Header="Routed events">
+      <pages:RoutedEventsPage />
+    </TabItem>
     <TabItem Header="Large Variable Height">
       <local:LargeVariableHeightPage />
     </TabItem>

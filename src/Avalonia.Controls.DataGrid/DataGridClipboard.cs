@@ -5,6 +5,7 @@
 
 using System;
 using System.Collections.Generic;
+using Avalonia.Interactivity;
 
 namespace Avalonia.Controls
 {
@@ -153,7 +154,7 @@ namespace Avalonia.Controls
 #if !DATAGRID_INTERNAL
     public
 #endif
-    class DataGridRowClipboardEventArgs : EventArgs
+    class DataGridRowClipboardEventArgs : RoutedEventArgs
     {
 
         private List<DataGridClipboardCellContent>? _clipboardRowContent;
@@ -165,7 +166,10 @@ namespace Avalonia.Controls
         /// </summary>
         /// <param name="item">The row's associated data item.</param>
         /// <param name="isColumnHeadersRow">Whether or not this EventArgs is for the column headers.</param>
-        internal DataGridRowClipboardEventArgs(object item, bool isColumnHeadersRow)
+        /// <param name="routedEvent">Routed event associated with these event args.</param>
+        /// <param name="source">Source object that raised the event.</param>
+        internal DataGridRowClipboardEventArgs(object item, bool isColumnHeadersRow, RoutedEvent? routedEvent = null, object? source = null)
+            : base(routedEvent, source)
         {
             _isColumnHeadersRow = isColumnHeadersRow;
             _item = item;

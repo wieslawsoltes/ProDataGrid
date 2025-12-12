@@ -7,6 +7,7 @@
 
 using Avalonia.Collections;
 using Avalonia.Controls.Utils;
+using Avalonia.Interactivity;
 using Avalonia.LogicalTree;
 using Avalonia.Media;
 using Avalonia.Utilities;
@@ -1124,28 +1125,24 @@ namespace Avalonia.Controls
 
         protected virtual void OnLoadingRow(DataGridRowEventArgs e)
         {
-            EventHandler<DataGridRowEventArgs> handler = LoadingRow;
-            if (handler != null)
-            {
-                Debug.Assert(!_loadedRows.Contains(e.Row));
-                _loadedRows.Add(e.Row);
-                LoadingOrUnloadingRow = true;
-                handler(this, e);
-                LoadingOrUnloadingRow = false;
-                Debug.Assert(_loadedRows.Contains(e.Row));
-                _loadedRows.Remove(e.Row);
-            }
+            Debug.Assert(!_loadedRows.Contains(e.Row));
+            _loadedRows.Add(e.Row);
+            LoadingOrUnloadingRow = true;
+            e.RoutedEvent ??= LoadingRowEvent;
+            e.Source ??= this;
+            RaiseEvent(e);
+            LoadingOrUnloadingRow = false;
+            Debug.Assert(_loadedRows.Contains(e.Row));
+            _loadedRows.Remove(e.Row);
         }
 
         protected virtual void OnUnloadingRow(DataGridRowEventArgs e)
         {
-            EventHandler<DataGridRowEventArgs> handler = UnloadingRow;
-            if (handler != null)
-            {
-                LoadingOrUnloadingRow = true;
-                handler(this, e);
-                LoadingOrUnloadingRow = false;
-            }
+            LoadingOrUnloadingRow = true;
+            e.RoutedEvent ??= UnloadingRowEvent;
+            e.Source ??= this;
+            RaiseEvent(e);
+            LoadingOrUnloadingRow = false;
         }
 
     }

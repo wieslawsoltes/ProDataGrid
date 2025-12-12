@@ -145,8 +145,30 @@ namespace Avalonia.Controls
             result.FilterFlyout = FilterFlyout;
             result.ShowFilterButton = ShowFilterButton || FilterFlyout != null;
 
-            result.PointerPressed += (s, e) => { HeaderPointerPressed?.Invoke(this, e); };
-            result.PointerReleased += (s, e) => { HeaderPointerReleased?.Invoke(this, e); };
+            result.PointerPressed += (s, e) =>
+            {
+                if (e.Handled)
+                {
+                    return;
+                }
+
+                e.RoutedEvent = DataGridColumnHeader.HeaderPointerPressedEvent;
+                e.Source ??= result;
+                result.RaiseEvent(e);
+                HeaderPointerPressed?.Invoke(this, e);
+            };
+            result.PointerReleased += (s, e) =>
+            {
+                if (e.Handled)
+                {
+                    return;
+                }
+
+                e.RoutedEvent = DataGridColumnHeader.HeaderPointerReleasedEvent;
+                e.Source ??= result;
+                result.RaiseEvent(e);
+                HeaderPointerReleased?.Invoke(this, e);
+            };
             return result;
         }
 

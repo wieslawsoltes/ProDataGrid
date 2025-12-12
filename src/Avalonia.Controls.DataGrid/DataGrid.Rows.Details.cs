@@ -4,6 +4,7 @@
 // All other rights reserved.
 
 using System.Diagnostics;
+using Avalonia.Interactivity;
 
 namespace Avalonia.Controls
 {
@@ -135,7 +136,9 @@ namespace Avalonia.Controls
         /// <param name="e">The event data.</param>
         protected internal virtual void OnRowDetailsVisibilityChanged(DataGridRowDetailsEventArgs e)
         {
-            RowDetailsVisibilityChanged?.Invoke(this, e);
+            e.RoutedEvent ??= RowDetailsVisibilityChangedEvent;
+            e.Source ??= this;
+            RaiseEvent(e);
         }
 
 

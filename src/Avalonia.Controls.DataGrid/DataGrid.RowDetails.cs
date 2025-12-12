@@ -7,6 +7,7 @@
 using Avalonia.Styling;
 using System;
 using System.Diagnostics;
+using Avalonia.Interactivity;
 
 namespace Avalonia.Controls
 {
@@ -18,6 +19,23 @@ namespace Avalonia.Controls
 #endif
     partial class DataGrid
     {
+        /// <summary>
+        /// Identifies the <see cref="LoadingRowDetails"/> routed event.
+        /// </summary>
+        public static readonly RoutedEvent<DataGridRowDetailsEventArgs> LoadingRowDetailsEvent =
+            RoutedEvent.Register<DataGrid, DataGridRowDetailsEventArgs>(nameof(LoadingRowDetails), RoutingStrategies.Bubble);
+
+        /// <summary>
+        /// Identifies the <see cref="UnloadingRowDetails"/> routed event.
+        /// </summary>
+        public static readonly RoutedEvent<DataGridRowDetailsEventArgs> UnloadingRowDetailsEvent =
+            RoutedEvent.Register<DataGrid, DataGridRowDetailsEventArgs>(nameof(UnloadingRowDetails), RoutingStrategies.Bubble);
+
+        /// <summary>
+        /// Identifies the <see cref="RowDetailsVisibilityChanged"/> routed event.
+        /// </summary>
+        public static readonly RoutedEvent<DataGridRowDetailsEventArgs> RowDetailsVisibilityChangedEvent =
+            RoutedEvent.Register<DataGrid, DataGridRowDetailsEventArgs>(nameof(RowDetailsVisibilityChanged), RoutingStrategies.Bubble);
 
         internal void OnRowDetailsChanged()
         {
@@ -35,13 +53,11 @@ namespace Avalonia.Controls
         /// </summary>
         protected virtual void OnLoadingRowDetails(DataGridRowDetailsEventArgs e)
         {
-            EventHandler<DataGridRowDetailsEventArgs> handler = LoadingRowDetails;
-            if (handler != null)
-            {
-                LoadingOrUnloadingRow = true;
-                handler(this, e);
-                LoadingOrUnloadingRow = false;
-            }
+            LoadingOrUnloadingRow = true;
+            e.RoutedEvent ??= LoadingRowDetailsEvent;
+            e.Source ??= this;
+            RaiseEvent(e);
+            LoadingOrUnloadingRow = false;
         }
 
 
@@ -50,13 +66,11 @@ namespace Avalonia.Controls
         /// </summary>
         protected virtual void OnUnloadingRowDetails(DataGridRowDetailsEventArgs e)
         {
-            EventHandler<DataGridRowDetailsEventArgs> handler = UnloadingRowDetails;
-            if (handler != null)
-            {
-                LoadingOrUnloadingRow = true;
-                handler(this, e);
-                LoadingOrUnloadingRow = false;
-            }
+            LoadingOrUnloadingRow = true;
+            e.RoutedEvent ??= UnloadingRowDetailsEvent;
+            e.Source ??= this;
+            RaiseEvent(e);
+            LoadingOrUnloadingRow = false;
         }
 
 
@@ -139,20 +153,32 @@ namespace Avalonia.Controls
         /// Occurs when a new row details template is applied to a row, so that you can customize
         /// the details section before it is used.
         /// </summary>
-        public event EventHandler<DataGridRowDetailsEventArgs> LoadingRowDetails;
+        public event EventHandler<DataGridRowDetailsEventArgs> LoadingRowDetails
+        {
+            add => AddHandler(LoadingRowDetailsEvent, value);
+            remove => RemoveHandler(LoadingRowDetailsEvent, value);
+        }
 
 
         /// <summary>
         /// Occurs when a row details element becomes available for reuse.
         /// </summary>
-        public event EventHandler<DataGridRowDetailsEventArgs> UnloadingRowDetails;
+        public event EventHandler<DataGridRowDetailsEventArgs> UnloadingRowDetails
+        {
+            add => AddHandler(UnloadingRowDetailsEvent, value);
+            remove => RemoveHandler(UnloadingRowDetailsEvent, value);
+        }
 
 
         /// <summary>
         /// Occurs when the <see cref="P:Avalonia.Controls.DataGrid.RowDetailsVisibilityMode" />
         /// property value changes.
         /// </summary>
-        public event EventHandler<DataGridRowDetailsEventArgs> RowDetailsVisibilityChanged;
+        public event EventHandler<DataGridRowDetailsEventArgs> RowDetailsVisibilityChanged
+        {
+            add => AddHandler(RowDetailsVisibilityChangedEvent, value);
+            remove => RemoveHandler(RowDetailsVisibilityChangedEvent, value);
+        }
 
 
         internal double RowDetailsHeightEstimate

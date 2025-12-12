@@ -7,6 +7,7 @@
 using System;
 using System.Diagnostics;
 using Avalonia.Collections;
+using Avalonia.Interactivity;
 
 namespace Avalonia.Controls
 {
@@ -18,6 +19,17 @@ namespace Avalonia.Controls
 #endif
     partial class DataGrid
     {
+        /// <summary>
+        /// Identifies the <see cref="LoadingRowGroup"/> routed event.
+        /// </summary>
+        public static readonly RoutedEvent<DataGridRowGroupHeaderEventArgs> LoadingRowGroupEvent =
+            RoutedEvent.Register<DataGrid, DataGridRowGroupHeaderEventArgs>(nameof(LoadingRowGroup), RoutingStrategies.Bubble);
+
+        /// <summary>
+        /// Identifies the <see cref="UnloadingRowGroup"/> routed event.
+        /// </summary>
+        public static readonly RoutedEvent<DataGridRowGroupHeaderEventArgs> UnloadingRowGroupEvent =
+            RoutedEvent.Register<DataGrid, DataGridRowGroupHeaderEventArgs>(nameof(UnloadingRowGroup), RoutingStrategies.Bubble);
 
         /// <summary>
         /// Returns the Group at the indicated level or null if the item is not in the ItemsSource
@@ -49,13 +61,11 @@ namespace Avalonia.Controls
         /// <param name="e">EventArgs</param>
         protected virtual void OnLoadingRowGroup(DataGridRowGroupHeaderEventArgs e)
         {
-            EventHandler<DataGridRowGroupHeaderEventArgs> handler = LoadingRowGroup;
-            if (handler != null)
-            {
-                LoadingOrUnloadingRow = true;
-                handler(this, e);
-                LoadingOrUnloadingRow = false;
-            }
+            LoadingOrUnloadingRow = true;
+            e.RoutedEvent ??= LoadingRowGroupEvent;
+            e.Source ??= this;
+            RaiseEvent(e);
+            LoadingOrUnloadingRow = false;
         }
 
 
@@ -65,13 +75,11 @@ namespace Avalonia.Controls
         /// <param name="e">EventArgs</param>
         protected virtual void OnUnloadingRowGroup(DataGridRowGroupHeaderEventArgs e)
         {
-            EventHandler<DataGridRowGroupHeaderEventArgs> handler = UnloadingRowGroup;
-            if (handler != null)
-            {
-                LoadingOrUnloadingRow = true;
-                handler(this, e);
-                LoadingOrUnloadingRow = false;
-            }
+            LoadingOrUnloadingRow = true;
+            e.RoutedEvent ??= UnloadingRowGroupEvent;
+            e.Source ??= this;
+            RaiseEvent(e);
+            LoadingOrUnloadingRow = false;
         }
 
 
@@ -112,13 +120,21 @@ namespace Avalonia.Controls
         /// <summary>
         /// Occurs before a DataGridRowGroupHeader header is used.
         /// </summary>
-        public event EventHandler<DataGridRowGroupHeaderEventArgs> LoadingRowGroup;
+        public event EventHandler<DataGridRowGroupHeaderEventArgs> LoadingRowGroup
+        {
+            add => AddHandler(LoadingRowGroupEvent, value);
+            remove => RemoveHandler(LoadingRowGroupEvent, value);
+        }
 
 
         /// <summary>
         /// Occurs when the DataGridRowGroupHeader is available for reuse.
         /// </summary>
-        public event EventHandler<DataGridRowGroupHeaderEventArgs> UnloadingRowGroup;
+        public event EventHandler<DataGridRowGroupHeaderEventArgs> UnloadingRowGroup
+        {
+            add => AddHandler(UnloadingRowGroupEvent, value);
+            remove => RemoveHandler(UnloadingRowGroupEvent, value);
+        }
 
     }
 }

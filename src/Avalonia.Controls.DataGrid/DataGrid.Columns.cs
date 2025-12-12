@@ -21,28 +21,36 @@ namespace Avalonia.Controls
 #if !DATAGRID_INTERNAL
     public
 #endif
-    partial class DataGrid
+        partial class DataGrid
     {
 
         protected virtual void OnColumnDisplayIndexChanged(DataGridColumnEventArgs e)
         {
-            ColumnDisplayIndexChanged?.Invoke(this, e);
+            e.RoutedEvent ??= ColumnDisplayIndexChangedEvent;
+            e.Source ??= this;
+            RaiseEvent(e);
         }
 
         protected internal virtual void OnColumnReordered(DataGridColumnEventArgs e)
         {
             EnsureVerticalGridLines();
-            ColumnReordered?.Invoke(this, e);
+            e.RoutedEvent ??= ColumnReorderedEvent;
+            e.Source ??= this;
+            RaiseEvent(e);
         }
 
         protected internal virtual void OnColumnReordering(DataGridColumnReorderingEventArgs e)
         {
-            ColumnReordering?.Invoke(this, e);
+            e.RoutedEvent ??= ColumnReorderingEvent;
+            e.Source ??= this;
+            RaiseEvent(e);
         }
 
         protected internal virtual void OnColumnSorting(DataGridColumnEventArgs e)
         {
-            Sorting?.Invoke(this, e);
+            e.RoutedEvent ??= SortingEvent;
+            e.Source ??= this;
+            RaiseEvent(e);
         }
 
         /// <summary>

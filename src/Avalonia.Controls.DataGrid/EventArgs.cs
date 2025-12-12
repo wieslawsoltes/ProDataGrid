@@ -5,6 +5,7 @@
 
 #nullable disable
 
+using Avalonia.Controls.Primitives;
 using Avalonia.Input;
 using Avalonia.Interactivity;
 using System;
@@ -19,21 +20,18 @@ namespace Avalonia.Controls
 #if !DATAGRID_INTERNAL
     public
 #endif
-    class DataGridAutoGeneratingColumnEventArgs : CancelEventArgs
+    class DataGridAutoGeneratingColumnEventArgs : CancelRoutedEventArgs
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="T:Avalonia.Controls.DataGridAutoGeneratingColumnEventArgs" /> class.
         /// </summary>
-        /// <param name="propertyName">
-        /// The name of the property bound to the generated column.
-        /// </param>
-        /// <param name="propertyType">
-        /// The <see cref="T:System.Type" /> of the property bound to the generated column.
-        /// </param>
-        /// <param name="column">
-        /// The generated column.
-        /// </param>
-        public DataGridAutoGeneratingColumnEventArgs(string propertyName, Type propertyType, DataGridColumn column)
+        /// <param name="propertyName">The name of the property bound to the generated column.</param>
+        /// <param name="propertyType">The <see cref="T:System.Type" /> of the property bound to the generated column.</param>
+        /// <param name="column">The generated column.</param>
+        /// <param name="routedEvent">The routed event associated with these event args.</param>
+        /// <param name="source">Source object that raised the event.</param>
+        public DataGridAutoGeneratingColumnEventArgs(string propertyName, Type propertyType, DataGridColumn column, RoutedEvent routedEvent = null, object source = null)
+            : base(routedEvent, source)
         {
             Column = column;
             PropertyName = propertyName;
@@ -74,24 +72,23 @@ namespace Avalonia.Controls
 #if !DATAGRID_INTERNAL
     public
 #endif
-    class DataGridBeginningEditEventArgs : CancelEventArgs
+    class DataGridBeginningEditEventArgs : CancelRoutedEventArgs
     {
         /// <summary>
         /// Initializes a new instance of the 
         /// <see cref="T:Avalonia.Controls.DataGridBeginningEditEventArgs" /> class.
         /// </summary>
-        /// <param name="column">
-        /// The column that contains the cell to be edited.
-        /// </param>
-        /// <param name="row">
-        /// The row that contains the cell to be edited.
-        /// </param>
-        /// <param name="editingEventArgs">
-        /// Information about the user gesture that caused the cell to enter edit mode.
-        /// </param>
+        /// <param name="column">The column that contains the cell to be edited.</param>
+        /// <param name="row">The row that contains the cell to be edited.</param>
+        /// <param name="editingEventArgs">Information about the user gesture that caused the cell to enter edit mode.</param>
+        /// <param name="routedEvent">The routed event associated with these event args.</param>
+        /// <param name="source">Source object that raised the event.</param>
         public DataGridBeginningEditEventArgs(DataGridColumn column,
                                               DataGridRow row,
-                                              RoutedEventArgs editingEventArgs)
+                                              RoutedEventArgs editingEventArgs,
+                                              RoutedEvent routedEvent = null,
+                                              object source = null)
+            : base(routedEvent, source)
         {
             this.Column = column;
             this.Row = row;
@@ -133,7 +130,7 @@ namespace Avalonia.Controls
 #if !DATAGRID_INTERNAL
     public
 #endif
-    class DataGridCellEditEndedEventArgs : EventArgs
+    class DataGridCellEditEndedEventArgs : RoutedEventArgs
     {
         /// <summary>
         /// Instantiates a new instance of this class.
@@ -141,7 +138,10 @@ namespace Avalonia.Controls
         /// <param name="column">The column of the cell that has just exited edit mode.</param>
         /// <param name="row">The row container of the cell container that has just exited edit mode.</param>
         /// <param name="editAction">The editing action that has been taken.</param>
-        public DataGridCellEditEndedEventArgs(DataGridColumn column, DataGridRow row, DataGridEditAction editAction)
+        /// <param name="routedEvent">The routed event associated with these event args.</param>
+        /// <param name="source">Source object that raised the event.</param>
+        public DataGridCellEditEndedEventArgs(DataGridColumn column, DataGridRow row, DataGridEditAction editAction, RoutedEvent routedEvent = null, object source = null)
+            : base(routedEvent, source)
         {
             Column = column;
             Row = row;
@@ -183,7 +183,7 @@ namespace Avalonia.Controls
 #if !DATAGRID_INTERNAL
     public
 #endif
-    class DataGridCellPointerPressedEventArgs : EventArgs
+    class DataGridCellPointerPressedEventArgs : RoutedEventArgs
     {
         /// <summary>
         /// Instantiates a new instance of this class.
@@ -192,10 +192,15 @@ namespace Avalonia.Controls
         /// <param name="row">The row container of the cell that has been pressed.</param>
         /// <param name="column">The column of the cell that has been pressed.</param>
         /// <param name="e">The pointer action that has been taken.</param>
+        /// <param name="routedEvent">The routed event associated with these event args.</param>
+        /// <param name="source">Source object that raised the event.</param>
         public DataGridCellPointerPressedEventArgs(DataGridCell cell, 
                                                    DataGridRow row,
                                                    DataGridColumn column,
-                                                   PointerPressedEventArgs e)
+                                                   PointerPressedEventArgs e,
+                                                   RoutedEvent routedEvent = null,
+                                                   object source = null)
+            : base(routedEvent, source)
         {
             Cell = cell;
             Row = row;
@@ -230,7 +235,7 @@ namespace Avalonia.Controls
 #if !DATAGRID_INTERNAL
     public
 #endif
-    class DataGridCellEditEndingEventArgs : CancelEventArgs
+    class DataGridCellEditEndingEventArgs : CancelRoutedEventArgs
     {
         /// <summary>
         /// Instantiates a new instance of this class.
@@ -239,10 +244,15 @@ namespace Avalonia.Controls
         /// <param name="row">The row container of the cell container that is about to exit edit mode.</param>
         /// <param name="editingElement">The editing element within the cell.</param>
         /// <param name="editAction">The editing action that will be taken.</param>
+        /// <param name="routedEvent">The routed event associated with these event args.</param>
+        /// <param name="source">Source object that raised the event.</param>
         public DataGridCellEditEndingEventArgs(DataGridColumn column,
                                                DataGridRow row,
                                                Control editingElement,
-                                               DataGridEditAction editAction)
+                                               DataGridEditAction editAction,
+                                               RoutedEvent routedEvent = null,
+                                               object source = null)
+            : base(routedEvent, source)
         {
             Column = column;
             Row = row;
@@ -309,13 +319,16 @@ namespace Avalonia.Controls
 #if !DATAGRID_INTERNAL
     public
 #endif
-    class DataGridColumnEventArgs : HandledEventArgs
+    class DataGridColumnEventArgs : RoutedEventArgs
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="T:Avalonia.Controls.DataGridColumnEventArgs" /> class.
         /// </summary>
         /// <param name="column">The column that the event occurs for.</param>
-        public DataGridColumnEventArgs(DataGridColumn column)
+        /// <param name="routedEvent">The routed event associated with these event args.</param>
+        /// <param name="source">Source object that raised the event.</param>
+        public DataGridColumnEventArgs(DataGridColumn column, RoutedEvent routedEvent = null, object source = null)
+            : base(routedEvent, source)
         {
             Column = column ?? throw new ArgumentNullException(nameof(column));
         }
@@ -336,13 +349,16 @@ namespace Avalonia.Controls
 #if !DATAGRID_INTERNAL
     public
 #endif
-    class DataGridColumnReorderingEventArgs : CancelEventArgs
+    class DataGridColumnReorderingEventArgs : CancelRoutedEventArgs
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="T:Avalonia.Controls.DataGridColumnReorderingEventArgs" /> class.
         /// </summary>
         /// <param name="dataGridColumn"></param>
-        public DataGridColumnReorderingEventArgs(DataGridColumn dataGridColumn)
+        /// <param name="routedEvent">The routed event associated with these event args.</param>
+        /// <param name="source">Source object that raised the event.</param>
+        public DataGridColumnReorderingEventArgs(DataGridColumn dataGridColumn, RoutedEvent routedEvent = null, object source = null)
+            : base(routedEvent, source)
         {
             this.Column = dataGridColumn;
         }
@@ -381,13 +397,16 @@ namespace Avalonia.Controls
 #if !DATAGRID_INTERNAL
     public
 #endif
-    class DataGridRowEventArgs : EventArgs
+    class DataGridRowEventArgs : RoutedEventArgs
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="T:Avalonia.Controls.DataGridRowEventArgs" /> class.
         /// </summary>
         /// <param name="dataGridRow">The row that the event occurs for.</param>
-        public DataGridRowEventArgs(DataGridRow dataGridRow)
+        /// <param name="routedEvent">The routed event associated with these event args.</param>
+        /// <param name="source">Source object that raised the event.</param>
+        public DataGridRowEventArgs(DataGridRow dataGridRow, RoutedEvent routedEvent = null, object source = null)
+            : base(routedEvent, source)
         {
             this.Row = dataGridRow;
         }
@@ -408,14 +427,17 @@ namespace Avalonia.Controls
 #if !DATAGRID_INTERNAL
     public
 #endif
-    class DataGridRowEditEndingEventArgs : CancelEventArgs
+    class DataGridRowEditEndingEventArgs : CancelRoutedEventArgs
     {
         /// <summary>
         /// Instantiates a new instance of this class.
         /// </summary>
         /// <param name="row">The row container of the cell container that is about to exit edit mode.</param>
         /// <param name="editAction">The editing action that will be taken.</param>
-        public DataGridRowEditEndingEventArgs(DataGridRow row, DataGridEditAction editAction)
+        /// <param name="routedEvent">The routed event associated with these event args.</param>
+        /// <param name="source">Source object that raised the event.</param>
+        public DataGridRowEditEndingEventArgs(DataGridRow row, DataGridEditAction editAction, RoutedEvent routedEvent = null, object source = null)
+            : base(routedEvent, source)
         {
             this.Row = row;
             this.EditAction = editAction;
@@ -446,14 +468,17 @@ namespace Avalonia.Controls
 #if !DATAGRID_INTERNAL
     public
 #endif
-    class DataGridRowEditEndedEventArgs : EventArgs
+    class DataGridRowEditEndedEventArgs : RoutedEventArgs
     {
         /// <summary>
         /// Instantiates a new instance of this class.
         /// </summary>
         /// <param name="row">The row container of the cell container that has just exited edit mode.</param>
         /// <param name="editAction">The editing action that has been taken.</param>
-        public DataGridRowEditEndedEventArgs(DataGridRow row, DataGridEditAction editAction)
+        /// <param name="routedEvent">The routed event associated with these event args.</param>
+        /// <param name="source">Source object that raised the event.</param>
+        public DataGridRowEditEndedEventArgs(DataGridRow row, DataGridEditAction editAction, RoutedEvent routedEvent = null, object source = null)
+            : base(routedEvent, source)
         {
             this.Row = row;
             this.EditAction = editAction;
@@ -484,7 +509,7 @@ namespace Avalonia.Controls
 #if !DATAGRID_INTERNAL
     public
 #endif
-    class DataGridPreparingCellForEditEventArgs : EventArgs
+    class DataGridPreparingCellForEditEventArgs : RoutedEventArgs
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="T:Avalonia.Controls.DataGridPreparingCellForEditEventArgs" /> class.
@@ -493,10 +518,15 @@ namespace Avalonia.Controls
         /// <param name="row">The row that contains the cell to be edited.</param>
         /// <param name="editingEventArgs">Information about the user gesture that caused the cell to enter edit mode.</param>
         /// <param name="editingElement">The element that the column displays for a cell in editing mode.</param>
+        /// <param name="routedEvent">The routed event associated with these event args.</param>
+        /// <param name="source">Source object that raised the event.</param>
         public DataGridPreparingCellForEditEventArgs(DataGridColumn column,
                                                      DataGridRow row,
                                                      RoutedEventArgs editingEventArgs,
-                                                     Control editingElement)
+                                                     Control editingElement,
+                                                     RoutedEvent routedEvent = null,
+                                                     object source = null)
+            : base(routedEvent, source)
         {
             Column = column;
             Row = row;
@@ -548,13 +578,16 @@ namespace Avalonia.Controls
 #if !DATAGRID_INTERNAL
     public
 #endif
-    class DataGridRowGroupHeaderEventArgs : EventArgs
+    class DataGridRowGroupHeaderEventArgs : RoutedEventArgs
     {
         /// <summary>
         /// Constructs a DataGridRowGroupHeaderEventArgs instance
         /// </summary>
-        /// <param name="rowGroupHeader"></param>
-        public DataGridRowGroupHeaderEventArgs(DataGridRowGroupHeader rowGroupHeader)
+        /// <param name="rowGroupHeader">Row group header associated with this instance.</param>
+        /// <param name="routedEvent">The routed event associated with these event args.</param>
+        /// <param name="source">Source object that raised the event.</param>
+        public DataGridRowGroupHeaderEventArgs(DataGridRowGroupHeader rowGroupHeader, RoutedEvent routedEvent = null, object source = null)
+            : base(routedEvent, source)
         {
             RowGroupHeader = rowGroupHeader;
         }
@@ -576,14 +609,17 @@ namespace Avalonia.Controls
 #if !DATAGRID_INTERNAL
     public
 #endif
-    class DataGridRowDetailsEventArgs : EventArgs
+    class DataGridRowDetailsEventArgs : RoutedEventArgs
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="T:Avalonia.Controls.DataGridRowDetailsEventArgs" /> class. 
         /// </summary>
         /// <param name="row">The row that the event occurs for.</param>
         /// <param name="detailsElement">The row details section as a framework element.</param>
-        public DataGridRowDetailsEventArgs(DataGridRow row, Control detailsElement)
+        /// <param name="routedEvent">The routed event associated with these event args.</param>
+        /// <param name="source">Source object that raised the event.</param>
+        public DataGridRowDetailsEventArgs(DataGridRow row, Control detailsElement, RoutedEvent routedEvent = null, object source = null)
+            : base(routedEvent, source)
         {
             Row = row;
             DetailsElement = detailsElement;
@@ -606,5 +642,68 @@ namespace Avalonia.Controls
             get;
             private set;
         }
+    }
+
+    /// <summary>
+    /// Provides data when the current cell changes.
+    /// </summary>
+#if !DATAGRID_INTERNAL
+    public
+#endif
+    class DataGridCurrentCellChangedEventArgs : RoutedEventArgs
+    {
+        public DataGridCurrentCellChangedEventArgs(DataGridColumn oldColumn, object oldItem, DataGridColumn newColumn, object newItem, RoutedEvent routedEvent = null, object source = null)
+            : base(routedEvent, source)
+        {
+            OldColumn = oldColumn;
+            OldItem = oldItem;
+            NewColumn = newColumn;
+            NewItem = newItem;
+        }
+
+        public DataGridColumn OldColumn { get; }
+
+        public object OldItem { get; }
+
+        public DataGridColumn NewColumn { get; }
+
+        public object NewItem { get; }
+    }
+
+    /// <summary>
+    /// Provides data for DataGrid scroll routed events.
+    /// </summary>
+#if !DATAGRID_INTERNAL
+    public
+#endif
+    class DataGridScrollEventArgs : RoutedEventArgs
+    {
+        public DataGridScrollEventArgs(ScrollEventType scrollEventType, double newValue, RoutedEvent routedEvent = null, object source = null)
+            : base(routedEvent, source)
+        {
+            ScrollEventType = scrollEventType;
+            NewValue = newValue;
+        }
+
+        public ScrollEventType ScrollEventType { get; }
+
+        public double NewValue { get; }
+    }
+
+    /// <summary>
+    /// Provides data for DataGrid column header click events.
+    /// </summary>
+#if !DATAGRID_INTERNAL
+    public
+#endif
+    class DataGridColumnHeaderClickEventArgs : RoutedEventArgs
+    {
+        public DataGridColumnHeaderClickEventArgs(KeyModifiers keyModifiers, RoutedEvent routedEvent = null, object source = null)
+            : base(routedEvent, source)
+        {
+            KeyModifiers = keyModifiers;
+        }
+
+        public KeyModifiers KeyModifiers { get; }
     }
 }

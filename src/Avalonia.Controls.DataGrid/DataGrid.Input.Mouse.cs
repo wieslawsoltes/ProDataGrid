@@ -87,7 +87,7 @@ namespace Avalonia.Controls
                     handled = true;
 
                     var eventType = scrollHeight > 0 ? ScrollEventType.SmallIncrement : ScrollEventType.SmallDecrement;
-                    VerticalScroll?.Invoke(this, new ScrollEventArgs(eventType, scrollHeight));
+                    OnVerticalScroll(new DataGridScrollEventArgs(eventType, scrollHeight, VerticalScrollEvent, this));
                 }
 
                 // Horizontal scroll handling
@@ -112,7 +112,7 @@ namespace Avalonia.Controls
                         handled = true;
 
                         var eventType = horizontalOffset > 0 ? ScrollEventType.SmallIncrement : ScrollEventType.SmallDecrement;
-                        HorizontalScroll?.Invoke(this, new ScrollEventArgs(eventType, horizontalOffset));
+                        OnHorizontalScroll(new DataGridScrollEventArgs(eventType, horizontalOffset, HorizontalScrollEvent, this));
                     }
                 }
 
@@ -160,7 +160,9 @@ namespace Avalonia.Controls
         /// </summary>
         internal virtual void OnCellPointerPressed(DataGridCellPointerPressedEventArgs e)
         {
-            CellPointerPressed?.Invoke(this, e);
+            e.RoutedEvent ??= CellPointerPressedEvent;
+            e.Source ??= this;
+            RaiseEvent(e);
         }
 
     }

@@ -150,7 +150,7 @@ namespace Avalonia.Controls
 
         private void ResetDisplayedRows()
         {
-            if (UnloadingRow != null || UnloadingRowGroup != null)
+            if (UnloadingRowEvent.HasRaisedSubscriptions || UnloadingRowGroupEvent.HasRaisedSubscriptions)
             {
                 foreach (Control element in DisplayData.GetScrollingElements())
                 {

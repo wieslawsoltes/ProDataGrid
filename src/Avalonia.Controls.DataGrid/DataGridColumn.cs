@@ -52,6 +52,18 @@ namespace Avalonia.Controls
         private FlyoutBase _filterFlyout;
 
         /// <summary>
+        /// Routed event raised when the column header receives a pointer press.
+        /// </summary>
+        public static readonly RoutedEvent<PointerPressedEventArgs> HeaderPointerPressedEvent =
+            DataGridColumnHeader.HeaderPointerPressedEvent;
+
+        /// <summary>
+        /// Routed event raised when the column header receives a pointer release.
+        /// </summary>
+        public static readonly RoutedEvent<PointerReleasedEventArgs> HeaderPointerReleasedEvent =
+            DataGridColumnHeader.HeaderPointerReleasedEvent;
+
+        /// <summary>
         /// Occurs when the pointer is pressed over the column's header
         /// </summary>
         public event EventHandler<PointerPressedEventArgs> HeaderPointerPressed;

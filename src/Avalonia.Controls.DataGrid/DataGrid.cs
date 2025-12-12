@@ -167,8 +167,52 @@ namespace Avalonia.Controls
         // does not know their actual height. The heights used for the approximation are the ones
         // set as the rows were scrolled off.
         private double _verticalOffset;
-        public event EventHandler<ScrollEventArgs> HorizontalScroll;
-        public event EventHandler<ScrollEventArgs> VerticalScroll;
+
+        /// <summary>
+        /// Identifies the <see cref="HorizontalScroll"/> routed event.
+        /// </summary>
+        public static readonly RoutedEvent<DataGridScrollEventArgs> HorizontalScrollEvent =
+            RoutedEvent.Register<DataGrid, DataGridScrollEventArgs>(nameof(HorizontalScroll), RoutingStrategies.Bubble);
+
+        /// <summary>
+        /// Identifies the <see cref="VerticalScroll"/> routed event.
+        /// </summary>
+        public static readonly RoutedEvent<DataGridScrollEventArgs> VerticalScrollEvent =
+            RoutedEvent.Register<DataGrid, DataGridScrollEventArgs>(nameof(VerticalScroll), RoutingStrategies.Bubble);
+
+        public event EventHandler<DataGridScrollEventArgs> HorizontalScroll
+        {
+            add => AddHandler(HorizontalScrollEvent, value);
+            remove => RemoveHandler(HorizontalScrollEvent, value);
+        }
+
+        public event EventHandler<DataGridScrollEventArgs> VerticalScroll
+        {
+            add => AddHandler(VerticalScrollEvent, value);
+            remove => RemoveHandler(VerticalScrollEvent, value);
+        }
+
+        /// <summary>
+        /// Raises the <see cref="HorizontalScroll"/> event.
+        /// </summary>
+        /// <param name="e">Scroll event data.</param>
+        protected virtual void OnHorizontalScroll(DataGridScrollEventArgs e)
+        {
+            e.RoutedEvent ??= HorizontalScrollEvent;
+            e.Source ??= this;
+            RaiseEvent(e);
+        }
+
+        /// <summary>
+        /// Raises the <see cref="VerticalScroll"/> event.
+        /// </summary>
+        /// <param name="e">Scroll event data.</param>
+        protected virtual void OnVerticalScroll(DataGridScrollEventArgs e)
+        {
+            e.RoutedEvent ??= VerticalScrollEvent;
+            e.Source ??= this;
+            RaiseEvent(e);
+        }
 
         static DataGrid()
         {

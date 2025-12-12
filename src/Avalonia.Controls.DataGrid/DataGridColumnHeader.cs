@@ -62,6 +62,24 @@ namespace Avalonia.Controls
         private static Lazy<Cursor> _resizeCursor = new Lazy<Cursor>(() => new Cursor(StandardCursorType.SizeWestEast));
         private DataGridColumn _owningColumn;
 
+        /// <summary>
+        /// Identifies the <see cref="LeftClick"/> routed event.
+        /// </summary>
+        public static readonly RoutedEvent<DataGridColumnHeaderClickEventArgs> LeftClickEvent =
+            RoutedEvent.Register<DataGridColumnHeader, DataGridColumnHeaderClickEventArgs>(nameof(LeftClick), RoutingStrategies.Bubble);
+
+        /// <summary>
+        /// Identifies the <see cref="HeaderPointerPressed"/> routed event.
+        /// </summary>
+        public static readonly RoutedEvent<PointerPressedEventArgs> HeaderPointerPressedEvent =
+            RoutedEvent.Register<DataGridColumnHeader, PointerPressedEventArgs>(nameof(HeaderPointerPressed), RoutingStrategies.Bubble);
+
+        /// <summary>
+        /// Identifies the <see cref="HeaderPointerReleased"/> routed event.
+        /// </summary>
+        public static readonly RoutedEvent<PointerReleasedEventArgs> HeaderPointerReleasedEvent =
+            RoutedEvent.Register<DataGridColumnHeader, PointerReleasedEventArgs>(nameof(HeaderPointerReleased), RoutingStrategies.Bubble);
+
         public static readonly StyledProperty<IBrush> SeparatorBrushProperty =
             AvaloniaProperty.Register<DataGridColumnHeader, IBrush>(nameof(SeparatorBrush));
 
@@ -323,11 +341,34 @@ namespace Avalonia.Controls
             }
         }
 
-        public event EventHandler<KeyModifiers> LeftClick;
+        public event EventHandler<DataGridColumnHeaderClickEventArgs> LeftClick
+        {
+            add => AddHandler(LeftClickEvent, value);
+            remove => RemoveHandler(LeftClickEvent, value);
+        }
+
+        /// <summary>
+        /// Occurs when the pointer is pressed over the column's header.
+        /// </summary>
+        public event EventHandler<PointerPressedEventArgs> HeaderPointerPressed
+        {
+            add => AddHandler(HeaderPointerPressedEvent, value);
+            remove => RemoveHandler(HeaderPointerPressedEvent, value);
+        }
+
+        /// <summary>
+        /// Occurs when the pointer is released over the column's header.
+        /// </summary>
+        public event EventHandler<PointerReleasedEventArgs> HeaderPointerReleased
+        {
+            add => AddHandler(HeaderPointerReleasedEvent, value);
+            remove => RemoveHandler(HeaderPointerReleasedEvent, value);
+        }
 
         internal void OnMouseLeftButtonUp_Click(KeyModifiers keyModifiers, ref bool handled)
         {
-            LeftClick?.Invoke(this, keyModifiers);
+            var args = new DataGridColumnHeaderClickEventArgs(keyModifiers, LeftClickEvent, this);
+            RaiseEvent(args);
 
             // completed a click without dragging, so we're sorting
             InvokeProcessSort(keyModifiers);
@@ -539,6 +580,9 @@ namespace Avalonia.Controls
             Point mousePosition = e.GetPosition(this);
             bool handled = e.Handled;
             OnMouseLeftButtonDown(ref handled, e, mousePosition);
+            e.RoutedEvent = HeaderPointerPressedEvent;
+            e.Source ??= this;
+            RaiseEvent(e);
             e.Handled = handled;
 
             UpdatePseudoClasses();
@@ -555,6 +599,9 @@ namespace Avalonia.Controls
             Point mousePositionHeaders = e.GetPosition(OwningGrid.ColumnHeaders);
             bool handled = e.Handled;
             OnMouseLeftButtonUp(ref handled, e, mousePosition, mousePositionHeaders);
+            e.RoutedEvent = HeaderPointerReleasedEvent;
+            e.Source ??= this;
+            RaiseEvent(e);
             e.Handled = handled;
 
             UpdatePseudoClasses();

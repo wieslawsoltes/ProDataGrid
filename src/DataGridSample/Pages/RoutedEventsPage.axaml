@@ -1,0 +1,113 @@
+<UserControl
+    x:Class="DataGridSample.Pages.RoutedEventsPage"
+    xmlns="https://github.com/avaloniaui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:vm="clr-namespace:DataGridSample.ViewModels"
+    mc:Ignorable="d">
+    <UserControl.DataContext>
+        <vm:RoutedEventsViewModel />
+    </UserControl.DataContext>
+
+    <Grid RowDefinitions="*,Auto,*,Auto,*"
+          RowSpacing="8">
+        <Grid Grid.Row="0" RowDefinitions="Auto,*" RowSpacing="4">
+            <TextBlock Grid.Row="0" Text="Routed events (main grid)" FontWeight="Bold" />
+            <DataGrid Grid.Row="1"
+                      x:Name="Grid"
+                      ItemsSource="{Binding ItemsView}"
+                      AutoGenerateColumns="True"
+                      RowDetailsVisibilityMode="Visible"
+                      LoadingRow="OnLoadingRow"
+                      UnloadingRow="OnUnloadingRow"
+                      Sorting="OnSorting"
+                      AutoGeneratingColumn="OnAutoGeneratingColumn"
+                      ColumnDisplayIndexChanged="OnColumnDisplayIndexChanged"
+                      ColumnReordered="OnColumnReordered"
+                      ColumnReordering="OnColumnReordering"
+                      CellPointerPressed="OnCellPointerPressed"
+                      CurrentCellChanged="OnCurrentCellChanged"
+                      HorizontalScroll="OnHorizontalScroll"
+                      VerticalScroll="OnVerticalScroll"
+                      CopyingRowClipboardContent="OnCopyingRowClipboardContent"
+                      LoadingRowDetails="OnLoadingRowDetails"
+                      UnloadingRowDetails="OnUnloadingRowDetails"
+                      RowDetailsVisibilityChanged="OnRowDetailsVisibilityChanged"
+                      LoadingRowGroup="OnLoadingRowGroup"
+                      UnloadingRowGroup="OnUnloadingRowGroup"
+                      BeginningEdit="OnBeginningEdit"
+                      CellEditEnding="OnCellEditEnding"
+                      CellEditEnded="OnCellEditEnded"
+                      PreparingCellForEdit="OnPreparingCellForEdit"
+                      RowEditEnding="OnRowEditEnding"
+                      RowEditEnded="OnRowEditEnded"
+                      SelectionChanged="OnSelectionChanged">
+                <DataGrid.RowDetailsTemplate>
+                    <DataTemplate>
+                        <TextBlock Text="{Binding Name}" Margin="4" />
+                    </DataTemplate>
+                </DataGrid.RowDetailsTemplate>
+            </DataGrid>
+        </Grid>
+
+        <GridSplitter Grid.Row="1"
+                      Background="{DynamicResource SystemControlHighlightAccentBrush}"
+                      HorizontalAlignment="Stretch"
+                      Height="6"
+                      ResizeDirection="Rows"
+                      ResizeBehavior="PreviousAndNext" />
+
+        <Grid Grid.Row="2" RowDefinitions="Auto,Auto,*" RowSpacing="4">
+            <TextBlock Grid.Row="0" Text="Hierarchical toggle routing" FontWeight="Bold" />
+            <TextBlock Grid.Row="1" Text="Toggle the expander icon to raise ToggleRequested routed events from DataGridHierarchicalPresenter." />
+            <DataGrid Grid.Row="2"
+                      x:Name="HierarchicalGrid"
+                      AutoGenerateColumns="False"
+                      HierarchicalRowsEnabled="True"
+                      HierarchicalModel="{Binding HierarchicalModel}"
+                      HeadersVisibility="Column"
+                      CanUserReorderColumns="False"
+                      CanUserResizeColumns="True"
+                      CanUserSortColumns="False"
+                      SelectionMode="Single"
+                      SelectionChanged="OnSelectionChanged">
+                <DataGrid.Columns>
+                    <DataGridHierarchicalColumn Header="Node"
+                                                Width="2*"
+                                                Binding="{Binding Item.Name}" />
+                    <DataGridTextColumn Header="Kind"
+                                        Width="*"
+                                        Binding="{Binding Item.Kind}" />
+                </DataGrid.Columns>
+            </DataGrid>
+        </Grid>
+
+        <GridSplitter Grid.Row="3"
+                      Background="{DynamicResource SystemControlHighlightAccentBrush}"
+                      HorizontalAlignment="Stretch"
+                      Height="6"
+                      ResizeDirection="Rows"
+                      ResizeBehavior="PreviousAndNext" />
+
+        <Grid Grid.Row="4" RowDefinitions="Auto,*" RowSpacing="6">
+            <TextBlock Grid.Row="0" Text="Routed event log" FontWeight="Bold" />
+            <Border Grid.Row="1"
+                    BorderBrush="{DynamicResource SystemControlHighlightAccentBrush}"
+                    BorderThickness="1"
+                    Padding="6">
+                <ListBox x:Name="LogList"
+                         ItemsSource="{Binding Logs}"
+                         SelectionMode="Single"
+                         ScrollViewer.VerticalScrollBarVisibility="Auto"
+                         BorderThickness="0">
+                    <ListBox.ItemTemplate>
+                        <DataTemplate>
+                            <TextBlock Text="{Binding}" />
+                        </DataTemplate>
+                    </ListBox.ItemTemplate>
+                </ListBox>
+            </Border>
+        </Grid>
+    </Grid>
+</UserControl>

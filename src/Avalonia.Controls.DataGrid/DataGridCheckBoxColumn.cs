@@ -276,7 +276,7 @@ namespace Avalonia.Controls
             return false;
         }
 
-        private void OwningGrid_CurrentCellChanged(object sender, EventArgs e)
+        private void OwningGrid_CurrentCellChanged(object sender, DataGridCurrentCellChangedEventArgs e)
         {
             if (_currentCheckBox != null)
             {

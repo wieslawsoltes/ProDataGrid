@@ -23,6 +23,11 @@ namespace Avalonia.Controls
 #endif
     partial class DataGrid
     {
+        /// <summary>
+        /// Identifies the <see cref="CellPointerPressed"/> routed event.
+        /// </summary>
+        public static readonly RoutedEvent<DataGridCellPointerPressedEventArgs> CellPointerPressedEvent =
+            RoutedEvent.Register<DataGrid, DataGridCellPointerPressedEventArgs>(nameof(CellPointerPressed), RoutingStrategies.Bubble);
 
         //TODO TabStop
         //TODO FlowDirection
@@ -928,7 +933,11 @@ namespace Avalonia.Controls
         /// <summary>
         /// Occurs when cell is mouse-pressed.
         /// </summary>
-        public event EventHandler<DataGridCellPointerPressedEventArgs> CellPointerPressed;
+        public event EventHandler<DataGridCellPointerPressedEventArgs> CellPointerPressed
+        {
+            add => AddHandler(CellPointerPressedEvent, value);
+            remove => RemoveHandler(CellPointerPressedEvent, value);
+        }
 
     }
 }

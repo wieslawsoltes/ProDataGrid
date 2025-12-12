@@ -6,6 +6,7 @@ using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.Primitives;
 using Avalonia.Input;
+using Avalonia.Interactivity;
 
 namespace Avalonia.Controls
 {
@@ -30,9 +31,19 @@ namespace Avalonia.Controls
             AvaloniaProperty.Register<DataGridHierarchicalPresenter, bool>(nameof(IsExpandable));
 
         /// <summary>
+        /// Identifies the <see cref="ToggleRequested"/> routed event.
+        /// </summary>
+        public static readonly RoutedEvent<RoutedEventArgs> ToggleRequestedEvent =
+            RoutedEvent.Register<DataGridHierarchicalPresenter, RoutedEventArgs>(nameof(ToggleRequested), RoutingStrategies.Bubble);
+
+        /// <summary>
         /// Raised when the expander is activated.
         /// </summary>
-        public event EventHandler? ToggleRequested;
+        public event EventHandler<RoutedEventArgs>? ToggleRequested
+        {
+            add => AddHandler(ToggleRequestedEvent, value);
+            remove => RemoveHandler(ToggleRequestedEvent, value);
+        }
 
         static DataGridHierarchicalPresenter()
         {
@@ -110,7 +121,7 @@ namespace Avalonia.Controls
 
         private void ExpanderOnClick(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
         {
-            ToggleRequested?.Invoke(this, EventArgs.Empty);
+            RaiseEvent(new RoutedEventArgs(ToggleRequestedEvent, this));
         }
 
         private void ExpanderOnKeyDown(object? sender, KeyEventArgs e)
@@ -122,7 +133,7 @@ namespace Avalonia.Controls
 
             if (e.Key == Key.Enter || e.Key == Key.Space)
             {
-                ToggleRequested?.Invoke(this, EventArgs.Empty);
+                RaiseEvent(new RoutedEventArgs(ToggleRequestedEvent, this));
                 e.Handled = true;
             }
         }

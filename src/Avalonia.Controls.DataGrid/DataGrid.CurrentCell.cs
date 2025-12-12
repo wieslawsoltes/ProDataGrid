@@ -20,6 +20,11 @@ namespace Avalonia.Controls
 #endif
     partial class DataGrid
     {
+        /// <summary>
+        /// Identifies the <see cref="CurrentCellChanged"/> routed event.
+        /// </summary>
+        public static readonly RoutedEvent<DataGridCurrentCellChangedEventArgs> CurrentCellChangedEvent =
+            RoutedEvent.Register<DataGrid, DataGridCurrentCellChangedEventArgs>(nameof(CurrentCellChanged), RoutingStrategies.Bubble);
 
         // Convenient overload that commits the current edit.
         internal bool SetCurrentCellCore(int columnIndex, int slot)
@@ -187,11 +192,16 @@ namespace Avalonia.Controls
             if (CurrentColumn != _previousCurrentColumn
                 || CurrentItem != _previousCurrentItem)
             {
-                CoerceSelectedItem();
-                _previousCurrentColumn = CurrentColumn;
-                _previousCurrentItem = CurrentItem;
+                var oldColumn = _previousCurrentColumn;
+                var oldItem = _previousCurrentItem;
+                var newColumn = CurrentColumn;
+                var newItem = CurrentItem;
 
-                OnCurrentCellChanged(EventArgs.Empty);
+                CoerceSelectedItem();
+                _previousCurrentColumn = newColumn;
+                _previousCurrentItem = newItem;
+
+                OnCurrentCellChanged(new DataGridCurrentCellChangedEventArgs(oldColumn, oldItem, newColumn, newItem, CurrentCellChangedEvent, this));
             }
 
             _flushCurrentCellChanged = false;
@@ -228,9 +238,11 @@ namespace Avalonia.Controls
         /// <summary>
         /// Raises the CurrentCellChanged event.
         /// </summary>
-        protected virtual void OnCurrentCellChanged(EventArgs e)
+        protected virtual void OnCurrentCellChanged(DataGridCurrentCellChangedEventArgs e)
         {
-            CurrentCellChanged?.Invoke(this, e);
+            e.RoutedEvent ??= CurrentCellChangedEvent;
+            e.Source ??= this;
+            RaiseEvent(e);
         }
 
         private int _noCurrentCellChangeCount;
@@ -251,7 +263,11 @@ namespace Avalonia.Controls
         /// <summary>
         /// Occurs when a different cell becomes the current cell.
         /// </summary>
-        public event EventHandler<EventArgs> CurrentCellChanged;
+        public event EventHandler<DataGridCurrentCellChangedEventArgs> CurrentCellChanged
+        {
+            add => AddHandler(CurrentCellChangedEvent, value);
+            remove => RemoveHandler(CurrentCellChangedEvent, value);
+        }
 
 
         /// <summary>

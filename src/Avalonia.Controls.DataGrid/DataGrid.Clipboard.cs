@@ -8,6 +8,7 @@ using Avalonia.Controls.Primitives;
 using Avalonia.Controls.Utils;
 using Avalonia.Input;
 using Avalonia.Input.Platform;
+using Avalonia.Interactivity;
 using Avalonia.Utilities;
 using System;
 using System.Text;
@@ -22,6 +23,11 @@ namespace Avalonia.Controls
 #endif
     partial class DataGrid
     {
+        /// <summary>
+        /// Identifies the <see cref="CopyingRowClipboardContent"/> routed event.
+        /// </summary>
+        public static readonly RoutedEvent<DataGridRowClipboardEventArgs> CopyingRowClipboardContentEvent =
+            RoutedEvent.Register<DataGrid, DataGridRowClipboardEventArgs>(nameof(CopyingRowClipboardContent), RoutingStrategies.Bubble);
 
         /// <summary>
         /// This method raises the CopyingRowClipboardContent event.
@@ -29,7 +35,9 @@ namespace Avalonia.Controls
         /// <param name="e">Contains the necessary information for generating the row clipboard content.</param>
         protected virtual void OnCopyingRowClipboardContent(DataGridRowClipboardEventArgs e)
         {
-            CopyingRowClipboardContent?.Invoke(this, e);
+            e.RoutedEvent ??= CopyingRowClipboardContentEvent;
+            e.Source ??= this;
+            RaiseEvent(e);
         }
 
 
@@ -79,7 +87,7 @@ namespace Avalonia.Controls
 
                 if (ClipboardCopyMode == DataGridClipboardCopyMode.IncludeHeader)
                 {
-                    DataGridRowClipboardEventArgs headerArgs = new DataGridRowClipboardEventArgs(null, true);
+                    DataGridRowClipboardEventArgs headerArgs = new DataGridRowClipboardEventArgs(null, true, CopyingRowClipboardContentEvent, this);
                     foreach (DataGridColumn column in ColumnsInternal.GetVisibleColumns())
                     {
                         headerArgs.ClipboardRowContent.Add(new DataGridClipboardCellContent(null, column, column.Header));
@@ -91,7 +99,7 @@ namespace Avalonia.Controls
                 for (int index = 0; index < SelectedItems.Count; index++)
                 {
                     object item = SelectedItems[index];
-                    DataGridRowClipboardEventArgs itemArgs = new DataGridRowClipboardEventArgs(item, false);
+                    DataGridRowClipboardEventArgs itemArgs = new DataGridRowClipboardEventArgs(item, false, CopyingRowClipboardContentEvent, this);
                     foreach (DataGridColumn column in ColumnsInternal.GetVisibleColumns())
                     {
                         object content = column.GetCellValue(item, column.ClipboardContentBinding);
@@ -128,7 +136,11 @@ namespace Avalonia.Controls
         /// This event is raised by OnCopyingRowClipboardContent method after the default row content is prepared.
         /// Event listeners can modify or add to the row clipboard content.
         /// </summary>
-        public event EventHandler<DataGridRowClipboardEventArgs> CopyingRowClipboardContent;
+        public event EventHandler<DataGridRowClipboardEventArgs> CopyingRowClipboardContent
+        {
+            add => AddHandler(CopyingRowClipboardContentEvent, value);
+            remove => RemoveHandler(CopyingRowClipboardContentEvent, value);
+        }
 
 
         /// <summary>
