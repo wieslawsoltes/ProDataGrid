@@ -1,0 +1,67 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             x:Class="DataGridSample.Pages.CurrentCellPage"
+             mc:Ignorable="d">
+  <Grid RowDefinitions="Auto,*"
+        ColumnDefinitions="2*,*"
+        Margin="12"
+        ColumnSpacing="12"
+        RowSpacing="8">
+    <StackPanel Grid.Row="0"
+                Grid.ColumnSpan="2"
+                Spacing="4">
+      <TextBlock Classes="h2" Text="Bind and drive CurrentCell" />
+      <TextBlock Text="Tracks DataGrid.CurrentCell with a two-way binding. Click cells or press the buttons to move currency; the summary and log come from the bound value."
+                 TextWrapping="Wrap" />
+    </StackPanel>
+
+    <DataGrid x:Name="CurrentCellGrid"
+              Grid.Row="1"
+              Grid.Column="0"
+              ItemsSource="{Binding Items}"
+              AutoGenerateColumns="True"
+              SelectionUnit="Cell"
+              HeadersVisibility="All"
+              CanUserAddRows="False"
+              GridLinesVisibility="Horizontal"
+              CurrentCell="{Binding CurrentCell, Mode=TwoWay}"
+              CurrentCellChanged="OnCurrentCellChanged" />
+
+    <StackPanel Grid.Row="1"
+                Grid.Column="1"
+                Spacing="8">
+      <Border BorderBrush="{DynamicResource SystemControlForegroundBaseMediumBrush}"
+              BorderThickness="1"
+              CornerRadius="4"
+              Padding="8">
+        <StackPanel Spacing="4">
+          <TextBlock Classes="h3" Text="Current cell" />
+          <TextBlock Text="{Binding CurrentCellDescription}"
+                     TextWrapping="Wrap" />
+        </StackPanel>
+      </Border>
+
+      <UniformGrid Columns="2"
+                   Rows="2"
+                   ColumnSpacing="6"
+                   RowSpacing="6">
+        <Button Content="First cell" Click="OnFirstCell" />
+        <Button Content="Last cell" Click="OnLastCell" />
+        <Button Content="Clear current" Click="OnClearCell" />
+      </UniformGrid>
+
+      <Border BorderBrush="{DynamicResource SystemControlForegroundBaseMediumBrush}"
+              BorderThickness="1"
+              CornerRadius="4"
+              Padding="8">
+        <StackPanel Spacing="4">
+          <TextBlock Classes="h3" Text="CurrentCellChanged log" />
+          <ListBox ItemsSource="{Binding Log}"
+                   Height="220" />
+        </StackPanel>
+      </Border>
+    </StackPanel>
+  </Grid>
+</UserControl>

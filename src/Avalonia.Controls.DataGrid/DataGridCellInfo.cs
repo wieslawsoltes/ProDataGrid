@@ -30,6 +30,8 @@ namespace Avalonia.Controls
 
         public bool IsValid { get; }
 
+        public static DataGridCellInfo Unset { get; } = default;
+
         public bool Equals(DataGridCellInfo other)
         {
             return ReferenceEquals(Column, other.Column) &&

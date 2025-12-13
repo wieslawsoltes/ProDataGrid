@@ -153,6 +153,7 @@ namespace Avalonia.Controls
                 }
             }
 
+            UpdateCurrentCellInfoFromState();
             return true;
         }
 
@@ -267,6 +268,172 @@ namespace Avalonia.Controls
         {
             add => AddHandler(CurrentCellChangedEvent, value);
             remove => RemoveHandler(CurrentCellChangedEvent, value);
+        }
+
+        private void SetCurrentCell(DataGridCellInfo cellInfo)
+        {
+            if (_currentCell.Equals(cellInfo) &&
+                _currentCell.RowIndex == cellInfo.RowIndex &&
+                _currentCell.ColumnIndex == cellInfo.ColumnIndex &&
+                _currentCell.IsValid == cellInfo.IsValid)
+            {
+                return;
+            }
+
+            if (!cellInfo.IsValid)
+            {
+                NoCurrentCellChangeCount++;
+                try
+                {
+                    ResetCurrentCellCore();
+                }
+                finally
+                {
+                    NoCurrentCellChangeCount--;
+                }
+
+                return;
+            }
+
+            if (TryResolveCurrentCellCoordinates(cellInfo, out var columnIndex, out var slot))
+            {
+                UpdateSelectionAndCurrency(columnIndex, slot, DataGridSelectionAction.SelectCurrent, scrollIntoView: true);
+            }
+        }
+
+        private bool TryResolveCurrentCellCoordinates(DataGridCellInfo cellInfo, out int columnIndex, out int slot)
+        {
+            columnIndex = -1;
+            slot = -1;
+
+            if (!cellInfo.IsValid || DataConnection == null)
+            {
+                return false;
+            }
+
+            var column = cellInfo.Column;
+            if (column == null)
+            {
+                return false;
+            }
+
+            if (column.OwningGrid != this)
+            {
+                throw DataGridError.DataGrid.ColumnNotInThisDataGrid();
+            }
+
+            if (!column.IsVisible)
+            {
+                throw DataGridError.DataGrid.ColumnCannotBeCollapsed();
+            }
+
+            if (ColumnsInternal.RowGroupSpacerColumn.IsRepresented &&
+                column == ColumnsInternal.RowGroupSpacerColumn)
+            {
+                return false;
+            }
+
+            columnIndex = column.Index;
+            if (IsColumnOutOfBounds(columnIndex))
+            {
+                return false;
+            }
+
+            var rowIndex = ResolveRowIndex(cellInfo);
+            if (rowIndex < 0)
+            {
+                return false;
+            }
+
+            slot = SlotFromRowIndex(rowIndex);
+            if (slot == -1 ||
+                RowGroupHeadersTable.Contains(slot) ||
+                IsSlotOutOfSelectionBounds(slot))
+            {
+                return false;
+            }
+
+            return true;
+        }
+
+        private int ResolveRowIndex(DataGridCellInfo cellInfo)
+        {
+            if (DataConnection == null)
+            {
+                return -1;
+            }
+
+            int rowIndex = cellInfo.RowIndex;
+            if (rowIndex >= 0 && rowIndex < DataConnection.Count)
+            {
+                if (cellInfo.Item != null)
+                {
+                    var itemAtIndex = DataConnection.GetDataItem(rowIndex);
+                    if (!Equals(itemAtIndex, cellInfo.Item))
+                    {
+                        rowIndex = DataConnection.IndexOf(cellInfo.Item);
+                    }
+                }
+
+                return rowIndex;
+            }
+
+            if (cellInfo.Item != null)
+            {
+                return DataConnection.IndexOf(cellInfo.Item);
+            }
+
+            return -1;
+        }
+
+        private void UpdateCurrentCellInfoFromState()
+        {
+            var info = CreateCurrentCellInfo();
+            var old = _currentCell;
+
+            if (old.Equals(info) &&
+                old.RowIndex == info.RowIndex &&
+                old.ColumnIndex == info.ColumnIndex &&
+                old.IsValid == info.IsValid)
+            {
+                return;
+            }
+
+            _currentCell = info;
+            RaisePropertyChanged(CurrentCellProperty, old, info);
+        }
+
+        private DataGridCellInfo CreateCurrentCellInfo()
+        {
+            if (CurrentColumnIndex < 0 || CurrentSlot < 0 || DataConnection == null)
+            {
+                return DataGridCellInfo.Unset;
+            }
+
+            if (IsColumnOutOfBounds(CurrentColumnIndex) ||
+                RowGroupHeadersTable.Contains(CurrentSlot) ||
+                IsSlotOutOfSelectionBounds(CurrentSlot))
+            {
+                return DataGridCellInfo.Unset;
+            }
+
+            var rowIndex = RowIndexFromSlot(CurrentSlot);
+            if (rowIndex < 0 || rowIndex >= DataConnection.Count)
+            {
+                return DataGridCellInfo.Unset;
+            }
+
+            var column = ColumnsItemsInternal[CurrentColumnIndex];
+            if (column == null ||
+                !column.IsVisible ||
+                (ColumnsInternal.RowGroupSpacerColumn.IsRepresented &&
+                 column == ColumnsInternal.RowGroupSpacerColumn))
+            {
+                return DataGridCellInfo.Unset;
+            }
+
+            var item = DataConnection.GetDataItem(rowIndex);
+            return new DataGridCellInfo(item, column, rowIndex, CurrentColumnIndex, isValid: true);
         }
 
 

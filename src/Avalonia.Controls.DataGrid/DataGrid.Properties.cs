@@ -536,6 +536,7 @@ namespace Avalonia.Controls
 
         private int _selectedIndex = -1;
         private object _selectedItem;
+        private DataGridCellInfo _currentCell = DataGridCellInfo.Unset;
 
         public static readonly DirectProperty<DataGrid, int> SelectedIndexProperty =
             AvaloniaProperty.RegisterDirect<DataGrid, int>(
@@ -585,6 +586,22 @@ namespace Avalonia.Controls
                 o => o.SelectedCells,
                 (o, v) => o.SelectedCells = v,
                 defaultBindingMode: BindingMode.TwoWay);
+
+        public static readonly DirectProperty<DataGrid, DataGridCellInfo> CurrentCellProperty =
+            AvaloniaProperty.RegisterDirect<DataGrid, DataGridCellInfo>(
+                nameof(CurrentCell),
+                o => o.CurrentCell,
+                (o, v) => o.CurrentCell = v,
+                defaultBindingMode: BindingMode.TwoWay);
+
+        /// <summary>
+        /// Gets or sets information about the current cell.
+        /// </summary>
+        public DataGridCellInfo CurrentCell
+        {
+            get => _currentCell;
+            set => SetCurrentCell(value);
+        }
 
         /// <summary>
         /// Gets or sets the selection model that drives row selection. If not provided, a default

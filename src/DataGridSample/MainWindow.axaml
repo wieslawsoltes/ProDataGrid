@@ -140,6 +140,9 @@
     <TabItem Header="Current Row Styling">
       <pages:CurrentRowPseudoClassPage />
     </TabItem>
+    <TabItem Header="Current Cell">
+      <pages:CurrentCellPage />
+    </TabItem>
     <TabItem Header="Styling &amp; Themes">
       <pages:StylingShowcasePage />
     </TabItem>
