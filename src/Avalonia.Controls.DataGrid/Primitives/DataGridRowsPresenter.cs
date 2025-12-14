@@ -200,7 +200,7 @@ namespace Avalonia.Controls.Primitives
             {
                 double? constrainedHeight = null;
 
-                if (!double.IsNaN(_lastArrangeHeight) && _lastArrangeHeight >= 0)
+                if (!double.IsNaN(_lastArrangeHeight) && _lastArrangeHeight > 0 && !double.IsInfinity(_lastArrangeHeight))
                 {
                     constrainedHeight = _lastArrangeHeight;
                 }
