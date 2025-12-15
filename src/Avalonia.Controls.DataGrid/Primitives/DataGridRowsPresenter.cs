@@ -347,6 +347,11 @@ namespace Avalonia.Controls.Primitives
                 return;
             }
 
+            if (!OwningGrid.TrimRecycledContainers)
+            {
+                return;
+            }
+
             var viewportHeight = OwningGrid.RowsPresenterAvailableSize.Value.Height;
             if (double.IsInfinity(viewportHeight) || double.IsNaN(viewportHeight))
             {

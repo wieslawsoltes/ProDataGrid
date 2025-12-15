@@ -574,6 +574,62 @@ namespace Avalonia.Controls
         }
 
         /// <summary>
+        /// Defines the <see cref="RecycledContainerHidingMode"/> property.
+        /// </summary>
+        public static readonly StyledProperty<DataGridRecycleHidingMode> RecycledContainerHidingModeProperty =
+            AvaloniaProperty.Register<DataGrid, DataGridRecycleHidingMode>(
+                nameof(RecycledContainerHidingMode),
+                defaultValue: DataGridRecycleHidingMode.MoveOffscreen);
+
+        /// <summary>
+        /// Gets or sets how recycled containers are hidden: either moved far offscreen or simply
+        /// marked invisible. Defaults to offscreen.
+        /// </summary>
+        public DataGridRecycleHidingMode RecycledContainerHidingMode
+        {
+            get { return GetValue(RecycledContainerHidingModeProperty); }
+            set { SetValue(RecycledContainerHidingModeProperty, value); }
+        }
+
+        /// <summary>
+        /// Defines the <see cref="KeepRecycledContainersInVisualTree"/> property.
+        /// </summary>
+        public static readonly StyledProperty<bool> KeepRecycledContainersInVisualTreeProperty =
+            AvaloniaProperty.Register<DataGrid, bool>(
+                nameof(KeepRecycledContainersInVisualTree),
+                defaultValue: true);
+
+        /// <summary>
+        /// Gets or sets a value indicating whether recycled rows/group headers should remain in the
+        /// rows presenter visual tree (arranged off-screen by default) instead of being removed.
+        /// Defaults to true.
+        /// </summary>
+        public bool KeepRecycledContainersInVisualTree
+        {
+            get { return GetValue(KeepRecycledContainersInVisualTreeProperty); }
+            set { SetValue(KeepRecycledContainersInVisualTreeProperty, value); }
+        }
+
+        /// <summary>
+        /// Defines the <see cref="TrimRecycledContainers"/> property.
+        /// </summary>
+        public static readonly StyledProperty<bool> TrimRecycledContainersProperty =
+            AvaloniaProperty.Register<DataGrid, bool>(
+                nameof(TrimRecycledContainers),
+                defaultValue: false);
+
+        /// <summary>
+        /// Gets or sets a value indicating whether recycled rows/group headers should be trimmed
+        /// to a small buffer when the viewport contracts. Defaults to false to retain larger
+        /// recycle pools unless explicitly trimmed.
+        /// </summary>
+        public bool TrimRecycledContainers
+        {
+            get { return GetValue(TrimRecycledContainersProperty); }
+            set { SetValue(TrimRecycledContainersProperty, value); }
+        }
+
+        /// <summary>
         /// Defines the <see cref="UseLogicalScrollable"/> property.
         /// </summary>
         public static readonly StyledProperty<bool> UseLogicalScrollableProperty =

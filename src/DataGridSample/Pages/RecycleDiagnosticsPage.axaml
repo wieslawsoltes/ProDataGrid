@@ -11,20 +11,34 @@
       <TextBlock Classes="h2" Text="Resize recycling diagnostics" />
       <TextBlock TextWrapping="Wrap"
                  Text="Resize the window (maximize/restore) and watch the realized vs recycled row counts. The recycle pool should shrink back to the small viewport budget after restoring." />
-      <StackPanel Orientation="Horizontal" Spacing="12">
-        <TextBlock Text="Realized rows:" />
-        <TextBlock FontWeight="Bold" Text="{Binding RealizedRows}" />
-        <TextBlock Text="Recycled rows:" />
-        <TextBlock FontWeight="Bold" Text="{Binding RecycledRows}" />
-        <TextBlock Text="Viewport height:" />
-        <TextBlock FontWeight="Bold" Text="{Binding ViewportHeight,StringFormat=0.0}" />
-      </StackPanel>
+      <Grid ColumnDefinitions="*,Auto" VerticalAlignment="Center">
+        <StackPanel Orientation="Horizontal" Spacing="12">
+          <TextBlock Text="Realized rows:" />
+          <TextBlock FontWeight="Bold" Text="{Binding RealizedRows}" />
+          <TextBlock Text="Recycled rows:" />
+          <TextBlock FontWeight="Bold" Text="{Binding RecycledRows}" />
+          <TextBlock Text="Viewport height:" />
+          <TextBlock FontWeight="Bold" Text="{Binding ViewportHeight,StringFormat=0.0}" />
+        </StackPanel>
+        <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="12" HorizontalAlignment="Right">
+          <CheckBox Content="Trim recycle pool"
+                    IsChecked="{Binding TrimRecycledContainers}" />
+          <CheckBox Content="Keep recycled in visual tree"
+                    IsChecked="{Binding KeepRecycledContainersInVisualTree}" />
+          <ComboBox Width="200"
+                    ItemsSource="{Binding RecycleHidingModes}"
+                    SelectedItem="{Binding RecycledContainerHidingMode}" />
+        </StackPanel>
+      </Grid>
     </StackPanel>
 
     <DataGrid x:Name="DiagnosticGrid"
               Grid.Row="1"
               Grid.ColumnSpan="2"
               ItemsSource="{Binding Items}"
+              TrimRecycledContainers="{Binding TrimRecycledContainers}"
+              KeepRecycledContainersInVisualTree="{Binding KeepRecycledContainersInVisualTree}"
+              RecycledContainerHidingMode="{Binding RecycledContainerHidingMode}"
               UseLogicalScrollable="True"
               HeadersVisibility="All"
               GridLinesVisibility="Horizontal"

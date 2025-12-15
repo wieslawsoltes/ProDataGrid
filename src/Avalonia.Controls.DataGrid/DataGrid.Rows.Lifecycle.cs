@@ -384,6 +384,11 @@ namespace Avalonia.Controls
             }
             DisplayData.ClearElements(recycle);
 
+            if (recycle && UseLogicalScrollable && _rowsPresenter != null && !KeepRecycledContainersInVisualTree)
+            {
+                RemoveRecycledChildrenFromVisualTree();
+            }
+
             // Update the AvailableRowRoom since we're displaying 0 rows now
             AvailableSlotElementRoom = CellsEstimatedHeight;
             VisibleSlotCount = 0;
@@ -409,7 +414,7 @@ namespace Avalonia.Controls
             if (recycleRow)
             {
                 DisplayData.RecycleRow(dataGridRow);
-                if (UseLogicalScrollable && _rowsPresenter != null)
+                if (UseLogicalScrollable && _rowsPresenter != null && !KeepRecycledContainersInVisualTree)
                 {
                     _rowsPresenter.Children.Remove(dataGridRow);
                 }
@@ -419,6 +424,22 @@ namespace Avalonia.Controls
                 //
                 _rowsPresenter.Children.Remove(dataGridRow);
                 dataGridRow.DetachFromDataGrid(false);
+            }
+        }
+
+        private void RemoveRecycledChildrenFromVisualTree()
+        {
+            if (_rowsPresenter == null)
+            {
+                return;
+            }
+
+            for (int i = _rowsPresenter.Children.Count - 1; i >= 0; i--)
+            {
+                if (_rowsPresenter.Children[i] is DataGridRow or DataGridRowGroupHeader)
+                {
+                    _rowsPresenter.Children.RemoveAt(i);
+                }
             }
         }
 

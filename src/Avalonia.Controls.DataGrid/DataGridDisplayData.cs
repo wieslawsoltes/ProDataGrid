@@ -273,12 +273,9 @@ namespace Avalonia.Controls
 
         #region Private Helpers
 
-        private static void HideElement(Control element)
+        private void HideElement(Control element)
         {
-            element.SetCurrentValue(Visual.IsVisibleProperty, false);
-            // Move hidden elements off-screen immediately to avoid stale bounds being picked up
-            // by layout-sensitive logic (e.g., tests that inspect all rows).
-            element.Arrange(new Rect(-10000, -10000, 0, 0));
+            _owner?.HideRecycledElement(element);
         }
 
         private static void RestoreElementVisibility(Control element)

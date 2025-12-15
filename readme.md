@@ -184,6 +184,36 @@ Add the v2 theme to opt into the new template (enables `UseLogicalScrollable` by
 
 If you use a custom control template, wrap `DataGridRowsPresenter` in a `ScrollViewer` named `PART_ScrollViewer` and set `UseLogicalScrollable="True"`. Keep the column headers in a separate row so they stay fixed while rows scroll.
 
+### Recycle pool controls
+
+Row recycling after resize/shrink is governed by three styled properties:
+
+- `TrimRecycledContainers` (default `False`): trims the recycled row/group-header pool to a small buffer when the viewport contracts (e.g., maximize then restore). Set to `True` to bound the recycle pool; leave `False` for a larger cache.
+- `KeepRecycledContainersInVisualTree` (default `True`): when `True`, recycled rows stay as hidden children; set to `False` to remove recycled containers from the presenter.
+- `RecycledContainerHidingMode` (default `MoveOffscreen`): choose how recycled containers are hidden when `KeepRecycledContainersInVisualTree=True`—either move far offscreen or just set `IsVisible=False` (TreeDataGrid-style).
+
+Typical usage:
+
+```xml
+<DataGrid UseLogicalScrollable="True"
+          TrimRecycledContainers="False"
+          KeepRecycledContainersInVisualTree="True"
+          RecycledContainerHidingMode="MoveOffscreen" />
+
+<!-- Bounded recycle pool, removed from tree -->
+<DataGrid UseLogicalScrollable="True"
+          TrimRecycledContainers="True"
+          KeepRecycledContainersInVisualTree="False" />
+
+<!-- TreeDataGrid-style visibility hiding -->
+<DataGrid UseLogicalScrollable="True"
+          TrimRecycledContainers="False"
+          KeepRecycledContainersInVisualTree="True"
+          RecycledContainerHidingMode="SetIsVisibleOnly" />
+```
+
+A sample toggle UI is available on the “Resize recycling diagnostics” page in the sample app.
+
 ## Row height estimators
 
 Scrolling with variable row heights is now driven by pluggable estimators via `RowHeightEstimator`:

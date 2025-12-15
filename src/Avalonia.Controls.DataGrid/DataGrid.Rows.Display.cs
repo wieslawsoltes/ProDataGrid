@@ -24,6 +24,7 @@ namespace Avalonia.Controls
 
             if (MathUtilities.LessThanOrClose(displayHeight, 0) || SlotCount == 0 || ColumnsItemsInternal.Count == 0)
             {
+                ResetDisplayedRows();
                 return;
             }
 
@@ -171,6 +172,11 @@ namespace Avalonia.Controls
             }
 
             DisplayData.ClearElements(recycle: true);
+
+            if (UseLogicalScrollable && _rowsPresenter != null && !KeepRecycledContainersInVisualTree)
+            {
+                RemoveRecycledChildrenFromVisualTree();
+            }
             AvailableSlotElementRoom = CellsEstimatedHeight;
         }
 
@@ -262,10 +268,7 @@ namespace Avalonia.Controls
 
             if (element is DataGridRow dataGridRow)
             {
-                // Always hide the row immediately to prevent ghost rows during scrolling
-                dataGridRow.SetCurrentValue(Visual.IsVisibleProperty, false);
-                // Move recycled rows out of the viewport so stale bounds don't interfere with layout checks
-                dataGridRow.Arrange(new Rect(-10000, -10000, 0, 0));
+                HideRecycledElement(dataGridRow);
 
                 if (IsRowRecyclable(dataGridRow))
                 {
@@ -279,7 +282,7 @@ namespace Avalonia.Controls
             else if (element is DataGridRowGroupHeader groupHeader)
             {
                 OnUnloadingRowGroup(new DataGridRowGroupHeaderEventArgs(groupHeader));
-                groupHeader.Arrange(new Rect(-10000, -10000, 0, 0));
+                HideRecycledElement(groupHeader);
                 DisplayData.RecycleGroupHeader(groupHeader);
             }
             else if (_rowsPresenter != null)
@@ -298,6 +301,18 @@ namespace Avalonia.Controls
             }
         }
 
+
+        internal void HideRecycledElement(Control element)
+        {
+            element.SetCurrentValue(Visual.IsVisibleProperty, false);
+
+            if (RecycledContainerHidingMode == DataGridRecycleHidingMode.MoveOffscreen)
+            {
+                // Move hidden elements off-screen immediately to avoid stale bounds being picked up
+                // by layout-sensitive logic (e.g., tests that inspect all rows).
+                element.Arrange(new Rect(-10000, -10000, 0, 0));
+            }
+        }
 
     }
 }

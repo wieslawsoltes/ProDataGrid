@@ -404,6 +404,8 @@ public class DataGridScrollingTests
         // Arrange
         var items = Enumerable.Range(0, 500).Select(x => new ScrollTestModel($"Item {x}")).ToList();
         var target = CreateV2Target(items, height: 300, useLogicalScrollable: true);
+        target.TrimRecycledContainers = true;
+        target.KeepRecycledContainersInVisualTree = false;
         var root = (Window)target.GetVisualRoot()!;
         var presenter = GetRowsPresenter(target);
 
@@ -444,6 +446,32 @@ public class DataGridScrollingTests
         const int recyclePoolLimit = 8;
         Assert.True(shrunkRecycled <= recyclePoolLimit,
             $"Recycle pool grew from {initialRecycled} to {shrunkRecycled} after shrink (expanded to {expandedRecycled}).");
+    }
+
+    [AvaloniaFact]
+    public void Recycling_Trim_Can_Be_Disabled()
+    {
+        // Arrange
+        var items = Enumerable.Range(0, 500).Select(x => new ScrollTestModel($"Item {x}")).ToList();
+        var target = CreateV2Target(items, height: 300, useLogicalScrollable: true);
+        target.TrimRecycledContainers = false;
+        var root = (Window)target.GetVisualRoot()!;
+
+        root.UpdateLayout();
+        var initialRecycled = GetRecycledRowCount(target);
+
+        // Act - expand then shrink
+        root.Height = 900;
+        root.UpdateLayout();
+        var expandedRecycled = GetRecycledRowCount(target);
+
+        root.Height = 300;
+        root.UpdateLayout();
+        var shrunkRecycled = GetRecycledRowCount(target);
+
+        // Assert - with trimming disabled the recycle pool should stay large
+        Assert.True(shrunkRecycled >= expandedRecycled - 1,
+            $"Expected recycle pool to remain large when trimming is disabled. Expanded: {expandedRecycled}, Shrunk: {shrunkRecycled}, Initial: {initialRecycled}");
     }
 
     [AvaloniaFact]
@@ -653,6 +681,57 @@ public class DataGridScrollingTests
         // Assert - even with infinite measure input, realized containers should match the small viewport
         Assert.True(rows.Count <= 8, $"Realized rows={rows.Count}, presenter children={presenterChildren}, recycled={recycled}");
         Assert.True(presenterChildren <= 12, $"Presenter children grew unexpectedly for infinite-measure host: {presenterChildren}");
+    }
+
+    [AvaloniaFact]
+    public void Recycled_Rows_Remain_In_VisualTree_When_Flag_Is_Enabled()
+    {
+        // Arrange
+        var items = Enumerable.Range(0, 200).Select(x => new ScrollTestModel($"Item {x}")).ToList();
+        var target = CreateV2Target(items, height: 400, useLogicalScrollable: true);
+        target.KeepRecycledContainersInVisualTree = true;
+        target.TrimRecycledContainers = false;
+        var root = (Window)target.GetVisualRoot()!;
+
+        root.UpdateLayout();
+
+        // Shrink to force recycling
+        root.Height = 1;
+        root.UpdateLayout();
+        target.UpdateLayout();
+
+        var presenter = GetRowsPresenter(target);
+        var recycledRows = GetRecycledRows(target);
+
+        Assert.NotEmpty(recycledRows);
+
+        Assert.All(recycledRows, recycled => Assert.Contains(recycled, presenter.Children));
+        Assert.All(recycledRows, recycled => Assert.False(recycled.IsVisible));
+    }
+
+    [AvaloniaFact]
+    public void Recycled_Rows_Are_Removed_When_Flag_Is_Disabled()
+    {
+        // Arrange
+        var items = Enumerable.Range(0, 200).Select(x => new ScrollTestModel($"Item {x}")).ToList();
+        var target = CreateV2Target(items, height: 400, useLogicalScrollable: true);
+        target.KeepRecycledContainersInVisualTree = false;
+        target.TrimRecycledContainers = false; // keep the pool so we can inspect it
+        var root = (Window)target.GetVisualRoot()!;
+
+        root.UpdateLayout();
+
+        // Shrink to force recycling
+        root.Height = 1;
+        root.UpdateLayout();
+        target.UpdateLayout();
+
+        var presenter = GetRowsPresenter(target);
+        var recycledRows = GetRecycledRows(target);
+
+        Assert.NotEmpty(recycledRows);
+        Assert.All(recycledRows, recycled => Assert.DoesNotContain(recycled, presenter.Children));
+        Assert.All(recycledRows, recycled => Assert.False(recycled.IsVisible));
     }
 
     #endregion
@@ -1316,6 +1395,14 @@ public class DataGridScrollingTests
         var field = typeof(DataGridDisplayData).GetField("_recycledRows", BindingFlags.NonPublic | BindingFlags.Instance);
         var recycledRows = (Stack<DataGridRow>)field!.GetValue(displayData)!;
         return recycledRows.Count;
+    }
+
+    private static IReadOnlyList<DataGridRow> GetRecycledRows(DataGrid target)
+    {
+        var displayData = target.DisplayData;
+        var field = typeof(DataGridDisplayData).GetField("_recycledRows", BindingFlags.NonPublic | BindingFlags.Instance);
+        var recycledRows = (Stack<DataGridRow>)field!.GetValue(displayData)!;
+        return recycledRows.ToArray();
     }
 
     private static DataGrid CreateV2Target(IList<ScrollTestModel> items, int height = 300, bool useLogicalScrollable = true)
