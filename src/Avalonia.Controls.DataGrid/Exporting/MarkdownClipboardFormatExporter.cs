@@ -11,7 +11,7 @@ namespace Avalonia.Controls
 
         public bool TryExport(DataGridClipboardExportContext context, DataTransferItem item)
         {
-            if (!context.Formats.HasFlag(DataGridClipboardExportFormat.Markdown))
+            if (context.Formats != DataGridClipboardExportFormat.Markdown)
             {
                 return false;
             }
@@ -22,6 +22,7 @@ namespace Avalonia.Controls
                 return false;
             }
 
+            item.Set(DataFormat.Text, markdown);
             item.Set(MarkdownFormat, markdown);
             return true;
         }

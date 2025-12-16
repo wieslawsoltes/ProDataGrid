@@ -8,23 +8,24 @@ namespace Avalonia.Controls
     internal sealed class HtmlClipboardFormatExporter : IDataGridClipboardFormatExporter
     {
         internal static readonly DataFormat<string> HtmlFormat = DataFormat.CreateStringPlatformFormat("text/html");
-        internal static readonly DataFormat<string> HtmlWindowsFormat = DataFormat.CreateStringPlatformFormat("HTML Format");
 
         public bool TryExport(DataGridClipboardExportContext context, DataTransferItem item)
         {
-            if (!context.Formats.HasFlag(DataGridClipboardExportFormat.Html))
+            if (context.Formats != DataGridClipboardExportFormat.Html)
             {
                 return false;
             }
 
-            var html = DataGridClipboardFormatting.BuildHtml(context.Rows);
-            if (string.IsNullOrEmpty(html))
+            if (!DataGridClipboardFormatting.TryBuildHtmlPayloads(
+                    context.Rows,
+                    out var html,
+                    out var cfHtml))
             {
                 return false;
             }
 
-            item.Set(HtmlFormat, html);
-            item.Set(HtmlWindowsFormat, html);
+            item.Set(DataFormat.Text, html);
+            item.Set(HtmlFormat, cfHtml);
             return true;
         }
     }

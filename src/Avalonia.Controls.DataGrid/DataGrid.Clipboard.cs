@@ -68,7 +68,7 @@ namespace Avalonia.Controls
 #endif
         bool CopySelectionToClipboard()
         {
-            return CopySelectionToClipboard(ClipboardExportFormats, ClipboardExporter);
+            return CopySelectionToClipboard(ClipboardExportFormat, ClipboardExporter);
         }
 
         /// <summary>
@@ -100,10 +100,7 @@ namespace Avalonia.Controls
                 return false;
             }
 
-            if (formats != DataGridClipboardExportFormat.None && !formats.HasFlag(DataGridClipboardExportFormat.Text))
-            {
-                formats |= DataGridClipboardExportFormat.Text;
-            }
+            var normalizedFormat = NormalizeClipboardFormats(formats);
 
             var rows = BuildClipboardRows();
             if (rows.Count == 0)
@@ -117,7 +114,7 @@ namespace Avalonia.Controls
                     this,
                     rows,
                     ClipboardCopyMode,
-                    formats,
+                    normalizedFormat,
                     SelectionUnit));
 
             if (data == null)
@@ -204,6 +201,22 @@ namespace Avalonia.Controls
             }
 
             return rows;
+        }
+
+        private static DataGridClipboardExportFormat NormalizeClipboardFormats(DataGridClipboardExportFormat formats)
+        {
+            return formats switch
+            {
+                DataGridClipboardExportFormat.None => DataGridClipboardExportFormat.Text,
+                DataGridClipboardExportFormat.Text => DataGridClipboardExportFormat.Text,
+                DataGridClipboardExportFormat.Csv => DataGridClipboardExportFormat.Csv,
+                DataGridClipboardExportFormat.Html => DataGridClipboardExportFormat.Html,
+                DataGridClipboardExportFormat.Markdown => DataGridClipboardExportFormat.Markdown,
+                DataGridClipboardExportFormat.Xml => DataGridClipboardExportFormat.Xml,
+                DataGridClipboardExportFormat.Yaml => DataGridClipboardExportFormat.Yaml,
+                DataGridClipboardExportFormat.Json => DataGridClipboardExportFormat.Json,
+                _ => DataGridClipboardExportFormat.Text
+            };
         }
 
 

@@ -7,11 +7,11 @@ namespace Avalonia.Controls
 {
     internal sealed class TextClipboardFormatExporter : IDataGridClipboardFormatExporter
     {
-        internal static readonly DataFormat<string> UnicodeTextFormat = DataFormat.CreateStringPlatformFormat("UnicodeText");
+        internal static readonly DataFormat<string> PlainTextFormat = DataFormat.CreateStringPlatformFormat("text/plain");
 
         public bool TryExport(DataGridClipboardExportContext context, DataTransferItem item)
         {
-            if (!context.Formats.HasFlag(DataGridClipboardExportFormat.Text))
+            if (context.Formats != DataGridClipboardExportFormat.Text)
             {
                 return false;
             }
@@ -23,7 +23,7 @@ namespace Avalonia.Controls
             }
 
             item.Set(DataFormat.Text, text);
-            item.Set(UnicodeTextFormat, text);
+            item.Set(PlainTextFormat, text);
             return true;
         }
     }

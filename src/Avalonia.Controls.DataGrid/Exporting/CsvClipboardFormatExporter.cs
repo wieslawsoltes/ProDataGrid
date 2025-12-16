@@ -8,11 +8,10 @@ namespace Avalonia.Controls
     internal sealed class CsvClipboardFormatExporter : IDataGridClipboardFormatExporter
     {
         internal static readonly DataFormat<string> CsvFormat = DataFormat.CreateStringPlatformFormat("text/csv");
-        internal static readonly DataFormat<string> CsvWindowsFormat = DataFormat.CreateStringPlatformFormat("Csv");
 
         public bool TryExport(DataGridClipboardExportContext context, DataTransferItem item)
         {
-            if (!context.Formats.HasFlag(DataGridClipboardExportFormat.Csv))
+            if (context.Formats != DataGridClipboardExportFormat.Csv)
             {
                 return false;
             }
@@ -23,8 +22,8 @@ namespace Avalonia.Controls
                 return false;
             }
 
+            item.Set(DataFormat.Text, csv);
             item.Set(CsvFormat, csv);
-            item.Set(CsvWindowsFormat, csv);
             return true;
         }
     }

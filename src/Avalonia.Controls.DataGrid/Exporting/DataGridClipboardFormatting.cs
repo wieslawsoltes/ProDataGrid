@@ -65,16 +65,7 @@ namespace Avalonia.Controls
 
         internal static string BuildHtml(IReadOnlyList<DataGridRowClipboardEventArgs> rows)
         {
-            var tableBuilder = StringBuilderCache.Acquire();
-            tableBuilder.Append("<table>");
-
-            foreach (var row in rows)
-            {
-                AppendHtmlRow(row, tableBuilder);
-            }
-
-            tableBuilder.Append("</table>");
-            var table = StringBuilderCache.GetStringAndRelease(tableBuilder);
+            var table = BuildHtmlTable(rows);
 
             if (table.Length == 0)
             {
@@ -82,6 +73,86 @@ namespace Avalonia.Controls
             }
 
             return BuildHtmlDocument(table);
+        }
+
+        internal static string BuildJson(IReadOnlyList<DataGridRowClipboardEventArgs> rows)
+        {
+            if (rows.Count == 0)
+            {
+                return string.Empty;
+            }
+
+            var hasHeader = rows[0].IsColumnHeadersRow;
+            var headers = hasHeader ? rows[0].ClipboardRowContent : null;
+            var startIndex = hasHeader ? 1 : 0;
+
+            var builder = StringBuilderCache.Acquire();
+            builder.Append('[');
+
+            for (var i = startIndex; i < rows.Count; i++)
+            {
+                var row = rows[i];
+                var cells = row.ClipboardRowContent;
+
+                if (headers is not null && headers.Count > 0)
+                {
+                    builder.Append('{');
+                    for (var c = 0; c < headers.Count; c++)
+                    {
+                        var header = headers[c].Content?.ToString() ?? $"Column{c + 1}";
+                        var value = c < cells.Count ? cells[c].Content?.ToString() ?? string.Empty : string.Empty;
+                        builder.Append('"').Append(EscapeJson(header)).Append("\":\"").Append(EscapeJson(value)).Append('"');
+                        if (c < headers.Count - 1)
+                        {
+                            builder.Append(',');
+                        }
+                    }
+
+                    builder.Append('}');
+                }
+                else
+                {
+                    builder.Append('[');
+                    for (var c = 0; c < cells.Count; c++)
+                    {
+                        var value = cells[c].Content?.ToString() ?? string.Empty;
+                        builder.Append('"').Append(EscapeJson(value)).Append('"');
+                        if (c < cells.Count - 1)
+                        {
+                            builder.Append(',');
+                        }
+                    }
+
+                    builder.Append(']');
+                }
+
+                if (i < rows.Count - 1)
+                {
+                    builder.Append(',');
+                }
+            }
+
+            builder.Append(']');
+            return StringBuilderCache.GetStringAndRelease(builder);
+        }
+
+        internal static bool TryBuildHtmlPayloads(
+            IReadOnlyList<DataGridRowClipboardEventArgs> rows,
+            out string html,
+            out string cfHtml)
+        {
+            var table = BuildHtmlTable(rows);
+
+            if (table.Length == 0)
+            {
+                html = string.Empty;
+                cfHtml = string.Empty;
+                return false;
+            }
+
+            html = BuildHtmlDocument(table);
+            cfHtml = BuildCfHtmlDocument(table);
+            return true;
         }
 
         private static void AppendHtmlRow(DataGridRowClipboardEventArgs args, StringBuilder builder)
@@ -113,6 +184,20 @@ namespace Avalonia.Controls
             }
 
             builder.Append("</tr>");
+        }
+
+        private static string BuildHtmlTable(IReadOnlyList<DataGridRowClipboardEventArgs> rows)
+        {
+            var builder = StringBuilderCache.Acquire();
+            builder.Append("<table>");
+
+            foreach (var row in rows)
+            {
+                AppendHtmlRow(row, builder);
+            }
+
+            builder.Append("</table>");
+            return StringBuilderCache.GetStringAndRelease(builder);
         }
 
         private static void AppendHtmlEncoded(string text, StringBuilder builder)
@@ -161,6 +246,15 @@ namespace Avalonia.Controls
         }
 
         private static string BuildHtmlDocument(string fragment)
+        {
+            var builder = StringBuilderCache.Acquire();
+            builder.Append("<html><body>");
+            builder.Append(fragment);
+            builder.Append("</body></html>");
+            return StringBuilderCache.GetStringAndRelease(builder);
+        }
+
+        private static string BuildCfHtmlDocument(string fragment)
         {
             const string htmlPrefix = "<html><body><!--StartFragment-->";
             const string htmlSuffix = "<!--EndFragment--></body></html>";
@@ -239,6 +333,34 @@ namespace Avalonia.Controls
             }
 
             builder.AppendLine();
+        }
+
+        internal static string EscapeJson(string value)
+        {
+            if (string.IsNullOrEmpty(value))
+            {
+                return string.Empty;
+            }
+
+            var builder = StringBuilderCache.Acquire();
+
+            foreach (var ch in value)
+            {
+                switch (ch)
+                {
+                    case '\\':
+                        builder.Append("\\\\");
+                        break;
+                    case '"':
+                        builder.Append("\\\"");
+                        break;
+                    default:
+                        builder.Append(ch);
+                        break;
+                }
+            }
+
+            return StringBuilderCache.GetStringAndRelease(builder);
         }
 
         private static void AppendMarkdownSeparator(int cellCount, StringBuilder builder)
@@ -337,7 +459,7 @@ namespace Avalonia.Controls
             }
 
             if (value.IndexOfAny(new[] { ':', '-', '#', '{', '}', '[', ']', ',', '&', '*', '!', '|', '>', '\'', '"', '%', '@', '`' }) >= 0 ||
-                value.Contains("\n", StringComparison.Ordinal))
+                value.IndexOf('\n') >= 0)
             {
                 return "\"" + value.Replace("\"", "\\\"") + "\"";
             }

@@ -38,6 +38,7 @@ public class DataGridClipboardExportTests
             var text = await data!.TryGetTextAsync();
             Assert.Equal("\"Name\"\t\"Value\"\r\n\"Alpha\"\t\"1\"\r\n\"Beta\"\t\"2\"\r\n", text);
             Assert.Contains(DataFormat.Text, data.Formats);
+            Assert.Contains(DataGridClipboardExporter.PlainTextFormat, data.Formats);
             Assert.DoesNotContain(DataGridClipboardExporter.HtmlFormat, data.Formats);
         }
         finally
@@ -53,7 +54,7 @@ public class DataGridClipboardExportTests
         try
         {
             grid.ClipboardCopyMode = DataGridClipboardCopyMode.IncludeHeader;
-            grid.ClipboardExportFormats = DataGridClipboardExportFormat.Text | DataGridClipboardExportFormat.Html;
+            grid.ClipboardExportFormat = DataGridClipboardExportFormat.Html;
             grid.SelectedItems.Add(items[0]);
             grid.SelectedItems.Add(items[1]);
 
@@ -63,10 +64,10 @@ public class DataGridClipboardExportTests
             Assert.NotNull(data);
 
             var htmlFormat = DataGridClipboardExporter.HtmlFormat;
-            var htmlWinFormat = DataGridClipboardExporter.HtmlWindowsFormat;
 
+            Assert.Contains(DataFormat.Text, data!.Formats);
+            Assert.Contains(DataGridClipboardExporter.PlainTextFormat, data.Formats);
             Assert.Contains(htmlFormat, data!.Formats);
-            Assert.Contains(htmlWinFormat, data.Formats);
 
             var html = await data.TryGetValueAsync(htmlFormat);
             Assert.NotNull(html);
@@ -90,7 +91,7 @@ public class DataGridClipboardExportTests
         try
         {
             grid.ClipboardCopyMode = DataGridClipboardCopyMode.IncludeHeader;
-            grid.ClipboardExportFormats = DataGridClipboardExportFormat.Text | DataGridClipboardExportFormat.Html;
+            grid.ClipboardExportFormat = DataGridClipboardExportFormat.Html;
             grid.SelectedItems.Add(items[0]);
 
             Assert.True(grid.CopySelectionToClipboard(DataGridClipboardExportFormat.Csv));
@@ -99,9 +100,8 @@ public class DataGridClipboardExportTests
             Assert.NotNull(data);
 
             Assert.Contains(DataFormat.Text, data!.Formats);
-            Assert.Contains(DataGridClipboardExporter.UnicodeTextFormat, data.Formats);
+            Assert.Contains(DataGridClipboardExporter.PlainTextFormat, data.Formats);
             Assert.Contains(DataGridClipboardExporter.CsvFormat, data!.Formats);
-            Assert.Contains(DataGridClipboardExporter.CsvWindowsFormat, data.Formats);
             Assert.DoesNotContain(DataGridClipboardExporter.HtmlFormat, data.Formats);
 
             var csv = await data.TryGetValueAsync(DataGridClipboardExporter.CsvFormat);
@@ -128,7 +128,7 @@ public class DataGridClipboardExportTests
             Assert.NotNull(data);
 
             Assert.Contains(DataFormat.Text, data!.Formats);
-            Assert.Contains(DataGridClipboardExporter.UnicodeTextFormat, data.Formats);
+            Assert.Contains(DataGridClipboardExporter.PlainTextFormat, data.Formats);
             Assert.DoesNotContain(DataGridClipboardExporter.CsvFormat, data.Formats);
             Assert.DoesNotContain(DataGridClipboardExporter.HtmlFormat, data.Formats);
             Assert.DoesNotContain(DataGridClipboardExporter.MarkdownFormat, data.Formats);
@@ -156,9 +156,8 @@ public class DataGridClipboardExportTests
             Assert.NotNull(data);
 
             Assert.Contains(DataFormat.Text, data!.Formats);
-            Assert.Contains(DataGridClipboardExporter.UnicodeTextFormat, data.Formats);
+            Assert.Contains(DataGridClipboardExporter.PlainTextFormat, data.Formats);
             Assert.Contains(DataGridClipboardExporter.HtmlFormat, data!.Formats);
-            Assert.Contains(DataGridClipboardExporter.HtmlWindowsFormat, data.Formats);
             Assert.DoesNotContain(DataGridClipboardExporter.CsvFormat, data.Formats);
 
             var html = await data.TryGetValueAsync(DataGridClipboardExporter.HtmlFormat);
@@ -187,7 +186,7 @@ public class DataGridClipboardExportTests
             Assert.NotNull(data);
 
             Assert.Contains(DataFormat.Text, data!.Formats);
-            Assert.Contains(DataGridClipboardExporter.UnicodeTextFormat, data.Formats);
+            Assert.Contains(DataGridClipboardExporter.PlainTextFormat, data.Formats);
             Assert.Contains(DataGridClipboardExporter.MarkdownFormat, data!.Formats);
             Assert.DoesNotContain(DataGridClipboardExporter.CsvFormat, data.Formats);
             Assert.DoesNotContain(DataGridClipboardExporter.HtmlFormat, data.Formats);
@@ -218,7 +217,7 @@ public class DataGridClipboardExportTests
             Assert.NotNull(data);
 
             Assert.Contains(DataFormat.Text, data!.Formats);
-            Assert.Contains(DataGridClipboardExporter.UnicodeTextFormat, data.Formats);
+            Assert.Contains(DataGridClipboardExporter.PlainTextFormat, data.Formats);
             Assert.Contains(DataGridClipboardExporter.XmlFormat, data!.Formats);
             Assert.DoesNotContain(DataGridClipboardExporter.CsvFormat, data.Formats);
             Assert.DoesNotContain(DataGridClipboardExporter.HtmlFormat, data.Formats);
@@ -249,15 +248,49 @@ public class DataGridClipboardExportTests
             Assert.NotNull(data);
 
             Assert.Contains(DataFormat.Text, data!.Formats);
-            Assert.Contains(DataGridClipboardExporter.UnicodeTextFormat, data.Formats);
+            Assert.Contains(DataGridClipboardExporter.PlainTextFormat, data.Formats);
             Assert.Contains(DataGridClipboardExporter.YamlFormat, data!.Formats);
             Assert.DoesNotContain(DataGridClipboardExporter.CsvFormat, data.Formats);
             Assert.DoesNotContain(DataGridClipboardExporter.HtmlFormat, data.Formats);
             Assert.DoesNotContain(DataGridClipboardExporter.MarkdownFormat, data.Formats);
             Assert.DoesNotContain(DataGridClipboardExporter.XmlFormat, data.Formats);
+            Assert.DoesNotContain(DataGridClipboardExporter.JsonFormat, data.Formats);
 
             var yaml = await data.TryGetValueAsync(DataGridClipboardExporter.YamlFormat);
             Assert.Equal("rows:\n- cells:\n  - Name\n  - Value\n- cells:\n  - Alpha\n  - 1\n", yaml?.Replace("\r\n", "\n", StringComparison.Ordinal));
+        }
+        finally
+        {
+            root.Close();
+        }
+    }
+
+    [AvaloniaFact]
+    public async Task CopySelectionToClipboard_Json_Only()
+    {
+        var (grid, root, items) = CreateGrid();
+        try
+        {
+            grid.ClipboardCopyMode = DataGridClipboardCopyMode.IncludeHeader;
+            grid.SelectedItems.Add(items[0]);
+
+            Assert.True(grid.CopySelectionToClipboard(DataGridClipboardExportFormat.Json));
+
+            var data = await WaitForClipboardAsync(root);
+            Assert.NotNull(data);
+
+            Assert.Contains(DataFormat.Text, data!.Formats);
+            Assert.Contains(DataGridClipboardExporter.PlainTextFormat, data.Formats);
+            Assert.Contains(DataGridClipboardExporter.JsonFormat, data!.Formats);
+            Assert.DoesNotContain(DataGridClipboardExporter.CsvFormat, data.Formats);
+            Assert.DoesNotContain(DataGridClipboardExporter.HtmlFormat, data.Formats);
+            Assert.DoesNotContain(DataGridClipboardExporter.MarkdownFormat, data.Formats);
+            Assert.DoesNotContain(DataGridClipboardExporter.XmlFormat, data.Formats);
+            Assert.DoesNotContain(DataGridClipboardExporter.YamlFormat, data.Formats);
+
+            var json = await data.TryGetValueAsync(DataGridClipboardExporter.JsonFormat);
+            Assert.NotNull(json);
+            Assert.Equal("[{\"Name\":\"Alpha\",\"Value\":\"1\"}]", json?.Replace("\r\n", "\n", StringComparison.Ordinal));
         }
         finally
         {
@@ -273,7 +306,7 @@ public class DataGridClipboardExportTests
         {
             var exporter = new RecordingExporter();
             grid.ClipboardCopyMode = DataGridClipboardCopyMode.IncludeHeader;
-            grid.ClipboardExportFormats = DataGridClipboardExportFormat.None;
+            grid.ClipboardExportFormat = DataGridClipboardExportFormat.None;
             grid.ClipboardExporter = exporter;
             grid.SelectedItems.Add(items[0]);
 

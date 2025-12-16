@@ -28,5 +28,6 @@ public class TextClipboardFormatExporterTests
 
         Assert.True(result);
         Assert.Equal("\"Name\"\t\"Value\"\r\n\"Alpha\"\t\"1\"\r\n", item.TryGetRaw(DataFormat.Text));
+        Assert.Equal("\"Name\"\t\"Value\"\r\n\"Alpha\"\t\"1\"\r\n", item.TryGetRaw(TextClipboardFormatExporter.PlainTextFormat));
     }
 }

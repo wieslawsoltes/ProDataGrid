@@ -3,17 +3,13 @@
 
 using System;
 using System.Collections.Generic;
-using System.Text;
 using Avalonia.Controls;
-using Avalonia.Input;
 using Avalonia.Interactivity;
 
 namespace DataGridSample.Pages;
 
 public partial class ClipboardExportPage : UserControl
 {
-    private readonly JsonClipboardExporter _jsonExporter = new();
-
     public ClipboardExportPage()
     {
         InitializeComponent();
@@ -44,53 +40,70 @@ public partial class ClipboardExportPage : UserControl
     private void CopyYamlFormat(object? sender, RoutedEventArgs e) =>
         CopyFormat(DataGridClipboardExportFormat.Yaml);
 
+    private void CopyJsonFormat(object? sender, RoutedEventArgs e) =>
+        CopyFormat(DataGridClipboardExportFormat.Json);
+
     private void CopyFormat(DataGridClipboardExportFormat format)
     {
-        ItemsGrid.CopySelectionToClipboard(format, exporter: null);
+        ItemsGrid.CopySelectionToClipboard(format);
     }
 
     private void UpdateExportSettings(object? sender, RoutedEventArgs? e)
     {
-        var formats = DataGridClipboardExportFormat.None;
-
-        if (TextFormatCheckBox.IsChecked == true)
+        var format = sender switch
         {
-            formats |= DataGridClipboardExportFormat.Text;
+            RadioButton { IsChecked: true } radio when ReferenceEquals(radio, TextFormatRadioButton) => DataGridClipboardExportFormat.Text,
+            RadioButton { IsChecked: true } radio when ReferenceEquals(radio, CsvFormatRadioButton) => DataGridClipboardExportFormat.Csv,
+            RadioButton { IsChecked: true } radio when ReferenceEquals(radio, HtmlFormatRadioButton) => DataGridClipboardExportFormat.Html,
+            RadioButton { IsChecked: true } radio when ReferenceEquals(radio, MarkdownFormatRadioButton) => DataGridClipboardExportFormat.Markdown,
+            RadioButton { IsChecked: true } radio when ReferenceEquals(radio, XmlFormatRadioButton) => DataGridClipboardExportFormat.Xml,
+            RadioButton { IsChecked: true } radio when ReferenceEquals(radio, YamlFormatRadioButton) => DataGridClipboardExportFormat.Yaml,
+            RadioButton { IsChecked: true } radio when ReferenceEquals(radio, JsonFormatRadioButton) => DataGridClipboardExportFormat.Json,
+            _ => SelectActiveFormat()
+        };
+
+        ItemsGrid.ClipboardExportFormat = format;
+    }
+
+    private DataGridClipboardExportFormat SelectActiveFormat()
+    {
+        if (TextFormatRadioButton.IsChecked == true)
+        {
+            return DataGridClipboardExportFormat.Text;
         }
 
-        if (CsvFormatCheckBox.IsChecked == true)
+        if (CsvFormatRadioButton.IsChecked == true)
         {
-            formats |= DataGridClipboardExportFormat.Csv;
+            return DataGridClipboardExportFormat.Csv;
         }
 
-        if (HtmlFormatCheckBox.IsChecked == true)
+        if (HtmlFormatRadioButton.IsChecked == true)
         {
-            formats |= DataGridClipboardExportFormat.Html;
+            return DataGridClipboardExportFormat.Html;
         }
 
-        if (MarkdownFormatCheckBox.IsChecked == true)
+        if (MarkdownFormatRadioButton.IsChecked == true)
         {
-            formats |= DataGridClipboardExportFormat.Markdown;
+            return DataGridClipboardExportFormat.Markdown;
         }
 
-        if (XmlFormatCheckBox.IsChecked == true)
+        if (XmlFormatRadioButton.IsChecked == true)
         {
-            formats |= DataGridClipboardExportFormat.Xml;
+            return DataGridClipboardExportFormat.Xml;
         }
 
-        if (YamlFormatCheckBox.IsChecked == true)
+        if (YamlFormatRadioButton.IsChecked == true)
         {
-            formats |= DataGridClipboardExportFormat.Yaml;
+            return DataGridClipboardExportFormat.Yaml;
         }
 
-        if (formats == DataGridClipboardExportFormat.None)
+        if (JsonFormatRadioButton.IsChecked == true)
         {
-            formats = DataGridClipboardExportFormat.Text;
-            TextFormatCheckBox.IsChecked = true;
+            return DataGridClipboardExportFormat.Json;
         }
 
-        ItemsGrid.ClipboardExportFormats = formats;
-        ItemsGrid.ClipboardExporter = CustomExporterCheckBox.IsChecked == true ? _jsonExporter : null;
+        TextFormatRadioButton.IsChecked = true;
+        return DataGridClipboardExportFormat.Text;
     }
 
     private static IReadOnlyList<ClipboardSampleItem> BuildItems() => new List<ClipboardSampleItem>
@@ -105,90 +118,4 @@ public partial class ClipboardExportPage : UserControl
     };
 
     private sealed record ClipboardSampleItem(string Name, string Category, decimal Price, DateTime LastOrder);
-
-    private sealed class JsonClipboardExporter : IDataGridClipboardExporter
-    {
-        private static readonly DataFormat<string> JsonFormat = DataFormat.CreateStringPlatformFormat("application/json");
-
-        public IAsyncDataTransfer? BuildClipboardData(DataGridClipboardExportContext context)
-        {
-            if (context.Rows.Count == 0)
-            {
-                return null;
-            }
-
-            var transfer = new DataTransfer();
-            var item = new DataTransferItem();
-
-            var text = BuildDelimited(context.Rows, '\t');
-            if (!string.IsNullOrEmpty(text))
-            {
-                item.Set(DataFormat.Text, text);
-            }
-
-            var json = BuildJson(context.Rows);
-            if (!string.IsNullOrEmpty(json))
-            {
-                item.Set(JsonFormat, json);
-            }
-
-            transfer.Add(item);
-            return transfer;
-        }
-
-        private static string BuildDelimited(IReadOnlyList<DataGridRowClipboardEventArgs> rows, char delimiter)
-        {
-            var builder = new StringBuilder();
-
-            foreach (var row in rows)
-            {
-                var cells = row.ClipboardRowContent;
-                if (cells.Count == 0)
-                {
-                    builder.Append("\r\n");
-                    continue;
-                }
-
-                for (int i = 0; i < cells.Count; i++)
-                {
-                    var value = cells[i].Content?.ToString() ?? string.Empty;
-                    value = value.Replace("\"", "\"\"");
-                    builder.Append('"').Append(value).Append('"');
-                    builder.Append(i == cells.Count - 1 ? "\r\n" : delimiter);
-                }
-            }
-
-            return builder.ToString();
-        }
-
-        private static string BuildJson(IReadOnlyList<DataGridRowClipboardEventArgs> rows)
-        {
-            var builder = new StringBuilder();
-            builder.Append("{\"rows\":[");
-
-            for (int i = 0; i < rows.Count; i++)
-            {
-                var row = rows[i];
-                builder.Append("{\"isHeader\":").Append(row.IsColumnHeadersRow.ToString().ToLowerInvariant()).Append(",\"cells\":[");
-                for (int c = 0; c < row.ClipboardRowContent.Count; c++)
-                {
-                    var cell = row.ClipboardRowContent[c];
-                    var value = cell.Content?.ToString() ?? string.Empty;
-                    builder.Append('"').Append(value.Replace("\"", "\\\"")).Append('"');
-                    if (c < row.ClipboardRowContent.Count - 1)
-                    {
-                        builder.Append(',');
-                    }
-                }
-                builder.Append("]}");
-                if (i < rows.Count - 1)
-                {
-                    builder.Append(',');
-                }
-            }
-
-            builder.Append("]}");
-            return builder.ToString();
-        }
-    }
 }

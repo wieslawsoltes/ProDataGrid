@@ -817,21 +817,22 @@ namespace Avalonia.Controls
         }
 
         /// <summary>
-        /// Identifies the <see cref="ClipboardExportFormats"/> styled property.
+        /// Identifies the <see cref="ClipboardExportFormat"/> styled property.
         /// </summary>
-        public static readonly StyledProperty<DataGridClipboardExportFormat> ClipboardExportFormatsProperty =
+        public static readonly StyledProperty<DataGridClipboardExportFormat> ClipboardExportFormatProperty =
             AvaloniaProperty.Register<DataGrid, DataGridClipboardExportFormat>(
-                nameof(ClipboardExportFormats),
+                nameof(ClipboardExportFormat),
                 defaultValue: DataGridClipboardExportFormat.Text);
 
         /// <summary>
-        /// Gets or sets the clipboard formats emitted by the grid's default exporter.
+        /// Gets or sets the clipboard format emitted by the grid's default exporter.
         /// </summary>
-        public DataGridClipboardExportFormat ClipboardExportFormats
+        public DataGridClipboardExportFormat ClipboardExportFormat
         {
-            get => GetValue(ClipboardExportFormatsProperty);
-            set => SetValue(ClipboardExportFormatsProperty, value);
+            get => GetValue(ClipboardExportFormatProperty);
+            set => SetValue(ClipboardExportFormatProperty, value);
         }
+
 
         /// <summary>
         /// Identifies the <see cref="ClipboardExporter"/> styled property.

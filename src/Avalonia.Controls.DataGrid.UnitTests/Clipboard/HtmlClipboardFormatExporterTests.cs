@@ -27,11 +27,20 @@ public class HtmlClipboardFormatExporterTests
             item);
 
         Assert.True(result);
-        var html = item.TryGetRaw(HtmlClipboardFormatExporter.HtmlFormat) as string;
-        Assert.NotNull(html);
-        Assert.Contains("StartHTML:", html);
-        Assert.Contains("<table>", html);
-        Assert.Contains("<th>Name</th>", html);
-        Assert.Contains("<td>Alpha</td>", html);
+        var cfHtml = item.TryGetRaw(HtmlClipboardFormatExporter.HtmlFormat) as string;
+        Assert.NotNull(cfHtml);
+        Assert.Contains("StartHTML:", cfHtml);
+        Assert.Contains("<!--StartFragment-->", cfHtml);
+        Assert.Contains("<table>", cfHtml);
+        Assert.Contains("<th>Name</th>", cfHtml);
+        Assert.Contains("<td>Alpha</td>", cfHtml);
+
+        var plain = item.TryGetRaw(DataFormat.Text) as string;
+        Assert.NotNull(plain);
+        Assert.DoesNotContain("StartHTML:", plain);
+        Assert.DoesNotContain("<!--StartFragment-->", plain);
+        Assert.Contains("<html><body><table>", plain);
+        Assert.Contains("<th>Name</th>", plain);
+        Assert.Contains("<td>Alpha</td>", plain);
     }
 }
