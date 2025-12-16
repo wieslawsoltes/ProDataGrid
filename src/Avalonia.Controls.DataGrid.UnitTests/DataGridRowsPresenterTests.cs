@@ -405,7 +405,7 @@ namespace Avalonia.Controls.DataGridTests
 
         #region GetControlInDirection Extended Tests
 
-        [Theory]
+        [AvaloniaTheory]
         [InlineData(NavigationDirection.Down)]
         [InlineData(NavigationDirection.Up)]
         [InlineData(NavigationDirection.Left)]
@@ -595,7 +595,7 @@ namespace Avalonia.Controls.DataGridTests
             Assert.True(snapInfo.AreVerticalSnapPointsRegular);
         }
 
-        [Theory]
+        [AvaloniaTheory]
         [InlineData(Orientation.Horizontal)]
         [InlineData(Orientation.Vertical)]
         public void GetIrregularSnapPoints_Returns_Empty_Without_OwningGrid(Orientation orientation)
@@ -611,7 +611,7 @@ namespace Avalonia.Controls.DataGridTests
             Assert.Empty(result);
         }
 
-        [Theory]
+        [AvaloniaTheory]
         [InlineData(Orientation.Horizontal)]
         [InlineData(Orientation.Vertical)]
         public void GetRegularSnapPoints_Returns_Zero_Without_OwningGrid(Orientation orientation)
@@ -628,7 +628,7 @@ namespace Avalonia.Controls.DataGridTests
             Assert.Equal(0, offset);
         }
 
-        [Theory]
+        [AvaloniaTheory]
         [InlineData(SnapPointsAlignment.Near)]
         [InlineData(SnapPointsAlignment.Center)]
         [InlineData(SnapPointsAlignment.Far)]
