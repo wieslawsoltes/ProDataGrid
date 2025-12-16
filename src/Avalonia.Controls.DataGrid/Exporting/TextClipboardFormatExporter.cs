@@ -7,6 +7,8 @@ namespace Avalonia.Controls
 {
     internal sealed class TextClipboardFormatExporter : IDataGridClipboardFormatExporter
     {
+        internal static readonly DataFormat<string> UnicodeTextFormat = DataFormat.CreateStringPlatformFormat("UnicodeText");
+
         public bool TryExport(DataGridClipboardExportContext context, DataTransferItem item)
         {
             if (!context.Formats.HasFlag(DataGridClipboardExportFormat.Text))
@@ -21,6 +23,7 @@ namespace Avalonia.Controls
             }
 
             item.Set(DataFormat.Text, text);
+            item.Set(UnicodeTextFormat, text);
             return true;
         }
     }

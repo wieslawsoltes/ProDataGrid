@@ -98,8 +98,10 @@ public class DataGridClipboardExportTests
             var data = await WaitForClipboardAsync(root);
             Assert.NotNull(data);
 
+            Assert.Contains(DataFormat.Text, data!.Formats);
+            Assert.Contains(DataGridClipboardExporter.UnicodeTextFormat, data.Formats);
             Assert.Contains(DataGridClipboardExporter.CsvFormat, data!.Formats);
-            Assert.DoesNotContain(DataFormat.Text, data.Formats);
+            Assert.Contains(DataGridClipboardExporter.CsvWindowsFormat, data.Formats);
             Assert.DoesNotContain(DataGridClipboardExporter.HtmlFormat, data.Formats);
 
             var csv = await data.TryGetValueAsync(DataGridClipboardExporter.CsvFormat);
@@ -126,6 +128,7 @@ public class DataGridClipboardExportTests
             Assert.NotNull(data);
 
             Assert.Contains(DataFormat.Text, data!.Formats);
+            Assert.Contains(DataGridClipboardExporter.UnicodeTextFormat, data.Formats);
             Assert.DoesNotContain(DataGridClipboardExporter.CsvFormat, data.Formats);
             Assert.DoesNotContain(DataGridClipboardExporter.HtmlFormat, data.Formats);
             Assert.DoesNotContain(DataGridClipboardExporter.MarkdownFormat, data.Formats);
@@ -152,9 +155,11 @@ public class DataGridClipboardExportTests
             var data = await WaitForClipboardAsync(root);
             Assert.NotNull(data);
 
+            Assert.Contains(DataFormat.Text, data!.Formats);
+            Assert.Contains(DataGridClipboardExporter.UnicodeTextFormat, data.Formats);
             Assert.Contains(DataGridClipboardExporter.HtmlFormat, data!.Formats);
             Assert.Contains(DataGridClipboardExporter.HtmlWindowsFormat, data.Formats);
-            Assert.DoesNotContain(DataFormat.Text, data.Formats);
+            Assert.DoesNotContain(DataGridClipboardExporter.CsvFormat, data.Formats);
 
             var html = await data.TryGetValueAsync(DataGridClipboardExporter.HtmlFormat);
             Assert.NotNull(html);
@@ -181,8 +186,9 @@ public class DataGridClipboardExportTests
             var data = await WaitForClipboardAsync(root);
             Assert.NotNull(data);
 
+            Assert.Contains(DataFormat.Text, data!.Formats);
+            Assert.Contains(DataGridClipboardExporter.UnicodeTextFormat, data.Formats);
             Assert.Contains(DataGridClipboardExporter.MarkdownFormat, data!.Formats);
-            Assert.DoesNotContain(DataFormat.Text, data.Formats);
             Assert.DoesNotContain(DataGridClipboardExporter.CsvFormat, data.Formats);
             Assert.DoesNotContain(DataGridClipboardExporter.HtmlFormat, data.Formats);
             Assert.DoesNotContain(DataGridClipboardExporter.XmlFormat, data.Formats);
@@ -211,8 +217,9 @@ public class DataGridClipboardExportTests
             var data = await WaitForClipboardAsync(root);
             Assert.NotNull(data);
 
+            Assert.Contains(DataFormat.Text, data!.Formats);
+            Assert.Contains(DataGridClipboardExporter.UnicodeTextFormat, data.Formats);
             Assert.Contains(DataGridClipboardExporter.XmlFormat, data!.Formats);
-            Assert.DoesNotContain(DataFormat.Text, data.Formats);
             Assert.DoesNotContain(DataGridClipboardExporter.CsvFormat, data.Formats);
             Assert.DoesNotContain(DataGridClipboardExporter.HtmlFormat, data.Formats);
             Assert.DoesNotContain(DataGridClipboardExporter.MarkdownFormat, data.Formats);
@@ -241,8 +248,9 @@ public class DataGridClipboardExportTests
             var data = await WaitForClipboardAsync(root);
             Assert.NotNull(data);
 
+            Assert.Contains(DataFormat.Text, data!.Formats);
+            Assert.Contains(DataGridClipboardExporter.UnicodeTextFormat, data.Formats);
             Assert.Contains(DataGridClipboardExporter.YamlFormat, data!.Formats);
-            Assert.DoesNotContain(DataFormat.Text, data.Formats);
             Assert.DoesNotContain(DataGridClipboardExporter.CsvFormat, data.Formats);
             Assert.DoesNotContain(DataGridClipboardExporter.HtmlFormat, data.Formats);
             Assert.DoesNotContain(DataGridClipboardExporter.MarkdownFormat, data.Formats);

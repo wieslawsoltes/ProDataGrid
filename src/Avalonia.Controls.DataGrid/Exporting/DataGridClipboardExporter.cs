@@ -68,8 +68,10 @@ namespace Avalonia.Controls
         internal static DataFormat<string> HtmlFormat => HtmlClipboardFormatExporter.HtmlFormat;
         internal static DataFormat<string> HtmlWindowsFormat => HtmlClipboardFormatExporter.HtmlWindowsFormat;
         internal static DataFormat<string> CsvFormat => CsvClipboardFormatExporter.CsvFormat;
+        internal static DataFormat<string> CsvWindowsFormat => CsvClipboardFormatExporter.CsvWindowsFormat;
         internal static DataFormat<string> MarkdownFormat => MarkdownClipboardFormatExporter.MarkdownFormat;
         internal static DataFormat<string> XmlFormat => XmlClipboardFormatExporter.XmlFormat;
         internal static DataFormat<string> YamlFormat => YamlClipboardFormatExporter.YamlFormat;
+        internal static DataFormat<string> UnicodeTextFormat => TextClipboardFormatExporter.UnicodeTextFormat;
     }
 }

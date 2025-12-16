@@ -12,6 +12,7 @@ using Avalonia.Interactivity;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace Avalonia.Controls
 {
@@ -97,6 +98,11 @@ namespace Avalonia.Controls
             if (ClipboardCopyMode == DataGridClipboardCopyMode.None)
             {
                 return false;
+            }
+
+            if (formats != DataGridClipboardExportFormat.None && !formats.HasFlag(DataGridClipboardExportFormat.Text))
+            {
+                formats |= DataGridClipboardExportFormat.Text;
             }
 
             var rows = BuildClipboardRows();
@@ -212,7 +218,23 @@ namespace Avalonia.Controls
 
             if (data != null)
             {
-                await clipboard.SetDataAsync(data);
+                for (var attempt = 0; attempt < 3; attempt++)
+                {
+                    try
+                    {
+                        await clipboard.SetDataAsync(data);
+                        break;
+                    }
+                    catch
+                    {
+                        if (attempt == 2)
+                        {
+                            throw;
+                        }
+
+                        await Task.Delay(10);
+                    }
+                }
             }
         }
 
