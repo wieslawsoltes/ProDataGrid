@@ -1,4 +1,5 @@
 using System;
+using System.Diagnostics.CodeAnalysis;
 using DataGridSample.Mvvm;
 
 namespace DataGridSample.Models
@@ -6,6 +7,7 @@ namespace DataGridSample.Models
     /// <summary>
     /// Represents a live-updating row used to exercise scrolling, snap points, and row details.
     /// </summary>
+    [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicParameterlessConstructor | DynamicallyAccessedMemberTypes.PublicProperties)]
     public class LiveDataItem : ObservableObject
     {
         private string _summary = string.Empty;

@@ -1,4 +1,5 @@
 using System.Collections.ObjectModel;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using DataGridSample.Mvvm;
 
@@ -36,6 +37,7 @@ namespace DataGridSample.ViewModels
         }
     }
 
+    [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors | DynamicallyAccessedMemberTypes.PublicProperties)]
     public class CurrentPerson
     {
         public CurrentPerson(string name, string team, string role)

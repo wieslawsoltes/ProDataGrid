@@ -10,6 +10,9 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:sorting="clr-namespace:Avalonia.Controls.DataGridSorting;assembly=Avalonia.Controls.DataGrid"
     xmlns:viewModels="clr-namespace:DataGridSample.ViewModels"
+    xmlns:models="clr-namespace:DataGridSample.Models"
+    xmlns:collections="clr-namespace:Avalonia.Collections;assembly=Avalonia.Controls.DataGrid"
+    x:DataType="viewModels:SortingModelViewModel"
     d:DesignHeight="600"
     d:DesignWidth="1000"
     mc:Ignorable="d">
@@ -63,10 +66,10 @@
               CanUserSortColumns="True"
               AreRowGroupHeadersFrozen="True">
       <DataGrid.Columns>
-        <DataGridTextColumn Header="Name" Binding="{Binding Name}" SortMemberPath="Name"/>
-        <DataGridTextColumn Header="Region" Binding="{Binding Region}" SortMemberPath="Region"/>
-        <DataGridTextColumn Header="Population" Binding="{Binding Population}" SortMemberPath="Population"/>
-        <DataGridTextColumn Header="Area" Binding="{Binding Area}" SortMemberPath="Area"/>
+        <DataGridTextColumn Header="Name" Binding="{Binding Name}" SortMemberPath="Name" x:DataType="models:Country"/>
+        <DataGridTextColumn Header="Region" Binding="{Binding Region}" SortMemberPath="Region" x:DataType="models:Country"/>
+        <DataGridTextColumn Header="Population" Binding="{Binding Population}" SortMemberPath="Population" x:DataType="models:Country"/>
+        <DataGridTextColumn Header="Area" Binding="{Binding Area}" SortMemberPath="Area" x:DataType="models:Country"/>
       </DataGrid.Columns>
     </DataGrid>
 
@@ -82,13 +85,13 @@
           </ItemsPanelTemplate>
         </ItemsControl.ItemsPanel>
         <ItemsControl.ItemTemplate>
-          <DataTemplate>
+          <DataTemplate x:DataType="collections:DataGridSortDescription">
             <Border Padding="4" Margin="0 2" Background="#1A000000" CornerRadius="4">
               <StackPanel Orientation="Horizontal" Spacing="6">
                 <TextBlock Text="{Binding PropertyPath}" />
                 <TextBlock Text="→" />
                 <TextBlock Text="{Binding Direction}" />
-                <TextBlock Text="{Binding SourceComparer, StringFormat=Comparer}" />
+                <TextBlock Text="{Binding Comparer, StringFormat=Comparer}" />
               </StackPanel>
             </Border>
           </DataTemplate>

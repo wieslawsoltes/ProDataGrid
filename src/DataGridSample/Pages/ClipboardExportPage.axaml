@@ -1,7 +1,9 @@
 <UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:pages="clr-namespace:DataGridSample.Pages"
              x:Class="DataGridSample.Pages.ClipboardExportPage"
-             x:Name="Root">
+             x:Name="Root"
+             x:DataType="pages:ClipboardExportPage">
 
   <Grid ColumnDefinitions="320,*"
         RowDefinitions="Auto,*"
@@ -124,16 +126,20 @@
         <DataGrid.Columns>
           <DataGridTextColumn Header="Item"
                               Width="2*"
-                              Binding="{Binding Name}" />
+                              Binding="{Binding Name}"
+                              x:DataType="pages:ClipboardSampleItem" />
           <DataGridTextColumn Header="Category"
                               Width="2*"
-                              Binding="{Binding Category}" />
+                              Binding="{Binding Category}"
+                              x:DataType="pages:ClipboardSampleItem" />
           <DataGridTextColumn Header="Price"
                               Width="*"
-                              Binding="{Binding Price, StringFormat='{}{0:C}'}" />
+                              Binding="{Binding Price, StringFormat='{}{0:C}'}"
+                              x:DataType="pages:ClipboardSampleItem" />
           <DataGridTextColumn Header="Last ordered"
                               Width="*"
-                              Binding="{Binding LastOrder, StringFormat='{}{0:yyyy-MM-dd}'}" />
+                              Binding="{Binding LastOrder, StringFormat='{}{0:yyyy-MM-dd}'}"
+                              x:DataType="pages:ClipboardSampleItem" />
         </DataGrid.Columns>
       </DataGrid>
     </Border>

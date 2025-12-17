@@ -35,16 +35,20 @@
               Height="460">
       <DataGrid.Columns>
         <DataGridTextColumn Header="Name"
-                            Binding="{Binding Name}" />
+                            Binding="{Binding Name}"
+                            x:DataType="viewModels:Contact" />
         <DataGridTextColumn Header="Role"
-                            Binding="{Binding Title}" />
+                            Binding="{Binding Title}"
+                            x:DataType="viewModels:Contact" />
         <DataGridComboBoxColumn Header="Status"
-                                ItemsSource="{Binding #Root.DataContext.Statuses}"
-                                SelectedItemBinding="{Binding Status}" />
+                                ItemsSource="{Binding #Root.((viewModels:ComboHyperlinkColumnsViewModel)DataContext).Statuses}"
+                                SelectedItemBinding="{Binding Status}"
+                                x:DataType="viewModels:Contact" />
         <DataGridHyperlinkColumn Header="Website"
                                  Binding="{Binding Link}"
                                  ContentBinding="{Binding LinkText}"
-                                 TargetName="_blank" />
+                                 TargetName="_blank"
+                                 x:DataType="viewModels:Contact" />
       </DataGrid.Columns>
     </DataGrid>
   </Grid>

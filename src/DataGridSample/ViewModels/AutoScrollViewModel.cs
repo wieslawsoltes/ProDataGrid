@@ -1,5 +1,6 @@
 using System;
 using System.Collections.ObjectModel;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Windows.Input;
 using Avalonia;
@@ -67,6 +68,7 @@ namespace DataGridSample.ViewModels
             }
         }
 
+        [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicParameterlessConstructor | DynamicallyAccessedMemberTypes.PublicProperties)]
         public class AutoItem
         {
             public int Index { get; set; }

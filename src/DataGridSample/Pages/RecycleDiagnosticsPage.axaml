@@ -1,7 +1,9 @@
 <UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:models="clr-namespace:DataGridSample.Models"
              xmlns:viewModels="clr-namespace:DataGridSample.ViewModels"
-             x:Class="DataGridSample.Pages.RecycleDiagnosticsPage">
+             x:Class="DataGridSample.Pages.RecycleDiagnosticsPage"
+             x:DataType="viewModels:RecycleDiagnosticsViewModel">
   <UserControl.DataContext>
     <viewModels:RecycleDiagnosticsViewModel />
   </UserControl.DataContext>
@@ -44,11 +46,11 @@
               GridLinesVisibility="Horizontal"
               RowBackground="#08000000">
       <DataGrid.Columns>
-        <DataGridTextColumn Header="ID" Binding="{Binding Id}" Width="80" />
-        <DataGridTextColumn Header="Name" Binding="{Binding Name}" Width="3*" />
-        <DataGridTextColumn Header="Category" Binding="{Binding Category}" Width="2*" />
-        <DataGridTextColumn Header="Description" Binding="{Binding Description}" Width="5*" />
-        <DataGridTextColumn Header="Notes" Binding="{Binding Notes}" Width="3*" />
+        <DataGridTextColumn Header="ID" Binding="{Binding Id}" Width="80" x:DataType="models:PixelItem" />
+        <DataGridTextColumn Header="Name" Binding="{Binding Name}" Width="3*" x:DataType="models:PixelItem" />
+        <DataGridTextColumn Header="Category" Binding="{Binding Category}" Width="2*" x:DataType="models:PixelItem" />
+        <DataGridTextColumn Header="Description" Binding="{Binding Description}" Width="5*" x:DataType="models:PixelItem" />
+        <DataGridTextColumn Header="Notes" Binding="{Binding Notes}" Width="3*" x:DataType="models:PixelItem" />
       </DataGrid.Columns>
     </DataGrid>
   </Grid>

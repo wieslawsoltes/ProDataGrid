@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Diagnostics.CodeAnalysis;
 using DataGridSample.Mvvm;
 
 namespace DataGridSample.ViewModels;
@@ -52,6 +53,7 @@ public class ColumnThemesViewModel : ObservableObject
     }
 }
 
+[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors | DynamicallyAccessedMemberTypes.PublicProperties)]
 public class ThemedRow : ObservableObject
 {
     private bool _done;

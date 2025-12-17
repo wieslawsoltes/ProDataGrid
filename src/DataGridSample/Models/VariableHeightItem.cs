@@ -1,5 +1,6 @@
 using System;
 using System.ComponentModel;
+using System.Diagnostics.CodeAnalysis;
 using DataGridSample.Mvvm;
 
 namespace DataGridSample.Models
@@ -7,6 +8,7 @@ namespace DataGridSample.Models
     /// <summary>
     /// Model for testing variable row heights in DataGrid smooth scrolling.
     /// </summary>
+    [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicParameterlessConstructor | DynamicallyAccessedMemberTypes.PublicProperties)]
     public class VariableHeightItem : ObservableObject
     {
         private int _id;

@@ -1,5 +1,6 @@
 <UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:models="clr-namespace:DataGridSample.Models"
              xmlns:viewModels="clr-namespace:DataGridSample.ViewModels"
              x:Class="DataGridSample.Pages.CustomSelectionModelPage"
              x:DataType="viewModels:CustomSelectionModelViewModel">
@@ -40,7 +41,7 @@
           <TextBlock Text="{Binding SelectionModel.AnchorIndex, StringFormat='AnchorIndex: {0}'}" />
           <ItemsControl ItemsSource="{Binding SelectionModel.SelectedItems}">
             <ItemsControl.ItemTemplate>
-              <DataTemplate>
+              <DataTemplate x:DataType="models:Country">
                 <TextBlock Text="{Binding Name}" />
               </DataTemplate>
             </ItemsControl.ItemTemplate>

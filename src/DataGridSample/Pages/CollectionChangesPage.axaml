@@ -1,5 +1,6 @@
 <UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:models="clr-namespace:DataGridSample.Models"
              xmlns:viewModels="clr-namespace:DataGridSample.ViewModels"
              x:Class="DataGridSample.Pages.CollectionChangesPage"
              x:DataType="viewModels:CollectionChangesViewModel">
@@ -33,9 +34,9 @@
                 Height="420"
                 IsReadOnly="True">
         <DataGrid.Columns>
-          <DataGridTextColumn Header="Id" Binding="{Binding Id}" Width="80" />
-          <DataGridTextColumn Header="Name" Binding="{Binding Name}" Width="2*" />
-          <DataGridTextColumn Header="Value" Binding="{Binding Value}" Width="*" />
+          <DataGridTextColumn Header="Id" Binding="{Binding Id}" Width="80" x:DataType="models:ChangeItem" />
+          <DataGridTextColumn Header="Name" Binding="{Binding Name}" Width="2*" x:DataType="models:ChangeItem" />
+          <DataGridTextColumn Header="Value" Binding="{Binding Value}" Width="*" x:DataType="models:ChangeItem" />
         </DataGrid.Columns>
       </DataGrid>
     </StackPanel>

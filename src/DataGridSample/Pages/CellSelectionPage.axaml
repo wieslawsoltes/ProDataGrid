@@ -1,6 +1,9 @@
 <UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             x:Class="DataGridSample.Pages.CellSelectionPage">
+             xmlns:pages="clr-namespace:DataGridSample.Pages"
+             xmlns:dg="clr-namespace:Avalonia.Controls;assembly=Avalonia.Controls.DataGrid"
+             x:Class="DataGridSample.Pages.CellSelectionPage"
+             x:DataType="pages:CellSelectionPage">
 
   <Grid RowDefinitions="Auto,Auto,*" ColumnDefinitions="3*,2*" Margin="12" ColumnSpacing="12" RowSpacing="8">
     <StackPanel Grid.Row="0" Grid.ColumnSpan="2" Spacing="4">
@@ -43,7 +46,7 @@
         <ListBox ItemsSource="{Binding SelectedCells}"
                  Height="200">
           <ListBox.ItemTemplate>
-            <DataTemplate>
+            <DataTemplate x:DataType="dg:DataGridCellInfo">
               <StackPanel Orientation="Horizontal" Spacing="6">
                 <TextBlock Text="{Binding RowIndex, StringFormat='Row {0}'}" />
                 <TextBlock Text="{Binding Column.Header}" />

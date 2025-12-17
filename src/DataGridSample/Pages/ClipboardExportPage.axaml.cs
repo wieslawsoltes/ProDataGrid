@@ -116,6 +116,6 @@ public partial class ClipboardExportPage : UserControl
         new("Quinoa", "Grain", 6.10m, new DateTime(2025, 2, 8)),
         new("Elderflower", "Floral", 18.60m, new DateTime(2025, 1, 31)),
     };
-
-    private sealed record ClipboardSampleItem(string Name, string Category, decimal Price, DateTime LastOrder);
 }
+
+public sealed record ClipboardSampleItem(string Name, string Category, decimal Price, DateTime LastOrder);

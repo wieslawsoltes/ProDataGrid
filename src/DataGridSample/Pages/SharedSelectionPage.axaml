@@ -1,5 +1,6 @@
 <UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:models="clr-namespace:DataGridSample.Models"
              xmlns:viewModels="clr-namespace:DataGridSample.ViewModels"
              x:Class="DataGridSample.Pages.SharedSelectionPage"
              x:DataType="viewModels:SharedSelectionViewModel">
@@ -30,7 +31,7 @@
                SelectionMode="Multiple"
                Height="200">
         <ListBox.ItemTemplate>
-          <DataTemplate>
+          <DataTemplate x:DataType="models:Country">
             <StackPanel Orientation="Horizontal" Spacing="6">
               <TextBlock Text="{Binding Name}" FontWeight="SemiBold" />
               <TextBlock Text="(" />
@@ -44,7 +45,7 @@
       <TextBlock Classes="h3" Text="Selected Items" />
       <ItemsControl ItemsSource="{Binding SelectionModel.SelectedItems}">
         <ItemsControl.ItemTemplate>
-          <DataTemplate>
+          <DataTemplate x:DataType="models:Country">
             <TextBlock Text="{Binding Name}" />
           </DataTemplate>
         </ItemsControl.ItemTemplate>

@@ -93,21 +93,25 @@
       <DataGrid.Columns>
         <columns:ThemedCheckBoxColumn Header="Done"
                                       Binding="{Binding Done}"
-                                      Width="80" />
+                                      Width="80"
+                                      x:DataType="viewModels:ThemedRow" />
         <columns:ThemedComboBoxColumn Header="Status"
-                                      ItemsSource="{Binding #Grid.DataContext.StatusOptions}"
+                                      ItemsSource="{Binding #Grid.((viewModels:ColumnThemesViewModel)DataContext).StatusOptions}"
                                       SelectedItemBinding="{Binding Status}"
-                                      Width="140" />
+                                      Width="140"
+                                      x:DataType="viewModels:ThemedRow" />
         <columns:ThemedHyperlinkColumn Header="Link"
                                        Binding="{Binding Target}"
                                        ContentBinding="{Binding Label}"
-                                       Width="200" />
+                                       Width="200"
+                                       x:DataType="viewModels:ThemedRow" />
         <columns:AccentTextColumn Header="Notes"
                                   Binding="{Binding Notes}"
-                                  Width="*" />
+                                  Width="*"
+                                  x:DataType="viewModels:ThemedRow" />
       </DataGrid.Columns>
       <DataGrid.RowDetailsTemplate>
-        <DataTemplate>
+        <DataTemplate x:DataType="viewModels:ThemedRow">
           <TextBlock Margin="12,4,12,10"
                      Text="{Binding Notes}"
                      TextWrapping="Wrap"

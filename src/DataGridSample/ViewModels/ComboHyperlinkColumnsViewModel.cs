@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Diagnostics.CodeAnalysis;
 using DataGridSample.Mvvm;
 
 namespace DataGridSample.ViewModels
@@ -76,6 +77,7 @@ namespace DataGridSample.ViewModels
         }
     }
 
+    [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors | DynamicallyAccessedMemberTypes.PublicProperties)]
     public class Contact : ObservableObject
     {
         private string _name;

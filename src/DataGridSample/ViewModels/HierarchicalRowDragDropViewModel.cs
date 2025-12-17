@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Diagnostics.CodeAnalysis;
 using Avalonia.Controls.DataGridDragDrop;
 using Avalonia.Controls.DataGridHierarchical;
 using Avalonia.Input;
@@ -103,6 +104,7 @@ namespace DataGridSample.ViewModels
             });
         }
 
+        [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors | DynamicallyAccessedMemberTypes.PublicProperties)]
         public class TreeItem
         {
             public TreeItem(string name, ObservableCollection<TreeItem>? children = null)

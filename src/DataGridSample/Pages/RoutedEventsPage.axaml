@@ -5,6 +5,8 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:vm="clr-namespace:DataGridSample.ViewModels"
+    xmlns:hier="clr-namespace:Avalonia.Controls.DataGridHierarchical;assembly=Avalonia.Controls.DataGrid"
+    x:DataType="vm:RoutedEventsViewModel"
     mc:Ignorable="d">
     <UserControl.DataContext>
         <vm:RoutedEventsViewModel />
@@ -43,8 +45,8 @@
                       RowEditEnding="OnRowEditEnding"
                       RowEditEnded="OnRowEditEnded"
                       SelectionChanged="OnSelectionChanged">
-                <DataGrid.RowDetailsTemplate>
-                    <DataTemplate>
+                    <DataGrid.RowDetailsTemplate>
+                    <DataTemplate x:DataType="vm:RoutedEventsViewModel+SampleItem">
                         <TextBlock Text="{Binding Name}" Margin="4" />
                     </DataTemplate>
                 </DataGrid.RowDetailsTemplate>
@@ -75,10 +77,25 @@
                 <DataGrid.Columns>
                     <DataGridHierarchicalColumn Header="Node"
                                                 Width="2*"
-                                                Binding="{Binding Item.Name}" />
-                    <DataGridTextColumn Header="Kind"
-                                        Width="*"
-                                        Binding="{Binding Item.Kind}" />
+                                                x:CompileBindings="False"
+                                                Binding="{Binding Item}">
+                        <DataGridHierarchicalColumn.CellTemplate>
+                            <DataTemplate x:DataType="vm:RoutedEventsViewModel+HierarchicalItem">
+                                <TextBlock Text="{Binding Name}" />
+                            </DataTemplate>
+                        </DataGridHierarchicalColumn.CellTemplate>
+                    </DataGridHierarchicalColumn>
+                    <DataGridTemplateColumn Header="Kind"
+                                            x:CompileBindings="False"
+                                            Width="*">
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate x:DataType="hier:HierarchicalNode">
+                                <TextBlock x:DataType="vm:RoutedEventsViewModel+HierarchicalItem"
+                                           DataContext="{Binding Item}"
+                                           Text="{Binding Kind}" />
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
                 </DataGrid.Columns>
             </DataGrid>
         </Grid>
@@ -102,7 +119,7 @@
                          ScrollViewer.VerticalScrollBarVisibility="Auto"
                          BorderThickness="0">
                     <ListBox.ItemTemplate>
-                        <DataTemplate>
+                        <DataTemplate x:DataType="x:String">
                             <TextBlock Text="{Binding}" />
                         </DataTemplate>
                     </ListBox.ItemTemplate>

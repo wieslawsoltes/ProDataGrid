@@ -1,4 +1,5 @@
 using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 
 namespace DataGridSample.Models
@@ -6,6 +7,7 @@ namespace DataGridSample.Models
     /// <summary>
     /// Simple model to showcase pixel-based column widths and horizontal scrolling.
     /// </summary>
+    [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicParameterlessConstructor | DynamicallyAccessedMemberTypes.PublicProperties)]
     public class PixelItem
     {
         public int Id { get; set; }

@@ -10,6 +10,8 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:viewModels="clr-namespace:DataGridSample.ViewModels"
     xmlns:adapters="clr-namespace:DataGridSample.Adapters"
+    xmlns:hier="clr-namespace:Avalonia.Controls.DataGridHierarchical;assembly=Avalonia.Controls.DataGrid"
+    x:DataType="viewModels:HierarchicalSampleViewModel"
     d:DesignHeight="720"
     d:DesignWidth="1100"
     mc:Ignorable="d">
@@ -51,6 +53,7 @@
               SortingModel="{Binding SortingModel, Mode=OneWay}"
               SortingAdapterFactory="{StaticResource HierarchicalSortingAdapterFactory}"
               HierarchicalRowsEnabled="True"
+              x:DataType="viewModels:HierarchicalSampleViewModel"
               CanUserSortColumns="True"
               HeadersVisibility="Column"
               GridLinesVisibility="Horizontal"
@@ -59,22 +62,53 @@
         <DataGridHierarchicalColumn Header="Name"
                                     SortMemberPath="Item.Name"
                                     Width="2*"
-                                    Binding="{Binding Item.Name}" />
+                                    x:CompileBindings="False"
+                                    Binding="{Binding Item}">
+          <DataGridHierarchicalColumn.CellTemplate>
+            <DataTemplate x:DataType="viewModels:HierarchicalSampleViewModel+TreeItem">
+              <TextBlock Text="{Binding Name}" />
+            </DataTemplate>
+          </DataGridHierarchicalColumn.CellTemplate>
+        </DataGridHierarchicalColumn>
 
-        <DataGridTextColumn Header="Kind"
-                            SortMemberPath="Item.Kind"
-                            Width="120"
-                            Binding="{Binding Item.Kind}" />
+        <DataGridTemplateColumn Header="Kind"
+                                SortMemberPath="Item.Kind"
+                                Width="120"
+                                x:CompileBindings="False">
+          <DataGridTemplateColumn.CellTemplate>
+            <DataTemplate x:DataType="hier:HierarchicalNode">
+              <TextBlock x:DataType="viewModels:HierarchicalSampleViewModel+TreeItem"
+                         DataContext="{Binding Item}"
+                         Text="{Binding Kind}" />
+            </DataTemplate>
+          </DataGridTemplateColumn.CellTemplate>
+        </DataGridTemplateColumn>
 
-        <DataGridTextColumn Header="Size"
-                            SortMemberPath="Item.Size"
-                            Width="120"
-                            Binding="{Binding Item.Size, StringFormat=N0}" />
+        <DataGridTemplateColumn Header="Size"
+                                SortMemberPath="Item.Size"
+                                Width="120"
+                                x:CompileBindings="False">
+          <DataGridTemplateColumn.CellTemplate>
+            <DataTemplate x:DataType="hier:HierarchicalNode">
+              <TextBlock x:DataType="viewModels:HierarchicalSampleViewModel+TreeItem"
+                         DataContext="{Binding Item}"
+                         Text="{Binding Size, StringFormat=N0}" />
+            </DataTemplate>
+          </DataGridTemplateColumn.CellTemplate>
+        </DataGridTemplateColumn>
 
-        <DataGridTextColumn Header="Modified"
-                            SortMemberPath="Item.Modified"
-                            Width="160"
-                            Binding="{Binding Item.Modified, StringFormat=yyyy-MM-dd HH:mm}" />
+        <DataGridTemplateColumn Header="Modified"
+                                SortMemberPath="Item.Modified"
+                                Width="160"
+                                x:CompileBindings="False">
+          <DataGridTemplateColumn.CellTemplate>
+            <DataTemplate x:DataType="hier:HierarchicalNode">
+              <TextBlock x:DataType="viewModels:HierarchicalSampleViewModel+TreeItem"
+                         DataContext="{Binding Item}"
+                         Text="{Binding Modified, StringFormat=yyyy-MM-dd HH:mm}" />
+            </DataTemplate>
+          </DataGridTemplateColumn.CellTemplate>
+        </DataGridTemplateColumn>
       </DataGrid.Columns>
     </DataGrid>
   </Grid>

@@ -1,4 +1,5 @@
 using System.Collections.ObjectModel;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using Avalonia.Collections;
 using Avalonia.Controls.DataGridHierarchical;
@@ -97,6 +98,7 @@ public class RoutedEventsViewModel
         return model;
     }
 
+    [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicParameterlessConstructor | DynamicallyAccessedMemberTypes.PublicProperties)]
     public class SampleItem
     {
         public int Id { get; set; }
@@ -108,5 +110,6 @@ public class RoutedEventsViewModel
         public string? LongText { get; set; }
     }
 
+    [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors | DynamicallyAccessedMemberTypes.PublicProperties)]
     public record HierarchicalItem(string Name, string Kind, ObservableCollection<HierarchicalItem> Children);
 }

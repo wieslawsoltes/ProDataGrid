@@ -3,7 +3,9 @@ using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
 using System.Windows.Input;
+using System.Diagnostics.CodeAnalysis;
 using Avalonia.Controls;
+using Avalonia.Controls.Templates;
 using Avalonia.Data;
 using Avalonia.Layout;
 using DataGridSample.Models;
@@ -21,6 +23,7 @@ namespace DataGridSample.ViewModels
         {
             Items = new ObservableCollection<Person>(CreatePeople());
             Columns = new ObservableCollection<DataGridColumn>();
+            ColumnPreviews = new ObservableCollection<ColumnPreview>();
 
             SetPresetACommand = new RelayCommand(_ => ApplyPresetA());
             SetPresetBCommand = new RelayCommand(_ => ApplyPresetB());
@@ -34,6 +37,8 @@ namespace DataGridSample.ViewModels
         public ObservableCollection<Person> Items { get; }
 
         public ObservableCollection<DataGridColumn> Columns { get; }
+
+        public ObservableCollection<ColumnPreview> ColumnPreviews { get; }
 
         public ColumnsSynchronizationMode ColumnsSyncMode
         {
@@ -72,24 +77,27 @@ namespace DataGridSample.ViewModels
         private void ApplyPresetA()
         {
             Columns.Clear();
-            Columns.Add(CreateTextColumn("First Name", nameof(Person.FirstName), 1.5));
-            Columns.Add(CreateTextColumn("Last Name", nameof(Person.LastName), 1.5));
+            Columns.Add(CreateTextColumn("First Name", "FirstName", p => p.FirstName, 1.5));
+            Columns.Add(CreateTextColumn("Last Name", "LastName", p => p.LastName, 1.5));
             // Leave Age to auto-generation to demo placement.
+            RefreshColumnPreviews();
         }
 
         private void ApplyPresetB()
         {
             Columns.Clear();
-            Columns.Add(CreateTextColumn("Name", nameof(Person.FirstName), 1.5));
-            Columns.Add(CreateCheckColumn("Banned", nameof(Person.IsBanned), 0.8));
-            Columns.Add(CreateTextColumn("Age", nameof(Person.Age), 0.8));
+            Columns.Add(CreateTextColumn("Name", "FirstName", p => p.FirstName, 1.5));
+            Columns.Add(CreateCheckColumn("Banned", "IsBanned", p => p.IsBanned, 0.8));
+            Columns.Add(CreateTextColumn("Age", "Age", p => p.Age, 0.8));
+            RefreshColumnPreviews();
         }
 
         private void AddTrailingColumn()
         {
             var index = Columns.Count + 1;
-            Columns.Add(CreateTextColumn($"Extra {index}", nameof(Person.FirstName), 1));
+            Columns.Add(CreateTextColumn($"Extra {index}", "FirstName", p => p.FirstName, 1));
             RaiseCommandCanExecute();
+            RefreshColumnPreviews();
         }
 
         private void RemoveLastColumn()
@@ -98,6 +106,7 @@ namespace DataGridSample.ViewModels
             {
                 Columns.RemoveAt(Columns.Count - 1);
                 RaiseCommandCanExecute();
+                RefreshColumnPreviews();
             }
         }
 
@@ -108,26 +117,38 @@ namespace DataGridSample.ViewModels
                 var last = Columns[Columns.Count - 1];
                 Columns.RemoveAt(Columns.Count - 1);
                 Columns.Insert(0, last);
+                RefreshColumnPreviews();
             }
         }
 
-        private static DataGridTextColumn CreateTextColumn(string header, string path, double starWeight)
+        private static DataGridTemplateColumn CreateTextColumn(string header, string path, Func<Person, object?> selector, double starWeight)
         {
-            return new DataGridTextColumn
+            return new DataGridTemplateColumn
             {
                 Header = header,
-                Binding = new Binding(path),
-                Width = new DataGridLength(starWeight, DataGridLengthUnitType.Star)
+                Tag = path,
+                Width = new DataGridLength(starWeight, DataGridLengthUnitType.Star),
+                CellTemplate = new FuncDataTemplate<Person>((item, _) =>
+                    new TextBlock
+                    {
+                        Text = selector(item)?.ToString() ?? string.Empty
+                    })
             };
         }
 
-        private static DataGridCheckBoxColumn CreateCheckColumn(string header, string path, double width)
+        private static DataGridTemplateColumn CreateCheckColumn(string header, string path, Func<Person, bool> selector, double width)
         {
-            return new DataGridCheckBoxColumn
+            return new DataGridTemplateColumn
             {
                 Header = header,
-                Binding = new Binding(path),
-                Width = new DataGridLength(width, DataGridLengthUnitType.Star)
+                Tag = path,
+                Width = new DataGridLength(width, DataGridLengthUnitType.Star),
+                CellTemplate = new FuncDataTemplate<Person>((item, _) =>
+                    new CheckBox
+                    {
+                        IsChecked = selector(item),
+                        IsEnabled = false
+                    })
             };
         }
 
@@ -148,5 +169,18 @@ namespace DataGridSample.ViewModels
             (RemoveLastColumnCommand as RelayCommand)?.RaiseCanExecuteChanged();
             (MoveLastToFirstCommand as RelayCommand)?.RaiseCanExecuteChanged();
         }
+
+        private void RefreshColumnPreviews()
+        {
+            ColumnPreviews.Clear();
+            foreach (var column in Columns)
+            {
+                var path = column.Tag as string ?? string.Empty;
+                ColumnPreviews.Add(new ColumnPreview(column.Header?.ToString() ?? "(unnamed)", path, column.GetType().Name));
+            }
+        }
+
+        [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors | DynamicallyAccessedMemberTypes.PublicProperties)]
+        public record ColumnPreview(string Header, string Path, string ColumnType);
     }
 }

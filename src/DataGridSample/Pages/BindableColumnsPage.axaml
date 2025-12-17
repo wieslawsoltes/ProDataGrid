@@ -1,5 +1,6 @@
 <UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:dg="clr-namespace:Avalonia.Controls;assembly=Avalonia.Controls.DataGrid"
              xmlns:viewModels="clr-namespace:DataGridSample.ViewModels"
              x:Class="DataGridSample.Pages.BindableColumnsPage"
              x:DataType="viewModels:BindableColumnsViewModel">
@@ -52,15 +53,16 @@
 
       <StackPanel Grid.Column="1" Spacing="6">
         <TextBlock Classes="h3" Text="Bound column order" />
-        <ItemsControl ItemsSource="{Binding Columns}">
+        <ItemsControl ItemsSource="{Binding ColumnPreviews}">
           <ItemsControl.ItemTemplate>
-            <DataTemplate>
+            <DataTemplate x:DataType="viewModels:BindableColumnsViewModel+ColumnPreview">
               <Border Margin="0,0,0,6" Padding="6"
                       BorderBrush="{DynamicResource SystemControlForegroundBaseMediumBrush}"
                       BorderThickness="1" CornerRadius="4">
-                <StackPanel Orientation="Horizontal" Spacing="8">
+                <StackPanel Orientation="Horizontal" Spacing="12">
                   <TextBlock Text="{Binding Header}" />
-                  <TextBlock Text="{Binding Binding.Path}" Classes="caption" />
+                  <TextBlock Text="{Binding Path}" Classes="caption" />
+                  <TextBlock Text="{Binding ColumnType}" Classes="caption" />
                 </StackPanel>
               </Border>
             </DataTemplate>

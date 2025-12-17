@@ -1,5 +1,6 @@
 <UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:models="clr-namespace:DataGridSample.Models"
              xmlns:viewModels="clr-namespace:DataGridSample.ViewModels"
              x:Class="DataGridSample.AddDeleteRowsPage"
              x:DataType="viewModels:AddDeleteRowsViewModel">
@@ -30,10 +31,10 @@
               CanUserReorderColumns="True"
               HeadersVisibility="All">
       <DataGrid.Columns>
-        <DataGridTextColumn Header="First Name" Binding="{Binding FirstName}" Width="2*" />
-        <DataGridTextColumn Header="Last Name" Binding="{Binding LastName}" Width="2*" />
-        <DataGridTextColumn Header="Age" Binding="{Binding Age}" Width="*" />
-        <DataGridCheckBoxColumn Header="Is Banned" Binding="{Binding IsBanned}" Width="*" />
+        <DataGridTextColumn Header="First Name" Binding="{Binding FirstName}" Width="2*" x:DataType="models:Person" />
+        <DataGridTextColumn Header="Last Name" Binding="{Binding LastName}" Width="2*" x:DataType="models:Person" />
+        <DataGridTextColumn Header="Age" Binding="{Binding Age}" Width="*" x:DataType="models:Person" />
+        <DataGridCheckBoxColumn Header="Is Banned" Binding="{Binding IsBanned}" Width="*" x:DataType="models:Person" />
       </DataGrid.Columns>
     </DataGrid>
   </Grid>

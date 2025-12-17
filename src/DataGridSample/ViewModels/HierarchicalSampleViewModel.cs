@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
 using Avalonia.Controls.DataGridHierarchical;
@@ -15,6 +16,7 @@ namespace DataGridSample.ViewModels
 {
     public class HierarchicalSampleViewModel : ObservableObject
     {
+        [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors | DynamicallyAccessedMemberTypes.PublicProperties)]
         public record TreeItem(
             string Name,
             string FullPath,

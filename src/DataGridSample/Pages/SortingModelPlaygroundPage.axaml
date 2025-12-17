@@ -10,6 +10,9 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:viewModels="clr-namespace:DataGridSample.ViewModels"
     xmlns:sorting="clr-namespace:Avalonia.Controls.DataGridSorting;assembly=Avalonia.Controls.DataGrid"
+    xmlns:models="clr-namespace:DataGridSample.Models"
+    xmlns:collections="clr-namespace:Avalonia.Collections;assembly=Avalonia.Controls.DataGrid"
+    x:DataType="viewModels:SortingModelPlaygroundViewModel"
     d:DesignHeight="720"
     d:DesignWidth="1100"
     mc:Ignorable="d">
@@ -65,31 +68,38 @@
         <DataGridTextColumn Header="Service (natural)"
                             Binding="{Binding Service}"
                             SortMemberPath="Service"
-                            Width="*"/>
+                            Width="*"
+                            x:DataType="models:Deployment"/>
         <DataGridTextColumn Header="Status"
                             Binding="{Binding Status}"
                             SortMemberPath="Status"
-                            Width="140"/>
+                            Width="140"
+                            x:DataType="models:Deployment"/>
         <DataGridTextColumn Header="Ring"
                             Binding="{Binding Ring}"
                             SortMemberPath="Ring"
-                            Width="90"/>
+                            Width="90"
+                            x:DataType="models:Deployment"/>
         <DataGridTextColumn Header="Region"
                             Binding="{Binding Region}"
                             SortMemberPath="Region"
-                            Width="120"/>
+                            Width="120"
+                            x:DataType="models:Deployment"/>
         <DataGridTextColumn Header="Started (UTC)"
                             Binding="{Binding Started, StringFormat='{}{0:MM-dd HH:mm}'}"
                             SortMemberPath="Started"
-                            Width="140"/>
+                            Width="140"
+                            x:DataType="models:Deployment"/>
         <DataGridTextColumn Header="Error Rate"
                             Binding="{Binding ErrorRate, StringFormat='{}{0:P2}'}"
                             SortMemberPath="ErrorRate"
-                            Width="110"/>
+                            Width="110"
+                            x:DataType="models:Deployment"/>
         <DataGridTextColumn Header="Incidents"
                             Binding="{Binding Incidents}"
                             SortMemberPath="Incidents"
-                            Width="90"/>
+                            Width="90"
+                            x:DataType="models:Deployment"/>
       </DataGrid.Columns>
     </DataGrid>
 
@@ -131,7 +141,7 @@
               </ItemsPanelTemplate>
             </ItemsControl.ItemsPanel>
             <ItemsControl.ItemTemplate>
-              <DataTemplate>
+              <DataTemplate x:DataType="viewModels:SortingModelPlaygroundViewModel+SortDescriptorSummary">
                 <Border Padding="6" Margin="0 3" Background="#08000000" CornerRadius="4">
                   <StackPanel Orientation="Horizontal" Spacing="6">
                     <TextBlock Text="{Binding Column}" FontWeight="SemiBold" />
@@ -151,12 +161,12 @@
               </ItemsPanelTemplate>
             </ItemsControl.ItemsPanel>
             <ItemsControl.ItemTemplate>
-              <DataTemplate>
+              <DataTemplate x:DataType="collections:DataGridSortDescription">
                 <Border Padding="6" Margin="0 3" Background="#08000000" CornerRadius="4">
                   <StackPanel Orientation="Horizontal" Spacing="6">
                     <TextBlock Text="{Binding PropertyPath, TargetNullValue=Comparer}" />
                     <TextBlock Text="{Binding Direction}" />
-                    <TextBlock Text="{Binding SourceComparer}" />
+                    <TextBlock Text="{Binding Comparer}" />
                   </StackPanel>
                 </Border>
               </DataTemplate>

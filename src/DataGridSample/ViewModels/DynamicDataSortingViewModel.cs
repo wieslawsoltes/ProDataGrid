@@ -8,6 +8,7 @@ using System.ComponentModel;
 using System.Linq;
 using System.Reactive.Disposables;
 using System.Reactive.Subjects;
+using System.Diagnostics.CodeAnalysis;
 using Avalonia.Collections;
 using Avalonia.Controls.DataGridSorting;
 using DataGridSample.Adapters;
@@ -150,6 +151,7 @@ namespace DataGridSample.ViewModels
             _cleanup.Dispose();
         }
 
+        [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors | DynamicallyAccessedMemberTypes.PublicProperties)]
         public record SortDescriptorSummary(string Column, string Kind, string Direction);
     }
 }

@@ -58,17 +58,20 @@
       <DataGrid.Columns>
         <DataGridTextColumn Header="Title"
                             Binding="{Binding Title}"
-                            Width="200" />
+                            Width="200"
+                            x:DataType="viewModels:NoteEntry" />
         <columns:AccentTextColumn Header="Notes"
                                   Binding="{Binding Body}"
                                   Width="*"
-                                  Watermark="Add details about this row" />
+                                  Watermark="Add details about this row"
+                                  x:DataType="viewModels:NoteEntry" />
         <DataGridTextColumn Header="Status"
                             Binding="{Binding Status}"
-                            Width="150" />
+                            Width="150"
+                            x:DataType="viewModels:NoteEntry" />
       </DataGrid.Columns>
       <DataGrid.RowDetailsTemplate>
-        <DataTemplate>
+        <DataTemplate x:DataType="viewModels:NoteEntry">
           <TextBlock Margin="12,4,12,8"
                      Text="{Binding Body}"
                      TextWrapping="Wrap"

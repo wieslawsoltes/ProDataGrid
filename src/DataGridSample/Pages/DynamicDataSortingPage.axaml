@@ -9,7 +9,9 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:viewModels="clr-namespace:DataGridSample.ViewModels"
+    xmlns:models="clr-namespace:DataGridSample.Models"
     xmlns:sorting="clr-namespace:Avalonia.Controls.DataGridSorting;assembly=Avalonia.Controls.DataGrid"
+    x:DataType="viewModels:DynamicDataSortingViewModel"
     d:DesignHeight="720"
     d:DesignWidth="1100"
     mc:Ignorable="d">
@@ -65,19 +67,23 @@
         <DataGridTextColumn Header="Service"
                             Binding="{Binding Service}"
                             SortMemberPath="Service"
-                            Width="*" />
+                            Width="*"
+                            x:DataType="models:Deployment" />
         <DataGridTextColumn Header="Status"
                             Binding="{Binding Status}"
                             SortMemberPath="Status"
-                            Width="140" />
+                            Width="140"
+                            x:DataType="models:Deployment" />
         <DataGridTextColumn Header="Region"
                             Binding="{Binding Region}"
                             SortMemberPath="Region"
-                            Width="140" />
+                            Width="140"
+                            x:DataType="models:Deployment" />
         <DataGridTextColumn Header="Started (UTC)"
                             Binding="{Binding Started, StringFormat='{}{0:MM-dd HH:mm}'}"
                             SortMemberPath="Started"
-                            Width="150" />
+                            Width="150"
+                            x:DataType="models:Deployment" />
       </DataGrid.Columns>
     </DataGrid>
 
@@ -95,7 +101,7 @@
               </ItemsPanelTemplate>
             </ItemsControl.ItemsPanel>
             <ItemsControl.ItemTemplate>
-              <DataTemplate>
+              <DataTemplate x:DataType="viewModels:DynamicDataSortingViewModel+SortDescriptorSummary">
                 <Border Padding="6" Margin="0 3" Background="#08000000" CornerRadius="4">
                   <StackPanel Orientation="Horizontal" Spacing="6">
                     <TextBlock Text="{Binding Column}" FontWeight="SemiBold" />
@@ -119,7 +125,7 @@
               </ItemsPanelTemplate>
             </ItemsControl.ItemsPanel>
             <ItemsControl.ItemTemplate>
-              <DataTemplate>
+              <DataTemplate x:DataType="x:String">
                 <Border Padding="6" Margin="0 3" Background="#08000000" CornerRadius="4">
                   <TextBlock Text="{Binding}" />
                 </Border>

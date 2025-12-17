@@ -2,7 +2,8 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:local="clr-namespace:DataGridSample.Pages"
              xmlns:controls="clr-namespace:DataGridSample.Pages"
-             x:Class="DataGridSample.Pages.ContainerLifecyclePage">
+             x:Class="DataGridSample.Pages.ContainerLifecyclePage"
+             x:DataType="local:ContainerLifecyclePage">
 
   <Grid RowDefinitions="Auto,Auto,*,Auto,Auto"
         ColumnDefinitions="*">
@@ -30,9 +31,9 @@
                                AutoGenerateColumns="False"
                                ContainerEvent="OnContainerEvent">
       <DataGrid.Columns>
-        <DataGridTextColumn Header="Id" Binding="{Binding Id}" Width="60"/>
-        <DataGridTextColumn Header="Name" Binding="{Binding Name}" Width="*"/>
-        <DataGridTextColumn Header="City" Binding="{Binding City}" Width="*"/>
+        <DataGridTextColumn Header="Id" Binding="{Binding Id}" Width="60" x:DataType="local:SampleItem"/>
+        <DataGridTextColumn Header="Name" Binding="{Binding Name}" Width="*" x:DataType="local:SampleItem"/>
+        <DataGridTextColumn Header="City" Binding="{Binding City}" Width="*" x:DataType="local:SampleItem"/>
       </DataGrid.Columns>
     </controls:TrackingDataGrid>
 

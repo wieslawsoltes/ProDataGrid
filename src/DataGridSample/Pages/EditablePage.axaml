@@ -1,5 +1,6 @@
 <UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:models="clr-namespace:DataGridSample.Models"
              xmlns:viewModels="clr-namespace:DataGridSample.ViewModels"
              x:Class="DataGridSample.EditablePage"
              x:DataType="viewModels:EditableViewModel">
@@ -25,17 +26,17 @@
                 ItemsSource="{Binding EditablePeople}"
                 IsReadOnly="False">
         <DataGrid.Columns>
-          <DataGridTextColumn Header="First Name" Binding="{Binding FirstName}" Width="2*" FontSize="{Binding #FontSizeSlider.Value, Mode=OneWay}" />
-          <DataGridTextColumn Header="Last" Binding="{Binding LastName}" Width="2*" FontSize="{Binding #FontSizeSlider.Value, Mode=OneWay}" />
-          <DataGridCheckBoxColumn Header="Is Banned" Binding="{Binding IsBanned}" Width="*" IsThreeState="{Binding #IsThreeStateCheckBox.IsChecked, Mode=OneWay}" />
+          <DataGridTextColumn Header="First Name" Binding="{Binding FirstName}" Width="2*" FontSize="{Binding #FontSizeSlider.Value, Mode=OneWay}" x:DataType="models:Person" />
+          <DataGridTextColumn Header="Last" Binding="{Binding LastName}" Width="2*" FontSize="{Binding #FontSizeSlider.Value, Mode=OneWay}" x:DataType="models:Person" />
+          <DataGridCheckBoxColumn Header="Is Banned" Binding="{Binding IsBanned}" Width="*" IsThreeState="{Binding #IsThreeStateCheckBox.IsChecked, Mode=OneWay}" x:DataType="models:Person" />
           <DataGridTemplateColumn Header="Age">
             <DataGridTemplateColumn.CellTemplate>
-              <DataTemplate>
+              <DataTemplate x:DataType="models:Person">
                 <TextBlock Text="{Binding Age, StringFormat='{}{0} years'}" VerticalAlignment="Center" HorizontalAlignment="Center" />
               </DataTemplate>
             </DataGridTemplateColumn.CellTemplate>
             <DataGridTemplateColumn.CellEditingTemplate>
-              <DataTemplate>
+              <DataTemplate x:DataType="models:Person">
                 <NumericUpDown Value="{Binding Age}" FormatString="N0" HorizontalAlignment="Stretch" Minimum="0" Maximum="120" TemplateApplied="OnNumericUpDownTemplateApplied" />
               </DataTemplate>
             </DataGridTemplateColumn.CellEditingTemplate>

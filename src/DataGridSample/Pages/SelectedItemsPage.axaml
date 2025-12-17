@@ -1,5 +1,6 @@
 <UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:models="clr-namespace:DataGridSample.Models"
              xmlns:viewModels="clr-namespace:DataGridSample.ViewModels"
              x:Class="DataGridSample.Pages.SelectedItemsPage"
              x:DataType="viewModels:SelectedItemsViewModel">
@@ -37,7 +38,7 @@
               BorderThickness="1" CornerRadius="4" Padding="4">
         <ListBox ItemsSource="{Binding SelectedItems}" Height="220">
           <ListBox.ItemTemplate>
-            <DataTemplate>
+            <DataTemplate x:DataType="models:Country">
               <TextBlock Text="{Binding Name}" />
             </DataTemplate>
           </ListBox.ItemTemplate>

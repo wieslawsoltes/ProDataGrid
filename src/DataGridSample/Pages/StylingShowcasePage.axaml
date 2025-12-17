@@ -1,5 +1,6 @@
 <UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:models="clr-namespace:DataGridSample.Models"
              xmlns:viewModels="clr-namespace:DataGridSample.ViewModels"
              x:Class="DataGridSample.Pages.StylingShowcasePage"
              x:DataType="viewModels:StylingShowcaseViewModel">
@@ -131,19 +132,23 @@
       <DataGrid.Columns>
         <DataGridTextColumn Header="Country" Binding="{Binding Name}" Width="3*"
                             HeaderStyleClasses="pill"
-                            CellStyleClasses="emphasis" />
+                            CellStyleClasses="emphasis"
+                            x:DataType="models:Country" />
         <DataGridTextColumn Header="Region" Binding="{Binding Region}" Width="2*"
                             HeaderStyleClasses="accent-border strong-text"
-                            ShowFilterButton="True" />
+                            ShowFilterButton="True"
+                            x:DataType="models:Country" />
         <DataGridTextColumn Header="Population" Binding="{Binding Population}" Width="2*"
                             HeaderStyleClasses="accent-border"
-                            CellStyleClasses="numeric" />
+                            CellStyleClasses="numeric"
+                            x:DataType="models:Country" />
         <DataGridTextColumn Header="GDP (USD)" Binding="{Binding GDP}" Width="2*"
                             HeaderTheme="{StaticResource HighlightHeaderTheme}"
                             CellTheme="{StaticResource HighlightCellTheme}"
                             HeaderStyleClasses="strong-text"
                             CellStyleClasses="numeric emphasis"
-                            ShowFilterButton="True" />
+                            ShowFilterButton="True"
+                            x:DataType="models:Country" />
       </DataGrid.Columns>
     </DataGrid>
   </Grid>

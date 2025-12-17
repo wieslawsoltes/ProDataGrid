@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Windows.Input;
+using System.Diagnostics.CodeAnalysis;
 using Avalonia.Collections;
 using Avalonia.Controls;
 using Avalonia.Controls.DataGridFiltering;
@@ -174,6 +175,7 @@ namespace DataGridSample.ViewModels
             }
         }
 
+        [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors | DynamicallyAccessedMemberTypes.PublicProperties)]
         public sealed class Order
         {
             public Order(string customer, string status, string region, double total, DateTimeOffset ordered)
@@ -193,7 +195,8 @@ namespace DataGridSample.ViewModels
         }
     }
 
-    public sealed class TextFilterContext : ObservableObject
+    [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors | DynamicallyAccessedMemberTypes.PublicProperties)]
+    public sealed class TextFilterContext : ObservableObject, Avalonia.Controls.DataGridFiltering.IFilterTextContext
     {
         private string? _text;
         private readonly Action<string?> _apply;
@@ -220,7 +223,8 @@ namespace DataGridSample.ViewModels
         public ICommand ClearCommand { get; }
     }
 
-    public sealed class NumberFilterContext : ObservableObject
+    [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors | DynamicallyAccessedMemberTypes.PublicProperties)]
+    public sealed class NumberFilterContext : ObservableObject, Avalonia.Controls.DataGridFiltering.IFilterNumberContext
     {
         private double? _min;
         private double? _max;
@@ -256,7 +260,8 @@ namespace DataGridSample.ViewModels
         public ICommand ClearCommand { get; }
     }
 
-    public sealed class DateFilterContext : ObservableObject
+    [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors | DynamicallyAccessedMemberTypes.PublicProperties)]
+    public sealed class DateFilterContext : ObservableObject, Avalonia.Controls.DataGridFiltering.IFilterDateContext
     {
         private DateTimeOffset? _from;
         private DateTimeOffset? _to;
@@ -290,16 +295,17 @@ namespace DataGridSample.ViewModels
         public ICommand ClearCommand { get; }
     }
 
-    public sealed class EnumFilterContext : ObservableObject
+    [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors | DynamicallyAccessedMemberTypes.PublicProperties)]
+    public sealed class EnumFilterContext : ObservableObject, Avalonia.Controls.DataGridFiltering.IFilterEnumContext
     {
-        private readonly ObservableCollection<EnumOption> _options;
+        private readonly ObservableCollection<IEnumOption> _options;
         private readonly Action<IReadOnlyList<string>> _apply;
         private readonly Action _clear;
 
         public EnumFilterContext(string label, IEnumerable<string> options, Action<IReadOnlyList<string>> apply, Action clear)
         {
             Label = label;
-            _options = new ObservableCollection<EnumOption>(options.Select(o => new EnumOption(o)));
+            _options = new ObservableCollection<IEnumOption>(options.Select(o => new EnumOption(o)));
             _apply = apply;
             _clear = clear;
             ApplyCommand = new RelayCommand(_ => _apply(SelectedValues));
@@ -312,7 +318,7 @@ namespace DataGridSample.ViewModels
 
         public string Label { get; }
 
-        public ObservableCollection<EnumOption> Options => _options;
+        public ObservableCollection<IEnumOption> Options => _options;
 
         private IReadOnlyList<string> SelectedValues => _options.Where(o => o.IsSelected).Select(o => o.Display).ToArray();
 
@@ -328,7 +334,8 @@ namespace DataGridSample.ViewModels
         }
     }
 
-    public sealed class EnumOption : ObservableObject
+    [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors | DynamicallyAccessedMemberTypes.PublicProperties)]
+    public sealed class EnumOption : ObservableObject, Avalonia.Controls.DataGridFiltering.IEnumOption
     {
         private bool _isSelected;
 

@@ -8,6 +8,7 @@ using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Globalization;
 using System.Linq;
+using System.Diagnostics.CodeAnalysis;
 using Avalonia.Collections;
 using Avalonia.Controls.DataGridSorting;
 using DataGridSample.Comparers;
@@ -391,6 +392,7 @@ namespace DataGridSample.ViewModels
             }
         }
 
+        [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors | DynamicallyAccessedMemberTypes.PublicProperties)]
         public record SortDescriptorSummary(string Column, string Kind, string Direction);
     }
 }

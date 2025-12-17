@@ -6,6 +6,9 @@
     <IsPackable>false</IsPackable>
     <Nullable>enable</Nullable>
     <ApplicationManifest>app.manifest</ApplicationManifest>
+    <PublishAot>true</PublishAot>
+    <!-- Re-enable compiled bindings to reduce runtime reflection; individual pages can opt out via x:CompileBindings="False". -->
+    <AvaloniaUseCompiledBindingsByDefault>true</AvaloniaUseCompiledBindingsByDefault>
   </PropertyGroup>
 
   <ItemGroup>

@@ -1,5 +1,6 @@
 using System;
 using System.Collections.ObjectModel;
+using System.Diagnostics.CodeAnalysis;
 using DataGridSample.Mvvm;
 
 namespace DataGridSample.ViewModels;
@@ -47,6 +48,7 @@ public class CustomTextColumnViewModel : ObservableObject
     }
 }
 
+[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors | DynamicallyAccessedMemberTypes.PublicProperties)]
 public class NoteEntry : ObservableObject
 {
     private string _title;

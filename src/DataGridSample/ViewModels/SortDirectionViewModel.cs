@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
+using System.Diagnostics.CodeAnalysis;
 using Avalonia.Collections;
 using Avalonia.Controls.DataGridSorting;
 using DataGridSample.Models;
@@ -91,5 +92,6 @@ namespace DataGridSample.ViewModels
         }
     }
 
+    [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors | DynamicallyAccessedMemberTypes.PublicProperties)]
     public record SortState(string Property, ListSortDirection Direction);
 }

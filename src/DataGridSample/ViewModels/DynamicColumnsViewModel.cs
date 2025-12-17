@@ -5,7 +5,8 @@ using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.Linq;
 using Avalonia.Controls;
-using Avalonia.Data;
+using Avalonia.Controls.Templates;
+using System.Diagnostics.CodeAnalysis;
 using DataGridSample.Models;
 using DataGridSample.Mvvm;
 
@@ -116,18 +117,22 @@ namespace DataGridSample.ViewModels
             Columns.Clear();
             _columnSeed = 1;
 
-            Columns.Add(CreateTextColumn("First Name", nameof(Person.FirstName), 1.2));
-            Columns.Add(CreateTextColumn("Last Name", nameof(Person.LastName), 1.2));
-            Columns.Add(CreateTextColumn("Age", nameof(Person.Age), 0.8));
+            Columns.Add(CreateTextColumn("First Name", p => p.FirstName, 1.2));
+            Columns.Add(CreateTextColumn("Last Name", p => p.LastName, 1.2));
+            Columns.Add(CreateTextColumn("Age", p => p.Age, 0.8));
         }
 
-        private DataGridTextColumn CreateTextColumn(string header, string path, double star = 1)
+        private DataGridTemplateColumn CreateTextColumn(string header, Func<Person, object?> selector, double star = 1)
         {
-            return new DataGridTextColumn
+            return new DataGridTemplateColumn
             {
                 Header = header,
-                Binding = new Binding(path),
-                Width = new DataGridLength(star, DataGridLengthUnitType.Star)
+                Width = new DataGridLength(star, DataGridLengthUnitType.Star),
+                CellTemplate = new FuncDataTemplate<Person>((item, _) =>
+                    new TextBlock
+                    {
+                        Text = selector(item)?.ToString() ?? string.Empty
+                    })
             };
         }
 
@@ -135,11 +140,15 @@ namespace DataGridSample.ViewModels
         {
             var index = _columnSeed++;
             var header = headerPrefix ?? "Dynamic";
-            return new DataGridTextColumn
+            return new DataGridTemplateColumn
             {
                 Header = $"{header} {index}",
-                Binding = new Binding(nameof(Person.Status)),
-                Width = new DataGridLength(1, DataGridLengthUnitType.Star)
+                Width = new DataGridLength(1, DataGridLengthUnitType.Star),
+                CellTemplate = new FuncDataTemplate<Person>((item, _) =>
+                    new TextBlock
+                    {
+                        Text = item.Status.ToString()
+                    })
             };
         }
 

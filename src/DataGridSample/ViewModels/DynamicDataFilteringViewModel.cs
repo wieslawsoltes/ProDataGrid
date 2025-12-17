@@ -8,6 +8,7 @@ using System.Linq;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
+using System.Diagnostics.CodeAnalysis;
 using Avalonia.Controls.DataGridFiltering;
 using DataGridSample.Adapters;
 using DataGridSample.Models;
@@ -419,10 +420,13 @@ namespace DataGridSample.ViewModels
             }
         }
 
+        [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors | DynamicallyAccessedMemberTypes.PublicProperties)]
         public record FilterDescriptorSummary(string Column, string Operator, string Value);
 
+        [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors | DynamicallyAccessedMemberTypes.PublicProperties)]
         public record FilterChip(object ColumnId, string Column, string Value);
 
+        [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors | DynamicallyAccessedMemberTypes.PublicProperties)]
         public sealed class SelectableFilterValue : ObservableObject
         {
             private bool _isSelected;

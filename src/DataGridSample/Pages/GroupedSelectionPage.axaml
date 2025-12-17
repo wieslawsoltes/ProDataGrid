@@ -1,5 +1,6 @@
 <UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:models="clr-namespace:DataGridSample.Models"
              xmlns:viewModels="clr-namespace:DataGridSample.ViewModels"
              x:Class="DataGridSample.Pages.GroupedSelectionPage"
              x:DataType="viewModels:GroupedSelectionViewModel">
@@ -27,7 +28,7 @@
       <TextBlock Classes="h3" Text="Selected items" />
       <ItemsControl ItemsSource="{Binding SelectionModel.SelectedItems}">
         <ItemsControl.ItemTemplate>
-          <DataTemplate>
+          <DataTemplate x:DataType="models:Country">
             <StackPanel Orientation="Horizontal" Spacing="6">
               <TextBlock Text="{Binding Name}" FontWeight="SemiBold" />
               <TextBlock Text="(" />

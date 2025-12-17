@@ -9,7 +9,7 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:viewModels="clr-namespace:DataGridSample.ViewModels"
-    xmlns:conv="clr-namespace:Avalonia.Data.Converters;assembly=Avalonia.Base"
+    x:DataType="viewModels:FilteringModelSampleViewModel"
     d:DesignHeight="720"
     d:DesignWidth="1100"
     mc:Ignorable="d">
@@ -38,6 +38,7 @@
             ContentTemplate="{StaticResource DataGridFilterDateEditorTemplate}" />
 
     <Flyout x:Key="TotalFilterFlyout"
+            x:DataType="viewModels:FilteringModelSampleViewModel"
             Placement="Bottom"
             FlyoutPresenterTheme="{StaticResource DataGridFilterFlyoutPresenterTheme}"
             Content="{Binding TotalFilter}"
@@ -72,25 +73,30 @@
         <DataGridTextColumn Width="*"
                             Header="Customer"
                             Binding="{Binding Customer}"
+                            x:DataType="viewModels:FilteringModelSampleViewModel+Order"
                             FilterFlyout="{StaticResource CustomerFilterFlyout}" />
 
         <DataGridTextColumn Width="140"
                             Header="Status"
                             Binding="{Binding Status}"
+                            x:DataType="viewModels:FilteringModelSampleViewModel+Order"
                             FilterFlyout="{StaticResource StatusFilterFlyout}" />
 
         <DataGridTextColumn Width="120"
                             Header="Region"
-                            Binding="{Binding Region}" />
+                            Binding="{Binding Region}"
+                            x:DataType="viewModels:FilteringModelSampleViewModel+Order" />
 
         <DataGridTextColumn Width="140"
                             Header="Ordered (UTC)"
                             Binding="{Binding Ordered, StringFormat='{}{0:MM-dd}'}"
+                            x:DataType="viewModels:FilteringModelSampleViewModel+Order"
                             FilterFlyout="{StaticResource DateFilterFlyout}" />
 
         <DataGridTextColumn Width="120"
                             Header="Total"
                             Binding="{Binding Total, StringFormat='{}{0:C2}'}"
+                            x:DataType="viewModels:FilteringModelSampleViewModel+Order"
                             FilterFlyout="{StaticResource TotalFilterFlyout}" />
       </DataGrid.Columns>
     </DataGrid>

@@ -9,6 +9,8 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:viewModels="clr-namespace:DataGridSample.ViewModels"
+    xmlns:models="clr-namespace:DataGridSample.Models"
+    x:DataType="viewModels:DynamicDataFilteringViewModel"
     d:DesignHeight="720"
     d:DesignWidth="1100"
     mc:Ignorable="d">
@@ -36,20 +38,20 @@
             FlyoutPresenterTheme="{StaticResource DataGridFilterFlyoutPresenterTheme}">
       <StackPanel Spacing="8" Width="240">
         <TextBlock Text="Status in" FontWeight="SemiBold" />
-        <ItemsControl ItemsSource="{Binding StatusOptions}">
-          <ItemsControl.ItemsPanel>
-            <ItemsPanelTemplate>
-              <UniformGrid Columns="2" />
-            </ItemsPanelTemplate>
-          </ItemsControl.ItemsPanel>
-          <ItemsControl.ItemTemplate>
-            <DataTemplate>
+          <ItemsControl ItemsSource="{Binding StatusOptions}">
+            <ItemsControl.ItemsPanel>
+              <ItemsPanelTemplate>
+                <UniformGrid Columns="2" />
+              </ItemsPanelTemplate>
+            </ItemsControl.ItemsPanel>
+            <ItemsControl.ItemTemplate>
+            <DataTemplate x:DataType="viewModels:DynamicDataFilteringViewModel+SelectableFilterValue">
               <CheckBox Content="{Binding Value}"
                         IsChecked="{Binding IsSelected, Mode=TwoWay}" />
             </DataTemplate>
-          </ItemsControl.ItemTemplate>
-        </ItemsControl>
-        <StackPanel Orientation="Horizontal" Spacing="6">
+            </ItemsControl.ItemTemplate>
+          </ItemsControl>
+          <StackPanel Orientation="Horizontal" Spacing="6">
           <Button Content="Clear" Command="{Binding ClearStatusFilterCommand}" />
           <Button Content="Apply" Command="{Binding ApplyStatusFilterCommand}" />
         </StackPanel>
@@ -173,7 +175,7 @@
             <UniformGrid Columns="2">
               <ItemsControl ItemsSource="{Binding StatusOptions}">
                 <ItemsControl.ItemTemplate>
-                  <DataTemplate>
+                  <DataTemplate x:DataType="viewModels:DynamicDataFilteringViewModel+SelectableFilterValue">
                     <CheckBox Content="{Binding Value}"
                               IsChecked="{Binding IsSelected, Mode=TwoWay}" />
                   </DataTemplate>
@@ -226,13 +228,13 @@
             </ItemsPanelTemplate>
           </ItemsControl.ItemsPanel>
           <ItemsControl.ItemTemplate>
-            <DataTemplate>
+            <DataTemplate x:DataType="viewModels:DynamicDataFilteringViewModel+FilterChip">
               <Border Padding="6" Margin="0 4 8 0" Background="#0D000000" CornerRadius="4">
                 <StackPanel Orientation="Horizontal" Spacing="6">
                   <TextBlock Text="{Binding Column}" FontWeight="SemiBold" />
                   <TextBlock Text="{Binding Value}" />
                   <Button Content="✕"
-                          Command="{Binding DataContext.RemoveChipCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                          Command="{Binding $parent[UserControl].((viewModels:DynamicDataFilteringViewModel)DataContext).RemoveChipCommand}"
                           CommandParameter="{Binding ColumnId}"
                           Padding="4" />
                 </StackPanel>
@@ -256,35 +258,42 @@
         <DataGridTextColumn Width="*"
                             Header="Service"
                             Binding="{Binding Service}"
+                            x:DataType="models:Deployment"
                             FilterFlyout="{StaticResource ServiceFilterFlyout}" />
 
         <DataGridTextColumn Width="140"
                             Header="Status"
                             Binding="{Binding Status}"
+                            x:DataType="models:Deployment"
                             FilterFlyout="{StaticResource StatusFilterFlyout}" />
 
         <DataGridTextColumn Width="140"
                             Header="Region"
                             Binding="{Binding Region}"
+                            x:DataType="models:Deployment"
                             FilterFlyout="{StaticResource RegionFilterFlyout}" />
 
         <DataGridTextColumn Header="Ring"
                             Binding="{Binding Ring}"
-                            Width="80" />
+                            Width="80"
+                            x:DataType="models:Deployment" />
 
         <DataGridTextColumn Width="150"
                             Header="Started (UTC)"
                             Binding="{Binding Started, StringFormat='{}{0:MM-dd HH:mm}'}"
+                            x:DataType="models:Deployment"
                             FilterFlyout="{StaticResource StartedFilterFlyout}" />
 
         <DataGridTextColumn Width="120"
                             Header="Error Rate"
                             Binding="{Binding ErrorRate, StringFormat='{}{0:P2}'}"
+                            x:DataType="models:Deployment"
                             FilterFlyout="{StaticResource ErrorFilterFlyout}" />
 
         <DataGridTextColumn Header="Incidents"
                             Binding="{Binding Incidents}"
-                            Width="90" />
+                            Width="90"
+                            x:DataType="models:Deployment" />
       </DataGrid.Columns>
     </DataGrid>
 
@@ -302,7 +311,7 @@
               </ItemsPanelTemplate>
             </ItemsControl.ItemsPanel>
             <ItemsControl.ItemTemplate>
-              <DataTemplate>
+              <DataTemplate x:DataType="viewModels:DynamicDataFilteringViewModel+FilterDescriptorSummary">
                 <Border Padding="6" Margin="0 3" Background="#08000000" CornerRadius="4">
                   <StackPanel Orientation="Horizontal" Spacing="6">
                     <TextBlock Text="{Binding Column}" FontWeight="SemiBold" />
@@ -326,7 +335,7 @@
               </ItemsPanelTemplate>
             </ItemsControl.ItemsPanel>
             <ItemsControl.ItemTemplate>
-              <DataTemplate>
+              <DataTemplate x:DataType="x:String">
                 <Border Padding="6" Margin="0 3" Background="#08000000" CornerRadius="4">
                   <TextBlock Text="{Binding}" />
                 </Border>
