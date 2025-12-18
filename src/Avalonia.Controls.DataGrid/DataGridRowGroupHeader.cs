@@ -11,7 +11,6 @@ using Avalonia.Controls.Primitives;
 using Avalonia.Input;
 using Avalonia.Media;
 using System;
-using System.Diagnostics;
 using Avalonia.LogicalTree;
 using Avalonia.Reactive;
 
@@ -156,8 +155,7 @@ namespace Avalonia.Controls
         {
             get
             {
-                Debug.Assert(OwningGrid != null);
-                return (RowGroupInfo.Slot == OwningGrid.CurrentSlot);
+                return RowGroupInfo.Slot == OwningGrid?.CurrentSlot;
             }
         }
 
