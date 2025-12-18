@@ -115,7 +115,17 @@ namespace Avalonia.Controls
         /// </summary>
         protected virtual void ClearContainerForItemOverride(DataGridRow element, object item)
         {
-            element.IsSelected = false;
+            var previousSuppress = _suppressSelectionUpdatesFromRows;
+            _suppressSelectionUpdatesFromRows = true;
+            try
+            {
+                element.IsSelected = false;
+            }
+            finally
+            {
+                _suppressSelectionUpdatesFromRows = previousSuppress;
+            }
+
             element.IsPlaceholder = false;
             element.ClearDragDropState();
             element.DataContext = null;
@@ -232,6 +242,7 @@ namespace Avalonia.Controls
         private DataGridSelection.DataGridPagedSelectionSource _pagedSelectionSource;
         private List<object> _selectionModelSnapshot;
         private bool _syncingSelectionModel;
+        private bool _suppressSelectionUpdatesFromRows;
         private bool _syncingSelectedItems;
         private bool _syncingSelectedCells;
         private readonly Dictionary<int, HashSet<int>> _selectedCells = new();

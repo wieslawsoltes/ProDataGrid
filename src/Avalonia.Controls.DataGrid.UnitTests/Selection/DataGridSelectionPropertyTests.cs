@@ -15,6 +15,7 @@ using Avalonia.Controls.Selection;
 using Avalonia.Data;
 using Avalonia.Headless.XUnit;
 using Avalonia.Markup.Xaml.Styling;
+using Avalonia.Threading;
 using Avalonia.VisualTree;
 using Xunit;
 
@@ -357,6 +358,142 @@ public class DataGridSelectionPropertyTests
 
         Assert.Equal("B", grid.SelectedItem);
         Assert.Equal(new[] { "B" }, grid.SelectedItems.Cast<string>());
+    }
+
+    [AvaloniaFact]
+    public void Multiple_Rows_Remain_Selected_After_Scrolling_Away_And_Back()
+    {
+        var items = Enumerable.Range(0, 200).Select(i => $"Item {i}").ToList();
+
+        var root = new Window
+        {
+            Width = 300,
+            Height = 200,
+            Styles =
+            {
+                new StyleInclude((Uri?)null)
+                {
+                    Source = new Uri("avares://Avalonia.Controls.DataGrid/Themes/Simple.xaml")
+                },
+            }
+        };
+
+        var grid = new DataGrid
+        {
+            ItemsSource = items,
+            SelectionMode = DataGridSelectionMode.Extended,
+            AutoGenerateColumns = true,
+            Height = 150,
+            Width = 280
+        };
+
+        root.Content = grid;
+        root.Show();
+        grid.UpdateLayout();
+
+        var log = new List<string>();
+        grid.Selection.SelectionChanged += (_, e) =>
+        {
+            log.Add(
+                $"add:{string.Join(",", e.SelectedIndexes)} remove:{string.Join(",", e.DeselectedIndexes)}");
+            if (e.DeselectedIndexes.Count > 0)
+            {
+                var frames = new System.Diagnostics.StackTrace(skipFrames: 0, fNeedFileInfo: true)
+                    .GetFrames()?
+                    .Take(12)
+                    .Select(f => $"{f.GetMethod()?.DeclaringType?.Name}.{f.GetMethod()?.Name}")
+                    .ToArray() ?? Array.Empty<string>();
+                log.Add("stack:" + string.Join(" > ", frames));
+            }
+        };
+
+        grid.Selection.SelectRange(5, 7);
+        grid.UpdateLayout();
+
+        Assert.Equal(new[] { 5, 6, 7 }, grid.Selection.SelectedIndexes.OrderBy(x => x));
+
+        var model = grid.Selection;
+        var sourceBeforeScroll = model.Source;
+
+        grid.ScrollIntoView(items[150], grid.Columns[0]);
+        grid.UpdateLayout();
+        Assert.Same(sourceBeforeScroll, model.Source);
+        var afterScroll = model.SelectedIndexes.OrderBy(x => x).ToArray();
+        Assert.True(afterScroll.SequenceEqual(new[] { 5, 6, 7 }),
+            $"Selection after scroll: [{string.Join(",", afterScroll)}]; log: {string.Join(" | ", log)}");
+
+        grid.ScrollIntoView(items[5], grid.Columns[0]);
+        grid.UpdateLayout();
+
+        var afterReturn = grid.Selection.SelectedIndexes.OrderBy(x => x).ToArray();
+        Assert.True(afterReturn.SequenceEqual(new[] { 5, 6, 7 }),
+            $"Selection after return: [{string.Join(",", afterReturn)}]; log: {string.Join(" | ", log)}");
+    }
+
+    [AvaloniaFact]
+    public void Selection_Visuals_Restore_After_Reattach()
+    {
+        var items = new ObservableCollection<string> { "A", "B", "C", "D", "E", "F" };
+
+        var root = new Window
+        {
+            Width = 300,
+            Height = 200,
+            Styles =
+            {
+                new StyleInclude((Uri?)null)
+                {
+                    Source = new Uri("avares://Avalonia.Controls.DataGrid/Themes/Simple.xaml")
+                },
+            }
+        };
+
+        var grid = new DataGrid
+        {
+            ItemsSource = items,
+            SelectionMode = DataGridSelectionMode.Extended,
+            AutoGenerateColumns = true,
+            Height = 150,
+            Width = 280
+        };
+
+        root.Content = grid;
+        root.Show();
+        grid.UpdateLayout();
+
+        grid.Selection.SelectRange(2, 4);
+        grid.UpdateLayout();
+
+        void AssertSelected()
+        {
+            grid.ApplyTemplate();
+            grid.UpdateLayout();
+            Dispatcher.UIThread.RunJobs();
+
+            var selectedIndexes = grid.Selection.SelectedIndexes.OrderBy(x => x).ToArray();
+            Assert.Equal(new[] { 2, 3, 4 }, selectedIndexes);
+
+            var selectedRows = grid.GetSelfAndVisualDescendants()
+                .OfType<DataGridRow>()
+                .Where(r => r.IsSelected)
+                .Select(r => r.DataContext)
+                .OfType<string>()
+                .OrderBy(x => x)
+                .ToArray();
+            Assert.Equal(new[] { "C", "D", "E" }, selectedRows);
+        }
+
+        AssertSelected();
+
+        root.Content = null;
+        Dispatcher.UIThread.RunJobs();
+
+        root.Content = grid;
+        grid.UpdateLayout();
+        Dispatcher.UIThread.RunJobs();
+        grid.UpdateLayout();
+
+        AssertSelected();
     }
 
     private static DataGrid CreateGrid(IEnumerable items)

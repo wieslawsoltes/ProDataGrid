@@ -7,6 +7,7 @@
 using Avalonia.Automation.Peers;
 using Avalonia.Controls.Automation.Peers;
 using Avalonia.Controls.Primitives;
+using Avalonia.Controls.Selection;
 using Avalonia.Controls.Utils;
 using Avalonia.Interactivity;
 using Avalonia.VisualTree;
@@ -133,6 +134,7 @@ namespace Avalonia.Controls
             try
             {
                 _noCurrentCellChangeCount++;
+                var selectionSnapshot = _selectionModelAdapter?.SelectedItemsView.Cast<object>().ToList();
 
                 // The underlying collection has changed and our editing row (if there is one)
                 // is no longer relevant, so we should force a cancel edit.
@@ -174,6 +176,33 @@ namespace Avalonia.Controls
                 if (RowDetailsVisibilityMode != DataGridRowDetailsVisibilityMode.Collapsed)
                 {
                     UpdateRowDetailsVisibilityMode(RowDetailsVisibilityMode);
+                }
+
+                if (_selectionModelAdapter != null && selectionSnapshot is { Count: > 0 })
+                {
+                    _syncingSelectionModel = true;
+                    try
+                    {
+                        using (_selectionModelAdapter.Model.BatchUpdate())
+                        {
+                            _selectionModelAdapter.Model.Clear();
+                            foreach (var item in selectionSnapshot)
+                            {
+                                int index = GetSelectionModelIndexOfItem(item);
+                                if (index >= 0)
+                                {
+                                    _selectionModelAdapter.Select(index);
+                                }
+                            }
+                        }
+
+                        ApplySelectionFromSelectionModel();
+                        UpdateSelectionSnapshot();
+                    }
+                    finally
+                    {
+                        _syncingSelectionModel = false;
+                    }
                 }
 
                 // The currently displayed rows may have incorrect visual states because of the selection change

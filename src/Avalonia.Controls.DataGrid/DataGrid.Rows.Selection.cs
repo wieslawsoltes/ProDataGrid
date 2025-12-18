@@ -210,6 +210,10 @@ namespace Avalonia.Controls
                 // Slot no longer maps to a data item (e.g. while resetting the collection)
                 return;
             }
+            if (_suppressSelectionUpdatesFromRows)
+            {
+                return;
+            }
             _noSelectionChangeCount++;
             try
             {
