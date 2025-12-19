@@ -78,17 +78,20 @@
       <!-- GridLines -->
       <DataGridGridLinesVisibility x:Key="DataGridGridLinesVisibility">None</DataGridGridLinesVisibility>
 
+      <!-- Transparent Brush (defined locally to avoid StaticResource lookup issues) -->
+      <SolidColorBrush x:Key="DataGridTransparentBrush" Color="Transparent" />
+      
       <!-- Static Resource References -->
-      <StaticResource x:Key="DataGridRowBackgroundBrush" ResourceKey="SystemControlTransparentBrush" />
-      <StaticResource x:Key="DataGridRowSelectedBackgroundOpacity" ResourceKey="ListAccentLowOpacity" />
-      <StaticResource x:Key="DataGridRowSelectedHoveredBackgroundOpacity" ResourceKey="ListAccentMediumOpacity" />
-      <StaticResource x:Key="DataGridRowSelectedUnfocusedBackgroundOpacity" ResourceKey="ListAccentLowOpacity" />
-      <StaticResource x:Key="DataGridRowSelectedHoveredUnfocusedBackgroundOpacity" ResourceKey="ListAccentMediumOpacity" />
-      <StaticResource x:Key="DataGridCellBackgroundBrush" ResourceKey="SystemControlTransparentBrush" />
-      <StaticResource x:Key="DataGridCurrencyVisualPrimaryBrush" ResourceKey="SystemControlTransparentBrush" />
-      <StaticResource x:Key="DataGridFillerColumnGridLinesBrush" ResourceKey="SystemControlTransparentBrush" />
-      <StaticResource x:Key="DataGridBackgroundBrush" ResourceKey="SystemControlTransparentBrush" />
-      <StaticResource x:Key="DataGridBorderBrush" ResourceKey="SystemControlTransparentBrush" />
+      <SolidColorBrush x:Key="DataGridRowBackgroundBrush" Color="Transparent" />
+      <x:Double x:Key="DataGridRowSelectedBackgroundOpacity">0.6</x:Double>
+      <x:Double x:Key="DataGridRowSelectedHoveredBackgroundOpacity">0.8</x:Double>
+      <x:Double x:Key="DataGridRowSelectedUnfocusedBackgroundOpacity">0.6</x:Double>
+      <x:Double x:Key="DataGridRowSelectedHoveredUnfocusedBackgroundOpacity">0.8</x:Double>
+      <SolidColorBrush x:Key="DataGridCellBackgroundBrush" Color="Transparent" />
+      <SolidColorBrush x:Key="DataGridCurrencyVisualPrimaryBrush" Color="Transparent" />
+      <SolidColorBrush x:Key="DataGridFillerColumnGridLinesBrush" Color="Transparent" />
+      <SolidColorBrush x:Key="DataGridBackgroundBrush" Color="Transparent" />
+      <SolidColorBrush x:Key="DataGridBorderBrush" Color="Transparent" />
       <StaticResource x:Key="DataGridDropLocationIndicatorBrush" ResourceKey="DataGridDropLocationIndicatorBackground" />
       <StaticResource x:Key="DataGridCellDataValidationErrorsTheme" ResourceKey="TooltipDataValidationErrors" />
     </ResourceDictionary>
