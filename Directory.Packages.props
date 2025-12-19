@@ -3,11 +3,9 @@
     <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
     <CentralPackageTransitivePinningEnabled>true</CentralPackageTransitivePinningEnabled>
   </PropertyGroup>
-
   <PropertyGroup>
     <AvaloniaVersion>11.3.9</AvaloniaVersion>
   </PropertyGroup>
-
   <!-- Avalonia packages -->
   <ItemGroup>
     <PackageVersion Include="Avalonia" Version="$(AvaloniaVersion)" />
@@ -18,17 +16,16 @@
     <PackageVersion Include="Avalonia.Markup.Xaml.Loader" Version="$(AvaloniaVersion)" />
     <PackageVersion Include="Avalonia.ReactiveUI" Version="$(AvaloniaVersion)" />
     <PackageVersion Include="Avalonia.Themes.Fluent" Version="$(AvaloniaVersion)" />
+    <PackageVersion Include="Avalonia.Themes.Simple" Version="11.3.9" />
     <PackageVersion Include="DynamicData" Version="9.4.1" />
     <PackageVersion Include="System.Reactive" Version="6.0.1" />
   </ItemGroup>
-
   <!-- Build tooling -->
   <ItemGroup>
     <PackageVersion Include="Microsoft.SourceLink.GitHub" Version="8.0.0" />
     <PackageVersion Include="Mono.Cecil" Version="0.11.5" />
     <PackageVersion Include="Microsoft.WindowsDesktop.App.Ref" Version="8.0.22" />
   </ItemGroup>
-
   <!-- Test packages -->
   <ItemGroup>
     <PackageVersion Include="JetBrains.dotMemoryUnit" Version="3.2.20220510" />
@@ -37,5 +34,4 @@
     <PackageVersion Include="xunit.runner.console" Version="2.9.3" />
     <PackageVersion Include="xunit.runner.visualstudio" Version="3.0.2" />
   </ItemGroup>
-
 </Project>

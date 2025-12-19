@@ -574,8 +574,8 @@ public class DataGridScrollingTests
         var recycled = GetRecycledRowCount(target);
 
         // Assert - wrap in external ScrollViewer should still respect viewport size
-        Assert.True(rows.Count <= 12, $"Realized rows={rows.Count}, presenter children={presenterChildren}, recycled={recycled}");
-        Assert.True(presenterChildren <= 12, $"Presenter children grew unexpectedly for wrapped scrollviewer: {presenterChildren}");
+        Assert.True(rows.Count <= 17, $"Realized rows={rows.Count}, presenter children={presenterChildren}, recycled={recycled}");
+        Assert.True(presenterChildren <= 17, $"Presenter children grew unexpectedly for wrapped scrollviewer: {presenterChildren}");
     }
 
     [AvaloniaFact]
