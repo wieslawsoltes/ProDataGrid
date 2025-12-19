@@ -147,6 +147,15 @@ namespace Avalonia.Controls.Primitives
             var row = target as DataGridRow ?? target.FindAncestorOfType<DataGridRow>();
             if (row != null && row.Index >= 0)
             {
+                // If we're currently editing this row, don't trigger ScrollIntoView
+                // because that would call CommitEditForOperation and end the edit prematurely.
+                // This can happen when Focus() is called on an editing element and the
+                // ScrollViewer intercepts the GotFocus event to call BringIntoView.
+                if (OwningGrid.EditingRow == row)
+                {
+                    return true; // Already visible since we're editing it
+                }
+                
                 OwningGrid.ScrollIntoView(OwningGrid.DataConnection.GetDataItem(row.Index), null);
                 return true;
             }

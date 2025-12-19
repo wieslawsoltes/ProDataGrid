@@ -197,7 +197,6 @@ namespace Avalonia.Controls
             if (_editingColumnIndex != -1)
             {
                 // Current cell is already in edit mode
-                Debug.Assert(_editingColumnIndex == CurrentColumnIndex);
                 return true;
             }
 
