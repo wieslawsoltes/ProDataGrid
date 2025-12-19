@@ -376,6 +376,8 @@ namespace Avalonia.Controls
                 || type == typeof(System.String)
                 || type == typeof(System.Char)
                 || type == typeof(System.DateTime)
+                || type == typeof(System.TimeSpan)
+                || type == typeof(System.DateTimeOffset)
                 || type == typeof(System.Boolean)
                 || type == typeof(System.Byte)
                 || type == typeof(System.SByte)
