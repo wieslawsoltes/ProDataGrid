@@ -732,7 +732,6 @@ namespace Avalonia.Controls
         }
 
 
-
         internal void OnRowGroupHeaderToggled(DataGridRowGroupHeader groupHeader, bool newIsVisible, bool setCurrent)
         {
             var collectionViewGroup = groupHeader.DataContext as DataGridCollectionViewGroup ??
@@ -810,6 +809,62 @@ namespace Avalonia.Controls
             return null;
         }
 
+        /// <summary>
+        /// Expands all DataGridRowGroupHeader instances in the DataGrid.
+        /// </summary>
+        public void ExpandAllGroups()
+        {
+            if (WaitForLostFocus(delegate { ExpandAllGroups(); }) || !CommitEdit())
+            {
+                return;
+            }
+
+            if (RowGroupHeadersTable == null || RowGroupHeadersTable.IsEmpty)
+            {
+                return;
+            }
+
+            foreach (int slot in RowGroupHeadersTable.GetIndexes())
+            {
+                var rowGroupInfo = RowGroupHeadersTable.GetValueAt(slot);
+                if (rowGroupInfo != null)
+                {
+                    EnsureRowGroupVisibility(rowGroupInfo, true, setCurrent: false);
+                }
+            }
+
+            ComputeScrollBarsLayout();
+            InvalidateRowsArrange();
+        }
+
+
+        /// <summary>
+        /// Collapses all DataGridRowGroupHeader instances in the DataGrid.
+        /// </summary>
+        public void CollapseAllGroups()
+        {
+            if (WaitForLostFocus(delegate { CollapseAllGroups(); }) || !CommitEdit())
+            {
+                return;
+            }
+
+            if (RowGroupHeadersTable == null || RowGroupHeadersTable.IsEmpty)
+            {
+                return;
+            }
+
+            foreach (int slot in RowGroupHeadersTable.GetIndexes())
+            {
+                var rowGroupInfo = RowGroupHeadersTable.GetValueAt(slot);
+                if (rowGroupInfo != null)
+                {
+                    EnsureRowGroupVisibility(rowGroupInfo, false, setCurrent: false);
+                }
+            }
+
+            ComputeScrollBarsLayout();
+            InvalidateRowsArrange();
+        }
 
 
         /// <summary>
