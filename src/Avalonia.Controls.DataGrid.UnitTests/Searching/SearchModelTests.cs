@@ -35,6 +35,18 @@ public class SearchModelTests
     }
 
     [Fact]
+    public void SetOrUpdate_Ignores_Explicit_Column_Order()
+    {
+        var model = new SearchModel();
+
+        model.SetOrUpdate(new SearchDescriptor("one", scope: SearchScope.ExplicitColumns, columnIds: new object[] { "Name", "Region" }));
+        model.SetOrUpdate(new SearchDescriptor("two", scope: SearchScope.ExplicitColumns, columnIds: new object[] { "Region", "Name" }));
+
+        var descriptor = Assert.Single(model.Descriptors);
+        Assert.Equal("two", descriptor.Query);
+    }
+
+    [Fact]
     public void UpdateResults_Resets_CurrentIndex_When_Empty()
     {
         var model = new SearchModel();

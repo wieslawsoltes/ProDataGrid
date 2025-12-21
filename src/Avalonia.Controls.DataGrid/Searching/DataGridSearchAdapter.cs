@@ -31,6 +31,7 @@ namespace Avalonia.Controls.DataGridSearching
         private readonly ISearchModel _model;
         private readonly Func<IEnumerable<DataGridColumn>> _columnProvider;
         private readonly Dictionary<(Type type, string property), Func<object, object>> _getterCache = new();
+        private readonly HashSet<INotifyPropertyChanged> _itemSubscriptions = new();
         private IDataGridCollectionView _view;
 
         public DataGridSearchAdapter(
@@ -96,41 +97,47 @@ namespace Avalonia.Controls.DataGridSearching
             if (_view == null)
             {
                 _model.UpdateResults(Array.Empty<SearchResult>());
+                ClearItemSubscriptions();
                 return;
             }
 
             if (descriptors == null || descriptors.Count == 0)
             {
                 _model.UpdateResults(Array.Empty<SearchResult>());
+                ClearItemSubscriptions();
                 return;
             }
 
             if (TryApplyModelToView(descriptors, previousDescriptors, out var handledResults))
             {
+                UpdateItemSubscriptionsFromView();
                 _model.UpdateResults(handledResults ?? Array.Empty<SearchResult>());
                 return;
             }
 
-            var results = ComputeResults(descriptors);
+            var results = ComputeResults(descriptors, trackItems: true);
             _model.UpdateResults(results);
         }
 
-        private IReadOnlyList<SearchResult> ComputeResults(IReadOnlyList<SearchDescriptor> descriptors)
+        private IReadOnlyList<SearchResult> ComputeResults(IReadOnlyList<SearchDescriptor> descriptors, bool trackItems)
         {
             if (_view == null || descriptors == null || descriptors.Count == 0)
             {
                 return Array.Empty<SearchResult>();
             }
 
+            var trackedItems = trackItems ? new HashSet<INotifyPropertyChanged>() : null;
             var columns = BuildColumnInfos();
             if (columns.Count == 0)
             {
+                UpdateItemSubscriptions(trackedItems);
                 return Array.Empty<SearchResult>();
             }
 
             var plans = BuildPlans(descriptors, columns);
             if (plans.Count == 0)
             {
+                UpdateItemSubscriptions(trackedItems);
                 return Array.Empty<SearchResult>();
             }
 
@@ -139,6 +146,7 @@ namespace Avalonia.Controls.DataGridSearching
             int rowIndex = 0;
             foreach (var item in _view)
             {
+                TrackItem(item, trackedItems);
                 foreach (var plan in plans)
                 {
                     for (int i = 0; i < plan.Columns.Count; i++)
@@ -169,6 +177,8 @@ namespace Avalonia.Controls.DataGridSearching
 
                 rowIndex++;
             }
+
+            UpdateItemSubscriptions(trackedItems);
 
             if (results.Count == 0)
             {
@@ -273,6 +283,8 @@ namespace Avalonia.Controls.DataGridSearching
                 else if (boundColumn.Binding is CompiledBindingExtension compiledBinding)
                 {
                     stringFormat = compiledBinding.StringFormat;
+                    converter = GetCompiledBindingConverter(compiledBinding);
+                    converterParameter = GetCompiledBindingConverterParameter(compiledBinding);
                 }
             }
 
@@ -394,18 +406,18 @@ namespace Avalonia.Controls.DataGridSearching
             var culture = descriptor?.Culture ?? _view?.Culture ?? CultureInfo.CurrentCulture;
             var provider = column.FormatProvider ?? culture;
 
+            object formattedValue = value;
             if (column.Converter != null)
             {
-                var converted = column.Converter.Convert(value, typeof(string), column.ConverterParameter, culture);
-                return Convert.ToString(converted, provider);
+                formattedValue = column.Converter.Convert(value, typeof(string), column.ConverterParameter, culture);
             }
 
             if (!string.IsNullOrEmpty(column.StringFormat))
             {
-                return string.Format(provider as IFormatProvider ?? CultureInfo.CurrentCulture, column.StringFormat, value);
+                return string.Format(provider, column.StringFormat, formattedValue);
             }
 
-            return Convert.ToString(value, provider);
+            return Convert.ToString(formattedValue, provider);
         }
 
         private Func<object, object> GetGetter(string propertyPath)
@@ -453,6 +465,123 @@ namespace Avalonia.Controls.DataGridSearching
             }
 
             _view = null;
+            ClearItemSubscriptions();
+        }
+
+        private void TrackItem(object item, HashSet<INotifyPropertyChanged> trackedItems)
+        {
+            if (trackedItems == null || item == null)
+            {
+                return;
+            }
+
+            if (item == DataGridCollectionView.NewItemPlaceholder || item is DataGridCollectionViewGroup)
+            {
+                return;
+            }
+
+            if (item is INotifyPropertyChanged inpc)
+            {
+                trackedItems.Add(inpc);
+            }
+        }
+
+        private void UpdateItemSubscriptionsFromView()
+        {
+            if (_view == null)
+            {
+                ClearItemSubscriptions();
+                return;
+            }
+
+            var items = new HashSet<INotifyPropertyChanged>();
+            foreach (var item in _view)
+            {
+                TrackItem(item, items);
+            }
+
+            UpdateItemSubscriptions(items);
+        }
+
+        private void UpdateItemSubscriptions(HashSet<INotifyPropertyChanged> items)
+        {
+            if (items == null)
+            {
+                return;
+            }
+
+            if (_itemSubscriptions.Count > 0)
+            {
+                var toRemove = new List<INotifyPropertyChanged>();
+                foreach (var existing in _itemSubscriptions)
+                {
+                    if (!items.Contains(existing))
+                    {
+                        existing.PropertyChanged -= Item_PropertyChanged;
+                        toRemove.Add(existing);
+                    }
+                }
+
+                for (int i = 0; i < toRemove.Count; i++)
+                {
+                    _itemSubscriptions.Remove(toRemove[i]);
+                }
+            }
+
+            foreach (var item in items)
+            {
+                if (_itemSubscriptions.Add(item))
+                {
+                    item.PropertyChanged += Item_PropertyChanged;
+                }
+            }
+        }
+
+        private void ClearItemSubscriptions()
+        {
+            if (_itemSubscriptions.Count == 0)
+            {
+                return;
+            }
+
+            foreach (var item in _itemSubscriptions)
+            {
+                item.PropertyChanged -= Item_PropertyChanged;
+            }
+
+            _itemSubscriptions.Clear();
+        }
+
+        private void Item_PropertyChanged(object sender, PropertyChangedEventArgs e)
+        {
+            if (_view == null || _model.Descriptors.Count == 0)
+            {
+                return;
+            }
+
+            ApplyModelToView(_model.Descriptors);
+        }
+
+        private static IValueConverter GetCompiledBindingConverter(CompiledBindingExtension compiledBinding)
+        {
+            if (compiledBinding == null)
+            {
+                return null;
+            }
+
+            var property = compiledBinding.GetType().GetProperty("Converter");
+            return property?.GetValue(compiledBinding) as IValueConverter;
+        }
+
+        private static object GetCompiledBindingConverterParameter(CompiledBindingExtension compiledBinding)
+        {
+            if (compiledBinding == null)
+            {
+                return null;
+            }
+
+            var property = compiledBinding.GetType().GetProperty("ConverterParameter");
+            return property?.GetValue(compiledBinding);
         }
 
         private readonly struct SearchCellKey : IEquatable<SearchCellKey>

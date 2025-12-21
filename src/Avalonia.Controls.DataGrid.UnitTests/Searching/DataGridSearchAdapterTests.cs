@@ -2,11 +2,14 @@
 // Licensed under the MIT license. See LICENSE file in the project root for details.
 
 using System;
+using System.ComponentModel;
+using System.Globalization;
 using System.Linq;
 using Avalonia.Collections;
 using Avalonia.Controls;
 using Avalonia.Controls.DataGridSearching;
 using Avalonia.Data;
+using Avalonia.Data.Converters;
 using Xunit;
 
 namespace Avalonia.Controls.DataGridTests.Searching;
@@ -283,6 +286,80 @@ public class DataGridSearchAdapterTests
         Assert.DoesNotContain(model.Results, r => r.RowIndex == 1);
     }
 
+    [Fact]
+    public void Converter_With_StringFormat_Uses_Formatted_Text()
+    {
+        var items = new[]
+        {
+            new PersonWithScore(5)
+        };
+
+        var view = new DataGridCollectionView(items);
+        var model = new SearchModel();
+        var grid = new DataGrid
+        {
+            AutoGenerateColumns = false,
+            ItemsSource = view
+        };
+
+        var converter = new MultiplyConverter();
+        var scoreColumn = new DataGridTextColumn
+        {
+            Header = "Score",
+            SortMemberPath = "Score",
+            Binding = new Binding("Score")
+            {
+                Converter = converter,
+                StringFormat = "Score: {0}"
+            }
+        };
+        grid.Columns.Add(scoreColumn);
+
+        var adapter = new DataGridSearchAdapter(model, () => grid.ColumnDefinitions);
+        adapter.AttachView(view);
+
+        model.SetOrUpdate(new SearchDescriptor(
+            "Score: 10",
+            scope: SearchScope.AllColumns,
+            comparison: StringComparison.Ordinal));
+
+        Assert.Contains(model.Results, r => ReferenceEquals(r.ColumnId, scoreColumn));
+    }
+
+    [Fact]
+    public void Item_Property_Changes_Recompute_Results()
+    {
+        var items = new[]
+        {
+            new NotifyPerson("Alpha")
+        };
+
+        var view = new DataGridCollectionView(items);
+        var model = new SearchModel();
+        var grid = new DataGrid
+        {
+            AutoGenerateColumns = false,
+            ItemsSource = view
+        };
+
+        var nameColumn = new DataGridTextColumn { Header = "Name", SortMemberPath = "Name", Binding = new Binding("Name") };
+        grid.Columns.Add(nameColumn);
+
+        var adapter = new DataGridSearchAdapter(model, () => grid.ColumnDefinitions);
+        adapter.AttachView(view);
+
+        model.SetOrUpdate(new SearchDescriptor(
+            "Alpha",
+            scope: SearchScope.AllColumns,
+            comparison: StringComparison.OrdinalIgnoreCase));
+
+        Assert.Single(model.Results);
+
+        items[0].Name = "Beta";
+
+        Assert.Empty(model.Results);
+    }
+
     private sealed class Person
     {
         public Person(string name, string region)
@@ -305,5 +382,55 @@ public class DataGridSearchAdapterTests
 
         public string Name { get; }
         public string Alias { get; }
+    }
+
+    private sealed class PersonWithScore
+    {
+        public PersonWithScore(int score)
+        {
+            Score = score;
+        }
+
+        public int Score { get; }
+    }
+
+    private sealed class MultiplyConverter : IValueConverter
+    {
+        public object? Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
+        {
+            return value is int number ? number * 2 : 0;
+        }
+
+        public object? ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture)
+        {
+            throw new NotSupportedException();
+        }
+    }
+
+    private sealed class NotifyPerson : INotifyPropertyChanged
+    {
+        private string _name;
+
+        public NotifyPerson(string name)
+        {
+            _name = name;
+        }
+
+        public string Name
+        {
+            get => _name;
+            set
+            {
+                if (_name == value)
+                {
+                    return;
+                }
+
+                _name = value;
+                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Name)));
+            }
+        }
+
+        public event PropertyChangedEventHandler? PropertyChanged;
     }
 }

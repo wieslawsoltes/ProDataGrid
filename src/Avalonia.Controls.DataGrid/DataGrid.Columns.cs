@@ -524,6 +524,8 @@ namespace Avalonia.Controls
                 row.Cells[updatedColumn.Index].IsVisible = updatedColumn.IsVisible;
                 row.InvalidateCellsIndex();
             }
+
+            UpdateSearchAdapterView();
         }
 
         internal void OnColumnVisibleStateChanging(DataGridColumn targetColumn)

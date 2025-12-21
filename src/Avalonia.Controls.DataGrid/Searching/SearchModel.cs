@@ -153,9 +153,29 @@ namespace Avalonia.Controls.DataGridSearching
                 return false;
             }
 
+            var matched = new bool[right.Count];
+
             for (int i = 0; i < left.Count; i++)
             {
-                if (!Equals(left[i], right[i]))
+                var value = left[i];
+                bool found = false;
+
+                for (int j = 0; j < right.Count; j++)
+                {
+                    if (matched[j])
+                    {
+                        continue;
+                    }
+
+                    if (Equals(value, right[j]))
+                    {
+                        matched[j] = true;
+                        found = true;
+                        break;
+                    }
+                }
+
+                if (!found)
                 {
                     return false;
                 }
@@ -174,10 +194,17 @@ namespace Avalonia.Controls.DataGridSearching
             unchecked
             {
                 int hash = 17;
+                int sum = 0;
+                int weighted = 0;
                 for (int i = 0; i < values.Count; i++)
                 {
-                    hash = (hash * 23) + (values[i]?.GetHashCode() ?? 0);
+                    var itemHash = values[i]?.GetHashCode() ?? 0;
+                    sum += itemHash;
+                    weighted += (itemHash * 397);
                 }
+                hash = (hash * 23) + sum;
+                hash = (hash * 23) + weighted;
+                hash = (hash * 23) + values.Count;
                 return hash;
             }
         }
@@ -683,9 +710,29 @@ namespace Avalonia.Controls.DataGridSearching
                 return false;
             }
 
+            var matched = new bool[right.Count];
+
             for (int i = 0; i < left.Count; i++)
             {
-                if (!Equals(left[i], right[i]))
+                var value = left[i];
+                bool found = false;
+
+                for (int j = 0; j < right.Count; j++)
+                {
+                    if (matched[j])
+                    {
+                        continue;
+                    }
+
+                    if (Equals(value, right[j]))
+                    {
+                        matched[j] = true;
+                        found = true;
+                        break;
+                    }
+                }
+
+                if (!found)
                 {
                     return false;
                 }
