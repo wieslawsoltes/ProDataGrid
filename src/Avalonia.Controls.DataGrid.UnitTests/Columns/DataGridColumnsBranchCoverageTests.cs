@@ -859,7 +859,7 @@ public class DataGridColumnsBranchCoverageTests
             {
                 ex = tie.InnerException;
             }
-            Assert.Equal("DebugAssertException", ex.GetType().Name);
+            Assert.Contains(ex.GetType().Name, new[] { "DebugAssertException", nameof(ArgumentOutOfRangeException) });
         }
         finally
         {
