@@ -160,6 +160,10 @@ namespace Avalonia.Controls.DataGridHierarchical
         private bool _virtualizeChildren = true;
         private int? _maxDepth;
         private bool _treatGroupsAsNodes;
+        private ExpandedStateKeyMode _expandedStateKeyMode = ExpandedStateKeyMode.Item;
+        private Func<T, object?>? _expandedStateKeySelector;
+        private Func<T, IReadOnlyList<int>?>? _itemPathSelector;
+        private bool _allowExpandToItemSearch;
 
         private HierarchicalOptions? _untyped;
 
@@ -318,6 +322,46 @@ namespace Avalonia.Controls.DataGridHierarchical
             }
         }
 
+        public ExpandedStateKeyMode ExpandedStateKeyMode
+        {
+            get => _expandedStateKeyMode;
+            set
+            {
+                _expandedStateKeyMode = value;
+                Push();
+            }
+        }
+
+        public Func<T, object?>? ExpandedStateKeySelector
+        {
+            get => _expandedStateKeySelector;
+            set
+            {
+                _expandedStateKeySelector = value;
+                Push();
+            }
+        }
+
+        public Func<T, IReadOnlyList<int>?>? ItemPathSelector
+        {
+            get => _itemPathSelector;
+            set
+            {
+                _itemPathSelector = value;
+                Push();
+            }
+        }
+
+        public bool AllowExpandToItemSearch
+        {
+            get => _allowExpandToItemSearch;
+            set
+            {
+                _allowExpandToItemSearch = value;
+                Push();
+            }
+        }
+
         internal HierarchicalOptions ToUntyped()
         {
             return EnsureUntyped();
@@ -345,6 +389,14 @@ namespace Avalonia.Controls.DataGridHierarchical
             target.VirtualizeChildren = VirtualizeChildren;
             target.MaxDepth = MaxDepth;
             target.TreatGroupsAsNodes = TreatGroupsAsNodes;
+            target.ExpandedStateKeyMode = ExpandedStateKeyMode;
+            target.ExpandedStateKeySelector = ExpandedStateKeySelector != null
+                ? o => o is T typed ? ExpandedStateKeySelector(typed) : null
+                : null;
+            target.ItemPathSelector = ItemPathSelector != null
+                ? o => o is T typed ? ItemPathSelector(typed) : null
+                : null;
+            target.AllowExpandToItemSearch = AllowExpandToItemSearch;
             target.ChildrenPropertyPath = ChildrenPropertyPath;
             target.ChildrenSelector = ChildrenSelector != null
                 ? o => o is T typed ? ChildrenSelector(typed) : null

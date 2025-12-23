@@ -171,13 +171,50 @@ public class HierarchicalIntegrationTests
         return value?.ToString();
     }
 
+    private static IReadOnlyList<int>? BuildPath(Item root, Item target)
+    {
+        var path = new List<int>();
+        if (!TryBuildPath(root, target, path))
+        {
+            return null;
+        }
+
+        path.Insert(0, 0);
+        return path;
+    }
+
+    private static bool TryBuildPath(Item current, Item target, List<int> path)
+    {
+        if (ReferenceEquals(current, target))
+        {
+            return true;
+        }
+
+        for (int i = 0; i < current.Children.Count; i++)
+        {
+            path.Add(i);
+            if (TryBuildPath(current.Children[i], target, path))
+            {
+                return true;
+            }
+
+            path.RemoveAt(path.Count - 1);
+        }
+
+        return false;
+    }
+
     [Fact]
     public void HeaderClick_SortsHierarchyAscending()
     {
         var root = new Item("root");
         root.Children.Add(new Item("b"));
         root.Children.Add(new Item("a"));
-        var model = CreateModel();
+        var model = new HierarchicalModel(new HierarchicalOptions
+        {
+            ChildrenSelector = o => ((Item)o).Children,
+            ItemPathSelector = o => BuildPath(root, (Item)o)
+        });
         model.SetRoot(root);
         model.Expand(model.Root!);
 
@@ -328,7 +365,11 @@ public class HierarchicalIntegrationTests
         var root = new Item("root");
         root.Children.Add(new Item("a"));
         root.Children.Add(new Item("b"));
-        var model = CreateModel();
+        var model = new HierarchicalModel(new HierarchicalOptions
+        {
+            ChildrenSelector = o => ((Item)o).Children,
+            ItemPathSelector = o => BuildPath(root, (Item)o)
+        });
         model.SetRoot(root);
         model.Expand(model.Root!);
 
@@ -358,7 +399,11 @@ public class HierarchicalIntegrationTests
         root.Children.Add(new Item("b"));
         root.Children.Add(new Item("a"));
 
-        var model = CreateModel();
+        var model = new HierarchicalModel(new HierarchicalOptions
+        {
+            ChildrenSelector = o => ((Item)o).Children,
+            ItemPathSelector = o => BuildPath(root, (Item)o)
+        });
         model.SetRoot(root);
         model.Expand(model.Root!);
 
@@ -912,7 +957,11 @@ public class HierarchicalIntegrationTests
         root.Children.Add(childA);
         root.Children.Add(childB);
 
-        var model = CreateModel();
+        var model = new HierarchicalModel(new HierarchicalOptions
+        {
+            ChildrenSelector = o => ((Item)o).Children,
+            ItemPathSelector = o => BuildPath(root, (Item)o)
+        });
         model.SetRoot(root);
         model.Expand(model.Root!);
 
@@ -1017,6 +1066,189 @@ public class HierarchicalIntegrationTests
         Assert.Equal(2, filtered.Length);
         Assert.Contains(filtered, x => x.Name == "alpha");
         Assert.Contains(filtered, x => x.Name == "alphabet");
+    }
+
+    [Fact]
+    public void SelectedItem_Maps_To_Underlying_Item_In_Hierarchical_Mode()
+    {
+        var root = new Item("root");
+        var childA = new Item("a");
+        var childB = new Item("b");
+        root.Children.Add(childA);
+        root.Children.Add(childB);
+
+        var model = CreateModel();
+        model.SetRoot(root);
+        model.Expand(model.Root!);
+
+        var grid = new DataGrid
+        {
+            HierarchicalModel = model,
+            HierarchicalRowsEnabled = true,
+            AutoGenerateColumns = false,
+            ItemsSource = model.Flattened
+        };
+
+        grid.ColumnsInternal.Add(new DataGridHierarchicalColumn
+        {
+            Header = "Name",
+            Binding = new Avalonia.Data.Binding("Item.Name")
+        });
+
+        grid.ApplyTemplate();
+        grid.UpdateLayout();
+
+        grid.SelectedItem = childB;
+
+        Assert.Same(childB, grid.SelectedItem);
+        Assert.Equal(model.IndexOf(childB), grid.SelectedIndex);
+        Assert.Same(childB, grid.Selection.SelectedItem);
+        Assert.Contains(childB, grid.SelectedItems.Cast<object>());
+    }
+
+    [Fact]
+    public void SelectedItem_Expands_Ancestors_When_AutoExpandSelectedItem_Enabled()
+    {
+        var root = new Item("root");
+        var child = new Item("child");
+        var grand = new Item("grand");
+        child.Children.Add(grand);
+        root.Children.Add(child);
+
+        var model = new HierarchicalModel(new HierarchicalOptions
+        {
+            ChildrenSelector = o => ((Item)o).Children,
+            ItemPathSelector = o => BuildPath(root, (Item)o)
+        });
+        model.SetRoot(root);
+
+        var grid = new DataGrid
+        {
+            HierarchicalModel = model,
+            HierarchicalRowsEnabled = true,
+            AutoGenerateColumns = false,
+            AutoExpandSelectedItem = true,
+            ItemsSource = model.Flattened
+        };
+
+        grid.ColumnsInternal.Add(new DataGridHierarchicalColumn
+        {
+            Header = "Name",
+            Binding = new Avalonia.Data.Binding("Item.Name")
+        });
+
+        grid.ApplyTemplate();
+        grid.UpdateLayout();
+
+        Assert.Equal(-1, model.IndexOf(grand));
+
+        grid.SelectedItem = grand;
+
+        Assert.NotEqual(-1, model.IndexOf(grand));
+        Assert.Same(grand, grid.SelectedItem);
+        Assert.Equal(model.IndexOf(grand), grid.SelectedIndex);
+    }
+
+    [Fact]
+    public void Selection_Persists_On_Rebuild_For_Child_Items()
+    {
+        var root = new Item("root");
+        var childA = new Item("a");
+        var childB = new Item("b");
+        root.Children.Add(childA);
+        root.Children.Add(childB);
+
+        var roots = new ObservableCollection<Item> { root };
+        var model = CreateModel();
+        model.SetRoots(roots);
+        model.Expand(model.Flattened[0]);
+
+        var grid = new DataGrid
+        {
+            HierarchicalModel = model,
+            HierarchicalRowsEnabled = true,
+            AutoGenerateColumns = false,
+            ItemsSource = model.Flattened
+        };
+
+        grid.ColumnsInternal.Add(new DataGridHierarchicalColumn
+        {
+            Header = "Name",
+            Binding = new Avalonia.Data.Binding("Item.Name")
+        });
+
+        grid.ApplyTemplate();
+        grid.UpdateLayout();
+
+        grid.SelectedItem = childB;
+        Assert.Same(childB, grid.SelectedItem);
+
+        model.SetRoots(roots);
+        grid.UpdateLayout();
+
+        Assert.Same(childB, grid.SelectedItem);
+        Assert.Equal(model.IndexOf(childB), grid.SelectedIndex);
+    }
+
+    [Fact]
+    public void Refresh_VirtualRoot_Rebuilds_Flattened()
+    {
+        var roots = new List<Item> { new Item("a"), new Item("b") };
+        var model = CreateModel();
+        model.SetRoots(roots);
+
+        Assert.Equal(2, model.Count);
+
+        roots.Add(new Item("c"));
+        model.Refresh();
+
+        Assert.Equal(3, model.Count);
+    }
+
+    [Fact]
+    public void Refresh_Maps_Indexes_By_Item()
+    {
+        var root = new Item("root");
+        var childA = new Item("a");
+        var childB = new Item("b");
+        root.Children.Add(childA);
+        root.Children.Add(childB);
+
+        var model = CreateModel();
+        model.SetRoot(root);
+        model.Expand(model.Root!);
+
+        var oldIndex = model.IndexOf(childB);
+
+        FlattenedIndexMap? indexMap = null;
+        model.FlattenedChanged += (_, e) => indexMap = e.IndexMap;
+
+        model.Refresh(model.Root);
+
+        Assert.NotNull(indexMap);
+        Assert.Equal(model.IndexOf(childB), indexMap!.MapOldIndexToNew(oldIndex));
+    }
+
+    [Fact]
+    public void Rebuild_Preserves_Expanded_State_For_SetRoot()
+    {
+        var root = new Item("root");
+        var child = new Item("child");
+        var grandChild = new Item("grand");
+        child.Children.Add(grandChild);
+        root.Children.Add(child);
+
+        var model = CreateModel();
+        model.SetRoot(root);
+        model.Expand(model.Root!);
+        model.Expand(model.FindNode(child)!);
+
+        Assert.Contains(grandChild, model.Flattened.Select(node => node.Item));
+
+        model.SetRoot(root);
+
+        Assert.Contains(grandChild, model.Flattened.Select(node => node.Item));
+        Assert.True(model.FindNode(child)!.IsExpanded);
     }
 
     private sealed class LocalHierarchicalSortingAdapter : DataGridSortingAdapter

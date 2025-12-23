@@ -167,6 +167,9 @@
     <TabItem Header="Hierarchical Model">
       <pages:HierarchicalSamplePage />
     </TabItem>
+    <TabItem Header="Hierarchical Selection">
+      <pages:HierarchicalSelectionPage />
+    </TabItem>
     <TabItem Header="Flyout Selection">
       <pages:HierarchicalFlyoutSelectionPage />
     </TabItem>

@@ -63,8 +63,7 @@ namespace Avalonia.Controls
                 else
                 {
                     // the row index will be set to -1 if the item is null or not in the list
-                    int rowIndex = DataConnection.IndexOf(item);
-                    if (rowIndex == -1)
+                    if (!TryGetRowIndexFromItem(item, out var rowIndex))
                     {
                         return;
                     }

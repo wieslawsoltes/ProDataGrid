@@ -388,6 +388,20 @@ namespace Avalonia.Controls.DataGridHierarchical
     }
 
     /// <summary>
+    /// Optional interface for models that can expand to a specific item on demand.
+    /// </summary>
+    public interface IHierarchicalModelExpander
+    {
+        /// <summary>
+        /// Expands ancestors so the specified item becomes visible, if possible.
+        /// </summary>
+        /// <param name="item">Target item.</param>
+        /// <param name="node">Resolved node, when successful.</param>
+        /// <returns>True when the item was expanded into view.</returns>
+        bool TryExpandToItem(object item, out HierarchicalNode? node);
+    }
+
+    /// <summary>
     /// Factory hook to allow replacing the default hierarchical model.
     /// </summary>
     public interface IDataGridHierarchicalModelFactory
@@ -399,7 +413,7 @@ namespace Avalonia.Controls.DataGridHierarchical
     /// Default hierarchical model implementation (initial scaffolding).
     /// </summary>
     [RequiresUnreferencedCode("HierarchicalModel uses reflection to access property paths and is not compatible with trimming.")]
-    public class HierarchicalModel : IHierarchicalModel
+    public class HierarchicalModel : IHierarchicalModel, IHierarchicalModelExpander
     {
         private readonly ObservableRangeCollection<HierarchicalNode> _flattened;
         private readonly ReadOnlyObservableCollection<HierarchicalNode> _flattenedObservableView;
@@ -474,15 +488,28 @@ namespace Avalonia.Controls.DataGridHierarchical
                 throw new ArgumentNullException(nameof(rootItem));
             }
 
+            var expandedItems = CaptureExpandedItems();
             _isVirtualRoot = false;
             _rootItems = null;
 
             var root = new HierarchicalNode(rootItem, parent: null, level: 0, isLeaf: DetermineInitialLeaf(rootItem));
-            SetRoot(root);
+            SetRoot(root, rebuildFlattened: false);
 
-            if (Options.AutoExpandRoot && WithinAutoExpandDepth(0))
+            var expandedNodes = new List<HierarchicalNode>();
+            if (Options.ExpandedStateKeyMode == ExpandedStateKeyMode.Path)
             {
-                AutoExpand(root, 0);
+                var path = new List<int> { 0 };
+                RestoreExpandedStateByPath(root, expandedItems, depth: 0, Options.AutoExpandRoot, expandedNodes, path);
+            }
+            else
+            {
+                RestoreExpandedState(root, expandedItems, depth: 0, Options.AutoExpandRoot, expandedNodes);
+            }
+            RecalculateExpandedCountsFrom(root);
+            ReplaceFlattened(BuildFlattenedFromRoot(root));
+            foreach (var expandedNode in expandedNodes)
+            {
+                OnNodeExpanded(expandedNode);
             }
         }
 
@@ -493,6 +520,7 @@ namespace Avalonia.Controls.DataGridHierarchical
                 throw new ArgumentNullException(nameof(rootItems));
             }
 
+            var expandedItems = CaptureExpandedItems();
             _isVirtualRoot = true;
             _rootItems = rootItems;
 
@@ -520,19 +548,32 @@ namespace Avalonia.Controls.DataGridHierarchical
             // Subscribe to INCC on rootItems if applicable.
             AttachChildrenNotifier(virtualRoot, rootItems);
 
-            // Flatten: the virtual root is not included, only its children.
-            ReplaceFlattened(BuildFlattenedFromVirtualRoot(virtualRoot));
-
-            // Auto-expand each child if configured.
-            if (Options.AutoExpandRoot)
+            var expandedNodes = new List<HierarchicalNode>();
+            if (Options.ExpandedStateKeyMode == ExpandedStateKeyMode.Path)
+            {
+                var path = new List<int>();
+                for (int i = 0; i < virtualRoot.MutableChildren.Count; i++)
+                {
+                    path.Add(i);
+                    RestoreExpandedStateByPath(virtualRoot.MutableChildren[i], expandedItems, depth: 0, Options.AutoExpandRoot, expandedNodes, path);
+                    path.RemoveAt(path.Count - 1);
+                }
+            }
+            else
             {
                 foreach (var child in virtualRoot.MutableChildren)
                 {
-                    if (WithinAutoExpandDepth(0))
-                    {
-                        AutoExpand(child, 0);
-                    }
+                    RestoreExpandedState(child, expandedItems, depth: 0, Options.AutoExpandRoot, expandedNodes);
                 }
+            }
+            RecalculateExpandedCountsFrom(virtualRoot);
+
+            // Flatten: the virtual root is not included, only its children.
+            ReplaceFlattened(BuildFlattenedFromVirtualRoot(virtualRoot));
+
+            foreach (var expandedNode in expandedNodes)
+            {
+                OnNodeExpanded(expandedNode);
             }
         }
 
@@ -548,6 +589,186 @@ namespace Avalonia.Controls.DataGridHierarchical
                 }
             }
             return result;
+        }
+
+        private IEnumerable<HierarchicalNode> BuildFlattenedFromRoot(HierarchicalNode root)
+        {
+            var result = new List<HierarchicalNode> { root };
+            if (root.IsExpanded)
+            {
+                CollectVisibleChildren(root, result);
+            }
+            return result;
+        }
+
+        private HashSet<object> CaptureExpandedItems()
+        {
+            var expanded = new HashSet<object>(EqualityComparer<object>.Default);
+            if (Root == null)
+            {
+                return expanded;
+            }
+
+            if (Options.ExpandedStateKeyMode == ExpandedStateKeyMode.Path)
+            {
+                CaptureExpandedPaths(expanded);
+                return expanded;
+            }
+
+            var stack = new Stack<HierarchicalNode>();
+            stack.Push(Root);
+
+            while (stack.Count > 0)
+            {
+                var node = stack.Pop();
+                if (node.IsExpanded && TryGetExpandedStateKey(node, out var key))
+                {
+                    expanded.Add(key);
+                }
+
+                foreach (var child in node.Children)
+                {
+                    stack.Push(child);
+                }
+            }
+
+            return expanded;
+        }
+
+        private void CaptureExpandedPaths(ISet<object> expanded)
+        {
+            if (Root == null)
+            {
+                return;
+            }
+
+            var path = new List<int>();
+
+            if (_isVirtualRoot)
+            {
+                var children = Root.MutableChildren;
+                for (int i = 0; i < children.Count; i++)
+                {
+                    path.Add(i);
+                    CaptureExpandedPathsRecursive(children[i], expanded, path);
+                    path.RemoveAt(path.Count - 1);
+                }
+
+                return;
+            }
+
+            path.Add(0);
+            CaptureExpandedPathsRecursive(Root, expanded, path);
+        }
+
+        private void CaptureExpandedPathsRecursive(
+            HierarchicalNode node,
+            ISet<object> expanded,
+            List<int> path)
+        {
+            if (node.IsExpanded)
+            {
+                expanded.Add(new ExpandedNodePath(path.ToArray()));
+            }
+
+            var children = node.MutableChildren;
+            for (int i = 0; i < children.Count; i++)
+            {
+                path.Add(i);
+                CaptureExpandedPathsRecursive(children[i], expanded, path);
+                path.RemoveAt(path.Count - 1);
+            }
+        }
+
+        private bool TryGetExpandedStateKey(HierarchicalNode node, out object key)
+        {
+            key = null;
+            switch (Options.ExpandedStateKeyMode)
+            {
+                case ExpandedStateKeyMode.Custom:
+                    if (Options.ExpandedStateKeySelector == null)
+                    {
+                        key = node.Item;
+                        return true;
+                    }
+
+                    key = Options.ExpandedStateKeySelector(node.Item);
+                    return key != null;
+                default:
+                    key = node.Item;
+                    return true;
+            }
+        }
+
+
+        private void RestoreExpandedState(
+            HierarchicalNode node,
+            ISet<object> expandedItems,
+            int depth,
+            bool applyAutoExpand,
+            List<HierarchicalNode> expandedNodes)
+        {
+            var shouldExpand = false;
+            if (TryGetExpandedStateKey(node, out var key) && expandedItems.Contains(key))
+            {
+                shouldExpand = true;
+            }
+            else if (applyAutoExpand && WithinAutoExpandDepth(depth))
+            {
+                shouldExpand = true;
+            }
+
+            if (!shouldExpand)
+            {
+                node.IsExpanded = false;
+                return;
+            }
+
+            node.IsExpanded = true;
+            expandedNodes.Add(node);
+            EnsureChildrenMaterialized(node);
+
+            foreach (var child in node.Children)
+            {
+                RestoreExpandedState(child, expandedItems, depth + 1, applyAutoExpand, expandedNodes);
+            }
+        }
+
+        private void RestoreExpandedStateByPath(
+            HierarchicalNode node,
+            ISet<object> expandedItems,
+            int depth,
+            bool applyAutoExpand,
+            List<HierarchicalNode> expandedNodes,
+            List<int> path)
+        {
+            var shouldExpand = false;
+            if (expandedItems.Contains(new ExpandedNodePath(path.ToArray())))
+            {
+                shouldExpand = true;
+            }
+            else if (applyAutoExpand && WithinAutoExpandDepth(depth))
+            {
+                shouldExpand = true;
+            }
+
+            if (!shouldExpand)
+            {
+                node.IsExpanded = false;
+                return;
+            }
+
+            node.IsExpanded = true;
+            expandedNodes.Add(node);
+            EnsureChildrenMaterialized(node);
+
+            var children = node.MutableChildren;
+            for (int i = 0; i < children.Count; i++)
+            {
+                path.Add(i);
+                RestoreExpandedStateByPath(children[i], expandedItems, depth + 1, applyAutoExpand, expandedNodes, path);
+                path.RemoveAt(path.Count - 1);
+            }
         }
 
         public object? GetItem(int index)
@@ -743,6 +964,9 @@ namespace Avalonia.Controls.DataGridHierarchical
 
             var parentIndex = _flattened.IndexOf(target);
             var wasExpanded = target.IsExpanded;
+            var canUpdateFlattened = wasExpanded && (parentIndex >= 0 || (_isVirtualRoot && ReferenceEquals(target, Root)));
+            var removeStart = parentIndex + 1;
+            IList<HierarchicalNode>? oldVisibleNodes = null;
 
             var oldChildren = target.MutableChildren.ToArray();
             foreach (var child in oldChildren)
@@ -759,19 +983,27 @@ namespace Avalonia.Controls.DataGridHierarchical
             var removedCount = 0;
             var insertedCount = 0;
 
-            if (wasExpanded && parentIndex >= 0)
+            if (canUpdateFlattened)
             {
+                var visibleCount = CountVisibleDescendantsInFlattened(target, parentIndex);
+                if (visibleCount > 0 && removeStart >= 0 && removeStart + visibleCount <= _flattened.Count)
+                {
+                    oldVisibleNodes = _flattened.GetRange(removeStart, visibleCount);
+                }
                 removedCount = RemoveVisibleDescendants(target, parentIndex, detachDescendants: false);
             }
 
-            if (wasExpanded && parentIndex >= 0 && !target.IsLeaf)
+            if (canUpdateFlattened && !target.IsLeaf)
             {
-                insertedCount = InsertVisibleChildren(target, parentIndex + 1);
+                insertedCount = InsertVisibleChildren(target, removeStart);
             }
 
-            if (wasExpanded && parentIndex >= 0 && (removedCount > 0 || insertedCount > 0))
+            if (canUpdateFlattened && (removedCount > 0 || insertedCount > 0))
             {
-                OnFlattenedChanged(new[] { new FlattenedChange(parentIndex + 1, removedCount, insertedCount) });
+                var indexMap = oldVisibleNodes != null && insertedCount > 0
+                    ? BuildIndexMap(oldVisibleNodes, removeStart, _flattened.GetRange(removeStart, insertedCount), removeStart)
+                    : null;
+                OnFlattenedChanged(new[] { new FlattenedChange(removeStart, removedCount, insertedCount) }, indexMap);
             }
 
             RecalculateExpandedCountsFrom(target);
@@ -784,15 +1016,187 @@ namespace Avalonia.Controls.DataGridHierarchical
                 throw new ArgumentNullException(nameof(item));
             }
 
+            HierarchicalNode? fallback = null;
             for (int i = 0; i < _flattened.Count; i++)
             {
-                if (Equals(_flattened[i].Item, item))
+                var node = _flattened[i];
+                if (ReferenceEquals(node.Item, item))
                 {
-                    return _flattened[i];
+                    return node;
+                }
+
+                if (fallback == null && Equals(node.Item, item))
+                {
+                    fallback = node;
                 }
             }
 
-            return null;
+            return fallback;
+        }
+
+        public bool TryExpandToItem(object item)
+        {
+            return TryExpandToItem(item, out _);
+        }
+
+        public bool TryExpandToItem(object item, out HierarchicalNode? node)
+        {
+            node = null;
+            if (item == null || Root == null)
+            {
+                return false;
+            }
+
+            if (item is HierarchicalNode candidate)
+            {
+                node = candidate;
+                ExpandAncestors(candidate);
+                return true;
+            }
+
+            node = FindNode(item);
+            if (node != null)
+            {
+                return true;
+            }
+
+            if (Options.ItemPathSelector != null)
+            {
+                var path = Options.ItemPathSelector(item);
+                if (path != null && TryExpandToPath(path, out var foundByPath))
+                {
+                    if (foundByPath != null &&
+                        (ReferenceEquals(foundByPath.Item, item) || Equals(foundByPath.Item, item)))
+                    {
+                        node = foundByPath;
+                        return true;
+                    }
+                }
+            }
+
+            if (!Options.AllowExpandToItemSearch)
+            {
+                return false;
+            }
+
+            if (TryFindAndExpand(Root, item, out var found))
+            {
+                node = found;
+                return true;
+            }
+
+            return false;
+        }
+
+        private bool TryFindAndExpand(HierarchicalNode current, object item, out HierarchicalNode? node)
+        {
+            if (ReferenceEquals(current.Item, item) || Equals(current.Item, item))
+            {
+                node = current;
+                return true;
+            }
+
+            node = null;
+            if (current.IsLeaf)
+            {
+                return false;
+            }
+
+            EnsureChildrenMaterialized(current);
+            foreach (var child in current.Children)
+            {
+                if (TryFindAndExpand(child, item, out node))
+                {
+                    if (!_isVirtualRoot || !ReferenceEquals(current, Root))
+                    {
+                        Expand(current);
+                    }
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        private bool TryExpandToPath(IReadOnlyList<int> path, out HierarchicalNode? node)
+        {
+            node = null;
+            if (Root == null || path == null)
+            {
+                return false;
+            }
+
+            if (path.Count == 0)
+            {
+                if (_isVirtualRoot)
+                {
+                    return false;
+                }
+
+                node = Root;
+                return true;
+            }
+
+            var current = Root;
+            var startIndex = 0;
+
+            if (!_isVirtualRoot)
+            {
+                if (path[0] != 0)
+                {
+                    return false;
+                }
+
+                startIndex = 1;
+            }
+
+            for (int i = startIndex; i < path.Count; i++)
+            {
+                var childIndex = path[i];
+                if (childIndex < 0)
+                {
+                    return false;
+                }
+
+                if (!(_isVirtualRoot && ReferenceEquals(current, Root)))
+                {
+                    if (!current.IsExpanded)
+                    {
+                        Expand(current);
+                    }
+
+                    if (current.IsLeaf)
+                    {
+                        return false;
+                    }
+
+                    EnsureChildrenMaterialized(current);
+                }
+
+                var children = current.MutableChildren;
+                if (childIndex >= children.Count)
+                {
+                    return false;
+                }
+
+                current = children[childIndex];
+            }
+
+            node = current;
+            return true;
+        }
+
+        private void ExpandAncestors(HierarchicalNode node)
+        {
+            for (var current = node.Parent; current != null; current = current.Parent)
+            {
+                if (_isVirtualRoot && ReferenceEquals(current, Root))
+                {
+                    continue;
+                }
+
+                Expand(current);
+            }
         }
 
         public void Sort(HierarchicalNode? node = null, IComparer<object>? comparer = null, bool recursive = true)
@@ -975,11 +1379,20 @@ namespace Avalonia.Controls.DataGridHierarchical
         internal void ReplaceFlattened(IEnumerable<HierarchicalNode> nodes, bool notify = true)
         {
             var oldCount = _flattened.Count;
+            List<HierarchicalNode>? oldNodes = null;
+            if (notify && oldCount > 0)
+            {
+                oldNodes = new List<HierarchicalNode>(oldCount);
+                oldNodes.AddRange(_flattened);
+            }
             _flattened.ResetWith(nodes ?? Array.Empty<HierarchicalNode>());
 
             if (notify)
             {
-                OnFlattenedChanged(new[] { new FlattenedChange(0, oldCount, _flattened.Count) });
+                var indexMap = oldNodes != null && _flattened.Count > 0
+                    ? BuildIndexMap(oldNodes, 0, _flattened, 0)
+                    : null;
+                OnFlattenedChanged(new[] { new FlattenedChange(0, oldCount, _flattened.Count) }, indexMap);
             }
         }
 
@@ -1789,6 +2202,11 @@ namespace Avalonia.Controls.DataGridHierarchical
                 return Task.FromResult<IEnumerable?>(null);
             }
 
+            if (item is VirtualRootContainer virtualRoot)
+            {
+                return Task.FromResult<IEnumerable?>(virtualRoot.Items);
+            }
+
             if (Options.ChildrenSelectorAsync != null)
             {
                 return Options.ChildrenSelectorAsync(item, cancellationToken);
@@ -1976,6 +2394,45 @@ namespace Avalonia.Controls.DataGridHierarchical
             };
         }
 
+        private static IReadOnlyDictionary<int, int>? BuildIndexMap(
+            IList<HierarchicalNode> oldNodes,
+            int oldStartIndex,
+            IList<HierarchicalNode> newNodes,
+            int newStartIndex)
+        {
+            if (oldNodes.Count == 0 || newNodes.Count == 0)
+            {
+                return null;
+            }
+
+            var nullKey = new object();
+            var lookup = new Dictionary<object, Queue<int>>(EqualityComparer<object>.Default);
+            for (int i = 0; i < newNodes.Count; i++)
+            {
+                var item = newNodes[i].Item;
+                var key = item ?? nullKey;
+                if (!lookup.TryGetValue(key, out var queue))
+                {
+                    queue = new Queue<int>();
+                    lookup[key] = queue;
+                }
+                queue.Enqueue(newStartIndex + i);
+            }
+
+            var map = new Dictionary<int, int>();
+            for (int i = 0; i < oldNodes.Count; i++)
+            {
+                var item = oldNodes[i].Item;
+                var key = item ?? nullKey;
+                if (lookup.TryGetValue(key, out var queue) && queue.Count > 0)
+                {
+                    map[oldStartIndex + i] = queue.Dequeue();
+                }
+            }
+
+            return map.Count > 0 ? map : null;
+        }
+
         private void RecalculateExpandedCountsFrom(HierarchicalNode node)
         {
             if (node == null)
@@ -2039,6 +2496,52 @@ namespace Avalonia.Controls.DataGridHierarchical
 
                 current.ExpandedCount = total;
                 current = current.Parent;
+            }
+        }
+
+        private readonly struct ExpandedNodePath : IEquatable<ExpandedNodePath>
+        {
+            private readonly int[] _segments;
+
+            public ExpandedNodePath(int[] segments)
+            {
+                _segments = segments ?? Array.Empty<int>();
+            }
+
+            public bool Equals(ExpandedNodePath other)
+            {
+                if (_segments.Length != other._segments.Length)
+                {
+                    return false;
+                }
+
+                for (int i = 0; i < _segments.Length; i++)
+                {
+                    if (_segments[i] != other._segments[i])
+                    {
+                        return false;
+                    }
+                }
+
+                return true;
+            }
+
+            public override bool Equals(object? obj)
+            {
+                return obj is ExpandedNodePath other && Equals(other);
+            }
+
+            public override int GetHashCode()
+            {
+                unchecked
+                {
+                    int hash = 17;
+                    for (int i = 0; i < _segments.Length; i++)
+                    {
+                        hash = (hash * 31) + _segments[i];
+                    }
+                    return hash;
+                }
             }
         }
 

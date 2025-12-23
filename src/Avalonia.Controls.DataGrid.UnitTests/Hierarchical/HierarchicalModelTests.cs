@@ -29,6 +29,29 @@ namespace Avalonia.Controls.DataGridTests.Hierarchical;
         public ObservableCollection<Item> Children { get; set; }
     }
 
+    private sealed class DuplicateItem
+    {
+        public DuplicateItem(string name)
+        {
+            Name = name;
+            Children = new ObservableCollection<DuplicateItem>();
+        }
+
+        public string Name { get; }
+
+        public ObservableCollection<DuplicateItem> Children { get; }
+
+        public override bool Equals(object? obj)
+        {
+            return obj is DuplicateItem other && string.Equals(Name, other.Name, StringComparison.Ordinal);
+        }
+
+        public override int GetHashCode()
+        {
+            return StringComparer.Ordinal.GetHashCode(Name);
+        }
+    }
+
     private static HierarchicalModel CreateModel()
     {
         return new HierarchicalModel(new HierarchicalOptions
@@ -71,6 +94,131 @@ namespace Avalonia.Controls.DataGridTests.Hierarchical;
 
         Assert.Equal(2, model.Count);
         Assert.Same(root.Children[0], model.GetItem(1));
+    }
+
+    [Fact]
+    public void Rebuild_Preserves_Expanded_State_By_Path_For_Duplicate_Items()
+    {
+        var root = new DuplicateItem("root");
+        var first = new DuplicateItem("dup");
+        var second = new DuplicateItem("dup");
+        var firstChild = new DuplicateItem("first-child");
+        var secondChild = new DuplicateItem("second-child");
+        first.Children.Add(firstChild);
+        second.Children.Add(secondChild);
+        root.Children.Add(first);
+        root.Children.Add(second);
+
+        var model = new HierarchicalModel(new HierarchicalOptions
+        {
+            ChildrenSelector = item => ((DuplicateItem)item).Children,
+            ExpandedStateKeyMode = ExpandedStateKeyMode.Path
+        });
+
+        model.SetRoot(root);
+        model.Expand(model.Root!);
+
+        var firstNode = FindNodeByReference(model, first);
+        model.Expand(firstNode);
+
+        Assert.True(FlattenedContains(model, firstChild));
+        Assert.False(FlattenedContains(model, secondChild));
+
+        model.SetRoot(root);
+
+        var firstNodeAfter = FindNodeByReference(model, first);
+        var secondNodeAfter = FindNodeByReference(model, second);
+
+        Assert.True(firstNodeAfter.IsExpanded);
+        Assert.False(secondNodeAfter.IsExpanded);
+        Assert.True(FlattenedContains(model, firstChild));
+        Assert.False(FlattenedContains(model, secondChild));
+    }
+
+    [Fact]
+    public void TryExpandToItem_Uses_PathSelector_For_Duplicates()
+    {
+        var root = new DuplicateItem("root");
+        var first = new DuplicateItem("dup");
+        var second = new DuplicateItem("dup");
+        var firstChild = new DuplicateItem("first-child");
+        var secondChild = new DuplicateItem("second-child");
+        first.Children.Add(firstChild);
+        second.Children.Add(secondChild);
+        root.Children.Add(first);
+        root.Children.Add(second);
+
+        var model = new HierarchicalModel(new HierarchicalOptions
+        {
+            ChildrenSelector = item => ((DuplicateItem)item).Children,
+            ItemPathSelector = item => BuildPath(root, (DuplicateItem)item)
+        });
+
+        model.SetRoot(root);
+
+        Assert.True(model.TryExpandToItem(firstChild, out var node));
+        Assert.Same(firstChild, node!.Item);
+        Assert.True(FlattenedContains(model, firstChild));
+        Assert.False(FlattenedContains(model, secondChild));
+    }
+
+    private static HierarchicalNode FindNodeByReference(HierarchicalModel model, object item)
+    {
+        foreach (var node in model.Flattened)
+        {
+            if (ReferenceEquals(node.Item, item))
+            {
+                return node;
+            }
+        }
+
+        throw new InvalidOperationException("Item not found in flattened list.");
+    }
+
+    private static bool FlattenedContains(HierarchicalModel model, object item)
+    {
+        foreach (var node in model.Flattened)
+        {
+            if (ReferenceEquals(node.Item, item))
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    private static IReadOnlyList<int>? BuildPath(DuplicateItem root, DuplicateItem target)
+    {
+        var path = new List<int>();
+        if (!TryBuildPath(root, target, path))
+        {
+            return null;
+        }
+
+        path.Insert(0, 0);
+        return path;
+    }
+
+    private static bool TryBuildPath(DuplicateItem current, DuplicateItem target, List<int> path)
+    {
+        if (ReferenceEquals(current, target))
+        {
+            return true;
+        }
+
+        for (int i = 0; i < current.Children.Count; i++)
+        {
+            path.Add(i);
+            if (TryBuildPath(current.Children[i], target, path))
+            {
+                return true;
+            }
+
+            path.RemoveAt(path.Count - 1);
+        }
+
+        return false;
     }
 
     [Fact]

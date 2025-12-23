@@ -24,9 +24,19 @@ namespace Avalonia.Controls.DataGridSelection
     public class DataGridSelectionModelAdapter : IDisposable
     {
         public DataGridSelectionModelAdapter(ISelectionModel model)
+            : this(model, null, null)
+        {
+        }
+
+        public DataGridSelectionModelAdapter(
+            ISelectionModel model,
+            Func<object?, object?>? itemSelector,
+            Func<object?, int>? indexResolver)
         {
             Model = model ?? throw new ArgumentNullException(nameof(model));
-            SelectedItemsView = new SelectedItemsView(Model);
+            SelectedItemsView = itemSelector == null && indexResolver == null
+                ? new SelectedItemsView(Model)
+                : new SelectedItemsView(Model, itemSelector, indexResolver);
         }
 
         public ISelectionModel Model { get; }

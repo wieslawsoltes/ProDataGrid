@@ -148,18 +148,18 @@ namespace Avalonia.Controls
                 if (!modelSelectionPending)
                 {
                     SelectedItem = null;
-                if (DataConnection.CollectionView != null && setDefaultSelection)
-                {
-                    SelectedItem = DataConnection.CollectionView.CurrentItem;
-                }
+                    if (DataConnection.CollectionView != null && setDefaultSelection)
+                    {
+                        SelectedItem = ProjectSelectionItem(DataConnection.CollectionView.CurrentItem);
+                    }
 
-                SyncSelectionModelFromGridSelection();
+                    SyncSelectionModelFromGridSelection();
 
-                if (_selectedItemsBinding != null && _selectedItemsBinding.Count > 0)
-                {
-                    ApplySelectedItemsFromBinding(_selectedItemsBinding);
+                    if (_selectedItemsBinding != null && _selectedItemsBinding.Count > 0)
+                    {
+                        ApplySelectedItemsFromBinding(_selectedItemsBinding);
+                    }
                 }
-            }
                 else
                 {
                     ApplySelectionFromSelectionModel();
@@ -295,7 +295,7 @@ namespace Avalonia.Controls
                     int index = GetSelectionModelIndexOfItem(item);
                     if (index >= 0)
                     {
-                        SetValueNoCallback(SelectedItemProperty, item);
+                        SetValueNoCallback(SelectedItemProperty, ProjectSelectionItem(item));
                         SetValueNoCallback(SelectedIndexProperty, index);
                         break;
                     }
@@ -398,6 +398,8 @@ namespace Avalonia.Controls
                 ClearRowGroupHeadersTable();
                 PopulateRowGroupHeadersTable();
             }
+
+            RequestPointerOverRefresh();
         }
 
 

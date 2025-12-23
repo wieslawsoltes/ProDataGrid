@@ -344,6 +344,7 @@ namespace Avalonia.Controls
 
             // isCollapsed below is always false because we only use the method if we're not grouping
             InsertElementAt(slot, rowIndex, item, null/*DataGridRowGroupInfo*/, false /*isCollapsed*/);
+            RequestPointerOverRefresh();
         }
 
         internal bool IsColumnDisplayed(int columnIndex)
@@ -449,6 +450,7 @@ namespace Avalonia.Controls
             RowHeightEstimator?.OnItemsRemoved(slot, 1);
             
             RemoveElementAt(slot, item, true);
+            RequestPointerOverRefresh();
         }
 
         internal bool ScrollSlotIntoView(int slot, bool scrolledHorizontally)

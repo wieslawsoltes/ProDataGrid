@@ -704,6 +704,25 @@ namespace Avalonia.Controls
             set { SetValue(AutoScrollToSelectedItemProperty, value); }
         }
 
+        /// <summary>
+        /// Gets or sets a value indicating whether the grid should automatically expand ancestor
+        /// nodes when <see cref="SelectedItem"/> targets a collapsed hierarchical item.
+        /// </summary>
+        public static readonly StyledProperty<bool> AutoExpandSelectedItemProperty =
+            AvaloniaProperty.Register<DataGrid, bool>(
+                nameof(AutoExpandSelectedItem),
+                defaultValue: false);
+
+        /// <summary>
+        /// Gets or sets whether the grid automatically expands ancestors when <see cref="SelectedItem"/>
+        /// refers to a collapsed hierarchical item.
+        /// </summary>
+        public bool AutoExpandSelectedItem
+        {
+            get { return GetValue(AutoExpandSelectedItemProperty); }
+            set { SetValue(AutoExpandSelectedItemProperty, value); }
+        }
+
         private int _selectedIndex = -1;
         private object _selectedItem;
         private DataGridCellInfo _currentCell = DataGridCellInfo.Unset;

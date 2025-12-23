@@ -4,6 +4,7 @@
 
 #nullable disable
 
+using Avalonia;
 using Avalonia.Collections;
 using Avalonia.Controls.Primitives;
 using Avalonia.Controls.Templates;
@@ -299,6 +300,8 @@ namespace Avalonia.Controls
 
         // prevents reentry into the VerticalScroll event handler
         private int? _mouseOverRowIndex;    // -1 is used for the 'new row'
+        private Point? _lastPointerPosition;
+        private bool _pendingPointerOverRefresh;
         private double[] _rowGroupHeightsByLevel;
         private double _rowHeaderDesiredWidth;
         private Size? _rowsPresenterAvailableSize;
@@ -325,6 +328,7 @@ namespace Avalonia.Controls
         private IDataGridSelectionModelFactory _selectionModelFactory;
         private bool _autoScrollPending;
         private int _autoScrollRequestToken;
+        private bool _autoExpandingSelection;
 
         // An approximation of the sum of the heights in pixels of the scrolling rows preceding
         // the first displayed scrolling row.  Since the scrolled off rows are discarded, the grid
@@ -406,6 +410,7 @@ namespace Avalonia.Controls
             SelectedIndexProperty.Changed.AddClassHandler<DataGrid>((x, e) => x.OnSelectedIndexChanged(e));
             SelectedItemProperty.Changed.AddClassHandler<DataGrid>((x, e) => x.OnSelectedItemChanged(e));
             AutoScrollToSelectedItemProperty.Changed.AddClassHandler<DataGrid>((x, e) => x.OnAutoScrollToSelectedItemChanged(e));
+            AutoExpandSelectedItemProperty.Changed.AddClassHandler<DataGrid>((x, e) => x.OnAutoExpandSelectedItemChanged(e));
             IsEnabledProperty.Changed.AddClassHandler<DataGrid>((x, e) => x.DataGrid_IsEnabledChanged(e));
             Visual.IsVisibleProperty.Changed.AddClassHandler<DataGrid>((x, e) => x.OnIsVisibleChanged(e));
             AreRowGroupHeadersFrozenProperty.Changed.AddClassHandler<DataGrid>((x, e) => x.OnAreRowGroupHeadersFrozenChanged(e));
@@ -442,6 +447,10 @@ namespace Avalonia.Controls
             //TODO: Check if override works
             GotFocus += DataGrid_GotFocus;
             LostFocus += DataGrid_LostFocus;
+            AddHandler(InputElement.PointerMovedEvent, DataGrid_PointerActivity, RoutingStrategies.Tunnel, handledEventsToo: true);
+            AddHandler(InputElement.PointerPressedEvent, DataGrid_PointerActivity, RoutingStrategies.Tunnel, handledEventsToo: true);
+            AddHandler(InputElement.PointerReleasedEvent, DataGrid_PointerActivity, RoutingStrategies.Tunnel, handledEventsToo: true);
+            AddHandler(InputElement.PointerExitedEvent, DataGrid_PointerExited, handledEventsToo: true);
 
             _loadedRows = new List<DataGridRow>();
             _lostFocusActions = new Queue<Action>();
@@ -885,6 +894,167 @@ namespace Avalonia.Controls
                     }
                 }
             }
+        }
+
+        private void DataGrid_PointerActivity(object? sender, PointerEventArgs e)
+        {
+            _lastPointerPosition = e.GetPosition(this);
+        }
+
+        private void DataGrid_PointerExited(object? sender, PointerEventArgs e)
+        {
+            _lastPointerPosition = null;
+            RequestPointerOverRefresh();
+        }
+
+        private void RequestPointerOverRefresh()
+        {
+            if (_pendingPointerOverRefresh)
+            {
+                return;
+            }
+
+            if (_lastPointerPosition == null && _mouseOverRowIndex == null)
+            {
+                return;
+            }
+
+            _pendingPointerOverRefresh = true;
+            LayoutUpdated += DataGrid_LayoutUpdatedPointerOverRefresh;
+            Dispatcher.UIThread.Post(() =>
+            {
+                if (!_pendingPointerOverRefresh)
+                {
+                    return;
+                }
+
+                LayoutUpdated -= DataGrid_LayoutUpdatedPointerOverRefresh;
+                _pendingPointerOverRefresh = false;
+                RefreshPointerOverRow();
+            }, DispatcherPriority.Background);
+        }
+
+        private void DataGrid_LayoutUpdatedPointerOverRefresh(object? sender, EventArgs e)
+        {
+            LayoutUpdated -= DataGrid_LayoutUpdatedPointerOverRefresh;
+            if (!_pendingPointerOverRefresh)
+            {
+                return;
+            }
+
+            _pendingPointerOverRefresh = false;
+            RefreshPointerOverRow();
+        }
+
+        private void RefreshPointerOverRow()
+        {
+            int? newRowIndex = null;
+            if (IsPointerOverSelfOrDescendant() && _lastPointerPosition != null)
+            {
+                if (TryGetRowFromPoint(_lastPointerPosition.Value, out var row))
+                {
+                    newRowIndex = row.Index;
+                }
+            }
+
+            if (_mouseOverRowIndex != newRowIndex)
+            {
+                MouseOverRowIndex = newRowIndex;
+            }
+
+            RefreshPointerOverRowStates();
+        }
+
+        private bool IsPointerOverSelfOrDescendant()
+        {
+            if (IsPointerOver)
+            {
+                return true;
+            }
+
+            if (VisualRoot is IInputRoot inputRoot && inputRoot.PointerOverElement is Visual visual)
+            {
+                if (visual.VisualRoot != null)
+                {
+                    for (var current = visual; current != null; current = current.VisualParent)
+                    {
+                        if (ReferenceEquals(current, this))
+                        {
+                            return true;
+                        }
+                    }
+
+                    return false;
+                }
+            }
+
+            return _lastPointerPosition != null && Bounds.Contains(_lastPointerPosition.Value);
+        }
+
+        private void RefreshPointerOverRowStates()
+        {
+            if (_rowsPresenter == null)
+            {
+                return;
+            }
+
+            foreach (var row in _rowsPresenter.Children.OfType<DataGridRow>())
+            {
+                row.ApplyState();
+            }
+        }
+
+        private bool TryGetRowFromPoint(Point point, out DataGridRow? row)
+        {
+            row = null;
+
+            var visual = this.GetVisualAt(point);
+            if (visual is Visual hit)
+            {
+                row = hit.GetSelfAndVisualAncestors()
+                    .OfType<DataGridRow>()
+                    .FirstOrDefault(r => r.OwningGrid == this && r.IsVisible);
+
+                if (row != null)
+                {
+                    var rowOrigin = row.TranslatePoint(new Point(0, 0), this);
+                    if (rowOrigin == null ||
+                        !new Rect(rowOrigin.Value, row.Bounds.Size).Contains(point))
+                    {
+                        row = null;
+                    }
+                }
+            }
+
+            if (row == null && _rowsPresenter != null)
+            {
+                var presenterPoint = this.TranslatePoint(point, _rowsPresenter) ?? point;
+                foreach (var candidate in _rowsPresenter.Children.OfType<DataGridRow>())
+                {
+                    if (!candidate.IsVisible)
+                    {
+                        continue;
+                    }
+
+                    if (!candidate.Bounds.Contains(presenterPoint))
+                    {
+                        continue;
+                    }
+
+                    row = candidate;
+                    break;
+                }
+            }
+
+            if (row == null ||
+                row.Index < 0 ||
+                ReferenceEquals(row.DataContext, DataGridCollectionView.NewItemPlaceholder))
+            {
+                row = null;
+                return false;
+            }
+
+            return true;
         }
 
         private DataGridRow GetDisplayedRowForIndex(int rowIndex)
@@ -2026,6 +2196,11 @@ namespace Avalonia.Controls
                 : item;
         }
 
+        private object? ProjectSelectionItem(object? item)
+        {
+            return _hierarchicalRowsEnabled ? ProjectHierarchicalSelectionItem(item) : item;
+        }
+
         private int ResolveHierarchicalIndex(object? item)
         {
             if (item == null || _hierarchicalModel == null)
@@ -2033,7 +2208,22 @@ namespace Avalonia.Controls
                 return -1;
             }
 
+            if (item is Avalonia.Controls.DataGridHierarchical.HierarchicalNode node)
+            {
+                return _hierarchicalModel.IndexOf(node);
+            }
+
             return _hierarchicalModel.IndexOf(item);
+        }
+
+        private int ResolveSelectionIndex(object? item)
+        {
+            if (item == null)
+            {
+                return -1;
+            }
+
+            return GetSelectionModelIndexOfItem(item);
         }
 
         private void UpdateSortingAdapterView()
@@ -2792,7 +2982,7 @@ namespace Avalonia.Controls
         /// <param name="model">The selection model instance to adapt.</param>
         protected virtual DataGridSelectionModelAdapter CreateSelectionModelAdapter(ISelectionModel model)
         {
-            return new DataGridSelectionModelAdapter(model);
+            return new DataGridSelectionModelAdapter(model, ProjectSelectionItem, ResolveSelectionIndex);
         }
 
         /// <summary>
@@ -2870,12 +3060,51 @@ namespace Avalonia.Controls
                 return -1;
             }
 
+            if (_hierarchicalRowsEnabled && _hierarchicalModel != null &&
+                item is not Avalonia.Controls.DataGridHierarchical.HierarchicalNode)
+            {
+                var hierarchicalIndex = _hierarchicalModel.IndexOf(item);
+                if (hierarchicalIndex >= 0)
+                {
+                    return hierarchicalIndex;
+                }
+            }
+
             if (DataConnection.CollectionView is DataGridCollectionView paged && paged.PageSize > 0)
             {
                 return paged.GetGlobalIndexOf(item);
             }
 
             return DataConnection.IndexOf(item);
+        }
+
+        private bool TryGetRowIndexFromItem(object? item, out int rowIndex)
+        {
+            rowIndex = -1;
+            if (item == null || DataConnection == null)
+            {
+                return false;
+            }
+
+            rowIndex = DataConnection.IndexOf(item);
+            if (rowIndex >= 0)
+            {
+                return true;
+            }
+
+            if (_hierarchicalRowsEnabled && _hierarchicalModel != null)
+            {
+                if (item is Avalonia.Controls.DataGridHierarchical.HierarchicalNode node)
+                {
+                    rowIndex = DataConnection.IndexOf(node);
+                }
+                else if (_hierarchicalModel.FindNode(item) is { } resolvedNode)
+                {
+                    rowIndex = DataConnection.IndexOf(resolvedNode);
+                }
+            }
+
+            return rowIndex >= 0;
         }
 
         private int GetSelectionIndexFromRowIndex(int rowIndex)
@@ -3109,7 +3338,15 @@ namespace Avalonia.Controls
 
             private void InnerSelectionChanged(object? sender, SelectionModelSelectionChangedEventArgs e)
             {
-                _selectionChanged?.Invoke(this, e);
+                if (_selectionChanged != null)
+                {
+                    var projected = new SelectionModelSelectionChangedEventArgs<object>(
+                        e.DeselectedIndexes,
+                        e.SelectedIndexes,
+                        ProjectSelectionItems(e.DeselectedItems),
+                        ProjectSelectionItems(e.SelectedItems));
+                    _selectionChanged.Invoke(this, projected);
+                }
                 _lastSelectionEmpty = _inner.SelectedIndexes.Count == 0;
             }
 
@@ -3133,6 +3370,13 @@ namespace Avalonia.Controls
             private void InnerPropertyChanged(object? sender, PropertyChangedEventArgs e)
             {
                 _propertyChanged?.Invoke(this, e);
+            }
+
+            private IReadOnlyList<object?> ProjectSelectionItems(IReadOnlyList<object?> items)
+            {
+                return items.Count == 0
+                    ? Array.Empty<object?>()
+                    : new ProjectedReadOnlyList(items, _itemSelector);
             }
 
             private sealed class ProjectedReadOnlyList : IReadOnlyList<object?>

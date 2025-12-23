@@ -157,6 +157,7 @@ namespace Avalonia.Controls
                 PseudoClassesHelper.Set(PseudoClasses, ":editing", IsEditing);
                 PseudoClassesHelper.Set(PseudoClasses, ":invalid", !IsValid);
                 UpdateCurrentPseudoClass();
+                PseudoClassesHelper.Set(PseudoClasses, ":pointerover", IsMouseOver);
                 ApplyHeaderStatus();
             }
         }
@@ -207,6 +208,7 @@ namespace Avalonia.Controls
 
             Slot = -1;
             UpdateCurrentPseudoClass();
+            PseudoClassesHelper.Set(PseudoClasses, ":pointerover", false);
             ClearDragDropState();
         }
 

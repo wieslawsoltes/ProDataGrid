@@ -1457,7 +1457,7 @@ namespace Avalonia.Controls
                 object preferredItem = DataConnection.GetDataItem(_preferredSelectionIndex);
                 if (preferredItem != null)
                 {
-                    SetValueNoCallback(SelectedItemProperty, preferredItem);
+                    SetValueNoCallback(SelectedItemProperty, ProjectSelectionItem(preferredItem));
                     SetValueNoCallback(SelectedIndexProperty, _preferredSelectionIndex);
                     _preferredSelectionIndex = -1;
                     return;
@@ -1481,7 +1481,7 @@ namespace Avalonia.Controls
                 selectedItem = _selectedItems[0];
             }
 
-            SetValueNoCallback(SelectedItemProperty, selectedItem);
+            SetValueNoCallback(SelectedItemProperty, ProjectSelectionItem(selectedItem));
 
             // Update the SelectedIndex
             int newIndex = -1;
@@ -1578,8 +1578,9 @@ namespace Avalonia.Controls
                 // against Count here to avoid enumerating through an Enumerable twice
                 // Setting SelectedItem coerces the finally value of the SelectedIndex
                 object newSelectedItem = (index < 0) ? null : DataConnection.GetDataItem(index);
-                SelectedItem = newSelectedItem;
-                if (SelectedItem != newSelectedItem)
+                var projectedItem = ProjectSelectionItem(newSelectedItem);
+                SelectedItem = projectedItem;
+                if (!Equals(SelectedItem, projectedItem))
                 {
                     SetValueNoCallback(SelectedIndexProperty, (int)e.OldValue);
                 }
@@ -1591,14 +1592,28 @@ namespace Avalonia.Controls
             if (!_areHandlersSuspended)
             {
                 using var _ = BeginSelectionChangeScope(DataGridSelectionChangeSource.Programmatic);
-                int selectionIndex = (e.NewValue == null) ? -1 : GetSelectionModelIndexOfItem(e.NewValue);
+                var normalizedItem = ProjectSelectionItem(e.NewValue);
+                var normalizedOld = ProjectSelectionItem(e.OldValue);
+                if (!Equals(normalizedItem, e.NewValue))
+                {
+                    SetValueNoCallback(SelectedItemProperty, normalizedItem);
+                }
+
+                int selectionIndex = (normalizedItem == null) ? -1 : GetSelectionModelIndexOfItem(normalizedItem);
+                if (selectionIndex == -1 && normalizedItem != null)
+                {
+                    if (TryAutoExpandSelectionItem(normalizedItem))
+                    {
+                        selectionIndex = GetSelectionModelIndexOfItem(normalizedItem);
+                    }
+                }
                 if (selectionIndex == -1)
                 {
                     // If the Item is null or it's not found, clear the Selection
                     if (!CommitEdit(DataGridEditingUnit.Row, exitEditingMode: true))
                     {
                         // Edited value couldn't be committed or aborted
-                        SetValueNoCallback(SelectedItemProperty, e.OldValue);
+                        SetValueNoCallback(SelectedItemProperty, normalizedOld);
                         return;
                     }
 
@@ -1624,7 +1639,7 @@ namespace Avalonia.Controls
                         if (!CommitEdit(DataGridEditingUnit.Row, exitEditingMode: true))
                         {
                             // Edited value couldn't be committed or aborted
-                            SetValueNoCallback(SelectedItemProperty, e.OldValue);
+                            SetValueNoCallback(SelectedItemProperty, normalizedOld);
                             return;
                         }
                         if (slot >= SlotCount || slot < -1)
@@ -1664,7 +1679,7 @@ namespace Avalonia.Controls
                     if (!_successfullyUpdatedSelection)
                     {
                         SetValueNoCallback(SelectedIndexProperty, oldSelectedIndex);
-                        SetValueNoCallback(SelectedItemProperty, e.OldValue);
+                        SetValueNoCallback(SelectedItemProperty, normalizedOld);
                     }
                     else
                     {
@@ -1672,6 +1687,57 @@ namespace Avalonia.Controls
                     }
                 }
             }
+        }
+
+        private bool TryAutoExpandSelectionItem(object item)
+        {
+            if (!AutoExpandSelectedItem || !_hierarchicalRowsEnabled || _hierarchicalModel == null)
+            {
+                return false;
+            }
+
+            if (_autoExpandingSelection)
+            {
+                return false;
+            }
+
+            if (IsHierarchicalItemVisible(item))
+            {
+                return false;
+            }
+
+            if (_hierarchicalModel is Avalonia.Controls.DataGridHierarchical.IHierarchicalModelExpander expander)
+            {
+                _autoExpandingSelection = true;
+                try
+                {
+                    return expander.TryExpandToItem(item, out _);
+                }
+                finally
+                {
+                    _autoExpandingSelection = false;
+                }
+            }
+
+            return false;
+        }
+
+        private bool IsHierarchicalItemVisible(object item)
+        {
+            if (_hierarchicalModel == null)
+            {
+                return false;
+            }
+
+            foreach (var node in _hierarchicalModel.Flattened)
+            {
+                if (ReferenceEquals(node, item) || ReferenceEquals(node.Item, item))
+                {
+                    return true;
+                }
+            }
+
+            return false;
         }
 
         private void OnSelectionModeChanged(AvaloniaPropertyChangedEventArgs e)
@@ -1723,6 +1789,25 @@ namespace Avalonia.Controls
             else
             {
                 _autoScrollPending = false;
+            }
+        }
+
+        private void OnAutoExpandSelectedItemChanged(AvaloniaPropertyChangedEventArgs e)
+        {
+            if (_areHandlersSuspended)
+            {
+                return;
+            }
+
+            if (!AutoExpandSelectedItem)
+            {
+                return;
+            }
+
+            var current = ProjectSelectionItem(SelectedItem);
+            if (current != null)
+            {
+                TryAutoExpandSelectionItem(current);
             }
         }
 
@@ -1812,7 +1897,7 @@ namespace Avalonia.Controls
                 item = SelectedItem;
             }
 
-            if (item == null || DataConnection == null || DataConnection.IndexOf(item) == -1)
+            if (item == null || DataConnection == null || !TryGetRowIndexFromItem(item, out _))
             {
                 return false;
             }

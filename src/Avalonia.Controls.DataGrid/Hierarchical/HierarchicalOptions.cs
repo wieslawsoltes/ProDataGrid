@@ -10,6 +10,27 @@ using System.Threading.Tasks;
 namespace Avalonia.Controls.DataGridHierarchical
 {
     /// <summary>
+    /// Defines how expanded nodes are matched when restoring expansion state.
+    /// </summary>
+    public enum ExpandedStateKeyMode
+    {
+        /// <summary>
+        /// Uses the item instance (or its equality semantics) as the key.
+        /// </summary>
+        Item,
+
+        /// <summary>
+        /// Uses the index path from the root to the node as the key.
+        /// </summary>
+        Path,
+
+        /// <summary>
+        /// Uses <see cref="HierarchicalOptions.ExpandedStateKeySelector"/> as the key source.
+        /// </summary>
+        Custom
+    }
+
+    /// <summary>
     /// Options controlling hierarchical data resolution and behavior.
     /// </summary>
     public class HierarchicalOptions
@@ -77,5 +98,29 @@ namespace Avalonia.Controls.DataGridHierarchical
         /// Default is false to keep grouping separate.
         /// </summary>
         public bool TreatGroupsAsNodes { get; set; }
+
+        /// <summary>
+        /// Controls how expanded nodes are matched when restoring expansion state.
+        /// </summary>
+        public ExpandedStateKeyMode ExpandedStateKeyMode { get; set; } = ExpandedStateKeyMode.Item;
+
+        /// <summary>
+        /// Optional selector used when <see cref="ExpandedStateKeyMode"/> is set to <see cref="ExpandedStateKeyMode.Custom"/>.
+        /// Return a stable, unique identifier for each item to preserve expansion state across rebuilds.
+        /// </summary>
+        public Func<object, object?>? ExpandedStateKeySelector { get; set; }
+
+        /// <summary>
+        /// Optional selector that returns the index path to an item from the root items collection.
+        /// For single-root models, the root item is index 0 in the path.
+        /// Use this to expand to a selected item without searching the entire hierarchy.
+        /// </summary>
+        public Func<object, IReadOnlyList<int>?>? ItemPathSelector { get; set; }
+
+        /// <summary>
+        /// When true, allows full hierarchy traversal to locate an item when expanding to selection.
+        /// Use with care on large or virtualized trees.
+        /// </summary>
+        public bool AllowExpandToItemSearch { get; set; }
     }
 }

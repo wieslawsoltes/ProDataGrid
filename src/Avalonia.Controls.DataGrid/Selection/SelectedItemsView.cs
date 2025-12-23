@@ -18,12 +18,24 @@ namespace Avalonia.Controls.DataGridSelection
     {
         private readonly ISelectionModel _model;
         private readonly List<object> _pending = new();
+        private readonly Func<object?, object?> _itemSelector;
+        private readonly Func<object?, int>? _indexResolver;
         private int _suppressNotifications;
         private bool _isDisposed;
 
         public SelectedItemsView(ISelectionModel model)
+            : this(model, null, null)
+        {
+        }
+
+        public SelectedItemsView(
+            ISelectionModel model,
+            Func<object?, object?>? itemSelector,
+            Func<object?, int>? indexResolver)
         {
             _model = model ?? throw new ArgumentNullException(nameof(model));
+            _itemSelector = itemSelector ?? (item => item);
+            _indexResolver = indexResolver;
             _model.SelectionChanged += OnSelectionChanged;
             _model.SourceReset += OnSourceReset;
             _model.PropertyChanged += OnModelPropertyChanged;
@@ -44,7 +56,7 @@ namespace Avalonia.Controls.DataGridSelection
                         throw new ArgumentOutOfRangeException(nameof(index));
                     }
 
-                    return _pending[index];
+                    return ProjectItem(_pending[index]);
                 }
 
                 var items = _model.SelectedItems;
@@ -52,7 +64,7 @@ namespace Avalonia.Controls.DataGridSelection
                 {
                     throw new ArgumentOutOfRangeException(nameof(index));
                 }
-                return items[index];
+                return ProjectItem(items[index]);
             }
             set => throw new NotSupportedException();
         }
@@ -120,7 +132,14 @@ namespace Avalonia.Controls.DataGridSelection
         {
             if (!HasSource)
             {
-                return _pending.Contains(value);
+                for (int i = 0; i < _pending.Count; i++)
+                {
+                    if (Equals(ProjectItem(_pending[i]), value))
+                    {
+                        return true;
+                    }
+                }
+                return false;
             }
 
             return IndexOf(value) != -1;
@@ -130,13 +149,20 @@ namespace Avalonia.Controls.DataGridSelection
         {
             if (!HasSource)
             {
-                return _pending.IndexOf(value);
+                for (int i = 0; i < _pending.Count; i++)
+                {
+                    if (Equals(ProjectItem(_pending[i]), value))
+                    {
+                        return i;
+                    }
+                }
+                return -1;
             }
 
             var items = _model.SelectedItems;
             for (int i = 0; i < items.Count; i++)
             {
-                if (Equals(items[i], value))
+                if (Equals(ProjectItem(items[i]), value))
                 {
                     return i;
                 }
@@ -207,7 +233,7 @@ namespace Avalonia.Controls.DataGridSelection
 
         public IEnumerator GetEnumerator()
         {
-            return HasSource ? _model.SelectedItems.GetEnumerator() : _pending.GetEnumerator();
+            return HasSource ? ProjectItems(_model.SelectedItems).GetEnumerator() : ProjectItems(_pending).GetEnumerator();
         }
 
         public IDisposable SuppressNotifications()
@@ -218,6 +244,17 @@ namespace Avalonia.Controls.DataGridSelection
 
         private int ResolveIndex(object value)
         {
+            if (_indexResolver != null)
+            {
+                var resolved = _indexResolver(value);
+                if (resolved >= 0)
+                {
+                    return resolved;
+                }
+
+                throw new ArgumentException("Item not found in selection model source.", nameof(value));
+            }
+
             if (_model.Source is IList list)
             {
                 return list.IndexOf(value);
@@ -239,6 +276,16 @@ namespace Avalonia.Controls.DataGridSelection
             throw new ArgumentException("Item not found in selection model source.", nameof(value));
         }
 
+        private object? ProjectItem(object? item) => _itemSelector(item);
+
+        private IEnumerable<object?> ProjectItems(IEnumerable? items)
+        {
+            foreach (var item in SafeEnumerate(items))
+            {
+                yield return ProjectItem(item);
+            }
+        }
+
         private void OnSelectionChanged(object sender, SelectionModelSelectionChangedEventArgs e)
         {
             if (_suppressNotifications > 0)
@@ -246,7 +293,7 @@ namespace Avalonia.Controls.DataGridSelection
                 return;
             }
 
-            RaiseDiff(SafeEnumerate(e.SelectedItems), SafeEnumerate(e.DeselectedItems));
+            RaiseDiff(ProjectItems(e.SelectedItems), ProjectItems(e.DeselectedItems));
         }
 
         private void OnModelPropertyChanged(object sender, PropertyChangedEventArgs e)

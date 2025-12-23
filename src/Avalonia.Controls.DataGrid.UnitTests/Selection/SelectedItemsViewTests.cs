@@ -1,6 +1,7 @@
 // Copyright (c) Wiesław Šoltés. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for details.
 
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Collections.Specialized;
@@ -124,6 +125,70 @@ public class SelectedItemsViewTests
 
         Assert.Equal("B", model.SelectedItem);
         Assert.Equal(new[] { 2 }, model.SelectedIndexes.ToArray());
+    }
+
+    [Fact]
+    public void SelectedItemsView_Projects_Items_Using_Selector()
+    {
+        var nodes = new[]
+        {
+            new Node("a"),
+            new Node("b")
+        };
+
+        var model = new SelectionModel<Node>
+        {
+            SingleSelect = false,
+            Source = nodes
+        };
+
+        var view = new SelectedItemsView(
+            model,
+            item => item is Node node ? node.Value : item,
+            null);
+
+        model.Select(1);
+
+        Assert.Equal("b", view[0]);
+        Assert.Contains("b", view.Cast<string>());
+    }
+
+    [Fact]
+    public void SelectedItemsView_Uses_IndexResolver_For_Add_And_Remove()
+    {
+        var nodes = new[]
+        {
+            new Node("a"),
+            new Node("b"),
+            new Node("c")
+        };
+
+        var model = new SelectionModel<Node>
+        {
+            SingleSelect = false,
+            Source = nodes
+        };
+
+        var view = new SelectedItemsView(
+            model,
+            item => item is Node node ? node.Value : item,
+            value => Array.FindIndex(nodes, node => Equals(node.Value, value)));
+
+        view.Add("c");
+        Assert.True(model.IsSelected(2));
+
+        view.Remove("c");
+        Assert.False(model.IsSelected(2));
+    }
+
+    private sealed class Node
+    {
+        public Node(string value)
+        {
+            Value = value;
+        }
+
+        public string Value { get; }
     }
 
 }
