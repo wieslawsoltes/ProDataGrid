@@ -95,7 +95,9 @@ namespace Avalonia.Controls
         {
             base.OnPropertyChanged(change);
 
-            if (change.Property == LevelProperty || change.Property == IndentProperty)
+            if (change.Property == LevelProperty ||
+                change.Property == IndentProperty ||
+                change.Property == StyledElement.DataContextProperty)
             {
                 UpdateIndentPadding();
             }

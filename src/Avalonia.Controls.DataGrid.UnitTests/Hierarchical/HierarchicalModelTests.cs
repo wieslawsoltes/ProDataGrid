@@ -1550,6 +1550,43 @@ namespace Avalonia.Controls.DataGridTests.Hierarchical;
     }
 
     [Fact]
+    public void Reparenting_Keeps_Node_Levels_Consistent()
+    {
+        var root1 = new Item("Root1");
+        var root2 = new Item("Root2");
+        var child = new Item("Child");
+        var grandchild = new Item("Grandchild");
+        child.Children.Add(grandchild);
+        root1.Children.Add(child);
+
+        var items = new ObservableCollection<Item> { root1, root2 };
+
+        var model = CreateModel();
+        model.SetRoots(items);
+        model.ExpandAll();
+
+        Assert.Equal(1, model.FindNode(child)!.Level);
+        Assert.Equal(2, model.FindNode(grandchild)!.Level);
+
+        for (var i = 0; i < 3; i++)
+        {
+            root1.Children.Remove(child);
+            root2.Children.Add(child);
+            model.ExpandAll();
+
+            Assert.Equal(1, model.FindNode(child)!.Level);
+            Assert.Equal(2, model.FindNode(grandchild)!.Level);
+
+            root2.Children.Remove(child);
+            root1.Children.Add(child);
+            model.ExpandAll();
+
+            Assert.Equal(1, model.FindNode(child)!.Level);
+            Assert.Equal(2, model.FindNode(grandchild)!.Level);
+        }
+    }
+
+    [Fact]
     public void SetRoots_TypedModel_WorksCorrectly()
     {
         var items = new ObservableCollection<Item>

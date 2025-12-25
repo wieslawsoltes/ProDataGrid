@@ -173,6 +173,9 @@
     <TabItem Header="Hierarchical Model">
       <pages:HierarchicalSamplePage />
     </TabItem>
+    <TabItem Header="Hierarchical Undo/Redo">
+      <pages:HierarchicalUndoRedoPage />
+    </TabItem>
     <TabItem Header="Hierarchical Expanded State">
       <pages:HierarchicalExpandedStatePage />
     </TabItem>

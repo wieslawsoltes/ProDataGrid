@@ -262,6 +262,88 @@ public class HierarchicalHeadlessTests
         }
     }
 
+    [AvaloniaFact]
+    public void Reparenting_Recycles_Rows_And_Reapplies_Indentation()
+    {
+        var roots = new ObservableCollection<Item>
+        {
+            CreateTree("RootA", childCount: 24, grandchildCount: 2),
+            CreateTree("RootB", childCount: 24, grandchildCount: 2)
+        };
+
+        var model = new HierarchicalModel(new HierarchicalOptions
+        {
+            ChildrenSelector = o => ((Item)o).Children,
+            AutoExpandRoot = true,
+            VirtualizeChildren = false
+        });
+        model.SetRoots(roots);
+        model.ExpandAll();
+
+        var window = new Window
+        {
+            Width = 420,
+            Height = 220
+        };
+
+        window.SetThemeStyles();
+
+        const double indent = 14;
+
+        var grid = new DataGrid
+        {
+            HierarchicalModel = model,
+            HierarchicalRowsEnabled = true,
+            AutoGenerateColumns = false,
+            HeadersVisibility = DataGridHeadersVisibility.None,
+            RowHeight = 28
+        };
+
+        grid.ColumnsInternal.Add(new DataGridHierarchicalColumn
+        {
+            Header = "Name",
+            Binding = new Avalonia.Data.Binding("Item.Name"),
+            Indent = indent
+        });
+
+        window.Content = grid;
+        window.Show();
+        PumpLayout(grid);
+
+        var initialRows = GetVisibleRows(grid);
+        var initialContexts = initialRows.ToDictionary(row => row, row => row.DataContext);
+
+        var sourceChild = roots[0].Children[0];
+        var movedItem = sourceChild.Children[0];
+
+        sourceChild.Children.Remove(movedItem);
+        roots[1].Children.Add(movedItem);
+
+        model.ExpandAll();
+        PumpLayout(grid);
+
+        var lastNode = model.GetNode(model.Count - 1);
+        grid.ScrollIntoView(lastNode, grid.ColumnsInternal[0]);
+        PumpLayout(grid);
+
+        var recycled = GetVisibleRows(grid).Any(row =>
+            initialContexts.TryGetValue(row, out var oldContext) &&
+            oldContext != null &&
+            !ReferenceEquals(oldContext, row.DataContext));
+
+        Assert.True(recycled);
+
+        var movedNode = model.FindNode(movedItem);
+        Assert.NotNull(movedNode);
+
+        grid.ScrollIntoView(movedNode!, grid.ColumnsInternal[0]);
+        PumpLayout(grid);
+
+        AssertVisibleRowsHaveCorrectIndent(grid, indent);
+
+        window.Close();
+    }
+
     private static void RunSortScenario(string sortMemberPath)
     {
         var root = new Item("root");
@@ -369,6 +451,62 @@ public class HierarchicalHeadlessTests
                 Assert.Same(model.GetNode(row.Index), node);
             }
         }
+    }
+
+    private static void PumpLayout(DataGrid grid)
+    {
+        Dispatcher.UIThread.RunJobs();
+        grid.UpdateLayout();
+        Dispatcher.UIThread.RunJobs();
+    }
+
+    private static IReadOnlyList<DataGridRow> GetVisibleRows(DataGrid grid)
+    {
+        return grid.GetSelfAndVisualDescendants()
+            .OfType<DataGridRow>()
+            .Where(row => row.IsVisible)
+            .ToList();
+    }
+
+    private static void AssertVisibleRowsHaveCorrectIndent(DataGrid grid, double indent)
+    {
+        foreach (var row in GetVisibleRows(grid))
+        {
+            var node = Assert.IsType<HierarchicalNode>(row.DataContext);
+            var presenter = GetHierarchicalPresenter(row);
+            Assert.Equal(new Thickness(node.Level * indent, 0, 0, 0), presenter.Padding);
+        }
+    }
+
+    private static DataGridHierarchicalPresenter GetHierarchicalPresenter(DataGridRow row)
+    {
+        if (row.Cells.Count > 0 && row.Cells[0].Content is DataGridHierarchicalPresenter presenter)
+        {
+            return presenter;
+        }
+
+        presenter = row.GetVisualDescendants()
+            .OfType<DataGridHierarchicalPresenter>()
+            .FirstOrDefault();
+
+        Assert.NotNull(presenter);
+        return presenter!;
+    }
+
+    private static Item CreateTree(string name, int childCount, int grandchildCount)
+    {
+        var root = new Item(name);
+        for (int i = 0; i < childCount; i++)
+        {
+            var child = new Item($"{name} {i + 1}");
+            for (int j = 0; j < grandchildCount; j++)
+            {
+                child.Children.Add(new Item($"{name} {i + 1}.{j + 1}"));
+            }
+            root.Children.Add(child);
+        }
+
+        return root;
     }
 
     private static void ClickHeader(DataGrid grid, string header, KeyModifiers modifiers = KeyModifiers.None)

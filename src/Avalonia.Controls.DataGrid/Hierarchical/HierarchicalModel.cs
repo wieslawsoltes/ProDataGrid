@@ -888,63 +888,72 @@ namespace Avalonia.Controls.DataGridHierarchical
                 throw new ArgumentNullException(nameof(node));
             }
 
-            var parentIndex = _flattened.IndexOf(node);
-            var hasVisibleDescendants = parentIndex >= 0 && CountVisibleDescendantsInFlattened(node, parentIndex) > 0;
-
-            if (node.IsExpanded && node.LoadError == null)
-            {
-                if (node.IsLeaf || parentIndex < 0)
-                {
-                    return;
-                }
-
-                if (node.HasMaterializedChildren && hasVisibleDescendants)
-                {
-                    return;
-                }
-            }
-
-            var wasExpanded = node.IsExpanded;
-            if (!wasExpanded)
-            {
-                SetNodeExpandedState(node, true); // gate concurrent expand attempts
-            }
-
+            var loadState = GetLoadState(node);
+            await loadState.ExpandGate.WaitAsync(cancellationToken).ConfigureAwait(false);
             try
             {
-                await EnsureChildrenMaterializedAsync(node, forceReload: false, cancellationToken).ConfigureAwait(false);
-            }
-            catch
-            {
-                SetNodeExpandedState(node, wasExpanded);
-                throw;
-            }
+                var parentIndex = _flattened.IndexOf(node);
+                var hasVisibleDescendants = parentIndex >= 0 && CountVisibleDescendantsInFlattened(node, parentIndex) > 0;
 
-            if (node.LoadError != null || !node.HasMaterializedChildren)
-            {
-                SetNodeExpandedState(node, wasExpanded);
-                return;
-            }
-
-            parentIndex = _flattened.IndexOf(node);
-            var inserted = 0;
-
-            if (parentIndex >= 0 && !node.IsLeaf)
-            {
-                var hasVisible = CountVisibleDescendantsInFlattened(node, parentIndex) > 0;
-                if (!wasExpanded || !hasVisible)
+                if (node.IsExpanded && node.LoadError == null)
                 {
-                    inserted = InsertVisibleChildren(node, parentIndex + 1);
-                    if (inserted > 0)
+                    if (node.IsLeaf || parentIndex < 0)
                     {
-                        OnFlattenedChanged(new[] { new FlattenedChange(parentIndex + 1, 0, inserted) });
+                        return;
+                    }
+
+                    if (node.HasMaterializedChildren && hasVisibleDescendants)
+                    {
+                        return;
                     }
                 }
-            }
 
-            SetNodeExpandedState(node, true);
-            RecalculateExpandedCountsFrom(node);
-            OnNodeExpanded(node);
+                var wasExpanded = node.IsExpanded;
+                if (!wasExpanded)
+                {
+                    SetNodeExpandedState(node, true); // gate concurrent expand attempts
+                }
+
+                try
+                {
+                    await EnsureChildrenMaterializedAsync(node, forceReload: false, cancellationToken).ConfigureAwait(false);
+                }
+                catch
+                {
+                    SetNodeExpandedState(node, wasExpanded);
+                    throw;
+                }
+
+                if (node.LoadError != null || !node.HasMaterializedChildren)
+                {
+                    SetNodeExpandedState(node, wasExpanded);
+                    return;
+                }
+
+                parentIndex = _flattened.IndexOf(node);
+                var inserted = 0;
+
+                if (parentIndex >= 0 && !node.IsLeaf)
+                {
+                    var hasVisible = CountVisibleDescendantsInFlattened(node, parentIndex) > 0;
+                    if (!hasVisible)
+                    {
+                        inserted = InsertVisibleChildren(node, parentIndex + 1);
+                        if (inserted > 0)
+                        {
+                            OnFlattenedChanged(new[] { new FlattenedChange(parentIndex + 1, 0, inserted) });
+                        }
+                    }
+                }
+
+                SetNodeExpandedState(node, true);
+                RecalculateExpandedCountsFrom(node);
+                OnNodeExpanded(node);
+            }
+            finally
+            {
+                loadState.ExpandGate.Release();
+            }
         }
 
         public void Collapse(HierarchicalNode node)
@@ -2935,6 +2944,8 @@ namespace Avalonia.Controls.DataGridHierarchical
 
         private sealed class NodeLoadState
         {
+            public SemaphoreSlim ExpandGate { get; } = new SemaphoreSlim(1, 1);
+
             public CancellationTokenSource? Cancellation { get; set; }
 
             public Task<IReadOnlyList<HierarchicalNode>>? Task { get; set; }

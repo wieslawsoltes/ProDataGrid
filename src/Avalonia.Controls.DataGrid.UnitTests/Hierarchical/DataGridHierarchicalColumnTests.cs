@@ -4,8 +4,10 @@
 using System.Linq;
 using Avalonia;
 using Avalonia.Controls;
+using Avalonia.Controls.DataGridHierarchical;
 using Avalonia.Controls.Primitives;
 using Avalonia.Controls.Templates;
+using Avalonia.Data;
 using Avalonia.Interactivity;
 using Avalonia.Input;
 using Avalonia.Headless.XUnit;
@@ -29,6 +31,28 @@ public class DataGridHierarchicalColumnTests
         presenter.Indent = 10;
 
         Assert.Equal(new Thickness(20, 0, 0, 0), presenter.Padding);
+    }
+
+    [AvaloniaFact]
+    public void Presenter_Reapplies_Padding_On_DataContext_Change()
+    {
+        var presenter = new DataGridHierarchicalPresenter
+        {
+            Indent = 8
+        };
+
+        presenter.Bind(DataGridHierarchicalPresenter.LevelProperty, new Binding(nameof(HierarchicalNode.Level)));
+
+        var nodeA = new HierarchicalNode(new object(), level: 1);
+        var nodeB = new HierarchicalNode(new object(), level: 1);
+
+        presenter.DataContext = nodeA;
+        Assert.Equal(new Thickness(8, 0, 0, 0), presenter.Padding);
+
+        presenter.Padding = new Thickness(123, 0, 0, 0);
+        presenter.DataContext = nodeB;
+
+        Assert.Equal(new Thickness(8, 0, 0, 0), presenter.Padding);
     }
 
     [AvaloniaFact]
