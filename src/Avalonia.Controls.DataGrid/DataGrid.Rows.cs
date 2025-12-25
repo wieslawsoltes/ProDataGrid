@@ -366,6 +366,26 @@ namespace Avalonia.Controls
             }
 
             _scrollStateManager.TryRestore();
+
+            SyncLogicalScrollableOffset();
+        }
+
+        private void SyncLogicalScrollableOffset()
+        {
+            if (!UseLogicalScrollable || _rowsPresenter == null)
+            {
+                return;
+            }
+
+            var targetVerticalOffset = GetVerticalOffset();
+            if (MathUtilities.AreClose(_rowsPresenter.Offset.X, HorizontalOffset) &&
+                MathUtilities.AreClose(_rowsPresenter.Offset.Y, targetVerticalOffset))
+            {
+                return;
+            }
+
+            _rowsPresenter.SyncOffset(HorizontalOffset, targetVerticalOffset);
+            _rowsPresenter.RaiseScrollInvalidated(EventArgs.Empty);
         }
 
         internal void RefreshRows(bool recycleRows, bool clearRows)
@@ -376,7 +396,16 @@ namespace Avalonia.Controls
                 // column position back to what it was before the refresh
                 _desiredCurrentColumnIndex = CurrentColumnIndex;
                 double verticalOffset = _verticalOffset;
-                if (DisplayData.PendingVerticalScrollHeight > 0)
+                if (UseLogicalScrollable && _rowsPresenter != null)
+                {
+                    verticalOffset = _rowsPresenter.Offset.Y;
+                }
+                if (_pendingHierarchicalScrollOffset.HasValue)
+                {
+                    verticalOffset = _pendingHierarchicalScrollOffset.Value;
+                    _pendingHierarchicalScrollOffset = null;
+                }
+                else if (DisplayData.PendingVerticalScrollHeight > 0)
                 {
                     // Use the pending vertical scrollbar position if there is one, in the case that the collection
                     // has been reset multiple times in a row.
@@ -429,6 +458,10 @@ namespace Avalonia.Controls
                 else if (_scrollStateManager.PendingRestore)
                 {
                     DisplayData.PendingVerticalScrollHeight = 0;
+                }
+                else if (UseLogicalScrollable)
+                {
+                    DisplayData.PendingVerticalScrollHeight = Math.Max(0, verticalOffset);
                 }
             }
             else

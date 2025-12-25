@@ -279,6 +279,8 @@ namespace Avalonia.Controls
         private bool _hierarchicalRowsEnabled;
         private int _hierarchicalRefreshSuppressionCount;
         private bool _pendingHierarchicalRefresh;
+        private HierarchicalAnchorHint? _pendingHierarchicalAnchorHint;
+        private double? _pendingHierarchicalScrollOffset;
         private IEnumerable _hierarchicalItemsSource;
         private bool _ownsHierarchicalItemsSource;
         private IDataGridRowDropHandler _rowDropHandler;
@@ -2025,6 +2027,30 @@ namespace Avalonia.Controls
                 return;
             }
 
+            var hasAnchor = TryGetHierarchicalAnchorHint(e, out var anchor);
+            if (!hasAnchor)
+            {
+                hasAnchor = TryGetHierarchicalAnchor(e, out anchor);
+            }
+            UpdateRowHeightEstimatorForHierarchicalChange(e.Changes);
+            if (hasAnchor)
+            {
+                var newSlot = SlotFromRowIndex(anchor.NewRowIndex);
+                if (newSlot >= 0)
+                {
+                    var estimator = RowHeightEstimator;
+                    var estimatedNewBaseOffset = estimator != null
+                        ? EstimateOffsetToVisibleSlot(newSlot, estimator)
+                        : newSlot * RowHeightEstimate;
+                    var delta = estimatedNewBaseOffset - anchor.EstimatedOldBaseOffset;
+                    if (!ChangesAffectAnchor(e.Changes, anchor.OldRowIndex))
+                    {
+                        delta = 0;
+                    }
+                    _pendingHierarchicalScrollOffset = Math.Max(0, anchor.ContentOffset + delta - anchor.ViewportOffset);
+                }
+            }
+
             var indexMap = e.IndexMap;
             using (_hierarchicalModel?.BeginVirtualizationGuard())
             using (_rowsPresenter?.BeginVirtualizationGuard())
@@ -2035,6 +2061,432 @@ namespace Avalonia.Controls
             }
 
             OnCollectionChangedForSummaries(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset));
+        }
+
+        private bool TryGetHierarchicalAnchorHint(FlattenedChangedEventArgs e, out HierarchicalAnchor anchor)
+        {
+            anchor = default;
+            if (!_pendingHierarchicalAnchorHint.HasValue)
+            {
+                return false;
+            }
+
+            var hint = _pendingHierarchicalAnchorHint.Value;
+            _pendingHierarchicalAnchorHint = null;
+
+            if (!TryMapAnchorIndex(e, hint.OldRowIndex, out var newRowIndex))
+            {
+                return false;
+            }
+
+            anchor = new HierarchicalAnchor(
+                hint.OldRowIndex,
+                newRowIndex,
+                hint.ViewportOffset,
+                hint.ContentOffset,
+                hint.EstimatedOldBaseOffset);
+
+            return true;
+        }
+
+        private bool TryGetHierarchicalAnchor(FlattenedChangedEventArgs e, out HierarchicalAnchor anchor)
+        {
+            anchor = default;
+
+            if (!UseLogicalScrollable || DisplayData.FirstScrollingSlot < 0 || e == null)
+            {
+                return false;
+            }
+
+            if (!TryGetVisibleAnchorFromChanges(e, out var anchorRowIndex, out var anchorViewportOffset) &&
+                !TryGetVisibleAnchorFromFirstRow(out anchorRowIndex, out anchorViewportOffset))
+            {
+                return false;
+            }
+
+            if (!TryMapAnchorIndex(e, anchorRowIndex, out var newRowIndex))
+            {
+                return false;
+            }
+
+            var oldSlot = SlotFromRowIndex(anchorRowIndex);
+            if (oldSlot < 0)
+            {
+                return false;
+            }
+
+            var estimator = RowHeightEstimator;
+            var estimatedOldBaseOffset = estimator != null
+                ? EstimateOffsetToVisibleSlot(oldSlot, estimator)
+                : oldSlot * RowHeightEstimate;
+            var currentVerticalOffset = GetEffectiveVerticalOffset();
+            var contentOffset = currentVerticalOffset + anchorViewportOffset;
+
+            anchor = new HierarchicalAnchor(anchorRowIndex, newRowIndex, anchorViewportOffset, contentOffset, estimatedOldBaseOffset);
+            return true;
+        }
+
+        private double GetEffectiveVerticalOffset()
+        {
+            return _verticalOffset;
+        }
+
+        internal void PrepareHierarchicalAnchor(int slot)
+        {
+            if (!UseLogicalScrollable || slot < 0 || DisplayData.FirstScrollingSlot < 0)
+            {
+                return;
+            }
+
+            if (IsGroupSlot(slot))
+            {
+                return;
+            }
+
+            if (slot < DisplayData.FirstScrollingSlot || slot > DisplayData.LastScrollingSlot)
+            {
+                return;
+            }
+
+            var rowIndex = RowIndexFromSlot(slot);
+            if (rowIndex < 0)
+            {
+                return;
+            }
+
+            if (!TryGetAnchorViewportOffset(slot, out var viewportOffset))
+            {
+                viewportOffset = -NegVerticalOffset;
+            }
+
+            var estimator = RowHeightEstimator;
+            var estimatedOldBaseOffset = estimator != null
+                ? EstimateOffsetToVisibleSlot(slot, estimator)
+                : slot * RowHeightEstimate;
+            var contentOffset = GetEffectiveVerticalOffset() + viewportOffset;
+
+            _pendingHierarchicalAnchorHint = new HierarchicalAnchorHint(
+                rowIndex,
+                viewportOffset,
+                contentOffset,
+                estimatedOldBaseOffset);
+
+            Dispatcher.UIThread.Post(() => _pendingHierarchicalAnchorHint = null, DispatcherPriority.Background);
+        }
+
+        private readonly struct HierarchicalAnchor
+        {
+            public HierarchicalAnchor(
+                int oldRowIndex,
+                int newRowIndex,
+                double viewportOffset,
+                double contentOffset,
+                double estimatedOldBaseOffset)
+            {
+                OldRowIndex = oldRowIndex;
+                NewRowIndex = newRowIndex;
+                ViewportOffset = viewportOffset;
+                ContentOffset = contentOffset;
+                EstimatedOldBaseOffset = estimatedOldBaseOffset;
+            }
+
+            public int OldRowIndex { get; }
+
+            public int NewRowIndex { get; }
+
+            public double ViewportOffset { get; }
+
+            public double ContentOffset { get; }
+
+            public double EstimatedOldBaseOffset { get; }
+        }
+
+        private readonly struct HierarchicalAnchorHint
+        {
+            public HierarchicalAnchorHint(
+                int oldRowIndex,
+                double viewportOffset,
+                double contentOffset,
+                double estimatedOldBaseOffset)
+            {
+                OldRowIndex = oldRowIndex;
+                ViewportOffset = viewportOffset;
+                ContentOffset = contentOffset;
+                EstimatedOldBaseOffset = estimatedOldBaseOffset;
+            }
+
+            public int OldRowIndex { get; }
+
+            public double ViewportOffset { get; }
+
+            public double ContentOffset { get; }
+
+            public double EstimatedOldBaseOffset { get; }
+        }
+
+        private bool TryGetVisibleAnchorFromChanges(FlattenedChangedEventArgs e, out int anchorRowIndex, out double anchorViewportOffset)
+        {
+            anchorRowIndex = -1;
+            anchorViewportOffset = 0;
+
+            if (e?.Changes == null || e.Changes.Count == 0)
+            {
+                return false;
+            }
+
+            foreach (var change in e.Changes)
+            {
+                if (change.OldCount == change.NewCount)
+                {
+                    continue;
+                }
+
+                var candidateRowIndex = change.Index - 1;
+                if (candidateRowIndex < 0)
+                {
+                    continue;
+                }
+
+                var candidateSlot = SlotFromRowIndex(candidateRowIndex);
+                if (candidateSlot < DisplayData.FirstScrollingSlot || candidateSlot > DisplayData.LastScrollingSlot)
+                {
+                    continue;
+                }
+
+                if (IsGroupSlot(candidateSlot))
+                {
+                    continue;
+                }
+
+                if (!IsHierarchicalAnchorCandidate(candidateSlot, change.NewCount > change.OldCount))
+                {
+                    continue;
+                }
+
+                if (TryGetAnchorViewportOffset(candidateSlot, out anchorViewportOffset))
+                {
+                    anchorRowIndex = candidateRowIndex;
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        private bool IsHierarchicalAnchorCandidate(int slot, bool isExpanding)
+        {
+            var row = DisplayData.GetDisplayedElement(slot) as DataGridRow;
+            if (row?.DataContext is not HierarchicalNode node)
+            {
+                return true;
+            }
+
+            return isExpanding ? node.IsExpanded : !node.IsExpanded;
+        }
+
+        private bool TryGetVisibleAnchorFromFirstRow(out int anchorRowIndex, out double anchorViewportOffset)
+        {
+            anchorRowIndex = -1;
+            anchorViewportOffset = 0;
+
+            var slot = DisplayData.FirstScrollingSlot;
+            if (slot < 0)
+            {
+                return false;
+            }
+
+            while (slot >= 0 && slot <= DisplayData.LastScrollingSlot)
+            {
+                if (!IsGroupSlot(slot))
+                {
+                    var rowIndex = RowIndexFromSlot(slot);
+                    if (rowIndex >= 0 && TryGetAnchorViewportOffset(slot, out anchorViewportOffset))
+                    {
+                        anchorRowIndex = rowIndex;
+                        return true;
+                    }
+                }
+
+                slot = GetNextVisibleSlot(slot);
+            }
+
+            return false;
+        }
+
+        private bool TryGetAnchorViewportOffset(int slot, out double anchorViewportOffset)
+        {
+            anchorViewportOffset = 0;
+            var element = DisplayData.GetDisplayedElement(slot);
+            if (element is Control control)
+            {
+                var offset = control.Bounds.Y;
+                if (!double.IsNaN(offset) && !double.IsInfinity(offset))
+                {
+                    if (!IsAnchorVisible(offset, control.Bounds.Height))
+                    {
+                        return false;
+                    }
+
+                    anchorViewportOffset = offset;
+                    return true;
+                }
+            }
+
+            var currentSlot = DisplayData.FirstScrollingSlot;
+            var y = -NegVerticalOffset;
+            while (currentSlot >= 0 && currentSlot <= DisplayData.LastScrollingSlot)
+            {
+                var currentElement = DisplayData.GetDisplayedElement(currentSlot);
+                if (currentElement == null)
+                {
+                    return false;
+                }
+
+                if (currentSlot == slot)
+                {
+                    if (!IsAnchorVisible(y, currentElement.DesiredSize.Height))
+                    {
+                        return false;
+                    }
+
+                    anchorViewportOffset = y;
+                    return true;
+                }
+
+                y += currentElement.DesiredSize.Height;
+                currentSlot = GetNextVisibleSlot(currentSlot);
+            }
+
+            return false;
+        }
+
+        private bool IsAnchorVisible(double top, double height)
+        {
+            if (double.IsNaN(top) || double.IsInfinity(top))
+            {
+                return false;
+            }
+
+            if (double.IsNaN(height) || double.IsInfinity(height) || MathUtilities.LessThanOrClose(height, 0))
+            {
+                height = RowHeightEstimate;
+            }
+
+            var viewportHeight = GetAnchorViewportHeight();
+            if (!viewportHeight.HasValue || MathUtilities.LessThanOrClose(viewportHeight.Value, 0))
+            {
+                return true;
+            }
+
+            return top + height > 0 && top < viewportHeight.Value;
+        }
+
+        private double? GetAnchorViewportHeight()
+        {
+            if (_rowsPresenter != null && _rowsPresenter.Viewport.Height > 0)
+            {
+                return _rowsPresenter.Viewport.Height;
+            }
+
+            if (RowsPresenterAvailableSize is { Height: > 0 })
+            {
+                return RowsPresenterAvailableSize.Value.Height;
+            }
+
+            if (_rowsPresenter != null && _rowsPresenter.Bounds.Height > 0)
+            {
+                return _rowsPresenter.Bounds.Height;
+            }
+
+            return null;
+        }
+
+        private bool TryMapAnchorIndex(FlattenedChangedEventArgs e, int oldRowIndex, out int newRowIndex)
+        {
+            newRowIndex = e.IndexMap.MapOldIndexToNew(oldRowIndex);
+            if (newRowIndex < 0)
+            {
+                newRowIndex = GetFallbackHierarchicalIndex(oldRowIndex, e.Changes, e.IndexMap.NewCount);
+            }
+
+            return newRowIndex >= 0;
+        }
+
+        private bool ChangesAffectAnchor(IReadOnlyList<FlattenedChange> changes, int anchorRowIndex)
+        {
+            if (changes == null || changes.Count == 0)
+            {
+                return false;
+            }
+
+            foreach (var change in changes)
+            {
+                if (change.Index <= anchorRowIndex)
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        private int GetFallbackHierarchicalIndex(int oldRowIndex, IReadOnlyList<FlattenedChange> changes, int newCount)
+        {
+            if (newCount <= 0)
+            {
+                return -1;
+            }
+
+            if (changes != null)
+            {
+                foreach (var change in changes)
+                {
+                    if (oldRowIndex < change.Index)
+                    {
+                        break;
+                    }
+
+                    if (oldRowIndex < change.Index + change.OldCount)
+                    {
+                        var candidate = change.Index > 0 ? change.Index - 1 : 0;
+                        return Math.Min(candidate, newCount - 1);
+                    }
+                }
+            }
+
+            return Math.Min(oldRowIndex, newCount - 1);
+        }
+
+        private void UpdateRowHeightEstimatorForHierarchicalChange(IReadOnlyList<FlattenedChange> changes)
+        {
+            if (RowHeightEstimator == null || changes == null || changes.Count == 0)
+            {
+                return;
+            }
+
+            foreach (var change in changes)
+            {
+                if (change.OldCount == 0 && change.NewCount == 0)
+                {
+                    continue;
+                }
+
+                var slot = SlotFromRowIndex(change.Index);
+                if (slot < 0)
+                {
+                    continue;
+                }
+
+                if (change.OldCount > 0)
+                {
+                    RowHeightEstimator.OnItemsRemoved(slot, change.OldCount);
+                }
+
+                if (change.NewCount > 0)
+                {
+                    RowHeightEstimator.OnItemsInserted(slot, change.NewCount);
+                }
+            }
         }
 
         private void EnsureHierarchicalItemsSource()

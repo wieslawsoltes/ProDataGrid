@@ -11,11 +11,13 @@ using System.Reflection;
 using Avalonia;
 using Avalonia.Collections;
 using Avalonia.Controls;
+using Avalonia.Controls.Primitives;
 using Avalonia.Controls.DataGridHierarchical;
 using Avalonia.Controls.DataGridSorting;
 using Avalonia.Headless.XUnit;
 using Avalonia.Input;
 using Avalonia.Markup.Xaml.Styling;
+using Avalonia.Styling;
 using Avalonia.Threading;
 using Avalonia.VisualTree;
 using Xunit;
@@ -263,6 +265,259 @@ public class HierarchicalHeadlessTests
     }
 
     [AvaloniaFact]
+    public void LogicalScrollOffset_Remains_Aligned_After_Expand_And_Collapse()
+    {
+        var root = CreateTree("Root", childCount: 200, grandchildCount: 5);
+        using var themeScope = UseApplicationTheme(DataGridTheme.SimpleV2);
+
+        var model = new HierarchicalModel(new HierarchicalOptions
+        {
+            ChildrenSelector = o => ((Item)o).Children,
+            AutoExpandRoot = true,
+            MaxAutoExpandDepth = 0,
+            VirtualizeChildren = true
+        });
+        model.SetRoot(root);
+
+        var grid = new DataGrid
+        {
+            HierarchicalModel = model,
+            HierarchicalRowsEnabled = true,
+            AutoGenerateColumns = false,
+            UseLogicalScrollable = true,
+            RowHeight = 24
+        };
+
+        grid.ColumnsInternal.Add(new DataGridHierarchicalColumn
+        {
+            Header = "Name",
+            Binding = new Avalonia.Data.Binding("Item.Name")
+        });
+
+        var window = new Window
+        {
+            Width = 420,
+            Height = 260,
+            Content = grid
+        };
+
+        window.SetThemeStyles(DataGridTheme.SimpleV2);
+        window.Show();
+        PumpLayout(grid);
+
+        var presenter = GetRowsPresenter(grid);
+        var scrollViewer = grid.ScrollViewer;
+        Assert.NotNull(scrollViewer);
+        scrollViewer!.Offset = new Vector(0, 247);
+        PumpLayout(grid);
+
+        var offsetBefore = presenter.Offset.Y;
+        var anchorCandidate = GetVisibleRows(grid)
+            .Select(row => new { Row = row, Node = row.DataContext as HierarchicalNode })
+            .FirstOrDefault(candidate =>
+                candidate.Node != null &&
+                candidate.Node.Level > 0 &&
+                candidate.Node.Item is Item item &&
+                item.Children.Count > 0 &&
+                !candidate.Node.IsExpanded);
+
+        Assert.NotNull(anchorCandidate);
+
+        var anchorRow = anchorCandidate!.Row;
+        var anchorNode = anchorCandidate.Node!;
+        var anchorY = anchorRow.Bounds.Y;
+        Assert.True(offsetBefore > 0);
+
+        model.Toggle(anchorNode);
+        PumpLayout(grid);
+
+        var anchorAfterExpand = FindVisibleRow(grid, anchorNode);
+        Assert.NotNull(anchorAfterExpand);
+        Assert.InRange(Math.Abs(anchorAfterExpand!.Bounds.Y - anchorY), 0, 0.5);
+        Assert.InRange(Math.Abs(grid.GetVerticalOffset() - presenter.Offset.Y), 0, 0.01);
+        Assert.InRange(Math.Abs(presenter.Offset.Y - offsetBefore), 0, 0.5);
+        Assert.InRange(Math.Abs(scrollViewer.Offset.Y - presenter.Offset.Y), 0, 0.01);
+
+        model.Toggle(anchorNode);
+        PumpLayout(grid);
+
+        var anchorAfterCollapse = FindVisibleRow(grid, anchorNode);
+        Assert.NotNull(anchorAfterCollapse);
+        Assert.InRange(Math.Abs(anchorAfterCollapse!.Bounds.Y - anchorY), 0, 0.5);
+        Assert.InRange(Math.Abs(grid.GetVerticalOffset() - presenter.Offset.Y), 0, 0.01);
+        Assert.InRange(Math.Abs(presenter.Offset.Y - offsetBefore), 0, 0.5);
+        Assert.InRange(Math.Abs(scrollViewer.Offset.Y - presenter.Offset.Y), 0, 0.01);
+
+        window.Close();
+    }
+
+    [AvaloniaFact]
+    public void Expanding_Node_Above_Viewport_Preserves_Row_Position_And_ScrollOffset()
+    {
+        var roots = new ObservableCollection<Item>();
+        for (int i = 0; i < 60; i++)
+        {
+            roots.Add(CreateTree($"Root {i + 1}", childCount: 6, grandchildCount: 0));
+        }
+        using var themeScope = UseApplicationTheme(DataGridTheme.SimpleV2);
+
+        var model = new HierarchicalModel(new HierarchicalOptions
+        {
+            ChildrenSelector = o => ((Item)o).Children,
+            AutoExpandRoot = false,
+            VirtualizeChildren = true
+        });
+        model.SetRoots(roots);
+
+        var grid = new DataGrid
+        {
+            HierarchicalModel = model,
+            HierarchicalRowsEnabled = true,
+            AutoGenerateColumns = false,
+            UseLogicalScrollable = true,
+            RowHeight = 24
+        };
+
+        grid.ColumnsInternal.Add(new DataGridHierarchicalColumn
+        {
+            Header = "Name",
+            Binding = new Avalonia.Data.Binding("Item.Name")
+        });
+
+        var window = new Window
+        {
+            Width = 420,
+            Height = 260,
+            Content = grid
+        };
+
+        window.SetThemeStyles(DataGridTheme.SimpleV2);
+        window.Show();
+        PumpLayout(grid);
+
+        var presenter = GetRowsPresenter(grid);
+        var scrollViewer = grid.ScrollViewer;
+        Assert.NotNull(scrollViewer);
+
+        scrollViewer!.Offset = new Vector(0, 600);
+        PumpLayout(grid);
+
+        var firstSlot = grid.DisplayData.FirstScrollingSlot;
+        Assert.True(firstSlot > 0);
+
+        var anchorRow = Assert.IsType<DataGridRow>(grid.DisplayData.GetDisplayedElement(firstSlot));
+        Assert.True(anchorRow.Index > 0);
+        var anchorNode = Assert.IsType<HierarchicalNode>(anchorRow.DataContext);
+        var anchorY = anchorRow.Bounds.Y;
+        var offsetBefore = presenter.Offset.Y;
+        var scrollOffsetBefore = scrollViewer.Offset.Y;
+
+        var aboveNode = model.GetNode(anchorRow.Index - 1);
+        Assert.NotNull(aboveNode);
+        Assert.False(aboveNode.IsExpanded);
+        Assert.True(((Item)aboveNode.Item).Children.Count > 0);
+
+        model.Toggle(aboveNode);
+        PumpLayout(grid);
+
+        var anchorAfterExpand = FindVisibleRow(grid, anchorNode);
+        Assert.NotNull(anchorAfterExpand);
+        Assert.InRange(Math.Abs(anchorAfterExpand!.Bounds.Y - anchorY), 0, 0.5);
+        Assert.InRange(Math.Abs(grid.GetVerticalOffset() - presenter.Offset.Y), 0, 0.01);
+        Assert.InRange(Math.Abs(scrollViewer.Offset.Y - presenter.Offset.Y), 0, 0.01);
+        Assert.True(presenter.Offset.Y > offsetBefore);
+        Assert.True(scrollViewer.Offset.Y > scrollOffsetBefore);
+
+        window.Close();
+    }
+
+    [AvaloniaFact]
+    public void Expanding_Scrolled_Root_Preserves_Row_Position()
+    {
+        var roots = new ObservableCollection<Item>();
+        for (int i = 0; i < 40; i++)
+        {
+            roots.Add(CreateTree($"Root {i + 1}", childCount: 5, grandchildCount: 0));
+        }
+        using var themeScope = UseApplicationTheme(DataGridTheme.SimpleV2);
+
+        var model = new HierarchicalModel(new HierarchicalOptions
+        {
+            ChildrenSelector = o => ((Item)o).Children,
+            AutoExpandRoot = false,
+            VirtualizeChildren = true
+        });
+        model.SetRoots(roots);
+
+        var grid = new DataGrid
+        {
+            HierarchicalModel = model,
+            HierarchicalRowsEnabled = true,
+            AutoGenerateColumns = false,
+            UseLogicalScrollable = true,
+            RowHeight = 24
+        };
+
+        grid.ColumnsInternal.Add(new DataGridHierarchicalColumn
+        {
+            Header = "Name",
+            Binding = new Avalonia.Data.Binding("Item.Name")
+        });
+
+        var window = new Window
+        {
+            Width = 420,
+            Height = 260,
+            Content = grid
+        };
+
+        window.SetThemeStyles(DataGridTheme.SimpleV2);
+        window.Show();
+        PumpLayout(grid);
+
+        var toggleMethod = typeof(DataGrid).GetMethod(
+            "TryToggleHierarchicalAtSlot",
+            BindingFlags.Instance | BindingFlags.NonPublic);
+
+        Assert.True((bool)toggleMethod!.Invoke(grid, new object[] { 0, false })!);
+        PumpLayout(grid);
+
+        var presenter = GetRowsPresenter(grid);
+        var scrollViewer = grid.ScrollViewer;
+        Assert.NotNull(scrollViewer);
+        scrollViewer!.Offset = new Vector(0, 500);
+        PumpLayout(grid);
+
+        var anchorCandidate = GetVisibleRows(grid)
+            .Select(row => new { Row = row, Node = row.DataContext as HierarchicalNode })
+            .FirstOrDefault(candidate =>
+                candidate.Node != null &&
+                candidate.Node.Level == 0 &&
+                !candidate.Node.IsExpanded);
+
+        Assert.NotNull(anchorCandidate);
+
+        var anchorRow = anchorCandidate!.Row;
+        var anchorNode = anchorCandidate.Node!;
+        var anchorY = anchorRow.Bounds.Y;
+
+        var slotMethod = typeof(DataGrid).GetMethod(
+            "SlotFromRowIndex",
+            BindingFlags.Instance | BindingFlags.NonPublic);
+        var anchorSlot = (int)slotMethod!.Invoke(grid, new object[] { anchorRow.Index })!;
+
+        Assert.True((bool)toggleMethod.Invoke(grid, new object[] { anchorSlot, false })!);
+        PumpLayout(grid);
+
+        var anchorAfterExpand = FindVisibleRow(grid, anchorNode);
+        Assert.NotNull(anchorAfterExpand);
+        Assert.InRange(Math.Abs(anchorAfterExpand!.Bounds.Y - anchorY), 0, 0.5);
+        Assert.InRange(Math.Abs(scrollViewer.Offset.Y - presenter.Offset.Y), 0, 0.01);
+
+        window.Close();
+    }
+
+    [AvaloniaFact]
     public void Reparenting_Recycles_Rows_And_Reapplies_Indentation()
     {
         var roots = new ObservableCollection<Item>
@@ -456,8 +711,52 @@ public class HierarchicalHeadlessTests
     private static void PumpLayout(DataGrid grid)
     {
         Dispatcher.UIThread.RunJobs();
+        if (grid.GetVisualRoot() is Window window)
+        {
+            window.ApplyTemplate();
+            window.UpdateLayout();
+        }
+        grid.ApplyTemplate();
         grid.UpdateLayout();
         Dispatcher.UIThread.RunJobs();
+        grid.UpdateLayout();
+        Dispatcher.UIThread.RunJobs();
+    }
+
+    private static IDisposable UseApplicationTheme(DataGridTheme theme)
+    {
+        var styles = ThemeHelper.GetThemeStyles(theme);
+        var appStyles = Application.Current?.Styles;
+        appStyles?.Add(styles);
+        return new ThemeScope(appStyles, styles);
+    }
+
+    private sealed class ThemeScope : IDisposable
+    {
+        private readonly Styles? _appStyles;
+        private readonly Styles _styles;
+
+        public ThemeScope(Styles? appStyles, Styles styles)
+        {
+            _appStyles = appStyles;
+            _styles = styles;
+        }
+
+        public void Dispose()
+        {
+            _appStyles?.Remove(_styles);
+        }
+    }
+
+    private static DataGridRowsPresenter GetRowsPresenter(DataGrid grid)
+    {
+        var presenter = grid.ScrollViewer?.Content as DataGridRowsPresenter;
+        presenter ??= grid.GetVisualDescendants().OfType<DataGridRowsPresenter>().FirstOrDefault();
+        presenter ??= typeof(DataGrid)
+            .GetField("_rowsPresenter", BindingFlags.Instance | BindingFlags.NonPublic)?
+            .GetValue(grid) as DataGridRowsPresenter;
+        Assert.NotNull(presenter);
+        return presenter!;
     }
 
     private static IReadOnlyList<DataGridRow> GetVisibleRows(DataGrid grid)
@@ -466,6 +765,20 @@ public class HierarchicalHeadlessTests
             .OfType<DataGridRow>()
             .Where(row => row.IsVisible)
             .ToList();
+    }
+
+    private static DataGridRow? FindVisibleRow(DataGrid grid, object dataContext)
+    {
+        if (dataContext is HierarchicalNode node)
+        {
+            return GetVisibleRows(grid)
+                .FirstOrDefault(row =>
+                    ReferenceEquals(row.DataContext, node) ||
+                    (row.DataContext is HierarchicalNode rowNode && ReferenceEquals(rowNode.Item, node.Item)));
+        }
+
+        return GetVisibleRows(grid)
+            .FirstOrDefault(row => ReferenceEquals(row.DataContext, dataContext));
     }
 
     private static void AssertVisibleRowsHaveCorrectIndent(DataGrid grid, double indent)

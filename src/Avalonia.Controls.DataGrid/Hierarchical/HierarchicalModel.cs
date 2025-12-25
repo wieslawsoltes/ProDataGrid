@@ -1311,6 +1311,12 @@ namespace Avalonia.Controls.DataGridHierarchical
             EnsureChildrenMaterialized(target);
             SortChildren(target, comparer, recursive);
 
+            if (_isVirtualRoot && ReferenceEquals(target, Root))
+            {
+                ReplaceFlattened(BuildFlattenedFromVirtualRoot(target));
+                return;
+            }
+
             if (target.IsExpanded)
             {
                 var parentIndex = _flattened.IndexOf(target);

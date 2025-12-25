@@ -4,6 +4,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Globalization;
+using Avalonia.Headless.XUnit;
 using Xunit;
 
 namespace Avalonia.Controls.DataGridTests.Summaries;
@@ -15,7 +16,7 @@ public class DataGridSummaryDescriptionTests
 {
     #region Aggregate Summary Description Tests
 
-    [Fact]
+    [AvaloniaFact]
     public void AggregateSummaryDescription_Calculates_Sum()
     {
         var description = new DataGridAggregateSummaryDescription
@@ -36,7 +37,7 @@ public class DataGridSummaryDescriptionTests
         Assert.Equal(60m, result);
     }
 
-    [Fact]
+    [AvaloniaFact]
     public void AggregateSummaryDescription_Calculates_Average()
     {
         var description = new DataGridAggregateSummaryDescription
@@ -57,7 +58,7 @@ public class DataGridSummaryDescriptionTests
         Assert.Equal(20m, result);
     }
 
-    [Fact]
+    [AvaloniaFact]
     public void AggregateSummaryDescription_Calculates_Count()
     {
         var description = new DataGridAggregateSummaryDescription
@@ -78,7 +79,7 @@ public class DataGridSummaryDescriptionTests
         Assert.Equal(3, result);
     }
 
-    [Fact]
+    [AvaloniaFact]
     public void AggregateSummaryDescription_Applies_StringFormat()
     {
         var description = new DataGridAggregateSummaryDescription
@@ -101,7 +102,7 @@ public class DataGridSummaryDescriptionTests
         Assert.Equal("60.00", formatted);
     }
 
-    [Fact]
+    [AvaloniaFact]
     public void AggregateSummaryDescription_Default_Properties()
     {
         var description = new DataGridAggregateSummaryDescription();
@@ -112,7 +113,7 @@ public class DataGridSummaryDescriptionTests
         Assert.Null(description.Title);
     }
 
-    [Fact]
+    [AvaloniaFact]
     public void AggregateSummaryDescription_FormatValue_Null_Returns_Empty_String()
     {
         var description = new DataGridAggregateSummaryDescription
@@ -125,7 +126,7 @@ public class DataGridSummaryDescriptionTests
         Assert.Equal(string.Empty, formatted);
     }
 
-    [Fact]
+    [AvaloniaFact]
     public void AggregateSummaryDescription_FormatValue_Prefixes_Title_With_Placeholder_Format()
     {
         var description = new DataGridAggregateSummaryDescription
@@ -139,7 +140,7 @@ public class DataGridSummaryDescriptionTests
         Assert.Equal("Total 12.30", formatted);
     }
 
-    [Fact]
+    [AvaloniaFact]
     public void AggregateSummaryDescription_FormatValue_Prefixes_Title_With_FormatString()
     {
         var description = new DataGridAggregateSummaryDescription
@@ -157,7 +158,7 @@ public class DataGridSummaryDescriptionTests
 
     #region Custom Summary Description Tests
 
-    [Fact]
+    [AvaloniaFact]
     public void CustomSummaryDescription_Uses_Custom_Calculator()
     {
         var calculator = new TestCustomCalculator();
@@ -178,7 +179,7 @@ public class DataGridSummaryDescriptionTests
         Assert.Equal("Custom Result", result);
     }
 
-    [Fact]
+    [AvaloniaFact]
     public void CustomSummaryDescription_Returns_Null_Without_Calculator()
     {
         var description = new DataGridCustomSummaryDescription();
@@ -195,7 +196,7 @@ public class DataGridSummaryDescriptionTests
         Assert.Null(result);
     }
 
-    [Fact]
+    [AvaloniaFact]
     public void CustomSummaryDescription_Default_Properties()
     {
         var description = new DataGridCustomSummaryDescription();
@@ -208,7 +209,7 @@ public class DataGridSummaryDescriptionTests
 
     #region Scope Tests
 
-    [Fact]
+    [AvaloniaFact]
     public void SummaryDescription_Default_Scope_Is_Total()
     {
         var description = new DataGridAggregateSummaryDescription();
@@ -216,7 +217,7 @@ public class DataGridSummaryDescriptionTests
         Assert.Equal(DataGridSummaryScope.Total, description.Scope);
     }
 
-    [Fact]
+    [AvaloniaFact]
     public void SummaryDescription_Can_Set_Group_Scope()
     {
         var description = new DataGridAggregateSummaryDescription
@@ -227,7 +228,7 @@ public class DataGridSummaryDescriptionTests
         Assert.Equal(DataGridSummaryScope.Group, description.Scope);
     }
 
-    [Fact]
+    [AvaloniaFact]
     public void SummaryDescription_Can_Set_Both_Scope()
     {
         var description = new DataGridAggregateSummaryDescription

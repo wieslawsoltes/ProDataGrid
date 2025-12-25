@@ -1984,23 +1984,13 @@ namespace Avalonia.Controls.DataGridTests.Hierarchical;
         var model = CreateModel();
         model.SetRoots(items);
 
-        // Sort is not directly supported on virtual roots since they're not visible
-        // We test that sorting individual nodes works correctly
-        var root1Node = model.GetNode(0);
-        ((Item)root1Node.Item).Children.Add(new Item("Z"));
-        ((Item)root1Node.Item).Children.Add(new Item("X"));
-        ((Item)root1Node.Item).Children.Add(new Item("Y"));
-
-        model.Expand(root1Node);
-        Assert.Equal(6, model.Count);
-
-        model.Sort(root1Node, Comparer<object>.Create((a, b) =>
+        model.Sort(comparer: Comparer<object>.Create((a, b) =>
             string.Compare(((Item)a).Name, ((Item)b).Name, StringComparison.Ordinal)));
 
-        // After sorting root1's children, they should be X, Y, Z
-        Assert.Equal("X", ((Item)model.GetItem(1)!).Name);
-        Assert.Equal("Y", ((Item)model.GetItem(2)!).Name);
-        Assert.Equal("Z", ((Item)model.GetItem(3)!).Name);
+        // After sorting, root items should be A, B, C
+        Assert.Equal("A", ((Item)model.GetItem(0)!).Name);
+        Assert.Equal("B", ((Item)model.GetItem(1)!).Name);
+        Assert.Equal("C", ((Item)model.GetItem(2)!).Name);
     }
 
     [Fact]

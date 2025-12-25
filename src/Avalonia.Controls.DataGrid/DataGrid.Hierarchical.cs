@@ -15,6 +15,8 @@ namespace Avalonia.Controls
                 return false;
             }
 
+            PrepareHierarchicalAnchor(slot);
+
             if (TryHandleGroupSlotAsNode(slot, GroupSlotAction.Toggle, toggleSubtree))
             {
                 return true;

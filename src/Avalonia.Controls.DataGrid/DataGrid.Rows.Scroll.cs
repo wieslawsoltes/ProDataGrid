@@ -60,7 +60,7 @@ namespace Avalonia.Controls
                             {
                                 // Use the estimator's slot-at-offset calculation for better accuracy
                                 int estimatedSlot = estimator.EstimateSlotAtOffset(_verticalOffset + height, SlotCount);
-                                newFirstScrollingSlot = Math.Min(GetNextVisibleSlot(estimatedSlot), lastVisibleSlot);
+                                newFirstScrollingSlot = Math.Min(GetNextVisibleSlot(estimatedSlot - 1), lastVisibleSlot);
                             }
                                 else
                                 {

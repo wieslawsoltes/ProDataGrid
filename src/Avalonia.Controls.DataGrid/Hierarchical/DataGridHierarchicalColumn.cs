@@ -8,6 +8,7 @@ using Avalonia.Controls.Templates;
 using Avalonia.Data;
 using Avalonia.Data.Converters;
 using Avalonia.Interactivity;
+using Avalonia.VisualTree;
 
 namespace Avalonia.Controls
 {
@@ -131,8 +132,15 @@ namespace Avalonia.Controls
                 return;
             }
 
-            if (sender is DataGridHierarchicalPresenter { DataContext: HierarchicalNode node })
+            if (sender is DataGridHierarchicalPresenter presenter &&
+                presenter.DataContext is HierarchicalNode node)
             {
+                var row = presenter.FindAncestorOfType<DataGridRow>();
+                if (row != null)
+                {
+                    OwningGrid.PrepareHierarchicalAnchor(row.Slot);
+                }
+
                 OwningGrid.HierarchicalModel.Toggle(node);
             }
         }
