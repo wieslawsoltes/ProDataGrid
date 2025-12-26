@@ -2,6 +2,7 @@
     <Folder Name="/build/">
         <File Path="build/SharedVersion.props" />
         <File Path="Directory.Build.props" />
+        <File Path="Directory.Packages.props" />
         <File Path="global.json" />
     </Folder>
     <Folder Name="/docs/">
