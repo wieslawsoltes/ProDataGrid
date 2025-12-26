@@ -13,7 +13,6 @@
 
   <ItemGroup>
     <PackageReference Include="Avalonia.Desktop" />
-    <PackageReference Include="Avalonia.Diagnostics" />
     <PackageReference Include="Avalonia.Fonts.Inter" />
     <PackageReference Include="Avalonia.Themes.Simple" />
     <PackageReference Include="Avalonia.Themes.Fluent" />
@@ -23,6 +22,7 @@
 
   <ItemGroup>
     <ProjectReference Include="../Avalonia.Controls.DataGrid/Avalonia.Controls.DataGrid.csproj" />
+    <ProjectReference Include="../ProDiagnostics/ProDiagnostics.csproj" />
   </ItemGroup>
 
   <Import Project="../../build/SharedVersion.props" />
