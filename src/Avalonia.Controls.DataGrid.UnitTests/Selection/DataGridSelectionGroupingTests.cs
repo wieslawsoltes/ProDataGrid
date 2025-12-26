@@ -77,6 +77,59 @@ public class DataGridSelectionGroupingTests
         Assert.Single(grid.SelectedItems);
     }
 
+    [AvaloniaFact]
+    public void Setting_Grouped_ItemsSource_When_Attached_Does_Not_Throw()
+    {
+        var items = new ObservableCollection<Item>
+        {
+            new() { Group = "A", Name = "One" },
+            new() { Group = "A", Name = "Two" },
+            new() { Group = "B", Name = "Three" },
+        };
+
+        dynamic view = CreateGroupedView(items, nameof(Item.Group));
+        var root = new Window
+        {
+            Width = 300,
+            Height = 200,
+        };
+
+        root.SetThemeStyles();
+
+        var grid = new DataGrid
+        {
+            Selection = new SelectionModel<Item>(),
+            SelectionMode = DataGridSelectionMode.Single,
+            AutoScrollToSelectedItem = true,
+        };
+
+        grid.ColumnsInternal.Add(new DataGridTextColumn
+        {
+            Header = "Group",
+            Binding = new Binding(nameof(Item.Group))
+        });
+        grid.ColumnsInternal.Add(new DataGridTextColumn
+        {
+            Header = "Name",
+            Binding = new Binding(nameof(Item.Name))
+        });
+
+        root.Content = grid;
+        root.Show();
+        grid.UpdateLayout();
+
+        try
+        {
+            var exception = Record.Exception(() => grid.ItemsSource = (System.Collections.IEnumerable)view);
+            Assert.Null(exception);
+            grid.UpdateLayout();
+        }
+        finally
+        {
+            root.Close();
+        }
+    }
+
     private static dynamic CreateGroupedView(IEnumerable<Item> items, string? groupPath)
     {
         var assembly = typeof(DataGrid).Assembly;

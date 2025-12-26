@@ -342,6 +342,7 @@ namespace Avalonia.Controls
             }
             SlotCount = DataConnection.Count + RowGroupHeadersTable.IndexCount + RowGroupFootersTable.IndexCount;
             VisibleSlotCount = SlotCount;
+            RefreshRowGroupHeaders();
         }
 
         private void SyncRowGroupInfoSlots()
