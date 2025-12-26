@@ -6,12 +6,15 @@
 [![GitHub Release](https://img.shields.io/github/v/release/wieslawsoltes/Avalonia.Controls.DataGrid.svg)](https://github.com/wieslawsoltes/Avalonia.Controls.DataGrid/releases)
 
 [![NuGet](https://img.shields.io/nuget/v/ProDataGrid.svg)](https://www.nuget.org/packages/ProDataGrid/)
+[![NuGet](https://img.shields.io/nuget/v/ProDiagnostics.svg)](https://www.nuget.org/packages/ProDiagnostics/)
 
 ## About
 
 `ProDataGrid` is a hard fork of the original `Avalonia.Controls.DataGrid` control for [Avalonia](https://github.com/AvaloniaUI/Avalonia).
 
 It displays repeating data in a customizable grid with enhanced features and improved performance, and is maintained as an independent NuGet package to evolve faster than the in-box control.
+
+`ProDiagnostics` is a hard fork of the original `Avalonia.Diagnostics` for [Avalonia](https://github.com/AvaloniaUI/Avalonia).
 
 ## Features
 
@@ -585,4 +588,4 @@ Sample: see `Hierarchical Model` page in `src/DataGridSample` for a file-system 
 
 ProDataGrid is licensed under the [MIT License](licence.md).
 
-The original Avalonia.Controls.DataGrid license is preserved in [licence-avalonia.md](licence-avalonia.md).
+The original `Avalonia.Controls.DataGrid` and `Avalonia.Diagnostics` license is preserved in [licence-avalonia.md](licence-avalonia.md).
