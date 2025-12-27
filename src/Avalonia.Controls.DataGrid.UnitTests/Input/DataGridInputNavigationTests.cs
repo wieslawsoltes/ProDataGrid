@@ -932,6 +932,34 @@ public class DataGridInputNavigationTests
     }
 
     [AvaloniaFact]
+    public void XYFocus_NavigationModes_Inherits_From_TopLevel()
+    {
+        var (grid, _) = CreateGrid(rowCount: 3);
+        var root = TopLevel.GetTopLevel(grid);
+        Assert.NotNull(root);
+
+        XYFocus.SetNavigationModes(root!, XYFocusNavigationModes.Enabled);
+        grid.UpdateLayout();
+        Dispatcher.UIThread.RunJobs();
+
+        Assert.Equal(XYFocusNavigationModes.Enabled, XYFocus.GetNavigationModes(grid));
+    }
+
+    [AvaloniaFact]
+    public void XYFocus_NavigationModes_Local_Value_Overrides_Inherited()
+    {
+        var (grid, _) = CreateGrid(rowCount: 3);
+        var root = TopLevel.GetTopLevel(grid);
+        Assert.NotNull(root);
+
+        XYFocus.SetNavigationModes(root!, XYFocusNavigationModes.Gamepad);
+        XYFocus.SetNavigationModes(grid, XYFocusNavigationModes.Enabled);
+        grid.UpdateLayout();
+
+        Assert.Equal(XYFocusNavigationModes.Enabled, XYFocus.GetNavigationModes(grid));
+    }
+
+    [AvaloniaFact]
     public void KeyDown_Respects_Handled_Flag()
     {
         var (grid, _) = CreateGrid();

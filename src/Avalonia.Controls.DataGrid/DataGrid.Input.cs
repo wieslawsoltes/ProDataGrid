@@ -974,12 +974,32 @@ internal
             return false;
         }
 
+        private void DataGrid_KeyDownDirectional(object sender, KeyEventArgs e)
+        {
+            if (e.Handled || !IsDirectionalKey(e.Key))
+            {
+                return;
+            }
+
+            if (!IsKeyEventFromThisGrid(e))
+            {
+                return;
+            }
+
+            e.Handled = ProcessDataGridKey(e);
+        }
+
         private void DataGrid_KeyDown(object sender, KeyEventArgs e)
         {
             if (!e.Handled)
             {
                 e.Handled = ProcessDataGridKey(e);
             }
+        }
+
+        private static bool IsDirectionalKey(Key key)
+        {
+            return key is Key.Up or Key.Down or Key.Left or Key.Right;
         }
 
 

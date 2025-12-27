@@ -1,0 +1,85 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:models="clr-namespace:DataGridSample.Models"
+             xmlns:viewModels="clr-namespace:DataGridSample.ViewModels"
+             x:Class="DataGridSample.Pages.XYFocusModesPage"
+             x:DataType="viewModels:XYFocusModesViewModel">
+  <UserControl.DataContext>
+    <viewModels:XYFocusModesViewModel />
+  </UserControl.DataContext>
+
+  <Grid RowDefinitions="Auto,Auto,*" Margin="12" RowSpacing="8">
+    <StackPanel Grid.Row="0" Spacing="4">
+      <TextBlock Classes="h2">XY focus modes</TextBlock>
+      <TextBlock Text="XYFocus.NavigationModes controls which key devices use 2D directional focus navigation. Enable Keyboard to move focus with arrow keys across the layout below."
+                 TextWrapping="Wrap" />
+    </StackPanel>
+
+    <StackPanel Grid.Row="1" Orientation="Horizontal" Spacing="12">
+      <TextBlock VerticalAlignment="Center" Text="Active modes:" />
+      <CheckBox Content="Keyboard" IsChecked="{Binding KeyboardEnabled}" />
+      <CheckBox Content="Gamepad" IsChecked="{Binding GamepadEnabled}" />
+      <CheckBox Content="Remote" IsChecked="{Binding RemoteEnabled}" />
+      <TextBlock VerticalAlignment="Center" Text="{Binding ModesLabel}" />
+    </StackPanel>
+
+    <Grid Grid.Row="2"
+          ColumnDefinitions="2*,3*"
+          ColumnSpacing="12"
+          XYFocus.NavigationModes="{Binding NavigationModes}">
+      <Border BorderBrush="{DynamicResource SystemControlForegroundBaseMediumBrush}"
+              BorderThickness="1"
+              CornerRadius="4"
+              Padding="8">
+        <StackPanel Spacing="6">
+          <TextBlock Classes="h3">Directional focus playground</TextBlock>
+          <TextBlock Text="Click any button and use arrow keys. With Keyboard mode enabled, focus moves in 2D."
+                     TextWrapping="Wrap" />
+          <UniformGrid Rows="3" Columns="3" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="0,4,0,0">
+            <Button Content="A1" />
+            <Button Content="A2" />
+            <Button Content="A3" />
+            <Button Content="B1" />
+            <Button Content="B2" />
+            <Button Content="B3" />
+            <Button Content="C1" />
+            <Button Content="C2" />
+            <Button Content="C3" />
+          </UniformGrid>
+          <StackPanel Orientation="Horizontal" Spacing="6">
+            <TextBox Width="140" Watermark="Focusable text" />
+            <ToggleButton Content="Toggle me" />
+            <Button Content="Action" />
+          </StackPanel>
+        </StackPanel>
+      </Border>
+
+      <Border Grid.Column="1"
+              BorderBrush="{DynamicResource SystemControlForegroundBaseMediumBrush}"
+              BorderThickness="1"
+              CornerRadius="4"
+              Padding="8">
+        <StackPanel Spacing="6">
+          <TextBlock Classes="h3">DataGrid focus</TextBlock>
+          <TextBlock Text="Arrow keys still navigate selection inside the grid, even when XY focus is enabled."
+                     TextWrapping="Wrap" />
+          <DataGrid ItemsSource="{Binding Items}"
+                    AutoGenerateColumns="False"
+                    CanUserAddRows="False"
+                    CanUserDeleteRows="False"
+                    SelectionMode="Single"
+                    SelectionUnit="FullRow"
+                    IsReadOnly="True"
+                    Height="280">
+            <DataGrid.Columns>
+              <DataGridTextColumn Header="First" Binding="{Binding FirstName}" Width="2*" x:DataType="models:Person" />
+              <DataGridTextColumn Header="Last" Binding="{Binding LastName}" Width="2*" x:DataType="models:Person" />
+              <DataGridTextColumn Header="Age" Binding="{Binding Age}" Width="*" x:DataType="models:Person" />
+              <DataGridCheckBoxColumn Header="Is Banned" Binding="{Binding IsBanned}" Width="*" x:DataType="models:Person" />
+            </DataGrid.Columns>
+          </DataGrid>
+        </StackPanel>
+      </Border>
+    </Grid>
+  </Grid>
+</UserControl>

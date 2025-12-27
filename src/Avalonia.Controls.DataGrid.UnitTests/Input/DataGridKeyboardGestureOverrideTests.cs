@@ -17,7 +17,40 @@ namespace Avalonia.Controls.DataGridTests.Input;
 public class DataGridKeyboardGestureOverrideTests
 {
     [AvaloniaFact]
-    public void KeyDown_Handler_Can_Block_BuiltIn_When_AfterHandlers()
+    public void KeyDown_Handler_Can_Block_BuiltIn_When_AfterHandlers_For_NonDirectionalKeys()
+    {
+        var (grid, _) = CreateGrid();
+        SetCurrentCell(grid, rowIndex: 0, columnIndex: 0);
+        SetDisplayedScrollingElements(grid, 1);
+
+        var invoked = false;
+        grid.KeyDown += (_, e) =>
+        {
+            if (e.Key == Key.PageDown)
+            {
+                invoked = true;
+                e.Handled = true;
+            }
+        };
+
+        var handledArgs = new KeyEventArgs
+        {
+            RoutedEvent = InputElement.KeyDownEvent,
+            Route = InputElement.KeyDownEvent.RoutingStrategies,
+            Key = Key.PageDown,
+            Source = grid,
+            KeyDeviceType = KeyDeviceType.Keyboard
+        };
+
+        grid.RaiseEvent(handledArgs);
+        InvokeDataGridKeyDown(grid, handledArgs);
+
+        Assert.True(invoked);
+        Assert.Equal(0, grid.SelectedIndex);
+    }
+
+    [AvaloniaFact]
+    public void DirectionalKeys_Run_Before_AfterHandlers()
     {
         var (grid, _) = CreateGrid();
         SetCurrentCell(grid, rowIndex: 0, columnIndex: 0);
@@ -32,7 +65,7 @@ public class DataGridKeyboardGestureOverrideTests
             }
         };
 
-        var handledArgs = new KeyEventArgs
+        var args = new KeyEventArgs
         {
             RoutedEvent = InputElement.KeyDownEvent,
             Route = InputElement.KeyDownEvent.RoutingStrategies,
@@ -41,11 +74,11 @@ public class DataGridKeyboardGestureOverrideTests
             KeyDeviceType = KeyDeviceType.Keyboard
         };
 
-        grid.RaiseEvent(handledArgs);
-        InvokeDataGridKeyDown(grid, handledArgs);
+        grid.RaiseEvent(args);
 
-        Assert.True(invoked);
-        Assert.Equal(0, grid.SelectedIndex);
+        Assert.False(invoked);
+        Assert.True(args.Handled);
+        Assert.Equal(1, grid.SelectedIndex);
     }
 
     [AvaloniaFact]

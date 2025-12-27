@@ -490,6 +490,9 @@ internal
         /// </summary>
         public DataGrid()
         {
+            // Handle arrow keys early so grid navigation wins over XYFocus.
+            KeyDown += DataGrid_KeyDownDirectional;
+
             //TODO: Check if override works
             GotFocus += DataGrid_GotFocus;
             LostFocus += DataGrid_LostFocus;

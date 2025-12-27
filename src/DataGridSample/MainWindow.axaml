@@ -140,6 +140,9 @@
     <TabItem Header="Keyboard Overrides">
       <pages:KeyboardGestureHandlingPage />
     </TabItem>
+    <TabItem Header="XY Focus Modes">
+      <pages:XYFocusModesPage />
+    </TabItem>
     <TabItem Header="Large Variable Height">
       <local:LargeVariableHeightPage />
     </TabItem>
