@@ -619,6 +619,8 @@ internal
 
             SetVerticalOffset(_verticalOffset);
 
+            SyncLogicalScrollableOffset();
+
             InvalidateMeasure();
             InvalidateRowsMeasure(false /*invalidateIndividualRows*/);
 

@@ -14,6 +14,7 @@ using Avalonia.Controls.Templates;
 using Avalonia.Data;
 using Avalonia.Headless;
 using Avalonia.Headless.XUnit;
+using Avalonia.Input;
 using Avalonia.Layout;
 using Avalonia.Markup.Xaml.Styling;
 using Avalonia.Media;
@@ -1485,6 +1486,35 @@ public class DataGridScrollingTests
     }
 
     [AvaloniaFact]
+    public void Keyboard_Navigation_Scrolls_When_AutoScroll_Disabled()
+    {
+        // Arrange
+        var items = Enumerable.Range(0, 300).Select(x => new ScrollTestModel($"Item {x}")).ToList();
+        var target = CreateTarget(items, height: 140, useLogicalScrollable: true);
+        target.AutoScrollToSelectedItem = false;
+        target.UpdateLayout();
+
+        var initialFirstVisible = GetFirstVisibleRowIndex(target);
+        Assert.True(target.DisplayData.LastScrollingSlot >= 0, $"Expected rows to be realized. LastScrollingSlot: {target.DisplayData.LastScrollingSlot}");
+
+        // Act - move down beyond the viewport
+        for (var i = 0; i < 40; i++)
+        {
+            PressKey(target, Key.Down);
+        }
+        Dispatcher.UIThread.RunJobs();
+        target.UpdateLayout();
+
+        // Assert - viewport should advance with keyboard navigation
+        Assert.True(target.SelectedIndex > 0, $"Expected selection to move. SelectedIndex: {target.SelectedIndex}");
+        Assert.True(target.CurrentSlot > 0, $"Expected current slot to move. CurrentSlot: {target.CurrentSlot}");
+        var firstVisibleAfter = GetFirstVisibleRowIndex(target);
+        Assert.True(firstVisibleAfter > initialFirstVisible,
+            $"Expected viewport to advance. Before: {initialFirstVisible}, After: {firstVisibleAfter}. " +
+            $"SelectedIndex: {target.SelectedIndex}, CurrentSlot: {target.CurrentSlot}");
+    }
+
+    [AvaloniaFact]
     public void AutoScrollToSelectedItem_Does_Not_Fight_User_Scroll()
     {
         // Arrange
@@ -1933,6 +1963,25 @@ public class DataGridScrollingTests
             .OfType<DataGridRow>()
             .FirstOrDefault(r => ReferenceEquals(r.DataContext, item));
     }
+
+    private static void PressKey(DataGrid target, Key key)
+    {
+        var args = new KeyEventArgs
+        {
+            RoutedEvent = InputElement.KeyDownEvent,
+            Route = InputElement.KeyDownEvent.RoutingStrategies,
+            Key = key,
+            KeyModifiers = KeyModifiers.None,
+            Source = target,
+            KeyDeviceType = KeyDeviceType.Keyboard
+        };
+
+        var method = typeof(DataGrid).GetMethod(
+            "DataGrid_KeyDown",
+            BindingFlags.Instance | BindingFlags.NonPublic);
+        method?.Invoke(target, new object[] { target, args });
+    }
+
 
     private static DataGrid CreateGroupedTarget(IList<GroupableTestModel> items, int height = 200, bool useLogicalScrollable = false)
     {

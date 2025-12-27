@@ -108,7 +108,10 @@ internal
                         break;
                 }
 
-                if (CurrentSlot != slot || (CurrentColumnIndex != columnIndex && columnIndex != -1))
+                bool currentCellChanged = CurrentSlot != slot || (CurrentColumnIndex != columnIndex && columnIndex != -1);
+                int scrollColumnIndex = columnIndex;
+
+                if (currentCellChanged)
                 {
                     if (columnIndex == -1)
                     {
@@ -130,15 +133,37 @@ internal
                         if (!SetCurrentCellCore(
                                 columnIndex, slot,
                                 commitEdit: true,
-                                endRowEdit: SlotFromRowIndex(SelectedIndex) != slot)
-                            || (scrollIntoView &&
-                                !ScrollSlotIntoView(
-                                    columnIndex, slot,
-                                    forCurrentCellChange: true,
-                                    forceHorizontalScroll: false)))
+                                endRowEdit: SlotFromRowIndex(SelectedIndex) != slot))
                         {
                             return;
                         }
+                    }
+
+                    scrollColumnIndex = columnIndex;
+                }
+
+                if (scrollIntoView)
+                {
+                    if (scrollColumnIndex == -1)
+                    {
+                        scrollColumnIndex = CurrentColumnIndex;
+                        if (scrollColumnIndex == -1)
+                        {
+                            DataGridColumn firstVisibleColumn = ColumnsInternal.FirstVisibleNonFillerColumn;
+                            if (firstVisibleColumn != null)
+                            {
+                                scrollColumnIndex = firstVisibleColumn.Index;
+                            }
+                        }
+                    }
+
+                    if (scrollColumnIndex != -1 &&
+                        !ScrollSlotIntoView(
+                            scrollColumnIndex, slot,
+                            forCurrentCellChange: currentCellChanged,
+                            forceHorizontalScroll: false))
+                    {
+                        return;
                     }
                 }
                 _successfullyUpdatedSelection = true;
