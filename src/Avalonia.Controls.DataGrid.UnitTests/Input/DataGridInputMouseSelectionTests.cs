@@ -102,7 +102,7 @@ public class DataGridInputMouseSelectionTests
     }
 
     [AvaloniaFact]
-    public void PointerPressed_Does_Not_Change_Selection_When_Handled()
+    public void PointerPressed_When_Handled_Changes_Selection_For_Unselected_Cell()
     {
         var (grid, items) = CreateGrid(selectionUnit: DataGridSelectionUnit.FullRow, selectionMode: DataGridSelectionMode.Extended);
         SetCurrentCell(grid, rowIndex: 0, columnIndex: 0);
@@ -123,7 +123,76 @@ public class DataGridInputMouseSelectionTests
         cell.RaiseEvent(args);
 
         Assert.Single(grid.SelectedItems);
+        Assert.Contains(items[1], grid.SelectedItems.Cast<RowItem>());
+        Assert.Equal(slot, grid.CurrentSlot);
+        Assert.Equal(0, grid.CurrentColumnIndex);
+    }
+
+    [AvaloniaFact]
+    public void PointerPressed_When_Handled_Does_Not_Change_Selection_For_Current_Cell()
+    {
+        var (grid, items) = CreateGrid(selectionUnit: DataGridSelectionUnit.FullRow, selectionMode: DataGridSelectionMode.Extended);
+        SetCurrentCell(grid, rowIndex: 0, columnIndex: 0);
+
+        var slot = grid.SlotFromRowIndex(0);
+        Assert.Equal(slot, grid.CurrentSlot);
+        Assert.Equal(0, grid.CurrentColumnIndex);
+        Assert.Single(grid.SelectedItems);
         Assert.Contains(items[0], grid.SelectedItems.Cast<RowItem>());
+
+        var row = grid.DisplayData.GetDisplayedElement(slot) as DataGridRow;
+        Assert.NotNull(row);
+
+        var cell = row!.Cells[0];
+        Assert.NotNull(cell);
+        cell.Focus();
+        grid.UpdateLayout();
+        Dispatcher.UIThread.RunJobs();
+        Assert.True(cell.IsKeyboardFocusWithin);
+
+        cell.AddHandler(InputElement.PointerPressedEvent, (_, eventArgs) => eventArgs.Handled = true, RoutingStrategies.Tunnel);
+
+        var args = CreateLeftPointerArgs(cell);
+        cell.RaiseEvent(args);
+
+        Assert.Single(grid.SelectedItems);
+        Assert.Contains(items[0], grid.SelectedItems.Cast<RowItem>());
+        Assert.Equal(slot, grid.CurrentSlot);
+        Assert.Equal(0, grid.CurrentColumnIndex);
+    }
+
+    [AvaloniaFact]
+    public void PointerPressed_When_Handled_Allows_Cell_MultiSelect_With_Ctrl()
+    {
+        var (grid, _) = CreateGrid(selectionUnit: DataGridSelectionUnit.Cell, selectionMode: DataGridSelectionMode.Extended);
+        var slot0 = grid.SlotFromRowIndex(0);
+        InvokeUpdateStateOnMouseLeftButtonDown(grid, CreateLeftPointerArgs(grid), columnIndex: 0, slot: slot0, allowEdit: false);
+
+        Assert.Single(grid.SelectedCells);
+        var firstCell = grid.SelectedCells.First();
+        Assert.Equal(0, firstCell.RowIndex);
+        Assert.Equal(0, firstCell.ColumnIndex);
+        Assert.Equal(slot0, grid.CurrentSlot);
+        Assert.Equal(0, grid.CurrentColumnIndex);
+
+        var ctrl = GetCtrlOrCmdModifier(grid);
+        var slot = grid.SlotFromRowIndex(1);
+        var row = grid.DisplayData.GetDisplayedElement(slot) as DataGridRow;
+        Assert.NotNull(row);
+
+        var cell = row!.Cells[1];
+        Assert.NotNull(cell);
+
+        cell.AddHandler(InputElement.PointerPressedEvent, (_, eventArgs) => eventArgs.Handled = true, RoutingStrategies.Tunnel);
+
+        var args = CreateLeftPointerArgs(cell, ctrl);
+        cell.RaiseEvent(args);
+
+        Assert.Equal(2, grid.SelectedCells.Count);
+        Assert.Contains(grid.SelectedCells, selected => selected.RowIndex == 0 && selected.ColumnIndex == 0);
+        Assert.Contains(grid.SelectedCells, selected => selected.RowIndex == 1 && selected.ColumnIndex == 1);
+        Assert.Equal(slot, grid.CurrentSlot);
+        Assert.Equal(1, grid.CurrentColumnIndex);
     }
 
     [AvaloniaFact]

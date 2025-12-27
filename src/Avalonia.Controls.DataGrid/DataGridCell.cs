@@ -10,6 +10,7 @@ using Avalonia.Automation.Peers;
 using Avalonia.Controls.Automation.Peers;
 using Avalonia.Controls.Metadata;
 using Avalonia.Controls.Primitives;
+using Avalonia.Controls.Utils;
 using Avalonia.Controls.Shapes;
 using Avalonia.Input;
 
@@ -55,7 +56,8 @@ internal
         static DataGridCell()
         {
             PointerPressedEvent.AddClassHandler<DataGridCell>(
-                (x,e) => x.DataGridCell_PointerPressed(e));
+                (x, e) => x.DataGridCell_PointerPressed(e),
+                handledEventsToo: true);
             FocusableProperty.OverrideDefaultValue<DataGridCell>(true);
             IsTabStopProperty.OverrideDefaultValue<DataGridCell>(false);
             AutomationProperties.IsOffscreenBehaviorProperty.OverrideDefaultValue<DataGridCell>(IsOffscreenBehavior.FromClip);
@@ -198,46 +200,51 @@ internal
         //TODO TabStop
         private void DataGridCell_PointerPressed(PointerPressedEventArgs e)
         {
-            if (e.Handled)
-            {
-                return;
-            }
-
             // OwningGrid is null for TopLeftHeaderCell and TopRightHeaderCell because they have no OwningRow
             if (OwningGrid == null)
             {
                 return;
             }
             OwningGrid.OnCellPointerPressed(new DataGridCellPointerPressedEventArgs(this, OwningRow, OwningColumn, e));
-            if (e.Handled)
+
+            var point = e.GetCurrentPoint(this);
+            if (point.Properties.IsLeftButtonPressed)
             {
-                return;
-            }
-            if (e.GetCurrentPoint(this).Properties.IsLeftButtonPressed)
-            {
-                if (OwningGrid.IsTabStop)
+                var focusWithin = IsKeyboardFocusWithin;
+                if (OwningGrid.IsTabStop && !focusWithin)
                 {
                     OwningGrid.Focus();
                 }
+
                 if (OwningRow != null)
                 {
-                    var handled = OwningGrid.UpdateStateOnMouseLeftButtonDown(e, ColumnIndex, OwningRow.Slot, !e.Handled);
+                    KeyboardHelper.GetMetaKeyState(this, e.KeyModifiers, out bool ctrl, out _);
+                    bool isSelected = OwningGrid.SelectionUnit == DataGridSelectionUnit.FullRow
+                        ? OwningGrid.GetRowSelection(OwningRow.Slot)
+                        : OwningGrid.GetCellSelectionFromSlot(OwningRow.Slot, ColumnIndex);
 
-                    // Do not handle PointerPressed with touch or pen,
-                    // so we can start scroll gesture on the same event.
-                    if (e.Pointer.Type != PointerType.Touch && e.Pointer.Type != PointerType.Pen)
+                    bool shouldHandleSelection = !e.Handled || !focusWithin || !isSelected || ctrl;
+                    if (shouldHandleSelection)
                     {
-                        e.Handled = handled;
+                        bool allowEdit = !e.Handled && focusWithin && isSelected && !ctrl;
+                        var handled = OwningGrid.UpdateStateOnMouseLeftButtonDown(e, ColumnIndex, OwningRow.Slot, allowEdit);
+
+                        // Do not handle PointerPressed with touch or pen,
+                        // so we can start scroll gesture on the same event.
+                        if (e.Pointer.Type != PointerType.Touch && e.Pointer.Type != PointerType.Pen)
+                        {
+                            e.Handled = handled;
+                        }
                     }
                 }
             }
-            else if (e.GetCurrentPoint(this).Properties.IsRightButtonPressed)
+            else if (point.Properties.IsRightButtonPressed)
             {
                 if (OwningGrid.IsTabStop)
                 {
                     OwningGrid.Focus();
                 }
-                if (OwningRow != null)
+                if (OwningRow != null && !e.Handled)
                 {
                     e.Handled = OwningGrid.UpdateStateOnMouseRightButtonDown(e, ColumnIndex, OwningRow.Slot, !e.Handled);
                 }
