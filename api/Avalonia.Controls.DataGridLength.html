@@ -1,0 +1,903 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+      <title>Struct DataGridLength | ProDataGrid for Avalonia </title>
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <meta name="title" content="Struct DataGridLength | ProDataGrid for Avalonia ">
+      
+      <meta name="description" content="Represents the lengths of elements within the  control.">
+      <link rel="icon" href="../favicon.ico">
+      <link rel="stylesheet" href="../public/docfx.min.css">
+      <link rel="stylesheet" href="../public/main.css">
+      <meta name="docfx:navrel" content="../toc.html">
+      <meta name="docfx:tocrel" content="toc.html">
+      
+      
+      
+      
+      <meta name="docfx:docurl" content="https://github.com/wieslawsoltes/ProDataGrid/new/Docs/apiSpec/new?filename=Avalonia_Controls_DataGridLength.md&amp;value=---%0Auid%3A%20Avalonia.Controls.DataGridLength%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">
+      <meta name="loc:inThisArticle" content="In this article">
+      <meta name="loc:searchResultsCount" content="{count} results for &quot;{query}&quot;">
+      <meta name="loc:searchNoResults" content="No results for &quot;{query}&quot;">
+      <meta name="loc:tocFilter" content="Filter by title">
+      <meta name="loc:nextArticle" content="Next">
+      <meta name="loc:prevArticle" content="Previous">
+      <meta name="loc:themeLight" content="Light">
+      <meta name="loc:themeDark" content="Dark">
+      <meta name="loc:themeAuto" content="Auto">
+      <meta name="loc:changeTheme" content="Change theme">
+      <meta name="loc:copy" content="Copy">
+      <meta name="loc:downloadPdf" content="Download PDF">
+
+      <script type="module" src="./../public/docfx.min.js"></script>
+
+      <script>
+        const theme = localStorage.getItem('theme') || 'auto'
+        document.documentElement.setAttribute('data-bs-theme', theme === 'auto' ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light') : theme)
+      </script>
+
+  </head>
+
+  <body class="tex2jax_ignore" data-layout="" data-yaml-mime="ManagedReference">
+    <header class="bg-body border-bottom">
+      <nav id="autocollapse" class="navbar navbar-expand-md" role="navigation">
+        <div class="container-xxl flex-nowrap">
+          <a class="navbar-brand" href="../index.html">
+            <img id="logo" class="svg" src="../images/logo.svg" alt="">
+            
+          </a>
+          <button class="btn btn-lg d-md-none border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navpanel" aria-controls="navpanel" aria-expanded="false" aria-label="Toggle navigation">
+            <i class="bi bi-three-dots"></i>
+          </button>
+          <div class="collapse navbar-collapse" id="navpanel">
+            <div id="navbar">
+            </div>
+          </div>
+        </div>
+      </nav>
+    </header>
+
+    <main class="container-xxl">
+      <div class="toc-offcanvas">
+        <div class="offcanvas-md offcanvas-start" tabindex="-1" id="tocOffcanvas" aria-labelledby="tocOffcanvasLabel">
+          <div class="offcanvas-header">
+            <h5 class="offcanvas-title" id="tocOffcanvasLabel">Table of Contents</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="offcanvas" data-bs-target="#tocOffcanvas" aria-label="Close"></button>
+          </div>
+          <div class="offcanvas-body">
+            <nav class="toc" id="toc"></nav>
+          </div>
+        </div>
+      </div>
+
+      <div class="content">
+        <div class="actionbar">
+          <button class="btn btn-lg border-0 d-md-none" type="button" data-bs-toggle="offcanvas" data-bs-target="#tocOffcanvas" aria-controls="tocOffcanvas" aria-expanded="false" aria-label="Show table of contents">
+            <i class="bi bi-list"></i>
+          </button>
+
+          <nav id="breadcrumb"></nav>
+        </div>
+
+        <article data-uid="Avalonia.Controls.DataGridLength">
+
+
+
+  <h1 id="Avalonia_Controls_DataGridLength" data-uid="Avalonia.Controls.DataGridLength" class="text-break">
+Struct DataGridLength  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/Docs/src/Avalonia.Controls.DataGrid/DataGridLength.cs/#L30"><i class="bi bi-code-slash"></i></a>
+  </h1>
+
+  <div class="facts text-secondary">
+    <dl><dt>Namespace</dt><dd><a class="xref" href="Avalonia.html">Avalonia</a>.<a class="xref" href="Avalonia.Controls.html">Controls</a></dd></dl>
+  <dl><dt>Assembly</dt><dd>Avalonia.Controls.DataGrid.dll</dd></dl>
+  </div>
+
+  <div class="markdown summary"><p>Represents the lengths of elements within the <a class="xref" href="Avalonia.Controls.DataGrid.html">DataGrid</a> control.</p>
+</div>
+  <div class="markdown conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">[TypeConverter(typeof(DataGridLengthConverter))]
+public struct DataGridLength : IEquatable&lt;DataGridLength&gt;</code></pre>
+  </div>
+
+
+
+
+
+  <dl class="typelist implements">
+    <dt>Implements</dt>
+    <dd>
+      <div><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.iequatable-1">IEquatable</a>&lt;<a class="xref" href="Avalonia.Controls.DataGridLength.html">DataGridLength</a>&gt;</div>
+    </dd>
+  </dl>
+
+
+  <dl class="typelist inheritedMembers">
+    <dt>Inherited Members</dt>
+    <dd>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.valuetype.tostring">ValueType.ToString()</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object-system-object)">object.Equals(object, object)</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.gettype">object.GetType()</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.referenceequals">object.ReferenceEquals(object, object)</a>
+    </div>
+  </dd></dl>
+
+
+
+
+
+
+  <h2 class="section" id="constructors">Constructors
+</h2>
+
+
+  <a id="Avalonia_Controls_DataGridLength__ctor_" data-uid="Avalonia.Controls.DataGridLength.#ctor*"></a>
+
+  <h3 id="Avalonia_Controls_DataGridLength__ctor_System_Double_" data-uid="Avalonia.Controls.DataGridLength.#ctor(System.Double)">
+  DataGridLength(double)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/Docs/src/Avalonia.Controls.DataGrid/DataGridLength.cs/#L56"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Initializes a new instance of the <a class="xref" href="Avalonia.Controls.DataGridLength.html">DataGridLength</a> class.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public DataGridLength(double value)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>value</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.double">double</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Avalonia_Controls_DataGridLength__ctor_" data-uid="Avalonia.Controls.DataGridLength.#ctor*"></a>
+
+  <h3 id="Avalonia_Controls_DataGridLength__ctor_System_Double_Avalonia_Controls_DataGridLengthUnitType_" data-uid="Avalonia.Controls.DataGridLength.#ctor(System.Double,Avalonia.Controls.DataGridLengthUnitType)">
+  DataGridLength(double, DataGridLengthUnitType)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/Docs/src/Avalonia.Controls.DataGrid/DataGridLength.cs/#L75"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Initializes to a specified value and unit.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public DataGridLength(double value, DataGridLengthUnitType type)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>value</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.double">double</a></dt>
+    <dd><p>The value to hold.</p>
+</dd>
+    <dt><code>type</code> <a class="xref" href="Avalonia.Controls.DataGridLengthUnitType.html">DataGridLengthUnitType</a></dt>
+    <dd><p>The unit of <code>value</code>.</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <h4 class="section" id="Avalonia_Controls_DataGridLength__ctor_System_Double_Avalonia_Controls_DataGridLengthUnitType__remarks">Remarks</h4>
+  <div class="markdown level1 remarks"><p><code>value</code> is ignored unless <code>type</code> is
+<code>DataGridLengthUnitType.Pixel</code> or
+<code>DataGridLengthUnitType.Star</code></p>
+</div>
+
+  <h4 class="section">Exceptions</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.argumentexception">ArgumentException</a></dt>
+    <dd><p>If <code>value</code> parameter is <code>double.NaN</code>
+or <code>value</code> parameter is <code>double.NegativeInfinity</code>
+or <code>value</code> parameter is <code>double.PositiveInfinity</code>.</p>
+</dd>
+  </dl>
+
+
+
+  <a id="Avalonia_Controls_DataGridLength__ctor_" data-uid="Avalonia.Controls.DataGridLength.#ctor*"></a>
+
+  <h3 id="Avalonia_Controls_DataGridLength__ctor_System_Double_Avalonia_Controls_DataGridLengthUnitType_System_Double_System_Double_" data-uid="Avalonia.Controls.DataGridLength.#ctor(System.Double,Avalonia.Controls.DataGridLengthUnitType,System.Double,System.Double)">
+  DataGridLength(double, DataGridLengthUnitType, double, double)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/Docs/src/Avalonia.Controls.DataGrid/DataGridLength.cs/#L97"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Initializes to a specified value and unit.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public DataGridLength(double value, DataGridLengthUnitType type, double desiredValue, double displayValue)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>value</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.double">double</a></dt>
+    <dd><p>The value to hold.</p>
+</dd>
+    <dt><code>type</code> <a class="xref" href="Avalonia.Controls.DataGridLengthUnitType.html">DataGridLengthUnitType</a></dt>
+    <dd><p>The unit of <code>value</code>.</p>
+</dd>
+    <dt><code>desiredValue</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.double">double</a></dt>
+    <dd></dd>
+    <dt><code>displayValue</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.double">double</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <h4 class="section" id="Avalonia_Controls_DataGridLength__ctor_System_Double_Avalonia_Controls_DataGridLengthUnitType_System_Double_System_Double__remarks">Remarks</h4>
+  <div class="markdown level1 remarks"><p><code>value</code> is ignored unless <code>type</code> is
+<code>DataGridLengthUnitType.Pixel</code> or
+<code>DataGridLengthUnitType.Star</code></p>
+</div>
+
+  <h4 class="section">Exceptions</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.argumentexception">ArgumentException</a></dt>
+    <dd><p>If <code>value</code> parameter is <code>double.NaN</code>
+or <code>value</code> parameter is <code>double.NegativeInfinity</code>
+or <code>value</code> parameter is <code>double.PositiveInfinity</code>.</p>
+</dd>
+  </dl>
+
+
+
+  <h2 class="section" id="properties">Properties
+</h2>
+
+
+  <a id="Avalonia_Controls_DataGridLength_Auto_" data-uid="Avalonia.Controls.DataGridLength.Auto*"></a>
+
+  <h3 id="Avalonia_Controls_DataGridLength_Auto" data-uid="Avalonia.Controls.DataGridLength.Auto">
+  Auto
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/Docs/src/Avalonia.Controls.DataGrid/DataGridLength.cs/#L149"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Gets a <a class="xref" href="Avalonia.Controls.DataGridLength.html">DataGridLength</a> structure that represents the standard automatic sizing mode.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static DataGridLength Auto { get; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="Avalonia.Controls.DataGridLength.html">DataGridLength</a></dt>
+    <dd><p>A <a class="xref" href="Avalonia.Controls.DataGridLength.html">DataGridLength</a> structure that represents the standard automatic sizing mode.</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="Avalonia_Controls_DataGridLength_DesiredValue_" data-uid="Avalonia.Controls.DataGridLength.DesiredValue*"></a>
+
+  <h3 id="Avalonia_Controls_DataGridLength_DesiredValue" data-uid="Avalonia.Controls.DataGridLength.DesiredValue">
+  DesiredValue
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/Docs/src/Avalonia.Controls.DataGrid/DataGridLength.cs/#L160"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Returns the desired value of this instance.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public double DesiredValue { get; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.double">double</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="Avalonia_Controls_DataGridLength_DisplayValue_" data-uid="Avalonia.Controls.DataGridLength.DisplayValue*"></a>
+
+  <h3 id="Avalonia_Controls_DataGridLength_DisplayValue" data-uid="Avalonia.Controls.DataGridLength.DisplayValue">
+  DisplayValue
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/Docs/src/Avalonia.Controls.DataGrid/DataGridLength.cs/#L171"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Returns the display value of this instance.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public double DisplayValue { get; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.double">double</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="Avalonia_Controls_DataGridLength_IsAbsolute_" data-uid="Avalonia.Controls.DataGridLength.IsAbsolute*"></a>
+
+  <h3 id="Avalonia_Controls_DataGridLength_IsAbsolute" data-uid="Avalonia.Controls.DataGridLength.IsAbsolute">
+  IsAbsolute
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/Docs/src/Avalonia.Controls.DataGrid/DataGridLength.cs/#L183"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Returns <code>true</code> if this DataGridLength instance holds
+an absolute (pixel) value.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public bool IsAbsolute { get; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="Avalonia_Controls_DataGridLength_IsAuto_" data-uid="Avalonia.Controls.DataGridLength.IsAuto*"></a>
+
+  <h3 id="Avalonia_Controls_DataGridLength_IsAuto" data-uid="Avalonia.Controls.DataGridLength.IsAuto">
+  IsAuto
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/Docs/src/Avalonia.Controls.DataGrid/DataGridLength.cs/#L195"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Returns <code>true</code> if this DataGridLength instance is
+automatic (not specified).</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public bool IsAuto { get; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="Avalonia_Controls_DataGridLength_IsSizeToCells_" data-uid="Avalonia.Controls.DataGridLength.IsSizeToCells*"></a>
+
+  <h3 id="Avalonia_Controls_DataGridLength_IsSizeToCells" data-uid="Avalonia.Controls.DataGridLength.IsSizeToCells">
+  IsSizeToCells
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/Docs/src/Avalonia.Controls.DataGrid/DataGridLength.cs/#L206"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Returns <code>true</code> if this instance is to size to the cells of a column or row.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public bool IsSizeToCells { get; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="Avalonia_Controls_DataGridLength_IsSizeToHeader_" data-uid="Avalonia.Controls.DataGridLength.IsSizeToHeader*"></a>
+
+  <h3 id="Avalonia_Controls_DataGridLength_IsSizeToHeader" data-uid="Avalonia.Controls.DataGridLength.IsSizeToHeader">
+  IsSizeToHeader
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/Docs/src/Avalonia.Controls.DataGrid/DataGridLength.cs/#L217"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Returns <code>true</code> if this instance is to size to the header of a column or row.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public bool IsSizeToHeader { get; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="Avalonia_Controls_DataGridLength_IsStar_" data-uid="Avalonia.Controls.DataGridLength.IsStar*"></a>
+
+  <h3 id="Avalonia_Controls_DataGridLength_IsStar" data-uid="Avalonia.Controls.DataGridLength.IsStar">
+  IsStar
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/Docs/src/Avalonia.Controls.DataGrid/DataGridLength.cs/#L229"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Returns <code>true</code> if this DataGridLength instance holds a weighted proportion
+of available space.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public bool IsStar { get; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="Avalonia_Controls_DataGridLength_SizeToCells_" data-uid="Avalonia.Controls.DataGridLength.SizeToCells*"></a>
+
+  <h3 id="Avalonia_Controls_DataGridLength_SizeToCells" data-uid="Avalonia.Controls.DataGridLength.SizeToCells">
+  SizeToCells
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/Docs/src/Avalonia.Controls.DataGrid/DataGridLength.cs/#L243"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Gets a <a class="xref" href="Avalonia.Controls.DataGridLength.html">DataGridLength</a> structure that represents the cell-based automatic sizing mode.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static DataGridLength SizeToCells { get; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="Avalonia.Controls.DataGridLength.html">DataGridLength</a></dt>
+    <dd><p>A <a class="xref" href="Avalonia.Controls.DataGridLength.html">DataGridLength</a> structure that represents the cell-based automatic sizing mode.</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="Avalonia_Controls_DataGridLength_SizeToHeader_" data-uid="Avalonia.Controls.DataGridLength.SizeToHeader*"></a>
+
+  <h3 id="Avalonia_Controls_DataGridLength_SizeToHeader" data-uid="Avalonia.Controls.DataGridLength.SizeToHeader">
+  SizeToHeader
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/Docs/src/Avalonia.Controls.DataGrid/DataGridLength.cs/#L257"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Gets a <a class="xref" href="Avalonia.Controls.DataGridLength.html">DataGridLength</a> structure that represents the header-based automatic sizing mode.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static DataGridLength SizeToHeader { get; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="Avalonia.Controls.DataGridLength.html">DataGridLength</a></dt>
+    <dd><p>A <a class="xref" href="Avalonia.Controls.DataGridLength.html">DataGridLength</a> structure that represents the header-based automatic sizing mode.</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="Avalonia_Controls_DataGridLength_UnitType_" data-uid="Avalonia.Controls.DataGridLength.UnitType*"></a>
+
+  <h3 id="Avalonia_Controls_DataGridLength_UnitType" data-uid="Avalonia.Controls.DataGridLength.UnitType">
+  UnitType
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/Docs/src/Avalonia.Controls.DataGrid/DataGridLength.cs/#L268"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Gets the <a class="xref" href="Avalonia.Controls.DataGridLengthUnitType.html">DataGridLengthUnitType</a> that represents the current sizing mode.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public DataGridLengthUnitType UnitType { get; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="Avalonia.Controls.DataGridLengthUnitType.html">DataGridLengthUnitType</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="Avalonia_Controls_DataGridLength_Value_" data-uid="Avalonia.Controls.DataGridLength.Value*"></a>
+
+  <h3 id="Avalonia_Controls_DataGridLength_Value" data-uid="Avalonia.Controls.DataGridLength.Value">
+  Value
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/Docs/src/Avalonia.Controls.DataGrid/DataGridLength.cs/#L282"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Gets the absolute value of the <a class="xref" href="Avalonia.Controls.DataGridLength.html">DataGridLength</a> in pixels.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public double Value { get; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.double">double</a></dt>
+    <dd><p>The absolute value of the <a class="xref" href="Avalonia.Controls.DataGridLength.html">DataGridLength</a> in pixels.</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <h2 class="section" id="methods">Methods
+</h2>
+
+
+  <a id="Avalonia_Controls_DataGridLength_Equals_" data-uid="Avalonia.Controls.DataGridLength.Equals*"></a>
+
+  <h3 id="Avalonia_Controls_DataGridLength_Equals_Avalonia_Controls_DataGridLength_" data-uid="Avalonia.Controls.DataGridLength.Equals(Avalonia.Controls.DataGridLength)">
+  Equals(DataGridLength)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/Docs/src/Avalonia.Controls.DataGrid/DataGridLength.cs/#L326"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Compares this instance of DataGridLength with another instance.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public bool Equals(DataGridLength other)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>other</code> <a class="xref" href="Avalonia.Controls.DataGridLength.html">DataGridLength</a></dt>
+    <dd><p>DataGridLength length instance to compare.</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></dt>
+    <dd><p><code>true</code> if this DataGridLength instance has the same value
+and unit type as gridLength.</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Avalonia_Controls_DataGridLength_Equals_" data-uid="Avalonia.Controls.DataGridLength.Equals*"></a>
+
+  <h3 id="Avalonia_Controls_DataGridLength_Equals_System_Object_" data-uid="Avalonia.Controls.DataGridLength.Equals(System.Object)">
+  Equals(object?)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/Docs/src/Avalonia.Controls.DataGrid/DataGridLength.cs/#L337"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Compares this instance of DataGridLength with another object.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public override bool Equals(object? obj)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>obj</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object">object</a></dt>
+    <dd><p>Reference to an object for comparison.</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></dt>
+    <dd><p><code>true</code> if this DataGridLength instance has the same value
+and unit type as oCompare.</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Avalonia_Controls_DataGridLength_GetHashCode_" data-uid="Avalonia.Controls.DataGridLength.GetHashCode*"></a>
+
+  <h3 id="Avalonia_Controls_DataGridLength_GetHashCode" data-uid="Avalonia.Controls.DataGridLength.GetHashCode">
+  GetHashCode()
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/Docs/src/Avalonia.Controls.DataGrid/DataGridLength.cs/#L351"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Returns a unique hash code for this DataGridLength</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public override int GetHashCode()</code></pre>
+  </div>
+
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a></dt>
+    <dd><p>hash code</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <h2 class="section" id="operators">Operators
+</h2>
+
+
+  <a id="Avalonia_Controls_DataGridLength_op_Equality_" data-uid="Avalonia.Controls.DataGridLength.op_Equality*"></a>
+
+  <h3 id="Avalonia_Controls_DataGridLength_op_Equality_Avalonia_Controls_DataGridLength_Avalonia_Controls_DataGridLength_" data-uid="Avalonia.Controls.DataGridLength.op_Equality(Avalonia.Controls.DataGridLength,Avalonia.Controls.DataGridLength)">
+  operator ==(DataGridLength, DataGridLength)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/Docs/src/Avalonia.Controls.DataGrid/DataGridLength.cs/#L297"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Overloaded operator, compares 2 DataGridLength's.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static bool operator ==(DataGridLength gl1, DataGridLength gl2)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>gl1</code> <a class="xref" href="Avalonia.Controls.DataGridLength.html">DataGridLength</a></dt>
+    <dd><p>first DataGridLength to compare.</p>
+</dd>
+    <dt><code>gl2</code> <a class="xref" href="Avalonia.Controls.DataGridLength.html">DataGridLength</a></dt>
+    <dd><p>second DataGridLength to compare.</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></dt>
+    <dd><p>true if specified DataGridLength have same value,
+unit type, desired value, and display value.</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Avalonia_Controls_DataGridLength_op_Inequality_" data-uid="Avalonia.Controls.DataGridLength.op_Inequality*"></a>
+
+  <h3 id="Avalonia_Controls_DataGridLength_op_Inequality_Avalonia_Controls_DataGridLength_Avalonia_Controls_DataGridLength_" data-uid="Avalonia.Controls.DataGridLength.op_Inequality(Avalonia.Controls.DataGridLength,Avalonia.Controls.DataGridLength)">
+  operator !=(DataGridLength, DataGridLength)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/Docs/src/Avalonia.Controls.DataGrid/DataGridLength.cs/#L312"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Overloaded operator, compares 2 DataGridLength's.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static bool operator !=(DataGridLength gl1, DataGridLength gl2)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>gl1</code> <a class="xref" href="Avalonia.Controls.DataGridLength.html">DataGridLength</a></dt>
+    <dd><p>first DataGridLength to compare.</p>
+</dd>
+    <dt><code>gl2</code> <a class="xref" href="Avalonia.Controls.DataGridLength.html">DataGridLength</a></dt>
+    <dd><p>second DataGridLength to compare.</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></dt>
+    <dd><p>true if specified DataGridLength have either different value,
+unit type, desired value, or display value.</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+
+</article>
+
+        <div class="contribution d-print-none">
+          <a href="https://github.com/wieslawsoltes/ProDataGrid/blob/Docs/src/Avalonia.Controls.DataGrid/DataGridLength.cs/#L30" class="edit-link">Edit this page</a>
+        </div>
+
+
+      </div>
+
+      <div class="affix">
+        <nav id="affix"></nav>
+      </div>
+    </main>
+
+
+    <footer class="border-top text-secondary">
+      <div class="container-xxl">
+        <div class="flex-fill">
+          <span>Made with <a href="https://dotnet.github.io/docfx">docfx</a></span>
+        </div>
+      </div>
+    </footer>
+  </body>
+</html>

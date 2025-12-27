@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+      <title>Selection and Navigation | ProDataGrid for Avalonia </title>
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <meta name="title" content="Selection and Navigation | ProDataGrid for Avalonia ">
+      
+      
+      <link rel="icon" href="../favicon.ico">
+      <link rel="stylesheet" href="../public/docfx.min.css">
+      <link rel="stylesheet" href="../public/main.css">
+      <meta name="docfx:navrel" content="../toc.html">
+      <meta name="docfx:tocrel" content="toc.html">
+      
+      
+      
+      
+      <meta name="docfx:docurl" content="https://github.com/wieslawsoltes/ProDataGrid/blob/Docs/docfx/articles/selection-and-navigation.md/#L1">
+      <meta name="loc:inThisArticle" content="In this article">
+      <meta name="loc:searchResultsCount" content="{count} results for &quot;{query}&quot;">
+      <meta name="loc:searchNoResults" content="No results for &quot;{query}&quot;">
+      <meta name="loc:tocFilter" content="Filter by title">
+      <meta name="loc:nextArticle" content="Next">
+      <meta name="loc:prevArticle" content="Previous">
+      <meta name="loc:themeLight" content="Light">
+      <meta name="loc:themeDark" content="Dark">
+      <meta name="loc:themeAuto" content="Auto">
+      <meta name="loc:changeTheme" content="Change theme">
+      <meta name="loc:copy" content="Copy">
+      <meta name="loc:downloadPdf" content="Download PDF">
+
+      <script type="module" src="./../public/docfx.min.js"></script>
+
+      <script>
+        const theme = localStorage.getItem('theme') || 'auto'
+        document.documentElement.setAttribute('data-bs-theme', theme === 'auto' ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light') : theme)
+      </script>
+
+  </head>
+
+  <body class="tex2jax_ignore" data-layout="" data-yaml-mime="">
+    <header class="bg-body border-bottom">
+      <nav id="autocollapse" class="navbar navbar-expand-md" role="navigation">
+        <div class="container-xxl flex-nowrap">
+          <a class="navbar-brand" href="../index.html">
+            <img id="logo" class="svg" src="../images/logo.svg" alt="">
+            
+          </a>
+          <button class="btn btn-lg d-md-none border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navpanel" aria-controls="navpanel" aria-expanded="false" aria-label="Toggle navigation">
+            <i class="bi bi-three-dots"></i>
+          </button>
+          <div class="collapse navbar-collapse" id="navpanel">
+            <div id="navbar">
+            </div>
+          </div>
+        </div>
+      </nav>
+    </header>
+
+    <main class="container-xxl">
+      <div class="toc-offcanvas">
+        <div class="offcanvas-md offcanvas-start" tabindex="-1" id="tocOffcanvas" aria-labelledby="tocOffcanvasLabel">
+          <div class="offcanvas-header">
+            <h5 class="offcanvas-title" id="tocOffcanvasLabel">Table of Contents</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="offcanvas" data-bs-target="#tocOffcanvas" aria-label="Close"></button>
+          </div>
+          <div class="offcanvas-body">
+            <nav class="toc" id="toc"></nav>
+          </div>
+        </div>
+      </div>
+
+      <div class="content">
+        <div class="actionbar">
+          <button class="btn btn-lg border-0 d-md-none" type="button" data-bs-toggle="offcanvas" data-bs-target="#tocOffcanvas" aria-controls="tocOffcanvas" aria-expanded="false" aria-label="Show table of contents">
+            <i class="bi bi-list"></i>
+          </button>
+
+          <nav id="breadcrumb"></nav>
+        </div>
+
+        <article data-uid="">
+<h1 id="selection-and-navigation">Selection and Navigation</h1>
+
+<p>Selection in ProDataGrid is built on Avalonia's <code>SelectionModel</code>, which provides stable selection across sorting, filtering, and paging. The grid still exposes the familiar <code>SelectedItem</code> and <code>SelectedItems</code> bindings while enabling richer scenarios.</p>
+<h2 id="using-selectionmodel-with-datagrid">Using SelectionModel with DataGrid</h2>
+<p>Bind <code>Selection</code> to your view-model's <code>SelectionModel&lt;T&gt;</code>:</p>
+<pre><code class="lang-xml">&lt;DataGrid ItemsSource=&quot;{Binding Items}&quot;
+          Selection=&quot;{Binding MySelectionModel}&quot;
+          SelectionMode=&quot;Extended&quot; /&gt;
+</code></pre>
+<pre><code class="lang-csharp">using Avalonia.Controls.Selection;
+
+public SelectionModel&lt;MyItem&gt; MySelectionModel { get; } = new()
+{
+    SingleSelect = false
+};
+</code></pre>
+<ul>
+<li>Let the grid assign <code>Selection.Source</code> to its collection view; avoid pre-setting <code>Source</code> to prevent mismatches.</li>
+<li>You can share the same <code>SelectionModel&lt;T&gt;</code> with other controls (e.g., <code>ListBox Selection=&quot;{Binding MySelectionModel}&quot;</code>) to keep selection in sync.</li>
+<li><code>SelectedItems</code> binding still works; when <code>Selection</code> is set, it reflects the model's selection and updates it when the binding changes.</li>
+</ul>
+<h2 id="selection-model-integration">Selection Model Integration</h2>
+<p>ProDataGrid routes row selection through Avalonia's <code>SelectionModel&lt;object?&gt;</code>, giving stable <code>SelectedItem/SelectedItems/SelectedIndex</code> bindings across sorting, filtering, paging, and collection mutations. Highlights:</p>
+<ul>
+<li><code>SelectedItems</code> remains an <code>IList</code> (for bindings) but is backed by the selection model; adding/removing in the bound collection updates the grid, and vice versa.</li>
+<li>Selection survives collection changes (including sorted <code>DataGridCollectionView</code> inserts/moves) without losing currency; current row is preserved when possible.</li>
+<li>Multi-select gestures and <code>SelectionMode</code> map to the model (<code>SelectionMode=Single</code> maps to <code>SingleSelect=true</code>).</li>
+<li>A thin adapter keeps row index to slot mapping internal, so custom selection models can be injected later.</li>
+</ul>
+<h2 id="selecteditems-and-selectedcells">SelectedItems and SelectedCells</h2>
+<p>You can still bind <code>SelectedItems</code> and <code>SelectedCells</code> directly:</p>
+<pre><code class="lang-xml">&lt;DataGrid ItemsSource=&quot;{Binding Items}&quot;
+          SelectedItems=&quot;{Binding SelectedItems, Mode=TwoWay}&quot;
+          SelectionMode=&quot;Extended&quot;
+          HeadersVisibility=&quot;All&quot; /&gt;
+</code></pre>
+<pre><code class="lang-xml">&lt;DataGrid ItemsSource=&quot;{Binding Items}&quot;
+          SelectedCells=&quot;{Binding SelectedCells, Mode=TwoWay}&quot;
+          SelectionUnit=&quot;Cell&quot;
+          SelectionMode=&quot;Extended&quot;
+          HeadersVisibility=&quot;All&quot; /&gt;
+</code></pre>
+<p>When <code>SelectionUnit</code> includes cells, <code>SelectedCells</code> is an <code>IList&lt;DataGridCellInfo&gt;</code> that you can bind and inspect.</p>
+<h2 id="selection-stability-and-paging">Selection Stability and Paging</h2>
+<ul>
+<li>Selection stays attached to items as rows are inserted, removed, shuffled, filtered, or sorted.</li>
+<li>With <code>DataGridCollectionView</code> paging, you can keep a single <code>SelectionModel</code> and preserve selections across page changes.</li>
+<li>In grouped views, selection targets data rows (group headers are ignored).</li>
+</ul>
+<h2 id="auto-scroll-to-selection">Auto-Scroll to Selection</h2>
+<p>Turn on <code>AutoScrollToSelectedItem</code> to keep the current selection in view without handling <code>SelectionChanged</code> manually:</p>
+<pre><code class="lang-xml">&lt;DataGrid ItemsSource=&quot;{Binding Items}&quot;
+          AutoScrollToSelectedItem=&quot;True&quot; /&gt;
+</code></pre>
+<h2 id="selection-change-origin">Selection Change Origin</h2>
+<p><code>SelectionChanged</code> now raises <code>DataGridSelectionChangedEventArgs</code>, which carries:</p>
+<ul>
+<li><code>Source</code> flag (<code>Pointer</code>, <code>Keyboard</code>, <code>Command</code>, <code>Programmatic</code>, <code>ItemsSourceChange</code>, <code>SelectionModelSync</code>).</li>
+<li><code>IsUserInitiated</code> helper (true when pointer/keyboard/command initiated the change).</li>
+<li><code>TriggerEvent</code> when an input event caused the change.</li>
+</ul>
+<p>Example handler:</p>
+<pre><code class="lang-csharp">private void OnSelectionChanged(object? sender, SelectionChangedEventArgs e)
+{
+    if (e is DataGridSelectionChangedEventArgs dg)
+    {
+        Debug.WriteLine($&quot;Source={dg.Source}, user={dg.IsUserInitiated}, trigger={dg.TriggerEvent?.GetType().Name ?? \&quot;none\&quot;}&quot;);
+    }
+}
+</code></pre>
+<p>See the &quot;Selection Origin&quot; sample page in <code>DataGridSample</code> to observe the flags for pointer/keyboard, <code>SelectAll()</code>, <code>SelectionModel</code>, bindings, and ItemsSource changes.</p>
+<h2 id="cell-and-row-selection">Cell and Row Selection</h2>
+<ul>
+<li><code>SelectionUnit=FullRow</code> or <code>Cell</code> controls selection granularity.</li>
+<li><code>CurrentCell</code> and <code>CurrentItem</code> are kept in sync with keyboard navigation.</li>
+</ul>
+<h2 id="currentcell-binding">CurrentCell Binding</h2>
+<p>Bind <code>CurrentCell</code> to track or drive the current cell, then react via <code>CurrentCellChanged</code>:</p>
+<pre><code class="lang-xml">&lt;DataGrid ItemsSource=&quot;{Binding Items}&quot;
+          SelectionUnit=&quot;Cell&quot;
+          CurrentCell=&quot;{Binding CurrentCell, Mode=TwoWay}&quot;
+          CurrentCellChanged=&quot;OnCurrentCellChanged&quot; /&gt;
+</code></pre>
+<pre><code class="lang-csharp">using Avalonia.Controls;
+
+public DataGridCellInfo CurrentCell { get; set; }
+</code></pre>
+<h2 id="keyboard-gestures">Keyboard Gestures</h2>
+<p>Override built-in gestures via <code>KeyboardGestureOverrides</code>:</p>
+<pre><code class="lang-csharp">KeyboardGestureOverrides = new DataGridKeyboardGestures
+{
+    MoveDown = new KeyGesture(Key.J),
+    MoveUp = new KeyGesture(Key.K)
+};
+</code></pre>
+<h2 id="clipboard-copy">Clipboard Copy</h2>
+<p>Enable clipboard copying via <code>ClipboardCopyMode</code>, then use standard copy gestures (<code>Ctrl/Cmd+C</code>) or the alternate (<code>Ctrl/Cmd+Insert</code>). See <a href="clipboard-and-export.html">Clipboard and Export</a> for formats and customization.</p>
+
+</article>
+
+        <div class="contribution d-print-none">
+          <a href="https://github.com/wieslawsoltes/ProDataGrid/blob/Docs/docfx/articles/selection-and-navigation.md/#L1" class="edit-link">Edit this page</a>
+        </div>
+
+        <div class="next-article d-print-none border-top" id="nextArticle"></div>
+
+      </div>
+
+      <div class="affix">
+        <nav id="affix"></nav>
+      </div>
+    </main>
+
+
+    <footer class="border-top text-secondary">
+      <div class="container-xxl">
+        <div class="flex-fill">
+          <span>Made with <a href="https://dotnet.github.io/docfx">docfx</a></span>
+        </div>
+      </div>
+    </footer>
+  </body>
+</html>

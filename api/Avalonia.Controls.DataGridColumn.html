@@ -1,0 +1,2275 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+      <title>Class DataGridColumn | ProDataGrid for Avalonia </title>
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <meta name="title" content="Class DataGridColumn | ProDataGrid for Avalonia ">
+      
+      
+      <link rel="icon" href="../favicon.ico">
+      <link rel="stylesheet" href="../public/docfx.min.css">
+      <link rel="stylesheet" href="../public/main.css">
+      <meta name="docfx:navrel" content="../toc.html">
+      <meta name="docfx:tocrel" content="toc.html">
+      
+      
+      
+      
+      <meta name="docfx:docurl" content="https://github.com/wieslawsoltes/ProDataGrid/new/Docs/apiSpec/new?filename=Avalonia_Controls_DataGridColumn.md&amp;value=---%0Auid%3A%20Avalonia.Controls.DataGridColumn%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">
+      <meta name="loc:inThisArticle" content="In this article">
+      <meta name="loc:searchResultsCount" content="{count} results for &quot;{query}&quot;">
+      <meta name="loc:searchNoResults" content="No results for &quot;{query}&quot;">
+      <meta name="loc:tocFilter" content="Filter by title">
+      <meta name="loc:nextArticle" content="Next">
+      <meta name="loc:prevArticle" content="Previous">
+      <meta name="loc:themeLight" content="Light">
+      <meta name="loc:themeDark" content="Dark">
+      <meta name="loc:themeAuto" content="Auto">
+      <meta name="loc:changeTheme" content="Change theme">
+      <meta name="loc:copy" content="Copy">
+      <meta name="loc:downloadPdf" content="Download PDF">
+
+      <script type="module" src="./../public/docfx.min.js"></script>
+
+      <script>
+        const theme = localStorage.getItem('theme') || 'auto'
+        document.documentElement.setAttribute('data-bs-theme', theme === 'auto' ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light') : theme)
+      </script>
+
+  </head>
+
+  <body class="tex2jax_ignore" data-layout="" data-yaml-mime="ManagedReference">
+    <header class="bg-body border-bottom">
+      <nav id="autocollapse" class="navbar navbar-expand-md" role="navigation">
+        <div class="container-xxl flex-nowrap">
+          <a class="navbar-brand" href="../index.html">
+            <img id="logo" class="svg" src="../images/logo.svg" alt="">
+            
+          </a>
+          <button class="btn btn-lg d-md-none border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navpanel" aria-controls="navpanel" aria-expanded="false" aria-label="Toggle navigation">
+            <i class="bi bi-three-dots"></i>
+          </button>
+          <div class="collapse navbar-collapse" id="navpanel">
+            <div id="navbar">
+            </div>
+          </div>
+        </div>
+      </nav>
+    </header>
+
+    <main class="container-xxl">
+      <div class="toc-offcanvas">
+        <div class="offcanvas-md offcanvas-start" tabindex="-1" id="tocOffcanvas" aria-labelledby="tocOffcanvasLabel">
+          <div class="offcanvas-header">
+            <h5 class="offcanvas-title" id="tocOffcanvasLabel">Table of Contents</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="offcanvas" data-bs-target="#tocOffcanvas" aria-label="Close"></button>
+          </div>
+          <div class="offcanvas-body">
+            <nav class="toc" id="toc"></nav>
+          </div>
+        </div>
+      </div>
+
+      <div class="content">
+        <div class="actionbar">
+          <button class="btn btn-lg border-0 d-md-none" type="button" data-bs-toggle="offcanvas" data-bs-target="#tocOffcanvas" aria-controls="tocOffcanvas" aria-expanded="false" aria-label="Show table of contents">
+            <i class="bi bi-list"></i>
+          </button>
+
+          <nav id="breadcrumb"></nav>
+        </div>
+
+        <article data-uid="Avalonia.Controls.DataGridColumn">
+
+
+
+  <h1 id="Avalonia_Controls_DataGridColumn" data-uid="Avalonia.Controls.DataGridColumn" class="text-break">
+Class DataGridColumn  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/Docs/src/Avalonia.Controls.DataGrid/DataGridColumn.Width.cs/#L25"><i class="bi bi-code-slash"></i></a>
+  </h1>
+
+  <div class="facts text-secondary">
+    <dl><dt>Namespace</dt><dd><a class="xref" href="Avalonia.html">Avalonia</a>.<a class="xref" href="Avalonia.Controls.html">Controls</a></dd></dl>
+  <dl><dt>Assembly</dt><dd>Avalonia.Controls.DataGrid.dll</dd></dl>
+  </div>
+
+  <div class="markdown summary"></div>
+  <div class="markdown conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public abstract class DataGridColumn : AvaloniaObject, INotifyPropertyChanged</code></pre>
+  </div>
+
+
+
+
+  <dl class="typelist inheritance">
+    <dt>Inheritance</dt>
+    <dd>
+      <div><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object">object</a></div>
+      <div><span class="xref">AvaloniaObject</span></div>
+      <div><span class="xref">DataGridColumn</span></div>
+    </dd>
+  </dl>
+
+  <dl class="typelist implements">
+    <dt>Implements</dt>
+    <dd>
+      <div><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.componentmodel.inotifypropertychanged">INotifyPropertyChanged</a></div>
+    </dd>
+  </dl>
+
+  <dl class="typelist derived">
+    <dt>Derived</dt>
+    <dd>
+      <div><a class="xref" href="Avalonia.Controls.DataGridBoundColumn.html">DataGridBoundColumn</a></div>
+      <div><a class="xref" href="Avalonia.Controls.DataGridButtonColumn.html">DataGridButtonColumn</a></div>
+      <div><a class="xref" href="Avalonia.Controls.DataGridComboBoxColumn.html">DataGridComboBoxColumn</a></div>
+      <div><a class="xref" href="Avalonia.Controls.DataGridTemplateColumn.html">DataGridTemplateColumn</a></div>
+    </dd>
+  </dl>
+
+  <dl class="typelist inheritedMembers">
+    <dt>Inherited Members</dt>
+    <dd>
+    <div>
+      <span class="xref">AvaloniaObject.CheckAccess()</span>
+    </div>
+    <div>
+      <span class="xref">AvaloniaObject.VerifyAccess()</span>
+    </div>
+    <div>
+      <span class="xref">AvaloniaObject.ClearValue(AvaloniaProperty)</span>
+    </div>
+    <div>
+      <span class="xref">AvaloniaObject.ClearValue&lt;T&gt;(AvaloniaProperty&lt;T&gt;)</span>
+    </div>
+    <div>
+      <span class="xref">AvaloniaObject.ClearValue&lt;T&gt;(StyledProperty&lt;T&gt;)</span>
+    </div>
+    <div>
+      <span class="xref">AvaloniaObject.ClearValue&lt;T&gt;(DirectPropertyBase&lt;T&gt;)</span>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object">AvaloniaObject.Equals(object)</a>
+    </div>
+    <div>
+      <span class="xref">AvaloniaObject.GetHashCode()</span>
+    </div>
+    <div>
+      <span class="xref">AvaloniaObject.GetValue(AvaloniaProperty)</span>
+    </div>
+    <div>
+      <span class="xref">AvaloniaObject.GetValue&lt;T&gt;(StyledProperty&lt;T&gt;)</span>
+    </div>
+    <div>
+      <span class="xref">AvaloniaObject.GetValue&lt;T&gt;(DirectPropertyBase&lt;T&gt;)</span>
+    </div>
+    <div>
+      <span class="xref">AvaloniaObject.GetBaseValue&lt;T&gt;(StyledProperty&lt;T&gt;)</span>
+    </div>
+    <div>
+      <span class="xref">AvaloniaObject.IsAnimating(AvaloniaProperty)</span>
+    </div>
+    <div>
+      <span class="xref">AvaloniaObject.IsSet(AvaloniaProperty)</span>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object">AvaloniaObject.SetValue(AvaloniaProperty, object, BindingPriority)</a>
+    </div>
+    <div>
+      <span class="xref">AvaloniaObject.SetValue&lt;T&gt;(StyledProperty&lt;T&gt;, T, BindingPriority)</span>
+    </div>
+    <div>
+      <span class="xref">AvaloniaObject.SetValue&lt;T&gt;(DirectPropertyBase&lt;T&gt;, T)</span>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object">AvaloniaObject.SetCurrentValue(AvaloniaProperty, object)</a>
+    </div>
+    <div>
+      <span class="xref">AvaloniaObject.SetCurrentValue&lt;T&gt;(StyledProperty&lt;T&gt;, T)</span>
+    </div>
+    <div>
+      <span class="xref">AvaloniaObject.Bind(AvaloniaProperty, IBinding)</span>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.iobservable-1">AvaloniaObject.Bind(AvaloniaProperty, IObservable&lt;object&gt;, BindingPriority)</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.iobservable-1">AvaloniaObject.Bind&lt;T&gt;(StyledProperty&lt;T&gt;, IObservable&lt;object&gt;, BindingPriority)</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.iobservable-1">AvaloniaObject.Bind&lt;T&gt;(StyledProperty&lt;T&gt;, IObservable&lt;T&gt;, BindingPriority)</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.iobservable-1">AvaloniaObject.Bind&lt;T&gt;(StyledProperty&lt;T&gt;, IObservable&lt;BindingValue&lt;T&gt;&gt;, BindingPriority)</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.iobservable-1">AvaloniaObject.Bind&lt;T&gt;(DirectPropertyBase&lt;T&gt;, IObservable&lt;object&gt;)</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.iobservable-1">AvaloniaObject.Bind&lt;T&gt;(DirectPropertyBase&lt;T&gt;, IObservable&lt;T&gt;)</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.iobservable-1">AvaloniaObject.Bind&lt;T&gt;(DirectPropertyBase&lt;T&gt;, IObservable&lt;BindingValue&lt;T&gt;&gt;)</a>
+    </div>
+    <div>
+      <span class="xref">AvaloniaObject.CoerceValue(AvaloniaProperty)</span>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.exception">AvaloniaObject.UpdateDataValidation(AvaloniaProperty, BindingValueType, Exception)</a>
+    </div>
+    <div>
+      <span class="xref">AvaloniaObject.OnPropertyChangedCore(AvaloniaPropertyChangedEventArgs)</span>
+    </div>
+    <div>
+      <span class="xref">AvaloniaObject.RaisePropertyChanged&lt;T&gt;(DirectPropertyBase&lt;T&gt;, T, T)</span>
+    </div>
+    <div>
+      <span class="xref">AvaloniaObject.SetAndRaise&lt;T&gt;(DirectPropertyBase&lt;T&gt;, ref T, T)</span>
+    </div>
+    <div>
+      <span class="xref">AvaloniaObject.InheritanceParent</span>
+    </div>
+    <div>
+      <span class="xref">AvaloniaObject.this[AvaloniaProperty]</span>
+    </div>
+    <div>
+      <span class="xref">AvaloniaObject.this[IndexerDescriptor]</span>
+    </div>
+    <div>
+      <span class="xref">AvaloniaObject.PropertyChanged</span>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object-system-object)">object.Equals(object, object)</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.gettype">object.GetType()</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.memberwiseclone">object.MemberwiseClone()</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.referenceequals">object.ReferenceEquals(object, object)</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.tostring">object.ToString()</a>
+    </div>
+  </dd></dl>
+
+
+
+
+
+
+  <h2 class="section" id="constructors">Constructors
+</h2>
+
+
+  <a id="Avalonia_Controls_DataGridColumn__ctor_" data-uid="Avalonia.Controls.DataGridColumn.#ctor*"></a>
+
+  <h3 id="Avalonia_Controls_DataGridColumn__ctor" data-uid="Avalonia.Controls.DataGridColumn.#ctor">
+  DataGridColumn()
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/Docs/src/Avalonia.Controls.DataGrid/DataGridColumn.cs/#L82"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Initializes a new instance of the <a class="xref" href="Avalonia.Controls.DataGridColumn.html">DataGridColumn</a> class.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">protected DataGridColumn()</code></pre>
+  </div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  <h2 class="section" id="fields">Fields
+</h2>
+
+
+
+  <h3 id="Avalonia_Controls_DataGridColumn_CellThemeProperty" data-uid="Avalonia.Controls.DataGridColumn.CellThemeProperty">
+  CellThemeProperty
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/Docs/src/Avalonia.Controls.DataGrid/DataGridColumn.cs/#L519"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Backing field for CellTheme property.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static readonly DirectProperty&lt;DataGridColumn, ControlTheme&gt; CellThemeProperty</code></pre>
+  </div>
+
+
+
+
+  <h4 class="section">Field Value</h4>
+  <dl class="parameters">
+    <dt><span class="xref">DirectProperty</span>&lt;<a class="xref" href="Avalonia.Controls.DataGridColumn.html">DataGridColumn</a>, <span class="xref">ControlTheme</span>&gt;</dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+  <h3 id="Avalonia_Controls_DataGridColumn_FilterFlyoutProperty" data-uid="Avalonia.Controls.DataGridColumn.FilterFlyoutProperty">
+  FilterFlyoutProperty
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/Docs/src/Avalonia.Controls.DataGrid/DataGridColumn.cs/#L591"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Backing field for FilterFlyout property.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static readonly DirectProperty&lt;DataGridColumn, FlyoutBase&gt; FilterFlyoutProperty</code></pre>
+  </div>
+
+
+
+
+  <h4 class="section">Field Value</h4>
+  <dl class="parameters">
+    <dt><span class="xref">DirectProperty</span>&lt;<a class="xref" href="Avalonia.Controls.DataGridColumn.html">DataGridColumn</a>, <span class="xref">FlyoutBase</span>&gt;</dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+  <h3 id="Avalonia_Controls_DataGridColumn_FilterThemeProperty" data-uid="Avalonia.Controls.DataGridColumn.FilterThemeProperty">
+  FilterThemeProperty
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/Docs/src/Avalonia.Controls.DataGrid/DataGridColumn.cs/#L537"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Backing field for FilterTheme property.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static readonly DirectProperty&lt;DataGridColumn, ControlTheme&gt; FilterThemeProperty</code></pre>
+  </div>
+
+
+
+
+  <h4 class="section">Field Value</h4>
+  <dl class="parameters">
+    <dt><span class="xref">DirectProperty</span>&lt;<a class="xref" href="Avalonia.Controls.DataGridColumn.html">DataGridColumn</a>, <span class="xref">ControlTheme</span>&gt;</dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+  <h3 id="Avalonia_Controls_DataGridColumn_HeaderPointerPressedEvent" data-uid="Avalonia.Controls.DataGridColumn.HeaderPointerPressedEvent">
+  HeaderPointerPressedEvent
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/Docs/src/Avalonia.Controls.DataGrid/DataGridColumn.cs/#L61"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Routed event raised when the column header receives a pointer press.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static readonly RoutedEvent&lt;PointerPressedEventArgs&gt; HeaderPointerPressedEvent</code></pre>
+  </div>
+
+
+
+
+  <h4 class="section">Field Value</h4>
+  <dl class="parameters">
+    <dt><span class="xref">RoutedEvent</span>&lt;<span class="xref">PointerPressedEventArgs</span>&gt;</dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+  <h3 id="Avalonia_Controls_DataGridColumn_HeaderPointerReleasedEvent" data-uid="Avalonia.Controls.DataGridColumn.HeaderPointerReleasedEvent">
+  HeaderPointerReleasedEvent
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/Docs/src/Avalonia.Controls.DataGrid/DataGridColumn.cs/#L67"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Routed event raised when the column header receives a pointer release.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static readonly RoutedEvent&lt;PointerReleasedEventArgs&gt; HeaderPointerReleasedEvent</code></pre>
+  </div>
+
+
+
+
+  <h4 class="section">Field Value</h4>
+  <dl class="parameters">
+    <dt><span class="xref">RoutedEvent</span>&lt;<span class="xref">PointerReleasedEventArgs</span>&gt;</dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+  <h3 id="Avalonia_Controls_DataGridColumn_HeaderProperty" data-uid="Avalonia.Controls.DataGridColumn.HeaderProperty">
+  HeaderProperty
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/Docs/src/Avalonia.Controls.DataGrid/DataGridColumn.cs/#L627"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Backing field for Header property</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static readonly DirectProperty&lt;DataGridColumn, object&gt; HeaderProperty</code></pre>
+  </div>
+
+
+
+
+  <h4 class="section">Field Value</h4>
+  <dl class="parameters">
+    <dt><span class="xref">DirectProperty</span>&lt;<a class="xref" href="Avalonia.Controls.DataGridColumn.html">DataGridColumn</a>, <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object">object</a>&gt;</dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+  <h3 id="Avalonia_Controls_DataGridColumn_HeaderTemplateProperty" data-uid="Avalonia.Controls.DataGridColumn.HeaderTemplateProperty">
+  HeaderTemplateProperty
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/Docs/src/Avalonia.Controls.DataGrid/DataGridColumn.cs/#L645"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Backing field for Header property</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static readonly DirectProperty&lt;DataGridColumn, IDataTemplate&gt; HeaderTemplateProperty</code></pre>
+  </div>
+
+
+
+
+  <h4 class="section">Field Value</h4>
+  <dl class="parameters">
+    <dt><span class="xref">DirectProperty</span>&lt;<a class="xref" href="Avalonia.Controls.DataGridColumn.html">DataGridColumn</a>, <span class="xref">IDataTemplate</span>&gt;</dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+  <h3 id="Avalonia_Controls_DataGridColumn_HeaderThemeProperty" data-uid="Avalonia.Controls.DataGridColumn.HeaderThemeProperty">
+  HeaderThemeProperty
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/Docs/src/Avalonia.Controls.DataGrid/DataGridColumn.cs/#L487"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Backing field for HeaderTheme property.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static readonly DirectProperty&lt;DataGridColumn, ControlTheme&gt; HeaderThemeProperty</code></pre>
+  </div>
+
+
+
+
+  <h4 class="section">Field Value</h4>
+  <dl class="parameters">
+    <dt><span class="xref">DirectProperty</span>&lt;<a class="xref" href="Avalonia.Controls.DataGridColumn.html">DataGridColumn</a>, <span class="xref">ControlTheme</span>&gt;</dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+  <h3 id="Avalonia_Controls_DataGridColumn_IsVisibleProperty" data-uid="Avalonia.Controls.DataGridColumn.IsVisibleProperty">
+  IsVisibleProperty
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/Docs/src/Avalonia.Controls.DataGrid/DataGridColumn.cs/#L224"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Defines the <a class="xref" href="Avalonia.Controls.DataGridColumn.html#Avalonia_Controls_DataGridColumn_IsVisible">IsVisible</a> property.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static readonly StyledProperty&lt;bool&gt; IsVisibleProperty</code></pre>
+  </div>
+
+
+
+
+  <h4 class="section">Field Value</h4>
+  <dl class="parameters">
+    <dt><span class="xref">StyledProperty</span>&lt;<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a>&gt;</dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+  <h3 id="Avalonia_Controls_DataGridColumn_ShowFilterButtonProperty" data-uid="Avalonia.Controls.DataGridColumn.ShowFilterButtonProperty">
+  ShowFilterButtonProperty
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/Docs/src/Avalonia.Controls.DataGrid/DataGridColumn.cs/#L564"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Backing field for ShowFilterButton property.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static readonly DirectProperty&lt;DataGridColumn, bool&gt; ShowFilterButtonProperty</code></pre>
+  </div>
+
+
+
+
+  <h4 class="section">Field Value</h4>
+  <dl class="parameters">
+    <dt><span class="xref">DirectProperty</span>&lt;<a class="xref" href="Avalonia.Controls.DataGridColumn.html">DataGridColumn</a>, <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a>&gt;</dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+  <h3 id="Avalonia_Controls_DataGridColumn_SortDirectionProperty" data-uid="Avalonia.Controls.DataGridColumn.SortDirectionProperty">
+  SortDirectionProperty
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/Docs/src/Avalonia.Controls.DataGrid/DataGridColumn.cs/#L864"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Gets or sets the current sort direction for this column.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static readonly StyledProperty&lt;ListSortDirection?&gt; SortDirectionProperty</code></pre>
+  </div>
+
+
+
+
+  <h4 class="section">Field Value</h4>
+  <dl class="parameters">
+    <dt><span class="xref">StyledProperty</span>&lt;<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.componentmodel.listsortdirection">ListSortDirection</a>?&gt;</dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+  <h3 id="Avalonia_Controls_DataGridColumn_SummaryCellThemeProperty" data-uid="Avalonia.Controls.DataGridColumn.SummaryCellThemeProperty">
+  SummaryCellThemeProperty
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/Docs/src/Avalonia.Controls.DataGrid/DataGridColumn.Summaries.cs/#L23"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Backing field for SummaryCellTheme property.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static readonly DirectProperty&lt;DataGridColumn, ControlTheme&gt; SummaryCellThemeProperty</code></pre>
+  </div>
+
+
+
+
+  <h4 class="section">Field Value</h4>
+  <dl class="parameters">
+    <dt><span class="xref">DirectProperty</span>&lt;<a class="xref" href="Avalonia.Controls.DataGridColumn.html">DataGridColumn</a>, <span class="xref">ControlTheme</span>&gt;</dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+  <h3 id="Avalonia_Controls_DataGridColumn_WidthProperty" data-uid="Avalonia.Controls.DataGridColumn.WidthProperty">
+  WidthProperty
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/Docs/src/Avalonia.Controls.DataGrid/DataGridColumn.cs/#L769"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static readonly StyledProperty&lt;DataGridLength&gt; WidthProperty</code></pre>
+  </div>
+
+
+
+
+  <h4 class="section">Field Value</h4>
+  <dl class="parameters">
+    <dt><span class="xref">StyledProperty</span>&lt;<a class="xref" href="Avalonia.Controls.DataGridLength.html">DataGridLength</a>&gt;</dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+  <h2 class="section" id="properties">Properties
+</h2>
+
+
+  <a id="Avalonia_Controls_DataGridColumn_ActualWidth_" data-uid="Avalonia.Controls.DataGridColumn.ActualWidth*"></a>
+
+  <h3 id="Avalonia_Controls_DataGridColumn_ActualWidth" data-uid="Avalonia.Controls.DataGridColumn.ActualWidth">
+  ActualWidth
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/Docs/src/Avalonia.Controls.DataGrid/DataGridColumn.cs/#L294"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Actual visible width after Width, MinWidth, and MaxWidth setting at the Column level and DataGrid level
+have been taken into account</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public double ActualWidth { get; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.double">double</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="Avalonia_Controls_DataGridColumn_CanUserReorder_" data-uid="Avalonia.Controls.DataGridColumn.CanUserReorder*"></a>
+
+  <h3 id="Avalonia_Controls_DataGridColumn_CanUserReorder" data-uid="Avalonia.Controls.DataGridColumn.CanUserReorder">
+  CanUserReorder
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/Docs/src/Avalonia.Controls.DataGrid/DataGridColumn.cs/#L313"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Gets or sets a value that indicates whether the user can change the column display position by
+dragging the column header.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public bool CanUserReorder { get; set; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></dt>
+    <dd><p>true if the user can drag the column header to a new position; otherwise, false. The default is the current <a class="xref" href="Avalonia.Controls.DataGrid.html#Avalonia_Controls_DataGrid_CanUserReorderColumns">CanUserReorderColumns</a> property value.</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="Avalonia_Controls_DataGridColumn_CanUserResize_" data-uid="Avalonia.Controls.DataGridColumn.CanUserResize*"></a>
+
+  <h3 id="Avalonia_Controls_DataGridColumn_CanUserResize" data-uid="Avalonia.Controls.DataGridColumn.CanUserResize">
+  CanUserResize
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/Docs/src/Avalonia.Controls.DataGrid/DataGridColumn.cs/#L334"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Gets or sets a value that indicates whether the user can adjust the column width using the mouse.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public bool CanUserResize { get; set; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></dt>
+    <dd><p>true if the user can resize the column; false if the user cannot resize the column. The default is the current <a class="xref" href="Avalonia.Controls.DataGrid.html#Avalonia_Controls_DataGrid_CanUserResizeColumns">CanUserResizeColumns</a> property value.</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="Avalonia_Controls_DataGridColumn_CanUserSort_" data-uid="Avalonia.Controls.DataGridColumn.CanUserSort*"></a>
+
+  <h3 id="Avalonia_Controls_DataGridColumn_CanUserSort" data-uid="Avalonia.Controls.DataGridColumn.CanUserSort">
+  CanUserSort
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/Docs/src/Avalonia.Controls.DataGrid/DataGridColumn.cs/#L356"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Gets or sets a value that indicates whether the user can sort the column by clicking the column header.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public bool CanUserSort { get; set; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></dt>
+    <dd><p>true if the user can sort the column; false if the user cannot sort the column. The default is the current <a class="xref" href="Avalonia.Controls.DataGrid.html#Avalonia_Controls_DataGrid_CanUserSortColumns">CanUserSortColumns</a> property value.</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="Avalonia_Controls_DataGridColumn_CellStyleClasses_" data-uid="Avalonia.Controls.DataGridColumn.CellStyleClasses*"></a>
+
+  <h3 id="Avalonia_Controls_DataGridColumn_CellStyleClasses" data-uid="Avalonia.Controls.DataGridColumn.CellStyleClasses">
+  CellStyleClasses
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/Docs/src/Avalonia.Controls.DataGrid/DataGridColumn.cs/#L473"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public Classes CellStyleClasses { get; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><span class="xref">Classes</span></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="Avalonia_Controls_DataGridColumn_CellTheme_" data-uid="Avalonia.Controls.DataGridColumn.CellTheme*"></a>
+
+  <h3 id="Avalonia_Controls_DataGridColumn_CellTheme" data-uid="Avalonia.Controls.DataGridColumn.CellTheme">
+  CellTheme
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/Docs/src/Avalonia.Controls.DataGrid/DataGridColumn.cs/#L528"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Gets or sets the <a class="xref" href="Avalonia.Controls.DataGridColumnHeader.html">DataGridColumnHeader</a> cell theme.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public ControlTheme CellTheme { get; set; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><span class="xref">ControlTheme</span></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="Avalonia_Controls_DataGridColumn_ClipboardContentBinding_" data-uid="Avalonia.Controls.DataGridColumn.ClipboardContentBinding*"></a>
+
+  <h3 id="Avalonia_Controls_DataGridColumn_ClipboardContentBinding" data-uid="Avalonia.Controls.DataGridColumn.ClipboardContentBinding">
+  ClipboardContentBinding
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/Docs/src/Avalonia.Controls.DataGrid/DataGridColumn.cs/#L783"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>The binding that will be used to get or set cell content for the clipboard.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public virtual IBinding ClipboardContentBinding { get; set; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><span class="xref">IBinding</span></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="Avalonia_Controls_DataGridColumn_CustomSortComparer_" data-uid="Avalonia.Controls.DataGridColumn.CustomSortComparer*"></a>
+
+  <h3 id="Avalonia_Controls_DataGridColumn_CustomSortComparer" data-uid="Avalonia.Controls.DataGridColumn.CustomSortComparer">
+  CustomSortComparer
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/Docs/src/Avalonia.Controls.DataGrid/DataGridColumn.cs/#L979"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Holds a Comparer to use for sorting, if not using the default.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public IComparer CustomSortComparer { get; set; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.icomparer">IComparer</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="Avalonia_Controls_DataGridColumn_DisplayIndex_" data-uid="Avalonia.Controls.DataGridColumn.DisplayIndex*"></a>
+
+  <h3 id="Avalonia_Controls_DataGridColumn_DisplayIndex" data-uid="Avalonia.Controls.DataGridColumn.DisplayIndex">
+  DisplayIndex
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/Docs/src/Avalonia.Controls.DataGrid/DataGridColumn.cs/#L416"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Gets or sets the display position of the column relative to the other columns in the <a class="xref" href="Avalonia.Controls.DataGrid.html">DataGrid</a>.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public int DisplayIndex { get; set; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a></dt>
+    <dd><p>The zero-based position of the column as it is displayed in the associated <a class="xref" href="Avalonia.Controls.DataGrid.html">DataGrid</a>. The default is the index of the corresponding <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">this[int]</a> in the <a class="xref" href="Avalonia.Controls.DataGrid.html#Avalonia_Controls_DataGrid_Columns">Columns</a> collection.</p>
+</dd>
+  </dl>
+
+
+
+
+
+  <h4 class="section">Exceptions</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.argumentoutofrangeexception">ArgumentOutOfRangeException</a></dt>
+    <dd><p>When setting this property, the specified value is less than -1 or equal to <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32.maxvalue">MaxValue</a>.</p>
+<p>-or-</p>
+<p>When setting this property on a column in a <a class="xref" href="Avalonia.Controls.DataGrid.html">DataGrid</a>, the specified value is less than zero or greater than or equal to the number of columns in the <a class="xref" href="Avalonia.Controls.DataGrid.html">DataGrid</a>.</p>
+</dd>
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.invalidoperationexception">InvalidOperationException</a></dt>
+    <dd><p>When setting this property, the <a class="xref" href="Avalonia.Controls.DataGrid.html">DataGrid</a> is already making <a class="xref" href="Avalonia.Controls.DataGridColumn.html#Avalonia_Controls_DataGridColumn_DisplayIndex">DisplayIndex</a> adjustments. For example, this exception is thrown when you attempt to set <a class="xref" href="Avalonia.Controls.DataGridColumn.html#Avalonia_Controls_DataGridColumn_DisplayIndex">DisplayIndex</a> in a <a class="xref" href="Avalonia.Controls.DataGrid.html#Avalonia_Controls_DataGrid_ColumnDisplayIndexChanged">ColumnDisplayIndexChanged</a> event handler.</p>
+<p>-or-</p>
+<p>When setting this property, the specified value would result in a frozen column being displayed in the range of unfrozen columns, or an unfrozen column being displayed in the range of frozen columns.</p>
+</dd>
+  </dl>
+
+
+
+  <a id="Avalonia_Controls_DataGridColumn_FilterFlyout_" data-uid="Avalonia.Controls.DataGridColumn.FilterFlyout*"></a>
+
+  <h3 id="Avalonia_Controls_DataGridColumn_FilterFlyout" data-uid="Avalonia.Controls.DataGridColumn.FilterFlyout">
+  FilterFlyout
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/Docs/src/Avalonia.Controls.DataGrid/DataGridColumn.cs/#L600"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Gets or sets the flyout that will be attached to the column header filter button.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public FlyoutBase FilterFlyout { get; set; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><span class="xref">FlyoutBase</span></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="Avalonia_Controls_DataGridColumn_FilterTheme_" data-uid="Avalonia.Controls.DataGridColumn.FilterTheme*"></a>
+
+  <h3 id="Avalonia_Controls_DataGridColumn_FilterTheme" data-uid="Avalonia.Controls.DataGridColumn.FilterTheme">
+  FilterTheme
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/Docs/src/Avalonia.Controls.DataGrid/DataGridColumn.cs/#L546"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Gets or sets the theme applied to the filter button inside the column header.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public ControlTheme FilterTheme { get; set; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><span class="xref">ControlTheme</span></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="Avalonia_Controls_DataGridColumn_Header_" data-uid="Avalonia.Controls.DataGridColumn.Header*"></a>
+
+  <h3 id="Avalonia_Controls_DataGridColumn_Header" data-uid="Avalonia.Controls.DataGridColumn.Header">
+  Header
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/Docs/src/Avalonia.Controls.DataGrid/DataGridColumn.cs/#L636"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Gets or sets the <a class="xref" href="Avalonia.Controls.DataGridColumnHeader.html">DataGridColumnHeader</a> content</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public object Header { get; set; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object">object</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="Avalonia_Controls_DataGridColumn_HeaderStyleClasses_" data-uid="Avalonia.Controls.DataGridColumn.HeaderStyleClasses*"></a>
+
+  <h3 id="Avalonia_Controls_DataGridColumn_HeaderStyleClasses" data-uid="Avalonia.Controls.DataGridColumn.HeaderStyleClasses">
+  HeaderStyleClasses
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/Docs/src/Avalonia.Controls.DataGrid/DataGridColumn.cs/#L475"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public Classes HeaderStyleClasses { get; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><span class="xref">Classes</span></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="Avalonia_Controls_DataGridColumn_HeaderTemplate_" data-uid="Avalonia.Controls.DataGridColumn.HeaderTemplate*"></a>
+
+  <h3 id="Avalonia_Controls_DataGridColumn_HeaderTemplate" data-uid="Avalonia.Controls.DataGridColumn.HeaderTemplate">
+  HeaderTemplate
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/Docs/src/Avalonia.Controls.DataGrid/DataGridColumn.cs/#L654"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Gets or sets an <span class="xref">Avalonia.Controls.Templates.IDataTemplate</span> for the <a class="xref" href="Avalonia.Controls.DataGridColumn.html#Avalonia_Controls_DataGridColumn_Header">Header</a></p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public IDataTemplate HeaderTemplate { get; set; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><span class="xref">IDataTemplate</span></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="Avalonia_Controls_DataGridColumn_HeaderTheme_" data-uid="Avalonia.Controls.DataGridColumn.HeaderTheme*"></a>
+
+  <h3 id="Avalonia_Controls_DataGridColumn_HeaderTheme" data-uid="Avalonia.Controls.DataGridColumn.HeaderTheme">
+  HeaderTheme
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/Docs/src/Avalonia.Controls.DataGrid/DataGridColumn.cs/#L496"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Gets or sets the <a class="xref" href="Avalonia.Controls.DataGridColumnHeader.html">DataGridColumnHeader</a> theme for this column. Overrides <a class="xref" href="Avalonia.Controls.DataGrid.html#Avalonia_Controls_DataGrid_ColumnHeaderTheme">ColumnHeaderTheme</a>.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public ControlTheme HeaderTheme { get; set; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><span class="xref">ControlTheme</span></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="Avalonia_Controls_DataGridColumn_IsAutoGenerated_" data-uid="Avalonia.Controls.DataGridColumn.IsAutoGenerated*"></a>
+
+  <h3 id="Avalonia_Controls_DataGridColumn_IsAutoGenerated" data-uid="Avalonia.Controls.DataGridColumn.IsAutoGenerated">
+  IsAutoGenerated
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/Docs/src/Avalonia.Controls.DataGrid/DataGridColumn.cs/#L660"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public bool IsAutoGenerated { get; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="Avalonia_Controls_DataGridColumn_IsFrozen_" data-uid="Avalonia.Controls.DataGridColumn.IsFrozen*"></a>
+
+  <h3 id="Avalonia_Controls_DataGridColumn_IsFrozen" data-uid="Avalonia.Controls.DataGridColumn.IsFrozen">
+  IsFrozen
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/Docs/src/Avalonia.Controls.DataGrid/DataGridColumn.cs/#L672"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public bool IsFrozen { get; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="Avalonia_Controls_DataGridColumn_IsReadOnly_" data-uid="Avalonia.Controls.DataGridColumn.IsReadOnly*"></a>
+
+  <h3 id="Avalonia_Controls_DataGridColumn_IsReadOnly" data-uid="Avalonia.Controls.DataGridColumn.IsReadOnly">
+  IsReadOnly
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/Docs/src/Avalonia.Controls.DataGrid/DataGridColumn.cs/#L681"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public virtual bool IsReadOnly { get; set; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="Avalonia_Controls_DataGridColumn_IsVisible_" data-uid="Avalonia.Controls.DataGridColumn.IsVisible*"></a>
+
+  <h3 id="Avalonia_Controls_DataGridColumn_IsVisible" data-uid="Avalonia.Controls.DataGridColumn.IsVisible">
+  IsVisible
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/Docs/src/Avalonia.Controls.DataGrid/DataGridColumn.cs/#L230"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Determines whether or not this column is visible.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public bool IsVisible { get; set; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="Avalonia_Controls_DataGridColumn_MaxWidth_" data-uid="Avalonia.Controls.DataGridColumn.MaxWidth*"></a>
+
+  <h3 id="Avalonia_Controls_DataGridColumn_MaxWidth" data-uid="Avalonia.Controls.DataGridColumn.MaxWidth">
+  MaxWidth
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/Docs/src/Avalonia.Controls.DataGrid/DataGridColumn.cs/#L705"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public double MaxWidth { get; set; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.double">double</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="Avalonia_Controls_DataGridColumn_MinWidth_" data-uid="Avalonia.Controls.DataGridColumn.MinWidth*"></a>
+
+  <h3 id="Avalonia_Controls_DataGridColumn_MinWidth" data-uid="Avalonia.Controls.DataGridColumn.MinWidth">
+  MinWidth
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/Docs/src/Avalonia.Controls.DataGrid/DataGridColumn.cs/#L733"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public double MinWidth { get; set; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.double">double</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="Avalonia_Controls_DataGridColumn_OwningGrid_" data-uid="Avalonia.Controls.DataGridColumn.OwningGrid*"></a>
+
+  <h3 id="Avalonia_Controls_DataGridColumn_OwningGrid" data-uid="Avalonia.Controls.DataGridColumn.OwningGrid">
+  OwningGrid
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/Docs/src/Avalonia.Controls.DataGrid/DataGridColumn.cs/#L92"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Gets the <a class="xref" href="Avalonia.Controls.DataGrid.html">DataGrid</a> control that contains this column.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">protected DataGrid OwningGrid { get; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="Avalonia.Controls.DataGrid.html">DataGrid</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="Avalonia_Controls_DataGridColumn_ShowFilterButton_" data-uid="Avalonia.Controls.DataGridColumn.ShowFilterButton*"></a>
+
+  <h3 id="Avalonia_Controls_DataGridColumn_ShowFilterButton" data-uid="Avalonia.Controls.DataGridColumn.ShowFilterButton">
+  ShowFilterButton
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/Docs/src/Avalonia.Controls.DataGrid/DataGridColumn.cs/#L573"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Gets or sets a value indicating whether the column header should display the filter button.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public bool ShowFilterButton { get; set; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="Avalonia_Controls_DataGridColumn_SortDirection_" data-uid="Avalonia.Controls.DataGridColumn.SortDirection*"></a>
+
+  <h3 id="Avalonia_Controls_DataGridColumn_SortDirection" data-uid="Avalonia.Controls.DataGridColumn.SortDirection">
+  SortDirection
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/Docs/src/Avalonia.Controls.DataGrid/DataGridColumn.cs/#L871"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Gets or sets the current sort direction for this column. Setting this property updates
+the owning grid's sorting model; clearing it removes the column from sorting.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public ListSortDirection? SortDirection { get; set; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.componentmodel.listsortdirection">ListSortDirection</a>?</dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="Avalonia_Controls_DataGridColumn_SortMemberPath_" data-uid="Avalonia.Controls.DataGridColumn.SortMemberPath*"></a>
+
+  <h3 id="Avalonia_Controls_DataGridColumn_SortMemberPath" data-uid="Avalonia.Controls.DataGridColumn.SortMemberPath">
+  SortMemberPath
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/Docs/src/Avalonia.Controls.DataGrid/DataGridColumn.cs/#L961"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Holds the name of the member to use for sorting, if not using the default.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public string SortMemberPath { get; set; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="Avalonia_Controls_DataGridColumn_Summaries_" data-uid="Avalonia.Controls.DataGridColumn.Summaries*"></a>
+
+  <h3 id="Avalonia_Controls_DataGridColumn_Summaries" data-uid="Avalonia.Controls.DataGridColumn.Summaries">
+  Summaries
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/Docs/src/Avalonia.Controls.DataGrid/DataGridColumn.Summaries.cs/#L32"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Gets the collection of summary descriptions for this column.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public DataGridSummaryDescriptionCollection Summaries { get; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="Avalonia.Controls.DataGridSummaryDescriptionCollection.html">DataGridSummaryDescriptionCollection</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="Avalonia_Controls_DataGridColumn_SummaryCellTheme_" data-uid="Avalonia.Controls.DataGridColumn.SummaryCellTheme*"></a>
+
+  <h3 id="Avalonia_Controls_DataGridColumn_SummaryCellTheme" data-uid="Avalonia.Controls.DataGridColumn.SummaryCellTheme">
+  SummaryCellTheme
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/Docs/src/Avalonia.Controls.DataGrid/DataGridColumn.Summaries.cs/#L48"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Gets or sets the theme for summary cells in this column.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public ControlTheme SummaryCellTheme { get; set; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><span class="xref">ControlTheme</span></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="Avalonia_Controls_DataGridColumn_Tag_" data-uid="Avalonia.Controls.DataGridColumn.Tag*"></a>
+
+  <h3 id="Avalonia_Controls_DataGridColumn_Tag" data-uid="Avalonia.Controls.DataGridColumn.Tag">
+  Tag
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/Docs/src/Avalonia.Controls.DataGrid/DataGridColumn.cs/#L970"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Gets or sets an object associated with this column.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public object Tag { get; set; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object">object</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="Avalonia_Controls_DataGridColumn_Width_" data-uid="Avalonia.Controls.DataGridColumn.Width*"></a>
+
+  <h3 id="Avalonia_Controls_DataGridColumn_Width" data-uid="Avalonia.Controls.DataGridColumn.Width">
+  Width
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/Docs/src/Avalonia.Controls.DataGrid/DataGridColumn.cs/#L774"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public DataGridLength Width { get; set; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="Avalonia.Controls.DataGridLength.html">DataGridLength</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <h2 class="section" id="methods">Methods
+</h2>
+
+
+  <a id="Avalonia_Controls_DataGridColumn_CancelCellEdit_" data-uid="Avalonia.Controls.DataGridColumn.CancelCellEdit*"></a>
+
+  <h3 id="Avalonia_Controls_DataGridColumn_CancelCellEdit_Avalonia_Controls_Control_System_Object_" data-uid="Avalonia.Controls.DataGridColumn.CancelCellEdit(Avalonia.Controls.Control,System.Object)">
+  CancelCellEdit(Control, object)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/Docs/src/Avalonia.Controls.DataGrid/DataGridColumn.Cells.cs/#L109"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>When overridden in a derived class, causes the column cell being edited to revert to the unedited value.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">protected virtual void CancelCellEdit(Control editingElement, object uneditedValue)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>editingElement</code> <span class="xref">Control</span></dt>
+    <dd><p>The element that the column displays for a cell in editing mode.</p>
+</dd>
+    <dt><code>uneditedValue</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object">object</a></dt>
+    <dd><p>The previous, unedited value in the cell being edited.</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Avalonia_Controls_DataGridColumn_ClearSort_" data-uid="Avalonia.Controls.DataGridColumn.ClearSort*"></a>
+
+  <h3 id="Avalonia_Controls_DataGridColumn_ClearSort" data-uid="Avalonia.Controls.DataGridColumn.ClearSort">
+  ClearSort()
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/Docs/src/Avalonia.Controls.DataGrid/DataGridColumn.Cells.cs/#L94"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Clears the current sort direction</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public void ClearSort()</code></pre>
+  </div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Avalonia_Controls_DataGridColumn_EndCellEdit_" data-uid="Avalonia.Controls.DataGridColumn.EndCellEdit*"></a>
+
+  <h3 id="Avalonia_Controls_DataGridColumn_EndCellEdit" data-uid="Avalonia.Controls.DataGridColumn.EndCellEdit">
+  EndCellEdit()
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/Docs/src/Avalonia.Controls.DataGrid/DataGridColumn.Cells.cs/#L120"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>When overridden in a derived class, called when a cell in the column exits editing mode.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">protected virtual void EndCellEdit()</code></pre>
+  </div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Avalonia_Controls_DataGridColumn_GenerateEditingElement_" data-uid="Avalonia.Controls.DataGridColumn.GenerateEditingElement*"></a>
+
+  <h3 id="Avalonia_Controls_DataGridColumn_GenerateEditingElement_Avalonia_Controls_DataGridCell_System_Object_Avalonia_Controls_Utils_ICellEditBinding__" data-uid="Avalonia.Controls.DataGridColumn.GenerateEditingElement(Avalonia.Controls.DataGridCell,System.Object,Avalonia.Controls.Utils.ICellEditBinding@)">
+  GenerateEditingElement(DataGridCell, object, out ICellEditBinding)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/Docs/src/Avalonia.Controls.DataGrid/DataGridColumn.cs/#L891"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>When overridden in a derived class, gets an editing element that is bound to the column's <a class="xref" href="Avalonia.Controls.DataGridBoundColumn.html#Avalonia_Controls_DataGridBoundColumn_Binding">Binding</a> property value.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">protected abstract Control GenerateEditingElement(DataGridCell cell, object dataItem, out ICellEditBinding binding)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>cell</code> <a class="xref" href="Avalonia.Controls.DataGridCell.html">DataGridCell</a></dt>
+    <dd><p>The cell that will contain the generated element.</p>
+</dd>
+    <dt><code>dataItem</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object">object</a></dt>
+    <dd><p>The data item represented by the row that contains the intended cell.</p>
+</dd>
+    <dt><code>binding</code> <a class="xref" href="Avalonia.Controls.Utils.ICellEditBinding.html">ICellEditBinding</a></dt>
+    <dd><p>When the method returns, contains the applied binding.</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><span class="xref">Control</span></dt>
+    <dd><p>A new editing element that is bound to the column's <a class="xref" href="Avalonia.Controls.DataGridBoundColumn.html#Avalonia_Controls_DataGridBoundColumn_Binding">Binding</a> property value.</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Avalonia_Controls_DataGridColumn_GenerateElement_" data-uid="Avalonia.Controls.DataGridColumn.GenerateElement*"></a>
+
+  <h3 id="Avalonia_Controls_DataGridColumn_GenerateElement_Avalonia_Controls_DataGridCell_System_Object_" data-uid="Avalonia.Controls.DataGridColumn.GenerateElement(Avalonia.Controls.DataGridCell,System.Object)">
+  GenerateElement(DataGridCell, object)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/Docs/src/Avalonia.Controls.DataGrid/DataGridColumn.cs/#L906"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>When overridden in a derived class, gets a read-only element that is bound to the column's
+<a class="xref" href="Avalonia.Controls.DataGridBoundColumn.html#Avalonia_Controls_DataGridBoundColumn_Binding">Binding</a> property value.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">protected abstract Control GenerateElement(DataGridCell cell, object dataItem)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>cell</code> <a class="xref" href="Avalonia.Controls.DataGridCell.html">DataGridCell</a></dt>
+    <dd><p>The cell that will contain the generated element.</p>
+</dd>
+    <dt><code>dataItem</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object">object</a></dt>
+    <dd><p>The data item represented by the row that contains the intended cell.</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><span class="xref">Control</span></dt>
+    <dd><p>A new, read-only element that is bound to the column's <a class="xref" href="Avalonia.Controls.DataGridBoundColumn.html#Avalonia_Controls_DataGridBoundColumn_Binding">Binding</a> property value.</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Avalonia_Controls_DataGridColumn_GetCellContent_" data-uid="Avalonia.Controls.DataGridColumn.GetCellContent*"></a>
+
+  <h3 id="Avalonia_Controls_DataGridColumn_GetCellContent_Avalonia_Controls_DataGridRow_" data-uid="Avalonia.Controls.DataGridColumn.GetCellContent(Avalonia.Controls.DataGridRow)">
+  GetCellContent(DataGridRow)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/Docs/src/Avalonia.Controls.DataGrid/DataGridColumn.Cells.cs/#L48"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public Control GetCellContent(DataGridRow dataGridRow)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>dataGridRow</code> <a class="xref" href="Avalonia.Controls.DataGridRow.html">DataGridRow</a></dt>
+    <dd></dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><span class="xref">Control</span></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Avalonia_Controls_DataGridColumn_GetCellContent_" data-uid="Avalonia.Controls.DataGridColumn.GetCellContent*"></a>
+
+  <h3 id="Avalonia_Controls_DataGridColumn_GetCellContent_System_Object_" data-uid="Avalonia.Controls.DataGridColumn.GetCellContent(System.Object)">
+  GetCellContent(object)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/Docs/src/Avalonia.Controls.DataGrid/DataGridColumn.cs/#L825"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public Control GetCellContent(object dataItem)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>dataItem</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object">object</a></dt>
+    <dd></dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><span class="xref">Control</span></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Avalonia_Controls_DataGridColumn_GetColumnContainingElement_" data-uid="Avalonia.Controls.DataGridColumn.GetColumnContainingElement*"></a>
+
+  <h3 id="Avalonia_Controls_DataGridColumn_GetColumnContainingElement_Avalonia_Controls_Control_" data-uid="Avalonia.Controls.DataGridColumn.GetColumnContainingElement(Avalonia.Controls.Control)">
+  GetColumnContainingElement(Control)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/Docs/src/Avalonia.Controls.DataGrid/DataGridColumn.Cells.cs/#L72"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Returns the column which contains the given element</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static DataGridColumn GetColumnContainingElement(Control element)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>element</code> <span class="xref">Control</span></dt>
+    <dd><p>element contained in a column</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="Avalonia.Controls.DataGridColumn.html">DataGridColumn</a></dt>
+    <dd><p>Column that contains the element, or null if not found</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Avalonia_Controls_DataGridColumn_GetColumnControlTheme_" data-uid="Avalonia.Controls.DataGridColumn.GetColumnControlTheme*"></a>
+
+  <h3 id="Avalonia_Controls_DataGridColumn_GetColumnControlTheme_System_String_" data-uid="Avalonia.Controls.DataGridColumn.GetColumnControlTheme(System.String)">
+  GetColumnControlTheme(string)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/Docs/src/Avalonia.Controls.DataGrid/DataGridColumn.cs/#L801"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Resolves a <span class="xref">Avalonia.Styling.ControlTheme</span> from the owning grid's resources for the given key.
+Returns <code>null</code> when the grid is unavailable, the resource is missing, or the value is not a theme.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">protected ControlTheme GetColumnControlTheme(string resourceKey)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>resourceKey</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></dt>
+    <dd><p>Resource key to search for.</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><span class="xref">ControlTheme</span></dt>
+    <dd><p>The located <span class="xref">Avalonia.Styling.ControlTheme</span> or <code>null</code>.</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Avalonia_Controls_DataGridColumn_NotifyPropertyChanged_" data-uid="Avalonia.Controls.DataGridColumn.NotifyPropertyChanged*"></a>
+
+  <h3 id="Avalonia_Controls_DataGridColumn_NotifyPropertyChanged_System_String_" data-uid="Avalonia.Controls.DataGridColumn.NotifyPropertyChanged(System.String)">
+  NotifyPropertyChanged(string)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/Docs/src/Avalonia.Controls.DataGrid/DataGridColumn.cs/#L913"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Called by a specific column type when one of its properties changed,
+and its current cells need to be updated.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">protected void NotifyPropertyChanged(string propertyName)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>propertyName</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></dt>
+    <dd><p>Indicates which property changed and caused this call</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Avalonia_Controls_DataGridColumn_OnPropertyChanged_" data-uid="Avalonia.Controls.DataGridColumn.OnPropertyChanged*"></a>
+
+  <h3 id="Avalonia_Controls_DataGridColumn_OnPropertyChanged_Avalonia_AvaloniaPropertyChangedEventArgs_" data-uid="Avalonia.Controls.DataGridColumn.OnPropertyChanged(Avalonia.AvaloniaPropertyChangedEventArgs)">
+  OnPropertyChanged(AvaloniaPropertyChangedEventArgs)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/Docs/src/Avalonia.Controls.DataGrid/DataGridColumn.cs/#L236"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Called when a avalonia property changes on the object.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">protected override void OnPropertyChanged(AvaloniaPropertyChangedEventArgs change)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>change</code> <span class="xref">AvaloniaPropertyChangedEventArgs</span></dt>
+    <dd><p>The property change details.</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Avalonia_Controls_DataGridColumn_PrepareCellForEdit_" data-uid="Avalonia.Controls.DataGridColumn.PrepareCellForEdit*"></a>
+
+  <h3 id="Avalonia_Controls_DataGridColumn_PrepareCellForEdit_Avalonia_Controls_Control_Avalonia_Interactivity_RoutedEventArgs_" data-uid="Avalonia.Controls.DataGridColumn.PrepareCellForEdit(Avalonia.Controls.Control,Avalonia.Interactivity.RoutedEventArgs)">
+  PrepareCellForEdit(Control, RoutedEventArgs)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/Docs/src/Avalonia.Controls.DataGrid/DataGridColumn.cs/#L930"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>When overridden in a derived class, called when a cell in the column enters editing mode.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">protected abstract object PrepareCellForEdit(Control editingElement, RoutedEventArgs editingEventArgs)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>editingElement</code> <span class="xref">Control</span></dt>
+    <dd><p>The element that the column displays for a cell in editing mode.</p>
+</dd>
+    <dt><code>editingEventArgs</code> <span class="xref">RoutedEventArgs</span></dt>
+    <dd><p>Information about the user gesture that is causing a cell to enter editing mode.</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object">object</a></dt>
+    <dd><p>The unedited value.</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Avalonia_Controls_DataGridColumn_RefreshCellContent_" data-uid="Avalonia.Controls.DataGridColumn.RefreshCellContent*"></a>
+
+  <h3 id="Avalonia_Controls_DataGridColumn_RefreshCellContent_Avalonia_Controls_Control_System_String_" data-uid="Avalonia.Controls.DataGridColumn.RefreshCellContent(Avalonia.Controls.Control,System.String)">
+  RefreshCellContent(Control, string)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/Docs/src/Avalonia.Controls.DataGrid/DataGridColumn.cs/#L938"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Called by the DataGrid control when a column asked for its
+elements to be refreshed, typically because one of its properties changed.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">protected virtual void RefreshCellContent(Control element, string propertyName)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>element</code> <span class="xref">Control</span></dt>
+    <dd><p>Indicates the element that needs to be refreshed</p>
+</dd>
+    <dt><code>propertyName</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></dt>
+    <dd><p>Indicates which property changed and caused this call</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Avalonia_Controls_DataGridColumn_Sort_" data-uid="Avalonia.Controls.DataGridColumn.Sort*"></a>
+
+  <h3 id="Avalonia_Controls_DataGridColumn_Sort" data-uid="Avalonia.Controls.DataGridColumn.Sort">
+  Sort()
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/Docs/src/Avalonia.Controls.DataGrid/DataGridColumn.cs/#L845"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Switches the current state of sort direction</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public void Sort()</code></pre>
+  </div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Avalonia_Controls_DataGridColumn_Sort_" data-uid="Avalonia.Controls.DataGridColumn.Sort*"></a>
+
+  <h3 id="Avalonia_Controls_DataGridColumn_Sort_System_ComponentModel_ListSortDirection_" data-uid="Avalonia.Controls.DataGridColumn.Sort(System.ComponentModel.ListSortDirection)">
+  Sort(ListSortDirection)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/Docs/src/Avalonia.Controls.DataGrid/DataGridColumn.cs/#L855"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Changes the sort direction of this column</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public void Sort(ListSortDirection direction)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>direction</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.componentmodel.listsortdirection">ListSortDirection</a></dt>
+    <dd><p>New sort direction</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+
+  <h2 class="section" id="events">Events
+</h2>
+
+
+
+  <h3 id="Avalonia_Controls_DataGridColumn_HeaderPointerPressed" data-uid="Avalonia.Controls.DataGridColumn.HeaderPointerPressed">
+  HeaderPointerPressed
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/Docs/src/Avalonia.Controls.DataGrid/DataGridColumn.cs/#L73"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Occurs when the pointer is pressed over the column's header</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public event EventHandler&lt;PointerPressedEventArgs&gt; HeaderPointerPressed</code></pre>
+  </div>
+
+
+
+
+
+
+  <h4 class="section">Event Type</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.eventhandler-1">EventHandler</a>&lt;<span class="xref">PointerPressedEventArgs</span>&gt;</dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <h3 id="Avalonia_Controls_DataGridColumn_HeaderPointerReleased" data-uid="Avalonia.Controls.DataGridColumn.HeaderPointerReleased">
+  HeaderPointerReleased
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/Docs/src/Avalonia.Controls.DataGrid/DataGridColumn.cs/#L77"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Occurs when the pointer is released over the column's header</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public event EventHandler&lt;PointerReleasedEventArgs&gt; HeaderPointerReleased</code></pre>
+  </div>
+
+
+
+
+
+
+  <h4 class="section">Event Type</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.eventhandler-1">EventHandler</a>&lt;<span class="xref">PointerReleasedEventArgs</span>&gt;</dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+</article>
+
+        <div class="contribution d-print-none">
+          <a href="https://github.com/wieslawsoltes/ProDataGrid/blob/Docs/src/Avalonia.Controls.DataGrid/DataGridColumn.Width.cs/#L25" class="edit-link">Edit this page</a>
+        </div>
+
+
+      </div>
+
+      <div class="affix">
+        <nav id="affix"></nav>
+      </div>
+    </main>
+
+
+    <footer class="border-top text-secondary">
+      <div class="container-xxl">
+        <div class="flex-fill">
+          <span>Made with <a href="https://dotnet.github.io/docfx">docfx</a></span>
+        </div>
+      </div>
+    </footer>
+  </body>
+</html>

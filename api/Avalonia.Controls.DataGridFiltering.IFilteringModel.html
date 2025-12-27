@@ -1,0 +1,525 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+      <title>Interface IFilteringModel | ProDataGrid for Avalonia </title>
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <meta name="title" content="Interface IFilteringModel | ProDataGrid for Avalonia ">
+      
+      
+      <link rel="icon" href="../favicon.ico">
+      <link rel="stylesheet" href="../public/docfx.min.css">
+      <link rel="stylesheet" href="../public/main.css">
+      <meta name="docfx:navrel" content="../toc.html">
+      <meta name="docfx:tocrel" content="toc.html">
+      
+      
+      
+      
+      <meta name="docfx:docurl" content="https://github.com/wieslawsoltes/ProDataGrid/new/Docs/apiSpec/new?filename=Avalonia_Controls_DataGridFiltering_IFilteringModel.md&amp;value=---%0Auid%3A%20Avalonia.Controls.DataGridFiltering.IFilteringModel%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">
+      <meta name="loc:inThisArticle" content="In this article">
+      <meta name="loc:searchResultsCount" content="{count} results for &quot;{query}&quot;">
+      <meta name="loc:searchNoResults" content="No results for &quot;{query}&quot;">
+      <meta name="loc:tocFilter" content="Filter by title">
+      <meta name="loc:nextArticle" content="Next">
+      <meta name="loc:prevArticle" content="Previous">
+      <meta name="loc:themeLight" content="Light">
+      <meta name="loc:themeDark" content="Dark">
+      <meta name="loc:themeAuto" content="Auto">
+      <meta name="loc:changeTheme" content="Change theme">
+      <meta name="loc:copy" content="Copy">
+      <meta name="loc:downloadPdf" content="Download PDF">
+
+      <script type="module" src="./../public/docfx.min.js"></script>
+
+      <script>
+        const theme = localStorage.getItem('theme') || 'auto'
+        document.documentElement.setAttribute('data-bs-theme', theme === 'auto' ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light') : theme)
+      </script>
+
+  </head>
+
+  <body class="tex2jax_ignore" data-layout="" data-yaml-mime="ManagedReference">
+    <header class="bg-body border-bottom">
+      <nav id="autocollapse" class="navbar navbar-expand-md" role="navigation">
+        <div class="container-xxl flex-nowrap">
+          <a class="navbar-brand" href="../index.html">
+            <img id="logo" class="svg" src="../images/logo.svg" alt="">
+            
+          </a>
+          <button class="btn btn-lg d-md-none border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navpanel" aria-controls="navpanel" aria-expanded="false" aria-label="Toggle navigation">
+            <i class="bi bi-three-dots"></i>
+          </button>
+          <div class="collapse navbar-collapse" id="navpanel">
+            <div id="navbar">
+            </div>
+          </div>
+        </div>
+      </nav>
+    </header>
+
+    <main class="container-xxl">
+      <div class="toc-offcanvas">
+        <div class="offcanvas-md offcanvas-start" tabindex="-1" id="tocOffcanvas" aria-labelledby="tocOffcanvasLabel">
+          <div class="offcanvas-header">
+            <h5 class="offcanvas-title" id="tocOffcanvasLabel">Table of Contents</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="offcanvas" data-bs-target="#tocOffcanvas" aria-label="Close"></button>
+          </div>
+          <div class="offcanvas-body">
+            <nav class="toc" id="toc"></nav>
+          </div>
+        </div>
+      </div>
+
+      <div class="content">
+        <div class="actionbar">
+          <button class="btn btn-lg border-0 d-md-none" type="button" data-bs-toggle="offcanvas" data-bs-target="#tocOffcanvas" aria-controls="tocOffcanvas" aria-expanded="false" aria-label="Show table of contents">
+            <i class="bi bi-list"></i>
+          </button>
+
+          <nav id="breadcrumb"></nav>
+        </div>
+
+        <article data-uid="Avalonia.Controls.DataGridFiltering.IFilteringModel">
+
+
+
+  <h1 id="Avalonia_Controls_DataGridFiltering_IFilteringModel" data-uid="Avalonia.Controls.DataGridFiltering.IFilteringModel" class="text-break">
+Interface IFilteringModel  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/Docs/src/Avalonia.Controls.DataGrid/Filtering/FilteringModel.cs/#L245"><i class="bi bi-code-slash"></i></a>
+  </h1>
+
+  <div class="facts text-secondary">
+    <dl><dt>Namespace</dt><dd><a class="xref" href="Avalonia.html">Avalonia</a>.<a class="xref" href="Avalonia.Controls.html">Controls</a>.<a class="xref" href="Avalonia.Controls.DataGridFiltering.html">DataGridFiltering</a></dd></dl>
+  <dl><dt>Assembly</dt><dd>Avalonia.Controls.DataGrid.dll</dd></dl>
+  </div>
+
+  <div class="markdown summary"></div>
+  <div class="markdown conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public interface IFilteringModel : INotifyPropertyChanged</code></pre>
+  </div>
+
+
+
+
+
+
+
+  <dl class="typelist inheritedMembers">
+    <dt>Inherited Members</dt>
+    <dd>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.componentmodel.inotifypropertychanged.propertychanged">INotifyPropertyChanged.PropertyChanged</a>
+    </div>
+  </dd></dl>
+
+
+
+
+
+
+  <h2 class="section" id="properties">Properties
+</h2>
+
+
+  <a id="Avalonia_Controls_DataGridFiltering_IFilteringModel_Descriptors_" data-uid="Avalonia.Controls.DataGridFiltering.IFilteringModel.Descriptors*"></a>
+
+  <h3 id="Avalonia_Controls_DataGridFiltering_IFilteringModel_Descriptors" data-uid="Avalonia.Controls.DataGridFiltering.IFilteringModel.Descriptors">
+  Descriptors
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/Docs/src/Avalonia.Controls.DataGrid/Filtering/FilteringModel.cs/#L251"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">IReadOnlyList&lt;FilteringDescriptor&gt; Descriptors { get; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.ireadonlylist-1">IReadOnlyList</a>&lt;<a class="xref" href="Avalonia.Controls.DataGridFiltering.FilteringDescriptor.html">FilteringDescriptor</a>&gt;</dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="Avalonia_Controls_DataGridFiltering_IFilteringModel_OwnsViewFilter_" data-uid="Avalonia.Controls.DataGridFiltering.IFilteringModel.OwnsViewFilter*"></a>
+
+  <h3 id="Avalonia_Controls_DataGridFiltering_IFilteringModel_OwnsViewFilter" data-uid="Avalonia.Controls.DataGridFiltering.IFilteringModel.OwnsViewFilter">
+  OwnsViewFilter
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/Docs/src/Avalonia.Controls.DataGrid/Filtering/FilteringModel.cs/#L253"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">bool OwnsViewFilter { get; set; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <h2 class="section" id="methods">Methods
+</h2>
+
+
+  <a id="Avalonia_Controls_DataGridFiltering_IFilteringModel_Apply_" data-uid="Avalonia.Controls.DataGridFiltering.IFilteringModel.Apply*"></a>
+
+  <h3 id="Avalonia_Controls_DataGridFiltering_IFilteringModel_Apply_System_Collections_Generic_IEnumerable_Avalonia_Controls_DataGridFiltering_FilteringDescriptor__" data-uid="Avalonia.Controls.DataGridFiltering.IFilteringModel.Apply(System.Collections.Generic.IEnumerable{Avalonia.Controls.DataGridFiltering.FilteringDescriptor})">
+  Apply(IEnumerable&lt;FilteringDescriptor&gt;)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/Docs/src/Avalonia.Controls.DataGrid/Filtering/FilteringModel.cs/#L261"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">void Apply(IEnumerable&lt;FilteringDescriptor&gt; descriptors)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>descriptors</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.ienumerable-1">IEnumerable</a>&lt;<a class="xref" href="Avalonia.Controls.DataGridFiltering.FilteringDescriptor.html">FilteringDescriptor</a>&gt;</dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Avalonia_Controls_DataGridFiltering_IFilteringModel_BeginUpdate_" data-uid="Avalonia.Controls.DataGridFiltering.IFilteringModel.BeginUpdate*"></a>
+
+  <h3 id="Avalonia_Controls_DataGridFiltering_IFilteringModel_BeginUpdate" data-uid="Avalonia.Controls.DataGridFiltering.IFilteringModel.BeginUpdate">
+  BeginUpdate()
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/Docs/src/Avalonia.Controls.DataGrid/Filtering/FilteringModel.cs/#L269"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">void BeginUpdate()</code></pre>
+  </div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Avalonia_Controls_DataGridFiltering_IFilteringModel_Clear_" data-uid="Avalonia.Controls.DataGridFiltering.IFilteringModel.Clear*"></a>
+
+  <h3 id="Avalonia_Controls_DataGridFiltering_IFilteringModel_Clear" data-uid="Avalonia.Controls.DataGridFiltering.IFilteringModel.Clear">
+  Clear()
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/Docs/src/Avalonia.Controls.DataGrid/Filtering/FilteringModel.cs/#L263"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">void Clear()</code></pre>
+  </div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Avalonia_Controls_DataGridFiltering_IFilteringModel_DeferRefresh_" data-uid="Avalonia.Controls.DataGridFiltering.IFilteringModel.DeferRefresh*"></a>
+
+  <h3 id="Avalonia_Controls_DataGridFiltering_IFilteringModel_DeferRefresh" data-uid="Avalonia.Controls.DataGridFiltering.IFilteringModel.DeferRefresh">
+  DeferRefresh()
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/Docs/src/Avalonia.Controls.DataGrid/Filtering/FilteringModel.cs/#L273"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">IDisposable DeferRefresh()</code></pre>
+  </div>
+
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.idisposable">IDisposable</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Avalonia_Controls_DataGridFiltering_IFilteringModel_EndUpdate_" data-uid="Avalonia.Controls.DataGridFiltering.IFilteringModel.EndUpdate*"></a>
+
+  <h3 id="Avalonia_Controls_DataGridFiltering_IFilteringModel_EndUpdate" data-uid="Avalonia.Controls.DataGridFiltering.IFilteringModel.EndUpdate">
+  EndUpdate()
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/Docs/src/Avalonia.Controls.DataGrid/Filtering/FilteringModel.cs/#L271"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">void EndUpdate()</code></pre>
+  </div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Avalonia_Controls_DataGridFiltering_IFilteringModel_Move_" data-uid="Avalonia.Controls.DataGridFiltering.IFilteringModel.Move*"></a>
+
+  <h3 id="Avalonia_Controls_DataGridFiltering_IFilteringModel_Move_System_Object_System_Int32_" data-uid="Avalonia.Controls.DataGridFiltering.IFilteringModel.Move(System.Object,System.Int32)">
+  Move(object, int)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/Docs/src/Avalonia.Controls.DataGrid/Filtering/FilteringModel.cs/#L267"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">bool Move(object columnId, int newIndex)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>columnId</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object">object</a></dt>
+    <dd></dd>
+    <dt><code>newIndex</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a></dt>
+    <dd></dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Avalonia_Controls_DataGridFiltering_IFilteringModel_Remove_" data-uid="Avalonia.Controls.DataGridFiltering.IFilteringModel.Remove*"></a>
+
+  <h3 id="Avalonia_Controls_DataGridFiltering_IFilteringModel_Remove_System_Object_" data-uid="Avalonia.Controls.DataGridFiltering.IFilteringModel.Remove(System.Object)">
+  Remove(object)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/Docs/src/Avalonia.Controls.DataGrid/Filtering/FilteringModel.cs/#L265"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">bool Remove(object columnId)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>columnId</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object">object</a></dt>
+    <dd></dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Avalonia_Controls_DataGridFiltering_IFilteringModel_SetOrUpdate_" data-uid="Avalonia.Controls.DataGridFiltering.IFilteringModel.SetOrUpdate*"></a>
+
+  <h3 id="Avalonia_Controls_DataGridFiltering_IFilteringModel_SetOrUpdate_Avalonia_Controls_DataGridFiltering_FilteringDescriptor_" data-uid="Avalonia.Controls.DataGridFiltering.IFilteringModel.SetOrUpdate(Avalonia.Controls.DataGridFiltering.FilteringDescriptor)">
+  SetOrUpdate(FilteringDescriptor)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/Docs/src/Avalonia.Controls.DataGrid/Filtering/FilteringModel.cs/#L259"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">void SetOrUpdate(FilteringDescriptor descriptor)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>descriptor</code> <a class="xref" href="Avalonia.Controls.DataGridFiltering.FilteringDescriptor.html">FilteringDescriptor</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+
+  <h2 class="section" id="events">Events
+</h2>
+
+
+
+  <h3 id="Avalonia_Controls_DataGridFiltering_IFilteringModel_FilteringChanged" data-uid="Avalonia.Controls.DataGridFiltering.IFilteringModel.FilteringChanged">
+  FilteringChanged
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/Docs/src/Avalonia.Controls.DataGrid/Filtering/FilteringModel.cs/#L255"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">event EventHandler&lt;FilteringChangedEventArgs&gt; FilteringChanged</code></pre>
+  </div>
+
+
+
+
+
+
+  <h4 class="section">Event Type</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.eventhandler-1">EventHandler</a>&lt;<a class="xref" href="Avalonia.Controls.DataGridFiltering.FilteringChangedEventArgs.html">FilteringChangedEventArgs</a>&gt;</dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <h3 id="Avalonia_Controls_DataGridFiltering_IFilteringModel_FilteringChanging" data-uid="Avalonia.Controls.DataGridFiltering.IFilteringModel.FilteringChanging">
+  FilteringChanging
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/Docs/src/Avalonia.Controls.DataGrid/Filtering/FilteringModel.cs/#L257"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">event EventHandler&lt;FilteringChangingEventArgs&gt; FilteringChanging</code></pre>
+  </div>
+
+
+
+
+
+
+  <h4 class="section">Event Type</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.eventhandler-1">EventHandler</a>&lt;<a class="xref" href="Avalonia.Controls.DataGridFiltering.FilteringChangingEventArgs.html">FilteringChangingEventArgs</a>&gt;</dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+</article>
+
+        <div class="contribution d-print-none">
+          <a href="https://github.com/wieslawsoltes/ProDataGrid/blob/Docs/src/Avalonia.Controls.DataGrid/Filtering/FilteringModel.cs/#L245" class="edit-link">Edit this page</a>
+        </div>
+
+
+      </div>
+
+      <div class="affix">
+        <nav id="affix"></nav>
+      </div>
+    </main>
+
+
+    <footer class="border-top text-secondary">
+      <div class="container-xxl">
+        <div class="flex-fill">
+          <span>Made with <a href="https://dotnet.github.io/docfx">docfx</a></span>
+        </div>
+      </div>
+    </footer>
+  </body>
+</html>

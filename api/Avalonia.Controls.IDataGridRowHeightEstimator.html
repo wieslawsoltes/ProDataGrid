@@ -1,0 +1,758 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+      <title>Interface IDataGridRowHeightEstimator | ProDataGrid for Avalonia </title>
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <meta name="title" content="Interface IDataGridRowHeightEstimator | ProDataGrid for Avalonia ">
+      
+      <meta name="description" content="Defines the contract for row height estimation and scroll position calculation in DataGrid. Implementations can provide different algorithms for handling variable row heights.">
+      <link rel="icon" href="../favicon.ico">
+      <link rel="stylesheet" href="../public/docfx.min.css">
+      <link rel="stylesheet" href="../public/main.css">
+      <meta name="docfx:navrel" content="../toc.html">
+      <meta name="docfx:tocrel" content="toc.html">
+      
+      
+      
+      
+      <meta name="docfx:docurl" content="https://github.com/wieslawsoltes/ProDataGrid/new/Docs/apiSpec/new?filename=Avalonia_Controls_IDataGridRowHeightEstimator.md&amp;value=---%0Auid%3A%20Avalonia.Controls.IDataGridRowHeightEstimator%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">
+      <meta name="loc:inThisArticle" content="In this article">
+      <meta name="loc:searchResultsCount" content="{count} results for &quot;{query}&quot;">
+      <meta name="loc:searchNoResults" content="No results for &quot;{query}&quot;">
+      <meta name="loc:tocFilter" content="Filter by title">
+      <meta name="loc:nextArticle" content="Next">
+      <meta name="loc:prevArticle" content="Previous">
+      <meta name="loc:themeLight" content="Light">
+      <meta name="loc:themeDark" content="Dark">
+      <meta name="loc:themeAuto" content="Auto">
+      <meta name="loc:changeTheme" content="Change theme">
+      <meta name="loc:copy" content="Copy">
+      <meta name="loc:downloadPdf" content="Download PDF">
+
+      <script type="module" src="./../public/docfx.min.js"></script>
+
+      <script>
+        const theme = localStorage.getItem('theme') || 'auto'
+        document.documentElement.setAttribute('data-bs-theme', theme === 'auto' ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light') : theme)
+      </script>
+
+  </head>
+
+  <body class="tex2jax_ignore" data-layout="" data-yaml-mime="ManagedReference">
+    <header class="bg-body border-bottom">
+      <nav id="autocollapse" class="navbar navbar-expand-md" role="navigation">
+        <div class="container-xxl flex-nowrap">
+          <a class="navbar-brand" href="../index.html">
+            <img id="logo" class="svg" src="../images/logo.svg" alt="">
+            
+          </a>
+          <button class="btn btn-lg d-md-none border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navpanel" aria-controls="navpanel" aria-expanded="false" aria-label="Toggle navigation">
+            <i class="bi bi-three-dots"></i>
+          </button>
+          <div class="collapse navbar-collapse" id="navpanel">
+            <div id="navbar">
+            </div>
+          </div>
+        </div>
+      </nav>
+    </header>
+
+    <main class="container-xxl">
+      <div class="toc-offcanvas">
+        <div class="offcanvas-md offcanvas-start" tabindex="-1" id="tocOffcanvas" aria-labelledby="tocOffcanvasLabel">
+          <div class="offcanvas-header">
+            <h5 class="offcanvas-title" id="tocOffcanvasLabel">Table of Contents</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="offcanvas" data-bs-target="#tocOffcanvas" aria-label="Close"></button>
+          </div>
+          <div class="offcanvas-body">
+            <nav class="toc" id="toc"></nav>
+          </div>
+        </div>
+      </div>
+
+      <div class="content">
+        <div class="actionbar">
+          <button class="btn btn-lg border-0 d-md-none" type="button" data-bs-toggle="offcanvas" data-bs-target="#tocOffcanvas" aria-controls="tocOffcanvas" aria-expanded="false" aria-label="Show table of contents">
+            <i class="bi bi-list"></i>
+          </button>
+
+          <nav id="breadcrumb"></nav>
+        </div>
+
+        <article data-uid="Avalonia.Controls.IDataGridRowHeightEstimator">
+
+
+
+  <h1 id="Avalonia_Controls_IDataGridRowHeightEstimator" data-uid="Avalonia.Controls.IDataGridRowHeightEstimator" class="text-break">
+Interface IDataGridRowHeightEstimator  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/Docs/src/Avalonia.Controls.DataGrid/RowHeightEstimators/IDataGridRowHeightEstimator.cs/#L13"><i class="bi bi-code-slash"></i></a>
+  </h1>
+
+  <div class="facts text-secondary">
+    <dl><dt>Namespace</dt><dd><a class="xref" href="Avalonia.html">Avalonia</a>.<a class="xref" href="Avalonia.Controls.html">Controls</a></dd></dl>
+  <dl><dt>Assembly</dt><dd>Avalonia.Controls.DataGrid.dll</dd></dl>
+  </div>
+
+  <div class="markdown summary"><p>Defines the contract for row height estimation and scroll position calculation in DataGrid.
+Implementations can provide different algorithms for handling variable row heights.</p>
+</div>
+  <div class="markdown conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public interface IDataGridRowHeightEstimator</code></pre>
+  </div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  <h2 class="section" id="properties">Properties
+</h2>
+
+
+  <a id="Avalonia_Controls_IDataGridRowHeightEstimator_DefaultRowHeight_" data-uid="Avalonia.Controls.IDataGridRowHeightEstimator.DefaultRowHeight*"></a>
+
+  <h3 id="Avalonia_Controls_IDataGridRowHeightEstimator_DefaultRowHeight" data-uid="Avalonia.Controls.IDataGridRowHeightEstimator.DefaultRowHeight">
+  DefaultRowHeight
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/Docs/src/Avalonia.Controls.DataGrid/RowHeightEstimators/IDataGridRowHeightEstimator.cs/#L22"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Gets or sets the default row height used as initial estimate.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">double DefaultRowHeight { get; set; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.double">double</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="Avalonia_Controls_IDataGridRowHeightEstimator_RowDetailsHeightEstimate_" data-uid="Avalonia.Controls.IDataGridRowHeightEstimator.RowDetailsHeightEstimate*"></a>
+
+  <h3 id="Avalonia_Controls_IDataGridRowHeightEstimator_RowDetailsHeightEstimate" data-uid="Avalonia.Controls.IDataGridRowHeightEstimator.RowDetailsHeightEstimate">
+  RowDetailsHeightEstimate
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/Docs/src/Avalonia.Controls.DataGrid/RowHeightEstimators/IDataGridRowHeightEstimator.cs/#L32"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Gets the current estimated height for row details.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">double RowDetailsHeightEstimate { get; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.double">double</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="Avalonia_Controls_IDataGridRowHeightEstimator_RowHeightEstimate_" data-uid="Avalonia.Controls.IDataGridRowHeightEstimator.RowHeightEstimate*"></a>
+
+  <h3 id="Avalonia_Controls_IDataGridRowHeightEstimator_RowHeightEstimate" data-uid="Avalonia.Controls.IDataGridRowHeightEstimator.RowHeightEstimate">
+  RowHeightEstimate
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/Docs/src/Avalonia.Controls.DataGrid/RowHeightEstimators/IDataGridRowHeightEstimator.cs/#L27"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Gets the current estimated height for unmeasured rows.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">double RowHeightEstimate { get; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.double">double</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <h2 class="section" id="methods">Methods
+</h2>
+
+
+  <a id="Avalonia_Controls_IDataGridRowHeightEstimator_CalculateTotalHeight_" data-uid="Avalonia.Controls.IDataGridRowHeightEstimator.CalculateTotalHeight*"></a>
+
+  <h3 id="Avalonia_Controls_IDataGridRowHeightEstimator_CalculateTotalHeight_System_Int32_System_Int32_System_Int32___System_Int32_" data-uid="Avalonia.Controls.IDataGridRowHeightEstimator.CalculateTotalHeight(System.Int32,System.Int32,System.Int32[],System.Int32)">
+  CalculateTotalHeight(int, int, int[], int)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/Docs/src/Avalonia.Controls.DataGrid/RowHeightEstimators/IDataGridRowHeightEstimator.cs/#L76"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Calculates the total estimated height for all rows in the data source.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">double CalculateTotalHeight(int totalSlotCount, int collapsedSlotCount, int[] rowGroupHeaderCounts, int detailsVisibleCount)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>totalSlotCount</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a></dt>
+    <dd><p>The total number of slots (rows + group headers).</p>
+</dd>
+    <dt><code>collapsedSlotCount</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a></dt>
+    <dd><p>The number of collapsed slots.</p>
+</dd>
+    <dt><code>rowGroupHeaderCounts</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a>[]</dt>
+    <dd><p>The count of row group headers at each level.</p>
+</dd>
+    <dt><code>detailsVisibleCount</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a></dt>
+    <dd><p>The number of rows with details visible.</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.double">double</a></dt>
+    <dd><p>The total estimated height.</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Avalonia_Controls_IDataGridRowHeightEstimator_EstimateOffsetToSlot_" data-uid="Avalonia.Controls.IDataGridRowHeightEstimator.EstimateOffsetToSlot*"></a>
+
+  <h3 id="Avalonia_Controls_IDataGridRowHeightEstimator_EstimateOffsetToSlot_System_Int32_" data-uid="Avalonia.Controls.IDataGridRowHeightEstimator.EstimateOffsetToSlot(System.Int32)">
+  EstimateOffsetToSlot(int)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/Docs/src/Avalonia.Controls.DataGrid/RowHeightEstimators/IDataGridRowHeightEstimator.cs/#L91"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Estimates the vertical offset to a specific slot.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">double EstimateOffsetToSlot(int slot)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>slot</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a></dt>
+    <dd><p>The target slot index.</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.double">double</a></dt>
+    <dd><p>The estimated vertical offset to the slot.</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Avalonia_Controls_IDataGridRowHeightEstimator_EstimateSlotAtOffset_" data-uid="Avalonia.Controls.IDataGridRowHeightEstimator.EstimateSlotAtOffset*"></a>
+
+  <h3 id="Avalonia_Controls_IDataGridRowHeightEstimator_EstimateSlotAtOffset_System_Double_System_Int32_" data-uid="Avalonia.Controls.IDataGridRowHeightEstimator.EstimateSlotAtOffset(System.Double,System.Int32)">
+  EstimateSlotAtOffset(double, int)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/Docs/src/Avalonia.Controls.DataGrid/RowHeightEstimators/IDataGridRowHeightEstimator.cs/#L84"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Estimates which slot would be at a given vertical offset.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">int EstimateSlotAtOffset(double verticalOffset, int totalSlotCount)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>verticalOffset</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.double">double</a></dt>
+    <dd><p>The vertical offset from the top.</p>
+</dd>
+    <dt><code>totalSlotCount</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a></dt>
+    <dd><p>The total number of slots.</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a></dt>
+    <dd><p>The estimated slot index at the given offset.</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Avalonia_Controls_IDataGridRowHeightEstimator_GetDiagnostics_" data-uid="Avalonia.Controls.IDataGridRowHeightEstimator.GetDiagnostics*"></a>
+
+  <h3 id="Avalonia_Controls_IDataGridRowHeightEstimator_GetDiagnostics" data-uid="Avalonia.Controls.IDataGridRowHeightEstimator.GetDiagnostics">
+  GetDiagnostics()
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/Docs/src/Avalonia.Controls.DataGrid/RowHeightEstimators/IDataGridRowHeightEstimator.cs/#L134"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Creates a snapshot of the current estimation state for debugging.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">RowHeightEstimatorDiagnostics GetDiagnostics()</code></pre>
+  </div>
+
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="Avalonia.Controls.RowHeightEstimatorDiagnostics.html">RowHeightEstimatorDiagnostics</a></dt>
+    <dd><p>A diagnostic snapshot of the estimator state.</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Avalonia_Controls_IDataGridRowHeightEstimator_GetEstimatedHeight_" data-uid="Avalonia.Controls.IDataGridRowHeightEstimator.GetEstimatedHeight*"></a>
+
+  <h3 id="Avalonia_Controls_IDataGridRowHeightEstimator_GetEstimatedHeight_System_Int32_System_Boolean_System_Int32_System_Boolean_" data-uid="Avalonia.Controls.IDataGridRowHeightEstimator.GetEstimatedHeight(System.Int32,System.Boolean,System.Int32,System.Boolean)">
+  GetEstimatedHeight(int, bool, int, bool)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/Docs/src/Avalonia.Controls.DataGrid/RowHeightEstimators/IDataGridRowHeightEstimator.cs/#L66"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Gets the estimated or cached height for a specific slot.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">double GetEstimatedHeight(int slot, bool isRowGroupHeader = false, int rowGroupLevel = 0, bool hasDetails = false)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>slot</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a></dt>
+    <dd><p>The slot index.</p>
+</dd>
+    <dt><code>isRowGroupHeader</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></dt>
+    <dd><p>Whether the slot is a row group header.</p>
+</dd>
+    <dt><code>rowGroupLevel</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a></dt>
+    <dd><p>The row group level if it's a header.</p>
+</dd>
+    <dt><code>hasDetails</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></dt>
+    <dd><p>Whether the row has details visible.</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.double">double</a></dt>
+    <dd><p>The estimated or cached height.</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Avalonia_Controls_IDataGridRowHeightEstimator_GetRowGroupHeaderHeightEstimate_" data-uid="Avalonia.Controls.IDataGridRowHeightEstimator.GetRowGroupHeaderHeightEstimate*"></a>
+
+  <h3 id="Avalonia_Controls_IDataGridRowHeightEstimator_GetRowGroupHeaderHeightEstimate_System_Int32_" data-uid="Avalonia.Controls.IDataGridRowHeightEstimator.GetRowGroupHeaderHeightEstimate(System.Int32)">
+  GetRowGroupHeaderHeightEstimate(int)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/Docs/src/Avalonia.Controls.DataGrid/RowHeightEstimators/IDataGridRowHeightEstimator.cs/#L39"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Gets the current estimated height for row group headers at a specific level.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">double GetRowGroupHeaderHeightEstimate(int level)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>level</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a></dt>
+    <dd><p>The group level (0 = top level).</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.double">double</a></dt>
+    <dd><p>The estimated height for row group headers at this level.</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Avalonia_Controls_IDataGridRowHeightEstimator_OnDataSourceChanged_" data-uid="Avalonia.Controls.IDataGridRowHeightEstimator.OnDataSourceChanged*"></a>
+
+  <h3 id="Avalonia_Controls_IDataGridRowHeightEstimator_OnDataSourceChanged_System_Int32_" data-uid="Avalonia.Controls.IDataGridRowHeightEstimator.OnDataSourceChanged(System.Int32)">
+  OnDataSourceChanged(int)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/Docs/src/Avalonia.Controls.DataGrid/RowHeightEstimators/IDataGridRowHeightEstimator.cs/#L114"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Called when the data source changes.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">void OnDataSourceChanged(int newItemCount)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>newItemCount</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a></dt>
+    <dd><p>The new total item count.</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Avalonia_Controls_IDataGridRowHeightEstimator_OnItemsInserted_" data-uid="Avalonia.Controls.IDataGridRowHeightEstimator.OnItemsInserted*"></a>
+
+  <h3 id="Avalonia_Controls_IDataGridRowHeightEstimator_OnItemsInserted_System_Int32_System_Int32_" data-uid="Avalonia.Controls.IDataGridRowHeightEstimator.OnItemsInserted(System.Int32,System.Int32)">
+  OnItemsInserted(int, int)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/Docs/src/Avalonia.Controls.DataGrid/RowHeightEstimators/IDataGridRowHeightEstimator.cs/#L121"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Called when items are inserted.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">void OnItemsInserted(int startIndex, int count)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>startIndex</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a></dt>
+    <dd><p>The starting index of insertion.</p>
+</dd>
+    <dt><code>count</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a></dt>
+    <dd><p>The number of items inserted.</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Avalonia_Controls_IDataGridRowHeightEstimator_OnItemsRemoved_" data-uid="Avalonia.Controls.IDataGridRowHeightEstimator.OnItemsRemoved*"></a>
+
+  <h3 id="Avalonia_Controls_IDataGridRowHeightEstimator_OnItemsRemoved_System_Int32_System_Int32_" data-uid="Avalonia.Controls.IDataGridRowHeightEstimator.OnItemsRemoved(System.Int32,System.Int32)">
+  OnItemsRemoved(int, int)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/Docs/src/Avalonia.Controls.DataGrid/RowHeightEstimators/IDataGridRowHeightEstimator.cs/#L128"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Called when items are removed.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">void OnItemsRemoved(int startIndex, int count)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>startIndex</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a></dt>
+    <dd><p>The starting index of removal.</p>
+</dd>
+    <dt><code>count</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a></dt>
+    <dd><p>The number of items removed.</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Avalonia_Controls_IDataGridRowHeightEstimator_RecordMeasuredHeight_" data-uid="Avalonia.Controls.IDataGridRowHeightEstimator.RecordMeasuredHeight*"></a>
+
+  <h3 id="Avalonia_Controls_IDataGridRowHeightEstimator_RecordMeasuredHeight_System_Int32_System_Double_System_Boolean_System_Double_" data-uid="Avalonia.Controls.IDataGridRowHeightEstimator.RecordMeasuredHeight(System.Int32,System.Double,System.Boolean,System.Double)">
+  RecordMeasuredHeight(int, double, bool, double)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/Docs/src/Avalonia.Controls.DataGrid/RowHeightEstimators/IDataGridRowHeightEstimator.cs/#L48"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Records an actual measured row height for a specific slot.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">void RecordMeasuredHeight(int slot, double measuredHeight, bool hasDetails = false, double detailsHeight = 0)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>slot</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a></dt>
+    <dd><p>The slot index of the row.</p>
+</dd>
+    <dt><code>measuredHeight</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.double">double</a></dt>
+    <dd><p>The actual measured height of the row.</p>
+</dd>
+    <dt><code>hasDetails</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></dt>
+    <dd><p>Whether the row has details visible.</p>
+</dd>
+    <dt><code>detailsHeight</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.double">double</a></dt>
+    <dd><p>The height of the row details if visible.</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Avalonia_Controls_IDataGridRowHeightEstimator_RecordRowGroupHeaderHeight_" data-uid="Avalonia.Controls.IDataGridRowHeightEstimator.RecordRowGroupHeaderHeight*"></a>
+
+  <h3 id="Avalonia_Controls_IDataGridRowHeightEstimator_RecordRowGroupHeaderHeight_System_Int32_System_Int32_System_Double_" data-uid="Avalonia.Controls.IDataGridRowHeightEstimator.RecordRowGroupHeaderHeight(System.Int32,System.Int32,System.Double)">
+  RecordRowGroupHeaderHeight(int, int, double)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/Docs/src/Avalonia.Controls.DataGrid/RowHeightEstimators/IDataGridRowHeightEstimator.cs/#L56"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Records an actual measured row group header height.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">void RecordRowGroupHeaderHeight(int slot, int level, double measuredHeight)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>slot</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a></dt>
+    <dd><p>The slot index of the row group header.</p>
+</dd>
+    <dt><code>level</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a></dt>
+    <dd><p>The group level.</p>
+</dd>
+    <dt><code>measuredHeight</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.double">double</a></dt>
+    <dd><p>The actual measured height.</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Avalonia_Controls_IDataGridRowHeightEstimator_Reset_" data-uid="Avalonia.Controls.IDataGridRowHeightEstimator.Reset*"></a>
+
+  <h3 id="Avalonia_Controls_IDataGridRowHeightEstimator_Reset" data-uid="Avalonia.Controls.IDataGridRowHeightEstimator.Reset">
+  Reset()
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/Docs/src/Avalonia.Controls.DataGrid/RowHeightEstimators/IDataGridRowHeightEstimator.cs/#L108"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Resets all cached heights and estimates.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">void Reset()</code></pre>
+  </div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Avalonia_Controls_IDataGridRowHeightEstimator_UpdateFromDisplayedRows_" data-uid="Avalonia.Controls.IDataGridRowHeightEstimator.UpdateFromDisplayedRows*"></a>
+
+  <h3 id="Avalonia_Controls_IDataGridRowHeightEstimator_UpdateFromDisplayedRows_System_Int32_System_Int32_System_Double___System_Double_System_Double_System_Int32_System_Int32_" data-uid="Avalonia.Controls.IDataGridRowHeightEstimator.UpdateFromDisplayedRows(System.Int32,System.Int32,System.Double[],System.Double,System.Double,System.Int32,System.Int32)">
+  UpdateFromDisplayedRows(int, int, double[], double, double, int, int)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/Docs/src/Avalonia.Controls.DataGrid/RowHeightEstimators/IDataGridRowHeightEstimator.cs/#L103"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Called when the displayed rows change to update internal estimates.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">void UpdateFromDisplayedRows(int firstDisplayedSlot, int lastDisplayedSlot, double[] displayedHeights, double verticalOffset, double negVerticalOffset, int collapsedSlotCount, int detailsCount)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>firstDisplayedSlot</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a></dt>
+    <dd><p>The first displayed slot index.</p>
+</dd>
+    <dt><code>lastDisplayedSlot</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a></dt>
+    <dd><p>The last displayed slot index.</p>
+</dd>
+    <dt><code>displayedHeights</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.double">double</a>[]</dt>
+    <dd><p>Array of actual heights for displayed slots.</p>
+</dd>
+    <dt><code>verticalOffset</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.double">double</a></dt>
+    <dd><p>The current vertical scroll offset.</p>
+</dd>
+    <dt><code>negVerticalOffset</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.double">double</a></dt>
+    <dd><p>The negative vertical offset (partial row at top).</p>
+</dd>
+    <dt><code>collapsedSlotCount</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a></dt>
+    <dd><p>The number of collapsed slots from 0 to lastDisplayedSlot.</p>
+</dd>
+    <dt><code>detailsCount</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a></dt>
+    <dd><p>The number of rows with details visible from 0 to lastDisplayedSlot.</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+</article>
+
+        <div class="contribution d-print-none">
+          <a href="https://github.com/wieslawsoltes/ProDataGrid/blob/Docs/src/Avalonia.Controls.DataGrid/RowHeightEstimators/IDataGridRowHeightEstimator.cs/#L13" class="edit-link">Edit this page</a>
+        </div>
+
+
+      </div>
+
+      <div class="affix">
+        <nav id="affix"></nav>
+      </div>
+    </main>
+
+
+    <footer class="border-top text-secondary">
+      <div class="container-xxl">
+        <div class="flex-fill">
+          <span>Made with <a href="https://dotnet.github.io/docfx">docfx</a></span>
+        </div>
+      </div>
+    </footer>
+  </body>
+</html>

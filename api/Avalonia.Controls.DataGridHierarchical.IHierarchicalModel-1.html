@@ -1,0 +1,1165 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+      <title>Interface IHierarchicalModel&lt;T&gt; | ProDataGrid for Avalonia </title>
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <meta name="title" content="Interface IHierarchicalModel&lt;T&gt; | ProDataGrid for Avalonia ">
+      
+      
+      <link rel="icon" href="../favicon.ico">
+      <link rel="stylesheet" href="../public/docfx.min.css">
+      <link rel="stylesheet" href="../public/main.css">
+      <meta name="docfx:navrel" content="../toc.html">
+      <meta name="docfx:tocrel" content="toc.html">
+      
+      
+      
+      
+      <meta name="docfx:docurl" content="https://github.com/wieslawsoltes/ProDataGrid/new/Docs/apiSpec/new?filename=Avalonia_Controls_DataGridHierarchical_IHierarchicalModel_1.md&amp;value=---%0Auid%3A%20Avalonia.Controls.DataGridHierarchical.IHierarchicalModel%601%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">
+      <meta name="loc:inThisArticle" content="In this article">
+      <meta name="loc:searchResultsCount" content="{count} results for &quot;{query}&quot;">
+      <meta name="loc:searchNoResults" content="No results for &quot;{query}&quot;">
+      <meta name="loc:tocFilter" content="Filter by title">
+      <meta name="loc:nextArticle" content="Next">
+      <meta name="loc:prevArticle" content="Previous">
+      <meta name="loc:themeLight" content="Light">
+      <meta name="loc:themeDark" content="Dark">
+      <meta name="loc:themeAuto" content="Auto">
+      <meta name="loc:changeTheme" content="Change theme">
+      <meta name="loc:copy" content="Copy">
+      <meta name="loc:downloadPdf" content="Download PDF">
+
+      <script type="module" src="./../public/docfx.min.js"></script>
+
+      <script>
+        const theme = localStorage.getItem('theme') || 'auto'
+        document.documentElement.setAttribute('data-bs-theme', theme === 'auto' ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light') : theme)
+      </script>
+
+  </head>
+
+  <body class="tex2jax_ignore" data-layout="" data-yaml-mime="ManagedReference">
+    <header class="bg-body border-bottom">
+      <nav id="autocollapse" class="navbar navbar-expand-md" role="navigation">
+        <div class="container-xxl flex-nowrap">
+          <a class="navbar-brand" href="../index.html">
+            <img id="logo" class="svg" src="../images/logo.svg" alt="">
+            
+          </a>
+          <button class="btn btn-lg d-md-none border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navpanel" aria-controls="navpanel" aria-expanded="false" aria-label="Toggle navigation">
+            <i class="bi bi-three-dots"></i>
+          </button>
+          <div class="collapse navbar-collapse" id="navpanel">
+            <div id="navbar">
+            </div>
+          </div>
+        </div>
+      </nav>
+    </header>
+
+    <main class="container-xxl">
+      <div class="toc-offcanvas">
+        <div class="offcanvas-md offcanvas-start" tabindex="-1" id="tocOffcanvas" aria-labelledby="tocOffcanvasLabel">
+          <div class="offcanvas-header">
+            <h5 class="offcanvas-title" id="tocOffcanvasLabel">Table of Contents</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="offcanvas" data-bs-target="#tocOffcanvas" aria-label="Close"></button>
+          </div>
+          <div class="offcanvas-body">
+            <nav class="toc" id="toc"></nav>
+          </div>
+        </div>
+      </div>
+
+      <div class="content">
+        <div class="actionbar">
+          <button class="btn btn-lg border-0 d-md-none" type="button" data-bs-toggle="offcanvas" data-bs-target="#tocOffcanvas" aria-controls="tocOffcanvas" aria-expanded="false" aria-label="Show table of contents">
+            <i class="bi bi-list"></i>
+          </button>
+
+          <nav id="breadcrumb"></nav>
+        </div>
+
+        <article data-uid="Avalonia.Controls.DataGridHierarchical.IHierarchicalModel`1">
+
+
+
+  <h1 id="Avalonia_Controls_DataGridHierarchical_IHierarchicalModel_1" data-uid="Avalonia.Controls.DataGridHierarchical.IHierarchicalModel`1" class="text-break">
+Interface IHierarchicalModel&lt;T&gt;  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/Docs/src/Avalonia.Controls.DataGrid/Hierarchical/HierarchicalModel.Generic.cs/#L17"><i class="bi bi-code-slash"></i></a>
+  </h1>
+
+  <div class="facts text-secondary">
+    <dl><dt>Namespace</dt><dd><a class="xref" href="Avalonia.html">Avalonia</a>.<a class="xref" href="Avalonia.Controls.html">Controls</a>.<a class="xref" href="Avalonia.Controls.DataGridHierarchical.html">DataGridHierarchical</a></dd></dl>
+  <dl><dt>Assembly</dt><dd>Avalonia.Controls.DataGrid.dll</dd></dl>
+  </div>
+
+  <div class="markdown summary"></div>
+  <div class="markdown conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public interface IHierarchicalModel&lt;T&gt; : IHierarchicalModel</code></pre>
+  </div>
+
+
+
+  <h4 class="section">Type Parameters</h4>
+  <dl class="parameters">
+    <dt><code>T</code></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+  <dl class="typelist inheritedMembers">
+    <dt>Inherited Members</dt>
+    <dd>
+    <div>
+      <a class="xref" href="Avalonia.Controls.DataGridHierarchical.IHierarchicalModel.html#Avalonia_Controls_DataGridHierarchical_IHierarchicalModel_SetRoot_System_Object_">IHierarchicalModel.SetRoot(object)</a>
+    </div>
+    <div>
+      <a class="xref" href="Avalonia.Controls.DataGridHierarchical.IHierarchicalModel.html#Avalonia_Controls_DataGridHierarchical_IHierarchicalModel_SetRoots_System_Collections_IEnumerable_">IHierarchicalModel.SetRoots(IEnumerable)</a>
+    </div>
+    <div>
+      <a class="xref" href="Avalonia.Controls.DataGridHierarchical.IHierarchicalModel.html#Avalonia_Controls_DataGridHierarchical_IHierarchicalModel_RootItems">IHierarchicalModel.RootItems</a>
+    </div>
+    <div>
+      <a class="xref" href="Avalonia.Controls.DataGridHierarchical.IHierarchicalModel.html#Avalonia_Controls_DataGridHierarchical_IHierarchicalModel_IsVirtualRoot">IHierarchicalModel.IsVirtualRoot</a>
+    </div>
+    <div>
+      <a class="xref" href="Avalonia.Controls.DataGridHierarchical.IHierarchicalModel.html#Avalonia_Controls_DataGridHierarchical_IHierarchicalModel_Options">IHierarchicalModel.Options</a>
+    </div>
+    <div>
+      <a class="xref" href="Avalonia.Controls.DataGridHierarchical.IHierarchicalModel.html#Avalonia_Controls_DataGridHierarchical_IHierarchicalModel_Count">IHierarchicalModel.Count</a>
+    </div>
+    <div>
+      <a class="xref" href="Avalonia.Controls.DataGridHierarchical.IHierarchicalModel.html#Avalonia_Controls_DataGridHierarchical_IHierarchicalModel_FlattenedVersion">IHierarchicalModel.FlattenedVersion</a>
+    </div>
+    <div>
+      <a class="xref" href="Avalonia.Controls.DataGridHierarchical.IHierarchicalModel.html#Avalonia_Controls_DataGridHierarchical_IHierarchicalModel_FlattenedChanged">IHierarchicalModel.FlattenedChanged</a>
+    </div>
+    <div>
+      <a class="xref" href="Avalonia.Controls.DataGridHierarchical.IHierarchicalModel.html#Avalonia_Controls_DataGridHierarchical_IHierarchicalModel_NodeExpanded">IHierarchicalModel.NodeExpanded</a>
+    </div>
+    <div>
+      <a class="xref" href="Avalonia.Controls.DataGridHierarchical.IHierarchicalModel.html#Avalonia_Controls_DataGridHierarchical_IHierarchicalModel_NodeCollapsed">IHierarchicalModel.NodeCollapsed</a>
+    </div>
+    <div>
+      <a class="xref" href="Avalonia.Controls.DataGridHierarchical.IHierarchicalModel.html#Avalonia_Controls_DataGridHierarchical_IHierarchicalModel_NodeLoading">IHierarchicalModel.NodeLoading</a>
+    </div>
+    <div>
+      <a class="xref" href="Avalonia.Controls.DataGridHierarchical.IHierarchicalModel.html#Avalonia_Controls_DataGridHierarchical_IHierarchicalModel_NodeLoaded">IHierarchicalModel.NodeLoaded</a>
+    </div>
+    <div>
+      <a class="xref" href="Avalonia.Controls.DataGridHierarchical.IHierarchicalModel.html#Avalonia_Controls_DataGridHierarchical_IHierarchicalModel_NodeLoadFailed">IHierarchicalModel.NodeLoadFailed</a>
+    </div>
+    <div>
+      <a class="xref" href="Avalonia.Controls.DataGridHierarchical.IHierarchicalModel.html#Avalonia_Controls_DataGridHierarchical_IHierarchicalModel_NodeLoadRetryScheduled">IHierarchicalModel.NodeLoadRetryScheduled</a>
+    </div>
+    <div>
+      <a class="xref" href="Avalonia.Controls.DataGridHierarchical.IHierarchicalModel.html#Avalonia_Controls_DataGridHierarchical_IHierarchicalModel_HierarchyChanged">IHierarchicalModel.HierarchyChanged</a>
+    </div>
+    <div>
+      <a class="xref" href="Avalonia.Controls.DataGridHierarchical.IHierarchicalModel.html#Avalonia_Controls_DataGridHierarchical_IHierarchicalModel_GetItem_System_Int32_">IHierarchicalModel.GetItem(int)</a>
+    </div>
+    <div>
+      <a class="xref" href="Avalonia.Controls.DataGridHierarchical.IHierarchicalModel.html#Avalonia_Controls_DataGridHierarchical_IHierarchicalModel_GetNode_System_Int32_">IHierarchicalModel.GetNode(int)</a>
+    </div>
+    <div>
+      <a class="xref" href="Avalonia.Controls.DataGridHierarchical.IHierarchicalModel.html#Avalonia_Controls_DataGridHierarchical_IHierarchicalModel_IndexOf_Avalonia_Controls_DataGridHierarchical_HierarchicalNode_">IHierarchicalModel.IndexOf(HierarchicalNode)</a>
+    </div>
+    <div>
+      <a class="xref" href="Avalonia.Controls.DataGridHierarchical.IHierarchicalModel.html#Avalonia_Controls_DataGridHierarchical_IHierarchicalModel_IndexOf_System_Object_">IHierarchicalModel.IndexOf(object)</a>
+    </div>
+    <div>
+      <a class="xref" href="Avalonia.Controls.DataGridHierarchical.IHierarchicalModel.html#Avalonia_Controls_DataGridHierarchical_IHierarchicalModel_BeginVirtualizationGuard">IHierarchicalModel.BeginVirtualizationGuard()</a>
+    </div>
+    <div>
+      <a class="xref" href="Avalonia.Controls.DataGridHierarchical.IHierarchicalModel.html#Avalonia_Controls_DataGridHierarchical_IHierarchicalModel_Expand_Avalonia_Controls_DataGridHierarchical_HierarchicalNode_">IHierarchicalModel.Expand(HierarchicalNode)</a>
+    </div>
+    <div>
+      <a class="xref" href="Avalonia.Controls.DataGridHierarchical.IHierarchicalModel.html#Avalonia_Controls_DataGridHierarchical_IHierarchicalModel_ExpandAsync_Avalonia_Controls_DataGridHierarchical_HierarchicalNode_System_Threading_CancellationToken_">IHierarchicalModel.ExpandAsync(HierarchicalNode, CancellationToken)</a>
+    </div>
+    <div>
+      <a class="xref" href="Avalonia.Controls.DataGridHierarchical.IHierarchicalModel.html#Avalonia_Controls_DataGridHierarchical_IHierarchicalModel_Collapse_Avalonia_Controls_DataGridHierarchical_HierarchicalNode_">IHierarchicalModel.Collapse(HierarchicalNode)</a>
+    </div>
+    <div>
+      <a class="xref" href="Avalonia.Controls.DataGridHierarchical.IHierarchicalModel.html#Avalonia_Controls_DataGridHierarchical_IHierarchicalModel_Toggle_Avalonia_Controls_DataGridHierarchical_HierarchicalNode_">IHierarchicalModel.Toggle(HierarchicalNode)</a>
+    </div>
+    <div>
+      <a class="xref" href="Avalonia.Controls.DataGridHierarchical.IHierarchicalModel.html#Avalonia_Controls_DataGridHierarchical_IHierarchicalModel_ToggleAsync_Avalonia_Controls_DataGridHierarchical_HierarchicalNode_System_Threading_CancellationToken_">IHierarchicalModel.ToggleAsync(HierarchicalNode, CancellationToken)</a>
+    </div>
+    <div>
+      <a class="xref" href="Avalonia.Controls.DataGridHierarchical.IHierarchicalModel.html#Avalonia_Controls_DataGridHierarchical_IHierarchicalModel_Refresh_Avalonia_Controls_DataGridHierarchical_HierarchicalNode_">IHierarchicalModel.Refresh(HierarchicalNode)</a>
+    </div>
+    <div>
+      <a class="xref" href="Avalonia.Controls.DataGridHierarchical.IHierarchicalModel.html#Avalonia_Controls_DataGridHierarchical_IHierarchicalModel_RefreshAsync_Avalonia_Controls_DataGridHierarchical_HierarchicalNode_System_Threading_CancellationToken_">IHierarchicalModel.RefreshAsync(HierarchicalNode, CancellationToken)</a>
+    </div>
+    <div>
+      <a class="xref" href="Avalonia.Controls.DataGridHierarchical.IHierarchicalModel.html#Avalonia_Controls_DataGridHierarchical_IHierarchicalModel_FindNode_System_Object_">IHierarchicalModel.FindNode(object)</a>
+    </div>
+    <div>
+      <a class="xref" href="Avalonia.Controls.DataGridHierarchical.IHierarchicalModel.html#Avalonia_Controls_DataGridHierarchical_IHierarchicalModel_Sort_Avalonia_Controls_DataGridHierarchical_HierarchicalNode_System_Collections_Generic_IComparer_System_Object__System_Boolean_">IHierarchicalModel.Sort(HierarchicalNode, IComparer&lt;object&gt;, bool)</a>
+    </div>
+    <div>
+      <a class="xref" href="Avalonia.Controls.DataGridHierarchical.IHierarchicalModel.html#Avalonia_Controls_DataGridHierarchical_IHierarchicalModel_ApplySiblingComparer_System_Collections_Generic_IComparer_System_Object__System_Boolean_">IHierarchicalModel.ApplySiblingComparer(IComparer&lt;object&gt;, bool)</a>
+    </div>
+    <div>
+      <a class="xref" href="Avalonia.Controls.DataGridHierarchical.IHierarchicalModel.html#Avalonia_Controls_DataGridHierarchical_IHierarchicalModel_ExpandAll_Avalonia_Controls_DataGridHierarchical_HierarchicalNode_System_Nullable_System_Int32__">IHierarchicalModel.ExpandAll(HierarchicalNode, int?)</a>
+    </div>
+    <div>
+      <a class="xref" href="Avalonia.Controls.DataGridHierarchical.IHierarchicalModel.html#Avalonia_Controls_DataGridHierarchical_IHierarchicalModel_CollapseAll_Avalonia_Controls_DataGridHierarchical_HierarchicalNode_System_Nullable_System_Int32__">IHierarchicalModel.CollapseAll(HierarchicalNode, int?)</a>
+    </div>
+  </dd></dl>
+
+
+
+
+
+
+  <h2 class="section" id="properties">Properties
+</h2>
+
+
+  <a id="Avalonia_Controls_DataGridHierarchical_IHierarchicalModel_1_Flattened_" data-uid="Avalonia.Controls.DataGridHierarchical.IHierarchicalModel`1.Flattened*"></a>
+
+  <h3 id="Avalonia_Controls_DataGridHierarchical_IHierarchicalModel_1_Flattened" data-uid="Avalonia.Controls.DataGridHierarchical.IHierarchicalModel`1.Flattened">
+  Flattened
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/Docs/src/Avalonia.Controls.DataGrid/Hierarchical/HierarchicalModel.Generic.cs/#L27"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">IReadOnlyList&lt;HierarchicalNode&lt;T&gt;&gt; Flattened { get; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.ireadonlylist-1">IReadOnlyList</a>&lt;<a class="xref" href="Avalonia.Controls.DataGridHierarchical.HierarchicalNode-1.html">HierarchicalNode</a>&lt;T&gt;&gt;</dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="Avalonia_Controls_DataGridHierarchical_IHierarchicalModel_1_ObservableFlattened_" data-uid="Avalonia.Controls.DataGridHierarchical.IHierarchicalModel`1.ObservableFlattened*"></a>
+
+  <h3 id="Avalonia_Controls_DataGridHierarchical_IHierarchicalModel_1_ObservableFlattened" data-uid="Avalonia.Controls.DataGridHierarchical.IHierarchicalModel`1.ObservableFlattened">
+  ObservableFlattened
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/Docs/src/Avalonia.Controls.DataGrid/Hierarchical/HierarchicalModel.Generic.cs/#L29"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">IReadOnlyList&lt;HierarchicalNode&lt;T&gt;&gt; ObservableFlattened { get; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.ireadonlylist-1">IReadOnlyList</a>&lt;<a class="xref" href="Avalonia.Controls.DataGridHierarchical.HierarchicalNode-1.html">HierarchicalNode</a>&lt;T&gt;&gt;</dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="Avalonia_Controls_DataGridHierarchical_IHierarchicalModel_1_Root_" data-uid="Avalonia.Controls.DataGridHierarchical.IHierarchicalModel`1.Root*"></a>
+
+  <h3 id="Avalonia_Controls_DataGridHierarchical_IHierarchicalModel_1_Root" data-uid="Avalonia.Controls.DataGridHierarchical.IHierarchicalModel`1.Root">
+  Root
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/Docs/src/Avalonia.Controls.DataGrid/Hierarchical/HierarchicalModel.Generic.cs/#L25"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">HierarchicalNode&lt;T&gt;? Root { get; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="Avalonia.Controls.DataGridHierarchical.HierarchicalNode-1.html">HierarchicalNode</a>&lt;T&gt;?</dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="Avalonia_Controls_DataGridHierarchical_IHierarchicalModel_1_TypedOptions_" data-uid="Avalonia.Controls.DataGridHierarchical.IHierarchicalModel`1.TypedOptions*"></a>
+
+  <h3 id="Avalonia_Controls_DataGridHierarchical_IHierarchicalModel_1_TypedOptions" data-uid="Avalonia.Controls.DataGridHierarchical.IHierarchicalModel`1.TypedOptions">
+  TypedOptions
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/Docs/src/Avalonia.Controls.DataGrid/Hierarchical/HierarchicalModel.Generic.cs/#L23"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">HierarchicalOptions&lt;T&gt; TypedOptions { get; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="Avalonia.Controls.DataGridHierarchical.HierarchicalOptions-1.html">HierarchicalOptions</a>&lt;T&gt;</dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <h2 class="section" id="methods">Methods
+</h2>
+
+
+  <a id="Avalonia_Controls_DataGridHierarchical_IHierarchicalModel_1_ApplySiblingComparer_" data-uid="Avalonia.Controls.DataGridHierarchical.IHierarchicalModel`1.ApplySiblingComparer*"></a>
+
+  <h3 id="Avalonia_Controls_DataGridHierarchical_IHierarchicalModel_1_ApplySiblingComparer_System_Collections_Generic_IComparer__0__System_Boolean_" data-uid="Avalonia.Controls.DataGridHierarchical.IHierarchicalModel`1.ApplySiblingComparer(System.Collections.Generic.IComparer{`0},System.Boolean)">
+  ApplySiblingComparer(IComparer&lt;T&gt;?, bool)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/Docs/src/Avalonia.Controls.DataGrid/Hierarchical/HierarchicalModel.Generic.cs/#L66"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">void ApplySiblingComparer(IComparer&lt;T&gt;? comparer, bool recursive = true)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>comparer</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.icomparer-1">IComparer</a>&lt;T&gt;</dt>
+    <dd></dd>
+    <dt><code>recursive</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Avalonia_Controls_DataGridHierarchical_IHierarchicalModel_1_Collapse_" data-uid="Avalonia.Controls.DataGridHierarchical.IHierarchicalModel`1.Collapse*"></a>
+
+  <h3 id="Avalonia_Controls_DataGridHierarchical_IHierarchicalModel_1_Collapse_Avalonia_Controls_DataGridHierarchical_HierarchicalNode__0__" data-uid="Avalonia.Controls.DataGridHierarchical.IHierarchicalModel`1.Collapse(Avalonia.Controls.DataGridHierarchical.HierarchicalNode{`0})">
+  Collapse(HierarchicalNode&lt;T&gt;)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/Docs/src/Avalonia.Controls.DataGrid/Hierarchical/HierarchicalModel.Generic.cs/#L50"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">void Collapse(HierarchicalNode&lt;T&gt; node)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>node</code> <a class="xref" href="Avalonia.Controls.DataGridHierarchical.HierarchicalNode-1.html">HierarchicalNode</a>&lt;T&gt;</dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Avalonia_Controls_DataGridHierarchical_IHierarchicalModel_1_CollapseAll_" data-uid="Avalonia.Controls.DataGridHierarchical.IHierarchicalModel`1.CollapseAll*"></a>
+
+  <h3 id="Avalonia_Controls_DataGridHierarchical_IHierarchicalModel_1_CollapseAll_System_Nullable_Avalonia_Controls_DataGridHierarchical_HierarchicalNode__0___System_Nullable_System_Int32__" data-uid="Avalonia.Controls.DataGridHierarchical.IHierarchicalModel`1.CollapseAll(System.Nullable{Avalonia.Controls.DataGridHierarchical.HierarchicalNode{`0}},System.Nullable{System.Int32})">
+  CollapseAll(HierarchicalNode&lt;T&gt;?, int?)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/Docs/src/Avalonia.Controls.DataGrid/Hierarchical/HierarchicalModel.Generic.cs/#L62"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">void CollapseAll(HierarchicalNode&lt;T&gt;? node = null, int? minDepth = null)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>node</code> <a class="xref" href="Avalonia.Controls.DataGridHierarchical.HierarchicalNode-1.html">HierarchicalNode</a>&lt;T&gt;?</dt>
+    <dd></dd>
+    <dt><code>minDepth</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a>?</dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Avalonia_Controls_DataGridHierarchical_IHierarchicalModel_1_Expand_" data-uid="Avalonia.Controls.DataGridHierarchical.IHierarchicalModel`1.Expand*"></a>
+
+  <h3 id="Avalonia_Controls_DataGridHierarchical_IHierarchicalModel_1_Expand_Avalonia_Controls_DataGridHierarchical_HierarchicalNode__0__" data-uid="Avalonia.Controls.DataGridHierarchical.IHierarchicalModel`1.Expand(Avalonia.Controls.DataGridHierarchical.HierarchicalNode{`0})">
+  Expand(HierarchicalNode&lt;T&gt;)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/Docs/src/Avalonia.Controls.DataGrid/Hierarchical/HierarchicalModel.Generic.cs/#L46"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">void Expand(HierarchicalNode&lt;T&gt; node)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>node</code> <a class="xref" href="Avalonia.Controls.DataGridHierarchical.HierarchicalNode-1.html">HierarchicalNode</a>&lt;T&gt;</dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Avalonia_Controls_DataGridHierarchical_IHierarchicalModel_1_ExpandAll_" data-uid="Avalonia.Controls.DataGridHierarchical.IHierarchicalModel`1.ExpandAll*"></a>
+
+  <h3 id="Avalonia_Controls_DataGridHierarchical_IHierarchicalModel_1_ExpandAll_System_Nullable_Avalonia_Controls_DataGridHierarchical_HierarchicalNode__0___System_Nullable_System_Int32__" data-uid="Avalonia.Controls.DataGridHierarchical.IHierarchicalModel`1.ExpandAll(System.Nullable{Avalonia.Controls.DataGridHierarchical.HierarchicalNode{`0}},System.Nullable{System.Int32})">
+  ExpandAll(HierarchicalNode&lt;T&gt;?, int?)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/Docs/src/Avalonia.Controls.DataGrid/Hierarchical/HierarchicalModel.Generic.cs/#L60"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">void ExpandAll(HierarchicalNode&lt;T&gt;? node = null, int? maxDepth = null)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>node</code> <a class="xref" href="Avalonia.Controls.DataGridHierarchical.HierarchicalNode-1.html">HierarchicalNode</a>&lt;T&gt;?</dt>
+    <dd></dd>
+    <dt><code>maxDepth</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a>?</dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Avalonia_Controls_DataGridHierarchical_IHierarchicalModel_1_ExpandAsync_" data-uid="Avalonia.Controls.DataGridHierarchical.IHierarchicalModel`1.ExpandAsync*"></a>
+
+  <h3 id="Avalonia_Controls_DataGridHierarchical_IHierarchicalModel_1_ExpandAsync_Avalonia_Controls_DataGridHierarchical_HierarchicalNode__0__System_Threading_CancellationToken_" data-uid="Avalonia.Controls.DataGridHierarchical.IHierarchicalModel`1.ExpandAsync(Avalonia.Controls.DataGridHierarchical.HierarchicalNode{`0},System.Threading.CancellationToken)">
+  ExpandAsync(HierarchicalNode&lt;T&gt;, CancellationToken)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/Docs/src/Avalonia.Controls.DataGrid/Hierarchical/HierarchicalModel.Generic.cs/#L48"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">Task ExpandAsync(HierarchicalNode&lt;T&gt; node, CancellationToken cancellationToken = default)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>node</code> <a class="xref" href="Avalonia.Controls.DataGridHierarchical.HierarchicalNode-1.html">HierarchicalNode</a>&lt;T&gt;</dt>
+    <dd></dd>
+    <dt><code>cancellationToken</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.threading.cancellationtoken">CancellationToken</a></dt>
+    <dd></dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.threading.tasks.task">Task</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Avalonia_Controls_DataGridHierarchical_IHierarchicalModel_1_FindNode_" data-uid="Avalonia.Controls.DataGridHierarchical.IHierarchicalModel`1.FindNode*"></a>
+
+  <h3 id="Avalonia_Controls_DataGridHierarchical_IHierarchicalModel_1_FindNode__0_" data-uid="Avalonia.Controls.DataGridHierarchical.IHierarchicalModel`1.FindNode(`0)">
+  FindNode(T)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/Docs/src/Avalonia.Controls.DataGrid/Hierarchical/HierarchicalModel.Generic.cs/#L42"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">HierarchicalNode&lt;T&gt;? FindNode(T item)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>item</code> <span class="xref">T</span></dt>
+    <dd></dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="Avalonia.Controls.DataGridHierarchical.HierarchicalNode-1.html">HierarchicalNode</a>&lt;T&gt;?</dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Avalonia_Controls_DataGridHierarchical_IHierarchicalModel_1_GetTypedNode_" data-uid="Avalonia.Controls.DataGridHierarchical.IHierarchicalModel`1.GetTypedNode*"></a>
+
+  <h3 id="Avalonia_Controls_DataGridHierarchical_IHierarchicalModel_1_GetTypedNode_System_Int32_" data-uid="Avalonia.Controls.DataGridHierarchical.IHierarchicalModel`1.GetTypedNode(System.Int32)">
+  GetTypedNode(int)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/Docs/src/Avalonia.Controls.DataGrid/Hierarchical/HierarchicalModel.Generic.cs/#L40"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">HierarchicalNode&lt;T&gt; GetTypedNode(int index)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>index</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a></dt>
+    <dd></dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="Avalonia.Controls.DataGridHierarchical.HierarchicalNode-1.html">HierarchicalNode</a>&lt;T&gt;</dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Avalonia_Controls_DataGridHierarchical_IHierarchicalModel_1_IndexOf_" data-uid="Avalonia.Controls.DataGridHierarchical.IHierarchicalModel`1.IndexOf*"></a>
+
+  <h3 id="Avalonia_Controls_DataGridHierarchical_IHierarchicalModel_1_IndexOf__0_" data-uid="Avalonia.Controls.DataGridHierarchical.IHierarchicalModel`1.IndexOf(`0)">
+  IndexOf(T)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/Docs/src/Avalonia.Controls.DataGrid/Hierarchical/HierarchicalModel.Generic.cs/#L44"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">int IndexOf(T item)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>item</code> <span class="xref">T</span></dt>
+    <dd></dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Avalonia_Controls_DataGridHierarchical_IHierarchicalModel_1_Refresh_" data-uid="Avalonia.Controls.DataGridHierarchical.IHierarchicalModel`1.Refresh*"></a>
+
+  <h3 id="Avalonia_Controls_DataGridHierarchical_IHierarchicalModel_1_Refresh_System_Nullable_Avalonia_Controls_DataGridHierarchical_HierarchicalNode__0___" data-uid="Avalonia.Controls.DataGridHierarchical.IHierarchicalModel`1.Refresh(System.Nullable{Avalonia.Controls.DataGridHierarchical.HierarchicalNode{`0}})">
+  Refresh(HierarchicalNode&lt;T&gt;?)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/Docs/src/Avalonia.Controls.DataGrid/Hierarchical/HierarchicalModel.Generic.cs/#L56"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">void Refresh(HierarchicalNode&lt;T&gt;? node = null)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>node</code> <a class="xref" href="Avalonia.Controls.DataGridHierarchical.HierarchicalNode-1.html">HierarchicalNode</a>&lt;T&gt;?</dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Avalonia_Controls_DataGridHierarchical_IHierarchicalModel_1_RefreshAsync_" data-uid="Avalonia.Controls.DataGridHierarchical.IHierarchicalModel`1.RefreshAsync*"></a>
+
+  <h3 id="Avalonia_Controls_DataGridHierarchical_IHierarchicalModel_1_RefreshAsync_System_Nullable_Avalonia_Controls_DataGridHierarchical_HierarchicalNode__0___System_Threading_CancellationToken_" data-uid="Avalonia.Controls.DataGridHierarchical.IHierarchicalModel`1.RefreshAsync(System.Nullable{Avalonia.Controls.DataGridHierarchical.HierarchicalNode{`0}},System.Threading.CancellationToken)">
+  RefreshAsync(HierarchicalNode&lt;T&gt;?, CancellationToken)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/Docs/src/Avalonia.Controls.DataGrid/Hierarchical/HierarchicalModel.Generic.cs/#L58"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">Task RefreshAsync(HierarchicalNode&lt;T&gt;? node = null, CancellationToken cancellationToken = default)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>node</code> <a class="xref" href="Avalonia.Controls.DataGridHierarchical.HierarchicalNode-1.html">HierarchicalNode</a>&lt;T&gt;?</dt>
+    <dd></dd>
+    <dt><code>cancellationToken</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.threading.cancellationtoken">CancellationToken</a></dt>
+    <dd></dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.threading.tasks.task">Task</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Avalonia_Controls_DataGridHierarchical_IHierarchicalModel_1_SetRoot_" data-uid="Avalonia.Controls.DataGridHierarchical.IHierarchicalModel`1.SetRoot*"></a>
+
+  <h3 id="Avalonia_Controls_DataGridHierarchical_IHierarchicalModel_1_SetRoot__0_" data-uid="Avalonia.Controls.DataGridHierarchical.IHierarchicalModel`1.SetRoot(`0)">
+  SetRoot(T)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/Docs/src/Avalonia.Controls.DataGrid/Hierarchical/HierarchicalModel.Generic.cs/#L31"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">void SetRoot(T rootItem)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>rootItem</code> <span class="xref">T</span></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Avalonia_Controls_DataGridHierarchical_IHierarchicalModel_1_SetRoots_" data-uid="Avalonia.Controls.DataGridHierarchical.IHierarchicalModel`1.SetRoots*"></a>
+
+  <h3 id="Avalonia_Controls_DataGridHierarchical_IHierarchicalModel_1_SetRoots_System_Collections_Generic_IEnumerable__0__" data-uid="Avalonia.Controls.DataGridHierarchical.IHierarchicalModel`1.SetRoots(System.Collections.Generic.IEnumerable{`0})">
+  SetRoots(IEnumerable&lt;T&gt;)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/Docs/src/Avalonia.Controls.DataGrid/Hierarchical/HierarchicalModel.Generic.cs/#L38"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Sets multiple root items that will be displayed at the top level.
+Creates a virtual root container that holds all items.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">void SetRoots(IEnumerable&lt;T&gt; rootItems)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>rootItems</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.ienumerable-1">IEnumerable</a>&lt;T&gt;</dt>
+    <dd><p>Collection of items to display at root level.</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Avalonia_Controls_DataGridHierarchical_IHierarchicalModel_1_Sort_" data-uid="Avalonia.Controls.DataGridHierarchical.IHierarchicalModel`1.Sort*"></a>
+
+  <h3 id="Avalonia_Controls_DataGridHierarchical_IHierarchicalModel_1_Sort_System_Nullable_Avalonia_Controls_DataGridHierarchical_HierarchicalNode__0___System_Collections_Generic_IComparer__0__System_Boolean_" data-uid="Avalonia.Controls.DataGridHierarchical.IHierarchicalModel`1.Sort(System.Nullable{Avalonia.Controls.DataGridHierarchical.HierarchicalNode{`0}},System.Collections.Generic.IComparer{`0},System.Boolean)">
+  Sort(HierarchicalNode&lt;T&gt;?, IComparer&lt;T&gt;?, bool)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/Docs/src/Avalonia.Controls.DataGrid/Hierarchical/HierarchicalModel.Generic.cs/#L64"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">void Sort(HierarchicalNode&lt;T&gt;? node = null, IComparer&lt;T&gt;? comparer = null, bool recursive = true)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>node</code> <a class="xref" href="Avalonia.Controls.DataGridHierarchical.HierarchicalNode-1.html">HierarchicalNode</a>&lt;T&gt;?</dt>
+    <dd></dd>
+    <dt><code>comparer</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.icomparer-1">IComparer</a>&lt;T&gt;</dt>
+    <dd></dd>
+    <dt><code>recursive</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Avalonia_Controls_DataGridHierarchical_IHierarchicalModel_1_Toggle_" data-uid="Avalonia.Controls.DataGridHierarchical.IHierarchicalModel`1.Toggle*"></a>
+
+  <h3 id="Avalonia_Controls_DataGridHierarchical_IHierarchicalModel_1_Toggle_Avalonia_Controls_DataGridHierarchical_HierarchicalNode__0__" data-uid="Avalonia.Controls.DataGridHierarchical.IHierarchicalModel`1.Toggle(Avalonia.Controls.DataGridHierarchical.HierarchicalNode{`0})">
+  Toggle(HierarchicalNode&lt;T&gt;)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/Docs/src/Avalonia.Controls.DataGrid/Hierarchical/HierarchicalModel.Generic.cs/#L52"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">void Toggle(HierarchicalNode&lt;T&gt; node)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>node</code> <a class="xref" href="Avalonia.Controls.DataGridHierarchical.HierarchicalNode-1.html">HierarchicalNode</a>&lt;T&gt;</dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Avalonia_Controls_DataGridHierarchical_IHierarchicalModel_1_ToggleAsync_" data-uid="Avalonia.Controls.DataGridHierarchical.IHierarchicalModel`1.ToggleAsync*"></a>
+
+  <h3 id="Avalonia_Controls_DataGridHierarchical_IHierarchicalModel_1_ToggleAsync_Avalonia_Controls_DataGridHierarchical_HierarchicalNode__0__System_Threading_CancellationToken_" data-uid="Avalonia.Controls.DataGridHierarchical.IHierarchicalModel`1.ToggleAsync(Avalonia.Controls.DataGridHierarchical.HierarchicalNode{`0},System.Threading.CancellationToken)">
+  ToggleAsync(HierarchicalNode&lt;T&gt;, CancellationToken)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/Docs/src/Avalonia.Controls.DataGrid/Hierarchical/HierarchicalModel.Generic.cs/#L54"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">Task ToggleAsync(HierarchicalNode&lt;T&gt; node, CancellationToken cancellationToken = default)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>node</code> <a class="xref" href="Avalonia.Controls.DataGridHierarchical.HierarchicalNode-1.html">HierarchicalNode</a>&lt;T&gt;</dt>
+    <dd></dd>
+    <dt><code>cancellationToken</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.threading.cancellationtoken">CancellationToken</a></dt>
+    <dd></dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.threading.tasks.task">Task</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <h2 class="section" id="events">Events
+</h2>
+
+
+
+  <h3 id="Avalonia_Controls_DataGridHierarchical_IHierarchicalModel_1_FlattenedChangedTyped" data-uid="Avalonia.Controls.DataGridHierarchical.IHierarchicalModel`1.FlattenedChangedTyped">
+  FlattenedChangedTyped
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/Docs/src/Avalonia.Controls.DataGrid/Hierarchical/HierarchicalModel.Generic.cs/#L82"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">event EventHandler&lt;FlattenedChangedEventArgs&lt;T&gt;&gt;? FlattenedChangedTyped</code></pre>
+  </div>
+
+
+
+
+
+
+  <h4 class="section">Event Type</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.eventhandler-1">EventHandler</a>&lt;<a class="xref" href="Avalonia.Controls.DataGridHierarchical.FlattenedChangedEventArgs-1.html">FlattenedChangedEventArgs</a>&lt;T&gt;&gt;</dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <h3 id="Avalonia_Controls_DataGridHierarchical_IHierarchicalModel_1_HierarchyChangedTyped" data-uid="Avalonia.Controls.DataGridHierarchical.IHierarchicalModel`1.HierarchyChangedTyped">
+  HierarchyChangedTyped
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/Docs/src/Avalonia.Controls.DataGrid/Hierarchical/HierarchicalModel.Generic.cs/#L80"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">event EventHandler&lt;HierarchyChangedEventArgs&lt;T&gt;&gt;? HierarchyChangedTyped</code></pre>
+  </div>
+
+
+
+
+
+
+  <h4 class="section">Event Type</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.eventhandler-1">EventHandler</a>&lt;<a class="xref" href="Avalonia.Controls.DataGridHierarchical.HierarchyChangedEventArgs-1.html">HierarchyChangedEventArgs</a>&lt;T&gt;&gt;</dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <h3 id="Avalonia_Controls_DataGridHierarchical_IHierarchicalModel_1_NodeCollapsedTyped" data-uid="Avalonia.Controls.DataGridHierarchical.IHierarchicalModel`1.NodeCollapsedTyped">
+  NodeCollapsedTyped
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/Docs/src/Avalonia.Controls.DataGrid/Hierarchical/HierarchicalModel.Generic.cs/#L70"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">event EventHandler&lt;HierarchicalNodeEventArgs&lt;T&gt;&gt;? NodeCollapsedTyped</code></pre>
+  </div>
+
+
+
+
+
+
+  <h4 class="section">Event Type</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.eventhandler-1">EventHandler</a>&lt;<a class="xref" href="Avalonia.Controls.DataGridHierarchical.HierarchicalNodeEventArgs-1.html">HierarchicalNodeEventArgs</a>&lt;T&gt;&gt;</dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <h3 id="Avalonia_Controls_DataGridHierarchical_IHierarchicalModel_1_NodeExpandedTyped" data-uid="Avalonia.Controls.DataGridHierarchical.IHierarchicalModel`1.NodeExpandedTyped">
+  NodeExpandedTyped
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/Docs/src/Avalonia.Controls.DataGrid/Hierarchical/HierarchicalModel.Generic.cs/#L68"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">event EventHandler&lt;HierarchicalNodeEventArgs&lt;T&gt;&gt;? NodeExpandedTyped</code></pre>
+  </div>
+
+
+
+
+
+
+  <h4 class="section">Event Type</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.eventhandler-1">EventHandler</a>&lt;<a class="xref" href="Avalonia.Controls.DataGridHierarchical.HierarchicalNodeEventArgs-1.html">HierarchicalNodeEventArgs</a>&lt;T&gt;&gt;</dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <h3 id="Avalonia_Controls_DataGridHierarchical_IHierarchicalModel_1_NodeLoadFailedTyped" data-uid="Avalonia.Controls.DataGridHierarchical.IHierarchicalModel`1.NodeLoadFailedTyped">
+  NodeLoadFailedTyped
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/Docs/src/Avalonia.Controls.DataGrid/Hierarchical/HierarchicalModel.Generic.cs/#L76"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">event EventHandler&lt;HierarchicalNodeLoadFailedEventArgs&lt;T&gt;&gt;? NodeLoadFailedTyped</code></pre>
+  </div>
+
+
+
+
+
+
+  <h4 class="section">Event Type</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.eventhandler-1">EventHandler</a>&lt;<a class="xref" href="Avalonia.Controls.DataGridHierarchical.HierarchicalNodeLoadFailedEventArgs-1.html">HierarchicalNodeLoadFailedEventArgs</a>&lt;T&gt;&gt;</dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <h3 id="Avalonia_Controls_DataGridHierarchical_IHierarchicalModel_1_NodeLoadRetryScheduledTyped" data-uid="Avalonia.Controls.DataGridHierarchical.IHierarchicalModel`1.NodeLoadRetryScheduledTyped">
+  NodeLoadRetryScheduledTyped
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/Docs/src/Avalonia.Controls.DataGrid/Hierarchical/HierarchicalModel.Generic.cs/#L78"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">event EventHandler&lt;HierarchicalNodeRetryEventArgs&lt;T&gt;&gt;? NodeLoadRetryScheduledTyped</code></pre>
+  </div>
+
+
+
+
+
+
+  <h4 class="section">Event Type</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.eventhandler-1">EventHandler</a>&lt;<a class="xref" href="Avalonia.Controls.DataGridHierarchical.HierarchicalNodeRetryEventArgs-1.html">HierarchicalNodeRetryEventArgs</a>&lt;T&gt;&gt;</dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <h3 id="Avalonia_Controls_DataGridHierarchical_IHierarchicalModel_1_NodeLoadedTyped" data-uid="Avalonia.Controls.DataGridHierarchical.IHierarchicalModel`1.NodeLoadedTyped">
+  NodeLoadedTyped
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/Docs/src/Avalonia.Controls.DataGrid/Hierarchical/HierarchicalModel.Generic.cs/#L74"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">event EventHandler&lt;HierarchicalNodeEventArgs&lt;T&gt;&gt;? NodeLoadedTyped</code></pre>
+  </div>
+
+
+
+
+
+
+  <h4 class="section">Event Type</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.eventhandler-1">EventHandler</a>&lt;<a class="xref" href="Avalonia.Controls.DataGridHierarchical.HierarchicalNodeEventArgs-1.html">HierarchicalNodeEventArgs</a>&lt;T&gt;&gt;</dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <h3 id="Avalonia_Controls_DataGridHierarchical_IHierarchicalModel_1_NodeLoadingTyped" data-uid="Avalonia.Controls.DataGridHierarchical.IHierarchicalModel`1.NodeLoadingTyped">
+  NodeLoadingTyped
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/Docs/src/Avalonia.Controls.DataGrid/Hierarchical/HierarchicalModel.Generic.cs/#L72"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">event EventHandler&lt;HierarchicalNodeEventArgs&lt;T&gt;&gt;? NodeLoadingTyped</code></pre>
+  </div>
+
+
+
+
+
+
+  <h4 class="section">Event Type</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.eventhandler-1">EventHandler</a>&lt;<a class="xref" href="Avalonia.Controls.DataGridHierarchical.HierarchicalNodeEventArgs-1.html">HierarchicalNodeEventArgs</a>&lt;T&gt;&gt;</dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+</article>
+
+        <div class="contribution d-print-none">
+          <a href="https://github.com/wieslawsoltes/ProDataGrid/blob/Docs/src/Avalonia.Controls.DataGrid/Hierarchical/HierarchicalModel.Generic.cs/#L17" class="edit-link">Edit this page</a>
+        </div>
+
+
+      </div>
+
+      <div class="affix">
+        <nav id="affix"></nav>
+      </div>
+    </main>
+
+
+    <footer class="border-top text-secondary">
+      <div class="container-xxl">
+        <div class="flex-fill">
+          <span>Made with <a href="https://dotnet.github.io/docfx">docfx</a></span>
+        </div>
+      </div>
+    </footer>
+  </body>
+</html>

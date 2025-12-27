@@ -1,0 +1,2398 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+      <title>Class DataGridCollectionView | ProDataGrid for Avalonia </title>
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <meta name="title" content="Class DataGridCollectionView | ProDataGrid for Avalonia ">
+      
+      <meta name="description" content="DataGrid-readable view over an IEnumerable.">
+      <link rel="icon" href="../favicon.ico">
+      <link rel="stylesheet" href="../public/docfx.min.css">
+      <link rel="stylesheet" href="../public/main.css">
+      <meta name="docfx:navrel" content="../toc.html">
+      <meta name="docfx:tocrel" content="toc.html">
+      
+      
+      
+      
+      <meta name="docfx:docurl" content="https://github.com/wieslawsoltes/ProDataGrid/new/Docs/apiSpec/new?filename=Avalonia_Collections_DataGridCollectionView.md&amp;value=---%0Auid%3A%20Avalonia.Collections.DataGridCollectionView%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">
+      <meta name="loc:inThisArticle" content="In this article">
+      <meta name="loc:searchResultsCount" content="{count} results for &quot;{query}&quot;">
+      <meta name="loc:searchNoResults" content="No results for &quot;{query}&quot;">
+      <meta name="loc:tocFilter" content="Filter by title">
+      <meta name="loc:nextArticle" content="Next">
+      <meta name="loc:prevArticle" content="Previous">
+      <meta name="loc:themeLight" content="Light">
+      <meta name="loc:themeDark" content="Dark">
+      <meta name="loc:themeAuto" content="Auto">
+      <meta name="loc:changeTheme" content="Change theme">
+      <meta name="loc:copy" content="Copy">
+      <meta name="loc:downloadPdf" content="Download PDF">
+
+      <script type="module" src="./../public/docfx.min.js"></script>
+
+      <script>
+        const theme = localStorage.getItem('theme') || 'auto'
+        document.documentElement.setAttribute('data-bs-theme', theme === 'auto' ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light') : theme)
+      </script>
+
+  </head>
+
+  <body class="tex2jax_ignore" data-layout="" data-yaml-mime="ManagedReference">
+    <header class="bg-body border-bottom">
+      <nav id="autocollapse" class="navbar navbar-expand-md" role="navigation">
+        <div class="container-xxl flex-nowrap">
+          <a class="navbar-brand" href="../index.html">
+            <img id="logo" class="svg" src="../images/logo.svg" alt="">
+            
+          </a>
+          <button class="btn btn-lg d-md-none border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navpanel" aria-controls="navpanel" aria-expanded="false" aria-label="Toggle navigation">
+            <i class="bi bi-three-dots"></i>
+          </button>
+          <div class="collapse navbar-collapse" id="navpanel">
+            <div id="navbar">
+            </div>
+          </div>
+        </div>
+      </nav>
+    </header>
+
+    <main class="container-xxl">
+      <div class="toc-offcanvas">
+        <div class="offcanvas-md offcanvas-start" tabindex="-1" id="tocOffcanvas" aria-labelledby="tocOffcanvasLabel">
+          <div class="offcanvas-header">
+            <h5 class="offcanvas-title" id="tocOffcanvasLabel">Table of Contents</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="offcanvas" data-bs-target="#tocOffcanvas" aria-label="Close"></button>
+          </div>
+          <div class="offcanvas-body">
+            <nav class="toc" id="toc"></nav>
+          </div>
+        </div>
+      </div>
+
+      <div class="content">
+        <div class="actionbar">
+          <button class="btn btn-lg border-0 d-md-none" type="button" data-bs-toggle="offcanvas" data-bs-target="#tocOffcanvas" aria-controls="tocOffcanvas" aria-expanded="false" aria-label="Show table of contents">
+            <i class="bi bi-list"></i>
+          </button>
+
+          <nav id="breadcrumb"></nav>
+        </div>
+
+        <article data-uid="Avalonia.Collections.DataGridCollectionView">
+
+
+
+  <h1 id="Avalonia_Collections_DataGridCollectionView" data-uid="Avalonia.Collections.DataGridCollectionView" class="text-break">
+Class DataGridCollectionView  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/Docs/src/Avalonia.Controls.DataGrid/Collections/DataGridCollectionView.TypedList.cs/#L12"><i class="bi bi-code-slash"></i></a>
+  </h1>
+
+  <div class="facts text-secondary">
+    <dl><dt>Namespace</dt><dd><a class="xref" href="Avalonia.html">Avalonia</a>.<a class="xref" href="Avalonia.Collections.html">Collections</a></dd></dl>
+  <dl><dt>Assembly</dt><dd>Avalonia.Controls.DataGrid.dll</dd></dl>
+  </div>
+
+  <div class="markdown summary"><p>DataGrid-readable view over an IEnumerable.</p>
+</div>
+  <div class="markdown conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">[RequiresUnreferencedCode(&quot;DataGridCollectionView uses reflection and TypeDescriptor to inspect data items and is not compatible with trimming.&quot;)]
+public sealed class DataGridCollectionView : IDataGridCollectionView, INotifyCollectionChanged, IList, ICollection, IEnumerable, INotifyPropertyChanged, ITypedList</code></pre>
+  </div>
+
+
+
+
+  <dl class="typelist inheritance">
+    <dt>Inheritance</dt>
+    <dd>
+      <div><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object">object</a></div>
+      <div><span class="xref">DataGridCollectionView</span></div>
+    </dd>
+  </dl>
+
+  <dl class="typelist implements">
+    <dt>Implements</dt>
+    <dd>
+      <div><a class="xref" href="Avalonia.Collections.IDataGridCollectionView.html">IDataGridCollectionView</a></div>
+      <div><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.specialized.inotifycollectionchanged">INotifyCollectionChanged</a></div>
+      <div><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.ilist">IList</a></div>
+      <div><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.icollection">ICollection</a></div>
+      <div><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.ienumerable">IEnumerable</a></div>
+      <div><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.componentmodel.inotifypropertychanged">INotifyPropertyChanged</a></div>
+      <div><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.componentmodel.itypedlist">ITypedList</a></div>
+    </dd>
+  </dl>
+
+
+  <dl class="typelist inheritedMembers">
+    <dt>Inherited Members</dt>
+    <dd>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object)">object.Equals(object)</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object-system-object)">object.Equals(object, object)</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.gethashcode">object.GetHashCode()</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.gettype">object.GetType()</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.referenceequals">object.ReferenceEquals(object, object)</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.tostring">object.ToString()</a>
+    </div>
+  </dd></dl>
+
+
+
+
+
+
+  <h2 class="section" id="constructors">Constructors
+</h2>
+
+
+  <a id="Avalonia_Collections_DataGridCollectionView__ctor_" data-uid="Avalonia.Collections.DataGridCollectionView.#ctor*"></a>
+
+  <h3 id="Avalonia_Collections_DataGridCollectionView__ctor_System_Collections_IEnumerable_" data-uid="Avalonia.Collections.DataGridCollectionView.#ctor(System.Collections.IEnumerable)">
+  DataGridCollectionView(IEnumerable)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/Docs/src/Avalonia.Controls.DataGrid/Collections/DataGridCollectionView.cs/#L235"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Helper constructor that sets default values for isDataSorted and isDataInGroupOrder.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public DataGridCollectionView(IEnumerable source)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>source</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.ienumerable">IEnumerable</a></dt>
+    <dd><p>The source for the collection</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Avalonia_Collections_DataGridCollectionView__ctor_" data-uid="Avalonia.Collections.DataGridCollectionView.#ctor*"></a>
+
+  <h3 id="Avalonia_Collections_DataGridCollectionView__ctor_System_Collections_IEnumerable_System_Boolean_System_Boolean_" data-uid="Avalonia.Collections.DataGridCollectionView.#ctor(System.Collections.IEnumerable,System.Boolean,System.Boolean)">
+  DataGridCollectionView(IEnumerable, bool, bool)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/Docs/src/Avalonia.Controls.DataGrid/Collections/DataGridCollectionView.cs/#L246"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Initializes a new instance of the DataGridCollectionView class.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public DataGridCollectionView(IEnumerable source, bool isDataSorted, bool isDataInGroupOrder)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>source</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.ienumerable">IEnumerable</a></dt>
+    <dd><p>The source for the collection</p>
+</dd>
+    <dt><code>isDataSorted</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></dt>
+    <dd><p>Determines whether the source is already sorted</p>
+</dd>
+    <dt><code>isDataInGroupOrder</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></dt>
+    <dd><p>Whether the source is already in the correct order for grouping</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+
+  <h2 class="section" id="properties">Properties
+</h2>
+
+
+  <a id="Avalonia_Collections_DataGridCollectionView_CanAddNew_" data-uid="Avalonia.Collections.DataGridCollectionView.CanAddNew*"></a>
+
+  <h3 id="Avalonia_Collections_DataGridCollectionView_CanAddNew" data-uid="Avalonia.Collections.DataGridCollectionView.CanAddNew">
+  CanAddNew
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/Docs/src/Avalonia.Controls.DataGrid/Collections/DataGridCollectionView.cs/#L416"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Gets a value indicating whether the view supports AddNew.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public bool CanAddNew { get; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="Avalonia_Collections_DataGridCollectionView_CanCancelEdit_" data-uid="Avalonia.Collections.DataGridCollectionView.CanCancelEdit*"></a>
+
+  <h3 id="Avalonia_Collections_DataGridCollectionView_CanCancelEdit" data-uid="Avalonia.Collections.DataGridCollectionView.CanCancelEdit">
+  CanCancelEdit
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/Docs/src/Avalonia.Controls.DataGrid/Collections/DataGridCollectionView.cs/#L433"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Gets a value indicating whether the view supports the notion of &quot;pending changes&quot;
+on the current edit item.  This may vary, depending on the view and the particular
+item.  For example, a view might return true if the current edit item
+implements IEditableObject, or if the view has special knowledge about
+the item that it can use to support rollback of pending changes.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public bool CanCancelEdit { get; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="Avalonia_Collections_DataGridCollectionView_CanChangePage_" data-uid="Avalonia.Collections.DataGridCollectionView.CanChangePage*"></a>
+
+  <h3 id="Avalonia_Collections_DataGridCollectionView_CanChangePage" data-uid="Avalonia.Collections.DataGridCollectionView.CanChangePage">
+  CanChangePage
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/Docs/src/Avalonia.Controls.DataGrid/Collections/DataGridCollectionView.cs/#L442"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Gets a value indicating whether the PageIndex value is allowed to change or not.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public bool CanChangePage { get; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="Avalonia_Collections_DataGridCollectionView_CanFilter_" data-uid="Avalonia.Collections.DataGridCollectionView.CanFilter*"></a>
+
+  <h3 id="Avalonia_Collections_DataGridCollectionView_CanFilter" data-uid="Avalonia.Collections.DataGridCollectionView.CanFilter">
+  CanFilter
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/Docs/src/Avalonia.Controls.DataGrid/Collections/DataGridCollectionView.cs/#L450"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Gets a value indicating whether we support filtering with this ICollectionView.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public bool CanFilter { get; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="Avalonia_Collections_DataGridCollectionView_CanGroup_" data-uid="Avalonia.Collections.DataGridCollectionView.CanGroup*"></a>
+
+  <h3 id="Avalonia_Collections_DataGridCollectionView_CanGroup" data-uid="Avalonia.Collections.DataGridCollectionView.CanGroup">
+  CanGroup
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/Docs/src/Avalonia.Controls.DataGrid/Collections/DataGridCollectionView.cs/#L459"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Gets a value indicating whether this view supports grouping.
+When this returns false, the rest of the interface is ignored.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public bool CanGroup { get; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="Avalonia_Collections_DataGridCollectionView_CanRemove_" data-uid="Avalonia.Collections.DataGridCollectionView.CanRemove*"></a>
+
+  <h3 id="Avalonia_Collections_DataGridCollectionView_CanRemove" data-uid="Avalonia.Collections.DataGridCollectionView.CanRemove">
+  CanRemove
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/Docs/src/Avalonia.Controls.DataGrid/Collections/DataGridCollectionView.cs/#L467"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Gets a value indicating whether the view supports Remove and RemoveAt.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public bool CanRemove { get; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="Avalonia_Collections_DataGridCollectionView_CanSort_" data-uid="Avalonia.Collections.DataGridCollectionView.CanSort*"></a>
+
+  <h3 id="Avalonia_Collections_DataGridCollectionView_CanSort" data-uid="Avalonia.Collections.DataGridCollectionView.CanSort">
+  CanSort
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/Docs/src/Avalonia.Controls.DataGrid/Collections/DataGridCollectionView.cs/#L479"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Gets a value indicating whether we support sorting with this ICollectionView.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public bool CanSort { get; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="Avalonia_Collections_DataGridCollectionView_Count_" data-uid="Avalonia.Collections.DataGridCollectionView.Count*"></a>
+
+  <h3 id="Avalonia_Collections_DataGridCollectionView_Count" data-uid="Avalonia.Collections.DataGridCollectionView.Count">
+  Count
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/Docs/src/Avalonia.Controls.DataGrid/Collections/DataGridCollectionView.cs/#L489"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Gets the number of records in the view after
+filtering, sorting, and paging.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public int Count { get; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="Avalonia_Collections_DataGridCollectionView_Culture_" data-uid="Avalonia.Collections.DataGridCollectionView.Culture*"></a>
+
+  <h3 id="Avalonia_Collections_DataGridCollectionView_Culture" data-uid="Avalonia.Collections.DataGridCollectionView.Culture">
+  Culture
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/Docs/src/Avalonia.Controls.DataGrid/Collections/DataGridCollectionView.cs/#L532"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Gets or sets Culture to use during sorting.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public CultureInfo Culture { get; set; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.globalization.cultureinfo">CultureInfo</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="Avalonia_Collections_DataGridCollectionView_CurrentAddItem_" data-uid="Avalonia.Collections.DataGridCollectionView.CurrentAddItem*"></a>
+
+  <h3 id="Avalonia_Collections_DataGridCollectionView_CurrentAddItem" data-uid="Avalonia.Collections.DataGridCollectionView.CurrentAddItem">
+  CurrentAddItem
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/Docs/src/Avalonia.Controls.DataGrid/Collections/DataGridCollectionView.cs/#L558"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Gets the new item when an AddNew transaction is in progress
+Otherwise it returns null.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public object CurrentAddItem { get; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object">object</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="Avalonia_Collections_DataGridCollectionView_CurrentEditItem_" data-uid="Avalonia.Collections.DataGridCollectionView.CurrentEditItem*"></a>
+
+  <h3 id="Avalonia_Collections_DataGridCollectionView_CurrentEditItem" data-uid="Avalonia.Collections.DataGridCollectionView.CurrentEditItem">
+  CurrentEditItem
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/Docs/src/Avalonia.Controls.DataGrid/Collections/DataGridCollectionView.cs/#L581"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Gets the affected item when an EditItem transaction is in progress
+Otherwise it returns null.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public object CurrentEditItem { get; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object">object</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="Avalonia_Collections_DataGridCollectionView_CurrentItem_" data-uid="Avalonia.Collections.DataGridCollectionView.CurrentItem*"></a>
+
+  <h3 id="Avalonia_Collections_DataGridCollectionView_CurrentItem" data-uid="Avalonia.Collections.DataGridCollectionView.CurrentItem">
+  CurrentItem
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/Docs/src/Avalonia.Controls.DataGrid/Collections/DataGridCollectionView.cs/#L608"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Gets the &quot;current item&quot; for this view</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public object CurrentItem { get; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object">object</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="Avalonia_Collections_DataGridCollectionView_CurrentPosition_" data-uid="Avalonia.Collections.DataGridCollectionView.CurrentPosition*"></a>
+
+  <h3 id="Avalonia_Collections_DataGridCollectionView_CurrentPosition" data-uid="Avalonia.Collections.DataGridCollectionView.CurrentPosition">
+  CurrentPosition
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/Docs/src/Avalonia.Controls.DataGrid/Collections/DataGridCollectionView.cs/#L621"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Gets the ordinal position of the CurrentItem within the
+(optionally sorted and filtered) view.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public int CurrentPosition { get; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="Avalonia_Collections_DataGridCollectionView_Filter_" data-uid="Avalonia.Collections.DataGridCollectionView.Filter*"></a>
+
+  <h3 id="Avalonia_Collections_DataGridCollectionView_Filter" data-uid="Avalonia.Collections.DataGridCollectionView.Filter">
+  Filter
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/Docs/src/Avalonia.Controls.DataGrid/Collections/DataGridCollectionView.cs/#L656"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Gets or sets the Filter, which is a callback set by the consumer of the ICollectionView
+and used by the implementation of the ICollectionView to determine if an
+item is suitable for inclusion in the view.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public Func&lt;object, bool&gt; Filter { get; set; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.func-2">Func</a>&lt;<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object">object</a>, <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a>&gt;</dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+  <h4 class="section">Exceptions</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.notsupportedexception">NotSupportedException</a></dt>
+    <dd><p>Simpler implementations do not support filtering and will throw a NotSupportedException.
+Use <a class="xref" href="Avalonia.Collections.DataGridCollectionView.html#Avalonia_Collections_DataGridCollectionView_CanFilter">CanFilter</a> property to test if filtering is supported before
+assigning a non-null value.</p>
+</dd>
+  </dl>
+
+
+
+  <a id="Avalonia_Collections_DataGridCollectionView_GroupDescriptions_" data-uid="Avalonia.Collections.DataGridCollectionView.GroupDescriptions*"></a>
+
+  <h3 id="Avalonia_Collections_DataGridCollectionView_GroupDescriptions" data-uid="Avalonia.Collections.DataGridCollectionView.GroupDescriptions">
+  GroupDescriptions
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/Docs/src/Avalonia.Controls.DataGrid/Collections/DataGridCollectionView.cs/#L687"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Gets the description of grouping, indexed by level.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public AvaloniaList&lt;DataGridGroupDescription&gt; GroupDescriptions { get; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><span class="xref">AvaloniaList</span>&lt;<a class="xref" href="Avalonia.Collections.DataGridGroupDescription.html">DataGridGroupDescription</a>&gt;</dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="Avalonia_Collections_DataGridCollectionView_Groups_" data-uid="Avalonia.Collections.DataGridCollectionView.Groups*"></a>
+
+  <h3 id="Avalonia_Collections_DataGridCollectionView_Groups" data-uid="Avalonia.Collections.DataGridCollectionView.Groups">
+  Groups
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/Docs/src/Avalonia.Controls.DataGrid/Collections/DataGridCollectionView.cs/#L713"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Gets the top-level groups, constructed according to the descriptions
+given in GroupDescriptions.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public IAvaloniaReadOnlyList&lt;object&gt; Groups { get; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><span class="xref">IAvaloniaReadOnlyList</span>&lt;<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object">object</a>&gt;</dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="Avalonia_Collections_DataGridCollectionView_IsAddingNew_" data-uid="Avalonia.Collections.DataGridCollectionView.IsAddingNew*"></a>
+
+  <h3 id="Avalonia_Collections_DataGridCollectionView_IsAddingNew" data-uid="Avalonia.Collections.DataGridCollectionView.IsAddingNew">
+  IsAddingNew
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/Docs/src/Avalonia.Controls.DataGrid/Collections/DataGridCollectionView.cs/#L729"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Gets a value indicating whether an &quot;AddNew&quot; transaction is in progress.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public bool IsAddingNew { get; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="Avalonia_Collections_DataGridCollectionView_IsCurrentAfterLast_" data-uid="Avalonia.Collections.DataGridCollectionView.IsCurrentAfterLast*"></a>
+
+  <h3 id="Avalonia_Collections_DataGridCollectionView_IsCurrentAfterLast" data-uid="Avalonia.Collections.DataGridCollectionView.IsCurrentAfterLast">
+  IsCurrentAfterLast
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/Docs/src/Avalonia.Controls.DataGrid/Collections/DataGridCollectionView.cs/#L738"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Gets a value indicating whether currency is beyond the end (End-Of-File).</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public bool IsCurrentAfterLast { get; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></dt>
+    <dd><p>Whether IsCurrentAfterLast</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="Avalonia_Collections_DataGridCollectionView_IsCurrentBeforeFirst_" data-uid="Avalonia.Collections.DataGridCollectionView.IsCurrentBeforeFirst*"></a>
+
+  <h3 id="Avalonia_Collections_DataGridCollectionView_IsCurrentBeforeFirst" data-uid="Avalonia.Collections.DataGridCollectionView.IsCurrentBeforeFirst">
+  IsCurrentBeforeFirst
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/Docs/src/Avalonia.Controls.DataGrid/Collections/DataGridCollectionView.cs/#L751"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Gets a value indicating whether currency is before the beginning (Beginning-Of-File).</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public bool IsCurrentBeforeFirst { get; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></dt>
+    <dd><p>Whether IsCurrentBeforeFirst</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="Avalonia_Collections_DataGridCollectionView_IsEditingItem_" data-uid="Avalonia.Collections.DataGridCollectionView.IsEditingItem*"></a>
+
+  <h3 id="Avalonia_Collections_DataGridCollectionView_IsEditingItem" data-uid="Avalonia.Collections.DataGridCollectionView.IsEditingItem">
+  IsEditingItem
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/Docs/src/Avalonia.Controls.DataGrid/Collections/DataGridCollectionView.cs/#L763"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Gets a value indicating whether an EditItem transaction is in progress.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public bool IsEditingItem { get; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="Avalonia_Collections_DataGridCollectionView_IsEmpty_" data-uid="Avalonia.Collections.DataGridCollectionView.IsEmpty*"></a>
+
+  <h3 id="Avalonia_Collections_DataGridCollectionView_IsEmpty" data-uid="Avalonia.Collections.DataGridCollectionView.IsEmpty">
+  IsEmpty
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/Docs/src/Avalonia.Controls.DataGrid/Collections/DataGridCollectionView.cs/#L771"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Gets a value indicating whether the resulting (filtered) view is empty.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public bool IsEmpty { get; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="Avalonia_Collections_DataGridCollectionView_IsPageChanging_" data-uid="Avalonia.Collections.DataGridCollectionView.IsPageChanging*"></a>
+
+  <h3 id="Avalonia_Collections_DataGridCollectionView_IsPageChanging" data-uid="Avalonia.Collections.DataGridCollectionView.IsPageChanging">
+  IsPageChanging
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/Docs/src/Avalonia.Controls.DataGrid/Collections/DataGridCollectionView.cs/#L784"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Gets a value indicating whether a page index change is in process or not.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public bool IsPageChanging { get; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="Avalonia_Collections_DataGridCollectionView_Item_" data-uid="Avalonia.Collections.DataGridCollectionView.Item*"></a>
+
+  <h3 id="Avalonia_Collections_DataGridCollectionView_Item_System_Int32_" data-uid="Avalonia.Collections.DataGridCollectionView.Item(System.Int32)">
+  this[int]
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/Docs/src/Avalonia.Controls.DataGrid/Collections/DataGridCollectionView.cs/#L1201"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Return the item at the specified index</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public object this[int index] { get; }</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>index</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a></dt>
+    <dd><p>Index of the item we want to retrieve</p>
+</dd>
+  </dl>
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object">object</a></dt>
+    <dd><p>The item at the specified index</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="Avalonia_Collections_DataGridCollectionView_ItemCount_" data-uid="Avalonia.Collections.DataGridCollectionView.ItemCount*"></a>
+
+  <h3 id="Avalonia_Collections_DataGridCollectionView_ItemCount" data-uid="Avalonia.Collections.DataGridCollectionView.ItemCount">
+  ItemCount
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/Docs/src/Avalonia.Controls.DataGrid/Collections/DataGridCollectionView.cs/#L805"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Gets the minimum number of items known to be in the source collection
+that verify the current filter if any</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public int ItemCount { get; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="Avalonia_Collections_DataGridCollectionView_NeedsRefresh_" data-uid="Avalonia.Collections.DataGridCollectionView.NeedsRefresh*"></a>
+
+  <h3 id="Avalonia_Collections_DataGridCollectionView_NeedsRefresh" data-uid="Avalonia.Collections.DataGridCollectionView.NeedsRefresh">
+  NeedsRefresh
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/Docs/src/Avalonia.Controls.DataGrid/Collections/DataGridCollectionView.cs/#L826"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Gets a value indicating whether this view needs to be refreshed.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public bool NeedsRefresh { get; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="Avalonia_Collections_DataGridCollectionView_NewItemPlaceholder_" data-uid="Avalonia.Collections.DataGridCollectionView.NewItemPlaceholder*"></a>
+
+  <h3 id="Avalonia_Collections_DataGridCollectionView_NewItemPlaceholder" data-uid="Avalonia.Collections.DataGridCollectionView.NewItemPlaceholder">
+  NewItemPlaceholder
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/Docs/src/Avalonia.Controls.DataGrid/Collections/DataGridCollectionView.cs/#L87"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Gets the object used as a placeholder for a new item row.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static object NewItemPlaceholder { get; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object">object</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="Avalonia_Collections_DataGridCollectionView_PageIndex_" data-uid="Avalonia.Collections.DataGridCollectionView.PageIndex*"></a>
+
+  <h3 id="Avalonia_Collections_DataGridCollectionView_PageIndex" data-uid="Avalonia.Collections.DataGridCollectionView.PageIndex">
+  PageIndex
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/Docs/src/Avalonia.Controls.DataGrid/Collections/DataGridCollectionView.cs/#L835"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Gets the current page we are on. (zero based)</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public int PageIndex { get; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="Avalonia_Collections_DataGridCollectionView_PageSize_" data-uid="Avalonia.Collections.DataGridCollectionView.PageSize*"></a>
+
+  <h3 id="Avalonia_Collections_DataGridCollectionView_PageSize" data-uid="Avalonia.Collections.DataGridCollectionView.PageSize">
+  PageSize
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/Docs/src/Avalonia.Controls.DataGrid/Collections/DataGridCollectionView.cs/#L850"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Gets or sets the number of items to display on a page. If the
+PageSize = 0, then we are not paging, and will display all items
+in the collection. Otherwise, we will have separate pages for
+the items to display.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public int PageSize { get; set; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="Avalonia_Collections_DataGridCollectionView_SortDescriptions_" data-uid="Avalonia.Collections.DataGridCollectionView.SortDescriptions*"></a>
+
+  <h3 id="Avalonia_Collections_DataGridCollectionView_SortDescriptions" data-uid="Avalonia.Collections.DataGridCollectionView.SortDescriptions">
+  SortDescriptions
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/Docs/src/Avalonia.Controls.DataGrid/Collections/DataGridCollectionView.cs/#L989"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Gets the Sort criteria to sort items in collection.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public DataGridSortDescriptionCollection SortDescriptions { get; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="Avalonia.Collections.DataGridSortDescriptionCollection.html">DataGridSortDescriptionCollection</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+  <h4 class="section" id="Avalonia_Collections_DataGridCollectionView_SortDescriptions_remarks">Remarks</h4>
+  <div class="markdown level1 remarks"><p>
+Clear a sort criteria by assigning SortDescription.Empty to this property.
+One or more sort criteria in form of <a class="xref" href="Avalonia.Collections.DataGridSortDescription.html">DataGridSortDescription</a>
+can be used, each specifying a property and direction to sort by.
+</p>
+</div>
+
+  <h4 class="section">Exceptions</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.notsupportedexception">NotSupportedException</a></dt>
+    <dd><p>Simpler implementations do not support sorting and will throw a NotSupportedException.
+Use <a class="xref" href="Avalonia.Collections.DataGridCollectionView.html#Avalonia_Collections_DataGridCollectionView_CanSort">CanSort</a> property to test if sorting is supported before adding
+to SortDescriptions.</p>
+</dd>
+  </dl>
+
+
+
+  <a id="Avalonia_Collections_DataGridCollectionView_SourceCollection_" data-uid="Avalonia.Collections.DataGridCollectionView.SourceCollection*"></a>
+
+  <h3 id="Avalonia_Collections_DataGridCollectionView_SourceCollection" data-uid="Avalonia.Collections.DataGridCollectionView.SourceCollection">
+  SourceCollection
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/Docs/src/Avalonia.Controls.DataGrid/Collections/DataGridCollectionView.cs/#L1005"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Gets the source of the IEnumerable collection we are using for our view.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public IEnumerable SourceCollection { get; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.ienumerable">IEnumerable</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="Avalonia_Collections_DataGridCollectionView_TotalItemCount_" data-uid="Avalonia.Collections.DataGridCollectionView.TotalItemCount*"></a>
+
+  <h3 id="Avalonia_Collections_DataGridCollectionView_TotalItemCount" data-uid="Avalonia.Collections.DataGridCollectionView.TotalItemCount">
+  TotalItemCount
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/Docs/src/Avalonia.Controls.DataGrid/Collections/DataGridCollectionView.cs/#L1013"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Gets the total number of items in the view before paging is applied.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public int TotalItemCount { get; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <h2 class="section" id="methods">Methods
+</h2>
+
+
+  <a id="Avalonia_Collections_DataGridCollectionView_AddNew_" data-uid="Avalonia.Collections.DataGridCollectionView.AddNew*"></a>
+
+  <h3 id="Avalonia_Collections_DataGridCollectionView_AddNew" data-uid="Avalonia.Collections.DataGridCollectionView.AddNew">
+  AddNew()
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/Docs/src/Avalonia.Controls.DataGrid/Collections/DataGridCollectionView.Editing.cs/#L32"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Add a new item to the underlying collection.  Returns the new item.
+After calling AddNew and changing the new item as desired, either
+CommitNew or CancelNew&quot; should be called to complete the transaction.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public object AddNew()</code></pre>
+  </div>
+
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object">object</a></dt>
+    <dd><p>The new item we are adding</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Avalonia_Collections_DataGridCollectionView_CancelEdit_" data-uid="Avalonia.Collections.DataGridCollectionView.CancelEdit*"></a>
+
+  <h3 id="Avalonia_Collections_DataGridCollectionView_CancelEdit" data-uid="Avalonia.Collections.DataGridCollectionView.CancelEdit">
+  CancelEdit()
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/Docs/src/Avalonia.Controls.DataGrid/Collections/DataGridCollectionView.Editing.cs/#L180"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Complete the transaction started by <a class="xref" href="Avalonia.Collections.DataGridCollectionView.html#Avalonia_Collections_DataGridCollectionView_EditItem_System_Object_">EditItem(object)</a>.
+The pending changes (if any) to the item are discarded.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public void CancelEdit()</code></pre>
+  </div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Avalonia_Collections_DataGridCollectionView_CancelNew_" data-uid="Avalonia.Collections.DataGridCollectionView.CancelNew*"></a>
+
+  <h3 id="Avalonia_Collections_DataGridCollectionView_CancelNew" data-uid="Avalonia.Collections.DataGridCollectionView.CancelNew">
+  CancelNew()
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/Docs/src/Avalonia.Controls.DataGrid/Collections/DataGridCollectionView.Editing.cs/#L216"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Complete the transaction started by AddNew. The new
+item is removed from the collection.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public void CancelNew()</code></pre>
+  </div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Avalonia_Collections_DataGridCollectionView_CommitEdit_" data-uid="Avalonia.Collections.DataGridCollectionView.CommitEdit*"></a>
+
+  <h3 id="Avalonia_Collections_DataGridCollectionView_CommitEdit" data-uid="Avalonia.Collections.DataGridCollectionView.CommitEdit">
+  CommitEdit()
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/Docs/src/Avalonia.Controls.DataGrid/Collections/DataGridCollectionView.Editing.cs/#L358"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Complete the transaction started by <a class="xref" href="Avalonia.Collections.DataGridCollectionView.html#Avalonia_Collections_DataGridCollectionView_EditItem_System_Object_">EditItem(object)</a>.
+The pending changes (if any) to the item are committed.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public void CommitEdit()</code></pre>
+  </div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Avalonia_Collections_DataGridCollectionView_CommitNew_" data-uid="Avalonia.Collections.DataGridCollectionView.CommitNew*"></a>
+
+  <h3 id="Avalonia_Collections_DataGridCollectionView_CommitNew" data-uid="Avalonia.Collections.DataGridCollectionView.CommitNew">
+  CommitNew()
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/Docs/src/Avalonia.Controls.DataGrid/Collections/DataGridCollectionView.Editing.cs/#L541"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Complete the transaction started by AddNew. We follow the WPF
+convention in that the view's sort, filter, and paging
+specifications (if any) are applied to the new item.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public void CommitNew()</code></pre>
+  </div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Avalonia_Collections_DataGridCollectionView_Contains_" data-uid="Avalonia.Collections.DataGridCollectionView.Contains*"></a>
+
+  <h3 id="Avalonia_Collections_DataGridCollectionView_Contains_System_Object_" data-uid="Avalonia.Collections.DataGridCollectionView.Contains(System.Object)">
+  Contains(object)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/Docs/src/Avalonia.Controls.DataGrid/Collections/DataGridCollectionView.CollectionOps.cs/#L33"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Return true if the item belongs to this view.  No assumptions are
+made about the item. This method will behave similarly to IList.Contains().
+If the caller knows that the item belongs to the
+underlying collection, it is more efficient to call PassesFilter.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public bool Contains(object item)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>item</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object">object</a></dt>
+    <dd><p>The item we are checking to see whether it is within the collection</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></dt>
+    <dd><p>Boolean value of whether or not the collection contains the item</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Avalonia_Collections_DataGridCollectionView_DeferRefresh_" data-uid="Avalonia.Collections.DataGridCollectionView.DeferRefresh*"></a>
+
+  <h3 id="Avalonia_Collections_DataGridCollectionView_DeferRefresh" data-uid="Avalonia.Collections.DataGridCollectionView.DeferRefresh">
+  DeferRefresh()
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/Docs/src/Avalonia.Controls.DataGrid/Collections/DataGridCollectionView.CollectionOps.cs/#L45"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Enter a Defer Cycle.
+Defer cycles are used to coalesce changes to the ICollectionView.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public IDisposable DeferRefresh()</code></pre>
+  </div>
+
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.idisposable">IDisposable</a></dt>
+    <dd><p>IDisposable used to notify that we no longer need to defer, when we dispose</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Avalonia_Collections_DataGridCollectionView_EditItem_" data-uid="Avalonia.Collections.DataGridCollectionView.EditItem*"></a>
+
+  <h3 id="Avalonia_Collections_DataGridCollectionView_EditItem_System_Object_" data-uid="Avalonia.Collections.DataGridCollectionView.EditItem(System.Object)">
+  EditItem(object)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/Docs/src/Avalonia.Controls.DataGrid/Collections/DataGridCollectionView.Editing.cs/#L752"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Begins an editing transaction on the given item.  The transaction is
+completed by calling either CommitEdit or CancelEdit.  Any changes made
+to the item during the transaction are considered &quot;pending&quot;, provided
+that the view supports the notion of &quot;pending changes&quot; for the given item.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public void EditItem(object item)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>item</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object">object</a></dt>
+    <dd><p>Item we want to edit</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Avalonia_Collections_DataGridCollectionView_GetEnumerator_" data-uid="Avalonia.Collections.DataGridCollectionView.GetEnumerator*"></a>
+
+  <h3 id="Avalonia_Collections_DataGridCollectionView_GetEnumerator" data-uid="Avalonia.Collections.DataGridCollectionView.GetEnumerator">
+  GetEnumerator()
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/Docs/src/Avalonia.Controls.DataGrid/Collections/DataGridCollectionView.CollectionOps.cs/#L63"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Implementation of IEnumerable.GetEnumerator().
+This provides a way to enumerate the members of the collection
+without changing the currency.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public IEnumerator GetEnumerator()</code></pre>
+  </div>
+
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.ienumerator">IEnumerator</a></dt>
+    <dd><p>IEnumerator for the collection</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Avalonia_Collections_DataGridCollectionView_GetItemAt_" data-uid="Avalonia.Collections.DataGridCollectionView.GetItemAt*"></a>
+
+  <h3 id="Avalonia_Collections_DataGridCollectionView_GetItemAt_System_Int32_" data-uid="Avalonia.Collections.DataGridCollectionView.GetItemAt(System.Int32)">
+  GetItemAt(int)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/Docs/src/Avalonia.Controls.DataGrid/Collections/DataGridCollectionView.CollectionOps.cs/#L108"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Retrieve item at the given zero-based index in this DataGridCollectionView, after the source collection
+is filtered, sorted, and paged.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public object GetItemAt(int index)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>index</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a></dt>
+    <dd><p>Index of the item we want to retrieve</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object">object</a></dt>
+    <dd><p>Item at specified index</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <h4 class="section">Exceptions</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.argumentoutofrangeexception">ArgumentOutOfRangeException</a></dt>
+    <dd><p>Thrown if index is out of range</p>
+</dd>
+  </dl>
+
+
+
+  <a id="Avalonia_Collections_DataGridCollectionView_IndexOf_" data-uid="Avalonia.Collections.DataGridCollectionView.IndexOf*"></a>
+
+  <h3 id="Avalonia_Collections_DataGridCollectionView_IndexOf_System_Object_" data-uid="Avalonia.Collections.DataGridCollectionView.IndexOf(System.Object)">
+  IndexOf(object)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/Docs/src/Avalonia.Controls.DataGrid/Collections/DataGridCollectionView.CollectionOps.cs/#L138"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Return the index where the given item appears, or -1 if doesn't appear.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public int IndexOf(object item)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>item</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object">object</a></dt>
+    <dd><p>Item we are searching for</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a></dt>
+    <dd><p>Index of specified item</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Avalonia_Collections_DataGridCollectionView_MoveCurrentTo_" data-uid="Avalonia.Collections.DataGridCollectionView.MoveCurrentTo*"></a>
+
+  <h3 id="Avalonia_Collections_DataGridCollectionView_MoveCurrentTo_System_Object_" data-uid="Avalonia.Collections.DataGridCollectionView.MoveCurrentTo(System.Object)">
+  MoveCurrentTo(object)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/Docs/src/Avalonia.Controls.DataGrid/Collections/DataGridCollectionView.Currency.cs/#L30"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Move to the given item.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public bool MoveCurrentTo(object item)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>item</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object">object</a></dt>
+    <dd><p>Item we want to move the currency to</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></dt>
+    <dd><p>Whether the operation was successful</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Avalonia_Collections_DataGridCollectionView_MoveCurrentToFirst_" data-uid="Avalonia.Collections.DataGridCollectionView.MoveCurrentToFirst*"></a>
+
+  <h3 id="Avalonia_Collections_DataGridCollectionView_MoveCurrentToFirst" data-uid="Avalonia.Collections.DataGridCollectionView.MoveCurrentToFirst">
+  MoveCurrentToFirst()
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/Docs/src/Avalonia.Controls.DataGrid/Collections/DataGridCollectionView.Currency.cs/#L54"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Move to the first item.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public bool MoveCurrentToFirst()</code></pre>
+  </div>
+
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></dt>
+    <dd><p>Whether the operation was successful</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Avalonia_Collections_DataGridCollectionView_MoveCurrentToLast_" data-uid="Avalonia.Collections.DataGridCollectionView.MoveCurrentToLast*"></a>
+
+  <h3 id="Avalonia_Collections_DataGridCollectionView_MoveCurrentToLast" data-uid="Avalonia.Collections.DataGridCollectionView.MoveCurrentToLast">
+  MoveCurrentToLast()
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/Docs/src/Avalonia.Controls.DataGrid/Collections/DataGridCollectionView.Currency.cs/#L65"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Move to the last item.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public bool MoveCurrentToLast()</code></pre>
+  </div>
+
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></dt>
+    <dd><p>Whether the operation was successful</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Avalonia_Collections_DataGridCollectionView_MoveCurrentToNext_" data-uid="Avalonia.Collections.DataGridCollectionView.MoveCurrentToNext*"></a>
+
+  <h3 id="Avalonia_Collections_DataGridCollectionView_MoveCurrentToNext" data-uid="Avalonia.Collections.DataGridCollectionView.MoveCurrentToNext">
+  MoveCurrentToNext()
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/Docs/src/Avalonia.Controls.DataGrid/Collections/DataGridCollectionView.Currency.cs/#L78"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Move to the next item.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public bool MoveCurrentToNext()</code></pre>
+  </div>
+
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></dt>
+    <dd><p>Whether the operation was successful</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Avalonia_Collections_DataGridCollectionView_MoveCurrentToPosition_" data-uid="Avalonia.Collections.DataGridCollectionView.MoveCurrentToPosition*"></a>
+
+  <h3 id="Avalonia_Collections_DataGridCollectionView_MoveCurrentToPosition_System_Int32_" data-uid="Avalonia.Collections.DataGridCollectionView.MoveCurrentToPosition(System.Int32)">
+  MoveCurrentToPosition(int)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/Docs/src/Avalonia.Controls.DataGrid/Collections/DataGridCollectionView.Currency.cs/#L99"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Move CurrentItem to this index</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public bool MoveCurrentToPosition(int position)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>position</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a></dt>
+    <dd><p>Position we want to move the currency to</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></dt>
+    <dd><p>True if the resulting CurrentItem is an item within the view; otherwise False</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Avalonia_Collections_DataGridCollectionView_MoveCurrentToPrevious_" data-uid="Avalonia.Collections.DataGridCollectionView.MoveCurrentToPrevious*"></a>
+
+  <h3 id="Avalonia_Collections_DataGridCollectionView_MoveCurrentToPrevious" data-uid="Avalonia.Collections.DataGridCollectionView.MoveCurrentToPrevious">
+  MoveCurrentToPrevious()
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/Docs/src/Avalonia.Controls.DataGrid/Collections/DataGridCollectionView.Currency.cs/#L142"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Move to the previous item.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public bool MoveCurrentToPrevious()</code></pre>
+  </div>
+
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></dt>
+    <dd><p>Whether the operation was successful</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Avalonia_Collections_DataGridCollectionView_MoveToFirstPage_" data-uid="Avalonia.Collections.DataGridCollectionView.MoveToFirstPage*"></a>
+
+  <h3 id="Avalonia_Collections_DataGridCollectionView_MoveToFirstPage" data-uid="Avalonia.Collections.DataGridCollectionView.MoveToFirstPage">
+  MoveToFirstPage()
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/Docs/src/Avalonia.Controls.DataGrid/Collections/DataGridCollectionView.Paging.cs/#L30"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Moves to the first page.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public bool MoveToFirstPage()</code></pre>
+  </div>
+
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></dt>
+    <dd><p>Whether or not the move was successful.</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Avalonia_Collections_DataGridCollectionView_MoveToLastPage_" data-uid="Avalonia.Collections.DataGridCollectionView.MoveToLastPage*"></a>
+
+  <h3 id="Avalonia_Collections_DataGridCollectionView_MoveToLastPage" data-uid="Avalonia.Collections.DataGridCollectionView.MoveToLastPage">
+  MoveToLastPage()
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/Docs/src/Avalonia.Controls.DataGrid/Collections/DataGridCollectionView.Paging.cs/#L41"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Moves to the last page.
+The move is only attempted when TotalItemCount is known.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public bool MoveToLastPage()</code></pre>
+  </div>
+
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></dt>
+    <dd><p>Whether or not the move was successful.</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Avalonia_Collections_DataGridCollectionView_MoveToNextPage_" data-uid="Avalonia.Collections.DataGridCollectionView.MoveToNextPage*"></a>
+
+  <h3 id="Avalonia_Collections_DataGridCollectionView_MoveToNextPage" data-uid="Avalonia.Collections.DataGridCollectionView.MoveToNextPage">
+  MoveToNextPage()
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/Docs/src/Avalonia.Controls.DataGrid/Collections/DataGridCollectionView.Paging.cs/#L58"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Moves to the page after the current page we are on.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public bool MoveToNextPage()</code></pre>
+  </div>
+
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></dt>
+    <dd><p>Whether or not the move was successful.</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Avalonia_Collections_DataGridCollectionView_MoveToPage_" data-uid="Avalonia.Collections.DataGridCollectionView.MoveToPage*"></a>
+
+  <h3 id="Avalonia_Collections_DataGridCollectionView_MoveToPage_System_Int32_" data-uid="Avalonia.Collections.DataGridCollectionView.MoveToPage(System.Int32)">
+  MoveToPage(int)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/Docs/src/Avalonia.Controls.DataGrid/Collections/DataGridCollectionView.Paging.cs/#L69"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Requests a page move to page <code class="paramref">pageIndex</code>.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public bool MoveToPage(int pageIndex)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>pageIndex</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a></dt>
+    <dd><p>Index of the target page</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></dt>
+    <dd><p>Whether or not the move was successfully initiated.</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Avalonia_Collections_DataGridCollectionView_MoveToPreviousPage_" data-uid="Avalonia.Collections.DataGridCollectionView.MoveToPreviousPage*"></a>
+
+  <h3 id="Avalonia_Collections_DataGridCollectionView_MoveToPreviousPage" data-uid="Avalonia.Collections.DataGridCollectionView.MoveToPreviousPage">
+  MoveToPreviousPage()
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/Docs/src/Avalonia.Controls.DataGrid/Collections/DataGridCollectionView.Paging.cs/#L167"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Moves to the page before the current page we are on.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public bool MoveToPreviousPage()</code></pre>
+  </div>
+
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></dt>
+    <dd><p>Whether or not the move was successful.</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Avalonia_Collections_DataGridCollectionView_PassesFilter_" data-uid="Avalonia.Collections.DataGridCollectionView.PassesFilter*"></a>
+
+  <h3 id="Avalonia_Collections_DataGridCollectionView_PassesFilter_System_Object_" data-uid="Avalonia.Collections.DataGridCollectionView.PassesFilter(System.Object)">
+  PassesFilter(object)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/Docs/src/Avalonia.Controls.DataGrid/Collections/DataGridCollectionView.CollectionOps.cs/#L181"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Return true if the item belongs to this view.  The item is assumed to belong to the
+underlying DataCollection;  this method merely takes filters into account.
+It is commonly used during collection-changed notifications to determine if the added/removed
+item requires processing.
+Returns true if no filter is set on collection view.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public bool PassesFilter(object item)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>item</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object">object</a></dt>
+    <dd><p>The item to compare against the Filter</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></dt>
+    <dd><p>Whether the item passes the filter</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Avalonia_Collections_DataGridCollectionView_Refresh_" data-uid="Avalonia.Collections.DataGridCollectionView.Refresh*"></a>
+
+  <h3 id="Avalonia_Collections_DataGridCollectionView_Refresh" data-uid="Avalonia.Collections.DataGridCollectionView.Refresh">
+  Refresh()
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/Docs/src/Avalonia.Controls.DataGrid/Collections/DataGridCollectionView.CollectionOps.cs/#L194"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Re-create the view, using any SortDescriptions and/or Filters.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public void Refresh()</code></pre>
+  </div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Avalonia_Collections_DataGridCollectionView_Remove_" data-uid="Avalonia.Collections.DataGridCollectionView.Remove*"></a>
+
+  <h3 id="Avalonia_Collections_DataGridCollectionView_Remove_System_Object_" data-uid="Avalonia.Collections.DataGridCollectionView.Remove(System.Object)">
+  Remove(object)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/Docs/src/Avalonia.Controls.DataGrid/Collections/DataGridCollectionView.CollectionOps.cs/#L210"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Remove the given item from the underlying collection. It
+needs to be in the current filtered, sorted, and paged view
+to call</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public void Remove(object item)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>item</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object">object</a></dt>
+    <dd><p>Item we want to remove</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Avalonia_Collections_DataGridCollectionView_RemoveAt_" data-uid="Avalonia.Collections.DataGridCollectionView.RemoveAt*"></a>
+
+  <h3 id="Avalonia_Collections_DataGridCollectionView_RemoveAt_System_Int32_" data-uid="Avalonia.Collections.DataGridCollectionView.RemoveAt(System.Int32)">
+  RemoveAt(int)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/Docs/src/Avalonia.Controls.DataGrid/Collections/DataGridCollectionView.CollectionOps.cs/#L226"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Remove the item at the given index from the underlying collection.
+The index is interpreted with respect to the view (filtered, sorted,
+and paged list).</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public void RemoveAt(int index)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>index</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a></dt>
+    <dd><p>Index of the item we want to remove</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+
+  <h2 class="section" id="events">Events
+</h2>
+
+
+
+  <h3 id="Avalonia_Collections_DataGridCollectionView_CollectionChanged" data-uid="Avalonia.Collections.DataGridCollectionView.CollectionChanged">
+  CollectionChanged
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/Docs/src/Avalonia.Controls.DataGrid/Collections/DataGridCollectionView.cs/#L295"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Raise this event when the (filtered) view changes</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public event NotifyCollectionChangedEventHandler CollectionChanged</code></pre>
+  </div>
+
+
+
+
+
+
+  <h4 class="section">Event Type</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.specialized.notifycollectionchangedeventhandler">NotifyCollectionChangedEventHandler</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <h3 id="Avalonia_Collections_DataGridCollectionView_CurrentChanged" data-uid="Avalonia.Collections.DataGridCollectionView.CurrentChanged">
+  CurrentChanged
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/Docs/src/Avalonia.Controls.DataGrid/Collections/DataGridCollectionView.cs/#L309"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Raised when the CurrentItem property changed</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public event EventHandler CurrentChanged</code></pre>
+  </div>
+
+
+
+
+
+
+  <h4 class="section">Event Type</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.eventhandler">EventHandler</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <h3 id="Avalonia_Collections_DataGridCollectionView_CurrentChanging" data-uid="Avalonia.Collections.DataGridCollectionView.CurrentChanging">
+  CurrentChanging
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/Docs/src/Avalonia.Controls.DataGrid/Collections/DataGridCollectionView.cs/#L314"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Raised when the CurrentItem property is changing</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public event EventHandler&lt;DataGridCurrentChangingEventArgs&gt; CurrentChanging</code></pre>
+  </div>
+
+
+
+
+
+
+  <h4 class="section">Event Type</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.eventhandler-1">EventHandler</a>&lt;<a class="xref" href="Avalonia.Collections.DataGridCurrentChangingEventArgs.html">DataGridCurrentChangingEventArgs</a>&gt;</dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <h3 id="Avalonia_Collections_DataGridCollectionView_PageChanged" data-uid="Avalonia.Collections.DataGridCollectionView.PageChanged">
+  PageChanged
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/Docs/src/Avalonia.Controls.DataGrid/Collections/DataGridCollectionView.cs/#L320"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Raised when a page index change completed</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public event EventHandler&lt;EventArgs&gt; PageChanged</code></pre>
+  </div>
+
+
+
+
+
+
+  <h4 class="section">Event Type</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.eventhandler-1">EventHandler</a>&lt;<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.eventargs">EventArgs</a>&gt;</dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <h3 id="Avalonia_Collections_DataGridCollectionView_PageChanging" data-uid="Avalonia.Collections.DataGridCollectionView.PageChanging">
+  PageChanging
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/Docs/src/Avalonia.Controls.DataGrid/Collections/DataGridCollectionView.cs/#L326"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Raised when a page index change is requested</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public event EventHandler&lt;PageChangingEventArgs&gt; PageChanging</code></pre>
+  </div>
+
+
+
+
+
+
+  <h4 class="section">Event Type</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.eventhandler-1">EventHandler</a>&lt;<a class="xref" href="Avalonia.Collections.PageChangingEventArgs.html">PageChangingEventArgs</a>&gt;</dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <h3 id="Avalonia_Collections_DataGridCollectionView_PropertyChanged" data-uid="Avalonia.Collections.DataGridCollectionView.PropertyChanged">
+  PropertyChanged
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/Docs/src/Avalonia.Controls.DataGrid/Collections/DataGridCollectionView.cs/#L331"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>PropertyChanged event.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public event PropertyChangedEventHandler PropertyChanged</code></pre>
+  </div>
+
+
+
+
+
+
+  <h4 class="section">Event Type</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.componentmodel.propertychangedeventhandler">PropertyChangedEventHandler</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+</article>
+
+        <div class="contribution d-print-none">
+          <a href="https://github.com/wieslawsoltes/ProDataGrid/blob/Docs/src/Avalonia.Controls.DataGrid/Collections/DataGridCollectionView.TypedList.cs/#L12" class="edit-link">Edit this page</a>
+        </div>
+
+
+      </div>
+
+      <div class="affix">
+        <nav id="affix"></nav>
+      </div>
+    </main>
+
+
+    <footer class="border-top text-secondary">
+      <div class="container-xxl">
+        <div class="flex-fill">
+          <span>Made with <a href="https://dotnet.github.io/docfx">docfx</a></span>
+        </div>
+      </div>
+    </footer>
+  </body>
+</html>

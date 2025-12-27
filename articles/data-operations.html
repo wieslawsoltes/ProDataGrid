@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+      <title>Data Operations | ProDataGrid for Avalonia </title>
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <meta name="title" content="Data Operations | ProDataGrid for Avalonia ">
+      
+      
+      <link rel="icon" href="../favicon.ico">
+      <link rel="stylesheet" href="../public/docfx.min.css">
+      <link rel="stylesheet" href="../public/main.css">
+      <meta name="docfx:navrel" content="../toc.html">
+      <meta name="docfx:tocrel" content="toc.html">
+      
+      
+      
+      
+      <meta name="docfx:docurl" content="https://github.com/wieslawsoltes/ProDataGrid/blob/Docs/docfx/articles/data-operations.md/#L1">
+      <meta name="loc:inThisArticle" content="In this article">
+      <meta name="loc:searchResultsCount" content="{count} results for &quot;{query}&quot;">
+      <meta name="loc:searchNoResults" content="No results for &quot;{query}&quot;">
+      <meta name="loc:tocFilter" content="Filter by title">
+      <meta name="loc:nextArticle" content="Next">
+      <meta name="loc:prevArticle" content="Previous">
+      <meta name="loc:themeLight" content="Light">
+      <meta name="loc:themeDark" content="Dark">
+      <meta name="loc:themeAuto" content="Auto">
+      <meta name="loc:changeTheme" content="Change theme">
+      <meta name="loc:copy" content="Copy">
+      <meta name="loc:downloadPdf" content="Download PDF">
+
+      <script type="module" src="./../public/docfx.min.js"></script>
+
+      <script>
+        const theme = localStorage.getItem('theme') || 'auto'
+        document.documentElement.setAttribute('data-bs-theme', theme === 'auto' ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light') : theme)
+      </script>
+
+  </head>
+
+  <body class="tex2jax_ignore" data-layout="" data-yaml-mime="">
+    <header class="bg-body border-bottom">
+      <nav id="autocollapse" class="navbar navbar-expand-md" role="navigation">
+        <div class="container-xxl flex-nowrap">
+          <a class="navbar-brand" href="../index.html">
+            <img id="logo" class="svg" src="../images/logo.svg" alt="">
+            
+          </a>
+          <button class="btn btn-lg d-md-none border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navpanel" aria-controls="navpanel" aria-expanded="false" aria-label="Toggle navigation">
+            <i class="bi bi-three-dots"></i>
+          </button>
+          <div class="collapse navbar-collapse" id="navpanel">
+            <div id="navbar">
+            </div>
+          </div>
+        </div>
+      </nav>
+    </header>
+
+    <main class="container-xxl">
+      <div class="toc-offcanvas">
+        <div class="offcanvas-md offcanvas-start" tabindex="-1" id="tocOffcanvas" aria-labelledby="tocOffcanvasLabel">
+          <div class="offcanvas-header">
+            <h5 class="offcanvas-title" id="tocOffcanvasLabel">Table of Contents</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="offcanvas" data-bs-target="#tocOffcanvas" aria-label="Close"></button>
+          </div>
+          <div class="offcanvas-body">
+            <nav class="toc" id="toc"></nav>
+          </div>
+        </div>
+      </div>
+
+      <div class="content">
+        <div class="actionbar">
+          <button class="btn btn-lg border-0 d-md-none" type="button" data-bs-toggle="offcanvas" data-bs-target="#tocOffcanvas" aria-controls="tocOffcanvas" aria-expanded="false" aria-label="Show table of contents">
+            <i class="bi bi-list"></i>
+          </button>
+
+          <nav id="breadcrumb"></nav>
+        </div>
+
+        <article data-uid="">
+<h1 id="data-operations">Data Operations</h1>
+
+<p>ProDataGrid supports rich data operations through <code>DataGridCollectionView</code> and model-driven sorting, filtering, grouping, and search. These models keep UI state explicit and allow adapters for custom pipelines.</p>
+<h2 id="sorting-model-integration">Sorting Model Integration</h2>
+<p>Sorting is driven by a dedicated <code>ISortingModel</code> and adapter instead of directly mutating <code>SortDescriptions</code> from the header. This keeps sort state explicit, pluggable, and testable:</p>
+<ul>
+<li>Configure gesture policies on the model via <code>IsMultiSortEnabled</code>, <code>SortCycleMode</code> (2- or 3-state), and <code>OwnsSortDescriptions</code> (strict vs observe external changes).</li>
+<li>Per-column comparers/culture and <code>SortMemberPath</code> flow into <code>SortingDescriptor</code>s; duplicate-column guards and batch updates prevent drift.</li>
+<li>Plug in a custom model without subclassing the grid: set <code>SortingModel</code> or <code>SortingModelFactory</code> before use to inject alternate sort pipelines (e.g., server-side).</li>
+<li>Plug in a custom adapter without subclassing the grid: set <code>SortingAdapterFactory</code> to supply a specialized adapter (e.g., DynamicData/server-side) that can short-circuit local <code>SortDescriptions</code> churn via <code>TryApplyModelToView</code>.</li>
+<li>The adapter mirrors <code>Sorting</code> to <code>DataGridCollectionView.SortDescriptions</code>, logging/rolling back on failures and refreshing rows while preserving selection snapshots.</li>
+<li>Gestures are unchanged (click/shift/meta), but glyphs and programmatic updates now reflect the model, so tests and automation can drive sorting through the same surface.</li>
+<li>Centralized descriptors plus <code>SortingChanging/SortingChanged</code> events make sort state observable; batch updates and duplicate-column guards prevent drift.</li>
+<li>Use <code>SortingChanging</code> to cancel or amend descriptor updates (for example, to keep a primary sort pinned).</li>
+<li>Observe mode keeps the model in sync when <code>SortDescriptions</code> is mutated externally; strict mode keeps the model authoritative.</li>
+<li>Per-column <code>CustomSortComparer</code>, culture, and paths are preserved in <code>SortingDescriptor</code>s, so custom comparers are first-class (including natural/ordinal/culture-aware string sorts).</li>
+<li>Sample: see <code>Sorting Model Playground</code> in <code>src/DataGridSample</code> for presets, external-sort reconciliation, and event logging.</li>
+</ul>
+<h3 id="using-sortingmodel-with-datagrid">Using SortingModel with DataGrid</h3>
+<p>Bind a custom sorting model or factory just like selection:</p>
+<pre><code class="lang-xml">&lt;DataGrid ItemsSource=&quot;{Binding Items}&quot;
+          SortingModel=&quot;{Binding MySortingModel}&quot;
+          IsMultiSortEnabled=&quot;True&quot;
+          SortCycleMode=&quot;AscendingDescendingNone&quot;
+          OwnsSortDescriptions=&quot;True&quot;&gt;
+  &lt;DataGrid.Columns&gt;
+    &lt;DataGridTextColumn Header=&quot;Name&quot;
+                        Binding=&quot;{Binding Name}&quot;
+                        SortMemberPath=&quot;Name&quot; /&gt;
+    &lt;DataGridTextColumn Header=&quot;Status&quot;
+                        Binding=&quot;{Binding Status}&quot;
+                        SortMemberPath=&quot;Status&quot;
+                        CustomSortComparer=&quot;{Binding StatusComparer}&quot; /&gt;
+  &lt;/DataGrid.Columns&gt;
+&lt;/DataGrid&gt;
+</code></pre>
+<pre><code class="lang-csharp">using Avalonia.Controls.DataGridSorting;
+using System.Collections;
+using System.ComponentModel;
+
+public ISortingModel MySortingModel { get; } = new SortingModel
+{
+    MultiSort = true,
+    CycleMode = SortCycleMode.AscendingDescendingNone,
+    OwnsViewSorts = true
+};
+
+public IComparer StatusComparer { get; } = new StatusComparer();
+
+public void ApplyPreset()
+{
+    MySortingModel.Apply(new[]
+    {
+        new SortingDescriptor(&quot;Status&quot;, ListSortDirection.Ascending, &quot;Status&quot;, StatusComparer),
+        new SortingDescriptor(&quot;Name&quot;, ListSortDirection.Ascending, &quot;Name&quot;)
+    });
+}
+</code></pre>
+<p>Or swap the model creation globally:</p>
+<pre><code class="lang-csharp">dataGrid.SortingModelFactory = new MyCustomSortingFactory();
+</code></pre>
+<h3 id="dynamicdata-integration-sorting">DynamicData Integration (Sorting)</h3>
+<p>To keep sorting upstream in a DynamicData pipeline (no local <code>SortDescriptions</code> churn), supply a custom adapter factory and feed a comparer subject into <code>Sort</code>:</p>
+<pre><code class="lang-csharp">var source = new SourceList&lt;Deployment&gt;();
+source.AddRange(Deployment.CreateSeed());
+
+var adapterFactory = new DynamicDataSortingAdapterFactory(log =&gt; Debug.WriteLine(log));
+var comparerSubject = new BehaviorSubject&lt;IComparer&lt;Deployment&gt;&gt;(adapterFactory.SortComparer);
+
+source.Connect()
+      .Sort(comparerSubject) // DynamicData performs the sort
+      .Bind(out _view)
+      .Subscribe();
+
+SortingModel sortingModel = new SortingModel
+{
+    MultiSort = true,
+    CycleMode = SortCycleMode.AscendingDescendingNone,
+    OwnsViewSorts = true
+};
+
+sortingModel.SortingChanged += (_, e) =&gt;
+{
+    adapterFactory.UpdateComparer(e.NewDescriptors);
+    comparerSubject.OnNext(adapterFactory.SortComparer);
+};
+
+// In code-behind (since SortingAdapterFactory cannot be bound directly in XAML):
+grid.SortingModel = sortingModel;
+grid.SortingAdapterFactory = adapterFactory;
+</code></pre>
+<p>Header clicks update the <code>SortingModel</code>; the custom adapter overrides <code>TryApplyModelToView</code>, so instead of touching <code>SortDescriptions</code> it rebuilds a <code>SortExpressionComparer</code> chain and pushes it to the DynamicData <code>Sort</code> operator. The grid still shows glyphs/state from the <code>SortingModel</code>, but the actual sort happens in the DynamicData pipeline.</p>
+<h2 id="filtering-model-integration">Filtering Model Integration</h2>
+<p>Filtering is also driven by a pluggable model/adapter pair so header filters stay in sync with UI state and selection remains stable when rows are filtered.</p>
+<ul>
+<li>Bind <code>FilteringModel</code> or set <code>FilteringModelFactory</code>; <code>OwnsViewFilter</code> switches between authoritative mode (adapter owns <code>Filter</code>) and observer mode (adapter reconciles to an external <code>Filter</code>), with <code>FilteringChanging/Changed</code> and <code>BeginUpdate/EndUpdate/DeferRefresh</code> batching a single refresh.</li>
+<li>Swap adapters via <code>FilteringAdapterFactory</code> (DynamicData/server-side) that override <code>TryApplyModelToView</code>; adapter lifecycle hooks mirror sorting (<code>AttachLifecycle</code>) so selection/currency snapshots are restored after filters apply.</li>
+<li>Per-column predicate factories avoid reflection: set <code>DataGridColumnFilter.PredicateFactory</code> to return a typed predicate/parser for that column; descriptors carry culture/string comparison.</li>
+<li>Adapter guarantees: descriptor to predicate for string/between/in/custom cases, duplicate guards, observer-mode reconciliation, and selection stability are covered by unit tests.</li>
+<li>The filter button glyphs and default editor templates (text/number/date/enum) live in <code>Themes/Generic.xaml</code> and can be reused across themes and samples.</li>
+</ul>
+<pre><code class="lang-xml">&lt;DataGrid ItemsSource=&quot;{Binding Items}&quot;
+          FilteringModel=&quot;{Binding MyFilteringModel}&quot;&gt;
+  &lt;DataGrid.Columns&gt;
+    &lt;DataGridTextColumn x:Name=&quot;NameColumn&quot;
+                        Header=&quot;Name&quot;
+                        Binding=&quot;{Binding Name}&quot;
+                        SortMemberPath=&quot;Name&quot; /&gt;
+    &lt;DataGridTextColumn x:Name=&quot;ScoreColumn&quot;
+                        Header=&quot;Score&quot;
+                        Binding=&quot;{Binding Score}&quot;
+                        SortMemberPath=&quot;Score&quot; /&gt;
+  &lt;/DataGrid.Columns&gt;
+&lt;/DataGrid&gt;
+</code></pre>
+<pre><code class="lang-csharp">using Avalonia.Controls.DataGridFiltering;
+
+public IFilteringModel MyFilteringModel { get; } = new FilteringModel { OwnsViewFilter = true };
+
+public void ApplyFilters()
+{
+    MyFilteringModel.Apply(new[]
+    {
+        new FilteringDescriptor(&quot;Score&quot;, FilteringOperator.GreaterThanOrEqual, nameof(Item.Score), value: 5),
+        new FilteringDescriptor(&quot;Name&quot;, FilteringOperator.Contains, nameof(Item.Name), value: &quot;al&quot;, stringComparison: StringComparison.OrdinalIgnoreCase)
+    });
+}
+
+// Optional: typed predicate, no reflection
+DataGridColumnFilter.SetPredicateFactory(ScoreColumn, descriptor =&gt;
+    o =&gt; ((Item)o).Score &gt;= 5);
+</code></pre>
+<p>For DynamicData/server-side filtering, supply a custom <code>FilteringAdapterFactory</code> that overrides <code>TryApplyModelToView</code> and pushes a composed predicate (or query object) upstream; the grid still drives glyphs and descriptors locally while selection stays intact.</p>
+<h3 id="filtering-ui-and-column-flyouts">Filtering UI and Column Flyouts</h3>
+<p>Columns expose <code>FilterFlyout</code> and <code>ShowFilterButton</code> so you can plug in custom editors while keeping the header glyphs consistent. The built-in templates live in <code>Themes/Generic.xaml</code>:</p>
+<pre><code class="lang-xml">&lt;UserControl.Resources&gt;
+  &lt;Flyout x:Key=&quot;StatusFilterFlyout&quot;
+          Placement=&quot;Bottom&quot;
+          FlyoutPresenterTheme=&quot;{StaticResource DataGridFilterFlyoutPresenterTheme}&quot;
+          Content=&quot;{Binding StatusFilter}&quot;
+          ContentTemplate=&quot;{StaticResource DataGridFilterEnumEditorTemplate}&quot; /&gt;
+&lt;/UserControl.Resources&gt;
+
+&lt;DataGridTextColumn Header=&quot;Status&quot;
+                    Binding=&quot;{Binding Status}&quot;
+                    FilterFlyout=&quot;{StaticResource StatusFilterFlyout}&quot; /&gt;
+</code></pre>
+<p>Use <code>ShowFilterButton=&quot;True&quot;</code> if you want a filter glyph without a flyout (for example, to open an external panel).</p>
+<h3 id="dynamicdata-integration-filtering">DynamicData Integration (Filtering)</h3>
+<p>Keep filtering upstream in a DynamicData pipeline while the grid shows filter glyphs from <code>FilteringModel</code>:</p>
+<pre><code class="lang-csharp">var source = new SourceList&lt;Deployment&gt;();
+source.AddRange(Deployment.CreateSeed());
+
+var adapterFactory = new DynamicDataFilteringAdapterFactory(log =&gt; Debug.WriteLine(log));
+var filterSubject = new BehaviorSubject&lt;Func&lt;Deployment, bool&gt;&gt;(adapterFactory.FilterPredicate);
+
+source.Connect()
+      .Filter(filterSubject) // DynamicData performs the filtering
+      .Bind(out _view)
+      .Subscribe();
+
+var filteringModel = new FilteringModel { OwnsViewFilter = true };
+
+filteringModel.FilteringChanged += (_, e) =&gt;
+{
+    adapterFactory.UpdateFilter(e.NewDescriptors);
+    filterSubject.OnNext(adapterFactory.FilterPredicate);
+};
+
+grid.FilteringModel = filteringModel;
+grid.FilteringAdapterFactory = adapterFactory; // bypasses DataGridCollectionView.Filter churn
+</code></pre>
+<p>If an external consumer owns <code>DataGridCollectionView.Filter</code>, set <code>OwnsViewFilter=false</code> and the adapter reconciles descriptors to that external filter (observer mode) while keeping glyphs in sync.</p>
+<h2 id="search-model-and-column-search">Search Model and Column Search</h2>
+<p>Search integrates with the model layer and can be scoped to columns for lightweight in-grid find operations.</p>
+<ul>
+<li>Bind <code>SearchModel</code> directly or set <code>SearchModelFactory</code> to supply a custom model.</li>
+<li>Replace the default adapter with <code>SearchAdapterFactory</code> when you want a custom search pipeline (the built-in adapter uses reflection against column bindings).</li>
+<li>Descriptors control match rules, term combining, scope, and parsing behavior.</li>
+<li>Scopes include <code>AllColumns</code>, <code>VisibleColumns</code>, and <code>ExplicitColumns</code> (provide a column id list).</li>
+<li>Column ids can be <code>DataGridColumn</code> instances or search member path strings.</li>
+<li>Use <code>DataGridColumnSearch</code> attached properties to opt out or override the search member path/text.</li>
+<li>Highlight styles are exposed as <code>:searchmatch</code> and <code>:searchcurrent</code> pseudo-classes on rows and cells.</li>
+</ul>
+<pre><code class="lang-csharp">using System;
+using Avalonia.Controls.DataGridSearching;
+
+public SearchModel SearchModel { get; } = new SearchModel
+{
+    HighlightMode = SearchHighlightMode.TextAndCell,
+    HighlightCurrent = true,
+    WrapNavigation = true,
+    UpdateSelectionOnNavigate = true
+};
+
+public void ApplySearch(string query)
+{
+    SearchModel.SetOrUpdate(new SearchDescriptor(
+        query.Trim(),
+        matchMode: SearchMatchMode.Contains,
+        termMode: SearchTermCombineMode.Any,
+        scope: SearchScope.VisibleColumns,
+        comparison: StringComparison.OrdinalIgnoreCase,
+        wholeWord: false,
+        normalizeWhitespace: true,
+        ignoreDiacritics: true));
+}
+</code></pre>
+<p>Explicit column search:</p>
+<pre><code class="lang-csharp">SearchModel.SetOrUpdate(new SearchDescriptor(
+    query.Trim(),
+    scope: SearchScope.ExplicitColumns,
+    columnIds: new object[] { &quot;FirstName&quot;, &quot;LastName&quot; }));
+</code></pre>
+<p>Customize column search behavior without a prefix in XAML by using the attached properties in code:</p>
+<pre><code class="lang-csharp">DataGridColumnSearch.SetIsSearchable(StatusColumn, false);
+DataGridColumnSearch.SetSearchMemberPath(NameColumn, &quot;Name&quot;);
+DataGridColumnSearch.SetTextProvider(NotesColumn, item =&gt; ((Person)item).Notes);
+</code></pre>
+<h3 id="dynamicdata-integration-search">DynamicData Integration (Search)</h3>
+<p>If you need search descriptors to drive an upstream query, set a custom <code>SearchAdapterFactory</code> in code-behind and keep the grid highlighting enabled:</p>
+<pre><code class="lang-csharp">grid.SearchModel = searchModel;
+grid.SearchAdapterFactory = new DynamicDataSearchAdapterFactory(log =&gt; Debug.WriteLine(log));
+</code></pre>
+<h2 id="grouping-and-paging">Grouping and Paging</h2>
+<p>Use <code>GroupDescriptions</code> to build group headers and control expand/collapse. Grouping can be modified at runtime.</p>
+<pre><code class="lang-csharp">using Avalonia.Collections;
+
+var view = new DataGridCollectionView(items);
+view.GroupDescriptions.Add(new DataGridPathGroupDescription(&quot;Region&quot;));
+grid.ItemsSource = view;
+grid.AreRowGroupHeadersFrozen = true;
+</code></pre>
+<p>You can expand or collapse all groups with <code>ExpandAllGroups()</code> and <code>CollapseAllGroups()</code>.</p>
+<h3 id="paging-and-currency">Paging and Currency</h3>
+<ul>
+<li>Page via <code>PageSize</code>, <code>PageIndex</code>, and <code>MoveToNextPage/MoveToPreviousPage/MoveToPage</code>.</li>
+<li>Currency is exposed through <code>CurrentItem</code>, <code>CurrentPosition</code>, <code>CurrentChanged</code>, and <code>CurrentChanging</code>.</li>
+</ul>
+<pre><code class="lang-csharp">var view = new DataGridCollectionView(items);
+view.PageSize = 50;
+view.MoveToFirstPage();
+</code></pre>
+
+</article>
+
+        <div class="contribution d-print-none">
+          <a href="https://github.com/wieslawsoltes/ProDataGrid/blob/Docs/docfx/articles/data-operations.md/#L1" class="edit-link">Edit this page</a>
+        </div>
+
+        <div class="next-article d-print-none border-top" id="nextArticle"></div>
+
+      </div>
+
+      <div class="affix">
+        <nav id="affix"></nav>
+      </div>
+    </main>
+
+
+    <footer class="border-top text-secondary">
+      <div class="container-xxl">
+        <div class="flex-fill">
+          <span>Made with <a href="https://dotnet.github.io/docfx">docfx</a></span>
+        </div>
+      </div>
+    </footer>
+  </body>
+</html>

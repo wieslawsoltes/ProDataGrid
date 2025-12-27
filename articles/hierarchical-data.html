@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+      <title>Hierarchical Data | ProDataGrid for Avalonia </title>
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <meta name="title" content="Hierarchical Data | ProDataGrid for Avalonia ">
+      
+      
+      <link rel="icon" href="../favicon.ico">
+      <link rel="stylesheet" href="../public/docfx.min.css">
+      <link rel="stylesheet" href="../public/main.css">
+      <meta name="docfx:navrel" content="../toc.html">
+      <meta name="docfx:tocrel" content="toc.html">
+      
+      
+      
+      
+      <meta name="docfx:docurl" content="https://github.com/wieslawsoltes/ProDataGrid/blob/Docs/docfx/articles/hierarchical-data.md/#L1">
+      <meta name="loc:inThisArticle" content="In this article">
+      <meta name="loc:searchResultsCount" content="{count} results for &quot;{query}&quot;">
+      <meta name="loc:searchNoResults" content="No results for &quot;{query}&quot;">
+      <meta name="loc:tocFilter" content="Filter by title">
+      <meta name="loc:nextArticle" content="Next">
+      <meta name="loc:prevArticle" content="Previous">
+      <meta name="loc:themeLight" content="Light">
+      <meta name="loc:themeDark" content="Dark">
+      <meta name="loc:themeAuto" content="Auto">
+      <meta name="loc:changeTheme" content="Change theme">
+      <meta name="loc:copy" content="Copy">
+      <meta name="loc:downloadPdf" content="Download PDF">
+
+      <script type="module" src="./../public/docfx.min.js"></script>
+
+      <script>
+        const theme = localStorage.getItem('theme') || 'auto'
+        document.documentElement.setAttribute('data-bs-theme', theme === 'auto' ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light') : theme)
+      </script>
+
+  </head>
+
+  <body class="tex2jax_ignore" data-layout="" data-yaml-mime="">
+    <header class="bg-body border-bottom">
+      <nav id="autocollapse" class="navbar navbar-expand-md" role="navigation">
+        <div class="container-xxl flex-nowrap">
+          <a class="navbar-brand" href="../index.html">
+            <img id="logo" class="svg" src="../images/logo.svg" alt="">
+            
+          </a>
+          <button class="btn btn-lg d-md-none border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navpanel" aria-controls="navpanel" aria-expanded="false" aria-label="Toggle navigation">
+            <i class="bi bi-three-dots"></i>
+          </button>
+          <div class="collapse navbar-collapse" id="navpanel">
+            <div id="navbar">
+            </div>
+          </div>
+        </div>
+      </nav>
+    </header>
+
+    <main class="container-xxl">
+      <div class="toc-offcanvas">
+        <div class="offcanvas-md offcanvas-start" tabindex="-1" id="tocOffcanvas" aria-labelledby="tocOffcanvasLabel">
+          <div class="offcanvas-header">
+            <h5 class="offcanvas-title" id="tocOffcanvasLabel">Table of Contents</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="offcanvas" data-bs-target="#tocOffcanvas" aria-label="Close"></button>
+          </div>
+          <div class="offcanvas-body">
+            <nav class="toc" id="toc"></nav>
+          </div>
+        </div>
+      </div>
+
+      <div class="content">
+        <div class="actionbar">
+          <button class="btn btn-lg border-0 d-md-none" type="button" data-bs-toggle="offcanvas" data-bs-target="#tocOffcanvas" aria-controls="tocOffcanvas" aria-expanded="false" aria-label="Show table of contents">
+            <i class="bi bi-list"></i>
+          </button>
+
+          <nav id="breadcrumb"></nav>
+        </div>
+
+        <article data-uid="">
+<h1 id="hierarchical-data">Hierarchical Data</h1>
+
+<p>ProDataGrid supports hierarchical rows with a dedicated column type and model adapters. This allows tree-like views while keeping DataGrid features such as selection, sorting, and summaries.</p>
+<h2 id="hierarchical-model-integration">Hierarchical Model Integration</h2>
+<p>Hierarchical rows are driven by <code>IHierarchicalModel</code> (flattened view of visible nodes) plus a thin adapter and a built-in <code>DataGridHierarchicalColumn</code> that renders indentation and the expander glyph.</p>
+<ul>
+<li>Plug in a model or factory: bind <code>HierarchicalModel</code>/<code>HierarchicalModelFactory</code> and set <code>HierarchicalRowsEnabled=&quot;True&quot;</code>.</li>
+<li>When hierarchical rows are enabled and no <code>ItemsSource</code> is provided, the grid auto-binds to the model's flattened view so callers don't have to manage or refresh a separate flattened collection; <code>ObservableFlattened</code> is available when you need <code>INotifyCollectionChanged</code> or reactive pipelines.</li>
+<li>Provide children/leaves via <code>HierarchicalOptions</code> (<code>ChildrenSelector</code>, optional <code>IsLeafSelector</code>, <code>AutoExpandRoot/MaxAutoExpandDepth</code>, <code>SiblingComparer</code>/<code>SiblingComparerSelector</code>, <code>VirtualizeChildren</code>). Use the typed flavor (<code>HierarchicalOptions&lt;T&gt;</code>/<code>HierarchicalModel&lt;T&gt;</code>) when you want strongly-typed selectors and observable flattened nodes.</li>
+<li>The adapter exposes <code>Count/ItemAt/Toggle/Expand/Collapse</code> and raises <code>FlattenedChanged</code>; selection mapping uses the flattened indices.</li>
+<li>Use <code>DataGridHierarchicalColumn</code> for the tree column; per-level indent is configurable via <code>Indent</code>.</li>
+</ul>
+<pre><code class="lang-xml">&lt;DataGrid ItemsSource=&quot;{Binding Rows}&quot;
+          HierarchicalModel=&quot;{Binding Model}&quot;
+          HierarchicalRowsEnabled=&quot;True&quot;
+          AutoGenerateColumns=&quot;False&quot;&gt;
+  &lt;DataGrid.Columns&gt;
+    &lt;DataGridHierarchicalColumn Header=&quot;Name&quot;
+                                Width=&quot;2*&quot;
+                                Binding=&quot;{Binding Item.Name}&quot; /&gt;
+    &lt;DataGridTextColumn Header=&quot;Kind&quot; Binding=&quot;{Binding Item.Kind}&quot; /&gt;
+  &lt;/DataGrid.Columns&gt;
+&lt;/DataGrid&gt;
+</code></pre>
+<pre><code class="lang-csharp">using Avalonia.Controls.DataGridHierarchical;
+
+var options = new HierarchicalOptions
+{
+    ChildrenSelector = item =&gt; ((TreeNode)item).Children,
+    IsLeafSelector = item =&gt; !((TreeNode)item).IsDirectory,
+    AutoExpandRoot = true,
+    MaxAutoExpandDepth = 0,
+    VirtualizeChildren = true
+};
+
+var model = new HierarchicalModel(options);
+model.SetRoot(rootNode);
+</code></pre>
+<p>Sample: see <code>Hierarchical Model</code> page in <code>src/DataGridSample</code> for a file-system tree with Name/Kind/Size/Modified columns.</p>
+<h2 id="expanded-state-and-path-selection">Expanded State and Path Selection</h2>
+<p>Bind expanded state to your model with <code>IsExpandedSelector</code>/<code>IsExpandedSetter</code> so expander toggles update your items:</p>
+<pre><code class="lang-csharp">var options = new HierarchicalOptions&lt;TreeItem&gt;
+{
+    ItemsSelector = item =&gt; item.Children,
+    IsExpandedSelector = item =&gt; item.IsExpanded,
+    IsExpandedSetter = (item, value) =&gt; item.IsExpanded = value,
+    ExpandedStateKeyMode = ExpandedStateKeyMode.Path
+};
+</code></pre>
+<p>For stable selection across refreshes or duplicate labels, supply an <code>ItemPathSelector</code> and enable automatic expansion:</p>
+<pre><code class="lang-xml">&lt;DataGrid HierarchicalRowsEnabled=&quot;True&quot;
+          HierarchicalModel=&quot;{Binding Model}&quot;
+          AutoScrollToSelectedItem=&quot;True&quot;
+          AutoExpandSelectedItem=&quot;True&quot; /&gt;
+</code></pre>
+<p><code>ExpandedStateKeyMode</code> can be <code>Item</code>, <code>Path</code>, or <code>Custom</code> (with <code>ExpandedStateKeySelector</code>) to control how expansion state is preserved. When <code>ItemPathSelector</code> is present, the grid expands to a selected item without traversing the entire tree.</p>
+<h2 id="undoredo">Undo/Redo</h2>
+<p>Hierarchical scenarios can capture actions for undo/redo to keep selection and expansion consistent across edits.</p>
+
+</article>
+
+        <div class="contribution d-print-none">
+          <a href="https://github.com/wieslawsoltes/ProDataGrid/blob/Docs/docfx/articles/hierarchical-data.md/#L1" class="edit-link">Edit this page</a>
+        </div>
+
+        <div class="next-article d-print-none border-top" id="nextArticle"></div>
+
+      </div>
+
+      <div class="affix">
+        <nav id="affix"></nav>
+      </div>
+    </main>
+
+
+    <footer class="border-top text-secondary">
+      <div class="container-xxl">
+        <div class="flex-fill">
+          <span>Made with <a href="https://dotnet.github.io/docfx">docfx</a></span>
+        </div>
+      </div>
+    </footer>
+  </body>
+</html>

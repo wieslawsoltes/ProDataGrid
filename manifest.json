@@ -1,0 +1,3698 @@
+{
+  "source_base_path": "/Users/wieslawsoltes/GitHub/Avalonia.Controls.DataGrid/docfx",
+  "xrefmap": "xrefmap.yml",
+  "files": [
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Automation.Peers.DataGridRowAutomationPeer.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Automation.Peers.DataGridRowAutomationPeer.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Automation.Peers.DataGridRowAutomationPeer",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Automation.Peers.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Automation.Peers.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Automation.Peers",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Collections.DataGridCollectionView.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Collections.DataGridCollectionView.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Collections.DataGridCollectionView",
+      "Summary": "<p sourcefile=\"api/Avalonia.Collections.DataGridCollectionView.yml\" sourcestartlinenumber=\"1\">DataGrid-readable view over an IEnumerable.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Collections.DataGridCollectionViewGroup.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Collections.DataGridCollectionViewGroup.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Collections.DataGridCollectionViewGroup",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Collections.DataGridComparerSortDescription.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Collections.DataGridComparerSortDescription.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Collections.DataGridComparerSortDescription",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Collections.DataGridCurrentChangingEventArgs.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Collections.DataGridCurrentChangingEventArgs.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Collections.DataGridCurrentChangingEventArgs",
+      "Summary": "<p sourcefile=\"api/Avalonia.Collections.DataGridCurrentChangingEventArgs.yml\" sourcestartlinenumber=\"1\">Provides data for the <xref href=\"Avalonia.Collections.ICollectionView.CurrentChanging\" data-throw-if-not-resolved=\"false\"></xref> event.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Collections.DataGridGroupDescription.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Collections.DataGridGroupDescription.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Collections.DataGridGroupDescription",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Collections.DataGridPathGroupDescription.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Collections.DataGridPathGroupDescription.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Collections.DataGridPathGroupDescription",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Collections.DataGridSortDescription.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Collections.DataGridSortDescription.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Collections.DataGridSortDescription",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Collections.DataGridSortDescriptionCollection.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Collections.DataGridSortDescriptionCollection.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Collections.DataGridSortDescriptionCollection",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Collections.IDataGridCollectionView.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Collections.IDataGridCollectionView.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Collections.IDataGridCollectionView",
+      "Summary": "<p sourcefile=\"api/Avalonia.Collections.IDataGridCollectionView.yml\" sourcestartlinenumber=\"1\">Enables collections to have the functionalities of current record management, custom sorting, filtering, and grouping.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Collections.IDataGridCollectionViewFactory.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Collections.IDataGridCollectionViewFactory.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Collections.IDataGridCollectionViewFactory",
+      "Summary": "<p sourcefile=\"api/Avalonia.Collections.IDataGridCollectionViewFactory.yml\" sourcestartlinenumber=\"1\">Defines a method that enables a collection to provide a custom view for specialized sorting, filtering, grouping, and currency.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Collections.PageChangingEventArgs.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Collections.PageChangingEventArgs.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Collections.PageChangingEventArgs",
+      "Summary": "<p sourcefile=\"api/Avalonia.Collections.PageChangingEventArgs.yml\" sourcestartlinenumber=\"1\">Event argument used for page index change notifications. The requested page move\ncan be canceled by setting e.Cancel to True.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Collections.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Collections.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Collections",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.AdvancedRowHeightEstimator.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.AdvancedRowHeightEstimator.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.AdvancedRowHeightEstimator",
+      "Summary": "<p sourcefile=\"api/Avalonia.Controls.AdvancedRowHeightEstimator.yml\" sourcestartlinenumber=\"1\">Advanced implementation of <xref href=\"Avalonia.Controls.IDataGridRowHeightEstimator\" data-throw-if-not-resolved=\"false\"></xref> that provides\noptimized handling for variable row heights. Features include:</p>\n<ul><li>Height cache for measured rows</li><li>Regional averages for localized estimation</li><li>Smooth scroll correction</li><li>Fenwick tree for efficient cumulative height queries</li><li>Bidirectional estimation updates</li></ul>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.AutoGeneratedColumnsPlacement.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.AutoGeneratedColumnsPlacement.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.AutoGeneratedColumnsPlacement",
+      "Summary": "<p sourcefile=\"api/Avalonia.Controls.AutoGeneratedColumnsPlacement.yml\" sourcestartlinenumber=\"1\">Controls placement of auto-generated columns relative to bound columns.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.Automation.Peers.DataGridAutomationPeer.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.Automation.Peers.DataGridAutomationPeer.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.Automation.Peers.DataGridAutomationPeer",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.Automation.Peers.DataGridCellAutomationPeer.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.Automation.Peers.DataGridCellAutomationPeer.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.Automation.Peers.DataGridCellAutomationPeer",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.Automation.Peers.DataGridColumnHeaderAutomationPeer.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.Automation.Peers.DataGridColumnHeaderAutomationPeer.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.Automation.Peers.DataGridColumnHeaderAutomationPeer",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.Automation.Peers.DataGridColumnHeadersPresenterAutomationPeer.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.Automation.Peers.DataGridColumnHeadersPresenterAutomationPeer.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.Automation.Peers.DataGridColumnHeadersPresenterAutomationPeer",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.Automation.Peers.DataGridDetailsPresenterAutomationPeer.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.Automation.Peers.DataGridDetailsPresenterAutomationPeer.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.Automation.Peers.DataGridDetailsPresenterAutomationPeer",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.Automation.Peers.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.Automation.Peers.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.Automation.Peers",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.CachingRowHeightEstimator.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.CachingRowHeightEstimator.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.CachingRowHeightEstimator",
+      "Summary": "<p sourcefile=\"api/Avalonia.Controls.CachingRowHeightEstimator.yml\" sourcestartlinenumber=\"1\">Advanced implementation of <xref href=\"Avalonia.Controls.IDataGridRowHeightEstimator\" data-throw-if-not-resolved=\"false\"></xref> that caches\nindividual row heights for more accurate scrolling with variable height rows.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.ColumnsSourceResetBehavior.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.ColumnsSourceResetBehavior.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.ColumnsSourceResetBehavior",
+      "Summary": "<p sourcefile=\"api/Avalonia.Controls.ColumnsSourceResetBehavior.yml\" sourcestartlinenumber=\"1\">Specifies how the grid reacts to Reset notifications from the bound columns source.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.ColumnsSynchronizationMode.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.ColumnsSynchronizationMode.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.ColumnsSynchronizationMode",
+      "Summary": "<p sourcefile=\"api/Avalonia.Controls.ColumnsSynchronizationMode.yml\" sourcestartlinenumber=\"1\">Determines how a bound columns source synchronizes with the grid.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.DataGrid.DisplayIndexComparer.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.DataGrid.DisplayIndexComparer.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.DataGrid.DisplayIndexComparer",
+      "Summary": "<p sourcefile=\"api/Avalonia.Controls.DataGrid.DisplayIndexComparer.yml\" sourcestartlinenumber=\"1\">Raises the LoadingRow event for row preparation.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.DataGrid.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.DataGrid.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.DataGrid",
+      "Summary": "<p sourcefile=\"api/Avalonia.Controls.DataGrid.yml\" sourcestartlinenumber=\"1\">Clipboard operations</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.DataGridAggregateSummaryDescription.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.DataGridAggregateSummaryDescription.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.DataGridAggregateSummaryDescription",
+      "Summary": "<p sourcefile=\"api/Avalonia.Controls.DataGridAggregateSummaryDescription.yml\" sourcestartlinenumber=\"1\">Summary description using built-in aggregate functions.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.DataGridAggregateType.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.DataGridAggregateType.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.DataGridAggregateType",
+      "Summary": "<p sourcefile=\"api/Avalonia.Controls.DataGridAggregateType.yml\" sourcestartlinenumber=\"1\">Specifies the type of aggregate function for a column summary.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.DataGridAutoCompleteColumn.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.DataGridAutoCompleteColumn.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.DataGridAutoCompleteColumn",
+      "Summary": "<p sourcefile=\"api/Avalonia.Controls.DataGridAutoCompleteColumn.yml\" sourcestartlinenumber=\"1\">Represents a <xref href=\"Avalonia.Controls.DataGrid\" data-throw-if-not-resolved=\"false\"></xref> column that hosts <xref href=\"Avalonia.Controls.AutoCompleteBox\" data-throw-if-not-resolved=\"false\"></xref> controls\nfor editing text values with auto-completion support.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.DataGridAutoGeneratingColumnEventArgs.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.DataGridAutoGeneratingColumnEventArgs.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.DataGridAutoGeneratingColumnEventArgs",
+      "Summary": "<p sourcefile=\"api/Avalonia.Controls.DataGridAutoGeneratingColumnEventArgs.yml\" sourcestartlinenumber=\"1\">Provides data for the <xref href=\"Avalonia.Controls.DataGrid.AutoGeneratingColumn\" data-throw-if-not-resolved=\"false\"></xref> event.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.DataGridBeginningEditEventArgs.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.DataGridBeginningEditEventArgs.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.DataGridBeginningEditEventArgs",
+      "Summary": "<p sourcefile=\"api/Avalonia.Controls.DataGridBeginningEditEventArgs.yml\" sourcestartlinenumber=\"1\">Provides data for the <xref href=\"Avalonia.Controls.DataGrid.BeginningEdit\" data-throw-if-not-resolved=\"false\"></xref> event.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.DataGridBoundColumn.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.DataGridBoundColumn.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.DataGridBoundColumn",
+      "Summary": "<p sourcefile=\"api/Avalonia.Controls.DataGridBoundColumn.yml\" sourcestartlinenumber=\"1\">Represents a <xref href=\"Avalonia.Controls.DataGrid\" data-throw-if-not-resolved=\"false\"></xref> column that can\nbind to a property in the grid's data source.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.DataGridButtonColumn.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.DataGridButtonColumn.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.DataGridButtonColumn",
+      "Summary": "<p sourcefile=\"api/Avalonia.Controls.DataGridButtonColumn.yml\" sourcestartlinenumber=\"1\">Represents a <xref href=\"Avalonia.Controls.DataGrid\" data-throw-if-not-resolved=\"false\"></xref> column that hosts <xref href=\"Avalonia.Controls.Button\" data-throw-if-not-resolved=\"false\"></xref> controls\nfor triggering actions (e.g., Delete, Edit, View) per row.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.DataGridCell.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.DataGridCell.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.DataGridCell",
+      "Summary": "<p sourcefile=\"api/Avalonia.Controls.DataGridCell.yml\" sourcestartlinenumber=\"1\">Represents an individual <xref href=\"Avalonia.Controls.DataGrid\" data-throw-if-not-resolved=\"false\"></xref> cell.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.DataGridCellEditEndedEventArgs.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.DataGridCellEditEndedEventArgs.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.DataGridCellEditEndedEventArgs",
+      "Summary": "<p sourcefile=\"api/Avalonia.Controls.DataGridCellEditEndedEventArgs.yml\" sourcestartlinenumber=\"1\">Provides information just after a cell has exited editing mode.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.DataGridCellEditEndingEventArgs.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.DataGridCellEditEndingEventArgs.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.DataGridCellEditEndingEventArgs",
+      "Summary": "<p sourcefile=\"api/Avalonia.Controls.DataGridCellEditEndingEventArgs.yml\" sourcestartlinenumber=\"1\">Provides information just before a cell exits editing mode.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.DataGridCellInfo.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.DataGridCellInfo.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.DataGridCellInfo",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.DataGridCellPointerPressedEventArgs.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.DataGridCellPointerPressedEventArgs.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.DataGridCellPointerPressedEventArgs",
+      "Summary": "<p sourcefile=\"api/Avalonia.Controls.DataGridCellPointerPressedEventArgs.yml\" sourcestartlinenumber=\"1\">Provides information after the cell has been pressed.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.DataGridCellState.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.DataGridCellState.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.DataGridCellState",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.DataGridCheckBoxColumn.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.DataGridCheckBoxColumn.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.DataGridCheckBoxColumn",
+      "Summary": "<p sourcefile=\"api/Avalonia.Controls.DataGridCheckBoxColumn.yml\" sourcestartlinenumber=\"1\">Represents a <xref href=\"System.Windows.Controls.DataGrid\" data-throw-if-not-resolved=\"false\"></xref> column that hosts\n<xref href=\"System.Windows.Controls.CheckBox\" data-throw-if-not-resolved=\"false\"></xref> controls in its cells.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.DataGridClipboardCellContent.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.DataGridClipboardCellContent.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.DataGridClipboardCellContent",
+      "Summary": "<p sourcefile=\"api/Avalonia.Controls.DataGridClipboardCellContent.yml\" sourcestartlinenumber=\"1\">This structure encapsulate the cell information necessary when clipboard content is prepared.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.DataGridClipboardCopyMode.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.DataGridClipboardCopyMode.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.DataGridClipboardCopyMode",
+      "Summary": "<p sourcefile=\"api/Avalonia.Controls.DataGridClipboardCopyMode.yml\" sourcestartlinenumber=\"1\">Defines modes that indicates how DataGrid content is copied to the Clipboard.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.DataGridClipboardExportContext.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.DataGridClipboardExportContext.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.DataGridClipboardExportContext",
+      "Summary": "<p sourcefile=\"api/Avalonia.Controls.DataGridClipboardExportContext.yml\" sourcestartlinenumber=\"1\">Provides context for clipboard export operations.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.DataGridClipboardExportFormat.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.DataGridClipboardExportFormat.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.DataGridClipboardExportFormat",
+      "Summary": "<p sourcefile=\"api/Avalonia.Controls.DataGridClipboardExportFormat.yml\" sourcestartlinenumber=\"1\">Defines formats that can be exported to the clipboard.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.DataGridColumn.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.DataGridColumn.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.DataGridColumn",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.DataGridColumnEventArgs.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.DataGridColumnEventArgs.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.DataGridColumnEventArgs",
+      "Summary": "<p sourcefile=\"api/Avalonia.Controls.DataGridColumnEventArgs.yml\" sourcestartlinenumber=\"1\">Provides data for <xref href=\"Avalonia.Controls.DataGrid\" data-throw-if-not-resolved=\"false\"></xref> column-related events.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.DataGridColumnHeader.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.DataGridColumnHeader.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.DataGridColumnHeader",
+      "Summary": "<p sourcefile=\"api/Avalonia.Controls.DataGridColumnHeader.yml\" sourcestartlinenumber=\"1\">Represents an individual <xref href=\"Avalonia.Controls.DataGrid\" data-throw-if-not-resolved=\"false\"></xref> column header.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.DataGridColumnHeaderClickEventArgs.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.DataGridColumnHeaderClickEventArgs.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.DataGridColumnHeaderClickEventArgs",
+      "Summary": "<p sourcefile=\"api/Avalonia.Controls.DataGridColumnHeaderClickEventArgs.yml\" sourcestartlinenumber=\"1\">Provides data for DataGrid column header click events.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.DataGridColumnLayoutState.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.DataGridColumnLayoutState.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.DataGridColumnLayoutState",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.DataGridColumnReorderingEventArgs.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.DataGridColumnReorderingEventArgs.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.DataGridColumnReorderingEventArgs",
+      "Summary": "<p sourcefile=\"api/Avalonia.Controls.DataGridColumnReorderingEventArgs.yml\" sourcestartlinenumber=\"1\">Provides data for the <xref href=\"Avalonia.Controls.DataGrid.ColumnReordering\" data-throw-if-not-resolved=\"false\"></xref> event.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.DataGridColumnState.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.DataGridColumnState.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.DataGridColumnState",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.DataGridComboBoxColumn.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.DataGridComboBoxColumn.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.DataGridComboBoxColumn",
+      "Summary": "<p sourcefile=\"api/Avalonia.Controls.DataGridComboBoxColumn.yml\" sourcestartlinenumber=\"1\">Represents a <xref href=\"Avalonia.Controls.DataGrid\" data-throw-if-not-resolved=\"false\"></xref> column that hosts <xref href=\"Avalonia.Controls.ComboBox\" data-throw-if-not-resolved=\"false\"></xref> controls in its cells.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.DataGridCurrentCellChangedEventArgs.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.DataGridCurrentCellChangedEventArgs.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.DataGridCurrentCellChangedEventArgs",
+      "Summary": "<p sourcefile=\"api/Avalonia.Controls.DataGridCurrentCellChangedEventArgs.yml\" sourcestartlinenumber=\"1\">Provides data when the current cell changes.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.DataGridCustomSummaryDescription.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.DataGridCustomSummaryDescription.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.DataGridCustomSummaryDescription",
+      "Summary": "<p sourcefile=\"api/Avalonia.Controls.DataGridCustomSummaryDescription.yml\" sourcestartlinenumber=\"1\">Summary description with custom calculation logic.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.DataGridDatePickerColumn.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.DataGridDatePickerColumn.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.DataGridDatePickerColumn",
+      "Summary": "<p sourcefile=\"api/Avalonia.Controls.DataGridDatePickerColumn.yml\" sourcestartlinenumber=\"1\">Represents a <xref href=\"Avalonia.Controls.DataGrid\" data-throw-if-not-resolved=\"false\"></xref> column that hosts <xref href=\"Avalonia.Controls.CalendarDatePicker\" data-throw-if-not-resolved=\"false\"></xref> controls\nfor editing date values.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.DataGridDragDrop.DataGridHierarchicalRowReorderHandler.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.DataGridDragDrop.DataGridHierarchicalRowReorderHandler.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.DataGridDragDrop.DataGridHierarchicalRowReorderHandler",
+      "Summary": "<p sourcefile=\"api/Avalonia.Controls.DataGridDragDrop.DataGridHierarchicalRowReorderHandler.yml\" sourcestartlinenumber=\"1\">Reorders hierarchical rows by moving items between sibling collections.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.DataGridDragDrop.DataGridRowDragDropOptions.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.DataGridDragDrop.DataGridRowDragDropOptions.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.DataGridDragDrop.DataGridRowDragDropOptions",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.DataGridDragDrop.DataGridRowDragHandle.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.DataGridDragDrop.DataGridRowDragHandle.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.DataGridDragDrop.DataGridRowDragHandle",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.DataGridDragDrop.DataGridRowDropEventArgs.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.DataGridDragDrop.DataGridRowDropEventArgs.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.DataGridDragDrop.DataGridRowDropEventArgs",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.DataGridDragDrop.DataGridRowDropPosition.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.DataGridDragDrop.DataGridRowDropPosition.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.DataGridDragDrop.DataGridRowDropPosition",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.DataGridDragDrop.DataGridRowReorderHandler.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.DataGridDragDrop.DataGridRowReorderHandler.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.DataGridDragDrop.DataGridRowReorderHandler",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.DataGridDragDrop.IDataGridRowDragDropController.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.DataGridDragDrop.IDataGridRowDragDropController.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.DataGridDragDrop.IDataGridRowDragDropController",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.DataGridDragDrop.IDataGridRowDragDropControllerFactory.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.DataGridDragDrop.IDataGridRowDragDropControllerFactory.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.DataGridDragDrop.IDataGridRowDragDropControllerFactory",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.DataGridDragDrop.IDataGridRowDropHandler.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.DataGridDragDrop.IDataGridRowDropHandler.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.DataGridDragDrop.IDataGridRowDropHandler",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.DataGridDragDrop.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.DataGridDragDrop.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.DataGridDragDrop",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.DataGridEditAction.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.DataGridEditAction.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.DataGridEditAction",
+      "Summary": "<p sourcefile=\"api/Avalonia.Controls.DataGridEditAction.yml\" sourcestartlinenumber=\"1\">Used to specify action to take out of edit mode.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.DataGridEditingUnit.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.DataGridEditingUnit.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.DataGridEditingUnit",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.DataGridFiltering.DataGridColumnFilter.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.DataGridFiltering.DataGridColumnFilter.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.DataGridFiltering.DataGridColumnFilter",
+      "Summary": "<p sourcefile=\"api/Avalonia.Controls.DataGridFiltering.DataGridColumnFilter.yml\" sourcestartlinenumber=\"1\">Attached properties for filtering configuration on <xref href=\"Avalonia.Controls.DataGridColumn\" data-throw-if-not-resolved=\"false\"></xref>.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.DataGridFiltering.DataGridFilteringAdapter.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.DataGridFiltering.DataGridFilteringAdapter.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.DataGridFiltering.DataGridFilteringAdapter",
+      "Summary": "<p sourcefile=\"api/Avalonia.Controls.DataGridFiltering.DataGridFilteringAdapter.yml\" sourcestartlinenumber=\"1\">Bridges filtering descriptors to the view's Filter predicate.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.DataGridFiltering.FilteringChangedEventArgs.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.DataGridFiltering.FilteringChangedEventArgs.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.DataGridFiltering.FilteringChangedEventArgs",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.DataGridFiltering.FilteringChangingEventArgs.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.DataGridFiltering.FilteringChangingEventArgs.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.DataGridFiltering.FilteringChangingEventArgs",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.DataGridFiltering.FilteringDescriptor.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.DataGridFiltering.FilteringDescriptor.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.DataGridFiltering.FilteringDescriptor",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.DataGridFiltering.FilteringModel.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.DataGridFiltering.FilteringModel.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.DataGridFiltering.FilteringModel",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.DataGridFiltering.FilteringOperator.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.DataGridFiltering.FilteringOperator.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.DataGridFiltering.FilteringOperator",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.DataGridFiltering.IDataGridFilteringAdapterFactory.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.DataGridFiltering.IDataGridFilteringAdapterFactory.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.DataGridFiltering.IDataGridFilteringAdapterFactory",
+      "Summary": "<p sourcefile=\"api/Avalonia.Controls.DataGridFiltering.IDataGridFilteringAdapterFactory.yml\" sourcestartlinenumber=\"1\">Factory for creating a <xref href=\"Avalonia.Controls.DataGridFiltering.DataGridFilteringAdapter\" data-throw-if-not-resolved=\"false\"></xref> without subclassing <xref href=\"Avalonia.Controls.DataGrid\" data-throw-if-not-resolved=\"false\"></xref>.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.DataGridFiltering.IDataGridFilteringModelFactory.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.DataGridFiltering.IDataGridFilteringModelFactory.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.DataGridFiltering.IDataGridFilteringModelFactory",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.DataGridFiltering.IEnumOption.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.DataGridFiltering.IEnumOption.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.DataGridFiltering.IEnumOption",
+      "Summary": "<p sourcefile=\"api/Avalonia.Controls.DataGridFiltering.IEnumOption.yml\" sourcestartlinenumber=\"1\">Option contract for enum/multi-select filter items.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.DataGridFiltering.IFilterDateContext.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.DataGridFiltering.IFilterDateContext.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.DataGridFiltering.IFilterDateContext",
+      "Summary": "<p sourcefile=\"api/Avalonia.Controls.DataGridFiltering.IFilterDateContext.yml\" sourcestartlinenumber=\"1\">Minimal contract for date range filter contexts.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.DataGridFiltering.IFilterEnumContext.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.DataGridFiltering.IFilterEnumContext.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.DataGridFiltering.IFilterEnumContext",
+      "Summary": "<p sourcefile=\"api/Avalonia.Controls.DataGridFiltering.IFilterEnumContext.yml\" sourcestartlinenumber=\"1\">Minimal contract for enum/multi-select filter contexts.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.DataGridFiltering.IFilterNumberContext.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.DataGridFiltering.IFilterNumberContext.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.DataGridFiltering.IFilterNumberContext",
+      "Summary": "<p sourcefile=\"api/Avalonia.Controls.DataGridFiltering.IFilterNumberContext.yml\" sourcestartlinenumber=\"1\">Minimal contract for numeric range filter contexts.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.DataGridFiltering.IFilterTextContext.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.DataGridFiltering.IFilterTextContext.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.DataGridFiltering.IFilterTextContext",
+      "Summary": "<p sourcefile=\"api/Avalonia.Controls.DataGridFiltering.IFilterTextContext.yml\" sourcestartlinenumber=\"1\">Minimal contract for text-based filter contexts consumed by the shared filter templates.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.DataGridFiltering.IFilteringModel.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.DataGridFiltering.IFilteringModel.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.DataGridFiltering.IFilteringModel",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.DataGridFiltering.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.DataGridFiltering.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.DataGridFiltering",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.DataGridFilteringState.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.DataGridFilteringState.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.DataGridFilteringState",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.DataGridGridLinesVisibility.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.DataGridGridLinesVisibility.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.DataGridGridLinesVisibility",
+      "Summary": "<p sourcefile=\"api/Avalonia.Controls.DataGridGridLinesVisibility.yml\" sourcestartlinenumber=\"1\">Determines whether the inner cells' vertical/horizontal gridlines are shown or not.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.DataGridGroupState.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.DataGridGroupState.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.DataGridGroupState",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.DataGridGroupSummaryPosition.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.DataGridGroupSummaryPosition.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.DataGridGroupSummaryPosition",
+      "Summary": "<p sourcefile=\"api/Avalonia.Controls.DataGridGroupSummaryPosition.yml\" sourcestartlinenumber=\"1\">Specifies the position of group summary rows.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.DataGridGroupingState.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.DataGridGroupingState.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.DataGridGroupingState",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.DataGridHeadersVisibility.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.DataGridHeadersVisibility.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.DataGridHeadersVisibility",
+      "Summary": "<p sourcefile=\"api/Avalonia.Controls.DataGridHeadersVisibility.yml\" sourcestartlinenumber=\"1\">Determines whether the row/column headers are shown or not.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.DataGridHierarchical.DataGridHierarchicalAdapter-1.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.DataGridHierarchical.DataGridHierarchicalAdapter-1.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.DataGridHierarchical.DataGridHierarchicalAdapter<T>",
+      "Summary": "<p sourcefile=\"api/Avalonia.Controls.DataGridHierarchical.DataGridHierarchicalAdapter-1.yml\" sourcestartlinenumber=\"1\">Typed adapter that wraps <xref href=\"Avalonia.Controls.DataGridHierarchical.DataGridHierarchicalAdapter\" data-throw-if-not-resolved=\"false\"></xref> to remove casts for <code class=\"typeparamref\">T</code>.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.DataGridHierarchical.DataGridHierarchicalAdapter.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.DataGridHierarchical.DataGridHierarchicalAdapter.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.DataGridHierarchical.DataGridHierarchicalAdapter",
+      "Summary": "<p sourcefile=\"api/Avalonia.Controls.DataGridHierarchical.DataGridHierarchicalAdapter.yml\" sourcestartlinenumber=\"1\">Bridges a hierarchical model to the DataGrid by exposing flattened accessors and gestures.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.DataGridHierarchical.ExpandedStateKeyMode.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.DataGridHierarchical.ExpandedStateKeyMode.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.DataGridHierarchical.ExpandedStateKeyMode",
+      "Summary": "<p sourcefile=\"api/Avalonia.Controls.DataGridHierarchical.ExpandedStateKeyMode.yml\" sourcestartlinenumber=\"1\">Defines how expanded nodes are matched when restoring expansion state.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.DataGridHierarchical.FlattenedChange.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.DataGridHierarchical.FlattenedChange.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.DataGridHierarchical.FlattenedChange",
+      "Summary": "<p sourcefile=\"api/Avalonia.Controls.DataGridHierarchical.FlattenedChange.yml\" sourcestartlinenumber=\"1\">Represents a change in the flattened list of visible nodes.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.DataGridHierarchical.FlattenedChangedEventArgs-1.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.DataGridHierarchical.FlattenedChangedEventArgs-1.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.DataGridHierarchical.FlattenedChangedEventArgs<T>",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.DataGridHierarchical.FlattenedChangedEventArgs.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.DataGridHierarchical.FlattenedChangedEventArgs.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.DataGridHierarchical.FlattenedChangedEventArgs",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.DataGridHierarchical.FlattenedIndexMap.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.DataGridHierarchical.FlattenedIndexMap.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.DataGridHierarchical.FlattenedIndexMap",
+      "Summary": "<p sourcefile=\"api/Avalonia.Controls.DataGridHierarchical.FlattenedIndexMap.yml\" sourcestartlinenumber=\"1\">Represents a mapping between the previous flattened list and the current one.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.DataGridHierarchical.HierarchicalModel-1.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.DataGridHierarchical.HierarchicalModel-1.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.DataGridHierarchical.HierarchicalModel<T>",
+      "Summary": "<p sourcefile=\"api/Avalonia.Controls.DataGridHierarchical.HierarchicalModel-1.yml\" sourcestartlinenumber=\"1\">Strongly-typed hierarchical model wrapper to make MVVM/DynamicData pipelines easier.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.DataGridHierarchical.HierarchicalModel.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.DataGridHierarchical.HierarchicalModel.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.DataGridHierarchical.HierarchicalModel",
+      "Summary": "<p sourcefile=\"api/Avalonia.Controls.DataGridHierarchical.HierarchicalModel.yml\" sourcestartlinenumber=\"1\">Default hierarchical model implementation (initial scaffolding).</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.DataGridHierarchical.HierarchicalNode-1.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.DataGridHierarchical.HierarchicalNode-1.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.DataGridHierarchical.HierarchicalNode<T>",
+      "Summary": "<p sourcefile=\"api/Avalonia.Controls.DataGridHierarchical.HierarchicalNode-1.yml\" sourcestartlinenumber=\"1\">Typed view over an existing hierarchical node.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.DataGridHierarchical.HierarchicalNode.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.DataGridHierarchical.HierarchicalNode.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.DataGridHierarchical.HierarchicalNode",
+      "Summary": "<p sourcefile=\"api/Avalonia.Controls.DataGridHierarchical.HierarchicalNode.yml\" sourcestartlinenumber=\"1\">Represents a single node in the hierarchical data model.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.DataGridHierarchical.HierarchicalNodeEventArgs-1.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.DataGridHierarchical.HierarchicalNodeEventArgs-1.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.DataGridHierarchical.HierarchicalNodeEventArgs<T>",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.DataGridHierarchical.HierarchicalNodeEventArgs.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.DataGridHierarchical.HierarchicalNodeEventArgs.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.DataGridHierarchical.HierarchicalNodeEventArgs",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.DataGridHierarchical.HierarchicalNodeLoadFailedEventArgs-1.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.DataGridHierarchical.HierarchicalNodeLoadFailedEventArgs-1.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.DataGridHierarchical.HierarchicalNodeLoadFailedEventArgs<T>",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.DataGridHierarchical.HierarchicalNodeLoadFailedEventArgs.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.DataGridHierarchical.HierarchicalNodeLoadFailedEventArgs.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.DataGridHierarchical.HierarchicalNodeLoadFailedEventArgs",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.DataGridHierarchical.HierarchicalNodeRetryEventArgs-1.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.DataGridHierarchical.HierarchicalNodeRetryEventArgs-1.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.DataGridHierarchical.HierarchicalNodeRetryEventArgs<T>",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.DataGridHierarchical.HierarchicalNodeRetryEventArgs.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.DataGridHierarchical.HierarchicalNodeRetryEventArgs.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.DataGridHierarchical.HierarchicalNodeRetryEventArgs",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.DataGridHierarchical.HierarchicalOptions-1.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.DataGridHierarchical.HierarchicalOptions-1.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.DataGridHierarchical.HierarchicalOptions<T>",
+      "Summary": "<p sourcefile=\"api/Avalonia.Controls.DataGridHierarchical.HierarchicalOptions-1.yml\" sourcestartlinenumber=\"1\">Strongly-typed options wrapper to avoid reflection when working with hierarchical data.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.DataGridHierarchical.HierarchicalOptions.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.DataGridHierarchical.HierarchicalOptions.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.DataGridHierarchical.HierarchicalOptions",
+      "Summary": "<p sourcefile=\"api/Avalonia.Controls.DataGridHierarchical.HierarchicalOptions.yml\" sourcestartlinenumber=\"1\">Options controlling hierarchical data resolution and behavior.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.DataGridHierarchical.HierarchicalSortingAdapter.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.DataGridHierarchical.HierarchicalSortingAdapter.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.DataGridHierarchical.HierarchicalSortingAdapter",
+      "Summary": "<p sourcefile=\"api/Avalonia.Controls.DataGridHierarchical.HierarchicalSortingAdapter.yml\" sourcestartlinenumber=\"1\">Sorting adapter that routes sorting descriptors into hierarchical sibling ordering.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.DataGridHierarchical.HierarchyChangedEventArgs-1.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.DataGridHierarchical.HierarchyChangedEventArgs-1.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.DataGridHierarchical.HierarchyChangedEventArgs<T>",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.DataGridHierarchical.HierarchyChangedEventArgs.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.DataGridHierarchical.HierarchyChangedEventArgs.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.DataGridHierarchical.HierarchyChangedEventArgs",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.DataGridHierarchical.IDataGridHierarchicalAdapterFactory-1.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.DataGridHierarchical.IDataGridHierarchicalAdapterFactory-1.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.DataGridHierarchical.IDataGridHierarchicalAdapterFactory<T>",
+      "Summary": "<p sourcefile=\"api/Avalonia.Controls.DataGridHierarchical.IDataGridHierarchicalAdapterFactory-1.yml\" sourcestartlinenumber=\"1\">Factory to create a strongly-typed hierarchical adapter without subclassing <xref href=\"Avalonia.Controls.DataGrid\" data-throw-if-not-resolved=\"false\"></xref>.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.DataGridHierarchical.IDataGridHierarchicalAdapterFactory.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.DataGridHierarchical.IDataGridHierarchicalAdapterFactory.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.DataGridHierarchical.IDataGridHierarchicalAdapterFactory",
+      "Summary": "<p sourcefile=\"api/Avalonia.Controls.DataGridHierarchical.IDataGridHierarchicalAdapterFactory.yml\" sourcestartlinenumber=\"1\">Factory to create a hierarchical adapter without subclassing <xref href=\"Avalonia.Controls.DataGrid\" data-throw-if-not-resolved=\"false\"></xref>.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.DataGridHierarchical.IDataGridHierarchicalModelFactory-1.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.DataGridHierarchical.IDataGridHierarchicalModelFactory-1.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.DataGridHierarchical.IDataGridHierarchicalModelFactory<T>",
+      "Summary": "<p sourcefile=\"api/Avalonia.Controls.DataGridHierarchical.IDataGridHierarchicalModelFactory-1.yml\" sourcestartlinenumber=\"1\">Factory to create a strongly-typed hierarchical model without subclassing <xref href=\"Avalonia.Controls.DataGrid\" data-throw-if-not-resolved=\"false\"></xref>.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.DataGridHierarchical.IDataGridHierarchicalModelFactory.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.DataGridHierarchical.IDataGridHierarchicalModelFactory.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.DataGridHierarchical.IDataGridHierarchicalModelFactory",
+      "Summary": "<p sourcefile=\"api/Avalonia.Controls.DataGridHierarchical.IDataGridHierarchicalModelFactory.yml\" sourcestartlinenumber=\"1\">Factory hook to allow replacing the default hierarchical model.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.DataGridHierarchical.IHierarchicalModel-1.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.DataGridHierarchical.IHierarchicalModel-1.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.DataGridHierarchical.IHierarchicalModel<T>",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.DataGridHierarchical.IHierarchicalModel.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.DataGridHierarchical.IHierarchicalModel.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.DataGridHierarchical.IHierarchicalModel",
+      "Summary": "<p sourcefile=\"api/Avalonia.Controls.DataGridHierarchical.IHierarchicalModel.yml\" sourcestartlinenumber=\"1\">Core contract for hierarchical models powering ProDataGrid.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.DataGridHierarchical.IHierarchicalModelExpander.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.DataGridHierarchical.IHierarchicalModelExpander.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.DataGridHierarchical.IHierarchicalModelExpander",
+      "Summary": "<p sourcefile=\"api/Avalonia.Controls.DataGridHierarchical.IHierarchicalModelExpander.yml\" sourcestartlinenumber=\"1\">Optional interface for models that can expand to a specific item on demand.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.DataGridHierarchical.IHierarchicalStateProvider.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.DataGridHierarchical.IHierarchicalStateProvider.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.DataGridHierarchical.IHierarchicalStateProvider",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.DataGridHierarchical.IHierarchicalStateProviderWithKeyMode.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.DataGridHierarchical.IHierarchicalStateProviderWithKeyMode.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.DataGridHierarchical.IHierarchicalStateProviderWithKeyMode",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.DataGridHierarchical.VirtualRootContainer.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.DataGridHierarchical.VirtualRootContainer.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.DataGridHierarchical.VirtualRootContainer",
+      "Summary": "<p sourcefile=\"api/Avalonia.Controls.DataGridHierarchical.VirtualRootContainer.yml\" sourcestartlinenumber=\"1\">Marker type used as the item for a virtual root node when multiple root items are set via <xref href=\"Avalonia.Controls.DataGridHierarchical.IHierarchicalModel.SetRoots(System.Collections.IEnumerable)\" data-throw-if-not-resolved=\"false\"></xref>.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.DataGridHierarchical.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.DataGridHierarchical.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.DataGridHierarchical",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.DataGridHierarchicalColumn.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.DataGridHierarchicalColumn.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.DataGridHierarchicalColumn",
+      "Summary": "<p sourcefile=\"api/Avalonia.Controls.DataGridHierarchicalColumn.yml\" sourcestartlinenumber=\"1\">Column that renders hierarchical rows with an expander and indentation.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.DataGridHierarchicalPresenter.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.DataGridHierarchicalPresenter.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.DataGridHierarchicalPresenter",
+      "Summary": "<p sourcefile=\"api/Avalonia.Controls.DataGridHierarchicalPresenter.yml\" sourcestartlinenumber=\"1\">Presenter used by <xref href=\"Avalonia.Controls.DataGridHierarchicalColumn\" data-throw-if-not-resolved=\"false\"></xref> to render an expander with indent.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.DataGridHierarchicalState.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.DataGridHierarchicalState.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.DataGridHierarchicalState",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.DataGridHyperlinkColumn.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.DataGridHyperlinkColumn.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.DataGridHyperlinkColumn",
+      "Summary": "<p sourcefile=\"api/Avalonia.Controls.DataGridHyperlinkColumn.yml\" sourcestartlinenumber=\"1\">Represents a <xref href=\"Avalonia.Controls.DataGridBoundColumn\" data-throw-if-not-resolved=\"false\"></xref> that displays hyperlinks.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.DataGridImageColumn.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.DataGridImageColumn.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.DataGridImageColumn",
+      "Summary": "<p sourcefile=\"api/Avalonia.Controls.DataGridImageColumn.yml\" sourcestartlinenumber=\"1\">Represents a <xref href=\"Avalonia.Controls.DataGrid\" data-throw-if-not-resolved=\"false\"></xref> column that hosts <xref href=\"Avalonia.Controls.Image\" data-throw-if-not-resolved=\"false\"></xref> controls\nfor displaying images. This column is read-only by default.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.DataGridKeyboardGestures.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.DataGridKeyboardGestures.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.DataGridKeyboardGestures",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.DataGridLayoutState.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.DataGridLayoutState.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.DataGridLayoutState",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.DataGridLength.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.DataGridLength.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.DataGridLength",
+      "Summary": "<p sourcefile=\"api/Avalonia.Controls.DataGridLength.yml\" sourcestartlinenumber=\"1\">Represents the lengths of elements within the <xref href=\"Avalonia.Controls.DataGrid\" data-throw-if-not-resolved=\"false\"></xref> control.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.DataGridLengthConverter.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.DataGridLengthConverter.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.DataGridLengthConverter",
+      "Summary": "<p sourcefile=\"api/Avalonia.Controls.DataGridLengthConverter.yml\" sourcestartlinenumber=\"1\">DataGridLengthConverter - Converter class for converting instances of other types to and from DataGridLength instances.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.DataGridLengthUnitType.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.DataGridLengthUnitType.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.DataGridLengthUnitType",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.DataGridMaskedTextColumn.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.DataGridMaskedTextColumn.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.DataGridMaskedTextColumn",
+      "Summary": "<p sourcefile=\"api/Avalonia.Controls.DataGridMaskedTextColumn.yml\" sourcestartlinenumber=\"1\">Represents a <xref href=\"Avalonia.Controls.DataGrid\" data-throw-if-not-resolved=\"false\"></xref> column that hosts <xref href=\"Avalonia.Controls.MaskedTextBox\" data-throw-if-not-resolved=\"false\"></xref> controls\nfor editing text values with input masks (e.g., phone numbers, SSN, credit cards).</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.DataGridNumericColumn.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.DataGridNumericColumn.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.DataGridNumericColumn",
+      "Summary": "<p sourcefile=\"api/Avalonia.Controls.DataGridNumericColumn.yml\" sourcestartlinenumber=\"1\">Represents a <xref href=\"Avalonia.Controls.DataGrid\" data-throw-if-not-resolved=\"false\"></xref> column that hosts <xref href=\"Avalonia.Controls.NumericUpDown\" data-throw-if-not-resolved=\"false\"></xref> controls\nfor editing numeric values (decimal, double, int) with optional formatting and spinner controls.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.DataGridPreparingCellForEditEventArgs.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.DataGridPreparingCellForEditEventArgs.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.DataGridPreparingCellForEditEventArgs",
+      "Summary": "<p sourcefile=\"api/Avalonia.Controls.DataGridPreparingCellForEditEventArgs.yml\" sourcestartlinenumber=\"1\">Provides data for the <xref href=\"Avalonia.Controls.DataGrid.PreparingCellForEdit\" data-throw-if-not-resolved=\"false\"></xref> event.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.DataGridProgressBarColumn.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.DataGridProgressBarColumn.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.DataGridProgressBarColumn",
+      "Summary": "<p sourcefile=\"api/Avalonia.Controls.DataGridProgressBarColumn.yml\" sourcestartlinenumber=\"1\">Represents a <xref href=\"Avalonia.Controls.DataGrid\" data-throw-if-not-resolved=\"false\"></xref> column that hosts <xref href=\"Avalonia.Controls.ProgressBar\" data-throw-if-not-resolved=\"false\"></xref> controls\nfor displaying progress values. This column is read-only.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.DataGridRecycleHidingMode.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.DataGridRecycleHidingMode.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.DataGridRecycleHidingMode",
+      "Summary": "<p sourcefile=\"api/Avalonia.Controls.DataGridRecycleHidingMode.yml\" sourcestartlinenumber=\"1\">Controls how recycled containers are hidden when removed from the viewport.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.DataGridRow.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.DataGridRow.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.DataGridRow",
+      "Summary": "<p sourcefile=\"api/Avalonia.Controls.DataGridRow.yml\" sourcestartlinenumber=\"1\">Represents a <xref href=\"Avalonia.Controls.DataGrid\" data-throw-if-not-resolved=\"false\"></xref> row.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.DataGridRowClipboardEventArgs.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.DataGridRowClipboardEventArgs.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.DataGridRowClipboardEventArgs",
+      "Summary": "<p sourcefile=\"api/Avalonia.Controls.DataGridRowClipboardEventArgs.yml\" sourcestartlinenumber=\"1\">This class encapsulates a selected row's information necessary for the CopyingRowClipboardContent event.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.DataGridRowDetailsEventArgs.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.DataGridRowDetailsEventArgs.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.DataGridRowDetailsEventArgs",
+      "Summary": "<p sourcefile=\"api/Avalonia.Controls.DataGridRowDetailsEventArgs.yml\" sourcestartlinenumber=\"1\">Provides data for the <xref href=\"Avalonia.Controls.DataGrid.LoadingRowDetails\" data-throw-if-not-resolved=\"false\"></xref>, <xref href=\"Avalonia.Controls.DataGrid.UnloadingRowDetails\" data-throw-if-not-resolved=\"false\"></xref>,\nand <xref href=\"Avalonia.Controls.DataGrid.RowDetailsVisibilityChanged\" data-throw-if-not-resolved=\"false\"></xref> events.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.DataGridRowDetailsVisibilityMode.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.DataGridRowDetailsVisibilityMode.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.DataGridRowDetailsVisibilityMode",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.DataGridRowDragCompletedEventArgs.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.DataGridRowDragCompletedEventArgs.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.DataGridRowDragCompletedEventArgs",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.DataGridRowDragStartingEventArgs.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.DataGridRowDragStartingEventArgs.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.DataGridRowDragStartingEventArgs",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.DataGridRowEditEndedEventArgs.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.DataGridRowEditEndedEventArgs.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.DataGridRowEditEndedEventArgs",
+      "Summary": "<p sourcefile=\"api/Avalonia.Controls.DataGridRowEditEndedEventArgs.yml\" sourcestartlinenumber=\"1\">Provides information just after a row has exited edit mode.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.DataGridRowEditEndingEventArgs.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.DataGridRowEditEndingEventArgs.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.DataGridRowEditEndingEventArgs",
+      "Summary": "<p sourcefile=\"api/Avalonia.Controls.DataGridRowEditEndingEventArgs.yml\" sourcestartlinenumber=\"1\">Provides information just before a row exits editing mode.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.DataGridRowEventArgs.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.DataGridRowEventArgs.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.DataGridRowEventArgs",
+      "Summary": "<p sourcefile=\"api/Avalonia.Controls.DataGridRowEventArgs.yml\" sourcestartlinenumber=\"1\">Provides data for <xref href=\"Avalonia.Controls.DataGrid\" data-throw-if-not-resolved=\"false\"></xref> row-related events.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.DataGridRowGroupFooter.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.DataGridRowGroupFooter.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.DataGridRowGroupFooter",
+      "Summary": "<p sourcefile=\"api/Avalonia.Controls.DataGridRowGroupFooter.yml\" sourcestartlinenumber=\"1\">A footer row displayed after group items, showing group summaries.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.DataGridRowGroupHeader.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.DataGridRowGroupHeader.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.DataGridRowGroupHeader",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.DataGridRowGroupHeaderEventArgs.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.DataGridRowGroupHeaderEventArgs.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.DataGridRowGroupHeaderEventArgs",
+      "Summary": "<p sourcefile=\"api/Avalonia.Controls.DataGridRowGroupHeaderEventArgs.yml\" sourcestartlinenumber=\"1\">EventArgs used for the DataGrid's LoadingRowGroup and UnloadingRowGroup events</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.DataGridScrollEventArgs.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.DataGridScrollEventArgs.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.DataGridScrollEventArgs",
+      "Summary": "<p sourcefile=\"api/Avalonia.Controls.DataGridScrollEventArgs.yml\" sourcestartlinenumber=\"1\">Provides data for DataGrid scroll routed events.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.DataGridScrollSample.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.DataGridScrollSample.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.DataGridScrollSample",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.DataGridScrollState.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.DataGridScrollState.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.DataGridScrollState",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.DataGridSearchCurrentState.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.DataGridSearchCurrentState.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.DataGridSearchCurrentState",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.DataGridSearchState.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.DataGridSearchState.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.DataGridSearchState",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.DataGridSearching.DataGridColumnSearch.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.DataGridSearching.DataGridColumnSearch.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.DataGridSearching.DataGridColumnSearch",
+      "Summary": "<p sourcefile=\"api/Avalonia.Controls.DataGridSearching.DataGridColumnSearch.yml\" sourcestartlinenumber=\"1\">Attached properties for search configuration on <xref href=\"Avalonia.Controls.DataGridColumn\" data-throw-if-not-resolved=\"false\"></xref>.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.DataGridSearching.DataGridSearchAdapter.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.DataGridSearching.DataGridSearchAdapter.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.DataGridSearching.DataGridSearchAdapter",
+      "Summary": "<p sourcefile=\"api/Avalonia.Controls.DataGridSearching.DataGridSearchAdapter.yml\" sourcestartlinenumber=\"1\">Computes search results from descriptors against the view.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.DataGridSearching.IDataGridSearchAdapterFactory.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.DataGridSearching.IDataGridSearchAdapterFactory.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.DataGridSearching.IDataGridSearchAdapterFactory",
+      "Summary": "<p sourcefile=\"api/Avalonia.Controls.DataGridSearching.IDataGridSearchAdapterFactory.yml\" sourcestartlinenumber=\"1\">Factory for creating a <xref href=\"Avalonia.Controls.DataGridSearching.DataGridSearchAdapter\" data-throw-if-not-resolved=\"false\"></xref> without subclassing <xref href=\"Avalonia.Controls.DataGrid\" data-throw-if-not-resolved=\"false\"></xref>.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.DataGridSearching.IDataGridSearchModelFactory.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.DataGridSearching.IDataGridSearchModelFactory.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.DataGridSearching.IDataGridSearchModelFactory",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.DataGridSearching.ISearchModel.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.DataGridSearching.ISearchModel.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.DataGridSearching.ISearchModel",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.DataGridSearching.SearchChangedEventArgs.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.DataGridSearching.SearchChangedEventArgs.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.DataGridSearching.SearchChangedEventArgs",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.DataGridSearching.SearchCurrentChangedEventArgs.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.DataGridSearching.SearchCurrentChangedEventArgs.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.DataGridSearching.SearchCurrentChangedEventArgs",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.DataGridSearching.SearchDescriptor.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.DataGridSearching.SearchDescriptor.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.DataGridSearching.SearchDescriptor",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.DataGridSearching.SearchHighlightMode.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.DataGridSearching.SearchHighlightMode.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.DataGridSearching.SearchHighlightMode",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.DataGridSearching.SearchMatch.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.DataGridSearching.SearchMatch.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.DataGridSearching.SearchMatch",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.DataGridSearching.SearchMatchMode.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.DataGridSearching.SearchMatchMode.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.DataGridSearching.SearchMatchMode",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.DataGridSearching.SearchModel.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.DataGridSearching.SearchModel.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.DataGridSearching.SearchModel",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.DataGridSearching.SearchResult.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.DataGridSearching.SearchResult.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.DataGridSearching.SearchResult",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.DataGridSearching.SearchResultsChangedEventArgs.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.DataGridSearching.SearchResultsChangedEventArgs.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.DataGridSearching.SearchResultsChangedEventArgs",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.DataGridSearching.SearchScope.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.DataGridSearching.SearchScope.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.DataGridSearching.SearchScope",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.DataGridSearching.SearchTermCombineMode.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.DataGridSearching.SearchTermCombineMode.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.DataGridSearching.SearchTermCombineMode",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.DataGridSearching.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.DataGridSearching.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.DataGridSearching",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.DataGridSelectedCellsChangedEventArgs.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.DataGridSelectedCellsChangedEventArgs.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.DataGridSelectedCellsChangedEventArgs",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.DataGridSelection.DataGridSelectionModelAdapter.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.DataGridSelection.DataGridSelectionModelAdapter.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.DataGridSelection.DataGridSelectionModelAdapter",
+      "Summary": "<p sourcefile=\"api/Avalonia.Controls.DataGridSelection.DataGridSelectionModelAdapter.yml\" sourcestartlinenumber=\"1\">Default adapter around ISelectionModel that DataGrid will use to manage selection.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.DataGridSelection.IDataGridSelectionModelFactory.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.DataGridSelection.IDataGridSelectionModelFactory.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.DataGridSelection.IDataGridSelectionModelFactory",
+      "Summary": "<p sourcefile=\"api/Avalonia.Controls.DataGridSelection.IDataGridSelectionModelFactory.yml\" sourcestartlinenumber=\"1\">Factory hook for creating selection models used by the DataGrid.\nImplementations can provide custom selection behavior.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.DataGridSelection.SelectedItemsView.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.DataGridSelection.SelectedItemsView.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.DataGridSelection.SelectedItemsView",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.DataGridSelection.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.DataGridSelection.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.DataGridSelection",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.DataGridSelectionChangeSource.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.DataGridSelectionChangeSource.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.DataGridSelectionChangeSource",
+      "Summary": "<p sourcefile=\"api/Avalonia.Controls.DataGridSelectionChangeSource.yml\" sourcestartlinenumber=\"1\">Describes the origin of a selection change.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.DataGridSelectionChangedEventArgs.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.DataGridSelectionChangedEventArgs.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.DataGridSelectionChangedEventArgs",
+      "Summary": "<p sourcefile=\"api/Avalonia.Controls.DataGridSelectionChangedEventArgs.yml\" sourcestartlinenumber=\"1\">Provides additional context for DataGrid selection changes.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.DataGridSelectionMode.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.DataGridSelectionMode.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.DataGridSelectionMode",
+      "Summary": "<p sourcefile=\"api/Avalonia.Controls.DataGridSelectionMode.yml\" sourcestartlinenumber=\"1\">Determines the selection model</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.DataGridSelectionState.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.DataGridSelectionState.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.DataGridSelectionState",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.DataGridSelectionUnit.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.DataGridSelectionUnit.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.DataGridSelectionUnit",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.DataGridSliderColumn.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.DataGridSliderColumn.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.DataGridSliderColumn",
+      "Summary": "<p sourcefile=\"api/Avalonia.Controls.DataGridSliderColumn.yml\" sourcestartlinenumber=\"1\">Represents a <xref href=\"Avalonia.Controls.DataGrid\" data-throw-if-not-resolved=\"false\"></xref> column that hosts <xref href=\"Avalonia.Controls.Slider\" data-throw-if-not-resolved=\"false\"></xref> controls\nfor editing numeric values with a slider.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.DataGridSorting.DataGridSortingAdapter.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.DataGridSorting.DataGridSortingAdapter.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.DataGridSorting.DataGridSortingAdapter",
+      "Summary": "<p sourcefile=\"api/Avalonia.Controls.DataGridSorting.DataGridSortingAdapter.yml\" sourcestartlinenumber=\"1\">Bridges sorting gestures/model to the view's SortDescriptions.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.DataGridSorting.IDataGridSortingAdapterFactory.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.DataGridSorting.IDataGridSortingAdapterFactory.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.DataGridSorting.IDataGridSortingAdapterFactory",
+      "Summary": "<p sourcefile=\"api/Avalonia.Controls.DataGridSorting.IDataGridSortingAdapterFactory.yml\" sourcestartlinenumber=\"1\">Factory for creating a <xref href=\"Avalonia.Controls.DataGridSorting.DataGridSortingAdapter\" data-throw-if-not-resolved=\"false\"></xref> without subclassing <xref href=\"Avalonia.Controls.DataGrid\" data-throw-if-not-resolved=\"false\"></xref>.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.DataGridSorting.IDataGridSortingModelFactory.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.DataGridSorting.IDataGridSortingModelFactory.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.DataGridSorting.IDataGridSortingModelFactory",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.DataGridSorting.ISortingModel.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.DataGridSorting.ISortingModel.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.DataGridSorting.ISortingModel",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.DataGridSorting.SortCycleMode.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.DataGridSorting.SortCycleMode.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.DataGridSorting.SortCycleMode",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.DataGridSorting.SortingChangedEventArgs.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.DataGridSorting.SortingChangedEventArgs.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.DataGridSorting.SortingChangedEventArgs",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.DataGridSorting.SortingChangingEventArgs.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.DataGridSorting.SortingChangingEventArgs.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.DataGridSorting.SortingChangingEventArgs",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.DataGridSorting.SortingDescriptor.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.DataGridSorting.SortingDescriptor.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.DataGridSorting.SortingDescriptor",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.DataGridSorting.SortingModel.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.DataGridSorting.SortingModel.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.DataGridSorting.SortingModel",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.DataGridSorting.SortingModifiers.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.DataGridSorting.SortingModifiers.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.DataGridSorting.SortingModifiers",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.DataGridSorting.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.DataGridSorting.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.DataGridSorting",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.DataGridSortingState.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.DataGridSortingState.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.DataGridSortingState",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.DataGridState.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.DataGridState.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.DataGridState",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.DataGridStateOptions.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.DataGridStateOptions.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.DataGridStateOptions",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.DataGridStateSections.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.DataGridStateSections.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.DataGridStateSections",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.DataGridSummaryCell.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.DataGridSummaryCell.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.DataGridSummaryCell",
+      "Summary": "<p sourcefile=\"api/Avalonia.Controls.DataGridSummaryCell.yml\" sourcestartlinenumber=\"1\">A cell that displays a summary value.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.DataGridSummaryCellsPresenter.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.DataGridSummaryCellsPresenter.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.DataGridSummaryCellsPresenter",
+      "Summary": "<p sourcefile=\"api/Avalonia.Controls.DataGridSummaryCellsPresenter.yml\" sourcestartlinenumber=\"1\">Presenter for summary cells, handles layout to align with columns.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.DataGridSummaryDescription.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.DataGridSummaryDescription.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.DataGridSummaryDescription",
+      "Summary": "<p sourcefile=\"api/Avalonia.Controls.DataGridSummaryDescription.yml\" sourcestartlinenumber=\"1\">Base class for column summary definitions.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.DataGridSummaryDescriptionCollection.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.DataGridSummaryDescriptionCollection.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.DataGridSummaryDescriptionCollection",
+      "Summary": "<p sourcefile=\"api/Avalonia.Controls.DataGridSummaryDescriptionCollection.yml\" sourcestartlinenumber=\"1\">A collection of <xref href=\"Avalonia.Controls.DataGridSummaryDescription\" data-throw-if-not-resolved=\"false\"></xref> objects.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.DataGridSummaryRecalculatedEventArgs.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.DataGridSummaryRecalculatedEventArgs.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.DataGridSummaryRecalculatedEventArgs",
+      "Summary": "<p sourcefile=\"api/Avalonia.Controls.DataGridSummaryRecalculatedEventArgs.yml\" sourcestartlinenumber=\"1\">Event arguments for when summaries are recalculated.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.DataGridSummaryRow.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.DataGridSummaryRow.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.DataGridSummaryRow",
+      "Summary": "<p sourcefile=\"api/Avalonia.Controls.DataGridSummaryRow.yml\" sourcestartlinenumber=\"1\">A row that displays summary values for columns.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.DataGridSummaryRowPosition.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.DataGridSummaryRowPosition.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.DataGridSummaryRowPosition",
+      "Summary": "<p sourcefile=\"api/Avalonia.Controls.DataGridSummaryRowPosition.yml\" sourcestartlinenumber=\"1\">Specifies the position of the total summary row.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.DataGridSummaryScope.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.DataGridSummaryScope.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.DataGridSummaryScope",
+      "Summary": "<p sourcefile=\"api/Avalonia.Controls.DataGridSummaryScope.yml\" sourcestartlinenumber=\"1\">Specifies the scope of a column summary calculation.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.DataGridTemplateColumn.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.DataGridTemplateColumn.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.DataGridTemplateColumn",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.DataGridTextColumn.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.DataGridTextColumn.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.DataGridTextColumn",
+      "Summary": "<p sourcefile=\"api/Avalonia.Controls.DataGridTextColumn.yml\" sourcestartlinenumber=\"1\">Represents a <xref href=\"Avalonia.Controls.DataGrid\" data-throw-if-not-resolved=\"false\"></xref> column that hosts textual content in its cells.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.DataGridTimePickerColumn.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.DataGridTimePickerColumn.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.DataGridTimePickerColumn",
+      "Summary": "<p sourcefile=\"api/Avalonia.Controls.DataGridTimePickerColumn.yml\" sourcestartlinenumber=\"1\">Represents a <xref href=\"Avalonia.Controls.DataGrid\" data-throw-if-not-resolved=\"false\"></xref> column that hosts <xref href=\"Avalonia.Controls.TimePicker\" data-throw-if-not-resolved=\"false\"></xref> controls\nfor editing time values.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.DataGridToggleButtonColumn.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.DataGridToggleButtonColumn.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.DataGridToggleButtonColumn",
+      "Summary": "<p sourcefile=\"api/Avalonia.Controls.DataGridToggleButtonColumn.yml\" sourcestartlinenumber=\"1\">Represents a <xref href=\"Avalonia.Controls.DataGrid\" data-throw-if-not-resolved=\"false\"></xref> column that hosts <xref href=\"Avalonia.Controls.Primitives.ToggleButton\" data-throw-if-not-resolved=\"false\"></xref> controls\nfor editing boolean values with a compact toggle button (alternative to ToggleSwitch).</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.DataGridToggleSwitchColumn.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.DataGridToggleSwitchColumn.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.DataGridToggleSwitchColumn",
+      "Summary": "<p sourcefile=\"api/Avalonia.Controls.DataGridToggleSwitchColumn.yml\" sourcestartlinenumber=\"1\">Represents a <xref href=\"Avalonia.Controls.DataGrid\" data-throw-if-not-resolved=\"false\"></xref> column that hosts <xref href=\"Avalonia.Controls.ToggleSwitch\" data-throw-if-not-resolved=\"false\"></xref> controls\nfor editing boolean values with a toggle switch.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.DefaultRowHeightEstimator.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.DefaultRowHeightEstimator.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.DefaultRowHeightEstimator",
+      "Summary": "<p sourcefile=\"api/Avalonia.Controls.DefaultRowHeightEstimator.yml\" sourcestartlinenumber=\"1\">Default implementation of <xref href=\"Avalonia.Controls.IDataGridRowHeightEstimator\" data-throw-if-not-resolved=\"false\"></xref> that uses\na simple average-based estimation algorithm. This matches the original DataGrid behavior.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.IDataGridClipboardExporter.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.IDataGridClipboardExporter.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.IDataGridClipboardExporter",
+      "Summary": "<p sourcefile=\"api/Avalonia.Controls.IDataGridClipboardExporter.yml\" sourcestartlinenumber=\"1\">Contract for building clipboard payloads for a DataGrid copy operation.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.IDataGridClipboardFormatExporter.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.IDataGridClipboardFormatExporter.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.IDataGridClipboardFormatExporter",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.IDataGridRowHeightEstimator.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.IDataGridRowHeightEstimator.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.IDataGridRowHeightEstimator",
+      "Summary": "<p sourcefile=\"api/Avalonia.Controls.IDataGridRowHeightEstimator.yml\" sourcestartlinenumber=\"1\">Defines the contract for row height estimation and scroll position calculation in DataGrid.\nImplementations can provide different algorithms for handling variable row heights.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.IDataGridRowHeightEstimatorStateful.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.IDataGridRowHeightEstimatorStateful.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.IDataGridRowHeightEstimatorStateful",
+      "Summary": "<p sourcefile=\"api/Avalonia.Controls.IDataGridRowHeightEstimatorStateful.yml\" sourcestartlinenumber=\"1\">Extends <xref href=\"Avalonia.Controls.IDataGridRowHeightEstimator\" data-throw-if-not-resolved=\"false\"></xref> with state capture/restore support.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.IDataGridSummaryCalculator.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.IDataGridSummaryCalculator.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.IDataGridSummaryCalculator",
+      "Summary": "<p sourcefile=\"api/Avalonia.Controls.IDataGridSummaryCalculator.yml\" sourcestartlinenumber=\"1\">Interface for implementing custom summary calculations.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.IDataGridSummaryState.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.IDataGridSummaryState.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.IDataGridSummaryState",
+      "Summary": "<p sourcefile=\"api/Avalonia.Controls.IDataGridSummaryState.yml\" sourcestartlinenumber=\"1\">State object for incremental summary calculations.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.JsonClipboardExporter.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.JsonClipboardExporter.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.JsonClipboardExporter",
+      "Summary": "<p sourcefile=\"api/Avalonia.Controls.JsonClipboardExporter.yml\" sourcestartlinenumber=\"1\">Example exporter that adds a JSON payload alongside the standard tab-delimited text.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.Primitives.DataGridCellsPresenter.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.Primitives.DataGridCellsPresenter.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.Primitives.DataGridCellsPresenter",
+      "Summary": "<p sourcefile=\"api/Avalonia.Controls.Primitives.DataGridCellsPresenter.yml\" sourcestartlinenumber=\"1\">Used within the template of a <xref href=\"Avalonia.Controls.DataGrid\" data-throw-if-not-resolved=\"false\"></xref>\nto specify the location in the control's visual tree where the cells are to be added.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.Primitives.DataGridColumnHeadersPresenter.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.Primitives.DataGridColumnHeadersPresenter.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.Primitives.DataGridColumnHeadersPresenter",
+      "Summary": "<p sourcefile=\"api/Avalonia.Controls.Primitives.DataGridColumnHeadersPresenter.yml\" sourcestartlinenumber=\"1\">Used within the template of a <xref href=\"Avalonia.Controls.DataGrid\" data-throw-if-not-resolved=\"false\"></xref> to specify the\nlocation in the control's visual tree where the column headers are to be added.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.Primitives.DataGridDetailsPresenter.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.Primitives.DataGridDetailsPresenter.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.Primitives.DataGridDetailsPresenter",
+      "Summary": "<p sourcefile=\"api/Avalonia.Controls.Primitives.DataGridDetailsPresenter.yml\" sourcestartlinenumber=\"1\">Used within the template of a <xref href=\"Avalonia.Controls.DataGrid\" data-throw-if-not-resolved=\"false\"></xref> to specify the location in the control's visual tree\nwhere the row details are to be added.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.Primitives.DataGridFrozenGrid.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.Primitives.DataGridFrozenGrid.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.Primitives.DataGridFrozenGrid",
+      "Summary": "<p sourcefile=\"api/Avalonia.Controls.Primitives.DataGridFrozenGrid.yml\" sourcestartlinenumber=\"1\">Represents a non-scrollable grid that contains <xref href=\"Avalonia.Controls.DataGrid\" data-throw-if-not-resolved=\"false\"></xref> row headers.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.Primitives.DataGridRowHeader.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.Primitives.DataGridRowHeader.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.Primitives.DataGridRowHeader",
+      "Summary": "<p sourcefile=\"api/Avalonia.Controls.Primitives.DataGridRowHeader.yml\" sourcestartlinenumber=\"1\">Represents an individual <xref href=\"Avalonia.Controls.DataGrid\" data-throw-if-not-resolved=\"false\"></xref> row header.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.Primitives.DataGridRowsPresenter.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.Primitives.DataGridRowsPresenter.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.Primitives.DataGridRowsPresenter",
+      "Summary": "<p sourcefile=\"api/Avalonia.Controls.Primitives.DataGridRowsPresenter.yml\" sourcestartlinenumber=\"1\">Used within the template of a <xref href=\"Avalonia.Controls.DataGrid\" data-throw-if-not-resolved=\"false\"></xref> to specify the\nlocation in the control's visual tree where the rows are to be added.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.Primitives.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.Primitives.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.Primitives",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.RowHeightEstimatorDiagnostics.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.RowHeightEstimatorDiagnostics.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.RowHeightEstimatorDiagnostics",
+      "Summary": "<p sourcefile=\"api/Avalonia.Controls.RowHeightEstimatorDiagnostics.yml\" sourcestartlinenumber=\"1\">Diagnostic information about the row height estimator state.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.RowHeightEstimatorState.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.RowHeightEstimatorState.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.RowHeightEstimatorState",
+      "Summary": "<p sourcefile=\"api/Avalonia.Controls.RowHeightEstimatorState.yml\" sourcestartlinenumber=\"1\">Base class for row height estimator state snapshots.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.Utils.ICellEditBinding.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.Utils.ICellEditBinding.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.Utils.ICellEditBinding",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.Utils.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.Utils.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.Utils",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.DevToolsExtensions.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.DevToolsExtensions.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.DevToolsExtensions",
+      "Summary": "<p sourcefile=\"api/Avalonia.DevToolsExtensions.yml\" sourcestartlinenumber=\"1\">Extension methods for attaching DevTools..</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Diagnostics.DevToolsOptions.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Diagnostics.DevToolsOptions.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Diagnostics.DevToolsOptions",
+      "Summary": "<p sourcefile=\"api/Avalonia.Diagnostics.DevToolsOptions.yml\" sourcestartlinenumber=\"1\">Describes options used to customize DevTools.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Diagnostics.DevToolsViewKind.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Diagnostics.DevToolsViewKind.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Diagnostics.DevToolsViewKind",
+      "Summary": "<p sourcefile=\"api/Avalonia.Diagnostics.DevToolsViewKind.yml\" sourcestartlinenumber=\"1\">Kinds of diagnostic views available in DevTools</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Diagnostics.HotKeyConfiguration.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Diagnostics.HotKeyConfiguration.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Diagnostics.HotKeyConfiguration",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Diagnostics.IScreenshotHandler.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Diagnostics.IScreenshotHandler.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Diagnostics.IScreenshotHandler",
+      "Summary": "<p sourcefile=\"api/Avalonia.Diagnostics.IScreenshotHandler.yml\" sourcestartlinenumber=\"1\">Allowed to define custom handler for Shreeshot</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Diagnostics.Screenshots.BaseRenderToStreamHandler.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Diagnostics.Screenshots.BaseRenderToStreamHandler.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Diagnostics.Screenshots.BaseRenderToStreamHandler",
+      "Summary": "<p sourcefile=\"api/Avalonia.Diagnostics.Screenshots.BaseRenderToStreamHandler.yml\" sourcestartlinenumber=\"1\">Base class for render Screenshto to stream</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Diagnostics.Screenshots.FilePickerHandler.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Diagnostics.Screenshots.FilePickerHandler.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Diagnostics.Screenshots.FilePickerHandler",
+      "Summary": "<p sourcefile=\"api/Avalonia.Diagnostics.Screenshots.FilePickerHandler.yml\" sourcestartlinenumber=\"1\">Show a FileSavePicker to select where save screenshot</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Diagnostics.Screenshots.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Diagnostics.Screenshots.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Diagnostics.Screenshots",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Diagnostics.VisualTreeDebug.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Diagnostics.VisualTreeDebug.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Diagnostics.VisualTreeDebug",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Diagnostics.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Diagnostics.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Diagnostics",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia",
+      "Summary": null
+    },
+    {
+      "type": "Conceptual",
+      "source_relative_path": "api/index.md",
+      "output": {
+        ".html": {
+          "relative_path": "api/index.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "Toc",
+      "source_relative_path": "api/toc.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/toc.html"
+        },
+        ".json": {
+          "relative_path": "api/toc.json"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "Conceptual",
+      "source_relative_path": "articles/api-comparison.md",
+      "output": {
+        ".html": {
+          "relative_path": "articles/api-comparison.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "Conceptual",
+      "source_relative_path": "articles/clipboard-and-export.md",
+      "output": {
+        ".html": {
+          "relative_path": "articles/clipboard-and-export.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "Conceptual",
+      "source_relative_path": "articles/columns-and-editing.md",
+      "output": {
+        ".html": {
+          "relative_path": "articles/columns-and-editing.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "Conceptual",
+      "source_relative_path": "articles/data-operations.md",
+      "output": {
+        ".html": {
+          "relative_path": "articles/data-operations.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "Conceptual",
+      "source_relative_path": "articles/diagnostics-and-tooling.md",
+      "output": {
+        ".html": {
+          "relative_path": "articles/diagnostics-and-tooling.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "Conceptual",
+      "source_relative_path": "articles/drag-drop.md",
+      "output": {
+        ".html": {
+          "relative_path": "articles/drag-drop.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "Conceptual",
+      "source_relative_path": "articles/events-and-routing.md",
+      "output": {
+        ".html": {
+          "relative_path": "articles/events-and-routing.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "Conceptual",
+      "source_relative_path": "articles/getting-started.md",
+      "output": {
+        ".html": {
+          "relative_path": "articles/getting-started.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "Conceptual",
+      "source_relative_path": "articles/hierarchical-data.md",
+      "output": {
+        ".html": {
+          "relative_path": "articles/hierarchical-data.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "Conceptual",
+      "source_relative_path": "articles/integration-samples.md",
+      "output": {
+        ".html": {
+          "relative_path": "articles/integration-samples.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "Conceptual",
+      "source_relative_path": "articles/intro.md",
+      "output": {
+        ".html": {
+          "relative_path": "articles/intro.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "Conceptual",
+      "source_relative_path": "articles/keyboard-shortcuts.md",
+      "output": {
+        ".html": {
+          "relative_path": "articles/keyboard-shortcuts.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "Conceptual",
+      "source_relative_path": "articles/license.md",
+      "output": {
+        ".html": {
+          "relative_path": "articles/license.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "Conceptual",
+      "source_relative_path": "articles/migration.md",
+      "output": {
+        ".html": {
+          "relative_path": "articles/migration.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "Conceptual",
+      "source_relative_path": "articles/prodiagnostics.md",
+      "output": {
+        ".html": {
+          "relative_path": "articles/prodiagnostics.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "Conceptual",
+      "source_relative_path": "articles/row-details-and-templates.md",
+      "output": {
+        ".html": {
+          "relative_path": "articles/row-details-and-templates.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "Conceptual",
+      "source_relative_path": "articles/sample-gallery.md",
+      "output": {
+        ".html": {
+          "relative_path": "articles/sample-gallery.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "Conceptual",
+      "source_relative_path": "articles/scrolling-virtualization.md",
+      "output": {
+        ".html": {
+          "relative_path": "articles/scrolling-virtualization.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "Conceptual",
+      "source_relative_path": "articles/selection-and-navigation.md",
+      "output": {
+        ".html": {
+          "relative_path": "articles/selection-and-navigation.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "Conceptual",
+      "source_relative_path": "articles/state-persistence.md",
+      "output": {
+        ".html": {
+          "relative_path": "articles/state-persistence.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "Conceptual",
+      "source_relative_path": "articles/styling-themes.md",
+      "output": {
+        ".html": {
+          "relative_path": "articles/styling-themes.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "Conceptual",
+      "source_relative_path": "articles/summaries.md",
+      "output": {
+        ".html": {
+          "relative_path": "articles/summaries.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "Toc",
+      "source_relative_path": "articles/toc.yml",
+      "output": {
+        ".html": {
+          "relative_path": "articles/toc.html"
+        },
+        ".json": {
+          "relative_path": "articles/toc.json"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "Conceptual",
+      "source_relative_path": "articles/validation-and-errors.md",
+      "output": {
+        ".html": {
+          "relative_path": "articles/validation-and-errors.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "Resource",
+      "source_relative_path": "images/logo.svg",
+      "output": {
+        "resource": {
+          "relative_path": "images/logo.svg"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "Conceptual",
+      "source_relative_path": "index.md",
+      "output": {
+        ".html": {
+          "relative_path": "index.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "Toc",
+      "source_relative_path": "toc.yml",
+      "output": {
+        ".html": {
+          "relative_path": "toc.html"
+        },
+        ".json": {
+          "relative_path": "toc.json"
+        }
+      },
+      "version": ""
+    }
+  ],
+  "groups": [
+    {
+      "xrefmap": "xrefmap.yml"
+    }
+  ]
+}

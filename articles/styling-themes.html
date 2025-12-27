@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+      <title>Styling and Themes | ProDataGrid for Avalonia </title>
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <meta name="title" content="Styling and Themes | ProDataGrid for Avalonia ">
+      
+      
+      <link rel="icon" href="../favicon.ico">
+      <link rel="stylesheet" href="../public/docfx.min.css">
+      <link rel="stylesheet" href="../public/main.css">
+      <meta name="docfx:navrel" content="../toc.html">
+      <meta name="docfx:tocrel" content="toc.html">
+      
+      
+      
+      
+      <meta name="docfx:docurl" content="https://github.com/wieslawsoltes/ProDataGrid/blob/Docs/docfx/articles/styling-themes.md/#L1">
+      <meta name="loc:inThisArticle" content="In this article">
+      <meta name="loc:searchResultsCount" content="{count} results for &quot;{query}&quot;">
+      <meta name="loc:searchNoResults" content="No results for &quot;{query}&quot;">
+      <meta name="loc:tocFilter" content="Filter by title">
+      <meta name="loc:nextArticle" content="Next">
+      <meta name="loc:prevArticle" content="Previous">
+      <meta name="loc:themeLight" content="Light">
+      <meta name="loc:themeDark" content="Dark">
+      <meta name="loc:themeAuto" content="Auto">
+      <meta name="loc:changeTheme" content="Change theme">
+      <meta name="loc:copy" content="Copy">
+      <meta name="loc:downloadPdf" content="Download PDF">
+
+      <script type="module" src="./../public/docfx.min.js"></script>
+
+      <script>
+        const theme = localStorage.getItem('theme') || 'auto'
+        document.documentElement.setAttribute('data-bs-theme', theme === 'auto' ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light') : theme)
+      </script>
+
+  </head>
+
+  <body class="tex2jax_ignore" data-layout="" data-yaml-mime="">
+    <header class="bg-body border-bottom">
+      <nav id="autocollapse" class="navbar navbar-expand-md" role="navigation">
+        <div class="container-xxl flex-nowrap">
+          <a class="navbar-brand" href="../index.html">
+            <img id="logo" class="svg" src="../images/logo.svg" alt="">
+            
+          </a>
+          <button class="btn btn-lg d-md-none border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navpanel" aria-controls="navpanel" aria-expanded="false" aria-label="Toggle navigation">
+            <i class="bi bi-three-dots"></i>
+          </button>
+          <div class="collapse navbar-collapse" id="navpanel">
+            <div id="navbar">
+            </div>
+          </div>
+        </div>
+      </nav>
+    </header>
+
+    <main class="container-xxl">
+      <div class="toc-offcanvas">
+        <div class="offcanvas-md offcanvas-start" tabindex="-1" id="tocOffcanvas" aria-labelledby="tocOffcanvasLabel">
+          <div class="offcanvas-header">
+            <h5 class="offcanvas-title" id="tocOffcanvasLabel">Table of Contents</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="offcanvas" data-bs-target="#tocOffcanvas" aria-label="Close"></button>
+          </div>
+          <div class="offcanvas-body">
+            <nav class="toc" id="toc"></nav>
+          </div>
+        </div>
+      </div>
+
+      <div class="content">
+        <div class="actionbar">
+          <button class="btn btn-lg border-0 d-md-none" type="button" data-bs-toggle="offcanvas" data-bs-target="#tocOffcanvas" aria-controls="tocOffcanvas" aria-expanded="false" aria-label="Show table of contents">
+            <i class="bi bi-list"></i>
+          </button>
+
+          <nav id="breadcrumb"></nav>
+        </div>
+
+        <article data-uid="">
+<h1 id="styling-and-themes">Styling and Themes</h1>
+
+<p>ProDataGrid ships updated templates and styling hooks so you can customize rows, cells, and headers while keeping logical scrolling and frozen columns aligned.</p>
+<h2 id="v2-templates">v2 Templates</h2>
+<pre><code class="lang-xml">&lt;StyleInclude Source=&quot;avares://Avalonia.Controls.DataGrid/Themes/Fluent.v2.xaml&quot; /&gt;
+&lt;StyleInclude Source=&quot;avares://Avalonia.Controls.DataGrid/Themes/Simple.v2.xaml&quot; /&gt;
+</code></pre>
+<h2 id="generic-and-legacy-themes">Generic and Legacy Themes</h2>
+<p>ProDataGrid also ships a shared <code>Generic.xaml</code> with core control themes and legacy theme wrappers:</p>
+<ul>
+<li><code>Themes/Generic.xaml</code> is the base theme for custom styling and non-Fluent/Simple environments.</li>
+<li><code>Themes/Fluent.xaml</code> and <code>Themes/Simple.xaml</code> are the legacy (non-v2) templates if you need to stay on the classic ScrollBar layout.</li>
+</ul>
+<pre><code class="lang-xml">&lt;StyleInclude Source=&quot;avares://Avalonia.Controls.DataGrid/Themes/Generic.xaml&quot; /&gt;
+</code></pre>
+<h2 id="row-and-cell-styling">Row and Cell Styling</h2>
+<p>Use styles that target <code>DataGridRow</code> and <code>DataGridCell</code> to control selection visuals, alternating rows, and focus cues. Useful pseudo-classes include <code>:selected</code>, <code>:current</code>, <code>:editing</code>, <code>:invalid</code>, <code>:searchmatch</code>, and <code>:searchcurrent</code>.</p>
+<pre><code class="lang-xml">&lt;Style Selector=&quot;DataGridRow:current&quot;&gt;
+  &lt;Setter Property=&quot;Background&quot; Value=&quot;#FFE3F2FD&quot; /&gt;
+  &lt;Setter Property=&quot;BorderBrush&quot; Value=&quot;#FF64B5F6&quot; /&gt;
+  &lt;Setter Property=&quot;BorderThickness&quot; Value=&quot;0,0,0,2&quot; /&gt;
+&lt;/Style&gt;
+</code></pre>
+<h2 id="column-themes">Column Themes</h2>
+<p>Column-specific styles let you highlight key columns or adjust alignment, formatting, and glyphs. Derived columns can reuse built-in cell themes through protected accessors and <code>ControlTheme</code> resources keyed in your app:</p>
+<ul>
+<li><code>CellCheckBoxTheme</code></li>
+<li><code>CellComboBoxTheme</code> / <code>CellComboBoxDisplayTheme</code></li>
+<li><code>CellHyperlinkButtonTheme</code></li>
+<li><code>CellTextBoxTheme</code> / <code>CellTextBlockTheme</code></li>
+</ul>
+<p>The sample <code>Column Themes</code> page shows custom columns applying these themes to generated elements.</p>
+<pre><code class="lang-xml">&lt;ControlTheme x:Key=&quot;DataGridCellCheckBoxTheme&quot;
+              TargetType=&quot;CheckBox&quot;
+              BasedOn=&quot;{StaticResource {x:Type CheckBox}}&quot; /&gt;
+</code></pre>
+<h2 id="current-row-and-current-cell">Current Row and Current Cell</h2>
+<p>The current row and cell are exposed through <code>:current</code> so you can style focus and selection states independently.</p>
+
+</article>
+
+        <div class="contribution d-print-none">
+          <a href="https://github.com/wieslawsoltes/ProDataGrid/blob/Docs/docfx/articles/styling-themes.md/#L1" class="edit-link">Edit this page</a>
+        </div>
+
+        <div class="next-article d-print-none border-top" id="nextArticle"></div>
+
+      </div>
+
+      <div class="affix">
+        <nav id="affix"></nav>
+      </div>
+    </main>
+
+
+    <footer class="border-top text-secondary">
+      <div class="container-xxl">
+        <div class="flex-fill">
+          <span>Made with <a href="https://dotnet.github.io/docfx">docfx</a></span>
+        </div>
+      </div>
+    </footer>
+  </body>
+</html>

@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+      <title>ProDataGrid for Avalonia | ProDataGrid for Avalonia </title>
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <meta name="title" content="ProDataGrid for Avalonia | ProDataGrid for Avalonia ">
+      
+      
+      <link rel="icon" href="favicon.ico">
+      <link rel="stylesheet" href="public/docfx.min.css">
+      <link rel="stylesheet" href="public/main.css">
+      <meta name="docfx:navrel" content="toc.html">
+      <meta name="docfx:tocrel" content="toc.html">
+      
+      
+      
+      
+      <meta name="docfx:docurl" content="https://github.com/wieslawsoltes/ProDataGrid/blob/Docs/docfx/index.md/#L1">
+      <meta name="loc:inThisArticle" content="In this article">
+      <meta name="loc:searchResultsCount" content="{count} results for &quot;{query}&quot;">
+      <meta name="loc:searchNoResults" content="No results for &quot;{query}&quot;">
+      <meta name="loc:tocFilter" content="Filter by title">
+      <meta name="loc:nextArticle" content="Next">
+      <meta name="loc:prevArticle" content="Previous">
+      <meta name="loc:themeLight" content="Light">
+      <meta name="loc:themeDark" content="Dark">
+      <meta name="loc:themeAuto" content="Auto">
+      <meta name="loc:changeTheme" content="Change theme">
+      <meta name="loc:copy" content="Copy">
+      <meta name="loc:downloadPdf" content="Download PDF">
+
+      <script type="module" src="./public/docfx.min.js"></script>
+
+      <script>
+        const theme = localStorage.getItem('theme') || 'auto'
+        document.documentElement.setAttribute('data-bs-theme', theme === 'auto' ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light') : theme)
+      </script>
+
+  </head>
+
+  <body class="tex2jax_ignore" data-layout="" data-yaml-mime="">
+    <header class="bg-body border-bottom">
+      <nav id="autocollapse" class="navbar navbar-expand-md" role="navigation">
+        <div class="container-xxl flex-nowrap">
+          <a class="navbar-brand" href="index.html">
+            <img id="logo" class="svg" src="images/logo.svg" alt="">
+            
+          </a>
+          <button class="btn btn-lg d-md-none border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navpanel" aria-controls="navpanel" aria-expanded="false" aria-label="Toggle navigation">
+            <i class="bi bi-three-dots"></i>
+          </button>
+          <div class="collapse navbar-collapse" id="navpanel">
+            <div id="navbar">
+            </div>
+          </div>
+        </div>
+      </nav>
+    </header>
+
+    <main class="container-xxl">
+
+      <div class="content">
+        <div class="actionbar">
+
+          <nav id="breadcrumb"></nav>
+        </div>
+
+        <article data-uid="">
+<h1 id="prodatagrid-for-avalonia">ProDataGrid for Avalonia</h1>
+
+<p><strong>ProDataGrid</strong> is a high-performance, feature-rich DataGrid control for <a href="https://github.com/AvaloniaUI/Avalonia">Avalonia</a>. It is a hard fork of the in-box <code>Avalonia.Controls.DataGrid</code>, tuned for stronger scrolling, richer selection, and advanced data operations while staying API compatible where it matters.</p>
+<h2 id="getting-started">Getting Started</h2>
+<h3 id="install">Install</h3>
+<pre><code class="lang-bash">dotnet add package ProDataGrid
+</code></pre>
+<pre><code class="lang-xml">&lt;PackageReference Include=&quot;ProDataGrid&quot; Version=&quot;...&quot; /&gt;
+</code></pre>
+<h3 id="add-themes-in-appaxaml">Add Themes in App.axaml</h3>
+<p>Include the ProDataGrid theme styles so the templates are available application-wide.</p>
+<pre><code class="lang-xml">&lt;Application.Styles&gt;
+  &lt;FluentTheme /&gt;
+  &lt;StyleInclude Source=&quot;avares://Avalonia.Controls.DataGrid/Themes/Fluent.v2.xaml&quot; /&gt;
+&lt;/Application.Styles&gt;
+</code></pre>
+<h3 id="basic-usage">Basic Usage</h3>
+<pre><code class="lang-xml">&lt;DataGrid ItemsSource=&quot;{Binding People}&quot;
+          AutoGenerateColumns=&quot;False&quot;
+          UseLogicalScrollable=&quot;True&quot;&gt;
+  &lt;DataGrid.Columns&gt;
+    &lt;DataGridTextColumn Header=&quot;Id&quot; Binding=&quot;{Binding Id}&quot; Width=&quot;60&quot; /&gt;
+    &lt;DataGridTextColumn Header=&quot;Name&quot; Binding=&quot;{Binding Name}&quot; Width=&quot;*&quot; /&gt;
+    &lt;DataGridCheckBoxColumn Header=&quot;Active&quot; Binding=&quot;{Binding IsActive}&quot; Width=&quot;80&quot; /&gt;
+  &lt;/DataGrid.Columns&gt;
+&lt;/DataGrid&gt;
+</code></pre>
+<h3 id="sample-app">Sample App</h3>
+<p>Run the sample gallery to explore features and configuration patterns:</p>
+<pre><code class="lang-bash">dotnet run --project src/DataGridSample/DataGridSample.csproj
+</code></pre>
+<h2 id="highlights">Highlights</h2>
+<table>
+<thead>
+<tr>
+<th>Area</th>
+<th>Highlights</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Virtualization &amp; scrolling</td>
+<td>ScrollViewer-based <code>ILogicalScrollable</code>, snap points, row height estimators, frozen columns.</td>
+</tr>
+<tr>
+<td>Selection &amp; navigation</td>
+<td>Avalonia <code>SelectionModel</code> integration, stable selection across sorting/filtering/paging.</td>
+</tr>
+<tr>
+<td>Data operations</td>
+<td>Sorting, filtering, grouping, paging, and search with pluggable models/adapters.</td>
+</tr>
+<tr>
+<td>Drag &amp; drop</td>
+<td>Row reordering with flat/hierarchical handlers and routed events.</td>
+</tr>
+<tr>
+<td>Styling</td>
+<td>Updated templates, column themes, and richer visuals.</td>
+</tr>
+</tbody>
+</table>
+<h2 id="documentation-sections">Documentation Sections</h2>
+<ul>
+<li><strong><a href="articles/intro.html">Articles</a></strong>: Practical guides and feature-focused walkthroughs.</li>
+<li><strong><a href="api/index.html">API Documentation</a></strong>: Reference for all public types and members.</li>
+</ul>
+<h2 id="license">License</h2>
+<p>ProDataGrid is licensed under the <a href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/licence.md">MIT License</a>.</p>
+
+</article>
+
+        <div class="contribution d-print-none">
+          <a href="https://github.com/wieslawsoltes/ProDataGrid/blob/Docs/docfx/index.md/#L1" class="edit-link">Edit this page</a>
+        </div>
+
+        <div class="next-article d-print-none border-top" id="nextArticle"></div>
+
+      </div>
+
+      <div class="affix">
+        <nav id="affix"></nav>
+      </div>
+    </main>
+
+
+    <footer class="border-top text-secondary">
+      <div class="container-xxl">
+        <div class="flex-fill">
+          <span>Made with <a href="https://dotnet.github.io/docfx">docfx</a></span>
+        </div>
+      </div>
+    </footer>
+  </body>
+</html>

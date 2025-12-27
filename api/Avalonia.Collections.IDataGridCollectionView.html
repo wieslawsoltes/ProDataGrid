@@ -1,0 +1,1062 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+      <title>Interface IDataGridCollectionView | ProDataGrid for Avalonia </title>
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <meta name="title" content="Interface IDataGridCollectionView | ProDataGrid for Avalonia ">
+      
+      <meta name="description" content="Enables collections to have the functionalities of current record management, custom sorting, filtering, and grouping.">
+      <link rel="icon" href="../favicon.ico">
+      <link rel="stylesheet" href="../public/docfx.min.css">
+      <link rel="stylesheet" href="../public/main.css">
+      <meta name="docfx:navrel" content="../toc.html">
+      <meta name="docfx:tocrel" content="toc.html">
+      
+      
+      
+      
+      <meta name="docfx:docurl" content="https://github.com/wieslawsoltes/ProDataGrid/new/Docs/apiSpec/new?filename=Avalonia_Collections_IDataGridCollectionView.md&amp;value=---%0Auid%3A%20Avalonia.Collections.IDataGridCollectionView%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">
+      <meta name="loc:inThisArticle" content="In this article">
+      <meta name="loc:searchResultsCount" content="{count} results for &quot;{query}&quot;">
+      <meta name="loc:searchNoResults" content="No results for &quot;{query}&quot;">
+      <meta name="loc:tocFilter" content="Filter by title">
+      <meta name="loc:nextArticle" content="Next">
+      <meta name="loc:prevArticle" content="Previous">
+      <meta name="loc:themeLight" content="Light">
+      <meta name="loc:themeDark" content="Dark">
+      <meta name="loc:themeAuto" content="Auto">
+      <meta name="loc:changeTheme" content="Change theme">
+      <meta name="loc:copy" content="Copy">
+      <meta name="loc:downloadPdf" content="Download PDF">
+
+      <script type="module" src="./../public/docfx.min.js"></script>
+
+      <script>
+        const theme = localStorage.getItem('theme') || 'auto'
+        document.documentElement.setAttribute('data-bs-theme', theme === 'auto' ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light') : theme)
+      </script>
+
+  </head>
+
+  <body class="tex2jax_ignore" data-layout="" data-yaml-mime="ManagedReference">
+    <header class="bg-body border-bottom">
+      <nav id="autocollapse" class="navbar navbar-expand-md" role="navigation">
+        <div class="container-xxl flex-nowrap">
+          <a class="navbar-brand" href="../index.html">
+            <img id="logo" class="svg" src="../images/logo.svg" alt="">
+            
+          </a>
+          <button class="btn btn-lg d-md-none border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navpanel" aria-controls="navpanel" aria-expanded="false" aria-label="Toggle navigation">
+            <i class="bi bi-three-dots"></i>
+          </button>
+          <div class="collapse navbar-collapse" id="navpanel">
+            <div id="navbar">
+            </div>
+          </div>
+        </div>
+      </nav>
+    </header>
+
+    <main class="container-xxl">
+      <div class="toc-offcanvas">
+        <div class="offcanvas-md offcanvas-start" tabindex="-1" id="tocOffcanvas" aria-labelledby="tocOffcanvasLabel">
+          <div class="offcanvas-header">
+            <h5 class="offcanvas-title" id="tocOffcanvasLabel">Table of Contents</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="offcanvas" data-bs-target="#tocOffcanvas" aria-label="Close"></button>
+          </div>
+          <div class="offcanvas-body">
+            <nav class="toc" id="toc"></nav>
+          </div>
+        </div>
+      </div>
+
+      <div class="content">
+        <div class="actionbar">
+          <button class="btn btn-lg border-0 d-md-none" type="button" data-bs-toggle="offcanvas" data-bs-target="#tocOffcanvas" aria-controls="tocOffcanvas" aria-expanded="false" aria-label="Show table of contents">
+            <i class="bi bi-list"></i>
+          </button>
+
+          <nav id="breadcrumb"></nav>
+        </div>
+
+        <article data-uid="Avalonia.Collections.IDataGridCollectionView">
+
+
+
+  <h1 id="Avalonia_Collections_IDataGridCollectionView" data-uid="Avalonia.Collections.IDataGridCollectionView" class="text-break">
+Interface IDataGridCollectionView  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/Docs/src/Avalonia.Controls.DataGrid/Collections/IDataGridCollectionView.cs/#L75"><i class="bi bi-code-slash"></i></a>
+  </h1>
+
+  <div class="facts text-secondary">
+    <dl><dt>Namespace</dt><dd><a class="xref" href="Avalonia.html">Avalonia</a>.<a class="xref" href="Avalonia.Collections.html">Collections</a></dd></dl>
+  <dl><dt>Assembly</dt><dd>Avalonia.Controls.DataGrid.dll</dd></dl>
+  </div>
+
+  <div class="markdown summary"><p>Enables collections to have the functionalities of current record management, custom sorting, filtering, and grouping.</p>
+</div>
+  <div class="markdown conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public interface IDataGridCollectionView : IEnumerable, INotifyCollectionChanged</code></pre>
+  </div>
+
+
+
+
+
+
+
+  <dl class="typelist inheritedMembers">
+    <dt>Inherited Members</dt>
+    <dd>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.ienumerable.getenumerator">IEnumerable.GetEnumerator()</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.specialized.inotifycollectionchanged.collectionchanged">INotifyCollectionChanged.CollectionChanged</a>
+    </div>
+  </dd></dl>
+
+
+
+
+
+
+  <h2 class="section" id="properties">Properties
+</h2>
+
+
+  <a id="Avalonia_Collections_IDataGridCollectionView_CanFilter_" data-uid="Avalonia.Collections.IDataGridCollectionView.CanFilter*"></a>
+
+  <h3 id="Avalonia_Collections_IDataGridCollectionView_CanFilter" data-uid="Avalonia.Collections.IDataGridCollectionView.CanFilter">
+  CanFilter
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/Docs/src/Avalonia.Controls.DataGrid/Collections/IDataGridCollectionView.cs/#L100"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Gets a value that indicates whether this view supports filtering by way of the <span class="xref">System.ComponentModel.ICollectionView.Filter</span> property.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">bool CanFilter { get; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></dt>
+    <dd><p>true if this view supports filtering; otherwise, false.</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="Avalonia_Collections_IDataGridCollectionView_CanGroup_" data-uid="Avalonia.Collections.IDataGridCollectionView.CanGroup*"></a>
+
+  <h3 id="Avalonia_Collections_IDataGridCollectionView_CanGroup" data-uid="Avalonia.Collections.IDataGridCollectionView.CanGroup">
+  CanGroup
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/Docs/src/Avalonia.Controls.DataGrid/Collections/IDataGridCollectionView.cs/#L112"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Gets a value that indicates whether this view supports grouping by way of the <span class="xref">System.ComponentModel.ICollectionView.GroupDescriptions</span> property.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">bool CanGroup { get; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></dt>
+    <dd><p>true if this view supports grouping; otherwise, false.</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="Avalonia_Collections_IDataGridCollectionView_CanSort_" data-uid="Avalonia.Collections.IDataGridCollectionView.CanSort*"></a>
+
+  <h3 id="Avalonia_Collections_IDataGridCollectionView_CanSort" data-uid="Avalonia.Collections.IDataGridCollectionView.CanSort">
+  CanSort
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/Docs/src/Avalonia.Controls.DataGrid/Collections/IDataGridCollectionView.cs/#L108"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Gets a value that indicates whether this view supports sorting by way of the <span class="xref">System.ComponentModel.ICollectionView.SortDescriptions</span> property.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">bool CanSort { get; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></dt>
+    <dd><p>true if this view supports sorting; otherwise, false.</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="Avalonia_Collections_IDataGridCollectionView_Culture_" data-uid="Avalonia.Collections.IDataGridCollectionView.Culture*"></a>
+
+  <h3 id="Avalonia_Collections_IDataGridCollectionView_Culture" data-uid="Avalonia.Collections.IDataGridCollectionView.Culture">
+  Culture
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/Docs/src/Avalonia.Controls.DataGrid/Collections/IDataGridCollectionView.cs/#L83"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Gets or sets the cultural information for any operations of the view that may differ by culture, such as sorting.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">CultureInfo Culture { get; set; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.globalization.cultureinfo">CultureInfo</a></dt>
+    <dd><p>The culture information to use during culture-sensitive operations.</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="Avalonia_Collections_IDataGridCollectionView_CurrentItem_" data-uid="Avalonia.Collections.IDataGridCollectionView.CurrentItem*"></a>
+
+  <h3 id="Avalonia_Collections_IDataGridCollectionView_CurrentItem" data-uid="Avalonia.Collections.IDataGridCollectionView.CurrentItem">
+  CurrentItem
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/Docs/src/Avalonia.Controls.DataGrid/Collections/IDataGridCollectionView.cs/#L139"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Gets the current item in the view.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">object CurrentItem { get; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object">object</a></dt>
+    <dd><p>The current item in the view or null if there is no current item.</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="Avalonia_Collections_IDataGridCollectionView_CurrentPosition_" data-uid="Avalonia.Collections.IDataGridCollectionView.CurrentPosition*"></a>
+
+  <h3 id="Avalonia_Collections_IDataGridCollectionView_CurrentPosition" data-uid="Avalonia.Collections.IDataGridCollectionView.CurrentPosition">
+  CurrentPosition
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/Docs/src/Avalonia.Controls.DataGrid/Collections/IDataGridCollectionView.cs/#L143"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Gets the ordinal position of the <span class="xref">System.ComponentModel.ICollectionView.CurrentItem</span> in the view.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">int CurrentPosition { get; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a></dt>
+    <dd><p>The ordinal position of the <span class="xref">System.ComponentModel.ICollectionView.CurrentItem</span> in the view.</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="Avalonia_Collections_IDataGridCollectionView_Filter_" data-uid="Avalonia.Collections.IDataGridCollectionView.Filter*"></a>
+
+  <h3 id="Avalonia_Collections_IDataGridCollectionView_Filter" data-uid="Avalonia.Collections.IDataGridCollectionView.Filter">
+  Filter
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/Docs/src/Avalonia.Controls.DataGrid/Collections/IDataGridCollectionView.cs/#L96"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Gets or sets a callback that is used to determine whether an item is appropriate for inclusion in the view.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">Func&lt;object, bool&gt; Filter { get; set; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.func-2">Func</a>&lt;<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object">object</a>, <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a>&gt;</dt>
+    <dd><p>A method that is used to determine whether an item is appropriate for inclusion in the view.</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="Avalonia_Collections_IDataGridCollectionView_GroupingDepth_" data-uid="Avalonia.Collections.IDataGridCollectionView.GroupingDepth*"></a>
+
+  <h3 id="Avalonia_Collections_IDataGridCollectionView_GroupingDepth" data-uid="Avalonia.Collections.IDataGridCollectionView.GroupingDepth">
+  GroupingDepth
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/Docs/src/Avalonia.Controls.DataGrid/Collections/IDataGridCollectionView.cs/#L119"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">int GroupingDepth { get; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="Avalonia_Collections_IDataGridCollectionView_Groups_" data-uid="Avalonia.Collections.IDataGridCollectionView.Groups*"></a>
+
+  <h3 id="Avalonia_Collections_IDataGridCollectionView_Groups" data-uid="Avalonia.Collections.IDataGridCollectionView.Groups">
+  Groups
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/Docs/src/Avalonia.Controls.DataGrid/Collections/IDataGridCollectionView.cs/#L124"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Gets the top-level groups.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">IAvaloniaReadOnlyList&lt;object&gt; Groups { get; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><span class="xref">IAvaloniaReadOnlyList</span>&lt;<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object">object</a>&gt;</dt>
+    <dd><p>A read-only collection of the top-level groups or null if there are no groups.</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="Avalonia_Collections_IDataGridCollectionView_IsCurrentAfterLast_" data-uid="Avalonia.Collections.IDataGridCollectionView.IsCurrentAfterLast*"></a>
+
+  <h3 id="Avalonia_Collections_IDataGridCollectionView_IsCurrentAfterLast" data-uid="Avalonia.Collections.IDataGridCollectionView.IsCurrentAfterLast">
+  IsCurrentAfterLast
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/Docs/src/Avalonia.Controls.DataGrid/Collections/IDataGridCollectionView.cs/#L147"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Gets a value that indicates whether the <span class="xref">System.ComponentModel.ICollectionView.CurrentItem</span> of the view is beyond the end of the collection.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">bool IsCurrentAfterLast { get; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></dt>
+    <dd><p>true if the <span class="xref">System.ComponentModel.ICollectionView.CurrentItem</span> of the view is beyond the end of the collection; otherwise, false.</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="Avalonia_Collections_IDataGridCollectionView_IsCurrentBeforeFirst_" data-uid="Avalonia.Collections.IDataGridCollectionView.IsCurrentBeforeFirst*"></a>
+
+  <h3 id="Avalonia_Collections_IDataGridCollectionView_IsCurrentBeforeFirst" data-uid="Avalonia.Collections.IDataGridCollectionView.IsCurrentBeforeFirst">
+  IsCurrentBeforeFirst
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/Docs/src/Avalonia.Controls.DataGrid/Collections/IDataGridCollectionView.cs/#L151"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Gets a value that indicates whether the <span class="xref">System.ComponentModel.ICollectionView.CurrentItem</span> of the view is beyond the start of the collection.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">bool IsCurrentBeforeFirst { get; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></dt>
+    <dd><p>true if the <span class="xref">System.ComponentModel.ICollectionView.CurrentItem</span> of the view is beyond the start of the collection; otherwise, false.</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="Avalonia_Collections_IDataGridCollectionView_IsEmpty_" data-uid="Avalonia.Collections.IDataGridCollectionView.IsEmpty*"></a>
+
+  <h3 id="Avalonia_Collections_IDataGridCollectionView_IsEmpty" data-uid="Avalonia.Collections.IDataGridCollectionView.IsEmpty">
+  IsEmpty
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/Docs/src/Avalonia.Controls.DataGrid/Collections/IDataGridCollectionView.cs/#L128"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Gets a value that indicates whether the view is empty.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">bool IsEmpty { get; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></dt>
+    <dd><p>true if the view is empty; otherwise, false.</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="Avalonia_Collections_IDataGridCollectionView_IsGrouping_" data-uid="Avalonia.Collections.IDataGridCollectionView.IsGrouping*"></a>
+
+  <h3 id="Avalonia_Collections_IDataGridCollectionView_IsGrouping" data-uid="Avalonia.Collections.IDataGridCollectionView.IsGrouping">
+  IsGrouping
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/Docs/src/Avalonia.Controls.DataGrid/Collections/IDataGridCollectionView.cs/#L118"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Gets a collection of <span class="xref">System.ComponentModel.GroupDescription</span> objects that describe how the items in the collection are grouped in the view.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">bool IsGrouping { get; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></dt>
+    <dd><p>A collection of objects that describe how the items in the collection are grouped in the view.</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="Avalonia_Collections_IDataGridCollectionView_SortDescriptions_" data-uid="Avalonia.Collections.IDataGridCollectionView.SortDescriptions*"></a>
+
+  <h3 id="Avalonia_Collections_IDataGridCollectionView_SortDescriptions" data-uid="Avalonia.Collections.IDataGridCollectionView.SortDescriptions">
+  SortDescriptions
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/Docs/src/Avalonia.Controls.DataGrid/Collections/IDataGridCollectionView.cs/#L104"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Gets a collection of <span class="xref">System.ComponentModel.SortDescription</span> instances that describe how the items in the collection are sorted in the view.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">DataGridSortDescriptionCollection SortDescriptions { get; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="Avalonia.Collections.DataGridSortDescriptionCollection.html">DataGridSortDescriptionCollection</a></dt>
+    <dd><p>A collection of values that describe how the items in the collection are sorted in the view.</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="Avalonia_Collections_IDataGridCollectionView_SourceCollection_" data-uid="Avalonia.Collections.IDataGridCollectionView.SourceCollection*"></a>
+
+  <h3 id="Avalonia_Collections_IDataGridCollectionView_SourceCollection" data-uid="Avalonia.Collections.IDataGridCollectionView.SourceCollection">
+  SourceCollection
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/Docs/src/Avalonia.Controls.DataGrid/Collections/IDataGridCollectionView.cs/#L92"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Gets the underlying collection.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">IEnumerable SourceCollection { get; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.ienumerable">IEnumerable</a></dt>
+    <dd><p>The underlying collection.</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <h2 class="section" id="methods">Methods
+</h2>
+
+
+  <a id="Avalonia_Collections_IDataGridCollectionView_Contains_" data-uid="Avalonia.Collections.IDataGridCollectionView.Contains*"></a>
+
+  <h3 id="Avalonia_Collections_IDataGridCollectionView_Contains_System_Object_" data-uid="Avalonia.Collections.IDataGridCollectionView.Contains(System.Object)">
+  Contains(object)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/Docs/src/Avalonia.Controls.DataGrid/Collections/IDataGridCollectionView.cs/#L88"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Indicates whether the specified item belongs to this collection view.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">bool Contains(object item)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>item</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object">object</a></dt>
+    <dd><p>The object to check.</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></dt>
+    <dd><p>true if the item belongs to this collection view; otherwise, false.</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Avalonia_Collections_IDataGridCollectionView_DeferRefresh_" data-uid="Avalonia.Collections.IDataGridCollectionView.DeferRefresh*"></a>
+
+  <h3 id="Avalonia_Collections_IDataGridCollectionView_DeferRefresh" data-uid="Avalonia.Collections.IDataGridCollectionView.DeferRefresh">
+  DeferRefresh()
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/Docs/src/Avalonia.Controls.DataGrid/Collections/IDataGridCollectionView.cs/#L135"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Enters a defer cycle that you can use to merge changes to the view and delay automatic refresh.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">IDisposable DeferRefresh()</code></pre>
+  </div>
+
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.idisposable">IDisposable</a></dt>
+    <dd><p>The typical usage is to create a using scope with an implementation of this method and then include multiple view-changing calls within the scope. The implementation should delay automatic refresh until after the using scope exits.</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Avalonia_Collections_IDataGridCollectionView_GetGroupingPropertyNameAtDepth_" data-uid="Avalonia.Collections.IDataGridCollectionView.GetGroupingPropertyNameAtDepth*"></a>
+
+  <h3 id="Avalonia_Collections_IDataGridCollectionView_GetGroupingPropertyNameAtDepth_System_Int32_" data-uid="Avalonia.Collections.IDataGridCollectionView.GetGroupingPropertyNameAtDepth(System.Int32)">
+  GetGroupingPropertyNameAtDepth(int)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/Docs/src/Avalonia.Controls.DataGrid/Collections/IDataGridCollectionView.cs/#L120"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">string GetGroupingPropertyNameAtDepth(int level)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>level</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a></dt>
+    <dd></dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Avalonia_Collections_IDataGridCollectionView_MoveCurrentTo_" data-uid="Avalonia.Collections.IDataGridCollectionView.MoveCurrentTo*"></a>
+
+  <h3 id="Avalonia_Collections_IDataGridCollectionView_MoveCurrentTo_System_Object_" data-uid="Avalonia.Collections.IDataGridCollectionView.MoveCurrentTo(System.Object)">
+  MoveCurrentTo(object)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/Docs/src/Avalonia.Controls.DataGrid/Collections/IDataGridCollectionView.cs/#L172"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Sets the specified item in the view as the <span class="xref">System.ComponentModel.ICollectionView.CurrentItem</span>.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">bool MoveCurrentTo(object item)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>item</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object">object</a></dt>
+    <dd><p>The item to set as the current item.</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></dt>
+    <dd><p>true if the resulting <span class="xref">System.ComponentModel.ICollectionView.CurrentItem</span> is an item in the view; otherwise, false.</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Avalonia_Collections_IDataGridCollectionView_MoveCurrentToFirst_" data-uid="Avalonia.Collections.IDataGridCollectionView.MoveCurrentToFirst*"></a>
+
+  <h3 id="Avalonia_Collections_IDataGridCollectionView_MoveCurrentToFirst" data-uid="Avalonia.Collections.IDataGridCollectionView.MoveCurrentToFirst">
+  MoveCurrentToFirst()
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/Docs/src/Avalonia.Controls.DataGrid/Collections/IDataGridCollectionView.cs/#L155"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Sets the first item in the view as the <span class="xref">System.ComponentModel.ICollectionView.CurrentItem</span>.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">bool MoveCurrentToFirst()</code></pre>
+  </div>
+
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></dt>
+    <dd><p>true if the resulting <span class="xref">System.ComponentModel.ICollectionView.CurrentItem</span> is an item in the view; otherwise, false.</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Avalonia_Collections_IDataGridCollectionView_MoveCurrentToLast_" data-uid="Avalonia.Collections.IDataGridCollectionView.MoveCurrentToLast*"></a>
+
+  <h3 id="Avalonia_Collections_IDataGridCollectionView_MoveCurrentToLast" data-uid="Avalonia.Collections.IDataGridCollectionView.MoveCurrentToLast">
+  MoveCurrentToLast()
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/Docs/src/Avalonia.Controls.DataGrid/Collections/IDataGridCollectionView.cs/#L159"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Sets the last item in the view as the <span class="xref">System.ComponentModel.ICollectionView.CurrentItem</span>.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">bool MoveCurrentToLast()</code></pre>
+  </div>
+
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></dt>
+    <dd><p>true if the resulting <span class="xref">System.ComponentModel.ICollectionView.CurrentItem</span> is an item in the view; otherwise, false.</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Avalonia_Collections_IDataGridCollectionView_MoveCurrentToNext_" data-uid="Avalonia.Collections.IDataGridCollectionView.MoveCurrentToNext*"></a>
+
+  <h3 id="Avalonia_Collections_IDataGridCollectionView_MoveCurrentToNext" data-uid="Avalonia.Collections.IDataGridCollectionView.MoveCurrentToNext">
+  MoveCurrentToNext()
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/Docs/src/Avalonia.Controls.DataGrid/Collections/IDataGridCollectionView.cs/#L163"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Sets the item after the <span class="xref">System.ComponentModel.ICollectionView.CurrentItem</span> in the view as the <span class="xref">System.ComponentModel.ICollectionView.CurrentItem</span>.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">bool MoveCurrentToNext()</code></pre>
+  </div>
+
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></dt>
+    <dd><p>true if the resulting <span class="xref">System.ComponentModel.ICollectionView.CurrentItem</span> is an item in the view; otherwise, false.</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Avalonia_Collections_IDataGridCollectionView_MoveCurrentToPosition_" data-uid="Avalonia.Collections.IDataGridCollectionView.MoveCurrentToPosition*"></a>
+
+  <h3 id="Avalonia_Collections_IDataGridCollectionView_MoveCurrentToPosition_System_Int32_" data-uid="Avalonia.Collections.IDataGridCollectionView.MoveCurrentToPosition(System.Int32)">
+  MoveCurrentToPosition(int)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/Docs/src/Avalonia.Controls.DataGrid/Collections/IDataGridCollectionView.cs/#L177"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Sets the item at the specified index to be the <span class="xref">System.ComponentModel.ICollectionView.CurrentItem</span> in the view.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">bool MoveCurrentToPosition(int position)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>position</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a></dt>
+    <dd><p>The index to set the <span class="xref">System.ComponentModel.ICollectionView.CurrentItem</span> to.</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></dt>
+    <dd><p>true if the resulting <span class="xref">System.ComponentModel.ICollectionView.CurrentItem</span> is an item in the view; otherwise, false.</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Avalonia_Collections_IDataGridCollectionView_MoveCurrentToPrevious_" data-uid="Avalonia.Collections.IDataGridCollectionView.MoveCurrentToPrevious*"></a>
+
+  <h3 id="Avalonia_Collections_IDataGridCollectionView_MoveCurrentToPrevious" data-uid="Avalonia.Collections.IDataGridCollectionView.MoveCurrentToPrevious">
+  MoveCurrentToPrevious()
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/Docs/src/Avalonia.Controls.DataGrid/Collections/IDataGridCollectionView.cs/#L167"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Sets the item before the <span class="xref">System.ComponentModel.ICollectionView.CurrentItem</span> in the view to the <span class="xref">System.ComponentModel.ICollectionView.CurrentItem</span>.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">bool MoveCurrentToPrevious()</code></pre>
+  </div>
+
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></dt>
+    <dd><p>true if the resulting <span class="xref">System.ComponentModel.ICollectionView.CurrentItem</span> is an item in the view; otherwise, false.</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Avalonia_Collections_IDataGridCollectionView_Refresh_" data-uid="Avalonia.Collections.IDataGridCollectionView.Refresh*"></a>
+
+  <h3 id="Avalonia_Collections_IDataGridCollectionView_Refresh" data-uid="Avalonia.Collections.IDataGridCollectionView.Refresh">
+  Refresh()
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/Docs/src/Avalonia.Controls.DataGrid/Collections/IDataGridCollectionView.cs/#L131"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Recreates the view.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">void Refresh()</code></pre>
+  </div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  <h2 class="section" id="events">Events
+</h2>
+
+
+
+  <h3 id="Avalonia_Collections_IDataGridCollectionView_CurrentChanged" data-uid="Avalonia.Collections.IDataGridCollectionView.CurrentChanged">
+  CurrentChanged
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/Docs/src/Avalonia.Controls.DataGrid/Collections/IDataGridCollectionView.cs/#L183"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Occurs after the current item has been changed.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">event EventHandler CurrentChanged</code></pre>
+  </div>
+
+
+
+
+
+
+  <h4 class="section">Event Type</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.eventhandler">EventHandler</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <h3 id="Avalonia_Collections_IDataGridCollectionView_CurrentChanging" data-uid="Avalonia.Collections.IDataGridCollectionView.CurrentChanging">
+  CurrentChanging
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/Docs/src/Avalonia.Controls.DataGrid/Collections/IDataGridCollectionView.cs/#L180"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Occurs before the current item changes.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">event EventHandler&lt;DataGridCurrentChangingEventArgs&gt; CurrentChanging</code></pre>
+  </div>
+
+
+
+
+
+
+  <h4 class="section">Event Type</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.eventhandler-1">EventHandler</a>&lt;<a class="xref" href="Avalonia.Collections.DataGridCurrentChangingEventArgs.html">DataGridCurrentChangingEventArgs</a>&gt;</dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+</article>
+
+        <div class="contribution d-print-none">
+          <a href="https://github.com/wieslawsoltes/ProDataGrid/blob/Docs/src/Avalonia.Controls.DataGrid/Collections/IDataGridCollectionView.cs/#L75" class="edit-link">Edit this page</a>
+        </div>
+
+
+      </div>
+
+      <div class="affix">
+        <nav id="affix"></nav>
+      </div>
+    </main>
+
+
+    <footer class="border-top text-secondary">
+      <div class="container-xxl">
+        <div class="flex-fill">
+          <span>Made with <a href="https://dotnet.github.io/docfx">docfx</a></span>
+        </div>
+      </div>
+    </footer>
+  </body>
+</html>
