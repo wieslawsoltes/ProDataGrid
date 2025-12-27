@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400" width="38" height="38">
+  <!-- Background -->
+  <rect x="25" y="25" width="350" height="350" rx="50" ry="50" fill="#6366f1"/>
+  
+  <!-- Simple 3x3 grid -->
+  <!-- Horizontal lines -->
+  <rect x="75" y="75" width="250" height="19" fill="white"/>
+  <rect x="75" y="187" width="250" height="12" fill="white"/>
+  <rect x="75" y="300" width="250" height="12" fill="white"/>
+  
+  <!-- Vertical lines -->
+  <rect x="75" y="75" width="12" height="237" fill="white"/>
+  <rect x="194" y="75" width="12" height="237" fill="white"/>
+  <rect x="313" y="75" width="12" height="237" fill="white"/>
+</svg>

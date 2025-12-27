@@ -328,3 +328,8 @@ ASALocalRun/
 
 # MFractors (Xamarin productivity tool) working folder 
 .mfractor/
+
+# DocFX output
+/_site
+docfx/api/*.yml
+docfx/api/*.manifest
