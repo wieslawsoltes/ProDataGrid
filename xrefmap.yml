@@ -27523,6 +27523,34 @@ references:
   isSpec: "True"
   fullName: Avalonia.Controls.RowHeightEstimatorState.EstimatorType
   nameWithType: RowHeightEstimatorState.EstimatorType
+- uid: Avalonia.Controls.Selection
+  name: Avalonia.Controls.Selection
+  href: api/Avalonia.Controls.Selection.html
+  commentId: N:Avalonia.Controls.Selection
+  fullName: Avalonia.Controls.Selection
+  nameWithType: Avalonia.Controls.Selection
+- uid: Avalonia.Controls.Selection.SelectionModelItemExtensions
+  name: SelectionModelItemExtensions
+  href: api/Avalonia.Controls.Selection.SelectionModelItemExtensions.html
+  commentId: T:Avalonia.Controls.Selection.SelectionModelItemExtensions
+  fullName: Avalonia.Controls.Selection.SelectionModelItemExtensions
+  nameWithType: SelectionModelItemExtensions
+- uid: Avalonia.Controls.Selection.SelectionModelItemExtensions.Select(Avalonia.Controls.Selection.ISelectionModel,System.Object)
+  name: Select(ISelectionModel, object)
+  href: api/Avalonia.Controls.Selection.SelectionModelItemExtensions.html#Avalonia_Controls_Selection_SelectionModelItemExtensions_Select_Avalonia_Controls_Selection_ISelectionModel_System_Object_
+  commentId: M:Avalonia.Controls.Selection.SelectionModelItemExtensions.Select(Avalonia.Controls.Selection.ISelectionModel,System.Object)
+  name.vb: Select(ISelectionModel, Object)
+  fullName: Avalonia.Controls.Selection.SelectionModelItemExtensions.Select(Avalonia.Controls.Selection.ISelectionModel, object)
+  fullName.vb: Avalonia.Controls.Selection.SelectionModelItemExtensions.Select(Avalonia.Controls.Selection.ISelectionModel, Object)
+  nameWithType: SelectionModelItemExtensions.Select(ISelectionModel, object)
+  nameWithType.vb: SelectionModelItemExtensions.Select(ISelectionModel, Object)
+- uid: Avalonia.Controls.Selection.SelectionModelItemExtensions.Select*
+  name: Select
+  href: api/Avalonia.Controls.Selection.SelectionModelItemExtensions.html#Avalonia_Controls_Selection_SelectionModelItemExtensions_Select_
+  commentId: Overload:Avalonia.Controls.Selection.SelectionModelItemExtensions.Select
+  isSpec: "True"
+  fullName: Avalonia.Controls.Selection.SelectionModelItemExtensions.Select
+  nameWithType: SelectionModelItemExtensions.Select
 - uid: Avalonia.Controls.Utils
   name: Avalonia.Controls.Utils
   href: api/Avalonia.Controls.Utils.html

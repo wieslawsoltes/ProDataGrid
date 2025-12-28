@@ -3196,6 +3196,34 @@
     },
     {
       "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.Selection.SelectionModelItemExtensions.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.Selection.SelectionModelItemExtensions.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.Selection.SelectionModelItemExtensions",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.Selection.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.Selection.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.Selection",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
       "source_relative_path": "api/Avalonia.Controls.Utils.ICellEditBinding.yml",
       "output": {
         ".html": {
