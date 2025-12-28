@@ -3435,6 +3435,16 @@
     },
     {
       "type": "Conceptual",
+      "source_relative_path": "articles/column-types-reference.md",
+      "output": {
+        ".html": {
+          "relative_path": "articles/column-types-reference.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "Conceptual",
       "source_relative_path": "articles/columns-and-editing.md",
       "output": {
         ".html": {
@@ -3449,6 +3459,16 @@
       "output": {
         ".html": {
           "relative_path": "articles/data-operations.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "Conceptual",
+      "source_relative_path": "articles/data-sources-and-collection-views.md",
+      "output": {
+        ".html": {
+          "relative_path": "articles/data-sources-and-collection-views.html"
         }
       },
       "version": ""

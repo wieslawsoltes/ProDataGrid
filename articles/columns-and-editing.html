@@ -83,13 +83,12 @@
         <article data-uid="">
 <h1 id="columns-and-editing">Columns and Editing</h1>
 
-<p>ProDataGrid supports classic text/checkbox/template columns with flexible sizing, auto generation, and strong binding support. Editing is built in and can be combined with validation rules and row operations.</p>
+<p>ProDataGrid supports a wide range of built-in columns, flexible sizing, auto-generation, and strong binding support. Editing is built in and can be combined with validation rules and row operations.</p>
 <h2 id="basic-setup">Basic Setup</h2>
 <p>Basic layout with common column types and width modes (pixel, auto, star):</p>
 <pre><code class="lang-xml">&lt;DataGrid ItemsSource=&quot;{Binding People}&quot;
           AutoGenerateColumns=&quot;False&quot;
           CanUserResizeColumns=&quot;True&quot;
-          UseLogicalScrollable=&quot;True&quot;
           GridLinesVisibility=&quot;Horizontal&quot;&gt;
   &lt;DataGrid.Columns&gt;
     &lt;!-- Pixel width --&gt;
@@ -126,43 +125,33 @@
 &lt;/DataGrid&gt;
 </code></pre>
 <p>Widths accept pixel values (<code>&quot;80&quot;</code>), <code>Auto</code> (content-based), <code>*</code> or weighted stars (e.g., <code>2*</code>) that share remaining space.</p>
-<h2 id="column-types-and-sizing">Column Types and Sizing</h2>
+<h2 id="column-sizing-and-layout">Column Sizing and Layout</h2>
 <ul>
-<li>Built-in columns include <code>DataGridTextColumn</code>, <code>DataGridCheckBoxColumn</code>, <code>DataGridComboBoxColumn</code>, <code>DataGridHyperlinkColumn</code>, <code>DataGridDatePickerColumn</code>, <code>DataGridTimePickerColumn</code>, <code>DataGridNumericColumn</code>, <code>DataGridSliderColumn</code>, <code>DataGridToggleSwitchColumn</code>, <code>DataGridToggleButtonColumn</code>, <code>DataGridProgressBarColumn</code>, <code>DataGridAutoCompleteColumn</code>, <code>DataGridMaskedTextColumn</code>, <code>DataGridImageColumn</code>, <code>DataGridButtonColumn</code>, and <code>DataGridTemplateColumn</code>.</li>
-<li>Widths support pixel values, <code>Auto</code>, and star sizing (<code>*</code> or <code>2*</code>).</li>
-<li>Use the dedicated column types instead of templates when possible; they wire editing, formatting, and validation for you.</li>
+<li>Widths: pixel, <code>Auto</code>, and star sizing (<code>*</code>, <code>2*</code>).</li>
+<li>Constraints: <code>MinWidth</code>/<code>MaxWidth</code> per column.</li>
+<li>Interaction: <code>CanUserResizeColumns</code> and <code>CanUserReorderColumns</code> at the grid level; <code>CanUserResize</code>, <code>CanUserReorder</code>, and <code>CanUserSort</code> per column.</li>
+<li>Frozen columns: <code>FrozenColumnCount</code> and <code>FrozenColumnCountRight</code> pin columns on the left/right.</li>
 </ul>
-<pre><code class="lang-xml">&lt;DataGridTextColumn Header=&quot;Name&quot; Binding=&quot;{Binding Name}&quot; Width=&quot;*&quot; /&gt;
-&lt;DataGridCheckBoxColumn Header=&quot;Active&quot; Binding=&quot;{Binding IsActive}&quot; Width=&quot;80&quot; /&gt;
-&lt;DataGridTemplateColumn Header=&quot;Notes&quot; Width=&quot;2*&quot;&gt;
-  &lt;DataGridTemplateColumn.CellTemplate&gt;
-    &lt;DataTemplate&gt;
-      &lt;TextBlock Text=&quot;{Binding Notes}&quot; TextWrapping=&quot;Wrap&quot; /&gt;
-    &lt;/DataTemplate&gt;
-  &lt;/DataGridTemplateColumn.CellTemplate&gt;
-&lt;/DataGridTemplateColumn&gt;
-</code></pre>
-<h2 id="frozen-columns">Frozen Columns</h2>
-<p>Pin columns on the left or right using <code>FrozenColumnCount</code> and <code>FrozenColumnCountRight</code>:</p>
 <pre><code class="lang-xml">&lt;DataGrid FrozenColumnCount=&quot;1&quot;
-          FrozenColumnCountRight=&quot;1&quot; /&gt;
+          FrozenColumnCountRight=&quot;1&quot;
+          CanUserResizeColumns=&quot;True&quot;
+          CanUserReorderColumns=&quot;True&quot; /&gt;
 </code></pre>
-<h2 id="pixel-widths-and-horizontal-scrolling">Pixel Widths and Horizontal Scrolling</h2>
-<p>Fixed pixel widths pair well with <code>HorizontalScrollBarVisibility=&quot;Visible&quot;</code> for data-heavy layouts:</p>
-<pre><code class="lang-xml">&lt;DataGrid HorizontalScrollBarVisibility=&quot;Visible&quot;&gt;
-  &lt;DataGrid.Columns&gt;
-    &lt;DataGridTextColumn Header=&quot;ID&quot; Width=&quot;80&quot; Binding=&quot;{Binding Id}&quot; /&gt;
-    &lt;DataGridTextColumn Header=&quot;Description&quot; Width=&quot;900&quot; Binding=&quot;{Binding Description}&quot; /&gt;
-  &lt;/DataGrid.Columns&gt;
-&lt;/DataGrid&gt;
-</code></pre>
-<h2 id="auto-generated-and-programmatic-columns">Auto-Generated and Programmatic Columns</h2>
+<h2 id="headers-sorting-and-filters">Headers, Sorting, and Filters</h2>
+<p>Columns expose header content and sorting metadata:</p>
+<ul>
+<li><code>Header</code> and <code>HeaderTemplate</code> define the column header content.</li>
+<li><code>SortMemberPath</code> controls which property is sorted when the header is clicked.</li>
+<li><code>SortDirection</code> can be set to seed an initial sort glyph.</li>
+<li><code>ShowFilterButton</code> and <code>FilterFlyout</code> control the built-in filter glyph and flyout entry point.</li>
+</ul>
+<p>Filter glyphs are driven by the filtering model; see <a href="data-operations.html">Data Operations</a>.</p>
+<h2 id="auto-generated-and-bindable-columns">Auto-Generated and Bindable Columns</h2>
 <ul>
 <li>Turn on <code>AutoGenerateColumns</code> to build columns from the data model.</li>
 <li>Use <code>AutoGeneratingColumn</code> to customize headers, widths, and bindings.</li>
 <li>Build or replace the <code>Columns</code> collection at runtime for dynamic layouts.</li>
 </ul>
-<h2 id="bindable-columns-and-auto-generated-placement">Bindable Columns and Auto-Generated Placement</h2>
 <p>Bind <code>Columns</code> to an <code>ObservableCollection&lt;DataGridColumn&gt;</code> to drive columns from a view-model. Control synchronization and placement when auto-generated columns are also enabled:</p>
 <ul>
 <li><code>ColumnsSynchronizationMode</code>: <code>OneWayToGrid</code> (default) or <code>TwoWay</code> to mirror grid structural changes back to the source.</li>
@@ -176,6 +165,30 @@
           AutoGeneratedColumnsPlacement=&quot;AfterSource&quot;
           AutoGenerateColumns=&quot;True&quot;
           HeadersVisibility=&quot;All&quot; /&gt;
+</code></pre>
+<h2 id="editing-and-row-operations">Editing and Row Operations</h2>
+<ul>
+<li><code>IsReadOnly</code> on the grid or column disables editing.</li>
+<li>Editing lifecycle: <code>BeginningEdit</code>, <code>PreparingCellForEdit</code>, <code>CellEditEnding</code>, <code>CellEditEnded</code>, <code>RowEditEnding</code>, <code>RowEditEnded</code>.</li>
+<li>Programmatic flow: <code>BeginEdit</code>, <code>CommitEdit</code>, <code>CancelEdit</code>.</li>
+<li><code>CanUserAddRows</code> and <code>CanUserDeleteRows</code> enable add/delete when the collection view supports it.</li>
+<li><code>DataGridTemplateColumn.NewRowCellTemplate</code> lets you customize cells in the new-row placeholder.</li>
+</ul>
+<p>Validation integrates with Avalonia validation rules and per-column settings. See <a href="validation-and-errors.html">Validation and Errors</a>.</p>
+<h2 id="template-columns">Template Columns</h2>
+<p><code>DataGridTemplateColumn</code> gives full control over display and editing:</p>
+<pre><code class="lang-xml">&lt;DataGridTemplateColumn Header=&quot;Notes&quot; Width=&quot;2*&quot;&gt;
+  &lt;DataGridTemplateColumn.CellTemplate&gt;
+    &lt;DataTemplate&gt;
+      &lt;TextBlock Text=&quot;{Binding Notes}&quot; TextWrapping=&quot;Wrap&quot; /&gt;
+    &lt;/DataTemplate&gt;
+  &lt;/DataGridTemplateColumn.CellTemplate&gt;
+  &lt;DataGridTemplateColumn.CellEditingTemplate&gt;
+    &lt;DataTemplate&gt;
+      &lt;TextBox Text=&quot;{Binding Notes}&quot; AcceptsReturn=&quot;True&quot; /&gt;
+    &lt;/DataTemplate&gt;
+  &lt;/DataGridTemplateColumn.CellEditingTemplate&gt;
+&lt;/DataGridTemplateColumn&gt;
 </code></pre>
 <h2 id="datatable-binding">DataTable Binding</h2>
 <p>When binding to <code>DataTable.DefaultView</code>, ProDataGrid binds cells via <code>TypeDescriptor</code> so you do not need manual indexers.</p>
@@ -197,12 +210,8 @@ public class AccentTextColumn : DataGridTextColumn
     }
 }
 </code></pre>
-<h2 id="editing-adddelete-and-validation">Editing, Add/Delete, and Validation</h2>
-<ul>
-<li>In-place editing supports commit/cancel flows and keyboard navigation.</li>
-<li><code>CanUserAddRows</code>/<code>CanUserDeleteRows</code> control row creation and removal.</li>
-<li>Validation integrates with Avalonia validation rules and per-column settings. See <a href="validation-and-errors.html">Validation and Errors</a>.</li>
-</ul>
+<h2 id="column-types-reference">Column Types Reference</h2>
+<p>For a catalog of built-in column types and their main properties, see <a href="column-types-reference.html">Column Types Reference</a>.</p>
 
 </article>
 

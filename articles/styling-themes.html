@@ -104,6 +104,20 @@
   &lt;Setter Property=&quot;BorderThickness&quot; Value=&quot;0,0,0,2&quot; /&gt;
 &lt;/Style&gt;
 </code></pre>
+<p>Additional states you can style:</p>
+<ul>
+<li>Drag and drop: <code>DataGridRow:dragging</code>, <code>DataGridRow:drag-over-before</code>, <code>DataGridRow:drag-over-after</code>, <code>DataGridRow:drag-over-inside</code></li>
+<li>Grid flags: <code>DataGrid:row-drag-enabled</code>, <code>DataGrid:row-drag-handle-visible</code>, <code>DataGrid:summary-top</code>, <code>DataGrid:summary-bottom</code></li>
+</ul>
+<h2 id="control-theme-overrides">Control Theme Overrides</h2>
+<p>You can override control themes at the grid level:</p>
+<ul>
+<li><code>RowTheme</code> and <code>CellTheme</code></li>
+<li><code>ColumnHeaderTheme</code> and <code>ColumnHeaderFilterTheme</code></li>
+<li><code>RowGroupTheme</code></li>
+<li><code>SummaryRowTheme</code></li>
+</ul>
+<p>Use these when you need consistent styling across all rows/cells/headers without restyling templates.</p>
 <h2 id="column-themes">Column Themes</h2>
 <p>Column-specific styles let you highlight key columns or adjust alignment, formatting, and glyphs. Derived columns can reuse built-in cell themes through protected accessors and <code>ControlTheme</code> resources keyed in your app:</p>
 <ul>
@@ -119,6 +133,13 @@
 </code></pre>
 <h2 id="current-row-and-current-cell">Current Row and Current Cell</h2>
 <p>The current row and cell are exposed through <code>:current</code> so you can style focus and selection states independently.</p>
+<h2 id="styling-resources">Styling Resources</h2>
+<p>Common resource keys in <code>Themes/Generic.xaml</code> include:</p>
+<ul>
+<li><code>DataGridFilterFlyoutPresenterTheme</code> for filter flyout presentation.</li>
+<li><code>DataGridDropLocationIndicatorBrush</code> and <code>DataGridDropLocationIndicatorWidth</code> for drag/drop indicators.</li>
+<li><code>DataGridRowHeaderDragGripSize</code> for the drag handle glyph.</li>
+</ul>
 
 </article>
 

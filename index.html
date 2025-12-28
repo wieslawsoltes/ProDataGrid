@@ -69,7 +69,7 @@
         <article data-uid="">
 <h1 id="prodatagrid-for-avalonia">ProDataGrid for Avalonia</h1>
 
-<p><strong>ProDataGrid</strong> is a high-performance, feature-rich DataGrid control for <a href="https://github.com/AvaloniaUI/Avalonia">Avalonia</a>. It is a hard fork of the in-box <code>Avalonia.Controls.DataGrid</code>, tuned for stronger scrolling, richer selection, and advanced data operations while staying API compatible where it matters.</p>
+<p><strong>ProDataGrid</strong> is a high-performance, feature-rich DataGrid control for <a href="https://github.com/AvaloniaUI/Avalonia">Avalonia</a>. It is a hard fork of the in-box <code>Avalonia.Controls.DataGrid</code>, tuned for stronger scrolling, richer selection, and model-driven data operations while staying API compatible where it matters.</p>
 <h2 id="getting-started">Getting Started</h2>
 <h3 id="install">Install</h3>
 <pre><code class="lang-bash">dotnet add package ProDataGrid
@@ -98,6 +98,12 @@
 <p>Run the sample gallery to explore features and configuration patterns:</p>
 <pre><code class="lang-bash">dotnet run --project src/DataGridSample/DataGridSample.csproj
 </code></pre>
+<h2 id="core-concepts">Core Concepts</h2>
+<ul>
+<li><strong>Models</strong>: <code>SelectionModel</code>, <code>SortingModel</code>, <code>FilteringModel</code>, <code>SearchModel</code>, and <code>HierarchicalModel</code> keep UI state explicit and easy to integrate.</li>
+<li><strong>Collection view</strong>: <code>DataGridCollectionView</code> provides sorting, filtering, grouping, paging, and currency over any <code>IEnumerable</code>.</li>
+<li><strong>Templates</strong>: v2 themes switch to a <code>ScrollViewer</code> + <code>ILogicalScrollable</code> pipeline for smoother scrolling and better scroll chaining.</li>
+</ul>
 <h2 id="highlights">Highlights</h2>
 <table>
 <thead>
@@ -120,12 +126,20 @@
 <td>Sorting, filtering, grouping, paging, and search with pluggable models/adapters.</td>
 </tr>
 <tr>
+<td>Editing &amp; columns</td>
+<td>Rich built-in column types, flexible sizing, auto generation, row add/delete.</td>
+</tr>
+<tr>
 <td>Drag &amp; drop</td>
-<td>Row reordering with flat/hierarchical handlers and routed events.</td>
+<td>Row reordering with flat/hierarchical handlers, visuals, and routed events.</td>
+</tr>
+<tr>
+<td>Export &amp; state</td>
+<td>Clipboard export (text/CSV/HTML/JSON/Markdown/XML/YAML), state capture/restore.</td>
 </tr>
 <tr>
 <td>Styling</td>
-<td>Updated templates, column themes, and richer visuals.</td>
+<td>Updated templates, column themes, filter/search glyphs, and pseudo-classes.</td>
 </tr>
 </tbody>
 </table>

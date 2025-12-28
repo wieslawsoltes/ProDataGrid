@@ -83,7 +83,7 @@
         <article data-uid="">
 <h1 id="validation-and-error-states">Validation and Error States</h1>
 
-<p>ProDataGrid uses Avalonia validation to surface invalid cells and rows. Any validation source that Avalonia recognizes (for example, <code>DataValidationException</code> or <code>INotifyDataErrorInfo</code>) will mark the cell and row as invalid.</p>
+<p>ProDataGrid uses Avalonia validation to surface invalid cells and rows. Any validation source that Avalonia recognizes (for example, <code>DataValidationException</code>, <code>INotifyDataErrorInfo</code>, or <code>IDataErrorInfo</code>) will mark the cell and row as invalid.</p>
 <h2 id="throw-datavalidationexception">Throw DataValidationException</h2>
 <p>Raise <code>DataValidationException</code> from your model setters to trigger inline errors:</p>
 <pre><code class="lang-csharp">using Avalonia.Data;
@@ -114,6 +114,7 @@ public string Name
   &lt;Setter Property=&quot;Background&quot; Value=&quot;#FFF7E6&quot; /&gt;
 &lt;/Style&gt;
 </code></pre>
+<p>You can also restyle the <code>DataValidationErrors</code> theme used by cell templates via <code>DataGridCellDataValidationErrorsTheme</code> in <code>Themes/Generic.xaml</code>.</p>
 <h2 id="sample-reference">Sample Reference</h2>
 <p>See the <code>Validation</code> page in <code>src/DataGridSample</code> for validation across every editable column type (numeric, date/time, masked text, combo boxes, toggles, hyperlinks, and more).</p>
 

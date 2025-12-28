@@ -83,12 +83,11 @@
         <article data-uid="">
 <h1 id="introduction">Introduction</h1>
 
-<p>ProDataGrid is a high-performance DataGrid control for Avalonia. It builds on the classic <code>Avalonia.Controls.DataGrid</code> surface while adding richer models (selection, sorting, filtering), better scrolling behavior, and more control over virtualization and diagnostics.</p>
+<p>ProDataGrid is a high-performance DataGrid control for Avalonia. It builds on the classic <code>Avalonia.Controls.DataGrid</code> surface while adding model-driven data operations, improved scrolling behavior, and stronger customization hooks for virtualization, styling, and diagnostics.</p>
 <h2 id="about">About</h2>
-<p><code>ProDataGrid</code> is a hard fork of the original <code>Avalonia.Controls.DataGrid</code> control for <a href="https://github.com/AvaloniaUI/Avalonia">Avalonia</a>.</p>
-<p>It displays repeating data in a customizable grid with enhanced features and improved performance, and is maintained as an independent NuGet package to evolve faster than the in-box control.</p>
-<p><code>ProDiagnostics</code> is a hard fork of the original <code>Avalonia.Diagnostics</code> for <a href="https://github.com/AvaloniaUI/Avalonia">Avalonia</a>.</p>
-<h2 id="features">Features</h2>
+<p><code>ProDataGrid</code> is a hard fork of the original <code>Avalonia.Controls.DataGrid</code> control for <a href="https://github.com/AvaloniaUI/Avalonia">Avalonia</a>. It stays API compatible where it matters while moving faster on performance, data operations, and advanced scenarios.</p>
+<p><code>ProDiagnostics</code> is a hard fork of the original <code>Avalonia.Diagnostics</code> with the same goal: ship developer tools independently from the main Avalonia package.</p>
+<h2 id="key-capabilities">Key Capabilities</h2>
 <table>
 <thead>
 <tr>
@@ -99,41 +98,49 @@
 <tbody>
 <tr>
 <td>Virtualization &amp; scrolling</td>
-<td>ScrollViewer-based <code>ILogicalScrollable</code> presenter, smooth wheel/gesture handling, snap points, anchor support, predictive row prefetch, frozen columns.</td>
+<td>ScrollViewer-based <code>ILogicalScrollable</code> presenter, snap points, scroll anchoring, row height estimators, frozen columns.</td>
 </tr>
 <tr>
 <td>Columns</td>
-<td>Text, template, checkbox columns; auto/star/pixel sizing; reordering, resizing, visibility control, frozen sections.</td>
+<td>Wide range of built-in column types, flexible sizing, reordering/resizing, auto-generation, bindable columns.</td>
 </tr>
 <tr>
 <td>Rows</td>
-<td>Variable-height support with pluggable estimators; row details; grouping headers; selection modes; row headers.</td>
+<td>Variable-height support, row details, group headers/footers, selection modes, row headers.</td>
 </tr>
 <tr>
 <td>Drag &amp; drop</td>
-<td>Opt-in row drag/drop with header/row handles, multi-row moves, routed events, pluggable handlers (flat + hierarchical before/after/inside), and built-in visuals/auto-scroll.</td>
+<td>Opt-in row drag/drop with handle control, multi-row moves, routed events, pluggable handlers (flat + hierarchical).</td>
 </tr>
 <tr>
 <td>Editing &amp; navigation</td>
-<td>In-place editing, commit/cancel, keyboard navigation, clipboard copy modes, current cell tracking.</td>
+<td>In-place editing, commit/cancel flow, keyboard navigation, clipboard copy and export.</td>
 </tr>
 <tr>
 <td>Data operations</td>
-<td>Sorting, grouping, paging, currency management via <code>DataGridCollectionView</code> family; selection built on Avalonia <code>SelectionModel</code> for stable binding across sort/filter.</td>
+<td>Sorting, filtering, grouping, paging, and search via <code>DataGridCollectionView</code> and model adapters.</td>
 </tr>
 <tr>
 <td>Styling &amp; theming</td>
-<td>Fluent/Simple v2 ScrollViewer templates, row/cell styling, template overrides, theme resources, focus/selection visuals.</td>
+<td>Fluent/Simple v2 templates, theme resources, control themes, pseudo-classes for states.</td>
 </tr>
 <tr>
-<td>Data binding</td>
-<td>Auto-generates columns from <code>DataTable.DefaultView</code> and binds cells via TypeDescriptor (no manual indexers), <code>SelectedItems</code> two-way binding support, <code>DataGridCollectionView</code> for sorting/grouping/editing.</td>
+<td>State &amp; diagnostics</td>
+<td>Capture/restore state, selection stability, row lifecycle hooks for diagnostics.</td>
 </tr>
 </tbody>
 </table>
+<h2 id="architecture-snapshot">Architecture Snapshot</h2>
+<p>ProDataGrid exposes explicit models for key operations so you can integrate with external pipelines or server-side APIs:</p>
+<ul>
+<li><code>SelectionModel</code> (stable selection)</li>
+<li><code>SortingModel</code>, <code>FilteringModel</code>, and <code>SearchModel</code> (descriptors + adapters)</li>
+<li><code>HierarchicalModel</code> (flattened view of tree data)</li>
+<li><code>DataGridCollectionView</code> (sorting/filtering/grouping/paging + currency on any <code>IEnumerable</code>)</li>
+</ul>
 <h2 id="supported-targets">Supported Targets</h2>
 <ul>
-<li>.NET 6.0 and 10.0; .NET Standard 2.0 for compatibility.</li>
+<li>.NET 6.0, .NET 8.0, and .NET 10.0; .NET Standard 2.0 for compatibility.</li>
 <li>Avalonia 11.3.x (see <code>Directory.Packages.props</code>).</li>
 <li>Windows, Linux, and macOS (via Avalonia's cross-platform stack).</li>
 </ul>

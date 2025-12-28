@@ -90,8 +90,8 @@
 <pre><code class="lang-xml">&lt;PackageReference Include=&quot;ProDataGrid&quot; Version=&quot;...&quot; /&gt;
 </code></pre>
 <h2 id="enable-the-v2-templates">Enable the v2 Templates</h2>
-<p>The v2 templates provide the ScrollViewer-based layout and enable logical scrolling by default.</p>
-<h2 id="add-themes-in-appaxaml">Add Themes in App.axaml</h2>
+<p>The v2 templates provide the ScrollViewer-based layout and set <code>UseLogicalScrollable=&quot;True&quot;</code> by default.</p>
+<h3 id="add-themes-in-appaxaml">Add Themes in App.axaml</h3>
 <p>Include the ProDataGrid theme styles in your <code>App.axaml</code> so the templates are available application-wide.</p>
 <pre><code class="lang-xml">&lt;Application.Styles&gt;
   &lt;FluentTheme /&gt;
@@ -122,7 +122,6 @@
 <h2 id="create-a-basic-grid">Create a Basic Grid</h2>
 <pre><code class="lang-xml">&lt;DataGrid ItemsSource=&quot;{Binding Items}&quot;
           AutoGenerateColumns=&quot;False&quot;
-          UseLogicalScrollable=&quot;True&quot;
           CanUserResizeColumns=&quot;True&quot;&gt;
   &lt;DataGrid.Columns&gt;
     &lt;DataGridTextColumn Header=&quot;Id&quot; Binding=&quot;{Binding Id}&quot; Width=&quot;60&quot; /&gt;
@@ -131,9 +130,16 @@
   &lt;/DataGrid.Columns&gt;
 &lt;/DataGrid&gt;
 </code></pre>
+<p>If you want a quick start with auto-generated columns, set <code>AutoGenerateColumns=&quot;True&quot;</code> and omit the <code>Columns</code> collection.</p>
 <h2 id="run-the-sample-app">Run the Sample App</h2>
 <pre><code class="lang-bash">dotnet run --project src/DataGridSample/DataGridSample.csproj
 </code></pre>
+<h2 id="next-steps">Next Steps</h2>
+<ul>
+<li>Column configuration and editing: <a href="columns-and-editing.html">Columns and Editing</a></li>
+<li>Data sources and collection view: <a href="data-sources-and-collection-views.html">Data Sources and Collection Views</a></li>
+<li>Sorting/filtering/search: <a href="data-operations.html">Data Operations</a></li>
+</ul>
 
 </article>
 

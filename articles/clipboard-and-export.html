@@ -83,7 +83,7 @@
         <article data-uid="">
 <h1 id="clipboard-and-export">Clipboard and Export</h1>
 
-<p>ProDataGrid can copy selected rows or cells to the clipboard in multiple formats, with hooks for custom formatting.</p>
+<p>ProDataGrid can copy selected rows or cells to the clipboard in multiple formats, with hooks for custom formatting and export pipelines.</p>
 <h2 id="enable-clipboard-copy">Enable Clipboard Copy</h2>
 <p>Set <code>ClipboardCopyMode</code> and choose a selection unit. Plain text is always included; <code>ClipboardExportFormat</code> adds one extra format.</p>
 <pre><code class="lang-xml">&lt;DataGrid ClipboardCopyMode=&quot;IncludeHeader&quot;
@@ -91,6 +91,24 @@
           SelectionMode=&quot;Extended&quot;
           SelectionUnit=&quot;CellOrRowHeader&quot; /&gt;
 </code></pre>
+<p><code>ClipboardCopyMode</code> options:</p>
+<ul>
+<li><code>None</code>: disable copy handling.</li>
+<li><code>ExcludeHeader</code>: copy content only.</li>
+<li><code>IncludeHeader</code>: prepend headers to the clipboard payload.</li>
+</ul>
+<h2 id="export-formats">Export Formats</h2>
+<p><code>ClipboardExportFormat</code> controls the optional extra format added alongside plain text:</p>
+<ul>
+<li><code>Text</code> (tab-separated)</li>
+<li><code>Csv</code></li>
+<li><code>Html</code></li>
+<li><code>Markdown</code></li>
+<li><code>Xml</code></li>
+<li><code>Yaml</code></li>
+<li><code>Json</code></li>
+</ul>
+<p>Plain text is always included for compatibility with basic clipboard targets.</p>
 <h2 id="copy-on-demand">Copy On Demand</h2>
 <p>Call <code>CopySelectionToClipboard</code> to use the current format or override it.</p>
 <pre><code class="lang-csharp">using Avalonia.Controls;
@@ -122,7 +140,7 @@ ItemsGrid.CopyingRowClipboardContent += (_, e) =&gt;
 };
 </code></pre>
 <h2 id="custom-exporters">Custom Exporters</h2>
-<p>Override <code>ClipboardExporter</code> or supply <code>ClipboardFormatExporters</code> to add or replace formats.</p>
+<p>Override <code>ClipboardExporter</code> or supply <code>ClipboardFormatExporters</code> to add or replace formats. Built-in format exporters include Text, CSV, HTML, Markdown, XML, YAML, and JSON.</p>
 <pre><code class="lang-csharp">using Avalonia.Controls;
 
 ItemsGrid.ClipboardExporter = new JsonClipboardExporter();

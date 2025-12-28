@@ -102,6 +102,12 @@ var state = grid.CaptureState(DataGridStateSections.All, options);
 // Later
 grid.RestoreState(state, DataGridStateSections.All, options);
 </code></pre>
+<p>If you do not supply key selectors/resolvers, the grid falls back to using column instances and item references. For stable persistence across reloads, provide durable keys (such as IDs).</p>
+<h2 id="save-and-restore-layout-only">Save and Restore Layout Only</h2>
+<p>Use <code>SaveLayout</code> and <code>RestoreLayout</code> to persist column layout and view operations without selection/scroll state:</p>
+<pre><code class="lang-csharp">var layout = grid.SaveLayout(options);
+grid.RestoreLayout(layout, options);
+</code></pre>
 <h2 id="section-helpers">Section Helpers</h2>
 <p>Each section has dedicated capture/restore helpers:</p>
 <ul>
@@ -135,6 +141,7 @@ grid.TryRestoreScrollState(scroll, options);
 <li>Layout (Columns + Sorting + Filtering + Searching + Grouping)</li>
 <li>View (Sorting + Filtering + Searching + Grouping)</li>
 </ul>
+<p>Selection state includes the current cell when <code>SelectionUnit</code> includes cells.</p>
 
 </article>
 

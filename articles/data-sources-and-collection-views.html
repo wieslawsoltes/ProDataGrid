@@ -2,9 +2,9 @@
 <html>
   <head>
     <meta charset="utf-8">
-      <title>Summaries and Aggregation | ProDataGrid for Avalonia </title>
+      <title>Data Sources and Collection Views | ProDataGrid for Avalonia </title>
       <meta name="viewport" content="width=device-width, initial-scale=1.0">
-      <meta name="title" content="Summaries and Aggregation | ProDataGrid for Avalonia ">
+      <meta name="title" content="Data Sources and Collection Views | ProDataGrid for Avalonia ">
       
       
       <link rel="icon" href="../favicon.ico">
@@ -16,7 +16,7 @@
       
       
       
-      <meta name="docfx:docurl" content="https://github.com/wieslawsoltes/ProDataGrid/blob/master/docfx/articles/summaries.md/#L1">
+      <meta name="docfx:docurl" content="https://github.com/wieslawsoltes/ProDataGrid/blob/master/docfx/articles/data-sources-and-collection-views.md/#L1">
       <meta name="loc:inThisArticle" content="In this article">
       <meta name="loc:searchResultsCount" content="{count} results for &quot;{query}&quot;">
       <meta name="loc:searchNoResults" content="No results for &quot;{query}&quot;">
@@ -81,62 +81,56 @@
         </div>
 
         <article data-uid="">
-<h1 id="summaries-and-aggregation">Summaries and Aggregation</h1>
+<h1 id="data-sources-and-collection-views">Data Sources and Collection Views</h1>
 
-<p>ProDataGrid supports column summaries for totals and aggregates. Summaries can appear in total rows, group headers/footers, and hierarchical views.</p>
-<h2 id="total-and-group-summaries">Total and Group Summaries</h2>
-<p>Enable total and group summaries on the grid and attach summary descriptions to columns:</p>
-<pre><code class="lang-xml">&lt;DataGrid ShowTotalSummary=&quot;True&quot;
-          ShowGroupSummary=&quot;True&quot;
-          TotalSummaryPosition=&quot;Bottom&quot;
-          GroupSummaryPosition=&quot;Footer&quot;&gt;
-  &lt;DataGrid.Columns&gt;
-    &lt;DataGridTextColumn Header=&quot;Quantity&quot; Binding=&quot;{Binding Quantity}&quot;&gt;
-      &lt;DataGridTextColumn.Summaries&gt;
-        &lt;DataGridAggregateSummaryDescription Aggregate=&quot;Sum&quot;
-                                             Scope=&quot;Both&quot;
-                                             Title=&quot;Sum: &quot;
-                                             StringFormat=&quot;N0&quot; /&gt;
-      &lt;/DataGridTextColumn.Summaries&gt;
-    &lt;/DataGridTextColumn&gt;
-  &lt;/DataGrid.Columns&gt;
-&lt;/DataGrid&gt;
+<p>ProDataGrid accepts any <code>IEnumerable</code> as an <code>ItemsSource</code> and wraps it in a view to provide sorting, filtering, grouping, paging, and currency.</p>
+<h2 id="itemssource-and-view-creation">ItemsSource and View Creation</h2>
+<p>When you set <code>ItemsSource</code>, the grid chooses a view in this order:</p>
+<ol>
+<li>If the source is an <code>IDataGridCollectionView</code>, it is used directly.</li>
+<li>If the source implements <code>IDataGridCollectionViewFactory</code>, the grid calls <code>CreateView()</code> to get a custom view.</li>
+<li>Otherwise, the grid wraps the source in <code>DataGridCollectionView</code>.</li>
+</ol>
+<p>This means you can supply your own view for server-side or specialized data pipelines without subclassing the grid.</p>
+<h2 id="datagridcollectionview-basics">DataGridCollectionView Basics</h2>
+<p><code>DataGridCollectionView</code> lives in <code>Avalonia.Collections</code> and provides:</p>
+<ul>
+<li>Sorting (<code>SortDescriptions</code>)</li>
+<li>Filtering (<code>Filter</code>)</li>
+<li>Grouping (<code>GroupDescriptions</code>)</li>
+<li>Paging (<code>PageSize</code>, <code>PageIndex</code>, <code>MoveToPage</code>)</li>
+<li>Currency (<code>CurrentItem</code>, <code>CurrentChanged</code>)</li>
+<li>Batch updates (<code>DeferRefresh</code>)</li>
+</ul>
+<p>Example:</p>
+<pre><code class="lang-csharp">using Avalonia.Collections;
+using System.ComponentModel;
+
+var view = new DataGridCollectionView(items);
+view.SortDescriptions.Add(DataGridSortDescription.FromPath(&quot;Name&quot;, ListSortDirection.Ascending));
+view.Filter = item =&gt; ((Person)item).IsActive;
+view.GroupDescriptions.Add(new DataGridPathGroupDescription(&quot;Department&quot;));
+view.PageSize = 50;
+
+grid.ItemsSource = view;
 </code></pre>
-<p>Built-in aggregates include <code>Sum</code>, <code>Average</code>, <code>Count</code>, <code>CountDistinct</code>, <code>Min</code>, <code>Max</code>, <code>First</code>, and <code>Last</code>.</p>
-<p><code>GroupSummaryPosition</code> supports <code>Header</code>, <code>Footer</code>, or <code>Both</code>. <code>TotalSummaryPosition</code> can be <code>Top</code> or <code>Bottom</code>.</p>
-<h2 id="summary-description-options">Summary Description Options</h2>
-<p>Each <code>DataGridSummaryDescription</code> supports:</p>
+<h2 id="editing-adddelete-and-new-row-placeholder">Editing, Add/Delete, and New-Row Placeholder</h2>
+<p><code>DataGridCollectionView</code> implements <code>IDataGridEditableCollectionView</code>, so it supports:</p>
 <ul>
-<li><code>Scope</code>: <code>Total</code>, <code>Group</code>, or <code>Both</code>.</li>
-<li><code>Title</code> and <code>StringFormat</code> for labeling/formatting.</li>
-<li><code>Converter</code>/<code>ConverterParameter</code> for custom formatting.</li>
-<li><code>ContentTemplate</code> for fully custom visuals.</li>
+<li>Add: <code>CanAddNew</code>, <code>AddNew</code>, <code>CommitNew</code>, <code>CancelNew</code></li>
+<li>Edit: <code>EditItem</code>, <code>CommitEdit</code>, <code>CancelEdit</code></li>
+<li>Remove: <code>CanRemove</code>, <code>Remove</code>, <code>RemoveAt</code></li>
 </ul>
-<h2 id="custom-calculators">Custom Calculators</h2>
-<p>Create custom summary calculators by implementing <code>IDataGridSummaryCalculator</code> and attach them with <code>DataGridCustomSummaryDescription</code>:</p>
-<pre><code class="lang-csharp">column.Summaries.Add(new DataGridCustomSummaryDescription
-{
-    Calculator = new StandardDeviationCalculator(),
-    Title = &quot;StdDev: &quot;,
-    StringFormat = &quot;N2&quot;
-});
-</code></pre>
-<h2 id="summary-row-styling-and-timing">Summary Row Styling and Timing</h2>
-<ul>
-<li><code>SummaryRowTheme</code> lets you theme total and group summary rows.</li>
-<li><code>SummaryRecalculationDelayMs</code> throttles recalculation during rapid updates.</li>
-<li><code>SummaryRecalculated</code> fires after recalculation completes.</li>
-</ul>
-<h2 id="notes">Notes</h2>
-<ul>
-<li>Summary values update as the view filters or expands hierarchical nodes.</li>
-<li>Group summaries honor the same descriptors and scopes as total summaries.</li>
-</ul>
+<p>When <code>CanUserAddRows=&quot;True&quot;</code> and the view supports adding, the grid shows a new-row placeholder. You can customize it per column with <code>DataGridTemplateColumn.NewRowCellTemplate</code>.</p>
+<h2 id="datatable-and-typedescriptor-support">DataTable and TypeDescriptor Support</h2>
+<p>When binding to <code>DataTable.DefaultView</code>, the grid uses <code>TypeDescriptor</code> to resolve column metadata and cell bindings. This allows auto-generated columns without manual indexers.</p>
+<h2 id="trimming-notes">Trimming Notes</h2>
+<p><code>DataGridCollectionView</code> uses reflection and <code>TypeDescriptor</code> to access properties. For trimming or AOT scenarios, prefer explicit columns or a custom collection view that does not rely on reflection.</p>
 
 </article>
 
         <div class="contribution d-print-none">
-          <a href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/docfx/articles/summaries.md/#L1" class="edit-link">Edit this page</a>
+          <a href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/docfx/articles/data-sources-and-collection-views.md/#L1" class="edit-link">Edit this page</a>
         </div>
 
         <div class="next-article d-print-none border-top" id="nextArticle"></div>

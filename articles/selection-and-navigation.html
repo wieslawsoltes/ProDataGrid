@@ -110,6 +110,7 @@ public SelectionModel&lt;MyItem&gt; MySelectionModel { get; } = new()
 <li>Multi-select gestures and <code>SelectionMode</code> map to the model (<code>SelectionMode=Single</code> maps to <code>SingleSelect=true</code>).</li>
 <li>A thin adapter keeps row index to slot mapping internal, so custom selection models can be injected later.</li>
 </ul>
+<p>If you need a custom selection model implementation, set <code>SelectionModelFactory</code> in code before the grid is loaded or assign <code>Selection</code> directly to an <code>ISelectionModel</code> instance.</p>
 <h2 id="selecteditems-and-selectedcells">SelectedItems and SelectedCells</h2>
 <p>You can still bind <code>SelectedItems</code> and <code>SelectedCells</code> directly:</p>
 <pre><code class="lang-xml">&lt;DataGrid ItemsSource=&quot;{Binding Items}&quot;
