@@ -3593,6 +3593,16 @@
     },
     {
       "type": "Conceptual",
+      "source_relative_path": "articles/metrics-and-activities.md",
+      "output": {
+        ".html": {
+          "relative_path": "articles/metrics-and-activities.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "Conceptual",
       "source_relative_path": "articles/migration.md",
       "output": {
         ".html": {
