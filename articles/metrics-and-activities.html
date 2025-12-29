@@ -83,10 +83,86 @@
         <article data-uid="">
 <h1 id="metrics-and-activities">Metrics and Activities</h1>
 
-<p>ProDataGrid exposes OpenTelemetry-friendly diagnostics via <code>ActivitySource</code> and <code>Meter</code> so you can track row generation, virtualization, selection changes, and collection view operations.</p>
+<p>ProDataGrid exposes OpenTelemetry-friendly diagnostics via <code>ActivitySource</code> and <code>Meter</code> so you can track row generation, virtualization, selection changes, and collection view operations. The diagnostics can be consumed in-process (OpenTelemetry) or streamed out-of-process using the ProDiagnostics UDP transport and viewer.</p>
 <h2 id="enabling-diagnostics">Enabling diagnostics</h2>
 <p>Diagnostics are opt-in. Enable them early in app startup (before any grids are created):</p>
 <pre><code class="lang-csharp">AppContext.SetSwitch(&quot;ProDataGrid.Diagnostics.IsEnabled&quot;, true);
+</code></pre>
+<h2 id="installation">Installation</h2>
+<p>Install the transport library from NuGet:</p>
+<pre><code class="lang-bash">dotnet add package ProDiagnostics.Transport
+</code></pre>
+<p>Install the viewer as a global tool:</p>
+<pre><code class="lang-bash">dotnet tool install -g prodiagnostics-viewer
+</code></pre>
+<p>To update later:</p>
+<pre><code class="lang-bash">dotnet tool update -g prodiagnostics-viewer
+</code></pre>
+<h2 id="transport-prodiagnostics-udp-stream">Transport: ProDiagnostics UDP stream</h2>
+<p><code>ProDiagnostics.Transport</code> provides a lightweight UDP protocol for streaming telemetry to an out-of-process viewer.</p>
+<p>What it does:</p>
+<ul>
+<li>Sends <code>Hello</code> packets (session identity) plus Activity and Metric packets.</li>
+<li>Uses a binary protocol (<code>TelemetryProtocol.Version == 1</code>) capped at 64 KB per datagram.</li>
+<li>Supports tag limits (<code>MaxTagsPerMessage</code>) and wildcard filtering for source/meter names (<code>*</code> and <code>?</code> patterns).</li>
+<li>Ignores malformed packets on the receiver so the stream stays resilient.</li>
+</ul>
+<h3 id="exporter-usage">Exporter usage</h3>
+<pre><code class="lang-csharp">using ProDiagnostics.Transport;
+
+var exporter = new DiagnosticsUdpExporter(new DiagnosticsUdpOptions
+{
+    Host = &quot;127.0.0.1&quot;,
+    Port = TelemetryProtocol.DefaultPort,
+    HelloInterval = TimeSpan.FromSeconds(5),
+    MaxTagsPerMessage = 32,
+    IncludeActivityTags = true,
+    IncludeMetricTags = true,
+    ActivitySourceNames = new[] { &quot;ProDataGrid.*&quot; },
+    MeterNames = new[] { &quot;ProDataGrid.Diagnostic.Meter&quot; }
+});
+
+exporter.Start();
+</code></pre>
+<p>Keep the exporter alive for the lifetime of the app and dispose it during shutdown.</p>
+<h2 id="viewer-app">Viewer app</h2>
+<p><code>ProDiagnostics.Viewer</code> is an Avalonia app that listens for UDP packets and visualizes them.</p>
+<p>Run it from the repo:</p>
+<pre><code class="lang-bash">dotnet run --project src/ProDiagnostics.Viewer/ProDiagnostics.Viewer.csproj
+</code></pre>
+<p>Viewer features:</p>
+<ul>
+<li>Session list populated from <code>Hello</code> packets (app name, process, machine, runtime).</li>
+<li>UDP port selection with pause/resume.</li>
+<li>Preset selection + reload (JSON files).</li>
+<li>Metrics and activities filters (name + alias matching).</li>
+<li>Column visibility toggles with resize/reorder in both grids.</li>
+<li>Metric sparklines + detailed tabs (double-click a metric row).</li>
+<li>Detail chart with min/avg/max thresholds based on the current window, plus pan/zoom and time-range selection.</li>
+</ul>
+<h2 id="presets">Presets</h2>
+<p>Presets are JSON files that live in a <code>Presets</code> folder. The viewer loads:</p>
+<ul>
+<li>Built-in presets from <code>Assets/Presets</code> in the app output.</li>
+<li>User presets from <code>%APPDATA%/ProDiagnostics.Viewer/Presets</code> (create the folder if it doesn't exist).</li>
+</ul>
+<p>Preset example:</p>
+<pre><code class="lang-json">{
+  &quot;name&quot;: &quot;ProDataGrid&quot;,
+  &quot;description&quot;: &quot;Focus on ProDataGrid diagnostics&quot;,
+  &quot;includeActivities&quot;: [
+    &quot;ProDataGrid.*&quot;
+  ],
+  &quot;includeMetrics&quot;: [
+    &quot;prodatagrid.*&quot;
+  ],
+  &quot;metricAliases&quot;: {
+    &quot;prodatagrid.refresh.time&quot;: &quot;Refresh Time&quot;
+  },
+  &quot;activityAliases&quot;: {
+    &quot;ProDataGrid.DataGrid.RefreshRowsAndColumns&quot;: &quot;Refresh Rows + Columns&quot;
+  }
+}
 </code></pre>
 <h2 id="activitysource">ActivitySource</h2>
 <p>ActivitySource name: <code>ProDataGrid.Diagnostic.Source</code></p>
@@ -166,7 +242,8 @@ ActivitySource.AddActivityListener(listener);
 <h2 id="notes">Notes</h2>
 <ul>
 <li>Diagnostics are off by default; set the switch before any grid usage.</li>
-<li>Some metrics are nested (e.g. refresh includes filter/sort/group), so prefer comparing like-for-like scenarios.</li>
+<li>UDP is best-effort and can drop packets; it is intended for live observability, not guaranteed delivery.</li>
+<li>Some metrics are nested (for example refresh includes filter/sort/group), so compare like-for-like scenarios.</li>
 </ul>
 
 </article>
