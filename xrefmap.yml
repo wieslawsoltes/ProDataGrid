@@ -3193,6 +3193,25 @@ references:
   isSpec: "True"
   fullName: Avalonia.Controls.DataGrid.CanUserResizeColumns
   nameWithType: DataGrid.CanUserResizeColumns
+- uid: Avalonia.Controls.DataGrid.CanUserResizeColumnsOnDoubleClick
+  name: CanUserResizeColumnsOnDoubleClick
+  href: api/Avalonia.Controls.DataGrid.html#Avalonia_Controls_DataGrid_CanUserResizeColumnsOnDoubleClick
+  commentId: P:Avalonia.Controls.DataGrid.CanUserResizeColumnsOnDoubleClick
+  fullName: Avalonia.Controls.DataGrid.CanUserResizeColumnsOnDoubleClick
+  nameWithType: DataGrid.CanUserResizeColumnsOnDoubleClick
+- uid: Avalonia.Controls.DataGrid.CanUserResizeColumnsOnDoubleClick*
+  name: CanUserResizeColumnsOnDoubleClick
+  href: api/Avalonia.Controls.DataGrid.html#Avalonia_Controls_DataGrid_CanUserResizeColumnsOnDoubleClick_
+  commentId: Overload:Avalonia.Controls.DataGrid.CanUserResizeColumnsOnDoubleClick
+  isSpec: "True"
+  fullName: Avalonia.Controls.DataGrid.CanUserResizeColumnsOnDoubleClick
+  nameWithType: DataGrid.CanUserResizeColumnsOnDoubleClick
+- uid: Avalonia.Controls.DataGrid.CanUserResizeColumnsOnDoubleClickProperty
+  name: CanUserResizeColumnsOnDoubleClickProperty
+  href: api/Avalonia.Controls.DataGrid.html#Avalonia_Controls_DataGrid_CanUserResizeColumnsOnDoubleClickProperty
+  commentId: F:Avalonia.Controls.DataGrid.CanUserResizeColumnsOnDoubleClickProperty
+  fullName: Avalonia.Controls.DataGrid.CanUserResizeColumnsOnDoubleClickProperty
+  nameWithType: DataGrid.CanUserResizeColumnsOnDoubleClickProperty
 - uid: Avalonia.Controls.DataGrid.CanUserResizeColumnsProperty
   name: CanUserResizeColumnsProperty
   href: api/Avalonia.Controls.DataGrid.html#Avalonia_Controls_DataGrid_CanUserResizeColumnsProperty

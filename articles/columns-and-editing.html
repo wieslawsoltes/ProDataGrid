@@ -129,9 +129,10 @@
 <ul>
 <li>Widths: pixel, <code>Auto</code>, and star sizing (<code>*</code>, <code>2*</code>).</li>
 <li>Constraints: <code>MinWidth</code>/<code>MaxWidth</code> per column.</li>
-<li>Interaction: <code>CanUserResizeColumns</code> and <code>CanUserReorderColumns</code> at the grid level; <code>CanUserResize</code>, <code>CanUserReorder</code>, and <code>CanUserSort</code> per column.</li>
+<li>Interaction: <code>CanUserResizeColumns</code>, <code>CanUserResizeColumnsOnDoubleClick</code>, and <code>CanUserReorderColumns</code> at the grid level; <code>CanUserResize</code>, <code>CanUserReorder</code>, and <code>CanUserSort</code> per column.</li>
 <li>Frozen columns: <code>FrozenColumnCount</code> and <code>FrozenColumnCountRight</code> pin columns on the left/right.</li>
 </ul>
+<p>Double-click the column header resize handle to fit the column to visible content when <code>CanUserResizeColumnsOnDoubleClick</code> is enabled.</p>
 <pre><code class="lang-xml">&lt;DataGrid FrozenColumnCount=&quot;1&quot;
           FrozenColumnCountRight=&quot;1&quot;
           CanUserResizeColumns=&quot;True&quot;
