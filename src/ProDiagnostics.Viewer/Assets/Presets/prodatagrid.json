@@ -1,0 +1,43 @@
+{
+  "name": "ProDataGrid",
+  "description": "Focus on ProDataGrid diagnostics",
+  "includeActivities": [
+    "ProDataGrid.*"
+  ],
+  "includeMetrics": [
+    "prodatagrid.*"
+  ],
+  "activityAliases": {
+    "ProDataGrid.DataGrid.RefreshRowsAndColumns": "Refresh Rows + Columns",
+    "ProDataGrid.DataGrid.RefreshRows": "Refresh Rows",
+    "ProDataGrid.DataGrid.UpdateDisplayedRows": "Update Displayed Rows",
+    "ProDataGrid.DataGrid.GenerateRow": "Generate Row",
+    "ProDataGrid.DataGrid.AutoGenerateColumns": "Auto-Generate Columns",
+    "ProDataGrid.DataGrid.SelectionChanged": "Selection Changed",
+    "ProDataGrid.CollectionView.Refresh": "Collection Refresh",
+    "ProDataGrid.CollectionView.Filter": "Collection Filter",
+    "ProDataGrid.CollectionView.Sort": "Collection Sort",
+    "ProDataGrid.CollectionView.Group": "Collection Group",
+    "ProDataGrid.CollectionView.GroupTemporary": "Collection Group (Temp)",
+    "ProDataGrid.CollectionView.GroupPage": "Collection Group (Page)"
+  },
+  "metricAliases": {
+    "prodatagrid.refresh.time": "Refresh Time",
+    "prodatagrid.rows.refresh.time": "Rows Refresh Time",
+    "prodatagrid.rows.display.update.time": "Displayed Rows Update",
+    "prodatagrid.rows.generate.time": "Row Generate Time",
+    "prodatagrid.columns.autogen.time": "Auto-Generate Columns Time",
+    "prodatagrid.selection.change.time": "Selection Change Time",
+    "prodatagrid.collection.refresh.time": "Collection Refresh Time",
+    "prodatagrid.collection.filter.time": "Collection Filter Time",
+    "prodatagrid.collection.sort.time": "Collection Sort Time",
+    "prodatagrid.collection.group.time": "Collection Group Time",
+    "prodatagrid.collection.group.temporary.time": "Collection Group Temp",
+    "prodatagrid.collection.group.page.time": "Collection Group Page",
+    "prodatagrid.rows.realized.count": "Rows Realized",
+    "prodatagrid.rows.recycled.count": "Rows Recycled",
+    "prodatagrid.rows.prepared.count": "Rows Prepared",
+    "prodatagrid.columns.autogen.count": "Columns Auto-Generated",
+    "prodatagrid.selection.changed.count": "Selection Changed"
+  }
+}

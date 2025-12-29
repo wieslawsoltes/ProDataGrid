@@ -23,6 +23,7 @@
   <ItemGroup>
     <ProjectReference Include="../Avalonia.Controls.DataGrid/Avalonia.Controls.DataGrid.csproj" />
     <ProjectReference Include="../ProDiagnostics/ProDiagnostics.csproj" />
+    <ProjectReference Include="../ProDiagnostics.Transport/ProDiagnostics.Transport.csproj" />
   </ItemGroup>
 
   <Import Project="../../build/SharedVersion.props" />

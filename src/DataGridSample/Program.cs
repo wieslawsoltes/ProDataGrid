@@ -11,11 +11,16 @@ using Avalonia.Controls.Primitives;
 using Avalonia.ReactiveUI;
 using DataGridSample.Models;
 using DataGridSample.ViewModels;
+using ProDiagnostics.Transport;
 
 namespace DataGridSample;
 
 public static class Program
 {
+    private const string DiagnosticsSwitchName = "ProDataGrid.Diagnostics.IsEnabled";
+    private const string AvaloniaDiagnosticsSwitchName = "Avalonia.Diagnostics.Diagnostic.IsEnabled";
+    private static DiagnosticsUdpExporter? _diagnosticsExporter;
+
     // Initialization code. Don't use any Avalonia, third-party APIs or any
     // SynchronizationContext-reliant code before AppMain is called: things aren't initialized
     // yet and stuff might break.
@@ -72,7 +77,22 @@ public static class Program
     [DynamicDependency(DynamicallyAccessedMemberTypes.All, typeof(DataGridHierarchicalColumn))]
     [DynamicDependency(DynamicallyAccessedMemberTypes.All, typeof(DataGridHierarchicalPresenter))]
     public static void Main(string[] args)
-        => BuildAvaloniaApp().StartWithClassicDesktopLifetime(args);
+    {
+        AppContext.SetSwitch(DiagnosticsSwitchName, true);
+        AppContext.SetSwitch(AvaloniaDiagnosticsSwitchName, true);
+
+        _diagnosticsExporter = new DiagnosticsUdpExporter(new DiagnosticsUdpOptions
+        {
+            ActivitySourceNames = new[] { "ProDataGrid.Diagnostic.Source", "Avalonia.Diagnostic.Source" },
+            MeterNames = new[] { "ProDataGrid.Diagnostic.Meter", "Avalonia.Diagnostic.Meter" }
+        });
+        _diagnosticsExporter.Start();
+
+        BuildAvaloniaApp().StartWithClassicDesktopLifetime(args);
+
+        _diagnosticsExporter.Dispose();
+        _diagnosticsExporter = null;
+    }
 
     // Avalonia configuration, don't remove; also used by visual designer.
     public static AppBuilder BuildAvaloniaApp()

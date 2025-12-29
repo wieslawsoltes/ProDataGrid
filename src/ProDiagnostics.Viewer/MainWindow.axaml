@@ -1,0 +1,254 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="using:ProDiagnostics.Viewer.ViewModels"
+        xmlns:models="using:ProDiagnostics.Viewer.Models"
+        xmlns:controls="using:ProDiagnostics.Viewer.Controls"
+        x:Class="ProDiagnostics.Viewer.MainWindow"
+        x:Name="Root"
+        x:DataType="vm:MainViewModel"
+        Width="1280"
+        Height="820"
+        Title="ProDiagnostics Viewer">
+
+  <Grid>
+    <Canvas IsHitTestVisible="False">
+      <Ellipse Width="420" Height="420" Fill="#1AE07A5F" Canvas.Left="-120" Canvas.Top="-140" />
+      <Ellipse Width="520" Height="520" Fill="#153D405B" Canvas.Right="-180" Canvas.Bottom="-180" />
+      <Rectangle Width="260" Height="260" Fill="#0FD9E5F2" Canvas.Left="220" Canvas.Bottom="120" RadiusX="60" RadiusY="60" />
+    </Canvas>
+
+    <Grid RowDefinitions="Auto,*">
+      <Border Classes="card" Margin="24,20,24,12" Padding="18">
+        <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="16" VerticalAlignment="Center">
+          <TextBlock Text="Telemetry Observatory" FontSize="22" FontWeight="SemiBold" VerticalAlignment="Center" />
+
+          <StackPanel Grid.Column="1" Spacing="2" VerticalAlignment="Center">
+            <TextBlock Text="Live metrics and activity streams over UDP" Classes="subtitle" />
+            <TextBlock Text="{Binding StatusText}" Classes="subtitle" />
+          </StackPanel>
+
+          <StackPanel Grid.Column="2" Orientation="Horizontal" Spacing="10" VerticalAlignment="Center">
+            <TextBlock Text="Port" VerticalAlignment="Center" Classes="subtitle" />
+            <TextBox Width="80" Text="{Binding Port}" />
+            <Button Classes="primary" Content="{Binding ListeningButtonText}" Command="{Binding ToggleListeningCommand}" />
+          </StackPanel>
+        </Grid>
+      </Border>
+
+      <Grid Grid.Row="1" ColumnDefinitions="280,*" ColumnSpacing="16" Margin="24,0,24,24">
+        <Border Classes="card alt" Padding="16" Grid.Column="0">
+          <StackPanel Spacing="14">
+            <TextBlock Text="Sessions" FontWeight="SemiBold" />
+            <ListBox ItemsSource="{Binding Sessions}" SelectedItem="{Binding SelectedSession}" Height="260">
+              <ListBox.ItemTemplate>
+                <DataTemplate x:DataType="vm:SessionViewModel">
+                  <StackPanel Spacing="2" Margin="6,4">
+                    <TextBlock Text="{Binding DisplayName}" FontWeight="SemiBold" />
+                    <TextBlock Text="{Binding Subtitle}" Classes="subtitle" TextWrapping="Wrap" />
+                  </StackPanel>
+                </DataTemplate>
+              </ListBox.ItemTemplate>
+            </ListBox>
+
+            <TextBlock Text="Preset" FontWeight="SemiBold" />
+            <ComboBox ItemsSource="{Binding Presets}" SelectedItem="{Binding SelectedPreset}">
+              <ComboBox.ItemTemplate>
+                <DataTemplate x:DataType="models:PresetDefinition">
+                  <StackPanel Spacing="2" Margin="4,2">
+                    <TextBlock Text="{Binding Name}" FontWeight="SemiBold" />
+                    <TextBlock Text="{Binding Description}" Classes="subtitle" TextWrapping="Wrap" />
+                  </StackPanel>
+                </DataTemplate>
+              </ComboBox.ItemTemplate>
+            </ComboBox>
+
+            <Button Content="Reload Presets" Command="{Binding ReloadPresetsCommand}" />
+
+            <Border Classes="card" Padding="10">
+              <StackPanel Spacing="6">
+                <TextBlock Text="User presets folder" FontWeight="SemiBold" />
+                <TextBlock Text="{Binding PresetFolder}" Classes="subtitle" TextWrapping="Wrap" />
+              </StackPanel>
+            </Border>
+          </StackPanel>
+        </Border>
+
+        <Border Classes="card" Padding="16" Grid.Column="1">
+          <TabControl>
+            <TabItem Header="Metrics">
+              <Grid RowDefinitions="Auto,*,Auto" RowSpacing="12">
+                <Grid ColumnDefinitions="*,Auto,Auto,Auto" ColumnSpacing="12">
+                  <TextBox Watermark="Filter metrics" Text="{Binding MetricsFilter}" />
+                  <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="6" VerticalAlignment="Center">
+                    <TextBlock Text="Trend" Classes="subtitle" VerticalAlignment="Center" />
+                    <ComboBox Width="110" ItemsSource="{Binding TrendRanges}" SelectedItem="{Binding SelectedTrendRange}">
+                      <ComboBox.ItemTemplate>
+                        <DataTemplate x:DataType="vm:TrendRangeOption">
+                          <TextBlock Text="{Binding Title}" />
+                        </DataTemplate>
+                      </ComboBox.ItemTemplate>
+                    </ComboBox>
+                  </StackPanel>
+                  <Button Grid.Column="2" Content="Columns">
+                    <Button.Flyout>
+                      <Flyout Placement="Bottom">
+                        <Border Background="{StaticResource SurfaceBrush}"
+                                BorderBrush="{StaticResource StrokeBrush}"
+                                BorderThickness="1"
+                                CornerRadius="8"
+                                Padding="12">
+                          <StackPanel Spacing="8">
+                            <TextBlock Text="Visible columns" FontWeight="SemiBold" />
+                            <ItemsControl ItemsSource="{Binding MetricColumns}">
+                              <ItemsControl.ItemTemplate>
+                                <DataTemplate x:DataType="vm:ColumnVisibilityOption">
+                                  <CheckBox Content="{Binding Title}" IsChecked="{Binding IsVisible, Mode=TwoWay}" />
+                                </DataTemplate>
+                              </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+                          </StackPanel>
+                        </Border>
+                      </Flyout>
+                    </Button.Flyout>
+                  </Button>
+                  <TextBlock Grid.Column="3" Text="{Binding SelectedSession.Metrics.Count}" Classes="subtitle" VerticalAlignment="Center" />
+                </Grid>
+
+                <DataGrid x:Name="MetricsGrid" Grid.Row="1" ItemsSource="{Binding SelectedSession.MetricsView}" AutoGenerateColumns="False" IsReadOnly="True" HeadersVisibility="Column" RowHeight="34" CanUserResizeColumns="True" CanUserReorderColumns="True" x:CompileBindings="False">
+                  <DataGrid.Columns>
+                    <DataGridTextColumn Header="Metric" Binding="{Binding DisplayName}" Width="2*" />
+                    <DataGridTextColumn Header="Description" Binding="{Binding Description}" Width="3*" />
+                    <DataGridTextColumn Header="Meter" Binding="{Binding MeterName}" Width="*" />
+                    <DataGridTextColumn Header="Unit" Binding="{Binding Unit}" Width="80" />
+                    <DataGridTextColumn Header="Last" Binding="{Binding LastValue, StringFormat=0.###}" Width="80" />
+                    <DataGridTextColumn Header="Avg" Binding="{Binding Average, StringFormat=0.###}" Width="80" />
+                    <DataGridTextColumn Header="Min" Binding="{Binding MinValue, StringFormat=0.###}" Width="80" />
+                    <DataGridTextColumn Header="Max" Binding="{Binding MaxValue, StringFormat=0.###}" Width="80" />
+                    <DataGridTextColumn Header="Samples" Binding="{Binding SampleCount}" Width="80" />
+                    <DataGridTemplateColumn Header="Trend" Width="120">
+                      <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate x:DataType="vm:MetricSeriesViewModel">
+                          <controls:Sparkline Height="28"
+                                              Samples="{Binding TimelineSamples}"
+                                              Stroke="{Binding AccentBrush}"
+                                              TimeRange="{Binding DataContext.SelectedSession.TrendRange, ElementName=Root}" />
+                        </DataTemplate>
+                      </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
+                    <DataGridTextColumn Header="Tags" Binding="{Binding TagsSummary}" Width="2*" />
+                  </DataGrid.Columns>
+                </DataGrid>
+
+                <Border Grid.Row="2" Background="{StaticResource SurfaceAltBrush}" BorderBrush="{StaticResource StrokeBrush}" BorderThickness="1" CornerRadius="10" Padding="12" IsVisible="{Binding SelectedSession.HasMetricTabs}">
+                  <TabControl ItemsSource="{Binding SelectedSession.MetricTabs}" SelectedItem="{Binding SelectedSession.SelectedMetricTab}">
+                    <TabControl.ItemTemplate>
+                      <DataTemplate x:DataType="vm:MetricDetailTabViewModel">
+                        <StackPanel Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
+                          <TextBlock Text="{Binding Series.DisplayName}" FontWeight="SemiBold" />
+                          <Button Classes="tab-close" Content="×" Command="{Binding CloseCommand}" />
+                        </StackPanel>
+                      </DataTemplate>
+                    </TabControl.ItemTemplate>
+                    <TabControl.ContentTemplate>
+                      <DataTemplate x:DataType="vm:MetricDetailTabViewModel">
+                        <Grid RowDefinitions="Auto,Auto,*" RowSpacing="10">
+                          <StackPanel Spacing="4">
+                            <TextBlock Text="{Binding Series.DisplayName}" FontSize="16" FontWeight="SemiBold" />
+                            <StackPanel Orientation="Horizontal" Spacing="10">
+                              <TextBlock Text="{Binding Series.MeterName}" Classes="subtitle" />
+                              <TextBlock Text="{Binding Series.InstrumentType}" Classes="subtitle" />
+                              <TextBlock Text="{Binding Series.Unit}" Classes="subtitle" />
+                            </StackPanel>
+                            <TextBlock Text="{Binding Series.Description}" Classes="subtitle" TextWrapping="Wrap" />
+                            <TextBlock Text="{Binding Series.TagsSummary}" Classes="subtitle" TextWrapping="Wrap" />
+                          </StackPanel>
+
+                          <Grid Grid.Row="1" ColumnDefinitions="Auto,Auto,Auto,Auto" ColumnSpacing="16">
+                            <StackPanel Spacing="2">
+                              <TextBlock Text="Last" Classes="subtitle" />
+                              <TextBlock Text="{Binding Series.LastValue, StringFormat=0.###}" FontWeight="SemiBold" />
+                            </StackPanel>
+                            <StackPanel Grid.Column="1" Spacing="2">
+                              <TextBlock Text="Avg" Classes="subtitle" />
+                              <TextBlock Text="{Binding Series.Average, StringFormat=0.###}" FontWeight="SemiBold" />
+                            </StackPanel>
+                            <StackPanel Grid.Column="2" Spacing="2">
+                              <TextBlock Text="Min" Classes="subtitle" />
+                              <TextBlock Text="{Binding Series.MinValue, StringFormat=0.###}" FontWeight="SemiBold" />
+                            </StackPanel>
+                            <StackPanel Grid.Column="3" Spacing="2">
+                              <TextBlock Text="Max" Classes="subtitle" />
+                              <TextBlock Text="{Binding Series.MaxValue, StringFormat=0.###}" FontWeight="SemiBold" />
+                            </StackPanel>
+                          </Grid>
+
+                          <Grid Grid.Row="2">
+                            <Border Background="{StaticResource SurfaceBrush}" BorderBrush="{StaticResource StrokeBrush}" BorderThickness="1" CornerRadius="8" Padding="10">
+                              <controls:MetricTrendChart Height="160"
+                                                         Samples="{Binding Series.TimelineSamples}"
+                                                         Stroke="{Binding Series.AccentBrush}"
+                                                         MinValue="{Binding Series.MinValue}"
+                                                         MaxValue="{Binding Series.MaxValue}"
+                                                         AverageValue="{Binding Series.Average}"
+                                                         MinLineBrush="{StaticResource ThresholdMinBrush}"
+                                                         MaxLineBrush="{StaticResource ThresholdMaxBrush}"
+                                                         AverageLineBrush="{StaticResource ThresholdAvgBrush}"
+                                                         TimeRange="{Binding DataContext.SelectedSession.TrendRange, ElementName=Root}"
+                                                         EnablePan="True"
+                                                         EnableWheelZoom="True" />
+                            </Border>
+                          </Grid>
+                        </Grid>
+                      </DataTemplate>
+                    </TabControl.ContentTemplate>
+                  </TabControl>
+                </Border>
+              </Grid>
+            </TabItem>
+
+            <TabItem Header="Activities">
+              <Grid RowDefinitions="Auto,*" RowSpacing="12">
+                <Grid ColumnDefinitions="*,Auto,Auto" ColumnSpacing="12">
+                  <TextBox Watermark="Filter activities" Text="{Binding ActivitiesFilter}" />
+                  <Button Grid.Column="1" Content="Columns">
+                    <Button.Flyout>
+                      <Flyout Placement="Bottom">
+                        <Border Background="{StaticResource SurfaceBrush}"
+                                BorderBrush="{StaticResource StrokeBrush}"
+                                BorderThickness="1"
+                                CornerRadius="8"
+                                Padding="12">
+                          <StackPanel Spacing="8">
+                            <TextBlock Text="Visible columns" FontWeight="SemiBold" />
+                            <ItemsControl ItemsSource="{Binding ActivityColumns}">
+                              <ItemsControl.ItemTemplate>
+                                <DataTemplate x:DataType="vm:ColumnVisibilityOption">
+                                  <CheckBox Content="{Binding Title}" IsChecked="{Binding IsVisible, Mode=TwoWay}" />
+                                </DataTemplate>
+                              </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+                          </StackPanel>
+                        </Border>
+                      </Flyout>
+                    </Button.Flyout>
+                  </Button>
+                  <TextBlock Grid.Column="2" Text="{Binding SelectedSession.Activities.Count}" Classes="subtitle" VerticalAlignment="Center" />
+                </Grid>
+
+                <DataGrid x:Name="ActivitiesGrid" Grid.Row="1" ItemsSource="{Binding SelectedSession.ActivitiesView}" AutoGenerateColumns="False" IsReadOnly="True" HeadersVisibility="Column" RowHeight="34" CanUserResizeColumns="True" CanUserReorderColumns="True" x:CompileBindings="False">
+                  <DataGrid.Columns>
+                    <DataGridTextColumn Header="Started" Binding="{Binding StartTime, StringFormat={}{0:HH:mm:ss.fff}}" Width="140" />
+                    <DataGridTextColumn Header="Activity" Binding="{Binding DisplayName}" Width="2*" />
+                    <DataGridTextColumn Header="Duration (ms)" Binding="{Binding Duration.TotalMilliseconds, StringFormat=0.###}" Width="120" />
+                    <DataGridTextColumn Header="Source" Binding="{Binding SourceName}" Width="*" />
+                    <DataGridTextColumn Header="Tags" Binding="{Binding TagsSummary}" Width="2*" />
+                  </DataGrid.Columns>
+                </DataGrid>
+              </Grid>
+            </TabItem>
+          </TabControl>
+        </Border>
+      </Grid>
+    </Grid>
+  </Grid>
+</Window>

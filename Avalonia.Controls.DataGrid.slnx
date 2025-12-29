@@ -12,6 +12,7 @@
     <Folder Name="/src/">
         <Project Path="src/Avalonia.Controls.DataGrid/Avalonia.Controls.DataGrid.csproj" />
         <Project Path="src/ProDiagnostics/ProDiagnostics.csproj" />
+        <Project Path="src/ProDiagnostics.Transport/ProDiagnostics.Transport.csproj" />
     </Folder>
     <Folder Name="/tests/">
         <Project Path="src/Avalonia.Controls.DataGrid.UnitTests/Avalonia.Controls.DataGrid.UnitTests.csproj" />
@@ -23,5 +24,6 @@
     <Folder Name="/tools/">
         <Project Path="tools/api-compare/api-compare.csproj" />
         <Project Path="tools/CoverageReporter/CoverageReporter.csproj" />
+        <Project Path="src/ProDiagnostics.Viewer/ProDiagnostics.Viewer.csproj" />
     </Folder>
 </Solution>

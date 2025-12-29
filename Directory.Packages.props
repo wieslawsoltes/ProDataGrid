@@ -37,4 +37,8 @@
     <PackageVersion Include="xunit.runner.console" Version="2.9.3" />
     <PackageVersion Include="xunit.runner.visualstudio" Version="3.0.2" />
   </ItemGroup>
+  <!-- Diagnostics transport -->
+  <ItemGroup>
+    <PackageVersion Include="System.Diagnostics.DiagnosticSource" Version="8.0.1" />
+  </ItemGroup>
 </Project>

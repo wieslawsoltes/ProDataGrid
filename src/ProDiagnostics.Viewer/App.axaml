@@ -1,0 +1,100 @@
+<Application xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             x:Class="ProDiagnostics.Viewer.App"
+             RequestedThemeVariant="Light">
+
+  <Application.Resources>
+    <FontFamily x:Key="AppFont">avares://ProDiagnostics.Viewer/Assets/Fonts/SourceSansPro-Regular.ttf#Source Sans Pro</FontFamily>
+
+    <Color x:Key="ColorBackgroundStart">#f6f2eb</Color>
+    <Color x:Key="ColorBackgroundEnd">#d9e5f2</Color>
+    <Color x:Key="ColorSurface">#ffffff</Color>
+    <Color x:Key="ColorSurfaceAlt">#f8f7f3</Color>
+    <Color x:Key="ColorStroke">#d2d3d8</Color>
+    <Color x:Key="ColorTextPrimary">#1f1f2a</Color>
+    <Color x:Key="ColorTextSecondary">#4c4c5a</Color>
+    <Color x:Key="ColorAccent">#e07a5f</Color>
+    <Color x:Key="ColorAccentDark">#3d405b</Color>
+
+    <LinearGradientBrush x:Key="AppBackground" StartPoint="0,0" EndPoint="1,1">
+      <GradientStop Color="{StaticResource ColorBackgroundStart}" Offset="0" />
+      <GradientStop Color="{StaticResource ColorBackgroundEnd}" Offset="1" />
+    </LinearGradientBrush>
+
+    <SolidColorBrush x:Key="SurfaceBrush" Color="{StaticResource ColorSurface}" />
+    <SolidColorBrush x:Key="SurfaceAltBrush" Color="{StaticResource ColorSurfaceAlt}" />
+    <SolidColorBrush x:Key="StrokeBrush" Color="{StaticResource ColorStroke}" />
+    <SolidColorBrush x:Key="AccentBrush" Color="{StaticResource ColorAccent}" />
+    <SolidColorBrush x:Key="AccentDarkBrush" Color="{StaticResource ColorAccentDark}" />
+    <SolidColorBrush x:Key="TextPrimaryBrush" Color="{StaticResource ColorTextPrimary}" />
+    <SolidColorBrush x:Key="TextSecondaryBrush" Color="{StaticResource ColorTextSecondary}" />
+    <SolidColorBrush x:Key="ThresholdMinBrush" Color="#6EA8B6" />
+    <SolidColorBrush x:Key="ThresholdAvgBrush" Color="{StaticResource ColorAccent}" />
+    <SolidColorBrush x:Key="ThresholdMaxBrush" Color="{StaticResource ColorAccentDark}" />
+  </Application.Resources>
+
+  <Application.Styles>
+    <FluentTheme />
+    <StyleInclude Source="avares://Avalonia.Controls.DataGrid/Themes/Fluent.v2.xaml" />
+
+    <Style Selector="Window">
+      <Setter Property="FontFamily" Value="{StaticResource AppFont}" />
+      <Setter Property="Background" Value="{StaticResource AppBackground}" />
+    </Style>
+
+    <Style Selector="TextBlock">
+      <Setter Property="Foreground" Value="{StaticResource TextPrimaryBrush}" />
+    </Style>
+
+    <Style Selector="TextBlock.subtitle">
+      <Setter Property="Foreground" Value="{StaticResource TextSecondaryBrush}" />
+      <Setter Property="FontSize" Value="12" />
+    </Style>
+
+    <Style Selector="Border.card">
+      <Setter Property="Background" Value="{StaticResource SurfaceBrush}" />
+      <Setter Property="BorderBrush" Value="{StaticResource StrokeBrush}" />
+      <Setter Property="BorderThickness" Value="1" />
+      <Setter Property="CornerRadius" Value="12" />
+      <Setter Property="BoxShadow" Value="0 8 24 0 #22000000" />
+    </Style>
+
+    <Style Selector="Border.card.alt">
+      <Setter Property="Background" Value="{StaticResource SurfaceAltBrush}" />
+    </Style>
+
+    <Style Selector="Button.primary">
+      <Setter Property="Background" Value="{StaticResource AccentBrush}" />
+      <Setter Property="Foreground" Value="White" />
+      <Setter Property="CornerRadius" Value="8" />
+      <Setter Property="Padding" Value="12,6" />
+    </Style>
+
+    <Style Selector="TextBox">
+      <Setter Property="CornerRadius" Value="8" />
+      <Setter Property="Background" Value="{StaticResource SurfaceAltBrush}" />
+      <Setter Property="BorderBrush" Value="{StaticResource StrokeBrush}" />
+      <Setter Property="BorderThickness" Value="1" />
+      <Setter Property="Foreground" Value="{StaticResource TextPrimaryBrush}" />
+      <Setter Property="Padding" Value="10,6" />
+      <Setter Property="VerticalContentAlignment" Value="Center" />
+    </Style>
+
+    <Style Selector="DataGrid">
+      <Setter Property="Background" Value="Transparent" />
+      <Setter Property="BorderThickness" Value="0" />
+    </Style>
+
+    <Style Selector="Button.tab-close">
+      <Setter Property="Background" Value="Transparent" />
+      <Setter Property="BorderThickness" Value="0" />
+      <Setter Property="Padding" Value="4,0" />
+      <Setter Property="Foreground" Value="{StaticResource TextSecondaryBrush}" />
+    </Style>
+
+    <Style Selector="Button.tab-close:pointerover">
+      <Setter Property="Foreground" Value="{StaticResource TextPrimaryBrush}" />
+    </Style>
+  </Application.Styles>
+
+</Application>

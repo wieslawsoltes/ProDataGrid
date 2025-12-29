@@ -15,9 +15,12 @@
 
   <ItemGroup>
     <ProjectReference Include="../ProDiagnostics/ProDiagnostics.csproj" />
+    <ProjectReference Include="../ProDiagnostics.Transport/ProDiagnostics.Transport.csproj" />
+    <ProjectReference Include="../ProDiagnostics.Viewer/ProDiagnostics.Viewer.csproj" />
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="Avalonia.Headless.XUnit" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" />
     <PackageReference Include="xunit" />
     <PackageReference Include="xunit.runner.visualstudio">

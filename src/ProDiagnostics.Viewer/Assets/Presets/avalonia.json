@@ -1,0 +1,30 @@
+{
+  "name": "Avalonia UI",
+  "description": "Focus on Avalonia core diagnostics",
+  "includeActivities": [
+    "Avalonia.*"
+  ],
+  "includeMetrics": [
+    "avalonia.*"
+  ],
+  "activityAliases": {
+    "Avalonia.AttachingStyle": "Attaching Style",
+    "Avalonia.FindingResource": "Finding Resource",
+    "Avalonia.EvaluatingStyle": "Evaluating Style",
+    "Avalonia.MeasuringLayoutable": "Measure",
+    "Avalonia.ArrangingLayoutable": "Arrange",
+    "Avalonia.PerformingHitTest": "Hit Test",
+    "Avalonia.RaisingRoutedEvent": "Routed Event"
+  },
+  "metricAliases": {
+    "avalonia.comp.render.time": "Compositor Render",
+    "avalonia.comp.update.time": "Compositor Update",
+    "avalonia.ui.measure.time": "UI Measure",
+    "avalonia.ui.arrange.time": "UI Arrange",
+    "avalonia.ui.render.time": "UI Render",
+    "avalonia.ui.input.time": "UI Input",
+    "avalonia.ui.event.handler.count": "Event Handlers",
+    "avalonia.ui.visual.count": "Visual Count",
+    "avalonia.ui.dispatcher.timer.count": "Dispatcher Timers"
+  }
+}
