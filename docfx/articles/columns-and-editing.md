@@ -52,8 +52,10 @@ Widths accept pixel values (`"80"`), `Auto` (content-based), `*` or weighted sta
 
 - Widths: pixel, `Auto`, and star sizing (`*`, `2*`).
 - Constraints: `MinWidth`/`MaxWidth` per column.
-- Interaction: `CanUserResizeColumns` and `CanUserReorderColumns` at the grid level; `CanUserResize`, `CanUserReorder`, and `CanUserSort` per column.
+- Interaction: `CanUserResizeColumns`, `CanUserResizeColumnsOnDoubleClick`, and `CanUserReorderColumns` at the grid level; `CanUserResize`, `CanUserReorder`, and `CanUserSort` per column.
 - Frozen columns: `FrozenColumnCount` and `FrozenColumnCountRight` pin columns on the left/right.
+
+Double-click the column header resize handle to fit the column to visible content when `CanUserResizeColumnsOnDoubleClick` is enabled.
 
 ```xml
 <DataGrid FrozenColumnCount="1"

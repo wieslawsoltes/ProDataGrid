@@ -63,6 +63,21 @@ internal
         }
 
         /// <summary>
+        /// Identifies the CanUserResizeColumnsOnDoubleClick dependency property.
+        /// </summary>
+        public static readonly StyledProperty<bool> CanUserResizeColumnsOnDoubleClickProperty =
+            AvaloniaProperty.Register<DataGrid, bool>(nameof(CanUserResizeColumnsOnDoubleClick), true);
+
+        /// <summary>
+        /// Gets or sets a value that indicates whether a column can be auto-fit by double-clicking its resize handle.
+        /// </summary>
+        public bool CanUserResizeColumnsOnDoubleClick
+        {
+            get { return GetValue(CanUserResizeColumnsOnDoubleClickProperty); }
+            set { SetValue(CanUserResizeColumnsOnDoubleClickProperty, value); }
+        }
+
+        /// <summary>
         /// Identifies the CanUserSortColumns dependency property.
         /// </summary>
         public static readonly StyledProperty<bool> CanUserSortColumnsProperty =

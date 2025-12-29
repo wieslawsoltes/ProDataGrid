@@ -456,12 +456,18 @@ internal
 
         //TODO DragDrop
 
-        internal void OnMouseLeftButtonDown(ref bool handled, PointerEventArgs args, Point mousePosition)
+        internal void OnMouseLeftButtonDown(ref bool handled, PointerPressedEventArgs args, Point mousePosition)
         {
             IsPressed = true;
 
             if (OwningGrid != null && OwningGrid.ColumnHeaders != null)
             {
+                if (TryAutoFitColumnOnDoubleClick(args, mousePosition))
+                {
+                    handled = true;
+                    return;
+                }
+
                 _dragMode = DragMode.MouseDown;
                 _frozenColumnsWidth = OwningGrid.GetVisibleFrozenColumnsWidthLeft();
                 _frozenColumnsRightWidth = OwningGrid.GetVisibleFrozenColumnsWidthRight();
@@ -494,6 +500,102 @@ internal
                     handled = true;
                 }
             }
+        }
+
+        private bool TryAutoFitColumnOnDoubleClick(PointerPressedEventArgs args, Point mousePosition)
+        {
+            if (OwningGrid == null || !OwningGrid.CanUserResizeColumnsOnDoubleClick || args.ClickCount != 2)
+            {
+                return false;
+            }
+
+            DataGridColumn currentColumn = OwningColumn;
+            if (currentColumn == null)
+            {
+                return false;
+            }
+
+            double distanceFromLeft = mousePosition.X;
+            double distanceFromRight = Bounds.Width - distanceFromLeft;
+            DataGridColumn previousColumn = null;
+
+            if (!(currentColumn is DataGridFillerColumn))
+            {
+                previousColumn = OwningGrid.ColumnsInternal.GetPreviousVisibleNonFillerColumn(currentColumn);
+            }
+
+            DataGridColumn targetColumn = null;
+            if (distanceFromRight <= DATAGRIDCOLUMNHEADER_resizeRegionWidth)
+            {
+                targetColumn = currentColumn;
+            }
+            else if (distanceFromLeft <= DATAGRIDCOLUMNHEADER_resizeRegionWidth)
+            {
+                targetColumn = previousColumn;
+            }
+
+            if (targetColumn == null || !CanResizeColumn(targetColumn))
+            {
+                return false;
+            }
+
+            AutoFitColumn(targetColumn);
+            return true;
+        }
+
+        private void AutoFitColumn(DataGridColumn column)
+        {
+            if (OwningGrid == null)
+            {
+                return;
+            }
+
+            double desiredWidth = MeasureAutoFitWidth(column);
+            if (double.IsNaN(desiredWidth) || double.IsInfinity(desiredWidth))
+            {
+                return;
+            }
+
+            desiredWidth = Math.Max(column.ActualMinWidth, Math.Min(column.ActualMaxWidth, desiredWidth));
+            var oldWidth = column.Width;
+            var newWidth = new DataGridLength(oldWidth.Value, oldWidth.UnitType, oldWidth.DesiredValue, desiredWidth);
+            var originalHorizontalOffset = OwningGrid.HorizontalOffset;
+            column.Resize(oldWidth, newWidth, true);
+            OwningGrid.UpdateHorizontalOffset(originalHorizontalOffset);
+        }
+
+        private double MeasureAutoFitWidth(DataGridColumn column)
+        {
+            double desiredWidth = 0;
+
+            var headerCell = column.HeaderCell;
+            if (headerCell != null)
+            {
+                headerCell.Measure(new Size(column.ActualMaxWidth, double.PositiveInfinity));
+                desiredWidth = Math.Max(desiredWidth, headerCell.DesiredSize.Width);
+            }
+
+            double measureHeight = OwningGrid != null && !double.IsNaN(OwningGrid.RowHeight)
+                ? OwningGrid.RowHeight
+                : double.PositiveInfinity;
+
+            foreach (Control element in OwningGrid.DisplayData.GetScrollingRows())
+            {
+                if (element is DataGridRow row)
+                {
+                    int columnIndex = column.Index;
+                    if (columnIndex < 0 || columnIndex >= row.Cells.Count)
+                    {
+                        continue;
+                    }
+
+                    var cell = row.Cells[columnIndex];
+                    cell.Measure(new Size(column.ActualMaxWidth, measureHeight));
+                    desiredWidth = Math.Max(desiredWidth, cell.DesiredSize.Width);
+                }
+            }
+
+            return desiredWidth;
         }
 
         //TODO DragEvents
