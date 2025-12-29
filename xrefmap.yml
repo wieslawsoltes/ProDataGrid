@@ -27570,6 +27570,28 @@ references:
   isSpec: "True"
   fullName: Avalonia.Controls.Selection.SelectionModelItemExtensions.Select
   nameWithType: SelectionModelItemExtensions.Select
+- uid: Avalonia.Controls.Selection.SelectionModelItemExtensions.SelectRange(Avalonia.Controls.Selection.ISelectionModel,System.Collections.IEnumerable)
+  name: SelectRange(ISelectionModel, IEnumerable)
+  href: api/Avalonia.Controls.Selection.SelectionModelItemExtensions.html#Avalonia_Controls_Selection_SelectionModelItemExtensions_SelectRange_Avalonia_Controls_Selection_ISelectionModel_System_Collections_IEnumerable_
+  commentId: M:Avalonia.Controls.Selection.SelectionModelItemExtensions.SelectRange(Avalonia.Controls.Selection.ISelectionModel,System.Collections.IEnumerable)
+  fullName: Avalonia.Controls.Selection.SelectionModelItemExtensions.SelectRange(Avalonia.Controls.Selection.ISelectionModel, System.Collections.IEnumerable)
+  nameWithType: SelectionModelItemExtensions.SelectRange(ISelectionModel, IEnumerable)
+- uid: Avalonia.Controls.Selection.SelectionModelItemExtensions.SelectRange(Avalonia.Controls.Selection.ISelectionModel,System.Object,System.Object)
+  name: SelectRange(ISelectionModel, object, object)
+  href: api/Avalonia.Controls.Selection.SelectionModelItemExtensions.html#Avalonia_Controls_Selection_SelectionModelItemExtensions_SelectRange_Avalonia_Controls_Selection_ISelectionModel_System_Object_System_Object_
+  commentId: M:Avalonia.Controls.Selection.SelectionModelItemExtensions.SelectRange(Avalonia.Controls.Selection.ISelectionModel,System.Object,System.Object)
+  name.vb: SelectRange(ISelectionModel, Object, Object)
+  fullName: Avalonia.Controls.Selection.SelectionModelItemExtensions.SelectRange(Avalonia.Controls.Selection.ISelectionModel, object, object)
+  fullName.vb: Avalonia.Controls.Selection.SelectionModelItemExtensions.SelectRange(Avalonia.Controls.Selection.ISelectionModel, Object, Object)
+  nameWithType: SelectionModelItemExtensions.SelectRange(ISelectionModel, object, object)
+  nameWithType.vb: SelectionModelItemExtensions.SelectRange(ISelectionModel, Object, Object)
+- uid: Avalonia.Controls.Selection.SelectionModelItemExtensions.SelectRange*
+  name: SelectRange
+  href: api/Avalonia.Controls.Selection.SelectionModelItemExtensions.html#Avalonia_Controls_Selection_SelectionModelItemExtensions_SelectRange_
+  commentId: Overload:Avalonia.Controls.Selection.SelectionModelItemExtensions.SelectRange
+  isSpec: "True"
+  fullName: Avalonia.Controls.Selection.SelectionModelItemExtensions.SelectRange
+  nameWithType: SelectionModelItemExtensions.SelectRange
 - uid: Avalonia.Controls.Utils
   name: Avalonia.Controls.Utils
   href: api/Avalonia.Controls.Utils.html
