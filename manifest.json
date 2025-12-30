@@ -2958,6 +2958,34 @@
     },
     {
       "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.DataGridValidationResult.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.DataGridValidationResult.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.DataGridValidationResult",
+      "Summary": "<p sourcefile=\"api/Avalonia.Controls.DataGridValidationResult.yml\" sourcestartlinenumber=\"1\">Describes a validation message with a severity level.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.DataGridValidationSeverity.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.DataGridValidationSeverity.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.DataGridValidationSeverity",
+      "Summary": "<p sourcefile=\"api/Avalonia.Controls.DataGridValidationSeverity.yml\" sourcestartlinenumber=\"1\">Defines the severity of a validation result.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
       "source_relative_path": "api/Avalonia.Controls.DefaultRowHeightEstimator.yml",
       "output": {
         ".html": {

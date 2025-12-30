@@ -6731,6 +6731,19 @@ references:
   isSpec: "True"
   fullName: Avalonia.Controls.DataGridBoundColumn.GenerateEditingElementDirect
   nameWithType: DataGridBoundColumn.GenerateEditingElementDirect
+- uid: Avalonia.Controls.DataGridBoundColumn.RefreshEditingElement(Avalonia.Controls.Control)
+  name: RefreshEditingElement(Control)
+  href: api/Avalonia.Controls.DataGridBoundColumn.html#Avalonia_Controls_DataGridBoundColumn_RefreshEditingElement_Avalonia_Controls_Control_
+  commentId: M:Avalonia.Controls.DataGridBoundColumn.RefreshEditingElement(Avalonia.Controls.Control)
+  fullName: Avalonia.Controls.DataGridBoundColumn.RefreshEditingElement(Avalonia.Controls.Control)
+  nameWithType: DataGridBoundColumn.RefreshEditingElement(Control)
+- uid: Avalonia.Controls.DataGridBoundColumn.RefreshEditingElement*
+  name: RefreshEditingElement
+  href: api/Avalonia.Controls.DataGridBoundColumn.html#Avalonia_Controls_DataGridBoundColumn_RefreshEditingElement_
+  commentId: Overload:Avalonia.Controls.DataGridBoundColumn.RefreshEditingElement
+  isSpec: "True"
+  fullName: Avalonia.Controls.DataGridBoundColumn.RefreshEditingElement
+  nameWithType: DataGridBoundColumn.RefreshEditingElement
 - uid: Avalonia.Controls.DataGridButtonColumn
   name: DataGridButtonColumn
   href: api/Avalonia.Controls.DataGridButtonColumn.html
@@ -7120,6 +7133,25 @@ references:
   commentId: F:Avalonia.Controls.DataGridCell.OwningRowProperty
   fullName: Avalonia.Controls.DataGridCell.OwningRowProperty
   nameWithType: DataGridCell.OwningRowProperty
+- uid: Avalonia.Controls.DataGridCell.ValidationSeverity
+  name: ValidationSeverity
+  href: api/Avalonia.Controls.DataGridCell.html#Avalonia_Controls_DataGridCell_ValidationSeverity
+  commentId: P:Avalonia.Controls.DataGridCell.ValidationSeverity
+  fullName: Avalonia.Controls.DataGridCell.ValidationSeverity
+  nameWithType: DataGridCell.ValidationSeverity
+- uid: Avalonia.Controls.DataGridCell.ValidationSeverity*
+  name: ValidationSeverity
+  href: api/Avalonia.Controls.DataGridCell.html#Avalonia_Controls_DataGridCell_ValidationSeverity_
+  commentId: Overload:Avalonia.Controls.DataGridCell.ValidationSeverity
+  isSpec: "True"
+  fullName: Avalonia.Controls.DataGridCell.ValidationSeverity
+  nameWithType: DataGridCell.ValidationSeverity
+- uid: Avalonia.Controls.DataGridCell.ValidationSeverityProperty
+  name: ValidationSeverityProperty
+  href: api/Avalonia.Controls.DataGridCell.html#Avalonia_Controls_DataGridCell_ValidationSeverityProperty
+  commentId: F:Avalonia.Controls.DataGridCell.ValidationSeverityProperty
+  fullName: Avalonia.Controls.DataGridCell.ValidationSeverityProperty
+  nameWithType: DataGridCell.ValidationSeverityProperty
 - uid: Avalonia.Controls.DataGridCellEditEndedEventArgs
   name: DataGridCellEditEndedEventArgs
   href: api/Avalonia.Controls.DataGridCellEditEndedEventArgs.html
@@ -8578,6 +8610,19 @@ references:
   isSpec: "True"
   fullName: Avalonia.Controls.DataGridColumn.RefreshCellContent
   nameWithType: DataGridColumn.RefreshCellContent
+- uid: Avalonia.Controls.DataGridColumn.RefreshEditingElement(Avalonia.Controls.Control)
+  name: RefreshEditingElement(Control)
+  href: api/Avalonia.Controls.DataGridColumn.html#Avalonia_Controls_DataGridColumn_RefreshEditingElement_Avalonia_Controls_Control_
+  commentId: M:Avalonia.Controls.DataGridColumn.RefreshEditingElement(Avalonia.Controls.Control)
+  fullName: Avalonia.Controls.DataGridColumn.RefreshEditingElement(Avalonia.Controls.Control)
+  nameWithType: DataGridColumn.RefreshEditingElement(Control)
+- uid: Avalonia.Controls.DataGridColumn.RefreshEditingElement*
+  name: RefreshEditingElement
+  href: api/Avalonia.Controls.DataGridColumn.html#Avalonia_Controls_DataGridColumn_RefreshEditingElement_
+  commentId: Overload:Avalonia.Controls.DataGridColumn.RefreshEditingElement
+  isSpec: "True"
+  fullName: Avalonia.Controls.DataGridColumn.RefreshEditingElement
+  nameWithType: DataGridColumn.RefreshEditingElement
 - uid: Avalonia.Controls.DataGridColumn.ShowFilterButton
   name: ShowFilterButton
   href: api/Avalonia.Controls.DataGridColumn.html#Avalonia_Controls_DataGridColumn_ShowFilterButton
@@ -19225,6 +19270,25 @@ references:
   commentId: F:Avalonia.Controls.DataGridRow.OwningGridProperty
   fullName: Avalonia.Controls.DataGridRow.OwningGridProperty
   nameWithType: DataGridRow.OwningGridProperty
+- uid: Avalonia.Controls.DataGridRow.ValidationSeverity
+  name: ValidationSeverity
+  href: api/Avalonia.Controls.DataGridRow.html#Avalonia_Controls_DataGridRow_ValidationSeverity
+  commentId: P:Avalonia.Controls.DataGridRow.ValidationSeverity
+  fullName: Avalonia.Controls.DataGridRow.ValidationSeverity
+  nameWithType: DataGridRow.ValidationSeverity
+- uid: Avalonia.Controls.DataGridRow.ValidationSeverity*
+  name: ValidationSeverity
+  href: api/Avalonia.Controls.DataGridRow.html#Avalonia_Controls_DataGridRow_ValidationSeverity_
+  commentId: Overload:Avalonia.Controls.DataGridRow.ValidationSeverity
+  isSpec: "True"
+  fullName: Avalonia.Controls.DataGridRow.ValidationSeverity
+  nameWithType: DataGridRow.ValidationSeverity
+- uid: Avalonia.Controls.DataGridRow.ValidationSeverityProperty
+  name: ValidationSeverityProperty
+  href: api/Avalonia.Controls.DataGridRow.html#Avalonia_Controls_DataGridRow_ValidationSeverityProperty
+  commentId: F:Avalonia.Controls.DataGridRow.ValidationSeverityProperty
+  fullName: Avalonia.Controls.DataGridRow.ValidationSeverityProperty
+  nameWithType: DataGridRow.ValidationSeverityProperty
 - uid: Avalonia.Controls.DataGridRowClipboardEventArgs
   name: DataGridRowClipboardEventArgs
   href: api/Avalonia.Controls.DataGridRowClipboardEventArgs.html
@@ -25851,6 +25915,100 @@ references:
   isSpec: "True"
   fullName: Avalonia.Controls.DataGridToggleSwitchColumn.RefreshCellContent
   nameWithType: DataGridToggleSwitchColumn.RefreshCellContent
+- uid: Avalonia.Controls.DataGridValidationResult
+  name: DataGridValidationResult
+  href: api/Avalonia.Controls.DataGridValidationResult.html
+  commentId: T:Avalonia.Controls.DataGridValidationResult
+  fullName: Avalonia.Controls.DataGridValidationResult
+  nameWithType: DataGridValidationResult
+- uid: Avalonia.Controls.DataGridValidationResult.#ctor(System.String,Avalonia.Controls.DataGridValidationSeverity)
+  name: DataGridValidationResult(string, DataGridValidationSeverity)
+  href: api/Avalonia.Controls.DataGridValidationResult.html#Avalonia_Controls_DataGridValidationResult__ctor_System_String_Avalonia_Controls_DataGridValidationSeverity_
+  commentId: M:Avalonia.Controls.DataGridValidationResult.#ctor(System.String,Avalonia.Controls.DataGridValidationSeverity)
+  name.vb: New(String, DataGridValidationSeverity)
+  fullName: Avalonia.Controls.DataGridValidationResult.DataGridValidationResult(string, Avalonia.Controls.DataGridValidationSeverity)
+  fullName.vb: Avalonia.Controls.DataGridValidationResult.New(String, Avalonia.Controls.DataGridValidationSeverity)
+  nameWithType: DataGridValidationResult.DataGridValidationResult(string, DataGridValidationSeverity)
+  nameWithType.vb: DataGridValidationResult.New(String, DataGridValidationSeverity)
+- uid: Avalonia.Controls.DataGridValidationResult.#ctor*
+  name: DataGridValidationResult
+  href: api/Avalonia.Controls.DataGridValidationResult.html#Avalonia_Controls_DataGridValidationResult__ctor_
+  commentId: Overload:Avalonia.Controls.DataGridValidationResult.#ctor
+  isSpec: "True"
+  name.vb: New
+  fullName: Avalonia.Controls.DataGridValidationResult.DataGridValidationResult
+  fullName.vb: Avalonia.Controls.DataGridValidationResult.New
+  nameWithType: DataGridValidationResult.DataGridValidationResult
+  nameWithType.vb: DataGridValidationResult.New
+- uid: Avalonia.Controls.DataGridValidationResult.Message
+  name: Message
+  href: api/Avalonia.Controls.DataGridValidationResult.html#Avalonia_Controls_DataGridValidationResult_Message
+  commentId: P:Avalonia.Controls.DataGridValidationResult.Message
+  fullName: Avalonia.Controls.DataGridValidationResult.Message
+  nameWithType: DataGridValidationResult.Message
+- uid: Avalonia.Controls.DataGridValidationResult.Message*
+  name: Message
+  href: api/Avalonia.Controls.DataGridValidationResult.html#Avalonia_Controls_DataGridValidationResult_Message_
+  commentId: Overload:Avalonia.Controls.DataGridValidationResult.Message
+  isSpec: "True"
+  fullName: Avalonia.Controls.DataGridValidationResult.Message
+  nameWithType: DataGridValidationResult.Message
+- uid: Avalonia.Controls.DataGridValidationResult.Severity
+  name: Severity
+  href: api/Avalonia.Controls.DataGridValidationResult.html#Avalonia_Controls_DataGridValidationResult_Severity
+  commentId: P:Avalonia.Controls.DataGridValidationResult.Severity
+  fullName: Avalonia.Controls.DataGridValidationResult.Severity
+  nameWithType: DataGridValidationResult.Severity
+- uid: Avalonia.Controls.DataGridValidationResult.Severity*
+  name: Severity
+  href: api/Avalonia.Controls.DataGridValidationResult.html#Avalonia_Controls_DataGridValidationResult_Severity_
+  commentId: Overload:Avalonia.Controls.DataGridValidationResult.Severity
+  isSpec: "True"
+  fullName: Avalonia.Controls.DataGridValidationResult.Severity
+  nameWithType: DataGridValidationResult.Severity
+- uid: Avalonia.Controls.DataGridValidationResult.ToString
+  name: ToString()
+  href: api/Avalonia.Controls.DataGridValidationResult.html#Avalonia_Controls_DataGridValidationResult_ToString
+  commentId: M:Avalonia.Controls.DataGridValidationResult.ToString
+  fullName: Avalonia.Controls.DataGridValidationResult.ToString()
+  nameWithType: DataGridValidationResult.ToString()
+- uid: Avalonia.Controls.DataGridValidationResult.ToString*
+  name: ToString
+  href: api/Avalonia.Controls.DataGridValidationResult.html#Avalonia_Controls_DataGridValidationResult_ToString_
+  commentId: Overload:Avalonia.Controls.DataGridValidationResult.ToString
+  isSpec: "True"
+  fullName: Avalonia.Controls.DataGridValidationResult.ToString
+  nameWithType: DataGridValidationResult.ToString
+- uid: Avalonia.Controls.DataGridValidationSeverity
+  name: DataGridValidationSeverity
+  href: api/Avalonia.Controls.DataGridValidationSeverity.html
+  commentId: T:Avalonia.Controls.DataGridValidationSeverity
+  fullName: Avalonia.Controls.DataGridValidationSeverity
+  nameWithType: DataGridValidationSeverity
+- uid: Avalonia.Controls.DataGridValidationSeverity.Error
+  name: Error
+  href: api/Avalonia.Controls.DataGridValidationSeverity.html#Avalonia_Controls_DataGridValidationSeverity_Error
+  commentId: F:Avalonia.Controls.DataGridValidationSeverity.Error
+  fullName: Avalonia.Controls.DataGridValidationSeverity.Error
+  nameWithType: DataGridValidationSeverity.Error
+- uid: Avalonia.Controls.DataGridValidationSeverity.Info
+  name: Info
+  href: api/Avalonia.Controls.DataGridValidationSeverity.html#Avalonia_Controls_DataGridValidationSeverity_Info
+  commentId: F:Avalonia.Controls.DataGridValidationSeverity.Info
+  fullName: Avalonia.Controls.DataGridValidationSeverity.Info
+  nameWithType: DataGridValidationSeverity.Info
+- uid: Avalonia.Controls.DataGridValidationSeverity.None
+  name: None
+  href: api/Avalonia.Controls.DataGridValidationSeverity.html#Avalonia_Controls_DataGridValidationSeverity_None
+  commentId: F:Avalonia.Controls.DataGridValidationSeverity.None
+  fullName: Avalonia.Controls.DataGridValidationSeverity.None
+  nameWithType: DataGridValidationSeverity.None
+- uid: Avalonia.Controls.DataGridValidationSeverity.Warning
+  name: Warning
+  href: api/Avalonia.Controls.DataGridValidationSeverity.html#Avalonia_Controls_DataGridValidationSeverity_Warning
+  commentId: F:Avalonia.Controls.DataGridValidationSeverity.Warning
+  fullName: Avalonia.Controls.DataGridValidationSeverity.Warning
+  nameWithType: DataGridValidationSeverity.Warning
 - uid: Avalonia.Controls.DefaultRowHeightEstimator
   name: DefaultRowHeightEstimator
   href: api/Avalonia.Controls.DefaultRowHeightEstimator.html

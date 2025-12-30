@@ -103,6 +103,41 @@ public string Name
     }
 }
 </code></pre>
+<h2 id="severity-levels">Severity Levels</h2>
+<p>Use <code>DataGridValidationResult</code> to distinguish blocking errors from non-blocking warnings and info messages. Errors prevent commit; warnings and info allow commit but keep the cell highlighted.</p>
+<pre><code class="lang-csharp">using Avalonia.Controls;
+using Avalonia.Data;
+
+public int Risk
+{
+    get =&gt; _risk;
+    set
+    {
+        _risk = value;
+        OnPropertyChanged();
+
+        if (value &gt;= 8)
+        {
+            throw new DataValidationException(
+                new DataGridValidationResult(&quot;Risk of 8+ is a warning.&quot;, DataGridValidationSeverity.Warning));
+        }
+    }
+}
+</code></pre>
+<h2 id="style-warning-and-info-states">Style Warning and Info States</h2>
+<p>Warning and info states are exposed as <code>:warning</code> and <code>:info</code> on <code>DataGridCell</code>:</p>
+<pre><code class="lang-xml">&lt;Style Selector=&quot;DataGridCell:warning&quot;&gt;
+  &lt;Setter Property=&quot;BorderBrush&quot; Value=&quot;#F59E0B&quot; /&gt;
+  &lt;Setter Property=&quot;BorderThickness&quot; Value=&quot;1&quot; /&gt;
+&lt;/Style&gt;
+
+&lt;Style Selector=&quot;DataGridCell:info&quot;&gt;
+  &lt;Setter Property=&quot;BorderBrush&quot; Value=&quot;#22C55E&quot; /&gt;
+  &lt;Setter Property=&quot;BorderThickness&quot; Value=&quot;1&quot; /&gt;
+&lt;/Style&gt;
+
+</code></pre>
+<p>Built-in DataValidationErrors themes include <code>DataGridCellDataValidationErrorsTheme</code>, <code>DataGridCellDataValidationWarningsTheme</code>, and <code>DataGridCellDataValidationInfoTheme</code>. Warning/info cells surface the same inline indicator and tooltip as errors.</p>
 <h2 id="style-invalid-rows-and-cells">Style Invalid Rows and Cells</h2>
 <p>Invalid rows and cells expose the <code>:invalid</code> pseudo-class:</p>
 <pre><code class="lang-xml">&lt;Style Selector=&quot;DataGridCell:invalid&quot;&gt;
@@ -116,7 +151,7 @@ public string Name
 </code></pre>
 <p>You can also restyle the <code>DataValidationErrors</code> theme used by cell templates via <code>DataGridCellDataValidationErrorsTheme</code> in <code>Themes/Generic.xaml</code>.</p>
 <h2 id="sample-reference">Sample Reference</h2>
-<p>See the <code>Validation</code> page in <code>src/DataGridSample</code> for validation across every editable column type (numeric, date/time, masked text, combo boxes, toggles, hyperlinks, and more).</p>
+<p>See the <code>Validation</code> page in <code>src/DataGridSample</code> for validation across every editable column type (numeric, date/time, masked text, combo boxes, toggles, hyperlinks, and more) and <code>Validation Styling</code> for severity-based warnings/info.</p>
 
 </article>
 
