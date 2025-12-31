@@ -581,14 +581,18 @@ namespace Avalonia.Controls
                 double heightChangeBelowLastDisplayedSlot = 0;
                 if (DisplayData.FirstScrollingSlot >= startSlot && DisplayData.FirstScrollingSlot <= endSlot)
                 {
-                    // Our first visible slot was collapsed, find the replacement
-                    int collapsedSlotsAbove = DisplayData.FirstScrollingSlot - startSlot - _collapsedSlotsTable.GetIndexCount(startSlot, DisplayData.FirstScrollingSlot);
-                    Debug.Assert(collapsedSlotsAbove > 0);
-                    int newFirstScrollingSlot = GetNextVisibleSlot(DisplayData.FirstScrollingSlot);
-                    while (collapsedSlotsAbove > 1 && newFirstScrollingSlot < SlotCount)
+                    int newFirstScrollingSlot = -1;
+                    if (isDisplayed)
                     {
-                        collapsedSlotsAbove--;
-                        newFirstScrollingSlot = GetNextVisibleSlot(newFirstScrollingSlot);
+                        // Our first visible slot was collapsed, find the replacement
+                        int collapsedSlotsAbove = DisplayData.FirstScrollingSlot - startSlot - _collapsedSlotsTable.GetIndexCount(startSlot, DisplayData.FirstScrollingSlot);
+                        Debug.Assert(collapsedSlotsAbove >= 0);
+                        newFirstScrollingSlot = GetNextVisibleSlot(DisplayData.FirstScrollingSlot);
+                        while (collapsedSlotsAbove > 1 && newFirstScrollingSlot < SlotCount)
+                        {
+                            collapsedSlotsAbove--;
+                            newFirstScrollingSlot = GetNextVisibleSlot(newFirstScrollingSlot);
+                        }
                     }
                     heightChange += CollapseSlotsInTable(startSlot, endSlot, ref slotsExpanded, oldLastDisplayedSlot, ref heightChangeBelowLastDisplayedSlot);
                     if (isDisplayed)
