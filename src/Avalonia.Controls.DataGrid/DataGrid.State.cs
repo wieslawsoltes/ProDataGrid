@@ -709,6 +709,12 @@ namespace Avalonia.Controls
             UpdateGroupingIndentation();
         }
 
+        internal void RefreshGroupingAfterDescriptionsChange()
+        {
+            RefreshGroupingLayout();
+            RequestGroupingIndentationRefresh();
+        }
+
         private void UpdateGroupingIndentation()
         {
             if (RowGroupSublevelIndents == null || DisplayData == null)

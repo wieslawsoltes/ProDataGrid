@@ -39,6 +39,7 @@ namespace Avalonia.Controls
         private bool _onCollectionAddRemoveNewRowPlaceholder;
         private int? _placeholderRowIndexDuringAdd;
         private DataGridCollectionView _groupingCollectionView;
+        private bool _pendingGroupingRefresh;
 
         public DataGridDataConnection(DataGrid owner)
         {
@@ -849,6 +850,7 @@ namespace Avalonia.Controls
 
         private void GroupDescriptions_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
         {
+            _pendingGroupingRefresh = true;
             if (e.OldItems != null)
             {
                 foreach (var item in e.OldItems)
@@ -876,6 +878,7 @@ namespace Avalonia.Controls
 
         private void GroupDescription_PropertyChanged(object sender, PropertyChangedEventArgs e)
         {
+            _pendingGroupingRefresh = true;
             _owner.OnGroupingChangedForSummaries();
         }
 
@@ -1083,6 +1086,12 @@ namespace Avalonia.Controls
 
                 // Notify the summary service about the collection change
                 _owner.OnCollectionChangedForSummaries(e);
+
+                if (_pendingGroupingRefresh && e.Action == NotifyCollectionChangedAction.Reset)
+                {
+                    _pendingGroupingRefresh = false;
+                    _owner.RefreshGroupingAfterDescriptionsChange();
+                }
 
                 // Ensure the visual selection state matches the restored selection after mutations
                 _owner.RefreshVisibleSelection();
