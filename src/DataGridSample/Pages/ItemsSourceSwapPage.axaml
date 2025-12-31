@@ -1,0 +1,55 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:viewModels="clr-namespace:DataGridSample.ViewModels"
+             x:Class="DataGridSample.Pages.ItemsSourceSwapPage"
+             x:DataType="viewModels:ItemsSourceSwapViewModel">
+  <UserControl.DataContext>
+    <viewModels:ItemsSourceSwapViewModel />
+  </UserControl.DataContext>
+
+  <Grid Margin="12"
+        RowDefinitions="Auto,Auto,*"
+        ColumnDefinitions="*"
+        RowSpacing="8">
+    <StackPanel Spacing="4">
+      <TextBlock Classes="h2">ItemsSource swaps</TextBlock>
+      <TextBlock Text="Swap the ItemsSource between lists, a DataGridCollectionView, and null. The grid rewires the selection model and resets selection as sources change."
+                 TextWrapping="Wrap" />
+    </StackPanel>
+
+    <StackPanel Grid.Row="1"
+                Orientation="Horizontal"
+                Spacing="6"
+                VerticalAlignment="Center">
+      <Button Content="List A" Command="{Binding UseListACommand}" />
+      <Button Content="List B" Command="{Binding UseListBCommand}" />
+      <Button Content="CollectionView" Command="{Binding UseViewCommand}" />
+      <Button Content="Clear" Command="{Binding ClearCommand}" />
+      <Button Content="Reset Items" Command="{Binding ResetCommand}" />
+      <TextBlock Text="{Binding Status}"
+                 Margin="12 0 0 0"
+                 VerticalAlignment="Center"
+                 TextWrapping="Wrap" />
+    </StackPanel>
+
+    <DataGrid Grid.Row="2"
+              ItemsSource="{Binding ItemsSource}"
+              Selection="{Binding SelectionModel}"
+              SelectionMode="Extended"
+              HeadersVisibility="All"
+              CanUserReorderColumns="True"
+              AutoGenerateColumns="False"
+              Height="420">
+      <DataGrid.Columns>
+        <DataGridTextColumn Header="Name"
+                            Binding="{Binding Name}"
+                            Width="2*"
+                            x:DataType="viewModels:ItemsSourceSwapViewModel+SwapItem" />
+        <DataGridTextColumn Header="Value"
+                            Binding="{Binding Value}"
+                            Width="*"
+                            x:DataType="viewModels:ItemsSourceSwapViewModel+SwapItem" />
+      </DataGrid.Columns>
+    </DataGrid>
+  </Grid>
+</UserControl>

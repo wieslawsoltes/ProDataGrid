@@ -89,6 +89,9 @@
     <TabItem Header="Collection Changes">
       <pages:CollectionChangesPage />
     </TabItem>
+    <TabItem Header="ItemsSource Swap">
+      <pages:ItemsSourceSwapPage />
+    </TabItem>
     <TabItem Header="Selection Binding">
       <pages:SelectedItemsPage />
     </TabItem>
@@ -247,6 +250,9 @@
     </TabItem>
     <TabItem Header="Hierarchical Model">
       <pages:HierarchicalSamplePage />
+    </TabItem>
+    <TabItem Header="Hierarchical Source Swap">
+      <pages:HierarchicalItemsSourceSwapPage />
     </TabItem>
     <TabItem Header="TreeView Mimic">
       <pages:TreeViewMimicPage />

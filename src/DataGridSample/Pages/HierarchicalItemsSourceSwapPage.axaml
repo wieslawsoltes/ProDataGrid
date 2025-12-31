@@ -1,0 +1,59 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:viewModels="clr-namespace:DataGridSample.ViewModels"
+             xmlns:hier="clr-namespace:Avalonia.Controls.DataGridHierarchical;assembly=Avalonia.Controls.DataGrid"
+             x:Class="DataGridSample.Pages.HierarchicalItemsSourceSwapPage"
+             x:DataType="viewModels:HierarchicalItemsSourceSwapViewModel">
+  <UserControl.DataContext>
+    <viewModels:HierarchicalItemsSourceSwapViewModel />
+  </UserControl.DataContext>
+
+  <Grid Margin="12"
+        RowDefinitions="Auto,Auto,*"
+        ColumnDefinitions="*"
+        RowSpacing="8">
+    <StackPanel Spacing="4">
+      <TextBlock Classes="h2">Hierarchical ItemsSource swap</TextBlock>
+      <TextBlock Text="Swap between two hierarchical models. The grid updates its owned ItemsSource and rewires the selection model as the flattened node list changes."
+                 TextWrapping="Wrap" />
+    </StackPanel>
+
+    <StackPanel Grid.Row="1"
+                Orientation="Horizontal"
+                Spacing="6"
+                VerticalAlignment="Center">
+      <Button Content="Model A" Command="{Binding UseModelACommand}" />
+      <Button Content="Model B" Command="{Binding UseModelBCommand}" />
+      <Button Content="Reset Models" Command="{Binding ResetCommand}" />
+      <TextBlock Text="{Binding Status}"
+                 Margin="12 0 0 0"
+                 VerticalAlignment="Center"
+                 TextWrapping="Wrap" />
+    </StackPanel>
+
+    <DataGrid Grid.Row="2"
+              ItemsSource="{Binding ItemsSource}"
+              HierarchicalModel="{Binding Model}"
+              HierarchicalRowsEnabled="True"
+              Selection="{Binding SelectionModel}"
+              SelectionMode="Single"
+              AutoGenerateColumns="False"
+              HeadersVisibility="All"
+              Height="420">
+      <DataGrid.Columns>
+        <DataGridHierarchicalColumn Header="Name"
+                                    Binding="{Binding Item.Name}"
+                                    Width="2*"
+                                    x:CompileBindings="False" />
+        <DataGridTextColumn Header="Level"
+                            Binding="{Binding Level}"
+                            Width="80"
+                            x:DataType="hier:HierarchicalNode" />
+        <DataGridTextColumn Header="Expanded"
+                            Binding="{Binding IsExpanded}"
+                            Width="120"
+                            x:DataType="hier:HierarchicalNode" />
+      </DataGrid.Columns>
+    </DataGrid>
+  </Grid>
+</UserControl>

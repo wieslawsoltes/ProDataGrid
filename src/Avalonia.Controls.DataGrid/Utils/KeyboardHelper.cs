@@ -25,8 +25,8 @@ namespace Avalonia.Controls.Utils
 
         public static KeyModifiers GetPlatformCtrlOrCmdKeyModifier(Control target)
         {
-            var keymap = TopLevel.GetTopLevel(target)!.PlatformSettings!.HotkeyConfiguration;
-            return keymap.CommandModifiers;
+            var topLevel = TopLevel.GetTopLevel(target);
+            return topLevel?.PlatformSettings?.HotkeyConfiguration.CommandModifiers ?? KeyModifiers.Control;
         }
     }
 }
