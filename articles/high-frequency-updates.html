@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+      <title>High-Frequency Updates and Large Collections | ProDataGrid for Avalonia </title>
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <meta name="title" content="High-Frequency Updates and Large Collections | ProDataGrid for Avalonia ">
+      
+      
+      <link rel="icon" href="../favicon.ico">
+      <link rel="stylesheet" href="../public/docfx.min.css">
+      <link rel="stylesheet" href="../public/main.css">
+      <meta name="docfx:navrel" content="../toc.html">
+      <meta name="docfx:tocrel" content="toc.html">
+      
+      
+      
+      
+      <meta name="docfx:docurl" content="https://github.com/wieslawsoltes/ProDataGrid/blob/master/docfx/articles/high-frequency-updates.md/#L1">
+      <meta name="loc:inThisArticle" content="In this article">
+      <meta name="loc:searchResultsCount" content="{count} results for &quot;{query}&quot;">
+      <meta name="loc:searchNoResults" content="No results for &quot;{query}&quot;">
+      <meta name="loc:tocFilter" content="Filter by title">
+      <meta name="loc:nextArticle" content="Next">
+      <meta name="loc:prevArticle" content="Previous">
+      <meta name="loc:themeLight" content="Light">
+      <meta name="loc:themeDark" content="Dark">
+      <meta name="loc:themeAuto" content="Auto">
+      <meta name="loc:changeTheme" content="Change theme">
+      <meta name="loc:copy" content="Copy">
+      <meta name="loc:downloadPdf" content="Download PDF">
+
+      <script type="module" src="./../public/docfx.min.js"></script>
+
+      <script>
+        const theme = localStorage.getItem('theme') || 'auto'
+        document.documentElement.setAttribute('data-bs-theme', theme === 'auto' ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light') : theme)
+      </script>
+
+  </head>
+
+  <body class="tex2jax_ignore" data-layout="" data-yaml-mime="">
+    <header class="bg-body border-bottom">
+      <nav id="autocollapse" class="navbar navbar-expand-md" role="navigation">
+        <div class="container-xxl flex-nowrap">
+          <a class="navbar-brand" href="../index.html">
+            <img id="logo" class="svg" src="../images/logo.svg" alt="">
+            
+          </a>
+          <button class="btn btn-lg d-md-none border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navpanel" aria-controls="navpanel" aria-expanded="false" aria-label="Toggle navigation">
+            <i class="bi bi-three-dots"></i>
+          </button>
+          <div class="collapse navbar-collapse" id="navpanel">
+            <div id="navbar">
+            </div>
+          </div>
+        </div>
+      </nav>
+    </header>
+
+    <main class="container-xxl">
+      <div class="toc-offcanvas">
+        <div class="offcanvas-md offcanvas-start" tabindex="-1" id="tocOffcanvas" aria-labelledby="tocOffcanvasLabel">
+          <div class="offcanvas-header">
+            <h5 class="offcanvas-title" id="tocOffcanvasLabel">Table of Contents</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="offcanvas" data-bs-target="#tocOffcanvas" aria-label="Close"></button>
+          </div>
+          <div class="offcanvas-body">
+            <nav class="toc" id="toc"></nav>
+          </div>
+        </div>
+      </div>
+
+      <div class="content">
+        <div class="actionbar">
+          <button class="btn btn-lg border-0 d-md-none" type="button" data-bs-toggle="offcanvas" data-bs-target="#tocOffcanvas" aria-controls="tocOffcanvas" aria-expanded="false" aria-label="Show table of contents">
+            <i class="bi bi-list"></i>
+          </button>
+
+          <nav id="breadcrumb"></nav>
+        </div>
+
+        <article data-uid="">
+<h1 id="high-frequency-updates-and-large-collections">High-Frequency Updates and Large Collections</h1>
+
+<p>ProDataGrid can handle very large collections, but the update pattern matters. This article explains the fast-path update behavior for <code>DataGridCollectionView</code>, when it applies, and how to keep UI updates constant-time for streaming or frequently changing data.</p>
+<h2 id="why-it-matters">Why it matters</h2>
+<p>When a collection changes, <code>DataGridCollectionView</code> normally maintains an internal list to support sorting, filtering, grouping, and paging. For large collections with frequent changes, rebuilding or copying that list can become the bottleneck.</p>
+<p>When the view is a straight pass-through, <code>DataGridCollectionView</code> now reuses the source list directly. That avoids extra list copies and lets add/remove/move updates flow in O(1).</p>
+<h2 id="fast-path-requirements">Fast-path requirements</h2>
+<p>The source must meet all of these conditions:</p>
+<ul>
+<li>Implements <code>IList</code>.</li>
+<li>Implements <code>INotifyCollectionChanged</code>.</li>
+<li>The view has no local transforms:
+<ul>
+<li><code>SortDescriptions.Count == 0</code></li>
+<li><code>Filter == null</code></li>
+<li><code>GroupDescriptions.Count == 0</code></li>
+<li><code>PageSize == 0</code></li>
+</ul>
+</li>
+</ul>
+<p>If any of these change at runtime, the view switches back to a local list to keep sorted/filtered/grouped/paged behavior correct.</p>
+<h2 id="update-patterns-that-stay-fast">Update patterns that stay fast</h2>
+<p>Use incremental change notifications:</p>
+<ul>
+<li><code>Add</code> with a valid <code>NewStartingIndex</code> (or no index so the view can locate the item)</li>
+<li><code>Remove</code> with a valid <code>OldStartingIndex</code></li>
+<li><code>Move</code> with valid old/new indices</li>
+<li><code>Replace</code> with valid <code>OldStartingIndex</code></li>
+</ul>
+<p>If indices are missing for remove/move/replace (for example, <code>OldStartingIndex &lt; 0</code>), the view falls back to a full refresh to remain consistent.</p>
+<h2 id="example-rolling-window-updates">Example: rolling window updates</h2>
+<pre><code class="lang-csharp">using System.Collections.ObjectModel;
+using Avalonia.Controls;
+using Avalonia.Threading;
+
+var items = new ObservableCollection&lt;StreamingItem&gt;();
+dataGrid.ItemsSource = items;
+
+void ApplyBatch()
+{
+    for (var i = 0; i &lt; 50; i++)
+    {
+        items.Add(CreateItem());
+        if (items.Count &gt; 10000)
+        {
+            items.RemoveAt(0);
+        }
+    }
+}
+
+// Dispatch to UI thread to keep updates safe.
+Dispatcher.UIThread.Post(ApplyBatch);
+</code></pre>
+<p>This pattern keeps the view and grid updates bounded to the small set of changed rows.</p>
+<h2 id="when-the-view-falls-back-to-a-full-refresh">When the view falls back to a full refresh</h2>
+<p>The fast path is disabled (or bypassed) when:</p>
+<ul>
+<li>Sorting, filtering, grouping, or paging is enabled.</li>
+<li>The source does not implement <code>INotifyCollectionChanged</code>.</li>
+<li>The collection raises <code>Reset</code> or lacks valid indices.</li>
+</ul>
+<p>For these cases, consider:</p>
+<ul>
+<li>Reducing the frequency of updates.</li>
+<li>Batching changes and issuing fewer notifications.</li>
+<li>Moving sorting/filtering/grouping upstream (server-side or custom view).</li>
+</ul>
+<h2 id="sample-streaming-updates">Sample: Streaming Updates</h2>
+<p>The DataGrid sample app includes a &quot;Streaming Updates&quot; tab that simulates a rolling window of adds/removes against a large <code>ObservableCollection</code>. Use it to validate update behavior and UI responsiveness.</p>
+<h2 id="related-topics">Related topics</h2>
+<ul>
+<li><a href="data-sources-and-collection-views.html">Data Sources and Collection Views</a></li>
+<li><a href="scrolling-virtualization.html">Scrolling and Virtualization</a></li>
+</ul>
+
+</article>
+
+        <div class="contribution d-print-none">
+          <a href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/docfx/articles/high-frequency-updates.md/#L1" class="edit-link">Edit this page</a>
+        </div>
+
+        <div class="next-article d-print-none border-top" id="nextArticle"></div>
+
+      </div>
+
+      <div class="affix">
+        <nav id="affix"></nav>
+      </div>
+    </main>
+
+
+    <footer class="border-top text-secondary">
+      <div class="container-xxl">
+        <div class="flex-fill">
+          <span>Made with <a href="https://dotnet.github.io/docfx">docfx</a></span>
+        </div>
+      </div>
+    </footer>
+  </body>
+</html>

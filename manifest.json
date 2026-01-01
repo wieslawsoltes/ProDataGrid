@@ -3551,6 +3551,26 @@
     },
     {
       "type": "Conceptual",
+      "source_relative_path": "articles/dynamicdata-streaming-sourcecache.md",
+      "output": {
+        ".html": {
+          "relative_path": "articles/dynamicdata-streaming-sourcecache.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "Conceptual",
+      "source_relative_path": "articles/dynamicdata-streaming-sourcelist.md",
+      "output": {
+        ".html": {
+          "relative_path": "articles/dynamicdata-streaming-sourcelist.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "Conceptual",
       "source_relative_path": "articles/events-and-routing.md",
       "output": {
         ".html": {
@@ -3575,6 +3595,16 @@
       "output": {
         ".html": {
           "relative_path": "articles/hierarchical-data.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "Conceptual",
+      "source_relative_path": "articles/high-frequency-updates.md",
+      "output": {
+        ".html": {
+          "relative_path": "articles/high-frequency-updates.html"
         }
       },
       "version": ""
