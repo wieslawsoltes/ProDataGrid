@@ -3611,6 +3611,16 @@
     },
     {
       "type": "Conceptual",
+      "source_relative_path": "articles/hierarchical-root-items.md",
+      "output": {
+        ".html": {
+          "relative_path": "articles/hierarchical-root-items.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "Conceptual",
       "source_relative_path": "articles/high-frequency-updates.md",
       "output": {
         ".html": {
