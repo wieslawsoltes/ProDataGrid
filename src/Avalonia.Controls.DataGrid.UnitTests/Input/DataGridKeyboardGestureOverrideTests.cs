@@ -50,20 +50,21 @@ public class DataGridKeyboardGestureOverrideTests
     }
 
     [AvaloniaFact]
-    public void DirectionalKeys_Run_Before_AfterHandlers()
+    public void DirectionalKeys_KeyDown_Handler_Can_Block_BuiltIn()
     {
-        var (grid, _) = CreateGrid();
-        SetCurrentCell(grid, rowIndex: 0, columnIndex: 0);
-
         var invoked = false;
-        grid.KeyDown += (_, e) =>
+        var (grid, _) = CreateGrid(beforeAttach: grid =>
         {
-            if (e.Key == Key.Down)
+            grid.KeyDown += (_, e) =>
             {
-                invoked = true;
-                e.Handled = true;
-            }
-        };
+                if (e.Key == Key.Down)
+                {
+                    invoked = true;
+                    e.Handled = true;
+                }
+            };
+        });
+        SetCurrentCell(grid, rowIndex: 0, columnIndex: 0);
 
         var args = new KeyEventArgs
         {
@@ -76,7 +77,39 @@ public class DataGridKeyboardGestureOverrideTests
 
         grid.RaiseEvent(args);
 
-        Assert.False(invoked);
+        Assert.True(invoked);
+        Assert.True(args.Handled);
+        Assert.Equal(0, grid.SelectedIndex);
+    }
+
+    [AvaloniaFact]
+    public void DirectionalKeys_Run_After_KeyDown_Handlers_When_Not_Handled()
+    {
+        var invoked = false;
+        var (grid, _) = CreateGrid(beforeAttach: grid =>
+        {
+            grid.KeyDown += (_, e) =>
+            {
+                if (e.Key == Key.Down)
+                {
+                    invoked = true;
+                }
+            };
+        });
+        SetCurrentCell(grid, rowIndex: 0, columnIndex: 0);
+
+        var args = new KeyEventArgs
+        {
+            RoutedEvent = InputElement.KeyDownEvent,
+            Route = InputElement.KeyDownEvent.RoutingStrategies,
+            Key = Key.Down,
+            Source = grid,
+            KeyDeviceType = KeyDeviceType.Keyboard
+        };
+
+        grid.RaiseEvent(args);
+
+        Assert.True(invoked);
         Assert.True(args.Handled);
         Assert.Equal(1, grid.SelectedIndex);
     }
@@ -416,7 +449,8 @@ public class DataGridKeyboardGestureOverrideTests
         int columnCount = 3,
         DataGridSelectionMode selectionMode = DataGridSelectionMode.Single,
         DataGridSelectionUnit selectionUnit = DataGridSelectionUnit.FullRow,
-        bool canUserDeleteRows = false)
+        bool canUserDeleteRows = false,
+        Action<DataGrid>? beforeAttach = null)
     {
         var items = new ObservableCollection<InputRow>();
         for (var i = 0; i < rowCount; i++)
@@ -469,6 +503,7 @@ public class DataGridKeyboardGestureOverrideTests
             });
         }
 
+        beforeAttach?.Invoke(grid);
         root.Content = grid;
         root.Show();
         grid.UpdateLayout();

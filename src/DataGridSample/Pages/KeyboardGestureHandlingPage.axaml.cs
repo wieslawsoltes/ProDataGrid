@@ -18,6 +18,11 @@ namespace DataGridSample.Pages
                 return;
             }
 
+            if (viewModel.HandleDirectionalKeys && e.Key is Key.Up or Key.Down or Key.Left or Key.Right)
+            {
+                e.Handled = true;
+            }
+
             var modifiers = e.KeyModifiers == KeyModifiers.None ? string.Empty : $" ({e.KeyModifiers})";
             var handled = e.Handled ? " handled" : string.Empty;
             viewModel.LastKey = $"{e.Key}{modifiers}{handled}";

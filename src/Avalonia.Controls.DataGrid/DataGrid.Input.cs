@@ -895,12 +895,15 @@ internal
             _keyDownRouteFinishedSubscription = null;
             _keyUpRouteFinishedSubscription?.Dispose();
             _keyUpRouteFinishedSubscription = null;
+            KeyDown -= DataGrid_KeyDownDirectional;
 
             if (!IsAttachedToVisualTree)
             {
                 return;
             }
 
+            // Attach after XAML handlers so user KeyDown can override directional keys.
+            KeyDown += DataGrid_KeyDownDirectional;
             _keyDownRouteFinishedSubscription = InputElement.KeyDownEvent.RouteFinished.Subscribe(OnKeyDownRouteFinished);
             _keyUpRouteFinishedSubscription = InputElement.KeyUpEvent.RouteFinished.Subscribe(OnKeyUpRouteFinished);
         }

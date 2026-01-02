@@ -22,6 +22,7 @@ namespace DataGridSample.ViewModels
 
             _lastKey = "None";
             _useVimNavigation = false;
+            _handleDirectionalKeys = false;
             UpdateGestureOverrides();
         }
 
@@ -55,6 +56,14 @@ namespace DataGridSample.ViewModels
         {
             get => _lastKey;
             set => SetProperty(ref _lastKey, value);
+        }
+
+        private bool _handleDirectionalKeys;
+
+        public bool HandleDirectionalKeys
+        {
+            get => _handleDirectionalKeys;
+            set => SetProperty(ref _handleDirectionalKeys, value);
         }
 
         private void UpdateGestureOverrides()

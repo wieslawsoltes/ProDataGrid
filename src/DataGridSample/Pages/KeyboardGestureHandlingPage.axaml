@@ -12,13 +12,16 @@
   <Grid RowDefinitions="Auto,Auto,*" RowSpacing="8" Margin="12">
     <StackPanel Grid.Row="0" Spacing="4">
       <TextBlock Classes="h2">Keyboard overrides</TextBlock>
-      <TextBlock Text="Built-in key handling respects Handled and uses KeyboardGestureOverrides for remapping (try J/K for navigation)." TextWrapping="Wrap" />
+      <TextBlock Text="Built-in key handling respects Handled and uses KeyboardGestureOverrides for remapping (try J/K for navigation). Use the toggle to intercept arrow keys via KeyDown." TextWrapping="Wrap" />
     </StackPanel>
 
     <StackPanel Grid.Row="1" Orientation="Horizontal" Spacing="12">
       <CheckBox VerticalAlignment="Center"
                 Content="Use Vim navigation (J/K)"
                 IsChecked="{Binding UseVimNavigation}" />
+      <CheckBox VerticalAlignment="Center"
+                Content="Handle arrow keys in KeyDown"
+                IsChecked="{Binding HandleDirectionalKeys}" />
       <ToggleButton x:Name="KeyboardShortcutsToggle"
                     VerticalAlignment="Center"
                     Content="Keyboard shortcuts" />
