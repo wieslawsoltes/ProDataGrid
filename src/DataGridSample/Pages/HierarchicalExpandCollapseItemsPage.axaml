@@ -1,0 +1,129 @@
+<!--
+  Copyright (c) Wieslaw Soltes. All rights reserved.
+  Licensed under the MIT license. See LICENSE file in the project root for details.
+-->
+<UserControl
+    x:Class="DataGridSample.Pages.HierarchicalExpandCollapseItemsPage"
+    xmlns="https://github.com/avaloniaui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:viewModels="clr-namespace:DataGridSample.ViewModels"
+    xmlns:hier="clr-namespace:Avalonia.Controls.DataGridHierarchical;assembly=Avalonia.Controls.DataGrid"
+    x:DataType="viewModels:HierarchicalExpandCollapseItemsViewModel"
+    d:DesignHeight="720"
+    d:DesignWidth="1100"
+    mc:Ignorable="d">
+
+  <UserControl.DataContext>
+    <viewModels:HierarchicalExpandCollapseItemsViewModel />
+  </UserControl.DataContext>
+
+  <Grid Margin="12"
+        ColumnDefinitions="2*,*"
+        RowDefinitions="Auto,Auto,*"
+        ColumnSpacing="12"
+        RowSpacing="8">
+    <StackPanel Grid.ColumnSpan="2"
+                Spacing="4">
+      <TextBlock Classes="h2"
+                 Text="Hierarchical Expand/Collapse Items" />
+      <TextBlock TextWrapping="Wrap"
+                 Text="Expand(IEnumerable&lt;T&gt;) and Collapse(IEnumerable&lt;T&gt;) apply to the selected items." />
+    </StackPanel>
+
+    <WrapPanel Grid.Row="1"
+               Grid.ColumnSpan="2">
+      <Button Content="Expand selected"
+              Command="{Binding ExpandSelectedCommand}"
+              Margin="0 0 8 8" />
+      <Button Content="Collapse selected"
+              Command="{Binding CollapseSelectedCommand}"
+              Margin="0 0 8 8" />
+      <Button Content="Expand all"
+              Command="{Binding ExpandAllCommand}"
+              Margin="0 0 8 8" />
+      <Button Content="Collapse all"
+              Command="{Binding CollapseAllCommand}"
+              Margin="0 0 8 8" />
+      <Button Content="Clear selection"
+              Command="{Binding ClearSelectionCommand}"
+              Margin="0 0 8 8" />
+    </WrapPanel>
+
+    <DataGrid Grid.Row="2"
+              Grid.Column="0"
+              AutoGenerateColumns="False"
+              HierarchicalModel="{Binding Model}"
+              HierarchicalRowsEnabled="True"
+              Selection="{Binding SelectionModel}"
+              SelectionMode="Extended"
+              HeadersVisibility="Column"
+              GridLinesVisibility="Horizontal"
+              x:DataType="viewModels:HierarchicalExpandCollapseItemsViewModel">
+      <DataGrid.Columns>
+        <DataGridHierarchicalColumn Header="Name"
+                                    Width="2*"
+                                    x:CompileBindings="False"
+                                    Binding="{Binding Item}">
+          <DataGridHierarchicalColumn.CellTemplate>
+            <DataTemplate x:DataType="viewModels:HierarchicalExpandCollapseItemsViewModel+TreeItem">
+              <TextBlock Text="{Binding Name}" />
+            </DataTemplate>
+          </DataGridHierarchicalColumn.CellTemplate>
+        </DataGridHierarchicalColumn>
+
+        <DataGridTemplateColumn Header="Id"
+                                Width="80"
+                                x:CompileBindings="False">
+          <DataGridTemplateColumn.CellTemplate>
+            <DataTemplate x:DataType="hier:HierarchicalNode">
+              <TextBlock x:DataType="viewModels:HierarchicalExpandCollapseItemsViewModel+TreeItem"
+                         DataContext="{Binding Item}"
+                         Text="{Binding Id}" />
+            </DataTemplate>
+          </DataGridTemplateColumn.CellTemplate>
+        </DataGridTemplateColumn>
+
+        <DataGridTemplateColumn Header="Children"
+                                Width="90"
+                                x:CompileBindings="False">
+          <DataGridTemplateColumn.CellTemplate>
+            <DataTemplate x:DataType="hier:HierarchicalNode">
+              <TextBlock x:DataType="viewModels:HierarchicalExpandCollapseItemsViewModel+TreeItem"
+                         DataContext="{Binding Item}"
+                         Text="{Binding Children.Count}" />
+            </DataTemplate>
+          </DataGridTemplateColumn.CellTemplate>
+        </DataGridTemplateColumn>
+      </DataGrid.Columns>
+    </DataGrid>
+
+    <StackPanel Grid.Row="2"
+                Grid.Column="1"
+                Spacing="8">
+      <TextBlock Classes="h3"
+                 Text="Selection state" />
+      <Border BorderBrush="{DynamicResource SystemControlForegroundBaseMediumBrush}"
+              BorderThickness="1"
+              CornerRadius="4"
+              Padding="4">
+        <StackPanel Spacing="4">
+          <TextBlock Text="{Binding VisibleCount, StringFormat='Visible nodes: {0}'}" />
+          <TextBlock Text="{Binding SelectedCount, StringFormat='Selected count: {0}'}" />
+          <ItemsControl ItemsSource="{Binding SelectionModel.SelectedItems}">
+            <ItemsControl.ItemTemplate>
+              <DataTemplate x:DataType="hier:HierarchicalNode">
+                <TextBlock x:DataType="viewModels:HierarchicalExpandCollapseItemsViewModel+TreeItem"
+                           DataContext="{Binding Item}"
+                           Text="{Binding Name}" />
+              </DataTemplate>
+            </ItemsControl.ItemTemplate>
+          </ItemsControl>
+        </StackPanel>
+      </Border>
+      <TextBlock Text="Select multiple rows, then expand or collapse the selected items."
+                 TextWrapping="Wrap" />
+    </StackPanel>
+  </Grid>
+</UserControl>

@@ -855,6 +855,140 @@ namespace Avalonia.Controls.DataGridTests.Hierarchical;
     }
 
     [Fact]
+    public void Expand_Items_Expands_Multiple_Nodes()
+    {
+        var root = new Item("root");
+        var child1 = new Item("child1");
+        var child2 = new Item("child2");
+        child1.Children.Add(new Item("grand1"));
+        child2.Children.Add(new Item("grand2"));
+        root.Children.Add(child1);
+        root.Children.Add(child2);
+
+        var model = new HierarchicalModel<Item>(new HierarchicalOptions<Item>
+        {
+            ChildrenSelector = item => item.Children
+        });
+
+        model.SetRoot(root);
+        model.Expand(model.Root!.Value);
+        model.Expand(new[] { child1, child2 });
+
+        var child1Node = model.FindNode(child1);
+        var child2Node = model.FindNode(child2);
+
+        Assert.True(child1Node.HasValue);
+        Assert.True(child2Node.HasValue);
+        Assert.True(child1Node!.Value.IsExpanded);
+        Assert.True(child2Node!.Value.IsExpanded);
+        Assert.Equal(5, model.Count);
+    }
+
+    [Fact]
+    public async Task ExpandAsync_Items_Uses_PathSelector()
+    {
+        var root = new Item("root");
+        var child = new Item("child");
+        var grand = new Item("grand");
+        child.Children.Add(grand);
+        root.Children.Add(child);
+
+        var model = new HierarchicalModel<Item>(new HierarchicalOptions<Item>
+        {
+            ChildrenSelector = item => item.Children,
+            ItemPathSelector = item =>
+            {
+                if (ReferenceEquals(item, root))
+                {
+                    return new[] { 0 };
+                }
+
+                if (ReferenceEquals(item, child))
+                {
+                    return new[] { 0, 0 };
+                }
+
+                if (ReferenceEquals(item, grand))
+                {
+                    return new[] { 0, 0, 0 };
+                }
+
+                return null;
+            }
+        });
+
+        model.SetRoot(root);
+        await model.ExpandAsync(new[] { child });
+
+        var childNode = model.FindNode(child);
+
+        Assert.True(model.Root!.Value.IsExpanded);
+        Assert.True(childNode.HasValue);
+        Assert.True(childNode!.Value.IsExpanded);
+        Assert.Equal(3, model.Count);
+    }
+
+    [Fact]
+    public void Collapse_Items_Collapses_Targets()
+    {
+        var root = new Item("root");
+        var child1 = new Item("child1");
+        var child2 = new Item("child2");
+        child1.Children.Add(new Item("grand1"));
+        child2.Children.Add(new Item("grand2"));
+        root.Children.Add(child1);
+        root.Children.Add(child2);
+
+        var model = new HierarchicalModel<Item>(new HierarchicalOptions<Item>
+        {
+            ChildrenSelector = item => item.Children
+        });
+
+        model.SetRoot(root);
+        model.ExpandAll();
+        model.Collapse(new[] { child1 });
+
+        var child1Node = model.FindNode(child1);
+        var child2Node = model.FindNode(child2);
+
+        Assert.True(child1Node.HasValue);
+        Assert.True(child2Node.HasValue);
+        Assert.False(child1Node!.Value.IsExpanded);
+        Assert.True(child2Node!.Value.IsExpanded);
+        Assert.Equal(4, model.Count);
+    }
+
+    [Fact]
+    public async Task CollapseAsync_Items_Collapses_Targets()
+    {
+        var root = new Item("root");
+        var child1 = new Item("child1");
+        var child2 = new Item("child2");
+        child1.Children.Add(new Item("grand1"));
+        child2.Children.Add(new Item("grand2"));
+        root.Children.Add(child1);
+        root.Children.Add(child2);
+
+        var model = new HierarchicalModel<Item>(new HierarchicalOptions<Item>
+        {
+            ChildrenSelector = item => item.Children
+        });
+
+        model.SetRoot(root);
+        model.ExpandAll();
+        await model.CollapseAsync(new[] { child1, child2 });
+
+        var child1Node = model.FindNode(child1);
+        var child2Node = model.FindNode(child2);
+
+        Assert.True(child1Node.HasValue);
+        Assert.True(child2Node.HasValue);
+        Assert.False(child1Node!.Value.IsExpanded);
+        Assert.False(child2Node!.Value.IsExpanded);
+        Assert.Equal(3, model.Count);
+    }
+
+    [Fact]
     public void FlattenedChangedTyped_FiresWithTypedNodes()
     {
         var root = new Item("root");

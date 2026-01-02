@@ -45,9 +45,17 @@ namespace Avalonia.Controls.DataGridHierarchical
 
         void Expand(HierarchicalNode<T> node);
 
+        void Expand(IEnumerable<T> items);
+
         Task ExpandAsync(HierarchicalNode<T> node, CancellationToken cancellationToken = default);
 
+        Task ExpandAsync(IEnumerable<T> items, CancellationToken cancellationToken = default);
+
         void Collapse(HierarchicalNode<T> node);
+
+        void Collapse(IEnumerable<T> items);
+
+        Task CollapseAsync(IEnumerable<T> items, CancellationToken cancellationToken = default);
 
         void Toggle(HierarchicalNode<T> node);
 
@@ -812,10 +820,20 @@ namespace Avalonia.Controls.DataGridHierarchical
 
         public void Expand(HierarchicalNode<T> node) => base.Expand(node.Inner);
 
+        public void Expand(IEnumerable<T> items) => base.Expand(items);
+
         public Task ExpandAsync(HierarchicalNode<T> node, CancellationToken cancellationToken = default) =>
             base.ExpandAsync(node.Inner, cancellationToken);
 
+        public Task ExpandAsync(IEnumerable<T> items, CancellationToken cancellationToken = default) =>
+            base.ExpandAsync(items, cancellationToken);
+
         public void Collapse(HierarchicalNode<T> node) => base.Collapse(node.Inner);
+
+        public void Collapse(IEnumerable<T> items) => base.Collapse(items);
+
+        public Task CollapseAsync(IEnumerable<T> items, CancellationToken cancellationToken = default) =>
+            base.CollapseAsync(items, cancellationToken);
 
         public void Toggle(HierarchicalNode<T> node) => base.Toggle(node.Inner);
 

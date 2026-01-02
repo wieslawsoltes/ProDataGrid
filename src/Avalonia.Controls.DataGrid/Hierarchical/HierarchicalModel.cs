@@ -350,6 +350,12 @@ namespace Avalonia.Controls.DataGridHierarchical
         void Expand(HierarchicalNode node);
 
         /// <summary>
+        /// Expands the nodes corresponding to the provided items.
+        /// </summary>
+        /// <param name="items">Items or nodes to expand.</param>
+        void Expand(IEnumerable items);
+
+        /// <summary>
         /// Asynchronously expands a node and realizes its visible children.
         /// </summary>
         /// <param name="node">Node to expand.</param>
@@ -357,10 +363,30 @@ namespace Avalonia.Controls.DataGridHierarchical
         Task ExpandAsync(HierarchicalNode node, CancellationToken cancellationToken = default);
 
         /// <summary>
+        /// Asynchronously expands the nodes corresponding to the provided items.
+        /// </summary>
+        /// <param name="items">Items or nodes to expand.</param>
+        /// <param name="cancellationToken">Cancellation token.</param>
+        Task ExpandAsync(IEnumerable items, CancellationToken cancellationToken = default);
+
+        /// <summary>
         /// Collapses a node, removing its descendants from the flattened list.
         /// </summary>
         /// <param name="node">Node to collapse.</param>
         void Collapse(HierarchicalNode node);
+
+        /// <summary>
+        /// Collapses the nodes corresponding to the provided items.
+        /// </summary>
+        /// <param name="items">Items or nodes to collapse.</param>
+        void Collapse(IEnumerable items);
+
+        /// <summary>
+        /// Asynchronously collapses the nodes corresponding to the provided items.
+        /// </summary>
+        /// <param name="items">Items or nodes to collapse.</param>
+        /// <param name="cancellationToken">Cancellation token.</param>
+        Task CollapseAsync(IEnumerable items, CancellationToken cancellationToken = default);
 
         /// <summary>
         /// Toggles expansion state of a node.
@@ -954,6 +980,11 @@ namespace Avalonia.Controls.DataGridHierarchical
             ExpandAsync(node, CancellationToken.None).GetAwaiter().GetResult();
         }
 
+        public void Expand(IEnumerable items)
+        {
+            ExpandAsync(items, CancellationToken.None).GetAwaiter().GetResult();
+        }
+
         public async Task ExpandAsync(HierarchicalNode node, CancellationToken cancellationToken = default)
         {
             if (node == null)
@@ -1029,6 +1060,32 @@ namespace Avalonia.Controls.DataGridHierarchical
             }
         }
 
+        public async Task ExpandAsync(IEnumerable items, CancellationToken cancellationToken = default)
+        {
+            if (items == null)
+            {
+                throw new ArgumentNullException(nameof(items));
+            }
+
+            var visited = new HashSet<HierarchicalNode>();
+            foreach (var item in items)
+            {
+                cancellationToken.ThrowIfCancellationRequested();
+
+                if (!TryResolveNodeFromItem(item, expandAncestors: true, out var node))
+                {
+                    continue;
+                }
+
+                if (!visited.Add(node))
+                {
+                    continue;
+                }
+
+                await ExpandAsync(node, cancellationToken).ConfigureAwait(false);
+            }
+        }
+
         public void Collapse(HierarchicalNode node)
         {
             if (node == null)
@@ -1081,6 +1138,39 @@ namespace Avalonia.Controls.DataGridHierarchical
                     _pendingCullNodes.Add(node);
                 }
             }
+        }
+
+        public void Collapse(IEnumerable items)
+        {
+            CollapseAsync(items, CancellationToken.None).GetAwaiter().GetResult();
+        }
+
+        public Task CollapseAsync(IEnumerable items, CancellationToken cancellationToken = default)
+        {
+            if (items == null)
+            {
+                throw new ArgumentNullException(nameof(items));
+            }
+
+            var visited = new HashSet<HierarchicalNode>();
+            foreach (var item in items)
+            {
+                cancellationToken.ThrowIfCancellationRequested();
+
+                if (!TryResolveNodeFromItem(item, expandAncestors: false, out var node))
+                {
+                    continue;
+                }
+
+                if (!visited.Add(node))
+                {
+                    continue;
+                }
+
+                Collapse(node);
+            }
+
+            return Task.CompletedTask;
         }
 
         public void Toggle(HierarchicalNode node)
@@ -1200,6 +1290,43 @@ namespace Avalonia.Controls.DataGridHierarchical
             }
 
             return fallback;
+        }
+
+        private bool TryResolveNodeFromItem(object? item, bool expandAncestors, out HierarchicalNode? node)
+        {
+            node = null;
+            if (item == null)
+            {
+                return false;
+            }
+
+            if (item is HierarchicalNode directNode)
+            {
+                node = directNode;
+                return true;
+            }
+
+            if (item is IHierarchicalNodeItem nodeItem)
+            {
+                item = nodeItem.Item;
+                if (item == null)
+                {
+                    return false;
+                }
+            }
+
+            node = FindNode(item);
+            if (node != null)
+            {
+                return true;
+            }
+
+            if (!expandAncestors)
+            {
+                return false;
+            }
+
+            return TryExpandToItem(item, out node);
         }
 
         public bool TryExpandToItem(object item)
