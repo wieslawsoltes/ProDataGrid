@@ -511,6 +511,9 @@ internal
             AddHandler(InputElement.PointerPressedEvent, DataGrid_PointerActivity, RoutingStrategies.Tunnel, handledEventsToo: true);
             AddHandler(InputElement.PointerReleasedEvent, DataGrid_PointerActivity, RoutingStrategies.Tunnel, handledEventsToo: true);
             AddHandler(InputElement.PointerExitedEvent, DataGrid_PointerExited, handledEventsToo: true);
+            AddHandler(InputElement.PointerMovedEvent, DataGrid_DragSelectionPointerMoved, RoutingStrategies.Tunnel, handledEventsToo: true);
+            AddHandler(InputElement.PointerReleasedEvent, DataGrid_DragSelectionPointerReleased, RoutingStrategies.Tunnel, handledEventsToo: true);
+            AddHandler(InputElement.PointerCaptureLostEvent, DataGrid_DragSelectionPointerCaptureLost, handledEventsToo: true);
 
             _loadedRows = new List<DataGridRow>();
             _lostFocusActions = new Queue<Action>();

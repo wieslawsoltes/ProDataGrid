@@ -240,6 +240,7 @@ internal
                     {
                         bool allowEdit = !e.Handled && focusWithin && isSelected && !ctrl;
                         var handled = OwningGrid.UpdateStateOnMouseLeftButtonDown(e, ColumnIndex, OwningRow.Slot, allowEdit);
+                        OwningGrid.TryBeginSelectionDrag(e, ColumnIndex, shouldHandleSelection, allowEdit);
 
                         // Do not handle PointerPressed with touch or pen,
                         // so we can start scroll gesture on the same event.

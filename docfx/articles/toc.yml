@@ -22,6 +22,8 @@
   href: validation-and-errors.md
 - name: Selection and Navigation
   href: selection-and-navigation.md
+- name: Drag (Slide) Selection
+  href: drag-selection.md
 - name: Clipboard and Export
   href: clipboard-and-export.md
 - name: Data Operations

@@ -9,7 +9,9 @@ using Avalonia.Data;
 using Avalonia.Headless.XUnit;
 using Avalonia.Input;
 using Avalonia.Interactivity;
+using Avalonia.Styling;
 using Avalonia.Threading;
+using Avalonia.VisualTree;
 using Xunit;
 
 namespace Avalonia.Controls.DataGridTests.Input;
@@ -99,6 +101,330 @@ public class DataGridInputMouseSelectionTests
 
         Assert.True(handled);
         Assert.Empty(grid.SelectedItems);
+    }
+
+    [AvaloniaFact]
+    public void MouseDrag_RowSelection_Extends_Range()
+    {
+        var (grid, items) = CreateGrid(rowCount: 4, selectionUnit: DataGridSelectionUnit.FullRow, selectionMode: DataGridSelectionMode.Extended);
+        grid.UpdateLayout();
+        Dispatcher.UIThread.RunJobs();
+
+        var startSlot = grid.SlotFromRowIndex(0);
+        var endSlot = grid.SlotFromRowIndex(2);
+        var startRow = grid.DisplayData.GetDisplayedElement(startSlot) as DataGridRow;
+        var endRow = grid.DisplayData.GetDisplayedElement(endSlot) as DataGridRow;
+        Assert.NotNull(startRow);
+        Assert.NotNull(endRow);
+
+        var startCell = startRow!.Cells[0];
+        var endCell = endRow!.Cells[0];
+        var startPoint = GetCenterPoint(startCell, grid);
+        var endPoint = GetCenterPoint(endCell, grid);
+
+        var pointer = new Pointer(Pointer.GetNextFreeId(), PointerType.Mouse, isPrimary: true);
+
+        startCell.RaiseEvent(CreatePointerPressedArgs(startCell, grid, pointer, startPoint, KeyModifiers.None));
+        grid.RaiseEvent(CreatePointerMovedArgs(grid, grid, pointer, endPoint, KeyModifiers.None));
+
+        Assert.Equal(3, grid.SelectedItems.Count);
+        Assert.Contains(items[0], grid.SelectedItems.Cast<RowItem>());
+        Assert.Contains(items[1], grid.SelectedItems.Cast<RowItem>());
+        Assert.Contains(items[2], grid.SelectedItems.Cast<RowItem>());
+        Assert.Equal(endSlot, grid.CurrentSlot);
+
+        grid.RaiseEvent(CreatePointerReleasedArgs(grid, grid, pointer, endPoint, KeyModifiers.None));
+    }
+
+    [AvaloniaFact]
+    public void MouseDrag_RowSelection_Shrinks_When_Reversing()
+    {
+        var (grid, items) = CreateGrid(rowCount: 4, selectionUnit: DataGridSelectionUnit.FullRow, selectionMode: DataGridSelectionMode.Extended);
+        grid.UpdateLayout();
+        Dispatcher.UIThread.RunJobs();
+
+        var startSlot = grid.SlotFromRowIndex(0);
+        var midSlot = grid.SlotFromRowIndex(1);
+        var endSlot = grid.SlotFromRowIndex(3);
+        var startRow = grid.DisplayData.GetDisplayedElement(startSlot) as DataGridRow;
+        var midRow = grid.DisplayData.GetDisplayedElement(midSlot) as DataGridRow;
+        var endRow = grid.DisplayData.GetDisplayedElement(endSlot) as DataGridRow;
+        Assert.NotNull(startRow);
+        Assert.NotNull(midRow);
+        Assert.NotNull(endRow);
+
+        var startCell = startRow!.Cells[0];
+        var midCell = midRow!.Cells[0];
+        var endCell = endRow!.Cells[0];
+        var startPoint = GetCenterPoint(startCell, grid);
+        var midPoint = GetCenterPoint(midCell, grid);
+        var endPoint = GetCenterPoint(endCell, grid);
+
+        var pointer = new Pointer(Pointer.GetNextFreeId(), PointerType.Mouse, isPrimary: true);
+
+        startCell.RaiseEvent(CreatePointerPressedArgs(startCell, grid, pointer, startPoint, KeyModifiers.None));
+        grid.RaiseEvent(CreatePointerMovedArgs(grid, grid, pointer, endPoint, KeyModifiers.None));
+
+        Assert.Equal(4, grid.SelectedItems.Count);
+        Assert.Contains(items[0], grid.SelectedItems.Cast<RowItem>());
+        Assert.Contains(items[1], grid.SelectedItems.Cast<RowItem>());
+        Assert.Contains(items[2], grid.SelectedItems.Cast<RowItem>());
+        Assert.Contains(items[3], grid.SelectedItems.Cast<RowItem>());
+        Assert.Equal(endSlot, grid.CurrentSlot);
+
+        grid.RaiseEvent(CreatePointerMovedArgs(grid, grid, pointer, midPoint, KeyModifiers.None));
+
+        Assert.Equal(2, grid.SelectedItems.Count);
+        Assert.Contains(items[0], grid.SelectedItems.Cast<RowItem>());
+        Assert.Contains(items[1], grid.SelectedItems.Cast<RowItem>());
+        Assert.DoesNotContain(items[2], grid.SelectedItems.Cast<RowItem>());
+        Assert.DoesNotContain(items[3], grid.SelectedItems.Cast<RowItem>());
+        Assert.Equal(midSlot, grid.CurrentSlot);
+
+        grid.RaiseEvent(CreatePointerReleasedArgs(grid, grid, pointer, midPoint, KeyModifiers.None));
+    }
+
+    [AvaloniaFact]
+    public void MouseDrag_RowSelection_Ctrl_Preserves_Existing_And_Shrinks()
+    {
+        var (grid, items) = CreateGrid(rowCount: 5, selectionUnit: DataGridSelectionUnit.FullRow, selectionMode: DataGridSelectionMode.Extended);
+        grid.UpdateLayout();
+        Dispatcher.UIThread.RunJobs();
+
+        SetCurrentCell(grid, rowIndex: 4, columnIndex: 0);
+
+        var ctrl = GetCtrlOrCmdModifier(grid);
+        var startSlot = grid.SlotFromRowIndex(0);
+        var midSlot = grid.SlotFromRowIndex(1);
+        var endSlot = grid.SlotFromRowIndex(2);
+        var startRow = grid.DisplayData.GetDisplayedElement(startSlot) as DataGridRow;
+        var midRow = grid.DisplayData.GetDisplayedElement(midSlot) as DataGridRow;
+        var endRow = grid.DisplayData.GetDisplayedElement(endSlot) as DataGridRow;
+        Assert.NotNull(startRow);
+        Assert.NotNull(midRow);
+        Assert.NotNull(endRow);
+
+        var startCell = startRow!.Cells[0];
+        var midCell = midRow!.Cells[0];
+        var endCell = endRow!.Cells[0];
+        var startPoint = GetCenterPoint(startCell, grid);
+        var midPoint = GetCenterPoint(midCell, grid);
+        var endPoint = GetCenterPoint(endCell, grid);
+
+        var pointer = new Pointer(Pointer.GetNextFreeId(), PointerType.Mouse, isPrimary: true);
+
+        startCell.RaiseEvent(CreatePointerPressedArgs(startCell, grid, pointer, startPoint, ctrl));
+        grid.RaiseEvent(CreatePointerMovedArgs(grid, grid, pointer, endPoint, ctrl));
+
+        Assert.Equal(4, grid.SelectedItems.Count);
+        Assert.Contains(items[0], grid.SelectedItems.Cast<RowItem>());
+        Assert.Contains(items[1], grid.SelectedItems.Cast<RowItem>());
+        Assert.Contains(items[2], grid.SelectedItems.Cast<RowItem>());
+        Assert.Contains(items[4], grid.SelectedItems.Cast<RowItem>());
+
+        grid.RaiseEvent(CreatePointerMovedArgs(grid, grid, pointer, midPoint, ctrl));
+
+        Assert.Equal(3, grid.SelectedItems.Count);
+        Assert.Contains(items[0], grid.SelectedItems.Cast<RowItem>());
+        Assert.Contains(items[1], grid.SelectedItems.Cast<RowItem>());
+        Assert.Contains(items[4], grid.SelectedItems.Cast<RowItem>());
+        Assert.DoesNotContain(items[2], grid.SelectedItems.Cast<RowItem>());
+
+        grid.RaiseEvent(CreatePointerReleasedArgs(grid, grid, pointer, midPoint, ctrl));
+    }
+
+    [AvaloniaFact]
+    public void MouseDrag_RowSelection_Refreshes_PointerOver_On_End()
+    {
+        var (grid, _) = CreateGrid(rowCount: 3, selectionUnit: DataGridSelectionUnit.FullRow, selectionMode: DataGridSelectionMode.Extended);
+        grid.UpdateLayout();
+        Dispatcher.UIThread.RunJobs();
+
+        var inputRoot = grid.GetVisualRoot() as IInputRoot;
+        Assert.NotNull(inputRoot);
+        inputRoot!.PointerOverElement = grid;
+
+        var startSlot = grid.SlotFromRowIndex(0);
+        var endSlot = grid.SlotFromRowIndex(2);
+        var startRow = grid.DisplayData.GetDisplayedElement(startSlot) as DataGridRow;
+        var endRow = grid.DisplayData.GetDisplayedElement(endSlot) as DataGridRow;
+        Assert.NotNull(startRow);
+        Assert.NotNull(endRow);
+
+        grid.MouseOverRowIndex = startRow!.Index;
+        Assert.True(((IPseudoClasses)startRow.Classes).Contains(":pointerover"));
+
+        var startCell = startRow.Cells[0];
+        var endCell = endRow!.Cells[0];
+        var startPoint = GetCenterPoint(startCell, grid);
+        var endPoint = GetCenterPoint(endCell, grid);
+
+        var pointer = new Pointer(Pointer.GetNextFreeId(), PointerType.Mouse, isPrimary: true);
+
+        startCell.RaiseEvent(CreatePointerPressedArgs(startCell, grid, pointer, startPoint, KeyModifiers.None));
+        grid.RaiseEvent(CreatePointerMovedArgs(grid, grid, pointer, endPoint, KeyModifiers.None));
+        grid.RaiseEvent(CreatePointerReleasedArgs(grid, grid, pointer, endPoint, KeyModifiers.None));
+
+        grid.UpdateLayout();
+        Dispatcher.UIThread.RunJobs();
+
+        Assert.Equal(endRow.Index, grid.MouseOverRowIndex);
+        Assert.True(((IPseudoClasses)endRow.Classes).Contains(":pointerover"));
+        Assert.False(((IPseudoClasses)startRow.Classes).Contains(":pointerover"));
+    }
+
+    [AvaloniaFact]
+    public void MouseDrag_RowSelection_Clears_PointerOver_When_Released_Outside()
+    {
+        var (grid, _) = CreateGrid(rowCount: 3, selectionUnit: DataGridSelectionUnit.FullRow, selectionMode: DataGridSelectionMode.Extended);
+        grid.UpdateLayout();
+        Dispatcher.UIThread.RunJobs();
+
+        var inputRoot = grid.GetVisualRoot() as IInputRoot;
+        Assert.NotNull(inputRoot);
+        inputRoot!.PointerOverElement = grid;
+
+        var startSlot = grid.SlotFromRowIndex(0);
+        var startRow = grid.DisplayData.GetDisplayedElement(startSlot) as DataGridRow;
+        Assert.NotNull(startRow);
+
+        grid.MouseOverRowIndex = startRow!.Index;
+        Assert.True(((IPseudoClasses)startRow.Classes).Contains(":pointerover"));
+
+        var startCell = startRow.Cells[0];
+        var startPoint = GetCenterPoint(startCell, grid);
+        var outsidePoint = new Point(-20, -20);
+
+        var pointer = new Pointer(Pointer.GetNextFreeId(), PointerType.Mouse, isPrimary: true);
+
+        startCell.RaiseEvent(CreatePointerPressedArgs(startCell, grid, pointer, startPoint, KeyModifiers.None));
+        grid.RaiseEvent(CreatePointerMovedArgs(grid, grid, pointer, outsidePoint, KeyModifiers.None));
+        inputRoot.PointerOverElement = null;
+        grid.RaiseEvent(CreatePointerReleasedArgs(grid, grid, pointer, outsidePoint, KeyModifiers.None));
+
+        grid.UpdateLayout();
+        Dispatcher.UIThread.RunJobs();
+
+        Assert.Null(grid.MouseOverRowIndex);
+        Assert.False(((IPseudoClasses)startRow.Classes).Contains(":pointerover"));
+    }
+
+    [AvaloniaFact]
+    public void MouseDrag_RowSelection_Preserves_Start_When_AnchorSlot_Shifts()
+    {
+        var (grid, items) = CreateGrid(rowCount: 4, selectionUnit: DataGridSelectionUnit.FullRow, selectionMode: DataGridSelectionMode.Extended);
+        grid.UpdateLayout();
+        Dispatcher.UIThread.RunJobs();
+
+        var startSlot = grid.SlotFromRowIndex(0);
+        var midSlot = grid.SlotFromRowIndex(1);
+        var endSlot = grid.SlotFromRowIndex(3);
+        var startRow = grid.DisplayData.GetDisplayedElement(startSlot) as DataGridRow;
+        var midRow = grid.DisplayData.GetDisplayedElement(midSlot) as DataGridRow;
+        var endRow = grid.DisplayData.GetDisplayedElement(endSlot) as DataGridRow;
+        Assert.NotNull(startRow);
+        Assert.NotNull(midRow);
+        Assert.NotNull(endRow);
+
+        var startCell = startRow!.Cells[0];
+        var midCell = midRow!.Cells[0];
+        var endCell = endRow!.Cells[0];
+        var startPoint = GetCenterPoint(startCell, grid);
+        var midPoint = GetCenterPoint(midCell, grid);
+        var endPoint = GetCenterPoint(endCell, grid);
+
+        var pointer = new Pointer(Pointer.GetNextFreeId(), PointerType.Mouse, isPrimary: true);
+
+        startCell.RaiseEvent(CreatePointerPressedArgs(startCell, grid, pointer, startPoint, KeyModifiers.None));
+        grid.RaiseEvent(CreatePointerMovedArgs(grid, grid, pointer, endPoint, KeyModifiers.None));
+
+        SetAnchorSlot(grid, endSlot);
+
+        grid.RaiseEvent(CreatePointerMovedArgs(grid, grid, pointer, midPoint, KeyModifiers.None));
+
+        Assert.Equal(2, grid.SelectedItems.Count);
+        Assert.Contains(items[0], grid.SelectedItems.Cast<RowItem>());
+        Assert.Contains(items[1], grid.SelectedItems.Cast<RowItem>());
+        Assert.DoesNotContain(items[2], grid.SelectedItems.Cast<RowItem>());
+        Assert.DoesNotContain(items[3], grid.SelectedItems.Cast<RowItem>());
+        Assert.Equal(midSlot, grid.CurrentSlot);
+
+        grid.RaiseEvent(CreatePointerReleasedArgs(grid, grid, pointer, midPoint, KeyModifiers.None));
+    }
+
+    [AvaloniaFact]
+    public void MouseDrag_RowSelection_From_Current_Cell_Extends_Range()
+    {
+        var (grid, items) = CreateGrid(rowCount: 4, selectionUnit: DataGridSelectionUnit.FullRow, selectionMode: DataGridSelectionMode.Extended);
+        grid.UpdateLayout();
+        Dispatcher.UIThread.RunJobs();
+
+        SetCurrentCell(grid, rowIndex: 0, columnIndex: 0);
+
+        var startSlot = grid.SlotFromRowIndex(0);
+        var endSlot = grid.SlotFromRowIndex(2);
+        var startRow = grid.DisplayData.GetDisplayedElement(startSlot) as DataGridRow;
+        var endRow = grid.DisplayData.GetDisplayedElement(endSlot) as DataGridRow;
+        Assert.NotNull(startRow);
+        Assert.NotNull(endRow);
+
+        var startCell = startRow!.Cells[0];
+        var endCell = endRow!.Cells[0];
+        startCell.Focus();
+        grid.UpdateLayout();
+        Dispatcher.UIThread.RunJobs();
+        Assert.True(startCell.IsKeyboardFocusWithin);
+
+        var startPoint = GetCenterPoint(startCell, grid);
+        var endPoint = GetCenterPoint(endCell, grid);
+
+        var pointer = new Pointer(Pointer.GetNextFreeId(), PointerType.Mouse, isPrimary: true);
+
+        startCell.RaiseEvent(CreatePointerPressedArgs(startCell, grid, pointer, startPoint, KeyModifiers.None));
+        grid.RaiseEvent(CreatePointerMovedArgs(grid, grid, pointer, endPoint, KeyModifiers.None));
+
+        Assert.Equal(3, grid.SelectedItems.Count);
+        Assert.Contains(items[0], grid.SelectedItems.Cast<RowItem>());
+        Assert.Contains(items[1], grid.SelectedItems.Cast<RowItem>());
+        Assert.Contains(items[2], grid.SelectedItems.Cast<RowItem>());
+        Assert.Equal(endSlot, grid.CurrentSlot);
+
+        grid.RaiseEvent(CreatePointerReleasedArgs(grid, grid, pointer, endPoint, KeyModifiers.None));
+    }
+
+    [AvaloniaFact]
+    public void MouseDrag_RowSelection_Allows_Implicit_Capture()
+    {
+        var (grid, items) = CreateGrid(rowCount: 4, selectionUnit: DataGridSelectionUnit.FullRow, selectionMode: DataGridSelectionMode.Extended);
+        grid.UpdateLayout();
+        Dispatcher.UIThread.RunJobs();
+
+        var startSlot = grid.SlotFromRowIndex(0);
+        var endSlot = grid.SlotFromRowIndex(2);
+        var startRow = grid.DisplayData.GetDisplayedElement(startSlot) as DataGridRow;
+        var endRow = grid.DisplayData.GetDisplayedElement(endSlot) as DataGridRow;
+        Assert.NotNull(startRow);
+        Assert.NotNull(endRow);
+
+        var startCell = startRow!.Cells[0];
+        var endCell = endRow!.Cells[0];
+        var startPoint = GetCenterPoint(startCell, grid);
+        var endPoint = GetCenterPoint(endCell, grid);
+
+        var pointer = new Pointer(Pointer.GetNextFreeId(), PointerType.Mouse, isPrimary: true);
+        pointer.Capture(startCell);
+
+        startCell.RaiseEvent(CreatePointerPressedArgs(startCell, grid, pointer, startPoint, KeyModifiers.None));
+        grid.RaiseEvent(CreatePointerMovedArgs(grid, grid, pointer, endPoint, KeyModifiers.None));
+
+        Assert.Equal(3, grid.SelectedItems.Count);
+        Assert.Contains(items[0], grid.SelectedItems.Cast<RowItem>());
+        Assert.Contains(items[1], grid.SelectedItems.Cast<RowItem>());
+        Assert.Contains(items[2], grid.SelectedItems.Cast<RowItem>());
+        Assert.Equal(endSlot, grid.CurrentSlot);
+
+        grid.RaiseEvent(CreatePointerReleasedArgs(grid, grid, pointer, endPoint, KeyModifiers.None));
+        pointer.Capture(null);
     }
 
     [AvaloniaFact]
@@ -269,6 +595,147 @@ public class DataGridInputMouseSelectionTests
 
         Assert.True(handled);
         Assert.Empty(grid.SelectedCells);
+    }
+
+    [AvaloniaFact]
+    public void MouseDrag_CellSelection_Extends_Range()
+    {
+        var (grid, _) = CreateGrid(selectionUnit: DataGridSelectionUnit.Cell, selectionMode: DataGridSelectionMode.Extended);
+        grid.UpdateLayout();
+        Dispatcher.UIThread.RunJobs();
+
+        var startSlot = grid.SlotFromRowIndex(0);
+        var endSlot = grid.SlotFromRowIndex(1);
+        var startRow = grid.DisplayData.GetDisplayedElement(startSlot) as DataGridRow;
+        var endRow = grid.DisplayData.GetDisplayedElement(endSlot) as DataGridRow;
+        Assert.NotNull(startRow);
+        Assert.NotNull(endRow);
+
+        var startCell = startRow!.Cells[0];
+        var endCell = endRow!.Cells[1];
+        var startPoint = GetCenterPoint(startCell, grid);
+        var endPoint = GetCenterPoint(endCell, grid);
+
+        var pointer = new Pointer(Pointer.GetNextFreeId(), PointerType.Mouse, isPrimary: true);
+
+        startCell.RaiseEvent(CreatePointerPressedArgs(startCell, grid, pointer, startPoint, KeyModifiers.None));
+        grid.RaiseEvent(CreatePointerMovedArgs(grid, grid, pointer, endPoint, KeyModifiers.None));
+
+        Assert.Equal(4, grid.SelectedCells.Count);
+        Assert.Contains(grid.SelectedCells, cell => cell.RowIndex == 0 && cell.ColumnIndex == 0);
+        Assert.Contains(grid.SelectedCells, cell => cell.RowIndex == 0 && cell.ColumnIndex == 1);
+        Assert.Contains(grid.SelectedCells, cell => cell.RowIndex == 1 && cell.ColumnIndex == 0);
+        Assert.Contains(grid.SelectedCells, cell => cell.RowIndex == 1 && cell.ColumnIndex == 1);
+        Assert.Equal(endSlot, grid.CurrentSlot);
+        Assert.Equal(1, grid.CurrentColumnIndex);
+
+        grid.RaiseEvent(CreatePointerReleasedArgs(grid, grid, pointer, endPoint, KeyModifiers.None));
+    }
+
+    [AvaloniaFact]
+    public void MouseDrag_CellSelection_Shrinks_When_Reversing()
+    {
+        var (grid, _) = CreateGrid(selectionUnit: DataGridSelectionUnit.Cell, selectionMode: DataGridSelectionMode.Extended);
+        grid.UpdateLayout();
+        Dispatcher.UIThread.RunJobs();
+
+        var startSlot = grid.SlotFromRowIndex(0);
+        var endSlot = grid.SlotFromRowIndex(1);
+        var startRow = grid.DisplayData.GetDisplayedElement(startSlot) as DataGridRow;
+        var endRow = grid.DisplayData.GetDisplayedElement(endSlot) as DataGridRow;
+        Assert.NotNull(startRow);
+        Assert.NotNull(endRow);
+
+        var startCell = startRow!.Cells[0];
+        var midCell = startRow.Cells[1];
+        var endCell = endRow!.Cells[1];
+        var startPoint = GetCenterPoint(startCell, grid);
+        var midPoint = GetCenterPoint(midCell, grid);
+        var endPoint = GetCenterPoint(endCell, grid);
+
+        var pointer = new Pointer(Pointer.GetNextFreeId(), PointerType.Mouse, isPrimary: true);
+
+        startCell.RaiseEvent(CreatePointerPressedArgs(startCell, grid, pointer, startPoint, KeyModifiers.None));
+        grid.RaiseEvent(CreatePointerMovedArgs(grid, grid, pointer, endPoint, KeyModifiers.None));
+
+        Assert.Equal(4, grid.SelectedCells.Count);
+        Assert.Contains(grid.SelectedCells, cell => cell.RowIndex == 0 && cell.ColumnIndex == 0);
+        Assert.Contains(grid.SelectedCells, cell => cell.RowIndex == 0 && cell.ColumnIndex == 1);
+        Assert.Contains(grid.SelectedCells, cell => cell.RowIndex == 1 && cell.ColumnIndex == 0);
+        Assert.Contains(grid.SelectedCells, cell => cell.RowIndex == 1 && cell.ColumnIndex == 1);
+        Assert.Equal(endSlot, grid.CurrentSlot);
+        Assert.Equal(1, grid.CurrentColumnIndex);
+
+        grid.RaiseEvent(CreatePointerMovedArgs(grid, grid, pointer, midPoint, KeyModifiers.None));
+
+        Assert.Equal(2, grid.SelectedCells.Count);
+        Assert.Contains(grid.SelectedCells, cell => cell.RowIndex == 0 && cell.ColumnIndex == 0);
+        Assert.Contains(grid.SelectedCells, cell => cell.RowIndex == 0 && cell.ColumnIndex == 1);
+        Assert.DoesNotContain(grid.SelectedCells, cell => cell.RowIndex == 1 && cell.ColumnIndex == 0);
+        Assert.DoesNotContain(grid.SelectedCells, cell => cell.RowIndex == 1 && cell.ColumnIndex == 1);
+        Assert.Equal(startSlot, grid.CurrentSlot);
+        Assert.Equal(1, grid.CurrentColumnIndex);
+
+        grid.RaiseEvent(CreatePointerReleasedArgs(grid, grid, pointer, midPoint, KeyModifiers.None));
+    }
+
+    [AvaloniaFact]
+    public void MouseDrag_CellSelection_Ctrl_Preserves_Existing_And_Shrinks()
+    {
+        var (grid, _) = CreateGrid(rowCount: 4, columnCount: 3, selectionUnit: DataGridSelectionUnit.Cell, selectionMode: DataGridSelectionMode.Extended);
+        grid.UpdateLayout();
+        Dispatcher.UIThread.RunJobs();
+
+        var ctrl = GetCtrlOrCmdModifier(grid);
+
+        var preSlot = grid.SlotFromRowIndex(3);
+        var preRow = grid.DisplayData.GetDisplayedElement(preSlot) as DataGridRow;
+        Assert.NotNull(preRow);
+
+        var preCell = preRow!.Cells[2];
+        var prePoint = GetCenterPoint(preCell, grid);
+        var prePointer = new Pointer(Pointer.GetNextFreeId(), PointerType.Mouse, isPrimary: true);
+        preCell.RaiseEvent(CreatePointerPressedArgs(preCell, grid, prePointer, prePoint, KeyModifiers.None));
+        grid.RaiseEvent(CreatePointerReleasedArgs(grid, grid, prePointer, prePoint, KeyModifiers.None));
+
+        Assert.Contains(grid.SelectedCells, cell => cell.RowIndex == 3 && cell.ColumnIndex == 2);
+
+        var startSlot = grid.SlotFromRowIndex(0);
+        var endSlot = grid.SlotFromRowIndex(1);
+        var startRow = grid.DisplayData.GetDisplayedElement(startSlot) as DataGridRow;
+        var endRow = grid.DisplayData.GetDisplayedElement(endSlot) as DataGridRow;
+        Assert.NotNull(startRow);
+        Assert.NotNull(endRow);
+
+        var startCell = startRow!.Cells[0];
+        var midCell = startRow.Cells[1];
+        var endCell = endRow!.Cells[1];
+        var startPoint = GetCenterPoint(startCell, grid);
+        var midPoint = GetCenterPoint(midCell, grid);
+        var endPoint = GetCenterPoint(endCell, grid);
+
+        var pointer = new Pointer(Pointer.GetNextFreeId(), PointerType.Mouse, isPrimary: true);
+
+        startCell.RaiseEvent(CreatePointerPressedArgs(startCell, grid, pointer, startPoint, ctrl));
+        grid.RaiseEvent(CreatePointerMovedArgs(grid, grid, pointer, endPoint, ctrl));
+
+        Assert.Equal(5, grid.SelectedCells.Count);
+        Assert.Contains(grid.SelectedCells, cell => cell.RowIndex == 0 && cell.ColumnIndex == 0);
+        Assert.Contains(grid.SelectedCells, cell => cell.RowIndex == 0 && cell.ColumnIndex == 1);
+        Assert.Contains(grid.SelectedCells, cell => cell.RowIndex == 1 && cell.ColumnIndex == 0);
+        Assert.Contains(grid.SelectedCells, cell => cell.RowIndex == 1 && cell.ColumnIndex == 1);
+        Assert.Contains(grid.SelectedCells, cell => cell.RowIndex == 3 && cell.ColumnIndex == 2);
+
+        grid.RaiseEvent(CreatePointerMovedArgs(grid, grid, pointer, midPoint, ctrl));
+
+        Assert.Equal(3, grid.SelectedCells.Count);
+        Assert.Contains(grid.SelectedCells, cell => cell.RowIndex == 0 && cell.ColumnIndex == 0);
+        Assert.Contains(grid.SelectedCells, cell => cell.RowIndex == 0 && cell.ColumnIndex == 1);
+        Assert.Contains(grid.SelectedCells, cell => cell.RowIndex == 3 && cell.ColumnIndex == 2);
+        Assert.DoesNotContain(grid.SelectedCells, cell => cell.RowIndex == 1 && cell.ColumnIndex == 0);
+        Assert.DoesNotContain(grid.SelectedCells, cell => cell.RowIndex == 1 && cell.ColumnIndex == 1);
+
+        grid.RaiseEvent(CreatePointerReleasedArgs(grid, grid, pointer, midPoint, ctrl));
     }
 
     [AvaloniaFact]
@@ -497,6 +964,30 @@ public class DataGridInputMouseSelectionTests
         return new PointerPressedEventArgs(target, pointer, target, new Point(0, 0), 0, properties, modifiers);
     }
 
+    private static Point GetCenterPoint(Control control, Visual relativeTo)
+    {
+        var center = new Point(control.Bounds.Width / 2, control.Bounds.Height / 2);
+        return control.TranslatePoint(center, relativeTo) ?? center;
+    }
+
+    private static PointerPressedEventArgs CreatePointerPressedArgs(Control source, Visual root, IPointer pointer, Point position, KeyModifiers modifiers)
+    {
+        var properties = new PointerPointProperties(RawInputModifiers.LeftMouseButton, PointerUpdateKind.LeftButtonPressed);
+        return new PointerPressedEventArgs(source, pointer, root, position, 0, properties, modifiers);
+    }
+
+    private static PointerEventArgs CreatePointerMovedArgs(Control source, Visual root, IPointer pointer, Point position, KeyModifiers modifiers)
+    {
+        var properties = new PointerPointProperties(RawInputModifiers.LeftMouseButton, PointerUpdateKind.Other);
+        return new PointerEventArgs(InputElement.PointerMovedEvent, source, pointer, root, position, 0, properties, modifiers);
+    }
+
+    private static PointerReleasedEventArgs CreatePointerReleasedArgs(Control source, Visual root, IPointer pointer, Point position, KeyModifiers modifiers)
+    {
+        var properties = new PointerPointProperties(RawInputModifiers.None, PointerUpdateKind.LeftButtonReleased);
+        return new PointerReleasedEventArgs(source, pointer, root, position, 0, properties, modifiers, MouseButton.Left);
+    }
+
     private static bool InvokeUpdateStateOnMouseLeftButtonDown(DataGrid grid, PointerPressedEventArgs args, int columnIndex, int slot, bool allowEdit)
     {
         return grid.UpdateStateOnMouseLeftButtonDown(args, columnIndex, slot, allowEdit);
@@ -541,6 +1032,20 @@ public class DataGridInputMouseSelectionTests
     {
         var focusedObjectField = typeof(DataGrid).GetField("_focusedObject", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic);
         focusedObjectField?.SetValue(grid, focusedObject);
+    }
+
+    private static void SetAnchorSlot(DataGrid grid, int slot)
+    {
+        var property = typeof(DataGrid).GetProperty("AnchorSlot", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic);
+        var setter = property?.GetSetMethod(true);
+        if (setter != null)
+        {
+            setter.Invoke(grid, new object[] { slot });
+            return;
+        }
+
+        var field = typeof(DataGrid).GetField("<AnchorSlot>k__BackingField", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic);
+        field?.SetValue(grid, slot);
     }
 
     private static void SetExecutingLostFocusActions(DataGrid grid, bool value)

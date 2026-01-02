@@ -229,6 +229,7 @@ internal
                     Debug.Assert(sender is DataGridRowHeader);
                     Debug.Assert(sender == this);
                     e.Handled = OwningGrid.UpdateStateOnMouseLeftButtonDown(e, -1, Slot, false);
+                    OwningGrid.TryBeginSelectionDrag(e, -1, startDragging: true, deferCapture: false);
                 }
             }
             else if (e.GetCurrentPoint(this).Properties.IsRightButtonPressed)
