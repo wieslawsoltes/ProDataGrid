@@ -15,6 +15,7 @@ using Avalonia.Controls.Primitives;
 using Avalonia.Controls.DataGridHierarchical;
 using Avalonia.Controls.DataGridSorting;
 using Avalonia.Controls.Templates;
+using Avalonia.Data;
 using Avalonia.Headless.XUnit;
 using Avalonia.Input;
 using Avalonia.Markup.Xaml.Styling;
@@ -689,6 +690,81 @@ public class HierarchicalHeadlessTests
         PumpLayout(grid);
 
         AssertVisibleRowsHaveCorrectIndent(grid, indent);
+
+        window.Close();
+    }
+
+    [AvaloniaFact]
+    public void Templated_Hierarchical_Cell_Rebinds_When_Row_Recycled()
+    {
+        var root = CreateTree("Root", childCount: 120, grandchildCount: 0);
+        using var themeScope = UseApplicationTheme(DataGridTheme.SimpleV2);
+
+        var model = new HierarchicalModel(new HierarchicalOptions
+        {
+            ChildrenSelector = o => ((Item)o).Children,
+            AutoExpandRoot = true,
+            MaxAutoExpandDepth = 1,
+            VirtualizeChildren = true
+        });
+        model.SetRoot(root);
+        model.Expand(model.Root!);
+
+        var grid = new DataGrid
+        {
+            HierarchicalModel = model,
+            HierarchicalRowsEnabled = true,
+            AutoGenerateColumns = false,
+            UseLogicalScrollable = true,
+            RowHeight = 24
+        };
+
+        grid.ColumnsInternal.Add(new DataGridHierarchicalColumn
+        {
+            Header = "Name",
+            CellTemplate = new FuncDataTemplate<HierarchicalNode>((_, _) => new TextBlock
+            {
+                [!TextBlock.TextProperty] = new Binding("Item.Name")
+            })
+        });
+
+        var window = new Window
+        {
+            Width = 420,
+            Height = 220,
+            Content = grid
+        };
+
+        window.SetThemeStyles(DataGridTheme.SimpleV2);
+        window.Show();
+        PumpLayout(grid);
+
+        var initialRows = GetVisibleRows(grid);
+        var initialContexts = initialRows.ToDictionary(row => row, row => row.DataContext);
+
+        var lastNode = model.GetNode(model.Count - 1);
+        grid.ScrollIntoView(lastNode, grid.ColumnsInternal[0]);
+        PumpLayout(grid);
+
+        var scrolledRows = GetVisibleRows(grid);
+        var recycledRows = scrolledRows
+            .Where(row =>
+                initialContexts.TryGetValue(row, out var oldContext) &&
+                !ReferenceEquals(oldContext, row.DataContext))
+            .ToList();
+
+        Assert.NotEmpty(recycledRows);
+
+        foreach (var row in recycledRows)
+        {
+            var node = Assert.IsType<HierarchicalNode>(row.DataContext);
+            var presenter = GetHierarchicalPresenter(row);
+            Assert.Same(node, presenter.Content);
+
+            var textBlock = presenter.GetVisualDescendants().OfType<TextBlock>().FirstOrDefault();
+            Assert.NotNull(textBlock);
+            Assert.Equal(((Item)node.Item).Name, textBlock!.Text);
+        }
 
         window.Close();
     }

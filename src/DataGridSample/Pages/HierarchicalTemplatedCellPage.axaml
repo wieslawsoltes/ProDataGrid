@@ -1,0 +1,99 @@
+<!--
+  Copyright (c) Wiesław Šoltés. All rights reserved.
+  Licensed under the MIT license. See LICENSE file in the project root for details.
+-->
+<UserControl
+    x:Class="DataGridSample.Pages.HierarchicalTemplatedCellPage"
+    xmlns="https://github.com/avaloniaui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:viewModels="clr-namespace:DataGridSample.ViewModels"
+    xmlns:converters="clr-namespace:DataGridSample.Converters"
+    xmlns:hier="clr-namespace:Avalonia.Controls.DataGridHierarchical;assembly=Avalonia.Controls.DataGrid"
+    x:DataType="viewModels:HierarchicalTemplatedCellViewModel"
+    d:DesignHeight="720"
+    d:DesignWidth="1100"
+    mc:Ignorable="d">
+
+  <UserControl.DataContext>
+    <viewModels:HierarchicalTemplatedCellViewModel />
+  </UserControl.DataContext>
+
+  <UserControl.Resources>
+    <converters:IconKeyToGeometryConverter x:Key="IconKeyToGeometryConverter" />
+  </UserControl.Resources>
+
+  <Grid Margin="12"
+        RowDefinitions="Auto,Auto,*"
+        ColumnDefinitions="*"
+        RowSpacing="8">
+    <StackPanel Spacing="4">
+      <TextBlock Classes="h2"
+                 Text="Hierarchical templated cells" />
+      <TextBlock TextWrapping="Wrap"
+                 Text="The first column uses Fluent icons inside a templated hierarchical cell. Expand or collapse nodes to verify icons remain aligned even as rows are virtualized and recycled." />
+    </StackPanel>
+
+    <StackPanel Grid.Row="1"
+                Orientation="Horizontal"
+                Spacing="8">
+      <Button Content="Expand all"
+              Command="{Binding ExpandAllCommand}" />
+      <Button Content="Collapse all"
+              Command="{Binding CollapseAllCommand}" />
+    </StackPanel>
+
+    <DataGrid Grid.Row="2"
+              AutoGenerateColumns="False"
+              HierarchicalModel="{Binding Model}"
+              HierarchicalRowsEnabled="True"
+              CanUserResizeColumns="True"
+              HeadersVisibility="Column"
+              GridLinesVisibility="Horizontal"
+              UseLogicalScrollable="True"
+              RowHeight="32"
+              x:DataType="viewModels:HierarchicalTemplatedCellViewModel">
+      <DataGrid.Columns>
+        <DataGridHierarchicalColumn Header="Icon"
+                                    Width="110"
+                                    x:CompileBindings="False">
+          <DataGridHierarchicalColumn.CellTemplate>
+            <DataTemplate x:DataType="hier:HierarchicalNode">
+              <Border Background="Transparent"
+                      HorizontalAlignment="Center"
+                      VerticalAlignment="Center"
+                      IsVisible="{Binding Item.IsIconVisible}">
+                <Path Width="16"
+                      Height="16"
+                      Stretch="Uniform"
+                      Data="{Binding Item.IconKey, Converter={StaticResource IconKeyToGeometryConverter}}"
+                      Fill="{Binding $parent[DataGridRow].Foreground}" />
+              </Border>
+            </DataTemplate>
+          </DataGridHierarchicalColumn.CellTemplate>
+        </DataGridHierarchicalColumn>
+
+        <DataGridTemplateColumn Header="Name"
+                                Width="*"
+                                x:CompileBindings="False">
+          <DataGridTemplateColumn.CellTemplate>
+            <DataTemplate x:DataType="hier:HierarchicalNode">
+              <TextBlock Text="{Binding Item.Name}" />
+            </DataTemplate>
+          </DataGridTemplateColumn.CellTemplate>
+        </DataGridTemplateColumn>
+
+        <DataGridTemplateColumn Header="Icon Key"
+                                Width="120"
+                                x:CompileBindings="False">
+          <DataGridTemplateColumn.CellTemplate>
+            <DataTemplate x:DataType="hier:HierarchicalNode">
+              <TextBlock Text="{Binding Item.IconKey}" />
+            </DataTemplate>
+          </DataGridTemplateColumn.CellTemplate>
+        </DataGridTemplateColumn>
+      </DataGrid.Columns>
+    </DataGrid>
+  </Grid>
+</UserControl>

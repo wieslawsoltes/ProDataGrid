@@ -119,6 +119,9 @@
     <TabItem Header="Hierarchical Root Items">
       <pages:HierarchicalRootItemsPage />
     </TabItem>
+    <TabItem Header="Hierarchical Templated Cells">
+      <pages:HierarchicalTemplatedCellPage />
+    </TabItem>
     <TabItem Header="Grouped Selection">
       <pages:GroupedSelectionPage />
     </TabItem>

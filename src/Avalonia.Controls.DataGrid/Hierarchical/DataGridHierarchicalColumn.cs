@@ -24,6 +24,7 @@ internal
     {
         private static readonly IValueConverter _isExpandableConverter =
             new FuncValueConverter<bool, bool>(value => !value);
+        private static readonly Binding _dataContextBinding = new Binding { Mode = BindingMode.OneWay };
 
         private readonly Lazy<IDataTemplate?> _cellTemplate;
 
@@ -154,6 +155,10 @@ internal
             if (Binding != null && dataItem != DataGridCollectionView.NewItemPlaceholder)
             {
                 presenter.Bind(ContentControl.ContentProperty, Binding);
+            }
+            else if (dataItem != DataGridCollectionView.NewItemPlaceholder)
+            {
+                presenter.Bind(ContentControl.ContentProperty, _dataContextBinding);
             }
             else
             {
