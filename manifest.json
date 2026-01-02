@@ -3551,6 +3551,16 @@
     },
     {
       "type": "Conceptual",
+      "source_relative_path": "articles/drag-selection.md",
+      "output": {
+        ".html": {
+          "relative_path": "articles/drag-selection.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "Conceptual",
       "source_relative_path": "articles/dynamicdata-streaming-sourcecache.md",
       "output": {
         ".html": {
