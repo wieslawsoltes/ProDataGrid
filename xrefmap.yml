@@ -12981,6 +12981,12 @@ references:
   commentId: M:Avalonia.Controls.DataGridHierarchical.HierarchicalModel.Collapse(Avalonia.Controls.DataGridHierarchical.HierarchicalNode)
   fullName: Avalonia.Controls.DataGridHierarchical.HierarchicalModel.Collapse(Avalonia.Controls.DataGridHierarchical.HierarchicalNode)
   nameWithType: HierarchicalModel.Collapse(HierarchicalNode)
+- uid: Avalonia.Controls.DataGridHierarchical.HierarchicalModel.Collapse(System.Collections.IEnumerable)
+  name: Collapse(IEnumerable)
+  href: api/Avalonia.Controls.DataGridHierarchical.HierarchicalModel.html#Avalonia_Controls_DataGridHierarchical_HierarchicalModel_Collapse_System_Collections_IEnumerable_
+  commentId: M:Avalonia.Controls.DataGridHierarchical.HierarchicalModel.Collapse(System.Collections.IEnumerable)
+  fullName: Avalonia.Controls.DataGridHierarchical.HierarchicalModel.Collapse(System.Collections.IEnumerable)
+  nameWithType: HierarchicalModel.Collapse(IEnumerable)
 - uid: Avalonia.Controls.DataGridHierarchical.HierarchicalModel.Collapse*
   name: Collapse
   href: api/Avalonia.Controls.DataGridHierarchical.HierarchicalModel.html#Avalonia_Controls_DataGridHierarchical_HierarchicalModel_Collapse_
@@ -13004,6 +13010,19 @@ references:
   isSpec: "True"
   fullName: Avalonia.Controls.DataGridHierarchical.HierarchicalModel.CollapseAll
   nameWithType: HierarchicalModel.CollapseAll
+- uid: Avalonia.Controls.DataGridHierarchical.HierarchicalModel.CollapseAsync(System.Collections.IEnumerable,System.Threading.CancellationToken)
+  name: CollapseAsync(IEnumerable, CancellationToken)
+  href: api/Avalonia.Controls.DataGridHierarchical.HierarchicalModel.html#Avalonia_Controls_DataGridHierarchical_HierarchicalModel_CollapseAsync_System_Collections_IEnumerable_System_Threading_CancellationToken_
+  commentId: M:Avalonia.Controls.DataGridHierarchical.HierarchicalModel.CollapseAsync(System.Collections.IEnumerable,System.Threading.CancellationToken)
+  fullName: Avalonia.Controls.DataGridHierarchical.HierarchicalModel.CollapseAsync(System.Collections.IEnumerable, System.Threading.CancellationToken)
+  nameWithType: HierarchicalModel.CollapseAsync(IEnumerable, CancellationToken)
+- uid: Avalonia.Controls.DataGridHierarchical.HierarchicalModel.CollapseAsync*
+  name: CollapseAsync
+  href: api/Avalonia.Controls.DataGridHierarchical.HierarchicalModel.html#Avalonia_Controls_DataGridHierarchical_HierarchicalModel_CollapseAsync_
+  commentId: Overload:Avalonia.Controls.DataGridHierarchical.HierarchicalModel.CollapseAsync
+  isSpec: "True"
+  fullName: Avalonia.Controls.DataGridHierarchical.HierarchicalModel.CollapseAsync
+  nameWithType: HierarchicalModel.CollapseAsync
 - uid: Avalonia.Controls.DataGridHierarchical.HierarchicalModel.Count
   name: Count
   href: api/Avalonia.Controls.DataGridHierarchical.HierarchicalModel.html#Avalonia_Controls_DataGridHierarchical_HierarchicalModel_Count
@@ -13023,6 +13042,12 @@ references:
   commentId: M:Avalonia.Controls.DataGridHierarchical.HierarchicalModel.Expand(Avalonia.Controls.DataGridHierarchical.HierarchicalNode)
   fullName: Avalonia.Controls.DataGridHierarchical.HierarchicalModel.Expand(Avalonia.Controls.DataGridHierarchical.HierarchicalNode)
   nameWithType: HierarchicalModel.Expand(HierarchicalNode)
+- uid: Avalonia.Controls.DataGridHierarchical.HierarchicalModel.Expand(System.Collections.IEnumerable)
+  name: Expand(IEnumerable)
+  href: api/Avalonia.Controls.DataGridHierarchical.HierarchicalModel.html#Avalonia_Controls_DataGridHierarchical_HierarchicalModel_Expand_System_Collections_IEnumerable_
+  commentId: M:Avalonia.Controls.DataGridHierarchical.HierarchicalModel.Expand(System.Collections.IEnumerable)
+  fullName: Avalonia.Controls.DataGridHierarchical.HierarchicalModel.Expand(System.Collections.IEnumerable)
+  nameWithType: HierarchicalModel.Expand(IEnumerable)
 - uid: Avalonia.Controls.DataGridHierarchical.HierarchicalModel.Expand*
   name: Expand
   href: api/Avalonia.Controls.DataGridHierarchical.HierarchicalModel.html#Avalonia_Controls_DataGridHierarchical_HierarchicalModel_Expand_
@@ -13052,6 +13077,12 @@ references:
   commentId: M:Avalonia.Controls.DataGridHierarchical.HierarchicalModel.ExpandAsync(Avalonia.Controls.DataGridHierarchical.HierarchicalNode,System.Threading.CancellationToken)
   fullName: Avalonia.Controls.DataGridHierarchical.HierarchicalModel.ExpandAsync(Avalonia.Controls.DataGridHierarchical.HierarchicalNode, System.Threading.CancellationToken)
   nameWithType: HierarchicalModel.ExpandAsync(HierarchicalNode, CancellationToken)
+- uid: Avalonia.Controls.DataGridHierarchical.HierarchicalModel.ExpandAsync(System.Collections.IEnumerable,System.Threading.CancellationToken)
+  name: ExpandAsync(IEnumerable, CancellationToken)
+  href: api/Avalonia.Controls.DataGridHierarchical.HierarchicalModel.html#Avalonia_Controls_DataGridHierarchical_HierarchicalModel_ExpandAsync_System_Collections_IEnumerable_System_Threading_CancellationToken_
+  commentId: M:Avalonia.Controls.DataGridHierarchical.HierarchicalModel.ExpandAsync(System.Collections.IEnumerable,System.Threading.CancellationToken)
+  fullName: Avalonia.Controls.DataGridHierarchical.HierarchicalModel.ExpandAsync(System.Collections.IEnumerable, System.Threading.CancellationToken)
+  nameWithType: HierarchicalModel.ExpandAsync(IEnumerable, CancellationToken)
 - uid: Avalonia.Controls.DataGridHierarchical.HierarchicalModel.ExpandAsync*
   name: ExpandAsync
   href: api/Avalonia.Controls.DataGridHierarchical.HierarchicalModel.html#Avalonia_Controls_DataGridHierarchical_HierarchicalModel_ExpandAsync_
@@ -13613,6 +13644,15 @@ references:
   fullName.vb: Avalonia.Controls.DataGridHierarchical.HierarchicalModel(Of T).Collapse(Avalonia.Controls.DataGridHierarchical.HierarchicalNode(Of T))
   nameWithType: HierarchicalModel<T>.Collapse(HierarchicalNode<T>)
   nameWithType.vb: HierarchicalModel(Of T).Collapse(HierarchicalNode(Of T))
+- uid: Avalonia.Controls.DataGridHierarchical.HierarchicalModel`1.Collapse(System.Collections.Generic.IEnumerable{`0})
+  name: Collapse(IEnumerable<T>)
+  href: api/Avalonia.Controls.DataGridHierarchical.HierarchicalModel-1.html#Avalonia_Controls_DataGridHierarchical_HierarchicalModel_1_Collapse_System_Collections_Generic_IEnumerable__0__
+  commentId: M:Avalonia.Controls.DataGridHierarchical.HierarchicalModel`1.Collapse(System.Collections.Generic.IEnumerable{`0})
+  name.vb: Collapse(IEnumerable(Of T))
+  fullName: Avalonia.Controls.DataGridHierarchical.HierarchicalModel<T>.Collapse(System.Collections.Generic.IEnumerable<T>)
+  fullName.vb: Avalonia.Controls.DataGridHierarchical.HierarchicalModel(Of T).Collapse(System.Collections.Generic.IEnumerable(Of T))
+  nameWithType: HierarchicalModel<T>.Collapse(IEnumerable<T>)
+  nameWithType.vb: HierarchicalModel(Of T).Collapse(IEnumerable(Of T))
 - uid: Avalonia.Controls.DataGridHierarchical.HierarchicalModel`1.Collapse*
   name: Collapse
   href: api/Avalonia.Controls.DataGridHierarchical.HierarchicalModel-1.html#Avalonia_Controls_DataGridHierarchical_HierarchicalModel_1_Collapse_
@@ -13640,6 +13680,24 @@ references:
   fullName.vb: Avalonia.Controls.DataGridHierarchical.HierarchicalModel(Of T).CollapseAll
   nameWithType: HierarchicalModel<T>.CollapseAll
   nameWithType.vb: HierarchicalModel(Of T).CollapseAll
+- uid: Avalonia.Controls.DataGridHierarchical.HierarchicalModel`1.CollapseAsync(System.Collections.Generic.IEnumerable{`0},System.Threading.CancellationToken)
+  name: CollapseAsync(IEnumerable<T>, CancellationToken)
+  href: api/Avalonia.Controls.DataGridHierarchical.HierarchicalModel-1.html#Avalonia_Controls_DataGridHierarchical_HierarchicalModel_1_CollapseAsync_System_Collections_Generic_IEnumerable__0__System_Threading_CancellationToken_
+  commentId: M:Avalonia.Controls.DataGridHierarchical.HierarchicalModel`1.CollapseAsync(System.Collections.Generic.IEnumerable{`0},System.Threading.CancellationToken)
+  name.vb: CollapseAsync(IEnumerable(Of T), CancellationToken)
+  fullName: Avalonia.Controls.DataGridHierarchical.HierarchicalModel<T>.CollapseAsync(System.Collections.Generic.IEnumerable<T>, System.Threading.CancellationToken)
+  fullName.vb: Avalonia.Controls.DataGridHierarchical.HierarchicalModel(Of T).CollapseAsync(System.Collections.Generic.IEnumerable(Of T), System.Threading.CancellationToken)
+  nameWithType: HierarchicalModel<T>.CollapseAsync(IEnumerable<T>, CancellationToken)
+  nameWithType.vb: HierarchicalModel(Of T).CollapseAsync(IEnumerable(Of T), CancellationToken)
+- uid: Avalonia.Controls.DataGridHierarchical.HierarchicalModel`1.CollapseAsync*
+  name: CollapseAsync
+  href: api/Avalonia.Controls.DataGridHierarchical.HierarchicalModel-1.html#Avalonia_Controls_DataGridHierarchical_HierarchicalModel_1_CollapseAsync_
+  commentId: Overload:Avalonia.Controls.DataGridHierarchical.HierarchicalModel`1.CollapseAsync
+  isSpec: "True"
+  fullName: Avalonia.Controls.DataGridHierarchical.HierarchicalModel<T>.CollapseAsync
+  fullName.vb: Avalonia.Controls.DataGridHierarchical.HierarchicalModel(Of T).CollapseAsync
+  nameWithType: HierarchicalModel<T>.CollapseAsync
+  nameWithType.vb: HierarchicalModel(Of T).CollapseAsync
 - uid: Avalonia.Controls.DataGridHierarchical.HierarchicalModel`1.Count
   name: Count
   href: api/Avalonia.Controls.DataGridHierarchical.HierarchicalModel-1.html#Avalonia_Controls_DataGridHierarchical_HierarchicalModel_1_Count
@@ -13666,6 +13724,15 @@ references:
   fullName.vb: Avalonia.Controls.DataGridHierarchical.HierarchicalModel(Of T).Expand(Avalonia.Controls.DataGridHierarchical.HierarchicalNode(Of T))
   nameWithType: HierarchicalModel<T>.Expand(HierarchicalNode<T>)
   nameWithType.vb: HierarchicalModel(Of T).Expand(HierarchicalNode(Of T))
+- uid: Avalonia.Controls.DataGridHierarchical.HierarchicalModel`1.Expand(System.Collections.Generic.IEnumerable{`0})
+  name: Expand(IEnumerable<T>)
+  href: api/Avalonia.Controls.DataGridHierarchical.HierarchicalModel-1.html#Avalonia_Controls_DataGridHierarchical_HierarchicalModel_1_Expand_System_Collections_Generic_IEnumerable__0__
+  commentId: M:Avalonia.Controls.DataGridHierarchical.HierarchicalModel`1.Expand(System.Collections.Generic.IEnumerable{`0})
+  name.vb: Expand(IEnumerable(Of T))
+  fullName: Avalonia.Controls.DataGridHierarchical.HierarchicalModel<T>.Expand(System.Collections.Generic.IEnumerable<T>)
+  fullName.vb: Avalonia.Controls.DataGridHierarchical.HierarchicalModel(Of T).Expand(System.Collections.Generic.IEnumerable(Of T))
+  nameWithType: HierarchicalModel<T>.Expand(IEnumerable<T>)
+  nameWithType.vb: HierarchicalModel(Of T).Expand(IEnumerable(Of T))
 - uid: Avalonia.Controls.DataGridHierarchical.HierarchicalModel`1.Expand*
   name: Expand
   href: api/Avalonia.Controls.DataGridHierarchical.HierarchicalModel-1.html#Avalonia_Controls_DataGridHierarchical_HierarchicalModel_1_Expand_
@@ -13702,6 +13769,15 @@ references:
   fullName.vb: Avalonia.Controls.DataGridHierarchical.HierarchicalModel(Of T).ExpandAsync(Avalonia.Controls.DataGridHierarchical.HierarchicalNode(Of T), System.Threading.CancellationToken)
   nameWithType: HierarchicalModel<T>.ExpandAsync(HierarchicalNode<T>, CancellationToken)
   nameWithType.vb: HierarchicalModel(Of T).ExpandAsync(HierarchicalNode(Of T), CancellationToken)
+- uid: Avalonia.Controls.DataGridHierarchical.HierarchicalModel`1.ExpandAsync(System.Collections.Generic.IEnumerable{`0},System.Threading.CancellationToken)
+  name: ExpandAsync(IEnumerable<T>, CancellationToken)
+  href: api/Avalonia.Controls.DataGridHierarchical.HierarchicalModel-1.html#Avalonia_Controls_DataGridHierarchical_HierarchicalModel_1_ExpandAsync_System_Collections_Generic_IEnumerable__0__System_Threading_CancellationToken_
+  commentId: M:Avalonia.Controls.DataGridHierarchical.HierarchicalModel`1.ExpandAsync(System.Collections.Generic.IEnumerable{`0},System.Threading.CancellationToken)
+  name.vb: ExpandAsync(IEnumerable(Of T), CancellationToken)
+  fullName: Avalonia.Controls.DataGridHierarchical.HierarchicalModel<T>.ExpandAsync(System.Collections.Generic.IEnumerable<T>, System.Threading.CancellationToken)
+  fullName.vb: Avalonia.Controls.DataGridHierarchical.HierarchicalModel(Of T).ExpandAsync(System.Collections.Generic.IEnumerable(Of T), System.Threading.CancellationToken)
+  nameWithType: HierarchicalModel<T>.ExpandAsync(IEnumerable<T>, CancellationToken)
+  nameWithType.vb: HierarchicalModel(Of T).ExpandAsync(IEnumerable(Of T), CancellationToken)
 - uid: Avalonia.Controls.DataGridHierarchical.HierarchicalModel`1.ExpandAsync*
   name: ExpandAsync
   href: api/Avalonia.Controls.DataGridHierarchical.HierarchicalModel-1.html#Avalonia_Controls_DataGridHierarchical_HierarchicalModel_1_ExpandAsync_
@@ -15561,6 +15637,12 @@ references:
   commentId: M:Avalonia.Controls.DataGridHierarchical.IHierarchicalModel.Collapse(Avalonia.Controls.DataGridHierarchical.HierarchicalNode)
   fullName: Avalonia.Controls.DataGridHierarchical.IHierarchicalModel.Collapse(Avalonia.Controls.DataGridHierarchical.HierarchicalNode)
   nameWithType: IHierarchicalModel.Collapse(HierarchicalNode)
+- uid: Avalonia.Controls.DataGridHierarchical.IHierarchicalModel.Collapse(System.Collections.IEnumerable)
+  name: Collapse(IEnumerable)
+  href: api/Avalonia.Controls.DataGridHierarchical.IHierarchicalModel.html#Avalonia_Controls_DataGridHierarchical_IHierarchicalModel_Collapse_System_Collections_IEnumerable_
+  commentId: M:Avalonia.Controls.DataGridHierarchical.IHierarchicalModel.Collapse(System.Collections.IEnumerable)
+  fullName: Avalonia.Controls.DataGridHierarchical.IHierarchicalModel.Collapse(System.Collections.IEnumerable)
+  nameWithType: IHierarchicalModel.Collapse(IEnumerable)
 - uid: Avalonia.Controls.DataGridHierarchical.IHierarchicalModel.Collapse*
   name: Collapse
   href: api/Avalonia.Controls.DataGridHierarchical.IHierarchicalModel.html#Avalonia_Controls_DataGridHierarchical_IHierarchicalModel_Collapse_
@@ -15584,6 +15666,19 @@ references:
   isSpec: "True"
   fullName: Avalonia.Controls.DataGridHierarchical.IHierarchicalModel.CollapseAll
   nameWithType: IHierarchicalModel.CollapseAll
+- uid: Avalonia.Controls.DataGridHierarchical.IHierarchicalModel.CollapseAsync(System.Collections.IEnumerable,System.Threading.CancellationToken)
+  name: CollapseAsync(IEnumerable, CancellationToken)
+  href: api/Avalonia.Controls.DataGridHierarchical.IHierarchicalModel.html#Avalonia_Controls_DataGridHierarchical_IHierarchicalModel_CollapseAsync_System_Collections_IEnumerable_System_Threading_CancellationToken_
+  commentId: M:Avalonia.Controls.DataGridHierarchical.IHierarchicalModel.CollapseAsync(System.Collections.IEnumerable,System.Threading.CancellationToken)
+  fullName: Avalonia.Controls.DataGridHierarchical.IHierarchicalModel.CollapseAsync(System.Collections.IEnumerable, System.Threading.CancellationToken)
+  nameWithType: IHierarchicalModel.CollapseAsync(IEnumerable, CancellationToken)
+- uid: Avalonia.Controls.DataGridHierarchical.IHierarchicalModel.CollapseAsync*
+  name: CollapseAsync
+  href: api/Avalonia.Controls.DataGridHierarchical.IHierarchicalModel.html#Avalonia_Controls_DataGridHierarchical_IHierarchicalModel_CollapseAsync_
+  commentId: Overload:Avalonia.Controls.DataGridHierarchical.IHierarchicalModel.CollapseAsync
+  isSpec: "True"
+  fullName: Avalonia.Controls.DataGridHierarchical.IHierarchicalModel.CollapseAsync
+  nameWithType: IHierarchicalModel.CollapseAsync
 - uid: Avalonia.Controls.DataGridHierarchical.IHierarchicalModel.Count
   name: Count
   href: api/Avalonia.Controls.DataGridHierarchical.IHierarchicalModel.html#Avalonia_Controls_DataGridHierarchical_IHierarchicalModel_Count
@@ -15603,6 +15698,12 @@ references:
   commentId: M:Avalonia.Controls.DataGridHierarchical.IHierarchicalModel.Expand(Avalonia.Controls.DataGridHierarchical.HierarchicalNode)
   fullName: Avalonia.Controls.DataGridHierarchical.IHierarchicalModel.Expand(Avalonia.Controls.DataGridHierarchical.HierarchicalNode)
   nameWithType: IHierarchicalModel.Expand(HierarchicalNode)
+- uid: Avalonia.Controls.DataGridHierarchical.IHierarchicalModel.Expand(System.Collections.IEnumerable)
+  name: Expand(IEnumerable)
+  href: api/Avalonia.Controls.DataGridHierarchical.IHierarchicalModel.html#Avalonia_Controls_DataGridHierarchical_IHierarchicalModel_Expand_System_Collections_IEnumerable_
+  commentId: M:Avalonia.Controls.DataGridHierarchical.IHierarchicalModel.Expand(System.Collections.IEnumerable)
+  fullName: Avalonia.Controls.DataGridHierarchical.IHierarchicalModel.Expand(System.Collections.IEnumerable)
+  nameWithType: IHierarchicalModel.Expand(IEnumerable)
 - uid: Avalonia.Controls.DataGridHierarchical.IHierarchicalModel.Expand*
   name: Expand
   href: api/Avalonia.Controls.DataGridHierarchical.IHierarchicalModel.html#Avalonia_Controls_DataGridHierarchical_IHierarchicalModel_Expand_
@@ -15632,6 +15733,12 @@ references:
   commentId: M:Avalonia.Controls.DataGridHierarchical.IHierarchicalModel.ExpandAsync(Avalonia.Controls.DataGridHierarchical.HierarchicalNode,System.Threading.CancellationToken)
   fullName: Avalonia.Controls.DataGridHierarchical.IHierarchicalModel.ExpandAsync(Avalonia.Controls.DataGridHierarchical.HierarchicalNode, System.Threading.CancellationToken)
   nameWithType: IHierarchicalModel.ExpandAsync(HierarchicalNode, CancellationToken)
+- uid: Avalonia.Controls.DataGridHierarchical.IHierarchicalModel.ExpandAsync(System.Collections.IEnumerable,System.Threading.CancellationToken)
+  name: ExpandAsync(IEnumerable, CancellationToken)
+  href: api/Avalonia.Controls.DataGridHierarchical.IHierarchicalModel.html#Avalonia_Controls_DataGridHierarchical_IHierarchicalModel_ExpandAsync_System_Collections_IEnumerable_System_Threading_CancellationToken_
+  commentId: M:Avalonia.Controls.DataGridHierarchical.IHierarchicalModel.ExpandAsync(System.Collections.IEnumerable,System.Threading.CancellationToken)
+  fullName: Avalonia.Controls.DataGridHierarchical.IHierarchicalModel.ExpandAsync(System.Collections.IEnumerable, System.Threading.CancellationToken)
+  nameWithType: IHierarchicalModel.ExpandAsync(IEnumerable, CancellationToken)
 - uid: Avalonia.Controls.DataGridHierarchical.IHierarchicalModel.ExpandAsync*
   name: ExpandAsync
   href: api/Avalonia.Controls.DataGridHierarchical.IHierarchicalModel.html#Avalonia_Controls_DataGridHierarchical_IHierarchicalModel_ExpandAsync_
@@ -16009,6 +16116,15 @@ references:
   fullName.vb: Avalonia.Controls.DataGridHierarchical.IHierarchicalModel(Of T).Collapse(Avalonia.Controls.DataGridHierarchical.HierarchicalNode(Of T))
   nameWithType: IHierarchicalModel<T>.Collapse(HierarchicalNode<T>)
   nameWithType.vb: IHierarchicalModel(Of T).Collapse(HierarchicalNode(Of T))
+- uid: Avalonia.Controls.DataGridHierarchical.IHierarchicalModel`1.Collapse(System.Collections.Generic.IEnumerable{`0})
+  name: Collapse(IEnumerable<T>)
+  href: api/Avalonia.Controls.DataGridHierarchical.IHierarchicalModel-1.html#Avalonia_Controls_DataGridHierarchical_IHierarchicalModel_1_Collapse_System_Collections_Generic_IEnumerable__0__
+  commentId: M:Avalonia.Controls.DataGridHierarchical.IHierarchicalModel`1.Collapse(System.Collections.Generic.IEnumerable{`0})
+  name.vb: Collapse(IEnumerable(Of T))
+  fullName: Avalonia.Controls.DataGridHierarchical.IHierarchicalModel<T>.Collapse(System.Collections.Generic.IEnumerable<T>)
+  fullName.vb: Avalonia.Controls.DataGridHierarchical.IHierarchicalModel(Of T).Collapse(System.Collections.Generic.IEnumerable(Of T))
+  nameWithType: IHierarchicalModel<T>.Collapse(IEnumerable<T>)
+  nameWithType.vb: IHierarchicalModel(Of T).Collapse(IEnumerable(Of T))
 - uid: Avalonia.Controls.DataGridHierarchical.IHierarchicalModel`1.Collapse*
   name: Collapse
   href: api/Avalonia.Controls.DataGridHierarchical.IHierarchicalModel-1.html#Avalonia_Controls_DataGridHierarchical_IHierarchicalModel_1_Collapse_
@@ -16036,6 +16152,24 @@ references:
   fullName.vb: Avalonia.Controls.DataGridHierarchical.IHierarchicalModel(Of T).CollapseAll
   nameWithType: IHierarchicalModel<T>.CollapseAll
   nameWithType.vb: IHierarchicalModel(Of T).CollapseAll
+- uid: Avalonia.Controls.DataGridHierarchical.IHierarchicalModel`1.CollapseAsync(System.Collections.Generic.IEnumerable{`0},System.Threading.CancellationToken)
+  name: CollapseAsync(IEnumerable<T>, CancellationToken)
+  href: api/Avalonia.Controls.DataGridHierarchical.IHierarchicalModel-1.html#Avalonia_Controls_DataGridHierarchical_IHierarchicalModel_1_CollapseAsync_System_Collections_Generic_IEnumerable__0__System_Threading_CancellationToken_
+  commentId: M:Avalonia.Controls.DataGridHierarchical.IHierarchicalModel`1.CollapseAsync(System.Collections.Generic.IEnumerable{`0},System.Threading.CancellationToken)
+  name.vb: CollapseAsync(IEnumerable(Of T), CancellationToken)
+  fullName: Avalonia.Controls.DataGridHierarchical.IHierarchicalModel<T>.CollapseAsync(System.Collections.Generic.IEnumerable<T>, System.Threading.CancellationToken)
+  fullName.vb: Avalonia.Controls.DataGridHierarchical.IHierarchicalModel(Of T).CollapseAsync(System.Collections.Generic.IEnumerable(Of T), System.Threading.CancellationToken)
+  nameWithType: IHierarchicalModel<T>.CollapseAsync(IEnumerable<T>, CancellationToken)
+  nameWithType.vb: IHierarchicalModel(Of T).CollapseAsync(IEnumerable(Of T), CancellationToken)
+- uid: Avalonia.Controls.DataGridHierarchical.IHierarchicalModel`1.CollapseAsync*
+  name: CollapseAsync
+  href: api/Avalonia.Controls.DataGridHierarchical.IHierarchicalModel-1.html#Avalonia_Controls_DataGridHierarchical_IHierarchicalModel_1_CollapseAsync_
+  commentId: Overload:Avalonia.Controls.DataGridHierarchical.IHierarchicalModel`1.CollapseAsync
+  isSpec: "True"
+  fullName: Avalonia.Controls.DataGridHierarchical.IHierarchicalModel<T>.CollapseAsync
+  fullName.vb: Avalonia.Controls.DataGridHierarchical.IHierarchicalModel(Of T).CollapseAsync
+  nameWithType: IHierarchicalModel<T>.CollapseAsync
+  nameWithType.vb: IHierarchicalModel(Of T).CollapseAsync
 - uid: Avalonia.Controls.DataGridHierarchical.IHierarchicalModel`1.Expand(Avalonia.Controls.DataGridHierarchical.HierarchicalNode{`0})
   name: Expand(HierarchicalNode<T>)
   href: api/Avalonia.Controls.DataGridHierarchical.IHierarchicalModel-1.html#Avalonia_Controls_DataGridHierarchical_IHierarchicalModel_1_Expand_Avalonia_Controls_DataGridHierarchical_HierarchicalNode__0__
@@ -16045,6 +16179,15 @@ references:
   fullName.vb: Avalonia.Controls.DataGridHierarchical.IHierarchicalModel(Of T).Expand(Avalonia.Controls.DataGridHierarchical.HierarchicalNode(Of T))
   nameWithType: IHierarchicalModel<T>.Expand(HierarchicalNode<T>)
   nameWithType.vb: IHierarchicalModel(Of T).Expand(HierarchicalNode(Of T))
+- uid: Avalonia.Controls.DataGridHierarchical.IHierarchicalModel`1.Expand(System.Collections.Generic.IEnumerable{`0})
+  name: Expand(IEnumerable<T>)
+  href: api/Avalonia.Controls.DataGridHierarchical.IHierarchicalModel-1.html#Avalonia_Controls_DataGridHierarchical_IHierarchicalModel_1_Expand_System_Collections_Generic_IEnumerable__0__
+  commentId: M:Avalonia.Controls.DataGridHierarchical.IHierarchicalModel`1.Expand(System.Collections.Generic.IEnumerable{`0})
+  name.vb: Expand(IEnumerable(Of T))
+  fullName: Avalonia.Controls.DataGridHierarchical.IHierarchicalModel<T>.Expand(System.Collections.Generic.IEnumerable<T>)
+  fullName.vb: Avalonia.Controls.DataGridHierarchical.IHierarchicalModel(Of T).Expand(System.Collections.Generic.IEnumerable(Of T))
+  nameWithType: IHierarchicalModel<T>.Expand(IEnumerable<T>)
+  nameWithType.vb: IHierarchicalModel(Of T).Expand(IEnumerable(Of T))
 - uid: Avalonia.Controls.DataGridHierarchical.IHierarchicalModel`1.Expand*
   name: Expand
   href: api/Avalonia.Controls.DataGridHierarchical.IHierarchicalModel-1.html#Avalonia_Controls_DataGridHierarchical_IHierarchicalModel_1_Expand_
@@ -16081,6 +16224,15 @@ references:
   fullName.vb: Avalonia.Controls.DataGridHierarchical.IHierarchicalModel(Of T).ExpandAsync(Avalonia.Controls.DataGridHierarchical.HierarchicalNode(Of T), System.Threading.CancellationToken)
   nameWithType: IHierarchicalModel<T>.ExpandAsync(HierarchicalNode<T>, CancellationToken)
   nameWithType.vb: IHierarchicalModel(Of T).ExpandAsync(HierarchicalNode(Of T), CancellationToken)
+- uid: Avalonia.Controls.DataGridHierarchical.IHierarchicalModel`1.ExpandAsync(System.Collections.Generic.IEnumerable{`0},System.Threading.CancellationToken)
+  name: ExpandAsync(IEnumerable<T>, CancellationToken)
+  href: api/Avalonia.Controls.DataGridHierarchical.IHierarchicalModel-1.html#Avalonia_Controls_DataGridHierarchical_IHierarchicalModel_1_ExpandAsync_System_Collections_Generic_IEnumerable__0__System_Threading_CancellationToken_
+  commentId: M:Avalonia.Controls.DataGridHierarchical.IHierarchicalModel`1.ExpandAsync(System.Collections.Generic.IEnumerable{`0},System.Threading.CancellationToken)
+  name.vb: ExpandAsync(IEnumerable(Of T), CancellationToken)
+  fullName: Avalonia.Controls.DataGridHierarchical.IHierarchicalModel<T>.ExpandAsync(System.Collections.Generic.IEnumerable<T>, System.Threading.CancellationToken)
+  fullName.vb: Avalonia.Controls.DataGridHierarchical.IHierarchicalModel(Of T).ExpandAsync(System.Collections.Generic.IEnumerable(Of T), System.Threading.CancellationToken)
+  nameWithType: IHierarchicalModel<T>.ExpandAsync(IEnumerable<T>, CancellationToken)
+  nameWithType.vb: IHierarchicalModel(Of T).ExpandAsync(IEnumerable(Of T), CancellationToken)
 - uid: Avalonia.Controls.DataGridHierarchical.IHierarchicalModel`1.ExpandAsync*
   name: ExpandAsync
   href: api/Avalonia.Controls.DataGridHierarchical.IHierarchicalModel-1.html#Avalonia_Controls_DataGridHierarchical_IHierarchicalModel_1_ExpandAsync_

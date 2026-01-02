@@ -384,7 +384,7 @@ When false, returns the single root item.</p>
 
   <h3 id="Avalonia_Controls_DataGridHierarchical_IHierarchicalModel_ApplySiblingComparer_System_Collections_Generic_IComparer_System_Object__System_Boolean_" data-uid="Avalonia.Controls.DataGridHierarchical.IHierarchicalModel.ApplySiblingComparer(System.Collections.Generic.IComparer{System.Object},System.Boolean)">
   ApplySiblingComparer(IComparer&lt;object&gt;?, bool)
-  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/Hierarchical/HierarchicalModel.cs/#L412"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/Hierarchical/HierarchicalModel.cs/#L438"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>Applies the specified comparer to siblings (optionally recursive) and stores it in <a class="xref" href="Avalonia.Controls.DataGridHierarchical.HierarchicalOptions.html#Avalonia_Controls_DataGridHierarchical_HierarchicalOptions_SiblingComparer">SiblingComparer</a>.</p>
@@ -452,7 +452,7 @@ When false, returns the single root item.</p>
 
   <h3 id="Avalonia_Controls_DataGridHierarchical_IHierarchicalModel_Collapse_Avalonia_Controls_DataGridHierarchical_HierarchicalNode_" data-uid="Avalonia.Controls.DataGridHierarchical.IHierarchicalModel.Collapse(Avalonia.Controls.DataGridHierarchical.HierarchicalNode)">
   Collapse(HierarchicalNode)
-  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/Hierarchical/HierarchicalModel.cs/#L363"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/Hierarchical/HierarchicalModel.cs/#L376"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>Collapses a node, removing its descendants from the flattened list.</p>
@@ -481,11 +481,44 @@ When false, returns the single root item.</p>
 
 
 
+  <a id="Avalonia_Controls_DataGridHierarchical_IHierarchicalModel_Collapse_" data-uid="Avalonia.Controls.DataGridHierarchical.IHierarchicalModel.Collapse*"></a>
+
+  <h3 id="Avalonia_Controls_DataGridHierarchical_IHierarchicalModel_Collapse_System_Collections_IEnumerable_" data-uid="Avalonia.Controls.DataGridHierarchical.IHierarchicalModel.Collapse(System.Collections.IEnumerable)">
+  Collapse(IEnumerable)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/Hierarchical/HierarchicalModel.cs/#L382"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Collapses the nodes corresponding to the provided items.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">void Collapse(IEnumerable items)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>items</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.ienumerable">IEnumerable</a></dt>
+    <dd><p>Items or nodes to collapse.</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+
   <a id="Avalonia_Controls_DataGridHierarchical_IHierarchicalModel_CollapseAll_" data-uid="Avalonia.Controls.DataGridHierarchical.IHierarchicalModel.CollapseAll*"></a>
 
   <h3 id="Avalonia_Controls_DataGridHierarchical_IHierarchicalModel_CollapseAll_Avalonia_Controls_DataGridHierarchical_HierarchicalNode_System_Nullable_System_Int32__" data-uid="Avalonia.Controls.DataGridHierarchical.IHierarchicalModel.CollapseAll(Avalonia.Controls.DataGridHierarchical.HierarchicalNode,System.Nullable{System.Int32})">
   CollapseAll(HierarchicalNode?, int?)
-  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/Hierarchical/HierarchicalModel.cs/#L428"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/Hierarchical/HierarchicalModel.cs/#L454"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>Collapses the specified node's descendants (or the root subtree) starting at the provided depth.
@@ -507,6 +540,47 @@ Depth is relative to the starting node; null collapses the starting node and all
 </dd>
   </dl>
 
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Avalonia_Controls_DataGridHierarchical_IHierarchicalModel_CollapseAsync_" data-uid="Avalonia.Controls.DataGridHierarchical.IHierarchicalModel.CollapseAsync*"></a>
+
+  <h3 id="Avalonia_Controls_DataGridHierarchical_IHierarchicalModel_CollapseAsync_System_Collections_IEnumerable_System_Threading_CancellationToken_" data-uid="Avalonia.Controls.DataGridHierarchical.IHierarchicalModel.CollapseAsync(System.Collections.IEnumerable,System.Threading.CancellationToken)">
+  CollapseAsync(IEnumerable, CancellationToken)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/Hierarchical/HierarchicalModel.cs/#L389"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Asynchronously collapses the nodes corresponding to the provided items.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">Task CollapseAsync(IEnumerable items, CancellationToken cancellationToken = default)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>items</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.ienumerable">IEnumerable</a></dt>
+    <dd><p>Items or nodes to collapse.</p>
+</dd>
+    <dt><code>cancellationToken</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.threading.cancellationtoken">CancellationToken</a></dt>
+    <dd><p>Cancellation token.</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.threading.tasks.task">Task</a></dt>
+    <dd></dd>
+  </dl>
 
 
 
@@ -551,11 +625,44 @@ Depth is relative to the starting node; null collapses the starting node and all
 
 
 
+  <a id="Avalonia_Controls_DataGridHierarchical_IHierarchicalModel_Expand_" data-uid="Avalonia.Controls.DataGridHierarchical.IHierarchicalModel.Expand*"></a>
+
+  <h3 id="Avalonia_Controls_DataGridHierarchical_IHierarchicalModel_Expand_System_Collections_IEnumerable_" data-uid="Avalonia.Controls.DataGridHierarchical.IHierarchicalModel.Expand(System.Collections.IEnumerable)">
+  Expand(IEnumerable)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/Hierarchical/HierarchicalModel.cs/#L356"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Expands the nodes corresponding to the provided items.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">void Expand(IEnumerable items)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>items</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.ienumerable">IEnumerable</a></dt>
+    <dd><p>Items or nodes to expand.</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+
   <a id="Avalonia_Controls_DataGridHierarchical_IHierarchicalModel_ExpandAll_" data-uid="Avalonia.Controls.DataGridHierarchical.IHierarchicalModel.ExpandAll*"></a>
 
   <h3 id="Avalonia_Controls_DataGridHierarchical_IHierarchicalModel_ExpandAll_Avalonia_Controls_DataGridHierarchical_HierarchicalNode_System_Nullable_System_Int32__" data-uid="Avalonia.Controls.DataGridHierarchical.IHierarchicalModel.ExpandAll(Avalonia.Controls.DataGridHierarchical.HierarchicalNode,System.Nullable{System.Int32})">
   ExpandAll(HierarchicalNode?, int?)
-  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/Hierarchical/HierarchicalModel.cs/#L420"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/Hierarchical/HierarchicalModel.cs/#L446"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>Expands the specified node (or root when null) and all descendants up to the provided depth.
@@ -592,7 +699,7 @@ Depth is relative to the starting node; null expands the full subtree.</p>
 
   <h3 id="Avalonia_Controls_DataGridHierarchical_IHierarchicalModel_ExpandAsync_Avalonia_Controls_DataGridHierarchical_HierarchicalNode_System_Threading_CancellationToken_" data-uid="Avalonia.Controls.DataGridHierarchical.IHierarchicalModel.ExpandAsync(Avalonia.Controls.DataGridHierarchical.HierarchicalNode,System.Threading.CancellationToken)">
   ExpandAsync(HierarchicalNode, CancellationToken)
-  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/Hierarchical/HierarchicalModel.cs/#L357"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/Hierarchical/HierarchicalModel.cs/#L363"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>Asynchronously expands a node and realizes its visible children.</p>
@@ -629,11 +736,52 @@ Depth is relative to the starting node; null expands the full subtree.</p>
 
 
 
+  <a id="Avalonia_Controls_DataGridHierarchical_IHierarchicalModel_ExpandAsync_" data-uid="Avalonia.Controls.DataGridHierarchical.IHierarchicalModel.ExpandAsync*"></a>
+
+  <h3 id="Avalonia_Controls_DataGridHierarchical_IHierarchicalModel_ExpandAsync_System_Collections_IEnumerable_System_Threading_CancellationToken_" data-uid="Avalonia.Controls.DataGridHierarchical.IHierarchicalModel.ExpandAsync(System.Collections.IEnumerable,System.Threading.CancellationToken)">
+  ExpandAsync(IEnumerable, CancellationToken)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/Hierarchical/HierarchicalModel.cs/#L370"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Asynchronously expands the nodes corresponding to the provided items.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">Task ExpandAsync(IEnumerable items, CancellationToken cancellationToken = default)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>items</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.ienumerable">IEnumerable</a></dt>
+    <dd><p>Items or nodes to expand.</p>
+</dd>
+    <dt><code>cancellationToken</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.threading.cancellationtoken">CancellationToken</a></dt>
+    <dd><p>Cancellation token.</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.threading.tasks.task">Task</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
   <a id="Avalonia_Controls_DataGridHierarchical_IHierarchicalModel_FindNode_" data-uid="Avalonia.Controls.DataGridHierarchical.IHierarchicalModel.FindNode*"></a>
 
   <h3 id="Avalonia_Controls_DataGridHierarchical_IHierarchicalModel_FindNode_System_Object_" data-uid="Avalonia.Controls.DataGridHierarchical.IHierarchicalModel.FindNode(System.Object)">
   FindNode(object)
-  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/Hierarchical/HierarchicalModel.cs/#L396"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/Hierarchical/HierarchicalModel.cs/#L422"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>Finds the node wrapping the given item, if realized.</p>
@@ -828,7 +976,7 @@ Depth is relative to the starting node; null expands the full subtree.</p>
 
   <h3 id="Avalonia_Controls_DataGridHierarchical_IHierarchicalModel_Refresh_Avalonia_Controls_DataGridHierarchical_HierarchicalNode_" data-uid="Avalonia.Controls.DataGridHierarchical.IHierarchicalModel.Refresh(Avalonia.Controls.DataGridHierarchical.HierarchicalNode)">
   Refresh(HierarchicalNode?)
-  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/Hierarchical/HierarchicalModel.cs/#L382"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/Hierarchical/HierarchicalModel.cs/#L408"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>Refreshes children for the given node (or root when null).</p>
@@ -861,7 +1009,7 @@ Depth is relative to the starting node; null expands the full subtree.</p>
 
   <h3 id="Avalonia_Controls_DataGridHierarchical_IHierarchicalModel_RefreshAsync_Avalonia_Controls_DataGridHierarchical_HierarchicalNode_System_Threading_CancellationToken_" data-uid="Avalonia.Controls.DataGridHierarchical.IHierarchicalModel.RefreshAsync(Avalonia.Controls.DataGridHierarchical.HierarchicalNode,System.Threading.CancellationToken)">
   RefreshAsync(HierarchicalNode?, CancellationToken)
-  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/Hierarchical/HierarchicalModel.cs/#L389"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/Hierarchical/HierarchicalModel.cs/#L415"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>Asynchronously refreshes children for the given node (or root when null).</p>
@@ -969,7 +1117,7 @@ Creates a virtual root container that holds all items.</p>
 
   <h3 id="Avalonia_Controls_DataGridHierarchical_IHierarchicalModel_Sort_Avalonia_Controls_DataGridHierarchical_HierarchicalNode_System_Collections_Generic_IComparer_System_Object__System_Boolean_" data-uid="Avalonia.Controls.DataGridHierarchical.IHierarchicalModel.Sort(Avalonia.Controls.DataGridHierarchical.HierarchicalNode,System.Collections.Generic.IComparer{System.Object},System.Boolean)">
   Sort(HierarchicalNode?, IComparer&lt;object&gt;?, bool)
-  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/Hierarchical/HierarchicalModel.cs/#L405"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/Hierarchical/HierarchicalModel.cs/#L431"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>Sorts siblings under the specified node (or root when null) using the provided comparer or the configured options (<code>SiblingComparerSelector</code> first, then <a class="xref" href="Avalonia.Controls.DataGridHierarchical.HierarchicalOptions.html#Avalonia_Controls_DataGridHierarchical_HierarchicalOptions_SiblingComparer">SiblingComparer</a>).
@@ -1009,7 +1157,7 @@ Only orders siblings within the same parent; cross-level sorting is not performe
 
   <h3 id="Avalonia_Controls_DataGridHierarchical_IHierarchicalModel_Toggle_Avalonia_Controls_DataGridHierarchical_HierarchicalNode_" data-uid="Avalonia.Controls.DataGridHierarchical.IHierarchicalModel.Toggle(Avalonia.Controls.DataGridHierarchical.HierarchicalNode)">
   Toggle(HierarchicalNode)
-  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/Hierarchical/HierarchicalModel.cs/#L369"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/Hierarchical/HierarchicalModel.cs/#L395"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>Toggles expansion state of a node.</p>
@@ -1042,7 +1190,7 @@ Only orders siblings within the same parent; cross-level sorting is not performe
 
   <h3 id="Avalonia_Controls_DataGridHierarchical_IHierarchicalModel_ToggleAsync_Avalonia_Controls_DataGridHierarchical_HierarchicalNode_System_Threading_CancellationToken_" data-uid="Avalonia.Controls.DataGridHierarchical.IHierarchicalModel.ToggleAsync(Avalonia.Controls.DataGridHierarchical.HierarchicalNode,System.Threading.CancellationToken)">
   ToggleAsync(HierarchicalNode, CancellationToken)
-  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/Hierarchical/HierarchicalModel.cs/#L376"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/Hierarchical/HierarchicalModel.cs/#L402"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>Asynchronously toggles expansion state of a node.</p>
