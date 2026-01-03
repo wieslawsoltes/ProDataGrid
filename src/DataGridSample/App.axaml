@@ -13,6 +13,10 @@
     <!-- <StyleInclude Source="avares://Avalonia.Controls.DataGrid/Themes/Simple.xaml" /> -->
     <!-- <StyleInclude Source="avares://Avalonia.Controls.DataGrid/Themes/Simple.v2.xaml" /> -->
 
+    <Style Selector="DataGrid.hierarchical DataGridCell">
+      <Setter Property="VerticalContentAlignment" Value="Center" />
+    </Style>
+
   </Application.Styles>
 
 </Application>

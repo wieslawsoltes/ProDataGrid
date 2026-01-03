@@ -36,7 +36,8 @@
               AutoGenerateColumns="False"
               HeadersVisibility="All"
               HierarchicalModel="{Binding Model}"
-              HierarchicalRowsEnabled="True">
+              HierarchicalRowsEnabled="True"
+              Classes="hierarchical">
       <DataGrid.Columns>
         <DataGridHierarchicalColumn Header="Name"
                                     Width="3*"

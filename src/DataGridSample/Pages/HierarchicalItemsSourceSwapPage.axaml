@@ -35,6 +35,7 @@
               ItemsSource="{Binding ItemsSource}"
               HierarchicalModel="{Binding Model}"
               HierarchicalRowsEnabled="True"
+              Classes="hierarchical"
               Selection="{Binding SelectionModel}"
               SelectionMode="Single"
               AutoGenerateColumns="False"

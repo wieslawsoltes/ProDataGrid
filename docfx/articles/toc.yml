@@ -6,10 +6,16 @@
   href: data-sources-and-collection-views.md
 - name: High-Frequency Updates
   href: high-frequency-updates.md
+- name: Hierarchical High-Frequency Updates
+  href: hierarchical-high-frequency-updates.md
 - name: DynamicData Streaming (SourceList)
   href: dynamicdata-streaming-sourcelist.md
 - name: DynamicData Streaming (SourceCache)
   href: dynamicdata-streaming-sourcecache.md
+- name: DynamicData Hierarchical (SourceList)
+  href: dynamicdata-hierarchical-streaming-sourcelist.md
+- name: DynamicData Hierarchical (SourceCache)
+  href: dynamicdata-hierarchical-streaming-sourcecache.md
 - name: Migration
   href: migration.md
 - name: Keyboard Shortcuts

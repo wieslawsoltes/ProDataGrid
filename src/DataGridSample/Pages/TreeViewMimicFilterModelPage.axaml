@@ -48,6 +48,7 @@
               AutoGenerateColumns="False"
               HierarchicalModel="{Binding Model}"
               HierarchicalRowsEnabled="True"
+              Classes="hierarchical"
               FilteringModel="{Binding FilteringModel}"
               x:DataType="viewModels:TreeViewMimicFilterModelViewModel"
               HeadersVisibility="None"

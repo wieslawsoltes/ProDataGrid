@@ -67,6 +67,7 @@
                       x:Name="HierarchicalGrid"
                       AutoGenerateColumns="False"
                       HierarchicalRowsEnabled="True"
+                      Classes="hierarchical"
                       HierarchicalModel="{Binding HierarchicalModel}"
                       HeadersVisibility="Column"
                       CanUserReorderColumns="False"

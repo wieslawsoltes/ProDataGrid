@@ -56,6 +56,7 @@
               AutoGenerateColumns="False"
               HierarchicalModel="{Binding Model}"
               HierarchicalRowsEnabled="True"
+              Classes="hierarchical"
               HeadersVisibility="Column"
               GridLinesVisibility="Horizontal"
               x:DataType="viewModels:HierarchicalRootItemsViewModel">

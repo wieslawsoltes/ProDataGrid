@@ -53,6 +53,7 @@
               AutoGenerateColumns="False"
               HierarchicalModel="{Binding Model}"
               HierarchicalRowsEnabled="True"
+              Classes="hierarchical"
               SortingModel="{Binding SortingModel}"
               SortingAdapterFactory="{StaticResource HierarchicalSortingAdapterFactory}"
               x:DataType="viewModels:TreeViewMimicSortModelViewModel"

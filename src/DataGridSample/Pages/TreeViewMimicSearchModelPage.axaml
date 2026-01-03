@@ -59,6 +59,7 @@
               AutoGenerateColumns="False"
               HierarchicalModel="{Binding Model}"
               HierarchicalRowsEnabled="True"
+              Classes="hierarchical"
               SearchModel="{Binding SearchModel}"
               x:DataType="viewModels:TreeViewMimicSearchModelViewModel"
               HeadersVisibility="None"

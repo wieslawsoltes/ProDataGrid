@@ -35,6 +35,7 @@
               AutoGenerateColumns="False"
               HierarchicalModel="{Binding Model}"
               HierarchicalRowsEnabled="True"
+              Classes="hierarchical"
               x:DataType="viewModels:TreeViewMimicDragDropViewModel"
               HeadersVisibility="None"
               GridLinesVisibility="None"

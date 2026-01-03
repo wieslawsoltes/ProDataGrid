@@ -1,0 +1,269 @@
+<UserControl
+    x:Class="DataGridSample.Pages.DynamicDataHierarchicalSourceCachePage"
+    xmlns="https://github.com/avaloniaui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:viewModels="clr-namespace:DataGridSample.ViewModels"
+    xmlns:models="clr-namespace:DataGridSample.Models"
+    xmlns:hier="clr-namespace:Avalonia.Controls.DataGridHierarchical;assembly=Avalonia.Controls.DataGrid"
+    xmlns:sorting="clr-namespace:Avalonia.Controls.DataGridSorting;assembly=Avalonia.Controls.DataGrid"
+    x:DataType="viewModels:DynamicDataHierarchicalSourceCacheViewModel"
+    d:DesignHeight="720"
+    d:DesignWidth="1100"
+    mc:Ignorable="d">
+
+  <UserControl.DataContext>
+    <viewModels:DynamicDataHierarchicalSourceCacheViewModel />
+  </UserControl.DataContext>
+
+  <Grid Margin="12"
+        RowDefinitions="Auto,Auto,*"
+        ColumnDefinitions="3*,*"
+        ColumnSpacing="12"
+        RowSpacing="8">
+    <StackPanel Grid.ColumnSpan="2" Spacing="4">
+      <TextBlock Text="DynamicData hierarchical (SourceCache)"
+                 FontWeight="Bold"
+                 FontSize="18" />
+      <TextBlock TextWrapping="Wrap"
+                 Text="Roots are driven by a DynamicData SourceCache keyed by Id. The HierarchicalModel listens to the bound root collection and updates the flattened view incrementally." />
+    </StackPanel>
+
+    <WrapPanel Grid.Row="1"
+               Grid.ColumnSpan="2"
+               VerticalAlignment="Center">
+      <Button Content="Start" Command="{Binding StartCommand}" />
+      <Button Content="Stop" Command="{Binding StopCommand}" />
+      <Button Content="Reset" Command="{Binding ResetCommand}" />
+      <TextBlock Text="Roots" VerticalAlignment="Center" />
+      <TextBox Width="84" Text="{Binding TargetRootCount, UpdateSourceTrigger=PropertyChanged}" />
+      <TextBlock Text="Children" VerticalAlignment="Center" />
+      <TextBox Width="56" Text="{Binding ChildrenPerRoot, UpdateSourceTrigger=PropertyChanged}" />
+      <TextBlock Text="Batch" VerticalAlignment="Center" />
+      <TextBox Width="56" Text="{Binding BatchSize, UpdateSourceTrigger=PropertyChanged}" />
+      <TextBlock Text="Interval (ms)" VerticalAlignment="Center" />
+      <TextBox Width="72" Text="{Binding IntervalMs, UpdateSourceTrigger=PropertyChanged}" />
+      <TextBlock Text="Name" VerticalAlignment="Center" />
+      <TextBox Width="140" Text="{Binding NameFilter, UpdateSourceTrigger=PropertyChanged}" />
+      <TextBlock Text="Min price" VerticalAlignment="Center" />
+      <NumericUpDown Width="120"
+                     Minimum="0"
+                     Maximum="1000"
+                     Increment="1"
+                     Value="{Binding MinPrice, Mode=TwoWay}" />
+      <TextBlock Text="Max price" VerticalAlignment="Center" />
+      <NumericUpDown Width="120"
+                     Minimum="0"
+                     Maximum="1000"
+                     Increment="1"
+                     Value="{Binding MaxPrice, Mode=TwoWay}" />
+      <Button Content="Clear filters" Command="{Binding ClearFiltersCommand}" />
+      <CheckBox Content="Multi-sort with Shift"
+                IsChecked="{Binding MultiSortEnabled}" />
+      <StackPanel Orientation="Horizontal" Spacing="6">
+        <TextBlock VerticalAlignment="Center" Text="Cycle:" />
+        <ComboBox Width="180"
+                  SelectedItem="{Binding SortCycleMode}">
+          <sorting:SortCycleMode>AscendingDescendingNone</sorting:SortCycleMode>
+          <sorting:SortCycleMode>AscendingDescending</sorting:SortCycleMode>
+        </ComboBox>
+      </StackPanel>
+      <Button Content="Clear sorts" Command="{Binding ClearSortsCommand}" />
+      <TextBlock Text="Search" VerticalAlignment="Center" />
+      <TextBox Width="160" Text="{Binding Query, UpdateSourceTrigger=PropertyChanged}" />
+      <Button Content="Clear" Command="{Binding ClearSearchCommand}" />
+      <Button Content="Previous" Command="{Binding PreviousCommand}" />
+      <Button Content="Next" Command="{Binding NextCommand}" />
+      <TextBlock VerticalAlignment="Center" Text="{Binding ResultSummary}" />
+    </WrapPanel>
+
+    <DataGrid Grid.Row="2"
+              Grid.Column="0"
+              x:Name="Grid"
+              AutoGenerateColumns="False"
+              HierarchicalModel="{Binding Model}"
+              SortingModel="{Binding SortingModel}"
+              FilteringModel="{Binding FilteringModel}"
+              SearchModel="{Binding SearchModel}"
+              HierarchicalRowsEnabled="True"
+              Classes="hierarchical"
+              UseLogicalScrollable="True"
+              RowHeight="24"
+              RowHeightEstimator="{x:Null}"
+              SelectionMode="Single"
+              SelectionUnit="FullRow"
+              CanUserReorderColumns="False"
+              CanUserResizeColumns="False"
+              CanUserSortColumns="True"
+              HeadersVisibility="Column"
+              GridLinesVisibility="None"
+              IsReadOnly="True"
+              x:DataType="viewModels:DynamicDataHierarchicalSourceCacheViewModel">
+      <DataGrid.Columns>
+        <DataGridHierarchicalColumn Header="Name"
+                                    SortMemberPath="Item.Name"
+                                    Width="2*"
+                                    x:CompileBindings="False"
+                                    Binding="{Binding Item}">
+          <DataGridHierarchicalColumn.CellTemplate>
+            <DataTemplate x:DataType="models:HierarchicalStreamingItem">
+              <TextBlock Text="{Binding Name}" />
+            </DataTemplate>
+          </DataGridHierarchicalColumn.CellTemplate>
+        </DataGridHierarchicalColumn>
+
+        <DataGridTemplateColumn Header="Id"
+                                SortMemberPath="Item.Id"
+                                Width="80"
+                                x:CompileBindings="False">
+          <DataGridTemplateColumn.CellTemplate>
+            <DataTemplate x:DataType="hier:HierarchicalNode">
+              <TextBlock x:DataType="models:HierarchicalStreamingItem"
+                         DataContext="{Binding Item}"
+                         Text="{Binding Id}" />
+            </DataTemplate>
+          </DataGridTemplateColumn.CellTemplate>
+        </DataGridTemplateColumn>
+
+        <DataGridTemplateColumn Header="Price"
+                                SortMemberPath="Item.Price"
+                                Width="100"
+                                x:CompileBindings="False">
+          <DataGridTemplateColumn.CellTemplate>
+            <DataTemplate x:DataType="hier:HierarchicalNode">
+              <TextBlock x:DataType="models:HierarchicalStreamingItem"
+                         DataContext="{Binding Item}"
+                         Text="{Binding PriceDisplay}" />
+            </DataTemplate>
+          </DataGridTemplateColumn.CellTemplate>
+        </DataGridTemplateColumn>
+
+        <DataGridTemplateColumn Header="Updated"
+                                SortMemberPath="Item.UpdatedAt"
+                                Width="120"
+                                x:CompileBindings="False">
+          <DataGridTemplateColumn.CellTemplate>
+            <DataTemplate x:DataType="hier:HierarchicalNode">
+              <TextBlock x:DataType="models:HierarchicalStreamingItem"
+                         DataContext="{Binding Item}"
+                         Text="{Binding UpdatedAtDisplay}" />
+            </DataTemplate>
+          </DataGridTemplateColumn.CellTemplate>
+        </DataGridTemplateColumn>
+      </DataGrid.Columns>
+    </DataGrid>
+
+    <StackPanel Grid.Row="2"
+                Grid.Column="1"
+                Spacing="10">
+      <Border Padding="10" Background="#0D000000" CornerRadius="6">
+        <StackPanel Spacing="6">
+          <TextBlock Text="Stats" FontWeight="Bold" />
+          <TextBlock Text="{Binding RootCount, StringFormat='Roots: {0}'}" />
+          <TextBlock Text="{Binding VisibleCount, StringFormat='Visible nodes: {0}'}" />
+          <TextBlock Text="{Binding Updates, StringFormat='Updates: {0}'}" />
+          <TextBlock Text="{Binding RunState, StringFormat='State: {0}'}" />
+        </StackPanel>
+      </Border>
+
+      <Border Padding="10" Background="#0D000000" CornerRadius="6">
+        <StackPanel Spacing="6">
+          <TextBlock Text="Sort descriptors" FontWeight="Bold" />
+          <ItemsControl ItemsSource="{Binding SortSummaries}">
+            <ItemsControl.ItemsPanel>
+              <ItemsPanelTemplate>
+                <StackPanel Orientation="Vertical" />
+              </ItemsPanelTemplate>
+            </ItemsControl.ItemsPanel>
+            <ItemsControl.ItemTemplate>
+              <DataTemplate x:DataType="viewModels:DynamicDataHierarchicalSourceCacheViewModel+SortDescriptorSummary">
+                <Border Padding="6" Margin="0 3" Background="#08000000" CornerRadius="4">
+                  <StackPanel Orientation="Horizontal" Spacing="6">
+                    <TextBlock Text="{Binding Column}" FontWeight="SemiBold" />
+                    <TextBlock Text="{Binding Direction}" />
+                  </StackPanel>
+                </Border>
+              </DataTemplate>
+            </ItemsControl.ItemTemplate>
+          </ItemsControl>
+        </StackPanel>
+      </Border>
+
+      <Border Padding="10" Background="#0D000000" CornerRadius="6">
+        <StackPanel Spacing="6">
+          <TextBlock Text="Filter descriptors" FontWeight="Bold" />
+          <ItemsControl ItemsSource="{Binding FilterSummaries}">
+            <ItemsControl.ItemsPanel>
+              <ItemsPanelTemplate>
+                <StackPanel Orientation="Vertical" />
+              </ItemsPanelTemplate>
+            </ItemsControl.ItemsPanel>
+            <ItemsControl.ItemTemplate>
+              <DataTemplate x:DataType="viewModels:DynamicDataHierarchicalSourceCacheViewModel+FilterDescriptorSummary">
+                <Border Padding="6" Margin="0 3" Background="#08000000" CornerRadius="4">
+                  <StackPanel Orientation="Horizontal" Spacing="6">
+                    <TextBlock Text="{Binding Column}" FontWeight="SemiBold" />
+                    <TextBlock Text="{Binding Operator}" />
+                    <TextBlock Text="{Binding Value}" />
+                  </StackPanel>
+                </Border>
+              </DataTemplate>
+            </ItemsControl.ItemTemplate>
+          </ItemsControl>
+        </StackPanel>
+      </Border>
+
+      <Border Padding="10" Background="#0D000000" CornerRadius="6">
+        <StackPanel Spacing="6">
+          <TextBlock Text="Upstream updates" FontWeight="Bold" />
+          <TextBlock Text="Sorts" FontWeight="SemiBold" />
+          <ItemsControl ItemsSource="{Binding UpstreamSorts}">
+            <ItemsControl.ItemsPanel>
+              <ItemsPanelTemplate>
+                <StackPanel Orientation="Vertical" />
+              </ItemsPanelTemplate>
+            </ItemsControl.ItemsPanel>
+            <ItemsControl.ItemTemplate>
+              <DataTemplate x:DataType="x:String">
+                <Border Padding="6" Margin="0 3" Background="#08000000" CornerRadius="4">
+                  <TextBlock Text="{Binding}" />
+                </Border>
+              </DataTemplate>
+            </ItemsControl.ItemTemplate>
+          </ItemsControl>
+          <TextBlock Text="Filters" FontWeight="SemiBold" />
+          <ItemsControl ItemsSource="{Binding UpstreamFilters}">
+            <ItemsControl.ItemsPanel>
+              <ItemsPanelTemplate>
+                <StackPanel Orientation="Vertical" />
+              </ItemsPanelTemplate>
+            </ItemsControl.ItemsPanel>
+            <ItemsControl.ItemTemplate>
+              <DataTemplate x:DataType="x:String">
+                <Border Padding="6" Margin="0 3" Background="#08000000" CornerRadius="4">
+                  <TextBlock Text="{Binding}" />
+                </Border>
+              </DataTemplate>
+            </ItemsControl.ItemTemplate>
+          </ItemsControl>
+          <TextBlock Text="Search" FontWeight="SemiBold" />
+          <ItemsControl ItemsSource="{Binding UpstreamSearches}">
+            <ItemsControl.ItemsPanel>
+              <ItemsPanelTemplate>
+                <StackPanel Orientation="Vertical" />
+              </ItemsPanelTemplate>
+            </ItemsControl.ItemsPanel>
+            <ItemsControl.ItemTemplate>
+              <DataTemplate x:DataType="x:String">
+                <Border Padding="6" Margin="0 3" Background="#08000000" CornerRadius="4">
+                  <TextBlock Text="{Binding}" />
+                </Border>
+              </DataTemplate>
+            </ItemsControl.ItemTemplate>
+          </ItemsControl>
+        </StackPanel>
+      </Border>
+    </StackPanel>
+  </Grid>
+</UserControl>

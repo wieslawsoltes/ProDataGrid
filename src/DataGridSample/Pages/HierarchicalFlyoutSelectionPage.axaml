@@ -66,6 +66,7 @@
                       <DataGrid Height="400"
                                 AutoGenerateColumns="False"
                                 HierarchicalRowsEnabled="True"
+                                Classes="hierarchical"
                                 HierarchicalModel="{Binding HierarchicalModel}"
                                 Selection="{Binding SelectionModel, Mode=OneTime}"
                                 SelectionMode="Extended"

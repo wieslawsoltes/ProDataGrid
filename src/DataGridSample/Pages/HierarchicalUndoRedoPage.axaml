@@ -78,6 +78,7 @@
               AutoGenerateColumns="False"
               HierarchicalModel="{Binding Model}"
               HierarchicalRowsEnabled="True"
+              Classes="hierarchical"
               SelectionMode="Single"
               SelectedItem="{Binding SelectedItem, Mode=TwoWay}"
               HeadersVisibility="Column"

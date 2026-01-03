@@ -92,6 +92,9 @@
     <TabItem Header="Streaming Updates">
       <pages:StreamingUpdatesPage />
     </TabItem>
+    <TabItem Header="Hierarchical Streaming Updates">
+      <pages:HierarchicalStreamingUpdatesPage />
+    </TabItem>
     <TabItem Header="ItemsSource Swap">
       <pages:ItemsSourceSwapPage />
     </TabItem>
@@ -268,6 +271,12 @@
     </TabItem>
     <TabItem Header="DynamicData Streaming (SourceCache)">
       <pages:DynamicDataStreamingSourceCachePage />
+    </TabItem>
+    <TabItem Header="DynamicData Hierarchical (SourceList)">
+      <pages:DynamicDataHierarchicalSourceListPage />
+    </TabItem>
+    <TabItem Header="DynamicData Hierarchical (SourceCache)">
+      <pages:DynamicDataHierarchicalSourceCachePage />
     </TabItem>
     <TabItem Header="Hierarchical Model">
       <pages:HierarchicalSamplePage />

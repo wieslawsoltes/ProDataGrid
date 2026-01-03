@@ -59,6 +59,7 @@
               AutoGenerateColumns="False"
               HierarchicalModel="{Binding Model}"
               HierarchicalRowsEnabled="True"
+              Classes="hierarchical"
               Selection="{Binding SelectionModel}"
               SelectionMode="Extended"
               HeadersVisibility="Column"

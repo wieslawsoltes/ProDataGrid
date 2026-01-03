@@ -66,6 +66,7 @@
               SortingModel="{Binding SortingModel, Mode=OneWay}"
               SortingAdapterFactory="{StaticResource HierarchicalSortingAdapterFactory}"
               HierarchicalRowsEnabled="True"
+              Classes="hierarchical"
               x:DataType="viewModels:HierarchicalSampleViewModel"
               CanUserSortColumns="True"
               HeadersVisibility="Column"

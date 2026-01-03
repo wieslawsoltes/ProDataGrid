@@ -961,7 +961,7 @@ namespace Avalonia.Controls.DataGridHierarchical
                 throw new ArgumentNullException(nameof(node));
             }
 
-            return _flattened.IndexOf(node);
+            return GetFlattenedIndex(node);
         }
 
         public int IndexOf(object item)
@@ -996,8 +996,8 @@ namespace Avalonia.Controls.DataGridHierarchical
             await loadState.ExpandGate.WaitAsync(cancellationToken).ConfigureAwait(false);
             try
             {
-                var parentIndex = _flattened.IndexOf(node);
-                var hasVisibleDescendants = parentIndex >= 0 && CountVisibleDescendantsInFlattened(node, parentIndex) > 0;
+                var parentIndex = GetFlattenedIndex(node);
+                var hasVisibleDescendants = GetVisibleDescendantCount(node, parentIndex) > 0;
 
                 if (node.IsExpanded && node.LoadError == null)
                 {
@@ -1034,12 +1034,12 @@ namespace Avalonia.Controls.DataGridHierarchical
                     return;
                 }
 
-                parentIndex = _flattened.IndexOf(node);
+                parentIndex = GetFlattenedIndex(node);
                 var inserted = 0;
 
                 if (parentIndex >= 0 && !node.IsLeaf)
                 {
-                    var hasVisible = CountVisibleDescendantsInFlattened(node, parentIndex) > 0;
+                    var hasVisible = GetVisibleDescendantCount(node, parentIndex) > 0;
                     if (!hasVisible)
                     {
                         inserted = InsertVisibleChildren(node, parentIndex + 1);
@@ -1103,8 +1103,8 @@ namespace Avalonia.Controls.DataGridHierarchical
                 return;
             }
 
-            var parentIndex = _flattened.IndexOf(node);
-            var visibleCount = parentIndex >= 0 ? CountVisibleDescendantsInFlattened(node, parentIndex) : 0;
+            var parentIndex = GetFlattenedIndex(node);
+            var visibleCount = GetVisibleDescendantCount(node, parentIndex);
 
             if (!node.IsExpanded && visibleCount == 0)
             {
@@ -1220,9 +1220,9 @@ namespace Avalonia.Controls.DataGridHierarchical
                 return;
             }
 
-            var parentIndex = _flattened.IndexOf(target);
+            var parentIndex = GetFlattenedIndex(target);
             var wasExpanded = target.IsExpanded;
-            var canUpdateFlattened = wasExpanded && (parentIndex >= 0 || (_isVirtualRoot && ReferenceEquals(target, Root)));
+            var canUpdateFlattened = wasExpanded && (parentIndex >= 0 || IsVirtualRootNode(target));
             var removeStart = parentIndex + 1;
             IList<HierarchicalNode>? oldVisibleNodes = null;
 
@@ -1243,7 +1243,7 @@ namespace Avalonia.Controls.DataGridHierarchical
 
             if (canUpdateFlattened)
             {
-                var visibleCount = CountVisibleDescendantsInFlattened(target, parentIndex);
+                var visibleCount = GetVisibleDescendantCount(target, parentIndex);
                 if (visibleCount > 0 && removeStart >= 0 && removeStart + visibleCount <= _flattened.Count)
                 {
                     oldVisibleNodes = _flattened.GetRange(removeStart, visibleCount);
@@ -1811,6 +1811,38 @@ namespace Avalonia.Controls.DataGridHierarchical
             }
         }
 
+        private int CollectVisibleChildrenAndUpdateCounts(HierarchicalNode parent, List<HierarchicalNode> buffer)
+        {
+            if (!parent.IsExpanded || parent.IsLeaf)
+            {
+                parent.ExpandedCount = 0;
+                return 0;
+            }
+
+            EnsureChildrenMaterialized(parent);
+
+            int total = 0;
+            foreach (var child in parent.Children)
+            {
+                buffer.Add(child);
+
+                int childDesc = 0;
+                if (child.IsExpanded && !child.IsLeaf)
+                {
+                    childDesc = CollectVisibleChildrenAndUpdateCounts(child, buffer);
+                }
+                else
+                {
+                    child.ExpandedCount = 0;
+                }
+
+                total += 1 + (child.IsExpanded ? childDesc : 0);
+            }
+
+            parent.ExpandedCount = total;
+            return total;
+        }
+
         private int CountVisibleDescendantsRecursive(HierarchicalNode node)
         {
             int count = 0;
@@ -1830,6 +1862,31 @@ namespace Avalonia.Controls.DataGridHierarchical
         private int GetVisibleVisibleCount(HierarchicalNode node)
         {
             return 1 + (node.IsExpanded ? node.ExpandedCount : 0);
+        }
+
+        private bool IsVirtualRootNode(HierarchicalNode node)
+        {
+            return _isVirtualRoot && ReferenceEquals(node, Root);
+        }
+
+        private int GetFlattenedIndex(HierarchicalNode node)
+        {
+            return IsVirtualRootNode(node) ? -1 : _flattened.IndexOf(node);
+        }
+
+        private int GetVisibleDescendantCount(HierarchicalNode node, int parentIndex)
+        {
+            if (parentIndex < 0 && !IsVirtualRootNode(node))
+            {
+                return 0;
+            }
+
+            if (node.IsExpanded)
+            {
+                return node.ExpandedCount;
+            }
+
+            return CountVisibleDescendantsInFlattened(node, parentIndex);
         }
 
         private int CountVisibleDescendantsInFlattened(HierarchicalNode node, int parentIndex)
@@ -1854,7 +1911,7 @@ namespace Avalonia.Controls.DataGridHierarchical
         private int RemoveVisibleDescendants(HierarchicalNode node, int parentIndex, bool detachDescendants)
         {
             var removeStart = parentIndex + 1;
-            var removeCount = CountVisibleDescendantsInFlattened(node, parentIndex);
+            var removeCount = GetVisibleDescendantCount(node, parentIndex);
             if (removeCount <= 0)
             {
                 return 0;
@@ -1875,25 +1932,118 @@ namespace Avalonia.Controls.DataGridHierarchical
 
         private int GetVisibleOffsetForChildIndex(HierarchicalNode parent, int childIndex)
         {
-            int offset = 0;
             var children = parent.MutableChildren;
-            var capped = Math.Min(childIndex, children.Count);
-
-            for (int i = 0; i < capped; i++)
+            if (children.Count == 0 || childIndex <= 0)
             {
-                offset++;
+                return 0;
+            }
 
-                if (children[i].IsExpanded)
+            if (!parent.IsExpanded)
+            {
+                return 0;
+            }
+
+            var capped = Math.Min(childIndex, children.Count);
+            if (capped == 0)
+            {
+                return 0;
+            }
+
+            var totalVisible = parent.ExpandedCount;
+            if (capped == children.Count)
+            {
+                return totalVisible;
+            }
+
+            var forwardCount = capped;
+            var backwardCount = children.Count - capped;
+            if (forwardCount <= backwardCount)
+            {
+                int offset = 0;
+                for (int i = 0; i < capped; i++)
                 {
-                    offset += CountVisibleDescendantsRecursive(children[i]);
+                    var child = children[i];
+                    offset += 1 + (child.IsExpanded ? child.ExpandedCount : 0);
+                }
+
+                return offset;
+            }
+
+            int tail = 0;
+            for (int i = children.Count - 1; i >= capped; i--)
+            {
+                var child = children[i];
+                tail += 1 + (child.IsExpanded ? child.ExpandedCount : 0);
+            }
+
+            return totalVisible - tail;
+        }
+
+        private bool TryNormalizeAddChange(HierarchicalNode parent, ref NotifyCollectionChangedEventArgs e)
+        {
+            if (e.NewStartingIndex >= 0)
+            {
+                return true;
+            }
+
+            if (e.NewItems == null || e.NewItems.Count == 0)
+            {
+                return true;
+            }
+
+            if (parent.ChildrenSource is not IList list)
+            {
+                return false;
+            }
+
+            var firstIndex = list.IndexOf(e.NewItems[0]);
+            if (firstIndex < 0)
+            {
+                return false;
+            }
+
+            for (int i = 1; i < e.NewItems.Count; i++)
+            {
+                if (list.IndexOf(e.NewItems[i]) != firstIndex + i)
+                {
+                    return false;
                 }
             }
 
-            return offset;
+            e = new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add, e.NewItems, firstIndex);
+            return true;
+        }
+
+        private bool ShouldRefreshForChildrenChange(HierarchicalNode parent, ref NotifyCollectionChangedEventArgs e)
+        {
+            if (GetComparerForParent(parent) != null)
+            {
+                return true;
+            }
+
+            switch (e.Action)
+            {
+                case NotifyCollectionChangedAction.Add:
+                    return !TryNormalizeAddChange(parent, ref e);
+                case NotifyCollectionChangedAction.Remove:
+                case NotifyCollectionChangedAction.Replace:
+                    return e.OldStartingIndex < 0;
+                case NotifyCollectionChangedAction.Move:
+                    return e.OldStartingIndex < 0 || e.NewStartingIndex < 0;
+                case NotifyCollectionChangedAction.Reset:
+                default:
+                    return true;
+            }
         }
 
         private void OnChildrenCollectionChanged(HierarchicalNode parent, NotifyCollectionChangedEventArgs e)
         {
+            if (ShouldRefreshForChildrenChange(parent, ref e))
+            {
+                Refresh(parent);
+                return;
+            }
+
             switch (e.Action)
             {
                 case NotifyCollectionChangedAction.Add:
@@ -1924,7 +2074,6 @@ namespace Avalonia.Controls.DataGridHierarchical
             var insertIndex = e.NewStartingIndex >= 0 ? e.NewStartingIndex : parent.MutableChildren.Count;
             insertIndex = Math.Min(insertIndex, parent.MutableChildren.Count);
 
-            var visibleOffset = GetVisibleOffsetForChildIndex(parent, insertIndex);
             var newNodes = new List<HierarchicalNode>();
             foreach (var item in e.NewItems)
             {
@@ -1947,41 +2096,81 @@ namespace Avalonia.Controls.DataGridHierarchical
                 return;
             }
 
-            parent.MutableChildren.InsertRange(insertIndex, newNodes);
-            parent.IsLeaf = parent.MutableChildren.Count == 0;
-
-            if (parent.IsExpanded)
+            var addedVisibleCount = 0;
+            var isVirtualRootParent = IsVirtualRootNode(parent);
+            var parentIndex = -1;
+            var canUpdateFlattened = parent.IsExpanded;
+            var visibleOffset = 0;
+            var flattenedIndex = -1;
+            if (canUpdateFlattened)
             {
-                var parentIndex = _flattened.IndexOf(parent);
-                // For virtual root (not in flattened list), children are direct top-level items.
-                var isVirtualRootParent = _isVirtualRoot && ReferenceEquals(parent, Root);
-
-                if (parentIndex >= 0 || isVirtualRootParent)
+                if (!isVirtualRootParent)
                 {
-                    var flattenedIndex = isVirtualRootParent
+                    parentIndex = _flattened.IndexOf(parent);
+                }
+
+                canUpdateFlattened = parentIndex >= 0 || isVirtualRootParent;
+                if (canUpdateFlattened)
+                {
+                    visibleOffset = GetVisibleOffsetForChildIndex(parent, insertIndex);
+                    flattenedIndex = isVirtualRootParent
                         ? visibleOffset
                         : parentIndex + 1 + visibleOffset;
-
-                    var visibleNodes = new List<HierarchicalNode>();
-                    foreach (var child in newNodes)
-                    {
-                        visibleNodes.Add(child);
-                        if (child.IsExpanded)
-                        {
-                            EnsureChildrenMaterialized(child);
-                            CollectVisibleChildren(child, visibleNodes);
-                        }
-                    }
-
-                    if (visibleNodes.Count > 0)
-                    {
-                        _flattened.InsertRange(flattenedIndex, visibleNodes);
-                        OnFlattenedChanged(new[] { new FlattenedChange(flattenedIndex, 0, visibleNodes.Count) });
-                    }
                 }
             }
 
-            RecalculateExpandedCountsFrom(parent);
+            parent.MutableChildren.InsertRange(insertIndex, newNodes);
+            parent.IsLeaf = parent.MutableChildren.Count == 0;
+
+            if (canUpdateFlattened)
+            {
+                var visibleNodes = new List<HierarchicalNode>();
+                foreach (var child in newNodes)
+                {
+                    visibleNodes.Add(child);
+                    if (child.IsExpanded && !child.IsLeaf)
+                    {
+                        var childDesc = CollectVisibleChildrenAndUpdateCounts(child, visibleNodes);
+                        addedVisibleCount += 1 + childDesc;
+                    }
+                    else
+                    {
+                        child.ExpandedCount = 0;
+                        addedVisibleCount += 1;
+                    }
+                }
+
+                if (visibleNodes.Count > 0)
+                {
+                    _flattened.InsertRange(flattenedIndex, visibleNodes);
+                    OnFlattenedChanged(new[] { new FlattenedChange(flattenedIndex, 0, visibleNodes.Count) });
+                }
+            }
+            else if (parent.IsExpanded)
+            {
+                foreach (var child in newNodes)
+                {
+                    if (child.IsExpanded && !child.IsLeaf)
+                    {
+                        var childDesc = RecalculateExpandedCountRecursive(child);
+                        addedVisibleCount += 1 + childDesc;
+                    }
+                    else
+                    {
+                        child.ExpandedCount = 0;
+                        addedVisibleCount += 1;
+                    }
+                }
+            }
+            else
+            {
+                foreach (var child in newNodes)
+                {
+                    child.ExpandedCount = 0;
+                }
+            }
+
+            ApplyExpandedCountDelta(parent, addedVisibleCount);
             OnHierarchyChanged(parent, NotifyCollectionChangedAction.Add);
         }
 
@@ -1995,19 +2184,31 @@ namespace Avalonia.Controls.DataGridHierarchical
             var removeIndex = e.OldStartingIndex >= 0 ? e.OldStartingIndex : 0;
             removeIndex = Math.Min(removeIndex, parent.MutableChildren.Count);
             var removeCount = Math.Min(e.OldItems.Count, parent.MutableChildren.Count - removeIndex);
-
-            var visibleOffset = GetVisibleOffsetForChildIndex(parent, removeIndex);
-            var removedNodes = new List<HierarchicalNode>();
-
-            for (int i = 0; i < removeCount; i++)
+            if (removeCount <= 0)
             {
-                if (removeIndex < parent.MutableChildren.Count)
-                {
-                    var child = parent.MutableChildren[removeIndex];
-                    removedNodes.Add(child);
-                    parent.MutableChildren.RemoveAt(removeIndex);
-                }
+                return;
             }
+
+            var isVirtualRootParent = IsVirtualRootNode(parent);
+            var parentIndex = -1;
+            var canUpdateFlattened = parent.IsExpanded;
+            if (canUpdateFlattened)
+            {
+                if (!isVirtualRootParent)
+                {
+                    parentIndex = _flattened.IndexOf(parent);
+                }
+
+                canUpdateFlattened = parentIndex >= 0 || isVirtualRootParent;
+            }
+
+            var visibleOffset = 0;
+            if (canUpdateFlattened)
+            {
+                visibleOffset = GetVisibleOffsetForChildIndex(parent, removeIndex);
+            }
+            var removedNodes = parent.MutableChildren.GetRange(removeIndex, removeCount);
+            parent.MutableChildren.RemoveRange(removeIndex, removeCount);
 
             parent.IsLeaf = parent.MutableChildren.Count == 0;
 
@@ -2017,39 +2218,21 @@ namespace Avalonia.Controls.DataGridHierarchical
                 {
                     DetachHierarchy(removed);
                 }
-                RecalculateExpandedCountsFrom(parent);
+                ApplyExpandedCountDelta(parent, 0);
                 return;
             }
-
-            var parentIndex = _flattened.IndexOf(parent);
-            var isVirtualRootParent = _isVirtualRoot && ReferenceEquals(parent, Root);
-
-            if (parentIndex < 0 && !isVirtualRootParent)
-            {
-                foreach (var removed in removedNodes)
-                {
-                    DetachHierarchy(removed);
-                }
-                RecalculateExpandedCountsFrom(parent);
-                return;
-            }
-
-            var flattenedIndex = isVirtualRootParent
-                ? visibleOffset
-                : parentIndex + 1 + visibleOffset;
 
             var totalRemoved = 0;
             foreach (var child in removedNodes)
             {
-                totalRemoved += 1;
-                if (child.IsExpanded)
-                {
-                    totalRemoved += CountVisibleDescendantsRecursive(child);
-                }
+                totalRemoved += GetVisibleVisibleCount(child);
             }
 
-            if (totalRemoved > 0)
+            if (canUpdateFlattened && totalRemoved > 0)
             {
+                var flattenedIndex = isVirtualRootParent
+                    ? visibleOffset
+                    : parentIndex + 1 + visibleOffset;
                 _flattened.RemoveRange(flattenedIndex, totalRemoved);
                 OnFlattenedChanged(new[] { new FlattenedChange(flattenedIndex, totalRemoved, 0) });
             }
@@ -2059,7 +2242,7 @@ namespace Avalonia.Controls.DataGridHierarchical
                 DetachHierarchy(removed);
             }
 
-            RecalculateExpandedCountsFrom(parent);
+            ApplyExpandedCountDelta(parent, -totalRemoved);
             OnHierarchyChanged(parent, NotifyCollectionChangedAction.Remove);
         }
 
@@ -2075,20 +2258,34 @@ namespace Avalonia.Controls.DataGridHierarchical
             replaceIndex = Math.Min(replaceIndex, parent.MutableChildren.Count);
 
             var removeCount = Math.Min(e.OldItems.Count, parent.MutableChildren.Count - replaceIndex);
-            var parentIndex = _flattened.IndexOf(parent);
-            var isVirtualRootParent = _isVirtualRoot && ReferenceEquals(parent, Root);
-            var visibleOffset = GetVisibleOffsetForChildIndex(parent, replaceIndex);
-            var removedNodes = new List<HierarchicalNode>();
-
-            for (int i = 0; i < removeCount; i++)
+            if (removeCount <= 0)
             {
-                if (replaceIndex < parent.MutableChildren.Count)
+                Refresh(parent);
+                return;
+            }
+            var isVirtualRootParent = IsVirtualRootNode(parent);
+            var parentIndex = -1;
+            var canUpdateFlattened = parent.IsExpanded;
+            if (canUpdateFlattened)
+            {
+                if (!isVirtualRootParent)
                 {
-                    var old = parent.MutableChildren[replaceIndex];
-                    removedNodes.Add(old);
-                    parent.MutableChildren.RemoveAt(replaceIndex);
-                    DetachHierarchy(old);
+                    parentIndex = _flattened.IndexOf(parent);
                 }
+
+                canUpdateFlattened = parentIndex >= 0 || isVirtualRootParent;
+            }
+
+            var visibleOffset = 0;
+            if (canUpdateFlattened)
+            {
+                visibleOffset = GetVisibleOffsetForChildIndex(parent, replaceIndex);
+            }
+            var removedNodes = parent.MutableChildren.GetRange(replaceIndex, removeCount);
+            parent.MutableChildren.RemoveRange(replaceIndex, removeCount);
+            foreach (var old in removedNodes)
+            {
+                DetachHierarchy(old);
             }
 
             var removedVisible = removedNodes.Sum(GetVisibleVisibleCount);
@@ -2109,7 +2306,8 @@ namespace Avalonia.Controls.DataGridHierarchical
             parent.MutableChildren.InsertRange(replaceIndex, newNodes);
             parent.IsLeaf = parent.MutableChildren.Count == 0;
 
-            if (parent.IsExpanded && (parentIndex >= 0 || isVirtualRootParent))
+            var insertedVisible = 0;
+            if (canUpdateFlattened)
             {
                 var flattenedIndex = isVirtualRootParent
                     ? visibleOffset
@@ -2124,10 +2322,15 @@ namespace Avalonia.Controls.DataGridHierarchical
                 foreach (var node in newNodes)
                 {
                     visibleNodes.Add(node);
-                    if (node.IsExpanded)
+                    if (node.IsExpanded && !node.IsLeaf)
                     {
-                        EnsureChildrenMaterialized(node);
-                        CollectVisibleChildren(node, visibleNodes);
+                        var nodeDesc = CollectVisibleChildrenAndUpdateCounts(node, visibleNodes);
+                        insertedVisible += 1 + nodeDesc;
+                    }
+                    else
+                    {
+                        node.ExpandedCount = 0;
+                        insertedVisible += 1;
                     }
                 }
 
@@ -2136,11 +2339,33 @@ namespace Avalonia.Controls.DataGridHierarchical
                     _flattened.InsertRange(flattenedIndex, visibleNodes);
                 }
 
-                var insertedVisible = parent.IsExpanded ? visibleNodes.Count : 0;
                 OnFlattenedChanged(new[] { new FlattenedChange(flattenedIndex, removedVisible, insertedVisible) });
             }
+            else if (parent.IsExpanded)
+            {
+                foreach (var node in newNodes)
+                {
+                    if (node.IsExpanded && !node.IsLeaf)
+                    {
+                        var nodeDesc = RecalculateExpandedCountRecursive(node);
+                        insertedVisible += 1 + nodeDesc;
+                    }
+                    else
+                    {
+                        node.ExpandedCount = 0;
+                        insertedVisible += 1;
+                    }
+                }
+            }
+            else
+            {
+                foreach (var node in newNodes)
+                {
+                    node.ExpandedCount = 0;
+                }
+            }
 
-            RecalculateExpandedCountsFrom(parent);
+            ApplyExpandedCountDelta(parent, insertedVisible - removedVisible);
             OnHierarchyChanged(parent, NotifyCollectionChangedAction.Replace);
         }
 
@@ -2167,19 +2392,26 @@ namespace Avalonia.Controls.DataGridHierarchical
                 return;
             }
 
-            var parentIndex = _flattened.IndexOf(parent);
-            var isVirtualRootParent = _isVirtualRoot && ReferenceEquals(parent, Root);
-            var expandedAndVisible = parent.IsExpanded && (parentIndex >= 0 || isVirtualRootParent);
-
-            var removeOffset = GetVisibleOffsetForChildIndex(parent, moveIndex);
-            var movedNodes = new List<HierarchicalNode>();
-
-            for (int i = 0; i < moveCount; i++)
+            var isVirtualRootParent = IsVirtualRootNode(parent);
+            var parentIndex = -1;
+            var expandedAndVisible = parent.IsExpanded;
+            if (expandedAndVisible)
             {
-                var node = parent.MutableChildren[moveIndex];
-                movedNodes.Add(node);
-                parent.MutableChildren.RemoveAt(moveIndex);
+                if (!isVirtualRootParent)
+                {
+                    parentIndex = _flattened.IndexOf(parent);
+                }
+
+                expandedAndVisible = parentIndex >= 0 || isVirtualRootParent;
             }
+
+            var removeOffset = 0;
+            if (expandedAndVisible)
+            {
+                removeOffset = GetVisibleOffsetForChildIndex(parent, moveIndex);
+            }
+            var movedNodes = parent.MutableChildren.GetRange(moveIndex, moveCount);
+            parent.MutableChildren.RemoveRange(moveIndex, moveCount);
 
             var removedVisible = expandedAndVisible ? movedNodes.Sum(GetVisibleVisibleCount) : 0;
 
@@ -2192,20 +2424,11 @@ namespace Avalonia.Controls.DataGridHierarchical
                     ? removeOffset
                     : parentIndex + 1 + removeOffset;
 
+                IList<HierarchicalNode>? visibleNodes = null;
                 if (removedVisible > 0)
                 {
+                    visibleNodes = _flattened.GetRange(removedAt, removedVisible);
                     _flattened.RemoveRange(removedAt, removedVisible);
-                }
-
-                var visibleNodes = new List<HierarchicalNode>();
-                foreach (var node in movedNodes)
-                {
-                    visibleNodes.Add(node);
-                    if (node.IsExpanded)
-                    {
-                        EnsureChildrenMaterialized(node);
-                        CollectVisibleChildren(node, visibleNodes);
-                    }
                 }
 
                 var insertOffset = GetVisibleOffsetForChildIndex(parent, insertIndex);
@@ -2213,15 +2436,15 @@ namespace Avalonia.Controls.DataGridHierarchical
                     ? insertOffset
                     : parentIndex + 1 + insertOffset;
 
-                if (visibleNodes.Count > 0)
+                if (visibleNodes != null && visibleNodes.Count > 0)
                 {
                     _flattened.InsertRange(insertAt, visibleNodes);
                 }
 
-                var insertedVisible = expandedAndVisible ? visibleNodes.Count : 0;
+                var insertedVisible = visibleNodes?.Count ?? 0;
                 var indexMap = new Dictionary<int, int>();
 
-                for (int i = 0; i < visibleNodes.Count; i++)
+                for (int i = 0; i < insertedVisible; i++)
                 {
                     indexMap[removedAt + i] = insertAt + i;
                 }
@@ -2233,7 +2456,6 @@ namespace Avalonia.Controls.DataGridHierarchical
                 }, indexMap.Count > 0 ? indexMap : null);
             }
 
-            RecalculateExpandedCountsFrom(parent);
             OnHierarchyChanged(parent, NotifyCollectionChangedAction.Move);
         }
 
@@ -3034,6 +3256,39 @@ namespace Avalonia.Controls.DataGridHierarchical
             }
 
             return map.Count > 0 ? map : null;
+        }
+
+        private void ApplyExpandedCountDelta(HierarchicalNode parent, int delta)
+        {
+            if (parent == null)
+            {
+                return;
+            }
+
+            if (!parent.IsExpanded)
+            {
+                parent.ExpandedCount = 0;
+                return;
+            }
+
+            if (delta == 0)
+            {
+                return;
+            }
+
+            parent.ExpandedCount += delta;
+
+            var current = parent.Parent;
+            while (current != null)
+            {
+                if (!current.IsExpanded)
+                {
+                    break;
+                }
+
+                current.ExpandedCount += delta;
+                current = current.Parent;
+            }
         }
 
         private void RecalculateExpandedCountsFrom(HierarchicalNode node)

@@ -48,6 +48,7 @@
               AutoGenerateColumns="False"
               HierarchicalModel="{Binding Model}"
               HierarchicalRowsEnabled="True"
+              Classes="hierarchical"
               CanUserResizeColumns="True"
               HeadersVisibility="Column"
               GridLinesVisibility="Horizontal"

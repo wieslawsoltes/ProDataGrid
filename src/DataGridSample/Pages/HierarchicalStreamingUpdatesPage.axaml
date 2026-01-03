@@ -1,0 +1,109 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:viewModels="clr-namespace:DataGridSample.ViewModels"
+             xmlns:hier="clr-namespace:Avalonia.Controls.DataGridHierarchical;assembly=Avalonia.Controls.DataGrid"
+             x:Class="DataGridSample.Pages.HierarchicalStreamingUpdatesPage"
+             x:DataType="viewModels:HierarchicalStreamingUpdatesViewModel">
+  <UserControl.DataContext>
+    <viewModels:HierarchicalStreamingUpdatesViewModel />
+  </UserControl.DataContext>
+
+  <Grid RowDefinitions="Auto,Auto,*"
+        ColumnDefinitions="*,Auto"
+        Margin="12"
+        ColumnSpacing="12"
+        RowSpacing="8">
+    <StackPanel Grid.Row="0" Grid.ColumnSpan="2" Spacing="4">
+      <TextBlock Classes="h2">Hierarchical streaming updates</TextBlock>
+      <TextBlock Text="Simulates rolling adds/removes on root items with child collections to exercise fast-path hierarchical updates."
+                 TextWrapping="Wrap" />
+    </StackPanel>
+
+    <StackPanel Grid.Row="1" Grid.Column="0" Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
+      <Button Content="Start" Command="{Binding StartCommand}" />
+      <Button Content="Stop" Command="{Binding StopCommand}" />
+      <Button Content="Reset" Command="{Binding ResetCommand}" />
+      <TextBlock Text="Roots" VerticalAlignment="Center" />
+      <TextBox Width="84" Text="{Binding TargetRootCount, UpdateSourceTrigger=PropertyChanged}" />
+      <TextBlock Text="Children" VerticalAlignment="Center" />
+      <TextBox Width="56" Text="{Binding ChildrenPerRoot, UpdateSourceTrigger=PropertyChanged}" />
+      <TextBlock Text="Batch" VerticalAlignment="Center" />
+      <TextBox Width="56" Text="{Binding BatchSize, UpdateSourceTrigger=PropertyChanged}" />
+      <TextBlock Text="Interval (ms)" VerticalAlignment="Center" />
+      <TextBox Width="72" Text="{Binding IntervalMs, UpdateSourceTrigger=PropertyChanged}" />
+    </StackPanel>
+
+    <StackPanel Grid.Row="1" Grid.Column="1" Spacing="4">
+      <TextBlock Text="{Binding RootCount, StringFormat='Roots: {0}'}" />
+      <TextBlock Text="{Binding VisibleCount, StringFormat='Visible nodes: {0}'}" />
+      <TextBlock Text="{Binding Updates, StringFormat='Updates: {0}'}" />
+      <TextBlock Text="{Binding RunState, StringFormat='State: {0}'}" />
+    </StackPanel>
+
+    <DataGrid Grid.Row="2" Grid.ColumnSpan="2"
+              AutoGenerateColumns="False"
+              HierarchicalModel="{Binding Model}"
+              HierarchicalRowsEnabled="True"
+              Classes="hierarchical"
+              UseLogicalScrollable="True"
+              RowHeight="24"
+              RowHeightEstimator="{x:Null}"
+              SelectionMode="Single"
+              SelectionUnit="FullRow"
+              CanUserReorderColumns="False"
+              CanUserResizeColumns="False"
+              HeadersVisibility="Column"
+              GridLinesVisibility="None"
+              IsReadOnly="True"
+              x:DataType="viewModels:HierarchicalStreamingUpdatesViewModel">
+      <DataGrid.Columns>
+        <DataGridHierarchicalColumn Header="Name"
+                                    Width="2*"
+                                    x:CompileBindings="False"
+                                    Binding="{Binding Item}">
+          <DataGridHierarchicalColumn.CellTemplate>
+            <DataTemplate x:DataType="viewModels:HierarchicalStreamingUpdatesViewModel+TreeItem">
+              <TextBlock Text="{Binding Name}" />
+            </DataTemplate>
+          </DataGridHierarchicalColumn.CellTemplate>
+        </DataGridHierarchicalColumn>
+
+        <DataGridTemplateColumn Header="Id"
+                                Width="80"
+                                x:CompileBindings="False">
+          <DataGridTemplateColumn.CellTemplate>
+            <DataTemplate x:DataType="hier:HierarchicalNode">
+              <TextBlock x:DataType="viewModels:HierarchicalStreamingUpdatesViewModel+TreeItem"
+                         DataContext="{Binding Item}"
+                         Text="{Binding Id}" />
+            </DataTemplate>
+          </DataGridTemplateColumn.CellTemplate>
+        </DataGridTemplateColumn>
+
+        <DataGridTemplateColumn Header="Price"
+                                Width="100"
+                                x:CompileBindings="False">
+          <DataGridTemplateColumn.CellTemplate>
+            <DataTemplate x:DataType="hier:HierarchicalNode">
+              <TextBlock x:DataType="viewModels:HierarchicalStreamingUpdatesViewModel+TreeItem"
+                         DataContext="{Binding Item}"
+                         Text="{Binding PriceDisplay}" />
+            </DataTemplate>
+          </DataGridTemplateColumn.CellTemplate>
+        </DataGridTemplateColumn>
+
+        <DataGridTemplateColumn Header="Updated"
+                                Width="120"
+                                x:CompileBindings="False">
+          <DataGridTemplateColumn.CellTemplate>
+            <DataTemplate x:DataType="hier:HierarchicalNode">
+              <TextBlock x:DataType="viewModels:HierarchicalStreamingUpdatesViewModel+TreeItem"
+                         DataContext="{Binding Item}"
+                         Text="{Binding UpdatedAtDisplay}" />
+            </DataTemplate>
+          </DataGridTemplateColumn.CellTemplate>
+        </DataGridTemplateColumn>
+      </DataGrid.Columns>
+    </DataGrid>
+  </Grid>
+</UserControl>

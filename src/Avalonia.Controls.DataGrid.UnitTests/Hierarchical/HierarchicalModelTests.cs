@@ -8,6 +8,7 @@ using System.Collections.Specialized;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Diagnostics;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Avalonia.Controls.DataGridHierarchical;
@@ -566,7 +567,8 @@ namespace Avalonia.Controls.DataGridTests.Hierarchical;
         var b = new Item("b");
         root.Children.Add(b);
 
-        Assert.Equal("b", ((Item)model.GetItem(3)!).Name);
+        Assert.Equal("b", ((Item)model.GetItem(2)!).Name);
+        Assert.Equal("c", ((Item)model.GetItem(3)!).Name);
 
         model.Sort();
 
@@ -1443,6 +1445,43 @@ namespace Avalonia.Controls.DataGridTests.Hierarchical;
     }
 
     [Fact]
+    public void Incc_Move_WithExpandedDescendants_MaintainsFlattenedOrder()
+    {
+        var root = new Item("root");
+        var a = new Item("a");
+        a.Children.Add(new Item("a1"));
+        var b = new Item("b");
+        b.Children.Add(new Item("b1"));
+        var c = new Item("c");
+        c.Children.Add(new Item("c1"));
+        root.Children.Add(a);
+        root.Children.Add(b);
+        root.Children.Add(c);
+
+        var model = CreateModel();
+        model.SetRoot(root);
+        model.ExpandAll();
+
+        FlattenedChangedEventArgs? args = null;
+        model.FlattenedChanged += (_, e) => args = e;
+
+        root.Children.Move(0, 2);
+
+        Assert.Equal(
+            new[] { "root", "b", "b1", "c", "c1", "a", "a1" },
+            model.Flattened.Select(node => ((Item)node.Item).Name).ToArray());
+
+        Assert.NotNull(args);
+        Assert.Equal(2, args!.Changes.Count);
+        Assert.Equal(1, args.Changes[0].Index);
+        Assert.Equal(2, args.Changes[0].OldCount);
+        Assert.Equal(0, args.Changes[0].NewCount);
+        Assert.Equal(5, args.Changes[1].Index);
+        Assert.Equal(0, args.Changes[1].OldCount);
+        Assert.Equal(2, args.Changes[1].NewCount);
+    }
+
+    [Fact]
     public void FlattenedIndexMap_TracksMove()
     {
         var root = new Item("root");
@@ -1464,6 +1503,40 @@ namespace Avalonia.Controls.DataGridTests.Hierarchical;
         Assert.Equal(3, map.MapOldIndexToNew(1)); // a moves to the end
         Assert.Equal(1, map.MapOldIndexToNew(2)); // b moves up
         Assert.Equal(2, map.MapOldIndexToNew(3)); // c moves up
+    }
+
+    [Fact]
+    public void SetRoots_INCC_MoveRootItem_WithExpandedDescendants_MaintainsFlattenedOrder()
+    {
+        var a = new Item("a");
+        a.Children.Add(new Item("a1"));
+        var b = new Item("b");
+        b.Children.Add(new Item("b1"));
+        var c = new Item("c");
+        c.Children.Add(new Item("c1"));
+
+        var items = new ObservableCollection<Item> { a, b, c };
+        var model = CreateModel();
+        model.SetRoots(items);
+        model.ExpandAll();
+
+        FlattenedChangedEventArgs? args = null;
+        model.FlattenedChanged += (_, e) => args = e;
+
+        items.Move(0, 2);
+
+        Assert.Equal(
+            new[] { "b", "b1", "c", "c1", "a", "a1" },
+            model.Flattened.Select(node => ((Item)node.Item).Name).ToArray());
+
+        Assert.NotNull(args);
+        Assert.Equal(2, args!.Changes.Count);
+        Assert.Equal(0, args.Changes[0].Index);
+        Assert.Equal(2, args.Changes[0].OldCount);
+        Assert.Equal(0, args.Changes[0].NewCount);
+        Assert.Equal(4, args.Changes[1].Index);
+        Assert.Equal(0, args.Changes[1].OldCount);
+        Assert.Equal(2, args.Changes[1].NewCount);
     }
 
     [Fact]

@@ -43,6 +43,7 @@
     <DataGrid Grid.Row="3"
               CanUserReorderRows="True"
               HierarchicalRowsEnabled="True"
+              Classes="hierarchical"
               RowDragHandle="{Binding RowDragHandle}"
               RowDragHandleVisible="{Binding ShowHandle}"
               RowDragDropOptions="{Binding Options}"
