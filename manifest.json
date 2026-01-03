@@ -3561,6 +3561,26 @@
     },
     {
       "type": "Conceptual",
+      "source_relative_path": "articles/dynamicdata-hierarchical-streaming-sourcecache.md",
+      "output": {
+        ".html": {
+          "relative_path": "articles/dynamicdata-hierarchical-streaming-sourcecache.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "Conceptual",
+      "source_relative_path": "articles/dynamicdata-hierarchical-streaming-sourcelist.md",
+      "output": {
+        ".html": {
+          "relative_path": "articles/dynamicdata-hierarchical-streaming-sourcelist.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "Conceptual",
       "source_relative_path": "articles/dynamicdata-streaming-sourcecache.md",
       "output": {
         ".html": {
@@ -3605,6 +3625,16 @@
       "output": {
         ".html": {
           "relative_path": "articles/hierarchical-data.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "Conceptual",
+      "source_relative_path": "articles/hierarchical-high-frequency-updates.md",
+      "output": {
+        ".html": {
+          "relative_path": "articles/hierarchical-high-frequency-updates.html"
         }
       },
       "version": ""

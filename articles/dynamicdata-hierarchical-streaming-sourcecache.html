@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+      <title>DynamicData Hierarchical Streaming with SourceCache | ProDataGrid for Avalonia </title>
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <meta name="title" content="DynamicData Hierarchical Streaming with SourceCache | ProDataGrid for Avalonia ">
+      
+      
+      <link rel="icon" href="../favicon.ico">
+      <link rel="stylesheet" href="../public/docfx.min.css">
+      <link rel="stylesheet" href="../public/main.css">
+      <meta name="docfx:navrel" content="../toc.html">
+      <meta name="docfx:tocrel" content="toc.html">
+      
+      
+      
+      
+      <meta name="docfx:docurl" content="https://github.com/wieslawsoltes/ProDataGrid/blob/master/docfx/articles/dynamicdata-hierarchical-streaming-sourcecache.md/#L1">
+      <meta name="loc:inThisArticle" content="In this article">
+      <meta name="loc:searchResultsCount" content="{count} results for &quot;{query}&quot;">
+      <meta name="loc:searchNoResults" content="No results for &quot;{query}&quot;">
+      <meta name="loc:tocFilter" content="Filter by title">
+      <meta name="loc:nextArticle" content="Next">
+      <meta name="loc:prevArticle" content="Previous">
+      <meta name="loc:themeLight" content="Light">
+      <meta name="loc:themeDark" content="Dark">
+      <meta name="loc:themeAuto" content="Auto">
+      <meta name="loc:changeTheme" content="Change theme">
+      <meta name="loc:copy" content="Copy">
+      <meta name="loc:downloadPdf" content="Download PDF">
+
+      <script type="module" src="./../public/docfx.min.js"></script>
+
+      <script>
+        const theme = localStorage.getItem('theme') || 'auto'
+        document.documentElement.setAttribute('data-bs-theme', theme === 'auto' ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light') : theme)
+      </script>
+
+  </head>
+
+  <body class="tex2jax_ignore" data-layout="" data-yaml-mime="">
+    <header class="bg-body border-bottom">
+      <nav id="autocollapse" class="navbar navbar-expand-md" role="navigation">
+        <div class="container-xxl flex-nowrap">
+          <a class="navbar-brand" href="../index.html">
+            <img id="logo" class="svg" src="../images/logo.svg" alt="">
+            
+          </a>
+          <button class="btn btn-lg d-md-none border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navpanel" aria-controls="navpanel" aria-expanded="false" aria-label="Toggle navigation">
+            <i class="bi bi-three-dots"></i>
+          </button>
+          <div class="collapse navbar-collapse" id="navpanel">
+            <div id="navbar">
+            </div>
+          </div>
+        </div>
+      </nav>
+    </header>
+
+    <main class="container-xxl">
+      <div class="toc-offcanvas">
+        <div class="offcanvas-md offcanvas-start" tabindex="-1" id="tocOffcanvas" aria-labelledby="tocOffcanvasLabel">
+          <div class="offcanvas-header">
+            <h5 class="offcanvas-title" id="tocOffcanvasLabel">Table of Contents</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="offcanvas" data-bs-target="#tocOffcanvas" aria-label="Close"></button>
+          </div>
+          <div class="offcanvas-body">
+            <nav class="toc" id="toc"></nav>
+          </div>
+        </div>
+      </div>
+
+      <div class="content">
+        <div class="actionbar">
+          <button class="btn btn-lg border-0 d-md-none" type="button" data-bs-toggle="offcanvas" data-bs-target="#tocOffcanvas" aria-controls="tocOffcanvas" aria-expanded="false" aria-label="Show table of contents">
+            <i class="bi bi-list"></i>
+          </button>
+
+          <nav id="breadcrumb"></nav>
+        </div>
+
+        <article data-uid="">
+<h1 id="dynamicdata-hierarchical-streaming-with-sourcecache">DynamicData Hierarchical Streaming with SourceCache</h1>
+
+<p>Use <code>SourceCache&lt;T, TKey&gt;</code> when you have stable keys and need efficient add/update/remove operations for hierarchical roots. Sorting and filtering still happen in the DynamicData pipeline so the grid stays in the hierarchical fast path.</p>
+<h2 id="pipeline-setup">Pipeline setup</h2>
+<pre><code class="lang-csharp">var cache = new SourceCache&lt;TreeItem, int&gt;(item =&gt; item.Id);
+var sortSubject = new BehaviorSubject&lt;IComparer&lt;TreeItem&gt;&gt;(sortComparer);
+var treeFilterSubject = new BehaviorSubject&lt;Func&lt;TreeItem, bool&gt;&gt;(static _ =&gt; true);
+
+var subscription = cache.Connect()
+    .Filter(treeFilterSubject)
+    .Sort(sortSubject)
+    .Bind(out ReadOnlyObservableCollection&lt;TreeItem&gt; roots)
+    .Subscribe();
+</code></pre>
+<h2 id="hierarchical-model-setup">Hierarchical model setup</h2>
+<pre><code class="lang-csharp">var options = new HierarchicalOptions&lt;TreeItem&gt;
+{
+    ChildrenSelector = item =&gt; item.Children,
+    IsLeafSelector = item =&gt; item.Children.Count == 0,
+    IsExpandedSelector = item =&gt; item.IsExpanded,
+    IsExpandedSetter = (item, value) =&gt; item.IsExpanded = value
+};
+
+Model = new HierarchicalModel&lt;TreeItem&gt;(options);
+Model.SetRoots(roots);
+</code></pre>
+<h2 id="rolling-window-updates">Rolling window updates</h2>
+<pre><code class="lang-csharp">var idQueue = new Queue&lt;int&gt;();
+
+cache.Edit(updater =&gt;
+{
+    for (var i = 0; i &lt; batchSize; i++)
+    {
+        var item = CreateItem();
+        updater.AddOrUpdate(item);
+        idQueue.Enqueue(item.Id);
+    }
+
+    while (idQueue.Count &gt; targetCount)
+    {
+        updater.RemoveKey(idQueue.Dequeue());
+    }
+});
+</code></pre>
+<h2 id="sample">Sample</h2>
+<p>See the <strong>DynamicData Hierarchical (SourceCache)</strong> tab in the sample gallery for a full implementation.</p>
+
+</article>
+
+        <div class="contribution d-print-none">
+          <a href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/docfx/articles/dynamicdata-hierarchical-streaming-sourcecache.md/#L1" class="edit-link">Edit this page</a>
+        </div>
+
+        <div class="next-article d-print-none border-top" id="nextArticle"></div>
+
+      </div>
+
+      <div class="affix">
+        <nav id="affix"></nav>
+      </div>
+    </main>
+
+
+    <footer class="border-top text-secondary">
+      <div class="container-xxl">
+        <div class="flex-fill">
+          <span>Made with <a href="https://dotnet.github.io/docfx">docfx</a></span>
+        </div>
+      </div>
+    </footer>
+  </body>
+</html>
