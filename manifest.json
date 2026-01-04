@@ -3771,6 +3771,16 @@
     },
     {
       "type": "Conceptual",
+      "source_relative_path": "articles/selection-highlighting.md",
+      "output": {
+        ".html": {
+          "relative_path": "articles/selection-highlighting.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "Conceptual",
       "source_relative_path": "articles/state-persistence.md",
       "output": {
         ".html": {

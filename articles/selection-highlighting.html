@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+      <title>Selection Highlighting | ProDataGrid for Avalonia </title>
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <meta name="title" content="Selection Highlighting | ProDataGrid for Avalonia ">
+      
+      
+      <link rel="icon" href="../favicon.ico">
+      <link rel="stylesheet" href="../public/docfx.min.css">
+      <link rel="stylesheet" href="../public/main.css">
+      <meta name="docfx:navrel" content="../toc.html">
+      <meta name="docfx:tocrel" content="toc.html">
+      
+      
+      
+      
+      <meta name="docfx:docurl" content="https://github.com/wieslawsoltes/ProDataGrid/blob/master/docfx/articles/selection-highlighting.md/#L1">
+      <meta name="loc:inThisArticle" content="In this article">
+      <meta name="loc:searchResultsCount" content="{count} results for &quot;{query}&quot;">
+      <meta name="loc:searchNoResults" content="No results for &quot;{query}&quot;">
+      <meta name="loc:tocFilter" content="Filter by title">
+      <meta name="loc:nextArticle" content="Next">
+      <meta name="loc:prevArticle" content="Previous">
+      <meta name="loc:themeLight" content="Light">
+      <meta name="loc:themeDark" content="Dark">
+      <meta name="loc:themeAuto" content="Auto">
+      <meta name="loc:changeTheme" content="Change theme">
+      <meta name="loc:copy" content="Copy">
+      <meta name="loc:downloadPdf" content="Download PDF">
+
+      <script type="module" src="./../public/docfx.min.js"></script>
+
+      <script>
+        const theme = localStorage.getItem('theme') || 'auto'
+        document.documentElement.setAttribute('data-bs-theme', theme === 'auto' ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light') : theme)
+      </script>
+
+  </head>
+
+  <body class="tex2jax_ignore" data-layout="" data-yaml-mime="">
+    <header class="bg-body border-bottom">
+      <nav id="autocollapse" class="navbar navbar-expand-md" role="navigation">
+        <div class="container-xxl flex-nowrap">
+          <a class="navbar-brand" href="../index.html">
+            <img id="logo" class="svg" src="../images/logo.svg" alt="">
+            
+          </a>
+          <button class="btn btn-lg d-md-none border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navpanel" aria-controls="navpanel" aria-expanded="false" aria-label="Toggle navigation">
+            <i class="bi bi-three-dots"></i>
+          </button>
+          <div class="collapse navbar-collapse" id="navpanel">
+            <div id="navbar">
+            </div>
+          </div>
+        </div>
+      </nav>
+    </header>
+
+    <main class="container-xxl">
+      <div class="toc-offcanvas">
+        <div class="offcanvas-md offcanvas-start" tabindex="-1" id="tocOffcanvas" aria-labelledby="tocOffcanvasLabel">
+          <div class="offcanvas-header">
+            <h5 class="offcanvas-title" id="tocOffcanvasLabel">Table of Contents</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="offcanvas" data-bs-target="#tocOffcanvas" aria-label="Close"></button>
+          </div>
+          <div class="offcanvas-body">
+            <nav class="toc" id="toc"></nav>
+          </div>
+        </div>
+      </div>
+
+      <div class="content">
+        <div class="actionbar">
+          <button class="btn btn-lg border-0 d-md-none" type="button" data-bs-toggle="offcanvas" data-bs-target="#tocOffcanvas" aria-controls="tocOffcanvas" aria-expanded="false" aria-label="Show table of contents">
+            <i class="bi bi-list"></i>
+          </button>
+
+          <nav id="breadcrumb"></nav>
+        </div>
+
+        <article data-uid="">
+<h1 id="selection-highlighting">Selection Highlighting</h1>
+
+<p>Selection visuals in ProDataGrid follow the selection unit and selection mode. Row selection and cell selection are surfaced separately so you can style them independently.</p>
+<h2 id="selection-units-and-visuals">Selection units and visuals</h2>
+<ul>
+<li><code>SelectionUnit=FullRow</code> highlights full rows and uses row headers for selection.</li>
+<li><code>SelectionUnit=Cell</code> highlights individual cells; rows still track selection for <code>SelectedItems</code> unless you suppress row visuals.</li>
+<li><code>SelectionUnit=CellOrRowHeader</code> lets row headers select rows and cell clicks select cells.</li>
+</ul>
+<p>Use <code>SelectionMode=Extended</code> for range selection (Shift) and multi-select (Ctrl/Cmd). <code>SelectionMode=Single</code> keeps a single active selection.</p>
+<h2 id="pseudo-classes">Pseudo classes</h2>
+<h3 id="datagridrow">DataGridRow</h3>
+<ul>
+<li><code>:selected</code> - row selection state.</li>
+<li><code>:current</code> - current row (currency).</li>
+<li><code>:pointerover</code> - mouse hover state.</li>
+</ul>
+<h3 id="datagridcell">DataGridCell</h3>
+<ul>
+<li><code>:selected</code> - selected state for the cell; maps to cell selection when the selection unit includes cells.</li>
+<li><code>:row-selected</code> - the row of this cell is selected.</li>
+<li><code>:cell-selected</code> - the cell is selected.</li>
+<li><code>:current</code> - current cell.</li>
+<li><code>:focus</code> - current cell with focus.</li>
+</ul>
+<p><code>DataGridCell:row-selected</code> lets you show a subtle row highlight even when only some cells are selected, while <code>DataGridCell:cell-selected</code> can be a stronger highlight for the selected cells themselves.</p>
+<h2 id="theme-resource-keys">Theme resource keys</h2>
+<p>Cell selection brushes can be customized via theme resources (Fluent and Simple define defaults):</p>
+<ul>
+<li><code>DataGridCellSelectedBackgroundBrush</code></li>
+<li><code>DataGridCellSelectedHoveredBackgroundBrush</code></li>
+<li><code>DataGridCellSelectedUnfocusedBackgroundBrush</code></li>
+<li><code>DataGridCellSelectedHoveredUnfocusedBackgroundBrush</code></li>
+</ul>
+<p>Row selection continues to use the existing row brushes such as <code>DataGridRowSelectedBackgroundBrush</code>.</p>
+<h2 id="styling-examples">Styling examples</h2>
+<p>Override the brushes:</p>
+<pre><code class="lang-xml">&lt;Styles.Resources&gt;
+  &lt;SolidColorBrush x:Key=&quot;DataGridCellSelectedBackgroundBrush&quot; Color=&quot;#FFBBDEFB&quot; /&gt;
+  &lt;SolidColorBrush x:Key=&quot;DataGridCellSelectedHoveredBackgroundBrush&quot; Color=&quot;#FF90CAF9&quot; /&gt;
+  &lt;SolidColorBrush x:Key=&quot;DataGridCellSelectedUnfocusedBackgroundBrush&quot; Color=&quot;#FFCFE8FC&quot; /&gt;
+  &lt;SolidColorBrush x:Key=&quot;DataGridCellSelectedHoveredUnfocusedBackgroundBrush&quot; Color=&quot;#FFB3E5FC&quot; /&gt;
+&lt;/Styles.Resources&gt;
+</code></pre>
+<p>Target pseudo classes directly:</p>
+<pre><code class="lang-xml">&lt;Style Selector=&quot;DataGridCell:row-selected&quot;&gt;
+  &lt;Setter Property=&quot;Background&quot; Value=&quot;#1F64B5F6&quot; /&gt;
+&lt;/Style&gt;
+
+&lt;Style Selector=&quot;DataGridCell:cell-selected&quot;&gt;
+  &lt;Setter Property=&quot;Background&quot; Value=&quot;#FFBBDEFB&quot; /&gt;
+  &lt;Setter Property=&quot;BorderBrush&quot; Value=&quot;#FF1E88E5&quot; /&gt;
+  &lt;Setter Property=&quot;BorderThickness&quot; Value=&quot;1&quot; /&gt;
+&lt;/Style&gt;
+
+&lt;Style Selector=&quot;DataGridRow:selected /template/ Rectangle#BackgroundRectangle&quot;&gt;
+  &lt;Setter Property=&quot;Fill&quot; Value=&quot;#FFE8F1FF&quot; /&gt;
+&lt;/Style&gt;
+</code></pre>
+<h2 id="usage-tips">Usage tips</h2>
+<ul>
+<li>For cell highlighting, set <code>SelectionUnit=Cell</code> or <code>SelectionUnit=CellOrRowHeader</code>.</li>
+<li>For row highlighting without cell selection, use <code>SelectionUnit=FullRow</code>.</li>
+<li>Bind <code>SelectedCells</code> when working with cell selection so you can inspect selected ranges.</li>
+</ul>
+<h2 id="samples">Samples</h2>
+<p>See the sample app pages:</p>
+<ul>
+<li><code>Selection Units</code> for side-by-side selection unit comparisons.</li>
+<li><code>Selection Highlighting</code> for custom row and cell visuals.</li>
+<li><code>Cell Selection</code> for <code>SelectedCells</code> binding and preset ranges.</li>
+<li><code>Cell Selection Only</code> to suppress row visuals and show cell highlights exclusively.</li>
+</ul>
+
+</article>
+
+        <div class="contribution d-print-none">
+          <a href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/docfx/articles/selection-highlighting.md/#L1" class="edit-link">Edit this page</a>
+        </div>
+
+        <div class="next-article d-print-none border-top" id="nextArticle"></div>
+
+      </div>
+
+      <div class="affix">
+        <nav id="affix"></nav>
+      </div>
+    </main>
+
+
+    <footer class="border-top text-secondary">
+      <div class="container-xxl">
+        <div class="flex-fill">
+          <span>Made with <a href="https://dotnet.github.io/docfx">docfx</a></span>
+        </div>
+      </div>
+    </footer>
+  </body>
+</html>
