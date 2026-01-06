@@ -547,6 +547,58 @@ public class DataGridAddDeleteRowsTests
         window.Close();
     }
 
+    [AvaloniaFact]
+    public void DataGrid_BeginEdit_On_Placeholder_Allows_Cell_Editing()
+    {
+        // Arrange
+        var items = new ObservableCollection<TestItem> { new TestItem { Name = "A" } };
+        var view = new DataGridCollectionView(items);
+
+        var window = new Window { Width = 400, Height = 300 };
+        window.SetThemeStyles();
+
+        var grid = new DataGrid
+        {
+            ItemsSource = view,
+            CanUserAddRows = true,
+            IsReadOnly = false
+        };
+
+        var column = new DataGridTextColumn { Header = "Name", Binding = new Binding("Name") };
+        grid.Columns.Add(column);
+
+        window.Content = grid;
+        window.Show();
+        PumpLayout(grid);
+
+        var placeholderSlot = grid.SlotCount - 1;
+        grid.UpdateSelectionAndCurrency(columnIndex: 0, slot: placeholderSlot, DataGridSelectionAction.SelectCurrent, scrollIntoView: false);
+        PumpLayout(grid);
+
+        // Act
+        Assert.True(grid.BeginEdit());
+        PumpLayout(grid);
+
+        var editingRow = grid.EditingRow;
+        Assert.NotNull(editingRow);
+        Assert.NotSame(DataGridCollectionView.NewItemPlaceholder, editingRow.DataContext);
+
+        var editingCell = editingRow.Cells[column.Index];
+        var textBox = Assert.IsType<TextBox>(editingCell.Content);
+
+        textBox.Text = "New";
+        BindingOperations.GetBindingExpressionBase(textBox, TextBox.TextProperty)?.UpdateSource();
+
+        Assert.True(grid.CommitEdit());
+        PumpLayout(grid);
+
+        // Assert
+        Assert.Equal(2, items.Count);
+        Assert.Equal("New", items.Last().Name);
+
+        window.Close();
+    }
+
     private static void PumpLayout(DataGrid grid)
     {
         Dispatcher.UIThread.RunJobs();

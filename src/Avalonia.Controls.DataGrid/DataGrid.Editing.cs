@@ -326,6 +326,24 @@ internal
                 return false;
             }
 
+            dataGridRow = ResolveEditingRowAfterAddNew(dataGridRow);
+            if (dataGridRow == null)
+            {
+                return false;
+            }
+
+            if (!ReferenceEquals(EditingRow, dataGridRow))
+            {
+                EditingRow = dataGridRow;
+                CaptureRowValidationSnapshot(dataGridRow);
+            }
+
+            dataGridCell = TryGetCell(dataGridRow, CurrentColumnIndex);
+            if (dataGridCell == null)
+            {
+                return false;
+            }
+
             // Finally, we can prepare the cell for editing
             _editingCellValidationSnapshot = CellValidationSnapshot.Capture(dataGridCell);
             // Hide existing cell errors while editing to avoid duplicate validation visuals.
@@ -341,6 +359,41 @@ internal
             return true;
         }
 
+        private DataGridRow ResolveEditingRowAfterAddNew(DataGridRow dataGridRow)
+        {
+            if (dataGridRow == null || !dataGridRow.IsPlaceholder)
+            {
+                return dataGridRow;
+            }
+
+            var editableCollectionView = DataConnection?.EditableCollectionView;
+            var addItem = editableCollectionView?.CurrentAddItem;
+            if (addItem == null)
+            {
+                return dataGridRow;
+            }
+
+            var row = GetRowFromItem(addItem);
+            if (row != null)
+            {
+                return row;
+            }
+
+            var rowIndex = DataConnection.IndexOf(addItem);
+            if (rowIndex < 0)
+            {
+                return dataGridRow;
+            }
+
+            var slot = SlotFromRowIndex(rowIndex);
+            if (IsSlotVisible(slot))
+            {
+                return DisplayData.GetDisplayedElement(slot) as DataGridRow ?? dataGridRow;
+            }
+
+            return GenerateRow(rowIndex, slot);
+        }
+
 
         //TODO Validation
         private bool BeginRowEdit(DataGridRow dataGridRow)
@@ -353,6 +406,7 @@ internal
 
             if (DataConnection.BeginEdit(dataGridRow.DataContext))
             {
+                dataGridRow = ResolveEditingRowAfterAddNew(dataGridRow);
                 EditingRow = dataGridRow;
                 CaptureRowValidationSnapshot(dataGridRow);
                 GenerateEditingElements();
