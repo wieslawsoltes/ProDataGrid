@@ -45,6 +45,10 @@ internal
 
         public KeyGesture CopyAlternate { get; set; }
 
+        public KeyGesture Paste { get; set; }
+
+        public KeyGesture PasteAlternate { get; set; }
+
         public KeyGesture Delete { get; set; }
 
         public KeyGesture ExpandAll { get; set; }
@@ -68,6 +72,8 @@ internal
                 SelectAll = new KeyGesture(Key.A, commandModifiers),
                 Copy = new KeyGesture(Key.C, commandModifiers),
                 CopyAlternate = new KeyGesture(Key.Insert, commandModifiers),
+                Paste = new KeyGesture(Key.V, commandModifiers),
+                PasteAlternate = new KeyGesture(Key.Insert, KeyModifiers.Shift),
                 Delete = new KeyGesture(Key.Delete),
                 ExpandAll = new KeyGesture(Key.Multiply)
             };

@@ -65,6 +65,25 @@ internal
     }
 
     /// <summary>
+    /// Controls which user gestures can begin editing.
+    /// </summary>
+    [Flags]
+#if !DATAGRID_INTERNAL
+public
+#else
+internal
+#endif
+    enum DataGridEditTriggers
+    {
+        None = 0,
+        CellClick = 1 << 0,
+        CellDoubleClick = 1 << 1,
+        TextInput = 1 << 2,
+        F2 = 1 << 3,
+        Default = CellClick | F2
+    }
+
+    /// <summary>
     /// Determines whether the row/column headers are shown or not.
     /// </summary>
     [Flags]

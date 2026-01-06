@@ -6,6 +6,7 @@
 #nullable disable
 
 using Avalonia.Collections;
+using Avalonia.Controls.Primitives;
 using Avalonia.Controls.Templates;
 using Avalonia.Controls.Utils;
 using Avalonia.Data;
@@ -24,6 +25,12 @@ namespace Avalonia.Controls
 {
     abstract partial class DataGridColumn
     {
+        private static readonly AttachedProperty<bool> CellBackgroundBindingAppliedProperty =
+            AvaloniaProperty.RegisterAttached<DataGridColumn, DataGridCell, bool>("CellBackgroundBindingApplied");
+
+        private static readonly AttachedProperty<bool> CellForegroundBindingAppliedProperty =
+            AvaloniaProperty.RegisterAttached<DataGridColumn, DataGridCell, bool>("CellForegroundBindingApplied");
+
         /// <summary>
         /// Gets the value of a cell according to the specified binding.
         /// </summary>
@@ -188,6 +195,41 @@ namespace Avalonia.Controls
         internal Control GenerateElementInternal(DataGridCell cell, object dataItem)
         {
             return GenerateElement(cell, dataItem);
+        }
+
+        internal void ApplyCellBindings(DataGridCell cell)
+        {
+            ApplyCellBinding(cell, TemplatedControl.BackgroundProperty, CellBackgroundBinding, CellBackgroundBindingAppliedProperty);
+            ApplyCellBinding(cell, TemplatedControl.ForegroundProperty, CellForegroundBinding, CellForegroundBindingAppliedProperty);
+        }
+
+        internal void RefreshCellBindings(DataGridCell cell, string propertyName)
+        {
+            if (propertyName == nameof(CellBackgroundBinding) || propertyName == nameof(CellForegroundBinding))
+            {
+                ApplyCellBindings(cell);
+            }
+        }
+
+        private static void ApplyCellBinding(
+            DataGridCell cell,
+            AvaloniaProperty property,
+            IBinding binding,
+            AttachedProperty<bool> appliedProperty)
+        {
+            if (binding != null)
+            {
+                cell.ClearValue(property);
+                cell.Bind(property, binding);
+                cell.SetValue(appliedProperty, true);
+                return;
+            }
+
+            if (cell.GetValue(appliedProperty))
+            {
+                cell.ClearValue(property);
+                cell.ClearValue(appliedProperty);
+            }
         }
 
         protected virtual void RefreshEditingElement(Control editingElement)

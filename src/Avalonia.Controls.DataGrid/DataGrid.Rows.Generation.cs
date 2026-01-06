@@ -69,12 +69,14 @@ namespace Avalonia.Controls
                 dataGridRow.OwningGrid = this;
                 dataGridRow.DataContext = dataContext;
                 dataGridRow.IsPlaceholder = ReferenceEquals(dataContext, DataGridCollectionView.NewItemPlaceholder);
+                UpdateRowHeader(dataGridRow);
                 if (RowTheme is {} rowTheme)
                 {
                     dataGridRow.SetValue(ThemeProperty, rowTheme, BindingPriority.Template);
                 }
                 CompleteCellsCollection(dataGridRow);
                 NotifyRowPrepared(dataGridRow, dataContext);
+                ApplyConditionalFormattingForRow(dataGridRow);
                 dataGridRow.ClearRecyclingState();
 
                 if (recycledRow != null &&
@@ -97,12 +99,14 @@ namespace Avalonia.Controls
                 dataGridRow.OwningGrid = this;
                 dataGridRow.DataContext = dataContext;
                 dataGridRow.IsPlaceholder = ReferenceEquals(dataGridRow.DataContext, DataGridCollectionView.NewItemPlaceholder);
+                UpdateRowHeader(dataGridRow);
                 if (RowTheme is {} rowTheme)
                 {
                     dataGridRow.SetValue(ThemeProperty, rowTheme, BindingPriority.Template);
                 }
                 CompleteCellsCollection(dataGridRow);
                 NotifyRowPrepared(dataGridRow, dataGridRow.DataContext ?? dataContext);
+                ApplyConditionalFormattingForRow(dataGridRow);
                 dataGridRow.ClearRecyclingState();
                 OnLoadingRow(new DataGridRowEventArgs(dataGridRow));
             }

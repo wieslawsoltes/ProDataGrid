@@ -10,6 +10,7 @@ using Avalonia.Controls.Primitives;
 using Avalonia.Controls.Selection;
 using Avalonia.Controls.DataGridSorting;
 using Avalonia.Controls.DataGridSearching;
+using Avalonia.Controls.DataGridFilling;
 using Avalonia.Controls.Templates;
 using Avalonia.Data;
 using Avalonia.Media;
@@ -93,6 +94,36 @@ internal
         }
 
         /// <summary>
+        /// Identifies the <see cref="CanUserSelectColumns"/> dependency property.
+        /// </summary>
+        public static readonly StyledProperty<bool> CanUserSelectColumnsProperty =
+            AvaloniaProperty.Register<DataGrid, bool>(nameof(CanUserSelectColumns));
+
+        /// <summary>
+        /// Gets or sets a value that indicates whether the user can select entire columns by clicking the column header.
+        /// </summary>
+        public bool CanUserSelectColumns
+        {
+            get { return GetValue(CanUserSelectColumnsProperty); }
+            set { SetValue(CanUserSelectColumnsProperty, value); }
+        }
+
+        /// <summary>
+        /// Identifies the <see cref="SuppressSortOnColumnHeaderSelection"/> dependency property.
+        /// </summary>
+        public static readonly StyledProperty<bool> SuppressSortOnColumnHeaderSelectionProperty =
+            AvaloniaProperty.Register<DataGrid, bool>(nameof(SuppressSortOnColumnHeaderSelection), true);
+
+        /// <summary>
+        /// Gets or sets a value that indicates whether column header selection suppresses sorting clicks.
+        /// </summary>
+        public bool SuppressSortOnColumnHeaderSelection
+        {
+            get { return GetValue(SuppressSortOnColumnHeaderSelectionProperty); }
+            set { SetValue(SuppressSortOnColumnHeaderSelectionProperty, value); }
+        }
+
+        /// <summary>
         /// Identifies the <see cref="CanUserAddRows"/> dependency property.
         /// </summary>
         public static readonly StyledProperty<bool> CanUserAddRowsProperty =
@@ -120,6 +151,36 @@ internal
         {
             get { return GetValue(CanUserDeleteRowsProperty); }
             set { SetValue(CanUserDeleteRowsProperty, value); }
+        }
+
+        /// <summary>
+        /// Identifies the <see cref="CanUserPaste"/> dependency property.
+        /// </summary>
+        public static readonly StyledProperty<bool> CanUserPasteProperty =
+            AvaloniaProperty.Register<DataGrid, bool>(nameof(CanUserPaste));
+
+        /// <summary>
+        /// Gets or sets a value that indicates whether the user can paste clipboard content into cells.
+        /// </summary>
+        public bool CanUserPaste
+        {
+            get { return GetValue(CanUserPasteProperty); }
+            set { SetValue(CanUserPasteProperty, value); }
+        }
+
+        /// <summary>
+        /// Identifies the <see cref="AllowPasteConverterFallback"/> dependency property.
+        /// </summary>
+        public static readonly StyledProperty<bool> AllowPasteConverterFallbackProperty =
+            AvaloniaProperty.Register<DataGrid, bool>(nameof(AllowPasteConverterFallback), true);
+
+        /// <summary>
+        /// Gets or sets whether paste falls back to default conversion when a binding converter fails.
+        /// </summary>
+        public bool AllowPasteConverterFallback
+        {
+            get { return GetValue(AllowPasteConverterFallbackProperty); }
+            set { SetValue(AllowPasteConverterFallbackProperty, value); }
         }
 
         /// <summary>
@@ -474,6 +535,38 @@ internal
             set { SetValue(IsReadOnlyProperty, value); }
         }
 
+        /// <summary>
+        /// Identifies the <see cref="EditTriggers"/> dependency property.
+        /// </summary>
+        public static readonly StyledProperty<DataGridEditTriggers> EditTriggersProperty =
+            AvaloniaProperty.Register<DataGrid, DataGridEditTriggers>(
+                nameof(EditTriggers),
+                defaultValue: DataGridEditTriggers.Default);
+
+        /// <summary>
+        /// Gets or sets the user gestures that can enter edit mode.
+        /// </summary>
+        public DataGridEditTriggers EditTriggers
+        {
+            get { return GetValue(EditTriggersProperty); }
+            set { SetValue(EditTriggersProperty, value); }
+        }
+
+        /// <summary>
+        /// Identifies the <see cref="RestrictTextInputEditToCells"/> dependency property.
+        /// </summary>
+        public static readonly StyledProperty<bool> RestrictTextInputEditToCellsProperty =
+            AvaloniaProperty.Register<DataGrid, bool>(nameof(RestrictTextInputEditToCells));
+
+        /// <summary>
+        /// Gets or sets a value that indicates whether text input can begin editing only from data cells.
+        /// </summary>
+        public bool RestrictTextInputEditToCells
+        {
+            get { return GetValue(RestrictTextInputEditToCellsProperty); }
+            set { SetValue(RestrictTextInputEditToCellsProperty, value); }
+        }
+
         public static readonly StyledProperty<bool> AreRowGroupHeadersFrozenProperty =
             AvaloniaProperty.Register<DataGrid, bool>(
                 nameof(AreRowGroupHeadersFrozen),
@@ -603,6 +696,18 @@ internal
         {
             get { return GetValue(RowHeaderWidthProperty); }
             set { SetValue(RowHeaderWidthProperty, value); }
+        }
+
+        public static readonly StyledProperty<bool> ShowRowNumbersProperty =
+            AvaloniaProperty.Register<DataGrid, bool>(nameof(ShowRowNumbers));
+
+        /// <summary>
+        /// Gets or sets a value indicating whether row headers display 1-based row numbers.
+        /// </summary>
+        public bool ShowRowNumbers
+        {
+            get { return GetValue(ShowRowNumbersProperty); }
+            set { SetValue(ShowRowNumbersProperty, value); }
         }
 
 #if !DATAGRID_INTERNAL
@@ -968,6 +1073,58 @@ internal
                 defaultBindingMode: BindingMode.TwoWay);
 
         /// <summary>
+        /// Gets or sets the conditional formatting model that drives cell/row styling. If not provided, a default
+        /// model is created.
+        /// </summary>
+        public static readonly DirectProperty<DataGrid, Avalonia.Controls.DataGridConditionalFormatting.IConditionalFormattingModel> ConditionalFormattingModelProperty =
+            AvaloniaProperty.RegisterDirect<DataGrid, Avalonia.Controls.DataGridConditionalFormatting.IConditionalFormattingModel>(
+                nameof(ConditionalFormattingModel),
+                o => o.ConditionalFormattingModel,
+                (o, v) => o.ConditionalFormattingModel = v,
+                defaultBindingMode: BindingMode.TwoWay);
+
+        /// <summary>
+        /// Gets or sets the fill model that drives the fill handle behavior. If not provided, a default
+        /// fill model is created.
+        /// </summary>
+        public static readonly DirectProperty<DataGrid, IDataGridFillModel> FillModelProperty =
+            AvaloniaProperty.RegisterDirect<DataGrid, IDataGridFillModel>(
+                nameof(FillModel),
+                o => o.FillModel,
+                (o, v) => o.FillModel = v,
+                defaultBindingMode: BindingMode.TwoWay);
+
+        /// <summary>
+        /// Gets or sets the range interaction model that drives selection drag and fill handle ranges.
+        /// </summary>
+        public static readonly DirectProperty<DataGrid, Avalonia.Controls.DataGridInteractions.IDataGridRangeInteractionModel> RangeInteractionModelProperty =
+            AvaloniaProperty.RegisterDirect<DataGrid, Avalonia.Controls.DataGridInteractions.IDataGridRangeInteractionModel>(
+                nameof(RangeInteractionModel),
+                o => o.RangeInteractionModel,
+                (o, v) => o.RangeInteractionModel = v,
+                defaultBindingMode: BindingMode.TwoWay);
+
+        /// <summary>
+        /// Gets or sets the clipboard import model that drives paste behavior.
+        /// </summary>
+        public static readonly DirectProperty<DataGrid, Avalonia.Controls.DataGridClipboard.IDataGridClipboardImportModel> ClipboardImportModelProperty =
+            AvaloniaProperty.RegisterDirect<DataGrid, Avalonia.Controls.DataGridClipboard.IDataGridClipboardImportModel>(
+                nameof(ClipboardImportModel),
+                o => o.ClipboardImportModel,
+                (o, v) => o.ClipboardImportModel = v,
+                defaultBindingMode: BindingMode.TwoWay);
+
+        /// <summary>
+        /// Gets or sets the editing interaction model that drives edit triggers and text input behavior.
+        /// </summary>
+        public static readonly DirectProperty<DataGrid, Avalonia.Controls.DataGridEditing.IDataGridEditingInteractionModel> EditingInteractionModelProperty =
+            AvaloniaProperty.RegisterDirect<DataGrid, Avalonia.Controls.DataGridEditing.IDataGridEditingInteractionModel>(
+                nameof(EditingInteractionModel),
+                o => o.EditingInteractionModel,
+                (o, v) => o.EditingInteractionModel = v,
+                defaultBindingMode: BindingMode.TwoWay);
+
+        /// <summary>
         /// Gets or sets the hierarchical model that drives tree-like rows. If not provided, a default
         /// hierarchical model is created.
         /// </summary>
@@ -1016,7 +1173,7 @@ internal
                 defaultValue: DataGridClipboardExportFormat.Text);
 
         /// <summary>
-        /// Gets or sets the clipboard format emitted by the grid's default exporter.
+        /// Gets or sets the clipboard format emitted by the grid's default exporter. Use None to fall back to Text.
         /// </summary>
 #if !DATAGRID_INTERNAL
         public

@@ -329,6 +329,70 @@ public class DataGridClipboardExportTests
         }
     }
 
+    [AvaloniaFact]
+    public async Task Copy_Cell_Selection_Preserves_Columns()
+    {
+        var (grid, root, items) = CreateGrid();
+        try
+        {
+            grid.SelectionUnit = DataGridSelectionUnit.Cell;
+            grid.SelectionMode = DataGridSelectionMode.Extended;
+            grid.ClipboardCopyMode = DataGridClipboardCopyMode.IncludeHeader;
+
+            var nameColumn = grid.ColumnsInternal[0];
+            var valueColumn = grid.ColumnsInternal[1];
+
+            grid.SelectedCells.Add(new DataGridCellInfo(items[0], nameColumn, 0, 0));
+            grid.SelectedCells.Add(new DataGridCellInfo(items[1], valueColumn, 1, 1));
+
+            Assert.True(grid.CopySelectionToClipboard(DataGridClipboardExportFormat.Text));
+
+            var data = await WaitForClipboardAsync(root);
+            Assert.NotNull(data);
+
+            var text = await data!.TryGetTextAsync();
+            Assert.Equal("\"Name\"\t\"Value\"\r\n\"Alpha\"\t\"\"\r\n\"\"\t\"2\"\r\n", text);
+        }
+        finally
+        {
+            root.Close();
+        }
+    }
+
+    [AvaloniaFact]
+    public async Task Copy_Cell_Selection_Uses_Display_Order()
+    {
+        var (grid, root, items) = CreateGrid();
+        try
+        {
+            grid.SelectionUnit = DataGridSelectionUnit.Cell;
+            grid.SelectionMode = DataGridSelectionMode.Extended;
+            grid.ClipboardCopyMode = DataGridClipboardCopyMode.IncludeHeader;
+
+            var nameColumn = grid.ColumnsInternal[0];
+            var valueColumn = grid.ColumnsInternal[1];
+
+            nameColumn.DisplayIndex = 1;
+            valueColumn.DisplayIndex = 0;
+            grid.UpdateLayout();
+
+            grid.SelectedCells.Add(new DataGridCellInfo(items[0], nameColumn, 0, nameColumn.Index, true));
+            grid.SelectedCells.Add(new DataGridCellInfo(items[0], valueColumn, 0, valueColumn.Index, true));
+
+            Assert.True(grid.CopySelectionToClipboard(DataGridClipboardExportFormat.Text));
+
+            var data = await WaitForClipboardAsync(root);
+            Assert.NotNull(data);
+
+            var text = await data!.TryGetTextAsync();
+            Assert.Equal("\"Value\"\t\"Name\"\r\n\"1\"\t\"Alpha\"\r\n", text);
+        }
+        finally
+        {
+            root.Close();
+        }
+    }
+
     private static (DataGrid Grid, Window Root, List<Item> Items) CreateGrid()
     {
         var items = new List<Item>

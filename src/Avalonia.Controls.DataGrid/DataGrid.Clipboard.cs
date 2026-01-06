@@ -4,12 +4,18 @@
 
 #nullable disable
 
+using Avalonia;
 using Avalonia.Controls.Primitives;
+using Avalonia.Controls.Utils;
+using Avalonia.Data;
 using Avalonia.Input;
 using Avalonia.Input.Platform;
 using Avalonia.Interactivity;
+using Avalonia.Controls.DataGridClipboard;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
+using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -67,10 +73,21 @@ internal
             return CopySelectionToClipboard();
         }
 
+        private bool ProcessPasteKey()
+        {
+            if (!CanUserPaste || IsReadOnly)
+            {
+                return false;
+            }
+
+            PasteFromClipboard();
+            return true;
+        }
+
         /// <summary>
         /// Copies the current selection to the clipboard using the configured export formats and exporter.
         /// </summary>
-        /// <returns>True when data was placed on the clipboard; otherwise false.</returns>
+        /// <returns>True when the copy request was accepted; the clipboard data may be written asynchronously.</returns>
 #if !DATAGRID_INTERNAL
 public
 #else
@@ -85,7 +102,7 @@ internal
         /// Copies the current selection to the clipboard using the provided formats and the configured exporter.
         /// </summary>
         /// <param name="formats">The formats that should be emitted by the default exporter.</param>
-        /// <returns>True when data was placed on the clipboard; otherwise false.</returns>
+        /// <returns>True when the copy request was accepted; the clipboard data may be written asynchronously.</returns>
 #if !DATAGRID_INTERNAL
 public
 #else
@@ -101,7 +118,7 @@ internal
         /// </summary>
         /// <param name="formats">The formats that should be emitted by the default exporter.</param>
         /// <param name="exporter">A custom exporter used to build the clipboard data.</param>
-        /// <returns>True when data was placed on the clipboard; otherwise false.</returns>
+        /// <returns>True when the copy request was accepted; the clipboard data may be written asynchronously.</returns>
 #if !DATAGRID_INTERNAL
 public
 #else
@@ -114,8 +131,6 @@ internal
                 return false;
             }
 
-            var normalizedFormat = NormalizeClipboardFormats(formats);
-
             var rows = BuildClipboardRows();
             if (rows.Count == 0)
             {
@@ -123,6 +138,9 @@ internal
             }
 
             var activeExporter = exporter ?? new DataGridClipboardExporter(ClipboardFormatExporters);
+            var normalizedFormat = exporter == null
+                ? NormalizeClipboardFormats(formats)
+                : formats;
             var data = activeExporter.BuildClipboardData(
                 new DataGridClipboardExportContext(
                     this,
@@ -136,8 +154,7 @@ internal
                 return false;
             }
 
-            CopyToClipboard(data);
-            return true;
+            return CopyToClipboard(data);
         }
 
         private List<DataGridRowClipboardEventArgs> BuildClipboardRows()
@@ -184,17 +201,19 @@ internal
                 }
 
                 var orderedColumns = validCells
-                    .GroupBy(c => c.Column)
-                    .Select(g => g.First())
-                    .OrderBy(c => c.ColumnIndex)
+                    .Select(c => c.Column)
+                    .Where(c => c != null)
+                    .Distinct()
+                    .OrderBy(c => c.DisplayIndex)
+                    .ThenBy(c => c.Index)
                     .ToList();
 
                 if (ClipboardCopyMode == DataGridClipboardCopyMode.IncludeHeader)
                 {
                     DataGridRowClipboardEventArgs headerArgs = new DataGridRowClipboardEventArgs(null, true, CopyingRowClipboardContentEvent, this);
-                    foreach (var cell in orderedColumns)
+                    foreach (var column in orderedColumns)
                     {
-                        headerArgs.ClipboardRowContent.Add(new DataGridClipboardCellContent(null, cell.Column, cell.Column.Header));
+                        headerArgs.ClipboardRowContent.Add(new DataGridClipboardCellContent(null, column, column.Header));
                     }
                     OnCopyingRowClipboardContent(headerArgs);
                     rows.Add(headerArgs);
@@ -204,10 +223,26 @@ internal
                 {
                     var item = DataConnection?.GetDataItem(rowGroup.Key);
                     DataGridRowClipboardEventArgs itemArgs = new DataGridRowClipboardEventArgs(item, false, CopyingRowClipboardContentEvent, this);
-                    foreach (var cell in rowGroup.OrderBy(c => c.ColumnIndex))
+                    var rowCells = new Dictionary<DataGridColumn, DataGridCellInfo>();
+                    foreach (var cell in rowGroup)
                     {
-                        object content = cell.Column.GetCellValue(item ?? cell.Item, cell.Column.ClipboardContentBinding);
-                        itemArgs.ClipboardRowContent.Add(new DataGridClipboardCellContent(item, cell.Column, content));
+                        if (cell.Column != null)
+                        {
+                            rowCells[cell.Column] = cell;
+                        }
+                    }
+
+                    foreach (var column in orderedColumns)
+                    {
+                        if (rowCells.TryGetValue(column, out var cell))
+                        {
+                            object content = cell.Column.GetCellValue(item ?? cell.Item, cell.Column.ClipboardContentBinding);
+                            itemArgs.ClipboardRowContent.Add(new DataGridClipboardCellContent(item, cell.Column, content));
+                        }
+                        else
+                        {
+                            itemArgs.ClipboardRowContent.Add(new DataGridClipboardCellContent(item, column, string.Empty));
+                        }
                     }
                     OnCopyingRowClipboardContent(itemArgs);
                     rows.Add(itemArgs);
@@ -233,36 +268,194 @@ internal
             };
         }
 
-
-        private async void CopyToClipboard(IAsyncDataTransfer data)
+        private async void PasteFromClipboard()
         {
             var clipboard = TopLevel.GetTopLevel(this)?.Clipboard;
-
             if (clipboard == null)
             {
                 return;
             }
 
-            if (data != null)
+            var text = await clipboard.GetTextAsync();
+            if (string.IsNullOrEmpty(text))
             {
-                for (var attempt = 0; attempt < 3; attempt++)
-                {
-                    try
-                    {
-                        await clipboard.SetDataAsync(data);
-                        break;
-                    }
-                    catch
-                    {
-                        if (attempt == 2)
-                        {
-                            throw;
-                        }
+                return;
+            }
 
-                        await Task.Delay(10);
+            PasteText(text);
+        }
+
+        internal bool PasteText(string text)
+        {
+            var model = ClipboardImportModel;
+            if (model == null)
+            {
+                return false;
+            }
+
+            var selectedCells = SelectedCells?.Where(c => c.IsValid).ToList() ?? new List<DataGridCellInfo>();
+            var context = new DataGridClipboardImportContext(this, text, selectedCells);
+            return model.Paste(context);
+        }
+
+        internal bool TrySetCellValue(object item, int columnIndex, string text)
+        {
+            if (columnIndex < 0 || columnIndex >= ColumnsItemsInternal.Count)
+            {
+                return false;
+            }
+
+            var column = ColumnsItemsInternal[columnIndex];
+            if (column == null || GetColumnEffectiveReadOnlyState(column))
+            {
+                return false;
+            }
+
+            var binding = column.ClipboardContentBinding;
+            var bindingPath = GetColumnBindingPath(column);
+            if (string.IsNullOrWhiteSpace(bindingPath))
+            {
+                bindingPath = GetBindingPath(binding);
+            }
+            if (string.IsNullOrWhiteSpace(bindingPath))
+            {
+                return false;
+            }
+
+            var propertyType = item.GetType().GetNestedPropertyType(bindingPath);
+            if (propertyType == null)
+            {
+                return false;
+            }
+
+            object converted;
+            if (!TryConvertClipboardText(binding, text, propertyType, out converted))
+            {
+                return false;
+            }
+
+            if (converted == AvaloniaProperty.UnsetValue || converted == BindingOperations.DoNothing)
+            {
+                return false;
+            }
+
+            return TypeHelper.TrySetNestedPropertyValue(item, bindingPath, converted, out _);
+        }
+
+        private bool TryConvertClipboardText(IBinding binding, string text, Type propertyType, out object converted)
+        {
+            converted = null;
+
+            var bindingBase = binding as BindingBase;
+            if (bindingBase?.Converter != null)
+            {
+                var culture = bindingBase.ConverterCulture ?? CultureInfo.CurrentCulture;
+                try
+                {
+                    converted = bindingBase.Converter.ConvertBack(text, propertyType, bindingBase.ConverterParameter, culture);
+                }
+                catch
+                {
+                    if (!AllowPasteConverterFallback)
+                    {
+                        return false;
                     }
+
+                    return TryConvertClipboardTextFallback(text, propertyType, out converted);
+                }
+
+                if (converted != AvaloniaProperty.UnsetValue && converted != BindingOperations.DoNothing)
+                {
+                    return true;
+                }
+
+                if (!AllowPasteConverterFallback)
+                {
+                    return false;
+                }
+
+                return TryConvertClipboardTextFallback(text, propertyType, out converted);
+            }
+
+            return TryConvertClipboardTextFallback(text, propertyType, out converted);
+        }
+
+        private static bool TryConvertClipboardTextFallback(string text, Type propertyType, out object converted)
+        {
+            try
+            {
+                converted = DataGridValueConverter.Instance.ConvertBack(text, propertyType, null, CultureInfo.CurrentCulture);
+            }
+            catch
+            {
+                converted = null;
+                return false;
+            }
+
+            return true;
+        }
+
+
+        private bool CopyToClipboard(IAsyncDataTransfer data)
+        {
+            var clipboard = TopLevel.GetTopLevel(this)?.Clipboard;
+
+            if (clipboard == null)
+            {
+                return false;
+            }
+
+            if (data == null)
+            {
+                return false;
+            }
+
+            var copyTask = TryCopyToClipboardAsync(clipboard, data);
+            if (copyTask.IsCompleted)
+            {
+                var result = copyTask.Status == TaskStatus.RanToCompletion && copyTask.Result;
+                if (!result)
+                {
+                    Debug.WriteLine("[DataGrid] Clipboard copy failed.");
+                }
+                return result;
+            }
+
+            _ = copyTask.ContinueWith(
+                task =>
+                {
+                    var succeeded = task.Status == TaskStatus.RanToCompletion && task.Result;
+                    if (!succeeded)
+                    {
+                        Debug.WriteLine("[DataGrid] Clipboard copy failed.");
+                    }
+                },
+                TaskScheduler.Default);
+
+            return true;
+        }
+
+        private static async Task<bool> TryCopyToClipboardAsync(IClipboard clipboard, IAsyncDataTransfer data)
+        {
+            for (var attempt = 0; attempt < 3; attempt++)
+            {
+                try
+                {
+                    await clipboard.SetDataAsync(data);
+                    return true;
+                }
+                catch
+                {
+                    if (attempt == 2)
+                    {
+                        return false;
+                    }
+
+                    await Task.Delay(10);
                 }
             }
+
+            return false;
         }
 
         private ContentControl _clipboardContentControl;

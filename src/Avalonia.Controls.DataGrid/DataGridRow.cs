@@ -196,6 +196,7 @@ internal
         static DataGridRow()
         {
             HeaderProperty.Changed.AddClassHandler<DataGridRow>((x, e) => x.OnHeaderChanged(e));
+            IndexProperty.Changed.AddClassHandler<DataGridRow>((x, e) => x.OnIndexChanged(e));
             DetailsTemplateProperty.Changed.AddClassHandler<DataGridRow>((x, e) => x.OnDetailsTemplateChanged(e));
             AreDetailsVisibleProperty.Changed.AddClassHandler<DataGridRow>((x, e) => x.OnAreDetailsVisibleChanged(e));
             PointerPressedEvent.AddClassHandler<DataGridRow>((x, e) => x.DataGridRow_PointerPressed(e));
@@ -247,6 +248,11 @@ internal
             {
                 _headerElement.Content = e.NewValue;
             }
+        }
+
+        private void OnIndexChanged(AvaloniaPropertyChangedEventArgs e)
+        {
+            OwningGrid?.OnRowIndexChanged(this);
         }
 
         private void OnDetailsTemplateChanged(AvaloniaPropertyChangedEventArgs e)

@@ -13,6 +13,11 @@ using Avalonia.Controls.DataGridSelection;
 using Avalonia.Controls.Selection;
 using Avalonia.Controls.DataGridFiltering;
 using Avalonia.Controls.DataGridSearching;
+using Avalonia.Controls.DataGridFilling;
+using Avalonia.Controls.DataGridConditionalFormatting;
+using Avalonia.Controls.DataGridClipboard;
+using Avalonia.Controls.DataGridEditing;
+using Avalonia.Controls.DataGridInteractions;
 using Avalonia.Controls.DataGridHierarchical;
 using Avalonia.Controls.DataGridDragDrop;
 using Avalonia.Input;
@@ -56,6 +61,9 @@ namespace Avalonia.Controls
     [TemplatePart(DATAGRID_elementFrozenColumnScrollBarSpacerRightName, typeof(Control))]
     [TemplatePart(DATAGRID_elementHorizontalScrollbarName,         typeof(ScrollBar))]
     [TemplatePart(DATAGRID_elementRowsPresenterName,               typeof(DataGridRowsPresenter))]
+    [TemplatePart(DATAGRID_elementSelectionOverlayName,            typeof(Canvas))]
+    [TemplatePart(DATAGRID_elementSelectionOutlineName,            typeof(Border))]
+    [TemplatePart(DATAGRID_elementFillHandleName,                  typeof(Border))]
     [TemplatePart(DATAGRID_elementScrollViewerName,                typeof(ScrollViewer))]
     [TemplatePart(DATAGRID_elementTopLeftCornerHeaderName,         typeof(ContentControl))]
     [TemplatePart(DATAGRID_elementTopRightCornerHeaderName,        typeof(ContentControl))]
@@ -74,6 +82,9 @@ internal
         private const string DATAGRID_elementFrozenColumnScrollBarSpacerName = "PART_FrozenColumnScrollBarSpacer";
         private const string DATAGRID_elementFrozenColumnScrollBarSpacerRightName = "PART_FrozenColumnScrollBarSpacerRight";
         private const string DATAGRID_elementScrollViewerName = "PART_ScrollViewer";
+        private const string DATAGRID_elementSelectionOverlayName = "PART_SelectionOverlay";
+        private const string DATAGRID_elementSelectionOutlineName = "PART_SelectionOutline";
+        private const string DATAGRID_elementFillHandleName = "PART_FillHandle";
         private const string DATAGRID_elementTopLeftCornerHeaderName = "PART_TopLeftCornerHeader";
         private const string DATAGRID_elementTopRightCornerHeaderName = "PART_TopRightCornerHeader";
         private const string DATAGRID_elementBottomRightCornerHeaderName = "PART_BottomRightCorner";
@@ -258,6 +269,9 @@ internal
         private DataGridColumnHeadersPresenter _columnHeadersPresenter;
         private DataGridRowsPresenter _rowsPresenter;
         private ScrollViewer _scrollViewer;
+        private Canvas _selectionOverlay;
+        private Border _selectionOutline;
+        private Border _fillHandle;
 
         private ContentControl _topLeftCornerHeader;
         private ContentControl _topRightCornerHeader;
@@ -292,6 +306,18 @@ internal
         private Avalonia.Controls.DataGridSearching.DataGridSearchAdapter _searchAdapter;
         private Avalonia.Controls.DataGridSearching.IDataGridSearchModelFactory _searchModelFactory;
         private Avalonia.Controls.DataGridSearching.IDataGridSearchAdapterFactory _searchAdapterFactory;
+        private Avalonia.Controls.DataGridConditionalFormatting.IConditionalFormattingModel _conditionalFormattingModel;
+        private Avalonia.Controls.DataGridConditionalFormatting.DataGridConditionalFormattingAdapter _conditionalFormattingAdapter;
+        private Avalonia.Controls.DataGridConditionalFormatting.IDataGridConditionalFormattingModelFactory _conditionalFormattingModelFactory;
+        private Avalonia.Controls.DataGridConditionalFormatting.IDataGridConditionalFormattingAdapterFactory _conditionalFormattingAdapterFactory;
+        private Avalonia.Controls.DataGridFilling.IDataGridFillModel _fillModel;
+        private Avalonia.Controls.DataGridFilling.IDataGridFillModelFactory _fillModelFactory;
+        private Avalonia.Controls.DataGridInteractions.IDataGridRangeInteractionModel _rangeInteractionModel;
+        private Avalonia.Controls.DataGridInteractions.IDataGridRangeInteractionModelFactory _rangeInteractionModelFactory;
+        private Avalonia.Controls.DataGridClipboard.IDataGridClipboardImportModel _clipboardImportModel;
+        private Avalonia.Controls.DataGridClipboard.IDataGridClipboardImportModelFactory _clipboardImportModelFactory;
+        private Avalonia.Controls.DataGridEditing.IDataGridEditingInteractionModel _editingInteractionModel;
+        private Avalonia.Controls.DataGridEditing.IDataGridEditingInteractionModelFactory _editingInteractionModelFactory;
         private readonly Dictionary<SearchCellKey, SearchResult> _searchResultsMap = new();
         private readonly HashSet<int> _searchRowMatches = new();
         private SearchCellKey? _currentSearchCell;
@@ -338,6 +364,7 @@ internal
         private IndexToValueTable<bool> _showDetailsTable;
         private DataGridSelectedItemsCollection _selectedItems;
         private IList _selectedItemsBinding;
+        private int _columnHeaderAnchorIndex = -1;
         private INotifyCollectionChanged _selectedItemsBindingNotifications;
         private IList<DataGridCellInfo> _selectedCellsBinding;
         private INotifyCollectionChanged _selectedCellsBindingNotifications;
@@ -464,6 +491,7 @@ internal
             CanUserDeleteRowsProperty.Changed.AddClassHandler<DataGrid>((x, e) => x.OnCanUserDeleteRowsChanged(e));
             RowHeightProperty.Changed.AddClassHandler<DataGrid>((x, e) => x.OnRowHeightChanged(e));
             RowHeaderWidthProperty.Changed.AddClassHandler<DataGrid>((x, e) => x.OnRowHeaderWidthChanged(e));
+            ShowRowNumbersProperty.Changed.AddClassHandler<DataGrid>((x, e) => x.OnShowRowNumbersChanged(e));
             SelectionModeProperty.Changed.AddClassHandler<DataGrid>((x, e) => x.OnSelectionModeChanged(e));
             SelectionUnitProperty.Changed.AddClassHandler<DataGrid>((x, e) => x.OnSelectionUnitChanged(e));
             VerticalGridLinesBrushProperty.Changed.AddClassHandler<DataGrid>((x, e) => x.OnVerticalGridLinesBrushChanged(e));
@@ -511,6 +539,11 @@ internal
             AddHandler(InputElement.PointerMovedEvent, DataGrid_DragSelectionPointerMoved, RoutingStrategies.Tunnel, handledEventsToo: true);
             AddHandler(InputElement.PointerReleasedEvent, DataGrid_DragSelectionPointerReleased, RoutingStrategies.Tunnel, handledEventsToo: true);
             AddHandler(InputElement.PointerCaptureLostEvent, DataGrid_DragSelectionPointerCaptureLost, handledEventsToo: true);
+            AddHandler(InputElement.PointerPressedEvent, DataGrid_FillHandlePointerPressed, RoutingStrategies.Tunnel, handledEventsToo: true);
+            AddHandler(InputElement.PointerMovedEvent, DataGrid_FillHandlePointerMoved, RoutingStrategies.Tunnel, handledEventsToo: true);
+            AddHandler(InputElement.PointerReleasedEvent, DataGrid_FillHandlePointerReleased, RoutingStrategies.Tunnel, handledEventsToo: true);
+            AddHandler(InputElement.PointerCaptureLostEvent, DataGrid_FillHandlePointerCaptureLost, RoutingStrategies.Tunnel, handledEventsToo: true);
+            AddHandler(DataGridColumnHeader.HeaderPointerPressedEvent, DataGrid_ColumnHeaderPointerPressed, handledEventsToo: true);
 
             _loadedRows = new List<DataGridRow>();
             _lostFocusActions = new Queue<Action>();
@@ -539,6 +572,11 @@ internal
             SetSortingModel(CreateSortingModel(), initializing: true);
             SetFilteringModel(CreateFilteringModel(), initializing: true);
             SetSearchModel(CreateSearchModel(), initializing: true);
+            SetConditionalFormattingModel(CreateConditionalFormattingModel(), initializing: true);
+            SetFillModel(CreateFillModel());
+            SetRangeInteractionModel(CreateRangeInteractionModel());
+            SetClipboardImportModel(CreateClipboardImportModel());
+            SetEditingInteractionModel(CreateEditingInteractionModel());
 
             AnchorSlot = -1;
             _lastEstimatedRow = -1;
@@ -1768,6 +1806,47 @@ internal
             return _searchModelFactory?.Create() ?? new SearchModel();
         }
 
+        protected virtual Avalonia.Controls.DataGridConditionalFormatting.IConditionalFormattingModel CreateConditionalFormattingModel()
+        {
+            return _conditionalFormattingModelFactory?.Create() ?? new Avalonia.Controls.DataGridConditionalFormatting.ConditionalFormattingModel();
+        }
+
+        /// <summary>
+        /// Creates the default fill model for the grid. Override or set <see cref="FillModelFactory"/>
+        /// before construction completes to supply a custom implementation.
+        /// </summary>
+        protected virtual IDataGridFillModel CreateFillModel()
+        {
+            return _fillModelFactory?.Create() ?? new DataGridFillModel();
+        }
+
+        /// <summary>
+        /// Creates the default range interaction model for the grid. Override or set
+        /// <see cref="RangeInteractionModelFactory"/> before construction completes to supply a custom implementation.
+        /// </summary>
+        protected virtual IDataGridRangeInteractionModel CreateRangeInteractionModel()
+        {
+            return _rangeInteractionModelFactory?.Create() ?? new DataGridRangeInteractionModel();
+        }
+
+        /// <summary>
+        /// Creates the default clipboard import model for the grid. Override or set
+        /// <see cref="ClipboardImportModelFactory"/> before construction completes to supply a custom implementation.
+        /// </summary>
+        protected virtual Avalonia.Controls.DataGridClipboard.IDataGridClipboardImportModel CreateClipboardImportModel()
+        {
+            return _clipboardImportModelFactory?.Create() ?? new Avalonia.Controls.DataGridClipboard.DataGridClipboardImportModel();
+        }
+
+        /// <summary>
+        /// Creates the default editing interaction model for the grid. Override or set
+        /// <see cref="EditingInteractionModelFactory"/> before construction completes to supply a custom implementation.
+        /// </summary>
+        protected virtual Avalonia.Controls.DataGridEditing.IDataGridEditingInteractionModel CreateEditingInteractionModel()
+        {
+            return _editingInteractionModelFactory?.Create() ?? new Avalonia.Controls.DataGridEditing.DataGridEditingInteractionModel();
+        }
+
         /// <summary>
         /// Optional factory used when creating the default sorting model.
         /// </summary>
@@ -1793,6 +1872,51 @@ internal
         {
             get => _searchModelFactory;
             set => _searchModelFactory = value;
+        }
+
+        /// <summary>
+        /// Optional factory used when creating the default conditional formatting model.
+        /// </summary>
+        public Avalonia.Controls.DataGridConditionalFormatting.IDataGridConditionalFormattingModelFactory ConditionalFormattingModelFactory
+        {
+            get => _conditionalFormattingModelFactory;
+            set => _conditionalFormattingModelFactory = value;
+        }
+
+        /// <summary>
+        /// Optional factory used when creating the default fill model.
+        /// </summary>
+        public IDataGridFillModelFactory FillModelFactory
+        {
+            get => _fillModelFactory;
+            set => _fillModelFactory = value;
+        }
+
+        /// <summary>
+        /// Optional factory used when creating the default range interaction model.
+        /// </summary>
+        public IDataGridRangeInteractionModelFactory RangeInteractionModelFactory
+        {
+            get => _rangeInteractionModelFactory;
+            set => _rangeInteractionModelFactory = value;
+        }
+
+        /// <summary>
+        /// Optional factory used when creating the default clipboard import model.
+        /// </summary>
+        public Avalonia.Controls.DataGridClipboard.IDataGridClipboardImportModelFactory ClipboardImportModelFactory
+        {
+            get => _clipboardImportModelFactory;
+            set => _clipboardImportModelFactory = value;
+        }
+
+        /// <summary>
+        /// Optional factory used when creating the default editing interaction model.
+        /// </summary>
+        public Avalonia.Controls.DataGridEditing.IDataGridEditingInteractionModelFactory EditingInteractionModelFactory
+        {
+            get => _editingInteractionModelFactory;
+            set => _editingInteractionModelFactory = value;
         }
 
         /// <summary>
@@ -1915,6 +2039,41 @@ internal
         }
 
         /// <summary>
+        /// Optional factory for creating the conditional formatting adapter. Use this to plug in a custom
+        /// adapter without subclassing <see cref="DataGrid"/>.
+        /// </summary>
+#if !DATAGRID_INTERNAL
+        public
+#else
+        internal
+#endif
+        Avalonia.Controls.DataGridConditionalFormatting.IDataGridConditionalFormattingAdapterFactory ConditionalFormattingAdapterFactory
+        {
+            get => _conditionalFormattingAdapterFactory;
+            set
+            {
+                if (_conditionalFormattingAdapterFactory == value)
+                {
+                    return;
+                }
+
+                _conditionalFormattingAdapterFactory = value;
+
+                if (_conditionalFormattingModel != null)
+                {
+                    if (_conditionalFormattingAdapter != null)
+                    {
+                        _conditionalFormattingAdapter.FormattingChanged -= ConditionalFormattingAdapter_FormattingChanged;
+                        _conditionalFormattingAdapter.Dispose();
+                    }
+                    _conditionalFormattingAdapter = CreateConditionalFormattingAdapter(_conditionalFormattingModel);
+                    _conditionalFormattingAdapter.FormattingChanged += ConditionalFormattingAdapter_FormattingChanged;
+                    UpdateConditionalFormattingAdapterView();
+                }
+            }
+        }
+
+        /// <summary>
         /// Enables or disables multi-column sorting (Shift + click).
         /// </summary>
         public bool IsMultiSortEnabled
@@ -1985,6 +2144,51 @@ internal
         {
             get => _searchModel;
             set => SetSearchModel(value);
+        }
+
+        /// <summary>
+        /// Gets or sets the conditional formatting model that drives cell and row styling.
+        /// </summary>
+        public Avalonia.Controls.DataGridConditionalFormatting.IConditionalFormattingModel ConditionalFormattingModel
+        {
+            get => _conditionalFormattingModel;
+            set => SetConditionalFormattingModel(value);
+        }
+
+        /// <summary>
+        /// Gets or sets the fill model that drives the fill handle behavior.
+        /// </summary>
+        public IDataGridFillModel FillModel
+        {
+            get => _fillModel;
+            set => SetFillModel(value);
+        }
+
+        /// <summary>
+        /// Gets or sets the range interaction model that drives selection drag and fill handle ranges.
+        /// </summary>
+        public IDataGridRangeInteractionModel RangeInteractionModel
+        {
+            get => _rangeInteractionModel;
+            set => SetRangeInteractionModel(value);
+        }
+
+        /// <summary>
+        /// Gets or sets the clipboard import model that drives paste behavior.
+        /// </summary>
+        public Avalonia.Controls.DataGridClipboard.IDataGridClipboardImportModel ClipboardImportModel
+        {
+            get => _clipboardImportModel;
+            set => SetClipboardImportModel(value);
+        }
+
+        /// <summary>
+        /// Gets or sets the editing interaction model that drives edit triggers and text input behavior.
+        /// </summary>
+        public Avalonia.Controls.DataGridEditing.IDataGridEditingInteractionModel EditingInteractionModel
+        {
+            get => _editingInteractionModel;
+            set => SetEditingInteractionModel(value);
         }
 
         /// <summary>
@@ -2099,6 +2303,32 @@ internal
             if (adapter == null)
             {
                 throw new InvalidOperationException("Search adapter factory returned null.");
+            }
+
+            return adapter;
+        }
+
+        /// <summary>
+        /// Creates the adapter that connects the conditional formatting model to the grid.
+        /// </summary>
+        /// <param name="model">Conditional formatting model instance.</param>
+        /// <returns>Adapter that will compute formatting matches for the view.</returns>
+#if !DATAGRID_INTERNAL
+        protected
+#else
+        internal
+#endif
+        virtual Avalonia.Controls.DataGridConditionalFormatting.DataGridConditionalFormattingAdapter CreateConditionalFormattingAdapter(
+            Avalonia.Controls.DataGridConditionalFormatting.IConditionalFormattingModel model)
+        {
+            var adapter = _conditionalFormattingAdapterFactory?.Create(this, model)
+                ?? new Avalonia.Controls.DataGridConditionalFormatting.DataGridConditionalFormattingAdapter(
+                    model,
+                    () => ColumnsItemsInternal);
+
+            if (adapter == null)
+            {
+                throw new InvalidOperationException("Conditional formatting adapter factory returned null.");
             }
 
             return adapter;
@@ -3035,6 +3265,11 @@ internal
             _searchAdapter?.AttachView(DataConnection?.CollectionView);
         }
 
+        private void UpdateConditionalFormattingAdapterView()
+        {
+            _conditionalFormattingAdapter?.AttachView(DataConnection?.CollectionView);
+        }
+
         internal void RefreshColumnSortStates()
         {
             if (ColumnsItemsInternal == null)
@@ -3450,6 +3685,100 @@ internal
 
             RefreshSearchStates();
             RaisePropertyChanged(SearchModelProperty, oldModel, _searchModel);
+        }
+
+        private void SetConditionalFormattingModel(
+            Avalonia.Controls.DataGridConditionalFormatting.IConditionalFormattingModel model,
+            bool initializing = false)
+        {
+            var oldModel = _conditionalFormattingModel;
+            var newModel = model ?? CreateConditionalFormattingModel();
+
+            if (ReferenceEquals(oldModel, newModel))
+            {
+                return;
+            }
+
+            if (_conditionalFormattingAdapter != null)
+            {
+                _conditionalFormattingAdapter.FormattingChanged -= ConditionalFormattingAdapter_FormattingChanged;
+                _conditionalFormattingAdapter.Dispose();
+            }
+            _conditionalFormattingAdapter = null;
+
+            _conditionalFormattingModel = newModel;
+
+            _conditionalFormattingAdapter = CreateConditionalFormattingAdapter(_conditionalFormattingModel);
+            _conditionalFormattingAdapter.FormattingChanged += ConditionalFormattingAdapter_FormattingChanged;
+
+            if (!initializing)
+            {
+                UpdateConditionalFormattingAdapterView();
+            }
+
+            RefreshConditionalFormatting();
+            RaisePropertyChanged(ConditionalFormattingModelProperty, oldModel, _conditionalFormattingModel);
+        }
+
+        private void ConditionalFormattingAdapter_FormattingChanged(object sender, EventArgs e)
+        {
+            RefreshConditionalFormatting();
+        }
+
+        private void SetFillModel(IDataGridFillModel model)
+        {
+            var oldModel = _fillModel;
+            var newModel = model ?? CreateFillModel();
+
+            if (ReferenceEquals(oldModel, newModel))
+            {
+                return;
+            }
+
+            _fillModel = newModel;
+            RaisePropertyChanged(FillModelProperty, oldModel, _fillModel);
+        }
+
+        private void SetRangeInteractionModel(IDataGridRangeInteractionModel model)
+        {
+            var oldModel = _rangeInteractionModel;
+            var newModel = model ?? CreateRangeInteractionModel();
+
+            if (ReferenceEquals(oldModel, newModel))
+            {
+                return;
+            }
+
+            _rangeInteractionModel = newModel;
+            RaisePropertyChanged(RangeInteractionModelProperty, oldModel, _rangeInteractionModel);
+        }
+
+        private void SetClipboardImportModel(Avalonia.Controls.DataGridClipboard.IDataGridClipboardImportModel model)
+        {
+            var oldModel = _clipboardImportModel;
+            var newModel = model ?? CreateClipboardImportModel();
+
+            if (ReferenceEquals(oldModel, newModel))
+            {
+                return;
+            }
+
+            _clipboardImportModel = newModel;
+            RaisePropertyChanged(ClipboardImportModelProperty, oldModel, _clipboardImportModel);
+        }
+
+        private void SetEditingInteractionModel(Avalonia.Controls.DataGridEditing.IDataGridEditingInteractionModel model)
+        {
+            var oldModel = _editingInteractionModel;
+            var newModel = model ?? CreateEditingInteractionModel();
+
+            if (ReferenceEquals(oldModel, newModel))
+            {
+                return;
+            }
+
+            _editingInteractionModel = newModel;
+            RaisePropertyChanged(EditingInteractionModelProperty, oldModel, _editingInteractionModel);
         }
 
         private void FilteringModel_PropertyChanged(object sender, PropertyChangedEventArgs e)

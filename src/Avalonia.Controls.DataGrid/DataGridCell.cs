@@ -245,7 +245,8 @@ internal
                     bool shouldHandleSelection = !e.Handled || !focusWithin || !isSelected || ctrl;
                     if (shouldHandleSelection)
                     {
-                        bool allowEdit = !e.Handled && focusWithin && isSelected && !ctrl;
+                        bool allowEdit = !e.Handled && focusWithin && isSelected && !ctrl &&
+                                         OwningGrid.ShouldBeginEditOnPointer(e);
                         var handled = OwningGrid.UpdateStateOnMouseLeftButtonDown(e, ColumnIndex, OwningRow.Slot, allowEdit);
                         OwningGrid.TryBeginSelectionDrag(e, ColumnIndex, shouldHandleSelection, allowEdit);
 

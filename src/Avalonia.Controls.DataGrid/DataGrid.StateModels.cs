@@ -7,6 +7,7 @@ using System;
 using System.Collections.Generic;
 using Avalonia.Collections;
 using Avalonia.Controls.DataGridFiltering;
+using Avalonia.Controls.DataGridConditionalFormatting;
 using Avalonia.Controls.DataGridHierarchical;
 using Avalonia.Controls.DataGridSearching;
 using Avalonia.Controls.DataGridSorting;
@@ -26,12 +27,13 @@ namespace Avalonia.Controls
         Sorting = 1 << 1,
         Filtering = 1 << 2,
         Searching = 1 << 3,
-        Grouping = 1 << 4,
-        Hierarchical = 1 << 5,
-        Selection = 1 << 6,
-        Scroll = 1 << 7,
-        Layout = Columns | Sorting | Filtering | Searching | Grouping,
-        View = Sorting | Filtering | Searching | Grouping,
+        ConditionalFormatting = 1 << 4,
+        Grouping = 1 << 5,
+        Hierarchical = 1 << 6,
+        Selection = 1 << 7,
+        Scroll = 1 << 8,
+        Layout = Columns | Sorting | Filtering | Searching | ConditionalFormatting | Grouping,
+        View = Sorting | Filtering | Searching | ConditionalFormatting | Grouping,
         All = Layout | Hierarchical | Selection | Scroll
     }
 
@@ -72,6 +74,8 @@ namespace Avalonia.Controls
 
         public DataGridSearchState Search { get; set; }
 
+        public DataGridConditionalFormattingState ConditionalFormatting { get; set; }
+
         public DataGridColumnLayoutState Columns { get; set; }
 
         public DataGridGroupingState Grouping { get; set; }
@@ -93,6 +97,8 @@ namespace Avalonia.Controls
         public DataGridFilteringState Filtering { get; set; }
 
         public DataGridSearchState Search { get; set; }
+
+        public DataGridConditionalFormattingState ConditionalFormatting { get; set; }
 
         public DataGridGroupingState Grouping { get; set; }
     }
@@ -239,6 +245,16 @@ namespace Avalonia.Controls
         public int RowIndex { get; set; } = -1;
 
         public int ColumnIndex { get; set; } = -1;
+    }
+
+    #if !DATAGRID_INTERNAL
+    public
+    #else
+    internal
+    #endif
+    sealed class DataGridConditionalFormattingState
+    {
+        public IReadOnlyList<ConditionalFormattingDescriptor> Descriptors { get; set; }
     }
 
     #if !DATAGRID_INTERNAL

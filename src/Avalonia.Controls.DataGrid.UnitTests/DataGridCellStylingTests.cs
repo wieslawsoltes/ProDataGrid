@@ -9,6 +9,7 @@ using Avalonia.Controls.Primitives;
 using Avalonia.Data;
 using Avalonia.Headless.XUnit;
 using Avalonia.Markup.Xaml.Styling;
+using Avalonia.Media;
 using Avalonia.Styling;
 using Avalonia.VisualTree;
 using Xunit;
@@ -73,6 +74,26 @@ public class DataGridCellStylingTests
             Assert.Same(column, cell.OwningColumn);
             Assert.NotNull(cell.OwningRow);
             Assert.Same(owningRow, cell.OwningRow);
+        }
+        finally
+        {
+            root.Close();
+        }
+    }
+
+    [AvaloniaFact]
+    public void ApplyCellBindings_Does_Not_Clear_Local_Background_When_No_Binding()
+    {
+        var (grid, root, column, _) = CreateGridWithCellClasses();
+        try
+        {
+            var cell = GetCellForColumn(grid, column);
+            var brush = new SolidColorBrush(Colors.Red);
+            cell.Background = brush;
+
+            column.ApplyCellBindings(cell);
+
+            Assert.Same(brush, cell.Background);
         }
         finally
         {

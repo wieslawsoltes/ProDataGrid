@@ -16,7 +16,7 @@ internal
     enum DataGridClipboardExportFormat
     {
         /// <summary>
-        /// No clipboard export format specified.
+        /// No clipboard export format specified. The built-in exporter falls back to Text.
         /// </summary>
         None,
         /// <summary>

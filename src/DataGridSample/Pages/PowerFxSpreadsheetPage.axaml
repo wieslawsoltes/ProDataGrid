@@ -1,0 +1,295 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:models="clr-namespace:DataGridSample.Models"
+             xmlns:viewModels="clr-namespace:DataGridSample.ViewModels"
+             x:Class="DataGridSample.Pages.PowerFxSpreadsheetPage"
+             x:DataType="viewModels:PowerFxSpreadsheetViewModel">
+  <UserControl.DataContext>
+    <viewModels:PowerFxSpreadsheetViewModel />
+  </UserControl.DataContext>
+
+  <UserControl.Resources>
+    <ControlTheme x:Key="PowerFxSheetErrorCellTheme"
+                  TargetType="DataGridCell"
+                  BasedOn="{StaticResource {x:Type DataGridCell}}">
+      <Setter Property="Background" Value="#2DFFC107" />
+      <Setter Property="Foreground" Value="#B05A00" />
+    </ControlTheme>
+    <ControlTheme x:Key="PowerFxSheetNegativeCellTheme"
+                  TargetType="DataGridCell"
+                  BasedOn="{StaticResource {x:Type DataGridCell}}">
+      <Setter Property="Background" Value="#1CE74C3C" />
+      <Setter Property="Foreground" Value="#C0392B" />
+    </ControlTheme>
+    <ControlTheme x:Key="PowerFxSheetPositiveCellTheme"
+                  TargetType="DataGridCell"
+                  BasedOn="{StaticResource {x:Type DataGridCell}}">
+      <Setter Property="Background" Value="#1C2ECC71" />
+    </ControlTheme>
+    <ControlTheme x:Key="PowerFxSheetFormulaCellTheme"
+                  TargetType="DataGridCell"
+                  BasedOn="{StaticResource {x:Type DataGridCell}}">
+      <Setter Property="Background" Value="#1A3498DB" />
+      <Setter Property="Foreground" Value="#34495E" />
+    </ControlTheme>
+  </UserControl.Resources>
+
+  <Grid RowDefinitions="Auto,*,Auto" RowSpacing="8" Margin="12">
+    <StackPanel Grid.Row="0" Spacing="6">
+      <TextBlock Classes="h2">Power Fx Spreadsheet</TextBlock>
+      <TextBlock Text="Edit formulas per cell with a formula bar. Columns A-F can be referenced in the same row, values recalc as you type, and conditional formatting highlights errors and thresholds."
+                 TextWrapping="Wrap" />
+
+      <Border BorderBrush="{DynamicResource SystemControlForegroundBaseMediumBrush}"
+              BorderThickness="1"
+              CornerRadius="4"
+              Padding="8">
+        <StackPanel Spacing="6">
+          <Grid ColumnDefinitions="Auto,Auto,*,Auto" ColumnSpacing="6">
+            <TextBox Width="110"
+                     Grid.Column="0"
+                     Text="{Binding NameBoxText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                     Watermark="A1"
+                     KeyDown="OnNameBoxKeyDown"
+                     LostFocus="OnNameBoxLostFocus" />
+            <Border Background="{DynamicResource SystemControlBackgroundBaseLowBrush}"
+                    Grid.Column="1"
+                    CornerRadius="3"
+                    Padding="6,2">
+              <TextBlock Text="fx" FontWeight="Bold" />
+            </Border>
+            <TextBox Text="{Binding SelectedCell.Input, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                     Grid.Column="2"
+                     Watermark="Type values or formulas (e.g. =A + B)"
+                     ToolTip.Tip="{Binding SelectedErrorMessage}"
+                     ToolTip.IsEnabled="{Binding SelectedHasError}" />
+            <Border Background="#FCE8E6"
+                    Grid.Column="3"
+                    BorderBrush="#C0392B"
+                    BorderThickness="1"
+                    CornerRadius="3"
+                    Padding="4,0"
+                    VerticalAlignment="Center"
+                    IsVisible="{Binding SelectedHasError}"
+                    ToolTip.Tip="{Binding SelectedErrorMessage}">
+              <TextBlock Text="!" FontWeight="Bold" Foreground="#C0392B" />
+            </Border>
+          </Grid>
+
+          <StackPanel Orientation="Horizontal" Spacing="6">
+            <TextBlock Text="Range:" FontWeight="Bold" />
+            <TextBlock Text="{Binding SelectionRange}" />
+            <TextBlock Text="Active:" FontWeight="Bold" Margin="12,0,0,0" />
+            <TextBlock Text="{Binding SelectedAddress}" />
+          </StackPanel>
+
+          <StackPanel Orientation="Horizontal" Spacing="6">
+            <TextBlock Text="Value:" FontWeight="Bold" />
+            <TextBlock Text="{Binding SelectedDisplayText}" />
+          </StackPanel>
+
+          <TextBlock Text="{Binding SelectedErrorMessage}"
+                     Foreground="#B03A2E"
+                     IsVisible="{Binding SelectedHasError}" />
+        </StackPanel>
+      </Border>
+    </StackPanel>
+
+    <DataGrid Grid.Row="1"
+              x:Name="PowerFxGrid"
+              ItemsSource="{Binding Rows}"
+              ConditionalFormattingModel="{Binding ConditionalFormatting}"
+              AutoGenerateColumns="False"
+              HeadersVisibility="All"
+              RowHeaderWidth="44"
+              ShowRowNumbers="True"
+              GridLinesVisibility="All"
+              SelectionUnit="Cell"
+              SelectionMode="Extended"
+              ClipboardCopyMode="IncludeHeader"
+              CanUserPaste="True"
+              CanUserSelectColumns="True"
+              SuppressSortOnColumnHeaderSelection="True"
+              EditTriggers="CellClick,TextInput"
+              IsReadOnly="False"
+              CurrentCellChanged="OnCurrentCellChanged"
+              SelectedCellsChanged="OnSelectedCellsChanged">
+      <DataGrid.Resources>
+        <SolidColorBrush x:Key="DataGridGridLinesBrush" Color="#D6DCE2" />
+        <SolidColorBrush x:Key="DataGridCellHoveredBackgroundBrush" Color="#F3F7F9" />
+        <SolidColorBrush x:Key="DataGridCellSelectedBackgroundBrush" Color="#CCE6D6" />
+        <SolidColorBrush x:Key="DataGridCellSelectedHoveredBackgroundBrush" Color="#C2E0CF" />
+        <SolidColorBrush x:Key="DataGridCellSelectedUnfocusedBackgroundBrush" Color="#E2F2E9" />
+        <SolidColorBrush x:Key="DataGridCellSelectedHoveredUnfocusedBackgroundBrush" Color="#D7ECE0" />
+        <SolidColorBrush x:Key="DataGridCurrencyVisualPrimaryBrush" Color="#2E7D32" />
+        <SolidColorBrush x:Key="DataGridCellFocusVisualPrimaryBrush" Color="#2E7D32" />
+        <SolidColorBrush x:Key="DataGridCellFocusVisualSecondaryBrush" Color="#FFFFFF" />
+        <SolidColorBrush x:Key="DataGridSelectionOutlineBrush" Color="#2E7D32" />
+        <SolidColorBrush x:Key="DataGridFillHandleBrush" Color="#2E7D32" />
+        <SolidColorBrush x:Key="DataGridColumnHeaderBackgroundBrush" Color="#F3F5F7" />
+        <SolidColorBrush x:Key="DataGridColumnHeaderForegroundBrush" Color="#2C3E50" />
+        <Thickness x:Key="DataGridSelectionOutlineThickness">2</Thickness>
+        <x:Double x:Key="DataGridFillHandleSize">6</x:Double>
+      </DataGrid.Resources>
+      <DataGrid.Styles>
+        <Style Selector="DataGridRow:pointerover /template/ Rectangle#BackgroundRectangle">
+          <Setter Property="Fill" Value="Transparent" />
+          <Setter Property="Opacity" Value="0" />
+        </Style>
+        <Style Selector="DataGridRow:selected /template/ Rectangle#BackgroundRectangle">
+          <Setter Property="Fill" Value="Transparent" />
+          <Setter Property="Opacity" Value="0" />
+        </Style>
+        <Style Selector="DataGridRow:selected:pointerover /template/ Rectangle#BackgroundRectangle">
+          <Setter Property="Fill" Value="Transparent" />
+          <Setter Property="Opacity" Value="0" />
+        </Style>
+        <Style Selector="DataGridRow:selected:focus /template/ Rectangle#BackgroundRectangle">
+          <Setter Property="Fill" Value="Transparent" />
+          <Setter Property="Opacity" Value="0" />
+        </Style>
+        <Style Selector="DataGridRow:selected:pointerover:focus /template/ Rectangle#BackgroundRectangle">
+          <Setter Property="Fill" Value="Transparent" />
+          <Setter Property="Opacity" Value="0" />
+        </Style>
+        <Style Selector="DataGridColumnHeader">
+          <Setter Property="HorizontalContentAlignment" Value="Center" />
+          <Setter Property="FontWeight" Value="SemiBold" />
+        </Style>
+        <Style Selector="DataGridRowHeader">
+          <Setter Property="HorizontalContentAlignment" Value="Right" />
+          <Setter Property="Padding" Value="8,0,6,0" />
+          <Setter Property="Foreground" Value="#2C3E50" />
+        </Style>
+        <Style Selector="DataGridRowHeader /template/ Rectangle#BackgroundRectangle">
+          <Setter Property="Fill" Value="#F3F5F7" />
+        </Style>
+      </DataGrid.Styles>
+      <DataGrid.Columns>
+        <DataGridTemplateColumn Header="A"
+                                Tag="A"
+                                Width="*"
+                                SortMemberPath="A"
+                                x:DataType="models:PowerFxSheetRow"
+                                ClipboardContentBinding="{Binding A.Input}">
+          <DataGridTemplateColumn.CellTemplate>
+            <DataTemplate x:DataType="models:PowerFxSheetRow">
+              <TextBlock Text="{Binding A.DisplayText}" VerticalAlignment="Center" TextTrimming="CharacterEllipsis" />
+            </DataTemplate>
+          </DataGridTemplateColumn.CellTemplate>
+          <DataGridTemplateColumn.CellEditingTemplate>
+            <DataTemplate x:DataType="models:PowerFxSheetRow">
+              <TextBox Text="{Binding A.Input, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+            </DataTemplate>
+          </DataGridTemplateColumn.CellEditingTemplate>
+        </DataGridTemplateColumn>
+
+        <DataGridTemplateColumn Header="B"
+                                Tag="B"
+                                Width="*"
+                                SortMemberPath="B"
+                                x:DataType="models:PowerFxSheetRow"
+                                ClipboardContentBinding="{Binding B.Input}">
+          <DataGridTemplateColumn.CellTemplate>
+            <DataTemplate x:DataType="models:PowerFxSheetRow">
+              <TextBlock Text="{Binding B.DisplayText}" VerticalAlignment="Center" TextTrimming="CharacterEllipsis" />
+            </DataTemplate>
+          </DataGridTemplateColumn.CellTemplate>
+          <DataGridTemplateColumn.CellEditingTemplate>
+            <DataTemplate x:DataType="models:PowerFxSheetRow">
+              <TextBox Text="{Binding B.Input, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+            </DataTemplate>
+          </DataGridTemplateColumn.CellEditingTemplate>
+        </DataGridTemplateColumn>
+
+        <DataGridTemplateColumn Header="C"
+                                Tag="C"
+                                Width="*"
+                                SortMemberPath="C"
+                                x:DataType="models:PowerFxSheetRow"
+                                ClipboardContentBinding="{Binding C.Input}">
+          <DataGridTemplateColumn.CellTemplate>
+            <DataTemplate x:DataType="models:PowerFxSheetRow">
+              <TextBlock Text="{Binding C.DisplayText}" VerticalAlignment="Center" TextTrimming="CharacterEllipsis" />
+            </DataTemplate>
+          </DataGridTemplateColumn.CellTemplate>
+          <DataGridTemplateColumn.CellEditingTemplate>
+            <DataTemplate x:DataType="models:PowerFxSheetRow">
+              <TextBox Text="{Binding C.Input, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+            </DataTemplate>
+          </DataGridTemplateColumn.CellEditingTemplate>
+        </DataGridTemplateColumn>
+
+        <DataGridTemplateColumn Header="D"
+                                Tag="D"
+                                Width="*"
+                                SortMemberPath="D"
+                                x:DataType="models:PowerFxSheetRow"
+                                ClipboardContentBinding="{Binding D.Input}">
+          <DataGridTemplateColumn.CellTemplate>
+            <DataTemplate x:DataType="models:PowerFxSheetRow">
+              <TextBlock Text="{Binding D.DisplayText}" VerticalAlignment="Center" TextTrimming="CharacterEllipsis" />
+            </DataTemplate>
+          </DataGridTemplateColumn.CellTemplate>
+          <DataGridTemplateColumn.CellEditingTemplate>
+            <DataTemplate x:DataType="models:PowerFxSheetRow">
+              <TextBox Text="{Binding D.Input, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+            </DataTemplate>
+          </DataGridTemplateColumn.CellEditingTemplate>
+        </DataGridTemplateColumn>
+
+        <DataGridTemplateColumn Header="E"
+                                Tag="E"
+                                Width="*"
+                                SortMemberPath="E"
+                                x:DataType="models:PowerFxSheetRow"
+                                ClipboardContentBinding="{Binding E.Input}">
+          <DataGridTemplateColumn.CellTemplate>
+            <DataTemplate x:DataType="models:PowerFxSheetRow">
+              <TextBlock Text="{Binding E.DisplayText}" VerticalAlignment="Center" TextTrimming="CharacterEllipsis" />
+            </DataTemplate>
+          </DataGridTemplateColumn.CellTemplate>
+          <DataGridTemplateColumn.CellEditingTemplate>
+            <DataTemplate x:DataType="models:PowerFxSheetRow">
+              <TextBox Text="{Binding E.Input, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+            </DataTemplate>
+          </DataGridTemplateColumn.CellEditingTemplate>
+        </DataGridTemplateColumn>
+
+        <DataGridTemplateColumn Header="F"
+                                Tag="F"
+                                Width="*"
+                                SortMemberPath="F"
+                                x:DataType="models:PowerFxSheetRow"
+                                ClipboardContentBinding="{Binding F.Input}">
+          <DataGridTemplateColumn.CellTemplate>
+            <DataTemplate x:DataType="models:PowerFxSheetRow">
+              <TextBlock Text="{Binding F.DisplayText}" VerticalAlignment="Center" TextTrimming="CharacterEllipsis" />
+            </DataTemplate>
+          </DataGridTemplateColumn.CellTemplate>
+          <DataGridTemplateColumn.CellEditingTemplate>
+            <DataTemplate x:DataType="models:PowerFxSheetRow">
+              <TextBox Text="{Binding F.Input, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+            </DataTemplate>
+          </DataGridTemplateColumn.CellEditingTemplate>
+        </DataGridTemplateColumn>
+      </DataGrid.Columns>
+    </DataGrid>
+
+    <Border Grid.Row="2"
+            BorderBrush="{DynamicResource SystemControlForegroundBaseMediumBrush}"
+            BorderThickness="1"
+            CornerRadius="4"
+            Padding="8">
+      <Grid ColumnDefinitions="Auto,*" ColumnSpacing="12">
+        <StackPanel Orientation="Horizontal" Spacing="6">
+          <TextBlock Text="Range:" FontWeight="Bold" />
+          <TextBlock Text="{Binding SelectionRange}" />
+        </StackPanel>
+        <TextBlock Grid.Column="1"
+                   Text="{Binding SelectionSummary}"
+                   HorizontalAlignment="Right" />
+      </Grid>
+    </Border>
+  </Grid>
+</UserControl>

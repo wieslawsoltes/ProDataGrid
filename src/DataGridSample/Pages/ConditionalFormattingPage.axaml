@@ -1,0 +1,69 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:models="clr-namespace:DataGridSample.Models"
+             xmlns:viewModels="clr-namespace:DataGridSample.ViewModels"
+             x:Class="DataGridSample.Pages.ConditionalFormattingPage"
+             x:DataType="viewModels:ConditionalFormattingSampleViewModel">
+  <UserControl.DataContext>
+    <viewModels:ConditionalFormattingSampleViewModel />
+  </UserControl.DataContext>
+
+  <UserControl.Resources>
+    <ControlTheme x:Key="ConditionalScoreHighCellTheme"
+                  TargetType="DataGridCell"
+                  BasedOn="{StaticResource {x:Type DataGridCell}}">
+      <Setter Property="Background" Value="#1C2ECC71" />
+      <Setter Property="Foreground" Value="#145A32" />
+    </ControlTheme>
+    <ControlTheme x:Key="ConditionalScoreLowCellTheme"
+                  TargetType="DataGridCell"
+                  BasedOn="{StaticResource {x:Type DataGridCell}}">
+      <Setter Property="Background" Value="#1CE74C3C" />
+      <Setter Property="Foreground" Value="#C0392B" />
+    </ControlTheme>
+    <ControlTheme x:Key="ConditionalDeltaNegativeCellTheme"
+                  TargetType="DataGridCell"
+                  BasedOn="{StaticResource {x:Type DataGridCell}}">
+      <Setter Property="Foreground" Value="#C0392B" />
+    </ControlTheme>
+    <ControlTheme x:Key="ConditionalRowWarningTheme"
+                  TargetType="DataGridRow"
+                  BasedOn="{StaticResource {x:Type DataGridRow}}">
+      <Style Selector="^ /template/ Rectangle#BackgroundRectangle">
+        <Setter Property="Fill" Value="#1AF59E0B" />
+        <Setter Property="Opacity" Value="1" />
+      </Style>
+    </ControlTheme>
+    <ControlTheme x:Key="ConditionalRowAlertTheme"
+                  TargetType="DataGridRow"
+                  BasedOn="{StaticResource {x:Type DataGridRow}}">
+      <Style Selector="^ /template/ Rectangle#BackgroundRectangle">
+        <Setter Property="Fill" Value="#1CD32F2F" />
+        <Setter Property="Opacity" Value="1" />
+      </Style>
+    </ControlTheme>
+  </UserControl.Resources>
+
+  <Grid RowDefinitions="Auto,*" RowSpacing="8" Margin="12">
+    <StackPanel Grid.Row="0" Spacing="4">
+      <TextBlock Classes="h2">Conditional formatting model</TextBlock>
+      <TextBlock Text="Rules drive cell and row themes. Score and change thresholds update per cell, and row states highlight at-risk or overdue records."
+                 TextWrapping="Wrap" />
+    </StackPanel>
+
+    <DataGrid Grid.Row="1"
+              ItemsSource="{Binding Rows}"
+              ConditionalFormattingModel="{Binding ConditionalFormatting}"
+              AutoGenerateColumns="False"
+              SelectionUnit="Cell"
+              SelectionMode="Extended">
+      <DataGrid.Columns>
+        <DataGridTextColumn Header="Region" Binding="{Binding Region}" Width="2*" x:DataType="models:ConditionalFormattingSampleRow" />
+        <DataGridNumericColumn Header="Score" Binding="{Binding Score}" Width="*" x:DataType="models:ConditionalFormattingSampleRow" />
+        <DataGridNumericColumn Header="Change" Binding="{Binding Change}" Width="*" x:DataType="models:ConditionalFormattingSampleRow" />
+        <DataGridNumericColumn Header="Target" Binding="{Binding Target}" Width="*" x:DataType="models:ConditionalFormattingSampleRow" />
+        <DataGridTextColumn Header="Status" Binding="{Binding Status}" Width="*" x:DataType="models:ConditionalFormattingSampleRow" />
+      </DataGrid.Columns>
+    </DataGrid>
+  </Grid>
+</UserControl>

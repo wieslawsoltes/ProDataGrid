@@ -37,14 +37,37 @@
                          Fill="{DynamicResource DataGridGridLinesBrush}" />
 
               <!-- ScrollViewer wrapping the RowsPresenter -->
-              <ScrollViewer Name="PART_ScrollViewer"
-                            Grid.Row="2"
-                            HorizontalScrollBarVisibility="{TemplateBinding HorizontalScrollBarVisibility}"
-                            VerticalScrollBarVisibility="{TemplateBinding VerticalScrollBarVisibility}"
-                            IsScrollInertiaEnabled="{TemplateBinding IsScrollInertiaEnabled}"
-                            AllowAutoHide="True">
-                <DataGridRowsPresenter Name="PART_RowsPresenter" />
-              </ScrollViewer>
+              <Grid Grid.Row="2">
+                <ScrollViewer Name="PART_ScrollViewer"
+                              HorizontalScrollBarVisibility="{TemplateBinding HorizontalScrollBarVisibility}"
+                              VerticalScrollBarVisibility="{TemplateBinding VerticalScrollBarVisibility}"
+                              IsScrollInertiaEnabled="{TemplateBinding IsScrollInertiaEnabled}"
+                              AllowAutoHide="True">
+                  <DataGridRowsPresenter Name="PART_RowsPresenter" />
+                </ScrollViewer>
+                <controls:DataGridSelectionOverlay Name="PART_SelectionOverlay"
+                        ClipToBounds="True"
+                        IsHitTestVisible="True"
+                        Panel.ZIndex="5">
+                  <Border Name="PART_SelectionOutline"
+                          BorderBrush="{DynamicResource DataGridSelectionOutlineBrush}"
+                          BorderThickness="{DynamicResource DataGridSelectionOutlineThickness}"
+                          Background="{x:Null}"
+                          IsHitTestVisible="False"
+                          IsVisible="False"
+                          Width="0"
+                          Height="0" />
+                  <Border Name="PART_FillHandle"
+                          Width="{DynamicResource DataGridFillHandleSize}"
+                          Height="{DynamicResource DataGridFillHandleSize}"
+                          Background="{DynamicResource DataGridFillHandleBrush}"
+                          BorderBrush="{DynamicResource DataGridSelectionOutlineBrush}"
+                          BorderThickness="1"
+                          CornerRadius="1"
+                          Cursor="Cross"
+                          IsVisible="False" />
+                </controls:DataGridSelectionOverlay>
+              </Grid>
 
               <!-- Total Summary Row (fixed at bottom) -->
               <controls:DataGridSummaryRow Name="PART_TotalSummaryRow"

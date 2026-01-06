@@ -296,6 +296,11 @@ namespace Avalonia.Controls
 
         private bool ProcessF2Key(KeyEventArgs e)
         {
+            if (!EditTriggers.HasFlag(DataGridEditTriggers.F2))
+            {
+                return false;
+            }
+
             if (_editingColumnIndex == -1 && CurrentColumnIndex != -1 && GetRowSelection(CurrentSlot) &&
                 !GetColumnEffectiveReadOnlyState(CurrentColumn))
             {

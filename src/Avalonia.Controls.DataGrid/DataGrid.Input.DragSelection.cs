@@ -4,6 +4,7 @@
 #nullable disable
 
 using Avalonia.Controls.Utils;
+using Avalonia.Controls.DataGridInteractions;
 using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.Threading;
@@ -22,8 +23,6 @@ internal
 #endif
     partial class DataGrid
     {
-        private const double DragSelectionThreshold = 4;
-
         private bool _isDraggingSelection;
         private bool _isRowSelectionDragging;
         private IPointer _dragPointer;
@@ -36,6 +35,7 @@ internal
         private int _dragAutoScrollDirectionX;
         private int _dragAutoScrollDirectionY;
         private int _dragAnchorSlot = -1;
+        private DataGridCellPosition? _dragAnchorCell;
         private int _dragLastSlot = -1;
         private int _dragLastColumnIndex = -1;
         private bool _dragCapturePending;
@@ -76,7 +76,41 @@ internal
             _dragLastSlot = CurrentSlot;
             _dragLastColumnIndex = CurrentColumnIndex;
             _dragAnchorSlot = AnchorSlot != -1 ? AnchorSlot : CurrentSlot;
+            _dragAnchorCell = null;
             _dragCapturePending = deferCapture;
+
+            if (!_isRowSelectionDragging)
+            {
+                DataGridCellPosition? existingAnchor = null;
+                if (_cellAnchor.Slot != -1 && _cellAnchor.ColumnIndex >= 0)
+                {
+                    var anchorRowIndex = RowIndexFromSlot(_cellAnchor.Slot);
+                    if (anchorRowIndex >= 0)
+                    {
+                        existingAnchor = new DataGridCellPosition(anchorRowIndex, _cellAnchor.ColumnIndex);
+                    }
+                }
+
+                var currentRowIndex = RowIndexFromSlot(CurrentSlot);
+                var currentColumnIndex = CurrentColumnIndex;
+                if (currentRowIndex < 0 || currentColumnIndex < 0)
+                {
+                    if (existingAnchor.HasValue)
+                    {
+                        currentRowIndex = existingAnchor.Value.RowIndex;
+                        currentColumnIndex = existingAnchor.Value.ColumnIndex;
+                    }
+                }
+
+                if (currentRowIndex >= 0 && currentColumnIndex >= 0)
+                {
+                    var currentCell = new DataGridCellPosition(currentRowIndex, currentColumnIndex);
+                    var model = RangeInteractionModel;
+                    _dragAnchorCell = model != null
+                        ? model.ResolveSelectionAnchor(new DataGridSelectionAnchorContext(this, existingAnchor, currentCell, e.KeyModifiers))
+                        : existingAnchor ?? currentCell;
+                }
+            }
 
             if (!deferCapture)
             {
@@ -117,6 +151,7 @@ internal
             _dragLastSlot = -1;
             _dragLastColumnIndex = -1;
             _dragAnchorSlot = -1;
+            _dragAnchorCell = null;
 
             if (wasDragging)
             {
@@ -152,7 +187,12 @@ internal
 
             if (_dragCapturePending && _dragStartPoint.HasValue)
             {
-                if (!IsDragSelectionThresholdMet(_dragStartPoint.Value, current.Position))
+                var model = RangeInteractionModel;
+                var thresholdMet = model != null
+                    ? model.IsSelectionDragThresholdMet(_dragStartPoint.Value, current.Position)
+                    : Math.Abs(current.Position.X - _dragStartPoint.Value.X) >= 4 ||
+                      Math.Abs(current.Position.Y - _dragStartPoint.Value.Y) >= 4;
+                if (!thresholdMet)
                 {
                     return;
                 }
@@ -265,12 +305,6 @@ internal
             {
                 DeselectRowsInRange(rangeEnd + 1, previousSlot);
             }
-        }
-
-        private static bool IsDragSelectionThresholdMet(Point start, Point current)
-        {
-            var delta = current - start;
-            return Math.Abs(delta.X) >= DragSelectionThreshold || Math.Abs(delta.Y) >= DragSelectionThreshold;
         }
 
         private bool UpdateRowSelectionForDrag(Point position, KeyModifiers modifiers)
@@ -551,6 +585,11 @@ internal
                 return;
             }
 
+            if (EditingRow != null && slot != EditingRow.Slot && !CommitEdit(DataGridEditingUnit.Row, true))
+            {
+                return;
+            }
+
             KeyboardHelper.GetMetaKeyState(this, modifiers, out bool ctrl, out _);
 
             var added = new List<DataGridCellInfo>();
@@ -566,16 +605,36 @@ internal
                 ClearCellSelectionInternal(clearRows: true, raiseEvent: false);
                 AddSingleCellSelection(columnIndex, slot, added);
             }
-            else if (_cellAnchor.Slot != -1)
+            else if (_dragAnchorCell.HasValue || _cellAnchor.Slot != -1)
             {
-                int anchorRowIndex = RowIndexFromSlot(_cellAnchor.Slot);
+                DataGridCellPosition? anchorCell = _dragAnchorCell;
+                if (!anchorCell.HasValue && _cellAnchor.Slot != -1 && _cellAnchor.ColumnIndex >= 0)
+                {
+                    var resolvedAnchorRowIndex = RowIndexFromSlot(_cellAnchor.Slot);
+                    if (resolvedAnchorRowIndex >= 0)
+                    {
+                        anchorCell = new DataGridCellPosition(resolvedAnchorRowIndex, _cellAnchor.ColumnIndex);
+                    }
+                }
+
+                if (!anchorCell.HasValue)
+                {
+                    return;
+                }
+
+                int anchorRowIndex = anchorCell.Value.RowIndex;
                 int targetRowIndex = RowIndexFromSlot(slot);
                 if (anchorRowIndex >= 0 && targetRowIndex >= 0)
                 {
-                    int startRow = Math.Min(anchorRowIndex, targetRowIndex);
-                    int endRow = Math.Max(anchorRowIndex, targetRowIndex);
-                    int startCol = Math.Min(_cellAnchor.ColumnIndex, columnIndex);
-                    int endCol = Math.Max(_cellAnchor.ColumnIndex, columnIndex);
+                    var targetCell = new DataGridCellPosition(targetRowIndex, columnIndex);
+                    var model = RangeInteractionModel;
+                    var range = model != null
+                        ? model.BuildSelectionRange(new DataGridSelectionRangeContext(this, anchorCell.Value, targetCell, modifiers))
+                        : new DataGridCellRange(
+                            Math.Min(anchorCell.Value.RowIndex, targetRowIndex),
+                            Math.Max(anchorCell.Value.RowIndex, targetRowIndex),
+                            Math.Min(anchorCell.Value.ColumnIndex, columnIndex),
+                            Math.Max(anchorCell.Value.ColumnIndex, columnIndex));
 
                     if (!ctrl)
                     {
@@ -584,10 +643,10 @@ internal
                     }
                     else
                     {
-                        RemovePreviousDragCellSelection(anchorRowIndex, _cellAnchor.ColumnIndex, removed);
+                        RemovePreviousDragCellSelection(anchorRowIndex, anchorCell.Value.ColumnIndex, removed);
                     }
 
-                    SelectCellRangeInternal(startRow, endRow, startCol, endCol, added);
+                    SelectCellRangeInternal(range.StartRow, range.EndRow, range.StartColumn, range.EndColumn, added);
                 }
             }
             else
@@ -683,55 +742,75 @@ internal
                 return;
             }
 
-            int verticalDirection = 0;
-            int horizontalDirection = 0;
-
-            if (_rowsPresenter != null)
+            var model = RangeInteractionModel;
+            DataGridAutoScrollDirection direction;
+            if (model != null)
             {
-                var presenterPoint = this.TranslatePoint(point, _rowsPresenter) ?? point;
-                var presenterHeight = _rowsPresenter.Bounds.Height;
-                if (presenterPoint.Y < 0)
-                {
-                    verticalDirection = -1;
-                }
-                else if (presenterPoint.Y > presenterHeight)
-                {
-                    verticalDirection = 1;
-                }
+                var presenterPoint = _rowsPresenter != null ? this.TranslatePoint(point, _rowsPresenter) : null;
+                var presenterSize = _rowsPresenter?.Bounds.Size ?? default;
+                direction = model.GetAutoScrollDirection(new DataGridAutoScrollContext(
+                    this,
+                    point,
+                    presenterPoint,
+                    presenterSize,
+                    ActualRowHeaderWidth,
+                    CellsWidth,
+                    _isRowSelectionDragging));
             }
             else
             {
-                if (point.Y < 0)
+                int verticalDirection = 0;
+                int horizontalDirection = 0;
+
+                if (_rowsPresenter != null)
                 {
-                    verticalDirection = -1;
+                    var presenterPoint = this.TranslatePoint(point, _rowsPresenter) ?? point;
+                    var presenterHeight = _rowsPresenter.Bounds.Height;
+                    if (presenterPoint.Y < 0)
+                    {
+                        verticalDirection = -1;
+                    }
+                    else if (presenterPoint.Y > presenterHeight)
+                    {
+                        verticalDirection = 1;
+                    }
                 }
-                else if (point.Y > Bounds.Height)
+                else
                 {
-                    verticalDirection = 1;
+                    if (point.Y < 0)
+                    {
+                        verticalDirection = -1;
+                    }
+                    else if (point.Y > Bounds.Height)
+                    {
+                        verticalDirection = 1;
+                    }
                 }
+
+                if (!_isRowSelectionDragging)
+                {
+                    var x = point.X - ActualRowHeaderWidth;
+                    if (x < 0)
+                    {
+                        horizontalDirection = -1;
+                    }
+                    else if (x > CellsWidth)
+                    {
+                        horizontalDirection = 1;
+                    }
+                }
+
+                direction = new DataGridAutoScrollDirection(horizontalDirection, verticalDirection);
             }
 
-            if (!_isRowSelectionDragging)
-            {
-                var x = point.X - ActualRowHeaderWidth;
-                if (x < 0)
-                {
-                    horizontalDirection = -1;
-                }
-                else if (x > CellsWidth)
-                {
-                    horizontalDirection = 1;
-                }
-            }
-
-            if (horizontalDirection == 0 && verticalDirection == 0)
+            if (!direction.HasScroll)
             {
                 StopDragAutoScroll();
                 return;
             }
 
-            _dragAutoScrollDirectionX = horizontalDirection;
-            _dragAutoScrollDirectionY = verticalDirection;
+            _dragAutoScrollDirectionX = direction.Horizontal;
+            _dragAutoScrollDirectionY = direction.Vertical;
             StartDragAutoScroll();
         }
 

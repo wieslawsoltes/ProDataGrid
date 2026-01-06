@@ -1,0 +1,62 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:models="clr-namespace:DataGridSample.Models"
+             xmlns:viewModels="clr-namespace:DataGridSample.ViewModels"
+             x:Class="DataGridSample.Pages.RangeInteractionModelPage"
+             x:DataType="viewModels:RangeInteractionModelViewModel">
+  <UserControl.DataContext>
+    <viewModels:RangeInteractionModelViewModel />
+  </UserControl.DataContext>
+
+  <Grid RowDefinitions="Auto,Auto,*" RowSpacing="8" Margin="12">
+    <StackPanel Grid.Row="0" Spacing="4">
+      <TextBlock Classes="h2">Range interaction model</TextBlock>
+      <TextBlock Text="Customize drag selection thresholds, anchors, and fill handle range behavior." TextWrapping="Wrap" />
+    </StackPanel>
+
+    <StackPanel Grid.Row="1" Orientation="Horizontal" Spacing="8">
+      <TextBlock VerticalAlignment="Center" Text="Custom model" />
+      <ToggleSwitch IsChecked="{Binding UseTopLeftAnchor}" Content="Top-left anchor + higher drag threshold" />
+    </StackPanel>
+
+    <DataGrid Grid.Row="2"
+              ItemsSource="{Binding Rows}"
+              RangeInteractionModel="{Binding RangeInteractionModel}"
+              AutoGenerateColumns="False"
+              SelectionUnit="Cell"
+              SelectionMode="Extended"
+              ClipboardCopyMode="IncludeHeader"
+              CanUserPaste="True"
+              EditTriggers="CellClick,TextInput">
+      <DataGrid.Styles>
+        <Style Selector="DataGridRow:pointerover /template/ Rectangle#BackgroundRectangle">
+          <Setter Property="Fill" Value="Transparent" />
+          <Setter Property="Opacity" Value="0" />
+        </Style>
+        <Style Selector="DataGridRow:selected /template/ Rectangle#BackgroundRectangle">
+          <Setter Property="Fill" Value="Transparent" />
+          <Setter Property="Opacity" Value="0" />
+        </Style>
+        <Style Selector="DataGridRow:selected:pointerover /template/ Rectangle#BackgroundRectangle">
+          <Setter Property="Fill" Value="Transparent" />
+          <Setter Property="Opacity" Value="0" />
+        </Style>
+        <Style Selector="DataGridRow:selected:focus /template/ Rectangle#BackgroundRectangle">
+          <Setter Property="Fill" Value="Transparent" />
+          <Setter Property="Opacity" Value="0" />
+        </Style>
+        <Style Selector="DataGridRow:selected:pointerover:focus /template/ Rectangle#BackgroundRectangle">
+          <Setter Property="Fill" Value="Transparent" />
+          <Setter Property="Opacity" Value="0" />
+        </Style>
+      </DataGrid.Styles>
+      <DataGrid.Columns>
+        <DataGridTextColumn Header="Label" Binding="{Binding Label}" Width="2*" IsReadOnly="True" x:DataType="models:FillHandleRow" />
+        <DataGridNumericColumn Header="V1" Binding="{Binding Value1}" Width="*" x:DataType="models:FillHandleRow" />
+        <DataGridNumericColumn Header="V2" Binding="{Binding Value2}" Width="*" x:DataType="models:FillHandleRow" />
+        <DataGridNumericColumn Header="V3" Binding="{Binding Value3}" Width="*" x:DataType="models:FillHandleRow" />
+        <DataGridNumericColumn Header="V4" Binding="{Binding Value4}" Width="*" x:DataType="models:FillHandleRow" />
+      </DataGrid.Columns>
+    </DataGrid>
+  </Grid>
+</UserControl>

@@ -1,0 +1,103 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:models="clr-namespace:DataGridSample.Models"
+             xmlns:viewModels="clr-namespace:DataGridSample.ViewModels"
+             x:Class="DataGridSample.Pages.PowerFxRulesPage"
+             x:DataType="viewModels:PowerFxRulesViewModel">
+  <UserControl.DataContext>
+    <viewModels:PowerFxRulesViewModel />
+  </UserControl.DataContext>
+
+  <UserControl.Resources>
+    <ControlTheme x:Key="PowerFxRuleAlertCellTheme"
+                  TargetType="DataGridCell"
+                  BasedOn="{StaticResource {x:Type DataGridCell}}">
+      <Setter Property="Background" Value="#233498DB" />
+    </ControlTheme>
+    <ControlTheme x:Key="PowerFxRuleErrorCellTheme"
+                  TargetType="DataGridCell"
+                  BasedOn="{StaticResource {x:Type DataGridCell}}">
+      <Setter Property="Background" Value="#28FFC107" />
+    </ControlTheme>
+  </UserControl.Resources>
+
+  <Grid RowDefinitions="Auto,*" RowSpacing="8" Margin="12">
+    <StackPanel Grid.Row="0" Spacing="6">
+      <TextBlock Classes="h2">Power Fx rules</TextBlock>
+      <TextBlock Text="Define a result formula and a conditional formatting rule in Power Fx. The Result and Status columns update live as you edit values."
+                 TextWrapping="Wrap" />
+
+      <Border BorderBrush="{DynamicResource SystemControlForegroundBaseMediumBrush}"
+              BorderThickness="1"
+              CornerRadius="4"
+              Padding="8">
+        <Grid RowDefinitions="Auto,Auto" ColumnDefinitions="Auto,*" ColumnSpacing="8" RowSpacing="6">
+          <TextBlock Text="Formula" VerticalAlignment="Center" FontWeight="Bold" />
+          <TextBox Grid.Column="1"
+                   Text="{Binding Formula, UpdateSourceTrigger=PropertyChanged}"
+                   Watermark="e.g. Revenue - Cost" />
+
+          <TextBlock Grid.Row="1"
+                     Text="Rule"
+                     VerticalAlignment="Center"
+                     FontWeight="Bold" />
+          <TextBox Grid.Row="1"
+                   Grid.Column="1"
+                   Text="{Binding RuleFormula, UpdateSourceTrigger=PropertyChanged}"
+                   Watermark="e.g. Result &lt; 0 || Revenue &lt; Target" />
+        </Grid>
+      </Border>
+    </StackPanel>
+
+    <DataGrid Grid.Row="1"
+              ItemsSource="{Binding Rows}"
+              ConditionalFormattingModel="{Binding ConditionalFormatting}"
+              AutoGenerateColumns="False"
+              SelectionUnit="Cell"
+              SelectionMode="Extended"
+              ClipboardCopyMode="IncludeHeader"
+              CanUserPaste="True"
+              EditTriggers="CellClick,TextInput"
+              IsReadOnly="False">
+      <DataGrid.Styles>
+        <Style Selector="DataGridRow:pointerover /template/ Rectangle#BackgroundRectangle">
+          <Setter Property="Fill" Value="Transparent" />
+          <Setter Property="Opacity" Value="0" />
+        </Style>
+        <Style Selector="DataGridRow:selected /template/ Rectangle#BackgroundRectangle">
+          <Setter Property="Fill" Value="Transparent" />
+          <Setter Property="Opacity" Value="0" />
+        </Style>
+        <Style Selector="DataGridRow:selected:pointerover /template/ Rectangle#BackgroundRectangle">
+          <Setter Property="Fill" Value="Transparent" />
+          <Setter Property="Opacity" Value="0" />
+        </Style>
+        <Style Selector="DataGridRow:selected:focus /template/ Rectangle#BackgroundRectangle">
+          <Setter Property="Fill" Value="Transparent" />
+          <Setter Property="Opacity" Value="0" />
+        </Style>
+        <Style Selector="DataGridRow:selected:pointerover:focus /template/ Rectangle#BackgroundRectangle">
+          <Setter Property="Fill" Value="Transparent" />
+          <Setter Property="Opacity" Value="0" />
+        </Style>
+      </DataGrid.Styles>
+      <DataGrid.Columns>
+        <DataGridTextColumn Header="Item" Binding="{Binding Item}" Width="2*" x:DataType="models:PowerFxRuleRow" />
+        <DataGridNumericColumn Header="Units" Binding="{Binding Units}" Width="*" x:DataType="models:PowerFxRuleRow" />
+        <DataGridNumericColumn Header="Revenue" Binding="{Binding Revenue}" Width="*" x:DataType="models:PowerFxRuleRow" />
+        <DataGridNumericColumn Header="Cost" Binding="{Binding Cost}" Width="*" x:DataType="models:PowerFxRuleRow" />
+        <DataGridNumericColumn Header="Target" Binding="{Binding Target}" Width="*" x:DataType="models:PowerFxRuleRow" />
+        <DataGridTextColumn Header="Result"
+                            Binding="{Binding ResultText}"
+                            IsReadOnly="True"
+                            Width="*"
+                            x:DataType="models:PowerFxRuleRow" />
+        <DataGridTextColumn Header="Status"
+                            Binding="{Binding Status}"
+                            IsReadOnly="True"
+                            Width="*"
+                            x:DataType="models:PowerFxRuleRow" />
+      </DataGrid.Columns>
+    </DataGrid>
+  </Grid>
+</UserControl>

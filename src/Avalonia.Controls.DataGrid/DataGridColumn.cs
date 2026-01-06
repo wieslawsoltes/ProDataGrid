@@ -19,6 +19,7 @@ using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.Layout;
 using Avalonia.Markup.Xaml.MarkupExtensions;
+using Avalonia.Metadata;
 using Avalonia.Styling;
 using Avalonia.VisualTree;
 using System.Collections.Specialized;
@@ -45,6 +46,8 @@ internal
         private Control _editingElement;
         private ICellEditBinding _editBinding;
         private IBinding _clipboardContentBinding;
+        private IBinding _cellBackgroundBinding;
+        private IBinding _cellForegroundBinding;
         private ControlTheme _headerTheme;
         private ControlTheme _cellTheme;
         private ControlTheme _filterTheme;
@@ -473,6 +476,36 @@ internal
         }
 
         public Classes CellStyleClasses => _cellStyleClasses ??= new();
+
+        [AssignBinding]
+        [InheritDataTypeFromItems(nameof(DataGrid.ItemsSource), AncestorType = typeof(DataGrid))]
+        public IBinding CellBackgroundBinding
+        {
+            get => _cellBackgroundBinding;
+            set
+            {
+                if (_cellBackgroundBinding != value)
+                {
+                    _cellBackgroundBinding = value;
+                    NotifyPropertyChanged(nameof(CellBackgroundBinding));
+                }
+            }
+        }
+
+        [AssignBinding]
+        [InheritDataTypeFromItems(nameof(DataGrid.ItemsSource), AncestorType = typeof(DataGrid))]
+        public IBinding CellForegroundBinding
+        {
+            get => _cellForegroundBinding;
+            set
+            {
+                if (_cellForegroundBinding != value)
+                {
+                    _cellForegroundBinding = value;
+                    NotifyPropertyChanged(nameof(CellForegroundBinding));
+                }
+            }
+        }
 
         public Classes HeaderStyleClasses => _headerStyleClasses ??= CreateHeaderStyleClasses();
 

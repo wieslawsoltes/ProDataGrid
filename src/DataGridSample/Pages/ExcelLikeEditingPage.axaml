@@ -1,0 +1,78 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:models="clr-namespace:DataGridSample.Models"
+             xmlns:viewModels="clr-namespace:DataGridSample.ViewModels"
+             x:Class="DataGridSample.Pages.ExcelLikeEditingPage"
+             x:DataType="viewModels:ExcelLikeEditingViewModel">
+  <UserControl.DataContext>
+    <viewModels:ExcelLikeEditingViewModel />
+  </UserControl.DataContext>
+
+  <UserControl.Resources>
+    <ControlTheme x:Key="ExcelDeltaPositiveCellTheme"
+                  TargetType="DataGridCell"
+                  BasedOn="{StaticResource {x:Type DataGridCell}}">
+      <Setter Property="Background" Value="#1C2ECC71" />
+    </ControlTheme>
+    <ControlTheme x:Key="ExcelDeltaNegativeCellTheme"
+                  TargetType="DataGridCell"
+                  BasedOn="{StaticResource {x:Type DataGridCell}}">
+      <Setter Property="Background" Value="#1CE74C3C" />
+    </ControlTheme>
+  </UserControl.Resources>
+
+  <Grid RowDefinitions="Auto,*" RowSpacing="8" Margin="12">
+    <StackPanel Grid.Row="0" Spacing="4">
+      <TextBlock Classes="h2">Excel-like editing</TextBlock>
+      <TextBlock Text="Type to edit cells, use Enter/Tab to move, paste ranges from the clipboard, and watch conditional formatting update with cell-only selection." TextWrapping="Wrap" />
+    </StackPanel>
+
+    <DataGrid Grid.Row="1"
+              ItemsSource="{Binding Rows}"
+              ConditionalFormattingModel="{Binding ConditionalFormatting}"
+              AutoGenerateColumns="False"
+              SelectionUnit="Cell"
+              SelectionMode="Extended"
+              ClipboardCopyMode="IncludeHeader"
+              CanUserPaste="True"
+              EditTriggers="CellClick,TextInput"
+              IsReadOnly="False">
+      <DataGrid.Styles>
+        <Style Selector="DataGridRow:pointerover /template/ Rectangle#BackgroundRectangle">
+          <Setter Property="Fill" Value="Transparent" />
+          <Setter Property="Opacity" Value="0" />
+        </Style>
+        <Style Selector="DataGridRow:selected /template/ Rectangle#BackgroundRectangle">
+          <Setter Property="Fill" Value="Transparent" />
+          <Setter Property="Opacity" Value="0" />
+        </Style>
+        <Style Selector="DataGridRow:selected:pointerover /template/ Rectangle#BackgroundRectangle">
+          <Setter Property="Fill" Value="Transparent" />
+          <Setter Property="Opacity" Value="0" />
+        </Style>
+        <Style Selector="DataGridRow:selected:focus /template/ Rectangle#BackgroundRectangle">
+          <Setter Property="Fill" Value="Transparent" />
+          <Setter Property="Opacity" Value="0" />
+        </Style>
+        <Style Selector="DataGridRow:selected:pointerover:focus /template/ Rectangle#BackgroundRectangle">
+          <Setter Property="Fill" Value="Transparent" />
+          <Setter Property="Opacity" Value="0" />
+        </Style>
+      </DataGrid.Styles>
+      <DataGrid.Columns>
+        <DataGridTextColumn Header="Account" Binding="{Binding Account}" Width="2*" x:DataType="models:SpreadsheetRow" />
+        <DataGridNumericColumn Header="Q1" Binding="{Binding Q1}" Width="*" x:DataType="models:SpreadsheetRow" />
+        <DataGridNumericColumn Header="Q2" Binding="{Binding Q2}" Width="*" x:DataType="models:SpreadsheetRow" />
+        <DataGridNumericColumn Header="Q3" Binding="{Binding Q3}" Width="*" x:DataType="models:SpreadsheetRow" />
+        <DataGridNumericColumn Header="Q4" Binding="{Binding Q4}" Width="*" x:DataType="models:SpreadsheetRow" />
+        <DataGridNumericColumn Header="Delta"
+                               Binding="{Binding Delta}"
+                               IsReadOnly="True"
+                               Width="*"
+                               x:DataType="models:SpreadsheetRow" />
+        <DataGridNumericColumn Header="Total" Binding="{Binding Total}" IsReadOnly="True" Width="*" x:DataType="models:SpreadsheetRow" />
+        <DataGridTextColumn Header="Notes" Binding="{Binding Notes}" Width="2*" x:DataType="models:SpreadsheetRow" />
+      </DataGrid.Columns>
+    </DataGrid>
+  </Grid>
+</UserControl>

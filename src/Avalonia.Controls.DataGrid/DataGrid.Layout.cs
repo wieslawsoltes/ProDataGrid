@@ -305,6 +305,11 @@ internal
                 {
                     newCell.SetValue(ThemeProperty, cellTheme, BindingPriority.Template);
                 }
+                if (_conditionalFormattingAdapter != null)
+                {
+                    var descriptor = _conditionalFormattingAdapter.MatchCell(row.DataContext, row.Index, column);
+                    ApplyConditionalFormattingToCell(newCell, descriptor);
+                }
             }
             row.Cells.Insert(column.Index, newCell);
         }

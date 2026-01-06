@@ -112,6 +112,7 @@ internal
                 UpdateSortingAdapterView();
                 UpdateFilteringAdapterView();
                 UpdateSearchAdapterView();
+                UpdateConditionalFormattingAdapterView();
 
                 if (DataConnection.DataSource != null)
                 {

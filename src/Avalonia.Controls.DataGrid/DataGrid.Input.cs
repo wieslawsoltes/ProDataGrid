@@ -6,6 +6,8 @@
 
 using Avalonia.Controls.Primitives;
 using Avalonia.Controls.Utils;
+using Avalonia.Controls.DataGridInteractions;
+using Avalonia.Controls.DataGridEditing;
 using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.Reactive;
@@ -42,6 +44,7 @@ internal
         private IDisposable _keyDownRouteFinishedSubscription;
         private IDisposable _keyUpRouteFinishedSubscription;
         private DataGridKeyboardGestures _defaultKeyboardGestures;
+        private string _pendingTextInput;
 
         //TODO TabStop
         //TODO FlowDirection
@@ -117,6 +120,11 @@ internal
                      MatchesGesture(ResolveGesture(overrides?.CopyAlternate, defaults.CopyAlternate), e, allowAdditionalModifiers: false))
             {
                 return ProcessCopyKey();
+            }
+            else if (MatchesGesture(ResolveGesture(overrides?.Paste, defaults.Paste), e, allowAdditionalModifiers: false) ||
+                     MatchesGesture(ResolveGesture(overrides?.PasteAlternate, defaults.PasteAlternate), e, allowAdditionalModifiers: false))
+            {
+                return ProcessPasteKey();
             }
             else if (MatchesGesture(ResolveGesture(overrides?.Delete, defaults.Delete), e, allowAdditionalModifiers: true))
             {
@@ -964,6 +972,21 @@ internal
             DataGrid_KeyUp(this, keyEventArgs);
         }
 
+        protected override void OnTextInput(TextInputEventArgs e)
+        {
+            base.OnTextInput(e);
+
+            if (e.Handled || !IsTextInputFromThisGrid(e))
+            {
+                return;
+            }
+
+            if (TryBeginEditFromTextInput(e))
+            {
+                e.Handled = true;
+            }
+        }
+
         private bool IsKeyEventFromThisGrid(KeyEventArgs e)
         {
             if (ReferenceEquals(e.Source, this))
@@ -978,6 +1001,92 @@ internal
             }
 
             return false;
+        }
+
+        private bool IsTextInputFromThisGrid(TextInputEventArgs e)
+        {
+            var model = EditingInteractionModel;
+            var source = e.Source ?? this;
+            if (model != null)
+            {
+                return model.IsTextInputFromGrid(new DataGridTextInputContext(this, source, RestrictTextInputEditToCells));
+            }
+
+            if (ReferenceEquals(source, this))
+            {
+                return true;
+            }
+
+            if (source is Visual visual)
+            {
+                if (RestrictTextInputEditToCells)
+                {
+                    var cell = visual.GetSelfAndVisualAncestors().OfType<DataGridCell>().FirstOrDefault();
+                    return cell?.OwningGrid == this;
+                }
+
+                var grid = visual.GetSelfAndVisualAncestors().OfType<DataGrid>().FirstOrDefault();
+                return grid == this;
+            }
+
+            return false;
+        }
+
+        private bool TryBeginEditFromTextInput(TextInputEventArgs e)
+        {
+            var model = EditingInteractionModel;
+            var canEditCurrentCell = CurrentColumnIndex != -1 && CanEditSlot(CurrentSlot);
+            var text = model != null
+                ? model.GetTextInputForEdit(new DataGridTextInputEditContext(
+                    this,
+                    e.Text ?? string.Empty,
+                    isEditing: _editingColumnIndex != -1,
+                    isReadOnly: IsReadOnly,
+                    canEditCurrentCell: canEditCurrentCell,
+                    editTriggers: EditTriggers,
+                    modifiers: KeyModifiers.None))
+                : e.Text;
+
+            if (string.IsNullOrEmpty(text))
+            {
+                return false;
+            }
+
+            _pendingTextInput = text;
+            if (!BeginEdit(e))
+            {
+                _pendingTextInput = null;
+                return false;
+            }
+
+            return true;
+        }
+
+        internal bool ShouldBeginEditOnPointer(PointerPressedEventArgs e)
+        {
+            var model = EditingInteractionModel;
+            if (model == null)
+            {
+                if (EditTriggers == DataGridEditTriggers.None)
+                {
+                    return false;
+                }
+
+                var isDoubleClick = e.ClickCount >= 2;
+                if (isDoubleClick)
+                {
+                    return EditTriggers.HasFlag(DataGridEditTriggers.CellDoubleClick) ||
+                           EditTriggers.HasFlag(DataGridEditTriggers.CellClick);
+                }
+
+                return EditTriggers.HasFlag(DataGridEditTriggers.CellClick);
+            }
+
+            return model.ShouldBeginEditOnPointer(new DataGridPointerEditContext(
+                this,
+                e.ClickCount >= 2,
+                EditTriggers,
+                e.KeyModifiers));
         }
 
         private void DataGrid_KeyDownDirectional(object sender, KeyEventArgs e)
@@ -1162,6 +1271,11 @@ internal
                 return true;
             }
 
+            if (EditingRow != null && slot != EditingRow.Slot && !CommitEdit(DataGridEditingUnit.Row, true))
+            {
+                return true;
+            }
+
             try
             {
                 _noSelectionChangeCount++;
@@ -1191,10 +1305,16 @@ internal
                     int targetRowIndex = RowIndexFromSlot(slot);
                     if (anchorRowIndex >= 0 && targetRowIndex >= 0)
                     {
-                        int startRow = Math.Min(anchorRowIndex, targetRowIndex);
-                        int endRow = Math.Max(anchorRowIndex, targetRowIndex);
-                        int startCol = Math.Min(_cellAnchor.ColumnIndex, columnIndex);
-                        int endCol = Math.Max(_cellAnchor.ColumnIndex, columnIndex);
+                        var anchorCell = new DataGridCellPosition(anchorRowIndex, _cellAnchor.ColumnIndex);
+                        var targetCell = new DataGridCellPosition(targetRowIndex, columnIndex);
+                        var model = RangeInteractionModel;
+                        var range = model != null
+                            ? model.BuildSelectionRange(new DataGridSelectionRangeContext(this, anchorCell, targetCell, pointerPressedEventArgs.KeyModifiers))
+                            : new DataGridCellRange(
+                                Math.Min(anchorRowIndex, targetRowIndex),
+                                Math.Max(anchorRowIndex, targetRowIndex),
+                                Math.Min(_cellAnchor.ColumnIndex, columnIndex),
+                                Math.Max(_cellAnchor.ColumnIndex, columnIndex));
 
                         if (!ctrl)
                         {
@@ -1202,7 +1322,7 @@ internal
                             ClearCellSelectionInternal(clearRows: true, raiseEvent: false);
                         }
 
-                        SelectCellRangeInternal(startRow, endRow, startCol, endCol, added);
+                        SelectCellRangeInternal(range.StartRow, range.EndRow, range.StartColumn, range.EndColumn, added);
                     }
                 }
                 else

@@ -158,6 +158,7 @@ internal
                 InvalidateColumnHeadersMeasure();
                 InvalidateRowsMeasure(true);
                 UpdateSummaryRowLayout();
+                RequestSelectionOverlayRefresh();
                 return true;
             }
             return false;
@@ -168,6 +169,7 @@ internal
         {
             _verticalOffset = newVerticalOffset;
             SyncVerticalScrollBarValue(newVerticalOffset);
+            RequestSelectionOverlayRefresh();
         }
 
 

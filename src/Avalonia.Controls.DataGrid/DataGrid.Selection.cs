@@ -1332,6 +1332,7 @@ internal
             UpdateSelectionVisuals(addedCells);
             UpdateSelectionVisuals(removedCells);
 
+            RequestSelectionOverlayRefresh();
             SelectedCellsChanged?.Invoke(this, new DataGridSelectedCellsChangedEventArgs(addedCells, removedCells));
         }
 
@@ -1875,6 +1876,7 @@ internal
             }
 
             RefreshVisibleSelection();
+            RequestSelectionOverlayRefresh();
         }
 
         private void OnAutoScrollToSelectedItemChanged(AvaloniaPropertyChangedEventArgs e)

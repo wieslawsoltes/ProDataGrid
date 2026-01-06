@@ -152,6 +152,33 @@
     <TabItem Header="Editable">
       <local:EditablePage />
     </TabItem>
+    <TabItem Header="Excel-like Editing">
+      <pages:ExcelLikeEditingPage />
+    </TabItem>
+    <TabItem Header="Conditional Formatting">
+      <pages:ConditionalFormattingPage />
+    </TabItem>
+    <TabItem Header="Fill Handle Model">
+      <pages:FillHandleModelPage />
+    </TabItem>
+    <TabItem Header="Range Interaction Model">
+      <pages:RangeInteractionModelPage />
+    </TabItem>
+    <TabItem Header="Clipboard Import Model">
+      <pages:ClipboardImportModelPage />
+    </TabItem>
+    <TabItem Header="Editing Interaction Model">
+      <pages:EditingInteractionModelPage />
+    </TabItem>
+    <TabItem Header="Power Fx">
+      <pages:PowerFxPage />
+    </TabItem>
+    <TabItem Header="Power Fx Spreadsheet">
+      <pages:PowerFxSpreadsheetPage />
+    </TabItem>
+    <TabItem Header="Power Fx Rules">
+      <pages:PowerFxRulesPage />
+    </TabItem>
     <TabItem Header="Add/Delete Rows">
       <local:AddDeleteRowsPage />
     </TabItem>

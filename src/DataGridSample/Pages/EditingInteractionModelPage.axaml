@@ -1,0 +1,40 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:models="clr-namespace:DataGridSample.Models"
+             xmlns:viewModels="clr-namespace:DataGridSample.ViewModels"
+             x:Class="DataGridSample.Pages.EditingInteractionModelPage"
+             x:DataType="viewModels:EditingInteractionModelViewModel">
+  <UserControl.DataContext>
+    <viewModels:EditingInteractionModelViewModel />
+  </UserControl.DataContext>
+
+  <Grid RowDefinitions="Auto,Auto,*" RowSpacing="8" Margin="12">
+    <StackPanel Grid.Row="0" Spacing="4">
+      <TextBlock Classes="h2">Editing interaction model</TextBlock>
+      <TextBlock Text="Control how pointer and text input begin edits. Try Alt+Click mode to lock edits to modifier clicks." TextWrapping="Wrap" />
+    </StackPanel>
+
+    <StackPanel Grid.Row="1" Orientation="Horizontal" Spacing="8">
+      <TextBlock VerticalAlignment="Center" Text="Custom model" />
+      <ToggleSwitch IsChecked="{Binding RequireAltClick}" Content="Require Alt+Click to edit" />
+    </StackPanel>
+
+    <DataGrid Grid.Row="2"
+              ItemsSource="{Binding Rows}"
+              EditingInteractionModel="{Binding EditingInteractionModel}"
+              AutoGenerateColumns="False"
+              SelectionUnit="Cell"
+              SelectionMode="Extended"
+              CanUserPaste="True"
+              EditTriggers="{Binding EditTriggers}">
+      <DataGrid.Columns>
+        <DataGridTextColumn Header="Account" Binding="{Binding Account}" Width="2*" x:DataType="models:SpreadsheetRow" />
+        <DataGridNumericColumn Header="Q1" Binding="{Binding Q1}" Width="*" x:DataType="models:SpreadsheetRow" />
+        <DataGridNumericColumn Header="Q2" Binding="{Binding Q2}" Width="*" x:DataType="models:SpreadsheetRow" />
+        <DataGridNumericColumn Header="Q3" Binding="{Binding Q3}" Width="*" x:DataType="models:SpreadsheetRow" />
+        <DataGridNumericColumn Header="Q4" Binding="{Binding Q4}" Width="*" x:DataType="models:SpreadsheetRow" />
+        <DataGridTextColumn Header="Notes" Binding="{Binding Notes}" Width="2*" x:DataType="models:SpreadsheetRow" />
+      </DataGrid.Columns>
+    </DataGrid>
+  </Grid>
+</UserControl>

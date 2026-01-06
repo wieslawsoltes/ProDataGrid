@@ -1,0 +1,39 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:models="clr-namespace:DataGridSample.Models"
+             xmlns:viewModels="clr-namespace:DataGridSample.ViewModels"
+             x:Class="DataGridSample.Pages.ClipboardImportModelPage"
+             x:DataType="viewModels:ClipboardImportModelViewModel">
+  <UserControl.DataContext>
+    <viewModels:ClipboardImportModelViewModel />
+  </UserControl.DataContext>
+
+  <Grid RowDefinitions="Auto,Auto,*" RowSpacing="8" Margin="12">
+    <StackPanel Grid.Row="0" Spacing="4">
+      <TextBlock Classes="h2">Clipboard import model</TextBlock>
+      <TextBlock Text="Paste tabular data into the grid. Toggle custom parsing to transform incoming values." TextWrapping="Wrap" />
+    </StackPanel>
+
+    <StackPanel Grid.Row="1" Orientation="Horizontal" Spacing="8">
+      <TextBlock VerticalAlignment="Center" Text="Custom model" />
+      <ToggleSwitch IsChecked="{Binding UseUppercasePaste}" Content="Uppercase pasted text" />
+    </StackPanel>
+
+    <DataGrid Grid.Row="2"
+              ItemsSource="{Binding Rows}"
+              ClipboardImportModel="{Binding ClipboardImportModel}"
+              AutoGenerateColumns="False"
+              SelectionUnit="Cell"
+              SelectionMode="Extended"
+              ClipboardCopyMode="IncludeHeader"
+              CanUserPaste="True"
+              EditTriggers="CellClick,TextInput">
+      <DataGrid.Columns>
+        <DataGridTextColumn Header="A" Binding="{Binding A}" Width="*" x:DataType="models:ClipboardSampleRow" />
+        <DataGridTextColumn Header="B" Binding="{Binding B}" Width="*" x:DataType="models:ClipboardSampleRow" />
+        <DataGridTextColumn Header="C" Binding="{Binding C}" Width="*" x:DataType="models:ClipboardSampleRow" />
+        <DataGridTextColumn Header="D" Binding="{Binding D}" Width="*" x:DataType="models:ClipboardSampleRow" />
+      </DataGrid.Columns>
+    </DataGrid>
+  </Grid>
+</UserControl>

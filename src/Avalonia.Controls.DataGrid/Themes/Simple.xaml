@@ -39,6 +39,8 @@
                        Opacity="{DynamicResource DataGridRowSelectedHoveredUnfocusedBackgroundOpacity}" />
       <SolidColorBrush x:Key="DataGridCellFocusVisualPrimaryBrush" Color="{DynamicResource ThemeBorderHighColor}" />
       <SolidColorBrush x:Key="DataGridCellFocusVisualSecondaryBrush" Color="{DynamicResource ThemeBorderMidColor}" />
+      <SolidColorBrush x:Key="DataGridSelectionOutlineBrush" Color="{DynamicResource ThemeAccentColor2}" />
+      <SolidColorBrush x:Key="DataGridFillHandleBrush" Color="{DynamicResource ThemeAccentColor2}" />
       <SolidColorBrush x:Key="DataGridCellInvalidBrush" Color="{DynamicResource ErrorColor}" />
       <SolidColorBrush x:Key="DataGridCellWarningBrush" Color="#F59E0B" />
       <SolidColorBrush x:Key="DataGridCellInfoBrush" Color="#22C55E" />
@@ -78,6 +80,8 @@
       <x:Double x:Key="DataGridHierarchicalExpanderSize">28</x:Double>
       <x:Double x:Key="DataGridHierarchicalExpanderGlyphSize">10</x:Double>
       <x:Double x:Key="DataGridDropLocationIndicatorWidth">2</x:Double>
+      <Thickness x:Key="DataGridSelectionOutlineThickness">2</Thickness>
+      <x:Double x:Key="DataGridFillHandleSize">6</x:Double>
 
       <!-- Grid Sizing -->
       <GridLength x:Key="DataGridRowHeaderIndicatorWidth">16</GridLength>

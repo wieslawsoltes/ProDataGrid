@@ -39,6 +39,24 @@ internal
             // The template has changed, so we need to refresh the visuals
             _measured = false;
 
+            if (_topLeftCornerHeader != null)
+            {
+                _topLeftCornerHeader.PointerPressed -= TopLeftCornerHeader_PointerPressed;
+            }
+
+            if (_selectionOverlay is DataGridSelectionOverlay oldOverlay)
+            {
+                oldOverlay.FillHandle = null;
+            }
+
+            if (_fillHandle != null)
+            {
+                _fillHandle.PointerPressed -= FillHandle_PointerPressed;
+                _fillHandle.PointerMoved -= FillHandle_PointerMoved;
+                _fillHandle.PointerReleased -= FillHandle_PointerReleased;
+                _fillHandle.PointerCaptureLost -= FillHandle_PointerCaptureLost;
+            }
+
             if (_columnHeadersPresenter != null)
             {
                 // If we're applying a new template, we want to remove the old column headers first
@@ -79,6 +97,23 @@ internal
                 UpdateRowDetailsHeightEstimate();
             }
 
+            _selectionOverlay = e.NameScope.Find<Canvas>(DATAGRID_elementSelectionOverlayName);
+            _selectionOutline = e.NameScope.Find<Border>(DATAGRID_elementSelectionOutlineName);
+            _fillHandle = e.NameScope.Find<Border>(DATAGRID_elementFillHandleName);
+
+            if (_selectionOverlay is DataGridSelectionOverlay overlay)
+            {
+                overlay.FillHandle = _fillHandle;
+            }
+
+            if (_fillHandle != null)
+            {
+                _fillHandle.PointerPressed += FillHandle_PointerPressed;
+                _fillHandle.PointerMoved += FillHandle_PointerMoved;
+                _fillHandle.PointerReleased += FillHandle_PointerReleased;
+                _fillHandle.PointerCaptureLost += FillHandle_PointerCaptureLost;
+            }
+
             // Look for the ScrollViewer (used in v2 themes with ILogicalScrollable)
             _scrollViewer = e.NameScope.Find<ScrollViewer>(DATAGRID_elementScrollViewerName);
 
@@ -93,10 +128,17 @@ internal
             _topRightCornerHeader = e.NameScope.Find<ContentControl>(DATAGRID_elementTopRightCornerHeaderName);
             _bottomRightCorner = e.NameScope.Find<Visual>(DATAGRID_elementBottomRightCornerHeaderName);
 
+            if (_topLeftCornerHeader != null)
+            {
+                _topLeftCornerHeader.PointerPressed += TopLeftCornerHeader_PointerPressed;
+            }
+
             // Setup total summary row from template
             SetupTotalSummaryRow(e.NameScope);
 
             TryExecutePendingAutoScroll();
+
+            RequestSelectionOverlayRefresh();
 
             // Ensure row drag/drop wiring is active even if the property was set while handlers were suspended.
             if (_rowDragDropController == null && CanUserReorderRows)

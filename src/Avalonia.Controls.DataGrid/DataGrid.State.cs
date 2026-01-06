@@ -10,6 +10,7 @@ using System.Linq;
 using Avalonia;
 using Avalonia.Collections;
 using Avalonia.Controls.DataGridFiltering;
+using Avalonia.Controls.DataGridConditionalFormatting;
 using Avalonia.Controls.DataGridHierarchical;
 using Avalonia.Controls.DataGridSearching;
 using Avalonia.Controls.DataGridSelection;
@@ -50,6 +51,11 @@ namespace Avalonia.Controls
             if (HasSection(sections, DataGridStateSections.Searching))
             {
                 state.Search = CaptureSearchState(options);
+            }
+
+            if (HasSection(sections, DataGridStateSections.ConditionalFormatting))
+            {
+                state.ConditionalFormatting = CaptureConditionalFormattingState(options);
             }
 
             if (HasSection(sections, DataGridStateSections.Grouping))
@@ -109,6 +115,11 @@ namespace Avalonia.Controls
                 RestoreSearchState(state.Search, options);
             }
 
+            if (HasSection(target, DataGridStateSections.ConditionalFormatting))
+            {
+                RestoreConditionalFormattingState(state.ConditionalFormatting, options);
+            }
+
             if (HasSection(target, DataGridStateSections.Hierarchical))
             {
                 RestoreHierarchicalState(state.Hierarchical, options);
@@ -133,6 +144,7 @@ namespace Avalonia.Controls
                 Sorting = CaptureSortingState(options),
                 Filtering = CaptureFilteringState(options),
                 Search = CaptureSearchState(options),
+                ConditionalFormatting = CaptureConditionalFormattingState(options),
                 Grouping = CaptureGroupingState(options)
             };
         }
@@ -149,6 +161,7 @@ namespace Avalonia.Controls
             RestoreSortingState(state.Sorting, options);
             RestoreFilteringState(state.Filtering, options);
             RestoreSearchState(state.Search, options);
+            RestoreConditionalFormattingState(state.ConditionalFormatting, options);
         }
 
         public DataGridSelectionState CaptureSelectionState(DataGridStateOptions options = null)
@@ -478,6 +491,44 @@ namespace Avalonia.Controls
                         _pendingSearchOptions = options;
                     }
                 }
+            }
+        }
+
+        public DataGridConditionalFormattingState CaptureConditionalFormattingState(DataGridStateOptions options = null)
+        {
+            if (ConditionalFormattingModel == null)
+            {
+                return null;
+            }
+
+            var descriptors = ConditionalFormattingModel.Descriptors
+                ?.Where(descriptor => descriptor != null)
+                .ToList();
+
+            return new DataGridConditionalFormattingState
+            {
+                Descriptors = descriptors
+            };
+        }
+
+        public void RestoreConditionalFormattingState(
+            DataGridConditionalFormattingState state,
+            DataGridStateOptions options = null)
+        {
+            if (state == null || ConditionalFormattingModel == null)
+            {
+                return;
+            }
+
+            if (state.Descriptors == null || state.Descriptors.Count == 0)
+            {
+                ConditionalFormattingModel.Clear();
+                return;
+            }
+
+            using (ConditionalFormattingModel.DeferRefresh())
+            {
+                ConditionalFormattingModel.Apply(state.Descriptors);
             }
         }
 

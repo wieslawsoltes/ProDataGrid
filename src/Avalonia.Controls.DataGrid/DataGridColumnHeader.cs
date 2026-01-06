@@ -64,6 +64,7 @@ internal
         private static double _frozenColumnsRightWidth;
         private static Lazy<Cursor> _resizeCursor = new Lazy<Cursor>(() => new Cursor(StandardCursorType.SizeWestEast));
         private DataGridColumn _owningColumn;
+        private bool _suppressSortOnClick;
 
         /// <summary>
         /// Identifies the <see cref="LeftClick"/> routed event.
@@ -220,6 +221,13 @@ internal
             }
         }
 
+        internal bool IsResizing => _dragMode == DragMode.Resize;
+
+        internal void SuppressSortOnClick()
+        {
+            _suppressSortOnClick = true;
+        }
+
         internal ListSortDirection? CurrentSortingState
         {
             get;
@@ -372,6 +380,13 @@ internal
         {
             var args = new DataGridColumnHeaderClickEventArgs(keyModifiers, LeftClickEvent, this);
             RaiseEvent(args);
+
+            if (_suppressSortOnClick)
+            {
+                _suppressSortOnClick = false;
+                handled = true;
+                return;
+            }
 
             // completed a click without dragging, so we're sorting
             InvokeProcessSort(keyModifiers);
@@ -630,6 +645,7 @@ internal
                 args.Pointer.Capture(null);
                 OnLostMouseCapture();
                 _dragMode = DragMode.None;
+                _suppressSortOnClick = false;
                 handled = true;
             }
         }
@@ -682,13 +698,14 @@ internal
                 return;
             }
 
+            _suppressSortOnClick = false;
             Point mousePosition = e.GetPosition(this);
             bool handled = e.Handled;
             OnMouseLeftButtonDown(ref handled, e, mousePosition);
             e.RoutedEvent = HeaderPointerPressedEvent;
             e.Source ??= this;
             RaiseEvent(e);
-            e.Handled = handled;
+            e.Handled = e.Handled || handled;
 
             UpdatePseudoClasses();
         }
@@ -707,7 +724,7 @@ internal
             e.RoutedEvent = HeaderPointerReleasedEvent;
             e.Source ??= this;
             RaiseEvent(e);
-            e.Handled = handled;
+            e.Handled = e.Handled || handled;
 
             UpdatePseudoClasses();
         }

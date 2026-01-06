@@ -7,6 +7,7 @@
 using Avalonia.Collections;
 using Avalonia.Controls.Primitives;
 using Avalonia.Controls.Utils;
+using Avalonia.Controls.DataGridEditing;
 using Avalonia.Data;
 using Avalonia.Input;
 using Avalonia.Interactivity;
@@ -16,6 +17,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
+using System.Linq;
 
 namespace Avalonia.Controls
 {
@@ -1011,6 +1013,64 @@ internal
             DataGridColumn dataGridColumn = CurrentColumn;
             _uneditedValue = dataGridColumn.PrepareCellForEditInternal(editingElement, _editingEventArgs);
             OnPreparingCellForEdit(new DataGridPreparingCellForEditEventArgs(dataGridColumn, EditingRow, _editingEventArgs, editingElement));
+            ApplyPendingTextInput(editingElement);
+        }
+
+        private void ApplyPendingTextInput(Control editingElement)
+        {
+            if (string.IsNullOrEmpty(_pendingTextInput))
+            {
+                return;
+            }
+
+            var text = _pendingTextInput;
+            _pendingTextInput = null;
+
+            if (TryApplyTextInput(editingElement, text))
+            {
+                return;
+            }
+
+            if (editingElement is TemplatedControl templated)
+            {
+                void Handler(object sender, TemplateAppliedEventArgs e)
+                {
+                    templated.TemplateApplied -= Handler;
+                    TryApplyTextInput(templated, text);
+                }
+
+                templated.TemplateApplied += Handler;
+            }
+        }
+
+        private bool TryApplyTextInput(Control editingElement, string text)
+        {
+            var model = EditingInteractionModel;
+            if (model != null)
+            {
+                return model.TryApplyTextInput(new DataGridTextInputApplyContext(editingElement, text));
+            }
+
+            if (editingElement is TextBox textBox)
+            {
+                textBox.Text = text;
+                textBox.CaretIndex = text.Length;
+                textBox.SelectionStart = text.Length;
+                textBox.SelectionEnd = text.Length;
+                return true;
+            }
+
+            var nestedTextBox = editingElement.GetVisualDescendants().OfType<TextBox>().FirstOrDefault();
+            if (nestedTextBox != null)
+            {
+                nestedTextBox.Text = text;
+                nestedTextBox.CaretIndex = text.Length;
+                nestedTextBox.SelectionStart = text.Length;
+                nestedTextBox.SelectionEnd = text.Length;
+                return true;
+            }
+
+            return false;
         }
 
 
@@ -1050,7 +1110,7 @@ internal
                 element = dataGridColumn.GenerateElementInternal(dataGridCell, dataGridRow.DataContext);
                 dataGridCell.Content = element;
             }
-
+            dataGridColumn.ApplyCellBindings(dataGridCell);
 
         }
 

@@ -22,18 +22,28 @@
   href: keyboard-shortcuts.md
 - name: Columns and Editing
   href: columns-and-editing.md
+- name: Editing Interaction Model
+  href: editing-interaction-model.md
 - name: Column Types Reference
   href: column-types-reference.md
 - name: Validation and Errors
   href: validation-and-errors.md
+- name: Conditional Formatting
+  href: conditional-formatting.md
 - name: Selection and Navigation
   href: selection-and-navigation.md
 - name: Selection Highlighting
   href: selection-highlighting.md
 - name: Drag (Slide) Selection
   href: drag-selection.md
+- name: Range Interaction Model
+  href: range-interaction-model.md
+- name: Fill Handle and Auto Fill
+  href: fill-handle-and-autofill.md
 - name: Clipboard and Export
   href: clipboard-and-export.md
+- name: Clipboard Import Model
+  href: clipboard-import-model.md
 - name: Data Operations
   href: data-operations.md
 - name: Scrolling and Virtualization

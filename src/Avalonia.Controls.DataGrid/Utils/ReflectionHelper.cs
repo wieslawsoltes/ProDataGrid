@@ -329,6 +329,74 @@ namespace Avalonia.Controls.Utils
             return null;
         }
 
+        internal static bool TrySetNestedPropertyValue(object? item, string? propertyPath, object? value, out Exception? exception)
+        {
+            exception = null;
+
+            if (item == null || string.IsNullOrEmpty(propertyPath))
+            {
+                return false;
+            }
+
+            object? current = item;
+            var type = item.GetType();
+            var propertyNames = SplitPropertyPath(propertyPath);
+            for (var i = 0; i < propertyNames.Count; i++)
+            {
+                var propertyInfo = type.GetPropertyOrIndexer(propertyNames[i], out var index);
+                if (propertyInfo == null)
+                {
+                    return false;
+                }
+
+                if (i == propertyNames.Count - 1)
+                {
+                    if (!propertyInfo.CanWrite)
+                    {
+                        exception = new InvalidOperationException(
+                            $"The property named '{propertyNames[i]}' on type '{type.GetTypeName()}' cannot be written.");
+                        return false;
+                    }
+
+                    try
+                    {
+                        propertyInfo.SetValue(current, value, index);
+                        return true;
+                    }
+                    catch (Exception ex)
+                    {
+                        exception = ex;
+                        return false;
+                    }
+                }
+
+                if (!propertyInfo.CanRead)
+                {
+                    exception = new InvalidOperationException(
+                        $"The property named '{propertyNames[i]}' on type '{type.GetTypeName()}' cannot be read.");
+                    return false;
+                }
+
+                try
+                {
+                    current = propertyInfo.GetValue(current, index);
+                }
+                catch (Exception ex)
+                {
+                    exception = ex;
+                    return false;
+                }
+                if (current == null)
+                {
+                    return false;
+                }
+
+                type = current.GetType();
+            }
+
+            return false;
+        }
+
         internal static Type GetNonNullableType(this Type type)
         {
             if (IsNullableType(type))

@@ -1289,6 +1289,7 @@ internal
             {
                 dataGridColumn.RefreshCellContent(element, propertyName);
             }
+            dataGridColumn.RefreshCellBindings(dataGridCell, propertyName);
         }
 
         private void UpdateDisplayedColumns()

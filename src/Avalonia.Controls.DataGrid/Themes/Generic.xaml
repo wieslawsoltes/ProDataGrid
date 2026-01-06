@@ -1248,6 +1248,32 @@
                                              IsScrollInertiaEnabled="{Binding (ScrollViewer.IsScrollInertiaEnabled), ElementName=PART_RowsPresenter}" />
                   </DataGridRowsPresenter.GestureRecognizers>
                 </DataGridRowsPresenter>
+                <controls:DataGridSelectionOverlay Name="PART_SelectionOverlay"
+                        Grid.Row="2"
+                        Grid.Column="0"
+                        Grid.RowSpan="2"
+                        Grid.ColumnSpan="3"
+                        ClipToBounds="True"
+                        IsHitTestVisible="True"
+                        Panel.ZIndex="5">
+                  <Border Name="PART_SelectionOutline"
+                          BorderBrush="{DynamicResource DataGridSelectionOutlineBrush}"
+                          BorderThickness="{DynamicResource DataGridSelectionOutlineThickness}"
+                          Background="{x:Null}"
+                          IsHitTestVisible="False"
+                          IsVisible="False"
+                          Width="0"
+                          Height="0" />
+                  <Border Name="PART_FillHandle"
+                          Width="{DynamicResource DataGridFillHandleSize}"
+                          Height="{DynamicResource DataGridFillHandleSize}"
+                          Background="{DynamicResource DataGridFillHandleBrush}"
+                          BorderBrush="{DynamicResource DataGridSelectionOutlineBrush}"
+                          BorderThickness="1"
+                          CornerRadius="1"
+                          Cursor="Cross"
+                          IsVisible="False" />
+                </controls:DataGridSelectionOverlay>
                 <controls:DataGridSummaryRow Name="PART_TotalSummaryRow"
                                               Grid.Row="4"
                                               Grid.Column="0"
@@ -1322,30 +1348,6 @@
   </Style>
 
   <!-- Selection-unit specific hover visuals -->
-  <Style Selector="DataGrid[SelectionUnit=Cell] DataGridRow:pointerover:not(:selected):not(:searchmatch):not(:searchcurrent) /template/ Rectangle#BackgroundRectangle">
-    <Setter Property="Fill" Value="Transparent" />
-    <Setter Property="Opacity" Value="0" />
-  </Style>
-  <Style Selector="DataGrid[SelectionUnit=CellOrRowHeader] DataGridRow:pointerover:not(:selected):not(:searchmatch):not(:searchcurrent) /template/ Rectangle#BackgroundRectangle">
-    <Setter Property="Fill" Value="Transparent" />
-    <Setter Property="Opacity" Value="0" />
-  </Style>
-  <Style Selector="DataGrid[SelectionUnit=Cell] DataGridRow:selected:pointerover:not(:searchmatch):not(:searchcurrent) /template/ Rectangle#BackgroundRectangle">
-    <Setter Property="Fill" Value="Transparent" />
-    <Setter Property="Opacity" Value="0" />
-  </Style>
-  <Style Selector="DataGrid[SelectionUnit=Cell] DataGridRow:selected:pointerover:focus:not(:searchmatch):not(:searchcurrent) /template/ Rectangle#BackgroundRectangle">
-    <Setter Property="Fill" Value="Transparent" />
-    <Setter Property="Opacity" Value="0" />
-  </Style>
-  <Style Selector="DataGrid[SelectionUnit=CellOrRowHeader] DataGridRow:selected:pointerover:not(:searchmatch):not(:searchcurrent) /template/ Rectangle#BackgroundRectangle">
-    <Setter Property="Fill" Value="Transparent" />
-    <Setter Property="Opacity" Value="0" />
-  </Style>
-  <Style Selector="DataGrid[SelectionUnit=CellOrRowHeader] DataGridRow:selected:pointerover:focus:not(:searchmatch):not(:searchcurrent) /template/ Rectangle#BackgroundRectangle">
-    <Setter Property="Fill" Value="Transparent" />
-    <Setter Property="Opacity" Value="0" />
-  </Style>
   <Style Selector="DataGrid[SelectionUnit=Cell] DataGridCell:pointerover:not(:cell-selected):not(:searchmatch):not(:searchcurrent)">
     <Setter Property="Background" Value="{DynamicResource DataGridCellHoveredBackgroundBrush}" />
   </Style>

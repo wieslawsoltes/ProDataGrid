@@ -18,6 +18,7 @@
     <PackageReference Include="Avalonia.Themes.Fluent" />
     <PackageReference Include="Avalonia.ReactiveUI" />
     <PackageReference Include="DynamicData" />
+    <PackageReference Include="Microsoft.PowerFx.Interpreter" />
   </ItemGroup>
 
   <ItemGroup>
