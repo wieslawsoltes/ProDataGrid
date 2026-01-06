@@ -328,6 +328,8 @@ internal
 
             // Finally, we can prepare the cell for editing
             _editingCellValidationSnapshot = CellValidationSnapshot.Capture(dataGridCell);
+            // Hide existing cell errors while editing to avoid duplicate validation visuals.
+            DataValidationErrors.ClearErrors(dataGridCell);
             _editingColumnIndex = CurrentColumnIndex;
             _editingEventArgs = editingEventArgs;
             dataGridCell.UpdatePseudoClasses();
