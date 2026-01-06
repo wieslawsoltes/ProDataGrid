@@ -1,0 +1,425 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+      <title>Class DataGridConditionalFormattingAdapter | ProDataGrid for Avalonia </title>
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <meta name="title" content="Class DataGridConditionalFormattingAdapter | ProDataGrid for Avalonia ">
+      
+      <meta name="description" content="Evaluates conditional formatting descriptors against the view and current items.">
+      <link rel="icon" href="../favicon.ico">
+      <link rel="stylesheet" href="../public/docfx.min.css">
+      <link rel="stylesheet" href="../public/main.css">
+      <meta name="docfx:navrel" content="../toc.html">
+      <meta name="docfx:tocrel" content="toc.html">
+      
+      
+      
+      
+      <meta name="docfx:docurl" content="https://github.com/wieslawsoltes/ProDataGrid/new/master/apiSpec/new?filename=Avalonia_Controls_DataGridConditionalFormatting_DataGridConditionalFormattingAdapter.md&amp;value=---%0Auid%3A%20Avalonia.Controls.DataGridConditionalFormatting.DataGridConditionalFormattingAdapter%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">
+      <meta name="loc:inThisArticle" content="In this article">
+      <meta name="loc:searchResultsCount" content="{count} results for &quot;{query}&quot;">
+      <meta name="loc:searchNoResults" content="No results for &quot;{query}&quot;">
+      <meta name="loc:tocFilter" content="Filter by title">
+      <meta name="loc:nextArticle" content="Next">
+      <meta name="loc:prevArticle" content="Previous">
+      <meta name="loc:themeLight" content="Light">
+      <meta name="loc:themeDark" content="Dark">
+      <meta name="loc:themeAuto" content="Auto">
+      <meta name="loc:changeTheme" content="Change theme">
+      <meta name="loc:copy" content="Copy">
+      <meta name="loc:downloadPdf" content="Download PDF">
+
+      <script type="module" src="./../public/docfx.min.js"></script>
+
+      <script>
+        const theme = localStorage.getItem('theme') || 'auto'
+        document.documentElement.setAttribute('data-bs-theme', theme === 'auto' ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light') : theme)
+      </script>
+
+  </head>
+
+  <body class="tex2jax_ignore" data-layout="" data-yaml-mime="ManagedReference">
+    <header class="bg-body border-bottom">
+      <nav id="autocollapse" class="navbar navbar-expand-md" role="navigation">
+        <div class="container-xxl flex-nowrap">
+          <a class="navbar-brand" href="../index.html">
+            <img id="logo" class="svg" src="../images/logo.svg" alt="">
+            
+          </a>
+          <button class="btn btn-lg d-md-none border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navpanel" aria-controls="navpanel" aria-expanded="false" aria-label="Toggle navigation">
+            <i class="bi bi-three-dots"></i>
+          </button>
+          <div class="collapse navbar-collapse" id="navpanel">
+            <div id="navbar">
+            </div>
+          </div>
+        </div>
+      </nav>
+    </header>
+
+    <main class="container-xxl">
+      <div class="toc-offcanvas">
+        <div class="offcanvas-md offcanvas-start" tabindex="-1" id="tocOffcanvas" aria-labelledby="tocOffcanvasLabel">
+          <div class="offcanvas-header">
+            <h5 class="offcanvas-title" id="tocOffcanvasLabel">Table of Contents</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="offcanvas" data-bs-target="#tocOffcanvas" aria-label="Close"></button>
+          </div>
+          <div class="offcanvas-body">
+            <nav class="toc" id="toc"></nav>
+          </div>
+        </div>
+      </div>
+
+      <div class="content">
+        <div class="actionbar">
+          <button class="btn btn-lg border-0 d-md-none" type="button" data-bs-toggle="offcanvas" data-bs-target="#tocOffcanvas" aria-controls="tocOffcanvas" aria-expanded="false" aria-label="Show table of contents">
+            <i class="bi bi-list"></i>
+          </button>
+
+          <nav id="breadcrumb"></nav>
+        </div>
+
+        <article data-uid="Avalonia.Controls.DataGridConditionalFormatting.DataGridConditionalFormattingAdapter">
+
+
+
+  <h1 id="Avalonia_Controls_DataGridConditionalFormatting_DataGridConditionalFormattingAdapter" data-uid="Avalonia.Controls.DataGridConditionalFormatting.DataGridConditionalFormattingAdapter" class="text-break">
+Class DataGridConditionalFormattingAdapter  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/ConditionalFormatting/DataGridConditionalFormattingAdapter.cs/#L23"><i class="bi bi-code-slash"></i></a>
+  </h1>
+
+  <div class="facts text-secondary">
+    <dl><dt>Namespace</dt><dd><a class="xref" href="Avalonia.html">Avalonia</a>.<a class="xref" href="Avalonia.Controls.html">Controls</a>.<a class="xref" href="Avalonia.Controls.DataGridConditionalFormatting.html">DataGridConditionalFormatting</a></dd></dl>
+  <dl><dt>Assembly</dt><dd>Avalonia.Controls.DataGrid.dll</dd></dl>
+  </div>
+
+  <div class="markdown summary"><p>Evaluates conditional formatting descriptors against the view and current items.</p>
+</div>
+  <div class="markdown conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">[RequiresUnreferencedCode(&quot;DataGridConditionalFormattingAdapter uses reflection to access item properties and is not compatible with trimming.&quot;)]
+public class DataGridConditionalFormattingAdapter : IDisposable</code></pre>
+  </div>
+
+
+
+
+  <dl class="typelist inheritance">
+    <dt>Inheritance</dt>
+    <dd>
+      <div><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object">object</a></div>
+      <div><span class="xref">DataGridConditionalFormattingAdapter</span></div>
+    </dd>
+  </dl>
+
+  <dl class="typelist implements">
+    <dt>Implements</dt>
+    <dd>
+      <div><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.idisposable">IDisposable</a></div>
+    </dd>
+  </dl>
+
+
+  <dl class="typelist inheritedMembers">
+    <dt>Inherited Members</dt>
+    <dd>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object)">object.Equals(object)</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object-system-object)">object.Equals(object, object)</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.gethashcode">object.GetHashCode()</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.gettype">object.GetType()</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.memberwiseclone">object.MemberwiseClone()</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.referenceequals">object.ReferenceEquals(object, object)</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.tostring">object.ToString()</a>
+    </div>
+  </dd></dl>
+
+
+
+
+
+
+  <h2 class="section" id="constructors">Constructors
+</h2>
+
+
+  <a id="Avalonia_Controls_DataGridConditionalFormatting_DataGridConditionalFormattingAdapter__ctor_" data-uid="Avalonia.Controls.DataGridConditionalFormatting.DataGridConditionalFormattingAdapter.#ctor*"></a>
+
+  <h3 id="Avalonia_Controls_DataGridConditionalFormatting_DataGridConditionalFormattingAdapter__ctor_Avalonia_Controls_DataGridConditionalFormatting_IConditionalFormattingModel_System_Func_System_Collections_Generic_IEnumerable_Avalonia_Controls_DataGridColumn___" data-uid="Avalonia.Controls.DataGridConditionalFormatting.DataGridConditionalFormattingAdapter.#ctor(Avalonia.Controls.DataGridConditionalFormatting.IConditionalFormattingModel,System.Func{System.Collections.Generic.IEnumerable{Avalonia.Controls.DataGridColumn}})">
+  DataGridConditionalFormattingAdapter(IConditionalFormattingModel, Func&lt;IEnumerable&lt;DataGridColumn&gt;&gt;)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/ConditionalFormatting/DataGridConditionalFormattingAdapter.cs/#L40"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public DataGridConditionalFormattingAdapter(IConditionalFormattingModel model, Func&lt;IEnumerable&lt;DataGridColumn&gt;&gt; columnProvider)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>model</code> <a class="xref" href="Avalonia.Controls.DataGridConditionalFormatting.IConditionalFormattingModel.html">IConditionalFormattingModel</a></dt>
+    <dd></dd>
+    <dt><code>columnProvider</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.func-1">Func</a>&lt;<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.ienumerable-1">IEnumerable</a>&lt;<a class="xref" href="Avalonia.Controls.DataGridColumn.html">DataGridColumn</a>&gt;&gt;</dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+
+  <h2 class="section" id="properties">Properties
+</h2>
+
+
+  <a id="Avalonia_Controls_DataGridConditionalFormatting_DataGridConditionalFormattingAdapter_View_" data-uid="Avalonia.Controls.DataGridConditionalFormatting.DataGridConditionalFormattingAdapter.View*"></a>
+
+  <h3 id="Avalonia_Controls_DataGridConditionalFormatting_DataGridConditionalFormattingAdapter_View" data-uid="Avalonia.Controls.DataGridConditionalFormatting.DataGridConditionalFormattingAdapter.View">
+  View
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/ConditionalFormatting/DataGridConditionalFormattingAdapter.cs/#L58"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public IDataGridCollectionView View { get; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="Avalonia.Collections.IDataGridCollectionView.html">IDataGridCollectionView</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <h2 class="section" id="methods">Methods
+</h2>
+
+
+  <a id="Avalonia_Controls_DataGridConditionalFormatting_DataGridConditionalFormattingAdapter_AttachView_" data-uid="Avalonia.Controls.DataGridConditionalFormatting.DataGridConditionalFormattingAdapter.AttachView*"></a>
+
+  <h3 id="Avalonia_Controls_DataGridConditionalFormatting_DataGridConditionalFormattingAdapter_AttachView_Avalonia_Collections_IDataGridCollectionView_" data-uid="Avalonia.Controls.DataGridConditionalFormatting.DataGridConditionalFormattingAdapter.AttachView(Avalonia.Collections.IDataGridCollectionView)">
+  AttachView(IDataGridCollectionView)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/ConditionalFormatting/DataGridConditionalFormattingAdapter.cs/#L65"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public void AttachView(IDataGridCollectionView view)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>view</code> <a class="xref" href="Avalonia.Collections.IDataGridCollectionView.html">IDataGridCollectionView</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Avalonia_Controls_DataGridConditionalFormatting_DataGridConditionalFormattingAdapter_Dispose_" data-uid="Avalonia.Controls.DataGridConditionalFormatting.DataGridConditionalFormattingAdapter.Dispose*"></a>
+
+  <h3 id="Avalonia_Controls_DataGridConditionalFormatting_DataGridConditionalFormattingAdapter_Dispose" data-uid="Avalonia.Controls.DataGridConditionalFormatting.DataGridConditionalFormattingAdapter.Dispose">
+  Dispose()
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/ConditionalFormatting/DataGridConditionalFormattingAdapter.cs/#L90"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public void Dispose()</code></pre>
+  </div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Avalonia_Controls_DataGridConditionalFormatting_DataGridConditionalFormattingAdapter_MatchCell_" data-uid="Avalonia.Controls.DataGridConditionalFormatting.DataGridConditionalFormattingAdapter.MatchCell*"></a>
+
+  <h3 id="Avalonia_Controls_DataGridConditionalFormatting_DataGridConditionalFormattingAdapter_MatchCell_System_Object_System_Int32_Avalonia_Controls_DataGridColumn_" data-uid="Avalonia.Controls.DataGridConditionalFormatting.DataGridConditionalFormattingAdapter.MatchCell(System.Object,System.Int32,Avalonia.Controls.DataGridColumn)">
+  MatchCell(object, int, DataGridColumn)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/ConditionalFormatting/DataGridConditionalFormattingAdapter.cs/#L96"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public ConditionalFormattingDescriptor MatchCell(object item, int rowIndex, DataGridColumn column)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>item</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object">object</a></dt>
+    <dd></dd>
+    <dt><code>rowIndex</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a></dt>
+    <dd></dd>
+    <dt><code>column</code> <a class="xref" href="Avalonia.Controls.DataGridColumn.html">DataGridColumn</a></dt>
+    <dd></dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="Avalonia.Controls.DataGridConditionalFormatting.ConditionalFormattingDescriptor.html">ConditionalFormattingDescriptor</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Avalonia_Controls_DataGridConditionalFormatting_DataGridConditionalFormattingAdapter_MatchRow_" data-uid="Avalonia.Controls.DataGridConditionalFormatting.DataGridConditionalFormattingAdapter.MatchRow*"></a>
+
+  <h3 id="Avalonia_Controls_DataGridConditionalFormatting_DataGridConditionalFormattingAdapter_MatchRow_System_Object_System_Int32_" data-uid="Avalonia.Controls.DataGridConditionalFormatting.DataGridConditionalFormattingAdapter.MatchRow(System.Object,System.Int32)">
+  MatchRow(object, int)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/ConditionalFormatting/DataGridConditionalFormattingAdapter.cs/#L137"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public ConditionalFormattingDescriptor MatchRow(object item, int rowIndex)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>item</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object">object</a></dt>
+    <dd></dd>
+    <dt><code>rowIndex</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a></dt>
+    <dd></dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="Avalonia.Controls.DataGridConditionalFormatting.ConditionalFormattingDescriptor.html">ConditionalFormattingDescriptor</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <h2 class="section" id="events">Events
+</h2>
+
+
+
+  <h3 id="Avalonia_Controls_DataGridConditionalFormatting_DataGridConditionalFormattingAdapter_FormattingChanged" data-uid="Avalonia.Controls.DataGridConditionalFormatting.DataGridConditionalFormattingAdapter.FormattingChanged">
+  FormattingChanged
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/ConditionalFormatting/DataGridConditionalFormattingAdapter.cs/#L55"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public event EventHandler FormattingChanged</code></pre>
+  </div>
+
+
+
+
+
+
+  <h4 class="section">Event Type</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.eventhandler">EventHandler</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+</article>
+
+        <div class="contribution d-print-none">
+          <a href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/ConditionalFormatting/DataGridConditionalFormattingAdapter.cs/#L23" class="edit-link">Edit this page</a>
+        </div>
+
+
+      </div>
+
+      <div class="affix">
+        <nav id="affix"></nav>
+      </div>
+    </main>
+
+
+    <footer class="border-top text-secondary">
+      <div class="container-xxl">
+        <div class="flex-fill">
+          <span>Made with <a href="https://dotnet.github.io/docfx">docfx</a></span>
+        </div>
+      </div>
+    </footer>
+  </body>
+</html>

@@ -1,0 +1,913 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+      <title>Class DataGridFillModel | ProDataGrid for Avalonia </title>
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <meta name="title" content="Class DataGridFillModel | ProDataGrid for Avalonia ">
+      
+      
+      <link rel="icon" href="../favicon.ico">
+      <link rel="stylesheet" href="../public/docfx.min.css">
+      <link rel="stylesheet" href="../public/main.css">
+      <meta name="docfx:navrel" content="../toc.html">
+      <meta name="docfx:tocrel" content="toc.html">
+      
+      
+      
+      
+      <meta name="docfx:docurl" content="https://github.com/wieslawsoltes/ProDataGrid/new/master/apiSpec/new?filename=Avalonia_Controls_DataGridFilling_DataGridFillModel.md&amp;value=---%0Auid%3A%20Avalonia.Controls.DataGridFilling.DataGridFillModel%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">
+      <meta name="loc:inThisArticle" content="In this article">
+      <meta name="loc:searchResultsCount" content="{count} results for &quot;{query}&quot;">
+      <meta name="loc:searchNoResults" content="No results for &quot;{query}&quot;">
+      <meta name="loc:tocFilter" content="Filter by title">
+      <meta name="loc:nextArticle" content="Next">
+      <meta name="loc:prevArticle" content="Previous">
+      <meta name="loc:themeLight" content="Light">
+      <meta name="loc:themeDark" content="Dark">
+      <meta name="loc:themeAuto" content="Auto">
+      <meta name="loc:changeTheme" content="Change theme">
+      <meta name="loc:copy" content="Copy">
+      <meta name="loc:downloadPdf" content="Download PDF">
+
+      <script type="module" src="./../public/docfx.min.js"></script>
+
+      <script>
+        const theme = localStorage.getItem('theme') || 'auto'
+        document.documentElement.setAttribute('data-bs-theme', theme === 'auto' ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light') : theme)
+      </script>
+
+  </head>
+
+  <body class="tex2jax_ignore" data-layout="" data-yaml-mime="ManagedReference">
+    <header class="bg-body border-bottom">
+      <nav id="autocollapse" class="navbar navbar-expand-md" role="navigation">
+        <div class="container-xxl flex-nowrap">
+          <a class="navbar-brand" href="../index.html">
+            <img id="logo" class="svg" src="../images/logo.svg" alt="">
+            
+          </a>
+          <button class="btn btn-lg d-md-none border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navpanel" aria-controls="navpanel" aria-expanded="false" aria-label="Toggle navigation">
+            <i class="bi bi-three-dots"></i>
+          </button>
+          <div class="collapse navbar-collapse" id="navpanel">
+            <div id="navbar">
+            </div>
+          </div>
+        </div>
+      </nav>
+    </header>
+
+    <main class="container-xxl">
+      <div class="toc-offcanvas">
+        <div class="offcanvas-md offcanvas-start" tabindex="-1" id="tocOffcanvas" aria-labelledby="tocOffcanvasLabel">
+          <div class="offcanvas-header">
+            <h5 class="offcanvas-title" id="tocOffcanvasLabel">Table of Contents</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="offcanvas" data-bs-target="#tocOffcanvas" aria-label="Close"></button>
+          </div>
+          <div class="offcanvas-body">
+            <nav class="toc" id="toc"></nav>
+          </div>
+        </div>
+      </div>
+
+      <div class="content">
+        <div class="actionbar">
+          <button class="btn btn-lg border-0 d-md-none" type="button" data-bs-toggle="offcanvas" data-bs-target="#tocOffcanvas" aria-controls="tocOffcanvas" aria-expanded="false" aria-label="Show table of contents">
+            <i class="bi bi-list"></i>
+          </button>
+
+          <nav id="breadcrumb"></nav>
+        </div>
+
+        <article data-uid="Avalonia.Controls.DataGridFilling.DataGridFillModel">
+
+
+
+  <h1 id="Avalonia_Controls_DataGridFilling_DataGridFillModel" data-uid="Avalonia.Controls.DataGridFilling.DataGridFillModel" class="text-break">
+Class DataGridFillModel  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/Filling/DataGridFillModel.cs/#L194"><i class="bi bi-code-slash"></i></a>
+  </h1>
+
+  <div class="facts text-secondary">
+    <dl><dt>Namespace</dt><dd><a class="xref" href="Avalonia.html">Avalonia</a>.<a class="xref" href="Avalonia.Controls.html">Controls</a>.<a class="xref" href="Avalonia.Controls.DataGridFilling.html">DataGridFilling</a></dd></dl>
+  <dl><dt>Assembly</dt><dd>Avalonia.Controls.DataGrid.dll</dd></dl>
+  </div>
+
+  <div class="markdown summary"></div>
+  <div class="markdown conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public class DataGridFillModel : IDataGridFillModel</code></pre>
+  </div>
+
+
+
+
+  <dl class="typelist inheritance">
+    <dt>Inheritance</dt>
+    <dd>
+      <div><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object">object</a></div>
+      <div><span class="xref">DataGridFillModel</span></div>
+    </dd>
+  </dl>
+
+  <dl class="typelist implements">
+    <dt>Implements</dt>
+    <dd>
+      <div><a class="xref" href="Avalonia.Controls.DataGridFilling.IDataGridFillModel.html">IDataGridFillModel</a></div>
+    </dd>
+  </dl>
+
+
+  <dl class="typelist inheritedMembers">
+    <dt>Inherited Members</dt>
+    <dd>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object)">object.Equals(object)</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object-system-object)">object.Equals(object, object)</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.gethashcode">object.GetHashCode()</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.gettype">object.GetType()</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.memberwiseclone">object.MemberwiseClone()</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.referenceequals">object.ReferenceEquals(object, object)</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.tostring">object.ToString()</a>
+    </div>
+  </dd></dl>
+
+
+
+
+
+
+  <h2 class="section" id="methods">Methods
+</h2>
+
+
+  <a id="Avalonia_Controls_DataGridFilling_DataGridFillModel_ApplyFill_" data-uid="Avalonia.Controls.DataGridFilling.DataGridFillModel.ApplyFill*"></a>
+
+  <h3 id="Avalonia_Controls_DataGridFilling_DataGridFillModel_ApplyFill_Avalonia_Controls_DataGridFilling_DataGridFillContext_" data-uid="Avalonia.Controls.DataGridFilling.DataGridFillModel.ApplyFill(Avalonia.Controls.DataGridFilling.DataGridFillContext)">
+  ApplyFill(DataGridFillContext)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/Filling/DataGridFillModel.cs/#L200"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public virtual void ApplyFill(DataGridFillContext context)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>context</code> <a class="xref" href="Avalonia.Controls.DataGridFilling.DataGridFillContext.html">DataGridFillContext</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Avalonia_Controls_DataGridFilling_DataGridFillModel_ApplyFillCore_" data-uid="Avalonia.Controls.DataGridFilling.DataGridFillModel.ApplyFillCore*"></a>
+
+  <h3 id="Avalonia_Controls_DataGridFilling_DataGridFillModel_ApplyFillCore_Avalonia_Controls_DataGridFilling_DataGridFillContext_Avalonia_Controls_DataGridCellRange_Avalonia_Controls_DataGridCellRange_System_Int32_System_Int32_System_Boolean_System_Boolean_System_Collections_Generic_Dictionary_System_Int32_Avalonia_Controls_DataGridFilling_DataGridFillModel_FillSeries__System_Collections_Generic_Dictionary_System_Int32_Avalonia_Controls_DataGridFilling_DataGridFillModel_FillSeries__" data-uid="Avalonia.Controls.DataGridFilling.DataGridFillModel.ApplyFillCore(Avalonia.Controls.DataGridFilling.DataGridFillContext,Avalonia.Controls.DataGridCellRange,Avalonia.Controls.DataGridCellRange,System.Int32,System.Int32,System.Boolean,System.Boolean,System.Collections.Generic.Dictionary{System.Int32,Avalonia.Controls.DataGridFilling.DataGridFillModel.FillSeries},System.Collections.Generic.Dictionary{System.Int32,Avalonia.Controls.DataGridFilling.DataGridFillModel.FillSeries})">
+  ApplyFillCore(DataGridFillContext, DataGridCellRange, DataGridCellRange, int, int, bool, bool, Dictionary&lt;int, FillSeries&gt;, Dictionary&lt;int, FillSeries&gt;)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/Filling/DataGridFillModel.cs/#L256"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">protected virtual void ApplyFillCore(DataGridFillContext context, DataGridCellRange source, DataGridCellRange target, int rowCount, int colCount, bool isVerticalFill, bool isHorizontalFill, Dictionary&lt;int, DataGridFillModel.FillSeries&gt; seriesByColumn, Dictionary&lt;int, DataGridFillModel.FillSeries&gt; seriesByRow)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>context</code> <a class="xref" href="Avalonia.Controls.DataGridFilling.DataGridFillContext.html">DataGridFillContext</a></dt>
+    <dd></dd>
+    <dt><code>source</code> <a class="xref" href="Avalonia.Controls.DataGridCellRange.html">DataGridCellRange</a></dt>
+    <dd></dd>
+    <dt><code>target</code> <a class="xref" href="Avalonia.Controls.DataGridCellRange.html">DataGridCellRange</a></dt>
+    <dd></dd>
+    <dt><code>rowCount</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a></dt>
+    <dd></dd>
+    <dt><code>colCount</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a></dt>
+    <dd></dd>
+    <dt><code>isVerticalFill</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></dt>
+    <dd></dd>
+    <dt><code>isHorizontalFill</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></dt>
+    <dd></dd>
+    <dt><code>seriesByColumn</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.dictionary-2">Dictionary</a>&lt;<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a>, <a class="xref" href="Avalonia.Controls.DataGridFilling.DataGridFillModel.html">DataGridFillModel</a>.<a class="xref" href="Avalonia.Controls.DataGridFilling.DataGridFillModel.FillSeries.html">FillSeries</a>&gt;</dt>
+    <dd></dd>
+    <dt><code>seriesByRow</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.dictionary-2">Dictionary</a>&lt;<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a>, <a class="xref" href="Avalonia.Controls.DataGridFilling.DataGridFillModel.html">DataGridFillModel</a>.<a class="xref" href="Avalonia.Controls.DataGridFilling.DataGridFillModel.FillSeries.html">FillSeries</a>&gt;</dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Avalonia_Controls_DataGridFilling_DataGridFillModel_BuildFillSeriesByColumn_" data-uid="Avalonia.Controls.DataGridFilling.DataGridFillModel.BuildFillSeriesByColumn*"></a>
+
+  <h3 id="Avalonia_Controls_DataGridFilling_DataGridFillModel_BuildFillSeriesByColumn_Avalonia_Controls_DataGridFilling_DataGridFillContext_Avalonia_Controls_DataGridCellRange_" data-uid="Avalonia.Controls.DataGridFilling.DataGridFillModel.BuildFillSeriesByColumn(Avalonia.Controls.DataGridFilling.DataGridFillContext,Avalonia.Controls.DataGridCellRange)">
+  BuildFillSeriesByColumn(DataGridFillContext, DataGridCellRange)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/Filling/DataGridFillModel.cs/#L321"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">protected virtual Dictionary&lt;int, DataGridFillModel.FillSeries&gt; BuildFillSeriesByColumn(DataGridFillContext context, DataGridCellRange source)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>context</code> <a class="xref" href="Avalonia.Controls.DataGridFilling.DataGridFillContext.html">DataGridFillContext</a></dt>
+    <dd></dd>
+    <dt><code>source</code> <a class="xref" href="Avalonia.Controls.DataGridCellRange.html">DataGridCellRange</a></dt>
+    <dd></dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.dictionary-2">Dictionary</a>&lt;<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a>, <a class="xref" href="Avalonia.Controls.DataGridFilling.DataGridFillModel.html">DataGridFillModel</a>.<a class="xref" href="Avalonia.Controls.DataGridFilling.DataGridFillModel.FillSeries.html">FillSeries</a>&gt;</dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Avalonia_Controls_DataGridFilling_DataGridFillModel_BuildFillSeriesByRow_" data-uid="Avalonia.Controls.DataGridFilling.DataGridFillModel.BuildFillSeriesByRow*"></a>
+
+  <h3 id="Avalonia_Controls_DataGridFilling_DataGridFillModel_BuildFillSeriesByRow_Avalonia_Controls_DataGridFilling_DataGridFillContext_Avalonia_Controls_DataGridCellRange_" data-uid="Avalonia.Controls.DataGridFilling.DataGridFillModel.BuildFillSeriesByRow(Avalonia.Controls.DataGridFilling.DataGridFillContext,Avalonia.Controls.DataGridCellRange)">
+  BuildFillSeriesByRow(DataGridFillContext, DataGridCellRange)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/Filling/DataGridFillModel.cs/#L334"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">protected virtual Dictionary&lt;int, DataGridFillModel.FillSeries&gt; BuildFillSeriesByRow(DataGridFillContext context, DataGridCellRange source)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>context</code> <a class="xref" href="Avalonia.Controls.DataGridFilling.DataGridFillContext.html">DataGridFillContext</a></dt>
+    <dd></dd>
+    <dt><code>source</code> <a class="xref" href="Avalonia.Controls.DataGridCellRange.html">DataGridCellRange</a></dt>
+    <dd></dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.dictionary-2">Dictionary</a>&lt;<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a>, <a class="xref" href="Avalonia.Controls.DataGridFilling.DataGridFillModel.html">DataGridFillModel</a>.<a class="xref" href="Avalonia.Controls.DataGridFilling.DataGridFillModel.FillSeries.html">FillSeries</a>&gt;</dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Avalonia_Controls_DataGridFilling_DataGridFillModel_CanApplyFill_" data-uid="Avalonia.Controls.DataGridFilling.DataGridFillModel.CanApplyFill*"></a>
+
+  <h3 id="Avalonia_Controls_DataGridFilling_DataGridFillModel_CanApplyFill_Avalonia_Controls_DataGridFilling_DataGridFillContext_" data-uid="Avalonia.Controls.DataGridFilling.DataGridFillModel.CanApplyFill(Avalonia.Controls.DataGridFilling.DataGridFillContext)">
+  CanApplyFill(DataGridFillContext)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/Filling/DataGridFillModel.cs/#L250"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">protected virtual bool CanApplyFill(DataGridFillContext context)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>context</code> <a class="xref" href="Avalonia.Controls.DataGridFilling.DataGridFillContext.html">DataGridFillContext</a></dt>
+    <dd></dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Avalonia_Controls_DataGridFilling_DataGridFillModel_FormatFillValue_" data-uid="Avalonia.Controls.DataGridFilling.DataGridFillModel.FormatFillValue*"></a>
+
+  <h3 id="Avalonia_Controls_DataGridFilling_DataGridFillModel_FormatFillValue_System_Object_" data-uid="Avalonia.Controls.DataGridFilling.DataGridFillModel.FormatFillValue(System.Object)">
+  FormatFillValue(object)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/Filling/DataGridFillModel.cs/#L602"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">protected virtual string FormatFillValue(object value)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>value</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object">object</a></dt>
+    <dd></dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Avalonia_Controls_DataGridFilling_DataGridFillModel_IsTimeOnlyString_" data-uid="Avalonia.Controls.DataGridFilling.DataGridFillModel.IsTimeOnlyString*"></a>
+
+  <h3 id="Avalonia_Controls_DataGridFilling_DataGridFillModel_IsTimeOnlyString_System_String_" data-uid="Avalonia.Controls.DataGridFilling.DataGridFillModel.IsTimeOnlyString(System.String)">
+  IsTimeOnlyString(string)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/Filling/DataGridFillModel.cs/#L608"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">protected virtual bool IsTimeOnlyString(string text)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>text</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></dt>
+    <dd></dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Avalonia_Controls_DataGridFilling_DataGridFillModel_Mod_" data-uid="Avalonia.Controls.DataGridFilling.DataGridFillModel.Mod*"></a>
+
+  <h3 id="Avalonia_Controls_DataGridFilling_DataGridFillModel_Mod_System_Int32_System_Int32_" data-uid="Avalonia.Controls.DataGridFilling.DataGridFillModel.Mod(System.Int32,System.Int32)">
+  Mod(int, int)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/Filling/DataGridFillModel.cs/#L682"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">protected static int Mod(int value, int modulo)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>value</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a></dt>
+    <dd></dd>
+    <dt><code>modulo</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a></dt>
+    <dd></dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Avalonia_Controls_DataGridFilling_DataGridFillModel_TryBuildDateSeries_" data-uid="Avalonia.Controls.DataGridFilling.DataGridFillModel.TryBuildDateSeries*"></a>
+
+  <h3 id="Avalonia_Controls_DataGridFilling_DataGridFillModel_TryBuildDateSeries_System_Collections_Generic_IReadOnlyList_System_Object__Avalonia_Controls_DataGridFilling_DataGridFillModel_FillSeries__" data-uid="Avalonia.Controls.DataGridFilling.DataGridFillModel.TryBuildDateSeries(System.Collections.Generic.IReadOnlyList{System.Object},Avalonia.Controls.DataGridFilling.DataGridFillModel.FillSeries@)">
+  TryBuildDateSeries(IReadOnlyList&lt;object&gt;, out FillSeries)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/Filling/DataGridFillModel.cs/#L436"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">protected virtual bool TryBuildDateSeries(IReadOnlyList&lt;object&gt; values, out DataGridFillModel.FillSeries series)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>values</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.ireadonlylist-1">IReadOnlyList</a>&lt;<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object">object</a>&gt;</dt>
+    <dd></dd>
+    <dt><code>series</code> <a class="xref" href="Avalonia.Controls.DataGridFilling.DataGridFillModel.html">DataGridFillModel</a>.<a class="xref" href="Avalonia.Controls.DataGridFilling.DataGridFillModel.FillSeries.html">FillSeries</a></dt>
+    <dd></dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Avalonia_Controls_DataGridFilling_DataGridFillModel_TryBuildFillSeries_" data-uid="Avalonia.Controls.DataGridFilling.DataGridFillModel.TryBuildFillSeries*"></a>
+
+  <h3 id="Avalonia_Controls_DataGridFilling_DataGridFillModel_TryBuildFillSeries_System_Collections_Generic_IReadOnlyList_System_Object__Avalonia_Controls_DataGridFilling_DataGridFillModel_FillSeries__" data-uid="Avalonia.Controls.DataGridFilling.DataGridFillModel.TryBuildFillSeries(System.Collections.Generic.IReadOnlyList{System.Object},Avalonia.Controls.DataGridFilling.DataGridFillModel.FillSeries@)">
+  TryBuildFillSeries(IReadOnlyList&lt;object&gt;, out FillSeries)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/Filling/DataGridFillModel.cs/#L379"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">protected virtual bool TryBuildFillSeries(IReadOnlyList&lt;object&gt; values, out DataGridFillModel.FillSeries series)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>values</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.ireadonlylist-1">IReadOnlyList</a>&lt;<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object">object</a>&gt;</dt>
+    <dd></dd>
+    <dt><code>series</code> <a class="xref" href="Avalonia.Controls.DataGridFilling.DataGridFillModel.html">DataGridFillModel</a>.<a class="xref" href="Avalonia.Controls.DataGridFilling.DataGridFillModel.FillSeries.html">FillSeries</a></dt>
+    <dd></dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Avalonia_Controls_DataGridFilling_DataGridFillModel_TryBuildFillSeriesForColumn_" data-uid="Avalonia.Controls.DataGridFilling.DataGridFillModel.TryBuildFillSeriesForColumn*"></a>
+
+  <h3 id="Avalonia_Controls_DataGridFilling_DataGridFillModel_TryBuildFillSeriesForColumn_Avalonia_Controls_DataGridFilling_DataGridFillContext_Avalonia_Controls_DataGridCellRange_System_Int32_Avalonia_Controls_DataGridFilling_DataGridFillModel_FillSeries__" data-uid="Avalonia.Controls.DataGridFilling.DataGridFillModel.TryBuildFillSeriesForColumn(Avalonia.Controls.DataGridFilling.DataGridFillContext,Avalonia.Controls.DataGridCellRange,System.Int32,Avalonia.Controls.DataGridFilling.DataGridFillModel.FillSeries@)">
+  TryBuildFillSeriesForColumn(DataGridFillContext, DataGridCellRange, int, out FillSeries)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/Filling/DataGridFillModel.cs/#L347"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">protected virtual bool TryBuildFillSeriesForColumn(DataGridFillContext context, DataGridCellRange source, int columnIndex, out DataGridFillModel.FillSeries series)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>context</code> <a class="xref" href="Avalonia.Controls.DataGridFilling.DataGridFillContext.html">DataGridFillContext</a></dt>
+    <dd></dd>
+    <dt><code>source</code> <a class="xref" href="Avalonia.Controls.DataGridCellRange.html">DataGridCellRange</a></dt>
+    <dd></dd>
+    <dt><code>columnIndex</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a></dt>
+    <dd></dd>
+    <dt><code>series</code> <a class="xref" href="Avalonia.Controls.DataGridFilling.DataGridFillModel.html">DataGridFillModel</a>.<a class="xref" href="Avalonia.Controls.DataGridFilling.DataGridFillModel.FillSeries.html">FillSeries</a></dt>
+    <dd></dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Avalonia_Controls_DataGridFilling_DataGridFillModel_TryBuildFillSeriesForRow_" data-uid="Avalonia.Controls.DataGridFilling.DataGridFillModel.TryBuildFillSeriesForRow*"></a>
+
+  <h3 id="Avalonia_Controls_DataGridFilling_DataGridFillModel_TryBuildFillSeriesForRow_Avalonia_Controls_DataGridFilling_DataGridFillContext_Avalonia_Controls_DataGridCellRange_System_Int32_Avalonia_Controls_DataGridFilling_DataGridFillModel_FillSeries__" data-uid="Avalonia.Controls.DataGridFilling.DataGridFillModel.TryBuildFillSeriesForRow(Avalonia.Controls.DataGridFilling.DataGridFillContext,Avalonia.Controls.DataGridCellRange,System.Int32,Avalonia.Controls.DataGridFilling.DataGridFillModel.FillSeries@)">
+  TryBuildFillSeriesForRow(DataGridFillContext, DataGridCellRange, int, out FillSeries)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/Filling/DataGridFillModel.cs/#L363"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">protected virtual bool TryBuildFillSeriesForRow(DataGridFillContext context, DataGridCellRange source, int rowIndex, out DataGridFillModel.FillSeries series)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>context</code> <a class="xref" href="Avalonia.Controls.DataGridFilling.DataGridFillContext.html">DataGridFillContext</a></dt>
+    <dd></dd>
+    <dt><code>source</code> <a class="xref" href="Avalonia.Controls.DataGridCellRange.html">DataGridCellRange</a></dt>
+    <dd></dd>
+    <dt><code>rowIndex</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a></dt>
+    <dd></dd>
+    <dt><code>series</code> <a class="xref" href="Avalonia.Controls.DataGridFilling.DataGridFillModel.html">DataGridFillModel</a>.<a class="xref" href="Avalonia.Controls.DataGridFilling.DataGridFillModel.FillSeries.html">FillSeries</a></dt>
+    <dd></dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Avalonia_Controls_DataGridFilling_DataGridFillModel_TryBuildNumberSeries_" data-uid="Avalonia.Controls.DataGridFilling.DataGridFillModel.TryBuildNumberSeries*"></a>
+
+  <h3 id="Avalonia_Controls_DataGridFilling_DataGridFillModel_TryBuildNumberSeries_System_Collections_Generic_IReadOnlyList_System_Object__Avalonia_Controls_DataGridFilling_DataGridFillModel_FillSeries__" data-uid="Avalonia.Controls.DataGridFilling.DataGridFillModel.TryBuildNumberSeries(System.Collections.Generic.IReadOnlyList{System.Object},Avalonia.Controls.DataGridFilling.DataGridFillModel.FillSeries@)">
+  TryBuildNumberSeries(IReadOnlyList&lt;object&gt;, out FillSeries)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/Filling/DataGridFillModel.cs/#L406"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">protected virtual bool TryBuildNumberSeries(IReadOnlyList&lt;object&gt; values, out DataGridFillModel.FillSeries series)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>values</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.ireadonlylist-1">IReadOnlyList</a>&lt;<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object">object</a>&gt;</dt>
+    <dd></dd>
+    <dt><code>series</code> <a class="xref" href="Avalonia.Controls.DataGridFilling.DataGridFillModel.html">DataGridFillModel</a>.<a class="xref" href="Avalonia.Controls.DataGridFilling.DataGridFillModel.FillSeries.html">FillSeries</a></dt>
+    <dd></dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Avalonia_Controls_DataGridFilling_DataGridFillModel_TryBuildTimeSeries_" data-uid="Avalonia.Controls.DataGridFilling.DataGridFillModel.TryBuildTimeSeries*"></a>
+
+  <h3 id="Avalonia_Controls_DataGridFilling_DataGridFillModel_TryBuildTimeSeries_System_Collections_Generic_IReadOnlyList_System_Object__Avalonia_Controls_DataGridFilling_DataGridFillModel_FillSeries__" data-uid="Avalonia.Controls.DataGridFilling.DataGridFillModel.TryBuildTimeSeries(System.Collections.Generic.IReadOnlyList{System.Object},Avalonia.Controls.DataGridFilling.DataGridFillModel.FillSeries@)">
+  TryBuildTimeSeries(IReadOnlyList&lt;object&gt;, out FillSeries)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/Filling/DataGridFillModel.cs/#L466"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">protected virtual bool TryBuildTimeSeries(IReadOnlyList&lt;object&gt; values, out DataGridFillModel.FillSeries series)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>values</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.ireadonlylist-1">IReadOnlyList</a>&lt;<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object">object</a>&gt;</dt>
+    <dd></dd>
+    <dt><code>series</code> <a class="xref" href="Avalonia.Controls.DataGridFilling.DataGridFillModel.html">DataGridFillModel</a>.<a class="xref" href="Avalonia.Controls.DataGridFilling.DataGridFillModel.FillSeries.html">FillSeries</a></dt>
+    <dd></dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Avalonia_Controls_DataGridFilling_DataGridFillModel_TryConvertToDateTime_" data-uid="Avalonia.Controls.DataGridFilling.DataGridFillModel.TryConvertToDateTime*"></a>
+
+  <h3 id="Avalonia_Controls_DataGridFilling_DataGridFillModel_TryConvertToDateTime_System_Object_System_DateTime__" data-uid="Avalonia.Controls.DataGridFilling.DataGridFillModel.TryConvertToDateTime(System.Object,System.DateTime@)">
+  TryConvertToDateTime(object, out DateTime)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/Filling/DataGridFillModel.cs/#L530"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">protected virtual bool TryConvertToDateTime(object value, out DateTime date)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>value</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object">object</a></dt>
+    <dd></dd>
+    <dt><code>date</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.datetime">DateTime</a></dt>
+    <dd></dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Avalonia_Controls_DataGridFilling_DataGridFillModel_TryConvertToDouble_" data-uid="Avalonia.Controls.DataGridFilling.DataGridFillModel.TryConvertToDouble*"></a>
+
+  <h3 id="Avalonia_Controls_DataGridFilling_DataGridFillModel_TryConvertToDouble_System_Object_System_Double__" data-uid="Avalonia.Controls.DataGridFilling.DataGridFillModel.TryConvertToDouble(System.Object,System.Double@)">
+  TryConvertToDouble(object, out double)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/Filling/DataGridFillModel.cs/#L496"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">protected virtual bool TryConvertToDouble(object value, out double number)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>value</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object">object</a></dt>
+    <dd></dd>
+    <dt><code>number</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.double">double</a></dt>
+    <dd></dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Avalonia_Controls_DataGridFilling_DataGridFillModel_TryConvertToTimeSpan_" data-uid="Avalonia.Controls.DataGridFilling.DataGridFillModel.TryConvertToTimeSpan*"></a>
+
+  <h3 id="Avalonia_Controls_DataGridFilling_DataGridFillModel_TryConvertToTimeSpan_System_Object_System_TimeSpan__" data-uid="Avalonia.Controls.DataGridFilling.DataGridFillModel.TryConvertToTimeSpan(System.Object,System.TimeSpan@)">
+  TryConvertToTimeSpan(object, out TimeSpan)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/Filling/DataGridFillModel.cs/#L554"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">protected virtual bool TryConvertToTimeSpan(object value, out TimeSpan time)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>value</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object">object</a></dt>
+    <dd></dd>
+    <dt><code>time</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.timespan">TimeSpan</a></dt>
+    <dd></dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Avalonia_Controls_DataGridFilling_DataGridFillModel_TryGetFillText_" data-uid="Avalonia.Controls.DataGridFilling.DataGridFillModel.TryGetFillText*"></a>
+
+  <h3 id="Avalonia_Controls_DataGridFilling_DataGridFillModel_TryGetFillText_Avalonia_Controls_DataGridFilling_DataGridFillContext_System_Int32_System_Int32_System_String__" data-uid="Avalonia.Controls.DataGridFilling.DataGridFillModel.TryGetFillText(Avalonia.Controls.DataGridFilling.DataGridFillContext,System.Int32,System.Int32,System.String@)">
+  TryGetFillText(DataGridFillContext, int, int, out string)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/Filling/DataGridFillModel.cs/#L316"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">protected virtual bool TryGetFillText(DataGridFillContext context, int rowIndex, int columnIndex, out string text)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>context</code> <a class="xref" href="Avalonia.Controls.DataGridFilling.DataGridFillContext.html">DataGridFillContext</a></dt>
+    <dd></dd>
+    <dt><code>rowIndex</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a></dt>
+    <dd></dd>
+    <dt><code>columnIndex</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a></dt>
+    <dd></dd>
+    <dt><code>text</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></dt>
+    <dd></dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Avalonia_Controls_DataGridFilling_DataGridFillModel_TryGetSeriesFillText_" data-uid="Avalonia.Controls.DataGridFilling.DataGridFillModel.TryGetSeriesFillText*"></a>
+
+  <h3 id="Avalonia_Controls_DataGridFilling_DataGridFillModel_TryGetSeriesFillText_Avalonia_Controls_DataGridFilling_DataGridFillModel_FillSeries_System_Int32_System_String__" data-uid="Avalonia.Controls.DataGridFilling.DataGridFillModel.TryGetSeriesFillText(Avalonia.Controls.DataGridFilling.DataGridFillModel.FillSeries,System.Int32,System.String@)">
+  TryGetSeriesFillText(FillSeries, int, out string)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/Filling/DataGridFillModel.cs/#L575"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">protected virtual bool TryGetSeriesFillText(DataGridFillModel.FillSeries series, int offset, out string text)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>series</code> <a class="xref" href="Avalonia.Controls.DataGridFilling.DataGridFillModel.html">DataGridFillModel</a>.<a class="xref" href="Avalonia.Controls.DataGridFilling.DataGridFillModel.FillSeries.html">FillSeries</a></dt>
+    <dd></dd>
+    <dt><code>offset</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a></dt>
+    <dd></dd>
+    <dt><code>text</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></dt>
+    <dd></dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+
+</article>
+
+        <div class="contribution d-print-none">
+          <a href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/Filling/DataGridFillModel.cs/#L194" class="edit-link">Edit this page</a>
+        </div>
+
+
+      </div>
+
+      <div class="affix">
+        <nav id="affix"></nav>
+      </div>
+    </main>
+
+
+    <footer class="border-top text-secondary">
+      <div class="container-xxl">
+        <div class="flex-fill">
+          <span>Made with <a href="https://dotnet.github.io/docfx">docfx</a></span>
+        </div>
+      </div>
+    </footer>
+  </body>
+</html>
