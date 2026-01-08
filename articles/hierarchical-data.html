@@ -120,6 +120,17 @@ var model = new HierarchicalModel(options);
 model.SetRoot(rootNode);
 </code></pre>
 <p>Sample: see <code>Hierarchical Model</code> page in <code>src/DataGridSample</code> for a file-system tree with Name/Kind/Size/Modified columns.</p>
+<h2 id="sorting">Sorting</h2>
+<p>Sorting is applied to sibling items in the hierarchical model. Sort member paths are evaluated against the underlying item, so templated columns bound to <code>HierarchicalNode.Item</code> can use either <code>Name</code> or the <code>Item.</code> prefix.</p>
+<pre><code class="lang-xml">&lt;DataGridTemplateColumn Header=&quot;Kind&quot;
+                        SortMemberPath=&quot;Item.Kind&quot;&gt;
+  &lt;DataGridTemplateColumn.CellTemplate&gt;
+    &lt;DataTemplate x:DataType=&quot;hier:HierarchicalNode&quot;&gt;
+      &lt;TextBlock Text=&quot;{Binding Item.Kind}&quot; /&gt;
+    &lt;/DataTemplate&gt;
+  &lt;/DataGridTemplateColumn.CellTemplate&gt;
+&lt;/DataGridTemplateColumn&gt;
+</code></pre>
 <h2 id="expanded-state-and-path-selection">Expanded State and Path Selection</h2>
 <p>Bind expanded state to your model with <code>IsExpandedSelector</code>/<code>IsExpandedSetter</code> so expander toggles update your items:</p>
 <pre><code class="lang-csharp">var options = new HierarchicalOptions&lt;TreeItem&gt;
