@@ -44,6 +44,21 @@ model.SetRoot(rootNode);
 
 Sample: see `Hierarchical Model` page in `src/DataGridSample` for a file-system tree with Name/Kind/Size/Modified columns.
 
+## Sorting
+
+Sorting is applied to sibling items in the hierarchical model. Sort member paths are evaluated against the underlying item, so templated columns bound to `HierarchicalNode.Item` can use either `Name` or the `Item.` prefix.
+
+```xml
+<DataGridTemplateColumn Header="Kind"
+                        SortMemberPath="Item.Kind">
+  <DataGridTemplateColumn.CellTemplate>
+    <DataTemplate x:DataType="hier:HierarchicalNode">
+      <TextBlock Text="{Binding Item.Kind}" />
+    </DataTemplate>
+  </DataGridTemplateColumn.CellTemplate>
+</DataGridTemplateColumn>
+```
+
 ## Expanded State and Path Selection
 
 Bind expanded state to your model with `IsExpandedSelector`/`IsExpandedSetter` so expander toggles update your items:
