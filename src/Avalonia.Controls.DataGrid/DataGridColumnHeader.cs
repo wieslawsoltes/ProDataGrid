@@ -986,11 +986,6 @@ internal
 
         private object? GetDragIndicatorContent(object? content, IDataTemplate? dataTemplate)
         {
-            if (content is ContentControl icc)
-            {
-                content = icc.Content;
-            }
-
             if (content is Control control)
             {
                 if (VisualRoot == null) return content;

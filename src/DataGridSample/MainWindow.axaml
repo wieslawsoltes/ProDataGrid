@@ -239,6 +239,9 @@
     <TabItem Header="Column Types">
       <pages:ColumnTypesPage />
     </TabItem>
+    <TabItem Header="Column Drag Indicator">
+      <pages:ColumnDragIndicatorPage />
+    </TabItem>
     <TabItem Header="Validation">
       <pages:ValidationColumnsPage />
     </TabItem>

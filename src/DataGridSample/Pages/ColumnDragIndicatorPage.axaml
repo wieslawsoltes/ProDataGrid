@@ -1,0 +1,65 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:models="clr-namespace:DataGridSample.Models"
+             xmlns:viewModels="clr-namespace:DataGridSample.ViewModels"
+             x:Class="DataGridSample.Pages.ColumnDragIndicatorPage"
+             x:DataType="viewModels:ColumnDragIndicatorViewModel">
+  <UserControl.DataContext>
+    <viewModels:ColumnDragIndicatorViewModel />
+  </UserControl.DataContext>
+
+  <Grid RowDefinitions="Auto,*" RowSpacing="12" Margin="12">
+    <StackPanel Spacing="4">
+      <TextBlock Classes="h2" Text="Column Drag Indicator" />
+      <TextBlock Text="Drag the templated column header to reorder. The preview should show the header content, not a type name."
+                 TextWrapping="Wrap" />
+    </StackPanel>
+
+    <DataGrid Grid.Row="1"
+              ItemsSource="{Binding Items}"
+              AutoGenerateColumns="False"
+              IsReadOnly="True"
+              CanUserReorderColumns="True"
+              HeadersVisibility="Column"
+              RowHeight="32">
+      <DataGrid.Columns>
+        <DataGridTextColumn Header="First"
+                            Binding="{Binding FirstName}"
+                            Width="2*"
+                            x:DataType="models:Person" />
+        <DataGridTextColumn Header="Last"
+                            Binding="{Binding LastName}"
+                            Width="2*"
+                            x:DataType="models:Person" />
+        <DataGridTextColumn Header="Age"
+                            Binding="{Binding Age}"
+                            Width="1*"
+                            x:DataType="models:Person" />
+        <DataGridTemplateColumn Width="2*">
+          <DataGridTemplateColumn.Header>
+            <ContentControl Content="{Binding TemplateHeader}">
+              <ContentControl.ContentTemplate>
+                <DataTemplate x:DataType="viewModels:ColumnDragIndicatorViewModel+ColumnHeaderInfo">
+                  <StackPanel Orientation="Horizontal" Spacing="6" VerticalAlignment="Center">
+                    <Border Width="8"
+                            Height="8"
+                            Background="#4C8DDC"
+                            CornerRadius="4"
+                            VerticalAlignment="Center" />
+                    <TextBlock Text="{Binding Title}" FontWeight="SemiBold" />
+                    <TextBlock Text="{Binding Detail}" Foreground="Gray" FontSize="11" />
+                  </StackPanel>
+                </DataTemplate>
+              </ContentControl.ContentTemplate>
+            </ContentControl>
+          </DataGridTemplateColumn.Header>
+          <DataGridTemplateColumn.CellTemplate>
+            <DataTemplate x:DataType="models:Person">
+              <TextBlock Text="{Binding Status}" />
+            </DataTemplate>
+          </DataGridTemplateColumn.CellTemplate>
+        </DataGridTemplateColumn>
+      </DataGrid.Columns>
+    </DataGrid>
+  </Grid>
+</UserControl>
