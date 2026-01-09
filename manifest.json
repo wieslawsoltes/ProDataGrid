@@ -4153,6 +4153,16 @@
     },
     {
       "type": "Conceptual",
+      "source_relative_path": "articles/cell-template-reuse.md",
+      "output": {
+        ".html": {
+          "relative_path": "articles/cell-template-reuse.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "Conceptual",
       "source_relative_path": "articles/clipboard-and-export.md",
       "output": {
         ".html": {

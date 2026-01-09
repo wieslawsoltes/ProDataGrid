@@ -29262,6 +29262,25 @@ references:
   isSpec: "True"
   fullName: Avalonia.Controls.DataGridTemplateColumn.RefreshCellContent
   nameWithType: DataGridTemplateColumn.RefreshCellContent
+- uid: Avalonia.Controls.DataGridTemplateColumn.ReuseCellContent
+  name: ReuseCellContent
+  href: api/Avalonia.Controls.DataGridTemplateColumn.html#Avalonia_Controls_DataGridTemplateColumn_ReuseCellContent
+  commentId: P:Avalonia.Controls.DataGridTemplateColumn.ReuseCellContent
+  fullName: Avalonia.Controls.DataGridTemplateColumn.ReuseCellContent
+  nameWithType: DataGridTemplateColumn.ReuseCellContent
+- uid: Avalonia.Controls.DataGridTemplateColumn.ReuseCellContent*
+  name: ReuseCellContent
+  href: api/Avalonia.Controls.DataGridTemplateColumn.html#Avalonia_Controls_DataGridTemplateColumn_ReuseCellContent_
+  commentId: Overload:Avalonia.Controls.DataGridTemplateColumn.ReuseCellContent
+  isSpec: "True"
+  fullName: Avalonia.Controls.DataGridTemplateColumn.ReuseCellContent
+  nameWithType: DataGridTemplateColumn.ReuseCellContent
+- uid: Avalonia.Controls.DataGridTemplateColumn.ReuseCellContentProperty
+  name: ReuseCellContentProperty
+  href: api/Avalonia.Controls.DataGridTemplateColumn.html#Avalonia_Controls_DataGridTemplateColumn_ReuseCellContentProperty
+  commentId: F:Avalonia.Controls.DataGridTemplateColumn.ReuseCellContentProperty
+  fullName: Avalonia.Controls.DataGridTemplateColumn.ReuseCellContentProperty
+  nameWithType: DataGridTemplateColumn.ReuseCellContentProperty
 - uid: Avalonia.Controls.DataGridTextColumn
   name: DataGridTextColumn
   href: api/Avalonia.Controls.DataGridTextColumn.html

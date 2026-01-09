@@ -429,7 +429,7 @@ Class DataGridTemplateColumn  <a class="header-action link-secondary" title="Vie
 
   <h3 id="Avalonia_Controls_DataGridTemplateColumn_CellEditingTemplateProperty" data-uid="Avalonia.Controls.DataGridTemplateColumn.CellEditingTemplateProperty">
   CellEditingTemplateProperty
-  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/DataGridTemplateColumn.cs/#L68"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/DataGridTemplateColumn.cs/#L89"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>Defines the <a class="xref" href="Avalonia.Controls.DataGridTemplateColumn.html#Avalonia_Controls_DataGridTemplateColumn_CellEditingTemplate">CellEditingTemplate</a> property.</p>
@@ -460,7 +460,7 @@ Class DataGridTemplateColumn  <a class="header-action link-secondary" title="Vie
 
   <h3 id="Avalonia_Controls_DataGridTemplateColumn_CellTemplateProperty" data-uid="Avalonia.Controls.DataGridTemplateColumn.CellTemplateProperty">
   CellTemplateProperty
-  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/DataGridTemplateColumn.cs/#L28"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/DataGridTemplateColumn.cs/#L29"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"></div>
@@ -490,7 +490,7 @@ Class DataGridTemplateColumn  <a class="header-action link-secondary" title="Vie
 
   <h3 id="Avalonia_Controls_DataGridTemplateColumn_NewRowCellTemplateProperty" data-uid="Avalonia.Controls.DataGridTemplateColumn.NewRowCellTemplateProperty">
   NewRowCellTemplateProperty
-  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/DataGridTemplateColumn.cs/#L47"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/DataGridTemplateColumn.cs/#L68"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>Defines the <a class="xref" href="Avalonia.Controls.DataGridTemplateColumn.html#Avalonia_Controls_DataGridTemplateColumn_NewRowCellTemplate">NewRowCellTemplate</a> property.</p>
@@ -518,6 +518,38 @@ Class DataGridTemplateColumn  <a class="header-action link-secondary" title="Vie
 
 
 
+
+  <h3 id="Avalonia_Controls_DataGridTemplateColumn_ReuseCellContentProperty" data-uid="Avalonia.Controls.DataGridTemplateColumn.ReuseCellContentProperty">
+  ReuseCellContentProperty
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/DataGridTemplateColumn.cs/#L47"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Gets or sets whether existing cell content can be reused for recycled rows when the
+template does not support <span class="xref">Avalonia.Controls.Templates.IRecyclingDataTemplate</span>.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static readonly DirectProperty&lt;DataGridTemplateColumn, bool&gt; ReuseCellContentProperty</code></pre>
+  </div>
+
+
+
+
+  <h4 class="section">Field Value</h4>
+  <dl class="parameters">
+    <dt><span class="xref">DirectProperty</span>&lt;<a class="xref" href="Avalonia.Controls.DataGridTemplateColumn.html">DataGridTemplateColumn</a>, <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a>&gt;</dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
   <h2 class="section" id="properties">Properties
 </h2>
 
@@ -526,7 +558,7 @@ Class DataGridTemplateColumn  <a class="header-action link-secondary" title="Vie
 
   <h3 id="Avalonia_Controls_DataGridTemplateColumn_CellEditingTemplate" data-uid="Avalonia.Controls.DataGridTemplateColumn.CellEditingTemplate">
   CellEditingTemplate
-  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/DataGridTemplateColumn.cs/#L83"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/DataGridTemplateColumn.cs/#L104"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>Gets or sets the <span class="xref">Avalonia.Controls.Templates.IDataTemplate</span> which is used for the editing mode of the current <a class="xref" href="Avalonia.Controls.DataGridCell.html">DataGridCell</a></p>
@@ -563,7 +595,7 @@ public IDataTemplate CellEditingTemplate { get; set; }</code></pre>
 
   <h3 id="Avalonia_Controls_DataGridTemplateColumn_CellTemplate" data-uid="Avalonia.Controls.DataGridTemplateColumn.CellTemplate">
   CellTemplate
-  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/DataGridTemplateColumn.cs/#L34"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/DataGridTemplateColumn.cs/#L35"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"></div>
@@ -596,7 +628,7 @@ public IDataTemplate CellTemplate { get; set; }</code></pre>
 
   <h3 id="Avalonia_Controls_DataGridTemplateColumn_IsReadOnly" data-uid="Avalonia.Controls.DataGridTemplateColumn.IsReadOnly">
   IsReadOnly
-  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/DataGridTemplateColumn.cs/#L185"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/DataGridTemplateColumn.cs/#L214"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"></div>
@@ -627,7 +659,7 @@ public IDataTemplate CellTemplate { get; set; }</code></pre>
 
   <h3 id="Avalonia_Controls_DataGridTemplateColumn_NewRowCellTemplate" data-uid="Avalonia.Controls.DataGridTemplateColumn.NewRowCellTemplate">
   NewRowCellTemplate
-  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/DataGridTemplateColumn.cs/#L56"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/DataGridTemplateColumn.cs/#L77"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>Gets or sets the template used for the placeholder row that allows adding a new item.</p>
@@ -656,6 +688,39 @@ public IDataTemplate NewRowCellTemplate { get; set; }</code></pre>
 
 
 
+  <a id="Avalonia_Controls_DataGridTemplateColumn_ReuseCellContent_" data-uid="Avalonia.Controls.DataGridTemplateColumn.ReuseCellContent*"></a>
+
+  <h3 id="Avalonia_Controls_DataGridTemplateColumn_ReuseCellContent" data-uid="Avalonia.Controls.DataGridTemplateColumn.ReuseCellContent">
+  ReuseCellContent
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/DataGridTemplateColumn.cs/#L57"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>When enabled, the column will keep the existing cell content control for recycled rows
+instead of rebuilding the template, as long as the template is not a recycling template.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public bool ReuseCellContent { get; set; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
   <h2 class="section" id="methods">Methods
 </h2>
 
@@ -664,7 +729,7 @@ public IDataTemplate NewRowCellTemplate { get; set; }</code></pre>
 
   <h3 id="Avalonia_Controls_DataGridTemplateColumn_EndCellEdit" data-uid="Avalonia.Controls.DataGridTemplateColumn.EndCellEdit">
   EndCellEdit()
-  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/DataGridTemplateColumn.cs/#L92"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/DataGridTemplateColumn.cs/#L113"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>When overridden in a derived class, called when a cell in the column exits editing mode.</p>
@@ -691,7 +756,7 @@ public IDataTemplate NewRowCellTemplate { get; set; }</code></pre>
 
   <h3 id="Avalonia_Controls_DataGridTemplateColumn_GenerateEditingElement_Avalonia_Controls_DataGridCell_System_Object_Avalonia_Controls_Utils_ICellEditBinding__" data-uid="Avalonia.Controls.DataGridTemplateColumn.GenerateEditingElement(Avalonia.Controls.DataGridCell,System.Object,Avalonia.Controls.Utils.ICellEditBinding@)">
   GenerateEditingElement(DataGridCell, object, out ICellEditBinding)
-  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/DataGridTemplateColumn.cs/#L148"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/DataGridTemplateColumn.cs/#L176"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>When overridden in a derived class, gets an editing element that is bound to the column's <a class="xref" href="Avalonia.Controls.DataGridBoundColumn.html#Avalonia_Controls_DataGridBoundColumn_Binding">Binding</a> property value.</p>
@@ -736,7 +801,7 @@ public IDataTemplate NewRowCellTemplate { get; set; }</code></pre>
 
   <h3 id="Avalonia_Controls_DataGridTemplateColumn_GenerateElement_Avalonia_Controls_DataGridCell_System_Object_" data-uid="Avalonia.Controls.DataGridTemplateColumn.GenerateElement(Avalonia.Controls.DataGridCell,System.Object)">
   GenerateElement(DataGridCell, object)
-  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/DataGridTemplateColumn.cs/#L99"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/DataGridTemplateColumn.cs/#L120"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>When overridden in a derived class, gets a read-only element that is bound to the column's
@@ -779,7 +844,7 @@ public IDataTemplate NewRowCellTemplate { get; set; }</code></pre>
 
   <h3 id="Avalonia_Controls_DataGridTemplateColumn_PrepareCellForEdit_Avalonia_Controls_Control_Avalonia_Interactivity_RoutedEventArgs_" data-uid="Avalonia.Controls.DataGridTemplateColumn.PrepareCellForEdit(Avalonia.Controls.Control,Avalonia.Interactivity.RoutedEventArgs)">
   PrepareCellForEdit(Control, RoutedEventArgs)
-  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/DataGridTemplateColumn.cs/#L169"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/DataGridTemplateColumn.cs/#L197"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>When overridden in a derived class, called when a cell in the column enters editing mode.</p>
@@ -821,7 +886,7 @@ public IDataTemplate NewRowCellTemplate { get; set; }</code></pre>
 
   <h3 id="Avalonia_Controls_DataGridTemplateColumn_RefreshCellContent_Avalonia_Controls_Control_System_String_" data-uid="Avalonia.Controls.DataGridTemplateColumn.RefreshCellContent(Avalonia.Controls.Control,System.String)">
   RefreshCellContent(Control, string)
-  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/DataGridTemplateColumn.cs/#L174"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/DataGridTemplateColumn.cs/#L202"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>Called by the DataGrid control when a column asked for its
