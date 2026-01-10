@@ -36,6 +36,14 @@ internal
             SetRowsSelection(0, SlotCount - 1);
         }
 
+        /// <summary>
+        /// Selects a single item (WPF-compat surface).
+        /// </summary>
+        public void SelectItem(object item)
+        {
+            SelectedItem = item;
+        }
+
 
         /// <summary>
         /// Selects items and updates currency based on parameters

@@ -1,0 +1,58 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:pages="clr-namespace:DataGridSample.Pages"
+             xmlns:local="clr-namespace:DataGridSample"
+             xmlns:models="clr-namespace:DataGridSample.Models"
+             xmlns:dg="clr-namespace:Avalonia.Controls;assembly=Avalonia.Controls.DataGrid"
+             x:Class="DataGridSample.Pages.RowDetailsPage">
+
+  <Grid Margin="8">
+    <Grid.RowDefinitions>
+      <RowDefinition Height="Auto"/>
+      <RowDefinition Height="*"/>
+    </Grid.RowDefinitions>
+
+    <StackPanel Grid.Row="0" Orientation="Vertical" Spacing="4" Margin="0 0 0 8">
+      <TextBlock Text="Row details" FontSize="18" FontWeight="Bold"/>
+      <TextBlock Text="Select a row to view nested information rendered inside the detail grid."
+                 TextWrapping="Wrap"/>
+    </StackPanel>
+
+    <dg:DataGrid x:Name="SampleGrid"
+                 Grid.Row="1"
+                 AutoGenerateColumns="True"
+                 RowDetailsVisibilityMode="VisibleWhenSelected"
+                 Margin="0">
+      <dg:DataGrid.RowDetailsTemplate>
+        <DataTemplate x:DataType="models:LocalSampleItem">
+          <Border BorderBrush="{DynamicResource DataGridDetailsPresenterBackgroundBrush}"
+                  BorderThickness="1"
+                  CornerRadius="4"
+                  Padding="8"
+                  Margin="4 8 4 4">
+            <StackPanel Spacing="6">
+              <TextBlock Text="Runtime details" FontWeight="Bold"/>
+              <TextBlock Text="{Binding Info}" />
+              <dg:DataGrid x:CompileBindings="False"
+                           ItemsSource="{Binding Details}"
+                           AutoGenerateColumns="False"
+                           IsReadOnly="True"
+                           HeadersVisibility="Column"
+                           CanUserResizeColumns="False"
+                           CanUserSortColumns="False"
+                           BorderThickness="0"
+                           Margin="0"
+                           RowDetailsVisibilityMode="Collapsed">
+                <dg:DataGrid.Columns>
+                  <dg:DataGridTextColumn Header="Field" Binding="{Binding Field}" Width="2*" />
+                  <dg:DataGridTextColumn Header="Value" Binding="{Binding Value}" Width="3*" />
+                </dg:DataGrid.Columns>
+              </dg:DataGrid>
+            </StackPanel>
+          </Border>
+        </DataTemplate>
+      </dg:DataGrid.RowDetailsTemplate>
+    </dg:DataGrid>
+  </Grid>
+
+</UserControl>

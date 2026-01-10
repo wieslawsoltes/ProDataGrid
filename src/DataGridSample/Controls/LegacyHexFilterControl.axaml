@@ -1,0 +1,14 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:dg="clr-namespace:Avalonia.Controls;assembly=Avalonia.Controls.DataGrid"
+             x:Class="DataGridSample.Controls.LegacyHexFilterControl"
+             x:DataType="dg:DataGridColumn">
+  <StackPanel Orientation="Horizontal" Margin="4,2" Spacing="4">
+    <TextBlock Text="0x" VerticalAlignment="Center" Margin="0,0,2,0" />
+    <TextBox x:Name="textBox"
+             Width="140"
+             Text="{Binding FilterValue, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+             Watermark="0x00000000"
+             HorizontalAlignment="Stretch" />
+  </StackPanel>
+</UserControl>

@@ -113,6 +113,12 @@ internal
         public static readonly StyledProperty<bool> ShowFilterButtonProperty =
             AvaloniaProperty.Register<DataGridColumnHeader, bool>(nameof(ShowFilterButton));
 
+        public static readonly DirectProperty<DataGridColumnHeader, string> FilterValueProperty =
+            AvaloniaProperty.RegisterDirect<DataGridColumnHeader, string>(
+                nameof(FilterValue),
+                o => o.FilterValue,
+                (o, v) => o.FilterValue = v);
+
         public bool AreSeparatorsVisible
         {
             get { return GetValue(AreSeparatorsVisibleProperty); }
@@ -135,6 +141,25 @@ internal
         {
             get { return GetValue(ShowFilterButtonProperty); }
             set { SetValue(ShowFilterButtonProperty, value); }
+        }
+
+        private string _filterValue;
+
+        public string FilterValue
+        {
+            get { return _filterValue; }
+            set
+            {
+                if (_filterValue != value)
+                {
+                    SetAndRaise(FilterValueProperty, ref _filterValue, value);
+                }
+
+                if (OwningColumn != null && OwningColumn.FilterValue != value)
+                {
+                    OwningColumn.FilterValue = value;
+                }
+            }
         }
 
         static DataGridColumnHeader()
@@ -205,9 +230,42 @@ internal
         public DataGridColumn OwningColumn
         {
             get => _owningColumn;
-            internal set => SetAndRaise(OwningColumnProperty, ref _owningColumn, value);
+            internal set
+            {
+                if (_owningColumn != value)
+                {
+                    if (_owningColumn != null)
+                    {
+                        _owningColumn.PropertyChanged -= OwningColumn_PropertyChanged;
+                    }
+
+                    SetAndRaise(OwningColumnProperty, ref _owningColumn, value);
+
+                    if (_owningColumn != null)
+                    {
+                        _owningColumn.PropertyChanged += OwningColumn_PropertyChanged;
+                        SetAndRaise(FilterValueProperty, ref _filterValue, _owningColumn.FilterValue);
+                    }
+                    else
+                    {
+                        SetAndRaise(FilterValueProperty, ref _filterValue, null);
+                    }
+                }
+            }
         }
         internal DataGrid OwningGrid => OwningColumn?.OwningGrid;
+
+        private void OwningColumn_PropertyChanged(object sender, AvaloniaPropertyChangedEventArgs e)
+        {
+            if (e.Property == DataGridColumn.FilterValueProperty)
+            {
+                var newValue = (string)e.NewValue;
+                if (_filterValue != newValue)
+                {
+                    SetAndRaise(FilterValueProperty, ref _filterValue, newValue);
+                }
+            }
+        }
 
         internal int ColumnIndex
         {
@@ -313,6 +371,11 @@ internal
             }
 
             _filterButton.IsVisible = ShowFilterButton;
+        }
+
+        internal void RefreshFilterButtonVisibility()
+        {
+            UpdateFilterButtonVisibility();
         }
 
         private void OnFilterFlyoutChanged(AvaloniaPropertyChangedEventArgs e)

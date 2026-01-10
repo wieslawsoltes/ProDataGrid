@@ -22,6 +22,18 @@ internal
 #endif
     partial class DataGrid
     {
+        /// <summary>
+        /// Scrolls the specified item into view.
+        /// </summary>
+#if !DATAGRID_INTERNAL
+        public
+#else
+        internal
+#endif
+        void ScrollIntoView(object item)
+        {
+            ScrollIntoView(item, null);
+        }
 
         /// <summary>
         /// Scrolls the specified item or RowGroupHeader and/or column into view.

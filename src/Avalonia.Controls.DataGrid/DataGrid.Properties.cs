@@ -94,6 +94,51 @@ internal
         }
 
         /// <summary>
+        /// Identifies the EnableColumnFilters dependency property.
+        /// </summary>
+        public static readonly StyledProperty<bool> EnableColumnFiltersProperty =
+            AvaloniaProperty.Register<DataGrid, bool>(nameof(EnableColumnFilters), true);
+
+        /// <summary>
+        /// Gets or sets a value that indicates whether column filter UI is enabled.
+        /// </summary>
+        public bool EnableColumnFilters
+        {
+            get { return GetValue(EnableColumnFiltersProperty); }
+            set { SetValue(EnableColumnFiltersProperty, value); }
+        }
+
+        /// <summary>
+        /// Identifies the EnableColumnVirtualization dependency property.
+        /// </summary>
+        public static readonly StyledProperty<bool> EnableColumnVirtualizationProperty =
+            AvaloniaProperty.Register<DataGrid, bool>(nameof(EnableColumnVirtualization), true);
+
+        /// <summary>
+        /// Gets or sets a value that indicates whether column virtualization is enabled.
+        /// </summary>
+        public bool EnableColumnVirtualization
+        {
+            get { return GetValue(EnableColumnVirtualizationProperty); }
+            set { SetValue(EnableColumnVirtualizationProperty, value); }
+        }
+
+        /// <summary>
+        /// Identifies the EnableRowVirtualization dependency property.
+        /// </summary>
+        public static readonly StyledProperty<bool> EnableRowVirtualizationProperty =
+            AvaloniaProperty.Register<DataGrid, bool>(nameof(EnableRowVirtualization), true);
+
+        /// <summary>
+        /// Gets or sets a value that indicates whether row virtualization is enabled.
+        /// </summary>
+        public bool EnableRowVirtualization
+        {
+            get { return GetValue(EnableRowVirtualizationProperty); }
+            set { SetValue(EnableRowVirtualizationProperty, value); }
+        }
+
+        /// <summary>
         /// Identifies the <see cref="CanUserSelectColumns"/> dependency property.
         /// </summary>
         public static readonly StyledProperty<bool> CanUserSelectColumnsProperty =
@@ -378,6 +423,21 @@ internal
         {
             get { return GetValue(CellThemeProperty); }
             set { SetValue(CellThemeProperty, value); }
+        }
+
+        /// <summary>
+        /// Identifies the CellStyle dependency property.
+        /// </summary>
+        public static readonly StyledProperty<Style> CellStyleProperty =
+            AvaloniaProperty.Register<DataGrid, Style>(nameof(CellStyle));
+
+        /// <summary>
+        /// Gets or sets the style applied to generated cells.
+        /// </summary>
+        public Style CellStyle
+        {
+            get { return GetValue(CellStyleProperty); }
+            set { SetValue(CellStyleProperty, value); }
         }
 
         /// <summary>
@@ -1366,6 +1426,19 @@ internal
             set => SetValue(ItemsSourceProperty, value);
         }
 
+        /// <summary>
+        /// Gets the items view (WPF-compat surface).
+        /// </summary>
+        public IList Items
+        {
+            get
+            {
+                return (DataConnection?.CollectionView as IList)
+                    ?? (ItemsSource as IList)
+                    ?? Array.Empty<object>();
+            }
+        }
+
         public static readonly StyledProperty<bool> AreRowDetailsFrozenProperty =
             AvaloniaProperty.Register<DataGrid, bool>(nameof(AreRowDetailsFrozen));
 
@@ -1389,6 +1462,21 @@ internal
         {
             get { return GetValue(RowDetailsTemplateProperty); }
             set { SetValue(RowDetailsTemplateProperty, value); }
+        }
+
+        /// <summary>
+        /// Identifies the RowDetailsTemplateSelector property.
+        /// </summary>
+        public static readonly StyledProperty<object> RowDetailsTemplateSelectorProperty =
+            AvaloniaProperty.Register<DataGrid, object>(nameof(RowDetailsTemplateSelector));
+
+        /// <summary>
+        /// Gets or sets the selector used to choose row details templates.
+        /// </summary>
+        public object RowDetailsTemplateSelector
+        {
+            get { return GetValue(RowDetailsTemplateSelectorProperty); }
+            set { SetValue(RowDetailsTemplateSelectorProperty, value); }
         }
 
 #if !DATAGRID_INTERNAL

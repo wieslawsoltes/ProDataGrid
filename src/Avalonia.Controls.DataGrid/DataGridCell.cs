@@ -100,6 +100,11 @@ internal
                 }
             }
         }
+
+        /// <summary>
+        /// WPF-compat alias for <see cref="OwningColumn"/>.
+        /// </summary>
+        public DataGridColumn Column => OwningColumn;
         /// <summary>
         /// Gets the row that owns this cell.
         /// </summary>

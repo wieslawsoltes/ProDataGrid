@@ -71,12 +71,16 @@ namespace Avalonia.Controls
 
         private void UpdateRowDetailsHeightEstimate()
         {
-            if (_rowsPresenter != null && _measured && RowDetailsTemplate != null)
+            if (_rowsPresenter != null && _measured && HasRowDetailsTemplate)
             {
                 object dataItem = null;
-                if(VisibleSlotCount > 0)
-                dataItem = DataConnection.GetDataItem(0);
-                var detailsContent = RowDetailsTemplate.Build(dataItem);
+                if (VisibleSlotCount > 0)
+                {
+                    dataItem = DataConnection.GetDataItem(0);
+                }
+
+                var detailsTemplate = GetRowDetailsTemplate(dataItem, this);
+                var detailsContent = detailsTemplate?.Build(dataItem);
                 if (detailsContent != null)
                 {
                     detailsContent.DataContext = dataItem;

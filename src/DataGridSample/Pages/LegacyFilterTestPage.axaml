@@ -1,0 +1,79 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:dg="clr-namespace:Avalonia.Controls;assembly=Avalonia.Controls.DataGrid"
+             xmlns:controls="clr-namespace:DataGridSample.Controls"
+             xmlns:pages="clr-namespace:DataGridSample.Pages"
+             xmlns:models="clr-namespace:DataGridSample.Models"
+             x:Class="DataGridSample.Pages.LegacyFilterTestPage"
+             x:DataType="pages:LegacyFilterTestPage">
+
+  <UserControl.Resources>
+    <ControlTemplate x:Key="DefaultFilter" x:DataType="dg:DataGridColumn">
+      <Grid ColumnDefinitions="Auto,*" Margin="6">
+        <TextBlock Grid.Column="0"
+                   VerticalAlignment="Center"
+                   Margin="0,0,4,0"
+                   Text="🔍" />
+        <TextBox Grid.Column="1"
+                 Text="{Binding FilterValue, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                 Watermark="Type to filter"
+                 HorizontalAlignment="Stretch"
+                 VerticalAlignment="Center" />
+      </Grid>
+    </ControlTemplate>
+
+    <ControlTemplate x:Key="HexFilter" x:DataType="dg:DataGridColumn">
+      <controls:LegacyHexFilterControl />
+    </ControlTemplate>
+  </UserControl.Resources>
+
+  <DockPanel Margin="8">
+    <StackPanel DockPanel.Dock="Top" Orientation="Horizontal" Spacing="12" Margin="0 0 0 8">
+      <TextBlock Text="Legacy filter bridge" FontSize="16" FontWeight="Bold" VerticalAlignment="Center" />
+      <Button Content="Clear filters" Click="OnClearFiltersClicked" />
+    </StackPanel>
+
+    <Border DockPanel.Dock="Bottom"
+            BorderBrush="{DynamicResource DataGridBorderBrush}"
+            BorderThickness="1"
+            CornerRadius="4"
+            Padding="8"
+            Margin="0 0 0 12">
+      <StackPanel Spacing="2">
+        <TextBlock Text="FilteringModel descriptors" FontWeight="Bold" />
+        <ItemsControl ItemsSource="{Binding FilterSummaries}">
+          <ItemsControl.ItemTemplate>
+            <DataTemplate x:DataType="x:String">
+              <TextBlock Text="{Binding}" />
+            </DataTemplate>
+          </ItemsControl.ItemTemplate>
+        </ItemsControl>
+      </StackPanel>
+    </Border>
+
+    <dg:DataGrid x:Name="LegacyGrid"
+                 AutoGenerateColumns="False"
+                 CanUserAddRows="False"
+                 CanUserDeleteRows="False"
+                 HeadersVisibility="Column"
+                 RowDetailsVisibilityMode="Collapsed"
+                 IsReadOnly="True"
+                 FilteringModel="{Binding FilteringModel}"
+                 x:CompileBindings="False">
+      <dg:DataGrid.Columns>
+        <dg:DataGridTextColumn
+                               Header="Description"
+                               Binding="{Binding Description}"
+                               Width="3*" />
+        <dg:DataGridTextColumn
+                               Header="Category"
+                               Binding="{Binding Category}"
+                               Width="2*" />
+        <dg:DataGridTextColumn
+                               Header="Token"
+                               Binding="{Binding Token, StringFormat='0x{0:X8}'}"
+                               Width="2*" />
+      </dg:DataGrid.Columns>
+    </dg:DataGrid>
+  </DockPanel>
+</UserControl>

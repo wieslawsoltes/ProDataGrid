@@ -305,6 +305,10 @@ internal
                 {
                     newCell.SetValue(ThemeProperty, cellTheme, BindingPriority.Template);
                 }
+                if (row.OwningGrid.CellStyle is {} cellStyle)
+                {
+                    newCell.Styles.Add(cellStyle);
+                }
                 if (_conditionalFormattingAdapter != null)
                 {
                     var descriptor = _conditionalFormattingAdapter.MatchCell(row.DataContext, row.Index, column);

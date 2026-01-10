@@ -65,7 +65,7 @@ namespace Avalonia.Controls
                             NegVerticalOffset = 0;
                             //
                             if (height > 2 * CellsEstimatedHeight &&
-                            (RowDetailsVisibilityMode != DataGridRowDetailsVisibilityMode.VisibleWhenSelected || RowDetailsTemplate == null))
+                            (RowDetailsVisibilityMode != DataGridRowDetailsVisibilityMode.VisibleWhenSelected || !HasRowDetailsTemplate))
                             {
                                 // Very large scroll occurred. Instead of determining the exact number of scrolled off rows,
                                 // let's estimate the number based on RowHeight.
@@ -138,7 +138,7 @@ namespace Avalonia.Controls
                         //
 
                         if (height < -2 * CellsEstimatedHeight &&
-                        (RowDetailsVisibilityMode != DataGridRowDetailsVisibilityMode.VisibleWhenSelected || RowDetailsTemplate == null))
+                        (RowDetailsVisibilityMode != DataGridRowDetailsVisibilityMode.VisibleWhenSelected || !HasRowDetailsTemplate))
                         {
                             // Very large scroll occurred. Instead of determining the exact number of scrolled off rows,
                             // let's estimate the number based on RowHeight.

@@ -656,6 +656,8 @@ internal
             {
                 boundColumn.SetHeaderFromBinding();
             }
+
+            ApplyLegacyColumnFilterIfNeeded(insertedColumn);
         }
 
         internal DataGridCellCoordinates OnInsertingColumn(int columnIndexInserted, DataGridColumn insertColumn)
@@ -697,6 +699,8 @@ internal
         {
             Debug.Assert(removedColumn.Index >= 0);
             Debug.Assert(removedColumn.OwningGrid == null);
+
+            RemoveLegacyColumnFilter(removedColumn);
 
             // Intentionally keep the DisplayIndex intact after detaching the column.
             CorrectColumnIndexesAfterDeletion(removedColumn);

@@ -67,6 +67,15 @@ internal
             get;
             private set;
         }
+
+        /// <summary>
+        /// Gets or sets the descriptor for the property bound to the generated column.
+        /// </summary>
+        public PropertyDescriptor PropertyDescriptor
+        {
+            get;
+            set;
+        }
     }
 
     /// <summary>

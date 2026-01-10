@@ -4,10 +4,13 @@
 
 #nullable disable
 
+using Avalonia;
+using Avalonia.Controls.Templates;
 using Avalonia.Styling;
 using System;
 using System.Diagnostics;
 using Avalonia.Interactivity;
+using System.Reflection;
 
 namespace Avalonia.Controls
 {
@@ -151,7 +154,6 @@ internal
 
         private void OnRowDetailsTemplateChanged(AvaloniaPropertyChangedEventArgs e)
         {
-
             // Update the RowDetails templates if necessary
             if (_rowsPresenter != null)
             {
@@ -169,10 +171,106 @@ internal
             InvalidateMeasure();
         }
 
+        private void OnRowDetailsTemplateSelectorChanged(AvaloniaPropertyChangedEventArgs e)
+        {
+            OnRowDetailsTemplateChanged(e);
+        }
+
+        internal bool HasRowDetailsTemplate
+        {
+            get { return RowDetailsTemplate != null || RowDetailsTemplateSelector != null; }
+        }
+
+        internal IDataTemplate GetRowDetailsTemplate(object item, AvaloniaObject container)
+        {
+            var selector = RowDetailsTemplateSelector;
+            if (selector != null)
+            {
+                var selected = SelectRowDetailsTemplate(selector, item, container);
+                if (selected != null)
+                {
+                    return selected;
+                }
+            }
+
+            return RowDetailsTemplate;
+        }
+
+        private static IDataTemplate SelectRowDetailsTemplate(object selector, object item, AvaloniaObject container)
+        {
+            var selectorType = selector.GetType();
+            var method = selectorType.GetMethod(
+                "SelectTemplate",
+                BindingFlags.Instance | BindingFlags.Public,
+                binder: null,
+                types: new[] { typeof(object), typeof(AvaloniaObject) },
+                modifiers: null);
+            method ??= selectorType.GetMethod(
+                "SelectTemplate",
+                BindingFlags.Instance | BindingFlags.Public,
+                binder: null,
+                types: new[] { typeof(object), typeof(object) },
+                modifiers: null);
+
+            if (method == null)
+            {
+                return null;
+            }
+
+            try
+            {
+                return method.Invoke(selector, new object[] { item, container }) as IDataTemplate;
+            }
+            catch
+            {
+                return null;
+            }
+        }
+
 
         private void OnRowDetailsVisibilityModeChanged(AvaloniaPropertyChangedEventArgs e)
         {
             UpdateRowDetailsVisibilityMode((DataGridRowDetailsVisibilityMode)e.NewValue);
+        }
+
+        /// <summary>
+        /// Sets the visibility for the details section of a given item.
+        /// </summary>
+#if !DATAGRID_INTERNAL
+        public
+#else
+        internal
+#endif
+        void SetDetailsVisibilityForItem(object item, DataGridRowDetailsVisibilityMode detailsVisibility)
+        {
+            if (item == null || DataConnection == null)
+            {
+                return;
+            }
+
+            if (!TryGetRowIndexFromItem(item, out var rowIndex))
+            {
+                return;
+            }
+
+            switch (detailsVisibility)
+            {
+                case DataGridRowDetailsVisibilityMode.Visible:
+                    OnRowDetailsVisibilityPropertyChanged(rowIndex, true);
+                    break;
+                case DataGridRowDetailsVisibilityMode.Collapsed:
+                    OnRowDetailsVisibilityPropertyChanged(rowIndex, false);
+                    break;
+                case DataGridRowDetailsVisibilityMode.VisibleWhenSelected:
+                    _showDetailsTable.RemoveValue(rowIndex);
+                    break;
+            }
+
+            var row = GetRowFromItem(item);
+            if (row != null)
+            {
+                EnsureRowDetailsVisibility(row, raiseNotification: true, animate: true);
+            }
         }
 
 

@@ -1358,6 +1358,33 @@ internal
             }
         }
 
+        private void OnCellStyleChanged(AvaloniaPropertyChangedEventArgs e)
+        {
+            var oldStyle = e.OldValue as Style;
+            var newStyle = e.NewValue as Style;
+            if (oldStyle == null && newStyle == null)
+            {
+                return;
+            }
+
+            foreach (var row in GetAllRows())
+            {
+                var cells = row.Cells;
+                for (var i = 0; i < cells.Count; i++)
+                {
+                    var cell = cells[i];
+                    if (oldStyle != null)
+                    {
+                        cell.Styles.Remove(oldStyle);
+                    }
+                    if (newStyle != null && !cell.Styles.Contains(newStyle))
+                    {
+                        cell.Styles.Add(newStyle);
+                    }
+                }
+            }
+        }
+
         private void OnRowHeaderWidthChanged(AvaloniaPropertyChangedEventArgs e)
         {
             if (!_areHandlersSuspended)

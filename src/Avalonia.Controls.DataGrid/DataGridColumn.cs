@@ -56,7 +56,16 @@ internal
         private bool _setWidthInternalNoCallback;
         private bool _showFilterButton;
         private FlyoutBase _filterFlyout;
+        private FlyoutBase _legacyFilterFlyout;
+        private bool _ownsLegacyFilterFlyout;
         private System.Collections.IComparer _customSortComparer;
+
+        static DataGridColumn()
+        {
+            FilterValueProperty.Changed.AddClassHandler<DataGridColumn>((x, e) => x.OnLegacyFilterValueChanged(e));
+            ContentFilterProperty.Changed.AddClassHandler<DataGridColumn>((x, e) => x.OnLegacyFilterValueChanged(e));
+            FilterControlTemplateProperty.Changed.AddClassHandler<DataGridColumn>((x, e) => x.OnLegacyFilterControlTemplateChanged(e));
+        }
 
 
         /// <summary>
@@ -657,6 +666,85 @@ internal
         }
 
         /// <summary>
+        /// Backing field for FilterControlTemplate property.
+        /// </summary>
+        public static readonly StyledProperty<IDataTemplate> FilterControlTemplateProperty =
+            AvaloniaProperty.Register<DataGridColumn, IDataTemplate>(nameof(FilterControlTemplate));
+
+        /// <summary>
+        /// Gets or sets the filter control template used by legacy filter shims.
+        /// </summary>
+        public IDataTemplate FilterControlTemplate
+        {
+            get { return GetValue(FilterControlTemplateProperty); }
+            set { SetValue(FilterControlTemplateProperty, value); }
+        }
+
+        /// <summary>
+        /// Backing field for FilterValue property.
+        /// </summary>
+        public static readonly StyledProperty<string> FilterValueProperty =
+            AvaloniaProperty.Register<DataGridColumn, string>(nameof(FilterValue));
+
+        /// <summary>
+        /// Gets or sets the legacy filter value for this column.
+        /// </summary>
+        public string FilterValue
+        {
+            get { return GetValue(FilterValueProperty); }
+            set { SetValue(FilterValueProperty, value); }
+        }
+
+        /// <summary>
+        /// Backing field for ContentFilter property.
+        /// </summary>
+        public static readonly StyledProperty<object> ContentFilterProperty =
+            AvaloniaProperty.Register<DataGridColumn, object>(nameof(ContentFilter));
+
+        /// <summary>
+        /// Gets or sets a custom content filter object for legacy filtering.
+        /// </summary>
+        public object ContentFilter
+        {
+            get { return GetValue(ContentFilterProperty); }
+            set { SetValue(ContentFilterProperty, value); }
+        }
+
+        private void OnLegacyFilterValueChanged(AvaloniaPropertyChangedEventArgs e)
+        {
+            OwningGrid?.OnLegacyColumnFilterChanged(this);
+        }
+
+        private void OnLegacyFilterControlTemplateChanged(AvaloniaPropertyChangedEventArgs e)
+        {
+            var template = e.NewValue as IDataTemplate;
+            if (template == null)
+            {
+                if (_ownsLegacyFilterFlyout && ReferenceEquals(FilterFlyout, _legacyFilterFlyout))
+                {
+                    FilterFlyout = null;
+                    ShowFilterButton = false;
+                }
+
+                _legacyFilterFlyout = null;
+                _ownsLegacyFilterFlyout = false;
+                return;
+            }
+
+            if (!_ownsLegacyFilterFlyout && FilterFlyout != null)
+            {
+                return;
+            }
+
+            var flyout = _legacyFilterFlyout as Flyout ?? new Flyout();
+            flyout.Content = this;
+            flyout.ContentTemplate = template;
+            _legacyFilterFlyout = flyout;
+            _ownsLegacyFilterFlyout = true;
+            FilterFlyout = flyout;
+        }
+
+        /// <summary>
         ///    Backing field for Header property
         /// </summary>
         public static readonly DirectProperty<DataGridColumn, object> HeaderProperty =
@@ -825,6 +913,30 @@ internal
             {
                 _clipboardContentBinding = value;
             }
+        }
+
+        /// <summary>
+        /// WPF-compat hook to customize clipboard content for a single cell.
+        /// </summary>
+        public virtual object OnCopyingCellClipboardContent(object item)
+        {
+            if (item == null)
+            {
+                return null;
+            }
+
+            if (OwningGrid == null)
+            {
+                return item;
+            }
+
+            var binding = ClipboardContentBinding;
+            if (binding == null)
+            {
+                return item;
+            }
+
+            return GetCellValue(item, binding);
         }
 
         /// <summary>

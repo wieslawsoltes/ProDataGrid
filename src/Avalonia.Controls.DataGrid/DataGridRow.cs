@@ -660,7 +660,12 @@ internal
             get
             {
                 Debug.Assert(OwningGrid != null);
-                return DetailsTemplate ?? OwningGrid.RowDetailsTemplate;
+                if (DetailsTemplate != null)
+                {
+                    return DetailsTemplate;
+                }
+
+                return OwningGrid.GetRowDetailsTemplate(DataContext, this);
             }
         }
 
