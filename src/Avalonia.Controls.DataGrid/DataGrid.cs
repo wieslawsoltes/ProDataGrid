@@ -116,6 +116,9 @@ internal
         private const double DATAGRID_defaultMinColumnWidth = 20;
         private const double DATAGRID_defaultMaxColumnWidth = double.PositiveInfinity;
 
+        // custom subclasses can inherit the base DataGrid style by default.
+        protected override Type StyleKeyOverride => typeof(DataGrid);
+
         /// <summary>
         /// Invoked when preparing a row container for an item.
         /// Mirrors ItemsControl naming while using the DataGrid row pipeline.
