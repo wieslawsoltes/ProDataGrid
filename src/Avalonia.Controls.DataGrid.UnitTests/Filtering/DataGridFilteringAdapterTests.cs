@@ -177,6 +177,34 @@ public class DataGridFilteringAdapterTests
     }
 
     [Fact]
+    public void Column_FilterValueAccessor_Is_Used_When_Filtering()
+    {
+        var items = new[]
+        {
+            new Person("Alpha", 1),
+            new Person("Beta", 2)
+        };
+        var view = new DataGridCollectionView(items);
+        var model = new FilteringModel();
+
+        var column = new DataGridTextColumn();
+        DataGridColumnFilter.SetValueAccessor(column, new DataGridColumnValueAccessor<Person, int>(p => p.Score));
+
+        var adapter = new DataGridFilteringAdapter(model, () => new[] { column });
+        adapter.AttachView(view);
+
+        model.SetOrUpdate(new FilteringDescriptor(
+            columnId: column,
+            @operator: FilteringOperator.Equals,
+            propertyPath: "Name",
+            value: 2));
+
+        var scores = view.Cast<Person>().Select(p => p.Score).ToArray();
+
+        Assert.Equal(new[] { 2 }, scores);
+    }
+
+    [Fact]
     public void Custom_Predicate_Is_Used_When_ValueAccessor_Is_Available()
     {
         var items = new[]

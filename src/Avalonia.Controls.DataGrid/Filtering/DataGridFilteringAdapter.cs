@@ -230,7 +230,8 @@ namespace Avalonia.Controls.DataGridFiltering
 
             if (column != null)
             {
-                var accessor = DataGridColumnMetadata.GetValueAccessor(column);
+                var filterAccessor = DataGridColumnFilter.GetValueAccessor(column);
+                var accessor = filterAccessor ?? DataGridColumnMetadata.GetValueAccessor(column);
                 if (accessor != null)
                 {
                     return item =>
@@ -321,13 +322,7 @@ namespace Avalonia.Controls.DataGridFiltering
 
             foreach (var column in columns)
             {
-                if (ReferenceEquals(column, descriptor.ColumnId))
-                {
-                    return column;
-                }
-
-                if (descriptor.ColumnId is DataGridColumnDefinition definition &&
-                    ReferenceEquals(DataGridColumnMetadata.GetDefinition(column), definition))
+                if (DataGridColumnMetadata.MatchesColumnId(column, descriptor.ColumnId))
                 {
                     return column;
                 }

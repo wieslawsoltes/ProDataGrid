@@ -363,9 +363,18 @@ namespace Avalonia.Controls.DataGridConditionalFormatting
                 return true;
             }
 
-            if (descriptor.ColumnId is DataGridColumnDefinition definition)
+            var definition = DataGridColumnMetadata.GetDefinition(column);
+            if (definition != null)
             {
-                return ReferenceEquals(DataGridColumnMetadata.GetDefinition(column), definition);
+                if (ReferenceEquals(descriptor.ColumnId, definition))
+                {
+                    return true;
+                }
+
+                if (definition.ColumnKey != null && Equals(definition.ColumnKey, descriptor.ColumnId))
+                {
+                    return true;
+                }
             }
 
             if (descriptor.ColumnId is string path)
