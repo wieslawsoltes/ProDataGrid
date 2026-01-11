@@ -1391,6 +1391,21 @@ internal
             set { SetValue(RowDetailsTemplateProperty, value); }
         }
 
+        /// <summary>
+        /// Gets or sets the template selector that is used to select the template
+        /// </summary>
+        public static readonly StyledProperty<DataTemplateSelector> RowDetailsTemplateSelectorProperty =
+            AvaloniaProperty.Register<DataGrid, DataTemplateSelector>(nameof(RowDetailsTemplateSelector));
+
+        /// <summary>
+        /// Gets or sets the template selector that is used to select the template
+        /// </summary>
+        public DataTemplateSelector RowDetailsTemplateSelector
+        {
+            get { return GetValue(RowDetailsTemplateSelectorProperty); }
+            set { SetValue(RowDetailsTemplateSelectorProperty, value); }
+        }
+
 #if !DATAGRID_INTERNAL
         public
 #else

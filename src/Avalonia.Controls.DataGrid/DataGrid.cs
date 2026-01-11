@@ -503,6 +503,7 @@ internal
             Visual.IsVisibleProperty.Changed.AddClassHandler<DataGrid>((x, e) => x.OnIsVisibleChanged(e));
             AreRowGroupHeadersFrozenProperty.Changed.AddClassHandler<DataGrid>((x, e) => x.OnAreRowGroupHeadersFrozenChanged(e));
             RowDetailsTemplateProperty.Changed.AddClassHandler<DataGrid>((x, e) => x.OnRowDetailsTemplateChanged(e));
+            RowDetailsTemplateSelectorProperty.Changed.AddClassHandler<DataGrid>((x, e) => x.OnRowDetailsTemplateSelectorChanged(e));
             RowDetailsVisibilityModeProperty.Changed.AddClassHandler<DataGrid>((x, e) => x.OnRowDetailsVisibilityModeChanged(e));
             AutoGenerateColumnsProperty.Changed.AddClassHandler<DataGrid>((x, e) => x.OnAutoGenerateColumnsChanged(e));
             RowHeightEstimatorProperty.Changed.AddClassHandler<DataGrid>((x, e) => x.OnRowHeightEstimatorChanged(e));

@@ -4,10 +4,10 @@
 
 #nullable disable
 
-using Avalonia.Styling;
 using System;
-using System.Diagnostics;
+using Avalonia.Controls.Templates;
 using Avalonia.Interactivity;
+using Avalonia.Markup.Xaml.Templates;
 
 namespace Avalonia.Controls
 {
@@ -64,7 +64,6 @@ internal
             }
         }
 
-
         /// <summary>
         /// Raises the LoadingRowDetails for row details preparation
         /// </summary>
@@ -82,7 +81,6 @@ internal
             LoadingOrUnloadingRow = false;
         }
 
-
         /// <summary>
         /// Raises the UnloadingRowDetails event
         /// </summary>
@@ -99,7 +97,6 @@ internal
             RaiseEvent(e);
             LoadingOrUnloadingRow = false;
         }
-
 
         private void UpdateRowDetailsVisibilityMode(DataGridRowDetailsVisibilityMode newDetailsMode)
         {
@@ -148,10 +145,8 @@ internal
             }
         }
 
-
         private void OnRowDetailsTemplateChanged(AvaloniaPropertyChangedEventArgs e)
         {
-
             // Update the RowDetails templates if necessary
             if (_rowsPresenter != null)
             {
@@ -169,12 +164,75 @@ internal
             InvalidateMeasure();
         }
 
+        private void OnRowDetailsTemplateSelectorChanged(AvaloniaPropertyChangedEventArgs e)
+        {
+            OnRowDetailsTemplateChanged(e);
+        }
+
+        internal bool HasRowDetailsTemplate
+        {
+            get { return RowDetailsTemplate != null || RowDetailsTemplateSelector != null; }
+        }
+
+        internal IDataTemplate GetRowDetailsTemplate(object item, AvaloniaObject container)
+        {
+            var selector = RowDetailsTemplateSelector;
+            if (selector != null)
+            {
+                var selected = selector.SelectTemplate(item, container);
+                if (selected != null)
+                {
+                    return selected;
+                }
+            }
+
+            return RowDetailsTemplate;
+        }
 
         private void OnRowDetailsVisibilityModeChanged(AvaloniaPropertyChangedEventArgs e)
         {
             UpdateRowDetailsVisibilityMode((DataGridRowDetailsVisibilityMode)e.NewValue);
         }
 
+        /// <summary>
+        /// Sets the visibility for the details section of a given item.
+        /// </summary>
+#if !DATAGRID_INTERNAL
+        public
+#else
+        internal
+#endif
+        void SetDetailsVisibilityForItem(object item, DataGridRowDetailsVisibilityMode detailsVisibility)
+        {
+            if (item == null || DataConnection == null)
+            {
+                return;
+            }
+
+            if (!TryGetRowIndexFromItem(item, out var rowIndex))
+            {
+                return;
+            }
+
+            switch (detailsVisibility)
+            {
+                case DataGridRowDetailsVisibilityMode.Visible:
+                    OnRowDetailsVisibilityPropertyChanged(rowIndex, true);
+                    break;
+                case DataGridRowDetailsVisibilityMode.Collapsed:
+                    OnRowDetailsVisibilityPropertyChanged(rowIndex, false);
+                    break;
+                case DataGridRowDetailsVisibilityMode.VisibleWhenSelected:
+                    _showDetailsTable.RemoveValue(rowIndex);
+                    break;
+            }
+
+            var row = GetRowFromItem(item);
+            if (row != null)
+            {
+                EnsureRowDetailsVisibility(row, raiseNotification: true, animate: true);
+            }
+        }
 
         /// <summary>
         /// Occurs when a new row details template is applied to a row, so that you can customize
@@ -191,7 +249,6 @@ internal
             remove => RemoveHandler(LoadingRowDetailsEvent, value);
         }
 
-
         /// <summary>
         /// Occurs when a row details element becomes available for reuse.
         /// </summary>
@@ -205,7 +262,6 @@ internal
             add => AddHandler(UnloadingRowDetailsEvent, value);
             remove => RemoveHandler(UnloadingRowDetailsEvent, value);
         }
-
 
         /// <summary>
         /// Occurs when the <see cref="P:Avalonia.Controls.DataGrid.RowDetailsVisibilityMode" />
@@ -222,12 +278,21 @@ internal
             remove => RemoveHandler(RowDetailsVisibilityChangedEvent, value);
         }
 
-
         internal double RowDetailsHeightEstimate
         {
             get;
             private set;
         }
 
+        /// <summary>
+        /// Minimal shim for WPF DataTemplateSelector.
+        /// </summary>
+        public class DataTemplateSelector
+        {
+            public virtual DataTemplate SelectTemplate(object item, AvaloniaObject container)
+            {
+                return null;
+            }
+        }
     }
 }

@@ -1,0 +1,34 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:pages="clr-namespace:DataGridSample.Pages"
+             xmlns:local="clr-namespace:DataGridSample"
+             xmlns:models="clr-namespace:DataGridSample.Models"
+             xmlns:dg="clr-namespace:Avalonia.Controls;assembly=Avalonia.Controls.DataGrid"
+             x:Class="DataGridSample.Pages.RowDetailsTemplateSelectorPage">
+
+  <Grid Margin="8">
+    <Grid.RowDefinitions>
+      <RowDefinition Height="Auto"/>
+      <RowDefinition Height="*"/>
+    </Grid.RowDefinitions>
+
+    <StackPanel Grid.Row="0" Orientation="Vertical" Spacing="4" Margin="0 0 0 8">
+      <TextBlock Text="Row Details Template Selector" FontSize="20" FontWeight="SemiBold"/>
+      <TextBlock Text="Select a row to reveal a richly styled details section that the selector paints differently per item." TextWrapping="Wrap"/>
+    </StackPanel>
+
+    <dg:DataGrid x:Name="SampleGrid"
+                 Grid.Row="1"
+                 AutoGenerateColumns="False"
+                 RowDetailsVisibilityMode="VisibleWhenSelected"
+                 Margin="0"
+                 x:DataType="models:LocalSampleItem">
+      <dg:DataGrid.Columns>
+        <dg:DataGridTextColumn Header="ID" Binding="{CompiledBinding Id}" Width="Auto" />
+        <dg:DataGridTextColumn Header="Name" Binding="{CompiledBinding Name}" Width="2*" />
+        <dg:DataGridTextColumn Header="Info" Binding="{CompiledBinding Info}" Width="3*" />
+      </dg:DataGrid.Columns>
+    </dg:DataGrid>
+  </Grid>
+
+</UserControl>

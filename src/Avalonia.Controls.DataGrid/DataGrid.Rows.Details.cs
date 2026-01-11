@@ -24,7 +24,7 @@ namespace Avalonia.Controls
             }
             if (RowDetailsVisibilityMode == DataGridRowDetailsVisibilityMode.Visible)
             {
-                // Total rows minus ones which explicity turned details off minus the RowGroupHeaders
+                // Total rows minus ones which explicitly turned details off minus the RowGroupHeaders
                 int groupSlotCount = RowGroupHeadersTable.GetIndexCount(lowerBound, upperBound) +
                     RowGroupFootersTable.GetIndexCount(lowerBound, upperBound);
                 return indexCount - _showDetailsTable.GetIndexCount(lowerBound, upperBound, false) - groupSlotCount;
@@ -71,12 +71,16 @@ namespace Avalonia.Controls
 
         private void UpdateRowDetailsHeightEstimate()
         {
-            if (_rowsPresenter != null && _measured && RowDetailsTemplate != null)
+            if (_rowsPresenter != null && _measured && HasRowDetailsTemplate)
             {
                 object dataItem = null;
-                if(VisibleSlotCount > 0)
-                dataItem = DataConnection.GetDataItem(0);
-                var detailsContent = RowDetailsTemplate.Build(dataItem);
+                if (VisibleSlotCount > 0)
+                {
+                    dataItem = DataConnection.GetDataItem(0);
+                }
+
+                var detailsTemplate = GetRowDetailsTemplate(dataItem, this);
+                var detailsContent = detailsTemplate?.Build(dataItem);
                 if (detailsContent != null)
                 {
                     detailsContent.DataContext = dataItem;
@@ -123,7 +127,7 @@ namespace Avalonia.Controls
             Debug.Assert(rowIndex != -1);
             if (_showDetailsTable.Contains(rowIndex))
             {
-                // The user explicity set DetailsVisibility on a row so we should respect that
+                // The user explicitly set DetailsVisibility on a row so we should respect that
                 return _showDetailsTable.GetValueAt(rowIndex);
             }
             else

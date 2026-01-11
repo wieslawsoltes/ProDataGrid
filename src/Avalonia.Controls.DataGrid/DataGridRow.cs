@@ -612,18 +612,6 @@ internal
             base.OnPointerExited(e);
         }
 
-
-
-
-
-
-
-
-
-
-
-
-
         private void DataGridCellCollection_CellAdded(object sender, DataGridCellEventArgs e)
         {
             _cellsElement?.Children.Add(e.Cell);
@@ -653,14 +641,19 @@ internal
         }
 
 
-        // Returns the actual template that should be sued for Details: either explicity set on this row
+        // Returns the actual template that should be sued for Details: either explicitly set on this row
         // or inherited from the DataGrid
         private IDataTemplate ActualDetailsTemplate
         {
             get
             {
                 Debug.Assert(OwningGrid != null);
-                return DetailsTemplate ?? OwningGrid.RowDetailsTemplate;
+                if (DetailsTemplate != null)
+                {
+                    return DetailsTemplate;
+                }
+
+                return OwningGrid.GetRowDetailsTemplate(DataContext, this);
             }
         }
 
