@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+      <title>Column Definitions: AOT-Friendly Bindings | ProDataGrid for Avalonia </title>
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <meta name="title" content="Column Definitions: AOT-Friendly Bindings | ProDataGrid for Avalonia ">
+      
+      
+      <link rel="icon" href="../favicon.ico">
+      <link rel="stylesheet" href="../public/docfx.min.css">
+      <link rel="stylesheet" href="../public/main.css">
+      <meta name="docfx:navrel" content="../toc.html">
+      <meta name="docfx:tocrel" content="toc.html">
+      
+      
+      
+      
+      <meta name="docfx:docurl" content="https://github.com/wieslawsoltes/ProDataGrid/blob/master/docfx/articles/column-definitions-aot.md/#L1">
+      <meta name="loc:inThisArticle" content="In this article">
+      <meta name="loc:searchResultsCount" content="{count} results for &quot;{query}&quot;">
+      <meta name="loc:searchNoResults" content="No results for &quot;{query}&quot;">
+      <meta name="loc:tocFilter" content="Filter by title">
+      <meta name="loc:nextArticle" content="Next">
+      <meta name="loc:prevArticle" content="Previous">
+      <meta name="loc:themeLight" content="Light">
+      <meta name="loc:themeDark" content="Dark">
+      <meta name="loc:themeAuto" content="Auto">
+      <meta name="loc:changeTheme" content="Change theme">
+      <meta name="loc:copy" content="Copy">
+      <meta name="loc:downloadPdf" content="Download PDF">
+
+      <script type="module" src="./../public/docfx.min.js"></script>
+
+      <script>
+        const theme = localStorage.getItem('theme') || 'auto'
+        document.documentElement.setAttribute('data-bs-theme', theme === 'auto' ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light') : theme)
+      </script>
+
+  </head>
+
+  <body class="tex2jax_ignore" data-layout="" data-yaml-mime="">
+    <header class="bg-body border-bottom">
+      <nav id="autocollapse" class="navbar navbar-expand-md" role="navigation">
+        <div class="container-xxl flex-nowrap">
+          <a class="navbar-brand" href="../index.html">
+            <img id="logo" class="svg" src="../images/logo.svg" alt="">
+            
+          </a>
+          <button class="btn btn-lg d-md-none border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navpanel" aria-controls="navpanel" aria-expanded="false" aria-label="Toggle navigation">
+            <i class="bi bi-three-dots"></i>
+          </button>
+          <div class="collapse navbar-collapse" id="navpanel">
+            <div id="navbar">
+            </div>
+          </div>
+        </div>
+      </nav>
+    </header>
+
+    <main class="container-xxl">
+      <div class="toc-offcanvas">
+        <div class="offcanvas-md offcanvas-start" tabindex="-1" id="tocOffcanvas" aria-labelledby="tocOffcanvasLabel">
+          <div class="offcanvas-header">
+            <h5 class="offcanvas-title" id="tocOffcanvasLabel">Table of Contents</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="offcanvas" data-bs-target="#tocOffcanvas" aria-label="Close"></button>
+          </div>
+          <div class="offcanvas-body">
+            <nav class="toc" id="toc"></nav>
+          </div>
+        </div>
+      </div>
+
+      <div class="content">
+        <div class="actionbar">
+          <button class="btn btn-lg border-0 d-md-none" type="button" data-bs-toggle="offcanvas" data-bs-target="#tocOffcanvas" aria-controls="tocOffcanvas" aria-expanded="false" aria-label="Show table of contents">
+            <i class="bi bi-list"></i>
+          </button>
+
+          <nav id="breadcrumb"></nav>
+        </div>
+
+        <article data-uid="">
+<h1 id="column-definitions-aot-friendly-bindings">Column Definitions: AOT-Friendly Bindings</h1>
+
+<p><code>DataGridBindingDefinition</code> is the bridge between column definitions and compiled bindings. For AOT, avoid expression-based overloads and supply a prebuilt <code>CompiledBindingPath</code> or <code>IPropertyInfo</code> with typed delegates.</p>
+<h2 id="why-this-matters">Why this matters</h2>
+<p>Expression-based overloads require dynamic code generation. In AOT environments, use the overloads that accept <code>CompiledBindingPath</code> or <code>IPropertyInfo</code> so bindings are compiled ahead of time and no runtime expression compilation is needed.</p>
+<h2 id="pattern-1-compiledbindingpath--delegates">Pattern 1: CompiledBindingPath + delegates</h2>
+<pre><code class="lang-csharp">static string GetName(Person person) =&gt; person.Name;
+
+static void SetName(Person person, string value) =&gt; person.Name = value;
+
+var nameProperty = new ClrPropertyInfo(
+    nameof(Person.Name),
+    target =&gt; ((Person)target).Name,
+    (target, value) =&gt; ((Person)target).Name = (string)value,
+    typeof(string));
+
+var namePath = new CompiledBindingPathBuilder()
+    .Property(nameProperty, PropertyInfoAccessorFactory.CreateInpcPropertyAccessor)
+    .Build();
+
+var nameBinding = DataGridBindingDefinition.Create&lt;Person, string&gt;(namePath, GetName, SetName);
+
+var nameColumn = new DataGridTextColumnDefinition
+{
+    Header = &quot;Name&quot;,
+    Binding = nameBinding
+};
+</code></pre>
+<p>Use <code>PropertyInfoAccessorFactory.CreateAvaloniaPropertyAccessor</code> when the source is an <code>AvaloniaProperty</code> instead of an INPC-backed CLR property.</p>
+<h2 id="pattern-2-ipropertyinfo--delegates">Pattern 2: IPropertyInfo + delegates</h2>
+<p>The <code>IPropertyInfo</code> overload builds the compiled binding path for you:</p>
+<pre><code class="lang-csharp">var nameProperty = new ClrPropertyInfo(
+    nameof(Person.Name),
+    target =&gt; ((Person)target).Name,
+    (target, value) =&gt; ((Person)target).Name = (string)value,
+    typeof(string));
+
+var nameBinding = DataGridBindingDefinition.Create&lt;Person, string&gt;(nameProperty, GetName, SetName);
+</code></pre>
+<p>If you reuse the same <code>IPropertyInfo</code> across many columns or grids, you can cache the compiled path:</p>
+<pre><code class="lang-csharp">var namePath = DataGridCompiledBindingPathCache.GetOrCreate(nameProperty);
+var nameBinding = DataGridBindingDefinition.Create&lt;Person, string&gt;(namePath, GetName, SetName);
+</code></pre>
+<p>There is also a convenience overload:</p>
+<pre><code class="lang-csharp">var nameBinding = DataGridBindingDefinition.CreateCached&lt;Person, string&gt;(nameProperty, GetName, SetName);
+</code></pre>
+<p>You can pair this with <code>DataGridColumnDefinitionBuilder</code> to keep column construction typed and AOT-friendly:</p>
+<pre><code class="lang-csharp">var builder = DataGridColumnDefinitionBuilder.For&lt;Person&gt;();
+var nameColumn = builder.Text(\&quot;Name\&quot;, nameProperty, GetName, SetName);
+</code></pre>
+<h2 id="editing-and-binding-modes">Editing and binding modes</h2>
+<ul>
+<li>Provide a setter when the column is editable.</li>
+<li>For read-only columns, omit the setter and set <code>IsReadOnly = true</code> or set <code>Binding.Mode = BindingMode.OneWay</code>.</li>
+<li><code>DataGridBindingDefinition</code> supports <code>Mode</code>, <code>UpdateSourceTrigger</code>, <code>StringFormat</code>, <code>Converter</code>, and other binding options.</li>
+</ul>
+<h2 id="works-across-all-column-bindings">Works across all column bindings</h2>
+<p>Any column definition that accepts <code>DataGridBindingDefinition</code> can use these AOT-friendly patterns:</p>
+<ul>
+<li><code>DataGridTextColumnDefinition.Binding</code></li>
+<li><code>DataGridNumericColumnDefinition.Binding</code></li>
+<li><code>DataGridComboBoxColumnDefinition.SelectedItemBinding</code> / <code>SelectedValueBinding</code> / <code>TextBinding</code></li>
+<li><code>DataGridHyperlinkColumnDefinition.Binding</code> / <code>ContentBinding</code></li>
+<li><code>CellBackgroundBinding</code> / <code>CellForegroundBinding</code></li>
+</ul>
+<h2 id="fast-path-accessors">Fast path accessors</h2>
+<p><code>DataGridBindingDefinition</code> also provides a typed value accessor used by sorting, filtering, searching, and conditional formatting. For computed values or non-binding columns, set a custom accessor and value type:</p>
+<pre><code class="lang-csharp">var totalColumn = new DataGridTextColumnDefinition
+{
+    Header = &quot;Total&quot;,
+    ValueAccessor = new DataGridColumnValueAccessor&lt;Order, decimal&gt;(o =&gt; o.Price * o.Quantity),
+    ValueType = typeof(decimal),
+    IsReadOnly = true
+};
+</code></pre>
+<p>For model integration details, see <a href="column-definitions-models.html">Column Definitions: Model Integration and Fast Path</a>.
+For an end-to-end fast path guide, see <a href="column-definitions-fast-path-overview.html">Column Definitions: Fast Path Overview</a>.</p>
+
+</article>
+
+        <div class="contribution d-print-none">
+          <a href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/docfx/articles/column-definitions-aot.md/#L1" class="edit-link">Edit this page</a>
+        </div>
+
+        <div class="next-article d-print-none border-top" id="nextArticle"></div>
+
+      </div>
+
+      <div class="affix">
+        <nav id="affix"></nav>
+      </div>
+    </main>
+
+
+    <footer class="border-top text-secondary">
+      <div class="container-xxl">
+        <div class="flex-fill">
+          <span>Made with <a href="https://dotnet.github.io/docfx">docfx</a></span>
+        </div>
+      </div>
+    </footer>
+  </body>
+</html>

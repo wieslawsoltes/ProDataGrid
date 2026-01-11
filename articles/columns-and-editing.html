@@ -167,6 +167,71 @@
           AutoGenerateColumns=&quot;True&quot;
           HeadersVisibility=&quot;All&quot; /&gt;
 </code></pre>
+<h2 id="mvvm-column-definitions">MVVM Column Definitions</h2>
+<p><code>ColumnDefinitionsSource</code> lets you define columns in view-models without creating Avalonia controls. Bind an <code>IList&lt;DataGridColumnDefinition&gt;</code> and the grid materializes the corresponding built-in columns. Use <code>DataGridColumnDefinitionList</code> when you want <code>AddRange</code> and <code>SuspendNotifications()</code> for batch updates.</p>
+<p>For a full walkthrough, see <a href="column-definitions.html">Column Definitions</a> and <a href="column-definitions-aot.html">Column Definitions: AOT-Friendly Bindings</a>.</p>
+<ul>
+<li>Use <code>DataGridTextColumnDefinition</code>, <code>DataGridCheckBoxColumnDefinition</code>, and the other <code>*ColumnDefinition</code> types.</li>
+<li>Template and theme references are string keys (<code>HeaderTemplateKey</code>, <code>CellTemplateKey</code>, <code>CellEditingTemplateKey</code>, <code>HeaderThemeKey</code>, <code>CellThemeKey</code>, <code>FilterThemeKey</code>).</li>
+<li>Bindings use <code>DataGridBindingDefinition.Create&lt;TItem, TValue&gt;(...)</code> to generate compiled bindings and INPC-aware value accessors; expression-based overloads require dynamic code generation.</li>
+<li>For AOT, use the overload that accepts a prebuilt <code>CompiledBindingPath</code> (or property info) with typed delegates to avoid runtime expression compilation.</li>
+<li><code>ValueAccessor</code>/<code>ValueType</code> still allow explicit overrides for sorting, filtering, searching, and conditional formatting.</li>
+<li>Use <code>ColumnKey</code> for stable column ids and <code>DataGridColumnDefinitionOptions</code> to attach search/filter/sort metadata.</li>
+<li><code>DataGridColumnDefinitionBuilder</code> offers typed helpers for common column definitions.</li>
+</ul>
+<pre><code class="lang-xml">&lt;DataGrid ItemsSource=&quot;{Binding Items}&quot;
+          ColumnDefinitionsSource=&quot;{Binding ColumnDefinitions}&quot;
+          AutoGenerateColumns=&quot;False&quot;
+          HeadersVisibility=&quot;All&quot;&gt;
+  &lt;DataGrid.Resources&gt;
+    &lt;DataTemplate x:Key=&quot;StatusCellTemplate&quot;&gt;
+      &lt;TextBlock Text=&quot;{Binding Status}&quot; /&gt;
+    &lt;/DataTemplate&gt;
+  &lt;/DataGrid.Resources&gt;
+&lt;/DataGrid&gt;
+</code></pre>
+<pre><code class="lang-csharp">public DataGridColumnDefinitionList ColumnDefinitions { get; } = new()
+{
+    new DataGridTextColumnDefinition
+    {
+        Header = &quot;Name&quot;,
+        Binding = DataGridBindingDefinition.Create&lt;Person, string&gt;(p =&gt; p.Name)
+    },
+    new DataGridTemplateColumnDefinition
+    {
+        Header = &quot;Status&quot;,
+        CellTemplateKey = &quot;StatusCellTemplate&quot;
+    },
+    new DataGridTextColumnDefinition
+    {
+        Header = &quot;Score&quot;,
+        ValueAccessor = new DataGridColumnValueAccessor&lt;Person, int&gt;(p =&gt; p.Score)
+    }
+};
+</code></pre>
+<pre><code class="lang-csharp">static string GetName(Person person) =&gt; person.Name;
+
+static void SetName(Person person, string value) =&gt; person.Name = value;
+
+var nameInfo = new ClrPropertyInfo(
+    nameof(Person.Name),
+    target =&gt; ((Person)target).Name,
+    (target, value) =&gt; ((Person)target).Name = (string)value,
+    typeof(string));
+
+var namePath = new CompiledBindingPathBuilder()
+    .Property(nameInfo, PropertyInfoAccessorFactory.CreateInpcPropertyAccessor)
+    .Build();
+
+var aotColumns = new ObservableCollection&lt;DataGridColumnDefinition&gt;
+{
+    new DataGridTextColumnDefinition
+    {
+        Header = &quot;Name&quot;,
+        Binding = DataGridBindingDefinition.Create&lt;Person, string&gt;(namePath, GetName, SetName)
+    }
+};
+</code></pre>
 <h2 id="editing-and-row-operations">Editing and Row Operations</h2>
 <ul>
 <li><code>IsReadOnly</code> on the grid or column disables editing.</li>

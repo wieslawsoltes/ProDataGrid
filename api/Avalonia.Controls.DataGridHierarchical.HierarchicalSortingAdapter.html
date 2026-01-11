@@ -171,9 +171,52 @@ public sealed class HierarchicalSortingAdapter : DataGridSortingAdapter, IDispos
 
   <a id="Avalonia_Controls_DataGridHierarchical_HierarchicalSortingAdapter__ctor_" data-uid="Avalonia.Controls.DataGridHierarchical.HierarchicalSortingAdapter.#ctor*"></a>
 
+  <h3 id="Avalonia_Controls_DataGridHierarchical_HierarchicalSortingAdapter__ctor_Avalonia_Controls_DataGridHierarchical_IHierarchicalModel_Avalonia_Controls_DataGridSorting_ISortingModel_System_Func_System_Collections_Generic_IEnumerable_Avalonia_Controls_DataGridColumn___Avalonia_Controls_DataGridFastPathOptions_System_Collections_Generic_IComparer_System_Object__System_Action_System_Action_" data-uid="Avalonia.Controls.DataGridHierarchical.HierarchicalSortingAdapter.#ctor(Avalonia.Controls.DataGridHierarchical.IHierarchicalModel,Avalonia.Controls.DataGridSorting.ISortingModel,System.Func{System.Collections.Generic.IEnumerable{Avalonia.Controls.DataGridColumn}},Avalonia.Controls.DataGridFastPathOptions,System.Collections.Generic.IComparer{System.Object},System.Action,System.Action)">
+  HierarchicalSortingAdapter(IHierarchicalModel, ISortingModel, Func&lt;IEnumerable&lt;DataGridColumn&gt;&gt;, DataGridFastPathOptions, IComparer&lt;object&gt;?, Action?, Action?)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/Hierarchical/HierarchicalSortingAdapter.cs/#L30"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public HierarchicalSortingAdapter(IHierarchicalModel model, ISortingModel sortingModel, Func&lt;IEnumerable&lt;DataGridColumn&gt;&gt; columnProvider, DataGridFastPathOptions options, IComparer&lt;object&gt;? defaultComparer = null, Action? beforeViewRefresh = null, Action? afterViewRefresh = null)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>model</code> <a class="xref" href="Avalonia.Controls.DataGridHierarchical.IHierarchicalModel.html">IHierarchicalModel</a></dt>
+    <dd></dd>
+    <dt><code>sortingModel</code> <a class="xref" href="Avalonia.Controls.DataGridSorting.ISortingModel.html">ISortingModel</a></dt>
+    <dd></dd>
+    <dt><code>columnProvider</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.func-1">Func</a>&lt;<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.ienumerable-1">IEnumerable</a>&lt;<a class="xref" href="Avalonia.Controls.DataGridColumn.html">DataGridColumn</a>&gt;&gt;</dt>
+    <dd></dd>
+    <dt><code>options</code> <a class="xref" href="Avalonia.Controls.DataGridFastPathOptions.html">DataGridFastPathOptions</a></dt>
+    <dd></dd>
+    <dt><code>defaultComparer</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.icomparer-1">IComparer</a>&lt;<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object">object</a>&gt;</dt>
+    <dd></dd>
+    <dt><code>beforeViewRefresh</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.action">Action</a></dt>
+    <dd></dd>
+    <dt><code>afterViewRefresh</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.action">Action</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Avalonia_Controls_DataGridHierarchical_HierarchicalSortingAdapter__ctor_" data-uid="Avalonia.Controls.DataGridHierarchical.HierarchicalSortingAdapter.#ctor*"></a>
+
   <h3 id="Avalonia_Controls_DataGridHierarchical_HierarchicalSortingAdapter__ctor_Avalonia_Controls_DataGridHierarchical_IHierarchicalModel_Avalonia_Controls_DataGridSorting_ISortingModel_System_Func_System_Collections_Generic_IEnumerable_Avalonia_Controls_DataGridColumn___System_Collections_Generic_IComparer_System_Object__System_Action_System_Action_" data-uid="Avalonia.Controls.DataGridHierarchical.HierarchicalSortingAdapter.#ctor(Avalonia.Controls.DataGridHierarchical.IHierarchicalModel,Avalonia.Controls.DataGridSorting.ISortingModel,System.Func{System.Collections.Generic.IEnumerable{Avalonia.Controls.DataGridColumn}},System.Collections.Generic.IComparer{System.Object},System.Action,System.Action)">
   HierarchicalSortingAdapter(IHierarchicalModel, ISortingModel, Func&lt;IEnumerable&lt;DataGridColumn&gt;&gt;, IComparer&lt;object&gt;?, Action?, Action?)
-  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/Hierarchical/HierarchicalSortingAdapter.cs/#L30"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/Hierarchical/HierarchicalSortingAdapter.cs/#L49"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"></div>
@@ -218,7 +261,7 @@ public sealed class HierarchicalSortingAdapter : DataGridSortingAdapter, IDispos
 
   <h3 id="Avalonia_Controls_DataGridHierarchical_HierarchicalSortingAdapter_TryApplyModelToView_System_Collections_Generic_IReadOnlyList_Avalonia_Controls_DataGridSorting_SortingDescriptor__System_Collections_Generic_IReadOnlyList_Avalonia_Controls_DataGridSorting_SortingDescriptor__System_Boolean__" data-uid="Avalonia.Controls.DataGridHierarchical.HierarchicalSortingAdapter.TryApplyModelToView(System.Collections.Generic.IReadOnlyList{Avalonia.Controls.DataGridSorting.SortingDescriptor},System.Collections.Generic.IReadOnlyList{Avalonia.Controls.DataGridSorting.SortingDescriptor},System.Boolean@)">
   TryApplyModelToView(IReadOnlyList&lt;SortingDescriptor&gt;, IReadOnlyList&lt;SortingDescriptor&gt;, out bool)
-  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/Hierarchical/HierarchicalSortingAdapter.cs/#L47"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/Hierarchical/HierarchicalSortingAdapter.cs/#L64"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>Override to short-circuit default sort application (e.g., push descriptors upstream).

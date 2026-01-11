@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+      <title>Column Definitions: Model Integration and Fast Path | ProDataGrid for Avalonia </title>
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <meta name="title" content="Column Definitions: Model Integration and Fast Path | ProDataGrid for Avalonia ">
+      
+      
+      <link rel="icon" href="../favicon.ico">
+      <link rel="stylesheet" href="../public/docfx.min.css">
+      <link rel="stylesheet" href="../public/main.css">
+      <meta name="docfx:navrel" content="../toc.html">
+      <meta name="docfx:tocrel" content="toc.html">
+      
+      
+      
+      
+      <meta name="docfx:docurl" content="https://github.com/wieslawsoltes/ProDataGrid/blob/master/docfx/articles/column-definitions-models.md/#L1">
+      <meta name="loc:inThisArticle" content="In this article">
+      <meta name="loc:searchResultsCount" content="{count} results for &quot;{query}&quot;">
+      <meta name="loc:searchNoResults" content="No results for &quot;{query}&quot;">
+      <meta name="loc:tocFilter" content="Filter by title">
+      <meta name="loc:nextArticle" content="Next">
+      <meta name="loc:prevArticle" content="Previous">
+      <meta name="loc:themeLight" content="Light">
+      <meta name="loc:themeDark" content="Dark">
+      <meta name="loc:themeAuto" content="Auto">
+      <meta name="loc:changeTheme" content="Change theme">
+      <meta name="loc:copy" content="Copy">
+      <meta name="loc:downloadPdf" content="Download PDF">
+
+      <script type="module" src="./../public/docfx.min.js"></script>
+
+      <script>
+        const theme = localStorage.getItem('theme') || 'auto'
+        document.documentElement.setAttribute('data-bs-theme', theme === 'auto' ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light') : theme)
+      </script>
+
+  </head>
+
+  <body class="tex2jax_ignore" data-layout="" data-yaml-mime="">
+    <header class="bg-body border-bottom">
+      <nav id="autocollapse" class="navbar navbar-expand-md" role="navigation">
+        <div class="container-xxl flex-nowrap">
+          <a class="navbar-brand" href="../index.html">
+            <img id="logo" class="svg" src="../images/logo.svg" alt="">
+            
+          </a>
+          <button class="btn btn-lg d-md-none border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navpanel" aria-controls="navpanel" aria-expanded="false" aria-label="Toggle navigation">
+            <i class="bi bi-three-dots"></i>
+          </button>
+          <div class="collapse navbar-collapse" id="navpanel">
+            <div id="navbar">
+            </div>
+          </div>
+        </div>
+      </nav>
+    </header>
+
+    <main class="container-xxl">
+      <div class="toc-offcanvas">
+        <div class="offcanvas-md offcanvas-start" tabindex="-1" id="tocOffcanvas" aria-labelledby="tocOffcanvasLabel">
+          <div class="offcanvas-header">
+            <h5 class="offcanvas-title" id="tocOffcanvasLabel">Table of Contents</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="offcanvas" data-bs-target="#tocOffcanvas" aria-label="Close"></button>
+          </div>
+          <div class="offcanvas-body">
+            <nav class="toc" id="toc"></nav>
+          </div>
+        </div>
+      </div>
+
+      <div class="content">
+        <div class="actionbar">
+          <button class="btn btn-lg border-0 d-md-none" type="button" data-bs-toggle="offcanvas" data-bs-target="#tocOffcanvas" aria-controls="tocOffcanvas" aria-expanded="false" aria-label="Show table of contents">
+            <i class="bi bi-list"></i>
+          </button>
+
+          <nav id="breadcrumb"></nav>
+        </div>
+
+        <article data-uid="">
+<h1 id="column-definitions-model-integration-and-fast-path">Column Definitions: Model Integration and Fast Path</h1>
+
+<p>Column definitions are data objects that the grid maps to real columns. Model-driven features (sorting, filtering, searching, conditional formatting) can reference definition instances directly, keeping column identity stable and avoiding reflection-heavy property paths.</p>
+<h2 id="fast-path-rules-of-thumb">Fast path rules of thumb</h2>
+<ul>
+<li>Use <code>DataGridBindingDefinition</code> (or <code>ValueAccessor</code>) so models can read values without reflection.</li>
+<li>Use the <code>DataGridColumnDefinition</code> instance as the column id in model descriptors, or assign <code>ColumnKey</code> and use that key for stable ids.</li>
+<li>Avoid string property paths unless you need them for external tooling or persistence.</li>
+</ul>
+<h2 id="sorting-model">Sorting model</h2>
+<p><code>SortingDescriptor</code> accepts an object id. Use the definition instance for a stable id that survives column re-materialization.</p>
+<pre><code class="lang-csharp">var firstNameColumn = new DataGridTextColumnDefinition
+{
+    Header = &quot;First Name&quot;,
+    Binding = DataGridBindingDefinition.Create&lt;Person, string&gt;(p =&gt; p.FirstName)
+};
+
+var lastNameColumn = new DataGridTextColumnDefinition
+{
+    Header = &quot;Last Name&quot;,
+    Binding = DataGridBindingDefinition.Create&lt;Person, string&gt;(p =&gt; p.LastName)
+};
+
+var sortingModel = new SortingModel();
+
+sortingModel.Apply(new[]
+{
+    new SortingDescriptor(firstNameColumn, ListSortDirection.Ascending),
+    new SortingDescriptor(lastNameColumn, ListSortDirection.Descending)
+});
+</code></pre>
+<p>If you need ids that survive recreation, assign <code>ColumnKey</code> and pass the key instead of the definition instance:</p>
+<pre><code class="lang-csharp">firstNameColumn.ColumnKey = &quot;first-name&quot;;
+sortingModel.Apply(new[]
+{
+    new SortingDescriptor(&quot;first-name&quot;, ListSortDirection.Ascending)
+});
+</code></pre>
+<p>If you set <code>ValueAccessor</code> or use <code>DataGridBindingDefinition</code>, sorting uses the typed accessor instead of reflection. <code>SortMemberPath</code> is still supported as a fallback.</p>
+<p>If the sort key should differ from the displayed binding, set <code>DataGridColumnDefinitionOptions.SortValueAccessor</code> on the definition.</p>
+<h2 id="filtering-model">Filtering model</h2>
+<p>When a descriptor references a column definition, the adapter resolves it to the materialized column and uses its value accessor.</p>
+<pre><code class="lang-csharp">var statusColumn = new DataGridTextColumnDefinition
+{
+    Header = &quot;Status&quot;,
+    Binding = DataGridBindingDefinition.Create&lt;Person, PersonStatus&gt;(p =&gt; p.Status)
+};
+
+var filteringModel = new FilteringModel { OwnsViewFilter = true };
+
+filteringModel.SetOrUpdate(new FilteringDescriptor(
+    columnId: statusColumn,
+    @operator: FilteringOperator.Equals,
+    value: PersonStatus.Active));
+</code></pre>
+<p>For fast path filtering, ensure the column definition provides a value accessor (via binding or <code>ValueAccessor</code>).</p>
+<p>If the filtering value should differ from the displayed value, set <code>DataGridColumnDefinitionOptions.FilterValueAccessor</code> on the definition to supply a dedicated filter accessor.</p>
+<h3 id="accessor-only-adapters">Accessor-only adapters</h3>
+<p>If you want to avoid the reflection fallback in filtering/searching, enable the built-in accessor-only adapters:</p>
+<pre><code class="lang-xml">&lt;DataGrid FilteringModel=&quot;{Binding FilteringModel}&quot;
+          SearchModel=&quot;{Binding SearchModel}&quot;&gt;
+  &lt;DataGrid.FastPathOptions&gt;
+    &lt;DataGridFastPathOptions UseAccessorsOnly=&quot;True&quot;
+                             ThrowOnMissingAccessor=&quot;True&quot; /&gt;
+  &lt;/DataGrid.FastPathOptions&gt;
+&lt;/DataGrid&gt;
+</code></pre>
+<p><code>FastPathOptions</code> is a CLR property. If you need to bind or reuse an instance from a view model, assign it in code-behind:</p>
+<pre><code class="lang-csharp">public MyPage()
+{
+    InitializeComponent();
+    if (DataContext is MyViewModel vm)
+    {
+        Grid.FastPathOptions = vm.FastPathOptions;
+    }
+}
+</code></pre>
+<p>You can also wire the factories explicitly (useful if you want custom adapters later):</p>
+<pre><code class="lang-xml">&lt;DataGrid FilteringModel=&quot;{Binding FilteringModel}&quot;
+          SearchModel=&quot;{Binding SearchModel}&quot;
+          FilteringAdapterFactory=&quot;{StaticResource AccessorFilteringAdapterFactory}&quot;
+          SearchAdapterFactory=&quot;{StaticResource AccessorSearchAdapterFactory}&quot; /&gt;
+</code></pre>
+<p>Define the resources using <code>DataGridAccessorFilteringAdapterFactory</code> and <code>DataGridAccessorSearchAdapterFactory</code>.</p>
+<h2 id="search-model">Search model</h2>
+<p><code>SearchDescriptor</code> supports explicit column sets. Pass definition instances to keep the mapping stable.</p>
+<pre><code class="lang-csharp">var searchModel = new SearchModel();
+
+searchModel.Apply(new[]
+{
+    new SearchDescriptor(
+        query: &quot;Ada&quot;,
+        scope: SearchScope.ExplicitColumns,
+        columnIds: new object[] { firstNameColumn, lastNameColumn })
+});
+</code></pre>
+<p>The search adapter uses the value accessor when present, avoiding reflection-based getters.</p>
+<p>For template columns or custom text, set <code>DataGridColumnDefinitionOptions.SearchTextProvider</code> (or the attached <code>DataGridColumnSearch.TextProvider</code>) to supply search text without reflection.</p>
+<p>You can also use <code>DataGridColumnDefinitionOptions.SearchMemberPath</code> and <code>SearchFormatProvider</code> to align search with a specific formatted value.</p>
+<h2 id="hierarchical-models">Hierarchical models</h2>
+<p>For hierarchical data, bind to <code>HierarchicalNode</code> and use <code>DataGridHierarchicalColumnDefinition</code> for the expander column. Apply sorting/filtering/searching in the hierarchical model and keep the adapters accessor-based.</p>
+<p>See <a href="column-definitions-hierarchical.html">Column Definitions (Hierarchical Columns)</a> and <a href="column-definitions-hot-path.html">Column Definitions (Hot Path Integration)</a>.</p>
+<h2 id="conditional-formatting-model">Conditional formatting model</h2>
+<p>Conditional formatting descriptors can target a column definition directly. The adapter resolves the column and reads values through the accessor.</p>
+<pre><code class="lang-csharp">var formattingModel = new ConditionalFormattingModel();
+
+formattingModel.Apply(new[]
+{
+    new ConditionalFormattingDescriptor(
+        ruleId: &quot;StatusActive&quot;,
+        columnId: statusColumn,
+        @operator: ConditionalFormattingOperator.Equals,
+        value: PersonStatus.Active,
+        themeKey: &quot;StatusActiveCellTheme&quot;)
+});
+</code></pre>
+<h2 id="summaries">Summaries</h2>
+<p>Summary calculators use the column value accessor when available. If you define summaries on materialized columns, the accessor from the definition is used to avoid reflection.</p>
+<h2 id="state-persistence">State persistence</h2>
+<p><code>DataGridState</code> uses the column definition as the default column key when available. If you need stable keys across sessions, set <code>DataGridStateOptions.ColumnKeySelector</code> and <code>ColumnKeyResolver</code> and return your own ids.</p>
+<h2 id="clipboard-and-export">Clipboard and export</h2>
+<p>Use <code>ClipboardContentBinding</code> on definitions to control exported values. AOT-friendly bindings work the same way as display/edit bindings and preserve type information.</p>
+<h2 id="related-articles">Related articles</h2>
+<ul>
+<li><a href="column-definitions.html">Column Definitions</a></li>
+<li><a href="column-definitions-aot.html">Column Definitions (AOT-Friendly Bindings)</a></li>
+<li><a href="column-definitions-hot-path.html">Column Definitions (Hot Path Integration)</a></li>
+<li><a href="column-definitions-hierarchical.html">Column Definitions (Hierarchical Columns)</a></li>
+<li><a href="column-definitions-fast-path-overview.html">Column Definitions: Fast Path Overview</a></li>
+</ul>
+
+</article>
+
+        <div class="contribution d-print-none">
+          <a href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/docfx/articles/column-definitions-models.md/#L1" class="edit-link">Edit this page</a>
+        </div>
+
+        <div class="next-article d-print-none border-top" id="nextArticle"></div>
+
+      </div>
+
+      <div class="affix">
+        <nav id="affix"></nav>
+      </div>
+    </main>
+
+
+    <footer class="border-top text-secondary">
+      <div class="container-xxl">
+        <div class="flex-fill">
+          <span>Made with <a href="https://dotnet.github.io/docfx">docfx</a></span>
+        </div>
+      </div>
+    </footer>
+  </body>
+</html>

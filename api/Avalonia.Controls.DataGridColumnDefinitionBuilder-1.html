@@ -1,0 +1,1923 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+      <title>Class DataGridColumnDefinitionBuilder&lt;TItem&gt; | ProDataGrid for Avalonia </title>
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <meta name="title" content="Class DataGridColumnDefinitionBuilder&lt;TItem&gt; | ProDataGrid for Avalonia ">
+      
+      
+      <link rel="icon" href="../favicon.ico">
+      <link rel="stylesheet" href="../public/docfx.min.css">
+      <link rel="stylesheet" href="../public/main.css">
+      <meta name="docfx:navrel" content="../toc.html">
+      <meta name="docfx:tocrel" content="toc.html">
+      
+      
+      
+      
+      <meta name="docfx:docurl" content="https://github.com/wieslawsoltes/ProDataGrid/new/master/apiSpec/new?filename=Avalonia_Controls_DataGridColumnDefinitionBuilder_1.md&amp;value=---%0Auid%3A%20Avalonia.Controls.DataGridColumnDefinitionBuilder%601%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">
+      <meta name="loc:inThisArticle" content="In this article">
+      <meta name="loc:searchResultsCount" content="{count} results for &quot;{query}&quot;">
+      <meta name="loc:searchNoResults" content="No results for &quot;{query}&quot;">
+      <meta name="loc:tocFilter" content="Filter by title">
+      <meta name="loc:nextArticle" content="Next">
+      <meta name="loc:prevArticle" content="Previous">
+      <meta name="loc:themeLight" content="Light">
+      <meta name="loc:themeDark" content="Dark">
+      <meta name="loc:themeAuto" content="Auto">
+      <meta name="loc:changeTheme" content="Change theme">
+      <meta name="loc:copy" content="Copy">
+      <meta name="loc:downloadPdf" content="Download PDF">
+
+      <script type="module" src="./../public/docfx.min.js"></script>
+
+      <script>
+        const theme = localStorage.getItem('theme') || 'auto'
+        document.documentElement.setAttribute('data-bs-theme', theme === 'auto' ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light') : theme)
+      </script>
+
+  </head>
+
+  <body class="tex2jax_ignore" data-layout="" data-yaml-mime="ManagedReference">
+    <header class="bg-body border-bottom">
+      <nav id="autocollapse" class="navbar navbar-expand-md" role="navigation">
+        <div class="container-xxl flex-nowrap">
+          <a class="navbar-brand" href="../index.html">
+            <img id="logo" class="svg" src="../images/logo.svg" alt="">
+            
+          </a>
+          <button class="btn btn-lg d-md-none border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navpanel" aria-controls="navpanel" aria-expanded="false" aria-label="Toggle navigation">
+            <i class="bi bi-three-dots"></i>
+          </button>
+          <div class="collapse navbar-collapse" id="navpanel">
+            <div id="navbar">
+            </div>
+          </div>
+        </div>
+      </nav>
+    </header>
+
+    <main class="container-xxl">
+      <div class="toc-offcanvas">
+        <div class="offcanvas-md offcanvas-start" tabindex="-1" id="tocOffcanvas" aria-labelledby="tocOffcanvasLabel">
+          <div class="offcanvas-header">
+            <h5 class="offcanvas-title" id="tocOffcanvasLabel">Table of Contents</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="offcanvas" data-bs-target="#tocOffcanvas" aria-label="Close"></button>
+          </div>
+          <div class="offcanvas-body">
+            <nav class="toc" id="toc"></nav>
+          </div>
+        </div>
+      </div>
+
+      <div class="content">
+        <div class="actionbar">
+          <button class="btn btn-lg border-0 d-md-none" type="button" data-bs-toggle="offcanvas" data-bs-target="#tocOffcanvas" aria-controls="tocOffcanvas" aria-expanded="false" aria-label="Show table of contents">
+            <i class="bi bi-list"></i>
+          </button>
+
+          <nav id="breadcrumb"></nav>
+        </div>
+
+        <article data-uid="Avalonia.Controls.DataGridColumnDefinitionBuilder`1">
+
+
+
+  <h1 id="Avalonia_Controls_DataGridColumnDefinitionBuilder_1" data-uid="Avalonia.Controls.DataGridColumnDefinitionBuilder`1" class="text-break">
+Class DataGridColumnDefinitionBuilder&lt;TItem&gt;  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/ColumnDefinitions/DataGridColumnDefinitionBuilder.cs/#L26"><i class="bi bi-code-slash"></i></a>
+  </h1>
+
+  <div class="facts text-secondary">
+    <dl><dt>Namespace</dt><dd><a class="xref" href="Avalonia.html">Avalonia</a>.<a class="xref" href="Avalonia.Controls.html">Controls</a></dd></dl>
+  <dl><dt>Assembly</dt><dd>Avalonia.Controls.DataGrid.dll</dd></dl>
+  </div>
+
+  <div class="markdown summary"></div>
+  <div class="markdown conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public sealed class DataGridColumnDefinitionBuilder&lt;TItem&gt;</code></pre>
+  </div>
+
+
+
+  <h4 class="section">Type Parameters</h4>
+  <dl class="parameters">
+    <dt><code>TItem</code></dt>
+    <dd></dd>
+  </dl>
+
+  <dl class="typelist inheritance">
+    <dt>Inheritance</dt>
+    <dd>
+      <div><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object">object</a></div>
+      <div><span class="xref">DataGridColumnDefinitionBuilder&lt;TItem&gt;</span></div>
+    </dd>
+  </dl>
+
+
+
+  <dl class="typelist inheritedMembers">
+    <dt>Inherited Members</dt>
+    <dd>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object)">object.Equals(object)</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object-system-object)">object.Equals(object, object)</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.gethashcode">object.GetHashCode()</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.gettype">object.GetType()</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.referenceequals">object.ReferenceEquals(object, object)</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.tostring">object.ToString()</a>
+    </div>
+  </dd></dl>
+
+
+
+
+
+
+  <h2 class="section" id="methods">Methods
+</h2>
+
+
+  <a id="Avalonia_Controls_DataGridColumnDefinitionBuilder_1_AutoComplete_" data-uid="Avalonia.Controls.DataGridColumnDefinitionBuilder`1.AutoComplete*"></a>
+
+  <h3 id="Avalonia_Controls_DataGridColumnDefinitionBuilder_1_AutoComplete__1_System_Object_Avalonia_Data_Core_IPropertyInfo_System_Func__0___0__System_Action__0___0__System_Action_Avalonia_Controls_DataGridAutoCompleteColumnDefinition__" data-uid="Avalonia.Controls.DataGridColumnDefinitionBuilder`1.AutoComplete``1(System.Object,Avalonia.Data.Core.IPropertyInfo,System.Func{`0,``0},System.Action{`0,``0},System.Action{Avalonia.Controls.DataGridAutoCompleteColumnDefinition})">
+  AutoComplete&lt;TValue&gt;(object, IPropertyInfo, Func&lt;TItem, TValue&gt;, Action&lt;TItem, TValue&gt;, Action&lt;DataGridAutoCompleteColumnDefinition&gt;)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/ColumnDefinitions/DataGridColumnDefinitionBuilder.cs/#L242"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public DataGridAutoCompleteColumnDefinition AutoComplete&lt;TValue&gt;(object header, IPropertyInfo property, Func&lt;TItem, TValue&gt; getter, Action&lt;TItem, TValue&gt; setter = null, Action&lt;DataGridAutoCompleteColumnDefinition&gt; configure = null)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>header</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object">object</a></dt>
+    <dd></dd>
+    <dt><code>property</code> <span class="xref">IPropertyInfo</span></dt>
+    <dd></dd>
+    <dt><code>getter</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.func-2">Func</a>&lt;TItem, TValue&gt;</dt>
+    <dd></dd>
+    <dt><code>setter</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.action-2">Action</a>&lt;TItem, TValue&gt;</dt>
+    <dd></dd>
+    <dt><code>configure</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.action-1">Action</a>&lt;<a class="xref" href="Avalonia.Controls.DataGridAutoCompleteColumnDefinition.html">DataGridAutoCompleteColumnDefinition</a>&gt;</dt>
+    <dd></dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="Avalonia.Controls.DataGridAutoCompleteColumnDefinition.html">DataGridAutoCompleteColumnDefinition</a></dt>
+    <dd></dd>
+  </dl>
+
+  <h4 class="section">Type Parameters</h4>
+  <dl class="parameters">
+    <dt><code>TValue</code></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+  <a id="Avalonia_Controls_DataGridColumnDefinitionBuilder_1_AutoComplete_" data-uid="Avalonia.Controls.DataGridColumnDefinitionBuilder`1.AutoComplete*"></a>
+
+  <h3 id="Avalonia_Controls_DataGridColumnDefinitionBuilder_1_AutoComplete__1_System_Object_Avalonia_Markup_Xaml_MarkupExtensions_CompiledBindings_CompiledBindingPath_System_Func__0___0__System_Action__0___0__System_Action_Avalonia_Controls_DataGridAutoCompleteColumnDefinition__" data-uid="Avalonia.Controls.DataGridColumnDefinitionBuilder`1.AutoComplete``1(System.Object,Avalonia.Markup.Xaml.MarkupExtensions.CompiledBindings.CompiledBindingPath,System.Func{`0,``0},System.Action{`0,``0},System.Action{Avalonia.Controls.DataGridAutoCompleteColumnDefinition})">
+  AutoComplete&lt;TValue&gt;(object, CompiledBindingPath, Func&lt;TItem, TValue&gt;, Action&lt;TItem, TValue&gt;, Action&lt;DataGridAutoCompleteColumnDefinition&gt;)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/ColumnDefinitions/DataGridColumnDefinitionBuilder.cs/#L232"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public DataGridAutoCompleteColumnDefinition AutoComplete&lt;TValue&gt;(object header, CompiledBindingPath path, Func&lt;TItem, TValue&gt; getter, Action&lt;TItem, TValue&gt; setter = null, Action&lt;DataGridAutoCompleteColumnDefinition&gt; configure = null)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>header</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object">object</a></dt>
+    <dd></dd>
+    <dt><code>path</code> <span class="xref">CompiledBindingPath</span></dt>
+    <dd></dd>
+    <dt><code>getter</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.func-2">Func</a>&lt;TItem, TValue&gt;</dt>
+    <dd></dd>
+    <dt><code>setter</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.action-2">Action</a>&lt;TItem, TValue&gt;</dt>
+    <dd></dd>
+    <dt><code>configure</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.action-1">Action</a>&lt;<a class="xref" href="Avalonia.Controls.DataGridAutoCompleteColumnDefinition.html">DataGridAutoCompleteColumnDefinition</a>&gt;</dt>
+    <dd></dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="Avalonia.Controls.DataGridAutoCompleteColumnDefinition.html">DataGridAutoCompleteColumnDefinition</a></dt>
+    <dd></dd>
+  </dl>
+
+  <h4 class="section">Type Parameters</h4>
+  <dl class="parameters">
+    <dt><code>TValue</code></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+  <a id="Avalonia_Controls_DataGridColumnDefinitionBuilder_1_Button_" data-uid="Avalonia.Controls.DataGridColumnDefinitionBuilder`1.Button*"></a>
+
+  <h3 id="Avalonia_Controls_DataGridColumnDefinitionBuilder_1_Button_System_Object_System_Object_System_Action_Avalonia_Controls_DataGridButtonColumnDefinition__" data-uid="Avalonia.Controls.DataGridColumnDefinitionBuilder`1.Button(System.Object,System.Object,System.Action{Avalonia.Controls.DataGridButtonColumnDefinition})">
+  Button(object, object, Action&lt;DataGridButtonColumnDefinition&gt;)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/ColumnDefinitions/DataGridColumnDefinitionBuilder.cs/#L393"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public DataGridButtonColumnDefinition Button(object header, object content = null, Action&lt;DataGridButtonColumnDefinition&gt; configure = null)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>header</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object">object</a></dt>
+    <dd></dd>
+    <dt><code>content</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object">object</a></dt>
+    <dd></dd>
+    <dt><code>configure</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.action-1">Action</a>&lt;<a class="xref" href="Avalonia.Controls.DataGridButtonColumnDefinition.html">DataGridButtonColumnDefinition</a>&gt;</dt>
+    <dd></dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="Avalonia.Controls.DataGridButtonColumnDefinition.html">DataGridButtonColumnDefinition</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Avalonia_Controls_DataGridColumnDefinitionBuilder_1_CheckBox_" data-uid="Avalonia.Controls.DataGridColumnDefinitionBuilder`1.CheckBox*"></a>
+
+  <h3 id="Avalonia_Controls_DataGridColumnDefinitionBuilder_1_CheckBox__1_System_Object_Avalonia_Data_Core_IPropertyInfo_System_Func__0___0__System_Action__0___0__System_Action_Avalonia_Controls_DataGridCheckBoxColumnDefinition__" data-uid="Avalonia.Controls.DataGridColumnDefinitionBuilder`1.CheckBox``1(System.Object,Avalonia.Data.Core.IPropertyInfo,System.Func{`0,``0},System.Action{`0,``0},System.Action{Avalonia.Controls.DataGridCheckBoxColumnDefinition})">
+  CheckBox&lt;TValue&gt;(object, IPropertyInfo, Func&lt;TItem, TValue&gt;, Action&lt;TItem, TValue&gt;, Action&lt;DataGridCheckBoxColumnDefinition&gt;)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/ColumnDefinitions/DataGridColumnDefinitionBuilder.cs/#L62"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public DataGridCheckBoxColumnDefinition CheckBox&lt;TValue&gt;(object header, IPropertyInfo property, Func&lt;TItem, TValue&gt; getter, Action&lt;TItem, TValue&gt; setter = null, Action&lt;DataGridCheckBoxColumnDefinition&gt; configure = null)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>header</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object">object</a></dt>
+    <dd></dd>
+    <dt><code>property</code> <span class="xref">IPropertyInfo</span></dt>
+    <dd></dd>
+    <dt><code>getter</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.func-2">Func</a>&lt;TItem, TValue&gt;</dt>
+    <dd></dd>
+    <dt><code>setter</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.action-2">Action</a>&lt;TItem, TValue&gt;</dt>
+    <dd></dd>
+    <dt><code>configure</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.action-1">Action</a>&lt;<a class="xref" href="Avalonia.Controls.DataGridCheckBoxColumnDefinition.html">DataGridCheckBoxColumnDefinition</a>&gt;</dt>
+    <dd></dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="Avalonia.Controls.DataGridCheckBoxColumnDefinition.html">DataGridCheckBoxColumnDefinition</a></dt>
+    <dd></dd>
+  </dl>
+
+  <h4 class="section">Type Parameters</h4>
+  <dl class="parameters">
+    <dt><code>TValue</code></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+  <a id="Avalonia_Controls_DataGridColumnDefinitionBuilder_1_CheckBox_" data-uid="Avalonia.Controls.DataGridColumnDefinitionBuilder`1.CheckBox*"></a>
+
+  <h3 id="Avalonia_Controls_DataGridColumnDefinitionBuilder_1_CheckBox__1_System_Object_Avalonia_Markup_Xaml_MarkupExtensions_CompiledBindings_CompiledBindingPath_System_Func__0___0__System_Action__0___0__System_Action_Avalonia_Controls_DataGridCheckBoxColumnDefinition__" data-uid="Avalonia.Controls.DataGridColumnDefinitionBuilder`1.CheckBox``1(System.Object,Avalonia.Markup.Xaml.MarkupExtensions.CompiledBindings.CompiledBindingPath,System.Func{`0,``0},System.Action{`0,``0},System.Action{Avalonia.Controls.DataGridCheckBoxColumnDefinition})">
+  CheckBox&lt;TValue&gt;(object, CompiledBindingPath, Func&lt;TItem, TValue&gt;, Action&lt;TItem, TValue&gt;, Action&lt;DataGridCheckBoxColumnDefinition&gt;)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/ColumnDefinitions/DataGridColumnDefinitionBuilder.cs/#L52"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public DataGridCheckBoxColumnDefinition CheckBox&lt;TValue&gt;(object header, CompiledBindingPath path, Func&lt;TItem, TValue&gt; getter, Action&lt;TItem, TValue&gt; setter = null, Action&lt;DataGridCheckBoxColumnDefinition&gt; configure = null)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>header</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object">object</a></dt>
+    <dd></dd>
+    <dt><code>path</code> <span class="xref">CompiledBindingPath</span></dt>
+    <dd></dd>
+    <dt><code>getter</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.func-2">Func</a>&lt;TItem, TValue&gt;</dt>
+    <dd></dd>
+    <dt><code>setter</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.action-2">Action</a>&lt;TItem, TValue&gt;</dt>
+    <dd></dd>
+    <dt><code>configure</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.action-1">Action</a>&lt;<a class="xref" href="Avalonia.Controls.DataGridCheckBoxColumnDefinition.html">DataGridCheckBoxColumnDefinition</a>&gt;</dt>
+    <dd></dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="Avalonia.Controls.DataGridCheckBoxColumnDefinition.html">DataGridCheckBoxColumnDefinition</a></dt>
+    <dd></dd>
+  </dl>
+
+  <h4 class="section">Type Parameters</h4>
+  <dl class="parameters">
+    <dt><code>TValue</code></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+  <a id="Avalonia_Controls_DataGridColumnDefinitionBuilder_1_ComboBoxSelectedItem_" data-uid="Avalonia.Controls.DataGridColumnDefinitionBuilder`1.ComboBoxSelectedItem*"></a>
+
+  <h3 id="Avalonia_Controls_DataGridColumnDefinitionBuilder_1_ComboBoxSelectedItem__1_System_Object_Avalonia_Data_Core_IPropertyInfo_System_Func__0___0__System_Action__0___0__System_Action_Avalonia_Controls_DataGridComboBoxColumnDefinition__" data-uid="Avalonia.Controls.DataGridColumnDefinitionBuilder`1.ComboBoxSelectedItem``1(System.Object,Avalonia.Data.Core.IPropertyInfo,System.Func{`0,``0},System.Action{`0,``0},System.Action{Avalonia.Controls.DataGridComboBoxColumnDefinition})">
+  ComboBoxSelectedItem&lt;TValue&gt;(object, IPropertyInfo, Func&lt;TItem, TValue&gt;, Action&lt;TItem, TValue&gt;, Action&lt;DataGridComboBoxColumnDefinition&gt;)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/ColumnDefinitions/DataGridColumnDefinitionBuilder.cs/#L323"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public DataGridComboBoxColumnDefinition ComboBoxSelectedItem&lt;TValue&gt;(object header, IPropertyInfo property, Func&lt;TItem, TValue&gt; getter, Action&lt;TItem, TValue&gt; setter = null, Action&lt;DataGridComboBoxColumnDefinition&gt; configure = null)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>header</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object">object</a></dt>
+    <dd></dd>
+    <dt><code>property</code> <span class="xref">IPropertyInfo</span></dt>
+    <dd></dd>
+    <dt><code>getter</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.func-2">Func</a>&lt;TItem, TValue&gt;</dt>
+    <dd></dd>
+    <dt><code>setter</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.action-2">Action</a>&lt;TItem, TValue&gt;</dt>
+    <dd></dd>
+    <dt><code>configure</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.action-1">Action</a>&lt;<a class="xref" href="Avalonia.Controls.DataGridComboBoxColumnDefinition.html">DataGridComboBoxColumnDefinition</a>&gt;</dt>
+    <dd></dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="Avalonia.Controls.DataGridComboBoxColumnDefinition.html">DataGridComboBoxColumnDefinition</a></dt>
+    <dd></dd>
+  </dl>
+
+  <h4 class="section">Type Parameters</h4>
+  <dl class="parameters">
+    <dt><code>TValue</code></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+  <a id="Avalonia_Controls_DataGridColumnDefinitionBuilder_1_ComboBoxSelectedItem_" data-uid="Avalonia.Controls.DataGridColumnDefinitionBuilder`1.ComboBoxSelectedItem*"></a>
+
+  <h3 id="Avalonia_Controls_DataGridColumnDefinitionBuilder_1_ComboBoxSelectedItem__1_System_Object_Avalonia_Markup_Xaml_MarkupExtensions_CompiledBindings_CompiledBindingPath_System_Func__0___0__System_Action__0___0__System_Action_Avalonia_Controls_DataGridComboBoxColumnDefinition__" data-uid="Avalonia.Controls.DataGridColumnDefinitionBuilder`1.ComboBoxSelectedItem``1(System.Object,Avalonia.Markup.Xaml.MarkupExtensions.CompiledBindings.CompiledBindingPath,System.Func{`0,``0},System.Action{`0,``0},System.Action{Avalonia.Controls.DataGridComboBoxColumnDefinition})">
+  ComboBoxSelectedItem&lt;TValue&gt;(object, CompiledBindingPath, Func&lt;TItem, TValue&gt;, Action&lt;TItem, TValue&gt;, Action&lt;DataGridComboBoxColumnDefinition&gt;)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/ColumnDefinitions/DataGridColumnDefinitionBuilder.cs/#L312"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public DataGridComboBoxColumnDefinition ComboBoxSelectedItem&lt;TValue&gt;(object header, CompiledBindingPath path, Func&lt;TItem, TValue&gt; getter, Action&lt;TItem, TValue&gt; setter = null, Action&lt;DataGridComboBoxColumnDefinition&gt; configure = null)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>header</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object">object</a></dt>
+    <dd></dd>
+    <dt><code>path</code> <span class="xref">CompiledBindingPath</span></dt>
+    <dd></dd>
+    <dt><code>getter</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.func-2">Func</a>&lt;TItem, TValue&gt;</dt>
+    <dd></dd>
+    <dt><code>setter</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.action-2">Action</a>&lt;TItem, TValue&gt;</dt>
+    <dd></dd>
+    <dt><code>configure</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.action-1">Action</a>&lt;<a class="xref" href="Avalonia.Controls.DataGridComboBoxColumnDefinition.html">DataGridComboBoxColumnDefinition</a>&gt;</dt>
+    <dd></dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="Avalonia.Controls.DataGridComboBoxColumnDefinition.html">DataGridComboBoxColumnDefinition</a></dt>
+    <dd></dd>
+  </dl>
+
+  <h4 class="section">Type Parameters</h4>
+  <dl class="parameters">
+    <dt><code>TValue</code></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+  <a id="Avalonia_Controls_DataGridColumnDefinitionBuilder_1_ComboBoxSelectedValue_" data-uid="Avalonia.Controls.DataGridColumnDefinitionBuilder`1.ComboBoxSelectedValue*"></a>
+
+  <h3 id="Avalonia_Controls_DataGridColumnDefinitionBuilder_1_ComboBoxSelectedValue__1_System_Object_Avalonia_Data_Core_IPropertyInfo_System_Func__0___0__System_Action__0___0__System_Action_Avalonia_Controls_DataGridComboBoxColumnDefinition__" data-uid="Avalonia.Controls.DataGridColumnDefinitionBuilder`1.ComboBoxSelectedValue``1(System.Object,Avalonia.Data.Core.IPropertyInfo,System.Func{`0,``0},System.Action{`0,``0},System.Action{Avalonia.Controls.DataGridComboBoxColumnDefinition})">
+  ComboBoxSelectedValue&lt;TValue&gt;(object, IPropertyInfo, Func&lt;TItem, TValue&gt;, Action&lt;TItem, TValue&gt;, Action&lt;DataGridComboBoxColumnDefinition&gt;)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/ColumnDefinitions/DataGridColumnDefinitionBuilder.cs/#L345"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public DataGridComboBoxColumnDefinition ComboBoxSelectedValue&lt;TValue&gt;(object header, IPropertyInfo property, Func&lt;TItem, TValue&gt; getter, Action&lt;TItem, TValue&gt; setter = null, Action&lt;DataGridComboBoxColumnDefinition&gt; configure = null)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>header</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object">object</a></dt>
+    <dd></dd>
+    <dt><code>property</code> <span class="xref">IPropertyInfo</span></dt>
+    <dd></dd>
+    <dt><code>getter</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.func-2">Func</a>&lt;TItem, TValue&gt;</dt>
+    <dd></dd>
+    <dt><code>setter</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.action-2">Action</a>&lt;TItem, TValue&gt;</dt>
+    <dd></dd>
+    <dt><code>configure</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.action-1">Action</a>&lt;<a class="xref" href="Avalonia.Controls.DataGridComboBoxColumnDefinition.html">DataGridComboBoxColumnDefinition</a>&gt;</dt>
+    <dd></dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="Avalonia.Controls.DataGridComboBoxColumnDefinition.html">DataGridComboBoxColumnDefinition</a></dt>
+    <dd></dd>
+  </dl>
+
+  <h4 class="section">Type Parameters</h4>
+  <dl class="parameters">
+    <dt><code>TValue</code></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+  <a id="Avalonia_Controls_DataGridColumnDefinitionBuilder_1_ComboBoxSelectedValue_" data-uid="Avalonia.Controls.DataGridColumnDefinitionBuilder`1.ComboBoxSelectedValue*"></a>
+
+  <h3 id="Avalonia_Controls_DataGridColumnDefinitionBuilder_1_ComboBoxSelectedValue__1_System_Object_Avalonia_Markup_Xaml_MarkupExtensions_CompiledBindings_CompiledBindingPath_System_Func__0___0__System_Action__0___0__System_Action_Avalonia_Controls_DataGridComboBoxColumnDefinition__" data-uid="Avalonia.Controls.DataGridColumnDefinitionBuilder`1.ComboBoxSelectedValue``1(System.Object,Avalonia.Markup.Xaml.MarkupExtensions.CompiledBindings.CompiledBindingPath,System.Func{`0,``0},System.Action{`0,``0},System.Action{Avalonia.Controls.DataGridComboBoxColumnDefinition})">
+  ComboBoxSelectedValue&lt;TValue&gt;(object, CompiledBindingPath, Func&lt;TItem, TValue&gt;, Action&lt;TItem, TValue&gt;, Action&lt;DataGridComboBoxColumnDefinition&gt;)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/ColumnDefinitions/DataGridColumnDefinitionBuilder.cs/#L334"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public DataGridComboBoxColumnDefinition ComboBoxSelectedValue&lt;TValue&gt;(object header, CompiledBindingPath path, Func&lt;TItem, TValue&gt; getter, Action&lt;TItem, TValue&gt; setter = null, Action&lt;DataGridComboBoxColumnDefinition&gt; configure = null)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>header</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object">object</a></dt>
+    <dd></dd>
+    <dt><code>path</code> <span class="xref">CompiledBindingPath</span></dt>
+    <dd></dd>
+    <dt><code>getter</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.func-2">Func</a>&lt;TItem, TValue&gt;</dt>
+    <dd></dd>
+    <dt><code>setter</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.action-2">Action</a>&lt;TItem, TValue&gt;</dt>
+    <dd></dd>
+    <dt><code>configure</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.action-1">Action</a>&lt;<a class="xref" href="Avalonia.Controls.DataGridComboBoxColumnDefinition.html">DataGridComboBoxColumnDefinition</a>&gt;</dt>
+    <dd></dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="Avalonia.Controls.DataGridComboBoxColumnDefinition.html">DataGridComboBoxColumnDefinition</a></dt>
+    <dd></dd>
+  </dl>
+
+  <h4 class="section">Type Parameters</h4>
+  <dl class="parameters">
+    <dt><code>TValue</code></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+  <a id="Avalonia_Controls_DataGridColumnDefinitionBuilder_1_ComboBoxText_" data-uid="Avalonia.Controls.DataGridColumnDefinitionBuilder`1.ComboBoxText*"></a>
+
+  <h3 id="Avalonia_Controls_DataGridColumnDefinitionBuilder_1_ComboBoxText__1_System_Object_Avalonia_Data_Core_IPropertyInfo_System_Func__0___0__System_Action__0___0__System_Action_Avalonia_Controls_DataGridComboBoxColumnDefinition__" data-uid="Avalonia.Controls.DataGridColumnDefinitionBuilder`1.ComboBoxText``1(System.Object,Avalonia.Data.Core.IPropertyInfo,System.Func{`0,``0},System.Action{`0,``0},System.Action{Avalonia.Controls.DataGridComboBoxColumnDefinition})">
+  ComboBoxText&lt;TValue&gt;(object, IPropertyInfo, Func&lt;TItem, TValue&gt;, Action&lt;TItem, TValue&gt;, Action&lt;DataGridComboBoxColumnDefinition&gt;)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/ColumnDefinitions/DataGridColumnDefinitionBuilder.cs/#L367"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public DataGridComboBoxColumnDefinition ComboBoxText&lt;TValue&gt;(object header, IPropertyInfo property, Func&lt;TItem, TValue&gt; getter, Action&lt;TItem, TValue&gt; setter = null, Action&lt;DataGridComboBoxColumnDefinition&gt; configure = null)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>header</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object">object</a></dt>
+    <dd></dd>
+    <dt><code>property</code> <span class="xref">IPropertyInfo</span></dt>
+    <dd></dd>
+    <dt><code>getter</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.func-2">Func</a>&lt;TItem, TValue&gt;</dt>
+    <dd></dd>
+    <dt><code>setter</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.action-2">Action</a>&lt;TItem, TValue&gt;</dt>
+    <dd></dd>
+    <dt><code>configure</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.action-1">Action</a>&lt;<a class="xref" href="Avalonia.Controls.DataGridComboBoxColumnDefinition.html">DataGridComboBoxColumnDefinition</a>&gt;</dt>
+    <dd></dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="Avalonia.Controls.DataGridComboBoxColumnDefinition.html">DataGridComboBoxColumnDefinition</a></dt>
+    <dd></dd>
+  </dl>
+
+  <h4 class="section">Type Parameters</h4>
+  <dl class="parameters">
+    <dt><code>TValue</code></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+  <a id="Avalonia_Controls_DataGridColumnDefinitionBuilder_1_ComboBoxText_" data-uid="Avalonia.Controls.DataGridColumnDefinitionBuilder`1.ComboBoxText*"></a>
+
+  <h3 id="Avalonia_Controls_DataGridColumnDefinitionBuilder_1_ComboBoxText__1_System_Object_Avalonia_Markup_Xaml_MarkupExtensions_CompiledBindings_CompiledBindingPath_System_Func__0___0__System_Action__0___0__System_Action_Avalonia_Controls_DataGridComboBoxColumnDefinition__" data-uid="Avalonia.Controls.DataGridColumnDefinitionBuilder`1.ComboBoxText``1(System.Object,Avalonia.Markup.Xaml.MarkupExtensions.CompiledBindings.CompiledBindingPath,System.Func{`0,``0},System.Action{`0,``0},System.Action{Avalonia.Controls.DataGridComboBoxColumnDefinition})">
+  ComboBoxText&lt;TValue&gt;(object, CompiledBindingPath, Func&lt;TItem, TValue&gt;, Action&lt;TItem, TValue&gt;, Action&lt;DataGridComboBoxColumnDefinition&gt;)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/ColumnDefinitions/DataGridColumnDefinitionBuilder.cs/#L356"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public DataGridComboBoxColumnDefinition ComboBoxText&lt;TValue&gt;(object header, CompiledBindingPath path, Func&lt;TItem, TValue&gt; getter, Action&lt;TItem, TValue&gt; setter = null, Action&lt;DataGridComboBoxColumnDefinition&gt; configure = null)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>header</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object">object</a></dt>
+    <dd></dd>
+    <dt><code>path</code> <span class="xref">CompiledBindingPath</span></dt>
+    <dd></dd>
+    <dt><code>getter</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.func-2">Func</a>&lt;TItem, TValue&gt;</dt>
+    <dd></dd>
+    <dt><code>setter</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.action-2">Action</a>&lt;TItem, TValue&gt;</dt>
+    <dd></dd>
+    <dt><code>configure</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.action-1">Action</a>&lt;<a class="xref" href="Avalonia.Controls.DataGridComboBoxColumnDefinition.html">DataGridComboBoxColumnDefinition</a>&gt;</dt>
+    <dd></dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="Avalonia.Controls.DataGridComboBoxColumnDefinition.html">DataGridComboBoxColumnDefinition</a></dt>
+    <dd></dd>
+  </dl>
+
+  <h4 class="section">Type Parameters</h4>
+  <dl class="parameters">
+    <dt><code>TValue</code></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+  <a id="Avalonia_Controls_DataGridColumnDefinitionBuilder_1_DatePicker_" data-uid="Avalonia.Controls.DataGridColumnDefinitionBuilder`1.DatePicker*"></a>
+
+  <h3 id="Avalonia_Controls_DataGridColumnDefinitionBuilder_1_DatePicker__1_System_Object_Avalonia_Data_Core_IPropertyInfo_System_Func__0___0__System_Action__0___0__System_Action_Avalonia_Controls_DataGridDatePickerColumnDefinition__" data-uid="Avalonia.Controls.DataGridColumnDefinitionBuilder`1.DatePicker``1(System.Object,Avalonia.Data.Core.IPropertyInfo,System.Func{`0,``0},System.Action{`0,``0},System.Action{Avalonia.Controls.DataGridDatePickerColumnDefinition})">
+  DatePicker&lt;TValue&gt;(object, IPropertyInfo, Func&lt;TItem, TValue&gt;, Action&lt;TItem, TValue&gt;, Action&lt;DataGridDatePickerColumnDefinition&gt;)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/ColumnDefinitions/DataGridColumnDefinitionBuilder.cs/#L182"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public DataGridDatePickerColumnDefinition DatePicker&lt;TValue&gt;(object header, IPropertyInfo property, Func&lt;TItem, TValue&gt; getter, Action&lt;TItem, TValue&gt; setter = null, Action&lt;DataGridDatePickerColumnDefinition&gt; configure = null)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>header</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object">object</a></dt>
+    <dd></dd>
+    <dt><code>property</code> <span class="xref">IPropertyInfo</span></dt>
+    <dd></dd>
+    <dt><code>getter</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.func-2">Func</a>&lt;TItem, TValue&gt;</dt>
+    <dd></dd>
+    <dt><code>setter</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.action-2">Action</a>&lt;TItem, TValue&gt;</dt>
+    <dd></dd>
+    <dt><code>configure</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.action-1">Action</a>&lt;<a class="xref" href="Avalonia.Controls.DataGridDatePickerColumnDefinition.html">DataGridDatePickerColumnDefinition</a>&gt;</dt>
+    <dd></dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="Avalonia.Controls.DataGridDatePickerColumnDefinition.html">DataGridDatePickerColumnDefinition</a></dt>
+    <dd></dd>
+  </dl>
+
+  <h4 class="section">Type Parameters</h4>
+  <dl class="parameters">
+    <dt><code>TValue</code></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+  <a id="Avalonia_Controls_DataGridColumnDefinitionBuilder_1_DatePicker_" data-uid="Avalonia.Controls.DataGridColumnDefinitionBuilder`1.DatePicker*"></a>
+
+  <h3 id="Avalonia_Controls_DataGridColumnDefinitionBuilder_1_DatePicker__1_System_Object_Avalonia_Markup_Xaml_MarkupExtensions_CompiledBindings_CompiledBindingPath_System_Func__0___0__System_Action__0___0__System_Action_Avalonia_Controls_DataGridDatePickerColumnDefinition__" data-uid="Avalonia.Controls.DataGridColumnDefinitionBuilder`1.DatePicker``1(System.Object,Avalonia.Markup.Xaml.MarkupExtensions.CompiledBindings.CompiledBindingPath,System.Func{`0,``0},System.Action{`0,``0},System.Action{Avalonia.Controls.DataGridDatePickerColumnDefinition})">
+  DatePicker&lt;TValue&gt;(object, CompiledBindingPath, Func&lt;TItem, TValue&gt;, Action&lt;TItem, TValue&gt;, Action&lt;DataGridDatePickerColumnDefinition&gt;)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/ColumnDefinitions/DataGridColumnDefinitionBuilder.cs/#L172"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public DataGridDatePickerColumnDefinition DatePicker&lt;TValue&gt;(object header, CompiledBindingPath path, Func&lt;TItem, TValue&gt; getter, Action&lt;TItem, TValue&gt; setter = null, Action&lt;DataGridDatePickerColumnDefinition&gt; configure = null)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>header</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object">object</a></dt>
+    <dd></dd>
+    <dt><code>path</code> <span class="xref">CompiledBindingPath</span></dt>
+    <dd></dd>
+    <dt><code>getter</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.func-2">Func</a>&lt;TItem, TValue&gt;</dt>
+    <dd></dd>
+    <dt><code>setter</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.action-2">Action</a>&lt;TItem, TValue&gt;</dt>
+    <dd></dd>
+    <dt><code>configure</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.action-1">Action</a>&lt;<a class="xref" href="Avalonia.Controls.DataGridDatePickerColumnDefinition.html">DataGridDatePickerColumnDefinition</a>&gt;</dt>
+    <dd></dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="Avalonia.Controls.DataGridDatePickerColumnDefinition.html">DataGridDatePickerColumnDefinition</a></dt>
+    <dd></dd>
+  </dl>
+
+  <h4 class="section">Type Parameters</h4>
+  <dl class="parameters">
+    <dt><code>TValue</code></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+  <a id="Avalonia_Controls_DataGridColumnDefinitionBuilder_1_Hierarchical_" data-uid="Avalonia.Controls.DataGridColumnDefinitionBuilder`1.Hierarchical*"></a>
+
+  <h3 id="Avalonia_Controls_DataGridColumnDefinitionBuilder_1_Hierarchical__1_System_Object_Avalonia_Data_Core_IPropertyInfo_System_Func__0___0__System_Action__0___0__System_Action_Avalonia_Controls_DataGridHierarchicalColumnDefinition__" data-uid="Avalonia.Controls.DataGridColumnDefinitionBuilder`1.Hierarchical``1(System.Object,Avalonia.Data.Core.IPropertyInfo,System.Func{`0,``0},System.Action{`0,``0},System.Action{Avalonia.Controls.DataGridHierarchicalColumnDefinition})">
+  Hierarchical&lt;TValue&gt;(object, IPropertyInfo, Func&lt;TItem, TValue&gt;, Action&lt;TItem, TValue&gt;, Action&lt;DataGridHierarchicalColumnDefinition&gt;)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/ColumnDefinitions/DataGridColumnDefinitionBuilder.cs/#L302"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public DataGridHierarchicalColumnDefinition Hierarchical&lt;TValue&gt;(object header, IPropertyInfo property, Func&lt;TItem, TValue&gt; getter, Action&lt;TItem, TValue&gt; setter = null, Action&lt;DataGridHierarchicalColumnDefinition&gt; configure = null)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>header</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object">object</a></dt>
+    <dd></dd>
+    <dt><code>property</code> <span class="xref">IPropertyInfo</span></dt>
+    <dd></dd>
+    <dt><code>getter</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.func-2">Func</a>&lt;TItem, TValue&gt;</dt>
+    <dd></dd>
+    <dt><code>setter</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.action-2">Action</a>&lt;TItem, TValue&gt;</dt>
+    <dd></dd>
+    <dt><code>configure</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.action-1">Action</a>&lt;<a class="xref" href="Avalonia.Controls.DataGridHierarchicalColumnDefinition.html">DataGridHierarchicalColumnDefinition</a>&gt;</dt>
+    <dd></dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="Avalonia.Controls.DataGridHierarchicalColumnDefinition.html">DataGridHierarchicalColumnDefinition</a></dt>
+    <dd></dd>
+  </dl>
+
+  <h4 class="section">Type Parameters</h4>
+  <dl class="parameters">
+    <dt><code>TValue</code></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+  <a id="Avalonia_Controls_DataGridColumnDefinitionBuilder_1_Hierarchical_" data-uid="Avalonia.Controls.DataGridColumnDefinitionBuilder`1.Hierarchical*"></a>
+
+  <h3 id="Avalonia_Controls_DataGridColumnDefinitionBuilder_1_Hierarchical__1_System_Object_Avalonia_Markup_Xaml_MarkupExtensions_CompiledBindings_CompiledBindingPath_System_Func__0___0__System_Action__0___0__System_Action_Avalonia_Controls_DataGridHierarchicalColumnDefinition__" data-uid="Avalonia.Controls.DataGridColumnDefinitionBuilder`1.Hierarchical``1(System.Object,Avalonia.Markup.Xaml.MarkupExtensions.CompiledBindings.CompiledBindingPath,System.Func{`0,``0},System.Action{`0,``0},System.Action{Avalonia.Controls.DataGridHierarchicalColumnDefinition})">
+  Hierarchical&lt;TValue&gt;(object, CompiledBindingPath, Func&lt;TItem, TValue&gt;, Action&lt;TItem, TValue&gt;, Action&lt;DataGridHierarchicalColumnDefinition&gt;)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/ColumnDefinitions/DataGridColumnDefinitionBuilder.cs/#L292"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public DataGridHierarchicalColumnDefinition Hierarchical&lt;TValue&gt;(object header, CompiledBindingPath path, Func&lt;TItem, TValue&gt; getter, Action&lt;TItem, TValue&gt; setter = null, Action&lt;DataGridHierarchicalColumnDefinition&gt; configure = null)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>header</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object">object</a></dt>
+    <dd></dd>
+    <dt><code>path</code> <span class="xref">CompiledBindingPath</span></dt>
+    <dd></dd>
+    <dt><code>getter</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.func-2">Func</a>&lt;TItem, TValue&gt;</dt>
+    <dd></dd>
+    <dt><code>setter</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.action-2">Action</a>&lt;TItem, TValue&gt;</dt>
+    <dd></dd>
+    <dt><code>configure</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.action-1">Action</a>&lt;<a class="xref" href="Avalonia.Controls.DataGridHierarchicalColumnDefinition.html">DataGridHierarchicalColumnDefinition</a>&gt;</dt>
+    <dd></dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="Avalonia.Controls.DataGridHierarchicalColumnDefinition.html">DataGridHierarchicalColumnDefinition</a></dt>
+    <dd></dd>
+  </dl>
+
+  <h4 class="section">Type Parameters</h4>
+  <dl class="parameters">
+    <dt><code>TValue</code></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+  <a id="Avalonia_Controls_DataGridColumnDefinitionBuilder_1_Hyperlink_" data-uid="Avalonia.Controls.DataGridColumnDefinitionBuilder`1.Hyperlink*"></a>
+
+  <h3 id="Avalonia_Controls_DataGridColumnDefinitionBuilder_1_Hyperlink__1_System_Object_Avalonia_Data_Core_IPropertyInfo_System_Func__0___0__System_Action__0___0__System_Action_Avalonia_Controls_DataGridHyperlinkColumnDefinition__" data-uid="Avalonia.Controls.DataGridColumnDefinitionBuilder`1.Hyperlink``1(System.Object,Avalonia.Data.Core.IPropertyInfo,System.Func{`0,``0},System.Action{`0,``0},System.Action{Avalonia.Controls.DataGridHyperlinkColumnDefinition})">
+  Hyperlink&lt;TValue&gt;(object, IPropertyInfo, Func&lt;TItem, TValue&gt;, Action&lt;TItem, TValue&gt;, Action&lt;DataGridHyperlinkColumnDefinition&gt;)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/ColumnDefinitions/DataGridColumnDefinitionBuilder.cs/#L82"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public DataGridHyperlinkColumnDefinition Hyperlink&lt;TValue&gt;(object header, IPropertyInfo property, Func&lt;TItem, TValue&gt; getter, Action&lt;TItem, TValue&gt; setter = null, Action&lt;DataGridHyperlinkColumnDefinition&gt; configure = null)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>header</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object">object</a></dt>
+    <dd></dd>
+    <dt><code>property</code> <span class="xref">IPropertyInfo</span></dt>
+    <dd></dd>
+    <dt><code>getter</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.func-2">Func</a>&lt;TItem, TValue&gt;</dt>
+    <dd></dd>
+    <dt><code>setter</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.action-2">Action</a>&lt;TItem, TValue&gt;</dt>
+    <dd></dd>
+    <dt><code>configure</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.action-1">Action</a>&lt;<a class="xref" href="Avalonia.Controls.DataGridHyperlinkColumnDefinition.html">DataGridHyperlinkColumnDefinition</a>&gt;</dt>
+    <dd></dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="Avalonia.Controls.DataGridHyperlinkColumnDefinition.html">DataGridHyperlinkColumnDefinition</a></dt>
+    <dd></dd>
+  </dl>
+
+  <h4 class="section">Type Parameters</h4>
+  <dl class="parameters">
+    <dt><code>TValue</code></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+  <a id="Avalonia_Controls_DataGridColumnDefinitionBuilder_1_Hyperlink_" data-uid="Avalonia.Controls.DataGridColumnDefinitionBuilder`1.Hyperlink*"></a>
+
+  <h3 id="Avalonia_Controls_DataGridColumnDefinitionBuilder_1_Hyperlink__1_System_Object_Avalonia_Markup_Xaml_MarkupExtensions_CompiledBindings_CompiledBindingPath_System_Func__0___0__System_Action__0___0__System_Action_Avalonia_Controls_DataGridHyperlinkColumnDefinition__" data-uid="Avalonia.Controls.DataGridColumnDefinitionBuilder`1.Hyperlink``1(System.Object,Avalonia.Markup.Xaml.MarkupExtensions.CompiledBindings.CompiledBindingPath,System.Func{`0,``0},System.Action{`0,``0},System.Action{Avalonia.Controls.DataGridHyperlinkColumnDefinition})">
+  Hyperlink&lt;TValue&gt;(object, CompiledBindingPath, Func&lt;TItem, TValue&gt;, Action&lt;TItem, TValue&gt;, Action&lt;DataGridHyperlinkColumnDefinition&gt;)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/ColumnDefinitions/DataGridColumnDefinitionBuilder.cs/#L72"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public DataGridHyperlinkColumnDefinition Hyperlink&lt;TValue&gt;(object header, CompiledBindingPath path, Func&lt;TItem, TValue&gt; getter, Action&lt;TItem, TValue&gt; setter = null, Action&lt;DataGridHyperlinkColumnDefinition&gt; configure = null)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>header</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object">object</a></dt>
+    <dd></dd>
+    <dt><code>path</code> <span class="xref">CompiledBindingPath</span></dt>
+    <dd></dd>
+    <dt><code>getter</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.func-2">Func</a>&lt;TItem, TValue&gt;</dt>
+    <dd></dd>
+    <dt><code>setter</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.action-2">Action</a>&lt;TItem, TValue&gt;</dt>
+    <dd></dd>
+    <dt><code>configure</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.action-1">Action</a>&lt;<a class="xref" href="Avalonia.Controls.DataGridHyperlinkColumnDefinition.html">DataGridHyperlinkColumnDefinition</a>&gt;</dt>
+    <dd></dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="Avalonia.Controls.DataGridHyperlinkColumnDefinition.html">DataGridHyperlinkColumnDefinition</a></dt>
+    <dd></dd>
+  </dl>
+
+  <h4 class="section">Type Parameters</h4>
+  <dl class="parameters">
+    <dt><code>TValue</code></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+  <a id="Avalonia_Controls_DataGridColumnDefinitionBuilder_1_Image_" data-uid="Avalonia.Controls.DataGridColumnDefinitionBuilder`1.Image*"></a>
+
+  <h3 id="Avalonia_Controls_DataGridColumnDefinitionBuilder_1_Image__1_System_Object_Avalonia_Data_Core_IPropertyInfo_System_Func__0___0__System_Action__0___0__System_Action_Avalonia_Controls_DataGridImageColumnDefinition__" data-uid="Avalonia.Controls.DataGridColumnDefinitionBuilder`1.Image``1(System.Object,Avalonia.Data.Core.IPropertyInfo,System.Func{`0,``0},System.Action{`0,``0},System.Action{Avalonia.Controls.DataGridImageColumnDefinition})">
+  Image&lt;TValue&gt;(object, IPropertyInfo, Func&lt;TItem, TValue&gt;, Action&lt;TItem, TValue&gt;, Action&lt;DataGridImageColumnDefinition&gt;)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/ColumnDefinitions/DataGridColumnDefinitionBuilder.cs/#L102"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public DataGridImageColumnDefinition Image&lt;TValue&gt;(object header, IPropertyInfo property, Func&lt;TItem, TValue&gt; getter, Action&lt;TItem, TValue&gt; setter = null, Action&lt;DataGridImageColumnDefinition&gt; configure = null)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>header</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object">object</a></dt>
+    <dd></dd>
+    <dt><code>property</code> <span class="xref">IPropertyInfo</span></dt>
+    <dd></dd>
+    <dt><code>getter</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.func-2">Func</a>&lt;TItem, TValue&gt;</dt>
+    <dd></dd>
+    <dt><code>setter</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.action-2">Action</a>&lt;TItem, TValue&gt;</dt>
+    <dd></dd>
+    <dt><code>configure</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.action-1">Action</a>&lt;<a class="xref" href="Avalonia.Controls.DataGridImageColumnDefinition.html">DataGridImageColumnDefinition</a>&gt;</dt>
+    <dd></dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="Avalonia.Controls.DataGridImageColumnDefinition.html">DataGridImageColumnDefinition</a></dt>
+    <dd></dd>
+  </dl>
+
+  <h4 class="section">Type Parameters</h4>
+  <dl class="parameters">
+    <dt><code>TValue</code></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+  <a id="Avalonia_Controls_DataGridColumnDefinitionBuilder_1_Image_" data-uid="Avalonia.Controls.DataGridColumnDefinitionBuilder`1.Image*"></a>
+
+  <h3 id="Avalonia_Controls_DataGridColumnDefinitionBuilder_1_Image__1_System_Object_Avalonia_Markup_Xaml_MarkupExtensions_CompiledBindings_CompiledBindingPath_System_Func__0___0__System_Action__0___0__System_Action_Avalonia_Controls_DataGridImageColumnDefinition__" data-uid="Avalonia.Controls.DataGridColumnDefinitionBuilder`1.Image``1(System.Object,Avalonia.Markup.Xaml.MarkupExtensions.CompiledBindings.CompiledBindingPath,System.Func{`0,``0},System.Action{`0,``0},System.Action{Avalonia.Controls.DataGridImageColumnDefinition})">
+  Image&lt;TValue&gt;(object, CompiledBindingPath, Func&lt;TItem, TValue&gt;, Action&lt;TItem, TValue&gt;, Action&lt;DataGridImageColumnDefinition&gt;)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/ColumnDefinitions/DataGridColumnDefinitionBuilder.cs/#L92"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public DataGridImageColumnDefinition Image&lt;TValue&gt;(object header, CompiledBindingPath path, Func&lt;TItem, TValue&gt; getter, Action&lt;TItem, TValue&gt; setter = null, Action&lt;DataGridImageColumnDefinition&gt; configure = null)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>header</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object">object</a></dt>
+    <dd></dd>
+    <dt><code>path</code> <span class="xref">CompiledBindingPath</span></dt>
+    <dd></dd>
+    <dt><code>getter</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.func-2">Func</a>&lt;TItem, TValue&gt;</dt>
+    <dd></dd>
+    <dt><code>setter</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.action-2">Action</a>&lt;TItem, TValue&gt;</dt>
+    <dd></dd>
+    <dt><code>configure</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.action-1">Action</a>&lt;<a class="xref" href="Avalonia.Controls.DataGridImageColumnDefinition.html">DataGridImageColumnDefinition</a>&gt;</dt>
+    <dd></dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="Avalonia.Controls.DataGridImageColumnDefinition.html">DataGridImageColumnDefinition</a></dt>
+    <dd></dd>
+  </dl>
+
+  <h4 class="section">Type Parameters</h4>
+  <dl class="parameters">
+    <dt><code>TValue</code></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+  <a id="Avalonia_Controls_DataGridColumnDefinitionBuilder_1_MaskedText_" data-uid="Avalonia.Controls.DataGridColumnDefinitionBuilder`1.MaskedText*"></a>
+
+  <h3 id="Avalonia_Controls_DataGridColumnDefinitionBuilder_1_MaskedText__1_System_Object_Avalonia_Data_Core_IPropertyInfo_System_Func__0___0__System_Action__0___0__System_Action_Avalonia_Controls_DataGridMaskedTextColumnDefinition__" data-uid="Avalonia.Controls.DataGridColumnDefinitionBuilder`1.MaskedText``1(System.Object,Avalonia.Data.Core.IPropertyInfo,System.Func{`0,``0},System.Action{`0,``0},System.Action{Avalonia.Controls.DataGridMaskedTextColumnDefinition})">
+  MaskedText&lt;TValue&gt;(object, IPropertyInfo, Func&lt;TItem, TValue&gt;, Action&lt;TItem, TValue&gt;, Action&lt;DataGridMaskedTextColumnDefinition&gt;)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/ColumnDefinitions/DataGridColumnDefinitionBuilder.cs/#L222"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public DataGridMaskedTextColumnDefinition MaskedText&lt;TValue&gt;(object header, IPropertyInfo property, Func&lt;TItem, TValue&gt; getter, Action&lt;TItem, TValue&gt; setter = null, Action&lt;DataGridMaskedTextColumnDefinition&gt; configure = null)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>header</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object">object</a></dt>
+    <dd></dd>
+    <dt><code>property</code> <span class="xref">IPropertyInfo</span></dt>
+    <dd></dd>
+    <dt><code>getter</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.func-2">Func</a>&lt;TItem, TValue&gt;</dt>
+    <dd></dd>
+    <dt><code>setter</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.action-2">Action</a>&lt;TItem, TValue&gt;</dt>
+    <dd></dd>
+    <dt><code>configure</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.action-1">Action</a>&lt;<a class="xref" href="Avalonia.Controls.DataGridMaskedTextColumnDefinition.html">DataGridMaskedTextColumnDefinition</a>&gt;</dt>
+    <dd></dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="Avalonia.Controls.DataGridMaskedTextColumnDefinition.html">DataGridMaskedTextColumnDefinition</a></dt>
+    <dd></dd>
+  </dl>
+
+  <h4 class="section">Type Parameters</h4>
+  <dl class="parameters">
+    <dt><code>TValue</code></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+  <a id="Avalonia_Controls_DataGridColumnDefinitionBuilder_1_MaskedText_" data-uid="Avalonia.Controls.DataGridColumnDefinitionBuilder`1.MaskedText*"></a>
+
+  <h3 id="Avalonia_Controls_DataGridColumnDefinitionBuilder_1_MaskedText__1_System_Object_Avalonia_Markup_Xaml_MarkupExtensions_CompiledBindings_CompiledBindingPath_System_Func__0___0__System_Action__0___0__System_Action_Avalonia_Controls_DataGridMaskedTextColumnDefinition__" data-uid="Avalonia.Controls.DataGridColumnDefinitionBuilder`1.MaskedText``1(System.Object,Avalonia.Markup.Xaml.MarkupExtensions.CompiledBindings.CompiledBindingPath,System.Func{`0,``0},System.Action{`0,``0},System.Action{Avalonia.Controls.DataGridMaskedTextColumnDefinition})">
+  MaskedText&lt;TValue&gt;(object, CompiledBindingPath, Func&lt;TItem, TValue&gt;, Action&lt;TItem, TValue&gt;, Action&lt;DataGridMaskedTextColumnDefinition&gt;)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/ColumnDefinitions/DataGridColumnDefinitionBuilder.cs/#L212"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public DataGridMaskedTextColumnDefinition MaskedText&lt;TValue&gt;(object header, CompiledBindingPath path, Func&lt;TItem, TValue&gt; getter, Action&lt;TItem, TValue&gt; setter = null, Action&lt;DataGridMaskedTextColumnDefinition&gt; configure = null)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>header</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object">object</a></dt>
+    <dd></dd>
+    <dt><code>path</code> <span class="xref">CompiledBindingPath</span></dt>
+    <dd></dd>
+    <dt><code>getter</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.func-2">Func</a>&lt;TItem, TValue&gt;</dt>
+    <dd></dd>
+    <dt><code>setter</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.action-2">Action</a>&lt;TItem, TValue&gt;</dt>
+    <dd></dd>
+    <dt><code>configure</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.action-1">Action</a>&lt;<a class="xref" href="Avalonia.Controls.DataGridMaskedTextColumnDefinition.html">DataGridMaskedTextColumnDefinition</a>&gt;</dt>
+    <dd></dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="Avalonia.Controls.DataGridMaskedTextColumnDefinition.html">DataGridMaskedTextColumnDefinition</a></dt>
+    <dd></dd>
+  </dl>
+
+  <h4 class="section">Type Parameters</h4>
+  <dl class="parameters">
+    <dt><code>TValue</code></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+  <a id="Avalonia_Controls_DataGridColumnDefinitionBuilder_1_Numeric_" data-uid="Avalonia.Controls.DataGridColumnDefinitionBuilder`1.Numeric*"></a>
+
+  <h3 id="Avalonia_Controls_DataGridColumnDefinitionBuilder_1_Numeric__1_System_Object_Avalonia_Data_Core_IPropertyInfo_System_Func__0___0__System_Action__0___0__System_Action_Avalonia_Controls_DataGridNumericColumnDefinition__" data-uid="Avalonia.Controls.DataGridColumnDefinitionBuilder`1.Numeric``1(System.Object,Avalonia.Data.Core.IPropertyInfo,System.Func{`0,``0},System.Action{`0,``0},System.Action{Avalonia.Controls.DataGridNumericColumnDefinition})">
+  Numeric&lt;TValue&gt;(object, IPropertyInfo, Func&lt;TItem, TValue&gt;, Action&lt;TItem, TValue&gt;, Action&lt;DataGridNumericColumnDefinition&gt;)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/ColumnDefinitions/DataGridColumnDefinitionBuilder.cs/#L122"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public DataGridNumericColumnDefinition Numeric&lt;TValue&gt;(object header, IPropertyInfo property, Func&lt;TItem, TValue&gt; getter, Action&lt;TItem, TValue&gt; setter = null, Action&lt;DataGridNumericColumnDefinition&gt; configure = null)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>header</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object">object</a></dt>
+    <dd></dd>
+    <dt><code>property</code> <span class="xref">IPropertyInfo</span></dt>
+    <dd></dd>
+    <dt><code>getter</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.func-2">Func</a>&lt;TItem, TValue&gt;</dt>
+    <dd></dd>
+    <dt><code>setter</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.action-2">Action</a>&lt;TItem, TValue&gt;</dt>
+    <dd></dd>
+    <dt><code>configure</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.action-1">Action</a>&lt;<a class="xref" href="Avalonia.Controls.DataGridNumericColumnDefinition.html">DataGridNumericColumnDefinition</a>&gt;</dt>
+    <dd></dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="Avalonia.Controls.DataGridNumericColumnDefinition.html">DataGridNumericColumnDefinition</a></dt>
+    <dd></dd>
+  </dl>
+
+  <h4 class="section">Type Parameters</h4>
+  <dl class="parameters">
+    <dt><code>TValue</code></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+  <a id="Avalonia_Controls_DataGridColumnDefinitionBuilder_1_Numeric_" data-uid="Avalonia.Controls.DataGridColumnDefinitionBuilder`1.Numeric*"></a>
+
+  <h3 id="Avalonia_Controls_DataGridColumnDefinitionBuilder_1_Numeric__1_System_Object_Avalonia_Markup_Xaml_MarkupExtensions_CompiledBindings_CompiledBindingPath_System_Func__0___0__System_Action__0___0__System_Action_Avalonia_Controls_DataGridNumericColumnDefinition__" data-uid="Avalonia.Controls.DataGridColumnDefinitionBuilder`1.Numeric``1(System.Object,Avalonia.Markup.Xaml.MarkupExtensions.CompiledBindings.CompiledBindingPath,System.Func{`0,``0},System.Action{`0,``0},System.Action{Avalonia.Controls.DataGridNumericColumnDefinition})">
+  Numeric&lt;TValue&gt;(object, CompiledBindingPath, Func&lt;TItem, TValue&gt;, Action&lt;TItem, TValue&gt;, Action&lt;DataGridNumericColumnDefinition&gt;)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/ColumnDefinitions/DataGridColumnDefinitionBuilder.cs/#L112"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public DataGridNumericColumnDefinition Numeric&lt;TValue&gt;(object header, CompiledBindingPath path, Func&lt;TItem, TValue&gt; getter, Action&lt;TItem, TValue&gt; setter = null, Action&lt;DataGridNumericColumnDefinition&gt; configure = null)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>header</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object">object</a></dt>
+    <dd></dd>
+    <dt><code>path</code> <span class="xref">CompiledBindingPath</span></dt>
+    <dd></dd>
+    <dt><code>getter</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.func-2">Func</a>&lt;TItem, TValue&gt;</dt>
+    <dd></dd>
+    <dt><code>setter</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.action-2">Action</a>&lt;TItem, TValue&gt;</dt>
+    <dd></dd>
+    <dt><code>configure</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.action-1">Action</a>&lt;<a class="xref" href="Avalonia.Controls.DataGridNumericColumnDefinition.html">DataGridNumericColumnDefinition</a>&gt;</dt>
+    <dd></dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="Avalonia.Controls.DataGridNumericColumnDefinition.html">DataGridNumericColumnDefinition</a></dt>
+    <dd></dd>
+  </dl>
+
+  <h4 class="section">Type Parameters</h4>
+  <dl class="parameters">
+    <dt><code>TValue</code></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+  <a id="Avalonia_Controls_DataGridColumnDefinitionBuilder_1_ProgressBar_" data-uid="Avalonia.Controls.DataGridColumnDefinitionBuilder`1.ProgressBar*"></a>
+
+  <h3 id="Avalonia_Controls_DataGridColumnDefinitionBuilder_1_ProgressBar__1_System_Object_Avalonia_Data_Core_IPropertyInfo_System_Func__0___0__System_Action__0___0__System_Action_Avalonia_Controls_DataGridProgressBarColumnDefinition__" data-uid="Avalonia.Controls.DataGridColumnDefinitionBuilder`1.ProgressBar``1(System.Object,Avalonia.Data.Core.IPropertyInfo,System.Func{`0,``0},System.Action{`0,``0},System.Action{Avalonia.Controls.DataGridProgressBarColumnDefinition})">
+  ProgressBar&lt;TValue&gt;(object, IPropertyInfo, Func&lt;TItem, TValue&gt;, Action&lt;TItem, TValue&gt;, Action&lt;DataGridProgressBarColumnDefinition&gt;)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/ColumnDefinitions/DataGridColumnDefinitionBuilder.cs/#L142"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public DataGridProgressBarColumnDefinition ProgressBar&lt;TValue&gt;(object header, IPropertyInfo property, Func&lt;TItem, TValue&gt; getter, Action&lt;TItem, TValue&gt; setter = null, Action&lt;DataGridProgressBarColumnDefinition&gt; configure = null)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>header</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object">object</a></dt>
+    <dd></dd>
+    <dt><code>property</code> <span class="xref">IPropertyInfo</span></dt>
+    <dd></dd>
+    <dt><code>getter</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.func-2">Func</a>&lt;TItem, TValue&gt;</dt>
+    <dd></dd>
+    <dt><code>setter</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.action-2">Action</a>&lt;TItem, TValue&gt;</dt>
+    <dd></dd>
+    <dt><code>configure</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.action-1">Action</a>&lt;<a class="xref" href="Avalonia.Controls.DataGridProgressBarColumnDefinition.html">DataGridProgressBarColumnDefinition</a>&gt;</dt>
+    <dd></dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="Avalonia.Controls.DataGridProgressBarColumnDefinition.html">DataGridProgressBarColumnDefinition</a></dt>
+    <dd></dd>
+  </dl>
+
+  <h4 class="section">Type Parameters</h4>
+  <dl class="parameters">
+    <dt><code>TValue</code></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+  <a id="Avalonia_Controls_DataGridColumnDefinitionBuilder_1_ProgressBar_" data-uid="Avalonia.Controls.DataGridColumnDefinitionBuilder`1.ProgressBar*"></a>
+
+  <h3 id="Avalonia_Controls_DataGridColumnDefinitionBuilder_1_ProgressBar__1_System_Object_Avalonia_Markup_Xaml_MarkupExtensions_CompiledBindings_CompiledBindingPath_System_Func__0___0__System_Action__0___0__System_Action_Avalonia_Controls_DataGridProgressBarColumnDefinition__" data-uid="Avalonia.Controls.DataGridColumnDefinitionBuilder`1.ProgressBar``1(System.Object,Avalonia.Markup.Xaml.MarkupExtensions.CompiledBindings.CompiledBindingPath,System.Func{`0,``0},System.Action{`0,``0},System.Action{Avalonia.Controls.DataGridProgressBarColumnDefinition})">
+  ProgressBar&lt;TValue&gt;(object, CompiledBindingPath, Func&lt;TItem, TValue&gt;, Action&lt;TItem, TValue&gt;, Action&lt;DataGridProgressBarColumnDefinition&gt;)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/ColumnDefinitions/DataGridColumnDefinitionBuilder.cs/#L132"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public DataGridProgressBarColumnDefinition ProgressBar&lt;TValue&gt;(object header, CompiledBindingPath path, Func&lt;TItem, TValue&gt; getter, Action&lt;TItem, TValue&gt; setter = null, Action&lt;DataGridProgressBarColumnDefinition&gt; configure = null)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>header</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object">object</a></dt>
+    <dd></dd>
+    <dt><code>path</code> <span class="xref">CompiledBindingPath</span></dt>
+    <dd></dd>
+    <dt><code>getter</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.func-2">Func</a>&lt;TItem, TValue&gt;</dt>
+    <dd></dd>
+    <dt><code>setter</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.action-2">Action</a>&lt;TItem, TValue&gt;</dt>
+    <dd></dd>
+    <dt><code>configure</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.action-1">Action</a>&lt;<a class="xref" href="Avalonia.Controls.DataGridProgressBarColumnDefinition.html">DataGridProgressBarColumnDefinition</a>&gt;</dt>
+    <dd></dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="Avalonia.Controls.DataGridProgressBarColumnDefinition.html">DataGridProgressBarColumnDefinition</a></dt>
+    <dd></dd>
+  </dl>
+
+  <h4 class="section">Type Parameters</h4>
+  <dl class="parameters">
+    <dt><code>TValue</code></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+  <a id="Avalonia_Controls_DataGridColumnDefinitionBuilder_1_Slider_" data-uid="Avalonia.Controls.DataGridColumnDefinitionBuilder`1.Slider*"></a>
+
+  <h3 id="Avalonia_Controls_DataGridColumnDefinitionBuilder_1_Slider__1_System_Object_Avalonia_Data_Core_IPropertyInfo_System_Func__0___0__System_Action__0___0__System_Action_Avalonia_Controls_DataGridSliderColumnDefinition__" data-uid="Avalonia.Controls.DataGridColumnDefinitionBuilder`1.Slider``1(System.Object,Avalonia.Data.Core.IPropertyInfo,System.Func{`0,``0},System.Action{`0,``0},System.Action{Avalonia.Controls.DataGridSliderColumnDefinition})">
+  Slider&lt;TValue&gt;(object, IPropertyInfo, Func&lt;TItem, TValue&gt;, Action&lt;TItem, TValue&gt;, Action&lt;DataGridSliderColumnDefinition&gt;)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/ColumnDefinitions/DataGridColumnDefinitionBuilder.cs/#L162"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public DataGridSliderColumnDefinition Slider&lt;TValue&gt;(object header, IPropertyInfo property, Func&lt;TItem, TValue&gt; getter, Action&lt;TItem, TValue&gt; setter = null, Action&lt;DataGridSliderColumnDefinition&gt; configure = null)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>header</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object">object</a></dt>
+    <dd></dd>
+    <dt><code>property</code> <span class="xref">IPropertyInfo</span></dt>
+    <dd></dd>
+    <dt><code>getter</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.func-2">Func</a>&lt;TItem, TValue&gt;</dt>
+    <dd></dd>
+    <dt><code>setter</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.action-2">Action</a>&lt;TItem, TValue&gt;</dt>
+    <dd></dd>
+    <dt><code>configure</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.action-1">Action</a>&lt;<a class="xref" href="Avalonia.Controls.DataGridSliderColumnDefinition.html">DataGridSliderColumnDefinition</a>&gt;</dt>
+    <dd></dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="Avalonia.Controls.DataGridSliderColumnDefinition.html">DataGridSliderColumnDefinition</a></dt>
+    <dd></dd>
+  </dl>
+
+  <h4 class="section">Type Parameters</h4>
+  <dl class="parameters">
+    <dt><code>TValue</code></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+  <a id="Avalonia_Controls_DataGridColumnDefinitionBuilder_1_Slider_" data-uid="Avalonia.Controls.DataGridColumnDefinitionBuilder`1.Slider*"></a>
+
+  <h3 id="Avalonia_Controls_DataGridColumnDefinitionBuilder_1_Slider__1_System_Object_Avalonia_Markup_Xaml_MarkupExtensions_CompiledBindings_CompiledBindingPath_System_Func__0___0__System_Action__0___0__System_Action_Avalonia_Controls_DataGridSliderColumnDefinition__" data-uid="Avalonia.Controls.DataGridColumnDefinitionBuilder`1.Slider``1(System.Object,Avalonia.Markup.Xaml.MarkupExtensions.CompiledBindings.CompiledBindingPath,System.Func{`0,``0},System.Action{`0,``0},System.Action{Avalonia.Controls.DataGridSliderColumnDefinition})">
+  Slider&lt;TValue&gt;(object, CompiledBindingPath, Func&lt;TItem, TValue&gt;, Action&lt;TItem, TValue&gt;, Action&lt;DataGridSliderColumnDefinition&gt;)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/ColumnDefinitions/DataGridColumnDefinitionBuilder.cs/#L152"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public DataGridSliderColumnDefinition Slider&lt;TValue&gt;(object header, CompiledBindingPath path, Func&lt;TItem, TValue&gt; getter, Action&lt;TItem, TValue&gt; setter = null, Action&lt;DataGridSliderColumnDefinition&gt; configure = null)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>header</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object">object</a></dt>
+    <dd></dd>
+    <dt><code>path</code> <span class="xref">CompiledBindingPath</span></dt>
+    <dd></dd>
+    <dt><code>getter</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.func-2">Func</a>&lt;TItem, TValue&gt;</dt>
+    <dd></dd>
+    <dt><code>setter</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.action-2">Action</a>&lt;TItem, TValue&gt;</dt>
+    <dd></dd>
+    <dt><code>configure</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.action-1">Action</a>&lt;<a class="xref" href="Avalonia.Controls.DataGridSliderColumnDefinition.html">DataGridSliderColumnDefinition</a>&gt;</dt>
+    <dd></dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="Avalonia.Controls.DataGridSliderColumnDefinition.html">DataGridSliderColumnDefinition</a></dt>
+    <dd></dd>
+  </dl>
+
+  <h4 class="section">Type Parameters</h4>
+  <dl class="parameters">
+    <dt><code>TValue</code></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+  <a id="Avalonia_Controls_DataGridColumnDefinitionBuilder_1_Template_" data-uid="Avalonia.Controls.DataGridColumnDefinitionBuilder`1.Template*"></a>
+
+  <h3 id="Avalonia_Controls_DataGridColumnDefinitionBuilder_1_Template_System_Object_System_String_System_Action_Avalonia_Controls_DataGridTemplateColumnDefinition__" data-uid="Avalonia.Controls.DataGridColumnDefinitionBuilder`1.Template(System.Object,System.String,System.Action{Avalonia.Controls.DataGridTemplateColumnDefinition})">
+  Template(object, string, Action&lt;DataGridTemplateColumnDefinition&gt;)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/ColumnDefinitions/DataGridColumnDefinitionBuilder.cs/#L378"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public DataGridTemplateColumnDefinition Template(object header, string cellTemplateKey, Action&lt;DataGridTemplateColumnDefinition&gt; configure = null)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>header</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object">object</a></dt>
+    <dd></dd>
+    <dt><code>cellTemplateKey</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></dt>
+    <dd></dd>
+    <dt><code>configure</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.action-1">Action</a>&lt;<a class="xref" href="Avalonia.Controls.DataGridTemplateColumnDefinition.html">DataGridTemplateColumnDefinition</a>&gt;</dt>
+    <dd></dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="Avalonia.Controls.DataGridTemplateColumnDefinition.html">DataGridTemplateColumnDefinition</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Avalonia_Controls_DataGridColumnDefinitionBuilder_1_Text_" data-uid="Avalonia.Controls.DataGridColumnDefinitionBuilder`1.Text*"></a>
+
+  <h3 id="Avalonia_Controls_DataGridColumnDefinitionBuilder_1_Text__1_System_Object_Avalonia_Data_Core_IPropertyInfo_System_Func__0___0__System_Action__0___0__System_Action_Avalonia_Controls_DataGridTextColumnDefinition__" data-uid="Avalonia.Controls.DataGridColumnDefinitionBuilder`1.Text``1(System.Object,Avalonia.Data.Core.IPropertyInfo,System.Func{`0,``0},System.Action{`0,``0},System.Action{Avalonia.Controls.DataGridTextColumnDefinition})">
+  Text&lt;TValue&gt;(object, IPropertyInfo, Func&lt;TItem, TValue&gt;, Action&lt;TItem, TValue&gt;, Action&lt;DataGridTextColumnDefinition&gt;)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/ColumnDefinitions/DataGridColumnDefinitionBuilder.cs/#L42"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public DataGridTextColumnDefinition Text&lt;TValue&gt;(object header, IPropertyInfo property, Func&lt;TItem, TValue&gt; getter, Action&lt;TItem, TValue&gt; setter = null, Action&lt;DataGridTextColumnDefinition&gt; configure = null)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>header</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object">object</a></dt>
+    <dd></dd>
+    <dt><code>property</code> <span class="xref">IPropertyInfo</span></dt>
+    <dd></dd>
+    <dt><code>getter</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.func-2">Func</a>&lt;TItem, TValue&gt;</dt>
+    <dd></dd>
+    <dt><code>setter</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.action-2">Action</a>&lt;TItem, TValue&gt;</dt>
+    <dd></dd>
+    <dt><code>configure</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.action-1">Action</a>&lt;<a class="xref" href="Avalonia.Controls.DataGridTextColumnDefinition.html">DataGridTextColumnDefinition</a>&gt;</dt>
+    <dd></dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="Avalonia.Controls.DataGridTextColumnDefinition.html">DataGridTextColumnDefinition</a></dt>
+    <dd></dd>
+  </dl>
+
+  <h4 class="section">Type Parameters</h4>
+  <dl class="parameters">
+    <dt><code>TValue</code></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+  <a id="Avalonia_Controls_DataGridColumnDefinitionBuilder_1_Text_" data-uid="Avalonia.Controls.DataGridColumnDefinitionBuilder`1.Text*"></a>
+
+  <h3 id="Avalonia_Controls_DataGridColumnDefinitionBuilder_1_Text__1_System_Object_Avalonia_Markup_Xaml_MarkupExtensions_CompiledBindings_CompiledBindingPath_System_Func__0___0__System_Action__0___0__System_Action_Avalonia_Controls_DataGridTextColumnDefinition__" data-uid="Avalonia.Controls.DataGridColumnDefinitionBuilder`1.Text``1(System.Object,Avalonia.Markup.Xaml.MarkupExtensions.CompiledBindings.CompiledBindingPath,System.Func{`0,``0},System.Action{`0,``0},System.Action{Avalonia.Controls.DataGridTextColumnDefinition})">
+  Text&lt;TValue&gt;(object, CompiledBindingPath, Func&lt;TItem, TValue&gt;, Action&lt;TItem, TValue&gt;, Action&lt;DataGridTextColumnDefinition&gt;)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/ColumnDefinitions/DataGridColumnDefinitionBuilder.cs/#L32"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public DataGridTextColumnDefinition Text&lt;TValue&gt;(object header, CompiledBindingPath path, Func&lt;TItem, TValue&gt; getter, Action&lt;TItem, TValue&gt; setter = null, Action&lt;DataGridTextColumnDefinition&gt; configure = null)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>header</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object">object</a></dt>
+    <dd></dd>
+    <dt><code>path</code> <span class="xref">CompiledBindingPath</span></dt>
+    <dd></dd>
+    <dt><code>getter</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.func-2">Func</a>&lt;TItem, TValue&gt;</dt>
+    <dd></dd>
+    <dt><code>setter</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.action-2">Action</a>&lt;TItem, TValue&gt;</dt>
+    <dd></dd>
+    <dt><code>configure</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.action-1">Action</a>&lt;<a class="xref" href="Avalonia.Controls.DataGridTextColumnDefinition.html">DataGridTextColumnDefinition</a>&gt;</dt>
+    <dd></dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="Avalonia.Controls.DataGridTextColumnDefinition.html">DataGridTextColumnDefinition</a></dt>
+    <dd></dd>
+  </dl>
+
+  <h4 class="section">Type Parameters</h4>
+  <dl class="parameters">
+    <dt><code>TValue</code></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+  <a id="Avalonia_Controls_DataGridColumnDefinitionBuilder_1_TimePicker_" data-uid="Avalonia.Controls.DataGridColumnDefinitionBuilder`1.TimePicker*"></a>
+
+  <h3 id="Avalonia_Controls_DataGridColumnDefinitionBuilder_1_TimePicker__1_System_Object_Avalonia_Data_Core_IPropertyInfo_System_Func__0___0__System_Action__0___0__System_Action_Avalonia_Controls_DataGridTimePickerColumnDefinition__" data-uid="Avalonia.Controls.DataGridColumnDefinitionBuilder`1.TimePicker``1(System.Object,Avalonia.Data.Core.IPropertyInfo,System.Func{`0,``0},System.Action{`0,``0},System.Action{Avalonia.Controls.DataGridTimePickerColumnDefinition})">
+  TimePicker&lt;TValue&gt;(object, IPropertyInfo, Func&lt;TItem, TValue&gt;, Action&lt;TItem, TValue&gt;, Action&lt;DataGridTimePickerColumnDefinition&gt;)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/ColumnDefinitions/DataGridColumnDefinitionBuilder.cs/#L202"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public DataGridTimePickerColumnDefinition TimePicker&lt;TValue&gt;(object header, IPropertyInfo property, Func&lt;TItem, TValue&gt; getter, Action&lt;TItem, TValue&gt; setter = null, Action&lt;DataGridTimePickerColumnDefinition&gt; configure = null)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>header</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object">object</a></dt>
+    <dd></dd>
+    <dt><code>property</code> <span class="xref">IPropertyInfo</span></dt>
+    <dd></dd>
+    <dt><code>getter</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.func-2">Func</a>&lt;TItem, TValue&gt;</dt>
+    <dd></dd>
+    <dt><code>setter</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.action-2">Action</a>&lt;TItem, TValue&gt;</dt>
+    <dd></dd>
+    <dt><code>configure</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.action-1">Action</a>&lt;<a class="xref" href="Avalonia.Controls.DataGridTimePickerColumnDefinition.html">DataGridTimePickerColumnDefinition</a>&gt;</dt>
+    <dd></dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="Avalonia.Controls.DataGridTimePickerColumnDefinition.html">DataGridTimePickerColumnDefinition</a></dt>
+    <dd></dd>
+  </dl>
+
+  <h4 class="section">Type Parameters</h4>
+  <dl class="parameters">
+    <dt><code>TValue</code></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+  <a id="Avalonia_Controls_DataGridColumnDefinitionBuilder_1_TimePicker_" data-uid="Avalonia.Controls.DataGridColumnDefinitionBuilder`1.TimePicker*"></a>
+
+  <h3 id="Avalonia_Controls_DataGridColumnDefinitionBuilder_1_TimePicker__1_System_Object_Avalonia_Markup_Xaml_MarkupExtensions_CompiledBindings_CompiledBindingPath_System_Func__0___0__System_Action__0___0__System_Action_Avalonia_Controls_DataGridTimePickerColumnDefinition__" data-uid="Avalonia.Controls.DataGridColumnDefinitionBuilder`1.TimePicker``1(System.Object,Avalonia.Markup.Xaml.MarkupExtensions.CompiledBindings.CompiledBindingPath,System.Func{`0,``0},System.Action{`0,``0},System.Action{Avalonia.Controls.DataGridTimePickerColumnDefinition})">
+  TimePicker&lt;TValue&gt;(object, CompiledBindingPath, Func&lt;TItem, TValue&gt;, Action&lt;TItem, TValue&gt;, Action&lt;DataGridTimePickerColumnDefinition&gt;)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/ColumnDefinitions/DataGridColumnDefinitionBuilder.cs/#L192"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public DataGridTimePickerColumnDefinition TimePicker&lt;TValue&gt;(object header, CompiledBindingPath path, Func&lt;TItem, TValue&gt; getter, Action&lt;TItem, TValue&gt; setter = null, Action&lt;DataGridTimePickerColumnDefinition&gt; configure = null)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>header</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object">object</a></dt>
+    <dd></dd>
+    <dt><code>path</code> <span class="xref">CompiledBindingPath</span></dt>
+    <dd></dd>
+    <dt><code>getter</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.func-2">Func</a>&lt;TItem, TValue&gt;</dt>
+    <dd></dd>
+    <dt><code>setter</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.action-2">Action</a>&lt;TItem, TValue&gt;</dt>
+    <dd></dd>
+    <dt><code>configure</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.action-1">Action</a>&lt;<a class="xref" href="Avalonia.Controls.DataGridTimePickerColumnDefinition.html">DataGridTimePickerColumnDefinition</a>&gt;</dt>
+    <dd></dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="Avalonia.Controls.DataGridTimePickerColumnDefinition.html">DataGridTimePickerColumnDefinition</a></dt>
+    <dd></dd>
+  </dl>
+
+  <h4 class="section">Type Parameters</h4>
+  <dl class="parameters">
+    <dt><code>TValue</code></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+  <a id="Avalonia_Controls_DataGridColumnDefinitionBuilder_1_ToggleButton_" data-uid="Avalonia.Controls.DataGridColumnDefinitionBuilder`1.ToggleButton*"></a>
+
+  <h3 id="Avalonia_Controls_DataGridColumnDefinitionBuilder_1_ToggleButton__1_System_Object_Avalonia_Data_Core_IPropertyInfo_System_Func__0___0__System_Action__0___0__System_Action_Avalonia_Controls_DataGridToggleButtonColumnDefinition__" data-uid="Avalonia.Controls.DataGridColumnDefinitionBuilder`1.ToggleButton``1(System.Object,Avalonia.Data.Core.IPropertyInfo,System.Func{`0,``0},System.Action{`0,``0},System.Action{Avalonia.Controls.DataGridToggleButtonColumnDefinition})">
+  ToggleButton&lt;TValue&gt;(object, IPropertyInfo, Func&lt;TItem, TValue&gt;, Action&lt;TItem, TValue&gt;, Action&lt;DataGridToggleButtonColumnDefinition&gt;)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/ColumnDefinitions/DataGridColumnDefinitionBuilder.cs/#L262"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public DataGridToggleButtonColumnDefinition ToggleButton&lt;TValue&gt;(object header, IPropertyInfo property, Func&lt;TItem, TValue&gt; getter, Action&lt;TItem, TValue&gt; setter = null, Action&lt;DataGridToggleButtonColumnDefinition&gt; configure = null)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>header</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object">object</a></dt>
+    <dd></dd>
+    <dt><code>property</code> <span class="xref">IPropertyInfo</span></dt>
+    <dd></dd>
+    <dt><code>getter</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.func-2">Func</a>&lt;TItem, TValue&gt;</dt>
+    <dd></dd>
+    <dt><code>setter</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.action-2">Action</a>&lt;TItem, TValue&gt;</dt>
+    <dd></dd>
+    <dt><code>configure</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.action-1">Action</a>&lt;<a class="xref" href="Avalonia.Controls.DataGridToggleButtonColumnDefinition.html">DataGridToggleButtonColumnDefinition</a>&gt;</dt>
+    <dd></dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="Avalonia.Controls.DataGridToggleButtonColumnDefinition.html">DataGridToggleButtonColumnDefinition</a></dt>
+    <dd></dd>
+  </dl>
+
+  <h4 class="section">Type Parameters</h4>
+  <dl class="parameters">
+    <dt><code>TValue</code></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+  <a id="Avalonia_Controls_DataGridColumnDefinitionBuilder_1_ToggleButton_" data-uid="Avalonia.Controls.DataGridColumnDefinitionBuilder`1.ToggleButton*"></a>
+
+  <h3 id="Avalonia_Controls_DataGridColumnDefinitionBuilder_1_ToggleButton__1_System_Object_Avalonia_Markup_Xaml_MarkupExtensions_CompiledBindings_CompiledBindingPath_System_Func__0___0__System_Action__0___0__System_Action_Avalonia_Controls_DataGridToggleButtonColumnDefinition__" data-uid="Avalonia.Controls.DataGridColumnDefinitionBuilder`1.ToggleButton``1(System.Object,Avalonia.Markup.Xaml.MarkupExtensions.CompiledBindings.CompiledBindingPath,System.Func{`0,``0},System.Action{`0,``0},System.Action{Avalonia.Controls.DataGridToggleButtonColumnDefinition})">
+  ToggleButton&lt;TValue&gt;(object, CompiledBindingPath, Func&lt;TItem, TValue&gt;, Action&lt;TItem, TValue&gt;, Action&lt;DataGridToggleButtonColumnDefinition&gt;)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/ColumnDefinitions/DataGridColumnDefinitionBuilder.cs/#L252"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public DataGridToggleButtonColumnDefinition ToggleButton&lt;TValue&gt;(object header, CompiledBindingPath path, Func&lt;TItem, TValue&gt; getter, Action&lt;TItem, TValue&gt; setter = null, Action&lt;DataGridToggleButtonColumnDefinition&gt; configure = null)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>header</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object">object</a></dt>
+    <dd></dd>
+    <dt><code>path</code> <span class="xref">CompiledBindingPath</span></dt>
+    <dd></dd>
+    <dt><code>getter</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.func-2">Func</a>&lt;TItem, TValue&gt;</dt>
+    <dd></dd>
+    <dt><code>setter</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.action-2">Action</a>&lt;TItem, TValue&gt;</dt>
+    <dd></dd>
+    <dt><code>configure</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.action-1">Action</a>&lt;<a class="xref" href="Avalonia.Controls.DataGridToggleButtonColumnDefinition.html">DataGridToggleButtonColumnDefinition</a>&gt;</dt>
+    <dd></dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="Avalonia.Controls.DataGridToggleButtonColumnDefinition.html">DataGridToggleButtonColumnDefinition</a></dt>
+    <dd></dd>
+  </dl>
+
+  <h4 class="section">Type Parameters</h4>
+  <dl class="parameters">
+    <dt><code>TValue</code></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+  <a id="Avalonia_Controls_DataGridColumnDefinitionBuilder_1_ToggleSwitch_" data-uid="Avalonia.Controls.DataGridColumnDefinitionBuilder`1.ToggleSwitch*"></a>
+
+  <h3 id="Avalonia_Controls_DataGridColumnDefinitionBuilder_1_ToggleSwitch__1_System_Object_Avalonia_Data_Core_IPropertyInfo_System_Func__0___0__System_Action__0___0__System_Action_Avalonia_Controls_DataGridToggleSwitchColumnDefinition__" data-uid="Avalonia.Controls.DataGridColumnDefinitionBuilder`1.ToggleSwitch``1(System.Object,Avalonia.Data.Core.IPropertyInfo,System.Func{`0,``0},System.Action{`0,``0},System.Action{Avalonia.Controls.DataGridToggleSwitchColumnDefinition})">
+  ToggleSwitch&lt;TValue&gt;(object, IPropertyInfo, Func&lt;TItem, TValue&gt;, Action&lt;TItem, TValue&gt;, Action&lt;DataGridToggleSwitchColumnDefinition&gt;)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/ColumnDefinitions/DataGridColumnDefinitionBuilder.cs/#L282"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public DataGridToggleSwitchColumnDefinition ToggleSwitch&lt;TValue&gt;(object header, IPropertyInfo property, Func&lt;TItem, TValue&gt; getter, Action&lt;TItem, TValue&gt; setter = null, Action&lt;DataGridToggleSwitchColumnDefinition&gt; configure = null)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>header</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object">object</a></dt>
+    <dd></dd>
+    <dt><code>property</code> <span class="xref">IPropertyInfo</span></dt>
+    <dd></dd>
+    <dt><code>getter</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.func-2">Func</a>&lt;TItem, TValue&gt;</dt>
+    <dd></dd>
+    <dt><code>setter</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.action-2">Action</a>&lt;TItem, TValue&gt;</dt>
+    <dd></dd>
+    <dt><code>configure</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.action-1">Action</a>&lt;<a class="xref" href="Avalonia.Controls.DataGridToggleSwitchColumnDefinition.html">DataGridToggleSwitchColumnDefinition</a>&gt;</dt>
+    <dd></dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="Avalonia.Controls.DataGridToggleSwitchColumnDefinition.html">DataGridToggleSwitchColumnDefinition</a></dt>
+    <dd></dd>
+  </dl>
+
+  <h4 class="section">Type Parameters</h4>
+  <dl class="parameters">
+    <dt><code>TValue</code></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+  <a id="Avalonia_Controls_DataGridColumnDefinitionBuilder_1_ToggleSwitch_" data-uid="Avalonia.Controls.DataGridColumnDefinitionBuilder`1.ToggleSwitch*"></a>
+
+  <h3 id="Avalonia_Controls_DataGridColumnDefinitionBuilder_1_ToggleSwitch__1_System_Object_Avalonia_Markup_Xaml_MarkupExtensions_CompiledBindings_CompiledBindingPath_System_Func__0___0__System_Action__0___0__System_Action_Avalonia_Controls_DataGridToggleSwitchColumnDefinition__" data-uid="Avalonia.Controls.DataGridColumnDefinitionBuilder`1.ToggleSwitch``1(System.Object,Avalonia.Markup.Xaml.MarkupExtensions.CompiledBindings.CompiledBindingPath,System.Func{`0,``0},System.Action{`0,``0},System.Action{Avalonia.Controls.DataGridToggleSwitchColumnDefinition})">
+  ToggleSwitch&lt;TValue&gt;(object, CompiledBindingPath, Func&lt;TItem, TValue&gt;, Action&lt;TItem, TValue&gt;, Action&lt;DataGridToggleSwitchColumnDefinition&gt;)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/ColumnDefinitions/DataGridColumnDefinitionBuilder.cs/#L272"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public DataGridToggleSwitchColumnDefinition ToggleSwitch&lt;TValue&gt;(object header, CompiledBindingPath path, Func&lt;TItem, TValue&gt; getter, Action&lt;TItem, TValue&gt; setter = null, Action&lt;DataGridToggleSwitchColumnDefinition&gt; configure = null)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>header</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object">object</a></dt>
+    <dd></dd>
+    <dt><code>path</code> <span class="xref">CompiledBindingPath</span></dt>
+    <dd></dd>
+    <dt><code>getter</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.func-2">Func</a>&lt;TItem, TValue&gt;</dt>
+    <dd></dd>
+    <dt><code>setter</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.action-2">Action</a>&lt;TItem, TValue&gt;</dt>
+    <dd></dd>
+    <dt><code>configure</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.action-1">Action</a>&lt;<a class="xref" href="Avalonia.Controls.DataGridToggleSwitchColumnDefinition.html">DataGridToggleSwitchColumnDefinition</a>&gt;</dt>
+    <dd></dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="Avalonia.Controls.DataGridToggleSwitchColumnDefinition.html">DataGridToggleSwitchColumnDefinition</a></dt>
+    <dd></dd>
+  </dl>
+
+  <h4 class="section">Type Parameters</h4>
+  <dl class="parameters">
+    <dt><code>TValue</code></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+</article>
+
+        <div class="contribution d-print-none">
+          <a href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/ColumnDefinitions/DataGridColumnDefinitionBuilder.cs/#L26" class="edit-link">Edit this page</a>
+        </div>
+
+
+      </div>
+
+      <div class="affix">
+        <nav id="affix"></nav>
+      </div>
+    </main>
+
+
+    <footer class="border-top text-secondary">
+      <div class="container-xxl">
+        <div class="flex-fill">
+          <span>Made with <a href="https://dotnet.github.io/docfx">docfx</a></span>
+        </div>
+      </div>
+    </footer>
+  </body>
+</html>

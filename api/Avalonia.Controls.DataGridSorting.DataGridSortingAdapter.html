@@ -85,7 +85,7 @@
 
 
   <h1 id="Avalonia_Controls_DataGridSorting_DataGridSortingAdapter" data-uid="Avalonia.Controls.DataGridSorting.DataGridSortingAdapter" class="text-break">
-Class DataGridSortingAdapter  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/Sorting/DataGridSortingAdapter.cs/#L25"><i class="bi bi-code-slash"></i></a>
+Class DataGridSortingAdapter  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/Sorting/DataGridSortingAdapter.cs/#L26"><i class="bi bi-code-slash"></i></a>
   </h1>
 
   <div class="facts text-secondary">
@@ -163,9 +163,48 @@ Class DataGridSortingAdapter  <a class="header-action link-secondary" title="Vie
 
   <a id="Avalonia_Controls_DataGridSorting_DataGridSortingAdapter__ctor_" data-uid="Avalonia.Controls.DataGridSorting.DataGridSortingAdapter.#ctor*"></a>
 
+  <h3 id="Avalonia_Controls_DataGridSorting_DataGridSortingAdapter__ctor_Avalonia_Controls_DataGridSorting_ISortingModel_System_Func_System_Collections_Generic_IEnumerable_Avalonia_Controls_DataGridColumn___Avalonia_Controls_DataGridFastPathOptions_System_Action_System_Action_" data-uid="Avalonia.Controls.DataGridSorting.DataGridSortingAdapter.#ctor(Avalonia.Controls.DataGridSorting.ISortingModel,System.Func{System.Collections.Generic.IEnumerable{Avalonia.Controls.DataGridColumn}},Avalonia.Controls.DataGridFastPathOptions,System.Action,System.Action)">
+  DataGridSortingAdapter(ISortingModel, Func&lt;IEnumerable&lt;DataGridColumn&gt;&gt;, DataGridFastPathOptions, Action, Action)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/Sorting/DataGridSortingAdapter.cs/#L44"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public DataGridSortingAdapter(ISortingModel model, Func&lt;IEnumerable&lt;DataGridColumn&gt;&gt; columnProvider, DataGridFastPathOptions options, Action beforeViewRefresh = null, Action afterViewRefresh = null)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>model</code> <a class="xref" href="Avalonia.Controls.DataGridSorting.ISortingModel.html">ISortingModel</a></dt>
+    <dd></dd>
+    <dt><code>columnProvider</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.func-1">Func</a>&lt;<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.ienumerable-1">IEnumerable</a>&lt;<a class="xref" href="Avalonia.Controls.DataGridColumn.html">DataGridColumn</a>&gt;&gt;</dt>
+    <dd></dd>
+    <dt><code>options</code> <a class="xref" href="Avalonia.Controls.DataGridFastPathOptions.html">DataGridFastPathOptions</a></dt>
+    <dd></dd>
+    <dt><code>beforeViewRefresh</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.action">Action</a></dt>
+    <dd></dd>
+    <dt><code>afterViewRefresh</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.action">Action</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Avalonia_Controls_DataGridSorting_DataGridSortingAdapter__ctor_" data-uid="Avalonia.Controls.DataGridSorting.DataGridSortingAdapter.#ctor*"></a>
+
   <h3 id="Avalonia_Controls_DataGridSorting_DataGridSortingAdapter__ctor_Avalonia_Controls_DataGridSorting_ISortingModel_System_Func_System_Collections_Generic_IEnumerable_Avalonia_Controls_DataGridColumn___System_Action_System_Action_" data-uid="Avalonia.Controls.DataGridSorting.DataGridSortingAdapter.#ctor(Avalonia.Controls.DataGridSorting.ISortingModel,System.Func{System.Collections.Generic.IEnumerable{Avalonia.Controls.DataGridColumn}},System.Action,System.Action)">
   DataGridSortingAdapter(ISortingModel, Func&lt;IEnumerable&lt;DataGridColumn&gt;&gt;, Action, Action)
-  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/Sorting/DataGridSortingAdapter.cs/#L40"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/Sorting/DataGridSortingAdapter.cs/#L67"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"></div>
@@ -206,7 +245,7 @@ Class DataGridSortingAdapter  <a class="header-action link-secondary" title="Vie
 
   <h3 id="Avalonia_Controls_DataGridSorting_DataGridSortingAdapter_View" data-uid="Avalonia.Controls.DataGridSorting.DataGridSortingAdapter.View">
   View
-  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/Sorting/DataGridSortingAdapter.cs/#L65"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/Sorting/DataGridSortingAdapter.cs/#L87"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"></div>
@@ -241,7 +280,7 @@ Class DataGridSortingAdapter  <a class="header-action link-secondary" title="Vie
 
   <h3 id="Avalonia_Controls_DataGridSorting_DataGridSortingAdapter_AttachView_Avalonia_Collections_IDataGridCollectionView_" data-uid="Avalonia.Controls.DataGridSorting.DataGridSortingAdapter.AttachView(Avalonia.Collections.IDataGridCollectionView)">
   AttachView(IDataGridCollectionView)
-  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/Sorting/DataGridSortingAdapter.cs/#L72"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/Sorting/DataGridSortingAdapter.cs/#L94"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"></div>
@@ -272,7 +311,7 @@ Class DataGridSortingAdapter  <a class="header-action link-secondary" title="Vie
 
   <h3 id="Avalonia_Controls_DataGridSorting_DataGridSortingAdapter_Dispose" data-uid="Avalonia.Controls.DataGridSorting.DataGridSortingAdapter.Dispose">
   Dispose()
-  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/Sorting/DataGridSortingAdapter.cs/#L132"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/Sorting/DataGridSortingAdapter.cs/#L154"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.</p>
@@ -299,7 +338,7 @@ Class DataGridSortingAdapter  <a class="header-action link-secondary" title="Vie
 
   <h3 id="Avalonia_Controls_DataGridSorting_DataGridSortingAdapter_HandleHeaderClick_Avalonia_Controls_DataGridColumn_Avalonia_Input_KeyModifiers_System_Nullable_System_ComponentModel_ListSortDirection__" data-uid="Avalonia.Controls.DataGridSorting.DataGridSortingAdapter.HandleHeaderClick(Avalonia.Controls.DataGridColumn,Avalonia.Input.KeyModifiers,System.Nullable{System.ComponentModel.ListSortDirection})">
   HandleHeaderClick(DataGridColumn, KeyModifiers, ListSortDirection?)
-  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/Sorting/DataGridSortingAdapter.cs/#L102"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/Sorting/DataGridSortingAdapter.cs/#L124"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"></div>
@@ -334,7 +373,7 @@ Class DataGridSortingAdapter  <a class="header-action link-secondary" title="Vie
 
   <h3 id="Avalonia_Controls_DataGridSorting_DataGridSortingAdapter_RefreshOwnership" data-uid="Avalonia.Controls.DataGridSorting.DataGridSortingAdapter.RefreshOwnership">
   RefreshOwnership()
-  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/Sorting/DataGridSortingAdapter.cs/#L147"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/Sorting/DataGridSortingAdapter.cs/#L169"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"></div>
@@ -360,7 +399,7 @@ Class DataGridSortingAdapter  <a class="header-action link-secondary" title="Vie
 
   <h3 id="Avalonia_Controls_DataGridSorting_DataGridSortingAdapter_TryApplyModelToView_System_Collections_Generic_IReadOnlyList_Avalonia_Controls_DataGridSorting_SortingDescriptor__System_Collections_Generic_IReadOnlyList_Avalonia_Controls_DataGridSorting_SortingDescriptor__System_Boolean__" data-uid="Avalonia.Controls.DataGridSorting.DataGridSortingAdapter.TryApplyModelToView(System.Collections.Generic.IReadOnlyList{Avalonia.Controls.DataGridSorting.SortingDescriptor},System.Collections.Generic.IReadOnlyList{Avalonia.Controls.DataGridSorting.SortingDescriptor},System.Boolean@)">
   TryApplyModelToView(IReadOnlyList&lt;SortingDescriptor&gt;, IReadOnlyList&lt;SortingDescriptor&gt;, out bool)
-  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/Sorting/DataGridSortingAdapter.cs/#L285"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/Sorting/DataGridSortingAdapter.cs/#L310"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>Override to short-circuit default sort application (e.g., push descriptors upstream).
@@ -407,7 +446,7 @@ the adapter should not rewrite <a class="xref" href="Avalonia.Collections.IDataG
 </article>
 
         <div class="contribution d-print-none">
-          <a href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/Sorting/DataGridSortingAdapter.cs/#L25" class="edit-link">Edit this page</a>
+          <a href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/Sorting/DataGridSortingAdapter.cs/#L26" class="edit-link">Edit this page</a>
         </div>
 
 

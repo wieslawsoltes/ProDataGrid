@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+      <title>Column Definitions: Hot Path Integration | ProDataGrid for Avalonia </title>
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <meta name="title" content="Column Definitions: Hot Path Integration | ProDataGrid for Avalonia ">
+      
+      
+      <link rel="icon" href="../favicon.ico">
+      <link rel="stylesheet" href="../public/docfx.min.css">
+      <link rel="stylesheet" href="../public/main.css">
+      <meta name="docfx:navrel" content="../toc.html">
+      <meta name="docfx:tocrel" content="toc.html">
+      
+      
+      
+      
+      <meta name="docfx:docurl" content="https://github.com/wieslawsoltes/ProDataGrid/blob/master/docfx/articles/column-definitions-hot-path.md/#L1">
+      <meta name="loc:inThisArticle" content="In this article">
+      <meta name="loc:searchResultsCount" content="{count} results for &quot;{query}&quot;">
+      <meta name="loc:searchNoResults" content="No results for &quot;{query}&quot;">
+      <meta name="loc:tocFilter" content="Filter by title">
+      <meta name="loc:nextArticle" content="Next">
+      <meta name="loc:prevArticle" content="Previous">
+      <meta name="loc:themeLight" content="Light">
+      <meta name="loc:themeDark" content="Dark">
+      <meta name="loc:themeAuto" content="Auto">
+      <meta name="loc:changeTheme" content="Change theme">
+      <meta name="loc:copy" content="Copy">
+      <meta name="loc:downloadPdf" content="Download PDF">
+
+      <script type="module" src="./../public/docfx.min.js"></script>
+
+      <script>
+        const theme = localStorage.getItem('theme') || 'auto'
+        document.documentElement.setAttribute('data-bs-theme', theme === 'auto' ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light') : theme)
+      </script>
+
+  </head>
+
+  <body class="tex2jax_ignore" data-layout="" data-yaml-mime="">
+    <header class="bg-body border-bottom">
+      <nav id="autocollapse" class="navbar navbar-expand-md" role="navigation">
+        <div class="container-xxl flex-nowrap">
+          <a class="navbar-brand" href="../index.html">
+            <img id="logo" class="svg" src="../images/logo.svg" alt="">
+            
+          </a>
+          <button class="btn btn-lg d-md-none border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navpanel" aria-controls="navpanel" aria-expanded="false" aria-label="Toggle navigation">
+            <i class="bi bi-three-dots"></i>
+          </button>
+          <div class="collapse navbar-collapse" id="navpanel">
+            <div id="navbar">
+            </div>
+          </div>
+        </div>
+      </nav>
+    </header>
+
+    <main class="container-xxl">
+      <div class="toc-offcanvas">
+        <div class="offcanvas-md offcanvas-start" tabindex="-1" id="tocOffcanvas" aria-labelledby="tocOffcanvasLabel">
+          <div class="offcanvas-header">
+            <h5 class="offcanvas-title" id="tocOffcanvasLabel">Table of Contents</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="offcanvas" data-bs-target="#tocOffcanvas" aria-label="Close"></button>
+          </div>
+          <div class="offcanvas-body">
+            <nav class="toc" id="toc"></nav>
+          </div>
+        </div>
+      </div>
+
+      <div class="content">
+        <div class="actionbar">
+          <button class="btn btn-lg border-0 d-md-none" type="button" data-bs-toggle="offcanvas" data-bs-target="#tocOffcanvas" aria-controls="tocOffcanvas" aria-expanded="false" aria-label="Show table of contents">
+            <i class="bi bi-list"></i>
+          </button>
+
+          <nav id="breadcrumb"></nav>
+        </div>
+
+        <article data-uid="">
+<h1 id="column-definitions-hot-path-integration">Column Definitions: Hot Path Integration</h1>
+
+<p>This guide focuses on wiring column definitions into sorting, filtering, searching, and other models without reflection. The goal is an AOT-friendly, fast path where models consume typed accessors.</p>
+<h2 id="1-provide-accessors-for-every-column">1. Provide accessors for every column</h2>
+<p><code>DataGridBindingDefinition</code> creates both a compiled binding and a typed value accessor. Prefer overloads that do not require dynamic code:</p>
+<pre><code class="lang-csharp">var path = new CompiledBindingPathBuilder()
+    .Property(Person.NameProperty, PropertyInfoAccessorFactory.CreateAvaloniaPropertyAccessor)
+    .Build();
+
+var nameBinding = DataGridBindingDefinition.Create&lt;Person, string&gt;(
+    path,
+    getter: p =&gt; p.Name);
+
+var nameColumn = new DataGridTextColumnDefinition
+{
+    Header = &quot;Name&quot;,
+    Binding = nameBinding,
+    SortMemberPath = &quot;Name&quot;
+};
+</code></pre>
+<p>For computed columns, set a value accessor directly:</p>
+<pre><code class="lang-csharp">new DataGridTextColumnDefinition
+{
+    Header = &quot;Total&quot;,
+    ValueAccessor = new DataGridColumnValueAccessor&lt;Order, decimal&gt;(o =&gt; o.Price * o.Quantity),
+    ValueType = typeof(decimal),
+    IsReadOnly = true
+};
+</code></pre>
+<h2 id="2-use-column-definitions-as-model-ids">2. Use column definitions as model ids</h2>
+<p>Always pass the definition instance as the column id so model descriptors map to the materialized column without string lookups.</p>
+<pre><code class="lang-csharp">sortingModel.Apply(new[]
+{
+    new SortingDescriptor(nameColumn, ListSortDirection.Ascending)
+});
+
+filteringModel.SetOrUpdate(new FilteringDescriptor(
+    columnId: nameColumn,
+    @operator: FilteringOperator.Contains,
+    value: &quot;Ada&quot;,
+    stringComparison: StringComparison.OrdinalIgnoreCase));
+</code></pre>
+<h2 id="3-avoid-reflection-in-filtering-and-searching">3. Avoid reflection in filtering and searching</h2>
+<p>Filtering and searching adapters fall back to property-path reflection when no accessor is available. You can enforce accessor-only behavior with <code>FastPathOptions</code>:</p>
+<pre><code class="lang-xml">&lt;DataGrid FilteringModel=&quot;{Binding FilteringModel}&quot;
+          SearchModel=&quot;{Binding SearchModel}&quot;&gt;
+  &lt;DataGrid.FastPathOptions&gt;
+    &lt;DataGridFastPathOptions UseAccessorsOnly=&quot;True&quot;
+                             ThrowOnMissingAccessor=&quot;True&quot; /&gt;
+  &lt;/DataGrid.FastPathOptions&gt;
+&lt;/DataGrid&gt;
+</code></pre>
+<p>If you need to bind or reuse a <code>DataGridFastPathOptions</code> instance from a view model, assign it in code-behind because it is a CLR property (not an AvaloniaProperty).</p>
+<p>You can also use the built-in adapter factories directly:</p>
+<pre><code class="lang-xml">&lt;DataGrid FilteringModel=&quot;{Binding FilteringModel}&quot;
+          SearchModel=&quot;{Binding SearchModel}&quot;
+          FilteringAdapterFactory=&quot;{StaticResource AccessorFilteringAdapterFactory}&quot;
+          SearchAdapterFactory=&quot;{StaticResource AccessorSearchAdapterFactory}&quot;
+          ColumnDefinitionsSource=&quot;{Binding ColumnDefinitions}&quot; /&gt;
+</code></pre>
+<p>The factories can be instantiated with <code>DataGridAccessorFilteringAdapterFactory</code> and <code>DataGridAccessorSearchAdapterFactory</code>. If you want custom behavior, implement your own adapter by overriding <code>TryApplyModelToView</code> and resolving values via <code>DataGridColumnMetadata.GetValueAccessor</code> or <code>DataGridColumnSearch.GetTextProvider</code>.</p>
+<p>If filtering should target a different value than the displayed binding, set <code>DataGridColumnDefinitionOptions.FilterValueAccessor</code> (or <code>DataGridColumnFilter.SetValueAccessor</code>) on the column definition.
+For custom operators, use <code>DataGridColumnDefinitionOptions.FilterPredicateFactory</code> to supply a predicate builder.</p>
+<h3 id="diagnostics-and-strict-mode">Diagnostics and strict mode</h3>
+<p>If you want diagnostics when a fast-path accessor is missing, subscribe to <code>DataGridFastPathOptions.MissingAccessor</code>. For a strict mode that enforces accessors and throws, set <code>StrictMode</code>:</p>
+<pre><code class="lang-csharp">grid.FastPathOptions = new DataGridFastPathOptions
+{
+    StrictMode = true
+};
+
+grid.FastPathOptions.MissingAccessor += (_, args) =&gt;
+    Debug.WriteLine($&quot;Missing accessor for {args.Feature}: {args.Message}&quot;);
+</code></pre>
+<h2 id="4-sorting-without-path-reflection">4. Sorting without path reflection</h2>
+<p>Sorting uses accessors automatically when present. If you work directly with collection views, use comparer or accessor-based sort descriptions:</p>
+<pre><code class="lang-csharp">var accessor = DataGridColumnMetadata.GetValueAccessor(nameColumn);
+view.SortDescriptions.Add(DataGridSortDescription.FromAccessor(accessor, propertyPath: &quot;Name&quot;));
+</code></pre>
+<p>Avoid <code>DataGridSortDescription.FromPath</code> in AOT scenarios.</p>
+<p>When the accessor implements <code>IDataGridColumnValueAccessor&lt;TItem, TValue&gt;</code>, sorting uses a typed comparer (<code>DataGridColumnValueAccessorComparer&lt;TItem, TValue&gt;</code>) to avoid boxing for value types.</p>
+<p>If you already have a typed accessor, you can use the generic overload:</p>
+<pre><code class="lang-csharp">var ageAccessor = new DataGridColumnValueAccessor&lt;Person, int&gt;(p =&gt; p.Age);
+view.SortDescriptions.Add(DataGridSortDescription.FromAccessor(ageAccessor, propertyPath: nameof(Person.Age)));
+</code></pre>
+<p><code>DataGridSortDescription.FromComparer</code> has an overload that keeps the property path even when you provide a custom comparer. This helps state persistence and model resolution.</p>
+<p>For computed sort keys, prefer <code>DataGridColumnDefinitionOptions.SortValueAccessor</code> to keep the displayed binding and sort key independent:</p>
+<pre><code class="lang-csharp">new DataGridTextColumnDefinition
+{
+    Header = &quot;Total&quot;,
+    Binding = DataGridBindingDefinition.Create&lt;Order, decimal&gt;(o =&gt; o.Total),
+    Options = new DataGridColumnDefinitionOptions
+    {
+        SortValueAccessor = new DataGridColumnValueAccessor&lt;Order, decimal&gt;(o =&gt; o.Price * o.Quantity)
+    }
+};
+</code></pre>
+<p>If you want to compare entire models (multi-field or custom ordering), use the typed options:</p>
+<pre><code class="lang-csharp">new DataGridTextColumnDefinition
+{
+    Header = &quot;Customer&quot;,
+    Binding = DataGridBindingDefinition.Create&lt;Order, string&gt;(o =&gt; o.CustomerName),
+    Options = new DataGridColumnDefinitionOptions&lt;Order&gt;
+    {
+        CompareAscending = (left, right) =&gt; string.Compare(left.CustomerName, right.CustomerName, StringComparison.Ordinal),
+        CompareDescending = (left, right) =&gt; string.Compare(right.CustomerName, left.CustomerName, StringComparison.Ordinal)
+    }
+};
+</code></pre>
+<h2 id="5-searching-text-sources">5. Searching text sources</h2>
+<p>Search uses value accessors by default. For non-string values or template columns, provide a text source:</p>
+<pre><code class="lang-csharp">DataGridColumnSearch.SetTextProvider(nameColumn, item =&gt; ((Person)item).Name);
+</code></pre>
+<p>This keeps search highlights and navigation working without reflection.</p>
+<p>If you provide custom accessors, implement <code>IDataGridColumnTextAccessor</code> (search) and <code>IDataGridColumnFilterAccessor</code> (filtering) to keep the fast path fully typed and avoid object-based fallbacks.</p>
+<h2 id="6-conditional-formatting-and-summaries">6. Conditional formatting and summaries</h2>
+<p>Conditional formatting and summary calculations read values from accessors when available:</p>
+<pre><code class="lang-csharp">formattingModel.Apply(new[]
+{
+    new ConditionalFormattingDescriptor(
+        ruleId: &quot;OverBudget&quot;,
+        columnId: totalColumn,
+        @operator: ConditionalFormattingOperator.GreaterThan,
+        value: 1000m,
+        themeKey: &quot;OverBudgetCellTheme&quot;)
+});
+</code></pre>
+<h2 id="7-state-clipboard-and-export">7. State, clipboard, and export</h2>
+<ul>
+<li>State persistence uses column definition ids by default; provide custom keys if you need stable ids across sessions.</li>
+<li>Clipboard/export bindings can use <code>DataGridBindingDefinition</code> to stay compiled and typed.</li>
+</ul>
+<h2 id="8-grouping-and-other-view-operations">8. Grouping and other view operations</h2>
+<p><code>DataGridPathGroupDescription</code> uses property paths and reflection. For AOT scenarios, implement a custom <code>DataGridGroupDescription</code> that reads values through your accessors.</p>
+<h2 id="related-articles">Related articles</h2>
+<ul>
+<li><a href="column-definitions.html">Column Definitions</a></li>
+<li><a href="column-definitions-aot.html">Column Definitions (AOT-Friendly Bindings)</a></li>
+<li><a href="column-definitions-models.html">Column Definitions (Model Integration)</a></li>
+<li><a href="column-definitions-hierarchical.html">Column Definitions (Hierarchical Columns)</a></li>
+<li><a href="column-definitions-fast-path-overview.html">Column Definitions: Fast Path Overview</a></li>
+</ul>
+
+</article>
+
+        <div class="contribution d-print-none">
+          <a href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/docfx/articles/column-definitions-hot-path.md/#L1" class="edit-link">Edit this page</a>
+        </div>
+
+        <div class="next-article d-print-none border-top" id="nextArticle"></div>
+
+      </div>
+
+      <div class="affix">
+        <nav id="affix"></nav>
+      </div>
+    </main>
+
+
+    <footer class="border-top text-secondary">
+      <div class="container-xxl">
+        <div class="flex-fill">
+          <span>Made with <a href="https://dotnet.github.io/docfx">docfx</a></span>
+        </div>
+      </div>
+    </footer>
+  </body>
+</html>

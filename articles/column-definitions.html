@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+      <title>Column Definitions | ProDataGrid for Avalonia </title>
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <meta name="title" content="Column Definitions | ProDataGrid for Avalonia ">
+      
+      
+      <link rel="icon" href="../favicon.ico">
+      <link rel="stylesheet" href="../public/docfx.min.css">
+      <link rel="stylesheet" href="../public/main.css">
+      <meta name="docfx:navrel" content="../toc.html">
+      <meta name="docfx:tocrel" content="toc.html">
+      
+      
+      
+      
+      <meta name="docfx:docurl" content="https://github.com/wieslawsoltes/ProDataGrid/blob/master/docfx/articles/column-definitions.md/#L1">
+      <meta name="loc:inThisArticle" content="In this article">
+      <meta name="loc:searchResultsCount" content="{count} results for &quot;{query}&quot;">
+      <meta name="loc:searchNoResults" content="No results for &quot;{query}&quot;">
+      <meta name="loc:tocFilter" content="Filter by title">
+      <meta name="loc:nextArticle" content="Next">
+      <meta name="loc:prevArticle" content="Previous">
+      <meta name="loc:themeLight" content="Light">
+      <meta name="loc:themeDark" content="Dark">
+      <meta name="loc:themeAuto" content="Auto">
+      <meta name="loc:changeTheme" content="Change theme">
+      <meta name="loc:copy" content="Copy">
+      <meta name="loc:downloadPdf" content="Download PDF">
+
+      <script type="module" src="./../public/docfx.min.js"></script>
+
+      <script>
+        const theme = localStorage.getItem('theme') || 'auto'
+        document.documentElement.setAttribute('data-bs-theme', theme === 'auto' ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light') : theme)
+      </script>
+
+  </head>
+
+  <body class="tex2jax_ignore" data-layout="" data-yaml-mime="">
+    <header class="bg-body border-bottom">
+      <nav id="autocollapse" class="navbar navbar-expand-md" role="navigation">
+        <div class="container-xxl flex-nowrap">
+          <a class="navbar-brand" href="../index.html">
+            <img id="logo" class="svg" src="../images/logo.svg" alt="">
+            
+          </a>
+          <button class="btn btn-lg d-md-none border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navpanel" aria-controls="navpanel" aria-expanded="false" aria-label="Toggle navigation">
+            <i class="bi bi-three-dots"></i>
+          </button>
+          <div class="collapse navbar-collapse" id="navpanel">
+            <div id="navbar">
+            </div>
+          </div>
+        </div>
+      </nav>
+    </header>
+
+    <main class="container-xxl">
+      <div class="toc-offcanvas">
+        <div class="offcanvas-md offcanvas-start" tabindex="-1" id="tocOffcanvas" aria-labelledby="tocOffcanvasLabel">
+          <div class="offcanvas-header">
+            <h5 class="offcanvas-title" id="tocOffcanvasLabel">Table of Contents</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="offcanvas" data-bs-target="#tocOffcanvas" aria-label="Close"></button>
+          </div>
+          <div class="offcanvas-body">
+            <nav class="toc" id="toc"></nav>
+          </div>
+        </div>
+      </div>
+
+      <div class="content">
+        <div class="actionbar">
+          <button class="btn btn-lg border-0 d-md-none" type="button" data-bs-toggle="offcanvas" data-bs-target="#tocOffcanvas" aria-controls="tocOffcanvas" aria-expanded="false" aria-label="Show table of contents">
+            <i class="bi bi-list"></i>
+          </button>
+
+          <nav id="breadcrumb"></nav>
+        </div>
+
+        <article data-uid="">
+<h1 id="column-definitions">Column Definitions</h1>
+
+<p>Column definitions let you define DataGrid columns as data in a view model. You bind <code>ColumnDefinitionsSource</code> to a list of <code>DataGridColumnDefinition</code> and the grid materializes the built-in column types for you. This keeps view models free of Avalonia control instances and keeps columns fully typed and in sync.</p>
+<h2 id="when-to-use-column-definitions">When to use column definitions</h2>
+<ul>
+<li>You want MVVM-friendly columns without constructing <code>DataGridColumn</code> controls in view models.</li>
+<li>You want to reuse column metadata across multiple views.</li>
+<li>You need string-keyed templates/themes and AOT-friendly compiled bindings.</li>
+</ul>
+<h2 id="basic-setup">Basic setup</h2>
+<pre><code class="lang-xml">&lt;DataGrid ItemsSource=&quot;{Binding Items}&quot;
+          ColumnDefinitionsSource=&quot;{Binding ColumnDefinitions}&quot;
+          AutoGenerateColumns=&quot;False&quot;
+          HeadersVisibility=&quot;All&quot;&gt;
+  &lt;DataGrid.Resources&gt;
+    &lt;DataTemplate x:Key=&quot;StatusBadgeTemplate&quot;&gt;
+      &lt;Border Padding=&quot;6,2&quot; CornerRadius=&quot;8&quot;&gt;
+        &lt;TextBlock Text=&quot;{Binding Status}&quot; /&gt;
+      &lt;/Border&gt;
+    &lt;/DataTemplate&gt;
+  &lt;/DataGrid.Resources&gt;
+&lt;/DataGrid&gt;
+</code></pre>
+<pre><code class="lang-csharp">public DataGridColumnDefinitionList ColumnDefinitions { get; } = new()
+{
+    new DataGridTextColumnDefinition
+    {
+        Header = &quot;First Name&quot;,
+        Binding = DataGridBindingDefinition.Create&lt;Person, string&gt;(p =&gt; p.FirstName),
+        Width = new DataGridLength(1.2, DataGridLengthUnitType.Star)
+    },
+    new DataGridTextColumnDefinition
+    {
+        Header = &quot;Last Name&quot;,
+        Binding = DataGridBindingDefinition.Create&lt;Person, string&gt;(p =&gt; p.LastName),
+        Width = new DataGridLength(1.2, DataGridLengthUnitType.Star)
+    },
+    new DataGridTemplateColumnDefinition
+    {
+        Header = &quot;Badge&quot;,
+        CellTemplateKey = &quot;StatusBadgeTemplate&quot;,
+        IsReadOnly = true
+    }
+};
+</code></pre>
+<h2 id="typed-builder">Typed builder</h2>
+<p>If you prefer a strongly typed builder, use <code>DataGridColumnDefinitionBuilder</code>:</p>
+<pre><code class="lang-csharp">var nameProperty = new ClrPropertyInfo(
+    nameof(Person.Name),
+    target =&gt; ((Person)target).Name,
+    (target, value) =&gt; ((Person)target).Name = (string)value,
+    typeof(string));
+
+var builder = DataGridColumnDefinitionBuilder.For&lt;Person&gt;();
+
+ColumnDefinitions = new DataGridColumnDefinitionList
+{
+    builder.Text(&quot;Name&quot;, nameProperty, p =&gt; p.Name, (p, v) =&gt; p.Name = v),
+    builder.Template(&quot;Badge&quot;, &quot;StatusBadgeTemplate&quot;)
+};
+</code></pre>
+<h2 id="definition-types-and-property-mapping">Definition types and property mapping</h2>
+<p>Each built-in column has a matching <code>*ColumnDefinition</code> type (for example, <code>DataGridTextColumnDefinition</code>). Definition properties mirror the column properties.</p>
+<ul>
+<li><code>Header</code>, <code>Width</code>, <code>MinWidth</code>, <code>MaxWidth</code>, <code>DisplayIndex</code>, <code>IsVisible</code>, <code>CanUserSort</code>, <code>IsReadOnly</code>, and more.</li>
+<li>Template/theme keys: <code>HeaderTemplateKey</code>, <code>CellTemplateKey</code>, <code>CellEditingTemplateKey</code>, <code>HeaderThemeKey</code>, <code>CellThemeKey</code>, <code>FilterThemeKey</code>.</li>
+<li>Style hooks: <code>CellStyleClasses</code>, <code>HeaderStyleClasses</code>.</li>
+<li>Bindings: <code>Binding</code>, <code>SelectedItemBinding</code>, <code>SelectedValueBinding</code>, <code>TextBinding</code>, <code>ClipboardContentBinding</code>, <code>CellBackgroundBinding</code>, and <code>CellForegroundBinding</code>.</li>
+</ul>
+<p>For the full catalog, see <a href="column-types-reference.html">Column Types Reference</a>.</p>
+<h2 id="template-and-theme-keys">Template and theme keys</h2>
+<p>Template and theme properties use string keys and are resolved against grid resources first, then application resources:</p>
+<ul>
+<li><code>HeaderTemplateKey</code>, <code>CellTemplateKey</code>, <code>CellEditingTemplateKey</code>, <code>NewRowCellTemplateKey</code></li>
+<li><code>HeaderThemeKey</code>, <code>CellThemeKey</code>, <code>FilterThemeKey</code></li>
+</ul>
+<p>Keep the templates in <code>DataGrid.Resources</code> or <code>Application.Resources</code> to decouple view models from visuals.</p>
+<h2 id="updates-lifetime-and-threading">Updates, lifetime, and threading</h2>
+<ul>
+<li><code>ColumnDefinitionsSource</code> tracks <code>INotifyCollectionChanged</code> and applies add/remove/reset changes.</li>
+<li>Move/replace notifications are handled incrementally to avoid rebuilding the whole column set.</li>
+<li>Each definition is <code>INotifyPropertyChanged</code>; updates are pushed to the materialized column.</li>
+<li>Changes must happen on the UI thread and the same thread that created the binding.</li>
+<li><code>ColumnDefinitionsSource</code> cannot be used together with bound <code>Columns</code> or inline column declarations.</li>
+</ul>
+<p><code>DataGridColumnDefinitionList</code> adds <code>AddRange</code> and <code>SuspendNotifications()</code> helpers for batching definition changes without triggering per-item updates.</p>
+<h2 id="auto-generated-columns">Auto-generated columns</h2>
+<p>You can combine <code>ColumnDefinitionsSource</code> with <code>AutoGenerateColumns</code>. Use <code>AutoGeneratedColumnsPlacement</code> to place auto-generated columns before or after the definition list.</p>
+<h2 id="bound-columns-and-value-accessors">Bound columns and value accessors</h2>
+<p><code>DataGridBindingDefinition</code> creates a compiled binding and also provides a typed value accessor used by sorting, filtering, searching, and conditional formatting. For computed values or non-binding scenarios, set <code>ValueAccessor</code> (and optionally <code>ValueType</code>) on the definition.</p>
+<pre><code class="lang-csharp">new DataGridTextColumnDefinition
+{
+    Header = &quot;Total&quot;,
+    ValueAccessor = new DataGridColumnValueAccessor&lt;Order, decimal&gt;(o =&gt; o.Price * o.Quantity),
+    ValueType = typeof(decimal),
+    IsReadOnly = true
+};
+</code></pre>
+<h2 id="column-options-for-search-filtering-and-sorting">Column options for search, filtering, and sorting</h2>
+<p><code>DataGridColumnDefinitionOptions</code> lets you attach search/filter/sort metadata to a definition. These settings are applied to the materialized column via the same attached properties used by manual column configuration.</p>
+<p>Key option properties:</p>
+<ul>
+<li>Search: <code>IsSearchable</code>, <code>SearchMemberPath</code>, <code>SearchTextProvider</code>, <code>SearchFormatProvider</code></li>
+<li>Filtering: <code>FilterPredicateFactory</code>, <code>FilterValueAccessor</code></li>
+<li>Sorting: <code>SortValueAccessor</code>, <code>SortValueComparer</code> (and typed comparisons via <code>DataGridColumnDefinitionOptions&lt;TItem&gt;</code>)</li>
+</ul>
+<pre><code class="lang-csharp">var nameOptions = new DataGridColumnDefinitionOptions
+{
+    IsSearchable = true,
+    SearchTextProvider = item =&gt; ((Person)item).Name,
+    SearchFormatProvider = CultureInfo.InvariantCulture,
+    FilterPredicateFactory = descriptor =&gt; item =&gt; ((Person)item).Age &gt;= 18,
+    FilterValueAccessor = new DataGridColumnValueAccessor&lt;Person, int&gt;(p =&gt; p.Age),
+    SortValueAccessor = new DataGridColumnValueAccessor&lt;Person, int&gt;(p =&gt; p.Age)
+};
+
+var nameColumn = new DataGridTextColumnDefinition
+{
+    Header = &quot;Name&quot;,
+    Binding = DataGridBindingDefinition.Create&lt;Person, string&gt;(p =&gt; p.Name),
+    Options = nameOptions
+};
+</code></pre>
+<p>Use <code>SortValueAccessor</code> when the sort key should differ from the displayed value or binding. <code>FilterValueAccessor</code> can similarly target a different value for filtering operations.
+Set <code>SortValueComparer</code> if you need custom ordering for the sort key values.</p>
+<p>For model-level comparisons (no reflection, no boxing for the comparer itself), use the typed options:</p>
+<pre><code class="lang-csharp">var sortOptions = new DataGridColumnDefinitionOptions&lt;Person&gt;
+{
+    CompareAscending = (left, right) =&gt; string.Compare(left.LastName, right.LastName, StringComparison.Ordinal),
+    CompareDescending = (left, right) =&gt; string.Compare(right.LastName, left.LastName, StringComparison.Ordinal)
+};
+</code></pre>
+<h2 id="column-keys">Column keys</h2>
+<p>If you need stable identifiers across column re-materialization, assign <code>ColumnKey</code> on the definition. Model descriptors and state persistence can use that key instead of the definition instance:</p>
+<pre><code class="lang-csharp">new DataGridTextColumnDefinition
+{
+    Header = &quot;Name&quot;,
+    ColumnKey = &quot;name&quot;,
+    Binding = DataGridBindingDefinition.Create&lt;Person, string&gt;(p =&gt; p.Name)
+};
+</code></pre>
+<h2 id="incremental-updates-and-diffing">Incremental updates and diffing</h2>
+<p><code>ColumnDefinitionsSource</code> supports incremental add/remove/move/replace updates and now applies definition property changes incrementally as well. For batches, use <code>BeginUpdate</code>/<code>EndUpdate</code> or a list that can suspend notifications:</p>
+<pre><code class="lang-csharp">var definitions = new DataGridColumnDefinitionList();
+
+using (definitions.SuspendNotifications())
+{
+    definitions.Add(CreateFirstNameColumn());
+    definitions.Add(CreateLastNameColumn());
+}
+</code></pre>
+<p>For single definition updates:</p>
+<pre><code class="lang-csharp">definition.BeginUpdate();
+definition.Header = &quot;Display Name&quot;;
+definition.IsReadOnly = true;
+definition.EndUpdate();
+</code></pre>
+<h2 id="aot-and-fast-path">AOT and fast path</h2>
+<p>Expression-based binding creation requires dynamic code generation. For AOT-friendly bindings and zero-reflection paths, use the overloads that accept a prebuilt <code>CompiledBindingPath</code> or <code>IPropertyInfo</code>. See:</p>
+<ul>
+<li><a href="column-definitions-aot.html">Column Definitions: AOT-Friendly Bindings</a></li>
+<li><a href="column-definitions-models.html">Column Definitions: Model Integration and Fast Path</a></li>
+<li><a href="column-definitions-hot-path.html">Column Definitions: Hot Path Integration</a></li>
+<li><a href="column-definitions-hierarchical.html">Column Definitions: Hierarchical Columns</a></li>
+<li><a href="column-definitions-fast-path-overview.html">Column Definitions: Fast Path Overview</a></li>
+</ul>
+<h2 id="fast-path-options-and-diagnostics">Fast path options and diagnostics</h2>
+<p>Use <code>DataGridFastPathOptions</code> to enforce accessor-only adapters and surface missing accessor diagnostics:</p>
+<pre><code class="lang-csharp">grid.FastPathOptions = new DataGridFastPathOptions
+{
+    UseAccessorsOnly = true,
+    ThrowOnMissingAccessor = true
+};
+
+grid.FastPathOptions.MissingAccessor += (_, args) =&gt;
+    Debug.WriteLine($&quot;{args.Feature}: {args.Message}&quot;);
+</code></pre>
+<p>If you need to bind or reuse a <code>DataGridFastPathOptions</code> instance from a view model, assign it in code-behind because it is a CLR property (not an AvaloniaProperty).</p>
+
+</article>
+
+        <div class="contribution d-print-none">
+          <a href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/docfx/articles/column-definitions.md/#L1" class="edit-link">Edit this page</a>
+        </div>
+
+        <div class="next-article d-print-none border-top" id="nextArticle"></div>
+
+      </div>
+
+      <div class="affix">
+        <nav id="affix"></nav>
+      </div>
+    </main>
+
+
+    <footer class="border-top text-secondary">
+      <div class="container-xxl">
+        <div class="flex-fill">
+          <span>Made with <a href="https://dotnet.github.io/docfx">docfx</a></span>
+        </div>
+      </div>
+    </footer>
+  </body>
+</html>

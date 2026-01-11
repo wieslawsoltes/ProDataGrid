@@ -85,7 +85,7 @@
 
 
   <h1 id="Avalonia_Collections_DataGridComparerSortDescription" data-uid="Avalonia.Collections.DataGridComparerSortDescription" class="text-break">
-Class DataGridComparerSortDescription  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/Collections/DataGridSortDescription.cs/#L302"><i class="bi bi-code-slash"></i></a>
+Class DataGridComparerSortDescription  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/Collections/DataGridSortDescription.cs/#L337"><i class="bi bi-code-slash"></i></a>
   </h1>
 
   <div class="facts text-secondary">
@@ -118,9 +118,6 @@ Class DataGridComparerSortDescription  <a class="header-action link-secondary" t
     <dt>Inherited Members</dt>
     <dd>
     <div>
-      <a class="xref" href="Avalonia.Collections.DataGridSortDescription.html#Avalonia_Collections_DataGridSortDescription_PropertyPath">DataGridSortDescription.PropertyPath</a>
-    </div>
-    <div>
       <a class="xref" href="Avalonia.Collections.DataGridSortDescription.html#Avalonia_Collections_DataGridSortDescription_HasPropertyPath">DataGridSortDescription.HasPropertyPath</a>
     </div>
     <div>
@@ -137,6 +134,15 @@ Class DataGridComparerSortDescription  <a class="header-action link-secondary" t
     </div>
     <div>
       <a class="xref" href="Avalonia.Collections.DataGridSortDescription.html#Avalonia_Collections_DataGridSortDescription_FromComparer_System_Collections_IComparer_System_ComponentModel_ListSortDirection_">DataGridSortDescription.FromComparer(IComparer, ListSortDirection)</a>
+    </div>
+    <div>
+      <a class="xref" href="Avalonia.Collections.DataGridSortDescription.html#Avalonia_Collections_DataGridSortDescription_FromComparer_System_Collections_IComparer_System_ComponentModel_ListSortDirection_System_String_">DataGridSortDescription.FromComparer(IComparer, ListSortDirection, string)</a>
+    </div>
+    <div>
+      <a class="xref" href="Avalonia.Collections.DataGridSortDescription.html#Avalonia_Collections_DataGridSortDescription_FromAccessor_Avalonia_Controls_IDataGridColumnValueAccessor_System_ComponentModel_ListSortDirection_System_Globalization_CultureInfo_System_String_">DataGridSortDescription.FromAccessor(IDataGridColumnValueAccessor, ListSortDirection, CultureInfo, string)</a>
+    </div>
+    <div>
+      <a class="xref" href="Avalonia.Collections.DataGridSortDescription.html#Avalonia_Collections_DataGridSortDescription_FromAccessor__2_Avalonia_Controls_IDataGridColumnValueAccessor___0___1__System_ComponentModel_ListSortDirection_System_Globalization_CultureInfo_System_String_">DataGridSortDescription.FromAccessor&lt;TItem, TValue&gt;(IDataGridColumnValueAccessor&lt;TItem, TValue&gt;, ListSortDirection, CultureInfo, string)</a>
     </div>
     <div>
       <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object)">object.Equals(object)</a>
@@ -174,7 +180,7 @@ Class DataGridComparerSortDescription  <a class="header-action link-secondary" t
 
   <h3 id="Avalonia_Collections_DataGridComparerSortDescription__ctor_System_Collections_IComparer_System_ComponentModel_ListSortDirection_" data-uid="Avalonia.Collections.DataGridComparerSortDescription.#ctor(System.Collections.IComparer,System.ComponentModel.ListSortDirection)">
   DataGridComparerSortDescription(IComparer, ListSortDirection)
-  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/Collections/DataGridSortDescription.cs/#L315"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/Collections/DataGridSortDescription.cs/#L353"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"></div>
@@ -203,6 +209,41 @@ Class DataGridComparerSortDescription  <a class="header-action link-secondary" t
 
 
 
+  <a id="Avalonia_Collections_DataGridComparerSortDescription__ctor_" data-uid="Avalonia.Collections.DataGridComparerSortDescription.#ctor*"></a>
+
+  <h3 id="Avalonia_Collections_DataGridComparerSortDescription__ctor_System_Collections_IComparer_System_ComponentModel_ListSortDirection_System_String_" data-uid="Avalonia.Collections.DataGridComparerSortDescription.#ctor(System.Collections.IComparer,System.ComponentModel.ListSortDirection,System.String)">
+  DataGridComparerSortDescription(IComparer, ListSortDirection, string)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/Collections/DataGridSortDescription.cs/#L358"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public DataGridComparerSortDescription(IComparer comparer, ListSortDirection direction, string propertyPath)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>comparer</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.icomparer">IComparer</a></dt>
+    <dd></dd>
+    <dt><code>direction</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.componentmodel.listsortdirection">ListSortDirection</a></dt>
+    <dd></dd>
+    <dt><code>propertyPath</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+
   <h2 class="section" id="properties">Properties
 </h2>
 
@@ -211,7 +252,7 @@ Class DataGridComparerSortDescription  <a class="header-action link-secondary" t
 
   <h3 id="Avalonia_Collections_DataGridComparerSortDescription_Comparer" data-uid="Avalonia.Collections.DataGridComparerSortDescription.Comparer">
   Comparer
-  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/Collections/DataGridSortDescription.cs/#L313"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/Collections/DataGridSortDescription.cs/#L349"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"></div>
@@ -242,7 +283,7 @@ Class DataGridComparerSortDescription  <a class="header-action link-secondary" t
 
   <h3 id="Avalonia_Collections_DataGridComparerSortDescription_Direction" data-uid="Avalonia.Collections.DataGridComparerSortDescription.Direction">
   Direction
-  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/Collections/DataGridSortDescription.cs/#L314"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/Collections/DataGridSortDescription.cs/#L350"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"></div>
@@ -269,11 +310,42 @@ Class DataGridComparerSortDescription  <a class="header-action link-secondary" t
 
 
 
+  <a id="Avalonia_Collections_DataGridComparerSortDescription_PropertyPath_" data-uid="Avalonia.Collections.DataGridComparerSortDescription.PropertyPath*"></a>
+
+  <h3 id="Avalonia_Collections_DataGridComparerSortDescription_PropertyPath" data-uid="Avalonia.Collections.DataGridComparerSortDescription.PropertyPath">
+  PropertyPath
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/Collections/DataGridSortDescription.cs/#L351"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public override string PropertyPath { get; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
   <a id="Avalonia_Collections_DataGridComparerSortDescription_SourceComparer_" data-uid="Avalonia.Collections.DataGridComparerSortDescription.SourceComparer*"></a>
 
   <h3 id="Avalonia_Collections_DataGridComparerSortDescription_SourceComparer" data-uid="Avalonia.Collections.DataGridComparerSortDescription.SourceComparer">
   SourceComparer
-  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/Collections/DataGridSortDescription.cs/#L312"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/Collections/DataGridSortDescription.cs/#L348"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"></div>
@@ -308,7 +380,7 @@ Class DataGridComparerSortDescription  <a class="header-action link-secondary" t
 
   <h3 id="Avalonia_Collections_DataGridComparerSortDescription_SwitchSortDirection" data-uid="Avalonia.Collections.DataGridComparerSortDescription.SwitchSortDirection">
   SwitchSortDirection()
-  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/Collections/DataGridSortDescription.cs/#L331"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/Collections/DataGridSortDescription.cs/#L375"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"></div>
@@ -339,7 +411,7 @@ Class DataGridComparerSortDescription  <a class="header-action link-secondary" t
 </article>
 
         <div class="contribution d-print-none">
-          <a href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/Collections/DataGridSortDescription.cs/#L302" class="edit-link">Edit this page</a>
+          <a href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/Collections/DataGridSortDescription.cs/#L337" class="edit-link">Edit this page</a>
         </div>
 
 
