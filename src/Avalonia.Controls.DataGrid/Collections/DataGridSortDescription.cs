@@ -326,7 +326,7 @@ internal
                 throw new ArgumentNullException(nameof(accessor));
             }
 
-            var comparer = new DataGridColumnValueAccessorComparer<TItem, TValue>(accessor, culture);
+            var comparer = DataGridColumnValueAccessorComparer<TItem, TValue>.Create(accessor, culture);
             return string.IsNullOrEmpty(propertyPath)
                 ? FromComparer(comparer, direction)
                 : FromComparer(comparer, direction, propertyPath);

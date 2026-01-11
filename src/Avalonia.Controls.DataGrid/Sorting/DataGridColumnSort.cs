@@ -29,6 +29,16 @@ namespace Avalonia.Controls.DataGridSorting
                 "ValueComparer",
                 typeof(DataGridColumnSort));
 
+        public static readonly AttachedProperty<IComparer> AscendingComparerProperty =
+            AvaloniaProperty.RegisterAttached<DataGridColumn, IComparer>(
+                "AscendingComparer",
+                typeof(DataGridColumnSort));
+
+        public static readonly AttachedProperty<IComparer> DescendingComparerProperty =
+            AvaloniaProperty.RegisterAttached<DataGridColumn, IComparer>(
+                "DescendingComparer",
+                typeof(DataGridColumnSort));
+
         public static void SetValueAccessor(AvaloniaObject target, IDataGridColumnValueAccessor value)
         {
             target.SetValue(ValueAccessorProperty, value);
@@ -47,6 +57,26 @@ namespace Avalonia.Controls.DataGridSorting
         public static IComparer GetValueComparer(AvaloniaObject target)
         {
             return target.GetValue(ValueComparerProperty);
+        }
+
+        public static void SetAscendingComparer(AvaloniaObject target, IComparer value)
+        {
+            target.SetValue(AscendingComparerProperty, value);
+        }
+
+        public static IComparer GetAscendingComparer(AvaloniaObject target)
+        {
+            return target.GetValue(AscendingComparerProperty);
+        }
+
+        public static void SetDescendingComparer(AvaloniaObject target, IComparer value)
+        {
+            target.SetValue(DescendingComparerProperty, value);
+        }
+
+        public static IComparer GetDescendingComparer(AvaloniaObject target)
+        {
+            return target.GetValue(DescendingComparerProperty);
         }
     }
 }

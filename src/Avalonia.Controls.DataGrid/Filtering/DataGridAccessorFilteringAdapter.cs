@@ -7,6 +7,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Globalization;
+using System.Runtime.CompilerServices;
 using Avalonia.Controls;
 
 namespace Avalonia.Controls.DataGridFiltering
@@ -18,9 +19,13 @@ namespace Avalonia.Controls.DataGridFiltering
 #endif
     sealed class DataGridAccessorFilteringAdapter : DataGridFilteringAdapter
     {
+        private static readonly object s_cultureComparerLock = new();
+        private static readonly Dictionary<CultureInfo, IComparer<object>> s_cultureComparers = new();
+
         private readonly Func<IEnumerable<DataGridColumn>> _columnProvider;
         private readonly bool _throwOnMissingAccessor;
         private readonly DataGridFastPathOptions _options;
+        private Dictionary<PredicateCacheKey, Func<object, bool>> _predicateCache;
 
         public DataGridAccessorFilteringAdapter(
             IFilteringModel model,
@@ -67,18 +72,26 @@ namespace Avalonia.Controls.DataGridFiltering
         {
             if (descriptors == null || descriptors.Count == 0)
             {
+                _predicateCache = null;
                 return null;
             }
+
+            var previousCache = _predicateCache;
+            var nextCache = previousCache != null
+                ? new Dictionary<PredicateCacheKey, Func<object, bool>>(previousCache.Count)
+                : new Dictionary<PredicateCacheKey, Func<object, bool>>();
 
             var compiled = new List<Func<object, bool>>();
             foreach (var descriptor in descriptors)
             {
-                var predicate = Compile(descriptor);
+                var predicate = Compile(descriptor, previousCache, nextCache);
                 if (predicate != null)
                 {
                     compiled.Add(predicate);
                 }
             }
+
+            _predicateCache = nextCache;
 
             if (compiled.Count == 0)
             {
@@ -104,7 +117,10 @@ namespace Avalonia.Controls.DataGridFiltering
             };
         }
 
-        private Func<object, bool> Compile(FilteringDescriptor descriptor)
+        private Func<object, bool> Compile(
+            FilteringDescriptor descriptor,
+            Dictionary<PredicateCacheKey, Func<object, bool>> previousCache,
+            Dictionary<PredicateCacheKey, Func<object, bool>> nextCache)
         {
             if (descriptor == null)
             {
@@ -117,7 +133,8 @@ namespace Avalonia.Controls.DataGridFiltering
                 var factory = DataGridColumnFilter.GetPredicateFactory(column);
                 if (factory != null)
                 {
-                    return factory(descriptor);
+                    var key = new PredicateCacheKey(descriptor, factory, null);
+                    return GetOrCreateCachedPredicate(key, previousCache, nextCache, () => factory(descriptor));
                 }
             }
 
@@ -168,21 +185,93 @@ namespace Avalonia.Controls.DataGridFiltering
                 return null;
             }
 
-            if (accessor is IDataGridColumnFilterAccessor typedFilterAccessor)
+            var accessorKey = new PredicateCacheKey(descriptor, accessor, null);
+            return GetOrCreateCachedPredicate(accessorKey, previousCache, nextCache, () =>
             {
-                return item =>
+                if (accessor is IDataGridColumnFilterAccessor typedFilterAccessor)
                 {
-                    if (typedFilterAccessor.TryMatch(item, descriptor, out var match))
+                    return item =>
                     {
-                        return match;
-                    }
+                        if (typedFilterAccessor.TryMatch(item, descriptor, out var match))
+                        {
+                            return match;
+                        }
 
-                    var value = accessor.GetValue(item);
-                    return EvaluateDescriptor(value, descriptor);
-                };
+                        var value = accessor.GetValue(item);
+                        return EvaluateDescriptor(value, descriptor);
+                    };
+                }
+
+                return item => EvaluateDescriptor(accessor.GetValue(item), descriptor);
+            });
+        }
+
+        private readonly struct PredicateCacheKey : IEquatable<PredicateCacheKey>
+        {
+            public PredicateCacheKey(FilteringDescriptor descriptor, object primary, object secondary)
+            {
+                Descriptor = descriptor;
+                Primary = primary;
+                Secondary = secondary;
             }
 
-            return item => EvaluateDescriptor(accessor.GetValue(item), descriptor);
+            public FilteringDescriptor Descriptor { get; }
+
+            public object Primary { get; }
+
+            public object Secondary { get; }
+
+            public bool Equals(PredicateCacheKey other)
+            {
+                return Equals(Descriptor, other.Descriptor)
+                    && ReferenceEquals(Primary, other.Primary)
+                    && ReferenceEquals(Secondary, other.Secondary);
+            }
+
+            public override bool Equals(object obj)
+            {
+                return obj is PredicateCacheKey other && Equals(other);
+            }
+
+            public override int GetHashCode()
+            {
+                unchecked
+                {
+                    var hash = Descriptor?.GetHashCode() ?? 0;
+                    if (Primary != null)
+                    {
+                        hash = (hash * 397) ^ RuntimeHelpers.GetHashCode(Primary);
+                    }
+
+                    if (Secondary != null)
+                    {
+                        hash = (hash * 397) ^ RuntimeHelpers.GetHashCode(Secondary);
+                    }
+
+                    return hash;
+                }
+            }
+        }
+
+        private static Func<object, bool> GetOrCreateCachedPredicate(
+            PredicateCacheKey key,
+            Dictionary<PredicateCacheKey, Func<object, bool>> previousCache,
+            Dictionary<PredicateCacheKey, Func<object, bool>> nextCache,
+            Func<Func<object, bool>> factory)
+        {
+            if (previousCache != null && previousCache.TryGetValue(key, out var cached))
+            {
+                nextCache[key] = cached;
+                return cached;
+            }
+
+            var created = factory();
+            if (created != null)
+            {
+                nextCache[key] = created;
+            }
+
+            return created;
         }
 
         private static bool EvaluateDescriptor(object value, FilteringDescriptor descriptor)
@@ -291,6 +380,26 @@ namespace Avalonia.Controls.DataGridFiltering
             return false;
         }
 
+        private static IComparer<object> GetComparer(CultureInfo culture)
+        {
+            if (culture == null)
+            {
+                return Comparer<object>.Default;
+            }
+
+            lock (s_cultureComparerLock)
+            {
+                if (!s_cultureComparers.TryGetValue(culture, out var comparer))
+                {
+                    comparer = Comparer<object>.Create((x, y) =>
+                        string.Compare(Convert.ToString(x, culture), Convert.ToString(y, culture), StringComparison.Ordinal));
+                    s_cultureComparers[culture] = comparer;
+                }
+
+                return comparer;
+            }
+        }
+
         private static int Compare(object left, object right, CultureInfo culture)
         {
             if (left == null && right == null)
@@ -313,12 +422,7 @@ namespace Avalonia.Controls.DataGridFiltering
                 return comparable.CompareTo(right);
             }
 
-            var comparer = culture != null
-                ? Comparer<object>.Create((x, y) =>
-                    string.Compare(Convert.ToString(x, culture), Convert.ToString(y, culture), StringComparison.Ordinal))
-                : Comparer<object>.Default;
-
-            return comparer.Compare(left, right);
+            return GetComparer(culture).Compare(left, right);
         }
 
         private static bool Between(object value, IReadOnlyList<object> bounds, CultureInfo culture)

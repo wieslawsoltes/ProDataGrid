@@ -363,6 +363,12 @@ namespace Avalonia.Controls.DataGridSorting
                 return new SortingDescriptor(columnId, direction, comparer: column.CustomSortComparer, culture: culture);
             }
 
+            var directionalComparer = GetDirectionalComparer(column, direction);
+            if (directionalComparer != null)
+            {
+                return new SortingDescriptor(columnId, direction, comparer: directionalComparer, culture: culture);
+            }
+
             var sortValueComparer = DataGridColumnSort.GetValueComparer(column);
             var sortAccessor = DataGridColumnSort.GetValueAccessor(column);
             if (sortAccessor != null || sortValueComparer != null)
@@ -441,6 +447,12 @@ namespace Avalonia.Controls.DataGridSorting
                 if (column.CustomSortComparer != null)
                 {
                     return DataGridSortDescription.FromComparer(column.CustomSortComparer, descriptor.Direction);
+                }
+
+                var directionalComparer = GetDirectionalComparer(column, descriptor.Direction);
+                if (directionalComparer != null)
+                {
+                    return DataGridSortDescription.FromComparer(directionalComparer, descriptor.Direction);
                 }
 
                 var sortValueComparer = DataGridColumnSort.GetValueComparer(column);
@@ -543,7 +555,7 @@ namespace Avalonia.Controls.DataGridSorting
                 }
 
                 var column = FindColumnForDescriptor(descriptor);
-                if (column != null && TryBuildComparer(column, descriptor.Culture, out var comparer))
+                if (column != null && TryBuildComparer(column, descriptor.Direction, descriptor.Culture, out var comparer))
                 {
                     var propertyPath = !string.IsNullOrEmpty(descriptor.PropertyPath)
                         ? descriptor.PropertyPath
@@ -589,7 +601,31 @@ namespace Avalonia.Controls.DataGridSorting
             return null;
         }
 
-        private bool TryBuildComparer(DataGridColumn column, CultureInfo culture, out IComparer comparer)
+        private IComparer GetDirectionalComparer(DataGridColumn column, ListSortDirection direction)
+        {
+            if (column == null)
+            {
+                return null;
+            }
+
+            if (direction == ListSortDirection.Ascending)
+            {
+                return DataGridColumnSort.GetAscendingComparer(column);
+            }
+
+            if (direction == ListSortDirection.Descending)
+            {
+                var comparer = DataGridColumnSort.GetDescendingComparer(column);
+                if (comparer != null)
+                {
+                    return new DataGridInvertedComparer(comparer);
+                }
+            }
+
+            return null;
+        }
+
+        private bool TryBuildComparer(DataGridColumn column, ListSortDirection direction, CultureInfo culture, out IComparer comparer)
         {
             comparer = null;
             if (column == null)
@@ -600,6 +636,13 @@ namespace Avalonia.Controls.DataGridSorting
             if (column.CustomSortComparer != null)
             {
                 comparer = column.CustomSortComparer;
+                return true;
+            }
+
+            var directionalComparer = GetDirectionalComparer(column, direction);
+            if (directionalComparer != null)
+            {
+                comparer = directionalComparer;
                 return true;
             }
 
@@ -652,12 +695,26 @@ namespace Avalonia.Controls.DataGridSorting
 
                 if (sort is DataGridComparerSortDescription comparerSort)
                 {
-                    if (column.CustomSortComparer != null && Equals(column.CustomSortComparer, comparerSort.SourceComparer))
+                    var sourceComparer = comparerSort.SourceComparer;
+                    if (column.CustomSortComparer != null && Equals(column.CustomSortComparer, sourceComparer))
                     {
                         return column;
                     }
 
-                    if (comparerSort.SourceComparer is IDataGridColumnValueAccessorComparer accessorComparer)
+                    var unwrappedComparer = DataGridSortComparerHelpers.Unwrap(sourceComparer);
+                    var ascendingComparer = DataGridColumnSort.GetAscendingComparer(column);
+                    if (ascendingComparer != null && ReferenceEquals(ascendingComparer, unwrappedComparer))
+                    {
+                        return column;
+                    }
+
+                    var descendingComparer = DataGridColumnSort.GetDescendingComparer(column);
+                    if (descendingComparer != null && ReferenceEquals(descendingComparer, unwrappedComparer))
+                    {
+                        return column;
+                    }
+
+                    if (sourceComparer is IDataGridColumnValueAccessorComparer accessorComparer)
                     {
                         var sortAccessor = DataGridColumnSort.GetValueAccessor(column);
                         var accessor = sortAccessor ?? DataGridColumnMetadata.GetValueAccessor(column);
