@@ -584,6 +584,26 @@ public class DataGridSelectionPropertyTests
         AssertSelected();
     }
 
+    [AvaloniaFact]
+    public void RefreshSelectionFromModel_Resets_Invalid_CurrentSlot()
+    {
+        var items = new ObservableCollection<string> { "A", "B" };
+        var grid = CreateGrid(items);
+        grid.UpdateLayout();
+
+        grid.SelectedIndex = 0;
+        grid.UpdateLayout();
+
+        SetPrivateProperty(grid, "CurrentColumnIndex", 0);
+        SetPrivateProperty(grid, "CurrentSlot", grid.SlotCount);
+
+        grid.RefreshSelectionFromModel();
+        grid.UpdateLayout();
+
+        Assert.True(grid.CurrentSlot >= 0 && grid.CurrentSlot < grid.SlotCount);
+        Assert.Equal(grid.SlotFromRowIndex(0), grid.CurrentSlot);
+    }
+
     private static DataGrid CreateGrid(IEnumerable items)
     {
         var root = new Window
@@ -609,6 +629,13 @@ public class DataGridSelectionPropertyTests
         root.Content = grid;
         root.Show();
         return grid;
+    }
+
+    private static void SetPrivateProperty<TValue>(object target, string propertyName, TValue value)
+    {
+        var property = target.GetType().GetProperty(propertyName, BindingFlags.Instance | BindingFlags.NonPublic);
+        Assert.NotNull(property);
+        property!.SetValue(target, value);
     }
 
     private sealed class VisibleColumnItem

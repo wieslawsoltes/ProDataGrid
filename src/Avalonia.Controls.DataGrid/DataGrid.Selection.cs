@@ -68,7 +68,7 @@ internal
                 {
                     slot = backupSlot;
                 }
-                if (slot < 0 || slot > SlotCount)
+                if (slot < 0 || slot >= SlotCount)
                 {
                     return;
                 }
@@ -291,6 +291,12 @@ internal
             _syncingSelectionModel = true;
             try
             {
+                if (CurrentColumnIndex > -1 && (CurrentSlot < 0 || CurrentSlot >= SlotCount))
+                {
+                    CurrentColumnIndex = -1;
+                    CurrentSlot = -1;
+                }
+
                 var indexes = _selectionModelAdapter?.Model.SelectedIndexes;
                 if (_selectionModelAdapter?.Model.Source == null || indexes == null || indexes.Count == 0)
                 {
