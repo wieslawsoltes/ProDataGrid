@@ -219,7 +219,13 @@ internal
             {
                 return;
             }
-            OwningGrid.OnCellPointerPressed(new DataGridCellPointerPressedEventArgs(this, OwningRow, OwningColumn, e));
+            var owningRow = OwningRow;
+            if (owningRow == null || owningRow.Slot < 0)
+            {
+                return;
+            }
+
+            OwningGrid.OnCellPointerPressed(new DataGridCellPointerPressedEventArgs(this, owningRow, OwningColumn, e));
 
             var point = e.GetCurrentPoint(this);
             if (point.Properties.IsLeftButtonPressed)
