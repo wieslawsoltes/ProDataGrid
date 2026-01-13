@@ -70,6 +70,61 @@ public class DataGridKeyboardHelperGuardTests
         window.Close();
     }
 
+    [AvaloniaFact]
+    public void PointerPressed_With_Invalid_Row_Slot_Does_Not_Throw()
+    {
+        var items = new ObservableCollection<RowItem>
+        {
+            new() { Name = "Alpha" },
+            new() { Name = "Beta" }
+        };
+
+        var window = new Window
+        {
+            Width = 400,
+            Height = 200
+        };
+
+        window.SetThemeStyles();
+
+        var grid = new DataGrid
+        {
+            ItemsSource = items,
+            AutoGenerateColumns = false,
+            SelectionMode = DataGridSelectionMode.Single,
+            SelectionUnit = DataGridSelectionUnit.FullRow,
+            CanUserAddRows = false,
+            CanUserDeleteRows = false,
+            IsTabStop = false
+        };
+
+        grid.ColumnsInternal.Add(new DataGridTextColumn
+        {
+            Header = "Name",
+            Binding = new Binding(nameof(RowItem.Name))
+        });
+
+        window.Content = grid;
+        window.Show();
+        grid.UpdateLayout();
+
+        var slot = grid.SlotFromRowIndex(0);
+        var row = grid.DisplayData.GetDisplayedElement(slot) as DataGridRow;
+        Assert.NotNull(row);
+
+        var cell = row!.Cells[0];
+        Assert.NotNull(cell);
+
+        row.Slot = -1;
+
+        var args = CreateLeftPointerArgs(cell);
+        var exception = Record.Exception(() => cell.RaiseEvent(args));
+
+        Assert.Null(exception);
+
+        window.Close();
+    }
+
     private static PointerPressedEventArgs CreateLeftPointerArgs(Control target)
     {
         var pointer = new Pointer(Pointer.GetNextFreeId(), PointerType.Mouse, isPrimary: true);
