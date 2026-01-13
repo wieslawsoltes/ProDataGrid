@@ -1004,7 +1004,12 @@ internal
 
             if (dataTemplate is not null)
             {
-                return dataTemplate.Build(content);
+                var templateContent = dataTemplate.Build(content);
+                if (templateContent is StyledElement styledElement)
+                {
+                    styledElement.DataContext = content;
+                }
+                return templateContent;
             }
             return content;
         }

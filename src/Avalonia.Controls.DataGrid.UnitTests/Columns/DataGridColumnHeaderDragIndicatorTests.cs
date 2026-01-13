@@ -7,6 +7,7 @@ using System.Reflection;
 using Avalonia.Controls;
 using Avalonia.Controls.Shapes;
 using Avalonia.Controls.Templates;
+using Avalonia.Data;
 using Avalonia.Headless.XUnit;
 using Avalonia.VisualTree;
 using Xunit;
@@ -34,6 +35,32 @@ public class DataGridColumnHeaderDragIndicatorTests
 
             Assert.IsType<Rectangle>(result);
             Assert.IsNotType<HeaderInfo>(result);
+        }
+        finally
+        {
+            root.Close();
+        }
+    }
+
+    [AvaloniaFact]
+    public void DragIndicatorContent_Uses_Header_Content_As_DataContext_For_Templated_Header()
+    {
+        var (grid, root, column, headerInfo) = CreateGridWithTemplatedHeader();
+
+        try
+        {
+            var header = GetHeaderForColumn(grid, column);
+
+            Assert.NotNull(header.GetVisualRoot());
+
+            var method = typeof(DataGridColumnHeader).GetMethod(
+                "GetDragIndicatorContent",
+                BindingFlags.Instance | BindingFlags.NonPublic);
+
+            var result = method!.Invoke(header, new object?[] { header.Content, header.ContentTemplate });
+
+            var textBlock = Assert.IsType<TextBlock>(result);
+            Assert.Same(headerInfo, textBlock.DataContext);
         }
         finally
         {
@@ -89,6 +116,47 @@ public class DataGridColumnHeaderDragIndicatorTests
         return (grid, root, column);
     }
 
+    private static (DataGrid grid, Window root, DataGridTemplateColumn column, HeaderInfo headerInfo) CreateGridWithTemplatedHeader()
+    {
+        var items = new ObservableCollection<Row>
+        {
+            new("A")
+        };
+
+        var headerInfo = new HeaderInfo("Status", "templated");
+        var column = new DataGridTemplateColumn
+        {
+            Header = headerInfo,
+            HeaderTemplate = new HeaderInfoTemplate(),
+            CellTemplate = new FuncDataTemplate<Row>((row, _) => new TextBlock
+            {
+                Text = row.Name
+            })
+        };
+
+        var grid = new DataGrid
+        {
+            AutoGenerateColumns = false,
+            ItemsSource = items,
+            DataContext = new HeaderInfo("Grid", "context")
+        };
+
+        grid.ColumnsInternal.Add(column);
+
+        var root = new Window
+        {
+            Width = 300,
+            Height = 200
+        };
+
+        root.SetThemeStyles();
+        root.Content = grid;
+        root.Show();
+        grid.UpdateLayout();
+
+        return (grid, root, column, headerInfo);
+    }
+
     private static DataGridColumnHeader GetHeaderForColumn(DataGrid grid, DataGridColumn column)
     {
         return grid.GetVisualDescendants()
@@ -107,6 +175,22 @@ public class DataGridColumnHeaderDragIndicatorTests
         public string Title { get; }
 
         public string Detail { get; }
+    }
+
+    private sealed class HeaderInfoTemplate : IDataTemplate
+    {
+        public Control Build(object? param)
+        {
+            return new TextBlock
+            {
+                [!TextBlock.TextProperty] = new Binding(nameof(HeaderInfo.Title))
+            };
+        }
+
+        public bool Match(object? data)
+        {
+            return data is HeaderInfo;
+        }
     }
 
     private sealed class Row
