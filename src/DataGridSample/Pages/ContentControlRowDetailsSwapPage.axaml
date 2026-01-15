@@ -1,0 +1,103 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:viewModels="clr-namespace:DataGridSample.ViewModels"
+             x:Class="DataGridSample.Pages.ContentControlRowDetailsSwapPage"
+             x:DataType="viewModels:ContentControlSwapViewModel">
+  <UserControl.DataContext>
+    <viewModels:ContentControlSwapViewModel />
+  </UserControl.DataContext>
+
+  <Grid Margin="12"
+        RowDefinitions="Auto,Auto,*"
+        ColumnDefinitions="*"
+        RowSpacing="8">
+    <StackPanel Spacing="4">
+      <TextBlock Classes="h2">ContentControl row details swap</TextBlock>
+      <TextBlock Text="Swap the selected item to rebuild a DataGrid with row details inside a ContentControl. This mirrors master/detail navigation where DataGrids are created and destroyed rapidly."
+                 TextWrapping="Wrap" />
+    </StackPanel>
+
+    <StackPanel Grid.Row="1" Orientation="Horizontal" Spacing="6" VerticalAlignment="Center">
+      <Button Content="Start" Command="{Binding StartCommand}" />
+      <Button Content="Stop" Command="{Binding StopCommand}" />
+      <Button Content="Swap Once" Command="{Binding SwapOnceCommand}" />
+      <TextBlock Text="Interval (ms)" VerticalAlignment="Center" Margin="12 0 0 0" />
+      <NumericUpDown Width="90"
+                     Minimum="5"
+                     Maximum="500"
+                     Increment="5"
+                     Value="{Binding IntervalMs, Mode=TwoWay}" />
+      <TextBlock Text="{Binding RunState}" VerticalAlignment="Center" Margin="12 0 0 0" />
+      <TextBlock Text="{Binding SwapCount, StringFormat='Swaps: {0}'}"
+                 VerticalAlignment="Center"
+                 Margin="6 0 0 0" />
+    </StackPanel>
+
+    <Border Grid.Row="2"
+            BorderBrush="{DynamicResource SystemControlForegroundBaseMediumBrush}"
+            BorderThickness="1"
+            CornerRadius="4"
+            Padding="8">
+      <Grid ColumnDefinitions="220,*" ColumnSpacing="12">
+        <StackPanel Grid.Column="0" Spacing="6">
+          <TextBlock Classes="h3" Text="Items" />
+          <ListBox ItemsSource="{Binding Items}"
+                   SelectedItem="{Binding SelectedItem}">
+            <ListBox.ItemTemplate>
+              <DataTemplate x:DataType="viewModels:ContentControlSwapViewModel+ItemViewModel">
+                <TextBlock Text="{Binding Name}" />
+              </DataTemplate>
+            </ListBox.ItemTemplate>
+          </ListBox>
+        </StackPanel>
+
+        <ContentControl Grid.Column="1"
+                        Content="{Binding SelectedItem}">
+          <ContentControl.DataTemplates>
+            <DataTemplate x:DataType="viewModels:ContentControlSwapViewModel+ItemViewModel">
+              <StackPanel Spacing="6">
+                <TextBlock Classes="h3" Text="{Binding Name}" />
+                <DataGrid ItemsSource="{Binding Rows}"
+                          AutoGenerateColumns="False"
+                          HeadersVisibility="All"
+                          Height="360"
+                          RowDetailsVisibilityMode="Visible">
+                  <DataGrid.RowDetailsTemplate>
+                    <DataTemplate x:DataType="viewModels:ContentControlSwapViewModel+RowViewModel">
+                      <Border Background="{DynamicResource SystemControlBackgroundBaseLowBrush}"
+                              BorderBrush="{DynamicResource SystemControlForegroundBaseMediumBrush}"
+                              BorderThickness="1"
+                              CornerRadius="4"
+                              Padding="8"
+                              Margin="0,4,0,6">
+                        <StackPanel Spacing="4">
+                          <TextBlock Text="{Binding Note}" TextWrapping="Wrap" />
+                          <TextBlock Text="{Binding Value, StringFormat='Value: {0}'}"
+                                     Foreground="{DynamicResource SystemControlForegroundBaseMediumBrush}" />
+                        </StackPanel>
+                      </Border>
+                    </DataTemplate>
+                  </DataGrid.RowDetailsTemplate>
+                  <DataGrid.Columns>
+                    <DataGridTextColumn Header="Name"
+                                        Binding="{Binding Name}"
+                                        Width="2*"
+                                        x:DataType="viewModels:ContentControlSwapViewModel+RowViewModel" />
+                    <DataGridTextColumn Header="Value"
+                                        Binding="{Binding Value}"
+                                        Width="*"
+                                        x:DataType="viewModels:ContentControlSwapViewModel+RowViewModel" />
+                    <DataGridTextColumn Header="Note"
+                                        Binding="{Binding Note}"
+                                        Width="2*"
+                                        x:DataType="viewModels:ContentControlSwapViewModel+RowViewModel" />
+                  </DataGrid.Columns>
+                </DataGrid>
+              </StackPanel>
+            </DataTemplate>
+          </ContentControl.DataTemplates>
+        </ContentControl>
+      </Grid>
+    </Border>
+  </Grid>
+</UserControl>

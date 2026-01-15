@@ -107,6 +107,9 @@
     <TabItem Header="ContentControl Swap">
       <pages:ContentControlSwapPage />
     </TabItem>
+    <TabItem Header="ContentControl Row Details Swap">
+      <pages:ContentControlRowDetailsSwapPage />
+    </TabItem>
     <TabItem Header="Detach While Editing">
       <pages:DetachWhileEditingPage />
     </TabItem>
