@@ -28023,6 +28023,19 @@ references:
   isSpec: "True"
   fullName: Avalonia.Controls.DataGridRowGroupHeader.OnApplyTemplate
   nameWithType: DataGridRowGroupHeader.OnApplyTemplate
+- uid: Avalonia.Controls.DataGridRowGroupHeader.OnAttachedToLogicalTree(Avalonia.LogicalTree.LogicalTreeAttachmentEventArgs)
+  name: OnAttachedToLogicalTree(LogicalTreeAttachmentEventArgs)
+  href: api/Avalonia.Controls.DataGridRowGroupHeader.html#Avalonia_Controls_DataGridRowGroupHeader_OnAttachedToLogicalTree_Avalonia_LogicalTree_LogicalTreeAttachmentEventArgs_
+  commentId: M:Avalonia.Controls.DataGridRowGroupHeader.OnAttachedToLogicalTree(Avalonia.LogicalTree.LogicalTreeAttachmentEventArgs)
+  fullName: Avalonia.Controls.DataGridRowGroupHeader.OnAttachedToLogicalTree(Avalonia.LogicalTree.LogicalTreeAttachmentEventArgs)
+  nameWithType: DataGridRowGroupHeader.OnAttachedToLogicalTree(LogicalTreeAttachmentEventArgs)
+- uid: Avalonia.Controls.DataGridRowGroupHeader.OnAttachedToLogicalTree*
+  name: OnAttachedToLogicalTree
+  href: api/Avalonia.Controls.DataGridRowGroupHeader.html#Avalonia_Controls_DataGridRowGroupHeader_OnAttachedToLogicalTree_
+  commentId: Overload:Avalonia.Controls.DataGridRowGroupHeader.OnAttachedToLogicalTree
+  isSpec: "True"
+  fullName: Avalonia.Controls.DataGridRowGroupHeader.OnAttachedToLogicalTree
+  nameWithType: DataGridRowGroupHeader.OnAttachedToLogicalTree
 - uid: Avalonia.Controls.DataGridRowGroupHeader.OnDetachedFromLogicalTree(Avalonia.LogicalTree.LogicalTreeAttachmentEventArgs)
   name: OnDetachedFromLogicalTree(LogicalTreeAttachmentEventArgs)
   href: api/Avalonia.Controls.DataGridRowGroupHeader.html#Avalonia_Controls_DataGridRowGroupHeader_OnDetachedFromLogicalTree_Avalonia_LogicalTree_LogicalTreeAttachmentEventArgs_
