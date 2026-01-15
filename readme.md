@@ -52,6 +52,34 @@ Basic XAML usage:
 </DataGrid>
 ```
 
+## Nightly Packages (GitHub Packages)
+
+Nightly builds are published to GitHub Packages with versions like `11.3.9-nightly.20241227.123`.
+
+Add the GitHub Packages feed (requires a GitHub token with `read:packages`):
+
+```sh
+dotnet nuget add source https://nuget.pkg.github.com/wieslawsoltes/index.json \
+  --name github \
+  --username YOUR_GITHUB_USERNAME \
+  --password YOUR_GITHUB_TOKEN \
+  --store-password-in-clear-text
+```
+
+GitHub Packages NuGet docs: https://docs.github.com/en/packages/working-with-a-github-packages-registry/working-with-the-nuget-registry
+
+Install a nightly package:
+
+```sh
+dotnet add package ProDataGrid --source github --prerelease
+```
+
+Or pin a specific nightly version:
+
+```sh
+dotnet add package ProDataGrid --source github --version 11.3.9-nightly.20241227.123
+```
+
 ## Documentation
 
 - DocFX articles: `docfx/articles/intro.md`
