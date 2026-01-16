@@ -4,6 +4,7 @@
 // All other rights reserved.
 
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 
 using Avalonia.Input;
@@ -246,8 +247,11 @@ internal
 
             double rowDesiredWidth = OwningGrid.RowHeadersDesiredWidth + OwningGrid.ColumnsInternal.VisibleEdgedColumnsWidth + OwningGrid.ColumnsInternal.FillerColumn.FillerWidth;
             double topEdge = -OwningGrid.NegVerticalOffset;
+            var displayedElements = new HashSet<Control>();
             foreach (Control element in OwningGrid.DisplayData.GetScrollingElements())
             {
+                displayedElements.Add(element);
+
                 if (element is DataGridRow row)
                 {
                     Debug.Assert(row.Index != -1); // A displayed row should always have its index
@@ -287,7 +291,15 @@ internal
             var offScreenRect = new Rect(-10000, -10000, 0, 0);
             foreach (Control child in Children)
             {
-                if (!child.IsVisible)
+                if (!displayedElements.Contains(child))
+                {
+                    if (child.IsVisible)
+                    {
+                        OwningGrid.HideRecycledElement(child);
+                    }
+                    child.Arrange(offScreenRect);
+                }
+                else if (!child.IsVisible)
                 {
                     child.Arrange(offScreenRect);
                 }

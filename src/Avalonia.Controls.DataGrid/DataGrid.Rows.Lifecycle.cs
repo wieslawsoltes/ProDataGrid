@@ -251,7 +251,7 @@ namespace Avalonia.Controls
                         // Deleted Row is within our Viewport, update the AvailableRowRoom
                         AvailableSlotElementRoom += elementDeleted.DesiredSize.Height;
                     }
-                    else
+                    else if (_suppressVerticalOffsetAdjustments == 0)
                     {
                         // Deleted Row is above our Viewport, update the vertical offset
                         SetVerticalOffset(Math.Max(0, _verticalOffset - RowHeightEstimate));

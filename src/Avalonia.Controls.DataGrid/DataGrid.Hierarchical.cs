@@ -3,6 +3,7 @@
 
 using Avalonia.Collections;
 using Avalonia.Data;
+using Avalonia.Utilities;
 
 namespace Avalonia.Controls
 {
@@ -180,6 +181,7 @@ namespace Avalonia.Controls
                 return;
             }
 
+            var needsReset = false;
             var requestPointerOverRefresh = false;
             var slot = DisplayData.FirstScrollingSlot;
             while (slot >= 0 && slot <= DisplayData.LastScrollingSlot)
@@ -188,6 +190,11 @@ namespace Avalonia.Controls
                 if (element is DataGridRow row)
                 {
                     var stateChanged = false;
+                    if (!row.IsVisible)
+                    {
+                        row.ClearValue(Visual.IsVisibleProperty);
+                        stateChanged = true;
+                    }
                     if (row.Slot != slot)
                     {
                         row.Slot = slot;
@@ -216,6 +223,10 @@ namespace Avalonia.Controls
                             row.IsPlaceholder = isPlaceholder;
                             stateChanged = true;
                         }
+                    }
+                    else if (rowIndex >= 0)
+                    {
+                        needsReset = true;
                     }
                     if (row.Index != rowIndex)
                     {
@@ -264,6 +275,22 @@ namespace Avalonia.Controls
                 if (requestPointerOverRefresh)
                 {
                     RequestPointerOverRefresh();
+                }
+            }
+
+            if (needsReset)
+            {
+                ResetDisplayedRows();
+                var displayHeight = CellsEstimatedHeight;
+                var firstSlot = DisplayData.FirstScrollingSlot;
+                var lastVisibleSlot = LastVisibleSlot;
+                if (firstSlot < 0 || firstSlot > lastVisibleSlot)
+                {
+                    firstSlot = FirstVisibleSlot;
+                }
+                if (firstSlot >= 0 && MathUtilities.GreaterThan(displayHeight, 0))
+                {
+                    UpdateDisplayedRows(firstSlot, displayHeight);
                 }
             }
         }

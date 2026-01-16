@@ -261,6 +261,34 @@ namespace Avalonia.Controls
             }
         }
 
+        internal void UnloadScrollingElement(Control element, int slot, bool updateSlotInformation, bool wasDeleted)
+        {
+            if (element == null)
+            {
+                UnloadScrollingElement(slot, updateSlotInformation, wasDeleted);
+                return;
+            }
+
+            int elementIndex = _scrollingElements.IndexOf(element);
+            if (elementIndex < 0)
+            {
+                UnloadScrollingElement(slot, updateSlotInformation, wasDeleted);
+                return;
+            }
+
+            if (elementIndex < _headScrollingElements)
+            {
+                _headScrollingElements--;
+            }
+
+            _scrollingElements.RemoveAt(elementIndex);
+
+            if (updateSlotInformation)
+            {
+                UpdateSlotIndexesAfterUnload(slot, wasDeleted);
+            }
+        }
+
         internal void CorrectSlotsAfterDeletion(int slot, bool wasCollapsed)
         {
             if (wasCollapsed)

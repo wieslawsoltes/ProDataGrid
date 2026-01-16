@@ -1,0 +1,107 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:hier="clr-namespace:Avalonia.Controls.DataGridHierarchical;assembly=Avalonia.Controls.DataGrid"
+             xmlns:viewModels="clr-namespace:DataGridSample.ViewModels"
+             x:Class="DataGridSample.Pages.HierarchicalCollapseGapsPage"
+             x:DataType="viewModels:HierarchicalCollapseGapsViewModel">
+  <UserControl.DataContext>
+    <viewModels:HierarchicalCollapseGapsViewModel />
+  </UserControl.DataContext>
+
+  <Grid Margin="12"
+        ColumnDefinitions="2*,*"
+        RowDefinitions="Auto,Auto,*"
+        ColumnSpacing="12"
+        RowSpacing="8">
+    <StackPanel Grid.Row="0" Grid.ColumnSpan="2" Spacing="4">
+      <TextBlock Classes="h2"
+                 Text="Hierarchical collapse gap check" />
+      <TextBlock TextWrapping="Wrap"
+                 Text="Scroll to trigger row recycling, then expand/collapse nodes with many descendants. The grid should not leave empty gaps." />
+    </StackPanel>
+
+    <WrapPanel Grid.Row="1"
+               Grid.ColumnSpan="2"
+               VerticalAlignment="Center">
+      <Button Content="Expand all"
+              Command="{Binding ExpandAllCommand}"
+              Margin="0 0 8 8" />
+      <Button Content="Collapse all"
+              Command="{Binding CollapseAllCommand}"
+              Margin="0 0 8 8" />
+      <Button Content="Reset data"
+              Command="{Binding ResetCommand}"
+              Margin="0 0 8 8" />
+      <TextBlock Text="{Binding VisibleCount, StringFormat='Visible: {0}'}"
+                 VerticalAlignment="Center"
+                 Margin="0 0 8 8" />
+      <TextBlock Text="{Binding SelectedCount, StringFormat='Selected: {0}'}"
+                 VerticalAlignment="Center"
+                 Margin="0 0 8 8" />
+    </WrapPanel>
+
+    <DataGrid Grid.Row="2"
+              Grid.Column="0"
+              AutoGenerateColumns="False"
+              HierarchicalModel="{Binding Model}"
+              HierarchicalRowsEnabled="True"
+              UseLogicalScrollable="True"
+              Selection="{Binding SelectionModel}"
+              SelectionMode="Extended"
+              AutoScrollToSelectedItem="True"
+              HeadersVisibility="Column"
+              GridLinesVisibility="Horizontal"
+              RowHeight="24"
+              x:DataType="viewModels:HierarchicalCollapseGapsViewModel">
+      <DataGrid.Styles>
+        <Style Selector="DataGridRow"
+               x:DataType="hier:HierarchicalNode"
+               x:CompileBindings="False">
+          <Setter Property="Height" Value="{Binding Item.RowHeight}" />
+        </Style>
+      </DataGrid.Styles>
+      <DataGrid.Columns>
+        <DataGridHierarchicalColumn Header="Name"
+                                    Width="2*"
+                                    x:CompileBindings="False"
+                                    Binding="{Binding Item}">
+          <DataGridHierarchicalColumn.CellTemplate>
+            <DataTemplate x:DataType="viewModels:HierarchicalCollapseGapsViewModel+TreeItem">
+              <TextBlock Text="{Binding Name}" />
+            </DataTemplate>
+          </DataGridHierarchicalColumn.CellTemplate>
+        </DataGridHierarchicalColumn>
+
+        <DataGridTemplateColumn Header="Depth"
+                                Width="80"
+                                x:CompileBindings="False">
+          <DataGridTemplateColumn.CellTemplate>
+            <DataTemplate x:DataType="hier:HierarchicalNode">
+              <TextBlock Text="{Binding Level}" />
+            </DataTemplate>
+          </DataGridTemplateColumn.CellTemplate>
+        </DataGridTemplateColumn>
+      </DataGrid.Columns>
+    </DataGrid>
+
+    <StackPanel Grid.Row="2"
+                Grid.Column="1"
+                Spacing="8">
+      <TextBlock Classes="h3"
+                 Text="Checklist" />
+      <Border BorderBrush="{DynamicResource SystemControlForegroundBaseMediumBrush}"
+              BorderThickness="1"
+              CornerRadius="4"
+              Padding="8">
+        <StackPanel Spacing="6">
+          <TextBlock TextWrapping="Wrap"
+                     Text="1. Scroll down to recycle rows." />
+          <TextBlock TextWrapping="Wrap"
+                     Text="2. Expand/collapse a child with many descendants." />
+          <TextBlock TextWrapping="Wrap"
+                     Text="3. Verify there are no blank rows after collapse." />
+        </StackPanel>
+      </Border>
+    </StackPanel>
+  </Grid>
+</UserControl>

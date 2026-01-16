@@ -14,6 +14,7 @@ using Avalonia.Controls;
 using Avalonia.Controls.Primitives;
 using Avalonia.Controls.DataGridHierarchical;
 using Avalonia.Controls.DataGridSorting;
+using Avalonia.Controls.Selection;
 using Avalonia.Controls.Templates;
 using Avalonia.Data;
 using Avalonia.Headless.XUnit;
@@ -907,7 +908,131 @@ public class HierarchicalHeadlessTests
         PumpLayout(grid);
 
         ValidateDisplayedRows(grid, model);
+        AssertDisplayDataRangeValid(grid);
         AssertVisibleRowsAreContiguous(grid);
+        AssertNoVisibleRowsOutsideDisplayData(grid);
+        AssertHiddenRowsAreOffscreen(grid);
+
+        window.Close();
+    }
+
+    [AvaloniaFact]
+    public void Collapsing_Node_Does_Not_Leave_Visible_Rows_Outside_DisplayData()
+    {
+        var root = CreateTree("Root", childCount: 180, grandchildCount: 4);
+        using var themeScope = UseApplicationTheme(DataGridTheme.SimpleV2);
+
+        var model = new HierarchicalModel(new HierarchicalOptions
+        {
+            ChildrenSelector = o => ((Item)o).Children,
+            AutoExpandRoot = true,
+            MaxAutoExpandDepth = 1,
+            VirtualizeChildren = true
+        });
+        model.SetRoot(root);
+        model.Expand(model.Root!);
+
+        var grid = new DataGrid
+        {
+            HierarchicalModel = model,
+            HierarchicalRowsEnabled = true,
+            AutoGenerateColumns = false,
+            UseLogicalScrollable = true,
+            RowHeight = 24
+        };
+
+        grid.ColumnsInternal.Add(new DataGridHierarchicalColumn
+        {
+            Header = "Name",
+            Binding = new Avalonia.Data.Binding("Item.Name")
+        });
+
+        var window = new Window
+        {
+            Width = 420,
+            Height = 240,
+            Content = grid
+        };
+
+        window.SetThemeStyles(DataGridTheme.SimpleV2);
+        window.Show();
+        PumpLayout(grid);
+
+        var scrollViewer = grid.ScrollViewer;
+        Assert.NotNull(scrollViewer);
+        scrollViewer!.Offset = new Vector(0, 600);
+        PumpLayout(grid);
+
+        var node = FindExpandableNode(grid);
+        grid.ScrollIntoView(node, grid.ColumnsInternal[0]);
+        PumpLayout(grid);
+        if (node.IsExpanded)
+        {
+            model.Collapse(node);
+            PumpLayout(grid);
+        }
+
+        ValidateDisplayedRows(grid, model);
+        AssertDisplayDataRangeValid(grid);
+        AssertNoVisibleRowsOutsideDisplayData(grid);
+        AssertHiddenRowsAreOffscreen(grid);
+
+        window.Close();
+    }
+
+    [AvaloniaFact]
+    public void Collapsing_Root_Rebuilds_DisplayData_Range()
+    {
+        var root = CreateTree("Root", childCount: 160, grandchildCount: 3);
+        using var themeScope = UseApplicationTheme(DataGridTheme.SimpleV2);
+
+        var model = new HierarchicalModel(new HierarchicalOptions
+        {
+            ChildrenSelector = o => ((Item)o).Children,
+            AutoExpandRoot = true,
+            MaxAutoExpandDepth = 1,
+            VirtualizeChildren = true
+        });
+        model.SetRoot(root);
+        model.Expand(model.Root!);
+
+        var grid = new DataGrid
+        {
+            HierarchicalModel = model,
+            HierarchicalRowsEnabled = true,
+            AutoGenerateColumns = false,
+            UseLogicalScrollable = true,
+            RowHeight = 24
+        };
+
+        grid.ColumnsInternal.Add(new DataGridHierarchicalColumn
+        {
+            Header = "Name",
+            Binding = new Avalonia.Data.Binding("Item.Name")
+        });
+
+        var window = new Window
+        {
+            Width = 420,
+            Height = 240,
+            Content = grid
+        };
+
+        window.SetThemeStyles(DataGridTheme.SimpleV2);
+        window.Show();
+        PumpLayout(grid);
+
+        var scrollViewer = grid.ScrollViewer;
+        Assert.NotNull(scrollViewer);
+        scrollViewer!.Offset = new Vector(0, 800);
+        PumpLayout(grid);
+
+        model.Collapse(model.Root!);
+        PumpLayout(grid);
+
+        ValidateDisplayedRows(grid, model);
+        AssertDisplayDataRangeValid(grid);
+        AssertHiddenRowsAreOffscreen(grid);
 
         window.Close();
     }
@@ -971,6 +1096,112 @@ public class HierarchicalHeadlessTests
         var scrollViewer = grid.ScrollViewer;
         Assert.NotNull(scrollViewer);
         scrollViewer!.Offset = new Vector(0, 580);
+        PumpLayout(grid);
+
+        var recycled = GetVisibleRows(grid).Any(row =>
+            initialContexts.TryGetValue(row, out var oldContext) &&
+            !ReferenceEquals(oldContext, row.DataContext));
+        Assert.True(recycled);
+
+        var node = FindExpandableNode(grid);
+        grid.ScrollIntoView(node, grid.ColumnsInternal[0]);
+        PumpLayout(grid);
+        if (node.IsExpanded)
+        {
+            model.Collapse(node);
+            PumpLayout(grid);
+        }
+        model.Expand(node);
+        PumpLayout(grid);
+
+        var lastGrandchild = ((Item)node.Item).Children.LastOrDefault();
+        Assert.NotNull(lastGrandchild);
+        var lastGrandchildNode = model.FindNode(lastGrandchild!);
+        Assert.NotNull(lastGrandchildNode);
+
+        grid.ScrollIntoView(lastGrandchildNode!, grid.ColumnsInternal[0]);
+        PumpLayout(grid);
+
+        grid.ScrollIntoView(node, grid.ColumnsInternal[0]);
+        PumpLayout(grid);
+
+        model.Collapse(node);
+        PumpLayout(grid);
+
+        ValidateDisplayedRows(grid, model);
+        AssertVisibleRowsAreContiguous(grid);
+        AssertVisibleRowsHaveExpectedText(grid);
+
+        window.Close();
+    }
+
+    [AvaloniaFact]
+    public void Collapsing_Templated_Node_With_SelectionModel_Does_Not_Leave_Gaps()
+    {
+        var root = CreateTreeWithRowHeights("Root", childCount: 180, grandchildCount: 3);
+        using var themeScope = UseApplicationTheme(DataGridTheme.SimpleV2);
+
+        var model = new HierarchicalModel(new HierarchicalOptions
+        {
+            ChildrenSelector = o => ((Item)o).Children,
+            AutoExpandRoot = true,
+            MaxAutoExpandDepth = 1,
+            VirtualizeChildren = true
+        });
+        model.SetRoot(root);
+        model.Expand(model.Root!);
+
+        var selectionModel = new SelectionModel<HierarchicalNode> { SingleSelect = false };
+
+        var grid = new DataGrid
+        {
+            HierarchicalModel = model,
+            HierarchicalRowsEnabled = true,
+            AutoGenerateColumns = false,
+            UseLogicalScrollable = true,
+            RowHeight = 24,
+            AutoScrollToSelectedItem = true,
+            Selection = selectionModel,
+            SelectionMode = DataGridSelectionMode.Extended
+        };
+
+        grid.ColumnsInternal.Add(new DataGridHierarchicalColumn
+        {
+            Header = "Name",
+            CellTemplate = new FuncDataTemplate<HierarchicalNode>((_, _) => new TextBlock
+            {
+                [!TextBlock.TextProperty] = new Binding("Item.Name")
+            })
+        });
+
+        grid.Styles.Add(new Style(x => x.OfType<DataGridRow>())
+        {
+            Setters =
+            {
+                new Setter(DataGridRow.HeightProperty, new Binding("Item.RowHeight"))
+            }
+        });
+
+        var window = new Window
+        {
+            Width = 420,
+            Height = 240,
+            Content = grid
+        };
+
+        window.SetThemeStyles(DataGridTheme.SimpleV2);
+        window.Show();
+        PumpLayout(grid);
+
+        selectionModel.Select(0);
+        PumpLayout(grid);
+
+        var initialRows = GetVisibleRows(grid);
+        var initialContexts = initialRows.ToDictionary(row => row, row => row.DataContext);
+
+        var scrollViewer = grid.ScrollViewer;
+        Assert.NotNull(scrollViewer);
+        scrollViewer!.Offset = new Vector(0, 620);
         PumpLayout(grid);
 
         var recycled = GetVisibleRows(grid).Any(row =>
@@ -1109,12 +1340,25 @@ public class HierarchicalHeadlessTests
         {
             if (element is DataGridRow row)
             {
+                Assert.True(row.IsVisible);
                 Assert.InRange(row.Index, 0, model.Count - 1);
                 Assert.True(seen.Add(row.Index));
 
                 var node = row.DataContext as HierarchicalNode;
                 Assert.NotNull(node);
                 Assert.Same(model.GetNode(row.Index), node);
+            }
+        }
+    }
+
+    private static void AssertNoVisibleRowsOutsideDisplayData(DataGrid grid)
+    {
+        var displayElements = new HashSet<Control>(grid.DisplayData.GetScrollingElements());
+        foreach (var row in grid.GetSelfAndVisualDescendants().OfType<DataGridRow>())
+        {
+            if (row.IsVisible)
+            {
+                Assert.True(displayElements.Contains(row));
             }
         }
     }
@@ -1320,6 +1564,34 @@ public class HierarchicalHeadlessTests
                 .OfType<TextBlock>()
                 .Any(textBlock => textBlock.Text == expected);
             Assert.True(hasMatch);
+        }
+    }
+
+    private static void AssertDisplayDataRangeValid(DataGrid grid)
+    {
+        var display = grid.DisplayData;
+        var lastVisibleSlot = grid.LastVisibleSlot;
+
+        if (lastVisibleSlot < 0)
+        {
+            Assert.True(display.FirstScrollingSlot < 0);
+            Assert.True(display.LastScrollingSlot < 0);
+            return;
+        }
+
+        Assert.InRange(display.FirstScrollingSlot, 0, lastVisibleSlot);
+        Assert.InRange(display.LastScrollingSlot, display.FirstScrollingSlot, lastVisibleSlot);
+    }
+
+    private static void AssertHiddenRowsAreOffscreen(DataGrid grid, double threshold = 1000)
+    {
+        var displayElements = new HashSet<Control>(grid.DisplayData.GetScrollingElements());
+        foreach (var row in grid.GetSelfAndVisualDescendants().OfType<DataGridRow>())
+        {
+            if (!row.IsVisible)
+            {
+                Assert.False(displayElements.Contains(row));
+            }
         }
     }
 

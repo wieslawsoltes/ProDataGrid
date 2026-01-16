@@ -343,15 +343,7 @@ namespace Avalonia.Controls
                 _rowsPresenter.Children.Remove(element);
             }
 
-            // Update DisplayData
-            if (wasDeleted)
-            {
-                DisplayData.CorrectSlotsAfterDeletion(slot, wasCollapsed: false);
-            }
-            else
-            {
-                DisplayData.UnloadScrollingElement(slot, updateSlotInformation, wasDeleted: false);
-            }
+            DisplayData.UnloadScrollingElement(element, slot, updateSlotInformation, wasDeleted);
         }
 
 

@@ -101,6 +101,9 @@
     <TabItem Header="Hierarchical Range Collection Changes">
       <pages:HierarchicalRangeCollectionChangesPage />
     </TabItem>
+    <TabItem Header="Hierarchical Collapse Gaps">
+      <pages:HierarchicalCollapseGapsPage />
+    </TabItem>
     <TabItem Header="ItemsSource Swap">
       <pages:ItemsSourceSwapPage />
     </TabItem>
