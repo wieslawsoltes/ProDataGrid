@@ -21,6 +21,11 @@
       <Button Content="Start" Command="{Binding StartCommand}" />
       <Button Content="Stop" Command="{Binding StopCommand}" />
       <Button Content="Swap Once" Command="{Binding SwapOnceCommand}" />
+      <CheckBox Content="Swap on UI thread"
+                IsChecked="{Binding UseUiThreadSwap}"
+                VerticalAlignment="Center"
+                Margin="12 0 0 0" />
+      <TextBlock Text="{Binding SwapMode}" VerticalAlignment="Center" Margin="4 0 0 0" />
       <TextBlock Text="Interval (ms)" VerticalAlignment="Center" Margin="12 0 0 0" />
       <NumericUpDown Width="90"
                      Minimum="5"

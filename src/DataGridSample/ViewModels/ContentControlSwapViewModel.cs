@@ -1,5 +1,7 @@
 using System;
 using System.Collections.ObjectModel;
+using System.Threading;
+using System.Threading.Tasks;
 using Avalonia.Threading;
 using DataGridSample.Mvvm;
 
@@ -13,6 +15,8 @@ namespace DataGridSample.ViewModels
         private int _intervalMs = 40;
         private long _swapCount;
         private int _nextIndex;
+        private bool _useUiThreadSwap = true;
+        private CancellationTokenSource? _swapCts;
 
         public ContentControlSwapViewModel()
         {
@@ -89,6 +93,25 @@ namespace DataGridSample.ViewModels
 
         public string RunState => IsRunning ? "Running" : "Stopped";
 
+        public bool UseUiThreadSwap
+        {
+            get => _useUiThreadSwap;
+            set
+            {
+                if (SetProperty(ref _useUiThreadSwap, value))
+                {
+                    OnPropertyChanged(nameof(SwapMode));
+                    if (IsRunning)
+                    {
+                        Stop();
+                        Start();
+                    }
+                }
+            }
+        }
+
+        public string SwapMode => UseUiThreadSwap ? "UI thread" : "Background thread";
+
         private void Start()
         {
             if (IsRunning)
@@ -96,8 +119,14 @@ namespace DataGridSample.ViewModels
                 return;
             }
 
-            _timer.Interval = TimeSpan.FromMilliseconds(_intervalMs);
-            _timer.Start();
+            if (UseUiThreadSwap)
+            {
+                StartTimer();
+            }
+            else
+            {
+                StartBackgroundLoop();
+            }
             IsRunning = true;
         }
 
@@ -108,8 +137,55 @@ namespace DataGridSample.ViewModels
                 return;
             }
 
-            _timer.Stop();
+            StopTimer();
+            StopBackgroundLoop();
             IsRunning = false;
+        }
+
+        private void StartTimer()
+        {
+            _timer.Interval = TimeSpan.FromMilliseconds(_intervalMs);
+            _timer.Start();
+        }
+
+        private void StopTimer()
+        {
+            _timer.Stop();
+        }
+
+        private void StartBackgroundLoop()
+        {
+            _swapCts?.Cancel();
+            _swapCts = new CancellationTokenSource();
+            var token = _swapCts.Token;
+
+            Task.Run(async () =>
+            {
+                while (!token.IsCancellationRequested)
+                {
+                    try
+                    {
+                        await Task.Delay(_intervalMs, token).ConfigureAwait(false);
+                    }
+                    catch (TaskCanceledException)
+                    {
+                        break;
+                    }
+
+                    if (token.IsCancellationRequested)
+                    {
+                        break;
+                    }
+
+                    SwapSelection();
+                }
+            }, token);
+        }
+
+        private void StopBackgroundLoop()
+        {
+            _swapCts?.Cancel();
+            _swapCts = null;
         }
 
         private void SwapSelection()
