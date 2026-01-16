@@ -584,37 +584,30 @@ internal
         /// </summary>
         private void EnsureRowPrepared(int slot)
         {
-            if (OwningGrid == null)
+            if (OwningGrid == null || OwningGrid.DataConnection == null)
                 return;
 
-            // Get or create a row from the recycling pool
+            int dataIndex = OwningGrid.RowIndexFromSlot(slot);
+            if (dataIndex < 0 || dataIndex >= OwningGrid.DataConnection.Count)
+            {
+                return;
+            }
+
+            var dataItem = OwningGrid.DataConnection.GetDataItem(dataIndex);
+            if (dataItem == null)
+            {
+                return;
+            }
+
+            // Get a recycled row, but always return it to the pool to avoid
+            // leaving visible containers outside DisplayData.
             var row = OwningGrid.DisplayData.GetRecycledRow();
             if (row == null)
             {
-                // If no recycled row available, we'll let normal realization handle it
                 return;
             }
 
-            // Prepare the row for the slot
-            try
-            {
-                int dataIndex = OwningGrid.RowIndexFromSlot(slot);
-                if (dataIndex >= 0 && dataIndex < OwningGrid.DataConnection.Count)
-                {
-                    var dataItem = OwningGrid.DataConnection.GetDataItem(dataIndex);
-                    if (dataItem != null)
-                    {
-                        // Configure the row but keep it in recyclable state
-                        // It will be properly added when it scrolls into view
-                        OwningGrid.DisplayData.RecycleRow(row);
-                    }
-                }
-            }
-            catch
-            {
-                // If preparation fails, just recycle the row back
-                OwningGrid.DisplayData.RecycleRow(row);
-            }
+            OwningGrid.DisplayData.RecycleRow(row);
         }
 
         /// <summary>
