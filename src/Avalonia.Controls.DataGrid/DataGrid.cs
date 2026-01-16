@@ -2666,35 +2666,68 @@ internal
                 return;
             }
 
-            var hasAnchor = TryGetHierarchicalAnchorHint(e, out var anchor);
+            var canApplyChanges = CanApplyHierarchicalFlattenedChanges(e);
+            var hasAnchor = false;
+            HierarchicalAnchor anchor = default;
+
+            hasAnchor = TryGetHierarchicalAnchorHint(e, out anchor);
             if (!hasAnchor)
             {
                 hasAnchor = TryGetHierarchicalAnchor(e, out anchor);
             }
-            UpdateRowHeightEstimatorForHierarchicalChange(e.Changes);
-            if (hasAnchor)
+
+            if (!canApplyChanges)
             {
-                var newSlot = SlotFromRowIndex(anchor.NewRowIndex);
-                if (newSlot >= 0)
+                UpdateRowHeightEstimatorForHierarchicalChange(e.Changes);
+                if (hasAnchor && TryGetHierarchicalScrollOffset(e.Changes, anchor, out var pendingOffset))
                 {
-                    var estimator = RowHeightEstimator;
-                    var estimatedNewBaseOffset = estimator != null
-                        ? EstimateOffsetToVisibleSlot(newSlot, estimator)
-                        : newSlot * RowHeightEstimate;
-                    var delta = estimatedNewBaseOffset - anchor.EstimatedOldBaseOffset;
-                    if (!ChangesAffectAnchor(e.Changes, anchor.OldRowIndex))
-                    {
-                        delta = 0;
-                    }
-                    _pendingHierarchicalScrollOffset = Math.Max(0, anchor.ContentOffset + delta - anchor.ViewportOffset);
+                    _pendingHierarchicalScrollOffset = pendingOffset;
                 }
+                else
+                {
+                    _pendingHierarchicalScrollOffset = null;
+                }
+            }
+            else
+            {
+                _pendingHierarchicalScrollOffset = null;
             }
             var indexMap = e.IndexMap;
             using (_hierarchicalModel?.BeginVirtualizationGuard())
             using (_rowsPresenter?.BeginVirtualizationGuard())
             {
                 RemapSelectionForHierarchyChange(indexMap);
-                RefreshRowsAndColumns(clearRows: false);
+                if (canApplyChanges)
+                {
+                    var suppressOffsetAdjustments = hasAnchor;
+                    if (suppressOffsetAdjustments)
+                    {
+                        _suppressVerticalOffsetAdjustments++;
+                    }
+                    try
+                    {
+                        ApplyHierarchicalFlattenedChanges(e.Changes);
+                    }
+                    finally
+                    {
+                        if (suppressOffsetAdjustments)
+                        {
+                            _suppressVerticalOffsetAdjustments = Math.Max(0, _suppressVerticalOffsetAdjustments - 1);
+                        }
+                    }
+                    if (suppressOffsetAdjustments &&
+                        TryGetHierarchicalScrollOffset(e.Changes, anchor, out var anchorOffset))
+                    {
+                        ApplyHierarchicalScrollOffset(anchorOffset);
+                    }
+                    RefreshHierarchicalIndentation();
+                    EnsureDisplayedRowsInRange();
+                    InvalidateMeasure();
+                }
+                else
+                {
+                    RefreshRowsAndColumns(clearRows: false);
+                }
                 if (CurrentColumnIndex > -1 && (CurrentSlot < 0 || CurrentSlot >= SlotCount))
                 {
                     CurrentColumnIndex = -1;
@@ -2705,6 +2738,124 @@ internal
             }
 
             OnCollectionChangedForSummaries(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset));
+        }
+
+        private bool CanApplyHierarchicalFlattenedChanges(FlattenedChangedEventArgs e)
+        {
+            if (e?.Changes == null || e.Changes.Count == 0)
+            {
+                return false;
+            }
+
+            if (DataConnection?.CollectionView is IDataGridCollectionView view && view.IsGrouping)
+            {
+                return false;
+            }
+
+            if (_selectionModelAdapter == null || ColumnsItemsInternal.Count == 0)
+            {
+                return false;
+            }
+
+            var hasChanges = false;
+            var count = e.IndexMap?.OldCount ?? SlotCount;
+            if (count < 0)
+            {
+                count = SlotCount;
+            }
+
+            foreach (var change in e.Changes)
+            {
+                if (change.Index < 0 || change.Index > count)
+                {
+                    return false;
+                }
+
+                if (change.OldCount < 0 || change.NewCount < 0)
+                {
+                    return false;
+                }
+
+                if (change.OldCount > count - change.Index)
+                {
+                    return false;
+                }
+
+                if (change.OldCount > 0 || change.NewCount > 0)
+                {
+                    hasChanges = true;
+                }
+
+                count += change.NewCount - change.OldCount;
+                if (count < 0)
+                {
+                    return false;
+                }
+            }
+
+            return hasChanges;
+        }
+
+        private void ApplyHierarchicalFlattenedChanges(IReadOnlyList<FlattenedChange> changes)
+        {
+            if (changes == null || changes.Count == 0)
+            {
+                return;
+            }
+
+            foreach (var change in changes)
+            {
+                for (var i = 0; i < change.OldCount; i++)
+                {
+                    RemoveRowAt(change.Index, null);
+                }
+
+                for (var i = 0; i < change.NewCount; i++)
+                {
+                    InsertRowAt(change.Index + i);
+                }
+            }
+        }
+
+        private void EnsureDisplayedRowsInRange()
+        {
+            if (DisplayData == null || DisplayData.FirstScrollingSlot < 0)
+            {
+                return;
+            }
+
+            if (SlotCount == 0 || ColumnsItemsInternal.Count == 0)
+            {
+                ResetDisplayedRows();
+                return;
+            }
+
+            var lastVisibleSlot = LastVisibleSlot;
+            if (lastVisibleSlot < 0)
+            {
+                ResetDisplayedRows();
+                return;
+            }
+
+            if (DisplayData.FirstScrollingSlot > lastVisibleSlot ||
+                DisplayData.LastScrollingSlot > lastVisibleSlot)
+            {
+                var firstSlot = Math.Min(DisplayData.FirstScrollingSlot, lastVisibleSlot);
+                if (firstSlot < 0)
+                {
+                    ResetDisplayedRows();
+                    return;
+                }
+
+                var displayHeight = CellsEstimatedHeight;
+                if (!MathUtilities.GreaterThan(displayHeight, 0))
+                {
+                    ResetDisplayedRows();
+                    return;
+                }
+
+                UpdateDisplayedRows(firstSlot, displayHeight);
+            }
         }
 
         private bool TryGetHierarchicalAnchorHint(FlattenedChangedEventArgs e, out HierarchicalAnchor anchor)
@@ -2731,6 +2882,61 @@ internal
                 hint.EstimatedOldBaseOffset);
 
             return true;
+        }
+
+        private bool TryGetHierarchicalScrollOffset(IReadOnlyList<FlattenedChange> changes, HierarchicalAnchor anchor, out double offset)
+        {
+            offset = 0;
+            var newSlot = SlotFromRowIndex(anchor.NewRowIndex);
+            if (newSlot < 0)
+            {
+                return false;
+            }
+
+            var estimator = RowHeightEstimator;
+            var estimatedNewBaseOffset = estimator != null
+                ? EstimateOffsetToVisibleSlot(newSlot, estimator)
+                : newSlot * RowHeightEstimate;
+            var delta = estimatedNewBaseOffset - anchor.EstimatedOldBaseOffset;
+            if (!ChangesAffectAnchor(changes, anchor.OldRowIndex))
+            {
+                delta = 0;
+            }
+
+            offset = Math.Max(0, anchor.ContentOffset + delta - anchor.ViewportOffset);
+            return true;
+        }
+
+        private void ApplyHierarchicalScrollOffset(double offset)
+        {
+            _pendingHierarchicalScrollOffset = null;
+
+            if (!UseLogicalScrollable)
+            {
+                return;
+            }
+
+            if (_scrollViewer != null)
+            {
+                var current = _scrollViewer.Offset;
+                if (!MathUtilities.AreClose(current.Y, offset))
+                {
+                    _scrollViewer.Offset = new Vector(current.X, offset);
+                }
+                return;
+            }
+
+            if (_rowsPresenter != null)
+            {
+                var current = _rowsPresenter.Offset;
+                if (!MathUtilities.AreClose(current.Y, offset))
+                {
+                    _rowsPresenter.Offset = new Vector(current.X, offset);
+                }
+                return;
+            }
+
+            _pendingHierarchicalScrollOffset = offset;
         }
 
         private bool TryGetHierarchicalAnchor(FlattenedChangedEventArgs e, out HierarchicalAnchor anchor)
