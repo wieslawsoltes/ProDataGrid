@@ -1585,18 +1585,12 @@ public class HierarchicalHeadlessTests
 
     private static void AssertHiddenRowsAreOffscreen(DataGrid grid, double threshold = 1000)
     {
-        if (grid.Bounds.Height <= 0)
-        {
-            return;
-        }
-
+        var displayElements = new HashSet<Control>(grid.DisplayData.GetScrollingElements());
         foreach (var row in grid.GetSelfAndVisualDescendants().OfType<DataGridRow>())
         {
             if (!row.IsVisible)
             {
-                var offscreen = row.Bounds.Bottom < -threshold ||
-                    row.Bounds.Y > grid.Bounds.Height + threshold;
-                Assert.True(offscreen);
+                Assert.False(displayElements.Contains(row));
             }
         }
     }
