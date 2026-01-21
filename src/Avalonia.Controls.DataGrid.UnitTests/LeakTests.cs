@@ -10,9 +10,11 @@ using System.Threading.Tasks;
 using System.Windows.Input;
 using Avalonia.Collections;
 using Avalonia.Headless;
+using Avalonia.Input;
 using Avalonia.Threading;
 using Avalonia.Controls.Templates;
 using Avalonia.Data;
+using Avalonia.Controls.DataGridClipboard;
 using Avalonia.Controls.DataGridConditionalFormatting;
 using Avalonia.Controls.DataGridFiltering;
 using Avalonia.Controls.DataGridHierarchical;
@@ -1336,6 +1338,246 @@ public class LeakTests
         GC.KeepAlive(result);
     }
 
+
+    [Fact]
+    [SuppressMessage("Usage", "xUnit1031:Do not use blocking task operations in test method", Justification = "Needed for dotMemoryUnit to work")]
+    public void DataGrid_ClipboardImport_DoesNotLeak()
+    {
+        if (!dotMemoryApi.IsEnabled)
+        {
+            return;
+        }
+
+        var items = new ObservableCollection<EditableRowItem>
+        {
+            new EditableRowItem("A"),
+            new EditableRowItem("B")
+        };
+
+        var run = async () =>
+        {
+            using var session = HeadlessUnitTestSession.StartNew(typeof(Application));
+
+            return await session.Dispatch(
+                () =>
+                {
+                    var grid = new DataGrid
+                    {
+                        AutoGenerateColumns = false,
+                        ItemsSource = items
+                    };
+
+                    grid.Columns.Add(new DataGridTextColumn
+                    {
+                        Header = "Name",
+                        Binding = new Binding(nameof(EditableRowItem.Name))
+                        {
+                            Mode = BindingMode.TwoWay
+                        }
+                    });
+
+                    var window = new Window
+                    {
+                        Content = grid
+                    };
+
+                    window.SetThemeStyles();
+                    window.Show();
+                    Dispatcher.UIThread.RunJobs();
+
+                    grid.SelectedItem = items[0];
+                    grid.CurrentCell = new DataGridCellInfo(items[0], grid.Columns[0], 0, 0);
+                    Dispatcher.UIThread.RunJobs();
+
+                    Assert.True(grid.PasteText("Pasted"));
+                    Dispatcher.UIThread.RunJobs();
+                    Assert.Equal("Pasted", items[0].Name);
+
+                    window.Content = null;
+                    Dispatcher.UIThread.RunJobs();
+
+                    return window;
+                },
+                CancellationToken.None);
+        };
+
+        var result = run().GetAwaiter().GetResult();
+
+        dotMemory.Check(memory =>
+            Assert.Equal(0, memory.GetObjects(where => where.Type.Is<DataGrid>()).ObjectsCount));
+
+        GC.KeepAlive(items);
+        GC.KeepAlive(result);
+    }
+
+    [Fact]
+    [SuppressMessage("Usage", "xUnit1031:Do not use blocking task operations in test method", Justification = "Needed for dotMemoryUnit to work")]
+    public void DataGrid_ClipboardImportModelSwap_DoesNotLeak()
+    {
+        if (!dotMemoryApi.IsEnabled)
+        {
+            return;
+        }
+
+        var items = new ObservableCollection<EditableRowItem>
+        {
+            new EditableRowItem("A"),
+            new EditableRowItem("B")
+        };
+
+        var run = async () =>
+        {
+            using var session = HeadlessUnitTestSession.StartNew(typeof(Application));
+
+            return await session.Dispatch(
+                () =>
+                {
+                    var grid = new DataGrid
+                    {
+                        AutoGenerateColumns = false,
+                        ItemsSource = items
+                    };
+
+                    grid.Columns.Add(new DataGridTextColumn
+                    {
+                        Header = "Name",
+                        Binding = new Binding(nameof(EditableRowItem.Name))
+                        {
+                            Mode = BindingMode.TwoWay
+                        }
+                    });
+
+                    var customImportModel = new TrackingClipboardImportModel();
+                    var customImportFactory = new TrackingClipboardImportModelFactory();
+                    grid.ClipboardImportModel = customImportModel;
+
+                    var window = new Window
+                    {
+                        Content = grid
+                    };
+
+                    window.SetThemeStyles();
+                    window.Show();
+                    Dispatcher.UIThread.RunJobs();
+
+                    grid.SelectedItem = items[0];
+                    grid.CurrentCell = new DataGridCellInfo(items[0], grid.Columns[0], 0, 0);
+                    Dispatcher.UIThread.RunJobs();
+
+                    Assert.True(grid.PasteText("Swap A"));
+                    Dispatcher.UIThread.RunJobs();
+                    Assert.True(customImportModel.Calls > 0);
+
+                    grid.ClipboardImportModelFactory = customImportFactory;
+                    grid.ClipboardImportModel = null;
+                    Dispatcher.UIThread.RunJobs();
+
+                    Assert.True(grid.PasteText("Swap B"));
+                    Dispatcher.UIThread.RunJobs();
+                    Assert.NotNull(customImportFactory.Model);
+                    Assert.True(customImportFactory.Model!.Calls > 0);
+
+                    window.Content = null;
+                    Dispatcher.UIThread.RunJobs();
+
+                    return window;
+                },
+                CancellationToken.None);
+        };
+
+        var result = run().GetAwaiter().GetResult();
+
+        dotMemory.Check(memory =>
+            Assert.Equal(0, memory.GetObjects(where => where.Type.Is<DataGrid>()).ObjectsCount));
+
+        GC.KeepAlive(items);
+        GC.KeepAlive(result);
+    }
+
+    [Fact]
+    [SuppressMessage("Usage", "xUnit1031:Do not use blocking task operations in test method", Justification = "Needed for dotMemoryUnit to work")]
+    public void DataGrid_ClipboardExporterSwap_DoesNotLeak()
+    {
+        if (!dotMemoryApi.IsEnabled)
+        {
+            return;
+        }
+
+        var items = new ObservableCollection<EditableRowItem>
+        {
+            new EditableRowItem("A"),
+            new EditableRowItem("B")
+        };
+
+        var run = async () =>
+        {
+            using var session = HeadlessUnitTestSession.StartNew(typeof(Application));
+
+            return await session.Dispatch(
+                () =>
+                {
+                    var grid = new DataGrid
+                    {
+                        AutoGenerateColumns = false,
+                        ItemsSource = items,
+                        ClipboardCopyMode = DataGridClipboardCopyMode.ExcludeHeader,
+                        SelectionUnit = DataGridSelectionUnit.FullRow
+                    };
+
+                    grid.Columns.Add(new DataGridTextColumn
+                    {
+                        Header = "Name",
+                        Binding = new Binding(nameof(EditableRowItem.Name))
+                        {
+                            Mode = BindingMode.TwoWay
+                        }
+                    });
+
+                    var customExporter = new TrackingClipboardExporter();
+                    var customFormatExporter = new TrackingClipboardFormatExporter();
+                    grid.ClipboardExporter = customExporter;
+
+                    var window = new Window
+                    {
+                        Content = grid
+                    };
+
+                    window.SetThemeStyles();
+                    window.Show();
+                    Dispatcher.UIThread.RunJobs();
+
+                    grid.SelectedItems.Add(items[0]);
+                    Dispatcher.UIThread.RunJobs();
+
+                    grid.CopySelectionToClipboard(DataGridClipboardExportFormat.Text);
+                    Dispatcher.UIThread.RunJobs();
+                    Assert.True(customExporter.Calls > 0);
+
+                    grid.ClipboardExporter = null;
+                    grid.ClipboardFormatExporters = new IDataGridClipboardFormatExporter[] { customFormatExporter };
+                    Dispatcher.UIThread.RunJobs();
+
+                    grid.CopySelectionToClipboard(DataGridClipboardExportFormat.Text);
+                    Dispatcher.UIThread.RunJobs();
+                    Assert.True(customFormatExporter.Calls > 0);
+
+                    window.Content = null;
+                    Dispatcher.UIThread.RunJobs();
+
+                    return window;
+                },
+                CancellationToken.None);
+        };
+
+        var result = run().GetAwaiter().GetResult();
+
+        dotMemory.Check(memory =>
+            Assert.Equal(0, memory.GetObjects(where => where.Type.Is<DataGrid>()).ObjectsCount));
+
+        GC.KeepAlive(items);
+        GC.KeepAlive(result);
+    }
+
     private sealed class SwapItem
     {
         public SwapItem(string name)
@@ -1439,6 +1681,56 @@ public class LeakTests
             _errors.Clear();
             _errors.AddRange(errors);
             ErrorsChanged?.Invoke(this, new DataErrorsChangedEventArgs(nameof(Name)));
+        }
+    }
+
+    private sealed class TrackingClipboardExporter : IDataGridClipboardExporter
+    {
+        public int Calls { get; private set; }
+
+        public IAsyncDataTransfer? BuildClipboardData(DataGridClipboardExportContext context)
+        {
+            Calls++;
+
+            var item = new DataTransferItem();
+            item.Set(DataFormat.Text, "export");
+            var transfer = new DataTransfer();
+            transfer.Add(item);
+            return transfer;
+        }
+    }
+
+    private sealed class TrackingClipboardFormatExporter : IDataGridClipboardFormatExporter
+    {
+        public int Calls { get; private set; }
+
+        public bool TryExport(DataGridClipboardExportContext context, DataTransferItem item)
+        {
+            Calls++;
+            item.Set(DataFormat.Text, "format");
+            return true;
+        }
+    }
+
+    private sealed class TrackingClipboardImportModel : IDataGridClipboardImportModel
+    {
+        public int Calls { get; private set; }
+
+        public bool Paste(DataGridClipboardImportContext context)
+        {
+            Calls++;
+            return true;
+        }
+    }
+
+    private sealed class TrackingClipboardImportModelFactory : IDataGridClipboardImportModelFactory
+    {
+        public TrackingClipboardImportModel? Model { get; private set; }
+
+        public IDataGridClipboardImportModel Create()
+        {
+            Model = new TrackingClipboardImportModel();
+            return Model;
         }
     }
 
