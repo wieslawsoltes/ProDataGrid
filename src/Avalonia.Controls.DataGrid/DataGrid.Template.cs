@@ -162,6 +162,11 @@ internal
                 InitializeElements(true /*recycleRows*/);
             }
 
+            if (_rowDragDropController == null && CanUserReorderRows)
+            {
+                RefreshRowDragDropController();
+            }
+
             TryExecutePendingAutoScroll();
             UpdateKeyboardGestureSubscriptions();
         }
@@ -175,12 +180,22 @@ internal
             _suppressCellContentUpdates = true;
             try
             {
-            UnloadElements(recycle: true);
+                UnloadElements(recycle: true);
             }
             finally
             {
                 _suppressCellContentUpdates = false;
             }
+
+            EndSelectionDrag();
+            DisposeDragAutoScrollTimer();
+            EndFillHandleDrag(applyFill: false);
+            DisposeFillAutoScrollTimer();
+            CancelPendingAutoScroll();
+
+            _rowDragDropController?.Dispose();
+            _rowDragDropController = null;
+
             // When wired to INotifyCollectionChanged, the DataGrid will be cleaned up by GC
             if (DataConnection.DataSource != null && DataConnection.EventsWired)
             {

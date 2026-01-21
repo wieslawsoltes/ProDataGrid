@@ -318,6 +318,18 @@ internal
             _fillAutoScrollDirectionY = 0;
         }
 
+        private void DisposeFillAutoScrollTimer()
+        {
+            if (_fillAutoScrollTimer == null)
+            {
+                return;
+            }
+
+            _fillAutoScrollTimer.Stop();
+            _fillAutoScrollTimer.Tick -= OnFillAutoScrollTick;
+            _fillAutoScrollTimer = null;
+        }
+
         private void OnFillAutoScrollTick(object? sender, EventArgs e)
         {
             if (!_isFillHandleDragging)
