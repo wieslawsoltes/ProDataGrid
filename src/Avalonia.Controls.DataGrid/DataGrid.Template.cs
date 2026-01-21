@@ -159,7 +159,21 @@ internal
             if (DataConnection.DataSource != null && !DataConnection.EventsWired)
             {
                 DataConnection.WireEvents(DataConnection.DataSource);
+                AttachExternalSubscriptions();
+                UpdateSortingAdapterView();
+                UpdateFilteringAdapterView();
+                UpdateSearchAdapterView();
+                UpdateConditionalFormattingAdapterView();
                 InitializeElements(true /*recycleRows*/);
+            }
+            else
+            {
+                AttachExternalSubscriptions();
+            }
+
+            if (_rowDragDropController == null && CanUserReorderRows)
+            {
+                RefreshRowDragDropController();
             }
 
             TryExecutePendingAutoScroll();
@@ -170,21 +184,40 @@ internal
         protected override void OnDetachedFromVisualTree(VisualTreeAttachmentEventArgs e)
         {
             base.OnDetachedFromVisualTree(e);
+            DetachExternalEditingElement();
             _scrollStateManager.Capture(preserveOnAttach: true);
             _suppressCellContentUpdates = true;
             try
             {
-            UnloadElements(recycle: true);
+                UnloadElements(recycle: true);
             }
             finally
             {
                 _suppressCellContentUpdates = false;
             }
+
+            EndSelectionDrag();
+            DisposeDragAutoScrollTimer();
+            EndFillHandleDrag(applyFill: false);
+            DisposeFillAutoScrollTimer();
+            CancelPendingAutoScroll();
+
+            _rowDragDropController?.Dispose();
+            _rowDragDropController = null;
+
+            _validationSubscription?.Dispose();
+            _validationSubscription = null;
+
+            DetachRowGroupHandlers(resetTopLevelGroup: false);
+            DetachExternalSubscriptions();
+
             // When wired to INotifyCollectionChanged, the DataGrid will be cleaned up by GC
             if (DataConnection.DataSource != null && DataConnection.EventsWired)
             {
                 DataConnection.UnWireEvents(DataConnection.DataSource);
             }
+
+            DetachAdapterViews();
 
             DisposeSummaryService();
             UpdateKeyboardGestureSubscriptions();

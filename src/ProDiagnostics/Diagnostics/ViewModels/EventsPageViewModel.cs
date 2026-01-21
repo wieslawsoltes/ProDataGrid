@@ -9,7 +9,7 @@ using Avalonia.Interactivity;
 
 namespace Avalonia.Diagnostics.ViewModels
 {
-    internal class EventsPageViewModel : ViewModelBase
+    internal class EventsPageViewModel : ViewModelBase, IDisposable
     {
         private static readonly HashSet<RoutedEvent> s_defaultEvents = new HashSet<RoutedEvent>()
         {
@@ -173,5 +173,29 @@ namespace Avalonia.Diagnostics.ViewModels
         }
 
         public MainViewModel MainView => _mainViewModel;
+
+        public void Dispose()
+        {
+            foreach (var node in Nodes)
+            {
+                DisposeNode(node);
+            }
+        }
+
+        private static void DisposeNode(EventTreeNodeBase node)
+        {
+            if (node is IDisposable disposable)
+            {
+                disposable.Dispose();
+            }
+
+            if (node.Children != null)
+            {
+                foreach (var child in node.Children)
+                {
+                    DisposeNode(child);
+                }
+            }
+        }
     }
 }

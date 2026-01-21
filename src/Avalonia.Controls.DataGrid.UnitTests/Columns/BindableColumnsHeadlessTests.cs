@@ -5,6 +5,7 @@ using Avalonia.Controls;
 using Avalonia.Data;
 using Avalonia.Headless.XUnit;
 using Avalonia.Markup.Xaml.Styling;
+using Avalonia.Threading;
 using Avalonia.VisualTree;
 using Xunit;
 
@@ -51,6 +52,42 @@ public class BindableColumnsHeadlessTests
 
         Assert.Same(second, vm.Columns[0]);
         Assert.Same(first, vm.Columns[1]);
+    }
+
+    [AvaloniaFact]
+    public void BoundColumns_Refresh_After_Reattach()
+    {
+        var vm = new ColumnsViewModel();
+        var (window, grid) = CreateWindow(vm);
+
+        window.Show();
+        grid.ApplyTemplate();
+        grid.UpdateLayout();
+
+        Assert.Equal(vm.Columns.Count, GetNonFillerColumns(grid).Length);
+
+        window.Content = null;
+        Dispatcher.UIThread.RunJobs();
+
+        vm.Columns.Add(new DataGridTextColumn { Header = "Extra", Binding = new Binding("Name") });
+
+        window.Content = grid;
+        Dispatcher.UIThread.RunJobs();
+        grid.ApplyTemplate();
+        grid.UpdateLayout();
+
+        var headers = GetNonFillerColumns(grid).Select(c => c.Header).ToArray();
+        Assert.Equal(vm.Columns.Count, headers.Length);
+        Assert.Contains("Extra", headers);
+
+        window.Close();
+    }
+
+    private static DataGridColumn[] GetNonFillerColumns(DataGrid grid)
+    {
+        return grid.ColumnsInternal.ItemsInternal
+            .Where(column => column is not DataGridFillerColumn)
+            .ToArray();
     }
 
     private static (Window window, DataGrid grid) CreateWindow(ColumnsViewModel vm, bool twoWay = false)

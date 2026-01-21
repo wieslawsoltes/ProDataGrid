@@ -8,11 +8,13 @@ using Avalonia.Reactive;
 
 namespace Avalonia.Diagnostics.ViewModels
 {
-    internal class EventTreeNode : EventTreeNodeBase
+    internal class EventTreeNode : EventTreeNodeBase, IDisposable
     {
         private readonly EventsPageViewModel _parentViewModel;
         private bool _isRegistered;
         private FiredEvent? _currentEvent;
+        private IDisposable? _classHandlerSubscription;
+        private IDisposable? _routeFinishedSubscription;
 
         public EventTreeNode(EventOwnerTreeNode parent, RoutedEvent @event, EventsPageViewModel vm)
             : base(parent, @event.Name)
@@ -50,16 +52,33 @@ namespace Avalonia.Diagnostics.ViewModels
 
         private void UpdateTracker()
         {
-            if (IsEnabled.GetValueOrDefault() && !_isRegistered)
+            var isEnabled = IsEnabled.GetValueOrDefault();
+            if (isEnabled && !_isRegistered)
             {
                 var allRoutes = RoutingStrategies.Direct | RoutingStrategies.Tunnel | RoutingStrategies.Bubble;
 
-                // FIXME: This leaks event handlers.
-                Event.AddClassHandler(typeof(object), HandleEvent, allRoutes, handledEventsToo: true);
-                Event.RouteFinished.Subscribe(HandleRouteFinished);
-                
+                _classHandlerSubscription = Event.AddClassHandler(typeof(object), HandleEvent, allRoutes, handledEventsToo: true);
+                _routeFinishedSubscription = Event.RouteFinished.Subscribe(HandleRouteFinished);
                 _isRegistered = true;
             }
+            else if (!isEnabled && _isRegistered)
+            {
+                DetachHandlers();
+            }
+        }
+
+        public void Dispose()
+        {
+            DetachHandlers();
+        }
+
+        private void DetachHandlers()
+        {
+            _classHandlerSubscription?.Dispose();
+            _classHandlerSubscription = null;
+            _routeFinishedSubscription?.Dispose();
+            _routeFinishedSubscription = null;
+            _isRegistered = false;
         }
 
         private void HandleEvent(object? sender, RoutedEventArgs e)

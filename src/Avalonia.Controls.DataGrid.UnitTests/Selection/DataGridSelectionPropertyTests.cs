@@ -585,6 +585,49 @@ public class DataGridSelectionPropertyTests
     }
 
     [AvaloniaFact]
+    public void ExternalSelectionModel_Source_Clears_On_Detach_And_Restores_On_Attach()
+    {
+        var items = new ObservableCollection<string> { "A", "B", "C" };
+        var selectionModel = new SelectionModel<string> { SingleSelect = false };
+
+        var window = new Window
+        {
+            Width = 300,
+            Height = 200,
+        };
+
+        window.SetThemeStyles();
+
+        var grid = new DataGrid
+        {
+            ItemsSource = items,
+            Selection = selectionModel,
+            AutoGenerateColumns = true
+        };
+
+        window.Content = grid;
+        window.Show();
+        grid.UpdateLayout();
+        Dispatcher.UIThread.RunJobs();
+
+        Assert.Same(selectionModel, grid.Selection);
+        Assert.Same(grid.CollectionView, selectionModel.Source);
+
+        window.Content = null;
+        Dispatcher.UIThread.RunJobs();
+
+        Assert.Null(selectionModel.Source);
+
+        window.Content = grid;
+        Dispatcher.UIThread.RunJobs();
+        grid.UpdateLayout();
+
+        Assert.Same(grid.CollectionView, selectionModel.Source);
+
+        window.Close();
+    }
+
+    [AvaloniaFact]
     public void RefreshSelectionFromModel_Resets_Invalid_CurrentSlot()
     {
         var items = new ObservableCollection<string> { "A", "B" };

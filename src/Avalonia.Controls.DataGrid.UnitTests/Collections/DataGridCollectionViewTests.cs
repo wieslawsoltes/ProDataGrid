@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -376,5 +377,149 @@ public class DataGridCollectionViewTests
         }
 
         Assert.Equal(42, (int)view[0]);
+    }
+
+    [Fact]
+    public void WeakCollectionChangedHandler_Unsubscribes_When_Target_Lost()
+    {
+        var source = new TrackingNotifyCollectionChanged();
+        var weak = new WeakReference<DataGridCollectionView>(null!);
+        var handler = CreateWeakCollectionChangedHandler(weak);
+
+        source.CollectionChanged += handler;
+        Assert.Equal(1, source.SubscriptionCount);
+
+        source.RaiseReset();
+
+        Assert.Equal(0, source.SubscriptionCount);
+    }
+
+    [Fact]
+    public void WeakListChangedHandler_Unsubscribes_When_Target_Lost()
+    {
+        var source = new TrackingBindingList();
+        var weak = new WeakReference<DataGridCollectionView>(null!);
+        var handler = CreateWeakListChangedHandler(weak);
+
+        source.ListChanged += handler;
+        Assert.Equal(1, source.SubscriptionCount);
+
+        source.RaiseReset();
+
+        Assert.Equal(0, source.SubscriptionCount);
+    }
+
+    private static NotifyCollectionChangedEventHandler CreateWeakCollectionChangedHandler(
+        WeakReference<DataGridCollectionView> weak)
+    {
+        var method = typeof(DataGridCollectionView)
+            .GetMethod("CreateWeakCollectionChangedHandler", BindingFlags.Static | BindingFlags.NonPublic);
+        Assert.NotNull(method);
+        return Assert.IsType<NotifyCollectionChangedEventHandler>(method!.Invoke(null, new object[] { weak }));
+    }
+
+    private static ListChangedEventHandler CreateWeakListChangedHandler(
+        WeakReference<DataGridCollectionView> weak)
+    {
+        var method = typeof(DataGridCollectionView)
+            .GetMethod("CreateWeakListChangedHandler", BindingFlags.Static | BindingFlags.NonPublic);
+        Assert.NotNull(method);
+        return Assert.IsType<ListChangedEventHandler>(method!.Invoke(null, new object[] { weak }));
+    }
+
+    private sealed class TrackingNotifyCollectionChanged : INotifyCollectionChanged
+    {
+        private NotifyCollectionChangedEventHandler? _collectionChanged;
+
+        public int SubscriptionCount { get; private set; }
+
+        public event NotifyCollectionChangedEventHandler? CollectionChanged
+        {
+            add
+            {
+                _collectionChanged += value;
+                SubscriptionCount = _collectionChanged?.GetInvocationList().Length ?? 0;
+            }
+            remove
+            {
+                _collectionChanged -= value;
+                SubscriptionCount = _collectionChanged?.GetInvocationList().Length ?? 0;
+            }
+        }
+
+        public void RaiseReset()
+        {
+            _collectionChanged?.Invoke(this, new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset));
+        }
+    }
+
+    private sealed class TrackingBindingList : IBindingList
+    {
+        private readonly List<object?> _items = new();
+        private ListChangedEventHandler? _listChanged;
+
+        public int SubscriptionCount { get; private set; }
+
+        public event ListChangedEventHandler? ListChanged
+        {
+            add
+            {
+                _listChanged += value;
+                SubscriptionCount = _listChanged?.GetInvocationList().Length ?? 0;
+            }
+            remove
+            {
+                _listChanged -= value;
+                SubscriptionCount = _listChanged?.GetInvocationList().Length ?? 0;
+            }
+        }
+
+        public void RaiseReset()
+        {
+            _listChanged?.Invoke(this, new ListChangedEventArgs(ListChangedType.Reset, -1));
+        }
+
+        public bool AllowNew => true;
+        public bool AllowEdit => true;
+        public bool AllowRemove => true;
+        public bool SupportsChangeNotification => true;
+        public bool SupportsSearching => false;
+        public bool SupportsSorting => false;
+        public bool IsSorted => false;
+        public ListSortDirection SortDirection => ListSortDirection.Ascending;
+        public PropertyDescriptor? SortProperty => null;
+
+        public object AddNew() => throw new NotSupportedException();
+        public void AddIndex(PropertyDescriptor property) => throw new NotSupportedException();
+        public void ApplySort(PropertyDescriptor property, ListSortDirection direction) => throw new NotSupportedException();
+        public int Find(PropertyDescriptor property, object key) => -1;
+        public void RemoveIndex(PropertyDescriptor property) => throw new NotSupportedException();
+        public void RemoveSort() => throw new NotSupportedException();
+
+        public int Add(object? value)
+        {
+            _items.Add(value);
+            return _items.Count - 1;
+        }
+
+        public void Clear() => _items.Clear();
+        public bool Contains(object? value) => _items.Contains(value);
+        public int IndexOf(object? value) => _items.IndexOf(value);
+        public void Insert(int index, object? value) => _items.Insert(index, value);
+        public void Remove(object? value) => _items.Remove(value);
+        public void RemoveAt(int index) => _items.RemoveAt(index);
+        public object? this[int index]
+        {
+            get => _items[index];
+            set => _items[index] = value;
+        }
+
+        public bool IsFixedSize => false;
+        public bool IsReadOnly => false;
+        public int Count => _items.Count;
+        public bool IsSynchronized => false;
+        public object SyncRoot => this;
+        public void CopyTo(Array array, int index) => ((ICollection)_items).CopyTo(array, index);
+        public IEnumerator GetEnumerator() => _items.GetEnumerator();
     }
 }

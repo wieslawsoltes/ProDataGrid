@@ -27,6 +27,7 @@ internal
         //TODO: Make override?
         private void DataGrid_GotFocus(object sender, RoutedEventArgs e)
         {
+            DetachExternalEditingElement();
             if (!ContainsFocus)
             {
                 ContainsFocus = true;
@@ -62,6 +63,7 @@ internal
         private void DataGrid_LostFocus(object sender, RoutedEventArgs e)
         {
             _focusedObject = null;
+            DetachExternalEditingElement();
             if (ContainsFocus)
             {
                 bool focusLeftDataGrid = true;
@@ -123,6 +125,11 @@ internal
                 {
                     if (focusedObject is Control focusedElement)
                     {
+                        if (!ReferenceEquals(_externalEditingElement, focusedElement))
+                        {
+                            DetachExternalEditingElement();
+                        }
+                        _externalEditingElement = focusedElement;
                         focusedElement.LostFocus += ExternalEditingElement_LostFocus;
                     }
                 }
@@ -135,6 +142,10 @@ internal
             if (sender is Control element)
             {
                 element.LostFocus -= ExternalEditingElement_LostFocus;
+                if (ReferenceEquals(_externalEditingElement, element))
+                {
+                    _externalEditingElement = null;
+                }
                 DataGrid_LostFocus(sender, e);
             }
         }
@@ -213,9 +224,20 @@ internal
             _focusedRow = null;
         }
 
+        private void DetachExternalEditingElement()
+        {
+            if (_externalEditingElement != null)
+            {
+                _externalEditingElement.LostFocus -= ExternalEditingElement_LostFocus;
+                _externalEditingElement = null;
+            }
+        }
+
         private Visual _focusedObject;
 
         private DataGridRow _focusedRow;
+
+        private Control _externalEditingElement;
 
         private Queue<Action> _lostFocusActions;
 

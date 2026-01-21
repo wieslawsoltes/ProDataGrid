@@ -376,6 +376,7 @@ internal
         private INotifyCollectionChanged _selectedItemsBindingNotifications;
         private IList<DataGridCellInfo> _selectedCellsBinding;
         private INotifyCollectionChanged _selectedCellsBindingNotifications;
+        private ISelectionModel _selectionModel;
         private DataGridSelectionModelAdapter _selectionModelAdapter;
         private ISelectionModel _selectionModelProxy;
         private DataGridSelection.DataGridPagedSelectionSource _pagedSelectionSource;
@@ -395,6 +396,7 @@ internal
         private bool _autoScrollPending;
         private int _autoScrollRequestToken;
         private bool _autoExpandingSelection;
+        private bool _externalSubscriptionsDetached;
 
         // An approximation of the sum of the heights in pixels of the scrolling rows preceding
         // the first displayed scrolling row.  Since the scrolled off rows are discarded, the grid
@@ -746,7 +748,7 @@ internal
         /// </summary>
         public ISelectionModel Selection
         {
-            get => _selectionModelProxy ?? _selectionModelAdapter?.Model;
+            get => _selectionModelProxy ?? _selectionModel;
             set => SetSelectionModel(value);
         }
 
@@ -2511,7 +2513,7 @@ internal
         {
             var newModel = model ?? CreateSelectionModel();
             var oldAdapter = _selectionModelAdapter;
-            var oldModel = oldAdapter?.Model;
+            var oldModel = _selectionModel;
 
             if (ReferenceEquals(oldModel, newModel))
             {
@@ -2530,11 +2532,12 @@ internal
             var removedItems = oldModel?.SelectedItems?.ToArray() ?? Array.Empty<object>();
 
             DetachSelectionModel();
+            _selectionModel = newModel;
 
             _syncingSelectionModel = true;
             try
             {
-                _selectionModelAdapter = CreateSelectionModelAdapter(newModel);
+                _selectionModelAdapter = CreateSelectionModelAdapter(_selectionModel);
                 _selectionModelAdapter.Model.SingleSelect = SelectionMode == DataGridSelectionMode.Single;
                 _selectionModelAdapter.Model.SelectionChanged += SelectionModel_SelectionChanged;
                 _selectionModelAdapter.Model.LostSelection += SelectionModel_LostSelection;
@@ -2551,7 +2554,7 @@ internal
 
             UpdateSelectionProxy();
 
-            RaisePropertyChanged(SelectionProperty, oldModel, newModel);
+            RaisePropertyChanged(SelectionProperty, oldModel, _selectionModel);
             RaisePropertyChanged(
                 SelectedItemsProperty,
                 GetSelectedItemsViewOrBinding(oldAdapter),
@@ -3676,6 +3679,360 @@ internal
             _conditionalFormattingAdapter?.AttachView(DataConnection?.CollectionView);
         }
 
+        private void DetachAdapterViews()
+        {
+            _sortingAdapter?.AttachView(null);
+            _filteringAdapter?.AttachView(null);
+            _searchAdapter?.AttachView(null);
+            _conditionalFormattingAdapter?.AttachView(null);
+        }
+
+        private void AttachExternalSubscriptions()
+        {
+            if (!_externalSubscriptionsDetached)
+            {
+                return;
+            }
+
+            if (_boundColumns != null)
+            {
+                DetachBoundColumns(_boundColumns);
+                AttachBoundColumns(_boundColumns);
+                if (_autoGeneratingColumnOperationCount > 0)
+                {
+                    _pendingBoundColumnsApply = true;
+                }
+                else
+                {
+                    ApplyBoundColumnsSnapshot();
+                }
+            }
+
+            if (_columnDefinitionsSource != null)
+            {
+                DetachColumnDefinitionsNotifications();
+                AttachColumnDefinitionsNotifications();
+                if (_autoGeneratingColumnOperationCount > 0)
+                {
+                    _pendingColumnDefinitionsApply = true;
+                }
+                else
+                {
+                    ApplyColumnDefinitionsSnapshot();
+                }
+            }
+
+            AttachSelectionModelHandlers();
+
+            if (_selectedItemsBinding != null)
+            {
+                DetachBoundSelectedItems();
+                AttachBoundSelectedItems();
+                ApplySelectedItemsFromBinding(_selectedItemsBinding);
+            }
+
+            if (_selectedCellsBinding != null)
+            {
+                DetachBoundSelectedCells();
+                AttachBoundSelectedCells();
+                ApplySelectedCellsFromBinding(_selectedCellsBinding);
+            }
+
+            AttachSortingModelHandlers();
+            AttachFilteringModelHandlers();
+            AttachSearchModelHandlers();
+            AttachConditionalFormattingHandlers();
+            AttachHierarchicalModelHandlers();
+            AttachFastPathOptionsHandlers();
+
+            _externalSubscriptionsDetached = false;
+        }
+
+        private void DetachExternalSubscriptions()
+        {
+            if (_externalSubscriptionsDetached)
+            {
+                return;
+            }
+
+            _externalSubscriptionsDetached = true;
+
+            if (_boundColumns != null)
+            {
+                DetachBoundColumns(_boundColumns);
+            }
+
+            if (_columnDefinitionsSource != null)
+            {
+                DetachColumnDefinitionsNotifications();
+            }
+
+            DetachBoundSelectedItems();
+            DetachBoundSelectedCells();
+
+            DetachSelectionModel(preserveSnapshot: true);
+            DetachSortingModelHandlers();
+            DetachFilteringModelHandlers();
+            DetachSearchModelHandlers();
+            DetachConditionalFormattingHandlers();
+            DetachHierarchicalModelHandlers();
+            DetachFastPathOptionsHandlers();
+
+            DetachBoundColumnsFromGrid();
+        }
+
+        private void DetachBoundColumnsFromGrid()
+        {
+            if (_boundColumns == null || ColumnsInternal.Count == 0)
+            {
+                return;
+            }
+
+            var boundColumns = new HashSet<DataGridColumn>(_boundColumns);
+            if (boundColumns.Count == 0)
+            {
+                return;
+            }
+
+            for (int i = ColumnsInternal.Count - 1; i >= 0; i--)
+            {
+                var column = ColumnsInternal[i];
+                if (column is DataGridFillerColumn)
+                {
+                    continue;
+                }
+
+                if (boundColumns.Contains(column))
+                {
+                    ColumnsInternal.RemoveAt(i);
+                }
+            }
+        }
+
+        private void AttachSelectionModelHandlers()
+        {
+            if (_selectionModel == null)
+            {
+                return;
+            }
+
+            _syncingSelectionModel = true;
+            try
+            {
+                if (_selectionModelAdapter == null)
+                {
+                    _selectionModelAdapter = CreateSelectionModelAdapter(_selectionModel);
+                }
+
+                var model = _selectionModelAdapter.Model;
+                model.SingleSelect = SelectionMode == DataGridSelectionMode.Single;
+
+                model.SelectionChanged -= SelectionModel_SelectionChanged;
+                model.SelectionChanged += SelectionModel_SelectionChanged;
+                model.LostSelection -= SelectionModel_LostSelection;
+                model.LostSelection += SelectionModel_LostSelection;
+                model.IndexesChanged -= SelectionModel_IndexesChanged;
+                model.IndexesChanged += SelectionModel_IndexesChanged;
+                model.PropertyChanged -= SelectionModel_PropertyChanged;
+                model.PropertyChanged += SelectionModel_PropertyChanged;
+                model.SourceReset -= SelectionModel_SourceReset;
+                model.SourceReset += SelectionModel_SourceReset;
+
+                UpdateSelectionModelSource();
+            }
+            finally
+            {
+                _syncingSelectionModel = false;
+            }
+
+            UpdateSelectionProxy();
+
+            if (_selectedItemsBinding == null)
+            {
+                RestoreSelectionFromSnapshot();
+                ApplySelectionFromSelectionModel();
+                UpdateSelectionSnapshot();
+            }
+        }
+
+        private void AttachSortingModelHandlers()
+        {
+            if (_sortingModel == null)
+            {
+                return;
+            }
+
+            _sortingModel.SortingChanged -= SortingModel_SortingChanged;
+            _sortingModel.SortingChanged += SortingModel_SortingChanged;
+
+            if (_sortingAdapter == null)
+            {
+                _sortingAdapter = CreateSortingAdapter(_sortingModel);
+            }
+        }
+
+        private void DetachSortingModelHandlers()
+        {
+            if (_sortingModel != null)
+            {
+                _sortingModel.SortingChanged -= SortingModel_SortingChanged;
+            }
+
+            if (_sortingAdapter != null)
+            {
+                _sortingAdapter.Dispose();
+                _sortingAdapter = null;
+            }
+        }
+
+        private void AttachFilteringModelHandlers()
+        {
+            if (_filteringModel == null)
+            {
+                return;
+            }
+
+            _filteringModel.FilteringChanged -= FilteringModel_FilteringChanged;
+            _filteringModel.FilteringChanged += FilteringModel_FilteringChanged;
+            _filteringModel.PropertyChanged -= FilteringModel_PropertyChanged;
+            _filteringModel.PropertyChanged += FilteringModel_PropertyChanged;
+
+            if (_filteringAdapter == null)
+            {
+                _filteringAdapter = CreateFilteringAdapter(_filteringModel);
+            }
+        }
+
+        private void DetachFilteringModelHandlers()
+        {
+            if (_filteringModel != null)
+            {
+                _filteringModel.FilteringChanged -= FilteringModel_FilteringChanged;
+                _filteringModel.PropertyChanged -= FilteringModel_PropertyChanged;
+            }
+
+            if (_filteringAdapter != null)
+            {
+                _filteringAdapter.Dispose();
+                _filteringAdapter = null;
+            }
+        }
+
+        private void AttachSearchModelHandlers()
+        {
+            if (_searchModel == null)
+            {
+                return;
+            }
+
+            _searchModel.ResultsChanged -= SearchModel_ResultsChanged;
+            _searchModel.ResultsChanged += SearchModel_ResultsChanged;
+            _searchModel.CurrentChanged -= SearchModel_CurrentChanged;
+            _searchModel.CurrentChanged += SearchModel_CurrentChanged;
+            _searchModel.PropertyChanged -= SearchModel_PropertyChanged;
+            _searchModel.PropertyChanged += SearchModel_PropertyChanged;
+
+            if (_searchAdapter == null)
+            {
+                _searchAdapter = CreateSearchAdapter(_searchModel);
+            }
+        }
+
+        private void DetachSearchModelHandlers()
+        {
+            if (_searchModel != null)
+            {
+                _searchModel.ResultsChanged -= SearchModel_ResultsChanged;
+                _searchModel.CurrentChanged -= SearchModel_CurrentChanged;
+                _searchModel.PropertyChanged -= SearchModel_PropertyChanged;
+            }
+
+            if (_searchAdapter != null)
+            {
+                _searchAdapter.Dispose();
+                _searchAdapter = null;
+            }
+        }
+
+        private void AttachConditionalFormattingHandlers()
+        {
+            if (_conditionalFormattingModel == null)
+            {
+                return;
+            }
+
+            if (_conditionalFormattingAdapter == null)
+            {
+                _conditionalFormattingAdapter = CreateConditionalFormattingAdapter(_conditionalFormattingModel);
+            }
+
+            _conditionalFormattingAdapter.FormattingChanged -= ConditionalFormattingAdapter_FormattingChanged;
+            _conditionalFormattingAdapter.FormattingChanged += ConditionalFormattingAdapter_FormattingChanged;
+        }
+
+        private void DetachConditionalFormattingHandlers()
+        {
+            if (_conditionalFormattingAdapter != null)
+            {
+                _conditionalFormattingAdapter.FormattingChanged -= ConditionalFormattingAdapter_FormattingChanged;
+                _conditionalFormattingAdapter.Dispose();
+                _conditionalFormattingAdapter = null;
+            }
+        }
+
+        private void AttachHierarchicalModelHandlers()
+        {
+            if (_hierarchicalModel == null)
+            {
+                return;
+            }
+
+            _hierarchicalModel.FlattenedChanged -= HierarchicalAdapter_FlattenedChanged;
+            _hierarchicalModel.FlattenedChanged += HierarchicalAdapter_FlattenedChanged;
+
+            if (_hierarchicalAdapter == null)
+            {
+                _hierarchicalAdapter = CreateHierarchicalAdapter(_hierarchicalModel);
+            }
+
+            EnsureHierarchicalItemsSource();
+            UpdateSelectionProxy();
+        }
+
+        private void DetachHierarchicalModelHandlers()
+        {
+            if (_hierarchicalAdapter != null)
+            {
+                _hierarchicalAdapter.FlattenedChanged -= HierarchicalAdapter_FlattenedChanged;
+                _hierarchicalAdapter.Dispose();
+                _hierarchicalAdapter = null;
+            }
+
+            if (_hierarchicalModel != null)
+            {
+                _hierarchicalModel.FlattenedChanged -= HierarchicalAdapter_FlattenedChanged;
+            }
+        }
+
+        private void AttachFastPathOptionsHandlers()
+        {
+            if (_fastPathOptions == null)
+            {
+                return;
+            }
+
+            _fastPathOptions.PropertyChanged -= FastPathOptions_PropertyChanged;
+            _fastPathOptions.PropertyChanged += FastPathOptions_PropertyChanged;
+        }
+
+        private void DetachFastPathOptionsHandlers()
+        {
+            if (_fastPathOptions != null)
+            {
+                _fastPathOptions.PropertyChanged -= FastPathOptions_PropertyChanged;
+            }
+        }
+
         internal void RefreshColumnSortStates()
         {
             if (ColumnsItemsInternal == null)
@@ -4550,21 +4907,32 @@ internal
             return _selectedItems;
         }
 
-        private void DetachSelectionModel()
+        private void DetachSelectionModel(bool preserveSnapshot = false)
         {
             if (_selectionModelAdapter != null)
             {
-                _selectionModelAdapter.Model.SelectionChanged -= SelectionModel_SelectionChanged;
-                _selectionModelAdapter.Model.LostSelection -= SelectionModel_LostSelection;
-                _selectionModelAdapter.Model.IndexesChanged -= SelectionModel_IndexesChanged;
-                _selectionModelAdapter.Model.PropertyChanged -= SelectionModel_PropertyChanged;
-                _selectionModelAdapter.Model.SourceReset -= SelectionModel_SourceReset;
+                var model = _selectionModelAdapter.Model;
+                if (preserveSnapshot)
+                {
+                    UpdateSelectionSnapshot();
+                }
+                model.SelectionChanged -= SelectionModel_SelectionChanged;
+                model.LostSelection -= SelectionModel_LostSelection;
+                model.IndexesChanged -= SelectionModel_IndexesChanged;
+                model.PropertyChanged -= SelectionModel_PropertyChanged;
+                model.SourceReset -= SelectionModel_SourceReset;
                 _selectionModelAdapter.Dispose();
                 _selectionModelAdapter = null;
+                model.Source = null;
             }
 
+            _pagedSelectionSource?.Dispose();
+            _pagedSelectionSource = null;
             _selectionModelProxy = null;
-            _selectionModelSnapshot = null;
+            if (!preserveSnapshot)
+            {
+                _selectionModelSnapshot = null;
+            }
         }
 
         /// <summary>

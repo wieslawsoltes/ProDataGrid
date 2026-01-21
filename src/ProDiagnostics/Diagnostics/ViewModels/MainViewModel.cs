@@ -263,6 +263,7 @@ namespace Avalonia.Diagnostics.ViewModels
             _pointerOverSubscription.Dispose();
             _logicalTree.Dispose();
             _visualTree.Dispose();
+            _events.Dispose();
             _currentFocusHighlightAdorner?.Dispose();
             if (TryGetRenderer() is { } renderer)
             {

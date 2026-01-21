@@ -146,6 +146,14 @@ namespace Avalonia.Controls.DataGridHierarchical
         public void Dispose()
         {
             _model.FlattenedChanged -= OnModelFlattenedChanged;
+            EndDebouncedVirtualizationGuard();
+
+            if (_guardTimer != null)
+            {
+                _guardTimer.Tick -= GuardTimer_Tick;
+                _guardTimer.Stop();
+                _guardTimer = null;
+            }
         }
 
         public void SetRoot(object root)
@@ -188,11 +196,16 @@ namespace Avalonia.Controls.DataGridHierarchical
             if (_guardTimer == null)
             {
                 _guardTimer = new DispatcherTimer { Interval = GuardDebounce };
-                _guardTimer.Tick += (_, __) => EndDebouncedVirtualizationGuard();
+                _guardTimer.Tick += GuardTimer_Tick;
             }
 
             _guardTimer.Stop();
             _guardTimer.Start();
+        }
+
+        private void GuardTimer_Tick(object? sender, EventArgs e)
+        {
+            EndDebouncedVirtualizationGuard();
         }
 
         private void EndDebouncedVirtualizationGuard()

@@ -272,14 +272,17 @@ internal
             SetFlag(CollectionViewFlags.CachedIsEmpty, Count == 0);
 
             // If we implement change notifications, hook them up
+            var weakThis = new WeakReference<DataGridCollectionView>(this);
             if (source is INotifyCollectionChanged coll)
             {
-                coll.CollectionChanged += (_, args) => ProcessCollectionChanged(args);
+                var handler = CreateWeakCollectionChangedHandler(weakThis);
+                coll.CollectionChanged += handler;
             }
             else if (source is IBindingList bindingList)
             {
                 _bindingList = bindingList;
-                _bindingList.ListChanged += OnBindingListChanged;
+                var handler = CreateWeakListChangedHandler(weakThis);
+                _bindingList.ListChanged += handler;
             }
             else
             {
@@ -287,6 +290,44 @@ internal
                 // detect changes by polling the enumerator
                 _pollForChanges = true;
             }
+        }
+
+        private static NotifyCollectionChangedEventHandler CreateWeakCollectionChangedHandler(
+            WeakReference<DataGridCollectionView> weakThis)
+        {
+            NotifyCollectionChangedEventHandler handler = null;
+            handler = (sender, args) =>
+            {
+                if (weakThis.TryGetTarget(out var view))
+                {
+                    view.ProcessCollectionChanged(args);
+                }
+                else if (sender is INotifyCollectionChanged incc)
+                {
+                    incc.CollectionChanged -= handler;
+                }
+            };
+
+            return handler;
+        }
+
+        private static ListChangedEventHandler CreateWeakListChangedHandler(
+            WeakReference<DataGridCollectionView> weakThis)
+        {
+            ListChangedEventHandler handler = null;
+            handler = (sender, args) =>
+            {
+                if (weakThis.TryGetTarget(out var view))
+                {
+                    view.OnBindingListChanged(sender, args);
+                }
+                else if (sender is IBindingList bindingList)
+                {
+                    bindingList.ListChanged -= handler;
+                }
+            };
+
+            return handler;
         }
 
         /// <summary>

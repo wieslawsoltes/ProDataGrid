@@ -192,21 +192,7 @@ namespace Avalonia.Controls
 
         private void ClearRowGroupHeadersTable()
         {
-            // Detach existing handlers on CollectionViewGroup.Items.CollectionChanged
-            foreach (int slot in RowGroupHeadersTable.GetIndexes())
-            {
-                DataGridRowGroupInfo groupInfo = RowGroupHeadersTable.GetValueAt(slot);
-                if (groupInfo.CollectionViewGroup.Items != null)
-                {
-                    groupInfo.CollectionViewGroup.Items.CollectionChanged -= CollectionViewGroup_CollectionChanged;
-                }
-            }
-            if (_topLevelGroup != null)
-            {
-                // The PagedCollectionView reuses the top level group so we need to detach any existing or else we'll get duplicate handers here
-                _topLevelGroup.CollectionChanged -= CollectionViewGroup_CollectionChanged;
-                _topLevelGroup = null;
-            }
+            DetachRowGroupHandlers(resetTopLevelGroup: true);
 
             RowGroupHeadersTable.Clear();
             RowGroupFootersTable.Clear();
@@ -216,6 +202,39 @@ namespace Avalonia.Controls
 
             _rowGroupHeightsByLevel = null;
             RowGroupSublevelIndents = null;
+        }
+
+        private void DetachRowGroupHandlers(bool resetTopLevelGroup)
+        {
+            foreach (int slot in RowGroupHeadersTable.GetIndexes())
+            {
+                var groupInfo = RowGroupHeadersTable.GetValueAt(slot);
+                if (groupInfo == null)
+                {
+                    continue;
+                }
+
+                var group = groupInfo.CollectionViewGroup;
+                if (group?.Items != null)
+                {
+                    group.Items.CollectionChanged -= CollectionViewGroup_CollectionChanged;
+                }
+
+                if (group is INotifyPropertyChanged inpc)
+                {
+                    inpc.PropertyChanged -= CollectionViewGroup_PropertyChanged;
+                }
+            }
+
+            if (_topLevelGroup != null)
+            {
+                // The PagedCollectionView reuses the top level group so we need to detach any existing or else we'll get duplicate handers here
+                _topLevelGroup.CollectionChanged -= CollectionViewGroup_CollectionChanged;
+                if (resetTopLevelGroup)
+                {
+                    _topLevelGroup = null;
+                }
+            }
         }
 
 

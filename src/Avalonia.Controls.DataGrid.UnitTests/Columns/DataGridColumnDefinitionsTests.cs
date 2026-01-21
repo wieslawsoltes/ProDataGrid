@@ -118,6 +118,58 @@ public class DataGridColumnDefinitionsTests
     }
 
     [AvaloniaFact]
+    public void ColumnDefinitionsSource_Refreshes_After_Reattach()
+    {
+        var definitions = new ObservableCollection<DataGridColumnDefinition>
+        {
+            new DataGridTextColumnDefinition
+            {
+                Header = "Name",
+                Binding = DataGridBindingDefinition.Create<Person, string>(p => p.Name)
+            }
+        };
+
+        var grid = new DataGrid
+        {
+            AutoGenerateColumns = false,
+            ColumnDefinitionsSource = definitions
+        };
+
+        var window = new Window
+        {
+            Width = 300,
+            Height = 200,
+            Content = grid
+        };
+
+        window.SetThemeStyles();
+        window.Show();
+        Dispatcher.UIThread.RunJobs();
+        grid.UpdateLayout();
+
+        Assert.Single(GetNonFillerColumns(grid));
+
+        window.Content = null;
+        Dispatcher.UIThread.RunJobs();
+
+        definitions.Add(new DataGridTextColumnDefinition
+        {
+            Header = "Age",
+            Binding = DataGridBindingDefinition.Create<Person, int>(p => p.Age)
+        });
+
+        window.Content = grid;
+        Dispatcher.UIThread.RunJobs();
+        grid.UpdateLayout();
+
+        var headers = GetNonFillerColumns(grid).Select(c => c.Header).ToArray();
+        Assert.Equal(2, headers.Length);
+        Assert.Contains("Age", headers);
+
+        window.Close();
+    }
+
+    [AvaloniaFact]
     public void ColumnDefinitionsSource_AddRange_Materializes_Columns()
     {
         var definitions = new DataGridColumnDefinitionList();

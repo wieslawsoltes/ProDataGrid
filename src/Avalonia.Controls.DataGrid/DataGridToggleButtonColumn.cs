@@ -319,21 +319,24 @@ internal
             toggleButton.ClickMode = ClickMode;
 
             // Set content based on checked state
+            toggleButton.PropertyChanged -= ToggleButton_PropertyChanged;
             if (isEnabled && CheckedContent != null && UncheckedContent != null)
             {
                 // Use checked/unchecked content if available
                 UpdateToggleButtonContent(toggleButton);
-                toggleButton.PropertyChanged += (s, e) =>
-                {
-                    if (e.Property == ToggleButton.IsCheckedProperty)
-                    {
-                        UpdateToggleButtonContent(toggleButton);
-                    }
-                };
+                toggleButton.PropertyChanged += ToggleButton_PropertyChanged;
             }
             else if (Content != null)
             {
                 toggleButton.Content = Content;
+            }
+        }
+
+        private void ToggleButton_PropertyChanged(object sender, AvaloniaPropertyChangedEventArgs e)
+        {
+            if (e.Property == ToggleButton.IsCheckedProperty && sender is ToggleButton toggleButton)
+            {
+                UpdateToggleButtonContent(toggleButton);
             }
         }
 

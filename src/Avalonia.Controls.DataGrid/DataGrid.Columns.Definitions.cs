@@ -106,27 +106,59 @@ namespace Avalonia.Controls
 
         private void DetachColumnDefinitions(IList<DataGridColumnDefinition> definitions)
         {
-            if (_columnDefinitionsNotifications != null)
-            {
-                _columnDefinitionsNotifications.CollectionChanged -= ColumnDefinitions_CollectionChanged;
-            }
+            DetachColumnDefinitionsNotifications();
 
             RemoveDefinitionColumns();
-
-            foreach (var definition in _columnDefinitionMap.Keys.ToList())
-            {
-                UnsubscribeDefinition(definition);
-            }
 
             foreach (var column in _columnDefinitionMap.Values)
             {
                 DataGridColumnMetadata.ClearDefinition(column);
             }
 
-            _columnDefinitionsNotifications = null;
-            _columnDefinitionsThreadId = null;
             _columnDefinitionMap.Clear();
             _definitionColumns.Clear();
+        }
+
+        private void AttachColumnDefinitionsNotifications()
+        {
+            if (_columnDefinitionsSource == null)
+            {
+                return;
+            }
+
+            _columnDefinitionsNotifications = _columnDefinitionsSource as INotifyCollectionChanged;
+            if (_columnDefinitionsNotifications != null)
+            {
+                _columnDefinitionsNotifications.CollectionChanged -= ColumnDefinitions_CollectionChanged;
+                _columnDefinitionsNotifications.CollectionChanged += ColumnDefinitions_CollectionChanged;
+            }
+            else
+            {
+                System.Diagnostics.Debug.WriteLine("ColumnDefinitionsSource does not implement INotifyCollectionChanged; applying snapshot without live updates.");
+            }
+
+            _columnDefinitionsThreadId = Environment.CurrentManagedThreadId;
+
+            foreach (var definition in _columnDefinitionMap.Keys.ToList())
+            {
+                SubscribeDefinition(definition);
+            }
+        }
+
+        private void DetachColumnDefinitionsNotifications()
+        {
+            if (_columnDefinitionsNotifications != null)
+            {
+                _columnDefinitionsNotifications.CollectionChanged -= ColumnDefinitions_CollectionChanged;
+                _columnDefinitionsNotifications = null;
+            }
+
+            foreach (var definition in _columnDefinitionMap.Keys.ToList())
+            {
+                UnsubscribeDefinition(definition);
+            }
+
+            _columnDefinitionsThreadId = null;
         }
 
         private void ColumnDefinitions_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)

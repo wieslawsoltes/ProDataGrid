@@ -840,6 +840,18 @@ internal
             _dragAutoScrollDirectionY = 0;
         }
 
+        private void DisposeDragAutoScrollTimer()
+        {
+            if (_dragAutoScrollTimer == null)
+            {
+                return;
+            }
+
+            _dragAutoScrollTimer.Stop();
+            _dragAutoScrollTimer.Tick -= OnDragAutoScrollTick;
+            _dragAutoScrollTimer = null;
+        }
+
         private void OnDragAutoScrollTick(object sender, EventArgs e)
         {
             if (!_isDraggingSelection)
