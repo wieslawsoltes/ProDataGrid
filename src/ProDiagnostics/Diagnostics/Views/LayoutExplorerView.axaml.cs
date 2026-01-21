@@ -20,6 +20,7 @@ namespace Avalonia.Diagnostics.Views
         private readonly Border _horizontalSize;
         private readonly Border _verticalSize;
         private readonly Border _contentArea;
+        private CompositeDisposable _sizeGuidelineSubscriptions = new CompositeDisposable();
 
         public LayoutExplorerView()
         {
@@ -39,20 +40,39 @@ namespace Avalonia.Diagnostics.Views
             _contentArea = this.GetControl<Border>("ContentArea");
 
             _layoutRoot = this.GetControl<Grid>("LayoutRoot");
+        }
 
-            Visual? visual = _contentArea;
-            while (visual != null && !ReferenceEquals(visual, this))
-            {
-                visual.GetPropertyChangedObservable(BoundsProperty)
-                    .Subscribe(UpdateSizeGuidelines);
-                visual = visual.VisualParent;
-            }
-            
+        protected override void OnAttachedToVisualTree(VisualTreeAttachmentEventArgs e)
+        {
+            base.OnAttachedToVisualTree(e);
+            ResetSizeGuidelineSubscriptions();
+        }
+
+        protected override void OnDetachedFromVisualTree(VisualTreeAttachmentEventArgs e)
+        {
+            base.OnDetachedFromVisualTree(e);
+            _sizeGuidelineSubscriptions.Dispose();
+            _sizeGuidelineSubscriptions = new CompositeDisposable();
         }
 
         private void InitializeComponent()
         {
             AvaloniaXamlLoader.Load(this);
+        }
+
+        private void ResetSizeGuidelineSubscriptions()
+        {
+            _sizeGuidelineSubscriptions.Dispose();
+            _sizeGuidelineSubscriptions = new CompositeDisposable();
+
+            Visual? visual = _contentArea;
+            while (visual != null && !ReferenceEquals(visual, this))
+            {
+                _sizeGuidelineSubscriptions.Add(
+                    visual.GetPropertyChangedObservable(BoundsProperty)
+                        .Subscribe(UpdateSizeGuidelines));
+                visual = visual.VisualParent;
+            }
         }
 
         private void UpdateSizeGuidelines(AvaloniaPropertyChangedEventArgs _)
