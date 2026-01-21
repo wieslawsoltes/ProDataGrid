@@ -7,6 +7,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Input;
+using Avalonia.Collections;
 using Avalonia.Headless;
 using Avalonia.Threading;
 using Avalonia.Controls.Templates;
@@ -53,6 +54,7 @@ public class LeakTests
                         }
                     };
 
+                    window.SetThemeStyles();
                     window.Show();
 
                     // Do a layout and make sure that DataGrid gets added to visual tree.
@@ -72,11 +74,89 @@ public class LeakTests
         var result = run().GetAwaiter().GetResult();
 
         dotMemory.Check(memory =>
-            Assert.Equal(0, memory.GetObjects(where => where.Type.Is<DataGrid>()).ObjectsCount));
+        {
+            Assert.Equal(0, memory.GetObjects(where => where.Type.Is<DataGrid>()).ObjectsCount);
+            Assert.Equal(0, memory.GetObjects(where => where.Type.Is<DataGridCollectionView>()).ObjectsCount);
+        });
 
         GC.KeepAlive(result);
     }
 
+    [Fact]
+    [SuppressMessage("Usage", "xUnit1031:Do not use blocking task operations in test method", Justification = "Needed for dotMemoryUnit to work")]
+    public void DataGrid_ItemsSourceSwap_DoesNotLeak()
+    {
+        if (!dotMemoryApi.IsEnabled)
+        {
+            return;
+        }
+
+        var itemsA = new ObservableCollection<RowItem>
+        {
+            new RowItem("A"),
+            new RowItem("B")
+        };
+
+        var itemsB = new ObservableCollection<RowItem>
+        {
+            new RowItem("C"),
+            new RowItem("D")
+        };
+
+        var run = async () =>
+        {
+            using var session = HeadlessUnitTestSession.StartNew(typeof(Application));
+
+            return await session.Dispatch(
+                () =>
+                {
+                    var grid = new DataGrid
+                    {
+                        AutoGenerateColumns = false,
+                        ItemsSource = itemsA
+                    };
+
+                    grid.Columns.Add(new DataGridTextColumn
+                    {
+                        Header = "Name",
+                        Binding = new Binding(nameof(RowItem.Name))
+                    });
+
+                    var window = new Window
+                    {
+                        Content = grid
+                    };
+
+                    window.SetThemeStyles();
+                    window.Show();
+                    Dispatcher.UIThread.RunJobs();
+                    Assert.IsType<DataGrid>(window.Presenter?.Child);
+
+                    grid.ItemsSource = itemsB;
+                    Dispatcher.UIThread.RunJobs();
+                    grid.ItemsSource = null;
+                    Dispatcher.UIThread.RunJobs();
+
+                    window.Content = null;
+                    Dispatcher.UIThread.RunJobs();
+
+                    return window;
+                },
+                CancellationToken.None);
+        };
+
+        var result = run().GetAwaiter().GetResult();
+
+        dotMemory.Check(memory =>
+        {
+            Assert.Equal(0, memory.GetObjects(where => where.Type.Is<DataGrid>()).ObjectsCount);
+            Assert.Equal(0, memory.GetObjects(where => where.Type.Is<DataGridCollectionView>()).ObjectsCount);
+        });
+
+        GC.KeepAlive(itemsA);
+        GC.KeepAlive(itemsB);
+        GC.KeepAlive(result);
+    }
     [Fact]
     [SuppressMessage("Usage", "xUnit1031:Do not use blocking task operations in test method", Justification = "Needed for dotMemoryUnit to work")]
     public void ContentControl_TemplateSwap_DoesNotLeak_DataGrid()
@@ -258,6 +338,143 @@ public class LeakTests
         GC.KeepAlive(result);
     }
 
+    [Fact]
+    [SuppressMessage("Usage", "xUnit1031:Do not use blocking task operations in test method", Justification = "Needed for dotMemoryUnit to work")]
+    public void DataGrid_ExternalCollectionView_Grouping_DoesNotLeak()
+    {
+        if (!dotMemoryApi.IsEnabled)
+        {
+            return;
+        }
+
+        var items = new ObservableCollection<GroupedRowItem>
+        {
+            new GroupedRowItem("A 1", "Group A"),
+            new GroupedRowItem("A 2", "Group A"),
+            new GroupedRowItem("B 1", "Group B"),
+        };
+        var view = new DataGridCollectionView(items);
+        view.GroupDescriptions.Add(new DataGridPathGroupDescription(nameof(GroupedRowItem.Group)));
+        view.Refresh();
+
+        var run = async () =>
+        {
+            using var session = HeadlessUnitTestSession.StartNew(typeof(Application));
+
+            return await session.Dispatch(
+                () =>
+                {
+                    var grid = new DataGrid
+                    {
+                        AutoGenerateColumns = false,
+                        ItemsSource = view
+                    };
+                    grid.Columns.Add(new DataGridTextColumn
+                    {
+                        Header = "Name",
+                        Binding = new Binding(nameof(GroupedRowItem.Name))
+                    });
+
+                    var window = new Window
+                    {
+                        Content = grid
+                    };
+
+                    window.SetThemeStyles();
+                    window.Show();
+                    Dispatcher.UIThread.RunJobs();
+                    Assert.IsType<DataGrid>(window.Presenter?.Child);
+
+                    window.Content = null;
+                    Dispatcher.UIThread.RunJobs();
+
+                    return window;
+                },
+                CancellationToken.None);
+        };
+
+        var result = run().GetAwaiter().GetResult();
+
+        dotMemory.Check(memory =>
+            Assert.Equal(0, memory.GetObjects(where => where.Type.Is<DataGrid>()).ObjectsCount));
+
+        GC.KeepAlive(view);
+        GC.KeepAlive(result);
+    }
+
+    [Fact]
+    [SuppressMessage("Usage", "xUnit1031:Do not use blocking task operations in test method", Justification = "Needed for dotMemoryUnit to work")]
+    public void DataGrid_ExternalCollectionView_GroupingToggle_DoesNotLeak()
+    {
+        if (!dotMemoryApi.IsEnabled)
+        {
+            return;
+        }
+
+        var items = new ObservableCollection<GroupedRowItem>
+        {
+            new GroupedRowItem("A 1", "Group A"),
+            new GroupedRowItem("A 2", "Group A"),
+            new GroupedRowItem("B 1", "Group B"),
+        };
+        var view = new DataGridCollectionView(items);
+        view.GroupDescriptions.Add(new DataGridPathGroupDescription(nameof(GroupedRowItem.Group)));
+        view.Refresh();
+
+        var run = async () =>
+        {
+            using var session = HeadlessUnitTestSession.StartNew(typeof(Application));
+
+            return await session.Dispatch(
+                () =>
+                {
+                    var grid = new DataGrid
+                    {
+                        AutoGenerateColumns = false,
+                        ItemsSource = view
+                    };
+                    grid.Columns.Add(new DataGridTextColumn
+                    {
+                        Header = "Name",
+                        Binding = new Binding(nameof(GroupedRowItem.Name))
+                    });
+
+                    var window = new Window
+                    {
+                        Content = grid
+                    };
+
+                    window.SetThemeStyles();
+                    window.Show();
+                    Dispatcher.UIThread.RunJobs();
+                    Assert.IsType<DataGrid>(window.Presenter?.Child);
+
+                    grid.ExpandAllGroups();
+                    Dispatcher.UIThread.RunJobs();
+                    grid.CollapseAllGroups();
+                    Dispatcher.UIThread.RunJobs();
+
+                    view.GroupDescriptions.Clear();
+                    view.Refresh();
+                    Dispatcher.UIThread.RunJobs();
+
+                    window.Content = null;
+                    Dispatcher.UIThread.RunJobs();
+
+                    return window;
+                },
+                CancellationToken.None);
+        };
+
+        var result = run().GetAwaiter().GetResult();
+
+        dotMemory.Check(memory =>
+            Assert.Equal(0, memory.GetObjects(where => where.Type.Is<DataGrid>()).ObjectsCount));
+
+        GC.KeepAlive(view);
+        GC.KeepAlive(items);
+        GC.KeepAlive(result);
+    }
     private sealed class SwapItem
     {
         public SwapItem(string name)
@@ -282,6 +499,18 @@ public class LeakTests
         public string Name { get; }
     }
 
+    private sealed class GroupedRowItem
+    {
+        public GroupedRowItem(string name, string group)
+        {
+            Name = name;
+            Group = group;
+        }
+
+        public string Name { get; }
+
+        public string Group { get; }
+    }
     private sealed class ReproMainViewModel : INotifyPropertyChanged
     {
         private CancellationTokenSource? _cts;
