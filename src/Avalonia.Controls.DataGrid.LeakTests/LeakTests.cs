@@ -615,6 +615,9 @@ public class LeakTests
                     Dispatcher.UIThread.RunJobs();
                     Assert.IsType<DataGrid>(window.Presenter?.Child);
 
+                    // Clear bound columns before swapping to avoid inline binding conflicts.
+                    grid.Columns = null;
+                    Dispatcher.UIThread.RunJobs();
                     grid.Columns = columnsB;
                     Dispatcher.UIThread.RunJobs();
 
