@@ -3,12 +3,12 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
-using System.Diagnostics.CodeAnalysis;
 using System.Linq;
-using System.Reflection;
+using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Input;
+using Avalonia;
 using Avalonia.Collections;
 using Avalonia.Headless;
 using Avalonia.Input;
@@ -23,6 +23,7 @@ using Avalonia.Controls.DataGridSearching;
 using Avalonia.Controls.DataGridSorting;
 using Avalonia.Controls.Selection;
 using Xunit;
+using static Avalonia.Controls.DataGridTests.LeakTestHelpers;
 
 namespace Avalonia.Controls.DataGridTests;
 
@@ -31,55 +32,17 @@ public class LeakTests
     // Need to have the collection as field, so GC will not free it
     private readonly ObservableCollection<string> _observableCollection = new();
 
-    [Fact]
-    [SuppressMessage("Usage", "xUnit1031:Do not use blocking task operations in test method", Justification = "Needed for headless UI dispatch")]
+    [ReleaseFact]
     public void DataGrid_Is_Freed()
     {
         // When attached to INotifyCollectionChanged, DataGrid will subscribe to its events, potentially causing leak
-        var run = async () =>
-        {
-            using var session = HeadlessUnitTestSession.StartNew(typeof(Application));
-
-            return await session.Dispatch(
-                () => {
-                    var grid = new DataGrid
-                    {
-                        ItemsSource = _observableCollection
-                    };
-                    var window = new Window
-                    {
-                        Content = grid
-                    };
-
-                    window.SetThemeStyles();
-                    window.Show();
-
-                    // Do a layout and make sure that DataGrid gets added to visual tree.
-                    window.Show();
-                    Assert.IsType<DataGrid>(window.Presenter?.Child);
-
-                    var gridRef = new WeakReference(grid);
-                    var viewRef = new WeakReference(grid.CollectionView!);
-
-                    // Clear the content and ensure the DataGrid is removed.
-                    window.Content = null;
-                    Dispatcher.UIThread.RunJobs();
-                    Assert.Null(window.Presenter.Child);
-
-                    return (gridRef, viewRef);
-                },
-                CancellationToken.None);
-        };
-
-        var (gridRef, viewRef) = run().GetAwaiter().GetResult();
-
+        var (gridRef, viewRef) = RunInSession(() => RunDataGridIsFreed(_observableCollection));
         AssertCollected(gridRef, viewRef);
 
         GC.KeepAlive(_observableCollection);
     }
 
-    [Fact]
-    [SuppressMessage("Usage", "xUnit1031:Do not use blocking task operations in test method", Justification = "Needed for headless UI dispatch")]
+    [ReleaseFact]
     public void DataGrid_ItemsSourceSwap_DoesNotLeak()
     {
         var itemsA = new ObservableCollection<RowItem>
@@ -93,53 +56,43 @@ public class LeakTests
             new RowItem("C"),
             new RowItem("D")
         };
-
-        var run = async () =>
+        (WeakReference GridRef, WeakReference ViewRef) Run()
         {
-            using var session = HeadlessUnitTestSession.StartNew(typeof(Application));
+            var grid = new DataGrid
+            {
+                AutoGenerateColumns = false,
+                ItemsSource = itemsA
+            };
 
-            return await session.Dispatch(
-                () =>
-                {
-                    var grid = new DataGrid
-                    {
-                        AutoGenerateColumns = false,
-                        ItemsSource = itemsA
-                    };
+            grid.Columns.Add(new DataGridTextColumn
+            {
+                Header = "Name",
+                Binding = new Binding(nameof(RowItem.Name))
+            });
 
-                    grid.Columns.Add(new DataGridTextColumn
-                    {
-                        Header = "Name",
-                        Binding = new Binding(nameof(RowItem.Name))
-                    });
+            var window = new Window
+            {
+                Content = grid
+            };
 
-                    var window = new Window
-                    {
-                        Content = grid
-                    };
+            window.SetThemeStyles(DataGridTheme.SimpleV2);
+            ShowWindow(window);
+            Assert.IsType<DataGrid>(window.Presenter?.Child);
 
-                    window.SetThemeStyles();
-                    window.Show();
-                    Dispatcher.UIThread.RunJobs();
-                    Assert.IsType<DataGrid>(window.Presenter?.Child);
+            grid.ItemsSource = itemsB;
+            Dispatcher.UIThread.RunJobs();
+            grid.ItemsSource = null;
+            Dispatcher.UIThread.RunJobs();
 
-                    grid.ItemsSource = itemsB;
-                    Dispatcher.UIThread.RunJobs();
-                    grid.ItemsSource = null;
-                    Dispatcher.UIThread.RunJobs();
+            var gridRef = new WeakReference(grid);
+            var viewRef = new WeakReference(grid.CollectionView!);
 
-                    var gridRef = new WeakReference(grid);
-                    var viewRef = new WeakReference(grid.CollectionView!);
+            CleanupWindow(window);
 
-                    window.Content = null;
-                    Dispatcher.UIThread.RunJobs();
+            return (gridRef, viewRef);
+        }
 
-                    return (gridRef, viewRef);
-                },
-                CancellationToken.None);
-        };
-
-        var (gridRef, viewRef) = run().GetAwaiter().GetResult();
+        var (gridRef, viewRef) = RunInSession(Run);
 
         AssertCollected(gridRef, viewRef);
 
@@ -147,8 +100,7 @@ public class LeakTests
         GC.KeepAlive(itemsB);
     }
 
-    [Fact]
-    [SuppressMessage("Usage", "xUnit1031:Do not use blocking task operations in test method", Justification = "Needed for headless UI dispatch")]
+    [ReleaseFact]
     public void ContentControl_TemplateSwap_DoesNotLeak_DataGrid()
     {
         var items = new[]
@@ -158,58 +110,46 @@ public class LeakTests
         };
         var gridRefs = new List<WeakReference>();
         var viewRefs = new List<WeakReference>();
-
-        var run = async () =>
+        void Run()
         {
-            using var session = HeadlessUnitTestSession.StartNew(typeof(Application));
-
-            return await session.Dispatch(
-                () =>
+            var contentControl = new ContentControl();
+            contentControl.DataTemplates.Add(new FuncDataTemplate<SwapItem>((item, _) =>
+            {
+                var grid = new DataGrid
                 {
-                    var contentControl = new ContentControl();
-                    contentControl.DataTemplates.Add(new FuncDataTemplate<SwapItem>((item, _) =>
-                    {
-                        var grid = new DataGrid
-                        {
-                            AutoGenerateColumns = false,
-                            ItemsSource = item.Rows
-                        };
-                        grid.Columns.Add(new DataGridTextColumn
-                        {
-                            Header = "Name",
-                            Binding = new Binding(nameof(RowItem.Name))
-                        });
-                        gridRefs.Add(new WeakReference(grid));
-                        if (grid.CollectionView != null)
-                        {
-                            viewRefs.Add(new WeakReference(grid.CollectionView));
-                        }
-                        return grid;
-                    }));
+                    AutoGenerateColumns = false,
+                    ItemsSource = item.Rows
+                };
+                grid.Columns.Add(new DataGridTextColumn
+                {
+                    Header = "Name",
+                    Binding = new Binding(nameof(RowItem.Name))
+                });
+                gridRefs.Add(new WeakReference(grid));
+                if (grid.CollectionView != null)
+                {
+                    viewRefs.Add(new WeakReference(grid.CollectionView));
+                }
+                return grid;
+            }));
 
-                    var window = new Window { Content = contentControl };
-                    window.SetThemeStyles();
-                    window.Show();
-                    Dispatcher.UIThread.RunJobs();
+            var window = new Window { Content = contentControl };
+            window.SetThemeStyles(DataGridTheme.SimpleV2);
+            ShowWindow(window);
 
-                    contentControl.Content = items[0];
-                    Dispatcher.UIThread.RunJobs();
+            contentControl.Content = items[0];
+            Dispatcher.UIThread.RunJobs();
 
-                    for (var i = 0; i < 50; i++)
-                    {
-                        contentControl.Content = items[i % items.Length];
-                        Dispatcher.UIThread.RunJobs();
-                    }
+            for (var i = 0; i < 50; i++)
+            {
+                contentControl.Content = items[i % items.Length];
+                Dispatcher.UIThread.RunJobs();
+            }
 
-                    window.Content = null;
-                    Dispatcher.UIThread.RunJobs();
+            CleanupWindow(window);
+        }
 
-                    return true;
-                },
-                CancellationToken.None);
-        };
-
-        run().GetAwaiter().GetResult();
+        RunInSession(Run);
 
         AssertCollected(gridRefs.ToArray());
         if (viewRefs.Count > 0)
@@ -219,89 +159,79 @@ public class LeakTests
         GC.KeepAlive(items);
     }
 
-    [Fact]
-    [SuppressMessage("Usage", "xUnit1031:Do not use blocking task operations in test method", Justification = "Needed for headless UI dispatch")]
-    public void ContentControl_TemplateSwap_BackgroundThread_DoesNotLeak_DataGrid()
+    [ReleaseFact]
+    public async Task ContentControl_TemplateSwap_BackgroundThread_DoesNotLeak_DataGrid()
     {
-        var gridRefs = new List<WeakReference>();
-        var run = async () =>
+        var gridRefs = await RunInSessionAsync(async () =>
         {
-            using var session = HeadlessUnitTestSession.StartNew(typeof(Application));
-            ReproMainViewModel? viewModel = null;
+            var gridRefs = new List<WeakReference>();
+            var viewModel = new ReproMainViewModel();
             Window? window = null;
 
-            await session.Dispatch(
-                () =>
+            var menuItem = new MenuItem { Header = "Start/Stop" };
+            menuItem.Bind(MenuItem.CommandProperty, new Binding(nameof(ReproMainViewModel.StartStopCommand)));
+            var menu = new Menu();
+            menu.Items.Add(menuItem);
+
+            var listBox = new ListBox { Width = 100 };
+            listBox.Bind(ItemsControl.ItemsSourceProperty, new Binding(nameof(ReproMainViewModel.Items)));
+            listBox.Bind(ListBox.SelectedItemProperty, new Binding(nameof(ReproMainViewModel.SelectedItem))
+            {
+                Mode = BindingMode.TwoWay
+            });
+            listBox.ItemTemplate = new FuncDataTemplate<ReproItemViewModel>((_, _) =>
+            {
+                var textBlock = new TextBlock();
+                textBlock.Bind(TextBlock.TextProperty, new Binding(nameof(ReproItemViewModel.Name)));
+                return textBlock;
+            });
+
+            var contentControl = new ContentControl();
+            contentControl.Bind(ContentControl.ContentProperty, new Binding(nameof(ReproMainViewModel.SelectedItem)));
+            contentControl.DataTemplates.Add(new FuncDataTemplate<ReproItemViewModel>((_, _) =>
+            {
+                var stack = new StackPanel();
+
+                var nameBlock = new TextBlock();
+                nameBlock.Bind(TextBlock.TextProperty, new Binding(nameof(ReproItemViewModel.Name)));
+                stack.Children.Add(nameBlock);
+
+                var grid = new DataGrid();
+                grid.Bind(ItemsControl.ItemsSourceProperty, new Binding(nameof(ReproItemViewModel.Rows)));
+                grid.Columns.Add(new DataGridTextColumn
                 {
-                    viewModel = new ReproMainViewModel();
+                    Header = "Name",
+                    Binding = new Binding(nameof(ReproRowViewModel.Name))
+                });
+                gridRefs.Add(new WeakReference(grid));
+                stack.Children.Add(grid);
 
-                    var menuItem = new MenuItem { Header = "Start/Stop" };
-                    menuItem.Bind(MenuItem.CommandProperty, new Binding(nameof(ReproMainViewModel.StartStopCommand)));
-                    var menu = new Menu();
-                    menu.Items.Add(menuItem);
+                return stack;
+            }));
 
-                    var listBox = new ListBox { Width = 100 };
-                    listBox.Bind(ItemsControl.ItemsSourceProperty, new Binding(nameof(ReproMainViewModel.Items)));
-                    listBox.Bind(ListBox.SelectedItemProperty, new Binding(nameof(ReproMainViewModel.SelectedItem))
-                    {
-                        Mode = BindingMode.TwoWay
-                    });
-                    listBox.ItemTemplate = new FuncDataTemplate<ReproItemViewModel>((_, _) =>
-                    {
-                        var textBlock = new TextBlock();
-                        textBlock.Bind(TextBlock.TextProperty, new Binding(nameof(ReproItemViewModel.Name)));
-                        return textBlock;
-                    });
+            var dockPanel = new DockPanel();
+            DockPanel.SetDock(menu, Dock.Top);
+            DockPanel.SetDock(listBox, Dock.Left);
+            dockPanel.Children.Add(menu);
+            dockPanel.Children.Add(listBox);
+            dockPanel.Children.Add(contentControl);
 
-                    var contentControl = new ContentControl();
-                    contentControl.Bind(ContentControl.ContentProperty, new Binding(nameof(ReproMainViewModel.SelectedItem)));
-                    contentControl.DataTemplates.Add(new FuncDataTemplate<ReproItemViewModel>((_, _) =>
-                    {
-                        var stack = new StackPanel();
+            window = new Window
+            {
+                Content = dockPanel,
+                DataContext = viewModel
+            };
 
-                        var nameBlock = new TextBlock();
-                        nameBlock.Bind(TextBlock.TextProperty, new Binding(nameof(ReproItemViewModel.Name)));
-                        stack.Children.Add(nameBlock);
+            window.SetThemeStyles(DataGridTheme.SimpleV2);
+            ShowWindow(window);
 
-                        var grid = new DataGrid();
-                        grid.Bind(ItemsControl.ItemsSourceProperty, new Binding(nameof(ReproItemViewModel.Rows)));
-                        grid.Columns.Add(new DataGridTextColumn
-                        {
-                            Header = "Name",
-                            Binding = new Binding(nameof(ReproRowViewModel.Name))
-                        });
-                        gridRefs.Add(new WeakReference(grid));
-                        stack.Children.Add(grid);
-
-                        return stack;
-                    }));
-
-                    var dockPanel = new DockPanel();
-                    DockPanel.SetDock(menu, Dock.Top);
-                    DockPanel.SetDock(listBox, Dock.Left);
-                    dockPanel.Children.Add(menu);
-                    dockPanel.Children.Add(listBox);
-                    dockPanel.Children.Add(contentControl);
-
-                    window = new Window
-                    {
-                        Content = dockPanel,
-                        DataContext = viewModel
-                    };
-
-                    window.SetThemeStyles();
-                    window.Show();
-                    Dispatcher.UIThread.RunJobs();
-                },
-                CancellationToken.None);
-
-            viewModel!.StartStopCommand.Execute(null);
+            viewModel.StartStopCommand.Execute(null);
 
             var runUntil = DateTime.UtcNow + TimeSpan.FromMilliseconds(300);
             while (DateTime.UtcNow < runUntil)
             {
                 await Task.Delay(10);
-                await session.Dispatch(() => Dispatcher.UIThread.RunJobs(), CancellationToken.None);
+                Dispatcher.UIThread.RunJobs();
             }
 
             viewModel.StartStopCommand.Execute(null);
@@ -309,27 +239,18 @@ public class LeakTests
             for (var i = 0; i < 100 && viewModel.IsRunning; i++)
             {
                 await Task.Delay(10);
-                await session.Dispatch(() => Dispatcher.UIThread.RunJobs(), CancellationToken.None);
+                Dispatcher.UIThread.RunJobs();
             }
 
-            await session.Dispatch(
-                () =>
-                {
-                    window!.Content = null;
-                    Dispatcher.UIThread.RunJobs();
-                },
-                CancellationToken.None);
+            CleanupWindow(window!);
 
-            return window!;
-        };
+            return gridRefs.ToArray();
+        });
 
-        run().GetAwaiter().GetResult();
-
-        AssertCollected(gridRefs.ToArray());
+        AssertCollected(gridRefs);
     }
 
-    [Fact]
-    [SuppressMessage("Usage", "xUnit1031:Do not use blocking task operations in test method", Justification = "Needed for headless UI dispatch")]
+    [ReleaseFact]
     public void DataGrid_ExternalCollectionView_Grouping_DoesNotLeak()
     {
         var items = new ObservableCollection<GroupedRowItem>
@@ -341,54 +262,45 @@ public class LeakTests
         var view = new DataGridCollectionView(items);
         view.GroupDescriptions.Add(new DataGridPathGroupDescription(nameof(GroupedRowItem.Group)));
         view.Refresh();
-
-        var run = async () =>
+        WeakReference Run()
         {
-            using var session = HeadlessUnitTestSession.StartNew(typeof(Application));
+            var grid = new DataGrid
+            {
+                AutoGenerateColumns = false,
+                ItemsSource = view
+            };
+            grid.Columns.Add(new DataGridTextColumn
+            {
+                Header = "Name",
+                Binding = new Binding(nameof(GroupedRowItem.Name))
+            });
 
-            return await session.Dispatch(
-                () =>
-                {
-                    var grid = new DataGrid
-                    {
-                        AutoGenerateColumns = false,
-                        ItemsSource = view
-                    };
-                    grid.Columns.Add(new DataGridTextColumn
-                    {
-                        Header = "Name",
-                        Binding = new Binding(nameof(GroupedRowItem.Name))
-                    });
+            var window = new Window
+            {
+                Content = grid
+            };
 
-                    var window = new Window
-                    {
-                        Content = grid
-                    };
+            window.SetThemeStyles(DataGridTheme.SimpleV2);
+            ShowWindow(window);
+            Assert.IsType<DataGrid>(window.Presenter?.Child);
 
-                    window.SetThemeStyles();
-                    window.Show();
-                    Dispatcher.UIThread.RunJobs();
-                    Assert.IsType<DataGrid>(window.Presenter?.Child);
+            grid.ColumnDefinitionsSource = null;
+            Dispatcher.UIThread.RunJobs();
 
-                    var gridRef = new WeakReference(grid);
+            var gridRef = new WeakReference(grid);
 
-                    window.Content = null;
-                    Dispatcher.UIThread.RunJobs();
+            CleanupWindow(window);
 
-                    return gridRef;
-                },
-                CancellationToken.None);
-        };
+            return gridRef;
+        }
 
-        var gridRef = run().GetAwaiter().GetResult();
-
+        var gridRef = RunInSession(Run);
         AssertCollected(gridRef);
 
         GC.KeepAlive(view);
     }
 
-    [Fact]
-    [SuppressMessage("Usage", "xUnit1031:Do not use blocking task operations in test method", Justification = "Needed for headless UI dispatch")]
+    [ReleaseFact]
     public void DataGrid_ExternalCollectionView_GroupingToggle_DoesNotLeak()
     {
         var items = new ObservableCollection<GroupedRowItem>
@@ -400,64 +312,52 @@ public class LeakTests
         var view = new DataGridCollectionView(items);
         view.GroupDescriptions.Add(new DataGridPathGroupDescription(nameof(GroupedRowItem.Group)));
         view.Refresh();
-
-        var run = async () =>
+        WeakReference Run()
         {
-            using var session = HeadlessUnitTestSession.StartNew(typeof(Application));
+            var grid = new DataGrid
+            {
+                AutoGenerateColumns = false,
+                ItemsSource = view
+            };
+            grid.Columns.Add(new DataGridTextColumn
+            {
+                Header = "Name",
+                Binding = new Binding(nameof(GroupedRowItem.Name))
+            });
 
-            return await session.Dispatch(
-                () =>
-                {
-                    var grid = new DataGrid
-                    {
-                        AutoGenerateColumns = false,
-                        ItemsSource = view
-                    };
-                    grid.Columns.Add(new DataGridTextColumn
-                    {
-                        Header = "Name",
-                        Binding = new Binding(nameof(GroupedRowItem.Name))
-                    });
+            var window = new Window
+            {
+                Content = grid
+            };
 
-                    var window = new Window
-                    {
-                        Content = grid
-                    };
+            window.SetThemeStyles();
+            ShowWindow(window);
+            Assert.IsType<DataGrid>(window.Presenter?.Child);
 
-                    window.SetThemeStyles();
-                    window.Show();
-                    Dispatcher.UIThread.RunJobs();
-                    Assert.IsType<DataGrid>(window.Presenter?.Child);
+            grid.ExpandAllGroups();
+            Dispatcher.UIThread.RunJobs();
+            grid.CollapseAllGroups();
+            Dispatcher.UIThread.RunJobs();
 
-                    grid.ExpandAllGroups();
-                    Dispatcher.UIThread.RunJobs();
-                    grid.CollapseAllGroups();
-                    Dispatcher.UIThread.RunJobs();
+            view.GroupDescriptions.Clear();
+            view.Refresh();
+            Dispatcher.UIThread.RunJobs();
 
-                    view.GroupDescriptions.Clear();
-                    view.Refresh();
-                    Dispatcher.UIThread.RunJobs();
+            var gridRef = new WeakReference(grid);
 
-                    var gridRef = new WeakReference(grid);
+            CleanupWindow(window);
 
-                    window.Content = null;
-                    Dispatcher.UIThread.RunJobs();
+            return gridRef;
+        }
 
-                    return gridRef;
-                },
-                CancellationToken.None);
-        };
-
-        var gridRef = run().GetAwaiter().GetResult();
-
+        var gridRef = RunInSession(Run);
         AssertCollected(gridRef);
 
         GC.KeepAlive(view);
         GC.KeepAlive(items);
     }
 
-    [Fact]
-    [SuppressMessage("Usage", "xUnit1031:Do not use blocking task operations in test method", Justification = "Needed for headless UI dispatch")]
+    [ReleaseFact]
     public void DataGrid_BoundColumns_DoesNotLeak()
     {
         var columns = new ObservableCollection<DataGridColumn>
@@ -474,43 +374,7 @@ public class LeakTests
             new RowItem("A"),
             new RowItem("B")
         };
-
-        var run = async () =>
-        {
-            using var session = HeadlessUnitTestSession.StartNew(typeof(Application));
-
-            return await session.Dispatch(
-                () =>
-                {
-                    var grid = new DataGrid
-                    {
-                        AutoGenerateColumns = false,
-                        ItemsSource = items,
-                        Columns = columns,
-                        SummaryRecalculationDelayMs = 0
-                    };
-
-                    var window = new Window
-                    {
-                        Content = grid
-                    };
-
-                    window.SetThemeStyles();
-                    window.Show();
-                    Dispatcher.UIThread.RunJobs();
-                    Assert.IsType<DataGrid>(window.Presenter?.Child);
-
-                    var gridRef = new WeakReference(grid);
-
-                    window.Content = null;
-                    Dispatcher.UIThread.RunJobs();
-
-                    return gridRef;
-                },
-                CancellationToken.None);
-        };
-
-        var gridRef = run().GetAwaiter().GetResult();
+        var gridRef = RunInSession(() => RunBoundColumns(columns, items));
 
         AssertCollected(gridRef);
 
@@ -518,8 +382,7 @@ public class LeakTests
         GC.KeepAlive(items);
     }
 
-    [Fact]
-    [SuppressMessage("Usage", "xUnit1031:Do not use blocking task operations in test method", Justification = "Needed for headless UI dispatch")]
+    [ReleaseFact]
     public void DataGrid_ColumnsSwap_WithSpecializedColumns_DoesNotLeak()
     {
         var columnsA = new ObservableCollection<DataGridColumn>
@@ -545,48 +408,7 @@ public class LeakTests
             new BoolRowItem(true),
             new BoolRowItem(false)
         };
-
-        var run = async () =>
-        {
-            using var session = HeadlessUnitTestSession.StartNew(typeof(Application));
-
-            return await session.Dispatch(
-                () =>
-                {
-                    var grid = new DataGrid
-                    {
-                        AutoGenerateColumns = false,
-                        ItemsSource = items,
-                        Columns = columnsA
-                    };
-
-                    var window = new Window
-                    {
-                        Content = grid
-                    };
-
-                    window.SetThemeStyles();
-                    window.Show();
-                    Dispatcher.UIThread.RunJobs();
-                    Assert.IsType<DataGrid>(window.Presenter?.Child);
-
-                    // Clear bound columns before swapping to avoid inline binding conflicts.
-                    grid.Columns = null;
-                    Dispatcher.UIThread.RunJobs();
-                    grid.Columns = columnsB;
-                    Dispatcher.UIThread.RunJobs();
-
-                    var gridRef = new WeakReference(grid);
-
-                    window.Content = null;
-                    Dispatcher.UIThread.RunJobs();
-
-                    return gridRef;
-                },
-                CancellationToken.None);
-        };
-
-        var gridRef = run().GetAwaiter().GetResult();
+        var gridRef = RunInSession(() => RunColumnsSwapWithSpecializedColumns(columnsA, columnsB, items));
 
         AssertCollected(gridRef);
 
@@ -595,8 +417,7 @@ public class LeakTests
         GC.KeepAlive(items);
     }
 
-    [Fact]
-    [SuppressMessage("Usage", "xUnit1031:Do not use blocking task operations in test method", Justification = "Needed for headless UI dispatch")]
+    [ReleaseFact]
     public void DataGrid_ColumnDefinitionsSource_DoesNotLeak()
     {
         var definitions = new ObservableCollection<DataGridColumnDefinition>
@@ -613,42 +434,7 @@ public class LeakTests
             new RowItem("A"),
             new RowItem("B")
         };
-
-        var run = async () =>
-        {
-            using var session = HeadlessUnitTestSession.StartNew(typeof(Application));
-
-            return await session.Dispatch(
-                () =>
-                {
-                    var grid = new DataGrid
-                    {
-                        AutoGenerateColumns = false,
-                        ItemsSource = items,
-                        ColumnDefinitionsSource = definitions
-                    };
-
-                    var window = new Window
-                    {
-                        Content = grid
-                    };
-
-                    window.SetThemeStyles();
-                    window.Show();
-                    Dispatcher.UIThread.RunJobs();
-                    Assert.IsType<DataGrid>(window.Presenter?.Child);
-
-                    var gridRef = new WeakReference(grid);
-
-                    window.Content = null;
-                    Dispatcher.UIThread.RunJobs();
-
-                    return gridRef;
-                },
-                CancellationToken.None);
-        };
-
-        var gridRef = run().GetAwaiter().GetResult();
+        var gridRef = RunInSession(() => RunColumnDefinitionsSource(definitions, items));
 
         AssertCollected(gridRef);
 
@@ -656,8 +442,7 @@ public class LeakTests
         GC.KeepAlive(items);
     }
 
-    [Fact]
-    [SuppressMessage("Usage", "xUnit1031:Do not use blocking task operations in test method", Justification = "Needed for headless UI dispatch")]
+    [ReleaseFact]
     public void DataGrid_ColumnDefinitionsSourceSwap_DoesNotLeak()
     {
         var definitionsA = new ObservableCollection<DataGridColumnDefinition>
@@ -684,45 +469,7 @@ public class LeakTests
             new RowItem("A"),
             new RowItem("B")
         };
-
-        var run = async () =>
-        {
-            using var session = HeadlessUnitTestSession.StartNew(typeof(Application));
-
-            return await session.Dispatch(
-                () =>
-                {
-                    var grid = new DataGrid
-                    {
-                        AutoGenerateColumns = false,
-                        ItemsSource = items,
-                        ColumnDefinitionsSource = definitionsA
-                    };
-
-                    var window = new Window
-                    {
-                        Content = grid
-                    };
-
-                    window.SetThemeStyles();
-                    window.Show();
-                    Dispatcher.UIThread.RunJobs();
-                    Assert.IsType<DataGrid>(window.Presenter?.Child);
-
-                    grid.ColumnDefinitionsSource = definitionsB;
-                    Dispatcher.UIThread.RunJobs();
-
-                    var gridRef = new WeakReference(grid);
-
-                    window.Content = null;
-                    Dispatcher.UIThread.RunJobs();
-
-                    return gridRef;
-                },
-                CancellationToken.None);
-        };
-
-        var gridRef = run().GetAwaiter().GetResult();
+        var gridRef = RunInSession(() => RunColumnDefinitionsSourceSwap(definitionsA, definitionsB, items));
 
         AssertCollected(gridRef);
 
@@ -731,8 +478,7 @@ public class LeakTests
         GC.KeepAlive(items);
     }
 
-    [Fact]
-    [SuppressMessage("Usage", "xUnit1031:Do not use blocking task operations in test method", Justification = "Needed for headless UI dispatch")]
+    [ReleaseFact]
     public void DataGrid_SelectedItemsBinding_DoesNotLeak()
     {
         var selectedItems = new ObservableCollection<object>();
@@ -741,41 +487,31 @@ public class LeakTests
             new RowItem("A"),
             new RowItem("B")
         };
-
-        var run = async () =>
+        WeakReference Run()
         {
-            using var session = HeadlessUnitTestSession.StartNew(typeof(Application));
+            var grid = new DataGrid
+            {
+                ItemsSource = items,
+                SelectedItems = selectedItems
+            };
 
-            return await session.Dispatch(
-                () =>
-                {
-                    var grid = new DataGrid
-                    {
-                        ItemsSource = items,
-                        SelectedItems = selectedItems
-                    };
+            var window = new Window
+            {
+                Content = grid
+            };
 
-                    var window = new Window
-                    {
-                        Content = grid
-                    };
+            window.SetThemeStyles();
+            ShowWindow(window);
+            Assert.IsType<DataGrid>(window.Presenter?.Child);
 
-                    window.SetThemeStyles();
-                    window.Show();
-                    Dispatcher.UIThread.RunJobs();
-                    Assert.IsType<DataGrid>(window.Presenter?.Child);
+            var gridRef = new WeakReference(grid);
 
-                    var gridRef = new WeakReference(grid);
+            CleanupWindow(window);
 
-                    window.Content = null;
-                    Dispatcher.UIThread.RunJobs();
+            return gridRef;
+        }
 
-                    return gridRef;
-                },
-                CancellationToken.None);
-        };
-
-        var gridRef = run().GetAwaiter().GetResult();
+        var gridRef = RunInSession(Run);
 
         AssertCollected(gridRef);
 
@@ -783,8 +519,7 @@ public class LeakTests
         GC.KeepAlive(items);
     }
 
-    [Fact]
-    [SuppressMessage("Usage", "xUnit1031:Do not use blocking task operations in test method", Justification = "Needed for headless UI dispatch")]
+    [ReleaseFact]
     public void DataGrid_SelectedCellsBinding_DoesNotLeak()
     {
         var selectedCells = new ObservableCollection<DataGridCellInfo>();
@@ -793,41 +528,31 @@ public class LeakTests
             new RowItem("A"),
             new RowItem("B")
         };
-
-        var run = async () =>
+        WeakReference Run()
         {
-            using var session = HeadlessUnitTestSession.StartNew(typeof(Application));
+            var grid = new DataGrid
+            {
+                ItemsSource = items,
+                SelectedCells = selectedCells
+            };
 
-            return await session.Dispatch(
-                () =>
-                {
-                    var grid = new DataGrid
-                    {
-                        ItemsSource = items,
-                        SelectedCells = selectedCells
-                    };
+            var window = new Window
+            {
+                Content = grid
+            };
 
-                    var window = new Window
-                    {
-                        Content = grid
-                    };
+            window.SetThemeStyles();
+            ShowWindow(window);
+            Assert.IsType<DataGrid>(window.Presenter?.Child);
 
-                    window.SetThemeStyles();
-                    window.Show();
-                    Dispatcher.UIThread.RunJobs();
-                    Assert.IsType<DataGrid>(window.Presenter?.Child);
+            var gridRef = new WeakReference(grid);
 
-                    var gridRef = new WeakReference(grid);
+            CleanupWindow(window);
 
-                    window.Content = null;
-                    Dispatcher.UIThread.RunJobs();
+            return gridRef;
+        }
 
-                    return gridRef;
-                },
-                CancellationToken.None);
-        };
-
-        var gridRef = run().GetAwaiter().GetResult();
+        var gridRef = RunInSession(Run);
 
         AssertCollected(gridRef);
 
@@ -835,8 +560,7 @@ public class LeakTests
         GC.KeepAlive(items);
     }
 
-    [Fact]
-    [SuppressMessage("Usage", "xUnit1031:Do not use blocking task operations in test method", Justification = "Needed for headless UI dispatch")]
+    [ReleaseFact]
     public void DataGrid_ExternalSelectionModel_DoesNotLeak()
     {
         var selectionModel = new SelectionModel<object>();
@@ -845,41 +569,31 @@ public class LeakTests
             new RowItem("A"),
             new RowItem("B")
         };
-
-        var run = async () =>
+        WeakReference Run()
         {
-            using var session = HeadlessUnitTestSession.StartNew(typeof(Application));
+            var grid = new DataGrid
+            {
+                ItemsSource = items,
+                Selection = selectionModel
+            };
 
-            return await session.Dispatch(
-                () =>
-                {
-                    var grid = new DataGrid
-                    {
-                        ItemsSource = items,
-                        Selection = selectionModel
-                    };
+            var window = new Window
+            {
+                Content = grid
+            };
 
-                    var window = new Window
-                    {
-                        Content = grid
-                    };
+            window.SetThemeStyles();
+            ShowWindow(window);
+            Assert.IsType<DataGrid>(window.Presenter?.Child);
 
-                    window.SetThemeStyles();
-                    window.Show();
-                    Dispatcher.UIThread.RunJobs();
-                    Assert.IsType<DataGrid>(window.Presenter?.Child);
+            var gridRef = new WeakReference(grid);
 
-                    var gridRef = new WeakReference(grid);
+            CleanupWindow(window);
 
-                    window.Content = null;
-                    Dispatcher.UIThread.RunJobs();
+            return gridRef;
+        }
 
-                    return gridRef;
-                },
-                CancellationToken.None);
-        };
-
-        var gridRef = run().GetAwaiter().GetResult();
+        var gridRef = RunInSession(Run);
 
         AssertCollected(gridRef);
 
@@ -887,8 +601,7 @@ public class LeakTests
         GC.KeepAlive(items);
     }
 
-    [Fact]
-    [SuppressMessage("Usage", "xUnit1031:Do not use blocking task operations in test method", Justification = "Needed for headless UI dispatch")]
+    [ReleaseFact]
     public void DataGrid_ExternalStateModels_DoesNotLeak()
     {
         var sortingModel = new SortingModel();
@@ -902,53 +615,43 @@ public class LeakTests
             new RowItem("A"),
             new RowItem("B")
         };
-
-        var run = async () =>
+        WeakReference Run()
         {
-            using var session = HeadlessUnitTestSession.StartNew(typeof(Application));
+            var grid = new DataGrid
+            {
+                AutoGenerateColumns = false,
+                ItemsSource = items,
+                SortingModel = sortingModel,
+                FilteringModel = filteringModel,
+                SearchModel = searchModel,
+                ConditionalFormattingModel = formattingModel,
+                HierarchicalModel = hierarchicalModel,
+                FastPathOptions = fastPathOptions
+            };
 
-            return await session.Dispatch(
-                () =>
-                {
-                    var grid = new DataGrid
-                    {
-                        AutoGenerateColumns = false,
-                        ItemsSource = items,
-                        SortingModel = sortingModel,
-                        FilteringModel = filteringModel,
-                        SearchModel = searchModel,
-                        ConditionalFormattingModel = formattingModel,
-                        HierarchicalModel = hierarchicalModel,
-                        FastPathOptions = fastPathOptions
-                    };
+            grid.Columns.Add(new DataGridTextColumn
+            {
+                Header = "Name",
+                Binding = new Binding(nameof(RowItem.Name))
+            });
 
-                    grid.Columns.Add(new DataGridTextColumn
-                    {
-                        Header = "Name",
-                        Binding = new Binding(nameof(RowItem.Name))
-                    });
+            var window = new Window
+            {
+                Content = grid
+            };
 
-                    var window = new Window
-                    {
-                        Content = grid
-                    };
+            window.SetThemeStyles();
+            ShowWindow(window);
+            Assert.IsType<DataGrid>(window.Presenter?.Child);
 
-                    window.SetThemeStyles();
-                    window.Show();
-                    Dispatcher.UIThread.RunJobs();
-                    Assert.IsType<DataGrid>(window.Presenter?.Child);
+            var gridRef = new WeakReference(grid);
 
-                    var gridRef = new WeakReference(grid);
+            CleanupWindow(window);
 
-                    window.Content = null;
-                    Dispatcher.UIThread.RunJobs();
+            return gridRef;
+        }
 
-                    return gridRef;
-                },
-                CancellationToken.None);
-        };
-
-        var gridRef = run().GetAwaiter().GetResult();
+        var gridRef = RunInSession(Run);
 
         AssertCollected(gridRef);
 
@@ -961,163 +664,151 @@ public class LeakTests
         GC.KeepAlive(items);
     }
 
-    [Fact]
-    [SuppressMessage("Usage", "xUnit1031:Do not use blocking task operations in test method", Justification = "Needed for headless UI dispatch")]
+    [ReleaseFact]
     public void DataGrid_ExternalEditingElement_DoesNotLeak()
     {
         var items = new ObservableCollection<RowItem>
         {
             new RowItem("A")
         };
-
-        var run = async () =>
+        WeakReference Run()
         {
-            using var session = HeadlessUnitTestSession.StartNew(typeof(Application));
+            var grid = new DataGrid
+            {
+                AutoGenerateColumns = false,
+                ItemsSource = items
+            };
 
-            return await session.Dispatch(
-                () =>
+            grid.Columns.Add(new DataGridTemplateColumn
+            {
+                Header = "Name",
+                CellTemplate = new FuncDataTemplate<RowItem>((item, _) =>
                 {
-                    var grid = new DataGrid
+                    var textBlock = new TextBlock();
+                    textBlock.Bind(TextBlock.TextProperty, new Binding(nameof(RowItem.Name)));
+                    return textBlock;
+                }),
+                CellEditingTemplate = new FuncDataTemplate<RowItem>((item, _) =>
+                {
+                    var textBox = new TextBox();
+                    textBox.Bind(TextBox.TextProperty, new Binding(nameof(RowItem.Name))
                     {
-                        AutoGenerateColumns = false,
-                        ItemsSource = items
-                    };
-
-                    grid.Columns.Add(new DataGridTemplateColumn
-                    {
-                        Header = "Name",
-                        CellTemplate = new FuncDataTemplate<RowItem>((item, _) =>
-                        {
-                            var textBlock = new TextBlock();
-                            textBlock.Bind(TextBlock.TextProperty, new Binding(nameof(RowItem.Name)));
-                            return textBlock;
-                        }),
-                        CellEditingTemplate = new FuncDataTemplate<RowItem>((item, _) =>
-                        {
-                            var textBox = new TextBox();
-                            textBox.Bind(TextBox.TextProperty, new Binding(nameof(RowItem.Name))
-                            {
-                                Mode = BindingMode.TwoWay
-                            });
-                            return textBox;
-                        })
+                        Mode = BindingMode.TwoWay
                     });
+                    return textBox;
+                })
+            });
 
-                    var externalBox = new TextBox();
+            var externalBox = new TextBox();
 
-                    var panel = new StackPanel();
-                    panel.Children.Add(grid);
-                    panel.Children.Add(externalBox);
+            var panel = new StackPanel();
+            panel.Children.Add(grid);
+            panel.Children.Add(externalBox);
 
-                    var window = new Window
-                    {
-                        Content = panel
-                    };
+            var window = new Window
+            {
+                Content = panel
+            };
 
-                    window.SetThemeStyles();
-                    window.Show();
-                    Dispatcher.UIThread.RunJobs();
+            window.SetThemeStyles();
+            ShowWindow(window);
 
-                    grid.CurrentCell = new DataGridCellInfo(items[0], grid.Columns[0], 0, 0);
-                    grid.BeginEdit();
-                    Dispatcher.UIThread.RunJobs();
+            grid.CurrentCell = new DataGridCellInfo(items[0], grid.Columns[0], 0, 0);
+            grid.BeginEdit();
+            Dispatcher.UIThread.RunJobs();
 
-                    externalBox.Focus();
-                    Dispatcher.UIThread.RunJobs();
+            externalBox.Focus();
+            Dispatcher.UIThread.RunJobs();
 
-                    panel.Children.Remove(grid);
-                    Dispatcher.UIThread.RunJobs();
+            panel.Children.Remove(grid);
+            RunJobsAndRender();
+            for (var i = 0; i < 3; i++)
+            {
+                ExecuteLayoutPass(window);
+                RunJobsAndRender();
+            }
+            window.UpdateLayout();
+            RunJobsAndRender();
 
-                    return new WeakReference(grid);
-                },
-                CancellationToken.None);
-        };
+            return new WeakReference(grid);
+        }
 
-        var gridRef = run().GetAwaiter().GetResult();
+        var gridRef = RunInSession(Run);
 
         AssertCollected(gridRef);
 
         GC.KeepAlive(items);
     }
 
-    [Fact]
-    [SuppressMessage("Usage", "xUnit1031:Do not use blocking task operations in test method", Justification = "Needed for headless UI dispatch")]
+    [ReleaseFact]
     public void DataGrid_ValidationSubscription_DoesNotLeak()
     {
         var items = new ObservableCollection<ValidatingRowItem>
         {
             new ValidatingRowItem("ok")
         };
-
-        var run = async () =>
+        WeakReference Run()
         {
-            using var session = HeadlessUnitTestSession.StartNew(typeof(Application));
+            var grid = new DataGrid
+            {
+                AutoGenerateColumns = false,
+                ItemsSource = items
+            };
 
-            return await session.Dispatch(
-                () =>
+            grid.Columns.Add(new DataGridTextColumn
+            {
+                Header = "Name",
+                Binding = new Binding(nameof(ValidatingRowItem.Name))
                 {
-                    var grid = new DataGrid
-                    {
-                        AutoGenerateColumns = false,
-                        ItemsSource = items
-                    };
+                    Mode = BindingMode.TwoWay
+                }
+            });
 
-                    grid.Columns.Add(new DataGridTextColumn
-                    {
-                        Header = "Name",
-                        Binding = new Binding(nameof(ValidatingRowItem.Name))
-                        {
-                            Mode = BindingMode.TwoWay
-                        }
-                    });
+            var window = new Window
+            {
+                Content = grid
+            };
 
-                    var window = new Window
-                    {
-                        Content = grid
-                    };
+            window.SetThemeStyles();
+            ShowWindow(window);
 
-                    window.SetThemeStyles();
-                    window.Show();
-                    Dispatcher.UIThread.RunJobs();
+            grid.SelectedItem = items[0];
+            grid.CurrentCell = new DataGridCellInfo(items[0], grid.Columns[0], 0, 0);
+            grid.ScrollIntoView(items[0], grid.Columns[0]);
+            Dispatcher.UIThread.RunJobs();
+            PumpLayout(grid);
 
-                    grid.SelectedItem = items[0];
-                    grid.CurrentCell = new DataGridCellInfo(items[0], grid.Columns[0], 0, 0);
-                    Dispatcher.UIThread.RunJobs();
+            Assert.True(grid.BeginEdit());
+            Dispatcher.UIThread.RunJobs();
 
-                    Assert.True(grid.BeginEdit());
-                    Dispatcher.UIThread.RunJobs();
+            var row = grid.EditingRow;
+            Assert.NotNull(row);
+            var cell = row!.Cells[grid.CurrentColumnIndex];
+            var textBox = cell.Content as TextBox;
+            Assert.NotNull(textBox);
 
-                    var row = grid.DisplayData.GetDisplayedElement(grid.CurrentSlot) as DataGridRow;
-                    Assert.NotNull(row);
-                    var cell = row!.Cells[grid.CurrentColumnIndex];
-                    var textBox = cell.Content as TextBox;
-                    Assert.NotNull(textBox);
+            textBox!.DataContext = items[0];
+            textBox!.Text = "bad";
+            Dispatcher.UIThread.RunJobs();
 
-                    textBox!.Text = "bad";
-                    Dispatcher.UIThread.RunJobs();
+            Assert.False(grid.CommitEdit());
+            Dispatcher.UIThread.RunJobs();
 
-                    Assert.False(grid.CommitEdit());
-                    Dispatcher.UIThread.RunJobs();
+            var gridRef = new WeakReference(grid);
 
-                    var gridRef = new WeakReference(grid);
+            CleanupWindow(window);
 
-                    window.Content = null;
-                    Dispatcher.UIThread.RunJobs();
+            return gridRef;
+        }
 
-                    return gridRef;
-                },
-                CancellationToken.None);
-        };
-
-        var gridRef = run().GetAwaiter().GetResult();
+        var gridRef = RunInSession(Run);
 
         AssertCollected(gridRef);
 
         GC.KeepAlive(items);
     }
 
-    [Fact]
-    [SuppressMessage("Usage", "xUnit1031:Do not use blocking task operations in test method", Justification = "Needed for headless UI dispatch")]
+    [ReleaseFact]
     public void DataGrid_NotifyDataErrorInfoValidation_DoesNotLeak()
     {
         var items = new ObservableCollection<NotifyDataErrorRowItem>
@@ -1125,133 +816,120 @@ public class LeakTests
             new NotifyDataErrorRowItem("A")
         };
         items[0].SetErrors(new[] { "Invalid" });
-
-        var run = async () =>
+        WeakReference Run()
         {
-            using var session = HeadlessUnitTestSession.StartNew(typeof(Application));
+            var grid = new DataGrid
+            {
+                AutoGenerateColumns = false,
+                ItemsSource = items
+            };
 
-            return await session.Dispatch(
-                () =>
+            grid.Columns.Add(new DataGridTextColumn
+            {
+                Header = "Name",
+                Binding = new Binding(nameof(NotifyDataErrorRowItem.Name))
                 {
-                    var grid = new DataGrid
-                    {
-                        AutoGenerateColumns = false,
-                        ItemsSource = items
-                    };
+                    Mode = BindingMode.TwoWay
+                }
+            });
 
-                    grid.Columns.Add(new DataGridTextColumn
-                    {
-                        Header = "Name",
-                        Binding = new Binding(nameof(NotifyDataErrorRowItem.Name))
-                        {
-                            Mode = BindingMode.TwoWay
-                        }
-                    });
+            var window = new Window
+            {
+                Content = grid
+            };
 
-                    var window = new Window
-                    {
-                        Content = grid
-                    };
+            window.SetThemeStyles();
+            ShowWindow(window);
 
-                    window.SetThemeStyles();
-                    window.Show();
-                    Dispatcher.UIThread.RunJobs();
+            grid.ScrollIntoView(items[0], grid.Columns[0]);
+            Dispatcher.UIThread.RunJobs();
+            PumpLayout(grid);
 
-                    var slot = grid.DisplayData.FirstScrollingSlot;
-                    var row = slot >= 0 ? grid.DisplayData.GetDisplayedElement(slot) as DataGridRow : null;
-                    Assert.NotNull(row);
-                    Assert.False(row!.IsValid);
+            grid.SelectedItem = items[0];
+            grid.CurrentCell = new DataGridCellInfo(items[0], grid.Columns[0], 0, 0);
+            Dispatcher.UIThread.RunJobs();
+            Assert.True(grid.BeginEdit());
+            Dispatcher.UIThread.RunJobs();
 
-                    var gridRef = new WeakReference(grid);
+            var row = grid.EditingRow;
+            Assert.NotNull(row);
+            Assert.False(row!.IsValid);
 
-                    window.Content = null;
-                    Dispatcher.UIThread.RunJobs();
+            var gridRef = new WeakReference(grid);
 
-                    return gridRef;
-                },
-                CancellationToken.None);
-        };
+            CleanupWindow(window);
 
-        var gridRef = run().GetAwaiter().GetResult();
+            return gridRef;
+        }
+
+        var gridRef = RunInSession(Run);
 
         AssertCollected(gridRef);
 
         GC.KeepAlive(items);
     }
 
-    [Fact]
-    [SuppressMessage("Usage", "xUnit1031:Do not use blocking task operations in test method", Justification = "Needed for headless UI dispatch")]
+    [ReleaseFact]
     public void DataGrid_NotifyDataErrorInfo_ErrorsChanged_DoesNotLeak()
     {
         var items = new ObservableCollection<NotifyDataErrorRowItem>
         {
             new NotifyDataErrorRowItem("A")
         };
-
-        var run = async () =>
+        WeakReference Run()
         {
-            using var session = HeadlessUnitTestSession.StartNew(typeof(Application));
+            var grid = new DataGrid
+            {
+                AutoGenerateColumns = false,
+                ItemsSource = items
+            };
 
-            return await session.Dispatch(
-                () =>
+            grid.Columns.Add(new DataGridTextColumn
+            {
+                Header = "Name",
+                Binding = new Binding(nameof(NotifyDataErrorRowItem.Name))
                 {
-                    var grid = new DataGrid
-                    {
-                        AutoGenerateColumns = false,
-                        ItemsSource = items
-                    };
+                    Mode = BindingMode.TwoWay
+                }
+            });
 
-                    grid.Columns.Add(new DataGridTextColumn
-                    {
-                        Header = "Name",
-                        Binding = new Binding(nameof(NotifyDataErrorRowItem.Name))
-                        {
-                            Mode = BindingMode.TwoWay
-                        }
-                    });
+            var window = new Window
+            {
+                Content = grid
+            };
 
-                    var window = new Window
-                    {
-                        Content = grid
-                    };
+            window.SetThemeStyles();
+            ShowWindow(window);
 
-                    window.SetThemeStyles();
-                    window.Show();
-                    Dispatcher.UIThread.RunJobs();
+            grid.SelectedItem = items[0];
+            grid.CurrentCell = new DataGridCellInfo(items[0], grid.Columns[0], 0, 0);
+            Dispatcher.UIThread.RunJobs();
+            Assert.True(grid.BeginEdit());
+            Dispatcher.UIThread.RunJobs();
 
-                    grid.SelectedItem = items[0];
-                    grid.CurrentCell = new DataGridCellInfo(items[0], grid.Columns[0], 0, 0);
-                    Dispatcher.UIThread.RunJobs();
-                    Assert.True(grid.BeginEdit());
-                    Dispatcher.UIThread.RunJobs();
+            items[0].SetErrors(new object[] { "Invalid" });
+            Dispatcher.UIThread.RunJobs();
+            items[0].SetErrors(Array.Empty<object>());
+            Dispatcher.UIThread.RunJobs();
 
-                    items[0].SetErrors(new object[] { "Invalid" });
-                    Dispatcher.UIThread.RunJobs();
-                    items[0].SetErrors(Array.Empty<object>());
-                    Dispatcher.UIThread.RunJobs();
+            grid.CancelEdit();
+            Dispatcher.UIThread.RunJobs();
 
-                    grid.CancelEdit();
-                    Dispatcher.UIThread.RunJobs();
+            var gridRef = new WeakReference(grid);
 
-                    var gridRef = new WeakReference(grid);
+            CleanupWindow(window);
 
-                    window.Content = null;
-                    Dispatcher.UIThread.RunJobs();
+            return gridRef;
+        }
 
-                    return gridRef;
-                },
-                CancellationToken.None);
-        };
-
-        var gridRef = run().GetAwaiter().GetResult();
+        var gridRef = RunInSession(Run);
 
         AssertCollected(gridRef);
 
         GC.KeepAlive(items);
     }
 
-    [Fact]
-    [SuppressMessage("Usage", "xUnit1031:Do not use blocking task operations in test method", Justification = "Needed for headless UI dispatch")]
+    [ReleaseFact]
     public void DataGrid_ClipboardImport_DoesNotLeak()
     {
         var items = new ObservableCollection<EditableRowItem>
@@ -1259,65 +937,54 @@ public class LeakTests
             new EditableRowItem("A"),
             new EditableRowItem("B")
         };
-
-        var run = async () =>
+        WeakReference Run()
         {
-            using var session = HeadlessUnitTestSession.StartNew(typeof(Application));
+            var grid = new DataGrid
+            {
+                AutoGenerateColumns = false,
+                ItemsSource = items
+            };
 
-            return await session.Dispatch(
-                () =>
+            grid.Columns.Add(new DataGridTextColumn
+            {
+                Header = "Name",
+                Binding = new Binding(nameof(EditableRowItem.Name))
                 {
-                    var grid = new DataGrid
-                    {
-                        AutoGenerateColumns = false,
-                        ItemsSource = items
-                    };
+                    Mode = BindingMode.TwoWay
+                }
+            });
 
-                    grid.Columns.Add(new DataGridTextColumn
-                    {
-                        Header = "Name",
-                        Binding = new Binding(nameof(EditableRowItem.Name))
-                        {
-                            Mode = BindingMode.TwoWay
-                        }
-                    });
+            var window = new Window
+            {
+                Content = grid
+            };
 
-                    var window = new Window
-                    {
-                        Content = grid
-                    };
+            window.SetThemeStyles();
+            ShowWindow(window);
 
-                    window.SetThemeStyles();
-                    window.Show();
-                    Dispatcher.UIThread.RunJobs();
+            grid.SelectedItem = items[0];
+            grid.CurrentCell = new DataGridCellInfo(items[0], grid.Columns[0], 0, 0);
+            Dispatcher.UIThread.RunJobs();
 
-                    grid.SelectedItem = items[0];
-                    grid.CurrentCell = new DataGridCellInfo(items[0], grid.Columns[0], 0, 0);
-                    Dispatcher.UIThread.RunJobs();
+            Assert.True(grid.PasteText("Pasted"));
+            Dispatcher.UIThread.RunJobs();
+            Assert.Equal("Pasted", items[0].Name);
 
-                    Assert.True(grid.PasteText("Pasted"));
-                    Dispatcher.UIThread.RunJobs();
-                    Assert.Equal("Pasted", items[0].Name);
+            var gridRef = new WeakReference(grid);
 
-                    var gridRef = new WeakReference(grid);
+            CleanupWindow(window);
 
-                    window.Content = null;
-                    Dispatcher.UIThread.RunJobs();
+            return gridRef;
+        }
 
-                    return gridRef;
-                },
-                CancellationToken.None);
-        };
-
-        var gridRef = run().GetAwaiter().GetResult();
+        var gridRef = RunInSession(Run);
 
         AssertCollected(gridRef);
 
         GC.KeepAlive(items);
     }
 
-    [Fact]
-    [SuppressMessage("Usage", "xUnit1031:Do not use blocking task operations in test method", Justification = "Needed for headless UI dispatch")]
+    [ReleaseFact]
     public void DataGrid_ClipboardImportModelSwap_DoesNotLeak()
     {
         var items = new ObservableCollection<EditableRowItem>
@@ -1325,78 +992,67 @@ public class LeakTests
             new EditableRowItem("A"),
             new EditableRowItem("B")
         };
-
-        var run = async () =>
+        WeakReference Run()
         {
-            using var session = HeadlessUnitTestSession.StartNew(typeof(Application));
+            var grid = new DataGrid
+            {
+                AutoGenerateColumns = false,
+                ItemsSource = items
+            };
 
-            return await session.Dispatch(
-                () =>
+            grid.Columns.Add(new DataGridTextColumn
+            {
+                Header = "Name",
+                Binding = new Binding(nameof(EditableRowItem.Name))
                 {
-                    var grid = new DataGrid
-                    {
-                        AutoGenerateColumns = false,
-                        ItemsSource = items
-                    };
+                    Mode = BindingMode.TwoWay
+                }
+            });
 
-                    grid.Columns.Add(new DataGridTextColumn
-                    {
-                        Header = "Name",
-                        Binding = new Binding(nameof(EditableRowItem.Name))
-                        {
-                            Mode = BindingMode.TwoWay
-                        }
-                    });
+            var customImportModel = new TrackingClipboardImportModel();
+            var customImportFactory = new TrackingClipboardImportModelFactory();
+            grid.ClipboardImportModel = customImportModel;
 
-                    var customImportModel = new TrackingClipboardImportModel();
-                    var customImportFactory = new TrackingClipboardImportModelFactory();
-                    grid.ClipboardImportModel = customImportModel;
+            var window = new Window
+            {
+                Content = grid
+            };
 
-                    var window = new Window
-                    {
-                        Content = grid
-                    };
+            window.SetThemeStyles();
+            ShowWindow(window);
 
-                    window.SetThemeStyles();
-                    window.Show();
-                    Dispatcher.UIThread.RunJobs();
+            grid.SelectedItem = items[0];
+            grid.CurrentCell = new DataGridCellInfo(items[0], grid.Columns[0], 0, 0);
+            Dispatcher.UIThread.RunJobs();
 
-                    grid.SelectedItem = items[0];
-                    grid.CurrentCell = new DataGridCellInfo(items[0], grid.Columns[0], 0, 0);
-                    Dispatcher.UIThread.RunJobs();
+            Assert.True(grid.PasteText("Swap A"));
+            Dispatcher.UIThread.RunJobs();
+            Assert.True(customImportModel.Calls > 0);
 
-                    Assert.True(grid.PasteText("Swap A"));
-                    Dispatcher.UIThread.RunJobs();
-                    Assert.True(customImportModel.Calls > 0);
+            grid.ClipboardImportModelFactory = customImportFactory;
+            grid.ClipboardImportModel = null;
+            Dispatcher.UIThread.RunJobs();
 
-                    grid.ClipboardImportModelFactory = customImportFactory;
-                    grid.ClipboardImportModel = null;
-                    Dispatcher.UIThread.RunJobs();
+            Assert.True(grid.PasteText("Swap B"));
+            Dispatcher.UIThread.RunJobs();
+            Assert.NotNull(customImportFactory.Model);
+            Assert.True(customImportFactory.Model!.Calls > 0);
 
-                    Assert.True(grid.PasteText("Swap B"));
-                    Dispatcher.UIThread.RunJobs();
-                    Assert.NotNull(customImportFactory.Model);
-                    Assert.True(customImportFactory.Model!.Calls > 0);
+            var gridRef = new WeakReference(grid);
 
-                    var gridRef = new WeakReference(grid);
+            CleanupWindow(window);
 
-                    window.Content = null;
-                    Dispatcher.UIThread.RunJobs();
+            return gridRef;
+        }
 
-                    return gridRef;
-                },
-                CancellationToken.None);
-        };
-
-        var gridRef = run().GetAwaiter().GetResult();
+        var gridRef = RunInSession(Run);
 
         AssertCollected(gridRef);
 
         GC.KeepAlive(items);
     }
 
-    [Fact]
-    [SuppressMessage("Usage", "xUnit1031:Do not use blocking task operations in test method", Justification = "Needed for headless UI dispatch")]
+    [ReleaseFact]
     public void DataGrid_ClipboardExporterSwap_DoesNotLeak()
     {
         var items = new ObservableCollection<EditableRowItem>
@@ -1404,78 +1060,67 @@ public class LeakTests
             new EditableRowItem("A"),
             new EditableRowItem("B")
         };
-
-        var run = async () =>
+        WeakReference Run()
         {
-            using var session = HeadlessUnitTestSession.StartNew(typeof(Application));
+            var grid = new DataGrid
+            {
+                AutoGenerateColumns = false,
+                ItemsSource = items,
+                ClipboardCopyMode = DataGridClipboardCopyMode.ExcludeHeader,
+                SelectionUnit = DataGridSelectionUnit.FullRow
+            };
 
-            return await session.Dispatch(
-                () =>
+            grid.Columns.Add(new DataGridTextColumn
+            {
+                Header = "Name",
+                Binding = new Binding(nameof(EditableRowItem.Name))
                 {
-                    var grid = new DataGrid
-                    {
-                        AutoGenerateColumns = false,
-                        ItemsSource = items,
-                        ClipboardCopyMode = DataGridClipboardCopyMode.ExcludeHeader,
-                        SelectionUnit = DataGridSelectionUnit.FullRow
-                    };
+                    Mode = BindingMode.TwoWay
+                }
+            });
 
-                    grid.Columns.Add(new DataGridTextColumn
-                    {
-                        Header = "Name",
-                        Binding = new Binding(nameof(EditableRowItem.Name))
-                        {
-                            Mode = BindingMode.TwoWay
-                        }
-                    });
+            var customExporter = new TrackingClipboardExporter();
+            var customFormatExporter = new TrackingClipboardFormatExporter();
+            grid.ClipboardExporter = customExporter;
 
-                    var customExporter = new TrackingClipboardExporter();
-                    var customFormatExporter = new TrackingClipboardFormatExporter();
-                    grid.ClipboardExporter = customExporter;
+            var window = new Window
+            {
+                Content = grid
+            };
 
-                    var window = new Window
-                    {
-                        Content = grid
-                    };
+            window.SetThemeStyles();
+            ShowWindow(window);
 
-                    window.SetThemeStyles();
-                    window.Show();
-                    Dispatcher.UIThread.RunJobs();
+            grid.SelectedItems.Add(items[0]);
+            Dispatcher.UIThread.RunJobs();
 
-                    grid.SelectedItems.Add(items[0]);
-                    Dispatcher.UIThread.RunJobs();
+            grid.CopySelectionToClipboard(DataGridClipboardExportFormat.Text);
+            Dispatcher.UIThread.RunJobs();
+            Assert.True(customExporter.Calls > 0);
 
-                    grid.CopySelectionToClipboard(DataGridClipboardExportFormat.Text);
-                    Dispatcher.UIThread.RunJobs();
-                    Assert.True(customExporter.Calls > 0);
+            grid.ClipboardExporter = null;
+            grid.ClipboardFormatExporters = new IDataGridClipboardFormatExporter[] { customFormatExporter };
+            Dispatcher.UIThread.RunJobs();
 
-                    grid.ClipboardExporter = null;
-                    grid.ClipboardFormatExporters = new IDataGridClipboardFormatExporter[] { customFormatExporter };
-                    Dispatcher.UIThread.RunJobs();
+            grid.CopySelectionToClipboard(DataGridClipboardExportFormat.Text);
+            Dispatcher.UIThread.RunJobs();
+            Assert.True(customFormatExporter.Calls > 0);
 
-                    grid.CopySelectionToClipboard(DataGridClipboardExportFormat.Text);
-                    Dispatcher.UIThread.RunJobs();
-                    Assert.True(customFormatExporter.Calls > 0);
+            var gridRef = new WeakReference(grid);
 
-                    var gridRef = new WeakReference(grid);
+            CleanupWindow(window);
 
-                    window.Content = null;
-                    Dispatcher.UIThread.RunJobs();
+            return gridRef;
+        }
 
-                    return gridRef;
-                },
-                CancellationToken.None);
-        };
-
-        var gridRef = run().GetAwaiter().GetResult();
+        var gridRef = RunInSession(Run);
 
         AssertCollected(gridRef);
 
         GC.KeepAlive(items);
     }
 
-    [Fact]
-    [SuppressMessage("Usage", "xUnit1031:Do not use blocking task operations in test method", Justification = "Needed for headless UI dispatch")]
+    [ReleaseFact]
     public void DataGrid_SummaryRows_WithExternalColumns_DoesNotLeak()
     {
         var columns = new ObservableCollection<DataGridColumn>();
@@ -1496,51 +1141,45 @@ public class LeakTests
             new RowItem("A"),
             new RowItem("B")
         };
-
-        var run = async () =>
+        WeakReference Run()
         {
-            using var session = HeadlessUnitTestSession.StartNew(typeof(Application));
+            var grid = new DataGrid
+            {
+                AutoGenerateColumns = false,
+                ItemsSource = items,
+                Columns = columns,
+                ShowTotalSummary = true,
+                ShowGroupSummary = true,
+                GroupSummaryPosition = DataGridGroupSummaryPosition.Both
+            };
+            if (grid.CollectionView is DataGridCollectionView view)
+            {
+                view.GroupDescriptions.Add(new DataGridPathGroupDescription(nameof(RowItem.Name)));
+            }
 
-            return await session.Dispatch(
-                () =>
-                {
-                    var grid = new DataGrid
-                    {
-                        AutoGenerateColumns = false,
-                        ItemsSource = items,
-                        Columns = columns,
-                        ShowTotalSummary = true,
-                        ShowGroupSummary = true,
-                        GroupSummaryPosition = DataGridGroupSummaryPosition.Both
-                    };
+            var window = new Window
+            {
+                Width = 400,
+                Height = 300
+            };
 
-                    if (grid.CollectionView is DataGridCollectionView view)
-                    {
-                        view.GroupDescriptions.Add(new DataGridPathGroupDescription(nameof(RowItem.Name)));
-                    }
+            window.SetThemeStyles(DataGridTheme.SimpleV2);
+            window.Content = grid;
+            window.Show();
+            grid.UpdateLayout();
+            Dispatcher.UIThread.RunJobs(DispatcherPriority.Loaded);
+            Dispatcher.UIThread.RunJobs();
+            Assert.IsType<DataGrid>(window.Presenter?.Child);
+            Assert.NotNull(grid.TotalSummaryRow);
 
-                    var window = new Window
-                    {
-                        Content = grid
-                    };
+            var gridRef = new WeakReference(grid);
 
-                    window.SetThemeStyles();
-                    window.Show();
-                    Dispatcher.UIThread.RunJobs();
-                    Assert.IsType<DataGrid>(window.Presenter?.Child);
-                    Assert.NotNull(grid.TotalSummaryRow);
+            CleanupWindow(window);
 
-                    var gridRef = new WeakReference(grid);
+            return gridRef;
+        }
 
-                    window.Content = null;
-                    Dispatcher.UIThread.RunJobs();
-
-                    return gridRef;
-                },
-                CancellationToken.None);
-        };
-
-        var gridRef = run().GetAwaiter().GetResult();
+        var gridRef = RunInSession(Run);
 
         AssertCollected(gridRef);
 
@@ -1548,8 +1187,7 @@ public class LeakTests
         GC.KeepAlive(items);
     }
 
-    [Fact]
-    [SuppressMessage("Usage", "xUnit1031:Do not use blocking task operations in test method", Justification = "Needed for headless UI dispatch")]
+    [ReleaseFact]
     public void DataGrid_SummaryRows_ToggleVisibility_DoesNotLeak()
     {
         var columns = new ObservableCollection<DataGridColumn>();
@@ -1570,59 +1208,53 @@ public class LeakTests
             new RowItem("A"),
             new RowItem("B")
         };
-
-        var run = async () =>
+        WeakReference Run()
         {
-            using var session = HeadlessUnitTestSession.StartNew(typeof(Application));
+            var grid = new DataGrid
+            {
+                AutoGenerateColumns = false,
+                ItemsSource = items,
+                Columns = columns
+            };
+            if (grid.CollectionView is DataGridCollectionView view)
+            {
+                view.GroupDescriptions.Add(new DataGridPathGroupDescription(nameof(RowItem.Name)));
+            }
 
-            return await session.Dispatch(
-                () =>
-                {
-                    var grid = new DataGrid
-                    {
-                        AutoGenerateColumns = false,
-                        ItemsSource = items,
-                        Columns = columns
-                    };
+            var window = new Window
+            {
+                Width = 400,
+                Height = 300
+            };
 
-                    if (grid.CollectionView is DataGridCollectionView view)
-                    {
-                        view.GroupDescriptions.Add(new DataGridPathGroupDescription(nameof(RowItem.Name)));
-                    }
+            window.SetThemeStyles(DataGridTheme.SimpleV2);
+            window.Content = grid;
+            window.Show();
+            grid.UpdateLayout();
+            Dispatcher.UIThread.RunJobs(DispatcherPriority.Loaded);
+            Dispatcher.UIThread.RunJobs();
+            Assert.IsType<DataGrid>(window.Presenter?.Child);
 
-                    var window = new Window
-                    {
-                        Content = grid
-                    };
+            grid.GroupSummaryPosition = DataGridGroupSummaryPosition.Both;
+            grid.ShowTotalSummary = true;
+            grid.ShowGroupSummary = true;
+            grid.RecalculateSummaries();
+            Dispatcher.UIThread.RunJobs();
+            Assert.NotNull(grid.TotalSummaryRow);
 
-                    window.SetThemeStyles();
-                    window.Show();
-                    Dispatcher.UIThread.RunJobs();
-                    Assert.IsType<DataGrid>(window.Presenter?.Child);
+            grid.ShowGroupSummary = false;
+            grid.ShowTotalSummary = false;
+            grid.RecalculateSummaries();
+            Dispatcher.UIThread.RunJobs();
 
-                    grid.GroupSummaryPosition = DataGridGroupSummaryPosition.Both;
-                    grid.ShowTotalSummary = true;
-                    grid.ShowGroupSummary = true;
-                    grid.RecalculateSummaries();
-                    Dispatcher.UIThread.RunJobs();
-                    Assert.NotNull(grid.TotalSummaryRow);
+            var gridRef = new WeakReference(grid);
 
-                    grid.ShowGroupSummary = false;
-                    grid.ShowTotalSummary = false;
-                    grid.RecalculateSummaries();
-                    Dispatcher.UIThread.RunJobs();
+            CleanupWindow(window);
 
-                    var gridRef = new WeakReference(grid);
+            return gridRef;
+        }
 
-                    window.Content = null;
-                    Dispatcher.UIThread.RunJobs();
-
-                    return gridRef;
-                },
-                CancellationToken.None);
-        };
-
-        var gridRef = run().GetAwaiter().GetResult();
+        var gridRef = RunInSession(Run);
 
         AssertCollected(gridRef);
 
@@ -1630,8 +1262,7 @@ public class LeakTests
         GC.KeepAlive(items);
     }
 
-    [Fact]
-    [SuppressMessage("Usage", "xUnit1031:Do not use blocking task operations in test method", Justification = "Needed for headless UI dispatch")]
+    [ReleaseFact]
     public void DataGrid_RowDetailsTemplate_DoesNotLeak()
     {
         var items = new ObservableCollection<RowItem>
@@ -1639,65 +1270,54 @@ public class LeakTests
             new RowItem("A"),
             new RowItem("B")
         };
-
-        var run = async () =>
+        WeakReference Run()
         {
-            using var session = HeadlessUnitTestSession.StartNew(typeof(Application));
-
-            return await session.Dispatch(
-                () =>
+            var grid = new DataGrid
+            {
+                AutoGenerateColumns = false,
+                ItemsSource = items,
+                RowDetailsVisibilityMode = DataGridRowDetailsVisibilityMode.Visible,
+                RowDetailsTemplate = new FuncDataTemplate<RowItem>((item, _) =>
                 {
-                    var grid = new DataGrid
+                    var details = new Border
                     {
-                        AutoGenerateColumns = false,
-                        ItemsSource = items,
-                        RowDetailsVisibilityMode = DataGridRowDetailsVisibilityMode.Visible,
-                        RowDetailsTemplate = new FuncDataTemplate<RowItem>((item, _) =>
-                        {
-                            var details = new Border
-                            {
-                                Margin = new Avalonia.Thickness(4),
-                                Child = new TextBlock { Text = "Details" }
-                            };
-                            return details;
-                        })
+                        Margin = new Avalonia.Thickness(4),
+                        Child = new TextBlock { Text = "Details" }
                     };
+                    return details;
+                })
+            };
 
-                    grid.Columns.Add(new DataGridTextColumn
-                    {
-                        Header = "Name",
-                        Binding = new Binding(nameof(RowItem.Name))
-                    });
+            grid.Columns.Add(new DataGridTextColumn
+            {
+                Header = "Name",
+                Binding = new Binding(nameof(RowItem.Name))
+            });
 
-                    var window = new Window
-                    {
-                        Content = grid
-                    };
+            var window = new Window
+            {
+                Content = grid
+            };
 
-                    window.SetThemeStyles();
-                    window.Show();
-                    Dispatcher.UIThread.RunJobs();
-                    Assert.IsType<DataGrid>(window.Presenter?.Child);
+            window.SetThemeStyles();
+            ShowWindow(window);
+            Assert.IsType<DataGrid>(window.Presenter?.Child);
 
-                    var gridRef = new WeakReference(grid);
+            var gridRef = new WeakReference(grid);
 
-                    window.Content = null;
-                    Dispatcher.UIThread.RunJobs();
+            CleanupWindow(window);
 
-                    return gridRef;
-                },
-                CancellationToken.None);
-        };
+            return gridRef;
+        }
 
-        var gridRef = run().GetAwaiter().GetResult();
+        var gridRef = RunInSession(Run);
 
         AssertCollected(gridRef);
 
         GC.KeepAlive(items);
     }
 
-    [Fact]
-    [SuppressMessage("Usage", "xUnit1031:Do not use blocking task operations in test method", Justification = "Needed for headless UI dispatch")]
+    [ReleaseFact]
     public void DataGrid_RowDetailsTemplateSwap_DoesNotLeak()
     {
         var items = new ObservableCollection<RowItem>
@@ -1705,79 +1325,68 @@ public class LeakTests
             new RowItem("A"),
             new RowItem("B")
         };
-
-        var run = async () =>
+        WeakReference Run()
         {
-            using var session = HeadlessUnitTestSession.StartNew(typeof(Application));
-
-            return await session.Dispatch(
-                () =>
+            var templateA = new FuncDataTemplate<RowItem>((item, _) =>
+            {
+                var details = new Border
                 {
-                    var templateA = new FuncDataTemplate<RowItem>((item, _) =>
-                    {
-                        var details = new Border
-                        {
-                            Padding = new Avalonia.Thickness(2),
-                            Child = new TextBlock { Text = "Details A" }
-                        };
-                        return details;
-                    });
+                    Padding = new Avalonia.Thickness(2),
+                    Child = new TextBlock { Text = "Details A" }
+                };
+                return details;
+            });
 
-                    var templateB = new FuncDataTemplate<RowItem>((item, _) =>
-                    {
-                        var panel = new StackPanel();
-                        panel.Children.Add(new TextBlock { Text = "Details B" });
-                        return panel;
-                    });
+            var templateB = new FuncDataTemplate<RowItem>((item, _) =>
+            {
+                var panel = new StackPanel();
+                panel.Children.Add(new TextBlock { Text = "Details B" });
+                return panel;
+            });
 
-                    var grid = new DataGrid
-                    {
-                        AutoGenerateColumns = false,
-                        ItemsSource = items,
-                        RowDetailsVisibilityMode = DataGridRowDetailsVisibilityMode.Visible,
-                        RowDetailsTemplate = templateA
-                    };
+            var grid = new DataGrid
+            {
+                AutoGenerateColumns = false,
+                ItemsSource = items,
+                RowDetailsVisibilityMode = DataGridRowDetailsVisibilityMode.Visible,
+                RowDetailsTemplate = templateA
+            };
 
-                    grid.Columns.Add(new DataGridTextColumn
-                    {
-                        Header = "Name",
-                        Binding = new Binding(nameof(RowItem.Name))
-                    });
+            grid.Columns.Add(new DataGridTextColumn
+            {
+                Header = "Name",
+                Binding = new Binding(nameof(RowItem.Name))
+            });
 
-                    var window = new Window
-                    {
-                        Content = grid
-                    };
+            var window = new Window
+            {
+                Content = grid
+            };
 
-                    window.SetThemeStyles();
-                    window.Show();
-                    Dispatcher.UIThread.RunJobs();
-                    Assert.IsType<DataGrid>(window.Presenter?.Child);
+            window.SetThemeStyles();
+            ShowWindow(window);
+            Assert.IsType<DataGrid>(window.Presenter?.Child);
 
-                    grid.RowDetailsTemplate = templateB;
-                    Dispatcher.UIThread.RunJobs();
-                    grid.RowDetailsTemplate = templateA;
-                    Dispatcher.UIThread.RunJobs();
+            grid.RowDetailsTemplate = templateB;
+            Dispatcher.UIThread.RunJobs();
+            grid.RowDetailsTemplate = templateA;
+            Dispatcher.UIThread.RunJobs();
 
-                    var gridRef = new WeakReference(grid);
+            var gridRef = new WeakReference(grid);
 
-                    window.Content = null;
-                    Dispatcher.UIThread.RunJobs();
+            CleanupWindow(window);
 
-                    return gridRef;
-                },
-                CancellationToken.None);
-        };
+            return gridRef;
+        }
 
-        var gridRef = run().GetAwaiter().GetResult();
+        var gridRef = RunInSession(Run);
 
         AssertCollected(gridRef);
 
         GC.KeepAlive(items);
     }
 
-    [Fact]
-    [SuppressMessage("Usage", "xUnit1031:Do not use blocking task operations in test method", Justification = "Needed for headless UI dispatch")]
+    [ReleaseFact]
     public void DataGrid_DragSelectionAutoScroll_DoesNotLeak()
     {
         var items = new ObservableCollection<RowItem>
@@ -1785,51 +1394,40 @@ public class LeakTests
             new RowItem("A"),
             new RowItem("B")
         };
-
-        var run = async () =>
+        WeakReference Run()
         {
-            using var session = HeadlessUnitTestSession.StartNew(typeof(Application));
+            var grid = new DataGrid
+            {
+                AutoGenerateColumns = true,
+                ItemsSource = items
+            };
 
-            return await session.Dispatch(
-                () =>
-                {
-                    var grid = new DataGrid
-                    {
-                        AutoGenerateColumns = true,
-                        ItemsSource = items
-                    };
+            var window = new Window
+            {
+                Content = grid
+            };
 
-                    var window = new Window
-                    {
-                        Content = grid
-                    };
+            window.SetThemeStyles();
+            ShowWindow(window);
+            Assert.IsType<DataGrid>(window.Presenter?.Child);
 
-                    window.SetThemeStyles();
-                    window.Show();
-                    Dispatcher.UIThread.RunJobs();
-                    Assert.IsType<DataGrid>(window.Presenter?.Child);
+            StartDragAutoScroll(grid);
 
-                    StartDragAutoScroll(grid);
+            var gridRef = new WeakReference(grid);
 
-                    var gridRef = new WeakReference(grid);
+            CleanupWindow(window);
 
-                    window.Content = null;
-                    Dispatcher.UIThread.RunJobs();
+            return gridRef;
+        }
 
-                    return gridRef;
-                },
-                CancellationToken.None);
-        };
-
-        var gridRef = run().GetAwaiter().GetResult();
+        var gridRef = RunInSession(Run);
 
         AssertCollected(gridRef);
 
         GC.KeepAlive(items);
     }
 
-    [Fact]
-    [SuppressMessage("Usage", "xUnit1031:Do not use blocking task operations in test method", Justification = "Needed for headless UI dispatch")]
+    [ReleaseFact]
     public void DataGrid_FillHandleAutoScroll_DoesNotLeak()
     {
         var items = new ObservableCollection<RowItem>
@@ -1837,51 +1435,40 @@ public class LeakTests
             new RowItem("A"),
             new RowItem("B")
         };
-
-        var run = async () =>
+        WeakReference Run()
         {
-            using var session = HeadlessUnitTestSession.StartNew(typeof(Application));
+            var grid = new DataGrid
+            {
+                AutoGenerateColumns = true,
+                ItemsSource = items
+            };
 
-            return await session.Dispatch(
-                () =>
-                {
-                    var grid = new DataGrid
-                    {
-                        AutoGenerateColumns = true,
-                        ItemsSource = items
-                    };
+            var window = new Window
+            {
+                Content = grid
+            };
 
-                    var window = new Window
-                    {
-                        Content = grid
-                    };
+            window.SetThemeStyles();
+            ShowWindow(window);
+            Assert.IsType<DataGrid>(window.Presenter?.Child);
 
-                    window.SetThemeStyles();
-                    window.Show();
-                    Dispatcher.UIThread.RunJobs();
-                    Assert.IsType<DataGrid>(window.Presenter?.Child);
+            StartFillAutoScroll(grid);
 
-                    StartFillAutoScroll(grid);
+            var gridRef = new WeakReference(grid);
 
-                    var gridRef = new WeakReference(grid);
+            CleanupWindow(window);
 
-                    window.Content = null;
-                    Dispatcher.UIThread.RunJobs();
+            return gridRef;
+        }
 
-                    return gridRef;
-                },
-                CancellationToken.None);
-        };
-
-        var gridRef = run().GetAwaiter().GetResult();
+        var gridRef = RunInSession(Run);
 
         AssertCollected(gridRef);
 
         GC.KeepAlive(items);
     }
 
-    [Fact]
-    [SuppressMessage("Usage", "xUnit1031:Do not use blocking task operations in test method", Justification = "Needed for headless UI dispatch")]
+    [ReleaseFact]
     public void DataGrid_RowDragDropAutoScroll_DoesNotLeak()
     {
         var items = new ObservableCollection<RowItem>
@@ -1889,52 +1476,41 @@ public class LeakTests
             new RowItem("A"),
             new RowItem("B")
         };
-
-        var run = async () =>
+        WeakReference Run()
         {
-            using var session = HeadlessUnitTestSession.StartNew(typeof(Application));
+            var grid = new DataGrid
+            {
+                AutoGenerateColumns = true,
+                CanUserReorderRows = true,
+                ItemsSource = items
+            };
 
-            return await session.Dispatch(
-                () =>
-                {
-                    var grid = new DataGrid
-                    {
-                        AutoGenerateColumns = true,
-                        CanUserReorderRows = true,
-                        ItemsSource = items
-                    };
+            var window = new Window
+            {
+                Content = grid
+            };
 
-                    var window = new Window
-                    {
-                        Content = grid
-                    };
+            window.SetThemeStyles();
+            ShowWindow(window);
+            Assert.IsType<DataGrid>(window.Presenter?.Child);
 
-                    window.SetThemeStyles();
-                    window.Show();
-                    Dispatcher.UIThread.RunJobs();
-                    Assert.IsType<DataGrid>(window.Presenter?.Child);
+            StartRowDragDropAutoScroll(grid);
 
-                    StartRowDragDropAutoScroll(grid);
+            var gridRef = new WeakReference(grid);
 
-                    var gridRef = new WeakReference(grid);
+            CleanupWindow(window);
 
-                    window.Content = null;
-                    Dispatcher.UIThread.RunJobs();
+            return gridRef;
+        }
 
-                    return gridRef;
-                },
-                CancellationToken.None);
-        };
-
-        var gridRef = run().GetAwaiter().GetResult();
+        var gridRef = RunInSession(Run);
 
         AssertCollected(gridRef);
 
         GC.KeepAlive(items);
     }
 
-    [Fact]
-    [SuppressMessage("Usage", "xUnit1031:Do not use blocking task operations in test method", Justification = "Needed for headless UI dispatch")]
+    [ReleaseFact]
     public void DataGrid_HierarchicalGuardTimer_DoesNotLeak()
     {
         var roots = new ObservableCollection<TreeItem>
@@ -1950,50 +1526,40 @@ public class LeakTests
             ChildrenSelector = item => ((TreeItem)item).Children
         });
         model.SetRoots(roots);
-
-        var run = async () =>
+        WeakReference Run()
         {
-            using var session = HeadlessUnitTestSession.StartNew(typeof(Application));
+            var grid = new DataGrid
+            {
+                AutoGenerateColumns = false,
+                HierarchicalModel = model,
+                HierarchicalRowsEnabled = true
+            };
 
-            return await session.Dispatch(
-                () =>
-                {
-                    var grid = new DataGrid
-                    {
-                        AutoGenerateColumns = false,
-                        HierarchicalModel = model,
-                        HierarchicalRowsEnabled = true
-                    };
+            grid.Columns.Add(new DataGridTextColumn
+            {
+                Header = "Name",
+                Binding = new Binding(nameof(TreeItem.Name))
+            });
 
-                    grid.Columns.Add(new DataGridTextColumn
-                    {
-                        Header = "Name",
-                        Binding = new Binding(nameof(TreeItem.Name))
-                    });
+            var window = new Window
+            {
+                Content = grid
+            };
 
-                    var window = new Window
-                    {
-                        Content = grid
-                    };
+            window.SetThemeStyles();
+            ShowWindow(window);
+            Assert.IsType<DataGrid>(window.Presenter?.Child);
 
-                    window.SetThemeStyles();
-                    window.Show();
-                    Dispatcher.UIThread.RunJobs();
-                    Assert.IsType<DataGrid>(window.Presenter?.Child);
+            Assert.True(grid.TryToggleHierarchicalAtSlot(0));
 
-                    Assert.True(grid.TryToggleHierarchicalAtSlot(0));
+            var gridRef = new WeakReference(grid);
 
-                    var gridRef = new WeakReference(grid);
+            CleanupWindow(window);
 
-                    window.Content = null;
-                    Dispatcher.UIThread.RunJobs();
+            return gridRef;
+        }
 
-                    return gridRef;
-                },
-                CancellationToken.None);
-        };
-
-        var gridRef = run().GetAwaiter().GetResult();
+        var gridRef = RunInSession(Run);
 
         AssertCollected(gridRef);
 
@@ -2001,28 +1567,166 @@ public class LeakTests
         GC.KeepAlive(model);
     }
 
-    private static void AssertCollected(params WeakReference[] references)
+    [MethodImpl(MethodImplOptions.NoInlining)]
+    private static WeakReference RunBoundColumns(
+        ObservableCollection<DataGridColumn> columns,
+        ObservableCollection<RowItem> items)
     {
-        foreach (var reference in references)
+        var grid = new DataGrid
         {
-            Assert.True(reference.IsAlive);
-        }
+            AutoGenerateColumns = false,
+            ItemsSource = items,
+            Columns = columns,
+            SummaryRecalculationDelayMs = 0
+        };
 
-        CollectGarbage();
-
-        foreach (var reference in references)
+        var window = new Window
         {
-            Assert.False(reference.IsAlive);
-        }
+            Content = grid
+        };
+
+        window.SetThemeStyles();
+        ShowWindow(window);
+        Assert.IsType<DataGrid>(window.Presenter?.Child);
+
+        var gridRef = new WeakReference(grid);
+
+        CleanupWindow(window);
+        Assert.Null(columns[0].OwningGrid);
+
+        return gridRef;
     }
 
-    private static void CollectGarbage()
+    [MethodImpl(MethodImplOptions.NoInlining)]
+    private static WeakReference RunColumnDefinitionsSource(
+        ObservableCollection<DataGridColumnDefinition> definitions,
+        ObservableCollection<RowItem> items)
     {
-        Dispatcher.UIThread.RunJobs(DispatcherPriority.Loaded);
-        GC.Collect();
+        var grid = new DataGrid
+        {
+            AutoGenerateColumns = false,
+            ItemsSource = items,
+            ColumnDefinitionsSource = definitions
+        };
 
+        var window = new Window
+        {
+            Content = grid
+        };
+
+        window.SetThemeStyles();
+        ShowWindow(window);
+        Assert.IsType<DataGrid>(window.Presenter?.Child);
+
+        var gridRef = new WeakReference(grid);
+
+        CleanupWindow(window);
+
+        return gridRef;
+    }
+
+    [MethodImpl(MethodImplOptions.NoInlining)]
+    private static WeakReference RunColumnDefinitionsSourceSwap(
+        ObservableCollection<DataGridColumnDefinition> definitionsA,
+        ObservableCollection<DataGridColumnDefinition> definitionsB,
+        ObservableCollection<RowItem> items)
+    {
+        var grid = new DataGrid
+        {
+            AutoGenerateColumns = false,
+            ItemsSource = items,
+            ColumnDefinitionsSource = definitionsA
+        };
+
+        var window = new Window
+        {
+            Content = grid
+        };
+
+        window.SetThemeStyles();
+        ShowWindow(window);
+        Assert.IsType<DataGrid>(window.Presenter?.Child);
+
+        grid.ColumnDefinitionsSource = definitionsB;
         Dispatcher.UIThread.RunJobs();
-        GC.Collect();
+
+        grid.ColumnDefinitionsSource = null;
+        Dispatcher.UIThread.RunJobs();
+
+        grid.ItemsSource = null;
+        Dispatcher.UIThread.RunJobs();
+
+        var gridRef = new WeakReference(grid);
+
+        CleanupWindow(window);
+
+        return gridRef;
+    }
+
+    [MethodImpl(MethodImplOptions.NoInlining)]
+    private static WeakReference RunColumnsSwapWithSpecializedColumns(
+        ObservableCollection<DataGridColumn> columnsA,
+        ObservableCollection<DataGridColumn> columnsB,
+        ObservableCollection<BoolRowItem> items)
+    {
+        var grid = new DataGrid
+        {
+            AutoGenerateColumns = false,
+            ItemsSource = items,
+            Columns = columnsA
+        };
+
+        var window = new Window
+        {
+            Content = grid
+        };
+
+        window.SetThemeStyles();
+        ShowWindow(window);
+        Assert.IsType<DataGrid>(window.Presenter?.Child);
+
+        // Clear bound columns before swapping to avoid inline binding conflicts.
+        grid.Columns = null;
+        Dispatcher.UIThread.RunJobs();
+        grid.Columns = columnsB;
+        Dispatcher.UIThread.RunJobs();
+
+        var gridRef = new WeakReference(grid);
+
+        grid.ItemsSource = null;
+        Dispatcher.UIThread.RunJobs();
+
+        CleanupWindow(window);
+
+        Assert.Null(columnsA[0].OwningGrid);
+        Assert.Null(columnsB[0].OwningGrid);
+
+        return gridRef;
+    }
+
+    [MethodImpl(MethodImplOptions.NoInlining)]
+    private static (WeakReference GridRef, WeakReference ViewRef) RunDataGridIsFreed(ObservableCollection<string> items)
+    {
+        var grid = new DataGrid
+        {
+            ItemsSource = items
+        };
+        var window = new Window
+        {
+            Content = grid
+        };
+
+        window.SetThemeStyles(DataGridTheme.SimpleV2);
+        ShowWindow(window);
+        Assert.IsType<DataGrid>(window.Presenter?.Child);
+
+        var gridRef = new WeakReference(grid);
+        var viewRef = new WeakReference(grid.CollectionView!);
+
+        CleanupWindow(window);
+        Assert.Null(window.Presenter.Child);
+
+        return (gridRef, viewRef);
     }
 
     private static void StartDragAutoScroll(DataGrid grid)
@@ -2042,39 +1746,6 @@ public class LeakTests
         var controller = GetPrivateField(grid, "_rowDragDropController");
         Assert.NotNull(controller);
         InvokePrivateMethod(controller!, "StartAutoScroll", new[] { typeof(int) }, new object[] { 1 });
-    }
-
-    private static object? GetPrivateField(object instance, string fieldName)
-    {
-        var field = instance.GetType().GetField(fieldName, BindingFlags.Instance | BindingFlags.NonPublic);
-        Assert.NotNull(field);
-        return field!.GetValue(instance);
-    }
-
-    private static void SetPrivateField<T>(object instance, string fieldName, T value)
-    {
-        var field = instance.GetType().GetField(fieldName, BindingFlags.Instance | BindingFlags.NonPublic);
-        Assert.NotNull(field);
-        field!.SetValue(instance, value);
-    }
-
-    private static void InvokePrivateMethod(object instance, string methodName)
-    {
-        var method = instance.GetType().GetMethod(methodName, BindingFlags.Instance | BindingFlags.NonPublic);
-        Assert.NotNull(method);
-        method!.Invoke(instance, null);
-    }
-
-    private static void InvokePrivateMethod(object instance, string methodName, Type[] parameterTypes, object[] arguments)
-    {
-        var method = instance.GetType().GetMethod(
-            methodName,
-            BindingFlags.Instance | BindingFlags.NonPublic,
-            binder: null,
-            types: parameterTypes,
-            modifiers: null);
-        Assert.NotNull(method);
-        method!.Invoke(instance, arguments);
     }
 
     private sealed class SwapItem
@@ -2297,26 +1968,35 @@ public class LeakTests
         {
             if (_cts == null)
             {
-                _cts = new CancellationTokenSource();
+                var cts = new CancellationTokenSource();
+                _cts = cts;
                 Task.Run(async () =>
                 {
-                    while (_cts?.IsCancellationRequested != true)
+                    try
                     {
                         const int Delay = 20;
-                        await Task.Delay(Delay);
-                        SelectedItem = Items[0];
+                        while (!cts.IsCancellationRequested)
+                        {
+                            await Task.Delay(Delay, cts.Token).ConfigureAwait(false);
+                            SelectedItem = Items[0];
 
-                        await Task.Delay(Delay);
-                        SelectedItem = Items[1];
+                            await Task.Delay(Delay, cts.Token).ConfigureAwait(false);
+                            SelectedItem = Items[1];
+                        }
                     }
-
-                    SelectedItem = null;
-                    _cts = null;
+                    catch (OperationCanceledException)
+                    {
+                    }
+                    finally
+                    {
+                        SelectedItem = null;
+                        _cts = null;
+                    }
                 });
             }
             else
             {
-                _cts?.Cancel();
+                _cts.Cancel();
             }
         }
 
