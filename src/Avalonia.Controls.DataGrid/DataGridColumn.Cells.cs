@@ -139,8 +139,10 @@ namespace Avalonia.Controls
             {
                 OwningColumn = this
             };
-            result[!ContentControl.ContentProperty] = this[!HeaderProperty];
-            result[!ContentControl.ContentTemplateProperty] = this[!HeaderTemplateProperty];
+            _headerContentBinding?.Dispose();
+            _headerTemplateBinding?.Dispose();
+            _headerContentBinding = result.Bind(ContentControl.ContentProperty, this.GetObservable(HeaderProperty));
+            _headerTemplateBinding = result.Bind(ContentControl.ContentTemplateProperty, this.GetObservable(HeaderTemplateProperty));
             result.Classes.Replace(HeaderStyleClasses);
             ApplyHeaderTheme(result);
 
@@ -264,6 +266,37 @@ namespace Avalonia.Controls
         internal void RemoveEditingElement()
         {
             _editingElement = null;
+        }
+
+        /// <summary>
+        /// Clears cached cell/editor elements held by the column.
+        /// </summary>
+        internal virtual void ClearElementCache()
+        {
+            RemoveEditingElement();
+            _editBinding = null;
+            if (_headerContentBinding != null)
+            {
+                _headerContentBinding.Dispose();
+                _headerContentBinding = null;
+            }
+            if (_headerTemplateBinding != null)
+            {
+                _headerTemplateBinding.Dispose();
+                _headerTemplateBinding = null;
+            }
+            if (_headerCell != null)
+            {
+                var headerCell = _headerCell;
+                _headerCell = null;
+                headerCell.ClearValue(ContentControl.ContentProperty);
+                headerCell.ClearValue(ContentControl.ContentTemplateProperty);
+                headerCell.ClearValue(StyledElement.ThemeProperty);
+                headerCell.ClearValue(DataGridColumnHeader.FilterThemeProperty);
+                headerCell.ClearValue(DataGridColumnHeader.FilterFlyoutProperty);
+                headerCell.ClearValue(DataGridColumnHeader.ShowFilterButtonProperty);
+                headerCell.OwningColumn = null;
+            }
         }
 
         /// <summary>

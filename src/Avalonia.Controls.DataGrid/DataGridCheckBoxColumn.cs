@@ -282,6 +282,20 @@ internal
             DataGridHelper.SyncColumnProperty(this, checkBox, IsThreeStateProperty);
         }
 
+        internal override void ClearElementCache()
+        {
+            base.ClearElementCache();
+            _currentCheckBox = null;
+            if (_owningGrid != null)
+            {
+                _owningGrid.ColumnsInternal.CollectionChanged -= Columns_CollectionChanged;
+                _owningGrid.CurrentCellChanged -= OwningGrid_CurrentCellChanged;
+                _owningGrid.KeyDown -= OwningGrid_KeyDown;
+                _owningGrid.LoadingRow -= OwningGrid_LoadingRow;
+                _owningGrid = null;
+            }
+        }
+
         private bool EnsureOwningGrid()
         {
             if (OwningGrid != null)

@@ -164,6 +164,7 @@ namespace Avalonia.Controls
                     {
                         // Detach the column...
                         ItemsInternal[columnIndex].OwningGrid = null;
+                        ItemsInternal[columnIndex].ClearElementCache();
                     }
                     ItemsInternal.Clear();
                     DisplayIndexMap.Clear();
@@ -610,7 +611,7 @@ namespace Avalonia.Controls
                     VisibleEdgedColumnsWidth -= dataGridColumn.ActualWidth;
                 }
                 dataGridColumn.OwningGrid = null;
-                dataGridColumn.RemoveEditingElement();
+                dataGridColumn.ClearElementCache();
 
                 // continue with the base remove
                 _owningGrid.OnRemovedColumn_PreNotification(dataGridColumn);
