@@ -170,6 +170,9 @@ internal
                 return;
             }
 
+            _cellsPresenter.OwningGrid = OwningGrid;
+            _cellsPresenter.OwnerRow = this;
+
             // Clear existing cells
             foreach (var cell in _cells)
             {
