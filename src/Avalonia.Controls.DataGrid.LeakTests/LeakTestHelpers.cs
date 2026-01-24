@@ -3,7 +3,6 @@ using System.Collections;
 using System.Linq;
 using System.Reflection;
 using System.Threading;
-using System.Threading.Tasks;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Headless;
@@ -15,56 +14,6 @@ namespace Avalonia.Controls.DataGridTests;
 
 internal static class LeakTestHelpers
 {
-    internal static void RunInSession(Action action)
-        => RunInSession(typeof(LeakTestsApp), action);
-
-    internal static void RunInSession(Type appType, Action action)
-    {
-        using var session = HeadlessUnitTestSession.StartNew(appType);
-        session.Dispatch(action, CancellationToken.None).GetAwaiter().GetResult();
-        ResetHeadlessCompositor();
-        ResetLoadedQueueForUnitTests();
-        StopDispatcherTimers();
-    }
-
-    internal static T RunInSession<T>(Func<T> action)
-        => RunInSession(typeof(LeakTestsApp), action);
-
-    internal static T RunInSession<T>(Type appType, Func<T> action)
-    {
-        using var session = HeadlessUnitTestSession.StartNew(appType);
-        var result = session.Dispatch(action, CancellationToken.None).GetAwaiter().GetResult();
-        ResetHeadlessCompositor();
-        ResetLoadedQueueForUnitTests();
-        StopDispatcherTimers();
-        return result;
-    }
-
-    internal static async Task RunInSessionAsync(Func<Task> action)
-        => await RunInSessionAsync(typeof(LeakTestsApp), action);
-
-    internal static async Task RunInSessionAsync(Type appType, Func<Task> action)
-    {
-        using var session = HeadlessUnitTestSession.StartNew(appType);
-        await session.Dispatch(action, CancellationToken.None);
-        ResetHeadlessCompositor();
-        ResetLoadedQueueForUnitTests();
-        StopDispatcherTimers();
-    }
-
-    internal static async Task<T> RunInSessionAsync<T>(Func<Task<T>> action)
-        => await RunInSessionAsync(typeof(LeakTestsApp), action);
-
-    internal static async Task<T> RunInSessionAsync<T>(Type appType, Func<Task<T>> action)
-    {
-        using var session = HeadlessUnitTestSession.StartNew(appType);
-        var result = await session.Dispatch(action, CancellationToken.None);
-        ResetHeadlessCompositor();
-        ResetLoadedQueueForUnitTests();
-        StopDispatcherTimers();
-        return result;
-    }
-
     internal static void AssertCollected(params WeakReference[] references)
     {
         for (var attempt = 0; attempt < 20 && references.Any(reference => reference.IsAlive); attempt++)

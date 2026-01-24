@@ -24,6 +24,7 @@ using Avalonia.Controls.DataGridSorting;
 using Avalonia.Controls.Selection;
 using Xunit;
 using static Avalonia.Controls.DataGridTests.LeakTestHelpers;
+using static Avalonia.Controls.DataGridTests.LeakTestSession;
 
 namespace Avalonia.Controls.DataGridTests;
 
