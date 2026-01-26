@@ -41286,6 +41286,18 @@ references:
   commentId: T:Avalonia.Diagnostics.DevToolsViewKind
   fullName: Avalonia.Diagnostics.DevToolsViewKind
   nameWithType: DevToolsViewKind
+- uid: Avalonia.Diagnostics.DevToolsViewKind.Assets
+  name: Assets
+  href: api/Avalonia.Diagnostics.DevToolsViewKind.html#Avalonia_Diagnostics_DevToolsViewKind_Assets
+  commentId: F:Avalonia.Diagnostics.DevToolsViewKind.Assets
+  fullName: Avalonia.Diagnostics.DevToolsViewKind.Assets
+  nameWithType: DevToolsViewKind.Assets
+- uid: Avalonia.Diagnostics.DevToolsViewKind.CombinedTree
+  name: CombinedTree
+  href: api/Avalonia.Diagnostics.DevToolsViewKind.html#Avalonia_Diagnostics_DevToolsViewKind_CombinedTree
+  commentId: F:Avalonia.Diagnostics.DevToolsViewKind.CombinedTree
+  fullName: Avalonia.Diagnostics.DevToolsViewKind.CombinedTree
+  nameWithType: DevToolsViewKind.CombinedTree
 - uid: Avalonia.Diagnostics.DevToolsViewKind.Events
   name: Events
   href: api/Avalonia.Diagnostics.DevToolsViewKind.html#Avalonia_Diagnostics_DevToolsViewKind_Events
@@ -41298,6 +41310,12 @@ references:
   commentId: F:Avalonia.Diagnostics.DevToolsViewKind.LogicalTree
   fullName: Avalonia.Diagnostics.DevToolsViewKind.LogicalTree
   nameWithType: DevToolsViewKind.LogicalTree
+- uid: Avalonia.Diagnostics.DevToolsViewKind.Resources
+  name: Resources
+  href: api/Avalonia.Diagnostics.DevToolsViewKind.html#Avalonia_Diagnostics_DevToolsViewKind_Resources
+  commentId: F:Avalonia.Diagnostics.DevToolsViewKind.Resources
+  fullName: Avalonia.Diagnostics.DevToolsViewKind.Resources
+  nameWithType: DevToolsViewKind.Resources
 - uid: Avalonia.Diagnostics.DevToolsViewKind.VisualTree
   name: VisualTree
   href: api/Avalonia.Diagnostics.DevToolsViewKind.html#Avalonia_Diagnostics_DevToolsViewKind_VisualTree
