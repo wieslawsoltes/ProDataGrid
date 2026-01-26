@@ -23,6 +23,7 @@ Highlights include:
 - Hierarchical data, hierarchical drag/drop, and tree-like mimics.
 - Virtualization and scrolling diagnostics (large datasets, row height estimators, recycling).
 - Styling showcases and column theme usage.
+- Column banding with stacked headers for non-pivot tables.
 
 Run it locally:
 

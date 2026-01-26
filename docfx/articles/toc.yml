@@ -62,6 +62,8 @@
     href: column-definitions-hot-path.md
   - name: Column Definitions (Hierarchical Columns)
     href: column-definitions-hierarchical.md
+  - name: Column Banding
+    href: column-banding.md
   - name: Column Types Reference
     href: column-types-reference.md
   - name: Editing Interaction Model

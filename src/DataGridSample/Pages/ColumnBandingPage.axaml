@@ -1,0 +1,27 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:viewModels="clr-namespace:DataGridSample.ViewModels"
+             x:Class="DataGridSample.Pages.ColumnBandingPage"
+             x:DataType="viewModels:ColumnBandingViewModel">
+  <UserControl.DataContext>
+    <viewModels:ColumnBandingViewModel />
+  </UserControl.DataContext>
+
+  <Grid Margin="12" RowDefinitions="Auto,*" RowSpacing="8">
+    <StackPanel Spacing="4">
+      <TextBlock Classes="h2">Column banding</TextBlock>
+      <TextBlock Text="Multi-level headers generated from a band model for non-pivot tables."
+                 TextWrapping="Wrap" />
+    </StackPanel>
+
+    <DataGrid Grid.Row="1"
+              ItemsSource="{Binding Source}"
+              ColumnDefinitionsSource="{Binding Bands.ColumnDefinitions}"
+              AutoGenerateColumns="False"
+              IsReadOnly="True"
+              HeadersVisibility="All"
+              CanUserResizeColumns="True"
+              CanUserReorderColumns="True"
+              RowHeight="28" />
+  </Grid>
+</UserControl>

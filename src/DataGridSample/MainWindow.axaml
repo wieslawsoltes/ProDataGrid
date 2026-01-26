@@ -335,6 +335,9 @@
     <TabItem Header="Column Definitions - Hierarchical Streaming">
       <pages:ColumnDefinitionsHierarchicalStreamingPage />
     </TabItem>
+    <TabItem Header="Column Banding">
+      <pages:ColumnBandingPage />
+    </TabItem>
     <TabItem Header="Programmatic Columns">
       <pages:DynamicColumnsPage />
     </TabItem>
