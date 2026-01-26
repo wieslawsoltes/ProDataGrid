@@ -4,7 +4,8 @@
         xmlns:controls="clr-namespace:Avalonia.Controls"
         xmlns:filtering="clr-namespace:Avalonia.Controls.DataGridFiltering"
         xmlns:pivoting="clr-namespace:Avalonia.Controls.DataGridPivoting"
-        xmlns:reporting="clr-namespace:Avalonia.Controls.DataGridReporting">
+        xmlns:reporting="clr-namespace:Avalonia.Controls.DataGridReporting"
+        xmlns:banding="clr-namespace:Avalonia.Controls.DataGridBanding">
   <Styles.Resources>
     <ResourceDictionary>
       <!-- StreamGeometry Icons -->
@@ -127,20 +128,39 @@
         </ItemsControl>
       </DataTemplate>
 
-      <DataTemplate x:Key="DataGridPivotRowHeaderTemplate"
-      <DataTemplate x:Key="DataGridOutlineRowHeaderTemplate"
-                    x:DataType="reporting:OutlineRow">
-        <TextBlock Text="{Binding Label}"
-                   VerticalAlignment="Center"
-                   TextTrimming="CharacterEllipsis"
-                   FontWeight="{Binding RowType, Converter={StaticResource OutlineRowTypeToFontWeightConverter}}" />
+      <DataTemplate x:Key="DataGridColumnBandHeaderTemplate"
+                    x:DataType="banding:ColumnBandHeader">
+        <ItemsControl ItemsSource="{Binding Segments}">
+          <ItemsControl.ItemsPanel>
+            <ItemsPanelTemplate>
+              <StackPanel Spacing="2" />
+            </ItemsPanelTemplate>
+          </ItemsControl.ItemsPanel>
+          <ItemsControl.ItemTemplate>
+            <DataTemplate>
+              <TextBlock Text="{Binding}"
+                         TextWrapping="NoWrap"
+                         TextTrimming="CharacterEllipsis" />
+            </DataTemplate>
+          </ItemsControl.ItemTemplate>
+        </ItemsControl>
       </DataTemplate>
+
+      <DataTemplate x:Key="DataGridPivotRowHeaderTemplate"
                     x:DataType="pivoting:PivotRow">
         <TextBlock Text="{Binding CompactLabel}"
                    Margin="{Binding Indent, Converter={StaticResource PivotIndentToThicknessConverter}}"
                    VerticalAlignment="Center"
                    TextTrimming="CharacterEllipsis"
                    FontWeight="{Binding RowType, Converter={StaticResource PivotRowTypeToFontWeightConverter}}" />
+      </DataTemplate>
+
+      <DataTemplate x:Key="DataGridOutlineRowHeaderTemplate"
+                    x:DataType="reporting:OutlineRow">
+        <TextBlock Text="{Binding Label}"
+                   VerticalAlignment="Center"
+                   TextTrimming="CharacterEllipsis"
+                   FontWeight="{Binding RowType, Converter={StaticResource OutlineRowTypeToFontWeightConverter}}" />
       </DataTemplate>
 
       <!-- DataGridFilterButtonTheme -->
