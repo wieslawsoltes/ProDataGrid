@@ -2958,6 +2958,496 @@
     },
     {
       "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.DataGridPivoting.IPivotAggregationState.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.DataGridPivoting.IPivotAggregationState.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.DataGridPivoting.IPivotAggregationState",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.DataGridPivoting.IPivotAggregator.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.DataGridPivoting.IPivotAggregator.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.DataGridPivoting.IPivotAggregator",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.DataGridPivoting.IPivotRow.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.DataGridPivoting.IPivotRow.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.DataGridPivoting.IPivotRow",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.DataGridPivoting.PivotAggregateType.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.DataGridPivoting.PivotAggregateType.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.DataGridPivoting.PivotAggregateType",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.DataGridPivoting.PivotAggregatorRegistry.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.DataGridPivoting.PivotAggregatorRegistry.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.DataGridPivoting.PivotAggregatorRegistry",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.DataGridPivoting.PivotAxisField.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.DataGridPivoting.PivotAxisField.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.DataGridPivoting.PivotAxisField",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.DataGridPivoting.PivotChangedEventArgs.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.DataGridPivoting.PivotChangedEventArgs.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.DataGridPivoting.PivotChangedEventArgs",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.DataGridPivoting.PivotChartChangedEventArgs.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.DataGridPivoting.PivotChartChangedEventArgs.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.DataGridPivoting.PivotChartChangedEventArgs",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.DataGridPivoting.PivotChartModel.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.DataGridPivoting.PivotChartModel.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.DataGridPivoting.PivotChartModel",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.DataGridPivoting.PivotChartSeries.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.DataGridPivoting.PivotChartSeries.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.DataGridPivoting.PivotChartSeries",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.DataGridPivoting.PivotChartSeriesSource.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.DataGridPivoting.PivotChartSeriesSource.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.DataGridPivoting.PivotChartSeriesSource",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.DataGridPivoting.PivotColumn.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.DataGridPivoting.PivotColumn.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.DataGridPivoting.PivotColumn",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.DataGridPivoting.PivotColumnType.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.DataGridPivoting.PivotColumnType.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.DataGridPivoting.PivotColumnType",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.DataGridPivoting.PivotFieldBase.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.DataGridPivoting.PivotFieldBase.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.DataGridPivoting.PivotFieldBase",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.DataGridPivoting.PivotFieldFilter.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.DataGridPivoting.PivotFieldFilter.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.DataGridPivoting.PivotFieldFilter",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.DataGridPivoting.PivotHeader.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.DataGridPivoting.PivotHeader.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.DataGridPivoting.PivotHeader",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.DataGridPivoting.PivotLayoutOptions.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.DataGridPivoting.PivotLayoutOptions.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.DataGridPivoting.PivotLayoutOptions",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.DataGridPivoting.PivotObservableCollection-1.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.DataGridPivoting.PivotObservableCollection-1.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.DataGridPivoting.PivotObservableCollection<T>",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.DataGridPivoting.PivotRow.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.DataGridPivoting.PivotRow.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.DataGridPivoting.PivotRow",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.DataGridPivoting.PivotRowLayout.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.DataGridPivoting.PivotRowLayout.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.DataGridPivoting.PivotRowLayout",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.DataGridPivoting.PivotRowType.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.DataGridPivoting.PivotRowType.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.DataGridPivoting.PivotRowType",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.DataGridPivoting.PivotSlicerFilterMode.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.DataGridPivoting.PivotSlicerFilterMode.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.DataGridPivoting.PivotSlicerFilterMode",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.DataGridPivoting.PivotSlicerItem.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.DataGridPivoting.PivotSlicerItem.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.DataGridPivoting.PivotSlicerItem",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.DataGridPivoting.PivotSlicerModel.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.DataGridPivoting.PivotSlicerModel.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.DataGridPivoting.PivotSlicerModel",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.DataGridPivoting.PivotSlicerSelectionMode.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.DataGridPivoting.PivotSlicerSelectionMode.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.DataGridPivoting.PivotSlicerSelectionMode",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.DataGridPivoting.PivotTableModel.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.DataGridPivoting.PivotTableModel.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.DataGridPivoting.PivotTableModel",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.DataGridPivoting.PivotTotalPosition.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.DataGridPivoting.PivotTotalPosition.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.DataGridPivoting.PivotTotalPosition",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.DataGridPivoting.PivotValueDisplayMode.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.DataGridPivoting.PivotValueDisplayMode.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.DataGridPivoting.PivotValueDisplayMode",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.DataGridPivoting.PivotValueField.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.DataGridPivoting.PivotValueField.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.DataGridPivoting.PivotValueField",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.DataGridPivoting.PivotValueFilter.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.DataGridPivoting.PivotValueFilter.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.DataGridPivoting.PivotValueFilter",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.DataGridPivoting.PivotValueFilterModel.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.DataGridPivoting.PivotValueFilterModel.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.DataGridPivoting.PivotValueFilterModel",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.DataGridPivoting.PivotValueFilterType.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.DataGridPivoting.PivotValueFilterType.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.DataGridPivoting.PivotValueFilterType",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.DataGridPivoting.PivotValueSort.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.DataGridPivoting.PivotValueSort.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.DataGridPivoting.PivotValueSort",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.DataGridPivoting.PivotValuesPosition.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.DataGridPivoting.PivotValuesPosition.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.DataGridPivoting.PivotValuesPosition",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.DataGridPivoting.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.DataGridPivoting.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.DataGridPivoting",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
       "source_relative_path": "api/Avalonia.Controls.DataGridPreparingCellForEditEventArgs.yml",
       "output": {
         ".html": {
@@ -5099,6 +5589,46 @@
       "output": {
         ".html": {
           "relative_path": "articles/migration.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "Conceptual",
+      "source_relative_path": "articles/pivot-calculated-measures.md",
+      "output": {
+        ".html": {
+          "relative_path": "articles/pivot-calculated-measures.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "Conceptual",
+      "source_relative_path": "articles/pivot-charts.md",
+      "output": {
+        ".html": {
+          "relative_path": "articles/pivot-charts.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "Conceptual",
+      "source_relative_path": "articles/pivot-slicers.md",
+      "output": {
+        ".html": {
+          "relative_path": "articles/pivot-slicers.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "Conceptual",
+      "source_relative_path": "articles/pivot-tables.md",
+      "output": {
+        ".html": {
+          "relative_path": "articles/pivot-tables.html"
         }
       },
       "version": ""
