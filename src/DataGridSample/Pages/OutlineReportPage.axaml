@@ -1,0 +1,70 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:models="clr-namespace:DataGridSample.Models"
+             xmlns:viewModels="clr-namespace:DataGridSample.ViewModels"
+             x:Class="DataGridSample.Pages.OutlineReportPage"
+             x:DataType="viewModels:OutlineReportViewModel">
+  <UserControl.DataContext>
+    <viewModels:OutlineReportViewModel />
+  </UserControl.DataContext>
+
+  <TabControl Margin="12">
+    <TabItem Header="Report">
+      <Grid RowDefinitions="Auto,*" RowSpacing="8">
+        <StackPanel Spacing="4">
+          <TextBlock Classes="h2">Outline report</TextBlock>
+          <TextBlock Text="Hierarchical group rows with subtotals, grand totals, and expandable detail rows."
+                     TextWrapping="Wrap" />
+          <WrapPanel>
+            <CheckBox Content="Subtotals" IsChecked="{Binding ShowSubtotals}" />
+            <CheckBox Content="Grand total" IsChecked="{Binding ShowGrandTotal}" />
+            <CheckBox Content="Detail rows" IsChecked="{Binding ShowDetailRows}" />
+            <CheckBox Content="Auto expand" IsChecked="{Binding AutoExpandGroups}" />
+            <Button Content="Expand All" Command="{Binding ExpandAllCommand}" />
+            <Button Content="Collapse All" Command="{Binding CollapseAllCommand}" />
+          </WrapPanel>
+        </StackPanel>
+
+        <DataGrid Grid.Row="1"
+                  ColumnDefinitionsSource="{Binding Report.ColumnDefinitions}"
+                  HierarchicalModel="{Binding Report.HierarchicalModel}"
+                  HierarchicalRowsEnabled="True"
+                  AutoGenerateColumns="False"
+                  IsReadOnly="True"
+                  HeadersVisibility="All"
+                  CanUserResizeColumns="True"
+                  CanUserReorderColumns="True"
+                  RowHeight="28" />
+      </Grid>
+    </TabItem>
+    <TabItem Header="Data">
+      <Grid RowDefinitions="Auto,*" RowSpacing="8">
+        <StackPanel Spacing="4">
+          <TextBlock Classes="h2">Source data</TextBlock>
+          <TextBlock Text="Rows used by the outline report." TextWrapping="Wrap" />
+          <CheckBox Content="Show filtered data" IsChecked="{Binding ShowFilteredData}" />
+        </StackPanel>
+
+        <DataGrid Grid.Row="1"
+                  ItemsSource="{Binding DataRows}"
+                  AutoGenerateColumns="False"
+                  IsReadOnly="True"
+                  HeadersVisibility="All"
+                  CanUserResizeColumns="True"
+                  CanUserReorderColumns="True"
+                  RowHeight="28">
+          <DataGrid.Columns>
+            <DataGridTextColumn Header="Order Date" Binding="{Binding OrderDate, StringFormat=d}" Width="*" x:DataType="models:SalesRecord" />
+            <DataGridTextColumn Header="Region" Binding="{Binding Region}" Width="*" x:DataType="models:SalesRecord" />
+            <DataGridTextColumn Header="Segment" Binding="{Binding Segment}" Width="*" x:DataType="models:SalesRecord" />
+            <DataGridTextColumn Header="Category" Binding="{Binding Category}" Width="*" x:DataType="models:SalesRecord" />
+            <DataGridTextColumn Header="Product" Binding="{Binding Product}" Width="*" x:DataType="models:SalesRecord" />
+            <DataGridNumericColumn Header="Sales" Binding="{Binding Sales}" Width="*" x:DataType="models:SalesRecord" />
+            <DataGridNumericColumn Header="Profit" Binding="{Binding Profit}" Width="*" x:DataType="models:SalesRecord" />
+            <DataGridNumericColumn Header="Units" Binding="{Binding Quantity}" Width="*" x:DataType="models:SalesRecord" />
+          </DataGrid.Columns>
+        </DataGrid>
+      </Grid>
+    </TabItem>
+  </TabControl>
+</UserControl>

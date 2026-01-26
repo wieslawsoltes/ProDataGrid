@@ -14,6 +14,7 @@ Highlights include:
 - Pivot table layouts for report filters, values in rows, percent of total, and show items with no data.
 - Pivot value filters, value sorting, running totals, differences from previous, percent of parent totals, and index calculations.
 - Pivot calculated measures, slicers, and pivot chart model data.
+- Outline reports with hierarchical grouping, subtotals, and detail rows.
 - Range interaction model samples (drag thresholds, selection anchors, fill handle ranges).
 - Clipboard import model samples (custom paste parsing and transforms).
 - Editing interaction model samples (custom edit triggers and input handling).

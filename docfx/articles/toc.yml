@@ -26,6 +26,8 @@
     href: pivot-tables.md
   - name: Pivot Calculated Measures
     href: pivot-calculated-measures.md
+  - name: Outline Reports
+    href: outline-reports.md
   - name: Pivot Slicers
     href: pivot-slicers.md
   - name: Pivot Chart Model

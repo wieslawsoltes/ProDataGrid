@@ -3,7 +3,8 @@
         xmlns:collections="using:Avalonia.Collections"
         xmlns:controls="clr-namespace:Avalonia.Controls"
         xmlns:filtering="clr-namespace:Avalonia.Controls.DataGridFiltering"
-        xmlns:pivoting="clr-namespace:Avalonia.Controls.DataGridPivoting">
+        xmlns:pivoting="clr-namespace:Avalonia.Controls.DataGridPivoting"
+        xmlns:reporting="clr-namespace:Avalonia.Controls.DataGridReporting">
   <Styles.Resources>
     <ResourceDictionary>
       <!-- StreamGeometry Icons -->
@@ -106,6 +107,7 @@
       <!-- Pivot table templates -->
       <pivoting:PivotIndentToThicknessConverter x:Key="PivotIndentToThicknessConverter" />
       <pivoting:PivotRowTypeToFontWeightConverter x:Key="PivotRowTypeToFontWeightConverter" />
+      <reporting:OutlineRowTypeToFontWeightConverter x:Key="OutlineRowTypeToFontWeightConverter" />
 
       <DataTemplate x:Key="DataGridPivotHeaderTemplate"
                     x:DataType="pivoting:PivotHeader">
@@ -126,6 +128,13 @@
       </DataTemplate>
 
       <DataTemplate x:Key="DataGridPivotRowHeaderTemplate"
+      <DataTemplate x:Key="DataGridOutlineRowHeaderTemplate"
+                    x:DataType="reporting:OutlineRow">
+        <TextBlock Text="{Binding Label}"
+                   VerticalAlignment="Center"
+                   TextTrimming="CharacterEllipsis"
+                   FontWeight="{Binding RowType, Converter={StaticResource OutlineRowTypeToFontWeightConverter}}" />
+      </DataTemplate>
                     x:DataType="pivoting:PivotRow">
         <TextBlock Text="{Binding CompactLabel}"
                    Margin="{Binding Indent, Converter={StaticResource PivotIndentToThicknessConverter}}"

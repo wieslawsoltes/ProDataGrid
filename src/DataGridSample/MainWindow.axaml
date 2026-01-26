@@ -212,6 +212,9 @@
     <TabItem Header="Pivot Chart Model">
       <pages:PivotChartPage />
     </TabItem>
+    <TabItem Header="Outline Report">
+      <pages:OutlineReportPage />
+    </TabItem>
     <TabItem Header="Programmatic Grouping">
       <pages:ProgrammaticGroupingPage />
     </TabItem>
