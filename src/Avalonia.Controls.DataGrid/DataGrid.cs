@@ -2716,6 +2716,11 @@ internal
                 return;
             }
 
+            if (!IsHierarchicalItemsSourceCompatible())
+            {
+                return;
+            }
+
             var canApplyChanges = CanApplyHierarchicalFlattenedChanges(e);
             var hasAnchor = false;
             HierarchicalAnchor anchor = default;
@@ -2788,6 +2793,37 @@ internal
             }
 
             OnCollectionChangedForSummaries(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset));
+        }
+
+        private bool IsHierarchicalItemsSourceCompatible()
+        {
+            if (!_hierarchicalRowsEnabled || _hierarchicalModel == null)
+            {
+                return false;
+            }
+
+            var itemsSource = ItemsSource;
+            if (itemsSource == null)
+            {
+                return false;
+            }
+
+            if (ReferenceEquals(itemsSource, _hierarchicalItemsSource) ||
+                ReferenceEquals(itemsSource, _hierarchicalModel.Flattened) ||
+                ReferenceEquals(itemsSource, _hierarchicalModel.ObservableFlattened))
+            {
+                return true;
+            }
+
+            if (itemsSource is IDataGridCollectionView view)
+            {
+                var source = view.SourceCollection;
+                return ReferenceEquals(source, _hierarchicalItemsSource) ||
+                       ReferenceEquals(source, _hierarchicalModel.Flattened) ||
+                       ReferenceEquals(source, _hierarchicalModel.ObservableFlattened);
+            }
+
+            return false;
         }
 
         private bool CanApplyHierarchicalFlattenedChanges(FlattenedChangedEventArgs e)
