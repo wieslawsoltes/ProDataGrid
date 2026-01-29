@@ -166,7 +166,23 @@ namespace Avalonia.Diagnostics.ViewModels
 
         private bool FilterProperty(object arg)
         {
-            return !(arg is PropertyViewModel property) || PropertiesFilter.Filter(property.Name);
+            if (arg is not PropertyViewModel property)
+            {
+                return true;
+            }
+
+            if (PropertiesFilter.Filter(property.Name))
+            {
+                return true;
+            }
+
+            if (PropertiesFilter.Filter(property.Type))
+            {
+                return true;
+            }
+
+            var valueText = property.Value?.ToString();
+            return !string.IsNullOrWhiteSpace(valueText) && PropertiesFilter.Filter(valueText);
         }
 
         private static List<PropertyViewModel> BuildProperties(object target, bool showImplementedInterfaces)

@@ -428,7 +428,27 @@ namespace Avalonia.Diagnostics.ViewModels
                 return true;
             }
 
-            return ResourcesFilter.Filter(entry.ValueTypeName);
+            if (ResourcesFilter.Filter(entry.ValueTypeName))
+            {
+                return true;
+            }
+
+            if (ResourcesFilter.Filter(entry.KeyTypeName))
+            {
+                return true;
+            }
+
+            if (ResourcesFilter.Filter(entry.ValuePreview))
+            {
+                return true;
+            }
+
+            if (ResourcesFilter.Filter(entry.ScopePath))
+            {
+                return true;
+            }
+
+            return entry.ThemeVariant != null && ResourcesFilter.Filter(entry.ThemeVariant);
         }
 
         private void SubscribeToResourcesChanged(ResourceTreeNode? node)
