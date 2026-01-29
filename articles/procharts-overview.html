@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+      <title>ProCharts Overview | ProDataGrid for Avalonia </title>
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <meta name="title" content="ProCharts Overview | ProDataGrid for Avalonia ">
+      
+      
+      <link rel="icon" href="../favicon.ico">
+      <link rel="stylesheet" href="../public/docfx.min.css">
+      <link rel="stylesheet" href="../public/main.css">
+      <meta name="docfx:navrel" content="../toc.html">
+      <meta name="docfx:tocrel" content="toc.html">
+      
+      
+      
+      
+      <meta name="docfx:docurl" content="https://github.com/wieslawsoltes/ProDataGrid/blob/master/docfx/articles/procharts-overview.md/#L1">
+      <meta name="loc:inThisArticle" content="In this article">
+      <meta name="loc:searchResultsCount" content="{count} results for &quot;{query}&quot;">
+      <meta name="loc:searchNoResults" content="No results for &quot;{query}&quot;">
+      <meta name="loc:tocFilter" content="Filter by title">
+      <meta name="loc:nextArticle" content="Next">
+      <meta name="loc:prevArticle" content="Previous">
+      <meta name="loc:themeLight" content="Light">
+      <meta name="loc:themeDark" content="Dark">
+      <meta name="loc:themeAuto" content="Auto">
+      <meta name="loc:changeTheme" content="Change theme">
+      <meta name="loc:copy" content="Copy">
+      <meta name="loc:downloadPdf" content="Download PDF">
+
+      <script type="module" src="./../public/docfx.min.js"></script>
+
+      <script>
+        const theme = localStorage.getItem('theme') || 'auto'
+        document.documentElement.setAttribute('data-bs-theme', theme === 'auto' ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light') : theme)
+      </script>
+
+  </head>
+
+  <body class="tex2jax_ignore" data-layout="" data-yaml-mime="">
+    <header class="bg-body border-bottom">
+      <nav id="autocollapse" class="navbar navbar-expand-md" role="navigation">
+        <div class="container-xxl flex-nowrap">
+          <a class="navbar-brand" href="../index.html">
+            <img id="logo" class="svg" src="../images/logo.svg" alt="">
+            
+          </a>
+          <button class="btn btn-lg d-md-none border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navpanel" aria-controls="navpanel" aria-expanded="false" aria-label="Toggle navigation">
+            <i class="bi bi-three-dots"></i>
+          </button>
+          <div class="collapse navbar-collapse" id="navpanel">
+            <div id="navbar">
+            </div>
+          </div>
+        </div>
+      </nav>
+    </header>
+
+    <main class="container-xxl">
+      <div class="toc-offcanvas">
+        <div class="offcanvas-md offcanvas-start" tabindex="-1" id="tocOffcanvas" aria-labelledby="tocOffcanvasLabel">
+          <div class="offcanvas-header">
+            <h5 class="offcanvas-title" id="tocOffcanvasLabel">Table of Contents</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="offcanvas" data-bs-target="#tocOffcanvas" aria-label="Close"></button>
+          </div>
+          <div class="offcanvas-body">
+            <nav class="toc" id="toc"></nav>
+          </div>
+        </div>
+      </div>
+
+      <div class="content">
+        <div class="actionbar">
+          <button class="btn btn-lg border-0 d-md-none" type="button" data-bs-toggle="offcanvas" data-bs-target="#tocOffcanvas" aria-controls="tocOffcanvas" aria-expanded="false" aria-label="Show table of contents">
+            <i class="bi bi-list"></i>
+          </button>
+
+          <nav id="breadcrumb"></nav>
+        </div>
+
+        <article data-uid="">
+<h1 id="procharts-overview">ProCharts Overview</h1>
+
+<p>ProCharts is an Excel-quality charting library built for ProDataGrid. It provides a renderer-agnostic chart model, a SkiaSharp renderer, and an Avalonia control for interactive charts. The core goal is fidelity to Excel chart behavior while keeping the data pipeline fast and incremental.</p>
+<h2 id="key-components">Key components</h2>
+<ul>
+<li><code>ProCharts</code> defines the chart model, series definitions, axes, legends, and snapshots.</li>
+<li><code>ProCharts.Skia</code> provides a SkiaSharp renderer and export helpers (PNG/SVG).</li>
+<li><code>ProCharts.Avalonia</code> provides <code>ProChartView</code> for interactive rendering in Avalonia.</li>
+<li><code>ProDataGrid.Charting</code> bridges DataGrid data, pivots, and formulas to chart series.</li>
+</ul>
+<h2 id="chart-model-basics">Chart model basics</h2>
+<p>A <code>ChartModel</code> describes the data and display options. A snapshot is built from that model, and renderers draw the snapshot.</p>
+<pre><code class="lang-csharp">var model = new ChartModel
+{
+    Title = &quot;Revenue by Quarter&quot;,
+    Series = new List&lt;ChartSeries&gt;
+    {
+        ChartSeries.Line(&quot;Q1&quot;, new[] { 120d, 140d, 110d, 180d }),
+        ChartSeries.Line(&quot;Q2&quot;, new[] { 160d, 130d, 150d, 210d })
+    },
+    XAxis = new ChartAxis { Title = &quot;Quarter&quot;, Kind = ChartAxisKind.Category },
+    YAxis = new ChartAxis { Title = &quot;Revenue&quot;, Kind = ChartAxisKind.Value }
+};
+</code></pre>
+<h2 id="rendering-pipeline">Rendering pipeline</h2>
+<ul>
+<li>The model is evaluated into a <code>ChartSnapshot</code> with resolved series, axes, and labels.</li>
+<li>Snapshots can carry <code>ChartDataDelta</code> to enable incremental updates.</li>
+<li>The Skia renderer caches layers (axes, legend, data, labels) for performance.</li>
+<li>Downsampling can be applied (bucket, LTTB, or windowed) to keep large series interactive.</li>
+</ul>
+<h2 id="integration-with-prodatagrid">Integration with ProDataGrid</h2>
+<p><code>ProDataGrid.Charting</code> provides models that reflect DataGrid state:</p>
+<ul>
+<li><code>DataGridChartModel</code> builds series from DataGrid rows with sorting/filtering applied.</li>
+<li><code>PivotChartDataSource</code> uses pivot tables and calculated measures.</li>
+<li>Formula-driven measures flow from the formula engine into chart series.</li>
+</ul>
+<p>This makes charts update as the grid filters, sorts, groups, or recalculates formulas.</p>
+<h2 id="export-and-headless-rendering">Export and headless rendering</h2>
+<ul>
+<li><code>ProChartView</code> supports copy and export to PNG/SVG.</li>
+<li><code>SkiaChartExporter</code> supports headless export for servers and CI.</li>
+</ul>
+<pre><code class="lang-csharp">var png = chartView.ExportPng();
+var svg = chartView.ExportSvg();
+await chartView.CopyToClipboardAsync(ChartClipboardFormat.Png);
+</code></pre>
+<h2 id="performance-tips">Performance tips</h2>
+<ul>
+<li>Use windowing (<code>WindowStart</code>/<code>WindowCount</code>) for streaming or huge series.</li>
+<li>Prefer aggregation or downsampling for dense line series.</li>
+<li>Keep legend and label density reasonable for fast layouts.</li>
+</ul>
+<h2 id="see-also">See also</h2>
+<ul>
+<li><code>procharts-architecture.md</code></li>
+<li><code>procharts-chart-model.md</code></li>
+<li><code>procharts-series-types.md</code></li>
+<li><code>procharts-axes-and-scales.md</code></li>
+<li><code>procharts-data-sources.md</code></li>
+</ul>
+
+</article>
+
+        <div class="contribution d-print-none">
+          <a href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/docfx/articles/procharts-overview.md/#L1" class="edit-link">Edit this page</a>
+        </div>
+
+        <div class="next-article d-print-none border-top" id="nextArticle"></div>
+
+      </div>
+
+      <div class="affix">
+        <nav id="affix"></nav>
+      </div>
+    </main>
+
+
+    <footer class="border-top text-secondary">
+      <div class="container-xxl">
+        <div class="flex-fill">
+          <span>Made with <a href="https://dotnet.github.io/docfx">docfx</a></span>
+        </div>
+      </div>
+    </footer>
+  </body>
+</html>

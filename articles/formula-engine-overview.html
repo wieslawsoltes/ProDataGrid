@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+      <title>Formula Engine Overview | ProDataGrid for Avalonia </title>
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <meta name="title" content="Formula Engine Overview | ProDataGrid for Avalonia ">
+      
+      
+      <link rel="icon" href="../favicon.ico">
+      <link rel="stylesheet" href="../public/docfx.min.css">
+      <link rel="stylesheet" href="../public/main.css">
+      <meta name="docfx:navrel" content="../toc.html">
+      <meta name="docfx:tocrel" content="toc.html">
+      
+      
+      
+      
+      <meta name="docfx:docurl" content="https://github.com/wieslawsoltes/ProDataGrid/blob/master/docfx/articles/formula-engine-overview.md/#L1">
+      <meta name="loc:inThisArticle" content="In this article">
+      <meta name="loc:searchResultsCount" content="{count} results for &quot;{query}&quot;">
+      <meta name="loc:searchNoResults" content="No results for &quot;{query}&quot;">
+      <meta name="loc:tocFilter" content="Filter by title">
+      <meta name="loc:nextArticle" content="Next">
+      <meta name="loc:prevArticle" content="Previous">
+      <meta name="loc:themeLight" content="Light">
+      <meta name="loc:themeDark" content="Dark">
+      <meta name="loc:themeAuto" content="Auto">
+      <meta name="loc:changeTheme" content="Change theme">
+      <meta name="loc:copy" content="Copy">
+      <meta name="loc:downloadPdf" content="Download PDF">
+
+      <script type="module" src="./../public/docfx.min.js"></script>
+
+      <script>
+        const theme = localStorage.getItem('theme') || 'auto'
+        document.documentElement.setAttribute('data-bs-theme', theme === 'auto' ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light') : theme)
+      </script>
+
+  </head>
+
+  <body class="tex2jax_ignore" data-layout="" data-yaml-mime="">
+    <header class="bg-body border-bottom">
+      <nav id="autocollapse" class="navbar navbar-expand-md" role="navigation">
+        <div class="container-xxl flex-nowrap">
+          <a class="navbar-brand" href="../index.html">
+            <img id="logo" class="svg" src="../images/logo.svg" alt="">
+            
+          </a>
+          <button class="btn btn-lg d-md-none border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navpanel" aria-controls="navpanel" aria-expanded="false" aria-label="Toggle navigation">
+            <i class="bi bi-three-dots"></i>
+          </button>
+          <div class="collapse navbar-collapse" id="navpanel">
+            <div id="navbar">
+            </div>
+          </div>
+        </div>
+      </nav>
+    </header>
+
+    <main class="container-xxl">
+      <div class="toc-offcanvas">
+        <div class="offcanvas-md offcanvas-start" tabindex="-1" id="tocOffcanvas" aria-labelledby="tocOffcanvasLabel">
+          <div class="offcanvas-header">
+            <h5 class="offcanvas-title" id="tocOffcanvasLabel">Table of Contents</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="offcanvas" data-bs-target="#tocOffcanvas" aria-label="Close"></button>
+          </div>
+          <div class="offcanvas-body">
+            <nav class="toc" id="toc"></nav>
+          </div>
+        </div>
+      </div>
+
+      <div class="content">
+        <div class="actionbar">
+          <button class="btn btn-lg border-0 d-md-none" type="button" data-bs-toggle="offcanvas" data-bs-target="#tocOffcanvas" aria-controls="tocOffcanvas" aria-expanded="false" aria-label="Show table of contents">
+            <i class="bi bi-list"></i>
+          </button>
+
+          <nav id="breadcrumb"></nav>
+        </div>
+
+        <article data-uid="">
+<h1 id="formula-engine-overview">Formula Engine Overview</h1>
+
+<p>The formula engine provides Excel-compatible parsing, evaluation, and recalculation for ProDataGrid. It supports A1 and R1C1 references, sheet prefixes (including external workbooks), structured references, arrays, dynamic spills, and Excel-style errors.</p>
+<p>This section is split into focused articles:</p>
+<ul>
+<li>Architecture and core types: <code>formula-engine-architecture.md</code></li>
+<li>Reference syntax: <code>formula-engine-reference-syntax.md</code></li>
+<li>Values and coercion rules: <code>formula-engine-values-and-coercion.md</code></li>
+<li>Arrays and spills: <code>formula-engine-arrays-and-spills.md</code></li>
+<li>Calculation engine and dependency graph: <code>formula-engine-calculation-engine.md</code></li>
+<li>Function library and custom functions: <code>formula-engine-functions.md</code></li>
+<li>Settings and culture: <code>formula-engine-settings.md</code></li>
+<li>Names and structured references: <code>formula-engine-names-and-structured-references.md</code></li>
+<li>Errors and validation: <code>formula-engine-errors-and-validation.md</code></li>
+<li>Formatting and normalization: <code>formula-engine-formatting.md</code></li>
+<li>Diagnostics and telemetry: <code>formula-engine-diagnostics.md</code></li>
+<li>Integration in DataGrid, pivots, and charts: <code>formula-engine-integration.md</code></li>
+<li>Testing, parity, and benchmarks: <code>formula-engine-testing-and-parity.md</code></li>
+</ul>
+<h2 id="what-the-engine-does">What the engine does</h2>
+<ul>
+<li>Parses Excel-like formulas into an AST.</li>
+<li>Evaluates formulas against a workbook abstraction.</li>
+<li>Tracks dependencies and recalculates incrementally.</li>
+<li>Applies Excel-style coercion, error propagation, and implicit intersection.</li>
+<li>Supports dynamic array functions with spill ranges in grids.</li>
+</ul>
+<h2 id="core-components">Core components</h2>
+<ul>
+<li><code>ExcelFormulaParser</code> and <code>ExcelFormulaTokenizer</code> (syntax and tokens).</li>
+<li><code>FormulaEvaluator</code> (expression execution).</li>
+<li><code>FormulaCalculationEngine</code> and <code>FormulaDependencyGraph</code> (recalc).</li>
+<li><code>FormulaValue</code> and <code>FormulaArray</code> (value model).</li>
+<li><code>ExcelFunctionRegistry</code> (function library and metadata).</li>
+</ul>
+<h2 id="where-it-runs">Where it runs</h2>
+<p>The engine uses <code>IFormulaWorkbook</code> and <code>IFormulaWorksheet</code> so it can evaluate:</p>
+<ul>
+<li>DataGrid cell formulas and formula columns.</li>
+<li>Pivot calculated measures.</li>
+<li>Chart series built from formula-driven data.</li>
+</ul>
+
+</article>
+
+        <div class="contribution d-print-none">
+          <a href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/docfx/articles/formula-engine-overview.md/#L1" class="edit-link">Edit this page</a>
+        </div>
+
+        <div class="next-article d-print-none border-top" id="nextArticle"></div>
+
+      </div>
+
+      <div class="affix">
+        <nav id="affix"></nav>
+      </div>
+    </main>
+
+
+    <footer class="border-top text-secondary">
+      <div class="container-xxl">
+        <div class="flex-fill">
+          <span>Made with <a href="https://dotnet.github.io/docfx">docfx</a></span>
+        </div>
+      </div>
+    </footer>
+  </body>
+</html>

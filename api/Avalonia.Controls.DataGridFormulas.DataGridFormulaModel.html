@@ -1,0 +1,604 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+      <title>Class DataGridFormulaModel | ProDataGrid for Avalonia </title>
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <meta name="title" content="Class DataGridFormulaModel | ProDataGrid for Avalonia ">
+      
+      
+      <link rel="icon" href="../favicon.ico">
+      <link rel="stylesheet" href="../public/docfx.min.css">
+      <link rel="stylesheet" href="../public/main.css">
+      <meta name="docfx:navrel" content="../toc.html">
+      <meta name="docfx:tocrel" content="toc.html">
+      
+      
+      
+      
+      <meta name="docfx:docurl" content="https://github.com/wieslawsoltes/ProDataGrid/new/master/apiSpec/new?filename=Avalonia_Controls_DataGridFormulas_DataGridFormulaModel.md&amp;value=---%0Auid%3A%20Avalonia.Controls.DataGridFormulas.DataGridFormulaModel%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">
+      <meta name="loc:inThisArticle" content="In this article">
+      <meta name="loc:searchResultsCount" content="{count} results for &quot;{query}&quot;">
+      <meta name="loc:searchNoResults" content="No results for &quot;{query}&quot;">
+      <meta name="loc:tocFilter" content="Filter by title">
+      <meta name="loc:nextArticle" content="Next">
+      <meta name="loc:prevArticle" content="Previous">
+      <meta name="loc:themeLight" content="Light">
+      <meta name="loc:themeDark" content="Dark">
+      <meta name="loc:themeAuto" content="Auto">
+      <meta name="loc:changeTheme" content="Change theme">
+      <meta name="loc:copy" content="Copy">
+      <meta name="loc:downloadPdf" content="Download PDF">
+
+      <script type="module" src="./../public/docfx.min.js"></script>
+
+      <script>
+        const theme = localStorage.getItem('theme') || 'auto'
+        document.documentElement.setAttribute('data-bs-theme', theme === 'auto' ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light') : theme)
+      </script>
+
+  </head>
+
+  <body class="tex2jax_ignore" data-layout="" data-yaml-mime="ManagedReference">
+    <header class="bg-body border-bottom">
+      <nav id="autocollapse" class="navbar navbar-expand-md" role="navigation">
+        <div class="container-xxl flex-nowrap">
+          <a class="navbar-brand" href="../index.html">
+            <img id="logo" class="svg" src="../images/logo.svg" alt="">
+            
+          </a>
+          <button class="btn btn-lg d-md-none border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navpanel" aria-controls="navpanel" aria-expanded="false" aria-label="Toggle navigation">
+            <i class="bi bi-three-dots"></i>
+          </button>
+          <div class="collapse navbar-collapse" id="navpanel">
+            <div id="navbar">
+            </div>
+          </div>
+        </div>
+      </nav>
+    </header>
+
+    <main class="container-xxl">
+      <div class="toc-offcanvas">
+        <div class="offcanvas-md offcanvas-start" tabindex="-1" id="tocOffcanvas" aria-labelledby="tocOffcanvasLabel">
+          <div class="offcanvas-header">
+            <h5 class="offcanvas-title" id="tocOffcanvasLabel">Table of Contents</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="offcanvas" data-bs-target="#tocOffcanvas" aria-label="Close"></button>
+          </div>
+          <div class="offcanvas-body">
+            <nav class="toc" id="toc"></nav>
+          </div>
+        </div>
+      </div>
+
+      <div class="content">
+        <div class="actionbar">
+          <button class="btn btn-lg border-0 d-md-none" type="button" data-bs-toggle="offcanvas" data-bs-target="#tocOffcanvas" aria-controls="tocOffcanvas" aria-expanded="false" aria-label="Show table of contents">
+            <i class="bi bi-list"></i>
+          </button>
+
+          <nav id="breadcrumb"></nav>
+        </div>
+
+        <article data-uid="Avalonia.Controls.DataGridFormulas.DataGridFormulaModel">
+
+
+
+  <h1 id="Avalonia_Controls_DataGridFormulas_DataGridFormulaModel" data-uid="Avalonia.Controls.DataGridFormulas.DataGridFormulaModel" class="text-break">
+Class DataGridFormulaModel  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/Formulas/DataGridFormulaModel.cs/#L72"><i class="bi bi-code-slash"></i></a>
+  </h1>
+
+  <div class="facts text-secondary">
+    <dl><dt>Namespace</dt><dd><a class="xref" href="Avalonia.html">Avalonia</a>.<a class="xref" href="Avalonia.Controls.html">Controls</a>.<a class="xref" href="Avalonia.Controls.DataGridFormulas.html">DataGridFormulas</a></dd></dl>
+  <dl><dt>Assembly</dt><dd>Avalonia.Controls.DataGrid.dll</dd></dl>
+  </div>
+
+  <div class="markdown summary"></div>
+  <div class="markdown conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public sealed class DataGridFormulaModel : IDataGridFormulaModel, IDisposable, INotifyPropertyChanged</code></pre>
+  </div>
+
+
+
+
+  <dl class="typelist inheritance">
+    <dt>Inheritance</dt>
+    <dd>
+      <div><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object">object</a></div>
+      <div><span class="xref">DataGridFormulaModel</span></div>
+    </dd>
+  </dl>
+
+  <dl class="typelist implements">
+    <dt>Implements</dt>
+    <dd>
+      <div><a class="xref" href="Avalonia.Controls.DataGridFormulas.IDataGridFormulaModel.html">IDataGridFormulaModel</a></div>
+      <div><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.idisposable">IDisposable</a></div>
+      <div><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.componentmodel.inotifypropertychanged">INotifyPropertyChanged</a></div>
+    </dd>
+  </dl>
+
+
+  <dl class="typelist inheritedMembers">
+    <dt>Inherited Members</dt>
+    <dd>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object)">object.Equals(object)</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object-system-object)">object.Equals(object, object)</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.gethashcode">object.GetHashCode()</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.gettype">object.GetType()</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.referenceequals">object.ReferenceEquals(object, object)</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.tostring">object.ToString()</a>
+    </div>
+  </dd></dl>
+
+
+
+
+
+
+  <h2 class="section" id="constructors">Constructors
+</h2>
+
+
+  <a id="Avalonia_Controls_DataGridFormulas_DataGridFormulaModel__ctor_" data-uid="Avalonia.Controls.DataGridFormulas.DataGridFormulaModel.#ctor*"></a>
+
+  <h3 id="Avalonia_Controls_DataGridFormulas_DataGridFormulaModel__ctor_ProDataGrid_FormulaEngine_FormulaCalculationSettings_ProDataGrid_FormulaEngine_Excel_ExcelFormulaParser_ProDataGrid_FormulaEngine_Excel_ExcelFunctionRegistry_" data-uid="Avalonia.Controls.DataGridFormulas.DataGridFormulaModel.#ctor(ProDataGrid.FormulaEngine.FormulaCalculationSettings,ProDataGrid.FormulaEngine.Excel.ExcelFormulaParser,ProDataGrid.FormulaEngine.Excel.ExcelFunctionRegistry)">
+  DataGridFormulaModel(FormulaCalculationSettings?, ExcelFormulaParser?, ExcelFunctionRegistry?)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/Formulas/DataGridFormulaModel.cs/#L120"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public DataGridFormulaModel(FormulaCalculationSettings? settings = null, ExcelFormulaParser? parser = null, ExcelFunctionRegistry? functions = null)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>settings</code> <a class="xref" href="ProDataGrid.FormulaEngine.FormulaCalculationSettings.html">FormulaCalculationSettings</a></dt>
+    <dd></dd>
+    <dt><code>parser</code> <a class="xref" href="ProDataGrid.FormulaEngine.Excel.ExcelFormulaParser.html">ExcelFormulaParser</a></dt>
+    <dd></dd>
+    <dt><code>functions</code> <a class="xref" href="ProDataGrid.FormulaEngine.Excel.ExcelFunctionRegistry.html">ExcelFunctionRegistry</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+
+  <h2 class="section" id="properties">Properties
+</h2>
+
+
+  <a id="Avalonia_Controls_DataGridFormulas_DataGridFormulaModel_CalculationMode_" data-uid="Avalonia.Controls.DataGridFormulas.DataGridFormulaModel.CalculationMode*"></a>
+
+  <h3 id="Avalonia_Controls_DataGridFormulas_DataGridFormulaModel_CalculationMode" data-uid="Avalonia.Controls.DataGridFormulas.DataGridFormulaModel.CalculationMode">
+  CalculationMode
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/Formulas/DataGridFormulaModel.cs/#L144"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public FormulaCalculationMode CalculationMode { get; set; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="ProDataGrid.FormulaEngine.FormulaCalculationMode.html">FormulaCalculationMode</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="Avalonia_Controls_DataGridFormulas_DataGridFormulaModel_FormulaVersion_" data-uid="Avalonia.Controls.DataGridFormulas.DataGridFormulaModel.FormulaVersion*"></a>
+
+  <h3 id="Avalonia_Controls_DataGridFormulas_DataGridFormulaModel_FormulaVersion" data-uid="Avalonia.Controls.DataGridFormulas.DataGridFormulaModel.FormulaVersion">
+  FormulaVersion
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/Formulas/DataGridFormulaModel.cs/#L159"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public int FormulaVersion { get; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <h2 class="section" id="methods">Methods
+</h2>
+
+
+  <a id="Avalonia_Controls_DataGridFormulas_DataGridFormulaModel_Attach_" data-uid="Avalonia.Controls.DataGridFormulas.DataGridFormulaModel.Attach*"></a>
+
+  <h3 id="Avalonia_Controls_DataGridFormulas_DataGridFormulaModel_Attach_Avalonia_Controls_DataGrid_" data-uid="Avalonia.Controls.DataGridFormulas.DataGridFormulaModel.Attach(Avalonia.Controls.DataGrid)">
+  Attach(DataGrid)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/Formulas/DataGridFormulaModel.cs/#L176"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public void Attach(DataGrid grid)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>grid</code> <a class="xref" href="Avalonia.Controls.DataGrid.html">DataGrid</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Avalonia_Controls_DataGridFormulas_DataGridFormulaModel_Detach_" data-uid="Avalonia.Controls.DataGridFormulas.DataGridFormulaModel.Detach*"></a>
+
+  <h3 id="Avalonia_Controls_DataGridFormulas_DataGridFormulaModel_Detach" data-uid="Avalonia.Controls.DataGridFormulas.DataGridFormulaModel.Detach">
+  Detach()
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/Formulas/DataGridFormulaModel.cs/#L214"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public void Detach()</code></pre>
+  </div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Avalonia_Controls_DataGridFormulas_DataGridFormulaModel_Dispose_" data-uid="Avalonia.Controls.DataGridFormulas.DataGridFormulaModel.Dispose*"></a>
+
+  <h3 id="Avalonia_Controls_DataGridFormulas_DataGridFormulaModel_Dispose" data-uid="Avalonia.Controls.DataGridFormulas.DataGridFormulaModel.Dispose">
+  Dispose()
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/Formulas/DataGridFormulaModel.cs/#L250"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public void Dispose()</code></pre>
+  </div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Avalonia_Controls_DataGridFormulas_DataGridFormulaModel_Evaluate_" data-uid="Avalonia.Controls.DataGridFormulas.DataGridFormulaModel.Evaluate*"></a>
+
+  <h3 id="Avalonia_Controls_DataGridFormulas_DataGridFormulaModel_Evaluate_System_Object_Avalonia_Controls_DataGridFormulaColumnDefinition_" data-uid="Avalonia.Controls.DataGridFormulas.DataGridFormulaModel.Evaluate(System.Object,Avalonia.Controls.DataGridFormulaColumnDefinition)">
+  Evaluate(object, DataGridFormulaColumnDefinition)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/Formulas/DataGridFormulaModel.cs/#L255"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public object? Evaluate(object item, DataGridFormulaColumnDefinition column)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>item</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object">object</a></dt>
+    <dd></dd>
+    <dt><code>column</code> <a class="xref" href="Avalonia.Controls.DataGridFormulaColumnDefinition.html">DataGridFormulaColumnDefinition</a></dt>
+    <dd></dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object">object</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Avalonia_Controls_DataGridFormulas_DataGridFormulaModel_GetCellFormula_" data-uid="Avalonia.Controls.DataGridFormulas.DataGridFormulaModel.GetCellFormula*"></a>
+
+  <h3 id="Avalonia_Controls_DataGridFormulas_DataGridFormulaModel_GetCellFormula_System_Object_Avalonia_Controls_DataGridFormulaColumnDefinition_" data-uid="Avalonia.Controls.DataGridFormulas.DataGridFormulaModel.GetCellFormula(System.Object,Avalonia.Controls.DataGridFormulaColumnDefinition)">
+  GetCellFormula(object, DataGridFormulaColumnDefinition)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/Formulas/DataGridFormulaModel.cs/#L301"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public string? GetCellFormula(object item, DataGridFormulaColumnDefinition column)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>item</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object">object</a></dt>
+    <dd></dd>
+    <dt><code>column</code> <a class="xref" href="Avalonia.Controls.DataGridFormulaColumnDefinition.html">DataGridFormulaColumnDefinition</a></dt>
+    <dd></dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Avalonia_Controls_DataGridFormulas_DataGridFormulaModel_Invalidate_" data-uid="Avalonia.Controls.DataGridFormulas.DataGridFormulaModel.Invalidate*"></a>
+
+  <h3 id="Avalonia_Controls_DataGridFormulas_DataGridFormulaModel_Invalidate" data-uid="Avalonia.Controls.DataGridFormulas.DataGridFormulaModel.Invalidate">
+  Invalidate()
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/Formulas/DataGridFormulaModel.cs/#L282"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public void Invalidate()</code></pre>
+  </div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Avalonia_Controls_DataGridFormulas_DataGridFormulaModel_Recalculate_" data-uid="Avalonia.Controls.DataGridFormulas.DataGridFormulaModel.Recalculate*"></a>
+
+  <h3 id="Avalonia_Controls_DataGridFormulas_DataGridFormulaModel_Recalculate" data-uid="Avalonia.Controls.DataGridFormulas.DataGridFormulaModel.Recalculate">
+  Recalculate()
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/Formulas/DataGridFormulaModel.cs/#L295"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public void Recalculate()</code></pre>
+  </div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Avalonia_Controls_DataGridFormulas_DataGridFormulaModel_TrySetCellFormula_" data-uid="Avalonia.Controls.DataGridFormulas.DataGridFormulaModel.TrySetCellFormula*"></a>
+
+  <h3 id="Avalonia_Controls_DataGridFormulas_DataGridFormulaModel_TrySetCellFormula_System_Object_Avalonia_Controls_DataGridFormulaColumnDefinition_System_String_System_String__" data-uid="Avalonia.Controls.DataGridFormulas.DataGridFormulaModel.TrySetCellFormula(System.Object,Avalonia.Controls.DataGridFormulaColumnDefinition,System.String,System.String@)">
+  TrySetCellFormula(object, DataGridFormulaColumnDefinition, string?, out string?)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/Formulas/DataGridFormulaModel.cs/#L328"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public bool TrySetCellFormula(object item, DataGridFormulaColumnDefinition column, string? formulaText, out string? error)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>item</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object">object</a></dt>
+    <dd></dd>
+    <dt><code>column</code> <a class="xref" href="Avalonia.Controls.DataGridFormulaColumnDefinition.html">DataGridFormulaColumnDefinition</a></dt>
+    <dd></dd>
+    <dt><code>formulaText</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></dt>
+    <dd></dd>
+    <dt><code>error</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></dt>
+    <dd></dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <h2 class="section" id="events">Events
+</h2>
+
+
+
+  <h3 id="Avalonia_Controls_DataGridFormulas_DataGridFormulaModel_Invalidated" data-uid="Avalonia.Controls.DataGridFormulas.DataGridFormulaModel.Invalidated">
+  Invalidated
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/Formulas/DataGridFormulaModel.cs/#L140"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public event EventHandler&lt;DataGridFormulaInvalidatedEventArgs&gt;? Invalidated</code></pre>
+  </div>
+
+
+
+
+
+
+  <h4 class="section">Event Type</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.eventhandler-1">EventHandler</a>&lt;<a class="xref" href="Avalonia.Controls.DataGridFormulas.DataGridFormulaInvalidatedEventArgs.html">DataGridFormulaInvalidatedEventArgs</a>&gt;</dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <h3 id="Avalonia_Controls_DataGridFormulas_DataGridFormulaModel_PropertyChanged" data-uid="Avalonia.Controls.DataGridFormulas.DataGridFormulaModel.PropertyChanged">
+  PropertyChanged
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/Formulas/DataGridFormulaModel.cs/#L142"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Occurs when a property value changes.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public event PropertyChangedEventHandler? PropertyChanged</code></pre>
+  </div>
+
+
+
+
+
+
+  <h4 class="section">Event Type</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.componentmodel.propertychangedeventhandler">PropertyChangedEventHandler</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+</article>
+
+        <div class="contribution d-print-none">
+          <a href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/Formulas/DataGridFormulaModel.cs/#L72" class="edit-link">Edit this page</a>
+        </div>
+
+
+      </div>
+
+      <div class="affix">
+        <nav id="affix"></nav>
+      </div>
+    </main>
+
+
+    <footer class="border-top text-secondary">
+      <div class="container-xxl">
+        <div class="flex-fill">
+          <span>Made with <a href="https://dotnet.github.io/docfx">docfx</a></span>
+        </div>
+      </div>
+    </footer>
+  </body>
+</html>

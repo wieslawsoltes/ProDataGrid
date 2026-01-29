@@ -1,0 +1,912 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+      <title>Class MetricSeriesViewModel | ProDataGrid for Avalonia </title>
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <meta name="title" content="Class MetricSeriesViewModel | ProDataGrid for Avalonia ">
+      
+      
+      <link rel="icon" href="../favicon.ico">
+      <link rel="stylesheet" href="../public/docfx.min.css">
+      <link rel="stylesheet" href="../public/main.css">
+      <meta name="docfx:navrel" content="../toc.html">
+      <meta name="docfx:tocrel" content="toc.html">
+      
+      
+      
+      
+      <meta name="docfx:docurl" content="https://github.com/wieslawsoltes/ProDataGrid/new/master/apiSpec/new?filename=ProDiagnostics_Viewer_ViewModels_MetricSeriesViewModel.md&amp;value=---%0Auid%3A%20ProDiagnostics.Viewer.ViewModels.MetricSeriesViewModel%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">
+      <meta name="loc:inThisArticle" content="In this article">
+      <meta name="loc:searchResultsCount" content="{count} results for &quot;{query}&quot;">
+      <meta name="loc:searchNoResults" content="No results for &quot;{query}&quot;">
+      <meta name="loc:tocFilter" content="Filter by title">
+      <meta name="loc:nextArticle" content="Next">
+      <meta name="loc:prevArticle" content="Previous">
+      <meta name="loc:themeLight" content="Light">
+      <meta name="loc:themeDark" content="Dark">
+      <meta name="loc:themeAuto" content="Auto">
+      <meta name="loc:changeTheme" content="Change theme">
+      <meta name="loc:copy" content="Copy">
+      <meta name="loc:downloadPdf" content="Download PDF">
+
+      <script type="module" src="./../public/docfx.min.js"></script>
+
+      <script>
+        const theme = localStorage.getItem('theme') || 'auto'
+        document.documentElement.setAttribute('data-bs-theme', theme === 'auto' ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light') : theme)
+      </script>
+
+  </head>
+
+  <body class="tex2jax_ignore" data-layout="" data-yaml-mime="ManagedReference">
+    <header class="bg-body border-bottom">
+      <nav id="autocollapse" class="navbar navbar-expand-md" role="navigation">
+        <div class="container-xxl flex-nowrap">
+          <a class="navbar-brand" href="../index.html">
+            <img id="logo" class="svg" src="../images/logo.svg" alt="">
+            
+          </a>
+          <button class="btn btn-lg d-md-none border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navpanel" aria-controls="navpanel" aria-expanded="false" aria-label="Toggle navigation">
+            <i class="bi bi-three-dots"></i>
+          </button>
+          <div class="collapse navbar-collapse" id="navpanel">
+            <div id="navbar">
+            </div>
+          </div>
+        </div>
+      </nav>
+    </header>
+
+    <main class="container-xxl">
+      <div class="toc-offcanvas">
+        <div class="offcanvas-md offcanvas-start" tabindex="-1" id="tocOffcanvas" aria-labelledby="tocOffcanvasLabel">
+          <div class="offcanvas-header">
+            <h5 class="offcanvas-title" id="tocOffcanvasLabel">Table of Contents</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="offcanvas" data-bs-target="#tocOffcanvas" aria-label="Close"></button>
+          </div>
+          <div class="offcanvas-body">
+            <nav class="toc" id="toc"></nav>
+          </div>
+        </div>
+      </div>
+
+      <div class="content">
+        <div class="actionbar">
+          <button class="btn btn-lg border-0 d-md-none" type="button" data-bs-toggle="offcanvas" data-bs-target="#tocOffcanvas" aria-controls="tocOffcanvas" aria-expanded="false" aria-label="Show table of contents">
+            <i class="bi bi-list"></i>
+          </button>
+
+          <nav id="breadcrumb"></nav>
+        </div>
+
+        <article data-uid="ProDiagnostics.Viewer.ViewModels.MetricSeriesViewModel">
+
+
+
+  <h1 id="ProDiagnostics_Viewer_ViewModels_MetricSeriesViewModel" data-uid="ProDiagnostics.Viewer.ViewModels.MetricSeriesViewModel" class="text-break">
+Class MetricSeriesViewModel  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/ProDiagnostics.Viewer/ViewModels/MetricSeriesViewModel.cs/#L9"><i class="bi bi-code-slash"></i></a>
+  </h1>
+
+  <div class="facts text-secondary">
+    <dl><dt>Namespace</dt><dd><a class="xref" href="ProDiagnostics.html">ProDiagnostics</a>.<a class="xref" href="ProDiagnostics.Viewer.html">Viewer</a>.<a class="xref" href="ProDiagnostics.Viewer.ViewModels.html">ViewModels</a></dd></dl>
+  <dl><dt>Assembly</dt><dd>ProDiagnostics.Viewer.dll</dd></dl>
+  </div>
+
+  <div class="markdown summary"></div>
+  <div class="markdown conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public sealed class MetricSeriesViewModel : ObservableObject, INotifyPropertyChanged</code></pre>
+  </div>
+
+
+
+
+  <dl class="typelist inheritance">
+    <dt>Inheritance</dt>
+    <dd>
+      <div><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object">object</a></div>
+      <div><a class="xref" href="ProDiagnostics.Viewer.ViewModels.ObservableObject.html">ObservableObject</a></div>
+      <div><span class="xref">MetricSeriesViewModel</span></div>
+    </dd>
+  </dl>
+
+  <dl class="typelist implements">
+    <dt>Implements</dt>
+    <dd>
+      <div><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.componentmodel.inotifypropertychanged">INotifyPropertyChanged</a></div>
+    </dd>
+  </dl>
+
+
+  <dl class="typelist inheritedMembers">
+    <dt>Inherited Members</dt>
+    <dd>
+    <div>
+      <a class="xref" href="ProDiagnostics.Viewer.ViewModels.ObservableObject.html#ProDiagnostics_Viewer_ViewModels_ObservableObject_PropertyChanged">ObservableObject.PropertyChanged</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object)">object.Equals(object)</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object-system-object)">object.Equals(object, object)</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.gethashcode">object.GetHashCode()</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.gettype">object.GetType()</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.referenceequals">object.ReferenceEquals(object, object)</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.tostring">object.ToString()</a>
+    </div>
+  </dd></dl>
+
+
+
+
+
+
+  <h2 class="section" id="constructors">Constructors
+</h2>
+
+
+  <a id="ProDiagnostics_Viewer_ViewModels_MetricSeriesViewModel__ctor_" data-uid="ProDiagnostics.Viewer.ViewModels.MetricSeriesViewModel.#ctor*"></a>
+
+  <h3 id="ProDiagnostics_Viewer_ViewModels_MetricSeriesViewModel__ctor_System_String_System_String_System_String_System_String_System_String_System_String_System_String_" data-uid="ProDiagnostics.Viewer.ViewModels.MetricSeriesViewModel.#ctor(System.String,System.String,System.String,System.String,System.String,System.String,System.String)">
+  MetricSeriesViewModel(string, string, string, string, string, string, string)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/ProDiagnostics.Viewer/ViewModels/MetricSeriesViewModel.cs/#L24"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public MetricSeriesViewModel(string key, string meterName, string name, string description, string unit, string instrumentType, string tagsSummary)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>key</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></dt>
+    <dd></dd>
+    <dt><code>meterName</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></dt>
+    <dd></dd>
+    <dt><code>name</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></dt>
+    <dd></dd>
+    <dt><code>description</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></dt>
+    <dd></dd>
+    <dt><code>unit</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></dt>
+    <dd></dd>
+    <dt><code>instrumentType</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></dt>
+    <dd></dd>
+    <dt><code>tagsSummary</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+
+  <h2 class="section" id="properties">Properties
+</h2>
+
+
+  <a id="ProDiagnostics_Viewer_ViewModels_MetricSeriesViewModel_AccentBrush_" data-uid="ProDiagnostics.Viewer.ViewModels.MetricSeriesViewModel.AccentBrush*"></a>
+
+  <h3 id="ProDiagnostics_Viewer_ViewModels_MetricSeriesViewModel_AccentBrush" data-uid="ProDiagnostics.Viewer.ViewModels.MetricSeriesViewModel.AccentBrush">
+  AccentBrush
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/ProDiagnostics.Viewer/ViewModels/MetricSeriesViewModel.cs/#L51"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public IBrush AccentBrush { get; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><span class="xref">IBrush</span></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="ProDiagnostics_Viewer_ViewModels_MetricSeriesViewModel_Average_" data-uid="ProDiagnostics.Viewer.ViewModels.MetricSeriesViewModel.Average*"></a>
+
+  <h3 id="ProDiagnostics_Viewer_ViewModels_MetricSeriesViewModel_Average" data-uid="ProDiagnostics.Viewer.ViewModels.MetricSeriesViewModel.Average">
+  Average
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/ProDiagnostics.Viewer/ViewModels/MetricSeriesViewModel.cs/#L79"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public double Average { get; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.double">double</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="ProDiagnostics_Viewer_ViewModels_MetricSeriesViewModel_Description_" data-uid="ProDiagnostics.Viewer.ViewModels.MetricSeriesViewModel.Description*"></a>
+
+  <h3 id="ProDiagnostics_Viewer_ViewModels_MetricSeriesViewModel_Description" data-uid="ProDiagnostics.Viewer.ViewModels.MetricSeriesViewModel.Description">
+  Description
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/ProDiagnostics.Viewer/ViewModels/MetricSeriesViewModel.cs/#L47"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public string Description { get; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="ProDiagnostics_Viewer_ViewModels_MetricSeriesViewModel_DisplayName_" data-uid="ProDiagnostics.Viewer.ViewModels.MetricSeriesViewModel.DisplayName*"></a>
+
+  <h3 id="ProDiagnostics_Viewer_ViewModels_MetricSeriesViewModel_DisplayName" data-uid="ProDiagnostics.Viewer.ViewModels.MetricSeriesViewModel.DisplayName">
+  DisplayName
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/ProDiagnostics.Viewer/ViewModels/MetricSeriesViewModel.cs/#L55"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public string DisplayName { get; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="ProDiagnostics_Viewer_ViewModels_MetricSeriesViewModel_InstrumentType_" data-uid="ProDiagnostics.Viewer.ViewModels.MetricSeriesViewModel.InstrumentType*"></a>
+
+  <h3 id="ProDiagnostics_Viewer_ViewModels_MetricSeriesViewModel_InstrumentType" data-uid="ProDiagnostics.Viewer.ViewModels.MetricSeriesViewModel.InstrumentType">
+  InstrumentType
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/ProDiagnostics.Viewer/ViewModels/MetricSeriesViewModel.cs/#L49"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public string InstrumentType { get; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="ProDiagnostics_Viewer_ViewModels_MetricSeriesViewModel_Key_" data-uid="ProDiagnostics.Viewer.ViewModels.MetricSeriesViewModel.Key*"></a>
+
+  <h3 id="ProDiagnostics_Viewer_ViewModels_MetricSeriesViewModel_Key" data-uid="ProDiagnostics.Viewer.ViewModels.MetricSeriesViewModel.Key">
+  Key
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/ProDiagnostics.Viewer/ViewModels/MetricSeriesViewModel.cs/#L44"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public string Key { get; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="ProDiagnostics_Viewer_ViewModels_MetricSeriesViewModel_LastValue_" data-uid="ProDiagnostics.Viewer.ViewModels.MetricSeriesViewModel.LastValue*"></a>
+
+  <h3 id="ProDiagnostics_Viewer_ViewModels_MetricSeriesViewModel_LastValue" data-uid="ProDiagnostics.Viewer.ViewModels.MetricSeriesViewModel.LastValue">
+  LastValue
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/ProDiagnostics.Viewer/ViewModels/MetricSeriesViewModel.cs/#L61"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public double LastValue { get; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.double">double</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="ProDiagnostics_Viewer_ViewModels_MetricSeriesViewModel_MaxValue_" data-uid="ProDiagnostics.Viewer.ViewModels.MetricSeriesViewModel.MaxValue*"></a>
+
+  <h3 id="ProDiagnostics_Viewer_ViewModels_MetricSeriesViewModel_MaxValue" data-uid="ProDiagnostics.Viewer.ViewModels.MetricSeriesViewModel.MaxValue">
+  MaxValue
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/ProDiagnostics.Viewer/ViewModels/MetricSeriesViewModel.cs/#L73"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public double MaxValue { get; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.double">double</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="ProDiagnostics_Viewer_ViewModels_MetricSeriesViewModel_MeterName_" data-uid="ProDiagnostics.Viewer.ViewModels.MetricSeriesViewModel.MeterName*"></a>
+
+  <h3 id="ProDiagnostics_Viewer_ViewModels_MetricSeriesViewModel_MeterName" data-uid="ProDiagnostics.Viewer.ViewModels.MetricSeriesViewModel.MeterName">
+  MeterName
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/ProDiagnostics.Viewer/ViewModels/MetricSeriesViewModel.cs/#L45"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public string MeterName { get; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="ProDiagnostics_Viewer_ViewModels_MetricSeriesViewModel_MinValue_" data-uid="ProDiagnostics.Viewer.ViewModels.MetricSeriesViewModel.MinValue*"></a>
+
+  <h3 id="ProDiagnostics_Viewer_ViewModels_MetricSeriesViewModel_MinValue" data-uid="ProDiagnostics.Viewer.ViewModels.MetricSeriesViewModel.MinValue">
+  MinValue
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/ProDiagnostics.Viewer/ViewModels/MetricSeriesViewModel.cs/#L67"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public double MinValue { get; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.double">double</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="ProDiagnostics_Viewer_ViewModels_MetricSeriesViewModel_Name_" data-uid="ProDiagnostics.Viewer.ViewModels.MetricSeriesViewModel.Name*"></a>
+
+  <h3 id="ProDiagnostics_Viewer_ViewModels_MetricSeriesViewModel_Name" data-uid="ProDiagnostics.Viewer.ViewModels.MetricSeriesViewModel.Name">
+  Name
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/ProDiagnostics.Viewer/ViewModels/MetricSeriesViewModel.cs/#L46"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public string Name { get; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="ProDiagnostics_Viewer_ViewModels_MetricSeriesViewModel_SampleCount_" data-uid="ProDiagnostics.Viewer.ViewModels.MetricSeriesViewModel.SampleCount*"></a>
+
+  <h3 id="ProDiagnostics_Viewer_ViewModels_MetricSeriesViewModel_SampleCount" data-uid="ProDiagnostics.Viewer.ViewModels.MetricSeriesViewModel.SampleCount">
+  SampleCount
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/ProDiagnostics.Viewer/ViewModels/MetricSeriesViewModel.cs/#L85"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public int SampleCount { get; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="ProDiagnostics_Viewer_ViewModels_MetricSeriesViewModel_Samples_" data-uid="ProDiagnostics.Viewer.ViewModels.MetricSeriesViewModel.Samples*"></a>
+
+  <h3 id="ProDiagnostics_Viewer_ViewModels_MetricSeriesViewModel_Samples" data-uid="ProDiagnostics.Viewer.ViewModels.MetricSeriesViewModel.Samples">
+  Samples
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/ProDiagnostics.Viewer/ViewModels/MetricSeriesViewModel.cs/#L52"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public ObservableCollection&lt;MetricSample&gt; Samples { get; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.objectmodel.observablecollection-1">ObservableCollection</a>&lt;<a class="xref" href="ProDiagnostics.Viewer.Models.MetricSample.html">MetricSample</a>&gt;</dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="ProDiagnostics_Viewer_ViewModels_MetricSeriesViewModel_TagsSummary_" data-uid="ProDiagnostics.Viewer.ViewModels.MetricSeriesViewModel.TagsSummary*"></a>
+
+  <h3 id="ProDiagnostics_Viewer_ViewModels_MetricSeriesViewModel_TagsSummary" data-uid="ProDiagnostics.Viewer.ViewModels.MetricSeriesViewModel.TagsSummary">
+  TagsSummary
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/ProDiagnostics.Viewer/ViewModels/MetricSeriesViewModel.cs/#L50"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public string TagsSummary { get; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="ProDiagnostics_Viewer_ViewModels_MetricSeriesViewModel_TimelineSamples_" data-uid="ProDiagnostics.Viewer.ViewModels.MetricSeriesViewModel.TimelineSamples*"></a>
+
+  <h3 id="ProDiagnostics_Viewer_ViewModels_MetricSeriesViewModel_TimelineSamples" data-uid="ProDiagnostics.Viewer.ViewModels.MetricSeriesViewModel.TimelineSamples">
+  TimelineSamples
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/ProDiagnostics.Viewer/ViewModels/MetricSeriesViewModel.cs/#L53"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public ObservableCollection&lt;MetricSample&gt; TimelineSamples { get; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.objectmodel.observablecollection-1">ObservableCollection</a>&lt;<a class="xref" href="ProDiagnostics.Viewer.Models.MetricSample.html">MetricSample</a>&gt;</dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="ProDiagnostics_Viewer_ViewModels_MetricSeriesViewModel_Unit_" data-uid="ProDiagnostics.Viewer.ViewModels.MetricSeriesViewModel.Unit*"></a>
+
+  <h3 id="ProDiagnostics_Viewer_ViewModels_MetricSeriesViewModel_Unit" data-uid="ProDiagnostics.Viewer.ViewModels.MetricSeriesViewModel.Unit">
+  Unit
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/ProDiagnostics.Viewer/ViewModels/MetricSeriesViewModel.cs/#L48"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public string Unit { get; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <h2 class="section" id="methods">Methods
+</h2>
+
+
+  <a id="ProDiagnostics_Viewer_ViewModels_MetricSeriesViewModel_AddSample_" data-uid="ProDiagnostics.Viewer.ViewModels.MetricSeriesViewModel.AddSample*"></a>
+
+  <h3 id="ProDiagnostics_Viewer_ViewModels_MetricSeriesViewModel_AddSample_ProDiagnostics_Viewer_Models_MetricSample_" data-uid="ProDiagnostics.Viewer.ViewModels.MetricSeriesViewModel.AddSample(ProDiagnostics.Viewer.Models.MetricSample)">
+  AddSample(MetricSample)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/ProDiagnostics.Viewer/ViewModels/MetricSeriesViewModel.cs/#L94"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public void AddSample(MetricSample sample)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>sample</code> <a class="xref" href="ProDiagnostics.Viewer.Models.MetricSample.html">MetricSample</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+
+  <a id="ProDiagnostics_Viewer_ViewModels_MetricSeriesViewModel_AddTimelineSample_" data-uid="ProDiagnostics.Viewer.ViewModels.MetricSeriesViewModel.AddTimelineSample*"></a>
+
+  <h3 id="ProDiagnostics_Viewer_ViewModels_MetricSeriesViewModel_AddTimelineSample_ProDiagnostics_Viewer_Models_MetricSample_" data-uid="ProDiagnostics.Viewer.ViewModels.MetricSeriesViewModel.AddTimelineSample(ProDiagnostics.Viewer.Models.MetricSample)">
+  AddTimelineSample(MetricSample)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/ProDiagnostics.Viewer/ViewModels/MetricSeriesViewModel.cs/#L136"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public void AddTimelineSample(MetricSample sample)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>sample</code> <a class="xref" href="ProDiagnostics.Viewer.Models.MetricSample.html">MetricSample</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+
+  <a id="ProDiagnostics_Viewer_ViewModels_MetricSeriesViewModel_ApplyAlias_" data-uid="ProDiagnostics.Viewer.ViewModels.MetricSeriesViewModel.ApplyAlias*"></a>
+
+  <h3 id="ProDiagnostics_Viewer_ViewModels_MetricSeriesViewModel_ApplyAlias_System_String_" data-uid="ProDiagnostics.Viewer.ViewModels.MetricSeriesViewModel.ApplyAlias(System.String)">
+  ApplyAlias(string?)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/ProDiagnostics.Viewer/ViewModels/MetricSeriesViewModel.cs/#L91"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public void ApplyAlias(string? alias)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>alias</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+
+  <a id="ProDiagnostics_Viewer_ViewModels_MetricSeriesViewModel_GetIntervalValue_" data-uid="ProDiagnostics.Viewer.ViewModels.MetricSeriesViewModel.GetIntervalValue*"></a>
+
+  <h3 id="ProDiagnostics_Viewer_ViewModels_MetricSeriesViewModel_GetIntervalValue" data-uid="ProDiagnostics.Viewer.ViewModels.MetricSeriesViewModel.GetIntervalValue">
+  GetIntervalValue()
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/ProDiagnostics.Viewer/ViewModels/MetricSeriesViewModel.cs/#L141"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public double GetIntervalValue()</code></pre>
+  </div>
+
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.double">double</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="ProDiagnostics_Viewer_ViewModels_MetricSeriesViewModel_PrefillTimelineSamples_" data-uid="ProDiagnostics.Viewer.ViewModels.MetricSeriesViewModel.PrefillTimelineSamples*"></a>
+
+  <h3 id="ProDiagnostics_Viewer_ViewModels_MetricSeriesViewModel_PrefillTimelineSamples_System_Collections_Generic_IReadOnlyList_ProDiagnostics_Viewer_Models_MetricSample__ProDiagnostics_Viewer_Models_MetricSample_" data-uid="ProDiagnostics.Viewer.ViewModels.MetricSeriesViewModel.PrefillTimelineSamples(System.Collections.Generic.IReadOnlyList{ProDiagnostics.Viewer.Models.MetricSample},ProDiagnostics.Viewer.Models.MetricSample)">
+  PrefillTimelineSamples(IReadOnlyList&lt;MetricSample&gt;?, MetricSample)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/ProDiagnostics.Viewer/ViewModels/MetricSeriesViewModel.cs/#L122"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public void PrefillTimelineSamples(IReadOnlyList&lt;MetricSample&gt;? templateSamples, MetricSample sample)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>templateSamples</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.ireadonlylist-1">IReadOnlyList</a>&lt;<a class="xref" href="ProDiagnostics.Viewer.Models.MetricSample.html">MetricSample</a>&gt;</dt>
+    <dd></dd>
+    <dt><code>sample</code> <a class="xref" href="ProDiagnostics.Viewer.Models.MetricSample.html">MetricSample</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+
+  <a id="ProDiagnostics_Viewer_ViewModels_MetricSeriesViewModel_ResetInterval_" data-uid="ProDiagnostics.Viewer.ViewModels.MetricSeriesViewModel.ResetInterval*"></a>
+
+  <h3 id="ProDiagnostics_Viewer_ViewModels_MetricSeriesViewModel_ResetInterval" data-uid="ProDiagnostics.Viewer.ViewModels.MetricSeriesViewModel.ResetInterval">
+  ResetInterval()
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/ProDiagnostics.Viewer/ViewModels/MetricSeriesViewModel.cs/#L151"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public void ResetInterval()</code></pre>
+  </div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</article>
+
+        <div class="contribution d-print-none">
+          <a href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/ProDiagnostics.Viewer/ViewModels/MetricSeriesViewModel.cs/#L9" class="edit-link">Edit this page</a>
+        </div>
+
+
+      </div>
+
+      <div class="affix">
+        <nav id="affix"></nav>
+      </div>
+    </main>
+
+
+    <footer class="border-top text-secondary">
+      <div class="container-xxl">
+        <div class="flex-fill">
+          <span>Made with <a href="https://dotnet.github.io/docfx">docfx</a></span>
+        </div>
+      </div>
+    </footer>
+  </body>
+</html>

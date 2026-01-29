@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+      <title>Formula Engine Architecture | ProDataGrid for Avalonia </title>
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <meta name="title" content="Formula Engine Architecture | ProDataGrid for Avalonia ">
+      
+      
+      <link rel="icon" href="../favicon.ico">
+      <link rel="stylesheet" href="../public/docfx.min.css">
+      <link rel="stylesheet" href="../public/main.css">
+      <meta name="docfx:navrel" content="../toc.html">
+      <meta name="docfx:tocrel" content="toc.html">
+      
+      
+      
+      
+      <meta name="docfx:docurl" content="https://github.com/wieslawsoltes/ProDataGrid/blob/master/docfx/articles/formula-engine-architecture.md/#L1">
+      <meta name="loc:inThisArticle" content="In this article">
+      <meta name="loc:searchResultsCount" content="{count} results for &quot;{query}&quot;">
+      <meta name="loc:searchNoResults" content="No results for &quot;{query}&quot;">
+      <meta name="loc:tocFilter" content="Filter by title">
+      <meta name="loc:nextArticle" content="Next">
+      <meta name="loc:prevArticle" content="Previous">
+      <meta name="loc:themeLight" content="Light">
+      <meta name="loc:themeDark" content="Dark">
+      <meta name="loc:themeAuto" content="Auto">
+      <meta name="loc:changeTheme" content="Change theme">
+      <meta name="loc:copy" content="Copy">
+      <meta name="loc:downloadPdf" content="Download PDF">
+
+      <script type="module" src="./../public/docfx.min.js"></script>
+
+      <script>
+        const theme = localStorage.getItem('theme') || 'auto'
+        document.documentElement.setAttribute('data-bs-theme', theme === 'auto' ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light') : theme)
+      </script>
+
+  </head>
+
+  <body class="tex2jax_ignore" data-layout="" data-yaml-mime="">
+    <header class="bg-body border-bottom">
+      <nav id="autocollapse" class="navbar navbar-expand-md" role="navigation">
+        <div class="container-xxl flex-nowrap">
+          <a class="navbar-brand" href="../index.html">
+            <img id="logo" class="svg" src="../images/logo.svg" alt="">
+            
+          </a>
+          <button class="btn btn-lg d-md-none border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navpanel" aria-controls="navpanel" aria-expanded="false" aria-label="Toggle navigation">
+            <i class="bi bi-three-dots"></i>
+          </button>
+          <div class="collapse navbar-collapse" id="navpanel">
+            <div id="navbar">
+            </div>
+          </div>
+        </div>
+      </nav>
+    </header>
+
+    <main class="container-xxl">
+      <div class="toc-offcanvas">
+        <div class="offcanvas-md offcanvas-start" tabindex="-1" id="tocOffcanvas" aria-labelledby="tocOffcanvasLabel">
+          <div class="offcanvas-header">
+            <h5 class="offcanvas-title" id="tocOffcanvasLabel">Table of Contents</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="offcanvas" data-bs-target="#tocOffcanvas" aria-label="Close"></button>
+          </div>
+          <div class="offcanvas-body">
+            <nav class="toc" id="toc"></nav>
+          </div>
+        </div>
+      </div>
+
+      <div class="content">
+        <div class="actionbar">
+          <button class="btn btn-lg border-0 d-md-none" type="button" data-bs-toggle="offcanvas" data-bs-target="#tocOffcanvas" aria-controls="tocOffcanvas" aria-expanded="false" aria-label="Show table of contents">
+            <i class="bi bi-list"></i>
+          </button>
+
+          <nav id="breadcrumb"></nav>
+        </div>
+
+        <article data-uid="">
+<h1 id="formula-engine-architecture">Formula Engine Architecture</h1>
+
+<p>The formula engine is split into a small core and an Excel compatibility layer so it can be reused in multiple contexts.</p>
+<h2 id="projects-and-responsibilities">Projects and responsibilities</h2>
+<ul>
+<li><code>ProDataGrid.FormulaEngine</code> (core):
+<ul>
+<li>Value model (<code>FormulaValue</code>, <code>FormulaArray</code>).</li>
+<li>Expression tree (<code>FormulaExpression</code>).</li>
+<li>Dependency graph and recalculation (<code>FormulaDependencyGraph</code>, <code>FormulaCalculationEngine</code>).</li>
+<li>Workbook abstractions (<code>IFormulaWorkbook</code>, <code>IFormulaWorksheet</code>, <code>IFormulaCell</code>).</li>
+</ul>
+</li>
+<li><code>ProDataGrid.FormulaEngine.Excel</code> (Excel compatibility):
+<ul>
+<li>Tokenizer and parser (<code>ExcelFormulaTokenizer</code>, <code>ExcelFormulaParser</code>).</li>
+<li>Excel function registry (<code>ExcelFunctionRegistry</code>).</li>
+<li>Excel-specific formatting and parsing helpers.</li>
+</ul>
+</li>
+<li><code>Avalonia.Controls.DataGrid</code> (integration):
+<ul>
+<li>DataGrid formula model and column definitions.</li>
+<li>Formula editing and validation in the UI.</li>
+</ul>
+</li>
+</ul>
+<h2 id="evaluation-pipeline">Evaluation pipeline</h2>
+<ol>
+<li>Parse formula text into a <code>FormulaExpression</code>.</li>
+<li>Register dependencies in <code>FormulaDependencyGraph</code>.</li>
+<li>Recalculate affected cells in dependency order.</li>
+<li>Evaluate expressions with <code>FormulaEvaluator</code> and a value resolver.</li>
+<li>Return a <code>FormulaValue</code> and cache results on cells.</li>
+</ol>
+<p>A simplified flow looks like this:</p>
+<pre><code class="lang-text">Formula text -&gt; Parser -&gt; AST -&gt; Dependency graph -&gt; Recalc order -&gt; Evaluator -&gt; FormulaValue
+</code></pre>
+<h2 id="workbook-and-resolver-model">Workbook and resolver model</h2>
+<p>The engine does not depend on a specific grid implementation. It uses:</p>
+<ul>
+<li><code>IFormulaWorkbook</code> to resolve worksheets and settings.</li>
+<li><code>IFormulaWorksheet</code> to resolve sparse cells.</li>
+<li><code>IFormulaCell</code> to hold formula text, parsed expression, and cached value.</li>
+</ul>
+<p>The default resolver (<code>WorkbookValueResolver</code>) evaluates cell references, ranges, external workbook references, names, and structured references using these interfaces.</p>
+<h2 id="calculation-settings">Calculation settings</h2>
+<p><code>FormulaCalculationSettings</code> controls parsing and evaluation behavior:</p>
+<ul>
+<li>Reference mode (A1 or R1C1).</li>
+<li>Culture-aware list and decimal separators.</li>
+<li>Date system (1900 or 1904).</li>
+<li>Automatic vs manual calculation.</li>
+<li>Dynamic array support and spill behavior.</li>
+<li>Iterative calculation options.</li>
+</ul>
+<h2 id="extensibility">Extensibility</h2>
+<ul>
+<li>Custom function registries can be plugged in by implementing <code>IFormulaFunctionRegistry</code>.</li>
+<li>Custom resolvers can be used to read from alternative data sources.</li>
+<li>Integration layers (like DataGrid) can map rows and columns into the workbook model.</li>
+</ul>
+
+</article>
+
+        <div class="contribution d-print-none">
+          <a href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/docfx/articles/formula-engine-architecture.md/#L1" class="edit-link">Edit this page</a>
+        </div>
+
+        <div class="next-article d-print-none border-top" id="nextArticle"></div>
+
+      </div>
+
+      <div class="affix">
+        <nav id="affix"></nav>
+      </div>
+    </main>
+
+
+    <footer class="border-top text-secondary">
+      <div class="container-xxl">
+        <div class="flex-fill">
+          <span>Made with <a href="https://dotnet.github.io/docfx">docfx</a></span>
+        </div>
+      </div>
+    </footer>
+  </body>
+</html>

@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+      <title>ProCharts Skia Style Reference | ProDataGrid for Avalonia </title>
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <meta name="title" content="ProCharts Skia Style Reference | ProDataGrid for Avalonia ">
+      
+      
+      <link rel="icon" href="../favicon.ico">
+      <link rel="stylesheet" href="../public/docfx.min.css">
+      <link rel="stylesheet" href="../public/main.css">
+      <meta name="docfx:navrel" content="../toc.html">
+      <meta name="docfx:tocrel" content="toc.html">
+      
+      
+      
+      
+      <meta name="docfx:docurl" content="https://github.com/wieslawsoltes/ProDataGrid/blob/master/docfx/articles/procharts-skia-style-reference.md/#L1">
+      <meta name="loc:inThisArticle" content="In this article">
+      <meta name="loc:searchResultsCount" content="{count} results for &quot;{query}&quot;">
+      <meta name="loc:searchNoResults" content="No results for &quot;{query}&quot;">
+      <meta name="loc:tocFilter" content="Filter by title">
+      <meta name="loc:nextArticle" content="Next">
+      <meta name="loc:prevArticle" content="Previous">
+      <meta name="loc:themeLight" content="Light">
+      <meta name="loc:themeDark" content="Dark">
+      <meta name="loc:themeAuto" content="Auto">
+      <meta name="loc:changeTheme" content="Change theme">
+      <meta name="loc:copy" content="Copy">
+      <meta name="loc:downloadPdf" content="Download PDF">
+
+      <script type="module" src="./../public/docfx.min.js"></script>
+
+      <script>
+        const theme = localStorage.getItem('theme') || 'auto'
+        document.documentElement.setAttribute('data-bs-theme', theme === 'auto' ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light') : theme)
+      </script>
+
+  </head>
+
+  <body class="tex2jax_ignore" data-layout="" data-yaml-mime="">
+    <header class="bg-body border-bottom">
+      <nav id="autocollapse" class="navbar navbar-expand-md" role="navigation">
+        <div class="container-xxl flex-nowrap">
+          <a class="navbar-brand" href="../index.html">
+            <img id="logo" class="svg" src="../images/logo.svg" alt="">
+            
+          </a>
+          <button class="btn btn-lg d-md-none border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navpanel" aria-controls="navpanel" aria-expanded="false" aria-label="Toggle navigation">
+            <i class="bi bi-three-dots"></i>
+          </button>
+          <div class="collapse navbar-collapse" id="navpanel">
+            <div id="navbar">
+            </div>
+          </div>
+        </div>
+      </nav>
+    </header>
+
+    <main class="container-xxl">
+      <div class="toc-offcanvas">
+        <div class="offcanvas-md offcanvas-start" tabindex="-1" id="tocOffcanvas" aria-labelledby="tocOffcanvasLabel">
+          <div class="offcanvas-header">
+            <h5 class="offcanvas-title" id="tocOffcanvasLabel">Table of Contents</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="offcanvas" data-bs-target="#tocOffcanvas" aria-label="Close"></button>
+          </div>
+          <div class="offcanvas-body">
+            <nav class="toc" id="toc"></nav>
+          </div>
+        </div>
+      </div>
+
+      <div class="content">
+        <div class="actionbar">
+          <button class="btn btn-lg border-0 d-md-none" type="button" data-bs-toggle="offcanvas" data-bs-target="#tocOffcanvas" aria-controls="tocOffcanvas" aria-expanded="false" aria-label="Show table of contents">
+            <i class="bi bi-list"></i>
+          </button>
+
+          <nav id="breadcrumb"></nav>
+        </div>
+
+        <article data-uid="">
+<h1 id="procharts-skia-style-reference">ProCharts Skia Style Reference</h1>
+
+<p><code>SkiaChartStyle</code> exposes renderer-specific knobs for layout, axes, labels, and per-series styling. This is useful when you need fine control over the Skia renderer beyond the renderer-agnostic <code>ChartTheme</code>.</p>
+<h2 id="layout-and-padding">Layout and padding</h2>
+<ul>
+<li><code>PaddingLeft</code>, <code>PaddingRight</code>, <code>PaddingTop</code>, <code>PaddingBottom</code></li>
+<li><code>Background</code></li>
+</ul>
+<h2 id="axes-and-gridlines">Axes and gridlines</h2>
+<ul>
+<li><code>Axis</code>, <code>AxisStrokeWidth</code></li>
+<li><code>ShowAxisLabels</code>, <code>ShowCategoryLabels</code></li>
+<li><code>AxisTickCount</code></li>
+<li><code>ShowGridlines</code>, <code>Gridline</code>, <code>GridlineStrokeWidth</code></li>
+<li><code>ShowCategoryGridlines</code></li>
+</ul>
+<p>Axis visibility and titles:</p>
+<ul>
+<li><code>ShowCategoryAxisLine</code>, <code>ShowValueAxisLine</code></li>
+<li><code>CategoryAxisTitle</code>, <code>ValueAxisTitle</code></li>
+<li>Secondary axis equivalents</li>
+</ul>
+<p>Axis ranges and kinds:</p>
+<ul>
+<li><code>CategoryAxisKind</code>, <code>ValueAxisKind</code></li>
+<li><code>CategoryAxisMinimum</code>, <code>CategoryAxisMaximum</code></li>
+<li><code>ValueAxisMinimum</code>, <code>ValueAxisMaximum</code></li>
+<li>Secondary axis equivalents</li>
+</ul>
+<p>Minor ticks and gridlines:</p>
+<ul>
+<li><code>CategoryAxisMinorTickCount</code>, <code>ShowCategoryMinorTicks</code>, <code>ShowCategoryMinorGridlines</code></li>
+<li><code>ValueAxisMinorTickCount</code>, <code>ShowValueMinorTicks</code>, <code>ShowValueMinorGridlines</code></li>
+<li>Secondary axis equivalents</li>
+</ul>
+<p>Axis crossing and offsets:</p>
+<ul>
+<li><code>CategoryAxisCrossing</code>, <code>CategoryAxisCrossingValue</code>, <code>CategoryAxisOffset</code></li>
+<li><code>ValueAxisCrossing</code>, <code>ValueAxisCrossingValue</code>, <code>ValueAxisOffset</code></li>
+<li>Secondary axis equivalents</li>
+</ul>
+<h2 id="legend">Legend</h2>
+<ul>
+<li><code>ShowLegend</code>, <code>LegendPosition</code></li>
+<li><code>LegendFlow</code>, <code>LegendWrap</code>, <code>LegendMaxWidth</code></li>
+<li><code>LegendPadding</code>, <code>LegendSwatchSize</code>, <code>LegendSpacing</code></li>
+<li>Grouping for stacked series: <code>LegendGroupStackedSeries</code>, <code>LegendStackedGroupTitle</code>, <code>LegendStandardGroupTitle</code></li>
+</ul>
+<h2 id="data-labels">Data labels</h2>
+<ul>
+<li><code>ShowDataLabels</code>, <code>DataLabelTextSize</code></li>
+<li><code>DataLabelPadding</code>, <code>DataLabelOffset</code></li>
+<li><code>DataLabelBackground</code>, <code>DataLabelText</code></li>
+<li><code>DataLabelFormatter</code>, <code>SeriesDataLabelFormatter</code></li>
+</ul>
+<h2 id="pie-and-donut">Pie and donut</h2>
+<ul>
+<li><code>PieLabelPlacement</code></li>
+<li><code>PieLabelLeaderLineLength</code>, <code>PieLabelLeaderLineOffset</code></li>
+<li><code>PieLabelLeaderLineColor</code>, <code>PieLabelLeaderLineWidth</code></li>
+<li><code>PieInnerRadiusRatio</code></li>
+</ul>
+<h2 id="series-styling">Series styling</h2>
+<ul>
+<li><code>SeriesStrokeWidth</code>, <code>AreaFillOpacity</code></li>
+<li><code>SeriesColors</code></li>
+<li><code>SeriesStyles</code> for per-series overrides</li>
+</ul>
+<h2 id="bubble-waterfall-and-special-charts">Bubble, waterfall, and special charts</h2>
+<ul>
+<li>Bubble: <code>BubbleMinRadius</code>, <code>BubbleMaxRadius</code>, <code>BubbleFillOpacity</code>, <code>BubbleStrokeWidth</code></li>
+<li>Waterfall: <code>WaterfallIncreaseColor</code>, <code>WaterfallDecreaseColor</code>, <code>WaterfallConnectorColor</code>, <code>ShowWaterfallConnectors</code></li>
+<li>Histogram: <code>HistogramBinCount</code></li>
+<li>Box and whisker: <code>BoxWhiskerFillOpacity</code>, <code>BoxWhiskerOutlierRadius</code>, <code>BoxWhiskerShowOutliers</code></li>
+<li>Radar: <code>RadarPointRadius</code></li>
+<li>Funnel: <code>FunnelGap</code>, <code>FunnelMinWidthRatio</code></li>
+</ul>
+<h2 id="trendlines-and-error-bars">Trendlines and error bars</h2>
+<ul>
+<li><code>TrendlineStrokeWidth</code></li>
+<li><code>ErrorBarStrokeWidth</code>, <code>ErrorBarCapSize</code></li>
+</ul>
+<h2 id="hit-testing">Hit testing</h2>
+<ul>
+<li><code>HitTestRadius</code></li>
+</ul>
+<h2 id="theme-bridging">Theme bridging</h2>
+<p><code>SkiaChartStyle</code> can blend renderer-agnostic styles with Skia-specific ones:</p>
+<ul>
+<li><code>CoreTheme</code> and <code>CoreSeriesStyles</code> are pulled from <code>ChartModel</code>.</li>
+<li><code>Theme</code> and <code>SeriesStyles</code> apply Skia overrides on top.</li>
+</ul>
+
+</article>
+
+        <div class="contribution d-print-none">
+          <a href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/docfx/articles/procharts-skia-style-reference.md/#L1" class="edit-link">Edit this page</a>
+        </div>
+
+        <div class="next-article d-print-none border-top" id="nextArticle"></div>
+
+      </div>
+
+      <div class="affix">
+        <nav id="affix"></nav>
+      </div>
+    </main>
+
+
+    <footer class="border-top text-secondary">
+      <div class="container-xxl">
+        <div class="flex-fill">
+          <span>Made with <a href="https://dotnet.github.io/docfx">docfx</a></span>
+        </div>
+      </div>
+    </footer>
+  </body>
+</html>

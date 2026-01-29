@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+      <title>Formula Engine Values and Coercion | ProDataGrid for Avalonia </title>
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <meta name="title" content="Formula Engine Values and Coercion | ProDataGrid for Avalonia ">
+      
+      
+      <link rel="icon" href="../favicon.ico">
+      <link rel="stylesheet" href="../public/docfx.min.css">
+      <link rel="stylesheet" href="../public/main.css">
+      <meta name="docfx:navrel" content="../toc.html">
+      <meta name="docfx:tocrel" content="toc.html">
+      
+      
+      
+      
+      <meta name="docfx:docurl" content="https://github.com/wieslawsoltes/ProDataGrid/blob/master/docfx/articles/formula-engine-values-and-coercion.md/#L1">
+      <meta name="loc:inThisArticle" content="In this article">
+      <meta name="loc:searchResultsCount" content="{count} results for &quot;{query}&quot;">
+      <meta name="loc:searchNoResults" content="No results for &quot;{query}&quot;">
+      <meta name="loc:tocFilter" content="Filter by title">
+      <meta name="loc:nextArticle" content="Next">
+      <meta name="loc:prevArticle" content="Previous">
+      <meta name="loc:themeLight" content="Light">
+      <meta name="loc:themeDark" content="Dark">
+      <meta name="loc:themeAuto" content="Auto">
+      <meta name="loc:changeTheme" content="Change theme">
+      <meta name="loc:copy" content="Copy">
+      <meta name="loc:downloadPdf" content="Download PDF">
+
+      <script type="module" src="./../public/docfx.min.js"></script>
+
+      <script>
+        const theme = localStorage.getItem('theme') || 'auto'
+        document.documentElement.setAttribute('data-bs-theme', theme === 'auto' ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light') : theme)
+      </script>
+
+  </head>
+
+  <body class="tex2jax_ignore" data-layout="" data-yaml-mime="">
+    <header class="bg-body border-bottom">
+      <nav id="autocollapse" class="navbar navbar-expand-md" role="navigation">
+        <div class="container-xxl flex-nowrap">
+          <a class="navbar-brand" href="../index.html">
+            <img id="logo" class="svg" src="../images/logo.svg" alt="">
+            
+          </a>
+          <button class="btn btn-lg d-md-none border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navpanel" aria-controls="navpanel" aria-expanded="false" aria-label="Toggle navigation">
+            <i class="bi bi-three-dots"></i>
+          </button>
+          <div class="collapse navbar-collapse" id="navpanel">
+            <div id="navbar">
+            </div>
+          </div>
+        </div>
+      </nav>
+    </header>
+
+    <main class="container-xxl">
+      <div class="toc-offcanvas">
+        <div class="offcanvas-md offcanvas-start" tabindex="-1" id="tocOffcanvas" aria-labelledby="tocOffcanvasLabel">
+          <div class="offcanvas-header">
+            <h5 class="offcanvas-title" id="tocOffcanvasLabel">Table of Contents</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="offcanvas" data-bs-target="#tocOffcanvas" aria-label="Close"></button>
+          </div>
+          <div class="offcanvas-body">
+            <nav class="toc" id="toc"></nav>
+          </div>
+        </div>
+      </div>
+
+      <div class="content">
+        <div class="actionbar">
+          <button class="btn btn-lg border-0 d-md-none" type="button" data-bs-toggle="offcanvas" data-bs-target="#tocOffcanvas" aria-controls="tocOffcanvas" aria-expanded="false" aria-label="Show table of contents">
+            <i class="bi bi-list"></i>
+          </button>
+
+          <nav id="breadcrumb"></nav>
+        </div>
+
+        <article data-uid="">
+<h1 id="formula-engine-values-and-coercion">Formula Engine Values and Coercion</h1>
+
+<p>The engine follows Excel-like typing and coercion rules. Values are represented by <code>FormulaValue</code>.</p>
+<h2 id="value-kinds">Value kinds</h2>
+<ul>
+<li><code>Blank</code> (empty cell)</li>
+<li><code>Number</code> (double)</li>
+<li><code>Text</code> (string)</li>
+<li><code>Boolean</code> (<code>TRUE</code>/<code>FALSE</code>)</li>
+<li><code>Error</code> (e.g., <code>#DIV/0!</code>)</li>
+<li><code>Array</code> (2D matrix of <code>FormulaValue</code>)</li>
+<li><code>Reference</code> (cell or range reference)</li>
+</ul>
+<h2 id="coercion-rules-high-level">Coercion rules (high level)</h2>
+<ul>
+<li>Numbers: keep numeric values, apply optional 15-digit precision.</li>
+<li>Booleans: coerce to 1 or 0 in arithmetic contexts.</li>
+<li>Blank: coerces to 0 in arithmetic and empty text in string contexts.</li>
+<li>Text: parsed using Excel-style number parsing when enabled in settings.</li>
+<li>Errors: propagate through most operations and functions.</li>
+</ul>
+<p>The parsing rules respect the workbook culture (decimal and list separators) and use Excel-like parsing when <code>UseExcelNumberParsing</code> is enabled.</p>
+<h2 id="comparisons">Comparisons</h2>
+<ul>
+<li>Numeric comparisons happen when both sides are numeric.</li>
+<li>Otherwise, comparisons fall back to text comparison.</li>
+<li>Errors propagate when involved in comparisons.</li>
+</ul>
+<h2 id="arrays-and-implicit-intersection">Arrays and implicit intersection</h2>
+<p>When a scalar context receives a range or array, the evaluator applies implicit intersection. In grid scenarios, dynamic array results spill into neighboring cells when enabled.</p>
+<h2 id="errors">Errors</h2>
+<p>Errors are represented by <code>FormulaError</code> and mapped to Excel-style error literals:</p>
+<ul>
+<li><code>#DIV/0!</code>, <code>#VALUE!</code>, <code>#NAME?</code>, <code>#REF!</code>, <code>#NUM!</code>, <code>#N/A</code>, <code>#NULL!</code>, <code>#SPILL!</code></li>
+</ul>
+
+</article>
+
+        <div class="contribution d-print-none">
+          <a href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/docfx/articles/formula-engine-values-and-coercion.md/#L1" class="edit-link">Edit this page</a>
+        </div>
+
+        <div class="next-article d-print-none border-top" id="nextArticle"></div>
+
+      </div>
+
+      <div class="affix">
+        <nav id="affix"></nav>
+      </div>
+    </main>
+
+
+    <footer class="border-top text-secondary">
+      <div class="container-xxl">
+        <div class="flex-fill">
+          <span>Made with <a href="https://dotnet.github.io/docfx">docfx</a></span>
+        </div>
+      </div>
+    </footer>
+  </body>
+</html>

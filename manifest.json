@@ -2118,6 +2118,90 @@
     },
     {
       "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.DataGridFormulaColumnDefinition.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.DataGridFormulaColumnDefinition.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.DataGridFormulaColumnDefinition",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.DataGridFormulaTextColumn.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.DataGridFormulaTextColumn.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.DataGridFormulaTextColumn",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.DataGridFormulas.DataGridFormulaInvalidatedEventArgs.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.DataGridFormulas.DataGridFormulaInvalidatedEventArgs.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.DataGridFormulas.DataGridFormulaInvalidatedEventArgs",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.DataGridFormulas.DataGridFormulaModel.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.DataGridFormulas.DataGridFormulaModel.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.DataGridFormulas.DataGridFormulaModel",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.DataGridFormulas.IDataGridFormulaModel.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.DataGridFormulas.IDataGridFormulaModel.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.DataGridFormulas.IDataGridFormulaModel",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.DataGridFormulas.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.DataGridFormulas.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.DataGridFormulas",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
       "source_relative_path": "api/Avalonia.Controls.DataGridGridLinesVisibility.yml",
       "output": {
         ".html": {
@@ -5421,6 +5505,2386 @@
       "Summary": null
     },
     {
+      "type": "ManagedReference",
+      "source_relative_path": "api/ProCharts.Avalonia.ChartClipboardFormat.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/ProCharts.Avalonia.ChartClipboardFormat.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "ProCharts.Avalonia.ChartClipboardFormat",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/ProCharts.Avalonia.ChartClipboardFormats.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/ProCharts.Avalonia.ChartClipboardFormats.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "ProCharts.Avalonia.ChartClipboardFormats",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/ProCharts.Avalonia.ProChartView.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/ProCharts.Avalonia.ProChartView.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "ProCharts.Avalonia.ProChartView",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/ProCharts.Avalonia.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/ProCharts.Avalonia.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "ProCharts.Avalonia",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/ProCharts.ChartAxisCrossing.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/ProCharts.ChartAxisCrossing.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "ProCharts.ChartAxisCrossing",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/ProCharts.ChartAxisDefinition.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/ProCharts.ChartAxisDefinition.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "ProCharts.ChartAxisDefinition",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/ProCharts.ChartAxisKind.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/ProCharts.ChartAxisKind.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "ProCharts.ChartAxisKind",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/ProCharts.ChartColor.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/ProCharts.ChartColor.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "ProCharts.ChartColor",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/ProCharts.ChartDataDelta.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/ProCharts.ChartDataDelta.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "ProCharts.ChartDataDelta",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/ProCharts.ChartDataDeltaKind.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/ProCharts.ChartDataDeltaKind.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "ProCharts.ChartDataDeltaKind",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/ProCharts.ChartDataRequest.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/ProCharts.ChartDataRequest.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "ProCharts.ChartDataRequest",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/ProCharts.ChartDataSnapshot.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/ProCharts.ChartDataSnapshot.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "ProCharts.ChartDataSnapshot",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/ProCharts.ChartDataUpdate.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/ProCharts.ChartDataUpdate.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "ProCharts.ChartDataUpdate",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/ProCharts.ChartDataUpdateEventArgs.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/ProCharts.ChartDataUpdateEventArgs.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "ProCharts.ChartDataUpdateEventArgs",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/ProCharts.ChartDownsampleMode.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/ProCharts.ChartDownsampleMode.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "ProCharts.ChartDownsampleMode",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/ProCharts.ChartErrorBarType.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/ProCharts.ChartErrorBarType.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "ProCharts.ChartErrorBarType",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/ProCharts.ChartGradient.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/ProCharts.ChartGradient.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "ProCharts.ChartGradient",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/ProCharts.ChartGradientDirection.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/ProCharts.ChartGradientDirection.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "ProCharts.ChartGradientDirection",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/ProCharts.ChartLegendDefinition.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/ProCharts.ChartLegendDefinition.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "ProCharts.ChartLegendDefinition",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/ProCharts.ChartLegendPosition.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/ProCharts.ChartLegendPosition.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "ProCharts.ChartLegendPosition",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/ProCharts.ChartLineInterpolation.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/ProCharts.ChartLineInterpolation.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "ProCharts.ChartLineInterpolation",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/ProCharts.ChartLineStyle.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/ProCharts.ChartLineStyle.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "ProCharts.ChartLineStyle",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/ProCharts.ChartMarkerShape.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/ProCharts.ChartMarkerShape.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "ProCharts.ChartMarkerShape",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/ProCharts.ChartModel.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/ProCharts.ChartModel.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "ProCharts.ChartModel",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/ProCharts.ChartSeriesKind.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/ProCharts.ChartSeriesKind.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "ProCharts.ChartSeriesKind",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/ProCharts.ChartSeriesSnapshot.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/ProCharts.ChartSeriesSnapshot.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "ProCharts.ChartSeriesSnapshot",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/ProCharts.ChartSeriesStyle.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/ProCharts.ChartSeriesStyle.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "ProCharts.ChartSeriesStyle",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/ProCharts.ChartTheme.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/ProCharts.ChartTheme.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "ProCharts.ChartTheme",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/ProCharts.ChartTrendlineType.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/ProCharts.ChartTrendlineType.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "ProCharts.ChartTrendlineType",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/ProCharts.ChartValueAxisAssignment.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/ProCharts.ChartValueAxisAssignment.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "ProCharts.ChartValueAxisAssignment",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/ProCharts.IChartDataSource.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/ProCharts.IChartDataSource.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "ProCharts.IChartDataSource",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/ProCharts.IChartIncrementalDataSource.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/ProCharts.IChartIncrementalDataSource.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "ProCharts.IChartIncrementalDataSource",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/ProCharts.IChartWindowInfoProvider.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/ProCharts.IChartWindowInfoProvider.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "ProCharts.IChartWindowInfoProvider",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/ProCharts.Skia.SkiaChartExporter.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/ProCharts.Skia.SkiaChartExporter.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "ProCharts.Skia.SkiaChartExporter",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/ProCharts.Skia.SkiaChartGradient.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/ProCharts.Skia.SkiaChartGradient.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "ProCharts.Skia.SkiaChartGradient",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/ProCharts.Skia.SkiaChartHitTestResult.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/ProCharts.Skia.SkiaChartHitTestResult.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "ProCharts.Skia.SkiaChartHitTestResult",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/ProCharts.Skia.SkiaChartRenderCache.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/ProCharts.Skia.SkiaChartRenderCache.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "ProCharts.Skia.SkiaChartRenderCache",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/ProCharts.Skia.SkiaChartRenderer.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/ProCharts.Skia.SkiaChartRenderer.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "ProCharts.Skia.SkiaChartRenderer",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/ProCharts.Skia.SkiaChartSeriesStyle.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/ProCharts.Skia.SkiaChartSeriesStyle.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "ProCharts.Skia.SkiaChartSeriesStyle",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/ProCharts.Skia.SkiaChartStyle.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/ProCharts.Skia.SkiaChartStyle.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "ProCharts.Skia.SkiaChartStyle",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/ProCharts.Skia.SkiaChartTheme.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/ProCharts.Skia.SkiaChartTheme.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "ProCharts.Skia.SkiaChartTheme",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/ProCharts.Skia.SkiaChartViewportInfo.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/ProCharts.Skia.SkiaChartViewportInfo.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "ProCharts.Skia.SkiaChartViewportInfo",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/ProCharts.Skia.SkiaGradientDirection.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/ProCharts.Skia.SkiaGradientDirection.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "ProCharts.Skia.SkiaGradientDirection",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/ProCharts.Skia.SkiaLegendFlow.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/ProCharts.Skia.SkiaLegendFlow.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "ProCharts.Skia.SkiaLegendFlow",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/ProCharts.Skia.SkiaLineInterpolation.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/ProCharts.Skia.SkiaLineInterpolation.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "ProCharts.Skia.SkiaLineInterpolation",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/ProCharts.Skia.SkiaLineStyle.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/ProCharts.Skia.SkiaLineStyle.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "ProCharts.Skia.SkiaLineStyle",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/ProCharts.Skia.SkiaMarkerShape.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/ProCharts.Skia.SkiaMarkerShape.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "ProCharts.Skia.SkiaMarkerShape",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/ProCharts.Skia.SkiaPieLabelPlacement.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/ProCharts.Skia.SkiaPieLabelPlacement.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "ProCharts.Skia.SkiaPieLabelPlacement",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/ProCharts.Skia.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/ProCharts.Skia.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "ProCharts.Skia",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/ProCharts.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/ProCharts.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "ProCharts",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/ProDataGrid.Charting.DataGridChartAggregation.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/ProDataGrid.Charting.DataGridChartAggregation.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "ProDataGrid.Charting.DataGridChartAggregation",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/ProDataGrid.Charting.DataGridChartGroupMode.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/ProDataGrid.Charting.DataGridChartGroupMode.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "ProDataGrid.Charting.DataGridChartGroupMode",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/ProDataGrid.Charting.DataGridChartModel.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/ProDataGrid.Charting.DataGridChartModel.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "ProDataGrid.Charting.DataGridChartModel",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/ProDataGrid.Charting.DataGridChartSeriesDefinition.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/ProDataGrid.Charting.DataGridChartSeriesDefinition.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "ProDataGrid.Charting.DataGridChartSeriesDefinition",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/ProDataGrid.Charting.PivotChartDataSource.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/ProDataGrid.Charting.PivotChartDataSource.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "ProDataGrid.Charting.PivotChartDataSource",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/ProDataGrid.Charting.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/ProDataGrid.Charting.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "ProDataGrid.Charting",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/ProDataGrid.FormulaEngine.Excel.ExcelDateConverter.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/ProDataGrid.FormulaEngine.Excel.ExcelDateConverter.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "ProDataGrid.FormulaEngine.Excel.ExcelDateConverter",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/ProDataGrid.FormulaEngine.Excel.ExcelFormulaFormatter.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/ProDataGrid.FormulaEngine.Excel.ExcelFormulaFormatter.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "ProDataGrid.FormulaEngine.Excel.ExcelFormulaFormatter",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/ProDataGrid.FormulaEngine.Excel.ExcelFormulaParser.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/ProDataGrid.FormulaEngine.Excel.ExcelFormulaParser.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "ProDataGrid.FormulaEngine.Excel.ExcelFormulaParser",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/ProDataGrid.FormulaEngine.Excel.ExcelFormulaTokenizer.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/ProDataGrid.FormulaEngine.Excel.ExcelFormulaTokenizer.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "ProDataGrid.FormulaEngine.Excel.ExcelFormulaTokenizer",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/ProDataGrid.FormulaEngine.Excel.ExcelFunctionRegistry.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/ProDataGrid.FormulaEngine.Excel.ExcelFunctionRegistry.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "ProDataGrid.FormulaEngine.Excel.ExcelFunctionRegistry",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/ProDataGrid.FormulaEngine.Excel.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/ProDataGrid.FormulaEngine.Excel.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "ProDataGrid.FormulaEngine.Excel",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/ProDataGrid.FormulaEngine.FormulaArray.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/ProDataGrid.FormulaEngine.FormulaArray.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "ProDataGrid.FormulaEngine.FormulaArray",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/ProDataGrid.FormulaEngine.FormulaArrayExpression.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/ProDataGrid.FormulaEngine.FormulaArrayExpression.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "ProDataGrid.FormulaEngine.FormulaArrayExpression",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/ProDataGrid.FormulaEngine.FormulaBinaryExpression.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/ProDataGrid.FormulaEngine.FormulaBinaryExpression.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "ProDataGrid.FormulaEngine.FormulaBinaryExpression",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/ProDataGrid.FormulaEngine.FormulaBinaryOperator.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/ProDataGrid.FormulaEngine.FormulaBinaryOperator.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "ProDataGrid.FormulaEngine.FormulaBinaryOperator",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/ProDataGrid.FormulaEngine.FormulaCalculationEngine.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/ProDataGrid.FormulaEngine.FormulaCalculationEngine.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "ProDataGrid.FormulaEngine.FormulaCalculationEngine",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/ProDataGrid.FormulaEngine.FormulaCalculationMode.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/ProDataGrid.FormulaEngine.FormulaCalculationMode.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "ProDataGrid.FormulaEngine.FormulaCalculationMode",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/ProDataGrid.FormulaEngine.FormulaCalculationSettings.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/ProDataGrid.FormulaEngine.FormulaCalculationSettings.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "ProDataGrid.FormulaEngine.FormulaCalculationSettings",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/ProDataGrid.FormulaEngine.FormulaCalculationTelemetry.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/ProDataGrid.FormulaEngine.FormulaCalculationTelemetry.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "ProDataGrid.FormulaEngine.FormulaCalculationTelemetry",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/ProDataGrid.FormulaEngine.FormulaCellAddress.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/ProDataGrid.FormulaEngine.FormulaCellAddress.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "ProDataGrid.FormulaEngine.FormulaCellAddress",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/ProDataGrid.FormulaEngine.FormulaCoercion.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/ProDataGrid.FormulaEngine.FormulaCoercion.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "ProDataGrid.FormulaEngine.FormulaCoercion",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/ProDataGrid.FormulaEngine.FormulaDateSystem.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/ProDataGrid.FormulaEngine.FormulaDateSystem.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "ProDataGrid.FormulaEngine.FormulaDateSystem",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/ProDataGrid.FormulaEngine.FormulaDependencyGraph.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/ProDataGrid.FormulaEngine.FormulaDependencyGraph.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "ProDataGrid.FormulaEngine.FormulaDependencyGraph",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/ProDataGrid.FormulaEngine.FormulaError.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/ProDataGrid.FormulaEngine.FormulaError.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "ProDataGrid.FormulaEngine.FormulaError",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/ProDataGrid.FormulaEngine.FormulaErrorType.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/ProDataGrid.FormulaEngine.FormulaErrorType.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "ProDataGrid.FormulaEngine.FormulaErrorType",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/ProDataGrid.FormulaEngine.FormulaEvaluationContext.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/ProDataGrid.FormulaEngine.FormulaEvaluationContext.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "ProDataGrid.FormulaEngine.FormulaEvaluationContext",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/ProDataGrid.FormulaEngine.FormulaEvaluator.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/ProDataGrid.FormulaEngine.FormulaEvaluator.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "ProDataGrid.FormulaEngine.FormulaEvaluator",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/ProDataGrid.FormulaEngine.FormulaExpression.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/ProDataGrid.FormulaEngine.FormulaExpression.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "ProDataGrid.FormulaEngine.FormulaExpression",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/ProDataGrid.FormulaEngine.FormulaExpressionKind.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/ProDataGrid.FormulaEngine.FormulaExpressionKind.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "ProDataGrid.FormulaEngine.FormulaExpressionKind",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/ProDataGrid.FormulaEngine.FormulaFormatOptions.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/ProDataGrid.FormulaEngine.FormulaFormatOptions.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "ProDataGrid.FormulaEngine.FormulaFormatOptions",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/ProDataGrid.FormulaEngine.FormulaFunctionCallExpression.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/ProDataGrid.FormulaEngine.FormulaFunctionCallExpression.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "ProDataGrid.FormulaEngine.FormulaFunctionCallExpression",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/ProDataGrid.FormulaEngine.FormulaFunctionContext.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/ProDataGrid.FormulaEngine.FormulaFunctionContext.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "ProDataGrid.FormulaEngine.FormulaFunctionContext",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/ProDataGrid.FormulaEngine.FormulaFunctionInfo.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/ProDataGrid.FormulaEngine.FormulaFunctionInfo.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "ProDataGrid.FormulaEngine.FormulaFunctionInfo",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/ProDataGrid.FormulaEngine.FormulaLiteralExpression.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/ProDataGrid.FormulaEngine.FormulaLiteralExpression.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "ProDataGrid.FormulaEngine.FormulaLiteralExpression",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/ProDataGrid.FormulaEngine.FormulaNameChangeKind.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/ProDataGrid.FormulaEngine.FormulaNameChangeKind.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "ProDataGrid.FormulaEngine.FormulaNameChangeKind",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/ProDataGrid.FormulaEngine.FormulaNameChangedEventArgs.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/ProDataGrid.FormulaEngine.FormulaNameChangedEventArgs.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "ProDataGrid.FormulaEngine.FormulaNameChangedEventArgs",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/ProDataGrid.FormulaEngine.FormulaNameExpression.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/ProDataGrid.FormulaEngine.FormulaNameExpression.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "ProDataGrid.FormulaEngine.FormulaNameExpression",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/ProDataGrid.FormulaEngine.FormulaNameTable.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/ProDataGrid.FormulaEngine.FormulaNameTable.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "ProDataGrid.FormulaEngine.FormulaNameTable",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/ProDataGrid.FormulaEngine.FormulaNumberUtilities.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/ProDataGrid.FormulaEngine.FormulaNumberUtilities.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "ProDataGrid.FormulaEngine.FormulaNumberUtilities",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/ProDataGrid.FormulaEngine.FormulaParseException.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/ProDataGrid.FormulaEngine.FormulaParseException.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "ProDataGrid.FormulaEngine.FormulaParseException",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/ProDataGrid.FormulaEngine.FormulaParseOptions.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/ProDataGrid.FormulaEngine.FormulaParseOptions.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "ProDataGrid.FormulaEngine.FormulaParseOptions",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/ProDataGrid.FormulaEngine.FormulaRangeAddress.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/ProDataGrid.FormulaEngine.FormulaRangeAddress.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "ProDataGrid.FormulaEngine.FormulaRangeAddress",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/ProDataGrid.FormulaEngine.FormulaRecalculationResult.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/ProDataGrid.FormulaEngine.FormulaRecalculationResult.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "ProDataGrid.FormulaEngine.FormulaRecalculationResult",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/ProDataGrid.FormulaEngine.FormulaReference.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/ProDataGrid.FormulaEngine.FormulaReference.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "ProDataGrid.FormulaEngine.FormulaReference",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/ProDataGrid.FormulaEngine.FormulaReferenceAddress.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/ProDataGrid.FormulaEngine.FormulaReferenceAddress.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "ProDataGrid.FormulaEngine.FormulaReferenceAddress",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/ProDataGrid.FormulaEngine.FormulaReferenceExpression.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/ProDataGrid.FormulaEngine.FormulaReferenceExpression.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "ProDataGrid.FormulaEngine.FormulaReferenceExpression",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/ProDataGrid.FormulaEngine.FormulaReferenceKind.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/ProDataGrid.FormulaEngine.FormulaReferenceKind.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "ProDataGrid.FormulaEngine.FormulaReferenceKind",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/ProDataGrid.FormulaEngine.FormulaReferenceMode.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/ProDataGrid.FormulaEngine.FormulaReferenceMode.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "ProDataGrid.FormulaEngine.FormulaReferenceMode",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/ProDataGrid.FormulaEngine.FormulaReferenceResolver.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/ProDataGrid.FormulaEngine.FormulaReferenceResolver.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "ProDataGrid.FormulaEngine.FormulaReferenceResolver",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/ProDataGrid.FormulaEngine.FormulaReferenceShiftResult.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/ProDataGrid.FormulaEngine.FormulaReferenceShiftResult.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "ProDataGrid.FormulaEngine.FormulaReferenceShiftResult",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/ProDataGrid.FormulaEngine.FormulaSheetReference.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/ProDataGrid.FormulaEngine.FormulaSheetReference.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "ProDataGrid.FormulaEngine.FormulaSheetReference",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/ProDataGrid.FormulaEngine.FormulaStructuredReference.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/ProDataGrid.FormulaEngine.FormulaStructuredReference.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "ProDataGrid.FormulaEngine.FormulaStructuredReference",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/ProDataGrid.FormulaEngine.FormulaStructuredReferenceExpression.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/ProDataGrid.FormulaEngine.FormulaStructuredReferenceExpression.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "ProDataGrid.FormulaEngine.FormulaStructuredReferenceExpression",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/ProDataGrid.FormulaEngine.FormulaStructuredReferenceScope.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/ProDataGrid.FormulaEngine.FormulaStructuredReferenceScope.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "ProDataGrid.FormulaEngine.FormulaStructuredReferenceScope",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/ProDataGrid.FormulaEngine.FormulaToken.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/ProDataGrid.FormulaEngine.FormulaToken.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "ProDataGrid.FormulaEngine.FormulaToken",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/ProDataGrid.FormulaEngine.FormulaTokenType.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/ProDataGrid.FormulaEngine.FormulaTokenType.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "ProDataGrid.FormulaEngine.FormulaTokenType",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/ProDataGrid.FormulaEngine.FormulaUnaryExpression.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/ProDataGrid.FormulaEngine.FormulaUnaryExpression.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "ProDataGrid.FormulaEngine.FormulaUnaryExpression",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/ProDataGrid.FormulaEngine.FormulaUnaryOperator.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/ProDataGrid.FormulaEngine.FormulaUnaryOperator.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "ProDataGrid.FormulaEngine.FormulaUnaryOperator",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/ProDataGrid.FormulaEngine.FormulaValue.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/ProDataGrid.FormulaEngine.FormulaValue.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "ProDataGrid.FormulaEngine.FormulaValue",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/ProDataGrid.FormulaEngine.FormulaValueKind.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/ProDataGrid.FormulaEngine.FormulaValueKind.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "ProDataGrid.FormulaEngine.FormulaValueKind",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/ProDataGrid.FormulaEngine.IFormulaCalculationModeProvider.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/ProDataGrid.FormulaEngine.IFormulaCalculationModeProvider.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "ProDataGrid.FormulaEngine.IFormulaCalculationModeProvider",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/ProDataGrid.FormulaEngine.IFormulaCalculationObserver.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/ProDataGrid.FormulaEngine.IFormulaCalculationObserver.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "ProDataGrid.FormulaEngine.IFormulaCalculationObserver",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/ProDataGrid.FormulaEngine.IFormulaCell.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/ProDataGrid.FormulaEngine.IFormulaCell.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "ProDataGrid.FormulaEngine.IFormulaCell",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/ProDataGrid.FormulaEngine.IFormulaFormatter.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/ProDataGrid.FormulaEngine.IFormulaFormatter.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "ProDataGrid.FormulaEngine.IFormulaFormatter",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/ProDataGrid.FormulaEngine.IFormulaFunction.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/ProDataGrid.FormulaEngine.IFormulaFunction.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "ProDataGrid.FormulaEngine.IFormulaFunction",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/ProDataGrid.FormulaEngine.IFormulaFunctionRegistry.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/ProDataGrid.FormulaEngine.IFormulaFunctionRegistry.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "ProDataGrid.FormulaEngine.IFormulaFunctionRegistry",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/ProDataGrid.FormulaEngine.IFormulaNameChangeNotifier.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/ProDataGrid.FormulaEngine.IFormulaNameChangeNotifier.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "ProDataGrid.FormulaEngine.IFormulaNameChangeNotifier",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/ProDataGrid.FormulaEngine.IFormulaNameCollection.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/ProDataGrid.FormulaEngine.IFormulaNameCollection.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "ProDataGrid.FormulaEngine.IFormulaNameCollection",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/ProDataGrid.FormulaEngine.IFormulaNameProvider.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/ProDataGrid.FormulaEngine.IFormulaNameProvider.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "ProDataGrid.FormulaEngine.IFormulaNameProvider",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/ProDataGrid.FormulaEngine.IFormulaParser.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/ProDataGrid.FormulaEngine.IFormulaParser.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "ProDataGrid.FormulaEngine.IFormulaParser",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/ProDataGrid.FormulaEngine.IFormulaRangeValueResolver.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/ProDataGrid.FormulaEngine.IFormulaRangeValueResolver.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "ProDataGrid.FormulaEngine.IFormulaRangeValueResolver",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/ProDataGrid.FormulaEngine.IFormulaStructuredReferenceDependencyResolver.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/ProDataGrid.FormulaEngine.IFormulaStructuredReferenceDependencyResolver.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "ProDataGrid.FormulaEngine.IFormulaStructuredReferenceDependencyResolver",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/ProDataGrid.FormulaEngine.IFormulaStructuredReferenceResolver.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/ProDataGrid.FormulaEngine.IFormulaStructuredReferenceResolver.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "ProDataGrid.FormulaEngine.IFormulaStructuredReferenceResolver",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/ProDataGrid.FormulaEngine.IFormulaValueResolver.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/ProDataGrid.FormulaEngine.IFormulaValueResolver.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "ProDataGrid.FormulaEngine.IFormulaValueResolver",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/ProDataGrid.FormulaEngine.IFormulaWorkbook.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/ProDataGrid.FormulaEngine.IFormulaWorkbook.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "ProDataGrid.FormulaEngine.IFormulaWorkbook",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/ProDataGrid.FormulaEngine.IFormulaWorkbookResolver.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/ProDataGrid.FormulaEngine.IFormulaWorkbookResolver.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "ProDataGrid.FormulaEngine.IFormulaWorkbookResolver",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/ProDataGrid.FormulaEngine.IFormulaWorksheet.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/ProDataGrid.FormulaEngine.IFormulaWorksheet.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "ProDataGrid.FormulaEngine.IFormulaWorksheet",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/ProDataGrid.FormulaEngine.ILazyFormulaFunction.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/ProDataGrid.FormulaEngine.ILazyFormulaFunction.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "ProDataGrid.FormulaEngine.ILazyFormulaFunction",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/ProDataGrid.FormulaEngine.WorkbookValueResolver.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/ProDataGrid.FormulaEngine.WorkbookValueResolver.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "ProDataGrid.FormulaEngine.WorkbookValueResolver",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/ProDataGrid.FormulaEngine.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/ProDataGrid.FormulaEngine.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "ProDataGrid.FormulaEngine",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/ProDiagnostics.Transport.DiagnosticsUdpExporter.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/ProDiagnostics.Transport.DiagnosticsUdpExporter.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "ProDiagnostics.Transport.DiagnosticsUdpExporter",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/ProDiagnostics.Transport.DiagnosticsUdpOptions.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/ProDiagnostics.Transport.DiagnosticsUdpOptions.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "ProDiagnostics.Transport.DiagnosticsUdpOptions",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/ProDiagnostics.Transport.DiagnosticsUdpReceiver.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/ProDiagnostics.Transport.DiagnosticsUdpReceiver.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "ProDiagnostics.Transport.DiagnosticsUdpReceiver",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/ProDiagnostics.Transport.TelemetryActivity.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/ProDiagnostics.Transport.TelemetryActivity.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "ProDiagnostics.Transport.TelemetryActivity",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/ProDiagnostics.Transport.TelemetryHello.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/ProDiagnostics.Transport.TelemetryHello.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "ProDiagnostics.Transport.TelemetryHello",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/ProDiagnostics.Transport.TelemetryMessageType.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/ProDiagnostics.Transport.TelemetryMessageType.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "ProDiagnostics.Transport.TelemetryMessageType",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/ProDiagnostics.Transport.TelemetryMetric.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/ProDiagnostics.Transport.TelemetryMetric.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "ProDiagnostics.Transport.TelemetryMetric",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/ProDiagnostics.Transport.TelemetryMetricValue.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/ProDiagnostics.Transport.TelemetryMetricValue.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "ProDiagnostics.Transport.TelemetryMetricValue",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/ProDiagnostics.Transport.TelemetryMetricValueType.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/ProDiagnostics.Transport.TelemetryMetricValueType.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "ProDiagnostics.Transport.TelemetryMetricValueType",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/ProDiagnostics.Transport.TelemetryPacket.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/ProDiagnostics.Transport.TelemetryPacket.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "ProDiagnostics.Transport.TelemetryPacket",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/ProDiagnostics.Transport.TelemetryPacketReader.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/ProDiagnostics.Transport.TelemetryPacketReader.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "ProDiagnostics.Transport.TelemetryPacketReader",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/ProDiagnostics.Transport.TelemetryPacketWriter.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/ProDiagnostics.Transport.TelemetryPacketWriter.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "ProDiagnostics.Transport.TelemetryPacketWriter",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/ProDiagnostics.Transport.TelemetryProtocol.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/ProDiagnostics.Transport.TelemetryProtocol.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "ProDiagnostics.Transport.TelemetryProtocol",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/ProDiagnostics.Transport.TelemetryTag.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/ProDiagnostics.Transport.TelemetryTag.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "ProDiagnostics.Transport.TelemetryTag",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/ProDiagnostics.Transport.TelemetryTagValueType.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/ProDiagnostics.Transport.TelemetryTagValueType.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "ProDiagnostics.Transport.TelemetryTagValueType",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/ProDiagnostics.Transport.WildcardMatcher.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/ProDiagnostics.Transport.WildcardMatcher.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "ProDiagnostics.Transport.WildcardMatcher",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/ProDiagnostics.Transport.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/ProDiagnostics.Transport.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "ProDiagnostics.Transport",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/ProDiagnostics.Viewer.App.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/ProDiagnostics.Viewer.App.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "ProDiagnostics.Viewer.App",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/ProDiagnostics.Viewer.Controls.MetricTrendChart.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/ProDiagnostics.Viewer.Controls.MetricTrendChart.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "ProDiagnostics.Viewer.Controls.MetricTrendChart",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/ProDiagnostics.Viewer.Controls.Sparkline.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/ProDiagnostics.Viewer.Controls.Sparkline.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "ProDiagnostics.Viewer.Controls.Sparkline",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/ProDiagnostics.Viewer.Controls.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/ProDiagnostics.Viewer.Controls.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "ProDiagnostics.Viewer.Controls",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/ProDiagnostics.Viewer.MainWindow.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/ProDiagnostics.Viewer.MainWindow.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "ProDiagnostics.Viewer.MainWindow",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/ProDiagnostics.Viewer.Models.MetricSample.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/ProDiagnostics.Viewer.Models.MetricSample.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "ProDiagnostics.Viewer.Models.MetricSample",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/ProDiagnostics.Viewer.Models.PresetDefinition.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/ProDiagnostics.Viewer.Models.PresetDefinition.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "ProDiagnostics.Viewer.Models.PresetDefinition",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/ProDiagnostics.Viewer.Models.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/ProDiagnostics.Viewer.Models.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "ProDiagnostics.Viewer.Models",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/ProDiagnostics.Viewer.Program.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/ProDiagnostics.Viewer.Program.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "ProDiagnostics.Viewer.Program",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/ProDiagnostics.Viewer.Services.PresetStore.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/ProDiagnostics.Viewer.Services.PresetStore.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "ProDiagnostics.Viewer.Services.PresetStore",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/ProDiagnostics.Viewer.Services.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/ProDiagnostics.Viewer.Services.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "ProDiagnostics.Viewer.Services",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/ProDiagnostics.Viewer.ViewModels.ActivityEventViewModel.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/ProDiagnostics.Viewer.ViewModels.ActivityEventViewModel.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "ProDiagnostics.Viewer.ViewModels.ActivityEventViewModel",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/ProDiagnostics.Viewer.ViewModels.ColumnVisibilityOption.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/ProDiagnostics.Viewer.ViewModels.ColumnVisibilityOption.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "ProDiagnostics.Viewer.ViewModels.ColumnVisibilityOption",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/ProDiagnostics.Viewer.ViewModels.MainViewModel.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/ProDiagnostics.Viewer.ViewModels.MainViewModel.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "ProDiagnostics.Viewer.ViewModels.MainViewModel",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/ProDiagnostics.Viewer.ViewModels.MetricDetailTabViewModel.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/ProDiagnostics.Viewer.ViewModels.MetricDetailTabViewModel.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "ProDiagnostics.Viewer.ViewModels.MetricDetailTabViewModel",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/ProDiagnostics.Viewer.ViewModels.MetricSeriesViewModel.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/ProDiagnostics.Viewer.ViewModels.MetricSeriesViewModel.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "ProDiagnostics.Viewer.ViewModels.MetricSeriesViewModel",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/ProDiagnostics.Viewer.ViewModels.ObservableObject.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/ProDiagnostics.Viewer.ViewModels.ObservableObject.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "ProDiagnostics.Viewer.ViewModels.ObservableObject",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/ProDiagnostics.Viewer.ViewModels.RelayCommand.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/ProDiagnostics.Viewer.ViewModels.RelayCommand.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "ProDiagnostics.Viewer.ViewModels.RelayCommand",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/ProDiagnostics.Viewer.ViewModels.SessionViewModel.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/ProDiagnostics.Viewer.ViewModels.SessionViewModel.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "ProDiagnostics.Viewer.ViewModels.SessionViewModel",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/ProDiagnostics.Viewer.ViewModels.TrendRangeOption.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/ProDiagnostics.Viewer.ViewModels.TrendRangeOption.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "ProDiagnostics.Viewer.ViewModels.TrendRangeOption",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/ProDiagnostics.Viewer.ViewModels.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/ProDiagnostics.Viewer.ViewModels.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "ProDiagnostics.Viewer.ViewModels",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/ProDiagnostics.Viewer.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/ProDiagnostics.Viewer.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "ProDiagnostics.Viewer",
+      "Summary": null
+    },
+    {
       "type": "Conceptual",
       "source_relative_path": "api/index.md",
       "output": {
@@ -5459,6 +7923,16 @@
       "output": {
         ".html": {
           "relative_path": "articles/cell-template-reuse.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "Conceptual",
+      "source_relative_path": "articles/chart-gallery.md",
+      "output": {
+        ".html": {
+          "relative_path": "articles/chart-gallery.html"
         }
       },
       "version": ""
@@ -5705,6 +8179,156 @@
     },
     {
       "type": "Conceptual",
+      "source_relative_path": "articles/formula-engine-architecture.md",
+      "output": {
+        ".html": {
+          "relative_path": "articles/formula-engine-architecture.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "Conceptual",
+      "source_relative_path": "articles/formula-engine-arrays-and-spills.md",
+      "output": {
+        ".html": {
+          "relative_path": "articles/formula-engine-arrays-and-spills.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "Conceptual",
+      "source_relative_path": "articles/formula-engine-calculation-engine.md",
+      "output": {
+        ".html": {
+          "relative_path": "articles/formula-engine-calculation-engine.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "Conceptual",
+      "source_relative_path": "articles/formula-engine-diagnostics.md",
+      "output": {
+        ".html": {
+          "relative_path": "articles/formula-engine-diagnostics.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "Conceptual",
+      "source_relative_path": "articles/formula-engine-errors-and-validation.md",
+      "output": {
+        ".html": {
+          "relative_path": "articles/formula-engine-errors-and-validation.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "Conceptual",
+      "source_relative_path": "articles/formula-engine-formatting.md",
+      "output": {
+        ".html": {
+          "relative_path": "articles/formula-engine-formatting.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "Conceptual",
+      "source_relative_path": "articles/formula-engine-functions.md",
+      "output": {
+        ".html": {
+          "relative_path": "articles/formula-engine-functions.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "Conceptual",
+      "source_relative_path": "articles/formula-engine-integration.md",
+      "output": {
+        ".html": {
+          "relative_path": "articles/formula-engine-integration.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "Conceptual",
+      "source_relative_path": "articles/formula-engine-names-and-structured-references.md",
+      "output": {
+        ".html": {
+          "relative_path": "articles/formula-engine-names-and-structured-references.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "Conceptual",
+      "source_relative_path": "articles/formula-engine-overview.md",
+      "output": {
+        ".html": {
+          "relative_path": "articles/formula-engine-overview.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "Conceptual",
+      "source_relative_path": "articles/formula-engine-reference-syntax.md",
+      "output": {
+        ".html": {
+          "relative_path": "articles/formula-engine-reference-syntax.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "Conceptual",
+      "source_relative_path": "articles/formula-engine-samples.md",
+      "output": {
+        ".html": {
+          "relative_path": "articles/formula-engine-samples.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "Conceptual",
+      "source_relative_path": "articles/formula-engine-settings.md",
+      "output": {
+        ".html": {
+          "relative_path": "articles/formula-engine-settings.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "Conceptual",
+      "source_relative_path": "articles/formula-engine-testing-and-parity.md",
+      "output": {
+        ".html": {
+          "relative_path": "articles/formula-engine-testing-and-parity.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "Conceptual",
+      "source_relative_path": "articles/formula-engine-values-and-coercion.md",
+      "output": {
+        ".html": {
+          "relative_path": "articles/formula-engine-values-and-coercion.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "Conceptual",
       "source_relative_path": "articles/getting-started.md",
       "output": {
         ".html": {
@@ -5859,6 +8483,146 @@
       "output": {
         ".html": {
           "relative_path": "articles/pivot-tables.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "Conceptual",
+      "source_relative_path": "articles/procharts-architecture.md",
+      "output": {
+        ".html": {
+          "relative_path": "articles/procharts-architecture.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "Conceptual",
+      "source_relative_path": "articles/procharts-axes-and-scales.md",
+      "output": {
+        ".html": {
+          "relative_path": "articles/procharts-axes-and-scales.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "Conceptual",
+      "source_relative_path": "articles/procharts-chart-model.md",
+      "output": {
+        ".html": {
+          "relative_path": "articles/procharts-chart-model.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "Conceptual",
+      "source_relative_path": "articles/procharts-data-sources.md",
+      "output": {
+        ".html": {
+          "relative_path": "articles/procharts-data-sources.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "Conceptual",
+      "source_relative_path": "articles/procharts-datagrid-integration.md",
+      "output": {
+        ".html": {
+          "relative_path": "articles/procharts-datagrid-integration.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "Conceptual",
+      "source_relative_path": "articles/procharts-export-clipboard.md",
+      "output": {
+        ".html": {
+          "relative_path": "articles/procharts-export-clipboard.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "Conceptual",
+      "source_relative_path": "articles/procharts-interaction.md",
+      "output": {
+        ".html": {
+          "relative_path": "articles/procharts-interaction.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "Conceptual",
+      "source_relative_path": "articles/procharts-overview.md",
+      "output": {
+        ".html": {
+          "relative_path": "articles/procharts-overview.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "Conceptual",
+      "source_relative_path": "articles/procharts-performance.md",
+      "output": {
+        ".html": {
+          "relative_path": "articles/procharts-performance.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "Conceptual",
+      "source_relative_path": "articles/procharts-rendering-pipeline.md",
+      "output": {
+        ".html": {
+          "relative_path": "articles/procharts-rendering-pipeline.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "Conceptual",
+      "source_relative_path": "articles/procharts-samples.md",
+      "output": {
+        ".html": {
+          "relative_path": "articles/procharts-samples.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "Conceptual",
+      "source_relative_path": "articles/procharts-series-types.md",
+      "output": {
+        ".html": {
+          "relative_path": "articles/procharts-series-types.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "Conceptual",
+      "source_relative_path": "articles/procharts-skia-style-reference.md",
+      "output": {
+        ".html": {
+          "relative_path": "articles/procharts-skia-style-reference.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "Conceptual",
+      "source_relative_path": "articles/procharts-styling.md",
+      "output": {
+        ".html": {
+          "relative_path": "articles/procharts-styling.html"
         }
       },
       "version": ""
