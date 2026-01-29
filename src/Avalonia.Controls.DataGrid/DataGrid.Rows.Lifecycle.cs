@@ -430,7 +430,26 @@ namespace Avalonia.Controls
                 return;
             }
 
-            Debug.Assert(_rowsPresenter.Children.Contains(dataGridRow));
+            if (!_rowsPresenter.Children.Contains(dataGridRow))
+            {
+                if (_loadedRows.Contains(dataGridRow))
+                {
+                    return; // The row is still referenced, we can't release it.
+                }
+
+                OnUnloadingRow(new DataGridRowEventArgs(dataGridRow));
+                bool shouldRecycleRow = CurrentSlot != dataGridRow.Index;
+                if (shouldRecycleRow)
+                {
+                    DisplayData.RecycleRow(dataGridRow);
+                }
+                else
+                {
+                    ClearContainerForItemOverride(dataGridRow, dataGridRow.DataContext);
+                    dataGridRow.DetachFromDataGrid(false);
+                }
+                return;
+            }
 
             if (_loadedRows.Contains(dataGridRow))
             {
