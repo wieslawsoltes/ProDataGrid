@@ -312,36 +312,25 @@ internal
                     }
                 }
 
+                if (estimator != null)
+                {
+                    var totalCollapsed = _collapsedSlotsTable.GetIndexCount(0, SlotCount - 1);
+                    var totalDetails = GetDetailsCountInclusive(0, SlotCount - 1);
+                    var rowGroupHeaderCounts = GetVisibleRowGroupHeaderCounts();
+                    return estimator.CalculateTotalHeight(SlotCount, totalCollapsed, rowGroupHeaderCounts, totalDetails);
+                }
+
                 // Calculate estimates for what's beyond the viewport
                 if (VisibleSlotCount > DisplayData.NumDisplayedScrollingElements)
                 {
                     int remainingRowCount = (SlotCount - DisplayData.LastScrollingSlot - _collapsedSlotsTable.GetIndexCount(DisplayData.LastScrollingSlot, SlotCount - 1) - 1);
 
-                    // Use estimator if available, otherwise fall back to simple estimate
-                    if (estimator != null)
-                    {
-                        // Sum estimated heights for remaining slots
-                        for (int slot = DisplayData.LastScrollingSlot + 1; slot < SlotCount; slot++)
-                        {
-                            if (!_collapsedSlotsTable.Contains(slot))
-                            {
-                                var rowGroupInfo = GetGroupInfoForSlot(slot);
-                                bool isGroupSlot = rowGroupInfo != null;
-                                int level = isGroupSlot ? rowGroupInfo.Level : 0;
-                                bool hasDetails = !isGroupSlot && GetRowDetailsVisibility(slot);
-                                totalRowsHeight += estimator.GetEstimatedHeight(slot, isGroupSlot, level, hasDetails);
-                            }
-                        }
-                    }
-                    else
-                    {
-                        // Add estimation for the cell heights of all rows beyond our viewport
-                        totalRowsHeight += RowHeightEstimate * remainingRowCount;
+                    // Add estimation for the cell heights of all rows beyond our viewport
+                    totalRowsHeight += RowHeightEstimate * remainingRowCount;
 
-                        // Add the rest of the details beyond the viewport
-                        detailsCount += GetDetailsCountInclusive(DisplayData.LastScrollingSlot + 1, SlotCount - 1);
-                        totalRowsHeight += detailsCount * rowDetailsEstimate;
-                    }
+                    // Add the rest of the details beyond the viewport
+                    detailsCount += GetDetailsCountInclusive(DisplayData.LastScrollingSlot + 1, SlotCount - 1);
+                    totalRowsHeight += detailsCount * rowDetailsEstimate;
                 }
                 else
                 {
@@ -350,6 +339,46 @@ internal
                 }
 
                 return totalRowsHeight;
+            }
+        }
+
+        private int[] GetVisibleRowGroupHeaderCounts()
+        {
+            if ((RowGroupHeadersTable?.RangeCount ?? 0) == 0 && (RowGroupFootersTable?.RangeCount ?? 0) == 0)
+            {
+                return Array.Empty<int>();
+            }
+
+            if (_rowGroupHeightsByLevel == null || _rowGroupHeightsByLevel.Length == 0)
+            {
+                return Array.Empty<int>();
+            }
+
+            var counts = new int[_rowGroupHeightsByLevel.Length];
+            AccumulateVisibleRowGroupHeaderCounts(RowGroupHeadersTable, counts);
+            AccumulateVisibleRowGroupHeaderCounts(RowGroupFootersTable, counts);
+            return counts;
+        }
+
+        private void AccumulateVisibleRowGroupHeaderCounts(IndexToValueTable<DataGridRowGroupInfo> table, int[] counts)
+        {
+            if (table == null || table.RangeCount == 0)
+            {
+                return;
+            }
+
+            foreach (int slot in table.GetIndexes())
+            {
+                if (_collapsedSlotsTable.Contains(slot))
+                {
+                    continue;
+                }
+
+                var info = table.GetValueAt(slot);
+                if (info != null && info.Level >= 0 && info.Level < counts.Length)
+                {
+                    counts[info.Level]++;
+                }
             }
         }
 

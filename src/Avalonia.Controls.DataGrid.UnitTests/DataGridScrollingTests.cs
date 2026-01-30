@@ -1012,6 +1012,109 @@ public class DataGridScrollingTests
 
     #endregion
 
+    #region Row Height Estimator Extent Tests
+
+    [AvaloniaFact]
+    public void EdgedRowsHeight_Uses_RowHeightEstimator_CalculateTotalHeight_NoGrouping()
+    {
+        // Arrange
+        var items = Enumerable.Range(0, 12).Select(x => new ScrollTestModel($"Item {x}")).ToList();
+        var root = new Window
+        {
+            Width = 300,
+            Height = 200,
+        };
+
+        root.SetThemeStyles();
+
+        var estimator = new CapturingRowHeightEstimator
+        {
+            ReturnValue = 1234.5
+        };
+
+        var target = new DataGrid
+        {
+            ItemsSource = items,
+            HeadersVisibility = DataGridHeadersVisibility.Column,
+            RowDetailsVisibilityMode = DataGridRowDetailsVisibilityMode.Visible,
+            RowHeightEstimator = estimator,
+        };
+        target.ColumnsInternal.Add(new DataGridTextColumn { Header = "Name", Binding = new Binding("Name") });
+
+        root.Content = target;
+        root.Show();
+        root.UpdateLayout();
+
+        // Act
+        var height = target.GetEdgedRowsHeight();
+
+        // Assert
+        Assert.Equal(estimator.ReturnValue, height);
+        Assert.True(estimator.CalculateCallCount > 0);
+        Assert.Equal(target.SlotCount, estimator.LastTotalSlotCount);
+        Assert.Equal(target.GetCollapsedSlotCount(0, target.SlotCount - 1), estimator.LastCollapsedSlotCount);
+        Assert.Empty(estimator.LastRowGroupHeaderCounts);
+        Assert.Equal(target.SlotCount, estimator.LastDetailsVisibleCount);
+    }
+
+    [AvaloniaFact]
+    public void EdgedRowsHeight_Passes_Visible_Group_Header_Counts_When_Group_Collapsed()
+    {
+        // Arrange
+        var items = new List<GroupableTestModel>
+        {
+            new("Alpha", "Group A"),
+            new("Beta", "Group A"),
+            new("Gamma", "Group A"),
+        };
+
+        var root = new Window
+        {
+            Width = 300,
+            Height = 300,
+        };
+
+        root.SetThemeStyles();
+
+        var view = new DataGridCollectionView(items);
+        view.GroupDescriptions.Add(new DataGridPathGroupDescription(nameof(GroupableTestModel.Group)));
+        view.GroupDescriptions.Add(new DataGridPathGroupDescription(nameof(GroupableTestModel.Name)));
+
+        var estimator = new CapturingRowHeightEstimator();
+        var target = new DataGrid
+        {
+            ItemsSource = view,
+            HeadersVisibility = DataGridHeadersVisibility.Column,
+            RowHeightEstimator = estimator,
+        };
+        target.ColumnsInternal.Add(new DataGridTextColumn { Header = "Name", Binding = new Binding("Name") });
+        target.ColumnsInternal.Add(new DataGridTextColumn { Header = "Group", Binding = new Binding("Group") });
+
+        root.Content = target;
+        root.Show();
+        root.UpdateLayout();
+
+        target.GetEdgedRowsHeight();
+
+        Assert.Equal(2, estimator.LastRowGroupHeaderCounts.Length);
+        Assert.Equal(1, estimator.LastRowGroupHeaderCounts[0]);
+        Assert.True(estimator.LastRowGroupHeaderCounts[1] > 0);
+
+        var topHeader = GetGroupHeaders(target).First(h => h.RowGroupInfo?.Level == 0);
+        topHeader.ToggleExpandCollapse(false, setCurrent: true);
+        root.UpdateLayout();
+        target.UpdateLayout();
+
+        target.GetEdgedRowsHeight();
+
+        Assert.Equal(2, estimator.LastRowGroupHeaderCounts.Length);
+        Assert.Equal(1, estimator.LastRowGroupHeaderCounts[0]);
+        Assert.Equal(0, estimator.LastRowGroupHeaderCounts[1]);
+        Assert.True(estimator.LastCollapsedSlotCount > 0);
+    }
+
+    #endregion
+
     #region Mouse Wheel Scrolling Tests
 
     [AvaloniaFact]
@@ -1883,6 +1986,140 @@ public class DataGridScrollingTests
             public Dictionary<int, double> MeasuredHeights { get; }
             public int TotalItemCount { get; }
             public int StateToken { get; }
+        }
+    }
+
+    private sealed class CapturingRowHeightEstimator : IDataGridRowHeightEstimator
+    {
+        private const double DefaultHeight = 22.0;
+        private double _rowHeightEstimate = DefaultHeight;
+        private double _rowDetailsHeightEstimate;
+        private double _defaultRowHeight = DefaultHeight;
+
+        public int CalculateCallCount { get; private set; }
+        public int LastTotalSlotCount { get; private set; }
+        public int LastCollapsedSlotCount { get; private set; }
+        public int[] LastRowGroupHeaderCounts { get; private set; } = Array.Empty<int>();
+        public int LastDetailsVisibleCount { get; private set; }
+
+        public double ReturnValue { get; set; } = 1000;
+
+        public double DefaultRowHeight
+        {
+            get => _defaultRowHeight;
+            set
+            {
+                _defaultRowHeight = value;
+                if (Math.Abs(_rowHeightEstimate - DefaultHeight) < 0.001)
+                {
+                    _rowHeightEstimate = value;
+                }
+            }
+        }
+
+        public double RowHeightEstimate => _rowHeightEstimate;
+
+        public double RowDetailsHeightEstimate => _rowDetailsHeightEstimate;
+
+        public double GetRowGroupHeaderHeightEstimate(int level) => DefaultHeight;
+
+        public void RecordMeasuredHeight(int slot, double measuredHeight, bool hasDetails = false, double detailsHeight = 0)
+        {
+            _rowHeightEstimate = measuredHeight;
+            if (hasDetails && detailsHeight > 0)
+            {
+                _rowDetailsHeightEstimate = detailsHeight;
+            }
+        }
+
+        public void RecordRowGroupHeaderHeight(int slot, int level, double measuredHeight)
+        {
+        }
+
+        public double GetEstimatedHeight(int slot, bool isRowGroupHeader = false, int rowGroupLevel = 0, bool hasDetails = false)
+        {
+            return _rowHeightEstimate + (hasDetails ? _rowDetailsHeightEstimate : 0);
+        }
+
+        public double CalculateTotalHeight(int totalSlotCount, int collapsedSlotCount, int[] rowGroupHeaderCounts, int detailsVisibleCount)
+        {
+            CalculateCallCount++;
+            LastTotalSlotCount = totalSlotCount;
+            LastCollapsedSlotCount = collapsedSlotCount;
+            LastRowGroupHeaderCounts = rowGroupHeaderCounts?.ToArray() ?? Array.Empty<int>();
+            LastDetailsVisibleCount = detailsVisibleCount;
+            return ReturnValue;
+        }
+
+        public int EstimateSlotAtOffset(double verticalOffset, int totalSlotCount)
+        {
+            if (totalSlotCount <= 0 || _rowHeightEstimate <= 0)
+            {
+                return 0;
+            }
+
+            var slot = (int)(verticalOffset / _rowHeightEstimate);
+            return Math.Min(Math.Max(0, slot), totalSlotCount - 1);
+        }
+
+        public double EstimateOffsetToSlot(int slot)
+        {
+            if (slot <= 0)
+            {
+                return 0;
+            }
+
+            return slot * _rowHeightEstimate;
+        }
+
+        public void UpdateFromDisplayedRows(int firstDisplayedSlot, int lastDisplayedSlot, double[] displayedHeights, double verticalOffset, double negVerticalOffset, int collapsedSlotCount, int detailsCount)
+        {
+            if (displayedHeights == null || displayedHeights.Length == 0)
+            {
+                return;
+            }
+
+            double total = 0;
+            for (int i = 0; i < displayedHeights.Length; i++)
+            {
+                total += displayedHeights[i];
+            }
+
+            _rowHeightEstimate = total / displayedHeights.Length;
+        }
+
+        public void Reset()
+        {
+            _rowHeightEstimate = DefaultRowHeight;
+            _rowDetailsHeightEstimate = 0;
+        }
+
+        public void OnDataSourceChanged(int newItemCount)
+        {
+        }
+
+        public void OnItemsInserted(int startIndex, int count)
+        {
+        }
+
+        public void OnItemsRemoved(int startIndex, int count)
+        {
+        }
+
+        public RowHeightEstimatorDiagnostics GetDiagnostics()
+        {
+            return new RowHeightEstimatorDiagnostics
+            {
+                AlgorithmName = "Capturing",
+                CurrentRowHeightEstimate = _rowHeightEstimate,
+                CachedHeightCount = 0,
+                TotalRowCount = LastTotalSlotCount,
+                EstimatedTotalHeight = ReturnValue,
+                MinMeasuredHeight = _rowHeightEstimate,
+                MaxMeasuredHeight = _rowHeightEstimate,
+                AverageMeasuredHeight = _rowHeightEstimate,
+                AdditionalInfo = $"Calls: {CalculateCallCount}"
+            };
         }
     }
 

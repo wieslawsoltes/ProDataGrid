@@ -2737,6 +2737,11 @@ internal
                 return;
             }
 
+            if (FlushPendingScrollForHierarchyChange())
+            {
+                _pendingHierarchicalAnchorHint = null;
+            }
+
             var canApplyChanges = CanApplyHierarchicalFlattenedChanges(e);
             var hasAnchor = false;
             HierarchicalAnchor anchor = default;
@@ -2809,6 +2814,30 @@ internal
             }
 
             OnCollectionChangedForSummaries(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset));
+        }
+
+        private bool FlushPendingScrollForHierarchyChange()
+        {
+            if (DisplayData == null ||
+                IsScrollStateRestoreActive ||
+                _scrollingByHeight ||
+                MathUtilities.IsZero(DisplayData.PendingVerticalScrollHeight))
+            {
+                return false;
+            }
+
+            if (DisplayData.FirstScrollingSlot < 0 || SlotCount == 0 || ColumnsItemsInternal.Count == 0)
+            {
+                DisplayData.PendingVerticalScrollHeight = 0;
+                return false;
+            }
+
+            var pendingHeight = DisplayData.PendingVerticalScrollHeight;
+            DisplayData.PendingVerticalScrollHeight = 0;
+            _restoredScrollSlot = null;
+            ScrollSlotsByHeight(pendingHeight);
+            SyncLogicalScrollableOffset();
+            return true;
         }
 
         private bool IsHierarchicalItemsSourceCompatible()
@@ -3091,9 +3120,17 @@ internal
 
         private double GetEffectiveVerticalOffset()
         {
-            if (UseLogicalScrollable && _rowsPresenter != null)
+            if (UseLogicalScrollable &&
+                _rowsPresenter != null &&
+                DisplayData != null &&
+                !_scrollingByHeight &&
+                MathUtilities.IsZero(DisplayData.PendingVerticalScrollHeight))
             {
-                return _rowsPresenter.Offset.Y;
+                var offset = _rowsPresenter.Offset.Y;
+                if (!double.IsNaN(offset) && !double.IsInfinity(offset))
+                {
+                    return offset;
+                }
             }
 
             return _verticalOffset;

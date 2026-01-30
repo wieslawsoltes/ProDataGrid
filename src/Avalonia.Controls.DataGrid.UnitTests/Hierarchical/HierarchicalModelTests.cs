@@ -383,6 +383,91 @@ namespace Avalonia.Controls.DataGridTests.Hierarchical;
         Assert.False(FlattenedContains(model, secondChild));
     }
 
+    [Fact]
+    public void FindNode_Prefers_Reference_Match_Over_Equality()
+    {
+        var root = new DuplicateItem("root");
+        var first = new DuplicateItem("dup");
+        var second = new DuplicateItem("dup");
+        root.Children.Add(first);
+        root.Children.Add(second);
+
+        var model = new HierarchicalModel(new HierarchicalOptions
+        {
+            ChildrenSelector = item => ((DuplicateItem)item).Children
+        });
+
+        model.SetRoot(root);
+        model.Expand(model.Root!);
+
+        var secondNode = model.FindNode(second);
+        Assert.NotNull(secondNode);
+        Assert.Same(second, secondNode!.Item);
+        Assert.Equal(2, model.IndexOf(second));
+
+        var probe = new DuplicateItem("dup");
+        var firstNode = model.FindNode(probe);
+        Assert.NotNull(firstNode);
+        Assert.Same(first, firstNode!.Item);
+        Assert.Equal(1, model.IndexOf(probe));
+    }
+
+    [Fact]
+    public void FindNode_Updates_After_Flattened_Changes()
+    {
+        var root = new Item("root");
+        var child = new Item("child");
+        root.Children.Add(child);
+
+        var model = CreateModel();
+        model.SetRoot(root);
+        model.Expand(model.Root!);
+
+        Assert.NotNull(model.FindNode(child));
+        Assert.Equal(1, model.IndexOf(child));
+
+        var added = new Item("added");
+        root.Children.Add(added);
+
+        Assert.NotNull(model.FindNode(added));
+        Assert.Equal(2, model.IndexOf(added));
+
+        model.Collapse(model.Root!);
+
+        Assert.Null(model.FindNode(child));
+        Assert.Equal(-1, model.IndexOf(child));
+    }
+
+    [Fact]
+    public void FindNode_Updates_During_Flattened_CollectionChanged()
+    {
+        var root = new Item("root");
+        var child = new Item("child");
+        root.Children.Add(child);
+
+        var model = CreateModel();
+        model.SetRoot(root);
+        model.Expand(model.Root!);
+
+        Assert.NotNull(model.FindNode(child));
+
+        var added = new Item("added");
+        HierarchicalNode? foundInEvent = null;
+        var indexInEvent = -1;
+
+        ((INotifyCollectionChanged)model.ObservableFlattened).CollectionChanged += (_, __) =>
+        {
+            foundInEvent = model.FindNode(added);
+            indexInEvent = model.IndexOf(added);
+        };
+
+        root.Children.Add(added);
+
+        Assert.NotNull(foundInEvent);
+        Assert.Same(added, foundInEvent!.Item);
+        Assert.Equal(model.IndexOf(added), indexInEvent);
+    }
+
     private static HierarchicalNode FindNodeByReference(HierarchicalModel model, object item)
     {
         foreach (var node in model.Flattened)
