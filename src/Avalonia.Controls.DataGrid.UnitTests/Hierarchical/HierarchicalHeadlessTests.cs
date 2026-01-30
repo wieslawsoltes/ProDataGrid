@@ -981,6 +981,67 @@ public class HierarchicalHeadlessTests
     }
 
     [AvaloniaFact]
+    public void Hierarchical_Change_Flushes_Pending_Logical_Scroll()
+    {
+        var root = CreateTree("Root", childCount: 80, grandchildCount: 6);
+        using var themeScope = UseApplicationTheme(DataGridTheme.SimpleV2);
+
+        var model = new HierarchicalModel(new HierarchicalOptions
+        {
+            ChildrenSelector = o => ((Item)o).Children
+        });
+        model.SetRoot(root);
+        model.Expand(model.Root!);
+
+        var expandedChild = model.FindNode(root.Children[0]);
+        Assert.NotNull(expandedChild);
+        model.Expand(expandedChild!);
+
+        var grid = new DataGrid
+        {
+            HierarchicalModel = model,
+            HierarchicalRowsEnabled = true,
+            AutoGenerateColumns = false,
+            UseLogicalScrollable = true,
+            RowHeight = 24
+        };
+
+        grid.ColumnsInternal.Add(new DataGridHierarchicalColumn
+        {
+            Header = "Name",
+            Binding = new Avalonia.Data.Binding("Item.Name")
+        });
+
+        var window = new Window
+        {
+            Width = 420,
+            Height = 240,
+            Content = grid
+        };
+
+        window.SetThemeStyles(DataGridTheme.SimpleV2);
+        window.Show();
+        PumpLayout(grid);
+
+        var presenter = GetRowsPresenter(grid);
+        presenter.Offset = new Vector(0, 600);
+
+        var pendingBefore = grid.DisplayData.PendingVerticalScrollHeight;
+        Assert.True(pendingBefore > 0);
+        var firstSlotBefore = grid.DisplayData.FirstScrollingSlot;
+        var removedCount = root.Children[0].Children.Count;
+        var maxExpectedDelta = grid.RowHeight * (removedCount + 1);
+
+        model.Collapse(expandedChild!);
+
+        var pendingAfter = grid.DisplayData.PendingVerticalScrollHeight;
+        Assert.True(Math.Abs(pendingAfter) <= maxExpectedDelta);
+        Assert.True(grid.DisplayData.FirstScrollingSlot > firstSlotBefore);
+
+        window.Close();
+    }
+
+    [AvaloniaFact]
     public void Collapsing_Root_Rebuilds_DisplayData_Range()
     {
         var root = CreateTree("Root", childCount: 160, grandchildCount: 3);
