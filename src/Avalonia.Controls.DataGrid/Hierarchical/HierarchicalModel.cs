@@ -507,6 +507,11 @@ namespace Avalonia.Controls.DataGridHierarchical
         private readonly HashSet<HierarchicalNode> _expandedStateUpdates = new();
         private readonly HashSet<HierarchicalNode> _nodeExpandedUpdates = new();
         private readonly Dictionary<HierarchicalNode, NodeLoadState> _loadStates = new();
+        // Cached lookups for flattened items to avoid repeated linear scans.
+        private int _flattenedLookupVersion = -1;
+        private Dictionary<object, int>? _flattenedReferenceIndexLookup;
+        private Dictionary<object, int>? _flattenedEqualityIndexLookup;
+        private Dictionary<HierarchicalNode, int>? _flattenedNodeIndexLookup;
         private int _virtualizationGuardDepth;
         private IEnumerable? _rootItems;
         private bool _isVirtualRoot;
@@ -515,6 +520,7 @@ namespace Avalonia.Controls.DataGridHierarchical
         {
             Options = options ?? new HierarchicalOptions();
             _flattened = new ObservableRangeCollection<HierarchicalNode>();
+            _flattened.CollectionChanged += OnFlattenedCollectionChanged;
             _flattenedObservableView = new ReadOnlyObservableCollection<HierarchicalNode>(_flattened);
             _flattenedView = new ReadOnlyListWrapper<HierarchicalNode>(_flattened);
             _propertyPathCache = new Dictionary<(Type, string), Func<object, object?>>();
@@ -972,8 +978,21 @@ namespace Avalonia.Controls.DataGridHierarchical
                 return -1;
             }
 
-            var node = FindNode(item);
-            return node != null ? IndexOf(node) : -1;
+            EnsureFlattenedLookup();
+
+            if (_flattenedReferenceIndexLookup != null &&
+                _flattenedReferenceIndexLookup.TryGetValue(item, out var index))
+            {
+                return index;
+            }
+
+            if (_flattenedEqualityIndexLookup != null &&
+                _flattenedEqualityIndexLookup.TryGetValue(item, out index))
+            {
+                return index;
+            }
+
+            return -1;
         }
 
         public void Expand(HierarchicalNode node)
@@ -1275,22 +1294,76 @@ namespace Avalonia.Controls.DataGridHierarchical
                 throw new ArgumentNullException(nameof(item));
             }
 
-            HierarchicalNode? fallback = null;
+            EnsureFlattenedLookup();
+
+            if (_flattenedReferenceIndexLookup != null &&
+                _flattenedReferenceIndexLookup.TryGetValue(item, out var index))
+            {
+                return _flattened[index];
+            }
+
+            if (_flattenedEqualityIndexLookup != null &&
+                _flattenedEqualityIndexLookup.TryGetValue(item, out index))
+            {
+                return _flattened[index];
+            }
+
+            return null;
+        }
+
+        private void EnsureFlattenedLookup()
+        {
+            if (_flattenedLookupVersion == FlattenedVersion &&
+                _flattenedReferenceIndexLookup != null &&
+                _flattenedEqualityIndexLookup != null &&
+                _flattenedNodeIndexLookup != null)
+            {
+                return;
+            }
+
+            var referenceLookup = new Dictionary<object, int>(ReferenceEqualityComparer.Instance);
+            var equalityLookup = new Dictionary<object, int>();
+            var nodeLookup = new Dictionary<HierarchicalNode, int>();
+
             for (int i = 0; i < _flattened.Count; i++)
             {
                 var node = _flattened[i];
-                if (ReferenceEquals(node.Item, item))
+                nodeLookup[node] = i;
+
+                var item = node.Item;
+                if (item == null)
                 {
-                    return node;
+                    continue;
                 }
 
-                if (fallback == null && Equals(node.Item, item))
+                if (!referenceLookup.ContainsKey(item))
                 {
-                    fallback = node;
+                    referenceLookup[item] = i;
+                }
+
+                if (!equalityLookup.ContainsKey(item))
+                {
+                    equalityLookup[item] = i;
                 }
             }
 
-            return fallback;
+            _flattenedReferenceIndexLookup = referenceLookup;
+            _flattenedEqualityIndexLookup = equalityLookup;
+            _flattenedNodeIndexLookup = nodeLookup;
+            _flattenedLookupVersion = FlattenedVersion;
+        }
+
+        private void OnFlattenedCollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
+        {
+            InvalidateFlattenedLookup();
+        }
+
+        private void InvalidateFlattenedLookup()
+        {
+            _flattenedLookupVersion = -1;
+            _flattenedReferenceIndexLookup = null;
+            _flattenedEqualityIndexLookup = null;
+            _flattenedNodeIndexLookup = null;
         }
 
         private bool TryResolveNodeFromItem(object? item, bool expandAncestors, out HierarchicalNode? node)
@@ -1520,7 +1593,7 @@ namespace Avalonia.Controls.DataGridHierarchical
 
             if (target.IsExpanded)
             {
-                var parentIndex = _flattened.IndexOf(target);
+                var parentIndex = GetFlattenedIndex(target);
                 if (parentIndex >= 0)
                 {
                     var removed = RemoveVisibleDescendants(target, parentIndex, detachDescendants: false);
@@ -1623,6 +1696,7 @@ namespace Avalonia.Controls.DataGridHierarchical
             IReadOnlyList<FlattenedChange> changes,
             IReadOnlyDictionary<int, int>? indexMapOverride = null)
         {
+            InvalidateFlattenedLookup();
             var version = ++FlattenedVersion;
             FlattenedChanged?.Invoke(this, new FlattenedChangedEventArgs(changes, version, _flattened.Count, indexMapOverride));
         }
@@ -1872,7 +1946,19 @@ namespace Avalonia.Controls.DataGridHierarchical
 
         private int GetFlattenedIndex(HierarchicalNode node)
         {
-            return IsVirtualRootNode(node) ? -1 : _flattened.IndexOf(node);
+            if (IsVirtualRootNode(node))
+            {
+                return -1;
+            }
+
+            EnsureFlattenedLookup();
+            if (_flattenedNodeIndexLookup != null &&
+                _flattenedNodeIndexLookup.TryGetValue(node, out var index))
+            {
+                return index;
+            }
+
+            return -1;
         }
 
         private int GetVisibleDescendantCount(HierarchicalNode node, int parentIndex)
@@ -2107,7 +2193,7 @@ namespace Avalonia.Controls.DataGridHierarchical
             {
                 if (!isVirtualRootParent)
                 {
-                    parentIndex = _flattened.IndexOf(parent);
+                    parentIndex = GetFlattenedIndex(parent);
                 }
 
                 canUpdateFlattened = parentIndex >= 0 || isVirtualRootParent;
@@ -2197,7 +2283,7 @@ namespace Avalonia.Controls.DataGridHierarchical
             {
                 if (!isVirtualRootParent)
                 {
-                    parentIndex = _flattened.IndexOf(parent);
+                    parentIndex = GetFlattenedIndex(parent);
                 }
 
                 canUpdateFlattened = parentIndex >= 0 || isVirtualRootParent;
@@ -2271,7 +2357,7 @@ namespace Avalonia.Controls.DataGridHierarchical
             {
                 if (!isVirtualRootParent)
                 {
-                    parentIndex = _flattened.IndexOf(parent);
+                    parentIndex = GetFlattenedIndex(parent);
                 }
 
                 canUpdateFlattened = parentIndex >= 0 || isVirtualRootParent;
@@ -2400,7 +2486,7 @@ namespace Avalonia.Controls.DataGridHierarchical
             {
                 if (!isVirtualRootParent)
                 {
-                    parentIndex = _flattened.IndexOf(parent);
+                    parentIndex = GetFlattenedIndex(parent);
                 }
 
                 expandedAndVisible = parentIndex >= 0 || isVirtualRootParent;
