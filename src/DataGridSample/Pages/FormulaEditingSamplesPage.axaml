@@ -51,7 +51,7 @@
                    TextWrapping="Wrap" />
       </StackPanel>
 
-      <DataGrid Name="IncrementalGrid"
+      <DataGrid x:Name="IncrementalGrid"
                 ItemsSource="{Binding RecalcItems}"
                 ColumnDefinitionsSource="{Binding RecalcColumns}"
                 AutoGenerateColumns="False"
