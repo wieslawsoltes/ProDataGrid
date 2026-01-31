@@ -737,8 +737,7 @@ internal
             {
                 // If Enter was used by a TextBox, we shouldn't handle the key
                 var focusManager = FocusManager.GetFocusManager(this);
-                Debug.Assert(focusManager != null);
-                if (focusManager!.GetFocusedElement() is TextBox focusedTextBox
+                if (focusManager?.GetFocusedElement() is TextBox focusedTextBox
                     && focusedTextBox.AcceptsReturn)
                 {
                     return false;
