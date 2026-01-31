@@ -4,6 +4,7 @@
         <File Path="Directory.Build.props" />
         <File Path="Directory.Packages.props" />
         <File Path="global.json" />
+        <File Path="NuGet.config" />
     </Folder>
     <Folder Name="/docs/">
         <File Path="licence.md" />
