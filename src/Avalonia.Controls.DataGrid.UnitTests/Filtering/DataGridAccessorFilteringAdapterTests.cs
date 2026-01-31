@@ -3,13 +3,14 @@ using System.Linq;
 using Avalonia.Collections;
 using Avalonia.Controls;
 using Avalonia.Controls.DataGridFiltering;
+using Avalonia.Headless.XUnit;
 using Xunit;
 
 namespace Avalonia.Controls.DataGridTests.Filtering;
 
 public class DataGridAccessorFilteringAdapterTests
 {
-    [Fact]
+    [AvaloniaFact]
     public void AccessorAdapter_Uses_ValueAccessor()
     {
         var items = new[]
@@ -35,7 +36,7 @@ public class DataGridAccessorFilteringAdapterTests
         Assert.Equal(new[] { 2 }, scores);
     }
 
-    [Fact]
+    [AvaloniaFact]
     public void AccessorAdapter_Uses_FilterValueAccessor()
     {
         var items = new[]
@@ -61,7 +62,7 @@ public class DataGridAccessorFilteringAdapterTests
         Assert.Equal(new[] { 2 }, scores);
     }
 
-    [Fact]
+    [AvaloniaFact]
     public void AccessorAdapter_Reuses_Predicate_For_Equivalent_Descriptors()
     {
         var items = new[]
@@ -96,7 +97,7 @@ public class DataGridAccessorFilteringAdapterTests
         Assert.Same(first, second);
     }
 
-    [Fact]
+    [AvaloniaFact]
     public void AccessorAdapter_Skips_PropertyPath_When_No_Accessor()
     {
         var items = new[]
@@ -122,7 +123,7 @@ public class DataGridAccessorFilteringAdapterTests
         Assert.Equal(new[] { 1, 2 }, scores);
     }
 
-    [Fact]
+    [AvaloniaFact]
     public void AccessorAdapter_Throws_When_Missing_Accessor_And_Option_Set()
     {
         var items = new[]
@@ -147,7 +148,7 @@ public class DataGridAccessorFilteringAdapterTests
                 value: 2)));
     }
 
-    [Fact]
+    [AvaloniaFact]
     public void AccessorAdapter_Raises_Diagnostics_When_Missing_Accessor()
     {
         var items = new[]
@@ -176,7 +177,7 @@ public class DataGridAccessorFilteringAdapterTests
         Assert.Same(column, captured.Column);
     }
 
-    [Fact]
+    [AvaloniaFact]
     public void AccessorAdapter_Uses_FilterAccessor_When_Available()
     {
         var items = new[]
