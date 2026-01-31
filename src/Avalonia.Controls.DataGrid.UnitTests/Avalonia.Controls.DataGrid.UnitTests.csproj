@@ -39,6 +39,7 @@
     <PackageReference Include="Avalonia.Headless.XUnit" />
     <PackageReference Include="Avalonia.Themes.Fluent" />
     <PackageReference Include="Avalonia.Themes.Simple" />
+    <PackageReference Include="SkiaSharp.NativeAssets.Linux" />
     <PackageReference Include="coverlet.collector">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
