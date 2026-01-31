@@ -12,6 +12,7 @@ using Avalonia.Controls;
 using Avalonia.Controls.Templates;
 using Avalonia.Data;
 using Avalonia.Headless.XUnit;
+using Avalonia.Layout;
 using Avalonia.Styling;
 using Avalonia.Threading;
 using Avalonia.VisualTree;
@@ -714,6 +715,213 @@ public class DataGridSummaryBehaviorTests
         cell.Value = 1.2m;
 
         Assert.Equal("1,20", cell.DisplayText);
+    }
+
+    [AvaloniaFact]
+    public void SummaryCell_Defaults_To_Grid_Alignment_When_Column_Not_Set()
+    {
+        var items = new ObservableCollection<SummaryItem>
+        {
+            new() { Value = 1 }
+        };
+
+        var column = new DataGridTextColumn
+        {
+            Header = "Value",
+            Binding = new Binding(nameof(SummaryItem.Value))
+        };
+
+        var (window, grid, _) = CreateSummaryGrid(items, column);
+        grid.SummaryCellHorizontalContentAlignment = HorizontalAlignment.Right;
+
+        try
+        {
+            var cell = grid.TotalSummaryRow.Cells[0];
+            Assert.Equal(HorizontalAlignment.Right, cell.HorizontalContentAlignment);
+        }
+        finally
+        {
+            window.Close();
+        }
+    }
+
+    [AvaloniaFact]
+    public void SummaryCell_Uses_Column_Alignment_When_Set()
+    {
+        var items = new ObservableCollection<SummaryItem>
+        {
+            new() { Value = 1 }
+        };
+
+        var column = new DataGridTextColumn
+        {
+            Header = "Value",
+            Binding = new Binding(nameof(SummaryItem.Value)),
+            SummaryCellHorizontalContentAlignment = HorizontalAlignment.Center
+        };
+
+        var (window, grid, _) = CreateSummaryGrid(items, column);
+        grid.SummaryCellHorizontalContentAlignment = HorizontalAlignment.Right;
+
+        try
+        {
+            var cell = grid.TotalSummaryRow.Cells[0];
+            Assert.Equal(HorizontalAlignment.Center, cell.HorizontalContentAlignment);
+        }
+        finally
+        {
+            window.Close();
+        }
+    }
+
+    [AvaloniaFact]
+    public void SummaryCell_Updates_When_Grid_Alignment_Changes()
+    {
+        var items = new ObservableCollection<SummaryItem>
+        {
+            new() { Value = 1 }
+        };
+
+        var column = new DataGridTextColumn
+        {
+            Header = "Value",
+            Binding = new Binding(nameof(SummaryItem.Value))
+        };
+
+        var (window, grid, _) = CreateSummaryGrid(items, column);
+
+        try
+        {
+            grid.SummaryCellHorizontalContentAlignment = HorizontalAlignment.Left;
+            var cell = grid.TotalSummaryRow.Cells[0];
+            Assert.Equal(HorizontalAlignment.Left, cell.HorizontalContentAlignment);
+
+            grid.SummaryCellHorizontalContentAlignment = HorizontalAlignment.Right;
+            Assert.Equal(HorizontalAlignment.Right, cell.HorizontalContentAlignment);
+        }
+        finally
+        {
+            window.Close();
+        }
+    }
+
+    [AvaloniaFact]
+    public void SummaryCell_Updates_When_Column_Alignment_Changes()
+    {
+        var items = new ObservableCollection<SummaryItem>
+        {
+            new() { Value = 1 }
+        };
+
+        var column = new DataGridTextColumn
+        {
+            Header = "Value",
+            Binding = new Binding(nameof(SummaryItem.Value))
+        };
+
+        var (window, grid, _) = CreateSummaryGrid(items, column);
+
+        try
+        {
+            var cell = grid.TotalSummaryRow.Cells[0];
+
+            column.SummaryCellHorizontalContentAlignment = HorizontalAlignment.Center;
+            Assert.Equal(HorizontalAlignment.Center, cell.HorizontalContentAlignment);
+
+            column.SummaryCellHorizontalContentAlignment = HorizontalAlignment.Right;
+            Assert.Equal(HorizontalAlignment.Right, cell.HorizontalContentAlignment);
+        }
+        finally
+        {
+            window.Close();
+        }
+    }
+
+    [AvaloniaFact]
+    public void NumericColumn_SummaryAlignment_Defaults_To_Right()
+    {
+        var items = new ObservableCollection<SummaryItem>
+        {
+            new() { Value = 1 }
+        };
+
+        var column = new DataGridNumericColumn
+        {
+            Header = "Value",
+            Binding = new Binding(nameof(SummaryItem.Value))
+        };
+
+        var (window, grid, _) = CreateSummaryGrid(items, column);
+
+        try
+        {
+            var cell = grid.TotalSummaryRow.Cells[0];
+            Assert.Equal(HorizontalAlignment.Right, cell.HorizontalContentAlignment);
+        }
+        finally
+        {
+            window.Close();
+        }
+    }
+
+    [AvaloniaFact]
+    public void NumericColumn_SummaryAlignment_Respects_Grid_Override()
+    {
+        var items = new ObservableCollection<SummaryItem>
+        {
+            new() { Value = 1 }
+        };
+
+        var column = new DataGridNumericColumn
+        {
+            Header = "Value",
+            Binding = new Binding(nameof(SummaryItem.Value))
+        };
+
+        var (window, grid, _) = CreateSummaryGrid(items, column);
+        grid.SummaryCellHorizontalContentAlignment = HorizontalAlignment.Left;
+
+        try
+        {
+            var cell = grid.TotalSummaryRow.Cells[0];
+            Assert.Equal(HorizontalAlignment.Left, cell.HorizontalContentAlignment);
+        }
+        finally
+        {
+            window.Close();
+        }
+    }
+
+    private static (Window window, DataGrid grid, DataGridColumn column) CreateSummaryGrid(
+        ObservableCollection<SummaryItem> items,
+        DataGridColumn column)
+    {
+        var window = new Window
+        {
+            Width = 400,
+            Height = 300
+        };
+        window.SetThemeStyles();
+
+        var grid = new DataGrid
+        {
+            AutoGenerateColumns = false,
+            ItemsSource = items,
+            ShowTotalSummary = true
+        };
+
+        column.Summaries.Add(new DataGridAggregateSummaryDescription
+        {
+            Aggregate = DataGridAggregateType.Sum
+        });
+
+        grid.ColumnsInternal.Add(column);
+
+        window.Content = grid;
+        window.Show();
+        grid.UpdateLayout();
+
+        return (window, grid, column);
     }
 
     private static IDictionary GetSummaryCache(DataGrid grid)

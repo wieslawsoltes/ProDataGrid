@@ -64,32 +64,35 @@
                             Width="80"
                             x:DataType="viewModels:SampleOrder" />
         
-        <DataGridTextColumn Header="Quantity" 
-                            Binding="{Binding Quantity}" 
-                            Width="80"
-                            x:DataType="viewModels:SampleOrder">
-          <DataGridTextColumn.Summaries>
+        <DataGridNumericColumn Header="Quantity" 
+                               Binding="{Binding Quantity}" 
+                               Width="80"
+                               FormatString="N0"
+                               x:DataType="viewModels:SampleOrder">
+          <DataGridNumericColumn.Summaries>
             <DataGridAggregateSummaryDescription Aggregate="Sum" StringFormat="N0" Title="Sum: " />
-          </DataGridTextColumn.Summaries>
-        </DataGridTextColumn>
+          </DataGridNumericColumn.Summaries>
+        </DataGridNumericColumn>
         
-        <DataGridTextColumn Header="Unit Price" 
-                            Binding="{Binding UnitPrice, StringFormat={}{0:C2}}" 
-                            Width="100"
-                            x:DataType="viewModels:SampleOrder">
-          <DataGridTextColumn.Summaries>
+        <DataGridNumericColumn Header="Unit Price" 
+                               Binding="{Binding UnitPrice}" 
+                               Width="100"
+                               FormatString="C2"
+                               x:DataType="viewModels:SampleOrder">
+          <DataGridNumericColumn.Summaries>
             <DataGridAggregateSummaryDescription Aggregate="Average" StringFormat="C2" Title="Avg: " />
-          </DataGridTextColumn.Summaries>
-        </DataGridTextColumn>
+          </DataGridNumericColumn.Summaries>
+        </DataGridNumericColumn>
         
-        <DataGridTextColumn Header="Total" 
-                            Binding="{Binding Total, StringFormat={}{0:C2}}" 
-                            Width="120"
-                            x:DataType="viewModels:SampleOrder">
-          <DataGridTextColumn.Summaries>
+        <DataGridNumericColumn Header="Total" 
+                               Binding="{Binding Total}" 
+                               Width="120"
+                               FormatString="C2"
+                               x:DataType="viewModels:SampleOrder">
+          <DataGridNumericColumn.Summaries>
             <DataGridAggregateSummaryDescription Aggregate="Sum" StringFormat="C2" Title="Total: " />
-          </DataGridTextColumn.Summaries>
-        </DataGridTextColumn>
+          </DataGridNumericColumn.Summaries>
+        </DataGridNumericColumn>
       </DataGrid.Columns>
     </DataGrid>
   </Grid>

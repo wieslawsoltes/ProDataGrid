@@ -6,6 +6,7 @@
 using Avalonia;
 using Avalonia.Controls.Metadata;
 using Avalonia.Controls.Primitives;
+using Avalonia.Layout;
 using Avalonia.Utilities;
 using System.Globalization;
 using System.Linq;
@@ -24,6 +25,7 @@ internal
     class DataGridSummaryCell : ContentControl
     {
         private DataGridColumn _column;
+        private DataGrid _owningGrid;
         private DataGridSummaryRow _owningRow;
         private DataGridSummaryDescription _description;
 
@@ -88,7 +90,8 @@ internal
                         OnColumnPropertyChanged);
                 }
 
-                ApplyColumnTheme();
+                ApplySummaryCellTheme();
+                ApplySummaryCellAlignment();
             }
         }
 
@@ -98,7 +101,16 @@ internal
         internal DataGridSummaryRow OwningRow
         {
             get => _owningRow;
-            set => _owningRow = value;
+            set
+            {
+                if (ReferenceEquals(_owningRow, value))
+                {
+                    return;
+                }
+
+                _owningRow = value;
+                UpdateOwningGrid(_owningRow?.OwningGrid);
+            }
         }
 
         /// <summary>
@@ -169,7 +181,25 @@ internal
         {
             if (e.Property == DataGridColumn.SummaryCellThemeProperty)
             {
-                ApplyColumnTheme();
+                ApplySummaryCellTheme();
+            }
+            else if (e.Property == DataGridColumn.SummaryCellHorizontalContentAlignmentProperty
+                || e.Property == DataGridColumn.SummaryCellVerticalContentAlignmentProperty)
+            {
+                ApplySummaryCellAlignment();
+            }
+        }
+
+        private void OnGridPropertyChanged(object sender, AvaloniaPropertyChangedEventArgs e)
+        {
+            if (e.Property == DataGrid.SummaryCellThemeProperty)
+            {
+                ApplySummaryCellTheme();
+            }
+            else if (e.Property == DataGrid.SummaryCellHorizontalContentAlignmentProperty
+                || e.Property == DataGrid.SummaryCellVerticalContentAlignmentProperty)
+            {
+                ApplySummaryCellAlignment();
             }
         }
 
@@ -215,16 +245,101 @@ internal
             }
         }
 
-        private void ApplyColumnTheme()
+        private void ApplySummaryCellTheme()
         {
             if (Column?.SummaryCellTheme != null)
             {
                 Theme = Column.SummaryCellTheme;
             }
+            else if (_owningGrid?.SummaryCellTheme != null)
+            {
+                Theme = _owningGrid.SummaryCellTheme;
+            }
             else
             {
                 ClearValue(ThemeProperty);
             }
+        }
+
+        private void ApplySummaryCellAlignment()
+        {
+            var column = Column;
+            var columnHorizontal = column?.SummaryCellHorizontalContentAlignment;
+            var columnHorizontalIsSet = column?.IsSet(DataGridColumn.SummaryCellHorizontalContentAlignmentProperty) == true;
+            var gridHorizontal = _owningGrid?.SummaryCellHorizontalContentAlignment;
+
+            if (columnHorizontalIsSet && columnHorizontal.HasValue)
+            {
+                SetValue(HorizontalContentAlignmentProperty, columnHorizontal.Value);
+            }
+            else if (gridHorizontal.HasValue)
+            {
+                SetValue(HorizontalContentAlignmentProperty, gridHorizontal.Value);
+            }
+            else if (columnHorizontal.HasValue)
+            {
+                SetValue(HorizontalContentAlignmentProperty, columnHorizontal.Value);
+            }
+            else
+            {
+                ClearValue(HorizontalContentAlignmentProperty);
+            }
+
+            var columnVertical = column?.SummaryCellVerticalContentAlignment;
+            var columnVerticalIsSet = column?.IsSet(DataGridColumn.SummaryCellVerticalContentAlignmentProperty) == true;
+            var gridVertical = _owningGrid?.SummaryCellVerticalContentAlignment;
+
+            if (columnVerticalIsSet && columnVertical.HasValue)
+            {
+                SetValue(VerticalContentAlignmentProperty, columnVertical.Value);
+            }
+            else if (gridVertical.HasValue)
+            {
+                SetValue(VerticalContentAlignmentProperty, gridVertical.Value);
+            }
+            else if (columnVertical.HasValue)
+            {
+                SetValue(VerticalContentAlignmentProperty, columnVertical.Value);
+            }
+            else
+            {
+                ClearValue(VerticalContentAlignmentProperty);
+            }
+        }
+
+        internal void UpdateOwningGrid(DataGrid grid)
+        {
+            if (ReferenceEquals(_owningGrid, grid))
+            {
+                return;
+            }
+
+            if (_owningGrid != null)
+            {
+                WeakEventHandlerManager.Unsubscribe<AvaloniaPropertyChangedEventArgs, DataGridSummaryCell>(
+                    _owningGrid,
+                    nameof(AvaloniaObject.PropertyChanged),
+                    OnGridPropertyChanged);
+            }
+
+            _owningGrid = grid;
+
+            if (_owningGrid != null)
+            {
+                WeakEventHandlerManager.Subscribe<AvaloniaObject, AvaloniaPropertyChangedEventArgs, DataGridSummaryCell>(
+                    _owningGrid,
+                    nameof(AvaloniaObject.PropertyChanged),
+                    OnGridPropertyChanged);
+            }
+
+            ApplySummaryCellTheme();
+            ApplySummaryCellAlignment();
+        }
+
+        internal void UpdateAppearance()
+        {
+            ApplySummaryCellTheme();
+            ApplySummaryCellAlignment();
         }
 
         /// <summary>
@@ -248,6 +363,7 @@ internal
                     OnDescriptionPropertyChanged);
             }
 
+            UpdateOwningGrid(null);
             _owningRow = null;
         }
 

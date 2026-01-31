@@ -237,6 +237,7 @@ internal
         static DataGridNumericColumn()
         {
             HorizontalContentAlignmentProperty.OverrideDefaultValue<DataGridNumericColumn>(HorizontalAlignment.Right);
+            SummaryCellHorizontalContentAlignmentProperty.OverrideDefaultValue<DataGridNumericColumn>(HorizontalAlignment.Right);
             ShowButtonSpinnerProperty.OverrideDefaultValue<DataGridNumericColumn>(true);
             AllowSpinProperty.OverrideDefaultValue<DataGridNumericColumn>(true);
             ClipValueToMinMaxProperty.OverrideDefaultValue<DataGridNumericColumn>(true);

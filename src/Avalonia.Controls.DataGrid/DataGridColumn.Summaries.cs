@@ -3,6 +3,7 @@
 
 #nullable disable
 
+using Avalonia.Layout;
 using Avalonia.Styling;
 using Avalonia.Utilities;
 using System.Collections.Specialized;
@@ -27,6 +28,20 @@ internal
                 nameof(SummaryCellTheme),
                 o => o.SummaryCellTheme,
                 (o, v) => o.SummaryCellTheme = v);
+
+        /// <summary>
+        /// Identifies the <see cref="SummaryCellHorizontalContentAlignment"/> property.
+        /// </summary>
+        public static readonly StyledProperty<HorizontalAlignment?> SummaryCellHorizontalContentAlignmentProperty =
+            AvaloniaProperty.Register<DataGridColumn, HorizontalAlignment?>(
+                nameof(SummaryCellHorizontalContentAlignment));
+
+        /// <summary>
+        /// Identifies the <see cref="SummaryCellVerticalContentAlignment"/> property.
+        /// </summary>
+        public static readonly StyledProperty<VerticalAlignment?> SummaryCellVerticalContentAlignmentProperty =
+            AvaloniaProperty.Register<DataGridColumn, VerticalAlignment?>(
+                nameof(SummaryCellVerticalContentAlignment));
 
         /// <summary>
         /// Gets the collection of summary descriptions for this column.
@@ -54,6 +69,24 @@ internal
         {
             get => _summaryCellTheme;
             set => SetAndRaise(SummaryCellThemeProperty, ref _summaryCellTheme, value);
+        }
+
+        /// <summary>
+        /// Gets or sets the horizontal alignment for summary cell content in this column.
+        /// </summary>
+        public HorizontalAlignment? SummaryCellHorizontalContentAlignment
+        {
+            get => GetValue(SummaryCellHorizontalContentAlignmentProperty);
+            set => SetValue(SummaryCellHorizontalContentAlignmentProperty, value);
+        }
+
+        /// <summary>
+        /// Gets or sets the vertical alignment for summary cell content in this column.
+        /// </summary>
+        public VerticalAlignment? SummaryCellVerticalContentAlignment
+        {
+            get => GetValue(SummaryCellVerticalContentAlignmentProperty);
+            set => SetValue(SummaryCellVerticalContentAlignmentProperty, value);
         }
 
         /// <summary>

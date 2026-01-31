@@ -159,6 +159,11 @@ formattingModel.Apply(new[]
 
 Summary calculators use the column value accessor when available. If you define summaries on materialized columns, the accessor from the definition is used to avoid reflection.
 
+Column definitions can also configure summary cell appearance:
+
+- `SummaryCellThemeKey` sets a theme for summary cells created from the definition.
+- `SummaryCellHorizontalContentAlignment` / `SummaryCellVerticalContentAlignment` control summary content alignment.
+
 ## State persistence
 
 `DataGridState` uses the column definition as the default column key when available. If you need stable keys across sessions, set `DataGridStateOptions.ColumnKeySelector` and `ColumnKeyResolver` and return your own ids.

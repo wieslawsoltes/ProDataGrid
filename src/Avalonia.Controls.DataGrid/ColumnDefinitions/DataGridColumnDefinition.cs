@@ -13,6 +13,7 @@ using Avalonia.Utilities;
 using Avalonia.Controls.DataGridSearching;
 using Avalonia.Controls.DataGridSorting;
 using Avalonia.Controls.Templates;
+using Avalonia.Layout;
 using Avalonia.Styling;
 
 namespace Avalonia.Controls
@@ -63,11 +64,14 @@ namespace Avalonia.Controls
         private string _headerTemplateKey;
         private string _headerThemeKey;
         private string _cellThemeKey;
+        private string _summaryCellThemeKey;
         private string _filterThemeKey;
         private IList<string> _cellStyleClasses;
         private IList<string> _headerStyleClasses;
         private DataGridBindingDefinition _cellBackgroundBinding;
         private DataGridBindingDefinition _cellForegroundBinding;
+        private HorizontalAlignment? _summaryCellHorizontalContentAlignment;
+        private VerticalAlignment? _summaryCellVerticalContentAlignment;
         private bool? _canUserSort;
         private bool? _canUserHide;
         private bool? _canUserResize;
@@ -116,6 +120,12 @@ namespace Avalonia.Controls
             set => SetProperty(ref _cellThemeKey, value);
         }
 
+        public string SummaryCellThemeKey
+        {
+            get => _summaryCellThemeKey;
+            set => SetProperty(ref _summaryCellThemeKey, value);
+        }
+
         public string FilterThemeKey
         {
             get => _filterThemeKey;
@@ -144,6 +154,18 @@ namespace Avalonia.Controls
         {
             get => _cellForegroundBinding;
             set => SetProperty(ref _cellForegroundBinding, value);
+        }
+
+        public HorizontalAlignment? SummaryCellHorizontalContentAlignment
+        {
+            get => _summaryCellHorizontalContentAlignment;
+            set => SetProperty(ref _summaryCellHorizontalContentAlignment, value);
+        }
+
+        public VerticalAlignment? SummaryCellVerticalContentAlignment
+        {
+            get => _summaryCellVerticalContentAlignment;
+            set => SetProperty(ref _summaryCellVerticalContentAlignment, value);
         }
 
         public bool? CanUserSort
@@ -390,6 +412,15 @@ namespace Avalonia.Controls
                 column.CellTheme = null;
             }
 
+            if (SummaryCellThemeKey != null)
+            {
+                column.SummaryCellTheme = context?.ResolveResource<ControlTheme>(SummaryCellThemeKey);
+            }
+            else
+            {
+                column.SummaryCellTheme = null;
+            }
+
             if (FilterThemeKey != null)
             {
                 column.FilterTheme = context?.ResolveResource<ControlTheme>(FilterThemeKey);
@@ -419,6 +450,24 @@ namespace Avalonia.Controls
 
             column.CellBackgroundBinding = CellBackgroundBinding?.CreateBinding();
             column.CellForegroundBinding = CellForegroundBinding?.CreateBinding();
+
+            if (SummaryCellHorizontalContentAlignment.HasValue)
+            {
+                column.SummaryCellHorizontalContentAlignment = SummaryCellHorizontalContentAlignment.Value;
+            }
+            else
+            {
+                column.ClearValue(DataGridColumn.SummaryCellHorizontalContentAlignmentProperty);
+            }
+
+            if (SummaryCellVerticalContentAlignment.HasValue)
+            {
+                column.SummaryCellVerticalContentAlignment = SummaryCellVerticalContentAlignment.Value;
+            }
+            else
+            {
+                column.ClearValue(DataGridColumn.SummaryCellVerticalContentAlignmentProperty);
+            }
 
             if (CanUserSort.HasValue)
             {
@@ -560,6 +609,11 @@ namespace Avalonia.Controls
                         ? context?.ResolveResource<ControlTheme>(CellThemeKey)
                         : null;
                     return true;
+                case nameof(SummaryCellThemeKey):
+                    column.SummaryCellTheme = SummaryCellThemeKey != null
+                        ? context?.ResolveResource<ControlTheme>(SummaryCellThemeKey)
+                        : null;
+                    return true;
                 case nameof(FilterThemeKey):
                     column.FilterTheme = FilterThemeKey != null
                         ? context?.ResolveResource<ControlTheme>(FilterThemeKey)
@@ -590,6 +644,26 @@ namespace Avalonia.Controls
                     return true;
                 case nameof(CellForegroundBinding):
                     column.CellForegroundBinding = CellForegroundBinding?.CreateBinding();
+                    return true;
+                case nameof(SummaryCellHorizontalContentAlignment):
+                    if (SummaryCellHorizontalContentAlignment.HasValue)
+                    {
+                        column.SummaryCellHorizontalContentAlignment = SummaryCellHorizontalContentAlignment.Value;
+                    }
+                    else
+                    {
+                        column.ClearValue(DataGridColumn.SummaryCellHorizontalContentAlignmentProperty);
+                    }
+                    return true;
+                case nameof(SummaryCellVerticalContentAlignment):
+                    if (SummaryCellVerticalContentAlignment.HasValue)
+                    {
+                        column.SummaryCellVerticalContentAlignment = SummaryCellVerticalContentAlignment.Value;
+                    }
+                    else
+                    {
+                        column.ClearValue(DataGridColumn.SummaryCellVerticalContentAlignmentProperty);
+                    }
                     return true;
                 case nameof(CanUserSort):
                     if (CanUserSort.HasValue)

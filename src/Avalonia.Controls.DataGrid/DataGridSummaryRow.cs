@@ -70,11 +70,21 @@ internal
             get => _owningGrid;
             internal set
             {
+                if (ReferenceEquals(_owningGrid, value))
+                {
+                    return;
+                }
+
                 _owningGrid = value;
                 if (_cellsPresenter != null)
                 {
                     _cellsPresenter.OwningGrid = value;
                     _cellsPresenter.OwnerRow = value == null ? null : this;
+                }
+
+                foreach (var cell in _cells)
+                {
+                    cell.UpdateOwningGrid(value);
                 }
             }
         }
@@ -220,6 +230,14 @@ internal
         {
             _cellsPresenter?.InvalidateMeasure();
             _cellsPresenter?.InvalidateArrange();
+        }
+
+        internal void UpdateCellAppearance()
+        {
+            foreach (var cell in _cells)
+            {
+                cell.UpdateAppearance();
+            }
         }
 
         /// <summary>

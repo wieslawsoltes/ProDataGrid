@@ -4,6 +4,7 @@
 #nullable disable
 
 using Avalonia.Collections;
+using Avalonia.Layout;
 using Avalonia.Styling;
 using System;
 using System.Collections.Specialized;
@@ -25,6 +26,9 @@ internal
         private DataGridSummaryRowPosition _totalSummaryPosition = DataGridSummaryRowPosition.Bottom;
         private DataGridGroupSummaryPosition _groupSummaryPosition = DataGridGroupSummaryPosition.Footer;
         private ControlTheme _summaryRowTheme;
+        private ControlTheme _summaryCellTheme;
+        private HorizontalAlignment? _summaryCellHorizontalContentAlignment;
+        private VerticalAlignment? _summaryCellVerticalContentAlignment;
         private int _summaryRecalculationDelayMs = 100;
 
         /// <summary>
@@ -81,6 +85,33 @@ internal
                 nameof(SummaryRowTheme),
                 o => o.SummaryRowTheme,
                 (o, v) => o.SummaryRowTheme = v);
+
+        /// <summary>
+        /// Identifies the <see cref="SummaryCellTheme"/> property.
+        /// </summary>
+        public static readonly DirectProperty<DataGrid, ControlTheme> SummaryCellThemeProperty =
+            AvaloniaProperty.RegisterDirect<DataGrid, ControlTheme>(
+                nameof(SummaryCellTheme),
+                o => o.SummaryCellTheme,
+                (o, v) => o.SummaryCellTheme = v);
+
+        /// <summary>
+        /// Identifies the <see cref="SummaryCellHorizontalContentAlignment"/> property.
+        /// </summary>
+        public static readonly DirectProperty<DataGrid, HorizontalAlignment?> SummaryCellHorizontalContentAlignmentProperty =
+            AvaloniaProperty.RegisterDirect<DataGrid, HorizontalAlignment?>(
+                nameof(SummaryCellHorizontalContentAlignment),
+                o => o.SummaryCellHorizontalContentAlignment,
+                (o, v) => o.SummaryCellHorizontalContentAlignment = v);
+
+        /// <summary>
+        /// Identifies the <see cref="SummaryCellVerticalContentAlignment"/> property.
+        /// </summary>
+        public static readonly DirectProperty<DataGrid, VerticalAlignment?> SummaryCellVerticalContentAlignmentProperty =
+            AvaloniaProperty.RegisterDirect<DataGrid, VerticalAlignment?>(
+                nameof(SummaryCellVerticalContentAlignment),
+                o => o.SummaryCellVerticalContentAlignment,
+                (o, v) => o.SummaryCellVerticalContentAlignment = v);
 
         /// <summary>
         /// Identifies the <see cref="SummaryRecalculationDelayMs"/> property.
@@ -172,6 +203,51 @@ internal
                 if (SetAndRaise(SummaryRowThemeProperty, ref _summaryRowTheme, value))
                 {
                     OnSummaryRowThemeChanged();
+                }
+            }
+        }
+
+        /// <summary>
+        /// Gets or sets the theme for summary cells.
+        /// </summary>
+        public ControlTheme SummaryCellTheme
+        {
+            get => _summaryCellTheme;
+            set
+            {
+                if (SetAndRaise(SummaryCellThemeProperty, ref _summaryCellTheme, value))
+                {
+                    OnSummaryCellThemeChanged();
+                }
+            }
+        }
+
+        /// <summary>
+        /// Gets or sets the default horizontal alignment for summary cell content.
+        /// </summary>
+        public HorizontalAlignment? SummaryCellHorizontalContentAlignment
+        {
+            get => _summaryCellHorizontalContentAlignment;
+            set
+            {
+                if (SetAndRaise(SummaryCellHorizontalContentAlignmentProperty, ref _summaryCellHorizontalContentAlignment, value))
+                {
+                    OnSummaryCellAlignmentChanged();
+                }
+            }
+        }
+
+        /// <summary>
+        /// Gets or sets the default vertical alignment for summary cell content.
+        /// </summary>
+        public VerticalAlignment? SummaryCellVerticalContentAlignment
+        {
+            get => _summaryCellVerticalContentAlignment;
+            set
+            {
+                if (SetAndRaise(SummaryCellVerticalContentAlignmentProperty, ref _summaryCellVerticalContentAlignment, value))
+                {
+                    OnSummaryCellAlignmentChanged();
                 }
             }
         }
@@ -377,6 +453,16 @@ internal
             UpdateGroupSummaryRowTheme();
         }
 
+        private void OnSummaryCellThemeChanged()
+        {
+            UpdateSummaryCellAppearance();
+        }
+
+        private void OnSummaryCellAlignmentChanged()
+        {
+            UpdateSummaryCellAppearance();
+        }
+
         private void RefreshGroupSummarySlots()
         {
             if (DataConnection?.CollectionView?.IsGrouping != true)
@@ -443,6 +529,32 @@ internal
                 else if (element is DataGridRowGroupFooter groupFooter)
                 {
                     groupFooter.ApplySummaryRowTheme();
+                }
+            }
+        }
+
+        private void UpdateSummaryCellAppearance()
+        {
+            _totalSummaryRow?.UpdateCellAppearance();
+            UpdateGroupSummaryCellAppearance();
+        }
+
+        private void UpdateGroupSummaryCellAppearance()
+        {
+            if (DisplayData == null)
+            {
+                return;
+            }
+
+            foreach (var element in DisplayData.GetScrollingElements())
+            {
+                if (element is DataGridRowGroupHeader groupHeader)
+                {
+                    groupHeader.SummaryRow?.UpdateCellAppearance();
+                }
+                else if (element is DataGridRowGroupFooter groupFooter)
+                {
+                    groupFooter.SummaryRow?.UpdateCellAppearance();
                 }
             }
         }
