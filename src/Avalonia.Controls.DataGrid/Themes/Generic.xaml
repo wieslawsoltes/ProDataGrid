@@ -105,6 +105,14 @@
         </StackPanel>
       </DataTemplate>
 
+      <!-- Column chooser item template -->
+      <DataTemplate x:Key="DataGridColumnChooserItemTemplate"
+                    x:DataType="controls:DataGridColumnChooserItem">
+        <CheckBox Content="{Binding Header}"
+                  IsChecked="{Binding IsVisible, Mode=TwoWay}"
+                  IsEnabled="{Binding CanUserHide}" />
+      </DataTemplate>
+
       <!-- Pivot table templates -->
       <pivoting:PivotIndentToThicknessConverter x:Key="PivotIndentToThicknessConverter" />
       <pivoting:PivotRowTypeToFontWeightConverter x:Key="PivotRowTypeToFontWeightConverter" />
@@ -1242,6 +1250,38 @@
                                 HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
                                 VerticalAlignment="{TemplateBinding VerticalContentAlignment}" />
             </Border>
+          </ControlTemplate>
+        </Setter>
+      </ControlTheme>
+
+      <!-- DataGridColumnChooser -->
+      <ControlTheme x:Key="{x:Type controls:DataGridColumnChooser}" TargetType="controls:DataGridColumnChooser">
+        <Setter Property="Header" Value="Columns" />
+        <Setter Property="ItemTemplate" Value="{StaticResource DataGridColumnChooserItemTemplate}" />
+        <Setter Property="ItemsPanel">
+          <ItemsPanelTemplate>
+            <StackPanel Spacing="6" />
+          </ItemsPanelTemplate>
+        </Setter>
+        <Setter Property="Template">
+          <ControlTemplate>
+            <DropDownButton Content="{TemplateBinding Header}"
+                            ContentTemplate="{TemplateBinding HeaderTemplate}"
+                            HorizontalContentAlignment="Left"
+                            VerticalContentAlignment="Center">
+              <DropDownButton.Flyout>
+                <Flyout ShowMode="Transient"
+                        Placement="BottomEdgeAlignedLeft">
+                  <Border Padding="8"
+                          MaxWidth="260"
+                          MaxHeight="320">
+                    <ScrollViewer VerticalScrollBarVisibility="Auto">
+                      <ItemsPresenter />
+                    </ScrollViewer>
+                  </Border>
+                </Flyout>
+              </DropDownButton.Flyout>
+            </DropDownButton>
           </ControlTemplate>
         </Setter>
       </ControlTheme>
