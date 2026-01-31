@@ -604,14 +604,15 @@ Class DataGridBindingDefinition  <a class="header-action link-secondary" title="
 
   <h3 id="Avalonia_Controls_DataGridBindingDefinition_Create__2_System_Linq_Expressions_Expression_System_Func___0___1___System_Action___0___1__" data-uid="Avalonia.Controls.DataGridBindingDefinition.Create``2(System.Linq.Expressions.Expression{System.Func{``0,``1}},System.Action{``0,``1})">
   Create&lt;TItem, TValue&gt;(Expression&lt;Func&lt;TItem, TValue&gt;&gt;, Action&lt;TItem, TValue&gt;)
-  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/ColumnDefinitions/DataGridBindingDefinition.cs/#L76"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/ColumnDefinitions/DataGridBindingDefinition.cs/#L72"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"></div>
   <div class="markdown level1 conceptual"></div>
 
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public static DataGridBindingDefinition Create&lt;TItem, TValue&gt;(Expression&lt;Func&lt;TItem, TValue&gt;&gt; expression, Action&lt;TItem, TValue&gt; setter = null)</code></pre>
+    <pre><code class="lang-csharp hljs">[RequiresDynamicCode(&quot;Expression-based column bindings require dynamic code generation. Use DataGridBindingDefinition.Create with a prebuilt CompiledBindingPath or property info for AOT.&quot;)]
+public static DataGridBindingDefinition Create&lt;TItem, TValue&gt;(Expression&lt;Func&lt;TItem, TValue&gt;&gt; expression, Action&lt;TItem, TValue&gt; setter = null)</code></pre>
   </div>
 
   <h4 class="section">Parameters</h4>
