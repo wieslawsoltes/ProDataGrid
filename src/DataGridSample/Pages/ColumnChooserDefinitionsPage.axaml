@@ -1,0 +1,65 @@
+<!--
+  Copyright (c) Wiesław Šoltés. All rights reserved.
+  Licensed under the MIT license. See LICENSE file in the project root for details.
+-->
+<UserControl
+    x:Class="DataGridSample.Pages.ColumnChooserDefinitionsPage"
+    xmlns="https://github.com/avaloniaui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:dg="clr-namespace:Avalonia.Controls;assembly=Avalonia.Controls.DataGrid"
+    xmlns:viewModels="clr-namespace:DataGridSample.ViewModels"
+    x:DataType="viewModels:ColumnChooserSampleViewModel"
+    d:DesignHeight="720"
+    d:DesignWidth="1100"
+    mc:Ignorable="d">
+
+  <UserControl.DataContext>
+    <viewModels:ColumnChooserSampleViewModel />
+  </UserControl.DataContext>
+
+  <Grid Margin="12"
+        RowDefinitions="Auto,*"
+        RowSpacing="8">
+    <StackPanel Spacing="4">
+      <TextBlock Classes="h2" Text="Column Chooser (Definitions)" />
+      <TextBlock TextWrapping="Wrap"
+                 Text="Column definitions create the grid columns, and the chooser updates the definitions so visibility persists when definitions refresh." />
+    </StackPanel>
+
+    <Grid Grid.Row="1"
+          ColumnDefinitions="2*,*"
+          ColumnSpacing="12">
+      <DataGrid x:Name="DefinitionsGrid"
+                ItemsSource="{Binding Items}"
+                ColumnDefinitionsSource="{Binding ColumnDefinitions}"
+                AutoGenerateColumns="False"
+                CanUserResizeColumns="True"
+                CanUserReorderColumns="True"
+                HeadersVisibility="All"
+                GridLinesVisibility="Horizontal"
+                Height="460" />
+
+      <StackPanel Grid.Column="1"
+                  Spacing="8">
+        <TextBlock Classes="h3" Text="Column chooser" />
+        <dg:DataGridColumnChooser Width="220"
+                                  HorizontalAlignment="Left"
+                                  DataGrid="{Binding ElementName=DefinitionsGrid}">
+          <dg:DataGridColumnChooser.Header>
+            <StackPanel Spacing="2">
+              <TextBlock Text="Columns"
+                         FontWeight="SemiBold" />
+              <TextBlock Text="Show or hide fields"
+                         FontSize="12"
+                         Foreground="{DynamicResource SystemControlForegroundBaseMediumHighBrush}" />
+            </StackPanel>
+          </dg:DataGridColumnChooser.Header>
+        </dg:DataGridColumnChooser>
+        <TextBlock TextWrapping="Wrap"
+                   Text="The Optional Status column starts hidden, and First Name is locked via CanUserHide=false in the definition." />
+      </StackPanel>
+    </Grid>
+  </Grid>
+</UserControl>

@@ -371,6 +371,12 @@
     <TabItem Header="Bindable Columns">
       <pages:BindableColumnsPage />
     </TabItem>
+    <TabItem Header="Column Chooser (XAML)">
+      <pages:ColumnChooserXamlPage />
+    </TabItem>
+    <TabItem Header="Column Chooser (Definitions)">
+      <pages:ColumnChooserDefinitionsPage />
+    </TabItem>
     <TabItem Header="Column Definitions">
       <pages:ColumnDefinitionsPage />
     </TabItem>
