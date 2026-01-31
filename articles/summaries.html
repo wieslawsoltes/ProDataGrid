@@ -127,6 +127,69 @@
 <li><code>SummaryRecalculationDelayMs</code> throttles recalculation during rapid updates.</li>
 <li><code>SummaryRecalculated</code> fires after recalculation completes.</li>
 </ul>
+<h2 id="summary-cell-alignment-and-themes">Summary Cell Alignment and Themes</h2>
+<p>Summary cells use <code>DataGridSummaryCell</code> and are left-aligned by default. Numeric columns now align summary values to the right by default to match numeric cell content.</p>
+<ul>
+<li><code>DataGrid.SummaryCellTheme</code> provides a grid-wide default theme for summary cells.</li>
+<li><code>DataGridColumn.SummaryCellTheme</code> overrides the grid theme for a specific column.</li>
+<li><code>DataGrid.SummaryCellHorizontalContentAlignment</code> / <code>DataGrid.SummaryCellVerticalContentAlignment</code> set grid-wide defaults.</li>
+<li><code>DataGridColumn.SummaryCellHorizontalContentAlignment</code> / <code>DataGridColumn.SummaryCellVerticalContentAlignment</code> override per column.</li>
+</ul>
+<h3 id="alignment-precedence">Alignment precedence</h3>
+<ol>
+<li>Column alignment (when explicitly set on the column).</li>
+<li>Grid alignment.</li>
+<li>Column default (e.g., numeric columns default to right alignment).</li>
+<li>Control theme default (left alignment in the default theme).</li>
+</ol>
+<pre><code class="lang-xml">&lt;DataGrid ShowTotalSummary=&quot;True&quot;
+          SummaryCellHorizontalContentAlignment=&quot;Right&quot;&gt;
+  &lt;DataGrid.Columns&gt;
+    &lt;DataGridTextColumn Header=&quot;Name&quot;
+                        Binding=&quot;{Binding Name}&quot;
+                        SummaryCellHorizontalContentAlignment=&quot;Left&quot; /&gt;
+    &lt;DataGridNumericColumn Header=&quot;Amount&quot;
+                           Binding=&quot;{Binding Amount}&quot;
+                           FormatString=&quot;C2&quot; /&gt;
+  &lt;/DataGrid.Columns&gt;
+&lt;/DataGrid&gt;
+</code></pre>
+<h3 id="customize-summary-cells-via-styles">Customize summary cells via styles</h3>
+<p><code>DataGridSummaryCell</code> exposes pseudo-classes for common aggregates, so you can style cells by summary type:</p>
+<ul>
+<li><code>:sum</code>, <code>:average</code>, <code>:count</code>, <code>:min</code>, <code>:max</code>, <code>:custom</code>, <code>:none</code></li>
+</ul>
+<pre><code class="lang-xml">&lt;Style Selector=&quot;DataGridSummaryCell:sum&quot;&gt;
+  &lt;Setter Property=&quot;Foreground&quot; Value=&quot;#D97706&quot; /&gt;
+&lt;/Style&gt;
+&lt;Style Selector=&quot;DataGridSummaryCell:average&quot;&gt;
+  &lt;Setter Property=&quot;Foreground&quot; Value=&quot;#2563EB&quot; /&gt;
+&lt;/Style&gt;
+</code></pre>
+<p>If you want a different layout or templating, set a theme on the grid or column:</p>
+<pre><code class="lang-xml">&lt;DataGrid SummaryCellTheme=&quot;{StaticResource CompactSummaryCellTheme}&quot; /&gt;
+</code></pre>
+<h3 id="customize-summary-cells-with-column-definitions">Customize summary cells with column definitions</h3>
+<p>When you use <code>ColumnDefinitionsSource</code>, you can configure summary cell appearance on the definitions:</p>
+<pre><code class="lang-xml">&lt;DataGrid ColumnDefinitionsSource=&quot;{Binding ColumnDefinitions}&quot;
+          ShowTotalSummary=&quot;True&quot;
+          SummaryCellHorizontalContentAlignment=&quot;Right&quot; /&gt;
+</code></pre>
+<pre><code class="lang-csharp">ColumnDefinitions = new ObservableCollection&lt;DataGridColumnDefinition&gt;
+{
+    new DataGridNumericColumnDefinition
+    {
+        Header = &quot;Amount&quot;,
+        Binding = ColumnDefinitionBindingFactory.CreateBinding&lt;Order, decimal&gt;(
+            nameof(Order.Amount),
+            o =&gt; o.Amount,
+            (o, v) =&gt; o.Amount = v),
+        SummaryCellHorizontalContentAlignment = HorizontalAlignment.Right,
+        SummaryCellThemeKey = &quot;AmountSummaryCellTheme&quot;
+    }
+};
+</code></pre>
+<p>You can also set summary alignment per column definition without touching the grid defaults.</p>
 <h2 id="notes">Notes</h2>
 <ul>
 <li>Summary values update as the view filters or expands hierarchical nodes.</li>

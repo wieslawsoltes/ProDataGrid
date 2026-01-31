@@ -199,6 +199,11 @@ formattingModel.Apply(new[]
 </code></pre>
 <h2 id="summaries">Summaries</h2>
 <p>Summary calculators use the column value accessor when available. If you define summaries on materialized columns, the accessor from the definition is used to avoid reflection.</p>
+<p>Column definitions can also configure summary cell appearance:</p>
+<ul>
+<li><code>SummaryCellThemeKey</code> sets a theme for summary cells created from the definition.</li>
+<li><code>SummaryCellHorizontalContentAlignment</code> / <code>SummaryCellVerticalContentAlignment</code> control summary content alignment.</li>
+</ul>
 <h2 id="state-persistence">State persistence</h2>
 <p><code>DataGridState</code> uses the column definition as the default column key when available. If you need stable keys across sessions, set <code>DataGridStateOptions.ColumnKeySelector</code> and <code>ColumnKeyResolver</code> and return your own ids.</p>
 <h2 id="clipboard-and-export">Clipboard and export</h2>

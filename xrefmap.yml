@@ -6433,6 +6433,63 @@ references:
   commentId: F:Avalonia.Controls.DataGrid.SortingModelProperty
   fullName: Avalonia.Controls.DataGrid.SortingModelProperty
   nameWithType: DataGrid.SortingModelProperty
+- uid: Avalonia.Controls.DataGrid.SummaryCellHorizontalContentAlignment
+  name: SummaryCellHorizontalContentAlignment
+  href: api/Avalonia.Controls.DataGrid.html#Avalonia_Controls_DataGrid_SummaryCellHorizontalContentAlignment
+  commentId: P:Avalonia.Controls.DataGrid.SummaryCellHorizontalContentAlignment
+  fullName: Avalonia.Controls.DataGrid.SummaryCellHorizontalContentAlignment
+  nameWithType: DataGrid.SummaryCellHorizontalContentAlignment
+- uid: Avalonia.Controls.DataGrid.SummaryCellHorizontalContentAlignment*
+  name: SummaryCellHorizontalContentAlignment
+  href: api/Avalonia.Controls.DataGrid.html#Avalonia_Controls_DataGrid_SummaryCellHorizontalContentAlignment_
+  commentId: Overload:Avalonia.Controls.DataGrid.SummaryCellHorizontalContentAlignment
+  isSpec: "True"
+  fullName: Avalonia.Controls.DataGrid.SummaryCellHorizontalContentAlignment
+  nameWithType: DataGrid.SummaryCellHorizontalContentAlignment
+- uid: Avalonia.Controls.DataGrid.SummaryCellHorizontalContentAlignmentProperty
+  name: SummaryCellHorizontalContentAlignmentProperty
+  href: api/Avalonia.Controls.DataGrid.html#Avalonia_Controls_DataGrid_SummaryCellHorizontalContentAlignmentProperty
+  commentId: F:Avalonia.Controls.DataGrid.SummaryCellHorizontalContentAlignmentProperty
+  fullName: Avalonia.Controls.DataGrid.SummaryCellHorizontalContentAlignmentProperty
+  nameWithType: DataGrid.SummaryCellHorizontalContentAlignmentProperty
+- uid: Avalonia.Controls.DataGrid.SummaryCellTheme
+  name: SummaryCellTheme
+  href: api/Avalonia.Controls.DataGrid.html#Avalonia_Controls_DataGrid_SummaryCellTheme
+  commentId: P:Avalonia.Controls.DataGrid.SummaryCellTheme
+  fullName: Avalonia.Controls.DataGrid.SummaryCellTheme
+  nameWithType: DataGrid.SummaryCellTheme
+- uid: Avalonia.Controls.DataGrid.SummaryCellTheme*
+  name: SummaryCellTheme
+  href: api/Avalonia.Controls.DataGrid.html#Avalonia_Controls_DataGrid_SummaryCellTheme_
+  commentId: Overload:Avalonia.Controls.DataGrid.SummaryCellTheme
+  isSpec: "True"
+  fullName: Avalonia.Controls.DataGrid.SummaryCellTheme
+  nameWithType: DataGrid.SummaryCellTheme
+- uid: Avalonia.Controls.DataGrid.SummaryCellThemeProperty
+  name: SummaryCellThemeProperty
+  href: api/Avalonia.Controls.DataGrid.html#Avalonia_Controls_DataGrid_SummaryCellThemeProperty
+  commentId: F:Avalonia.Controls.DataGrid.SummaryCellThemeProperty
+  fullName: Avalonia.Controls.DataGrid.SummaryCellThemeProperty
+  nameWithType: DataGrid.SummaryCellThemeProperty
+- uid: Avalonia.Controls.DataGrid.SummaryCellVerticalContentAlignment
+  name: SummaryCellVerticalContentAlignment
+  href: api/Avalonia.Controls.DataGrid.html#Avalonia_Controls_DataGrid_SummaryCellVerticalContentAlignment
+  commentId: P:Avalonia.Controls.DataGrid.SummaryCellVerticalContentAlignment
+  fullName: Avalonia.Controls.DataGrid.SummaryCellVerticalContentAlignment
+  nameWithType: DataGrid.SummaryCellVerticalContentAlignment
+- uid: Avalonia.Controls.DataGrid.SummaryCellVerticalContentAlignment*
+  name: SummaryCellVerticalContentAlignment
+  href: api/Avalonia.Controls.DataGrid.html#Avalonia_Controls_DataGrid_SummaryCellVerticalContentAlignment_
+  commentId: Overload:Avalonia.Controls.DataGrid.SummaryCellVerticalContentAlignment
+  isSpec: "True"
+  fullName: Avalonia.Controls.DataGrid.SummaryCellVerticalContentAlignment
+  nameWithType: DataGrid.SummaryCellVerticalContentAlignment
+- uid: Avalonia.Controls.DataGrid.SummaryCellVerticalContentAlignmentProperty
+  name: SummaryCellVerticalContentAlignmentProperty
+  href: api/Avalonia.Controls.DataGrid.html#Avalonia_Controls_DataGrid_SummaryCellVerticalContentAlignmentProperty
+  commentId: F:Avalonia.Controls.DataGrid.SummaryCellVerticalContentAlignmentProperty
+  fullName: Avalonia.Controls.DataGrid.SummaryCellVerticalContentAlignmentProperty
+  nameWithType: DataGrid.SummaryCellVerticalContentAlignmentProperty
 - uid: Avalonia.Controls.DataGrid.SummaryRecalculated
   name: SummaryRecalculated
   href: api/Avalonia.Controls.DataGrid.html#Avalonia_Controls_DataGrid_SummaryRecalculated
@@ -10729,6 +10786,25 @@ references:
   isSpec: "True"
   fullName: Avalonia.Controls.DataGridColumn.Summaries
   nameWithType: DataGridColumn.Summaries
+- uid: Avalonia.Controls.DataGridColumn.SummaryCellHorizontalContentAlignment
+  name: SummaryCellHorizontalContentAlignment
+  href: api/Avalonia.Controls.DataGridColumn.html#Avalonia_Controls_DataGridColumn_SummaryCellHorizontalContentAlignment
+  commentId: P:Avalonia.Controls.DataGridColumn.SummaryCellHorizontalContentAlignment
+  fullName: Avalonia.Controls.DataGridColumn.SummaryCellHorizontalContentAlignment
+  nameWithType: DataGridColumn.SummaryCellHorizontalContentAlignment
+- uid: Avalonia.Controls.DataGridColumn.SummaryCellHorizontalContentAlignment*
+  name: SummaryCellHorizontalContentAlignment
+  href: api/Avalonia.Controls.DataGridColumn.html#Avalonia_Controls_DataGridColumn_SummaryCellHorizontalContentAlignment_
+  commentId: Overload:Avalonia.Controls.DataGridColumn.SummaryCellHorizontalContentAlignment
+  isSpec: "True"
+  fullName: Avalonia.Controls.DataGridColumn.SummaryCellHorizontalContentAlignment
+  nameWithType: DataGridColumn.SummaryCellHorizontalContentAlignment
+- uid: Avalonia.Controls.DataGridColumn.SummaryCellHorizontalContentAlignmentProperty
+  name: SummaryCellHorizontalContentAlignmentProperty
+  href: api/Avalonia.Controls.DataGridColumn.html#Avalonia_Controls_DataGridColumn_SummaryCellHorizontalContentAlignmentProperty
+  commentId: F:Avalonia.Controls.DataGridColumn.SummaryCellHorizontalContentAlignmentProperty
+  fullName: Avalonia.Controls.DataGridColumn.SummaryCellHorizontalContentAlignmentProperty
+  nameWithType: DataGridColumn.SummaryCellHorizontalContentAlignmentProperty
 - uid: Avalonia.Controls.DataGridColumn.SummaryCellTheme
   name: SummaryCellTheme
   href: api/Avalonia.Controls.DataGridColumn.html#Avalonia_Controls_DataGridColumn_SummaryCellTheme
@@ -10748,6 +10824,25 @@ references:
   commentId: F:Avalonia.Controls.DataGridColumn.SummaryCellThemeProperty
   fullName: Avalonia.Controls.DataGridColumn.SummaryCellThemeProperty
   nameWithType: DataGridColumn.SummaryCellThemeProperty
+- uid: Avalonia.Controls.DataGridColumn.SummaryCellVerticalContentAlignment
+  name: SummaryCellVerticalContentAlignment
+  href: api/Avalonia.Controls.DataGridColumn.html#Avalonia_Controls_DataGridColumn_SummaryCellVerticalContentAlignment
+  commentId: P:Avalonia.Controls.DataGridColumn.SummaryCellVerticalContentAlignment
+  fullName: Avalonia.Controls.DataGridColumn.SummaryCellVerticalContentAlignment
+  nameWithType: DataGridColumn.SummaryCellVerticalContentAlignment
+- uid: Avalonia.Controls.DataGridColumn.SummaryCellVerticalContentAlignment*
+  name: SummaryCellVerticalContentAlignment
+  href: api/Avalonia.Controls.DataGridColumn.html#Avalonia_Controls_DataGridColumn_SummaryCellVerticalContentAlignment_
+  commentId: Overload:Avalonia.Controls.DataGridColumn.SummaryCellVerticalContentAlignment
+  isSpec: "True"
+  fullName: Avalonia.Controls.DataGridColumn.SummaryCellVerticalContentAlignment
+  nameWithType: DataGridColumn.SummaryCellVerticalContentAlignment
+- uid: Avalonia.Controls.DataGridColumn.SummaryCellVerticalContentAlignmentProperty
+  name: SummaryCellVerticalContentAlignmentProperty
+  href: api/Avalonia.Controls.DataGridColumn.html#Avalonia_Controls_DataGridColumn_SummaryCellVerticalContentAlignmentProperty
+  commentId: F:Avalonia.Controls.DataGridColumn.SummaryCellVerticalContentAlignmentProperty
+  fullName: Avalonia.Controls.DataGridColumn.SummaryCellVerticalContentAlignmentProperty
+  nameWithType: DataGridColumn.SummaryCellVerticalContentAlignmentProperty
 - uid: Avalonia.Controls.DataGridColumn.Tag
   name: Tag
   href: api/Avalonia.Controls.DataGridColumn.html#Avalonia_Controls_DataGridColumn_Tag
@@ -11473,6 +11568,45 @@ references:
   isSpec: "True"
   fullName: Avalonia.Controls.DataGridColumnDefinition.SortMemberPath
   nameWithType: DataGridColumnDefinition.SortMemberPath
+- uid: Avalonia.Controls.DataGridColumnDefinition.SummaryCellHorizontalContentAlignment
+  name: SummaryCellHorizontalContentAlignment
+  href: api/Avalonia.Controls.DataGridColumnDefinition.html#Avalonia_Controls_DataGridColumnDefinition_SummaryCellHorizontalContentAlignment
+  commentId: P:Avalonia.Controls.DataGridColumnDefinition.SummaryCellHorizontalContentAlignment
+  fullName: Avalonia.Controls.DataGridColumnDefinition.SummaryCellHorizontalContentAlignment
+  nameWithType: DataGridColumnDefinition.SummaryCellHorizontalContentAlignment
+- uid: Avalonia.Controls.DataGridColumnDefinition.SummaryCellHorizontalContentAlignment*
+  name: SummaryCellHorizontalContentAlignment
+  href: api/Avalonia.Controls.DataGridColumnDefinition.html#Avalonia_Controls_DataGridColumnDefinition_SummaryCellHorizontalContentAlignment_
+  commentId: Overload:Avalonia.Controls.DataGridColumnDefinition.SummaryCellHorizontalContentAlignment
+  isSpec: "True"
+  fullName: Avalonia.Controls.DataGridColumnDefinition.SummaryCellHorizontalContentAlignment
+  nameWithType: DataGridColumnDefinition.SummaryCellHorizontalContentAlignment
+- uid: Avalonia.Controls.DataGridColumnDefinition.SummaryCellThemeKey
+  name: SummaryCellThemeKey
+  href: api/Avalonia.Controls.DataGridColumnDefinition.html#Avalonia_Controls_DataGridColumnDefinition_SummaryCellThemeKey
+  commentId: P:Avalonia.Controls.DataGridColumnDefinition.SummaryCellThemeKey
+  fullName: Avalonia.Controls.DataGridColumnDefinition.SummaryCellThemeKey
+  nameWithType: DataGridColumnDefinition.SummaryCellThemeKey
+- uid: Avalonia.Controls.DataGridColumnDefinition.SummaryCellThemeKey*
+  name: SummaryCellThemeKey
+  href: api/Avalonia.Controls.DataGridColumnDefinition.html#Avalonia_Controls_DataGridColumnDefinition_SummaryCellThemeKey_
+  commentId: Overload:Avalonia.Controls.DataGridColumnDefinition.SummaryCellThemeKey
+  isSpec: "True"
+  fullName: Avalonia.Controls.DataGridColumnDefinition.SummaryCellThemeKey
+  nameWithType: DataGridColumnDefinition.SummaryCellThemeKey
+- uid: Avalonia.Controls.DataGridColumnDefinition.SummaryCellVerticalContentAlignment
+  name: SummaryCellVerticalContentAlignment
+  href: api/Avalonia.Controls.DataGridColumnDefinition.html#Avalonia_Controls_DataGridColumnDefinition_SummaryCellVerticalContentAlignment
+  commentId: P:Avalonia.Controls.DataGridColumnDefinition.SummaryCellVerticalContentAlignment
+  fullName: Avalonia.Controls.DataGridColumnDefinition.SummaryCellVerticalContentAlignment
+  nameWithType: DataGridColumnDefinition.SummaryCellVerticalContentAlignment
+- uid: Avalonia.Controls.DataGridColumnDefinition.SummaryCellVerticalContentAlignment*
+  name: SummaryCellVerticalContentAlignment
+  href: api/Avalonia.Controls.DataGridColumnDefinition.html#Avalonia_Controls_DataGridColumnDefinition_SummaryCellVerticalContentAlignment_
+  commentId: Overload:Avalonia.Controls.DataGridColumnDefinition.SummaryCellVerticalContentAlignment
+  isSpec: "True"
+  fullName: Avalonia.Controls.DataGridColumnDefinition.SummaryCellVerticalContentAlignment
+  nameWithType: DataGridColumnDefinition.SummaryCellVerticalContentAlignment
 - uid: Avalonia.Controls.DataGridColumnDefinition.Tag
   name: Tag
   href: api/Avalonia.Controls.DataGridColumnDefinition.html#Avalonia_Controls_DataGridColumnDefinition_Tag
