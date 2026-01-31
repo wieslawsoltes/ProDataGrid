@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+      <title>Column Chooser | ProDataGrid for Avalonia </title>
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <meta name="title" content="Column Chooser | ProDataGrid for Avalonia ">
+      
+      
+      <link rel="icon" href="../favicon.ico">
+      <link rel="stylesheet" href="../public/docfx.min.css">
+      <link rel="stylesheet" href="../public/main.css">
+      <meta name="docfx:navrel" content="../toc.html">
+      <meta name="docfx:tocrel" content="toc.html">
+      
+      
+      
+      
+      <meta name="docfx:docurl" content="https://github.com/wieslawsoltes/ProDataGrid/blob/master/docfx/articles/column-chooser.md/#L1">
+      <meta name="loc:inThisArticle" content="In this article">
+      <meta name="loc:searchResultsCount" content="{count} results for &quot;{query}&quot;">
+      <meta name="loc:searchNoResults" content="No results for &quot;{query}&quot;">
+      <meta name="loc:tocFilter" content="Filter by title">
+      <meta name="loc:nextArticle" content="Next">
+      <meta name="loc:prevArticle" content="Previous">
+      <meta name="loc:themeLight" content="Light">
+      <meta name="loc:themeDark" content="Dark">
+      <meta name="loc:themeAuto" content="Auto">
+      <meta name="loc:changeTheme" content="Change theme">
+      <meta name="loc:copy" content="Copy">
+      <meta name="loc:downloadPdf" content="Download PDF">
+
+      <script type="module" src="./../public/docfx.min.js"></script>
+
+      <script>
+        const theme = localStorage.getItem('theme') || 'auto'
+        document.documentElement.setAttribute('data-bs-theme', theme === 'auto' ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light') : theme)
+      </script>
+
+  </head>
+
+  <body class="tex2jax_ignore" data-layout="" data-yaml-mime="">
+    <header class="bg-body border-bottom">
+      <nav id="autocollapse" class="navbar navbar-expand-md" role="navigation">
+        <div class="container-xxl flex-nowrap">
+          <a class="navbar-brand" href="../index.html">
+            <img id="logo" class="svg" src="../images/logo.svg" alt="">
+            
+          </a>
+          <button class="btn btn-lg d-md-none border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navpanel" aria-controls="navpanel" aria-expanded="false" aria-label="Toggle navigation">
+            <i class="bi bi-three-dots"></i>
+          </button>
+          <div class="collapse navbar-collapse" id="navpanel">
+            <div id="navbar">
+            </div>
+          </div>
+        </div>
+      </nav>
+    </header>
+
+    <main class="container-xxl">
+      <div class="toc-offcanvas">
+        <div class="offcanvas-md offcanvas-start" tabindex="-1" id="tocOffcanvas" aria-labelledby="tocOffcanvasLabel">
+          <div class="offcanvas-header">
+            <h5 class="offcanvas-title" id="tocOffcanvasLabel">Table of Contents</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="offcanvas" data-bs-target="#tocOffcanvas" aria-label="Close"></button>
+          </div>
+          <div class="offcanvas-body">
+            <nav class="toc" id="toc"></nav>
+          </div>
+        </div>
+      </div>
+
+      <div class="content">
+        <div class="actionbar">
+          <button class="btn btn-lg border-0 d-md-none" type="button" data-bs-toggle="offcanvas" data-bs-target="#tocOffcanvas" aria-controls="tocOffcanvas" aria-expanded="false" aria-label="Show table of contents">
+            <i class="bi bi-list"></i>
+          </button>
+
+          <nav id="breadcrumb"></nav>
+        </div>
+
+        <article data-uid="">
+<h1 id="column-chooser">Column Chooser</h1>
+
+<p>The column chooser provides a simple UI for end users to show or hide columns at runtime. It surfaces the DataGrid column collection in a checklist and keeps the grid in sync, including columns generated from column definitions.</p>
+<h2 id="quick-start-xaml-columns">Quick start (XAML columns)</h2>
+<p>Use <code>DataGridColumnChooser</code> and bind it to the grid. The default control theme renders a <code>DropDownButton</code> and hosts the checklist in a flyout. Customize the button content via <code>Header</code>/<code>HeaderTemplate</code>.</p>
+<pre><code class="lang-xml">&lt;UserControl xmlns=&quot;https://github.com/avaloniaui&quot;
+             xmlns:x=&quot;http://schemas.microsoft.com/winfx/2006/xaml&quot;
+             xmlns:dg=&quot;clr-namespace:Avalonia.Controls;assembly=Avalonia.Controls.DataGrid&quot;&gt;
+  &lt;Grid RowDefinitions=&quot;Auto,*&quot; RowSpacing=&quot;8&quot;&gt;
+    &lt;dg:DataGridColumnChooser Width=&quot;220&quot;
+                              DataGrid=&quot;{Binding ElementName=MyGrid}&quot;&gt;
+      &lt;dg:DataGridColumnChooser.Header&gt;
+        &lt;TextBlock Text=&quot;Columns&quot; /&gt;
+      &lt;/dg:DataGridColumnChooser.Header&gt;
+    &lt;/dg:DataGridColumnChooser&gt;
+
+    &lt;DataGrid x:Name=&quot;MyGrid&quot;
+              Grid.Row=&quot;1&quot;
+              AutoGenerateColumns=&quot;False&quot;&gt;
+      &lt;DataGrid.Columns&gt;
+        &lt;DataGridTextColumn Header=&quot;First Name&quot; Binding=&quot;{Binding FirstName}&quot; CanUserHide=&quot;False&quot; /&gt;
+        &lt;DataGridTextColumn Header=&quot;Last Name&quot; Binding=&quot;{Binding LastName}&quot; /&gt;
+        &lt;DataGridTextColumn Header=&quot;Status&quot; Binding=&quot;{Binding Status}&quot; /&gt;
+        &lt;DataGridTextColumn Header=&quot;Optional Status&quot; Binding=&quot;{Binding OptionalStatus}&quot; IsVisible=&quot;False&quot; /&gt;
+      &lt;/DataGrid.Columns&gt;
+    &lt;/DataGrid&gt;
+  &lt;/Grid&gt;
+&lt;/UserControl&gt;
+</code></pre>
+<ul>
+<li><code>CanUserHide</code> locks a column in the chooser.</li>
+<li><code>IsVisible</code> can be used to start a column hidden.</li>
+<li><code>DataGrid.CanUserHideColumns</code> is the grid-wide default for columns that do not specify <code>CanUserHide</code>.</li>
+<li>Retemplate <code>DataGridColumnChooser</code> (via <code>ControlTheme</code>) if you prefer an inline list instead of the default drop-down.</li>
+</ul>
+<h2 id="column-definitions">Column definitions</h2>
+<p>The chooser also works with <code>ColumnDefinitionsSource</code>. When a column is backed by a <code>DataGridColumnDefinition</code>, the chooser updates the definition so visibility persists across definition refreshes.</p>
+<pre><code class="lang-xml">&lt;UserControl xmlns=&quot;https://github.com/avaloniaui&quot;
+             xmlns:x=&quot;http://schemas.microsoft.com/winfx/2006/xaml&quot;
+             xmlns:dg=&quot;clr-namespace:Avalonia.Controls;assembly=Avalonia.Controls.DataGrid&quot;&gt;
+  &lt;DataGrid x:Name=&quot;DefinitionGrid&quot;
+            ItemsSource=&quot;{Binding Items}&quot;
+            ColumnDefinitionsSource=&quot;{Binding ColumnDefinitions}&quot;
+            AutoGenerateColumns=&quot;False&quot; /&gt;
+
+  &lt;dg:DataGridColumnChooser DataGrid=&quot;{Binding ElementName=DefinitionGrid}&quot; /&gt;
+&lt;/UserControl&gt;
+</code></pre>
+<pre><code class="lang-csharp">public ObservableCollection&lt;DataGridColumnDefinition&gt; ColumnDefinitions { get; } = new()
+{
+    new DataGridTextColumnDefinition
+    {
+        Header = &quot;First Name&quot;,
+        Binding = ColumnDefinitionBindingFactory.CreateBinding&lt;Person, string&gt;(
+            nameof(Person.FirstName),
+            p =&gt; p.FirstName,
+            (p, v) =&gt; p.FirstName = v),
+        CanUserHide = false
+    },
+    new DataGridTextColumnDefinition
+    {
+        Header = &quot;Optional Status&quot;,
+        Binding = ColumnDefinitionBindingFactory.CreateBinding&lt;Person, PersonStatus?&gt;(
+            nameof(Person.OptionalStatus),
+            p =&gt; p.OptionalStatus,
+            (p, v) =&gt; p.OptionalStatus = v),
+        IsVisible = false
+    }
+};
+</code></pre>
+<h2 id="customize-the-item-template">Customize the item template</h2>
+<p>The chooser uses the <code>DataGridColumnChooserItemTemplate</code> resource by default. Override it in your scope to change the checklist look. The item data context is <code>DataGridColumnChooserItem</code> and exposes <code>Header</code>, <code>IsVisible</code>, <code>CanUserHide</code>, and <code>Column</code>.</p>
+<pre><code class="lang-xml">&lt;DataTemplate x:Key=&quot;DataGridColumnChooserItemTemplate&quot;
+              x:DataType=&quot;dg:DataGridColumnChooserItem&quot;&gt;
+  &lt;CheckBox IsChecked=&quot;{Binding IsVisible, Mode=TwoWay}&quot;
+            IsEnabled=&quot;{Binding CanUserHide}&quot;&gt;
+    &lt;StackPanel Orientation=&quot;Horizontal&quot; Spacing=&quot;6&quot;&gt;
+      &lt;TextBlock Text=&quot;{Binding Header}&quot; /&gt;
+      &lt;TextBlock Text=&quot;(hideable)&quot;
+                 Foreground=&quot;{DynamicResource SystemControlForegroundBaseMediumBrush}&quot;
+                 IsVisible=&quot;{Binding CanUserHide}&quot; /&gt;
+    &lt;/StackPanel&gt;
+  &lt;/CheckBox&gt;
+&lt;/DataTemplate&gt;
+</code></pre>
+<h2 id="inline-chooser-template">Inline chooser template</h2>
+<p>If you want to host the list directly (for example, inside your own flyout or a side panel), apply a custom <code>ControlTheme</code> that replaces the drop-down template with an <code>ItemsPresenter</code>.</p>
+<pre><code class="lang-xml">&lt;ControlTheme x:Key=&quot;InlineColumnChooserTheme&quot;
+              TargetType=&quot;dg:DataGridColumnChooser&quot;
+              BasedOn=&quot;{StaticResource {x:Type dg:DataGridColumnChooser}}&quot;&gt;
+  &lt;Setter Property=&quot;Template&quot;&gt;
+    &lt;ControlTemplate&gt;
+      &lt;Border Padding=&quot;8&quot;&gt;
+        &lt;ItemsPresenter /&gt;
+      &lt;/Border&gt;
+    &lt;/ControlTemplate&gt;
+  &lt;/Setter&gt;
+&lt;/ControlTheme&gt;
+</code></pre>
+<pre><code class="lang-xml">&lt;dg:DataGridColumnChooser Theme=&quot;{StaticResource InlineColumnChooserTheme}&quot;
+                          DataGrid=&quot;{Binding ElementName=MyGrid}&quot; /&gt;
+</code></pre>
+<h2 id="show-or-hide-all-columns">Show or hide all columns</h2>
+<p><code>DataGridColumnChooser</code> exposes <code>ShowAll()</code> and <code>HideAll()</code> helpers so you can wire quick actions to buttons or commands.</p>
+<pre><code class="lang-csharp">ColumnChooser.ShowAll();
+ColumnChooser.HideAll();
+</code></pre>
+<h2 id="notes">Notes</h2>
+<ul>
+<li>The chooser orders columns by <code>DisplayIndex</code> so it tracks user reordering.</li>
+<li>Hidden columns stay listed so users can bring them back.</li>
+</ul>
+
+</article>
+
+        <div class="contribution d-print-none">
+          <a href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/docfx/articles/column-chooser.md/#L1" class="edit-link">Edit this page</a>
+        </div>
+
+        <div class="next-article d-print-none border-top" id="nextArticle"></div>
+
+      </div>
+
+      <div class="affix">
+        <nav id="affix"></nav>
+      </div>
+    </main>
+
+
+    <footer class="border-top text-secondary">
+      <div class="container-xxl">
+        <div class="flex-fill">
+          <span>Made with <a href="https://dotnet.github.io/docfx">docfx</a></span>
+        </div>
+      </div>
+    </footer>
+  </body>
+</html>
