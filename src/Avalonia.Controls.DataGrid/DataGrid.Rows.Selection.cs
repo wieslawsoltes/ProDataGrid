@@ -25,7 +25,7 @@ namespace Avalonia.Controls
             {
                 row.ApplyState(isSelectedOverride);
                 row.ApplyCellsState();
-                EnsureRowDetailsVisibility(row, raiseNotification: true, animate: true);
+                EnsureRowDetailsVisibility(row, raiseNotification: true, animate: true, isSelectedOverride: isSelectedOverride);
             }
             else
             {

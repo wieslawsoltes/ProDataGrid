@@ -61,10 +61,13 @@ namespace Avalonia.Controls
 
 
 
-        private void EnsureRowDetailsVisibility(DataGridRow row, bool raiseNotification, bool animate)
+        private void EnsureRowDetailsVisibility(DataGridRow row, bool raiseNotification, bool animate, bool? isSelectedOverride = null)
         {
             // Show or hide RowDetails based on DataGrid settings
-            row.SetDetailsVisibilityInternal(GetRowDetailsVisibility(row.Index), raiseNotification, animate);
+            row.SetDetailsVisibilityInternal(
+                GetRowDetailsVisibility(row.Index, RowDetailsVisibilityMode, isSelectedOverride),
+                raiseNotification,
+                animate);
         }
 
 
@@ -120,6 +123,11 @@ namespace Avalonia.Controls
 
         internal bool GetRowDetailsVisibility(int rowIndex, DataGridRowDetailsVisibilityMode gridLevelRowDetailsVisibility)
         {
+            return GetRowDetailsVisibility(rowIndex, gridLevelRowDetailsVisibility, isSelectedOverride: null);
+        }
+
+        private bool GetRowDetailsVisibility(int rowIndex, DataGridRowDetailsVisibilityMode gridLevelRowDetailsVisibility, bool? isSelectedOverride)
+        {
             Debug.Assert(rowIndex != -1);
             if (_showDetailsTable.Contains(rowIndex))
             {
@@ -131,7 +139,7 @@ namespace Avalonia.Controls
                 return
                 gridLevelRowDetailsVisibility == DataGridRowDetailsVisibilityMode.Visible ||
                 (gridLevelRowDetailsVisibility == DataGridRowDetailsVisibilityMode.VisibleWhenSelected &&
-                GetRowSelectionFromRowIndex(rowIndex));
+                (isSelectedOverride ?? GetRowSelectionFromRowIndex(rowIndex)));
             }
         }
 
