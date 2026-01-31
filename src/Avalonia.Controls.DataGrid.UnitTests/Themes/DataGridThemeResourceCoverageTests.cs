@@ -398,6 +398,7 @@ public class DataGridThemeResourceCoverageTests
         new(typeof(DataGridRowGroupHeader), typeof(DataGridRowGroupHeader)),
         new(typeof(DataGridSummaryRow), typeof(DataGridSummaryRow)),
         new(typeof(DataGridSummaryCell), typeof(DataGridSummaryCell)),
+        new(typeof(DataGridColumnChooser), typeof(DataGridColumnChooser)),
         new(typeof(DataGridRowGroupFooter), typeof(DataGridRowGroupFooter)),
         new(typeof(DataGrid), typeof(DataGrid))
     };
@@ -408,6 +409,7 @@ public class DataGridThemeResourceCoverageTests
         new("DataGridFilterNumberEditorTemplate", typeof(IDataTemplate)),
         new("DataGridFilterDateEditorTemplate", typeof(IDataTemplate)),
         new("DataGridFilterEnumEditorTemplate", typeof(IDataTemplate)),
+        new("DataGridColumnChooserItemTemplate", typeof(IDataTemplate)),
         new("DataGridHierarchicalCellTemplate", typeof(IDataTemplate))
     };
 
