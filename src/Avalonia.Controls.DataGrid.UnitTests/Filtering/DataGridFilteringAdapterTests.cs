@@ -152,7 +152,7 @@ public class DataGridFilteringAdapterTests
         Assert.Equal(new[] { "Beta" }, names);
     }
 
-    [Fact]
+    [AvaloniaFact]
     public void Column_PredicateFactory_Takes_Precedence()
     {
         var items = new[]
@@ -181,7 +181,7 @@ public class DataGridFilteringAdapterTests
         Assert.Equal(new[] { "alpha" }, names);
     }
 
-    [Fact]
+    [AvaloniaFact]
     public void Column_ValueAccessor_Is_Used_When_Filtering()
     {
         var items = new[]
@@ -209,7 +209,7 @@ public class DataGridFilteringAdapterTests
         Assert.Equal(new[] { 2 }, scores);
     }
 
-    [Fact]
+    [AvaloniaFact]
     public void Column_FilterValueAccessor_Is_Used_When_Filtering()
     {
         var items = new[]
@@ -237,7 +237,7 @@ public class DataGridFilteringAdapterTests
         Assert.Equal(new[] { 2 }, scores);
     }
 
-    [Fact]
+    [AvaloniaFact]
     public void Custom_Predicate_Is_Used_When_ValueAccessor_Is_Available()
     {
         var items = new[]
