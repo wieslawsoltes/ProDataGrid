@@ -8,6 +8,7 @@ using Avalonia.Controls.Templates;
 using Avalonia.Data;
 using Avalonia.Data.Core;
 using Avalonia.Headless.XUnit;
+using Avalonia.Layout;
 using Avalonia.Markup.Xaml.MarkupExtensions;
 using Avalonia.Markup.Xaml.MarkupExtensions.CompiledBindings;
 using Avalonia.Threading;
@@ -82,6 +83,28 @@ public class DataGridColumnDefinitionsTests
         Assert.Equal("Active", checkBoxColumn.Header);
         var checkBinding = Assert.IsType<CompiledBindingExtension>(checkBoxColumn.Binding);
         Assert.Equal(nameof(Person.IsActive), checkBinding.Path?.ToString());
+    }
+
+    [AvaloniaFact]
+    public void ColumnDefinition_Applies_SummaryCell_Alignment()
+    {
+        var definitions = new ObservableCollection<DataGridColumnDefinition>
+        {
+            new DataGridTextColumnDefinition
+            {
+                Header = "Value",
+                Binding = DataGridBindingDefinition.Create<Person, int>(p => p.Age),
+                SummaryCellHorizontalContentAlignment = HorizontalAlignment.Right
+            }
+        };
+
+        var grid = new DataGrid
+        {
+            ColumnDefinitionsSource = definitions
+        };
+
+        var column = Assert.IsType<DataGridTextColumn>(GetNonFillerColumns(grid).Single());
+        Assert.Equal(HorizontalAlignment.Right, column.SummaryCellHorizontalContentAlignment);
     }
 
     [AvaloniaFact]
