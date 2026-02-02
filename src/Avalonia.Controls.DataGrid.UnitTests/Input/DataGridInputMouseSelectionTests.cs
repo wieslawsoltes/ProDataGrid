@@ -3,13 +3,17 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using Avalonia;
+using Avalonia.Collections;
 using Avalonia.Controls;
+using Avalonia.Controls.DataGridDragDrop;
+using Avalonia.Controls.Shapes;
 using Avalonia.Controls.Templates;
 using Avalonia.Controls.Utils;
 using Avalonia.Data;
 using Avalonia.Headless.XUnit;
 using Avalonia.Input;
 using Avalonia.Interactivity;
+using Avalonia.Layout;
 using Avalonia.Styling;
 using Avalonia.Threading;
 using Avalonia.VisualTree;
@@ -215,6 +219,677 @@ public class DataGridInputMouseSelectionTests
         Assert.Same(grid, pointer.Captured);
 
         grid.RaiseEvent(CreatePointerReleasedArgs(grid, grid, pointer, movePoint, KeyModifiers.None));
+    }
+
+    [AvaloniaFact]
+    public void RowHeader_Click_Does_Not_Select_When_CanUserSelectRows_False()
+    {
+        var (grid, _) = CreateGrid(selectionUnit: DataGridSelectionUnit.CellOrRowHeader, selectionMode: DataGridSelectionMode.Extended);
+        grid.HeadersVisibility = DataGridHeadersVisibility.All;
+        grid.RowHeaderWidth = 28;
+        grid.CanUserSelectRows = false;
+        grid.UpdateLayout();
+        Dispatcher.UIThread.RunJobs();
+
+        var slot = grid.SlotFromRowIndex(0);
+        var row = grid.DisplayData.GetDisplayedElement(slot) as DataGridRow;
+        Assert.NotNull(row);
+        Assert.True(row!.HasHeaderCell);
+
+        var header = row.HeaderCell;
+        var point = GetCenterPoint(header, grid);
+        var pointer = new Pointer(Pointer.GetNextFreeId(), PointerType.Mouse, isPrimary: true);
+
+        header.RaiseEvent(CreatePointerPressedArgs(header, grid, pointer, point, KeyModifiers.None));
+        grid.UpdateLayout();
+
+        Assert.Empty(grid.SelectedItems.Cast<object>());
+    }
+
+    [AvaloniaFact]
+    public void RowHeader_Click_Selects_Row_Cells_When_CellUnit()
+    {
+        var (grid, _) = CreateGrid(selectionUnit: DataGridSelectionUnit.CellOrRowHeader, selectionMode: DataGridSelectionMode.Extended);
+        grid.HeadersVisibility = DataGridHeadersVisibility.All;
+        grid.RowHeaderWidth = 28;
+        grid.UpdateLayout();
+        Dispatcher.UIThread.RunJobs();
+
+        var slot = grid.SlotFromRowIndex(0);
+        var row = grid.DisplayData.GetDisplayedElement(slot) as DataGridRow;
+        Assert.NotNull(row);
+        Assert.True(row!.HasHeaderCell);
+
+        var header = row.HeaderCell;
+        var point = GetCenterPoint(header, grid);
+        var pointer = new Pointer(Pointer.GetNextFreeId(), PointerType.Mouse, isPrimary: true);
+
+        header.RaiseEvent(CreatePointerPressedArgs(header, grid, pointer, point, KeyModifiers.None));
+        grid.UpdateLayout();
+
+        Assert.Equal(grid.ColumnsInternal.Count, grid.SelectedCells.Count);
+        Assert.Single(grid.SelectedItems.Cast<object>());
+    }
+
+    [AvaloniaFact]
+    public void RowHeader_CtrlClick_Toggles_Selected_Row_Cells()
+    {
+        var (grid, _) = CreateGrid(selectionUnit: DataGridSelectionUnit.CellOrRowHeader, selectionMode: DataGridSelectionMode.Extended);
+        grid.HeadersVisibility = DataGridHeadersVisibility.All;
+        grid.RowHeaderWidth = 28;
+        grid.UpdateLayout();
+        Dispatcher.UIThread.RunJobs();
+
+        var slot = grid.SlotFromRowIndex(0);
+        var row = grid.DisplayData.GetDisplayedElement(slot) as DataGridRow;
+        Assert.NotNull(row);
+        Assert.True(row!.HasHeaderCell);
+
+        var header = row.HeaderCell;
+        var point = GetCenterPoint(header, grid);
+        var pointer = new Pointer(Pointer.GetNextFreeId(), PointerType.Mouse, isPrimary: true);
+        var ctrl = GetCtrlOrCmdModifier(grid);
+
+        header.RaiseEvent(CreatePointerPressedArgs(header, grid, pointer, point, KeyModifiers.None));
+        grid.UpdateLayout();
+
+        Assert.Equal(grid.ColumnsInternal.Count, grid.SelectedCells.Count);
+
+        header.RaiseEvent(CreatePointerPressedArgs(header, grid, pointer, point, ctrl));
+        grid.UpdateLayout();
+
+        Assert.Empty(grid.SelectedCells);
+        Assert.Empty(grid.SelectedItems.Cast<object>());
+    }
+
+    [AvaloniaFact]
+    public void RowHeader_Drag_Selects_Row_Cell_Range_When_CellUnit()
+    {
+        var (grid, _) = CreateGrid(rowCount: 4, selectionUnit: DataGridSelectionUnit.CellOrRowHeader, selectionMode: DataGridSelectionMode.Extended);
+        grid.HeadersVisibility = DataGridHeadersVisibility.All;
+        grid.RowHeaderWidth = 28;
+        grid.UpdateLayout();
+        Dispatcher.UIThread.RunJobs();
+
+        var startSlot = grid.SlotFromRowIndex(0);
+        var endSlot = grid.SlotFromRowIndex(2);
+        var startRow = grid.DisplayData.GetDisplayedElement(startSlot) as DataGridRow;
+        var endRow = grid.DisplayData.GetDisplayedElement(endSlot) as DataGridRow;
+        Assert.NotNull(startRow);
+        Assert.NotNull(endRow);
+        Assert.True(startRow!.HasHeaderCell);
+        Assert.True(endRow!.HasHeaderCell);
+
+        var startHeader = startRow.HeaderCell;
+        var endHeader = endRow.HeaderCell;
+        var startPoint = GetCenterPoint(startHeader, grid);
+        var endPoint = GetCenterPoint(endHeader, grid);
+
+        var pointer = new Pointer(Pointer.GetNextFreeId(), PointerType.Mouse, isPrimary: true);
+
+        startHeader.RaiseEvent(CreatePointerPressedArgs(startHeader, grid, pointer, startPoint, KeyModifiers.None));
+        grid.RaiseEvent(CreatePointerMovedArgs(grid, grid, pointer, endPoint, KeyModifiers.None));
+
+        var expectedCells = grid.ColumnsInternal.Count * 3;
+        Assert.Equal(expectedCells, grid.SelectedCells.Count);
+        Assert.Equal(3, grid.SelectedItems.Count);
+
+        grid.RaiseEvent(CreatePointerReleasedArgs(grid, grid, pointer, endPoint, KeyModifiers.None));
+    }
+
+    [AvaloniaFact]
+    public void ColumnHeader_Click_Selects_Column_When_Enabled()
+    {
+        var (grid, items) = CreateGrid(selectionUnit: DataGridSelectionUnit.CellOrColumnHeader, selectionMode: DataGridSelectionMode.Extended);
+        grid.HeadersVisibility = DataGridHeadersVisibility.All;
+        grid.CanUserSelectColumns = true;
+        grid.UpdateLayout();
+        Dispatcher.UIThread.RunJobs();
+
+        var column = grid.ColumnsInternal[1];
+        var header = GetColumnHeader(grid, column);
+        var point = GetCenterPoint(header, grid);
+        var pointer = new Pointer(Pointer.GetNextFreeId(), PointerType.Mouse, isPrimary: true);
+
+        header.RaiseEvent(CreatePointerPressedArgs(header, grid, pointer, point, KeyModifiers.None));
+        grid.UpdateLayout();
+
+        Assert.Contains(column, grid.SelectedColumns);
+        Assert.Equal(items.Count, grid.SelectedCells.Count);
+    }
+
+    [AvaloniaFact]
+    public void ColumnHeader_Click_Then_Cell_Click_Clears_Header_Selected_PseudoClass()
+    {
+        var (grid, _) = CreateGrid(selectionUnit: DataGridSelectionUnit.CellOrColumnHeader, selectionMode: DataGridSelectionMode.Extended);
+        grid.HeadersVisibility = DataGridHeadersVisibility.All;
+        grid.CanUserSelectColumns = true;
+        grid.UpdateLayout();
+        Dispatcher.UIThread.RunJobs();
+
+        var column = grid.ColumnsInternal[0];
+        var header = GetColumnHeader(grid, column);
+        var headerPoint = GetCenterPoint(header, grid);
+        var pointer = new Pointer(Pointer.GetNextFreeId(), PointerType.Mouse, isPrimary: true);
+
+        header.RaiseEvent(CreatePointerPressedArgs(header, grid, pointer, headerPoint, KeyModifiers.None));
+        grid.UpdateLayout();
+        Dispatcher.UIThread.RunJobs();
+
+        Assert.True(((IPseudoClasses)header.Classes).Contains(":selected"));
+
+        var slot = grid.SlotFromRowIndex(0);
+        var row = grid.DisplayData.GetDisplayedElement(slot) as DataGridRow;
+        Assert.NotNull(row);
+
+        var cell = row!.Cells[1];
+        var cellPoint = GetCenterPoint(cell, grid);
+        cell.RaiseEvent(CreatePointerPressedArgs(cell, grid, pointer, cellPoint, KeyModifiers.None));
+        grid.UpdateLayout();
+        Dispatcher.UIThread.RunJobs();
+
+        Assert.False(((IPseudoClasses)header.Classes).Contains(":selected"));
+    }
+
+    [AvaloniaFact]
+    public void CellDragSelection_Works_With_SelectedCellsBinding()
+    {
+        var (grid, _) = CreateGrid(rowCount: 4, columnCount: 3, selectionUnit: DataGridSelectionUnit.CellOrRowOrColumnHeader, selectionMode: DataGridSelectionMode.Extended);
+        grid.SelectedCells = new AvaloniaList<DataGridCellInfo>();
+        grid.UpdateLayout();
+        Dispatcher.UIThread.RunJobs();
+
+        var startSlot = grid.SlotFromRowIndex(0);
+        var endSlot = grid.SlotFromRowIndex(2);
+        var startRow = grid.DisplayData.GetDisplayedElement(startSlot) as DataGridRow;
+        var endRow = grid.DisplayData.GetDisplayedElement(endSlot) as DataGridRow;
+        Assert.NotNull(startRow);
+        Assert.NotNull(endRow);
+
+        var startCell = startRow!.Cells[0];
+        var endCell = endRow!.Cells[2];
+        var startPoint = GetCenterPoint(startCell, grid);
+        var endPoint = GetCenterPoint(endCell, grid);
+        var pointer = new Pointer(Pointer.GetNextFreeId(), PointerType.Mouse, isPrimary: true);
+
+        startCell.RaiseEvent(CreatePointerPressedArgs(startCell, grid, pointer, startPoint, KeyModifiers.None));
+        grid.RaiseEvent(CreatePointerMovedArgs(grid, grid, pointer, endPoint, KeyModifiers.None));
+
+        Assert.Equal(9, grid.SelectedCells.Count);
+
+        grid.RaiseEvent(CreatePointerReleasedArgs(grid, grid, pointer, endPoint, KeyModifiers.None));
+    }
+
+    [AvaloniaFact]
+    public void CellDragSelection_Ignores_Touch_By_Default()
+    {
+        var (grid, _) = CreateGrid(rowCount: 3, columnCount: 3, selectionUnit: DataGridSelectionUnit.CellOrRowOrColumnHeader, selectionMode: DataGridSelectionMode.Extended);
+        grid.UpdateLayout();
+        Dispatcher.UIThread.RunJobs();
+
+        var startSlot = grid.SlotFromRowIndex(0);
+        var startRow = grid.DisplayData.GetDisplayedElement(startSlot) as DataGridRow;
+        Assert.NotNull(startRow);
+
+        var startCell = startRow!.Cells[0];
+        var startPoint = GetCenterPoint(startCell, grid);
+        var endPoint = new Point(startPoint.X + 60, startPoint.Y + 40);
+        var pointer = new Pointer(Pointer.GetNextFreeId(), PointerType.Touch, isPrimary: true);
+
+        startCell.RaiseEvent(CreateTouchPointerPressedArgs(startCell, grid, pointer, startPoint));
+        grid.RaiseEvent(CreateTouchPointerMovedArgs(grid, grid, pointer, endPoint));
+
+        Assert.Empty(grid.SelectedCells);
+
+        grid.RaiseEvent(CreatePointerReleasedArgs(grid, grid, pointer, endPoint, KeyModifiers.None));
+    }
+
+    [AvaloniaFact]
+    public void CellDragSelection_Allows_Touch_When_Enabled()
+    {
+        var (grid, _) = CreateGrid(rowCount: 3, columnCount: 3, selectionUnit: DataGridSelectionUnit.CellOrRowOrColumnHeader, selectionMode: DataGridSelectionMode.Extended);
+        grid.AllowTouchDragSelection = true;
+        grid.UpdateLayout();
+        Dispatcher.UIThread.RunJobs();
+
+        var startSlot = grid.SlotFromRowIndex(0);
+        var endSlot = grid.SlotFromRowIndex(2);
+        var startRow = grid.DisplayData.GetDisplayedElement(startSlot) as DataGridRow;
+        var endRow = grid.DisplayData.GetDisplayedElement(endSlot) as DataGridRow;
+        Assert.NotNull(startRow);
+        Assert.NotNull(endRow);
+
+        var startCell = startRow!.Cells[0];
+        var endCell = endRow!.Cells[2];
+        var startPoint = GetCenterPoint(startCell, grid);
+        var endPoint = GetCenterPoint(endCell, grid);
+        var pointer = new Pointer(Pointer.GetNextFreeId(), PointerType.Touch, isPrimary: true);
+
+        startCell.RaiseEvent(CreateTouchPointerPressedArgs(startCell, grid, pointer, startPoint));
+        grid.RaiseEvent(CreateTouchPointerMovedArgs(grid, grid, pointer, endPoint));
+
+        Assert.Equal(9, grid.SelectedCells.Count);
+
+        grid.RaiseEvent(CreatePointerReleasedArgs(grid, grid, pointer, endPoint, KeyModifiers.None));
+    }
+
+    [AvaloniaFact]
+    public void ColumnHeader_CtrlClick_Toggles_Selected_Column()
+    {
+        var (grid, _) = CreateGrid(selectionUnit: DataGridSelectionUnit.CellOrColumnHeader, selectionMode: DataGridSelectionMode.Extended);
+        grid.HeadersVisibility = DataGridHeadersVisibility.All;
+        grid.CanUserSelectColumns = true;
+        grid.UpdateLayout();
+        Dispatcher.UIThread.RunJobs();
+
+        var column = grid.ColumnsInternal[0];
+        var header = GetColumnHeader(grid, column);
+        var point = GetCenterPoint(header, grid);
+        var pointer = new Pointer(Pointer.GetNextFreeId(), PointerType.Mouse, isPrimary: true);
+        var ctrl = GetCtrlOrCmdModifier(grid);
+
+        header.RaiseEvent(CreatePointerPressedArgs(header, grid, pointer, point, KeyModifiers.None));
+        grid.UpdateLayout();
+
+        Assert.Contains(column, grid.SelectedColumns);
+
+        header.RaiseEvent(CreatePointerPressedArgs(header, grid, pointer, point, ctrl));
+        grid.UpdateLayout();
+
+        Assert.DoesNotContain(column, grid.SelectedColumns);
+        Assert.Empty(grid.SelectedCells);
+    }
+
+    [AvaloniaFact]
+    public void ColumnHeader_CtrlClick_Deselect_Preserves_RowHeader_Selection()
+    {
+        var (grid, _) = CreateGrid(rowCount: 3, columnCount: 3, selectionUnit: DataGridSelectionUnit.CellOrRowOrColumnHeader, selectionMode: DataGridSelectionMode.Extended);
+        grid.HeadersVisibility = DataGridHeadersVisibility.All;
+        grid.RowHeaderWidth = 28;
+        grid.CanUserSelectRows = true;
+        grid.CanUserSelectColumns = true;
+        grid.UpdateLayout();
+        Dispatcher.UIThread.RunJobs();
+
+        var slot = grid.SlotFromRowIndex(0);
+        var row = grid.DisplayData.GetDisplayedElement(slot) as DataGridRow;
+        Assert.NotNull(row);
+        Assert.True(row!.HasHeaderCell);
+
+        var rowHeader = row.HeaderCell;
+        var pointer = new Pointer(Pointer.GetNextFreeId(), PointerType.Mouse, isPrimary: true);
+        rowHeader.RaiseEvent(CreatePointerPressedArgs(rowHeader, grid, pointer, GetCenterPoint(rowHeader, grid), KeyModifiers.None));
+        grid.UpdateLayout();
+        Dispatcher.UIThread.RunJobs();
+
+        var column = grid.ColumnsInternal[1];
+        var columnHeader = GetColumnHeader(grid, column);
+        var ctrl = GetCtrlOrCmdModifier(grid);
+        columnHeader.RaiseEvent(CreatePointerPressedArgs(columnHeader, grid, pointer, GetCenterPoint(columnHeader, grid), ctrl));
+        grid.UpdateLayout();
+        Dispatcher.UIThread.RunJobs();
+
+        Assert.Contains(column, grid.SelectedColumns);
+
+        columnHeader.RaiseEvent(CreatePointerPressedArgs(columnHeader, grid, pointer, GetCenterPoint(columnHeader, grid), ctrl));
+        grid.UpdateLayout();
+        Dispatcher.UIThread.RunJobs();
+
+        Assert.DoesNotContain(column, grid.SelectedColumns);
+        Assert.Equal(grid.ColumnsInternal.Count, grid.SelectedCells.Count);
+        Assert.Contains(grid.SelectedCells, cell => cell.RowIndex == 0 && cell.ColumnIndex == column.Index);
+        Assert.DoesNotContain(grid.SelectedCells, cell => cell.RowIndex == 1 && cell.ColumnIndex == column.Index);
+    }
+
+    [AvaloniaFact]
+    public void RowHeader_CtrlClick_Deselect_Preserves_ColumnHeader_Selection()
+    {
+        var (grid, items) = CreateGrid(rowCount: 3, columnCount: 3, selectionUnit: DataGridSelectionUnit.CellOrRowOrColumnHeader, selectionMode: DataGridSelectionMode.Extended);
+        grid.HeadersVisibility = DataGridHeadersVisibility.All;
+        grid.RowHeaderWidth = 28;
+        grid.CanUserSelectRows = true;
+        grid.CanUserSelectColumns = true;
+        grid.UpdateLayout();
+        Dispatcher.UIThread.RunJobs();
+
+        var column = grid.ColumnsInternal[1];
+        var columnHeader = GetColumnHeader(grid, column);
+        var pointer = new Pointer(Pointer.GetNextFreeId(), PointerType.Mouse, isPrimary: true);
+        columnHeader.RaiseEvent(CreatePointerPressedArgs(columnHeader, grid, pointer, GetCenterPoint(columnHeader, grid), KeyModifiers.None));
+        grid.UpdateLayout();
+        Dispatcher.UIThread.RunJobs();
+
+        Assert.Contains(column, grid.SelectedColumns);
+
+        var slot = grid.SlotFromRowIndex(0);
+        var row = grid.DisplayData.GetDisplayedElement(slot) as DataGridRow;
+        Assert.NotNull(row);
+        Assert.True(row!.HasHeaderCell);
+
+        var rowHeader = row.HeaderCell;
+        var ctrl = GetCtrlOrCmdModifier(grid);
+        rowHeader.RaiseEvent(CreatePointerPressedArgs(rowHeader, grid, pointer, GetCenterPoint(rowHeader, grid), ctrl));
+        grid.UpdateLayout();
+        Dispatcher.UIThread.RunJobs();
+
+        rowHeader.RaiseEvent(CreatePointerPressedArgs(rowHeader, grid, pointer, GetCenterPoint(rowHeader, grid), ctrl));
+        grid.UpdateLayout();
+        Dispatcher.UIThread.RunJobs();
+
+        Assert.Contains(column, grid.SelectedColumns);
+        Assert.Equal(items.Count, grid.SelectedCells.Count);
+        Assert.Contains(grid.SelectedCells, cell => cell.RowIndex == 0 && cell.ColumnIndex == column.Index);
+        Assert.DoesNotContain(grid.SelectedCells, cell => cell.RowIndex == 0 && cell.ColumnIndex == 0);
+    }
+
+    [AvaloniaFact]
+    public void ColumnDragHandle_Press_Ignores_Modifiers_And_Selects_Single_Column()
+    {
+        var (grid, _) = CreateGrid(selectionUnit: DataGridSelectionUnit.CellOrColumnHeader, selectionMode: DataGridSelectionMode.Extended);
+        grid.HeadersVisibility = DataGridHeadersVisibility.All;
+        grid.CanUserSelectColumns = true;
+        grid.CanUserReorderColumns = true;
+        grid.ColumnDragHandle = DataGridColumnDragHandle.DragHandle;
+        grid.ColumnDragHandleVisible = true;
+        grid.UpdateLayout();
+        Dispatcher.UIThread.RunJobs();
+
+        var column0 = grid.ColumnsInternal[0];
+        var column1 = grid.ColumnsInternal[1];
+        var header0 = GetColumnHeader(grid, column0);
+        var header1 = GetColumnHeader(grid, column1);
+        var pointer = new Pointer(Pointer.GetNextFreeId(), PointerType.Mouse, isPrimary: true);
+        var ctrl = GetCtrlOrCmdModifier(grid);
+
+        header0.RaiseEvent(CreatePointerPressedArgs(header0, grid, pointer, GetCenterPoint(header0, grid), KeyModifiers.None));
+        header1.RaiseEvent(CreatePointerPressedArgs(header1, grid, pointer, GetCenterPoint(header1, grid), ctrl));
+        grid.UpdateLayout();
+
+        Assert.Equal(2, grid.SelectedColumns.Count);
+
+        SetPointerOver(header1, true);
+        header1.RaiseEvent(CreatePointerMovedArgs(header1, grid, pointer, GetCenterPoint(header1, grid), KeyModifiers.None));
+        Dispatcher.UIThread.RunJobs();
+
+        var dragGrip = GetDragGrip(header1);
+        dragGrip.RaiseEvent(CreatePointerPressedArgs(dragGrip, grid, pointer, GetCenterPoint(dragGrip, grid), ctrl));
+        grid.UpdateLayout();
+
+        Assert.Single(grid.SelectedColumns);
+        Assert.Equal(column1.DisplayIndex, grid.SelectedColumns[0].DisplayIndex);
+    }
+
+    [AvaloniaFact]
+    public void ColumnHeader_Drag_Selects_Column_Cell_Range_When_Reorder_Disabled()
+    {
+        var (grid, items) = CreateGrid(rowCount: 4, selectionUnit: DataGridSelectionUnit.CellOrColumnHeader, selectionMode: DataGridSelectionMode.Extended);
+        grid.HeadersVisibility = DataGridHeadersVisibility.All;
+        grid.CanUserSelectColumns = true;
+        grid.CanUserReorderColumns = false;
+        grid.UpdateLayout();
+        Dispatcher.UIThread.RunJobs();
+
+        var startColumn = grid.ColumnsInternal[0];
+        var endColumn = grid.ColumnsInternal[2];
+        var startHeader = GetColumnHeader(grid, startColumn);
+        var endHeader = GetColumnHeader(grid, endColumn);
+        var startPoint = GetCenterPoint(startHeader, grid);
+        var endPoint = GetCenterPoint(endHeader, grid);
+
+        var pointer = new Pointer(Pointer.GetNextFreeId(), PointerType.Mouse, isPrimary: true);
+
+        startHeader.RaiseEvent(CreatePointerPressedArgs(startHeader, grid, pointer, startPoint, KeyModifiers.None));
+        grid.RaiseEvent(CreatePointerMovedArgs(grid, grid, pointer, endPoint, KeyModifiers.None));
+
+        var expectedCells = items.Count * 3;
+        Assert.Equal(expectedCells, grid.SelectedCells.Count);
+        Assert.Equal(3, grid.SelectedColumns.Count);
+
+        grid.RaiseEvent(CreatePointerReleasedArgs(grid, grid, pointer, endPoint, KeyModifiers.None));
+    }
+
+    [AvaloniaFact]
+    public void ColumnHeader_Drag_Uses_DisplayIndex_Order()
+    {
+        var (grid, _) = CreateGrid(rowCount: 3, columnCount: 3, selectionUnit: DataGridSelectionUnit.CellOrColumnHeader, selectionMode: DataGridSelectionMode.Extended);
+        grid.HeadersVisibility = DataGridHeadersVisibility.All;
+        grid.CanUserSelectColumns = true;
+        grid.CanUserReorderColumns = false;
+        grid.UpdateLayout();
+        Dispatcher.UIThread.RunJobs();
+
+        var columnA = grid.ColumnsInternal[0];
+        var columnB = grid.ColumnsInternal[1];
+        var columnC = grid.ColumnsInternal[2];
+
+        columnC.DisplayIndex = 0;
+        columnA.DisplayIndex = 1;
+        columnB.DisplayIndex = 2;
+        grid.UpdateLayout();
+        Dispatcher.UIThread.RunJobs();
+
+        var startHeader = GetColumnHeader(grid, columnA);
+        var endHeader = GetColumnHeader(grid, columnB);
+        var startPoint = GetCenterPoint(startHeader, grid);
+        var endPoint = GetCenterPoint(endHeader, grid);
+        var pointer = new Pointer(Pointer.GetNextFreeId(), PointerType.Mouse, isPrimary: true);
+
+        startHeader.RaiseEvent(CreatePointerPressedArgs(startHeader, grid, pointer, startPoint, KeyModifiers.None));
+        grid.RaiseEvent(CreatePointerMovedArgs(grid, grid, pointer, endPoint, KeyModifiers.None));
+        grid.UpdateLayout();
+        Dispatcher.UIThread.RunJobs();
+
+        Assert.Contains(columnA, grid.SelectedColumns);
+        Assert.Contains(columnB, grid.SelectedColumns);
+        Assert.DoesNotContain(columnC, grid.SelectedColumns);
+        Assert.DoesNotContain(grid.SelectedCells, cell => cell.ColumnIndex == columnC.Index);
+
+        grid.RaiseEvent(CreatePointerReleasedArgs(grid, grid, pointer, endPoint, KeyModifiers.None));
+    }
+
+    [AvaloniaFact]
+    public void ColumnHeader_ShiftClick_Uses_DisplayIndex_Order()
+    {
+        var (grid, _) = CreateGrid(rowCount: 3, columnCount: 3, selectionUnit: DataGridSelectionUnit.CellOrColumnHeader, selectionMode: DataGridSelectionMode.Extended);
+        grid.HeadersVisibility = DataGridHeadersVisibility.All;
+        grid.CanUserSelectColumns = true;
+        grid.UpdateLayout();
+        Dispatcher.UIThread.RunJobs();
+
+        var columnA = grid.ColumnsInternal[0];
+        var columnB = grid.ColumnsInternal[1];
+        var columnC = grid.ColumnsInternal[2];
+
+        columnC.DisplayIndex = 0;
+        columnA.DisplayIndex = 1;
+        columnB.DisplayIndex = 2;
+        grid.UpdateLayout();
+        Dispatcher.UIThread.RunJobs();
+
+        var headerA = GetColumnHeader(grid, columnA);
+        var headerB = GetColumnHeader(grid, columnB);
+        var pointer = new Pointer(Pointer.GetNextFreeId(), PointerType.Mouse, isPrimary: true);
+        var shift = KeyModifiers.Shift;
+
+        headerA.RaiseEvent(CreatePointerPressedArgs(headerA, grid, pointer, GetCenterPoint(headerA, grid), KeyModifiers.None));
+        grid.UpdateLayout();
+        Dispatcher.UIThread.RunJobs();
+
+        headerB.RaiseEvent(CreatePointerPressedArgs(headerB, grid, pointer, GetCenterPoint(headerB, grid), shift));
+        grid.UpdateLayout();
+        Dispatcher.UIThread.RunJobs();
+
+        Assert.Contains(columnA, grid.SelectedColumns);
+        Assert.Contains(columnB, grid.SelectedColumns);
+        Assert.DoesNotContain(columnC, grid.SelectedColumns);
+        Assert.DoesNotContain(grid.SelectedCells, cell => cell.ColumnIndex == columnC.Index);
+    }
+
+    [AvaloniaFact]
+    public void ColumnHeader_Drag_Selects_Column_Cell_Range_When_Reorder_Uses_Drag_Handle()
+    {
+        var (grid, items) = CreateGrid(rowCount: 4, selectionUnit: DataGridSelectionUnit.CellOrColumnHeader, selectionMode: DataGridSelectionMode.Extended);
+        grid.HeadersVisibility = DataGridHeadersVisibility.All;
+        grid.CanUserSelectColumns = true;
+        grid.CanUserReorderColumns = true;
+        grid.ColumnDragHandle = DataGridColumnDragHandle.DragHandle;
+        grid.ColumnDragHandleVisible = true;
+        grid.UpdateLayout();
+        Dispatcher.UIThread.RunJobs();
+
+        var startColumn = grid.ColumnsInternal[0];
+        var endColumn = grid.ColumnsInternal[2];
+        var startHeader = GetColumnHeader(grid, startColumn);
+        var endHeader = GetColumnHeader(grid, endColumn);
+        var startPoint = GetCenterPoint(startHeader, grid);
+        var endPoint = GetCenterPoint(endHeader, grid);
+
+        var pointer = new Pointer(Pointer.GetNextFreeId(), PointerType.Mouse, isPrimary: true);
+
+        startHeader.RaiseEvent(CreatePointerPressedArgs(startHeader, grid, pointer, startPoint, KeyModifiers.None));
+        grid.RaiseEvent(CreatePointerMovedArgs(grid, grid, pointer, endPoint, KeyModifiers.None));
+
+        var expectedCells = items.Count * 3;
+        Assert.Equal(expectedCells, grid.SelectedCells.Count);
+        Assert.Equal(3, grid.SelectedColumns.Count);
+
+        grid.RaiseEvent(CreatePointerReleasedArgs(grid, grid, pointer, endPoint, KeyModifiers.None));
+    }
+
+    [AvaloniaFact]
+    public void ColumnDragHandle_Visible_Only_On_Header_PointerOver()
+    {
+        var (grid, _) = CreateGrid(selectionUnit: DataGridSelectionUnit.CellOrColumnHeader, selectionMode: DataGridSelectionMode.Extended);
+        grid.HeadersVisibility = DataGridHeadersVisibility.All;
+        grid.CanUserReorderColumns = true;
+        grid.ColumnDragHandle = DataGridColumnDragHandle.DragHandle;
+        grid.ColumnDragHandleVisible = true;
+        grid.UpdateLayout();
+        Dispatcher.UIThread.RunJobs();
+
+        var column = grid.ColumnsInternal[0];
+        var header = GetColumnHeader(grid, column);
+        var dragGrip = GetDragGrip(header);
+        var dragGripIcon = GetDragGripIcon(header);
+
+        Assert.Equal(VerticalAlignment.Top, dragGrip.VerticalAlignment);
+        Assert.Equal(HorizontalAlignment.Stretch, dragGrip.HorizontalAlignment);
+        Assert.Equal(HorizontalAlignment.Center, dragGripIcon.HorizontalAlignment);
+        Assert.False(dragGrip.IsVisible);
+
+        SetPointerOver(header, true);
+        var pointer = new Pointer(Pointer.GetNextFreeId(), PointerType.Mouse, isPrimary: true);
+        var point = GetCenterPoint(header, grid);
+        header.RaiseEvent(CreatePointerMovedArgs(header, grid, pointer, point, KeyModifiers.None));
+        Dispatcher.UIThread.RunJobs();
+
+        Assert.True(dragGrip.IsVisible);
+        Assert.True(dragGrip.Bounds.Width > dragGripIcon.Bounds.Width);
+
+        SetPointerOver(header, false);
+
+        Assert.False(dragGrip.IsVisible);
+    }
+
+    [AvaloniaFact]
+    public void RowDragHandle_Visible_Only_On_RowHeader_PointerOver()
+    {
+        var (grid, _) = CreateGrid(selectionUnit: DataGridSelectionUnit.CellOrRowHeader, selectionMode: DataGridSelectionMode.Extended);
+        grid.HeadersVisibility = DataGridHeadersVisibility.All;
+        grid.RowHeaderWidth = 28;
+        grid.CanUserReorderRows = true;
+        grid.RowDragHandle = DataGridRowDragHandle.RowHeader;
+        grid.RowDragHandleVisible = true;
+        grid.UpdateLayout();
+        Dispatcher.UIThread.RunJobs();
+
+        var slot = grid.SlotFromRowIndex(0);
+        var row = grid.DisplayData.GetDisplayedElement(slot) as DataGridRow;
+        Assert.NotNull(row);
+        var header = row!.HeaderCell;
+        var dragGrip = GetDragGrip(header);
+        var dragGripIcon = GetDragGripIcon(header);
+
+        Assert.Equal(VerticalAlignment.Stretch, dragGrip.VerticalAlignment);
+        Assert.Equal(HorizontalAlignment.Center, dragGrip.HorizontalAlignment);
+        Assert.Equal(VerticalAlignment.Center, dragGripIcon.VerticalAlignment);
+        Assert.False(dragGrip.IsVisible);
+
+        SetPointerOver(header, true);
+        var pointer = new Pointer(Pointer.GetNextFreeId(), PointerType.Mouse, isPrimary: true);
+        var point = GetCenterPoint(header, grid);
+        header.RaiseEvent(CreatePointerMovedArgs(header, grid, pointer, point, KeyModifiers.None));
+        Dispatcher.UIThread.RunJobs();
+
+        Assert.True(dragGrip.IsVisible);
+        Assert.True(dragGrip.Bounds.Height > dragGripIcon.Bounds.Height);
+
+        SetPointerOver(header, false);
+
+        Assert.False(dragGrip.IsVisible);
+    }
+
+    [AvaloniaFact]
+    public void RowDragHandle_Press_Ignores_Modifiers_And_Selects_Single_Row()
+    {
+        var (grid, items) = CreateGrid(selectionUnit: DataGridSelectionUnit.CellOrRowHeader, selectionMode: DataGridSelectionMode.Extended);
+        grid.HeadersVisibility = DataGridHeadersVisibility.All;
+        grid.RowHeaderWidth = 28;
+        grid.CanUserReorderRows = true;
+        grid.RowDragHandle = DataGridRowDragHandle.RowHeader;
+        grid.RowDragHandleVisible = true;
+        grid.UpdateLayout();
+        Dispatcher.UIThread.RunJobs();
+
+        var row0Slot = grid.SlotFromRowIndex(0);
+        var row1Slot = grid.SlotFromRowIndex(1);
+        var row0 = grid.DisplayData.GetDisplayedElement(row0Slot) as DataGridRow;
+        var row1 = grid.DisplayData.GetDisplayedElement(row1Slot) as DataGridRow;
+        Assert.NotNull(row0);
+        Assert.NotNull(row1);
+
+        var header0 = row0!.HeaderCell;
+        var header1 = row1!.HeaderCell;
+        var pointer = new Pointer(Pointer.GetNextFreeId(), PointerType.Mouse, isPrimary: true);
+        var ctrl = GetCtrlOrCmdModifier(grid);
+
+        header0.RaiseEvent(CreatePointerPressedArgs(header0, grid, pointer, GetCenterPoint(header0, grid), KeyModifiers.None));
+        header1.RaiseEvent(CreatePointerPressedArgs(header1, grid, pointer, GetCenterPoint(header1, grid), ctrl));
+        grid.UpdateLayout();
+
+        Assert.Equal(2, grid.SelectedItems.Count);
+
+        SetPointerOver(header1, true);
+        header1.RaiseEvent(CreatePointerMovedArgs(header1, grid, pointer, GetCenterPoint(header1, grid), KeyModifiers.None));
+        Dispatcher.UIThread.RunJobs();
+
+        var dragGrip = GetDragGrip(header1);
+        dragGrip.RaiseEvent(CreatePointerPressedArgs(dragGrip, grid, pointer, GetCenterPoint(dragGrip, grid), ctrl));
+        grid.UpdateLayout();
+
+        Assert.Single(grid.SelectedItems);
+        Assert.Contains(items[1], grid.SelectedItems.Cast<RowItem>());
+    }
+
+    [AvaloniaFact]
+    public void ColumnHeader_Click_Does_Not_Select_When_SelectionUnit_Disallows_Columns()
+    {
+        var (grid, _) = CreateGrid(selectionUnit: DataGridSelectionUnit.Cell, selectionMode: DataGridSelectionMode.Extended);
+        grid.HeadersVisibility = DataGridHeadersVisibility.All;
+        grid.CanUserSelectColumns = true;
+        grid.UpdateLayout();
+        Dispatcher.UIThread.RunJobs();
+
+        var column = grid.ColumnsInternal[0];
+        var header = GetColumnHeader(grid, column);
+        var point = GetCenterPoint(header, grid);
+        var pointer = new Pointer(Pointer.GetNextFreeId(), PointerType.Mouse, isPrimary: true);
+
+        header.RaiseEvent(CreatePointerPressedArgs(header, grid, pointer, point, KeyModifiers.None));
+        grid.UpdateLayout();
+
+        Assert.Empty(grid.SelectedColumns);
+        Assert.Empty(grid.SelectedCells);
     }
 
     [AvaloniaFact]
@@ -1078,16 +1753,64 @@ public class DataGridInputMouseSelectionTests
         return control.TranslatePoint(center, relativeTo) ?? center;
     }
 
+    private static DataGridColumnHeader GetColumnHeader(DataGrid grid, DataGridColumn column)
+    {
+        return grid.GetVisualDescendants()
+            .OfType<DataGridColumnHeader>()
+            .First(header => ReferenceEquals(header.OwningColumn, column));
+    }
+
+    private static Control GetDragGrip(Control header)
+    {
+        return header.GetVisualDescendants()
+            .OfType<Control>()
+            .First(control => control.Name == "DragGrip");
+    }
+
+    private static Path GetDragGripIcon(Control header)
+    {
+        return header.GetVisualDescendants()
+            .OfType<Path>()
+            .First(path => path.Name == "DragGripIcon");
+    }
+
+    private static void SetPointerOver(Control target, bool isOver)
+    {
+        if (target.Classes is IPseudoClasses pseudoClasses)
+        {
+            if (isOver)
+            {
+                pseudoClasses.Add(":pointerover");
+            }
+            else
+            {
+                pseudoClasses.Remove(":pointerover");
+            }
+        }
+    }
+
     private static PointerPressedEventArgs CreatePointerPressedArgs(Control source, Visual root, IPointer pointer, Point position, KeyModifiers modifiers, int clickCount = 1)
     {
         var properties = new PointerPointProperties(RawInputModifiers.LeftMouseButton, PointerUpdateKind.LeftButtonPressed);
         return new PointerPressedEventArgs(source, pointer, root, position, 0, properties, modifiers, clickCount);
     }
 
+    private static PointerPressedEventArgs CreateTouchPointerPressedArgs(Control source, Visual root, IPointer pointer, Point position)
+    {
+        var properties = new PointerPointProperties(RawInputModifiers.None, PointerUpdateKind.Other);
+        return new PointerPressedEventArgs(source, pointer, root, position, 0, properties, KeyModifiers.None, clickCount: 1);
+    }
+
     private static PointerEventArgs CreatePointerMovedArgs(Control source, Visual root, IPointer pointer, Point position, KeyModifiers modifiers)
     {
         var properties = new PointerPointProperties(RawInputModifiers.LeftMouseButton, PointerUpdateKind.Other);
         return new PointerEventArgs(InputElement.PointerMovedEvent, source, pointer, root, position, 0, properties, modifiers);
+    }
+
+    private static PointerEventArgs CreateTouchPointerMovedArgs(Control source, Visual root, IPointer pointer, Point position)
+    {
+        var properties = new PointerPointProperties(RawInputModifiers.None, PointerUpdateKind.Other);
+        return new PointerEventArgs(InputElement.PointerMovedEvent, source, pointer, root, position, 0, properties, KeyModifiers.None);
     }
 
     private static PointerReleasedEventArgs CreatePointerReleasedArgs(Control source, Visual root, IPointer pointer, Point position, KeyModifiers modifiers)

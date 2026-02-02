@@ -170,6 +170,130 @@ namespace Avalonia.Controls.DataGridTests.Formulas
             Assert.Equal("#VALUE!", model.Evaluate(items[0], formulaDefinition));
         }
 
+        [AvaloniaFact]
+        public void FormulaModel_Resolves_Named_Ranges_In_Formulas()
+        {
+            var items = new ObservableCollection<RowItem>
+            {
+                new("A", 10d),
+                new("B", 20d)
+            };
+
+            var builder = DataGridColumnDefinitionBuilder.For<RowItem>();
+            var amountProperty = CreateProperty(nameof(RowItem.Amount), row => row.Amount, (row, value) => row.Amount = value);
+
+            var amountDefinition = builder.Numeric(
+                header: "Amount",
+                property: amountProperty,
+                getter: row => row.Amount,
+                setter: (row, value) => row.Amount = value,
+                configure: column => column.ColumnKey = "Amount");
+
+            var formulaDefinition = builder.Formula(
+                header: "Calc",
+                formula: "=[@Amount]*TaxRate",
+                formulaName: "Calc",
+                configure: column => column.ColumnKey = "Calc");
+
+            var grid = new DataGrid
+            {
+                Name = "SalesTable",
+                ItemsSource = items,
+                ColumnDefinitionsSource = new ObservableCollection<DataGridColumnDefinition>
+                {
+                    amountDefinition,
+                    formulaDefinition
+                },
+                AutoGenerateColumns = false
+            };
+
+            var model = (DataGridFormulaModel)grid.FormulaModel;
+
+            var success = model.TrySetNamedRange("TaxRate", "2", out var error);
+
+            Assert.True(success);
+            Assert.True(string.IsNullOrWhiteSpace(error));
+
+            model.Recalculate();
+
+            Assert.Equal(20d, model.Evaluate(items[0], formulaDefinition));
+            Assert.Equal(40d, model.Evaluate(items[1], formulaDefinition));
+        }
+
+        [AvaloniaFact]
+        public void FormulaModel_TrySetNamedRange_Rejects_ColumnName()
+        {
+            var items = new ObservableCollection<RowItem>
+            {
+                new("A", 10d)
+            };
+
+            var builder = DataGridColumnDefinitionBuilder.For<RowItem>();
+            var amountProperty = CreateProperty(nameof(RowItem.Amount), row => row.Amount, (row, value) => row.Amount = value);
+
+            var amountDefinition = builder.Numeric(
+                header: "Amount",
+                property: amountProperty,
+                getter: row => row.Amount,
+                setter: (row, value) => row.Amount = value,
+                configure: column => column.ColumnKey = "Amount");
+
+            var grid = new DataGrid
+            {
+                Name = "SalesTable",
+                ItemsSource = items,
+                ColumnDefinitionsSource = new ObservableCollection<DataGridColumnDefinition>
+                {
+                    amountDefinition
+                },
+                AutoGenerateColumns = false
+            };
+
+            var model = (DataGridFormulaModel)grid.FormulaModel;
+
+            var success = model.TrySetNamedRange("Amount", "2", out var error);
+
+            Assert.False(success);
+            Assert.False(string.IsNullOrWhiteSpace(error));
+        }
+
+        [AvaloniaFact]
+        public void FormulaModel_TryGetNamedRange_Returns_Stored_Formula()
+        {
+            var items = new ObservableCollection<RowItem>
+            {
+                new("A", 10d)
+            };
+
+            var builder = DataGridColumnDefinitionBuilder.For<RowItem>();
+            var amountProperty = CreateProperty(nameof(RowItem.Amount), row => row.Amount, (row, value) => row.Amount = value);
+
+            var amountDefinition = builder.Numeric(
+                header: "Amount",
+                property: amountProperty,
+                getter: row => row.Amount,
+                setter: (row, value) => row.Amount = value,
+                configure: column => column.ColumnKey = "Amount");
+
+            var grid = new DataGrid
+            {
+                Name = "SalesTable",
+                ItemsSource = items,
+                ColumnDefinitionsSource = new ObservableCollection<DataGridColumnDefinition>
+                {
+                    amountDefinition
+                },
+                AutoGenerateColumns = false
+            };
+
+            var model = (DataGridFormulaModel)grid.FormulaModel;
+
+            model.TrySetNamedRange("TaxRate", "2", out _);
+
+            Assert.True(model.TryGetNamedRange("TaxRate", out var formula));
+            Assert.Equal("=2", formula);
+        }
+
         private static IPropertyInfo CreateProperty<TValue>(
             string name,
             System.Func<RowItem, TValue> getter,

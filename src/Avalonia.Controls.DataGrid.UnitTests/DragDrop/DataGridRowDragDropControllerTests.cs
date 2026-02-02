@@ -133,6 +133,38 @@ namespace Avalonia.Controls.DataGridTests.DragDrop;
     }
 
     [AvaloniaFact]
+    public void RowHeader_DragHandle_Does_Not_Start_From_Cell()
+    {
+        var items = new ObservableCollection<RowItem>
+        {
+            new("A"),
+            new("B")
+        };
+        var (grid, window) = CreateGrid(items);
+        grid.CanUserReorderRows = true;
+        grid.HeadersVisibility = DataGridHeadersVisibility.All;
+        grid.RowHeaderWidth = 28;
+        grid.RowDragHandle = DataGridRowDragHandle.RowHeader;
+        grid.UpdateLayout();
+
+        var handler = new DataGridRowReorderHandler();
+        using var controller = new DataGridRowDragDropController(grid, handler, new DataGridRowDragDropOptions());
+
+        var row = grid.GetVisualDescendants().OfType<DataGridRow>().First();
+        var cell = row.Cells[0];
+        var point = cell.TranslatePoint(new Point(2, 2), grid) ?? new Point(2, 2);
+
+        var pointer = new Avalonia.Input.Pointer(Avalonia.Input.Pointer.GetNextFreeId(), PointerType.Mouse, isPrimary: true);
+        cell.RaiseEvent(CreatePointerPressedArgs(cell, window, pointer, point));
+
+        var pointerIdField = typeof(DataGridRowDragDropController).GetField("_pointerId", BindingFlags.NonPublic | BindingFlags.Instance);
+        var pointerId = (int?)pointerIdField!.GetValue(controller);
+        Assert.Null(pointerId);
+
+        window.Close();
+    }
+
+    [AvaloniaFact]
     public void Drop_Reorders_Items()
     {
         var items = new ObservableCollection<RowItem>
