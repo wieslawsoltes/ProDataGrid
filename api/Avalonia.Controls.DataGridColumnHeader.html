@@ -85,7 +85,7 @@
 
 
   <h1 id="Avalonia_Controls_DataGridColumnHeader" data-uid="Avalonia.Controls.DataGridColumnHeader" class="text-break">
-Class DataGridColumnHeader  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/DataGridColumnHeader.cs/#L34"><i class="bi bi-code-slash"></i></a>
+Class DataGridColumnHeader  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/DataGridColumnHeader.cs/#L36"><i class="bi bi-code-slash"></i></a>
   </h1>
 
   <div class="facts text-secondary">
@@ -98,7 +98,7 @@ Class DataGridColumnHeader  <a class="header-action link-secondary" title="View 
   <div class="markdown conceptual"></div>
 
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">[PseudoClasses(new string[] { &quot;:dragIndicator&quot;, &quot;:pressed&quot;, &quot;:sortascending&quot;, &quot;:sortdescending&quot;, &quot;:filtered&quot; })]
+    <pre><code class="lang-csharp hljs">[PseudoClasses(new string[] { &quot;:dragIndicator&quot;, &quot;:pressed&quot;, &quot;:sortascending&quot;, &quot;:sortdescending&quot;, &quot;:filtered&quot;, &quot;:selected&quot;, &quot;:current&quot; })]
 public class DataGridColumnHeader : ContentControl, INotifyPropertyChanged, IDataContextProvider, ILogical, IThemeVariantHost, IResourceHost, IResourceNode, IStyleHost, ISetLogicalParent, ISetInheritanceParent, ISupportInitialize, IStyleable, INamed, IInputElement, IDataTemplateHost, ISetterValue</code></pre>
   </div>
 
@@ -1078,7 +1078,7 @@ public class DataGridColumnHeader : ContentControl, INotifyPropertyChanged, IDat
 
   <h3 id="Avalonia_Controls_DataGridColumnHeader__ctor" data-uid="Avalonia.Controls.DataGridColumnHeader.#ctor">
   DataGridColumnHeader()
-  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/DataGridColumnHeader.cs/#L162"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/DataGridColumnHeader.cs/#L165"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>Initializes a new instance of the <span class="xref">Avalonia.Controls.Primitives.DataGridColumnHeader</span> class.</p>
@@ -1108,7 +1108,7 @@ public class DataGridColumnHeader : ContentControl, INotifyPropertyChanged, IDat
 
   <h3 id="Avalonia_Controls_DataGridColumnHeader_AreSeparatorsVisibleProperty" data-uid="Avalonia.Controls.DataGridColumnHeader.AreSeparatorsVisibleProperty">
   AreSeparatorsVisibleProperty
-  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/DataGridColumnHeader.cs/#L96"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/DataGridColumnHeader.cs/#L99"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"></div>
@@ -1138,7 +1138,7 @@ public class DataGridColumnHeader : ContentControl, INotifyPropertyChanged, IDat
 
   <h3 id="Avalonia_Controls_DataGridColumnHeader_FilterFlyoutProperty" data-uid="Avalonia.Controls.DataGridColumnHeader.FilterFlyoutProperty">
   FilterFlyoutProperty
-  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/DataGridColumnHeader.cs/#L110"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/DataGridColumnHeader.cs/#L113"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"></div>
@@ -1168,7 +1168,7 @@ public class DataGridColumnHeader : ContentControl, INotifyPropertyChanged, IDat
 
   <h3 id="Avalonia_Controls_DataGridColumnHeader_FilterThemeProperty" data-uid="Avalonia.Controls.DataGridColumnHeader.FilterThemeProperty">
   FilterThemeProperty
-  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/DataGridColumnHeader.cs/#L107"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/DataGridColumnHeader.cs/#L110"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"></div>
@@ -1198,7 +1198,7 @@ public class DataGridColumnHeader : ContentControl, INotifyPropertyChanged, IDat
 
   <h3 id="Avalonia_Controls_DataGridColumnHeader_HeaderPointerPressedEvent" data-uid="Avalonia.Controls.DataGridColumnHeader.HeaderPointerPressedEvent">
   HeaderPointerPressedEvent
-  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/DataGridColumnHeader.cs/#L78"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/DataGridColumnHeader.cs/#L81"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>Identifies the <a class="xref" href="Avalonia.Controls.DataGridColumnHeader.html#Avalonia_Controls_DataGridColumnHeader_HeaderPointerPressed">HeaderPointerPressed</a> routed event.</p>
@@ -1229,7 +1229,7 @@ public class DataGridColumnHeader : ContentControl, INotifyPropertyChanged, IDat
 
   <h3 id="Avalonia_Controls_DataGridColumnHeader_HeaderPointerReleasedEvent" data-uid="Avalonia.Controls.DataGridColumnHeader.HeaderPointerReleasedEvent">
   HeaderPointerReleasedEvent
-  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/DataGridColumnHeader.cs/#L84"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/DataGridColumnHeader.cs/#L87"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>Identifies the <a class="xref" href="Avalonia.Controls.DataGridColumnHeader.html#Avalonia_Controls_DataGridColumnHeader_HeaderPointerReleased">HeaderPointerReleased</a> routed event.</p>
@@ -1260,7 +1260,7 @@ public class DataGridColumnHeader : ContentControl, INotifyPropertyChanged, IDat
 
   <h3 id="Avalonia_Controls_DataGridColumnHeader_LeftClickEvent" data-uid="Avalonia.Controls.DataGridColumnHeader.LeftClickEvent">
   LeftClickEvent
-  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/DataGridColumnHeader.cs/#L72"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/DataGridColumnHeader.cs/#L75"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>Identifies the <a class="xref" href="Avalonia.Controls.DataGridColumnHeader.html#Avalonia_Controls_DataGridColumnHeader_LeftClick">LeftClick</a> routed event.</p>
@@ -1291,7 +1291,7 @@ public class DataGridColumnHeader : ContentControl, INotifyPropertyChanged, IDat
 
   <h3 id="Avalonia_Controls_DataGridColumnHeader_OwningColumnProperty" data-uid="Avalonia.Controls.DataGridColumnHeader.OwningColumnProperty">
   OwningColumnProperty
-  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/DataGridColumnHeader.cs/#L101"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/DataGridColumnHeader.cs/#L104"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"></div>
@@ -1321,7 +1321,7 @@ public class DataGridColumnHeader : ContentControl, INotifyPropertyChanged, IDat
 
   <h3 id="Avalonia_Controls_DataGridColumnHeader_SeparatorBrushProperty" data-uid="Avalonia.Controls.DataGridColumnHeader.SeparatorBrushProperty">
   SeparatorBrushProperty
-  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/DataGridColumnHeader.cs/#L87"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/DataGridColumnHeader.cs/#L90"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"></div>
@@ -1351,7 +1351,7 @@ public class DataGridColumnHeader : ContentControl, INotifyPropertyChanged, IDat
 
   <h3 id="Avalonia_Controls_DataGridColumnHeader_ShowFilterButtonProperty" data-uid="Avalonia.Controls.DataGridColumnHeader.ShowFilterButtonProperty">
   ShowFilterButtonProperty
-  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/DataGridColumnHeader.cs/#L113"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/DataGridColumnHeader.cs/#L116"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"></div>
@@ -1386,7 +1386,7 @@ public class DataGridColumnHeader : ContentControl, INotifyPropertyChanged, IDat
 
   <h3 id="Avalonia_Controls_DataGridColumnHeader_AreSeparatorsVisible" data-uid="Avalonia.Controls.DataGridColumnHeader.AreSeparatorsVisible">
   AreSeparatorsVisible
-  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/DataGridColumnHeader.cs/#L116"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/DataGridColumnHeader.cs/#L119"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"></div>
@@ -1417,7 +1417,7 @@ public class DataGridColumnHeader : ContentControl, INotifyPropertyChanged, IDat
 
   <h3 id="Avalonia_Controls_DataGridColumnHeader_FilterFlyout" data-uid="Avalonia.Controls.DataGridColumnHeader.FilterFlyout">
   FilterFlyout
-  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/DataGridColumnHeader.cs/#L128"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/DataGridColumnHeader.cs/#L131"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"></div>
@@ -1448,7 +1448,7 @@ public class DataGridColumnHeader : ContentControl, INotifyPropertyChanged, IDat
 
   <h3 id="Avalonia_Controls_DataGridColumnHeader_FilterTheme" data-uid="Avalonia.Controls.DataGridColumnHeader.FilterTheme">
   FilterTheme
-  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/DataGridColumnHeader.cs/#L122"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/DataGridColumnHeader.cs/#L125"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"></div>
@@ -1479,7 +1479,7 @@ public class DataGridColumnHeader : ContentControl, INotifyPropertyChanged, IDat
 
   <h3 id="Avalonia_Controls_DataGridColumnHeader_OwningColumn" data-uid="Avalonia.Controls.DataGridColumnHeader.OwningColumn">
   OwningColumn
-  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/DataGridColumnHeader.cs/#L213"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/DataGridColumnHeader.cs/#L216"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"></div>
@@ -1510,7 +1510,7 @@ public class DataGridColumnHeader : ContentControl, INotifyPropertyChanged, IDat
 
   <h3 id="Avalonia_Controls_DataGridColumnHeader_SeparatorBrush" data-uid="Avalonia.Controls.DataGridColumnHeader.SeparatorBrush">
   SeparatorBrush
-  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/DataGridColumnHeader.cs/#L90"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/DataGridColumnHeader.cs/#L93"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"></div>
@@ -1541,7 +1541,7 @@ public class DataGridColumnHeader : ContentControl, INotifyPropertyChanged, IDat
 
   <h3 id="Avalonia_Controls_DataGridColumnHeader_ShowFilterButton" data-uid="Avalonia.Controls.DataGridColumnHeader.ShowFilterButton">
   ShowFilterButton
-  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/DataGridColumnHeader.cs/#L134"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/DataGridColumnHeader.cs/#L137"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"></div>
@@ -1576,7 +1576,7 @@ public class DataGridColumnHeader : ContentControl, INotifyPropertyChanged, IDat
 
   <h3 id="Avalonia_Controls_DataGridColumnHeader_OnApplyTemplate_Avalonia_Controls_Primitives_TemplateAppliedEventArgs_" data-uid="Avalonia.Controls.DataGridColumnHeader.OnApplyTemplate(Avalonia.Controls.Primitives.TemplateAppliedEventArgs)">
   OnApplyTemplate(TemplateAppliedEventArgs)
-  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/DataGridColumnHeader.cs/#L194"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/DataGridColumnHeader.cs/#L197"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>Called when the control's template is applied.
@@ -1610,7 +1610,7 @@ In simple terms, this means the method is called just before the control is disp
 
   <h3 id="Avalonia_Controls_DataGridColumnHeader_OnCreateAutomationPeer" data-uid="Avalonia.Controls.DataGridColumnHeader.OnCreateAutomationPeer">
   OnCreateAutomationPeer()
-  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/DataGridColumnHeader.cs/#L173"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/DataGridColumnHeader.cs/#L176"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>Returns a new, type-specific <span class="xref">Avalonia.Automation.Peers.AutomationPeer</span> implementation for the control.</p>
@@ -1646,7 +1646,7 @@ In simple terms, this means the method is called just before the control is disp
 
   <h3 id="Avalonia_Controls_DataGridColumnHeader_HeaderPointerPressed" data-uid="Avalonia.Controls.DataGridColumnHeader.HeaderPointerPressed">
   HeaderPointerPressed
-  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/DataGridColumnHeader.cs/#L372"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/DataGridColumnHeader.cs/#L413"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>Occurs when the pointer is pressed over the column's header.</p>
@@ -1677,7 +1677,7 @@ In simple terms, this means the method is called just before the control is disp
 
   <h3 id="Avalonia_Controls_DataGridColumnHeader_HeaderPointerReleased" data-uid="Avalonia.Controls.DataGridColumnHeader.HeaderPointerReleased">
   HeaderPointerReleased
-  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/DataGridColumnHeader.cs/#L381"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/DataGridColumnHeader.cs/#L422"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>Occurs when the pointer is released over the column's header.</p>
@@ -1708,7 +1708,7 @@ In simple terms, this means the method is called just before the control is disp
 
   <h3 id="Avalonia_Controls_DataGridColumnHeader_LeftClick" data-uid="Avalonia.Controls.DataGridColumnHeader.LeftClick">
   LeftClick
-  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/DataGridColumnHeader.cs/#L363"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/DataGridColumnHeader.cs/#L404"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"></div>
@@ -1739,7 +1739,7 @@ In simple terms, this means the method is called just before the control is disp
 </article>
 
         <div class="contribution d-print-none">
-          <a href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/DataGridColumnHeader.cs/#L34" class="edit-link">Edit this page</a>
+          <a href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/DataGridColumnHeader.cs/#L36" class="edit-link">Edit this page</a>
         </div>
 
 

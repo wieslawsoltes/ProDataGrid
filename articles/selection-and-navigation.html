@@ -125,6 +125,14 @@ public SelectionModel&lt;MyItem&gt; MySelectionModel { get; } = new()
           HeadersVisibility=&quot;All&quot; /&gt;
 </code></pre>
 <p>When <code>SelectionUnit</code> includes cells, <code>SelectedCells</code> is an <code>IList&lt;DataGridCellInfo&gt;</code> that you can bind and inspect.</p>
+<h2 id="selectedcolumns">SelectedColumns</h2>
+<p>Enable column header selection with <code>SelectionUnit=CellOrColumnHeader</code> (or <code>CellOrRowOrColumnHeader</code>) and <code>CanUserSelectColumns=&quot;True&quot;</code>. You can bind <code>SelectedColumns</code> to observe full-column selections:</p>
+<pre><code class="lang-xml">&lt;DataGrid ItemsSource=&quot;{Binding Items}&quot;
+          SelectionUnit=&quot;CellOrColumnHeader&quot;
+          CanUserSelectColumns=&quot;True&quot;
+          SelectedColumns=&quot;{Binding SelectedColumns, Mode=TwoWay}&quot; /&gt;
+</code></pre>
+<p><code>SelectedColumns</code> is an <code>IList&lt;DataGridColumn&gt;</code> representing fully-selected columns.</p>
 <h2 id="selection-stability-and-paging">Selection Stability and Paging</h2>
 <ul>
 <li>Selection stays attached to items as rows are inserted, removed, shuffled, filtered, or sorted.</li>
@@ -156,6 +164,10 @@ public SelectionModel&lt;MyItem&gt; MySelectionModel { get; } = new()
 <h2 id="cell-and-row-selection">Cell and Row Selection</h2>
 <ul>
 <li><code>SelectionUnit=FullRow</code> or <code>Cell</code> controls selection granularity.</li>
+<li><code>SelectionUnit=CellOrRowHeader</code> enables row header selection for rows.</li>
+<li><code>SelectionUnit=CellOrColumnHeader</code> enables column header selection for columns.</li>
+<li><code>SelectionUnit=CellOrRowOrColumnHeader</code> enables both row and column header selection.</li>
+<li><code>CanUserSelectRows</code> and <code>CanUserSelectColumns</code> gate header selection gestures.</li>
 <li><code>CurrentCell</code> and <code>CurrentItem</code> are kept in sync with keyboard navigation.</li>
 </ul>
 <h2 id="currentcell-binding">CurrentCell Binding</h2>

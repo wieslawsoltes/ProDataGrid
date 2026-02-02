@@ -89,6 +89,8 @@
 <li><code>SelectionUnit=FullRow</code> highlights full rows and uses row headers for selection.</li>
 <li><code>SelectionUnit=Cell</code> highlights individual cells; rows still track selection for <code>SelectedItems</code> unless you suppress row visuals.</li>
 <li><code>SelectionUnit=CellOrRowHeader</code> lets row headers select rows and cell clicks select cells.</li>
+<li><code>SelectionUnit=CellOrColumnHeader</code> lets column headers select columns and cell clicks select cells.</li>
+<li><code>SelectionUnit=CellOrRowOrColumnHeader</code> enables both row and column header selection.</li>
 </ul>
 <p>Use <code>SelectionMode=Extended</code> for range selection (Shift) and multi-select (Ctrl/Cmd). <code>SelectionMode=Single</code> keeps a single active selection.</p>
 <h2 id="pseudo-classes">Pseudo classes</h2>
@@ -107,6 +109,12 @@
 <li><code>:focus</code> - current cell with focus.</li>
 </ul>
 <p><code>DataGridCell:row-selected</code> lets you show a subtle row highlight even when only some cells are selected, while <code>DataGridCell:cell-selected</code> can be a stronger highlight for the selected cells themselves.</p>
+<h3 id="datagridcolumnheader">DataGridColumnHeader</h3>
+<ul>
+<li><code>:selected</code> - column is fully selected (all visible rows are selected in that column).</li>
+<li><code>:current</code> - current column (current cell’s column).</li>
+<li><code>:pointerover</code> - hover state.</li>
+</ul>
 <h2 id="theme-resource-keys">Theme resource keys</h2>
 <p>Cell selection brushes can be customized via theme resources (Fluent and Simple define defaults):</p>
 <ul>
@@ -116,6 +124,14 @@
 <li><code>DataGridCellSelectedHoveredUnfocusedBackgroundBrush</code></li>
 </ul>
 <p>Row selection continues to use the existing row brushes such as <code>DataGridRowSelectedBackgroundBrush</code>.</p>
+<p>Column header selection brushes:</p>
+<ul>
+<li><code>DataGridColumnHeaderSelectedBackgroundBrush</code></li>
+<li><code>DataGridColumnHeaderSelectedHoveredBackgroundBrush</code></li>
+<li><code>DataGridColumnHeaderSelectedForegroundBrush</code></li>
+<li><code>DataGridColumnHeaderCurrentBackgroundBrush</code></li>
+<li><code>DataGridColumnHeaderCurrentForegroundBrush</code></li>
+</ul>
 <h2 id="styling-examples">Styling examples</h2>
 <p>Override the brushes:</p>
 <pre><code class="lang-xml">&lt;Styles.Resources&gt;
@@ -144,6 +160,7 @@
 <ul>
 <li>For cell highlighting, set <code>SelectionUnit=Cell</code> or <code>SelectionUnit=CellOrRowHeader</code>.</li>
 <li>For row highlighting without cell selection, use <code>SelectionUnit=FullRow</code>.</li>
+<li>For column header selection, use <code>SelectionUnit=CellOrColumnHeader</code> (or <code>CellOrRowOrColumnHeader</code>) and set <code>CanUserSelectColumns=&quot;True&quot;</code>.</li>
 <li>Bind <code>SelectedCells</code> when working with cell selection so you can inspect selected ranges.</li>
 </ul>
 <h2 id="samples">Samples</h2>

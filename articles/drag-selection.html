@@ -89,6 +89,8 @@
 <li><strong>FullRow</strong>: drag up or down to extend the row selection from the anchor row.</li>
 <li><strong>Cell</strong>: drag to select a rectangular range of cells.</li>
 <li><strong>CellOrRowHeader</strong>: drag a row header for row selection; drag inside cells for cell selection.</li>
+<li><strong>CellOrColumnHeader</strong>: drag inside cells for cell selection; click column headers to select full columns.</li>
+<li><strong>CellOrRowOrColumnHeader</strong>: drag row headers for row selection, click column headers for column selection, and drag inside cells for ranges.</li>
 <li><strong>SelectionMode</strong>: works in <code>Single</code> (selection follows the pointer) and <code>Extended</code> (range selection).</li>
 </ul>
 <p>The selection anchor is set by the initial click, so dragging behaves like a Shift-extend gesture without requiring the Shift key.</p>
@@ -96,7 +98,8 @@
 <p>Dragging outside the visible rows or cells starts auto-scrolling, keeping the selection range expanding as the grid scrolls.</p>
 <h2 id="notes">Notes</h2>
 <ul>
-<li>Drag selection uses the mouse pointer; touch and pen are left to scroll and gesture interactions.</li>
+<li>Drag selection uses the mouse pointer by default; touch and pen are left to scroll and gesture interactions.</li>
+<li>Set <code>AllowTouchDragSelection=&quot;True&quot;</code> to enable drag selection for touch and pen input.</li>
 <li><code>SelectionChanged</code> includes <code>Source=Pointer</code> and carries the triggering pointer event for diagnostics.</li>
 <li>Holding Ctrl/Cmd preserves existing selections while the drag range updates.</li>
 <li>The hover row (<code>:pointerover</code>) refreshes when drag selection ends to match the row under the pointer.</li>

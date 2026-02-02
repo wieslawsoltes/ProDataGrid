@@ -998,6 +998,20 @@
     },
     {
       "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.DataGridColumnDragHandle.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.DataGridColumnDragHandle.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.DataGridColumnDragHandle",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
       "source_relative_path": "api/Avalonia.Controls.DataGridColumnEventArgs.yml",
       "output": {
         ".html": {
@@ -4340,6 +4354,20 @@
       "Uid": null,
       "IsMRef": true,
       "Title": "Avalonia.Controls.DataGridSelectedCellsChangedEventArgs",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.DataGridSelectedColumnsChangedEventArgs.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.DataGridSelectedColumnsChangedEventArgs.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.DataGridSelectedColumnsChangedEventArgs",
       "Summary": null
     },
     {
