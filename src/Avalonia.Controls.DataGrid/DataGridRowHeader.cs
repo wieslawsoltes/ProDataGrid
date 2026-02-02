@@ -11,7 +11,9 @@ using Avalonia.Controls.Metadata;
 using Avalonia.Controls.DataGridDragDrop;
 using Avalonia.Input;
 using Avalonia.Media;
+using Avalonia.VisualTree;
 using System.Diagnostics;
+using System.Linq;
 
 namespace Avalonia.Controls.Primitives
 {
@@ -89,6 +91,40 @@ internal
                 }
                 return null;
             }
+        }
+
+        private bool IsDragGripHit(object source, PointerEventArgs e)
+        {
+            if (source is Visual visual)
+            {
+                foreach (var ancestor in visual.GetSelfAndVisualAncestors())
+                {
+                    if (ancestor is StyledElement styled && styled.Name == "DragGrip" &&
+                        ancestor is Visual gripVisual && gripVisual.IsVisible)
+                    {
+                        return true;
+                    }
+                }
+            }
+
+            var dragGrip = this.GetVisualDescendants()
+                .OfType<Control>()
+                .FirstOrDefault(control => control.Name == "DragGrip");
+
+            if (dragGrip == null || !dragGrip.IsVisible)
+            {
+                return false;
+            }
+
+            var point = e.GetPosition(this);
+            var origin = dragGrip.TranslatePoint(new Point(0, 0), this);
+            if (!origin.HasValue)
+            {
+                return false;
+            }
+
+            var bounds = new Rect(origin.Value, dragGrip.Bounds.Size);
+            return bounds.Contains(point);
         }
 
         private int Slot
@@ -203,7 +239,11 @@ internal
                 return;
             }
 
-            if (e.GetCurrentPoint(this).Properties.IsLeftButtonPressed)
+            var point = e.GetCurrentPoint(this);
+            var isTouchLike = e.Pointer.Type == PointerType.Touch || e.Pointer.Type == PointerType.Pen;
+            var isPrimaryPressed = point.Properties.IsLeftButtonPressed ||
+                                   (isTouchLike && OwningGrid.AllowTouchDragSelection);
+            if (isPrimaryPressed)
             {
                 if (!e.Handled)
                 //if (!e.Handled && OwningGrid.IsTabStop)
@@ -211,10 +251,13 @@ internal
                     OwningGrid.Focus();
                 }
 
+                var rowDragHandleVisible =
+                    OwningGrid.RowDragHandleVisible &&
+                    (OwningGrid.RowDragHandle == DataGridRowDragHandle.RowHeader ||
+                     OwningGrid.RowDragHandle == DataGridRowDragHandle.RowHeaderAndRow);
                 var suppressToggleForDragHandle =
                     OwningGrid.CanUserReorderRows &&
-                    OwningGrid.RowDragHandle == DataGridRowDragHandle.RowHeader &&
-                    OwningGrid.RowDragHandleVisible;
+                    rowDragHandleVisible;
 
                 if (!suppressToggleForDragHandle &&
                     OwningGrid != null &&
@@ -226,13 +269,34 @@ internal
 
                 if (OwningRow != null)
                 {
+                    if (!OwningGrid.AllowsRowHeaderSelection)
+                    {
+                        return;
+                    }
+
                     Debug.Assert(sender is DataGridRowHeader);
                     Debug.Assert(sender == this);
-                    e.Handled = OwningGrid.UpdateStateOnMouseLeftButtonDown(e, -1, Slot, false);
-                    OwningGrid.TryBeginSelectionDrag(e, -1, startDragging: true);
+                    var dragHandleHit = IsDragGripHit(e.Source, e);
+                    if (OwningGrid.TryHandleRowHeaderSelection(e, Slot, dragHandleHit))
+                    {
+                        if (!dragHandleHit)
+                        {
+                            var rowIndex = OwningGrid.RowIndexFromSlot(Slot);
+                            OwningGrid.TryBeginRowHeaderSelectionDrag(e, rowIndex);
+                        }
+
+                        e.Handled = true;
+                        return;
+                    }
+
+                    e.Handled = OwningGrid.UpdateStateOnMouseLeftButtonDown(e, -1, Slot, allowEdit: false, ignoreModifiers: dragHandleHit);
+                    if (!dragHandleHit)
+                    {
+                        OwningGrid.TryBeginSelectionDrag(e, -1, startDragging: true);
+                    }
                 }
             }
-            else if (e.GetCurrentPoint(this).Properties.IsRightButtonPressed)
+            else if (point.Properties.IsRightButtonPressed)
             {
                 if (!e.Handled)
                 {
@@ -240,8 +304,19 @@ internal
                 }
                 if (OwningRow != null)
                 {
+                    if (!OwningGrid.AllowsRowHeaderSelection)
+                    {
+                        return;
+                    }
+
                     Debug.Assert(sender is DataGridRowHeader);
                     Debug.Assert(sender == this);
+                    if (OwningGrid.TryHandleRowHeaderSelection(e, Slot))
+                    {
+                        e.Handled = true;
+                        return;
+                    }
+
                     e.Handled = OwningGrid.UpdateStateOnMouseRightButtonDown(e, -1, Slot, false);
                 }
             }

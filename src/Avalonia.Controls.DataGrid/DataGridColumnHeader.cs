@@ -8,6 +8,7 @@
 using System;
 using System.ComponentModel;
 using System.Diagnostics;
+using System.Linq;
 using Avalonia.Automation;
 using Avalonia.Automation.Peers;
 using Avalonia.Collections;
@@ -24,6 +25,7 @@ using Avalonia.Interactivity;
 using Avalonia.Media;
 using Avalonia.Styling;
 using Avalonia.Utilities;
+using Avalonia.VisualTree;
 using Button = Avalonia.Controls.Button;
 
 namespace Avalonia.Controls
@@ -31,7 +33,7 @@ namespace Avalonia.Controls
     /// <summary>
     /// Represents an individual <see cref="T:Avalonia.Controls.DataGrid" /> column header.
     /// </summary>
-    [PseudoClasses(":dragIndicator", ":pressed", ":sortascending", ":sortdescending", ":filtered")]
+    [PseudoClasses(":dragIndicator", ":pressed", ":sortascending", ":sortdescending", ":filtered", ":selected", ":current")]
 #if !DATAGRID_INTERNAL
 public
 #else
@@ -65,6 +67,7 @@ internal
         private static Lazy<Cursor> _resizeCursor = new Lazy<Cursor>(() => new Cursor(StandardCursorType.SizeWestEast));
         private DataGridColumn _owningColumn;
         private bool _suppressSortOnClick;
+        private bool _allowColumnReorder;
 
         /// <summary>
         /// Identifies the <see cref="LeftClick"/> routed event.
@@ -236,6 +239,40 @@ internal
             _suppressSortOnClick = true;
         }
 
+        internal bool IsDragGripHit(object source, PointerEventArgs e)
+        {
+            if (source is Visual visual)
+            {
+                foreach (var ancestor in visual.GetSelfAndVisualAncestors())
+                {
+                    if (ancestor is StyledElement styled && styled.Name == "DragGrip" &&
+                        ancestor is Visual gripVisual && gripVisual.IsVisible)
+                    {
+                        return true;
+                    }
+                }
+            }
+
+            var dragGrip = this.GetVisualDescendants()
+                .OfType<Control>()
+                .FirstOrDefault(control => control.Name == "DragGrip");
+
+            if (dragGrip == null || !dragGrip.IsVisible)
+            {
+                return false;
+            }
+
+            var point = e.GetPosition(this);
+            var origin = dragGrip.TranslatePoint(new Point(0, 0), this);
+            if (!origin.HasValue)
+            {
+                return false;
+            }
+
+            var bounds = new Rect(origin.Value, dragGrip.Bounds.Size);
+            return bounds.Contains(point);
+        }
+
         internal ListSortDirection? CurrentSortingState
         {
             get;
@@ -287,6 +324,10 @@ internal
                 CurrentSortingState == ListSortDirection.Descending);
             PseudoClassesHelper.Set(PseudoClasses, ":filtered",
                 OwningGrid?.GetFilteringDescriptorForColumn(OwningColumn) != null);
+            var isSelected = OwningGrid?.IsColumnSelected(OwningColumn) == true;
+            PseudoClassesHelper.Set(PseudoClasses, ":selected", isSelected);
+            PseudoClassesHelper.Set(PseudoClasses, ":current",
+                isSelected && OwningGrid?.IsColumnCurrent(OwningColumn) == true);
         }
 
         private void FilterButton_Click(object sender, RoutedEventArgs e)
@@ -707,6 +748,18 @@ internal
             }
 
             _suppressSortOnClick = false;
+
+            var dragHandleHit = OwningGrid != null
+                && OwningGrid.ColumnDragHandle == DataGridColumnDragHandle.DragHandle
+                && IsDragGripHit(e.Source, e);
+            _allowColumnReorder = OwningGrid != null &&
+                (OwningGrid.ColumnDragHandle == DataGridColumnDragHandle.ColumnHeader || dragHandleHit);
+
+            if (dragHandleHit)
+            {
+                SuppressSortOnClick();
+            }
+
             Point mousePosition = e.GetPosition(this);
             bool handled = e.Handled;
             OnMouseLeftButtonDown(ref handled, e, mousePosition);
@@ -1033,7 +1086,7 @@ internal
             }
 
             //handle entry into reorder mode
-            if (_dragMode == DragMode.MouseDown && _dragColumn == null && _lastMousePositionHeaders != null)
+            if (_dragMode == DragMode.MouseDown && _dragColumn == null && _lastMousePositionHeaders != null && _allowColumnReorder)
             {
                 var distanceFromInitial = (Vector)(mousePositionHeaders - _lastMousePositionHeaders);
                 if (distanceFromInitial.Length > DATAGRIDCOLUMNHEADER_columnsDragTreshold)

@@ -154,6 +154,7 @@ namespace Avalonia.Controls
             {
                 var isSelected = isSelectedOverride ?? (Slot != -1 && OwningGrid.GetRowSelection(Slot));
                 IsSelected = isSelected;
+                UpdateSelectionPseudoClasses();
                 PseudoClassesHelper.Set(PseudoClasses, ":editing", IsEditing);
                 PseudoClassesHelper.Set(PseudoClasses, ":invalid", ValidationSeverity == DataGridValidationSeverity.Error);
                 PseudoClassesHelper.Set(PseudoClasses, ":warning", ValidationSeverity == DataGridValidationSeverity.Warning);

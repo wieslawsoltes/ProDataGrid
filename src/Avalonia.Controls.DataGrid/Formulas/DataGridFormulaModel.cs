@@ -89,6 +89,8 @@ namespace Avalonia.Controls.DataGridFormulas
         private readonly Dictionary<FormulaCellAddress, FormulaValue> _spillValues = new();
         private readonly Dictionary<string, FormulaExpression> _nameExpressions =
             new(StringComparer.OrdinalIgnoreCase);
+        private readonly Dictionary<string, NamedRangeEntry> _namedRanges =
+            new(StringComparer.OrdinalIgnoreCase);
         private readonly Dictionary<string, IDataGridColumnValueAccessor> _accessors =
             new(StringComparer.OrdinalIgnoreCase);
         private readonly Dictionary<string, DataGridFormulaColumnDefinition> _formulaColumns =
@@ -371,6 +373,75 @@ namespace Avalonia.Controls.DataGridFormulas
                 QueueRecalculate();
                 return false;
             }
+        }
+
+        public bool TrySetNamedRange(string name, string? formulaText, out string? error)
+        {
+            error = null;
+            var trimmed = name?.Trim();
+            if (string.IsNullOrWhiteSpace(trimmed))
+            {
+                error = "Name is required.";
+                return false;
+            }
+
+            if (!IsValidName(trimmed))
+            {
+                error = "Invalid name.";
+                return false;
+            }
+
+            EnsureColumnMaps();
+            if (_columnIndexByName.ContainsKey(trimmed))
+            {
+                error = "Name conflicts with a column header.";
+                return false;
+            }
+
+            var normalized = NormalizeFormulaText(formulaText);
+            if (string.IsNullOrWhiteSpace(normalized))
+            {
+                if (_namedRanges.Remove(trimmed))
+                {
+                    BuildNameExpressions();
+                    _engine.RefreshDependenciesForNames(_workbook);
+                    QueueRecalculate();
+                }
+
+                return true;
+            }
+
+            try
+            {
+                var expression = _parser.Parse(normalized, _settings.CreateParseOptions());
+                _namedRanges[trimmed] = new NamedRangeEntry(normalized, expression);
+                BuildNameExpressions();
+                _engine.RefreshDependenciesForNames(_workbook);
+                QueueRecalculate();
+                return true;
+            }
+            catch (FormulaParseException ex)
+            {
+                error = ex.Message;
+                return false;
+            }
+        }
+
+        public bool TryGetNamedRange(string name, out string? formulaText)
+        {
+            formulaText = null;
+            if (string.IsNullOrWhiteSpace(name))
+            {
+                return false;
+            }
+
+            if (_namedRanges.TryGetValue(name.Trim(), out var entry))
+            {
+                formulaText = entry.FormulaText;
+                return true;
+            }
+
+            return false;
         }
 
         internal void InvalidateColumns()
@@ -849,6 +920,11 @@ namespace Avalonia.Controls.DataGridFormulas
                     var formulaText = NormalizeFormulaText(entry.FormulaDefinition.Formula);
                     if (string.IsNullOrWhiteSpace(formulaText))
                     {
+                        if (entry.FormulaDefinition.AllowCellFormulas)
+                        {
+                            GetOrCreateFormulaCell(row, entry.Index);
+                        }
+
                         continue;
                     }
 
@@ -1866,6 +1942,7 @@ namespace Avalonia.Controls.DataGridFormulas
             _nameExpressions.Clear();
             if (_columnIndexByName.Count == 0)
             {
+                AppendNamedRanges();
                 return;
             }
 
@@ -1894,6 +1971,26 @@ namespace Avalonia.Controls.DataGridFormulas
                 {
                     // Ignore invalid name expressions.
                 }
+            }
+
+            AppendNamedRanges();
+        }
+
+        private void AppendNamedRanges()
+        {
+            if (_namedRanges.Count == 0)
+            {
+                return;
+            }
+
+            foreach (var pair in _namedRanges)
+            {
+                if (_nameExpressions.ContainsKey(pair.Key))
+                {
+                    continue;
+                }
+
+                _nameExpressions[pair.Key] = pair.Value.Expression;
             }
         }
 
@@ -2206,6 +2303,61 @@ namespace Avalonia.Controls.DataGridFormulas
             return $"={trimmed}";
         }
 
+        private static bool IsValidName(string name)
+        {
+            if (string.IsNullOrWhiteSpace(name))
+            {
+                return false;
+            }
+
+            var trimmed = name.Trim();
+            if (LooksLikeCellReference(trimmed))
+            {
+                return false;
+            }
+
+            var first = trimmed[0];
+            if (!char.IsLetter(first) && first != '_' && first != '\\')
+            {
+                return false;
+            }
+
+            for (var i = 1; i < trimmed.Length; i++)
+            {
+                var ch = trimmed[i];
+                if (!char.IsLetterOrDigit(ch) && ch != '_' && ch != '.')
+                {
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
+        private static bool LooksLikeCellReference(string text)
+        {
+            var index = 0;
+            while (index < text.Length && char.IsLetter(text[index]))
+            {
+                index++;
+            }
+
+            if (index == 0 || index == text.Length)
+            {
+                return false;
+            }
+
+            for (var i = index; i < text.Length; i++)
+            {
+                if (!char.IsDigit(text[i]))
+                {
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
         private FormulaValue ConvertToFormulaValue(object? value)
         {
             if (value == null)
@@ -2362,6 +2514,19 @@ namespace Avalonia.Controls.DataGridFormulas
             public string? SortMemberPath { get; }
 
             public int Index { get; }
+        }
+
+        private readonly struct NamedRangeEntry
+        {
+            public NamedRangeEntry(string formulaText, FormulaExpression expression)
+            {
+                FormulaText = formulaText;
+                Expression = expression;
+            }
+
+            public string FormulaText { get; }
+
+            public FormulaExpression Expression { get; }
         }
 
         private sealed class DataGridFormulaWorkbook : IFormulaWorkbook,

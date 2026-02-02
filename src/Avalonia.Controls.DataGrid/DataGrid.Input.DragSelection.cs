@@ -39,6 +39,18 @@ internal
         private int _dragLastSlot = -1;
         private int _dragLastColumnIndex = -1;
         private bool _dragCapturePending;
+        private HeaderSelectionDragMode _headerSelectionDragMode;
+        private int _dragHeaderAnchorRowIndex = -1;
+        private int _dragHeaderAnchorColumnIndex = -1;
+
+        private enum HeaderSelectionDragMode
+        {
+            None,
+            RowHeader,
+            ColumnHeader
+        }
+
+        internal bool IsHeaderSelectionDragActive => _headerSelectionDragMode != HeaderSelectionDragMode.None;
 
         internal void TryBeginSelectionDrag(PointerPressedEventArgs e, int columnIndex, bool startDragging)
         {
@@ -47,7 +59,7 @@ internal
                 return;
             }
 
-            if (e.Pointer.Type == PointerType.Touch || e.Pointer.Type == PointerType.Pen)
+            if ((e.Pointer.Type == PointerType.Touch || e.Pointer.Type == PointerType.Pen) && !AllowTouchDragSelection)
             {
                 return;
             }
@@ -116,6 +128,74 @@ internal
             // Capture happens once the drag threshold is met.
         }
 
+        internal void TryBeginRowHeaderSelectionDrag(PointerPressedEventArgs e, int rowIndex)
+        {
+            if (SelectionMode != DataGridSelectionMode.Extended)
+            {
+                return;
+            }
+
+            if (rowIndex < 0)
+            {
+                return;
+            }
+
+            BeginHeaderSelectionDrag(e, HeaderSelectionDragMode.RowHeader, rowIndex, columnIndex: -1);
+        }
+
+        internal void TryBeginColumnHeaderSelectionDrag(PointerPressedEventArgs e, int columnIndex)
+        {
+            if (SelectionMode != DataGridSelectionMode.Extended)
+            {
+                return;
+            }
+
+            if (columnIndex < 0)
+            {
+                return;
+            }
+
+            BeginHeaderSelectionDrag(e, HeaderSelectionDragMode.ColumnHeader, rowIndex: -1, columnIndex);
+        }
+
+        private void BeginHeaderSelectionDrag(PointerPressedEventArgs e, HeaderSelectionDragMode mode, int rowIndex, int columnIndex)
+        {
+            if ((e.Pointer.Type == PointerType.Touch || e.Pointer.Type == PointerType.Pen) && !AllowTouchDragSelection)
+            {
+                return;
+            }
+
+            if (!IsEnabled)
+            {
+                return;
+            }
+
+            if (e.Pointer.Captured is Visual captured &&
+                !captured.GetSelfAndVisualAncestors().Contains(this))
+            {
+                return;
+            }
+
+            EndSelectionDrag();
+
+            _isDraggingSelection = true;
+            _isRowSelectionDragging = false;
+            _headerSelectionDragMode = mode;
+            _dragHeaderAnchorRowIndex = rowIndex;
+            _dragHeaderAnchorColumnIndex = columnIndex;
+            _dragPointer = e.Pointer;
+            _dragPointerId = e.Pointer.Id;
+            _dragStartPoint = e.GetPosition(this);
+            _dragLastPoint = _dragStartPoint;
+            _dragLastModifiers = e.KeyModifiers;
+            _dragTriggerEvent = e;
+            _dragLastSlot = rowIndex >= 0 ? SlotFromRowIndex(rowIndex) : CurrentSlot;
+            _dragLastColumnIndex = columnIndex >= 0 ? columnIndex : CurrentColumnIndex;
+            _dragAnchorSlot = AnchorSlot != -1 ? AnchorSlot : CurrentSlot;
+            _dragAnchorCell = null;
+            _dragCapturePending = true;
+        }
+
         private bool ShouldDragSelectRows(int columnIndex)
         {
             if (SelectionUnit == DataGridSelectionUnit.FullRow)
@@ -123,7 +203,7 @@ internal
                 return true;
             }
 
-            return columnIndex < 0;
+            return columnIndex < 0 && AllowsRowHeaderSelection;
         }
 
         private void EndSelectionDrag()
@@ -150,6 +230,9 @@ internal
             _dragLastColumnIndex = -1;
             _dragAnchorSlot = -1;
             _dragAnchorCell = null;
+            _headerSelectionDragMode = HeaderSelectionDragMode.None;
+            _dragHeaderAnchorRowIndex = -1;
+            _dragHeaderAnchorColumnIndex = -1;
 
             if (wasDragging)
             {
@@ -177,7 +260,8 @@ internal
             }
 
             var current = e.GetCurrentPoint(this);
-            if (!current.Properties.IsLeftButtonPressed)
+            var isTouchLike = e.Pointer.Type == PointerType.Touch || e.Pointer.Type == PointerType.Pen;
+            if (!current.Properties.IsLeftButtonPressed && !(isTouchLike && AllowTouchDragSelection))
             {
                 EndSelectionDrag();
                 return;
@@ -241,12 +325,121 @@ internal
 
             _dragLastPoint = position;
 
-            var updated = _isRowSelectionDragging
-                ? UpdateRowSelectionForDrag(position, modifiers)
-                : UpdateCellSelectionForDrag(position, modifiers);
+            var updated = _headerSelectionDragMode != HeaderSelectionDragMode.None
+                ? UpdateHeaderSelectionForDrag(position, modifiers)
+                : _isRowSelectionDragging
+                    ? UpdateRowSelectionForDrag(position, modifiers)
+                    : UpdateCellSelectionForDrag(position, modifiers);
 
             UpdateDragAutoScroll(position);
             return updated;
+        }
+
+        private bool UpdateHeaderSelectionForDrag(Point position, KeyModifiers modifiers)
+        {
+            if (DataConnection == null || DataConnection.Count == 0 || ColumnsItemsInternal == null || ColumnsItemsInternal.Count == 0)
+            {
+                return false;
+            }
+
+            KeyboardHelper.GetMetaKeyState(this, modifiers, out bool ctrl, out _);
+            var append = SelectionMode == DataGridSelectionMode.Extended && ctrl;
+
+            if (_headerSelectionDragMode == HeaderSelectionDragMode.RowHeader)
+            {
+                if (!TryGetDragRowTarget(position, out var slot))
+                {
+                    return false;
+                }
+
+                if (slot == _dragLastSlot)
+                {
+                    return false;
+                }
+
+                var rowIndex = RowIndexFromSlot(slot);
+                if (rowIndex < 0)
+                {
+                    return false;
+                }
+
+                var anchorRowIndex = _dragHeaderAnchorRowIndex >= 0 ? _dragHeaderAnchorRowIndex : rowIndex;
+                var startRow = Math.Min(anchorRowIndex, rowIndex);
+                var endRow = Math.Max(anchorRowIndex, rowIndex);
+                var range = new DataGridCellRange(startRow, endRow, 0, ColumnsItemsInternal.Count - 1);
+
+                if (!ApplyCellSelectionRange(range, append, DataGridSelectionChangeSource.Pointer, _dragTriggerEvent))
+                {
+                    return false;
+                }
+
+                SetRowHeaderSelectionRange(startRow, endRow, append);
+
+                var anchorSlot = SlotFromRowIndex(startRow);
+                if (anchorSlot >= 0 && !IsGroupSlot(anchorSlot))
+                {
+                    var anchorColumn = ColumnsInternal.FirstVisibleNonFillerColumn;
+                    var anchorColumnIndex = anchorColumn?.Index ?? range.StartColumn;
+                    SetCurrentCellCore(anchorColumnIndex, anchorSlot, commitEdit: true, endRowEdit: false);
+                }
+
+                _dragLastSlot = slot;
+                _rowHeaderAnchorIndex = anchorRowIndex;
+                return true;
+            }
+
+            if (_headerSelectionDragMode == HeaderSelectionDragMode.ColumnHeader)
+            {
+                if (!TryGetColumnIndexFromPoint(position, out var columnIndex))
+                {
+                    return false;
+                }
+
+                if (columnIndex == _dragLastColumnIndex)
+                {
+                    return false;
+                }
+
+                var anchorDisplayIndex = _dragHeaderAnchorColumnIndex >= 0
+                    ? GetColumnDisplayIndex(_dragHeaderAnchorColumnIndex)
+                    : GetColumnDisplayIndex(columnIndex);
+                if (anchorDisplayIndex < 0)
+                {
+                    anchorDisplayIndex = GetColumnDisplayIndex(columnIndex);
+                }
+
+                var currentDisplayIndex = GetColumnDisplayIndex(columnIndex);
+                if (currentDisplayIndex < 0)
+                {
+                    return false;
+                }
+
+                var startDisplayIndex = Math.Min(anchorDisplayIndex, currentDisplayIndex);
+                var endDisplayIndex = Math.Max(anchorDisplayIndex, currentDisplayIndex);
+
+                if (!ApplyColumnHeaderSelectionRange(startDisplayIndex, endDisplayIndex, append, DataGridSelectionChangeSource.Pointer, _dragTriggerEvent))
+                {
+                    return false;
+                }
+
+                SetColumnHeaderSelectionRange(startDisplayIndex, endDisplayIndex, append);
+
+                var anchorSlot = SlotFromRowIndex(0);
+                if (anchorSlot >= 0 && !IsGroupSlot(anchorSlot))
+                {
+                    var startColumnIndex = GetColumnIndexFromDisplayIndex(startDisplayIndex);
+                    if (startColumnIndex >= 0)
+                    {
+                        SetCurrentCellCore(startColumnIndex, anchorSlot, commitEdit: true, endRowEdit: false);
+                    }
+                }
+
+                _dragLastColumnIndex = columnIndex;
+                _columnHeaderAnchorIndex = _dragHeaderAnchorColumnIndex >= 0 ? _dragHeaderAnchorColumnIndex : columnIndex;
+                return true;
+            }
+
+            return false;
         }
 
         private static bool ArePointsClose(Point left, Point right)
@@ -746,6 +939,7 @@ internal
             {
                 var presenterPoint = _rowsPresenter != null ? this.TranslatePoint(point, _rowsPresenter) : null;
                 var presenterSize = _rowsPresenter?.Bounds.Size ?? default;
+                var isRowSelection = _isRowSelectionDragging || _headerSelectionDragMode == HeaderSelectionDragMode.RowHeader;
                 direction = model.GetAutoScrollDirection(new DataGridAutoScrollContext(
                     this,
                     point,
@@ -753,7 +947,7 @@ internal
                     presenterSize,
                     ActualRowHeaderWidth,
                     CellsWidth,
-                    _isRowSelectionDragging));
+                    isRowSelection));
             }
             else
             {

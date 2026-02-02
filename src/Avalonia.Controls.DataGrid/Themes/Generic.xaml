@@ -16,6 +16,7 @@
       <StreamGeometry x:Key="DataGridRowGroupHeaderIconClosedPath">M4.895 10 L4.895 10 M7.65 4.15c.2-.2.5-.2.7 0l5.49 5.46c.21.22.21.57 0 .78l-5.49 5.46a.5.5 0 0 1-.7-.7L12.8 10 7.65 4.85a.5.5 0 0 1 0-.7Z M16.595 10 L16.595 10</StreamGeometry>
       <StreamGeometry x:Key="DataGridRowGroupHeaderIconOpenedPath">M10 4.895 L10 4.895 M15.85 7.65c.2.2.2.5 0 .7l-5.46 5.49a.55.55 0 0 1-.78 0L4.15 8.35a.5.5 0 1 1 .7-.7L10 12.8l5.15-5.16c.2-.2.5-.2.7 0Z M10 16.595 L10 16.595</StreamGeometry>
       <StreamGeometry x:Key="DataGridDragGripIconPath">M4 3 a1 1 0 1 1 0.001 0 M8 3 a1 1 0 1 1 0.001 0 M4 7 a1 1 0 1 1 0.001 0 M8 7 a1 1 0 1 1 0.001 0 M4 11 a1 1 0 1 1 0.001 0 M8 11 a1 1 0 1 1 0.001 0</StreamGeometry>
+      <StreamGeometry x:Key="DataGridColumnDragGripIconPath">M3 4 a1 1 0 1 1 0.001 0 M7 4 a1 1 0 1 1 0.001 0 M11 4 a1 1 0 1 1 0.001 0 M3 8 a1 1 0 1 1 0.001 0 M7 8 a1 1 0 1 1 0.001 0 M11 8 a1 1 0 1 1 0.001 0</StreamGeometry>
 
       <!-- Cell corner radius -->
       <CornerRadius x:Key="DataGridCellCornerRadius">0</CornerRadius>
@@ -797,25 +798,27 @@
                     CornerRadius="{TemplateBinding CornerRadius}">
               <Grid Name="PART_ColumnHeaderRoot" ColumnDefinitions="*,Auto">
 
-                <Panel Margin="{TemplateBinding Padding}"
-                       HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
-                       VerticalAlignment="{TemplateBinding VerticalContentAlignment}">
-                  <Grid>
-                    <Grid.ColumnDefinitions>
-                      <ColumnDefinition Width="*" />
-                      <ColumnDefinition Width="Auto" MinWidth="{DynamicResource DataGridSortIconMinWidth}" />
-                    </Grid.ColumnDefinitions>
+                <Grid>
+                  <Panel Margin="{TemplateBinding Padding}"
+                         HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                         VerticalAlignment="{TemplateBinding VerticalContentAlignment}">
+                    <Grid>
+                      <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" MinWidth="{DynamicResource DataGridSortIconMinWidth}" />
+                      </Grid.ColumnDefinitions>
 
-                    <ContentPresenter x:Name="PART_ContentPresenter"
-                                      Content="{TemplateBinding Content}"
-                                      ContentTemplate="{TemplateBinding ContentTemplate}"
-                                      VerticalAlignment="{TemplateBinding VerticalContentAlignment}" />
+                      <ContentPresenter x:Name="PART_ContentPresenter"
+                                        Grid.Column="0"
+                                        Content="{TemplateBinding Content}"
+                                        ContentTemplate="{TemplateBinding ContentTemplate}"
+                                        VerticalAlignment="{TemplateBinding VerticalContentAlignment}" />
 
-                    <StackPanel Grid.Column="1"
-                                Orientation="Horizontal"
-                                Spacing="{DynamicResource DataGridColumnHeaderIconSpacing}"
-                                HorizontalAlignment="Center"
-                                VerticalAlignment="Center">
+                      <StackPanel Grid.Column="1"
+                                  Orientation="Horizontal"
+                                  Spacing="{DynamicResource DataGridColumnHeaderIconSpacing}"
+                                  HorizontalAlignment="Center"
+                                  VerticalAlignment="Center">
                       <Button Name="PART_FilterButton"
                               Theme="{TemplateBinding FilterTheme}"
                               FlyoutBase.AttachedFlyout="{TemplateBinding FilterFlyout}"
@@ -837,8 +840,27 @@
                             Data="{DynamicResource DataGridFilterIconPath}"
                             Stretch="Uniform" />
                     </StackPanel>
-                  </Grid>
-                </Panel>
+                    </Grid>
+                  </Panel>
+
+                  <Border x:Name="DragGrip"
+                          HorizontalAlignment="Stretch"
+                          VerticalAlignment="Top"
+                          Height="{DynamicResource DataGridColumnHeaderDragGripSize}"
+                          Margin="{DynamicResource DataGridColumnHeaderDragGripMargin}"
+                          Background="Transparent"
+                          IsVisible="False">
+                    <Path x:Name="DragGripIcon"
+                          HorizontalAlignment="Center"
+                          VerticalAlignment="Center"
+                          Width="{DynamicResource DataGridColumnHeaderDragGripSize}"
+                          Height="{DynamicResource DataGridColumnHeaderDragGripSize}"
+                          Stretch="Uniform"
+                          Fill="{TemplateBinding Foreground}"
+                          StrokeThickness="0"
+                          Data="{DynamicResource DataGridColumnDragGripIconPath}" />
+                  </Border>
+                </Grid>
 
                 <Rectangle Name="VerticalSeparator"
                            Grid.Column="1"
@@ -874,12 +896,26 @@
           <Setter Property="IsVisible" Value="True" />
         </Style>
 
-        <Style Selector="^:pointerover /template/ Grid#PART_ColumnHeaderRoot">
+        <Style Selector="^:pointerover:not(:selected):not(:current) /template/ Grid#PART_ColumnHeaderRoot">
           <Setter Property="Background" Value="{DynamicResource DataGridColumnHeaderHoveredBackgroundBrush}" />
         </Style>
 
         <Style Selector="^:pressed /template/ Grid#PART_ColumnHeaderRoot">
           <Setter Property="Background" Value="{DynamicResource DataGridColumnHeaderPressedBackgroundBrush}" />
+        </Style>
+
+        <Style Selector="^:selected">
+          <Setter Property="Background" Value="{DynamicResource DataGridColumnHeaderSelectedBackgroundBrush}" />
+          <Setter Property="Foreground" Value="{DynamicResource DataGridColumnHeaderSelectedForegroundBrush}" />
+        </Style>
+
+        <Style Selector="^:selected:pointerover">
+          <Setter Property="Background" Value="{DynamicResource DataGridColumnHeaderSelectedBackgroundBrush}" />
+        </Style>
+
+        <Style Selector="^:current">
+          <Setter Property="Background" Value="{DynamicResource DataGridColumnHeaderSelectedBackgroundBrush}" />
+          <Setter Property="Foreground" Value="{DynamicResource DataGridColumnHeaderSelectedForegroundBrush}" />
         </Style>
 
         <Style Selector="^:dragIndicator">
@@ -957,17 +993,23 @@
                          Fill="{TemplateBinding SeparatorBrush}"
                          IsVisible="{TemplateBinding AreSeparatorsVisible}" />
 
-              <Path x:Name="DragGrip"
-                    Grid.RowSpan="2"
-                    HorizontalAlignment="Center"
-                    VerticalAlignment="Center"
-                    Width="{DynamicResource DataGridRowHeaderDragGripSize}"
-                    Height="{DynamicResource DataGridRowHeaderDragGripSize}"
-                    Stretch="Uniform"
-                    Fill="{TemplateBinding Foreground}"
-                    StrokeThickness="0"
-                    IsVisible="False"
-                    Data="{DynamicResource DataGridDragGripIconPath}" />
+              <Border x:Name="DragGrip"
+                      Grid.RowSpan="2"
+                      HorizontalAlignment="Center"
+                      VerticalAlignment="Stretch"
+                      Width="{DynamicResource DataGridRowHeaderDragGripSize}"
+                      Background="Transparent"
+                      IsVisible="False">
+                <Path x:Name="DragGripIcon"
+                      HorizontalAlignment="Center"
+                      VerticalAlignment="Center"
+                      Width="{DynamicResource DataGridRowHeaderDragGripSize}"
+                      Height="{DynamicResource DataGridRowHeaderDragGripSize}"
+                      Stretch="Uniform"
+                      Fill="{TemplateBinding Foreground}"
+                      StrokeThickness="0"
+                      Data="{DynamicResource DataGridDragGripIconPath}" />
+              </Border>
 
               <ContentPresenter Grid.RowSpan="2"
                                 Grid.Column="1"
@@ -1499,17 +1541,32 @@
   <Style Selector="DataGrid[SelectionUnit=CellOrRowHeader] DataGridCell:pointerover:not(:cell-selected):not(:searchmatch):not(:searchcurrent)">
     <Setter Property="Background" Value="{DynamicResource DataGridCellHoveredBackgroundBrush}" />
   </Style>
+  <Style Selector="DataGrid[SelectionUnit=CellOrColumnHeader] DataGridCell:pointerover:not(:cell-selected):not(:searchmatch):not(:searchcurrent)">
+    <Setter Property="Background" Value="{DynamicResource DataGridCellHoveredBackgroundBrush}" />
+  </Style>
+  <Style Selector="DataGrid[SelectionUnit=CellOrRowOrColumnHeader] DataGridCell:pointerover:not(:cell-selected):not(:searchmatch):not(:searchcurrent)">
+    <Setter Property="Background" Value="{DynamicResource DataGridCellHoveredBackgroundBrush}" />
+  </Style>
   <Style Selector="DataGrid[SelectionUnit=CellOrRowHeader] DataGridRowHeader:pointerover /template/ Rectangle#BackgroundRectangle">
+    <Setter Property="Fill" Value="{DynamicResource DataGridRowHoveredBackgroundBrush}" />
+    <Setter Property="Opacity" Value="1" />
+  </Style>
+  <Style Selector="DataGrid[SelectionUnit=CellOrRowOrColumnHeader] DataGridRowHeader:pointerover /template/ Rectangle#BackgroundRectangle">
     <Setter Property="Fill" Value="{DynamicResource DataGridRowHoveredBackgroundBrush}" />
     <Setter Property="Opacity" Value="1" />
   </Style>
 
   <!-- Drag and Drop Styles -->
-  <Style Selector="DataGrid:row-drag-enabled:row-drag-handle-visible DataGridRowHeader">
+  <Style Selector="DataGrid:column-drag-enabled:column-drag-handle-visible DataGridColumnHeader:pointerover /template/ Border#DragGrip">
+    <Setter Property="IsVisible" Value="True" />
     <Setter Property="Cursor" Value="SizeAll" />
   </Style>
 
-  <Style Selector="DataGrid:row-drag-enabled:row-drag-handle-visible DataGridRowHeader /template/ Path#DragGrip">
+  <Style Selector="DataGrid:row-drag-enabled:row-drag-handle-visible DataGridRowHeader:pointerover">
+    <Setter Property="Cursor" Value="SizeAll" />
+  </Style>
+
+  <Style Selector="DataGrid:row-drag-enabled:row-drag-handle-visible DataGridRowHeader:pointerover /template/ Border#DragGrip">
     <Setter Property="IsVisible" Value="True" />
   </Style>
 
@@ -1517,7 +1574,7 @@
     <Setter Property="Cursor" Value="Arrow" />
   </Style>
 
-  <Style Selector="DataGridRow:placeholder DataGridRowHeader /template/ Path#DragGrip">
+  <Style Selector="DataGridRow:placeholder DataGridRowHeader /template/ Border#DragGrip">
     <Setter Property="IsVisible" Value="False" />
   </Style>
 </Styles>

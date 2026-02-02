@@ -13,6 +13,17 @@
           <SolidColorBrush x:Key="DataGridColumnHeaderHoveredBackgroundBrush" Color="{DynamicResource SystemListLowColor}" />
           <SolidColorBrush x:Key="DataGridColumnHeaderPressedBackgroundBrush" Color="{DynamicResource SystemListMediumColor}" />
           <SolidColorBrush x:Key="DataGridColumnHeaderDraggedBackgroundBrush" Color="{DynamicResource SystemChromeMediumLowColor}" />
+          <SolidColorBrush x:Key="DataGridColumnHeaderSelectedBackgroundBrush"
+                           Color="{DynamicResource SystemAccentColor}"
+                           Opacity="{DynamicResource ListAccentLowOpacity}" />
+          <SolidColorBrush x:Key="DataGridColumnHeaderSelectedHoveredBackgroundBrush"
+                           Color="{DynamicResource SystemAccentColor}"
+                           Opacity="{DynamicResource ListAccentMediumOpacity}" />
+          <SolidColorBrush x:Key="DataGridColumnHeaderSelectedForegroundBrush" Color="{DynamicResource SystemBaseHighColor}" />
+          <SolidColorBrush x:Key="DataGridColumnHeaderCurrentBackgroundBrush"
+                           Color="{DynamicResource SystemAccentColor}"
+                           Opacity="{DynamicResource ListAccentMediumOpacity}" />
+          <SolidColorBrush x:Key="DataGridColumnHeaderCurrentForegroundBrush" Color="{DynamicResource SystemBaseHighColor}" />
           <SolidColorBrush x:Key="DataGridRowGroupHeaderBackgroundBrush" Color="{DynamicResource SystemChromeMediumColor}" />
           <SolidColorBrush x:Key="DataGridRowGroupHeaderPressedBackgroundBrush" Color="{DynamicResource SystemListMediumColor}" />
           <SolidColorBrush x:Key="DataGridRowGroupHeaderForegroundBrush" Color="{DynamicResource SystemBaseHighColor}" />
@@ -67,6 +78,17 @@
           <SolidColorBrush x:Key="DataGridColumnHeaderHoveredBackgroundBrush" Color="{DynamicResource SystemListLowColor}" />
           <SolidColorBrush x:Key="DataGridColumnHeaderPressedBackgroundBrush" Color="{DynamicResource SystemListMediumColor}" />
           <SolidColorBrush x:Key="DataGridColumnHeaderDraggedBackgroundBrush" Color="{DynamicResource SystemChromeMediumLowColor}" />
+          <SolidColorBrush x:Key="DataGridColumnHeaderSelectedBackgroundBrush"
+                           Color="{DynamicResource SystemAccentColor}"
+                           Opacity="{DynamicResource ListAccentLowOpacity}" />
+          <SolidColorBrush x:Key="DataGridColumnHeaderSelectedHoveredBackgroundBrush"
+                           Color="{DynamicResource SystemAccentColor}"
+                           Opacity="{DynamicResource ListAccentMediumOpacity}" />
+          <SolidColorBrush x:Key="DataGridColumnHeaderSelectedForegroundBrush" Color="{DynamicResource SystemBaseHighColor}" />
+          <SolidColorBrush x:Key="DataGridColumnHeaderCurrentBackgroundBrush"
+                           Color="{DynamicResource SystemAccentColor}"
+                           Opacity="{DynamicResource ListAccentMediumOpacity}" />
+          <SolidColorBrush x:Key="DataGridColumnHeaderCurrentForegroundBrush" Color="{DynamicResource SystemBaseHighColor}" />
           <SolidColorBrush x:Key="DataGridRowGroupHeaderBackgroundBrush" Color="{DynamicResource SystemChromeMediumColor}" />
           <SolidColorBrush x:Key="DataGridRowGroupHeaderPressedBackgroundBrush" Color="{DynamicResource SystemListMediumColor}" />
           <SolidColorBrush x:Key="DataGridRowGroupHeaderForegroundBrush" Color="{DynamicResource SystemBaseHighColor}" />
@@ -132,6 +154,7 @@
       <x:Double x:Key="DataGridSummaryRowMinHeight">32</x:Double>
       <x:Double x:Key="DataGridColumnHeaderIconSize">12</x:Double>
       <x:Double x:Key="DataGridColumnHeaderIconSpacing">4</x:Double>
+      <x:Double x:Key="DataGridColumnHeaderDragGripSize">10</x:Double>
       <x:Double x:Key="DataGridRowHeaderDragGripSize">12</x:Double>
       <x:Double x:Key="DataGridRowGroupHeaderExpanderSize">12</x:Double>
       <x:Double x:Key="DataGridHierarchicalExpanderSize">28</x:Double>
@@ -148,6 +171,7 @@
       <Thickness x:Key="DataGridCellComboBoxPadding">8,0</Thickness>
       <Thickness x:Key="DataGridColumnHeaderPadding">12,0,0,0</Thickness>
       <Thickness x:Key="DataGridColumnHeaderSortIconMargin">0,0,4,0</Thickness>
+      <Thickness x:Key="DataGridColumnHeaderDragGripMargin">2,0,2,0</Thickness>
       <Thickness x:Key="DataGridRowGroupHeaderExpanderMargin">12,0,0,0</Thickness>
       <Thickness x:Key="DataGridRowGroupHeaderContentMargin">12,0,0,0</Thickness>
       <Thickness x:Key="DataGridRowGroupHeaderTextMargin">4,0,0,0</Thickness>

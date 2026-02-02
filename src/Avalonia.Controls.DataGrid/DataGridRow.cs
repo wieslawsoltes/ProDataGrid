@@ -736,10 +736,25 @@ internal
                     OwningGrid.SetRowSelection(Slot, value, false);
                 }
 
-                PseudoClassesHelper.Set(PseudoClasses, ":selected", value);
+                UpdateSelectionPseudoClasses();
             }
 
             base.OnPropertyChanged(change);
+        }
+
+        internal void UpdateSelectionPseudoClasses()
+        {
+            bool isSelected = false;
+            if (OwningGrid != null && Slot != -1)
+            {
+                isSelected = OwningGrid.IsRowFullySelected(Slot);
+            }
+            else
+            {
+                isSelected = IsSelected;
+            }
+
+            PseudoClassesHelper.Set(PseudoClasses, ":selected", isSelected);
         }
 
         internal void UpdateSearchPseudoClasses(bool isSearchMatch, bool isSearchCurrent)

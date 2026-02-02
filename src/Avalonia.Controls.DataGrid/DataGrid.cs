@@ -375,6 +375,7 @@ internal
         private DataGridSelectedItemsCollection _selectedItems;
         private IList _selectedItemsBinding;
         private int _columnHeaderAnchorIndex = -1;
+        private int _rowHeaderAnchorIndex = -1;
         private INotifyCollectionChanged _selectedItemsBindingNotifications;
         private IList<DataGridCellInfo> _selectedCellsBinding;
         private INotifyCollectionChanged _selectedCellsBindingNotifications;
@@ -392,6 +393,14 @@ internal
         private bool _syncingSelectedCells;
         private readonly Dictionary<int, HashSet<int>> _selectedCells = new();
         private readonly AvaloniaList<DataGridCellInfo> _selectedCellsView = new();
+        private IList<DataGridColumn> _selectedColumnsBinding;
+        private INotifyCollectionChanged _selectedColumnsBindingNotifications;
+        private bool _syncingSelectedColumns;
+        private readonly Dictionary<int, int> _selectedColumnCounts = new();
+        private readonly HashSet<int> _selectedColumnIndices = new();
+        private readonly HashSet<int> _selectedRowHeaderIndices = new();
+        private readonly HashSet<int> _selectedColumnHeaderIndices = new();
+        private readonly AvaloniaList<DataGridColumn> _selectedColumnsView = new();
         private DataGridCellCoordinates _cellAnchor = new DataGridCellCoordinates(-1, -1);
         private int _preferredSelectionIndex = -1;
         private IDataGridSelectionModelFactory _selectionModelFactory;
@@ -527,7 +536,10 @@ internal
             ColumnsProperty.Changed.AddClassHandler<DataGrid>((x, e) => x.OnColumnsPropertyChanged(e));
             ColumnDefinitionsSourceProperty.Changed.AddClassHandler<DataGrid>((x, e) => x.OnColumnDefinitionsSourceChanged(e));
             ColumnDisplayIndexChangedEvent.AddClassHandler<DataGrid>((x, e) => x.OnColumnDisplayIndexChangedBinding(e));
+            CanUserReorderColumnsProperty.Changed.AddClassHandler<DataGrid>((x, e) => x.OnCanUserReorderColumnsChanged(e));
             CanUserReorderRowsProperty.Changed.AddClassHandler<DataGrid>((x, e) => x.OnCanUserReorderRowsChanged(e));
+            ColumnDragHandleProperty.Changed.AddClassHandler<DataGrid>((x, e) => x.OnColumnDragHandleChanged(e));
+            ColumnDragHandleVisibleProperty.Changed.AddClassHandler<DataGrid>((x, e) => x.OnColumnDragHandleVisibleChanged(e));
             RowDragHandleProperty.Changed.AddClassHandler<DataGrid>((x, e) => x.OnRowDragHandleChanged(e));
             RowDragHandleVisibleProperty.Changed.AddClassHandler<DataGrid>((x, e) => x.OnRowDragHandleVisibleChanged(e));
             RowDropHandlerProperty.Changed.AddClassHandler<DataGrid>((x, e) => x.OnRowDropHandlerChanged(e));
@@ -565,6 +577,7 @@ internal
             _selectedItems = new DataGridSelectedItemsCollection(this);
             _selectedItems.CollectionChanged += OnSelectedItemsCollectionChanged;
             _selectedCellsView.CollectionChanged += OnSelectedCellsCollectionChanged;
+            _selectedColumnsView.CollectionChanged += OnSelectedColumnsCollectionChanged;
             RowGroupHeadersTable = new IndexToValueTable<DataGridRowGroupInfo>();
             RowGroupFootersTable = new IndexToValueTable<DataGridRowGroupInfo>();
             _bindingValidationErrors = new List<Exception>();
@@ -627,8 +640,17 @@ internal
         {
             PseudoClassesHelper.Set(PseudoClasses, ":empty-columns", !ColumnsInternal.GetVisibleColumns().Any());
             PseudoClassesHelper.Set(PseudoClasses, ":empty-rows", !DataConnection.Any());
+            PseudoClassesHelper.Set(PseudoClasses, ":column-drag-enabled", CanUserReorderColumns);
+            PseudoClassesHelper.Set(
+                PseudoClasses,
+                ":column-drag-handle-visible",
+                CanUserReorderColumns && ColumnDragHandle == DataGridColumnDragHandle.DragHandle && ColumnDragHandleVisible);
             PseudoClassesHelper.Set(PseudoClasses, ":row-drag-enabled", CanUserReorderRows);
-            PseudoClassesHelper.Set(PseudoClasses, ":row-drag-handle-visible", CanUserReorderRows && RowDragHandleVisible);
+            var rowDragHandleVisible = CanUserReorderRows &&
+                                       RowDragHandleVisible &&
+                                       (RowDragHandle == DataGridDragDrop.DataGridRowDragHandle.RowHeader ||
+                                        RowDragHandle == DataGridDragDrop.DataGridRowDragHandle.RowHeaderAndRow);
+            PseudoClassesHelper.Set(PseudoClasses, ":row-drag-handle-visible", rowDragHandleVisible);
             PseudoClassesHelper.Set(PseudoClasses, ":summary-top", _totalSummaryPosition == DataGridSummaryRowPosition.Top);
             PseudoClassesHelper.Set(PseudoClasses, ":summary-bottom", _totalSummaryPosition == DataGridSummaryRowPosition.Bottom);
         }
@@ -745,6 +767,38 @@ internal
         internal
 #endif
         event EventHandler<DataGridSelectedCellsChangedEventArgs> SelectedCellsChanged;
+
+        /// <summary>
+        /// Gets or sets the collection of selected columns.
+        /// </summary>
+#if !DATAGRID_INTERNAL
+        public
+#else
+        internal
+#endif
+        IList<DataGridColumn> SelectedColumns
+        {
+            get
+            {
+                if (_selectedColumnsBinding != null)
+                {
+                    return _selectedColumnsBinding;
+                }
+
+                return _selectedColumnsView;
+            }
+            set => SetSelectedColumnsCollection(value);
+        }
+
+        /// <summary>
+        /// Raised when the set of selected columns changes.
+        /// </summary>
+#if !DATAGRID_INTERNAL
+        public
+#else
+        internal
+#endif
+        event EventHandler<DataGridSelectedColumnsChangedEventArgs> SelectedColumnsChanged;
 
         /// <summary>
         /// Gets or sets the selection model that drives row selection.

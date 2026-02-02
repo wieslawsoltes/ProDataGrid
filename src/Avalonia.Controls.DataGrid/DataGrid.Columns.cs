@@ -551,6 +551,7 @@ internal
             {
                 row.Cells[updatedColumn.Index].IsVisible = updatedColumn.IsVisible;
                 row.InvalidateCellsIndex();
+                row.UpdateSelectionPseudoClasses();
             }
 
             UpdateSearchAdapterView();

@@ -1192,6 +1192,7 @@ namespace Avalonia.Controls
                 }
 
                 _owner.UpdatePseudoClasses();
+                _owner.RefreshSelectedColumnsFromCounts();
 
                 // Notify the summary service about the collection change
                 _owner.OnCollectionChangedForSummaries(e);

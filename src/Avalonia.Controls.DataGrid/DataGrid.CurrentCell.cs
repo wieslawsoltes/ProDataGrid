@@ -205,6 +205,12 @@ internal
                 var newColumn = CurrentColumn;
                 var newItem = CurrentItem;
 
+                if (!ReferenceEquals(oldColumn, newColumn))
+                {
+                    oldColumn?.HeaderCell?.UpdatePseudoClasses();
+                    newColumn?.HeaderCell?.UpdatePseudoClasses();
+                }
+
                 CoerceSelectedItem();
                 _previousCurrentColumn = newColumn;
                 _previousCurrentItem = newItem;

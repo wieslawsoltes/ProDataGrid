@@ -311,7 +311,15 @@ namespace Avalonia.Controls.DataGridDragDrop
         {
             if (header != null)
             {
-                return true;
+                var origin = header.TranslatePoint(new Point(0, 0), _grid);
+                if (origin.HasValue)
+                {
+                    var headerBounds = new Rect(origin.Value, header.Bounds.Size);
+                    if (headerBounds.Contains(gridPoint))
+                    {
+                        return true;
+                    }
+                }
             }
 
             if (_grid.RowDragHandle != DataGridRowDragHandle.RowHeader)
@@ -374,6 +382,12 @@ namespace Avalonia.Controls.DataGridDragDrop
         {
             if (_pointerId == null || e.Pointer.Id != _pointerId)
             {
+                return;
+            }
+
+            if (_grid.IsHeaderSelectionDragActive)
+            {
+                ResetPointerState();
                 return;
             }
 

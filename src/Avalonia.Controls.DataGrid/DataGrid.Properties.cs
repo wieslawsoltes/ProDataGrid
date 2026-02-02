@@ -125,6 +125,21 @@ internal
         }
 
         /// <summary>
+        /// Identifies the <see cref="CanUserSelectRows"/> dependency property.
+        /// </summary>
+        public static readonly StyledProperty<bool> CanUserSelectRowsProperty =
+            AvaloniaProperty.Register<DataGrid, bool>(nameof(CanUserSelectRows), true);
+
+        /// <summary>
+        /// Gets or sets a value that indicates whether the user can select entire rows by clicking the row header.
+        /// </summary>
+        public bool CanUserSelectRows
+        {
+            get { return GetValue(CanUserSelectRowsProperty); }
+            set { SetValue(CanUserSelectRowsProperty, value); }
+        }
+
+        /// <summary>
         /// Identifies the <see cref="SuppressSortOnColumnHeaderSelection"/> dependency property.
         /// </summary>
         public static readonly StyledProperty<bool> SuppressSortOnColumnHeaderSelectionProperty =
@@ -212,6 +227,40 @@ internal
         {
             get { return GetValue(CanUserReorderRowsProperty); }
             set { SetValue(CanUserReorderRowsProperty, value); }
+        }
+
+        /// <summary>
+        /// Identifies the <see cref="ColumnDragHandle"/> dependency property.
+        /// </summary>
+        public static readonly StyledProperty<DataGridColumnDragHandle> ColumnDragHandleProperty =
+            AvaloniaProperty.Register<DataGrid, DataGridColumnDragHandle>(
+                nameof(ColumnDragHandle),
+                defaultValue: DataGridColumnDragHandle.ColumnHeader);
+
+        /// <summary>
+        /// Gets or sets the column drag handle surface.
+        /// </summary>
+        public DataGridColumnDragHandle ColumnDragHandle
+        {
+            get { return GetValue(ColumnDragHandleProperty); }
+            set { SetValue(ColumnDragHandleProperty, value); }
+        }
+
+        /// <summary>
+        /// Identifies the <see cref="ColumnDragHandleVisible"/> dependency property.
+        /// </summary>
+        public static readonly StyledProperty<bool> ColumnDragHandleVisibleProperty =
+            AvaloniaProperty.Register<DataGrid, bool>(
+                nameof(ColumnDragHandleVisible),
+                defaultValue: true);
+
+        /// <summary>
+        /// Gets or sets a value that indicates whether the drag handle grip is visible in the column header.
+        /// </summary>
+        public bool ColumnDragHandleVisible
+        {
+            get => GetValue(ColumnDragHandleVisibleProperty);
+            set => SetValue(ColumnDragHandleVisibleProperty, value);
         }
 
         /// <summary>
@@ -744,6 +793,14 @@ internal
                 nameof(SelectionUnit),
                 defaultValue: DataGridSelectionUnit.FullRow);
 
+#if !DATAGRID_INTERNAL
+        public
+#else
+        internal
+#endif
+        static readonly StyledProperty<bool> AllowTouchDragSelectionProperty =
+            AvaloniaProperty.Register<DataGrid, bool>(nameof(AllowTouchDragSelection));
+
         /// <summary>
         /// Gets or sets the selection behavior of the data grid.
         /// </summary>
@@ -770,6 +827,20 @@ internal
         {
             get { return GetValue(SelectionUnitProperty); }
             set { SetValue(SelectionUnitProperty, value); }
+        }
+
+        /// <summary>
+        /// Gets or sets whether drag selection is allowed for touch or pen input.
+        /// </summary>
+#if !DATAGRID_INTERNAL
+        public
+#else
+        internal
+#endif
+        bool AllowTouchDragSelection
+        {
+            get { return GetValue(AllowTouchDragSelectionProperty); }
+            set { SetValue(AllowTouchDragSelectionProperty, value); }
         }
 
         /// <summary>
@@ -1016,6 +1087,18 @@ internal
                 nameof(SelectedCells),
                 o => o.SelectedCells,
                 (o, v) => o.SelectedCells = v,
+                defaultBindingMode: BindingMode.TwoWay);
+
+#if !DATAGRID_INTERNAL
+        public
+#else
+        internal
+#endif
+        static readonly DirectProperty<DataGrid, IList<DataGridColumn>> SelectedColumnsProperty =
+            AvaloniaProperty.RegisterDirect<DataGrid, IList<DataGridColumn>>(
+                nameof(SelectedColumns),
+                o => o.SelectedColumns,
+                (o, v) => o.SelectedColumns = v,
                 defaultBindingMode: BindingMode.TwoWay);
 
 #if !DATAGRID_INTERNAL

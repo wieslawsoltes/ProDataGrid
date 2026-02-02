@@ -1263,6 +1263,215 @@ internal
             }
         }
 
+        private void SetSelectedColumnsCollection(IList<DataGridColumn> value)
+        {
+            IList<DataGridColumn> newValue = value ?? (IList<DataGridColumn>)_selectedColumnsView;
+            IList<DataGridColumn> oldValue = SelectedColumns;
+
+            if (ReferenceEquals(oldValue, newValue))
+            {
+                return;
+            }
+
+            DetachBoundSelectedColumns();
+            _selectedColumnsBinding = ReferenceEquals(newValue, _selectedColumnsView) ? null : newValue;
+            AttachBoundSelectedColumns();
+
+            RaisePropertyChanged(SelectedColumnsProperty, oldValue, SelectedColumns);
+
+            if (_selectedColumnsBinding != null)
+            {
+                ApplySelectedColumnsFromBinding(_selectedColumnsBinding);
+            }
+        }
+
+        private void AttachBoundSelectedColumns()
+        {
+            if (_selectedColumnsBinding is INotifyCollectionChanged incc)
+            {
+                _selectedColumnsBindingNotifications = incc;
+                WeakEventHandlerManager.Subscribe<INotifyCollectionChanged, NotifyCollectionChangedEventArgs, DataGrid>(
+                    _selectedColumnsBindingNotifications,
+                    nameof(INotifyCollectionChanged.CollectionChanged),
+                    OnBoundSelectedColumnsCollectionChanged);
+            }
+        }
+
+        private void DetachBoundSelectedColumns()
+        {
+            if (_selectedColumnsBindingNotifications != null)
+            {
+                WeakEventHandlerManager.Unsubscribe<NotifyCollectionChangedEventArgs, DataGrid>(
+                    _selectedColumnsBindingNotifications,
+                    nameof(INotifyCollectionChanged.CollectionChanged),
+                    OnBoundSelectedColumnsCollectionChanged);
+                _selectedColumnsBindingNotifications = null;
+            }
+        }
+
+        private void OnBoundSelectedColumnsCollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
+        {
+            if (_syncingSelectedColumns || _selectedColumnsBinding == null)
+            {
+                return;
+            }
+
+            using var _ = BeginSelectionChangeScope(DataGridSelectionChangeSource.Programmatic);
+            try
+            {
+                _syncingSelectedColumns = true;
+                ApplySelectedColumnsChangeFromBinding(e);
+            }
+            finally
+            {
+                _syncingSelectedColumns = false;
+            }
+        }
+
+        private void OnSelectedColumnsCollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
+        {
+            if (_syncingSelectedColumns || _selectedColumnsBinding == null)
+            {
+                return;
+            }
+
+            try
+            {
+                _syncingSelectedColumns = true;
+                ApplySelectedColumnsChangeToBinding(e);
+            }
+            finally
+            {
+                _syncingSelectedColumns = false;
+            }
+        }
+
+        private void ApplySelectedColumnsFromBinding(IList<DataGridColumn> boundColumns)
+        {
+            bool previousSync = _syncingSelectedColumns;
+            _syncingSelectedColumns = true;
+            try
+            {
+                var removedColumns = _selectedColumnsView.ToList();
+                var removedCells = _selectedCellsView.ToList();
+
+                ClearCellSelectionInternal(clearRows: true, raiseEvent: false);
+
+                var addedCells = new List<DataGridCellInfo>();
+                var rowCount = DataConnection?.Count ?? 0;
+                if (rowCount <= 0)
+                {
+                    if (removedColumns.Count > 0 || removedCells.Count > 0)
+                    {
+                        RaiseSelectedCellsChanged(Array.Empty<DataGridCellInfo>(), removedCells);
+                        RaiseSelectedColumnsChanged(Array.Empty<DataGridColumn>(), removedColumns);
+                    }
+
+                    return;
+                }
+
+                foreach (var column in boundColumns)
+                {
+                    if (column == null)
+                    {
+                        continue;
+                    }
+
+                    var columnIndex = column.Index;
+                    if (columnIndex < 0 || columnIndex >= ColumnsItemsInternal.Count)
+                    {
+                        continue;
+                    }
+
+                    SelectCellRangeInternal(0, rowCount - 1, columnIndex, columnIndex, addedCells);
+                }
+
+                if (addedCells.Count > 0 || removedCells.Count > 0)
+                {
+                    RaiseSelectedCellsChanged(addedCells, removedCells);
+                }
+
+                var newColumns = _selectedColumnsView.ToList();
+                var removedSet = new HashSet<DataGridColumn>(removedColumns);
+                var newSet = new HashSet<DataGridColumn>(newColumns);
+
+                var addedColumns = new List<DataGridColumn>();
+                foreach (var column in newColumns)
+                {
+                    if (!removedSet.Contains(column))
+                    {
+                        addedColumns.Add(column);
+                    }
+                }
+
+                var removedDelta = new List<DataGridColumn>();
+                foreach (var column in removedColumns)
+                {
+                    if (!newSet.Contains(column))
+                    {
+                        removedDelta.Add(column);
+                    }
+                }
+
+                if (addedColumns.Count > 0 || removedDelta.Count > 0)
+                {
+                    RaiseSelectedColumnsChanged(addedColumns, removedDelta);
+                }
+            }
+            finally
+            {
+                _syncingSelectedColumns = previousSync;
+            }
+        }
+
+        private void ApplySelectedColumnsChangeFromBinding(NotifyCollectionChangedEventArgs e)
+        {
+            if (ReferenceEquals(_selectedColumnsBinding, _selectedColumnsView))
+            {
+                return;
+            }
+
+            switch (e.Action)
+            {
+                case NotifyCollectionChangedAction.Reset:
+                    ApplySelectedColumnsFromBinding(_selectedColumnsBinding);
+                    break;
+                default:
+                    ApplySelectedColumnsFromBinding(_selectedColumnsBinding);
+                    break;
+            }
+        }
+
+        private void ApplySelectedColumnsChangeToBinding(NotifyCollectionChangedEventArgs e)
+        {
+            if (_selectedColumnsBinding == null || ReferenceEquals(_selectedColumnsBinding, _selectedColumnsView))
+            {
+                return;
+            }
+
+            void CopyToBinding()
+            {
+                _selectedColumnsBinding.Clear();
+                foreach (var column in _selectedColumnsView)
+                {
+                    _selectedColumnsBinding.Add(column);
+                }
+            }
+
+            switch (e.Action)
+            {
+                case NotifyCollectionChangedAction.Reset:
+                    CopyToBinding();
+                    break;
+                case NotifyCollectionChangedAction.Add:
+                case NotifyCollectionChangedAction.Remove:
+                case NotifyCollectionChangedAction.Replace:
+                case NotifyCollectionChangedAction.Move:
+                    CopyToBinding();
+                    break;
+            }
+        }
+
         private bool TryNormalizeCell(DataGridCellInfo cell, out DataGridCellInfo normalized)
         {
             normalized = default;
@@ -1293,7 +1502,10 @@ internal
 
         private void ClearCellSelectionInternal(bool clearRows, bool raiseEvent = true)
         {
-            if (_selectedCells.Count == 0 && _selectedCellsView.Count == 0)
+            if (_selectedCells.Count == 0 &&
+                _selectedCellsView.Count == 0 &&
+                _selectedColumnCounts.Count == 0 &&
+                _selectedColumnsView.Count == 0)
             {
                 return;
             }
@@ -1302,6 +1514,8 @@ internal
 
             _selectedCells.Clear();
             _selectedCellsView.Clear();
+            ClearHeaderSelectionTracking();
+            ClearSelectedColumnsInternal(raiseEvent);
 
             if (clearRows && SelectionUnit != DataGridSelectionUnit.FullRow)
             {
@@ -1335,6 +1549,7 @@ internal
             }
 
             _selectedCellsView.Add(cell);
+            UpdateSelectedColumnCount(cell.ColumnIndex, delta: 1);
 
             addedCollector?.Add(cell);
             return true;
@@ -1359,6 +1574,18 @@ internal
                 removedCollector?.Add(existing);
             }
 
+            UpdateSelectedColumnCount(columnIndex, delta: -1);
+
+            if (_selectedRowHeaderIndices.Contains(rowIndex) && !IsRowFullySelectedByCells(rowIndex))
+            {
+                _selectedRowHeaderIndices.Remove(rowIndex);
+            }
+
+            if (_selectedColumnHeaderIndices.Contains(columnIndex) && !IsColumnFullySelectedByCells(columnIndex))
+            {
+                _selectedColumnHeaderIndices.Remove(columnIndex);
+            }
+
             return true;
         }
 
@@ -1371,9 +1598,222 @@ internal
 
             UpdateSelectionVisuals(addedCells);
             UpdateSelectionVisuals(removedCells);
+            UpdateRowSelectionVisuals(addedCells);
+            UpdateRowSelectionVisuals(removedCells);
+            UpdateColumnHeaderSelectionVisuals(addedCells);
+            UpdateColumnHeaderSelectionVisuals(removedCells);
 
             RequestSelectionOverlayRefresh();
             SelectedCellsChanged?.Invoke(this, new DataGridSelectedCellsChangedEventArgs(addedCells, removedCells));
+        }
+
+        private void RaiseSelectedColumnsChanged(IReadOnlyList<DataGridColumn> addedColumns, IReadOnlyList<DataGridColumn> removedColumns)
+        {
+            if (addedColumns.Count == 0 && removedColumns.Count == 0)
+            {
+                return;
+            }
+
+            SelectedColumnsChanged?.Invoke(this, new DataGridSelectedColumnsChangedEventArgs(addedColumns, removedColumns));
+        }
+
+        private void ClearSelectedColumnsInternal(bool raiseEvent)
+        {
+            if (_selectedColumnCounts.Count == 0 && _selectedColumnsView.Count == 0 && _selectedColumnIndices.Count == 0)
+            {
+                return;
+            }
+
+            var removed = _selectedColumnsView.ToList();
+            if (removed.Count == 0 && _selectedColumnIndices.Count > 0)
+            {
+                foreach (var index in _selectedColumnIndices)
+                {
+                    var column = GetColumnForIndex(index);
+                    if (column != null)
+                    {
+                        removed.Add(column);
+                    }
+                }
+            }
+            _selectedColumnCounts.Clear();
+            _selectedColumnIndices.Clear();
+            _selectedColumnHeaderIndices.Clear();
+            _selectedColumnsView.Clear();
+
+            foreach (var column in removed)
+            {
+                column?.HeaderCell?.UpdatePseudoClasses();
+            }
+
+            if (raiseEvent)
+            {
+                RaiseSelectedColumnsChanged(Array.Empty<DataGridColumn>(), removed);
+            }
+        }
+
+        private void UpdateSelectedColumnCount(int columnIndex, int delta)
+        {
+            if (DataConnection == null)
+            {
+                return;
+            }
+
+            var rowCount = DataConnection.Count;
+            if (rowCount <= 0)
+            {
+                return;
+            }
+
+            var nextCount = delta;
+            if (_selectedColumnCounts.TryGetValue(columnIndex, out var current))
+            {
+                nextCount = current + delta;
+            }
+
+            if (nextCount <= 0)
+            {
+                _selectedColumnCounts.Remove(columnIndex);
+            }
+            else
+            {
+                _selectedColumnCounts[columnIndex] = nextCount;
+            }
+
+            var shouldSelect = nextCount >= rowCount;
+            if (shouldSelect)
+            {
+                MarkColumnSelected(columnIndex);
+            }
+            else
+            {
+                MarkColumnUnselected(columnIndex);
+            }
+        }
+
+        private void MarkColumnSelected(int columnIndex)
+        {
+            if (!_selectedColumnIndices.Add(columnIndex))
+            {
+                return;
+            }
+
+            var column = GetColumnForIndex(columnIndex);
+            if (column == null)
+            {
+                return;
+            }
+
+            InsertSelectedColumn(column);
+
+            if (!_syncingSelectedColumns)
+            {
+                RaiseSelectedColumnsChanged(new[] { column }, Array.Empty<DataGridColumn>());
+            }
+
+            column.HeaderCell?.UpdatePseudoClasses();
+        }
+
+        private void MarkColumnUnselected(int columnIndex)
+        {
+            if (!_selectedColumnIndices.Remove(columnIndex))
+            {
+                return;
+            }
+
+            var column = GetColumnForIndex(columnIndex);
+            if (column == null)
+            {
+                return;
+            }
+
+            _selectedColumnsView.Remove(column);
+
+            if (!_syncingSelectedColumns)
+            {
+                RaiseSelectedColumnsChanged(Array.Empty<DataGridColumn>(), new[] { column });
+            }
+
+            column.HeaderCell?.UpdatePseudoClasses();
+        }
+
+        private void InsertSelectedColumn(DataGridColumn column)
+        {
+            var insertIndex = 0;
+            while (insertIndex < _selectedColumnsView.Count &&
+                   _selectedColumnsView[insertIndex].Index < column.Index)
+            {
+                insertIndex++;
+            }
+
+            if (insertIndex >= _selectedColumnsView.Count)
+            {
+                _selectedColumnsView.Add(column);
+            }
+            else
+            {
+                _selectedColumnsView.Insert(insertIndex, column);
+            }
+        }
+
+        private DataGridColumn GetColumnForIndex(int columnIndex)
+        {
+            if (ColumnsItemsInternal == null ||
+                columnIndex < 0 ||
+                columnIndex >= ColumnsItemsInternal.Count)
+            {
+                return null;
+            }
+
+            return ColumnsItemsInternal[columnIndex];
+        }
+
+        internal bool IsColumnSelected(DataGridColumn column)
+        {
+            if (column == null || SelectionUnit == DataGridSelectionUnit.FullRow)
+            {
+                return false;
+            }
+
+            return _selectedColumnIndices.Contains(column.Index);
+        }
+
+        internal bool IsColumnCurrent(DataGridColumn column)
+        {
+            if (column == null || SelectionUnit == DataGridSelectionUnit.FullRow)
+            {
+                return false;
+            }
+
+            return ReferenceEquals(CurrentColumn, column);
+        }
+
+        internal void RefreshSelectedColumnsFromCounts()
+        {
+            var rowCount = DataConnection?.Count ?? 0;
+            if (rowCount <= 0)
+            {
+                ClearSelectedColumnsInternal(raiseEvent: true);
+                return;
+            }
+
+            var selectedSnapshot = _selectedColumnIndices.ToList();
+            foreach (var index in selectedSnapshot)
+            {
+                var count = _selectedColumnCounts.TryGetValue(index, out var stored) ? stored : 0;
+                if (count < rowCount)
+                {
+                    MarkColumnUnselected(index);
+                }
+            }
+
+            foreach (var pair in _selectedColumnCounts)
+            {
+                if (pair.Value >= rowCount)
+                {
+                    MarkColumnSelected(pair.Key);
+                }
+            }
         }
 
         private void UpdateSelectionVisuals(IReadOnlyList<DataGridCellInfo> cells)
@@ -1405,10 +1845,243 @@ internal
             }
         }
 
+        private void UpdateRowSelectionVisuals(IReadOnlyList<DataGridCellInfo> cells)
+        {
+            if (cells.Count == 0 || DisplayData == null)
+            {
+                return;
+            }
+
+            HashSet<int>? updated = null;
+            foreach (var cell in cells)
+            {
+                if (!cell.IsValid)
+                {
+                    continue;
+                }
+
+                int slot = SlotFromRowIndex(cell.RowIndex);
+                if (!IsSlotVisible(slot))
+                {
+                    continue;
+                }
+
+                if (DisplayData.GetDisplayedElement(slot) is DataGridRow row)
+                {
+                    updated ??= new HashSet<int>();
+                    if (!updated.Add(slot))
+                    {
+                        continue;
+                    }
+
+                    row.UpdateSelectionPseudoClasses();
+                }
+            }
+        }
+
+        private void UpdateColumnHeaderSelectionVisuals(IReadOnlyList<DataGridCellInfo> cells)
+        {
+            if (cells.Count == 0 || ColumnsItemsInternal == null)
+            {
+                return;
+            }
+
+            HashSet<int>? updated = null;
+            foreach (var cell in cells)
+            {
+                if (!cell.IsValid)
+                {
+                    continue;
+                }
+
+                var columnIndex = cell.ColumnIndex;
+                if (columnIndex < 0 || columnIndex >= ColumnsItemsInternal.Count)
+                {
+                    continue;
+                }
+
+                updated ??= new HashSet<int>();
+                if (!updated.Add(columnIndex))
+                {
+                    continue;
+                }
+
+                ColumnsItemsInternal[columnIndex]?.HeaderCell?.UpdatePseudoClasses();
+            }
+        }
+
         internal bool IsCellSelected(int rowIndex, int columnIndex)
         {
             return _selectedCells.TryGetValue(rowIndex, out var columns) && columns.Contains(columnIndex);
         }
+
+        internal bool IsRowFullySelected(int slot)
+        {
+            if (SelectionUnit == DataGridSelectionUnit.FullRow)
+            {
+                return GetRowSelection(slot);
+            }
+
+            if (slot < 0 || ColumnsItemsInternal == null || ColumnsItemsInternal.Count == 0)
+            {
+                return false;
+            }
+
+            if (!GetRowSelection(slot))
+            {
+                return false;
+            }
+
+            int rowIndex = RowIndexFromSlot(slot);
+            if (rowIndex < 0)
+            {
+                return false;
+            }
+
+            if (!_selectedCells.TryGetValue(rowIndex, out var columns) || columns.Count == 0)
+            {
+                return SelectionUnit == DataGridSelectionUnit.CellOrRowHeader ||
+                       SelectionUnit == DataGridSelectionUnit.CellOrRowOrColumnHeader;
+            }
+
+            int visibleColumnCount = GetVisibleSelectableColumnCount();
+            return visibleColumnCount > 0 && columns.Count >= visibleColumnCount;
+        }
+
+        private int GetVisibleSelectableColumnCount()
+        {
+            if (ColumnsItemsInternal == null)
+            {
+                return 0;
+            }
+
+            int count = 0;
+            for (int i = 0; i < ColumnsItemsInternal.Count; i++)
+            {
+                var column = ColumnsItemsInternal[i];
+                if (column != null && column.IsVisible && column is not DataGridFillerColumn)
+                {
+                    count++;
+                }
+            }
+
+            return count;
+        }
+
+        private void ClearHeaderSelectionTracking()
+        {
+            _selectedRowHeaderIndices.Clear();
+            _selectedColumnHeaderIndices.Clear();
+        }
+
+        private void SetRowHeaderSelectionRange(int startRow, int endRow, bool append)
+        {
+            if (!append)
+            {
+                _selectedRowHeaderIndices.Clear();
+            }
+
+            if (DataConnection == null || startRow > endRow)
+            {
+                return;
+            }
+
+            var first = Math.Max(0, startRow);
+            var last = Math.Min(endRow, DataConnection.Count - 1);
+            for (var rowIndex = first; rowIndex <= last; rowIndex++)
+            {
+                _selectedRowHeaderIndices.Add(rowIndex);
+            }
+        }
+
+        private void SetColumnHeaderSelectionRange(int startColumn, int endColumn, bool append)
+        {
+            if (!append)
+            {
+                _selectedColumnHeaderIndices.Clear();
+            }
+
+            if (ColumnsInternal == null)
+            {
+                return;
+            }
+
+            var first = Math.Min(startColumn, endColumn);
+            var last = Math.Max(startColumn, endColumn);
+            for (var displayIndex = first; displayIndex <= last; displayIndex++)
+            {
+                var column = ColumnsInternal.GetColumnAtDisplayIndex(displayIndex);
+                if (column == null || column is DataGridFillerColumn)
+                {
+                    continue;
+                }
+
+                _selectedColumnHeaderIndices.Add(column.Index);
+            }
+        }
+
+        private bool IsRowHeaderSelectionActive(int rowIndex) => _selectedRowHeaderIndices.Contains(rowIndex);
+
+        private bool IsColumnHeaderSelectionActive(int columnIndex) => _selectedColumnHeaderIndices.Contains(columnIndex);
+
+        private int GetColumnDisplayIndex(int columnIndex)
+        {
+            if (ColumnsItemsInternal == null || columnIndex < 0 || columnIndex >= ColumnsItemsInternal.Count)
+            {
+                return -1;
+            }
+
+            var column = ColumnsItemsInternal[columnIndex];
+            return column?.DisplayIndex ?? -1;
+        }
+
+        private int GetColumnIndexFromDisplayIndex(int displayIndex)
+        {
+            if (ColumnsInternal == null || displayIndex < 0 || displayIndex >= ColumnsInternal.DisplayIndexMap.Count)
+            {
+                return -1;
+            }
+
+            var column = ColumnsInternal.GetColumnAtDisplayIndex(displayIndex);
+            if (column == null || column is DataGridFillerColumn)
+            {
+                return -1;
+            }
+
+            return column.Index;
+        }
+
+        private bool IsRowFullySelectedByCells(int rowIndex)
+        {
+            if (!_selectedCells.TryGetValue(rowIndex, out var columns) || columns.Count == 0)
+            {
+                return false;
+            }
+
+            var visibleColumnCount = GetVisibleSelectableColumnCount();
+            return visibleColumnCount > 0 && columns.Count >= visibleColumnCount;
+        }
+
+        private bool IsColumnFullySelectedByCells(int columnIndex)
+        {
+            if (DataConnection == null)
+            {
+                return false;
+            }
+
+            return _selectedColumnCounts.TryGetValue(columnIndex, out var count) && count >= DataConnection.Count;
+        }
+
+        internal bool AllowsRowHeaderSelection =>
+            CanUserSelectRows &&
+            (SelectionUnit == DataGridSelectionUnit.FullRow ||
+             SelectionUnit == DataGridSelectionUnit.CellOrRowHeader ||
+             SelectionUnit == DataGridSelectionUnit.CellOrRowOrColumnHeader);
+
+        internal bool AllowsColumnHeaderSelection =>
+            CanUserSelectColumns &&
+            (SelectionUnit == DataGridSelectionUnit.CellOrColumnHeader ||
+             SelectionUnit == DataGridSelectionUnit.CellOrRowOrColumnHeader);
 
         internal bool GetCellSelectionFromSlot(int slot, int columnIndex)
         {

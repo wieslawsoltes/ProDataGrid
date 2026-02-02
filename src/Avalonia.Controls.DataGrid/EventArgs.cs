@@ -344,6 +344,26 @@ internal
         public IReadOnlyList<DataGridCellInfo> RemovedCells { get; }
     }
 
+#if !DATAGRID_INTERNAL
+public
+#else
+internal
+#endif
+    class DataGridSelectedColumnsChangedEventArgs : EventArgs
+    {
+        public DataGridSelectedColumnsChangedEventArgs(
+            IReadOnlyList<DataGridColumn> addedColumns,
+            IReadOnlyList<DataGridColumn> removedColumns)
+        {
+            AddedColumns = addedColumns;
+            RemovedColumns = removedColumns;
+        }
+
+        public IReadOnlyList<DataGridColumn> AddedColumns { get; }
+
+        public IReadOnlyList<DataGridColumn> RemovedColumns { get; }
+    }
+
     /// <summary>
     /// Provides data for <see cref="T:Avalonia.Controls.DataGrid" /> column-related events.
     /// </summary>

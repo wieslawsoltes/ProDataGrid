@@ -163,6 +163,8 @@ internal
         FullRow = 0,
         Cell = 1,
         CellOrRowHeader = 2,
+        CellOrColumnHeader = 3,
+        CellOrRowOrColumnHeader = 4,
     }
 
     /// <summary>

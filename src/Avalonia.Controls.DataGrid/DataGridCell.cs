@@ -228,7 +228,10 @@ internal
             OwningGrid.OnCellPointerPressed(new DataGridCellPointerPressedEventArgs(this, owningRow, OwningColumn, e));
 
             var point = e.GetCurrentPoint(this);
-            if (point.Properties.IsLeftButtonPressed)
+            var isTouchLike = e.Pointer.Type == PointerType.Touch || e.Pointer.Type == PointerType.Pen;
+            var isPrimaryPressed = point.Properties.IsLeftButtonPressed ||
+                                   (isTouchLike && OwningGrid.AllowTouchDragSelection);
+            if (isPrimaryPressed)
             {
                 if (OwningGrid.HierarchicalRowsEnabled && IsHierarchicalExpanderHit(e.Source))
                 {
