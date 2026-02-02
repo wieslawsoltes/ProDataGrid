@@ -130,10 +130,11 @@ public sealed class DataGridSelectionBinder
 
             _isUpdating = true;
             var syncGrid = false;
+            SpreadsheetCellReference? currentReference = null;
             try
             {
                 var current = _grid.CurrentCell;
-                var currentReference = current.IsValid && TryResolveCellReference(current, out var resolvedCurrent)
+                currentReference = current.IsValid && TryResolveCellReference(current, out var resolvedCurrent)
                     ? resolvedCurrent
                     : (SpreadsheetCellReference?)null;
 
@@ -220,9 +221,9 @@ public sealed class DataGridSelectionBinder
                 _isUpdating = false;
             }
 
-            if (syncGrid)
+            if (syncGrid && currentReference.HasValue)
             {
-                UpdateGridSelection();
+                UpdateGridCurrentCell(currentReference.Value);
             }
         }
 
@@ -303,6 +304,37 @@ public sealed class DataGridSelectionBinder
                 {
                     _grid.CurrentCell = new DataGridCellInfo(currentItem, currentColumn, currentViewRow, currentViewColumn, isValid: true);
                 }
+            }
+            finally
+            {
+                _isUpdating = false;
+            }
+        }
+
+        private void UpdateGridCurrentCell(SpreadsheetCellReference current)
+        {
+            if (_grid == null || _isUpdating)
+            {
+                return;
+            }
+
+            if (_grid.ItemsSource is not IList items)
+            {
+                return;
+            }
+
+            var columnMap = BuildColumnIndexMap(_grid);
+            var rowMap = BuildRowIndexMap(items);
+            if (!TryResolveRowItem(items, rowMap, current.RowIndex, out var currentItem, out var currentViewRow) ||
+                !TryResolveColumn(_grid, columnMap, current.ColumnIndex, out var currentColumn, out var currentViewColumn))
+            {
+                return;
+            }
+
+            _isUpdating = true;
+            try
+            {
+                _grid.CurrentCell = new DataGridCellInfo(currentItem, currentColumn, currentViewRow, currentViewColumn, isValid: true);
             }
             finally
             {
