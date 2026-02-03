@@ -666,6 +666,200 @@ public class DataGridAttachDetachModelTests
     }
 
     [AvaloniaFact]
+    public void SelectionModel_Clear_While_Detached_Is_Respected()
+    {
+        var items = new ObservableCollection<Item>
+        {
+            new("Alpha"),
+            new("Beta"),
+            new("Gamma")
+        };
+
+        var selection = new SelectionModel<object?> { SingleSelect = true };
+        var grid = CreateBasicGrid(items);
+        grid.Selection = selection;
+        grid.SelectionMode = DataGridSelectionMode.Single;
+
+        var window = Attach(grid);
+
+        grid.SelectedItem = items[0];
+        Dispatcher.UIThread.RunJobs();
+
+        window.Content = null;
+        Dispatcher.UIThread.RunJobs();
+
+        selection.Clear();
+        Dispatcher.UIThread.RunJobs();
+
+        window.Content = grid;
+        Dispatcher.UIThread.RunJobs();
+        PumpLayout(grid);
+
+        Assert.Empty(selection.SelectedItems);
+        Assert.Null(grid.SelectedItem);
+
+        window.Close();
+    }
+
+    [AvaloniaFact]
+    public void SelectionModel_Changes_While_Detached_Are_Respected_With_HierarchicalProxy()
+    {
+        var root = new TreeItem("root");
+        var childA = new TreeItem("childA");
+        var childB = new TreeItem("childB");
+        root.Children.Add(childA);
+        root.Children.Add(childB);
+
+        var model = new HierarchicalModel(new HierarchicalOptions
+        {
+            ChildrenSelector = item => ((TreeItem)item).Children,
+            AutoExpandRoot = true,
+            MaxAutoExpandDepth = 1
+        });
+        model.SetRoot(root);
+        model.ExpandAll();
+
+        var selection = new SelectionModel<HierarchicalNode> { SingleSelect = true };
+
+        var grid = new DataGrid
+        {
+            HierarchicalRowsEnabled = true,
+            HierarchicalModel = model,
+            ItemsSource = model.ObservableFlattened,
+            Selection = selection,
+            SelectionMode = DataGridSelectionMode.Single,
+            AutoGenerateColumns = false,
+            Height = 200
+        };
+
+        grid.Columns.Add(new DataGridHierarchicalColumn
+        {
+            Header = "Name",
+            Binding = new Binding("Item.Name")
+        });
+
+        var window = Attach(grid);
+
+        InvokeMouseSelection(grid, model, childA);
+        AssertSelection(selection, childA);
+
+        window.Content = null;
+        Dispatcher.UIThread.RunJobs();
+
+        selection.Clear();
+        selection.Select(model.IndexOf(childB));
+        Dispatcher.UIThread.RunJobs();
+
+        window.Content = grid;
+        Dispatcher.UIThread.RunJobs();
+        PumpLayout(grid);
+
+        AssertSelection(selection, childB);
+
+        window.Close();
+    }
+
+    [AvaloniaFact]
+    public void SelectionModel_SelectionChanged_Items_Are_Not_Null_When_Detached()
+    {
+        var items = new ObservableCollection<Item>
+        {
+            new("Alpha"),
+            new("Beta"),
+            new("Gamma")
+        };
+
+        var selection = new SelectionModel<object?> { SingleSelect = true };
+        var grid = CreateBasicGrid(items);
+        grid.Selection = selection;
+        grid.SelectionMode = DataGridSelectionMode.Single;
+
+        var window = Attach(grid);
+
+        grid.SelectedItem = items[0];
+        Dispatcher.UIThread.RunJobs();
+
+        SelectionModelSelectionChangedEventArgs<object?>? args = null;
+        selection.SelectionChanged += (_, e) => args = e;
+
+        window.Content = null;
+        Dispatcher.UIThread.RunJobs();
+
+        selection.Select(1);
+        Dispatcher.UIThread.RunJobs();
+
+        var captured = args ?? throw new InvalidOperationException("Expected selection change.");
+        Assert.Single(captured.SelectedItems);
+        Assert.Same(items[1], captured.SelectedItems[0]);
+        Assert.Single(captured.DeselectedItems);
+        Assert.Same(items[0], captured.DeselectedItems[0]);
+
+        window.Close();
+    }
+
+    [AvaloniaFact]
+    public void SelectionModel_SelectionChanged_Items_Are_Not_Null_When_Detached_With_HierarchicalProxy()
+    {
+        var root = new TreeItem("root");
+        var childA = new TreeItem("childA");
+        var childB = new TreeItem("childB");
+        root.Children.Add(childA);
+        root.Children.Add(childB);
+
+        var model = new HierarchicalModel(new HierarchicalOptions
+        {
+            ChildrenSelector = item => ((TreeItem)item).Children,
+            AutoExpandRoot = true,
+            MaxAutoExpandDepth = 1
+        });
+        model.SetRoot(root);
+        model.ExpandAll();
+
+        var selection = new SelectionModel<HierarchicalNode> { SingleSelect = true };
+
+        var grid = new DataGrid
+        {
+            HierarchicalRowsEnabled = true,
+            HierarchicalModel = model,
+            ItemsSource = model.ObservableFlattened,
+            Selection = selection,
+            SelectionMode = DataGridSelectionMode.Single,
+            AutoGenerateColumns = false,
+            Height = 200
+        };
+
+        grid.Columns.Add(new DataGridHierarchicalColumn
+        {
+            Header = "Name",
+            Binding = new Binding("Item.Name")
+        });
+
+        var window = Attach(grid);
+
+        InvokeMouseSelection(grid, model, childA);
+        Dispatcher.UIThread.RunJobs();
+
+        SelectionModelSelectionChangedEventArgs<HierarchicalNode>? args = null;
+        selection.SelectionChanged += (_, e) => args = e;
+
+        window.Content = null;
+        Dispatcher.UIThread.RunJobs();
+
+        selection.Select(model.IndexOf(childB));
+        Dispatcher.UIThread.RunJobs();
+
+        var captured = args ?? throw new InvalidOperationException("Expected selection change.");
+        Assert.Single(captured.SelectedItems);
+        var selected = captured.SelectedItems[0] ?? throw new InvalidOperationException("Expected selected item.");
+        Assert.Same(childB, selected.Item);
+        Assert.Single(captured.DeselectedItems);
+        var deselected = captured.DeselectedItems[0] ?? throw new InvalidOperationException("Expected deselected item.");
+        Assert.Same(childA, deselected.Item);
+
+        window.Close();
+    }
+
+    [AvaloniaFact]
     public void ClearRowSelection_Clears_SelectionModel_When_SelectedItemsEmpty()
     {
         var items = new ObservableCollection<Item>
