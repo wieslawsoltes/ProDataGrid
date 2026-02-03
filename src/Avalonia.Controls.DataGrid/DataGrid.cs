@@ -384,6 +384,8 @@ internal
         private ISelectionModel _selectionModelProxy;
         private DataGridSelection.DataGridPagedSelectionSource _pagedSelectionSource;
         private List<object> _selectionModelSnapshot;
+        private DataGridSelectionMode? _detachedSelectionMode;
+        private bool? _detachedSelectionModelSingleSelect;
         private IReadOnlyList<object> _pendingHierarchicalSelectionSnapshot;
         private IReadOnlyList<int> _pendingHierarchicalSelectionIndexes;
         private bool _suppressSelectionSnapshotUpdates;
@@ -4042,7 +4044,7 @@ internal
                 }
 
                 var model = _selectionModelAdapter.Model;
-                model.SingleSelect = SelectionMode == DataGridSelectionMode.Single;
+                SyncSelectionModeOnAttach(model);
 
                 WeakEventHandlerManager.Unsubscribe<SelectionModelSelectionChangedEventArgs, DataGrid>(
                     model,
@@ -4100,6 +4102,31 @@ internal
                 ApplySelectionFromSelectionModel();
                 UpdateSelectionSnapshot();
             }
+        }
+
+        private void SyncSelectionModeOnAttach(ISelectionModel model)
+        {
+            if (_detachedSelectionMode.HasValue && _detachedSelectionModelSingleSelect.HasValue)
+            {
+                var modeChanged = _detachedSelectionMode.Value != SelectionMode;
+                var modelChanged = _detachedSelectionModelSingleSelect.Value != model.SingleSelect;
+
+                if (!modeChanged && modelChanged)
+                {
+                    var targetMode = model.SingleSelect
+                        ? DataGridSelectionMode.Single
+                        : DataGridSelectionMode.Extended;
+
+                    if (SelectionMode != targetMode)
+                    {
+                        SetValueNoCallback(SelectionModeProperty, targetMode);
+                    }
+                }
+            }
+
+            model.SingleSelect = SelectionMode == DataGridSelectionMode.Single;
+            _detachedSelectionMode = null;
+            _detachedSelectionModelSingleSelect = null;
         }
 
         private void AttachSortingModelHandlers()
@@ -5329,12 +5356,20 @@ internal
 
         private void DetachSelectionModel(bool preserveSnapshot = false)
         {
+            if (!preserveSnapshot)
+            {
+                _detachedSelectionMode = null;
+                _detachedSelectionModelSingleSelect = null;
+            }
+
             if (_selectionModelAdapter != null)
             {
                 var model = _selectionModelAdapter.Model;
                 if (preserveSnapshot)
                 {
                     UpdateSelectionSnapshot();
+                    _detachedSelectionMode = SelectionMode;
+                    _detachedSelectionModelSingleSelect = model.SingleSelect;
                 }
                 WeakEventHandlerManager.Unsubscribe<SelectionModelSelectionChangedEventArgs, DataGrid>(
                     model,
