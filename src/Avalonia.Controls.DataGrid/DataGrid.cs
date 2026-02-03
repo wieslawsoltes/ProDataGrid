@@ -388,7 +388,7 @@ internal
         private DataGridSelectionMode? _detachedSelectionMode;
         private bool? _detachedSelectionModelSingleSelect;
         private bool _detachedSelectionChanged;
-        private ISelectionModel _detachedSelectionModel;
+        private DetachedSelectionMonitor _detachedSelectionMonitor;
         private IReadOnlyList<object> _pendingHierarchicalSelectionSnapshot;
         private IReadOnlyList<int> _pendingHierarchicalSelectionIndexes;
         private bool _suppressSelectionSnapshotUpdates;
@@ -4140,58 +4140,30 @@ internal
 
         private void AttachDetachedSelectionMonitor(ISelectionModel model)
         {
-            if (model == null || ReferenceEquals(_detachedSelectionModel, model))
+            if (model == null)
+            {
+                return;
+            }
+
+            if (_detachedSelectionMonitor != null
+                && ReferenceEquals(_detachedSelectionMonitor.Model, model))
             {
                 return;
             }
 
             DetachDetachedSelectionMonitor();
-            _detachedSelectionModel = model;
-
-            WeakEventHandlerManager.Subscribe<ISelectionModel, SelectionModelSelectionChangedEventArgs, DataGrid>(
-                model,
-                nameof(ISelectionModel.SelectionChanged),
-                DetachedSelectionModel_SelectionChanged);
-            WeakEventHandlerManager.Subscribe<ISelectionModel, SelectionModelIndexesChangedEventArgs, DataGrid>(
-                model,
-                nameof(ISelectionModel.IndexesChanged),
-                DetachedSelectionModel_IndexesChanged);
-            WeakEventHandlerManager.Subscribe<ISelectionModel, EventArgs, DataGrid>(
-                model,
-                nameof(ISelectionModel.LostSelection),
-                DetachedSelectionModel_LostSelection);
-            WeakEventHandlerManager.Subscribe<ISelectionModel, EventArgs, DataGrid>(
-                model,
-                nameof(ISelectionModel.SourceReset),
-                DetachedSelectionModel_SourceReset);
+            _detachedSelectionMonitor = new DetachedSelectionMonitor(this, model);
         }
 
         private void DetachDetachedSelectionMonitor()
         {
-            if (_detachedSelectionModel == null)
+            if (_detachedSelectionMonitor == null)
             {
                 return;
             }
 
-            var model = _detachedSelectionModel;
-            _detachedSelectionModel = null;
-
-            WeakEventHandlerManager.Unsubscribe<SelectionModelSelectionChangedEventArgs, DataGrid>(
-                model,
-                nameof(ISelectionModel.SelectionChanged),
-                DetachedSelectionModel_SelectionChanged);
-            WeakEventHandlerManager.Unsubscribe<SelectionModelIndexesChangedEventArgs, DataGrid>(
-                model,
-                nameof(ISelectionModel.IndexesChanged),
-                DetachedSelectionModel_IndexesChanged);
-            WeakEventHandlerManager.Unsubscribe<EventArgs, DataGrid>(
-                model,
-                nameof(ISelectionModel.LostSelection),
-                DetachedSelectionModel_LostSelection);
-            WeakEventHandlerManager.Unsubscribe<EventArgs, DataGrid>(
-                model,
-                nameof(ISelectionModel.SourceReset),
-                DetachedSelectionModel_SourceReset);
+            _detachedSelectionMonitor.Dispose();
+            _detachedSelectionMonitor = null;
         }
 
         private void DetachedSelectionModel_SelectionChanged(object sender, SelectionModelSelectionChangedEventArgs e)
@@ -4209,14 +4181,81 @@ internal
             MarkDetachedSelectionChanged();
         }
 
-        private void DetachedSelectionModel_SourceReset(object sender, EventArgs e)
-        {
-            MarkDetachedSelectionChanged();
-        }
-
         private void MarkDetachedSelectionChanged()
         {
             _detachedSelectionChanged = true;
+        }
+
+        private sealed class DetachedSelectionMonitor : IDisposable
+        {
+            private readonly WeakReference<DataGrid> _owner;
+            private ISelectionModel _model;
+            private readonly EventHandler<SelectionModelSelectionChangedEventArgs> _selectionChanged;
+            private readonly EventHandler<SelectionModelIndexesChangedEventArgs> _indexesChanged;
+            private readonly EventHandler _lostSelection;
+
+            public DetachedSelectionMonitor(DataGrid owner, ISelectionModel model)
+            {
+                _owner = new WeakReference<DataGrid>(owner ?? throw new ArgumentNullException(nameof(owner)));
+                _model = model ?? throw new ArgumentNullException(nameof(model));
+                _selectionChanged = OnSelectionChanged;
+                _indexesChanged = OnIndexesChanged;
+                _lostSelection = OnLostSelection;
+
+                _model.SelectionChanged += _selectionChanged;
+                _model.IndexesChanged += _indexesChanged;
+                _model.LostSelection += _lostSelection;
+            }
+
+            public ISelectionModel Model => _model;
+
+            private void OnSelectionChanged(object sender, SelectionModelSelectionChangedEventArgs e)
+            {
+                if (TryGetOwner(out var owner))
+                {
+                    owner.MarkDetachedSelectionChanged();
+                }
+            }
+
+            private void OnIndexesChanged(object sender, SelectionModelIndexesChangedEventArgs e)
+            {
+                if (TryGetOwner(out var owner))
+                {
+                    owner.MarkDetachedSelectionChanged();
+                }
+            }
+
+            private void OnLostSelection(object sender, EventArgs e)
+            {
+                if (TryGetOwner(out var owner))
+                {
+                    owner.MarkDetachedSelectionChanged();
+                }
+            }
+
+            private bool TryGetOwner(out DataGrid owner)
+            {
+                if (_owner.TryGetTarget(out owner))
+                {
+                    return true;
+                }
+
+                Dispose();
+                return false;
+            }
+
+            public void Dispose()
+            {
+                if (_model == null)
+                {
+                    return;
+                }
+
+                _model.SelectionChanged -= _selectionChanged;
+                _model.IndexesChanged -= _indexesChanged;
+                _model.LostSelection -= _lostSelection;
+                _model = null;
+            }
         }
 
         private bool ShouldRestoreSelectionSnapshot(ISelectionModel model)
@@ -4231,11 +4270,6 @@ internal
                 return false;
             }
 
-            if (!SelectionSnapshotMatchesCurrentSelection())
-            {
-                return false;
-            }
-
             if (HasInvalidSelectionIndexes(model))
             {
                 return true;
@@ -4245,35 +4279,6 @@ internal
             if (selected is { Count: > 0 } || model.SelectedIndex >= 0)
             {
                 return false;
-            }
-
-            return true;
-        }
-
-        private bool SelectionSnapshotMatchesCurrentSelection()
-        {
-            if (_selectionModelSnapshot == null || _selectionModelSnapshot.Count == 0)
-            {
-                return false;
-            }
-
-            if (_selectionModelAdapter == null)
-            {
-                return false;
-            }
-
-            var current = _selectionModelAdapter.SelectedItemsView;
-            if (current.Count != _selectionModelSnapshot.Count)
-            {
-                return false;
-            }
-
-            for (int i = 0; i < _selectionModelSnapshot.Count; i++)
-            {
-                if (!Equals(_selectionModelSnapshot[i], current[i]))
-                {
-                    return false;
-                }
             }
 
             return true;
@@ -5803,6 +5808,7 @@ internal
         {
             _syncingSelectionModel = previous;
         }
+
         private sealed class HierarchicalSelectionProxy : ISelectionModel
         {
             private readonly ISelectionModel _inner;
