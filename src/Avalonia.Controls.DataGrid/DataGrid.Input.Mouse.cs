@@ -62,22 +62,25 @@ namespace Avalonia.Controls
                 var handled = false;
                 var ignoreInvalidate = false;
                 var scrollHeight = 0d;
+                var verticalMaximum = GetInputVerticalMaximum();
+                var currentVerticalOffset = UseLogicalScrollable
+                    ? GetProjectedVerticalOffsetForInput(delta.Y, verticalMaximum)
+                    : Math.Max(0, Math.Min(_verticalOffset, verticalMaximum));
 
                 // Vertical scroll handling
                 if (delta.Y > 0)
                 {
-                    scrollHeight = Math.Max(-_verticalOffset, -delta.Y);
+                    scrollHeight = Math.Max(-currentVerticalOffset, -delta.Y);
                 }
                 else if (delta.Y < 0)
                 {
                     if (HasLegacyVerticalScrollBar && VerticalScrollBarVisibility == ScrollBarVisibility.Visible)
                     {
-                        scrollHeight = Math.Min(Math.Max(0, GetLegacyVerticalScrollMaximum() - _verticalOffset), -delta.Y);
+                        scrollHeight = Math.Min(Math.Max(0, verticalMaximum - currentVerticalOffset), -delta.Y);
                     }
                     else
                     {
-                        double maximum = EdgedRowsHeightCalculated - CellsEstimatedHeight;
-                        scrollHeight = Math.Min(Math.Max(0, maximum - _verticalOffset), -delta.Y);
+                        scrollHeight = Math.Min(Math.Max(0, verticalMaximum - currentVerticalOffset), -delta.Y);
                     }
                 }
 
@@ -128,6 +131,76 @@ namespace Avalonia.Controls
             }
 
             return false;
+        }
+
+        private double GetInputVerticalMaximum()
+        {
+            if (HasLegacyVerticalScrollBar && VerticalScrollBarVisibility == ScrollBarVisibility.Visible)
+            {
+                return Math.Max(0, GetLegacyVerticalScrollMaximum());
+            }
+
+            if (UseLogicalScrollable && _rowsPresenter != null)
+            {
+                var logicalMaximum = _rowsPresenter.Extent.Height - _rowsPresenter.Viewport.Height;
+                if (!double.IsNaN(logicalMaximum) && !double.IsInfinity(logicalMaximum))
+                {
+                    return Math.Max(0, logicalMaximum);
+                }
+            }
+
+            return Math.Max(0, EdgedRowsHeightCalculated - CellsEstimatedHeight);
+        }
+
+        private double GetProjectedVerticalOffsetForInput(double inputDeltaY, double verticalMaximum)
+        {
+            var pendingVerticalScrollHeight = DisplayData.PendingVerticalScrollHeight;
+            var projectedVerticalOffset = Math.Max(0, Math.Min(_verticalOffset + pendingVerticalScrollHeight, verticalMaximum));
+
+            if (!UseLogicalScrollable || _rowsPresenter == null)
+            {
+                return projectedVerticalOffset;
+            }
+
+            var presenterOffset = _rowsPresenter.Offset.Y;
+            if (double.IsNaN(presenterOffset) || double.IsInfinity(presenterOffset))
+            {
+                return projectedVerticalOffset;
+            }
+
+            presenterOffset = Math.Max(0, Math.Min(presenterOffset, verticalMaximum));
+            return ReconcileProjectedInputOffset(projectedVerticalOffset, presenterOffset, pendingVerticalScrollHeight, inputDeltaY);
+        }
+
+        private static double ReconcileProjectedInputOffset(
+            double projectedVerticalOffset,
+            double presenterVerticalOffset,
+            double pendingVerticalScrollHeight,
+            double inputDeltaY)
+        {
+            if (inputDeltaY > 0)
+            {
+                // Upward input should not use an underestimated offset or we can incorrectly clamp to zero.
+                return Math.Max(projectedVerticalOffset, presenterVerticalOffset);
+            }
+
+            if (inputDeltaY < 0)
+            {
+                // Downward input should not use an overestimated offset or we can clamp too early near max.
+                return Math.Min(projectedVerticalOffset, presenterVerticalOffset);
+            }
+
+            if (pendingVerticalScrollHeight > 0)
+            {
+                return Math.Min(projectedVerticalOffset, presenterVerticalOffset);
+            }
+
+            if (pendingVerticalScrollHeight < 0)
+            {
+                return Math.Max(projectedVerticalOffset, presenterVerticalOffset);
+            }
+
+            return Math.Max(projectedVerticalOffset, presenterVerticalOffset);
         }
 
         //TODO: Ensure left button is checked for
