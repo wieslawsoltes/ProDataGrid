@@ -2006,6 +2006,20 @@
     },
     {
       "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.DataGridFiltering.FilteringModelInteractionEventArgs.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.DataGridFiltering.FilteringModelInteractionEventArgs.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.DataGridFiltering.FilteringModelInteractionEventArgs",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
       "source_relative_path": "api/Avalonia.Controls.DataGridFiltering.FilteringOperator.yml",
       "output": {
         ".html": {
@@ -2128,6 +2142,20 @@
       "Uid": null,
       "IsMRef": true,
       "Title": "Avalonia.Controls.DataGridFiltering.IFilteringModel",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.DataGridFiltering.IFilteringModelInteraction.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.DataGridFiltering.IFilteringModelInteraction.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.DataGridFiltering.IFilteringModelInteraction",
       "Summary": null
     },
     {
@@ -8089,6 +8117,16 @@
       "output": {
         ".html": {
           "relative_path": "articles/column-definitions.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "Conceptual",
+      "source_relative_path": "articles/column-header-menus-and-filters.md",
+      "output": {
+        ".html": {
+          "relative_path": "articles/column-header-menus-and-filters.html"
         }
       },
       "version": ""

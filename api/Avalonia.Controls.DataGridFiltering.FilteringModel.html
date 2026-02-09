@@ -85,7 +85,7 @@
 
 
   <h1 id="Avalonia_Controls_DataGridFiltering_FilteringModel" data-uid="Avalonia.Controls.DataGridFiltering.FilteringModel" class="text-break">
-Class FilteringModel  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/Filtering/FilteringModel.cs/#L289"><i class="bi bi-code-slash"></i></a>
+Class FilteringModel  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/Filtering/FilteringModel.cs/#L316"><i class="bi bi-code-slash"></i></a>
   </h1>
 
   <div class="facts text-secondary">
@@ -97,7 +97,7 @@ Class FilteringModel  <a class="header-action link-secondary" title="View source
   <div class="markdown conceptual"></div>
 
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public sealed class FilteringModel : IFilteringModel, INotifyPropertyChanged</code></pre>
+    <pre><code class="lang-csharp hljs">public sealed class FilteringModel : IFilteringModel, INotifyPropertyChanged, IFilteringModelInteraction</code></pre>
   </div>
 
 
@@ -116,6 +116,7 @@ Class FilteringModel  <a class="header-action link-secondary" title="View source
     <dd>
       <div><a class="xref" href="Avalonia.Controls.DataGridFiltering.IFilteringModel.html">IFilteringModel</a></div>
       <div><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.componentmodel.inotifypropertychanged">INotifyPropertyChanged</a></div>
+      <div><a class="xref" href="Avalonia.Controls.DataGridFiltering.IFilteringModelInteraction.html">IFilteringModelInteraction</a></div>
     </dd>
   </dl>
 
@@ -156,7 +157,7 @@ Class FilteringModel  <a class="header-action link-secondary" title="View source
 
   <h3 id="Avalonia_Controls_DataGridFiltering_FilteringModel__ctor" data-uid="Avalonia.Controls.DataGridFiltering.FilteringModel.#ctor">
   FilteringModel()
-  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/Filtering/FilteringModel.cs/#L301"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/Filtering/FilteringModel.cs/#L328"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"></div>
@@ -186,7 +187,7 @@ Class FilteringModel  <a class="header-action link-secondary" title="View source
 
   <h3 id="Avalonia_Controls_DataGridFiltering_FilteringModel_Descriptors" data-uid="Avalonia.Controls.DataGridFiltering.FilteringModel.Descriptors">
   Descriptors
-  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/Filtering/FilteringModel.cs/#L307"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/Filtering/FilteringModel.cs/#L334"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"></div>
@@ -217,7 +218,7 @@ Class FilteringModel  <a class="header-action link-secondary" title="View source
 
   <h3 id="Avalonia_Controls_DataGridFiltering_FilteringModel_OwnsViewFilter" data-uid="Avalonia.Controls.DataGridFiltering.FilteringModel.OwnsViewFilter">
   OwnsViewFilter
-  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/Filtering/FilteringModel.cs/#L311"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/Filtering/FilteringModel.cs/#L338"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"></div>
@@ -252,7 +253,7 @@ Class FilteringModel  <a class="header-action link-secondary" title="View source
 
   <h3 id="Avalonia_Controls_DataGridFiltering_FilteringModel_Apply_System_Collections_Generic_IEnumerable_Avalonia_Controls_DataGridFiltering_FilteringDescriptor__" data-uid="Avalonia.Controls.DataGridFiltering.FilteringModel.Apply(System.Collections.Generic.IEnumerable{Avalonia.Controls.DataGridFiltering.FilteringDescriptor})">
   Apply(IEnumerable&lt;FilteringDescriptor&gt;)
-  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/Filtering/FilteringModel.cs/#L351"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/Filtering/FilteringModel.cs/#L390"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"></div>
@@ -283,7 +284,7 @@ Class FilteringModel  <a class="header-action link-secondary" title="View source
 
   <h3 id="Avalonia_Controls_DataGridFiltering_FilteringModel_BeginUpdate" data-uid="Avalonia.Controls.DataGridFiltering.FilteringModel.BeginUpdate">
   BeginUpdate()
-  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/Filtering/FilteringModel.cs/#L417"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/Filtering/FilteringModel.cs/#L456"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"></div>
@@ -309,7 +310,7 @@ Class FilteringModel  <a class="header-action link-secondary" title="View source
 
   <h3 id="Avalonia_Controls_DataGridFiltering_FilteringModel_Clear" data-uid="Avalonia.Controls.DataGridFiltering.FilteringModel.Clear">
   Clear()
-  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/Filtering/FilteringModel.cs/#L361"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/Filtering/FilteringModel.cs/#L400"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"></div>
@@ -335,7 +336,7 @@ Class FilteringModel  <a class="header-action link-secondary" title="View source
 
   <h3 id="Avalonia_Controls_DataGridFiltering_FilteringModel_DeferRefresh" data-uid="Avalonia.Controls.DataGridFiltering.FilteringModel.DeferRefresh">
   DeferRefresh()
-  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/Filtering/FilteringModel.cs/#L440"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/Filtering/FilteringModel.cs/#L479"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"></div>
@@ -366,7 +367,7 @@ Class FilteringModel  <a class="header-action link-secondary" title="View source
 
   <h3 id="Avalonia_Controls_DataGridFiltering_FilteringModel_EndUpdate" data-uid="Avalonia.Controls.DataGridFiltering.FilteringModel.EndUpdate">
   EndUpdate()
-  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/Filtering/FilteringModel.cs/#L422"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/Filtering/FilteringModel.cs/#L461"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"></div>
@@ -392,7 +393,7 @@ Class FilteringModel  <a class="header-action link-secondary" title="View source
 
   <h3 id="Avalonia_Controls_DataGridFiltering_FilteringModel_Move_System_Object_System_Int32_" data-uid="Avalonia.Controls.DataGridFiltering.FilteringModel.Move(System.Object,System.Int32)">
   Move(object, int)
-  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/Filtering/FilteringModel.cs/#L390"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/Filtering/FilteringModel.cs/#L429"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"></div>
@@ -430,7 +431,7 @@ Class FilteringModel  <a class="header-action link-secondary" title="View source
 
   <h3 id="Avalonia_Controls_DataGridFiltering_FilteringModel_Remove_System_Object_" data-uid="Avalonia.Controls.DataGridFiltering.FilteringModel.Remove(System.Object)">
   Remove(object)
-  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/Filtering/FilteringModel.cs/#L371"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/Filtering/FilteringModel.cs/#L410"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"></div>
@@ -462,11 +463,42 @@ Class FilteringModel  <a class="header-action link-secondary" title="View source
 
 
 
+  <a id="Avalonia_Controls_DataGridFiltering_FilteringModel_RequestShowFilterFlyout_" data-uid="Avalonia.Controls.DataGridFiltering.FilteringModel.RequestShowFilterFlyout*"></a>
+
+  <h3 id="Avalonia_Controls_DataGridFiltering_FilteringModel_RequestShowFilterFlyout_System_Object_" data-uid="Avalonia.Controls.DataGridFiltering.FilteringModel.RequestShowFilterFlyout(System.Object)">
+  RequestShowFilterFlyout(object)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/Filtering/FilteringModel.cs/#L359"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public void RequestShowFilterFlyout(object columnId)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>columnId</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object">object</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+
   <a id="Avalonia_Controls_DataGridFiltering_FilteringModel_SetOrUpdate_" data-uid="Avalonia.Controls.DataGridFiltering.FilteringModel.SetOrUpdate*"></a>
 
   <h3 id="Avalonia_Controls_DataGridFiltering_FilteringModel_SetOrUpdate_Avalonia_Controls_DataGridFiltering_FilteringDescriptor_" data-uid="Avalonia.Controls.DataGridFiltering.FilteringModel.SetOrUpdate(Avalonia.Controls.DataGridFiltering.FilteringDescriptor)">
   SetOrUpdate(FilteringDescriptor)
-  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/Filtering/FilteringModel.cs/#L330"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/Filtering/FilteringModel.cs/#L369"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"></div>
@@ -500,7 +532,7 @@ Class FilteringModel  <a class="header-action link-secondary" title="View source
 
   <h3 id="Avalonia_Controls_DataGridFiltering_FilteringModel_FilteringChanged" data-uid="Avalonia.Controls.DataGridFiltering.FilteringModel.FilteringChanged">
   FilteringChanged
-  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/Filtering/FilteringModel.cs/#L324"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/Filtering/FilteringModel.cs/#L351"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"></div>
@@ -530,7 +562,7 @@ Class FilteringModel  <a class="header-action link-secondary" title="View source
 
   <h3 id="Avalonia_Controls_DataGridFiltering_FilteringModel_FilteringChanging" data-uid="Avalonia.Controls.DataGridFiltering.FilteringModel.FilteringChanging">
   FilteringChanging
-  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/Filtering/FilteringModel.cs/#L326"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/Filtering/FilteringModel.cs/#L353"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"></div>
@@ -560,7 +592,7 @@ Class FilteringModel  <a class="header-action link-secondary" title="View source
 
   <h3 id="Avalonia_Controls_DataGridFiltering_FilteringModel_PropertyChanged" data-uid="Avalonia.Controls.DataGridFiltering.FilteringModel.PropertyChanged">
   PropertyChanged
-  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/Filtering/FilteringModel.cs/#L328"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/Filtering/FilteringModel.cs/#L357"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>Occurs when a property value changes.</p>
@@ -589,10 +621,40 @@ Class FilteringModel  <a class="header-action link-secondary" title="View source
 
 
 
+  <h3 id="Avalonia_Controls_DataGridFiltering_FilteringModel_ShowFilterFlyoutRequested" data-uid="Avalonia.Controls.DataGridFiltering.FilteringModel.ShowFilterFlyoutRequested">
+  ShowFilterFlyoutRequested
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/Filtering/FilteringModel.cs/#L355"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public event EventHandler&lt;FilteringModelInteractionEventArgs&gt; ShowFilterFlyoutRequested</code></pre>
+  </div>
+
+
+
+
+
+
+  <h4 class="section">Event Type</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.eventhandler-1">EventHandler</a>&lt;<a class="xref" href="Avalonia.Controls.DataGridFiltering.FilteringModelInteractionEventArgs.html">FilteringModelInteractionEventArgs</a>&gt;</dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
 </article>
 
         <div class="contribution d-print-none">
-          <a href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/Filtering/FilteringModel.cs/#L289" class="edit-link">Edit this page</a>
+          <a href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/Filtering/FilteringModel.cs/#L316" class="edit-link">Edit this page</a>
         </div>
 
 
