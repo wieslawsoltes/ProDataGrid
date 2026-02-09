@@ -130,6 +130,8 @@
     href: column-banding.md
   - name: Column Chooser
     href: column-chooser.md
+  - name: Column Header Menus and Filters
+    href: column-header-menus-and-filters.md
   - name: Column Types Reference
     href: column-types-reference.md
   - name: Editing Interaction Model

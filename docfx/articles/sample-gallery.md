@@ -7,6 +7,7 @@ Highlights include:
 - Column types, editing, and validation.
 - Bindable columns, auto-generation, and `DataTable.DefaultView` binding.
 - Sorting/filtering/search models, grouping, and paging.
+- Header context menus with filter flyouts and column visibility toggles.
 - Selection stability, selection origin logging, and current cell tracking.
 - Selection units and highlighting (row, column, and cell visuals).
 - Clipboard export formats and export customization.
