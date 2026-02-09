@@ -30,6 +30,28 @@ public class FilteringModelTests
         Assert.Single(args!.OldDescriptors);
     }
 
+    public class FilteringModelInteractionTests
+    {
+        [Fact]
+        public void RequestShowFilterFlyout_Raises_Event()
+        {
+            var model = new FilteringModel();
+            var raised = false;
+            object? captured = null;
+
+            model.ShowFilterFlyoutRequested += (_, args) =>
+            {
+                raised = true;
+                captured = args.ColumnId;
+            };
+
+            model.RequestShowFilterFlyout("Name");
+
+            Assert.True(raised);
+            Assert.Equal("Name", captured);
+        }
+    }
+
     [Fact]
     public void Move_Reorders_Descriptors()
     {
