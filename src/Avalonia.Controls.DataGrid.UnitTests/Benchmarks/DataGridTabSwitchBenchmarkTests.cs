@@ -264,20 +264,35 @@ public class DataGridTabSwitchBenchmarkTests
         {
             var rowsRefresh = GetDoubleStats(DataGridDiagnostics.Meters.RowsRefreshTimeName);
             var rowsDisplay = GetDoubleStats(DataGridDiagnostics.Meters.RowsDisplayUpdateTimeName);
+            var rowsDisplayScan = GetDoubleStats(DataGridDiagnostics.Meters.RowsDisplayScanTimeName);
+            var rowsDisplayTrim = GetDoubleStats(DataGridDiagnostics.Meters.RowsDisplayTrimTimeName);
             var rowsMeasure = GetDoubleStats(DataGridDiagnostics.Meters.RowsMeasureTimeName);
             var rowsArrange = GetDoubleStats(DataGridDiagnostics.Meters.RowsArrangeTimeName);
             var rowGenerate = GetDoubleStats(DataGridDiagnostics.Meters.RowGenerateTimeName);
             var gridRefresh = GetDoubleStats(DataGridDiagnostics.Meters.DataGridRefreshTimeName);
 
+            var rowsDisplayScanned = GetLongTotal(DataGridDiagnostics.Meters.RowsDisplayScannedCountName);
+            var rowsDisplayRemoved = GetLongTotal(DataGridDiagnostics.Meters.RowsDisplayRemovedCountName);
             var rowsRealized = GetLongTotal(DataGridDiagnostics.Meters.RowsRealizedCountName);
             var rowsRecycled = GetLongTotal(DataGridDiagnostics.Meters.RowsRecycledCountName);
             var rowsPrepared = GetLongTotal(DataGridDiagnostics.Meters.RowsPreparedCountName);
             var rowsMeasured = GetLongTotal(DataGridDiagnostics.Meters.RowsMeasuredCountName);
+            var rowsMeasureSkipped = GetLongTotal(DataGridDiagnostics.Meters.RowsMeasureSkippedCountName);
             var rowsArranged = GetLongTotal(DataGridDiagnostics.Meters.RowsArrangedCountName);
+            var rowsArrangeSkipped = GetLongTotal(DataGridDiagnostics.Meters.RowsArrangeSkippedCountName);
+            var rowsArrangeOffscreen = GetLongTotal(DataGridDiagnostics.Meters.RowsArrangeOffscreenCountName);
             var rowsDisplayReused = GetLongTotal(DataGridDiagnostics.Meters.RowsDisplayReusedCountName);
+            var totalMeasureDecisions = rowsMeasured + rowsMeasureSkipped;
+            var totalArrangeDecisions = rowsArranged + rowsArrangeSkipped;
+            var measureWorkRate = totalMeasureDecisions > 0
+                ? (double)rowsMeasured / totalMeasureDecisions * 100
+                : 0;
+            var arrangeWorkRate = totalArrangeDecisions > 0
+                ? (double)rowsArranged / totalArrangeDecisions * 100
+                : 0;
 
             return FormattableString.Invariant(
-                $"Tab switch diagnostics: grid-refresh total={gridRefresh.Total:F2} ms count={gridRefresh.Count} avg={gridRefresh.Average:F2} ms; rows-refresh total={rowsRefresh.Total:F2} ms count={rowsRefresh.Count} avg={rowsRefresh.Average:F2} ms; rows-display total={rowsDisplay.Total:F2} ms count={rowsDisplay.Count} avg={rowsDisplay.Average:F2} ms; rows-measure total={rowsMeasure.Total:F2} ms count={rowsMeasure.Count} avg={rowsMeasure.Average:F2} ms; rows-arrange total={rowsArrange.Total:F2} ms count={rowsArrange.Count} avg={rowsArrange.Average:F2} ms; row-generate total={rowGenerate.Total:F2} ms count={rowGenerate.Count} avg={rowGenerate.Average:F2} ms; rows-display-reused={rowsDisplayReused}; rows-measured={rowsMeasured}; rows-arranged={rowsArranged}; rows-realized={rowsRealized}; rows-recycled={rowsRecycled}; rows-prepared={rowsPrepared}");
+                $"Tab switch diagnostics: grid-refresh total={gridRefresh.Total:F2} ms count={gridRefresh.Count} avg={gridRefresh.Average:F2} ms; rows-refresh total={rowsRefresh.Total:F2} ms count={rowsRefresh.Count} avg={rowsRefresh.Average:F2} ms; rows-display total={rowsDisplay.Total:F2} ms count={rowsDisplay.Count} avg={rowsDisplay.Average:F2} ms; rows-display-scan total={rowsDisplayScan.Total:F2} ms count={rowsDisplayScan.Count} avg={rowsDisplayScan.Average:F2} ms; rows-display-trim total={rowsDisplayTrim.Total:F2} ms count={rowsDisplayTrim.Count} avg={rowsDisplayTrim.Average:F2} ms; rows-measure total={rowsMeasure.Total:F2} ms count={rowsMeasure.Count} avg={rowsMeasure.Average:F2} ms; rows-arrange total={rowsArrange.Total:F2} ms count={rowsArrange.Count} avg={rowsArrange.Average:F2} ms; row-generate total={rowGenerate.Total:F2} ms count={rowGenerate.Count} avg={rowGenerate.Average:F2} ms; rows-display-reused={rowsDisplayReused}; rows-display-scanned={rowsDisplayScanned}; rows-display-removed={rowsDisplayRemoved}; rows-measured={rowsMeasured}; rows-measure-skipped={rowsMeasureSkipped}; rows-arranged={rowsArranged}; rows-arrange-skipped={rowsArrangeSkipped}; rows-arrange-offscreen={rowsArrangeOffscreen}; rows-measure-work={measureWorkRate:F1}%; rows-arrange-work={arrangeWorkRate:F1}%; rows-realized={rowsRealized}; rows-recycled={rowsRecycled}; rows-prepared={rowsPrepared}");
         }
 
         public void Dispose()
