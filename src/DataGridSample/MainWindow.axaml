@@ -467,6 +467,9 @@
     <TabItem Header="Filtering Model">
       <pages:FilteringModelSamplePage />
     </TabItem>
+    <TabItem Header="Between Filter Operator">
+      <pages:BetweenFilterOperatorPage />
+    </TabItem>
     <TabItem Header="Header Context Menu">
       <pages:HeaderContextMenuPage />
     </TabItem>
