@@ -264,16 +264,20 @@ public class DataGridTabSwitchBenchmarkTests
         {
             var rowsRefresh = GetDoubleStats(DataGridDiagnostics.Meters.RowsRefreshTimeName);
             var rowsDisplay = GetDoubleStats(DataGridDiagnostics.Meters.RowsDisplayUpdateTimeName);
+            var rowsMeasure = GetDoubleStats(DataGridDiagnostics.Meters.RowsMeasureTimeName);
+            var rowsArrange = GetDoubleStats(DataGridDiagnostics.Meters.RowsArrangeTimeName);
             var rowGenerate = GetDoubleStats(DataGridDiagnostics.Meters.RowGenerateTimeName);
             var gridRefresh = GetDoubleStats(DataGridDiagnostics.Meters.DataGridRefreshTimeName);
 
             var rowsRealized = GetLongTotal(DataGridDiagnostics.Meters.RowsRealizedCountName);
             var rowsRecycled = GetLongTotal(DataGridDiagnostics.Meters.RowsRecycledCountName);
             var rowsPrepared = GetLongTotal(DataGridDiagnostics.Meters.RowsPreparedCountName);
+            var rowsMeasured = GetLongTotal(DataGridDiagnostics.Meters.RowsMeasuredCountName);
+            var rowsArranged = GetLongTotal(DataGridDiagnostics.Meters.RowsArrangedCountName);
             var rowsDisplayReused = GetLongTotal(DataGridDiagnostics.Meters.RowsDisplayReusedCountName);
 
             return FormattableString.Invariant(
-                $"Tab switch diagnostics: grid-refresh total={gridRefresh.Total:F2} ms count={gridRefresh.Count} avg={gridRefresh.Average:F2} ms; rows-refresh total={rowsRefresh.Total:F2} ms count={rowsRefresh.Count} avg={rowsRefresh.Average:F2} ms; rows-display total={rowsDisplay.Total:F2} ms count={rowsDisplay.Count} avg={rowsDisplay.Average:F2} ms; row-generate total={rowGenerate.Total:F2} ms count={rowGenerate.Count} avg={rowGenerate.Average:F2} ms; rows-display-reused={rowsDisplayReused}; rows-realized={rowsRealized}; rows-recycled={rowsRecycled}; rows-prepared={rowsPrepared}");
+                $"Tab switch diagnostics: grid-refresh total={gridRefresh.Total:F2} ms count={gridRefresh.Count} avg={gridRefresh.Average:F2} ms; rows-refresh total={rowsRefresh.Total:F2} ms count={rowsRefresh.Count} avg={rowsRefresh.Average:F2} ms; rows-display total={rowsDisplay.Total:F2} ms count={rowsDisplay.Count} avg={rowsDisplay.Average:F2} ms; rows-measure total={rowsMeasure.Total:F2} ms count={rowsMeasure.Count} avg={rowsMeasure.Average:F2} ms; rows-arrange total={rowsArrange.Total:F2} ms count={rowsArrange.Count} avg={rowsArrange.Average:F2} ms; row-generate total={rowGenerate.Total:F2} ms count={rowGenerate.Count} avg={rowGenerate.Average:F2} ms; rows-display-reused={rowsDisplayReused}; rows-measured={rowsMeasured}; rows-arranged={rowsArranged}; rows-realized={rowsRealized}; rows-recycled={rowsRecycled}; rows-prepared={rowsPrepared}");
         }
 
         public void Dispose()
