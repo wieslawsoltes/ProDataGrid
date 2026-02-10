@@ -279,8 +279,12 @@ namespace Avalonia.Controls
                     _rowsPresenter.RegisterAnchorCandidate(groupFooter);
                 }
 
-                // Measure the element and update AvailableRowRoom
-                element.Measure(new Size(double.PositiveInfinity, double.PositiveInfinity));
+                // Avoid redundant measure work during displayed-row scan updates.
+                // Recycled/unchanged elements can already have a valid DesiredSize.
+                if (!element.IsMeasureValid)
+                {
+                    element.Measure(new Size(double.PositiveInfinity, double.PositiveInfinity));
+                }
                 AvailableSlotElementRoom -= element.DesiredSize.Height;
 
                 var estimator = RowHeightEstimator;
