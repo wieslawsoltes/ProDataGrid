@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+      <title>Filtering Model: End-to-End Usage | ProDataGrid for Avalonia </title>
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <meta name="title" content="Filtering Model: End-to-End Usage | ProDataGrid for Avalonia ">
+      
+      
+      <link rel="icon" href="../favicon.ico">
+      <link rel="stylesheet" href="../public/docfx.min.css">
+      <link rel="stylesheet" href="../public/main.css">
+      <meta name="docfx:navrel" content="../toc.html">
+      <meta name="docfx:tocrel" content="toc.html">
+      
+      
+      
+      
+      <meta name="docfx:docurl" content="https://github.com/wieslawsoltes/ProDataGrid/blob/master/docfx/articles/filtering-model-end-to-end.md/#L1">
+      <meta name="loc:inThisArticle" content="In this article">
+      <meta name="loc:searchResultsCount" content="{count} results for &quot;{query}&quot;">
+      <meta name="loc:searchNoResults" content="No results for &quot;{query}&quot;">
+      <meta name="loc:tocFilter" content="Filter by title">
+      <meta name="loc:nextArticle" content="Next">
+      <meta name="loc:prevArticle" content="Previous">
+      <meta name="loc:themeLight" content="Light">
+      <meta name="loc:themeDark" content="Dark">
+      <meta name="loc:themeAuto" content="Auto">
+      <meta name="loc:changeTheme" content="Change theme">
+      <meta name="loc:copy" content="Copy">
+      <meta name="loc:downloadPdf" content="Download PDF">
+
+      <script type="module" src="./../public/docfx.min.js"></script>
+
+      <script>
+        const theme = localStorage.getItem('theme') || 'auto'
+        document.documentElement.setAttribute('data-bs-theme', theme === 'auto' ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light') : theme)
+      </script>
+
+  </head>
+
+  <body class="tex2jax_ignore" data-layout="" data-yaml-mime="">
+    <header class="bg-body border-bottom">
+      <nav id="autocollapse" class="navbar navbar-expand-md" role="navigation">
+        <div class="container-xxl flex-nowrap">
+          <a class="navbar-brand" href="../index.html">
+            <img id="logo" class="svg" src="../images/logo.svg" alt="">
+            
+          </a>
+          <button class="btn btn-lg d-md-none border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navpanel" aria-controls="navpanel" aria-expanded="false" aria-label="Toggle navigation">
+            <i class="bi bi-three-dots"></i>
+          </button>
+          <div class="collapse navbar-collapse" id="navpanel">
+            <div id="navbar">
+            </div>
+          </div>
+        </div>
+      </nav>
+    </header>
+
+    <main class="container-xxl">
+      <div class="toc-offcanvas">
+        <div class="offcanvas-md offcanvas-start" tabindex="-1" id="tocOffcanvas" aria-labelledby="tocOffcanvasLabel">
+          <div class="offcanvas-header">
+            <h5 class="offcanvas-title" id="tocOffcanvasLabel">Table of Contents</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="offcanvas" data-bs-target="#tocOffcanvas" aria-label="Close"></button>
+          </div>
+          <div class="offcanvas-body">
+            <nav class="toc" id="toc"></nav>
+          </div>
+        </div>
+      </div>
+
+      <div class="content">
+        <div class="actionbar">
+          <button class="btn btn-lg border-0 d-md-none" type="button" data-bs-toggle="offcanvas" data-bs-target="#tocOffcanvas" aria-controls="tocOffcanvas" aria-expanded="false" aria-label="Show table of contents">
+            <i class="bi bi-list"></i>
+          </button>
+
+          <nav id="breadcrumb"></nav>
+        </div>
+
+        <article data-uid="">
+<h1 id="filtering-model-end-to-end-usage">Filtering Model: End-to-End Usage</h1>
+
+<p>This guide shows a complete <code>FilteringModel</code> setup: model wiring, filter flyouts, descriptor updates, and troubleshooting. It is based on the filtering sample in <code>src/DataGridSample</code>.</p>
+<h2 id="what-this-gives-you">What this gives you</h2>
+<ul>
+<li>One source of truth for filter state (<code>FilteringModel.Descriptors</code>).</li>
+<li>Header glyphs and filter flyouts that stay in sync with model state.</li>
+<li>Programmatic filtering (<code>SetOrUpdate</code>, <code>Apply</code>, <code>Remove</code>, <code>Clear</code>) without mutating <code>DataGridCollectionView.Filter</code> manually.</li>
+<li>A migration path to DynamicData/server-side filtering through a custom adapter.</li>
+</ul>
+<h2 id="end-to-end-flow">End-to-end flow</h2>
+<ol>
+<li>UI (flyout editors, buttons, commands) updates filter context objects.</li>
+<li>Filter context commands write <code>FilteringDescriptor</code> entries to <code>FilteringModel</code>.</li>
+<li><code>DataGridFilteringAdapter</code> composes predicates from descriptors.</li>
+<li>The adapter updates the view filter (<code>OwnsViewFilter=true</code>) or reconciles external filter ownership (<code>OwnsViewFilter=false</code>).</li>
+<li>The grid updates rows and filter glyph state from the same descriptor list.</li>
+</ol>
+<h2 id="1-viewmodel-wiring">1. ViewModel wiring</h2>
+<p>Use stable column ids and include <code>propertyPath</code> in descriptors. For inline XAML columns, string <code>ColumnKey</code> ids are the most robust option.</p>
+<pre><code class="lang-csharp">using System;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Linq;
+using System.Windows.Input;
+using Avalonia.Collections;
+using Avalonia.Controls.DataGridFiltering;
+
+public sealed class OrdersViewModel
+{
+    private const string CustomerColumn = &quot;customer&quot;;
+    private const string StatusColumn = &quot;status&quot;;
+    private const string OrderedColumn = &quot;ordered&quot;;
+    private const string TotalColumn = &quot;total&quot;;
+
+    public DataGridCollectionView View { get; }
+    public FilteringModel FilteringModel { get; } = new() { OwnsViewFilter = true };
+
+    public IFilterTextContext CustomerFilter { get; }
+    public IFilterEnumContext StatusFilter { get; }
+    public IFilterDateContext OrderedFilter { get; }
+    public IFilterNumberContext TotalFilter { get; }
+    public ICommand ClearAllCommand { get; }
+
+    public OrdersViewModel()
+    {
+        View = new DataGridCollectionView(new ObservableCollection&lt;Order&gt;(Seed()));
+
+        CustomerFilter = new TextFilterContext(
+            &quot;Customer contains&quot;,
+            apply: ApplyCustomer,
+            clear: () =&gt; FilteringModel.Remove(CustomerColumn));
+
+        StatusFilter = new EnumFilterContext(
+            &quot;Status (In)&quot;,
+            new[] { &quot;New&quot;, &quot;Processing&quot;, &quot;Shipped&quot;, &quot;Delivered&quot;, &quot;Canceled&quot; },
+            apply: ApplyStatus,
+            clear: () =&gt; FilteringModel.Remove(StatusColumn));
+
+        OrderedFilter = new DateFilterContext(
+            &quot;Ordered between&quot;,
+            apply: ApplyOrderedRange,
+            clear: () =&gt; FilteringModel.Remove(OrderedColumn));
+
+        TotalFilter = new NumberFilterContext(
+            &quot;Total between&quot;,
+            apply: ApplyTotalRange,
+            clear: () =&gt; FilteringModel.Remove(TotalColumn));
+
+        ClearAllCommand = new RelayCommand(_ =&gt; FilteringModel.Clear());
+    }
+
+    private void ApplyCustomer(string? text)
+    {
+        if (string.IsNullOrWhiteSpace(text))
+        {
+            FilteringModel.Remove(CustomerColumn);
+            return;
+        }
+
+        FilteringModel.SetOrUpdate(new FilteringDescriptor(
+            columnId: CustomerColumn,
+            @operator: FilteringOperator.Contains,
+            propertyPath: nameof(Order.Customer),
+            value: text,
+            stringComparison: StringComparison.OrdinalIgnoreCase));
+    }
+
+    private void ApplyStatus(IReadOnlyList&lt;string&gt; selected)
+    {
+        if (selected.Count == 0)
+        {
+            FilteringModel.Remove(StatusColumn);
+            return;
+        }
+
+        FilteringModel.SetOrUpdate(new FilteringDescriptor(
+            columnId: StatusColumn,
+            @operator: FilteringOperator.In,
+            propertyPath: nameof(Order.Status),
+            values: selected.Cast&lt;object&gt;().ToArray()));
+    }
+
+    private void ApplyOrderedRange(DateTimeOffset? from, DateTimeOffset? to)
+    {
+        if (from == null &amp;&amp; to == null)
+        {
+            FilteringModel.Remove(OrderedColumn);
+            return;
+        }
+
+        FilteringModel.SetOrUpdate(new FilteringDescriptor(
+            columnId: OrderedColumn,
+            @operator: FilteringOperator.Between,
+            propertyPath: nameof(Order.Ordered),
+            values: new object[] { from ?? DateTimeOffset.MinValue, to ?? DateTimeOffset.MaxValue }));
+    }
+
+    private void ApplyTotalRange(double? min, double? max)
+    {
+        if (min == null &amp;&amp; max == null)
+        {
+            FilteringModel.Remove(TotalColumn);
+            return;
+        }
+
+        FilteringModel.SetOrUpdate(new FilteringDescriptor(
+            columnId: TotalColumn,
+            @operator: FilteringOperator.Between,
+            propertyPath: nameof(Order.Total),
+            values: new object[] { min ?? double.MinValue, max ?? double.MaxValue }));
+    }
+
+    private static IEnumerable&lt;Order&gt; Seed()
+    {
+        return new[]
+        {
+            new Order(&quot;Contoso&quot;, &quot;New&quot;, DateTimeOffset.UtcNow.AddDays(-1), 450),
+            new Order(&quot;Fabrikam&quot;, &quot;Processing&quot;, DateTimeOffset.UtcNow.AddDays(-4), 1320),
+            new Order(&quot;Tailspin&quot;, &quot;Delivered&quot;, DateTimeOffset.UtcNow.AddDays(-8), 860)
+        };
+    }
+
+    public sealed record Order(string Customer, string Status, DateTimeOffset Ordered, double Total);
+}
+</code></pre>
+<p>The shared filter templates consume simple context interfaces:</p>
+<ul>
+<li><code>IFilterTextContext</code></li>
+<li><code>IFilterNumberContext</code></li>
+<li><code>IFilterDateContext</code></li>
+<li><code>IFilterEnumContext</code></li>
+</ul>
+<p>You can copy the minimal context implementations from <code>src/DataGridSample/ViewModels/FilteringModelSampleViewModel.cs</code>.
+The sample uses <code>RelayCommand</code>; any <code>ICommand</code> implementation is valid for the filter context apply/clear commands.</p>
+<h2 id="2-xaml-wiring-with-built-in-filter-editors">2. XAML wiring with built-in filter editors</h2>
+<p>Attach <code>FilteringModel</code> to the grid, assign <code>ColumnKey</code> on each filterable column, and reuse built-in filter templates.</p>
+<pre><code class="lang-xml">&lt;UserControl.Resources&gt;
+  &lt;Flyout x:Key=&quot;CustomerFilterFlyout&quot;
+          Placement=&quot;Bottom&quot;
+          FlyoutPresenterTheme=&quot;{StaticResource DataGridFilterFlyoutPresenterTheme}&quot;
+          Content=&quot;{Binding CustomerFilter}&quot;
+          ContentTemplate=&quot;{StaticResource DataGridFilterTextEditorTemplate}&quot; /&gt;
+
+  &lt;Flyout x:Key=&quot;StatusFilterFlyout&quot;
+          Placement=&quot;Bottom&quot;
+          FlyoutPresenterTheme=&quot;{StaticResource DataGridFilterFlyoutPresenterTheme}&quot;
+          Content=&quot;{Binding StatusFilter}&quot;
+          ContentTemplate=&quot;{StaticResource DataGridFilterEnumEditorTemplate}&quot; /&gt;
+
+  &lt;Flyout x:Key=&quot;OrderedFilterFlyout&quot;
+          Placement=&quot;Bottom&quot;
+          FlyoutPresenterTheme=&quot;{StaticResource DataGridFilterFlyoutPresenterTheme}&quot;
+          Content=&quot;{Binding OrderedFilter}&quot;
+          ContentTemplate=&quot;{StaticResource DataGridFilterDateEditorTemplate}&quot; /&gt;
+
+  &lt;Flyout x:Key=&quot;TotalFilterFlyout&quot;
+          Placement=&quot;Bottom&quot;
+          FlyoutPresenterTheme=&quot;{StaticResource DataGridFilterFlyoutPresenterTheme}&quot;
+          Content=&quot;{Binding TotalFilter}&quot;
+          ContentTemplate=&quot;{StaticResource DataGridFilterNumberEditorTemplate}&quot; /&gt;
+&lt;/UserControl.Resources&gt;
+
+&lt;DataGrid ItemsSource=&quot;{Binding View}&quot;
+          FilteringModel=&quot;{Binding FilteringModel}&quot;
+          AutoGenerateColumns=&quot;False&quot;&gt;
+  &lt;DataGrid.Columns&gt;
+    &lt;DataGridTextColumn Header=&quot;Customer&quot;
+                        ColumnKey=&quot;customer&quot;
+                        Binding=&quot;{Binding Customer}&quot;
+                        SortMemberPath=&quot;Customer&quot;
+                        FilterFlyout=&quot;{StaticResource CustomerFilterFlyout}&quot; /&gt;
+
+    &lt;DataGridTextColumn Header=&quot;Status&quot;
+                        ColumnKey=&quot;status&quot;
+                        Binding=&quot;{Binding Status}&quot;
+                        SortMemberPath=&quot;Status&quot;
+                        FilterFlyout=&quot;{StaticResource StatusFilterFlyout}&quot; /&gt;
+
+    &lt;DataGridTextColumn Header=&quot;Ordered&quot;
+                        ColumnKey=&quot;ordered&quot;
+                        Binding=&quot;{Binding Ordered, StringFormat='{}{0:MM-dd}'}&quot;
+                        SortMemberPath=&quot;Ordered&quot;
+                        FilterFlyout=&quot;{StaticResource OrderedFilterFlyout}&quot; /&gt;
+
+    &lt;DataGridTextColumn Header=&quot;Total&quot;
+                        ColumnKey=&quot;total&quot;
+                        Binding=&quot;{Binding Total, StringFormat='{}{0:C2}'}&quot;
+                        SortMemberPath=&quot;Total&quot;
+                        FilterFlyout=&quot;{StaticResource TotalFilterFlyout}&quot; /&gt;
+  &lt;/DataGrid.Columns&gt;
+&lt;/DataGrid&gt;
+</code></pre>
+<h2 id="3-programmatic-filtering-and-batching">3. Programmatic filtering and batching</h2>
+<p>Use <code>DeferRefresh()</code> when you apply several descriptors at once.</p>
+<pre><code class="lang-csharp">using (FilteringModel.DeferRefresh())
+{
+    FilteringModel.SetOrUpdate(new FilteringDescriptor(
+        columnId: &quot;status&quot;,
+        @operator: FilteringOperator.In,
+        propertyPath: nameof(Order.Status),
+        values: new object[] { &quot;Processing&quot;, &quot;Shipped&quot; }));
+
+    FilteringModel.SetOrUpdate(new FilteringDescriptor(
+        columnId: &quot;total&quot;,
+        @operator: FilteringOperator.GreaterThanOrEqual,
+        propertyPath: nameof(Order.Total),
+        value: 500d));
+}
+</code></pre>
+<p>Use <code>Apply(...)</code> when you want to replace the full descriptor set in one operation:</p>
+<pre><code class="lang-csharp">FilteringModel.Apply(new[]
+{
+    new FilteringDescriptor(&quot;customer&quot;, FilteringOperator.Contains, nameof(Order.Customer), value: &quot;Contoso&quot;),
+    new FilteringDescriptor(&quot;status&quot;, FilteringOperator.Equals, nameof(Order.Status), value: &quot;Delivered&quot;)
+});
+</code></pre>
+<h2 id="4-column-identity-rules-important">4. Column identity rules (important)</h2>
+<p>Choose one identity strategy and keep it consistent:</p>
+<ul>
+<li>Inline XAML columns: set <code>DataGridColumn.ColumnKey</code> and use the same key as <code>FilteringDescriptor.ColumnId</code>.</li>
+<li>Column definitions (<code>ColumnDefinitionsSource</code>): use the definition instance or its <code>ColumnKey</code>.</li>
+<li>Always include <code>propertyPath</code> unless the descriptor is <code>FilteringOperator.Custom</code> with a full predicate.</li>
+</ul>
+<p>Common failure mode:</p>
+<ul>
+<li>Descriptors are created with <code>DataGridColumnDefinition</code> ids but the page uses inline <code>DataGridColumn</code>s. The ids do not match materialized columns, so predicates are not applied. Use shared <code>ColumnKey</code> values (or matching <code>propertyPath</code>) to fix this.</li>
+</ul>
+<h2 id="5-external-filter-ownership">5. External filter ownership</h2>
+<p>If another layer owns <code>DataGridCollectionView.Filter</code>, set:</p>
+<pre><code class="lang-csharp">FilteringModel.OwnsViewFilter = false;
+</code></pre>
+<p>In this mode the filtering adapter reconciles model descriptors with the external filter instead of replacing it as the single owner.</p>
+<h2 id="6-dynamicdata-or-server-side-filtering">6. DynamicData or server-side filtering</h2>
+<p>Keep the same <code>FilteringModel</code> in the grid, but provide a custom <code>FilteringAdapterFactory</code> that translates descriptors to your upstream query/predicate pipeline.</p>
+<pre><code class="lang-csharp">grid.FilteringModel = viewModel.FilteringModel;
+grid.FilteringAdapterFactory = viewModel.FilteringAdapterFactory;
+</code></pre>
+<p>Reference implementations:</p>
+<ul>
+<li><code>src/DataGridSample/Adapters/DynamicDataFilteringAdapterFactory.cs</code></li>
+<li><code>src/DataGridSample/Adapters/DynamicDataStreamingFilteringAdapterFactory.cs</code></li>
+</ul>
+<h2 id="full-sample-references">Full sample references</h2>
+<ul>
+<li><code>src/DataGridSample/Pages/FilteringModelSamplePage.axaml</code></li>
+<li><code>src/DataGridSample/ViewModels/FilteringModelSampleViewModel.cs</code></li>
+<li><code>src/DataGridSample/Pages/ColumnDefinitionsFilteringModelPage.axaml</code></li>
+</ul>
+<h2 id="related-articles">Related articles</h2>
+<ul>
+<li><a href="data-operations.html">Data Operations</a></li>
+<li><a href="sorting-model-end-to-end.html">Sorting Model: End-to-End Usage</a></li>
+<li><a href="search-model-end-to-end.html">Search Model: End-to-End Usage</a></li>
+<li><a href="column-header-menus-and-filters.html">Column Header Menus and Filters</a></li>
+<li><a href="column-definitions-models.html">Column Definitions (Model Integration)</a></li>
+<li><a href="dynamicdata-streaming-sourcelist.html">DynamicData Streaming (SourceList)</a></li>
+</ul>
+
+</article>
+
+        <div class="contribution d-print-none">
+          <a href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/docfx/articles/filtering-model-end-to-end.md/#L1" class="edit-link">Edit this page</a>
+        </div>
+
+        <div class="next-article d-print-none border-top" id="nextArticle"></div>
+
+      </div>
+
+      <div class="affix">
+        <nav id="affix"></nav>
+      </div>
+    </main>
+
+
+    <footer class="border-top text-secondary">
+      <div class="container-xxl">
+        <div class="flex-fill">
+          <span>Made with <a href="https://dotnet.github.io/docfx">docfx</a></span>
+        </div>
+      </div>
+    </footer>
+  </body>
+</html>

@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+      <title>Hierarchical Model: End-to-End Usage | ProDataGrid for Avalonia </title>
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <meta name="title" content="Hierarchical Model: End-to-End Usage | ProDataGrid for Avalonia ">
+      
+      
+      <link rel="icon" href="../favicon.ico">
+      <link rel="stylesheet" href="../public/docfx.min.css">
+      <link rel="stylesheet" href="../public/main.css">
+      <meta name="docfx:navrel" content="../toc.html">
+      <meta name="docfx:tocrel" content="toc.html">
+      
+      
+      
+      
+      <meta name="docfx:docurl" content="https://github.com/wieslawsoltes/ProDataGrid/blob/master/docfx/articles/hierarchical-model-end-to-end.md/#L1">
+      <meta name="loc:inThisArticle" content="In this article">
+      <meta name="loc:searchResultsCount" content="{count} results for &quot;{query}&quot;">
+      <meta name="loc:searchNoResults" content="No results for &quot;{query}&quot;">
+      <meta name="loc:tocFilter" content="Filter by title">
+      <meta name="loc:nextArticle" content="Next">
+      <meta name="loc:prevArticle" content="Previous">
+      <meta name="loc:themeLight" content="Light">
+      <meta name="loc:themeDark" content="Dark">
+      <meta name="loc:themeAuto" content="Auto">
+      <meta name="loc:changeTheme" content="Change theme">
+      <meta name="loc:copy" content="Copy">
+      <meta name="loc:downloadPdf" content="Download PDF">
+
+      <script type="module" src="./../public/docfx.min.js"></script>
+
+      <script>
+        const theme = localStorage.getItem('theme') || 'auto'
+        document.documentElement.setAttribute('data-bs-theme', theme === 'auto' ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light') : theme)
+      </script>
+
+  </head>
+
+  <body class="tex2jax_ignore" data-layout="" data-yaml-mime="">
+    <header class="bg-body border-bottom">
+      <nav id="autocollapse" class="navbar navbar-expand-md" role="navigation">
+        <div class="container-xxl flex-nowrap">
+          <a class="navbar-brand" href="../index.html">
+            <img id="logo" class="svg" src="../images/logo.svg" alt="">
+            
+          </a>
+          <button class="btn btn-lg d-md-none border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navpanel" aria-controls="navpanel" aria-expanded="false" aria-label="Toggle navigation">
+            <i class="bi bi-three-dots"></i>
+          </button>
+          <div class="collapse navbar-collapse" id="navpanel">
+            <div id="navbar">
+            </div>
+          </div>
+        </div>
+      </nav>
+    </header>
+
+    <main class="container-xxl">
+      <div class="toc-offcanvas">
+        <div class="offcanvas-md offcanvas-start" tabindex="-1" id="tocOffcanvas" aria-labelledby="tocOffcanvasLabel">
+          <div class="offcanvas-header">
+            <h5 class="offcanvas-title" id="tocOffcanvasLabel">Table of Contents</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="offcanvas" data-bs-target="#tocOffcanvas" aria-label="Close"></button>
+          </div>
+          <div class="offcanvas-body">
+            <nav class="toc" id="toc"></nav>
+          </div>
+        </div>
+      </div>
+
+      <div class="content">
+        <div class="actionbar">
+          <button class="btn btn-lg border-0 d-md-none" type="button" data-bs-toggle="offcanvas" data-bs-target="#tocOffcanvas" aria-controls="tocOffcanvas" aria-expanded="false" aria-label="Show table of contents">
+            <i class="bi bi-list"></i>
+          </button>
+
+          <nav id="breadcrumb"></nav>
+        </div>
+
+        <article data-uid="">
+<h1 id="hierarchical-model-end-to-end-usage">Hierarchical Model: End-to-End Usage</h1>
+
+<p>This guide shows complete <code>HierarchicalModel</code> usage with <code>DataGrid</code>: building the tree model, binding flattened nodes automatically, hierarchical sorting, and expansion workflows.</p>
+<h2 id="what-this-gives-you">What this gives you</h2>
+<ul>
+<li>Tree data rendered in <code>DataGrid</code> without manually maintaining a flattened list.</li>
+<li>Expand/collapse behavior driven by a model instead of UI container state.</li>
+<li>Optional sibling sorting integrated with <code>SortingModel</code>.</li>
+<li>Scalable updates through <code>VirtualizeChildren</code> and model refresh APIs.</li>
+</ul>
+<h2 id="end-to-end-flow">End-to-end flow</h2>
+<ol>
+<li>Build <code>HierarchicalOptions&lt;T&gt;</code> with child selectors and behavior flags.</li>
+<li>Create <code>HierarchicalModel&lt;T&gt;</code> and set roots.</li>
+<li>Bind <code>HierarchicalModel</code> to grid with <code>HierarchicalRowsEnabled=&quot;True&quot;</code>.</li>
+<li>Grid consumes flattened visible nodes and updates as model expansion changes.</li>
+</ol>
+<h2 id="1-viewmodel-wiring">1. ViewModel wiring</h2>
+<pre><code class="lang-csharp">using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using Avalonia.Controls.DataGridHierarchical;
+using Avalonia.Controls.DataGridSorting;
+
+public sealed class FilesViewModel
+{
+    public HierarchicalModel&lt;TreeItem&gt; Model { get; }
+    public ISortingModel SortingModel { get; } = new SortingModel();
+
+    public FilesViewModel(TreeItem root)
+    {
+        var options = new HierarchicalOptions&lt;TreeItem&gt;
+        {
+            ItemsSelector = item =&gt; item.Children,
+            IsLeafSelector = item =&gt; !item.IsDirectory,
+            AutoExpandRoot = true,
+            MaxAutoExpandDepth = 0,
+            VirtualizeChildren = true
+        };
+
+        Model = new HierarchicalModel&lt;TreeItem&gt;(options);
+        Model.SetRoot(root);
+
+        SortingModel.SortingChanged += (_, e) =&gt;
+        {
+            var comparer = BuildComparer(e.NewDescriptors);
+            Model.ApplySiblingComparer(comparer, recursive: true);
+        };
+    }
+
+    public void ExpandAll() =&gt; Model.ExpandAll();
+    public void CollapseAll() =&gt; Model.CollapseAll();
+    public void RefreshRoot() =&gt; Model.Refresh(Model.Root);
+
+    private static IComparer&lt;TreeItem&gt; BuildComparer(IReadOnlyList&lt;SortingDescriptor&gt; descriptors)
+    {
+        return Comparer&lt;TreeItem&gt;.Create((left, right) =&gt;
+        {
+            foreach (var descriptor in descriptors)
+            {
+                if (string.Equals(descriptor.PropertyPath, &quot;Item.Name&quot;, StringComparison.Ordinal))
+                {
+                    var result = string.Compare(left.Name, right.Name, StringComparison.OrdinalIgnoreCase);
+                    if (result != 0)
+                    {
+                        return descriptor.Direction == ListSortDirection.Descending ? -result : result;
+                    }
+                }
+            }
+
+            return 0;
+        });
+    }
+}
+</code></pre>
+<p>Minimal item shape used by the sample:</p>
+<pre><code class="lang-csharp">public sealed class TreeItem
+{
+    public string Name { get; init; } = string.Empty;
+    public string Kind { get; init; } = string.Empty;
+    public long Size { get; init; }
+    public DateTimeOffset Modified { get; init; }
+    public bool IsDirectory { get; init; }
+    public IReadOnlyList&lt;TreeItem&gt; Children { get; init; } = Array.Empty&lt;TreeItem&gt;();
+}
+</code></pre>
+<h2 id="2-xaml-wiring">2. XAML wiring</h2>
+<pre><code class="lang-xml">&lt;DataGrid HierarchicalModel=&quot;{Binding Model}&quot;
+          HierarchicalRowsEnabled=&quot;True&quot;
+          SortingModel=&quot;{Binding SortingModel}&quot;
+          SortingAdapterFactory=&quot;{StaticResource HierarchicalSortingAdapterFactory}&quot;
+          AutoGenerateColumns=&quot;False&quot;
+          CanUserSortColumns=&quot;True&quot;&gt;
+  &lt;DataGrid.Columns&gt;
+    &lt;DataGridHierarchicalColumn Header=&quot;Name&quot;
+                                SortMemberPath=&quot;Item.Name&quot;
+                                Binding=&quot;{Binding Item}&quot;
+                                Width=&quot;2*&quot; /&gt;
+    &lt;DataGridTemplateColumn Header=&quot;Kind&quot; SortMemberPath=&quot;Item.Kind&quot; Width=&quot;120&quot; /&gt;
+    &lt;DataGridTemplateColumn Header=&quot;Size&quot; SortMemberPath=&quot;Item.Size&quot; Width=&quot;120&quot; /&gt;
+    &lt;DataGridTemplateColumn Header=&quot;Modified&quot; SortMemberPath=&quot;Item.Modified&quot; Width=&quot;160&quot; /&gt;
+  &lt;/DataGrid.Columns&gt;
+&lt;/DataGrid&gt;
+</code></pre>
+<p>When <code>HierarchicalRowsEnabled</code> is true and <code>ItemsSource</code> is omitted, the grid binds to the hierarchical model output automatically.</p>
+<h2 id="3-expansion-and-path-behavior">3. Expansion and path behavior</h2>
+<p>Use model commands (<code>Expand</code>, <code>Collapse</code>, <code>ExpandAll</code>, <code>CollapseAll</code>) rather than manipulating row containers directly.</p>
+<p>For persistent expansion/selection scenarios, configure:</p>
+<ul>
+<li><code>ExpandedStateKeyMode</code> (<code>Item</code>, <code>Path</code>, <code>Custom</code>)</li>
+<li><code>ItemPathSelector</code></li>
+<li><code>IsExpandedSelector</code> / <code>IsExpandedSetter</code></li>
+</ul>
+<p>These options keep expansion stable across refreshes and source updates.</p>
+<h2 id="4-refresh-and-high-frequency-updates">4. Refresh and high-frequency updates</h2>
+<ul>
+<li>Call <code>Model.Refresh(node)</code> when child content changes.</li>
+<li>For observable child collections, model flattening updates incrementally.</li>
+<li>Keep <code>VirtualizeChildren=true</code> for large trees to avoid retaining collapsed child nodes.</li>
+</ul>
+<h2 id="5-filteringsearching-with-hierarchical-data">5. Filtering/searching with hierarchical data</h2>
+<p>You can combine hierarchical data with filtering/search models. Common pattern:</p>
+<ol>
+<li>Translate descriptors to predicates (often via custom adapter factories).</li>
+<li>Apply tree-aware predicates in your pipeline.</li>
+<li>Refresh the hierarchical model after predicate changes.</li>
+</ol>
+<p>Reference implementations:</p>
+<ul>
+<li><code>src/DataGridSample/Adapters/HierarchicalFilteringAdapterFactory.cs</code></li>
+<li><code>src/DataGridSample/Adapters/HierarchicalSearchAdapterFactory.cs</code></li>
+<li><code>src/DataGridSample/Adapters/HierarchicalSortingAdapterFactory.cs</code></li>
+</ul>
+<h2 id="troubleshooting">Troubleshooting</h2>
+<ul>
+<li>Grid shows flat rows only:
+Ensure <code>HierarchicalRowsEnabled=&quot;True&quot;</code> and a valid <code>HierarchicalModel</code> is assigned.</li>
+<li>Expansion toggles do nothing:
+Verify <code>ItemsSelector</code>/<code>ChildrenSelector</code> returns children for directory/non-leaf nodes.</li>
+<li>Sort headers toggle but tree order does not change:
+Apply sibling comparer changes in <code>SortingChanged</code> (or use a hierarchical sorting adapter).</li>
+</ul>
+<h2 id="full-sample-references">Full sample references</h2>
+<ul>
+<li><code>src/DataGridSample/Pages/HierarchicalSamplePage.axaml</code></li>
+<li><code>src/DataGridSample/ViewModels/HierarchicalSampleViewModel.cs</code></li>
+<li><code>src/DataGridSample/Pages/ColumnDefinitionsHierarchicalPage.axaml</code></li>
+</ul>
+<h2 id="related-articles">Related articles</h2>
+<ul>
+<li><a href="hierarchical-data.html">Hierarchical Data</a></li>
+<li><a href="hierarchical-high-frequency-updates.html">Hierarchical High-Frequency Updates</a></li>
+<li><a href="sorting-model-end-to-end.html">Sorting Model: End-to-End Usage</a></li>
+<li><a href="filtering-model-end-to-end.html">Filtering Model: End-to-End Usage</a></li>
+</ul>
+
+</article>
+
+        <div class="contribution d-print-none">
+          <a href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/docfx/articles/hierarchical-model-end-to-end.md/#L1" class="edit-link">Edit this page</a>
+        </div>
+
+        <div class="next-article d-print-none border-top" id="nextArticle"></div>
+
+      </div>
+
+      <div class="affix">
+        <nav id="affix"></nav>
+      </div>
+    </main>
+
+
+    <footer class="border-top text-secondary">
+      <div class="container-xxl">
+        <div class="flex-fill">
+          <span>Made with <a href="https://dotnet.github.io/docfx">docfx</a></span>
+        </div>
+      </div>
+    </footer>
+  </body>
+</html>

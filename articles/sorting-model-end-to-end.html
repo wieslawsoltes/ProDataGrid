@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+      <title>Sorting Model: End-to-End Usage | ProDataGrid for Avalonia </title>
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <meta name="title" content="Sorting Model: End-to-End Usage | ProDataGrid for Avalonia ">
+      
+      
+      <link rel="icon" href="../favicon.ico">
+      <link rel="stylesheet" href="../public/docfx.min.css">
+      <link rel="stylesheet" href="../public/main.css">
+      <meta name="docfx:navrel" content="../toc.html">
+      <meta name="docfx:tocrel" content="toc.html">
+      
+      
+      
+      
+      <meta name="docfx:docurl" content="https://github.com/wieslawsoltes/ProDataGrid/blob/master/docfx/articles/sorting-model-end-to-end.md/#L1">
+      <meta name="loc:inThisArticle" content="In this article">
+      <meta name="loc:searchResultsCount" content="{count} results for &quot;{query}&quot;">
+      <meta name="loc:searchNoResults" content="No results for &quot;{query}&quot;">
+      <meta name="loc:tocFilter" content="Filter by title">
+      <meta name="loc:nextArticle" content="Next">
+      <meta name="loc:prevArticle" content="Previous">
+      <meta name="loc:themeLight" content="Light">
+      <meta name="loc:themeDark" content="Dark">
+      <meta name="loc:themeAuto" content="Auto">
+      <meta name="loc:changeTheme" content="Change theme">
+      <meta name="loc:copy" content="Copy">
+      <meta name="loc:downloadPdf" content="Download PDF">
+
+      <script type="module" src="./../public/docfx.min.js"></script>
+
+      <script>
+        const theme = localStorage.getItem('theme') || 'auto'
+        document.documentElement.setAttribute('data-bs-theme', theme === 'auto' ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light') : theme)
+      </script>
+
+  </head>
+
+  <body class="tex2jax_ignore" data-layout="" data-yaml-mime="">
+    <header class="bg-body border-bottom">
+      <nav id="autocollapse" class="navbar navbar-expand-md" role="navigation">
+        <div class="container-xxl flex-nowrap">
+          <a class="navbar-brand" href="../index.html">
+            <img id="logo" class="svg" src="../images/logo.svg" alt="">
+            
+          </a>
+          <button class="btn btn-lg d-md-none border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navpanel" aria-controls="navpanel" aria-expanded="false" aria-label="Toggle navigation">
+            <i class="bi bi-three-dots"></i>
+          </button>
+          <div class="collapse navbar-collapse" id="navpanel">
+            <div id="navbar">
+            </div>
+          </div>
+        </div>
+      </nav>
+    </header>
+
+    <main class="container-xxl">
+      <div class="toc-offcanvas">
+        <div class="offcanvas-md offcanvas-start" tabindex="-1" id="tocOffcanvas" aria-labelledby="tocOffcanvasLabel">
+          <div class="offcanvas-header">
+            <h5 class="offcanvas-title" id="tocOffcanvasLabel">Table of Contents</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="offcanvas" data-bs-target="#tocOffcanvas" aria-label="Close"></button>
+          </div>
+          <div class="offcanvas-body">
+            <nav class="toc" id="toc"></nav>
+          </div>
+        </div>
+      </div>
+
+      <div class="content">
+        <div class="actionbar">
+          <button class="btn btn-lg border-0 d-md-none" type="button" data-bs-toggle="offcanvas" data-bs-target="#tocOffcanvas" aria-controls="tocOffcanvas" aria-expanded="false" aria-label="Show table of contents">
+            <i class="bi bi-list"></i>
+          </button>
+
+          <nav id="breadcrumb"></nav>
+        </div>
+
+        <article data-uid="">
+<h1 id="sorting-model-end-to-end-usage">Sorting Model: End-to-End Usage</h1>
+
+<p>This guide shows complete <code>SortingModel</code> wiring: descriptor ownership, header gestures, programmatic presets, and adapter handoff for upstream sorting pipelines.</p>
+<h2 id="what-this-gives-you">What this gives you</h2>
+<ul>
+<li>A single sort state source (<code>SortingModel.Descriptors</code>).</li>
+<li>Header-click sorting and programmatic sorting through the same model.</li>
+<li>Optional guard rails via <code>SortingChanging</code> (cancel/normalize sort changes).</li>
+<li>Clear ownership control between model and <code>DataGridCollectionView.SortDescriptions</code>.</li>
+</ul>
+<h2 id="end-to-end-flow">End-to-end flow</h2>
+<ol>
+<li>Header clicks or commands create/update sort descriptors.</li>
+<li><code>SortingModel</code> raises <code>SortingChanging</code> and then <code>SortingChanged</code>.</li>
+<li>The sorting adapter applies descriptors to the view sort pipeline.</li>
+<li>Grid sort glyphs and <code>SortDescriptions</code> remain synchronized.</li>
+</ol>
+<h2 id="1-viewmodel-wiring">1. ViewModel wiring</h2>
+<p>Use stable <code>columnId</code> values (<code>ColumnKey</code> or definition instance) and include <code>propertyPath</code> when sorting by member path.</p>
+<pre><code class="lang-csharp">using System;
+using System.ComponentModel;
+using Avalonia.Collections;
+using Avalonia.Controls.DataGridSorting;
+
+public sealed class DeploymentsViewModel
+{
+    public DataGridCollectionView View { get; }
+
+    public ISortingModel SortingModel { get; } = new SortingModel
+    {
+        MultiSort = true,
+        CycleMode = SortCycleMode.AscendingDescendingNone,
+        OwnsViewSorts = true
+    };
+
+    public bool PinStatusPrimary { get; set; } = true;
+
+    public DeploymentsViewModel()
+    {
+        View = new DataGridCollectionView(Deployment.CreateSeed());
+        SortingModel.SortingChanging += OnSortingChanging;
+    }
+
+    public void ApplyStatusPreset()
+    {
+        SortingModel.Apply(new[]
+        {
+            new SortingDescriptor(&quot;status&quot;, ListSortDirection.Ascending, nameof(Deployment.Status)),
+            new SortingDescriptor(&quot;ring&quot;, ListSortDirection.Ascending, nameof(Deployment.Ring)),
+            new SortingDescriptor(&quot;started&quot;, ListSortDirection.Descending, nameof(Deployment.Started))
+        });
+    }
+
+    public void AddServiceTiebreaker()
+    {
+        SortingModel.SetOrUpdate(new SortingDescriptor(
+            columnId: &quot;service&quot;,
+            direction: ListSortDirection.Ascending,
+            propertyPath: nameof(Deployment.Service)));
+    }
+
+    public void ClearSorts() =&gt; SortingModel.Clear();
+
+    private void OnSortingChanging(object? sender, SortingChangingEventArgs e)
+    {
+        if (!PinStatusPrimary)
+        {
+            return;
+        }
+
+        if (e.NewDescriptors.Count == 0 ||
+            !string.Equals(e.NewDescriptors[0].PropertyPath, nameof(Deployment.Status), StringComparison.Ordinal))
+        {
+            e.Cancel = true;
+        }
+    }
+}
+</code></pre>
+<h2 id="2-xaml-wiring">2. XAML wiring</h2>
+<p>Bind <code>SortingModel</code> and use matching <code>ColumnKey</code> values in columns:</p>
+<pre><code class="lang-xml">&lt;DataGrid ItemsSource=&quot;{Binding View}&quot;
+          SortingModel=&quot;{Binding SortingModel}&quot;
+          AutoGenerateColumns=&quot;False&quot;
+          CanUserSortColumns=&quot;True&quot;
+          IsMultiSortEnabled=&quot;True&quot;
+          SortCycleMode=&quot;AscendingDescendingNone&quot;&gt;
+  &lt;DataGrid.Columns&gt;
+    &lt;DataGridTextColumn Header=&quot;Service&quot;
+                        ColumnKey=&quot;service&quot;
+                        Binding=&quot;{Binding Service}&quot;
+                        SortMemberPath=&quot;Service&quot; /&gt;
+    &lt;DataGridTextColumn Header=&quot;Status&quot;
+                        ColumnKey=&quot;status&quot;
+                        Binding=&quot;{Binding Status}&quot;
+                        SortMemberPath=&quot;Status&quot; /&gt;
+    &lt;DataGridTextColumn Header=&quot;Ring&quot;
+                        ColumnKey=&quot;ring&quot;
+                        Binding=&quot;{Binding Ring}&quot;
+                        SortMemberPath=&quot;Ring&quot; /&gt;
+    &lt;DataGridTextColumn Header=&quot;Started&quot;
+                        ColumnKey=&quot;started&quot;
+                        Binding=&quot;{Binding Started}&quot;
+                        SortMemberPath=&quot;Started&quot; /&gt;
+  &lt;/DataGrid.Columns&gt;
+&lt;/DataGrid&gt;
+</code></pre>
+<h2 id="3-batching-and-ownership">3. Batching and ownership</h2>
+<p>Batch descriptor updates:</p>
+<pre><code class="lang-csharp">using (SortingModel.DeferRefresh())
+{
+    SortingModel.SetOrUpdate(new SortingDescriptor(&quot;status&quot;, ListSortDirection.Ascending, nameof(Deployment.Status)));
+    SortingModel.SetOrUpdate(new SortingDescriptor(&quot;started&quot;, ListSortDirection.Descending, nameof(Deployment.Started)));
+}
+</code></pre>
+<p>If an external pipeline owns <code>SortDescriptions</code>, switch the model to observe mode:</p>
+<pre><code class="lang-csharp">SortingModel.OwnsViewSorts = false;
+</code></pre>
+<p>In observe mode, model and view stay synchronized, but external mutations are not overwritten by model ownership.</p>
+<h2 id="4-custom-comparer-sorting">4. Custom comparer sorting</h2>
+<p>Use comparer-backed descriptors for domain ordering:</p>
+<pre><code class="lang-csharp">SortingModel.SetOrUpdate(new SortingDescriptor(
+    columnId: &quot;status&quot;,
+    direction: ListSortDirection.Ascending,
+    propertyPath: nameof(Deployment.Status),
+    comparer: StringComparer.OrdinalIgnoreCase));
+</code></pre>
+<p>For header clicks to use a custom comparer, set <code>CustomSortComparer</code> on the corresponding <code>DataGridColumn</code>.</p>
+<h2 id="5-dynamicdataserver-side-sorting">5. DynamicData/server-side sorting</h2>
+<p>Use a custom <code>SortingAdapterFactory</code> to translate model descriptors upstream:</p>
+<pre><code class="lang-csharp">grid.SortingModel = viewModel.SortingModel;
+grid.SortingAdapterFactory = viewModel.SortingAdapterFactory;
+</code></pre>
+<p>Reference implementations:</p>
+<ul>
+<li><code>src/DataGridSample/Adapters/DynamicDataSortingAdapterFactory.cs</code></li>
+<li><code>src/DataGridSample/Adapters/DynamicDataStreamingSortingAdapterFactory.cs</code></li>
+</ul>
+<h2 id="troubleshooting">Troubleshooting</h2>
+<ul>
+<li>Sorting appears ignored:
+Make sure <code>SortMemberPath</code> (or descriptor <code>propertyPath</code>) resolves to a real member, or provide a comparer.</li>
+<li>Wrong column sorted:
+Ensure <code>SortingDescriptor.ColumnId</code> matches <code>DataGridColumn.ColumnKey</code> (or the materialized column/definition id).</li>
+<li>Duplicate/unstable sort order:
+Normalize descriptors in <code>SortingChanging</code>, or apply full presets with <code>Apply(...)</code> instead of ad-hoc updates.</li>
+</ul>
+<h2 id="full-sample-references">Full sample references</h2>
+<ul>
+<li><code>src/DataGridSample/Pages/SortingModelPlaygroundPage.axaml</code></li>
+<li><code>src/DataGridSample/ViewModels/SortingModelPlaygroundViewModel.cs</code></li>
+<li><code>src/DataGridSample/Pages/SortingModelPage.axaml</code></li>
+</ul>
+<h2 id="related-articles">Related articles</h2>
+<ul>
+<li><a href="data-operations.html">Data Operations</a></li>
+<li><a href="column-definitions-models.html">Column Definitions (Model Integration)</a></li>
+<li><a href="filtering-model-end-to-end.html">Filtering Model: End-to-End Usage</a></li>
+<li><a href="search-model-end-to-end.html">Search Model: End-to-End Usage</a></li>
+</ul>
+
+</article>
+
+        <div class="contribution d-print-none">
+          <a href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/docfx/articles/sorting-model-end-to-end.md/#L1" class="edit-link">Edit this page</a>
+        </div>
+
+        <div class="next-article d-print-none border-top" id="nextArticle"></div>
+
+      </div>
+
+      <div class="affix">
+        <nav id="affix"></nav>
+      </div>
+    </main>
+
+
+    <footer class="border-top text-secondary">
+      <div class="container-xxl">
+        <div class="flex-fill">
+          <span>Made with <a href="https://dotnet.github.io/docfx">docfx</a></span>
+        </div>
+      </div>
+    </footer>
+  </body>
+</html>

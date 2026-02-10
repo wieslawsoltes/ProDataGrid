@@ -138,6 +138,7 @@ filteringModel.SetOrUpdate(new FilteringDescriptor(
 </code></pre>
 <p>For fast path filtering, ensure the column definition provides a value accessor (via binding or <code>ValueAccessor</code>).</p>
 <p>If the filtering value should differ from the displayed value, set <code>DataGridColumnDefinitionOptions.FilterValueAccessor</code> on the definition to supply a dedicated filter accessor.</p>
+<p>If your page uses inline XAML columns instead of <code>ColumnDefinitionsSource</code>, use explicit <code>DataGridColumn.ColumnKey</code> ids and match those keys in <code>FilteringDescriptor.ColumnId</code>. The full mixed-scenario guidance is in <a href="filtering-model-end-to-end.html">Filtering Model: End-to-End Usage</a>.</p>
 <h3 id="accessor-only-adapters">Accessor-only adapters</h3>
 <p>If you want to avoid the reflection fallback in filtering/searching, enable the built-in accessor-only adapters:</p>
 <pre><code class="lang-xml">&lt;DataGrid FilteringModel=&quot;{Binding FilteringModel}&quot;
@@ -215,6 +216,10 @@ formattingModel.Apply(new[]
 <li><a href="column-definitions-hot-path.html">Column Definitions (Hot Path Integration)</a></li>
 <li><a href="column-definitions-hierarchical.html">Column Definitions (Hierarchical Columns)</a></li>
 <li><a href="column-definitions-fast-path-overview.html">Column Definitions: Fast Path Overview</a></li>
+<li><a href="sorting-model-end-to-end.html">Sorting Model: End-to-End Usage</a></li>
+<li><a href="filtering-model-end-to-end.html">Filtering Model: End-to-End Usage</a></li>
+<li><a href="search-model-end-to-end.html">Search Model: End-to-End Usage</a></li>
+<li><a href="conditional-formatting-model-end-to-end.html">Conditional Formatting Model: End-to-End Usage</a></li>
 </ul>
 
 </article>

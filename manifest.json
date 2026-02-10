@@ -8153,6 +8153,16 @@
     },
     {
       "type": "Conceptual",
+      "source_relative_path": "articles/conditional-formatting-model-end-to-end.md",
+      "output": {
+        ".html": {
+          "relative_path": "articles/conditional-formatting-model-end-to-end.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "Conceptual",
       "source_relative_path": "articles/conditional-formatting.md",
       "output": {
         ".html": {
@@ -8277,6 +8287,16 @@
       "output": {
         ".html": {
           "relative_path": "articles/fill-handle-and-autofill.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "Conceptual",
+      "source_relative_path": "articles/filtering-model-end-to-end.md",
+      "output": {
+        ".html": {
+          "relative_path": "articles/filtering-model-end-to-end.html"
         }
       },
       "version": ""
@@ -8457,6 +8477,16 @@
       "output": {
         ".html": {
           "relative_path": "articles/hierarchical-high-frequency-updates.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "Conceptual",
+      "source_relative_path": "articles/hierarchical-model-end-to-end.md",
+      "output": {
+        ".html": {
+          "relative_path": "articles/hierarchical-model-end-to-end.html"
         }
       },
       "version": ""
@@ -8783,6 +8813,16 @@
     },
     {
       "type": "Conceptual",
+      "source_relative_path": "articles/search-model-end-to-end.md",
+      "output": {
+        ".html": {
+          "relative_path": "articles/search-model-end-to-end.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "Conceptual",
       "source_relative_path": "articles/selection-and-navigation.md",
       "output": {
         ".html": {
@@ -8797,6 +8837,26 @@
       "output": {
         ".html": {
           "relative_path": "articles/selection-highlighting.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "Conceptual",
+      "source_relative_path": "articles/selection-model-end-to-end.md",
+      "output": {
+        ".html": {
+          "relative_path": "articles/selection-model-end-to-end.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "Conceptual",
+      "source_relative_path": "articles/sorting-model-end-to-end.md",
+      "output": {
+        ".html": {
+          "relative_path": "articles/sorting-model-end-to-end.html"
         }
       },
       "version": ""

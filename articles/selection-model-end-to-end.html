@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+      <title>Selection Model: End-to-End Usage | ProDataGrid for Avalonia </title>
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <meta name="title" content="Selection Model: End-to-End Usage | ProDataGrid for Avalonia ">
+      
+      
+      <link rel="icon" href="../favicon.ico">
+      <link rel="stylesheet" href="../public/docfx.min.css">
+      <link rel="stylesheet" href="../public/main.css">
+      <meta name="docfx:navrel" content="../toc.html">
+      <meta name="docfx:tocrel" content="toc.html">
+      
+      
+      
+      
+      <meta name="docfx:docurl" content="https://github.com/wieslawsoltes/ProDataGrid/blob/master/docfx/articles/selection-model-end-to-end.md/#L1">
+      <meta name="loc:inThisArticle" content="In this article">
+      <meta name="loc:searchResultsCount" content="{count} results for &quot;{query}&quot;">
+      <meta name="loc:searchNoResults" content="No results for &quot;{query}&quot;">
+      <meta name="loc:tocFilter" content="Filter by title">
+      <meta name="loc:nextArticle" content="Next">
+      <meta name="loc:prevArticle" content="Previous">
+      <meta name="loc:themeLight" content="Light">
+      <meta name="loc:themeDark" content="Dark">
+      <meta name="loc:themeAuto" content="Auto">
+      <meta name="loc:changeTheme" content="Change theme">
+      <meta name="loc:copy" content="Copy">
+      <meta name="loc:downloadPdf" content="Download PDF">
+
+      <script type="module" src="./../public/docfx.min.js"></script>
+
+      <script>
+        const theme = localStorage.getItem('theme') || 'auto'
+        document.documentElement.setAttribute('data-bs-theme', theme === 'auto' ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light') : theme)
+      </script>
+
+  </head>
+
+  <body class="tex2jax_ignore" data-layout="" data-yaml-mime="">
+    <header class="bg-body border-bottom">
+      <nav id="autocollapse" class="navbar navbar-expand-md" role="navigation">
+        <div class="container-xxl flex-nowrap">
+          <a class="navbar-brand" href="../index.html">
+            <img id="logo" class="svg" src="../images/logo.svg" alt="">
+            
+          </a>
+          <button class="btn btn-lg d-md-none border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navpanel" aria-controls="navpanel" aria-expanded="false" aria-label="Toggle navigation">
+            <i class="bi bi-three-dots"></i>
+          </button>
+          <div class="collapse navbar-collapse" id="navpanel">
+            <div id="navbar">
+            </div>
+          </div>
+        </div>
+      </nav>
+    </header>
+
+    <main class="container-xxl">
+      <div class="toc-offcanvas">
+        <div class="offcanvas-md offcanvas-start" tabindex="-1" id="tocOffcanvas" aria-labelledby="tocOffcanvasLabel">
+          <div class="offcanvas-header">
+            <h5 class="offcanvas-title" id="tocOffcanvasLabel">Table of Contents</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="offcanvas" data-bs-target="#tocOffcanvas" aria-label="Close"></button>
+          </div>
+          <div class="offcanvas-body">
+            <nav class="toc" id="toc"></nav>
+          </div>
+        </div>
+      </div>
+
+      <div class="content">
+        <div class="actionbar">
+          <button class="btn btn-lg border-0 d-md-none" type="button" data-bs-toggle="offcanvas" data-bs-target="#tocOffcanvas" aria-controls="tocOffcanvas" aria-expanded="false" aria-label="Show table of contents">
+            <i class="bi bi-list"></i>
+          </button>
+
+          <nav id="breadcrumb"></nav>
+        </div>
+
+        <article data-uid="">
+<h1 id="selection-model-end-to-end-usage">Selection Model: End-to-End Usage</h1>
+
+<p>This guide shows complete <code>SelectionModel</code> usage with <code>DataGrid</code>: shared selection across controls, stable selection during data mutations, and programmatic selection workflows.</p>
+<h2 id="what-this-gives-you">What this gives you</h2>
+<ul>
+<li>A single selection source for grid and companion controls.</li>
+<li>Stable selection across sorting, filtering, inserts/removes, and reordering.</li>
+<li>Programmatic selection control without directly manipulating row visuals.</li>
+<li>Clear separation of selection state from UI containers.</li>
+</ul>
+<h2 id="end-to-end-flow">End-to-end flow</h2>
+<ol>
+<li>User gestures update the grid selection.</li>
+<li>Grid synchronizes with bound <code>SelectionModel&lt;T&gt;</code>.</li>
+<li><code>SelectionModel</code> events update logs, badges, or side panels.</li>
+<li>Programmatic operations (<code>Select</code>, <code>Clear</code>, batch restore) use the same model.</li>
+</ol>
+<h2 id="1-viewmodel-wiring">1. ViewModel wiring</h2>
+<pre><code class="lang-csharp">using System.Collections.ObjectModel;
+using Avalonia.Collections;
+using Avalonia.Controls.Selection;
+
+public sealed class CountriesViewModel
+{
+    public ObservableCollection&lt;Country&gt; Items { get; }
+    public DataGridCollectionView View { get; }
+    public SelectionModel&lt;Country&gt; SelectionModel { get; } = new() { SingleSelect = false };
+
+    public CountriesViewModel()
+    {
+        Items = new ObservableCollection&lt;Country&gt;(Countries.All);
+        View = new DataGridCollectionView(Items);
+
+        // Optional when sharing across controls that use the same data source.
+        SelectionModel.Source = View;
+    }
+
+    public void SelectFirstThree()
+    {
+        using (SelectionModel.BatchUpdate())
+        {
+            SelectionModel.Clear();
+            SelectionModel.Select(0);
+            SelectionModel.Select(1);
+            SelectionModel.Select(2);
+        }
+    }
+}
+</code></pre>
+<h2 id="2-xaml-wiring-grid--shared-control">2. XAML wiring (grid + shared control)</h2>
+<pre><code class="lang-xml">&lt;Grid ColumnDefinitions=&quot;2*,*&quot;&gt;
+  &lt;DataGrid Grid.Column=&quot;0&quot;
+            ItemsSource=&quot;{Binding View}&quot;
+            Selection=&quot;{Binding SelectionModel}&quot;
+            SelectionMode=&quot;Extended&quot;
+            AutoGenerateColumns=&quot;True&quot; /&gt;
+
+  &lt;ListBox Grid.Column=&quot;1&quot;
+           ItemsSource=&quot;{Binding View}&quot;
+           Selection=&quot;{Binding SelectionModel}&quot;
+           SelectionMode=&quot;Multiple&quot; /&gt;
+&lt;/Grid&gt;
+</code></pre>
+<p>The same <code>SelectionModel&lt;T&gt;</code> keeps both controls synchronized.</p>
+<h2 id="3-preserving-selection-while-mutating-data">3. Preserving selection while mutating data</h2>
+<p>When reordering/replacing items, snapshot selected items, mutate, then restore by index:</p>
+<pre><code class="lang-csharp">using System.Linq;
+
+var snapshot = SelectionModel.SelectedItems.OfType&lt;Country&gt;().ToList();
+
+MutateItems();
+
+using (SelectionModel.BatchUpdate())
+{
+    SelectionModel.Clear();
+    foreach (var item in snapshot)
+    {
+        var index = Items.IndexOf(item);
+        if (index &gt;= 0)
+        {
+            SelectionModel.Select(index);
+        }
+    }
+}
+</code></pre>
+<p>This pattern is used in the stability sample to keep selection attached to items after shuffle/sort/insert/remove.</p>
+<h2 id="4-binding-with-selecteditems-and-selectedcells">4. Binding with <code>SelectedItems</code> and <code>SelectedCells</code></h2>
+<p><code>SelectionModel</code> works with existing bindings:</p>
+<pre><code class="lang-xml">&lt;DataGrid ItemsSource=&quot;{Binding View}&quot;
+          Selection=&quot;{Binding SelectionModel}&quot;
+          SelectedItems=&quot;{Binding SelectedItems, Mode=TwoWay}&quot;
+          SelectionMode=&quot;Extended&quot; /&gt;
+</code></pre>
+<p>For cell selection workflows:</p>
+<pre><code class="lang-xml">&lt;DataGrid ItemsSource=&quot;{Binding View}&quot;
+          SelectionUnit=&quot;Cell&quot;
+          SelectedCells=&quot;{Binding SelectedCells, Mode=TwoWay}&quot; /&gt;
+</code></pre>
+<h2 id="5-selection-behavior-switches">5. Selection behavior switches</h2>
+<ul>
+<li><code>SelectionMode=&quot;Single&quot;</code> maps to single-select behavior.</li>
+<li><code>SelectionUnit</code> controls row/cell/header selection granularity.</li>
+<li><code>CanUserSelectRows</code> and <code>CanUserSelectColumns</code> gate header selection gestures.</li>
+</ul>
+<h2 id="troubleshooting">Troubleshooting</h2>
+<ul>
+<li>Selection not synchronized between controls:
+Ensure both controls share the same <code>SelectionModel&lt;T&gt;</code> and compatible <code>Source</code>.</li>
+<li>Selection jumps after data reset:
+Restore by item identity after mutations (batch update pattern above).</li>
+<li>Programmatic select targets wrong row:
+Use indices from the current source (<code>DataGridCollectionView</code>), not the original raw collection order.</li>
+</ul>
+<h2 id="full-sample-references">Full sample references</h2>
+<ul>
+<li><code>src/DataGridSample/Pages/SharedSelectionPage.axaml</code></li>
+<li><code>src/DataGridSample/ViewModels/SharedSelectionViewModel.cs</code></li>
+<li><code>src/DataGridSample/Pages/SelectionModelStabilityPage.axaml</code></li>
+<li><code>src/DataGridSample/ViewModels/SelectionModelStabilityViewModel.cs</code></li>
+</ul>
+<h2 id="related-articles">Related articles</h2>
+<ul>
+<li><a href="selection-and-navigation.html">Selection and Navigation</a></li>
+<li><a href="selection-highlighting.html">Selection Highlighting</a></li>
+<li><a href="sorting-model-end-to-end.html">Sorting Model: End-to-End Usage</a></li>
+<li><a href="filtering-model-end-to-end.html">Filtering Model: End-to-End Usage</a></li>
+</ul>
+
+</article>
+
+        <div class="contribution d-print-none">
+          <a href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/docfx/articles/selection-model-end-to-end.md/#L1" class="edit-link">Edit this page</a>
+        </div>
+
+        <div class="next-article d-print-none border-top" id="nextArticle"></div>
+
+      </div>
+
+      <div class="affix">
+        <nav id="affix"></nav>
+      </div>
+    </main>
+
+
+    <footer class="border-top text-secondary">
+      <div class="container-xxl">
+        <div class="flex-fill">
+          <span>Made with <a href="https://dotnet.github.io/docfx">docfx</a></span>
+        </div>
+      </div>
+    </footer>
+  </body>
+</html>
