@@ -38,6 +38,8 @@ internal
         private DataGrid? _owningGrid;
         private double _lastArrangeHeight;
         private bool _lastArrangeMatchesDesired = true;
+        private readonly HashSet<Control> _displayedElementsScratch = new();
+        private readonly RectangleGeometry _clipRectGeometry = new();
 
         internal double LastArrangeHeight => _lastArrangeHeight;
 
@@ -247,8 +249,11 @@ internal
 
             double rowDesiredWidth = OwningGrid.RowHeadersDesiredWidth + OwningGrid.ColumnsInternal.VisibleEdgedColumnsWidth + OwningGrid.ColumnsInternal.FillerColumn.FillerWidth;
             double topEdge = -OwningGrid.NegVerticalOffset;
-            var displayedElements = new HashSet<Control>();
+            var displayedElements = _displayedElementsScratch;
+            displayedElements.Clear();
             int arrangedElements = 0;
+            int skippedArrangeElements = 0;
+            int offscreenArrangedElements = 0;
             using var __ = DataGridDiagnostics.BeginRowsArrange();
             foreach (Control element in OwningGrid.DisplayData.GetScrollingElements())
             {
@@ -267,6 +272,10 @@ internal
                         row.Arrange(targetRect);
                         arrangedElements++;
                     }
+                    else
+                    {
+                        skippedArrangeElements++;
+                    }
                 }
                 else if (element is DataGridRowGroupHeader groupHeader)
                 {
@@ -276,6 +285,10 @@ internal
                     {
                         groupHeader.Arrange(targetRect);
                         arrangedElements++;
+                    }
+                    else
+                    {
+                        skippedArrangeElements++;
                     }
                 }
                 else if (element is DataGridRowGroupFooter groupFooter)
@@ -287,6 +300,10 @@ internal
                         groupFooter.Arrange(targetRect);
                         arrangedElements++;
                     }
+                    else
+                    {
+                        skippedArrangeElements++;
+                    }
                 }
 
                 topEdge += element.DesiredSize.Height;
@@ -295,11 +312,15 @@ internal
             double finalHeight = Math.Max(topEdge + OwningGrid.NegVerticalOffset, finalSize.Height);
 
             // Clip the RowsPresenter so rows cannot overlap other elements in certain styling scenarios
-            var rg = new RectangleGeometry
+            var clipRect = new Rect(0, 0, finalSize.Width, finalHeight);
+            if (!AreClose(_clipRectGeometry.Rect, clipRect))
             {
-                Rect = new Rect(0, 0, finalSize.Width, finalHeight)
-            };
-            Clip = rg;
+                _clipRectGeometry.Rect = clipRect;
+            }
+            if (!ReferenceEquals(Clip, _clipRectGeometry))
+            {
+                Clip = _clipRectGeometry;
+            }
 
             // Arrange any hidden/recycled children off-screen to prevent ghost rows
             // This is necessary because Avalonia keeps elements at their last arranged position
@@ -326,16 +347,31 @@ internal
                     {
                         child.Arrange(offScreenRect);
                         arrangedElements++;
+                        offscreenArrangedElements++;
+                    }
+                    else
+                    {
+                        skippedArrangeElements++;
                     }
                 }
-                else if (!child.IsVisible && ShouldArrangeElement(child, offScreenRect))
+                else if (!child.IsVisible)
                 {
-                    child.Arrange(offScreenRect);
-                    arrangedElements++;
+                    if (ShouldArrangeElement(child, offScreenRect))
+                    {
+                        child.Arrange(offScreenRect);
+                        arrangedElements++;
+                        offscreenArrangedElements++;
+                    }
+                    else
+                    {
+                        skippedArrangeElements++;
+                    }
                 }
             }
 
             DataGridDiagnostics.RecordRowsArranged(arrangedElements);
+            DataGridDiagnostics.RecordRowsArrangeSkipped(skippedArrangeElements);
+            DataGridDiagnostics.RecordRowsArrangeOffscreen(offscreenArrangedElements);
             return new Size(finalSize.Width, finalHeight);
         }
 
@@ -473,7 +509,8 @@ internal
             }
 
             // If the Width of our RowsPresenter changed then we need to invalidate our rows
-            bool invalidateRows = (!OwningGrid.RowsPresenterAvailableSize.HasValue || availableSize.Width != OwningGrid.RowsPresenterAvailableSize.Value.Width)
+            bool invalidateRows = (!OwningGrid.RowsPresenterAvailableSize.HasValue ||
+                                   !MathUtilities.AreClose(availableSize.Width, OwningGrid.RowsPresenterAvailableSize.Value.Width))
                                   && !double.IsInfinity(availableSize.Width);
 
             // The DataGrid uses the RowsPresenter available size in order to autogrow
@@ -487,6 +524,17 @@ internal
 
             double headerWidth = 0;
             int measuredElements = 0;
+            int skippedMeasureElements = 0;
+            double measureWidth = availableSize.Width;
+            if (double.IsInfinity(measureWidth) || double.IsNaN(measureWidth))
+            {
+                // Fall back to the space the grid will actually use (headers + columns + filler)
+                measureWidth = OwningGrid.RowHeadersDesiredWidth
+                               + OwningGrid.ColumnsInternal.VisibleEdgedColumnsWidth
+                               + OwningGrid.ColumnsInternal.FillerColumn.FillerWidth;
+            }
+
+            var measureConstraint = new Size(measureWidth, double.PositiveInfinity);
             using var __ = DataGridDiagnostics.BeginRowsMeasure();
             foreach (Control element in OwningGrid.DisplayData.GetScrollingElements())
             {
@@ -495,19 +543,14 @@ internal
                     element.InvalidateMeasure();
                 }
 
-                double measureWidth = availableSize.Width;
-                if (double.IsInfinity(measureWidth) || double.IsNaN(measureWidth))
-                {
-                    // Fall back to the space the grid will actually use (headers + columns + filler)
-                    measureWidth = OwningGrid.RowHeadersDesiredWidth
-                                   + OwningGrid.ColumnsInternal.VisibleEdgedColumnsWidth
-                                   + OwningGrid.ColumnsInternal.FillerColumn.FillerWidth;
-                }
-
                 if (invalidateRows || !element.IsMeasureValid)
                 {
-                    element.Measure(new Size(measureWidth, double.PositiveInfinity));
+                    element.Measure(measureConstraint);
                     measuredElements++;
+                }
+                else
+                {
+                    skippedMeasureElements++;
                 }
 
                 DataGridRow? row = element as DataGridRow;
@@ -524,6 +567,7 @@ internal
             }
 
             DataGridDiagnostics.RecordRowsMeasured(measuredElements);
+            DataGridDiagnostics.RecordRowsMeasureSkipped(skippedMeasureElements);
             OwningGrid.RowHeadersDesiredWidth = headerWidth;
             // Could be positive infinity depending on the DataGrid's bounds
             OwningGrid.AvailableSlotElementRoom = availableSize.Height - totalHeight;
@@ -576,6 +620,14 @@ internal
                    !MathUtilities.AreClose(bounds.Y, targetRect.Y) ||
                    !MathUtilities.AreClose(bounds.Width, targetRect.Width) ||
                    !MathUtilities.AreClose(bounds.Height, targetRect.Height);
+        }
+
+        private static bool AreClose(Rect first, Rect second)
+        {
+            return MathUtilities.AreClose(first.X, second.X) &&
+                   MathUtilities.AreClose(first.Y, second.Y) &&
+                   MathUtilities.AreClose(first.Width, second.Width) &&
+                   MathUtilities.AreClose(first.Height, second.Height);
         }
 
         private void OnScrollGesture(object? sender, ScrollGestureEventArgs e)
