@@ -22,6 +22,9 @@ internal static partial class DataGridDiagnostics
         public const string RowsDisplayUpdateTimeName = "prodatagrid.rows.display.update.time";
         public const string RowsDisplayUpdateTimeDescription = "Duration of updating displayed rows during scrolling/virtualization.";
 
+        public const string RowsDisplayReusedCountName = "prodatagrid.rows.display.reused.count";
+        public const string RowsDisplayReusedCountDescription = "Number of displayed-row updates that reused current viewport rows without full recomputation.";
+
         public const string RowGenerateTimeName = "prodatagrid.rows.generate.time";
         public const string RowGenerateTimeDescription = "Duration of row generation and preparation.";
 
