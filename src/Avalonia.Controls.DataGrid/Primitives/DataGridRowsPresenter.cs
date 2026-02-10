@@ -248,6 +248,8 @@ internal
             double rowDesiredWidth = OwningGrid.RowHeadersDesiredWidth + OwningGrid.ColumnsInternal.VisibleEdgedColumnsWidth + OwningGrid.ColumnsInternal.FillerColumn.FillerWidth;
             double topEdge = -OwningGrid.NegVerticalOffset;
             var displayedElements = new HashSet<Control>();
+            int arrangedElements = 0;
+            using var __ = DataGridDiagnostics.BeginRowsArrange();
             foreach (Control element in OwningGrid.DisplayData.GetScrollingElements())
             {
                 displayedElements.Add(element);
@@ -256,20 +258,35 @@ internal
                 {
                     Debug.Assert(row.Index != -1); // A displayed row should always have its index
 
-                    // Visibility for all filler cells needs to be set in one place.  Setting it individually in
-                    // each CellsPresenter causes an NxN layout cycle (see DevDiv Bugs 211557)
-                    row.EnsureFillerVisibility();
-                    row.Arrange(new Rect(-OwningGrid.HorizontalOffset, topEdge, rowDesiredWidth, element.DesiredSize.Height));
+                    var targetRect = new Rect(-OwningGrid.HorizontalOffset, topEdge, rowDesiredWidth, element.DesiredSize.Height);
+                    if (ShouldArrangeElement(row, targetRect))
+                    {
+                        // Visibility for all filler cells needs to be set in one place.  Setting it individually in
+                        // each CellsPresenter causes an NxN layout cycle (see DevDiv Bugs 211557)
+                        row.EnsureFillerVisibility();
+                        row.Arrange(targetRect);
+                        arrangedElements++;
+                    }
                 }
                 else if (element is DataGridRowGroupHeader groupHeader)
                 {
                     double leftEdge = (OwningGrid.AreRowGroupHeadersFrozen) ? 0 : -OwningGrid.HorizontalOffset;
-                    groupHeader.Arrange(new Rect(leftEdge, topEdge, rowDesiredWidth - leftEdge, element.DesiredSize.Height));
+                    var targetRect = new Rect(leftEdge, topEdge, rowDesiredWidth - leftEdge, element.DesiredSize.Height);
+                    if (ShouldArrangeElement(groupHeader, targetRect))
+                    {
+                        groupHeader.Arrange(targetRect);
+                        arrangedElements++;
+                    }
                 }
                 else if (element is DataGridRowGroupFooter groupFooter)
                 {
                     double leftEdge = (OwningGrid.AreRowGroupHeadersFrozen) ? 0 : -OwningGrid.HorizontalOffset;
-                    groupFooter.Arrange(new Rect(leftEdge, topEdge, rowDesiredWidth - leftEdge, element.DesiredSize.Height));
+                    var targetRect = new Rect(leftEdge, topEdge, rowDesiredWidth - leftEdge, element.DesiredSize.Height);
+                    if (ShouldArrangeElement(groupFooter, targetRect))
+                    {
+                        groupFooter.Arrange(targetRect);
+                        arrangedElements++;
+                    }
                 }
 
                 topEdge += element.DesiredSize.Height;
@@ -293,18 +310,32 @@ internal
             {
                 if (!displayedElements.Contains(child))
                 {
+                    bool shouldArrangeOffscreen = false;
                     if (child.IsVisible)
                     {
                         OwningGrid.HideRecycledElement(child);
+                        shouldArrangeOffscreen = true;
                     }
-                    child.Arrange(offScreenRect);
+
+                    if (!shouldArrangeOffscreen && ShouldArrangeElement(child, offScreenRect))
+                    {
+                        shouldArrangeOffscreen = true;
+                    }
+
+                    if (shouldArrangeOffscreen)
+                    {
+                        child.Arrange(offScreenRect);
+                        arrangedElements++;
+                    }
                 }
-                else if (!child.IsVisible)
+                else if (!child.IsVisible && ShouldArrangeElement(child, offScreenRect))
                 {
                     child.Arrange(offScreenRect);
+                    arrangedElements++;
                 }
             }
 
+            DataGridDiagnostics.RecordRowsArranged(arrangedElements);
             return new Size(finalSize.Width, finalHeight);
         }
 
@@ -455,15 +486,13 @@ internal
             double totalCellsWidth = OwningGrid.ColumnsInternal.VisibleEdgedColumnsWidth;
 
             double headerWidth = 0;
+            int measuredElements = 0;
+            using var __ = DataGridDiagnostics.BeginRowsMeasure();
             foreach (Control element in OwningGrid.DisplayData.GetScrollingElements())
             {
-                DataGridRow? row = element as DataGridRow;
-                if (row != null)
+                if (invalidateRows)
                 {
-                    if (invalidateRows)
-                    {
-                        row.InvalidateMeasure();
-                    }
+                    element.InvalidateMeasure();
                 }
 
                 double measureWidth = availableSize.Width;
@@ -475,8 +504,13 @@ internal
                                    + OwningGrid.ColumnsInternal.FillerColumn.FillerWidth;
                 }
 
-                element.Measure(new Size(measureWidth, double.PositiveInfinity));
+                if (invalidateRows || !element.IsMeasureValid)
+                {
+                    element.Measure(new Size(measureWidth, double.PositiveInfinity));
+                    measuredElements++;
+                }
 
+                DataGridRow? row = element as DataGridRow;
                 if (row != null && row.HeaderCell != null)
                 {
                     headerWidth = Math.Max(headerWidth, row.HeaderCell.DesiredSize.Width);
@@ -489,6 +523,7 @@ internal
                 totalHeight += element.DesiredSize.Height;
             }
 
+            DataGridDiagnostics.RecordRowsMeasured(measuredElements);
             OwningGrid.RowHeadersDesiredWidth = headerWidth;
             // Could be positive infinity depending on the DataGrid's bounds
             OwningGrid.AvailableSlotElementRoom = availableSize.Height - totalHeight;
@@ -527,6 +562,20 @@ internal
 
             var threshold = Math.Max(OwningGrid?.RowHeightEstimate ?? 1, 1);
             return Math.Abs(arrangedHeight - desiredHeight) <= threshold;
+        }
+
+        private static bool ShouldArrangeElement(Control element, Rect targetRect)
+        {
+            if (!element.IsArrangeValid)
+            {
+                return true;
+            }
+
+            var bounds = element.Bounds;
+            return !MathUtilities.AreClose(bounds.X, targetRect.X) ||
+                   !MathUtilities.AreClose(bounds.Y, targetRect.Y) ||
+                   !MathUtilities.AreClose(bounds.Width, targetRect.Width) ||
+                   !MathUtilities.AreClose(bounds.Height, targetRect.Height);
         }
 
         private void OnScrollGesture(object? sender, ScrollGestureEventArgs e)
