@@ -55,6 +55,8 @@ internal
         private DataGridCell _fillerCell;
         private DataGridRowHeader _headerElement;
         private double _lastHorizontalOffset;
+        private double _lastMeasureConstraintWidth = double.NaN;
+        private double _lastMeasureConstraintHeight = double.NaN;
         private int? _mouseOverColumnIndex;
         private DataGrid _owningGrid;
         private bool _isValid = true;

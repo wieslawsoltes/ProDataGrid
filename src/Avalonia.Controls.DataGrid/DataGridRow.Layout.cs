@@ -105,18 +105,28 @@ namespace Avalonia.Controls
                 return base.MeasureOverride(availableSize);
             }
 
-            //Allow the DataGrid specific components to adjust themselves based on new values
-            if (_headerElement != null)
+            bool constraintsChanged =
+                !MathUtilities.AreClose(_lastMeasureConstraintWidth, availableSize.Width) ||
+                !MathUtilities.AreClose(_lastMeasureConstraintHeight, availableSize.Height);
+
+            if (constraintsChanged)
             {
-                _headerElement.InvalidateMeasure();
-            }
-            if (_cellsElement != null)
-            {
-                _cellsElement.InvalidateMeasure();
-            }
-            if (_detailsElement != null)
-            {
-                _detailsElement.InvalidateMeasure();
+                _lastMeasureConstraintWidth = availableSize.Width;
+                _lastMeasureConstraintHeight = availableSize.Height;
+
+                // Re-measure child presenters only when row constraints actually change.
+                if (_headerElement != null && _headerElement.IsMeasureValid)
+                {
+                    _headerElement.InvalidateMeasure();
+                }
+                if (_cellsElement != null && _cellsElement.IsMeasureValid)
+                {
+                    _cellsElement.InvalidateMeasure();
+                }
+                if (_detailsElement != null && _detailsElement.IsMeasureValid)
+                {
+                    _detailsElement.InvalidateMeasure();
+                }
             }
 
             Size desiredSize = base.MeasureOverride(availableSize);
@@ -127,7 +137,10 @@ namespace Avalonia.Controls
         {
             foreach (DataGridCell dataGridCell in Cells)
             {
-                dataGridCell.UpdatePseudoClasses();
+                if (dataGridCell.IsVisible || dataGridCell.IsCurrent)
+                {
+                    dataGridCell.UpdatePseudoClasses();
+                }
             }
         }
 

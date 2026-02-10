@@ -197,8 +197,13 @@ internal
             {
                 if (displayColumn)
                 {
+                    bool wasVisible = cell.IsVisible;
                     cell.IsVisible = true;
                     cell.Clip = null;
+                    if (!wasVisible)
+                    {
+                        cell.UpdatePseudoClasses();
+                    }
                 }
                 else
                 {
@@ -210,7 +215,12 @@ internal
             }
             else
             {
+                bool wasVisible = cell.IsVisible;
                 cell.IsVisible = displayColumn;
+                if (displayColumn && !wasVisible)
+                {
+                    cell.UpdatePseudoClasses();
+                }
             }
         }
 
