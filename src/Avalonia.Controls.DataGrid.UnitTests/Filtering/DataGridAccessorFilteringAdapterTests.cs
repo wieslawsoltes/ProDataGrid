@@ -206,6 +206,127 @@ public class DataGridAccessorFilteringAdapterTests
         Assert.Equal(0, accessor.ValueCalls);
     }
 
+    [AvaloniaFact]
+    public void AccessorAdapter_Between_With_Int32_Bounds_And_Int64_Value_Does_Not_Throw()
+    {
+        var items = new[]
+        {
+            new LongPerson("A", 1L),
+            new LongPerson("B", 5L),
+            new LongPerson("C", 9L),
+            new LongPerson("D", 12L)
+        };
+        var view = new DataGridCollectionView(items);
+        var model = new FilteringModel();
+
+        var column = new DataGridTextColumn();
+        DataGridColumnMetadata.SetValueAccessor(column, new DataGridColumnValueAccessor<LongPerson, long>(p => p.Score));
+
+        var adapter = new DataGridAccessorFilteringAdapter(model, () => new[] { column });
+        adapter.AttachView(view);
+
+        var exception = Record.Exception(() =>
+            model.SetOrUpdate(new FilteringDescriptor(
+                columnId: column,
+                @operator: FilteringOperator.Between,
+                values: new object[] { 5, 10 })));
+
+        Assert.Null(exception);
+
+        var scores = view.Cast<LongPerson>().Select(p => p.Score).ToArray();
+        Assert.Equal(new[] { 5L, 9L }, scores);
+    }
+
+    [AvaloniaFact]
+    public void AccessorAdapter_GreaterThan_With_Int32_Value_And_Int64_Source_Does_Not_Throw()
+    {
+        var items = new[]
+        {
+            new LongPerson("A", 1L),
+            new LongPerson("B", 5L),
+            new LongPerson("C", 9L),
+            new LongPerson("D", 12L)
+        };
+        var view = new DataGridCollectionView(items);
+        var model = new FilteringModel();
+
+        var column = new DataGridTextColumn();
+        DataGridColumnMetadata.SetValueAccessor(column, new DataGridColumnValueAccessor<LongPerson, long>(p => p.Score));
+
+        var adapter = new DataGridAccessorFilteringAdapter(model, () => new[] { column });
+        adapter.AttachView(view);
+
+        var exception = Record.Exception(() =>
+            model.SetOrUpdate(new FilteringDescriptor(
+                columnId: column,
+                @operator: FilteringOperator.GreaterThan,
+                value: 5)));
+
+        Assert.Null(exception);
+
+        var scores = view.Cast<LongPerson>().Select(p => p.Score).ToArray();
+        Assert.Equal(new[] { 9L, 12L }, scores);
+    }
+
+    [AvaloniaFact]
+    public void AccessorAdapter_Between_With_Int64_Bounds_And_Int32_Value_Does_Not_Throw()
+    {
+        var items = new[]
+        {
+            new Person("A", 1),
+            new Person("B", 5),
+            new Person("C", 9),
+            new Person("D", 12)
+        };
+        var view = new DataGridCollectionView(items);
+        var model = new FilteringModel();
+
+        var column = new DataGridTextColumn();
+        DataGridColumnMetadata.SetValueAccessor(column, new DataGridColumnValueAccessor<Person, int>(p => p.Score));
+
+        var adapter = new DataGridAccessorFilteringAdapter(model, () => new[] { column });
+        adapter.AttachView(view);
+
+        var exception = Record.Exception(() =>
+            model.SetOrUpdate(new FilteringDescriptor(
+                columnId: column,
+                @operator: FilteringOperator.Between,
+                values: new object[] { 5L, 10L })));
+
+        Assert.Null(exception);
+
+        var scores = view.Cast<Person>().Select(p => p.Score).ToArray();
+        Assert.Equal(new[] { 5, 9 }, scores);
+    }
+
+    [AvaloniaFact]
+    public void AccessorAdapter_Between_With_NonConvertible_Bounds_Does_Not_Throw_And_Matches_Nothing()
+    {
+        var items = new[]
+        {
+            new LongPerson("A", 1L),
+            new LongPerson("B", 5L),
+            new LongPerson("C", 9L)
+        };
+        var view = new DataGridCollectionView(items);
+        var model = new FilteringModel();
+
+        var column = new DataGridTextColumn();
+        DataGridColumnMetadata.SetValueAccessor(column, new DataGridColumnValueAccessor<LongPerson, long>(p => p.Score));
+
+        var adapter = new DataGridAccessorFilteringAdapter(model, () => new[] { column });
+        adapter.AttachView(view);
+
+        var exception = Record.Exception(() =>
+            model.SetOrUpdate(new FilteringDescriptor(
+                columnId: column,
+                @operator: FilteringOperator.Between,
+                values: new object[] { "x", "y" })));
+
+        Assert.Null(exception);
+        Assert.Empty(view.Cast<LongPerson>());
+    }
+
     private sealed class Person
     {
         public Person(string name, int score)
@@ -248,5 +369,18 @@ public class DataGridAccessorFilteringAdapterTests
             match = item is Person person && descriptor.Value is int expected && person.Score == expected;
             return true;
         }
+    }
+
+    private sealed class LongPerson
+    {
+        public LongPerson(string name, long score)
+        {
+            Name = name;
+            Score = score;
+        }
+
+        public string Name { get; }
+
+        public long Score { get; }
     }
 }
