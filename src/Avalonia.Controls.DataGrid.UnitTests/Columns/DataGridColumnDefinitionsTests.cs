@@ -4,6 +4,7 @@ using System.ComponentModel;
 using System.Linq;
 using System.Reflection;
 using Avalonia.Controls;
+using Avalonia.Controls.Primitives;
 using Avalonia.Controls.Templates;
 using Avalonia.Data;
 using Avalonia.Data.Core;
@@ -321,6 +322,89 @@ public class DataGridColumnDefinitionsTests
             var headers = GetNonFillerColumns(grid).Select(c => c.Header).ToArray();
             Assert.Single(headers);
             Assert.Equal("Name", headers[0]);
+        }
+        finally
+        {
+            window.Close();
+        }
+    }
+
+    [AvaloniaFact]
+    public void ColumnDefinitionsSource_Move_and_replace_while_detached_rebuilds_headers_on_reattach()
+    {
+        var definitions = new ObservableCollection<DataGridColumnDefinition>
+        {
+            new DataGridTextColumnDefinition
+            {
+                Header = "First",
+                Binding = DataGridBindingDefinition.Create<Person, string>(p => p.Name)
+            },
+            new DataGridTextColumnDefinition
+            {
+                Header = "Second",
+                Binding = DataGridBindingDefinition.Create<Person, int>(p => p.Age)
+            },
+            new DataGridTextColumnDefinition
+            {
+                Header = "Third",
+                Binding = DataGridBindingDefinition.Create<Person, bool>(p => p.IsActive)
+            }
+        };
+
+        var grid = new DataGrid
+        {
+            AutoGenerateColumns = false,
+            HeadersVisibility = DataGridHeadersVisibility.Column,
+            ColumnDefinitionsSource = definitions
+        };
+
+        var window = new Window
+        {
+            Width = 320,
+            Height = 220,
+            Content = grid
+        };
+        window.SetThemeStyles();
+
+        try
+        {
+            window.Show();
+            Dispatcher.UIThread.RunJobs();
+            grid.UpdateLayout();
+
+            window.Content = null;
+            Dispatcher.UIThread.RunJobs();
+
+            definitions.Move(0, 2);
+            definitions[1] = new DataGridTextColumnDefinition
+            {
+                Header = "Replacement",
+                Binding = DataGridBindingDefinition.Create<Person, string>(p => p.Name)
+            };
+            definitions.Add(new DataGridTextColumnDefinition
+            {
+                Header = "Tail",
+                Binding = DataGridBindingDefinition.Create<Person, string>(p => p.Name)
+            });
+
+            window.Content = grid;
+            Dispatcher.UIThread.RunJobs();
+            grid.UpdateLayout();
+
+            var expectedHeaders = definitions.Select(definition => definition.Header).ToArray();
+            var actualHeaders = GetNonFillerColumns(grid).Select(column => column.Header).ToArray();
+            Assert.Equal(expectedHeaders, actualHeaders);
+
+            var presenter = grid.GetVisualDescendants()
+                .OfType<DataGridColumnHeadersPresenter>()
+                .Single();
+            var renderedHeaders = presenter.Children
+                .OfType<DataGridColumnHeader>()
+                .Where(header => header.OwningColumn is not DataGridFillerColumn)
+                .Select(header => header.Content)
+                .ToArray();
+
+            Assert.Equal(expectedHeaders, renderedHeaders);
         }
         finally
         {

@@ -437,7 +437,8 @@ internal
             {
                 Debug.Assert(!Children.Contains(fillerColumn.HeaderCell));
                 fillerColumn.HeaderCell.AreSeparatorsVisible = false;
-                Children.Insert(OwningGrid.ColumnsInternal.Count, fillerColumn.HeaderCell);
+                var insertionIndex = Math.Clamp(OwningGrid.ColumnsInternal.Count, 0, Children.Count);
+                Children.Insert(insertionIndex, fillerColumn.HeaderCell);
                 fillerColumn.IsRepresented = true;
                 // Optimize for the case where we don't need the filler cell 
                 fillerColumn.HeaderCell.IsVisible = false;

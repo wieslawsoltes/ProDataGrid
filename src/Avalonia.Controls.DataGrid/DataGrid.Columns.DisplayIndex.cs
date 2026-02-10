@@ -4,6 +4,7 @@
 // All other rights reserved.
 
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 
 namespace Avalonia.Controls
@@ -178,6 +179,118 @@ namespace Avalonia.Controls
             {
                 ColumnsItemsInternal[columnIndex].Index = columnIndex;
             }
+        }
+
+        private void NormalizeColumnDisplayIndexesAfterDetachedMutations()
+        {
+            int columnCount = ColumnsItemsInternal.Count;
+            if (columnCount == 0)
+            {
+                ColumnsInternal.DisplayIndexMap.Clear();
+                return;
+            }
+
+            var previousDisplayOrder = BuildPreviousDisplayOrder(columnCount);
+            ColumnsInternal.DisplayIndexMap.Clear();
+
+            // Ensure indices match the current collection order before rebuilding the map.
+            for (int index = 0; index < columnCount; index++)
+            {
+                ColumnsItemsInternal[index].Index = index;
+            }
+
+            var orderedColumns = new List<(DataGridColumn Column, int SortKey, int MoveDirection, int PreviousOrder, int CollectionOrder)>(columnCount);
+            for (int order = 0; order < columnCount; order++)
+            {
+                DataGridColumn column = ColumnsItemsInternal[order];
+                int previousOrder = previousDisplayOrder[column];
+                int rawDisplayIndex = column.DisplayIndexWithFiller;
+                int sortKey = rawDisplayIndex;
+                int moveDirection = 0;
+                if (sortKey < 0 || sortKey >= columnCount)
+                {
+                    // Detached columns can keep stale/out-of-range values after remove/add cycles.
+                    // Fall back to prior display order for deterministic compaction.
+                    sortKey = previousOrder;
+                }
+                else if (sortKey != previousOrder)
+                {
+                    // -1 => moved left, +1 => moved right.
+                    moveDirection = sortKey < previousOrder ? -1 : 1;
+                }
+
+                orderedColumns.Add((column, sortKey, moveDirection, previousOrder, order));
+            }
+
+            orderedColumns.Sort((left, right) =>
+            {
+                int compare = left.SortKey.CompareTo(right.SortKey);
+                if (compare != 0)
+                {
+                    return compare;
+                }
+
+                // For equal target indexes:
+                // left movers should be inserted before stationary columns,
+                // right movers should be inserted after stationary columns.
+                compare = left.MoveDirection.CompareTo(right.MoveDirection);
+                if (compare != 0)
+                {
+                    return compare;
+                }
+
+                compare = left.PreviousOrder.CompareTo(right.PreviousOrder);
+                if (compare != 0)
+                {
+                    return compare;
+                }
+
+                return left.CollectionOrder.CompareTo(right.CollectionOrder);
+            });
+
+            for (int displayIndex = 0; displayIndex < orderedColumns.Count; displayIndex++)
+            {
+                DataGridColumn column = orderedColumns[displayIndex].Column;
+                column.DisplayIndexWithFiller = displayIndex;
+                column.DisplayIndexHasChanged = false;
+                ColumnsInternal.DisplayIndexMap.Add(column.Index);
+            }
+        }
+
+        private Dictionary<DataGridColumn, int> BuildPreviousDisplayOrder(int columnCount)
+        {
+            var displayOrder = new Dictionary<DataGridColumn, int>(columnCount);
+            bool useExistingMap = ColumnsInternal.DisplayIndexMap.Count == columnCount;
+            if (useExistingMap)
+            {
+                for (int displayIndex = 0; displayIndex < columnCount; displayIndex++)
+                {
+                    int columnIndex = ColumnsInternal.DisplayIndexMap[displayIndex];
+                    if (columnIndex < 0 || columnIndex >= ColumnsItemsInternal.Count)
+                    {
+                        useExistingMap = false;
+                        break;
+                    }
+
+                    DataGridColumn column = ColumnsItemsInternal[columnIndex];
+                    if (!displayOrder.TryAdd(column, displayIndex))
+                    {
+                        useExistingMap = false;
+                        break;
+                    }
+                }
+            }
+
+            if (!useExistingMap)
+            {
+                displayOrder.Clear();
+                for (int index = 0; index < ColumnsItemsInternal.Count; index++)
+                {
+                    displayOrder[ColumnsItemsInternal[index]] = index;
+                }
+            }
+
+            return displayOrder;
         }
 
 
