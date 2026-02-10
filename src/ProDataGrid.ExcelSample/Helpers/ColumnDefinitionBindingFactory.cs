@@ -23,10 +23,10 @@ internal static class ColumnDefinitionBindingFactory
 
         return new ClrPropertyInfo(
             name,
-            target => getter((TItem)target),
+            target => TryGetValue(target, getter),
             setter == null
                 ? null
-                : (target, value) => setter((TItem)target, value is null ? default! : (TValue)value),
+                : (target, value) => TrySetValue(target, value, setter),
             typeof(TValue));
     }
 
@@ -37,5 +37,37 @@ internal static class ColumnDefinitionBindingFactory
     {
         var propertyInfo = CreateProperty(name, getter, setter);
         return DataGridBindingDefinition.Create(propertyInfo, getter, setter);
+    }
+
+    private static TValue TryGetValue<TItem, TValue>(object target, Func<TItem, TValue> getter)
+    {
+        if (target is not TItem item)
+        {
+            return default!;
+        }
+
+        return getter(item);
+    }
+
+    private static void TrySetValue<TItem, TValue>(object target, object? value, Action<TItem, TValue> setter)
+    {
+        if (target is not TItem item)
+        {
+            return;
+        }
+
+        if (value is null)
+        {
+            setter(item, default!);
+            return;
+        }
+
+        if (value is TValue typedValue)
+        {
+            setter(item, typedValue);
+            return;
+        }
+
+        setter(item, (TValue)value);
     }
 }

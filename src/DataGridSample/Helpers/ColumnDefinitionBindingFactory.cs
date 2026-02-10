@@ -23,13 +23,45 @@ namespace DataGridSample.Helpers
 
             var propertyInfo = new ClrPropertyInfo(
                 name,
-                target => getter((TItem)target),
+                target => TryGetValue(target, getter),
                 setter == null
                     ? null
-                    : (target, value) => setter((TItem)target, value is null ? default! : (TValue)value),
+                    : (target, value) => TrySetValue(target, value, setter),
                 typeof(TValue));
 
             return DataGridBindingDefinition.Create<TItem, TValue>(propertyInfo, getter, setter);
+        }
+
+        private static TValue TryGetValue<TItem, TValue>(object target, Func<TItem, TValue> getter)
+        {
+            if (target is not TItem item)
+            {
+                return default!;
+            }
+
+            return getter(item);
+        }
+
+        private static void TrySetValue<TItem, TValue>(object target, object? value, Action<TItem, TValue> setter)
+        {
+            if (target is not TItem item)
+            {
+                return;
+            }
+
+            if (value is null)
+            {
+                setter(item, default!);
+                return;
+            }
+
+            if (value is TValue typedValue)
+            {
+                setter(item, typedValue);
+                return;
+            }
+
+            setter(item, (TValue)value);
         }
     }
 }
