@@ -20,6 +20,11 @@ namespace DataGridSample.ViewModels
     /// </summary>
     public class FilteringModelSampleViewModel : ObservableObject
     {
+        private const string CustomerPropertyPath = nameof(Order.Customer);
+        private const string StatusPropertyPath = nameof(Order.Status);
+        private const string OrderedPropertyPath = nameof(Order.Ordered);
+        private const string TotalPropertyPath = nameof(Order.Total);
+
         private readonly ObservableCollection<Order> _items;
         private readonly RelayCommand _clearAllCommand;
         private readonly DataGridColumnDefinition _customerColumn;
@@ -40,7 +45,7 @@ namespace DataGridSample.ViewModels
 
             CustomerFilter = new TextFilterContext(
                 "Customer contains",
-                apply: text => ApplyTextFilter(_customerColumn, text),
+                apply: text => ApplyTextFilter(_customerColumn, CustomerPropertyPath, text),
                 clear: () => ClearFilter(_customerColumn, () => CustomerFilter.Text = string.Empty));
 
             TotalFilter = new NumberFilterContext(
@@ -71,21 +76,21 @@ namespace DataGridSample.ViewModels
                     "Delivered",
                     "Canceled"
                 },
-                apply: selected => ApplyEnumFilter(_statusColumn, selected),
+                apply: selected => ApplyEnumFilter(_statusColumn, StatusPropertyPath, selected),
                 clear: () => ClearFilter(_statusColumn, () => StatusFilter.SelectNone()));
 
             _customerColumn = new DataGridTextColumnDefinition
             {
                 Header = "Customer",
-                Binding = ColumnDefinitionBindingFactory.CreateBinding<Order, string>(nameof(Order.Customer), o => o.Customer),
-                SortMemberPath = nameof(Order.Customer),
+                Binding = ColumnDefinitionBindingFactory.CreateBinding<Order, string>(CustomerPropertyPath, o => o.Customer),
+                SortMemberPath = CustomerPropertyPath,
                 Width = new DataGridLength(1.4, DataGridLengthUnitType.Star)
             };
             _statusColumn = new DataGridTextColumnDefinition
             {
                 Header = "Status",
-                Binding = ColumnDefinitionBindingFactory.CreateBinding<Order, string>(nameof(Order.Status), o => o.Status),
-                SortMemberPath = nameof(Order.Status),
+                Binding = ColumnDefinitionBindingFactory.CreateBinding<Order, string>(StatusPropertyPath, o => o.Status),
+                SortMemberPath = StatusPropertyPath,
                 Width = new DataGridLength(1.1, DataGridLengthUnitType.Star)
             };
             _regionColumn = new DataGridTextColumnDefinition
@@ -126,32 +131,32 @@ namespace DataGridSample.ViewModels
 
         private static DataGridColumnDefinition CreateOrderedColumnDefinition()
         {
-            var orderedBinding = ColumnDefinitionBindingFactory.CreateBinding<Order, DateTimeOffset>(nameof(Order.Ordered), o => o.Ordered);
+            var orderedBinding = ColumnDefinitionBindingFactory.CreateBinding<Order, DateTimeOffset>(OrderedPropertyPath, o => o.Ordered);
             orderedBinding.StringFormat = "{0:MM-dd}";
             return new DataGridTextColumnDefinition
             {
                 Header = "Ordered (UTC)",
                 Binding = orderedBinding,
-                SortMemberPath = nameof(Order.Ordered),
+                SortMemberPath = OrderedPropertyPath,
                 Width = new DataGridLength(0.9, DataGridLengthUnitType.Star)
             };
         }
 
         private static DataGridColumnDefinition CreateTotalColumnDefinition()
         {
-            var totalBinding = ColumnDefinitionBindingFactory.CreateBinding<Order, double>(nameof(Order.Total), o => o.Total);
+            var totalBinding = ColumnDefinitionBindingFactory.CreateBinding<Order, double>(TotalPropertyPath, o => o.Total);
             totalBinding.StringFormat = "{0:C2}";
             return new DataGridNumericColumnDefinition
             {
                 Header = "Total",
                 Binding = totalBinding,
-                SortMemberPath = nameof(Order.Total),
+                SortMemberPath = TotalPropertyPath,
                 Width = new DataGridLength(0.9, DataGridLengthUnitType.Star),
                 FormatString = "C2"
             };
         }
 
-        private void ApplyTextFilter(DataGridColumnDefinition columnId, string? text)
+        private void ApplyTextFilter(DataGridColumnDefinition columnId, string propertyPath, string? text)
         {
             if (string.IsNullOrWhiteSpace(text))
             {
@@ -162,6 +167,7 @@ namespace DataGridSample.ViewModels
             FilteringModel.SetOrUpdate(new FilteringDescriptor(
                 columnId: columnId,
                 @operator: FilteringOperator.Contains,
+                propertyPath: propertyPath,
                 value: text,
                 stringComparison: StringComparison.OrdinalIgnoreCase));
         }
@@ -180,6 +186,7 @@ namespace DataGridSample.ViewModels
             FilteringModel.SetOrUpdate(new FilteringDescriptor(
                 columnId: _totalColumn,
                 @operator: FilteringOperator.Between,
+                propertyPath: TotalPropertyPath,
                 values: new object[] { lower, upper }));
         }
 
@@ -197,10 +204,11 @@ namespace DataGridSample.ViewModels
             FilteringModel.SetOrUpdate(new FilteringDescriptor(
                 columnId: _orderedColumn,
                 @operator: FilteringOperator.Between,
+                propertyPath: OrderedPropertyPath,
                 values: new object[] { start, end }));
         }
 
-        private void ApplyEnumFilter(DataGridColumnDefinition columnId, IReadOnlyList<string> selected)
+        private void ApplyEnumFilter(DataGridColumnDefinition columnId, string propertyPath, IReadOnlyList<string> selected)
         {
             if (selected.Count == 0)
             {
@@ -211,6 +219,7 @@ namespace DataGridSample.ViewModels
             FilteringModel.SetOrUpdate(new FilteringDescriptor(
                 columnId: columnId,
                 @operator: FilteringOperator.In,
+                propertyPath: propertyPath,
                 values: selected.Cast<object>().ToArray()));
         }
 
