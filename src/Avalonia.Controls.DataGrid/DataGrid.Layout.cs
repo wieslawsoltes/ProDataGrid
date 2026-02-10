@@ -318,13 +318,34 @@ internal
         private void CompleteCellsCollection(DataGridRow dataGridRow)
         {
             Debug.Assert(dataGridRow != null);
-            int cellsInCollection = dataGridRow.Cells.Count;
-            if (ColumnsItemsInternal.Count > cellsInCollection)
+            var expectedCellCount = ColumnsItemsInternal.Count;
+            var shouldRebuildCells = dataGridRow.Cells.Count != expectedCellCount;
+
+            if (!shouldRebuildCells)
             {
-                for (int columnIndex = cellsInCollection; columnIndex < ColumnsItemsInternal.Count; columnIndex++)
+                for (var columnIndex = 0; columnIndex < expectedCellCount; columnIndex++)
                 {
-                    AddNewCellPrivate(dataGridRow, ColumnsItemsInternal[columnIndex]);
+                    if (!ReferenceEquals(dataGridRow.Cells[columnIndex].OwningColumn, ColumnsItemsInternal[columnIndex]))
+                    {
+                        shouldRebuildCells = true;
+                        break;
+                    }
                 }
+            }
+
+            if (!shouldRebuildCells)
+            {
+                return;
+            }
+
+            for (var cellIndex = dataGridRow.Cells.Count - 1; cellIndex >= 0; cellIndex--)
+            {
+                dataGridRow.Cells.RemoveAt(cellIndex);
+            }
+
+            for (var columnIndex = 0; columnIndex < expectedCellCount; columnIndex++)
+            {
+                AddNewCellPrivate(dataGridRow, ColumnsItemsInternal[columnIndex]);
             }
         }
 

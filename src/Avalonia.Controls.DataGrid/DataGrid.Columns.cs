@@ -318,6 +318,11 @@ internal
 
         internal void OnColumnCollectionChanged_PreNotification(bool columnsGrew)
         {
+            if (!IsAttachedToVisualTree)
+            {
+                _columnsChangedWhileDetached = true;
+            }
+
             // dataGridColumn==null means the collection was refreshed.
             if (_totalSummaryRow != null && _totalSummaryRow.CellsPresenter != null && _totalSummaryRow.Cells.Count != ColumnsItemsInternal.Count)
             {
@@ -353,6 +358,11 @@ internal
 
         internal void OnColumnDisplayIndexChanged_PostNotification()
         {
+            if (!IsAttachedToVisualTree)
+            {
+                _columnsChangedWhileDetached = true;
+            }
+
             // Notifications for adjusted display indexes.
             FlushDisplayIndexChanged(true /*raiseEvent*/);
 
@@ -1333,9 +1343,25 @@ internal
             Debug.Assert(dataGridColumn != null);
             if (_columnHeadersPresenter != null)
             {
+                if (!IsAttachedToVisualTree)
+                {
+                    // Rebuild headers on next attach; detached presenters can have empty child collections.
+                    return;
+                }
+
                 dataGridColumn.HeaderCell.IsVisible = dataGridColumn.IsVisible;
                 Debug.Assert(!_columnHeadersPresenter.Children.Contains(dataGridColumn.HeaderCell));
-                _columnHeadersPresenter.Children.Insert(dataGridColumn.DisplayIndexWithFiller, dataGridColumn.HeaderCell);
+                if (_columnHeadersPresenter.Children.Contains(dataGridColumn.HeaderCell))
+                {
+                    return;
+                }
+
+                var insertionIndex = Math.Clamp(
+                    dataGridColumn.DisplayIndexWithFiller,
+                    0,
+                    _columnHeadersPresenter.Children.Count);
+
+                _columnHeadersPresenter.Children.Insert(insertionIndex, dataGridColumn.HeaderCell);
             }
         }
 

@@ -2,6 +2,7 @@ using System;
 using System.Collections.ObjectModel;
 using System.Linq;
 using Avalonia.Controls;
+using Avalonia.Controls.Primitives;
 using Avalonia.Data;
 using Avalonia.Headless.XUnit;
 using Avalonia.Markup.Xaml.Styling;
@@ -81,6 +82,52 @@ public class BindableColumnsHeadlessTests
         Assert.Contains("Extra", headers);
 
         window.Close();
+    }
+
+    [AvaloniaFact]
+    public void BoundColumns_Move_and_replace_while_detached_rebuilds_headers_on_reattach()
+    {
+        var vm = new ColumnsViewModel();
+        vm.Columns.Add(new DataGridTextColumn { Header = "Extra", Binding = new Binding("Name") });
+
+        var (window, grid) = CreateWindow(vm);
+        try
+        {
+            window.Show();
+            grid.ApplyTemplate();
+            grid.UpdateLayout();
+
+            window.Content = null;
+            Dispatcher.UIThread.RunJobs();
+
+            vm.Columns.Move(0, vm.Columns.Count - 1);
+            vm.Columns[1] = new DataGridTextColumn { Header = "Replacement", Binding = new Binding("Name.Length") };
+            vm.Columns.Add(new DataGridTextColumn { Header = "Tail", Binding = new Binding("Name") });
+
+            window.Content = grid;
+            Dispatcher.UIThread.RunJobs();
+            grid.ApplyTemplate();
+            grid.UpdateLayout();
+
+            var expectedHeaders = vm.Columns.Select(column => column.Header).ToArray();
+            var actualHeaders = GetNonFillerColumns(grid).Select(column => column.Header).ToArray();
+            Assert.Equal(expectedHeaders, actualHeaders);
+
+            var presenter = grid.GetVisualDescendants()
+                .OfType<DataGridColumnHeadersPresenter>()
+                .Single();
+            var renderedHeaders = presenter.Children
+                .OfType<DataGridColumnHeader>()
+                .Where(header => header.OwningColumn is not DataGridFillerColumn)
+                .Select(header => header.Content)
+                .ToArray();
+
+            Assert.Equal(expectedHeaders, renderedHeaders);
+        }
+        finally
+        {
+            window.Close();
+        }
     }
 
     private static DataGridColumn[] GetNonFillerColumns(DataGrid grid)

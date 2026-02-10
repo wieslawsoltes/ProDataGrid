@@ -389,6 +389,7 @@ internal
         private DataGridSelectionMode? _detachedSelectionMode;
         private bool? _detachedSelectionModelSingleSelect;
         private bool _detachedSelectionChanged;
+        private bool _columnsChangedWhileDetached;
         private DetachedSelectionMonitor _detachedSelectionMonitor;
         private IReadOnlyList<object> _pendingHierarchicalSelectionSnapshot;
         private IReadOnlyList<int> _pendingHierarchicalSelectionIndexes;

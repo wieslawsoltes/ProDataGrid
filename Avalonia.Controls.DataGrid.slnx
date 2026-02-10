@@ -24,6 +24,7 @@
     <Folder Name="/tests/">
         <Project Path="src/Avalonia.Controls.DataGrid.UnitTests/Avalonia.Controls.DataGrid.UnitTests.csproj" />
         <Project Path="src/Avalonia.Controls.DataGrid.LeakTests/Avalonia.Controls.DataGrid.LeakTests.csproj" />
+        <Project Path="src/DataGridSample.UnitTests/DataGridSample.UnitTests.csproj" />
         <Project Path="src/ProDataGrid.ExcelSample.UnitTests/ProDataGrid.ExcelSample.UnitTests.csproj" />
         <Project Path="src/ProDataGrid.FormulaEngine.UnitTests/ProDataGrid.FormulaEngine.UnitTests.csproj" />
         <Project Path="tests/ProDataGrid.FormulaEngine.Benchmarks/ProDataGrid.FormulaEngine.Benchmarks.csproj" />

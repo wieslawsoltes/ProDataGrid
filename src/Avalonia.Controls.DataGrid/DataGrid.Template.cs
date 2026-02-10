@@ -163,6 +163,7 @@ internal
                     column.OwningGrid = this;
                 }
             }
+            NormalizeColumnDisplayIndexesAfterDetachedMutations();
             if (_columnHeadersPresenter != null && _columnHeadersPresenter.OwningGrid == null)
             {
                 _columnHeadersPresenter.OwningGrid = this;
@@ -186,7 +187,7 @@ internal
                 UpdateFilteringAdapterView();
                 UpdateSearchAdapterView();
                 UpdateConditionalFormattingAdapterView();
-                if (_scrollStateManager.ShouldPreserveScrollState())
+                if (_scrollStateManager.ShouldPreserveScrollState() && !_columnsChangedWhileDetached)
                 {
                     InitializeElementsAfterReattach();
                 }
@@ -199,6 +200,8 @@ internal
             {
                 AttachExternalSubscriptions();
             }
+
+            _columnsChangedWhileDetached = false;
 
             TryRestorePendingGroupingState();
 
