@@ -64,6 +64,7 @@ namespace Avalonia.Controls
                 {
                     DataGridDiagnostics.RecordRowsDisplayReused();
                     DataGridDiagnostics.RecordRowsDisplayScanned(scannedSlots);
+                    DataGridDiagnostics.RecordRowsDisplayScanRealizeTime(0);
                     activity?.SetTag(DataGridDiagnostics.Tags.FirstDisplayedSlot, DisplayData.FirstScrollingSlot);
                     activity?.SetTag(DataGridDiagnostics.Tags.LastDisplayedSlot, DisplayData.LastScrollingSlot);
                     activity?.SetTag(DataGridDiagnostics.Tags.DisplayedSlots, DisplayData.NumDisplayedScrollingElements);
