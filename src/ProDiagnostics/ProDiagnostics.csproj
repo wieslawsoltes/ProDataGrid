@@ -28,6 +28,8 @@
                   Link="Themes/Simple.xaml" />
     <AvaloniaXaml Include="../Avalonia.Controls.DataGrid/Themes/Simple.v2.xaml"
                   Link="Themes/Simple.v2.xaml" />
+    <AvaloniaXaml Include="../Avalonia.Controls.DataGrid/Themes/DensityStyles/Simple.Compact.xaml"
+                  Link="Themes/DensityStyles/Simple.Compact.xaml" />
   </ItemGroup>
 
   <ItemGroup>
