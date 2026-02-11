@@ -281,9 +281,43 @@ namespace Avalonia.Controls
 
                 // Avoid redundant measure work during displayed-row scan updates.
                 // Recycled/unchanged elements can already have a valid DesiredSize.
+                // When we do need to measure, use the same finite width the rows presenter uses
+                // so we don't immediately re-measure with a different constraint.
                 if (!element.IsMeasureValid)
                 {
-                    element.Measure(new Size(double.PositiveInfinity, double.PositiveInfinity));
+                    double measureWidth = double.NaN;
+                    if (RowsPresenterAvailableSize is Size rowsPresenterAvailableSize &&
+                        !double.IsNaN(rowsPresenterAvailableSize.Width) &&
+                        !double.IsInfinity(rowsPresenterAvailableSize.Width) &&
+                        rowsPresenterAvailableSize.Width > 0)
+                    {
+                        measureWidth = rowsPresenterAvailableSize.Width;
+                    }
+                    else if (!double.IsNaN(_rowsPresenter.Bounds.Width) &&
+                             !double.IsInfinity(_rowsPresenter.Bounds.Width) &&
+                             _rowsPresenter.Bounds.Width > 0)
+                    {
+                        measureWidth = _rowsPresenter.Bounds.Width;
+                    }
+                    else
+                    {
+                        var fallbackWidth = RowHeadersDesiredWidth
+                                            + ColumnsInternal.VisibleEdgedColumnsWidth
+                                            + ColumnsInternal.FillerColumn.FillerWidth;
+                        if (!double.IsNaN(fallbackWidth) &&
+                            !double.IsInfinity(fallbackWidth) &&
+                            fallbackWidth > 0)
+                        {
+                            measureWidth = fallbackWidth;
+                        }
+                    }
+
+                    if (double.IsNaN(measureWidth) || double.IsInfinity(measureWidth) || measureWidth <= 0)
+                    {
+                        measureWidth = double.PositiveInfinity;
+                    }
+
+                    element.Measure(new Size(measureWidth, double.PositiveInfinity));
                 }
                 AvailableSlotElementRoom -= element.DesiredSize.Height;
 
