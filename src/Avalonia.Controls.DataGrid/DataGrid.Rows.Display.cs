@@ -57,6 +57,7 @@ namespace Avalonia.Controls
                 firstDisplayedScrollingSlot = 0;
             }
 
+            bool useEstimatorFirstScan = CanUseEstimatorFirstScan();
             using (DataGridDiagnostics.BeginRowsDisplayScan())
             {
                 if (TryReuseDisplayedRows(firstDisplayedScrollingSlot, displayHeight, ref scannedSlots))
@@ -69,7 +70,34 @@ namespace Avalonia.Controls
                     return;
                 }
 
-                int slot = firstDisplayedScrollingSlot;
+                int slot;
+                if (useEstimatorFirstScan &&
+                    TryEstimateScanRangeFromTop(
+                        firstDisplayedScrollingSlot,
+                        displayHeight,
+                        out int candidateFirstDisplayedSlot,
+                        out int candidateLastDisplayedSlot,
+                        ref scannedSlots))
+                {
+                    firstDisplayedScrollingSlot = candidateFirstDisplayedSlot;
+                    slot = firstDisplayedScrollingSlot;
+
+                    while (slot >= 0 &&
+                        slot <= candidateLastDisplayedSlot &&
+                        !MathUtilities.GreaterThanOrClose(deltaY, displayHeight))
+                    {
+                        scannedSlots++;
+                        deltaY += GetDisplayedScanSlotHeight(slot, ref scanRealizedTicks);
+                        visibleScrollingRows++;
+                        lastDisplayedScrollingSlot = slot;
+                        slot = GetNextVisibleSlot(slot);
+                    }
+                }
+                else
+                {
+                    slot = firstDisplayedScrollingSlot;
+                }
+
                 while (slot < SlotCount && !MathUtilities.GreaterThanOrClose(deltaY, displayHeight))
                 {
                     scannedSlots++;
@@ -79,11 +107,16 @@ namespace Avalonia.Controls
                     slot = GetNextVisibleSlot(slot);
                 }
 
-                while (MathUtilities.LessThan(deltaY, displayHeight) && slot >= 0)
+                if (slot >= SlotCount)
                 {
-                    slot = GetPreviousVisibleSlot(firstDisplayedScrollingSlot);
-                    if (slot >= 0)
+                    while (MathUtilities.LessThan(deltaY, displayHeight))
                     {
+                        slot = GetPreviousVisibleSlot(firstDisplayedScrollingSlot);
+                        if (slot < 0)
+                        {
+                            break;
+                        }
+
                         scannedSlots++;
                         deltaY += GetDisplayedScanSlotHeight(slot, ref scanRealizedTicks);
                         firstDisplayedScrollingSlot = slot;
@@ -204,6 +237,142 @@ namespace Avalonia.Controls
             return true;
         }
 
+        private bool CanUseEstimatorFirstScan()
+        {
+            if (RowHeightEstimator == null)
+            {
+                return false;
+            }
+
+            if (RowGroupHeadersTable.IndexCount > 0 || RowGroupFootersTable.IndexCount > 0)
+            {
+                return false;
+            }
+
+            if (RowDetailsTemplate != null &&
+                RowDetailsVisibilityMode != DataGridRowDetailsVisibilityMode.Collapsed)
+            {
+                return false;
+            }
+
+            return IsEstimatorConfidenceHigh();
+        }
+
+        private bool IsEstimatorConfidenceHigh()
+        {
+            int sampleCount = 0;
+            double totalHeight = 0;
+            double minHeight = double.MaxValue;
+            double maxHeight = 0;
+
+            foreach (Control element in DisplayData.GetScrollingElements())
+            {
+                double height = element.DesiredSize.Height;
+                if (MathUtilities.LessThanOrClose(height, 0))
+                {
+                    continue;
+                }
+
+                sampleCount++;
+                totalHeight += height;
+                minHeight = Math.Min(minHeight, height);
+                maxHeight = Math.Max(maxHeight, height);
+            }
+
+            if (sampleCount < 3)
+            {
+                return false;
+            }
+
+            double averageHeight = totalHeight / sampleCount;
+            double baseline = Math.Max(1, averageHeight);
+            double estimatedHeight = Math.Max(1, RowHeightEstimator?.RowHeightEstimate ?? RowHeightEstimate);
+            double relativeError = Math.Abs(estimatedHeight - averageHeight) / baseline;
+            double relativeSpread = (maxHeight - minHeight) / baseline;
+
+            return relativeError <= 0.35 && relativeSpread <= 1.5;
+        }
+
+        private bool TryEstimateScanRangeFromTop(
+            int firstDisplayedScrollingSlot,
+            double displayHeight,
+            out int estimatedFirstDisplayedSlot,
+            out int estimatedLastDisplayedSlot,
+            ref int scannedSlots)
+        {
+            estimatedFirstDisplayedSlot = firstDisplayedScrollingSlot;
+            estimatedLastDisplayedSlot = -1;
+
+            if (firstDisplayedScrollingSlot < 0 || firstDisplayedScrollingSlot >= SlotCount)
+            {
+                return false;
+            }
+
+            double estimatedHeight = -NegVerticalOffset;
+            int slot = firstDisplayedScrollingSlot;
+            while (slot >= 0 &&
+                slot < SlotCount &&
+                !MathUtilities.GreaterThanOrClose(estimatedHeight, displayHeight))
+            {
+                scannedSlots++;
+                estimatedHeight += GetDisplayedEstimatedScanSlotHeight(slot);
+                estimatedLastDisplayedSlot = slot;
+                slot = GetNextVisibleSlot(slot);
+            }
+
+            while (MathUtilities.LessThan(estimatedHeight, displayHeight))
+            {
+                int previousSlot = GetPreviousVisibleSlot(estimatedFirstDisplayedSlot);
+                if (previousSlot < 0)
+                {
+                    break;
+                }
+
+                scannedSlots++;
+                estimatedHeight += GetDisplayedEstimatedScanSlotHeight(previousSlot);
+                estimatedFirstDisplayedSlot = previousSlot;
+            }
+
+            return estimatedLastDisplayedSlot >= estimatedFirstDisplayedSlot && estimatedLastDisplayedSlot >= 0;
+        }
+
+        private bool TryEstimateScanRangeFromBottom(
+            int lastDisplayedScrollingSlot,
+            double displayHeight,
+            out int estimatedFirstDisplayedSlot,
+            ref int scannedSlots)
+        {
+            estimatedFirstDisplayedSlot = -1;
+
+            if (lastDisplayedScrollingSlot < 0 || lastDisplayedScrollingSlot >= SlotCount)
+            {
+                return false;
+            }
+
+            double estimatedHeight = 0;
+            int slot = lastDisplayedScrollingSlot;
+            while (MathUtilities.LessThan(estimatedHeight, displayHeight) && slot >= 0)
+            {
+                scannedSlots++;
+                estimatedHeight += GetDisplayedEstimatedScanSlotHeight(slot);
+                estimatedFirstDisplayedSlot = slot;
+                slot = GetPreviousVisibleSlot(slot);
+            }
+
+            return estimatedFirstDisplayedSlot >= 0;
+        }
+
+        private double GetDisplayedEstimatedScanSlotHeight(int slot)
+        {
+            if (slot >= DisplayData.FirstScrollingSlot &&
+                slot <= DisplayData.LastScrollingSlot)
+            {
+                return DisplayData.GetDisplayedElement(slot).DesiredSize.Height;
+            }
+
+            return GetSlotElementHeight(slot);
+        }
+
         private double GetDisplayedScanSlotHeight(int slot, ref long scanRealizedTicks)
         {
             if (slot >= DisplayData.FirstScrollingSlot &&
@@ -261,9 +430,34 @@ namespace Avalonia.Controls
                 lastDisplayedScrollingRow = 0;
             }
 
+            bool useEstimatorFirstScan = CanUseEstimatorFirstScan();
             using (DataGridDiagnostics.BeginRowsDisplayScan())
             {
-                int slot = lastDisplayedScrollingRow;
+                int slot;
+                if (useEstimatorFirstScan &&
+                    TryEstimateScanRangeFromBottom(
+                        lastDisplayedScrollingRow,
+                        displayHeight,
+                        out int candidateFirstDisplayedSlot,
+                        ref scannedSlots))
+                {
+                    slot = lastDisplayedScrollingRow;
+                    while (MathUtilities.LessThan(deltaY, displayHeight) &&
+                        slot >= candidateFirstDisplayedSlot &&
+                        slot >= 0)
+                    {
+                        scannedSlots++;
+                        deltaY += GetDisplayedScanSlotHeight(slot, ref scanRealizedTicks);
+                        visibleScrollingRows++;
+                        firstDisplayedScrollingRow = slot;
+                        slot = GetPreviousVisibleSlot(slot);
+                    }
+                }
+                else
+                {
+                    slot = lastDisplayedScrollingRow;
+                }
+
                 while (MathUtilities.LessThan(deltaY, displayHeight) && slot >= 0)
                 {
                     scannedSlots++;
