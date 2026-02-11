@@ -158,6 +158,7 @@ Histograms (ms):
 - `prodatagrid.rows.refresh.time` - Row refresh pass.
 - `prodatagrid.rows.display.update.time` - Displayed rows update during virtualization.
 - `prodatagrid.rows.display.scan.time` - Slot/range scan phase inside displayed-row updates.
+- `prodatagrid.rows.display.scan.realize.time` - Row/container realization time incurred while scanning displayed rows.
 - `prodatagrid.rows.display.trim.time` - Trim/remove phase for non-displayed rows.
 - `prodatagrid.rows.measure.time` - Rows presenter measure pass for displayed elements.
 - `prodatagrid.rows.arrange.time` - Rows presenter arrange pass for displayed/recycled elements.

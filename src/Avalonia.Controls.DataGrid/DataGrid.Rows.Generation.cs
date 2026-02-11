@@ -6,6 +6,7 @@
 using Avalonia.Collections;
 using Avalonia.Data;
 using Avalonia.Styling;
+using Avalonia.Utilities;
 using System.Diagnostics;
 
 namespace Avalonia.Controls
@@ -184,7 +185,7 @@ namespace Avalonia.Controls
 
 
 
-        private Control InsertDisplayedElement(int slot, bool updateSlotInformation)
+        private Control InsertDisplayedElement(int slot, bool updateSlotInformation, bool measureElement = true)
         {
             Control slotElement;
             if (IsGroupHeaderSlot(slot))
@@ -202,13 +203,18 @@ namespace Avalonia.Controls
                 // from top to bottom or bottom to up so it's better to do in one pass
                 slotElement = GenerateRow(RowIndexFromSlot(slot), slot);
             }
-            InsertDisplayedElement(slot, slotElement, wasNewlyAdded: false, updateSlotInformation: updateSlotInformation);
+            InsertDisplayedElement(
+                slot,
+                slotElement,
+                wasNewlyAdded: false,
+                updateSlotInformation: updateSlotInformation,
+                measureElement: measureElement);
             return slotElement;
         }
 
 
 
-        private void InsertDisplayedElement(int slot, Control element, bool wasNewlyAdded, bool updateSlotInformation)
+        private void InsertDisplayedElement(int slot, Control element, bool wasNewlyAdded, bool updateSlotInformation, bool measureElement = true)
         {
             // We can only support creating new rows that are adjacent to the currently visible rows
             // since they need to be added to the visual tree for us to Measure them.
@@ -279,29 +285,67 @@ namespace Avalonia.Controls
                     _rowsPresenter.RegisterAnchorCandidate(groupFooter);
                 }
 
-                // Avoid redundant measure work during displayed-row scan updates.
-                // Recycled/unchanged elements can already have a valid DesiredSize.
-                if (!element.IsMeasureValid)
+                bool shouldMeasureElement = measureElement ||
+                    !element.IsMeasureValid ||
+                    MathUtilities.LessThanOrClose(element.DesiredSize.Height, 0);
+
+                if (shouldMeasureElement)
                 {
-                    element.Measure(new Size(double.PositiveInfinity, double.PositiveInfinity));
+                    double measureWidth = double.NaN;
+                    if (RowsPresenterAvailableSize is Size rowsPresenterAvailableSize &&
+                        !double.IsNaN(rowsPresenterAvailableSize.Width) &&
+                        !double.IsInfinity(rowsPresenterAvailableSize.Width) &&
+                        rowsPresenterAvailableSize.Width > 0)
+                    {
+                        measureWidth = rowsPresenterAvailableSize.Width;
+                    }
+                    else if (!double.IsNaN(_rowsPresenter.Bounds.Width) &&
+                             !double.IsInfinity(_rowsPresenter.Bounds.Width) &&
+                             _rowsPresenter.Bounds.Width > 0)
+                    {
+                        measureWidth = _rowsPresenter.Bounds.Width;
+                    }
+                    else
+                    {
+                        var fallbackWidth = RowHeadersDesiredWidth
+                                            + ColumnsInternal.VisibleEdgedColumnsWidth
+                                            + ColumnsInternal.FillerColumn.FillerWidth;
+                        if (!double.IsNaN(fallbackWidth) &&
+                            !double.IsInfinity(fallbackWidth) &&
+                            fallbackWidth > 0)
+                        {
+                            measureWidth = fallbackWidth;
+                        }
+                    }
+
+                    if (double.IsNaN(measureWidth) || double.IsInfinity(measureWidth) || measureWidth <= 0)
+                    {
+                        measureWidth = double.PositiveInfinity;
+                    }
+
+                    element.Measure(new Size(measureWidth, double.PositiveInfinity));
                 }
-                AvailableSlotElementRoom -= element.DesiredSize.Height;
+
+                var realizedHeight = shouldMeasureElement
+                    ? element.DesiredSize.Height
+                    : GetEstimatedSlotHeightForUnmeasuredRealization(slot, row, groupHeader, groupFooter);
+                AvailableSlotElementRoom -= realizedHeight;
 
                 var estimator = RowHeightEstimator;
                 
-                if (groupHeader != null)
+                if (shouldMeasureElement && groupHeader != null)
                 {
                     _rowGroupHeightsByLevel[groupHeader.Level] = groupHeader.DesiredSize.Height;
                     // Record the measured group header height with the estimator
                     estimator?.RecordRowGroupHeaderHeight(slot, groupHeader.Level, element.DesiredSize.Height);
                 }
-                else if (groupFooter != null)
+                else if (shouldMeasureElement && groupFooter != null)
                 {
                     _rowGroupHeightsByLevel[groupFooter.Level] = groupFooter.DesiredSize.Height;
                     estimator?.RecordRowGroupHeaderHeight(slot, groupFooter.Level, element.DesiredSize.Height);
                 }
 
-                if (row != null)
+                if (shouldMeasureElement && row != null)
                 {
                     // Record the measured row height with the estimator
                     bool hasDetails = GetRowDetailsVisibility(slot);
@@ -324,6 +368,42 @@ namespace Avalonia.Controls
             {
                 DisplayData.LoadScrollingSlot(slot, element, updateSlotInformation);
             }
+        }
+
+        private double GetEstimatedSlotHeightForUnmeasuredRealization(
+            int slot,
+            DataGridRow? row,
+            DataGridRowGroupHeader? groupHeader,
+            DataGridRowGroupFooter? groupFooter)
+        {
+            var estimator = RowHeightEstimator;
+            if (groupHeader != null)
+            {
+                if (estimator != null)
+                {
+                    return estimator.GetEstimatedHeight(slot, isRowGroupHeader: true, rowGroupLevel: groupHeader.Level);
+                }
+
+                return _rowGroupHeightsByLevel[groupHeader.Level];
+            }
+
+            if (groupFooter != null)
+            {
+                if (estimator != null)
+                {
+                    return estimator.GetEstimatedHeight(slot, isRowGroupHeader: true, rowGroupLevel: groupFooter.Level);
+                }
+
+                return _rowGroupHeightsByLevel[groupFooter.Level];
+            }
+
+            bool hasDetails = row != null && GetRowDetailsVisibility(slot);
+            if (estimator != null)
+            {
+                return estimator.GetEstimatedHeight(slot, hasDetails: hasDetails);
+            }
+
+            return RowHeightEstimate + (hasDetails ? RowDetailsHeightEstimate : 0);
         }
 
 

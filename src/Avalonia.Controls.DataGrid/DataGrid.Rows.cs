@@ -1324,28 +1324,32 @@ internal
                 Debug.Assert(DisplayData.GetDisplayedElement(slot) != null);
                 return DisplayData.GetDisplayedElement(slot).DesiredSize.Height;
             }
-            else
+
+            return GetEstimatedSlotElementHeight(slot);
+        }
+
+        private double GetEstimatedSlotElementHeight(int slot)
+        {
+            Debug.Assert(slot >= 0 && slot < SlotCount);
+            var estimator = RowHeightEstimator;
+            DataGridRowGroupInfo rowGroupInfo = GetGroupInfoForSlot(slot);
+
+            if (estimator != null)
             {
-                var estimator = RowHeightEstimator;
-                DataGridRowGroupInfo rowGroupInfo = GetGroupInfoForSlot(slot);
-                
-                if (estimator != null)
-                {
-                    bool isGroupSlot = rowGroupInfo != null;
-                    int level = isGroupSlot ? rowGroupInfo.Level : 0;
-                    bool hasDetails = !isGroupSlot && GetRowDetailsVisibility(slot);
-                    return estimator.GetEstimatedHeight(slot, isGroupSlot, level, hasDetails);
-                }
-
-                // Fallback to simple estimation
-                if (rowGroupInfo != null)
-                {
-                    return _rowGroupHeightsByLevel[rowGroupInfo.Level];
-                }
-
-                // Assume it's a row since we're either not grouping or it wasn't a RowGroupHeader
-                return RowHeightEstimate + (GetRowDetailsVisibility(slot) ? RowDetailsHeightEstimate : 0);
+                bool isGroupSlot = rowGroupInfo != null;
+                int level = isGroupSlot ? rowGroupInfo.Level : 0;
+                bool hasDetails = !isGroupSlot && GetRowDetailsVisibility(slot);
+                return estimator.GetEstimatedHeight(slot, isGroupSlot, level, hasDetails);
             }
+
+            // Fallback to simple estimation
+            if (rowGroupInfo != null)
+            {
+                return _rowGroupHeightsByLevel[rowGroupInfo.Level];
+            }
+
+            // Assume it's a row since we're either not grouping or it wasn't a RowGroupHeader
+            return RowHeightEstimate + (GetRowDetailsVisibility(slot) ? RowDetailsHeightEstimate : 0);
         }
 
         /// <summary>
