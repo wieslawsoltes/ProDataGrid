@@ -487,6 +487,7 @@ public class DataGridThemeResourceCoverageTests
         "DataGridColumnHeaderMinHeight",
         "DataGridRowGroupHeaderFontSize",
         "DataGridRowGroupHeaderMinHeight",
+        "DataGridSummaryRowMinHeight",
         "DataGridColumnHeaderIconSize",
         "DataGridColumnHeaderIconSpacing",
         "DataGridColumnHeaderDragGripSize",
@@ -494,7 +495,52 @@ public class DataGridThemeResourceCoverageTests
         "DataGridRowGroupHeaderExpanderSize",
         "DataGridHierarchicalExpanderSize",
         "DataGridHierarchicalExpanderGlyphSize",
-        "DataGridDropLocationIndicatorWidth"
+        "DataGridDropLocationIndicatorWidth",
+        "DataGridFilterEditorSpacing",
+        "DataGridFilterEditorActionSpacing",
+        "DataGridFilterTextEditorWidth",
+        "DataGridFilterNumberEditorWidth",
+        "DataGridFilterNumberInputWidth",
+        "DataGridFilterDateEditorWidth",
+        "DataGridFilterDateEditorFieldSpacing",
+        "DataGridFilterEnumEditorWidth",
+        "DataGridPivotHeaderSegmentsSpacing",
+        "DataGridColumnBandHeaderSegmentsSpacing",
+        "DataGridFilterButtonSize",
+        "DataGridFilterGlyphSize",
+        "DataGridFilterGlyphStrokeThickness",
+        "DataGridValidationInlineIndicatorSize",
+        "DataGridValidationInlineIndicatorStrokeThickness",
+        "DataGridCellValidationStrokeThickness",
+        "DataGridCellFocusPrimaryStrokeThickness",
+        "DataGridCellFocusSecondaryStrokeThickness",
+        "DataGridCellGridLineWidth",
+        "DataGridColumnHeaderVerticalSeparatorWidth",
+        "DataGridColumnHeaderDragGripIconStrokeThickness",
+        "DataGridColumnHeaderDragIndicatorOpacity",
+        "DataGridTopLeftColumnHeaderSeparatorStrokeThickness",
+        "DataGridTopLeftColumnHeaderSeparatorHeight",
+        "DataGridRowHeaderHorizontalSeparatorHeight",
+        "DataGridRowHeaderDragGripIconStrokeThickness",
+        "DataGridHierarchicalPresenterIndent",
+        "DataGridHierarchicalDisabledGlyphOpacity",
+        "DataGridRowBottomGridLineHeight",
+        "DataGridRowGroupBottomGridLineHeight",
+        "DataGridRowInvalidOpacity",
+        "DataGridRowWarningOpacity",
+        "DataGridRowInfoOpacity",
+        "DataGridRowSearchMatchOpacity",
+        "DataGridRowSearchCurrentOpacity",
+        "DataGridRowDraggingOpacity",
+        "DataGridRowDragOverInsideOpacity",
+        "DataGridRowGroupCurrencyStrokeThickness",
+        "DataGridRowGroupFocusPrimaryStrokeThickness",
+        "DataGridRowGroupFocusSecondaryStrokeThickness",
+        "DataGridSelectionOverlayInitialSize",
+        "DataGridColumnHeadersSeparatorHeight",
+        "DataGridColumnChooserItemsSpacing",
+        "DataGridColumnChooserFlyoutMaxWidth",
+        "DataGridColumnChooserFlyoutMaxHeight"
     };
 
     private static readonly string[] SimpleGridLengthKeys =
@@ -514,13 +560,25 @@ public class DataGridThemeResourceCoverageTests
         "DataGridRowGroupHeaderTextMargin",
         "DataGridHierarchicalPresenterContentMargin",
         "DataGridFilterFlyoutPadding",
-        "DataGridBorderThickness"
+        "DataGridBorderThickness",
+        "DataGridValidationInlineIndicatorMargin",
+        "DataGridCellFocusSecondaryMargin",
+        "DataGridTopLeftColumnHeaderBorderThickness",
+        "DataGridRowHeaderBorderThickness",
+        "DataGridRowHeaderHorizontalSeparatorMargin",
+        "DataGridRowGroupFocusSecondaryMargin",
+        "DataGridSummaryRowBorderThickness",
+        "DataGridSummaryCellBorderThickness",
+        "DataGridRowGroupFooterBorderThickness",
+        "DataGridFillHandleBorderThickness",
+        "DataGridColumnChooserFlyoutPadding"
     };
 
     private static readonly string[] SimpleCornerRadiusKeys =
     {
         "DataGridFilterFlyoutCornerRadius",
-        "DataGridCellCornerRadius"
+        "DataGridCellCornerRadius",
+        "DataGridFillHandleCornerRadius"
     };
 
     private static readonly string[] FluentThemeBrushKeys =
@@ -608,7 +666,52 @@ public class DataGridThemeResourceCoverageTests
         "DataGridRowSelectedBackgroundOpacity",
         "DataGridRowSelectedHoveredBackgroundOpacity",
         "DataGridRowSelectedUnfocusedBackgroundOpacity",
-        "DataGridRowSelectedHoveredUnfocusedBackgroundOpacity"
+        "DataGridRowSelectedHoveredUnfocusedBackgroundOpacity",
+        "DataGridFilterEditorSpacing",
+        "DataGridFilterEditorActionSpacing",
+        "DataGridFilterTextEditorWidth",
+        "DataGridFilterNumberEditorWidth",
+        "DataGridFilterNumberInputWidth",
+        "DataGridFilterDateEditorWidth",
+        "DataGridFilterDateEditorFieldSpacing",
+        "DataGridFilterEnumEditorWidth",
+        "DataGridPivotHeaderSegmentsSpacing",
+        "DataGridColumnBandHeaderSegmentsSpacing",
+        "DataGridFilterButtonSize",
+        "DataGridFilterGlyphSize",
+        "DataGridFilterGlyphStrokeThickness",
+        "DataGridValidationInlineIndicatorSize",
+        "DataGridValidationInlineIndicatorStrokeThickness",
+        "DataGridCellValidationStrokeThickness",
+        "DataGridCellFocusPrimaryStrokeThickness",
+        "DataGridCellFocusSecondaryStrokeThickness",
+        "DataGridCellGridLineWidth",
+        "DataGridColumnHeaderVerticalSeparatorWidth",
+        "DataGridColumnHeaderDragGripIconStrokeThickness",
+        "DataGridColumnHeaderDragIndicatorOpacity",
+        "DataGridTopLeftColumnHeaderSeparatorStrokeThickness",
+        "DataGridTopLeftColumnHeaderSeparatorHeight",
+        "DataGridRowHeaderHorizontalSeparatorHeight",
+        "DataGridRowHeaderDragGripIconStrokeThickness",
+        "DataGridHierarchicalPresenterIndent",
+        "DataGridHierarchicalDisabledGlyphOpacity",
+        "DataGridRowBottomGridLineHeight",
+        "DataGridRowGroupBottomGridLineHeight",
+        "DataGridRowInvalidOpacity",
+        "DataGridRowWarningOpacity",
+        "DataGridRowInfoOpacity",
+        "DataGridRowSearchMatchOpacity",
+        "DataGridRowSearchCurrentOpacity",
+        "DataGridRowDraggingOpacity",
+        "DataGridRowDragOverInsideOpacity",
+        "DataGridRowGroupCurrencyStrokeThickness",
+        "DataGridRowGroupFocusPrimaryStrokeThickness",
+        "DataGridRowGroupFocusSecondaryStrokeThickness",
+        "DataGridSelectionOverlayInitialSize",
+        "DataGridColumnHeadersSeparatorHeight",
+        "DataGridColumnChooserItemsSpacing",
+        "DataGridColumnChooserFlyoutMaxWidth",
+        "DataGridColumnChooserFlyoutMaxHeight"
     };
 
     private static readonly string[] FluentGridLengthKeys =
@@ -628,13 +731,25 @@ public class DataGridThemeResourceCoverageTests
         "DataGridRowGroupHeaderTextMargin",
         "DataGridHierarchicalPresenterContentMargin",
         "DataGridFilterFlyoutPadding",
-        "DataGridBorderThickness"
+        "DataGridBorderThickness",
+        "DataGridValidationInlineIndicatorMargin",
+        "DataGridCellFocusSecondaryMargin",
+        "DataGridTopLeftColumnHeaderBorderThickness",
+        "DataGridRowHeaderBorderThickness",
+        "DataGridRowHeaderHorizontalSeparatorMargin",
+        "DataGridRowGroupFocusSecondaryMargin",
+        "DataGridSummaryRowBorderThickness",
+        "DataGridSummaryCellBorderThickness",
+        "DataGridRowGroupFooterBorderThickness",
+        "DataGridFillHandleBorderThickness",
+        "DataGridColumnChooserFlyoutPadding"
     };
 
     private static readonly string[] FluentCornerRadiusKeys =
     {
         "DataGridFilterFlyoutCornerRadius",
-        "DataGridCellCornerRadius"
+        "DataGridCellCornerRadius",
+        "DataGridFillHandleCornerRadius"
     };
 }
 

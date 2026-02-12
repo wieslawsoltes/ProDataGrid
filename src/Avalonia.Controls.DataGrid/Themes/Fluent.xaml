@@ -1,11 +1,15 @@
 <Styles xmlns="https://github.com/avaloniaui"
-        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        x:Class="Avalonia.Controls.Themes.DataGridFluentTheme">
 
   <!-- Include Generic.xaml with all ControlThemes -->
   <StyleInclude Source="/Themes/Generic.xaml" />
 
   <Styles.Resources>
     <ResourceDictionary>
+      <!-- Keep compact density styles outside theme dictionaries so they can be activated by theme API. -->
+      <ResourceInclude x:Key="CompactStyles" Source="/Themes/DensityStyles/Fluent.Compact.xaml" />
+
       <ResourceDictionary.ThemeDictionaries>
         <ResourceDictionary x:Key="Dark">
           <SolidColorBrush x:Key="DataGridColumnHeaderForegroundBrush" Color="{DynamicResource SystemBaseMediumColor}" />
@@ -179,6 +183,65 @@
       <Thickness x:Key="DataGridFilterFlyoutPadding">12</Thickness>
       <Thickness x:Key="DataGridBorderThickness">0</Thickness>
       <CornerRadius x:Key="DataGridFilterFlyoutCornerRadius">4</CornerRadius>
+
+      <!-- Additional tokenized metrics -->
+      <x:Double x:Key="DataGridFilterEditorSpacing">8</x:Double>
+      <x:Double x:Key="DataGridFilterEditorActionSpacing">6</x:Double>
+      <x:Double x:Key="DataGridFilterTextEditorWidth">240</x:Double>
+      <x:Double x:Key="DataGridFilterNumberEditorWidth">240</x:Double>
+      <x:Double x:Key="DataGridFilterNumberInputWidth">100</x:Double>
+      <x:Double x:Key="DataGridFilterDateEditorWidth">260</x:Double>
+      <x:Double x:Key="DataGridFilterDateEditorFieldSpacing">6</x:Double>
+      <x:Double x:Key="DataGridFilterEnumEditorWidth">240</x:Double>
+      <x:Double x:Key="DataGridPivotHeaderSegmentsSpacing">2</x:Double>
+      <x:Double x:Key="DataGridColumnBandHeaderSegmentsSpacing">2</x:Double>
+      <x:Double x:Key="DataGridFilterButtonSize">22</x:Double>
+      <x:Double x:Key="DataGridFilterGlyphSize">12</x:Double>
+      <x:Double x:Key="DataGridFilterGlyphStrokeThickness">1.2</x:Double>
+      <Thickness x:Key="DataGridValidationInlineIndicatorMargin">8,0</Thickness>
+      <x:Double x:Key="DataGridValidationInlineIndicatorSize">14</x:Double>
+      <x:Double x:Key="DataGridValidationInlineIndicatorStrokeThickness">2</x:Double>
+      <x:Double x:Key="DataGridCellValidationStrokeThickness">1</x:Double>
+      <x:Double x:Key="DataGridCellFocusPrimaryStrokeThickness">2</x:Double>
+      <Thickness x:Key="DataGridCellFocusSecondaryMargin">2</Thickness>
+      <x:Double x:Key="DataGridCellFocusSecondaryStrokeThickness">1</x:Double>
+      <x:Double x:Key="DataGridCellGridLineWidth">1</x:Double>
+      <x:Double x:Key="DataGridColumnHeaderVerticalSeparatorWidth">1</x:Double>
+      <x:Double x:Key="DataGridColumnHeaderDragGripIconStrokeThickness">0</x:Double>
+      <x:Double x:Key="DataGridColumnHeaderDragIndicatorOpacity">0.5</x:Double>
+      <Thickness x:Key="DataGridTopLeftColumnHeaderBorderThickness">0,0,1,0</Thickness>
+      <x:Double x:Key="DataGridTopLeftColumnHeaderSeparatorStrokeThickness">1</x:Double>
+      <x:Double x:Key="DataGridTopLeftColumnHeaderSeparatorHeight">1</x:Double>
+      <Thickness x:Key="DataGridRowHeaderBorderThickness">0,0,1,0</Thickness>
+      <x:Double x:Key="DataGridRowHeaderHorizontalSeparatorHeight">1</x:Double>
+      <Thickness x:Key="DataGridRowHeaderHorizontalSeparatorMargin">1,0,1,0</Thickness>
+      <x:Double x:Key="DataGridRowHeaderDragGripIconStrokeThickness">0</x:Double>
+      <x:Double x:Key="DataGridHierarchicalPresenterIndent">16</x:Double>
+      <x:Double x:Key="DataGridHierarchicalDisabledGlyphOpacity">0</x:Double>
+      <x:Double x:Key="DataGridRowBottomGridLineHeight">1</x:Double>
+      <x:Double x:Key="DataGridRowGroupBottomGridLineHeight">1</x:Double>
+      <x:Double x:Key="DataGridRowInvalidOpacity">0.4</x:Double>
+      <x:Double x:Key="DataGridRowWarningOpacity">0.35</x:Double>
+      <x:Double x:Key="DataGridRowInfoOpacity">0.35</x:Double>
+      <x:Double x:Key="DataGridRowSearchMatchOpacity">0.18</x:Double>
+      <x:Double x:Key="DataGridRowSearchCurrentOpacity">0.24</x:Double>
+      <x:Double x:Key="DataGridRowDraggingOpacity">0.6</x:Double>
+      <x:Double x:Key="DataGridRowDragOverInsideOpacity">0.08</x:Double>
+      <x:Double x:Key="DataGridRowGroupCurrencyStrokeThickness">1</x:Double>
+      <x:Double x:Key="DataGridRowGroupFocusPrimaryStrokeThickness">2</x:Double>
+      <Thickness x:Key="DataGridRowGroupFocusSecondaryMargin">2</Thickness>
+      <x:Double x:Key="DataGridRowGroupFocusSecondaryStrokeThickness">1</x:Double>
+      <Thickness x:Key="DataGridSummaryRowBorderThickness">0,1,0,0</Thickness>
+      <Thickness x:Key="DataGridSummaryCellBorderThickness">0,0,1,0</Thickness>
+      <Thickness x:Key="DataGridRowGroupFooterBorderThickness">0,0,0,1</Thickness>
+      <Thickness x:Key="DataGridFillHandleBorderThickness">1</Thickness>
+      <CornerRadius x:Key="DataGridFillHandleCornerRadius">1</CornerRadius>
+      <x:Double x:Key="DataGridSelectionOverlayInitialSize">0</x:Double>
+      <x:Double x:Key="DataGridColumnHeadersSeparatorHeight">1</x:Double>
+      <x:Double x:Key="DataGridColumnChooserItemsSpacing">6</x:Double>
+      <Thickness x:Key="DataGridColumnChooserFlyoutPadding">8</Thickness>
+      <x:Double x:Key="DataGridColumnChooserFlyoutMaxWidth">260</x:Double>
+      <x:Double x:Key="DataGridColumnChooserFlyoutMaxHeight">320</x:Double>
 
       <!-- GridLines -->
       <DataGridGridLinesVisibility x:Key="DataGridGridLinesVisibility">None</DataGridGridLinesVisibility>
