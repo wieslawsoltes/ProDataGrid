@@ -203,11 +203,6 @@ ActivitySource.AddActivityListener(listener);
 <li><code>prodatagrid.refresh.time</code> - DataGrid refresh pass (rows + columns).</li>
 <li><code>prodatagrid.rows.refresh.time</code> - Row refresh pass.</li>
 <li><code>prodatagrid.rows.display.update.time</code> - Displayed rows update during virtualization.</li>
-<li><code>prodatagrid.rows.display.scan.time</code> - Slot/range scan phase inside displayed-row updates.</li>
-<li><code>prodatagrid.rows.display.scan.realize.time</code> - Row/container realization time incurred while scanning displayed rows.</li>
-<li><code>prodatagrid.rows.display.trim.time</code> - Trim/remove phase for non-displayed rows.</li>
-<li><code>prodatagrid.rows.measure.time</code> - Rows presenter measure pass for displayed elements.</li>
-<li><code>prodatagrid.rows.arrange.time</code> - Rows presenter arrange pass for displayed/recycled elements.</li>
 <li><code>prodatagrid.rows.generate.time</code> - Row generation and preparation.</li>
 <li><code>prodatagrid.columns.autogen.time</code> - Auto-generated columns pass.</li>
 <li><code>prodatagrid.selection.change.time</code> - SelectionChanged handling.</li>
@@ -220,17 +215,9 @@ ActivitySource.AddActivityListener(listener);
 </ul>
 <p>Counters:</p>
 <ul>
-<li><code>prodatagrid.rows.display.reused.count</code> - Display updates that reused the current displayed range.</li>
 <li><code>prodatagrid.rows.realized.count</code> - Row containers realized.</li>
 <li><code>prodatagrid.rows.recycled.count</code> - Row containers recycled.</li>
 <li><code>prodatagrid.rows.prepared.count</code> - Row containers prepared.</li>
-<li><code>prodatagrid.rows.measured.count</code> - Row elements measured by the rows presenter.</li>
-<li><code>prodatagrid.rows.arranged.count</code> - Row elements arranged by the rows presenter.</li>
-<li><code>prodatagrid.rows.display.scanned.count</code> - Row slots scanned while computing displayed range.</li>
-<li><code>prodatagrid.rows.display.removed.count</code> - Displayed elements removed while trimming viewport.</li>
-<li><code>prodatagrid.rows.measure.skipped.count</code> - Elements skipped in measure because size was still valid.</li>
-<li><code>prodatagrid.rows.arrange.skipped.count</code> - Elements skipped in arrange because bounds were unchanged.</li>
-<li><code>prodatagrid.rows.arrange.offscreen.count</code> - Elements explicitly arranged to offscreen bounds.</li>
 <li><code>prodatagrid.columns.autogen.count</code> - Columns auto-generated.</li>
 <li><code>prodatagrid.selection.changed.count</code> - SelectionChanged events raised.</li>
 </ul>
