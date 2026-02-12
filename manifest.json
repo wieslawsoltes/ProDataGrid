@@ -5394,6 +5394,62 @@
     },
     {
       "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.Themes.DataGridDensityStyle.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.Themes.DataGridDensityStyle.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.Themes.DataGridDensityStyle",
+      "Summary": "<p sourcefile=\"api/Avalonia.Controls.Themes.DataGridDensityStyle.yml\" sourcestartlinenumber=\"1\">Defines density presets for DataGrid theme resources.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.Themes.DataGridFluentTheme.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.Themes.DataGridFluentTheme.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.Themes.DataGridFluentTheme",
+      "Summary": "<p sourcefile=\"api/Avalonia.Controls.Themes.DataGridFluentTheme.yml\" sourcestartlinenumber=\"1\">Fluent DataGrid theme resource host with density switching support.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.Themes.DataGridSimpleTheme.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.Themes.DataGridSimpleTheme.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.Themes.DataGridSimpleTheme",
+      "Summary": "<p sourcefile=\"api/Avalonia.Controls.Themes.DataGridSimpleTheme.yml\" sourcestartlinenumber=\"1\">Simple DataGrid theme resource host with density switching support.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.Themes.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.Themes.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.Themes",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
       "source_relative_path": "api/Avalonia.Controls.Utils.ICellEditBinding.yml",
       "output": {
         ".html": {
