@@ -54,7 +54,6 @@ public class DataGridDiagnosticsTests
         AssertHasDoubleMeasurement(listener, DataGridDiagnostics.Meters.DataGridRefreshTimeName);
         AssertHasDoubleMeasurement(listener, DataGridDiagnostics.Meters.RowsRefreshTimeName);
         AssertHasDoubleMeasurement(listener, DataGridDiagnostics.Meters.RowsDisplayUpdateTimeName);
-        AssertHasDoubleMeasurement(listener, DataGridDiagnostics.Meters.RowsDisplayScanRealizeTimeName);
         AssertHasDoubleMeasurement(listener, DataGridDiagnostics.Meters.RowGenerateTimeName);
         AssertHasDoubleMeasurement(listener, DataGridDiagnostics.Meters.ColumnsAutoGenerateTimeName);
         AssertHasDoubleMeasurement(listener, DataGridDiagnostics.Meters.SelectionChangedTimeName);
@@ -219,7 +218,6 @@ public class DataGridDiagnosticsTests
         AssertValidDoubleMeasurements(listener, DataGridDiagnostics.Meters.DataGridRefreshTimeName);
         AssertValidDoubleMeasurements(listener, DataGridDiagnostics.Meters.RowsRefreshTimeName);
         AssertValidDoubleMeasurements(listener, DataGridDiagnostics.Meters.RowsDisplayUpdateTimeName);
-        AssertValidDoubleMeasurements(listener, DataGridDiagnostics.Meters.RowsDisplayScanRealizeTimeName);
         AssertValidDoubleMeasurements(listener, DataGridDiagnostics.Meters.RowGenerateTimeName);
         AssertValidDoubleMeasurements(listener, DataGridDiagnostics.Meters.ColumnsAutoGenerateTimeName);
         AssertValidDoubleMeasurements(listener, DataGridDiagnostics.Meters.SelectionChangedTimeName);

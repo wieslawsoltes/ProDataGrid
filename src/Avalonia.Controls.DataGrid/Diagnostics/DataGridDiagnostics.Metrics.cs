@@ -9,7 +9,6 @@ internal static partial class DataGridDiagnostics
     private static Histogram<double>? s_rowsRefresh;
     private static Histogram<double>? s_rowsDisplayUpdate;
     private static Histogram<double>? s_rowsDisplayScan;
-    private static Histogram<double>? s_rowsDisplayScanRealize;
     private static Histogram<double>? s_rowsDisplayTrim;
     private static Histogram<double>? s_rowsMeasure;
     private static Histogram<double>? s_rowsArrange;
@@ -57,10 +56,6 @@ internal static partial class DataGridDiagnostics
             Meters.RowsDisplayScanTimeName,
             Meters.MillisecondsUnit,
             Meters.RowsDisplayScanTimeDescription);
-        s_rowsDisplayScanRealize = meter.CreateHistogram<double>(
-            Meters.RowsDisplayScanRealizeTimeName,
-            Meters.MillisecondsUnit,
-            Meters.RowsDisplayScanRealizeTimeDescription);
         s_rowsDisplayTrim = meter.CreateHistogram<double>(
             Meters.RowsDisplayTrimTimeName,
             Meters.MillisecondsUnit,
@@ -197,14 +192,6 @@ internal static partial class DataGridDiagnostics
     public static void RecordRowRecycled() => s_rowsRecycled?.Add(1);
 
     public static void RecordRowPrepared() => s_rowsPrepared?.Add(1);
-
-    public static void RecordRowsDisplayScanRealizeTime(double milliseconds)
-    {
-        if (!double.IsNaN(milliseconds) && !double.IsInfinity(milliseconds) && milliseconds >= 0)
-        {
-            s_rowsDisplayScanRealize?.Record(milliseconds);
-        }
-    }
 
     public static void RecordRowsDisplayScanned(int count)
     {

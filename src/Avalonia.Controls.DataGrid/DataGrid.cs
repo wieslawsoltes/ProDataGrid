@@ -4699,7 +4699,7 @@ internal
             isMatch = false;
             isCurrent = false;
 
-            if (!HasActiveSearchHighlights())
+            if (_searchModel == null || _searchModel.HighlightMode == SearchHighlightMode.None)
             {
                 return false;
             }
@@ -4718,16 +4718,6 @@ internal
             }
 
             return isMatch || isCurrent;
-        }
-
-        private bool HasActiveSearchHighlights()
-        {
-            if (_searchModel == null || _searchModel.HighlightMode == SearchHighlightMode.None)
-            {
-                return false;
-            }
-
-            return _searchResultsMap.Count > 0;
         }
 
         private bool TryGetSearchResult(int rowIndex, DataGridColumn column, out SearchResult result)

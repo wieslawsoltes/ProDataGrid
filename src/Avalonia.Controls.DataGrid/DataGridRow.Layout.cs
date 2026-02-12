@@ -144,17 +144,6 @@ namespace Avalonia.Controls
             }
         }
 
-        internal void ResetVisibleCellsInteractionState()
-        {
-            foreach (DataGridCell dataGridCell in Cells)
-            {
-                if (dataGridCell.IsVisible || dataGridCell.IsCurrent)
-                {
-                    dataGridCell.ResetInteractionPseudoClasses();
-                }
-            }
-        }
-
         internal void ApplyHeaderStatus()
         {
             if (_headerElement != null && OwningGrid.AreRowHeadersVisible)

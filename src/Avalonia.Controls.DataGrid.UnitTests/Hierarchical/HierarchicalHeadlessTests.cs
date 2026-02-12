@@ -483,7 +483,6 @@ public class HierarchicalHeadlessTests
 
         model.Toggle(anchorNode);
         PumpLayout(grid);
-        PumpLayout(grid);
 
         var anchorAfterExpand = FindVisibleRow(grid, anchorNode);
         Assert.NotNull(anchorAfterExpand);
@@ -493,7 +492,6 @@ public class HierarchicalHeadlessTests
         Assert.InRange(Math.Abs(scrollViewer.Offset.Y - presenter.Offset.Y), 0, 0.01);
 
         model.Toggle(anchorNode);
-        PumpLayout(grid);
         PumpLayout(grid);
 
         var anchorAfterCollapse = FindVisibleRow(grid, anchorNode);

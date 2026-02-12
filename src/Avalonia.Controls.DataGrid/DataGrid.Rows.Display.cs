@@ -37,7 +37,6 @@ namespace Avalonia.Controls
             double deltaY = -NegVerticalOffset;
             int visibleScrollingRows = 0;
             int scannedSlots = 0;
-            long scanRealizedTicks = 0;
 
             if (_rowsPresenter == null)
             {
@@ -57,156 +56,40 @@ namespace Avalonia.Controls
                 firstDisplayedScrollingSlot = 0;
             }
 
-            bool useEstimatorFirstScan = CanUseEstimatorFirstScan();
             using (DataGridDiagnostics.BeginRowsDisplayScan())
             {
                 if (TryReuseDisplayedRows(firstDisplayedScrollingSlot, displayHeight, ref scannedSlots))
                 {
                     DataGridDiagnostics.RecordRowsDisplayReused();
                     DataGridDiagnostics.RecordRowsDisplayScanned(scannedSlots);
-                    DataGridDiagnostics.RecordRowsDisplayScanRealizeTime(0);
                     activity?.SetTag(DataGridDiagnostics.Tags.FirstDisplayedSlot, DisplayData.FirstScrollingSlot);
                     activity?.SetTag(DataGridDiagnostics.Tags.LastDisplayedSlot, DisplayData.LastScrollingSlot);
                     activity?.SetTag(DataGridDiagnostics.Tags.DisplayedSlots, DisplayData.NumDisplayedScrollingElements);
                     return;
                 }
 
-                int slot;
-                if (useEstimatorFirstScan &&
-                    TryEstimateScanRangeFromTop(
-                        firstDisplayedScrollingSlot,
-                        displayHeight,
-                        out int candidateFirstDisplayedSlot,
-                        out int candidateLastDisplayedSlot,
-                        ref scannedSlots))
+                int slot = firstDisplayedScrollingSlot;
+                while (slot < SlotCount && !MathUtilities.GreaterThanOrClose(deltaY, displayHeight))
                 {
-                    firstDisplayedScrollingSlot = candidateFirstDisplayedSlot;
-                    lastDisplayedScrollingSlot = candidateLastDisplayedSlot;
-
-                    if (CanUseEstimatorNoMeasureRealization())
-                    {
-                        MeasureDisplayedScanRangeEstimatedFromTop(
-                            firstDisplayedScrollingSlot,
-                            lastDisplayedScrollingSlot,
-                            ref scannedSlots,
-                            ref deltaY,
-                            ref visibleScrollingRows);
-
-                        TrimExcessBottomRowsForDisplayHeight(
-                            ref lastDisplayedScrollingSlot,
-                            ref deltaY,
-                            ref visibleScrollingRows,
-                            displayHeight);
-
-                        slot = GetNextVisibleSlot(lastDisplayedScrollingSlot);
-                        while (slot < SlotCount && !MathUtilities.GreaterThanOrClose(deltaY, displayHeight))
-                        {
-                            scannedSlots++;
-                            deltaY += GetDisplayedEstimatedScanSlotHeight(slot);
-                            visibleScrollingRows++;
-                            lastDisplayedScrollingSlot = slot;
-                            slot = GetNextVisibleSlot(slot);
-                        }
-
-                        if (slot >= SlotCount)
-                        {
-                            while (MathUtilities.LessThan(deltaY, displayHeight))
-                            {
-                                slot = GetPreviousVisibleSlot(firstDisplayedScrollingSlot);
-                                if (slot < 0)
-                                {
-                                    break;
-                                }
-
-                                scannedSlots++;
-                                deltaY += GetDisplayedEstimatedScanSlotHeight(slot);
-                                firstDisplayedScrollingSlot = slot;
-                                visibleScrollingRows++;
-                            }
-                        }
-
-                        EnsureDisplayedRangeRealizedWithoutMeasure(
-                            firstDisplayedScrollingSlot,
-                            lastDisplayedScrollingSlot,
-                            ref scanRealizedTicks);
-                    }
-                    else
-                    {
-                        MeasureDisplayedScanRangeExactFromTop(
-                            firstDisplayedScrollingSlot,
-                            lastDisplayedScrollingSlot,
-                            ref scannedSlots,
-                            ref scanRealizedTicks,
-                            ref deltaY,
-                            ref visibleScrollingRows);
-
-                        TrimExcessBottomRowsForDisplayHeight(
-                            ref lastDisplayedScrollingSlot,
-                            ref deltaY,
-                            ref visibleScrollingRows,
-                            displayHeight);
-
-                        slot = GetNextVisibleSlot(lastDisplayedScrollingSlot);
-                        while (slot < SlotCount && !MathUtilities.GreaterThanOrClose(deltaY, displayHeight))
-                        {
-                            scannedSlots++;
-                            deltaY += GetDisplayedScanSlotHeight(slot, ref scanRealizedTicks);
-                            visibleScrollingRows++;
-                            lastDisplayedScrollingSlot = slot;
-                            slot = GetNextVisibleSlot(slot);
-                        }
-
-                        if (slot >= SlotCount)
-                        {
-                            while (MathUtilities.LessThan(deltaY, displayHeight))
-                            {
-                                slot = GetPreviousVisibleSlot(firstDisplayedScrollingSlot);
-                                if (slot < 0)
-                                {
-                                    break;
-                                }
-
-                                scannedSlots++;
-                                deltaY += GetDisplayedScanSlotHeight(slot, ref scanRealizedTicks);
-                                firstDisplayedScrollingSlot = slot;
-                                visibleScrollingRows++;
-                            }
-                        }
-                    }
+                    scannedSlots++;
+                    deltaY += GetExactSlotElementHeight(slot);
+                    visibleScrollingRows++;
+                    lastDisplayedScrollingSlot = slot;
+                    slot = GetNextVisibleSlot(slot);
                 }
-                else
+
+                while (MathUtilities.LessThan(deltaY, displayHeight) && slot >= 0)
                 {
-                    slot = firstDisplayedScrollingSlot;
-                    while (slot < SlotCount && !MathUtilities.GreaterThanOrClose(deltaY, displayHeight))
+                    slot = GetPreviousVisibleSlot(firstDisplayedScrollingSlot);
+                    if (slot >= 0)
                     {
                         scannedSlots++;
-                        deltaY += GetDisplayedScanSlotHeight(slot, ref scanRealizedTicks);
+                        deltaY += GetExactSlotElementHeight(slot);
+                        firstDisplayedScrollingSlot = slot;
                         visibleScrollingRows++;
-                        lastDisplayedScrollingSlot = slot;
-                        slot = GetNextVisibleSlot(slot);
-                    }
-
-                    if (slot >= SlotCount)
-                    {
-                        while (MathUtilities.LessThan(deltaY, displayHeight))
-                        {
-                            slot = GetPreviousVisibleSlot(firstDisplayedScrollingSlot);
-                            if (slot < 0)
-                            {
-                                break;
-                            }
-
-                            scannedSlots++;
-                            deltaY += GetDisplayedScanSlotHeight(slot, ref scanRealizedTicks);
-                            firstDisplayedScrollingSlot = slot;
-                            visibleScrollingRows++;
-                        }
                     }
                 }
             }
-
-            DataGridDiagnostics.RecordRowsDisplayScanRealizeTime(GetElapsedMilliseconds(scanRealizedTicks));
-
             // If we're up to the first row, and we still have room left, uncover as much of the first row as we can
             if (firstDisplayedScrollingSlot == 0 && MathUtilities.LessThan(deltaY, displayHeight))
             {
@@ -268,11 +151,10 @@ namespace Avalonia.Controls
 
             double deltaY = -NegVerticalOffset;
             int visibleScrollingRows = 0;
-            int slot = DisplayData.FirstScrollingSlot;
-            while (slot >= 0 && slot <= DisplayData.LastScrollingSlot)
+            foreach (Control element in DisplayData.GetScrollingElements())
             {
                 scannedSlots++;
-                deltaY += GetDisplayedEstimatedScanSlotHeight(slot);
+                deltaY += element.DesiredSize.Height;
                 visibleScrollingRows++;
 
                 if (MathUtilities.GreaterThanOrClose(deltaY, displayHeight))
@@ -291,13 +173,6 @@ namespace Avalonia.Controls
                             : visibleScrollingRows;
                     return true;
                 }
-
-                if (slot == DisplayData.LastScrollingSlot)
-                {
-                    break;
-                }
-
-                slot = GetNextVisibleSlot(slot);
             }
 
             // If we're up to the first row, and we still have room left, uncover as much of
@@ -325,425 +200,6 @@ namespace Avalonia.Controls
             return true;
         }
 
-        private bool CanUseEstimatorFirstScan()
-        {
-            if (RowHeightEstimator == null)
-            {
-                return false;
-            }
-
-            if (_hierarchicalRowsEnabled)
-            {
-                return false;
-            }
-
-            if (RowGroupHeadersTable.IndexCount > 0 || RowGroupFootersTable.IndexCount > 0)
-            {
-                return false;
-            }
-
-            if (RowDetailsTemplate != null &&
-                RowDetailsVisibilityMode != DataGridRowDetailsVisibilityMode.Collapsed)
-            {
-                return false;
-            }
-
-            return IsEstimatorConfidenceHigh();
-        }
-
-        private bool IsEstimatorConfidenceHigh()
-        {
-            if (!TryGetEstimatorConfidenceMetrics(out int sampleCount, out double relativeError, out double relativeSpread))
-            {
-                return false;
-            }
-
-            return sampleCount >= 3 && relativeError <= 0.35 && relativeSpread <= 1.5;
-        }
-
-        private bool CanUseEstimatorNoMeasureRealization()
-        {
-            if (RowHeightEstimator == null)
-            {
-                return false;
-            }
-
-            if (_hierarchicalRowsEnabled)
-            {
-                return false;
-            }
-
-            if (RowGroupHeadersTable.IndexCount > 0 || RowGroupFootersTable.IndexCount > 0)
-            {
-                return false;
-            }
-
-            if (RowDetailsTemplate != null &&
-                RowDetailsVisibilityMode != DataGridRowDetailsVisibilityMode.Collapsed)
-            {
-                return false;
-            }
-
-            if (!TryGetEstimatorConfidenceMetrics(out int sampleCount, out double relativeError, out double relativeSpread))
-            {
-                return false;
-            }
-
-            return sampleCount >= 8 && relativeError <= 0.20 && relativeSpread <= 0.90;
-        }
-
-        private bool TryGetEstimatorConfidenceMetrics(
-            out int sampleCount,
-            out double relativeError,
-            out double relativeSpread)
-        {
-            sampleCount = 0;
-            relativeError = 0;
-            relativeSpread = 0;
-
-            double totalHeight = 0;
-            double minHeight = double.MaxValue;
-            double maxHeight = 0;
-
-            foreach (Control element in DisplayData.GetScrollingElements())
-            {
-                double height = element.DesiredSize.Height;
-                if (MathUtilities.LessThanOrClose(height, 0))
-                {
-                    continue;
-                }
-
-                sampleCount++;
-                totalHeight += height;
-                minHeight = Math.Min(minHeight, height);
-                maxHeight = Math.Max(maxHeight, height);
-            }
-
-            if (sampleCount <= 0)
-            {
-                return false;
-            }
-
-            double averageHeight = totalHeight / sampleCount;
-            double baseline = Math.Max(1, averageHeight);
-            double estimatedHeight = Math.Max(1, RowHeightEstimator?.RowHeightEstimate ?? RowHeightEstimate);
-            relativeError = Math.Abs(estimatedHeight - averageHeight) / baseline;
-            relativeSpread = (maxHeight - minHeight) / baseline;
-            return true;
-        }
-
-        private bool TryEstimateScanRangeFromTop(
-            int firstDisplayedScrollingSlot,
-            double displayHeight,
-            out int estimatedFirstDisplayedSlot,
-            out int estimatedLastDisplayedSlot,
-            ref int scannedSlots)
-        {
-            estimatedFirstDisplayedSlot = firstDisplayedScrollingSlot;
-            estimatedLastDisplayedSlot = -1;
-
-            if (firstDisplayedScrollingSlot < 0 || firstDisplayedScrollingSlot >= SlotCount)
-            {
-                return false;
-            }
-
-            double estimatedHeight = -NegVerticalOffset;
-            int slot = firstDisplayedScrollingSlot;
-            while (slot >= 0 &&
-                slot < SlotCount &&
-                !MathUtilities.GreaterThanOrClose(estimatedHeight, displayHeight))
-            {
-                scannedSlots++;
-                estimatedHeight += GetDisplayedEstimatedScanSlotHeight(slot);
-                estimatedLastDisplayedSlot = slot;
-                slot = GetNextVisibleSlot(slot);
-            }
-
-            while (MathUtilities.LessThan(estimatedHeight, displayHeight))
-            {
-                int previousSlot = GetPreviousVisibleSlot(estimatedFirstDisplayedSlot);
-                if (previousSlot < 0)
-                {
-                    break;
-                }
-
-                scannedSlots++;
-                estimatedHeight += GetDisplayedEstimatedScanSlotHeight(previousSlot);
-                estimatedFirstDisplayedSlot = previousSlot;
-            }
-
-            return estimatedLastDisplayedSlot >= estimatedFirstDisplayedSlot && estimatedLastDisplayedSlot >= 0;
-        }
-
-        private void MeasureDisplayedScanRangeEstimatedFromTop(
-            int firstDisplayedSlot,
-            int lastDisplayedSlot,
-            ref int scannedSlots,
-            ref double totalHeight,
-            ref int visibleRowCount)
-        {
-            int slot = firstDisplayedSlot;
-            while (slot >= 0 && slot <= lastDisplayedSlot)
-            {
-                scannedSlots++;
-                totalHeight += GetDisplayedEstimatedScanSlotHeight(slot);
-                visibleRowCount++;
-
-                if (slot == lastDisplayedSlot)
-                {
-                    break;
-                }
-
-                slot = GetNextVisibleSlot(slot);
-            }
-        }
-
-        private void MeasureDisplayedScanRangeExactFromTop(
-            int firstDisplayedSlot,
-            int lastDisplayedSlot,
-            ref int scannedSlots,
-            ref long scanRealizedTicks,
-            ref double totalHeight,
-            ref int visibleRowCount)
-        {
-            int slot = firstDisplayedSlot;
-            while (slot >= 0 && slot <= lastDisplayedSlot)
-            {
-                scannedSlots++;
-                totalHeight += GetDisplayedScanSlotHeight(slot, ref scanRealizedTicks);
-                visibleRowCount++;
-
-                if (slot == lastDisplayedSlot)
-                {
-                    break;
-                }
-
-                slot = GetNextVisibleSlot(slot);
-            }
-        }
-
-        private void MeasureDisplayedScanRangeEstimatedFromBottom(
-            int firstDisplayedSlot,
-            int lastDisplayedSlot,
-            ref int scannedSlots,
-            ref double totalHeight,
-            ref int visibleRowCount)
-        {
-            int slot = lastDisplayedSlot;
-            while (slot >= 0 && slot >= firstDisplayedSlot)
-            {
-                scannedSlots++;
-                totalHeight += GetDisplayedEstimatedScanSlotHeight(slot);
-                visibleRowCount++;
-
-                if (slot == firstDisplayedSlot)
-                {
-                    break;
-                }
-
-                slot = GetPreviousVisibleSlot(slot);
-            }
-        }
-
-        private void MeasureDisplayedScanRangeExactFromBottom(
-            int firstDisplayedSlot,
-            int lastDisplayedSlot,
-            ref int scannedSlots,
-            ref long scanRealizedTicks,
-            ref double totalHeight,
-            ref int visibleRowCount)
-        {
-            int slot = lastDisplayedSlot;
-            while (slot >= 0 && slot >= firstDisplayedSlot)
-            {
-                scannedSlots++;
-                totalHeight += GetDisplayedScanSlotHeight(slot, ref scanRealizedTicks);
-                visibleRowCount++;
-
-                if (slot == firstDisplayedSlot)
-                {
-                    break;
-                }
-
-                slot = GetPreviousVisibleSlot(slot);
-            }
-        }
-
-        private void TrimExcessBottomRowsForDisplayHeight(
-            ref int lastDisplayedSlot,
-            ref double totalHeight,
-            ref int visibleRowCount,
-            double displayHeight)
-        {
-            while (visibleRowCount > 1)
-            {
-                double slotHeight = GetDisplayedEstimatedScanSlotHeight(lastDisplayedSlot);
-                if (!MathUtilities.GreaterThanOrClose(totalHeight - slotHeight, displayHeight))
-                {
-                    break;
-                }
-
-                totalHeight -= slotHeight;
-                visibleRowCount--;
-                lastDisplayedSlot = GetPreviousVisibleSlot(lastDisplayedSlot);
-            }
-        }
-
-        private void TrimExcessTopRowsForDisplayHeight(
-            ref int firstDisplayedSlot,
-            ref double totalHeight,
-            ref int visibleRowCount,
-            double displayHeight)
-        {
-            while (visibleRowCount > 1)
-            {
-                double slotHeight = GetDisplayedEstimatedScanSlotHeight(firstDisplayedSlot);
-                if (!MathUtilities.GreaterThanOrClose(totalHeight - slotHeight, displayHeight))
-                {
-                    break;
-                }
-
-                totalHeight -= slotHeight;
-                visibleRowCount--;
-                firstDisplayedSlot = GetNextVisibleSlot(firstDisplayedSlot);
-            }
-        }
-
-        private bool TryEstimateScanRangeFromBottom(
-            int lastDisplayedScrollingSlot,
-            double displayHeight,
-            out int estimatedFirstDisplayedSlot,
-            ref int scannedSlots)
-        {
-            estimatedFirstDisplayedSlot = -1;
-
-            if (lastDisplayedScrollingSlot < 0 || lastDisplayedScrollingSlot >= SlotCount)
-            {
-                return false;
-            }
-
-            double estimatedHeight = 0;
-            int slot = lastDisplayedScrollingSlot;
-            while (MathUtilities.LessThan(estimatedHeight, displayHeight) && slot >= 0)
-            {
-                scannedSlots++;
-                estimatedHeight += GetDisplayedEstimatedScanSlotHeight(slot);
-                estimatedFirstDisplayedSlot = slot;
-                slot = GetPreviousVisibleSlot(slot);
-            }
-
-            return estimatedFirstDisplayedSlot >= 0;
-        }
-
-        private double GetDisplayedEstimatedScanSlotHeight(int slot)
-        {
-            if (slot >= DisplayData.FirstScrollingSlot &&
-                slot <= DisplayData.LastScrollingSlot)
-            {
-                Control displayedElement = DisplayData.GetDisplayedElement(slot);
-                double displayedHeight = displayedElement.DesiredSize.Height;
-                if (displayedElement.IsMeasureValid && MathUtilities.GreaterThan(displayedHeight, 0))
-                {
-                    return displayedHeight;
-                }
-            }
-
-            return GetEstimatedSlotElementHeight(slot);
-        }
-
-        private double GetDisplayedScanSlotHeight(int slot, ref long scanRealizedTicks)
-        {
-            if (slot >= DisplayData.FirstScrollingSlot &&
-                slot <= DisplayData.LastScrollingSlot)
-            {
-                Control displayedElement = DisplayData.GetDisplayedElement(slot);
-                double displayedHeight = displayedElement.DesiredSize.Height;
-                if (displayedElement.IsMeasureValid && MathUtilities.GreaterThan(displayedHeight, 0))
-                {
-                    return displayedHeight;
-                }
-
-                return GetEstimatedSlotElementHeight(slot);
-            }
-
-            var startTimestamp = Stopwatch.GetTimestamp();
-            var slotElement = InsertDisplayedElement(slot, updateSlotInformation: true);
-            scanRealizedTicks += Stopwatch.GetTimestamp() - startTimestamp;
-            return slotElement.DesiredSize.Height;
-        }
-
-        private void EnsureDisplayedRangeRealizedWithoutMeasure(
-            int firstDisplayedSlot,
-            int lastDisplayedSlot,
-            ref long scanRealizedTicks)
-        {
-            if (firstDisplayedSlot < 0 || lastDisplayedSlot < firstDisplayedSlot)
-            {
-                return;
-            }
-
-            if (DisplayData.FirstScrollingSlot == -1 || DisplayData.LastScrollingSlot == -1)
-            {
-                int slot = firstDisplayedSlot;
-                while (slot >= 0 && slot <= lastDisplayedSlot)
-                {
-                    RealizeDisplayedSlotWithoutMeasure(slot, ref scanRealizedTicks);
-                    if (slot == lastDisplayedSlot)
-                    {
-                        break;
-                    }
-
-                    slot = GetNextVisibleSlot(slot);
-                }
-
-                return;
-            }
-
-            if (firstDisplayedSlot < DisplayData.FirstScrollingSlot)
-            {
-                int slot = GetPreviousVisibleSlot(DisplayData.FirstScrollingSlot);
-                while (slot >= 0 && slot >= firstDisplayedSlot)
-                {
-                    RealizeDisplayedSlotWithoutMeasure(slot, ref scanRealizedTicks);
-                    slot = GetPreviousVisibleSlot(slot);
-                }
-            }
-
-            if (lastDisplayedSlot > DisplayData.LastScrollingSlot)
-            {
-                int slot = GetNextVisibleSlot(DisplayData.LastScrollingSlot);
-                while (slot >= 0 && slot <= lastDisplayedSlot)
-                {
-                    RealizeDisplayedSlotWithoutMeasure(slot, ref scanRealizedTicks);
-                    slot = GetNextVisibleSlot(slot);
-                }
-            }
-        }
-
-        private void RealizeDisplayedSlotWithoutMeasure(int slot, ref long scanRealizedTicks)
-        {
-            if (slot < 0 || slot >= SlotCount)
-            {
-                return;
-            }
-
-            if (slot >= DisplayData.FirstScrollingSlot && slot <= DisplayData.LastScrollingSlot)
-            {
-                return;
-            }
-
-            var startTimestamp = Stopwatch.GetTimestamp();
-            InsertDisplayedElement(slot, updateSlotInformation: true, measureElement: false);
-            scanRealizedTicks += Stopwatch.GetTimestamp() - startTimestamp;
-        }
-
-        private static double GetElapsedMilliseconds(long timestampDelta)
-        {
-            return timestampDelta <= 0
-                ? 0
-                : timestampDelta * 1000.0 / Stopwatch.Frequency;
-        }
-
 
         private void UpdateDisplayedRowsFromBottom(int newLastDisplayedScrollingRow)
         {
@@ -761,7 +217,6 @@ namespace Avalonia.Controls
             double deltaY = 0;
             int visibleScrollingRows = 0;
             int scannedSlots = 0;
-            long scanRealizedTicks = 0;
 
             if (_rowsPresenter == null)
             {
@@ -780,90 +235,18 @@ namespace Avalonia.Controls
                 lastDisplayedScrollingRow = 0;
             }
 
-            bool useEstimatorFirstScan = CanUseEstimatorFirstScan();
             using (DataGridDiagnostics.BeginRowsDisplayScan())
             {
-                int slot = -1;
-                if (useEstimatorFirstScan &&
-                    TryEstimateScanRangeFromBottom(
-                        lastDisplayedScrollingRow,
-                        displayHeight,
-                        out int candidateFirstDisplayedSlot,
-                        ref scannedSlots))
+                int slot = lastDisplayedScrollingRow;
+                while (MathUtilities.LessThan(deltaY, displayHeight) && slot >= 0)
                 {
-                    firstDisplayedScrollingRow = candidateFirstDisplayedSlot;
-                    if (CanUseEstimatorNoMeasureRealization())
-                    {
-                        MeasureDisplayedScanRangeEstimatedFromBottom(
-                            firstDisplayedScrollingRow,
-                            lastDisplayedScrollingRow,
-                            ref scannedSlots,
-                            ref deltaY,
-                            ref visibleScrollingRows);
-
-                        TrimExcessTopRowsForDisplayHeight(
-                            ref firstDisplayedScrollingRow,
-                            ref deltaY,
-                            ref visibleScrollingRows,
-                            displayHeight);
-
-                        slot = GetPreviousVisibleSlot(firstDisplayedScrollingRow);
-                        while (MathUtilities.LessThan(deltaY, displayHeight) && slot >= 0)
-                        {
-                            scannedSlots++;
-                            deltaY += GetDisplayedEstimatedScanSlotHeight(slot);
-                            visibleScrollingRows++;
-                            firstDisplayedScrollingRow = slot;
-                            slot = GetPreviousVisibleSlot(slot);
-                        }
-
-                        EnsureDisplayedRangeRealizedWithoutMeasure(
-                            firstDisplayedScrollingRow,
-                            lastDisplayedScrollingRow,
-                            ref scanRealizedTicks);
-                    }
-                    else
-                    {
-                        MeasureDisplayedScanRangeExactFromBottom(
-                            firstDisplayedScrollingRow,
-                            lastDisplayedScrollingRow,
-                            ref scannedSlots,
-                            ref scanRealizedTicks,
-                            ref deltaY,
-                            ref visibleScrollingRows);
-
-                        TrimExcessTopRowsForDisplayHeight(
-                            ref firstDisplayedScrollingRow,
-                            ref deltaY,
-                            ref visibleScrollingRows,
-                            displayHeight);
-
-                        slot = GetPreviousVisibleSlot(firstDisplayedScrollingRow);
-                        while (MathUtilities.LessThan(deltaY, displayHeight) && slot >= 0)
-                        {
-                            scannedSlots++;
-                            deltaY += GetDisplayedScanSlotHeight(slot, ref scanRealizedTicks);
-                            visibleScrollingRows++;
-                            firstDisplayedScrollingRow = slot;
-                            slot = GetPreviousVisibleSlot(slot);
-                        }
-                    }
-                }
-                else
-                {
-                    slot = lastDisplayedScrollingRow;
-                    while (MathUtilities.LessThan(deltaY, displayHeight) && slot >= 0)
-                    {
-                        scannedSlots++;
-                        deltaY += GetDisplayedScanSlotHeight(slot, ref scanRealizedTicks);
-                        visibleScrollingRows++;
-                        firstDisplayedScrollingRow = slot;
-                        slot = GetPreviousVisibleSlot(slot);
-                    }
+                    scannedSlots++;
+                    deltaY += GetExactSlotElementHeight(slot);
+                    visibleScrollingRows++;
+                    firstDisplayedScrollingRow = slot;
+                    slot = GetPreviousVisibleSlot(slot);
                 }
             }
-
-            DataGridDiagnostics.RecordRowsDisplayScanRealizeTime(GetElapsedMilliseconds(scanRealizedTicks));
 
             DisplayData.NumTotallyDisplayedScrollingElements = deltaY > displayHeight ? visibleScrollingRows - 1 : visibleScrollingRows;
 
@@ -988,26 +371,10 @@ namespace Avalonia.Controls
             row.ClearValue(Visual.IsVisibleProperty);
             row.ClearValue(Visual.ClipProperty);
 
-            var searchModel = _searchModel;
-            var highlightMode = searchModel?.HighlightMode ?? SearchHighlightMode.None;
-            bool hasActiveSearchHighlights = HasActiveSearchHighlights();
-            bool highlightCurrent = hasActiveSearchHighlights && searchModel?.HighlightCurrent == true;
-            bool shouldRefreshSearchState = hasActiveSearchHighlights || highlightMode == SearchHighlightMode.TextAndCell;
-            bool shouldShowDetails = GetRowDetailsVisibility(row.Index);
-            bool canUseLightweightState = CanUseLightweightRowVisualRefresh(row, hasActiveSearchHighlights, shouldShowDetails);
-
             // If the row has been recycled, reapply the BackgroundBrush
             if (row.IsRecycled)
             {
-                if (canUseLightweightState)
-                {
-                    row.ResetVisibleCellsInteractionState();
-                }
-                else
-                {
-                    row.ApplyCellsState();
-                }
-
+                row.ApplyCellsState();
                 _rowsPresenter?.InvalidateChildIndex(row);
             }
             else if (row == EditingRow)
@@ -1023,64 +390,23 @@ namespace Avalonia.Controls
             // Check to see if the row contains the CurrentCell, apply its state.
             if (CurrentColumnIndex != -1 &&
             CurrentSlot != -1 &&
-            row.Index == CurrentSlot &&
-            !canUseLightweightState)
+            row.Index == CurrentSlot)
             {
                 row.Cells[CurrentColumnIndex].UpdatePseudoClasses();
             }
 
-            if (canUseLightweightState)
-            {
-                row.ApplyState(isSelectedOverride: false);
-            }
-            else
-            {
-                row.ApplyState();
-            }
+            row.ApplyState();
 
             // Show or hide RowDetails based on DataGrid settings
-            if (!canUseLightweightState || shouldShowDetails)
-            {
-                EnsureRowDetailsVisibility(row, raiseNotification: false, animate: false);
-            }
+            EnsureRowDetailsVisibility(row, raiseNotification: false, animate: false);
 
-            if (searchModel != null && shouldRefreshSearchState)
+            if (_searchModel != null)
             {
-                UpdateSearchStatesForRow(row, highlightMode, hasActiveSearchHighlights, highlightCurrent);
+                var highlightMode = _searchModel.HighlightMode;
+                bool highlightMatches = highlightMode != SearchHighlightMode.None;
+                bool highlightCurrent = highlightMatches && _searchModel.HighlightCurrent;
+                UpdateSearchStatesForRow(row, highlightMode, highlightMatches, highlightCurrent);
             }
-        }
-
-        private bool CanUseLightweightRowVisualRefresh(
-            DataGridRow row,
-            bool hasActiveSearchHighlights,
-            bool shouldShowDetails)
-        {
-            if (row == null || !row.IsRecycled || row.Slot < 0 || row.Index < 0)
-            {
-                return false;
-            }
-
-            if (SelectionUnit != DataGridSelectionUnit.FullRow)
-            {
-                return false;
-            }
-
-            if (hasActiveSearchHighlights || shouldShowDetails)
-            {
-                return false;
-            }
-
-            if (row == EditingRow || row.IsEditing || CurrentSlot == row.Slot)
-            {
-                return false;
-            }
-
-            if (row.ValidationSeverity != DataGridValidationSeverity.None)
-            {
-                return false;
-            }
-
-            return !GetRowSelection(row.Slot);
         }
 
 

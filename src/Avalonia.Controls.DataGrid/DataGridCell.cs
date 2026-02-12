@@ -332,21 +332,6 @@ internal
             PseudoClassesHelper.Set(PseudoClasses, ":searchcurrent", isSearchCurrent);
         }
 
-        internal void ResetInteractionPseudoClasses()
-        {
-            PseudoClassesHelper.Set(PseudoClasses, ":selected", false);
-            PseudoClassesHelper.Set(PseudoClasses, ":row-selected", false);
-            PseudoClassesHelper.Set(PseudoClasses, ":cell-selected", false);
-            PseudoClassesHelper.Set(PseudoClasses, ":current", false);
-            PseudoClassesHelper.Set(PseudoClasses, ":edited", false);
-            PseudoClassesHelper.Set(PseudoClasses, ":invalid", false);
-            PseudoClassesHelper.Set(PseudoClasses, ":warning", false);
-            PseudoClassesHelper.Set(PseudoClasses, ":info", false);
-            PseudoClassesHelper.Set(PseudoClasses, ":focus", false);
-            PseudoClassesHelper.Set(PseudoClasses, ":searchmatch", false);
-            PseudoClassesHelper.Set(PseudoClasses, ":searchcurrent", false);
-        }
-
         // Makes sure the right gridline has the proper stroke and visibility. If lastVisibleColumn is specified, the 
         // right gridline will be collapsed if this cell belongs to the lastVisibleColumn and there is no filler column
         internal void EnsureGridLine(DataGridColumn lastVisibleColumn)

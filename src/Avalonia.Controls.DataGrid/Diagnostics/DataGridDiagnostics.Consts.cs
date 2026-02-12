@@ -25,9 +25,6 @@ internal static partial class DataGridDiagnostics
         public const string RowsDisplayScanTimeName = "prodatagrid.rows.display.scan.time";
         public const string RowsDisplayScanTimeDescription = "Duration of scanning row slots to compute displayed range.";
 
-        public const string RowsDisplayScanRealizeTimeName = "prodatagrid.rows.display.scan.realize.time";
-        public const string RowsDisplayScanRealizeTimeDescription = "Duration spent realizing non-displayed slots while scanning displayed range.";
-
         public const string RowsDisplayTrimTimeName = "prodatagrid.rows.display.trim.time";
         public const string RowsDisplayTrimTimeDescription = "Duration of trimming displayed rows that are outside the viewport.";
 
