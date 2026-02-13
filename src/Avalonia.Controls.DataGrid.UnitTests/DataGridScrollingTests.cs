@@ -2426,6 +2426,88 @@ public class DataGridScrollingTests
         return target;
     }
 
+    private static DataGrid CreateVariableHeightSampleTarget(IList<SampleVariableHeightModel> items, int width = 1400, int height = 760)
+    {
+        var root = new Window
+        {
+            Width = width,
+            Height = height,
+        };
+
+        root.SetThemeStyles();
+
+        var templateColumn = new DataGridTemplateColumn
+        {
+            Header = "Description (Variable Height)",
+            Width = new DataGridLength(1, DataGridLengthUnitType.Star),
+            CellTemplate = new FuncDataTemplate<SampleVariableHeightModel>((item, _) => new Border
+            {
+                Padding = new Thickness(4),
+                Child = new TextBlock
+                {
+                    Text = item.Content,
+                    TextWrapping = TextWrapping.Wrap,
+                    VerticalAlignment = VerticalAlignment.Top
+                }
+            }),
+        };
+
+        var target = new DataGrid
+        {
+            ItemsSource = items,
+            HeadersVisibility = DataGridHeadersVisibility.Column,
+            UseLogicalScrollable = true,
+        };
+
+        target.ColumnsInternal.Add(new DataGridTextColumn { Header = "ID", Binding = new Binding(nameof(SampleVariableHeightModel.Id)), Width = new DataGridLength(60) });
+        target.ColumnsInternal.Add(new DataGridTextColumn { Header = "Title", Binding = new Binding(nameof(SampleVariableHeightModel.Title)), Width = new DataGridLength(100) });
+        target.ColumnsInternal.Add(new DataGridTextColumn { Header = "Lines", Binding = new Binding(nameof(SampleVariableHeightModel.LineCount)), Width = new DataGridLength(60) });
+        target.ColumnsInternal.Add(new DataGridTextColumn { Header = "Est. Height", Binding = new Binding(nameof(SampleVariableHeightModel.ExpectedHeight)), Width = new DataGridLength(80) });
+        target.ColumnsInternal.Add(templateColumn);
+
+        root.Content = target;
+        root.Show();
+        return target;
+    }
+
+    private static IEnumerable<SampleVariableHeightModel> CreateSampleVariableHeightItems(int count, int seed)
+    {
+        var random = new Random(seed);
+        var words = new[]
+        {
+            "lorem", "ipsum", "dolor", "sit", "amet", "consectetur",
+            "adipiscing", "elit", "sed", "do", "eiusmod", "tempor",
+            "incididunt", "labore", "dolore", "magna", "aliqua",
+            "enim", "minim", "veniam"
+        };
+
+        for (int i = 0; i < count; i++)
+        {
+            int lineCount = random.Next(1, 11);
+            var lines = new string[lineCount];
+            for (int line = 0; line < lineCount; line++)
+            {
+                int wordCount = random.Next(3, 12);
+                var lineWords = new string[wordCount];
+                for (int w = 0; w < wordCount; w++)
+                {
+                    lineWords[w] = words[random.Next(words.Length)];
+                }
+
+                lines[line] = $"Line {line + 1}: {string.Join(' ', lineWords)}";
+            }
+
+            yield return new SampleVariableHeightModel
+            {
+                Id = i + 1,
+                Title = $"Item {i + 1}",
+                LineCount = lineCount,
+                ExpectedHeight = 20 + (lineCount * 16),
+                Content = string.Join(Environment.NewLine, lines)
+            };
+        }
+    }
+
     #endregion
 
     #region Ghost Row Tests
@@ -2500,6 +2582,348 @@ public class DataGridScrollingTests
         {
             Assert.Equal(orderedIndices[i - 1] + 1, orderedIndices[i]);
         }
+    }
+
+    [AvaloniaFact]
+    public void LogicalScrollable_VariableHeight_DownwardInput_AtLogicalMaximum_BeforeVisualTail_IsHandled()
+    {
+        // Arrange - keep top rows short and tail rows tall so offset max can be reached before
+        // the last rows become visible.
+        var items = Enumerable.Range(0, 500)
+            .Select(i => new VariableHeightModel
+            {
+                Title = $"Item {i}",
+                Content = i < 350
+                    ? "short"
+                    : string.Join(' ', Enumerable.Repeat("very long wrapped content", 24))
+            })
+            .ToList();
+
+        var target = CreateVariableHeightTarget(items, height: 220);
+        target.CanUserAddRows = false;
+        target.RowHeightEstimator = new CapturingRowHeightEstimator
+        {
+            // Keep estimated extent intentionally low to reproduce "logical max before visual tail".
+            ReturnValue = 3000
+        };
+        target.UpdateLayout();
+
+        var presenter = GetRowsPresenter(target);
+        var logicalMaximum = Math.Max(0, presenter.Extent.Height - presenter.Viewport.Height);
+        Assert.True(logicalMaximum > 0, $"Expected logical max > 0, got {logicalMaximum}.");
+
+        presenter.Offset = new Vector(0, logicalMaximum);
+        target.UpdateLayout();
+
+        var lastVisibleIndexBefore = GetRows(target).Max(r => r.Index);
+
+        if (lastVisibleIndexBefore >= items.Count - 1)
+        {
+            // If max offset already reaches the tail, we should remain stable with no visible regression.
+            target.UpdateScroll(new Vector(0, -30));
+            target.UpdateLayout();
+
+            var stableTailIndex = GetRows(target).Max(r => r.Index);
+            Assert.Equal(items.Count - 1, stableTailIndex);
+            return;
+        }
+
+        // Act
+        var handled = target.UpdateScroll(new Vector(0, -30));
+        target.UpdateLayout();
+
+        // Assert
+        Assert.True(handled, "Downward input should remain handled when visual tail is not reached yet.");
+
+        var lastVisibleIndexAfter = GetRows(target).Max(r => r.Index);
+        Assert.True(lastVisibleIndexAfter >= lastVisibleIndexBefore,
+            $"Expected visible range to move or stay stable, but regressed from {lastVisibleIndexBefore} to {lastVisibleIndexAfter}.");
+    }
+
+    [AvaloniaFact]
+    public void LogicalScrollable_VariableHeight_OffsetSetter_AtLogicalMaximum_BeforeVisualTail_Advances()
+    {
+        var items = Enumerable.Range(0, 500)
+            .Select(i => new VariableHeightModel
+            {
+                Title = $"Item {i}",
+                Content = i < 350
+                    ? "short"
+                    : string.Join(' ', Enumerable.Repeat("very long wrapped content", 24))
+            })
+            .ToList();
+
+        var target = CreateVariableHeightTarget(items, height: 220);
+        target.CanUserAddRows = false;
+        target.RowHeightEstimator = new CapturingRowHeightEstimator
+        {
+            ReturnValue = 3000
+        };
+        target.UpdateLayout();
+
+        var presenter = GetRowsPresenter(target);
+        var logicalMaximum = Math.Max(0, presenter.Extent.Height - presenter.Viewport.Height);
+        Assert.True(logicalMaximum > 0, $"Expected logical max > 0, got {logicalMaximum}.");
+
+        presenter.Offset = new Vector(0, logicalMaximum);
+        target.UpdateLayout();
+
+        var lastVisibleIndexBefore = GetRows(target).Max(r => r.Index);
+        if (lastVisibleIndexBefore >= items.Count - 1)
+        {
+            return;
+        }
+
+        var offsetBefore = presenter.Offset.Y;
+        presenter.Offset = new Vector(0, logicalMaximum + 30);
+        target.UpdateLayout();
+
+        var offsetAfter = presenter.Offset.Y;
+        var logicalMaximumAfter = Math.Max(0, presenter.Extent.Height - presenter.Viewport.Height);
+        Assert.True(logicalMaximumAfter > logicalMaximum || offsetAfter > offsetBefore,
+            "Expected logical range to expand or offset to advance past the initial logical maximum.");
+
+        var lastVisibleIndexAfter = GetRows(target).Max(r => r.Index);
+        Assert.True(lastVisibleIndexAfter >= lastVisibleIndexBefore,
+            $"Expected visible range to move or stay stable, but regressed from {lastVisibleIndexBefore} to {lastVisibleIndexAfter}.");
+    }
+
+    [AvaloniaFact]
+    public void LogicalScrollable_UniformRows_DownwardInput_AtVisualTail_DoesNotSnap()
+    {
+        var items = Enumerable.Range(0, 300).Select(x => new ScrollTestModel($"Item {x}")).ToList();
+        var target = CreateTarget(items, height: 160, useLogicalScrollable: true);
+        target.CanUserAddRows = false;
+        target.UpdateLayout();
+
+        target.ScrollIntoView(items[^1], target.ColumnDefinitions[0]);
+        target.UpdateLayout();
+
+        var presenter = GetRowsPresenter(target);
+        var lastVisibleBefore = GetRows(target).Max(r => r.Index);
+        Assert.Equal(items.Count - 1, lastVisibleBefore);
+
+        var offsets = new List<double> { presenter.Offset.Y };
+        for (int i = 0; i < 6; i++)
+        {
+            target.UpdateScroll(new Vector(0, -30));
+            target.UpdateLayout();
+            offsets.Add(presenter.Offset.Y);
+        }
+
+        var lastVisibleAfter = GetRows(target).Max(r => r.Index);
+        Assert.Equal(items.Count - 1, lastVisibleAfter);
+
+        var maxOffsetDelta = offsets.Zip(offsets.Skip(1), (previous, current) => Math.Abs(current - previous)).Max();
+        Assert.InRange(maxOffsetDelta, 0, 1.0);
+    }
+
+    [AvaloniaFact]
+    public void LogicalScrollable_VariableHeight_AtVisualTail_LogicalMaximum_MatchesCurrentOffset()
+    {
+        var items = CreateSampleVariableHeightItems(500, seed: 42).ToList();
+        var target = CreateVariableHeightSampleTarget(items, width: 1400, height: 760);
+        target.CanUserAddRows = false;
+        target.RowHeightEstimator = new CapturingRowHeightEstimator
+        {
+            // Intentionally overestimated to ensure tail logic, not estimator value, drives bottom snap.
+            ReturnValue = 100000
+        };
+        target.UpdateLayout();
+
+        target.ScrollIntoView(items[^1], target.ColumnDefinitions[0]);
+        target.UpdateLayout();
+
+        var presenter = GetRowsPresenter(target);
+        var lastVisibleIndex = GetRows(target).Max(r => r.Index);
+        Assert.Equal(items.Count - 1, lastVisibleIndex);
+
+        for (int i = 0; i < 24; i++)
+        {
+            target.UpdateScroll(new Vector(0, -30));
+            target.UpdateLayout();
+        }
+
+        var logicalMaximum = Math.Max(0, presenter.Extent.Height - presenter.Viewport.Height);
+        Assert.InRange(Math.Abs(logicalMaximum - presenter.Offset.Y), 0, 1.0);
+    }
+
+    [AvaloniaFact]
+    public void LogicalScrollable_UniformRows_DownwardInput_BeforeVisualTail_IsBoundedToInputDelta()
+    {
+        var items = Enumerable.Range(0, 500).Select(x => new ScrollTestModel($"Item {x}")).ToList();
+        var target = CreateTarget(items, height: 160, useLogicalScrollable: true);
+        target.CanUserAddRows = false;
+        target.RowHeightEstimator = new CapturingRowHeightEstimator
+        {
+            // Intentionally low extent to reproduce logical max before visual tail.
+            ReturnValue = 3000
+        };
+        target.UpdateLayout();
+
+        var presenter = GetRowsPresenter(target);
+        var logicalMaximum = Math.Max(0, presenter.Extent.Height - presenter.Viewport.Height);
+        presenter.Offset = new Vector(0, logicalMaximum);
+        target.UpdateLayout();
+
+        var lastVisibleBefore = GetRows(target).Max(r => r.Index);
+        if (lastVisibleBefore >= items.Count - 1)
+        {
+            // Nothing to validate if we already reached the tail with this setup.
+            return;
+        }
+
+        var offsetBefore = presenter.Offset.Y;
+        var handled = target.UpdateScroll(new Vector(0, -30));
+        target.UpdateLayout();
+
+        var offsetAfter = presenter.Offset.Y;
+        var delta = offsetAfter - offsetBefore;
+
+        Assert.True(handled, "Downward input should be handled before visual tail is reached.");
+        Assert.InRange(delta, 0, 31);
+    }
+
+    [AvaloniaFact]
+    public void LogicalScrollable_VariableHeight_DownwardInput_NearTail_DoesNotRegressOffset()
+    {
+        var random = new Random(42);
+        var items = Enumerable.Range(0, 500)
+            .Select(i =>
+            {
+                var lineCount = random.Next(1, 11);
+                var content = string.Join(Environment.NewLine,
+                    Enumerable.Range(0, lineCount)
+                        .Select(line => $"Line {line + 1}: {string.Join(' ', Enumerable.Repeat("wrapped variable content", random.Next(3, 10)))}"));
+
+                return new VariableHeightModel
+                {
+                    Title = $"Item {i}",
+                    Content = content
+                };
+            })
+            .ToList();
+
+        var target = CreateVariableHeightTarget(items, height: 220);
+        target.CanUserAddRows = false;
+        target.RowHeightEstimator = new AdvancedRowHeightEstimator();
+        target.UpdateLayout();
+
+        var presenter = GetRowsPresenter(target);
+        var logicalMaximum = Math.Max(0, presenter.Extent.Height - presenter.Viewport.Height);
+        presenter.Offset = new Vector(0, Math.Max(0, logicalMaximum - 120));
+        target.UpdateLayout();
+
+        var offsets = new List<double> { presenter.Offset.Y };
+        var lastVisible = new List<int> { GetRows(target).Max(r => r.Index) };
+
+        for (int i = 0; i < 16; i++)
+        {
+            target.UpdateScroll(new Vector(0, -30));
+            target.UpdateLayout();
+            offsets.Add(presenter.Offset.Y);
+            lastVisible.Add(GetRows(target).Max(r => r.Index));
+        }
+
+        var deltas = offsets.Zip(offsets.Skip(1), (previous, current) => current - previous).ToList();
+        var negativeDeltas = deltas.Where(delta => delta < -1).ToList();
+
+        Assert.True(negativeDeltas.Count == 0,
+            $"Offset regressed near tail. Offsets: {string.Join(", ", offsets.Select(o => o.ToString("F1")))}");
+
+        var lastVisibleRegressions = lastVisible.Zip(lastVisible.Skip(1), (previous, current) => current - previous)
+            .Where(delta => delta < 0)
+            .ToList();
+        Assert.True(lastVisibleRegressions.Count == 0,
+            $"Visible tail regressed near bottom. Last visible indices: {string.Join(", ", lastVisible)}");
+    }
+
+    [AvaloniaFact]
+    public void LogicalScrollable_VariableHeight_ContinuousWheelDown_DoesNotJumpBackward()
+    {
+        var random = new Random(42);
+        var items = Enumerable.Range(0, 500)
+            .Select(i =>
+            {
+                var lineCount = random.Next(1, 11);
+                var content = string.Join(Environment.NewLine,
+                    Enumerable.Range(0, lineCount)
+                        .Select(line => $"Line {line + 1}: {string.Join(' ', Enumerable.Repeat("variable text", random.Next(3, 12)))}"));
+
+                return new VariableHeightModel
+                {
+                    Title = $"Item {i}",
+                    Content = content
+                };
+            })
+            .ToList();
+
+        var target = CreateVariableHeightTarget(items, height: 220);
+        target.CanUserAddRows = false;
+        target.RowHeightEstimator = new AdvancedRowHeightEstimator();
+        target.UpdateLayout();
+
+        var presenter = GetRowsPresenter(target);
+        var offsets = new List<double> { presenter.Offset.Y };
+        var visibles = new List<int> { GetRows(target).Max(r => r.Index) };
+
+        for (int i = 0; i < 220; i++)
+        {
+            target.UpdateScroll(new Vector(0, -30));
+            target.UpdateLayout();
+            offsets.Add(presenter.Offset.Y);
+            visibles.Add(GetRows(target).Max(r => r.Index));
+        }
+
+        var deltas = offsets.Zip(offsets.Skip(1), (previous, current) => current - previous).ToList();
+        var largeBackward = deltas.Where(delta => delta < -50).ToList();
+
+        Assert.True(largeBackward.Count == 0,
+            $"Detected backward jump during continuous downward scroll. Offsets: {string.Join(", ", offsets.Select(o => o.ToString("F1")))}; LastVisible: {string.Join(", ", visibles)}");
+    }
+
+    [AvaloniaFact]
+    public void LogicalScrollable_VariableHeightSample_Bottom_ExtraWheel_DoesNotJumpBackward()
+    {
+        var items = CreateSampleVariableHeightItems(500, seed: 42).ToList();
+        var target = CreateVariableHeightSampleTarget(items, width: 1400, height: 760);
+        target.CanUserAddRows = false;
+        target.RowHeightEstimator = new AdvancedRowHeightEstimator();
+        target.UpdateLayout();
+
+        target.ScrollIntoView(items[^1], target.ColumnDefinitions[0]);
+        target.UpdateLayout();
+
+        var presenter = GetRowsPresenter(target);
+        var offsets = new List<double> { presenter.Offset.Y };
+        var lastVisible = new List<int> { GetRows(target).Max(r => r.Index) };
+
+        for (int i = 0; i < 120; i++)
+        {
+            target.UpdateScroll(new Vector(0, -30));
+            target.UpdateLayout();
+
+            offsets.Add(presenter.Offset.Y);
+            lastVisible.Add(GetRows(target).Max(r => r.Index));
+        }
+
+        int firstTailIndex = lastVisible.FindIndex(index => index == items.Count - 1);
+        Assert.True(firstTailIndex >= 0 && lastVisible[^1] == items.Count - 1,
+            $"Expected to reach tail row during downward wheel input. LastVisible trace: {string.Join(", ", lastVisible)}");
+
+        var deltasAfterTail = offsets
+            .Skip(firstTailIndex)
+            .Zip(offsets.Skip(firstTailIndex + 1), (previous, current) => current - previous)
+            .ToList();
+
+        Assert.True(deltasAfterTail.All(delta => delta >= -1),
+            $"Detected backward offset jump near bottom. Deltas after tail: {string.Join(", ", deltasAfterTail.Select(d => d.ToString("F1")))}");
+        Assert.True(deltasAfterTail.All(delta => delta <= 31),
+            $"Detected oversized forward snap near bottom. Deltas after tail: {string.Join(", ", deltasAfterTail.Select(d => d.ToString("F1")))}");
+
+        var logicalMaximum = Math.Max(0, presenter.Extent.Height - presenter.Viewport.Height);
+        Assert.True(Math.Abs(logicalMaximum - presenter.Offset.Y) <= 1,
+            $"Expected to settle at logical max after extra wheel input. Offset: {presenter.Offset.Y:F3}, Max: {logicalMaximum:F3}");
     }
 
     #region Hit Test
@@ -2948,6 +3372,15 @@ public class DataGridScrollingTests
     private class VariableHeightModel
     {
         public string Title { get; set; } = string.Empty;
+        public string Content { get; set; } = string.Empty;
+    }
+
+    private class SampleVariableHeightModel
+    {
+        public int Id { get; set; }
+        public string Title { get; set; } = string.Empty;
+        public int LineCount { get; set; }
+        public double ExpectedHeight { get; set; }
         public string Content { get; set; } = string.Empty;
     }
 
