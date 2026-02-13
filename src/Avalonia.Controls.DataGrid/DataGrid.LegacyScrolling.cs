@@ -263,6 +263,8 @@ internal
                         _vScrollBar.IsEnabled = false;
                     }
 
+                    CoerceLegacyVerticalOffsetToRange();
+
                     if (!_vScrollBar.IsVisible)
                     {
                         // This will trigger a call to this method via Cells_SizeChanged for
@@ -279,6 +281,7 @@ internal
                 else
                 {
                     _vScrollBar.Maximum = 0;
+                    CoerceLegacyVerticalOffsetToRange();
                     if (_vScrollBar.IsVisible)
                     {
                         // This will trigger a call to this method via Cells_SizeChanged for
@@ -287,6 +290,31 @@ internal
                         _ignoreNextScrollBarsLayout = true;
                     }
                 }
+            }
+        }
+
+        private void CoerceLegacyVerticalOffsetToRange()
+        {
+            if (_vScrollBar == null)
+            {
+                return;
+            }
+
+            var maximum = Math.Max(0, _vScrollBar.Maximum);
+            var coerced = Math.Max(0, Math.Min(_verticalOffset, maximum));
+
+            if (!MathUtilities.AreClose(_verticalOffset, coerced))
+            {
+                if (DisplayData != null)
+                {
+                    DisplayData.PendingVerticalScrollHeight = 0;
+                }
+
+                SetVerticalOffset(coerced);
+            }
+            else if (!MathUtilities.AreClose(_vScrollBar.Value, coerced))
+            {
+                _vScrollBar.Value = coerced;
             }
         }
 

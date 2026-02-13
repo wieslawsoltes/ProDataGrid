@@ -2392,6 +2392,15 @@ public class DataGridScrollingTests
         return target;
     }
 
+    private static void AddGroup(ICollection<GroupableTestModel> items, string group, int count)
+    {
+        var start = items.Count;
+        for (var i = 0; i < count; i++)
+        {
+            items.Add(new GroupableTestModel($"Item {start + i}", group));
+        }
+    }
+
     private static DataGrid CreateVariableHeightTarget(IList<VariableHeightModel> items, int height = 200)
     {
         var root = new Window
@@ -3278,6 +3287,556 @@ public class DataGridScrollingTests
             var duplicateSlots = slots.GroupBy(s => s).Where(g => g.Count() > 1).Select(g => g.Key).ToList();
             
             Assert.Empty(duplicateSlots);
+        }
+    }
+
+    [AvaloniaFact]
+    public void Grouped_DataGrid_Collapse_Coerces_Legacy_Scroll_Value_To_New_Maximum()
+    {
+        // Arrange - legacy scrolling path used by the Grouping sample.
+        var items = Enumerable.Range(0, 400)
+            .Select(x => new GroupableTestModel($"Item {x}", $"Group {x / 20}"))
+            .ToList();
+        var target = CreateGroupedTarget(items, height: 260, useLogicalScrollable: false);
+        target.VerticalScrollBarVisibility = ScrollBarVisibility.Visible;
+        target.UpdateLayout();
+
+        var verticalBar = target.GetSelfAndVisualDescendants()
+            .OfType<ScrollBar>()
+            .First(sb => sb.Orientation == Orientation.Vertical);
+
+        Assert.True(verticalBar.Maximum > 0, "Expected a positive vertical scroll range for grouped data.");
+
+        // Scroll near the bottom before collapsing groups.
+        target.ScrollIntoView(items[^1], target.ColumnDefinitions[0]);
+        target.UpdateLayout();
+
+        var beforeCollapseMaximum = verticalBar.Maximum;
+        var beforeCollapseOffset = target.GetVerticalOffset();
+        Assert.True(beforeCollapseOffset > 0, "Expected to be scrolled away from top before collapsing.");
+
+        var view = Assert.IsType<DataGridCollectionView>(target.ItemsSource);
+        Assert.NotNull(view.Groups);
+
+        // Collapse a few top-level groups while currently scrolled low in the list.
+        var groupsToCollapse = view.Groups
+            .OfType<DataGridCollectionViewGroup>()
+            .Take(3)
+            .ToList();
+        Assert.True(groupsToCollapse.Count >= 2, "Expected at least two top-level groups.");
+
+        foreach (var group in groupsToCollapse)
+        {
+            target.CollapseRowGroup(group, collapseAllSubgroups: false);
+        }
+
+        target.UpdateLayout();
+
+        var afterCollapseMaximum = verticalBar.Maximum;
+        var afterCollapseOffset = target.GetVerticalOffset();
+        var afterCollapseValue = verticalBar.Value;
+
+        Assert.True(afterCollapseMaximum <= beforeCollapseMaximum + 0.01,
+            $"Expected scrollbar maximum to shrink or stay equal after collapse. Before: {beforeCollapseMaximum}, After: {afterCollapseMaximum}");
+
+        Assert.True(afterCollapseOffset <= afterCollapseMaximum + 0.01,
+            $"Internal vertical offset exceeded scrollbar maximum after collapse. Offset: {afterCollapseOffset}, Max: {afterCollapseMaximum}");
+
+        Assert.InRange(Math.Abs(afterCollapseValue - afterCollapseOffset), 0, 0.01);
+
+        // A small thumb-track movement should be honored immediately and keep the internal offset
+        // synchronized with the scrollbar after group collapse.
+        var requestedValue = Math.Max(0, afterCollapseMaximum - 5);
+        verticalBar.Value = requestedValue;
+        target.ProcessVerticalScroll(ScrollEventType.ThumbTrack);
+        target.UpdateLayout();
+
+        var offsetAfterThumbTrack = target.GetVerticalOffset();
+        Assert.InRange(Math.Abs(offsetAfterThumbTrack - requestedValue), 0, 0.01);
+    }
+
+    [AvaloniaFact]
+    public void Grouped_DataGrid_Visible_Header_Collapse_Keeps_Legacy_ThumbTrack_Precise()
+    {
+        // Arrange
+        var items = Enumerable.Range(0, 500)
+            .Select(x => new GroupableTestModel($"Item {x}", $"Group {x / 20}"))
+            .ToList();
+        var target = CreateGroupedTarget(items, height: 260, useLogicalScrollable: false);
+        target.VerticalScrollBarVisibility = ScrollBarVisibility.Visible;
+        target.UpdateLayout();
+
+        var verticalBar = target.GetSelfAndVisualDescendants()
+            .OfType<ScrollBar>()
+            .First(sb => sb.Orientation == Orientation.Vertical);
+
+        // Move away from top so collapse changes the active viewport and offset.
+        target.ScrollIntoView(items[260], target.ColumnDefinitions[0]);
+        target.UpdateLayout();
+
+        var maxBefore = verticalBar.Maximum;
+
+        var headerToCollapse = GetGroupHeaders(target)
+            .Where(h => h.IsVisible && h.RowGroupInfo?.IsVisible == true)
+            .OrderBy(h => h.RowGroupInfo!.Slot)
+            .FirstOrDefault();
+
+        Assert.NotNull(headerToCollapse);
+
+        // Act - collapse an on-screen group header (same interaction as the sample).
+        headerToCollapse!.ToggleExpandCollapse(isVisible: false, setCurrent: true);
+        target.UpdateLayout();
+
+        // Assert - scrollbar range must react and thumb tracking remains exact.
+        Assert.True(verticalBar.Maximum <= maxBefore + 0.01,
+            $"Expected collapse to reduce or preserve range. Before: {maxBefore}, After: {verticalBar.Maximum}");
+
+        var requestedValue = Math.Max(0, verticalBar.Maximum - 4);
+        verticalBar.Value = requestedValue;
+        target.ProcessVerticalScroll(ScrollEventType.ThumbTrack);
+        target.UpdateLayout();
+
+        var offsetAfterThumbTrack = target.GetVerticalOffset();
+        Assert.InRange(Math.Abs(offsetAfterThumbTrack - requestedValue), 0, 0.01);
+    }
+
+    [AvaloniaFact]
+    public void Grouped_DataGrid_Legacy_Scroll_Clamps_Internal_Offset_When_Maximum_Shrinks()
+    {
+        var items = Enumerable.Range(0, 400)
+            .Select(x => new GroupableTestModel($"Item {x}", $"Group {x / 20}"))
+            .ToList();
+        var target = CreateGroupedTarget(items, height: 240, useLogicalScrollable: false);
+        target.VerticalScrollBarVisibility = ScrollBarVisibility.Visible;
+        target.UpdateLayout();
+
+        var verticalBar = target.GetSelfAndVisualDescendants()
+            .OfType<ScrollBar>()
+            .First(sb => sb.Orientation == Orientation.Vertical);
+
+        target.ScrollIntoView(items[^1], target.ColumnDefinitions[0]);
+        target.UpdateLayout();
+
+        Assert.True(verticalBar.Maximum > 0, "Expected positive vertical range before collapsing.");
+
+        // Simulate stale internal offset that can happen when extent changes race with legacy value sync.
+        var offsetField = typeof(DataGrid).GetField("_verticalOffset", BindingFlags.Instance | BindingFlags.NonPublic);
+        Assert.NotNull(offsetField);
+        offsetField!.SetValue(target, verticalBar.Maximum + 120);
+
+        var view = Assert.IsType<DataGridCollectionView>(target.ItemsSource);
+        var group = view.Groups.OfType<DataGridCollectionViewGroup>().FirstOrDefault();
+        Assert.NotNull(group);
+        target.CollapseRowGroup(group!, collapseAllSubgroups: false);
+        target.UpdateLayout();
+
+        var clampedOffset = target.GetVerticalOffset();
+        Assert.True(clampedOffset <= verticalBar.Maximum + 0.01,
+            $"Internal offset should be clamped to scrollbar maximum. Offset: {clampedOffset}, Max: {verticalBar.Maximum}");
+    }
+
+    [AvaloniaFact]
+    public void Grouped_DataGrid_ThumbTrack_After_Collapse_Does_Not_Drift_Scrollbar_Maximum()
+    {
+        var items = Enumerable.Range(0, 800)
+            .Select(x => new GroupableTestModel($"Item {x}", $"Group {x / 20}"))
+            .ToList();
+        var target = CreateGroupedTarget(items, height: 260, useLogicalScrollable: false);
+        target.VerticalScrollBarVisibility = ScrollBarVisibility.Visible;
+        target.UpdateLayout();
+
+        var verticalBar = target.GetSelfAndVisualDescendants()
+            .OfType<ScrollBar>()
+            .First(sb => sb.Orientation == Orientation.Vertical);
+
+        target.ScrollIntoView(items[450], target.ColumnDefinitions[0]);
+        target.UpdateLayout();
+
+        var view = Assert.IsType<DataGridCollectionView>(target.ItemsSource);
+        var groupToCollapse = view.Groups.OfType<DataGridCollectionViewGroup>().FirstOrDefault();
+        Assert.NotNull(groupToCollapse);
+
+        target.CollapseRowGroup(groupToCollapse!, collapseAllSubgroups: false);
+        target.UpdateLayout();
+
+        var maxima = new List<double> { verticalBar.Maximum };
+
+        for (int i = 0; i < 10; i++)
+        {
+            var requested = Math.Min(verticalBar.Maximum, verticalBar.Value + 8);
+            verticalBar.Value = requested;
+            target.ProcessVerticalScroll(ScrollEventType.ThumbTrack);
+            target.UpdateLayout();
+
+            maxima.Add(verticalBar.Maximum);
+
+            var offset = target.GetVerticalOffset();
+            Assert.InRange(Math.Abs(offset - requested), 0, 0.01);
+        }
+
+        var maximumDrift = maxima.Max() - maxima.Min();
+        Assert.True(maximumDrift < 1.0, $"Unexpected scrollbar maximum drift after collapse. Drift: {maximumDrift}");
+    }
+
+    [AvaloniaFact]
+    public void Grouped_DataGrid_Collapse_Clears_Stale_Pending_ThumbTrack_Delta()
+    {
+        var items = Enumerable.Range(0, 500)
+            .Select(x => new GroupableTestModel($"Item {x}", $"Group {x / 20}"))
+            .ToList();
+        var target = CreateGroupedTarget(items, height: 260, useLogicalScrollable: false);
+        target.VerticalScrollBarVisibility = ScrollBarVisibility.Visible;
+        target.UpdateLayout();
+
+        var verticalBar = target.GetSelfAndVisualDescendants()
+            .OfType<ScrollBar>()
+            .First(sb => sb.Orientation == Orientation.Vertical);
+
+        // Queue a thumb-track scroll request but do not process layout yet.
+        var requestedBeforeCollapse = Math.Max(0, verticalBar.Maximum - 30);
+        verticalBar.Value = requestedBeforeCollapse;
+        target.ProcessVerticalScroll(ScrollEventType.ThumbTrack);
+
+        var view = Assert.IsType<DataGridCollectionView>(target.ItemsSource);
+        var groupToCollapse = view.Groups.OfType<DataGridCollectionViewGroup>().FirstOrDefault();
+        Assert.NotNull(groupToCollapse);
+
+        target.CollapseRowGroup(groupToCollapse!, collapseAllSubgroups: false);
+        target.UpdateLayout();
+
+        var maxAfterCollapse = verticalBar.Maximum;
+        var requestedAfterCollapse = Math.Max(0, maxAfterCollapse - 6);
+        verticalBar.Value = requestedAfterCollapse;
+        target.ProcessVerticalScroll(ScrollEventType.ThumbTrack);
+        target.UpdateLayout();
+
+        var offset = target.GetVerticalOffset();
+        Assert.InRange(Math.Abs(offset - requestedAfterCollapse), 0, 0.01);
+    }
+
+    [AvaloniaFact]
+    public void Grouped_DataGrid_UnevenGroups_Collapse_AboveViewport_Keeps_ThumbTrack_Precise()
+    {
+        var items = new List<GroupableTestModel>();
+        AddGroup(items, "A", 300);
+        AddGroup(items, "B", 20);
+        AddGroup(items, "C", 10);
+        AddGroup(items, "D", 150);
+        AddGroup(items, "E", 20);
+
+        var target = CreateGroupedTarget(items, height: 260, useLogicalScrollable: false);
+        target.VerticalScrollBarVisibility = ScrollBarVisibility.Visible;
+        target.UpdateLayout();
+
+        var verticalBar = target.GetSelfAndVisualDescendants()
+            .OfType<ScrollBar>()
+            .First(sb => sb.Orientation == Orientation.Vertical);
+
+        target.ScrollIntoView(items[^1], target.ColumnDefinitions[0]);
+        target.UpdateLayout();
+
+        var view = Assert.IsType<DataGridCollectionView>(target.ItemsSource);
+        var firstGroup = view.Groups.OfType<DataGridCollectionViewGroup>().FirstOrDefault();
+        Assert.NotNull(firstGroup);
+
+        target.CollapseRowGroup(firstGroup!, collapseAllSubgroups: false);
+        target.UpdateLayout();
+
+        var requested = Math.Max(0, verticalBar.Maximum - 10);
+        verticalBar.Value = requested;
+        target.ProcessVerticalScroll(ScrollEventType.ThumbTrack);
+        target.UpdateLayout();
+
+        var offset = target.GetVerticalOffset();
+        Assert.InRange(Math.Abs(offset - requested), 0, 0.01);
+    }
+
+    [AvaloniaFact]
+    public void Grouped_DataGrid_CollapseAllGroups_Keeps_Legacy_Scrollbar_And_Header_Slots_In_Sync()
+    {
+        var items = Enumerable.Range(0, 800)
+            .Select(x => new GroupableTestModel($"Item {x}", $"Group {x / 20}"))
+            .ToList();
+        var target = CreateGroupedTarget(items, height: 260, useLogicalScrollable: false);
+        target.VerticalScrollBarVisibility = ScrollBarVisibility.Visible;
+        target.UpdateLayout();
+
+        var verticalBar = target.GetSelfAndVisualDescendants()
+            .OfType<ScrollBar>()
+            .First(sb => sb.Orientation == Orientation.Vertical);
+
+        target.ScrollIntoView(items[^1], target.ColumnDefinitions[0]);
+        target.UpdateLayout();
+
+        var maxBeforeCollapse = verticalBar.Maximum;
+
+        target.CollapseAllGroups();
+        target.UpdateLayout();
+
+        Assert.True(verticalBar.Maximum <= maxBeforeCollapse + 0.01,
+            $"Expected legacy range to shrink after CollapseAllGroups. Before: {maxBeforeCollapse}, After: {verticalBar.Maximum}");
+
+        var requested = Math.Max(0, verticalBar.Maximum - 2);
+        verticalBar.Value = requested;
+        target.ProcessVerticalScroll(ScrollEventType.ThumbTrack);
+        target.UpdateLayout();
+
+        var offset = target.GetVerticalOffset();
+        Assert.InRange(Math.Abs(offset - requested), 0, 0.01);
+
+        var displayData = target.DisplayData;
+        var getDisplayedElement = displayData.GetType()
+            .GetMethod("GetDisplayedElement", BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public);
+        Assert.NotNull(getDisplayedElement);
+
+        foreach (var header in GetGroupHeaders(target).Where(h => h.IsVisible))
+        {
+            var slot = header.RowGroupInfo?.Slot ?? -1;
+            if (slot < displayData.FirstScrollingSlot || slot > displayData.LastScrollingSlot)
+            {
+                continue;
+            }
+
+            var elementAtSlot = getDisplayedElement!.Invoke(displayData, new object[] { slot });
+            Assert.IsType<DataGridRowGroupHeader>(elementAtSlot);
+        }
+    }
+
+    [AvaloniaFact]
+    public void Grouped_DataGrid_Logical_Collapse_Updates_RowsPresenter_Extent()
+    {
+        var root = new Window
+        {
+            Width = 320,
+            Height = 280
+        };
+        root.SetThemeStyles(DataGridTheme.FluentV2);
+
+        var items = Enumerable.Range(0, 500)
+            .Select(x => new GroupableTestModel($"Item {x}", $"Group {x / 20}"))
+            .ToList();
+        var view = new DataGridCollectionView(items);
+        view.GroupDescriptions.Add(new DataGridPathGroupDescription(nameof(GroupableTestModel.Group)));
+
+        var target = new DataGrid
+        {
+            ItemsSource = view,
+            HeadersVisibility = DataGridHeadersVisibility.Column,
+            UseLogicalScrollable = true
+        };
+        target.ColumnsInternal.Add(new DataGridTextColumn { Header = "Name", Binding = new Binding("Name") });
+        target.ColumnsInternal.Add(new DataGridTextColumn { Header = "Group", Binding = new Binding("Group") });
+
+        root.Content = target;
+        root.Show();
+        target.UpdateLayout();
+
+        var presenter = GetRowsPresenter(target);
+        var extentBefore = presenter.Extent.Height;
+        Assert.True(extentBefore > 0, "Expected positive extent before collapsing.");
+
+        var header = GetGroupHeaders(target)
+            .Where(h => h.IsVisible && h.RowGroupInfo?.IsVisible == true)
+            .OrderBy(h => h.RowGroupInfo!.Slot)
+            .FirstOrDefault();
+        Assert.NotNull(header);
+
+        header!.ToggleExpandCollapse(isVisible: false, setCurrent: true);
+        target.UpdateLayout();
+
+        var extentAfter = presenter.Extent.Height;
+        Assert.True(extentAfter < extentBefore - 1,
+            $"Expected logical extent to shrink after collapse. Before: {extentBefore}, After: {extentAfter}");
+    }
+
+    [AvaloniaFact]
+    public void Grouped_DataGrid_Logical_Collapse_Clamps_Internal_And_Presenter_Offsets()
+    {
+        var root = new Window
+        {
+            Width = 320,
+            Height = 280
+        };
+        root.SetThemeStyles(DataGridTheme.FluentV2);
+
+        var items = Enumerable.Range(0, 800)
+            .Select(x => new GroupableTestModel($"Item {x}", $"Group {x / 20}"))
+            .ToList();
+        var view = new DataGridCollectionView(items);
+        view.GroupDescriptions.Add(new DataGridPathGroupDescription(nameof(GroupableTestModel.Group)));
+
+        var target = new DataGrid
+        {
+            ItemsSource = view,
+            HeadersVisibility = DataGridHeadersVisibility.Column,
+            UseLogicalScrollable = true
+        };
+        target.ColumnsInternal.Add(new DataGridTextColumn { Header = "Name", Binding = new Binding("Name") });
+        target.ColumnsInternal.Add(new DataGridTextColumn { Header = "Group", Binding = new Binding("Group") });
+
+        root.Content = target;
+        root.Show();
+        target.UpdateLayout();
+
+        var presenter = GetRowsPresenter(target);
+
+        // Scroll near bottom first.
+        for (int i = 0; i < 40; i++)
+        {
+            Assert.True(target.UpdateScroll(new Vector(0, -120)), "Expected logical scroll to be handled.");
+            target.UpdateLayout();
+        }
+
+        var groupToCollapse = view.Groups.OfType<DataGridCollectionViewGroup>().FirstOrDefault();
+        Assert.NotNull(groupToCollapse);
+        target.CollapseRowGroup(groupToCollapse!, collapseAllSubgroups: false);
+        target.UpdateLayout();
+
+        var logicalMaximum = Math.Max(0, presenter.Extent.Height - presenter.Viewport.Height);
+        var presenterOffset = presenter.Offset.Y;
+        var internalOffset = target.GetVerticalOffset();
+
+        Assert.True(presenterOffset <= logicalMaximum + 0.01,
+            $"Presenter offset exceeded logical maximum after collapse. Offset: {presenterOffset}, Max: {logicalMaximum}");
+        Assert.True(internalOffset <= logicalMaximum + 0.01,
+            $"Internal offset exceeded logical maximum after collapse. Offset: {internalOffset}, Max: {logicalMaximum}");
+        var offsetDelta = Math.Abs(internalOffset - presenterOffset);
+        Assert.True(offsetDelta <= 0.5,
+            $"Expected internal and presenter offsets to stay synchronized. Internal: {internalOffset}, Presenter: {presenterOffset}, Delta: {offsetDelta}, Max: {logicalMaximum}");
+    }
+
+    [AvaloniaFact]
+    public void Grouped_DataGrid_Logical_Collapse_Offscreen_Group_Shrinks_Extent()
+    {
+        var root = new Window
+        {
+            Width = 420,
+            Height = 300
+        };
+        root.SetThemeStyles(DataGridTheme.FluentV2);
+
+        var items = Enumerable.Range(0, 1000)
+            .Select(x => new GroupableTestModel($"Item {x}", $"Group {x / 20}"))
+            .ToList();
+        var view = new DataGridCollectionView(items);
+        view.GroupDescriptions.Add(new DataGridPathGroupDescription(nameof(GroupableTestModel.Group)));
+
+        var target = new DataGrid
+        {
+            ItemsSource = view,
+            HeadersVisibility = DataGridHeadersVisibility.Column,
+            UseLogicalScrollable = true
+        };
+        target.ColumnsInternal.Add(new DataGridTextColumn { Header = "Name", Binding = new Binding("Name") });
+        target.ColumnsInternal.Add(new DataGridTextColumn { Header = "Group", Binding = new Binding("Group") });
+
+        root.Content = target;
+        root.Show();
+        target.UpdateLayout();
+
+        var presenter = GetRowsPresenter(target);
+        var extentBeforeCollapse = presenter.Extent.Height;
+
+        // Warm up estimator/cache by scrolling through a substantial portion of rows.
+        for (int i = 0; i < 80; i++)
+        {
+            Assert.True(target.UpdateScroll(new Vector(0, -120)), "Expected logical scroll to be handled.");
+            target.UpdateLayout();
+        }
+
+        var firstGroup = view.Groups.OfType<DataGridCollectionViewGroup>().FirstOrDefault();
+        Assert.NotNull(firstGroup);
+        target.CollapseRowGroup(firstGroup!, collapseAllSubgroups: false);
+        target.UpdateLayout();
+
+        var extentAfterCollapse = presenter.Extent.Height;
+        Assert.True(extentAfterCollapse < extentBeforeCollapse,
+            $"Expected extent to shrink after collapsing all groups. Before: {extentBeforeCollapse}, After: {extentAfterCollapse}");
+
+        Assert.True(extentBeforeCollapse - extentAfterCollapse > 120,
+            $"Expected collapsing one full group to reduce extent by a meaningful amount. Before: {extentBeforeCollapse}, After: {extentAfterCollapse}");
+    }
+
+    [AvaloniaFact]
+    public void Grouped_DataGrid_Logical_Repeated_Collapse_Keeps_Offset_And_Max_In_Sync()
+    {
+        var root = new Window
+        {
+            Width = 360,
+            Height = 300
+        };
+        root.SetThemeStyles(DataGridTheme.FluentV2);
+
+        var items = Enumerable.Range(0, 900)
+            .Select(x => new GroupableTestModel($"Item {x}", $"Group {x / 15}"))
+            .ToList();
+        var view = new DataGridCollectionView(items);
+        view.GroupDescriptions.Add(new DataGridPathGroupDescription(nameof(GroupableTestModel.Group)));
+
+        var target = new DataGrid
+        {
+            ItemsSource = view,
+            HeadersVisibility = DataGridHeadersVisibility.Column,
+            UseLogicalScrollable = true
+        };
+        target.ColumnsInternal.Add(new DataGridTextColumn { Header = "Name", Binding = new Binding("Name") });
+        target.ColumnsInternal.Add(new DataGridTextColumn { Header = "Group", Binding = new Binding("Group") });
+
+        root.Content = target;
+        root.Show();
+        target.UpdateLayout();
+
+        var presenter = GetRowsPresenter(target);
+
+        for (int i = 0; i < 60; i++)
+        {
+            Assert.True(target.UpdateScroll(new Vector(0, -100)), "Expected initial logical scroll.");
+            target.UpdateLayout();
+        }
+
+        // Mix visible and offscreen collapse operations and verify logical state remains consistent.
+        for (int i = 0; i < 8; i++)
+        {
+            if (i % 2 == 0)
+            {
+                var visibleHeader = GetGroupHeaders(target)
+                    .Where(h => h.IsVisible && h.RowGroupInfo?.IsVisible == true)
+                    .OrderBy(h => h.RowGroupInfo!.Slot)
+                    .FirstOrDefault();
+
+                if (visibleHeader != null)
+                {
+                    visibleHeader.ToggleExpandCollapse(isVisible: false, setCurrent: true);
+                }
+            }
+            else
+            {
+                var offscreenGroup = view.Groups
+                    .OfType<DataGridCollectionViewGroup>()
+                    .Skip(i)
+                    .FirstOrDefault(g => g != null);
+
+                if (offscreenGroup != null)
+                {
+                    target.CollapseRowGroup(offscreenGroup, collapseAllSubgroups: false);
+                }
+            }
+
+            target.UpdateLayout();
+
+            var logicalMaximum = Math.Max(0, presenter.Extent.Height - presenter.Viewport.Height);
+            var presenterOffset = presenter.Offset.Y;
+            var internalOffset = target.GetVerticalOffset();
+
+            Assert.True(presenterOffset <= logicalMaximum + 0.01,
+                $"Presenter offset exceeded logical maximum. Iteration: {i}, Offset: {presenterOffset}, Max: {logicalMaximum}");
+            Assert.True(internalOffset <= logicalMaximum + 0.01,
+                $"Internal offset exceeded logical maximum. Iteration: {i}, Offset: {internalOffset}, Max: {logicalMaximum}");
+            Assert.True(Math.Abs(presenterOffset - internalOffset) <= 0.5,
+                $"Presenter/internal offsets diverged. Iteration: {i}, Presenter: {presenterOffset}, Internal: {internalOffset}, Max: {logicalMaximum}");
+
+            Assert.True(target.UpdateScroll(new Vector(0, -32)), "Expected follow-up logical scroll.");
+            target.UpdateLayout();
         }
     }
 

@@ -31,8 +31,7 @@ namespace Avalonia.Controls
             activity?.SetTag(DataGridDiagnostics.Tags.SlotCount, SlotCount);
             activity?.SetTag(DataGridDiagnostics.Tags.Columns, ColumnsItemsInternal.Count);
 
-            Debug.Assert(!_collapsedSlotsTable.Contains(newFirstDisplayedSlot));
-            int firstDisplayedScrollingSlot = newFirstDisplayedSlot;
+            int firstDisplayedScrollingSlot = NormalizeDisplayedFirstSlot(newFirstDisplayedSlot);
             int lastDisplayedScrollingSlot = -1;
             double deltaY = -NegVerticalOffset;
             int visibleScrollingRows = 0;
@@ -51,8 +50,8 @@ namespace Avalonia.Controls
 
             if (firstDisplayedScrollingSlot == -1)
             {
-                // 0 is fine because the element in the first slot cannot be collapsed
-                firstDisplayedScrollingSlot = 0;
+                ResetDisplayedRows();
+                return;
             }
 
             int slot = firstDisplayedScrollingSlot;
@@ -109,6 +108,38 @@ namespace Avalonia.Controls
             activity?.SetTag(DataGridDiagnostics.Tags.FirstDisplayedSlot, DisplayData.FirstScrollingSlot);
             activity?.SetTag(DataGridDiagnostics.Tags.LastDisplayedSlot, DisplayData.LastScrollingSlot);
             activity?.SetTag(DataGridDiagnostics.Tags.DisplayedSlots, DisplayData.NumDisplayedScrollingElements);
+        }
+
+        private int NormalizeDisplayedFirstSlot(int slot)
+        {
+            if (SlotCount == 0)
+            {
+                return -1;
+            }
+
+            if (slot == -1)
+            {
+                return GetNextVisibleSlot(-1);
+            }
+
+            if (slot < 0 || slot >= SlotCount)
+            {
+                return GetNextVisibleSlot(-1);
+            }
+
+            if (!_collapsedSlotsTable.Contains(slot))
+            {
+                return slot;
+            }
+
+            int nextVisible = GetNextVisibleSlot(slot);
+            if (nextVisible != -1 && nextVisible < SlotCount)
+            {
+                return nextVisible;
+            }
+
+            int previousVisible = GetPreviousVisibleSlot(slot + 1);
+            return previousVisible >= 0 ? previousVisible : -1;
         }
 
 

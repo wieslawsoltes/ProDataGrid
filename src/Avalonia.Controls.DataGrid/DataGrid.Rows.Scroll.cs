@@ -341,6 +341,7 @@ namespace Avalonia.Controls
                 // If scrolling request resulted in no visual position change (same first slot and same
                 // partial-row offset), keep the logical vertical offset stable to avoid drift at edges.
                 bool noVisualPositionChange =
+                    UseLogicalScrollable &&
                     DisplayData.FirstScrollingSlot == previousFirstScrollingSlot &&
                     MathUtilities.AreClose(NegVerticalOffset, previousNegVerticalOffset);
 
