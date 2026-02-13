@@ -44,6 +44,133 @@ public class HierarchicalHeadlessTests
         public double RowHeight { get; set; } = 24;
     }
 
+    private sealed class FixedExtentRowHeightEstimator : IDataGridRowHeightEstimator
+    {
+        private readonly double _estimatedTotalHeight;
+        private double _rowHeightEstimate;
+        private double _rowDetailsHeightEstimate;
+
+        public FixedExtentRowHeightEstimator(double estimatedTotalHeight, double defaultHeight = 24)
+        {
+            _estimatedTotalHeight = Math.Max(0, estimatedTotalHeight);
+            _rowHeightEstimate = Math.Max(1, defaultHeight);
+            DefaultRowHeight = _rowHeightEstimate;
+        }
+
+        public double DefaultRowHeight { get; set; }
+
+        public double RowHeightEstimate => _rowHeightEstimate;
+
+        public double RowDetailsHeightEstimate => _rowDetailsHeightEstimate;
+
+        public double GetRowGroupHeaderHeightEstimate(int level) => _rowHeightEstimate;
+
+        public void RecordMeasuredHeight(int slot, double measuredHeight, bool hasDetails = false, double detailsHeight = 0)
+        {
+            if (!double.IsNaN(measuredHeight) && !double.IsInfinity(measuredHeight) && measuredHeight > 0)
+            {
+                _rowHeightEstimate = measuredHeight;
+            }
+
+            if (hasDetails && detailsHeight > 0 && !double.IsNaN(detailsHeight) && !double.IsInfinity(detailsHeight))
+            {
+                _rowDetailsHeightEstimate = detailsHeight;
+            }
+        }
+
+        public void RecordRowGroupHeaderHeight(int slot, int level, double measuredHeight)
+        {
+            if (!double.IsNaN(measuredHeight) && !double.IsInfinity(measuredHeight) && measuredHeight > 0)
+            {
+                _rowHeightEstimate = measuredHeight;
+            }
+        }
+
+        public double GetEstimatedHeight(int slot, bool isRowGroupHeader = false, int rowGroupLevel = 0, bool hasDetails = false)
+        {
+            return _rowHeightEstimate + (hasDetails ? _rowDetailsHeightEstimate : 0);
+        }
+
+        public double CalculateTotalHeight(int totalSlotCount, int collapsedSlotCount, int[] rowGroupHeaderCounts, int detailsVisibleCount)
+        {
+            return _estimatedTotalHeight;
+        }
+
+        public int EstimateSlotAtOffset(double verticalOffset, int totalSlotCount)
+        {
+            if (totalSlotCount <= 0 || _rowHeightEstimate <= 0)
+            {
+                return 0;
+            }
+
+            var slot = (int)(verticalOffset / _rowHeightEstimate);
+            return Math.Min(Math.Max(0, slot), totalSlotCount - 1);
+        }
+
+        public double EstimateOffsetToSlot(int slot)
+        {
+            if (slot <= 0)
+            {
+                return 0;
+            }
+
+            return slot * _rowHeightEstimate;
+        }
+
+        public void UpdateFromDisplayedRows(int firstDisplayedSlot, int lastDisplayedSlot, double[] displayedHeights, double verticalOffset, double negVerticalOffset, int collapsedSlotCount, int detailsCount)
+        {
+            if (displayedHeights == null || displayedHeights.Length == 0)
+            {
+                return;
+            }
+
+            double total = 0;
+            for (int i = 0; i < displayedHeights.Length; i++)
+            {
+                total += displayedHeights[i];
+            }
+
+            var average = total / displayedHeights.Length;
+            if (!double.IsNaN(average) && !double.IsInfinity(average) && average > 0)
+            {
+                _rowHeightEstimate = average;
+            }
+        }
+
+        public void Reset()
+        {
+            _rowHeightEstimate = Math.Max(1, DefaultRowHeight);
+            _rowDetailsHeightEstimate = 0;
+        }
+
+        public void OnDataSourceChanged(int newItemCount)
+        {
+        }
+
+        public void OnItemsInserted(int startIndex, int count)
+        {
+        }
+
+        public void OnItemsRemoved(int startIndex, int count)
+        {
+        }
+
+        public RowHeightEstimatorDiagnostics GetDiagnostics()
+        {
+            return new RowHeightEstimatorDiagnostics
+            {
+                AlgorithmName = nameof(FixedExtentRowHeightEstimator),
+                CurrentRowHeightEstimate = _rowHeightEstimate,
+                CachedHeightCount = 0,
+                TotalRowCount = 0,
+                EstimatedTotalHeight = _estimatedTotalHeight,
+                MinMeasuredHeight = _rowHeightEstimate,
+                MaxMeasuredHeight = _rowHeightEstimate,
+                AverageMeasuredHeight = _rowHeightEstimate
+            };
+        }
+    }
+
     [AvaloniaFact]
     public void Header_Click_Toggles_Sort_And_Indicators()
     {
@@ -666,6 +793,89 @@ public class HierarchicalHeadlessTests
         Assert.NotNull(anchorAfterExpand);
         Assert.InRange(Math.Abs(anchorAfterExpand!.Bounds.Y - anchorY), 0, 0.5);
         Assert.InRange(Math.Abs(scrollViewer.Offset.Y - presenter.Offset.Y), 0, 0.01);
+
+        window.Close();
+    }
+
+    [AvaloniaFact]
+    public void Hierarchical_DownwardInput_AtLogicalMaximum_BeforeVisualTail_IsHandled()
+    {
+        var root = CreateTreeWithRowHeights("Root", childCount: 220, grandchildCount: 3);
+        using var themeScope = UseApplicationTheme(DataGridTheme.SimpleV2);
+
+        var model = new HierarchicalModel(new HierarchicalOptions
+        {
+            ChildrenSelector = o => ((Item)o).Children,
+            AutoExpandRoot = true,
+            MaxAutoExpandDepth = 1,
+            VirtualizeChildren = true
+        });
+        model.SetRoot(root);
+        model.Expand(model.Root!);
+
+        var grid = new DataGrid
+        {
+            HierarchicalModel = model,
+            HierarchicalRowsEnabled = true,
+            AutoGenerateColumns = false,
+            UseLogicalScrollable = true,
+            CanUserAddRows = false,
+            RowHeightEstimator = new FixedExtentRowHeightEstimator(estimatedTotalHeight: 3600)
+        };
+
+        grid.ColumnsInternal.Add(new DataGridHierarchicalColumn
+        {
+            Header = "Name",
+            Binding = new Avalonia.Data.Binding("Item.Name")
+        });
+
+        grid.Styles.Add(new Style(x => x.OfType<DataGridRow>())
+        {
+            Setters =
+            {
+                new Setter(DataGridRow.HeightProperty, new Binding("Item.RowHeight"))
+            }
+        });
+
+        var window = new Window
+        {
+            Width = 420,
+            Height = 260,
+            Content = grid
+        };
+
+        window.SetThemeStyles(DataGridTheme.SimpleV2);
+        window.Show();
+        PumpLayout(grid);
+
+        var presenter = GetRowsPresenter(grid);
+        var logicalMaximum = Math.Max(0, presenter.Extent.Height - presenter.Viewport.Height);
+        Assert.True(logicalMaximum > 0, $"Expected logical max > 0, got {logicalMaximum}.");
+
+        presenter.Offset = new Vector(0, logicalMaximum);
+        PumpLayout(grid);
+
+        var maxVisibleIndexBefore = GetVisibleRows(grid).Max(row => row.Index);
+
+        if (maxVisibleIndexBefore >= model.Count - 1)
+        {
+            grid.UpdateScroll(new Vector(0, -30));
+            PumpLayout(grid);
+
+            var stableTailIndex = GetVisibleRows(grid).Max(row => row.Index);
+            Assert.Equal(model.Count - 1, stableTailIndex);
+            window.Close();
+            return;
+        }
+
+        var handled = grid.UpdateScroll(new Vector(0, -30));
+        PumpLayout(grid);
+
+        Assert.True(handled, "Downward input should remain handled when visual tail is not reached yet.");
+
+        var maxVisibleIndexAfter = GetVisibleRows(grid).Max(row => row.Index);
+        Assert.True(maxVisibleIndexAfter >= maxVisibleIndexBefore,
+            $"Expected visible range to move or stay stable, but regressed from {maxVisibleIndexBefore} to {maxVisibleIndexAfter}.");
 
         window.Close();
     }
