@@ -22,6 +22,7 @@ ProDataGrid now follows the same UX patterns using Avalonia concepts such as `Co
 - `DataGridColumnHeader.TryShowFilterFlyout()`: programmatically show the header's filter flyout.
 - `DataGrid.ClearFilter(DataGridColumn column)`: clear the active filter for a column.
 - `DataGridColumn.ClearFilter()`: clear the active filter for the column instance.
+- `DataGridColumnDefinition.FilterFlyout` / `FilterFlyoutKey`: configure per-column flyouts when using `ColumnDefinitionsSource`.
 
 ## Context Menu with Filter Actions
 
@@ -59,6 +60,19 @@ To clear a filter programmatically:
 
 ```csharp
 column.ClearFilter();
+```
+
+## ColumnDefinitionsSource + Filter Flyouts
+
+When columns are materialized from `ColumnDefinitionsSource`, configure flyouts on the definitions:
+
+```csharp
+new DataGridTextColumnDefinition
+{
+    Header = "Customer",
+    Binding = DataGridBindingDefinition.Create<Order, string>(o => o.Customer),
+    FilterFlyoutKey = "CustomerFilterFlyout"
+};
 ```
 
 ## Filter Status Icon

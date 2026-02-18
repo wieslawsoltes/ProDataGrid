@@ -9,6 +9,7 @@ using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using Avalonia;
 using Avalonia.Controls.DataGridFiltering;
+using Avalonia.Controls.Primitives;
 using Avalonia.Utilities;
 using Avalonia.Controls.DataGridSearching;
 using Avalonia.Controls.DataGridSorting;
@@ -79,6 +80,8 @@ namespace Avalonia.Controls
         private bool? _isReadOnly;
         private bool? _isVisible;
         private bool? _showFilterButton;
+        private FlyoutBase _filterFlyout;
+        private string _filterFlyoutKey;
         private int? _displayIndex;
         private DataGridLength? _width;
         private double? _minWidth;
@@ -208,6 +211,18 @@ namespace Avalonia.Controls
         {
             get => _showFilterButton;
             set => SetProperty(ref _showFilterButton, value);
+        }
+
+        public FlyoutBase FilterFlyout
+        {
+            get => _filterFlyout;
+            set => SetProperty(ref _filterFlyout, value);
+        }
+
+        public string FilterFlyoutKey
+        {
+            get => _filterFlyoutKey;
+            set => SetProperty(ref _filterFlyoutKey, value);
         }
 
         public int? DisplayIndex
@@ -504,6 +519,8 @@ namespace Avalonia.Controls
                 column.ShowFilterButton = ShowFilterButton.Value;
             }
 
+            column.FilterFlyout = ResolveFilterFlyout(context);
+
             if (DisplayIndex.HasValue)
             {
                 column.DisplayIndex = DisplayIndex.Value;
@@ -707,6 +724,10 @@ namespace Avalonia.Controls
                         column.ShowFilterButton = ShowFilterButton.Value;
                     }
                     return true;
+                case nameof(FilterFlyout):
+                case nameof(FilterFlyoutKey):
+                    column.FilterFlyout = ResolveFilterFlyout(context);
+                    return true;
                 case nameof(DisplayIndex):
                     if (DisplayIndex.HasValue)
                     {
@@ -762,6 +783,21 @@ namespace Avalonia.Controls
             }
 
             return false;
+        }
+
+        private FlyoutBase ResolveFilterFlyout(DataGridColumnDefinitionContext context)
+        {
+            if (FilterFlyout != null)
+            {
+                return FilterFlyout;
+            }
+
+            if (FilterFlyoutKey != null)
+            {
+                return context?.ResolveResource<FlyoutBase>(FilterFlyoutKey);
+            }
+
+            return null;
         }
 
         protected bool SetProperty<T>(ref T field, T value, [CallerMemberName] string propertyName = null)

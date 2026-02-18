@@ -37,6 +37,7 @@ Each built-in column has a corresponding `*ColumnDefinition` type for use with `
 - For details and AOT guidance, see [Column Definitions](column-definitions.md) and [Column Definitions: AOT-Friendly Bindings](column-definitions-aot.md).
 - Example: `DataGridTextColumn` → `DataGridTextColumnDefinition`.
 - Template definitions use string keys (`CellTemplateKey`, `CellEditingTemplateKey`, `NewRowCellTemplateKey`) resolved from grid or application resources.
+- Filter flyouts can be configured per definition using `FilterFlyout` (instance) or `FilterFlyoutKey` (resource key).
 - Typed builder: `DataGridColumnDefinitionBuilder` can create definitions without reflection or expression compilation.
 - Stable ids: use `ColumnKey` for keys that survive re-materialization and can be reused in model descriptors.
 - Definition options: use `Options` to attach search/filter/sort metadata (for example, `SortValueAccessor`, `SortValueComparer`, `FilterValueAccessor`, `SearchTextProvider`, `SearchMemberPath`).

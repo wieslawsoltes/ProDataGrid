@@ -839,6 +839,124 @@ public class DataGridColumnDefinitionsTests
     }
 
     [AvaloniaFact]
+    public void ColumnDefinitionsSource_Applies_FilterFlyout_From_Definition()
+    {
+        var flyout = new Flyout { Content = new TextBlock { Text = "Filter" } };
+        var definition = new DataGridTextColumnDefinition
+        {
+            Header = "Name",
+            Binding = DataGridBindingDefinition.Create<Person, string>(p => p.Name),
+            FilterFlyout = flyout
+        };
+
+        var grid = new DataGrid
+        {
+            ColumnDefinitionsSource = new ObservableCollection<DataGridColumnDefinition> { definition }
+        };
+
+        var column = Assert.IsType<DataGridTextColumn>(GetNonFillerColumns(grid).Single());
+        Assert.Same(flyout, column.FilterFlyout);
+        Assert.True(column.ShowFilterButton);
+    }
+
+    [AvaloniaFact]
+    public void ColumnDefinitionsSource_Resolves_FilterFlyoutKey_From_Resources()
+    {
+        var flyout = new Flyout { Content = new TextBlock { Text = "Filter" } };
+        var definition = new DataGridTextColumnDefinition
+        {
+            Header = "Name",
+            Binding = DataGridBindingDefinition.Create<Person, string>(p => p.Name),
+            FilterFlyoutKey = "NameFilterFlyout"
+        };
+
+        var grid = new DataGrid();
+        grid.Resources["NameFilterFlyout"] = flyout;
+        grid.ColumnDefinitionsSource = new ObservableCollection<DataGridColumnDefinition> { definition };
+
+        var column = Assert.IsType<DataGridTextColumn>(GetNonFillerColumns(grid).Single());
+        Assert.Same(flyout, column.FilterFlyout);
+        Assert.True(column.ShowFilterButton);
+    }
+
+    [AvaloniaFact]
+    public void ColumnDefinitionsSource_Updates_FilterFlyout_On_Definition_Change()
+    {
+        var initialFlyout = new Flyout { Content = new TextBlock { Text = "Initial" } };
+        var updatedFlyout = new Flyout { Content = new TextBlock { Text = "Updated" } };
+        var definition = new DataGridTextColumnDefinition
+        {
+            Header = "Name",
+            Binding = DataGridBindingDefinition.Create<Person, string>(p => p.Name),
+            FilterFlyout = initialFlyout
+        };
+
+        var grid = new DataGrid
+        {
+            ColumnDefinitionsSource = new ObservableCollection<DataGridColumnDefinition> { definition }
+        };
+
+        var column = Assert.IsType<DataGridTextColumn>(GetNonFillerColumns(grid).Single());
+        Assert.Same(initialFlyout, column.FilterFlyout);
+
+        definition.FilterFlyout = updatedFlyout;
+        Assert.Same(updatedFlyout, column.FilterFlyout);
+
+        definition.FilterFlyout = null;
+        Assert.Null(column.FilterFlyout);
+    }
+
+    [AvaloniaFact]
+    public void ColumnDefinitionsSource_FilterFlyout_Prefers_Instance_Then_Falls_Back_To_Key()
+    {
+        var keyedFlyout = new Flyout { Content = new TextBlock { Text = "Keyed" } };
+        var directFlyout = new Flyout { Content = new TextBlock { Text = "Direct" } };
+
+        var definition = new DataGridTextColumnDefinition
+        {
+            Header = "Name",
+            Binding = DataGridBindingDefinition.Create<Person, string>(p => p.Name),
+            FilterFlyoutKey = "NameFilterFlyout",
+            FilterFlyout = directFlyout
+        };
+
+        var grid = new DataGrid();
+        grid.Resources["NameFilterFlyout"] = keyedFlyout;
+        grid.ColumnDefinitionsSource = new ObservableCollection<DataGridColumnDefinition> { definition };
+
+        var column = Assert.IsType<DataGridTextColumn>(GetNonFillerColumns(grid).Single());
+        Assert.Same(directFlyout, column.FilterFlyout);
+
+        definition.FilterFlyout = null;
+        Assert.Same(keyedFlyout, column.FilterFlyout);
+    }
+
+    [AvaloniaFact]
+    public void ColumnDefinitionsSource_Updates_FilterFlyout_When_FilterFlyoutKey_Changes()
+    {
+        var firstFlyout = new Flyout { Content = new TextBlock { Text = "First" } };
+        var secondFlyout = new Flyout { Content = new TextBlock { Text = "Second" } };
+
+        var definition = new DataGridTextColumnDefinition
+        {
+            Header = "Name",
+            Binding = DataGridBindingDefinition.Create<Person, string>(p => p.Name),
+            FilterFlyoutKey = "FirstFlyout"
+        };
+
+        var grid = new DataGrid();
+        grid.Resources["FirstFlyout"] = firstFlyout;
+        grid.Resources["SecondFlyout"] = secondFlyout;
+        grid.ColumnDefinitionsSource = new ObservableCollection<DataGridColumnDefinition> { definition };
+
+        var column = Assert.IsType<DataGridTextColumn>(GetNonFillerColumns(grid).Single());
+        Assert.Same(firstFlyout, column.FilterFlyout);
+
+        definition.FilterFlyoutKey = "SecondFlyout";
+        Assert.Same(secondFlyout, column.FilterFlyout);
+    }
+
+    [AvaloniaFact]
     public void ColumnDefinitionsSource_Batches_Definition_Updates()
     {
         var definition = new CountingColumnDefinition

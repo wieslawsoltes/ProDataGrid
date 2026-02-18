@@ -73,8 +73,9 @@ ColumnDefinitions = new DataGridColumnDefinitionList
 
 Each built-in column has a matching `*ColumnDefinition` type (for example, `DataGridTextColumnDefinition`). Definition properties mirror the column properties.
 
-- `Header`, `Width`, `MinWidth`, `MaxWidth`, `DisplayIndex`, `IsVisible`, `CanUserSort`, `IsReadOnly`, and more.
+- `Header`, `Width`, `MinWidth`, `MaxWidth`, `DisplayIndex`, `IsVisible`, `CanUserSort`, `IsReadOnly`, `FilterFlyout`, and more.
 - Template/theme keys: `HeaderTemplateKey`, `CellTemplateKey`, `CellEditingTemplateKey`, `HeaderThemeKey`, `CellThemeKey`, `FilterThemeKey`.
+- Flyout resource keys: `FilterFlyoutKey`.
 - Style hooks: `CellStyleClasses`, `HeaderStyleClasses`.
 - Bindings: `Binding`, `SelectedItemBinding`, `SelectedValueBinding`, `TextBinding`, `ClipboardContentBinding`, `CellBackgroundBinding`, and `CellForegroundBinding`.
 
@@ -86,8 +87,35 @@ Template and theme properties use string keys and are resolved against grid reso
 
 - `HeaderTemplateKey`, `CellTemplateKey`, `CellEditingTemplateKey`, `NewRowCellTemplateKey`
 - `HeaderThemeKey`, `CellThemeKey`, `FilterThemeKey`
+- `FilterFlyoutKey`
 
 Keep the templates in `DataGrid.Resources` or `Application.Resources` to decouple view models from visuals.
+
+## Per-column filter flyouts
+
+Use `FilterFlyout` to assign a flyout instance directly, or `FilterFlyoutKey` to resolve flyouts from resources (recommended for MVVM-friendly definitions):
+
+```csharp
+new DataGridTextColumnDefinition
+{
+    Header = "Customer",
+    Binding = DataGridBindingDefinition.Create<Order, string>(o => o.Customer),
+    FilterFlyoutKey = "CustomerFilterFlyout"
+};
+```
+
+```xml
+<DataGrid ColumnDefinitionsSource="{Binding ColumnDefinitions}"
+          FilteringModel="{Binding FilteringModel}">
+  <DataGrid.Resources>
+    <Flyout x:Key="CustomerFilterFlyout"
+            Placement="Bottom"
+            FlyoutPresenterTheme="{StaticResource DataGridFilterFlyoutPresenterTheme}"
+            Content="{Binding CustomerFilter}"
+            ContentTemplate="{StaticResource DataGridFilterTextEditorTemplate}" />
+  </DataGrid.Resources>
+</DataGrid>
+```
 
 ## Updates, lifetime, and threading
 
