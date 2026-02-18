@@ -101,6 +101,7 @@
 <li><code>DataGridColumnHeader.TryShowFilterFlyout()</code>: programmatically show the header's filter flyout.</li>
 <li><code>DataGrid.ClearFilter(DataGridColumn column)</code>: clear the active filter for a column.</li>
 <li><code>DataGridColumn.ClearFilter()</code>: clear the active filter for the column instance.</li>
+<li><code>DataGridColumnDefinition.FilterFlyout</code> / <code>FilterFlyoutKey</code>: configure per-column flyouts when using <code>ColumnDefinitionsSource</code>.</li>
 </ul>
 <h2 id="context-menu-with-filter-actions">Context Menu with Filter Actions</h2>
 <p>Define a shared header context menu and use <code>DataGrid.ColumnHeaderContextMenuColumnId</code> as the command parameter. This works for right-clicks on the header surface and on header icons:</p>
@@ -128,6 +129,15 @@
 </code></pre>
 <p>To clear a filter programmatically:</p>
 <pre><code class="lang-csharp">column.ClearFilter();
+</code></pre>
+<h2 id="columndefinitionssource--filter-flyouts">ColumnDefinitionsSource + Filter Flyouts</h2>
+<p>When columns are materialized from <code>ColumnDefinitionsSource</code>, configure flyouts on the definitions:</p>
+<pre><code class="lang-csharp">new DataGridTextColumnDefinition
+{
+    Header = &quot;Customer&quot;,
+    Binding = DataGridBindingDefinition.Create&lt;Order, string&gt;(o =&gt; o.Customer),
+    FilterFlyoutKey = &quot;CustomerFilterFlyout&quot;
+};
 </code></pre>
 <h2 id="filter-status-icon">Filter Status Icon</h2>
 <p>When a column is filtered and the filter button is hidden, the header now shows a filter status icon. This is driven by the header template and the <code>:filtered</code> pseudo class, so it stays consistent across themes and re-templating.</p>

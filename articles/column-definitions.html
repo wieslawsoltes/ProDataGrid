@@ -145,8 +145,9 @@ ColumnDefinitions = new DataGridColumnDefinitionList
 <h2 id="definition-types-and-property-mapping">Definition types and property mapping</h2>
 <p>Each built-in column has a matching <code>*ColumnDefinition</code> type (for example, <code>DataGridTextColumnDefinition</code>). Definition properties mirror the column properties.</p>
 <ul>
-<li><code>Header</code>, <code>Width</code>, <code>MinWidth</code>, <code>MaxWidth</code>, <code>DisplayIndex</code>, <code>IsVisible</code>, <code>CanUserSort</code>, <code>IsReadOnly</code>, and more.</li>
+<li><code>Header</code>, <code>Width</code>, <code>MinWidth</code>, <code>MaxWidth</code>, <code>DisplayIndex</code>, <code>IsVisible</code>, <code>CanUserSort</code>, <code>IsReadOnly</code>, <code>FilterFlyout</code>, and more.</li>
 <li>Template/theme keys: <code>HeaderTemplateKey</code>, <code>CellTemplateKey</code>, <code>CellEditingTemplateKey</code>, <code>HeaderThemeKey</code>, <code>CellThemeKey</code>, <code>FilterThemeKey</code>.</li>
+<li>Flyout resource keys: <code>FilterFlyoutKey</code>.</li>
 <li>Style hooks: <code>CellStyleClasses</code>, <code>HeaderStyleClasses</code>.</li>
 <li>Bindings: <code>Binding</code>, <code>SelectedItemBinding</code>, <code>SelectedValueBinding</code>, <code>TextBinding</code>, <code>ClipboardContentBinding</code>, <code>CellBackgroundBinding</code>, and <code>CellForegroundBinding</code>.</li>
 </ul>
@@ -156,8 +157,29 @@ ColumnDefinitions = new DataGridColumnDefinitionList
 <ul>
 <li><code>HeaderTemplateKey</code>, <code>CellTemplateKey</code>, <code>CellEditingTemplateKey</code>, <code>NewRowCellTemplateKey</code></li>
 <li><code>HeaderThemeKey</code>, <code>CellThemeKey</code>, <code>FilterThemeKey</code></li>
+<li><code>FilterFlyoutKey</code></li>
 </ul>
 <p>Keep the templates in <code>DataGrid.Resources</code> or <code>Application.Resources</code> to decouple view models from visuals.</p>
+<h2 id="per-column-filter-flyouts">Per-column filter flyouts</h2>
+<p>Use <code>FilterFlyout</code> to assign a flyout instance directly, or <code>FilterFlyoutKey</code> to resolve flyouts from resources (recommended for MVVM-friendly definitions):</p>
+<pre><code class="lang-csharp">new DataGridTextColumnDefinition
+{
+    Header = &quot;Customer&quot;,
+    Binding = DataGridBindingDefinition.Create&lt;Order, string&gt;(o =&gt; o.Customer),
+    FilterFlyoutKey = &quot;CustomerFilterFlyout&quot;
+};
+</code></pre>
+<pre><code class="lang-xml">&lt;DataGrid ColumnDefinitionsSource=&quot;{Binding ColumnDefinitions}&quot;
+          FilteringModel=&quot;{Binding FilteringModel}&quot;&gt;
+  &lt;DataGrid.Resources&gt;
+    &lt;Flyout x:Key=&quot;CustomerFilterFlyout&quot;
+            Placement=&quot;Bottom&quot;
+            FlyoutPresenterTheme=&quot;{StaticResource DataGridFilterFlyoutPresenterTheme}&quot;
+            Content=&quot;{Binding CustomerFilter}&quot;
+            ContentTemplate=&quot;{StaticResource DataGridFilterTextEditorTemplate}&quot; /&gt;
+  &lt;/DataGrid.Resources&gt;
+&lt;/DataGrid&gt;
+</code></pre>
 <h2 id="updates-lifetime-and-threading">Updates, lifetime, and threading</h2>
 <ul>
 <li><code>ColumnDefinitionsSource</code> tracks <code>INotifyCollectionChanged</code> and applies add/remove/reset changes.</li>

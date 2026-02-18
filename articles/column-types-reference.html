@@ -193,6 +193,7 @@
 <li>For details and AOT guidance, see <a href="column-definitions.html">Column Definitions</a> and <a href="column-definitions-aot.html">Column Definitions: AOT-Friendly Bindings</a>.</li>
 <li>Example: <code>DataGridTextColumn</code> → <code>DataGridTextColumnDefinition</code>.</li>
 <li>Template definitions use string keys (<code>CellTemplateKey</code>, <code>CellEditingTemplateKey</code>, <code>NewRowCellTemplateKey</code>) resolved from grid or application resources.</li>
+<li>Filter flyouts can be configured per definition using <code>FilterFlyout</code> (instance) or <code>FilterFlyoutKey</code> (resource key).</li>
 <li>Typed builder: <code>DataGridColumnDefinitionBuilder</code> can create definitions without reflection or expression compilation.</li>
 <li>Stable ids: use <code>ColumnKey</code> for keys that survive re-materialization and can be reused in model descriptors.</li>
 <li>Definition options: use <code>Options</code> to attach search/filter/sort metadata (for example, <code>SortValueAccessor</code>, <code>SortValueComparer</code>, <code>FilterValueAccessor</code>, <code>SearchTextProvider</code>, <code>SearchMemberPath</code>).</li>
