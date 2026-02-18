@@ -22,8 +22,14 @@ namespace DataGridSample.ViewModels
     {
         private const string CustomerPropertyPath = nameof(Order.Customer);
         private const string StatusPropertyPath = nameof(Order.Status);
+        private const string RegionPropertyPath = nameof(Order.Region);
         private const string OrderedPropertyPath = nameof(Order.Ordered);
         private const string TotalPropertyPath = nameof(Order.Total);
+        private const string CustomerFilterFlyoutKey = "CustomerFilterFlyout";
+        private const string StatusFilterFlyoutKey = "StatusFilterFlyout";
+        private const string RegionFilterFlyoutKey = "RegionFilterFlyout";
+        private const string DateFilterFlyoutKey = "DateFilterFlyout";
+        private const string TotalFilterFlyoutKey = "TotalFilterFlyout";
 
         private readonly ObservableCollection<Order> _items;
         private readonly RelayCommand _clearAllCommand;
@@ -84,24 +90,33 @@ namespace DataGridSample.ViewModels
                 Header = "Customer",
                 Binding = ColumnDefinitionBindingFactory.CreateBinding<Order, string>(CustomerPropertyPath, o => o.Customer),
                 SortMemberPath = CustomerPropertyPath,
-                Width = new DataGridLength(1.4, DataGridLengthUnitType.Star)
+                Width = new DataGridLength(1.4, DataGridLengthUnitType.Star),
+                FilterFlyoutKey = CustomerFilterFlyoutKey
             };
             _statusColumn = new DataGridTextColumnDefinition
             {
                 Header = "Status",
                 Binding = ColumnDefinitionBindingFactory.CreateBinding<Order, string>(StatusPropertyPath, o => o.Status),
                 SortMemberPath = StatusPropertyPath,
-                Width = new DataGridLength(1.1, DataGridLengthUnitType.Star)
+                Width = new DataGridLength(1.1, DataGridLengthUnitType.Star),
+                FilterFlyoutKey = StatusFilterFlyoutKey
             };
             _regionColumn = new DataGridTextColumnDefinition
             {
                 Header = "Region",
-                Binding = ColumnDefinitionBindingFactory.CreateBinding<Order, string>(nameof(Order.Region), o => o.Region),
-                SortMemberPath = nameof(Order.Region),
-                Width = new DataGridLength(1, DataGridLengthUnitType.Star)
+                Binding = ColumnDefinitionBindingFactory.CreateBinding<Order, string>(RegionPropertyPath, o => o.Region),
+                SortMemberPath = RegionPropertyPath,
+                Width = new DataGridLength(1, DataGridLengthUnitType.Star),
+                FilterFlyoutKey = RegionFilterFlyoutKey
             };
             _orderedColumn = CreateOrderedColumnDefinition();
             _totalColumn = CreateTotalColumnDefinition();
+
+            RegionFilter = new RegionFilterContext(
+                "Region equals",
+                _items.Select(o => o.Region).Distinct(StringComparer.Ordinal).OrderBy(o => o, StringComparer.Ordinal),
+                apply: region => ApplyRegionFilter(region),
+                clear: () => ClearFilter(_regionColumn, () => RegionFilter.SelectedRegion = null));
 
             ColumnDefinitions = new ObservableCollection<DataGridColumnDefinition>
             {
@@ -129,6 +144,8 @@ namespace DataGridSample.ViewModels
 
         public EnumFilterContext StatusFilter { get; }
 
+        public RegionFilterContext RegionFilter { get; }
+
         private static DataGridColumnDefinition CreateOrderedColumnDefinition()
         {
             var orderedBinding = ColumnDefinitionBindingFactory.CreateBinding<Order, DateTimeOffset>(OrderedPropertyPath, o => o.Ordered);
@@ -138,7 +155,8 @@ namespace DataGridSample.ViewModels
                 Header = "Ordered (UTC)",
                 Binding = orderedBinding,
                 SortMemberPath = OrderedPropertyPath,
-                Width = new DataGridLength(0.9, DataGridLengthUnitType.Star)
+                Width = new DataGridLength(0.9, DataGridLengthUnitType.Star),
+                FilterFlyoutKey = DateFilterFlyoutKey
             };
         }
 
@@ -152,7 +170,8 @@ namespace DataGridSample.ViewModels
                 Binding = totalBinding,
                 SortMemberPath = TotalPropertyPath,
                 Width = new DataGridLength(0.9, DataGridLengthUnitType.Star),
-                FormatString = "C2"
+                FormatString = "C2",
+                FilterFlyoutKey = TotalFilterFlyoutKey
             };
         }
 
@@ -221,6 +240,22 @@ namespace DataGridSample.ViewModels
                 @operator: FilteringOperator.In,
                 propertyPath: propertyPath,
                 values: selected.Cast<object>().ToArray()));
+        }
+
+        private void ApplyRegionFilter(string? region)
+        {
+            if (string.IsNullOrWhiteSpace(region))
+            {
+                FilteringModel.Remove(_regionColumn);
+                return;
+            }
+
+            FilteringModel.SetOrUpdate(new FilteringDescriptor(
+                columnId: _regionColumn,
+                @operator: FilteringOperator.Equals,
+                propertyPath: RegionPropertyPath,
+                value: region,
+                stringComparison: StringComparison.OrdinalIgnoreCase));
         }
 
         private void ClearFilter(DataGridColumnDefinition columnId, Action reset)
@@ -424,5 +459,37 @@ namespace DataGridSample.ViewModels
             get => _isSelected;
             set => SetProperty(ref _isSelected, value);
         }
+    }
+
+    [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors | DynamicallyAccessedMemberTypes.PublicProperties)]
+    public sealed class RegionFilterContext : ObservableObject
+    {
+        private string? _selectedRegion;
+        private readonly Action<string?> _apply;
+        private readonly Action _clear;
+
+        public RegionFilterContext(string label, IEnumerable<string> regions, Action<string?> apply, Action clear)
+        {
+            Label = label;
+            Regions = new ObservableCollection<string>(regions);
+            _apply = apply;
+            _clear = clear;
+            ApplyCommand = new RelayCommand(_ => _apply(SelectedRegion));
+            ClearCommand = new RelayCommand(_ => _clear());
+        }
+
+        public string Label { get; }
+
+        public ObservableCollection<string> Regions { get; }
+
+        public string? SelectedRegion
+        {
+            get => _selectedRegion;
+            set => SetProperty(ref _selectedRegion, value);
+        }
+
+        public ICommand ApplyCommand { get; }
+
+        public ICommand ClearCommand { get; }
     }
 }

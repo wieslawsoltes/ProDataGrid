@@ -21,6 +21,57 @@
 
   <UserControl.Resources>
     <adapters:AccessorFilteringAdapterFactory x:Key="AccessorFilteringAdapterFactory" />
+
+    <DataTemplate x:Key="RegionFilterEditorTemplate"
+                  x:DataType="viewModels:RegionFilterContext">
+      <StackPanel Spacing="{DynamicResource DataGridFilterEditorSpacing}"
+                  Width="{DynamicResource DataGridFilterTextEditorWidth}">
+        <TextBlock Text="{Binding Label, FallbackValue=Region filter}"
+                   FontWeight="SemiBold" />
+        <ComboBox ItemsSource="{Binding Regions}"
+                  SelectedItem="{Binding SelectedRegion, Mode=TwoWay}" />
+        <StackPanel Orientation="Horizontal"
+                    Spacing="{DynamicResource DataGridFilterEditorActionSpacing}">
+          <Button Content="Clear" Command="{Binding ClearCommand}" />
+          <Button Content="Apply" Command="{Binding ApplyCommand}" />
+        </StackPanel>
+      </StackPanel>
+    </DataTemplate>
+
+    <Flyout x:Key="CustomerFilterFlyout"
+            x:DataType="viewModels:FilteringModelSampleViewModel"
+            Placement="Bottom"
+            FlyoutPresenterTheme="{StaticResource DataGridFilterFlyoutPresenterTheme}"
+            Content="{Binding CustomerFilter}"
+            ContentTemplate="{StaticResource DataGridFilterTextEditorTemplate}" />
+
+    <Flyout x:Key="StatusFilterFlyout"
+            x:DataType="viewModels:FilteringModelSampleViewModel"
+            Placement="Bottom"
+            FlyoutPresenterTheme="{StaticResource DataGridFilterFlyoutPresenterTheme}"
+            Content="{Binding StatusFilter}"
+            ContentTemplate="{StaticResource DataGridFilterEnumEditorTemplate}" />
+
+    <Flyout x:Key="RegionFilterFlyout"
+            x:DataType="viewModels:FilteringModelSampleViewModel"
+            Placement="Bottom"
+            FlyoutPresenterTheme="{StaticResource DataGridFilterFlyoutPresenterTheme}"
+            Content="{Binding RegionFilter}"
+            ContentTemplate="{StaticResource RegionFilterEditorTemplate}" />
+
+    <Flyout x:Key="DateFilterFlyout"
+            x:DataType="viewModels:FilteringModelSampleViewModel"
+            Placement="Bottom"
+            FlyoutPresenterTheme="{StaticResource DataGridFilterFlyoutPresenterTheme}"
+            Content="{Binding DateFilter}"
+            ContentTemplate="{StaticResource DataGridFilterDateEditorTemplate}" />
+
+    <Flyout x:Key="TotalFilterFlyout"
+            x:DataType="viewModels:FilteringModelSampleViewModel"
+            Placement="Bottom"
+            FlyoutPresenterTheme="{StaticResource DataGridFilterFlyoutPresenterTheme}"
+            Content="{Binding TotalFilter}"
+            ContentTemplate="{StaticResource DataGridFilterNumberEditorTemplate}" />
   </UserControl.Resources>
 
   <Grid Margin="12"
@@ -32,7 +83,7 @@
                 Spacing="4">
       <TextBlock Classes="h2">Column Definitions + FilteringModel</TextBlock>
       <TextBlock TextWrapping="Wrap"
-                 Text="Filter using model descriptors while columns are defined in view models. Filters are applied through the shared editor templates without per-column flyouts." />
+                 Text="Filter using model descriptors while columns are defined in view models. Per-column filter flyouts are resolved from resources via definition keys, including a custom Region template." />
     </StackPanel>
 
     <DataGrid Grid.Row="1"
@@ -58,6 +109,8 @@
                         ContentTemplate="{StaticResource DataGridFilterTextEditorTemplate}" />
         <ContentControl Content="{Binding StatusFilter}"
                         ContentTemplate="{StaticResource DataGridFilterEnumEditorTemplate}" />
+        <ContentControl Content="{Binding RegionFilter}"
+                        ContentTemplate="{StaticResource RegionFilterEditorTemplate}" />
         <ContentControl Content="{Binding DateFilter}"
                         ContentTemplate="{StaticResource DataGridFilterDateEditorTemplate}" />
         <ContentControl Content="{Binding TotalFilter}"
