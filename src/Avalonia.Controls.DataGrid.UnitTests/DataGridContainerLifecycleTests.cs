@@ -276,6 +276,26 @@ public class DataGridContainerLifecycleTests
         Assert.False(generatedRow.RecycledIsPlaceholder);
     }
 
+    [AvaloniaFact]
+    public void Recycled_real_row_to_placeholder_with_compiled_binding_does_not_throw()
+    {
+        var grid = new TrackingDataGrid();
+        var placeholder = GetPlaceholder();
+        var column = new DataGridTextColumn
+        {
+            Binding = DataGridBindingDefinition.Create<CompiledBindingItem, string>(item => item.Name).CreateBinding()
+        };
+        grid.ColumnsInternal.Add(column);
+
+        var item = new CompiledBindingItem { Name = "Row 0" };
+        var generatedRow = grid.InvokeGenerateRow(rowIndex: 0, slot: 0, dataContext: item);
+        grid.DisplayData.RecycleRow(generatedRow);
+
+        var exception = Record.Exception(() => grid.InvokeGenerateRow(rowIndex: 1, slot: 1, dataContext: placeholder));
+
+        Assert.Null(exception);
+    }
+
     private static TrackingDataGrid CreateGrid(IList<string> items, out Window window)
     {
         window = new Window
@@ -386,5 +406,10 @@ public class DataGridContainerLifecycleTests
             RefreshCalled = true;
             base.RefreshCellContent(element, propertyName);
         }
+    }
+
+    private sealed class CompiledBindingItem
+    {
+        public string Name { get; init; } = string.Empty;
     }
 }
