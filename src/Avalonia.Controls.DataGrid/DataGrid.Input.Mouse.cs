@@ -147,7 +147,8 @@ namespace Avalonia.Controls
                 var logicalMaximum = _rowsPresenter.Extent.Height - _rowsPresenter.Viewport.Height;
                 if (!double.IsNaN(logicalMaximum) && !double.IsInfinity(logicalMaximum))
                 {
-                    return Math.Max(0, logicalMaximum);
+                    var approximateMaximum = GetApproximateLogicalVerticalMaximum();
+                    return Math.Max(0, Math.Min(Math.Max(0, logicalMaximum), approximateMaximum));
                 }
             }
 
