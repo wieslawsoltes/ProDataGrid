@@ -16,6 +16,34 @@ namespace Avalonia.Controls
     #endif
     partial class DataGrid
     {
+        private bool CanUseEstimatedScrollFastPath()
+        {
+            return RowDetailsVisibilityMode != DataGridRowDetailsVisibilityMode.VisibleWhenSelected || RowDetailsTemplate == null;
+        }
+
+        private bool ShouldUseEstimatedScrollFastPath(double remainingHeight)
+        {
+            if (!CanUseEstimatedScrollFastPath() || MathUtilities.LessThanOrClose(remainingHeight, 0))
+            {
+                return false;
+            }
+
+            if (MathUtilities.GreaterThan(remainingHeight, 2 * CellsEstimatedHeight))
+            {
+                return true;
+            }
+
+            double singleRowHeightEstimate = RowHeightEstimate + (RowDetailsVisibilityMode == DataGridRowDetailsVisibilityMode.Visible ? RowDetailsHeightEstimate : 0);
+            if (MathUtilities.LessThanOrClose(singleRowHeightEstimate, 0))
+            {
+                singleRowHeightEstimate = Math.Max(RowHeightEstimate, 1);
+            }
+
+            // For multi-row jumps, estimator-based repositioning is faster than per-slot recycle loops.
+            double estimatedRowsToSkip = remainingHeight / Math.Max(singleRowHeightEstimate, 1);
+            return MathUtilities.GreaterThan(estimatedRowsToSkip, 64);
+        }
+
         private void ScrollSlotsByHeight(double height)
         {
             if (SlotCount == 0)
@@ -67,20 +95,20 @@ namespace Avalonia.Controls
                             // Figure out what row we've scrolled down to and update the value for NegVerticalOffset
                             NegVerticalOffset = 0;
                             //
-                            if (height > 2 * CellsEstimatedHeight &&
-                            (RowDetailsVisibilityMode != DataGridRowDetailsVisibilityMode.VisibleWhenSelected || RowDetailsTemplate == null))
+                            var remainingScrollHeight = Math.Max(0, height - deltaY);
+                            if (ShouldUseEstimatedScrollFastPath(remainingScrollHeight))
                             {
                                 // Very large scroll occurred. Instead of determining the exact number of scrolled off rows,
                                 // let's estimate the number based on RowHeight.
-                            ResetDisplayedRows();
-                            
-                            var estimator = RowHeightEstimator;
-                            if (estimator != null)
-                            {
-                                // Use the estimator's slot-at-offset calculation for better accuracy
-                                int estimatedSlot = estimator.EstimateSlotAtOffset(_verticalOffset + height, SlotCount);
-                                newFirstScrollingSlot = Math.Min(GetNextVisibleSlot(estimatedSlot - 1), lastVisibleSlot);
-                            }
+                                ResetDisplayedRows();
+
+                                var estimator = RowHeightEstimator;
+                                if (estimator != null)
+                                {
+                                    // Use the estimator's slot-at-offset calculation for better accuracy
+                                    int estimatedSlot = estimator.EstimateSlotAtOffset(_verticalOffset + height, SlotCount);
+                                    newFirstScrollingSlot = Math.Min(GetNextVisibleSlot(estimatedSlot - 1), lastVisibleSlot);
+                                }
                                 else
                                 {
                                     double singleRowHeightEstimate = RowHeightEstimate + (RowDetailsVisibilityMode == DataGridRowDetailsVisibilityMode.Visible ? RowDetailsHeightEstimate : 0);
@@ -140,8 +168,8 @@ namespace Avalonia.Controls
                         NegVerticalOffset = 0;
                         //
 
-                        if (height < -2 * CellsEstimatedHeight &&
-                        (RowDetailsVisibilityMode != DataGridRowDetailsVisibilityMode.VisibleWhenSelected || RowDetailsTemplate == null))
+                        var remainingScrollHeight = Math.Max(0, Math.Abs(height) - Math.Abs(deltaY));
+                        if (ShouldUseEstimatedScrollFastPath(remainingScrollHeight))
                         {
                             // Very large scroll occurred. Instead of determining the exact number of scrolled off rows,
                             // let's estimate the number based on RowHeight.
