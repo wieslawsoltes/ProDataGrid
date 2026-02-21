@@ -430,7 +430,7 @@ namespace Avalonia.Controls
                 return;
             }
 
-            if (!_rowsPresenter.Children.Contains(dataGridRow))
+            if (!ReferenceEquals(dataGridRow.Parent, _rowsPresenter))
             {
                 if (_loadedRows.Contains(dataGridRow))
                 {
