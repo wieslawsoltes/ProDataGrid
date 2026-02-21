@@ -92,6 +92,10 @@ namespace DataGridSample.ViewModels
                 stopwatch.Stop();
                 Summary = $"Items: {Items.Count:n0} | Regenerated in {stopwatch.Elapsed.TotalSeconds:N2}s";
             }
+            catch (Exception ex)
+            {
+                Summary = $"Regenerate failed: {ex.Message}";
+            }
             finally
             {
                 IsRegenerating = false;
