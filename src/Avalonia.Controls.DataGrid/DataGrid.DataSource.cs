@@ -194,6 +194,7 @@ internal
 
                 UpdatePseudoClasses();
                 OnDataSourceChangedForSummaries();
+                OnDataSourceChangedForValidation();
             }
         }
 
@@ -565,6 +566,7 @@ internal
         private void ColumnsInternal_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
         {
             OnColumnsInternalBindingChanged(e);
+            OnColumnsChangedForValidation();
 
             if (e.Action == NotifyCollectionChangedAction.Add
                 || e.Action == NotifyCollectionChangedAction.Remove

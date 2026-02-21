@@ -179,6 +179,7 @@ internal
                 OnDataSourceChangedForSummaries();
             }
             EnsureTotalSummaryRow();
+            OnDataSourceChangedForValidation();
             if (DataConnection.DataSource != null && !DataConnection.EventsWired)
             {
                 DataConnection.WireEvents(DataConnection.DataSource);
@@ -256,6 +257,7 @@ internal
 
             _validationSubscription?.Dispose();
             _validationSubscription = null;
+            InvalidateCollectionValidationState(clearTracking: true);
 
             DetachRowGroupHandlers(resetTopLevelGroup: false);
             DetachSummaryRows();
