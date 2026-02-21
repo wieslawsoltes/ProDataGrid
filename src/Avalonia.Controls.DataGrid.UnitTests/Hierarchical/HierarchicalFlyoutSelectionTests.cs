@@ -216,6 +216,51 @@ public class HierarchicalFlyoutSelectionTests
     }
 
     [AvaloniaFact]
+    public void Closing_Flyout_With_Selected_Item_Does_Not_Leave_Invalid_CurrentSlot()
+    {
+        var folderRoot = new Folder("root");
+        var childA = new Folder("childA");
+        var childB = new Folder("childB");
+        folderRoot.Folders.Add(childA);
+        folderRoot.Folders.Add(childB);
+
+        var manager = new FolderDestinationManagerVm(folderRoot);
+        var host = new HostVm(manager);
+
+        var template = CreateTemplate();
+
+        var contentControl = CreateContentControl(host, template);
+        var flyout = CreateFlyout(contentControl);
+        var dropDown = CreateDropDown(host, flyout);
+        var window = CreateWindow(dropDown);
+        try
+        {
+            window.Show();
+            window.ApplyTemplate();
+            window.UpdateLayout();
+
+            flyout.ShowAt(dropDown);
+            Dispatcher.UIThread.RunJobs();
+
+            ClickFolder(window, childA);
+
+            var grid = window.GetVisualDescendants().OfType<DataGrid>().First();
+            Assert.True(grid.CurrentCell.IsValid);
+
+            flyout.Hide();
+            Dispatcher.UIThread.RunJobs();
+
+            Assert.True(
+                grid.CurrentSlot == -1 || (grid.CurrentSlot >= 0 && grid.CurrentSlot < grid.SlotCount),
+                $"Expected CurrentSlot to be unset or in range. CurrentSlot={grid.CurrentSlot}, SlotCount={grid.SlotCount}, CurrentColumnIndex={grid.CurrentColumnIndex}");
+        }
+        finally
+        {
+            window.Close();
+        }
+    }
+
+    [AvaloniaFact]
     public void SelectionModel_Raises_When_Reopened_With_Reused_Content()
     {
         var folderRoot = new Folder("root");
