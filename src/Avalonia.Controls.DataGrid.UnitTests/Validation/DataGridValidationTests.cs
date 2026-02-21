@@ -443,6 +443,52 @@ public class DataGridValidationTests
     }
 
     [AvaloniaFact]
+    public void Grid_validation_updates_when_offscreen_item_errors_change()
+    {
+        var (grid, root, errorItem, items) = CreateOffscreenErrorValidationGrid();
+
+        try
+        {
+            Assert.False(grid.IsValid);
+
+            errorItem.ErrorValue = "Ok";
+            grid.UpdateLayout();
+
+            Assert.True(grid.IsValid);
+
+            items[0].ErrorValue = string.Empty;
+            grid.UpdateLayout();
+
+            Assert.False(grid.IsValid);
+        }
+        finally
+        {
+            root.Close();
+        }
+    }
+
+    [AvaloniaFact]
+    public void Grid_validation_recomputes_when_error_binding_changes()
+    {
+        var (grid, root, _, _) = CreateOffscreenErrorValidationGrid();
+
+        try
+        {
+            Assert.False(grid.IsValid);
+
+            var column = Assert.IsType<DataGridTextColumn>(grid.ColumnsInternal[0]);
+            column.Binding = TwoWayBinding(nameof(MixedValidationItem.WarningValue));
+            grid.UpdateLayout();
+
+            Assert.True(grid.IsValid);
+        }
+        finally
+        {
+            root.Close();
+        }
+    }
+
+    [AvaloniaFact]
     public void Cancel_row_edit_restores_template_column_validation_for_indei()
     {
         var (grid, root, item, boundColumn, templateColumn) = CreateNotifyTemplateValidationGrid();
