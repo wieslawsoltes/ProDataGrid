@@ -8629,6 +8629,16 @@
     },
     {
       "type": "Conceptual",
+      "source_relative_path": "articles/observable-range-collection.md",
+      "output": {
+        ".html": {
+          "relative_path": "articles/observable-range-collection.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "Conceptual",
       "source_relative_path": "articles/outline-reports.md",
       "output": {
         ".html": {
