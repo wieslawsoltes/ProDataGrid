@@ -1,9 +1,9 @@
 using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Diagnostics;
-using System.Windows.Input;
+using System.Threading.Tasks;
 using Avalonia.Controls;
+using DataGridSample.Collections;
 using DataGridSample.Models;
 using DataGridSample.Mvvm;
 
@@ -16,20 +16,23 @@ public sealed class LogicalScrollPerformanceViewModel : ObservableObject
     private string _selectedEstimator = "Advanced";
     private string _summary = "Preparing rows...";
     private IDataGridRowHeightEstimator _rowHeightEstimator = new AdvancedRowHeightEstimator();
+    private bool _isRegenerating;
 
     public LogicalScrollPerformanceViewModel()
     {
         Estimators = new[] { "Advanced", "Caching", "Default" };
-        Rows = new ObservableCollection<LogicalScrollPerformanceRow>();
-        RegenerateCommand = new RelayCommand(_ => PopulateRows());
-        PopulateRows();
+        Rows = new ObservableRangeCollection<LogicalScrollPerformanceRow>();
+        RegenerateCommand = new RelayCommand(
+            _ => _ = PopulateRowsAsync(),
+            _ => !IsRegenerating);
+        _ = PopulateRowsAsync();
     }
 
-    public ObservableCollection<LogicalScrollPerformanceRow> Rows { get; }
+    public ObservableRangeCollection<LogicalScrollPerformanceRow> Rows { get; }
 
     public IReadOnlyList<string> Estimators { get; }
 
-    public ICommand RegenerateCommand { get; }
+    public RelayCommand RegenerateCommand { get; }
 
     public int ItemCount
     {
@@ -62,6 +65,18 @@ public sealed class LogicalScrollPerformanceViewModel : ObservableObject
         private set => SetProperty(ref _summary, value);
     }
 
+    public bool IsRegenerating
+    {
+        get => _isRegenerating;
+        private set
+        {
+            if (SetProperty(ref _isRegenerating, value))
+            {
+                RegenerateCommand.RaiseCanExecuteChanged();
+            }
+        }
+    }
+
     private static IDataGridRowHeightEstimator CreateEstimator(string? name)
     {
         return name switch
@@ -72,27 +87,54 @@ public sealed class LogicalScrollPerformanceViewModel : ObservableObject
         };
     }
 
-    private void PopulateRows()
+    private async Task PopulateRowsAsync()
     {
-        var stopwatch = Stopwatch.StartNew();
-        Rows.Clear();
-
-        var random = new Random(12345);
-        for (int i = 1; i <= ItemCount; i++)
+        if (IsRegenerating)
         {
-            Rows.Add(new LogicalScrollPerformanceRow
-            {
-                Id = i,
-                Category = $"CAT-{i % 50:D2}",
-                Code = $"CODE-{i % 1000:D4}",
-                Amount = Math.Round((random.NextDouble() * 100000) - 50000, 2),
-                CreatedAt = DateTime.UtcNow.AddSeconds(-i),
-                Description = $"Row {i} | sample payload for scroll performance checks"
-            });
+            return;
         }
 
-        stopwatch.Stop();
-        UpdateSummary(stopwatch.Elapsed.TotalSeconds);
+        IsRegenerating = true;
+        var targetCount = ItemCount;
+        Summary = $"Rows: {targetCount:n0} | Regenerating... | Estimator: {SelectedEstimator}";
+
+        var stopwatch = Stopwatch.StartNew();
+        try
+        {
+            var rows = await Task.Run(() =>
+            {
+                var random = new Random(12345);
+                var utcNow = DateTime.UtcNow;
+                var data = new List<LogicalScrollPerformanceRow>(targetCount);
+                for (int i = 1; i <= targetCount; i++)
+                {
+                    data.Add(new LogicalScrollPerformanceRow
+                    {
+                        Id = i,
+                        Category = $"CAT-{i % 50:D2}",
+                        Code = $"CODE-{i % 1000:D4}",
+                        Amount = Math.Round((random.NextDouble() * 100000) - 50000, 2),
+                        CreatedAt = utcNow.AddSeconds(-i),
+                        Description = $"Row {i} | sample payload for scroll performance checks"
+                    });
+                }
+
+                return data;
+            }).ConfigureAwait(true);
+
+            Rows.ResetWith(rows);
+
+            stopwatch.Stop();
+            UpdateSummary(stopwatch.Elapsed.TotalSeconds);
+        }
+        catch (Exception ex)
+        {
+            Summary = $"Regenerate failed: {ex.Message} | Estimator: {SelectedEstimator}";
+        }
+        finally
+        {
+            IsRegenerating = false;
+        }
     }
 
     private void UpdateSummary(double loadSeconds)
