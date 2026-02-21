@@ -140,16 +140,81 @@ namespace Avalonia.Controls
                 return Math.Max(0, GetLegacyVerticalScrollMaximum());
             }
 
+            var fallbackMaximum = Math.Max(0, EdgedRowsHeightCalculated - CellsEstimatedHeight);
+
             if (UseLogicalScrollable && _rowsPresenter != null)
             {
                 var logicalMaximum = _rowsPresenter.Extent.Height - _rowsPresenter.Viewport.Height;
                 if (!double.IsNaN(logicalMaximum) && !double.IsInfinity(logicalMaximum))
                 {
-                    return Math.Max(0, logicalMaximum);
+                    var approximateMaximum = GetApproximateLogicalVerticalMaximum();
+                    return Math.Max(0, Math.Min(Math.Max(0, logicalMaximum), approximateMaximum));
                 }
             }
 
-            return Math.Max(0, EdgedRowsHeightCalculated - CellsEstimatedHeight);
+            if (UseLogicalScrollable)
+            {
+                return GetApproximateLogicalVerticalMaximum();
+            }
+
+            return fallbackMaximum;
+        }
+
+        private double GetApproximateLogicalVerticalMaximum()
+        {
+            if (SlotCount <= 0)
+            {
+                return 0;
+            }
+
+            var viewportHeight = CellsEstimatedHeight;
+            if ((double.IsNaN(viewportHeight) || double.IsInfinity(viewportHeight) || MathUtilities.LessThanOrClose(viewportHeight, 0)) &&
+                _rowsPresenter != null)
+            {
+                var presenterViewport = _rowsPresenter.Viewport.Height;
+                if (!double.IsNaN(presenterViewport) && !double.IsInfinity(presenterViewport) && MathUtilities.GreaterThan(presenterViewport, 0))
+                {
+                    viewportHeight = presenterViewport;
+                }
+            }
+
+            if ((double.IsNaN(viewportHeight) || double.IsInfinity(viewportHeight) || MathUtilities.LessThanOrClose(viewportHeight, 0)) &&
+                RowsPresenterAvailableSize.HasValue)
+            {
+                var availableHeight = RowsPresenterAvailableSize.Value.Height;
+                if (!double.IsNaN(availableHeight) && !double.IsInfinity(availableHeight) && MathUtilities.GreaterThan(availableHeight, 0))
+                {
+                    viewportHeight = availableHeight;
+                }
+            }
+
+            if (double.IsNaN(viewportHeight) || double.IsInfinity(viewportHeight) || MathUtilities.LessThanOrClose(viewportHeight, 0))
+            {
+                return Math.Max(0, EdgedRowsHeightCalculated - CellsEstimatedHeight);
+            }
+
+            var rowEstimate = RowHeightEstimator?.RowHeightEstimate ?? RowHeightEstimate;
+            if (double.IsNaN(rowEstimate) || double.IsInfinity(rowEstimate) || MathUtilities.LessThanOrClose(rowEstimate, 0))
+            {
+                rowEstimate = Math.Max(1, DATAGRID_defaultRowHeight);
+            }
+
+            var estimatedTotalHeight = SlotCount * rowEstimate;
+            if (RowDetailsVisibilityMode == DataGridRowDetailsVisibilityMode.Visible)
+            {
+                var detailsEstimate = RowHeightEstimator?.RowDetailsHeightEstimate ?? RowDetailsHeightEstimate;
+                if (!double.IsNaN(detailsEstimate) && !double.IsInfinity(detailsEstimate) && MathUtilities.GreaterThan(detailsEstimate, 0))
+                {
+                    estimatedTotalHeight += SlotCount * detailsEstimate;
+                }
+            }
+
+            if (double.IsNaN(estimatedTotalHeight) || double.IsInfinity(estimatedTotalHeight))
+            {
+                return Math.Max(0, EdgedRowsHeightCalculated - viewportHeight);
+            }
+
+            return Math.Max(0, estimatedTotalHeight - viewportHeight);
         }
 
         private double GetProjectedVerticalOffsetForInput(double inputDeltaY, double verticalMaximum)

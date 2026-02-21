@@ -622,7 +622,12 @@ internal
             else if (!MathUtilities.IsZero(DisplayData.PendingVerticalScrollHeight))
             {
                 _restoredScrollSlot = null;
-                ScrollSlotsByHeight(DisplayData.PendingVerticalScrollHeight);
+                CoerceLogicalPendingVerticalScrollHeight();
+                var pendingVerticalScrollHeight = DisplayData.PendingVerticalScrollHeight;
+                if (!MathUtilities.IsZero(pendingVerticalScrollHeight))
+                {
+                    ScrollSlotsByHeight(pendingVerticalScrollHeight);
+                }
                 DisplayData.PendingVerticalScrollHeight = 0;
             }
 
@@ -634,6 +639,44 @@ internal
 
             SyncLogicalScrollableOffset();
             TickScrollRestoreGuard();
+        }
+
+        private void CoerceLogicalPendingVerticalScrollHeight()
+        {
+            if (!UseLogicalScrollable || MathUtilities.IsZero(DisplayData.PendingVerticalScrollHeight))
+            {
+                return;
+            }
+
+            var verticalMaximum = GetInputVerticalMaximum();
+            if (double.IsNaN(verticalMaximum) || double.IsInfinity(verticalMaximum))
+            {
+                return;
+            }
+
+            verticalMaximum = Math.Max(0, verticalMaximum);
+
+            var currentVerticalOffset = Math.Max(0, Math.Min(_verticalOffset, verticalMaximum));
+            if (!MathUtilities.AreClose(currentVerticalOffset, _verticalOffset))
+            {
+                _verticalOffset = currentVerticalOffset;
+                if (MathUtilities.GreaterThan(NegVerticalOffset, _verticalOffset))
+                {
+                    NegVerticalOffset = _verticalOffset;
+                }
+
+                SetVerticalOffset(_verticalOffset);
+            }
+
+            var pendingVerticalScrollHeight = DisplayData.PendingVerticalScrollHeight;
+            var coercedPendingVerticalScrollHeight = pendingVerticalScrollHeight > 0
+                ? Math.Min(pendingVerticalScrollHeight, Math.Max(0, verticalMaximum - currentVerticalOffset))
+                : Math.Max(pendingVerticalScrollHeight, -currentVerticalOffset);
+
+            if (!MathUtilities.AreClose(coercedPendingVerticalScrollHeight, pendingVerticalScrollHeight))
+            {
+                DisplayData.PendingVerticalScrollHeight = coercedPendingVerticalScrollHeight;
+            }
         }
 
         private void SyncLogicalScrollableOffset()
