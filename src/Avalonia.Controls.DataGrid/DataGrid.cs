@@ -1294,6 +1294,7 @@ internal
         {
             int? newRowIndex = null;
             var isPointerOverGrid = IsPointerOverSelfOrDescendant();
+            var isPointerOverGroupSlot = IsPointerOverGroupHeaderOrFooter();
             if (isPointerOverGrid && DisplayData.FirstScrollingSlot < 0 && _mouseOverRowIndex.HasValue && SlotCount > 0)
             {
                 newRowIndex = _mouseOverRowIndex;
@@ -1306,6 +1307,7 @@ internal
                 }
                 else if (_mouseOverRowIndex.HasValue &&
                     IsPointWithinDisplayedRows(_lastPointerPosition.Value) &&
+                    !isPointerOverGroupSlot &&
                     !IsPointOverGroupHeaderOrFooter(_lastPointerPosition.Value))
                 {
                     newRowIndex = _mouseOverRowIndex;
@@ -1322,6 +1324,34 @@ internal
             }
 
             RefreshPointerOverRowStates();
+        }
+
+        private bool IsPointerOverGroupHeaderOrFooter()
+        {
+            if (VisualRoot is not IInputRoot inputRoot || inputRoot.PointerOverElement is not Visual visual)
+            {
+                return false;
+            }
+
+            if (visual.VisualRoot == null)
+            {
+                return false;
+            }
+
+            for (var current = visual; current != null; current = current.VisualParent)
+            {
+                if (current is DataGridRowGroupHeader or DataGridRowGroupFooter)
+                {
+                    return true;
+                }
+
+                if (ReferenceEquals(current, this))
+                {
+                    break;
+                }
+            }
+
+            return false;
         }
 
         private bool IsPointOverGroupHeaderOrFooter(Point point)
