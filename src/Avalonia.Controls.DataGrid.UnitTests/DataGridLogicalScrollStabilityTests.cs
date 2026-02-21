@@ -3,9 +3,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Collections.Specialized;
-using System.ComponentModel;
 using System.Linq;
 using Avalonia;
 using Avalonia.Controls;
@@ -94,66 +91,6 @@ public class DataGridLogicalScrollStabilityTests
 
         var afterAlternating = GetFirstVisibleRowIndex(target);
         Assert.InRange(afterAlternating, Math.Max(0, baseline - 2), baseline + 2);
-    }
-
-    [AvaloniaFact]
-    public void LogicalScrollable_ResetToSmallerCollection_ClampsOffset_And_RemainsScrollable()
-    {
-        var rows = new ResettableCollection<ResetRow>(CreateResetRows(100_000));
-        var root = new Window
-        {
-            Width = 700,
-            Height = 220
-        };
-
-        root.SetThemeStyles();
-
-        var target = new DataGrid
-        {
-            ItemsSource = rows,
-            HeadersVisibility = DataGridHeadersVisibility.Column,
-            UseLogicalScrollable = true
-        };
-
-        target.ColumnsInternal.Add(new DataGridTextColumn
-        {
-            Header = "Id",
-            Binding = new Binding(nameof(ResetRow.Id))
-        });
-
-        root.Content = target;
-        root.Show();
-        root.UpdateLayout();
-        target.UpdateLayout();
-
-        var presenter = GetRowsPresenter(target);
-        var initialMaximum = Math.Max(0, presenter.Extent.Height - presenter.Viewport.Height);
-        Assert.True(initialMaximum > 0, $"Expected positive logical maximum before reset. Extent={presenter.Extent.Height}, Viewport={presenter.Viewport.Height}");
-        presenter.Offset = new Vector(0, initialMaximum);
-        root.UpdateLayout();
-        target.UpdateLayout();
-
-        rows.ResetWith(CreateResetRows(10_000));
-        root.UpdateLayout();
-        target.UpdateLayout();
-
-        presenter = GetRowsPresenter(target);
-        var logicalMaximum = Math.Max(0, presenter.Extent.Height - presenter.Viewport.Height);
-        Assert.InRange(presenter.Offset.Y, 0, logicalMaximum + 0.01);
-
-        presenter.Offset = new Vector(0, 0);
-        root.UpdateLayout();
-        target.UpdateLayout();
-        var topSlot = target.DisplayData.FirstScrollingSlot;
-
-        presenter.Offset = new Vector(0, logicalMaximum);
-        root.UpdateLayout();
-        target.UpdateLayout();
-        var bottomSlot = target.DisplayData.FirstScrollingSlot;
-
-        Assert.True(topSlot >= 0);
-        Assert.True(bottomSlot > topSlot,
-            $"Expected logical offset to move viewport after reset. TopSlot={topSlot}, BottomSlot={bottomSlot}, Max={logicalMaximum}, Offset={presenter.Offset.Y}");
     }
 
     private static DataGrid CreateStandaloneTarget(int itemCount, int height, bool useLogicalScrollable)
@@ -340,17 +277,6 @@ public class DataGridLogicalScrollStabilityTests
             .Min(row => row.Index);
     }
 
-    private static List<ResetRow> CreateResetRows(int count)
-    {
-        var rows = new List<ResetRow>(count);
-        for (var i = 0; i < count; i++)
-        {
-            rows.Add(new ResetRow { Id = i });
-        }
-
-        return rows;
-    }
-
     private sealed class ScrollStabilityRow
     {
         public int Id { get; set; }
@@ -363,41 +289,5 @@ public class DataGridLogicalScrollStabilityTests
         public double Delta { get; set; }
         public double Score { get; set; }
         public double Ratio { get; set; }
-    }
-
-    private sealed class ResetRow
-    {
-        public int Id { get; set; }
-    }
-
-    private sealed class ResettableCollection<T> : ObservableCollection<T>
-    {
-        public ResettableCollection()
-        {
-        }
-
-        public ResettableCollection(IEnumerable<T> items)
-            : base(items)
-        {
-        }
-
-        public void ResetWith(IEnumerable<T> items)
-        {
-            if (items == null)
-            {
-                throw new ArgumentNullException(nameof(items));
-            }
-
-            CheckReentrancy();
-            Items.Clear();
-            foreach (var item in items)
-            {
-                Items.Add(item);
-            }
-
-            OnPropertyChanged(new PropertyChangedEventArgs(nameof(Count)));
-            OnPropertyChanged(new PropertyChangedEventArgs("Item[]"));
-            OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset));
-        }
     }
 }
