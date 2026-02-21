@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+using System.Reflection;
 using Avalonia.Controls;
 using Avalonia.Headless.XUnit;
 using Avalonia.Markup.Xaml.Styling;
@@ -190,6 +191,35 @@ public class CurrentCellTests
         Assert.False(grid.CurrentCell.IsValid);
     }
 
+    [AvaloniaFact]
+    public void Resetting_CurrentCell_Handles_Stale_CurrentSlot_When_SlotCount_Is_Zero()
+    {
+        var items = new ObservableCollection<Item>
+        {
+            new() { Name = "A" },
+            new() { Name = "B" },
+        };
+
+        var grid = CreateGrid(items);
+        grid.SelectionUnit = DataGridSelectionUnit.Cell;
+        grid.UpdateLayout();
+
+        var column = grid.Columns.First();
+        grid.CurrentCell = new DataGridCellInfo(items[0], column, 0, 0, isValid: true);
+        Assert.True(grid.CurrentCell.IsValid);
+
+        // Recreate the state from issue #269: SlotCount cleared while CurrentSlot still points
+        // to a previously selected row.
+        SetPrivateProperty(grid, "SlotCount", 0);
+        SetPrivateProperty(grid, "CurrentSlot", 1);
+
+        grid.CurrentCell = DataGridCellInfo.Unset;
+        grid.UpdateLayout();
+
+        Assert.False(grid.CurrentCell.IsValid);
+        Assert.Equal(-1, grid.CurrentSlot);
+    }
+
     private static DataGrid CreateGrid(IEnumerable<Item> items)
     {
         var root = new Window
@@ -211,6 +241,13 @@ public class CurrentCellTests
         root.Show();
         grid.UpdateLayout();
         return grid;
+    }
+
+    private static void SetPrivateProperty(object target, string propertyName, object value)
+    {
+        var property = target.GetType().GetProperty(propertyName, BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public);
+        Assert.NotNull(property);
+        property!.SetValue(target, value);
     }
 
     private class Item

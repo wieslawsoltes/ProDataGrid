@@ -63,6 +63,16 @@ internal
             Control oldDisplayedElement = null;
             DataGridCellCoordinates oldCurrentCell = new DataGridCellCoordinates(CurrentCellCoordinates);
 
+            if (CurrentColumnIndex > -1 &&
+                (CurrentColumnIndex >= ColumnsItemsInternal.Count || CurrentSlot < 0 || CurrentSlot >= SlotCount))
+            {
+                // Data can be reset (for example when flyout-hosted content is detached) before
+                // current-cell state is normalized. Clear stale coordinates before processing.
+                CurrentColumnIndex = -1;
+                CurrentSlot = -1;
+                oldCurrentCell = new DataGridCellCoordinates(-1, -1);
+            }
+
             object newCurrentItem = null;
             if (!IsGroupSlot(slot))
             {
