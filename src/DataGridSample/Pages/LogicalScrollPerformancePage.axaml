@@ -52,8 +52,6 @@
               ItemsSource="{Binding Rows}"
               RowHeightEstimator="{Binding RowHeightEstimator}"
               UseLogicalScrollable="True"
-              KeepRecycledContainersInVisualTree="False"
-              TrimRecycledContainers="True"
               AutoGenerateColumns="False"
               IsReadOnly="True"
               CanUserSortColumns="True"
