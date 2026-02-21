@@ -1304,7 +1304,9 @@ internal
                 {
                     newRowIndex = row.Index;
                 }
-                else if (_mouseOverRowIndex.HasValue && IsPointWithinDisplayedRows(_lastPointerPosition.Value))
+                else if (_mouseOverRowIndex.HasValue &&
+                    IsPointWithinDisplayedRows(_lastPointerPosition.Value) &&
+                    !IsPointOverGroupHeaderOrFooter(_lastPointerPosition.Value))
                 {
                     newRowIndex = _mouseOverRowIndex;
                 }
@@ -1320,6 +1322,49 @@ internal
             }
 
             RefreshPointerOverRowStates();
+        }
+
+        private bool IsPointOverGroupHeaderOrFooter(Point point)
+        {
+            var visual = this.GetVisualAt(point) as Visual;
+            for (var current = visual; current != null; current = current.VisualParent)
+            {
+                if (current is DataGridRowGroupHeader or DataGridRowGroupFooter)
+                {
+                    return true;
+                }
+
+                if (ReferenceEquals(current, this))
+                {
+                    break;
+                }
+            }
+
+            if (_rowsPresenter == null || DisplayData == null)
+            {
+                return false;
+            }
+
+            var presenterPoint = this.TranslatePoint(point, _rowsPresenter) ?? point;
+            foreach (var element in DisplayData.GetScrollingRows())
+            {
+                if (!element.IsVisible)
+                {
+                    continue;
+                }
+
+                if (element is not DataGridRowGroupHeader && element is not DataGridRowGroupFooter)
+                {
+                    continue;
+                }
+
+                if (element.Bounds.Contains(presenterPoint))
+                {
+                    return true;
+                }
+            }
+
+            return false;
         }
 
         private bool IsPointerOverSelfOrDescendant()
