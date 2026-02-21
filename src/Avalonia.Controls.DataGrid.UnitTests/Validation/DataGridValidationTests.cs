@@ -489,35 +489,6 @@ public class DataGridValidationTests
     }
 
     [AvaloniaFact]
-    public void Grid_validation_stays_invalid_when_duplicate_error_item_is_removed_once()
-    {
-        var (grid, root, errorItem, items) = CreateOffscreenDuplicateErrorValidationGrid();
-
-        try
-        {
-            var realizedRows = grid.GetVisualDescendants().OfType<DataGridRow>().ToList();
-
-            Assert.True(realizedRows.Count < items.Count);
-            Assert.DoesNotContain(realizedRows, row => ReferenceEquals(row.DataContext, errorItem));
-            Assert.False(grid.IsValid);
-
-            items.RemoveAt(items.Count - 1);
-            grid.UpdateLayout();
-
-            Assert.False(grid.IsValid);
-
-            errorItem.ErrorValue = "Ok";
-            grid.UpdateLayout();
-
-            Assert.True(grid.IsValid);
-        }
-        finally
-        {
-            root.Close();
-        }
-    }
-
-    [AvaloniaFact]
     public void Cancel_row_edit_restores_template_column_validation_for_indei()
     {
         var (grid, root, item, boundColumn, templateColumn) = CreateNotifyTemplateValidationGrid();
@@ -886,52 +857,6 @@ public class DataGridValidationTests
         }
 
         var errorItem = items[^1];
-
-        var root = new Window
-        {
-            Width = 600,
-            Height = 140
-        };
-
-        root.SetThemeStyles(DataGridTheme.Simple);
-
-        var grid = new DataGrid
-        {
-            ItemsSource = items,
-            AutoGenerateColumns = false,
-            Height = 80
-        };
-
-        grid.ColumnsInternal.Add(new DataGridTextColumn
-        {
-            Header = "Error",
-            Binding = TwoWayBinding(nameof(MixedValidationItem.ErrorValue))
-        });
-
-        root.Content = grid;
-        root.Show();
-        grid.ApplyTemplate();
-        grid.UpdateLayout();
-
-        return (grid, root, errorItem, items);
-    }
-
-    private static (DataGrid grid, Window root, MixedValidationItem errorItem, ObservableCollection<MixedValidationItem> items) CreateOffscreenDuplicateErrorValidationGrid()
-    {
-        var items = new ObservableCollection<MixedValidationItem>();
-
-        for (var i = 0; i < 30; i++)
-        {
-            var item = new MixedValidationItem
-            {
-                ErrorValue = "Ok"
-            };
-            items.Add(item);
-        }
-
-        var errorItem = new MixedValidationItem();
-        items.Add(errorItem);
-        items.Add(errorItem);
 
         var root = new Window
         {

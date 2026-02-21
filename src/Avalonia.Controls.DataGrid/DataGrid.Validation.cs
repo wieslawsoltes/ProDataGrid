@@ -355,7 +355,7 @@ internal
         private void ReevaluateTrackedCollectionValidationItems()
         {
             _collectionValidationItemsWithError.Clear();
-            foreach (var notifyDataErrorInfo in _collectionValidationTrackedItems.Keys)
+            foreach (var notifyDataErrorInfo in _collectionValidationTrackedItems)
             {
                 UpdateTrackedCollectionValidationItemState(notifyDataErrorInfo);
             }
@@ -429,13 +429,11 @@ internal
 
         private void TrackCollectionValidationItem(INotifyDataErrorInfo notifyDataErrorInfo)
         {
-            if (_collectionValidationTrackedItems.TryGetValue(notifyDataErrorInfo, out var count))
+            if (!_collectionValidationTrackedItems.Add(notifyDataErrorInfo))
             {
-                _collectionValidationTrackedItems[notifyDataErrorInfo] = count + 1;
                 return;
             }
 
-            _collectionValidationTrackedItems.Add(notifyDataErrorInfo, 1);
             WeakEventHandlerManager.Subscribe<INotifyDataErrorInfo, DataErrorsChangedEventArgs, DataGrid>(
                 notifyDataErrorInfo,
                 nameof(INotifyDataErrorInfo.ErrorsChanged),
@@ -444,18 +442,11 @@ internal
 
         private void UntrackCollectionValidationItem(INotifyDataErrorInfo notifyDataErrorInfo)
         {
-            if (!_collectionValidationTrackedItems.TryGetValue(notifyDataErrorInfo, out var count))
+            if (!_collectionValidationTrackedItems.Remove(notifyDataErrorInfo))
             {
                 return;
             }
 
-            if (count > 1)
-            {
-                _collectionValidationTrackedItems[notifyDataErrorInfo] = count - 1;
-                return;
-            }
-
-            _collectionValidationTrackedItems.Remove(notifyDataErrorInfo);
             WeakEventHandlerManager.Unsubscribe<DataErrorsChangedEventArgs, DataGrid>(
                 notifyDataErrorInfo,
                 nameof(INotifyDataErrorInfo.ErrorsChanged),
@@ -481,7 +472,7 @@ internal
                 return;
             }
 
-            if (!_collectionValidationTrackedItems.ContainsKey(notifyDataErrorInfo))
+            if (!_collectionValidationTrackedItems.Contains(notifyDataErrorInfo))
             {
                 return;
             }
@@ -492,7 +483,7 @@ internal
 
         private void DetachCollectionValidationTracking()
         {
-            foreach (var notifyDataErrorInfo in _collectionValidationTrackedItems.Keys)
+            foreach (var notifyDataErrorInfo in _collectionValidationTrackedItems)
             {
                 WeakEventHandlerManager.Unsubscribe<DataErrorsChangedEventArgs, DataGrid>(
                     notifyDataErrorInfo,
@@ -567,7 +558,7 @@ internal
         private IDisposable _validationSubscription;
 
         private bool _isValid = true;
-        private readonly Dictionary<INotifyDataErrorInfo, int> _collectionValidationTrackedItems = new(ReferenceEqualityComparer.Instance);
+        private readonly HashSet<INotifyDataErrorInfo> _collectionValidationTrackedItems = new(ReferenceEqualityComparer.Instance);
         private readonly HashSet<INotifyDataErrorInfo> _collectionValidationItemsWithError = new(ReferenceEqualityComparer.Instance);
         private bool _collectionValidationStateInitialized;
         private bool _collectionValidationStateInvalidated = true;
