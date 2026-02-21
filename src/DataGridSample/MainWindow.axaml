@@ -344,6 +344,9 @@
     <TabItem Header="Logical Scroll Stability">
       <pages:LogicalScrollStabilityPage />
     </TabItem>
+    <TabItem Header="Logical Scroll Performance">
+      <pages:LogicalScrollPerformancePage />
+    </TabItem>
     <TabItem Header="Routed events">
       <pages:RoutedEventsPage />
     </TabItem>

@@ -1,7 +1,8 @@
 using System;
-using System.Collections.ObjectModel;
 using System.Collections.Generic;
-using System.Windows.Input;
+using System.Diagnostics;
+using System.Threading.Tasks;
+using DataGridSample.Collections;
 using DataGridSample.Models;
 using DataGridSample.Mvvm;
 
@@ -12,18 +13,21 @@ namespace DataGridSample.ViewModels
         private int _itemCount = 200_000;
         private string _summary = "Items: 0";
         private string _selectedEstimator = "Advanced";
+        private bool _isRegenerating;
 
         public LargeUniformViewModel()
         {
-            Items = new ObservableCollection<PixelItem>();
+            Items = new ObservableRangeCollection<PixelItem>();
             Estimators = new[] { "Advanced", "Caching", "Default" };
-            RegenerateCommand = new RelayCommand(_ => Populate());
-            Populate();
+            RegenerateCommand = new RelayCommand(
+                _ => _ = PopulateAsync(),
+                _ => !IsRegenerating);
+            _ = PopulateAsync();
         }
 
-        public ObservableCollection<PixelItem> Items { get; }
+        public ObservableRangeCollection<PixelItem> Items { get; }
 
-        public ICommand RegenerateCommand { get; }
+        public RelayCommand RegenerateCommand { get; }
 
         public IReadOnlyList<string> Estimators { get; }
 
@@ -45,17 +49,57 @@ namespace DataGridSample.ViewModels
             set => SetProperty(ref _selectedEstimator, value);
         }
 
-        private void Populate()
+        public bool IsRegenerating
         {
-            Items.Clear();
-
-            var random = new Random(17);
-            for (int i = 1; i <= ItemCount; i++)
+            get => _isRegenerating;
+            private set
             {
-                Items.Add(PixelItem.Create(i, random));
+                if (SetProperty(ref _isRegenerating, value))
+                {
+                    RegenerateCommand.RaiseCanExecuteChanged();
+                }
+            }
+        }
+
+        private async Task PopulateAsync()
+        {
+            if (IsRegenerating)
+            {
+                return;
             }
 
-            Summary = $"Items: {Items.Count:n0}";
+            IsRegenerating = true;
+            var targetCount = ItemCount;
+            Summary = $"Items: {targetCount:n0} | Regenerating...";
+
+            var stopwatch = Stopwatch.StartNew();
+            try
+            {
+                var items = await Task.Run(() =>
+                {
+                    var list = new List<PixelItem>(targetCount);
+                    var random = new Random(17);
+                    for (int i = 1; i <= targetCount; i++)
+                    {
+                        list.Add(PixelItem.Create(i, random));
+                    }
+
+                    return list;
+                }).ConfigureAwait(true);
+
+                Items.ResetWith(items);
+
+                stopwatch.Stop();
+                Summary = $"Items: {Items.Count:n0} | Regenerated in {stopwatch.Elapsed.TotalSeconds:N2}s";
+            }
+            catch (Exception ex)
+            {
+                Summary = $"Regenerate failed: {ex.Message}";
+            }
+            finally
+            {
+                IsRegenerating = false;
+            }
         }
     }
 }

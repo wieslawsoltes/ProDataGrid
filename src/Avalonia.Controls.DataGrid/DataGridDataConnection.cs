@@ -1207,6 +1207,7 @@ namespace Avalonia.Controls
 
                 // Notify the summary service about the collection change
                 _owner.OnCollectionChangedForSummaries(e);
+                _owner.OnCollectionChangedForValidation(e);
 
                 if (e.Action == NotifyCollectionChangedAction.Reset)
                 {

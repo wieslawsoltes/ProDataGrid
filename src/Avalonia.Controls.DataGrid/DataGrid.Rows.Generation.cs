@@ -224,7 +224,7 @@ namespace Avalonia.Controls
                 {
                     LoadRowVisualsForDisplay(row);
 
-                    if (_rowsPresenter != null && !_rowsPresenter.Children.Contains(row))
+                    if (!ReferenceEquals(row.Parent, _rowsPresenter))
                     {
                         _rowsPresenter.Children.Add(row);
                     }
@@ -246,7 +246,7 @@ namespace Avalonia.Controls
                     if (groupHeader != null)
                     {
                         groupHeader.TotalIndent = (groupHeader.Level == 0) ? 0 : RowGroupSublevelIndents[groupHeader.Level - 1];
-                        if (_rowsPresenter != null && !_rowsPresenter.Children.Contains(groupHeader))
+                        if (!ReferenceEquals(groupHeader.Parent, _rowsPresenter))
                         {
                             _rowsPresenter.Children.Add(element);
                         }
@@ -255,7 +255,7 @@ namespace Avalonia.Controls
                     }
                     else if (groupFooter != null)
                     {
-                        if (_rowsPresenter != null && !_rowsPresenter.Children.Contains(groupFooter))
+                        if (!ReferenceEquals(groupFooter.Parent, _rowsPresenter))
                         {
                             _rowsPresenter.Children.Add(element);
                         }

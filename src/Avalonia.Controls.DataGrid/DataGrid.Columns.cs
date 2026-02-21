@@ -447,6 +447,8 @@ internal
                 }
             }
 
+            OnColumnBindingChangedForValidation();
+
             if (column.HasSummaries)
             {
                 OnColumnSummariesChanged(column);

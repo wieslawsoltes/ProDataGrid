@@ -81,5 +81,6 @@ The DataGrid sample app includes a "Streaming Updates" tab that simulates a roll
 
 ## Related topics
 
+- [ObservableRangeCollection and Performance](observable-range-collection.md)
 - [Data Sources and Collection Views](data-sources-and-collection-views.md)
 - [Scrolling and Virtualization](scrolling-virtualization.md)

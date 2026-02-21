@@ -8,9 +8,11 @@ using Avalonia.Collections;
 using Avalonia.Controls.Utils;
 using Avalonia.Data;
 using Avalonia.Markup.Xaml.MarkupExtensions;
+using Avalonia.Utilities;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Collections.Specialized;
 using System.ComponentModel;
 
 namespace Avalonia.Controls
@@ -211,31 +213,8 @@ internal
 
         private bool CollectionViewHasError()
         {
-            var collectionView = DataConnection?.CollectionView;
-            if (collectionView == null)
-            {
-                return false;
-            }
-
-            foreach (var item in collectionView)
-            {
-                if (item == null || ReferenceEquals(item, DataGridCollectionView.NewItemPlaceholder))
-                {
-                    continue;
-                }
-
-                if (item is not INotifyDataErrorInfo notifyDataErrorInfo || !notifyDataErrorInfo.HasErrors)
-                {
-                    continue;
-                }
-
-                if (ItemHasError(notifyDataErrorInfo))
-                {
-                    return true;
-                }
-            }
-
-            return false;
+            EnsureCollectionValidationState();
+            return _collectionValidationItemsWithError.Count > 0;
         }
 
         private bool ItemHasError(INotifyDataErrorInfo notifyDataErrorInfo)
@@ -267,6 +246,253 @@ internal
             }
 
             return false;
+        }
+
+        private void OnDataSourceChangedForValidation()
+        {
+            InvalidateCollectionValidationState(clearTracking: true);
+            if (!IsAttachedToVisualTree)
+            {
+                return;
+            }
+
+            UpdateGridValidationState();
+        }
+
+        internal void OnCollectionChangedForValidation(NotifyCollectionChangedEventArgs e)
+        {
+            if (!_collectionValidationStateInitialized)
+            {
+                return;
+            }
+
+            if (e == null)
+            {
+                InvalidateCollectionValidationState(clearTracking: true);
+                UpdateGridValidationState();
+                return;
+            }
+
+            switch (e.Action)
+            {
+                case NotifyCollectionChangedAction.Add:
+                    TrackCollectionValidationItems(e.NewItems);
+                    break;
+                case NotifyCollectionChangedAction.Remove:
+                    UntrackCollectionValidationItems(e.OldItems);
+                    break;
+                case NotifyCollectionChangedAction.Replace:
+                    UntrackCollectionValidationItems(e.OldItems);
+                    TrackCollectionValidationItems(e.NewItems);
+                    break;
+                case NotifyCollectionChangedAction.Move:
+                    return;
+                case NotifyCollectionChangedAction.Reset:
+                    InvalidateCollectionValidationState(clearTracking: true);
+                    break;
+            }
+
+            UpdateGridValidationState();
+        }
+
+        private void OnColumnsChangedForValidation()
+        {
+            if (!_collectionValidationStateInitialized)
+            {
+                return;
+            }
+
+            InvalidateCollectionValidationState(clearTracking: false);
+            UpdateGridValidationState();
+        }
+
+        private void OnColumnBindingChangedForValidation()
+        {
+            OnColumnsChangedForValidation();
+        }
+
+        private void EnsureCollectionValidationState()
+        {
+            if (!_collectionValidationStateInitialized)
+            {
+                BuildCollectionValidationState();
+                return;
+            }
+
+            if (_collectionValidationStateInvalidated)
+            {
+                ReevaluateTrackedCollectionValidationItems();
+            }
+        }
+
+        private void BuildCollectionValidationState()
+        {
+            DetachCollectionValidationTracking();
+
+            var collectionView = DataConnection?.CollectionView;
+            if (collectionView == null)
+            {
+                _collectionValidationStateInitialized = true;
+                _collectionValidationStateInvalidated = false;
+                return;
+            }
+
+            foreach (var item in collectionView)
+            {
+                if (!TryGetCollectionValidationItem(item, out var notifyDataErrorInfo))
+                {
+                    continue;
+                }
+
+                TrackCollectionValidationItem(notifyDataErrorInfo);
+                UpdateTrackedCollectionValidationItemState(notifyDataErrorInfo);
+            }
+
+            _collectionValidationStateInitialized = true;
+            _collectionValidationStateInvalidated = false;
+        }
+
+        private void ReevaluateTrackedCollectionValidationItems()
+        {
+            _collectionValidationItemsWithError.Clear();
+            foreach (var notifyDataErrorInfo in _collectionValidationTrackedItems)
+            {
+                UpdateTrackedCollectionValidationItemState(notifyDataErrorInfo);
+            }
+
+            _collectionValidationStateInvalidated = false;
+        }
+
+        private void InvalidateCollectionValidationState(bool clearTracking)
+        {
+            _collectionValidationStateInvalidated = true;
+            if (!clearTracking)
+            {
+                return;
+            }
+
+            DetachCollectionValidationTracking();
+            _collectionValidationStateInitialized = false;
+        }
+
+        private void TrackCollectionValidationItems(IList items)
+        {
+            if (items == null)
+            {
+                return;
+            }
+
+            foreach (var item in items)
+            {
+                if (!TryGetCollectionValidationItem(item, out var notifyDataErrorInfo))
+                {
+                    continue;
+                }
+
+                TrackCollectionValidationItem(notifyDataErrorInfo);
+                UpdateTrackedCollectionValidationItemState(notifyDataErrorInfo);
+            }
+        }
+
+        private void UntrackCollectionValidationItems(IList items)
+        {
+            if (items == null)
+            {
+                return;
+            }
+
+            foreach (var item in items)
+            {
+                if (item is INotifyDataErrorInfo notifyDataErrorInfo)
+                {
+                    UntrackCollectionValidationItem(notifyDataErrorInfo);
+                }
+            }
+        }
+
+        private static bool TryGetCollectionValidationItem(object item, out INotifyDataErrorInfo notifyDataErrorInfo)
+        {
+            notifyDataErrorInfo = null;
+            if (item == null || ReferenceEquals(item, DataGridCollectionView.NewItemPlaceholder))
+            {
+                return false;
+            }
+
+            if (item is not INotifyDataErrorInfo indei)
+            {
+                return false;
+            }
+
+            notifyDataErrorInfo = indei;
+            return true;
+        }
+
+        private void TrackCollectionValidationItem(INotifyDataErrorInfo notifyDataErrorInfo)
+        {
+            if (!_collectionValidationTrackedItems.Add(notifyDataErrorInfo))
+            {
+                return;
+            }
+
+            WeakEventHandlerManager.Subscribe<INotifyDataErrorInfo, DataErrorsChangedEventArgs, DataGrid>(
+                notifyDataErrorInfo,
+                nameof(INotifyDataErrorInfo.ErrorsChanged),
+                CollectionValidationItem_ErrorsChanged);
+        }
+
+        private void UntrackCollectionValidationItem(INotifyDataErrorInfo notifyDataErrorInfo)
+        {
+            if (!_collectionValidationTrackedItems.Remove(notifyDataErrorInfo))
+            {
+                return;
+            }
+
+            WeakEventHandlerManager.Unsubscribe<DataErrorsChangedEventArgs, DataGrid>(
+                notifyDataErrorInfo,
+                nameof(INotifyDataErrorInfo.ErrorsChanged),
+                CollectionValidationItem_ErrorsChanged);
+            _collectionValidationItemsWithError.Remove(notifyDataErrorInfo);
+        }
+
+        private void UpdateTrackedCollectionValidationItemState(INotifyDataErrorInfo notifyDataErrorInfo)
+        {
+            if (!notifyDataErrorInfo.HasErrors || !ItemHasError(notifyDataErrorInfo))
+            {
+                _collectionValidationItemsWithError.Remove(notifyDataErrorInfo);
+                return;
+            }
+
+            _collectionValidationItemsWithError.Add(notifyDataErrorInfo);
+        }
+
+        private void CollectionValidationItem_ErrorsChanged(object sender, DataErrorsChangedEventArgs e)
+        {
+            if (sender is not INotifyDataErrorInfo notifyDataErrorInfo)
+            {
+                return;
+            }
+
+            if (!_collectionValidationTrackedItems.Contains(notifyDataErrorInfo))
+            {
+                return;
+            }
+
+            UpdateTrackedCollectionValidationItemState(notifyDataErrorInfo);
+            UpdateGridValidationState();
+        }
+
+        private void DetachCollectionValidationTracking()
+        {
+            foreach (var notifyDataErrorInfo in _collectionValidationTrackedItems)
+            {
+                WeakEventHandlerManager.Unsubscribe<DataErrorsChangedEventArgs, DataGrid>(
+                    notifyDataErrorInfo,
+                    nameof(INotifyDataErrorInfo.ErrorsChanged),
+                    CollectionValidationItem_ErrorsChanged);
+            }
+
+            _collectionValidationTrackedItems.Clear();
+            _collectionValidationItemsWithError.Clear();
         }
 
         private static string GetBindingPath(IBinding binding)
@@ -332,6 +558,10 @@ internal
         private IDisposable _validationSubscription;
 
         private bool _isValid = true;
+        private readonly HashSet<INotifyDataErrorInfo> _collectionValidationTrackedItems = new(ReferenceEqualityComparer.Instance);
+        private readonly HashSet<INotifyDataErrorInfo> _collectionValidationItemsWithError = new(ReferenceEqualityComparer.Instance);
+        private bool _collectionValidationStateInitialized;
+        private bool _collectionValidationStateInvalidated = true;
 
 
         public bool IsValid

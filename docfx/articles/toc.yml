@@ -106,6 +106,8 @@
     href: procharts-datagrid-integration.md
 - name: Real-Time Updates
   items:
+  - name: ObservableRangeCollection and Performance
+    href: observable-range-collection.md
   - name: High-Frequency Updates
     href: high-frequency-updates.md
   - name: Hierarchical High-Frequency Updates

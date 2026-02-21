@@ -1,0 +1,72 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:models="clr-namespace:DataGridSample.Models"
+             xmlns:viewModels="clr-namespace:DataGridSample.ViewModels"
+             x:Class="DataGridSample.Pages.LogicalScrollPerformancePage"
+             x:DataType="viewModels:LogicalScrollPerformanceViewModel">
+  <UserControl.DataContext>
+    <viewModels:LogicalScrollPerformanceViewModel />
+  </UserControl.DataContext>
+
+  <Grid RowDefinitions="Auto,Auto,*"
+        RowSpacing="8"
+        Margin="12">
+    <StackPanel Grid.Row="0"
+                Spacing="4">
+      <TextBlock Classes="h2">Logical scroll performance (200k repro)</TextBlock>
+      <TextBlock TextWrapping="Wrap"
+                 Text="Repro from issue #273. Compare mouse wheel versus fast scrollbar thumb drag. Use estimator switch to verify all strategies follow the same drag target smoothly." />
+    </StackPanel>
+
+    <StackPanel Grid.Row="1"
+                Orientation="Horizontal"
+                Spacing="12">
+      <StackPanel Orientation="Horizontal"
+                  Spacing="4">
+        <TextBlock Text="Row Count:"
+                   VerticalAlignment="Center" />
+        <NumericUpDown Minimum="5000"
+                       Maximum="1000000"
+                       Increment="5000"
+                       Width="140"
+                       Value="{Binding ItemCount, Mode=TwoWay}" />
+      </StackPanel>
+
+      <Button Content="Regenerate"
+              Command="{Binding RegenerateCommand}" />
+
+      <StackPanel Orientation="Horizontal"
+                  Spacing="4">
+        <TextBlock Text="Estimator:"
+                   VerticalAlignment="Center" />
+        <ComboBox Width="160"
+                  ItemsSource="{Binding Estimators}"
+                  SelectedItem="{Binding SelectedEstimator, Mode=TwoWay}" />
+      </StackPanel>
+
+      <TextBlock VerticalAlignment="Center"
+                 Text="{Binding Summary}" />
+    </StackPanel>
+
+    <DataGrid Grid.Row="2"
+              ItemsSource="{Binding Rows}"
+              RowHeightEstimator="{Binding RowHeightEstimator}"
+              UseLogicalScrollable="True"
+              AutoGenerateColumns="False"
+              IsReadOnly="True"
+              CanUserSortColumns="True"
+              GridLinesVisibility="All"
+              HeadersVisibility="All"
+              SelectionMode="Extended"
+              SelectionUnit="CellOrRowHeader">
+      <DataGrid.Columns>
+        <DataGridTextColumn Header="Id" Binding="{Binding Id}" Width="90" x:DataType="models:LogicalScrollPerformanceRow" />
+        <DataGridTextColumn Header="Category" Binding="{Binding Category}" Width="130" x:DataType="models:LogicalScrollPerformanceRow" />
+        <DataGridTextColumn Header="Code" Binding="{Binding Code}" Width="130" x:DataType="models:LogicalScrollPerformanceRow" />
+        <DataGridTextColumn Header="Amount" Binding="{Binding Amount, StringFormat={}{0:N2}}" Width="130" x:DataType="models:LogicalScrollPerformanceRow" />
+        <DataGridTextColumn Header="CreatedAt" Binding="{Binding CreatedAt, StringFormat={}{0:yyyy-MM-dd HH:mm:ss}}" Width="220" x:DataType="models:LogicalScrollPerformanceRow" />
+        <DataGridTextColumn Header="Description" Binding="{Binding Description}" Width="*" x:DataType="models:LogicalScrollPerformanceRow" />
+      </DataGrid.Columns>
+    </DataGrid>
+  </Grid>
+</UserControl>

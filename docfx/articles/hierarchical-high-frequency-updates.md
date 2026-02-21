@@ -54,5 +54,6 @@ See the **Hierarchical Streaming Updates** tab in the sample gallery for a full 
 
 ## Related topics
 
+- [ObservableRangeCollection and Performance](observable-range-collection.md)
 - [Hierarchical Data](hierarchical-data.md)
 - [High-Frequency Updates](high-frequency-updates.md)
