@@ -22,7 +22,6 @@ namespace DataGridSample.ViewModels
         private readonly DataGridColumnDefinition _priceColumn;
         private readonly DataGridColumnDefinition _updatedColumn;
         private readonly Dictionary<object, IComparer<TreeItem>> _sortComparers;
-        private readonly IComparer<TreeItem> _defaultComparer;
 
         private string _filterText = string.Empty;
         private string _query = string.Empty;
@@ -30,9 +29,6 @@ namespace DataGridSample.ViewModels
 
         public ColumnDefinitionsHierarchicalStreamingViewModel()
         {
-            _defaultComparer = Comparer<TreeItem>.Create((x, y) =>
-                string.Compare(x?.Name, y?.Name, StringComparison.OrdinalIgnoreCase));
-
             _nameColumn = new DataGridHierarchicalColumnDefinition
             {
                 Header = "Name",
@@ -114,8 +110,6 @@ namespace DataGridSample.ViewModels
                     ApplyFilter();
                 }
             };
-
-            Model.ApplySiblingComparer(_defaultComparer, recursive: true);
         }
 
         public ObservableCollection<DataGridColumnDefinition> ColumnDefinitions { get; }
@@ -182,7 +176,8 @@ namespace DataGridSample.ViewModels
         {
             if (descriptors == null || descriptors.Count == 0)
             {
-                Model.ApplySiblingComparer(_defaultComparer, recursive: true);
+                // Keep comparer disabled when unsorted so range updates stay on the hierarchical fast path.
+                Model.ApplySiblingComparer(null, recursive: true);
                 return;
             }
 
@@ -204,7 +199,7 @@ namespace DataGridSample.ViewModels
 
             if (comparers.Count == 0)
             {
-                Model.ApplySiblingComparer(_defaultComparer, recursive: true);
+                Model.ApplySiblingComparer(null, recursive: true);
                 return;
             }
 
