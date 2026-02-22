@@ -14,6 +14,7 @@ using Avalonia.Controls.Utils;
 using Avalonia.Controls.Shapes;
 using Avalonia.Input;
 using Avalonia.VisualTree;
+using System;
 using System.Linq;
 
 namespace Avalonia.Controls
@@ -38,6 +39,25 @@ internal
 
         bool _isValid = true;
         DataGridValidationSeverity _validationSeverity = DataGridValidationSeverity.None;
+        private CellPseudoClassFlags _pseudoClassFlags;
+        private bool _hasPseudoClassFlags;
+
+        [Flags]
+        private enum CellPseudoClassFlags
+        {
+            None = 0,
+            Selected = 1 << 0,
+            RowSelected = 1 << 1,
+            CellSelected = 1 << 2,
+            Current = 1 << 3,
+            Edited = 1 << 4,
+            Invalid = 1 << 5,
+            Warning = 1 << 6,
+            Info = 1 << 7,
+            Focus = 1 << 8,
+            SearchMatch = 1 << 9,
+            SearchCurrent = 1 << 10
+        }
 
         public static readonly DirectProperty<DataGridCell, bool> IsValidProperty =
             AvaloniaProperty.RegisterDirect<DataGridCell, bool>(
@@ -97,6 +117,7 @@ internal
                 {
                     SetAndRaise(OwningColumnProperty, ref _owningColumn, value);
                     OnOwningColumnSet(value);
+                    ResetPseudoClassCache();
                 }
             }
         }
@@ -106,7 +127,14 @@ internal
         public DataGridRow OwningRow
         {
             get => _owningRow;
-            internal set => SetAndRaise(OwningRowProperty, ref _owningRow, value);
+            internal set
+            {
+                if (_owningRow != value)
+                {
+                    SetAndRaise(OwningRowProperty, ref _owningRow, value);
+                    ResetPseudoClassCache();
+                }
+            }
         }
 
         internal DataGrid OwningGrid
@@ -299,37 +327,151 @@ internal
 
         internal void UpdatePseudoClasses()
         {
-            if (OwningGrid == null || OwningColumn == null || OwningRow == null || !OwningRow.IsVisible || OwningRow.Slot == -1)
+            var owningGrid = OwningGrid;
+            var owningColumn = OwningColumn;
+            var owningRow = OwningRow;
+
+            if (owningGrid == null || owningColumn == null || owningRow == null || !owningRow.IsVisible || owningRow.Slot == -1)
+            {
+                ResetPseudoClassCache();
+                return;
+            }
+
+            bool rowSelected = owningRow.IsSelected;
+            bool cellSelected = owningGrid.SelectionUnit != DataGridSelectionUnit.FullRow
+                && owningGrid.GetCellSelectionFromSlot(owningRow.Slot, ColumnIndex);
+            bool isSelected = owningGrid.SelectionUnit == DataGridSelectionUnit.FullRow
+                ? rowSelected
+                : cellSelected;
+            bool isCurrent = owningGrid.CurrentColumnIndex == owningColumn.Index &&
+                             owningGrid.CurrentSlot == owningRow.Slot;
+            bool isEdited = owningGrid.EditingRow == owningRow &&
+                            owningGrid.EditingColumnIndex == ColumnIndex;
+            bool isInvalid = ValidationSeverity == DataGridValidationSeverity.Error;
+            bool isWarning = ValidationSeverity == DataGridValidationSeverity.Warning;
+            bool isInfo = ValidationSeverity == DataGridValidationSeverity.Info;
+            bool isFocus = owningGrid.IsFocused && isCurrent;
+
+            owningGrid.TryGetSearchCellState(owningRow.Index, owningColumn, out bool isSearchMatch, out bool isSearchCurrent);
+
+            var nextFlags = BuildPseudoClassFlags(
+                isSelected,
+                rowSelected,
+                cellSelected,
+                isCurrent,
+                isEdited,
+                isInvalid,
+                isWarning,
+                isInfo,
+                isFocus,
+                isSearchMatch,
+                isSearchCurrent);
+
+            if (_hasPseudoClassFlags && _pseudoClassFlags == nextFlags)
             {
                 return;
             }
 
-            bool rowSelected = OwningRow.IsSelected;
-            bool cellSelected = OwningGrid.SelectionUnit != DataGridSelectionUnit.FullRow
-                && OwningGrid.GetCellSelectionFromSlot(OwningRow.Slot, ColumnIndex);
-            bool isSelected = OwningGrid.SelectionUnit == DataGridSelectionUnit.FullRow
-                ? rowSelected
-                : cellSelected;
+            SetPseudoClassFlag(":selected", nextFlags, CellPseudoClassFlags.Selected);
+            SetPseudoClassFlag(":row-selected", nextFlags, CellPseudoClassFlags.RowSelected);
+            SetPseudoClassFlag(":cell-selected", nextFlags, CellPseudoClassFlags.CellSelected);
+            SetPseudoClassFlag(":current", nextFlags, CellPseudoClassFlags.Current);
+            SetPseudoClassFlag(":edited", nextFlags, CellPseudoClassFlags.Edited);
+            SetPseudoClassFlag(":invalid", nextFlags, CellPseudoClassFlags.Invalid);
+            SetPseudoClassFlag(":warning", nextFlags, CellPseudoClassFlags.Warning);
+            SetPseudoClassFlag(":info", nextFlags, CellPseudoClassFlags.Info);
+            SetPseudoClassFlag(":focus", nextFlags, CellPseudoClassFlags.Focus);
+            SetPseudoClassFlag(":searchmatch", nextFlags, CellPseudoClassFlags.SearchMatch);
+            SetPseudoClassFlag(":searchcurrent", nextFlags, CellPseudoClassFlags.SearchCurrent);
 
-            PseudoClassesHelper.Set(PseudoClasses, ":selected", isSelected);
-            PseudoClassesHelper.Set(PseudoClasses, ":row-selected", rowSelected);
-            PseudoClassesHelper.Set(PseudoClasses, ":cell-selected", cellSelected);
-            PseudoClassesHelper.Set(PseudoClasses, ":current", IsCurrent);
-            PseudoClassesHelper.Set(PseudoClasses, ":edited", IsEdited);
-            PseudoClassesHelper.Set(PseudoClasses, ":invalid", ValidationSeverity == DataGridValidationSeverity.Error);
-            PseudoClassesHelper.Set(PseudoClasses, ":warning", ValidationSeverity == DataGridValidationSeverity.Warning);
-            PseudoClassesHelper.Set(PseudoClasses, ":info", ValidationSeverity == DataGridValidationSeverity.Info);
-            PseudoClassesHelper.Set(PseudoClasses, ":focus", OwningGrid.IsFocused && IsCurrent);
+            _pseudoClassFlags = nextFlags;
+            _hasPseudoClassFlags = true;
+        }
 
-            bool isSearchMatch = false;
-            bool isSearchCurrent = false;
-            if (OwningGrid != null)
+        private void ResetPseudoClassCache()
+        {
+            _hasPseudoClassFlags = false;
+            _pseudoClassFlags = CellPseudoClassFlags.None;
+        }
+
+        private void SetPseudoClassFlag(string pseudoClass, CellPseudoClassFlags nextFlags, CellPseudoClassFlags flag)
+        {
+            if (!_hasPseudoClassFlags || ((_pseudoClassFlags ^ nextFlags) & flag) != 0)
             {
-                OwningGrid.TryGetSearchCellState(OwningRow.Index, OwningColumn, out isSearchMatch, out isSearchCurrent);
+                PseudoClassesHelper.Set(PseudoClasses, pseudoClass, (nextFlags & flag) != 0);
+            }
+        }
+
+        private static CellPseudoClassFlags BuildPseudoClassFlags(
+            bool isSelected,
+            bool rowSelected,
+            bool cellSelected,
+            bool isCurrent,
+            bool isEdited,
+            bool isInvalid,
+            bool isWarning,
+            bool isInfo,
+            bool isFocus,
+            bool isSearchMatch,
+            bool isSearchCurrent)
+        {
+            var flags = CellPseudoClassFlags.None;
+            if (isSelected)
+            {
+                flags |= CellPseudoClassFlags.Selected;
             }
 
-            PseudoClassesHelper.Set(PseudoClasses, ":searchmatch", isSearchMatch);
-            PseudoClassesHelper.Set(PseudoClasses, ":searchcurrent", isSearchCurrent);
+            if (rowSelected)
+            {
+                flags |= CellPseudoClassFlags.RowSelected;
+            }
+
+            if (cellSelected)
+            {
+                flags |= CellPseudoClassFlags.CellSelected;
+            }
+
+            if (isCurrent)
+            {
+                flags |= CellPseudoClassFlags.Current;
+            }
+
+            if (isEdited)
+            {
+                flags |= CellPseudoClassFlags.Edited;
+            }
+
+            if (isInvalid)
+            {
+                flags |= CellPseudoClassFlags.Invalid;
+            }
+
+            if (isWarning)
+            {
+                flags |= CellPseudoClassFlags.Warning;
+            }
+
+            if (isInfo)
+            {
+                flags |= CellPseudoClassFlags.Info;
+            }
+
+            if (isFocus)
+            {
+                flags |= CellPseudoClassFlags.Focus;
+            }
+
+            if (isSearchMatch)
+            {
+                flags |= CellPseudoClassFlags.SearchMatch;
+            }
+
+            if (isSearchCurrent)
+            {
+                flags |= CellPseudoClassFlags.SearchCurrent;
+            }
+
+            return flags;
         }
 
         // Makes sure the right gridline has the proper stroke and visibility. If lastVisibleColumn is specified, the 
