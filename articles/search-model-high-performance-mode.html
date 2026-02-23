@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+      <title>Search Model: High-Performance Mode | ProDataGrid for Avalonia </title>
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <meta name="title" content="Search Model: High-Performance Mode | ProDataGrid for Avalonia ">
+      
+      
+      <link rel="icon" href="../favicon.ico">
+      <link rel="stylesheet" href="../public/docfx.min.css">
+      <link rel="stylesheet" href="../public/main.css">
+      <meta name="docfx:navrel" content="../toc.html">
+      <meta name="docfx:tocrel" content="toc.html">
+      
+      
+      
+      
+      <meta name="docfx:docurl" content="https://github.com/wieslawsoltes/ProDataGrid/blob/master/docfx/articles/search-model-high-performance-mode.md/#L1">
+      <meta name="loc:inThisArticle" content="In this article">
+      <meta name="loc:searchResultsCount" content="{count} results for &quot;{query}&quot;">
+      <meta name="loc:searchNoResults" content="No results for &quot;{query}&quot;">
+      <meta name="loc:tocFilter" content="Filter by title">
+      <meta name="loc:nextArticle" content="Next">
+      <meta name="loc:prevArticle" content="Previous">
+      <meta name="loc:themeLight" content="Light">
+      <meta name="loc:themeDark" content="Dark">
+      <meta name="loc:themeAuto" content="Auto">
+      <meta name="loc:changeTheme" content="Change theme">
+      <meta name="loc:copy" content="Copy">
+      <meta name="loc:downloadPdf" content="Download PDF">
+
+      <script type="module" src="./../public/docfx.min.js"></script>
+
+      <script>
+        const theme = localStorage.getItem('theme') || 'auto'
+        document.documentElement.setAttribute('data-bs-theme', theme === 'auto' ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light') : theme)
+      </script>
+
+  </head>
+
+  <body class="tex2jax_ignore" data-layout="" data-yaml-mime="">
+    <header class="bg-body border-bottom">
+      <nav id="autocollapse" class="navbar navbar-expand-md" role="navigation">
+        <div class="container-xxl flex-nowrap">
+          <a class="navbar-brand" href="../index.html">
+            <img id="logo" class="svg" src="../images/logo.svg" alt="">
+            
+          </a>
+          <button class="btn btn-lg d-md-none border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navpanel" aria-controls="navpanel" aria-expanded="false" aria-label="Toggle navigation">
+            <i class="bi bi-three-dots"></i>
+          </button>
+          <div class="collapse navbar-collapse" id="navpanel">
+            <div id="navbar">
+            </div>
+          </div>
+        </div>
+      </nav>
+    </header>
+
+    <main class="container-xxl">
+      <div class="toc-offcanvas">
+        <div class="offcanvas-md offcanvas-start" tabindex="-1" id="tocOffcanvas" aria-labelledby="tocOffcanvasLabel">
+          <div class="offcanvas-header">
+            <h5 class="offcanvas-title" id="tocOffcanvasLabel">Table of Contents</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="offcanvas" data-bs-target="#tocOffcanvas" aria-label="Close"></button>
+          </div>
+          <div class="offcanvas-body">
+            <nav class="toc" id="toc"></nav>
+          </div>
+        </div>
+      </div>
+
+      <div class="content">
+        <div class="actionbar">
+          <button class="btn btn-lg border-0 d-md-none" type="button" data-bs-toggle="offcanvas" data-bs-target="#tocOffcanvas" aria-controls="tocOffcanvas" aria-expanded="false" aria-label="Show table of contents">
+            <i class="bi bi-list"></i>
+          </button>
+
+          <nav id="breadcrumb"></nav>
+        </div>
+
+        <article data-uid="">
+<h1 id="search-model-high-performance-mode">Search Model: High-Performance Mode</h1>
+
+<p>This guide explains the high-performance search mode designed for large, frequently changing collections (for example, streaming updates with 50k to 500k rows).</p>
+<p>The mode preserves all existing <code>SearchModel</code> features and navigation behavior, while reducing expensive full recomputation during add/remove/replace update bursts.</p>
+<h2 id="when-to-use-this-mode">When to use this mode</h2>
+<p>Use high-performance mode when all of the following are true:</p>
+<ul>
+<li>You already use <code>SearchModel</code>.</li>
+<li>Your <code>ItemsSource</code> changes frequently (streaming, rolling windows, incremental ingest).</li>
+<li>Search recomputation is a visible bottleneck.</li>
+</ul>
+<h2 id="what-this-mode-changes">What this mode changes</h2>
+<p>When enabled, accessor-based search can apply many collection changes incrementally instead of recomputing all results every time.</p>
+<p>Key points:</p>
+<ul>
+<li>It is enabled by default for <code>DataGridAccessorSearchAdapter</code>.</li>
+<li>You can disable it if you need to force full recomputation behavior.</li>
+<li>It works best with accessor-based columns (fast path).</li>
+<li>It can track item property changes, or skip them for maximum throughput.</li>
+</ul>
+<h2 id="api-surface">API surface</h2>
+<p>The mode is controlled by <code>DataGridFastPathOptions</code>:</p>
+<ul>
+<li><code>EnableHighPerformanceSearching</code> (default: <code>true</code>)</li>
+<li><code>HighPerformanceSearchTrackItemChanges</code> (default: <code>true</code>)</li>
+</ul>
+<p>You usually combine it with:</p>
+<ul>
+<li><code>UseAccessorsOnly</code></li>
+<li>optional <code>ThrowOnMissingAccessor</code> during rollout</li>
+</ul>
+<h2 id="recommended-configurations">Recommended configurations</h2>
+<h3 id="streaming-appendremove-highest-throughput">Streaming append/remove (highest throughput)</h3>
+<p>Use this when your rows are mostly added/removed and existing row values rarely change:</p>
+<pre><code class="lang-csharp">grid.FastPathOptions = new DataGridFastPathOptions
+{
+    UseAccessorsOnly = true,
+    EnableHighPerformanceSearching = true,
+    HighPerformanceSearchTrackItemChanges = false
+};
+</code></pre>
+<h3 id="mixed-updates-rows-also-mutate-in-place">Mixed updates (rows also mutate in place)</h3>
+<p>Use this when existing row properties change and those changes must immediately affect search results:</p>
+<pre><code class="lang-csharp">grid.FastPathOptions = new DataGridFastPathOptions
+{
+    UseAccessorsOnly = true,
+    EnableHighPerformanceSearching = true,
+    HighPerformanceSearchTrackItemChanges = true
+};
+</code></pre>
+<h2 id="end-to-end-setup">End-to-end setup</h2>
+<h2 id="1-keep-normal-searchmodel-wiring">1. Keep normal SearchModel wiring</h2>
+<pre><code class="lang-csharp">public SearchModel SearchModel { get; } = new()
+{
+    HighlightMode = SearchHighlightMode.TextAndCell,
+    HighlightCurrent = true,
+    WrapNavigation = true
+};
+</code></pre>
+<pre><code class="lang-xml">&lt;DataGrid ItemsSource=&quot;{Binding View}&quot;
+          SearchModel=&quot;{Binding SearchModel}&quot; /&gt;
+</code></pre>
+<h2 id="2-configure-fast-path-options-on-the-datagrid">2. Configure fast-path options on the DataGrid</h2>
+<p><code>FastPathOptions</code> is a CLR property, so assign it in code-behind or view setup:</p>
+<pre><code class="lang-csharp">StreamingGrid.FastPathOptions = new DataGridFastPathOptions
+{
+    UseAccessorsOnly = true,
+    EnableHighPerformanceSearching = true,
+    HighPerformanceSearchTrackItemChanges = false
+};
+</code></pre>
+<p>You only need to set <code>EnableHighPerformanceSearching</code> explicitly when you want to turn it off.</p>
+<pre><code class="lang-csharp">StreamingGrid.FastPathOptions = new DataGridFastPathOptions
+{
+    UseAccessorsOnly = true,
+    EnableHighPerformanceSearching = false
+};
+</code></pre>
+<h2 id="3-use-accessor-based-search-adapter-recommended">3. Use accessor-based search adapter (recommended)</h2>
+<p>If you configure a custom search adapter factory, use the accessor adapter factory:</p>
+<pre><code class="lang-xml">&lt;UserControl.Resources&gt;
+  &lt;dataGridSearching:DataGridAccessorSearchAdapterFactory x:Key=&quot;AccessorSearchAdapterFactory&quot; /&gt;
+&lt;/UserControl.Resources&gt;
+
+&lt;DataGrid SearchAdapterFactory=&quot;{StaticResource AccessorSearchAdapterFactory}&quot; /&gt;
+</code></pre>
+<p>If you do not override <code>SearchAdapterFactory</code>, <code>DataGrid</code> will still create the accessor adapter automatically when <code>UseAccessorsOnly = true</code>.</p>
+<h2 id="4-ensure-columns-provide-accessors">4. Ensure columns provide accessors</h2>
+<p>For column definitions, prefer <code>DataGridBindingDefinition</code>/typed binding helpers so accessors are available.</p>
+<p>For custom or template columns, provide <code>ValueAccessor</code> (or equivalent options) so searching can remain on the fast path.</p>
+<p>If a required accessor is missing:</p>
+<ul>
+<li>with <code>ThrowOnMissingAccessor = false</code>: that column is skipped and a diagnostic event is raised.</li>
+<li>with <code>ThrowOnMissingAccessor = true</code>: searching throws for the missing column (useful in development/CI).</li>
+</ul>
+<h2 id="behavior-and-fallbacks">Behavior and fallbacks</h2>
+<p>High-performance search applies incremental updates when safe. It falls back to full recompute when needed to preserve correctness.</p>
+<p>Typical fallback triggers:</p>
+<ul>
+<li>Search descriptor set changes.</li>
+<li>Collection reset.</li>
+<li>Unsupported/ambiguous change patterns where row mapping cannot be resolved safely.</li>
+</ul>
+<p>This is intentional: correctness first, performance where safe.</p>
+<h2 id="practical-tuning-checklist">Practical tuning checklist</h2>
+<ul>
+<li>Start with:
+<ul>
+<li><code>UseAccessorsOnly = true</code></li>
+<li><code>EnableHighPerformanceSearching = true</code></li>
+<li><code>HighPerformanceSearchTrackItemChanges = false</code> (streaming)</li>
+</ul>
+</li>
+<li>If in-place row edits must update search immediately, switch <code>HighPerformanceSearchTrackItemChanges</code> to <code>true</code>.</li>
+<li>During rollout, set <code>ThrowOnMissingAccessor = true</code> in dev/test to catch incomplete column accessor wiring.</li>
+<li>Keep your existing <code>SearchModel</code> descriptors/navigation unchanged; only infrastructure changes.</li>
+</ul>
+<h2 id="sample-reference-column-definitions---streaming-models">Sample reference: Column Definitions - Streaming Models</h2>
+<p>The sample app includes a full implementation:</p>
+<ul>
+<li><code>src/DataGridSample/ViewModels/ColumnDefinitionsStreamingModelsViewModel.cs</code></li>
+<li><code>src/DataGridSample/Pages/ColumnDefinitionsStreamingModelsPage.axaml</code></li>
+<li><code>src/DataGridSample/Pages/ColumnDefinitionsStreamingModelsPage.axaml.cs</code></li>
+</ul>
+<p>The sample enables:</p>
+<ul>
+<li><code>UseAccessorsOnly = true</code></li>
+<li><code>EnableHighPerformanceSearching = true</code></li>
+<li><code>HighPerformanceSearchTrackItemChanges = false</code></li>
+</ul>
+<p>This is the recommended baseline for high-volume streaming scenarios where row mutations are rare.</p>
+<h2 id="related-articles">Related articles</h2>
+<ul>
+<li><a href="search-model-end-to-end.html">Search Model: End-to-End Usage</a></li>
+<li><a href="column-definitions-fast-path-overview.html">Column Definitions: Fast Path Overview</a></li>
+<li><a href="high-frequency-updates.html">High-Frequency Updates</a></li>
+<li><a href="column-definitions-hot-path.html">Column Definitions: Hot Path Integration</a></li>
+</ul>
+
+</article>
+
+        <div class="contribution d-print-none">
+          <a href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/docfx/articles/search-model-high-performance-mode.md/#L1" class="edit-link">Edit this page</a>
+        </div>
+
+        <div class="next-article d-print-none border-top" id="nextArticle"></div>
+
+      </div>
+
+      <div class="affix">
+        <nav id="affix"></nav>
+      </div>
+    </main>
+
+
+    <footer class="border-top text-secondary">
+      <div class="container-xxl">
+        <div class="flex-fill">
+          <span>Made with <a href="https://dotnet.github.io/docfx">docfx</a></span>
+        </div>
+      </div>
+    </footer>
+  </body>
+</html>

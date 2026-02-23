@@ -175,10 +175,15 @@ SearchModel.SetOrUpdate(new SearchDescriptor(
 <pre><code class="lang-csharp">Grid.FastPathOptions = new DataGridFastPathOptions
 {
     UseAccessorsOnly = true,
-    ThrowOnMissingAccessor = true
+    ThrowOnMissingAccessor = true,
+    EnableHighPerformanceSearching = true,
+    HighPerformanceSearchTrackItemChanges = true
 };
 </code></pre>
 <p><code>FastPathOptions</code> controls filtering and searching adapters. Sorting uses accessors automatically when they are present.</p>
+<p><code>EnableHighPerformanceSearching</code> is enabled by default for accessor search adapters. Set it to <code>false</code> if you need legacy full-recompute behavior for diagnostics or comparison:</p>
+<pre><code class="lang-csharp">Grid.FastPathOptions.EnableHighPerformanceSearching = false;
+</code></pre>
 <p>Optional: if you prefer explicit adapter factories, use the built-in accessor factories:</p>
 <pre><code class="lang-xml">&lt;!-- Add namespaces: dataGridFiltering, dataGridSearching --&gt;
 &lt;UserControl.Resources&gt;

@@ -85,7 +85,7 @@
 
 
   <h1 id="Avalonia_Controls_DataGridSearching_DataGridSearchAdapter" data-uid="Avalonia.Controls.DataGridSearching.DataGridSearchAdapter" class="text-break">
-Class DataGridSearchAdapter  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/Searching/DataGridSearchAdapter.cs/#L29"><i class="bi bi-code-slash"></i></a>
+Class DataGridSearchAdapter  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/Searching/DataGridSearchAdapter.cs/#L30"><i class="bi bi-code-slash"></i></a>
   </h1>
 
   <div class="facts text-secondary">
@@ -166,7 +166,7 @@ public class DataGridSearchAdapter : IDisposable</code></pre>
 
   <h3 id="Avalonia_Controls_DataGridSearching_DataGridSearchAdapter__ctor_Avalonia_Controls_DataGridSearching_ISearchModel_System_Func_System_Collections_Generic_IEnumerable_Avalonia_Controls_DataGridColumn___" data-uid="Avalonia.Controls.DataGridSearching.DataGridSearchAdapter.#ctor(Avalonia.Controls.DataGridSearching.ISearchModel,System.Func{System.Collections.Generic.IEnumerable{Avalonia.Controls.DataGridColumn}})">
   DataGridSearchAdapter(ISearchModel, Func&lt;IEnumerable&lt;DataGridColumn&gt;&gt;)
-  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/Searching/DataGridSearchAdapter.cs/#L44"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/Searching/DataGridSearchAdapter.cs/#L47"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"></div>
@@ -199,11 +199,42 @@ public class DataGridSearchAdapter : IDisposable</code></pre>
 </h2>
 
 
+  <a id="Avalonia_Controls_DataGridSearching_DataGridSearchAdapter_TrackItemPropertyChanges_" data-uid="Avalonia.Controls.DataGridSearching.DataGridSearchAdapter.TrackItemPropertyChanges*"></a>
+
+  <h3 id="Avalonia_Controls_DataGridSearching_DataGridSearchAdapter_TrackItemPropertyChanges" data-uid="Avalonia.Controls.DataGridSearching.DataGridSearchAdapter.TrackItemPropertyChanges">
+  TrackItemPropertyChanges
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/Searching/DataGridSearchAdapter.cs/#L117"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">protected virtual bool TrackItemPropertyChanges { get; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
   <a id="Avalonia_Controls_DataGridSearching_DataGridSearchAdapter_View_" data-uid="Avalonia.Controls.DataGridSearching.DataGridSearchAdapter.View*"></a>
 
   <h3 id="Avalonia_Controls_DataGridSearching_DataGridSearchAdapter_View" data-uid="Avalonia.Controls.DataGridSearching.DataGridSearchAdapter.View">
   View
-  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/Searching/DataGridSearchAdapter.cs/#L62"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/Searching/DataGridSearchAdapter.cs/#L65"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"></div>
@@ -238,7 +269,7 @@ public class DataGridSearchAdapter : IDisposable</code></pre>
 
   <h3 id="Avalonia_Controls_DataGridSearching_DataGridSearchAdapter_AttachView_Avalonia_Collections_IDataGridCollectionView_" data-uid="Avalonia.Controls.DataGridSearching.DataGridSearchAdapter.AttachView(Avalonia.Collections.IDataGridCollectionView)">
   AttachView(IDataGridCollectionView)
-  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/Searching/DataGridSearchAdapter.cs/#L69"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/Searching/DataGridSearchAdapter.cs/#L72"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"></div>
@@ -269,7 +300,7 @@ public class DataGridSearchAdapter : IDisposable</code></pre>
 
   <h3 id="Avalonia_Controls_DataGridSearching_DataGridSearchAdapter_Dispose" data-uid="Avalonia.Controls.DataGridSearching.DataGridSearchAdapter.Dispose">
   Dispose()
-  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/Searching/DataGridSearchAdapter.cs/#L95"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/Searching/DataGridSearchAdapter.cs/#L98"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.</p>
@@ -292,11 +323,75 @@ public class DataGridSearchAdapter : IDisposable</code></pre>
 
 
 
+  <a id="Avalonia_Controls_DataGridSearching_DataGridSearchAdapter_OnViewCollectionChanged_" data-uid="Avalonia.Controls.DataGridSearching.DataGridSearchAdapter.OnViewCollectionChanged*"></a>
+
+  <h3 id="Avalonia_Controls_DataGridSearching_DataGridSearchAdapter_OnViewCollectionChanged_System_Collections_Specialized_NotifyCollectionChangedEventArgs_" data-uid="Avalonia.Controls.DataGridSearching.DataGridSearchAdapter.OnViewCollectionChanged(System.Collections.Specialized.NotifyCollectionChangedEventArgs)">
+  OnViewCollectionChanged(NotifyCollectionChangedEventArgs)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/Searching/DataGridSearchAdapter.cs/#L119"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">protected virtual void OnViewCollectionChanged(NotifyCollectionChangedEventArgs e)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>e</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.specialized.notifycollectionchangedeventargs">NotifyCollectionChangedEventArgs</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Avalonia_Controls_DataGridSearching_DataGridSearchAdapter_OnViewItemPropertyChanged_" data-uid="Avalonia.Controls.DataGridSearching.DataGridSearchAdapter.OnViewItemPropertyChanged*"></a>
+
+  <h3 id="Avalonia_Controls_DataGridSearching_DataGridSearchAdapter_OnViewItemPropertyChanged_System_Object_System_ComponentModel_PropertyChangedEventArgs_" data-uid="Avalonia.Controls.DataGridSearching.DataGridSearchAdapter.OnViewItemPropertyChanged(System.Object,System.ComponentModel.PropertyChangedEventArgs)">
+  OnViewItemPropertyChanged(object, PropertyChangedEventArgs)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/Searching/DataGridSearchAdapter.cs/#L123"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">protected virtual void OnViewItemPropertyChanged(object sender, PropertyChangedEventArgs e)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>sender</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object">object</a></dt>
+    <dd></dd>
+    <dt><code>e</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.componentmodel.propertychangedeventargs">PropertyChangedEventArgs</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+
   <a id="Avalonia_Controls_DataGridSearching_DataGridSearchAdapter_TryApplyModelToView_" data-uid="Avalonia.Controls.DataGridSearching.DataGridSearchAdapter.TryApplyModelToView*"></a>
 
   <h3 id="Avalonia_Controls_DataGridSearching_DataGridSearchAdapter_TryApplyModelToView_System_Collections_Generic_IReadOnlyList_Avalonia_Controls_DataGridSearching_SearchDescriptor__System_Collections_Generic_IReadOnlyList_Avalonia_Controls_DataGridSearching_SearchDescriptor__System_Collections_Generic_IReadOnlyList_Avalonia_Controls_DataGridSearching_SearchResult___" data-uid="Avalonia.Controls.DataGridSearching.DataGridSearchAdapter.TryApplyModelToView(System.Collections.Generic.IReadOnlyList{Avalonia.Controls.DataGridSearching.SearchDescriptor},System.Collections.Generic.IReadOnlyList{Avalonia.Controls.DataGridSearching.SearchDescriptor},System.Collections.Generic.IReadOnlyList{Avalonia.Controls.DataGridSearching.SearchResult}@)">
   TryApplyModelToView(IReadOnlyList&lt;SearchDescriptor&gt;, IReadOnlyList&lt;SearchDescriptor&gt;, out IReadOnlyList&lt;SearchResult&gt;)
-  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/Searching/DataGridSearchAdapter.cs/#L104"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/Searching/DataGridSearchAdapter.cs/#L108"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"></div>
@@ -336,7 +431,7 @@ public class DataGridSearchAdapter : IDisposable</code></pre>
 </article>
 
         <div class="contribution d-print-none">
-          <a href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/Searching/DataGridSearchAdapter.cs/#L29" class="edit-link">Edit this page</a>
+          <a href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/Searching/DataGridSearchAdapter.cs/#L30" class="edit-link">Edit this page</a>
         </div>
 
 

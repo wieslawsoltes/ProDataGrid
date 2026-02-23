@@ -9309,6 +9309,16 @@
     },
     {
       "type": "Conceptual",
+      "source_relative_path": "articles/search-model-high-performance-mode.md",
+      "output": {
+        ".html": {
+          "relative_path": "articles/search-model-high-performance-mode.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "Conceptual",
       "source_relative_path": "articles/selection-and-navigation.md",
       "output": {
         ".html": {

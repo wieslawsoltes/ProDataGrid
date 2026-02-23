@@ -85,7 +85,7 @@
 
 
   <h1 id="Avalonia_Controls_DataGridSearching_DataGridAccessorSearchAdapter" data-uid="Avalonia.Controls.DataGridSearching.DataGridAccessorSearchAdapter" class="text-break">
-Class DataGridAccessorSearchAdapter  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/Searching/DataGridAccessorSearchAdapter.cs/#L21"><i class="bi bi-code-slash"></i></a>
+Class DataGridAccessorSearchAdapter  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/Searching/DataGridAccessorSearchAdapter.cs/#L24"><i class="bi bi-code-slash"></i></a>
   </h1>
 
   <div class="facts text-secondary">
@@ -165,7 +165,7 @@ Class DataGridAccessorSearchAdapter  <a class="header-action link-secondary" tit
 
   <h3 id="Avalonia_Controls_DataGridSearching_DataGridAccessorSearchAdapter__ctor_Avalonia_Controls_DataGridSearching_ISearchModel_System_Func_System_Collections_Generic_IEnumerable_Avalonia_Controls_DataGridColumn___Avalonia_Controls_DataGridFastPathOptions_" data-uid="Avalonia.Controls.DataGridSearching.DataGridAccessorSearchAdapter.#ctor(Avalonia.Controls.DataGridSearching.ISearchModel,System.Func{System.Collections.Generic.IEnumerable{Avalonia.Controls.DataGridColumn}},Avalonia.Controls.DataGridFastPathOptions)">
   DataGridAccessorSearchAdapter(ISearchModel, Func&lt;IEnumerable&lt;DataGridColumn&gt;&gt;, DataGridFastPathOptions)
-  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/Searching/DataGridAccessorSearchAdapter.cs/#L31"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/Searching/DataGridAccessorSearchAdapter.cs/#L38"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"></div>
@@ -196,15 +196,114 @@ Class DataGridAccessorSearchAdapter  <a class="header-action link-secondary" tit
 
 
 
+  <h2 class="section" id="properties">Properties
+</h2>
+
+
+  <a id="Avalonia_Controls_DataGridSearching_DataGridAccessorSearchAdapter_TrackItemPropertyChanges_" data-uid="Avalonia.Controls.DataGridSearching.DataGridAccessorSearchAdapter.TrackItemPropertyChanges*"></a>
+
+  <h3 id="Avalonia_Controls_DataGridSearching_DataGridAccessorSearchAdapter_TrackItemPropertyChanges" data-uid="Avalonia.Controls.DataGridSearching.DataGridAccessorSearchAdapter.TrackItemPropertyChanges">
+  TrackItemPropertyChanges
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/Searching/DataGridAccessorSearchAdapter.cs/#L55"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">protected override bool TrackItemPropertyChanges { get; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
   <h2 class="section" id="methods">Methods
 </h2>
+
+
+  <a id="Avalonia_Controls_DataGridSearching_DataGridAccessorSearchAdapter_OnViewCollectionChanged_" data-uid="Avalonia.Controls.DataGridSearching.DataGridAccessorSearchAdapter.OnViewCollectionChanged*"></a>
+
+  <h3 id="Avalonia_Controls_DataGridSearching_DataGridAccessorSearchAdapter_OnViewCollectionChanged_System_Collections_Specialized_NotifyCollectionChangedEventArgs_" data-uid="Avalonia.Controls.DataGridSearching.DataGridAccessorSearchAdapter.OnViewCollectionChanged(System.Collections.Specialized.NotifyCollectionChangedEventArgs)">
+  OnViewCollectionChanged(NotifyCollectionChangedEventArgs)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/Searching/DataGridAccessorSearchAdapter.cs/#L58"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">protected override void OnViewCollectionChanged(NotifyCollectionChangedEventArgs e)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>e</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.specialized.notifycollectionchangedeventargs">NotifyCollectionChangedEventArgs</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Avalonia_Controls_DataGridSearching_DataGridAccessorSearchAdapter_OnViewItemPropertyChanged_" data-uid="Avalonia.Controls.DataGridSearching.DataGridAccessorSearchAdapter.OnViewItemPropertyChanged*"></a>
+
+  <h3 id="Avalonia_Controls_DataGridSearching_DataGridAccessorSearchAdapter_OnViewItemPropertyChanged_System_Object_System_ComponentModel_PropertyChangedEventArgs_" data-uid="Avalonia.Controls.DataGridSearching.DataGridAccessorSearchAdapter.OnViewItemPropertyChanged(System.Object,System.ComponentModel.PropertyChangedEventArgs)">
+  OnViewItemPropertyChanged(object, PropertyChangedEventArgs)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/Searching/DataGridAccessorSearchAdapter.cs/#L68"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">protected override void OnViewItemPropertyChanged(object sender, PropertyChangedEventArgs e)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>sender</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object">object</a></dt>
+    <dd></dd>
+    <dt><code>e</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.componentmodel.propertychangedeventargs">PropertyChangedEventArgs</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
 
 
   <a id="Avalonia_Controls_DataGridSearching_DataGridAccessorSearchAdapter_TryApplyModelToView_" data-uid="Avalonia.Controls.DataGridSearching.DataGridAccessorSearchAdapter.TryApplyModelToView*"></a>
 
   <h3 id="Avalonia_Controls_DataGridSearching_DataGridAccessorSearchAdapter_TryApplyModelToView_System_Collections_Generic_IReadOnlyList_Avalonia_Controls_DataGridSearching_SearchDescriptor__System_Collections_Generic_IReadOnlyList_Avalonia_Controls_DataGridSearching_SearchDescriptor__System_Collections_Generic_IReadOnlyList_Avalonia_Controls_DataGridSearching_SearchResult___" data-uid="Avalonia.Controls.DataGridSearching.DataGridAccessorSearchAdapter.TryApplyModelToView(System.Collections.Generic.IReadOnlyList{Avalonia.Controls.DataGridSearching.SearchDescriptor},System.Collections.Generic.IReadOnlyList{Avalonia.Controls.DataGridSearching.SearchDescriptor},System.Collections.Generic.IReadOnlyList{Avalonia.Controls.DataGridSearching.SearchResult}@)">
   TryApplyModelToView(IReadOnlyList&lt;SearchDescriptor&gt;, IReadOnlyList&lt;SearchDescriptor&gt;, out IReadOnlyList&lt;SearchResult&gt;)
-  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/Searching/DataGridAccessorSearchAdapter.cs/#L42"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/Searching/DataGridAccessorSearchAdapter.cs/#L87"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"></div>
@@ -244,7 +343,7 @@ Class DataGridAccessorSearchAdapter  <a class="header-action link-secondary" tit
 </article>
 
         <div class="contribution d-print-none">
-          <a href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/Searching/DataGridAccessorSearchAdapter.cs/#L21" class="edit-link">Edit this page</a>
+          <a href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/Searching/DataGridAccessorSearchAdapter.cs/#L24" class="edit-link">Edit this page</a>
         </div>
 
 
