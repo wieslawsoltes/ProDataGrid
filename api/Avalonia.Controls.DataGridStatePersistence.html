@@ -1,0 +1,737 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+      <title>Class DataGridStatePersistence | ProDataGrid for Avalonia </title>
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <meta name="title" content="Class DataGridStatePersistence | ProDataGrid for Avalonia ">
+      
+      <meta name="description" content="Provides persistence helpers to capture/restore DataGrid state as string or byte[] payloads.">
+      <link rel="icon" href="../favicon.ico">
+      <link rel="stylesheet" href="../public/docfx.min.css">
+      <link rel="stylesheet" href="../public/main.css">
+      <meta name="docfx:navrel" content="../toc.html">
+      <meta name="docfx:tocrel" content="toc.html">
+      
+      
+      
+      
+      <meta name="docfx:docurl" content="https://github.com/wieslawsoltes/ProDataGrid/new/master/apiSpec/new?filename=Avalonia_Controls_DataGridStatePersistence.md&amp;value=---%0Auid%3A%20Avalonia.Controls.DataGridStatePersistence%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">
+      <meta name="loc:inThisArticle" content="In this article">
+      <meta name="loc:searchResultsCount" content="{count} results for &quot;{query}&quot;">
+      <meta name="loc:searchNoResults" content="No results for &quot;{query}&quot;">
+      <meta name="loc:tocFilter" content="Filter by title">
+      <meta name="loc:nextArticle" content="Next">
+      <meta name="loc:prevArticle" content="Previous">
+      <meta name="loc:themeLight" content="Light">
+      <meta name="loc:themeDark" content="Dark">
+      <meta name="loc:themeAuto" content="Auto">
+      <meta name="loc:changeTheme" content="Change theme">
+      <meta name="loc:copy" content="Copy">
+      <meta name="loc:downloadPdf" content="Download PDF">
+
+      <script type="module" src="./../public/docfx.min.js"></script>
+
+      <script>
+        const theme = localStorage.getItem('theme') || 'auto'
+        document.documentElement.setAttribute('data-bs-theme', theme === 'auto' ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light') : theme)
+      </script>
+
+  </head>
+
+  <body class="tex2jax_ignore" data-layout="" data-yaml-mime="ManagedReference">
+    <header class="bg-body border-bottom">
+      <nav id="autocollapse" class="navbar navbar-expand-md" role="navigation">
+        <div class="container-xxl flex-nowrap">
+          <a class="navbar-brand" href="../index.html">
+            <img id="logo" class="svg" src="../images/logo.svg" alt="">
+            
+          </a>
+          <button class="btn btn-lg d-md-none border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navpanel" aria-controls="navpanel" aria-expanded="false" aria-label="Toggle navigation">
+            <i class="bi bi-three-dots"></i>
+          </button>
+          <div class="collapse navbar-collapse" id="navpanel">
+            <div id="navbar">
+            </div>
+          </div>
+        </div>
+      </nav>
+    </header>
+
+    <main class="container-xxl">
+      <div class="toc-offcanvas">
+        <div class="offcanvas-md offcanvas-start" tabindex="-1" id="tocOffcanvas" aria-labelledby="tocOffcanvasLabel">
+          <div class="offcanvas-header">
+            <h5 class="offcanvas-title" id="tocOffcanvasLabel">Table of Contents</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="offcanvas" data-bs-target="#tocOffcanvas" aria-label="Close"></button>
+          </div>
+          <div class="offcanvas-body">
+            <nav class="toc" id="toc"></nav>
+          </div>
+        </div>
+      </div>
+
+      <div class="content">
+        <div class="actionbar">
+          <button class="btn btn-lg border-0 d-md-none" type="button" data-bs-toggle="offcanvas" data-bs-target="#tocOffcanvas" aria-controls="tocOffcanvas" aria-expanded="false" aria-label="Show table of contents">
+            <i class="bi bi-list"></i>
+          </button>
+
+          <nav id="breadcrumb"></nav>
+        </div>
+
+        <article data-uid="Avalonia.Controls.DataGridStatePersistence">
+
+
+
+  <h1 id="Avalonia_Controls_DataGridStatePersistence" data-uid="Avalonia.Controls.DataGridStatePersistence" class="text-break">
+Class DataGridStatePersistence  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/StatePersistence/DataGridStatePersistence.cs/#L15"><i class="bi bi-code-slash"></i></a>
+  </h1>
+
+  <div class="facts text-secondary">
+    <dl><dt>Namespace</dt><dd><a class="xref" href="Avalonia.html">Avalonia</a>.<a class="xref" href="Avalonia.Controls.html">Controls</a></dd></dl>
+  <dl><dt>Assembly</dt><dd>Avalonia.Controls.DataGrid.dll</dd></dl>
+  </div>
+
+  <div class="markdown summary"><p>Provides persistence helpers to capture/restore DataGrid state as string or byte[] payloads.</p>
+</div>
+  <div class="markdown conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static class DataGridStatePersistence</code></pre>
+  </div>
+
+
+
+
+  <dl class="typelist inheritance">
+    <dt>Inheritance</dt>
+    <dd>
+      <div><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object">object</a></div>
+      <div><span class="xref">DataGridStatePersistence</span></div>
+    </dd>
+  </dl>
+
+
+
+  <dl class="typelist inheritedMembers">
+    <dt>Inherited Members</dt>
+    <dd>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object)">object.Equals(object)</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object-system-object)">object.Equals(object, object)</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.gethashcode">object.GetHashCode()</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.gettype">object.GetType()</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.memberwiseclone">object.MemberwiseClone()</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.referenceequals">object.ReferenceEquals(object, object)</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.tostring">object.ToString()</a>
+    </div>
+  </dd></dl>
+
+
+
+
+
+
+  <h2 class="section" id="methods">Methods
+</h2>
+
+
+  <a id="Avalonia_Controls_DataGridStatePersistence_CaptureState_" data-uid="Avalonia.Controls.DataGridStatePersistence.CaptureState*"></a>
+
+  <h3 id="Avalonia_Controls_DataGridStatePersistence_CaptureState_Avalonia_Controls_DataGrid_Avalonia_Controls_DataGridStateSections_Avalonia_Controls_DataGridStateOptions_Avalonia_Controls_DataGridStatePersistenceOptions_" data-uid="Avalonia.Controls.DataGridStatePersistence.CaptureState(Avalonia.Controls.DataGrid,Avalonia.Controls.DataGridStateSections,Avalonia.Controls.DataGridStateOptions,Avalonia.Controls.DataGridStatePersistenceOptions)">
+  CaptureState(DataGrid, DataGridStateSections, DataGridStateOptions, DataGridStatePersistenceOptions)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/StatePersistence/DataGridStatePersistence.cs/#L26"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Captures runtime DataGrid state and converts it to a serializer-friendly persisted model.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static DataGridPersistedState CaptureState(DataGrid grid, DataGridStateSections sections = DataGridStateSections.All, DataGridStateOptions stateOptions = null, DataGridStatePersistenceOptions persistenceOptions = null)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>grid</code> <a class="xref" href="Avalonia.Controls.DataGrid.html">DataGrid</a></dt>
+    <dd></dd>
+    <dt><code>sections</code> <a class="xref" href="Avalonia.Controls.DataGridStateSections.html">DataGridStateSections</a></dt>
+    <dd></dd>
+    <dt><code>stateOptions</code> <a class="xref" href="Avalonia.Controls.DataGridStateOptions.html">DataGridStateOptions</a></dt>
+    <dd></dd>
+    <dt><code>persistenceOptions</code> <a class="xref" href="Avalonia.Controls.DataGridStatePersistenceOptions.html">DataGridStatePersistenceOptions</a></dt>
+    <dd></dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="Avalonia.Controls.DataGridPersistedState.html">DataGridPersistedState</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Avalonia_Controls_DataGridStatePersistence_DecodeBase64_" data-uid="Avalonia.Controls.DataGridStatePersistence.DecodeBase64*"></a>
+
+  <h3 id="Avalonia_Controls_DataGridStatePersistence_DecodeBase64_System_String_" data-uid="Avalonia.Controls.DataGridStatePersistence.DecodeBase64(System.String)">
+  DecodeBase64(string)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/StatePersistence/DataGridStatePersistence.cs/#L189"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Decodes a Base64 state payload.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static byte[] DecodeBase64(string payload)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>payload</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></dt>
+    <dd></dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.byte">byte</a>[]</dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Avalonia_Controls_DataGridStatePersistence_Deserialize_" data-uid="Avalonia.Controls.DataGridStatePersistence.Deserialize*"></a>
+
+  <h3 id="Avalonia_Controls_DataGridStatePersistence_Deserialize_System_ReadOnlySpan_System_Byte__Avalonia_Controls_IDataGridStateSerializer_" data-uid="Avalonia.Controls.DataGridStatePersistence.Deserialize(System.ReadOnlySpan{System.Byte},Avalonia.Controls.IDataGridStateSerializer)">
+  Deserialize(ReadOnlySpan&lt;byte&gt;, IDataGridStateSerializer)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/StatePersistence/DataGridStatePersistence.cs/#L98"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Deserializes a persisted state model from byte[].</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static DataGridPersistedState Deserialize(ReadOnlySpan&lt;byte&gt; payload, IDataGridStateSerializer serializer = null)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>payload</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.readonlyspan-1">ReadOnlySpan</a>&lt;<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.byte">byte</a>&gt;</dt>
+    <dd></dd>
+    <dt><code>serializer</code> <a class="xref" href="Avalonia.Controls.IDataGridStateSerializer.html">IDataGridStateSerializer</a></dt>
+    <dd></dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="Avalonia.Controls.DataGridPersistedState.html">DataGridPersistedState</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Avalonia_Controls_DataGridStatePersistence_Deserialize_" data-uid="Avalonia.Controls.DataGridStatePersistence.Deserialize*"></a>
+
+  <h3 id="Avalonia_Controls_DataGridStatePersistence_Deserialize_System_String_Avalonia_Controls_IDataGridStateSerializer_" data-uid="Avalonia.Controls.DataGridStatePersistence.Deserialize(System.String,Avalonia.Controls.IDataGridStateSerializer)">
+  Deserialize(string, IDataGridStateSerializer)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/StatePersistence/DataGridStatePersistence.cs/#L108"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Deserializes a persisted state model from string.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static DataGridPersistedState Deserialize(string payload, IDataGridStateSerializer serializer = null)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>payload</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></dt>
+    <dd></dd>
+    <dt><code>serializer</code> <a class="xref" href="Avalonia.Controls.IDataGridStateSerializer.html">IDataGridStateSerializer</a></dt>
+    <dd></dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="Avalonia.Controls.DataGridPersistedState.html">DataGridPersistedState</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Avalonia_Controls_DataGridStatePersistence_EncodeBase64_" data-uid="Avalonia.Controls.DataGridStatePersistence.EncodeBase64*"></a>
+
+  <h3 id="Avalonia_Controls_DataGridStatePersistence_EncodeBase64_System_ReadOnlySpan_System_Byte__" data-uid="Avalonia.Controls.DataGridStatePersistence.EncodeBase64(System.ReadOnlySpan{System.Byte})">
+  EncodeBase64(ReadOnlySpan&lt;byte&gt;)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/StatePersistence/DataGridStatePersistence.cs/#L181"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Encodes a binary state payload to Base64.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static string EncodeBase64(ReadOnlySpan&lt;byte&gt; payload)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>payload</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.readonlyspan-1">ReadOnlySpan</a>&lt;<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.byte">byte</a>&gt;</dt>
+    <dd></dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Avalonia_Controls_DataGridStatePersistence_FromUtf8Bytes_" data-uid="Avalonia.Controls.DataGridStatePersistence.FromUtf8Bytes*"></a>
+
+  <h3 id="Avalonia_Controls_DataGridStatePersistence_FromUtf8Bytes_System_ReadOnlySpan_System_Byte__" data-uid="Avalonia.Controls.DataGridStatePersistence.FromUtf8Bytes(System.ReadOnlySpan{System.Byte})">
+  FromUtf8Bytes(ReadOnlySpan&lt;byte&gt;)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/StatePersistence/DataGridStatePersistence.cs/#L215"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Decodes UTF8 bytes to a string.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static string FromUtf8Bytes(ReadOnlySpan&lt;byte&gt; payload)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>payload</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.readonlyspan-1">ReadOnlySpan</a>&lt;<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.byte">byte</a>&gt;</dt>
+    <dd></dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Avalonia_Controls_DataGridStatePersistence_RestoreState_" data-uid="Avalonia.Controls.DataGridStatePersistence.RestoreState*"></a>
+
+  <h3 id="Avalonia_Controls_DataGridStatePersistence_RestoreState_Avalonia_Controls_DataGrid_Avalonia_Controls_DataGridPersistedState_Avalonia_Controls_DataGridStateSections_Avalonia_Controls_DataGridStateOptions_Avalonia_Controls_DataGridStatePersistenceOptions_" data-uid="Avalonia.Controls.DataGridStatePersistence.RestoreState(Avalonia.Controls.DataGrid,Avalonia.Controls.DataGridPersistedState,Avalonia.Controls.DataGridStateSections,Avalonia.Controls.DataGridStateOptions,Avalonia.Controls.DataGridStatePersistenceOptions)">
+  RestoreState(DataGrid, DataGridPersistedState, DataGridStateSections, DataGridStateOptions, DataGridStatePersistenceOptions)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/StatePersistence/DataGridStatePersistence.cs/#L44"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Restores DataGrid state from a persisted model.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static void RestoreState(DataGrid grid, DataGridPersistedState state, DataGridStateSections sections = DataGridStateSections.All, DataGridStateOptions stateOptions = null, DataGridStatePersistenceOptions persistenceOptions = null)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>grid</code> <a class="xref" href="Avalonia.Controls.DataGrid.html">DataGrid</a></dt>
+    <dd></dd>
+    <dt><code>state</code> <a class="xref" href="Avalonia.Controls.DataGridPersistedState.html">DataGridPersistedState</a></dt>
+    <dd></dd>
+    <dt><code>sections</code> <a class="xref" href="Avalonia.Controls.DataGridStateSections.html">DataGridStateSections</a></dt>
+    <dd></dd>
+    <dt><code>stateOptions</code> <a class="xref" href="Avalonia.Controls.DataGridStateOptions.html">DataGridStateOptions</a></dt>
+    <dd></dd>
+    <dt><code>persistenceOptions</code> <a class="xref" href="Avalonia.Controls.DataGridStatePersistenceOptions.html">DataGridStatePersistenceOptions</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Avalonia_Controls_DataGridStatePersistence_RestoreState_" data-uid="Avalonia.Controls.DataGridStatePersistence.RestoreState*"></a>
+
+  <h3 id="Avalonia_Controls_DataGridStatePersistence_RestoreState_Avalonia_Controls_DataGrid_System_ReadOnlySpan_System_Byte__Avalonia_Controls_DataGridStateSections_Avalonia_Controls_DataGridStateOptions_Avalonia_Controls_IDataGridStateSerializer_Avalonia_Controls_DataGridStatePersistenceOptions_" data-uid="Avalonia.Controls.DataGridStatePersistence.RestoreState(Avalonia.Controls.DataGrid,System.ReadOnlySpan{System.Byte},Avalonia.Controls.DataGridStateSections,Avalonia.Controls.DataGridStateOptions,Avalonia.Controls.IDataGridStateSerializer,Avalonia.Controls.DataGridStatePersistenceOptions)">
+  RestoreState(DataGrid, ReadOnlySpan&lt;byte&gt;, DataGridStateSections, DataGridStateOptions, IDataGridStateSerializer, DataGridStatePersistenceOptions)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/StatePersistence/DataGridStatePersistence.cs/#L151"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Deserializes and restores DataGrid state from byte[] payload.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static void RestoreState(DataGrid grid, ReadOnlySpan&lt;byte&gt; payload, DataGridStateSections sections = DataGridStateSections.All, DataGridStateOptions stateOptions = null, IDataGridStateSerializer serializer = null, DataGridStatePersistenceOptions persistenceOptions = null)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>grid</code> <a class="xref" href="Avalonia.Controls.DataGrid.html">DataGrid</a></dt>
+    <dd></dd>
+    <dt><code>payload</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.readonlyspan-1">ReadOnlySpan</a>&lt;<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.byte">byte</a>&gt;</dt>
+    <dd></dd>
+    <dt><code>sections</code> <a class="xref" href="Avalonia.Controls.DataGridStateSections.html">DataGridStateSections</a></dt>
+    <dd></dd>
+    <dt><code>stateOptions</code> <a class="xref" href="Avalonia.Controls.DataGridStateOptions.html">DataGridStateOptions</a></dt>
+    <dd></dd>
+    <dt><code>serializer</code> <a class="xref" href="Avalonia.Controls.IDataGridStateSerializer.html">IDataGridStateSerializer</a></dt>
+    <dd></dd>
+    <dt><code>persistenceOptions</code> <a class="xref" href="Avalonia.Controls.DataGridStatePersistenceOptions.html">DataGridStatePersistenceOptions</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Avalonia_Controls_DataGridStatePersistence_RestoreStateFromString_" data-uid="Avalonia.Controls.DataGridStatePersistence.RestoreStateFromString*"></a>
+
+  <h3 id="Avalonia_Controls_DataGridStatePersistence_RestoreStateFromString_Avalonia_Controls_DataGrid_System_String_Avalonia_Controls_DataGridStateSections_Avalonia_Controls_DataGridStateOptions_Avalonia_Controls_IDataGridStateSerializer_Avalonia_Controls_DataGridStatePersistenceOptions_" data-uid="Avalonia.Controls.DataGridStatePersistence.RestoreStateFromString(Avalonia.Controls.DataGrid,System.String,Avalonia.Controls.DataGridStateSections,Avalonia.Controls.DataGridStateOptions,Avalonia.Controls.IDataGridStateSerializer,Avalonia.Controls.DataGridStatePersistenceOptions)">
+  RestoreStateFromString(DataGrid, string, DataGridStateSections, DataGridStateOptions, IDataGridStateSerializer, DataGridStatePersistenceOptions)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/StatePersistence/DataGridStatePersistence.cs/#L166"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Deserializes and restores DataGrid state from string payload.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static void RestoreStateFromString(DataGrid grid, string payload, DataGridStateSections sections = DataGridStateSections.All, DataGridStateOptions stateOptions = null, IDataGridStateSerializer serializer = null, DataGridStatePersistenceOptions persistenceOptions = null)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>grid</code> <a class="xref" href="Avalonia.Controls.DataGrid.html">DataGrid</a></dt>
+    <dd></dd>
+    <dt><code>payload</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></dt>
+    <dd></dd>
+    <dt><code>sections</code> <a class="xref" href="Avalonia.Controls.DataGridStateSections.html">DataGridStateSections</a></dt>
+    <dd></dd>
+    <dt><code>stateOptions</code> <a class="xref" href="Avalonia.Controls.DataGridStateOptions.html">DataGridStateOptions</a></dt>
+    <dd></dd>
+    <dt><code>serializer</code> <a class="xref" href="Avalonia.Controls.IDataGridStateSerializer.html">IDataGridStateSerializer</a></dt>
+    <dd></dd>
+    <dt><code>persistenceOptions</code> <a class="xref" href="Avalonia.Controls.DataGridStatePersistenceOptions.html">DataGridStatePersistenceOptions</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Avalonia_Controls_DataGridStatePersistence_Serialize_" data-uid="Avalonia.Controls.DataGridStatePersistence.Serialize*"></a>
+
+  <h3 id="Avalonia_Controls_DataGridStatePersistence_Serialize_Avalonia_Controls_DataGridPersistedState_Avalonia_Controls_IDataGridStateSerializer_" data-uid="Avalonia.Controls.DataGridStatePersistence.Serialize(Avalonia.Controls.DataGridPersistedState,Avalonia.Controls.IDataGridStateSerializer)">
+  Serialize(DataGridPersistedState, IDataGridStateSerializer)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/StatePersistence/DataGridStatePersistence.cs/#L68"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Serializes a persisted state model to byte[].</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static byte[] Serialize(DataGridPersistedState state, IDataGridStateSerializer serializer = null)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>state</code> <a class="xref" href="Avalonia.Controls.DataGridPersistedState.html">DataGridPersistedState</a></dt>
+    <dd></dd>
+    <dt><code>serializer</code> <a class="xref" href="Avalonia.Controls.IDataGridStateSerializer.html">IDataGridStateSerializer</a></dt>
+    <dd></dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.byte">byte</a>[]</dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Avalonia_Controls_DataGridStatePersistence_SerializeState_" data-uid="Avalonia.Controls.DataGridStatePersistence.SerializeState*"></a>
+
+  <h3 id="Avalonia_Controls_DataGridStatePersistence_SerializeState_Avalonia_Controls_DataGrid_Avalonia_Controls_DataGridStateSections_Avalonia_Controls_DataGridStateOptions_Avalonia_Controls_IDataGridStateSerializer_Avalonia_Controls_DataGridStatePersistenceOptions_" data-uid="Avalonia.Controls.DataGridStatePersistence.SerializeState(Avalonia.Controls.DataGrid,Avalonia.Controls.DataGridStateSections,Avalonia.Controls.DataGridStateOptions,Avalonia.Controls.IDataGridStateSerializer,Avalonia.Controls.DataGridStatePersistenceOptions)">
+  SerializeState(DataGrid, DataGridStateSections, DataGridStateOptions, IDataGridStateSerializer, DataGridStatePersistenceOptions)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/StatePersistence/DataGridStatePersistence.cs/#L123"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Captures and serializes DataGrid state to byte[].</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static byte[] SerializeState(DataGrid grid, DataGridStateSections sections = DataGridStateSections.All, DataGridStateOptions stateOptions = null, IDataGridStateSerializer serializer = null, DataGridStatePersistenceOptions persistenceOptions = null)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>grid</code> <a class="xref" href="Avalonia.Controls.DataGrid.html">DataGrid</a></dt>
+    <dd></dd>
+    <dt><code>sections</code> <a class="xref" href="Avalonia.Controls.DataGridStateSections.html">DataGridStateSections</a></dt>
+    <dd></dd>
+    <dt><code>stateOptions</code> <a class="xref" href="Avalonia.Controls.DataGridStateOptions.html">DataGridStateOptions</a></dt>
+    <dd></dd>
+    <dt><code>serializer</code> <a class="xref" href="Avalonia.Controls.IDataGridStateSerializer.html">IDataGridStateSerializer</a></dt>
+    <dd></dd>
+    <dt><code>persistenceOptions</code> <a class="xref" href="Avalonia.Controls.DataGridStatePersistenceOptions.html">DataGridStatePersistenceOptions</a></dt>
+    <dd></dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.byte">byte</a>[]</dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Avalonia_Controls_DataGridStatePersistence_SerializeStateToString_" data-uid="Avalonia.Controls.DataGridStatePersistence.SerializeStateToString*"></a>
+
+  <h3 id="Avalonia_Controls_DataGridStatePersistence_SerializeStateToString_Avalonia_Controls_DataGrid_Avalonia_Controls_DataGridStateSections_Avalonia_Controls_DataGridStateOptions_Avalonia_Controls_IDataGridStateSerializer_Avalonia_Controls_DataGridStatePersistenceOptions_" data-uid="Avalonia.Controls.DataGridStatePersistence.SerializeStateToString(Avalonia.Controls.DataGrid,Avalonia.Controls.DataGridStateSections,Avalonia.Controls.DataGridStateOptions,Avalonia.Controls.IDataGridStateSerializer,Avalonia.Controls.DataGridStatePersistenceOptions)">
+  SerializeStateToString(DataGrid, DataGridStateSections, DataGridStateOptions, IDataGridStateSerializer, DataGridStatePersistenceOptions)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/StatePersistence/DataGridStatePersistence.cs/#L137"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Captures and serializes DataGrid state to string.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static string SerializeStateToString(DataGrid grid, DataGridStateSections sections = DataGridStateSections.All, DataGridStateOptions stateOptions = null, IDataGridStateSerializer serializer = null, DataGridStatePersistenceOptions persistenceOptions = null)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>grid</code> <a class="xref" href="Avalonia.Controls.DataGrid.html">DataGrid</a></dt>
+    <dd></dd>
+    <dt><code>sections</code> <a class="xref" href="Avalonia.Controls.DataGridStateSections.html">DataGridStateSections</a></dt>
+    <dd></dd>
+    <dt><code>stateOptions</code> <a class="xref" href="Avalonia.Controls.DataGridStateOptions.html">DataGridStateOptions</a></dt>
+    <dd></dd>
+    <dt><code>serializer</code> <a class="xref" href="Avalonia.Controls.IDataGridStateSerializer.html">IDataGridStateSerializer</a></dt>
+    <dd></dd>
+    <dt><code>persistenceOptions</code> <a class="xref" href="Avalonia.Controls.DataGridStatePersistenceOptions.html">DataGridStatePersistenceOptions</a></dt>
+    <dd></dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Avalonia_Controls_DataGridStatePersistence_SerializeToString_" data-uid="Avalonia.Controls.DataGridStatePersistence.SerializeToString*"></a>
+
+  <h3 id="Avalonia_Controls_DataGridStatePersistence_SerializeToString_Avalonia_Controls_DataGridPersistedState_Avalonia_Controls_IDataGridStateSerializer_" data-uid="Avalonia.Controls.DataGridStatePersistence.SerializeToString(Avalonia.Controls.DataGridPersistedState,Avalonia.Controls.IDataGridStateSerializer)">
+  SerializeToString(DataGridPersistedState, IDataGridStateSerializer)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/StatePersistence/DataGridStatePersistence.cs/#L83"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Serializes a persisted state model to string.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static string SerializeToString(DataGridPersistedState state, IDataGridStateSerializer serializer = null)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>state</code> <a class="xref" href="Avalonia.Controls.DataGridPersistedState.html">DataGridPersistedState</a></dt>
+    <dd></dd>
+    <dt><code>serializer</code> <a class="xref" href="Avalonia.Controls.IDataGridStateSerializer.html">IDataGridStateSerializer</a></dt>
+    <dd></dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Avalonia_Controls_DataGridStatePersistence_ToUtf8Bytes_" data-uid="Avalonia.Controls.DataGridStatePersistence.ToUtf8Bytes*"></a>
+
+  <h3 id="Avalonia_Controls_DataGridStatePersistence_ToUtf8Bytes_System_String_" data-uid="Avalonia.Controls.DataGridStatePersistence.ToUtf8Bytes(System.String)">
+  ToUtf8Bytes(string)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/StatePersistence/DataGridStatePersistence.cs/#L202"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Encodes a string as UTF8 bytes.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static byte[] ToUtf8Bytes(string payload)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>payload</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></dt>
+    <dd></dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.byte">byte</a>[]</dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+
+</article>
+
+        <div class="contribution d-print-none">
+          <a href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/StatePersistence/DataGridStatePersistence.cs/#L15" class="edit-link">Edit this page</a>
+        </div>
+
+
+      </div>
+
+      <div class="affix">
+        <nav id="affix"></nav>
+      </div>
+    </main>
+
+
+    <footer class="border-top text-secondary">
+      <div class="container-xxl">
+        <div class="flex-fill">
+          <span>Made with <a href="https://dotnet.github.io/docfx">docfx</a></span>
+        </div>
+      </div>
+    </footer>
+  </body>
+</html>
