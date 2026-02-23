@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+      <title>Selection Index Resolution Performance | ProDataGrid for Avalonia </title>
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <meta name="title" content="Selection Index Resolution Performance | ProDataGrid for Avalonia ">
+      
+      
+      <link rel="icon" href="../favicon.ico">
+      <link rel="stylesheet" href="../public/docfx.min.css">
+      <link rel="stylesheet" href="../public/main.css">
+      <meta name="docfx:navrel" content="../toc.html">
+      <meta name="docfx:tocrel" content="toc.html">
+      
+      
+      
+      
+      <meta name="docfx:docurl" content="https://github.com/wieslawsoltes/ProDataGrid/blob/master/docfx/articles/selection-index-resolution-performance.md/#L1">
+      <meta name="loc:inThisArticle" content="In this article">
+      <meta name="loc:searchResultsCount" content="{count} results for &quot;{query}&quot;">
+      <meta name="loc:searchNoResults" content="No results for &quot;{query}&quot;">
+      <meta name="loc:tocFilter" content="Filter by title">
+      <meta name="loc:nextArticle" content="Next">
+      <meta name="loc:prevArticle" content="Previous">
+      <meta name="loc:themeLight" content="Light">
+      <meta name="loc:themeDark" content="Dark">
+      <meta name="loc:themeAuto" content="Auto">
+      <meta name="loc:changeTheme" content="Change theme">
+      <meta name="loc:copy" content="Copy">
+      <meta name="loc:downloadPdf" content="Download PDF">
+
+      <script type="module" src="./../public/docfx.min.js"></script>
+
+      <script>
+        const theme = localStorage.getItem('theme') || 'auto'
+        document.documentElement.setAttribute('data-bs-theme', theme === 'auto' ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light') : theme)
+      </script>
+
+  </head>
+
+  <body class="tex2jax_ignore" data-layout="" data-yaml-mime="">
+    <header class="bg-body border-bottom">
+      <nav id="autocollapse" class="navbar navbar-expand-md" role="navigation">
+        <div class="container-xxl flex-nowrap">
+          <a class="navbar-brand" href="../index.html">
+            <img id="logo" class="svg" src="../images/logo.svg" alt="">
+            
+          </a>
+          <button class="btn btn-lg d-md-none border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navpanel" aria-controls="navpanel" aria-expanded="false" aria-label="Toggle navigation">
+            <i class="bi bi-three-dots"></i>
+          </button>
+          <div class="collapse navbar-collapse" id="navpanel">
+            <div id="navbar">
+            </div>
+          </div>
+        </div>
+      </nav>
+    </header>
+
+    <main class="container-xxl">
+      <div class="toc-offcanvas">
+        <div class="offcanvas-md offcanvas-start" tabindex="-1" id="tocOffcanvas" aria-labelledby="tocOffcanvasLabel">
+          <div class="offcanvas-header">
+            <h5 class="offcanvas-title" id="tocOffcanvasLabel">Table of Contents</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="offcanvas" data-bs-target="#tocOffcanvas" aria-label="Close"></button>
+          </div>
+          <div class="offcanvas-body">
+            <nav class="toc" id="toc"></nav>
+          </div>
+        </div>
+      </div>
+
+      <div class="content">
+        <div class="actionbar">
+          <button class="btn btn-lg border-0 d-md-none" type="button" data-bs-toggle="offcanvas" data-bs-target="#tocOffcanvas" aria-controls="tocOffcanvas" aria-expanded="false" aria-label="Show table of contents">
+            <i class="bi bi-list"></i>
+          </button>
+
+          <nav id="breadcrumb"></nav>
+        </div>
+
+        <article data-uid="">
+<h1 id="selection-index-resolution-performance">Selection Index Resolution Performance</h1>
+
+<p>Selection index resolution can become a performance bottleneck on large datasets when item-to-index mapping relies on linear reference scans.
+This article documents the supported optimization paths and their fallback behavior.</p>
+<p>ProDataGrid now supports three complementary solutions:</p>
+<ol>
+<li>Built-in reference index cache (default, no setup)</li>
+<li>Specialized collection interface (<code>IDataGridIndexOf</code>)</li>
+<li>Per-grid resolver hook (<code>DataGrid.ReferenceIndexResolver</code>)</li>
+</ol>
+<h2 id="default-behavior">Default behavior</h2>
+<p>By default, <code>DataGridDataConnection</code> builds and reuses an internal reference-index cache for <code>IList</code> data sources.
+The cache is invalidated on collection changes and data source swaps, then rebuilt lazily on demand.</p>
+<p>This keeps selection and current-item index resolution fast for repeated operations on large lists without any application changes.</p>
+<h2 id="option-1-idatagridindexof">Option 1: <code>IDataGridIndexOf</code></h2>
+<p>Implement <code>IDataGridIndexOf</code> on your source collection when you already maintain an O(1) reference lookup:</p>
+<pre><code class="lang-csharp">public sealed class FastItems : ObservableCollection&lt;MyItem&gt;, IDataGridIndexOf
+{
+    private readonly Dictionary&lt;object, int&gt; _index = new(ReferenceEqualityComparer.Instance);
+
+    public bool TryGetReferenceIndex(object item, out int index) =&gt;
+        _index.TryGetValue(item, out index);
+}
+</code></pre>
+<p>Use this when your data source can efficiently maintain a reference-to-index map.</p>
+<h2 id="option-2-referenceindexresolver">Option 2: <code>ReferenceIndexResolver</code></h2>
+<p>Provide a resolver delegate per grid when you cannot (or do not want to) change the collection type:</p>
+<pre><code class="lang-csharp">dataGrid.ReferenceIndexResolver = (list, item) =&gt;
+{
+    return lookup.TryGetValue(item, out var index) ? index : -1;
+};
+</code></pre>
+<p>Return:</p>
+<ul>
+<li><code>&gt;= 0</code> to use the resolved index</li>
+<li><code>&lt; 0</code> to fall back to the built-in strategies</li>
+</ul>
+<h2 id="resolution-order">Resolution order</h2>
+<p>For reference-based item lookup, DataGrid uses:</p>
+<ol>
+<li><code>ReferenceIndexResolver</code> (if configured)</li>
+<li><code>IDataGridIndexOf</code> (if available)</li>
+<li>internal cache</li>
+<li>linear reference scan fallback</li>
+</ol>
+<p>This preserves compatibility while giving fast paths for advanced scenarios.</p>
+<h2 id="sample-pages">Sample pages</h2>
+<p>See these DataGridSample pages:</p>
+<ul>
+<li><strong>Selection Fast Index (Interface)</strong> — <code>SelectionFastIndexInterfacePage</code></li>
+<li><strong>Selection Fast Index (Cache)</strong> — <code>SelectionFastIndexCachePage</code></li>
+<li><strong>Selection Fast Index (Resolver)</strong> — <code>SelectionFastIndexResolverPage</code></li>
+</ul>
+
+</article>
+
+        <div class="contribution d-print-none">
+          <a href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/docfx/articles/selection-index-resolution-performance.md/#L1" class="edit-link">Edit this page</a>
+        </div>
+
+        <div class="next-article d-print-none border-top" id="nextArticle"></div>
+
+      </div>
+
+      <div class="affix">
+        <nav id="affix"></nav>
+      </div>
+    </main>
+
+
+    <footer class="border-top text-secondary">
+      <div class="container-xxl">
+        <div class="flex-fill">
+          <span>Made with <a href="https://dotnet.github.io/docfx">docfx</a></span>
+        </div>
+      </div>
+    </footer>
+  </body>
+</html>

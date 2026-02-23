@@ -140,6 +140,14 @@ public SelectionModel&lt;MyItem&gt; MySelectionModel { get; } = new()
 <li>With <code>DataGridCollectionView</code> paging, you can keep a single <code>SelectionModel</code> and preserve selections across page changes.</li>
 <li>In grouped views, selection targets data rows (group headers are ignored).</li>
 </ul>
+<h2 id="large-dataset-index-resolution">Large Dataset Index Resolution</h2>
+<p>For large lists, DataGrid now includes optimized item-to-index lookup for selection and currency updates.
+See <a href="selection-index-resolution-performance.html">Selection Index Resolution Performance</a> for:</p>
+<ul>
+<li>built-in cache behavior (default),</li>
+<li><code>IDataGridIndexOf</code>,</li>
+<li><code>ReferenceIndexResolver</code>.</li>
+</ul>
 <h2 id="auto-scroll-to-selection">Auto-Scroll to Selection</h2>
 <p>Turn on <code>AutoScrollToSelectedItem</code> to keep the current selection in view without handling <code>SelectionChanged</code> manually:</p>
 <pre><code class="lang-xml">&lt;DataGrid ItemsSource=&quot;{Binding Items}&quot;
