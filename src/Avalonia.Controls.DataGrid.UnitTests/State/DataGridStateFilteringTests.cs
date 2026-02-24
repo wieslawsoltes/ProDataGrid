@@ -48,6 +48,7 @@ public class DataGridStateFilteringTests
             Assert.Same(nameColumn, restored.ColumnId);
             Assert.Equal(FilteringOperator.Contains, restored.Operator);
             Assert.Equal("Item 1", restored.Value);
+            Assert.Equal("Name", ((DataGridColumn)restored.ColumnId).ColumnKey);
         }
         finally
         {
@@ -80,7 +81,7 @@ public class DataGridStateFilteringTests
             var state = grid.CaptureFilteringState(options);
 
             Assert.NotNull(state);
-            Assert.Same(nameDefinition, state.Descriptors[0].ColumnId);
+            Assert.Equal("Name", state.Descriptors[0].ColumnId);
 
             grid.FilteringModel.Clear();
             grid.FilteringModel.OwnsViewFilter = false;
@@ -92,6 +93,8 @@ public class DataGridStateFilteringTests
             Assert.Same(nameDefinition, restored.ColumnId);
             Assert.Equal(FilteringOperator.Contains, restored.Operator);
             Assert.Equal("Item 1", restored.Value);
+            Assert.IsType<DataGridColumnDefinition>(restored.ColumnId, exactMatch: false);
+            Assert.Equal("Name", ((DataGridColumnDefinition)restored.ColumnId).ColumnKey);
         }
         finally
         {

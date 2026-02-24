@@ -127,13 +127,15 @@ namespace Avalonia.Controls
     #endif
     interface IDataGridStatePersistenceTokenProvider
     {
-        bool TryGetSortingComparerToken(IComparer comparer, out string token);
+        bool TryGetSortingComparerToken(SortingDescriptor descriptor, out string token);
 
-        bool TryGetFilteringPredicateToken(Func<object, bool> predicate, out string token);
+        bool TryGetFilteringPredicateToken(FilteringDescriptor descriptor, out string token);
 
-        bool TryGetConditionalFormattingPredicateToken(Func<ConditionalFormattingContext, bool> predicate, out string token);
+        bool TryGetFilteringValueToken(FilteringDescriptor descriptor, object value, out string token);
 
-        bool TryGetConditionalFormattingThemeToken(ControlTheme theme, out string token);
+        bool TryGetConditionalFormattingPredicateToken(ConditionalFormattingDescriptor descriptor, out string token);
+
+        bool TryGetConditionalFormattingThemeToken(ConditionalFormattingDescriptor descriptor, out string token);
 
         bool TryGetGroupingValueConverterToken(IValueConverter converter, out string token);
     }
@@ -150,7 +152,9 @@ namespace Avalonia.Controls
     {
         bool TryResolveSortingComparer(string token, out IComparer comparer);
 
-        bool TryResolveFilteringPredicate(string token, out Func<object, bool> predicate);
+        bool TryResolveFilteringPredicate(string token, object value, List<object> values, out Func<object, bool> predicate);
+
+        bool TryResolveFilteringValue(string token, out object value);
 
         bool TryResolveConditionalFormattingPredicate(string token, out Func<ConditionalFormattingContext, bool> predicate);
 
@@ -331,14 +335,19 @@ namespace Avalonia.Controls
             public string PropertyPath { get; set; }
 
             public PersistedValue Value { get; set; }
+            public string ValueToken { get; set; }
 
             public IReadOnlyList<PersistedValue> Values { get; set; }
+
+            public string[] ValuesTokens { get; set; }
 
             public string CultureName { get; set; }
 
             public StringComparison? StringComparisonMode { get; set; }
 
             public string PredicateToken { get; set; }
+
+            public bool? ColumnIdIsColumnDefinition { get; set; }
         }
 
         #if !DATAGRID_INTERNAL

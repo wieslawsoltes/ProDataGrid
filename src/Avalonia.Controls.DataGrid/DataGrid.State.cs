@@ -1342,6 +1342,11 @@ namespace Avalonia.Controls
             return null;
         }
 
+        private DataGridColumnDefinition FindColumnDefinitionByColumnKey(object key)
+        {
+            return _columnDefinitionsSource.FirstOrDefault(x => object.Equals(x.ColumnKey, key));
+        }
+
         private DataGridColumn FindColumnByDefinition(DataGridColumnDefinition definition)
         {
             if (definition == null)
@@ -1455,10 +1460,21 @@ namespace Avalonia.Controls
                 return null;
             }
 
+            bool? columnDefinition = null;
             var columnId = descriptor.ColumnId;
+            if (columnId is DataGridColumnDefinition definition)
+            {
+                columnId = ResolveColumnKey(definition, options, null, -1);
+                columnDefinition = true;
+            }
+
             if (columnId is DataGridColumn column)
             {
                 columnId = GetColumnKey(column, options);
+                if (columnDefinition == null)
+                {
+                    columnDefinition = false;
+                }
             }
 
             return new FilteringDescriptor(
@@ -1469,7 +1485,10 @@ namespace Avalonia.Controls
                 descriptor.Values,
                 descriptor.Predicate,
                 descriptor.Culture,
-                descriptor.StringComparisonMode);
+                descriptor.StringComparisonMode)
+            {
+                ColumnIdIsColumnDefinition = columnDefinition
+            };
         }
 
         private FilteringDescriptor ResolveFilteringDescriptor(FilteringDescriptor descriptor, DataGridStateOptions options)
@@ -1480,12 +1499,23 @@ namespace Avalonia.Controls
             }
 
             var columnId = descriptor.ColumnId;
-            if (columnId is not DataGridColumnDefinition)
+            if (columnId is not DataGridColumn && columnId is not DataGridColumnDefinition)
             {
-                var resolved = ResolveColumnKey(columnId, options, descriptor.PropertyPath, -1);
-                if (resolved != null)
+                if (descriptor.ColumnIdIsColumnDefinition == true)
                 {
-                    columnId = resolved;
+                    var resolved = FindColumnDefinitionByColumnKey(columnId);
+                    if (resolved != null)
+                    {
+                        columnId = resolved;
+                    }
+                }
+                else if (descriptor.ColumnIdIsColumnDefinition == false)
+                {
+                    var resolved = ResolveColumnKey(columnId, options, descriptor.PropertyPath, -1);
+                    if (resolved != null)
+                    {
+                        columnId = resolved;
+                    }
                 }
             }
 

@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Globalization;
 using System.Linq;
@@ -116,6 +117,95 @@ public class DataGridStatePersistenceTests
                 .ToArray();
 
             Assert.Equal(new[] { 12, 14 }, selectedIds);
+        }
+        finally
+        {
+            root.Close();
+        }
+    }
+
+    [AvaloniaFact]
+    public void SerializeAndRestoreState_RoundTrips_Filtering_ColumnDefinition()
+    {
+        var items = StateTestHelper.CreateItems(40);
+        var (grid, root, definitions) = StateTestHelper.CreateGridWithDefinitions(items);
+
+        try
+        {
+            var idColumn = definitions[0];
+
+            grid.FilteringModel.Apply(new[]
+            {
+                new FilteringDescriptor(idColumn, FilteringOperator.Equals, nameof(StateTestItem.Id), 1),
+            });
+
+            Dispatcher.UIThread.RunJobs();
+
+            var options = StateTestHelper.CreateKeyedOptions(grid, items);
+            var payload = DataGridStatePersistence.SerializeStateToString(
+                grid,
+                DataGridStateSections.Filtering,
+                options);
+
+            Assert.False(string.IsNullOrWhiteSpace(payload));
+
+            grid.FilteringModel.Clear();
+
+            DataGridStatePersistence.RestoreStateFromString(
+                grid,
+                payload,
+                DataGridStateSections.All,
+                options);
+
+            Dispatcher.UIThread.RunJobs();
+
+            Assert.Single(grid.FilteringModel.Descriptors);
+            Assert.IsType<DataGridColumnDefinition>(grid.FilteringModel.Descriptors[0].ColumnId, exactMatch: false);
+            Assert.Equal("Id", ((DataGridColumnDefinition)grid.FilteringModel.Descriptors[0].ColumnId).ColumnKey);
+        }
+        finally
+        {
+            root.Close();
+        }
+    }
+
+    [AvaloniaFact]
+    public void SerializeAndRestoreState_RoundTrips_Filtering_MaterializedColumn()
+    {
+        var items = StateTestHelper.CreateItems(40);
+        var (grid, root) = StateTestHelper.CreateGrid(items);
+
+        try
+        {
+            var idColumn = grid.ColumnsInternal[0];
+            grid.FilteringModel.Apply(new[]
+            {
+                new FilteringDescriptor(idColumn, FilteringOperator.Equals, nameof(StateTestItem.Id), 1),
+            });
+
+            Dispatcher.UIThread.RunJobs();
+
+            var options = StateTestHelper.CreateKeyedOptions(grid, items);
+            var payload = DataGridStatePersistence.SerializeStateToString(
+                grid,
+                DataGridStateSections.Filtering,
+                options);
+
+            Assert.False(string.IsNullOrWhiteSpace(payload));
+
+            grid.FilteringModel.Clear();
+
+            DataGridStatePersistence.RestoreStateFromString(
+                grid,
+                payload,
+                DataGridStateSections.All,
+                options);
+
+            Dispatcher.UIThread.RunJobs();
+
+            Assert.Single(grid.FilteringModel.Descriptors);
+            Assert.IsType<DataGridColumn>(grid.FilteringModel.Descriptors[0].ColumnId, exactMatch: false);
+            Assert.Equal("Id", ((DataGridColumn)grid.FilteringModel.Descriptors[0].ColumnId).ColumnKey);
         }
         finally
         {
@@ -304,6 +394,105 @@ public class DataGridStatePersistenceTests
         Assert.Single(restored.Filtering.Descriptors);
         Assert.Equal(FilteringOperator.Custom, restored.Filtering.Descriptors[0].Operator);
         Assert.Same(predicate, restored.Filtering.Descriptors[0].Predicate);
+    }
+
+    [Fact]
+    public void Mapper_RoundTrips_FilteringValueToken()
+    {
+        Func<object, bool> predicate = _ => true;
+        object value = "filtering:value0";
+        var registry = new TokenRegistry
+        {
+            FilteringPredicate = predicate,
+            FilteringValues = [ value ]
+        };
+
+        var runtime = new DataGridState
+        {
+            Sections = DataGridStateSections.Filtering,
+            Filtering = new DataGridFilteringState
+            {
+                Descriptors = new[]
+                {
+                    new FilteringDescriptor(
+                        "Name",
+                        FilteringOperator.Custom,
+                        nameof(StateTestItem.Name),
+                        predicate: predicate,
+                        value: value)
+                },
+                OwnsViewFilter = true
+            }
+        };
+
+        var options = new DataGridStatePersistenceOptions
+        {
+            TokenProvider = registry,
+            TokenResolver = registry
+        };
+
+        var persisted = DataGridStatePersistenceMapper.ToPersisted(runtime, stateOptions: null, options);
+        Assert.Equal("filtering:predicate", persisted.Filtering.Descriptors[0].PredicateToken);
+
+        var restored = DataGridStatePersistenceMapper.ToRuntime(
+            persisted,
+            DataGridStateSections.All,
+            stateOptions: null,
+            options);
+
+        Assert.Single(restored.Filtering.Descriptors);
+        Assert.Equal(FilteringOperator.Custom, restored.Filtering.Descriptors[0].Operator);
+        Assert.Same(value, restored.Filtering.Descriptors[0].Value);
+    }
+
+    [Fact]
+    public void Mapper_RoundTrips_FilteringValuesToken()
+    {
+        Func<object, bool> predicate = _ => true;
+        object[] values = [ "filtering:value1", "filtering:value2"];
+        var registry = new TokenRegistry
+        {
+            FilteringPredicate = predicate,
+            FilteringValues = values
+        };
+
+        var runtime = new DataGridState
+        {
+            Sections = DataGridStateSections.Filtering,
+            Filtering = new DataGridFilteringState
+            {
+                Descriptors = new[]
+                {
+                    new FilteringDescriptor(
+                        "Name",
+                        FilteringOperator.Custom,
+                        nameof(StateTestItem.Name),
+                        predicate: predicate,
+                        values: values)
+                },
+                OwnsViewFilter = true
+            }
+        };
+
+        var options = new DataGridStatePersistenceOptions
+        {
+            TokenProvider = registry,
+            TokenResolver = registry
+        };
+
+        var persisted = DataGridStatePersistenceMapper.ToPersisted(runtime, stateOptions: null, options);
+        Assert.Equal("filtering:predicate", persisted.Filtering.Descriptors[0].PredicateToken);
+
+        var restored = DataGridStatePersistenceMapper.ToRuntime(
+            persisted,
+            DataGridStateSections.All,
+            stateOptions: null,
+            options);
+
+        Assert.Single(restored.Filtering.Descriptors);
+        Assert.Equal(FilteringOperator.Custom, restored.Filtering.Descriptors[0].Operator);
+        Assert.Same(values[0], restored.Filtering.Descriptors[0].Values[0]);
+        Assert.Same(values[1], restored.Filtering.Descriptors[0].Values[1]);
     }
 
     [Fact]
@@ -1185,15 +1374,17 @@ public class DataGridStatePersistenceTests
 
         public Func<object, bool> FilteringPredicate { get; set; }
 
+        public object[] FilteringValues { get; set; }
+
         public Func<ConditionalFormattingContext, bool> ConditionalFormattingPredicate { get; set; }
 
         public ControlTheme ConditionalFormattingTheme { get; set; }
 
         public IValueConverter GroupingValueConverter { get; set; }
 
-        public bool TryGetSortingComparerToken(IComparer comparer, out string token)
+        public bool TryGetSortingComparerToken(SortingDescriptor descriptor, out string token)
         {
-            if (ReferenceEquals(comparer, SortingComparer))
+            if (ReferenceEquals(descriptor.Comparer, SortingComparer))
             {
                 token = "sorting:comparer";
                 return true;
@@ -1203,9 +1394,9 @@ public class DataGridStatePersistenceTests
             return false;
         }
 
-        public bool TryGetFilteringPredicateToken(Func<object, bool> predicate, out string token)
+        public bool TryGetFilteringPredicateToken(FilteringDescriptor descriptor, out string token)
         {
-            if (ReferenceEquals(predicate, FilteringPredicate))
+            if (ReferenceEquals(descriptor.Predicate, FilteringPredicate))
             {
                 token = "filtering:predicate";
                 return true;
@@ -1215,11 +1406,24 @@ public class DataGridStatePersistenceTests
             return false;
         }
 
+        public bool TryGetFilteringValueToken(FilteringDescriptor descriptor, object value, out string token)
+        {
+            var idx = FilteringValues.IndexOf(value);
+            if (idx != -1)
+            {
+                token = value.ToString()!;
+                return true;
+            }
+
+            token = null;
+            return false;
+        }
+
         public bool TryGetConditionalFormattingPredicateToken(
-            Func<ConditionalFormattingContext, bool> predicate,
+            ConditionalFormattingDescriptor descriptor,
             out string token)
         {
-            if (ReferenceEquals(predicate, ConditionalFormattingPredicate))
+            if (ReferenceEquals(descriptor.Predicate, ConditionalFormattingPredicate))
             {
                 token = "conditional:predicate";
                 return true;
@@ -1229,9 +1433,9 @@ public class DataGridStatePersistenceTests
             return false;
         }
 
-        public bool TryGetConditionalFormattingThemeToken(ControlTheme theme, out string token)
+        public bool TryGetConditionalFormattingThemeToken(ConditionalFormattingDescriptor descriptor, out string token)
         {
-            if (ReferenceEquals(theme, ConditionalFormattingTheme))
+            if (ReferenceEquals(descriptor.Theme, ConditionalFormattingTheme))
             {
                 token = "conditional:theme";
                 return true;
@@ -1265,7 +1469,11 @@ public class DataGridStatePersistenceTests
             return false;
         }
 
-        public bool TryResolveFilteringPredicate(string token, out Func<object, bool> predicate)
+        public bool TryResolveFilteringPredicate(
+            string token,
+            object value,
+            List<object> values,
+            out Func<object, bool> predicate)
         {
             if (string.Equals(token, "filtering:predicate", StringComparison.Ordinal))
             {
@@ -1274,6 +1482,18 @@ public class DataGridStatePersistenceTests
             }
 
             predicate = null;
+            return false;
+        }
+
+        public bool TryResolveFilteringValue(string token, out object value)
+        {
+            if (token.StartsWith("filtering:value", StringComparison.Ordinal))
+            {
+                value = token;
+                return value != null;
+            }
+
+            value = null;
             return false;
         }
 

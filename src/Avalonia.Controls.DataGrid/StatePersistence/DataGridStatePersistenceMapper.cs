@@ -429,7 +429,7 @@ namespace Avalonia.Controls
                     string comparerToken = null;
                     if (descriptor.Comparer != null
                         && !context.TryGetSortingComparerToken(
-                            descriptor.Comparer,
+                            descriptor,
                             $"Sorting.Descriptors[{i}].Comparer",
                             out comparerToken))
                     {
@@ -556,7 +556,7 @@ namespace Avalonia.Controls
                     string predicateToken = null;
                     if (descriptor.Predicate != null
                         && !context.TryGetFilteringPredicateToken(
-                            descriptor.Predicate,
+                            descriptor,
                             $"Filtering.Descriptors[{i}].Predicate",
                             out predicateToken))
                     {
@@ -574,17 +574,20 @@ namespace Avalonia.Controls
                         }
                     }
 
+                    DataGridPersistedState.PersistedValue value = null;
+                    IReadOnlyList<DataGridPersistedState.PersistedValue> values = null;
+
                     if (!TryMapValueToPersisted(descriptor.ColumnId, $"Filtering.Descriptors[{i}].ColumnId", context, out var columnId))
                     {
                         continue;
                     }
 
-                    if (!TryMapValueToPersisted(descriptor.Value, $"Filtering.Descriptors[{i}].Value", context, out var value))
+                    if (!context.TryGetFilteringValueToken(descriptor, out var valueToken) && !TryMapValueToPersisted(descriptor.Value, $"Filtering.Descriptors[{i}].Value", context, out value))
                     {
                         continue;
                     }
 
-                    if (!TryMapValuesToPersisted(descriptor.Values, $"Filtering.Descriptors[{i}].Values", context, out var values))
+                    if (!context.TryGetFilteringValuesTokens(descriptor, out var valuesTokens) && !TryMapValuesToPersisted(descriptor.Values, $"Filtering.Descriptors[{i}].Values", context, out values))
                     {
                         continue;
                     }
@@ -595,10 +598,13 @@ namespace Avalonia.Controls
                         Operator = descriptor.Operator,
                         PropertyPath = descriptor.PropertyPath,
                         Value = value,
+                        ValueToken = valueToken,
                         Values = values,
+                        ValuesTokens = valuesTokens,
                         CultureName = descriptor.Culture?.Name,
                         StringComparisonMode = descriptor.StringComparisonMode,
-                        PredicateToken = predicateToken
+                        PredicateToken = predicateToken,
+                        ColumnIdIsColumnDefinition = descriptor.ColumnIdIsColumnDefinition
                     });
                 }
             }
@@ -634,9 +640,33 @@ namespace Avalonia.Controls
                         continue;
                     }
 
+                    if (!TryMapValueToRuntime(descriptor.ColumnId, $"Filtering.Descriptors[{i}].ColumnId", context, out var columnId))
+                    {
+                        continue;
+                    }
+
+                    if (columnId == null)
+                    {
+                        if (!context.Unsupported($"Filtering.Descriptors[{i}].ColumnId", "Column id cannot be null."))
+                        {
+                            continue;
+                        }
+                    }
+
+                    List<object> values = null;
+                    if (!context.TryResolveFilteringValue(descriptor.ValueToken, out var value) && !DataGridStatePersistenceValueConverter.TryReadValue(descriptor.Value, out value, out _))
+                    {
+                        if (!context.TryResolveFilteringValues(descriptor.ValuesTokens, out values) && !TryMapValuesToRuntime(descriptor.Values, $"Filtering.Descriptors[{i}].Values", context, out values))
+                        {
+                            continue;
+                        }
+                    }
+
                     if (!context.TryResolveFilteringPredicate(
                             descriptor.PredicateToken,
                             $"Filtering.Descriptors[{i}].PredicateToken",
+                            value,
+                            values,
                             out var predicate))
                     {
                         continue;
@@ -653,29 +683,6 @@ namespace Avalonia.Controls
                         }
                     }
 
-                    if (!TryMapValueToRuntime(descriptor.ColumnId, $"Filtering.Descriptors[{i}].ColumnId", context, out var columnId))
-                    {
-                        continue;
-                    }
-
-                    if (columnId == null)
-                    {
-                        if (!context.Unsupported($"Filtering.Descriptors[{i}].ColumnId", "Column id cannot be null."))
-                        {
-                            continue;
-                        }
-                    }
-
-                    if (!TryMapValueToRuntime(descriptor.Value, $"Filtering.Descriptors[{i}].Value", context, out var value))
-                    {
-                        continue;
-                    }
-
-                    if (!TryMapValuesToRuntime(descriptor.Values, $"Filtering.Descriptors[{i}].Values", context, out var values))
-                    {
-                        continue;
-                    }
-
                     if (!TryParseCulture(descriptor.CultureName, $"Filtering.Descriptors[{i}].CultureName", context, out var culture))
                     {
                         continue;
@@ -689,7 +696,10 @@ namespace Avalonia.Controls
                         values,
                         predicate: predicate,
                         culture: culture,
-                        stringComparison: descriptor.StringComparisonMode));
+                        stringComparison: descriptor.StringComparisonMode)
+                    {
+                        ColumnIdIsColumnDefinition = descriptor.ColumnIdIsColumnDefinition
+                    });
                 }
             }
 
@@ -878,7 +888,7 @@ namespace Avalonia.Controls
                     string predicateToken = null;
                     if (descriptor.Predicate != null
                         && !context.TryGetConditionalFormattingPredicateToken(
-                            descriptor.Predicate,
+                            descriptor,
                             $"ConditionalFormatting.Descriptors[{i}].Predicate",
                             out predicateToken))
                     {
@@ -888,7 +898,7 @@ namespace Avalonia.Controls
                     string themeToken = null;
                     if (descriptor.Theme != null
                         && !context.TryGetConditionalFormattingThemeToken(
-                            descriptor.Theme,
+                            descriptor,
                             $"ConditionalFormatting.Descriptors[{i}].Theme",
                             out themeToken))
                     {
@@ -1732,16 +1742,16 @@ namespace Avalonia.Controls
                 return false;
             }
 
-            public bool TryGetSortingComparerToken(IComparer comparer, string path, out string token)
+            public bool TryGetSortingComparerToken(SortingDescriptor descriptor, string path, out string token)
             {
                 token = null;
-                if (comparer == null)
+                if (descriptor.Comparer == null)
                 {
                     return true;
                 }
 
                 if (_tokenProvider != null
-                    && _tokenProvider.TryGetSortingComparerToken(comparer, out token)
+                    && _tokenProvider.TryGetSortingComparerToken(descriptor, out token)
                     && !string.IsNullOrWhiteSpace(token))
                 {
                     return true;
@@ -1750,16 +1760,16 @@ namespace Avalonia.Controls
                 return Unsupported(path, "Sorting comparer is runtime-only and no token provider mapping exists.");
             }
 
-            public bool TryGetFilteringPredicateToken(Func<object, bool> predicate, string path, out string token)
+            public bool TryGetFilteringPredicateToken(FilteringDescriptor descriptor, string path, out string token)
             {
                 token = null;
-                if (predicate == null)
+                if (descriptor.Predicate == null)
                 {
                     return true;
                 }
 
                 if (_tokenProvider != null
-                    && _tokenProvider.TryGetFilteringPredicateToken(predicate, out token)
+                    && _tokenProvider.TryGetFilteringPredicateToken(descriptor, out token)
                     && !string.IsNullOrWhiteSpace(token))
                 {
                     return true;
@@ -1768,19 +1778,70 @@ namespace Avalonia.Controls
                 return Unsupported(path, "Filtering predicate is runtime-only and no token provider mapping exists.");
             }
 
-            public bool TryGetConditionalFormattingPredicateToken(
-                Func<ConditionalFormattingContext, bool> predicate,
-                string path,
-                out string token)
+            public bool TryGetFilteringValueToken(FilteringDescriptor descriptor, out string token)
             {
                 token = null;
-                if (predicate == null)
+                if (descriptor.Value == null)
                 {
                     return true;
                 }
 
                 if (_tokenProvider != null
-                    && _tokenProvider.TryGetConditionalFormattingPredicateToken(predicate, out token)
+                    && _tokenProvider.TryGetFilteringValueToken(descriptor, descriptor.Value, out token)
+                    && !string.IsNullOrWhiteSpace(token))
+                {
+                    return true;
+                }
+
+                return false;
+            }
+
+            public bool TryGetFilteringValuesTokens(FilteringDescriptor descriptor, out string[] tokens)
+            {
+                tokens = null;
+                if (descriptor.Values == null || descriptor.Values.Count == 0)
+                {
+                    return true;
+                }
+
+                if (_tokenProvider == null)
+                {
+                    return false;
+                }
+
+                var ret = new string[descriptor.Values.Count];
+
+                for (var x = 0;x < ret.Length;x++)
+                {
+                    if (!_tokenProvider.TryGetFilteringValueToken(descriptor, descriptor.Values[x], out ret[x]))
+                    {
+                        return false;
+                    }
+
+                    if (string.IsNullOrWhiteSpace(ret[x]))
+                    {
+                        return false;
+                    }
+                }
+
+                tokens = ret;
+
+                return true;
+            }
+
+            public bool TryGetConditionalFormattingPredicateToken(
+                ConditionalFormattingDescriptor descriptor,
+                string path,
+                out string token)
+            {
+                token = null;
+                if (descriptor.Predicate == null)
+                {
+                    return true;
+                }
+
+                if (_tokenProvider != null
+                    && _tokenProvider.TryGetConditionalFormattingPredicateToken(descriptor, out token)
                     && !string.IsNullOrWhiteSpace(token))
                 {
                     return true;
@@ -1789,16 +1850,16 @@ namespace Avalonia.Controls
                 return Unsupported(path, "Conditional formatting predicate is runtime-only and no token provider mapping exists.");
             }
 
-            public bool TryGetConditionalFormattingThemeToken(ControlTheme theme, string path, out string token)
+            public bool TryGetConditionalFormattingThemeToken(ConditionalFormattingDescriptor descriptor, string path, out string token)
             {
                 token = null;
-                if (theme == null)
+                if (descriptor.Theme == null)
                 {
                     return true;
                 }
 
                 if (_tokenProvider != null
-                    && _tokenProvider.TryGetConditionalFormattingThemeToken(theme, out token)
+                    && _tokenProvider.TryGetConditionalFormattingThemeToken(descriptor, out token)
                     && !string.IsNullOrWhiteSpace(token))
                 {
                     return true;
@@ -1843,7 +1904,7 @@ namespace Avalonia.Controls
                 return Unsupported(path, $"Cannot resolve sorting comparer token '{token}'.");
             }
 
-            public bool TryResolveFilteringPredicate(string token, string path, out Func<object, bool> predicate)
+            public bool TryResolveFilteringPredicate(string token, string path, object value, List<object> values, out Func<object, bool> predicate)
             {
                 predicate = null;
                 if (string.IsNullOrWhiteSpace(token))
@@ -1852,13 +1913,68 @@ namespace Avalonia.Controls
                 }
 
                 if (_tokenResolver != null
-                    && _tokenResolver.TryResolveFilteringPredicate(token, out predicate)
+                    && _tokenResolver.TryResolveFilteringPredicate(token, value, values, out predicate)
                     && predicate != null)
                 {
                     return true;
                 }
 
                 return Unsupported(path, $"Cannot resolve filtering predicate token '{token}'.");
+            }
+
+            public bool TryResolveFilteringValue(string token, out object value)
+            {
+                value = null;
+                if (string.IsNullOrWhiteSpace(token))
+                {
+                    return false;
+                }
+
+                if (_tokenResolver != null
+                    && _tokenResolver.TryResolveFilteringValue(token, out value)
+                    && value != null)
+                {
+                    return true;
+                }
+
+                return false;
+            }
+
+            public bool TryResolveFilteringValues(string[] tokens, out List<object> values)
+            {
+                values = null;
+
+                if (_tokenResolver == null)
+                {
+                    return false;
+                }
+
+                if (tokens == null || tokens.Length == 0)
+                {
+                    values = [];
+                    return true;
+                }
+
+                var ret = new List<object>(tokens.Length);
+
+                for (var x = 0;x < tokens.Length; x++)
+                {
+                    if (string.IsNullOrWhiteSpace(tokens[x]))
+                    {
+                        return false;
+                    }
+
+                    if (!_tokenResolver.TryResolveFilteringValue(tokens[x], out var value) || value == null)
+                    {
+                        return false;
+                    }
+
+                    ret.Add(value);
+                }
+
+                values = ret;
+
+                return true;
             }
 
             public bool TryResolveConditionalFormattingPredicate(
