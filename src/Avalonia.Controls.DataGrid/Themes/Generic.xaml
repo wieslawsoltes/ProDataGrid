@@ -391,6 +391,12 @@
         <Setter Property="VerticalAlignment" Value="Center" />
       </ControlTheme>
 
+      <!-- DataGridCellCustomDrawingTheme -->
+      <ControlTheme x:Key="DataGridCellCustomDrawingTheme" TargetType="controls:DataGridCustomDrawingCell">
+        <Setter Property="Margin" Value="{DynamicResource DataGridCellTextBlockMargin}" />
+        <Setter Property="VerticalAlignment" Value="Center" />
+      </ControlTheme>
+
       <!-- DataGridCellTextBoxTheme -->
       <ControlTheme x:Key="DataGridCellTextBoxTheme"
                     TargetType="TextBox"
