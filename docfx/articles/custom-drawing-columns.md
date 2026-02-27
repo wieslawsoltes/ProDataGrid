@@ -21,6 +21,7 @@ Core types:
 - `IDataGridCellDrawOperationFactory`
 - `IDataGridCellDrawOperationMeasureProvider` (optional)
 - `IDataGridCellDrawOperationArrangeProvider` (optional)
+- `IDataGridCellDrawOperationItemCache` (optional per-item cache contract)
 - `DataGridCellDrawOperationContext`
 - `DataGridCellDrawOperationMeasureContext`
 - `DataGridCellDrawOperationArrangeContext`
@@ -64,7 +65,9 @@ This is the same pattern used by the variable-height Skia sample page.
     <customDrawing:SkiaTextCellDrawOperationFactory x:Key="DefaultSkiaTextFactory"
                                                      Padding="4,2,4,2"
                                                      TextAlignment="Left"
-                                                     VerticalAlignment="Center" />
+                                                     VerticalAlignment="Center"
+                                                     UseItemCacheContract="True"
+                                                     ItemCacheSlot="0" />
   </UserControl.Resources>
 
   <DataGrid ItemsSource="{Binding Items}" AutoGenerateColumns="False">
@@ -210,6 +213,68 @@ Use larger `SharedTextLayoutCacheCapacity` when:
 - repeated texts are common,
 - typography/constraints are stable.
 
+## Per-Item Draw Metrics Cache Contract (Opt-In)
+
+For very large item sets, factory-level LRU caches can still add contention and churn in hot paths.
+`IDataGridCellDrawOperationItemCache` lets row items store cache entries directly, so factories can resolve metrics without touching shared cache lists/dictionaries.
+
+Interface:
+
+```csharp
+public interface IDataGridCellDrawOperationItemCache
+{
+    bool TryGetCellDrawCacheEntry(int cacheSlot, int cacheKey, out object value);
+    void SetCellDrawCacheEntry(int cacheSlot, int cacheKey, object value);
+}
+```
+
+Factory opt-in knobs (sample `SkiaTextCellDrawOperationFactory`):
+
+- `UseItemCacheContract`: enables item-contract cache lookup.
+- `ItemCacheSlot`: slot index written/read on each item for this factory instance.
+
+Typical item implementation (array-backed, no dictionary/list):
+
+```csharp
+public sealed class RowItem : IDataGridCellDrawOperationItemCache
+{
+    private SlotEntry[]? _entries;
+
+    public bool TryGetCellDrawCacheEntry(int cacheSlot, int cacheKey, out object value)
+    {
+        if (_entries is not null && cacheSlot >= 0 && cacheSlot < _entries.Length)
+        {
+            SlotEntry entry = _entries[cacheSlot];
+            if (entry.HasValue && entry.CacheKey == cacheKey && entry.Value is not null)
+            {
+                value = entry.Value;
+                return true;
+            }
+        }
+
+        value = null!;
+        return false;
+    }
+
+    public void SetCellDrawCacheEntry(int cacheSlot, int cacheKey, object value)
+    {
+        if (cacheSlot < 0)
+        {
+            return;
+        }
+
+        EnsureCapacity(cacheSlot + 1)[cacheSlot] = new SlotEntry
+        {
+            HasValue = true,
+            CacheKey = cacheKey,
+            Value = value
+        };
+    }
+}
+```
+
+Sample page wiring (`VariableHeightSkiaCustomDrawPage.axaml`) uses separate slots per column factory (`0..4`) and enables `UseItemCacheContract="True"` on each resource.
+
 ## Fast Path Guidance
 
 Enable `DrawOperationLayoutFastPath` only when:
@@ -220,7 +285,7 @@ Enable `DrawOperationLayoutFastPath` only when:
 
 Recommended approach for high-performance variable-height cells:
 
-1. Cache draw-operation text metrics in the factory (LRU or bounded dictionary).
+1. Cache draw-operation text metrics in the factory (LRU/bounded dictionary) or via `IDataGridCellDrawOperationItemCache` on row items.
 2. Return those metrics from `TryMeasure(...)`.
 3. Return `context.FinalSize` from `TryArrange(...)` unless custom arrange math is required.
 4. Keep `TextLayoutCacheMode=Shared` for fallback text path and hybrid modes.
