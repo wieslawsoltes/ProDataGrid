@@ -11,10 +11,10 @@ using SkiaSharp;
 
 namespace DataGridSample.CustomDrawing
 {
-        public sealed class SkiaTextCellDrawOperationFactory :
-            IDataGridCellDrawOperationFactory,
-            IDataGridCellDrawOperationMeasureProvider,
-            IDataGridCellDrawOperationArrangeProvider
+    public sealed class SkiaTextCellDrawOperationFactory :
+        IDataGridCellDrawOperationFactory,
+        IDataGridCellDrawOperationMeasureProvider,
+        IDataGridCellDrawOperationArrangeProvider
     {
         private readonly Dictionary<MetricsCacheKey, LinkedListNode<MetricsCacheEntry>> _metricsCache = new();
         private readonly LinkedList<MetricsCacheEntry> _metricsCacheLru = new();
@@ -28,17 +28,27 @@ namespace DataGridSample.CustomDrawing
 
         public int MetricsCacheCapacity { get; set; } = 4096;
 
+        /// <summary>
+        /// Enables optional per-item metrics caching via <see cref="IDataGridCellDrawOperationItemCache"/>.
+        /// </summary>
+        public bool UseItemCacheContract { get; set; }
+
+        /// <summary>
+        /// Factory-defined slot used for per-item cache entries.
+        /// </summary>
+        public int ItemCacheSlot { get; set; }
+
         public ICustomDrawOperation CreateDrawOperation(DataGridCellDrawOperationContext context)
         {
             float fontSize = (float)Math.Max(1d, context.FontSize);
-            var metrics = GetOrCreateMetrics(context.Text ?? string.Empty, fontSize, context.Typeface.ToString() ?? string.Empty);
+            var metrics = GetOrCreateMetrics(context.Item, context.Text ?? string.Empty, fontSize, context.Typeface.ToString() ?? string.Empty);
             return new SkiaTextCellDrawOperation(context, TextAlignment, VerticalAlignment, Padding, metrics);
         }
 
         public bool TryMeasure(DataGridCellDrawOperationMeasureContext context, out Size desiredSize)
         {
             float fontSize = (float)Math.Max(1d, context.FontSize);
-            var metrics = GetOrCreateMetrics(context.Text ?? string.Empty, fontSize, context.Typeface.ToString() ?? string.Empty);
+            var metrics = GetOrCreateMetrics(context.Item, context.Text ?? string.Empty, fontSize, context.Typeface.ToString() ?? string.Empty);
             double width = metrics.MaxLineWidth + Padding.Left + Padding.Right;
             double height = metrics.TotalHeight + Padding.Top + Padding.Bottom;
 
@@ -55,9 +65,27 @@ namespace DataGridSample.CustomDrawing
             return true;
         }
 
-        private SkiaTextLayoutMetrics GetOrCreateMetrics(string text, float fontSize, string typefaceKey)
+        private SkiaTextLayoutMetrics GetOrCreateMetrics(object? item, string text, float fontSize, string typefaceKey)
         {
             var key = new MetricsCacheKey(text, fontSize, typefaceKey);
+            int itemCacheSlot = ItemCacheSlot;
+            if (UseItemCacheContract &&
+                itemCacheSlot >= 0 &&
+                item is IDataGridCellDrawOperationItemCache itemCache)
+            {
+                int itemCacheKey = key.GetHashCode();
+                if (itemCache.TryGetCellDrawCacheEntry(itemCacheSlot, itemCacheKey, out object? value) &&
+                    value is ItemMetricsCacheEntry entry &&
+                    entry.Key.Equals(key))
+                {
+                    return entry.Metrics;
+                }
+
+                var metrics = CreateMetrics(text, fontSize);
+                itemCache.SetCellDrawCacheEntry(itemCacheSlot, itemCacheKey, new ItemMetricsCacheEntry(key, metrics));
+                return metrics;
+            }
+
             int capacity = Math.Max(1, MetricsCacheCapacity);
 
             lock (_metricsCacheGate)
@@ -151,6 +179,19 @@ namespace DataGridSample.CustomDrawing
         private readonly struct MetricsCacheEntry
         {
             public MetricsCacheEntry(MetricsCacheKey key, SkiaTextLayoutMetrics metrics)
+            {
+                Key = key;
+                Metrics = metrics;
+            }
+
+            public MetricsCacheKey Key { get; }
+
+            public SkiaTextLayoutMetrics Metrics { get; }
+        }
+
+        private readonly struct ItemMetricsCacheEntry
+        {
+            public ItemMetricsCacheEntry(MetricsCacheKey key, SkiaTextLayoutMetrics metrics)
             {
                 Key = key;
                 Metrics = metrics;

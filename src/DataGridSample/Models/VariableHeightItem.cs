@@ -1,6 +1,7 @@
 using System;
 using System.ComponentModel;
 using System.Diagnostics.CodeAnalysis;
+using Avalonia.Controls;
 using DataGridSample.Mvvm;
 
 namespace DataGridSample.Models
@@ -9,24 +10,44 @@ namespace DataGridSample.Models
     /// Model for testing variable row heights in DataGrid smooth scrolling.
     /// </summary>
     [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicParameterlessConstructor | DynamicallyAccessedMemberTypes.PublicProperties)]
-    public class VariableHeightItem : ObservableObject
+    public class VariableHeightItem : ObservableObject, IDataGridCellDrawOperationItemCache
     {
+        private struct CellDrawCacheSlotEntry
+        {
+            public bool HasValue;
+            public int CacheKey;
+            public object? Value;
+        }
+
         private int _id;
         private string _title = string.Empty;
         private string _description = string.Empty;
         private int _lineCount;
         private double _rowHeight;
+        private CellDrawCacheSlotEntry[]? _cellDrawCacheEntries;
 
         public int Id
         {
             get => _id;
-            set => SetProperty(ref _id, value);
+            set
+            {
+                if (SetProperty(ref _id, value))
+                {
+                    ClearCellDrawCacheEntries();
+                }
+            }
         }
 
         public string Title
         {
             get => _title;
-            set => SetProperty(ref _title, value);
+            set
+            {
+                if (SetProperty(ref _title, value))
+                {
+                    ClearCellDrawCacheEntries();
+                }
+            }
         }
 
         /// <summary>
@@ -35,7 +56,13 @@ namespace DataGridSample.Models
         public string Description
         {
             get => _description;
-            set => SetProperty(ref _description, value);
+            set
+            {
+                if (SetProperty(ref _description, value))
+                {
+                    ClearCellDrawCacheEntries();
+                }
+            }
         }
 
         /// <summary>
@@ -44,7 +71,13 @@ namespace DataGridSample.Models
         public int LineCount
         {
             get => _lineCount;
-            set => SetProperty(ref _lineCount, value);
+            set
+            {
+                if (SetProperty(ref _lineCount, value))
+                {
+                    ClearCellDrawCacheEntries();
+                }
+            }
         }
 
         /// <summary>
@@ -53,7 +86,81 @@ namespace DataGridSample.Models
         public double ExpectedHeight
         {
             get => _rowHeight;
-            set => SetProperty(ref _rowHeight, value);
+            set
+            {
+                if (SetProperty(ref _rowHeight, value))
+                {
+                    ClearCellDrawCacheEntries();
+                }
+            }
+        }
+
+        public bool TryGetCellDrawCacheEntry(int cacheSlot, int cacheKey, out object value)
+        {
+            CellDrawCacheSlotEntry[]? entries = _cellDrawCacheEntries;
+            if (entries is not null &&
+                cacheSlot >= 0 &&
+                cacheSlot < entries.Length)
+            {
+                CellDrawCacheSlotEntry entry = entries[cacheSlot];
+                if (entry.HasValue &&
+                    entry.CacheKey == cacheKey &&
+                    entry.Value is not null)
+                {
+                    value = entry.Value;
+                    return true;
+                }
+            }
+
+            value = null!;
+            return false;
+        }
+
+        public void SetCellDrawCacheEntry(int cacheSlot, int cacheKey, object value)
+        {
+            if (cacheSlot < 0)
+            {
+                return;
+            }
+
+            CellDrawCacheSlotEntry[] entries = EnsureCellDrawCacheCapacity(cacheSlot + 1);
+            entries[cacheSlot] = new CellDrawCacheSlotEntry
+            {
+                HasValue = true,
+                CacheKey = cacheKey,
+                Value = value
+            };
+        }
+
+        private CellDrawCacheSlotEntry[] EnsureCellDrawCacheCapacity(int capacity)
+        {
+            CellDrawCacheSlotEntry[]? entries = _cellDrawCacheEntries;
+            if (entries is null)
+            {
+                entries = new CellDrawCacheSlotEntry[Math.Max(1, capacity)];
+                _cellDrawCacheEntries = entries;
+                return entries;
+            }
+
+            if (entries.Length >= capacity)
+            {
+                return entries;
+            }
+
+            Array.Resize(ref entries, capacity);
+            _cellDrawCacheEntries = entries;
+            return entries;
+        }
+
+        private void ClearCellDrawCacheEntries()
+        {
+            CellDrawCacheSlotEntry[]? entries = _cellDrawCacheEntries;
+            if (entries is null)
+            {
+                return;
+            }
+
+            Array.Clear(entries, 0, entries.Length);
         }
 
         /// <summary>
