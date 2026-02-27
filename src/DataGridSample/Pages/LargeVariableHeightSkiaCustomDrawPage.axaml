@@ -1,0 +1,118 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:customDrawing="clr-namespace:DataGridSample.CustomDrawing"
+             xmlns:models="clr-namespace:DataGridSample.Models"
+             xmlns:viewModels="clr-namespace:DataGridSample.ViewModels"
+             xmlns:dgrid="clr-namespace:Avalonia.Controls;assembly=Avalonia.Controls.DataGrid"
+             x:Class="DataGridSample.LargeVariableHeightSkiaCustomDrawPage"
+             x:DataType="viewModels:LargeVariableHeightViewModel">
+  <UserControl.Resources>
+    <customDrawing:SkiaTextCellDrawOperationFactory x:Key="IdSkiaTextFactory"
+                                                     Padding="4,2,4,2"
+                                                     TextAlignment="Left"
+                                                     VerticalAlignment="Center"
+                                                     UseItemCacheContract="True"
+                                                     ItemCacheSlot="0" />
+    <customDrawing:SkiaTextCellDrawOperationFactory x:Key="TitleSkiaTextFactory"
+                                                     Padding="4,2,4,2"
+                                                     TextAlignment="Left"
+                                                     VerticalAlignment="Center"
+                                                     UseItemCacheContract="True"
+                                                     ItemCacheSlot="1" />
+    <customDrawing:SkiaTextCellDrawOperationFactory x:Key="LineCountSkiaTextFactory"
+                                                     Padding="4,2,4,2"
+                                                     TextAlignment="Left"
+                                                     VerticalAlignment="Center"
+                                                     UseItemCacheContract="True"
+                                                     ItemCacheSlot="2" />
+    <customDrawing:SkiaTextCellDrawOperationFactory x:Key="ExpectedHeightSkiaTextFactory"
+                                                     Padding="4,2,4,2"
+                                                     TextAlignment="Left"
+                                                     VerticalAlignment="Center"
+                                                     UseItemCacheContract="True"
+                                                     ItemCacheSlot="3" />
+    <customDrawing:SkiaTextCellDrawOperationFactory x:Key="DescriptionSkiaTextFactory"
+                                                     Padding="4,4,4,4"
+                                                     TextAlignment="Left"
+                                                     VerticalAlignment="Top"
+                                                     UseItemCacheContract="True"
+                                                     ItemCacheSlot="4" />
+  </UserControl.Resources>
+
+  <DataGrid ItemsSource="{Binding Items}"
+            UseLogicalScrollable="True"
+            IsReadOnly="True"
+            HeadersVisibility="All"
+            CanUserResizeColumns="True"
+            CanUserReorderColumns="True"
+            CanUserSortColumns="True"
+            RowBackground="#08000000"
+            GridLinesVisibility="Horizontal">
+    <DataGrid.RowHeightEstimator>
+      <dgrid:AdvancedRowHeightEstimator />
+    </DataGrid.RowHeightEstimator>
+
+    <DataGrid.Columns>
+      <DataGridCustomDrawingColumn Header="ID"
+                                   Binding="{Binding Id}"
+                                   Width="80"
+                                   DrawingMode="DrawOperation"
+                                   DrawOperationFactory="{StaticResource IdSkiaTextFactory}"
+                                   TextLayoutCacheMode="Shared"
+                                   SharedTextLayoutCacheCapacity="4096"
+                                   DrawOperationLayoutFastPath="True"
+                                   Foreground="{DynamicResource ThemeForegroundBrush}"
+                                   x:DataType="models:VariableHeightItem" />
+
+      <DataGridCustomDrawingColumn Header="Title"
+                                   Binding="{Binding Title}"
+                                   Width="140"
+                                   DrawingMode="DrawOperation"
+                                   DrawOperationFactory="{StaticResource TitleSkiaTextFactory}"
+                                   TextLayoutCacheMode="Shared"
+                                   SharedTextLayoutCacheCapacity="4096"
+                                   DrawOperationLayoutFastPath="True"
+                                   Foreground="{DynamicResource ThemeForegroundBrush}"
+                                   x:DataType="models:VariableHeightItem" />
+
+      <DataGridCustomDrawingColumn Header="Lines"
+                                   Binding="{Binding LineCount}"
+                                   Width="80"
+                                   DrawingMode="DrawOperation"
+                                   DrawOperationFactory="{StaticResource LineCountSkiaTextFactory}"
+                                   TextLayoutCacheMode="Shared"
+                                   SharedTextLayoutCacheCapacity="4096"
+                                   DrawOperationLayoutFastPath="True"
+                                   Foreground="{DynamicResource ThemeForegroundBrush}"
+                                   x:DataType="models:VariableHeightItem" />
+
+      <DataGridCustomDrawingColumn Header="Est. Height"
+                                   Binding="{Binding ExpectedHeight, StringFormat='{}{0:F0}'}"
+                                   Width="100"
+                                   DrawingMode="DrawOperation"
+                                   DrawOperationFactory="{StaticResource ExpectedHeightSkiaTextFactory}"
+                                   TextLayoutCacheMode="Shared"
+                                   SharedTextLayoutCacheCapacity="4096"
+                                   DrawOperationLayoutFastPath="True"
+                                   Foreground="{DynamicResource ThemeForegroundBrush}"
+                                   x:DataType="models:VariableHeightItem" />
+
+      <DataGridCustomDrawingColumn Header="Description (Variable Height, Skia)"
+                                   Binding="{Binding Description}"
+                                   Width="*"
+                                   DrawingMode="DrawOperation"
+                                   DrawOperationFactory="{StaticResource DescriptionSkiaTextFactory}"
+                                   TextLayoutCacheMode="Shared"
+                                   SharedTextLayoutCacheCapacity="4096"
+                                   DrawOperationLayoutFastPath="True"
+                                   Foreground="{DynamicResource ThemeForegroundBrush}"
+                                   x:DataType="models:VariableHeightItem" />
+    </DataGrid.Columns>
+
+    <DataGrid.Styles>
+      <Style Selector="DataGridRow">
+        <Setter Property="Header" Value="{Binding $self.Index}" />
+      </Style>
+    </DataGrid.Styles>
+  </DataGrid>
+</UserControl>

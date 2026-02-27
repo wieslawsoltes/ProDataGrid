@@ -371,6 +371,9 @@
     <TabItem Header="Large Variable Height">
       <local:LargeVariableHeightPage />
     </TabItem>
+    <TabItem Header="Large Variable Height (Skia Custom Draw)">
+      <local:LargeVariableHeightSkiaCustomDrawPage />
+    </TabItem>
     <TabItem Header="Large Uniform Rows">
       <local:LargeUniformPage />
     </TabItem>
