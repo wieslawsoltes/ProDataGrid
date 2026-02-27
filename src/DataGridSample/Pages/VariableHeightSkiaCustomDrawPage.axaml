@@ -6,14 +6,36 @@
              x:Class="DataGridSample.VariableHeightSkiaCustomDrawPage"
              x:DataType="viewModels:VariableHeightViewModel">
   <UserControl.Resources>
-    <customDrawing:SkiaTextCellDrawOperationFactory x:Key="DefaultSkiaTextFactory"
+    <customDrawing:SkiaTextCellDrawOperationFactory x:Key="IdSkiaTextFactory"
                                                      Padding="4,2,4,2"
                                                      TextAlignment="Left"
-                                                     VerticalAlignment="Center" />
+                                                     VerticalAlignment="Center"
+                                                     UseItemCacheContract="True"
+                                                     ItemCacheSlot="0" />
+    <customDrawing:SkiaTextCellDrawOperationFactory x:Key="TitleSkiaTextFactory"
+                                                     Padding="4,2,4,2"
+                                                     TextAlignment="Left"
+                                                     VerticalAlignment="Center"
+                                                     UseItemCacheContract="True"
+                                                     ItemCacheSlot="1" />
+    <customDrawing:SkiaTextCellDrawOperationFactory x:Key="LineCountSkiaTextFactory"
+                                                     Padding="4,2,4,2"
+                                                     TextAlignment="Left"
+                                                     VerticalAlignment="Center"
+                                                     UseItemCacheContract="True"
+                                                     ItemCacheSlot="2" />
+    <customDrawing:SkiaTextCellDrawOperationFactory x:Key="ExpectedHeightSkiaTextFactory"
+                                                     Padding="4,2,4,2"
+                                                     TextAlignment="Left"
+                                                     VerticalAlignment="Center"
+                                                     UseItemCacheContract="True"
+                                                     ItemCacheSlot="3" />
     <customDrawing:SkiaTextCellDrawOperationFactory x:Key="DescriptionSkiaTextFactory"
                                                      Padding="4,4,4,4"
                                                      TextAlignment="Left"
-                                                     VerticalAlignment="Top" />
+                                                     VerticalAlignment="Top"
+                                                     UseItemCacheContract="True"
+                                                     ItemCacheSlot="4" />
   </UserControl.Resources>
 
   <Grid RowDefinitions="Auto,Auto,*,Auto">
@@ -21,7 +43,7 @@
     <StackPanel Orientation="Vertical" Spacing="4" Grid.Row="0" Margin="0,0,0,8">
       <TextBlock Classes="h2" Text="Variable Row Height Scrolling Test (Skia Custom Draw)" />
       <TextBlock TextWrapping="Wrap"
-                 Text="This page mirrors the variable-height sample, but columns render via DataGridCustomDrawingColumn and Skia custom draw operations." />
+                 Text="This page mirrors the variable-height sample, but columns render via DataGridCustomDrawingColumn and Skia custom draw operations with per-item metrics cache contract enabled." />
     </StackPanel>
 
     <!-- Controls -->
@@ -83,7 +105,7 @@
                                      Binding="{Binding Id}"
                                      Width="60"
                                      DrawingMode="DrawOperation"
-                                     DrawOperationFactory="{StaticResource DefaultSkiaTextFactory}"
+                                     DrawOperationFactory="{StaticResource IdSkiaTextFactory}"
                                      TextLayoutCacheMode="Shared"
                                      SharedTextLayoutCacheCapacity="4096"
                                      DrawOperationLayoutFastPath="True"
@@ -94,7 +116,7 @@
                                      Binding="{Binding Title}"
                                      Width="100"
                                      DrawingMode="DrawOperation"
-                                     DrawOperationFactory="{StaticResource DefaultSkiaTextFactory}"
+                                     DrawOperationFactory="{StaticResource TitleSkiaTextFactory}"
                                      TextLayoutCacheMode="Shared"
                                      SharedTextLayoutCacheCapacity="4096"
                                      DrawOperationLayoutFastPath="True"
@@ -105,7 +127,7 @@
                                      Binding="{Binding LineCount}"
                                      Width="60"
                                      DrawingMode="DrawOperation"
-                                     DrawOperationFactory="{StaticResource DefaultSkiaTextFactory}"
+                                     DrawOperationFactory="{StaticResource LineCountSkiaTextFactory}"
                                      TextLayoutCacheMode="Shared"
                                      SharedTextLayoutCacheCapacity="4096"
                                      DrawOperationLayoutFastPath="True"
@@ -116,7 +138,7 @@
                                      Binding="{Binding ExpectedHeight, StringFormat='{}{0:F0}'}"
                                      Width="80"
                                      DrawingMode="DrawOperation"
-                                     DrawOperationFactory="{StaticResource DefaultSkiaTextFactory}"
+                                     DrawOperationFactory="{StaticResource ExpectedHeightSkiaTextFactory}"
                                      TextLayoutCacheMode="Shared"
                                      SharedTextLayoutCacheCapacity="4096"
                                      DrawOperationLayoutFastPath="True"
