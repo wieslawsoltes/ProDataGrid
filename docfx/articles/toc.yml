@@ -146,6 +146,8 @@
     href: column-header-menus-and-filters.md
   - name: Column Types Reference
     href: column-types-reference.md
+  - name: Custom Drawing Columns and Skia
+    href: custom-drawing-columns.md
   - name: Editing Interaction Model
     href: editing-interaction-model.md
   - name: Validation and Errors

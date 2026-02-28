@@ -1,8 +1,7 @@
 using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Linq;
 using System.Windows.Input;
+using DataGridSample.Collections;
 using DataGridSample.Models;
 using DataGridSample.Mvvm;
 
@@ -21,11 +20,11 @@ namespace DataGridSample.ViewModels
         public VariableHeightViewModel()
         {
             Estimators = new[] { "Advanced", "Caching", "Default" };
-            Items = new ObservableCollection<VariableHeightItem>();
+            Items = new ObservableRangeCollection<VariableHeightItem>();
             RegenerateCommand = new RelayCommand(_ => GenerateItems());
         }
 
-        public ObservableCollection<VariableHeightItem> Items { get; }
+        public ObservableRangeCollection<VariableHeightItem> Items { get; }
 
         public IReadOnlyList<string> Estimators { get; }
 
@@ -75,12 +74,7 @@ namespace DataGridSample.ViewModels
 
         public void GenerateItems()
         {
-            Items.Clear();
-
-            foreach (var item in VariableHeightItem.GenerateItems(ItemCount, Seed))
-            {
-                Items.Add(item);
-            }
+            Items.ResetWith(VariableHeightItem.GenerateItems(ItemCount, Seed));
 
             ItemCountText = $"Items: {Items.Count}";
             ItemsRegenerated?.Invoke();

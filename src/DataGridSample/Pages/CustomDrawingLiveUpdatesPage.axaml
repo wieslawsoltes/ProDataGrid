@@ -1,0 +1,80 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:customDrawing="clr-namespace:DataGridSample.CustomDrawing"
+             xmlns:viewModels="clr-namespace:DataGridSample.ViewModels"
+             x:Class="DataGridSample.Pages.CustomDrawingLiveUpdatesPage"
+             x:DataType="viewModels:CustomDrawingLiveUpdatesViewModel">
+  <UserControl.Resources>
+    <customDrawing:SkiaAnimatedTextCellDrawOperationFactory x:Key="LiveSkiaFactory"
+                                                             Padding="4,2,4,2"
+                                                             TextAlignment="Left"
+                                                             VerticalAlignment="Center"
+                                                             WaveAmplitude="1.8" />
+  </UserControl.Resources>
+
+  <Grid RowDefinitions="Auto,Auto,*"
+        RowSpacing="12"
+        Margin="12">
+    <StackPanel Spacing="4">
+      <TextBlock Classes="h2">Custom Drawing Columns (Live Updates)</TextBlock>
+      <TextBlock Text="This sample animates Skia-rendered custom drawing cells in real time using the CompositionCustomVisual backend and factory invalidation events. Bound row values stay static; redraw is driven by explicit invalidation."
+                 TextWrapping="Wrap" />
+    </StackPanel>
+
+    <StackPanel Grid.Row="1"
+                Orientation="Horizontal"
+                Spacing="8"
+                VerticalAlignment="Center">
+      <Button Content="Start"
+              Command="{Binding StartCommand}" />
+      <Button Content="Stop"
+              Command="{Binding StopCommand}" />
+      <Button Content="Reset Rows"
+              Command="{Binding ResetRowsCommand}" />
+      <TextBlock Text="Interval (ms)"
+                 VerticalAlignment="Center" />
+      <TextBox Width="72"
+               Text="{Binding IntervalMs, UpdateSourceTrigger=PropertyChanged}" />
+      <TextBlock Text="{Binding FrameCount, StringFormat='Frames: {0}'}"
+                 VerticalAlignment="Center" />
+      <TextBlock Text="{Binding RunState, StringFormat='State: {0}'}"
+                 VerticalAlignment="Center" />
+    </StackPanel>
+
+    <DataGrid Grid.Row="2"
+              ItemsSource="{Binding Rows}"
+              AutoGenerateColumns="False"
+              CanUserAddRows="False"
+              CanUserReorderColumns="True"
+              CanUserResizeColumns="True"
+              CanUserSortColumns="True"
+              IsReadOnly="True"
+              RowHeight="28"
+              GridLinesVisibility="Horizontal"
+              RowBackground="#08000000">
+      <DataGrid.Columns>
+        <DataGridTextColumn Header="ID"
+                            Binding="{Binding Id}"
+                            Width="90"
+                            x:DataType="viewModels:CustomDrawingLiveUpdatesRow" />
+
+        <DataGridTextColumn Header="Symbol"
+                            Binding="{Binding Symbol}"
+                            Width="120"
+                            x:DataType="viewModels:CustomDrawingLiveUpdatesRow" />
+
+        <DataGridCustomDrawingColumn Header="Animated Message"
+                                     Binding="{Binding Message}"
+                                     Width="*"
+                                     DrawingMode="DrawOperation"
+                                     RenderBackend="CompositionCustomVisual"
+                                     DrawOperationFactory="{StaticResource LiveSkiaFactory}"
+                                     TextLayoutCacheMode="Shared"
+                                     SharedTextLayoutCacheCapacity="1024"
+                                     DrawOperationLayoutFastPath="False"
+                                     Foreground="{DynamicResource ThemeForegroundBrush}"
+                                     x:DataType="viewModels:CustomDrawingLiveUpdatesRow" />
+      </DataGrid.Columns>
+    </DataGrid>
+  </Grid>
+</UserControl>

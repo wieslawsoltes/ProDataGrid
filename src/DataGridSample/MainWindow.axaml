@@ -347,6 +347,15 @@
     <TabItem Header="Variable Height Scrolling">
       <local:VariableHeightPage />
     </TabItem>
+    <TabItem Header="Variable Height Scrolling (Skia Custom Draw)">
+      <local:VariableHeightSkiaCustomDrawPage />
+    </TabItem>
+    <TabItem Header="Custom Drawing Columns (Editing)">
+      <pages:CustomDrawingEditingPage />
+    </TabItem>
+    <TabItem Header="Custom Drawing Columns (Live Updates)">
+      <pages:CustomDrawingLiveUpdatesPage />
+    </TabItem>
     <TabItem Header="Scroll Snap &amp; Details">
       <local:ScrollInteractionsPage />
     </TabItem>
@@ -367,6 +376,9 @@
     </TabItem>
     <TabItem Header="Large Variable Height">
       <local:LargeVariableHeightPage />
+    </TabItem>
+    <TabItem Header="Large Variable Height (Skia Custom Draw)">
+      <local:LargeVariableHeightSkiaCustomDrawPage />
     </TabItem>
     <TabItem Header="Large Uniform Rows">
       <local:LargeUniformPage />

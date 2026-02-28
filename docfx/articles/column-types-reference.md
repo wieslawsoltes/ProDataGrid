@@ -28,6 +28,7 @@ This reference summarizes the built-in column types shipped with ProDataGrid and
 | `DataGridHyperlinkColumn` | `HyperlinkButton` | `Binding` to `NavigateUri`; optional `ContentBinding`. |
 | `DataGridButtonColumn` | `Button` | `Content`, `Command`, and `CommandParameter` (row item by default). |
 | `DataGridTemplateColumn` | `DataTemplate` | `CellTemplate`, `CellEditingTemplate`, and `NewRowCellTemplate`. |
+| `DataGridCustomDrawingColumn` | `DataGridCustomDrawingCell` | Low-level text/custom draw-operation rendering with immediate or composition custom-visual backend, optional shared text cache, and layout fast path. |
 | `DataGridHierarchicalColumn` | `DataGridHierarchicalPresenter` | Tree column with `Indent`; used with hierarchical models. |
 
 ## Column Definitions (MVVM)
@@ -47,3 +48,4 @@ Each built-in column has a corresponding `*ColumnDefinition` type for use with `
 - Prefer built-in columns over templates when possible; they wire editing, validation, and theme resources for you.
 - Use `ClipboardContentBinding` on a column when you need different export text than the displayed value.
 - For hierarchical data, combine `DataGridHierarchicalColumn` with [Hierarchical Data](hierarchical-data.md).
+- For low-level text rendering and Skia draw operations, use `DataGridCustomDrawingColumn`. See [Custom Drawing Columns and Skia Draw Operations](custom-drawing-columns.md).

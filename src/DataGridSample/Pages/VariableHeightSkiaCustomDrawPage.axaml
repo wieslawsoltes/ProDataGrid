@@ -1,0 +1,184 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:customDrawing="clr-namespace:DataGridSample.CustomDrawing"
+             xmlns:models="clr-namespace:DataGridSample.Models"
+             xmlns:viewModels="clr-namespace:DataGridSample.ViewModels"
+             x:Class="DataGridSample.VariableHeightSkiaCustomDrawPage"
+             x:DataType="viewModels:VariableHeightViewModel">
+  <UserControl.Resources>
+    <customDrawing:SkiaTextCellDrawOperationFactory x:Key="IdSkiaTextFactory"
+                                                     Padding="4,2,4,2"
+                                                     TextAlignment="Left"
+                                                     VerticalAlignment="Center"
+                                                     UseItemCacheContract="True"
+                                                     ItemCacheSlot="0" />
+    <customDrawing:SkiaTextCellDrawOperationFactory x:Key="TitleSkiaTextFactory"
+                                                     Padding="4,2,4,2"
+                                                     TextAlignment="Left"
+                                                     VerticalAlignment="Center"
+                                                     UseItemCacheContract="True"
+                                                     ItemCacheSlot="1" />
+    <customDrawing:SkiaTextCellDrawOperationFactory x:Key="LineCountSkiaTextFactory"
+                                                     Padding="4,2,4,2"
+                                                     TextAlignment="Left"
+                                                     VerticalAlignment="Center"
+                                                     UseItemCacheContract="True"
+                                                     ItemCacheSlot="2" />
+    <customDrawing:SkiaTextCellDrawOperationFactory x:Key="ExpectedHeightSkiaTextFactory"
+                                                     Padding="4,2,4,2"
+                                                     TextAlignment="Left"
+                                                     VerticalAlignment="Center"
+                                                     UseItemCacheContract="True"
+                                                     ItemCacheSlot="3" />
+    <customDrawing:SkiaTextCellDrawOperationFactory x:Key="DescriptionSkiaTextFactory"
+                                                     Padding="4,4,4,4"
+                                                     TextAlignment="Left"
+                                                     VerticalAlignment="Top"
+                                                     UseItemCacheContract="True"
+                                                     ItemCacheSlot="4" />
+  </UserControl.Resources>
+
+  <Grid RowDefinitions="Auto,Auto,*,Auto">
+    <!-- Header -->
+    <StackPanel Orientation="Vertical" Spacing="4" Grid.Row="0" Margin="0,0,0,8">
+      <TextBlock Classes="h2" Text="Variable Row Height Scrolling Test (Skia Custom Draw)" />
+      <TextBlock TextWrapping="Wrap"
+                 Text="This page mirrors the variable-height sample, but columns render via DataGridCustomDrawingColumn using the CompositionCustomVisual backend with Skia draw operations and per-item metrics cache contract enabled." />
+    </StackPanel>
+
+    <!-- Controls -->
+    <StackPanel Grid.Row="1" Orientation="Horizontal" Spacing="12" Margin="0,0,0,8">
+      <StackPanel Orientation="Horizontal" Spacing="4">
+        <TextBlock Text="Item Count:" VerticalAlignment="Center" />
+        <NumericUpDown Minimum="10"
+                       Maximum="1000000"
+                       Value="{Binding ItemCount, Mode=TwoWay}"
+                       Increment="100"
+                       Width="120" />
+      </StackPanel>
+
+      <StackPanel Orientation="Horizontal" Spacing="4">
+        <TextBlock Text="Seed:" VerticalAlignment="Center" />
+        <NumericUpDown Minimum="1"
+                       Maximum="9999"
+                       Value="{Binding Seed, Mode=TwoWay}"
+                       Increment="1"
+                       Width="80" />
+      </StackPanel>
+
+      <Button Content="Regenerate Items"
+              Command="{Binding RegenerateCommand}" />
+
+      <Separator />
+
+      <StackPanel Orientation="Horizontal" Spacing="4">
+        <TextBlock Text="Estimator:" VerticalAlignment="Center" />
+        <ComboBox Width="160"
+                  ItemsSource="{Binding Estimators}"
+                  SelectedItem="{Binding SelectedEstimator, Mode=TwoWay}" />
+      </StackPanel>
+
+      <StackPanel Orientation="Horizontal" Spacing="4">
+        <TextBlock Text="Scroll To:" VerticalAlignment="Center" />
+        <NumericUpDown Minimum="0"
+                       Maximum="9999"
+                       Value="{Binding ScrollToIndex, Mode=TwoWay}"
+                       Increment="10"
+                       Width="100" />
+        <Button x:Name="ScrollToButton" Content="Scroll" />
+      </StackPanel>
+    </StackPanel>
+
+    <!-- DataGrid with variable row heights -->
+    <DataGrid x:Name="VariableHeightSkiaDataGrid"
+              Grid.Row="2"
+              CanUserResizeColumns="True"
+              CanUserReorderColumns="True"
+              CanUserSortColumns="True"
+              HeadersVisibility="All"
+              IsReadOnly="True"
+              RowBackground="#08000000"
+              GridLinesVisibility="Horizontal"
+              ItemsSource="{Binding Items}">
+      <DataGrid.Columns>
+        <DataGridCustomDrawingColumn Header="ID"
+                                     Binding="{Binding Id}"
+                                     Width="60"
+                                     DrawingMode="DrawOperation"
+                                     RenderBackend="CompositionCustomVisual"
+                                     DrawOperationFactory="{StaticResource IdSkiaTextFactory}"
+                                     TextLayoutCacheMode="Shared"
+                                     SharedTextLayoutCacheCapacity="4096"
+                                     DrawOperationLayoutFastPath="True"
+                                     Foreground="{DynamicResource ThemeForegroundBrush}"
+                                     x:DataType="models:VariableHeightItem" />
+
+        <DataGridCustomDrawingColumn Header="Title"
+                                     Binding="{Binding Title}"
+                                     Width="100"
+                                     DrawingMode="DrawOperation"
+                                     RenderBackend="CompositionCustomVisual"
+                                     DrawOperationFactory="{StaticResource TitleSkiaTextFactory}"
+                                     TextLayoutCacheMode="Shared"
+                                     SharedTextLayoutCacheCapacity="4096"
+                                     DrawOperationLayoutFastPath="True"
+                                     Foreground="{DynamicResource ThemeForegroundBrush}"
+                                     x:DataType="models:VariableHeightItem" />
+
+        <DataGridCustomDrawingColumn Header="Lines"
+                                     Binding="{Binding LineCount}"
+                                     Width="60"
+                                     DrawingMode="DrawOperation"
+                                     RenderBackend="CompositionCustomVisual"
+                                     DrawOperationFactory="{StaticResource LineCountSkiaTextFactory}"
+                                     TextLayoutCacheMode="Shared"
+                                     SharedTextLayoutCacheCapacity="4096"
+                                     DrawOperationLayoutFastPath="True"
+                                     Foreground="{DynamicResource ThemeForegroundBrush}"
+                                     x:DataType="models:VariableHeightItem" />
+
+        <DataGridCustomDrawingColumn Header="Est. Height"
+                                     Binding="{Binding ExpectedHeight, StringFormat='{}{0:F0}'}"
+                                     Width="80"
+                                     DrawingMode="DrawOperation"
+                                     RenderBackend="CompositionCustomVisual"
+                                     DrawOperationFactory="{StaticResource ExpectedHeightSkiaTextFactory}"
+                                     TextLayoutCacheMode="Shared"
+                                     SharedTextLayoutCacheCapacity="4096"
+                                     DrawOperationLayoutFastPath="True"
+                                     Foreground="{DynamicResource ThemeForegroundBrush}"
+                                     x:DataType="models:VariableHeightItem" />
+
+        <DataGridCustomDrawingColumn Header="Description (Variable Height, Skia)"
+                                     Binding="{Binding Description}"
+                                     Width="*"
+                                     DrawingMode="DrawOperation"
+                                     RenderBackend="CompositionCustomVisual"
+                                     DrawOperationFactory="{StaticResource DescriptionSkiaTextFactory}"
+                                     TextLayoutCacheMode="Shared"
+                                     SharedTextLayoutCacheCapacity="4096"
+                                     DrawOperationLayoutFastPath="True"
+                                     Foreground="{DynamicResource ThemeForegroundBrush}"
+                                     x:DataType="models:VariableHeightItem" />
+      </DataGrid.Columns>
+
+      <DataGrid.Styles>
+        <Style Selector="DataGridRow">
+          <Setter Property="Header" Value="{Binding $self.Index}" />
+        </Style>
+      </DataGrid.Styles>
+    </DataGrid>
+
+    <!-- Status bar -->
+    <Border Grid.Row="3"
+            Background="#20000000"
+            Padding="8,4"
+            Margin="0,8,0,0">
+      <StackPanel Orientation="Horizontal" Spacing="20">
+        <TextBlock Text="{Binding ItemCountText}" />
+        <TextBlock Text="{Binding ScrollInfoText}" />
+        <TextBlock Text="{Binding VisibleRangeText}" />
+      </StackPanel>
+    </Border>
+  </Grid>
+</UserControl>

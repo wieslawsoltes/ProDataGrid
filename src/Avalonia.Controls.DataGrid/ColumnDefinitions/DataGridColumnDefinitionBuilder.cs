@@ -309,6 +309,26 @@ namespace Avalonia.Controls
             return CreateBoundDefinition<DataGridHierarchicalColumnDefinition, TValue>(header, property, getter, setter, configure);
         }
 
+        public DataGridCustomDrawingColumnDefinition CustomDrawing<TValue>(
+            object header,
+            CompiledBindingPath path,
+            Func<TItem, TValue> getter,
+            Action<TItem, TValue> setter = null,
+            Action<DataGridCustomDrawingColumnDefinition> configure = null)
+        {
+            return CreateBoundDefinition<DataGridCustomDrawingColumnDefinition, TValue>(header, path, getter, setter, configure);
+        }
+
+        public DataGridCustomDrawingColumnDefinition CustomDrawing<TValue>(
+            object header,
+            IPropertyInfo property,
+            Func<TItem, TValue> getter,
+            Action<TItem, TValue> setter = null,
+            Action<DataGridCustomDrawingColumnDefinition> configure = null)
+        {
+            return CreateBoundDefinition<DataGridCustomDrawingColumnDefinition, TValue>(header, property, getter, setter, configure);
+        }
+
         public DataGridComboBoxColumnDefinition ComboBoxSelectedItem<TValue>(
             object header,
             CompiledBindingPath path,

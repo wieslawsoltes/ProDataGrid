@@ -14,6 +14,7 @@ using Avalonia.Layout;
 using Avalonia.Markup.Xaml;
 using Avalonia.Markup.Xaml.MarkupExtensions;
 using Avalonia.Markup.Xaml.MarkupExtensions.CompiledBindings;
+using Avalonia.Rendering.SceneGraph;
 using Avalonia.Threading;
 using Avalonia.Media;
 using Avalonia.VisualTree;
@@ -41,6 +42,7 @@ public class DataGridColumnDefinitionsTests
         new object[] { new DataGridAutoCompleteColumnDefinition(), typeof(DataGridAutoCompleteColumn) },
         new object[] { new DataGridToggleButtonColumnDefinition(), typeof(DataGridToggleButtonColumn) },
         new object[] { new DataGridToggleSwitchColumnDefinition(), typeof(DataGridToggleSwitchColumn) },
+        new object[] { new DataGridCustomDrawingColumnDefinition(), typeof(DataGridCustomDrawingColumn) },
         new object[] { new DataGridHierarchicalColumnDefinition(), typeof(DataGridHierarchicalColumn) }
     };
 
@@ -50,6 +52,35 @@ public class DataGridColumnDefinitionsTests
     {
         var column = definition.CreateColumn(new DataGridColumnDefinitionContext(new DataGrid()));
         Assert.IsType(expectedType, column);
+    }
+
+    [Fact]
+    public void CustomDrawingColumnDefinition_Applies_Drawing_Properties()
+    {
+        var factory = new TestDrawOperationFactory();
+        var definition = new DataGridCustomDrawingColumnDefinition
+        {
+            Binding = DataGridBindingDefinition.Create<Person, string>(p => p.Name),
+            IsReadOnly = false,
+            DrawingMode = DataGridCustomDrawingMode.TextAndDrawOperation,
+            RenderBackend = DataGridCustomDrawingRenderBackend.CompositionCustomVisual,
+            DrawOperationFactory = factory,
+            Foreground = Brushes.Green,
+            TextLayoutCacheMode = DataGridCustomDrawingTextLayoutCacheMode.Shared,
+            SharedTextLayoutCacheCapacity = 512,
+            DrawOperationLayoutFastPath = true
+        };
+
+        var column = Assert.IsType<DataGridCustomDrawingColumn>(definition.CreateColumn(new DataGridColumnDefinitionContext(new DataGrid())));
+
+        Assert.Equal(DataGridCustomDrawingMode.TextAndDrawOperation, column.DrawingMode);
+        Assert.Equal(DataGridCustomDrawingRenderBackend.CompositionCustomVisual, column.RenderBackend);
+        Assert.Same(factory, column.DrawOperationFactory);
+        Assert.Equal(Brushes.Green, column.Foreground);
+        Assert.Equal(DataGridCustomDrawingTextLayoutCacheMode.Shared, column.TextLayoutCacheMode);
+        Assert.Equal(512, column.SharedTextLayoutCacheCapacity);
+        Assert.True(column.DrawOperationLayoutFastPath);
+        Assert.False(column.IsReadOnly);
     }
 
     [Fact]
@@ -1361,6 +1392,29 @@ public class DataGridColumnDefinitionsTests
     }
 
     [AvaloniaFact]
+    public void ColumnDefinitionBuilder_Creates_CustomDrawingColumn()
+    {
+        var propertyInfo = new ClrPropertyInfo(
+            nameof(Person.Name),
+            target => ((Person)target).Name,
+            (target, value) => ((Person)target).Name = (string)value,
+            typeof(string));
+
+        var definition = DataGridColumnDefinitionBuilder.For<Person>()
+            .CustomDrawing("Name", propertyInfo, GetName, SetName);
+
+        var grid = new DataGrid
+        {
+            ColumnDefinitionsSource = new ObservableCollection<DataGridColumnDefinition> { definition }
+        };
+
+        var column = Assert.IsType<DataGridCustomDrawingColumn>(GetNonFillerColumns(grid).Single());
+        var accessor = DataGridColumnMetadata.GetValueAccessor(column);
+        Assert.NotNull(accessor);
+        Assert.Equal("Ada", accessor.GetValue(new Person { Name = "Ada" }));
+    }
+
+    [AvaloniaFact]
     public void ColumnKey_Maps_To_Metadata_Id()
     {
         var definition = new DataGridTextColumnDefinition
@@ -1745,6 +1799,42 @@ public class DataGridColumnDefinitionsTests
     private static string GetName(Person person) => person.Name;
 
     private static void SetName(Person person, string value) => person.Name = value;
+
+    private sealed class TestDrawOperationFactory : IDataGridCellDrawOperationFactory
+    {
+        public ICustomDrawOperation CreateDrawOperation(DataGridCellDrawOperationContext context)
+        {
+            return new TestDrawOperation(context.Bounds);
+        }
+    }
+
+    private sealed class TestDrawOperation : ICustomDrawOperation
+    {
+        public TestDrawOperation(Rect bounds)
+        {
+            Bounds = bounds;
+        }
+
+        public Rect Bounds { get; }
+
+        public void Dispose()
+        {
+        }
+
+        public bool Equals(ICustomDrawOperation? other)
+        {
+            return false;
+        }
+
+        public bool HitTest(Point p)
+        {
+            return Bounds.Contains(p);
+        }
+
+        public void Render(ImmediateDrawingContext context)
+        {
+        }
+    }
 
     private static void AssertHasAssignBinding(Type type, string propertyName)
     {
