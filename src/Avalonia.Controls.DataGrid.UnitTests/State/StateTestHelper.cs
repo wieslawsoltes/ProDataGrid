@@ -72,21 +72,25 @@ internal static class StateTestHelper
         grid.ColumnsInternal.Add(new DataGridTextColumn
         {
             Header = "Id",
+            ColumnKey = nameof(StateTestItem.Id),
             Binding = new Binding(nameof(StateTestItem.Id)),
         });
         grid.ColumnsInternal.Add(new DataGridTextColumn
         {
             Header = "Name",
+            ColumnKey = nameof(StateTestItem.Name),
             Binding = new Binding(nameof(StateTestItem.Name)),
         });
         grid.ColumnsInternal.Add(new DataGridTextColumn
         {
             Header = "Category",
+            ColumnKey = nameof(StateTestItem.Category),
             Binding = new Binding(nameof(StateTestItem.Category)),
         });
         grid.ColumnsInternal.Add(new DataGridTextColumn
         {
             Header = "Group",
+            ColumnKey = nameof(StateTestItem.Group),
             Binding = new Binding(nameof(StateTestItem.Group)),
         });
 
@@ -180,6 +184,7 @@ internal static class StateTestHelper
         return new DataGridTextColumnDefinition
         {
             Header = header,
+            ColumnKey = propertyName,
             Binding = DataGridBindingDefinition.Create<StateTestItem, TValue>(propertyInfo, getter)
         };
     }

@@ -396,6 +396,7 @@ namespace Avalonia.Controls
         protected virtual void ApplyBaseProperties(DataGridColumn column, DataGridColumnDefinitionContext context)
         {
             column.Header = Header;
+            column.ColumnKey = ColumnKey;
             column.SortMemberPath = SortMemberPath;
             column.Tag = Tag;
             column.CustomSortComparer = CustomSortComparer;

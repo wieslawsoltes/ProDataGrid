@@ -113,7 +113,7 @@ public class DataGridStateSearchTests
             Assert.NotNull(state);
             Assert.NotNull(state.Descriptors[0].ColumnIds);
             Assert.Same(nameDefinition, state.Descriptors[0].ColumnIds[0]);
-            Assert.Same(nameDefinition, state.Current.ColumnKey);
+            Assert.Same("Name", state.Current.ColumnKey);
 
             grid.SearchModel.Clear();
             grid.SearchModel.HighlightMode = SearchHighlightMode.None;
