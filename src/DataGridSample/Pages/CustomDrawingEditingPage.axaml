@@ -1,0 +1,117 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:customDrawing="clr-namespace:DataGridSample.CustomDrawing"
+             xmlns:viewModels="clr-namespace:DataGridSample.ViewModels"
+             x:Class="DataGridSample.Pages.CustomDrawingEditingPage"
+             x:DataType="viewModels:CustomDrawingEditingViewModel">
+  <UserControl.DataContext>
+    <viewModels:CustomDrawingEditingViewModel />
+  </UserControl.DataContext>
+
+  <UserControl.Resources>
+    <customDrawing:SkiaTextCellDrawOperationFactory x:Key="IdSkiaTextFactory"
+                                                     Padding="4,2,4,2"
+                                                     TextAlignment="Left"
+                                                     VerticalAlignment="Center"
+                                                     UseItemCacheContract="True"
+                                                     ItemCacheSlot="0" />
+    <customDrawing:SkiaTextCellDrawOperationFactory x:Key="TitleSkiaTextFactory"
+                                                     Padding="4,2,4,2"
+                                                     TextAlignment="Left"
+                                                     VerticalAlignment="Center"
+                                                     UseItemCacheContract="True"
+                                                     ItemCacheSlot="1" />
+    <customDrawing:SkiaTextCellDrawOperationFactory x:Key="NotesSkiaTextFactory"
+                                                     Padding="4,2,4,2"
+                                                     TextAlignment="Left"
+                                                     VerticalAlignment="Center"
+                                                     UseItemCacheContract="True"
+                                                     ItemCacheSlot="2" />
+    <customDrawing:SkiaTextCellDrawOperationFactory x:Key="CategorySkiaTextFactory"
+                                                     Padding="4,2,4,2"
+                                                     TextAlignment="Left"
+                                                     VerticalAlignment="Center"
+                                                     UseItemCacheContract="True"
+                                                     ItemCacheSlot="3" />
+  </UserControl.Resources>
+
+  <Grid RowDefinitions="Auto,Auto,*"
+        RowSpacing="12"
+        Margin="12">
+    <StackPanel Spacing="4">
+      <TextBlock Classes="h2">Custom Drawing Columns (Editing)</TextBlock>
+      <TextBlock Text="This sample shows DataGridCustomDrawingColumn rendering via Skia draw operations while still supporting in-place text editing. Double-click a Title, Notes, or Category cell, or press F2."
+                 TextWrapping="Wrap" />
+    </StackPanel>
+
+    <StackPanel Grid.Row="1"
+                Orientation="Horizontal"
+                Spacing="8">
+      <Button Content="Add Row"
+              Command="{Binding AddRowCommand}" />
+      <Button Content="Reset Rows"
+              Command="{Binding ResetRowsCommand}" />
+    </StackPanel>
+
+    <DataGrid Grid.Row="2"
+              ItemsSource="{Binding Rows}"
+              AutoGenerateColumns="False"
+              CanUserAddRows="False"
+              CanUserReorderColumns="True"
+              CanUserResizeColumns="True"
+              CanUserSortColumns="True"
+              IsReadOnly="False"
+              RowBackground="#08000000"
+              GridLinesVisibility="Horizontal">
+      <DataGrid.Columns>
+        <DataGridCustomDrawingColumn Header="ID"
+                                     Binding="{Binding Id}"
+                                     Width="90"
+                                     IsReadOnly="True"
+                                     DrawingMode="DrawOperation"
+                                     DrawOperationFactory="{StaticResource IdSkiaTextFactory}"
+                                     TextLayoutCacheMode="Shared"
+                                     SharedTextLayoutCacheCapacity="1024"
+                                     DrawOperationLayoutFastPath="True"
+                                     Foreground="{DynamicResource ThemeForegroundBrush}"
+                                     x:DataType="viewModels:CustomDrawingEditingRow" />
+
+        <DataGridCustomDrawingColumn Header="Title"
+                                     Binding="{Binding Title}"
+                                     Width="220"
+                                     IsReadOnly="False"
+                                     DrawingMode="DrawOperation"
+                                     DrawOperationFactory="{StaticResource TitleSkiaTextFactory}"
+                                     TextLayoutCacheMode="Shared"
+                                     SharedTextLayoutCacheCapacity="1024"
+                                     DrawOperationLayoutFastPath="True"
+                                     Foreground="{DynamicResource ThemeForegroundBrush}"
+                                     x:DataType="viewModels:CustomDrawingEditingRow" />
+
+        <DataGridCustomDrawingColumn Header="Notes"
+                                     Binding="{Binding Notes}"
+                                     Width="*"
+                                     IsReadOnly="False"
+                                     DrawingMode="DrawOperation"
+                                     DrawOperationFactory="{StaticResource NotesSkiaTextFactory}"
+                                     TextLayoutCacheMode="Shared"
+                                     SharedTextLayoutCacheCapacity="1024"
+                                     DrawOperationLayoutFastPath="True"
+                                     Foreground="{DynamicResource ThemeForegroundBrush}"
+                                     x:DataType="viewModels:CustomDrawingEditingRow" />
+
+        <DataGridCustomDrawingColumn Header="Category"
+                                     Binding="{Binding Category}"
+                                     Width="140"
+                                     IsReadOnly="False"
+                                     DrawingMode="DrawOperation"
+                                     DrawOperationFactory="{StaticResource CategorySkiaTextFactory}"
+                                     TextLayoutCacheMode="Shared"
+                                     SharedTextLayoutCacheCapacity="1024"
+                                     DrawOperationLayoutFastPath="True"
+                                     Foreground="{DynamicResource ThemeForegroundBrush}"
+                                     x:DataType="viewModels:CustomDrawingEditingRow" />
+      </DataGrid.Columns>
+    </DataGrid>
+  </Grid>
+</UserControl>
