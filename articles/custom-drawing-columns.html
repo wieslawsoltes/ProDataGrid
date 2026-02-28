@@ -1,0 +1,534 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+      <title>Custom Drawing Columns and Skia Draw Operations | ProDataGrid for Avalonia </title>
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <meta name="title" content="Custom Drawing Columns and Skia Draw Operations | ProDataGrid for Avalonia ">
+      
+      
+      <link rel="icon" href="../favicon.ico">
+      <link rel="stylesheet" href="../public/docfx.min.css">
+      <link rel="stylesheet" href="../public/main.css">
+      <meta name="docfx:navrel" content="../toc.html">
+      <meta name="docfx:tocrel" content="toc.html">
+      
+      
+      
+      
+      <meta name="docfx:docurl" content="https://github.com/wieslawsoltes/ProDataGrid/blob/master/docfx/articles/custom-drawing-columns.md/#L1">
+      <meta name="loc:inThisArticle" content="In this article">
+      <meta name="loc:searchResultsCount" content="{count} results for &quot;{query}&quot;">
+      <meta name="loc:searchNoResults" content="No results for &quot;{query}&quot;">
+      <meta name="loc:tocFilter" content="Filter by title">
+      <meta name="loc:nextArticle" content="Next">
+      <meta name="loc:prevArticle" content="Previous">
+      <meta name="loc:themeLight" content="Light">
+      <meta name="loc:themeDark" content="Dark">
+      <meta name="loc:themeAuto" content="Auto">
+      <meta name="loc:changeTheme" content="Change theme">
+      <meta name="loc:copy" content="Copy">
+      <meta name="loc:downloadPdf" content="Download PDF">
+
+      <script type="module" src="./../public/docfx.min.js"></script>
+
+      <script>
+        const theme = localStorage.getItem('theme') || 'auto'
+        document.documentElement.setAttribute('data-bs-theme', theme === 'auto' ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light') : theme)
+      </script>
+
+  </head>
+
+  <body class="tex2jax_ignore" data-layout="" data-yaml-mime="">
+    <header class="bg-body border-bottom">
+      <nav id="autocollapse" class="navbar navbar-expand-md" role="navigation">
+        <div class="container-xxl flex-nowrap">
+          <a class="navbar-brand" href="../index.html">
+            <img id="logo" class="svg" src="../images/logo.svg" alt="">
+            
+          </a>
+          <button class="btn btn-lg d-md-none border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navpanel" aria-controls="navpanel" aria-expanded="false" aria-label="Toggle navigation">
+            <i class="bi bi-three-dots"></i>
+          </button>
+          <div class="collapse navbar-collapse" id="navpanel">
+            <div id="navbar">
+            </div>
+          </div>
+        </div>
+      </nav>
+    </header>
+
+    <main class="container-xxl">
+      <div class="toc-offcanvas">
+        <div class="offcanvas-md offcanvas-start" tabindex="-1" id="tocOffcanvas" aria-labelledby="tocOffcanvasLabel">
+          <div class="offcanvas-header">
+            <h5 class="offcanvas-title" id="tocOffcanvasLabel">Table of Contents</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="offcanvas" data-bs-target="#tocOffcanvas" aria-label="Close"></button>
+          </div>
+          <div class="offcanvas-body">
+            <nav class="toc" id="toc"></nav>
+          </div>
+        </div>
+      </div>
+
+      <div class="content">
+        <div class="actionbar">
+          <button class="btn btn-lg border-0 d-md-none" type="button" data-bs-toggle="offcanvas" data-bs-target="#tocOffcanvas" aria-controls="tocOffcanvas" aria-expanded="false" aria-label="Show table of contents">
+            <i class="bi bi-list"></i>
+          </button>
+
+          <nav id="breadcrumb"></nav>
+        </div>
+
+        <article data-uid="">
+<h1 id="custom-drawing-columns-and-skia-draw-operations">Custom Drawing Columns and Skia Draw Operations</h1>
+
+<p><code>DataGridCustomDrawingColumn</code> is a bound column that renders display cell content through <code>DataGridCustomDrawingCell</code>. It is read-only by default, and supports opt-in editing via <code>IsReadOnly=&quot;False&quot;</code>. It supports:</p>
+<ul>
+<li>low-level text rendering using the control text path (<code>FormattedText</code>),</li>
+<li>custom <code>ICustomDrawOperation</code> rendering (<code>DrawingContext.Custom(...)</code>),</li>
+<li>composition custom-visual rendering for draw operations (<code>RenderBackend=CompositionCustomVisual</code>),</li>
+<li>optional draw-operation-driven measure/arrange fast path,</li>
+<li>shared text layout caching for high-frequency text scenarios.</li>
+</ul>
+<p>Use this column when you need lower render overhead than template columns and you want full control over drawing behavior.</p>
+<h2 id="api-surface">API Surface</h2>
+<p>Core types:</p>
+<ul>
+<li><code>DataGridCustomDrawingColumn</code></li>
+<li><code>DataGridCustomDrawingCell</code></li>
+<li><code>DataGridCustomDrawingColumnDefinition</code> (for <code>ColumnDefinitionsSource</code>)</li>
+<li><code>DataGridCustomDrawingMode</code> (<code>Text</code>, <code>DrawOperation</code>, <code>TextAndDrawOperation</code>)</li>
+<li><code>DataGridCustomDrawingRenderBackend</code> (<code>ImmediateDrawOperation</code>, <code>CompositionCustomVisual</code>)</li>
+<li><code>DataGridCustomDrawingTextLayoutCacheMode</code> (<code>PerCell</code>, <code>Shared</code>)</li>
+<li><code>IDataGridCellDrawOperationFactory</code></li>
+<li><code>IDataGridCellDrawOperationMeasureProvider</code> (optional)</li>
+<li><code>IDataGridCellDrawOperationArrangeProvider</code> (optional)</li>
+<li><code>IDataGridCellDrawOperationItemCache</code> (optional per-item cache contract)</li>
+<li><code>DataGridCellDrawOperationContext</code></li>
+<li><code>DataGridCellDrawOperationMeasureContext</code></li>
+<li><code>DataGridCellDrawOperationArrangeContext</code></li>
+</ul>
+<p>Primary column properties:</p>
+<table>
+<thead>
+<tr>
+<th>Property</th>
+<th>Type</th>
+<th>Default</th>
+<th>Notes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>Binding</code></td>
+<td><code>IBinding</code></td>
+<td>n/a</td>
+<td>Bound value used as source text/value for the cell.</td>
+</tr>
+<tr>
+<td><code>DrawOperationFactory</code></td>
+<td><code>IDataGridCellDrawOperationFactory</code></td>
+<td><code>null</code></td>
+<td>Factory creating per-cell draw operations.</td>
+</tr>
+<tr>
+<td><code>DrawingMode</code></td>
+<td><code>DataGridCustomDrawingMode</code></td>
+<td><code>Text</code></td>
+<td>Selects text path, draw-operation path, or both.</td>
+</tr>
+<tr>
+<td><code>RenderBackend</code></td>
+<td><code>DataGridCustomDrawingRenderBackend</code></td>
+<td><code>ImmediateDrawOperation</code></td>
+<td>Selects immediate draw-op rendering or composition custom-visual backend for draw-operation modes.</td>
+</tr>
+<tr>
+<td><code>TextLayoutCacheMode</code></td>
+<td><code>DataGridCustomDrawingTextLayoutCacheMode</code></td>
+<td><code>PerCell</code></td>
+<td>Per-cell text layout cache or shared per-column cache.</td>
+</tr>
+<tr>
+<td><code>SharedTextLayoutCacheCapacity</code></td>
+<td><code>int</code></td>
+<td><code>1024</code></td>
+<td>Max entry count for shared layout cache (minimum effective value: <code>1</code>).</td>
+</tr>
+<tr>
+<td><code>DrawOperationLayoutFastPath</code></td>
+<td><code>bool</code></td>
+<td><code>false</code></td>
+<td>Opt-in measure/arrange fast path driven by draw-operation provider interfaces.</td>
+</tr>
+<tr>
+<td><code>RenderInvalidationToken</code></td>
+<td><code>int</code></td>
+<td><code>0</code></td>
+<td>Increment to force redraw of realized custom drawing display cells.</td>
+</tr>
+<tr>
+<td><code>LayoutInvalidationToken</code></td>
+<td><code>int</code></td>
+<td><code>0</code></td>
+<td>Increment to force measure/arrange + redraw of realized custom drawing display cells.</td>
+</tr>
+<tr>
+<td><code>FontFamily</code>, <code>FontSize</code>, <code>FontStyle</code>, <code>FontWeight</code>, <code>FontStretch</code>, <code>Foreground</code>, <code>TextAlignment</code>, <code>TextTrimming</code></td>
+<td>standard text properties</td>
+<td>inherited/default</td>
+<td>Applied to <code>DataGridCustomDrawingCell</code>.</td>
+</tr>
+</tbody>
+</table>
+<h2 id="rendering-and-layout-pipeline">Rendering and Layout Pipeline</h2>
+<ol>
+<li><code>DataGridCustomDrawingColumn</code> creates <code>DataGridCustomDrawingCell</code> for each realized cell.</li>
+<li>Cell resolves display text from <code>Value</code> (string or <code>Convert.ToString(...)</code>).</li>
+<li>Measure path:
+<ul>
+<li>If <code>DrawOperationLayoutFastPath=true</code>, <code>DrawingMode=DrawOperation</code>, and factory implements <code>IDataGridCellDrawOperationMeasureProvider</code>, <code>TryMeasure(...)</code> is used.</li>
+<li>Otherwise cell measures text using <code>FormattedText</code>.</li>
+</ul>
+</li>
+<li>Arrange path:
+<ul>
+<li>If fast path is enabled and factory implements <code>IDataGridCellDrawOperationArrangeProvider</code>, <code>TryArrange(...)</code> is used.</li>
+<li>Otherwise default arrange path is used.</li>
+</ul>
+</li>
+<li>Render path:
+<ul>
+<li>Text draws when mode includes text (<code>Text</code>/<code>TextAndDrawOperation</code>) or when draw operation is unavailable.</li>
+<li>Draw operation draws when factory is available and mode includes draw operations (<code>DrawOperation</code>/<code>TextAndDrawOperation</code>).</li>
+<li>Backend is selected by <code>RenderBackend</code>:
+<ul>
+<li><code>ImmediateDrawOperation</code>: draw op is submitted via <code>context.Custom(...)</code>.</li>
+<li><code>CompositionCustomVisual</code>: draw op snapshot is sent to a composition custom visual handler, which owns invalidation/render.</li>
+</ul>
+</li>
+</ul>
+</li>
+</ol>
+<h2 id="direct-column-usage-xaml">Direct Column Usage (XAML)</h2>
+<p>This is the same pattern used by the variable-height Skia sample page.</p>
+<pre><code class="lang-xml">&lt;UserControl xmlns=&quot;https://github.com/avaloniaui&quot;
+             xmlns:x=&quot;http://schemas.microsoft.com/winfx/2006/xaml&quot;
+             xmlns:customDrawing=&quot;clr-namespace:DataGridSample.CustomDrawing&quot;
+             xmlns:models=&quot;clr-namespace:DataGridSample.Models&quot;&gt;
+  &lt;UserControl.Resources&gt;
+    &lt;customDrawing:SkiaTextCellDrawOperationFactory x:Key=&quot;DefaultSkiaTextFactory&quot;
+                                                     Padding=&quot;4,2,4,2&quot;
+                                                     TextAlignment=&quot;Left&quot;
+                                                     VerticalAlignment=&quot;Center&quot;
+                                                     UseItemCacheContract=&quot;True&quot;
+                                                     ItemCacheSlot=&quot;0&quot; /&gt;
+  &lt;/UserControl.Resources&gt;
+
+  &lt;DataGrid ItemsSource=&quot;{Binding Items}&quot; AutoGenerateColumns=&quot;False&quot;&gt;
+    &lt;DataGrid.Columns&gt;
+      &lt;DataGridCustomDrawingColumn Header=&quot;Title&quot;
+                                   Binding=&quot;{Binding Title}&quot;
+                                   Width=&quot;*&quot;
+                                   DrawingMode=&quot;DrawOperation&quot;
+                                   RenderBackend=&quot;CompositionCustomVisual&quot;
+                                   DrawOperationFactory=&quot;{StaticResource DefaultSkiaTextFactory}&quot;
+                                   TextLayoutCacheMode=&quot;Shared&quot;
+                                   SharedTextLayoutCacheCapacity=&quot;4096&quot;
+                                   DrawOperationLayoutFastPath=&quot;True&quot;
+                                   Foreground=&quot;{DynamicResource ThemeForegroundBrush}&quot;
+                                   x:DataType=&quot;models:VariableHeightItem&quot; /&gt;
+    &lt;/DataGrid.Columns&gt;
+  &lt;/DataGrid&gt;
+&lt;/UserControl&gt;
+</code></pre>
+<h2 id="draw-operation-factory-skia-api-lease">Draw Operation Factory (Skia API Lease)</h2>
+<p>Implement <code>IDataGridCellDrawOperationFactory</code> to render with <code>ICustomDrawOperation</code>. For Skia, lease the current <code>ISkiaSharpApiLeaseFeature</code> in <code>Render(...)</code>.</p>
+<pre><code class="lang-csharp">public sealed class SkiaTextCellDrawOperationFactory :
+    IDataGridCellDrawOperationFactory,
+    IDataGridCellDrawOperationMeasureProvider,
+    IDataGridCellDrawOperationArrangeProvider
+{
+    public ICustomDrawOperation CreateDrawOperation(DataGridCellDrawOperationContext context)
+    {
+        return new SkiaTextCellDrawOperation(context);
+    }
+
+    public bool TryMeasure(DataGridCellDrawOperationMeasureContext context, out Size desiredSize)
+    {
+        // Return draw-operation text metrics (optionally cached) for fast measure.
+        desiredSize = new Size(120, 20);
+        return true;
+    }
+
+    public bool TryArrange(DataGridCellDrawOperationArrangeContext context, out Size arrangedSize)
+    {
+        // Usually pass through final size.
+        arrangedSize = context.FinalSize;
+        return true;
+    }
+}
+
+internal sealed class SkiaTextCellDrawOperation : ICustomDrawOperation
+{
+    private readonly DataGridCellDrawOperationContext _context;
+
+    public SkiaTextCellDrawOperation(DataGridCellDrawOperationContext context)
+    {
+        _context = context;
+        Bounds = context.Bounds;
+    }
+
+    public Rect Bounds { get; }
+    public void Dispose() { }
+    public bool HitTest(Point p) =&gt; Bounds.Contains(p);
+    public bool Equals(ICustomDrawOperation? other) =&gt; false;
+
+    public void Render(ImmediateDrawingContext context)
+    {
+        using ISkiaSharpApiLease? lease = context.TryGetFeature&lt;ISkiaSharpApiLeaseFeature&gt;()?.Lease();
+        if (lease is null)
+        {
+            return;
+        }
+
+        // Use lease.SkCanvas and draw text/glyphs/shapes here.
+    }
+}
+</code></pre>
+<p>Context objects provide cell, column, item, value, resolved text, typography, foreground, and selection/current flags. Measure/arrange contexts additionally provide <code>AvailableSize</code> / <code>FinalSize</code>, trimming, alignment, and flow direction.</p>
+<h2 id="composition-backend">Composition Backend</h2>
+<p><code>RenderBackend=&quot;CompositionCustomVisual&quot;</code> routes draw-operation rendering through a composition custom visual attached to each realized <code>DataGridCustomDrawingCell</code>.</p>
+<ul>
+<li>UI thread: resolves cell state and creates draw-operation snapshots via <code>DrawOperationFactory</code>.</li>
+<li>Composition handler: receives snapshots, stores the latest operation, and requests redraw via composition invalidation.</li>
+<li>Render thread: executes the stored draw operation in the composition visual render pass.</li>
+</ul>
+<p>Use composition backend when you want stronger invalidation control for high-frequency custom-draw scenarios (for example live animation/update loops) while preserving the same draw-operation factory contract.</p>
+<p>If the composition host cannot be created for a realized cell, rendering falls back to the immediate draw-operation path for compatibility.</p>
+<h2 id="column-definitions-mvvm--datagrid-design-pattern">Column Definitions (MVVM / DataGrid Design Pattern)</h2>
+<p><code>DataGridCustomDrawingColumnDefinition</code> exposes the same custom drawing settings for <code>ColumnDefinitionsSource</code>.</p>
+<pre><code class="lang-csharp">public DataGridColumnDefinitionList ColumnDefinitions { get; }
+
+public MyViewModel(IDataGridCellDrawOperationFactory factory)
+{
+    ColumnDefinitions = new DataGridColumnDefinitionList
+    {
+        new DataGridCustomDrawingColumnDefinition
+        {
+            Header = &quot;Description&quot;,
+            Binding = DataGridBindingDefinition.Create&lt;RowItem, string&gt;(x =&gt; x.Description),
+            DrawingMode = DataGridCustomDrawingMode.DrawOperation,
+            RenderBackend = DataGridCustomDrawingRenderBackend.CompositionCustomVisual,
+            DrawOperationFactory = factory,
+            TextLayoutCacheMode = DataGridCustomDrawingTextLayoutCacheMode.Shared,
+            SharedTextLayoutCacheCapacity = 4096,
+            DrawOperationLayoutFastPath = true
+        }
+    };
+}
+</code></pre>
+<pre><code class="lang-xml">&lt;DataGrid ItemsSource=&quot;{Binding Items}&quot;
+          ColumnDefinitionsSource=&quot;{Binding ColumnDefinitions}&quot;
+          AutoGenerateColumns=&quot;False&quot; /&gt;
+</code></pre>
+<p>Typed builder support is also available:</p>
+<pre><code class="lang-csharp">var builder = DataGridColumnDefinitionBuilder.For&lt;RowItem&gt;();
+
+var definition = builder.CustomDrawing(
+    header: &quot;Description&quot;,
+    property: descriptionPropertyInfo,
+    getter: row =&gt; row.Description,
+    setter: null,
+    configure: d =&gt;
+    {
+        d.DrawingMode = DataGridCustomDrawingMode.DrawOperation;
+        d.RenderBackend = DataGridCustomDrawingRenderBackend.CompositionCustomVisual;
+        d.DrawOperationFactory = factory;
+        d.TextLayoutCacheMode = DataGridCustomDrawingTextLayoutCacheMode.Shared;
+        d.SharedTextLayoutCacheCapacity = 4096;
+        d.DrawOperationLayoutFastPath = true;
+    });
+</code></pre>
+<h2 id="text-layout-caching">Text Layout Caching</h2>
+<p><code>TextLayoutCacheMode</code> controls <code>FormattedText</code> reuse:</p>
+<ul>
+<li><code>PerCell</code>: cache is local to each realized <code>DataGridCustomDrawingCell</code>.</li>
+<li><code>Shared</code>: all realized cells in the same <code>DataGridCustomDrawingColumn</code> share a bounded LRU cache.</li>
+</ul>
+<p>Shared cache keys include text, typography, alignment, trimming, flow direction, culture, and max text width/height constraints. This makes shared cache mode suitable for repeated text patterns across many rows.</p>
+<p>Use larger <code>SharedTextLayoutCacheCapacity</code> when:</p>
+<ul>
+<li>the dataset is large,</li>
+<li>repeated texts are common,</li>
+<li>typography/constraints are stable.</li>
+</ul>
+<h2 id="per-item-draw-metrics-cache-contract-opt-in">Per-Item Draw Metrics Cache Contract (Opt-In)</h2>
+<p>For very large item sets, factory-level LRU caches can still add contention and churn in hot paths.
+<code>IDataGridCellDrawOperationItemCache</code> lets row items store cache entries directly, so factories can resolve metrics without touching shared cache lists/dictionaries.</p>
+<p>Interface:</p>
+<pre><code class="lang-csharp">public interface IDataGridCellDrawOperationItemCache
+{
+    bool TryGetCellDrawCacheEntry(int cacheSlot, int cacheKey, out object value);
+    void SetCellDrawCacheEntry(int cacheSlot, int cacheKey, object value);
+}
+</code></pre>
+<p>Factory opt-in knobs (sample <code>SkiaTextCellDrawOperationFactory</code>):</p>
+<ul>
+<li><code>UseItemCacheContract</code>: enables item-contract cache lookup.</li>
+<li><code>ItemCacheSlot</code>: slot index written/read on each item for this factory instance.</li>
+</ul>
+<p>Typical item implementation (array-backed, no dictionary/list):</p>
+<pre><code class="lang-csharp">public sealed class RowItem : IDataGridCellDrawOperationItemCache
+{
+    private SlotEntry[]? _entries;
+
+    public bool TryGetCellDrawCacheEntry(int cacheSlot, int cacheKey, out object value)
+    {
+        if (_entries is not null &amp;&amp; cacheSlot &gt;= 0 &amp;&amp; cacheSlot &lt; _entries.Length)
+        {
+            SlotEntry entry = _entries[cacheSlot];
+            if (entry.HasValue &amp;&amp; entry.CacheKey == cacheKey &amp;&amp; entry.Value is not null)
+            {
+                value = entry.Value;
+                return true;
+            }
+        }
+
+        value = null!;
+        return false;
+    }
+
+    public void SetCellDrawCacheEntry(int cacheSlot, int cacheKey, object value)
+    {
+        if (cacheSlot &lt; 0)
+        {
+            return;
+        }
+
+        EnsureCapacity(cacheSlot + 1)[cacheSlot] = new SlotEntry
+        {
+            HasValue = true,
+            CacheKey = cacheKey,
+            Value = value
+        };
+    }
+}
+</code></pre>
+<p>Sample page wiring (<code>VariableHeightSkiaCustomDrawPage.axaml</code>) uses separate slots per column factory (<code>0..4</code>) and enables <code>UseItemCacheContract=&quot;True&quot;</code> on each resource.</p>
+<h2 id="fast-path-guidance">Fast Path Guidance</h2>
+<p>Enable <code>DrawOperationLayoutFastPath</code> only when:</p>
+<ul>
+<li><code>DrawingMode</code> is <code>DrawOperation</code>,</li>
+<li>your factory implements measure (and optionally arrange) providers,</li>
+<li>measured metrics are consistent with rendered output.</li>
+</ul>
+<p>Recommended approach for high-performance variable-height cells:</p>
+<ol>
+<li>Cache draw-operation text metrics in the factory (LRU/bounded dictionary) or via <code>IDataGridCellDrawOperationItemCache</code> on row items.</li>
+<li>Return those metrics from <code>TryMeasure(...)</code>.</li>
+<li>Return <code>context.FinalSize</code> from <code>TryArrange(...)</code> unless custom arrange math is required.</li>
+<li>Keep <code>TextLayoutCacheMode=Shared</code> for fallback text path and hybrid modes.</li>
+</ol>
+<h2 id="explicit-invalidation-for-custom-draw">Explicit Invalidation for Custom Draw</h2>
+<p>When draw output depends on external mutable state (animation phase, external diagnostics values, etc.) and bound row values do not change, use explicit invalidation.</p>
+<h3 id="column-api">Column API</h3>
+<p><code>DataGridCustomDrawingColumn</code> now exposes:</p>
+<ul>
+<li><code>InvalidateCustomDrawingCells(bool invalidateMeasure = false, bool clearSharedTextLayoutCache = false)</code></li>
+<li><code>RenderInvalidationToken</code></li>
+<li><code>LayoutInvalidationToken</code></li>
+</ul>
+<p>Typical usage:</p>
+<pre><code class="lang-csharp">// Render-only refresh (recommended for most animations).
+myCustomDrawingColumn.InvalidateCustomDrawingCells();
+
+// Force measure/arrange and clear shared text cache when layout-affecting state changed.
+myCustomDrawingColumn.InvalidateCustomDrawingCells(
+    invalidateMeasure: true,
+    clearSharedTextLayoutCache: true);
+</code></pre>
+<h3 id="factory-driven-invalidation-optional">Factory-Driven Invalidation (Optional)</h3>
+<p>If your draw-operation factory can emit invalidation events, implement <code>IDataGridCellDrawOperationInvalidationSource</code>.
+When assigned to <code>DrawOperationFactory</code>, <code>DataGridCustomDrawingColumn</code> subscribes automatically and invalidates realized cells when the factory raises <code>Invalidated</code>.</p>
+<pre><code class="lang-csharp">public sealed class AnimatedFactory :
+    IDataGridCellDrawOperationFactory,
+    IDataGridCellDrawOperationInvalidationSource
+{
+    public event EventHandler&lt;DataGridCellDrawOperationInvalidatedEventArgs&gt;? Invalidated;
+
+    public void Tick(float phase)
+    {
+        // update internal render state
+        Invalidated?.Invoke(this, new DataGridCellDrawOperationInvalidatedEventArgs());
+    }
+}
+</code></pre>
+<h2 id="editing-support">Editing Support</h2>
+<p><code>DataGridCustomDrawingColumn</code> supports the standard DataGrid editing pipeline when <code>IsReadOnly</code> is set to <code>False</code>.</p>
+<ul>
+<li>Display mode remains custom drawing (<code>DataGridCustomDrawingCell</code>).</li>
+<li>Editing mode uses a <code>TextBox</code> editor bound to the same <code>Binding</code>.</li>
+<li>Editor theme uses <code>DataGridCellTextBoxTheme</code>.</li>
+<li>Font/foreground/text alignment column properties are applied to both display and editing elements.</li>
+</ul>
+<p>Example:</p>
+<pre><code class="lang-xml">&lt;DataGridCustomDrawingColumn Header=&quot;Title&quot;
+                             Binding=&quot;{Binding Title}&quot;
+                             DrawingMode=&quot;DrawOperation&quot;
+                             DrawOperationFactory=&quot;{StaticResource TitleSkiaTextFactory}&quot;
+                             IsReadOnly=&quot;False&quot;
+                             Foreground=&quot;{DynamicResource ThemeForegroundBrush}&quot;
+                             x:DataType=&quot;models:VariableHeightItem&quot; /&gt;
+</code></pre>
+<h2 id="end-to-end-sample">End-to-End Sample</h2>
+<p>Sample app page:</p>
+<ul>
+<li>Tab: <code>Variable Height Scrolling (Skia Custom Draw)</code></li>
+<li>Tab: <code>Custom Drawing Columns (Live Updates)</code></li>
+<li>Files:
+<ul>
+<li><code>src/DataGridSample/Pages/VariableHeightSkiaCustomDrawPage.axaml</code></li>
+<li><code>src/DataGridSample/CustomDrawing/SkiaTextCellDrawOperationFactory.cs</code></li>
+<li><code>src/DataGridSample/Pages/CustomDrawingLiveUpdatesPage.axaml</code></li>
+<li><code>src/DataGridSample/CustomDrawing/SkiaAnimatedTextCellDrawOperationFactory.cs</code></li>
+</ul>
+</li>
+</ul>
+<p>Run:</p>
+<pre><code class="lang-bash">dotnet run --project src/DataGridSample/DataGridSample.csproj
+</code></pre>
+<h2 id="related-articles">Related Articles</h2>
+<ul>
+<li><a href="column-types-reference.html">Column Types Reference</a></li>
+<li><a href="column-definitions.html">Column Definitions</a></li>
+<li><a href="column-definitions-fast-path-overview.html">Column Definitions: Fast Path Overview</a></li>
+<li><a href="scrolling-virtualization.html">Scrolling and Virtualization</a></li>
+</ul>
+
+</article>
+
+        <div class="contribution d-print-none">
+          <a href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/docfx/articles/custom-drawing-columns.md/#L1" class="edit-link">Edit this page</a>
+        </div>
+
+        <div class="next-article d-print-none border-top" id="nextArticle"></div>
+
+      </div>
+
+      <div class="affix">
+        <nav id="affix"></nav>
+      </div>
+    </main>
+
+
+    <footer class="border-top text-secondary">
+      <div class="container-xxl">
+        <div class="flex-fill">
+          <span>Made with <a href="https://dotnet.github.io/docfx">docfx</a></span>
+        </div>
+      </div>
+    </footer>
+  </body>
+</html>

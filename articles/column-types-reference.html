@@ -181,6 +181,11 @@
 <td><code>CellTemplate</code>, <code>CellEditingTemplate</code>, and <code>NewRowCellTemplate</code>.</td>
 </tr>
 <tr>
+<td><code>DataGridCustomDrawingColumn</code></td>
+<td><code>DataGridCustomDrawingCell</code></td>
+<td>Low-level text/custom draw-operation rendering with immediate or composition custom-visual backend, optional shared text cache, and layout fast path.</td>
+</tr>
+<tr>
 <td><code>DataGridHierarchicalColumn</code></td>
 <td><code>DataGridHierarchicalPresenter</code></td>
 <td>Tree column with <code>Indent</code>; used with hierarchical models.</td>
@@ -203,6 +208,7 @@
 <li>Prefer built-in columns over templates when possible; they wire editing, validation, and theme resources for you.</li>
 <li>Use <code>ClipboardContentBinding</code> on a column when you need different export text than the displayed value.</li>
 <li>For hierarchical data, combine <code>DataGridHierarchicalColumn</code> with <a href="hierarchical-data.html">Hierarchical Data</a>.</li>
+<li>For low-level text rendering and Skia draw operations, use <code>DataGridCustomDrawingColumn</code>. See <a href="custom-drawing-columns.html">Custom Drawing Columns and Skia Draw Operations</a>.</li>
 </ul>
 
 </article>
