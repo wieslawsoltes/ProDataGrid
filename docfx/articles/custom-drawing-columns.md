@@ -4,6 +4,7 @@
 
 - low-level text rendering using the control text path (`FormattedText`),
 - custom `ICustomDrawOperation` rendering (`DrawingContext.Custom(...)`),
+- composition custom-visual rendering for draw operations (`RenderBackend=CompositionCustomVisual`),
 - optional draw-operation-driven measure/arrange fast path,
 - shared text layout caching for high-frequency text scenarios.
 
@@ -17,6 +18,7 @@ Core types:
 - `DataGridCustomDrawingCell`
 - `DataGridCustomDrawingColumnDefinition` (for `ColumnDefinitionsSource`)
 - `DataGridCustomDrawingMode` (`Text`, `DrawOperation`, `TextAndDrawOperation`)
+- `DataGridCustomDrawingRenderBackend` (`ImmediateDrawOperation`, `CompositionCustomVisual`)
 - `DataGridCustomDrawingTextLayoutCacheMode` (`PerCell`, `Shared`)
 - `IDataGridCellDrawOperationFactory`
 - `IDataGridCellDrawOperationMeasureProvider` (optional)
@@ -33,6 +35,7 @@ Primary column properties:
 | `Binding` | `IBinding` | n/a | Bound value used as source text/value for the cell. |
 | `DrawOperationFactory` | `IDataGridCellDrawOperationFactory` | `null` | Factory creating per-cell draw operations. |
 | `DrawingMode` | `DataGridCustomDrawingMode` | `Text` | Selects text path, draw-operation path, or both. |
+| `RenderBackend` | `DataGridCustomDrawingRenderBackend` | `ImmediateDrawOperation` | Selects immediate draw-op rendering or composition custom-visual backend for draw-operation modes. |
 | `TextLayoutCacheMode` | `DataGridCustomDrawingTextLayoutCacheMode` | `PerCell` | Per-cell text layout cache or shared per-column cache. |
 | `SharedTextLayoutCacheCapacity` | `int` | `1024` | Max entry count for shared layout cache (minimum effective value: `1`). |
 | `DrawOperationLayoutFastPath` | `bool` | `false` | Opt-in measure/arrange fast path driven by draw-operation provider interfaces. |
@@ -53,6 +56,9 @@ Primary column properties:
 5. Render path:
    - Text draws when mode includes text (`Text`/`TextAndDrawOperation`) or when draw operation is unavailable.
    - Draw operation draws when factory is available and mode includes draw operations (`DrawOperation`/`TextAndDrawOperation`).
+   - Backend is selected by `RenderBackend`:
+     - `ImmediateDrawOperation`: draw op is submitted via `context.Custom(...)`.
+     - `CompositionCustomVisual`: draw op snapshot is sent to a composition custom visual handler, which owns invalidation/render.
 
 ## Direct Column Usage (XAML)
 
@@ -78,6 +84,7 @@ This is the same pattern used by the variable-height Skia sample page.
                                    Binding="{Binding Title}"
                                    Width="*"
                                    DrawingMode="DrawOperation"
+                                   RenderBackend="CompositionCustomVisual"
                                    DrawOperationFactory="{StaticResource DefaultSkiaTextFactory}"
                                    TextLayoutCacheMode="Shared"
                                    SharedTextLayoutCacheCapacity="4096"
@@ -149,6 +156,18 @@ internal sealed class SkiaTextCellDrawOperation : ICustomDrawOperation
 
 Context objects provide cell, column, item, value, resolved text, typography, foreground, and selection/current flags. Measure/arrange contexts additionally provide `AvailableSize` / `FinalSize`, trimming, alignment, and flow direction.
 
+## Composition Backend
+
+`RenderBackend="CompositionCustomVisual"` routes draw-operation rendering through a composition custom visual attached to each realized `DataGridCustomDrawingCell`.
+
+- UI thread: resolves cell state and creates draw-operation snapshots via `DrawOperationFactory`.
+- Composition handler: receives snapshots, stores the latest operation, and requests redraw via composition invalidation.
+- Render thread: executes the stored draw operation in the composition visual render pass.
+
+Use composition backend when you want stronger invalidation control for high-frequency custom-draw scenarios (for example live animation/update loops) while preserving the same draw-operation factory contract.
+
+If the composition host cannot be created for a realized cell, rendering falls back to the immediate draw-operation path for compatibility.
+
 ## Column Definitions (MVVM / DataGrid Design Pattern)
 
 `DataGridCustomDrawingColumnDefinition` exposes the same custom drawing settings for `ColumnDefinitionsSource`.
@@ -165,6 +184,7 @@ public MyViewModel(IDataGridCellDrawOperationFactory factory)
             Header = "Description",
             Binding = DataGridBindingDefinition.Create<RowItem, string>(x => x.Description),
             DrawingMode = DataGridCustomDrawingMode.DrawOperation,
+            RenderBackend = DataGridCustomDrawingRenderBackend.CompositionCustomVisual,
             DrawOperationFactory = factory,
             TextLayoutCacheMode = DataGridCustomDrawingTextLayoutCacheMode.Shared,
             SharedTextLayoutCacheCapacity = 4096,
@@ -193,6 +213,7 @@ var definition = builder.CustomDrawing(
     configure: d =>
     {
         d.DrawingMode = DataGridCustomDrawingMode.DrawOperation;
+        d.RenderBackend = DataGridCustomDrawingRenderBackend.CompositionCustomVisual;
         d.DrawOperationFactory = factory;
         d.TextLayoutCacheMode = DataGridCustomDrawingTextLayoutCacheMode.Shared;
         d.SharedTextLayoutCacheCapacity = 4096;

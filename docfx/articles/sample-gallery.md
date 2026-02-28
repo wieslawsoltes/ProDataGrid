@@ -25,8 +25,8 @@ Highlights include:
 - Conditional formatting model samples (cell and row themes, Power Fx and Excel-like scenarios).
 - Hierarchical data, hierarchical drag/drop, and tree-like mimics.
 - Virtualization and scrolling diagnostics (large datasets, row height estimators, recycling).
-- Variable-height scrolling with `DataGridCustomDrawingColumn`, Skia custom draw operations, shared text cache, and layout fast path.
-- Live custom-drawing updates with factory-driven invalidation (`DataGridCustomDrawingColumn.InvalidateCustomDrawingCells` and `IDataGridCellDrawOperationInvalidationSource`).
+- Variable-height scrolling with `DataGridCustomDrawingColumn`, composition custom-visual backend, Skia custom draw operations, shared text cache, and layout fast path.
+- Live custom-drawing updates with composition backend + factory-driven invalidation (`DataGridCustomDrawingColumn.InvalidateCustomDrawingCells` and `IDataGridCellDrawOperationInvalidationSource`).
 - Styling showcases and column theme usage.
 - Column banding with stacked headers for non-pivot tables.
 

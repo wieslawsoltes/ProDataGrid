@@ -28,7 +28,7 @@ This reference summarizes the built-in column types shipped with ProDataGrid and
 | `DataGridHyperlinkColumn` | `HyperlinkButton` | `Binding` to `NavigateUri`; optional `ContentBinding`. |
 | `DataGridButtonColumn` | `Button` | `Content`, `Command`, and `CommandParameter` (row item by default). |
 | `DataGridTemplateColumn` | `DataTemplate` | `CellTemplate`, `CellEditingTemplate`, and `NewRowCellTemplate`. |
-| `DataGridCustomDrawingColumn` | `DataGridCustomDrawingCell` | Low-level text/custom draw-operation rendering with optional shared text cache and layout fast path. |
+| `DataGridCustomDrawingColumn` | `DataGridCustomDrawingCell` | Low-level text/custom draw-operation rendering with immediate or composition custom-visual backend, optional shared text cache, and layout fast path. |
 | `DataGridHierarchicalColumn` | `DataGridHierarchicalPresenter` | Tree column with `Indent`; used with hierarchical models. |
 
 ## Column Definitions (MVVM)
