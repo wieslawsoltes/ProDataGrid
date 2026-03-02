@@ -17,6 +17,7 @@ namespace Avalonia.Diagnostics.ViewModels
         private readonly ISet<string> _pinnedProperties;
         private readonly IHierarchicalModel _hierarchicalModel;
         private bool _isUpdatingSelectedNodeItem;
+        private bool _suppressMainSelectionNotification;
 
         public TreePageViewModel(MainViewModel mainView, TreeNode[] nodes, ITreeHierarchyModelFactory modelFactory, ISet<string> pinnedProperties)
         {
@@ -68,9 +69,12 @@ namespace Avalonia.Diagnostics.ViewModels
                     Details?.UpdatePropertiesView(MainView.ShowImplementedInterfaces);
                     Details?.UpdateStyleFilters();
 
-                    // Notify after details are rebuilt so the Properties tab receives
-                    // the current selection's details rather than the previous node.
-                    MainView.NotifyTreeSelectionChanged(value?.Visual);
+                    if (!_suppressMainSelectionNotification)
+                    {
+                        // Notify after details are rebuilt so the Properties tab receives
+                        // the current selection's details rather than the previous node.
+                        MainView.NotifyTreeSelectionChanged(value?.Visual);
+                    }
                 }
             }
         }
@@ -160,6 +164,16 @@ namespace Avalonia.Diagnostics.ViewModels
 
         public void SelectControl(Control control)
         {
+            SelectControl(control, notifyMainSelection: true);
+        }
+
+        public void SelectControl(Control control, bool notifyMainSelection)
+        {
+            var previousSuppression = _suppressMainSelectionNotification;
+            _suppressMainSelectionNotification = !notifyMainSelection;
+
+            try
+            {
             var node = default(TreeNode);
             Control? c = control;
 
@@ -176,6 +190,11 @@ namespace Avalonia.Diagnostics.ViewModels
             if (node != null)
             {
                 SelectedNode = node;
+            }
+            }
+            finally
+            {
+                _suppressMainSelectionNotification = previousSuppression;
             }
         }
 

@@ -55,8 +55,8 @@
           </MenuItem.Icon>
         </MenuItem>
       </MenuItem>
-      <MenuItem Header="_View">
-        <MenuItem Header="Control _Details">
+        <MenuItem Header="_View">
+          <MenuItem Header="Control _Details">
           <MenuItem Header="Show Implemented Interfaces" Command="{Binding ToggleShowImplementedInterfaces}">
             <MenuItem.Icon>
               <CheckBox BorderThickness="0"
@@ -71,7 +71,8 @@
                         IsEnabled="False"/>
             </MenuItem.Icon>
           </MenuItem>
-        </MenuItem>
+          </MenuItem>
+        <MenuItem Header="_Code" Command="{Binding ShowCode}" />
         <MenuItem Header="Elements/_3D" Command="{Binding ShowElements3D}" />
         <MenuItem Header="_Profiler" Command="{Binding ShowProfiler}" />
         <MenuItem Header="_Metrics" Command="{Binding ShowMetrics}" />
@@ -323,6 +324,7 @@
                 BorderThickness="0"
                 SelectedIndex="{Binding SelectedRightTab, Mode=TwoWay}">
         <TabStripItem Content="Properties" />
+        <TabStripItem Content="Code" />
         <TabStripItem Content="Elements 3D" />
         <TabStripItem Content="Resources" />
         <TabStripItem Content="Assets" />

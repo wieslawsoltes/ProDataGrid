@@ -29,6 +29,8 @@ internal sealed class StylesDiagnosticsPageViewModel : ViewModelBase, IDisposabl
     private AvaloniaObject? _inspectedObject;
     private StylesTreeEntryViewModel? _selectedTreeEntry;
     private ValueFrameViewModel? _selectedFrame;
+    private SetterViewModel? _selectedSetter;
+    private StyleResolutionTraceEntryViewModel? _selectedResolutionEntry;
     private string _inspectedRoot = "(none)";
     private string _inspectedRootType = string.Empty;
     private bool _showInactiveFrames = true;
@@ -154,6 +156,18 @@ internal sealed class StylesDiagnosticsPageViewModel : ViewModelBase, IDisposabl
                 RebuildSetterEntries();
             }
         }
+    }
+
+    public SetterViewModel? SelectedSetter
+    {
+        get => _selectedSetter;
+        set => RaiseAndSetIfChanged(ref _selectedSetter, value);
+    }
+
+    public StyleResolutionTraceEntryViewModel? SelectedResolutionEntry
+    {
+        get => _selectedResolutionEntry;
+        set => RaiseAndSetIfChanged(ref _selectedResolutionEntry, value);
     }
 
     public bool ShowInactiveFrames
@@ -329,6 +343,8 @@ internal sealed class StylesDiagnosticsPageViewModel : ViewModelBase, IDisposabl
         _setters.Clear();
         _pseudoClasses.Clear();
         SelectedFrame = null;
+        SelectedSetter = null;
+        SelectedResolutionEntry = null;
 
         if (entry is null)
         {
@@ -457,6 +473,7 @@ internal sealed class StylesDiagnosticsPageViewModel : ViewModelBase, IDisposabl
         }
 
         RefreshSetters();
+        SelectedSetter = _setters.Count > 0 ? _setters[0] : null;
     }
 
     private void RefreshTreeEntries()
@@ -576,6 +593,109 @@ internal sealed class StylesDiagnosticsPageViewModel : ViewModelBase, IDisposabl
         }
 
         return SettersFilter.Filter(GetSetterKind(setter));
+    }
+
+    public string? GetPreferredSourceLocationText()
+    {
+        if (!string.IsNullOrWhiteSpace(SelectedSetter?.SourceLocation))
+        {
+            return SelectedSetter.SourceLocation;
+        }
+
+        if (!string.IsNullOrWhiteSpace(SelectedResolutionEntry?.SourceLocation))
+        {
+            return SelectedResolutionEntry.SourceLocation;
+        }
+
+        if (!string.IsNullOrWhiteSpace(SelectedFrame?.SourceLocation))
+        {
+            return SelectedFrame.SourceLocation;
+        }
+
+        if (!string.IsNullOrWhiteSpace(SelectedTreeEntry?.SourceLocation))
+        {
+            return SelectedTreeEntry.SourceLocation;
+        }
+
+        return null;
+    }
+
+    public bool TrySelectBySourceLocation(SourceDocumentLocation location)
+    {
+        var updated = false;
+
+        var matchingTree = FindBestSourceMatch(_treeEntries, static entry => entry.SourceLocation, location);
+        if (matchingTree is not null && !ReferenceEquals(SelectedTreeEntry, matchingTree))
+        {
+            SelectedTreeEntry = matchingTree;
+            updated = true;
+        }
+
+        var matchingFrame = FindBestSourceMatch(_frames, static frame => frame.SourceLocation, location);
+        if (matchingFrame is not null && !ReferenceEquals(SelectedFrame, matchingFrame))
+        {
+            SelectedFrame = matchingFrame;
+            updated = true;
+        }
+
+        var matchingSetter = FindBestSourceMatch(_setters, static setter => setter.SourceLocation, location);
+        if (matchingSetter is not null && !ReferenceEquals(SelectedSetter, matchingSetter))
+        {
+            SelectedSetter = matchingSetter;
+            updated = true;
+        }
+
+        var matchingResolution = FindBestSourceMatch(
+            _resolutionEntries,
+            static entry => entry.SourceLocation,
+            location);
+        if (matchingResolution is not null && !ReferenceEquals(SelectedResolutionEntry, matchingResolution))
+        {
+            SelectedResolutionEntry = matchingResolution;
+            updated = true;
+        }
+
+        return updated;
+    }
+
+    private static T? FindBestSourceMatch<T>(
+        IEnumerable<T> entries,
+        Func<T, string> sourceSelector,
+        SourceDocumentLocation target)
+        where T : class
+    {
+        T? best = null;
+        var bestScore = int.MaxValue;
+
+        foreach (var entry in entries)
+        {
+            if (!SourceLocationTextParser.TryParse(sourceSelector(entry), out var parsed))
+            {
+                continue;
+            }
+
+            if (!SourceLocationTextParser.IsSameDocument(parsed.FilePath, target.FilePath))
+            {
+                continue;
+            }
+
+            var lineDistance = Math.Abs(parsed.Line - target.Line);
+            var columnDistance = Math.Abs(parsed.Column - target.Column);
+            var score = (lineDistance * 1000) + columnDistance;
+            if (score >= bestScore)
+            {
+                continue;
+            }
+
+            best = entry;
+            bestScore = score;
+            if (score == 0)
+            {
+                break;
+            }
+        }
+
+        return best;
     }
 
     private bool FilterResolutionEntry(object item)

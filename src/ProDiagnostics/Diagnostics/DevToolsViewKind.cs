@@ -65,4 +65,8 @@ public enum DevToolsViewKind
     /// Styles diagnostic view
     /// </summary>
     Styles = 14,
+    /// <summary>
+    /// Source code and XAML diagnostics view.
+    /// </summary>
+    Code = 15,
 }

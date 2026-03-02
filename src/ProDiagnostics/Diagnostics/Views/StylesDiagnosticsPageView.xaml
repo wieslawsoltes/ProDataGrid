@@ -188,6 +188,7 @@
                        UseRegexFilter="{Binding UseRegexFilter}" />
         <DataGrid Grid.Row="2"
                   ItemsSource="{Binding SettersView}"
+                  SelectedItem="{Binding SelectedSetter, Mode=TwoWay}"
                   AutoGenerateColumns="False"
                   HeadersVisibility="Column"
                   BorderThickness="0"
@@ -267,6 +268,7 @@
                      UseWholeWordFilter="{Binding UseWholeWordFilter}"
                      UseRegexFilter="{Binding UseRegexFilter}" />
       <DataGrid ItemsSource="{Binding ResolutionEntriesView}"
+                SelectedItem="{Binding SelectedResolutionEntry, Mode=TwoWay}"
                 AutoGenerateColumns="False"
                 HeadersVisibility="Column"
                 BorderThickness="0"

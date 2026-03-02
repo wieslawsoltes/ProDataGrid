@@ -203,6 +203,47 @@ namespace Avalonia.Diagnostics.ViewModels
             }
         }
 
+        public bool TrySelectResourceBySourceLocation(SourceDocumentLocation location)
+        {
+            ResourceEntryViewModel? best = null;
+            var bestScore = int.MaxValue;
+
+            for (var i = 0; i < _resourceEntries.Count; i++)
+            {
+                var entry = _resourceEntries[i];
+                if (!SourceLocationTextParser.TryParse(entry.SourceLocation, out var parsed))
+                {
+                    continue;
+                }
+
+                if (!SourceLocationTextParser.IsSameDocument(parsed.FilePath, location.FilePath))
+                {
+                    continue;
+                }
+
+                var score = Math.Abs(parsed.Line - location.Line) * 1000 + Math.Abs(parsed.Column - location.Column);
+                if (score >= bestScore)
+                {
+                    continue;
+                }
+
+                best = entry;
+                bestScore = score;
+                if (score == 0)
+                {
+                    break;
+                }
+            }
+
+            if (best is null || ReferenceEquals(best, SelectedResource))
+            {
+                return false;
+            }
+
+            SelectedResource = best;
+            return true;
+        }
+
         private void RefreshResources()
         {
             _resourceEntries.Clear();

@@ -147,6 +147,47 @@ namespace Avalonia.Diagnostics.ViewModels
             });
         }
 
+        public bool TrySelectAssetBySourceLocation(SourceDocumentLocation location)
+        {
+            AssetEntryViewModel? best = null;
+            var bestScore = int.MaxValue;
+
+            for (var i = 0; i < _assets.Count; i++)
+            {
+                var asset = _assets[i];
+                if (!SourceLocationTextParser.TryParse(asset.SourceLocation, out var parsed))
+                {
+                    continue;
+                }
+
+                if (!SourceLocationTextParser.IsSameDocument(parsed.FilePath, location.FilePath))
+                {
+                    continue;
+                }
+
+                var score = Math.Abs(parsed.Line - location.Line) * 1000 + Math.Abs(parsed.Column - location.Column);
+                if (score >= bestScore)
+                {
+                    continue;
+                }
+
+                best = asset;
+                bestScore = score;
+                if (score == 0)
+                {
+                    break;
+                }
+            }
+
+            if (best is null || ReferenceEquals(best, SelectedAsset))
+            {
+                return false;
+            }
+
+            SelectedAsset = best;
+            return true;
+        }
+
         private bool FilterAsset(object obj)
         {
             if (obj is not AssetEntryViewModel asset)

@@ -17,8 +17,8 @@ namespace Avalonia.Diagnostics.ViewModels
 {
     internal class MainViewModel : ViewModelBase, IDisposable
     {
-        private const int LastVisibleTabIndex = 15;
-        private const int LastTabIndex = 16;
+        private const int LastVisibleTabIndex = 16;
+        private const int LastTabIndex = 17;
         private const int LastRightPanelTabIndex = LastTabIndex - 3;
 
         private readonly AvaloniaObject _root;
@@ -26,6 +26,7 @@ namespace Avalonia.Diagnostics.ViewModels
         private readonly TreePageViewModel _visualTree;
         private readonly TreePageViewModel _combinedTree;
         private readonly ResourcesPageViewModel _resources;
+        private readonly CodePageViewModel _code;
         private readonly AssetsPageViewModel _assets;
         private readonly EventsPageViewModel _events;
         private readonly BreakpointService _breakpointService;
@@ -39,6 +40,7 @@ namespace Avalonia.Diagnostics.ViewModels
         private readonly ProfilerPageViewModel _profiler;
         private readonly SettingsPageViewModel _settings;
         private readonly HotKeyPageViewModel _hotKeys;
+        private readonly ISourceLocationService _sourceLocationService;
         private readonly IDisposable _pointerOverSubscription;
 
         private readonly HashSet<string> _pinnedProperties = new();
@@ -70,10 +72,16 @@ namespace Avalonia.Diagnostics.ViewModels
         private AvaloniaObject? _selectedDiagnosticsObject;
         private bool _isSynchronizingCombinedTreeSelection;
         private bool _isSynchronizingTabSelection;
+        private readonly Dictionary<AvaloniaObject, SourceLocationInfo> _sourceLocationCache = new();
+        private bool _isSyncingFromCodeSelection;
+        private ControlDetailsViewModel? _logicalDetailsSubscription;
+        private ControlDetailsViewModel? _visualDetailsSubscription;
+        private ControlDetailsViewModel? _combinedDetailsSubscription;
 
         public MainViewModel(AvaloniaObject root)
         {
             _root = root;
+            _sourceLocationService = new PortablePdbSourceLocationService();
             var templateProvider = new TemplateVisualTreeProvider();
             var treeModelFactory = new TreeHierarchyModelFactory();
             var logicalProvider = new LogicalTreeNodeProvider();
@@ -89,6 +97,7 @@ namespace Avalonia.Diagnostics.ViewModels
             _visualTree = new TreePageViewModel(this, visualProvider.Create(root), treeModelFactory, _pinnedProperties);
             _combinedTree = new TreePageViewModel(this, combinedProvider.Create(root), treeModelFactory, _pinnedProperties);
             _resources = new ResourcesPageViewModel(this, resourceProvider.Create(root), resourceModelFactory, resourceFormatter);
+            _code = new CodePageViewModel(GetSelectedDiagnosticsObject, OnCodeCaretLocationChanged, _sourceLocationService);
             _assets = new AssetsPageViewModel(this);
             _events = new EventsPageViewModel(this, _breakpointService);
             _breakpoints = new BreakpointsPageViewModel(_breakpointService);
@@ -103,6 +112,17 @@ namespace Avalonia.Diagnostics.ViewModels
             _hotKeys = new HotKeyPageViewModel();
             _treeContent = ResolveTreeTabContent(0);
             _rightContent = ResolveRightTabContent(3, inspectSelection: false);
+
+            _logicalTree.PropertyChanged += TreePagePropertyChanged;
+            _visualTree.PropertyChanged += TreePagePropertyChanged;
+            _combinedTree.PropertyChanged += TreePagePropertyChanged;
+            AttachDetailsSubscription(_logicalTree);
+            AttachDetailsSubscription(_visualTree);
+            AttachDetailsSubscription(_combinedTree);
+
+            _stylesDiagnostics.PropertyChanged += StylesDiagnosticsPropertyChanged;
+            _resources.PropertyChanged += ResourcesPagePropertyChanged;
+            _assets.PropertyChanged += AssetsPagePropertyChanged;
 
             UpdateFocusedControl();
 
@@ -452,37 +472,39 @@ namespace Avalonia.Diagnostics.ViewModels
             private set => RaiseAndSetIfChanged(ref _pointerOverElementName, value);
         }
 
-        public void ShowHotKeys() => SelectedTab = 16;
+        public void ShowHotKeys() => SelectedTab = 17;
 
-        public void ShowBreakpoints() => SelectedTab = 8;
+        public void ShowCode() => SelectedTab = 4;
 
-        public void ShowTransportSettings() => SelectedTab = 14;
+        public void ShowBreakpoints() => SelectedTab = 9;
 
-        public void ShowMetrics() => SelectedTab = 10;
+        public void ShowTransportSettings() => SelectedTab = 15;
+
+        public void ShowMetrics() => SelectedTab = 11;
 
         public void ShowViewModelsBindings()
         {
             _viewModelsBindings.InspectSelection();
-            SelectedTab = 11;
+            SelectedTab = 12;
         }
 
         public void ShowStyles()
         {
             _stylesDiagnostics.InspectSelection();
-            SelectedTab = 13;
+            SelectedTab = 14;
         }
 
-        public void ShowLogs() => SelectedTab = 9;
+        public void ShowLogs() => SelectedTab = 10;
 
         public void ShowElements3D()
         {
             _elements3D.InspectSelection();
-            SelectedTab = 4;
+            SelectedTab = 5;
         }
 
-        public void ShowProfiler() => SelectedTab = 12;
+        public void ShowProfiler() => SelectedTab = 13;
 
-        public void ShowSettings() => SelectedTab = 15;
+        public void ShowSettings() => SelectedTab = 16;
 
         public void SelectNextToolTab()
         {
@@ -515,6 +537,9 @@ namespace Avalonia.Diagnostics.ViewModels
                     break;
                 case ControlDetailsViewModel details:
                     details.UpdatePropertiesView(ShowImplementedInterfaces);
+                    break;
+                case CodePageViewModel codePage:
+                    codePage.Refresh();
                     break;
                 case ResourcesPageViewModel resources:
                     resources.UpdateDetailsView();
@@ -567,6 +592,9 @@ namespace Avalonia.Diagnostics.ViewModels
                     break;
                 case StylesDiagnosticsPageViewModel stylesPage:
                     stylesPage.Clear();
+                    break;
+                case CodePageViewModel codePage:
+                    codePage.InspectControl(GetSelectedDiagnosticsObject());
                     break;
                 case ProfilerPageViewModel profilerPage:
                     profilerPage.Clear();
@@ -678,17 +706,16 @@ namespace Avalonia.Diagnostics.ViewModels
 
         public void SelectControl(Control control)
         {
-            if (!ReferenceEquals(_combinedTree.SelectedNode?.Visual, control))
-            {
-                _combinedTree.SelectControl(control);
-            }
+            _combinedTree.SelectControl(control, notifyMainSelection: false);
+            _logicalTree.SelectControl(control, notifyMainSelection: false);
+            _visualTree.SelectControl(control, notifyMainSelection: false);
 
             switch (Content)
             {
                 case TreePageViewModel tree:
                     if (!ReferenceEquals(tree, _combinedTree))
                     {
-                        tree.SelectControl(control);
+                        tree.SelectControl(control, notifyMainSelection: false);
                     }
 
                     break;
@@ -719,6 +746,16 @@ namespace Avalonia.Diagnostics.ViewModels
                 KeyboardDevice.Instance.PropertyChanged -= KeyboardPropertyChanged;
             }
 
+            _logicalTree.PropertyChanged -= TreePagePropertyChanged;
+            _visualTree.PropertyChanged -= TreePagePropertyChanged;
+            _combinedTree.PropertyChanged -= TreePagePropertyChanged;
+            DetachDetailsSubscription(_logicalTree, ref _logicalDetailsSubscription);
+            DetachDetailsSubscription(_visualTree, ref _visualDetailsSubscription);
+            DetachDetailsSubscription(_combinedTree, ref _combinedDetailsSubscription);
+            _stylesDiagnostics.PropertyChanged -= StylesDiagnosticsPropertyChanged;
+            _resources.PropertyChanged -= ResourcesPagePropertyChanged;
+            _assets.PropertyChanged -= AssetsPagePropertyChanged;
+
             _pointerOverSubscription.Dispose();
             _breakpointService.Clear();
             _logicalTree.Dispose();
@@ -729,6 +766,7 @@ namespace Avalonia.Diagnostics.ViewModels
             _breakpoints.Dispose();
             _logs.Dispose();
             _metrics.Dispose();
+            _code.InspectControl(null);
             _stylesDiagnostics.Dispose();
             _transportSettings.Dispose();
             _profiler.Dispose();
@@ -898,6 +936,7 @@ namespace Avalonia.Diagnostics.ViewModels
             _stylesDiagnostics.InspectControl(resolvedSelection);
             _elements3D.InspectControl(resolvedSelection);
             RefreshPropertiesTabContent();
+            SyncCodeFromCurrentContext();
             UpdateInspectionHighlight();
         }
 
@@ -970,18 +1009,19 @@ namespace Avalonia.Diagnostics.ViewModels
                 DevToolsViewKind.CombinedTree => 0,
                 DevToolsViewKind.LogicalTree => 1,
                 DevToolsViewKind.VisualTree => 2,
-                DevToolsViewKind.Elements3D => 4,
-                DevToolsViewKind.Resources => 5,
-                DevToolsViewKind.Assets => 6,
-                DevToolsViewKind.Events => 7,
-                DevToolsViewKind.Breakpoints => 8,
-                DevToolsViewKind.Logs => 9,
-                DevToolsViewKind.Metrics => 10,
-                DevToolsViewKind.ViewModelsBindings => 11,
-                DevToolsViewKind.Profiler => 12,
-                DevToolsViewKind.Styles => 13,
-                DevToolsViewKind.TransportSettings => 14,
-                DevToolsViewKind.Settings => 15,
+                DevToolsViewKind.Code => 4,
+                DevToolsViewKind.Elements3D => 5,
+                DevToolsViewKind.Resources => 6,
+                DevToolsViewKind.Assets => 7,
+                DevToolsViewKind.Events => 8,
+                DevToolsViewKind.Breakpoints => 9,
+                DevToolsViewKind.Logs => 10,
+                DevToolsViewKind.Metrics => 11,
+                DevToolsViewKind.ViewModelsBindings => 12,
+                DevToolsViewKind.Profiler => 13,
+                DevToolsViewKind.Styles => 14,
+                DevToolsViewKind.TransportSettings => 15,
+                DevToolsViewKind.Settings => 16,
                 _ => 0
             };
         }
@@ -1061,45 +1101,48 @@ namespace Avalonia.Diagnostics.ViewModels
                 case 3:
                     return ResolvePropertiesContent();
                 case 4:
+                    SyncCodeFromCurrentContext();
+                    return _code;
+                case 5:
                     if (inspectSelection)
                     {
                         _elements3D.InspectSelection();
                     }
 
                     return _elements3D;
-                case 5:
-                    return _resources;
                 case 6:
-                    return _assets;
+                    return _resources;
                 case 7:
-                    return _events;
+                    return _assets;
                 case 8:
-                    return _breakpoints;
+                    return _events;
                 case 9:
-                    return _logs;
+                    return _breakpoints;
                 case 10:
-                    return _metrics;
+                    return _logs;
                 case 11:
+                    return _metrics;
+                case 12:
                     if (inspectSelection)
                     {
                         _viewModelsBindings.InspectSelection();
                     }
 
                     return _viewModelsBindings;
-                case 12:
-                    return _profiler;
                 case 13:
+                    return _profiler;
+                case 14:
                     if (inspectSelection)
                     {
                         _stylesDiagnostics.InspectSelection();
                     }
 
                     return _stylesDiagnostics;
-                case 14:
-                    return _transportSettings;
                 case 15:
-                    return _settings;
+                    return _transportSettings;
                 case 16:
+                    return _settings;
+                case 17:
                     return _hotKeys;
                 default:
                     return _resources;
@@ -1137,6 +1180,253 @@ namespace Avalonia.Diagnostics.ViewModels
             if (SelectedTab == 3)
             {
                 Content = RightContent;
+            }
+        }
+
+        private void TreePagePropertyChanged(object? sender, PropertyChangedEventArgs e)
+        {
+            if (sender is not TreePageViewModel treeViewModel)
+            {
+                return;
+            }
+
+            if (e.PropertyName == nameof(TreePageViewModel.Details))
+            {
+                AttachDetailsSubscription(treeViewModel);
+            }
+        }
+
+        private void AttachDetailsSubscription(TreePageViewModel treeViewModel)
+        {
+            ref var currentDetails = ref GetDetailsSubscriptionSlot(treeViewModel);
+            if (ReferenceEquals(currentDetails, treeViewModel.Details))
+            {
+                return;
+            }
+
+            if (currentDetails is not null)
+            {
+                currentDetails.PropertyChanged -= ControlDetailsPropertyChanged;
+            }
+
+            currentDetails = treeViewModel.Details;
+            if (currentDetails is not null)
+            {
+                currentDetails.PropertyChanged += ControlDetailsPropertyChanged;
+            }
+        }
+
+        private void DetachDetailsSubscription(TreePageViewModel treeViewModel, ref ControlDetailsViewModel? currentDetails)
+        {
+            if (currentDetails is not null)
+            {
+                currentDetails.PropertyChanged -= ControlDetailsPropertyChanged;
+                currentDetails = null;
+            }
+
+            treeViewModel.PropertyChanged -= TreePagePropertyChanged;
+        }
+
+        private ref ControlDetailsViewModel? GetDetailsSubscriptionSlot(TreePageViewModel treeViewModel)
+        {
+            if (ReferenceEquals(treeViewModel, _logicalTree))
+            {
+                return ref _logicalDetailsSubscription;
+            }
+
+            if (ReferenceEquals(treeViewModel, _visualTree))
+            {
+                return ref _visualDetailsSubscription;
+            }
+
+            return ref _combinedDetailsSubscription;
+        }
+
+        private void ControlDetailsPropertyChanged(object? sender, PropertyChangedEventArgs e)
+        {
+            if (e.PropertyName is nameof(ControlDetailsViewModel.SelectedEntity)
+                or nameof(ControlDetailsViewModel.SelectedProperty)
+                or nameof(ControlDetailsViewModel.XamlSourceText)
+                or nameof(ControlDetailsViewModel.CodeSourceText))
+            {
+                SyncCodeFromCurrentContext();
+            }
+        }
+
+        private void StylesDiagnosticsPropertyChanged(object? sender, PropertyChangedEventArgs e)
+        {
+            if (e.PropertyName is nameof(StylesDiagnosticsPageViewModel.SelectedTreeEntry)
+                or nameof(StylesDiagnosticsPageViewModel.SelectedFrame)
+                or nameof(StylesDiagnosticsPageViewModel.SelectedSetter)
+                or nameof(StylesDiagnosticsPageViewModel.SelectedResolutionEntry))
+            {
+                SyncCodeFromCurrentContext();
+            }
+        }
+
+        private void ResourcesPagePropertyChanged(object? sender, PropertyChangedEventArgs e)
+        {
+            if (e.PropertyName == nameof(ResourcesPageViewModel.SelectedResource))
+            {
+                SyncCodeFromCurrentContext();
+            }
+        }
+
+        private void AssetsPagePropertyChanged(object? sender, PropertyChangedEventArgs e)
+        {
+            if (e.PropertyName == nameof(AssetsPageViewModel.SelectedAsset))
+            {
+                SyncCodeFromCurrentContext();
+            }
+        }
+
+        private void SyncCodeFromCurrentContext()
+        {
+            if (_isSyncingFromCodeSelection)
+            {
+                return;
+            }
+
+            var selectedObject = GetSelectedDiagnosticsObject();
+            var preferredSourceText = GetPreferredSourceLocationText();
+            _code.InspectControl(selectedObject, preferredSourceText);
+        }
+
+        private string? GetPreferredSourceLocationText()
+        {
+            switch (RightContent)
+            {
+                case StylesDiagnosticsPageViewModel styles:
+                    return styles.GetPreferredSourceLocationText();
+                case ResourcesPageViewModel resources:
+                    return resources.SelectedResource?.SourceLocation;
+                case AssetsPageViewModel assets:
+                    return assets.SelectedAsset?.SourceLocation;
+                case ControlDetailsViewModel details:
+                    return !string.IsNullOrWhiteSpace(details.XamlSourceText)
+                        ? details.XamlSourceText
+                        : details.CodeSourceText;
+                case CodePageViewModel:
+                    return _code.SelectedDocumentTab == 0
+                        ? _code.XamlLocationText
+                        : _code.CodeLocationText;
+                default:
+                    return null;
+            }
+        }
+
+        private void OnCodeCaretLocationChanged(SourceDocumentLocation location)
+        {
+            if (_isSyncingFromCodeSelection)
+            {
+                return;
+            }
+
+            _isSyncingFromCodeSelection = true;
+            try
+            {
+                if (TrySelectControlBySourceLocation(location, out var matchedControl))
+                {
+                    SelectControl(matchedControl);
+                }
+
+                _stylesDiagnostics.TrySelectBySourceLocation(location);
+                _resources.TrySelectResourceBySourceLocation(location);
+                _assets.TrySelectAssetBySourceLocation(location);
+            }
+            finally
+            {
+                _isSyncingFromCodeSelection = false;
+            }
+        }
+
+        private bool TrySelectControlBySourceLocation(SourceDocumentLocation target, out Control matchedControl)
+        {
+            matchedControl = null!;
+            var bestScore = int.MaxValue;
+
+            foreach (var node in EnumerateTreeNodes(_combinedTree.Nodes))
+            {
+                if (node.Visual is not Control control)
+                {
+                    continue;
+                }
+
+                var sourceInfo = GetCachedSourceLocation(control);
+                var hasXamlScore = TryGetLocationScore(sourceInfo.XamlLocation, target, out var xamlScore);
+                var hasCodeScore = TryGetLocationScore(sourceInfo.CodeLocation, target, out var codeScore);
+                if (!hasXamlScore && !hasCodeScore)
+                {
+                    continue;
+                }
+
+                var score = hasXamlScore && hasCodeScore
+                    ? Math.Min(xamlScore, codeScore)
+                    : hasXamlScore
+                        ? xamlScore
+                        : codeScore;
+                if (score >= bestScore)
+                {
+                    continue;
+                }
+
+                bestScore = score;
+                matchedControl = control;
+                if (score == 0)
+                {
+                    return true;
+                }
+            }
+
+            return bestScore < int.MaxValue;
+        }
+
+        private SourceLocationInfo GetCachedSourceLocation(AvaloniaObject source)
+        {
+            if (_sourceLocationCache.TryGetValue(source, out var cached))
+            {
+                return cached;
+            }
+
+            var resolved = _sourceLocationService.ResolveObject(source);
+            _sourceLocationCache[source] = resolved;
+            return resolved;
+        }
+
+        private static bool TryGetLocationScore(SourceDocumentLocation? candidate, SourceDocumentLocation target, out int score)
+        {
+            score = int.MaxValue;
+            if (candidate is null)
+            {
+                return false;
+            }
+
+            if (!SourceLocationTextParser.IsSameDocument(candidate.FilePath, target.FilePath))
+            {
+                return false;
+            }
+
+            score = Math.Abs(candidate.Line - target.Line) * 1000 + Math.Abs(candidate.Column - target.Column);
+            return true;
+        }
+
+        private static IEnumerable<TreeNode> EnumerateTreeNodes(IEnumerable<TreeNode> roots)
+        {
+            var stack = new Stack<TreeNode>();
+            foreach (var root in roots)
+            {
+                stack.Push(root);
+            }
+
+            while (stack.Count > 0)
+            {
+                var current = stack.Pop();
+                yield return current;
+
+                for (var i = current.Children.Count - 1; i >= 0; i--)
+                {
+                    stack.Push(current.Children[i]);
+                }
             }
         }
 
