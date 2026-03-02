@@ -1,5 +1,6 @@
 <UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:local="using:Avalonia.Diagnostics.Views"
              xmlns:vm="using:Avalonia.Diagnostics.ViewModels"
              x:Class="Avalonia.Diagnostics.Views.StylesDiagnosticsPageView"
              x:DataType="vm:StylesDiagnosticsPageViewModel">
@@ -74,11 +75,17 @@
                               Width="1.2*"
                               IsReadOnly="True"
                               x:DataType="vm:StylesTreeEntryViewModel" />
-          <DataGridTextColumn Header="Source"
-                              Binding="{Binding SourceLocation}"
-                              Width="2*"
-                              IsReadOnly="True"
-                              x:DataType="vm:StylesTreeEntryViewModel" />
+          <DataGridTemplateColumn Header="Source" Width="2*" ReuseCellContent="True">
+            <DataGridTemplateColumn.CellTemplate>
+              <DataTemplate x:DataType="vm:StylesTreeEntryViewModel">
+                <TextBlock Text="{Binding SourceLocation}" TextTrimming="CharacterEllipsis">
+                  <ToolTip.Tip>
+                    <local:SourceLocationToolTipView SourceLocation="{Binding SourceLocation}" />
+                  </ToolTip.Tip>
+                </TextBlock>
+              </DataTemplate>
+            </DataGridTemplateColumn.CellTemplate>
+          </DataGridTemplateColumn>
           <DataGridTextColumn Header="Depth"
                               Binding="{Binding Depth}"
                               Width="0.8*"
@@ -147,11 +154,17 @@
                                 Width="0.8*"
                                 IsReadOnly="True"
                                 x:DataType="vm:ValueFrameViewModel" />
-            <DataGridTextColumn Header="Source"
-                                Binding="{Binding SourceLocation}"
-                                Width="1.8*"
-                                IsReadOnly="True"
-                                x:DataType="vm:ValueFrameViewModel" />
+            <DataGridTemplateColumn Header="Source" Width="1.8*" ReuseCellContent="True">
+              <DataGridTemplateColumn.CellTemplate>
+                <DataTemplate x:DataType="vm:ValueFrameViewModel">
+                  <TextBlock Text="{Binding SourceLocation}" TextTrimming="CharacterEllipsis">
+                    <ToolTip.Tip>
+                      <local:SourceLocationToolTipView SourceLocation="{Binding SourceLocation}" />
+                    </ToolTip.Tip>
+                  </TextBlock>
+                </DataTemplate>
+              </DataGridTemplateColumn.CellTemplate>
+            </DataGridTemplateColumn>
           </DataGrid.Columns>
         </DataGrid>
       </DockPanel>
@@ -197,11 +210,17 @@
                                     Width="0.8*"
                                     IsReadOnly="True"
                                     x:DataType="vm:SetterViewModel" />
-            <DataGridTextColumn Header="Source"
-                                Binding="{Binding SourceLocation}"
-                                Width="1.8*"
-                                IsReadOnly="True"
-                                x:DataType="vm:SetterViewModel" />
+            <DataGridTemplateColumn Header="Source" Width="1.8*" ReuseCellContent="True">
+              <DataGridTemplateColumn.CellTemplate>
+                <DataTemplate x:DataType="vm:SetterViewModel">
+                  <TextBlock Text="{Binding SourceLocation}" TextTrimming="CharacterEllipsis">
+                    <ToolTip.Tip>
+                      <local:SourceLocationToolTipView SourceLocation="{Binding SourceLocation}" />
+                    </ToolTip.Tip>
+                  </TextBlock>
+                </DataTemplate>
+              </DataGridTemplateColumn.CellTemplate>
+            </DataGridTemplateColumn>
           </DataGrid.Columns>
         </DataGrid>
 
@@ -310,11 +329,17 @@
                               Width="0.8*"
                               IsReadOnly="True"
                               x:DataType="vm:StyleResolutionTraceEntryViewModel" />
-          <DataGridTextColumn Header="Source"
-                              Binding="{Binding SourceLocation}"
-                              Width="1.8*"
-                              IsReadOnly="True"
-                              x:DataType="vm:StyleResolutionTraceEntryViewModel" />
+          <DataGridTemplateColumn Header="Source" Width="1.8*" ReuseCellContent="True">
+            <DataGridTemplateColumn.CellTemplate>
+              <DataTemplate x:DataType="vm:StyleResolutionTraceEntryViewModel">
+                <TextBlock Text="{Binding SourceLocation}" TextTrimming="CharacterEllipsis">
+                  <ToolTip.Tip>
+                    <local:SourceLocationToolTipView SourceLocation="{Binding SourceLocation}" />
+                  </ToolTip.Tip>
+                </TextBlock>
+              </DataTemplate>
+            </DataGridTemplateColumn.CellTemplate>
+          </DataGridTemplateColumn>
           <DataGridTextColumn Header="Active/Matched"
                               Binding="{Binding AppliedSummary}"
                               Width="0.9*"

@@ -139,11 +139,20 @@
                                 IsReadOnly="True"
                                 Width="3*"
                                 x:DataType="vm:ResourceEntryViewModel"/>
-            <DataGridTextColumn Header="Source"
-                                Binding="{Binding SourceLocation}"
-                                IsReadOnly="True"
-                                Width="2.2*"
-                                x:DataType="vm:ResourceEntryViewModel"/>
+            <DataGridTemplateColumn Header="Source"
+                                    Width="2.2*"
+                                    ReuseCellContent="True">
+              <DataGridTemplateColumn.CellTemplate>
+                <DataTemplate x:DataType="vm:ResourceEntryViewModel">
+                  <TextBlock Text="{Binding SourceLocation}"
+                             TextTrimming="CharacterEllipsis">
+                    <ToolTip.Tip>
+                      <views:SourceLocationToolTipView SourceLocation="{Binding SourceLocation}" />
+                    </ToolTip.Tip>
+                  </TextBlock>
+                </DataTemplate>
+              </DataGridTemplateColumn.CellTemplate>
+            </DataGridTemplateColumn>
             <DataGridTextColumn Header="Theme"
                                 Binding="{Binding ThemeVariant}"
                                 IsReadOnly="True"
