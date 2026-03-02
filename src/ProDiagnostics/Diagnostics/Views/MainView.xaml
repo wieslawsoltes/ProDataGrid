@@ -75,9 +75,9 @@
         <MenuItem Header="Elements/_3D" Command="{Binding ShowElements3D}" />
         <MenuItem Header="_Profiler" Command="{Binding ShowProfiler}" />
         <MenuItem Header="_Metrics" Command="{Binding ShowMetrics}" />
-        <MenuItem Header="ViewModels/_Bindings" Command="{Binding ShowViewModelsBindings}" />
+        <MenuItem Header="_Bindings" Command="{Binding ShowViewModelsBindings}" />
         <MenuItem Header="St_yles" Command="{Binding ShowStyles}" />
-        <MenuItem Header="_Transport/Process" Command="{Binding ShowTransportSettings}" />
+        <MenuItem Header="_Transport" Command="{Binding ShowTransportSettings}" />
         <MenuItem Header="_Breakpoints" Command="{Binding ShowBreakpoints}" />
         <MenuItem Header="_Logs" Command="{Binding ShowLogs}" />
         <MenuItem Header="_Settings" Command="{Binding ShowSettings}" />
@@ -303,31 +303,58 @@
       </MenuItem>
     </Menu>
 
-    <TabStrip Grid.Row="2"
-              BorderBrush="Transparent"
-              BorderThickness="0"
-              SelectedIndex="{Binding SelectedTab, Mode=TwoWay}">
-      <TabStripItem Content="Combined Tree" />
-      <TabStripItem Content="Logical Tree" />
-      <TabStripItem Content="Visual Tree" />
-      <TabStripItem Content="Resources" />
-      <TabStripItem Content="Assets" />
-      <TabStripItem Content="Events" />
-      <TabStripItem Content="Breakpoints" />
-      <TabStripItem Content="Logs" />
-      <TabStripItem Content="Metrics" />
-      <TabStripItem Content="ViewModels/Bindings" />
-      <TabStripItem Content="Transport/Process" />
-      <TabStripItem Content="Elements 3D" />
-      <TabStripItem Content="Profiler" />
-      <TabStripItem Content="Settings" />
-      <TabStripItem Content="Styles" />
-      <TabStripItem Content="HotKeys" IsVisible="False" />
-    </TabStrip>
+    <Grid Grid.Row="2"
+          Grid.RowSpan="2"
+          ColumnDefinitions="2*,Auto,3*"
+          RowDefinitions="Auto,*">
+      <TabStrip Grid.Row="0"
+                Grid.Column="0"
+                BorderBrush="Transparent"
+                BorderThickness="0"
+                SelectedIndex="{Binding SelectedTreeTab, Mode=TwoWay}">
+        <TabStripItem Content="Combined" />
+        <TabStripItem Content="Visual" />
+        <TabStripItem Content="Logical" />
+      </TabStrip>
 
-    <ContentControl Grid.Row="3"
-                    BorderThickness="0"
-                    Content="{Binding Content}" />
+      <TabStrip Grid.Row="0"
+                Grid.Column="2"
+                BorderBrush="Transparent"
+                BorderThickness="0"
+                SelectedIndex="{Binding SelectedRightTab, Mode=TwoWay}">
+        <TabStripItem Content="Properties" />
+        <TabStripItem Content="Elements 3D" />
+        <TabStripItem Content="Resources" />
+        <TabStripItem Content="Assets" />
+        <TabStripItem Content="Events" />
+        <TabStripItem Content="Breakpoints" />
+        <TabStripItem Content="Logs" />
+        <TabStripItem Content="Metrics" />
+        <TabStripItem Content="Bindings" />
+        <TabStripItem Content="Profiler" />
+        <TabStripItem Content="Styles" />
+        <TabStripItem Content="Transport" />
+        <TabStripItem Content="Settings" />
+        <TabStripItem Content="HotKeys" IsVisible="False" />
+      </TabStrip>
+
+      <GridSplitter Grid.RowSpan="2"
+                    Grid.Column="1"
+                    Width="4"
+                    ResizeDirection="Columns"
+                    ResizeBehavior="PreviousAndNext"
+                    Background="{DynamicResource ThemeControlMidBrush}" />
+
+      <ContentControl Grid.Row="1"
+                      Grid.Column="0"
+                      BorderThickness="0"
+                      Content="{Binding TreeContent}" />
+
+      <ContentControl Grid.Row="1"
+                      Grid.Column="2"
+                      BorderThickness="0"
+                      Content="{Binding RightContent}" />
+    </Grid>
 
     <GridSplitter Name="consoleSplitter" Grid.Row="4" Height="1"
                   Background="{DynamicResource ThemeControlMidBrush}"

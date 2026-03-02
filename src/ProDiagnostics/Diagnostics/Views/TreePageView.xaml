@@ -3,7 +3,7 @@
              xmlns:vm="using:Avalonia.Diagnostics.ViewModels"
              x:Class="Avalonia.Diagnostics.Views.TreePageView"
              x:DataType="vm:TreePageViewModel">
-  <Grid ColumnDefinitions="0.35*,4,0.65*">
+  <Grid>
     <DataGrid Name="tree"
               BorderThickness="0"
               AutoGenerateColumns="False"
@@ -52,8 +52,5 @@
         </MenuFlyout>
       </DataGrid.ContextFlyout>
     </DataGrid>
-
-    <GridSplitter Background="{DynamicResource ThemeControlMidBrush}" Width="1" Grid.Column="1"/>
-    <ContentControl Content="{Binding Details}" Grid.Column="2"/>
   </Grid>
 </UserControl>

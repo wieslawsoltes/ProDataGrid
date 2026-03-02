@@ -17,7 +17,9 @@ namespace Avalonia.Diagnostics.ViewModels
 {
     internal class MainViewModel : ViewModelBase, IDisposable
     {
-        private const int LastVisibleTabIndex = 14;
+        private const int LastVisibleTabIndex = 15;
+        private const int LastTabIndex = 16;
+        private const int LastRightPanelTabIndex = LastTabIndex - 3;
 
         private readonly AvaloniaObject _root;
         private readonly TreePageViewModel _logicalTree;
@@ -42,7 +44,11 @@ namespace Avalonia.Diagnostics.ViewModels
         private readonly HashSet<string> _pinnedProperties = new();
 
         private ViewModelBase? _content;
-        private int _selectedTab;
+        private ViewModelBase? _treeContent;
+        private ViewModelBase? _rightContent;
+        private int _selectedTab = -1;
+        private int _selectedTreeTab;
+        private int _selectedRightTab;
         private string? _focusedControl;
         private IInputElement? _pointerOverElement;
         private bool _shouldVisualizeMarginPadding = true;
@@ -63,6 +69,7 @@ namespace Avalonia.Diagnostics.ViewModels
         private IDisposable? _currentInspectionHighlightAdorner;
         private AvaloniaObject? _selectedDiagnosticsObject;
         private bool _isSynchronizingCombinedTreeSelection;
+        private bool _isSynchronizingTabSelection;
 
         public MainViewModel(AvaloniaObject root)
         {
@@ -94,6 +101,8 @@ namespace Avalonia.Diagnostics.ViewModels
             _profiler = new ProfilerPageViewModel();
             _settings = new SettingsPageViewModel(this);
             _hotKeys = new HotKeyPageViewModel();
+            _treeContent = ResolveTreeTabContent(0);
+            _rightContent = ResolveRightTabContent(3, inspectSelection: false);
 
             UpdateFocusedControl();
 
@@ -330,68 +339,83 @@ namespace Avalonia.Diagnostics.ViewModels
             }
         }
 
+        public ViewModelBase? TreeContent
+        {
+            get => _treeContent;
+            private set => RaiseAndSetIfChanged(ref _treeContent, value);
+        }
+
+        public ViewModelBase? RightContent
+        {
+            get => _rightContent;
+            private set => RaiseAndSetIfChanged(ref _rightContent, value);
+        }
+
+        public int SelectedTreeTab
+        {
+            get => _selectedTreeTab;
+            set
+            {
+                var normalized = NormalizeTreeTabIndex(value);
+                if (!RaiseAndSetIfChanged(ref _selectedTreeTab, normalized))
+                {
+                    return;
+                }
+
+                TreeContent = ResolveTreeTabContent(normalized);
+                RefreshPropertiesTabContent();
+                if (!_isSynchronizingTabSelection)
+                {
+                    SelectedTab = MapTreeTabToGlobalTab(normalized);
+                }
+            }
+        }
+
+        public int SelectedRightTab
+        {
+            get => _selectedRightTab;
+            set
+            {
+                var normalized = NormalizeRightTabIndex(value);
+                if (!RaiseAndSetIfChanged(ref _selectedRightTab, normalized))
+                {
+                    return;
+                }
+
+                RightContent = ResolveRightTabContent(MapRightTabToGlobalTab(normalized), inspectSelection: true);
+                if (!_isSynchronizingTabSelection)
+                {
+                    SelectedTab = MapRightTabToGlobalTab(normalized);
+                }
+            }
+        }
+
         public int SelectedTab
         {
             get => _selectedTab;
             set
             {
-                _selectedTab = value;
+                var normalized = NormalizeGlobalTabIndex(value);
+                _selectedTab = normalized;
 
-                switch (value)
+                _isSynchronizingTabSelection = true;
+                try
                 {
-                    case 1:
-                        Content = _logicalTree;
-                        break;
-                    case 2:
-                        Content = _visualTree;
-                        break;
-                    case 3:
-                        Content = _resources;
-                        break;
-                    case 4:
-                        Content = _assets;
-                        break;
-                    case 5:
-                        Content = _events;
-                        break;
-                    case 6:
-                        Content = _breakpoints;
-                        break;
-                    case 7:
-                        Content = _logs;
-                        break;
-                    case 8:
-                        Content = _metrics;
-                        break;
-                    case 9:
-                        _viewModelsBindings.InspectSelection();
-                        Content = _viewModelsBindings;
-                        break;
-                    case 10:
-                        Content = _transportSettings;
-                        break;
-                    case 11:
-                        _elements3D.InspectSelection();
-                        Content = _elements3D;
-                        break;
-                    case 12:
-                        Content = _profiler;
-                        break;
-                    case 13:
-                        Content = _settings;
-                        break;
-                    case 14:
-                        _stylesDiagnostics.InspectSelection();
-                        Content = _stylesDiagnostics;
-                        break;
-                    case 15:
-                        Content = _hotKeys;
-                        break;
-                    default:
-                        Content = _combinedTree;
-                        break;
+                    if (IsTreeTab(normalized))
+                    {
+                        SelectedTreeTab = MapGlobalTabToTreeTab(normalized);
+                    }
+                    else
+                    {
+                        SelectedRightTab = MapGlobalTabToRightTab(normalized);
+                    }
+                }
+                finally
+                {
+                    _isSynchronizingTabSelection = false;
                 }
 
+                Content = IsTreeTab(normalized) ? TreeContent : RightContent;
                 RaisePropertyChanged();
             }
         }
@@ -428,37 +452,37 @@ namespace Avalonia.Diagnostics.ViewModels
             private set => RaiseAndSetIfChanged(ref _pointerOverElementName, value);
         }
 
-        public void ShowHotKeys() => SelectedTab = 15;
+        public void ShowHotKeys() => SelectedTab = 16;
 
-        public void ShowBreakpoints() => SelectedTab = 6;
+        public void ShowBreakpoints() => SelectedTab = 8;
 
-        public void ShowTransportSettings() => SelectedTab = 10;
+        public void ShowTransportSettings() => SelectedTab = 14;
 
-        public void ShowMetrics() => SelectedTab = 8;
+        public void ShowMetrics() => SelectedTab = 10;
 
         public void ShowViewModelsBindings()
         {
             _viewModelsBindings.InspectSelection();
-            SelectedTab = 9;
+            SelectedTab = 11;
         }
 
         public void ShowStyles()
         {
             _stylesDiagnostics.InspectSelection();
-            SelectedTab = 14;
+            SelectedTab = 13;
         }
 
-        public void ShowLogs() => SelectedTab = 7;
+        public void ShowLogs() => SelectedTab = 9;
 
         public void ShowElements3D()
         {
             _elements3D.InspectSelection();
-            SelectedTab = 11;
+            SelectedTab = 4;
         }
 
         public void ShowProfiler() => SelectedTab = 12;
 
-        public void ShowSettings() => SelectedTab = 13;
+        public void ShowSettings() => SelectedTab = 15;
 
         public void SelectNextToolTab()
         {
@@ -488,6 +512,9 @@ namespace Avalonia.Diagnostics.ViewModels
             {
                 case TreePageViewModel tree:
                     tree.UpdatePropertiesView();
+                    break;
+                case ControlDetailsViewModel details:
+                    details.UpdatePropertiesView(ShowImplementedInterfaces);
                     break;
                 case ResourcesPageViewModel resources:
                     resources.UpdateDetailsView();
@@ -794,15 +821,15 @@ namespace Avalonia.Diagnostics.ViewModels
         [DependsOn(nameof(Content))]
         public bool CanShot(object? parameter)
         {
-            return Content is TreePageViewModel tree
-                && tree.SelectedNode != null
+            var tree = GetActiveTreeViewModel();
+            return tree.SelectedNode != null
                 && tree.SelectedNode.Visual is Visual visual
                 && visual.VisualRoot != null;
         }
 
         public async void Shot(object? parameter)
         {
-            if ((Content as TreePageViewModel)?.SelectedNode?.Visual is Control control && _screenshotHandler is { })
+            if (GetActiveTreeViewModel().SelectedNode?.Visual is Control control && _screenshotHandler is { })
             {
                 try
                 {
@@ -870,6 +897,7 @@ namespace Avalonia.Diagnostics.ViewModels
             _viewModelsBindings.InspectControl(resolvedSelection);
             _stylesDiagnostics.InspectControl(resolvedSelection);
             _elements3D.InspectControl(resolvedSelection);
+            RefreshPropertiesTabContent();
             UpdateInspectionHighlight();
         }
 
@@ -896,6 +924,10 @@ namespace Avalonia.Diagnostics.ViewModels
             if (Content is TreePageViewModel viewModel)
             {
                 viewModel.UpdatePropertiesView();
+            }
+            else if (Content is ControlDetailsViewModel detailsViewModel)
+            {
+                detailsViewModel.UpdatePropertiesView(value);
             }
             else if (Content is ResourcesPageViewModel resourcesViewModel)
             {
@@ -938,20 +970,174 @@ namespace Avalonia.Diagnostics.ViewModels
                 DevToolsViewKind.CombinedTree => 0,
                 DevToolsViewKind.LogicalTree => 1,
                 DevToolsViewKind.VisualTree => 2,
-                DevToolsViewKind.Resources => 3,
-                DevToolsViewKind.Assets => 4,
-                DevToolsViewKind.Events => 5,
-                DevToolsViewKind.Breakpoints => 6,
-                DevToolsViewKind.Logs => 7,
-                DevToolsViewKind.Metrics => 8,
-                DevToolsViewKind.ViewModelsBindings => 9,
-                DevToolsViewKind.TransportSettings => 10,
-                DevToolsViewKind.Elements3D => 11,
+                DevToolsViewKind.Elements3D => 4,
+                DevToolsViewKind.Resources => 5,
+                DevToolsViewKind.Assets => 6,
+                DevToolsViewKind.Events => 7,
+                DevToolsViewKind.Breakpoints => 8,
+                DevToolsViewKind.Logs => 9,
+                DevToolsViewKind.Metrics => 10,
+                DevToolsViewKind.ViewModelsBindings => 11,
                 DevToolsViewKind.Profiler => 12,
-                DevToolsViewKind.Settings => 13,
-                DevToolsViewKind.Styles => 14,
+                DevToolsViewKind.Styles => 13,
+                DevToolsViewKind.TransportSettings => 14,
+                DevToolsViewKind.Settings => 15,
                 _ => 0
             };
+        }
+
+        private static bool IsTreeTab(int tabIndex) => tabIndex is 0 or 1 or 2;
+
+        private static int NormalizeTreeTabIndex(int tabIndex)
+        {
+            return tabIndex switch
+            {
+                < 0 => 0,
+                > 2 => 2,
+                _ => tabIndex
+            };
+        }
+
+        private static int NormalizeRightTabIndex(int tabIndex)
+        {
+            return Math.Clamp(tabIndex, 0, LastRightPanelTabIndex);
+        }
+
+        private static int NormalizeGlobalTabIndex(int tabIndex)
+        {
+            return tabIndex switch
+            {
+                < 0 => 0,
+                > LastTabIndex => LastTabIndex,
+                _ => tabIndex
+            };
+        }
+
+        // Left panel order is Combined, Visual, Logical for faster inspection flow.
+        private static int MapTreeTabToGlobalTab(int treeTabIndex)
+        {
+            return treeTabIndex switch
+            {
+                1 => 2,
+                2 => 1,
+                _ => 0
+            };
+        }
+
+        private static int MapGlobalTabToTreeTab(int globalTabIndex)
+        {
+            return globalTabIndex switch
+            {
+                2 => 1,
+                1 => 2,
+                _ => 0
+            };
+        }
+
+        private static int MapRightTabToGlobalTab(int rightTabIndex)
+        {
+            return NormalizeRightTabIndex(rightTabIndex) + 3;
+        }
+
+        private static int MapGlobalTabToRightTab(int globalTabIndex)
+        {
+            return NormalizeRightTabIndex(globalTabIndex - 3);
+        }
+
+        private ViewModelBase ResolveTreeTabContent(int treeTabIndex)
+        {
+            return treeTabIndex switch
+            {
+                1 => _visualTree,
+                2 => _logicalTree,
+                _ => _combinedTree
+            };
+        }
+
+        private ViewModelBase? ResolveRightTabContent(int globalTabIndex, bool inspectSelection)
+        {
+            switch (globalTabIndex)
+            {
+                case 3:
+                    return ResolvePropertiesContent();
+                case 4:
+                    if (inspectSelection)
+                    {
+                        _elements3D.InspectSelection();
+                    }
+
+                    return _elements3D;
+                case 5:
+                    return _resources;
+                case 6:
+                    return _assets;
+                case 7:
+                    return _events;
+                case 8:
+                    return _breakpoints;
+                case 9:
+                    return _logs;
+                case 10:
+                    return _metrics;
+                case 11:
+                    if (inspectSelection)
+                    {
+                        _viewModelsBindings.InspectSelection();
+                    }
+
+                    return _viewModelsBindings;
+                case 12:
+                    return _profiler;
+                case 13:
+                    if (inspectSelection)
+                    {
+                        _stylesDiagnostics.InspectSelection();
+                    }
+
+                    return _stylesDiagnostics;
+                case 14:
+                    return _transportSettings;
+                case 15:
+                    return _settings;
+                case 16:
+                    return _hotKeys;
+                default:
+                    return _resources;
+            }
+        }
+
+        private TreePageViewModel GetActiveTreeViewModel()
+        {
+            return SelectedTreeTab switch
+            {
+                1 => _visualTree,
+                2 => _logicalTree,
+                _ => _combinedTree
+            };
+        }
+
+        private ControlDetailsViewModel? ResolvePropertiesContent()
+        {
+            return GetActiveTreeViewModel().Details;
+        }
+
+        private void RefreshPropertiesTabContent()
+        {
+            if (SelectedRightTab != 0)
+            {
+                return;
+            }
+
+            var propertiesContent = ResolvePropertiesContent();
+            if (!ReferenceEquals(RightContent, propertiesContent))
+            {
+                RightContent = propertiesContent;
+            }
+
+            if (SelectedTab == 3)
+            {
+                Content = RightContent;
+            }
         }
 
         private AvaloniaObject? GetSelectedDiagnosticsObject()

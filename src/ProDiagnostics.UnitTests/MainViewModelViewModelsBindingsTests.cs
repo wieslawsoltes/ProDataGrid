@@ -20,7 +20,7 @@ public class MainViewModelViewModelsBindingsTests
         };
 
         using var viewModel = new MainViewModel(root);
-        viewModel.SelectedTab = 9;
+        viewModel.SelectedTab = 11;
 
         var content = Assert.IsType<ViewModelsBindingsPageViewModel>(viewModel.Content);
         Assert.NotEqual("(none)", content.InspectedElement);
@@ -37,7 +37,7 @@ public class MainViewModelViewModelsBindingsTests
         var root = new TopLevelGroup(new SingleViewTopLevelGroup(window));
 
         using var viewModel = new MainViewModel(root);
-        viewModel.SelectedTab = 9;
+        viewModel.SelectedTab = 11;
 
         var content = Assert.IsType<ViewModelsBindingsPageViewModel>(viewModel.Content);
         Assert.NotEqual("(none)", content.InspectedElement);
@@ -60,7 +60,7 @@ public class MainViewModelViewModelsBindingsTests
         };
 
         using var viewModel = new MainViewModel(root);
-        viewModel.SelectedTab = 9;
+        viewModel.SelectedTab = 11;
 
         var content = Assert.IsType<ViewModelsBindingsPageViewModel>(viewModel.Content);
         viewModel.SelectControl(button);
@@ -85,7 +85,7 @@ public class MainViewModelViewModelsBindingsTests
         };
 
         using var viewModel = new MainViewModel(root);
-        viewModel.SelectedTab = 11;
+        viewModel.SelectedTab = 4;
 
         var content = Assert.IsType<Elements3DPageViewModel>(viewModel.Content);
         viewModel.SelectControl(button);
@@ -108,7 +108,7 @@ public class MainViewModelViewModelsBindingsTests
 
         using var viewModel = new MainViewModel(root);
         viewModel.SelectControl(button);
-        viewModel.SelectedTab = 11;
+        viewModel.SelectedTab = 4;
 
         var content = Assert.IsType<Elements3DPageViewModel>(viewModel.Content);
         Assert.Equal("Button#ScopedButton", content.InspectedRoot);
@@ -129,7 +129,7 @@ public class MainViewModelViewModelsBindingsTests
 
         using var viewModel = new MainViewModel(root);
         viewModel.SelectControl(button);
-        viewModel.SelectedTab = 14;
+        viewModel.SelectedTab = 13;
 
         var content = Assert.IsType<StylesDiagnosticsPageViewModel>(viewModel.Content);
         Assert.Equal("Button#StyledButton", content.InspectedRoot);
@@ -151,7 +151,7 @@ public class MainViewModelViewModelsBindingsTests
         };
 
         using var viewModel = new MainViewModel(root);
-        viewModel.SelectedTab = 14;
+        viewModel.SelectedTab = 13;
 
         var content = Assert.IsType<StylesDiagnosticsPageViewModel>(viewModel.Content);
         viewModel.SelectControl(second);
@@ -182,7 +182,7 @@ public class MainViewModelViewModelsBindingsTests
 
         combinedTree.SelectedNode = node;
 
-        viewModel.SelectedTab = 11;
+        viewModel.SelectedTab = 4;
         var content = Assert.IsType<Elements3DPageViewModel>(viewModel.Content);
         Assert.Equal("Button#ManualScopeButton", content.InspectedRoot);
     }
@@ -208,7 +208,7 @@ public class MainViewModelViewModelsBindingsTests
         Assert.NotNull(node);
         combinedTree.SelectedNodeItem = new SelectionItemWrapper(node!);
 
-        viewModel.SelectedTab = 11;
+        viewModel.SelectedTab = 4;
         var content = Assert.IsType<Elements3DPageViewModel>(viewModel.Content);
         Assert.Equal("Button#WrapperScopeButton", content.InspectedRoot);
     }
@@ -236,7 +236,7 @@ public class MainViewModelViewModelsBindingsTests
 
         combinedTree.SelectedNodeItem = new object();
 
-        viewModel.SelectedTab = 11;
+        viewModel.SelectedTab = 4;
         var content = Assert.IsType<Elements3DPageViewModel>(viewModel.Content);
         Assert.Equal("Button#StableScopeButton", content.InspectedRoot);
     }
@@ -264,7 +264,7 @@ public class MainViewModelViewModelsBindingsTests
 
         combinedTree.SelectedNodeItem = null;
 
-        viewModel.SelectedTab = 11;
+        viewModel.SelectedTab = 4;
         var content = Assert.IsType<Elements3DPageViewModel>(viewModel.Content);
         Assert.Equal("Button#TransientNullButton", content.InspectedRoot);
     }
