@@ -5,7 +5,14 @@
 - Visual and logical tree inspection.
 - Property and style inspection with live values.
 - Routed event tracking.
+- Runtime logs capture and filtering.
+- Runtime metrics capture and aggregation.
+- Runtime profiler sampling (CPU/memory/GC deltas).
+- Elements 3D visual-tree depth and stacking inspection.
+- Transport/process UDP export settings for remote diagnostics viewers.
+- ViewModels and bindings diagnostics.
 - Layout exploration and renderer diagnostics overlays.
+- In-window settings for overlay/inspection behavior.
 
 ## Installation
 
