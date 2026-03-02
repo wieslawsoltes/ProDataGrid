@@ -12,6 +12,7 @@ internal static partial class DataGridDiagnostics
         public const string RowsUnit = "{row}";
         public const string ColumnsUnit = "{column}";
         public const string SelectionUnit = "{selection}";
+        public const string DecisionsUnit = "{decision}";
 
         public const string DataGridRefreshTimeName = "prodatagrid.refresh.time";
         public const string DataGridRefreshTimeDescription = "Duration of DataGrid refresh pass (rows and columns).";
@@ -49,6 +50,18 @@ internal static partial class DataGridDiagnostics
         public const string CollectionGroupPageTimeName = "prodatagrid.collection.group.page.time";
         public const string CollectionGroupPageTimeDescription = "Duration of building page-level groups.";
 
+        public const string HierarchicalRefreshTimeName = "prodatagrid.hierarchical.refresh.time";
+        public const string HierarchicalRefreshTimeDescription = "Duration of HierarchicalModel refresh operations.";
+
+        public const string HierarchicalFlattenedApplyTimeName = "prodatagrid.hierarchical.flattened.apply.time";
+        public const string HierarchicalFlattenedApplyTimeDescription = "Duration of applying hierarchical flattened deltas in DataGrid.";
+
+        public const string HierarchicalFlattenedApplyGateCountName = "prodatagrid.hierarchical.flattened.apply.gate.count";
+        public const string HierarchicalFlattenedApplyGateCountDescription = "Count of flattened apply gate decisions and rejection reasons.";
+
+        public const string CellPseudoClassUpdateTimeName = "prodatagrid.cells.pseudoclasses.update.time";
+        public const string CellPseudoClassUpdateTimeDescription = "Duration of DataGridCell pseudo-class updates.";
+
         public const string RowsRealizedCountName = "prodatagrid.rows.realized.count";
         public const string RowsRealizedCountDescription = "Number of row containers realized by the DataGrid.";
 
@@ -84,6 +97,8 @@ internal static partial class DataGridDiagnostics
         public const string AddedCount = nameof(AddedCount);
         public const string RemovedCount = nameof(RemovedCount);
         public const string SelectionSource = nameof(SelectionSource);
+        public const string CanApply = nameof(CanApply);
+        public const string Reason = nameof(Reason);
         public const string UserInitiated = nameof(UserInitiated);
         public const string SortDescriptions = nameof(SortDescriptions);
         public const string GroupDescriptions = nameof(GroupDescriptions);
@@ -92,6 +107,7 @@ internal static partial class DataGridDiagnostics
         public const string PageIndex = nameof(PageIndex);
         public const string UsesLocalArray = nameof(UsesLocalArray);
         public const string IsGrouping = nameof(IsGrouping);
+        public const string ChangeCount = nameof(ChangeCount);
     }
 
     public static class Sources
@@ -100,5 +116,23 @@ internal static partial class DataGridDiagnostics
         public const string New = "new";
         public const string Recycled = "recycled";
         public const string OwnContainer = "own-container";
+    }
+
+    public static class HierarchicalFlattenedApplyGateReasons
+    {
+        public const string Allowed = "allowed";
+        public const string HierarchicalRowsDisabled = "hierarchical-rows-disabled";
+        public const string HierarchicalRefreshSuppressed = "hierarchical-refresh-suppressed";
+        public const string IncompatibleItemsSource = "incompatible-items-source";
+        public const string MissingChanges = "missing-changes";
+        public const string GroupingEnabled = "grouping-enabled";
+        public const string MissingSelectionModelOrColumns = "missing-selection-model-or-columns";
+        public const string InvalidChangeIndex = "invalid-change-index";
+        public const string NegativeChangeCount = "negative-change-count";
+        public const string OldCountOutOfRange = "old-count-out-of-range";
+        public const string InvalidSlot = "invalid-slot";
+        public const string OldCountPastSlotEnd = "old-count-past-slot-end";
+        public const string NegativeResultingCount = "negative-resulting-count";
+        public const string NoEffectiveChanges = "no-effective-changes";
     }
 }

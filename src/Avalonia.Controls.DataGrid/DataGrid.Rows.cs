@@ -550,14 +550,53 @@ internal
 
         internal void InsertRowAt(int rowIndex)
         {
-            int slot = SlotFromRowIndex(rowIndex);
-            object item = DataConnection.GetDataItem(rowIndex);
+            InsertRowsAt(rowIndex, 1);
+        }
+
+        internal void InsertRowsAt(int rowIndex, int count)
+        {
+            if (count <= 0)
+            {
+                return;
+            }
+
+            if (DataConnection == null)
+            {
+                return;
+            }
+
+            var items = new object[count];
+            for (var i = 0; i < count; i++)
+            {
+                items[i] = DataConnection.GetDataItem(rowIndex + i);
+            }
+
+            InsertRowsAt(rowIndex, items);
+        }
+
+        internal void InsertRowsAt(int rowIndex, IReadOnlyList<object> items)
+        {
+            if (items == null || items.Count == 0)
+            {
+                return;
+            }
+
+            int firstSlot = SlotFromRowIndex(rowIndex);
+            Debug.Assert(firstSlot >= 0);
 
             // Notify the estimator about the insertion
-            RowHeightEstimator?.OnItemsInserted(slot, 1);
+            RowHeightEstimator?.OnItemsInserted(firstSlot, items.Count);
 
-            // isCollapsed below is always false because we only use the method if we're not grouping
-            InsertElementAt(slot, rowIndex, item, null/*DataGridRowGroupInfo*/, false /*isCollapsed*/);
+            for (var i = 0; i < items.Count; i++)
+            {
+                var currentRowIndex = rowIndex + i;
+                var slot = SlotFromRowIndex(currentRowIndex);
+                var item = items[i];
+
+                // isCollapsed below is always false because we only use the method if we're not grouping
+                InsertElementAt(slot, currentRowIndex, item, null /*DataGridRowGroupInfo*/, false /*isCollapsed*/);
+            }
+
             RequestPointerOverRefresh();
         }
 
@@ -802,12 +841,28 @@ internal
 
         internal void RemoveRowAt(int rowIndex, object item)
         {
+            RemoveRowsAt(rowIndex, 1, item);
+        }
+
+        internal void RemoveRowsAt(int rowIndex, int count, object item)
+        {
+            if (count <= 0)
+            {
+                return;
+            }
+
             int slot = SlotFromRowIndex(rowIndex);
-            
+            Debug.Assert(slot >= 0);
+
             // Notify the estimator about the removal
-            RowHeightEstimator?.OnItemsRemoved(slot, 1);
-            
-            RemoveElementAt(slot, item, true);
+            RowHeightEstimator?.OnItemsRemoved(slot, count);
+
+            for (var i = 0; i < count; i++)
+            {
+                // Always remove at the same slot because following rows shift into it.
+                RemoveElementAt(slot, item, true);
+            }
+
             RequestPointerOverRefresh();
         }
 

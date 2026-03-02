@@ -198,6 +198,7 @@ namespace Avalonia.Controls.DataGridHierarchical
         private Func<T, bool>? _isLeafSelector;
         private IComparer<T>? _siblingComparer;
         private Func<T, IComparer<T>?>? _siblingComparerSelector;
+        private SiblingComparerCollectionChangeMode _siblingComparerCollectionChangeMode;
         private string? _childrenPropertyPath;
         private bool _autoExpandRoot;
         private int? _maxAutoExpandDepth;
@@ -305,6 +306,16 @@ namespace Avalonia.Controls.DataGridHierarchical
             set
             {
                 _siblingComparerSelector = value;
+                Push();
+            }
+        }
+
+        public SiblingComparerCollectionChangeMode SiblingComparerCollectionChangeMode
+        {
+            get => _siblingComparerCollectionChangeMode;
+            set
+            {
+                _siblingComparerCollectionChangeMode = value;
                 Push();
             }
         }
@@ -532,6 +543,7 @@ namespace Avalonia.Controls.DataGridHierarchical
                     return null;
                 }
                 : null;
+            target.SiblingComparerCollectionChangeMode = SiblingComparerCollectionChangeMode;
         }
 
         private Func<object, CancellationToken, Task<IEnumerable?>>? ResolveAsyncSelector()

@@ -25,7 +25,7 @@ namespace Avalonia.Controls
             if (element is DataGridRow row)
             {
                 row.ApplyState(isSelectedOverride);
-                row.ApplyCellsState();
+                row.ApplyCellsState(force: true);
                 EnsureRowDetailsVisibility(row, raiseNotification: true, animate: true, isSelectedOverride: isSelectedOverride);
             }
             else

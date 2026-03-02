@@ -327,6 +327,18 @@ internal
 
         internal void UpdatePseudoClasses()
         {
+            if (DataGridDiagnostics.IsEnabled)
+            {
+                using var _ = DataGridDiagnostics.BeginCellPseudoClassUpdate();
+                UpdatePseudoClassesCore();
+                return;
+            }
+
+            UpdatePseudoClassesCore();
+        }
+
+        private void UpdatePseudoClassesCore()
+        {
             var owningGrid = OwningGrid;
             var owningColumn = OwningColumn;
             var owningRow = OwningRow;
@@ -352,7 +364,12 @@ internal
             bool isInfo = ValidationSeverity == DataGridValidationSeverity.Info;
             bool isFocus = owningGrid.IsFocused && isCurrent;
 
-            owningGrid.TryGetSearchCellState(owningRow.Index, owningColumn, out bool isSearchMatch, out bool isSearchCurrent);
+            bool isSearchMatch = false;
+            bool isSearchCurrent = false;
+            if (owningGrid.IsSearchCellHighlightingEnabled())
+            {
+                owningGrid.TryGetSearchCellState(owningRow.Index, owningColumn, out isSearchMatch, out isSearchCurrent);
+            }
 
             var nextFlags = BuildPseudoClassFlags(
                 isSelected,

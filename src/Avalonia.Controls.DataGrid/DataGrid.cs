@@ -335,6 +335,10 @@ internal
         private HierarchicalAnchorHint? _pendingHierarchicalAnchorHint;
         private double? _pendingHierarchicalScrollOffset;
         private bool _pendingHierarchicalIndentationRefresh;
+        private readonly object _pendingHierarchicalFlattenedChangesGate = new();
+        private List<PendingHierarchicalFlattenedChange> _pendingHierarchicalFlattenedChanges;
+        private bool _pendingHierarchicalFlattenedChangesQueued;
+        private bool _processingHierarchicalFlattenedChanges;
         private bool _pendingGroupingIndentationRefresh;
         private bool _groupingIndentationRefreshQueued;
         private bool _pendingGroupingIndentationReset;
@@ -426,6 +430,8 @@ internal
         // set as the rows were scrolled off.
         private double _verticalOffset;
         private int _suppressVerticalOffsetAdjustments;
+        private int _deferRowsLayoutUpdates;
+        private bool _pendingRowsLayoutRefresh;
 
         /// <summary>
         /// Identifies the <see cref="HorizontalScroll"/> routed event.
@@ -2889,24 +2895,337 @@ internal
 
         private void HierarchicalAdapter_FlattenedChanged(object sender, FlattenedChangedEventArgs e)
         {
-            HandleHierarchicalFlattenedChanged(e);
+            QueueHierarchicalFlattenedChanged(e);
         }
 
-        private void HandleHierarchicalFlattenedChanged(FlattenedChangedEventArgs e)
+        private sealed class PendingHierarchicalFlattenedChange
+        {
+            public PendingHierarchicalFlattenedChange(
+                FlattenedChangedEventArgs args,
+                IReadOnlyList<object>[] insertedItemsByChange)
+            {
+                Args = args ?? throw new ArgumentNullException(nameof(args));
+                InsertedItemsByChange = insertedItemsByChange ?? Array.Empty<IReadOnlyList<object>>();
+            }
+
+            public FlattenedChangedEventArgs Args { get; }
+
+            public IReadOnlyList<object>[] InsertedItemsByChange { get; }
+        }
+
+        private void QueueHierarchicalFlattenedChanged(FlattenedChangedEventArgs e)
+        {
+            if (e == null)
+            {
+                return;
+            }
+
+            var pendingChange = new PendingHierarchicalFlattenedChange(
+                e,
+                CaptureHierarchicalInsertedItems(e));
+
+            var processNow = false;
+            var schedule = false;
+
+            lock (_pendingHierarchicalFlattenedChangesGate)
+            {
+                _pendingHierarchicalFlattenedChanges ??= new List<PendingHierarchicalFlattenedChange>();
+                _pendingHierarchicalFlattenedChanges.Add(pendingChange);
+
+                if (_processingHierarchicalFlattenedChanges)
+                {
+                    return;
+                }
+
+                if (Dispatcher.UIThread.CheckAccess())
+                {
+                    processNow = true;
+                }
+                else if (!_pendingHierarchicalFlattenedChangesQueued)
+                {
+                    _pendingHierarchicalFlattenedChangesQueued = true;
+                    schedule = true;
+                }
+            }
+
+            if (processNow)
+            {
+                ProcessPendingHierarchicalFlattenedChanges();
+                return;
+            }
+
+            if (schedule)
+            {
+                Dispatcher.UIThread.Post(ProcessPendingHierarchicalFlattenedChanges, DispatcherPriority.Background);
+            }
+        }
+
+        private void ProcessPendingHierarchicalFlattenedChanges()
+        {
+            lock (_pendingHierarchicalFlattenedChangesGate)
+            {
+                if (_processingHierarchicalFlattenedChanges)
+                {
+                    return;
+                }
+
+                _processingHierarchicalFlattenedChanges = true;
+            }
+
+            try
+            {
+                while (true)
+                {
+                    List<PendingHierarchicalFlattenedChange> pending;
+                    lock (_pendingHierarchicalFlattenedChangesGate)
+                    {
+                        _pendingHierarchicalFlattenedChangesQueued = false;
+                        pending = _pendingHierarchicalFlattenedChanges;
+                        _pendingHierarchicalFlattenedChanges = null;
+                    }
+
+                    if (pending == null || pending.Count == 0)
+                    {
+                        break;
+                    }
+
+                    var pendingChangeCount = GetPendingHierarchicalChangeCount(pending);
+
+                    if (!_hierarchicalRowsEnabled)
+                    {
+                        if (DataGridDiagnostics.IsEnabled)
+                        {
+                            DataGridDiagnostics.RecordHierarchicalFlattenedApplyGate(
+                                canApply: false,
+                                DataGridDiagnostics.HierarchicalFlattenedApplyGateReasons.HierarchicalRowsDisabled,
+                                pendingChangeCount);
+                        }
+                        continue;
+                    }
+
+                    if (_hierarchicalRefreshSuppressionCount > 0)
+                    {
+                        if (DataGridDiagnostics.IsEnabled)
+                        {
+                            DataGridDiagnostics.RecordHierarchicalFlattenedApplyGate(
+                                canApply: false,
+                                DataGridDiagnostics.HierarchicalFlattenedApplyGateReasons.HierarchicalRefreshSuppressed,
+                                pendingChangeCount);
+                        }
+                        _pendingHierarchicalRefresh = true;
+                        continue;
+                    }
+
+                    if (!IsHierarchicalItemsSourceCompatible())
+                    {
+                        if (DataGridDiagnostics.IsEnabled)
+                        {
+                            DataGridDiagnostics.RecordHierarchicalFlattenedApplyGate(
+                                canApply: false,
+                                DataGridDiagnostics.HierarchicalFlattenedApplyGateReasons.IncompatibleItemsSource,
+                                pendingChangeCount);
+                        }
+                        continue;
+                    }
+
+                    if (FlushPendingScrollForHierarchyChange())
+                    {
+                        _pendingHierarchicalAnchorHint = null;
+                    }
+
+                    if (pending.Count == 1)
+                    {
+                        var single = pending[0];
+                        HandleHierarchicalFlattenedChanged(single.Args, single.InsertedItemsByChange);
+                        continue;
+                    }
+
+                    HandleHierarchicalFlattenedChangedBatch(pending);
+                }
+            }
+            finally
+            {
+                lock (_pendingHierarchicalFlattenedChangesGate)
+                {
+                    _processingHierarchicalFlattenedChanges = false;
+                }
+
+                SchedulePendingHierarchicalFlattenedChangesIfNeeded();
+            }
+        }
+
+        private void SchedulePendingHierarchicalFlattenedChangesIfNeeded()
+        {
+            var schedule = false;
+            lock (_pendingHierarchicalFlattenedChangesGate)
+            {
+                if (_pendingHierarchicalFlattenedChangesQueued ||
+                    _pendingHierarchicalFlattenedChanges == null ||
+                    _pendingHierarchicalFlattenedChanges.Count == 0)
+                {
+                    return;
+                }
+
+                _pendingHierarchicalFlattenedChangesQueued = true;
+                schedule = true;
+            }
+
+            if (schedule)
+            {
+                Dispatcher.UIThread.Post(ProcessPendingHierarchicalFlattenedChanges, DispatcherPriority.Background);
+            }
+        }
+
+        private static int GetPendingHierarchicalChangeCount(IReadOnlyList<PendingHierarchicalFlattenedChange> pending)
+        {
+            if (pending == null || pending.Count == 0)
+            {
+                return 0;
+            }
+
+            var total = 0;
+            for (var i = 0; i < pending.Count; i++)
+            {
+                total += pending[i].Args?.Changes?.Count ?? 0;
+            }
+
+            return total;
+        }
+
+        private IReadOnlyList<object>[] CaptureHierarchicalInsertedItems(FlattenedChangedEventArgs e)
+        {
+            var snapshots = new IReadOnlyList<object>[e.Changes.Count];
+            var flattened = _hierarchicalModel?.Flattened;
+            if (flattened == null)
+            {
+                return snapshots;
+            }
+
+            for (var i = 0; i < e.Changes.Count; i++)
+            {
+                var change = e.Changes[i];
+                if (change.NewCount <= 0)
+                {
+                    continue;
+                }
+
+                if (change.Index < 0 || change.Index + change.NewCount > flattened.Count)
+                {
+                    continue;
+                }
+
+                var items = new object[change.NewCount];
+                for (var j = 0; j < change.NewCount; j++)
+                {
+                    items[j] = flattened[change.Index + j];
+                }
+
+                snapshots[i] = items;
+            }
+
+            return snapshots;
+        }
+
+        private void HandleHierarchicalFlattenedChangedBatch(IReadOnlyList<PendingHierarchicalFlattenedChange> pending)
+        {
+            if (pending == null || pending.Count == 0)
+            {
+                return;
+            }
+
+            var canApplyAll = true;
+            _pendingHierarchicalScrollOffset = null;
+            _pendingHierarchicalAnchorHint = null;
+
+            using (_hierarchicalModel?.BeginVirtualizationGuard())
+            using (_rowsPresenter?.BeginVirtualizationGuard())
+            {
+                BeginRowsLayoutUpdateBatch();
+                try
+                {
+                    foreach (var change in pending)
+                    {
+                        RemapSelectionForHierarchyChange(change.Args.IndexMap);
+
+                        if (!canApplyAll)
+                        {
+                            continue;
+                        }
+
+                        if (!CanApplyHierarchicalFlattenedChanges(change.Args))
+                        {
+                            canApplyAll = false;
+                            continue;
+                        }
+
+                        ApplyHierarchicalFlattenedChanges(change.Args.Changes, change.InsertedItemsByChange);
+                    }
+                }
+                finally
+                {
+                    EndRowsLayoutUpdateBatch();
+                }
+
+                if (canApplyAll)
+                {
+                    RefreshHierarchicalIndentation();
+                    EnsureDisplayedRowsInRange();
+                    InvalidateMeasure();
+                }
+                else
+                {
+                    RefreshRowsAndColumns(clearRows: false);
+                }
+
+                if (CurrentColumnIndex > -1 && (CurrentSlot < 0 || CurrentSlot >= SlotCount))
+                {
+                    CurrentColumnIndex = -1;
+                    CurrentSlot = -1;
+                }
+
+                RefreshSelectionFromModel();
+                RequestHierarchicalIndentationRefresh();
+            }
+
+            OnCollectionChangedForSummaries(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset));
+        }
+
+        private void HandleHierarchicalFlattenedChanged(FlattenedChangedEventArgs e, IReadOnlyList<object>[] insertedItemsByChange = null)
         {
             if (!_hierarchicalRowsEnabled)
             {
+                if (DataGridDiagnostics.IsEnabled)
+                {
+                    DataGridDiagnostics.RecordHierarchicalFlattenedApplyGate(
+                        canApply: false,
+                        DataGridDiagnostics.HierarchicalFlattenedApplyGateReasons.HierarchicalRowsDisabled,
+                        e?.Changes?.Count ?? 0);
+                }
                 return;
             }
 
             if (_hierarchicalRefreshSuppressionCount > 0)
             {
+                if (DataGridDiagnostics.IsEnabled)
+                {
+                    DataGridDiagnostics.RecordHierarchicalFlattenedApplyGate(
+                        canApply: false,
+                        DataGridDiagnostics.HierarchicalFlattenedApplyGateReasons.HierarchicalRefreshSuppressed,
+                        e?.Changes?.Count ?? 0);
+                }
                 _pendingHierarchicalRefresh = true;
                 return;
             }
 
             if (!IsHierarchicalItemsSourceCompatible())
             {
+                if (DataGridDiagnostics.IsEnabled)
+                {
+                    DataGridDiagnostics.RecordHierarchicalFlattenedApplyGate(
+                        canApply: false,
+                        DataGridDiagnostics.HierarchicalFlattenedApplyGateReasons.IncompatibleItemsSource,
+                        e?.Changes?.Count ?? 0);
+                }
                 return;
             }
 
@@ -2955,7 +3274,7 @@ internal
                     }
                     try
                     {
-                        ApplyHierarchicalFlattenedChanges(e.Changes);
+                        ApplyHierarchicalFlattenedChanges(e.Changes, insertedItemsByChange);
                     }
                     finally
                     {
@@ -3046,19 +3365,33 @@ internal
 
         private bool CanApplyHierarchicalFlattenedChanges(FlattenedChangedEventArgs e)
         {
+            var reason = EvaluateHierarchicalFlattenedApplyGate(e);
+            if (DataGridDiagnostics.IsEnabled)
+            {
+                DataGridDiagnostics.RecordHierarchicalFlattenedApplyGate(
+                    reason == HierarchicalFlattenedApplyGateReason.Allowed,
+                    GetHierarchicalFlattenedApplyGateReason(reason),
+                    e?.Changes?.Count ?? 0);
+            }
+
+            return reason == HierarchicalFlattenedApplyGateReason.Allowed;
+        }
+
+        private HierarchicalFlattenedApplyGateReason EvaluateHierarchicalFlattenedApplyGate(FlattenedChangedEventArgs e)
+        {
             if (e?.Changes == null || e.Changes.Count == 0)
             {
-                return false;
+                return HierarchicalFlattenedApplyGateReason.MissingChanges;
             }
 
             if (DataConnection?.CollectionView is IDataGridCollectionView view && view.IsGrouping)
             {
-                return false;
+                return HierarchicalFlattenedApplyGateReason.GroupingEnabled;
             }
 
             if (_selectionModelAdapter == null || ColumnsItemsInternal.Count == 0)
             {
-                return false;
+                return HierarchicalFlattenedApplyGateReason.MissingSelectionModelOrColumns;
             }
 
             var hasChanges = false;
@@ -3072,28 +3405,28 @@ internal
             {
                 if (change.Index < 0 || change.Index > count)
                 {
-                    return false;
+                    return HierarchicalFlattenedApplyGateReason.InvalidChangeIndex;
                 }
 
                 if (change.OldCount < 0 || change.NewCount < 0)
                 {
-                    return false;
+                    return HierarchicalFlattenedApplyGateReason.NegativeChangeCount;
                 }
 
                 if (change.OldCount > count - change.Index)
                 {
-                    return false;
+                    return HierarchicalFlattenedApplyGateReason.OldCountOutOfRange;
                 }
 
                 var slot = SlotFromRowIndex(change.Index);
                 if (slot < 0 || slot > SlotCount)
                 {
-                    return false;
+                    return HierarchicalFlattenedApplyGateReason.InvalidSlot;
                 }
 
                 if (change.OldCount > 0 && slot >= SlotCount)
                 {
-                    return false;
+                    return HierarchicalFlattenedApplyGateReason.OldCountPastSlotEnd;
                 }
 
                 if (change.OldCount > 0 || change.NewCount > 0)
@@ -3104,31 +3437,93 @@ internal
                 count += change.NewCount - change.OldCount;
                 if (count < 0)
                 {
-                    return false;
+                    return HierarchicalFlattenedApplyGateReason.NegativeResultingCount;
                 }
             }
 
-            return hasChanges;
+            return hasChanges
+                ? HierarchicalFlattenedApplyGateReason.Allowed
+                : HierarchicalFlattenedApplyGateReason.NoEffectiveChanges;
         }
 
-        private void ApplyHierarchicalFlattenedChanges(IReadOnlyList<FlattenedChange> changes)
+        private static string GetHierarchicalFlattenedApplyGateReason(HierarchicalFlattenedApplyGateReason reason)
+        {
+            return reason switch
+            {
+                HierarchicalFlattenedApplyGateReason.Allowed => DataGridDiagnostics.HierarchicalFlattenedApplyGateReasons.Allowed,
+                HierarchicalFlattenedApplyGateReason.MissingChanges => DataGridDiagnostics.HierarchicalFlattenedApplyGateReasons.MissingChanges,
+                HierarchicalFlattenedApplyGateReason.GroupingEnabled => DataGridDiagnostics.HierarchicalFlattenedApplyGateReasons.GroupingEnabled,
+                HierarchicalFlattenedApplyGateReason.MissingSelectionModelOrColumns => DataGridDiagnostics.HierarchicalFlattenedApplyGateReasons.MissingSelectionModelOrColumns,
+                HierarchicalFlattenedApplyGateReason.InvalidChangeIndex => DataGridDiagnostics.HierarchicalFlattenedApplyGateReasons.InvalidChangeIndex,
+                HierarchicalFlattenedApplyGateReason.NegativeChangeCount => DataGridDiagnostics.HierarchicalFlattenedApplyGateReasons.NegativeChangeCount,
+                HierarchicalFlattenedApplyGateReason.OldCountOutOfRange => DataGridDiagnostics.HierarchicalFlattenedApplyGateReasons.OldCountOutOfRange,
+                HierarchicalFlattenedApplyGateReason.InvalidSlot => DataGridDiagnostics.HierarchicalFlattenedApplyGateReasons.InvalidSlot,
+                HierarchicalFlattenedApplyGateReason.OldCountPastSlotEnd => DataGridDiagnostics.HierarchicalFlattenedApplyGateReasons.OldCountPastSlotEnd,
+                HierarchicalFlattenedApplyGateReason.NegativeResultingCount => DataGridDiagnostics.HierarchicalFlattenedApplyGateReasons.NegativeResultingCount,
+                _ => DataGridDiagnostics.HierarchicalFlattenedApplyGateReasons.NoEffectiveChanges
+            };
+        }
+
+        private enum HierarchicalFlattenedApplyGateReason
+        {
+            Allowed,
+            MissingChanges,
+            GroupingEnabled,
+            MissingSelectionModelOrColumns,
+            InvalidChangeIndex,
+            NegativeChangeCount,
+            OldCountOutOfRange,
+            InvalidSlot,
+            OldCountPastSlotEnd,
+            NegativeResultingCount,
+            NoEffectiveChanges,
+        }
+
+        private void ApplyHierarchicalFlattenedChanges(
+            IReadOnlyList<FlattenedChange> changes,
+            IReadOnlyList<object>[] insertedItemsByChange = null)
         {
             if (changes == null || changes.Count == 0)
             {
                 return;
             }
 
-            foreach (var change in changes)
+            using var _ = DataGridDiagnostics.BeginHierarchicalFlattenedApply();
+            BeginRowsLayoutUpdateBatch();
+            try
             {
-                for (var i = 0; i < change.OldCount; i++)
+                for (var changeIndex = 0; changeIndex < changes.Count; changeIndex++)
                 {
-                    RemoveRowAt(change.Index, null);
-                }
+                    var change = changes[changeIndex];
+                    if (change.OldCount > 0)
+                    {
+                        RemoveRowsAt(change.Index, change.OldCount, null);
+                    }
 
-                for (var i = 0; i < change.NewCount; i++)
-                {
-                    InsertRowAt(change.Index + i);
+                    if (change.NewCount > 0)
+                    {
+                        var insertedItems =
+                            insertedItemsByChange != null &&
+                            changeIndex < insertedItemsByChange.Length &&
+                            insertedItemsByChange[changeIndex] != null &&
+                            insertedItemsByChange[changeIndex].Count == change.NewCount
+                                ? insertedItemsByChange[changeIndex]
+                                : null;
+
+                        if (insertedItems != null)
+                        {
+                            InsertRowsAt(change.Index, insertedItems);
+                        }
+                        else
+                        {
+                            InsertRowsAt(change.Index, change.NewCount);
+                        }
+                    }
                 }
+            }
+            finally
+            {
+                EndRowsLayoutUpdateBatch();
             }
         }
 
@@ -4783,7 +5178,7 @@ internal
             isMatch = false;
             isCurrent = false;
 
-            if (_searchModel == null || _searchModel.HighlightMode == SearchHighlightMode.None)
+            if (!IsSearchCellHighlightingEnabled())
             {
                 return false;
             }
@@ -4802,6 +5197,11 @@ internal
             }
 
             return isMatch || isCurrent;
+        }
+
+        internal bool IsSearchCellHighlightingEnabled()
+        {
+            return _searchModel != null && _searchModel.HighlightMode != SearchHighlightMode.None;
         }
 
         private bool TryGetSearchResult(int rowIndex, DataGridColumn column, out SearchResult result)

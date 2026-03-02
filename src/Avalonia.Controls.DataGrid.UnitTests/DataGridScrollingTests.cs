@@ -478,6 +478,34 @@ public class DataGridScrollingTests
     }
 
     [AvaloniaFact]
+    public void RemoveNonDisplayedRows_Does_Not_Continue_When_Display_Becomes_Empty()
+    {
+        // Arrange
+        var items = Enumerable.Range(0, 500).Select(x => new ScrollTestModel($"Item {x}")).ToList();
+        var target = CreateV2Target(items, height: 320, useLogicalScrollable: true);
+        var root = (Window)target.GetVisualRoot()!;
+        root.UpdateLayout();
+        root.UpdateLayout();
+
+        // Reduce the displayed range to a single slot.
+        while (target.DisplayData.NumDisplayedScrollingElements > 1)
+        {
+            InvokeRemoveDisplayedElement(target, target.DisplayData.LastScrollingSlot);
+        }
+
+        var remainingSlot = target.DisplayData.FirstScrollingSlot;
+        Assert.Equal(remainingSlot, target.DisplayData.LastScrollingSlot);
+
+        // Act
+        var exception = Record.Exception(() => InvokeRemoveNonDisplayedRows(target, remainingSlot + 1, remainingSlot + 1));
+
+        // Assert
+        Assert.Null(exception);
+        Assert.Equal(-1, target.DisplayData.FirstScrollingSlot);
+        Assert.Equal(-1, target.DisplayData.LastScrollingSlot);
+    }
+
+    [AvaloniaFact]
     public void Tiny_Viewport_Does_Not_Realize_Excess_Rows()
     {
         // Arrange
@@ -1683,6 +1711,37 @@ public class DataGridScrollingTests
     }
 
     [AvaloniaFact]
+    public void ItemsSource_Reset_Clamps_Stale_HorizontalOffset_When_No_Previous_Scrolling_Column_Exists()
+    {
+        // Arrange
+        var items = Enumerable.Range(0, 80).Select(x => new ScrollTestModel($"Item {x}")).ToList();
+        var target = CreateTarget(items, height: 140, useLogicalScrollable: true);
+        target.ColumnsInternal[0].Width = new DataGridLength(80);
+        target.UpdateLayout();
+
+        var horizontalOffsetField = typeof(DataGrid).GetField("_horizontalOffset", BindingFlags.Instance | BindingFlags.NonPublic);
+        var negHorizontalOffsetField = typeof(DataGrid).GetField("_negHorizontalOffset", BindingFlags.Instance | BindingFlags.NonPublic);
+        Assert.NotNull(horizontalOffsetField);
+        Assert.NotNull(negHorizontalOffsetField);
+
+        // Simulate stale state during data source swap: positive offset, no partial first-column offset.
+        horizontalOffsetField!.SetValue(target, 64d);
+        negHorizontalOffsetField!.SetValue(target, 0d);
+
+        // Act - reset ItemsSource, which triggers ClearRows -> ComputeScrollBarsLayout -> ComputeDisplayedColumns.
+        target.ItemsSource = Enumerable.Range(0, 20).Select(x => new ScrollTestModel($"Replacement {x}")).ToList();
+        target.UpdateLayout();
+
+        // Assert - stale horizontal offset is clamped and does not assert.
+        var horizontalOffset = target.HorizontalOffset;
+        var internalHorizontalOffset = (double?)horizontalOffsetField.GetValue(target) ?? -1;
+        var internalNegHorizontalOffset = (double?)negHorizontalOffsetField.GetValue(target) ?? -1;
+        Assert.InRange(horizontalOffset, 0, 0.01);
+        Assert.InRange(internalHorizontalOffset, 0, 0.01);
+        Assert.InRange(internalNegHorizontalOffset, 0, 0.01);
+    }
+
+    [AvaloniaFact]
     public void AutoScrollToSelectedItem_Off_Does_Not_Scroll_On_Selection()
     {
         // Arrange
@@ -2274,6 +2333,32 @@ public class DataGridScrollingTests
         var field = typeof(DataGridDisplayData).GetField("_recycledRows", BindingFlags.NonPublic | BindingFlags.Instance);
         var recycledRows = (Stack<DataGridRow>)field!.GetValue(displayData)!;
         return recycledRows.Count;
+    }
+
+    private static void InvokeRemoveDisplayedElement(DataGrid target, int slot)
+    {
+        var method = typeof(DataGrid).GetMethod(
+            "RemoveDisplayedElement",
+            BindingFlags.Instance | BindingFlags.NonPublic,
+            binder: null,
+            types: new[] { typeof(int), typeof(bool), typeof(bool) },
+            modifiers: null);
+
+        Assert.NotNull(method);
+        method!.Invoke(target, new object[] { slot, false, true });
+    }
+
+    private static void InvokeRemoveNonDisplayedRows(DataGrid target, int firstSlot, int lastSlot)
+    {
+        var method = typeof(DataGrid).GetMethod(
+            "RemoveNonDisplayedRows",
+            BindingFlags.Instance | BindingFlags.NonPublic,
+            binder: null,
+            types: new[] { typeof(int), typeof(int) },
+            modifiers: null);
+
+        Assert.NotNull(method);
+        method!.Invoke(target, new object[] { firstSlot, lastSlot });
     }
 
     private static IReadOnlyList<DataGridRow> GetRecycledRows(DataGrid target)

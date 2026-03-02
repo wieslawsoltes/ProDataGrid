@@ -8,11 +8,13 @@ using System.Collections.Specialized;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
+using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
 using Avalonia.Collections;
+using Avalonia.Controls;
 using Avalonia.Utilities;
 
 namespace Avalonia.Controls.DataGridHierarchical
@@ -1234,57 +1236,72 @@ namespace Avalonia.Controls.DataGridHierarchical
 
         public async Task RefreshAsync(HierarchicalNode? node = null, CancellationToken cancellationToken = default)
         {
-            var target = node ?? Root;
-            if (target == null)
+            var startTimestamp = DataGridDiagnostics.IsEnabled
+                ? Stopwatch.GetTimestamp()
+                : 0;
+
+            try
             {
-                return;
-            }
-
-            var parentIndex = GetFlattenedIndex(target);
-            var wasExpanded = target.IsExpanded;
-            var canUpdateFlattened = wasExpanded && (parentIndex >= 0 || IsVirtualRootNode(target));
-            var removeStart = parentIndex + 1;
-            IList<HierarchicalNode>? oldVisibleNodes = null;
-
-            var oldChildren = target.MutableChildren.ToArray();
-            foreach (var child in oldChildren)
-            {
-                DetachHierarchy(child);
-            }
-
-            DetachChildrenNotifier(target);
-            target.MutableChildren.Clear();
-            target.IsLeaf = false;
-            target.LoadError = null;
-            await EnsureChildrenMaterializedAsync(target, forceReload: true, cancellationToken).ConfigureAwait(false);
-
-            var removedCount = 0;
-            var insertedCount = 0;
-
-            if (canUpdateFlattened)
-            {
-                var visibleCount = GetVisibleDescendantCount(target, parentIndex);
-                if (visibleCount > 0 && removeStart >= 0 && removeStart + visibleCount <= _flattened.Count)
+                var target = node ?? Root;
+                if (target == null)
                 {
-                    oldVisibleNodes = _flattened.GetRange(removeStart, visibleCount);
+                    return;
                 }
-                removedCount = RemoveVisibleDescendants(target, parentIndex, detachDescendants: false);
-            }
 
-            if (canUpdateFlattened && !target.IsLeaf)
+                var parentIndex = GetFlattenedIndex(target);
+                var wasExpanded = target.IsExpanded;
+                var canUpdateFlattened = wasExpanded && (parentIndex >= 0 || IsVirtualRootNode(target));
+                var removeStart = parentIndex + 1;
+                IList<HierarchicalNode>? oldVisibleNodes = null;
+
+                var oldChildren = target.MutableChildren.ToArray();
+                foreach (var child in oldChildren)
+                {
+                    DetachHierarchy(child);
+                }
+
+                DetachChildrenNotifier(target);
+                target.MutableChildren.Clear();
+                target.IsLeaf = false;
+                target.LoadError = null;
+                await EnsureChildrenMaterializedAsync(target, forceReload: true, cancellationToken).ConfigureAwait(false);
+
+                var removedCount = 0;
+                var insertedCount = 0;
+
+                if (canUpdateFlattened)
+                {
+                    var visibleCount = GetVisibleDescendantCount(target, parentIndex);
+                    if (visibleCount > 0 && removeStart >= 0 && removeStart + visibleCount <= _flattened.Count)
+                    {
+                        oldVisibleNodes = _flattened.GetRange(removeStart, visibleCount);
+                    }
+                    removedCount = RemoveVisibleDescendants(target, parentIndex, detachDescendants: false);
+                }
+
+                if (canUpdateFlattened && !target.IsLeaf)
+                {
+                    insertedCount = InsertVisibleChildren(target, removeStart);
+                }
+
+                if (canUpdateFlattened && (removedCount > 0 || insertedCount > 0))
+                {
+                    var indexMap = oldVisibleNodes != null && insertedCount > 0
+                        ? BuildIndexMap(oldVisibleNodes, removeStart, _flattened.GetRange(removeStart, insertedCount), removeStart)
+                        : null;
+                    OnFlattenedChanged(new[] { new FlattenedChange(removeStart, removedCount, insertedCount) }, indexMap);
+                }
+
+                RecalculateExpandedCountsFrom(target);
+            }
+            finally
             {
-                insertedCount = InsertVisibleChildren(target, removeStart);
+                if (startTimestamp != 0)
+                {
+                    var elapsedMs = (Stopwatch.GetTimestamp() - startTimestamp) * 1000.0 / Stopwatch.Frequency;
+                    DataGridDiagnostics.RecordHierarchicalRefreshDuration(elapsedMs);
+                }
             }
-
-            if (canUpdateFlattened && (removedCount > 0 || insertedCount > 0))
-            {
-                var indexMap = oldVisibleNodes != null && insertedCount > 0
-                    ? BuildIndexMap(oldVisibleNodes, removeStart, _flattened.GetRange(removeStart, insertedCount), removeStart)
-                    : null;
-                OnFlattenedChanged(new[] { new FlattenedChange(removeStart, removedCount, insertedCount) }, indexMap);
-            }
-
-            RecalculateExpandedCountsFrom(target);
         }
 
         public HierarchicalNode? FindNode(object item)
@@ -2103,9 +2120,10 @@ namespace Avalonia.Controls.DataGridHierarchical
 
         private bool ShouldRefreshForChildrenChange(HierarchicalNode parent, ref NotifyCollectionChangedEventArgs e)
         {
-            if (GetComparerForParent(parent) != null)
+            var comparer = GetComparerForParent(parent);
+            if (comparer != null)
             {
-                return true;
+                return ShouldRefreshForComparerChildrenChange(parent, comparer, ref e);
             }
 
             switch (e.Action)
@@ -2121,6 +2139,85 @@ namespace Avalonia.Controls.DataGridHierarchical
                 default:
                     return true;
             }
+        }
+
+        private bool ShouldRefreshForComparerChildrenChange(
+            HierarchicalNode parent,
+            IComparer<object> comparer,
+            ref NotifyCollectionChangedEventArgs e)
+        {
+            if (Options.SiblingComparerCollectionChangeMode != SiblingComparerCollectionChangeMode.IncrementalMonotonic)
+            {
+                return true;
+            }
+
+            switch (e.Action)
+            {
+                case NotifyCollectionChangedAction.Add:
+                    if (!TryNormalizeAddChange(parent, ref e))
+                    {
+                        return true;
+                    }
+
+                    return !CanApplyComparerAddIncrementally(parent, comparer, e);
+                case NotifyCollectionChangedAction.Remove:
+                    return e.OldStartingIndex < 0;
+                case NotifyCollectionChangedAction.Replace:
+                case NotifyCollectionChangedAction.Move:
+                case NotifyCollectionChangedAction.Reset:
+                default:
+                    return true;
+            }
+        }
+
+        private bool CanApplyComparerAddIncrementally(
+            HierarchicalNode parent,
+            IComparer<object> comparer,
+            NotifyCollectionChangedEventArgs e)
+        {
+            if (e.NewItems == null || e.NewItems.Count == 0)
+            {
+                return true;
+            }
+
+            if (parent.ChildrenSource is not IList list)
+            {
+                return false;
+            }
+
+            var start = e.NewStartingIndex;
+            var count = e.NewItems.Count;
+            if (start < 0 || start + count > list.Count)
+            {
+                return false;
+            }
+
+            try
+            {
+                if (start > 0 && comparer.Compare(list[start - 1], list[start]) > 0)
+                {
+                    return false;
+                }
+
+                for (var i = start + 1; i < start + count; i++)
+                {
+                    if (comparer.Compare(list[i - 1], list[i]) > 0)
+                    {
+                        return false;
+                    }
+                }
+
+                if (start + count < list.Count && comparer.Compare(list[start + count - 1], list[start + count]) > 0)
+                {
+                    return false;
+                }
+            }
+            catch
+            {
+                return false;
+            }
+
+            return true;
         }
 
         private void OnChildrenCollectionChanged(HierarchicalNode parent, NotifyCollectionChangedEventArgs e)
