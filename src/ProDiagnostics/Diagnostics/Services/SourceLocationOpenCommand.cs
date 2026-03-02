@@ -1,6 +1,5 @@
 using System;
 using System.Diagnostics;
-using System.IO;
 using System.Windows.Input;
 
 namespace Avalonia.Diagnostics.Services
@@ -11,17 +10,21 @@ namespace Avalonia.Diagnostics.Services
 
         private static bool CanExecute(object? parameter)
         {
-            return TryParse(parameter, out _, out _);
+            return TryParse(parameter, out _);
         }
 
         private static void Execute(object? parameter)
         {
-            if (!TryParse(parameter, out var filePath, out var line))
+            if (!TryParse(parameter, out var location))
             {
                 return;
             }
 
-            if (TryOpenWithCommand("code", BuildCodeArguments(filePath, line)))
+            var filePath = location.FilePath;
+            var line = location.Line;
+            var column = location.Column;
+
+            if (TryOpenWithCommand("code", BuildCodeArguments(filePath, line, column)))
             {
                 return;
             }
@@ -39,83 +42,32 @@ namespace Avalonia.Diagnostics.Services
             TryOpenWithShell(filePath);
         }
 
-        private static bool TryParse(object? parameter, out string filePath, out int line)
+        private static bool TryParse(object? parameter, out SourceDocumentLocation location)
         {
-            filePath = string.Empty;
-            line = 0;
+            location = default!;
 
-            if (parameter is not string text || string.IsNullOrWhiteSpace(text))
+            if (parameter is SourceDocumentLocation parsedLocation &&
+                !string.IsNullOrWhiteSpace(parsedLocation.FilePath))
             {
-                return false;
+                location = parsedLocation;
+                return true;
             }
 
-            var trimmed = text.Trim();
-
-            // Strip optional labels like "XAML: " / "C#: ".
-            var labelSeparator = trimmed.IndexOf(": ", StringComparison.Ordinal);
-            if (labelSeparator > 0)
+            if (parameter is string text && SourceLocationTextParser.TryParse(text, out var parsedTextLocation))
             {
-                var prefix = trimmed.Substring(0, labelSeparator);
-                if (prefix.IndexOf(Path.DirectorySeparatorChar) < 0 &&
-                    prefix.IndexOf(Path.AltDirectorySeparatorChar) < 0)
-                {
-                    trimmed = trimmed.Substring(labelSeparator + 2);
-                }
+                location = parsedTextLocation;
+                return true;
             }
 
-            var methodMarker = trimmed.LastIndexOf(" (", StringComparison.Ordinal);
-            var locationPart = methodMarker > 0 ? trimmed.Substring(0, methodMarker) : trimmed;
-            locationPart = locationPart.Trim();
-
-            var end = locationPart.Length - 1;
-            while (end >= 0 && char.IsWhiteSpace(locationPart[end]))
-            {
-                end--;
-            }
-
-            var cursor = end;
-            while (cursor >= 0 && char.IsDigit(locationPart[cursor]))
-            {
-                cursor--;
-            }
-
-            if (cursor >= 0 && cursor < end && locationPart[cursor] == ':')
-            {
-                if (!int.TryParse(locationPart.Substring(cursor + 1, end - cursor), out line))
-                {
-                    line = 0;
-                }
-
-                filePath = locationPart.Substring(0, cursor).Trim();
-            }
-            else
-            {
-                filePath = locationPart;
-            }
-
-            filePath = filePath.Trim('"');
-
-            if (filePath.Length == 0)
-            {
-                return false;
-            }
-
-            if (!Path.IsPathRooted(filePath) && !OperatingSystem.IsWindows())
-            {
-                var rootedCandidate = "/" + filePath.TrimStart('/');
-                if (File.Exists(rootedCandidate))
-                {
-                    filePath = rootedCandidate;
-                }
-            }
-
-            return true;
+            return false;
         }
 
-        private static string BuildCodeArguments(string filePath, int line)
+        private static string BuildCodeArguments(string filePath, int line, int column)
         {
-            return line > 0
-                ? "--goto \"" + filePath + ":" + line + "\""
+            return line > 0 && column > 0
+                ? "--goto \"" + filePath + ":" + line + ":" + column + "\""
+                : line > 0
+                    ? "--goto \"" + filePath + ":" + line + "\""
                 : "\"" + filePath + "\"";
         }
 

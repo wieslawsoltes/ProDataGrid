@@ -665,7 +665,12 @@ namespace Avalonia.Diagnostics.Services
                                 continue;
                             }
 
-                            var candidate = new CandidateLocation(documentPath, sequencePoint.StartLine, methodName, priority: 0);
+                            var candidate = new CandidateLocation(
+                                documentPath,
+                                sequencePoint.StartLine,
+                                sequencePoint.StartColumn,
+                                methodName,
+                                priority: 0);
                             var normalizedPath = NormalizeDocumentPath(documentPath);
                             UpsertBestCandidate(byPath, normalizedPath, candidate);
 
@@ -801,7 +806,12 @@ namespace Avalonia.Diagnostics.Services
                         continue;
                     }
 
-                    return new CandidateLocation(documentPath, sequencePoint.StartLine, methodName, methodPriority);
+                    return new CandidateLocation(
+                        documentPath,
+                        sequencePoint.StartLine,
+                        sequencePoint.StartColumn,
+                        methodName,
+                        methodPriority);
                 }
 
                 return null;
@@ -1009,10 +1019,11 @@ namespace Avalonia.Diagnostics.Services
 
             private readonly struct CandidateLocation
             {
-                public CandidateLocation(string filePath, int line, string methodName, int priority)
+                public CandidateLocation(string filePath, int line, int column, string methodName, int priority)
                 {
                     FilePath = filePath;
                     Line = line;
+                    Column = column;
                     MethodName = methodName;
                     Priority = priority;
                 }
@@ -1020,6 +1031,8 @@ namespace Avalonia.Diagnostics.Services
                 public string FilePath { get; }
 
                 public int Line { get; }
+
+                public int Column { get; }
 
                 public string MethodName { get; }
 
@@ -1037,12 +1050,17 @@ namespace Avalonia.Diagnostics.Services
                         return Line < other.Line;
                     }
 
+                    if (Column != other.Column)
+                    {
+                        return Column < other.Column;
+                    }
+
                     return string.CompareOrdinal(FilePath, other.FilePath) < 0;
                 }
 
                 public SourceDocumentLocation ToSourceDocumentLocation()
                 {
-                    return new SourceDocumentLocation(FilePath, Line, MethodName);
+                    return new SourceDocumentLocation(FilePath, Line, MethodName, Column);
                 }
             }
         }
