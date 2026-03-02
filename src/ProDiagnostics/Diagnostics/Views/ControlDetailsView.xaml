@@ -58,7 +58,7 @@
                      FontSize="11"
                      TextTrimming="CharacterEllipsis">
             <ToolTip.Tip>
-              <TextBlock Text="{Binding XamlSourceText}" />
+              <local:SourceLocationToolTipView SourceLocation="{Binding XamlSourceText}" />
             </ToolTip.Tip>
           </TextBlock>
           <TextBlock Text="{Binding CodeSourceText}"
@@ -67,7 +67,7 @@
                      FontSize="11"
                      TextTrimming="CharacterEllipsis">
             <ToolTip.Tip>
-              <TextBlock Text="{Binding CodeSourceText}" />
+              <local:SourceLocationToolTipView SourceLocation="{Binding CodeSourceText}" />
             </ToolTip.Tip>
           </TextBlock>
           <TextBlock Text="{Binding SourceLocationStatus}"
@@ -218,9 +218,13 @@
                       <Binding Path="IsVisible" />
                     </MultiBinding>
                   </Border.IsVisible>
-                  <Expander IsExpanded="True" Margin="0" Padding="8,0" ContentTransition="{x:Null}" >
+                    <Expander IsExpanded="True" Margin="0" Padding="8,0" ContentTransition="{x:Null}" >
                     <Expander.Header>
-                      <TextBlock Grid.Row="0" Text="{Binding Description}" />
+                      <TextBlock Grid.Row="0" Text="{Binding Description}">
+                        <ToolTip.Tip>
+                          <local:SourceLocationToolTipView SourceLocation="{Binding SourceLocation}" />
+                        </ToolTip.Tip>
+                      </TextBlock>
                     </Expander.Header>
 
                     <ItemsControl Margin="20,0,0,0" Grid.Row="1" ItemsSource="{Binding Setters}">
@@ -273,6 +277,9 @@
                               </ContextMenu>
                             </Panel.ContextMenu>
                             <StackPanel Orientation="Horizontal" Spacing="2">
+                              <ToolTip.Tip>
+                                <local:SourceLocationToolTipView SourceLocation="{Binding SourceLocation}" />
+                              </ToolTip.Tip>
                               <TextBlock Classes="property-name" PointerPressed="PropertyNamePressed" Text="{Binding Name}" />
                               <TextBlock Text=":" />
                               <TextBlock>{</TextBlock>
@@ -294,6 +301,9 @@
                               </ContextMenu>
                             </Panel.ContextMenu>
                             <StackPanel Orientation="Horizontal" Spacing="2" HorizontalAlignment="Left">
+                              <ToolTip.Tip>
+                                <local:SourceLocationToolTipView SourceLocation="{Binding SourceLocation}" />
+                              </ToolTip.Tip>
                               <TextBlock Classes="property-name" PointerPressed="PropertyNamePressed" Text="{Binding Name}" />
                               <TextBlock Text=":" />
                               <TextBlock Text="{Binding Value}" />
@@ -315,6 +325,9 @@
                               </ContextMenu>
                             </Panel.ContextMenu>
                             <StackPanel Orientation="Horizontal" Spacing="2">
+                              <ToolTip.Tip>
+                                <local:SourceLocationToolTipView SourceLocation="{Binding SourceLocation}" />
+                              </ToolTip.Tip>
                               <TextBlock Classes="property-name" PointerPressed="PropertyNamePressed" Text="{Binding Name}" />
                               <TextBlock Text=":" />
                               <TextBlock Text="{Binding Value}" />
