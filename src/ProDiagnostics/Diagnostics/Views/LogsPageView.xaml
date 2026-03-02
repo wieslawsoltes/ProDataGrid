@@ -66,28 +66,27 @@
 
     <WrapPanel Grid.Row="3"
                Margin="8,0,8,6"
-               ItemHeight="24"
                Orientation="Horizontal">
       <TextBlock Text="Levels:"
                  Margin="0,0,6,0"
                  VerticalAlignment="Center" />
       <CheckBox Content="Verbose"
-                IsChecked="{Binding ShowVerbose}"
+                IsChecked="{Binding ShowVerbose, Mode=TwoWay}"
                 Margin="0,0,6,0" />
       <CheckBox Content="Debug"
-                IsChecked="{Binding ShowDebug}"
+                IsChecked="{Binding ShowDebug, Mode=TwoWay}"
                 Margin="0,0,6,0" />
       <CheckBox Content="Info"
-                IsChecked="{Binding ShowInformation}"
+                IsChecked="{Binding ShowInformation, Mode=TwoWay}"
                 Margin="0,0,6,0" />
       <CheckBox Content="Warning"
-                IsChecked="{Binding ShowWarning}"
+                IsChecked="{Binding ShowWarning, Mode=TwoWay}"
                 Margin="0,0,6,0" />
       <CheckBox Content="Error"
-                IsChecked="{Binding ShowError}"
+                IsChecked="{Binding ShowError, Mode=TwoWay}"
                 Margin="0,0,6,0" />
       <CheckBox Content="Fatal"
-                IsChecked="{Binding ShowFatal}"
+                IsChecked="{Binding ShowFatal, Mode=TwoWay}"
                 Margin="0,0,10,0" />
       <TextBlock Text="Max entries"
                  Margin="0,0,4,0"
@@ -95,10 +94,12 @@
       <NumericUpDown Width="100"
                      Minimum="1"
                      Maximum="50000"
-                     Value="{Binding MaxEntries}" />
+                     Value="{Binding MaxEntries, Mode=TwoWay}"
+                     VerticalAlignment="Center" />
       <Button Content="Clear"
               Margin="10,0,0,0"
-              Command="{Binding Clear}" />
+              Command="{Binding Clear}"
+              VerticalAlignment="Center" />
     </WrapPanel>
   </Grid>
 </UserControl>

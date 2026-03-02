@@ -269,6 +269,9 @@ internal sealed class LogsPageViewModel : ViewModelBase, IDisposable
 
     private void RefreshEntries()
     {
+        // Re-assigning the predicate ensures the underlying collection view re-evaluates
+        // filter state when level toggles are changed repeatedly.
+        _entriesView.Filter = FilterEntry;
         _entriesView.Refresh();
         RaisePropertyChanged(nameof(EntryCount));
         RaisePropertyChanged(nameof(VisibleEntryCount));

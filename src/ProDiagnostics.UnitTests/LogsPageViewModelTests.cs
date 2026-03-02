@@ -83,6 +83,40 @@ public class LogsPageViewModelTests
     }
 
     [AvaloniaFact]
+    public void Level_Filter_Hides_Warning_When_Disabled()
+    {
+        using var viewModel = new LogsPageViewModel();
+        var warningToken = "warning-toggle-" + Guid.NewGuid().ToString("N");
+        var errorToken = "error-toggle-" + Guid.NewGuid().ToString("N");
+
+        viewModel.SetOptions(new DevToolsOptions
+        {
+            LogCollector = new ReplayOnSubscribeLogCollector(
+                "replay-warning-filter",
+                warningToken,
+                LogEventLevel.Warning,
+                area: "Tests.Warning")
+        });
+
+        viewModel.SetOptions(new DevToolsOptions
+        {
+            LogCollector = new ReplayOnSubscribeLogCollector(
+                "replay-error-filter",
+                errorToken,
+                LogEventLevel.Error,
+                area: "Tests.Error")
+        });
+
+        Assert.Contains(viewModel.EntriesView.Cast<LogEntryViewModel>(), x => x.Message.Contains(warningToken, StringComparison.Ordinal));
+        Assert.Contains(viewModel.EntriesView.Cast<LogEntryViewModel>(), x => x.Message.Contains(errorToken, StringComparison.Ordinal));
+
+        viewModel.ShowWarning = false;
+
+        Assert.DoesNotContain(viewModel.EntriesView.Cast<LogEntryViewModel>(), x => x.Message.Contains(warningToken, StringComparison.Ordinal));
+        Assert.Contains(viewModel.EntriesView.Cast<LogEntryViewModel>(), x => x.Message.Contains(errorToken, StringComparison.Ordinal));
+    }
+
+    [AvaloniaFact]
     public void Renders_Structured_Log_Message_With_Placeholder_Values()
     {
         var previousSink = Logger.Sink;
@@ -386,11 +420,22 @@ public class LogsPageViewModelTests
     private sealed class ReplayOnSubscribeLogCollector : IDevToolsLogCollector
     {
         private readonly string _message;
+        private readonly LogEventLevel _level;
+        private readonly string _area;
+        private readonly string _source;
 
-        public ReplayOnSubscribeLogCollector(string collectorName, string message)
+        public ReplayOnSubscribeLogCollector(
+            string collectorName,
+            string message,
+            LogEventLevel level = LogEventLevel.Warning,
+            string area = "Tests",
+            string source = "ReplayCollector")
         {
             CollectorName = collectorName;
             _message = message;
+            _level = level;
+            _area = area;
+            _source = source;
         }
 
         public string CollectorName { get; }
@@ -399,9 +444,9 @@ public class LogsPageViewModelTests
         {
             onLogEvent(new DevToolsLogEvent(
                 DateTimeOffset.UtcNow,
-                LogEventLevel.Warning,
-                "Tests",
-                "ReplayCollector",
+                _level,
+                _area,
+                _source,
                 _message));
             return EmptyDisposable.Instance;
         }
