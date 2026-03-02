@@ -113,7 +113,6 @@
 
     <WrapPanel Grid.Row="3"
                Margin="8,0,8,6"
-               ItemHeight="24"
                Orientation="Horizontal">
       <TextBlock Text="Types:"
                  Margin="0,0,6,0"
@@ -139,23 +138,28 @@
       <NumericUpDown Width="90"
                      Minimum="1"
                      Maximum="10000"
-                     Value="{Binding MaxSeries}" />
+                     Value="{Binding MaxSeries}"
+                     VerticalAlignment="Center" />
       <TextBlock Text="Max samples"
                  Margin="10,0,4,0"
                  VerticalAlignment="Center" />
       <NumericUpDown Width="90"
                      Minimum="2"
                      Maximum="10000"
-                     Value="{Binding MaxSamplesPerSeries}" />
+                     Value="{Binding MaxSamplesPerSeries}"
+                     VerticalAlignment="Center" />
       <Button Content="Reconnect"
               Margin="10,0,0,0"
-              Command="{Binding RefreshObservableMetrics}" />
+              Command="{Binding RefreshObservableMetrics}"
+              VerticalAlignment="Center" />
       <Button Content="{Binding ToggleUpdatesText}"
               Margin="6,0,0,0"
-              Command="{Binding PauseOrResumeUpdates}" />
+              Command="{Binding PauseOrResumeUpdates}"
+              VerticalAlignment="Center" />
       <Button Content="Clear"
               Margin="6,0,0,0"
-              Command="{Binding Clear}" />
+              Command="{Binding Clear}"
+              VerticalAlignment="Center" />
     </WrapPanel>
   </Grid>
 </UserControl>
