@@ -57,8 +57,6 @@ namespace Avalonia.Diagnostics.ViewModels
                         RaisePropertyChanged(nameof(SelectedNodeItem));
                     }
 
-                    MainView.NotifyTreeSelectionChanged(value?.Visual);
-
                     if (value != null)
                     {
                         ExpandNode(value.Parent);
@@ -69,6 +67,10 @@ namespace Avalonia.Diagnostics.ViewModels
                         null;
                     Details?.UpdatePropertiesView(MainView.ShowImplementedInterfaces);
                     Details?.UpdateStyleFilters();
+
+                    // Notify after details are rebuilt so the Properties tab receives
+                    // the current selection's details rather than the previous node.
+                    MainView.NotifyTreeSelectionChanged(value?.Visual);
                 }
             }
         }
@@ -91,6 +93,12 @@ namespace Avalonia.Diagnostics.ViewModels
                 // Ignore these transients to avoid clearing cross-page inspection state.
                 if (value is not null && resolvedNode is null && _selectedNode is not null)
                 {
+                    if (!ReferenceEquals(_selectedNodeItem, _selectedNode))
+                    {
+                        _selectedNodeItem = _selectedNode;
+                        RaisePropertyChanged(nameof(SelectedNodeItem));
+                    }
+
                     return;
                 }
 
@@ -314,7 +322,17 @@ namespace Avalonia.Diagnostics.ViewModels
                     var wrappedItem = TryGetWrappedItem(item);
                     if (wrappedItem is not null)
                     {
-                        return ResolveWrappedItem(wrappedItem);
+                        var resolvedWrappedItem = ResolveWrappedItem(wrappedItem);
+                        if (resolvedWrappedItem is not null)
+                        {
+                            return resolvedWrappedItem;
+                        }
+
+                        var nestedWrappedItem = TryGetWrappedItem(wrappedItem);
+                        if (nestedWrappedItem is not null && !ReferenceEquals(nestedWrappedItem, wrappedItem))
+                        {
+                            return ResolveWrappedItem(nestedWrappedItem);
+                        }
                     }
 
                     return ResolveWrappedItem(item);
@@ -379,15 +397,53 @@ namespace Avalonia.Diagnostics.ViewModels
                 return null;
             }
 
-            var property = selectionItem.GetType().GetProperty(
-                "Item",
-                BindingFlags.Instance | BindingFlags.Public);
-            if (property is null || !property.CanRead)
+            const BindingFlags flags = BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic;
+            var type = selectionItem.GetType();
+
+            if (TryReadProperty(type.GetProperty("Item", flags), selectionItem, out var value))
             {
-                return null;
+                return value;
             }
 
-            return property.GetValue(selectionItem);
+            if (TryReadProperty(type.GetProperty("Node", flags), selectionItem, out value))
+            {
+                return value;
+            }
+
+            foreach (var property in type.GetProperties(flags))
+            {
+                if (!property.Name.EndsWith(".Item", StringComparison.Ordinal) &&
+                    !property.Name.EndsWith(".Node", StringComparison.Ordinal))
+                {
+                    continue;
+                }
+
+                if (TryReadProperty(property, selectionItem, out value))
+                {
+                    return value;
+                }
+            }
+
+            return null;
+        }
+
+        private static bool TryReadProperty(PropertyInfo? property, object target, out object? value)
+        {
+            value = null;
+            if (property is null || !property.CanRead || property.GetIndexParameters().Length != 0)
+            {
+                return false;
+            }
+
+            try
+            {
+                value = property.GetValue(target);
+                return true;
+            }
+            catch
+            {
+                return false;
+            }
         }
 
         internal void UpdatePropertiesView()

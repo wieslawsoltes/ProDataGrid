@@ -214,6 +214,64 @@ public class MainViewModelViewModelsBindingsTests
     }
 
     [AvaloniaFact]
+    public void CombinedTree_ExplicitInterfaceSelectionWrapper_Updates_SelectedNode_And_Details()
+    {
+        var first = new Button { Name = "FirstWrapperButton" };
+        var second = new Button { Name = "SecondWrapperButton" };
+        var root = new Window
+        {
+            Content = new StackPanel
+            {
+                Name = "HostPanel",
+                Children = { first, second }
+            }
+        };
+
+        using var viewModel = new MainViewModel(root);
+        viewModel.SelectedTab = 0;
+
+        var combinedTree = Assert.IsType<TreePageViewModel>(viewModel.Content);
+        var firstNode = FindNode(combinedTree.Nodes, first);
+        var secondNode = FindNode(combinedTree.Nodes, second);
+        Assert.NotNull(firstNode);
+        Assert.NotNull(secondNode);
+
+        combinedTree.SelectedNode = firstNode;
+        combinedTree.SelectedNodeItem = new ExplicitSelectionItemWrapper(secondNode!);
+
+        Assert.Same(secondNode, combinedTree.SelectedNode);
+        Assert.NotNull(combinedTree.Details);
+        Assert.Same(secondNode!.Visual, combinedTree.Details!.SelectedEntity);
+    }
+
+    [AvaloniaFact]
+    public void CombinedTree_UnresolvedSelectionToken_Reasserts_Current_SelectedNodeItem()
+    {
+        var button = new Button { Name = "StableSelectionButton" };
+        var root = new Window
+        {
+            Content = new StackPanel
+            {
+                Name = "HostPanel",
+                Children = { button }
+            }
+        };
+
+        using var viewModel = new MainViewModel(root);
+        viewModel.SelectedTab = 0;
+
+        var combinedTree = Assert.IsType<TreePageViewModel>(viewModel.Content);
+        var node = FindNode(combinedTree.Nodes, button);
+        Assert.NotNull(node);
+        combinedTree.SelectedNode = node;
+
+        combinedTree.SelectedNodeItem = new object();
+
+        Assert.Same(node, combinedTree.SelectedNode);
+        Assert.Same(node, combinedTree.SelectedNodeItem);
+    }
+
+    [AvaloniaFact]
     public void CombinedTree_UnresolvedSelectionToken_DoesNotClear_Elements3DScope()
     {
         var button = new Button { Name = "StableScopeButton" };
@@ -310,6 +368,23 @@ public class MainViewModelViewModelsBindingsTests
         }
 
         public object Item { get; }
+    }
+
+    private interface IExplicitSelectionItemWrapper
+    {
+        object Item { get; }
+    }
+
+    private sealed class ExplicitSelectionItemWrapper : IExplicitSelectionItemWrapper
+    {
+        private readonly object _item;
+
+        public ExplicitSelectionItemWrapper(object item)
+        {
+            _item = item;
+        }
+
+        object IExplicitSelectionItemWrapper.Item => _item;
     }
 
     private sealed class TestViewModel
