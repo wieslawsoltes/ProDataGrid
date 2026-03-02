@@ -11,10 +11,18 @@ namespace ProDiagnostics.Viewer.ViewModels;
 
 public sealed class MainViewModel : ObservableObject, IDisposable
 {
+    private const int MinPort = 1;
+    private const int MaxPort = 65535;
+
     private readonly Dictionary<string, ColumnVisibilityOption> _metricColumnsByKey = new(StringComparer.OrdinalIgnoreCase);
     private readonly Dictionary<string, ColumnVisibilityOption> _activityColumnsByKey = new(StringComparer.OrdinalIgnoreCase);
     private readonly Dictionary<Guid, SessionViewModel> _sessionsById = new();
+    private readonly HashSet<Guid> _allowedSessions = new();
+    private readonly HashSet<Guid> _blockedSessions = new();
     private DiagnosticsUdpReceiver? _receiver;
+    private readonly string? _targetAppName;
+    private readonly string? _targetProcessName;
+    private readonly int? _targetProcessId;
     private SessionViewModel? _selectedSession;
     private PresetDefinition? _selectedPreset;
     private TrendRangeOption? _selectedTrendRange;
@@ -25,12 +33,31 @@ public sealed class MainViewModel : ObservableObject, IDisposable
     private string _statusText = string.Empty;
 
     public MainViewModel()
-        : this(startListening: true)
+        : this(TelemetryProtocol.DefaultPort, startListening: true, targetAppName: null, targetProcessName: null, targetProcessId: null)
     {
     }
 
     public MainViewModel(bool startListening)
+        : this(TelemetryProtocol.DefaultPort, startListening, targetAppName: null, targetProcessName: null, targetProcessId: null)
     {
+    }
+
+    public MainViewModel(int port, bool startListening)
+        : this(port, startListening, targetAppName: null, targetProcessName: null, targetProcessId: null)
+    {
+    }
+
+    public MainViewModel(
+        int port,
+        bool startListening,
+        string? targetAppName,
+        string? targetProcessName,
+        int? targetProcessId)
+    {
+        _port = NormalizePort(port);
+        _targetAppName = NormalizeOptionalText(targetAppName);
+        _targetProcessName = NormalizeOptionalText(targetProcessName);
+        _targetProcessId = NormalizeProcessId(targetProcessId);
         Sessions = new ObservableCollection<SessionViewModel>();
         Presets = new ObservableCollection<PresetDefinition>(PresetStore.LoadPresets());
         MetricColumns = new ObservableCollection<ColumnVisibilityOption>();
@@ -44,6 +71,10 @@ public sealed class MainViewModel : ObservableObject, IDisposable
         if (startListening)
         {
             StartListening();
+        }
+        else
+        {
+            StatusText = "Not listening";
         }
     }
 
@@ -120,7 +151,7 @@ public sealed class MainViewModel : ObservableObject, IDisposable
     public int Port
     {
         get => _port;
-        set => SetProperty(ref _port, value);
+        set => SetProperty(ref _port, NormalizePort(value));
     }
 
     public bool IsListening
@@ -147,6 +178,9 @@ public sealed class MainViewModel : ObservableObject, IDisposable
 
     public string PresetFolder
         => PresetStore.GetUserPresetFolder();
+
+    public string TargetSummary
+        => BuildTargetSummary();
 
     public void OpenMetricTab(MetricSeriesViewModel series)
     {
@@ -226,24 +260,71 @@ public sealed class MainViewModel : ObservableObject, IDisposable
         Dispatcher.UIThread.Post(() => HandlePacket(packet));
     }
 
+    internal void HandlePacketForTests(TelemetryPacket packet)
+    {
+        HandlePacket(packet);
+    }
+
     private void HandlePacket(TelemetryPacket packet)
     {
-        var session = EnsureSession(packet.SessionId);
-
         switch (packet)
         {
             case TelemetryHello hello:
-                session.UpdateHello(hello);
+                HandleHelloPacket(hello);
                 break;
             case TelemetryActivity activity:
-                var activityEntry = session.AddActivity(activity);
+                if (!ShouldAcceptSessionPacket(activity.SessionId))
+                {
+                    return;
+                }
+
+                var activitySession = EnsureSession(activity.SessionId);
+                var activityEntry = activitySession.AddActivity(activity);
                 activityEntry.ApplyAlias(GetActivityAlias(activityEntry.Name));
                 break;
             case TelemetryMetric metric:
-                var series = session.AddMetric(metric);
+                if (!ShouldAcceptSessionPacket(metric.SessionId))
+                {
+                    return;
+                }
+
+                var metricSession = EnsureSession(metric.SessionId);
+                var series = metricSession.AddMetric(metric);
                 series.ApplyAlias(GetMetricAlias(series.Name));
                 break;
         }
+    }
+
+    private void HandleHelloPacket(TelemetryHello hello)
+    {
+        if (HasTargetFilter && !MatchesTargetFilter(hello))
+        {
+            _blockedSessions.Add(hello.SessionId);
+            _allowedSessions.Remove(hello.SessionId);
+            RemoveSession(hello.SessionId);
+            return;
+        }
+
+        _blockedSessions.Remove(hello.SessionId);
+        _allowedSessions.Add(hello.SessionId);
+
+        var session = EnsureSession(hello.SessionId);
+        session.UpdateHello(hello);
+    }
+
+    private bool ShouldAcceptSessionPacket(Guid sessionId)
+    {
+        if (!HasTargetFilter)
+        {
+            return true;
+        }
+
+        if (_blockedSessions.Contains(sessionId))
+        {
+            return false;
+        }
+
+        return _allowedSessions.Contains(sessionId);
     }
 
     private SessionViewModel EnsureSession(Guid sessionId)
@@ -262,6 +343,24 @@ public sealed class MainViewModel : ObservableObject, IDisposable
         Sessions.Add(session);
         SelectedSession ??= session;
         return session;
+    }
+
+    private void RemoveSession(Guid sessionId)
+    {
+        if (!_sessionsById.TryGetValue(sessionId, out var session))
+        {
+            return;
+        }
+
+        _sessionsById.Remove(sessionId);
+        Sessions.Remove(session);
+
+        if (!ReferenceEquals(SelectedSession, session))
+        {
+            return;
+        }
+
+        SelectedSession = Sessions.Count > 0 ? Sessions[0] : null;
     }
 
     private void ApplyPreset()
@@ -421,5 +520,83 @@ public sealed class MainViewModel : ObservableObject, IDisposable
     private void AddTrendRange(string title, TimeSpan range)
     {
         TrendRanges.Add(new TrendRangeOption(title, range));
+    }
+
+    private bool HasTargetFilter
+        => _targetAppName != null || _targetProcessName != null || _targetProcessId.HasValue;
+
+    private bool MatchesTargetFilter(TelemetryHello hello)
+    {
+        if (_targetAppName != null &&
+            !string.Equals(hello.AppName, _targetAppName, StringComparison.OrdinalIgnoreCase))
+        {
+            return false;
+        }
+
+        if (_targetProcessName != null &&
+            !string.Equals(hello.ProcessName, _targetProcessName, StringComparison.OrdinalIgnoreCase))
+        {
+            return false;
+        }
+
+        if (_targetProcessId is { } processId && hello.ProcessId != processId)
+        {
+            return false;
+        }
+
+        return true;
+    }
+
+    private string BuildTargetSummary()
+    {
+        if (!HasTargetFilter)
+        {
+            return "Target: Any process";
+        }
+
+        var parts = new List<string>(3);
+        if (_targetAppName != null)
+        {
+            parts.Add("App=" + _targetAppName);
+        }
+
+        if (_targetProcessName != null)
+        {
+            parts.Add("Process=" + _targetProcessName);
+        }
+
+        if (_targetProcessId is { } processId)
+        {
+            parts.Add("PID=" + processId);
+        }
+
+        return "Target: " + string.Join(" | ", parts);
+    }
+
+    private static string? NormalizeOptionalText(string? value)
+    {
+        if (string.IsNullOrWhiteSpace(value))
+        {
+            return null;
+        }
+
+        return value.Trim();
+    }
+
+    private static int? NormalizeProcessId(int? value)
+    {
+        if (!value.HasValue || value.Value <= 0)
+        {
+            return null;
+        }
+
+        return value;
+    }
+
+    private static int NormalizePort(int port)
+    {
+        return port is < MinPort or > MaxPort
+            ? TelemetryProtocol.DefaultPort
+            : port;
     }
 }

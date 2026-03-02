@@ -15,7 +15,12 @@ public partial class App : Application
     {
         if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
         {
-            desktop.MainWindow = new MainWindow();
+            desktop.MainWindow = new MainWindow(
+                ViewerStartupSettings.PortOverride,
+                ViewerStartupSettings.StartListening,
+                ViewerStartupSettings.TargetAppName,
+                ViewerStartupSettings.TargetProcessName,
+                ViewerStartupSettings.TargetProcessId);
         }
 
         base.OnFrameworkInitializationCompleted();
