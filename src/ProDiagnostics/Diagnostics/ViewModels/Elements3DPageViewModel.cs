@@ -282,6 +282,12 @@ internal sealed class Elements3DPageViewModel : ViewModelBase
 
     internal void InspectControl(AvaloniaObject? target)
     {
+        if (target is Visual selectedVisual)
+        {
+            BuildSelectionScope(selectedVisual);
+            return;
+        }
+
         BuildFrom(target, preferTopLevelRoot: false, trackAsMainRoot: false);
     }
 
@@ -292,16 +298,7 @@ internal sealed class Elements3DPageViewModel : ViewModelBase
             return;
         }
 
-        var baseRoot = ResolveScopeBaseRoot(selected);
-
-        if (ReferenceEquals(baseRoot, selected))
-        {
-            BuildFrom(selected, preferTopLevelRoot: false, trackAsMainRoot: false);
-        }
-        else
-        {
-            BuildFrom(baseRoot, preferTopLevelRoot: false, trackAsMainRoot: false, scopedSelection: selected);
-        }
+        BuildSelectionScope(selected);
     }
 
     public void ResetToMainRoot()
@@ -589,6 +586,19 @@ internal sealed class Elements3DPageViewModel : ViewModelBase
         }
 
         return selectedTopMostAncestor;
+    }
+
+    private void BuildSelectionScope(Visual selected)
+    {
+        var baseRoot = ResolveScopeBaseRoot(selected);
+
+        if (ReferenceEquals(baseRoot, selected))
+        {
+            BuildFrom(selected, preferTopLevelRoot: false, trackAsMainRoot: false);
+            return;
+        }
+
+        BuildFrom(baseRoot, preferTopLevelRoot: false, trackAsMainRoot: false, scopedSelection: selected);
     }
 
     private static Visual GetTopMostAncestor(Visual selected)

@@ -90,7 +90,7 @@ public class MainViewModelViewModelsBindingsTests
         var content = Assert.IsType<Elements3DPageViewModel>(viewModel.Content);
         viewModel.SelectControl(button);
 
-        Assert.Equal("Button#ScopedButton", content.InspectedRoot);
+        Assert.Contains("Button#ScopedButton", content.InspectedRoot);
     }
 
     [AvaloniaFact]
@@ -111,7 +111,7 @@ public class MainViewModelViewModelsBindingsTests
         viewModel.SelectedTab = 4;
 
         var content = Assert.IsType<Elements3DPageViewModel>(viewModel.Content);
-        Assert.Equal("Button#ScopedButton", content.InspectedRoot);
+        Assert.Contains("Button#ScopedButton", content.InspectedRoot);
     }
 
     [AvaloniaFact]
@@ -184,7 +184,7 @@ public class MainViewModelViewModelsBindingsTests
 
         viewModel.SelectedTab = 4;
         var content = Assert.IsType<Elements3DPageViewModel>(viewModel.Content);
-        Assert.Equal("Button#ManualScopeButton", content.InspectedRoot);
+        Assert.Contains("Button#ManualScopeButton", content.InspectedRoot);
     }
 
     [AvaloniaFact]
@@ -210,7 +210,7 @@ public class MainViewModelViewModelsBindingsTests
 
         viewModel.SelectedTab = 4;
         var content = Assert.IsType<Elements3DPageViewModel>(viewModel.Content);
-        Assert.Equal("Button#WrapperScopeButton", content.InspectedRoot);
+        Assert.Contains("Button#WrapperScopeButton", content.InspectedRoot);
     }
 
     [AvaloniaFact]
@@ -238,7 +238,7 @@ public class MainViewModelViewModelsBindingsTests
 
         viewModel.SelectedTab = 4;
         var content = Assert.IsType<Elements3DPageViewModel>(viewModel.Content);
-        Assert.Equal("Button#StableScopeButton", content.InspectedRoot);
+        Assert.Contains("Button#StableScopeButton", content.InspectedRoot);
     }
 
     [AvaloniaFact]
@@ -266,7 +266,7 @@ public class MainViewModelViewModelsBindingsTests
 
         viewModel.SelectedTab = 4;
         var content = Assert.IsType<Elements3DPageViewModel>(viewModel.Content);
-        Assert.Equal("Button#TransientNullButton", content.InspectedRoot);
+        Assert.Contains("Button#TransientNullButton", content.InspectedRoot);
     }
 
     private static TreeNode? FindNode(TreeNode[] roots, AvaloniaObject target)

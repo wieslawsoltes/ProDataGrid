@@ -73,7 +73,7 @@ public class Elements3DPageViewModelTests
     }
 
     [AvaloniaFact]
-    public void InspectControl_Scopes_To_Selected_Subtree()
+    public void InspectControl_Scopes_To_Selected_Node_With_Ancestor_Context()
     {
         var root = new StackPanel { Name = "RootPanel" };
         var child = new Border { Name = "ChildBorder" };
@@ -84,10 +84,14 @@ public class Elements3DPageViewModelTests
         var viewModel = new Elements3DPageViewModel(root, () => child);
         viewModel.InspectControl(child);
 
-        Assert.Equal("Border#ChildBorder", viewModel.InspectedRoot);
-        Assert.DoesNotContain(
+        Assert.Contains("StackPanel#RootPanel", viewModel.InspectedRoot);
+        Assert.Contains("Border#ChildBorder", viewModel.InspectedRoot);
+        Assert.Contains(
             viewModel.NodesView.Cast<Elements3DNodeViewModel>(),
             x => x.Node.Contains("StackPanel#RootPanel"));
+        Assert.Contains(
+            viewModel.NodesView.Cast<Elements3DNodeViewModel>(),
+            x => x.Node.Contains("Border#ChildBorder"));
         Assert.Contains(
             viewModel.NodesView.Cast<Elements3DNodeViewModel>(),
             x => x.Node.Contains("Button#GrandChildButton"));
