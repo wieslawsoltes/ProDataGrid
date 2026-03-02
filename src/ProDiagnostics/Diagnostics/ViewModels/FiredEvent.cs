@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.ObjectModel;
+using Avalonia;
 using Avalonia.Diagnostics.Models;
 using Avalonia.Interactivity;
 
@@ -9,6 +10,7 @@ namespace Avalonia.Diagnostics.ViewModels
     {
         private readonly RoutedEventArgs _eventArgs;
         private readonly RoutedEvent? _originalEvent;
+        private readonly AvaloniaObject? _source;
         private EventChainLink? _handledBy;
 
         public FiredEvent(RoutedEventArgs eventArgs, EventChainLink originator, DateTime triggerTime)
@@ -16,6 +18,7 @@ namespace Avalonia.Diagnostics.ViewModels
             _eventArgs = eventArgs ?? throw new ArgumentNullException(nameof(eventArgs));
             Originator = originator ?? throw new ArgumentNullException(nameof(originator));
             _originalEvent = _eventArgs.RoutedEvent;
+            _source = _eventArgs.Source as AvaloniaObject;
             AddToChain(originator);
             TriggerTime = triggerTime;
         }
@@ -31,6 +34,22 @@ namespace Avalonia.Diagnostics.ViewModels
 
         public RoutedEvent Event => _originalEvent!;
 
+        public AvaloniaObject? Source => _source;
+
+        public RoutingStrategies ObservedRoutes
+        {
+            get
+            {
+                RoutingStrategies routes = 0;
+                for (var i = 0; i < EventChain.Count; i++)
+                {
+                    routes |= EventChain[i].Route;
+                }
+
+                return routes;
+            }
+        }
+
         public bool IsHandled => HandledBy?.Handled == true;
 
         public ObservableCollection<EventChainLink> EventChain { get; } = new ObservableCollection<EventChainLink>();
@@ -42,10 +61,10 @@ namespace Avalonia.Diagnostics.ViewModels
                 if (IsHandled)
                 {
                     return $"{Event.Name} on {Originator.HandlerName};" + Environment.NewLine +
-                           $"strategies: {Event.RoutingStrategies}; handled by: {HandledBy!.HandlerName}";
+                           $"strategies: {ObservedRoutes}; handled by: {HandledBy!.HandlerName}";
                 }
 
-                return $"{Event.Name} on {Originator.HandlerName}; strategies: {Event.RoutingStrategies}";
+                return $"{Event.Name} on {Originator.HandlerName}; strategies: {ObservedRoutes}";
             }
         }
 
@@ -79,6 +98,8 @@ namespace Avalonia.Diagnostics.ViewModels
             }
 
             EventChain.Add(link);
+            RaisePropertyChanged(nameof(ObservedRoutes));
+            RaisePropertyChanged(nameof(DisplayText));
 
             if (HandledBy == null && link.Handled)
                 HandledBy = link;

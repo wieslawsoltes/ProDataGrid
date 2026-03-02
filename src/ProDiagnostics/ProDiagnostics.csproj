@@ -45,6 +45,7 @@
   <ItemGroup>
     <ProjectReference Include="..\\ProDataGrid.FormulaEngine\\ProDataGrid.FormulaEngine.csproj" />
     <ProjectReference Include="..\\ProDataGrid.FormulaEngine.Excel\\ProDataGrid.FormulaEngine.Excel.csproj" />
+    <ProjectReference Include="..\\ProDiagnostics.Transport\\ProDiagnostics.Transport.csproj" />
   </ItemGroup>
 
   <Import Project="../../build/SharedVersion.props" />

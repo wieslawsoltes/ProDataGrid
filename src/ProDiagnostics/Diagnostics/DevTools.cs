@@ -33,6 +33,11 @@ namespace Avalonia.Diagnostics
                 }
             }
 
+            if (options.ConnectOnStartup && (!Design.IsDesignMode || options.AutoConnectFromDesignMode))
+            {
+                Open(root, options);
+            }
+
             return (root ?? throw new ArgumentNullException(nameof(root))).AddDisposableHandler(
                 InputElement.KeyDownEvent,
                 PreviewKeyDown,
@@ -51,8 +56,8 @@ namespace Avalonia.Diagnostics
             var result = new CompositeDisposable(2);
             result.Add(openedDisposable);
 
-            // Skip if call on Design Mode
-            if (!Design.IsDesignMode)
+            // Skip design mode unless explicitly enabled.
+            if (!Design.IsDesignMode || options.AutoConnectFromDesignMode)
             {
                 var lifeTime = application.ApplicationLifetime
                     as Avalonia.Controls.ApplicationLifetimes.IClassicDesktopStyleApplicationLifetime;
@@ -64,8 +69,29 @@ namespace Avalonia.Diagnostics
 
                 if (application.InputManager is not null)
                 {
+                    var startupConnected = false;
+                    void TryConnectOnStartup()
+                    {
+                        if (startupConnected || !options.ConnectOnStartup)
+                        {
+                            return;
+                        }
+
+                        if (lifeTime.MainWindow is { } startupOwner)
+                        {
+                            openedDisposable.Disposable = Open(
+                                new ClassicDesktopStyleApplicationLifetimeTopLevelGroup(lifeTime),
+                                options,
+                                startupOwner,
+                                application);
+                            startupConnected = true;
+                        }
+                    }
+
+                    TryConnectOnStartup();
                     result.Add(application.InputManager.PreProcess.Subscribe(e =>
                     {
+                        TryConnectOnStartup();
                         var owner = lifeTime.MainWindow;
 
                         if (e is RawKeyEventArgs keyEventArgs

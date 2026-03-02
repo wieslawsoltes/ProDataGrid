@@ -5,6 +5,7 @@ using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
 using System.Reflection;
+using Avalonia;
 using Avalonia.Collections;
 using Avalonia.Controls;
 using Avalonia.Controls.Metadata;
@@ -543,6 +544,35 @@ namespace Avalonia.Diagnostics.ViewModels
                 }
                 PropertiesView?.Refresh();
             }
+        }
+
+        public void SetPropertyBreakpoint(object? parameter)
+        {
+            if (parameter is not AvaloniaPropertyViewModel propertyViewModel)
+            {
+                return;
+            }
+
+            if (SelectedEntity is not AvaloniaObject target)
+            {
+                target = _avaloniaObject;
+            }
+
+            TreePage.MainView.BreakpointService.AddPropertyBreakpoint(
+                propertyViewModel.Property,
+                target,
+                DescribeTarget(target));
+            TreePage.MainView.ShowBreakpoints();
+        }
+
+        private static string DescribeTarget(AvaloniaObject target)
+        {
+            if (target is INamed named && !string.IsNullOrWhiteSpace(named.Name))
+            {
+                return named.Name + " (" + target.GetType().Name + ")";
+            }
+
+            return target.GetType().Name;
         }
     }
 }

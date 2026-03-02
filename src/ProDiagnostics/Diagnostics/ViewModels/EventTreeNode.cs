@@ -99,15 +99,14 @@ namespace Avalonia.Diagnostics.ViewModels
                 {
                     _currentEvent = new FiredEvent(e, new EventChainLink(s, handled, route), triggerTime);
 
-                    _parentViewModel.RecordedEvents.Add(_currentEvent);
-
-                    while (_parentViewModel.RecordedEvents.Count > 100)
-                        _parentViewModel.RecordedEvents.RemoveAt(0);
+                    _parentViewModel.AddRecordedEvent(_currentEvent);
                 }
                 else
                 {
                     _currentEvent.AddToChain(new EventChainLink(s, handled, route));
                 }
+
+                _parentViewModel.EvaluateEventBreakpoints(Event, sender, e.Source);
             };
 
             if (!Dispatcher.UIThread.CheckAccess())
@@ -136,6 +135,7 @@ namespace Avalonia.Diagnostics.ViewModels
 
                     link.Handled = true;
                     _currentEvent.HandledBy ??= link;
+                    _parentViewModel.RefreshRecordedEvents();
                 }
             }
 

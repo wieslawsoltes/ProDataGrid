@@ -29,4 +29,40 @@ public enum DevToolsViewKind
     /// Assets diagnostic view
     /// </summary>
     Assets = 5,
+    /// <summary>
+    /// Logs diagnostic view
+    /// </summary>
+    Logs = 6,
+    /// <summary>
+    /// Metrics diagnostic view
+    /// </summary>
+    Metrics = 7,
+    /// <summary>
+    /// ViewModels and bindings diagnostic view
+    /// </summary>
+    ViewModelsBindings = 8,
+    /// <summary>
+    /// Transport and process export settings view
+    /// </summary>
+    TransportSettings = 9,
+    /// <summary>
+    /// Breakpoints diagnostic view
+    /// </summary>
+    Breakpoints = 10,
+    /// <summary>
+    /// Elements 3D diagnostic view
+    /// </summary>
+    Elements3D = 11,
+    /// <summary>
+    /// Settings diagnostic view
+    /// </summary>
+    Settings = 12,
+    /// <summary>
+    /// Profiler diagnostic view
+    /// </summary>
+    Profiler = 13,
+    /// <summary>
+    /// Styles diagnostic view
+    /// </summary>
+    Styles = 14,
 }

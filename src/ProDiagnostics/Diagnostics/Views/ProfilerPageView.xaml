@@ -1,0 +1,133 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:Avalonia.Diagnostics.ViewModels"
+             x:Class="Avalonia.Diagnostics.Views.ProfilerPageView"
+             x:DataType="vm:ProfilerPageViewModel">
+  <Grid RowDefinitions="Auto,Auto,*,Auto">
+    <StackPanel Grid.Row="0"
+                Margin="8,6,8,4"
+                Orientation="Horizontal"
+                Spacing="12">
+      <TextBlock Text="{Binding CurrentCpuPercent, StringFormat=CPU: {0:0.0}%}" />
+      <TextBlock Text="{Binding PeakCpuPercent, StringFormat=Peak CPU: {0:0.0}%}" />
+      <TextBlock Text="{Binding CurrentWorkingSetMb, StringFormat=Working Set: {0:0.0} MB}" />
+      <TextBlock Text="{Binding PeakWorkingSetMb, StringFormat=Peak Working Set: {0:0.0} MB}" />
+      <TextBlock Text="{Binding CurrentManagedHeapMb, StringFormat=Managed Heap: {0:0.0} MB}" />
+      <TextBlock Text="{Binding CurrentActivityDurationMs, StringFormat=Activity: {0:0.###} ms}" />
+      <TextBlock Text="{Binding PeakActivityDurationMs, StringFormat=Peak Activity: {0:0.###} ms}" />
+      <TextBlock Text="{Binding RemotePacketCount, StringFormat=Remote: {0}}"
+                 Foreground="Gray" />
+      <TextBlock Text="{Binding DroppedLocalPacketCount, StringFormat=Dropped Local: {0}}"
+                 Foreground="Gray" />
+      <TextBlock Text="{Binding RemoteStatusText}"
+                 Foreground="Gray" />
+    </StackPanel>
+
+    <StackPanel Grid.Row="1"
+                Margin="8,0,8,4"
+                Orientation="Horizontal"
+                Spacing="8">
+      <Button Content="{Binding ToggleSamplingText}"
+              Command="{Binding PauseOrResumeSampling}" />
+      <Button Content="Refresh now"
+              Command="{Binding RefreshNow}" />
+      <Button Content="Reconnect remote"
+              Command="{Binding RefreshRemoteActivities}" />
+      <Button Content="Clear"
+              Command="{Binding Clear}" />
+      <TextBlock Text="Max samples"
+                 VerticalAlignment="Center" />
+      <NumericUpDown Width="90"
+                     Minimum="1"
+                     Maximum="5000"
+                     Value="{Binding MaxSamples}" />
+      <TextBlock Text="{Binding SampleCount, StringFormat=Samples: {0}}"
+                 Margin="6,0,0,0"
+                 VerticalAlignment="Center" />
+      <TextBlock Foreground="Gray"
+                 Margin="8,0,0,0"
+                 VerticalAlignment="Center"
+                 Text="Profiler captures local process samples by default and switches to remote activity mode when UDP activity telemetry is received." />
+    </StackPanel>
+
+    <DataGrid Grid.Row="2"
+              Margin="8,0,8,6"
+              ItemsSource="{Binding SamplesView}"
+              SelectedItem="{Binding SelectedSample, Mode=TwoWay}"
+              AutoGenerateColumns="False"
+              HeadersVisibility="Column"
+              BorderThickness="0"
+              SelectionMode="Single"
+              CanUserSortColumns="True"
+              CanUserResizeColumns="True"
+              CanUserReorderColumns="False">
+      <DataGrid.Columns>
+        <DataGridTextColumn Header="Timestamp (UTC)"
+                            Binding="{Binding Timestamp, StringFormat={}{0:HH:mm:ss.fff}}"
+                            Width="1.4*"
+                            IsReadOnly="True"
+                            x:DataType="vm:ProfilerSampleViewModel" />
+        <DataGridTextColumn Header="Source"
+                            Binding="{Binding SourceName}"
+                            Width="1.5*"
+                            IsReadOnly="True"
+                            x:DataType="vm:ProfilerSampleViewModel" />
+        <DataGridTextColumn Header="Activity"
+                            Binding="{Binding ActivityName}"
+                            Width="1.6*"
+                            IsReadOnly="True"
+                            x:DataType="vm:ProfilerSampleViewModel" />
+        <DataGridTextColumn Header="Duration (ms)"
+                            Binding="{Binding DurationMs, StringFormat={}{0:0.###}}"
+                            Width="1.0*"
+                            IsReadOnly="True"
+                            x:DataType="vm:ProfilerSampleViewModel" />
+        <DataGridTextColumn Header="Process"
+                            Binding="{Binding Process}"
+                            Width="1.2*"
+                            IsReadOnly="True"
+                            x:DataType="vm:ProfilerSampleViewModel" />
+        <DataGridTextColumn Header="CPU %"
+                            Binding="{Binding CpuPercent, StringFormat={}{0:0.00}}"
+                            Width="0.9*"
+                            IsReadOnly="True"
+                            x:DataType="vm:ProfilerSampleViewModel" />
+        <DataGridTextColumn Header="Working Set MB"
+                            Binding="{Binding WorkingSetMb, StringFormat={}{0:0.00}}"
+                            Width="1.2*"
+                            IsReadOnly="True"
+                            x:DataType="vm:ProfilerSampleViewModel" />
+        <DataGridTextColumn Header="Private MB"
+                            Binding="{Binding PrivateMemoryMb, StringFormat={}{0:0.00}}"
+                            Width="1.1*"
+                            IsReadOnly="True"
+                            x:DataType="vm:ProfilerSampleViewModel" />
+        <DataGridTextColumn Header="Managed MB"
+                            Binding="{Binding ManagedHeapMb, StringFormat={}{0:0.00}}"
+                            Width="1.1*"
+                            IsReadOnly="True"
+                            x:DataType="vm:ProfilerSampleViewModel" />
+        <DataGridTextColumn Header="Gen0"
+                            Binding="{Binding Gen0Collections}"
+                            Width="0.7*"
+                            IsReadOnly="True"
+                            x:DataType="vm:ProfilerSampleViewModel" />
+        <DataGridTextColumn Header="Gen1"
+                            Binding="{Binding Gen1Collections}"
+                            Width="0.7*"
+                            IsReadOnly="True"
+                            x:DataType="vm:ProfilerSampleViewModel" />
+        <DataGridTextColumn Header="Gen2"
+                            Binding="{Binding Gen2Collections}"
+                            Width="0.7*"
+                            IsReadOnly="True"
+                            x:DataType="vm:ProfilerSampleViewModel" />
+      </DataGrid.Columns>
+    </DataGrid>
+
+    <TextBlock Grid.Row="3"
+               Margin="8,0,8,6"
+               Foreground="Gray"
+               Text="Gen0/1/2 values show collection deltas between samples." />
+  </Grid>
+</UserControl>

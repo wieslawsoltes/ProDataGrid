@@ -12,10 +12,11 @@ namespace Avalonia.Diagnostics
             if (data is null)
                 return null;
 
-            var name = data.GetType().FullName!.Replace("ViewModel", "View");
-            var type = Type.GetType(name);
+            var viewModelType = data.GetType();
+            var name = GetViewTypeName(viewModelType);
+            var type = viewModelType.Assembly.GetType(name);
 
-            if (type != null)
+            if (type is not null && typeof(Control).IsAssignableFrom(type))
             {
                 return (Control)Activator.CreateInstance(type)!;
             }
@@ -28,6 +29,20 @@ namespace Avalonia.Diagnostics
         public bool Match(object? data)
         {
             return data is ViewModelBase;
+        }
+
+        private static string GetViewTypeName(Type viewModelType)
+        {
+            var fullName = viewModelType.FullName ?? viewModelType.Name;
+            var mappedNamespace = fullName.Replace(".ViewModels.", ".Views.", StringComparison.Ordinal);
+
+            const string suffix = "ViewModel";
+            if (mappedNamespace.EndsWith(suffix, StringComparison.Ordinal))
+            {
+                return mappedNamespace[..^suffix.Length] + "View";
+            }
+
+            return mappedNamespace;
         }
     }
 }

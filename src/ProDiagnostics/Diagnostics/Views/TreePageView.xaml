@@ -19,7 +19,7 @@
               CanUserSortColumns="False"
               CanUserResizeColumns="False"
               CanUserReorderColumns="False"
-              SelectedItem="{Binding SelectedNode, Mode=TwoWay}"
+              SelectedItem="{Binding SelectedNodeItem, Mode=TwoWay}"
               PointerMoved="UpdateAdorner"
               PointerExited="RemoveAdorner">
       <DataGrid.Columns>

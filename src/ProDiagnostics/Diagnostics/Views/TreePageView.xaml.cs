@@ -14,6 +14,8 @@ namespace Avalonia.Diagnostics.Views
         private DataGridRow? _hovered;
         private DataGrid _tree;
         private System.IDisposable? _adorner;
+        private Visual? _adornedVisual;
+        private MainViewModel? _mainView;
 
         public TreePageView()
         {
@@ -35,29 +37,34 @@ namespace Avalonia.Diagnostics.Views
             }
 
             _adorner?.Dispose();
+            _adorner = null;
 
             if (row is null || row.OwningGrid != _tree)
             {
                 _hovered = null;
+                _adornedVisual = null;
                 return;
             }
 
             _hovered = row;
 
             var visual = ResolveNode(row.DataContext)?.Visual as Visual;
-            var shouldVisualizeMarginPadding = (DataContext as TreePageViewModel)?.MainView.ShouldVisualizeMarginPadding;
-            if (visual is null || shouldVisualizeMarginPadding is null)
+            _adornedVisual = visual;
+            if (DataContext is not TreePageViewModel vm ||
+                visual is null ||
+                !vm.MainView.HighlightElements)
             {
                 return;
             }
 
-            _adorner = Controls.ControlHighlightAdorner.Add(visual, visualizeMarginPadding: shouldVisualizeMarginPadding == true);
+            _adorner = Controls.ControlHighlightAdorner.Add(visual, vm.MainView.OverlayDisplayOptions);
         }
 
         private void RemoveAdorner(object? sender, PointerEventArgs e)
         {
             _adorner?.Dispose();
             _adorner = null;
+            _adornedVisual = null;
         }
 
         private static TreeNode? ResolveNode(object? dataContext)
@@ -77,10 +84,65 @@ namespace Avalonia.Diagnostics.Views
             if (change.Property == DataContextProperty)
             {
                 if (change.GetOldValue<object?>() is TreePageViewModel oldViewModel)
+                {
                     oldViewModel.ClipboardCopyRequested -= OnClipboardCopyRequested;
+                    oldViewModel.MainView.PropertyChanged -= OnMainViewPropertyChanged;
+                }
+
                 if (change.GetNewValue<object?>() is TreePageViewModel newViewModel)
+                {
                     newViewModel.ClipboardCopyRequested += OnClipboardCopyRequested;
+                    newViewModel.MainView.PropertyChanged += OnMainViewPropertyChanged;
+                    _mainView = newViewModel.MainView;
+                    RefreshAdornerFromCurrentVisual();
+                }
+                else
+                {
+                    _mainView = null;
+                    _adornedVisual = null;
+                    _adorner?.Dispose();
+                    _adorner = null;
+                }
             }
+        }
+
+        protected override void OnDetachedFromVisualTree(VisualTreeAttachmentEventArgs e)
+        {
+            if (DataContext is TreePageViewModel vm)
+            {
+                vm.MainView.PropertyChanged -= OnMainViewPropertyChanged;
+            }
+
+            _adorner?.Dispose();
+            _adorner = null;
+            _adornedVisual = null;
+            _mainView = null;
+            base.OnDetachedFromVisualTree(e);
+        }
+
+        private void OnMainViewPropertyChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e)
+        {
+            if (e.PropertyName is nameof(MainViewModel.HighlightElements)
+                or nameof(MainViewModel.ShouldVisualizeMarginPadding)
+                or nameof(MainViewModel.ShowOverlayInfo)
+                or nameof(MainViewModel.ShowOverlayRulers)
+                or nameof(MainViewModel.ShowOverlayExtensionLines))
+            {
+                RefreshAdornerFromCurrentVisual();
+            }
+        }
+
+        private void RefreshAdornerFromCurrentVisual()
+        {
+            _adorner?.Dispose();
+            _adorner = null;
+
+            if (_adornedVisual is null || _mainView is not { HighlightElements: true })
+            {
+                return;
+            }
+
+            _adorner = Controls.ControlHighlightAdorner.Add(_adornedVisual, _mainView.OverlayDisplayOptions);
         }
 
         private void InitializeComponent()

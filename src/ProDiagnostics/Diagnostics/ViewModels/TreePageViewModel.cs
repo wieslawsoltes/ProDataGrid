@@ -5,15 +5,18 @@ using Avalonia.Controls.DataGridHierarchical;
 using Avalonia.Diagnostics.Services;
 using Avalonia.Controls;
 using Avalonia.VisualTree;
+using System.Reflection;
 
 namespace Avalonia.Diagnostics.ViewModels
 {
     internal class TreePageViewModel : ViewModelBase, IDisposable
     {
         private TreeNode? _selectedNode;
+        private object? _selectedNodeItem;
         private ControlDetailsViewModel? _details;
         private readonly ISet<string> _pinnedProperties;
         private readonly IHierarchicalModel _hierarchicalModel;
+        private bool _isUpdatingSelectedNodeItem;
 
         public TreePageViewModel(MainViewModel mainView, TreeNode[] nodes, ITreeHierarchyModelFactory modelFactory, ISet<string> pinnedProperties)
         {
@@ -47,6 +50,15 @@ namespace Avalonia.Diagnostics.ViewModels
             {
                 if (RaiseAndSetIfChanged(ref _selectedNode, value))
                 {
+                    if (!_isUpdatingSelectedNodeItem &&
+                        !ReferenceEquals(_selectedNodeItem, value))
+                    {
+                        _selectedNodeItem = value;
+                        RaisePropertyChanged(nameof(SelectedNodeItem));
+                    }
+
+                    MainView.NotifyTreeSelectionChanged(value?.Visual);
+
                     if (value != null)
                     {
                         ExpandNode(value.Parent);
@@ -57,6 +69,44 @@ namespace Avalonia.Diagnostics.ViewModels
                         null;
                     Details?.UpdatePropertiesView(MainView.ShowImplementedInterfaces);
                     Details?.UpdateStyleFilters();
+                }
+            }
+        }
+
+        public object? SelectedNodeItem
+        {
+            get => _selectedNodeItem;
+            set
+            {
+                var resolvedNode = ResolveNodeFromSelectionItem(value);
+
+                // DataGrid may transiently clear SelectedItem when the view is detached during tab switch.
+                // Keep the current selection so cross-page diagnostics scope remains stable.
+                if (value is null && _selectedNode is not null)
+                {
+                    return;
+                }
+
+                // Some virtualization wrappers can briefly surface selection tokens that do not map to a tree node.
+                // Ignore these transients to avoid clearing cross-page inspection state.
+                if (value is not null && resolvedNode is null && _selectedNode is not null)
+                {
+                    return;
+                }
+
+                if (!RaiseAndSetIfChanged(ref _selectedNodeItem, value))
+                {
+                    return;
+                }
+
+                _isUpdatingSelectedNodeItem = true;
+                try
+                {
+                    SelectedNode = resolvedNode;
+                }
+                finally
+                {
+                    _isUpdatingSelectedNodeItem = false;
                 }
             }
         }
@@ -249,6 +299,95 @@ namespace Avalonia.Diagnostics.ViewModels
             }
 
             return null;
+        }
+
+        private TreeNode? ResolveNodeFromSelectionItem(object? item)
+        {
+            switch (item)
+            {
+                case TreeNode treeNode:
+                    return treeNode;
+                case HierarchicalNode node:
+                    return ResolveWrappedItem(node.Item);
+                default:
+                {
+                    var wrappedItem = TryGetWrappedItem(item);
+                    if (wrappedItem is not null)
+                    {
+                        return ResolveWrappedItem(wrappedItem);
+                    }
+
+                    return ResolveWrappedItem(item);
+                }
+            }
+        }
+
+        private TreeNode? ResolveWrappedItem(object? wrappedItem)
+        {
+            switch (wrappedItem)
+            {
+                case null:
+                    return null;
+                case TreeNode treeNode:
+                    return treeNode;
+                case Control control:
+                    return FindNode(control);
+                case AvaloniaObject avaloniaObject:
+                    return FindNodeByVisual(avaloniaObject);
+                default:
+                    return null;
+            }
+        }
+
+        private TreeNode? FindNodeByVisual(AvaloniaObject visual)
+        {
+            foreach (var node in Nodes)
+            {
+                var result = FindNodeByVisual(node, visual);
+                if (result is not null)
+                {
+                    return result;
+                }
+            }
+
+            return null;
+        }
+
+        private static TreeNode? FindNodeByVisual(TreeNode node, AvaloniaObject visual)
+        {
+            if (ReferenceEquals(node.Visual, visual))
+            {
+                return node;
+            }
+
+            foreach (var child in node.Children)
+            {
+                var result = FindNodeByVisual(child, visual);
+                if (result is not null)
+                {
+                    return result;
+                }
+            }
+
+            return null;
+        }
+
+        private static object? TryGetWrappedItem(object? selectionItem)
+        {
+            if (selectionItem is null)
+            {
+                return null;
+            }
+
+            var property = selectionItem.GetType().GetProperty(
+                "Item",
+                BindingFlags.Instance | BindingFlags.Public);
+            if (property is null || !property.CanRead)
+            {
+                return null;
+            }
+
+            return property.GetValue(selectionItem);
         }
 
         internal void UpdatePropertiesView()

@@ -1,0 +1,317 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:Avalonia.Diagnostics.ViewModels"
+             x:Class="Avalonia.Diagnostics.Views.StylesDiagnosticsPageView"
+             x:DataType="vm:StylesDiagnosticsPageViewModel">
+  <Grid RowDefinitions="Auto,Auto,*,4,2*,4,2*">
+    <StackPanel Grid.Row="0"
+                Margin="8,6,8,4"
+                Orientation="Horizontal"
+                Spacing="12">
+      <TextBlock Text="{Binding InspectedRoot, StringFormat=Root: {0}}" />
+      <TextBlock Text="{Binding TreeNodeCount, StringFormat=Nodes: {0}}" />
+      <TextBlock Text="{Binding VisibleTreeNodeCount, StringFormat=Visible: {0}}" />
+      <TextBlock Text="{Binding FrameCount, StringFormat=Frames: {0}}" />
+      <TextBlock Text="{Binding VisibleFrameCount, StringFormat=Visible Frames: {0}}" />
+      <TextBlock Text="{Binding SetterCount, StringFormat=Setters: {0}}" />
+      <TextBlock Text="{Binding PseudoClassCount, StringFormat=Pseudo: {0}}" />
+      <TextBlock Text="{Binding ResolutionEntryCount, StringFormat=Trace: {0}}" />
+    </StackPanel>
+
+    <WrapPanel Grid.Row="1"
+               Margin="8,0,8,6"
+               Orientation="Horizontal"
+               ItemHeight="24">
+      <Button Content="Inspect selected"
+              Command="{Binding InspectSelection}" />
+      <Button Content="Refresh"
+              Margin="6,0,0,0"
+              Command="{Binding Refresh}" />
+      <Button Content="Clear"
+              Margin="6,0,0,0"
+              Command="{Binding Clear}" />
+      <CheckBox Content="Show inactive"
+                Margin="12,0,0,0"
+                IsChecked="{Binding ShowInactiveFrames}" />
+      <ToggleButton Content="Snapshot"
+                    Margin="6,0,0,0"
+                    IsChecked="{Binding SnapshotFrames}"
+                    ToolTip.Tip="Freeze selection-driven style inspection updates." />
+      <TextBlock Text="{Binding InspectedRootType}"
+                 Margin="12,0,0,0"
+                 Foreground="Gray"
+                 VerticalAlignment="Center" />
+    </WrapPanel>
+
+    <DockPanel Grid.Row="2"
+               Margin="8,0,8,4"
+               LastChildFill="True">
+      <FilterTextBox DockPanel.Dock="Top"
+                     Margin="0,0,0,4"
+                     DataContext="{Binding TreeFilter}"
+                     Text="{Binding FilterString}"
+                     Watermark="Filter style tree"
+                     UseCaseSensitiveFilter="{Binding UseCaseSensitiveFilter}"
+                     UseWholeWordFilter="{Binding UseWholeWordFilter}"
+                     UseRegexFilter="{Binding UseRegexFilter}" />
+
+      <DataGrid ItemsSource="{Binding TreeEntriesView}"
+                SelectedItem="{Binding SelectedTreeEntry, Mode=TwoWay}"
+                AutoGenerateColumns="False"
+                HeadersVisibility="Column"
+                BorderThickness="0"
+                SelectionMode="Single"
+                CanUserResizeColumns="True"
+                CanUserSortColumns="True">
+        <DataGrid.Columns>
+          <DataGridTextColumn Header="Node"
+                              Binding="{Binding DisplayElement}"
+                              Width="3.2*"
+                              IsReadOnly="True"
+                              x:DataType="vm:StylesTreeEntryViewModel" />
+          <DataGridTextColumn Header="Type"
+                              Binding="{Binding ElementType}"
+                              Width="1.2*"
+                              IsReadOnly="True"
+                              x:DataType="vm:StylesTreeEntryViewModel" />
+          <DataGridTextColumn Header="Depth"
+                              Binding="{Binding Depth}"
+                              Width="0.8*"
+                              IsReadOnly="True"
+                              x:DataType="vm:StylesTreeEntryViewModel" />
+          <DataGridTextColumn Header="Frames"
+                              Binding="{Binding ActiveSummary}"
+                              Width="0.9*"
+                              IsReadOnly="True"
+                              x:DataType="vm:StylesTreeEntryViewModel" />
+          <DataGridTextColumn Header="Pseudo Classes"
+                              Binding="{Binding PseudoClasses}"
+                              Width="1.5*"
+                              IsReadOnly="True"
+                              x:DataType="vm:StylesTreeEntryViewModel" />
+          <DataGridTextColumn Header="Classes"
+                              Binding="{Binding Classes}"
+                              Width="1.5*"
+                              IsReadOnly="True"
+                              x:DataType="vm:StylesTreeEntryViewModel" />
+        </DataGrid.Columns>
+      </DataGrid>
+    </DockPanel>
+
+    <GridSplitter Grid.Row="3"
+                  Height="4" />
+
+    <Grid Grid.Row="4"
+          Margin="8,0,8,6"
+          ColumnDefinitions="*,4,*">
+      <DockPanel Grid.Column="0"
+                 LastChildFill="True">
+        <TextBlock DockPanel.Dock="Top"
+                   Margin="0,0,0,4"
+                   FontWeight="SemiBold"
+                   Text="{Binding FramesStatus}" />
+        <FilterTextBox DockPanel.Dock="Top"
+                       Margin="0,0,0,4"
+                       DataContext="{Binding FramesFilter}"
+                       Text="{Binding FilterString}"
+                       Watermark="Filter value frames"
+                       UseCaseSensitiveFilter="{Binding UseCaseSensitiveFilter}"
+                       UseWholeWordFilter="{Binding UseWholeWordFilter}"
+                       UseRegexFilter="{Binding UseRegexFilter}" />
+        <DataGrid ItemsSource="{Binding FramesView}"
+                  SelectedItem="{Binding SelectedFrame, Mode=TwoWay}"
+                  AutoGenerateColumns="False"
+                  HeadersVisibility="Column"
+                  BorderThickness="0"
+                  SelectionMode="Single"
+                  CanUserResizeColumns="True"
+                  CanUserSortColumns="True">
+          <DataGrid.Columns>
+            <DataGridTextColumn Header="Frame"
+                                Binding="{Binding Description}"
+                                Width="2.8*"
+                                IsReadOnly="True"
+                                x:DataType="vm:ValueFrameViewModel" />
+            <DataGridCheckBoxColumn Header="Active"
+                                    Binding="{Binding IsActive}"
+                                    Width="0.8*"
+                                    IsReadOnly="True"
+                                    x:DataType="vm:ValueFrameViewModel" />
+            <DataGridTextColumn Header="Setters"
+                                Binding="{Binding Setters.Count}"
+                                Width="0.8*"
+                                IsReadOnly="True"
+                                x:DataType="vm:ValueFrameViewModel" />
+          </DataGrid.Columns>
+        </DataGrid>
+      </DockPanel>
+
+      <GridSplitter Grid.Column="1"
+                    Width="4" />
+
+      <Grid Grid.Column="2"
+            RowDefinitions="Auto,Auto,*,Auto,*">
+        <TextBlock Grid.Row="0"
+                   Margin="0,0,0,4"
+                   FontWeight="SemiBold"
+                   Text="{Binding SelectedTreeEntry.Element, StringFormat=Selected: {0}}" />
+        <FilterTextBox Grid.Row="1"
+                       Margin="0,0,0,4"
+                       DataContext="{Binding SettersFilter}"
+                       Text="{Binding FilterString}"
+                       Watermark="Filter setters"
+                       UseCaseSensitiveFilter="{Binding UseCaseSensitiveFilter}"
+                       UseWholeWordFilter="{Binding UseWholeWordFilter}"
+                       UseRegexFilter="{Binding UseRegexFilter}" />
+        <DataGrid Grid.Row="2"
+                  ItemsSource="{Binding SettersView}"
+                  AutoGenerateColumns="False"
+                  HeadersVisibility="Column"
+                  BorderThickness="0"
+                  SelectionMode="Single"
+                  CanUserResizeColumns="True"
+                  CanUserSortColumns="True">
+          <DataGrid.Columns>
+            <DataGridTextColumn Header="Property"
+                                Binding="{Binding Name}"
+                                Width="1.5*"
+                                IsReadOnly="True"
+                                x:DataType="vm:SetterViewModel" />
+            <DataGridTextColumn Header="Value"
+                                Binding="{Binding Value}"
+                                Width="2.4*"
+                                IsReadOnly="True"
+                                x:DataType="vm:SetterViewModel" />
+            <DataGridCheckBoxColumn Header="Active"
+                                    Binding="{Binding IsActive}"
+                                    Width="0.8*"
+                                    IsReadOnly="True"
+                                    x:DataType="vm:SetterViewModel" />
+          </DataGrid.Columns>
+        </DataGrid>
+
+        <TextBlock Grid.Row="3"
+                   Margin="0,8,0,4"
+                   FontWeight="SemiBold"
+                   Text="Pseudo classes" />
+        <ScrollViewer Grid.Row="4"
+                      HorizontalScrollBarVisibility="Disabled">
+          <ItemsControl ItemsSource="{Binding PseudoClasses}">
+            <ItemsControl.ItemsPanel>
+              <ItemsPanelTemplate>
+                <WrapPanel />
+              </ItemsPanelTemplate>
+            </ItemsControl.ItemsPanel>
+            <ItemsControl.ItemTemplate>
+              <DataTemplate x:DataType="vm:PseudoClassViewModel">
+                <CheckBox Margin="2"
+                          Content="{Binding Name}"
+                          IsChecked="{Binding IsActive, Mode=TwoWay}" />
+              </DataTemplate>
+            </ItemsControl.ItemTemplate>
+          </ItemsControl>
+        </ScrollViewer>
+      </Grid>
+    </Grid>
+
+    <GridSplitter Grid.Row="5"
+                  Height="4" />
+
+    <DockPanel Grid.Row="6"
+               Margin="8,0,8,6"
+               LastChildFill="True">
+      <TextBlock DockPanel.Dock="Top"
+                 Margin="0,0,0,4"
+                 FontWeight="SemiBold"
+                 Text="{Binding ResolutionTraceStatus}" />
+      <FilterTextBox DockPanel.Dock="Top"
+                     Margin="0,0,0,4"
+                     DataContext="{Binding ResolutionFilter}"
+                     Text="{Binding FilterString}"
+                     Watermark="Filter style resolution trace"
+                     UseCaseSensitiveFilter="{Binding UseCaseSensitiveFilter}"
+                     UseWholeWordFilter="{Binding UseWholeWordFilter}"
+                     UseRegexFilter="{Binding UseRegexFilter}" />
+      <DataGrid ItemsSource="{Binding ResolutionEntriesView}"
+                AutoGenerateColumns="False"
+                HeadersVisibility="Column"
+                BorderThickness="0"
+                SelectionMode="Single"
+                CanUserResizeColumns="True"
+                CanUserSortColumns="True">
+        <DataGrid.Columns>
+          <DataGridTextColumn Header="#"
+                              Binding="{Binding Order}"
+                              Width="0.5*"
+                              IsReadOnly="True"
+                              x:DataType="vm:StyleResolutionTraceEntryViewModel" />
+          <DataGridTextColumn Header="Level"
+                              Binding="{Binding HostLevel}"
+                              Width="0.7*"
+                              IsReadOnly="True"
+                              x:DataType="vm:StyleResolutionTraceEntryViewModel" />
+          <DataGridTextColumn Header="Host"
+                              Binding="{Binding Host}"
+                              Width="1.6*"
+                              IsReadOnly="True"
+                              x:DataType="vm:StyleResolutionTraceEntryViewModel" />
+          <DataGridTextColumn Header="Host Kind"
+                              Binding="{Binding HostKind}"
+                              Width="1.1*"
+                              IsReadOnly="True"
+                              x:DataType="vm:StyleResolutionTraceEntryViewModel" />
+          <DataGridTextColumn Header="Scope"
+                              Binding="{Binding PropagationScope}"
+                              Width="1.4*"
+                              IsReadOnly="True"
+                              x:DataType="vm:StyleResolutionTraceEntryViewModel" />
+          <DataGridTextColumn Header="L"
+                              Binding="{Binding LogicalDistance}"
+                              Width="0.45*"
+                              IsReadOnly="True"
+                              x:DataType="vm:StyleResolutionTraceEntryViewModel" />
+          <DataGridTextColumn Header="V"
+                              Binding="{Binding VisualDistance}"
+                              Width="0.45*"
+                              IsReadOnly="True"
+                              x:DataType="vm:StyleResolutionTraceEntryViewModel" />
+          <DataGridTextColumn Header="Style"
+                              Binding="{Binding Style}"
+                              Width="2*"
+                              IsReadOnly="True"
+                              x:DataType="vm:StyleResolutionTraceEntryViewModel" />
+          <DataGridTextColumn Header="Kind"
+                              Binding="{Binding StyleKind}"
+                              Width="0.9*"
+                              IsReadOnly="True"
+                              x:DataType="vm:StyleResolutionTraceEntryViewModel" />
+          <DataGridTextColumn Header="Selector/Target"
+                              Binding="{Binding Selector}"
+                              Width="1.8*"
+                              IsReadOnly="True"
+                              x:DataType="vm:StyleResolutionTraceEntryViewModel" />
+          <DataGridTextColumn Header="Path"
+                              Binding="{Binding Path}"
+                              Width="0.8*"
+                              IsReadOnly="True"
+                              x:DataType="vm:StyleResolutionTraceEntryViewModel" />
+          <DataGridTextColumn Header="Active/Matched"
+                              Binding="{Binding AppliedSummary}"
+                              Width="0.9*"
+                              IsReadOnly="True"
+                              x:DataType="vm:StyleResolutionTraceEntryViewModel" />
+          <DataGridCheckBoxColumn Header="Init"
+                                  Binding="{Binding StylesInitialized}"
+                                  Width="0.6*"
+                                  IsReadOnly="True"
+                                  x:DataType="vm:StyleResolutionTraceEntryViewModel" />
+          <DataGridTextColumn Header="Notes"
+                              Binding="{Binding Notes}"
+                              Width="1.8*"
+                              IsReadOnly="True"
+                              x:DataType="vm:StyleResolutionTraceEntryViewModel" />
+        </DataGrid.Columns>
+      </DataGrid>
+    </DockPanel>
+  </Grid>
+</UserControl>

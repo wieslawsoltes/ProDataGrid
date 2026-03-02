@@ -1,0 +1,42 @@
+using Avalonia;
+using Avalonia.VisualTree;
+
+namespace Avalonia.Diagnostics.ViewModels;
+
+internal sealed class Elements3DNodeViewModel
+{
+    public Elements3DNodeViewModel(
+        int depth,
+        string node,
+        int zIndex,
+        Rect boundsRect,
+        bool isVisible,
+        double opacity,
+        Visual visual)
+    {
+        Depth = depth;
+        Node = node;
+        ZIndex = zIndex;
+        BoundsRect = boundsRect;
+        Bounds = boundsRect.ToString();
+        IsVisible = isVisible;
+        Opacity = opacity;
+        Visual = visual;
+    }
+
+    public int Depth { get; }
+
+    public string Node { get; }
+
+    public int ZIndex { get; }
+
+    public Rect BoundsRect { get; }
+
+    public string Bounds { get; }
+
+    public bool IsVisible { get; }
+
+    public double Opacity { get; }
+
+    internal Visual Visual { get; }
+}

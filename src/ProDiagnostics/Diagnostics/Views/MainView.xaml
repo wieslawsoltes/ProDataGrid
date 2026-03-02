@@ -72,6 +72,15 @@
             </MenuItem.Icon>
           </MenuItem>
         </MenuItem>
+        <MenuItem Header="Elements/_3D" Command="{Binding ShowElements3D}" />
+        <MenuItem Header="_Profiler" Command="{Binding ShowProfiler}" />
+        <MenuItem Header="_Metrics" Command="{Binding ShowMetrics}" />
+        <MenuItem Header="ViewModels/_Bindings" Command="{Binding ShowViewModelsBindings}" />
+        <MenuItem Header="St_yles" Command="{Binding ShowStyles}" />
+        <MenuItem Header="_Transport/Process" Command="{Binding ShowTransportSettings}" />
+        <MenuItem Header="_Breakpoints" Command="{Binding ShowBreakpoints}" />
+        <MenuItem Header="_Logs" Command="{Binding ShowLogs}" />
+        <MenuItem Header="_Settings" Command="{Binding ShowSettings}" />
         <MenuItem Header="_HotKeys" Command="{Binding ShowHotKeys}" />
       </MenuItem>
       <MenuItem Header="_Overlays">
@@ -79,6 +88,48 @@
           <MenuItem.Icon>
             <CheckBox BorderThickness="0"
                       IsChecked="{Binding ShouldVisualizeMarginPadding}"
+                      IsEnabled="False" />
+          </MenuItem.Icon>
+        </MenuItem>
+        <MenuItem Header="Show overlay info" Command="{Binding ToggleOverlayInfo}">
+          <MenuItem.Icon>
+            <CheckBox BorderThickness="0"
+                      IsChecked="{Binding ShowOverlayInfo}"
+                      IsEnabled="False" />
+          </MenuItem.Icon>
+        </MenuItem>
+        <MenuItem Header="Show rulers" Command="{Binding ToggleOverlayRulers}">
+          <MenuItem.Icon>
+            <CheckBox BorderThickness="0"
+                      IsChecked="{Binding ShowOverlayRulers}"
+                      IsEnabled="False" />
+          </MenuItem.Icon>
+        </MenuItem>
+        <MenuItem Header="Show extension lines" Command="{Binding ToggleOverlayExtensionLines}">
+          <MenuItem.Icon>
+            <CheckBox BorderThickness="0"
+                      IsChecked="{Binding ShowOverlayExtensionLines}"
+                      IsEnabled="False" />
+          </MenuItem.Icon>
+        </MenuItem>
+        <MenuItem Header="Highlight elements" Command="{Binding ToggleHighlightElements}">
+          <MenuItem.Icon>
+            <CheckBox BorderThickness="0"
+                      IsChecked="{Binding HighlightElements}"
+                      IsEnabled="False" />
+          </MenuItem.Icon>
+        </MenuItem>
+        <MenuItem Header="Live hover overlay" Command="{Binding ToggleLiveHoverOverlay}">
+          <MenuItem.Icon>
+            <CheckBox BorderThickness="0"
+                      IsChecked="{Binding LiveHoverOverlay}"
+                      IsEnabled="False" />
+          </MenuItem.Icon>
+        </MenuItem>
+        <MenuItem Header="Track focus" Command="{Binding ToggleFocusTracking}">
+          <MenuItem.Icon>
+            <CheckBox BorderThickness="0"
+                      IsChecked="{Binding TrackFocusedControl}"
                       IsEnabled="False" />
           </MenuItem.Icon>
         </MenuItem>
@@ -262,6 +313,15 @@
       <TabStripItem Content="Resources" />
       <TabStripItem Content="Assets" />
       <TabStripItem Content="Events" />
+      <TabStripItem Content="Breakpoints" />
+      <TabStripItem Content="Logs" />
+      <TabStripItem Content="Metrics" />
+      <TabStripItem Content="ViewModels/Bindings" />
+      <TabStripItem Content="Transport/Process" />
+      <TabStripItem Content="Elements 3D" />
+      <TabStripItem Content="Profiler" />
+      <TabStripItem Content="Settings" />
+      <TabStripItem Content="Styles" />
       <TabStripItem Content="HotKeys" IsVisible="False" />
     </TabStrip>
 
@@ -278,7 +338,7 @@
             BorderThickness="0,1,0,0">
       <Grid ColumnDefinitions="*, Auto">
         <StackPanel Grid.Column="0" Spacing="4" Orientation="Horizontal">
-          <TextBlock>Hold Ctrl+Shift over a control to inspect.</TextBlock>
+          <TextBlock>Press Ctrl+Shift over a control to inspect.</TextBlock>
           <Separator Width="8" />
           <TextBlock>Focused:</TextBlock>
           <TextBlock Text="{Binding FocusedControl}" />
