@@ -56,7 +56,8 @@ internal sealed class MetricsPageViewModel : ViewModelBase, IDisposable
             remotePort: TelemetryProtocol.DefaultPort,
             localProcessId: Environment.ProcessId,
             maxPendingMeasurements: DefaultPendingMeasurementQueueCapacity,
-            maxRemoteSessions: DefaultRemoteSessionCapacity)
+            maxRemoteSessions: DefaultRemoteSessionCapacity,
+            startPaused: true)
     {
     }
 
@@ -67,7 +68,8 @@ internal sealed class MetricsPageViewModel : ViewModelBase, IDisposable
             remotePort: TelemetryProtocol.DefaultPort,
             localProcessId: Environment.ProcessId,
             maxPendingMeasurements: DefaultPendingMeasurementQueueCapacity,
-            maxRemoteSessions: DefaultRemoteSessionCapacity)
+            maxRemoteSessions: DefaultRemoteSessionCapacity,
+            startPaused: false)
     {
     }
 
@@ -78,7 +80,8 @@ internal sealed class MetricsPageViewModel : ViewModelBase, IDisposable
             remotePort,
             localProcessId,
             DefaultPendingMeasurementQueueCapacity,
-            DefaultRemoteSessionCapacity)
+            DefaultRemoteSessionCapacity,
+            startPaused: false)
     {
     }
 
@@ -94,7 +97,8 @@ internal sealed class MetricsPageViewModel : ViewModelBase, IDisposable
             remotePort,
             localProcessId,
             maxPendingMeasurements,
-            maxRemoteSessions)
+            maxRemoteSessions,
+            startPaused: false)
     {
     }
 
@@ -104,13 +108,15 @@ internal sealed class MetricsPageViewModel : ViewModelBase, IDisposable
         int remotePort,
         int localProcessId,
         int maxPendingMeasurements,
-        int maxRemoteSessions)
+        int maxRemoteSessions,
+        bool startPaused = false)
     {
         _localProcessId = localProcessId;
         _remotePort = NormalizePort(remotePort);
         _maxPendingMeasurements = NormalizePositiveCapacity(maxPendingMeasurements, DefaultPendingMeasurementQueueCapacity);
         _maxRemoteSessions = NormalizePositiveCapacity(maxRemoteSessions, DefaultRemoteSessionCapacity);
         _isLocalCaptureEnabled = subscribeToLiveMetrics;
+        _isUpdatesPaused = startPaused;
 
         MetricsFilter = new FilterViewModel();
         MetricsFilter.RefreshFilter += (_, _) => RefreshSeries();
