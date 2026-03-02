@@ -13,7 +13,8 @@ namespace Avalonia.Diagnostics.ViewModels
             ResourceEntryPropertyViewModel valueProperty,
             string scopeName,
             string scopePath,
-            string? themeVariant)
+            string? themeVariant,
+            string sourceLocation)
         {
             Key = key;
             Value = value;
@@ -26,6 +27,7 @@ namespace Avalonia.Diagnostics.ViewModels
             ScopeName = scopeName;
             ScopePath = scopePath;
             ThemeVariant = themeVariant;
+            SourceLocation = sourceLocation;
         }
 
         public object Key { get; }
@@ -39,5 +41,6 @@ namespace Avalonia.Diagnostics.ViewModels
         public string ScopeName { get; }
         public string ScopePath { get; }
         public string? ThemeVariant { get; }
+        public string SourceLocation { get; }
     }
 }

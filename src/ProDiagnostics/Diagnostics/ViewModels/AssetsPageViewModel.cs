@@ -5,6 +5,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Avalonia.Collections;
 using Avalonia.Controls;
+using Avalonia.Diagnostics.Services;
 using Avalonia.Platform;
 using Avalonia.Threading;
 
@@ -12,15 +13,18 @@ namespace Avalonia.Diagnostics.ViewModels
 {
     internal sealed class AssetsPageViewModel : ViewModelBase
     {
+        private static readonly ISourceLocationService DefaultSourceLocationService = new PortablePdbSourceLocationService();
         private readonly AvaloniaList<AssetEntryViewModel> _assets = new();
         private readonly DataGridCollectionView _assetsView;
+        private readonly ISourceLocationService _sourceLocationService;
         private AssetEntryViewModel? _selectedAsset;
         private bool _isLoading;
         private string? _status;
 
-        public AssetsPageViewModel(MainViewModel mainView)
+        public AssetsPageViewModel(MainViewModel mainView, ISourceLocationService? sourceLocationService = null)
         {
             MainView = mainView;
+            _sourceLocationService = sourceLocationService ?? DefaultSourceLocationService;
             AssetsFilter = new FilterViewModel();
             AssetsFilter.RefreshFilter += (_, _) => _assetsView.Refresh();
 
@@ -132,6 +136,7 @@ namespace Avalonia.Diagnostics.ViewModels
                 _assets.Clear();
                 for (var i = 0; i < assets.Count; i++)
                 {
+                    assets[i].SourceLocation = ResolveAssetSourceLocation(assets[i]);
                     _assets.Add(assets[i]);
                 }
 
@@ -160,6 +165,11 @@ namespace Avalonia.Diagnostics.ViewModels
             }
 
             if (AssetsFilter.Filter(asset.AssemblyName))
+            {
+                return true;
+            }
+
+            if (AssetsFilter.Filter(asset.SourceLocation))
             {
                 return true;
             }
@@ -207,7 +217,7 @@ namespace Avalonia.Diagnostics.ViewModels
                     var assetPath = NormalizePath(assetUri);
                     var assemblyName = string.IsNullOrWhiteSpace(assetUri.Host) ? name : assetUri.Host;
                     var kind = ClassifyKind(assetPath);
-                    results.Add(new AssetEntryViewModel(assetUri, assemblyName, assetPath, kind));
+                    results.Add(new AssetEntryViewModel(assetUri, assembly, assemblyName, assetPath, kind));
                 }
             }
 
@@ -291,6 +301,23 @@ namespace Avalonia.Diagnostics.ViewModels
                 or ".yml"
                 or ".ini"
                 or ".config";
+        }
+
+        private string ResolveAssetSourceLocation(AssetEntryViewModel asset)
+        {
+            var byPath = _sourceLocationService.ResolveDocument(asset.Assembly, asset.AssetPath, asset.AssetPath);
+            if (byPath is not null)
+            {
+                return byPath.DisplayText;
+            }
+
+            var byFileName = _sourceLocationService.ResolveDocument(asset.Assembly, asset.Name, asset.Name);
+            if (byFileName is not null)
+            {
+                return byFileName.DisplayText;
+            }
+
+            return string.Empty;
         }
     }
 }

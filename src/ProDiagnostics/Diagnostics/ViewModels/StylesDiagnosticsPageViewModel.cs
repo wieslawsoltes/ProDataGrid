@@ -5,6 +5,7 @@ using System.Linq;
 using Avalonia.Collections;
 using Avalonia.Controls;
 using Avalonia.Controls.Metadata;
+using Avalonia.Diagnostics.Services;
 using Avalonia.LogicalTree;
 using Avalonia.Styling;
 using Avalonia.VisualTree;
@@ -13,6 +14,7 @@ namespace Avalonia.Diagnostics.ViewModels;
 
 internal sealed class StylesDiagnosticsPageViewModel : ViewModelBase, IDisposable
 {
+    private static readonly ISourceLocationService DefaultSourceLocationService = new PortablePdbSourceLocationService();
     private readonly AvaloniaList<StylesTreeEntryViewModel> _treeEntries = new();
     private readonly AvaloniaList<ValueFrameViewModel> _frames = new();
     private readonly AvaloniaList<SetterViewModel> _setters = new();
@@ -23,6 +25,7 @@ internal sealed class StylesDiagnosticsPageViewModel : ViewModelBase, IDisposabl
     private readonly DataGridCollectionView _settersView;
     private readonly DataGridCollectionView _resolutionEntriesView;
     private readonly Func<AvaloniaObject?>? _selectedObjectAccessor;
+    private readonly ISourceLocationService _sourceLocationService;
     private AvaloniaObject? _inspectedObject;
     private StylesTreeEntryViewModel? _selectedTreeEntry;
     private ValueFrameViewModel? _selectedFrame;
@@ -34,19 +37,23 @@ internal sealed class StylesDiagnosticsPageViewModel : ViewModelBase, IDisposabl
     private string _resolutionTraceStatus = "Style resolution trace (0/0 visible)";
 
     public StylesDiagnosticsPageViewModel()
-        : this(mainView: null, selectedObjectAccessor: null)
+        : this(mainView: null, selectedObjectAccessor: null, sourceLocationService: null)
     {
     }
 
     internal StylesDiagnosticsPageViewModel(Func<AvaloniaObject?>? selectedObjectAccessor)
-        : this(mainView: null, selectedObjectAccessor)
+        : this(mainView: null, selectedObjectAccessor, sourceLocationService: null)
     {
     }
 
-    internal StylesDiagnosticsPageViewModel(MainViewModel? mainView, Func<AvaloniaObject?>? selectedObjectAccessor)
+    internal StylesDiagnosticsPageViewModel(
+        MainViewModel? mainView,
+        Func<AvaloniaObject?>? selectedObjectAccessor,
+        ISourceLocationService? sourceLocationService = null)
     {
         MainView = mainView;
         _selectedObjectAccessor = selectedObjectAccessor;
+        _sourceLocationService = sourceLocationService ?? DefaultSourceLocationService;
 
         TreeFilter = new FilterViewModel();
         TreeFilter.RefreshFilter += (_, _) => RefreshTreeEntries();
@@ -340,7 +347,7 @@ internal sealed class StylesDiagnosticsPageViewModel : ViewModelBase, IDisposabl
         var appliedFrames = diagnostics.AppliedFrames.ToArray();
         foreach (var frame in appliedFrames.OrderBy(s => s.Priority))
         {
-            _frames.Add(new ValueFrameViewModel(styledElement, frame, clipboard));
+            _frames.Add(new ValueFrameViewModel(styledElement, frame, clipboard, _sourceLocationService));
         }
 
         BuildPseudoClasses(styledElement);
@@ -508,6 +515,11 @@ internal sealed class StylesDiagnosticsPageViewModel : ViewModelBase, IDisposabl
             return true;
         }
 
+        if (TreeFilter.Filter(entry.SourceLocation))
+        {
+            return true;
+        }
+
         return TreeFilter.Filter(entry.ActiveSummary);
     }
 
@@ -533,6 +545,11 @@ internal sealed class StylesDiagnosticsPageViewModel : ViewModelBase, IDisposabl
             return true;
         }
 
+        if (FramesFilter.Filter(frame.SourceLocation))
+        {
+            return true;
+        }
+
         return FramesFilter.Filter(frame.Setters.Count.ToString());
     }
 
@@ -549,6 +566,11 @@ internal sealed class StylesDiagnosticsPageViewModel : ViewModelBase, IDisposabl
         }
 
         if (SettersFilter.Filter(setter.Value?.ToString() ?? string.Empty))
+        {
+            return true;
+        }
+
+        if (SettersFilter.Filter(setter.SourceLocation))
         {
             return true;
         }
@@ -594,6 +616,11 @@ internal sealed class StylesDiagnosticsPageViewModel : ViewModelBase, IDisposabl
         }
 
         if (ResolutionFilter.Filter(entry.Path))
+        {
+            return true;
+        }
+
+        if (ResolutionFilter.Filter(entry.SourceLocation))
         {
             return true;
         }
@@ -644,6 +671,7 @@ internal sealed class StylesDiagnosticsPageViewModel : ViewModelBase, IDisposabl
             var propagationScope = DescribePropagationScope(target, host, out var logicalDistance, out var visualDistance);
             if (!host.IsStylesInitialized)
             {
+                var hostSourceLocation = ResolveSourceLocationText(host);
                 _resolutionEntries.Add(new StyleResolutionTraceEntryViewModel(
                     order++,
                     hostLevel,
@@ -657,6 +685,7 @@ internal sealed class StylesDiagnosticsPageViewModel : ViewModelBase, IDisposabl
                     styleKind: "Host",
                     selector: string.Empty,
                     path: string.Empty,
+                    sourceLocation: hostSourceLocation,
                     appliedCount: 0,
                     activeCount: 0,
                     notes: "Host styles were not initialized."));
@@ -666,6 +695,7 @@ internal sealed class StylesDiagnosticsPageViewModel : ViewModelBase, IDisposabl
             var styles = host.Styles;
             if (styles.Count == 0)
             {
+                var hostSourceLocation = ResolveSourceLocationText(host);
                 _resolutionEntries.Add(new StyleResolutionTraceEntryViewModel(
                     order++,
                     hostLevel,
@@ -679,6 +709,7 @@ internal sealed class StylesDiagnosticsPageViewModel : ViewModelBase, IDisposabl
                     styleKind: "Host",
                     selector: string.Empty,
                     path: string.Empty,
+                    sourceLocation: hostSourceLocation,
                     appliedCount: 0,
                     activeCount: 0,
                     notes: string.Empty));
@@ -727,6 +758,7 @@ internal sealed class StylesDiagnosticsPageViewModel : ViewModelBase, IDisposabl
                 styleKind: DescribeStyleKind(kvp.Key),
                 selector: selector,
                 path: string.Empty,
+                sourceLocation: ResolveSourceLocationText(kvp.Key, TryGetSourceHint(kvp.Key)),
                 appliedCount: kvp.Value.AppliedCount,
                 activeCount: kvp.Value.ActiveCount,
                 notes: "Applied style source was not found in the styling-parent host chain."));
@@ -804,6 +836,7 @@ internal sealed class StylesDiagnosticsPageViewModel : ViewModelBase, IDisposabl
                 styleKind: "Style",
                 selector: string.Empty,
                 path: path,
+                sourceLocation: ResolveSourceLocationText(style, TryGetSourceHint(style)),
                 appliedCount: 0,
                 activeCount: 0,
                 notes: "Recursive style reference detected."));
@@ -832,6 +865,7 @@ internal sealed class StylesDiagnosticsPageViewModel : ViewModelBase, IDisposabl
             styleKind: DescribeStyleKind(style),
             selector: selector,
             path: path,
+            sourceLocation: ResolveSourceLocationText(style, TryGetSourceHint(style)),
             appliedCount: stats.AppliedCount,
             activeCount: stats.ActiveCount,
             notes: notes));
@@ -1041,7 +1075,7 @@ internal sealed class StylesDiagnosticsPageViewModel : ViewModelBase, IDisposabl
         return null;
     }
 
-    private static StylesTreeEntryViewModel CreateTreeEntry(StyledElement styled, int depth)
+    private StylesTreeEntryViewModel CreateTreeEntry(StyledElement styled, int depth)
     {
         var diagnostics = styled.GetValueStoreDiagnostic();
         var totalFrames = 0;
@@ -1066,7 +1100,8 @@ internal sealed class StylesDiagnosticsPageViewModel : ViewModelBase, IDisposabl
             totalFrames,
             activeFrames,
             classes,
-            pseudoClasses);
+            pseudoClasses,
+            ResolveSourceLocationText(styled));
     }
 
     private static string DescribeElement(AvaloniaObject target)
@@ -1094,5 +1129,58 @@ internal sealed class StylesDiagnosticsPageViewModel : ViewModelBase, IDisposabl
         }
 
         return !visual.DoesBelongToDevTool();
+    }
+
+    private string ResolveSourceLocationText(object? source, string? sourceHint = null)
+    {
+        if (source is null)
+        {
+            return string.Empty;
+        }
+
+        var lineHint = (source as StyledElement)?.Name;
+        var sourceInfo = _sourceLocationService.ResolveObject(source, sourceHint, lineHint);
+        if (sourceInfo.XamlLocation is not null)
+        {
+            return sourceInfo.XamlLocation.DisplayText;
+        }
+
+        if (sourceInfo.CodeLocation is not null)
+        {
+            return sourceInfo.CodeLocation.DisplayText;
+        }
+
+        if (!string.IsNullOrWhiteSpace(sourceHint))
+        {
+            var hinted = _sourceLocationService.ResolveDocument(source.GetType().Assembly, sourceHint, lineHint);
+            if (hinted is not null)
+            {
+                return hinted.DisplayText;
+            }
+        }
+
+        return string.Empty;
+    }
+
+    private static string? TryGetSourceHint(object? source)
+    {
+        if (source is null)
+        {
+            return null;
+        }
+
+        var sourceProperty = source.GetType().GetProperty("Source");
+        if (sourceProperty is null)
+        {
+            return null;
+        }
+
+        var value = sourceProperty.GetValue(source);
+        if (value is Uri uri)
+        {
+            return uri.ToString();
+        }
+
+        return value as string;
     }
 }

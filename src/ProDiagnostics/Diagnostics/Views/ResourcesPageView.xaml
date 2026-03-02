@@ -139,6 +139,11 @@
                                 IsReadOnly="True"
                                 Width="3*"
                                 x:DataType="vm:ResourceEntryViewModel"/>
+            <DataGridTextColumn Header="Source"
+                                Binding="{Binding SourceLocation}"
+                                IsReadOnly="True"
+                                Width="2.2*"
+                                x:DataType="vm:ResourceEntryViewModel"/>
             <DataGridTextColumn Header="Theme"
                                 Binding="{Binding ThemeVariant}"
                                 IsReadOnly="True"

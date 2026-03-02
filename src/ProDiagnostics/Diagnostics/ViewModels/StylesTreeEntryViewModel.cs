@@ -13,7 +13,8 @@ internal sealed class StylesTreeEntryViewModel : ViewModelBase
         int frameCount,
         int activeFrameCount,
         string classes,
-        string pseudoClasses)
+        string pseudoClasses,
+        string sourceLocation)
     {
         SourceObject = sourceObject;
         Depth = depth;
@@ -23,6 +24,7 @@ internal sealed class StylesTreeEntryViewModel : ViewModelBase
         ActiveFrameCount = activeFrameCount;
         Classes = classes;
         PseudoClasses = pseudoClasses;
+        SourceLocation = sourceLocation;
     }
 
     public StyledElement SourceObject { get; }
@@ -40,6 +42,8 @@ internal sealed class StylesTreeEntryViewModel : ViewModelBase
     public string Classes { get; }
 
     public string PseudoClasses { get; }
+
+    public string SourceLocation { get; }
 
     public string ActiveSummary => ActiveFrameCount + "/" + FrameCount;
 

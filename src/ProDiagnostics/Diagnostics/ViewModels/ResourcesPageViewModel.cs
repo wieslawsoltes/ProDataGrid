@@ -13,7 +13,9 @@ namespace Avalonia.Diagnostics.ViewModels
 {
     internal sealed class ResourcesPageViewModel : ViewModelBase, IDisposable
     {
+        private static readonly ISourceLocationService DefaultSourceLocationService = new PortablePdbSourceLocationService();
         private readonly IResourceNodeFormatter _formatter;
+        private readonly ISourceLocationService _sourceLocationService;
         private readonly AvaloniaList<ResourceEntryViewModel> _resourceEntries = new();
         private readonly IHierarchicalModel _hierarchicalModel;
         private readonly DataGridCollectionView _resourcesView;
@@ -31,12 +33,14 @@ namespace Avalonia.Diagnostics.ViewModels
             MainViewModel mainView,
             ResourceTreeNode[] nodes,
             IResourceHierarchyModelFactory modelFactory,
-            IResourceNodeFormatter formatter)
+            IResourceNodeFormatter formatter,
+            ISourceLocationService? sourceLocationService = null)
         {
             MainView = mainView;
             Nodes = nodes;
             _hierarchicalModel = modelFactory.Create(nodes);
             _formatter = formatter;
+            _sourceLocationService = sourceLocationService ?? DefaultSourceLocationService;
             ResourcesFilter = new FilterViewModel();
             ResourcesFilter.RefreshFilter += (_, _) =>
             {
@@ -294,7 +298,8 @@ namespace Avalonia.Diagnostics.ViewModels
                         valueProperty,
                         scopeName,
                         scopePath,
-                        themeVariant));
+                        themeVariant,
+                        ResolveSourceLocationText(node, value)));
                 }
             }
         }
@@ -448,6 +453,11 @@ namespace Avalonia.Diagnostics.ViewModels
                 return true;
             }
 
+            if (ResourcesFilter.Filter(entry.SourceLocation))
+            {
+                return true;
+            }
+
             return entry.ThemeVariant != null && ResourcesFilter.Filter(entry.ThemeVariant);
         }
 
@@ -565,6 +575,87 @@ namespace Avalonia.Diagnostics.ViewModels
             }
 
             return null;
+        }
+
+        private string ResolveSourceLocationText(ResourceTreeNode node, object? value)
+        {
+            var nodeSourceHint = TryGetSourceHint(node.Source);
+            var fromValue = ResolveSourceFromObject(value, nodeSourceHint, node.Name);
+            if (!string.IsNullOrEmpty(fromValue))
+            {
+                return fromValue;
+            }
+
+            var fromNode = ResolveSourceFromObject(node.Source, nodeSourceHint, node.Name);
+            if (!string.IsNullOrEmpty(fromNode))
+            {
+                return fromNode;
+            }
+
+            if (!string.IsNullOrWhiteSpace(nodeSourceHint))
+            {
+                var ownerAssembly = node.Source?.GetType().Assembly ?? value?.GetType().Assembly;
+                var document = _sourceLocationService.ResolveDocument(ownerAssembly, nodeSourceHint, node.Name);
+                if (document is not null)
+                {
+                    return document.DisplayText;
+                }
+            }
+
+            return string.Empty;
+        }
+
+        private string ResolveSourceFromObject(object? source, string? sourceHint, string? lineHint)
+        {
+            if (source is null)
+            {
+                return string.Empty;
+            }
+
+            var sourceInfo = _sourceLocationService.ResolveObject(source, sourceHint, lineHint);
+            if (sourceInfo.XamlLocation is not null)
+            {
+                return sourceInfo.XamlLocation.DisplayText;
+            }
+
+            if (sourceInfo.CodeLocation is not null)
+            {
+                return sourceInfo.CodeLocation.DisplayText;
+            }
+
+            var fallbackSourceHint = sourceHint ?? TryGetSourceHint(source);
+            if (!string.IsNullOrWhiteSpace(fallbackSourceHint))
+            {
+                var hinted = _sourceLocationService.ResolveDocument(source.GetType().Assembly, fallbackSourceHint, lineHint);
+                if (hinted is not null)
+                {
+                    return hinted.DisplayText;
+                }
+            }
+
+            return string.Empty;
+        }
+
+        private static string? TryGetSourceHint(object? source)
+        {
+            if (source is null)
+            {
+                return null;
+            }
+
+            var sourceProperty = source.GetType().GetProperty("Source", BindingFlags.Instance | BindingFlags.Public);
+            if (sourceProperty is null)
+            {
+                return null;
+            }
+
+            var sourceValue = sourceProperty.GetValue(source);
+            if (sourceValue is Uri uri)
+            {
+                return uri.ToString();
+            }
+
+            return sourceValue as string;
         }
     }
 }

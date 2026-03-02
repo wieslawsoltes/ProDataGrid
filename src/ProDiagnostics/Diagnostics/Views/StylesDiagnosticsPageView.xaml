@@ -74,6 +74,11 @@
                               Width="1.2*"
                               IsReadOnly="True"
                               x:DataType="vm:StylesTreeEntryViewModel" />
+          <DataGridTextColumn Header="Source"
+                              Binding="{Binding SourceLocation}"
+                              Width="2*"
+                              IsReadOnly="True"
+                              x:DataType="vm:StylesTreeEntryViewModel" />
           <DataGridTextColumn Header="Depth"
                               Binding="{Binding Depth}"
                               Width="0.8*"
@@ -142,6 +147,11 @@
                                 Width="0.8*"
                                 IsReadOnly="True"
                                 x:DataType="vm:ValueFrameViewModel" />
+            <DataGridTextColumn Header="Source"
+                                Binding="{Binding SourceLocation}"
+                                Width="1.8*"
+                                IsReadOnly="True"
+                                x:DataType="vm:ValueFrameViewModel" />
           </DataGrid.Columns>
         </DataGrid>
       </DockPanel>
@@ -187,6 +197,11 @@
                                     Width="0.8*"
                                     IsReadOnly="True"
                                     x:DataType="vm:SetterViewModel" />
+            <DataGridTextColumn Header="Source"
+                                Binding="{Binding SourceLocation}"
+                                Width="1.8*"
+                                IsReadOnly="True"
+                                x:DataType="vm:SetterViewModel" />
           </DataGrid.Columns>
         </DataGrid>
 
@@ -293,6 +308,11 @@
           <DataGridTextColumn Header="Path"
                               Binding="{Binding Path}"
                               Width="0.8*"
+                              IsReadOnly="True"
+                              x:DataType="vm:StyleResolutionTraceEntryViewModel" />
+          <DataGridTextColumn Header="Source"
+                              Binding="{Binding SourceLocation}"
+                              Width="1.8*"
                               IsReadOnly="True"
                               x:DataType="vm:StyleResolutionTraceEntryViewModel" />
           <DataGridTextColumn Header="Active/Matched"

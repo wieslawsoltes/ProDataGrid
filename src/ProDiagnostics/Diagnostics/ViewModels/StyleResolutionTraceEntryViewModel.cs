@@ -15,6 +15,7 @@ internal sealed class StyleResolutionTraceEntryViewModel
         string styleKind,
         string selector,
         string path,
+        string sourceLocation,
         int appliedCount,
         int activeCount,
         string notes)
@@ -31,6 +32,7 @@ internal sealed class StyleResolutionTraceEntryViewModel
         StyleKind = styleKind;
         Selector = selector;
         Path = path;
+        SourceLocation = sourceLocation;
         AppliedCount = appliedCount;
         ActiveCount = activeCount;
         Notes = notes;
@@ -59,6 +61,8 @@ internal sealed class StyleResolutionTraceEntryViewModel
     public string Selector { get; }
 
     public string Path { get; }
+
+    public string SourceLocation { get; }
 
     public int AppliedCount { get; }
 
