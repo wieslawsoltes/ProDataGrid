@@ -10,6 +10,7 @@ using Avalonia.Collections;
 using Avalonia.Controls;
 using Avalonia.Controls.Metadata;
 using Avalonia.Data;
+using Avalonia.Diagnostics.Services;
 using Avalonia.Markup.Xaml.MarkupExtensions;
 using Avalonia.Styling;
 using Avalonia.Threading;
@@ -18,8 +19,10 @@ namespace Avalonia.Diagnostics.ViewModels
 {
     internal class ControlDetailsViewModel : ViewModelBase, IDisposable, IClassesChangedListener
     {
+        private static readonly ISourceLocationService DefaultSourceLocationService = new PortablePdbSourceLocationService();
         private readonly AvaloniaObject _avaloniaObject;
         private readonly ISet<string> _pinnedProperties;
+        private readonly ISourceLocationService _sourceLocationService;
         private IDictionary<object, PropertyViewModel[]>? _propertyIndex;
         private PropertyViewModel? _selectedProperty;
         private DataGridCollectionView? _propertiesView;
@@ -30,6 +33,9 @@ namespace Avalonia.Diagnostics.ViewModels
         private readonly Stack<(string Name, object Entry)> _selectedEntitiesStack = new();
         private string? _selectedEntityName;
         private string? _selectedEntityType;
+        private string? _xamlSourceText;
+        private string? _codeSourceText;
+        private string? _sourceLocationStatus;
         private bool _showImplementedInterfaces;
         // new DataGridPathGroupDescription(nameof(AvaloniaPropertyViewModel.Group))
         private readonly static IReadOnlyList<DataGridPathGroupDescription> GroupDescriptors = new DataGridPathGroupDescription[]
@@ -42,10 +48,15 @@ namespace Avalonia.Diagnostics.ViewModels
             new DataGridComparerSortDescription(PropertyComparer.Instance!, ListSortDirection.Ascending),
         };
 
-        public ControlDetailsViewModel(TreePageViewModel treePage, AvaloniaObject avaloniaObject, ISet<string> pinnedProperties)
+        public ControlDetailsViewModel(
+            TreePageViewModel treePage,
+            AvaloniaObject avaloniaObject,
+            ISet<string> pinnedProperties,
+            ISourceLocationService? sourceLocationService = null)
         {
             _avaloniaObject = avaloniaObject;
             _pinnedProperties = pinnedProperties;
+            _sourceLocationService = sourceLocationService ?? DefaultSourceLocationService;
             TreePage = treePage;
             Layout = avaloniaObject is Visual visual
                 ? new ControlLayoutViewModel(visual)
@@ -114,6 +125,44 @@ namespace Avalonia.Diagnostics.ViewModels
             get => _selectedEntityType;
             set => RaiseAndSetIfChanged(ref _selectedEntityType, value);
         }
+
+        public string? XamlSourceText
+        {
+            get => _xamlSourceText;
+            private set
+            {
+                if (RaiseAndSetIfChanged(ref _xamlSourceText, value))
+                {
+                    RaisePropertyChanged(nameof(HasXamlSource));
+                    RaisePropertyChanged(nameof(HasAnySourceLocation));
+                }
+            }
+        }
+
+        public string? CodeSourceText
+        {
+            get => _codeSourceText;
+            private set
+            {
+                if (RaiseAndSetIfChanged(ref _codeSourceText, value))
+                {
+                    RaisePropertyChanged(nameof(HasCodeSource));
+                    RaisePropertyChanged(nameof(HasAnySourceLocation));
+                }
+            }
+        }
+
+        public string? SourceLocationStatus
+        {
+            get => _sourceLocationStatus;
+            private set => RaiseAndSetIfChanged(ref _sourceLocationStatus, value);
+        }
+
+        public bool HasXamlSource => !string.IsNullOrWhiteSpace(XamlSourceText);
+
+        public bool HasCodeSource => !string.IsNullOrWhiteSpace(CodeSourceText);
+
+        public bool HasAnySourceLocation => HasXamlSource || HasCodeSource;
 
         public PropertyViewModel? SelectedProperty
         {
@@ -462,6 +511,7 @@ namespace Avalonia.Diagnostics.ViewModels
             SelectedEntity = o;
             SelectedEntityName = entityName;
             SelectedEntityType = o.ToString();
+            UpdateSourceLocation(o);
 
             var properties = GetAvaloniaProperties(o)
                 .Concat(GetClrProperties(o, _showImplementedInterfaces))
@@ -491,6 +541,18 @@ namespace Avalonia.Diagnostics.ViewModels
                     inpc2.PropertyChanged += ControlPropertyChanged;
                     break;
             }
+        }
+
+        private void UpdateSourceLocation(object selectedEntity)
+        {
+            var sourceLocation = _sourceLocationService.ResolveObject(selectedEntity);
+            XamlSourceText = sourceLocation.XamlLocation is null
+                ? null
+                : "XAML: " + sourceLocation.XamlLocation.DisplayText;
+            CodeSourceText = sourceLocation.CodeLocation is null
+                ? null
+                : "C#: " + sourceLocation.CodeLocation.DisplayText;
+            SourceLocationStatus = sourceLocation.Status;
         }
 
         internal void SelectProperty(AvaloniaProperty property)

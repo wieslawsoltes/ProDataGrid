@@ -6,6 +6,7 @@ namespace Avalonia.Diagnostics.ViewModels
     {
         private bool _isActive;
         private bool _isVisible;
+        private string _sourceLocation = string.Empty;
 
         public AvaloniaProperty Property { get; }
 
@@ -23,6 +24,12 @@ namespace Avalonia.Diagnostics.ViewModels
         {
             get => _isVisible;
             set => RaiseAndSetIfChanged(ref _isVisible, value);
+        }
+
+        public string SourceLocation
+        {
+            get => _sourceLocation;
+            set => RaiseAndSetIfChanged(ref _sourceLocation, value);
         }
 
         private IClipboard? _clipboard;

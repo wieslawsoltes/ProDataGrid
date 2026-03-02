@@ -43,14 +43,38 @@
     
     <Grid Grid.Column="0" RowDefinitions="Auto,Auto,*">
 
-      <Grid ColumnDefinitions="Auto, *" RowDefinitions="Auto, Auto">
-        <Button Grid.Column="0" Grid.RowSpan="2" Content="^" 
+      <Grid ColumnDefinitions="Auto, *" RowDefinitions="Auto, Auto, Auto">
+        <Button Grid.Column="0" Grid.RowSpan="3" Content="^" 
                 IsEnabled="{Binding CanNavigateToParentProperty}"
                 Margin="0 0 4 0"
                 ToolTip.Tip="Navigate to parent property"
                 Command="{Binding NavigateToParentProperty}" />
         <TextBlock Grid.Column="1" Grid.Row="0" Text="{Binding SelectedEntityName}" FontWeight="Bold" />
         <TextBlock Grid.Column="1" Grid.Row="1" Text="{Binding SelectedEntityType}" FontStyle="Italic" />
+        <StackPanel Grid.Column="1" Grid.Row="2" Spacing="2" Margin="0,2,0,0">
+          <TextBlock Text="{Binding XamlSourceText}"
+                     IsVisible="{Binding HasXamlSource}"
+                     Foreground="Gray"
+                     FontSize="11"
+                     TextTrimming="CharacterEllipsis">
+            <ToolTip.Tip>
+              <TextBlock Text="{Binding XamlSourceText}" />
+            </ToolTip.Tip>
+          </TextBlock>
+          <TextBlock Text="{Binding CodeSourceText}"
+                     IsVisible="{Binding HasCodeSource}"
+                     Foreground="Gray"
+                     FontSize="11"
+                     TextTrimming="CharacterEllipsis">
+            <ToolTip.Tip>
+              <TextBlock Text="{Binding CodeSourceText}" />
+            </ToolTip.Tip>
+          </TextBlock>
+          <TextBlock Text="{Binding SourceLocationStatus}"
+                     IsVisible="{Binding !HasAnySourceLocation}"
+                     Foreground="Gray"
+                     FontSize="11" />
+        </StackPanel>
       </Grid>
       
       <FilterTextBox Grid.Row="1"
