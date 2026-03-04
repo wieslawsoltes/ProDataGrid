@@ -13,6 +13,7 @@ using Xunit;
 
 namespace Avalonia.Diagnostics.UnitTests;
 
+[Collection("MetricsCapture")]
 public class MetricsPageViewModelTests
 {
     [AvaloniaFact]

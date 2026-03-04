@@ -6,7 +6,7 @@
     <IsTestProject>true</IsTestProject>
     <IsPackable>false</IsPackable>
     <Nullable>enable</Nullable>
-    <RootNamespace>Avalonia.Diagnostics.UnitTests</RootNamespace>
+    <RootNamespace>Avalonia.Diagnostics.IntegrationTests</RootNamespace>
     <SignAssembly>true</SignAssembly>
     <AssemblyOriginatorKeyFile>$(MSBuildThisFileDirectory)/../../build/avalonia.snk</AssemblyOriginatorKeyFile>
   </PropertyGroup>
@@ -16,8 +16,6 @@
   <ItemGroup>
     <ProjectReference Include="../ProDiagnostics/ProDiagnostics.csproj" />
     <ProjectReference Include="../ProDiagnostics.Remote/ProDiagnostics.Remote.csproj" />
-    <ProjectReference Include="../ProDiagnostics.Transport/ProDiagnostics.Transport.csproj" />
-    <ProjectReference Include="../ProDiagnostics.Viewer/ProDiagnostics.Viewer.csproj" />
   </ItemGroup>
 
   <ItemGroup>
