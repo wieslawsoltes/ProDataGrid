@@ -231,6 +231,11 @@ button:disabled {
   border-bottom: 1px solid #edf2f7;
 }
 
+.tree-viewport-spacer {
+  width: 1px;
+  pointer-events: none;
+}
+
 .tree-row:hover {
   background: #edf4fb;
 }

@@ -43,6 +43,7 @@ export const RemoteMethods = Object.freeze({
   EventsDisableAll: "diagnostics.events.disable-all",
   LogsClear: "diagnostics.logs.clear",
   LogsLevelsSet: "diagnostics.logs.levels.set",
+  StreamDemandSet: "diagnostics.stream.demand.set",
   MetricsPausedSet: "diagnostics.metrics.paused.set",
   ProfilerPausedSet: "diagnostics.profiler.paused.set",
 });

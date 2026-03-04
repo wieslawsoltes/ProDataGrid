@@ -23,6 +23,29 @@ const defaultSettings = Object.freeze({
   autoRefreshTreeOnConnect: false,
 });
 
+const TREE_ROW_HEIGHT_PX = 24;
+const TREE_OVERSCAN_ROWS = 10;
+const TABULATOR_DELTA_RATIO_THRESHOLD = 0.45;
+const TABULATOR_DELTA_ABSOLUTE_THRESHOLD = 200;
+const CHART_THROTTLE_MS = Object.freeze({
+  metrics: 120,
+  profiler: 140,
+  elements3dDepth: 220,
+});
+const CHART_MAX_POINTS = Object.freeze({
+  metricsSeries: 180,
+  profilerSeries: 200,
+  elements3dDepthBars: 90,
+});
+const METRICS_MAX_SERIES = 8;
+const METRICS_MAX_RAW_POINTS = 3000;
+const PROFILER_MAX_RAW_POINTS = 2400;
+const ELEMENTS3D_DETAIL_PROFILES = Object.freeze({
+  full: Object.freeze({ maxSvgNodes: 0, depthChartTargetNodes: 12000 }),
+  balanced: Object.freeze({ maxSvgNodes: 5000, depthChartTargetNodes: 5000 }),
+  fast: Object.freeze({ maxSvgNodes: 2500, depthChartTargetNodes: 2000 }),
+});
+
 const state = {
   activeTab: "properties",
   scope: "combined",
@@ -70,6 +93,26 @@ const state = {
       visual: [],
       logical: [],
     },
+    visibleIndexByScope: {
+      combined: new Map(),
+      visual: new Map(),
+      logical: new Map(),
+    },
+    viewportByScope: {
+      combined: null,
+      visual: null,
+      logical: null,
+    },
+    jstreeMetaByScope: {
+      combined: { generation: null, nodeCount: 0, filter: "" },
+      visual: { generation: null, nodeCount: 0, filter: "" },
+      logical: { generation: null, nodeCount: 0, filter: "" },
+    },
+    generationByScope: {
+      combined: 0,
+      visual: 0,
+      logical: 0,
+    },
   },
   treeRefreshPending: {
     combined: null,
@@ -79,6 +122,7 @@ const state = {
   gridUi: Object.create(null),
   elements3d: {
     renderMode: "svg",
+    detailLevel: "balanced",
     scene: null,
     camera: null,
     renderer: null,
@@ -86,6 +130,9 @@ const state = {
     root: null,
     resizeObserver: null,
     panZoomInstance: null,
+    lastSvgContentHash: "",
+    lastSnapshotSignature: "",
+    lastDepthChartSignature: "",
   },
   preview: {
     pointerButtons: new Set(),
@@ -103,6 +150,12 @@ const state = {
     metrics: false,
     profiler: false,
     preview: false,
+  },
+  streamDemandSignature: "",
+  chartUi: {
+    lastRenderAtByKey: Object.create(null),
+    timerHandleByKey: Object.create(null),
+    pendingTaskByKey: Object.create(null),
   },
 };
 
@@ -197,6 +250,7 @@ function bindDom() {
 
     refreshElements3dBtn: getById("refreshElements3dBtn"),
     elements3dRenderModeInput: getById("elements3dRenderModeInput"),
+    elements3dDetailInput: getById("elements3dDetailInput"),
     depthSpacingInput: getById("depthSpacingInput"),
     elementsZoomInput: getById("elementsZoomInput"),
     elements3dResetViewBtn: getById("elements3dResetViewBtn"),
@@ -296,6 +350,9 @@ function bindDom() {
 
 function initializeRichUi() {
   state.elements3d.renderMode = dom.elements3dRenderModeInput?.value || "svg";
+  state.elements3d.detailLevel = normalizeElements3dDetailLevel(
+    dom.elements3dDetailInput?.value,
+  );
   if (!uiLib.tabulator || !uiLib.jstree || !uiLib.chart || !uiLib.svgPanZoom) {
     const missing = [];
     if (!uiLib.tabulator) {
@@ -379,7 +436,10 @@ function wireUiEvents() {
 
       state.activeTab = nextTab;
       activateMainTab(nextTab);
-      await withUiGuard(() => refreshActiveTabIfNeeded(nextTab));
+      await withUiGuard(async () => {
+        await syncStreamDemandHints();
+        await refreshActiveTabIfNeeded(nextTab);
+      });
     });
   });
 
@@ -396,6 +456,13 @@ function wireUiEvents() {
   wirePreviewInputEvents();
 
   dom.treeFilterInput.addEventListener("input", () => renderTree());
+  dom.treeContainer.addEventListener("scroll", () => {
+    if (uiLib.jstree) {
+      return;
+    }
+
+    renderFallbackTreeViewport(state.scope);
+  });
   dom.treeContainer.addEventListener("keydown", (event) => {
     if (uiLib.jstree) {
       return;
@@ -437,6 +504,12 @@ function wireUiEvents() {
   dom.elements3dRenderModeInput.addEventListener("change", () => {
     state.elements3d.renderMode = dom.elements3dRenderModeInput.value;
     renderElements3d();
+  });
+  dom.elements3dDetailInput.addEventListener("change", () => {
+    state.elements3d.detailLevel = normalizeElements3dDetailLevel(
+      dom.elements3dDetailInput.value,
+    );
+    void withUiGuard(refreshElements3dSnapshot);
   });
   dom.depthSpacingInput.addEventListener("change", () =>
     withUiGuard(() => applyElements3dViewSettings()),
@@ -612,6 +685,8 @@ function wireClientEvents() {
     state.previewCapabilities = null;
     state.previewLastFrameHash = null;
     state.elements3dSnapshot = null;
+    state.streamDemandSignature = "";
+    clearAllScheduledChartUpdates();
     renderPreview();
     renderElements3d();
   });
@@ -704,6 +779,7 @@ async function refreshAllTrees() {
 async function refreshOnConnect() {
   state.previewLastFrameHash = null;
   state.previewSnapshot = null;
+  await syncStreamDemandHints(true);
   await syncRemotePauseStates();
   await refreshPreviewCapabilities();
 
@@ -829,6 +905,7 @@ async function refreshTree(scope = state.scope, options = {}) {
       { timeoutMs: 60000 },
     );
     const nodes = Array.isArray(response.payload?.nodes) ? response.payload.nodes : [];
+    state.treeUi.generationByScope[scope] = Number(response.payload?.generation ?? 0);
     state.trees[scope] = nodes;
     normalizeCollapsedStateForScope(scope, nodes);
 
@@ -918,13 +995,18 @@ async function refreshElements3dSnapshot() {
 
   const width = Math.max(320, Math.floor(dom.elements3dStage?.clientWidth || 1600));
   const height = Math.max(240, Math.floor(dom.elements3dStage?.clientHeight || 520));
+  const includeSvgSnapshot = (state.elements3d.renderMode || "svg") === "svg";
+  state.elements3d.detailLevel = normalizeElements3dDetailLevel(
+    dom.elements3dDetailInput?.value ?? state.elements3d.detailLevel,
+  );
+  const detailProfile = getElements3dDetailProfile(state.elements3d.detailLevel);
   const response = await client.request(RemoteMethods.Elements3DSnapshotGet, {
     includeNodes: true,
     includeVisibleNodeIds: true,
-    includeSvgSnapshot: true,
+    includeSvgSnapshot,
     svgWidth: width,
     svgHeight: height,
-    maxSvgNodes: 2500,
+    maxSvgNodes: detailProfile.maxSvgNodes,
   }, { timeoutMs: 60000 });
   state.elements3dSnapshot = response.payload ?? null;
   if (state.elements3dSnapshot) {
@@ -1128,6 +1210,7 @@ function renderTree() {
   const filter = dom.treeFilterInput.value.trim().toLowerCase();
   const visibleRows = computeVisibleTreeRows(scope, index, filter);
   state.treeUi.visibleRowsByScope[scope] = visibleRows;
+  state.treeUi.visibleIndexByScope[scope] = buildVisibleRowIndex(visibleRows);
 
   dom.treeSummary.textContent = `Nodes: ${nodes.length} | Visible: ${visibleRows.length}`;
   if (uiLib.jstree) {
@@ -1135,110 +1218,44 @@ function renderTree() {
     return;
   }
 
-  dom.treeContainer.innerHTML = "";
-
-  if (visibleRows.length === 0) {
-    const empty = document.createElement("div");
-    empty.className = "summary-line muted no-border";
-    empty.textContent = "No tree nodes match current filter.";
-    dom.treeContainer.appendChild(empty);
-    return;
-  }
-
-  const fragment = document.createDocumentFragment();
-  for (const rowModel of visibleRows) {
-    const node = rowModel.node;
-    const row = document.createElement("div");
-    row.className = "tree-row";
-    row.setAttribute("role", "treeitem");
-    row.dataset.nodePath = node.nodePath ?? "";
-    row.setAttribute("aria-level", String((node.depth ?? 0) + 1));
-    row.setAttribute("aria-expanded", rowModel.hasChildren ? String(!rowModel.isCollapsed) : "false");
-    if (state.selectedNodePath === node.nodePath) {
-      row.classList.add("selected");
-      row.setAttribute("aria-selected", "true");
-    } else {
-      row.setAttribute("aria-selected", "false");
-    }
-
-    const main = document.createElement("div");
-    main.className = "tree-cell-main";
-    main.style.paddingLeft = `${(node.depth ?? 0) * 14 + 6}px`;
-
-    if (rowModel.hasChildren) {
-      const expander = document.createElement("button");
-      expander.className = "tree-expander";
-      expander.type = "button";
-      expander.textContent = rowModel.isCollapsed ? "▶" : "▼";
-      expander.title = rowModel.isCollapsed ? "Expand node" : "Collapse node";
-      expander.setAttribute("aria-label", expander.title);
-      expander.addEventListener("click", (event) => {
-        event.stopPropagation();
-        toggleTreeNodeCollapse(scope, node.nodePath);
-      });
-      main.appendChild(expander);
-    } else {
-      const spacer = document.createElement("span");
-      spacer.className = "tree-expander";
-      spacer.textContent = "";
-      main.appendChild(spacer);
-    }
-
-    const label = document.createElement("div");
-    label.className = "tree-label";
-    label.textContent = node.displayName || node.type || "(node)";
-    label.title = node.nodePath ?? "";
-    main.appendChild(label);
-
-    const type = document.createElement("div");
-    type.className = "tree-cell-type";
-    type.textContent = node.type ?? "";
-    type.title = node.type ?? "";
-
-    row.appendChild(main);
-    row.appendChild(type);
-    row.addEventListener("click", () => {
-      dom.treeContainer.focus({ preventScroll: true });
-      void withUiGuard(() => selectTreeNodeByPath(node.nodePath));
-    });
-    fragment.appendChild(row);
-  }
-
-  dom.treeContainer.appendChild(fragment);
-
-  if (state.selectedNodePath) {
-    const selectedRow = dom.treeContainer.querySelector(
-      `[data-node-path="${escapeCssToken(state.selectedNodePath)}"]`,
-    );
-    if (selectedRow) {
-      selectedRow.scrollIntoView({ block: "nearest" });
-    }
-  }
+  dom.treeContainer.classList.remove("library-tree");
+  renderFallbackTreeViewport(scope, {
+    force: true,
+    ensureSelectionInView: true,
+  });
 }
 
 function renderTreeWithJsTree(scope, nodes, filter) {
   const collapsed = getCollapsedSet(scope);
-  const treeData = nodes
-    .filter((node) => typeof node?.nodePath === "string" && node.nodePath.length > 0)
-    .map((node) => ({
-      id: node.nodePath,
-      parent: node.parentNodePath || "#",
-      text: node.displayName || node.type || "(node)",
-      icon: false,
-      data: {
-        nodePath: node.nodePath,
-        nodeId: node.nodeId ?? null,
-        type: node.type ?? "",
-      },
-      state: {
-        opened: !collapsed.has(node.nodePath),
-        selected: state.selectedNodePath === node.nodePath,
-      },
-    }));
+  const generation = state.treeUi.generationByScope[scope] ?? 0;
+  const jstreeMeta = state.treeUi.jstreeMetaByScope[scope];
 
   dom.treeContainer.classList.add("library-tree");
   const $tree = window.$(dom.treeContainer);
   const existing = $tree.jstree(true);
+  const requiresStructureRefresh = !existing ||
+    jstreeMeta.generation !== generation ||
+    jstreeMeta.nodeCount !== nodes.length;
+  const treeData = requiresStructureRefresh
+    ? nodes
+      .filter((node) => typeof node?.nodePath === "string" && node.nodePath.length > 0)
+      .map((node) => ({
+        id: node.nodePath,
+        parent: node.parentNodePath || "#",
+        text: node.displayName || node.type || "(node)",
+        icon: false,
+        data: {
+          nodePath: node.nodePath,
+          nodeId: node.nodeId ?? null,
+          type: node.type ?? "",
+        },
+        state: {
+          opened: !collapsed.has(node.nodePath),
+          selected: state.selectedNodePath === node.nodePath,
+        },
+      }))
+    : null;
+
   if (!existing) {
     $tree
       .on("select_node.jstree", (_event, data) => {
@@ -1273,7 +1290,7 @@ function renderTreeWithJsTree(scope, nodes, filter) {
         },
         plugins: ["wholerow", "search"],
       });
-  } else {
+  } else if (requiresStructureRefresh) {
     existing.settings.core.data = treeData;
     existing.refresh(true, false);
   }
@@ -1284,17 +1301,212 @@ function renderTreeWithJsTree(scope, nodes, filter) {
       return;
     }
 
-    if (filter) {
-      tree.search(filter);
-    } else {
-      tree.clear_search();
+    if (requiresStructureRefresh || jstreeMeta.filter !== filter) {
+      if (filter) {
+        tree.search(filter);
+      } else {
+        tree.clear_search();
+      }
+
+      jstreeMeta.filter = filter;
     }
 
-    if (state.selectedNodePath && tree.get_node(state.selectedNodePath)) {
-      tree.deselect_all(true);
-      tree.select_node(state.selectedNodePath, true, true);
-    }
+    syncJsTreeSelection(state.selectedNodePath, {
+      ensureAncestors: true,
+    });
+
+    jstreeMeta.generation = generation;
+    jstreeMeta.nodeCount = nodes.length;
   }, 0);
+}
+
+function renderFallbackTreeViewport(scope, options = {}) {
+  const container = dom.treeContainer;
+  const visibleRows = state.treeUi.visibleRowsByScope[scope] ?? [];
+  const totalRows = visibleRows.length;
+  const rowHeight = TREE_ROW_HEIGHT_PX;
+  const viewportHeight = Math.max(container.clientHeight || 0, rowHeight * 6);
+  const overscan = TREE_OVERSCAN_ROWS;
+  const scrollTop = Math.max(0, container.scrollTop || 0);
+  const startIndex = Math.max(0, Math.floor(scrollTop / rowHeight) - overscan);
+  const renderCount = Math.max(1, Math.ceil(viewportHeight / rowHeight) + overscan * 2);
+  const endIndex = Math.min(totalRows, startIndex + renderCount);
+  const viewportState = state.treeUi.viewportByScope[scope];
+  const selectedNodePath = state.selectedNodePath ?? "";
+
+  const unchangedViewport =
+    !options.force &&
+    viewportState &&
+    viewportState.totalRows === totalRows &&
+    viewportState.startIndex === startIndex &&
+    viewportState.endIndex === endIndex &&
+    viewportState.selectedNodePath === selectedNodePath;
+  if (unchangedViewport) {
+    return;
+  }
+
+  container.innerHTML = "";
+  if (totalRows === 0) {
+    const empty = document.createElement("div");
+    empty.className = "summary-line muted no-border";
+    empty.textContent = "No tree nodes match current filter.";
+    container.appendChild(empty);
+    state.treeUi.viewportByScope[scope] = {
+      totalRows,
+      startIndex: 0,
+      endIndex: 0,
+      selectedNodePath,
+    };
+    return;
+  }
+
+  const fragment = document.createDocumentFragment();
+  const topGap = startIndex * rowHeight;
+  if (topGap > 0) {
+    fragment.appendChild(createTreeViewportSpacer(topGap));
+  }
+
+  for (let rowIndex = startIndex; rowIndex < endIndex; rowIndex += 1) {
+    fragment.appendChild(createTreeRowElement(scope, visibleRows[rowIndex], rowIndex));
+  }
+
+  const bottomGap = Math.max(0, (totalRows - endIndex) * rowHeight);
+  if (bottomGap > 0) {
+    fragment.appendChild(createTreeViewportSpacer(bottomGap));
+  }
+
+  container.appendChild(fragment);
+  state.treeUi.viewportByScope[scope] = {
+    totalRows,
+    startIndex,
+    endIndex,
+    selectedNodePath,
+  };
+
+  if (options.ensureSelectionInView) {
+    ensureFallbackSelectionVisible(scope);
+  }
+}
+
+function createTreeViewportSpacer(heightPx) {
+  const spacer = document.createElement("div");
+  spacer.className = "tree-viewport-spacer";
+  spacer.style.height = `${heightPx}px`;
+  return spacer;
+}
+
+function createTreeRowElement(scope, rowModel, rowIndex) {
+  const node = rowModel?.node ?? {};
+  const row = document.createElement("div");
+  row.className = "tree-row";
+  row.setAttribute("role", "treeitem");
+  row.style.height = `${TREE_ROW_HEIGHT_PX}px`;
+  row.dataset.nodePath = node.nodePath ?? "";
+  row.dataset.rowIndex = String(rowIndex);
+  row.setAttribute("aria-level", String((node.depth ?? 0) + 1));
+  row.setAttribute("aria-expanded", rowModel.hasChildren ? String(!rowModel.isCollapsed) : "false");
+  if (state.selectedNodePath === node.nodePath) {
+    row.classList.add("selected");
+    row.setAttribute("aria-selected", "true");
+  } else {
+    row.setAttribute("aria-selected", "false");
+  }
+
+  const main = document.createElement("div");
+  main.className = "tree-cell-main";
+  main.style.paddingLeft = `${(node.depth ?? 0) * 14 + 6}px`;
+
+  if (rowModel.hasChildren) {
+    const expander = document.createElement("button");
+    expander.className = "tree-expander";
+    expander.type = "button";
+    expander.textContent = rowModel.isCollapsed ? "▶" : "▼";
+    expander.title = rowModel.isCollapsed ? "Expand node" : "Collapse node";
+    expander.setAttribute("aria-label", expander.title);
+    expander.addEventListener("click", (event) => {
+      event.stopPropagation();
+      toggleTreeNodeCollapse(scope, node.nodePath);
+    });
+    main.appendChild(expander);
+  } else {
+    const spacer = document.createElement("span");
+    spacer.className = "tree-expander";
+    spacer.textContent = "";
+    main.appendChild(spacer);
+  }
+
+  const label = document.createElement("div");
+  label.className = "tree-label";
+  label.textContent = node.displayName || node.type || "(node)";
+  label.title = node.nodePath ?? "";
+  main.appendChild(label);
+
+  const type = document.createElement("div");
+  type.className = "tree-cell-type";
+  type.textContent = node.type ?? "";
+  type.title = node.type ?? "";
+
+  row.appendChild(main);
+  row.appendChild(type);
+  row.addEventListener("click", () => {
+    dom.treeContainer.focus({ preventScroll: true });
+    void withUiGuard(() => selectTreeNodeByPath(node.nodePath));
+  });
+  return row;
+}
+
+function ensureFallbackSelectionVisible(scope) {
+  if (!state.selectedNodePath) {
+    return;
+  }
+
+  const selectedRow = dom.treeContainer.querySelector(
+    `[data-node-path="${escapeCssToken(state.selectedNodePath)}"]`,
+  );
+  if (selectedRow) {
+    return;
+  }
+
+  const visibleIndex = state.treeUi.visibleIndexByScope[scope];
+  const selectedIndex = visibleIndex?.get(state.selectedNodePath);
+  if (selectedIndex == null) {
+    return;
+  }
+
+  const container = dom.treeContainer;
+  const viewportHeight = Math.max(container.clientHeight || 0, TREE_ROW_HEIGHT_PX * 6);
+  const top = selectedIndex * TREE_ROW_HEIGHT_PX;
+  const bottom = top + TREE_ROW_HEIGHT_PX;
+  const currentTop = container.scrollTop;
+  const currentBottom = currentTop + viewportHeight;
+  let targetTop = currentTop;
+
+  if (top < currentTop) {
+    targetTop = top;
+  } else if (bottom > currentBottom) {
+    targetTop = bottom - viewportHeight;
+  }
+
+  targetTop = Math.max(0, Math.floor(targetTop));
+  if (targetTop !== currentTop) {
+    container.scrollTop = targetTop;
+    renderFallbackTreeViewport(scope, {
+      force: true,
+      ensureSelectionInView: false,
+    });
+  }
+}
+
+function buildVisibleRowIndex(visibleRows) {
+  const map = new Map();
+  for (let i = 0; i < visibleRows.length; i += 1) {
+    const path = visibleRows[i]?.node?.nodePath;
+    if (path) {
+      map.set(path, i);
+    }
+  }
+
+  return map;
 }
 
 function buildTreeIndex(nodes) {
@@ -1451,18 +1663,23 @@ function toggleTreeNodeCollapse(scope, nodePath) {
 
 function expandTreeNodeAncestors(scope, nodePath) {
   if (!nodePath) {
-    return;
+    return false;
   }
 
   const nodes = state.trees[scope] ?? [];
   const byPath = new Map(nodes.map((node) => [node.nodePath, node]));
   const collapsed = getCollapsedSet(scope);
+  let changed = false;
   let cursorPath = nodePath;
   while (cursorPath) {
-    collapsed.delete(cursorPath);
+    if (collapsed.delete(cursorPath)) {
+      changed = true;
+    }
     const cursor = byPath.get(cursorPath);
     cursorPath = cursor?.parentNodePath ?? null;
   }
+
+  return changed;
 }
 
 async function selectTreeNodeByPath(nodePath, options = {}) {
@@ -1480,16 +1697,23 @@ async function selectTreeNodeByPath(nodePath, options = {}) {
     return;
   }
 
+  const previousNodePath = state.selectedNodePath;
   state.selectedNodePath = node.nodePath;
   state.selectedNodeId = node.nodeId ?? null;
   state.selectedNodeDisplayName = node.displayName ?? node.type ?? node.nodePath;
   state.selectedSource = normalizeSourceLocation(node.source);
-  expandTreeNodeAncestors(scope, node.nodePath);
+  const expandedAncestors = expandTreeNodeAncestors(scope, node.nodePath);
   updateSelectionFooter();
   if (uiLib.jstree) {
-    syncJsTreeSelection(node.nodePath);
+    syncJsTreeSelection(node.nodePath, {
+      ensureAncestors: true,
+    });
   } else {
-    renderTree();
+    if (expandedAncestors) {
+      renderTree();
+    } else {
+      updateFallbackTreeSelection(scope, previousNodePath, node.nodePath);
+    }
   }
   renderElements3d();
   renderCodePanel();
@@ -1500,7 +1724,37 @@ async function selectTreeNodeByPath(nodePath, options = {}) {
   }
 }
 
-function syncJsTreeSelection(nodePath) {
+function updateFallbackTreeSelection(scope, previousNodePath, nextNodePath) {
+  const container = dom.treeContainer;
+  if (container.classList.contains("library-tree")) {
+    return;
+  }
+
+  if (previousNodePath) {
+    const previous = container.querySelector(
+      `[data-node-path="${escapeCssToken(previousNodePath)}"]`,
+    );
+    if (previous) {
+      previous.classList.remove("selected");
+      previous.setAttribute("aria-selected", "false");
+    }
+  }
+
+  if (nextNodePath) {
+    const current = container.querySelector(
+      `[data-node-path="${escapeCssToken(nextNodePath)}"]`,
+    );
+    if (current) {
+      current.classList.add("selected");
+      current.setAttribute("aria-selected", "true");
+      return;
+    }
+  }
+
+  ensureFallbackSelectionVisible(scope);
+}
+
+function syncJsTreeSelection(nodePath, options = {}) {
   if (!uiLib.jstree) {
     return;
   }
@@ -1508,6 +1762,14 @@ function syncJsTreeSelection(nodePath) {
   const tree = window.$(dom.treeContainer).jstree(true);
   if (!tree || !tree.get_node(nodePath)) {
     return;
+  }
+
+  if (options.ensureAncestors) {
+    let cursor = tree.get_node(nodePath);
+    while (cursor && cursor.parent && cursor.parent !== "#") {
+      tree.open_node(cursor.parent);
+      cursor = tree.get_node(cursor.parent);
+    }
   }
 
   tree.deselect_all(true);
@@ -2650,8 +2912,11 @@ function renderMetricsChart(rows) {
     return;
   }
 
+  const recentRows = Array.isArray(rows) && rows.length > METRICS_MAX_RAW_POINTS
+    ? rows.slice(-METRICS_MAX_RAW_POINTS)
+    : (Array.isArray(rows) ? rows : []);
   const grouped = new Map();
-  for (const row of rows) {
+  for (const row of recentRows) {
     const meterName = row?.meterName ?? "";
     const instrumentName = row?.instrumentName ?? "";
     const key = `${meterName}|${instrumentName}`;
@@ -2674,12 +2939,12 @@ function renderMetricsChart(rows) {
 
   const datasets = Array.from(grouped.values())
     .sort((a, b) => b.points.length - a.points.length)
-    .slice(0, 8)
+    .slice(0, METRICS_MAX_SERIES)
     .map((series, index) => {
       const hue = (index * 47) % 360;
       return {
         label: series.label,
-        data: series.points.slice(-120),
+        data: downsampleTimeSeries(series.points, CHART_MAX_POINTS.metricsSeries),
         borderColor: `hsl(${hue}deg 82% 45%)`,
         backgroundColor: `hsl(${hue}deg 82% 45% / 0.18)`,
         fill: false,
@@ -2690,62 +2955,64 @@ function renderMetricsChart(rows) {
       };
     });
 
-  const chart = ensureChart("metrics", canvas, {
-    type: "line",
-    data: {
-      datasets,
-    },
-    options: {
-      animation: false,
-      maintainAspectRatio: false,
-      parsing: false,
-      normalized: true,
-      scales: {
-        x: {
-          type: "linear",
-          ticks: {
-            callback: (value) => formatChartTimestamp(value),
-            maxRotation: 0,
-            autoSkip: true,
-          },
-          grid: {
-            color: "#e6edf6",
-          },
-        },
-        y: {
-          beginAtZero: false,
-          grid: {
-            color: "#e6edf6",
-          },
-        },
+  runThrottledChartUpdate("metrics", CHART_THROTTLE_MS.metrics, () => {
+    const chart = ensureChart("metrics", canvas, {
+      type: "line",
+      data: {
+        datasets,
       },
-      plugins: {
-        legend: {
-          display: datasets.length > 0,
-          position: "bottom",
-          labels: {
-            boxWidth: 10,
-            usePointStyle: true,
+      options: {
+        animation: false,
+        maintainAspectRatio: false,
+        parsing: false,
+        normalized: true,
+        scales: {
+          x: {
+            type: "linear",
+            ticks: {
+              callback: (value) => formatChartTimestamp(value),
+              maxRotation: 0,
+              autoSkip: true,
+            },
+            grid: {
+              color: "#e6edf6",
+            },
+          },
+          y: {
+            beginAtZero: false,
+            grid: {
+              color: "#e6edf6",
+            },
           },
         },
-        tooltip: {
-          mode: "nearest",
-          intersect: false,
-          callbacks: {
-            title: (items) => {
-              if (!items?.length) {
-                return "";
-              }
-              return formatChartTimestamp(items[0].parsed?.x);
+        plugins: {
+          legend: {
+            display: datasets.length > 0,
+            position: "bottom",
+            labels: {
+              boxWidth: 10,
+              usePointStyle: true,
+            },
+          },
+          tooltip: {
+            mode: "nearest",
+            intersect: false,
+            callbacks: {
+              title: (items) => {
+                if (!items?.length) {
+                  return "";
+                }
+                return formatChartTimestamp(items[0].parsed?.x);
+              },
             },
           },
         },
       },
-    },
-  });
+    });
 
-  chart.data.datasets = datasets;
-  chart.update("none");
+    chart.data.datasets = datasets;
+    chart.update("none");
+  });
 }
 
 function renderProfilerChart(rows) {
@@ -2758,7 +3025,10 @@ function renderProfilerChart(rows) {
     return;
   }
 
-  const samples = rows.slice(-240).map((entry, index) => {
+  const recentRows = Array.isArray(rows) && rows.length > PROFILER_MAX_RAW_POINTS
+    ? rows.slice(-PROFILER_MAX_RAW_POINTS)
+    : (Array.isArray(rows) ? rows : []);
+  const samples = recentRows.map((entry, index) => {
     const timestamp = Date.parse(entry?.timestampUtc ?? "");
     return {
       x: Number.isFinite(timestamp) ? timestamp : index,
@@ -2768,104 +3038,115 @@ function renderProfilerChart(rows) {
     };
   });
 
-  const cpuData = samples.map((sample) => ({ x: sample.x, y: sample.cpu }));
-  const workingSetData = samples.map((sample) => ({ x: sample.x, y: sample.workingSet }));
-  const managedHeapData = samples.map((sample) => ({ x: sample.x, y: sample.managedHeap }));
+  const cpuData = downsampleTimeSeries(
+    samples.map((sample) => ({ x: sample.x, y: sample.cpu })),
+    CHART_MAX_POINTS.profilerSeries,
+  );
+  const workingSetData = downsampleTimeSeries(
+    samples.map((sample) => ({ x: sample.x, y: sample.workingSet })),
+    CHART_MAX_POINTS.profilerSeries,
+  );
+  const managedHeapData = downsampleTimeSeries(
+    samples.map((sample) => ({ x: sample.x, y: sample.managedHeap })),
+    CHART_MAX_POINTS.profilerSeries,
+  );
 
-  const chart = ensureChart("profiler", canvas, {
-    type: "line",
-    data: {
-      datasets: [
-        {
-          label: "CPU %",
-          data: cpuData,
-          yAxisID: "yCpu",
-          borderColor: "#db3f2f",
-          backgroundColor: "rgba(219, 63, 47, 0.18)",
-          pointRadius: 0,
-          borderWidth: 1.8,
-          tension: 0.2,
-        },
-        {
-          label: "Working Set MB",
-          data: workingSetData,
-          yAxisID: "yMemory",
-          borderColor: "#0d79ca",
-          backgroundColor: "rgba(13, 121, 202, 0.18)",
-          pointRadius: 0,
-          borderWidth: 1.8,
-          tension: 0.2,
-        },
-        {
-          label: "Managed Heap MB",
-          data: managedHeapData,
-          yAxisID: "yMemory",
-          borderColor: "#1b9a65",
-          backgroundColor: "rgba(27, 154, 101, 0.18)",
-          pointRadius: 0,
-          borderWidth: 1.8,
-          tension: 0.2,
-        },
-      ],
-    },
-    options: {
-      animation: false,
-      maintainAspectRatio: false,
-      parsing: false,
-      normalized: true,
-      scales: {
-        x: {
-          type: "linear",
-          ticks: {
-            callback: (value) => formatChartTimestamp(value),
-            maxRotation: 0,
-            autoSkip: true,
+  runThrottledChartUpdate("profiler", CHART_THROTTLE_MS.profiler, () => {
+    const chart = ensureChart("profiler", canvas, {
+      type: "line",
+      data: {
+        datasets: [
+          {
+            label: "CPU %",
+            data: cpuData,
+            yAxisID: "yCpu",
+            borderColor: "#db3f2f",
+            backgroundColor: "rgba(219, 63, 47, 0.18)",
+            pointRadius: 0,
+            borderWidth: 1.8,
+            tension: 0.2,
           },
-          grid: {
-            color: "#e6edf6",
+          {
+            label: "Working Set MB",
+            data: workingSetData,
+            yAxisID: "yMemory",
+            borderColor: "#0d79ca",
+            backgroundColor: "rgba(13, 121, 202, 0.18)",
+            pointRadius: 0,
+            borderWidth: 1.8,
+            tension: 0.2,
+          },
+          {
+            label: "Managed Heap MB",
+            data: managedHeapData,
+            yAxisID: "yMemory",
+            borderColor: "#1b9a65",
+            backgroundColor: "rgba(27, 154, 101, 0.18)",
+            pointRadius: 0,
+            borderWidth: 1.8,
+            tension: 0.2,
+          },
+        ],
+      },
+      options: {
+        animation: false,
+        maintainAspectRatio: false,
+        parsing: false,
+        normalized: true,
+        scales: {
+          x: {
+            type: "linear",
+            ticks: {
+              callback: (value) => formatChartTimestamp(value),
+              maxRotation: 0,
+              autoSkip: true,
+            },
+            grid: {
+              color: "#e6edf6",
+            },
+          },
+          yCpu: {
+            type: "linear",
+            position: "left",
+            beginAtZero: true,
+            title: {
+              display: true,
+              text: "CPU %",
+            },
+            grid: {
+              color: "#f2f5f9",
+            },
+          },
+          yMemory: {
+            type: "linear",
+            position: "right",
+            beginAtZero: true,
+            title: {
+              display: true,
+              text: "Memory MB",
+            },
+            grid: {
+              drawOnChartArea: false,
+            },
           },
         },
-        yCpu: {
-          type: "linear",
-          position: "left",
-          beginAtZero: true,
-          title: {
-            display: true,
-            text: "CPU %",
-          },
-          grid: {
-            color: "#f2f5f9",
-          },
-        },
-        yMemory: {
-          type: "linear",
-          position: "right",
-          beginAtZero: true,
-          title: {
-            display: true,
-            text: "Memory MB",
-          },
-          grid: {
-            drawOnChartArea: false,
+        plugins: {
+          legend: {
+            position: "bottom",
+            labels: {
+              boxWidth: 10,
+              usePointStyle: true,
+            },
           },
         },
       },
-      plugins: {
-        legend: {
-          position: "bottom",
-          labels: {
-            boxWidth: 10,
-            usePointStyle: true,
-          },
-        },
-      },
-    },
+    });
+
+    chart.data.datasets[0].data = cpuData;
+    chart.data.datasets[1].data = workingSetData;
+    chart.data.datasets[2].data = managedHeapData;
+    chart.update("none");
   });
-
-  chart.data.datasets[0].data = cpuData;
-  chart.data.datasets[1].data = workingSetData;
-  chart.data.datasets[2].data = managedHeapData;
-  chart.update("none");
 }
 
 function ensureChart(key, canvas, baseConfig) {
@@ -2949,6 +3230,7 @@ function renderElements3d() {
   const snapshot = state.elements3dSnapshot;
   const svgContainer = dom.elements3dSvgContainer;
   const canvas = dom.elements3dCanvas;
+  const detailLevel = normalizeElements3dDetailLevel(state.elements3d.detailLevel);
 
   if (canvas) {
     canvas.style.display = "none";
@@ -2959,21 +3241,34 @@ function renderElements3d() {
     clearElements3dDepthChart();
     svgContainer.classList.remove("active");
     svgContainer.innerHTML = "";
+    state.elements3d.lastSvgContentHash = "";
+    state.elements3d.lastSnapshotSignature = "";
+    state.elements3d.lastDepthChartSignature = "";
     dom.elements3dSummary.textContent = client.isConnected
       ? "No Elements 3D snapshot loaded."
       : "Elements 3D is disconnected.";
     return;
   }
 
+  const snapshotSignature = buildElements3dSnapshotSignature(snapshot, detailLevel);
   const svgSnapshot = emptyToNull(snapshot.svgSnapshot);
   if (svgSnapshot) {
-    svgContainer.innerHTML = svgSnapshot;
-    svgContainer.classList.add("active");
-    queueElements3dPanZoomInit();
+    const nextSvgHash = hashText(svgSnapshot);
+    if (nextSvgHash !== state.elements3d.lastSvgContentHash) {
+      svgContainer.innerHTML = svgSnapshot;
+      svgContainer.classList.add("active");
+      state.elements3d.lastSvgContentHash = nextSvgHash;
+      queueElements3dPanZoomInit();
+    } else {
+      svgContainer.classList.add("active");
+    }
   } else {
     destroyElements3dPanZoom();
     svgContainer.classList.remove("active");
-    svgContainer.innerHTML = "";
+    if (state.elements3d.lastSvgContentHash) {
+      svgContainer.innerHTML = "";
+      state.elements3d.lastSvgContentHash = "";
+    }
   }
 
   renderElements3dDepthChart(snapshot);
@@ -2994,7 +3289,8 @@ function renderElements3d() {
   dom.elements3dSummary.textContent =
     `Root: ${root} | Nodes: ${nodeCount} | Visible: ${visibleNodeCount} | ` +
     `Depth: ${minDepth}..${maxDepth} | Spacing: ${spacing.toFixed(1)} | Zoom: ${zoom.toFixed(2)} | Viewport: ${viewportZoom.toFixed(2)} | ` +
-    `Mode: ${renderMode.toUpperCase()} | SVG: ${svgSnapshot ? "ready" : "unavailable"}`;
+    `Mode: ${renderMode.toUpperCase()} | Detail: ${detailLevel} | SVG: ${svgSnapshot ? "ready" : "unavailable"}`;
+  state.elements3d.lastSnapshotSignature = snapshotSignature;
 }
 
 function wireElements3dPanZoom() {
@@ -3122,7 +3418,9 @@ function renderElements3dDepthChart(snapshot) {
     return;
   }
 
-  const nodes = Array.isArray(snapshot?.nodes) ? snapshot.nodes : [];
+  const detailProfile = getElements3dDetailProfile(state.elements3d.detailLevel);
+  const rawNodes = Array.isArray(snapshot?.nodes) ? snapshot.nodes : [];
+  const nodes = sampleArrayEvenly(rawNodes, detailProfile.depthChartTargetNodes);
   const depthMap = new Map();
   for (const node of nodes) {
     const depth = Number(node?.depth ?? 0);
@@ -3130,59 +3428,79 @@ function renderElements3dDepthChart(snapshot) {
   }
 
   const sortedDepths = Array.from(depthMap.keys()).sort((a, b) => a - b);
-  const labels = sortedDepths.map((depth) => `Depth ${depth}`);
-  const values = sortedDepths.map((depth) => depthMap.get(depth) ?? 0);
+  const bars = downsampleDepthBars(
+    sortedDepths.map((depth) => ({
+      depth,
+      count: depthMap.get(depth) ?? 0,
+    })),
+    CHART_MAX_POINTS.elements3dDepthBars,
+  );
+  const labels = bars.map((entry) =>
+    entry.fromDepth === entry.toDepth
+      ? `Depth ${entry.fromDepth}`
+      : `Depth ${entry.fromDepth}-${entry.toDepth}`,
+  );
+  const values = bars.map((entry) => entry.count);
+  const signature = `${state.elements3d.detailLevel}|${labels.join(",")}|${values.join(",")}`;
+  if (signature === state.elements3d.lastDepthChartSignature) {
+    return;
+  }
 
-  const chart = ensureChart("elements3d-depth", dom.elements3dDepthChart, {
-    type: "bar",
-    data: {
-      labels,
-      datasets: [
-        {
-          label: "Visible nodes by depth",
-          data: values,
-          borderWidth: 1,
-          borderRadius: 4,
-          backgroundColor: "rgba(12, 109, 216, 0.7)",
-          borderColor: "rgba(12, 109, 216, 1)",
+  state.elements3d.lastDepthChartSignature = signature;
+  runThrottledChartUpdate("elements3d-depth", CHART_THROTTLE_MS.elements3dDepth, () => {
+    const chart = ensureChart("elements3d-depth", dom.elements3dDepthChart, {
+      type: "bar",
+      data: {
+        labels,
+        datasets: [
+          {
+            label: "Visible nodes by depth",
+            data: values,
+            borderWidth: 1,
+            borderRadius: 4,
+            backgroundColor: "rgba(12, 109, 216, 0.7)",
+            borderColor: "rgba(12, 109, 216, 1)",
+          },
+        ],
+      },
+      options: {
+        animation: false,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: {
+            display: true,
+            position: "bottom",
+          },
         },
-      ],
-    },
-    options: {
-      animation: false,
-      maintainAspectRatio: false,
-      plugins: {
-        legend: {
-          display: true,
-          position: "bottom",
+        scales: {
+          x: {
+            ticks: {
+              maxRotation: 0,
+              autoSkip: true,
+            },
+            grid: {
+              color: "#e6edf6",
+            },
+          },
+          y: {
+            beginAtZero: true,
+            grid: {
+              color: "#e6edf6",
+            },
+          },
         },
       },
-      scales: {
-        x: {
-          ticks: {
-            maxRotation: 0,
-            autoSkip: true,
-          },
-          grid: {
-            color: "#e6edf6",
-          },
-        },
-        y: {
-          beginAtZero: true,
-          grid: {
-            color: "#e6edf6",
-          },
-        },
-      },
-    },
+    });
+
+    chart.data.labels = labels;
+    chart.data.datasets[0].data = values;
+    chart.update("none");
   });
-
-  chart.data.labels = labels;
-  chart.data.datasets[0].data = values;
-  chart.update("none");
 }
 
 function clearElements3dDepthChart() {
+  clearScheduledChartUpdate("elements3d-depth");
+  state.elements3d.lastDepthChartSignature = "";
   const entry = chartRegistry.get("elements3d-depth");
   if (!entry) {
     return;
@@ -3194,6 +3512,238 @@ function clearElements3dDepthChart() {
     // ignore stale chart destroy failures
   }
   chartRegistry.delete("elements3d-depth");
+}
+
+function runThrottledChartUpdate(chartKey, throttleMs, task) {
+  if (!chartKey || typeof task !== "function") {
+    return;
+  }
+
+  const now = getNowTimestamp();
+  const lastRenderAt = Number(state.chartUi.lastRenderAtByKey[chartKey] ?? 0);
+  const minInterval = Math.max(0, Number(throttleMs) || 0);
+  state.chartUi.pendingTaskByKey[chartKey] = task;
+
+  const execute = () => {
+    const pending = state.chartUi.pendingTaskByKey[chartKey];
+    if (typeof pending !== "function") {
+      return;
+    }
+
+    state.chartUi.pendingTaskByKey[chartKey] = null;
+    state.chartUi.lastRenderAtByKey[chartKey] = getNowTimestamp();
+    pending();
+  };
+
+  if (minInterval === 0 || now - lastRenderAt >= minInterval) {
+    clearScheduledChartUpdate(chartKey, { clearPendingTask: false });
+    queueAnimationFrame(execute);
+    return;
+  }
+
+  if (state.chartUi.timerHandleByKey[chartKey]) {
+    return;
+  }
+
+  const remaining = Math.max(0, minInterval - (now - lastRenderAt));
+  state.chartUi.timerHandleByKey[chartKey] = window.setTimeout(() => {
+    state.chartUi.timerHandleByKey[chartKey] = null;
+    queueAnimationFrame(execute);
+  }, remaining);
+}
+
+function clearScheduledChartUpdate(chartKey, options = {}) {
+  const clearPendingTask = options.clearPendingTask ?? true;
+  const timer = state.chartUi.timerHandleByKey[chartKey];
+  if (timer) {
+    window.clearTimeout(timer);
+  }
+
+  state.chartUi.timerHandleByKey[chartKey] = null;
+  if (clearPendingTask) {
+    state.chartUi.pendingTaskByKey[chartKey] = null;
+  }
+}
+
+function clearAllScheduledChartUpdates() {
+  const timerMap = state.chartUi.timerHandleByKey;
+  const pendingMap = state.chartUi.pendingTaskByKey;
+  const renderMap = state.chartUi.lastRenderAtByKey;
+  for (const chartKey of Object.keys(timerMap)) {
+    clearScheduledChartUpdate(chartKey);
+    renderMap[chartKey] = 0;
+  }
+
+  for (const chartKey of Object.keys(pendingMap)) {
+    pendingMap[chartKey] = null;
+  }
+}
+
+function queueAnimationFrame(callback) {
+  if (typeof callback !== "function") {
+    return;
+  }
+
+  if (typeof window.requestAnimationFrame === "function") {
+    window.requestAnimationFrame(callback);
+  } else {
+    window.setTimeout(callback, 16);
+  }
+}
+
+function getNowTimestamp() {
+  if (typeof performance !== "undefined" && typeof performance.now === "function") {
+    return performance.now();
+  }
+
+  return Date.now();
+}
+
+function downsampleTimeSeries(points, maxPoints) {
+  if (!Array.isArray(points) || points.length === 0 || maxPoints <= 0) {
+    return [];
+  }
+
+  if (points.length <= maxPoints) {
+    return points.slice();
+  }
+
+  const result = [];
+  const lastIndex = points.length - 1;
+  const step = lastIndex / Math.max(1, maxPoints - 1);
+  let previousIndex = -1;
+  for (let i = 0; i < maxPoints; i += 1) {
+    let index = Math.round(i * step);
+    if (index <= previousIndex) {
+      index = Math.min(lastIndex, previousIndex + 1);
+    }
+    result.push(points[index]);
+    previousIndex = index;
+    if (index >= lastIndex) {
+      break;
+    }
+  }
+
+  const lastPoint = points[lastIndex];
+  if (result[result.length - 1] !== lastPoint) {
+    result[result.length - 1] = lastPoint;
+  }
+
+  return result;
+}
+
+function sampleArrayEvenly(items, maxCount) {
+  if (!Array.isArray(items) || items.length === 0 || maxCount <= 0) {
+    return [];
+  }
+
+  if (items.length <= maxCount) {
+    return items;
+  }
+
+  const result = [];
+  const lastIndex = items.length - 1;
+  const step = lastIndex / Math.max(1, maxCount - 1);
+  let previousIndex = -1;
+  for (let i = 0; i < maxCount; i += 1) {
+    let index = Math.round(i * step);
+    if (index <= previousIndex) {
+      index = Math.min(lastIndex, previousIndex + 1);
+    }
+    result.push(items[index]);
+    previousIndex = index;
+    if (index >= lastIndex) {
+      break;
+    }
+  }
+
+  const lastItem = items[lastIndex];
+  if (result[result.length - 1] !== lastItem) {
+    result[result.length - 1] = lastItem;
+  }
+
+  return result;
+}
+
+function downsampleDepthBars(depthBars, maxBars) {
+  if (!Array.isArray(depthBars) || depthBars.length === 0) {
+    return [];
+  }
+
+  const normalized = depthBars.map((entry) => ({
+    fromDepth: Number(entry.depth ?? entry.fromDepth ?? 0),
+    toDepth: Number(entry.depth ?? entry.toDepth ?? 0),
+    count: Number(entry.count ?? 0),
+  }));
+
+  if (maxBars <= 0 || normalized.length <= maxBars) {
+    return normalized;
+  }
+
+  const result = [];
+  const bucketSize = Math.max(1, Math.ceil(normalized.length / maxBars));
+  for (let start = 0; start < normalized.length; start += bucketSize) {
+    const slice = normalized.slice(start, start + bucketSize);
+    if (slice.length === 0) {
+      continue;
+    }
+
+    result.push({
+      fromDepth: slice[0].fromDepth,
+      toDepth: slice[slice.length - 1].toDepth,
+      count: slice.reduce((sum, item) => sum + item.count, 0),
+    });
+  }
+
+  return result;
+}
+
+function normalizeElements3dDetailLevel(value) {
+  const key = String(value ?? "").trim().toLowerCase();
+  if (Object.prototype.hasOwnProperty.call(ELEMENTS3D_DETAIL_PROFILES, key)) {
+    return key;
+  }
+
+  return "balanced";
+}
+
+function getElements3dDetailProfile(detailLevel) {
+  const level = normalizeElements3dDetailLevel(detailLevel);
+  return ELEMENTS3D_DETAIL_PROFILES[level] ?? ELEMENTS3D_DETAIL_PROFILES.balanced;
+}
+
+function buildElements3dSnapshotSignature(snapshot, detailLevel) {
+  const nodes = Array.isArray(snapshot?.nodes) ? snapshot.nodes : [];
+  const nodeCount = Number(snapshot?.nodeCount ?? nodes.length ?? 0);
+  const visibleIds = Array.isArray(snapshot?.visibleNodeIds) ? snapshot.visibleNodeIds : [];
+  const visibleNodeCount = Number(snapshot?.visibleNodeCount ?? visibleIds.length ?? 0);
+  const firstNode = nodes[0]?.nodePath ?? "";
+  const lastNode = nodes[nodes.length - 1]?.nodePath ?? "";
+  return [
+    snapshot?.inspectedRoot ?? "",
+    snapshot?.minVisibleDepth ?? "",
+    snapshot?.maxVisibleDepth ?? "",
+    snapshot?.depthSpacing ?? "",
+    snapshot?.zoom ?? "",
+    nodeCount,
+    visibleNodeCount,
+    visibleIds.length,
+    nodes.length,
+    firstNode,
+    lastNode,
+    normalizeElements3dDetailLevel(detailLevel),
+  ].join("|");
+}
+
+function hashText(value) {
+  const text = String(value ?? "");
+  let hash = 2166136261;
+  for (let i = 0; i < text.length; i += 1) {
+    hash ^= text.charCodeAt(i);
+    hash = Math.imul(hash, 16777619);
+  }
+
+  return (hash >>> 0).toString(16).padStart(8, "0");
 }
 
 function renderCodePanel() {
@@ -3246,6 +3796,7 @@ async function togglePause(streamName) {
   }
 
   state.paused[streamName] = next;
+  await syncStreamDemandHints();
   syncPauseButtons();
   switch (streamName) {
     case "logs":
@@ -3276,6 +3827,70 @@ async function syncRemotePauseStates() {
   await applyRemoteStreamPauseState("metrics", state.paused.metrics);
   await applyRemoteStreamPauseState("profiler", state.paused.profiler);
   await applyRemoteStreamPauseState("preview", state.paused.preview);
+}
+
+async function syncStreamDemandHints(force = false) {
+  if (!client.isConnected) {
+    return;
+  }
+
+  const topics = resolveStreamDemandTopics();
+  const signature = topics.join("|");
+  if (!force && signature === state.streamDemandSignature) {
+    return;
+  }
+
+  try {
+    await executeMutation(RemoteMethods.StreamDemandSet, { topics });
+    state.streamDemandSignature = signature;
+  } catch (error) {
+    const message = normalizeError(error).toLowerCase();
+    if (
+      message.includes("unsupported method") ||
+      message.includes("method_not_found") ||
+      message.includes("request_method_not_found")
+    ) {
+      state.streamDemandSignature = signature;
+      return;
+    }
+
+    throw error;
+  }
+}
+
+function resolveStreamDemandTopics() {
+  const topics = [RemoteStreamTopics.Selection];
+  switch (state.activeTab) {
+    case "preview":
+      if (!state.paused.preview) {
+        topics.push(RemoteStreamTopics.Preview);
+      }
+      break;
+    case "logs":
+      if (!state.paused.logs) {
+        topics.push(RemoteStreamTopics.Logs);
+      }
+      break;
+    case "events":
+      if (!state.paused.events) {
+        topics.push(RemoteStreamTopics.Events);
+      }
+      break;
+    case "metrics":
+      if (!state.paused.metrics) {
+        topics.push(RemoteStreamTopics.Metrics);
+      }
+      break;
+    case "profiler":
+      if (!state.paused.profiler) {
+        topics.push(RemoteStreamTopics.Profiler);
+      }
+      break;
+    default:
+      break;
+  }
+
+  return topics;
 }
 
 async function applyRemoteStreamPauseState(streamName, isPaused) {
@@ -3480,6 +4095,7 @@ function renderTableWithTabulator(tableElement, rows = [], columns = [], options
       __rowKey: String(entry.rowKey),
       __rowIndex: entry.index,
       __rowData: entry.rowData,
+      __rowSignature: buildTabulatorRowSignature(entry.rowData, columns),
     };
     for (const definition of columns) {
       row[definition.key] = entry.rowData?.[definition.key];
@@ -3520,6 +4136,11 @@ function renderTableWithTabulator(tableElement, rows = [], columns = [], options
       options: null,
       built: false,
       pendingRender: queuedRender,
+      renderScheduled: false,
+      rowSnapshotByKey: new Map(),
+      rowCount: 0,
+      lastSortKey: null,
+      lastSortAsc: null,
     };
 
     const table = new window.Tabulator(tableElement, {
@@ -3550,7 +4171,9 @@ function renderTableWithTabulator(tableElement, rows = [], columns = [], options
     table.on("tableBuilt", () => {
       entry.built = true;
       if (entry.pendingRender) {
-        applyTabulatorRender(entry, entry.pendingRender);
+        applyTabulatorRender(entry, entry.pendingRender, {
+          forceFullDataSync: true,
+        });
         entry.pendingRender = null;
       }
     });
@@ -3575,29 +4198,186 @@ function renderTableWithTabulator(tableElement, rows = [], columns = [], options
     return;
   }
 
-  applyTabulatorRender(entry, queuedRender);
+  queueTabulatorRender(entry, queuedRender);
 }
 
-function applyTabulatorRender(entry, renderState) {
+function queueTabulatorRender(entry, renderState) {
+  entry.pendingRender = renderState;
+  if (entry.renderScheduled) {
+    return;
+  }
+
+  entry.renderScheduled = true;
+  const flush = () => {
+    entry.renderScheduled = false;
+    const pending = entry.pendingRender;
+    entry.pendingRender = null;
+    if (!pending) {
+      return;
+    }
+
+    applyTabulatorRender(entry, pending);
+  };
+
+  if (typeof window.requestAnimationFrame === "function") {
+    window.requestAnimationFrame(flush);
+  } else {
+    window.setTimeout(flush, 16);
+  }
+}
+
+function applyTabulatorRender(entry, renderState, options = {}) {
   if (!entry?.table || !renderState) {
     return;
   }
 
   if (entry.columnSignature !== renderState.columnSignature) {
-    entry.table.setColumns(getTabulatorColumns(renderState.columns));
+    runTabulatorCommand(entry.table.setColumns(getTabulatorColumns(renderState.columns)));
     entry.columnSignature = renderState.columnSignature;
+    options.forceFullDataSync = true;
   }
 
-  entry.table.setData(renderState.tableData);
+  applyTabulatorData(entry, renderState.tableData, options.forceFullDataSync === true);
 
-  if (
+  const canSortByRequestedColumn =
     renderState.sortKey &&
-    renderState.columns.some((columnDef) => columnDef.key === renderState.sortKey && columnDef.sortable !== false)
-  ) {
-    entry.table.setSort(renderState.sortKey, renderState.sortAsc === false ? "desc" : "asc");
+    renderState.columns.some((columnDef) => columnDef.key === renderState.sortKey && columnDef.sortable !== false);
+  if (canSortByRequestedColumn) {
+    const sortDirection = renderState.sortAsc === false ? "desc" : "asc";
+    if (entry.lastSortKey !== renderState.sortKey || entry.lastSortAsc !== sortDirection) {
+      runTabulatorCommand(entry.table.setSort(renderState.sortKey, sortDirection));
+      entry.lastSortKey = renderState.sortKey;
+      entry.lastSortAsc = sortDirection;
+    }
   }
 
   syncTabulatorSelection(entry.table, renderState.selectedRowKey);
+}
+
+function applyTabulatorData(entry, tableData, forceFullDataSync) {
+  if (forceFullDataSync || entry.rowCount === 0 || tableData.length === 0) {
+    runTabulatorCommand(entry.table.setData(tableData));
+    entry.rowSnapshotByKey = mapRowsByKey(tableData);
+    entry.rowCount = tableData.length;
+    return;
+  }
+
+  applyTabulatorDataDelta(entry, tableData);
+}
+
+function applyTabulatorDataDelta(entry, tableData) {
+  const previous = entry.rowSnapshotByKey;
+  const next = mapRowsByKey(tableData);
+
+  const upserts = [];
+  for (const [rowKey, row] of next) {
+    const previousRow = previous.get(rowKey);
+    if (!areTabulatorRowsEquivalent(previousRow, row)) {
+      upserts.push(row);
+    }
+  }
+
+  const removals = [];
+  for (const rowKey of previous.keys()) {
+    if (!next.has(rowKey)) {
+      removals.push(rowKey);
+    }
+  }
+
+  const deltaSize = upserts.length + removals.length;
+  const nextCount = tableData.length;
+  const changeRatio = deltaSize / Math.max(1, nextCount);
+  const requiresFullSync =
+    changeRatio > TABULATOR_DELTA_RATIO_THRESHOLD ||
+    deltaSize > TABULATOR_DELTA_ABSOLUTE_THRESHOLD ||
+    Math.abs(nextCount - entry.rowCount) > Math.max(128, Math.floor(nextCount * 0.4));
+  if (requiresFullSync) {
+    runTabulatorCommand(entry.table.setData(tableData));
+  } else {
+    if (removals.length > 0) {
+      runTabulatorCommand(entry.table.deleteRow(removals));
+    }
+    if (upserts.length > 0) {
+      runTabulatorCommand(entry.table.updateOrAddData(upserts));
+    }
+  }
+
+  entry.rowSnapshotByKey = next;
+  entry.rowCount = nextCount;
+}
+
+function areTabulatorRowsEquivalent(left, right) {
+  if (!left || !right) {
+    return false;
+  }
+
+  return left.__rowSignature === right.__rowSignature &&
+    left.__rowIndex === right.__rowIndex;
+}
+
+function mapRowsByKey(rows) {
+  const result = new Map();
+  for (const row of rows) {
+    result.set(String(row.__rowKey), row);
+  }
+
+  return result;
+}
+
+function runTabulatorCommand(commandResult) {
+  if (!commandResult || typeof commandResult.then !== "function") {
+    return;
+  }
+
+  commandResult.catch(() => {
+    // Ignore transient tabulator command races during rapid refresh/update cycles.
+  });
+}
+
+function buildTabulatorRowSignature(rowData, columns) {
+  if (!rowData || !Array.isArray(columns) || columns.length === 0) {
+    return "";
+  }
+
+  let signature = "";
+  for (const definition of columns) {
+    signature += "|";
+    signature += normalizeValueForSignature(rowData?.[definition.key]);
+  }
+  return signature;
+}
+
+function normalizeValueForSignature(value) {
+  if (value == null) {
+    return "";
+  }
+
+  const type = typeof value;
+  if (type === "string" || type === "number" || type === "boolean") {
+    return String(value);
+  }
+
+  if (Array.isArray(value)) {
+    let signature = "[";
+    const maxItems = Math.min(12, value.length);
+    for (let i = 0; i < maxItems; i += 1) {
+      if (i > 0) {
+        signature += ",";
+      }
+      signature += normalizeValueForSignature(value[i]);
+    }
+    if (value.length > maxItems) {
+      signature += ",…";
+    }
+    signature += "]";
+    return signature;
+  }
+
+  try {
+    return JSON.stringify(value);
+  } catch {
+    return String(value);
+  }
 }
 
 function syncTabulatorSelection(table, selectedRowKey) {
