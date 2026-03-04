@@ -49,6 +49,24 @@ Use these hooks to assert recycling order, verify placeholders vs real items, or
 
 `TrimRecycledContainers`, `KeepRecycledContainersInVisualTree`, and `RecycledContainerHidingMode` let you tune the recycling pool. The sample app includes a diagnostics page to visualize these settings.
 
+## ProDiagnostics DevTools Integration
+
+For runtime inspection beyond control-level hooks, use `ProDiagnostics`:
+
+- Left tree pane with `Combined`/`Visual`/`Logical` scope tabs.
+- Right diagnostics tabs (`Properties`, `Code`, `Elements 3D`, `Resources`, `Assets`, `Events`, `Breakpoints`, `Logs`, `Metrics`, `Bindings`, `Profiler`, `Styles`, `Transport`, `Settings`).
+- Cross-tab selection synchronization (tree, properties, styles, code, 3D).
+- Overlay tools (margin/padding, rulers, info panel, extension lines, live-hover overlay).
+- Source-location tracing (portable PDB) visible in properties/styles/resources/assets/code.
+
+Launch defaults:
+
+- `F12` for standard in-process mode.
+- `F11` for remote-enabled mode (loopback attach runtime).
+- `Ctrl+Shift` to inspect the hovered control.
+
+See [ProDiagnostics](prodiagnostics.md) for setup and [Remote Diagnostics Overview](remote-diagnostics/index.md) for out-of-process attach flows.
+
 ## Metrics and Activities
 
 See `metrics-and-activities.md` for OpenTelemetry-friendly diagnostics and instrumentation details.

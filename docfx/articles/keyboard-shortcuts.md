@@ -1,5 +1,16 @@
 # Keyboard Shortcuts
 
+This page includes both ProDataGrid keyboard mappings and ProDiagnostics DevTools launch/inspection gestures.
+
+## ProDiagnostics DevTools
+
+| Action | Default | Notes |
+| --- | --- | --- |
+| Open DevTools (in-process) | `F12` | Opens standard managed DevTools mode. |
+| Open DevTools (remote-enabled) | `F11` | Starts DevTools with local remote loopback runtime enabled. |
+| Inspect hovered control | `Ctrl+Shift` | Picks currently hovered app control and syncs selection across diagnostics tabs. |
+| Screenshot selected control | `F8` | Captures selected control from active tree page. |
+
 ## Default Gestures
 
 | Action | Default | Notes |
