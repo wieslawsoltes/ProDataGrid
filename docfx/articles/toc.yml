@@ -204,6 +204,23 @@
     href: metrics-and-activities.md
   - name: ProDiagnostics
     href: prodiagnostics.md
+  - name: Remote Diagnostics
+    href: remote-diagnostics/index.md
+    items:
+    - name: Remote Protocol
+      href: remote-diagnostics/protocol.md
+    - name: Hosting and Attach Endpoints
+      href: remote-diagnostics/hosting-and-attach.md
+    - name: Managed DevTools Remote Runtime
+      href: remote-diagnostics/managed-devtools-remote-runtime.md
+    - name: Web Client
+      href: remote-diagnostics/web-client.md
+    - name: Preview and Elements 3D
+      href: remote-diagnostics/preview-and-elements3d.md
+    - name: Performance and Streaming
+      href: remote-diagnostics/performance-and-streaming.md
+    - name: Troubleshooting
+      href: remote-diagnostics/troubleshooting.md
 - name: Samples
   items:
   - name: Sample Gallery
