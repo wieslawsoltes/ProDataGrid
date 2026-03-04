@@ -65,26 +65,38 @@ internal static class Elements3DSvgVectorExporter
         var renderView = CreateRenderView(viewModel, orderedNodes, selectedNode, width, height);
         using var stream = new MemoryStream();
         var viewport = SKRect.Create(width, height);
-        using var canvas = SKSvgCanvas.Create(viewport, stream);
-        if (canvas is null)
-        {
-            return null;
-        }
-
         try
         {
+            using var canvas = SKSvgCanvas.Create(viewport, stream);
+            if (canvas is null)
+            {
+                return null;
+            }
+
             DrawingContextHelper
                 .RenderAsync(canvas, renderView, new Rect(0, 0, width, height), s_exportDpi)
                 .GetAwaiter()
                 .GetResult();
+
+            canvas.Flush();
         }
         catch (InvalidCastException)
         {
             return null;
         }
+        catch (ObjectDisposedException)
+        {
+            return null;
+        }
 
-        canvas.Flush();
-        var svg = Encoding.UTF8.GetString(stream.ToArray());
+        stream.Position = 0;
+        using var reader = new StreamReader(
+            stream,
+            Encoding.UTF8,
+            detectEncodingFromByteOrderMarks: true,
+            bufferSize: 4096,
+            leaveOpen: true);
+        var svg = reader.ReadToEnd();
         if (string.IsNullOrWhiteSpace(svg))
         {
             return null;
