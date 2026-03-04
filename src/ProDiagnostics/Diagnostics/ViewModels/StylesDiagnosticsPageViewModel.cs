@@ -2,9 +2,12 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 using Avalonia.Collections;
 using Avalonia.Controls;
 using Avalonia.Controls.Metadata;
+using Avalonia.Diagnostics.Remote;
 using Avalonia.Diagnostics.Services;
 using Avalonia.LogicalTree;
 using Avalonia.Styling;
@@ -26,6 +29,9 @@ internal sealed class StylesDiagnosticsPageViewModel : ViewModelBase, IDisposabl
     private readonly DataGridCollectionView _resolutionEntriesView;
     private readonly Func<AvaloniaObject?>? _selectedObjectAccessor;
     private readonly ISourceLocationService _sourceLocationService;
+    private IRemoteReadOnlyDiagnosticsDomainService? _remoteReadOnly;
+    private Func<(string Scope, string? NodePath, string? ControlName)>? _remoteContextAccessor;
+    private long _remoteRefreshVersion;
     private AvaloniaObject? _inspectedObject;
     private StylesTreeEntryViewModel? _selectedTreeEntry;
     private ValueFrameViewModel? _selectedFrame;
@@ -37,6 +43,7 @@ internal sealed class StylesDiagnosticsPageViewModel : ViewModelBase, IDisposabl
     private bool _snapshotFrames;
     private string _framesStatus = "Value Frames (0/0 active)";
     private string _resolutionTraceStatus = "Style resolution trace (0/0 visible)";
+    private bool _isApplyingRemoteSnapshot;
 
     public StylesDiagnosticsPageViewModel()
         : this(mainView: null, selectedObjectAccessor: null, sourceLocationService: null)
@@ -141,7 +148,10 @@ internal sealed class StylesDiagnosticsPageViewModel : ViewModelBase, IDisposabl
         {
             if (RaiseAndSetIfChanged(ref _selectedTreeEntry, value))
             {
-                LoadStyleInspector(value);
+                if (!_isApplyingRemoteSnapshot)
+                {
+                    LoadStyleInspector(value);
+                }
             }
         }
     }
@@ -229,11 +239,23 @@ internal sealed class StylesDiagnosticsPageViewModel : ViewModelBase, IDisposabl
 
     public void InspectSelection()
     {
+        if (_remoteReadOnly is not null)
+        {
+            _ = RefreshFromRemoteAsync();
+            return;
+        }
+
         InspectControlCore(_selectedObjectAccessor?.Invoke(), forceRefresh: true);
     }
 
     public void Refresh()
     {
+        if (_remoteReadOnly is not null)
+        {
+            _ = RefreshFromRemoteAsync();
+            return;
+        }
+
         InspectControlCore(_inspectedObject, forceRefresh: true);
     }
 
@@ -256,8 +278,27 @@ internal sealed class StylesDiagnosticsPageViewModel : ViewModelBase, IDisposabl
         RaisePropertyChanged(nameof(PseudoClassCount));
     }
 
+    internal void SetRemoteReadOnlySource(
+        IRemoteReadOnlyDiagnosticsDomainService? readOnly,
+        Func<(string Scope, string? NodePath, string? ControlName)>? contextAccessor,
+        bool refreshNow = true)
+    {
+        _remoteReadOnly = readOnly;
+        _remoteContextAccessor = contextAccessor;
+        if (refreshNow)
+        {
+            _ = RefreshFromRemoteAsync();
+        }
+    }
+
     internal void InspectControl(AvaloniaObject? target)
     {
+        if (_remoteReadOnly is not null)
+        {
+            _ = RefreshFromRemoteAsync();
+            return;
+        }
+
         if (SnapshotFrames && _inspectedObject is not null && !ReferenceEquals(target, _inspectedObject))
         {
             return;
@@ -339,6 +380,34 @@ internal sealed class StylesDiagnosticsPageViewModel : ViewModelBase, IDisposabl
 
     private void LoadStyleInspector(StylesTreeEntryViewModel? entry)
     {
+        if (_remoteReadOnly is not null)
+        {
+            if (_isApplyingRemoteSnapshot)
+            {
+                return;
+            }
+
+            if (entry is null)
+            {
+                _frames.Clear();
+                _setters.Clear();
+                _pseudoClasses.Clear();
+                _resolutionEntries.Clear();
+                SelectedFrame = null;
+                SelectedSetter = null;
+                SelectedResolutionEntry = null;
+                FramesStatus = "Value Frames (0/0 active)";
+                RefreshFrames();
+                RefreshSetters();
+                RefreshResolutionEntries();
+                RaisePropertyChanged(nameof(PseudoClassCount));
+                return;
+            }
+
+            _ = RefreshFromRemoteAsync(entry.NodePath, entry.Element);
+            return;
+        }
+
         _frames.Clear();
         _setters.Clear();
         _pseudoClasses.Clear();
@@ -423,7 +492,7 @@ internal sealed class StylesDiagnosticsPageViewModel : ViewModelBase, IDisposabl
             }
         }
 
-        var propertyBuckets = new Dictionary<AvaloniaProperty, List<SetterViewModel>>();
+        var propertyBuckets = new Dictionary<string, List<SetterViewModel>>(StringComparer.Ordinal);
         for (var i = _frames.Count - 1; i >= 0; i--)
         {
             var frame = _frames[i];
@@ -435,10 +504,11 @@ internal sealed class StylesDiagnosticsPageViewModel : ViewModelBase, IDisposabl
             for (var j = 0; j < frame.Setters.Count; j++)
             {
                 var setter = frame.Setters[j];
-                if (!propertyBuckets.TryGetValue(setter.Property, out var setters))
+                var propertyKey = setter.Name;
+                if (!propertyBuckets.TryGetValue(propertyKey, out var setters))
                 {
                     setters = new List<SetterViewModel>();
-                    propertyBuckets.Add(setter.Property, setters);
+                    propertyBuckets.Add(propertyKey, setters);
                 }
                 else
                 {
@@ -1302,5 +1372,161 @@ internal sealed class StylesDiagnosticsPageViewModel : ViewModelBase, IDisposabl
         }
 
         return value as string;
+    }
+
+    private async Task RefreshFromRemoteAsync(string? nodePathOverride = null, string? controlNameOverride = null)
+    {
+        var readOnly = _remoteReadOnly;
+        if (readOnly is null)
+        {
+            return;
+        }
+
+        var context = _remoteContextAccessor?.Invoke() ?? (
+            Scope: "combined",
+            NodePath: (string?)null,
+            ControlName: (string?)null);
+        var refreshVersion = Interlocked.Increment(ref _remoteRefreshVersion);
+        try
+        {
+            var snapshot = await readOnly.GetStylesSnapshotAsync(
+                new RemoteStylesSnapshotRequest
+                {
+                    Scope = context.Scope,
+                    NodePath = nodePathOverride ?? context.NodePath,
+                    ControlName = controlNameOverride ?? context.ControlName,
+                    IncludeTreeEntries = true,
+                    IncludeFrames = true,
+                    IncludeSetters = true,
+                    IncludeResolution = true,
+                }).ConfigureAwait(false);
+
+            await Avalonia.Threading.Dispatcher.UIThread.InvokeAsync(() =>
+            {
+                if (refreshVersion != _remoteRefreshVersion)
+                {
+                    return;
+                }
+
+                ApplyRemoteSnapshot(snapshot, nodePathOverride);
+            });
+        }
+        catch
+        {
+            // Keep previous state on remote read failures.
+        }
+    }
+
+    private void ApplyRemoteSnapshot(RemoteStylesSnapshot snapshot, string? preferredNodePath)
+    {
+        _inspectedObject = null;
+        _treeEntries.Clear();
+        _frames.Clear();
+        _setters.Clear();
+        _pseudoClasses.Clear();
+        _resolutionEntries.Clear();
+
+        InspectedRoot = string.IsNullOrWhiteSpace(snapshot.InspectedRoot) ? "(none)" : snapshot.InspectedRoot;
+        InspectedRootType = snapshot.InspectedRootType ?? string.Empty;
+
+        for (var i = 0; i < snapshot.TreeEntries.Count; i++)
+        {
+            var entry = snapshot.TreeEntries[i];
+            _treeEntries.Add(
+                new StylesTreeEntryViewModel(
+                    sourceObject: null,
+                    depth: entry.Depth,
+                    element: entry.Element,
+                    elementType: entry.ElementType,
+                    frameCount: entry.FrameCount,
+                    activeFrameCount: entry.ActiveFrameCount,
+                    classes: entry.Classes,
+                    pseudoClasses: entry.PseudoClasses,
+                    sourceLocation: entry.SourceLocation,
+                    nodeId: entry.NodeId,
+                    nodePath: entry.NodePath,
+                    parentId: entry.ParentId));
+        }
+
+        for (var i = 0; i < snapshot.Frames.Count; i++)
+        {
+            var frame = snapshot.Frames[i];
+            var setters = new List<SetterViewModel>(frame.Setters.Count);
+            for (var j = 0; j < frame.Setters.Count; j++)
+            {
+                var setter = frame.Setters[j];
+                setters.Add(
+                    new SetterViewModel(
+                        setter.Name,
+                        setter.ValueText,
+                        setter.SourceLocation)
+                    {
+                        IsActive = setter.IsActive,
+                        IsVisible = true,
+                    });
+            }
+
+            _frames.Add(
+                new ValueFrameViewModel(
+                    frame.Id,
+                    frame.Description,
+                    frame.IsActive,
+                    frame.SourceLocation,
+                    setters));
+        }
+
+        for (var i = 0; i < snapshot.Resolution.Count; i++)
+        {
+            var entry = snapshot.Resolution[i];
+            _resolutionEntries.Add(
+                new StyleResolutionTraceEntryViewModel(
+                    entry.Order,
+                    entry.HostLevel,
+                    entry.Host,
+                    entry.HostKind,
+                    entry.PropagationScope,
+                    entry.LogicalDistance,
+                    entry.VisualDistance,
+                    entry.StylesInitialized,
+                    entry.Style,
+                    entry.StyleKind,
+                    entry.Selector,
+                    entry.Path,
+                    entry.SourceLocation,
+                    entry.AppliedCount,
+                    entry.ActiveCount,
+                    entry.Notes));
+        }
+
+        _isApplyingRemoteSnapshot = true;
+        try
+        {
+            StylesTreeEntryViewModel? selectedEntry = null;
+            if (!string.IsNullOrWhiteSpace(preferredNodePath))
+            {
+                selectedEntry = _treeEntries.FirstOrDefault(
+                    x => string.Equals(x.NodePath, preferredNodePath, StringComparison.Ordinal));
+            }
+
+            selectedEntry ??= _treeEntries.FirstOrDefault(
+                x => string.Equals(x.NodeId, snapshot.InspectedRootNodeId, StringComparison.Ordinal));
+            selectedEntry ??= _treeEntries.Count > 0 ? _treeEntries[0] : null;
+            SelectedTreeEntry = selectedEntry;
+
+            SelectedFrame = _frames.Count > 0 ? _frames[0] : null;
+            RebuildSetterEntries();
+            SelectedResolutionEntry = _resolutionEntries.Count > 0 ? _resolutionEntries[0] : null;
+        }
+        finally
+        {
+            _isApplyingRemoteSnapshot = false;
+        }
+
+        UpdateStyles();
+        RefreshTreeEntries();
+        RefreshFrames();
+        RefreshSetters();
+        RefreshResolutionEntries();
+        RaisePropertyChanged(nameof(PseudoClassCount));
     }
 }

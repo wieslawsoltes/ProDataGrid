@@ -1,7 +1,10 @@
 using System;
 using System.Collections.Specialized;
+using System.ComponentModel;
 using System.Linq;
+using System.Threading.Tasks;
 using Avalonia.Collections;
+using Avalonia.Diagnostics.Remote;
 using Avalonia.Diagnostics.Services;
 
 namespace Avalonia.Diagnostics.ViewModels;
@@ -11,6 +14,8 @@ internal sealed class BreakpointsPageViewModel : ViewModelBase, IDisposable
     private readonly BreakpointService _breakpointService;
     private readonly DataGridCollectionView _breakpointsView;
     private BreakpointEntry? _selectedBreakpoint;
+    private IRemoteMutationDiagnosticsDomainService? _remoteMutation;
+    private bool _isApplyingRemoteBreakpointState;
 
     public BreakpointsPageViewModel(BreakpointService breakpointService)
     {
@@ -20,6 +25,10 @@ internal sealed class BreakpointsPageViewModel : ViewModelBase, IDisposable
         BreakpointsFilter.RefreshFilter += (_, _) => Refresh();
 
         _breakpointService.Entries.CollectionChanged += OnBreakpointsCollectionChanged;
+        for (var i = 0; i < _breakpointService.Entries.Count; i++)
+        {
+            _breakpointService.Entries[i].PropertyChanged += OnBreakpointPropertyChanged;
+        }
         _breakpointsView = new DataGridCollectionView(_breakpointService.Entries)
         {
             Filter = FilterBreakpoint
@@ -42,7 +51,23 @@ internal sealed class BreakpointsPageViewModel : ViewModelBase, IDisposable
 
     public void RemoveSelected()
     {
-        _breakpointService.Remove(SelectedBreakpoint);
+        if (SelectedBreakpoint is not { } selected)
+        {
+            return;
+        }
+
+        if (_remoteMutation is null)
+        {
+            _breakpointService.Remove(selected);
+            return;
+        }
+
+        _ = InvokeRemoteMutationAsync(
+            mutation => mutation.RemoveBreakpointAsync(new RemoteRemoveBreakpointRequest
+            {
+                BreakpointId = selected.Id,
+            }),
+            fallback: () => _breakpointService.Remove(selected));
     }
 
     public bool RemoveSelectedRecord()
@@ -60,29 +85,76 @@ internal sealed class BreakpointsPageViewModel : ViewModelBase, IDisposable
 
     public void ClearAll()
     {
-        _breakpointService.Clear();
+        if (_remoteMutation is null)
+        {
+            _breakpointService.Clear();
+            SelectedBreakpoint = null;
+            return;
+        }
+
+        _ = InvokeRemoteMutationAsync(
+            mutation => mutation.ClearBreakpointsAsync(),
+            fallback: () => _breakpointService.Clear());
         SelectedBreakpoint = null;
     }
 
     public void EnableAll()
     {
-        foreach (var entry in _breakpointService.Entries)
+        if (_remoteMutation is not null)
         {
-            entry.IsEnabled = true;
+            _ = InvokeRemoteMutationAsync(
+                mutation => mutation.SetBreakpointsEnabledAsync(new RemoteSetBreakpointsEnabledRequest { IsEnabled = true }),
+                fallback: SetAllEnabledLocalTrue);
+            return;
         }
+
+        SetAllEnabledLocalTrue();
     }
 
     public void DisableAll()
     {
-        foreach (var entry in _breakpointService.Entries)
+        if (_remoteMutation is not null)
         {
-            entry.IsEnabled = false;
+            _ = InvokeRemoteMutationAsync(
+                mutation => mutation.SetBreakpointsEnabledAsync(new RemoteSetBreakpointsEnabledRequest { IsEnabled = false }),
+                fallback: SetAllEnabledLocalFalse);
+            return;
+        }
+
+        SetAllEnabledLocalFalse();
+    }
+
+    internal void SetRemoteMutationSource(IRemoteMutationDiagnosticsDomainService? mutation)
+    {
+        _remoteMutation = mutation;
+    }
+
+    internal void ApplyRemoteStateMutation(Action action)
+    {
+        if (action is null)
+        {
+            return;
+        }
+
+        var wasApplying = _isApplyingRemoteBreakpointState;
+        _isApplyingRemoteBreakpointState = true;
+        try
+        {
+            action();
+        }
+        finally
+        {
+            _isApplyingRemoteBreakpointState = wasApplying;
         }
     }
 
     public void Dispose()
     {
         _breakpointService.Entries.CollectionChanged -= OnBreakpointsCollectionChanged;
+        for (var i = 0; i < _breakpointService.Entries.Count; i++)
+        {
+            _breakpointService.Entries[i].PropertyChanged -= OnBreakpointPropertyChanged;
+        }
     }
 
     private bool FilterBreakpoint(object item)
@@ -100,7 +172,94 @@ internal sealed class BreakpointsPageViewModel : ViewModelBase, IDisposable
 
     private void OnBreakpointsCollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
     {
+        if (e.OldItems is not null)
+        {
+            for (var i = 0; i < e.OldItems.Count; i++)
+            {
+                if (e.OldItems[i] is BreakpointEntry oldEntry)
+                {
+                    oldEntry.PropertyChanged -= OnBreakpointPropertyChanged;
+                }
+            }
+        }
+
+        if (e.NewItems is not null)
+        {
+            for (var i = 0; i < e.NewItems.Count; i++)
+            {
+                if (e.NewItems[i] is BreakpointEntry newEntry)
+                {
+                    newEntry.PropertyChanged += OnBreakpointPropertyChanged;
+                }
+            }
+        }
+
         Refresh();
+    }
+
+    private void OnBreakpointPropertyChanged(object? sender, PropertyChangedEventArgs e)
+    {
+        if (_remoteMutation is null ||
+            _isApplyingRemoteBreakpointState ||
+            sender is not BreakpointEntry entry ||
+            e.PropertyName != nameof(BreakpointEntry.IsEnabled))
+        {
+            return;
+        }
+
+        _ = InvokeRemoteMutationAsync(
+            mutation => mutation.ToggleBreakpointAsync(
+                new RemoteToggleBreakpointRequest
+                {
+                    BreakpointId = entry.Id,
+                    IsEnabled = entry.IsEnabled,
+                }),
+            fallback: () => { });
+    }
+
+    private async Task InvokeRemoteMutationAsync(
+        Func<IRemoteMutationDiagnosticsDomainService, ValueTask<RemoteMutationResult>> action,
+        Action fallback)
+    {
+        var mutation = _remoteMutation;
+        if (mutation is null)
+        {
+            fallback();
+            return;
+        }
+
+        try
+        {
+            await action(mutation).ConfigureAwait(false);
+        }
+        catch
+        {
+            _isApplyingRemoteBreakpointState = true;
+            try
+            {
+                fallback();
+            }
+            finally
+            {
+                _isApplyingRemoteBreakpointState = false;
+            }
+        }
+    }
+
+    private void SetAllEnabledLocalTrue()
+    {
+        foreach (var entry in _breakpointService.Entries)
+        {
+            entry.IsEnabled = true;
+        }
+    }
+
+    private void SetAllEnabledLocalFalse()
+    {
+        foreach (var entry in _breakpointService.Entries)
+        {
+            entry.IsEnabled = false;
+        }
     }
 
     public void Refresh()

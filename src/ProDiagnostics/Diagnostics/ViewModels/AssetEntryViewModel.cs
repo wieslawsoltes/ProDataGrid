@@ -28,8 +28,33 @@ namespace Avalonia.Diagnostics.ViewModels
             _sourceLocation = string.Empty;
         }
 
+        public AssetEntryViewModel(
+            string uriText,
+            string assemblyName,
+            string assetPath,
+            AssetKind kind,
+            string sourceLocation)
+        {
+            if (!Uri.TryCreate(uriText, UriKind.Absolute, out var parsedUri))
+            {
+                parsedUri = new Uri("avares://unknown/" + assetPath.TrimStart('/'));
+            }
+
+            Uri = parsedUri;
+            Assembly = null;
+            UriText = uriText;
+            AssemblyName = assemblyName;
+            AssetPath = assetPath;
+            Name = Path.GetFileName(assetPath);
+            Extension = Path.GetExtension(assetPath);
+            Kind = kind;
+            KindDisplay = kind.ToString();
+            IsPreviewSupported = false;
+            _sourceLocation = sourceLocation ?? string.Empty;
+        }
+
         public Uri Uri { get; }
-        public Assembly Assembly { get; }
+        public Assembly? Assembly { get; }
         public string UriText { get; }
         public string AssemblyName { get; }
         public string AssetPath { get; }

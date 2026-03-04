@@ -3,13 +3,17 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Globalization;
 using System.Linq;
 using System.Reflection;
+using System.Threading;
+using System.Threading.Tasks;
 using Avalonia;
 using Avalonia.Collections;
 using Avalonia.Controls;
 using Avalonia.Controls.Metadata;
 using Avalonia.Data;
+using Avalonia.Diagnostics.Remote;
 using Avalonia.Diagnostics.Services;
 using Avalonia.Markup.Xaml.MarkupExtensions;
 using Avalonia.Styling;
@@ -37,6 +41,10 @@ namespace Avalonia.Diagnostics.ViewModels
         private string? _codeSourceText;
         private string? _sourceLocationStatus;
         private bool _showImplementedInterfaces;
+        private readonly IRemoteReadOnlyDiagnosticsDomainService? _remoteReadOnly;
+        private readonly IRemoteMutationDiagnosticsDomainService? _remoteMutation;
+        private readonly Func<(string Scope, string? NodePath, string? ControlName)>? _remoteContextAccessor;
+        private long _remoteRefreshVersion;
         // new DataGridPathGroupDescription(nameof(AvaloniaPropertyViewModel.Group))
         private readonly static IReadOnlyList<DataGridPathGroupDescription> GroupDescriptors = new DataGridPathGroupDescription[]
         {
@@ -52,24 +60,31 @@ namespace Avalonia.Diagnostics.ViewModels
             TreePageViewModel treePage,
             AvaloniaObject avaloniaObject,
             ISet<string> pinnedProperties,
-            ISourceLocationService? sourceLocationService = null)
+            ISourceLocationService? sourceLocationService = null,
+            IRemoteReadOnlyDiagnosticsDomainService? remoteReadOnly = null,
+            IRemoteMutationDiagnosticsDomainService? remoteMutation = null,
+            Func<(string Scope, string? NodePath, string? ControlName)>? remoteContextAccessor = null)
         {
             _avaloniaObject = avaloniaObject;
             _pinnedProperties = pinnedProperties;
             _sourceLocationService = sourceLocationService ?? DefaultSourceLocationService;
+            _remoteReadOnly = remoteReadOnly;
+            _remoteMutation = remoteMutation;
+            _remoteContextAccessor = remoteContextAccessor;
             TreePage = treePage;
             Layout = avaloniaObject is Visual visual
                 ? new ControlLayoutViewModel(visual)
                 : default;
-
-            NavigateToProperty(_avaloniaObject, (_avaloniaObject as Control)?.Name ?? _avaloniaObject.ToString());
 
             AppliedFrames = new ObservableCollection<ValueFrameViewModel>();
             PseudoClasses = new ObservableCollection<PseudoClassViewModel>();
 
             if (avaloniaObject is StyledElement styledElement)
             {
-                styledElement.Classes.AddListener(this);
+                if (_remoteReadOnly is null)
+                {
+                    styledElement.Classes.AddListener(this);
+                }
 
                 var pseudoClassAttributes = styledElement.GetType().GetCustomAttributes<PseudoClassesAttribute>(true);
 
@@ -77,20 +92,38 @@ namespace Avalonia.Diagnostics.ViewModels
                 {
                     foreach (var className in classAttribute.PseudoClasses)
                     {
-                        PseudoClasses.Add(new PseudoClassViewModel(className, styledElement));
+                        PseudoClasses.Add(new PseudoClassViewModel(
+                            className,
+                            styledElement,
+                            _remoteMutation is null ? null : QueueRemotePseudoClassMutation));
                     }
                 }
 
-                var styleDiagnostics = styledElement.GetValueStoreDiagnostic();
-
-                var clipboard = TopLevel.GetTopLevel(_avaloniaObject as Visual)?.Clipboard;
-
-                foreach (var appliedStyle in styleDiagnostics.AppliedFrames.OrderBy(s => s.Priority))
+                if (_remoteReadOnly is null)
                 {
-                    AppliedFrames.Add(new ValueFrameViewModel(styledElement, appliedStyle, clipboard));
-                }
+                    var styleDiagnostics = styledElement.GetValueStoreDiagnostic();
 
-                UpdateStyles();
+                    var clipboard = TopLevel.GetTopLevel(_avaloniaObject as Visual)?.Clipboard;
+
+                    foreach (var appliedStyle in styleDiagnostics.AppliedFrames.OrderBy(s => s.Priority))
+                    {
+                        AppliedFrames.Add(new ValueFrameViewModel(styledElement, appliedStyle, clipboard));
+                    }
+
+                    UpdateStyles();
+                }
+            }
+
+            if (_remoteReadOnly is null)
+            {
+                NavigateToProperty(_avaloniaObject, (_avaloniaObject as Control)?.Name ?? _avaloniaObject.ToString());
+            }
+            else
+            {
+                SelectedEntity = _avaloniaObject;
+                SelectedEntityName = (_avaloniaObject as Control)?.Name ?? _avaloniaObject.ToString();
+                SelectedEntityType = _avaloniaObject.GetType().FullName ?? _avaloniaObject.GetType().Name;
+                _ = RefreshFromRemoteAsync();
             }
         }
 
@@ -331,7 +364,7 @@ namespace Avalonia.Diagnostics.ViewModels
                 }
             }
 
-            var propertyBuckets = new Dictionary<AvaloniaProperty, List<SetterViewModel>>();
+            var propertyBuckets = new Dictionary<string, List<SetterViewModel>>(StringComparer.Ordinal);
 
             foreach (var style in AppliedFrames.Reverse())
             {
@@ -342,7 +375,8 @@ namespace Avalonia.Diagnostics.ViewModels
 
                 foreach (var setter in style.Setters)
                 {
-                    if (propertyBuckets.TryGetValue(setter.Property, out var setters))
+                    var propertyKey = setter.Name;
+                    if (propertyBuckets.TryGetValue(propertyKey, out var setters))
                     {
                         foreach (var otherSetter in setters)
                         {
@@ -359,7 +393,7 @@ namespace Avalonia.Diagnostics.ViewModels
 
                         setters = new List<SetterViewModel> { setter };
 
-                        propertyBuckets.Add(setter.Property, setters);
+                        propertyBuckets.Add(propertyKey, setters);
                     }
                 }
             }
@@ -435,6 +469,11 @@ namespace Avalonia.Diagnostics.ViewModels
 
         public void NavigateToSelectedProperty()
         {
+            if (_remoteReadOnly is not null)
+            {
+                return;
+            }
+
             var selectedProperty = SelectedProperty;
             var selectedEntity = SelectedEntity;
             var selectedEntityName = SelectedEntityName;
@@ -484,6 +523,11 @@ namespace Avalonia.Diagnostics.ViewModels
 
         public void NavigateToParentProperty()
         {
+            if (_remoteReadOnly is not null)
+            {
+                return;
+            }
+
             if (_selectedEntitiesStack.Count > 0)
             {
                 var property = _selectedEntitiesStack.Pop();
@@ -495,6 +539,11 @@ namespace Avalonia.Diagnostics.ViewModels
 
         protected void NavigateToProperty(object o, string? entityName)
         {
+            if (_remoteReadOnly is not null)
+            {
+                return;
+            }
+
             var oldSelectedEntity = SelectedEntity;
 
             switch (oldSelectedEntity)
@@ -586,6 +635,12 @@ namespace Avalonia.Diagnostics.ViewModels
         {
             _showImplementedInterfaces = showImplementedInterfaces;
             SelectedProperty = null;
+            if (_remoteReadOnly is not null)
+            {
+                _ = RefreshFromRemoteAsync();
+                return;
+            }
+
             NavigateToProperty(_avaloniaObject, (_avaloniaObject as Control)?.Name ?? _avaloniaObject.ToString());
         }
 
@@ -620,6 +675,13 @@ namespace Avalonia.Diagnostics.ViewModels
                 target = _avaloniaObject;
             }
 
+            if (_remoteMutation is not null)
+            {
+                _ = QueueRemotePropertyBreakpointAsync(target, propertyViewModel.Name);
+                TreePage.MainView.ShowBreakpoints();
+                return;
+            }
+
             TreePage.MainView.BreakpointService.AddPropertyBreakpoint(
                 propertyViewModel.Property,
                 target,
@@ -635,6 +697,269 @@ namespace Avalonia.Diagnostics.ViewModels
             }
 
             return target.GetType().Name;
+        }
+
+        private async Task RefreshFromRemoteAsync()
+        {
+            var readOnly = _remoteReadOnly;
+            if (readOnly is null)
+            {
+                return;
+            }
+
+            var context = _remoteContextAccessor?.Invoke() ?? (
+                Scope: "combined",
+                NodePath: TreePage.SelectedNodePath,
+                ControlName: (_avaloniaObject as INamed)?.Name);
+            var refreshVersion = Interlocked.Increment(ref _remoteRefreshVersion);
+            try
+            {
+                var snapshot = await readOnly.GetPropertiesSnapshotAsync(
+                    new RemotePropertiesSnapshotRequest
+                    {
+                        Scope = context.Scope,
+                        NodePath = context.NodePath,
+                        ControlName = context.ControlName,
+                        IncludeClrProperties = _showImplementedInterfaces,
+                    }).ConfigureAwait(false);
+
+                await Dispatcher.UIThread.InvokeAsync(() =>
+                {
+                    if (refreshVersion != _remoteRefreshVersion)
+                    {
+                        return;
+                    }
+
+                    ApplyRemoteSnapshot(snapshot);
+                });
+            }
+            catch
+            {
+                // Keep previous state on remote read failures.
+            }
+        }
+
+        private void ApplyRemoteSnapshot(RemotePropertiesSnapshot snapshot)
+        {
+            var previousPropertyName = SelectedProperty?.Name;
+
+            SelectedEntity = _avaloniaObject;
+            SelectedEntityName = string.IsNullOrWhiteSpace(snapshot.Target)
+                ? (_avaloniaObject as Control)?.Name ?? _avaloniaObject.ToString()
+                : snapshot.Target;
+            SelectedEntityType = string.IsNullOrWhiteSpace(snapshot.TargetType)
+                ? _avaloniaObject.GetType().FullName ?? _avaloniaObject.GetType().Name
+                : snapshot.TargetType;
+
+            XamlSourceText = FormatSourceLabel("XAML", snapshot.Source.Xaml);
+            CodeSourceText = FormatSourceLabel("C#", snapshot.Source.Code);
+            SourceLocationStatus = snapshot.Source.Status;
+
+            var properties = new PropertyViewModel[snapshot.Properties.Count];
+            for (var i = 0; i < snapshot.Properties.Count; i++)
+            {
+                var property = snapshot.Properties[i];
+                var typeText = !string.IsNullOrWhiteSpace(property.Type)
+                    ? property.Type
+                    : property.PropertyType;
+                var propertyViewModel = new RemotePropertyViewModel(
+                    name: property.Name,
+                    group: property.Group,
+                    displayType: typeText,
+                    declaringTypeName: property.DeclaringType,
+                    priority: property.Priority,
+                    isAttached: property.IsAttached,
+                    isReadOnly: property.IsReadOnly,
+                    valueText: property.ValueText,
+                    setValueCallback: OnRemotePropertyValueChanged);
+                propertyViewModel.IsPinned = _pinnedProperties.Contains(propertyViewModel.FullName);
+                properties[i] = propertyViewModel;
+            }
+
+            _propertyIndex = null;
+            var view = new DataGridCollectionView(properties);
+            view.GroupDescriptions.AddRange(GroupDescriptors);
+            view.SortDescriptions.AddRange(SortDescriptions);
+            view.Filter = FilterProperty;
+            PropertiesView = view;
+
+            SelectedProperty = null;
+            if (!string.IsNullOrWhiteSpace(previousPropertyName))
+            {
+                for (var i = 0; i < properties.Length; i++)
+                {
+                    if (string.Equals(properties[i].Name, previousPropertyName, StringComparison.Ordinal))
+                    {
+                        SelectedProperty = properties[i];
+                        break;
+                    }
+                }
+            }
+
+            AppliedFrames.Clear();
+            PseudoClasses.Clear();
+            for (var i = 0; i < snapshot.Frames.Count; i++)
+            {
+                var frame = snapshot.Frames[i];
+                var setters = new List<SetterViewModel>(frame.Setters.Count);
+                for (var j = 0; j < frame.Setters.Count; j++)
+                {
+                    var setter = frame.Setters[j];
+                    var setterViewModel = new SetterViewModel(
+                        setter.Name,
+                        setter.ValueText,
+                        setter.SourceLocation)
+                    {
+                        IsActive = setter.IsActive,
+                        IsVisible = true,
+                    };
+                    setters.Add(setterViewModel);
+                }
+
+                AppliedFrames.Add(
+                    new ValueFrameViewModel(
+                        frame.Id,
+                        frame.Description,
+                        frame.IsActive,
+                        frame.SourceLocation,
+                        setters));
+            }
+
+            UpdateStyles();
+            UpdateStyleFilters();
+        }
+
+        private static string? FormatSourceLabel(string label, string? sourceText)
+        {
+            if (string.IsNullOrWhiteSpace(sourceText))
+            {
+                return null;
+            }
+
+            return label + ": " + sourceText;
+        }
+
+        private void OnRemotePropertyValueChanged(RemotePropertyViewModel property, object? value)
+        {
+            if (_remoteMutation is null)
+            {
+                return;
+            }
+
+            _ = ApplyRemotePropertyMutationAsync(property.Name, value);
+        }
+
+        private async Task ApplyRemotePropertyMutationAsync(string propertyName, object? value)
+        {
+            var mutation = _remoteMutation;
+            if (mutation is null)
+            {
+                return;
+            }
+
+            var context = _remoteContextAccessor?.Invoke() ?? (
+                Scope: "combined",
+                NodePath: TreePage.SelectedNodePath,
+                ControlName: (_avaloniaObject as INamed)?.Name);
+            try
+            {
+                var valueText = value switch
+                {
+                    null => null,
+                    string text => text,
+                    IFormattable formattable => formattable.ToString(null, CultureInfo.InvariantCulture),
+                    _ => value.ToString(),
+                };
+
+                await mutation.SetPropertyAsync(
+                    new RemoteSetPropertyRequest
+                    {
+                        Scope = context.Scope,
+                        NodePath = context.NodePath,
+                        ControlName = context.ControlName,
+                        PropertyName = propertyName,
+                        ValueText = valueText,
+                        ValueIsNull = value is null,
+                        ClearValue = false,
+                    }).ConfigureAwait(false);
+
+                await RefreshFromRemoteAsync().ConfigureAwait(false);
+            }
+            catch
+            {
+                // Keep current value when remote command fails.
+            }
+        }
+
+        private void QueueRemotePseudoClassMutation(string pseudoClass, bool isActive)
+        {
+            if (_remoteMutation is null)
+            {
+                if (_avaloniaObject is StyledElement styledElement)
+                {
+                    styledElement.Classes.Set(pseudoClass, isActive);
+                }
+
+                return;
+            }
+
+            _ = ApplyRemotePseudoClassMutationAsync(pseudoClass, isActive);
+        }
+
+        private async Task ApplyRemotePseudoClassMutationAsync(string pseudoClass, bool isActive)
+        {
+            var mutation = _remoteMutation;
+            if (mutation is null)
+            {
+                return;
+            }
+
+            var context = _remoteContextAccessor?.Invoke() ?? (
+                Scope: "combined",
+                NodePath: TreePage.SelectedNodePath,
+                ControlName: (_avaloniaObject as INamed)?.Name);
+            try
+            {
+                await mutation.SetPseudoClassAsync(
+                    new RemoteSetPseudoClassRequest
+                    {
+                        Scope = context.Scope,
+                        NodePath = context.NodePath,
+                        ControlName = context.ControlName,
+                        PseudoClass = pseudoClass,
+                        IsActive = isActive,
+                    }).ConfigureAwait(false);
+            }
+            catch
+            {
+                // Keep UI responsive when remote pseudo-class command fails.
+            }
+        }
+
+        private async Task QueueRemotePropertyBreakpointAsync(AvaloniaObject target, string propertyName)
+        {
+            var mutation = _remoteMutation;
+            if (mutation is null)
+            {
+                return;
+            }
+
+            var context = TreePage.MainView.GetRemoteTargetContext(target);
+            try
+            {
+                await mutation.AddPropertyBreakpointAsync(
+                    new RemoteAddPropertyBreakpointRequest
+                    {
+                        Scope = context.Scope,
+                        NodePath = context.NodePath,
+                        ControlName = context.ControlName,
+                        PropertyName = propertyName,
+                    }).ConfigureAwait(false);
+            }
+            catch
+            {
+                // Ignore remote errors; local fallback remains available when remote mutation is disabled.
+            }
         }
     }
 }

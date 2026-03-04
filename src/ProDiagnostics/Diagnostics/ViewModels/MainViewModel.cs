@@ -2,14 +2,17 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
+using System.Threading.Tasks;
 using Avalonia.Controls;
 using Avalonia.Diagnostics.Controls;
+using Avalonia.Diagnostics.Remote;
 using Avalonia.Diagnostics.Services;
 using Avalonia.Input;
 using Avalonia.Metadata;
 using Avalonia.Media;
 using Avalonia.Reactive;
 using Avalonia.Rendering;
+using Avalonia.Styling;
 using Avalonia.Threading;
 using Avalonia.VisualTree;
 
@@ -42,6 +45,7 @@ namespace Avalonia.Diagnostics.ViewModels
         private readonly HotKeyPageViewModel _hotKeys;
         private readonly ISourceLocationService _sourceLocationService;
         private readonly IDisposable _pointerOverSubscription;
+        private readonly InProcessRemoteSelectionState _selectionStore = new();
 
         private readonly HashSet<string> _pinnedProperties = new();
 
@@ -77,6 +81,13 @@ namespace Avalonia.Diagnostics.ViewModels
         private ControlDetailsViewModel? _logicalDetailsSubscription;
         private ControlDetailsViewModel? _visualDetailsSubscription;
         private ControlDetailsViewModel? _combinedDetailsSubscription;
+        private DevToolsRemoteLoopbackSession? _remoteLoopbackSession;
+        private IRemoteReadOnlyDiagnosticsDomainService? _remoteReadOnly;
+        private IRemoteMutationDiagnosticsDomainService? _remoteMutation;
+        private IDisposable? _remoteSelectionStreamSubscription;
+        private bool _remoteLoopbackInitializationRequested;
+        private bool _isApplyingSelectionSnapshot;
+        private bool _suppressRemoteSelectionPush;
 
         public MainViewModel(AvaloniaObject root)
         {
@@ -93,9 +104,9 @@ namespace Avalonia.Diagnostics.ViewModels
             var resourceModelFactory = new ResourceHierarchyModelFactory();
 
             _breakpointService = new BreakpointService();
-            _logicalTree = new TreePageViewModel(this, logicalProvider.Create(root), treeModelFactory, _pinnedProperties);
-            _visualTree = new TreePageViewModel(this, visualProvider.Create(root), treeModelFactory, _pinnedProperties);
-            _combinedTree = new TreePageViewModel(this, combinedProvider.Create(root), treeModelFactory, _pinnedProperties);
+            _logicalTree = new TreePageViewModel(this, logicalProvider.Create(root), treeModelFactory, _pinnedProperties, remoteScope: "logical");
+            _visualTree = new TreePageViewModel(this, visualProvider.Create(root), treeModelFactory, _pinnedProperties, remoteScope: "visual");
+            _combinedTree = new TreePageViewModel(this, combinedProvider.Create(root), treeModelFactory, _pinnedProperties, remoteScope: "combined");
             _resources = new ResourcesPageViewModel(this, resourceProvider.Create(root), resourceModelFactory, resourceFormatter);
             _code = new CodePageViewModel(GetSelectedDiagnosticsObject, OnCodeCaretLocationChanged, _sourceLocationService);
             _assets = new AssetsPageViewModel(this);
@@ -123,6 +134,8 @@ namespace Avalonia.Diagnostics.ViewModels
             _stylesDiagnostics.PropertyChanged += StylesDiagnosticsPropertyChanged;
             _resources.PropertyChanged += ResourcesPagePropertyChanged;
             _assets.PropertyChanged += AssetsPagePropertyChanged;
+            _elements3D.PropertyChanged += Elements3DPropertyChanged;
+            _selectionStore.SelectionChanged += SelectionStoreSelectionChanged;
 
             UpdateFocusedControl();
 
@@ -149,6 +162,8 @@ namespace Avalonia.Diagnostics.ViewModels
                     }
                 });
             }
+
+            PublishSelectionToStore(GetSelectedDiagnosticsObject(), combinedNodePathHint: _combinedTree.SelectedNodePath, pushRemote: false);
         }
 
         public bool FreezePopups
@@ -346,7 +361,7 @@ namespace Avalonia.Diagnostics.ViewModels
                         {
                             try
                             {
-                                newTree.SelectControl(control);
+                                newTree.SelectControl(control, notifyMainSelection: false);
                             }
                             catch
                             {
@@ -383,6 +398,11 @@ namespace Avalonia.Diagnostics.ViewModels
                 }
 
                 TreeContent = ResolveTreeTabContent(normalized);
+                if (TreeContent is TreePageViewModel activeTree)
+                {
+                    activeTree.EnsureRemoteTreeLoaded();
+                }
+
                 RefreshPropertiesTabContent();
                 if (!_isSynchronizingTabSelection)
                 {
@@ -542,7 +562,10 @@ namespace Avalonia.Diagnostics.ViewModels
                     codePage.Refresh();
                     break;
                 case ResourcesPageViewModel resources:
-                    resources.UpdateDetailsView();
+                    resources.Refresh();
+                    break;
+                case AssetsPageViewModel assets:
+                    assets.Refresh();
                     break;
                 case EventsPageViewModel eventsPage:
                     eventsPage.RefreshRecordedEvents();
@@ -706,25 +729,12 @@ namespace Avalonia.Diagnostics.ViewModels
 
         public void SelectControl(Control control)
         {
-            _combinedTree.SelectControl(control, notifyMainSelection: false);
-            _logicalTree.SelectControl(control, notifyMainSelection: false);
-            _visualTree.SelectControl(control, notifyMainSelection: false);
-
-            switch (Content)
+            if (Content is ResourcesPageViewModel resources)
             {
-                case TreePageViewModel tree:
-                    if (!ReferenceEquals(tree, _combinedTree))
-                    {
-                        tree.SelectControl(control, notifyMainSelection: false);
-                    }
-
-                    break;
-                case ResourcesPageViewModel resources:
-                    resources.SelectResourceHost(control);
-                    break;
+                resources.SelectResourceHost(control);
             }
 
-            NotifyTreeSelectionChanged(control);
+            PublishSelectionToStore(control, combinedNodePathHint: ResolveCombinedNodePath(nodePath: null, scope: "combined", selectedObject: control));
         }
 
         public void EnableSnapshotStyles(bool enable)
@@ -755,6 +765,10 @@ namespace Avalonia.Diagnostics.ViewModels
             _stylesDiagnostics.PropertyChanged -= StylesDiagnosticsPropertyChanged;
             _resources.PropertyChanged -= ResourcesPagePropertyChanged;
             _assets.PropertyChanged -= AssetsPagePropertyChanged;
+            _elements3D.PropertyChanged -= Elements3DPropertyChanged;
+            _selectionStore.SelectionChanged -= SelectionStoreSelectionChanged;
+            _remoteSelectionStreamSubscription?.Dispose();
+            _remoteSelectionStreamSubscription = null;
 
             _pointerOverSubscription.Dispose();
             _breakpointService.Clear();
@@ -776,6 +790,20 @@ namespace Avalonia.Diagnostics.ViewModels
             if (TryGetRenderer() is { } renderer)
             {
                 renderer.Diagnostics.DebugOverlays = RendererDebugOverlays.None;
+            }
+
+            if (_remoteLoopbackSession is not null)
+            {
+                try
+                {
+                    _remoteLoopbackSession.DisposeAsync().AsTask().GetAwaiter().GetResult();
+                }
+                catch
+                {
+                    // Best-effort cleanup for diagnostics loopback transport.
+                }
+
+                _remoteLoopbackSession = null;
             }
         }
 
@@ -902,19 +930,187 @@ namespace Avalonia.Diagnostics.ViewModels
             _transportSettings.SetOptions(options);
             _hotKeys.SetOptions(options);
 
+            if (options.UseRemoteRuntime)
+            {
+                _ = EnsureRemoteReadOnlyLoopbackAsync(options);
+            }
+
             SelectedTab = GetTabIndex(options.LaunchView);
         }
 
-        internal void NotifyTreeSelectionChanged(AvaloniaObject? selectedObject)
+        internal void NotifyTreeSelectionChanged(
+            AvaloniaObject? selectedObject,
+            string? scope = null,
+            string? nodePath = null)
+        {
+            PublishSelectionToStore(selectedObject, combinedNodePathHint: ResolveCombinedNodePath(nodePath, scope, selectedObject));
+        }
+
+        private void SelectionStoreSelectionChanged(RemoteSelectionSnapshot snapshot)
+        {
+            if (!Dispatcher.UIThread.CheckAccess())
+            {
+                _ = Dispatcher.UIThread.InvokeAsync(() => SelectionStoreSelectionChanged(snapshot));
+                return;
+            }
+
+            ApplySelectionSnapshot(snapshot);
+        }
+
+        private void PublishSelectionToStore(AvaloniaObject? selectedObject, string? combinedNodePathHint, bool pushRemote = true)
+        {
+            var resolvedSelection = selectedObject
+                ?? _selectedDiagnosticsObject
+                ?? _combinedTree.SelectedNode?.Visual
+                ?? _logicalTree.SelectedNode?.Visual
+                ?? _visualTree.SelectedNode?.Visual
+                ?? TryGetFocusedDiagnosticsObject()
+                ?? TryGetPointerOverDiagnosticsObject()
+                ?? TryGetFirstNonDevToolsTopLevel()
+                ?? _root;
+            var combinedPath = ResolveCombinedNodePath(combinedNodePathHint, scope: null, resolvedSelection);
+            var target = DescribeSelectionTarget(resolvedSelection);
+            var targetType = resolvedSelection.GetType().FullName ?? resolvedSelection.GetType().Name;
+
+            var previousSuppress = _suppressRemoteSelectionPush;
+            if (!pushRemote)
+            {
+                _suppressRemoteSelectionPush = true;
+            }
+
+            try
+            {
+                _selectionStore.SetSelection(
+                    scope: "combined",
+                    nodeId: null,
+                    nodePath: combinedPath,
+                    target: target,
+                    targetType: targetType);
+            }
+            finally
+            {
+                _suppressRemoteSelectionPush = previousSuppress;
+            }
+        }
+
+        private void PublishSelectionByNodePath(string nodePath)
+        {
+            if (string.IsNullOrWhiteSpace(nodePath))
+            {
+                return;
+            }
+
+            AvaloniaObject? selectedObject = null;
+            if (_combinedTree.TryGetNodeByPath(nodePath, out var treeNode))
+            {
+                selectedObject = treeNode?.Visual;
+            }
+
+            PublishSelectionToStore(selectedObject, combinedNodePathHint: nodePath);
+        }
+
+        private string? ResolveCombinedNodePath(string? nodePath, string? scope, AvaloniaObject? selectedObject)
+        {
+            if (!string.IsNullOrWhiteSpace(nodePath) &&
+                string.Equals(NormalizeScope(scope), "combined", StringComparison.Ordinal))
+            {
+                return nodePath;
+            }
+
+            if (selectedObject is not null &&
+                _combinedTree.TryGetNodePathForObject(selectedObject, out var pathFromObject))
+            {
+                return pathFromObject;
+            }
+
+            if (string.IsNullOrWhiteSpace(nodePath))
+            {
+                return _combinedTree.SelectedNodePath;
+            }
+
+            if (_combinedTree.TryGetNodeByPath(nodePath, out _))
+            {
+                return nodePath;
+            }
+
+            return _combinedTree.SelectedNodePath;
+        }
+
+        private void ApplySelectionSnapshot(RemoteSelectionSnapshot snapshot)
+        {
+            if (_isApplyingSelectionSnapshot)
+            {
+                return;
+            }
+
+            _isApplyingSelectionSnapshot = true;
+            try
+            {
+                AvaloniaObject? resolvedSelection = null;
+                if (!string.IsNullOrWhiteSpace(snapshot.NodePath) &&
+                    _combinedTree.TrySelectNodeByPath(snapshot.NodePath, notifyMainSelection: false))
+                {
+                    resolvedSelection = _combinedTree.SelectedNode?.Visual;
+                }
+
+                resolvedSelection ??= _combinedTree.SelectedNode?.Visual
+                    ?? _selectedDiagnosticsObject
+                    ?? TryGetFocusedDiagnosticsObject()
+                    ?? TryGetPointerOverDiagnosticsObject()
+                    ?? TryGetFirstNonDevToolsTopLevel()
+                    ?? _root;
+
+                SynchronizeTreeSelections(resolvedSelection);
+                _selectedDiagnosticsObject = resolvedSelection;
+                if (resolvedSelection is Control selectedControl &&
+                    RightContent is ResourcesPageViewModel resourcesPage)
+                {
+                    resourcesPage.SelectResourceHost(selectedControl);
+                }
+
+                if (RightContent is ViewModelsBindingsPageViewModel)
+                {
+                    _viewModelsBindings.InspectControl(resolvedSelection);
+                }
+
+                if (RightContent is StylesDiagnosticsPageViewModel)
+                {
+                    _stylesDiagnostics.InspectControl(resolvedSelection);
+                }
+
+                if (RightContent is Elements3DPageViewModel)
+                {
+                    _elements3D.InspectControl(resolvedSelection);
+                }
+
+                RefreshPropertiesTabContent();
+                if (RightContent is CodePageViewModel)
+                {
+                    SyncCodeFromCurrentContext();
+                }
+                UpdateInspectionHighlight();
+
+                if (!_suppressRemoteSelectionPush)
+                {
+                    _ = PushRemoteSelectionAsync(snapshot);
+                }
+            }
+            finally
+            {
+                _isApplyingSelectionSnapshot = false;
+            }
+        }
+
+        private void SynchronizeTreeSelections(AvaloniaObject selection)
         {
             if (!_isSynchronizingCombinedTreeSelection &&
-                selectedObject is Control control &&
+                selection is Control control &&
                 !ReferenceEquals(_combinedTree.SelectedNode?.Visual, control))
             {
                 _isSynchronizingCombinedTreeSelection = true;
                 try
                 {
-                    _combinedTree.SelectControl(control);
+                    _combinedTree.SelectControl(control, notifyMainSelection: false);
                 }
                 finally
                 {
@@ -922,25 +1118,38 @@ namespace Avalonia.Diagnostics.ViewModels
                 }
             }
 
-            var resolvedSelection = _combinedTree.SelectedNode?.Visual as AvaloniaObject
-                ?? selectedObject
-                ?? _selectedDiagnosticsObject
-                ?? _logicalTree.SelectedNode?.Visual
-                ?? _visualTree.SelectedNode?.Visual
-                ?? TryGetFocusedDiagnosticsObject()
-                ?? TryGetPointerOverDiagnosticsObject()
-                ?? TryGetFirstNonDevToolsTopLevel()
-                ?? _root;
-            _selectedDiagnosticsObject = resolvedSelection;
-            _viewModelsBindings.InspectControl(resolvedSelection);
-            _stylesDiagnostics.InspectControl(resolvedSelection);
-            _elements3D.InspectControl(resolvedSelection);
-            RefreshPropertiesTabContent();
-            SyncCodeFromCurrentContext();
-            UpdateInspectionHighlight();
+            _combinedTree.SelectObject(selection, notifyMainSelection: false);
+            _logicalTree.SelectObject(selection, notifyMainSelection: false);
+            _visualTree.SelectObject(selection, notifyMainSelection: false);
+        }
+
+        private static string DescribeSelectionTarget(AvaloniaObject selection)
+        {
+            if (selection is StyledElement { Name: { Length: > 0 } name })
+            {
+                return selection.GetType().Name + "#" + name;
+            }
+
+            return selection.GetType().Name;
+        }
+
+        private static string NormalizeScope(string? scope)
+        {
+            if (string.Equals(scope, "logical", StringComparison.OrdinalIgnoreCase))
+            {
+                return "logical";
+            }
+
+            if (string.Equals(scope, "visual", StringComparison.OrdinalIgnoreCase))
+            {
+                return "visual";
+            }
+
+            return "combined";
         }
 
         internal BreakpointService BreakpointService => _breakpointService;
+        internal bool HasRemoteMutation => _remoteMutation is not null;
 
         public bool ShowImplementedInterfaces
         {
@@ -1111,8 +1320,18 @@ namespace Avalonia.Diagnostics.ViewModels
 
                     return _elements3D;
                 case 6:
+                    if (inspectSelection)
+                    {
+                        _resources.Refresh();
+                    }
+
                     return _resources;
                 case 7:
+                    if (inspectSelection)
+                    {
+                        _assets.Refresh();
+                    }
+
                     return _assets;
                 case 8:
                     return _events;
@@ -1255,12 +1474,50 @@ namespace Avalonia.Diagnostics.ViewModels
 
         private void StylesDiagnosticsPropertyChanged(object? sender, PropertyChangedEventArgs e)
         {
-            if (e.PropertyName is nameof(StylesDiagnosticsPageViewModel.SelectedTreeEntry)
-                or nameof(StylesDiagnosticsPageViewModel.SelectedFrame)
+            if (e.PropertyName == nameof(StylesDiagnosticsPageViewModel.SelectedTreeEntry))
+            {
+                if (!_isApplyingSelectionSnapshot)
+                {
+                    var selectedTreeEntry = _stylesDiagnostics.SelectedTreeEntry;
+                    if (selectedTreeEntry?.SourceObject is AvaloniaObject sourceObject)
+                    {
+                        PublishSelectionToStore(sourceObject, combinedNodePathHint: ResolveCombinedNodePath(selectedTreeEntry.NodePath, "combined", sourceObject));
+                    }
+                    else if (!string.IsNullOrWhiteSpace(selectedTreeEntry?.NodePath))
+                    {
+                        PublishSelectionByNodePath(selectedTreeEntry.NodePath);
+                    }
+                }
+
+                SyncCodeFromCurrentContext();
+                return;
+            }
+
+            if (e.PropertyName is nameof(StylesDiagnosticsPageViewModel.SelectedFrame)
                 or nameof(StylesDiagnosticsPageViewModel.SelectedSetter)
                 or nameof(StylesDiagnosticsPageViewModel.SelectedResolutionEntry))
             {
                 SyncCodeFromCurrentContext();
+            }
+        }
+
+        private void Elements3DPropertyChanged(object? sender, PropertyChangedEventArgs e)
+        {
+            if (e.PropertyName != nameof(Elements3DPageViewModel.SelectedNode) || _isApplyingSelectionSnapshot)
+            {
+                return;
+            }
+
+            var selectedNode = _elements3D.SelectedNode;
+            if (selectedNode?.Visual is AvaloniaObject selectedObject)
+            {
+                PublishSelectionToStore(selectedObject, combinedNodePathHint: ResolveCombinedNodePath(selectedNode.NodePath, "combined", selectedObject));
+                return;
+            }
+
+            if (!string.IsNullOrWhiteSpace(selectedNode?.NodePath))
+            {
+                PublishSelectionByNodePath(selectedNode.NodePath);
             }
         }
 
@@ -1283,6 +1540,12 @@ namespace Avalonia.Diagnostics.ViewModels
         private void SyncCodeFromCurrentContext()
         {
             if (_isSyncingFromCodeSelection)
+            {
+                return;
+            }
+
+            if (_remoteReadOnly is not null &&
+                SelectedRightTab != MapGlobalTabToRightTab(4))
             {
                 return;
             }
@@ -1489,6 +1752,278 @@ namespace Avalonia.Diagnostics.ViewModels
             }
 
             return null;
+        }
+
+        private async Task EnsureRemoteReadOnlyLoopbackAsync(DevToolsOptions options)
+        {
+            if (_remoteLoopbackSession is not null)
+            {
+                BindRemoteReadOnlyTabs(_remoteLoopbackSession);
+                return;
+            }
+
+            if (_remoteLoopbackInitializationRequested)
+            {
+                return;
+            }
+
+            _remoteLoopbackInitializationRequested = true;
+            try
+            {
+                var session = await DevToolsRemoteLoopbackSession.StartAsync(
+                    _root,
+                    options.RemoteLoopbackOptions).ConfigureAwait(false);
+
+                await Dispatcher.UIThread.InvokeAsync(() =>
+                {
+                    _remoteLoopbackSession = session;
+                    BindRemoteReadOnlyTabs(session);
+                });
+            }
+            catch
+            {
+                _remoteLoopbackInitializationRequested = false;
+            }
+        }
+
+        private void BindRemoteReadOnlyTabs(DevToolsRemoteLoopbackSession session)
+        {
+            _remoteReadOnly = session.ReadOnly;
+            _remoteMutation = session.Mutation;
+            _remoteSelectionStreamSubscription?.Dispose();
+            _remoteSelectionStreamSubscription = session.Stream.Subscribe(
+                RemoteStreamTopics.Selection,
+                RemoteJsonSerializerContext.Default.RemoteSelectionSnapshot,
+                OnRemoteSelectionStreamPayload);
+            var activeTree = GetActiveTreeViewModel();
+            _logicalTree.SetRemoteReadOnlySource(session.ReadOnly, refreshTreeNow: ReferenceEquals(activeTree, _logicalTree));
+            _visualTree.SetRemoteReadOnlySource(session.ReadOnly, refreshTreeNow: ReferenceEquals(activeTree, _visualTree));
+            _combinedTree.SetRemoteReadOnlySource(session.ReadOnly, refreshTreeNow: ReferenceEquals(activeTree, _combinedTree));
+            _logicalTree.SetRemoteMutationSource(session.Mutation);
+            _visualTree.SetRemoteMutationSource(session.Mutation);
+            _combinedTree.SetRemoteMutationSource(session.Mutation);
+            _events.SetRemoteMutationSource(session.Mutation, GetRemoteTargetContext);
+            _breakpoints.SetRemoteMutationSource(session.Mutation);
+            _logs.SetRemoteMutationSource(session.Mutation);
+            _metrics.SetRemoteMutationSource(session.Mutation);
+            _profiler.SetRemoteMutationSource(session.Mutation);
+            var activeRightGlobalTab = MapRightTabToGlobalTab(SelectedRightTab);
+            _code.SetRemoteReadOnlySource(
+                session.ReadOnly,
+                GetRemoteSelectionContext,
+                refreshNow: activeRightGlobalTab == 4);
+            _viewModelsBindings.SetRemoteReadOnlySource(
+                session.ReadOnly,
+                GetRemoteSelectionContext,
+                refreshNow: activeRightGlobalTab == 12);
+            _assets.SetRemoteReadOnlySource(
+                session.ReadOnly,
+                refreshNow: activeRightGlobalTab == 7);
+            _resources.SetRemoteReadOnlySource(
+                session.ReadOnly,
+                refreshNow: activeRightGlobalTab == 6);
+            _stylesDiagnostics.SetRemoteReadOnlySource(
+                session.ReadOnly,
+                GetRemoteSelectionContext,
+                refreshNow: activeRightGlobalTab == 14);
+            _elements3D.SetRemoteReadOnlySource(
+                session.ReadOnly,
+                GetRemoteSelectionContext,
+                refreshNow: activeRightGlobalTab == 5);
+            _ = RefreshRemoteSelectionSnapshotAsync();
+        }
+
+        private void OnRemoteSelectionStreamPayload(RemoteTypedStreamPayload<RemoteSelectionSnapshot> payload)
+        {
+            if (!payload.IsParsed || payload.Payload is null)
+            {
+                return;
+            }
+
+            var snapshot = payload.Payload;
+            if (!Dispatcher.UIThread.CheckAccess())
+            {
+                _ = Dispatcher.UIThread.InvokeAsync(() => ApplyRemoteSelectionSnapshot(snapshot));
+                return;
+            }
+
+            ApplyRemoteSelectionSnapshot(snapshot);
+        }
+
+        private async Task RefreshRemoteSelectionSnapshotAsync()
+        {
+            var readOnly = _remoteReadOnly;
+            if (readOnly is null)
+            {
+                return;
+            }
+
+            try
+            {
+                var snapshot = await readOnly.GetSelectionSnapshotAsync(
+                    new RemoteSelectionSnapshotRequest
+                    {
+                        Scope = "combined",
+                    }).ConfigureAwait(false);
+
+                await Dispatcher.UIThread.InvokeAsync(() => ApplyRemoteSelectionSnapshot(snapshot));
+            }
+            catch
+            {
+                // Keep local selection state when remote snapshot bootstrap fails.
+            }
+        }
+
+        private void ApplyRemoteSelectionSnapshot(RemoteSelectionSnapshot snapshot)
+        {
+            var combinedSnapshot = snapshot;
+            if (!string.Equals(NormalizeScope(snapshot.Scope), "combined", StringComparison.Ordinal))
+            {
+                var selectionFromScope = ResolveSelectionObjectFromScope(snapshot.Scope, snapshot.NodePath);
+                var combinedPath = ResolveCombinedNodePath(nodePath: null, scope: null, selectedObject: selectionFromScope);
+                combinedSnapshot = snapshot with
+                {
+                    Scope = "combined",
+                    NodePath = combinedPath,
+                    Target = selectionFromScope is null ? snapshot.Target : DescribeSelectionTarget(selectionFromScope),
+                    TargetType = selectionFromScope?.GetType().FullName ?? selectionFromScope?.GetType().Name ?? snapshot.TargetType,
+                };
+            }
+
+            var previousSuppress = _suppressRemoteSelectionPush;
+            _suppressRemoteSelectionPush = true;
+            try
+            {
+                _selectionStore.SetSelection(
+                    scope: "combined",
+                    nodeId: combinedSnapshot.NodeId,
+                    nodePath: combinedSnapshot.NodePath,
+                    target: combinedSnapshot.Target,
+                    targetType: combinedSnapshot.TargetType);
+            }
+            finally
+            {
+                _suppressRemoteSelectionPush = previousSuppress;
+            }
+        }
+
+        private AvaloniaObject? ResolveSelectionObjectFromScope(string? scope, string? nodePath)
+        {
+            if (string.IsNullOrWhiteSpace(nodePath))
+            {
+                return null;
+            }
+
+            var tree = NormalizeScope(scope) switch
+            {
+                "logical" => _logicalTree,
+                "visual" => _visualTree,
+                _ => _combinedTree,
+            };
+            if (tree.TryGetNodeByPath(nodePath, out var treeNode))
+            {
+                return treeNode?.Visual;
+            }
+
+            return null;
+        }
+
+        private (string Scope, string? NodePath, string? ControlName) GetRemoteSelectionContext()
+        {
+            var selection = _selectionStore.GetSnapshot("combined");
+            var nodePath = selection.NodePath ?? _combinedTree.SelectedNodePath;
+            var controlName = (_selectedDiagnosticsObject as INamed)?.Name;
+            return ("combined", nodePath, controlName);
+        }
+
+        internal (string Scope, string? NodePath, string? ControlName) GetRemoteTargetContext(AvaloniaObject? target)
+        {
+            if (target is not null &&
+                _combinedTree.TryGetNodePathForObject(target, out var nodePath) &&
+                !string.IsNullOrWhiteSpace(nodePath))
+            {
+                var controlName = (target as INamed)?.Name;
+                return ("combined", nodePath, controlName);
+            }
+
+            if (target is INamed named && !string.IsNullOrWhiteSpace(named.Name))
+            {
+                return ("combined", null, named.Name);
+            }
+
+            return GetRemoteSelectionContext();
+        }
+
+        private async Task PushRemoteSelectionAsync(RemoteSelectionSnapshot snapshot)
+        {
+            var mutation = _remoteMutation;
+            if (mutation is null)
+            {
+                return;
+            }
+
+            var controlName = (_selectedDiagnosticsObject as INamed)?.Name;
+            if (string.IsNullOrWhiteSpace(snapshot.NodePath) && string.IsNullOrWhiteSpace(controlName))
+            {
+                return;
+            }
+
+            try
+            {
+                await mutation.SetSelectionAsync(
+                    new RemoteSetSelectionRequest
+                    {
+                        Scope = "combined",
+                        NodePath = snapshot.NodePath,
+                        ControlName = controlName,
+                    }).ConfigureAwait(false);
+            }
+            catch
+            {
+                // Keep local selection flow resilient when remote command path fails.
+            }
+        }
+
+        internal async Task<bool> InspectHoveredViaRemoteAsync()
+        {
+            var mutation = _remoteMutation;
+            var readOnly = _remoteReadOnly;
+            if (mutation is null || readOnly is null)
+            {
+                return false;
+            }
+
+            try
+            {
+                var result = await mutation.InspectHoveredAsync(
+                    new RemoteInspectHoveredRequest
+                    {
+                        Scope = "combined",
+                        RequireInspectGesture = false,
+                        IncludeDevTools = false,
+                    }).ConfigureAwait(false);
+                if (!result.Changed)
+                {
+                    return true;
+                }
+
+                var selection = await readOnly.GetSelectionSnapshotAsync(
+                    new RemoteSelectionSnapshotRequest
+                    {
+                        Scope = "combined",
+                    }).ConfigureAwait(false);
+
+                await Dispatcher.UIThread.InvokeAsync(() =>
+                {
+                    ApplyRemoteSelectionSnapshot(selection);
+                });
+
+                return true;
+            }
+            catch
+            {
+                return false;
+            }
         }
     }
 }

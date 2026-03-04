@@ -1,10 +1,13 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Threading.Tasks;
 using Avalonia.Collections;
 using Avalonia.Data;
 using Avalonia.Data.Core;
+using Avalonia.Diagnostics.Remote;
 using Avalonia.LogicalTree;
+using Avalonia.Threading;
 
 namespace Avalonia.Diagnostics.ViewModels;
 
@@ -19,6 +22,9 @@ internal sealed class ViewModelsBindingsPageViewModel : ViewModelBase
     private string _inspectedElement = "(none)";
     private string _inspectedElementType = string.Empty;
     private bool _showOnlyBindingErrors;
+    private IRemoteReadOnlyDiagnosticsDomainService? _remoteReadOnly;
+    private Func<(string Scope, string? NodePath, string? ControlName)>? _remoteContextAccessor;
+    private long _remoteRefreshVersion;
 
     public ViewModelsBindingsPageViewModel()
         : this(mainView: null, selectedObjectAccessor: null)
@@ -105,12 +111,37 @@ internal sealed class ViewModelsBindingsPageViewModel : ViewModelBase
 
     public void InspectSelection()
     {
+        if (_remoteReadOnly is not null)
+        {
+            _ = RefreshFromRemoteAsync();
+            return;
+        }
+
         InspectControl(_selectedObjectAccessor?.Invoke());
     }
 
     public void Refresh()
     {
+        if (_remoteReadOnly is not null)
+        {
+            _ = RefreshFromRemoteAsync();
+            return;
+        }
+
         InspectControl(_inspectedObject);
+    }
+
+    internal void SetRemoteReadOnlySource(
+        IRemoteReadOnlyDiagnosticsDomainService? readOnly,
+        Func<(string Scope, string? NodePath, string? ControlName)>? contextAccessor,
+        bool refreshNow = true)
+    {
+        _remoteReadOnly = readOnly;
+        _remoteContextAccessor = contextAccessor;
+        if (refreshNow)
+        {
+            _ = RefreshFromRemoteAsync();
+        }
     }
 
     public void Clear()
@@ -126,6 +157,12 @@ internal sealed class ViewModelsBindingsPageViewModel : ViewModelBase
 
     internal void InspectControl(AvaloniaObject? target)
     {
+        if (_remoteReadOnly is not null)
+        {
+            _ = RefreshFromRemoteAsync();
+            return;
+        }
+
         _inspectedObject = target;
         _bindingEntries.Clear();
         _viewModelEntries.Clear();
@@ -419,5 +456,87 @@ internal sealed class ViewModelsBindingsPageViewModel : ViewModelBase
         }
 
         return value;
+    }
+
+    private async Task RefreshFromRemoteAsync()
+    {
+        var readOnly = _remoteReadOnly;
+        if (readOnly is null)
+        {
+            return;
+        }
+
+        var context = _remoteContextAccessor?.Invoke() ?? (Scope: "combined", NodePath: (string?)null, ControlName: (string?)null);
+        var version = System.Threading.Interlocked.Increment(ref _remoteRefreshVersion);
+        try
+        {
+            var snapshot = await readOnly.GetBindingsSnapshotAsync(
+                new RemoteBindingsSnapshotRequest
+                {
+                    Scope = context.Scope,
+                    NodePath = context.NodePath,
+                    ControlName = context.ControlName,
+                }).ConfigureAwait(false);
+
+            await Dispatcher.UIThread.InvokeAsync(() =>
+            {
+                if (version != _remoteRefreshVersion)
+                {
+                    return;
+                }
+
+                ApplyRemoteSnapshot(snapshot);
+            });
+        }
+        catch
+        {
+            // Keep previous state on remote read failures.
+        }
+    }
+
+    private void ApplyRemoteSnapshot(RemoteBindingsSnapshot snapshot)
+    {
+        _inspectedObject = null;
+        _bindingEntries.Clear();
+        _viewModelEntries.Clear();
+
+        InspectedElement = string.IsNullOrWhiteSpace(snapshot.InspectedElement) ? "(none)" : snapshot.InspectedElement;
+        InspectedElementType = snapshot.InspectedElementType ?? string.Empty;
+        _showOnlyBindingErrors = snapshot.ShowOnlyBindingErrors;
+        RaisePropertyChanged(nameof(ShowOnlyBindingErrors));
+
+        for (var i = 0; i < snapshot.ViewModels.Count; i++)
+        {
+            var entry = snapshot.ViewModels[i];
+            _viewModelEntries.Add(
+                new ViewModelContextEntryViewModel(
+                    entry.Level,
+                    entry.Element,
+                    entry.Priority,
+                    entry.ViewModelType,
+                    entry.ValuePreview,
+                    entry.IsCurrent,
+                    sourceObject: null));
+        }
+
+        for (var i = 0; i < snapshot.Bindings.Count; i++)
+        {
+            var entry = snapshot.Bindings[i];
+            _bindingEntries.Add(
+                new BindingDiagnosticEntryViewModel(
+                    entry.PropertyName,
+                    entry.OwnerType,
+                    entry.Priority,
+                    entry.BindingDescription,
+                    entry.Diagnostic,
+                    entry.ValueType,
+                    entry.ValuePreview,
+                    entry.HasError,
+                    entry.Status,
+                    sourceObject: null));
+        }
+
+        RefreshBindings();
+        RefreshViewModels();
     }
 }

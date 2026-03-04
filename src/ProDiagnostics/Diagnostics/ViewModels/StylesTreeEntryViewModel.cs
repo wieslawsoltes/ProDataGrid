@@ -6,7 +6,7 @@ namespace Avalonia.Diagnostics.ViewModels;
 internal sealed class StylesTreeEntryViewModel : ViewModelBase
 {
     public StylesTreeEntryViewModel(
-        StyledElement sourceObject,
+        StyledElement? sourceObject,
         int depth,
         string element,
         string elementType,
@@ -14,7 +14,10 @@ internal sealed class StylesTreeEntryViewModel : ViewModelBase
         int activeFrameCount,
         string classes,
         string pseudoClasses,
-        string sourceLocation)
+        string sourceLocation,
+        string? nodeId = null,
+        string? nodePath = null,
+        string? parentId = null)
     {
         SourceObject = sourceObject;
         Depth = depth;
@@ -25,9 +28,12 @@ internal sealed class StylesTreeEntryViewModel : ViewModelBase
         Classes = classes;
         PseudoClasses = pseudoClasses;
         SourceLocation = sourceLocation;
+        NodeId = nodeId;
+        NodePath = nodePath;
+        ParentId = parentId;
     }
 
-    public StyledElement SourceObject { get; }
+    public StyledElement? SourceObject { get; }
 
     public int Depth { get; }
 
@@ -44,6 +50,12 @@ internal sealed class StylesTreeEntryViewModel : ViewModelBase
     public string PseudoClasses { get; }
 
     public string SourceLocation { get; }
+
+    public string? NodeId { get; }
+
+    public string? NodePath { get; }
+
+    public string? ParentId { get; }
 
     public string ActiveSummary => ActiveFrameCount + "/" + FrameCount;
 

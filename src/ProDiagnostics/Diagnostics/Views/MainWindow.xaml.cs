@@ -367,6 +367,12 @@ namespace Avalonia.Diagnostics.Views
 
         private void InspectHoveredControl(TopLevel root, MainViewModel vm)
         {
+            if (vm.HasRemoteMutation)
+            {
+                _ = vm.InspectHoveredViaRemoteAsync();
+                return;
+            }
+
             Control? control = null;
 
             foreach (var popupRoot in GetPopupRoots(root))

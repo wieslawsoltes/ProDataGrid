@@ -3,7 +3,9 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Linq;
+using System.Threading.Tasks;
 using Avalonia.Collections;
+using Avalonia.Diagnostics.Remote;
 using Avalonia.Threading;
 using ProDiagnostics.Transport;
 
@@ -31,6 +33,7 @@ internal sealed class ProfilerPageViewModel : ViewModelBase, IDisposable
     private bool _isDisposed;
     private bool _isRemoteFlushScheduled;
     private bool _isRemoteStatusRefreshScheduled;
+    private bool _isApplyingRemoteSettings;
     private int _remotePort;
     private long _remotePacketCount;
     private long _droppedLocalPacketCount;
@@ -46,6 +49,7 @@ internal sealed class ProfilerPageViewModel : ViewModelBase, IDisposable
     private double _currentActivityDurationMs;
     private double _peakActivityDurationMs;
     private ProfilerSampleViewModel? _selectedSample;
+    private IRemoteMutationDiagnosticsDomainService? _remoteMutation;
 
     public ProfilerPageViewModel()
         : this(
@@ -158,8 +162,14 @@ internal sealed class ProfilerPageViewModel : ViewModelBase, IDisposable
             {
                 TrimToMaxSamples();
                 RaisePropertyChanged(nameof(SampleCount));
+                QueueRemoteProfilerSettingsUpdate();
             }
         }
+    }
+
+    internal void SetRemoteMutationSource(IRemoteMutationDiagnosticsDomainService? mutation)
+    {
+        _remoteMutation = mutation;
     }
 
     public bool IsSampling
@@ -235,20 +245,19 @@ internal sealed class ProfilerPageViewModel : ViewModelBase, IDisposable
 
     public void PauseOrResumeSampling()
     {
-        if (IsRemoteMode)
+        if (IsRemoteMode && _remoteMutation is null)
         {
             return;
         }
 
-        IsSampling = !IsSampling;
-        if (IsSampling)
+        var nextIsSampling = !IsSampling;
+        if (_remoteMutation is not null)
         {
-            _timer.Start();
+            _ = ApplyRemotePausedStateAsync(nextIsSampling);
+            return;
         }
-        else
-        {
-            _timer.Stop();
-        }
+
+        ApplySamplingState(nextIsSampling);
     }
 
     public void RefreshNow()
@@ -771,6 +780,89 @@ internal sealed class ProfilerPageViewModel : ViewModelBase, IDisposable
         }
 
         return port;
+    }
+
+    private void ApplySamplingState(bool isSampling)
+    {
+        IsSampling = isSampling;
+        if (IsRemoteMode)
+        {
+            return;
+        }
+
+        if (isSampling)
+        {
+            _timer.Start();
+        }
+        else
+        {
+            _timer.Stop();
+        }
+    }
+
+    private void QueueRemoteProfilerSettingsUpdate()
+    {
+        if (_remoteMutation is null || _isApplyingRemoteSettings)
+        {
+            return;
+        }
+
+        _ = ApplyRemoteProfilerSettingsAsync();
+    }
+
+    private async Task ApplyRemotePausedStateAsync(bool nextIsSampling)
+    {
+        var mutation = _remoteMutation;
+        if (mutation is null)
+        {
+            ApplySamplingState(nextIsSampling);
+            return;
+        }
+
+        try
+        {
+            _isApplyingRemoteSettings = true;
+            await mutation.SetProfilerPausedAsync(new RemoteSetPausedRequest
+            {
+                IsPaused = !nextIsSampling,
+            }).ConfigureAwait(false);
+
+            await Dispatcher.UIThread.InvokeAsync(() => ApplySamplingState(nextIsSampling));
+        }
+        catch
+        {
+            // Keep local behavior unchanged when remote profiler pause command fails.
+        }
+        finally
+        {
+            _isApplyingRemoteSettings = false;
+        }
+    }
+
+    private async Task ApplyRemoteProfilerSettingsAsync()
+    {
+        var mutation = _remoteMutation;
+        if (mutation is null)
+        {
+            return;
+        }
+
+        try
+        {
+            _isApplyingRemoteSettings = true;
+            await mutation.SetProfilerSettingsAsync(new RemoteSetProfilerSettingsRequest
+            {
+                MaxRetainedSamples = MaxSamples,
+            }).ConfigureAwait(false);
+        }
+        catch
+        {
+            // Keep local profiler settings active when remote update fails.
+        }
+        finally
+        {
+            _isApplyingRemoteSettings = false;
+        }
     }
 
     private readonly record struct RemoteSessionInfo(int ProcessId, string ProcessName, string AppName);

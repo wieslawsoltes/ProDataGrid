@@ -3,9 +3,11 @@ using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Collections.ObjectModel;
 using System.Linq;
+using System.Threading.Tasks;
 using Avalonia;
 using Avalonia.Collections;
 using Avalonia.Controls;
+using Avalonia.Diagnostics.Remote;
 using Avalonia.Diagnostics.Models;
 using Avalonia.Diagnostics.Services;
 using Avalonia.Input;
@@ -38,6 +40,9 @@ namespace Avalonia.Diagnostics.ViewModels
         private bool _includeUnhandledEvents = true;
         private int _maxRecordedEvents = 100;
         private bool _autoScrollToLatest = true;
+        private IRemoteMutationDiagnosticsDomainService? _remoteMutation;
+        private Func<AvaloniaObject?, (string Scope, string? NodePath, string? ControlName)>? _remoteTargetContextAccessor;
+        private bool _isApplyingRemoteMutations;
 
         public EventsPageViewModel(MainViewModel? mainViewModel, BreakpointService? breakpointService = null)
         {
@@ -162,9 +167,16 @@ namespace Avalonia.Diagnostics.ViewModels
 
         public void Clear()
         {
-            RecordedEvents.Clear();
-            SelectedEvent = null;
-            RefreshRecordedEvents();
+            if (_remoteMutation is null)
+            {
+                ClearRecordedEventsLocal();
+                return;
+            }
+
+            _ = InvokeRemoteMutationAsync(
+                mutation => mutation.ClearEventsAsync(),
+                onSuccess: ClearRecordedEventsLocal,
+                onFailure: ClearRecordedEventsLocal);
         }
 
         public bool SelectNextMatch()
@@ -213,12 +225,30 @@ namespace Avalonia.Diagnostics.ViewModels
 
         public void DisableAll()
         {
-            EvaluateNodeEnabled(_ => false);
+            if (_remoteMutation is null)
+            {
+                DisableAllLocal();
+                return;
+            }
+
+            _ = InvokeRemoteMutationAsync(
+                mutation => mutation.DisableAllEventsAsync(),
+                onSuccess: DisableAllLocal,
+                onFailure: DisableAllLocal);
         }
 
         public void EnableDefault()
         {
-            EvaluateNodeEnabled(node => _defaultEvents.Contains(node.Event));
+            if (_remoteMutation is null)
+            {
+                EnableDefaultLocal();
+                return;
+            }
+
+            _ = InvokeRemoteMutationAsync(
+                mutation => mutation.EnableDefaultEventsAsync(),
+                onSuccess: EnableDefaultLocal,
+                onFailure: EnableDefaultLocal);
         }
 
         public void SetOptions(DevToolsOptions options)
@@ -368,10 +398,34 @@ namespace Avalonia.Diagnostics.ViewModels
 
         public MainViewModel? MainView => _mainViewModel;
 
+        internal void SetRemoteMutationSource(
+            IRemoteMutationDiagnosticsDomainService? mutation,
+            Func<AvaloniaObject?, (string Scope, string? NodePath, string? ControlName)>? contextAccessor)
+        {
+            _remoteMutation = mutation;
+            _remoteTargetContextAccessor = contextAccessor;
+        }
+
         public void AddGlobalEventBreakpoint(object? parameter)
         {
             if (!TryGetEvent(parameter, out var routedEvent))
             {
+                return;
+            }
+
+            if (_remoteMutation is not null)
+            {
+                _ = InvokeRemoteMutationAsync(
+                    mutation => mutation.AddEventBreakpointAsync(
+                        new RemoteAddEventBreakpointRequest
+                        {
+                            Scope = "combined",
+                            EventName = routedEvent.Name,
+                            EventOwnerType = routedEvent.OwnerType.FullName ?? routedEvent.OwnerType.Name,
+                            IsGlobal = true,
+                        }),
+                    fallback: () => _breakpointService.AddEventBreakpoint(routedEvent, target: null, targetDescription: "(global)"));
+                _mainViewModel?.ShowBreakpoints();
                 return;
             }
 
@@ -387,6 +441,28 @@ namespace Avalonia.Diagnostics.ViewModels
             }
 
             var source = firedEvent.Source;
+            if (_remoteMutation is not null)
+            {
+                var context = ResolveRemoteTargetContext(source);
+                _ = InvokeRemoteMutationAsync(
+                    mutation => mutation.AddEventBreakpointAsync(
+                        new RemoteAddEventBreakpointRequest
+                        {
+                            Scope = context.Scope,
+                            NodePath = context.NodePath,
+                            ControlName = context.ControlName,
+                            EventName = firedEvent.Event.Name,
+                            EventOwnerType = firedEvent.Event.OwnerType.FullName ?? firedEvent.Event.OwnerType.Name,
+                            IsGlobal = false,
+                        }),
+                    fallback: () => _breakpointService.AddEventBreakpoint(
+                        firedEvent.Event,
+                        source,
+                        source != null ? DescribeTarget(source) : "(source unavailable)"));
+                _mainViewModel?.ShowBreakpoints();
+                return;
+            }
+
             _breakpointService.AddEventBreakpoint(
                 firedEvent.Event,
                 source,
@@ -406,8 +482,68 @@ namespace Avalonia.Diagnostics.ViewModels
                 return;
             }
 
+            if (_remoteMutation is not null)
+            {
+                var context = ResolveRemoteTargetContext(target);
+                _ = InvokeRemoteMutationAsync(
+                    mutation => mutation.AddEventBreakpointAsync(
+                        new RemoteAddEventBreakpointRequest
+                        {
+                            Scope = context.Scope,
+                            NodePath = context.NodePath,
+                            ControlName = context.ControlName,
+                            EventName = routedEvent.Name,
+                            EventOwnerType = routedEvent.OwnerType.FullName ?? routedEvent.OwnerType.Name,
+                            IsGlobal = false,
+                        }),
+                    fallback: () => _breakpointService.AddEventBreakpoint(routedEvent, target, DescribeTarget(target)));
+                _mainViewModel?.ShowBreakpoints();
+                return;
+            }
+
             _breakpointService.AddEventBreakpoint(routedEvent, target, DescribeTarget(target));
             _mainViewModel?.ShowBreakpoints();
+        }
+
+        internal void NotifyEventNodeIsEnabledChanged(EventTreeNode eventNode, bool isEnabled)
+        {
+            if (_remoteMutation is null || _isApplyingRemoteMutations)
+            {
+                return;
+            }
+
+            _ = InvokeRemoteMutationAsync(
+                mutation => mutation.SetEventEnabledAsync(
+                    new RemoteSetEventEnabledRequest
+                    {
+                        EventId = string.Empty,
+                        EventName = eventNode.Event.Name,
+                        EventOwnerType = eventNode.Event.OwnerType.FullName ?? eventNode.Event.OwnerType.Name,
+                        IsEnabled = isEnabled,
+                    }),
+                fallback: () => { });
+        }
+
+        internal void SetEventEnabledLocal(EventTreeNode eventNode, bool isEnabled)
+        {
+            RunWithoutRemoteMutations(() => eventNode.IsEnabled = isEnabled);
+        }
+
+        internal void EnableDefaultLocal()
+        {
+            RunWithoutRemoteMutations(() => EvaluateNodeEnabled(node => _defaultEvents.Contains(node.Event)));
+        }
+
+        internal void DisableAllLocal()
+        {
+            RunWithoutRemoteMutations(() => EvaluateNodeEnabled(_ => false));
+        }
+
+        internal void ClearRecordedEventsLocal()
+        {
+            RecordedEvents.Clear();
+            SelectedEvent = null;
+            RefreshRecordedEvents();
         }
 
         public void Dispose()
@@ -542,6 +678,70 @@ namespace Avalonia.Diagnostics.ViewModels
             }
 
             return target.GetType().Name;
+        }
+
+        private (string Scope, string? NodePath, string? ControlName) ResolveRemoteTargetContext(AvaloniaObject? target)
+        {
+            if (_remoteTargetContextAccessor is not null)
+            {
+                return _remoteTargetContextAccessor(target);
+            }
+
+            if (_mainViewModel is not null)
+            {
+                return _mainViewModel.GetRemoteTargetContext(target);
+            }
+
+            return ("combined", null, (target as INamed)?.Name);
+        }
+
+        private async Task InvokeRemoteMutationAsync(
+            Func<IRemoteMutationDiagnosticsDomainService, ValueTask<RemoteMutationResult>> action,
+            Action? onSuccess,
+            Action? onFailure)
+        {
+            var mutation = _remoteMutation;
+            if (mutation is null)
+            {
+                onFailure?.Invoke();
+                return;
+            }
+
+            try
+            {
+                await action(mutation).ConfigureAwait(false);
+                onSuccess?.Invoke();
+            }
+            catch
+            {
+                onFailure?.Invoke();
+            }
+        }
+
+        private Task InvokeRemoteMutationAsync(
+            Func<IRemoteMutationDiagnosticsDomainService, ValueTask<RemoteMutationResult>> action,
+            Action fallback)
+        {
+            return InvokeRemoteMutationAsync(action, onSuccess: null, onFailure: fallback);
+        }
+
+        private void RunWithoutRemoteMutations(Action action)
+        {
+            if (action is null)
+            {
+                return;
+            }
+
+            var wasApplying = _isApplyingRemoteMutations;
+            _isApplyingRemoteMutations = true;
+            try
+            {
+                action();
+            }
+            finally
+            {
+                _isApplyingRemoteMutations = wasApplying;
+            }
         }
 
         private bool NavigateSelection(bool forward)

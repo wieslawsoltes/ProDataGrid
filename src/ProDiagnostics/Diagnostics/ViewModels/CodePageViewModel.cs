@@ -1,8 +1,12 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
+using System.Threading.Tasks;
 using System.Windows.Input;
+using Avalonia.Diagnostics.Remote;
 using Avalonia.Diagnostics.Services;
+using Avalonia.Threading;
 
 namespace Avalonia.Diagnostics.ViewModels;
 
@@ -33,6 +37,9 @@ internal sealed class CodePageViewModel : ViewModelBase
     private string? _lastPublishedPath;
     private int _lastPublishedLine;
     private int _lastPublishedColumn;
+    private IRemoteReadOnlyDiagnosticsDomainService? _remoteReadOnly;
+    private Func<(string Scope, string? NodePath, string? ControlName)>? _remoteContextAccessor;
+    private long _remoteRefreshVersion;
 
     public CodePageViewModel(
         Func<AvaloniaObject?>? selectedObjectAccessor = null,
@@ -177,6 +184,12 @@ internal sealed class CodePageViewModel : ViewModelBase
 
     public void InspectControl(AvaloniaObject? target, string? preferredSourceText = null)
     {
+        if (_remoteReadOnly is not null)
+        {
+            _ = RefreshFromRemoteAsync(preferredSourceText);
+            return;
+        }
+
         _inspectedObject = target;
         if (target is null)
         {
@@ -212,7 +225,26 @@ internal sealed class CodePageViewModel : ViewModelBase
 
     public void Refresh()
     {
+        if (_remoteReadOnly is not null)
+        {
+            _ = RefreshFromRemoteAsync(preferredSourceText: null);
+            return;
+        }
+
         InspectControl(_inspectedObject);
+    }
+
+    internal void SetRemoteReadOnlySource(
+        IRemoteReadOnlyDiagnosticsDomainService? readOnly,
+        Func<(string Scope, string? NodePath, string? ControlName)>? contextAccessor,
+        bool refreshNow = true)
+    {
+        _remoteReadOnly = readOnly;
+        _remoteContextAccessor = contextAccessor;
+        if (refreshNow)
+        {
+            _ = RefreshFromRemoteAsync(preferredSourceText: null);
+        }
     }
 
     private void ApplyDocument(DocumentKind kind, SourceDocumentLocation? location)
@@ -493,5 +525,143 @@ internal sealed class CodePageViewModel : ViewModelBase
     {
         Xaml,
         Code
+    }
+
+    private async Task RefreshFromRemoteAsync(string? preferredSourceText)
+    {
+        var readOnly = _remoteReadOnly;
+        if (readOnly is null)
+        {
+            return;
+        }
+
+        var context = _remoteContextAccessor?.Invoke() ?? (Scope: "combined", NodePath: (string?)null, ControlName: (string?)null);
+        var version = System.Threading.Interlocked.Increment(ref _remoteRefreshVersion);
+        try
+        {
+            var snapshot = await readOnly.GetCodeDocumentsSnapshotAsync(
+                new RemoteCodeDocumentsRequest
+                {
+                    Scope = context.Scope,
+                    NodePath = context.NodePath,
+                    ControlName = context.ControlName,
+                }).ConfigureAwait(false);
+
+            await Dispatcher.UIThread.InvokeAsync(() =>
+            {
+                if (version != _remoteRefreshVersion)
+                {
+                    return;
+                }
+
+                ApplyRemoteSnapshot(snapshot, preferredSourceText);
+            });
+        }
+        catch (Exception ex)
+        {
+            await Dispatcher.UIThread.InvokeAsync(() =>
+            {
+                if (version != _remoteRefreshVersion)
+                {
+                    return;
+                }
+
+                ClearDocuments("Remote source failed: " + ex.Message);
+            });
+        }
+    }
+
+    private void ApplyRemoteSnapshot(RemoteCodeDocumentsSnapshot snapshot, string? preferredSourceText)
+    {
+        InspectedElement = string.IsNullOrWhiteSpace(snapshot.Target) ? "(none)" : snapshot.Target;
+        InspectedElementType = snapshot.TargetType ?? string.Empty;
+
+        var xamlDocument = snapshot.Documents.FirstOrDefault(static x => string.Equals(x.Kind, "xaml", StringComparison.OrdinalIgnoreCase));
+        var codeDocument = snapshot.Documents.FirstOrDefault(static x => string.Equals(x.Kind, "code", StringComparison.OrdinalIgnoreCase));
+
+        ApplyRemoteDocument(DocumentKind.Xaml, xamlDocument);
+        ApplyRemoteDocument(DocumentKind.Code, codeDocument);
+
+        var preferredLocation = SourceLocationTextParser.TryParse(preferredSourceText, out var parsedPreferred)
+            ? parsedPreferred
+            : null;
+        var selectedLocation = ResolvePreferredRemoteLocation(xamlDocument, codeDocument, preferredLocation);
+        if (selectedLocation is not null)
+        {
+            SelectDocumentByLocation(selectedLocation);
+        }
+
+        Status = string.IsNullOrWhiteSpace(snapshot.Status)
+            ? (selectedLocation is not null ? "Remote source synchronized with selection." : "Remote source loaded.")
+            : snapshot.Status;
+    }
+
+    private void ApplyRemoteDocument(DocumentKind kind, RemoteCodeDocumentSnapshot? document)
+    {
+        if (document is null || string.IsNullOrWhiteSpace(document.FilePath))
+        {
+            SetDocumentState(kind, string.Empty, string.Empty, string.Empty, new[] { 0 });
+            return;
+        }
+
+        var locationText = string.IsNullOrWhiteSpace(document.LocationText)
+            ? new SourceDocumentLocation(
+                document.FilePath,
+                Math.Max(1, document.Line),
+                document.MethodName,
+                Math.Max(1, document.Column)).DisplayText
+            : document.LocationText;
+
+        var text = document.Text ?? string.Empty;
+        SetDocumentState(kind, document.FilePath, locationText, text, BuildLineStarts(text));
+    }
+
+    private static SourceDocumentLocation? ResolvePreferredRemoteLocation(
+        RemoteCodeDocumentSnapshot? xamlDocument,
+        RemoteCodeDocumentSnapshot? codeDocument,
+        SourceDocumentLocation? preferredLocation)
+    {
+        if (preferredLocation is not null)
+        {
+            if (xamlDocument is not null &&
+                SourceLocationTextParser.IsSameDocument(preferredLocation.FilePath, xamlDocument.FilePath))
+            {
+                return new SourceDocumentLocation(
+                    xamlDocument.FilePath,
+                    preferredLocation.Line,
+                    xamlDocument.MethodName,
+                    preferredLocation.Column);
+            }
+
+            if (codeDocument is not null &&
+                SourceLocationTextParser.IsSameDocument(preferredLocation.FilePath, codeDocument.FilePath))
+            {
+                return new SourceDocumentLocation(
+                    codeDocument.FilePath,
+                    preferredLocation.Line,
+                    codeDocument.MethodName,
+                    preferredLocation.Column);
+            }
+        }
+
+        if (xamlDocument is not null)
+        {
+            return new SourceDocumentLocation(
+                xamlDocument.FilePath,
+                Math.Max(1, xamlDocument.Line),
+                xamlDocument.MethodName,
+                Math.Max(1, xamlDocument.Column));
+        }
+
+        if (codeDocument is not null)
+        {
+            return new SourceDocumentLocation(
+                codeDocument.FilePath,
+                Math.Max(1, codeDocument.Line),
+                codeDocument.MethodName,
+                Math.Max(1, codeDocument.Column));
+        }
+
+        return null;
     }
 }

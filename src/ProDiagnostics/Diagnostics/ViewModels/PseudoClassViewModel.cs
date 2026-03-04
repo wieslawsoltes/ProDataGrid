@@ -1,4 +1,5 @@
 ﻿using Avalonia.Controls;
+using System;
 
 namespace Avalonia.Diagnostics.ViewModels
 {
@@ -6,14 +7,16 @@ namespace Avalonia.Diagnostics.ViewModels
     {
         private readonly IPseudoClasses _pseudoClasses;
         private readonly StyledElement _source;
+        private readonly Action<string, bool>? _setStateOverride;
         private bool _isActive;
         private bool _isUpdating;
 
-        public PseudoClassViewModel(string name, StyledElement source)
+        public PseudoClassViewModel(string name, StyledElement source, Action<string, bool>? setStateOverride = null)
         {
             Name = name;
             _source = source;
             _pseudoClasses = _source.Classes;
+            _setStateOverride = setStateOverride;
 
             Update();
         }
@@ -29,7 +32,14 @@ namespace Avalonia.Diagnostics.ViewModels
 
                 if (!_isUpdating)
                 {
-                    _pseudoClasses.Set(Name, value);
+                    if (_setStateOverride is null)
+                    {
+                        _pseudoClasses.Set(Name, value);
+                    }
+                    else
+                    {
+                        _setStateOverride(Name, value);
+                    }
                 }
             }
         }

@@ -832,7 +832,7 @@ internal sealed class Elements3DExplodedView : Control
 
     private static Color ResolveNodeColor(Elements3DNodeViewModel node)
     {
-        if (TryResolveVisualColor(node.Visual, out var visualColor))
+        if (node.Visual is not null && TryResolveVisualColor(node.Visual, out var visualColor))
         {
             return ApplyNodeOpacity(visualColor, node.IsVisible, node.Opacity);
         }

@@ -13,6 +13,21 @@ internal sealed class Elements3DNodeViewModel
         bool isVisible,
         double opacity,
         Visual visual)
+        : this(depth, node, zIndex, boundsRect, isVisible, opacity, visual, nodeId: null, nodePath: null, isRendered: true)
+    {
+    }
+
+    public Elements3DNodeViewModel(
+        int depth,
+        string node,
+        int zIndex,
+        Rect boundsRect,
+        bool isVisible,
+        double opacity,
+        Visual? visual,
+        string? nodeId,
+        string? nodePath,
+        bool isRendered)
     {
         Depth = depth;
         Node = node;
@@ -22,6 +37,9 @@ internal sealed class Elements3DNodeViewModel
         IsVisible = isVisible;
         Opacity = opacity;
         Visual = visual;
+        NodeId = nodeId;
+        NodePath = nodePath;
+        IsRendered = isRendered;
     }
 
     public int Depth { get; }
@@ -38,5 +56,11 @@ internal sealed class Elements3DNodeViewModel
 
     public double Opacity { get; }
 
-    internal Visual Visual { get; }
+    public bool IsRendered { get; }
+
+    public string? NodeId { get; }
+
+    public string? NodePath { get; }
+
+    internal Visual? Visual { get; }
 }

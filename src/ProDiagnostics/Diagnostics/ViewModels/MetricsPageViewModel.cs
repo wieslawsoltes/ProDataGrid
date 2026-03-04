@@ -3,7 +3,9 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Globalization;
 using System.Linq;
+using System.Threading.Tasks;
 using Avalonia.Collections;
+using Avalonia.Diagnostics.Remote;
 using Avalonia.Diagnostics.Services;
 using Avalonia.Threading;
 using ProDiagnostics.Transport;
@@ -39,6 +41,7 @@ internal sealed class MetricsPageViewModel : ViewModelBase, IDisposable
     private bool _isUpdatesPaused;
     private bool _isFlushScheduled;
     private bool _isRemoteStatusRefreshScheduled;
+    private bool _isApplyingRemoteSettings;
     private bool _isDisposed;
     private long _totalMeasurements;
     private long _remotePacketCount;
@@ -48,6 +51,7 @@ internal sealed class MetricsPageViewModel : ViewModelBase, IDisposable
     private long _droppedSessionCount;
     private string _remoteStatusText = "Remote metrics listener is stopped.";
     private MetricSeriesViewModel? _selectedSeries;
+    private IRemoteMutationDiagnosticsDomainService? _remoteMutation;
 
     public MetricsPageViewModel()
         : this(
@@ -206,6 +210,7 @@ internal sealed class MetricsPageViewModel : ViewModelBase, IDisposable
             {
                 TrimToMaxSeries();
                 RefreshSeries();
+                QueueRemoteMetricsSettingsUpdate();
             }
         }
     }
@@ -219,8 +224,14 @@ internal sealed class MetricsPageViewModel : ViewModelBase, IDisposable
             if (RaiseAndSetIfChanged(ref _maxSamplesPerSeries, clamped))
             {
                 RefreshSeries();
+                QueueRemoteMetricsSettingsUpdate();
             }
         }
+    }
+
+    internal void SetRemoteMutationSource(IRemoteMutationDiagnosticsDomainService? mutation)
+    {
+        _remoteMutation = mutation;
     }
 
     public bool ShowCounters
@@ -379,8 +390,20 @@ internal sealed class MetricsPageViewModel : ViewModelBase, IDisposable
 
     public void PauseOrResumeUpdates()
     {
-        IsUpdatesPaused = !IsUpdatesPaused;
-        if (!IsUpdatesPaused && !_isDisposed && _pendingMeasurements.Count > 0 && !_isFlushScheduled)
+        var nextPaused = !IsUpdatesPaused;
+        if (_remoteMutation is not null)
+        {
+            _ = ApplyRemotePausedStateAsync(nextPaused);
+            return;
+        }
+
+        ApplyPausedState(nextPaused);
+    }
+
+    private void ApplyPausedState(bool isPaused)
+    {
+        IsUpdatesPaused = isPaused;
+        if (!isPaused && !_isDisposed && _pendingMeasurements.Count > 0 && !_isFlushScheduled)
         {
             _isFlushScheduled = true;
             Dispatcher.UIThread.Post(FlushPendingMeasurements, DispatcherPriority.Background);
@@ -518,6 +541,11 @@ internal sealed class MetricsPageViewModel : ViewModelBase, IDisposable
         }
 
         _pendingMeasurements.Enqueue(measurement);
+        if (IsUpdatesPaused)
+        {
+            return;
+        }
+
         if (_isFlushScheduled)
         {
             return;
@@ -869,6 +897,72 @@ internal sealed class MetricsPageViewModel : ViewModelBase, IDisposable
         }
 
         return defaultValue;
+    }
+
+    private void QueueRemoteMetricsSettingsUpdate()
+    {
+        if (_remoteMutation is null || _isApplyingRemoteSettings)
+        {
+            return;
+        }
+
+        _ = ApplyRemoteMetricsSettingsAsync();
+    }
+
+    private async Task ApplyRemotePausedStateAsync(bool isPaused)
+    {
+        var mutation = _remoteMutation;
+        if (mutation is null)
+        {
+            ApplyPausedState(isPaused);
+            return;
+        }
+
+        try
+        {
+            _isApplyingRemoteSettings = true;
+            await mutation.SetMetricsPausedAsync(new RemoteSetPausedRequest
+            {
+                IsPaused = isPaused,
+            }).ConfigureAwait(false);
+
+            await Dispatcher.UIThread.InvokeAsync(() => ApplyPausedState(isPaused));
+        }
+        catch
+        {
+            // Keep local behavior unchanged when remote pause command fails.
+        }
+        finally
+        {
+            _isApplyingRemoteSettings = false;
+        }
+    }
+
+    private async Task ApplyRemoteMetricsSettingsAsync()
+    {
+        var mutation = _remoteMutation;
+        if (mutation is null)
+        {
+            return;
+        }
+
+        try
+        {
+            _isApplyingRemoteSettings = true;
+            await mutation.SetMetricsSettingsAsync(new RemoteSetMetricsSettingsRequest
+            {
+                MaxSeries = MaxSeries,
+                MaxSamplesPerSeries = MaxSamplesPerSeries,
+            }).ConfigureAwait(false);
+        }
+        catch
+        {
+            // Keep local metrics settings active when remote settings update fails.
+        }
+        finally
+        {
+            _isApplyingRemoteSettings = false;
+        }
     }
 
     private readonly record struct RemoteSessionInfo(int ProcessId, string ProcessName, string AppName);

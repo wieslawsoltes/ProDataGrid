@@ -35,6 +35,8 @@ internal sealed class BreakpointEntry : INotifyPropertyChanged
 
     public event PropertyChangedEventHandler? PropertyChanged;
 
+    public string Id { get; } = Guid.NewGuid().ToString("N");
+
     public BreakpointKind Kind { get; }
 
     public string Name { get; }

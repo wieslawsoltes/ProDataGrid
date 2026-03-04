@@ -3,10 +3,13 @@ using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 using Avalonia;
 using Avalonia.Collections;
 using Avalonia.Controls;
 using Avalonia.Diagnostics.Controls;
+using Avalonia.Diagnostics.Remote;
 using Avalonia.LogicalTree;
 using Avalonia.VisualTree;
 
@@ -50,6 +53,10 @@ internal sealed class Elements3DPageViewModel : ViewModelBase
     private int _maxVisibleDepth = int.MaxValue;
     private int _maxVisibleElements;
     private HashSet<Elements3DNodeViewModel>? _limitedVisibleNodes;
+    private IRemoteReadOnlyDiagnosticsDomainService? _remoteReadOnly;
+    private Func<(string Scope, string? NodePath, string? ControlName)>? _remoteContextAccessor;
+    private long _remoteRefreshVersion;
+    private bool _isApplyingRemoteSnapshot;
 
     public Elements3DPageViewModel(AvaloniaObject root, Func<AvaloniaObject?>? selectedObjectAccessor)
     {
@@ -86,6 +93,14 @@ internal sealed class Elements3DPageViewModel : ViewModelBase
     public int NodeCount => _nodes.Count;
 
     public int VisibleNodeCount => _visibleNodes.Count;
+
+    internal Visual? MainRootVisual => _mainRootVisual;
+
+    internal Visual? CurrentRootVisual => _currentRootVisual;
+
+    internal Visual? ScopedSelectionVisual => _scopedSelectionVisual;
+
+    internal bool IsScopedToSelectionBranch => _isScopedToSelectionBranch;
 
     public string InspectedRoot
     {
@@ -272,16 +287,34 @@ internal sealed class Elements3DPageViewModel : ViewModelBase
 
     public void InspectSelection()
     {
+        if (_remoteReadOnly is not null)
+        {
+            _ = RefreshFromRemoteAsync();
+            return;
+        }
+
         InspectControl(_selectedObjectAccessor?.Invoke());
     }
 
     public void InspectRoot()
     {
+        if (_remoteReadOnly is not null)
+        {
+            _ = RefreshFromRemoteAsync();
+            return;
+        }
+
         BuildFrom(_root, preferTopLevelRoot: true, trackAsMainRoot: true);
     }
 
     internal void InspectControl(AvaloniaObject? target)
     {
+        if (_remoteReadOnly is not null)
+        {
+            _ = RefreshFromRemoteAsync();
+            return;
+        }
+
         if (target is Visual selectedVisual)
         {
             BuildSelectionScope(selectedVisual);
@@ -293,6 +326,12 @@ internal sealed class Elements3DPageViewModel : ViewModelBase
 
     public void ScopeSelectedNodeAsRoot()
     {
+        if (_remoteReadOnly is not null)
+        {
+            _ = RefreshFromRemoteAsync();
+            return;
+        }
+
         if (SelectedNode?.Visual is not Visual selected)
         {
             return;
@@ -303,6 +342,12 @@ internal sealed class Elements3DPageViewModel : ViewModelBase
 
     public void ResetToMainRoot()
     {
+        if (_remoteReadOnly is not null)
+        {
+            _ = RefreshFromRemoteAsync();
+            return;
+        }
+
         if (_mainRootVisual is null)
         {
             return;
@@ -318,6 +363,12 @@ internal sealed class Elements3DPageViewModel : ViewModelBase
 
     public void Refresh()
     {
+        if (_remoteReadOnly is not null && !_isApplyingRemoteSnapshot)
+        {
+            _ = RefreshFromRemoteAsync();
+            return;
+        }
+
         RebuildLimitedVisibleNodeSet();
         _allNodesView.Refresh();
         _nodesView.Refresh();
@@ -344,12 +395,129 @@ internal sealed class Elements3DPageViewModel : ViewModelBase
 
     public void ResetLayerVisibilityFilters()
     {
+        if (_remoteReadOnly is not null)
+        {
+            _ = RefreshFromRemoteAsync();
+            return;
+        }
+
         var minChanged = RaiseAndSetIfChanged(ref _minVisibleDepth, AvailableMinDepth);
         var maxChanged = RaiseAndSetIfChanged(ref _maxVisibleDepth, AvailableMaxDepth);
         var countChanged = RaiseAndSetIfChanged(ref _maxVisibleElements, 0);
         if (minChanged || maxChanged || countChanged)
         {
             Refresh();
+        }
+    }
+
+    internal void SetRemoteReadOnlySource(
+        IRemoteReadOnlyDiagnosticsDomainService? readOnly,
+        Func<(string Scope, string? NodePath, string? ControlName)>? contextAccessor,
+        bool refreshNow = true)
+    {
+        _remoteReadOnly = readOnly;
+        _remoteContextAccessor = contextAccessor;
+        if (refreshNow)
+        {
+            _ = RefreshFromRemoteAsync();
+        }
+    }
+
+    private async Task RefreshFromRemoteAsync()
+    {
+        var readOnly = _remoteReadOnly;
+        if (readOnly is null)
+        {
+            return;
+        }
+
+        var refreshVersion = Interlocked.Increment(ref _remoteRefreshVersion);
+        try
+        {
+            var snapshot = await readOnly.GetElements3DSnapshotAsync(
+                new RemoteElements3DSnapshotRequest
+                {
+                    IncludeNodes = true,
+                    IncludeVisibleNodeIds = true
+                }).ConfigureAwait(false);
+
+            await Avalonia.Threading.Dispatcher.UIThread.InvokeAsync(() =>
+            {
+                if (refreshVersion != _remoteRefreshVersion)
+                {
+                    return;
+                }
+
+                ApplyRemoteSnapshot(snapshot);
+            });
+        }
+        catch
+        {
+            // Keep previous state on remote read failures.
+        }
+    }
+
+    private void ApplyRemoteSnapshot(RemoteElements3DSnapshot snapshot)
+    {
+        _isApplyingRemoteSnapshot = true;
+        try
+        {
+            _mainRootVisual = null;
+            _currentRootVisual = null;
+            _scopedSelectionVisual = null;
+            _isScopedToSelectionBranch = snapshot.IsScopedToSelectionBranch;
+            RaiseAndSetIfChanged(ref _showInvisibleNodes, snapshot.ShowInvisibleNodes, nameof(ShowInvisibleNodes));
+            RaiseAndSetIfChanged(ref _showExploded3DView, snapshot.ShowExploded3DView, nameof(ShowExploded3DView));
+            if (RaiseAndSetIfChanged(ref _showAllLayersInGrid, snapshot.ShowAllLayersInGrid, nameof(ShowAllLayersInGrid)))
+            {
+                RaisePropertyChanged(nameof(GridNodesView));
+            }
+            RaiseAndSetIfChanged(ref _depthSpacing, snapshot.DepthSpacing, nameof(DepthSpacing));
+            RaiseAndSetIfChanged(ref _flat2DMaxLayersPerRow, snapshot.Flat2DMaxLayersPerRow, nameof(Flat2DMaxLayersPerRow));
+            RaiseAndSetIfChanged(ref _tilt, snapshot.Tilt, nameof(Tilt));
+            RaiseAndSetIfChanged(ref _zoom, snapshot.Zoom, nameof(Zoom));
+            RaiseAndSetIfChanged(ref _orbitYaw, snapshot.OrbitYaw, nameof(OrbitYaw));
+            RaiseAndSetIfChanged(ref _orbitPitch, snapshot.OrbitPitch, nameof(OrbitPitch));
+            RaiseAndSetIfChanged(ref _orbitRoll, snapshot.OrbitRoll, nameof(OrbitRoll));
+            RaiseAndSetIfChanged(ref _availableMinDepth, snapshot.AvailableMinDepth, nameof(AvailableMinDepth));
+            RaiseAndSetIfChanged(ref _availableMaxDepth, snapshot.AvailableMaxDepth, nameof(AvailableMaxDepth));
+            RaiseAndSetIfChanged(ref _minVisibleDepth, snapshot.MinVisibleDepth, nameof(MinVisibleDepth));
+            RaiseAndSetIfChanged(ref _maxVisibleDepth, snapshot.MaxVisibleDepth, nameof(MaxVisibleDepth));
+            RaiseAndSetIfChanged(ref _maxVisibleElements, snapshot.MaxVisibleElements, nameof(MaxVisibleElements));
+            InspectedRoot = string.IsNullOrWhiteSpace(snapshot.InspectedRoot) ? "(none)" : snapshot.InspectedRoot;
+
+            _nodes.Clear();
+            Elements3DNodeViewModel? selected = null;
+            for (var i = 0; i < snapshot.Nodes.Count; i++)
+            {
+                var node = snapshot.Nodes[i];
+                var bounds = new Rect(node.Bounds.X, node.Bounds.Y, node.Bounds.Width, node.Bounds.Height);
+                var nodeViewModel = new Elements3DNodeViewModel(
+                    depth: node.Depth,
+                    node: node.Node,
+                    zIndex: node.ZIndex,
+                    boundsRect: bounds,
+                    isVisible: node.IsVisible,
+                    opacity: node.Opacity,
+                    visual: null,
+                    nodeId: node.NodeId,
+                    nodePath: node.NodePath,
+                    isRendered: node.IsRendered);
+                _nodes.Add(nodeViewModel);
+
+                if (string.Equals(node.NodeId, snapshot.SelectedNodeId, StringComparison.Ordinal))
+                {
+                    selected = nodeViewModel;
+                }
+            }
+
+            SelectedNode = selected ?? (_nodes.Count > 0 ? _nodes[0] : null);
+            Refresh();
+            RaiseRootScopeStateChanged();
+        }
+        finally
+        {
+            _isApplyingRemoteSnapshot = false;
         }
     }
 

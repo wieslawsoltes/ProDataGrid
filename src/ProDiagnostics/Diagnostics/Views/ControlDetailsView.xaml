@@ -145,7 +145,7 @@
               </DataTemplate>
             </DataGridTemplateColumn.CellTemplate>
           </DataGridTemplateColumn>
-          <DataGridTextColumn Header="Type" Binding="{Binding Type}"
+          <DataGridTextColumn Header="Type" Binding="{Binding DisplayType}"
                               IsReadOnly="True"
                               IsVisible="{Binding !$parent[UserControl;2].((vm:MainViewModel)DataContext).ShowDetailsPropertyType}"
                               x:DataType="vm:PropertyViewModel"

@@ -10,7 +10,8 @@ namespace Avalonia
     public static class DevToolsExtensions
     {
         /// <summary>
-        /// Attaches DevTools to a window, to be opened with the F12 key.
+        /// Attaches DevTools to a window, to be opened with the F12 key for in-process mode
+        /// and F11 for remote-enabled mode.
         /// </summary>
         /// <param name="root">The window to attach DevTools to.</param>
         public static void AttachDevTools(this TopLevel root)

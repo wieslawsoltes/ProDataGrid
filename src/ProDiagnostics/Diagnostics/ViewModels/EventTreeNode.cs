@@ -34,6 +34,10 @@ namespace Avalonia.Diagnostics.ViewModels
                 {
                     base.IsEnabled = value;
                     UpdateTracker();
+                    if (value is bool isEnabled)
+                    {
+                        _parentViewModel.NotifyEventNodeIsEnabledChanged(this, isEnabled);
+                    }
                     if (Parent != null && _updateParent)
                     {
                         try

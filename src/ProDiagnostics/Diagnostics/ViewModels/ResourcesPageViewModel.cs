@@ -2,9 +2,12 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Reflection;
+using System.Threading;
+using System.Threading.Tasks;
 using Avalonia.Collections;
 using Avalonia.Controls;
 using Avalonia.Controls.DataGridHierarchical;
+using Avalonia.Diagnostics.Remote;
 using Avalonia.Diagnostics.Services;
 using Avalonia.Reactive;
 using Avalonia.Styling;
@@ -28,6 +31,10 @@ namespace Avalonia.Diagnostics.ViewModels
         private bool _includeNested = true;
         private ResourceSortMode _sortMode = ResourceSortMode.Key;
         private ListSortDirection _sortDirection = ListSortDirection.Ascending;
+        private IRemoteReadOnlyDiagnosticsDomainService? _remoteReadOnly;
+        private long _remoteRefreshVersion;
+        private List<RemoteResourceEntrySnapshot> _remoteEntries = new();
+        private List<RemoteResourceNodeSnapshot> _remoteNodes = new();
 
         public ResourcesPageViewModel(
             MainViewModel mainView,
@@ -102,12 +109,15 @@ namespace Avalonia.Diagnostics.ViewModels
                     }
 
                     SelectedScopePath = value != null ? BuildScopePath(value) : string.Empty;
-                    Details = value != null
+                    Details = _remoteReadOnly is null && value != null
                         ? new ResourceDetailsViewModel(value, MainView.ShowImplementedInterfaces, showProperties: false)
                         : null;
                     SelectedResource = null;
                     RefreshResources();
-                    SubscribeToResourcesChanged(value);
+                    if (_remoteReadOnly is null)
+                    {
+                        SubscribeToResourcesChanged(value);
+                    }
                     RaisePropertyChanged(nameof(HasSelectedNode));
                     RaisePropertyChanged(nameof(ShowNoSelectionMessage));
                     RaisePropertyChanged(nameof(ShowNoResourcesMessage));
@@ -246,6 +256,12 @@ namespace Avalonia.Diagnostics.ViewModels
 
         private void RefreshResources()
         {
+            if (_remoteReadOnly is not null)
+            {
+                _ = RefreshRemoteResourcesAsync();
+                return;
+            }
+
             _resourceEntries.Clear();
 
             if (_selectedNode == null)
@@ -279,7 +295,27 @@ namespace Avalonia.Diagnostics.ViewModels
 
         public void UpdateDetailsView()
         {
+            if (_remoteReadOnly is not null)
+            {
+                return;
+            }
+
             Details?.UpdatePropertiesView(MainView.ShowImplementedInterfaces);
+        }
+
+        public void Refresh()
+        {
+            RefreshResources();
+        }
+
+        internal void SetRemoteReadOnlySource(IRemoteReadOnlyDiagnosticsDomainService? readOnly, bool refreshNow = true)
+        {
+            _remoteReadOnly = readOnly;
+            Details = null;
+            if (refreshNow)
+            {
+                _ = RefreshRemoteResourcesAsync();
+            }
         }
 
         private void CollectEntries(ResourceTreeNode node, bool includeNested, List<ResourceEntryViewModel> entries)
@@ -697,6 +733,213 @@ namespace Avalonia.Diagnostics.ViewModels
             }
 
             return sourceValue as string;
+        }
+
+        private async Task RefreshRemoteResourcesAsync()
+        {
+            var readOnly = _remoteReadOnly;
+            if (readOnly is null)
+            {
+                return;
+            }
+
+            var refreshVersion = Interlocked.Increment(ref _remoteRefreshVersion);
+            try
+            {
+                var snapshot = await readOnly.GetResourcesSnapshotAsync(
+                    new RemoteResourcesSnapshotRequest
+                    {
+                        IncludeEntries = true
+                    }).ConfigureAwait(false);
+
+                await Avalonia.Threading.Dispatcher.UIThread.InvokeAsync(() =>
+                {
+                    if (refreshVersion != _remoteRefreshVersion)
+                    {
+                        return;
+                    }
+
+                    _remoteEntries = new List<RemoteResourceEntrySnapshot>(snapshot.Entries);
+                    _remoteNodes = new List<RemoteResourceNodeSnapshot>(snapshot.Nodes);
+                    ApplyRemoteResources();
+                });
+            }
+            catch
+            {
+                // Keep previous state on remote read failures.
+            }
+        }
+
+        private void ApplyRemoteResources()
+        {
+            _resourceEntries.Clear();
+
+            if (_selectedNode is null)
+            {
+                _resourcesView.Refresh();
+                UpdateResourceCount();
+                return;
+            }
+
+            var selectedPath = GetSelectedNodePath();
+            if (string.IsNullOrWhiteSpace(selectedPath))
+            {
+                _resourcesView.Refresh();
+                UpdateResourceCount();
+                return;
+            }
+
+            for (var i = 0; i < _remoteEntries.Count; i++)
+            {
+                var entry = _remoteEntries[i];
+                if (!ShouldIncludeRemoteEntry(entry.NodePath, selectedPath, IncludeNested))
+                {
+                    continue;
+                }
+
+                _resourceEntries.Add(CreateRemoteEntry(entry));
+            }
+
+            _resourcesView.Refresh();
+            UpdateResourceCount();
+        }
+
+        private ResourceEntryViewModel CreateRemoteEntry(RemoteResourceEntrySnapshot entry)
+        {
+            var scopePath = ResolveScopePath(entry.NodePath);
+            return new ResourceEntryViewModel(
+                keyDisplay: entry.KeyDisplay,
+                keyTypeName: entry.KeyType,
+                valueTypeName: entry.ValueType,
+                valuePreview: entry.ValuePreview,
+                isDeferred: entry.IsDeferred,
+                scopePath: scopePath,
+                sourceLocation: entry.SourceLocation,
+                themeVariant: ResolveThemeVariant(entry.NodePath));
+        }
+
+        private string ResolveScopePath(string nodePath)
+        {
+            if (string.IsNullOrWhiteSpace(nodePath))
+            {
+                return string.Empty;
+            }
+
+            var stack = new Stack<string>();
+            var currentPath = nodePath;
+            while (!string.IsNullOrWhiteSpace(currentPath))
+            {
+                var currentNode = FindRemoteNode(currentPath);
+                if (currentNode is null)
+                {
+                    break;
+                }
+
+                stack.Push(currentNode.Name);
+                currentPath = currentNode.ParentNodePath ?? string.Empty;
+            }
+
+            return string.Join(" / ", stack);
+        }
+
+        private string? ResolveThemeVariant(string nodePath)
+        {
+            var currentPath = nodePath;
+            while (!string.IsNullOrWhiteSpace(currentPath))
+            {
+                var node = FindRemoteNode(currentPath);
+                if (node is null)
+                {
+                    break;
+                }
+
+                if (node.Kind.Contains("ThemeVariant", StringComparison.OrdinalIgnoreCase))
+                {
+                    return node.Name;
+                }
+
+                currentPath = node.ParentNodePath ?? string.Empty;
+            }
+
+            return null;
+        }
+
+        private RemoteResourceNodeSnapshot? FindRemoteNode(string nodePath)
+        {
+            for (var i = 0; i < _remoteNodes.Count; i++)
+            {
+                if (string.Equals(_remoteNodes[i].NodePath, nodePath, StringComparison.Ordinal))
+                {
+                    return _remoteNodes[i];
+                }
+            }
+
+            return null;
+        }
+
+        private string? GetSelectedNodePath()
+        {
+            if (_selectedNode is null)
+            {
+                return null;
+            }
+
+            return TryBuildNodePath(_selectedNode);
+        }
+
+        private string? TryBuildNodePath(ResourceTreeNode node)
+        {
+            var indexes = new Stack<int>();
+            var current = node;
+            while (current.Parent is { } parent)
+            {
+                var childIndex = GetChildIndex(parent, current);
+                if (childIndex < 0)
+                {
+                    return null;
+                }
+
+                indexes.Push(childIndex);
+                current = parent;
+            }
+
+            var rootIndex = Array.IndexOf(Nodes, current);
+            if (rootIndex < 0)
+            {
+                return null;
+            }
+
+            var path = rootIndex.ToString();
+            while (indexes.Count > 0)
+            {
+                path += "/" + indexes.Pop();
+            }
+
+            return path;
+        }
+
+        private static int GetChildIndex(ResourceTreeNode parent, ResourceTreeNode child)
+        {
+            for (var i = 0; i < parent.Children.Count; i++)
+            {
+                if (ReferenceEquals(parent.Children[i], child))
+                {
+                    return i;
+                }
+            }
+
+            return -1;
+        }
+
+        private static bool ShouldIncludeRemoteEntry(string nodePath, string selectedPath, bool includeNested)
+        {
+            if (includeNested)
+            {
+                return string.Equals(nodePath, selectedPath, StringComparison.Ordinal)
+                    || nodePath.StartsWith(selectedPath + "/", StringComparison.Ordinal);
+            }
+
+            return string.Equals(nodePath, selectedPath, StringComparison.Ordinal);
         }
     }
 }

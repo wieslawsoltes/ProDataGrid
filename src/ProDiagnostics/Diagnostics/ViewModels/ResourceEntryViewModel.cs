@@ -30,6 +30,35 @@ namespace Avalonia.Diagnostics.ViewModels
             SourceLocation = sourceLocation;
         }
 
+        public ResourceEntryViewModel(
+            string keyDisplay,
+            string keyTypeName,
+            string valueTypeName,
+            string valuePreview,
+            bool isDeferred,
+            string scopePath,
+            string sourceLocation,
+            string? themeVariant)
+        {
+            Key = keyDisplay;
+            Value = valuePreview;
+            KeyDisplay = keyDisplay;
+            KeyTypeName = keyTypeName;
+            ValueTypeName = valueTypeName;
+            ValuePreview = valuePreview;
+            IsDeferred = isDeferred;
+            ScopeName = scopePath;
+            ScopePath = scopePath;
+            ThemeVariant = themeVariant;
+            SourceLocation = sourceLocation;
+            ValueProperty = new ResourceEntryPropertyViewModel(
+                name: keyDisplay,
+                propertyType: typeof(string),
+                getter: () => valuePreview,
+                setter: null,
+                declaringType: typeof(ResourceEntryViewModel));
+        }
+
         public object Key { get; }
         public object? Value { get; }
         public string KeyDisplay { get; }

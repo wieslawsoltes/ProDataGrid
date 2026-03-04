@@ -21,6 +21,8 @@ internal abstract class PropertyViewModel : ViewModelBase
         PropertyType.GetTypeName() :
         $"{PropertyType.GetTypeName()} {{{AssignedType.GetTypeName()}}}";
 
+    public virtual string DisplayType => Type;
+
     public abstract bool IsReadonly { get; }
 
     public bool IsPinned { get => _isPinned; set => RaiseAndSetIfChanged(ref _isPinned, value); }

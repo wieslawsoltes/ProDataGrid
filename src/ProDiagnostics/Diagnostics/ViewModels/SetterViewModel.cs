@@ -7,10 +7,11 @@ namespace Avalonia.Diagnostics.ViewModels
         private bool _isActive;
         private bool _isVisible;
         private string _sourceLocation = string.Empty;
+        private readonly string _name;
 
-        public AvaloniaProperty Property { get; }
+        public AvaloniaProperty? Property { get; }
 
-        public string Name { get; }
+        public string Name => _name;
 
         public object? Value { get; }
 
@@ -37,11 +38,22 @@ namespace Avalonia.Diagnostics.ViewModels
         public SetterViewModel(AvaloniaProperty property, object? value, IClipboard? clipboard)
         {
             Property = property;
-            Name = property.Name;
+            _name = property.Name;
             Value = value;
             IsActive = true;
             IsVisible = true;
 
+            _clipboard = clipboard;
+        }
+
+        public SetterViewModel(string name, object? value, string sourceLocation = "", IClipboard? clipboard = null)
+        {
+            Property = null;
+            _name = string.IsNullOrWhiteSpace(name) ? "(unknown)" : name;
+            Value = value;
+            _sourceLocation = sourceLocation ?? string.Empty;
+            IsActive = true;
+            IsVisible = true;
             _clipboard = clipboard;
         }
 
@@ -59,7 +71,7 @@ namespace Avalonia.Diagnostics.ViewModels
 
         public void CopyPropertyName()
         {
-            CopyToClipboard(Property.Name);
+            CopyToClipboard(Name);
         }
 
         protected void CopyToClipboard(string value)

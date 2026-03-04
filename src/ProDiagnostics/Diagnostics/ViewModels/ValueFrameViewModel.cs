@@ -14,7 +14,7 @@ namespace Avalonia.Diagnostics.ViewModels
     internal class ValueFrameViewModel : ViewModelBase
     {
         private static readonly ISourceLocationService DefaultSourceLocationService = new PortablePdbSourceLocationService();
-        private readonly IValueFrameDiagnostic _valueFrame;
+        private readonly IValueFrameDiagnostic? _valueFrame;
         private bool _isActive;
         private bool _isVisible;
 
@@ -80,6 +80,23 @@ namespace Avalonia.Diagnostics.ViewModels
             Update();
         }
 
+        public ValueFrameViewModel(
+            string id,
+            string description,
+            bool isActive,
+            string sourceLocation,
+            IReadOnlyList<SetterViewModel> setters)
+        {
+            Id = id;
+            Description = description;
+            SourceLocation = sourceLocation ?? string.Empty;
+            Setters = setters?.ToList() ?? new List<SetterViewModel>();
+            IsActive = isActive;
+            IsVisible = true;
+        }
+
+        public string? Id { get; }
+
         public bool IsActive
         {
             get => _isActive;
@@ -100,6 +117,11 @@ namespace Avalonia.Diagnostics.ViewModels
 
         public void Update()
         {
+            if (_valueFrame is null)
+            {
+                return;
+            }
+
             IsActive = _valueFrame.IsActive;
         }
 

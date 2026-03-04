@@ -20,6 +20,16 @@ namespace Avalonia.Diagnostics
         public KeyGesture Gesture { get; set; } = new KeyGesture(Key.F12);
 
         /// <summary>
+        /// Gets or sets the key gesture used to open DevTools with remote-enabled mode.
+        /// </summary>
+        public KeyGesture RemoteGesture { get; set; } = new KeyGesture(Key.F11);
+
+        /// <summary>
+        /// Gets or sets whether the remote launch gesture is enabled.
+        /// </summary>
+        public bool EnableRemoteGesture { get; set; } = true;
+
+        /// <summary>
         /// Optional display name of the inspected application.
         /// </summary>
         public string? ApplicationName { get; set; }
@@ -227,5 +237,18 @@ namespace Avalonia.Diagnostics
         /// Gets or sets the meter name patterns included in export.
         /// </summary>
         public IReadOnlyList<string>? TransportMeterNames { get; set; } = new[] { "*" };
+
+        /// <summary>
+        /// Gets or sets local loopback host/client options used when <see cref="UseRemoteRuntime"/> is enabled.
+        /// </summary>
+        public DevToolsRemoteLoopbackOptions RemoteLoopbackOptions { get; set; } = new();
+
+        /// <summary>
+        /// Gets or sets whether this DevTools instance should run against the local remote loopback runtime.
+        /// When false, DevTools uses direct in-process diagnostics services.
+        /// </summary>
+        public bool UseRemoteRuntime { get; set; }
+
+        internal DevToolsOptions Clone() => (DevToolsOptions)MemberwiseClone();
     }
 }

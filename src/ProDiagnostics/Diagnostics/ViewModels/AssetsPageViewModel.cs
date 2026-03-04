@@ -5,6 +5,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Avalonia.Collections;
 using Avalonia.Controls;
+using Avalonia.Diagnostics.Remote;
 using Avalonia.Diagnostics.Services;
 using Avalonia.Platform;
 using Avalonia.Threading;
@@ -20,6 +21,8 @@ namespace Avalonia.Diagnostics.ViewModels
         private AssetEntryViewModel? _selectedAsset;
         private bool _isLoading;
         private string? _status;
+        private IRemoteReadOnlyDiagnosticsDomainService? _remoteReadOnly;
+        private long _remoteRefreshVersion;
 
         public AssetsPageViewModel(MainViewModel mainView, ISourceLocationService? sourceLocationService = null)
         {
@@ -83,6 +86,20 @@ namespace Avalonia.Diagnostics.ViewModels
 
         public int AssetCount => _assets.Count;
 
+        public void Refresh()
+        {
+            _ = LoadAssetsAsync();
+        }
+
+        internal void SetRemoteReadOnlySource(IRemoteReadOnlyDiagnosticsDomainService? readOnly, bool refreshNow = true)
+        {
+            _remoteReadOnly = readOnly;
+            if (refreshNow)
+            {
+                _ = LoadAssetsAsync();
+            }
+        }
+
         public void CopyAssetUri()
         {
             if (SelectedAsset != null)
@@ -109,6 +126,12 @@ namespace Avalonia.Diagnostics.ViewModels
 
         private async Task LoadAssetsAsync()
         {
+            if (_remoteReadOnly is not null)
+            {
+                await LoadRemoteAssetsAsync().ConfigureAwait(false);
+                return;
+            }
+
             await Dispatcher.UIThread.InvokeAsync(() =>
             {
                 IsLoading = true;
@@ -145,6 +168,65 @@ namespace Avalonia.Diagnostics.ViewModels
                 Status = $"{assets.Count} assets";
                 IsLoading = false;
             });
+        }
+
+        private async Task LoadRemoteAssetsAsync()
+        {
+            var readOnly = _remoteReadOnly;
+            if (readOnly is null)
+            {
+                return;
+            }
+
+            var version = System.Threading.Interlocked.Increment(ref _remoteRefreshVersion);
+            await Dispatcher.UIThread.InvokeAsync(() =>
+            {
+                IsLoading = true;
+                Status = "Loading remote assets...";
+            });
+
+            try
+            {
+                var snapshot = await readOnly.GetAssetsSnapshotAsync(new RemoteAssetsSnapshotRequest()).ConfigureAwait(false);
+                await Dispatcher.UIThread.InvokeAsync(() =>
+                {
+                    if (version != _remoteRefreshVersion)
+                    {
+                        return;
+                    }
+
+                    _assets.Clear();
+                    for (var i = 0; i < snapshot.Assets.Count; i++)
+                    {
+                        var entry = snapshot.Assets[i];
+                        var kind = ParseRemoteKind(entry.Kind);
+                        _assets.Add(new AssetEntryViewModel(
+                            entry.Uri,
+                            entry.AssemblyName,
+                            entry.AssetPath,
+                            kind,
+                            entry.SourceLocation));
+                    }
+
+                    _assetsView.Refresh();
+                    RaisePropertyChanged(nameof(AssetCount));
+                    Status = snapshot.Assets.Count + " assets";
+                    IsLoading = false;
+                });
+            }
+            catch (Exception ex)
+            {
+                await Dispatcher.UIThread.InvokeAsync(() =>
+                {
+                    if (version != _remoteRefreshVersion)
+                    {
+                        return;
+                    }
+
+                    Status = "Remote asset load failed: " + ex.Message;
+                    IsLoading = false;
+                });
+            }
         }
 
         public bool TrySelectAssetBySourceLocation(SourceDocumentLocation location)
@@ -346,6 +428,11 @@ namespace Avalonia.Diagnostics.ViewModels
 
         private string ResolveAssetSourceLocation(AssetEntryViewModel asset)
         {
+            if (asset.Assembly is null)
+            {
+                return asset.SourceLocation;
+            }
+
             var byPath = _sourceLocationService.ResolveDocument(asset.Assembly, asset.AssetPath, asset.AssetPath);
             if (byPath is not null)
             {
@@ -359,6 +446,16 @@ namespace Avalonia.Diagnostics.ViewModels
             }
 
             return string.Empty;
+        }
+
+        private static AssetKind ParseRemoteKind(string? kind)
+        {
+            if (Enum.TryParse<AssetKind>(kind, ignoreCase: true, out var parsed))
+            {
+                return parsed;
+            }
+
+            return AssetKind.Other;
         }
     }
 }

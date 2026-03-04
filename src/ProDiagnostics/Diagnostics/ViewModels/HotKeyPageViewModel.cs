@@ -20,7 +20,7 @@ namespace Avalonia.Diagnostics.ViewModels
 
             HotKeyDescriptions = new()
             {
-                new(CreateDescription(options.Gesture), "Launch DevTools", "Launches DevTools to inspect the TopLevel that received the hotkey input"),
+                new(CreateDescription(options.Gesture), "Launch DevTools (In-Process)", "Launches DevTools in in-process mode for the TopLevel that received the hotkey input"),
                 new(CreateDescription(hotKeys.ValueFramesFreeze), "Freeze Value Frames", "Pauses refreshing the Value Frames inspector for the selected Control"),
                 new(CreateDescription(hotKeys.ValueFramesUnfreeze), "Unfreeze Value Frames", "Resumes refreshing the Value Frames inspector for the selected Control"),
                 new(CreateDescription(hotKeys.InspectHoveredControl), "Inspect Control Under Pointer", "Inspects the hovered Control in the Logical or Visual Tree Page"),
@@ -43,6 +43,16 @@ namespace Avalonia.Diagnostics.ViewModels
                 new(CreateDescription(hotKeys.ClearSelectionOrFilter), "Clear Selection/Filter", "Clears selection first, then clears the active filter"),
                 new(CreateDescription(hotKeys.RemoveSelectedRecord), "Remove Selected Record", "Removes selected item from the active record list")
             };
+
+            if (options.EnableRemoteGesture)
+            {
+                HotKeyDescriptions.Insert(
+                    1,
+                    new(
+                        CreateDescription(options.RemoteGesture),
+                        "Launch DevTools (Remote)",
+                        "Launches DevTools in remote-enabled mode for the TopLevel that received the hotkey input"));
+            }
         }
 
         private string CreateDescription(KeyGesture gesture)

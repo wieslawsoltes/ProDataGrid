@@ -27,15 +27,21 @@ namespace Avalonia.Diagnostics
         {
             void PreviewKeyDown(object? sender, KeyEventArgs e)
             {
-                if (options.Gesture.Matches(e))
+                if (MatchesGesture(options.Gesture, e))
                 {
-                    Open(root, options);
+                    Open(root, CreateLaunchOptions(options, useRemoteRuntime: false));
+                    return;
+                }
+
+                if (options.EnableRemoteGesture && MatchesGesture(options.RemoteGesture, e))
+                {
+                    Open(root, CreateLaunchOptions(options, useRemoteRuntime: true));
                 }
             }
 
             if (options.ConnectOnStartup && (!Design.IsDesignMode || options.AutoConnectFromDesignMode))
             {
-                Open(root, options);
+                Open(root, CreateLaunchOptions(options, useRemoteRuntime: options.UseRemoteRuntime));
             }
 
             return (root ?? throw new ArgumentNullException(nameof(root))).AddDisposableHandler(
@@ -95,13 +101,28 @@ namespace Avalonia.Diagnostics
                         var owner = lifeTime.MainWindow;
 
                         if (e is RawKeyEventArgs keyEventArgs
-                            && keyEventArgs.Type == RawKeyEventType.KeyUp
-                            && options.Gesture.Matches(keyEventArgs))
+                            && keyEventArgs.Type == RawKeyEventType.KeyUp)
                         {
-                            openedDisposable.Disposable =
-                                Open(new ClassicDesktopStyleApplicationLifetimeTopLevelGroup(lifeTime), options,
-                                    owner, application);
-                            e.Handled = true;
+                            if (options.EnableRemoteGesture && options.RemoteGesture.Matches(keyEventArgs))
+                            {
+                                openedDisposable.Disposable =
+                                    Open(
+                                        new ClassicDesktopStyleApplicationLifetimeTopLevelGroup(lifeTime),
+                                        CreateLaunchOptions(options, useRemoteRuntime: true),
+                                        owner,
+                                        application);
+                                e.Handled = true;
+                            }
+                            else if (options.Gesture.Matches(keyEventArgs))
+                            {
+                                openedDisposable.Disposable =
+                                    Open(
+                                        new ClassicDesktopStyleApplicationLifetimeTopLevelGroup(lifeTime),
+                                        CreateLaunchOptions(options, useRemoteRuntime: false),
+                                        owner,
+                                        application);
+                                e.Handled = true;
+                            }
                         }
                     }));
                 }
@@ -169,6 +190,23 @@ namespace Avalonia.Diagnostics
             var window = (MainWindow)sender!;
             window.Closed -= DevToolsClosed;
             s_open.Remove((IDevToolsTopLevelGroup)window.Tag!);
+        }
+
+        private static bool MatchesGesture(KeyGesture gesture, KeyEventArgs e)
+        {
+            if (gesture.Key == Key.None && gesture.KeyModifiers == KeyModifiers.None)
+            {
+                return false;
+            }
+
+            return gesture.Matches(e);
+        }
+
+        private static DevToolsOptions CreateLaunchOptions(DevToolsOptions source, bool useRemoteRuntime)
+        {
+            var launchOptions = source.Clone();
+            launchOptions.UseRemoteRuntime = useRemoteRuntime;
+            return launchOptions;
         }
 
         internal static bool DoesBelongToDevTool(this Visual v)
