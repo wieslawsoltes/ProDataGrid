@@ -1,0 +1,339 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>ProDiagnostics Remote DevTools</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/tabulator-tables@6.3.0/dist/css/tabulator.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/jstree@3.3.17/dist/themes/default/style.min.css">
+  <link rel="stylesheet" href="./styles.css">
+</head>
+<body>
+  <header class="topbar">
+    <div class="topbar-title">
+      <h1>ProDiagnostics Remote DevTools</h1>
+      <p id="statusLabel" class="status offline">Offline</p>
+    </div>
+    <form id="connectForm" class="connect-form">
+      <label>
+        WebSocket URL
+        <input id="urlInput" type="url" spellcheck="false" value="ws://127.0.0.1:29414/attach" required>
+      </label>
+      <label>
+        Client Name
+        <input id="clientNameInput" type="text" value="prodiagnostics-web-client">
+      </label>
+      <button id="connectBtn" type="submit">Connect</button>
+      <button id="disconnectBtn" type="button" disabled>Disconnect</button>
+    </form>
+  </header>
+
+  <main class="workspace">
+    <aside class="tree-pane">
+      <div class="tree-pane-header">
+        <div class="scope-tabs">
+          <button class="scope-tab active" data-scope="combined" type="button">Combined</button>
+          <button class="scope-tab" data-scope="visual" type="button">Visual</button>
+          <button class="scope-tab" data-scope="logical" type="button">Logical</button>
+        </div>
+        <div class="tree-toolbar">
+          <input id="treeFilterInput" type="text" placeholder="Filter tree by name, type, path">
+          <button id="refreshTreeBtn" type="button">Refresh</button>
+        </div>
+      </div>
+      <div id="treeSummary" class="summary-line">No data.</div>
+      <div id="treeContainer" class="tree-container" role="tree" tabindex="0" aria-label="Diagnostics tree"></div>
+    </aside>
+
+    <section class="details-pane">
+      <nav class="main-tabs" id="mainTabs">
+        <button class="main-tab active" data-tab="properties" type="button">Properties</button>
+        <button class="main-tab" data-tab="preview" type="button">Preview</button>
+        <button class="main-tab" data-tab="elements3d" type="button">Elements 3D</button>
+        <button class="main-tab" data-tab="resources" type="button">Resources</button>
+        <button class="main-tab" data-tab="assets" type="button">Assets</button>
+        <button class="main-tab" data-tab="events" type="button">Events</button>
+        <button class="main-tab" data-tab="breakpoints" type="button">Breakpoints</button>
+        <button class="main-tab" data-tab="logs" type="button">Logs</button>
+        <button class="main-tab" data-tab="metrics" type="button">Metrics</button>
+        <button class="main-tab" data-tab="bindings" type="button">Bindings</button>
+        <button class="main-tab" data-tab="profiler" type="button">Profiler</button>
+        <button class="main-tab" data-tab="styles" type="button">Styles</button>
+        <button class="main-tab" data-tab="transport" type="button">Transport</button>
+        <button class="main-tab" data-tab="code" type="button">Code</button>
+        <button class="main-tab" data-tab="settings" type="button">Settings</button>
+      </nav>
+
+      <section id="tab-properties" class="tab-panel active">
+        <div class="panel-actions">
+          <button id="refreshPropertiesBtn" type="button">Refresh</button>
+          <button id="refreshStylesFromPropertiesBtn" type="button">Refresh Styles</button>
+        </div>
+        <div id="propertiesTargetInfo" class="summary-line">Select a tree node to inspect properties.</div>
+        <div id="propertiesSourceInfo" class="summary-line muted"></div>
+        <section class="card property-editor-card">
+          <h3>Property Editor</h3>
+          <div id="propertyEditorInfo" class="summary-line muted no-border">Select a property row to edit.</div>
+          <div class="inline-form">
+            <input id="propertyEditorNameInput" type="text" placeholder="Property" readonly>
+            <input id="propertyEditorTypeInput" type="text" placeholder="Type" readonly>
+            <input id="propertyEditorValueInput" type="text" placeholder="Value text">
+            <label><input id="propertyEditorNullInput" type="checkbox"> Null</label>
+            <label><input id="propertyEditorClearInput" type="checkbox"> Clear value</label>
+            <button id="applyPropertyEditorBtn" type="button">Apply</button>
+          </div>
+        </section>
+        <div class="inline-form">
+          <input id="setPropertyNameInput" type="text" placeholder="Property name">
+          <input id="setPropertyValueInput" type="text" placeholder="Value text">
+          <label><input id="setPropertyNullInput" type="checkbox"> Null</label>
+          <label><input id="setPropertyClearInput" type="checkbox"> Clear value</label>
+          <button id="setPropertyBtn" type="button">Set Property</button>
+        </div>
+        <div class="inline-form">
+          <input id="propertiesFilterInput" type="text" placeholder="Filter properties">
+          <input id="framesFilterInput" type="text" placeholder="Filter value frames">
+        </div>
+        <h3>Properties</h3>
+        <table id="propertiesTable" class="data-table"></table>
+        <h3>Value Frames</h3>
+        <table id="framesTable" class="data-table"></table>
+      </section>
+
+      <section id="tab-preview" class="tab-panel">
+        <div class="panel-actions">
+          <button id="refreshPreviewBtn" type="button">Refresh</button>
+          <button id="pausePreviewBtn" type="button">Pause</button>
+          <button id="previewApplySettingsBtn" type="button">Apply Settings</button>
+        </div>
+        <div class="inline-form">
+          <label>Transport
+            <select id="previewTransportInput">
+              <option value="svg" selected>SVG</option>
+              <option value="png">PNG</option>
+            </select>
+          </label>
+          <label>Target FPS <input id="previewTargetFpsInput" type="number" min="1" max="60" step="1" value="5"></label>
+          <label>Scale <input id="previewScaleInput" type="number" min="0.1" max="4" step="0.1" value="1"></label>
+          <label>Max Width <input id="previewMaxWidthInput" type="number" min="256" max="4096" step="1" value="1920"></label>
+          <label>Max Height <input id="previewMaxHeightInput" type="number" min="256" max="4096" step="1" value="1080"></label>
+          <label><input id="previewEnableDiffInput" type="checkbox" checked> Diff mode</label>
+          <label><input id="previewIncludeFrameDataInput" type="checkbox" checked> Include frame payload</label>
+        </div>
+        <div id="previewSummary" class="summary-line">Preview is disconnected.</div>
+        <div id="previewStage" class="preview-stage" tabindex="0" aria-label="Remote app preview">
+          <img id="previewImage" class="preview-image" alt="Remote application preview">
+          <div id="previewSvg" class="preview-svg"></div>
+        </div>
+      </section>
+
+      <section id="tab-elements3d" class="tab-panel">
+        <div class="panel-actions">
+          <button id="refreshElements3dBtn" type="button">Refresh</button>
+          <label>Render
+            <select id="elements3dRenderModeInput">
+              <option value="svg" selected>SVG Snapshot</option>
+            </select>
+          </label>
+          <label>Depth spacing <input id="depthSpacingInput" type="range" min="8" max="80" step="1" value="22"></label>
+          <label>Zoom <input id="elementsZoomInput" type="range" min="0.25" max="24" step="0.05" value="1"></label>
+          <button id="elements3dResetViewBtn" type="button">Reset View</button>
+          <button id="elements3dZoomInBtn" type="button">Zoom +</button>
+          <button id="elements3dZoomOutBtn" type="button">Zoom -</button>
+          <button id="elements3dFitBtn" type="button">Fit</button>
+        </div>
+        <div id="elements3dSummary" class="summary-line">Depth projection based on current tree scope.</div>
+        <div id="elements3dStage" class="elements3d-stage">
+          <div id="elements3dSvgContainer" class="elements3d-svg-container active"></div>
+        </div>
+        <div class="chart-card">
+          <canvas id="elements3dDepthChart" height="160"></canvas>
+        </div>
+      </section>
+
+      <section id="tab-resources" class="tab-panel">
+        <div class="panel-actions">
+          <button id="refreshResourcesBtn" type="button">Refresh</button>
+          <label><input id="includeResourceEntriesInput" type="checkbox" checked> Include entries</label>
+        </div>
+        <div id="resourcesSummary" class="summary-line">No resources loaded.</div>
+        <h3>Resource Nodes</h3>
+        <table id="resourcesNodesTable" class="data-table"></table>
+        <h3>Resource Entries</h3>
+        <table id="resourcesEntriesTable" class="data-table"></table>
+      </section>
+
+      <section id="tab-assets" class="tab-panel">
+        <div class="panel-actions">
+          <button id="refreshAssetsBtn" type="button">Refresh</button>
+        </div>
+        <div id="assetsSummary" class="summary-line">No assets loaded.</div>
+        <table id="assetsTable" class="data-table"></table>
+      </section>
+
+      <section id="tab-events" class="tab-panel">
+        <div class="panel-actions">
+          <button id="clearEventsBtn" type="button">Clear Source</button>
+          <button id="enableDefaultEventsBtn" type="button">Enable Defaults</button>
+          <button id="disableAllEventsBtn" type="button">Disable All</button>
+          <button id="pauseEventsBtn" type="button">Pause</button>
+        </div>
+        <div id="eventsSummary" class="summary-line">Events stream idle.</div>
+        <table id="eventsTable" class="data-table"></table>
+      </section>
+
+      <section id="tab-breakpoints" class="tab-panel">
+        <div class="panel-actions">
+          <label><input id="breakpointsEnabledInput" type="checkbox" checked> Breakpoints enabled</label>
+          <button id="applyBreakpointsEnabledBtn" type="button">Apply</button>
+          <button id="clearBreakpointsBtn" type="button">Clear All</button>
+        </div>
+        <h3>Property Breakpoint</h3>
+        <div class="inline-form">
+          <input id="breakpointPropertyNameInput" type="text" placeholder="Property name">
+          <button id="addPropertyBreakpointBtn" type="button">Add</button>
+        </div>
+        <h3>Event Breakpoint</h3>
+        <div class="inline-form">
+          <input id="breakpointEventNameInput" type="text" placeholder="Event name">
+          <input id="breakpointEventOwnerInput" type="text" placeholder="Owner type (optional)">
+          <label><input id="breakpointGlobalInput" type="checkbox"> Global</label>
+          <button id="addEventBreakpointBtn" type="button">Add</button>
+        </div>
+        <div id="breakpointsSummary" class="summary-line">Use selected tree node as command target.</div>
+      </section>
+
+      <section id="tab-logs" class="tab-panel">
+        <div class="panel-actions">
+          <button id="clearLogsBtn" type="button">Clear Source</button>
+          <button id="pauseLogsBtn" type="button">Pause</button>
+          <button id="applyLogLevelsBtn" type="button">Apply Levels</button>
+          <input id="logsFilterInput" type="text" placeholder="Filter logs">
+        </div>
+        <div class="inline-form">
+          <label><input id="logsLevelVerbose" type="checkbox"> Verbose</label>
+          <label><input id="logsLevelDebug" type="checkbox"> Debug</label>
+          <label><input id="logsLevelInformation" type="checkbox" checked> Info</label>
+          <label><input id="logsLevelWarning" type="checkbox" checked> Warning</label>
+          <label><input id="logsLevelError" type="checkbox" checked> Error</label>
+          <label><input id="logsLevelFatal" type="checkbox" checked> Fatal</label>
+          <label>Max entries <input id="logsMaxEntriesInput" type="number" min="100" max="50000" step="100" value="4000"></label>
+        </div>
+        <div id="logsSummary" class="summary-line">Logs stream idle.</div>
+        <table id="logsTable" class="data-table"></table>
+      </section>
+
+      <section id="tab-metrics" class="tab-panel">
+        <div class="panel-actions">
+          <button id="pauseMetricsBtn" type="button">Pause</button>
+          <button id="clearMetricsBtn" type="button">Clear Local</button>
+          <input id="metricsFilterInput" type="text" placeholder="Filter metrics">
+        </div>
+        <div id="metricsSummary" class="summary-line">Metrics stream idle.</div>
+        <div class="chart-card">
+          <canvas id="metricsChart" height="180"></canvas>
+        </div>
+        <h3>Series</h3>
+        <table id="metricsSeriesTable" class="data-table"></table>
+        <h3>Raw Metrics</h3>
+        <table id="metricsRawTable" class="data-table"></table>
+      </section>
+
+      <section id="tab-bindings" class="tab-panel">
+        <div class="panel-actions">
+          <button id="refreshBindingsBtn" type="button">Refresh</button>
+          <button id="clearBindingsBtn" type="button">Clear Local</button>
+          <label><input id="bindingsOnlyErrorsInput" type="checkbox"> Only binding errors</label>
+        </div>
+        <div id="bindingsSummary" class="summary-line">Select a tree node and refresh bindings.</div>
+        <div class="inline-form">
+          <input id="bindingsViewModelsFilterInput" type="text" placeholder="Filter view models">
+          <input id="bindingsBindingsFilterInput" type="text" placeholder="Filter bindings">
+        </div>
+        <h3>View Models</h3>
+        <table id="bindingsViewModelsTable" class="data-table"></table>
+        <h3>Bindings</h3>
+        <table id="bindingsBindingsTable" class="data-table"></table>
+      </section>
+
+      <section id="tab-profiler" class="tab-panel">
+        <div class="panel-actions">
+          <button id="pauseProfilerBtn" type="button">Pause</button>
+          <button id="clearProfilerBtn" type="button">Clear Local</button>
+        </div>
+        <div id="profilerSummary" class="summary-line">Profiler stream idle.</div>
+        <div class="chart-card">
+          <canvas id="profilerChart" height="180"></canvas>
+        </div>
+        <table id="profilerTable" class="data-table"></table>
+      </section>
+
+      <section id="tab-styles" class="tab-panel">
+        <div class="panel-actions">
+          <button id="refreshStylesBtn" type="button">Refresh</button>
+        </div>
+        <div id="stylesSummary" class="summary-line">No styles snapshot loaded.</div>
+        <section class="card style-visualizer-card">
+          <h3>Style Visualizer</h3>
+          <div id="stylesVisualizerSummary" class="summary-line muted no-border">Select style tree/resolution/setter rows for semantic details.</div>
+          <div id="stylesVisualizerContent" class="style-visualizer-content"></div>
+        </section>
+        <h3>Style Tree</h3>
+        <table id="stylesTreeTable" class="data-table"></table>
+        <h3>Resolution Trace</h3>
+        <table id="stylesResolutionTable" class="data-table"></table>
+        <h3>Active Setters</h3>
+        <table id="stylesSettersTable" class="data-table"></table>
+      </section>
+
+      <section id="tab-transport" class="tab-panel">
+        <div class="panel-actions">
+          <button id="refreshTransportBtn" type="button">Refresh</button>
+        </div>
+        <div id="transportSummary" class="summary-line">No transport activity.</div>
+        <table id="transportStatsTable" class="data-table"></table>
+        <h3>Recent Protocol Traffic</h3>
+        <table id="transportTimelineTable" class="data-table"></table>
+      </section>
+
+      <section id="tab-code" class="tab-panel">
+        <div class="panel-actions">
+          <button id="openSourceXamlBtn" type="button">Open XAML Source</button>
+          <button id="openSourceCodeBtn" type="button">Open Code Source</button>
+        </div>
+        <div id="codeSummary" class="summary-line">Source follows tree selection and properties snapshot metadata.</div>
+        <pre id="sourcePreview" class="source-preview">No source metadata available.</pre>
+      </section>
+
+      <section id="tab-settings" class="tab-panel">
+        <h2>Client Settings</h2>
+        <div class="inline-form">
+          <label><input id="autoRefreshOnSelectionInput" type="checkbox" checked> Auto-refresh on tree selection</label>
+          <label><input id="autoRefreshTreeOnConnectInput" type="checkbox" checked> Auto-refresh trees on connect</label>
+          <label>Max streamed rows per table <input id="maxRowsInput" type="number" min="100" max="100000" step="100" value="4000"></label>
+          <button id="saveSettingsBtn" type="button">Save Settings</button>
+        </div>
+        <p class="muted">
+          Settings are stored in browser local storage for this site origin.
+        </p>
+      </section>
+    </section>
+  </main>
+
+  <footer class="statusbar">
+    <div id="footerSelection">Selection: none</div>
+    <div id="footerScope">Scope: combined</div>
+    <div id="footerSession">Session: n/a</div>
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/jquery@3.7.1/dist/jquery.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/jstree@3.3.17/dist/jstree.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/tabulator-tables@6.3.0/dist/js/tabulator.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.6/dist/chart.umd.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/svg-pan-zoom@3.6.1/dist/svg-pan-zoom.min.js"></script>
+  <script type="module" src="./app.js"></script>
+</body>
+</html>
