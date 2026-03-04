@@ -20,6 +20,8 @@
         <Project Path="src/ProDataGrid.FormulaEngine.Excel/ProDataGrid.FormulaEngine.Excel.csproj" />
         <Project Path="src/ProDiagnostics/ProDiagnostics.csproj" />
         <Project Path="src/ProDiagnostics.Transport/ProDiagnostics.Transport.csproj" />
+        <Project Path="src/ProDiagnostics.IntegrationTests/ProDiagnostics.IntegrationTests.csproj" />
+        <Project Path="src/ProDiagnostics.Remote/ProDiagnostics.Remote.csproj" />
     </Folder>
     <Folder Name="/tests/">
         <Project Path="src/Avalonia.Controls.DataGrid.UnitTests/Avalonia.Controls.DataGrid.UnitTests.csproj" />

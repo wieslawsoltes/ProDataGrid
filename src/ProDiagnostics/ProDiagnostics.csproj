@@ -38,13 +38,16 @@
 
   <ItemGroup>
     <PackageReference Include="Avalonia" />
+    <PackageReference Include="Avalonia.Skia" />
     <PackageReference Include="Avalonia.Controls.ColorPicker" />
+    <PackageReference Include="SkiaSharp" />
     <PackageReference Include="Avalonia.Themes.Simple" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\\ProDataGrid.FormulaEngine\\ProDataGrid.FormulaEngine.csproj" />
     <ProjectReference Include="..\\ProDataGrid.FormulaEngine.Excel\\ProDataGrid.FormulaEngine.Excel.csproj" />
+    <ProjectReference Include="..\\ProDiagnostics.Remote\\ProDiagnostics.Remote.csproj" />
     <ProjectReference Include="..\\ProDiagnostics.Transport\\ProDiagnostics.Transport.csproj" />
   </ItemGroup>
 
