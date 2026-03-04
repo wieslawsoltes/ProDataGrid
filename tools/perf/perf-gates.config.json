@@ -1,0 +1,81 @@
+{
+  "protocol": {
+    "checks": [
+      {
+        "name": "serializer.deserialize_request_16384.mean",
+        "file": "ProDiagnostics.Remote.Protocol.Benchmarks.RemoteMessageSerializerBenchmarks-report.csv",
+        "match": {
+          "Method": "Deserialize_Request",
+          "PayloadBytes": "16384"
+        },
+        "valueColumn": "Mean",
+        "valueKind": "time",
+        "unit": "ns",
+        "baseline": 1562.79,
+        "maxRegressionPercent": 120,
+        "hardMax": 5000
+      },
+      {
+        "name": "router.handle_treesnapshot_2000.mean",
+        "file": "ProDiagnostics.Remote.Protocol.Benchmarks.RemoteReadOnlyRouterBenchmarks-report.csv",
+        "match": {
+          "Method": "Handle_TreeSnapshot",
+          "NodeCount": "2000"
+        },
+        "valueColumn": "Mean",
+        "valueKind": "time",
+        "unit": "ns",
+        "baseline": 457119.3,
+        "maxRegressionPercent": 85,
+        "hardMax": 1500000
+      },
+      {
+        "name": "stream.publish_fanout_20x50.mean",
+        "file": "ProDiagnostics.Remote.Protocol.Benchmarks.RemoteStreamSessionHubBenchmarks-report.csv",
+        "match": {
+          "Method": "Publish_FanoutBurst",
+          "SessionCount": "20",
+          "MessagesPerOperation": "50"
+        },
+        "valueColumn": "Mean",
+        "valueKind": "time",
+        "unit": "ns",
+        "baseline": 626389.1,
+        "maxRegressionPercent": 80,
+        "hardMax": 1500000
+      }
+    ]
+  },
+  "hostLoad": {
+    "scenarios": [
+      {
+        "name": "snapshot-storm",
+        "maxP95Ms": 300,
+        "maxErrors": 0
+      },
+      {
+        "name": "mixed-workload",
+        "maxP95Ms": 400,
+        "maxErrors": 0
+      },
+      {
+        "name": "stream-fanout",
+        "maxP95Ms": 50,
+        "maxErrors": 0
+      }
+    ]
+  },
+  "web": {
+    "requiredMetrics": [
+      "connectMs",
+      "firstTreeMs"
+    ],
+    "thresholdsMs": {
+      "connectMs": 5000,
+      "firstTreeMs": 12000,
+      "filterMs": 3000,
+      "collapseMs": 3000,
+      "expandMs": 3000
+    }
+  }
+}

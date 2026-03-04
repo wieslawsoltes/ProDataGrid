@@ -1,0 +1,78 @@
+name: Perf Nightly
+
+on:
+  schedule:
+    - cron: "0 2 * * *"
+  workflow_dispatch:
+
+env:
+  DOTNET_NOLOGO: true
+  DOTNET_CLI_TELEMETRY_OPTOUT: true
+  DOTNET_SKIP_FIRST_TIME_EXPERIENCE: true
+
+jobs:
+  nightly-perf:
+    name: Nightly Perf
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          global-json-file: global.json
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Restore
+        run: dotnet restore
+
+      - name: Restore Perf History Cache
+        uses: actions/cache/restore@v4
+        with:
+          path: .github/perf-history
+          key: perf-history-${{ github.run_id }}
+          restore-keys: |
+            perf-history-
+
+      - name: Run Nightly Perf Suite
+        env:
+          PERF_HISTORY_FILE: .github/perf-history/remote-perf-history.json
+        run: bash tools/perf/run-perf-nightly.sh
+
+      - name: Save Perf History Cache
+        if: always()
+        uses: actions/cache/save@v4
+        with:
+          path: .github/perf-history
+          key: perf-history-${{ github.run_id }}
+
+      - name: Publish Nightly Perf Summary
+        if: always()
+        run: |
+          if [[ -f artifacts/perf-gates/perf-nightly-summary.md ]]; then
+            cat artifacts/perf-gates/perf-nightly-summary.md >> "$GITHUB_STEP_SUMMARY"
+          else
+            echo "Nightly perf summary not found." >> "$GITHUB_STEP_SUMMARY"
+          fi
+
+      - name: Upload Nightly Perf Artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: perf-nightly-artifacts
+          path: |
+            artifacts/perf-gates/**
+            artifacts/remote-protocol-bench/**
+            artifacts/remote-hostload/**
+            artifacts/remote-webclient-perf/**
+            .github/perf-history/**
+            tests/ProDiagnostics.Remote.WebClient.Perf/playwright-report/**
+          if-no-files-found: warn
+          retention-days: 30

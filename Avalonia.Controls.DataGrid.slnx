@@ -31,6 +31,10 @@
         <Project Path="src/ProDataGrid.FormulaEngine.UnitTests/ProDataGrid.FormulaEngine.UnitTests.csproj" />
         <Project Path="tests/ProDataGrid.FormulaEngine.Benchmarks/ProDataGrid.FormulaEngine.Benchmarks.csproj" />
         <Project Path="src/ProDiagnostics.UnitTests/ProDiagnostics.UnitTests.csproj" />
+        <Project Path="tests/ProDiagnostics.Remote.Protocol.Benchmarks/ProDiagnostics.Remote.Protocol.Benchmarks.csproj" />
+        <Project Path="tests/ProDiagnostics.Remote.HostLoad/ProDiagnostics.Remote.HostLoad.csproj" />
+        <Project Path="tests/ProDiagnostics.ManagedDevTools.PerfTests/ProDiagnostics.ManagedDevTools.PerfTests.csproj" />
+        <Project Path="tests/ProDiagnostics.Remote.WebClient.Perf/PerfHost/ProDiagnostics.Remote.WebClient.PerfHost.csproj" />
     </Folder>
     <Folder Name="/samples/">
         <Project Path="src/DataGridSample/DataGridSample.csproj" />
