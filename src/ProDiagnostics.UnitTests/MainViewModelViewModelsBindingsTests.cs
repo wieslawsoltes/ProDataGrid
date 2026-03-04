@@ -162,6 +162,52 @@ public class MainViewModelViewModelsBindingsTests
     }
 
     [AvaloniaFact]
+    public void Metrics_Tab_Deactivation_AutoPauses_And_Reactivation_AutoResumes()
+    {
+        var root = new Window
+        {
+            Content = new Border()
+        };
+
+        using var viewModel = new MainViewModel(root);
+        viewModel.ShowMetrics();
+
+        var metrics = Assert.IsType<MetricsPageViewModel>(viewModel.Content);
+        Assert.True(metrics.IsUpdatesPaused);
+
+        metrics.PauseOrResumeUpdates();
+        Assert.False(metrics.IsUpdatesPaused);
+
+        viewModel.ShowLogs();
+        Assert.True(metrics.IsUpdatesPaused);
+
+        viewModel.ShowMetrics();
+        Assert.False(metrics.IsUpdatesPaused);
+    }
+
+    [AvaloniaFact]
+    public void Profiler_Tab_Deactivation_AutoPauses_And_Reactivation_AutoResumes()
+    {
+        var root = new Window
+        {
+            Content = new Border()
+        };
+
+        using var viewModel = new MainViewModel(root);
+        viewModel.ShowProfiler();
+
+        var profiler = Assert.IsType<ProfilerPageViewModel>(viewModel.Content);
+        profiler.PauseOrResumeSampling();
+        Assert.True(profiler.IsSampling);
+
+        viewModel.ShowLogs();
+        Assert.False(profiler.IsSampling);
+
+        viewModel.ShowProfiler();
+        Assert.True(profiler.IsSampling);
+    }
+
+    [AvaloniaFact]
     public void CombinedTree_ManualSelection_Updates_Elements3D_SelectionScope()
     {
         var button = new Button { Name = "ManualScopeButton" };

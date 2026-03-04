@@ -96,6 +96,30 @@ public class ProfilerPageViewModelTests
     }
 
     [AvaloniaFact]
+    public void SetTabActive_AutoPauses_And_Resumes_Only_For_TabDriven_Pause()
+    {
+        using var viewModel = new ProfilerPageViewModel(
+            new FakeProfilerSampler(new ProfilerSampleSnapshot(DateTimeOffset.UtcNow, 0, 0, 0, 0, 0, 0, 0)),
+            startSampling: false);
+
+        viewModel.PauseOrResumeSampling();
+        Assert.True(viewModel.IsSampling);
+
+        viewModel.SetTabActive(false);
+        Assert.False(viewModel.IsSampling);
+
+        viewModel.SetTabActive(true);
+        Assert.True(viewModel.IsSampling);
+
+        viewModel.PauseOrResumeSampling();
+        Assert.False(viewModel.IsSampling);
+
+        viewModel.SetTabActive(false);
+        viewModel.SetTabActive(true);
+        Assert.False(viewModel.IsSampling);
+    }
+
+    [AvaloniaFact]
     public void Search_Selection_And_Remove_Selected_Record_Work()
     {
         var sampler = new FakeProfilerSampler(
@@ -233,6 +257,70 @@ public class ProfilerPageViewModelTests
         Assert.Equal(1, viewModel.RemoteSessionCount);
         Assert.Equal(1, viewModel.RemotePacketCount);
         Assert.Equal(0, viewModel.DroppedLocalPacketCount);
+    }
+
+    [AvaloniaFact]
+    public void SetTabActive_Inactive_RemoteMode_WithoutMutation_Drops_Incoming_Samples_Until_Reactivated()
+    {
+        var now = DateTimeOffset.UtcNow;
+        var sessionId = Guid.NewGuid();
+        using var viewModel = new ProfilerPageViewModel(
+            new FakeProfilerSampler(new ProfilerSampleSnapshot(now, 1, 2, 3, 4, 0, 0, 0)),
+            startSampling: false,
+            startRemoteListener: false,
+            remotePort: TelemetryProtocol.DefaultPort,
+            localProcessId: 1234);
+
+        viewModel.HandleTelemetryPacket(new TelemetryHello(
+            sessionId,
+            now,
+            ProcessId: 5678,
+            ProcessName: "RemoteApp",
+            AppName: "RemoteApp",
+            MachineName: "test-machine",
+            RuntimeVersion: Environment.Version.ToString()));
+
+        viewModel.HandleTelemetryPacket(new TelemetryActivity(
+            sessionId,
+            now.AddMilliseconds(1),
+            SourceName: "remote.activity.source",
+            Name: "Before Inactive",
+            StartTime: now,
+            Duration: TimeSpan.FromMilliseconds(10),
+            Tags: Array.Empty<TelemetryTag>()));
+
+        Dispatcher.UIThread.RunJobs();
+        Dispatcher.UIThread.RunJobs();
+        Assert.Equal(1, viewModel.SampleCount);
+        Assert.True(viewModel.IsRemoteMode);
+
+        viewModel.SetTabActive(false);
+        viewModel.HandleTelemetryPacket(new TelemetryActivity(
+            sessionId,
+            now.AddMilliseconds(2),
+            SourceName: "remote.activity.source",
+            Name: "While Inactive",
+            StartTime: now,
+            Duration: TimeSpan.FromMilliseconds(11),
+            Tags: Array.Empty<TelemetryTag>()));
+        Dispatcher.UIThread.RunJobs();
+        Dispatcher.UIThread.RunJobs();
+
+        Assert.Equal(1, viewModel.SampleCount);
+
+        viewModel.SetTabActive(true);
+        viewModel.HandleTelemetryPacket(new TelemetryActivity(
+            sessionId,
+            now.AddMilliseconds(3),
+            SourceName: "remote.activity.source",
+            Name: "After Reactivation",
+            StartTime: now,
+            Duration: TimeSpan.FromMilliseconds(12),
+            Tags: Array.Empty<TelemetryTag>()));
+        Dispatcher.UIThread.RunJobs();
+        Dispatcher.UIThread.RunJobs();
+
+        Assert.Equal(2, viewModel.SampleCount);
     }
 
     private sealed class FakeProfilerSampler : IProfilerSampler

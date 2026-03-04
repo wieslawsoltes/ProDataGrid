@@ -8,6 +8,8 @@ namespace Avalonia.Diagnostics.Services;
 
 internal static class MetricCaptureService
 {
+    // Avoid feedback loops by excluding internal remote diagnostics runtime meters.
+    private const string RemoteDiagnosticsMeterPrefix = "Avalonia.Diagnostics.Remote.";
     private static readonly object s_gate = new();
     private static readonly List<Action<MetricMeasurementEvent>> s_subscribers = new();
     private static readonly AsyncLocal<int> s_suppressCaptureDepth = new();
@@ -84,6 +86,11 @@ internal static class MetricCaptureService
 
     private static void OnInstrumentPublished(Instrument instrument, MeterListener listener)
     {
+        if (instrument.Meter.Name.StartsWith(RemoteDiagnosticsMeterPrefix, StringComparison.Ordinal))
+        {
+            return;
+        }
+
         listener.EnableMeasurementEvents(instrument);
     }
 

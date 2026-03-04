@@ -50,6 +50,9 @@ internal sealed class ProfilerPageViewModel : ViewModelBase, IDisposable
     private double _peakActivityDurationMs;
     private ProfilerSampleViewModel? _selectedSample;
     private IRemoteMutationDiagnosticsDomainService? _remoteMutation;
+    private bool _isTabActive = true;
+    private bool _isAutoPausedByTabState;
+    private bool _isRemotePaused;
 
     public ProfilerPageViewModel()
         : this(
@@ -172,6 +175,70 @@ internal sealed class ProfilerPageViewModel : ViewModelBase, IDisposable
         _remoteMutation = mutation;
     }
 
+    internal void SetTabActive(bool isActive)
+    {
+        if (_isDisposed || _isTabActive == isActive)
+        {
+            return;
+        }
+
+        _isTabActive = isActive;
+        if (!isActive)
+        {
+            if (IsRemoteMode)
+            {
+                if (_remoteMutation is null)
+                {
+                    _isAutoPausedByTabState = true;
+                    return;
+                }
+
+                if (_isRemotePaused)
+                {
+                    _isAutoPausedByTabState = false;
+                    return;
+                }
+
+                _ = ApplyRemotePausedStateAsync(nextIsSampling: false, pausedByTabState: true);
+                return;
+            }
+
+            if (!IsSampling)
+            {
+                _isAutoPausedByTabState = false;
+                return;
+            }
+
+            if (_remoteMutation is not null)
+            {
+                _ = ApplyRemotePausedStateAsync(nextIsSampling: false, pausedByTabState: true);
+                return;
+            }
+
+            ApplySamplingState(isSampling: false, pausedByTabState: true);
+            return;
+        }
+
+        if (!_isAutoPausedByTabState)
+        {
+            return;
+        }
+
+        if (IsRemoteMode && _remoteMutation is null)
+        {
+            _isAutoPausedByTabState = false;
+            return;
+        }
+
+        if (_remoteMutation is not null)
+        {
+            _ = ApplyRemotePausedStateAsync(nextIsSampling: true, pausedByTabState: false);
+            return;
+        }
+
+        ApplySamplingState(isSampling: true, pausedByTabState: false);
+    }
+
     public bool IsSampling
     {
         get => _isSampling;
@@ -253,11 +320,11 @@ internal sealed class ProfilerPageViewModel : ViewModelBase, IDisposable
         var nextIsSampling = !IsSampling;
         if (_remoteMutation is not null)
         {
-            _ = ApplyRemotePausedStateAsync(nextIsSampling);
+            _ = ApplyRemotePausedStateAsync(nextIsSampling, pausedByTabState: false);
             return;
         }
 
-        ApplySamplingState(nextIsSampling);
+        ApplySamplingState(nextIsSampling, pausedByTabState: false);
     }
 
     public void RefreshNow()
@@ -474,6 +541,11 @@ internal sealed class ProfilerPageViewModel : ViewModelBase, IDisposable
 
                 _remotePacketCount++;
                 ScheduleRemoteStatusRefresh();
+                if (!_isTabActive)
+                {
+                    return;
+                }
+
                 SwitchToRemoteModeIfNeeded();
                 EnqueueRemoteSample(sample);
                 break;
@@ -586,6 +658,7 @@ internal sealed class ProfilerPageViewModel : ViewModelBase, IDisposable
         _timer.Stop();
         _samples.Clear();
         SelectedSample = null;
+        _isAutoPausedByTabState = false;
         CurrentCpuPercent = 0;
         PeakCpuPercent = 0;
         CurrentWorkingSetMb = 0;
@@ -782,9 +855,10 @@ internal sealed class ProfilerPageViewModel : ViewModelBase, IDisposable
         return port;
     }
 
-    private void ApplySamplingState(bool isSampling)
+    private void ApplySamplingState(bool isSampling, bool pausedByTabState)
     {
         IsSampling = isSampling;
+        _isAutoPausedByTabState = !isSampling && pausedByTabState;
         if (IsRemoteMode)
         {
             return;
@@ -810,12 +884,12 @@ internal sealed class ProfilerPageViewModel : ViewModelBase, IDisposable
         _ = ApplyRemoteProfilerSettingsAsync();
     }
 
-    private async Task ApplyRemotePausedStateAsync(bool nextIsSampling)
+    private async Task ApplyRemotePausedStateAsync(bool nextIsSampling, bool pausedByTabState)
     {
         var mutation = _remoteMutation;
         if (mutation is null)
         {
-            ApplySamplingState(nextIsSampling);
+            ApplySamplingState(nextIsSampling, pausedByTabState);
             return;
         }
 
@@ -827,7 +901,11 @@ internal sealed class ProfilerPageViewModel : ViewModelBase, IDisposable
                 IsPaused = !nextIsSampling,
             }).ConfigureAwait(false);
 
-            await Dispatcher.UIThread.InvokeAsync(() => ApplySamplingState(nextIsSampling));
+            await Dispatcher.UIThread.InvokeAsync(() =>
+            {
+                _isRemotePaused = !nextIsSampling;
+                ApplySamplingState(nextIsSampling, pausedByTabState);
+            });
         }
         catch
         {

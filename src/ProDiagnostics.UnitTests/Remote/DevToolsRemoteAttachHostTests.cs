@@ -4,6 +4,7 @@ using System.Net;
 using System.Net.Sockets;
 using System.Net.WebSockets;
 using System.Linq;
+using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 using Avalonia.Controls;
@@ -67,11 +68,21 @@ public class DevToolsRemoteAttachHostTests
             await ReceiveUntilNotKeepAliveAsync(client, TimeSpan.FromSeconds(5)));
         Assert.Equal(sessionId, helloAck.SessionId);
         Assert.Equal(RemoteProtocol.Version, helloAck.NegotiatedProtocolVersion);
-        Assert.True(helloAck.EnabledFeatures.Contains("trees", StringComparer.OrdinalIgnoreCase));
-        Assert.True(helloAck.EnabledFeatures.Contains("properties", StringComparer.OrdinalIgnoreCase));
-        Assert.True(helloAck.EnabledFeatures.Contains("code", StringComparer.OrdinalIgnoreCase));
-        Assert.False(helloAck.EnabledFeatures.Contains("mutation", StringComparer.OrdinalIgnoreCase));
-        Assert.False(helloAck.EnabledFeatures.Contains("streaming", StringComparer.OrdinalIgnoreCase));
+        Assert.Contains(
+            helloAck.EnabledFeatures,
+            feature => string.Equals(feature, "trees", StringComparison.OrdinalIgnoreCase));
+        Assert.Contains(
+            helloAck.EnabledFeatures,
+            feature => string.Equals(feature, "properties", StringComparison.OrdinalIgnoreCase));
+        Assert.Contains(
+            helloAck.EnabledFeatures,
+            feature => string.Equals(feature, "code", StringComparison.OrdinalIgnoreCase));
+        Assert.DoesNotContain(
+            helloAck.EnabledFeatures,
+            feature => string.Equals(feature, "mutation", StringComparison.OrdinalIgnoreCase));
+        Assert.DoesNotContain(
+            helloAck.EnabledFeatures,
+            feature => string.Equals(feature, "streaming", StringComparison.OrdinalIgnoreCase));
 
         var requestId = 42L;
         await SendAsync(
@@ -161,6 +172,68 @@ public class DevToolsRemoteAttachHostTests
             snapshot.RecentEvents,
             entry => entry.EventType == RemoteProtocolEventType.ReceiveFailure &&
                      (entry.Details?.Contains(RemoteReadOnlyMethods.TreeSnapshotGet, StringComparison.Ordinal) ?? false));
+    }
+
+    [AvaloniaFact]
+    public async Task DevToolsRemoteAttachHost_StreamDemandSet_Works_When_StreamingEnabled_WithoutMutationRouter()
+    {
+        var port = AllocateTcpPort();
+        var options = new DevToolsRemoteAttachHostOptions
+        {
+            HttpOptions = HttpAttachServerOptions.Default with
+            {
+                Port = port,
+                Path = "/attach",
+                BindingMode = HttpAttachBindingMode.Localhost,
+                ReceiveTimeout = TimeSpan.FromSeconds(5),
+            },
+            EnableMutationApi = false,
+            EnableStreamingApi = true,
+        };
+
+        var root = new Window
+        {
+            Content = new Grid()
+        };
+
+        await using var host = new DevToolsRemoteAttachHost(root, options);
+        await host.StartAsync();
+
+        using var client = new ClientWebSocket();
+        await client.ConnectAsync(options.HttpOptions.BuildClientWebSocketUri(), CancellationToken.None);
+
+        var sessionId = Guid.NewGuid();
+        await SendAsync(
+            client,
+            new RemoteHelloMessage(
+                SessionId: sessionId,
+                ProcessId: 100,
+                ProcessName: "stream-demand",
+                ApplicationName: "stream-demand",
+                MachineName: Environment.MachineName,
+                RuntimeVersion: Environment.Version.ToString(),
+                ClientName: "stream-demand-suite",
+                RequestedFeatures: new[] { "streaming" }));
+
+        _ = Assert.IsType<RemoteHelloAckMessage>(
+            await ReceiveUntilNotKeepAliveAsync(client, TimeSpan.FromSeconds(5)));
+
+        await SendAsync(
+            client,
+            new RemoteRequestMessage(
+                SessionId: sessionId,
+                RequestId: 5,
+                Method: RemoteMutationMethods.StreamDemandSet,
+                PayloadJson: "{\"topics\":[\"diagnostics.stream.selection\"]}"));
+
+        var response = Assert.IsType<RemoteResponseMessage>(
+            await ReceiveUntilNotKeepAliveAsync(client, TimeSpan.FromSeconds(5)));
+        Assert.True(response.IsSuccess);
+        var payload = JsonSerializer.Deserialize(
+            response.PayloadJson,
+            RemoteJsonSerializerContext.Default.RemoteMutationResult);
+        Assert.NotNull(payload);
+        Assert.Equal(RemoteMutationMethods.StreamDemandSet, payload!.Operation);
     }
 
     private static async Task SendAsync(ClientWebSocket socket, IRemoteMessage message)

@@ -518,6 +518,27 @@ public class MetricsPageViewModelTests
     }
 
     [AvaloniaFact]
+    public void SetTabActive_AutoPauses_And_Resumes_Only_For_TabDriven_Pause()
+    {
+        using var viewModel = new MetricsPageViewModel(subscribeToLiveMetrics: false);
+
+        Assert.False(viewModel.IsUpdatesPaused);
+
+        viewModel.SetTabActive(false);
+        Assert.True(viewModel.IsUpdatesPaused);
+
+        viewModel.SetTabActive(true);
+        Assert.False(viewModel.IsUpdatesPaused);
+
+        viewModel.PauseOrResumeUpdates();
+        Assert.True(viewModel.IsUpdatesPaused);
+
+        viewModel.SetTabActive(false);
+        viewModel.SetTabActive(true);
+        Assert.True(viewModel.IsUpdatesPaused);
+    }
+
+    [AvaloniaFact]
     public void Clear_Resets_Remote_Session_Tracking_And_Counters()
     {
         var now = DateTimeOffset.UtcNow;

@@ -582,7 +582,7 @@ public class RemoteMutationMessageRouterTests
         var tree = await readOnlySource.GetTreeSnapshotAsync(
             new RemoteTreeSnapshotRequest { Scope = "combined" },
             CancellationToken.None);
-        var buttonNode = Assert.Single(tree.Nodes.Where(node => node.ElementName == "TestButton"));
+        var buttonNode = Assert.Single(tree.Nodes, node => node.ElementName == "TestButton");
 
         var setSelection = await SendRequestAsync<RemoteMutationResult>(
             router,

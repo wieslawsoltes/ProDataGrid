@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+
 namespace Avalonia.Diagnostics.Remote;
 
 /// <summary>
@@ -229,6 +231,14 @@ public sealed record class RemoteSetLogLevelsRequest
 public sealed record class RemoteSetPausedRequest
 {
     public bool IsPaused { get; init; }
+}
+
+/// <summary>
+/// Request to update per-session stream topic demand hints.
+/// </summary>
+public sealed record class RemoteSetStreamDemandRequest
+{
+    public IReadOnlyList<string>? Topics { get; init; }
 }
 
 /// <summary>

@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -15,6 +14,7 @@ public sealed class RemoteStreamSessionHub : IAsyncDisposable
 
     private readonly object _sync = new();
     private readonly Dictionary<Guid, SessionChannel> _sessions = new();
+    private SessionChannel[] _sessionSnapshot = Array.Empty<SessionChannel>();
     private readonly RemoteStreamSessionHubOptions _options;
     private readonly IRemoteProtocolMonitor _protocolMonitor;
     private readonly IRemoteDiagnosticsLogger _diagnosticsLogger;
@@ -66,6 +66,8 @@ public sealed class RemoteStreamSessionHub : IAsyncDisposable
             created = new SessionChannel(sessionId, connection);
             created.StartPump(() => RunPumpAsync(created));
             _sessions.Add(sessionId, created);
+            RefreshSessionSnapshotLocked();
+            RemoteRuntimeMetrics.SetActiveStreamSessions(_sessions.Count);
         }
 
         if (previous is not null)
@@ -82,6 +84,77 @@ public sealed class RemoteStreamSessionHub : IAsyncDisposable
         }
     }
 
+    public bool SetSessionDemand(Guid sessionId, IReadOnlyList<string>? topics)
+    {
+        if (sessionId == Guid.Empty)
+        {
+            return false;
+        }
+
+        SessionChannel? session;
+        lock (_sync)
+        {
+            if (!_sessions.TryGetValue(sessionId, out session))
+            {
+                return false;
+            }
+        }
+
+        var demand = RemoteStreamDemandSnapshot.FromTopics(topics);
+        var changed = session.SetDemand(demand);
+        if (changed)
+        {
+            Log(
+                RemoteDiagnosticsLogLevel.Debug,
+                "session-demand-updated",
+                session.Connection.ConnectionId,
+                session.Connection.RemoteEndpoint,
+                session.SessionId,
+                null,
+                "selection=" + demand.Selection
+                + ", preview=" + demand.Preview
+                + ", metrics=" + demand.Metrics
+                + ", profiler=" + demand.Profiler
+                + ", logs=" + demand.Logs
+                + ", events=" + demand.Events);
+        }
+
+        return changed;
+    }
+
+    public RemoteStreamDemandSnapshot GetAggregatedDemand()
+    {
+        SessionChannel[] snapshot;
+        lock (_sync)
+        {
+            snapshot = _sessionSnapshot;
+        }
+
+        if (snapshot.Length == 0)
+        {
+            return RemoteStreamDemandSnapshot.None;
+        }
+
+        var demand = RemoteStreamDemandSnapshot.None;
+        for (var i = 0; i < snapshot.Length; i++)
+        {
+            var sessionDemand = snapshot[i].GetEffectiveDemand();
+            demand = new RemoteStreamDemandSnapshot(
+                Selection: demand.Selection || sessionDemand.Selection,
+                Preview: demand.Preview || sessionDemand.Preview,
+                Metrics: demand.Metrics || sessionDemand.Metrics,
+                Profiler: demand.Profiler || sessionDemand.Profiler,
+                Logs: demand.Logs || sessionDemand.Logs,
+                Events: demand.Events || sessionDemand.Events);
+            if (demand == RemoteStreamDemandSnapshot.All)
+            {
+                return demand;
+            }
+        }
+
+        return demand;
+    }
+
     public bool TryUnregisterSession(Guid sessionId)
     {
         SessionChannel? removed;
@@ -93,9 +166,12 @@ public sealed class RemoteStreamSessionHub : IAsyncDisposable
             }
 
             _sessions.Remove(sessionId);
+            RefreshSessionSnapshotLocked();
+            RemoteRuntimeMetrics.SetActiveStreamSessions(_sessions.Count);
         }
 
         removed.Cancel();
+        UpdateQueueDepthGauges();
         Log(
             RemoteDiagnosticsLogLevel.Debug,
             "session-unregistered",
@@ -123,19 +199,35 @@ public sealed class RemoteStreamSessionHub : IAsyncDisposable
         lock (_sync)
         {
             ThrowIfDisposed();
-            if (_sessions.Count == 0)
-            {
-                return;
-            }
-
-            targets = _sessions.Values.ToArray();
+            targets = _sessionSnapshot;
         }
 
+        if (targets.Length == 0)
+        {
+            RemoteRuntimeMetrics.SetStreamQueueDepth(0, 0);
+            return;
+        }
+
+        var maxQueueDepth = 0L;
+        var totalQueueDepth = 0L;
+        var payloadUtf8Bytes = RemoteRuntimeMetrics.GetUtf8ByteCount(payloadJson);
         for (var i = 0; i < targets.Length; i++)
         {
-            var dropped = targets[i].Enqueue(topic, payloadJson, _options.MaxQueueLengthPerSession);
+            if (!targets[i].IsTopicDemanded(topic))
+            {
+                continue;
+            }
+
+            var dropped = targets[i].Enqueue(
+                topic,
+                payloadJson,
+                payloadUtf8Bytes,
+                _options.MaxQueueLengthPerSession,
+                out var queueDepth);
             if (dropped > 0)
             {
+                var domain = ResolveDomainFromTopic(topic);
+                RemoteRuntimeMetrics.RecordStreamDropped(domain, dropped, "remote");
                 _protocolMonitor.RecordStreamDropped(targets[i].SessionId, topic, dropped);
                 Log(
                     RemoteDiagnosticsLogLevel.Warning,
@@ -146,7 +238,17 @@ public sealed class RemoteStreamSessionHub : IAsyncDisposable
                     topic,
                     "Dropped messages: " + dropped);
             }
+
+            totalQueueDepth += queueDepth;
+            if (queueDepth > maxQueueDepth)
+            {
+                maxQueueDepth = queueDepth;
+            }
         }
+
+        RemoteRuntimeMetrics.SetStreamQueueDepth(
+            maxDepth: maxQueueDepth,
+            averageDepth: targets.Length == 0 ? 0 : totalQueueDepth / targets.Length);
     }
 
     public void Publish(RemoteStreamPayload payload)
@@ -159,7 +261,7 @@ public sealed class RemoteStreamSessionHub : IAsyncDisposable
         SessionChannel[] snapshot;
         lock (_sync)
         {
-            snapshot = _sessions.Values.ToArray();
+            snapshot = _sessionSnapshot;
         }
 
         if (snapshot.Length == 0)
@@ -187,8 +289,11 @@ public sealed class RemoteStreamSessionHub : IAsyncDisposable
             }
 
             _isDisposed = true;
-            sessions = _sessions.Values.ToArray();
+            sessions = _sessionSnapshot;
             _sessions.Clear();
+            _sessionSnapshot = Array.Empty<SessionChannel>();
+            RemoteRuntimeMetrics.SetActiveStreamSessions(0);
+            RemoteRuntimeMetrics.SetStreamQueueDepth(0, 0);
         }
 
         _shutdown.Cancel();
@@ -223,8 +328,9 @@ public sealed class RemoteStreamSessionHub : IAsyncDisposable
                 break;
             }
 
+            var targetBatchSize = ResolveDispatchBatchSize(session.GetQueueLength(), _options.MaxDispatchBatchSize);
             var dispatched = 0;
-            while (dispatched < _options.MaxDispatchBatchSize && !cancellationToken.IsCancellationRequested)
+            while (dispatched < targetBatchSize && !cancellationToken.IsCancellationRequested)
             {
                 if (!session.TryDequeue(out var pending, out var droppedBefore, out var sequence))
                 {
@@ -242,6 +348,14 @@ public sealed class RemoteStreamSessionHub : IAsyncDisposable
                                 PayloadJson: pending.PayloadJson),
                             cancellationToken)
                         .ConfigureAwait(false);
+                    var domain = ResolveDomainFromTopic(pending.Topic);
+                    RemoteRuntimeMetrics.RecordPayloadOutBytes(
+                        transport: "inproc",
+                        method: "stream",
+                        domain: domain,
+                        scope: "none",
+                        status: "ok",
+                        bytes: pending.PayloadUtf8Bytes);
                     session.MarkSent();
                 }
                 catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
@@ -250,6 +364,11 @@ public sealed class RemoteStreamSessionHub : IAsyncDisposable
                 }
                 catch (Exception ex)
                 {
+                    RemoteRuntimeMetrics.RecordTransportFailure(
+                        transport: "inproc",
+                        method: "stream",
+                        domain: ResolveDomainFromTopic(pending.Topic),
+                        status: "error");
                     _protocolMonitor.RecordStreamDispatchFailure(session.SessionId, pending.Topic, ex.Message);
                     Log(
                         RemoteDiagnosticsLogLevel.Warning,
@@ -277,13 +396,48 @@ public sealed class RemoteStreamSessionHub : IAsyncDisposable
         }
     }
 
-    private readonly record struct PendingStreamItem(string Topic, string PayloadJson);
+    private void RefreshSessionSnapshotLocked()
+    {
+        var next = new SessionChannel[_sessions.Count];
+        var index = 0;
+        foreach (var session in _sessions.Values)
+        {
+            next[index++] = session;
+        }
+
+        _sessionSnapshot = next;
+    }
+
+    private static int ResolveDispatchBatchSize(int queueDepth, int maxBatchSize)
+    {
+        if (maxBatchSize <= 1)
+        {
+            return 1;
+        }
+
+        if (queueDepth <= 0)
+        {
+            return 1;
+        }
+
+        var adaptive = queueDepth / 2;
+        if (adaptive < 1)
+        {
+            return 1;
+        }
+
+        return adaptive > maxBatchSize ? maxBatchSize : adaptive;
+    }
+
+    private readonly record struct PendingStreamItem(string Topic, string PayloadJson, int PayloadUtf8Bytes);
 
     private sealed class SessionChannel : IDisposable
     {
         private readonly object _gate = new();
         private readonly Queue<PendingStreamItem> _queue = new();
         private readonly CancellationTokenSource _cancellation = new();
+        private RemoteStreamDemandSnapshot _explicitDemand = RemoteStreamDemandSnapshot.None;
+        private bool _hasExplicitDemand;
         private long _sequence;
         private long _sent;
         private long _dropped;
@@ -304,7 +458,12 @@ public sealed class RemoteStreamSessionHub : IAsyncDisposable
 
         public SemaphoreSlim Signal { get; } = new(0);
 
-        public int Enqueue(string topic, string payloadJson, int maxQueueLength)
+        public int Enqueue(
+            string topic,
+            string payloadJson,
+            int payloadUtf8Bytes,
+            int maxQueueLength,
+            out int queueDepth)
         {
             var dropped = 0;
             lock (_gate)
@@ -317,11 +476,45 @@ public sealed class RemoteStreamSessionHub : IAsyncDisposable
                     dropped = 1;
                 }
 
-                _queue.Enqueue(new PendingStreamItem(topic, payloadJson));
+                _queue.Enqueue(new PendingStreamItem(topic, payloadJson, payloadUtf8Bytes));
+                queueDepth = _queue.Count;
             }
 
             Signal.Release();
             return dropped;
+        }
+
+        public bool SetDemand(RemoteStreamDemandSnapshot demand)
+        {
+            lock (_gate)
+            {
+                if (_hasExplicitDemand && _explicitDemand == demand)
+                {
+                    return false;
+                }
+
+                _explicitDemand = demand;
+                _hasExplicitDemand = true;
+                return true;
+            }
+        }
+
+        public RemoteStreamDemandSnapshot GetEffectiveDemand()
+        {
+            lock (_gate)
+            {
+                return _hasExplicitDemand
+                    ? _explicitDemand
+                    : RemoteStreamDemandSnapshot.All;
+            }
+        }
+
+        public bool IsTopicDemanded(string topic)
+        {
+            lock (_gate)
+            {
+                return !_hasExplicitDemand || _explicitDemand.IsDemanded(topic);
+            }
         }
 
         public bool TryDequeue(out PendingStreamItem item, out int droppedBefore, out long sequence)
@@ -365,6 +558,14 @@ public sealed class RemoteStreamSessionHub : IAsyncDisposable
             Interlocked.Increment(ref _sent);
         }
 
+        public int GetQueueLength()
+        {
+            lock (_gate)
+            {
+                return _queue.Count;
+            }
+        }
+
         public RemoteStreamSessionStats GetStats()
         {
             int queueLength;
@@ -386,6 +587,49 @@ public sealed class RemoteStreamSessionHub : IAsyncDisposable
             _cancellation.Dispose();
             Signal.Dispose();
         }
+    }
+
+    private static string ResolveDomainFromTopic(string topic)
+    {
+        return topic switch
+        {
+            RemoteStreamTopics.Selection => "tree",
+            RemoteStreamTopics.Events => "events",
+            RemoteStreamTopics.Logs => "logs",
+            RemoteStreamTopics.Metrics => "metrics",
+            RemoteStreamTopics.Profiler => "profiler",
+            RemoteStreamTopics.Preview => "preview",
+            _ => "none",
+        };
+    }
+
+    private void UpdateQueueDepthGauges()
+    {
+        SessionChannel[] snapshot;
+        lock (_sync)
+        {
+            snapshot = _sessionSnapshot;
+        }
+
+        if (snapshot.Length == 0)
+        {
+            RemoteRuntimeMetrics.SetStreamQueueDepth(0, 0);
+            return;
+        }
+
+        var maxQueueDepth = 0L;
+        var totalQueueDepth = 0L;
+        for (var i = 0; i < snapshot.Length; i++)
+        {
+            var queueDepth = snapshot[i].GetQueueLength();
+            totalQueueDepth += queueDepth;
+            if (queueDepth > maxQueueDepth)
+            {
+                maxQueueDepth = queueDepth;
+            }
+        }
+
+        RemoteRuntimeMetrics.SetStreamQueueDepth(maxQueueDepth, totalQueueDepth / snapshot.Length);
     }
 
     private void Log(

@@ -23,6 +23,15 @@ namespace Avalonia.Diagnostics.ViewModels
         private const int LastVisibleTabIndex = 16;
         private const int LastTabIndex = 17;
         private const int LastRightPanelTabIndex = LastTabIndex - 3;
+        private const int CodeGlobalTabIndex = 4;
+        private const int Elements3DGlobalTabIndex = 5;
+        private const int MetricsGlobalTabIndex = 11;
+        private const int BindingsGlobalTabIndex = 12;
+        private const int ProfilerGlobalTabIndex = 13;
+        private const int StylesGlobalTabIndex = 14;
+        private static readonly TimeSpan DeferredRefreshCadence = TimeSpan.FromMilliseconds(140);
+        private static readonly TimeSpan DeferredRefreshBurstWindow = TimeSpan.FromSeconds(4);
+        private const int DeferredRefreshBurstThreshold = 40;
 
         private readonly AvaloniaObject _root;
         private readonly TreePageViewModel _logicalTree;
@@ -88,6 +97,8 @@ namespace Avalonia.Diagnostics.ViewModels
         private bool _remoteLoopbackInitializationRequested;
         private bool _isApplyingSelectionSnapshot;
         private bool _suppressRemoteSelectionPush;
+        private readonly Dictionary<int, DeferredRefreshState> _deferredRightTabRefreshStates = new();
+        private bool _isDisposed;
 
         public MainViewModel(AvaloniaObject root)
         {
@@ -164,6 +175,7 @@ namespace Avalonia.Diagnostics.ViewModels
             }
 
             PublishSelectionToStore(GetSelectedDiagnosticsObject(), combinedNodePathHint: _combinedTree.SelectedNodePath, pushRemote: false);
+            ApplyRightTabRuntimePolicies(MapRightTabToGlobalTab(_selectedRightTab), forceRefresh: false);
         }
 
         public bool FreezePopups
@@ -423,6 +435,7 @@ namespace Avalonia.Diagnostics.ViewModels
                 }
 
                 RightContent = ResolveRightTabContent(MapRightTabToGlobalTab(normalized), inspectSelection: true);
+                ApplyRightTabRuntimePolicies(MapRightTabToGlobalTab(normalized), forceRefresh: true);
                 if (!_isSynchronizingTabSelection)
                 {
                     SelectedTab = MapRightTabToGlobalTab(normalized);
@@ -550,6 +563,11 @@ namespace Avalonia.Diagnostics.ViewModels
 
         public void RefreshCurrentTool()
         {
+            if (!IsTreeTab(SelectedTab))
+            {
+                ResetDeferredRefreshState(MapRightTabToGlobalTab(SelectedRightTab), runPendingAction: true);
+            }
+
             switch (Content)
             {
                 case TreePageViewModel tree:
@@ -751,6 +769,14 @@ namespace Avalonia.Diagnostics.ViewModels
 
         public void Dispose()
         {
+            _isDisposed = true;
+            foreach (var deferredState in _deferredRightTabRefreshStates.Values)
+            {
+                deferredState.ResetTracking();
+            }
+
+            _deferredRightTabRefreshStates.Clear();
+
             if (KeyboardDevice.Instance is not null)
             {
                 KeyboardDevice.Instance.PropertyChanged -= KeyboardPropertyChanged;
@@ -1038,7 +1064,7 @@ namespace Avalonia.Diagnostics.ViewModels
 
         private void ApplySelectionSnapshot(RemoteSelectionSnapshot snapshot)
         {
-            if (_isApplyingSelectionSnapshot)
+            if (_isDisposed || _isApplyingSelectionSnapshot)
             {
                 return;
             }
@@ -1070,23 +1096,29 @@ namespace Avalonia.Diagnostics.ViewModels
 
                 if (RightContent is ViewModelsBindingsPageViewModel)
                 {
-                    _viewModelsBindings.InspectControl(resolvedSelection);
+                    QueueDeferredRightTabRefresh(
+                        BindingsGlobalTabIndex,
+                        () => _viewModelsBindings.InspectControl(resolvedSelection));
                 }
 
                 if (RightContent is StylesDiagnosticsPageViewModel)
                 {
-                    _stylesDiagnostics.InspectControl(resolvedSelection);
+                    QueueDeferredRightTabRefresh(
+                        StylesGlobalTabIndex,
+                        () => _stylesDiagnostics.InspectControl(resolvedSelection));
                 }
 
                 if (RightContent is Elements3DPageViewModel)
                 {
-                    _elements3D.InspectControl(resolvedSelection);
+                    QueueDeferredRightTabRefresh(
+                        Elements3DGlobalTabIndex,
+                        () => _elements3D.InspectControl(resolvedSelection));
                 }
 
                 RefreshPropertiesTabContent();
                 if (RightContent is CodePageViewModel)
                 {
-                    SyncCodeFromCurrentContext();
+                    QueueDeferredRightTabRefresh(CodeGlobalTabIndex, SyncCodeFromCurrentContext);
                 }
                 UpdateInspectionHighlight();
 
@@ -1291,6 +1323,197 @@ namespace Avalonia.Diagnostics.ViewModels
         private static int MapGlobalTabToRightTab(int globalTabIndex)
         {
             return NormalizeRightTabIndex(globalTabIndex - 3);
+        }
+
+        private static bool IsDeferredRefreshTab(int globalTabIndex)
+        {
+            return globalTabIndex is CodeGlobalTabIndex
+                or Elements3DGlobalTabIndex
+                or BindingsGlobalTabIndex
+                or StylesGlobalTabIndex;
+        }
+
+        private void ApplyRightTabRuntimePolicies(int activeRightGlobalTab, bool forceRefresh)
+        {
+            if (_isDisposed)
+            {
+                return;
+            }
+
+            _metrics.SetTabActive(activeRightGlobalTab == MetricsGlobalTabIndex);
+            _profiler.SetTabActive(activeRightGlobalTab == ProfilerGlobalTabIndex);
+
+            if (!IsDeferredRefreshTab(activeRightGlobalTab))
+            {
+                return;
+            }
+
+            if (forceRefresh)
+            {
+                ResetDeferredRefreshState(activeRightGlobalTab, runPendingAction: true);
+                return;
+            }
+
+            FlushDeferredRightTabRefresh(activeRightGlobalTab, force: false);
+        }
+
+        private DeferredRefreshState GetDeferredRefreshState(int globalTabIndex)
+        {
+            if (!_deferredRightTabRefreshStates.TryGetValue(globalTabIndex, out var state))
+            {
+                state = new DeferredRefreshState();
+                _deferredRightTabRefreshStates[globalTabIndex] = state;
+            }
+
+            return state;
+        }
+
+        private void QueueDeferredRightTabRefresh(int globalTabIndex, Action refreshAction, bool force = false)
+        {
+            if (_isDisposed)
+            {
+                return;
+            }
+
+            if (!IsDeferredRefreshTab(globalTabIndex))
+            {
+                refreshAction();
+                return;
+            }
+
+            var state = GetDeferredRefreshState(globalTabIndex);
+            var isActiveTab = MapRightTabToGlobalTab(SelectedRightTab) == globalTabIndex;
+            if (force && isActiveTab)
+            {
+                state.ResetTracking();
+                state.LastDispatchUtc = DateTimeOffset.UtcNow;
+                state.PendingAction = null;
+                refreshAction();
+                return;
+            }
+
+            state.PendingAction = refreshAction;
+            if (!isActiveTab || state.IsManualRefreshOnly)
+            {
+                return;
+            }
+
+            var now = DateTimeOffset.UtcNow;
+            state.RegisterBurst(now, DeferredRefreshBurstWindow);
+            if (state.BurstCount > DeferredRefreshBurstThreshold)
+            {
+                state.IsManualRefreshOnly = true;
+                return;
+            }
+
+            if (state.CanDispatch(now, DeferredRefreshCadence))
+            {
+                state.LastDispatchUtc = now;
+                var action = state.PendingAction;
+                state.PendingAction = null;
+                action?.Invoke();
+                return;
+            }
+
+            if (state.IsFlushScheduled)
+            {
+                return;
+            }
+
+            state.IsFlushScheduled = true;
+            var delay = state.GetRemainingCadence(now, DeferredRefreshCadence);
+            DispatcherTimer.RunOnce(() => FlushDeferredRightTabRefresh(globalTabIndex, force: false), delay);
+        }
+
+        private void FlushDeferredRightTabRefresh(int globalTabIndex, bool force)
+        {
+            if (_isDisposed)
+            {
+                return;
+            }
+
+            if (!_deferredRightTabRefreshStates.TryGetValue(globalTabIndex, out var state))
+            {
+                return;
+            }
+
+            if (force)
+            {
+                state.IsFlushScheduled = false;
+            }
+
+            if (!force)
+            {
+                if (!state.IsFlushScheduled)
+                {
+                    return;
+                }
+
+                state.IsFlushScheduled = false;
+            }
+
+            var isActiveTab = MapRightTabToGlobalTab(SelectedRightTab) == globalTabIndex;
+            if (!isActiveTab || state.PendingAction is null)
+            {
+                return;
+            }
+
+            if (state.IsManualRefreshOnly && !force)
+            {
+                return;
+            }
+
+            var now = DateTimeOffset.UtcNow;
+            if (!force && !state.CanDispatch(now, DeferredRefreshCadence))
+            {
+                if (!state.IsFlushScheduled)
+                {
+                    state.IsFlushScheduled = true;
+                    var delay = state.GetRemainingCadence(now, DeferredRefreshCadence);
+                    DispatcherTimer.RunOnce(() => FlushDeferredRightTabRefresh(globalTabIndex, force: false), delay);
+                }
+
+                return;
+            }
+
+            var action = state.PendingAction;
+            state.PendingAction = null;
+            state.LastDispatchUtc = now;
+            if (force)
+            {
+                state.IsManualRefreshOnly = false;
+            }
+
+            action?.Invoke();
+        }
+
+        private void ResetDeferredRefreshState(int globalTabIndex, bool runPendingAction)
+        {
+            if (_isDisposed)
+            {
+                return;
+            }
+
+            if (!_deferredRightTabRefreshStates.TryGetValue(globalTabIndex, out var state))
+            {
+                return;
+            }
+
+            var action = state.PendingAction;
+            state.ResetTracking();
+            if (!runPendingAction || action is null)
+            {
+                return;
+            }
+
+            if (MapRightTabToGlobalTab(SelectedRightTab) != globalTabIndex)
+            {
+                state.PendingAction = action;
+                return;
+            }
+
+            state.LastDispatchUtc = DateTimeOffset.UtcNow;
+            action();
         }
 
         private ViewModelBase ResolveTreeTabContent(int treeTabIndex)
@@ -1830,6 +2053,7 @@ namespace Avalonia.Diagnostics.ViewModels
                 session.ReadOnly,
                 GetRemoteSelectionContext,
                 refreshNow: activeRightGlobalTab == 5);
+            ApplyRightTabRuntimePolicies(activeRightGlobalTab, forceRefresh: false);
             _ = RefreshRemoteSelectionSnapshotAsync();
         }
 
@@ -2023,6 +2247,63 @@ namespace Avalonia.Diagnostics.ViewModels
             catch
             {
                 return false;
+            }
+        }
+
+        private sealed class DeferredRefreshState
+        {
+            public DateTimeOffset LastDispatchUtc { get; set; }
+
+            public DateTimeOffset BurstWindowStartedUtc { get; private set; }
+
+            public int BurstCount { get; private set; }
+
+            public bool IsFlushScheduled { get; set; }
+
+            public bool IsManualRefreshOnly { get; set; }
+
+            public Action? PendingAction { get; set; }
+
+            public void RegisterBurst(DateTimeOffset now, TimeSpan burstWindow)
+            {
+                if (BurstWindowStartedUtc == default || now - BurstWindowStartedUtc > burstWindow)
+                {
+                    BurstWindowStartedUtc = now;
+                    BurstCount = 1;
+                    return;
+                }
+
+                BurstCount++;
+            }
+
+            public bool CanDispatch(DateTimeOffset now, TimeSpan cadence)
+            {
+                return LastDispatchUtc == default || now - LastDispatchUtc >= cadence;
+            }
+
+            public TimeSpan GetRemainingCadence(DateTimeOffset now, TimeSpan cadence)
+            {
+                if (LastDispatchUtc == default)
+                {
+                    return TimeSpan.Zero;
+                }
+
+                var elapsed = now - LastDispatchUtc;
+                if (elapsed >= cadence)
+                {
+                    return TimeSpan.Zero;
+                }
+
+                return cadence - elapsed;
+            }
+
+            public void ResetTracking()
+            {
+                IsFlushScheduled = false;
+                IsManualRefreshOnly = false;
+                BurstWindowStartedUtc = default;
+                BurstCount = 0;
+                PendingAction = null;
             }
         }
     }

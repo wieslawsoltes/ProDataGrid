@@ -87,6 +87,55 @@ public class RemoteReadOnlyMessageRouterParityTests
     }
 
     [AvaloniaFact]
+    public async Task HandleAsync_PreviewSnapshot_SvgDiffWithoutFrameData_RemainsStable_WhenUnchanged()
+    {
+        var window = CreateTestWindow();
+        using var streamSource = new InProcessRemoteStreamSource(
+            root: window,
+            options: InProcessRemoteStreamSourceOptions.Default with
+            {
+                EnableUdpTelemetryFallback = false,
+            });
+        using var _ = streamSource.Subscribe(static _ => { });
+        var source = new InProcessRemoteReadOnlyDiagnosticsSource(
+            window,
+            streamPauseController: streamSource);
+        var router = new RemoteReadOnlyMessageRouter(source);
+
+        var first = await SendRequestAsync<RemotePreviewSnapshot>(
+            router,
+            RemoteReadOnlyMethods.PreviewSnapshotGet,
+            new RemotePreviewSnapshotRequest
+            {
+                Transport = "svg",
+                IncludeFrameData = false,
+                EnableDiff = true,
+                MaxWidth = 1200,
+                MaxHeight = 900,
+                Scale = 1d,
+            });
+
+        var second = await SendRequestAsync<RemotePreviewSnapshot>(
+            router,
+            RemoteReadOnlyMethods.PreviewSnapshotGet,
+            new RemotePreviewSnapshotRequest
+            {
+                Transport = "svg",
+                IncludeFrameData = false,
+                EnableDiff = true,
+                PreviousFrameHash = first.FrameHash,
+                MaxWidth = 1200,
+                MaxHeight = 900,
+                Scale = 1d,
+            });
+
+        Assert.Equal(first.FrameHash, second.FrameHash);
+        Assert.False(second.HasChanges);
+        Assert.Null(second.FrameData);
+        Assert.Equal("image/svg+xml", second.MimeType);
+    }
+
+    [AvaloniaFact]
     public async Task HandleAsync_TreeSnapshot_Matches_Direct_Source_Output()
     {
         var window = CreateTestWindow();
@@ -349,6 +398,8 @@ public class RemoteReadOnlyMessageRouterParityTests
         using var streamSource = new InProcessRemoteStreamSource(
             options: InProcessRemoteStreamSourceOptions.Default with
             {
+                EnableMetricsStream = false,
+                EnableProfilerStream = false,
                 EnableUdpTelemetryFallback = false,
             });
         using var _ = streamSource.Subscribe(static _ => { });

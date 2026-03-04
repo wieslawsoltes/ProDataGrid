@@ -52,6 +52,8 @@ internal sealed class MetricsPageViewModel : ViewModelBase, IDisposable
     private string _remoteStatusText = "Remote metrics listener is stopped.";
     private MetricSeriesViewModel? _selectedSeries;
     private IRemoteMutationDiagnosticsDomainService? _remoteMutation;
+    private bool _isTabActive = true;
+    private bool _isAutoPausedByTabState;
 
     public MetricsPageViewModel()
         : this(
@@ -234,6 +236,46 @@ internal sealed class MetricsPageViewModel : ViewModelBase, IDisposable
         _remoteMutation = mutation;
     }
 
+    internal void SetTabActive(bool isActive)
+    {
+        if (_isDisposed || _isTabActive == isActive)
+        {
+            return;
+        }
+
+        _isTabActive = isActive;
+        if (!isActive)
+        {
+            if (IsUpdatesPaused)
+            {
+                _isAutoPausedByTabState = false;
+                return;
+            }
+
+            if (_remoteMutation is not null)
+            {
+                _ = ApplyRemotePausedStateAsync(isPaused: true, pausedByTabState: true);
+                return;
+            }
+
+            ApplyPausedState(isPaused: true, pausedByTabState: true);
+            return;
+        }
+
+        if (!_isAutoPausedByTabState)
+        {
+            return;
+        }
+
+        if (_remoteMutation is not null)
+        {
+            _ = ApplyRemotePausedStateAsync(isPaused: false, pausedByTabState: false);
+            return;
+        }
+
+        ApplyPausedState(isPaused: false, pausedByTabState: false);
+    }
+
     public bool ShowCounters
     {
         get => _showCounters;
@@ -393,16 +435,17 @@ internal sealed class MetricsPageViewModel : ViewModelBase, IDisposable
         var nextPaused = !IsUpdatesPaused;
         if (_remoteMutation is not null)
         {
-            _ = ApplyRemotePausedStateAsync(nextPaused);
+            _ = ApplyRemotePausedStateAsync(nextPaused, pausedByTabState: false);
             return;
         }
 
-        ApplyPausedState(nextPaused);
+        ApplyPausedState(nextPaused, pausedByTabState: false);
     }
 
-    private void ApplyPausedState(bool isPaused)
+    private void ApplyPausedState(bool isPaused, bool pausedByTabState)
     {
         IsUpdatesPaused = isPaused;
+        _isAutoPausedByTabState = isPaused && pausedByTabState;
         if (!isPaused && !_isDisposed && _pendingMeasurements.Count > 0 && !_isFlushScheduled)
         {
             _isFlushScheduled = true;
@@ -909,12 +952,12 @@ internal sealed class MetricsPageViewModel : ViewModelBase, IDisposable
         _ = ApplyRemoteMetricsSettingsAsync();
     }
 
-    private async Task ApplyRemotePausedStateAsync(bool isPaused)
+    private async Task ApplyRemotePausedStateAsync(bool isPaused, bool pausedByTabState)
     {
         var mutation = _remoteMutation;
         if (mutation is null)
         {
-            ApplyPausedState(isPaused);
+            ApplyPausedState(isPaused, pausedByTabState);
             return;
         }
 
@@ -926,7 +969,7 @@ internal sealed class MetricsPageViewModel : ViewModelBase, IDisposable
                 IsPaused = isPaused,
             }).ConfigureAwait(false);
 
-            await Dispatcher.UIThread.InvokeAsync(() => ApplyPausedState(isPaused));
+            await Dispatcher.UIThread.InvokeAsync(() => ApplyPausedState(isPaused, pausedByTabState));
         }
         catch
         {

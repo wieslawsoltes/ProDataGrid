@@ -16,6 +16,7 @@ using Avalonia.Controls.Primitives;
 using Avalonia.Diagnostics.Remote;
 using Avalonia.Diagnostics.ViewModels;
 using Avalonia.Media.Imaging;
+using Avalonia.Rendering;
 using Avalonia.Threading;
 using Avalonia.VisualTree;
 using ProDiagnostics.Transport;
@@ -39,13 +40,16 @@ internal sealed class InProcessRemoteStreamSource : IRemoteStreamSource, IRemote
     private readonly IDevToolsLogCollector _logCollector;
     private readonly EventsPageViewModel? _eventsPageViewModel;
     private readonly InProcessRemoteStreamSourceOptions _options;
+    private readonly int _maxMetricStreamPerSecond;
     private readonly int _maxLogStreamPerSecond;
     private readonly int _maxEventStreamPerSecond;
     private readonly Guid _localSessionId = Guid.NewGuid();
     private readonly string _localProcessName;
     private readonly int _localProcessId;
     private readonly Dictionary<Guid, RemoteUdpSessionInfo> _udpSessions = new();
-    private readonly List<RemoteMetricStreamPayload> _metricHistory = new();
+    private readonly List<MetricHistoryEntry> _metricHistory = new();
+    private readonly Dictionary<string, MetricSeriesState> _metricSeriesByKey = new(StringComparer.Ordinal);
+    private readonly LinkedList<string> _metricSeriesOrder = new();
     private readonly List<RemoteProfilerStreamPayload> _profilerHistory = new();
     private readonly ProcessProfilerSampler _profilerSampler = new();
 
@@ -54,6 +58,7 @@ internal sealed class InProcessRemoteStreamSource : IRemoteStreamSource, IRemote
     private DiagnosticsUdpReceiver? _udpReceiver;
     private Timer? _previewTimer;
     private Timer? _profilerTimer;
+    private Timer? _metricsCoalesceTimer;
     private string _previewTransport = "svg";
     private int _previewTargetFps = 5;
     private int _previewMaxWidth = 1920;
@@ -63,6 +68,16 @@ internal sealed class InProcessRemoteStreamSource : IRemoteStreamSource, IRemote
     private bool _previewIncludeFrameData = true;
     private string? _previewLastFrameHash;
     private int _previewCaptureScheduled;
+    private long _previewLastCaptureTicks;
+    private double _previewAdaptiveScaleFactor = 1d;
+    private int _previewSlowCaptureStreak;
+    private int _previewFastCaptureStreak;
+    private long _previewSceneInvalidationVersion = 1;
+    private long _previewLastCapturedSceneVersion = -1;
+    private IRenderer? _previewRenderer;
+    private EventHandler<SceneInvalidatedEventArgs>? _previewSceneInvalidatedHandler;
+    private PreviewSvgFrameCacheEntry? _previewSvgFrameCache;
+    private PreviewPngFrameCacheEntry? _previewPngFrameCache;
     private bool _eventsHooked;
     private bool _isDisposed;
     private bool _isStarted;
@@ -81,8 +96,19 @@ internal sealed class InProcessRemoteStreamSource : IRemoteStreamSource, IRemote
     private long _totalProfilerSamples;
     private long _droppedMetricMeasurements;
     private long _droppedProfilerSamples;
+    private long _nextMetricSequence;
+    private double _profilerCurrentCpuPercent;
+    private double _profilerPeakCpuPercent;
+    private double _profilerCurrentWorkingSetMb;
+    private double _profilerPeakWorkingSetMb;
+    private double _profilerCurrentManagedHeapMb;
+    private double _profilerCurrentActivityDurationMs;
+    private double _profilerPeakActivityDurationMs;
     private long _nextLogPublishTicksUtc;
     private long _nextEventPublishTicksUtc;
+    private long _nextMetricPublishTicksUtc;
+    private RemoteMetricStreamPayload? _pendingMetricPayload;
+    private RemoteStreamDemandSnapshot _streamDemand = RemoteStreamDemandSnapshot.All;
 
     public InProcessRemoteStreamSource(
         AvaloniaObject? root = null,
@@ -100,6 +126,7 @@ internal sealed class InProcessRemoteStreamSource : IRemoteStreamSource, IRemote
         _maxSeries = _options.MaxSeries;
         _maxSamplesPerSeries = _options.MaxSamplesPerSeries;
         _profilerSampleInterval = _options.ProfilerSampleInterval;
+        _maxMetricStreamPerSecond = _options.MaxMetricStreamPerSecond;
         _maxLogStreamPerSecond = _options.MaxLogStreamPerSecond;
         _maxEventStreamPerSecond = _options.MaxEventStreamPerSecond;
 
@@ -165,14 +192,7 @@ internal sealed class InProcessRemoteStreamSource : IRemoteStreamSource, IRemote
                 return changed;
             }
 
-            if (next != 0)
-            {
-                DisablePreviewTimer();
-            }
-            else
-            {
-                EnsurePreviewTimer();
-            }
+            SyncPreviewProducerLocked();
 
             if (changed)
             {
@@ -253,14 +273,7 @@ internal sealed class InProcessRemoteStreamSource : IRemoteStreamSource, IRemote
                 return changed;
             }
 
-            if (next != 0)
-            {
-                DisableMetricsSubscription();
-            }
-            else
-            {
-                EnsureMetricsSubscription();
-            }
+            SyncMetricsProducerLocked();
 
             if (changed)
             {
@@ -288,14 +301,7 @@ internal sealed class InProcessRemoteStreamSource : IRemoteStreamSource, IRemote
                 return changed;
             }
 
-            if (next != 0)
-            {
-                DisableProfilerTimer();
-            }
-            else
-            {
-                EnsureProfilerTimer();
-            }
+            SyncProfilerProducerLocked();
 
             if (changed)
             {
@@ -304,6 +310,28 @@ internal sealed class InProcessRemoteStreamSource : IRemoteStreamSource, IRemote
         }
 
         return changed;
+    }
+
+    public void SetStreamDemand(RemoteStreamDemandSnapshot demand)
+    {
+        lock (_gate)
+        {
+            if (_streamDemand == demand)
+            {
+                return;
+            }
+
+            _streamDemand = demand;
+            SyncStreamProducersLocked();
+        }
+    }
+
+    public RemoteStreamDemandSnapshot GetStreamDemand()
+    {
+        lock (_gate)
+        {
+            return _streamDemand;
+        }
     }
 
     public RemoteMetricsSnapshot GetMetricsSnapshot(RemoteMetricsSnapshotRequest request)
@@ -322,7 +350,7 @@ internal sealed class InProcessRemoteStreamSource : IRemoteStreamSource, IRemote
                 : "Metrics stream is disabled.";
             var measurements = request.IncludeMeasurements
                 ? _metricHistory
-                    .Select(MapMetricMeasurement)
+                    .Select(static entry => MapMetricMeasurement(entry.Payload))
                     .ToArray()
                 : Array.Empty<RemoteMetricMeasurementSnapshot>();
             var series = request.IncludeSeries
@@ -366,41 +394,6 @@ internal sealed class InProcessRemoteStreamSource : IRemoteStreamSource, IRemote
                     .ToArray()
                 : Array.Empty<RemoteProfilerSampleSnapshot>();
 
-            var currentCpu = 0d;
-            var peakCpu = 0d;
-            var currentWorkingSet = 0d;
-            var peakWorkingSet = 0d;
-            var currentManagedHeap = 0d;
-            var currentDuration = 0d;
-            var peakDuration = 0d;
-            if (_profilerHistory.Count > 0)
-            {
-                var last = _profilerHistory[_profilerHistory.Count - 1];
-                currentCpu = last.CpuPercent;
-                currentWorkingSet = last.WorkingSetMb;
-                currentManagedHeap = last.ManagedHeapMb;
-                currentDuration = last.DurationMs;
-
-                for (var i = 0; i < _profilerHistory.Count; i++)
-                {
-                    var sample = _profilerHistory[i];
-                    if (sample.CpuPercent > peakCpu)
-                    {
-                        peakCpu = sample.CpuPercent;
-                    }
-
-                    if (sample.WorkingSetMb > peakWorkingSet)
-                    {
-                        peakWorkingSet = sample.WorkingSetMb;
-                    }
-
-                    if (sample.DurationMs > peakDuration)
-                    {
-                        peakDuration = sample.DurationMs;
-                    }
-                }
-            }
-
             return new RemoteProfilerSnapshot(
                 SnapshotVersion: SnapshotVersion,
                 Generation: _profilerGeneration,
@@ -411,13 +404,13 @@ internal sealed class InProcessRemoteStreamSource : IRemoteStreamSource, IRemote
                 TotalSamples: _totalProfilerSamples,
                 DroppedSamples: _droppedProfilerSamples,
                 SampleCount: _profilerHistory.Count,
-                CurrentCpuPercent: currentCpu,
-                PeakCpuPercent: peakCpu,
-                CurrentWorkingSetMb: currentWorkingSet,
-                PeakWorkingSetMb: peakWorkingSet,
-                CurrentManagedHeapMb: currentManagedHeap,
-                CurrentActivityDurationMs: currentDuration,
-                PeakActivityDurationMs: peakDuration,
+                CurrentCpuPercent: _profilerCurrentCpuPercent,
+                PeakCpuPercent: _profilerPeakCpuPercent,
+                CurrentWorkingSetMb: _profilerCurrentWorkingSetMb,
+                PeakWorkingSetMb: _profilerPeakWorkingSetMb,
+                CurrentManagedHeapMb: _profilerCurrentManagedHeapMb,
+                CurrentActivityDurationMs: _profilerCurrentActivityDurationMs,
+                PeakActivityDurationMs: _profilerPeakActivityDurationMs,
                 Samples: samples);
         }
     }
@@ -530,13 +523,18 @@ internal sealed class InProcessRemoteStreamSource : IRemoteStreamSource, IRemote
             if (changed > 0)
             {
                 _previewLastFrameHash = null;
+                _previewLastCapturedSceneVersion = -1;
+                _previewAdaptiveScaleFactor = 1d;
+                _previewSlowCaptureStreak = 0;
+                _previewFastCaptureStreak = 0;
+                ResetPreviewEncodedFrameCache();
                 _previewGeneration++;
             }
 
-            if (restartTimer && _isStarted && !IsPreviewPaused)
+            if (restartTimer && _isStarted)
             {
                 DisablePreviewTimer();
-                EnsurePreviewTimer();
+                SyncPreviewProducerLocked();
             }
 
             return changed;
@@ -561,6 +559,7 @@ internal sealed class InProcessRemoteStreamSource : IRemoteStreamSource, IRemote
             }
 
             var changed = 0;
+            var rebuildSeries = false;
 
             if (request.MaxRetainedMeasurements is { } maxRetainedMeasurements)
             {
@@ -587,6 +586,7 @@ internal sealed class InProcessRemoteStreamSource : IRemoteStreamSource, IRemote
                 {
                     _maxSeries = maxSeries;
                     changed++;
+                    rebuildSeries = true;
                 }
             }
 
@@ -601,14 +601,29 @@ internal sealed class InProcessRemoteStreamSource : IRemoteStreamSource, IRemote
                 {
                     _maxSamplesPerSeries = maxSamplesPerSeries;
                     changed++;
+                    rebuildSeries = true;
                 }
             }
 
             if (_metricHistory.Count > _maxRetainedMeasurements)
             {
                 var removeCount = _metricHistory.Count - _maxRetainedMeasurements;
+                for (var i = 0; i < removeCount; i++)
+                {
+                    RemoveMetricSeriesSample(_metricHistory[i]);
+                }
+
                 _metricHistory.RemoveRange(0, removeCount);
                 _droppedMetricMeasurements += removeCount;
+            }
+
+            if (rebuildSeries)
+            {
+                RebuildMetricSeriesStateFromHistory();
+            }
+            else
+            {
+                PruneMetricSeriesState();
             }
 
             if (changed > 0)
@@ -673,12 +688,13 @@ internal sealed class InProcessRemoteStreamSource : IRemoteStreamSource, IRemote
                 var removeCount = _profilerHistory.Count - _maxRetainedProfilerSamples;
                 _profilerHistory.RemoveRange(0, removeCount);
                 _droppedProfilerSamples += removeCount;
+                RecomputeProfilerAggregates();
             }
 
-            if (restartTimer && _isStarted && _options.EnableProfilerStream && !IsProfilerPaused)
+            if (restartTimer && _isStarted)
             {
                 DisableProfilerTimer();
-                EnsureProfilerTimer();
+                SyncProfilerProducerLocked();
             }
 
             if (changed > 0)
@@ -692,6 +708,11 @@ internal sealed class InProcessRemoteStreamSource : IRemoteStreamSource, IRemote
 
     public void PublishSelection(RemoteSelectionSnapshot selection)
     {
+        if (!IsTopicDemanded(RemoteStreamTopics.Selection))
+        {
+            return;
+        }
+
         PublishObject(RemoteStreamTopics.Selection, selection);
     }
 
@@ -702,8 +723,7 @@ internal sealed class InProcessRemoteStreamSource : IRemoteStreamSource, IRemote
             return;
         }
 
-        EnsurePreviewTimer();
-        EnsureMetricsSubscription();
+        EnsurePreviewSceneSubscription();
 
         if (_options.EnableLogsStream)
         {
@@ -716,14 +736,13 @@ internal sealed class InProcessRemoteStreamSource : IRemoteStreamSource, IRemote
             _eventsHooked = true;
         }
 
-        EnsureProfilerTimer();
+        _isStarted = true;
+        SyncStreamProducersLocked();
 
         if (_options.EnableUdpTelemetryFallback)
         {
             TryStartUdpReceiver();
         }
-
-        _isStarted = true;
     }
 
     private void StopCore()
@@ -734,6 +753,8 @@ internal sealed class InProcessRemoteStreamSource : IRemoteStreamSource, IRemote
         }
 
         DisablePreviewTimer();
+        DisablePreviewSceneSubscription();
+        ResetPreviewEncodedFrameCache();
         DisableMetricsSubscription();
 
         _logsSubscription?.Dispose();
@@ -781,29 +802,140 @@ internal sealed class InProcessRemoteStreamSource : IRemoteStreamSource, IRemote
 
     private void OnMetricCaptured(MetricCaptureService.MetricMeasurementEvent measurement)
     {
-        if (IsMetricsPaused)
+        var payload = new RemoteMetricStreamPayload(
+            TimestampUtc: measurement.Timestamp,
+            Source: "local",
+            SessionId: _localSessionId,
+            MeterName: measurement.MeterName,
+            InstrumentName: measurement.InstrumentName,
+            Description: measurement.Description,
+            Unit: measurement.Unit,
+            InstrumentType: measurement.InstrumentType,
+            Value: measurement.Value,
+            Tags: ConvertTags(measurement.Tags));
+        HandleIncomingMetricPayload(payload);
+    }
+
+    private void HandleIncomingMetricPayload(RemoteMetricStreamPayload payload)
+    {
+        var publishImmediately = false;
+        lock (_gate)
+        {
+            if (_isDisposed || !_isStarted || !ShouldEmitMetricsStreamLocked())
+            {
+                return;
+            }
+
+            RecordMetricPayload(payload);
+            publishImmediately = TryScheduleMetricsPublishLocked(payload);
+        }
+
+        if (publishImmediately)
+        {
+            PublishObject(RemoteStreamTopics.Metrics, payload, recordForSnapshots: false);
+        }
+    }
+
+    private bool TryScheduleMetricsPublishLocked(RemoteMetricStreamPayload payload)
+    {
+        if (_maxMetricStreamPerSecond <= 0)
+        {
+            return true;
+        }
+
+        var spacingTicks = ResolveMetricSpacingTicks();
+        var nowTicks = DateTime.UtcNow.Ticks;
+        if (nowTicks >= _nextMetricPublishTicksUtc)
+        {
+            _nextMetricPublishTicksUtc = nowTicks + spacingTicks;
+            return true;
+        }
+
+        _pendingMetricPayload = payload;
+        EnsureMetricsCoalesceTimerLocked(spacingTicks);
+        return false;
+    }
+
+    private static long ResolveMetricSpacingTicks(int maxMetricStreamPerSecond)
+    {
+        if (maxMetricStreamPerSecond <= 0)
+        {
+            return 1;
+        }
+
+        return Math.Max(1L, TimeSpan.TicksPerSecond / maxMetricStreamPerSecond);
+    }
+
+    private long ResolveMetricSpacingTicks()
+    {
+        return ResolveMetricSpacingTicks(_maxMetricStreamPerSecond);
+    }
+
+    private void EnsureMetricsCoalesceTimerLocked(long spacingTicks)
+    {
+        if (_metricsCoalesceTimer is not null)
         {
             return;
         }
 
-        var tags = ConvertTags(measurement.Tags);
-        PublishObject(
-            RemoteStreamTopics.Metrics,
-            new RemoteMetricStreamPayload(
-                TimestampUtc: measurement.Timestamp,
-                Source: "local",
-                SessionId: _localSessionId,
-                MeterName: measurement.MeterName,
-                InstrumentName: measurement.InstrumentName,
-                Description: measurement.Description,
-                Unit: measurement.Unit,
-                InstrumentType: measurement.InstrumentType,
-                Value: measurement.Value,
-                Tags: tags));
+        var interval = TimeSpan.FromTicks(spacingTicks);
+        _metricsCoalesceTimer = new Timer(
+            static state => ((InProcessRemoteStreamSource)state!).OnMetricsCoalesceTimerTick(),
+            this,
+            dueTime: interval,
+            period: interval);
+    }
+
+    private void DisableMetricsCoalesceTimer()
+    {
+        _metricsCoalesceTimer?.Dispose();
+        _metricsCoalesceTimer = null;
+    }
+
+    private void OnMetricsCoalesceTimerTick()
+    {
+        RemoteMetricStreamPayload? payload = null;
+        lock (_gate)
+        {
+            var canEmit = ShouldEmitMetricsStreamLocked();
+            if (!canEmit || _pendingMetricPayload is null)
+            {
+                if (!canEmit)
+                {
+                    _pendingMetricPayload = null;
+                }
+
+                return;
+            }
+
+            var nowTicks = DateTime.UtcNow.Ticks;
+            if (_maxMetricStreamPerSecond > 0 && nowTicks < _nextMetricPublishTicksUtc)
+            {
+                return;
+            }
+
+            if (_maxMetricStreamPerSecond > 0)
+            {
+                _nextMetricPublishTicksUtc = nowTicks + ResolveMetricSpacingTicks();
+            }
+
+            payload = _pendingMetricPayload;
+            _pendingMetricPayload = null;
+        }
+
+        if (payload.HasValue)
+        {
+            PublishObject(RemoteStreamTopics.Metrics, payload.Value, recordForSnapshots: false);
+        }
     }
 
     private void OnLogCaptured(DevToolsLogEvent logEvent)
     {
+        if (!IsTopicDemanded(RemoteStreamTopics.Logs))
+        {
+            return;
+        }
+
         if (!CanPublishAtRate(ref _nextLogPublishTicksUtc, _maxLogStreamPerSecond))
         {
             return;
@@ -821,6 +953,11 @@ internal sealed class InProcessRemoteStreamSource : IRemoteStreamSource, IRemote
 
     private void OnRecordedEventsChanged(object? sender, NotifyCollectionChangedEventArgs e)
     {
+        if (!IsTopicDemanded(RemoteStreamTopics.Events))
+        {
+            return;
+        }
+
         if (e.Action is not NotifyCollectionChangedAction.Add || e.NewItems is null)
         {
             return;
@@ -873,7 +1010,12 @@ internal sealed class InProcessRemoteStreamSource : IRemoteStreamSource, IRemote
 
     private void OnPreviewTimerTick()
     {
-        if (IsPreviewPaused)
+        if (!ShouldEmitPreviewStream())
+        {
+            return;
+        }
+
+        if (ShouldSkipPreviewTimerTick())
         {
             return;
         }
@@ -890,7 +1032,7 @@ internal sealed class InProcessRemoteStreamSource : IRemoteStreamSource, IRemote
                 {
                     lock (_gate)
                     {
-                        if (_isDisposed || !_isStarted || IsPreviewPaused)
+                        if (!ShouldEmitPreviewStreamLocked())
                         {
                             return;
                         }
@@ -910,6 +1052,7 @@ internal sealed class InProcessRemoteStreamSource : IRemoteStreamSource, IRemote
                             request,
                             previousFrameHash: _previewLastFrameHash,
                             isStreaming: true);
+                        Volatile.Write(ref _previewLastCaptureTicks, Stopwatch.GetTimestamp());
                         if (snapshot.HasChanges)
                         {
                             _previewLastFrameHash = snapshot.FrameHash;
@@ -948,7 +1091,7 @@ internal sealed class InProcessRemoteStreamSource : IRemoteStreamSource, IRemote
 
     private void OnProfilerTimerTick()
     {
-        if (IsProfilerPaused)
+        if (!ShouldEmitProfilerStream())
         {
             return;
         }
@@ -1006,13 +1149,7 @@ internal sealed class InProcessRemoteStreamSource : IRemoteStreamSource, IRemote
                     break;
                 }
 
-                if (IsMetricsPaused)
-                {
-                    break;
-                }
-
-                PublishObject(
-                    RemoteStreamTopics.Metrics,
+                HandleIncomingMetricPayload(
                     new RemoteMetricStreamPayload(
                         TimestampUtc: metric.Timestamp,
                         Source: "udp",
@@ -1031,7 +1168,7 @@ internal sealed class InProcessRemoteStreamSource : IRemoteStreamSource, IRemote
                     break;
                 }
 
-                if (IsProfilerPaused)
+                if (!ShouldEmitProfilerStream())
                 {
                     break;
                 }
@@ -1071,11 +1208,18 @@ internal sealed class InProcessRemoteStreamSource : IRemoteStreamSource, IRemote
         return "remote";
     }
 
-    private void PublishObject<TPayload>(string topic, TPayload payload)
+    private void PublishObject<TPayload>(string topic, TPayload payload, bool recordForSnapshots = true)
     {
-        RecordPayloadForSnapshots(topic, payload);
+        var domain = ResolveDomainForTopic(topic);
+        var source = ResolveStreamSource(payload);
+        if (recordForSnapshots)
+        {
+            RecordPayloadForSnapshots(topic, payload);
+        }
+
         var payloadJson = JsonSerializer.Serialize(payload, s_jsonSerializerOptions);
         PublishRaw(new RemoteStreamPayload(topic, payloadJson));
+        RemoteRuntimeMetrics.RecordStreamPublish(domain, source);
     }
 
     private void PublishRaw(RemoteStreamPayload payload)
@@ -1202,12 +1346,20 @@ internal sealed class InProcessRemoteStreamSource : IRemoteStreamSource, IRemote
     private void RecordMetricPayload(RemoteMetricStreamPayload payload)
     {
         _totalMetricMeasurements++;
-        _metricHistory.Add(payload);
+        var entry = new MetricHistoryEntry(Sequence: ++_nextMetricSequence, Payload: payload);
+        _metricHistory.Add(entry);
+        AddMetricSeriesSample(entry);
         if (_metricHistory.Count > _maxRetainedMeasurements)
         {
             var removeCount = _metricHistory.Count - _maxRetainedMeasurements;
+            for (var i = 0; i < removeCount; i++)
+            {
+                RemoveMetricSeriesSample(_metricHistory[i]);
+            }
+
             _metricHistory.RemoveRange(0, removeCount);
             _droppedMetricMeasurements += removeCount;
+            RemoteRuntimeMetrics.RecordStreamDropped("metrics", removeCount, payload.Source);
         }
 
         _metricsGeneration++;
@@ -1217,14 +1369,256 @@ internal sealed class InProcessRemoteStreamSource : IRemoteStreamSource, IRemote
     {
         _totalProfilerSamples++;
         _profilerHistory.Add(payload);
+        _profilerCurrentCpuPercent = payload.CpuPercent;
+        _profilerCurrentWorkingSetMb = payload.WorkingSetMb;
+        _profilerCurrentManagedHeapMb = payload.ManagedHeapMb;
+        _profilerCurrentActivityDurationMs = payload.DurationMs;
+        if (payload.CpuPercent > _profilerPeakCpuPercent)
+        {
+            _profilerPeakCpuPercent = payload.CpuPercent;
+        }
+
+        if (payload.WorkingSetMb > _profilerPeakWorkingSetMb)
+        {
+            _profilerPeakWorkingSetMb = payload.WorkingSetMb;
+        }
+
+        if (payload.DurationMs > _profilerPeakActivityDurationMs)
+        {
+            _profilerPeakActivityDurationMs = payload.DurationMs;
+        }
+
         if (_profilerHistory.Count > _maxRetainedProfilerSamples)
         {
             var removeCount = _profilerHistory.Count - _maxRetainedProfilerSamples;
+            var removedPeakCandidate = false;
+            for (var i = 0; i < removeCount; i++)
+            {
+                var removed = _profilerHistory[i];
+                if (removed.CpuPercent >= _profilerPeakCpuPercent ||
+                    removed.WorkingSetMb >= _profilerPeakWorkingSetMb ||
+                    removed.DurationMs >= _profilerPeakActivityDurationMs)
+                {
+                    removedPeakCandidate = true;
+                }
+            }
+
             _profilerHistory.RemoveRange(0, removeCount);
             _droppedProfilerSamples += removeCount;
+            RemoteRuntimeMetrics.RecordStreamDropped("profiler", removeCount, payload.Source);
+            if (removedPeakCandidate)
+            {
+                RecomputeProfilerAggregates();
+            }
         }
 
         _profilerGeneration++;
+    }
+
+    private void AddMetricSeriesSample(MetricHistoryEntry entry)
+    {
+        if (_maxSeries <= 0 || _maxSamplesPerSeries <= 0)
+        {
+            return;
+        }
+
+        var payload = entry.Payload;
+        var key = BuildMetricSeriesKey(payload);
+        if (!_metricSeriesByKey.TryGetValue(key, out var state))
+        {
+            state = new MetricSeriesState(payload);
+            _metricSeriesByKey[key] = state;
+            state.OrderNode = _metricSeriesOrder.AddLast(key);
+        }
+        else
+        {
+            TouchMetricSeriesOrder(state);
+        }
+
+        state.Add(entry.Sequence, payload.Value, payload.TimestampUtc, _maxSamplesPerSeries);
+        if (_metricSeriesByKey.Count > _maxSeries)
+        {
+            TrimMetricSeriesToMaxSeries();
+        }
+    }
+
+    private void RemoveMetricSeriesSample(MetricHistoryEntry entry)
+    {
+        var payload = entry.Payload;
+        var key = BuildMetricSeriesKey(payload);
+        if (!_metricSeriesByKey.TryGetValue(key, out var state))
+        {
+            return;
+        }
+
+        state.RemoveUpTo(entry.Sequence);
+        if (state.SampleCount > 0)
+        {
+            return;
+        }
+
+        RemoveMetricSeriesState(key, state);
+    }
+
+    private void PruneMetricSeriesState()
+    {
+        if (_metricSeriesByKey.Count == 0)
+        {
+            return;
+        }
+
+        if (_maxSamplesPerSeries <= 0 || _maxSeries <= 0)
+        {
+            _metricSeriesByKey.Clear();
+            _metricSeriesOrder.Clear();
+            return;
+        }
+
+        var keysToRemove = new List<string>();
+        foreach (var pair in _metricSeriesByKey)
+        {
+            var state = pair.Value;
+            state.TrimToMaxSamples(_maxSamplesPerSeries);
+            if (state.SampleCount == 0)
+            {
+                keysToRemove.Add(pair.Key);
+            }
+        }
+
+        for (var i = 0; i < keysToRemove.Count; i++)
+        {
+            var key = keysToRemove[i];
+            if (_metricSeriesByKey.TryGetValue(key, out var state))
+            {
+                RemoveMetricSeriesState(key, state);
+            }
+        }
+
+        TrimMetricSeriesToMaxSeries();
+    }
+
+    private void RebuildMetricSeriesStateFromHistory()
+    {
+        _metricSeriesByKey.Clear();
+        _metricSeriesOrder.Clear();
+        if (_maxSeries <= 0 || _maxSamplesPerSeries <= 0 || _metricHistory.Count == 0)
+        {
+            return;
+        }
+
+        for (var i = 0; i < _metricHistory.Count; i++)
+        {
+            AddMetricSeriesSample(_metricHistory[i]);
+        }
+    }
+
+    private void TrimMetricSeriesToMaxSeries()
+    {
+        while (_metricSeriesByKey.Count > _maxSeries && _metricSeriesOrder.First is { } oldest)
+        {
+            var key = oldest.Value;
+            if (_metricSeriesByKey.TryGetValue(key, out var state))
+            {
+                RemoveMetricSeriesState(key, state);
+            }
+            else
+            {
+                _metricSeriesOrder.RemoveFirst();
+            }
+        }
+    }
+
+    private void RemoveMetricSeriesState(string key, MetricSeriesState state)
+    {
+        if (state.OrderNode is { List: not null })
+        {
+            _metricSeriesOrder.Remove(state.OrderNode);
+        }
+
+        _metricSeriesByKey.Remove(key);
+    }
+
+    private void TouchMetricSeriesOrder(MetricSeriesState state)
+    {
+        var node = state.OrderNode;
+        if (node is null || node.List is null)
+        {
+            return;
+        }
+
+        _metricSeriesOrder.Remove(node);
+        _metricSeriesOrder.AddLast(node);
+    }
+
+    private void RecomputeProfilerAggregates()
+    {
+        if (_profilerHistory.Count == 0)
+        {
+            _profilerCurrentCpuPercent = 0d;
+            _profilerPeakCpuPercent = 0d;
+            _profilerCurrentWorkingSetMb = 0d;
+            _profilerPeakWorkingSetMb = 0d;
+            _profilerCurrentManagedHeapMb = 0d;
+            _profilerCurrentActivityDurationMs = 0d;
+            _profilerPeakActivityDurationMs = 0d;
+            return;
+        }
+
+        var last = _profilerHistory[_profilerHistory.Count - 1];
+        _profilerCurrentCpuPercent = last.CpuPercent;
+        _profilerCurrentWorkingSetMb = last.WorkingSetMb;
+        _profilerCurrentManagedHeapMb = last.ManagedHeapMb;
+        _profilerCurrentActivityDurationMs = last.DurationMs;
+
+        var peakCpu = 0d;
+        var peakWorkingSet = 0d;
+        var peakDuration = 0d;
+        for (var i = 0; i < _profilerHistory.Count; i++)
+        {
+            var sample = _profilerHistory[i];
+            if (sample.CpuPercent > peakCpu)
+            {
+                peakCpu = sample.CpuPercent;
+            }
+
+            if (sample.WorkingSetMb > peakWorkingSet)
+            {
+                peakWorkingSet = sample.WorkingSetMb;
+            }
+
+            if (sample.DurationMs > peakDuration)
+            {
+                peakDuration = sample.DurationMs;
+            }
+        }
+
+        _profilerPeakCpuPercent = peakCpu;
+        _profilerPeakWorkingSetMb = peakWorkingSet;
+        _profilerPeakActivityDurationMs = peakDuration;
+    }
+
+    private static string ResolveDomainForTopic(string topic)
+    {
+        return topic switch
+        {
+            RemoteStreamTopics.Selection => "tree",
+            RemoteStreamTopics.Logs => "logs",
+            RemoteStreamTopics.Events => "events",
+            RemoteStreamTopics.Metrics => "metrics",
+            RemoteStreamTopics.Profiler => "profiler",
+            RemoteStreamTopics.Preview => "preview",
+            _ => "none",
+        };
+    }
+
+    private static string ResolveStreamSource<TPayload>(TPayload payload)
+    {
+        return payload switch
+        {
+            RemoteMetricStreamPayload metric => metric.Source,
+            RemoteProfilerStreamPayload profiler => profiler.Source,
+            _ => "local",
+        };
     }
 
     private static RemoteMetricMeasurementSnapshot MapMetricMeasurement(RemoteMetricStreamPayload payload)
@@ -1282,61 +1676,33 @@ internal sealed class InProcessRemoteStreamSource : IRemoteStreamSource, IRemote
 
     private RemoteMetricSeriesSnapshot[] BuildMetricSeries()
     {
-        if (_metricHistory.Count == 0 || _maxSeries <= 0 || _maxSamplesPerSeries <= 0)
+        if (_metricSeriesByKey.Count == 0 || _maxSeries <= 0 || _maxSamplesPerSeries <= 0)
         {
             return Array.Empty<RemoteMetricSeriesSnapshot>();
         }
 
-        var ordered = new List<MetricSeriesAccumulator>(_maxSeries);
-        var lookup = new Dictionary<string, MetricSeriesAccumulator>(StringComparer.Ordinal);
-        for (var i = _metricHistory.Count - 1; i >= 0; i--)
+        var result = new List<RemoteMetricSeriesSnapshot>(_metricSeriesByKey.Count);
+        for (var node = _metricSeriesOrder.Last; node is not null; node = node.Previous)
         {
-            var payload = _metricHistory[i];
-            var key = BuildMetricSeriesKey(payload);
-            if (!lookup.TryGetValue(key, out var accumulator))
-            {
-                if (lookup.Count >= _maxSeries)
-                {
-                    continue;
-                }
-
-                accumulator = new MetricSeriesAccumulator(payload);
-                lookup[key] = accumulator;
-                ordered.Add(accumulator);
-            }
-
-            if (accumulator.SampleCount >= _maxSamplesPerSeries)
+            if (!_metricSeriesByKey.TryGetValue(node.Value, out var state))
             {
                 continue;
             }
 
-            accumulator.Add(payload.Value);
+            if (state.SampleCount <= 0)
+            {
+                continue;
+            }
+
+            result.Add(state.ToSnapshot());
         }
 
-        var result = new RemoteMetricSeriesSnapshot[ordered.Count];
-        for (var i = 0; i < ordered.Count; i++)
+        if (result.Count == 0)
         {
-            var accumulator = ordered[i];
-            var average = accumulator.SampleCount == 0
-                ? 0
-                : accumulator.Sum / accumulator.SampleCount;
-            result[i] = new RemoteMetricSeriesSnapshot(
-                Id: accumulator.Id,
-                MeterName: accumulator.MeterName,
-                InstrumentName: accumulator.InstrumentName,
-                Description: accumulator.Description,
-                Unit: accumulator.Unit,
-                InstrumentType: accumulator.InstrumentType,
-                LastValue: accumulator.LastValue,
-                AverageValue: average,
-                MinValue: accumulator.MinValue,
-                MaxValue: accumulator.MaxValue,
-                SampleCount: accumulator.SampleCount,
-                UpdatedAt: accumulator.UpdatedAt,
-                Tags: accumulator.Tags);
+            return Array.Empty<RemoteMetricSeriesSnapshot>();
         }
 
-        return result;
+        return result.ToArray();
     }
 
     private static string BuildMetricSeriesKey(RemoteMetricStreamPayload payload)
@@ -1420,10 +1786,17 @@ internal sealed class InProcessRemoteStreamSource : IRemoteStreamSource, IRemote
                 FrameData: null);
         }
 
+        EnsurePreviewSceneSubscription(topLevel);
+
         var requestedTransport = NormalizePreviewTransport(request.Transport);
         var maxWidth = request.MaxWidth > 0 ? request.MaxWidth : _previewMaxWidth;
         var maxHeight = request.MaxHeight > 0 ? request.MaxHeight : _previewMaxHeight;
         var requestedScale = ClampPreviewScale(request.Scale <= 0 ? _previewScale : request.Scale);
+        if (isStreaming && _previewAdaptiveScaleFactor < 1d)
+        {
+            requestedScale = ClampPreviewScale(requestedScale * _previewAdaptiveScaleFactor);
+        }
+
         var enableDiff = request.EnableDiff;
         var includeFrameData = request.IncludeFrameData;
 
@@ -1448,14 +1821,71 @@ internal sealed class InProcessRemoteStreamSource : IRemoteStreamSource, IRemote
             width = Math.Max(1, (int)Math.Round(width * ratio, MidpointRounding.AwayFromZero));
         }
 
-        byte[] pngBytes;
+        var capturedAtUtc = DateTimeOffset.UtcNow;
+        var isDelta = enableDiff && !string.IsNullOrWhiteSpace(previousFrameHash);
+        var sceneVersion = Volatile.Read(ref _previewSceneInvalidationVersion);
+
+        if (isStreaming &&
+            isDelta &&
+            sceneVersion == Volatile.Read(ref _previewLastCapturedSceneVersion) &&
+            !string.IsNullOrWhiteSpace(previousFrameHash))
+        {
+            return new RemotePreviewSnapshot(
+                SnapshotVersion: SnapshotVersion,
+                Generation: _previewGeneration,
+                Status: status,
+                Transport: requestedTransport,
+                MimeType: string.Equals(requestedTransport, "png", StringComparison.Ordinal)
+                    ? "image/png"
+                    : "image/svg+xml",
+                Width: width,
+                Height: height,
+                Scale: requestedScale,
+                RenderScaling: renderScaling,
+                CapturedAtUtc: capturedAtUtc,
+                IsPaused: IsPreviewPaused,
+                IsDelta: true,
+                HasChanges: false,
+                FrameHash: previousFrameHash!,
+                PreviousFrameHash: previousFrameHash,
+                DiffKind: "full-frame",
+                ChangedRegions: Array.Empty<RemotePreviewRectSnapshot>(),
+                FrameData: null);
+        }
+
+        var captureStarted = Stopwatch.GetTimestamp();
+        string frameHash;
+        string? frameData = null;
         try
         {
-            using var renderTarget = new RenderTargetBitmap(new PixelSize(width, height), new Vector(96, 96));
-            renderTarget.Render(topLevel);
-            using var pngStream = new MemoryStream();
-            renderTarget.Save(pngStream);
-            pngBytes = pngStream.ToArray();
+            if (string.Equals(requestedTransport, "png", StringComparison.Ordinal))
+            {
+                var pngBytes = CapturePreviewPngBytes(topLevel, width, height);
+                frameHash = Convert.ToHexString(SHA256.HashData(pngBytes)).ToLowerInvariant();
+
+                if (includeFrameData)
+                {
+                    if (TryGetCachedPngFrameData(frameHash, width, height, out var cachedPng))
+                    {
+                        frameData = cachedPng;
+                    }
+                    else
+                    {
+                        frameData = Convert.ToBase64String(pngBytes);
+                        StoreCachedPngFrameData(frameHash, width, height, frameData);
+                    }
+                }
+            }
+            else
+            {
+                frameHash = CreateSnapshotId(
+                    "preview-scene",
+                    sceneVersion.ToString(CultureInfo.InvariantCulture),
+                    width.ToString(CultureInfo.InvariantCulture),
+                    height.ToString(CultureInfo.InvariantCulture),
+                    requestedScale.ToString("R", CultureInfo.InvariantCulture),
+                    renderScaling.ToString("R", CultureInfo.InvariantCulture));
+            }
         }
         catch (Exception ex)
         {
@@ -1470,7 +1900,7 @@ internal sealed class InProcessRemoteStreamSource : IRemoteStreamSource, IRemote
                 Height: height,
                 Scale: requestedScale,
                 RenderScaling: renderScaling,
-                CapturedAtUtc: DateTimeOffset.UtcNow,
+                CapturedAtUtc: capturedAtUtc,
                 IsPaused: IsPreviewPaused,
                 IsDelta: false,
                 HasChanges: false,
@@ -1481,9 +1911,37 @@ internal sealed class InProcessRemoteStreamSource : IRemoteStreamSource, IRemote
                 FrameData: null);
         }
 
-        var frameHash = Convert.ToHexString(SHA256.HashData(pngBytes)).ToLowerInvariant();
-        var isDelta = enableDiff && !string.IsNullOrWhiteSpace(previousFrameHash);
         var hasChanges = !string.Equals(previousFrameHash, frameHash, StringComparison.Ordinal);
+        var shouldEmitFrameData = includeFrameData && (!isDelta || hasChanges || !isStreaming);
+        if (shouldEmitFrameData &&
+            string.Equals(requestedTransport, "svg", StringComparison.Ordinal))
+        {
+            if (TryGetCachedSvgFrameData(sceneVersion, width, height, out var cachedSvg))
+            {
+                frameData = cachedSvg;
+            }
+            else
+            {
+                var svg = PreviewSvgVectorExporter.Export(topLevel, width, height);
+                if (!string.IsNullOrWhiteSpace(svg))
+                {
+                    frameData = svg;
+                    StoreCachedSvgFrameData(sceneVersion, width, height, svg);
+                }
+                else
+                {
+                    var pngBytes = CapturePreviewPngBytes(topLevel, width, height);
+                    frameData = WrapPngInSvg(width, height, Convert.ToBase64String(pngBytes));
+                    StoreCachedSvgFrameData(sceneVersion, width, height, frameData);
+                }
+            }
+        }
+
+        if (!shouldEmitFrameData)
+        {
+            frameData = null;
+        }
+
         var changedRegions = hasChanges
             ? new RemotePreviewRectSnapshot[]
             {
@@ -1495,38 +1953,15 @@ internal sealed class InProcessRemoteStreamSource : IRemoteStreamSource, IRemote
             }
             : Array.Empty<RemotePreviewRectSnapshot>();
 
-        string? frameData = null;
-        if (includeFrameData && (!isDelta || hasChanges || !isStreaming))
-        {
-            if (string.Equals(requestedTransport, "png", StringComparison.Ordinal))
-            {
-                frameData = Convert.ToBase64String(pngBytes);
-            }
-            else
-            {
-                var pngBase64 = Convert.ToBase64String(pngBytes);
-                frameData =
-                    "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\""
-                    + width.ToString(CultureInfo.InvariantCulture)
-                    + "\" height=\""
-                    + height.ToString(CultureInfo.InvariantCulture)
-                    + "\" viewBox=\"0 0 "
-                    + width.ToString(CultureInfo.InvariantCulture)
-                    + " "
-                    + height.ToString(CultureInfo.InvariantCulture)
-                    + "\"><image width=\""
-                    + width.ToString(CultureInfo.InvariantCulture)
-                    + "\" height=\""
-                    + height.ToString(CultureInfo.InvariantCulture)
-                    + "\" href=\"data:image/png;base64,"
-                    + pngBase64
-                    + "\"/></svg>";
-            }
-        }
-
         if (hasChanges)
         {
             _previewGeneration++;
+        }
+
+        _previewLastCapturedSceneVersion = sceneVersion;
+        if (isStreaming)
+        {
+            UpdatePreviewAdaptiveScale(RemoteRuntimeMetrics.ElapsedMilliseconds(captureStarted));
         }
 
         return new RemotePreviewSnapshot(
@@ -1541,7 +1976,7 @@ internal sealed class InProcessRemoteStreamSource : IRemoteStreamSource, IRemote
             Height: height,
             Scale: requestedScale,
             RenderScaling: renderScaling,
-            CapturedAtUtc: DateTimeOffset.UtcNow,
+            CapturedAtUtc: capturedAtUtc,
             IsPaused: IsPreviewPaused,
             IsDelta: isDelta,
             HasChanges: hasChanges,
@@ -1550,6 +1985,195 @@ internal sealed class InProcessRemoteStreamSource : IRemoteStreamSource, IRemote
             DiffKind: isDelta ? "full-frame" : "none",
             ChangedRegions: changedRegions,
             FrameData: frameData);
+    }
+
+    private bool ShouldSkipPreviewTimerTick()
+    {
+        var lastCaptureTicks = Volatile.Read(ref _previewLastCaptureTicks);
+        if (lastCaptureTicks <= 0)
+        {
+            return false;
+        }
+
+        var minTicks = Math.Max(1L, Stopwatch.Frequency / Math.Max(1, _previewTargetFps));
+        var elapsed = Stopwatch.GetTimestamp() - lastCaptureTicks;
+        return elapsed < minTicks;
+    }
+
+    private void EnsurePreviewSceneSubscription()
+    {
+        var topLevel = ResolvePreviewTopLevel();
+        if (topLevel is null)
+        {
+            DisablePreviewSceneSubscription();
+            return;
+        }
+
+        EnsurePreviewSceneSubscription(topLevel);
+    }
+
+    private void EnsurePreviewSceneSubscription(TopLevel topLevel)
+    {
+        var renderer = topLevel.Renderer;
+        if (ReferenceEquals(_previewRenderer, renderer))
+        {
+            return;
+        }
+
+        DisablePreviewSceneSubscription();
+        _previewRenderer = renderer;
+        _previewSceneInvalidatedHandler ??= OnPreviewSceneInvalidated;
+        _previewRenderer.SceneInvalidated += _previewSceneInvalidatedHandler;
+        Interlocked.Increment(ref _previewSceneInvalidationVersion);
+    }
+
+    private void DisablePreviewSceneSubscription()
+    {
+        if (_previewRenderer is null || _previewSceneInvalidatedHandler is null)
+        {
+            _previewRenderer = null;
+            return;
+        }
+
+        _previewRenderer.SceneInvalidated -= _previewSceneInvalidatedHandler;
+        _previewRenderer = null;
+    }
+
+    private void OnPreviewSceneInvalidated(object? sender, SceneInvalidatedEventArgs e)
+    {
+        Interlocked.Increment(ref _previewSceneInvalidationVersion);
+    }
+
+    private static byte[] CapturePreviewPngBytes(TopLevel topLevel, int width, int height)
+    {
+        using var renderTarget = new RenderTargetBitmap(new PixelSize(width, height), new Vector(96, 96));
+        renderTarget.Render(topLevel);
+        using var pngStream = new MemoryStream();
+        renderTarget.Save(pngStream);
+        return pngStream.ToArray();
+    }
+
+    private static string WrapPngInSvg(int width, int height, string pngBase64)
+    {
+        return "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\""
+               + width.ToString(CultureInfo.InvariantCulture)
+               + "\" height=\""
+               + height.ToString(CultureInfo.InvariantCulture)
+               + "\" viewBox=\"0 0 "
+               + width.ToString(CultureInfo.InvariantCulture)
+               + " "
+               + height.ToString(CultureInfo.InvariantCulture)
+               + "\"><image width=\""
+               + width.ToString(CultureInfo.InvariantCulture)
+               + "\" height=\""
+               + height.ToString(CultureInfo.InvariantCulture)
+               + "\" href=\"data:image/png;base64,"
+               + pngBase64
+               + "\"/></svg>";
+    }
+
+    private bool TryGetCachedSvgFrameData(long sceneVersion, int width, int height, out string frameData)
+    {
+        if (_previewSvgFrameCache is
+            {
+                SceneVersion: var cachedSceneVersion,
+                Width: var cachedWidth,
+                Height: var cachedHeight,
+                FrameData: var cachedFrameData
+            } &&
+            cachedSceneVersion == sceneVersion &&
+            cachedWidth == width &&
+            cachedHeight == height)
+        {
+            frameData = cachedFrameData;
+            return true;
+        }
+
+        frameData = string.Empty;
+        return false;
+    }
+
+    private void StoreCachedSvgFrameData(long sceneVersion, int width, int height, string frameData)
+    {
+        _previewSvgFrameCache = new PreviewSvgFrameCacheEntry(
+            SceneVersion: sceneVersion,
+            Width: width,
+            Height: height,
+            FrameData: frameData);
+    }
+
+    private bool TryGetCachedPngFrameData(string frameHash, int width, int height, out string frameData)
+    {
+        if (_previewPngFrameCache is
+            {
+                FrameHash: var cachedHash,
+                Width: var cachedWidth,
+                Height: var cachedHeight,
+                FrameData: var cachedFrameData
+            } &&
+            string.Equals(cachedHash, frameHash, StringComparison.Ordinal) &&
+            cachedWidth == width &&
+            cachedHeight == height)
+        {
+            frameData = cachedFrameData;
+            return true;
+        }
+
+        frameData = string.Empty;
+        return false;
+    }
+
+    private void StoreCachedPngFrameData(string frameHash, int width, int height, string frameData)
+    {
+        _previewPngFrameCache = new PreviewPngFrameCacheEntry(
+            FrameHash: frameHash,
+            Width: width,
+            Height: height,
+            FrameData: frameData);
+    }
+
+    private void ResetPreviewEncodedFrameCache()
+    {
+        _previewSvgFrameCache = null;
+        _previewPngFrameCache = null;
+    }
+
+    private void UpdatePreviewAdaptiveScale(double captureDurationMs)
+    {
+        if (!double.IsFinite(captureDurationMs) || captureDurationMs <= 0)
+        {
+            return;
+        }
+
+        var frameBudgetMs = 1000d / Math.Max(1, _previewTargetFps);
+        if (captureDurationMs > frameBudgetMs * 1.2d)
+        {
+            _previewSlowCaptureStreak++;
+            _previewFastCaptureStreak = 0;
+            if (_previewSlowCaptureStreak >= 3)
+            {
+                _previewAdaptiveScaleFactor = Math.Max(0.4d, _previewAdaptiveScaleFactor * 0.9d);
+                _previewSlowCaptureStreak = 0;
+            }
+
+            return;
+        }
+
+        if (captureDurationMs < frameBudgetMs * 0.55d)
+        {
+            _previewFastCaptureStreak++;
+            _previewSlowCaptureStreak = 0;
+            if (_previewFastCaptureStreak >= 5)
+            {
+                _previewAdaptiveScaleFactor = Math.Min(1d, _previewAdaptiveScaleFactor * 1.05d);
+                _previewFastCaptureStreak = 0;
+            }
+
+            return;
+        }
+
+        _previewSlowCaptureStreak = 0;
+        _previewFastCaptureStreak = 0;
     }
 
     private TopLevel? ResolvePreviewTopLevel()
@@ -1592,6 +2216,101 @@ internal sealed class InProcessRemoteStreamSource : IRemoteStreamSource, IRemote
         return Math.Clamp(scale, 0.1d, 4d);
     }
 
+    private bool IsTopicDemanded(string topic)
+    {
+        lock (_gate)
+        {
+            return !_isDisposed &&
+                   _isStarted &&
+                   _streamDemand.IsDemanded(topic);
+        }
+    }
+
+    private bool ShouldEmitPreviewStream()
+    {
+        lock (_gate)
+        {
+            return ShouldEmitPreviewStreamLocked();
+        }
+    }
+
+    private bool ShouldEmitProfilerStream()
+    {
+        lock (_gate)
+        {
+            return ShouldEmitProfilerStreamLocked();
+        }
+    }
+
+    private bool ShouldEmitPreviewStreamLocked()
+    {
+        return !_isDisposed &&
+               _isStarted &&
+               !IsPreviewPaused &&
+               _streamDemand.Preview;
+    }
+
+    private bool ShouldEmitMetricsStreamLocked()
+    {
+        return !_isDisposed &&
+               _isStarted &&
+               _options.EnableMetricsStream &&
+               !IsMetricsPaused &&
+               _streamDemand.Metrics;
+    }
+
+    private bool ShouldEmitProfilerStreamLocked()
+    {
+        return !_isDisposed &&
+               _isStarted &&
+               _options.EnableProfilerStream &&
+               !IsProfilerPaused &&
+               _streamDemand.Profiler;
+    }
+
+    private void SyncStreamProducersLocked()
+    {
+        SyncPreviewProducerLocked();
+        SyncMetricsProducerLocked();
+        SyncProfilerProducerLocked();
+    }
+
+    private void SyncPreviewProducerLocked()
+    {
+        if (ShouldEmitPreviewStreamLocked())
+        {
+            EnsurePreviewTimer();
+        }
+        else
+        {
+            DisablePreviewTimer();
+        }
+    }
+
+    private void SyncMetricsProducerLocked()
+    {
+        if (ShouldEmitMetricsStreamLocked())
+        {
+            EnsureMetricsSubscription();
+        }
+        else
+        {
+            DisableMetricsSubscription();
+        }
+    }
+
+    private void SyncProfilerProducerLocked()
+    {
+        if (ShouldEmitProfilerStreamLocked())
+        {
+            EnsureProfilerTimer();
+        }
+        else
+        {
+            DisableProfilerTimer();
+        }
+    }
+
     private void ThrowIfDisposed()
     {
         if (_isDisposed)
@@ -1604,7 +2323,7 @@ internal sealed class InProcessRemoteStreamSource : IRemoteStreamSource, IRemote
 
     private void EnsurePreviewTimer()
     {
-        if (IsPreviewPaused || _previewTimer is not null)
+        if (!ShouldEmitPreviewStreamLocked() || _previewTimer is not null)
         {
             return;
         }
@@ -1627,7 +2346,7 @@ internal sealed class InProcessRemoteStreamSource : IRemoteStreamSource, IRemote
 
     private void EnsureMetricsSubscription()
     {
-        if (!_options.EnableMetricsStream || IsMetricsPaused || _metricsSubscription is not null)
+        if (!ShouldEmitMetricsStreamLocked() || _metricsSubscription is not null)
         {
             return;
         }
@@ -1639,11 +2358,14 @@ internal sealed class InProcessRemoteStreamSource : IRemoteStreamSource, IRemote
     {
         _metricsSubscription?.Dispose();
         _metricsSubscription = null;
+        _pendingMetricPayload = null;
+        _nextMetricPublishTicksUtc = 0;
+        DisableMetricsCoalesceTimer();
     }
 
     private void EnsureProfilerTimer()
     {
-        if (!_options.EnableProfilerStream || IsProfilerPaused || _profilerTimer is not null)
+        if (!ShouldEmitProfilerStreamLocked() || _profilerTimer is not null)
         {
             return;
         }
@@ -1685,9 +2407,27 @@ internal sealed class InProcessRemoteStreamSource : IRemoteStreamSource, IRemote
         }
     }
 
-    private sealed class MetricSeriesAccumulator
+    private readonly record struct PreviewSvgFrameCacheEntry(
+        long SceneVersion,
+        int Width,
+        int Height,
+        string FrameData);
+
+    private readonly record struct PreviewPngFrameCacheEntry(
+        string FrameHash,
+        int Width,
+        int Height,
+        string FrameData);
+
+    private readonly record struct MetricHistoryEntry(long Sequence, RemoteMetricStreamPayload Payload);
+
+    private readonly record struct MetricSeriesSample(long Sequence, double Value);
+
+    private sealed class MetricSeriesState
     {
-        public MetricSeriesAccumulator(RemoteMetricStreamPayload payload)
+        private readonly Queue<MetricSeriesSample> _samples = new();
+
+        public MetricSeriesState(RemoteMetricStreamPayload payload)
         {
             Id = CreateSnapshotId(
                 "metric-series",
@@ -1707,8 +2447,11 @@ internal sealed class InProcessRemoteStreamSource : IRemoteStreamSource, IRemote
             LastValue = payload.Value;
             UpdatedAt = payload.TimestampUtc;
             Tags = payload.Tags;
+            MinValue = 0d;
+            MaxValue = 0d;
         }
 
+        public LinkedListNode<string>? OrderNode { get; set; }
         public string Id { get; }
         public string MeterName { get; }
         public string InstrumentName { get; }
@@ -1716,26 +2459,147 @@ internal sealed class InProcessRemoteStreamSource : IRemoteStreamSource, IRemote
         public string Unit { get; }
         public string InstrumentType { get; }
         public IReadOnlyList<RemoteStreamTag> Tags { get; }
-        public double LastValue { get; }
-        public DateTimeOffset UpdatedAt { get; }
+        public double LastValue { get; private set; }
+        public DateTimeOffset UpdatedAt { get; private set; }
         public int SampleCount { get; private set; }
         public double Sum { get; private set; }
-        public double MinValue { get; private set; } = double.PositiveInfinity;
-        public double MaxValue { get; private set; } = double.NegativeInfinity;
+        public double MinValue { get; private set; }
+        public double MaxValue { get; private set; }
 
-        public void Add(double value)
+        public void Add(long sequence, double value, DateTimeOffset timestampUtc, int maxSamples)
         {
+            _samples.Enqueue(new MetricSeriesSample(sequence, value));
+            LastValue = value;
+            UpdatedAt = timestampUtc;
+
             SampleCount++;
             Sum += value;
-            if (value < MinValue)
+            if (SampleCount == 1)
             {
                 MinValue = value;
-            }
-
-            if (value > MaxValue)
-            {
                 MaxValue = value;
             }
+            else
+            {
+                if (value < MinValue)
+                {
+                    MinValue = value;
+                }
+
+                if (value > MaxValue)
+                {
+                    MaxValue = value;
+                }
+            }
+
+            TrimToMaxSamples(maxSamples);
+        }
+
+        public void TrimToMaxSamples(int maxSamples)
+        {
+            if (maxSamples <= 0)
+            {
+                _samples.Clear();
+                SampleCount = 0;
+                Sum = 0d;
+                MinValue = 0d;
+                MaxValue = 0d;
+                return;
+            }
+
+            while (_samples.Count > maxSamples)
+            {
+                RemoveOldestSample();
+            }
+        }
+
+        public void RemoveUpTo(long sequence)
+        {
+            while (_samples.Count > 0 && _samples.Peek().Sequence <= sequence)
+            {
+                RemoveOldestSample();
+                if (SampleCount == 0)
+                {
+                    return;
+                }
+
+                if (_samples.Count > 0 && _samples.Peek().Sequence > sequence)
+                {
+                    return;
+                }
+            }
+        }
+
+        public RemoteMetricSeriesSnapshot ToSnapshot()
+        {
+            var average = SampleCount == 0 ? 0d : Sum / SampleCount;
+            return new RemoteMetricSeriesSnapshot(
+                Id: Id,
+                MeterName: MeterName,
+                InstrumentName: InstrumentName,
+                Description: Description,
+                Unit: Unit,
+                InstrumentType: InstrumentType,
+                LastValue: LastValue,
+                AverageValue: average,
+                MinValue: MinValue,
+                MaxValue: MaxValue,
+                SampleCount: SampleCount,
+                UpdatedAt: UpdatedAt,
+                Tags: Tags);
+        }
+
+        private void RemoveOldestSample()
+        {
+            if (_samples.Count == 0)
+            {
+                return;
+            }
+
+            var removed = _samples.Dequeue();
+            SampleCount--;
+            Sum -= removed.Value;
+            if (SampleCount <= 0)
+            {
+                SampleCount = 0;
+                Sum = 0d;
+                MinValue = 0d;
+                MaxValue = 0d;
+                return;
+            }
+
+            if (removed.Value <= MinValue || removed.Value >= MaxValue)
+            {
+                RecomputeExtrema();
+            }
+        }
+
+        private void RecomputeExtrema()
+        {
+            if (_samples.Count == 0)
+            {
+                MinValue = 0d;
+                MaxValue = 0d;
+                return;
+            }
+
+            var min = double.PositiveInfinity;
+            var max = double.NegativeInfinity;
+            foreach (var sample in _samples)
+            {
+                if (sample.Value < min)
+                {
+                    min = sample.Value;
+                }
+
+                if (sample.Value > max)
+                {
+                    max = sample.Value;
+                }
+            }
+
+            MinValue = min;
+            MaxValue = max;
         }
     }
 }
@@ -1754,7 +2618,8 @@ internal readonly record struct InProcessRemoteStreamSourceOptions(
     int MaxSamplesPerSeries,
     int MaxLogStreamPerSecond,
     int MaxEventStreamPerSecond,
-    TimeSpan ProfilerSampleInterval)
+    TimeSpan ProfilerSampleInterval,
+    int MaxMetricStreamPerSecond = 60)
 {
     public static InProcessRemoteStreamSourceOptions Default => new(
         EnableMetricsStream: true,
@@ -1770,7 +2635,8 @@ internal readonly record struct InProcessRemoteStreamSourceOptions(
         MaxSamplesPerSeries: 250,
         MaxLogStreamPerSecond: 60,
         MaxEventStreamPerSecond: 60,
-        ProfilerSampleInterval: TimeSpan.FromSeconds(1));
+        ProfilerSampleInterval: TimeSpan.FromSeconds(1),
+        MaxMetricStreamPerSecond: 60);
 
     public static InProcessRemoteStreamSourceOptions Normalize(InProcessRemoteStreamSourceOptions options)
     {
@@ -1803,6 +2669,9 @@ internal readonly record struct InProcessRemoteStreamSourceOptions(
         var maxEventStreamPerSecond = options.MaxEventStreamPerSecond <= 0
             ? Default.MaxEventStreamPerSecond
             : options.MaxEventStreamPerSecond;
+        var maxMetricStreamPerSecond = options.MaxMetricStreamPerSecond <= 0
+            ? Default.MaxMetricStreamPerSecond
+            : options.MaxMetricStreamPerSecond;
         var profilerInterval = options.ProfilerSampleInterval <= TimeSpan.Zero
             ? TimeSpan.FromSeconds(1)
             : options.ProfilerSampleInterval;
@@ -1817,7 +2686,8 @@ internal readonly record struct InProcessRemoteStreamSourceOptions(
             MaxSamplesPerSeries = maxSamplesPerSeries,
             MaxLogStreamPerSecond = maxLogStreamPerSecond,
             MaxEventStreamPerSecond = maxEventStreamPerSecond,
-            ProfilerSampleInterval = profilerInterval
+            ProfilerSampleInterval = profilerInterval,
+            MaxMetricStreamPerSecond = maxMetricStreamPerSecond
         };
     }
 }

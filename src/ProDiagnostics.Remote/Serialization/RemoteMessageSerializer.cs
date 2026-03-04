@@ -1,4 +1,5 @@
 using System;
+using System.Buffers;
 using System.Buffers.Binary;
 using System.Collections.Generic;
 using System.Text;
@@ -14,21 +15,21 @@ public static class RemoteMessageSerializer
     {
         ArgumentNullException.ThrowIfNull(message);
 
-        var payloadWriter = new PayloadWriter(256);
+        using var payloadWriter = new PayloadWriter(256);
         WritePayload(payloadWriter, message);
-        var payload = payloadWriter.WrittenSpan;
+        var payloadLength = payloadWriter.WrittenCount;
 
-        if (payload.Length > RemoteProtocol.MaxFramePayloadBytes)
+        if (payloadLength > RemoteProtocol.MaxFramePayloadBytes)
         {
             throw new InvalidOperationException(
                 "Remote message payload exceeds max frame size of " + RemoteProtocol.MaxFramePayloadBytes + " bytes.");
         }
 
-        var frame = new byte[RemoteProtocol.HeaderSizeBytes + payload.Length];
+        var frame = GC.AllocateUninitializedArray<byte>(RemoteProtocol.HeaderSizeBytes + payloadLength);
         frame[0] = RemoteProtocol.Version;
         frame[1] = (byte)message.Kind;
-        BinaryPrimitives.WriteInt32LittleEndian(frame.AsSpan(2, sizeof(int)), payload.Length);
-        payload.CopyTo(frame.AsSpan(RemoteProtocol.HeaderSizeBytes));
+        BinaryPrimitives.WriteInt32LittleEndian(frame.AsSpan(2, sizeof(int)), payloadLength);
+        payloadWriter.CopyWrittenBytesTo(frame.AsSpan(RemoteProtocol.HeaderSizeBytes));
         return frame;
     }
 
@@ -320,18 +321,20 @@ public static class RemoteMessageSerializer
         return true;
     }
 
-    private sealed class PayloadWriter
+    private sealed class PayloadWriter : IDisposable
     {
         private byte[] _buffer;
         private int _position;
+        private bool _disposed;
         private static readonly Encoding Utf8 = Encoding.UTF8;
 
         public PayloadWriter(int initialCapacity)
         {
-            _buffer = new byte[initialCapacity];
+            _buffer = ArrayPool<byte>.Shared.Rent(Math.Max(16, initialCapacity));
         }
 
         public ReadOnlySpan<byte> WrittenSpan => _buffer.AsSpan(0, _position);
+        public int WrittenCount => _position;
 
         public void WriteByte(byte value)
         {
@@ -378,6 +381,16 @@ public static class RemoteMessageSerializer
             _position += byteCount;
         }
 
+        public void CopyWrittenBytesTo(Span<byte> destination)
+        {
+            if (destination.Length < _position)
+            {
+                throw new ArgumentException("Destination buffer is smaller than written payload.");
+            }
+
+            _buffer.AsSpan(0, _position).CopyTo(destination);
+        }
+
         private void EnsureCapacity(int sizeHint)
         {
             if (_buffer.Length - _position >= sizeHint)
@@ -386,7 +399,23 @@ public static class RemoteMessageSerializer
             }
 
             var newSize = Math.Max(_buffer.Length * 2, _position + sizeHint);
-            Array.Resize(ref _buffer, newSize);
+            var expanded = ArrayPool<byte>.Shared.Rent(newSize);
+            _buffer.AsSpan(0, _position).CopyTo(expanded.AsSpan());
+            ArrayPool<byte>.Shared.Return(_buffer);
+            _buffer = expanded;
+        }
+
+        public void Dispose()
+        {
+            if (_disposed)
+            {
+                return;
+            }
+
+            _disposed = true;
+            ArrayPool<byte>.Shared.Return(_buffer);
+            _buffer = Array.Empty<byte>();
+            _position = 0;
         }
     }
 

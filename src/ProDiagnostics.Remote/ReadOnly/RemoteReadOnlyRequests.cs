@@ -58,7 +58,7 @@ public sealed record class RemoteElements3DSnapshotRequest
 {
     public bool IncludeNodes { get; init; } = true;
     public bool IncludeVisibleNodeIds { get; init; } = true;
-    public bool IncludeSvgSnapshot { get; init; } = true;
+    public bool IncludeSvgSnapshot { get; init; }
     public int SvgWidth { get; init; } = 1600;
     public int SvgHeight { get; init; } = 900;
     public int MaxSvgNodes { get; init; } = 2000;

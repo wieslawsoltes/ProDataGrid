@@ -35,6 +35,7 @@ public static class RemoteMutationMethods
     public const string LogsClear = "diagnostics.logs.clear";
     public const string LogsLevelsSet = "diagnostics.logs.levels.set";
 
+    public const string StreamDemandSet = "diagnostics.stream.demand.set";
     public const string MetricsPausedSet = "diagnostics.metrics.paused.set";
     public const string MetricsSettingsSet = "diagnostics.metrics.settings.set";
     public const string ProfilerPausedSet = "diagnostics.profiler.paused.set";

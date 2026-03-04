@@ -1,6 +1,7 @@
 using System;
 using System.Buffers;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Globalization;
 using System.Linq;
 using System.Net;
@@ -127,6 +128,7 @@ public sealed class HttpAttachServer : IAttachServer
             lifecycleCts = _lifecycleCts;
 
             _connections.Clear();
+            RemoteRuntimeMetrics.SetActiveConnections(TransportName, 0);
             _clientTasks.Clear();
             _acceptLoopTask = null;
             _heartbeatLoopTask = null;
@@ -346,9 +348,11 @@ public sealed class HttpAttachServer : IAttachServer
             lock (_sync)
             {
                 _connections.Add(connection);
+                RemoteRuntimeMetrics.SetActiveConnections(TransportName, _connections.Count);
             }
 
             _protocolMonitor.RecordConnectionAccepted(TransportName, connection.ConnectionId, connection.RemoteEndpoint);
+            RemoteRuntimeMetrics.RecordConnectionAccepted(TransportName);
             Log(
                 RemoteDiagnosticsLogLevel.Information,
                 "connection-accepted",
@@ -395,11 +399,12 @@ public sealed class HttpAttachServer : IAttachServer
 
     private async Task RunHeartbeatLoopAsync(CancellationToken cancellationToken)
     {
+        var delay = Options.HeartbeatInterval;
         while (!cancellationToken.IsCancellationRequested)
         {
             try
             {
-                await Task.Delay(Options.HeartbeatInterval, cancellationToken).ConfigureAwait(false);
+                await Task.Delay(delay, cancellationToken).ConfigureAwait(false);
             }
             catch (OperationCanceledException)
             {
@@ -412,6 +417,8 @@ public sealed class HttpAttachServer : IAttachServer
                 snapshot = _connections.ToList();
             }
 
+            var sentHeartbeats = 0;
+            var skippedBecauseActive = 0;
             foreach (var connection in snapshot)
             {
                 if (!connection.IsOpen)
@@ -420,6 +427,13 @@ public sealed class HttpAttachServer : IAttachServer
                     continue;
                 }
 
+                if (connection.HasRecentActivity(Options.HeartbeatInterval))
+                {
+                    skippedBecauseActive++;
+                    continue;
+                }
+
+                var heartbeatStarted = Stopwatch.GetTimestamp();
                 try
                 {
                     var keepAlive = new RemoteKeepAliveMessage(
@@ -427,6 +441,11 @@ public sealed class HttpAttachServer : IAttachServer
                         Sequence: Interlocked.Increment(ref _keepAliveSequence),
                         TimestampUtc: DateTimeOffset.UtcNow);
                     await connection.SendAsync(keepAlive, cancellationToken).ConfigureAwait(false);
+                    sentHeartbeats++;
+                    RemoteRuntimeMetrics.RecordHeartbeatDuration(
+                        transport: TransportName,
+                        status: "ok",
+                        durationMs: RemoteRuntimeMetrics.ElapsedMilliseconds(heartbeatStarted));
                 }
                 catch (OperationCanceledException)
                 {
@@ -434,6 +453,15 @@ public sealed class HttpAttachServer : IAttachServer
                 }
                 catch (Exception ex)
                 {
+                    RemoteRuntimeMetrics.RecordHeartbeatDuration(
+                        transport: TransportName,
+                        status: "error",
+                        durationMs: RemoteRuntimeMetrics.ElapsedMilliseconds(heartbeatStarted));
+                    RemoteRuntimeMetrics.RecordTransportFailure(
+                        transport: TransportName,
+                        method: "keepAlive",
+                        domain: "none",
+                        status: "error");
                     Log(
                         RemoteDiagnosticsLogLevel.Warning,
                         "heartbeat-send-failed",
@@ -454,6 +482,17 @@ public sealed class HttpAttachServer : IAttachServer
 
                     RemoveConnection(connection);
                 }
+            }
+
+            if (snapshot.Count > 0 && sentHeartbeats == 0 && skippedBecauseActive > 0)
+            {
+                var doubled = Options.HeartbeatInterval.Ticks * 2;
+                var capped = Math.Min(doubled, TimeSpan.FromSeconds(30).Ticks);
+                delay = TimeSpan.FromTicks(capped);
+            }
+            else
+            {
+                delay = Options.HeartbeatInterval;
             }
         }
     }
@@ -691,6 +730,7 @@ public sealed class HttpAttachServer : IAttachServer
         lock (_sync)
         {
             _connections.Remove(connection);
+            RemoteRuntimeMetrics.SetActiveConnections(TransportName, _connections.Count);
         }
     }
 

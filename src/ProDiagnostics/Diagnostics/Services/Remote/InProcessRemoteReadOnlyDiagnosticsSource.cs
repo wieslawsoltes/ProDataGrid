@@ -26,8 +26,15 @@ namespace Avalonia.Diagnostics.Services;
 internal sealed class InProcessRemoteReadOnlyDiagnosticsSource : IRemoteReadOnlyDiagnosticsSource
 {
     private const int SnapshotVersion = 1;
-    private const long SnapshotGeneration = 1;
+    private const int ProjectionYieldInterval = 256;
     private const int TreeSnapshotCacheTtlMilliseconds = 750;
+    private const int TreeLookupCacheTtlMilliseconds = 750;
+    private const int PropertiesSnapshotCacheCapacity = 128;
+    private const int StylesSnapshotCacheCapacity = 96;
+    private const int ResourcesSnapshotCacheCapacity = 32;
+    private const int AssetsSnapshotCacheCapacity = 32;
+    private const int SourceTypeCacheCapacity = 512;
+    private const int SourceObjectCacheCapacity = 2048;
 
     private static readonly RemoteSourceLocationSnapshot s_emptySourceSnapshot = new(
         Xaml: null,
@@ -41,7 +48,12 @@ internal sealed class InProcessRemoteReadOnlyDiagnosticsSource : IRemoteReadOnly
     private readonly ITreeNodeProvider _logicalTreeProvider;
     private readonly ITreeNodeProvider _visualTreeProvider;
     private readonly IResourceTreeNodeProvider _resourceTreeProvider;
-    private readonly Dictionary<Type, RemoteSourceLocationSnapshot> _treeNodeSourceCache = new();
+    private readonly LruCache<Type, RemoteSourceLocationSnapshot> _treeNodeSourceCache =
+        new(SourceTypeCacheCapacity);
+    private readonly LruCache<object, RemoteSourceLocationSnapshot> _sourceInstanceCache =
+        new(SourceObjectCacheCapacity, ReferenceEqualityComparer.Instance);
+    private readonly LruCache<string, RemoteSourceLocationSnapshot> _sourceDocumentCache =
+        new(SourceObjectCacheCapacity);
     private readonly InProcessRemoteNodeIdentityProvider _nodeIdentityProvider;
     private readonly InProcessRemoteSelectionState _selectionState;
     private readonly IRemoteStreamPauseController? _streamPauseController;
@@ -52,7 +64,22 @@ internal sealed class InProcessRemoteReadOnlyDiagnosticsSource : IRemoteReadOnly
     private readonly InProcessRemoteOverlayState _overlayState;
     private readonly ViewModelsBindingsPageViewModel _bindingsPageViewModel;
     private readonly StylesDiagnosticsPageViewModel _stylesPageViewModel;
+    private readonly object _treeCacheSync = new();
+    private readonly object _elements3DSvgCacheSync = new();
     private readonly Dictionary<string, TreeSnapshotCacheEntry> _treeSnapshotCache = new(StringComparer.Ordinal);
+    private readonly Dictionary<string, TreeLookupCacheEntry> _treeLookupCache = new(StringComparer.Ordinal);
+    private readonly LruCache<string, RemotePropertiesSnapshot> _propertiesSnapshotCache =
+        new(PropertiesSnapshotCacheCapacity);
+    private readonly LruCache<string, RemoteStylesSnapshot> _stylesSnapshotCache =
+        new(StylesSnapshotCacheCapacity);
+    private readonly LruCache<string, RemoteResourcesSnapshot> _resourcesSnapshotCache =
+        new(ResourcesSnapshotCacheCapacity);
+    private readonly LruCache<string, RemoteAssetsSnapshot> _assetsSnapshotCache =
+        new(AssetsSnapshotCacheCapacity);
+    private long _treeCacheGeneration = 1;
+    private long _treeCacheTimestampTicks;
+    private long _elements3DSnapshotRequestVersion;
+    private Elements3DSvgCacheEntry? _elements3DSvgCache;
     private AvaloniaObject? _bindingsInspectionTarget;
     private StyledElement? _stylesInspectionTarget;
 
@@ -89,56 +116,87 @@ internal sealed class InProcessRemoteReadOnlyDiagnosticsSource : IRemoteReadOnly
             mainView: null,
             selectedObjectAccessor: () => _stylesInspectionTarget,
             sourceLocationService: _sourceLocationService);
+        RemoteRuntimeMetrics.SetSnapshotCacheEntries(_treeSnapshotCache.Count);
     }
 
     public ValueTask<RemoteTreeSnapshot> GetTreeSnapshotAsync(
         RemoteTreeSnapshotRequest request,
         CancellationToken cancellationToken = default)
     {
-        return InvokeOnUiThreadAsync(() =>
-        {
-            cancellationToken.ThrowIfCancellationRequested();
-            var scope = NormalizeScope(request.Scope);
-            var cacheKey = BuildTreeSnapshotCacheKey(scope, request.IncludeSourceLocations, request.IncludeVisualDetails);
-            if (TryGetCachedTreeSnapshot(cacheKey, out var cached))
+        var scope = NormalizeScope(request.Scope);
+        return CaptureAndProjectSnapshotAsync(
+            domain: "tree",
+            scope: scope,
+            captureOperation: (context, token) =>
             {
-                return cached;
-            }
+                token.ThrowIfCancellationRequested();
+                var generation = GetSnapshotGeneration();
+                var cacheKey = BuildTreeSnapshotCacheKey(
+                    scope,
+                    request.IncludeSourceLocations,
+                    request.IncludeVisualDetails,
+                    generation);
+                if (TryGetCachedTreeSnapshot(cacheKey, generation, out var cached))
+                {
+                    context.Cache = "hit";
+                    return TreeSnapshotUiCapture.ForCached(cached);
+                }
 
-            var nodes = BuildFastTreeNodeSnapshots(
-                scope,
-                request.IncludeSourceLocations,
-                request.IncludeVisualDetails,
-                cancellationToken);
-            var snapshot = new RemoteTreeSnapshot(
-                SnapshotVersion: SnapshotVersion,
-                Generation: SnapshotGeneration,
-                Scope: scope,
-                Nodes: nodes);
-            StoreTreeSnapshot(cacheKey, snapshot);
-            return snapshot;
-        }, cancellationToken);
+                var nodes = BuildFastTreeNodeCaptureEntries(
+                    scope,
+                    request.IncludeSourceLocations,
+                    request.IncludeVisualDetails,
+                    token);
+                context.Cache = "miss";
+                return TreeSnapshotUiCapture.ForCapture(
+                    generation,
+                    scope,
+                    cacheKey,
+                    request.IncludeSourceLocations,
+                    nodes);
+            },
+            projectOperation: (capture, _, token) =>
+                capture.CachedSnapshot is not null
+                    ? new ValueTask<RemoteTreeSnapshot>(capture.CachedSnapshot)
+                    : ProjectTreeSnapshotAsync(capture, token),
+            cancellationToken);
     }
 
     public ValueTask<RemoteSelectionSnapshot> GetSelectionSnapshotAsync(
         RemoteSelectionSnapshotRequest request,
         CancellationToken cancellationToken = default)
     {
-        return InvokeOnUiThreadAsync(() =>
+        var scope = NormalizeScope(request.Scope);
+        return CaptureSnapshotAsync(
+            domain: "tree",
+            scope: scope,
+            operation: _ =>
         {
             cancellationToken.ThrowIfCancellationRequested();
             return _selectionState.GetSnapshot(request.Scope);
-        }, cancellationToken);
+        },
+            cancellationToken);
     }
 
     public ValueTask<RemotePropertiesSnapshot> GetPropertiesSnapshotAsync(
         RemotePropertiesSnapshotRequest request,
         CancellationToken cancellationToken = default)
     {
-        return InvokeOnUiThreadAsync(() =>
+        var scope = NormalizeScope(request.Scope);
+        return CaptureSnapshotAsync(
+            domain: "properties",
+            scope: scope,
+            operation: context =>
         {
             cancellationToken.ThrowIfCancellationRequested();
-            var scope = NormalizeScope(request.Scope);
+            var generation = GetSnapshotGeneration();
+            var cacheKey = BuildPropertiesSnapshotCacheKey(scope, request, generation);
+            if (_propertiesSnapshotCache.TryGetValue(cacheKey, out var cached))
+            {
+                context.Cache = "hit";
+                return cached;
+            }
+
             var targetLookup = BuildTreeLookup(scope);
             try
             {
@@ -146,13 +204,13 @@ internal sealed class InProcessRemoteReadOnlyDiagnosticsSource : IRemoteReadOnly
                 var targetNodePath = ResolveTargetNodePath(request, targetLookup, target);
                 var targetNodeId = targetLookup.FindNodeId(target);
                 var properties = BuildPropertySnapshots(target, includeClrProperties: request.IncludeClrProperties);
-                var frames = BuildValueFrameSnapshots(target);
+                var frames = BuildValueFrameSnapshots(target, cancellationToken);
                 var source = ResolveSourceLocationSnapshot(target);
 
-                return
+                var snapshot =
                 new RemotePropertiesSnapshot(
                     SnapshotVersion: SnapshotVersion,
-                    Generation: SnapshotGeneration,
+                    Generation: generation,
                     Scope: scope,
                     Target: DescribeTarget(target),
                     TargetType: target.GetType().FullName ?? target.GetType().Name,
@@ -161,123 +219,163 @@ internal sealed class InProcessRemoteReadOnlyDiagnosticsSource : IRemoteReadOnly
                     Properties: properties,
                     Frames: frames,
                     Source: source);
+                _propertiesSnapshotCache[cacheKey] = snapshot;
+                context.Cache = "miss";
+                return snapshot;
             }
             finally
             {
                 targetLookup.Dispose();
             }
-        }, cancellationToken);
+        },
+            cancellationToken);
     }
 
     public ValueTask<RemoteElements3DSnapshot> GetElements3DSnapshotAsync(
         RemoteElements3DSnapshotRequest request,
         CancellationToken cancellationToken = default)
     {
-        return InvokeOnUiThreadAsync(() =>
-        {
-            cancellationToken.ThrowIfCancellationRequested();
-            var viewModel = _elements3DPageViewModel;
-            var includeNodes = request.IncludeNodes;
-            var includeVisibleNodeIds = request.IncludeVisibleNodeIds;
-            var rootPaths = includeNodes
-                ? BuildVisualPathLookup(viewModel.CurrentRootVisual)
-                : null;
-
-            HashSet<string>? visibleNodeIds = null;
-            if (includeNodes || includeVisibleNodeIds)
+        return CaptureAndProjectSnapshotAsync(
+            domain: "elements3d",
+            scope: "none",
+            captureOperation: (context, token) =>
             {
-                visibleNodeIds = new HashSet<string>(StringComparer.Ordinal);
-                for (var i = 0; i < viewModel.VisibleNodes.Count; i++)
+                token.ThrowIfCancellationRequested();
+                var viewModel = _elements3DPageViewModel;
+                var includeNodes = request.IncludeNodes;
+                var includeVisibleNodeIds = request.IncludeVisibleNodeIds;
+                var requestVersion = Interlocked.Increment(ref _elements3DSnapshotRequestVersion);
+                var sceneRevision = viewModel.SnapshotRevision;
+                var rootPaths = includeNodes
+                    ? BuildVisualPathLookup(viewModel.CurrentRootVisual)
+                    : null;
+
+                var visibleNodeIdSet = includeNodes || includeVisibleNodeIds
+                    ? new HashSet<string>(StringComparer.Ordinal)
+                    : null;
+                if (visibleNodeIdSet is not null)
                 {
-                    cancellationToken.ThrowIfCancellationRequested();
-                    visibleNodeIds.Add(_nodeIdentityProvider.GetNodeId(viewModel.VisibleNodes[i].Visual));
+                    for (var i = 0; i < viewModel.VisibleNodes.Count; i++)
+                    {
+                        token.ThrowIfCancellationRequested();
+                        visibleNodeIdSet.Add(_nodeIdentityProvider.GetNodeId(viewModel.VisibleNodes[i].Visual));
+                    }
                 }
-            }
 
-            var selectedNodeId = viewModel.SelectedNode is null
-                ? null
-                : _nodeIdentityProvider.GetNodeId(viewModel.SelectedNode.Visual);
-            RemoteElements3DNodeSnapshot[] nodes;
-            if (includeNodes)
-            {
-                nodes = new RemoteElements3DNodeSnapshot[viewModel.Nodes.Count];
-                for (var i = 0; i < viewModel.Nodes.Count; i++)
+                var selectedNodeId = viewModel.SelectedNode is null
+                    ? null
+                    : _nodeIdentityProvider.GetNodeId(viewModel.SelectedNode.Visual);
+                var capturedNodes = includeNodes
+                    ? new CapturedElements3DNode[viewModel.Nodes.Count]
+                    : Array.Empty<CapturedElements3DNode>();
+                if (includeNodes)
                 {
-                    cancellationToken.ThrowIfCancellationRequested();
-                    var node = viewModel.Nodes[i];
-                    var nodeId = _nodeIdentityProvider.GetNodeId(node.Visual);
-                    rootPaths!.TryGetValue(node.Visual, out var nodePath);
-                    nodes[i] = new RemoteElements3DNodeSnapshot(
-                        NodeId: nodeId,
-                        NodePath: nodePath,
-                        Depth: node.Depth,
-                        Node: node.Node,
-                        ZIndex: node.ZIndex,
-                        Bounds: new RemoteRectSnapshot(
-                            X: node.BoundsRect.X,
-                            Y: node.BoundsRect.Y,
-                            Width: node.BoundsRect.Width,
-                            Height: node.BoundsRect.Height),
-                        IsVisible: node.IsVisible,
-                        Opacity: node.Opacity,
-                        IsRendered: visibleNodeIds is not null && visibleNodeIds.Contains(nodeId),
-                        IsSelected: string.Equals(nodeId, selectedNodeId, StringComparison.Ordinal));
+                    for (var i = 0; i < viewModel.Nodes.Count; i++)
+                    {
+                        token.ThrowIfCancellationRequested();
+                        var node = viewModel.Nodes[i];
+                        var nodeId = _nodeIdentityProvider.GetNodeId(node.Visual);
+                        rootPaths!.TryGetValue(node.Visual, out var nodePath);
+                        capturedNodes[i] = new CapturedElements3DNode(
+                            NodeId: nodeId,
+                            NodePath: nodePath,
+                            Depth: node.Depth,
+                            Node: node.Node,
+                            ZIndex: node.ZIndex,
+                            BoundsX: node.BoundsRect.X,
+                            BoundsY: node.BoundsRect.Y,
+                            BoundsWidth: node.BoundsRect.Width,
+                            BoundsHeight: node.BoundsRect.Height,
+                            IsVisible: node.IsVisible,
+                            Opacity: node.Opacity,
+                            IsRendered: visibleNodeIdSet is not null && visibleNodeIdSet.Contains(nodeId),
+                            IsSelected: string.Equals(nodeId, selectedNodeId, StringComparison.Ordinal));
+                    }
                 }
-            }
-            else
-            {
-                nodes = Array.Empty<RemoteElements3DNodeSnapshot>();
-            }
 
-            var visibleIds = includeVisibleNodeIds && visibleNodeIds is not null
-                ? visibleNodeIds.ToArray()
-                : Array.Empty<string>();
-            var svg = request.IncludeSvgSnapshot
-                ? BuildElements3DSvgSnapshot(
-                    viewModel,
-                    request.SvgWidth,
-                    request.SvgHeight,
-                    request.MaxSvgNodes)
-                : null;
+                var visibleIds = includeVisibleNodeIds && visibleNodeIdSet is not null
+                    ? visibleNodeIdSet.ToArray()
+                    : Array.Empty<string>();
 
-            return new RemoteElements3DSnapshot(
-                SnapshotVersion: SnapshotVersion,
-                Generation: SnapshotGeneration,
-                Status: "ok",
-                InspectedRoot: viewModel.InspectedRoot,
-                MainRootNodeId: viewModel.MainRootVisual is null
-                    ? null
-                    : _nodeIdentityProvider.GetNodeId(viewModel.MainRootVisual),
-                CurrentRootNodeId: viewModel.CurrentRootVisual is null
-                    ? null
-                    : _nodeIdentityProvider.GetNodeId(viewModel.CurrentRootVisual),
-                ScopedSelectionNodeId: viewModel.ScopedSelectionVisual is null
-                    ? null
-                    : _nodeIdentityProvider.GetNodeId(viewModel.ScopedSelectionVisual),
-                SelectedNodeId: selectedNodeId,
-                IsScopedToSelectionBranch: viewModel.IsScopedToSelectionBranch,
-                NodeCount: viewModel.NodeCount,
-                VisibleNodeCount: viewModel.VisibleNodeCount,
-                ShowInvisibleNodes: viewModel.ShowInvisibleNodes,
-                ShowExploded3DView: viewModel.ShowExploded3DView,
-                ShowAllLayersInGrid: viewModel.ShowAllLayersInGrid,
-                DepthSpacing: viewModel.DepthSpacing,
-                Flat2DMaxLayersPerRow: viewModel.Flat2DMaxLayersPerRow,
-                Tilt: viewModel.Tilt,
-                Zoom: viewModel.Zoom,
-                OrbitYaw: viewModel.OrbitYaw,
-                OrbitPitch: viewModel.OrbitPitch,
-                OrbitRoll: viewModel.OrbitRoll,
-                AvailableMinDepth: viewModel.AvailableMinDepth,
-                AvailableMaxDepth: viewModel.AvailableMaxDepth,
-                MinVisibleDepth: viewModel.MinVisibleDepth,
-                MaxVisibleDepth: viewModel.MaxVisibleDepth,
-                MaxVisibleElements: viewModel.MaxVisibleElements,
-                SvgSnapshot: svg?.svgSnapshot,
-                SvgViewBox: svg?.svgViewBox,
-                Nodes: nodes,
-                VisibleNodeIds: visibleIds);
-        }, cancellationToken);
+                (string svgSnapshot, string svgViewBox)? svg = null;
+                if (request.IncludeSvgSnapshot &&
+                    requestVersion == Volatile.Read(ref _elements3DSnapshotRequestVersion))
+                {
+                    var svgWidth = Math.Clamp(request.SvgWidth, 320, 8192);
+                    var svgHeight = Math.Clamp(request.SvgHeight, 240, 8192);
+                    if (TryGetCachedElements3DSvgSnapshot(
+                            sceneRevision,
+                            svgWidth,
+                            svgHeight,
+                            request.MaxSvgNodes,
+                            out var cachedSvg))
+                    {
+                        svg = cachedSvg;
+                        context.Cache = "hit";
+                    }
+                    else
+                    {
+                        var renderedSvg = BuildElements3DSvgSnapshot(
+                            viewModel,
+                            svgWidth,
+                            svgHeight,
+                            request.MaxSvgNodes);
+                        if (requestVersion == Volatile.Read(ref _elements3DSnapshotRequestVersion))
+                        {
+                            svg = renderedSvg;
+                            if (renderedSvg is { } produced)
+                            {
+                                StoreCachedElements3DSvgSnapshot(
+                                    sceneRevision,
+                                    svgWidth,
+                                    svgHeight,
+                                    request.MaxSvgNodes,
+                                    produced);
+                            }
+
+                            context.Cache = "miss";
+                        }
+                    }
+                }
+
+                return new Elements3DSnapshotUiCapture(
+                    Generation: sceneRevision,
+                    InspectedRoot: viewModel.InspectedRoot,
+                    MainRootNodeId: viewModel.MainRootVisual is null
+                        ? null
+                        : _nodeIdentityProvider.GetNodeId(viewModel.MainRootVisual),
+                    CurrentRootNodeId: viewModel.CurrentRootVisual is null
+                        ? null
+                        : _nodeIdentityProvider.GetNodeId(viewModel.CurrentRootVisual),
+                    ScopedSelectionNodeId: viewModel.ScopedSelectionVisual is null
+                        ? null
+                        : _nodeIdentityProvider.GetNodeId(viewModel.ScopedSelectionVisual),
+                    SelectedNodeId: selectedNodeId,
+                    IsScopedToSelectionBranch: viewModel.IsScopedToSelectionBranch,
+                    NodeCount: viewModel.NodeCount,
+                    VisibleNodeCount: viewModel.VisibleNodeCount,
+                    ShowInvisibleNodes: viewModel.ShowInvisibleNodes,
+                    ShowExploded3DView: viewModel.ShowExploded3DView,
+                    ShowAllLayersInGrid: viewModel.ShowAllLayersInGrid,
+                    DepthSpacing: viewModel.DepthSpacing,
+                    Flat2DMaxLayersPerRow: viewModel.Flat2DMaxLayersPerRow,
+                    Tilt: viewModel.Tilt,
+                    Zoom: viewModel.Zoom,
+                    OrbitYaw: viewModel.OrbitYaw,
+                    OrbitPitch: viewModel.OrbitPitch,
+                    OrbitRoll: viewModel.OrbitRoll,
+                    AvailableMinDepth: viewModel.AvailableMinDepth,
+                    AvailableMaxDepth: viewModel.AvailableMaxDepth,
+                    MinVisibleDepth: viewModel.MinVisibleDepth,
+                    MaxVisibleDepth: viewModel.MaxVisibleDepth,
+                    MaxVisibleElements: viewModel.MaxVisibleElements,
+                    SvgSnapshot: svg?.svgSnapshot,
+                    SvgViewBox: svg?.svgViewBox,
+                    Nodes: capturedNodes,
+                    VisibleNodeIds: visibleIds);
+            },
+            projectOperation: ProjectElements3DSnapshotAsync,
+            cancellationToken);
     }
 
     private static (string svgSnapshot, string svgViewBox)? BuildElements3DSvgSnapshot(
@@ -293,26 +391,83 @@ internal sealed class InProcessRemoteReadOnlyDiagnosticsSource : IRemoteReadOnly
             maxSvgNodes);
     }
 
+    private bool TryGetCachedElements3DSvgSnapshot(
+        long sceneRevision,
+        int svgWidth,
+        int svgHeight,
+        int maxSvgNodes,
+        out (string svgSnapshot, string svgViewBox) svg)
+    {
+        lock (_elements3DSvgCacheSync)
+        {
+            if (_elements3DSvgCache is
+                {
+                    SceneRevision: var revision,
+                    SvgWidth: var width,
+                    SvgHeight: var height,
+                    MaxSvgNodes: var maxNodes,
+                    SvgSnapshot: var snapshot,
+                    SvgViewBox: var viewBox
+                } &&
+                revision == sceneRevision &&
+                width == svgWidth &&
+                height == svgHeight &&
+                maxNodes == maxSvgNodes)
+            {
+                svg = (snapshot, viewBox);
+                return true;
+            }
+        }
+
+        svg = default;
+        return false;
+    }
+
+    private void StoreCachedElements3DSvgSnapshot(
+        long sceneRevision,
+        int svgWidth,
+        int svgHeight,
+        int maxSvgNodes,
+        (string svgSnapshot, string svgViewBox) snapshot)
+    {
+        lock (_elements3DSvgCacheSync)
+        {
+            _elements3DSvgCache = new Elements3DSvgCacheEntry(
+                SceneRevision: sceneRevision,
+                SvgWidth: svgWidth,
+                SvgHeight: svgHeight,
+                MaxSvgNodes: maxSvgNodes,
+                SvgSnapshot: snapshot.svgSnapshot,
+                SvgViewBox: snapshot.svgViewBox);
+        }
+    }
+
     public ValueTask<RemoteOverlayOptionsSnapshot> GetOverlayOptionsSnapshotAsync(
         RemoteOverlayOptionsSnapshotRequest request,
         CancellationToken cancellationToken = default)
     {
-        return InvokeOnUiThreadAsync(() =>
+        return CaptureSnapshotAsync(
+            domain: "overlay",
+            scope: "none",
+            operation: _ =>
         {
             cancellationToken.ThrowIfCancellationRequested();
-            _ = request;
             return _overlayState.GetSnapshot();
-        }, cancellationToken);
+        },
+            cancellationToken);
     }
 
     public ValueTask<RemoteCodeDocumentsSnapshot> GetCodeDocumentsSnapshotAsync(
         RemoteCodeDocumentsRequest request,
         CancellationToken cancellationToken = default)
     {
-        return InvokeOnUiThreadAsync(() =>
+        var scope = NormalizeScope(request.Scope);
+        return CaptureSnapshotAsync(
+            domain: "code",
+            scope: scope,
+            operation: _ =>
         {
             cancellationToken.ThrowIfCancellationRequested();
-            var scope = NormalizeScope(request.Scope);
             var targetLookup = BuildTreeLookup(scope);
             try
             {
@@ -336,17 +491,21 @@ internal sealed class InProcessRemoteReadOnlyDiagnosticsSource : IRemoteReadOnly
             {
                 targetLookup.Dispose();
             }
-        }, cancellationToken);
+        },
+            cancellationToken);
     }
 
     public ValueTask<RemoteCodeResolveNodeSnapshot> ResolveCodeNodeAsync(
         RemoteCodeResolveNodeRequest request,
         CancellationToken cancellationToken = default)
     {
-        return InvokeOnUiThreadAsync(() =>
+        var scope = NormalizeScope(request.Scope);
+        return CaptureSnapshotAsync(
+            domain: "code",
+            scope: scope,
+            operation: _ =>
         {
             cancellationToken.ThrowIfCancellationRequested();
-            var scope = NormalizeScope(request.Scope);
             var filePath = request.FilePath?.Trim() ?? string.Empty;
             if (filePath.Length == 0)
             {
@@ -394,17 +553,21 @@ internal sealed class InProcessRemoteReadOnlyDiagnosticsSource : IRemoteReadOnly
                 TargetType: target?.GetType().FullName ?? target?.GetType().Name,
                 MatchKind: matchKind,
                 Status: found ? "Node resolved from source location." : "No matching node found.");
-        }, cancellationToken);
+        },
+            cancellationToken);
     }
 
     public ValueTask<RemoteBindingsSnapshot> GetBindingsSnapshotAsync(
         RemoteBindingsSnapshotRequest request,
         CancellationToken cancellationToken = default)
     {
-        return InvokeOnUiThreadAsync(() =>
+        var scope = NormalizeScope(request.Scope);
+        return CaptureSnapshotAsync(
+            domain: "bindings",
+            scope: scope,
+            operation: _ =>
         {
             cancellationToken.ThrowIfCancellationRequested();
-            var scope = NormalizeScope(request.Scope);
             var targetLookup = BuildTreeLookup(scope);
             try
             {
@@ -440,27 +603,39 @@ internal sealed class InProcessRemoteReadOnlyDiagnosticsSource : IRemoteReadOnly
             {
                 targetLookup.Dispose();
             }
-        }, cancellationToken);
+        },
+            cancellationToken);
     }
 
     public ValueTask<RemoteStylesSnapshot> GetStylesSnapshotAsync(
         RemoteStylesSnapshotRequest request,
         CancellationToken cancellationToken = default)
     {
-        return InvokeOnUiThreadAsync(() =>
+        var scope = NormalizeScope(request.Scope);
+        return CaptureSnapshotAsync(
+            domain: "styles",
+            scope: scope,
+            operation: context =>
         {
             cancellationToken.ThrowIfCancellationRequested();
-            var scope = NormalizeScope(request.Scope);
+            var generation = GetSnapshotGeneration();
+            var cacheKey = BuildStylesSnapshotCacheKey(scope, request, generation);
+            if (_stylesSnapshotCache.TryGetValue(cacheKey, out var cached))
+            {
+                context.Cache = "hit";
+                return cached;
+            }
+
             var targetLookup = BuildTreeLookup(scope);
             try
             {
                 var target = ResolveTarget(request, targetLookup) as StyledElement;
                 if (target is null)
                 {
-                    return
+                    var empty =
                     new RemoteStylesSnapshot(
                         SnapshotVersion: SnapshotVersion,
-                        Generation: SnapshotGeneration,
+                        Generation: generation,
                         Scope: scope,
                         InspectedRoot: "(none)",
                         InspectedRootType: string.Empty,
@@ -469,6 +644,9 @@ internal sealed class InProcessRemoteReadOnlyDiagnosticsSource : IRemoteReadOnly
                         Frames: Array.Empty<RemoteValueFrameSnapshot>(),
                         Setters: Array.Empty<RemoteSetterSnapshot>(),
                         Resolution: Array.Empty<RemoteStyleResolutionSnapshot>());
+                    _stylesSnapshotCache[cacheKey] = empty;
+                    context.Cache = "miss";
+                    return empty;
                 }
 
                 _stylesInspectionTarget = target;
@@ -497,61 +675,73 @@ internal sealed class InProcessRemoteReadOnlyDiagnosticsSource : IRemoteReadOnly
                 }
 
                 var frames = includeFrames
-                    ? _stylesPageViewModel.FramesView
-                        .Cast<ValueFrameViewModel>()
-                        .Select((frame, index) => MapFrame(
-                            frame,
-                            parentId: null,
-                            index: index,
-                            context: "styles-frames"))
-                        .ToArray()
+                    ? MapFramesWithCancellation(
+                        _stylesPageViewModel.FramesView
+                            .Cast<ValueFrameViewModel>()
+                            .ToArray(),
+                        context: "styles-frames",
+                        cancellationToken)
                     : Array.Empty<RemoteValueFrameSnapshot>();
                 var setters = includeSetters
-                    ? _stylesPageViewModel.SettersView
-                        .Cast<SetterViewModel>()
-                        .Select((setter, index) => MapSetter(
-                            setter,
-                            frameId: null,
-                            index: index,
-                            context: "styles-setters"))
-                        .ToArray()
+                    ? MapSettersWithCancellation(
+                        _stylesPageViewModel.SettersView
+                            .Cast<SetterViewModel>()
+                            .ToArray(),
+                        context: "styles-setters",
+                        cancellationToken)
                     : Array.Empty<RemoteSetterSnapshot>();
                 var resolution = includeResolution
-                    ? _stylesPageViewModel.ResolutionEntriesView
-                        .Cast<StyleResolutionTraceEntryViewModel>()
-                        .Select((entry, index) => MapStyleResolutionEntry(entry, index))
-                        .ToArray()
+                    ? MapStyleResolutionEntriesWithCancellation(
+                        _stylesPageViewModel.ResolutionEntriesView
+                            .Cast<StyleResolutionTraceEntryViewModel>()
+                            .ToArray(),
+                        cancellationToken)
                     : Array.Empty<RemoteStyleResolutionSnapshot>();
 
-                return
+                var snapshot =
                 new RemoteStylesSnapshot(
                     SnapshotVersion: SnapshotVersion,
-                    Generation: SnapshotGeneration,
+                    Generation: generation,
                     Scope: scope,
                     InspectedRoot: _stylesPageViewModel.InspectedRoot,
                     InspectedRootType: _stylesPageViewModel.InspectedRootType,
                     InspectedRootNodeId: targetLookup.FindNodeId(target),
                     TreeEntries: includeTreeEntries
-                        ? MapStyleTreeEntries(treeEntries, targetLookup)
+                        ? MapStyleTreeEntries(treeEntries, targetLookup, cancellationToken)
                         : Array.Empty<RemoteStyleTreeEntrySnapshot>(),
                     Frames: frames,
                     Setters: setters,
                     Resolution: resolution);
+                _stylesSnapshotCache[cacheKey] = snapshot;
+                context.Cache = "miss";
+                return snapshot;
             }
             finally
             {
                 targetLookup.Dispose();
             }
-        }, cancellationToken);
+        },
+            cancellationToken);
     }
 
     public ValueTask<RemoteResourcesSnapshot> GetResourcesSnapshotAsync(
         RemoteResourcesSnapshotRequest request,
         CancellationToken cancellationToken = default)
     {
-        return InvokeOnUiThreadAsync(() =>
+        return CaptureSnapshotAsync(
+            domain: "resources",
+            scope: "none",
+            operation: context =>
         {
             cancellationToken.ThrowIfCancellationRequested();
+            var generation = GetSnapshotGeneration();
+            var cacheKey = BuildResourcesSnapshotCacheKey(request, generation);
+            if (_resourcesSnapshotCache.TryGetValue(cacheKey, out var cached))
+            {
+                context.Cache = "hit";
+                return cached;
+            }
+
             var roots = _resourceTreeProvider.Create(_root);
             try
             {
@@ -559,40 +749,58 @@ internal sealed class InProcessRemoteReadOnlyDiagnosticsSource : IRemoteReadOnly
                 var entries = new List<RemoteResourceEntrySnapshot>();
                 for (var i = 0; i < roots.Length; i++)
                 {
+                    cancellationToken.ThrowIfCancellationRequested();
                     FlattenResourceNode(
                         roots[i],
                         nodePath: i.ToString(),
                         parentNodePath: null,
                         depth: 0,
                         includeEntries: request.IncludeEntries,
+                        cancellationToken,
                         nodes,
                         entries);
                 }
 
-                return
+                var snapshot =
                 new RemoteResourcesSnapshot(
                     SnapshotVersion: SnapshotVersion,
-                    Generation: SnapshotGeneration,
+                    Generation: generation,
                     Nodes: nodes,
                     Entries: entries);
+                _resourcesSnapshotCache[cacheKey] = snapshot;
+                context.Cache = "miss";
+                return snapshot;
             }
             finally
             {
                 DisposeResourceNodes(roots);
             }
-        }, cancellationToken);
+        },
+            cancellationToken);
     }
 
     public ValueTask<RemoteAssetsSnapshot> GetAssetsSnapshotAsync(
         RemoteAssetsSnapshotRequest request,
         CancellationToken cancellationToken = default)
     {
-        return InvokeOnUiThreadAsync(() =>
+        return CaptureSnapshotAsync(
+            domain: "assets",
+            scope: "none",
+            operation: context =>
         {
             cancellationToken.ThrowIfCancellationRequested();
-            var assets = CollectAssets()
+            var generation = GetSnapshotGeneration();
+            var cacheKey = BuildAssetsSnapshotCacheKey(generation);
+            if (_assetsSnapshotCache.TryGetValue(cacheKey, out var cached))
+            {
+                context.Cache = "hit";
+                return cached;
+            }
+
+            var assets = CollectAssets(cancellationToken)
                 .Select(asset =>
                 {
+                    cancellationToken.ThrowIfCancellationRequested();
                     var source = ResolveAssetSourceLocationSnapshot(asset.assembly, asset.assetPath, asset.name);
                     return new RemoteAssetSnapshot(
                         Id: CreateStableId("asset", asset.assemblyName, asset.assetPath),
@@ -606,22 +814,29 @@ internal sealed class InProcessRemoteReadOnlyDiagnosticsSource : IRemoteReadOnly
                 })
                 .ToArray();
 
-            return new RemoteAssetsSnapshot(
+            var snapshot = new RemoteAssetsSnapshot(
                 SnapshotVersion: SnapshotVersion,
-                Generation: SnapshotGeneration,
+                Generation: generation,
                 Assets: assets);
-        }, cancellationToken);
+            _assetsSnapshotCache[cacheKey] = snapshot;
+            context.Cache = "miss";
+            return snapshot;
+        },
+            cancellationToken);
     }
 
     public ValueTask<RemoteEventsSnapshot> GetEventsSnapshotAsync(
         RemoteEventsSnapshotRequest request,
         CancellationToken cancellationToken = default)
     {
-        return InvokeOnUiThreadAsync(() =>
+        var scope = NormalizeScope(request.Scope);
+        return CaptureSnapshotAsync(
+            domain: "events",
+            scope: scope,
+            operation: _ =>
         {
             cancellationToken.ThrowIfCancellationRequested();
             var eventsPage = _eventsPageViewModel;
-            var scope = NormalizeScope(request.Scope);
             if (eventsPage is null)
             {
                 return new RemoteEventsSnapshot(
@@ -666,18 +881,22 @@ internal sealed class InProcessRemoteReadOnlyDiagnosticsSource : IRemoteReadOnly
                 VisibleRecordedEvents: eventsPage.VisibleRecordedEvents,
                 Nodes: nodes,
                 RecordedEvents: records);
-        }, cancellationToken);
+        },
+            cancellationToken);
     }
 
     public ValueTask<RemoteBreakpointsSnapshot> GetBreakpointsSnapshotAsync(
         RemoteBreakpointsSnapshotRequest request,
         CancellationToken cancellationToken = default)
     {
-        return InvokeOnUiThreadAsync(() =>
+        var scope = NormalizeScope(request.Scope);
+        return CaptureSnapshotAsync(
+            domain: "breakpoints",
+            scope: scope,
+            operation: _ =>
         {
             cancellationToken.ThrowIfCancellationRequested();
             var breakpoints = _breakpointService;
-            var scope = NormalizeScope(request.Scope);
             if (breakpoints is null)
             {
                 return new RemoteBreakpointsSnapshot(
@@ -700,14 +919,18 @@ internal sealed class InProcessRemoteReadOnlyDiagnosticsSource : IRemoteReadOnly
                 Status: "ok",
                 BreakpointCount: breakpoints.Entries.Count,
                 Breakpoints: items);
-        }, cancellationToken);
+        },
+            cancellationToken);
     }
 
     public ValueTask<RemoteLogsSnapshot> GetLogsSnapshotAsync(
         RemoteLogsSnapshotRequest request,
         CancellationToken cancellationToken = default)
     {
-        return InvokeOnUiThreadAsync(() =>
+        return CaptureSnapshotAsync(
+            domain: "logs",
+            scope: "none",
+            operation: _ =>
         {
             cancellationToken.ThrowIfCancellationRequested();
             var logsPage = _logsPageViewModel;
@@ -753,14 +976,18 @@ internal sealed class InProcessRemoteReadOnlyDiagnosticsSource : IRemoteReadOnly
                 VisibleEntryCount: logsPage.VisibleEntryCount,
                 FilterText: logsPage.LogsFilter.FilterString ?? string.Empty,
                 Entries: items);
-        }, cancellationToken);
+        },
+            cancellationToken);
     }
 
     public ValueTask<RemotePreviewCapabilitiesSnapshot> GetPreviewCapabilitiesSnapshotAsync(
         RemotePreviewCapabilitiesRequest request,
         CancellationToken cancellationToken = default)
     {
-        return InvokeOnUiThreadAsync(() =>
+        return CaptureSnapshotAsync(
+            domain: "preview",
+            scope: "none",
+            operation: _ =>
         {
             cancellationToken.ThrowIfCancellationRequested();
             if (_streamPauseController is null)
@@ -782,14 +1009,18 @@ internal sealed class InProcessRemoteReadOnlyDiagnosticsSource : IRemoteReadOnly
             }
 
             return _streamPauseController.GetPreviewCapabilitiesSnapshot(request);
-        }, cancellationToken);
+        },
+            cancellationToken);
     }
 
     public ValueTask<RemotePreviewSnapshot> GetPreviewSnapshotAsync(
         RemotePreviewSnapshotRequest request,
         CancellationToken cancellationToken = default)
     {
-        return InvokeOnUiThreadAsync(() =>
+        return CaptureSnapshotAsync(
+            domain: "preview",
+            scope: "none",
+            operation: _ =>
         {
             cancellationToken.ThrowIfCancellationRequested();
             if (_streamPauseController is null)
@@ -819,14 +1050,18 @@ internal sealed class InProcessRemoteReadOnlyDiagnosticsSource : IRemoteReadOnly
             }
 
             return _streamPauseController.GetPreviewSnapshot(request);
-        }, cancellationToken);
+        },
+            cancellationToken);
     }
 
     public ValueTask<RemoteMetricsSnapshot> GetMetricsSnapshotAsync(
         RemoteMetricsSnapshotRequest request,
         CancellationToken cancellationToken = default)
     {
-        return InvokeOnUiThreadAsync(() =>
+        return CaptureSnapshotAsync(
+            domain: "metrics",
+            scope: "none",
+            operation: _ =>
         {
             cancellationToken.ThrowIfCancellationRequested();
             if (_streamPauseController is null)
@@ -848,14 +1083,18 @@ internal sealed class InProcessRemoteReadOnlyDiagnosticsSource : IRemoteReadOnly
             }
 
             return _streamPauseController.GetMetricsSnapshot(request);
-        }, cancellationToken);
+        },
+            cancellationToken);
     }
 
     public ValueTask<RemoteProfilerSnapshot> GetProfilerSnapshotAsync(
         RemoteProfilerSnapshotRequest request,
         CancellationToken cancellationToken = default)
     {
-        return InvokeOnUiThreadAsync(() =>
+        return CaptureSnapshotAsync(
+            domain: "profiler",
+            scope: "none",
+            operation: _ =>
         {
             cancellationToken.ThrowIfCancellationRequested();
             if (_streamPauseController is null)
@@ -881,8 +1120,274 @@ internal sealed class InProcessRemoteReadOnlyDiagnosticsSource : IRemoteReadOnly
             }
 
             return _streamPauseController.GetProfilerSnapshot(request);
-        }, cancellationToken);
+        },
+            cancellationToken);
     }
+
+    private async ValueTask<TSnapshot> CaptureSnapshotAsync<TSnapshot>(
+        string domain,
+        string scope,
+        Func<SnapshotCaptureContext, TSnapshot> operation,
+        CancellationToken cancellationToken)
+    {
+        var context = new SnapshotCaptureContext();
+        var snapshotStarted = Stopwatch.GetTimestamp();
+        var snapshotStatus = "ok";
+        try
+        {
+            var snapshot = await InvokeOnUiThreadAsync(() =>
+            {
+                var uiThreadStarted = Stopwatch.GetTimestamp();
+                var uiThreadStatus = "ok";
+                try
+                {
+                    return operation(context);
+                }
+                catch (OperationCanceledException)
+                {
+                    uiThreadStatus = "cancelled";
+                    throw;
+                }
+                catch
+                {
+                    uiThreadStatus = "error";
+                    throw;
+                }
+                finally
+                {
+                    RemoteRuntimeMetrics.RecordUiThreadCaptureDuration(
+                        domain: domain,
+                        scope: scope,
+                        status: uiThreadStatus,
+                        durationMs: RemoteRuntimeMetrics.ElapsedMilliseconds(uiThreadStarted),
+                        cache: context.Cache);
+                }
+            }, cancellationToken);
+            return snapshot;
+        }
+        catch (OperationCanceledException)
+        {
+            snapshotStatus = "cancelled";
+            throw;
+        }
+        catch
+        {
+            snapshotStatus = "error";
+            throw;
+        }
+        finally
+        {
+            RemoteRuntimeMetrics.RecordSnapshotDuration(
+                domain: domain,
+                scope: scope,
+                status: snapshotStatus,
+                durationMs: RemoteRuntimeMetrics.ElapsedMilliseconds(snapshotStarted),
+                cache: context.Cache);
+        }
+    }
+
+    private async ValueTask<TSnapshot> CaptureAndProjectSnapshotAsync<TCapture, TSnapshot>(
+        string domain,
+        string scope,
+        Func<SnapshotCaptureContext, CancellationToken, TCapture> captureOperation,
+        Func<TCapture, SnapshotCaptureContext, CancellationToken, ValueTask<TSnapshot>> projectOperation,
+        CancellationToken cancellationToken)
+    {
+        var context = new SnapshotCaptureContext();
+        var snapshotStarted = Stopwatch.GetTimestamp();
+        var snapshotStatus = "ok";
+        try
+        {
+            var captured = await InvokeOnUiThreadAsync(() =>
+            {
+                var uiThreadStarted = Stopwatch.GetTimestamp();
+                var uiThreadStatus = "ok";
+                try
+                {
+                    return captureOperation(context, cancellationToken);
+                }
+                catch (OperationCanceledException)
+                {
+                    uiThreadStatus = "cancelled";
+                    throw;
+                }
+                catch
+                {
+                    uiThreadStatus = "error";
+                    throw;
+                }
+                finally
+                {
+                    RemoteRuntimeMetrics.RecordUiThreadCaptureDuration(
+                        domain: domain,
+                        scope: scope,
+                        status: uiThreadStatus,
+                        durationMs: RemoteRuntimeMetrics.ElapsedMilliseconds(uiThreadStarted),
+                        cache: context.Cache);
+                }
+            }, cancellationToken).ConfigureAwait(false);
+
+            cancellationToken.ThrowIfCancellationRequested();
+            if (Dispatcher.UIThread.CheckAccess())
+            {
+                return await Task.Run(
+                    async () => await AwaitValueTask(projectOperation(captured, context, cancellationToken)).ConfigureAwait(false),
+                    cancellationToken).ConfigureAwait(false);
+            }
+
+            return await AwaitValueTask(projectOperation(captured, context, cancellationToken)).ConfigureAwait(false);
+        }
+        catch (OperationCanceledException)
+        {
+            snapshotStatus = "cancelled";
+            throw;
+        }
+        catch
+        {
+            snapshotStatus = "error";
+            throw;
+        }
+        finally
+        {
+            RemoteRuntimeMetrics.RecordSnapshotDuration(
+                domain: domain,
+                scope: scope,
+                status: snapshotStatus,
+                durationMs: RemoteRuntimeMetrics.ElapsedMilliseconds(snapshotStarted),
+                cache: context.Cache);
+        }
+    }
+
+    private static ValueTask<T> AwaitValueTask<T>(ValueTask<T> valueTask)
+    {
+        return valueTask.IsCompletedSuccessfully
+            ? new ValueTask<T>(valueTask.Result)
+            : valueTask;
+    }
+
+    private sealed class SnapshotCaptureContext
+    {
+        public string Cache { get; set; } = "bypass";
+    }
+
+    private sealed class TreeSnapshotUiCapture
+    {
+        private TreeSnapshotUiCapture(
+            RemoteTreeSnapshot? cachedSnapshot,
+            long generation,
+            string scope,
+            string cacheKey,
+            bool includeSourceLocations,
+            IReadOnlyList<CapturedTreeNode> nodes)
+        {
+            CachedSnapshot = cachedSnapshot;
+            Generation = generation;
+            Scope = scope;
+            CacheKey = cacheKey;
+            IncludeSourceLocations = includeSourceLocations;
+            Nodes = nodes;
+        }
+
+        public RemoteTreeSnapshot? CachedSnapshot { get; }
+
+        public long Generation { get; }
+
+        public string Scope { get; }
+
+        public string CacheKey { get; }
+
+        public bool IncludeSourceLocations { get; }
+
+        public IReadOnlyList<CapturedTreeNode> Nodes { get; }
+
+        public static TreeSnapshotUiCapture ForCached(RemoteTreeSnapshot cachedSnapshot)
+        {
+            return new TreeSnapshotUiCapture(
+                cachedSnapshot,
+                generation: cachedSnapshot.Generation,
+                scope: cachedSnapshot.Scope,
+                cacheKey: string.Empty,
+                includeSourceLocations: false,
+                nodes: Array.Empty<CapturedTreeNode>());
+        }
+
+        public static TreeSnapshotUiCapture ForCapture(
+            long generation,
+            string scope,
+            string cacheKey,
+            bool includeSourceLocations,
+            IReadOnlyList<CapturedTreeNode> nodes)
+        {
+            return new TreeSnapshotUiCapture(
+                cachedSnapshot: null,
+                generation: generation,
+                scope: scope,
+                cacheKey: cacheKey,
+                includeSourceLocations: includeSourceLocations,
+                nodes: nodes);
+        }
+    }
+
+    private readonly record struct CapturedTreeNode(
+        string NodeId,
+        string NodePath,
+        string? ParentNodePath,
+        int Depth,
+        string Type,
+        string? ElementName,
+        string Classes,
+        string DisplayName,
+        Type? SourceType,
+        string RelationshipKind,
+        bool IsVisible,
+        double Opacity,
+        int ZIndex,
+        RemoteRectSnapshot? Bounds);
+
+    private sealed record Elements3DSnapshotUiCapture(
+        long Generation,
+        string InspectedRoot,
+        string? MainRootNodeId,
+        string? CurrentRootNodeId,
+        string? ScopedSelectionNodeId,
+        string? SelectedNodeId,
+        bool IsScopedToSelectionBranch,
+        int NodeCount,
+        int VisibleNodeCount,
+        bool ShowInvisibleNodes,
+        bool ShowExploded3DView,
+        bool ShowAllLayersInGrid,
+        double DepthSpacing,
+        int Flat2DMaxLayersPerRow,
+        double Tilt,
+        double Zoom,
+        double OrbitYaw,
+        double OrbitPitch,
+        double OrbitRoll,
+        int AvailableMinDepth,
+        int AvailableMaxDepth,
+        int MinVisibleDepth,
+        int MaxVisibleDepth,
+        int MaxVisibleElements,
+        string? SvgSnapshot,
+        string? SvgViewBox,
+        CapturedElements3DNode[] Nodes,
+        string[] VisibleNodeIds);
+
+    private readonly record struct CapturedElements3DNode(
+        string NodeId,
+        string? NodePath,
+        int Depth,
+        string Node,
+        int ZIndex,
+        double BoundsX,
+        double BoundsY,
+        double BoundsWidth,
+        double BoundsHeight,
+        bool IsVisible,
+        double Opacity,
+        bool IsRendered,
+        bool IsSelected);
 
     private ITreeNodeProvider ResolveTreeProvider(string scope)
     {
@@ -979,13 +1484,13 @@ internal sealed class InProcessRemoteReadOnlyDiagnosticsSource : IRemoteReadOnly
         }
     }
 
-    private List<RemoteTreeNodeSnapshot> BuildFastTreeNodeSnapshots(
+    private List<CapturedTreeNode> BuildFastTreeNodeCaptureEntries(
         string scope,
         bool includeSourceLocations,
         bool includeVisualDetails,
         CancellationToken cancellationToken)
     {
-        var result = new List<RemoteTreeNodeSnapshot>(512);
+        var result = new List<CapturedTreeNode>(512);
         var visited = new HashSet<AvaloniaObject>(ReferenceEqualityComparer.Instance);
 
         switch (scope)
@@ -1003,7 +1508,7 @@ internal sealed class InProcessRemoteReadOnlyDiagnosticsSource : IRemoteReadOnly
 
         if (result.Count == 0)
         {
-            result.Add(CreateFallbackRootNode(scope, includeSourceLocations, includeVisualDetails));
+            result.Add(CreateFallbackRootCapture(scope, includeSourceLocations, includeVisualDetails));
         }
 
         return result;
@@ -1018,7 +1523,7 @@ internal sealed class InProcessRemoteReadOnlyDiagnosticsSource : IRemoteReadOnly
         bool includeVisualDetails,
         string relationshipKind,
         HashSet<AvaloniaObject> visited,
-        List<RemoteTreeNodeSnapshot> output,
+        List<CapturedTreeNode> output,
         CancellationToken cancellationToken)
     {
         if (ShouldStopTraversal(cancellationToken, visited, node))
@@ -1026,7 +1531,7 @@ internal sealed class InProcessRemoteReadOnlyDiagnosticsSource : IRemoteReadOnly
             return;
         }
 
-        AddFastNode(node, nodePath, parentNodePath, depth, includeSourceLocations, includeVisualDetails, relationshipKind, output);
+        AddFastNodeCapture(node, nodePath, parentNodePath, depth, includeSourceLocations, includeVisualDetails, relationshipKind, output);
 
         if (node is not Visual visual)
         {
@@ -1063,7 +1568,7 @@ internal sealed class InProcessRemoteReadOnlyDiagnosticsSource : IRemoteReadOnly
         bool includeVisualDetails,
         string relationshipKind,
         HashSet<AvaloniaObject> visited,
-        List<RemoteTreeNodeSnapshot> output,
+        List<CapturedTreeNode> output,
         CancellationToken cancellationToken)
     {
         if (ShouldStopTraversal(cancellationToken, visited, node))
@@ -1071,7 +1576,7 @@ internal sealed class InProcessRemoteReadOnlyDiagnosticsSource : IRemoteReadOnly
             return;
         }
 
-        AddFastNode(node, nodePath, parentNodePath, depth, includeSourceLocations, includeVisualDetails, relationshipKind, output);
+        AddFastNodeCapture(node, nodePath, parentNodePath, depth, includeSourceLocations, includeVisualDetails, relationshipKind, output);
 
         if (node is not ILogical logical)
         {
@@ -1110,7 +1615,7 @@ internal sealed class InProcessRemoteReadOnlyDiagnosticsSource : IRemoteReadOnly
         bool includeVisualDetails,
         string relationshipKind,
         HashSet<AvaloniaObject> visited,
-        List<RemoteTreeNodeSnapshot> output,
+        List<CapturedTreeNode> output,
         CancellationToken cancellationToken)
     {
         if (ShouldStopTraversal(cancellationToken, visited, node))
@@ -1118,7 +1623,7 @@ internal sealed class InProcessRemoteReadOnlyDiagnosticsSource : IRemoteReadOnly
             return;
         }
 
-        AddFastNode(node, nodePath, parentNodePath, depth, includeSourceLocations, includeVisualDetails, relationshipKind, output);
+        AddFastNodeCapture(node, nodePath, parentNodePath, depth, includeSourceLocations, includeVisualDetails, relationshipKind, output);
 
         var childIndex = 0;
         if (node is ILogical logical)
@@ -1157,11 +1662,8 @@ internal sealed class InProcessRemoteReadOnlyDiagnosticsSource : IRemoteReadOnly
         }
 
         var templatePath = nodePath + "/" + childIndex;
-        var templateSource = includeSourceLocations
-            ? ResolveTreeNodeSourceSnapshot(control)
-            : s_emptySourceSnapshot;
         output.Add(
-            new RemoteTreeNodeSnapshot(
+            new CapturedTreeNode(
                 NodeId: _nodeIdentityProvider.GetNodeId(control),
                 NodePath: templatePath,
                 ParentNodePath: nodePath,
@@ -1170,7 +1672,7 @@ internal sealed class InProcessRemoteReadOnlyDiagnosticsSource : IRemoteReadOnly
                 ElementName: null,
                 Classes: string.Empty,
                 DisplayName: "/template/",
-                Source: templateSource,
+                SourceType: includeSourceLocations ? control.GetType() : null,
                 RelationshipKind: "template-host",
                 IsVisible: !includeVisualDetails || control.IsVisible,
                 Opacity: includeVisualDetails ? control.Opacity : 1d,
@@ -1198,10 +1700,7 @@ internal sealed class InProcessRemoteReadOnlyDiagnosticsSource : IRemoteReadOnly
         HashSet<AvaloniaObject> visited,
         AvaloniaObject node)
     {
-        if (cancellationToken.IsCancellationRequested)
-        {
-            return true;
-        }
+        cancellationToken.ThrowIfCancellationRequested();
 
         if (!visited.Add(node))
         {
@@ -1211,7 +1710,7 @@ internal sealed class InProcessRemoteReadOnlyDiagnosticsSource : IRemoteReadOnly
         return false;
     }
 
-    private void AddFastNode(
+    private void AddFastNodeCapture(
         AvaloniaObject node,
         string nodePath,
         string? parentNodePath,
@@ -1219,11 +1718,8 @@ internal sealed class InProcessRemoteReadOnlyDiagnosticsSource : IRemoteReadOnly
         bool includeSourceLocations,
         bool includeVisualDetails,
         string relationshipKind,
-        List<RemoteTreeNodeSnapshot> output)
+        List<CapturedTreeNode> output)
     {
-        var source = includeSourceLocations
-            ? ResolveTreeNodeSourceSnapshot(node)
-            : s_emptySourceSnapshot;
         var type = node.GetType().Name;
         var elementName = node is INamed named ? named.Name : null;
         var classes = node is StyledElement { Classes.Count: > 0 } styleable
@@ -1245,7 +1741,7 @@ internal sealed class InProcessRemoteReadOnlyDiagnosticsSource : IRemoteReadOnly
         }
 
         output.Add(
-            new RemoteTreeNodeSnapshot(
+            new CapturedTreeNode(
                 NodeId: _nodeIdentityProvider.GetNodeId(node),
                 NodePath: nodePath,
                 ParentNodePath: parentNodePath,
@@ -1254,12 +1750,182 @@ internal sealed class InProcessRemoteReadOnlyDiagnosticsSource : IRemoteReadOnly
                 ElementName: string.IsNullOrWhiteSpace(elementName) ? null : elementName,
                 Classes: classes,
                 DisplayName: displayName,
-                Source: source,
+                SourceType: includeSourceLocations ? node.GetType() : null,
                 RelationshipKind: relationshipKind,
                 IsVisible: isVisible,
                 Opacity: opacity,
                 ZIndex: zIndex,
                 Bounds: bounds));
+    }
+
+    private async ValueTask<RemoteTreeSnapshot> ProjectTreeSnapshotAsync(
+        TreeSnapshotUiCapture capture,
+        CancellationToken cancellationToken)
+    {
+        var count = capture.Nodes.Count;
+        var projected = new RemoteTreeNodeSnapshot[count];
+        Dictionary<Type, RemoteSourceLocationSnapshot>? projectedSourceCache = null;
+        if (capture.IncludeSourceLocations)
+        {
+            projectedSourceCache = new Dictionary<Type, RemoteSourceLocationSnapshot>();
+        }
+
+        for (var i = 0; i < count; i++)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            if (ShouldYieldProjection(i))
+            {
+                await Task.Yield();
+            }
+
+            var node = capture.Nodes[i];
+            var source = capture.IncludeSourceLocations && node.SourceType is not null
+                ? ResolveProjectedTreeSourceSnapshot(node.SourceType, projectedSourceCache!)
+                : s_emptySourceSnapshot;
+            projected[i] = new RemoteTreeNodeSnapshot(
+                NodeId: node.NodeId,
+                NodePath: node.NodePath,
+                ParentNodePath: node.ParentNodePath,
+                Depth: node.Depth,
+                Type: node.Type,
+                ElementName: node.ElementName,
+                Classes: node.Classes,
+                DisplayName: node.DisplayName,
+                Source: source,
+                RelationshipKind: node.RelationshipKind,
+                IsVisible: node.IsVisible,
+                Opacity: node.Opacity,
+                ZIndex: node.ZIndex,
+                Bounds: node.Bounds);
+        }
+
+        var snapshot = new RemoteTreeSnapshot(
+            SnapshotVersion: SnapshotVersion,
+            Generation: capture.Generation,
+            Scope: capture.Scope,
+            Nodes: projected);
+
+        await InvokeOnUiThreadAsync(() =>
+        {
+            StoreTreeSnapshot(capture.CacheKey, capture.Generation, snapshot);
+            return 0;
+        }, cancellationToken).ConfigureAwait(false);
+        return snapshot;
+    }
+
+    private RemoteSourceLocationSnapshot ResolveProjectedTreeSourceSnapshot(
+        Type sourceType,
+        Dictionary<Type, RemoteSourceLocationSnapshot> projectedCache)
+    {
+        if (projectedCache.TryGetValue(sourceType, out var cached))
+        {
+            return cached;
+        }
+
+        var info = _sourceLocationService.Resolve(sourceType);
+        var snapshot = new RemoteSourceLocationSnapshot(
+            Xaml: info.XamlLocation?.DisplayText,
+            Code: info.CodeLocation?.DisplayText,
+            Status: info.Status,
+            XamlLocation: ToRemoteSourceDocument(info.XamlLocation),
+            CodeLocation: ToRemoteSourceDocument(info.CodeLocation));
+        projectedCache[sourceType] = snapshot;
+        return snapshot;
+    }
+
+    private static bool ShouldYieldProjection(int index)
+    {
+        return index > 0 && (index % ProjectionYieldInterval) == 0;
+    }
+
+    private async ValueTask<RemoteElements3DSnapshot> ProjectElements3DSnapshotAsync(
+        Elements3DSnapshotUiCapture capture,
+        SnapshotCaptureContext _,
+        CancellationToken cancellationToken)
+    {
+        var projectedNodes = capture.Nodes.Length == 0
+            ? Array.Empty<RemoteElements3DNodeSnapshot>()
+            : new RemoteElements3DNodeSnapshot[capture.Nodes.Length];
+        for (var i = 0; i < capture.Nodes.Length; i++)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            if (ShouldYieldProjection(i))
+            {
+                await Task.Yield();
+            }
+
+            var node = capture.Nodes[i];
+            projectedNodes[i] = new RemoteElements3DNodeSnapshot(
+                NodeId: node.NodeId,
+                NodePath: node.NodePath,
+                Depth: node.Depth,
+                Node: node.Node,
+                ZIndex: node.ZIndex,
+                Bounds: new RemoteRectSnapshot(
+                    X: node.BoundsX,
+                    Y: node.BoundsY,
+                    Width: node.BoundsWidth,
+                    Height: node.BoundsHeight),
+                IsVisible: node.IsVisible,
+                Opacity: node.Opacity,
+                IsRendered: node.IsRendered,
+                IsSelected: node.IsSelected);
+        }
+
+        return new RemoteElements3DSnapshot(
+            SnapshotVersion: SnapshotVersion,
+            Generation: capture.Generation,
+            Status: "ok",
+            InspectedRoot: capture.InspectedRoot,
+            MainRootNodeId: capture.MainRootNodeId,
+            CurrentRootNodeId: capture.CurrentRootNodeId,
+            ScopedSelectionNodeId: capture.ScopedSelectionNodeId,
+            SelectedNodeId: capture.SelectedNodeId,
+            IsScopedToSelectionBranch: capture.IsScopedToSelectionBranch,
+            NodeCount: capture.NodeCount,
+            VisibleNodeCount: capture.VisibleNodeCount,
+            ShowInvisibleNodes: capture.ShowInvisibleNodes,
+            ShowExploded3DView: capture.ShowExploded3DView,
+            ShowAllLayersInGrid: capture.ShowAllLayersInGrid,
+            DepthSpacing: capture.DepthSpacing,
+            Flat2DMaxLayersPerRow: capture.Flat2DMaxLayersPerRow,
+            Tilt: capture.Tilt,
+            Zoom: capture.Zoom,
+            OrbitYaw: capture.OrbitYaw,
+            OrbitPitch: capture.OrbitPitch,
+            OrbitRoll: capture.OrbitRoll,
+            AvailableMinDepth: capture.AvailableMinDepth,
+            AvailableMaxDepth: capture.AvailableMaxDepth,
+            MinVisibleDepth: capture.MinVisibleDepth,
+            MaxVisibleDepth: capture.MaxVisibleDepth,
+            MaxVisibleElements: capture.MaxVisibleElements,
+            SvgSnapshot: capture.SvgSnapshot,
+            SvgViewBox: capture.SvgViewBox,
+            Nodes: projectedNodes,
+            VisibleNodeIds: capture.VisibleNodeIds);
+    }
+
+    private CapturedTreeNode CreateFallbackRootCapture(
+        string scope,
+        bool includeSourceLocations,
+        bool includeVisualDetails)
+    {
+        var elementName = _root is INamed named ? named.Name : null;
+        return new CapturedTreeNode(
+            NodeId: _nodeIdentityProvider.GetNodeId(_root),
+            NodePath: "0",
+            ParentNodePath: null,
+            Depth: 0,
+            Type: _root.GetType().Name,
+            ElementName: string.IsNullOrWhiteSpace(elementName) ? null : elementName,
+            Classes: string.Empty,
+            DisplayName: DescribeTarget(_root),
+            SourceType: includeSourceLocations ? _root.GetType() : null,
+            RelationshipKind: scope + "-root",
+            IsVisible: !includeVisualDetails || _root is not Visual visual || visual.IsVisible,
+            Opacity: includeVisualDetails && _root is Visual opacityVisual ? opacityVisual.Opacity : 1d,
+            ZIndex: includeVisualDetails && _root is Visual zVisual ? GetVisualZIndex(zVisual) : 0,
+            Bounds: includeVisualDetails && _root is Visual boundsVisual ? TryGetVisualBounds(boundsVisual) : null);
     }
 
     private static Dictionary<Visual, string> BuildVisualPathLookup(Visual? root)
@@ -1287,6 +1953,19 @@ internal sealed class InProcessRemoteReadOnlyDiagnosticsSource : IRemoteReadOnly
     }
 
     private TreeLookup BuildTreeLookup(string scope)
+    {
+        var generation = GetSnapshotGeneration();
+        if (TryGetCachedTreeLookup(scope, generation, out var cached))
+        {
+            return cached;
+        }
+
+        var lookup = BuildTreeLookupCore(scope);
+        StoreTreeLookup(scope, generation, lookup);
+        return lookup;
+    }
+
+    private TreeLookup BuildTreeLookupCore(string scope)
     {
         var nodesByPath = new Dictionary<string, AvaloniaObject>(StringComparer.Ordinal);
         var nodesById = new Dictionary<string, AvaloniaObject>(StringComparer.Ordinal);
@@ -1612,7 +2291,9 @@ internal sealed class InProcessRemoteReadOnlyDiagnosticsSource : IRemoteReadOnly
             Source: source);
     }
 
-    private IReadOnlyList<RemoteValueFrameSnapshot> BuildValueFrameSnapshots(AvaloniaObject target)
+    private IReadOnlyList<RemoteValueFrameSnapshot> BuildValueFrameSnapshots(
+        AvaloniaObject target,
+        CancellationToken cancellationToken)
     {
         if (target is not StyledElement styledElement)
         {
@@ -1623,15 +2304,29 @@ internal sealed class InProcessRemoteReadOnlyDiagnosticsSource : IRemoteReadOnly
             ? TopLevel.GetTopLevel(visual)?.Clipboard
             : null;
         var diagnostics = styledElement.GetValueStoreDiagnostic();
-        return diagnostics.AppliedFrames
+        var frames = diagnostics.AppliedFrames
             .OrderBy(static frame => frame.Priority)
-            .Select(frame => new ValueFrameViewModel(styledElement, frame, clipboard, _sourceLocationService))
-            .Select((frame, index) => MapFrame(
-                frame,
-                parentId: null,
-                index: index,
-                context: styledElement.GetType().FullName ?? styledElement.GetType().Name))
             .ToArray();
+        if (frames.Length == 0)
+        {
+            return Array.Empty<RemoteValueFrameSnapshot>();
+        }
+
+        var context = styledElement.GetType().FullName ?? styledElement.GetType().Name;
+        var mapped = new RemoteValueFrameSnapshot[frames.Length];
+        for (var i = 0; i < frames.Length; i++)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            var viewModel = new ValueFrameViewModel(styledElement, frames[i], clipboard, _sourceLocationService);
+            mapped[i] = MapFrame(
+                viewModel,
+                parentId: null,
+                index: i,
+                context: context,
+                cancellationToken);
+        }
+
+        return mapped;
     }
 
     private static IReadOnlyList<RemoteCodeDocumentSnapshot> BuildCodeDocumentSnapshots(SourceLocationInfo sourceInfo)
@@ -1753,7 +2448,8 @@ internal sealed class InProcessRemoteReadOnlyDiagnosticsSource : IRemoteReadOnly
         ValueFrameViewModel frame,
         string? parentId,
         int index,
-        string context)
+        string context,
+        CancellationToken cancellationToken = default)
     {
         var source = ParseSourceLocation(frame.SourceLocation);
         var frameId = CreateStableId(
@@ -1762,18 +2458,26 @@ internal sealed class InProcessRemoteReadOnlyDiagnosticsSource : IRemoteReadOnly
             index.ToString(),
             frame.Description,
             frame.SourceLocation);
+        var setters = frame.Setters;
+        var mappedSetters = setters.Count == 0
+            ? Array.Empty<RemoteSetterSnapshot>()
+            : new RemoteSetterSnapshot[setters.Count];
+        for (var setterIndex = 0; setterIndex < setters.Count; setterIndex++)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            mappedSetters[setterIndex] = MapSetter(
+                setters[setterIndex],
+                frameId: frameId,
+                index: setterIndex,
+                context: context);
+        }
+
         return new RemoteValueFrameSnapshot(
             Id: frameId,
             Description: frame.Description ?? string.Empty,
             IsActive: frame.IsActive,
             SourceLocation: frame.SourceLocation,
-            Setters: frame.Setters
-                .Select((setter, setterIndex) => MapSetter(
-                    setter,
-                    frameId: frameId,
-                    index: setterIndex,
-                    context: context))
-                .ToArray(),
+            Setters: mappedSetters,
             Source: source,
             ParentId: parentId);
     }
@@ -1801,6 +2505,74 @@ internal sealed class InProcessRemoteReadOnlyDiagnosticsSource : IRemoteReadOnly
             SourceLocation: setter.SourceLocation,
             Source: source,
             FrameId: frameId);
+    }
+
+    private static RemoteValueFrameSnapshot[] MapFramesWithCancellation(
+        IReadOnlyList<ValueFrameViewModel> frames,
+        string context,
+        CancellationToken cancellationToken)
+    {
+        if (frames.Count == 0)
+        {
+            return Array.Empty<RemoteValueFrameSnapshot>();
+        }
+
+        var mapped = new RemoteValueFrameSnapshot[frames.Count];
+        for (var i = 0; i < frames.Count; i++)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            mapped[i] = MapFrame(
+                frames[i],
+                parentId: null,
+                index: i,
+                context: context,
+                cancellationToken);
+        }
+
+        return mapped;
+    }
+
+    private static RemoteSetterSnapshot[] MapSettersWithCancellation(
+        IReadOnlyList<SetterViewModel> setters,
+        string context,
+        CancellationToken cancellationToken)
+    {
+        if (setters.Count == 0)
+        {
+            return Array.Empty<RemoteSetterSnapshot>();
+        }
+
+        var mapped = new RemoteSetterSnapshot[setters.Count];
+        for (var i = 0; i < setters.Count; i++)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            mapped[i] = MapSetter(
+                setters[i],
+                frameId: null,
+                index: i,
+                context: context);
+        }
+
+        return mapped;
+    }
+
+    private static RemoteStyleResolutionSnapshot[] MapStyleResolutionEntriesWithCancellation(
+        IReadOnlyList<StyleResolutionTraceEntryViewModel> entries,
+        CancellationToken cancellationToken)
+    {
+        if (entries.Count == 0)
+        {
+            return Array.Empty<RemoteStyleResolutionSnapshot>();
+        }
+
+        var mapped = new RemoteStyleResolutionSnapshot[entries.Count];
+        for (var i = 0; i < entries.Count; i++)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            mapped[i] = MapStyleResolutionEntry(entries[i], i);
+        }
+
+        return mapped;
     }
 
     private RemoteViewModelContextSnapshot MapViewModelEntry(ViewModelContextEntryViewModel entry, TreeLookup lookup)
@@ -2015,7 +2787,8 @@ internal sealed class InProcessRemoteReadOnlyDiagnosticsSource : IRemoteReadOnly
 
     private RemoteStyleTreeEntrySnapshot[] MapStyleTreeEntries(
         IReadOnlyList<StylesTreeEntryViewModel> entries,
-        TreeLookup lookup)
+        TreeLookup lookup,
+        CancellationToken cancellationToken)
     {
         if (entries.Count == 0)
         {
@@ -2026,6 +2799,7 @@ internal sealed class InProcessRemoteReadOnlyDiagnosticsSource : IRemoteReadOnly
         var parentStack = new Stack<(int depth, string id)>();
         for (var i = 0; i < entries.Count; i++)
         {
+            cancellationToken.ThrowIfCancellationRequested();
             var entry = entries[i];
             while (parentStack.Count > 0 && parentStack.Peek().depth >= entry.Depth)
             {
@@ -2112,9 +2886,11 @@ internal sealed class InProcessRemoteReadOnlyDiagnosticsSource : IRemoteReadOnly
         string? parentNodePath,
         int depth,
         bool includeEntries,
+        CancellationToken cancellationToken,
         List<RemoteResourceNodeSnapshot> nodes,
         List<RemoteResourceEntrySnapshot> entries)
     {
+        cancellationToken.ThrowIfCancellationRequested();
         var source = ResolveSourceLocationSnapshot(node.Source);
         var sourceLocation = GetSourceLocationText(source);
         var nodeSource = node.Source as AvaloniaObject;
@@ -2178,18 +2954,21 @@ internal sealed class InProcessRemoteReadOnlyDiagnosticsSource : IRemoteReadOnly
                 nodePath,
                 depth + 1,
                 includeEntries,
+                cancellationToken,
                 nodes,
                 entries);
         }
     }
 
-    private IEnumerable<(Uri uri, Assembly assembly, string assemblyName, string assetPath, string name, string kind)> CollectAssets()
+    private IEnumerable<(Uri uri, Assembly assembly, string assemblyName, string assetPath, string name, string kind)> CollectAssets(
+        CancellationToken cancellationToken)
     {
         var seen = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
         var results = new List<(Uri uri, Assembly assembly, string assemblyName, string assetPath, string name, string kind)>();
 
         foreach (var assembly in AppDomain.CurrentDomain.GetAssemblies())
         {
+            cancellationToken.ThrowIfCancellationRequested();
             if (assembly.IsDynamic)
             {
                 continue;
@@ -2214,6 +2993,7 @@ internal sealed class InProcessRemoteReadOnlyDiagnosticsSource : IRemoteReadOnly
 
             foreach (var assetUri in assets)
             {
+                cancellationToken.ThrowIfCancellationRequested();
                 var uriText = assetUri.ToString();
                 if (!seen.Add(uriText))
                 {
@@ -2266,40 +3046,69 @@ internal sealed class InProcessRemoteReadOnlyDiagnosticsSource : IRemoteReadOnly
 
     private RemoteSourceLocationSnapshot ResolveAssetSourceLocationSnapshot(Assembly assembly, string assetPath, string assetName)
     {
+        var assemblyName = assembly.GetName().Name ?? assembly.FullName ?? "assembly";
+        var cacheKey = "asset|" + assemblyName + "|" + assetPath + "|" + assetName;
+        if (_sourceDocumentCache.TryGetValue(cacheKey, out var cached))
+        {
+            return cached;
+        }
+
         var byPath = _sourceLocationService.ResolveDocument(assembly, assetPath, assetPath);
         if (byPath is not null)
         {
-            return new RemoteSourceLocationSnapshot(
+            var snapshot = new RemoteSourceLocationSnapshot(
                 Xaml: byPath.DisplayText,
                 Code: null,
                 Status: "ok",
                 XamlLocation: ToRemoteSourceDocument(byPath),
                 CodeLocation: null);
+            _sourceDocumentCache[cacheKey] = snapshot;
+            return snapshot;
         }
 
         var byName = _sourceLocationService.ResolveDocument(assembly, assetName, assetName);
         if (byName is not null)
         {
-            return new RemoteSourceLocationSnapshot(
+            var snapshot = new RemoteSourceLocationSnapshot(
                 Xaml: byName.DisplayText,
                 Code: null,
                 Status: "ok",
                 XamlLocation: ToRemoteSourceDocument(byName),
                 CodeLocation: null);
+            _sourceDocumentCache[cacheKey] = snapshot;
+            return snapshot;
         }
 
+        _sourceDocumentCache[cacheKey] = s_emptySourceSnapshot;
         return s_emptySourceSnapshot;
     }
 
     private RemoteSourceLocationSnapshot ResolveSourceLocationSnapshot(object? source)
     {
+        if (source is null)
+        {
+            return s_emptySourceSnapshot;
+        }
+
+        if (source is Type sourceType)
+        {
+            return ResolveSourceLocationSnapshot(sourceType);
+        }
+
+        if (_sourceInstanceCache.TryGetValue(source, out var cached))
+        {
+            return cached;
+        }
+
         var info = _sourceLocationService.ResolveObject(source);
-        return new RemoteSourceLocationSnapshot(
+        var snapshot = new RemoteSourceLocationSnapshot(
             Xaml: info.XamlLocation?.DisplayText,
             Code: info.CodeLocation?.DisplayText,
             Status: info.Status,
             XamlLocation: ToRemoteSourceDocument(info.XamlLocation),
             CodeLocation: ToRemoteSourceDocument(info.CodeLocation));
+        _sourceInstanceCache[source] = snapshot;
+        return snapshot;
     }
 
     private RemoteSourceLocationSnapshot ResolveSourceLocationSnapshot(Type? sourceType)
@@ -2327,9 +3136,9 @@ internal sealed class InProcessRemoteReadOnlyDiagnosticsSource : IRemoteReadOnly
 
     private string ResolveSourceLocationText(object? source)
     {
-        var info = _sourceLocationService.ResolveObject(source);
-        return info.XamlLocation?.DisplayText
-               ?? info.CodeLocation?.DisplayText
+        var snapshot = ResolveSourceLocationSnapshot(source);
+        return snapshot.Xaml
+               ?? snapshot.Code
                ?? string.Empty;
     }
 
@@ -2484,40 +3293,210 @@ internal sealed class InProcessRemoteReadOnlyDiagnosticsSource : IRemoteReadOnly
         return await Dispatcher.UIThread.InvokeAsync(operation, DispatcherPriority.Background, cancellationToken);
     }
 
-    private static string BuildTreeSnapshotCacheKey(string scope, bool includeSourceLocations, bool includeVisualDetails)
+    private long SnapshotGeneration => Volatile.Read(ref _treeCacheGeneration);
+
+    private long GetSnapshotGeneration()
+    {
+        EnsureSnapshotCacheGeneration();
+        return SnapshotGeneration;
+    }
+
+    private void EnsureSnapshotCacheGeneration()
+    {
+        lock (_treeCacheSync)
+        {
+            var nowTicks = Stopwatch.GetTimestamp();
+            if (_treeCacheTimestampTicks == 0)
+            {
+                _treeCacheTimestampTicks = nowTicks;
+                return;
+            }
+
+            var ageMs = (nowTicks - _treeCacheTimestampTicks) * 1000d / Stopwatch.Frequency;
+            if (ageMs <= TreeSnapshotCacheTtlMilliseconds)
+            {
+                return;
+            }
+
+            InvalidateDerivedSnapshotCaches(nowTicks);
+        }
+    }
+
+    private void InvalidateDerivedSnapshotCaches(long timestampTicks)
+    {
+        lock (_treeCacheSync)
+        {
+            _treeSnapshotCache.Clear();
+            _treeLookupCache.Clear();
+            _propertiesSnapshotCache.Clear();
+            _stylesSnapshotCache.Clear();
+            _resourcesSnapshotCache.Clear();
+            _assetsSnapshotCache.Clear();
+            Interlocked.Increment(ref _treeCacheGeneration);
+            _treeCacheTimestampTicks = timestampTicks;
+        }
+
+        RemoteRuntimeMetrics.SetSnapshotCacheEntries(0);
+    }
+
+    private static string BuildTreeSnapshotCacheKey(
+        string scope,
+        bool includeSourceLocations,
+        bool includeVisualDetails,
+        long generation)
     {
         return scope
                + '|'
                + (includeSourceLocations ? "1" : "0")
                + '|'
-               + (includeVisualDetails ? "1" : "0");
+               + (includeVisualDetails ? "1" : "0")
+               + '|'
+               + generation.ToString();
     }
 
-    private bool TryGetCachedTreeSnapshot(string cacheKey, out RemoteTreeSnapshot snapshot)
+    private static string BuildPropertiesSnapshotCacheKey(string scope, RemotePropertiesSnapshotRequest request, long generation)
     {
-        var nowTicks = Stopwatch.GetTimestamp();
-        if (_treeSnapshotCache.TryGetValue(cacheKey, out var entry))
-        {
-            var ageMs = (nowTicks - entry.TimestampTicks) * 1000d / Stopwatch.Frequency;
-            if (ageMs <= TreeSnapshotCacheTtlMilliseconds)
-            {
-                snapshot = entry.Snapshot;
-                return true;
-            }
+        return "properties|"
+               + generation.ToString()
+               + '|'
+               + scope
+               + '|'
+               + BuildTargetCacheIdentity(request.NodeId, request.NodePath, request.ControlName)
+               + '|'
+               + (request.IncludeClrProperties ? "1" : "0");
+    }
 
-            _treeSnapshotCache.Remove(cacheKey);
+    private static string BuildStylesSnapshotCacheKey(string scope, RemoteStylesSnapshotRequest request, long generation)
+    {
+        return "styles|"
+               + generation.ToString()
+               + '|'
+               + scope
+               + '|'
+               + BuildTargetCacheIdentity(request.NodeId, request.NodePath, request.ControlName)
+               + '|'
+               + (request.IncludeTreeEntries ? "1" : "0")
+               + '|'
+               + (request.IncludeFrames ? "1" : "0")
+               + '|'
+               + (request.IncludeSetters ? "1" : "0")
+               + '|'
+               + (request.IncludeResolution ? "1" : "0");
+    }
+
+    private static string BuildResourcesSnapshotCacheKey(RemoteResourcesSnapshotRequest request, long generation)
+    {
+        return "resources|" + generation.ToString() + "|" + (request.IncludeEntries ? "1" : "0");
+    }
+
+    private static string BuildAssetsSnapshotCacheKey(long generation)
+    {
+        return "assets|" + generation.ToString();
+    }
+
+    private static string BuildTargetCacheIdentity(string? nodeId, string? nodePath, string? controlName)
+    {
+        if (!string.IsNullOrWhiteSpace(nodeId))
+        {
+            return "id:" + nodeId;
+        }
+
+        if (!string.IsNullOrWhiteSpace(nodePath))
+        {
+            return "path:" + nodePath;
+        }
+
+        if (!string.IsNullOrWhiteSpace(controlName))
+        {
+            return "name:" + controlName;
+        }
+
+        return "root";
+    }
+
+    private bool TryGetCachedTreeSnapshot(string cacheKey, long generation, out RemoteTreeSnapshot snapshot)
+    {
+        lock (_treeCacheSync)
+        {
+            var nowTicks = Stopwatch.GetTimestamp();
+            if (_treeSnapshotCache.TryGetValue(cacheKey, out var entry))
+            {
+                var ageMs = (nowTicks - entry.TimestampTicks) * 1000d / Stopwatch.Frequency;
+                if (entry.Generation == generation && ageMs <= TreeSnapshotCacheTtlMilliseconds)
+                {
+                    snapshot = entry.Snapshot;
+                    return true;
+                }
+
+                _treeSnapshotCache.Remove(cacheKey);
+                RemoteRuntimeMetrics.SetSnapshotCacheEntries(_treeSnapshotCache.Count);
+            }
         }
 
         snapshot = default!;
         return false;
     }
 
-    private void StoreTreeSnapshot(string cacheKey, RemoteTreeSnapshot snapshot)
+    private void StoreTreeSnapshot(string cacheKey, long generation, RemoteTreeSnapshot snapshot)
     {
-        _treeSnapshotCache[cacheKey] = new TreeSnapshotCacheEntry(snapshot, Stopwatch.GetTimestamp());
+        lock (_treeCacheSync)
+        {
+            var nowTicks = Stopwatch.GetTimestamp();
+            _treeSnapshotCache[cacheKey] = new TreeSnapshotCacheEntry(snapshot, generation, nowTicks);
+            _treeCacheTimestampTicks = nowTicks;
+            RemoteRuntimeMetrics.SetSnapshotCacheEntries(_treeSnapshotCache.Count);
+        }
     }
 
-    private readonly record struct TreeSnapshotCacheEntry(RemoteTreeSnapshot Snapshot, long TimestampTicks);
+    private bool TryGetCachedTreeLookup(string scope, long generation, out TreeLookup lookup)
+    {
+        lock (_treeCacheSync)
+        {
+            var nowTicks = Stopwatch.GetTimestamp();
+            if (_treeLookupCache.TryGetValue(scope, out var entry))
+            {
+                var ageMs = (nowTicks - entry.TimestampTicks) * 1000d / Stopwatch.Frequency;
+                if (entry.Generation == generation && ageMs <= TreeLookupCacheTtlMilliseconds)
+                {
+                    lookup = new TreeLookup(entry.NodesByPath, entry.NodesById, Array.Empty<TreeNode>());
+                    return true;
+                }
+
+                _treeLookupCache.Remove(scope);
+            }
+        }
+
+        lookup = default!;
+        return false;
+    }
+
+    private void StoreTreeLookup(string scope, long generation, TreeLookup lookup)
+    {
+        lock (_treeCacheSync)
+        {
+            var nowTicks = Stopwatch.GetTimestamp();
+            _treeLookupCache[scope] = new TreeLookupCacheEntry(
+                NodesByPath: lookup.NodesByPath,
+                NodesById: lookup.NodesById,
+                Generation: generation,
+                TimestampTicks: nowTicks);
+            _treeCacheTimestampTicks = nowTicks;
+        }
+    }
+
+    private readonly record struct TreeSnapshotCacheEntry(RemoteTreeSnapshot Snapshot, long Generation, long TimestampTicks);
+    private readonly record struct Elements3DSvgCacheEntry(
+        long SceneRevision,
+        int SvgWidth,
+        int SvgHeight,
+        int MaxSvgNodes,
+        string SvgSnapshot,
+        string SvgViewBox);
+    private readonly record struct TreeLookupCacheEntry(
+        Dictionary<string, AvaloniaObject> NodesByPath,
+        Dictionary<string, AvaloniaObject> NodesById,
+        long Generation,
+        long TimestampTicks);
 
     private sealed class TreeLookup : IDisposable
     {
@@ -2539,6 +3518,10 @@ internal sealed class InProcessRemoteReadOnlyDiagnosticsSource : IRemoteReadOnly
 
         public bool TryGetByNodeId(string nodeId, out AvaloniaObject value) =>
             _nodesById.TryGetValue(nodeId, out value!);
+
+        public Dictionary<string, AvaloniaObject> NodesByPath => _nodesByPath;
+
+        public Dictionary<string, AvaloniaObject> NodesById => _nodesById;
 
         public IEnumerable<KeyValuePair<string, AvaloniaObject>> EnumerateNodesByPath()
         {
@@ -2589,5 +3572,75 @@ internal sealed class InProcessRemoteReadOnlyDiagnosticsSource : IRemoteReadOnly
         {
             DisposeTreeNodes(_roots);
         }
+    }
+
+    private sealed class LruCache<TKey, TValue>
+        where TKey : notnull
+    {
+        private readonly int _capacity;
+        private readonly Dictionary<TKey, LinkedListNode<LruEntry>> _lookup;
+        private readonly LinkedList<LruEntry> _entries = new();
+
+        public LruCache(int capacity, IEqualityComparer<TKey>? comparer = null)
+        {
+            _capacity = Math.Max(1, capacity);
+            _lookup = new Dictionary<TKey, LinkedListNode<LruEntry>>(_capacity, comparer);
+        }
+
+        public int Count => _lookup.Count;
+
+        public TValue this[TKey key]
+        {
+            set => Set(key, value);
+        }
+
+        public bool TryGetValue(TKey key, out TValue value)
+        {
+            if (_lookup.TryGetValue(key, out var node))
+            {
+                _entries.Remove(node);
+                _entries.AddFirst(node);
+                value = node.Value.Value;
+                return true;
+            }
+
+            value = default!;
+            return false;
+        }
+
+        public void Clear()
+        {
+            _lookup.Clear();
+            _entries.Clear();
+        }
+
+        private void Set(TKey key, TValue value)
+        {
+            if (_lookup.TryGetValue(key, out var existing))
+            {
+                existing.Value = new LruEntry(key, value);
+                _entries.Remove(existing);
+                _entries.AddFirst(existing);
+                return;
+            }
+
+            var node = new LinkedListNode<LruEntry>(new LruEntry(key, value));
+            _entries.AddFirst(node);
+            _lookup[key] = node;
+
+            while (_lookup.Count > _capacity)
+            {
+                var tail = _entries.Last;
+                if (tail is null)
+                {
+                    break;
+                }
+
+                _entries.RemoveLast();
+                _lookup.Remove(tail.Value.Key);
+            }
+        }
+
+        private readonly record struct LruEntry(TKey Key, TValue Value);
     }
 }

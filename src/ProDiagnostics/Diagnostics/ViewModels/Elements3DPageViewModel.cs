@@ -56,6 +56,7 @@ internal sealed class Elements3DPageViewModel : ViewModelBase
     private IRemoteReadOnlyDiagnosticsDomainService? _remoteReadOnly;
     private Func<(string Scope, string? NodePath, string? ControlName)>? _remoteContextAccessor;
     private long _remoteRefreshVersion;
+    private long _snapshotRevision = 1;
     private bool _isApplyingRemoteSnapshot;
 
     public Elements3DPageViewModel(AvaloniaObject root, Func<AvaloniaObject?>? selectedObjectAccessor)
@@ -94,6 +95,8 @@ internal sealed class Elements3DPageViewModel : ViewModelBase
 
     public int VisibleNodeCount => _visibleNodes.Count;
 
+    public long SnapshotRevision => Volatile.Read(ref _snapshotRevision);
+
     internal Visual? MainRootVisual => _mainRootVisual;
 
     internal Visual? CurrentRootVisual => _currentRootVisual;
@@ -117,6 +120,7 @@ internal sealed class Elements3DPageViewModel : ViewModelBase
             {
                 RaisePropertyChanged(nameof(SelectedNodeSummary));
                 RaisePropertyChanged(nameof(CanScopeSelectedNodeAsRoot));
+                BumpSnapshotRevision();
             }
         }
     }
@@ -163,7 +167,13 @@ internal sealed class Elements3DPageViewModel : ViewModelBase
     public bool ShowExploded3DView
     {
         get => _showExploded3DView;
-        set => RaiseAndSetIfChanged(ref _showExploded3DView, value);
+        set
+        {
+            if (RaiseAndSetIfChanged(ref _showExploded3DView, value))
+            {
+                BumpSnapshotRevision();
+            }
+        }
     }
 
     public bool ShowAllLayersInGrid
@@ -174,6 +184,7 @@ internal sealed class Elements3DPageViewModel : ViewModelBase
             if (RaiseAndSetIfChanged(ref _showAllLayersInGrid, value))
             {
                 RaisePropertyChanged(nameof(GridNodesView));
+                BumpSnapshotRevision();
             }
         }
     }
@@ -181,43 +192,85 @@ internal sealed class Elements3DPageViewModel : ViewModelBase
     public double DepthSpacing
     {
         get => _depthSpacing;
-        set => RaiseAndSetIfChanged(ref _depthSpacing, Math.Clamp(value, 0, 400));
+        set
+        {
+            if (RaiseAndSetIfChanged(ref _depthSpacing, Math.Clamp(value, 0, 400)))
+            {
+                BumpSnapshotRevision();
+            }
+        }
     }
 
     public int Flat2DMaxLayersPerRow
     {
         get => _flat2DMaxLayersPerRow;
-        set => RaiseAndSetIfChanged(ref _flat2DMaxLayersPerRow, Math.Clamp(value, 0, 512));
+        set
+        {
+            if (RaiseAndSetIfChanged(ref _flat2DMaxLayersPerRow, Math.Clamp(value, 0, 512)))
+            {
+                BumpSnapshotRevision();
+            }
+        }
     }
 
     public double Tilt
     {
         get => _tilt;
-        set => RaiseAndSetIfChanged(ref _tilt, Math.Clamp(value, 0, 1));
+        set
+        {
+            if (RaiseAndSetIfChanged(ref _tilt, Math.Clamp(value, 0, 1)))
+            {
+                BumpSnapshotRevision();
+            }
+        }
     }
 
     public double Zoom
     {
         get => _zoom;
-        set => RaiseAndSetIfChanged(ref _zoom, Math.Clamp(value, 0.25, 24));
+        set
+        {
+            if (RaiseAndSetIfChanged(ref _zoom, Math.Clamp(value, 0.25, 24)))
+            {
+                BumpSnapshotRevision();
+            }
+        }
     }
 
     public double OrbitYaw
     {
         get => _orbitYaw;
-        set => RaiseAndSetIfChanged(ref _orbitYaw, Math.Clamp(value, -180, 180));
+        set
+        {
+            if (RaiseAndSetIfChanged(ref _orbitYaw, Math.Clamp(value, -180, 180)))
+            {
+                BumpSnapshotRevision();
+            }
+        }
     }
 
     public double OrbitPitch
     {
         get => _orbitPitch;
-        set => RaiseAndSetIfChanged(ref _orbitPitch, Math.Clamp(value, -180, 180));
+        set
+        {
+            if (RaiseAndSetIfChanged(ref _orbitPitch, Math.Clamp(value, -180, 180)))
+            {
+                BumpSnapshotRevision();
+            }
+        }
     }
 
     public double OrbitRoll
     {
         get => _orbitRoll;
-        set => RaiseAndSetIfChanged(ref _orbitRoll, Math.Clamp(value, -180, 180));
+        set
+        {
+            if (RaiseAndSetIfChanged(ref _orbitRoll, Math.Clamp(value, -180, 180)))
+            {
+                BumpSnapshotRevision();
+            }
+        }
     }
 
     public int AvailableMinDepth
@@ -380,6 +433,7 @@ internal sealed class Elements3DPageViewModel : ViewModelBase
 
         RaisePropertyChanged(nameof(NodeCount));
         RaisePropertyChanged(nameof(VisibleNodeCount));
+        BumpSnapshotRevision();
     }
 
     public void ResetProjectionView()
@@ -514,6 +568,7 @@ internal sealed class Elements3DPageViewModel : ViewModelBase
             SelectedNode = selected ?? (_nodes.Count > 0 ? _nodes[0] : null);
             Refresh();
             RaiseRootScopeStateChanged();
+            BumpSnapshotRevision();
         }
         finally
         {
@@ -925,6 +980,11 @@ internal sealed class Elements3DPageViewModel : ViewModelBase
         }
 
         return typeName;
+    }
+
+    private void BumpSnapshotRevision()
+    {
+        Interlocked.Increment(ref _snapshotRevision);
     }
 
     private sealed class DepthThenZIndexComparer : IComparer

@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Avalonia.Controls;
 using Avalonia.Diagnostics.Remote;
 using Avalonia.Diagnostics.Services;
+using Avalonia.Diagnostics.ViewModels;
 using Avalonia.Headless.XUnit;
 using Avalonia.Styling;
 using Xunit;
@@ -66,6 +67,30 @@ public class RemoteBackendHardeningTests
     }
 
     [AvaloniaFact]
+    public async Task SnapshotCaching_IsGenerationAware_AcrossRequestWindow()
+    {
+        var window = CreateLargeTreeWindow(nodeCount: 128);
+        var source = new InProcessRemoteReadOnlyDiagnosticsSource(window);
+        var request = new RemoteTreeSnapshotRequest
+        {
+            Scope = "combined",
+            IncludeSourceLocations = false,
+            IncludeVisualDetails = false,
+        };
+
+        var first = await source.GetTreeSnapshotAsync(request, CancellationToken.None);
+        var immediate = await source.GetTreeSnapshotAsync(request, CancellationToken.None);
+        Assert.Same(first, immediate);
+        Assert.Equal(first.Generation, immediate.Generation);
+
+        await Task.Delay(900);
+
+        var refreshed = await source.GetTreeSnapshotAsync(request, CancellationToken.None);
+        Assert.NotSame(first, refreshed);
+        Assert.True(refreshed.Generation > first.Generation);
+    }
+
+    [AvaloniaFact]
     public async Task HeavySnapshots_CanSkip_Optional_Collections()
     {
         var window = CreateStyledWindow();
@@ -96,6 +121,47 @@ public class RemoteBackendHardeningTests
             CancellationToken.None);
         Assert.Empty(elements.Nodes);
         Assert.Empty(elements.VisibleNodeIds);
+    }
+
+    [AvaloniaFact]
+    public async Task GetElements3DSnapshotAsync_DefaultRequest_DoesNotIncludeSvg()
+    {
+        var window = CreateLargeTreeWindow(nodeCount: 64);
+        var source = new InProcessRemoteReadOnlyDiagnosticsSource(window);
+
+        var snapshot = await source.GetElements3DSnapshotAsync(
+            new RemoteElements3DSnapshotRequest
+            {
+                IncludeNodes = false,
+                IncludeVisibleNodeIds = false,
+            },
+            CancellationToken.None);
+
+        Assert.Null(snapshot.SvgSnapshot);
+        Assert.Null(snapshot.SvgViewBox);
+    }
+
+    [AvaloniaFact]
+    public async Task GetElements3DSnapshotAsync_GenerationTracksSceneRevisionChanges()
+    {
+        var window = CreateLargeTreeWindow(nodeCount: 48);
+        var elements3D = new Elements3DPageViewModel(window, selectedObjectAccessor: null);
+        var source = new InProcessRemoteReadOnlyDiagnosticsSource(
+            window,
+            elements3DPageViewModel: elements3D);
+
+        var request = new RemoteElements3DSnapshotRequest
+        {
+            IncludeNodes = false,
+            IncludeVisibleNodeIds = false,
+            IncludeSvgSnapshot = false,
+        };
+
+        var first = await source.GetElements3DSnapshotAsync(request, CancellationToken.None);
+        elements3D.DepthSpacing += 2d;
+        var second = await source.GetElements3DSnapshotAsync(request, CancellationToken.None);
+
+        Assert.True(second.Generation > first.Generation);
     }
 
     [AvaloniaFact]

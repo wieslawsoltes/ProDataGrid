@@ -1,6 +1,8 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
+using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 using Avalonia;
@@ -64,6 +66,7 @@ public sealed class DevToolsRemoteAttachHost : IAsyncDisposable
         RemoteMutationMethods.EventsDisableAll,
         RemoteMutationMethods.LogsClear,
         RemoteMutationMethods.LogsLevelsSet,
+        RemoteMutationMethods.StreamDemandSet,
         RemoteMutationMethods.MetricsPausedSet,
         RemoteMutationMethods.MetricsSettingsSet,
         RemoteMutationMethods.ProfilerPausedSet,
@@ -180,6 +183,7 @@ public sealed class DevToolsRemoteAttachHost : IAsyncDisposable
                 protocolMonitor: _protocolMonitor,
                 diagnosticsLogger: _diagnosticsLogger);
             _streamBridge = new RemoteAttachStreamBridge(_streamHub, _streamSource);
+            _streamSource.SetStreamDemand(_streamHub.GetAggregatedDemand());
         }
 
         if (normalized.EnableMutationApi)
@@ -373,35 +377,66 @@ public sealed class DevToolsRemoteAttachHost : IAsyncDisposable
                         break;
 
                     case RemoteRequestMessage request:
-                        IRemoteMessage? requestResponse;
+                        var requestStarted = Stopwatch.GetTimestamp();
+                        var requestStatus = "ok";
+                        var payloadOutBytes = 0L;
                         try
                         {
-                            requestResponse = await HandleRequestAsync(connection, request, sessionId, cancellationToken)
-                                .ConfigureAwait(false);
-                        }
-                        catch (Exception ex) when (!cancellationToken.IsCancellationRequested)
-                        {
-                            requestResponse = CreateFailureResponse(
-                                request,
-                                "server_error",
-                                ex.Message);
-                        }
-
-                        if (requestResponse is not null)
-                        {
-                            var keepConnectionOpen = await TrySendRequestResponseAsync(
-                                    connection,
-                                    sessionId,
-                                    request,
-                                    requestResponse,
-                                    cancellationToken)
-                                .ConfigureAwait(false);
-                            if (!keepConnectionOpen)
+                            IRemoteMessage? requestResponse;
+                            try
                             {
-                                return;
+                                requestResponse = await HandleRequestAsync(connection, request, sessionId, cancellationToken)
+                                    .ConfigureAwait(false);
+                            }
+                            catch (OperationCanceledException)
+                            {
+                                requestStatus = "cancelled";
+                                throw;
+                            }
+                            catch (Exception ex) when (!cancellationToken.IsCancellationRequested)
+                            {
+                                requestStatus = "error";
+                                requestResponse = CreateFailureResponse(
+                                    request,
+                                    "server_error",
+                                    ex.Message);
+                            }
+
+                            if (requestResponse is not null)
+                            {
+                                var sendResult = await TrySendRequestResponseAsync(
+                                        connection,
+                                        sessionId,
+                                        request,
+                                        requestResponse,
+                                        cancellationToken)
+                                    .ConfigureAwait(false);
+                                payloadOutBytes = sendResult.PayloadOutBytes;
+                                requestStatus = sendResult.Status;
+                                if (!sendResult.KeepConnectionOpen)
+                                {
+                                    if (string.Equals(requestStatus, "ok", StringComparison.Ordinal))
+                                    {
+                                        requestStatus = "error";
+                                    }
+
+                                    return;
+                                }
                             }
                         }
-
+                        finally
+                        {
+                            var requestDomain = RemoteRuntimeMetrics.ResolveDomainFromMethod(request.Method);
+                            RemoteRuntimeMetrics.RecordRequest(
+                                transport: TransportName,
+                                method: request.Method,
+                                domain: requestDomain,
+                                scope: "none",
+                                status: requestStatus,
+                                durationMs: RemoteRuntimeMetrics.ElapsedMilliseconds(requestStarted),
+                                payloadInBytes: received.Value.FrameSizeBytes,
+                                payloadOutBytes: payloadOutBytes);
+                        }
                         break;
 
                     case RemoteKeepAliveMessage keepAlive:
@@ -481,6 +516,7 @@ public sealed class DevToolsRemoteAttachHost : IAsyncDisposable
         if (_streamHub is not null && session is not null)
         {
             _streamHub.RegisterSession(session.SessionId, connection);
+            SyncStreamDemandFromSessions();
         }
 
         var enabledFeatures = SelectEnabledFeatures(
@@ -532,6 +568,19 @@ public sealed class DevToolsRemoteAttachHost : IAsyncDisposable
 
             if (s_mutationMethods.Contains(request.Method))
             {
+                if (string.Equals(request.Method, RemoteMutationMethods.StreamDemandSet, StringComparison.Ordinal))
+                {
+                    if (_streamHub is null || _streamSource is null)
+                    {
+                        return CreateFailureResponse(
+                            request,
+                            "streaming_disabled",
+                            "Streaming API is disabled on this host.");
+                    }
+
+                    return HandleStreamDemandSet(request, activeSessionId);
+                }
+
                 if (_mutationRouter is null)
                 {
                     return CreateFailureResponse(
@@ -573,7 +622,7 @@ public sealed class DevToolsRemoteAttachHost : IAsyncDisposable
         }
     }
 
-    private async Task<bool> TrySendRequestResponseAsync(
+    private async Task<RequestResponseSendResult> TrySendRequestResponseAsync(
         IAttachConnection connection,
         Guid sessionId,
         RemoteRequestMessage request,
@@ -583,7 +632,10 @@ public sealed class DevToolsRemoteAttachHost : IAsyncDisposable
         try
         {
             await connection.SendAsync(response, cancellationToken).ConfigureAwait(false);
-            return true;
+            return new RequestResponseSendResult(
+                KeepConnectionOpen: true,
+                Status: ResolveResponseStatus(response),
+                PayloadOutBytes: ResolveResponsePayloadBytes(response));
         }
         catch (InvalidOperationException ex) when (
             IsPayloadTooLargeException(ex) &&
@@ -596,18 +648,27 @@ public sealed class DevToolsRemoteAttachHost : IAsyncDisposable
             try
             {
                 await connection.SendAsync(fallback, cancellationToken).ConfigureAwait(false);
-                return true;
+                return new RequestResponseSendResult(
+                    KeepConnectionOpen: true,
+                    Status: ResolveResponseStatus(fallback),
+                    PayloadOutBytes: ResolveResponsePayloadBytes(fallback));
             }
             catch (Exception fallbackEx) when (!cancellationToken.IsCancellationRequested)
             {
                 LogConnectionLoopSendFailure(connection, sessionId, request, fallbackEx, isFallback: true);
-                return false;
+                return new RequestResponseSendResult(
+                    KeepConnectionOpen: false,
+                    Status: "error",
+                    PayloadOutBytes: 0);
             }
         }
         catch (Exception ex) when (!cancellationToken.IsCancellationRequested)
         {
             LogConnectionLoopSendFailure(connection, sessionId, request, ex, isFallback: false);
-            return false;
+            return new RequestResponseSendResult(
+                KeepConnectionOpen: false,
+                Status: "error",
+                PayloadOutBytes: 0);
         }
     }
 
@@ -648,6 +709,23 @@ public sealed class DevToolsRemoteAttachHost : IAsyncDisposable
     private static bool IsPayloadTooLargeException(InvalidOperationException exception) =>
         exception.Message.Contains("max frame size", StringComparison.OrdinalIgnoreCase);
 
+    private static string ResolveResponseStatus(IRemoteMessage response)
+    {
+        return response switch
+        {
+            RemoteResponseMessage success when success.IsSuccess => "ok",
+            RemoteResponseMessage failure => MapResponseStatus(failure.ErrorCode),
+            _ => "ok",
+        };
+    }
+
+    private static long ResolveResponsePayloadBytes(IRemoteMessage response)
+    {
+        return response is RemoteResponseMessage responseMessage
+            ? RemoteRuntimeMetrics.GetUtf8ByteCount(responseMessage.PayloadJson)
+            : 0;
+    }
+
     private void UnregisterSession(Guid sessionId)
     {
         if (sessionId == Guid.Empty)
@@ -657,6 +735,60 @@ public sealed class DevToolsRemoteAttachHost : IAsyncDisposable
 
         _sessionManager.TryRemove(sessionId, out _);
         _streamHub?.TryUnregisterSession(sessionId);
+        SyncStreamDemandFromSessions();
+    }
+
+    private RemoteResponseMessage HandleStreamDemandSet(RemoteRequestMessage request, Guid activeSessionId)
+    {
+        RemoteSetStreamDemandRequest? payload;
+        try
+        {
+            payload = string.IsNullOrWhiteSpace(request.PayloadJson)
+                ? new RemoteSetStreamDemandRequest()
+                : JsonSerializer.Deserialize(
+                    request.PayloadJson,
+                    RemoteJsonSerializerContext.Default.RemoteSetStreamDemandRequest);
+        }
+        catch (JsonException ex)
+        {
+            return CreateFailureResponse(request, "invalid_request", ex.Message);
+        }
+
+        if (_streamHub is null || _streamSource is null)
+        {
+            return CreateFailureResponse(
+                request,
+                "streaming_disabled",
+                "Streaming API is disabled on this host.");
+        }
+
+        var changed = _streamHub.SetSessionDemand(activeSessionId, payload?.Topics);
+        SyncStreamDemandFromSessions();
+        var result = new RemoteMutationResult(
+            Operation: RemoteMutationMethods.StreamDemandSet,
+            Changed: changed,
+            Message: changed
+                ? "Updated stream topic demand for active session."
+                : "Stream topic demand unchanged.",
+            AffectedCount: changed ? 1 : 0);
+
+        return new RemoteResponseMessage(
+            SessionId: request.SessionId,
+            RequestId: request.RequestId,
+            IsSuccess: true,
+            PayloadJson: JsonSerializer.Serialize(result, RemoteJsonSerializerContext.Default.RemoteMutationResult),
+            ErrorCode: string.Empty,
+            ErrorMessage: string.Empty);
+    }
+
+    private void SyncStreamDemandFromSessions()
+    {
+        if (_streamHub is null || _streamSource is null)
+        {
+            return;
+        }
+
+        _streamSource.SetStreamDemand(_streamHub.GetAggregatedDemand());
     }
 
     private async ValueTask DisposeStreamingAsync()
@@ -756,6 +888,21 @@ public sealed class DevToolsRemoteAttachHost : IAsyncDisposable
             ErrorCode: errorCode,
             ErrorMessage: errorMessage);
     }
+
+    private static string MapResponseStatus(string? errorCode)
+    {
+        return errorCode switch
+        {
+            "request_timeout" => "timeout",
+            "request_cancelled" => "cancelled",
+            _ => "error",
+        };
+    }
+
+    private readonly record struct RequestResponseSendResult(
+        bool KeepConnectionOpen,
+        string Status,
+        long PayloadOutBytes);
 
     private static async Task ObserveTaskAsync(Task task)
     {

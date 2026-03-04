@@ -16,6 +16,10 @@ internal interface IRemoteStreamPauseController
 
     bool SetProfilerPaused(bool isPaused);
 
+    void SetStreamDemand(RemoteStreamDemandSnapshot demand);
+
+    RemoteStreamDemandSnapshot GetStreamDemand();
+
     RemotePreviewCapabilitiesSnapshot GetPreviewCapabilitiesSnapshot(RemotePreviewCapabilitiesRequest request);
 
     RemotePreviewSnapshot GetPreviewSnapshot(RemotePreviewSnapshotRequest request);

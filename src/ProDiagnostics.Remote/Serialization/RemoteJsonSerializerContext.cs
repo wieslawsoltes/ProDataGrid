@@ -37,6 +37,7 @@ namespace Avalonia.Diagnostics.Remote;
 [JsonSerializable(typeof(RemoteSetOverlayOptionsRequest))]
 [JsonSerializable(typeof(RemoteSetOverlayLiveHoverRequest))]
 [JsonSerializable(typeof(RemoteCodeDocumentOpenRequest))]
+[JsonSerializable(typeof(RemoteSetStreamDemandRequest))]
 [JsonSerializable(typeof(RemoteAddPropertyBreakpointRequest))]
 [JsonSerializable(typeof(RemoteAddEventBreakpointRequest))]
 [JsonSerializable(typeof(RemoteRemoveBreakpointRequest))]

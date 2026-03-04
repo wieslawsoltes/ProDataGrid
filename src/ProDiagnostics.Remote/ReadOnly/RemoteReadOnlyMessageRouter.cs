@@ -231,13 +231,39 @@ public sealed class RemoteReadOnlyMessageRouter : IRemoteMessageRouter
         TPayload payload,
         JsonTypeInfo<TPayload> typeInfo)
     {
+        var payloadJson = JsonSerializer.Serialize(payload, typeInfo);
+        var domain = RemoteRuntimeMetrics.ResolveDomainFromMethod(requestMessage.Method);
+        var scope = ResolveScope(payload);
+        RemoteRuntimeMetrics.RecordSnapshotPayloadBytes(
+            domain: domain,
+            scope: scope,
+            bytes: RemoteRuntimeMetrics.GetUtf8ByteCount(payloadJson),
+            cache: "bypass");
+
         return new RemoteResponseMessage(
             SessionId: requestMessage.SessionId,
             RequestId: requestMessage.RequestId,
             IsSuccess: true,
-            PayloadJson: JsonSerializer.Serialize(payload, typeInfo),
+            PayloadJson: payloadJson,
             ErrorCode: string.Empty,
             ErrorMessage: string.Empty);
+    }
+
+    private static string ResolveScope<TPayload>(TPayload payload)
+    {
+        return payload switch
+        {
+            RemoteTreeSnapshot tree => tree.Scope,
+            RemoteSelectionSnapshot selection => selection.Scope,
+            RemotePropertiesSnapshot properties => properties.Scope,
+            RemoteCodeDocumentsSnapshot codeDocuments => codeDocuments.Scope,
+            RemoteCodeResolveNodeSnapshot codeResolve => codeResolve.Scope,
+            RemoteBindingsSnapshot bindings => bindings.Scope,
+            RemoteStylesSnapshot styles => styles.Scope,
+            RemoteEventsSnapshot eventsSnapshot => eventsSnapshot.Scope,
+            RemoteBreakpointsSnapshot breakpoints => breakpoints.Scope,
+            _ => "none",
+        };
     }
 
     private static RemoteResponseMessage BuildFailureResponse(

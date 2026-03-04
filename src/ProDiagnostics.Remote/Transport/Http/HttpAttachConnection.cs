@@ -1,5 +1,6 @@
 using System;
 using System.Buffers;
+using System.Diagnostics;
 using System.Net.WebSockets;
 using System.Threading;
 using System.Threading.Tasks;
@@ -21,7 +22,10 @@ public sealed class HttpAttachConnection : IAttachConnection
     private readonly IRemoteProtocolMonitor _protocolMonitor;
     private readonly IRemoteDiagnosticsLogger _diagnosticsLogger;
     private readonly SemaphoreSlim _sendGate = new(1, 1);
+    private readonly SemaphoreSlim _receiveGate = new(1, 1);
     private readonly TaskCompletionSource<object?> _closedTcs = new(TaskCreationOptions.RunContinuationsAsynchronously);
+    private byte[]? _receiveAggregateBuffer;
+    private long _lastActivityTicksUtc;
     private int _closed;
 
     public HttpAttachConnection(
@@ -40,6 +44,8 @@ public sealed class HttpAttachConnection : IAttachConnection
         _maxPayloadBytes = maxPayloadBytes > 0 ? maxPayloadBytes : RemoteProtocol.MaxFramePayloadBytes;
         _protocolMonitor = protocolMonitor ?? NoOpRemoteProtocolMonitor.Instance;
         _diagnosticsLogger = diagnosticsLogger ?? NoOpRemoteDiagnosticsLogger.Instance;
+        _receiveAggregateBuffer = ArrayPool<byte>.Shared.Rent(Math.Min(InitialBufferSize, _maxPayloadBytes));
+        TouchActivity();
     }
 
     public Guid ConnectionId { get; }
@@ -59,12 +65,29 @@ public sealed class HttpAttachConnection : IAttachConnection
         }
 
         ReadOnlyMemory<byte> payload;
+        var messageMethod = RemoteRuntimeMetrics.MapMessageKind(message.Kind);
+        var serializeStarted = Stopwatch.GetTimestamp();
         try
         {
             payload = RemoteMessageSerializer.Serialize(message);
+            RemoteRuntimeMetrics.RecordSerializeDuration(
+                transport: TransportName,
+                method: messageMethod,
+                status: "ok",
+                durationMs: RemoteRuntimeMetrics.ElapsedMilliseconds(serializeStarted));
         }
         catch (Exception ex)
         {
+            RemoteRuntimeMetrics.RecordSerializeDuration(
+                transport: TransportName,
+                method: messageMethod,
+                status: "error",
+                durationMs: RemoteRuntimeMetrics.ElapsedMilliseconds(serializeStarted));
+            RemoteRuntimeMetrics.RecordTransportFailure(
+                transport: TransportName,
+                method: messageMethod,
+                domain: "none",
+                status: "error");
             _protocolMonitor.RecordSendFailure(
                 TransportName,
                 ConnectionId,
@@ -97,13 +120,31 @@ public sealed class HttpAttachConnection : IAttachConnection
                 RemoteEndpoint,
                 message.Kind,
                 payload.Length);
+            TouchActivity();
+            RemoteRuntimeMetrics.RecordPayloadOutBytes(
+                transport: TransportName,
+                method: messageMethod,
+                domain: "none",
+                scope: "none",
+                status: "ok",
+                bytes: payload.Length);
         }
         catch (OperationCanceledException)
         {
+            RemoteRuntimeMetrics.RecordTransportFailure(
+                transport: TransportName,
+                method: messageMethod,
+                domain: "none",
+                status: "cancelled");
             throw;
         }
         catch (Exception ex)
         {
+            RemoteRuntimeMetrics.RecordTransportFailure(
+                transport: TransportName,
+                method: messageMethod,
+                domain: "none",
+                status: "error");
             _protocolMonitor.RecordSendFailure(
                 TransportName,
                 ConnectionId,
@@ -126,7 +167,14 @@ public sealed class HttpAttachConnection : IAttachConnection
         }
         finally
         {
-            _sendGate.Release();
+            try
+            {
+                _sendGate.Release();
+            }
+            catch (ObjectDisposedException)
+            {
+                // Connection shutdown can race with in-flight send completion.
+            }
         }
     }
 
@@ -137,21 +185,37 @@ public sealed class HttpAttachConnection : IAttachConnection
             return null;
         }
 
-        using var timeoutCts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
-        timeoutCts.CancelAfter(_receiveTimeout);
-
-        var readBuffer = ArrayPool<byte>.Shared.Rent(InitialBufferSize);
-        var aggregate = ArrayPool<byte>.Shared.Rent(Math.Min(InitialBufferSize, _maxPayloadBytes));
-        var total = 0;
-
+        var receiveLockAcquired = false;
         try
         {
+            await _receiveGate.WaitAsync(cancellationToken).ConfigureAwait(false);
+            receiveLockAcquired = true;
+            using var timeoutCts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
+            timeoutCts.CancelAfter(_receiveTimeout);
+
+            var aggregate = _receiveAggregateBuffer ??=
+                ArrayPool<byte>.Shared.Rent(Math.Min(InitialBufferSize, _maxPayloadBytes));
+            var total = 0;
+
             while (true)
             {
-                WebSocketReceiveResult result;
+                var minWritable = Math.Min(InitialBufferSize, _maxPayloadBytes - total);
+                if (minWritable <= 0)
+                {
+                    return await FailReceiveAsync(
+                            WebSocketCloseStatus.MessageTooBig,
+                            "Payload too large")
+                        .ConfigureAwait(false);
+                }
+
+                aggregate = EnsureReceiveAggregateCapacity(aggregate, total, total + minWritable, _maxPayloadBytes);
+                var writableLength = Math.Min(minWritable, aggregate.Length - total);
+                ValueWebSocketReceiveResult result;
                 try
                 {
-                    result = await _webSocket.ReceiveAsync(readBuffer, timeoutCts.Token).ConfigureAwait(false);
+                    result = await _webSocket
+                        .ReceiveAsync(aggregate.AsMemory(total, writableLength), timeoutCts.Token)
+                        .ConfigureAwait(false);
                 }
                 catch (OperationCanceledException) when (!cancellationToken.IsCancellationRequested)
                 {
@@ -189,8 +253,6 @@ public sealed class HttpAttachConnection : IAttachConnection
                             .ConfigureAwait(false);
                     }
 
-                    aggregate = EnsureAggregateCapacity(aggregate, total, total + result.Count, _maxPayloadBytes);
-                    readBuffer.AsSpan(0, result.Count).CopyTo(aggregate.AsSpan(total, result.Count));
                     total += result.Count;
                 }
 
@@ -208,26 +270,55 @@ public sealed class HttpAttachConnection : IAttachConnection
                     .ConfigureAwait(false);
             }
 
+            var deserializeStarted = Stopwatch.GetTimestamp();
             if (!RemoteMessageSerializer.TryDeserialize(aggregate.AsSpan(0, total), out var message))
             {
+                RemoteRuntimeMetrics.RecordDeserializeDuration(
+                    transport: TransportName,
+                    method: "response",
+                    status: "error",
+                    durationMs: RemoteRuntimeMetrics.ElapsedMilliseconds(deserializeStarted));
                 return await FailReceiveAsync(
                         WebSocketCloseStatus.InvalidPayloadData,
                         "Invalid protocol frame")
                     .ConfigureAwait(false);
             }
 
+            var messageMethod = RemoteRuntimeMetrics.MapMessageKind(message!.Kind);
+            RemoteRuntimeMetrics.RecordDeserializeDuration(
+                transport: TransportName,
+                method: messageMethod,
+                status: "ok",
+                durationMs: RemoteRuntimeMetrics.ElapsedMilliseconds(deserializeStarted));
             _protocolMonitor.RecordMessageReceived(
                 TransportName,
                 ConnectionId,
                 RemoteEndpoint,
                 message!.Kind,
                 total);
+            TouchActivity();
+            RemoteRuntimeMetrics.RecordPayloadInBytes(
+                transport: TransportName,
+                method: messageMethod,
+                domain: "none",
+                scope: "none",
+                status: "ok",
+                bytes: total);
             return new AttachReceiveResult(message!, total, DateTimeOffset.UtcNow);
         }
         finally
         {
-            ArrayPool<byte>.Shared.Return(readBuffer);
-            ArrayPool<byte>.Shared.Return(aggregate);
+            if (receiveLockAcquired)
+            {
+                try
+                {
+                    _receiveGate.Release();
+                }
+                catch (ObjectDisposedException)
+                {
+                    // Connection shutdown can race with in-flight receive completion.
+                }
+            }
         }
     }
 
@@ -251,8 +342,40 @@ public sealed class HttpAttachConnection : IAttachConnection
                 "Disposed",
                 CancellationToken.None)
             .ConfigureAwait(false);
-        _sendGate.Dispose();
+        var receiveGateAcquired = await TryAcquireGateAsync(_receiveGate, timeout: TimeSpan.FromMilliseconds(250))
+            .ConfigureAwait(false);
+        try
+        {
+            if (receiveGateAcquired && _receiveAggregateBuffer is { } receiveAggregate)
+            {
+                _receiveAggregateBuffer = null;
+                ArrayPool<byte>.Shared.Return(receiveAggregate);
+            }
+        }
+        finally
+        {
+            if (receiveGateAcquired)
+            {
+                _receiveGate.Release();
+            }
+        }
         _webSocket.Dispose();
+    }
+
+    internal bool HasRecentActivity(TimeSpan activityWindow)
+    {
+        if (activityWindow <= TimeSpan.Zero)
+        {
+            return false;
+        }
+
+        var lastActivityTicks = Interlocked.Read(ref _lastActivityTicksUtc);
+        if (lastActivityTicks <= 0)
+        {
+            return false;
+        }
+
+        return DateTime.UtcNow.Ticks - lastActivityTicks <= activityWindow.Ticks;
     }
 
     private async ValueTask CloseInternalAsync(
@@ -296,6 +419,7 @@ public sealed class HttpAttachConnection : IAttachConnection
         }
 
         _protocolMonitor.RecordConnectionClosed(TransportName, ConnectionId, RemoteEndpoint, description);
+        RemoteRuntimeMetrics.RecordConnectionClosed(TransportName);
         Log(
             RemoteDiagnosticsLogLevel.Information,
             "closed",
@@ -310,6 +434,14 @@ public sealed class HttpAttachConnection : IAttachConnection
         WebSocketCloseStatus closeStatus,
         string reason)
     {
+        var status = string.Equals(reason, "Receive timeout", StringComparison.OrdinalIgnoreCase)
+            ? "timeout"
+            : "error";
+        RemoteRuntimeMetrics.RecordTransportFailure(
+            transport: TransportName,
+            method: "response",
+            domain: "none",
+            status: status);
         _protocolMonitor.RecordReceiveFailure(TransportName, ConnectionId, RemoteEndpoint, reason);
         Log(
             RemoteDiagnosticsLogLevel.Warning,
@@ -322,7 +454,7 @@ public sealed class HttpAttachConnection : IAttachConnection
         return null;
     }
 
-    private static byte[] EnsureAggregateCapacity(
+    private byte[] EnsureReceiveAggregateCapacity(
         byte[] aggregate,
         int existingLength,
         int requiredLength,
@@ -350,7 +482,25 @@ public sealed class HttpAttachConnection : IAttachConnection
         var expanded = ArrayPool<byte>.Shared.Rent(newSize);
         aggregate.AsSpan(0, existingLength).CopyTo(expanded.AsSpan());
         ArrayPool<byte>.Shared.Return(aggregate);
+        _receiveAggregateBuffer = expanded;
         return expanded;
+    }
+
+    private void TouchActivity()
+    {
+        Interlocked.Exchange(ref _lastActivityTicksUtc, DateTime.UtcNow.Ticks);
+    }
+
+    private static async Task<bool> TryAcquireGateAsync(SemaphoreSlim gate, TimeSpan timeout)
+    {
+        try
+        {
+            return await gate.WaitAsync(timeout).ConfigureAwait(false);
+        }
+        catch (ObjectDisposedException)
+        {
+            return false;
+        }
     }
 
     private void Log(
