@@ -130,6 +130,11 @@ public sealed class NamedPipeAttachServer : IAttachServer
         lifecycleCts?.Cancel();
         await TryWakeAcceptLoopAsync().ConfigureAwait(false);
 
+        foreach (var connection in connections)
+        {
+            await ObserveConnectionShutdownAsync(connection, cancellationToken).ConfigureAwait(false);
+        }
+
         if (acceptLoop is not null)
         {
             await ObserveShutdownTaskAsync(acceptLoop, "accept-loop").ConfigureAwait(false);
@@ -146,20 +151,6 @@ public sealed class NamedPipeAttachServer : IAttachServer
             {
                 await ObserveShutdownTaskAsync(clientTask, "connection-loop").ConfigureAwait(false);
             }
-        }
-
-        foreach (var connection in connections)
-        {
-            try
-            {
-                await connection.CloseAsync("Server stopping", cancellationToken).ConfigureAwait(false);
-            }
-            catch
-            {
-                // no-op
-            }
-
-            await connection.DisposeAsync().ConfigureAwait(false);
         }
 
         lifecycleCts?.Dispose();
@@ -484,6 +475,33 @@ public sealed class NamedPipeAttachServer : IAttachServer
         }
 
         await ObserveTaskAsync(task).ConfigureAwait(false);
+    }
+
+    private async Task ObserveConnectionShutdownAsync(
+        NamedPipeAttachConnection connection,
+        CancellationToken cancellationToken)
+    {
+        try
+        {
+            await ObserveShutdownTaskAsync(
+                connection.CloseAsync("Server stopping", cancellationToken).AsTask(),
+                "connection-close").ConfigureAwait(false);
+        }
+        catch
+        {
+            // no-op during shutdown
+        }
+
+        try
+        {
+            await ObserveShutdownTaskAsync(
+                connection.DisposeAsync().AsTask(),
+                "connection-dispose").ConfigureAwait(false);
+        }
+        catch
+        {
+            // no-op during shutdown
+        }
     }
 
     private async Task TryWakeAcceptLoopAsync()
