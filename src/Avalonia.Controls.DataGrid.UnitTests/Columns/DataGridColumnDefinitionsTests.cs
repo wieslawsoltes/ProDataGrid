@@ -24,37 +24,40 @@ namespace Avalonia.Controls.DataGridTests.Columns;
 
 public class DataGridColumnDefinitionsTests
 {
-    public static System.Collections.Generic.IEnumerable<object[]> ColumnDefinitionMappings => new[]
+    [AvaloniaFact]
+    public void ColumnDefinitions_Create_BuiltIn_Columns()
     {
-        new object[] { new DataGridTextColumnDefinition(), typeof(DataGridTextColumn) },
-        new object[] { new DataGridCheckBoxColumnDefinition(), typeof(DataGridCheckBoxColumn) },
-        new object[] { new DataGridComboBoxColumnDefinition(), typeof(DataGridComboBoxColumn) },
-        new object[] { new DataGridButtonColumnDefinition(), typeof(DataGridButtonColumn) },
-        new object[] { new DataGridHyperlinkColumnDefinition(), typeof(DataGridHyperlinkColumn) },
-        new object[] { new DataGridImageColumnDefinition(), typeof(DataGridImageColumn) },
-        new object[] { new DataGridTemplateColumnDefinition(), typeof(DataGridTemplateColumn) },
-        new object[] { new DataGridNumericColumnDefinition(), typeof(DataGridNumericColumn) },
-        new object[] { new DataGridProgressBarColumnDefinition(), typeof(DataGridProgressBarColumn) },
-        new object[] { new DataGridSliderColumnDefinition(), typeof(DataGridSliderColumn) },
-        new object[] { new DataGridDatePickerColumnDefinition(), typeof(DataGridDatePickerColumn) },
-        new object[] { new DataGridTimePickerColumnDefinition(), typeof(DataGridTimePickerColumn) },
-        new object[] { new DataGridMaskedTextColumnDefinition(), typeof(DataGridMaskedTextColumn) },
-        new object[] { new DataGridAutoCompleteColumnDefinition(), typeof(DataGridAutoCompleteColumn) },
-        new object[] { new DataGridToggleButtonColumnDefinition(), typeof(DataGridToggleButtonColumn) },
-        new object[] { new DataGridToggleSwitchColumnDefinition(), typeof(DataGridToggleSwitchColumn) },
-        new object[] { new DataGridCustomDrawingColumnDefinition(), typeof(DataGridCustomDrawingColumn) },
-        new object[] { new DataGridHierarchicalColumnDefinition(), typeof(DataGridHierarchicalColumn) }
-    };
+        var mappings = new (DataGridColumnDefinition Definition, Type ExpectedType)[]
+        {
+            (new DataGridTextColumnDefinition(), typeof(DataGridTextColumn)),
+            (new DataGridCheckBoxColumnDefinition(), typeof(DataGridCheckBoxColumn)),
+            (new DataGridComboBoxColumnDefinition(), typeof(DataGridComboBoxColumn)),
+            (new DataGridButtonColumnDefinition(), typeof(DataGridButtonColumn)),
+            (new DataGridHyperlinkColumnDefinition(), typeof(DataGridHyperlinkColumn)),
+            (new DataGridImageColumnDefinition(), typeof(DataGridImageColumn)),
+            (new DataGridTemplateColumnDefinition(), typeof(DataGridTemplateColumn)),
+            (new DataGridNumericColumnDefinition(), typeof(DataGridNumericColumn)),
+            (new DataGridProgressBarColumnDefinition(), typeof(DataGridProgressBarColumn)),
+            (new DataGridSliderColumnDefinition(), typeof(DataGridSliderColumn)),
+            (new DataGridDatePickerColumnDefinition(), typeof(DataGridDatePickerColumn)),
+            (new DataGridTimePickerColumnDefinition(), typeof(DataGridTimePickerColumn)),
+            (new DataGridMaskedTextColumnDefinition(), typeof(DataGridMaskedTextColumn)),
+            (new DataGridAutoCompleteColumnDefinition(), typeof(DataGridAutoCompleteColumn)),
+            (new DataGridToggleButtonColumnDefinition(), typeof(DataGridToggleButtonColumn)),
+            (new DataGridToggleSwitchColumnDefinition(), typeof(DataGridToggleSwitchColumn)),
+            (new DataGridCustomDrawingColumnDefinition(), typeof(DataGridCustomDrawingColumn)),
+            (new DataGridHierarchicalColumnDefinition(), typeof(DataGridHierarchicalColumn))
+        };
 
-    [Theory]
-    [MemberData(nameof(ColumnDefinitionMappings))]
-    public void ColumnDefinitions_Create_BuiltIn_Columns(DataGridColumnDefinition definition, Type expectedType)
-    {
-        var column = definition.CreateColumn(new DataGridColumnDefinitionContext(new DataGrid()));
-        Assert.IsType(expectedType, column);
+        var context = new DataGridColumnDefinitionContext(new DataGrid());
+        foreach (var (definition, expectedType) in mappings)
+        {
+            var column = definition.CreateColumn(context);
+            Assert.IsType(expectedType, column);
+        }
     }
 
-    [Fact]
+    [AvaloniaFact]
     public void CustomDrawingColumnDefinition_Applies_Drawing_Properties()
     {
         var factory = new TestDrawOperationFactory();

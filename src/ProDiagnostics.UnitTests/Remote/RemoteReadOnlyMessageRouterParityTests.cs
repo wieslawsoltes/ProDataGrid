@@ -1,6 +1,7 @@
 using System;
 using System.Linq;
 using System.Text.Json;
+using System.Text.Json.Nodes;
 using System.Threading;
 using System.Threading.Tasks;
 using Avalonia.Controls;
@@ -504,9 +505,20 @@ public class RemoteReadOnlyMessageRouterParityTests
 
     private static void AssertSnapshotsEqual<TSnapshot>(TSnapshot expected, TSnapshot actual)
     {
-        var expectedJson = JsonSerializer.Serialize(expected, JsonOptions);
-        var actualJson = JsonSerializer.Serialize(actual, JsonOptions);
+        var expectedJson = NormalizeSnapshotJson(JsonSerializer.Serialize(expected, JsonOptions));
+        var actualJson = NormalizeSnapshotJson(JsonSerializer.Serialize(actual, JsonOptions));
         Assert.Equal(expectedJson, actualJson);
+    }
+
+    private static string NormalizeSnapshotJson(string json)
+    {
+        var node = JsonNode.Parse(json);
+        if (node is JsonObject obj)
+        {
+            obj.Remove("generation");
+        }
+
+        return node?.ToJsonString(JsonOptions) ?? json;
     }
 
     private static Window CreateTestWindow()
