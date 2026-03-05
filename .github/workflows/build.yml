@@ -83,7 +83,7 @@ jobs:
         run: |
           TEST_ARGS=(-c Release --no-build --logger trx --results-directory artifacts/test --filter FullyQualifiedName!~LeakTests)
           if [[ "${{ matrix.os }}" == "windows-latest" ]]; then
-            TEST_ARGS=(-m:1 --blame-hang --blame-hang-timeout 15m --blame-hang-dump-type none "${TEST_ARGS[@]}")
+            TEST_ARGS=(-m:1 "${TEST_ARGS[@]}")
           fi
           dotnet test "${TEST_ARGS[@]}"
 
