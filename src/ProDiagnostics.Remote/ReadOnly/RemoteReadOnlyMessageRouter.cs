@@ -12,6 +12,12 @@ namespace Avalonia.Diagnostics.Remote;
 public sealed class RemoteReadOnlyMessageRouter : IRemoteMessageRouter
 {
     private readonly IRemoteReadOnlyDiagnosticsSource _source;
+    private readonly object _treeSnapshotCacheGate = new();
+    private string _treeSnapshotCacheRequestPayload = string.Empty;
+    private string _treeSnapshotCacheScope = string.Empty;
+    private long _treeSnapshotCacheGeneration = long.MinValue;
+    private int _treeSnapshotCacheVersion = int.MinValue;
+    private string? _treeSnapshotCachePayloadJson;
 
     public RemoteReadOnlyMessageRouter(IRemoteReadOnlyDiagnosticsSource source)
     {
@@ -58,7 +64,7 @@ public sealed class RemoteReadOnlyMessageRouter : IRemoteMessageRouter
                                 RemoteJsonSerializerContext.Default.RemoteTreeSnapshotRequest),
                             cancellationToken)
                         .ConfigureAwait(false),
-                    RemoteJsonSerializerContext.Default.RemoteTreeSnapshot),
+                    requestMessage.PayloadJson),
                 RemoteReadOnlyMethods.SelectionGet => BuildSuccessResponse(
                     requestMessage,
                     await _source.GetSelectionSnapshotAsync(
@@ -214,6 +220,34 @@ public sealed class RemoteReadOnlyMessageRouter : IRemoteMessageRouter
         }
     }
 
+    private string GetTreeSnapshotPayloadJson(RemoteTreeSnapshot snapshot, string requestPayloadJson)
+    {
+        lock (_treeSnapshotCacheGate)
+        {
+            if (_treeSnapshotCachePayloadJson is not null &&
+                _treeSnapshotCacheGeneration == snapshot.Generation &&
+                _treeSnapshotCacheVersion == snapshot.SnapshotVersion &&
+                string.Equals(_treeSnapshotCacheScope, snapshot.Scope, StringComparison.Ordinal) &&
+                string.Equals(_treeSnapshotCacheRequestPayload, requestPayloadJson, StringComparison.Ordinal))
+            {
+                return _treeSnapshotCachePayloadJson;
+            }
+        }
+
+        var payloadJson = JsonSerializer.Serialize(snapshot, RemoteJsonSerializerContext.Default.RemoteTreeSnapshot);
+
+        lock (_treeSnapshotCacheGate)
+        {
+            _treeSnapshotCacheRequestPayload = requestPayloadJson;
+            _treeSnapshotCacheScope = snapshot.Scope;
+            _treeSnapshotCacheGeneration = snapshot.Generation;
+            _treeSnapshotCacheVersion = snapshot.SnapshotVersion;
+            _treeSnapshotCachePayloadJson = payloadJson;
+        }
+
+        return payloadJson;
+    }
+
     private static TRequest DeserializeRequest<TRequest>(string payloadJson, JsonTypeInfo<TRequest> typeInfo)
         where TRequest : class, new()
     {
@@ -232,17 +266,42 @@ public sealed class RemoteReadOnlyMessageRouter : IRemoteMessageRouter
         JsonTypeInfo<TPayload> typeInfo)
     {
         var payloadJson = JsonSerializer.Serialize(payload, typeInfo);
+        var scope = ResolveScope(payload);
+        RecordSnapshotPayloadBytesIfEnabled(requestMessage.Method, scope, payloadJson);
+
+        return BuildSuccessResponse(requestMessage, payloadJson);
+    }
+
+    private RemoteResponseMessage BuildSuccessResponse(
+        RemoteRequestMessage requestMessage,
+        RemoteTreeSnapshot snapshot,
+        string requestPayloadJson)
+    {
+        var payloadJson = GetTreeSnapshotPayloadJson(snapshot, requestPayloadJson);
+        RecordSnapshotPayloadBytesIfEnabled(requestMessage.Method, snapshot.Scope, payloadJson);
+        return BuildSuccessResponse(requestMessage, payloadJson);
+    }
+
+    private static void RecordSnapshotPayloadBytesIfEnabled(
+        string method,
+        string scope,
+        string payloadJson)
+    {
         if (RemoteRuntimeMetrics.IsSnapshotPayloadMetricsEnabled)
         {
-            var domain = RemoteRuntimeMetrics.ResolveDomainFromMethod(requestMessage.Method);
-            var scope = ResolveScope(payload);
+            var domain = RemoteRuntimeMetrics.ResolveDomainFromMethod(method);
             RemoteRuntimeMetrics.RecordSnapshotPayloadBytes(
                 domain: domain,
                 scope: scope,
                 bytes: RemoteRuntimeMetrics.GetUtf8ByteCount(payloadJson),
                 cache: "bypass");
         }
+    }
 
+    private static RemoteResponseMessage BuildSuccessResponse(
+        RemoteRequestMessage requestMessage,
+        string payloadJson)
+    {
         return new RemoteResponseMessage(
             SessionId: requestMessage.SessionId,
             RequestId: requestMessage.RequestId,
