@@ -78,7 +78,14 @@ jobs:
         run: dotnet build -c Release --no-restore -p:VersionSuffix="${{ needs.build.outputs.version-suffix }}"
 
       - name: Test
-        run: dotnet test -c Release --no-build --logger trx --results-directory artifacts/test --filter FullyQualifiedName!~LeakTests
+        timeout-minutes: 30
+        shell: bash
+        run: |
+          TEST_ARGS=(-c Release --no-build --logger trx --results-directory artifacts/test --filter FullyQualifiedName!~LeakTests)
+          if [[ "${{ matrix.os }}" == "windows-latest" ]]; then
+            TEST_ARGS=(-m:1 --blame-hang --blame-hang-timeout 15m --blame-hang-dump-type none "${TEST_ARGS[@]}")
+          fi
+          dotnet test "${TEST_ARGS[@]}"
 
       - name: Upload test results
         uses: actions/upload-artifact@v4
