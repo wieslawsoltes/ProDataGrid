@@ -89,12 +89,30 @@ public class NamedPipeAttachServerTests
         {
             if (firstConnection is not null)
             {
-                await firstConnection.DisposeAsync();
+                try
+                {
+                    await firstConnection.DisposeAsync()
+                        .AsTask()
+                        .WaitAsync(TimeSpan.FromSeconds(3));
+                }
+                catch
+                {
+                    // Ignore cleanup errors in test teardown.
+                }
             }
 
             if (secondConnection is not null)
             {
-                await secondConnection.DisposeAsync();
+                try
+                {
+                    await secondConnection.DisposeAsync()
+                        .AsTask()
+                        .WaitAsync(TimeSpan.FromSeconds(3));
+                }
+                catch
+                {
+                    // Ignore cleanup errors in test teardown.
+                }
             }
         }
     }
@@ -158,7 +176,7 @@ public class NamedPipeAttachServerTests
             foreach (var connection in acceptedConnections)
             {
                 using var receiveCts = new CancellationTokenSource(TimeSpan.FromSeconds(5));
-                var received = await connection.ReceiveAsync(receiveCts.Token);
+                var received = await ReceiveAttachMessageAsync(connection, receiveCts.Token, TimeSpan.FromSeconds(6));
                 Assert.NotNull(received);
                 var request = Assert.IsType<RemoteRequestMessage>(received.Value.Message);
                 receivedRequestIds.Add(request.RequestId);
@@ -193,7 +211,9 @@ public class NamedPipeAttachServerTests
                 {
                     if (connection.IsOpen)
                     {
-                        await connection.CloseAsync("done", CancellationToken.None);
+                        await connection.CloseAsync("done", CancellationToken.None)
+                            .AsTask()
+                            .WaitAsync(TimeSpan.FromSeconds(3));
                     }
                 }
                 catch
@@ -201,12 +221,30 @@ public class NamedPipeAttachServerTests
                     // Ignore cleanup errors in test teardown.
                 }
 
-                await connection.DisposeAsync();
+                try
+                {
+                    await connection.DisposeAsync()
+                        .AsTask()
+                        .WaitAsync(TimeSpan.FromSeconds(3));
+                }
+                catch
+                {
+                    // Ignore cleanup errors in test teardown.
+                }
             }
 
             foreach (var client in clients)
             {
-                await client.DisposeAsync();
+                try
+                {
+                    await client.DisposeAsync()
+                        .AsTask()
+                        .WaitAsync(TimeSpan.FromSeconds(3));
+                }
+                catch
+                {
+                    // Ignore cleanup errors in test teardown.
+                }
             }
         }
     }
@@ -240,7 +278,16 @@ public class NamedPipeAttachServerTests
         }
         finally
         {
-            await acceptedConnection.DisposeAsync();
+            try
+            {
+                await acceptedConnection.DisposeAsync()
+                    .AsTask()
+                    .WaitAsync(TimeSpan.FromSeconds(3));
+            }
+            catch
+            {
+                // Ignore cleanup errors in test teardown.
+            }
         }
     }
 
@@ -391,5 +438,34 @@ public class NamedPipeAttachServerTests
         }
 
         return true;
+    }
+
+    private static async Task<AttachReceiveResult?> ReceiveAttachMessageAsync(
+        IAttachConnection connection,
+        CancellationToken cancellationToken,
+        TimeSpan hardTimeout)
+    {
+        var receiveTask = connection.ReceiveAsync(cancellationToken).AsTask();
+        try
+        {
+            return await receiveTask.WaitAsync(hardTimeout);
+        }
+        catch (TimeoutException ex)
+        {
+            try
+            {
+                await connection.CloseAsync("test-timeout", CancellationToken.None)
+                    .AsTask()
+                    .WaitAsync(TimeSpan.FromSeconds(2));
+            }
+            catch
+            {
+                // Ignore cleanup errors while surfacing timeout.
+            }
+
+            throw new TimeoutException(
+                "Timed out waiting for named-pipe attach message within " + hardTimeout + ".",
+                ex);
+        }
     }
 }
