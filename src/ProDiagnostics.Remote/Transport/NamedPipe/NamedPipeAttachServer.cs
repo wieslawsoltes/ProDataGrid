@@ -16,6 +16,7 @@ public sealed class NamedPipeAttachServer : IAttachServer
 {
     private const string TransportName = "namedpipe";
     private const string LogCategory = "remote.attach.namedpipe.server";
+    private static readonly TimeSpan ShutdownWaitTimeout = TimeSpan.FromSeconds(5);
 
     private readonly NamedPipeAttachServerOptions _namedPipeOptions;
     private readonly IRemoteAccessPolicy _accessPolicy;
@@ -127,20 +128,24 @@ public sealed class NamedPipeAttachServer : IAttachServer
         }
 
         lifecycleCts?.Cancel();
+        await TryWakeAcceptLoopAsync().ConfigureAwait(false);
 
         if (acceptLoop is not null)
         {
-            await ObserveTaskAsync(acceptLoop).ConfigureAwait(false);
+            await ObserveShutdownTaskAsync(acceptLoop, "accept-loop").ConfigureAwait(false);
         }
 
         if (heartbeatLoop is not null)
         {
-            await ObserveTaskAsync(heartbeatLoop).ConfigureAwait(false);
+            await ObserveShutdownTaskAsync(heartbeatLoop, "heartbeat-loop").ConfigureAwait(false);
         }
 
         if (clientTasks.Count > 0)
         {
-            await Task.WhenAll(clientTasks.Select(ObserveTaskAsync)).ConfigureAwait(false);
+            foreach (var clientTask in clientTasks)
+            {
+                await ObserveShutdownTaskAsync(clientTask, "connection-loop").ConfigureAwait(false);
+            }
         }
 
         foreach (var connection in connections)
@@ -458,6 +463,44 @@ public sealed class NamedPipeAttachServer : IAttachServer
         catch
         {
             // no-op during shutdown
+        }
+    }
+
+    private async Task ObserveShutdownTaskAsync(Task task, string taskName)
+    {
+        var completedTask = await Task.WhenAny(task, Task.Delay(ShutdownWaitTimeout)).ConfigureAwait(false);
+        if (!ReferenceEquals(completedTask, task))
+        {
+            Log(
+                RemoteDiagnosticsLogLevel.Warning,
+                "shutdown-timeout",
+                Guid.Empty,
+                "pipe:" + _namedPipeOptions.PipeName,
+                null,
+                0,
+                taskName + " did not complete within " + ShutdownWaitTimeout + ".",
+                null);
+            return;
+        }
+
+        await ObserveTaskAsync(task).ConfigureAwait(false);
+    }
+
+    private async Task TryWakeAcceptLoopAsync()
+    {
+        try
+        {
+            using var client = new NamedPipeClientStream(
+                ".",
+                _namedPipeOptions.PipeName,
+                PipeDirection.InOut,
+                PipeOptions.Asynchronous);
+            using var cts = new CancellationTokenSource(TimeSpan.FromMilliseconds(500));
+            await client.ConnectAsync(cts.Token).ConfigureAwait(false);
+        }
+        catch
+        {
+            // Best-effort wake-up only.
         }
     }
 
