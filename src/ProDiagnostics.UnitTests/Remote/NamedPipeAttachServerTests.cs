@@ -10,6 +10,7 @@ using Xunit;
 
 namespace Avalonia.Diagnostics.UnitTests.Remote;
 
+[Collection("RemoteAttachServers")]
 public class NamedPipeAttachServerTests
 {
     [Fact]

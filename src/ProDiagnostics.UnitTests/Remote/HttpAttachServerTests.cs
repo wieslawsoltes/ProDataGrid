@@ -14,6 +14,7 @@ using Xunit;
 
 namespace Avalonia.Diagnostics.UnitTests.Remote;
 
+[Collection("RemoteAttachServers")]
 public class HttpAttachServerTests
 {
     [Fact]
@@ -23,25 +24,42 @@ public class HttpAttachServerTests
         await using var server = new HttpAttachServer(options);
         await server.StartAsync();
 
-        var firstAccepted = AwaitAcceptedConnection(server);
         using var firstClient = new ClientWebSocket();
-        await ConnectClientAsync(server, firstClient, options.BuildClientWebSocketUri());
-        var firstConnection = await firstAccepted;
-        Assert.True(firstConnection.IsOpen);
-
-        await firstConnection.CloseAsync("test-close", CancellationToken.None);
-
-        var closeResult = await ReceiveWebSocketMessageAsync(firstClient, TimeSpan.FromSeconds(3));
-        Assert.True(closeResult.IsCloseFrame);
-
-        var secondAccepted = AwaitAcceptedConnection(server);
         using var secondClient = new ClientWebSocket();
-        await ConnectClientAsync(server, secondClient, options.BuildClientWebSocketUri());
-        var secondConnection = await secondAccepted;
-        Assert.True(secondConnection.IsOpen);
-        Assert.NotEqual(firstConnection.ConnectionId, secondConnection.ConnectionId);
+        IAttachConnection? firstConnection = null;
+        IAttachConnection? secondConnection = null;
+        try
+        {
+            var firstAccepted = AwaitAcceptedConnection(server);
+            await ConnectClientAsync(server, firstClient, options.BuildClientWebSocketUri());
+            firstConnection = await firstAccepted;
+            Assert.True(firstConnection.IsOpen);
 
-        await secondConnection.CloseAsync("done", CancellationToken.None);
+            await firstConnection.CloseAsync("test-close", CancellationToken.None);
+
+            var closeResult = await ReceiveWebSocketMessageAsync(firstClient, TimeSpan.FromSeconds(3));
+            Assert.True(closeResult.IsCloseFrame);
+
+            var secondAccepted = AwaitAcceptedConnection(server);
+            await ConnectClientAsync(server, secondClient, options.BuildClientWebSocketUri());
+            secondConnection = await secondAccepted;
+            Assert.True(secondConnection.IsOpen);
+            Assert.NotEqual(firstConnection.ConnectionId, secondConnection.ConnectionId);
+
+            await secondConnection.CloseAsync("done", CancellationToken.None);
+        }
+        finally
+        {
+            if (firstConnection is not null)
+            {
+                await firstConnection.DisposeAsync();
+            }
+
+            if (secondConnection is not null)
+            {
+                await secondConnection.DisposeAsync();
+            }
+        }
     }
 
     [Fact]
@@ -69,67 +87,85 @@ public class HttpAttachServerTests
         };
 
         var clients = new List<ClientWebSocket>();
-        for (var i = 0; i < clientCount; i++)
+        try
         {
-            var client = new ClientWebSocket();
-            clients.Add(client);
-            await ConnectClientAsync(server, client, options.BuildClientWebSocketUri());
+            for (var i = 0; i < clientCount; i++)
+            {
+                var client = new ClientWebSocket();
+                clients.Add(client);
+                await ConnectClientAsync(server, client, options.BuildClientWebSocketUri());
+            }
+
+            await acceptedSignal.Task.WaitAsync(TimeSpan.FromSeconds(5));
+            Assert.Equal(clientCount, acceptedConnections.Count);
+
+            var expectedRequestIds = new HashSet<long>();
+            for (var i = 0; i < clients.Count; i++)
+            {
+                var requestId = 1000 + i;
+                expectedRequestIds.Add(requestId);
+                var request = new RemoteRequestMessage(
+                    SessionId: Guid.NewGuid(),
+                    RequestId: requestId,
+                    Method: "tree.snapshot.get",
+                    PayloadJson: "{\"scope\":\"combined\"}");
+                await SendWebSocketMessageAsync(clients[i], request, CancellationToken.None);
+            }
+
+            var receivedRequestIds = new HashSet<long>();
+            foreach (var connection in acceptedConnections)
+            {
+                using var receiveCts = new CancellationTokenSource(TimeSpan.FromSeconds(5));
+                var received = await connection.ReceiveAsync(receiveCts.Token);
+                Assert.NotNull(received);
+                var request = Assert.IsType<RemoteRequestMessage>(received.Value.Message);
+                receivedRequestIds.Add(request.RequestId);
+
+                var response = new RemoteResponseMessage(
+                    SessionId: request.SessionId,
+                    RequestId: request.RequestId,
+                    IsSuccess: true,
+                    PayloadJson: "{\"ok\":true}",
+                    ErrorCode: string.Empty,
+                    ErrorMessage: string.Empty);
+                await connection.SendAsync(response, CancellationToken.None);
+            }
+
+            Assert.Equal(expectedRequestIds, receivedRequestIds);
+
+            var responseIds = new HashSet<long>();
+            foreach (var client in clients)
+            {
+                var responseMessage = await ReceiveWebSocketMessageAsync(client, TimeSpan.FromSeconds(3));
+                var response = Assert.IsType<RemoteResponseMessage>(responseMessage.Message);
+                responseIds.Add(response.RequestId);
+            }
+
+            Assert.Equal(expectedRequestIds, responseIds);
         }
-
-        await acceptedSignal.Task.WaitAsync(TimeSpan.FromSeconds(5));
-        Assert.Equal(clientCount, acceptedConnections.Count);
-
-        var expectedRequestIds = new HashSet<long>();
-        for (var i = 0; i < clients.Count; i++)
+        finally
         {
-            var requestId = 1000 + i;
-            expectedRequestIds.Add(requestId);
-            var request = new RemoteRequestMessage(
-                SessionId: Guid.NewGuid(),
-                RequestId: requestId,
-                Method: "tree.snapshot.get",
-                PayloadJson: "{\"scope\":\"combined\"}");
-            await SendWebSocketMessageAsync(clients[i], request, CancellationToken.None);
-        }
+            foreach (var connection in acceptedConnections)
+            {
+                try
+                {
+                    if (connection.IsOpen)
+                    {
+                        await connection.CloseAsync("done", CancellationToken.None);
+                    }
+                }
+                catch
+                {
+                    // Ignore cleanup errors in test teardown.
+                }
 
-        var receivedRequestIds = new HashSet<long>();
-        foreach (var connection in acceptedConnections)
-        {
-            var received = await connection.ReceiveAsync(CancellationToken.None);
-            var request = Assert.IsType<RemoteRequestMessage>(received!.Value.Message);
-            receivedRequestIds.Add(request.RequestId);
+                await connection.DisposeAsync();
+            }
 
-            var response = new RemoteResponseMessage(
-                SessionId: request.SessionId,
-                RequestId: request.RequestId,
-                IsSuccess: true,
-                PayloadJson: "{\"ok\":true}",
-                ErrorCode: string.Empty,
-                ErrorMessage: string.Empty);
-            await connection.SendAsync(response, CancellationToken.None);
-        }
-
-        Assert.Equal(expectedRequestIds, receivedRequestIds);
-
-        var responseIds = new HashSet<long>();
-        foreach (var client in clients)
-        {
-            var responseMessage = await ReceiveWebSocketMessageAsync(client, TimeSpan.FromSeconds(3));
-            var response = Assert.IsType<RemoteResponseMessage>(responseMessage.Message);
-            responseIds.Add(response.RequestId);
-        }
-
-        Assert.Equal(expectedRequestIds, responseIds);
-
-        foreach (var connection in acceptedConnections)
-        {
-            await connection.CloseAsync("done", CancellationToken.None);
-            await connection.DisposeAsync();
-        }
-
-        foreach (var client in clients)
-        {
-            client.Dispose();
+            foreach (var client in clients)
+            {
+                client.Dispose();
+            }
         }
     }
 
@@ -145,13 +181,21 @@ public class HttpAttachServerTests
         await ConnectClientAsync(server, client, options.BuildClientWebSocketUri());
         var acceptedConnection = await acceptedConnectionTask;
 
-        var heartbeat = await ReceiveWebSocketMessageAsync(client, TimeSpan.FromSeconds(3));
-        Assert.IsType<RemoteKeepAliveMessage>(heartbeat.Message);
+        try
+        {
+            var heartbeat = await ReceiveWebSocketMessageAsync(client, TimeSpan.FromSeconds(3));
+            Assert.IsType<RemoteKeepAliveMessage>(heartbeat.Message);
 
-        // Do not send client data; server-side receive should timeout and close the connection.
-        var timedOutReceive = await acceptedConnection.ReceiveAsync(CancellationToken.None);
-        Assert.Null(timedOutReceive);
-        Assert.False(acceptedConnection.IsOpen);
+            // Do not send client data; server-side receive should timeout and close the connection.
+            using var receiveCts = new CancellationTokenSource(TimeSpan.FromSeconds(5));
+            var timedOutReceive = await acceptedConnection.ReceiveAsync(receiveCts.Token);
+            Assert.Null(timedOutReceive);
+            Assert.False(acceptedConnection.IsOpen);
+        }
+        finally
+        {
+            await acceptedConnection.DisposeAsync();
+        }
     }
 
     [Fact]
@@ -208,9 +252,15 @@ public class HttpAttachServerTests
         await ConnectClientAsync(server, client, options.BuildClientWebSocketUri());
 
         var connection = await accepted;
-        Assert.True(connection.IsOpen);
-
-        await connection.CloseAsync("done", CancellationToken.None);
+        try
+        {
+            Assert.True(connection.IsOpen);
+            await connection.CloseAsync("done", CancellationToken.None);
+        }
+        finally
+        {
+            await connection.DisposeAsync();
+        }
     }
 
     [Fact]
@@ -238,7 +288,8 @@ public class HttpAttachServerTests
             PayloadJson: "{\"scope\":\"combined\"}");
         await SendWebSocketMessageAsync(client, request, CancellationToken.None);
 
-        var received = await connection.ReceiveAsync(CancellationToken.None);
+        using var receiveCts = new CancellationTokenSource(TimeSpan.FromSeconds(5));
+        var received = await connection.ReceiveAsync(receiveCts.Token);
         Assert.NotNull(received);
         var requestFromClient = Assert.IsType<RemoteRequestMessage>(received.Value.Message);
         Assert.Equal(request.RequestId, requestFromClient.RequestId);
@@ -256,6 +307,7 @@ public class HttpAttachServerTests
         Assert.IsType<RemoteResponseMessage>(responseFromServer.Message);
 
         await connection.CloseAsync("done", CancellationToken.None);
+        await connection.DisposeAsync();
         await Task.Delay(100);
 
         var snapshot = monitor.GetSnapshot();
