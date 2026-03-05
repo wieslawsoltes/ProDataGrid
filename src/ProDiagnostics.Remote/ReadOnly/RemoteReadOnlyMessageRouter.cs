@@ -232,13 +232,16 @@ public sealed class RemoteReadOnlyMessageRouter : IRemoteMessageRouter
         JsonTypeInfo<TPayload> typeInfo)
     {
         var payloadJson = JsonSerializer.Serialize(payload, typeInfo);
-        var domain = RemoteRuntimeMetrics.ResolveDomainFromMethod(requestMessage.Method);
-        var scope = ResolveScope(payload);
-        RemoteRuntimeMetrics.RecordSnapshotPayloadBytes(
-            domain: domain,
-            scope: scope,
-            bytes: RemoteRuntimeMetrics.GetUtf8ByteCount(payloadJson),
-            cache: "bypass");
+        if (RemoteRuntimeMetrics.IsSnapshotPayloadMetricsEnabled)
+        {
+            var domain = RemoteRuntimeMetrics.ResolveDomainFromMethod(requestMessage.Method);
+            var scope = ResolveScope(payload);
+            RemoteRuntimeMetrics.RecordSnapshotPayloadBytes(
+                domain: domain,
+                scope: scope,
+                bytes: RemoteRuntimeMetrics.GetUtf8ByteCount(payloadJson),
+                cache: "bypass");
+        }
 
         return new RemoteResponseMessage(
             SessionId: requestMessage.SessionId,

@@ -160,6 +160,8 @@ public static class RemoteRuntimeMetrics
 
     public static string RuntimeMeterName => MeterName;
 
+    public static bool IsSnapshotPayloadMetricsEnabled => s_snapshotPayloadBytes.Enabled;
+
     public static string ResolveDomainFromMethod(string? method)
     {
         if (string.IsNullOrWhiteSpace(method))
@@ -338,6 +340,11 @@ public static class RemoteRuntimeMetrics
         long bytes,
         string cache)
     {
+        if (!s_snapshotPayloadBytes.Enabled || bytes < 0)
+        {
+            return;
+        }
+
         var tags = BuildCommonTags(
             transport: "inproc",
             method: "none",
