@@ -60,24 +60,42 @@ public class NamedPipeAttachServerTests
         await using var server = new NamedPipeAttachServer(options);
         await server.StartAsync();
 
-        var firstAccepted = AwaitAcceptedConnection(server);
         await using var firstClient = CreateClient(options.PipeName);
-        await ConnectClientAsync(firstClient);
-        var firstConnection = await firstAccepted;
-        Assert.True(firstConnection.IsOpen);
-
-        await firstConnection.CloseAsync("test-close", CancellationToken.None);
-        var closeResult = await ReceivePipeMessageAsync(firstClient, TimeSpan.FromSeconds(3));
-        Assert.True(closeResult.IsClosed);
-
-        var secondAccepted = AwaitAcceptedConnection(server);
         await using var secondClient = CreateClient(options.PipeName);
-        await ConnectClientAsync(secondClient);
-        var secondConnection = await secondAccepted;
-        Assert.True(secondConnection.IsOpen);
-        Assert.NotEqual(firstConnection.ConnectionId, secondConnection.ConnectionId);
+        IAttachConnection? firstConnection = null;
+        IAttachConnection? secondConnection = null;
 
-        await secondConnection.CloseAsync("done", CancellationToken.None);
+        try
+        {
+            var firstAccepted = AwaitAcceptedConnection(server);
+            await ConnectClientAsync(firstClient);
+            firstConnection = await firstAccepted;
+            Assert.True(firstConnection.IsOpen);
+
+            await firstConnection.CloseAsync("test-close", CancellationToken.None);
+            var closeResult = await ReceivePipeMessageAsync(firstClient, TimeSpan.FromSeconds(3));
+            Assert.True(closeResult.IsClosed);
+
+            var secondAccepted = AwaitAcceptedConnection(server);
+            await ConnectClientAsync(secondClient);
+            secondConnection = await secondAccepted;
+            Assert.True(secondConnection.IsOpen);
+            Assert.NotEqual(firstConnection.ConnectionId, secondConnection.ConnectionId);
+
+            await secondConnection.CloseAsync("done", CancellationToken.None);
+        }
+        finally
+        {
+            if (firstConnection is not null)
+            {
+                await firstConnection.DisposeAsync();
+            }
+
+            if (secondConnection is not null)
+            {
+                await secondConnection.DisposeAsync();
+            }
+        }
     }
 
     [Fact]
@@ -110,67 +128,85 @@ public class NamedPipeAttachServerTests
         };
 
         var clients = new List<NamedPipeClientStream>();
-        for (var i = 0; i < clientCount; i++)
+        try
         {
-            var client = CreateClient(options.PipeName);
-            clients.Add(client);
-            await ConnectClientAsync(client);
+            for (var i = 0; i < clientCount; i++)
+            {
+                var client = CreateClient(options.PipeName);
+                clients.Add(client);
+                await ConnectClientAsync(client);
+            }
+
+            await acceptedSignal.Task.WaitAsync(TimeSpan.FromSeconds(5));
+            Assert.Equal(clientCount, acceptedConnections.Count);
+
+            var expectedRequestIds = new HashSet<long>();
+            for (var i = 0; i < clients.Count; i++)
+            {
+                var requestId = 1000 + i;
+                expectedRequestIds.Add(requestId);
+                var request = new RemoteRequestMessage(
+                    SessionId: Guid.NewGuid(),
+                    RequestId: requestId,
+                    Method: "tree.snapshot.get",
+                    PayloadJson: "{\"scope\":\"combined\"}");
+                await SendPipeMessageAsync(clients[i], request, CancellationToken.None);
+            }
+
+            var receivedRequestIds = new HashSet<long>();
+            foreach (var connection in acceptedConnections)
+            {
+                using var receiveCts = new CancellationTokenSource(TimeSpan.FromSeconds(5));
+                var received = await connection.ReceiveAsync(receiveCts.Token);
+                Assert.NotNull(received);
+                var request = Assert.IsType<RemoteRequestMessage>(received.Value.Message);
+                receivedRequestIds.Add(request.RequestId);
+
+                var response = new RemoteResponseMessage(
+                    SessionId: request.SessionId,
+                    RequestId: request.RequestId,
+                    IsSuccess: true,
+                    PayloadJson: "{\"ok\":true}",
+                    ErrorCode: string.Empty,
+                    ErrorMessage: string.Empty);
+                await connection.SendAsync(response, CancellationToken.None);
+            }
+
+            Assert.Equal(expectedRequestIds, receivedRequestIds);
+
+            var responseIds = new HashSet<long>();
+            foreach (var client in clients)
+            {
+                var responseMessage = await ReceivePipeMessageAsync(client, TimeSpan.FromSeconds(3));
+                var response = Assert.IsType<RemoteResponseMessage>(responseMessage.Message);
+                responseIds.Add(response.RequestId);
+            }
+
+            Assert.Equal(expectedRequestIds, responseIds);
         }
-
-        await acceptedSignal.Task.WaitAsync(TimeSpan.FromSeconds(5));
-        Assert.Equal(clientCount, acceptedConnections.Count);
-
-        var expectedRequestIds = new HashSet<long>();
-        for (var i = 0; i < clients.Count; i++)
+        finally
         {
-            var requestId = 1000 + i;
-            expectedRequestIds.Add(requestId);
-            var request = new RemoteRequestMessage(
-                SessionId: Guid.NewGuid(),
-                RequestId: requestId,
-                Method: "tree.snapshot.get",
-                PayloadJson: "{\"scope\":\"combined\"}");
-            await SendPipeMessageAsync(clients[i], request, CancellationToken.None);
-        }
+            foreach (var connection in acceptedConnections)
+            {
+                try
+                {
+                    if (connection.IsOpen)
+                    {
+                        await connection.CloseAsync("done", CancellationToken.None);
+                    }
+                }
+                catch
+                {
+                    // Ignore cleanup errors in test teardown.
+                }
 
-        var receivedRequestIds = new HashSet<long>();
-        foreach (var connection in acceptedConnections)
-        {
-            var received = await connection.ReceiveAsync(CancellationToken.None);
-            var request = Assert.IsType<RemoteRequestMessage>(received!.Value.Message);
-            receivedRequestIds.Add(request.RequestId);
+                await connection.DisposeAsync();
+            }
 
-            var response = new RemoteResponseMessage(
-                SessionId: request.SessionId,
-                RequestId: request.RequestId,
-                IsSuccess: true,
-                PayloadJson: "{\"ok\":true}",
-                ErrorCode: string.Empty,
-                ErrorMessage: string.Empty);
-            await connection.SendAsync(response, CancellationToken.None);
-        }
-
-        Assert.Equal(expectedRequestIds, receivedRequestIds);
-
-        var responseIds = new HashSet<long>();
-        foreach (var client in clients)
-        {
-            var responseMessage = await ReceivePipeMessageAsync(client, TimeSpan.FromSeconds(3));
-            var response = Assert.IsType<RemoteResponseMessage>(responseMessage.Message);
-            responseIds.Add(response.RequestId);
-        }
-
-        Assert.Equal(expectedRequestIds, responseIds);
-
-        foreach (var connection in acceptedConnections)
-        {
-            await connection.CloseAsync("done", CancellationToken.None);
-            await connection.DisposeAsync();
-        }
-
-        foreach (var client in clients)
-        {
-            await client.DisposeAsync();
+            foreach (var client in clients)
+            {
+                await client.DisposeAsync();
+            }
         }
     }
 
@@ -191,12 +227,20 @@ public class NamedPipeAttachServerTests
         await ConnectClientAsync(client);
         var acceptedConnection = await acceptedConnectionTask;
 
-        var heartbeat = await ReceivePipeMessageAsync(client, TimeSpan.FromSeconds(3));
-        Assert.IsType<RemoteKeepAliveMessage>(heartbeat.Message);
+        try
+        {
+            var heartbeat = await ReceivePipeMessageAsync(client, TimeSpan.FromSeconds(3));
+            Assert.IsType<RemoteKeepAliveMessage>(heartbeat.Message);
 
-        var timedOutReceive = await acceptedConnection.ReceiveAsync(CancellationToken.None);
-        Assert.Null(timedOutReceive);
-        Assert.False(acceptedConnection.IsOpen);
+            using var receiveCts = new CancellationTokenSource(TimeSpan.FromSeconds(5));
+            var timedOutReceive = await acceptedConnection.ReceiveAsync(receiveCts.Token);
+            Assert.Null(timedOutReceive);
+            Assert.False(acceptedConnection.IsOpen);
+        }
+        finally
+        {
+            await acceptedConnection.DisposeAsync();
+        }
     }
 
     [Fact]
