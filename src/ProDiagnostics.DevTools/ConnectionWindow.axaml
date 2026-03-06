@@ -1,0 +1,54 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:diag="using:Avalonia.Diagnostics"
+        x:Class="ProDiagnostics.DevTools.ConnectionWindow"
+        Title="ProDiagnostics Remote Connection"
+        Width="620"
+        Height="360"
+        CanResize="False"
+        WindowStartupLocation="CenterScreen">
+  <Grid RowDefinitions="Auto,Auto,Auto,Auto,Auto,*"
+        ColumnDefinitions="Auto,*"
+        Margin="20"
+        ColumnSpacing="12"
+        RowSpacing="10">
+
+    <TextBlock Grid.Row="0" Grid.ColumnSpan="2"
+               Text="Connect standalone ProDiagnostics to a remote runtime endpoint."
+               TextWrapping="Wrap"
+               FontWeight="SemiBold" />
+
+    <TextBlock Grid.Row="1" Grid.Column="0" VerticalAlignment="Center" Text="Endpoint" />
+    <TextBox Grid.Row="1" Grid.Column="1"
+             x:Name="EndpointTextBox"
+             Watermark="ws://127.0.0.1:29414/attach/" />
+
+    <TextBlock Grid.Row="2" Grid.Column="0" VerticalAlignment="Center" Text="App name" />
+    <TextBox Grid.Row="2" Grid.Column="1"
+             x:Name="ApplicationNameTextBox"
+             Watermark="Optional" />
+
+    <TextBlock Grid.Row="3" Grid.Column="0" VerticalAlignment="Center" Text="Launch view" />
+    <ComboBox Grid.Row="3" Grid.Column="1"
+              x:Name="LaunchViewComboBox"
+              HorizontalAlignment="Stretch"
+              MinWidth="220" />
+
+    <TextBlock Grid.Row="4" Grid.Column="0" VerticalAlignment="Center" Text="Window size" />
+    <StackPanel Grid.Row="4" Grid.Column="1" Orientation="Horizontal" Spacing="8">
+      <TextBox x:Name="WidthTextBox" Width="110" Watermark="Width" />
+      <TextBlock VerticalAlignment="Center" Text="x" />
+      <TextBox x:Name="HeightTextBox" Width="110" Watermark="Height" />
+    </StackPanel>
+
+    <StackPanel Grid.Row="5" Grid.ColumnSpan="2" Spacing="10" VerticalAlignment="Bottom">
+      <TextBlock x:Name="StatusTextBlock"
+                 TextWrapping="Wrap"
+                 MinHeight="24" />
+      <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Spacing="8">
+        <Button x:Name="CancelButton" Content="Close" Click="CancelButton_OnClick" MinWidth="96" />
+        <Button x:Name="ConnectButton" Content="Connect" Click="ConnectButton_OnClick" MinWidth="120" />
+      </StackPanel>
+    </StackPanel>
+  </Grid>
+</Window>

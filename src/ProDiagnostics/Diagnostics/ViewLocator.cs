@@ -1,4 +1,5 @@
 using System;
+using System.Diagnostics;
 using Avalonia.Controls;
 using Avalonia.Controls.Templates;
 using Avalonia.Diagnostics.ViewModels;
@@ -7,6 +8,11 @@ namespace Avalonia.Diagnostics
 {
     internal class ViewLocator : IDataTemplate
     {
+        private static readonly bool TraceEnabled = string.Equals(
+            Environment.GetEnvironmentVariable("PRODIAG_TRACE"),
+            "1",
+            StringComparison.Ordinal);
+
         public Control? Build(object? data)
         {
             if (data is null)
@@ -18,10 +24,14 @@ namespace Avalonia.Diagnostics
 
             if (type is not null && typeof(Control).IsAssignableFrom(type))
             {
+                if (TraceEnabled)
+                    Console.WriteLine($"[ViewLocator] {viewModelType.Name} -> {type.Name}");
                 return (Control)Activator.CreateInstance(type)!;
             }
             else
             {
+                if (TraceEnabled)
+                    Console.WriteLine($"[ViewLocator] {viewModelType.Name} -> fallback {name}");
                 return new TextBlock { Text = name };
             }
         }

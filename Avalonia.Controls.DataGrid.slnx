@@ -44,5 +44,6 @@
         <Project Path="tools/api-compare/api-compare.csproj" />
         <Project Path="tools/CoverageReporter/CoverageReporter.csproj" />
         <Project Path="src/ProDiagnostics.Viewer/ProDiagnostics.Viewer.csproj" />
+        <Project Path="src/ProDiagnostics.DevTools/ProDiagnostics.DevTools.csproj" />
     </Folder>
 </Solution>

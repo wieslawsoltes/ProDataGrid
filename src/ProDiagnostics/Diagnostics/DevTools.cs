@@ -206,6 +206,7 @@ namespace Avalonia.Diagnostics
         {
             var launchOptions = source.Clone();
             launchOptions.UseRemoteRuntime = useRemoteRuntime;
+            launchOptions.ConnectOnStartup = true;
             return launchOptions;
         }
 
@@ -213,8 +214,13 @@ namespace Avalonia.Diagnostics
         {
             var topLevel = TopLevel.GetTopLevel(v);
 
-            while (topLevel is not null && topLevel is not Views.MainWindow)
+            while (topLevel is not null)
             {
+                if (topLevel is Views.MainWindow or IDevToolsHostSurface)
+                {
+                    return true;
+                }
+
                 if (topLevel is Avalonia.Controls.Primitives.PopupRoot pr)
                 {
                     topLevel = pr.ParentTopLevel;
@@ -224,7 +230,8 @@ namespace Avalonia.Diagnostics
                     return false;
                 }
             }
-            return true;
+
+            return false;
         }
     }
 }

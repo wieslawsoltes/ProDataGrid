@@ -5,20 +5,31 @@ namespace Avalonia.Diagnostics.ViewModels
 {
     internal class PseudoClassViewModel : ViewModelBase
     {
-        private readonly IPseudoClasses _pseudoClasses;
-        private readonly StyledElement _source;
+        private readonly IPseudoClasses? _pseudoClasses;
+        private readonly StyledElement? _source;
         private readonly Action<string, bool>? _setStateOverride;
         private bool _isActive;
         private bool _isUpdating;
 
-        public PseudoClassViewModel(string name, StyledElement source, Action<string, bool>? setStateOverride = null)
+        public PseudoClassViewModel(
+            string name,
+            StyledElement? source,
+            Action<string, bool>? setStateOverride = null,
+            bool initialState = false)
         {
             Name = name;
             _source = source;
-            _pseudoClasses = _source.Classes;
+            _pseudoClasses = _source?.Classes;
             _setStateOverride = setStateOverride;
 
-            Update();
+            if (_source is null)
+            {
+                _isActive = initialState;
+            }
+            else
+            {
+                Update();
+            }
         }
 
         public string Name { get; }
@@ -28,24 +39,38 @@ namespace Avalonia.Diagnostics.ViewModels
             get => _isActive;
             set
             {
-                RaiseAndSetIfChanged(ref _isActive, value);
+                var changed = RaiseAndSetIfChanged(ref _isActive, value);
 
-                if (!_isUpdating)
+                if (_isUpdating || !changed)
+                {
+                    return;
+                }
+
+                try
                 {
                     if (_setStateOverride is null)
                     {
-                        _pseudoClasses.Set(Name, value);
+                        _pseudoClasses?.Set(Name, value);
                     }
                     else
                     {
                         _setStateOverride(Name, value);
                     }
                 }
+                catch
+                {
+                    Update();
+                }
             }
         }
 
         public void Update()
         {
+            if (_source is null || _pseudoClasses is null)
+            {
+                return;
+            }
+
             try
             {
                 _isUpdating = true;

@@ -15,6 +15,10 @@ namespace Avalonia.Diagnostics.Remote;
 /// </summary>
 public sealed class RemoteDiagnosticsClient : IRemoteDiagnosticsClient
 {
+    private static readonly bool TraceEnabled = string.Equals(
+        Environment.GetEnvironmentVariable("PRODIAG_TRACE"),
+        "1",
+        StringComparison.Ordinal);
     private readonly object _stateGate = new();
     private readonly SemaphoreSlim _lifecycleGate = new(1, 1);
     private readonly SemaphoreSlim _sendGate = new(1, 1);
@@ -126,6 +130,10 @@ public sealed class RemoteDiagnosticsClient : IRemoteDiagnosticsClient
         await _lifecycleGate.WaitAsync(cancellationToken).ConfigureAwait(false);
         try
         {
+            if (TraceEnabled)
+            {
+                Console.WriteLine($"[RemoteClient] connect start endpoint={endpoint}");
+            }
             if (_socket is not null)
             {
                 await DisconnectCoreAsync("Reconnect", cancellationToken).ConfigureAwait(false);
@@ -136,6 +144,10 @@ public sealed class RemoteDiagnosticsClient : IRemoteDiagnosticsClient
             using var connectCts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
             connectCts.CancelAfter(normalizedOptions.ConnectTimeout);
             await socket.ConnectAsync(endpoint, connectCts.Token).ConfigureAwait(false);
+            if (TraceEnabled)
+            {
+                Console.WriteLine($"[RemoteClient] websocket connected endpoint={endpoint}");
+            }
 
             var sessionId = Guid.NewGuid();
             var connectionCts = new CancellationTokenSource();
@@ -180,6 +192,10 @@ public sealed class RemoteDiagnosticsClient : IRemoteDiagnosticsClient
                     normalizedOptions.ConnectTimeout,
                     cancellationToken)
                 .ConfigureAwait(false);
+            if (TraceEnabled)
+            {
+                Console.WriteLine($"[RemoteClient] handshake complete endpoint={endpoint} protocol={helloAck.NegotiatedProtocolVersion} features={string.Join(",", helloAck.EnabledFeatures)}");
+            }
 
             lock (_stateGate)
             {
@@ -192,8 +208,12 @@ public sealed class RemoteDiagnosticsClient : IRemoteDiagnosticsClient
 
             RaiseStatusChanged(RemoteDiagnosticsClientStatus.Online, endpoint, null);
         }
-        catch
+        catch (Exception ex)
         {
+            if (TraceEnabled)
+            {
+                Console.WriteLine($"[RemoteClient] connect failed endpoint={endpoint} error={ex.GetType().Name}: {ex.Message}");
+            }
             await DisconnectCoreAsync("Connect failed", CancellationToken.None).ConfigureAwait(false);
             throw;
         }
@@ -265,6 +285,10 @@ public sealed class RemoteDiagnosticsClient : IRemoteDiagnosticsClient
 
         try
         {
+            if (TraceEnabled)
+            {
+                Console.WriteLine($"[RemoteClient] request send {method} #{requestId}");
+            }
             await SendCoreAsync(socket, message, cancellationToken).ConfigureAwait(false);
         }
         catch
@@ -280,10 +304,18 @@ public sealed class RemoteDiagnosticsClient : IRemoteDiagnosticsClient
         try
         {
             response = await pending.Completion.Task.WaitAsync(timeoutCts.Token).ConfigureAwait(false);
+            if (TraceEnabled)
+            {
+                Console.WriteLine($"[RemoteClient] request complete {method} #{requestId} success={response.IsSuccess}");
+            }
         }
         catch (OperationCanceledException) when (!cancellationToken.IsCancellationRequested)
         {
             RemovePendingRequest(requestId);
+            if (TraceEnabled)
+            {
+                Console.WriteLine($"[RemoteClient] request timeout {method} #{requestId}");
+            }
             throw new TimeoutException("Remote request timed out: " + method);
         }
 
@@ -373,6 +405,10 @@ public sealed class RemoteDiagnosticsClient : IRemoteDiagnosticsClient
     private async Task ReceiveLoopAsync(ClientWebSocket socket, CancellationToken cancellationToken)
     {
         string disconnectReason = "Remote connection closed.";
+        if (TraceEnabled)
+        {
+            Console.WriteLine("[RemoteClient] receive loop started");
+        }
         try
         {
             while (!cancellationToken.IsCancellationRequested)
@@ -389,9 +425,17 @@ public sealed class RemoteDiagnosticsClient : IRemoteDiagnosticsClient
                 switch (received.Message)
                 {
                     case RemoteHelloAckMessage helloAck:
+                        if (TraceEnabled)
+                        {
+                            Console.WriteLine("[RemoteClient] received hello ack");
+                        }
                         _helloAckTcs?.TrySetResult(helloAck);
                         break;
                     case RemoteHelloRejectMessage helloReject:
+                        if (TraceEnabled)
+                        {
+                            Console.WriteLine($"[RemoteClient] received hello reject reason={helloReject.Reason}");
+                        }
                         _helloRejectTcs?.TrySetResult(helloReject);
                         break;
                     case RemoteKeepAliveMessage keepAlive:
@@ -428,10 +472,18 @@ public sealed class RemoteDiagnosticsClient : IRemoteDiagnosticsClient
         catch (Exception ex)
         {
             disconnectReason = ex.Message;
+            if (TraceEnabled)
+            {
+                Console.WriteLine($"[RemoteClient] receive loop failed error={ex.GetType().Name}: {ex.Message}");
+            }
             Error?.Invoke(this, new RemoteDiagnosticsClientErrorEventArgs("receive", ex));
         }
         finally
         {
+            if (TraceEnabled)
+            {
+                Console.WriteLine($"[RemoteClient] receive loop ended reason={disconnectReason}");
+            }
             FailAllPendingRequests(new InvalidOperationException("Disconnected: " + disconnectReason));
             SetOffline(disconnectReason);
             await DisposeSocketIfOwnedAsync(socket).ConfigureAwait(false);
