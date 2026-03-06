@@ -1,5 +1,7 @@
 using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Linq;
 using Avalonia;
 using Avalonia.Diagnostics.Models;
 using Avalonia.Interactivity;
@@ -13,6 +15,7 @@ namespace Avalonia.Diagnostics.ViewModels
         private readonly AvaloniaObject? _source;
         private readonly string _eventName;
         private readonly string? _eventOwnerType;
+        private readonly string? _remoteSourceNodeId;
         private readonly string? _remoteSourceNodePath;
         private readonly RoutingStrategies? _observedRoutesOverride;
         private EventChainLink? _handledBy;
@@ -39,22 +42,37 @@ namespace Avalonia.Diagnostics.ViewModels
             string? handledByDisplay,
             RoutingStrategies observedRoutes,
             bool isHandled,
-            string? sourceNodePath)
+            string? sourceNodeId,
+            string? sourceNodePath,
+            IEnumerable<EventChainLink>? remoteEventChain = null)
         {
             RecordId = recordId;
             TriggerTime = triggerTime;
             _eventName = eventName ?? throw new ArgumentNullException(nameof(eventName));
             _eventOwnerType = eventOwnerType;
+            _remoteSourceNodeId = sourceNodeId;
             _remoteSourceNodePath = sourceNodePath;
             _observedRoutesOverride = observedRoutes;
-            Originator = new EventChainLink(handler: null, handled: false, observedRoutes, handlerNameOverride: originatorDisplay);
-            AddToChain(Originator);
+            var chain = remoteEventChain?.ToArray();
+            if (chain is { Length: > 0 })
+            {
+                Originator = chain[0];
+                for (var i = 0; i < chain.Length; i++)
+                {
+                    AddToChain(chain[i]);
+                }
+            }
+            else
+            {
+                Originator = new EventChainLink(handler: null, handled: false, observedRoutes, handlerNameOverride: originatorDisplay);
+                AddToChain(Originator);
+            }
 
-            if (!string.IsNullOrWhiteSpace(handledByDisplay))
+            if (HandledBy is null && !string.IsNullOrWhiteSpace(handledByDisplay))
             {
                 AddToChain(new EventChainLink(handler: null, handled: true, observedRoutes, handlerNameOverride: handledByDisplay));
             }
-            else if (isHandled)
+            else if (HandledBy is null && isHandled)
             {
                 Originator.Handled = true;
                 HandledBy = Originator;
@@ -81,6 +99,8 @@ namespace Avalonia.Diagnostics.ViewModels
         public AvaloniaObject? Source => _source;
 
         public string? RemoteSourceNodePath => _remoteSourceNodePath;
+
+        public string? RemoteSourceNodeId => _remoteSourceNodeId;
 
         public string SourceDisplay { get; } = string.Empty;
 

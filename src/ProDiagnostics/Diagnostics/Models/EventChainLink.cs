@@ -5,17 +5,33 @@ namespace Avalonia.Diagnostics.Models
 {
     internal class EventChainLink
     {
-        public EventChainLink(object? handler, bool handled, RoutingStrategies route, string? handlerNameOverride = null)
+        public EventChainLink(
+            object? handler,
+            bool handled,
+            RoutingStrategies route,
+            string? handlerNameOverride = null,
+            string? remoteNodeId = null,
+            string? remoteNodePath = null,
+            string? remoteHandlerType = null)
         {
             Handler = handler;
             Handled = handled;
             Route = route;
             _handlerNameOverride = handlerNameOverride;
+            RemoteNodeId = remoteNodeId;
+            RemoteNodePath = remoteNodePath;
+            RemoteHandlerType = remoteHandlerType;
         }
 
         private readonly string? _handlerNameOverride;
 
         public object? Handler { get; }
+
+        public string? RemoteNodeId { get; }
+
+        public string? RemoteNodePath { get; }
+
+        public string? RemoteHandlerType { get; }
 
         public bool BeginsNewRoute { get; set; }
 

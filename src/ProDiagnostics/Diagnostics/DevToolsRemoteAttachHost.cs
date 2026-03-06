@@ -153,6 +153,7 @@ public sealed class DevToolsRemoteAttachHost : IAsyncDisposable
             _streamSource = new InProcessRemoteStreamSource(
                 root: root,
                 eventsPageViewModel: _eventsPageViewModel,
+                nodeIdentityProvider: nodeIdentityProvider,
                 options: InProcessRemoteStreamSourceOptions.Default with
                 {
                     EnableUdpTelemetryFallback = normalized.EnableUdpTelemetryFallback,

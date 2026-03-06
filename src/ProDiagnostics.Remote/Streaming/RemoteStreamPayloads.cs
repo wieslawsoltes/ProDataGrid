@@ -79,9 +79,13 @@ public readonly record struct RemoteLogStreamPayload(
 public readonly record struct RemoteEventStreamPayload(
     DateTimeOffset TimestampUtc,
     string EventName,
+    string? EventOwnerType,
     string Source,
     string Originator,
     string ObservedRoutes,
     bool IsHandled,
     string HandledBy,
-    int ChainLength);
+    int ChainLength,
+    string? SourceNodeId,
+    string? SourceNodePath,
+    IReadOnlyList<RemoteEventChainLinkSnapshot> EventChain);

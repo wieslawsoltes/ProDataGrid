@@ -136,6 +136,7 @@ public sealed record class RemotePropertySnapshot(
     bool? IsAttached,
     bool IsReadOnly,
     string? ValueText,
+    string PropertyKind = "unknown",
     string EditorKind = "text",
     IReadOnlyList<string>? EnumOptions = null,
     bool CanClearValue = false,
@@ -489,19 +490,33 @@ public sealed record class RemoteEventNodeSnapshot(
     string? EventName);
 
 /// <summary>
+/// One routed-event handler-chain entry.
+/// </summary>
+public sealed record class RemoteEventChainLinkSnapshot(
+    string HandlerName,
+    string Route,
+    bool Handled,
+    bool BeginsNewRoute,
+    string? NodeId,
+    string? NodePath,
+    string? HandlerType);
+
+/// <summary>
 /// One recorded routed-event entry.
 /// </summary>
 public sealed record class RemoteRecordedEventSnapshot(
     string Id,
     DateTimeOffset TriggerTime,
     string EventName,
+    string? EventOwnerType,
     string Source,
     string Originator,
     string? HandledBy,
     string ObservedRoutes,
     bool IsHandled,
     string? SourceNodeId,
-    string? SourceNodePath);
+    string? SourceNodePath,
+    IReadOnlyList<RemoteEventChainLinkSnapshot> EventChain);
 
 /// <summary>
 /// Snapshot for events diagnostics.

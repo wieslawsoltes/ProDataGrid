@@ -95,6 +95,50 @@ public class EventsPageViewModelTests
     }
 
     [AvaloniaFact]
+    public void RemoteRecordedEvents_Preserve_Full_EventChain_And_Filter_Locally()
+    {
+        var viewModel = new EventsPageViewModel(mainViewModel: null);
+        var ownerType = TestControl.MixedEvent.OwnerType.FullName ?? TestControl.MixedEvent.OwnerType.Name;
+        var remoteEvent = new FiredEvent(
+            recordId: "remote-1",
+            triggerTime: DateTime.UtcNow,
+            eventName: TestControl.MixedEvent.Name,
+            eventOwnerType: ownerType,
+            sourceDisplay: "TestButton (Button)",
+            originatorDisplay: "RootWindow (Window)",
+            handledByDisplay: "TestButton (Button)",
+            observedRoutes: RoutingStrategies.Tunnel | RoutingStrategies.Bubble,
+            isHandled: true,
+            sourceNodeId: "node-button",
+            sourceNodePath: "0/0/0",
+            remoteEventChain: new[]
+            {
+                new EventChainLink(handler: null, handled: false, RoutingStrategies.Tunnel, handlerNameOverride: "RootWindow (Window)", remoteNodeId: "node-window", remoteNodePath: "0"),
+                new EventChainLink(handler: null, handled: false, RoutingStrategies.Bubble, handlerNameOverride: "RootPanel (Panel)", remoteNodeId: "node-panel", remoteNodePath: "0/0"),
+                new EventChainLink(handler: null, handled: true, RoutingStrategies.Bubble, handlerNameOverride: "TestButton (Button)", remoteNodeId: "node-button", remoteNodePath: "0/0/0"),
+            });
+
+        viewModel.AddRecordedEvent(remoteEvent);
+
+        var recorded = Assert.Single(viewModel.RecordedEvents);
+        Assert.Equal(3, recorded.EventChain.Count);
+        Assert.Equal("0/0", recorded.EventChain[1].RemoteNodePath);
+        Assert.Equal("0/0/0", recorded.HandledBy?.RemoteNodePath);
+
+        viewModel.IncludeHandledEvents = false;
+        Assert.Empty(viewModel.RecordedEventsView.Cast<object>());
+
+        viewModel.IncludeHandledEvents = true;
+        viewModel.IncludeBubbleRoutes = false;
+        viewModel.IncludeDirectRoutes = false;
+        viewModel.IncludeTunnelRoutes = true;
+        Assert.Single(viewModel.RecordedEventsView.Cast<object>());
+
+        viewModel.IncludeTunnelRoutes = false;
+        Assert.Empty(viewModel.RecordedEventsView.Cast<object>());
+    }
+
+    [AvaloniaFact]
     public void SetOptions_Uses_Custom_Default_Routed_Events()
     {
         _ = TestControl.BubbleEvent;

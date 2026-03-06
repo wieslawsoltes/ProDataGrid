@@ -37,6 +37,8 @@ internal sealed class InProcessRemoteStreamSource : IRemoteStreamSource, IRemote
     private readonly object _gate = new();
     private readonly List<Action<RemoteStreamPayload>> _subscribers = new();
     private readonly AvaloniaObject? _root;
+    private readonly InProcessRemoteNodeIdentityProvider _nodeIdentityProvider;
+    private readonly CombinedTreeNodeProvider _combinedTreeProvider;
     private readonly IDevToolsLogCollector _logCollector;
     private readonly EventsPageViewModel? _eventsPageViewModel;
     private readonly InProcessRemoteStreamSourceOptions _options;
@@ -114,9 +116,12 @@ internal sealed class InProcessRemoteStreamSource : IRemoteStreamSource, IRemote
         AvaloniaObject? root = null,
         EventsPageViewModel? eventsPageViewModel = null,
         IDevToolsLogCollector? logCollector = null,
+        InProcessRemoteNodeIdentityProvider? nodeIdentityProvider = null,
         InProcessRemoteStreamSourceOptions? options = null)
     {
         _root = root;
+        _nodeIdentityProvider = nodeIdentityProvider ?? new InProcessRemoteNodeIdentityProvider();
+        _combinedTreeProvider = new CombinedTreeNodeProvider(new TemplateVisualTreeProvider());
         _eventsPageViewModel = eventsPageViewModel;
         _logCollector = logCollector ?? InProcessDevToolsLogCollector.Instance;
         _options = InProcessRemoteStreamSourceOptions.Normalize(options ?? InProcessRemoteStreamSourceOptions.Default);
@@ -970,23 +975,41 @@ internal sealed class InProcessRemoteStreamSource : IRemoteStreamSource, IRemote
                 continue;
             }
 
-            if (!CanPublishAtRate(ref _nextEventPublishTicksUtc, _maxEventStreamPerSecond))
-            {
-                continue;
-            }
-
-            PublishObject(
-                RemoteStreamTopics.Events,
-                new RemoteEventStreamPayload(
-                    TimestampUtc: new DateTimeOffset(firedEvent.TriggerTime),
-                    EventName: firedEvent.Event.Name,
-                    Source: DescribeTarget(firedEvent.Source),
-                    Originator: firedEvent.Originator.HandlerName,
-                    ObservedRoutes: firedEvent.ObservedRoutes.ToString(),
-                    IsHandled: firedEvent.IsHandled,
-                    HandledBy: firedEvent.HandledBy?.HandlerName ?? string.Empty,
-                    ChainLength: firedEvent.EventChain.Count));
+            Dispatcher.UIThread.Post(
+                () => PublishRecordedEvent(firedEvent),
+                DispatcherPriority.Background);
         }
+    }
+
+    private void PublishRecordedEvent(FiredEvent firedEvent)
+    {
+        if (!IsTopicDemanded(RemoteStreamTopics.Events))
+        {
+            return;
+        }
+
+        if (!CanPublishAtRate(ref _nextEventPublishTicksUtc, _maxEventStreamPerSecond))
+        {
+            return;
+        }
+
+        var eventTargetLookup = BuildEventTargetLookup(firedEvent);
+        var sourceLocation = ResolveEventSourceLocation(firedEvent, eventTargetLookup);
+        PublishObject(
+            RemoteStreamTopics.Events,
+            new RemoteEventStreamPayload(
+                TimestampUtc: new DateTimeOffset(firedEvent.TriggerTime),
+                EventName: firedEvent.Event?.Name ?? firedEvent.EventName,
+                EventOwnerType: firedEvent.Event?.OwnerType.FullName ?? firedEvent.Event?.OwnerType.Name ?? firedEvent.EventOwnerType,
+                Source: ResolveEventSourceDisplay(firedEvent),
+                Originator: firedEvent.Originator.HandlerName,
+                ObservedRoutes: firedEvent.ObservedRoutes.ToString(),
+                IsHandled: firedEvent.IsHandled,
+                HandledBy: firedEvent.HandledBy?.HandlerName ?? string.Empty,
+                ChainLength: firedEvent.EventChain.Count,
+                SourceNodeId: sourceLocation.NodeId,
+                SourceNodePath: sourceLocation.NodePath,
+                EventChain: MapEventChain(firedEvent, eventTargetLookup)));
     }
 
     private static bool CanPublishAtRate(ref long nextAllowedTicksUtc, int maxPerSecond)
@@ -1312,6 +1335,151 @@ internal sealed class InProcessRemoteStreamSource : IRemoteStreamSource, IRemote
         return source.GetType().Name;
     }
 
+    private string ResolveEventSourceDisplay(FiredEvent firedEvent)
+    {
+        if (firedEvent.Source is { } source)
+        {
+            return DescribeTarget(source);
+        }
+
+        return string.IsNullOrWhiteSpace(firedEvent.SourceDisplay) ? string.Empty : firedEvent.SourceDisplay;
+    }
+
+    private EventTargetLocation ResolveEventSourceLocation(
+        FiredEvent firedEvent,
+        IReadOnlyDictionary<AvaloniaObject, EventTargetLocation> lookup)
+    {
+        if (firedEvent.Source is not AvaloniaObject source)
+        {
+            return new EventTargetLocation(null, firedEvent.RemoteSourceNodePath);
+        }
+
+        return lookup.TryGetValue(source, out var location)
+            ? location
+            : new EventTargetLocation(null, firedEvent.RemoteSourceNodePath);
+    }
+
+    private IReadOnlyList<RemoteEventChainLinkSnapshot> MapEventChain(
+        FiredEvent firedEvent,
+        IReadOnlyDictionary<AvaloniaObject, EventTargetLocation> lookup)
+    {
+        if (firedEvent.EventChain.Count == 0)
+        {
+            return Array.Empty<RemoteEventChainLinkSnapshot>();
+        }
+
+        var chain = new RemoteEventChainLinkSnapshot[firedEvent.EventChain.Count];
+        for (var i = 0; i < firedEvent.EventChain.Count; i++)
+        {
+            var link = firedEvent.EventChain[i];
+            string? nodeId = link.RemoteNodeId;
+            string? nodePath = link.RemoteNodePath;
+            string? handlerType = link.RemoteHandlerType;
+            if (link.Handler is AvaloniaObject avaloniaHandler)
+            {
+                if (lookup.TryGetValue(avaloniaHandler, out var location))
+                {
+                    nodeId = location.NodeId;
+                    nodePath = location.NodePath;
+                }
+
+                handlerType = avaloniaHandler.GetType().FullName ?? avaloniaHandler.GetType().Name;
+            }
+            else if (link.Handler is not null)
+            {
+                handlerType = link.Handler.GetType().FullName ?? link.Handler.GetType().Name;
+            }
+
+            chain[i] = new RemoteEventChainLinkSnapshot(
+                HandlerName: link.HandlerName,
+                Route: link.Route.ToString(),
+                Handled: link.Handled,
+                BeginsNewRoute: link.BeginsNewRoute,
+                NodeId: nodeId,
+                NodePath: nodePath,
+                HandlerType: handlerType);
+        }
+
+        return chain;
+    }
+
+    private Dictionary<AvaloniaObject, EventTargetLocation> BuildEventTargetLookup(FiredEvent firedEvent)
+    {
+        if (_root is null)
+        {
+            return s_emptyEventTargetLookup;
+        }
+
+        var targets = new HashSet<AvaloniaObject>(ReferenceEqualityComparer.Instance);
+        if (firedEvent.Source is AvaloniaObject source)
+        {
+            targets.Add(source);
+        }
+
+        for (var i = 0; i < firedEvent.EventChain.Count; i++)
+        {
+            if (firedEvent.EventChain[i].Handler is AvaloniaObject handler)
+            {
+                targets.Add(handler);
+            }
+        }
+
+        if (targets.Count == 0)
+        {
+            return s_emptyEventTargetLookup;
+        }
+
+        var locations = new Dictionary<AvaloniaObject, EventTargetLocation>(ReferenceEqualityComparer.Instance);
+        var roots = _combinedTreeProvider.Create(_root);
+        if (roots.Length == 0)
+        {
+            if (targets.Contains(_root))
+            {
+                locations[_root] = new EventTargetLocation(_nodeIdentityProvider.GetNodeId(_root), "0");
+            }
+
+            return locations;
+        }
+
+        for (var i = 0; i < roots.Length; i++)
+        {
+            Visit(roots[i], i.ToString(CultureInfo.InvariantCulture));
+            if (locations.Count == targets.Count)
+            {
+                break;
+            }
+        }
+
+        return locations;
+
+        void Visit(TreeNode node, string nodePath)
+        {
+            var visual = node.Visual;
+            if (targets.Contains(visual))
+            {
+                locations[visual] = new EventTargetLocation(_nodeIdentityProvider.GetNodeId(visual), nodePath);
+                if (locations.Count == targets.Count)
+                {
+                    return;
+                }
+            }
+
+            if (node.Children is null)
+            {
+                return;
+            }
+
+            for (var childIndex = 0; childIndex < node.Children.Count; childIndex++)
+            {
+                Visit(node.Children[childIndex], nodePath + "/" + childIndex.ToString(CultureInfo.InvariantCulture));
+                if (locations.Count == targets.Count)
+                {
+                    return;
+                }
+            }
+        }
+    }
+
     private static string FormatValue(object? value)
     {
         if (value is null)
@@ -1320,6 +1488,20 @@ internal sealed class InProcessRemoteStreamSource : IRemoteStreamSource, IRemote
         }
 
         return value.ToString() ?? string.Empty;
+    }
+
+    private static readonly Dictionary<AvaloniaObject, EventTargetLocation> s_emptyEventTargetLookup =
+        new(ReferenceEqualityComparer.Instance);
+
+    private readonly record struct EventTargetLocation(string? NodeId, string? NodePath);
+
+    private sealed class ReferenceEqualityComparer : IEqualityComparer<AvaloniaObject>
+    {
+        public static ReferenceEqualityComparer Instance { get; } = new();
+
+        public bool Equals(AvaloniaObject? x, AvaloniaObject? y) => ReferenceEquals(x, y);
+
+        public int GetHashCode(AvaloniaObject obj) => System.Runtime.CompilerServices.RuntimeHelpers.GetHashCode(obj);
     }
 
     private void RecordPayloadForSnapshots<TPayload>(string topic, TPayload payload)

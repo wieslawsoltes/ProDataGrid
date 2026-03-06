@@ -4,9 +4,12 @@ using System.Net;
 using System.Net.Sockets;
 using System.Threading.Tasks;
 using Avalonia.Controls;
+using Avalonia.Controls.Primitives;
 using Avalonia.Diagnostics;
 using Avalonia.Diagnostics.Remote;
 using Avalonia.Headless.XUnit;
+using Avalonia.Interactivity;
+using Avalonia.Threading;
 using Xunit;
 
 namespace Avalonia.Diagnostics.UnitTests.Remote;
@@ -242,10 +245,208 @@ public class RemoteDiagnosticsClientBootstrapTests
         Assert.NotEmpty(tree.Nodes);
     }
 
+    [AvaloniaFact]
+    public async Task RemoteDiagnosticsClient_Selection_And_Overlay_Render_On_Target_Window()
+    {
+        var target = new TextBlock
+        {
+            Name = "OverlayTarget",
+            Text = "Overlay target",
+        };
+        var root = new Window
+        {
+            Name = "OverlayRoot",
+            Width = 640,
+            Height = 480,
+            Content = new VisualLayerManager
+            {
+                Child = new Grid
+                {
+                    Children =
+                    {
+                        target,
+                    },
+                },
+            },
+        };
+        root.Show();
+        Dispatcher.UIThread.RunJobs();
+        await WaitUntilAsync(() =>
+        {
+            Dispatcher.UIThread.RunJobs();
+            return AdornerLayer.GetAdornerLayer(target) is not null;
+        });
+
+        var port = AllocateTcpPort();
+        await using var host = new DevToolsRemoteAttachHost(
+            root,
+            new DevToolsRemoteAttachHostOptions
+            {
+                HttpOptions = HttpAttachServerOptions.Default with
+                {
+                    Port = port,
+                    Path = "/attach",
+                    BindingMode = HttpAttachBindingMode.Localhost,
+                    ReceiveTimeout = TimeSpan.FromSeconds(10),
+                    ServerOptions = RemoteProtocol.DefaultServerOptions with
+                    {
+                        HeartbeatInterval = TimeSpan.FromSeconds(30),
+                    },
+                },
+                EnableMutationApi = true,
+                EnableStreamingApi = true,
+                RequestTimeout = TimeSpan.FromSeconds(10),
+            });
+        await host.StartAsync();
+        root.Show();
+        Dispatcher.UIThread.RunJobs();
+
+        await using IRemoteDiagnosticsClient client = new RemoteDiagnosticsClient();
+        await client.ConnectAsync(
+            host.WebSocketEndpoint,
+            new RemoteDiagnosticsClientOptions
+            {
+                ClientName = "overlay-tests",
+                ConnectTimeout = TimeSpan.FromSeconds(8),
+                RequestTimeout = TimeSpan.FromSeconds(10),
+            });
+
+        var domains = new RemoteDiagnosticsDomainServices(client);
+        await domains.Mutation.SetSelectionAsync(
+            new RemoteSetSelectionRequest
+            {
+                Scope = "combined",
+                ControlName = "OverlayTarget",
+            });
+        await domains.Mutation.SetOverlayOptionsAsync(
+            new RemoteSetOverlayOptionsRequest
+            {
+                HighlightElements = true,
+                VisualizeMarginPadding = true,
+            });
+
+        await WaitUntilAsync(() =>
+        {
+            Dispatcher.UIThread.RunJobs();
+            return AdornerLayer.GetAdornerLayer(target)?.Children.Count > 0;
+        });
+
+        await domains.Mutation.SetOverlayOptionsAsync(
+            new RemoteSetOverlayOptionsRequest
+            {
+                HighlightElements = false,
+            });
+
+        await WaitUntilAsync(() =>
+        {
+            Dispatcher.UIThread.RunJobs();
+            return AdornerLayer.GetAdornerLayer(target)?.Children.Count == 0;
+        });
+
+        root.Close();
+    }
+
+    [AvaloniaFact]
+    public async Task RemoteDiagnosticsClient_Streams_Full_Event_Chain_Metadata()
+    {
+        var port = AllocateTcpPort();
+        var button = new Button
+        {
+            Name = "RemoteButton",
+            Content = "Click me",
+        };
+
+        var root = new Window
+        {
+            Name = "EventsRoot",
+            Content = new StackPanel
+            {
+                Name = "EventsPanel",
+                Children =
+                {
+                    button,
+                },
+            },
+        };
+
+        await using var host = new DevToolsRemoteAttachHost(
+            root,
+            new DevToolsRemoteAttachHostOptions
+            {
+                HttpOptions = HttpAttachServerOptions.Default with
+                {
+                    Port = port,
+                    Path = "/attach",
+                    BindingMode = HttpAttachBindingMode.Localhost,
+                    ReceiveTimeout = TimeSpan.FromSeconds(10),
+                    ServerOptions = RemoteProtocol.DefaultServerOptions with
+                    {
+                        HeartbeatInterval = TimeSpan.FromSeconds(30),
+                    },
+                },
+                EnableMutationApi = true,
+                EnableStreamingApi = true,
+                RequestTimeout = TimeSpan.FromSeconds(10),
+            });
+        await host.StartAsync();
+
+        await using IRemoteDiagnosticsClient client = new RemoteDiagnosticsClient();
+        await client.ConnectAsync(
+            host.WebSocketEndpoint,
+            new RemoteDiagnosticsClientOptions
+            {
+                ClientName = "events-stream-tests",
+                ConnectTimeout = TimeSpan.FromSeconds(8),
+                RequestTimeout = TimeSpan.FromSeconds(10),
+            });
+
+        var domains = new RemoteDiagnosticsDomainServices(client);
+        var receivedEvent = new TaskCompletionSource<RemoteEventStreamPayload>(TaskCreationOptions.RunContinuationsAsynchronously);
+        using var subscription = domains.Stream.Subscribe(
+            RemoteStreamTopics.Events,
+            RemoteJsonSerializerContext.Default.RemoteEventStreamPayload,
+            payload =>
+            {
+                if (payload.IsParsed &&
+                    payload.Payload is { } eventPayload &&
+                    string.Equals(eventPayload.EventName, Button.ClickEvent.Name, StringComparison.Ordinal))
+                {
+                    receivedEvent.TrySetResult(eventPayload);
+                }
+            });
+
+        await Dispatcher.UIThread.InvokeAsync(() => button.RaiseEvent(new RoutedEventArgs(Button.ClickEvent, button)));
+
+        var streamedEvent = await receivedEvent.Task.WaitAsync(TimeSpan.FromSeconds(10));
+
+        Assert.True(streamedEvent.ChainLength >= 2);
+        Assert.Equal(streamedEvent.ChainLength, streamedEvent.EventChain.Count);
+        Assert.Contains(streamedEvent.EventChain, link => !string.IsNullOrWhiteSpace(link.NodePath));
+        Assert.Equal(Button.ClickEvent.OwnerType.FullName ?? Button.ClickEvent.OwnerType.Name, streamedEvent.EventOwnerType);
+
+        root.Close();
+    }
+
     private static int AllocateTcpPort()
     {
         using var listener = new TcpListener(IPAddress.Loopback, 0);
         listener.Start();
         return ((IPEndPoint)listener.LocalEndpoint).Port;
+    }
+
+    private static async Task WaitUntilAsync(Func<bool> predicate, TimeSpan? timeout = null)
+    {
+        var deadline = DateTime.UtcNow + (timeout ?? TimeSpan.FromSeconds(5));
+        while (DateTime.UtcNow < deadline)
+        {
+            if (predicate())
+            {
+                return;
+            }
+
+            await Task.Delay(25);
+        }
+
+        Assert.True(predicate(), "Condition was not satisfied before timeout.");
     }
 }

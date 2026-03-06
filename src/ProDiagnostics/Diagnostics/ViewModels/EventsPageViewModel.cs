@@ -306,12 +306,6 @@ namespace Avalonia.Diagnostics.ViewModels
 
         public void RefreshRecordedEvents()
         {
-            if (_remoteReadOnly is not null)
-            {
-                QueueRemoteRefresh();
-                return;
-            }
-
             _recordedEventsView.Refresh();
             RaisePropertyChanged(nameof(TotalRecordedEvents));
             RaisePropertyChanged(nameof(VisibleRecordedEvents));
@@ -322,6 +316,12 @@ namespace Avalonia.Diagnostics.ViewModels
             if (navTarget.Handler is Control control)
             {
                 _mainViewModel?.RequestTreeNavigateTo(control, true);
+                return;
+            }
+
+            if (!string.IsNullOrWhiteSpace(navTarget.RemoteNodePath))
+            {
+                _mainViewModel?.RequestTreeNavigateTo(navTarget.RemoteNodePath);
             }
         }
 
@@ -475,7 +475,7 @@ namespace Avalonia.Diagnostics.ViewModels
 
         public void AddGlobalEventBreakpoint(object? parameter)
         {
-            if (!TryGetEvent(parameter, out var routedEvent))
+            if (!TryGetEventIdentity(parameter, out var routedEvent, out var eventName, out var eventOwnerType))
             {
                 return;
             }
@@ -487,12 +487,23 @@ namespace Avalonia.Diagnostics.ViewModels
                         new RemoteAddEventBreakpointRequest
                         {
                             Scope = "combined",
-                            EventName = routedEvent.Name,
-                            EventOwnerType = routedEvent.OwnerType.FullName ?? routedEvent.OwnerType.Name,
+                            EventName = eventName,
+                            EventOwnerType = eventOwnerType,
                             IsGlobal = true,
                         }),
-                    fallback: () => _breakpointService.AddEventBreakpoint(routedEvent, target: null, targetDescription: "(global)"));
+                    fallback: () =>
+                    {
+                        if (routedEvent is not null)
+                        {
+                            _breakpointService.AddEventBreakpoint(routedEvent, target: null, targetDescription: "(global)");
+                        }
+                    });
                 _mainViewModel?.ShowBreakpoints();
+                return;
+            }
+
+            if (routedEvent is null)
+            {
                 return;
             }
 
@@ -562,11 +573,6 @@ namespace Avalonia.Diagnostics.ViewModels
                 return;
             }
 
-            if (chainLink.Handler is not AvaloniaObject target)
-            {
-                return;
-            }
-
             var routedEvent = selectedEvent.Event;
             var eventName = routedEvent?.Name ?? selectedEvent.EventName;
             var eventOwnerType = routedEvent?.OwnerType.FullName ?? routedEvent?.OwnerType.Name ?? selectedEvent.EventOwnerType;
@@ -577,21 +583,30 @@ namespace Avalonia.Diagnostics.ViewModels
 
             if (_remoteMutation is not null)
             {
-                var context = ResolveRemoteTargetContext(target);
+                var target = chainLink.Handler as AvaloniaObject;
+                var context = !string.IsNullOrWhiteSpace(chainLink.RemoteNodePath)
+                    ? ("combined", chainLink.RemoteNodePath, (string?)null)
+                    : ResolveRemoteTargetContext(target);
+
+                if (string.IsNullOrWhiteSpace(context.Item2) && target is null)
+                {
+                    return;
+                }
+
                 _ = InvokeRemoteMutationAsync(
                     mutation => mutation.AddEventBreakpointAsync(
                         new RemoteAddEventBreakpointRequest
                         {
-                            Scope = context.Scope,
-                            NodePath = context.NodePath,
-                            ControlName = context.ControlName,
+                            Scope = context.Item1,
+                            NodePath = context.Item2,
+                            ControlName = context.Item3,
                             EventName = eventName,
                             EventOwnerType = eventOwnerType,
                             IsGlobal = false,
                         }),
                     fallback: () =>
                     {
-                        if (routedEvent is not null)
+                        if (routedEvent is not null && target is not null)
                         {
                             _breakpointService.AddEventBreakpoint(routedEvent, target, DescribeTarget(target));
                         }
@@ -600,12 +615,17 @@ namespace Avalonia.Diagnostics.ViewModels
                 return;
             }
 
+            if (chainLink.Handler is not AvaloniaObject localTarget)
+            {
+                return;
+            }
+
             if (routedEvent is null)
             {
                 return;
             }
 
-            _breakpointService.AddEventBreakpoint(routedEvent, target, DescribeTarget(target));
+            _breakpointService.AddEventBreakpoint(routedEvent, localTarget, DescribeTarget(localTarget));
             _mainViewModel?.ShowBreakpoints();
         }
 
@@ -868,13 +888,15 @@ namespace Avalonia.Diagnostics.ViewModels
                 recordId: null,
                 triggerTime: payload.TimestampUtc.LocalDateTime,
                 eventName: payload.EventName,
-                eventOwnerType: null,
+                eventOwnerType: payload.EventOwnerType,
                 sourceDisplay: payload.Source,
                 originatorDisplay: payload.Originator,
                 handledByDisplay: payload.HandledBy,
                 observedRoutes,
                 isHandled: payload.IsHandled,
-                sourceNodePath: null);
+                sourceNodeId: payload.SourceNodeId,
+                sourceNodePath: payload.SourceNodePath,
+                remoteEventChain: BuildRemoteEventChain(payload.EventChain));
             AddRecordedEvent(firedEvent);
         }
 
@@ -961,13 +983,15 @@ namespace Avalonia.Diagnostics.ViewModels
                     record.Id,
                     record.TriggerTime.LocalDateTime,
                     record.EventName,
-                    eventOwnerType: FindEventOwnerType(Nodes, record.EventName),
+                    eventOwnerType: record.EventOwnerType,
                     sourceDisplay: record.Source,
                     originatorDisplay: record.Originator,
                     handledByDisplay: record.HandledBy,
                     observedRoutes: ParseRoutingStrategies(record.ObservedRoutes),
                     isHandled: record.IsHandled,
-                    sourceNodePath: record.SourceNodePath);
+                    sourceNodeId: record.SourceNodeId,
+                    sourceNodePath: record.SourceNodePath,
+                    remoteEventChain: BuildRemoteEventChain(record.EventChain));
                 RecordedEvents.Add(firedEvent);
 
                 if ((previousSelectedRecordId is not null && string.Equals(previousSelectedRecordId, record.Id, StringComparison.Ordinal)) ||
@@ -989,20 +1013,38 @@ namespace Avalonia.Diagnostics.ViewModels
             _breakpointService.EvaluateEvent(routedEvent, sender as AvaloniaObject, source as AvaloniaObject);
         }
 
-        private static bool TryGetEvent(object? parameter, out RoutedEvent routedEvent)
+        private static bool TryGetEventIdentity(
+            object? parameter,
+            out RoutedEvent? routedEvent,
+            out string? eventName,
+            out string? eventOwnerType)
         {
             switch (parameter)
             {
                 case RoutedEvent evt:
                     routedEvent = evt;
+                    eventName = evt.Name;
+                    eventOwnerType = evt.OwnerType.FullName ?? evt.OwnerType.Name;
                     return true;
 
                 case FiredEvent { Event: not null } firedEvent:
                     routedEvent = firedEvent.Event;
+                    eventName = firedEvent.Event.Name;
+                    eventOwnerType = firedEvent.Event.OwnerType.FullName ?? firedEvent.Event.OwnerType.Name;
+                    return true;
+
+                case FiredEvent remoteFiredEvent
+                    when !string.IsNullOrWhiteSpace(remoteFiredEvent.EventName) &&
+                         !string.IsNullOrWhiteSpace(remoteFiredEvent.EventOwnerType):
+                    routedEvent = null;
+                    eventName = remoteFiredEvent.EventName;
+                    eventOwnerType = remoteFiredEvent.EventOwnerType;
                     return true;
 
                 default:
-                    routedEvent = null!;
+                    routedEvent = null;
+                    eventName = null;
+                    eventOwnerType = null;
                     return false;
             }
         }
@@ -1187,19 +1229,6 @@ namespace Avalonia.Diagnostics.ViewModels
             return node;
         }
 
-        private static string? FindEventOwnerType(IEnumerable<EventTreeNodeBase> nodes, string eventName)
-        {
-            foreach (var node in nodes)
-            {
-                if (FindMatchingNode(node, eventName, eventOwnerType: null) is { } matched)
-                {
-                    return matched.EventOwnerType;
-                }
-            }
-
-            return null;
-        }
-
         private static RemoteEventTreeNode? FindMatchingNode(EventTreeNodeBase node, string eventName, string? eventOwnerType)
         {
             if (node is RemoteEventTreeNode remoteNode &&
@@ -1231,6 +1260,34 @@ namespace Avalonia.Diagnostics.ViewModels
             return Enum.TryParse(text, ignoreCase: true, out RoutingStrategies routes)
                 ? routes
                 : RoutingStrategies.Direct;
+        }
+
+        private static IReadOnlyList<EventChainLink> BuildRemoteEventChain(IReadOnlyList<RemoteEventChainLinkSnapshot>? snapshots)
+        {
+            if (snapshots is not { Count: > 0 })
+            {
+                return Array.Empty<EventChainLink>();
+            }
+
+            var chain = new EventChainLink[snapshots.Count];
+            for (var i = 0; i < snapshots.Count; i++)
+            {
+                var snapshot = snapshots[i];
+                var link = new EventChainLink(
+                    handler: null,
+                    handled: snapshot.Handled,
+                    route: ParseRoutingStrategies(snapshot.Route),
+                    handlerNameOverride: snapshot.HandlerName,
+                    remoteNodeId: snapshot.NodeId,
+                    remoteNodePath: snapshot.NodePath,
+                    remoteHandlerType: snapshot.HandlerType)
+                {
+                    BeginsNewRoute = snapshot.BeginsNewRoute
+                };
+                chain[i] = link;
+            }
+
+            return chain;
         }
 
         private sealed class RemoteEventOwnerTreeNode : EventTreeNodeBase

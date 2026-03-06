@@ -65,6 +65,7 @@ namespace Avalonia.Diagnostics.Remote;
 [JsonSerializable(typeof(RemoteResourcesSnapshot))]
 [JsonSerializable(typeof(RemoteAssetsSnapshot))]
 [JsonSerializable(typeof(RemoteEventsSnapshot))]
+[JsonSerializable(typeof(RemoteEventChainLinkSnapshot))]
 [JsonSerializable(typeof(RemoteBreakpointsSnapshot))]
 [JsonSerializable(typeof(RemoteLogsSnapshot))]
 [JsonSerializable(typeof(RemoteMetricsSnapshot))]

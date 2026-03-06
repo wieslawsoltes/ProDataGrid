@@ -863,8 +863,8 @@ internal sealed class InProcessRemoteReadOnlyDiagnosticsSource : IRemoteReadOnly
             using var lookup = BuildTreeLookup(scope);
             var nodes = FlattenEventNodes(eventsPage.Nodes);
             var records = request.IncludeRecordedEvents
-                ? eventsPage.RecordedEventsView
-                    .Cast<FiredEvent>()
+                ? eventsPage.RecordedEvents
+                    .ToArray()
                     .Select(record => MapRecordedEvent(record, lookup))
                     .ToArray()
                 : Array.Empty<RemoteRecordedEventSnapshot>();
@@ -2269,19 +2269,26 @@ internal sealed class InProcessRemoteReadOnlyDiagnosticsSource : IRemoteReadOnly
         var validationStatus = hasValidationError
             ? "error: " + ((Exception)value).GetBaseException().Message
             : "ok";
+        var propertyKind = property switch
+        {
+            AvaloniaPropertyViewModel => "avalonia",
+            ClrPropertyViewModel => "clr",
+            _ => "unknown",
+        };
 
         var source = ResolveSourceLocationSnapshot(property.DeclaringType ?? property.AssignedType);
         return new RemotePropertySnapshot(
             Name: property.Name,
             Group: property.Group,
             Type: property.Type,
-            AssignedType: property.AssignedType.FullName ?? property.AssignedType.Name,
-            PropertyType: property.PropertyType.FullName ?? property.PropertyType.Name,
-            DeclaringType: property.DeclaringType?.FullName,
+            AssignedType: GetTypeIdentity(property.AssignedType),
+            PropertyType: GetTypeIdentity(property.PropertyType),
+            DeclaringType: property.DeclaringType is null ? null : GetTypeIdentity(property.DeclaringType),
             Priority: priority,
             IsAttached: property.IsAttached,
             IsReadOnly: property.IsReadonly,
-            ValueText: value?.ToString(),
+            ValueText: value is null ? null : PropertyValueEditorStringConversion.ToString(value) ?? value.ToString(),
+            PropertyKind: propertyKind,
             EditorKind: editorKind,
             EnumOptions: enumOptions,
             CanClearValue: property is AvaloniaPropertyViewModel && !property.IsReadonly,
@@ -2292,6 +2299,11 @@ internal sealed class InProcessRemoteReadOnlyDiagnosticsSource : IRemoteReadOnly
             CoercionStatus: "unknown",
             ValidationStatus: validationStatus,
             Source: source);
+    }
+
+    private static string GetTypeIdentity(Type type)
+    {
+        return type.AssemblyQualifiedName ?? type.FullName ?? type.Name;
     }
 
     private IReadOnlyList<RemotePseudoClassSnapshot> BuildPseudoClassSnapshots(AvaloniaObject target)
@@ -2749,7 +2761,7 @@ internal sealed class InProcessRemoteReadOnlyDiagnosticsSource : IRemoteReadOnly
     {
         string? sourceNodeId = null;
         string? sourceNodePath = null;
-        var sourceText = "(null)";
+        var sourceText = string.IsNullOrWhiteSpace(firedEvent.SourceDisplay) ? "(null)" : firedEvent.SourceDisplay;
         if (firedEvent.Source is { } source)
         {
             sourceText = DescribeTarget(source);
@@ -2758,23 +2770,65 @@ internal sealed class InProcessRemoteReadOnlyDiagnosticsSource : IRemoteReadOnly
         }
 
         var handledBy = firedEvent.HandledBy?.HandlerName;
+        var eventName = firedEvent.Event?.Name ?? firedEvent.EventName;
+        var eventChain = MapEventChain(firedEvent, lookup);
         return new RemoteRecordedEventSnapshot(
             Id: CreateStableId(
                 "event-record",
                 firedEvent.TriggerTime.ToString("O"),
-                firedEvent.Event.Name,
+                eventName,
                 sourceText,
                 firedEvent.Originator.HandlerName,
                 handledBy),
             TriggerTime: new DateTimeOffset(firedEvent.TriggerTime),
-            EventName: firedEvent.Event.Name,
+            EventName: eventName,
+            EventOwnerType: firedEvent.Event?.OwnerType.FullName ?? firedEvent.Event?.OwnerType.Name ?? firedEvent.EventOwnerType,
             Source: sourceText,
             Originator: firedEvent.Originator.HandlerName,
             HandledBy: handledBy,
             ObservedRoutes: firedEvent.ObservedRoutes.ToString(),
             IsHandled: firedEvent.IsHandled,
             SourceNodeId: sourceNodeId,
-            SourceNodePath: sourceNodePath);
+            SourceNodePath: sourceNodePath,
+            EventChain: eventChain);
+    }
+
+    private IReadOnlyList<RemoteEventChainLinkSnapshot> MapEventChain(FiredEvent firedEvent, TreeLookup lookup)
+    {
+        if (firedEvent.EventChain.Count == 0)
+        {
+            return Array.Empty<RemoteEventChainLinkSnapshot>();
+        }
+
+        var chain = new RemoteEventChainLinkSnapshot[firedEvent.EventChain.Count];
+        for (var i = 0; i < firedEvent.EventChain.Count; i++)
+        {
+            var link = firedEvent.EventChain[i];
+            string? nodeId = null;
+            string? nodePath = null;
+            string? handlerType = null;
+            if (link.Handler is AvaloniaObject avaloniaHandler)
+            {
+                nodeId = lookup.FindNodeId(avaloniaHandler);
+                nodePath = lookup.FindPath(avaloniaHandler);
+                handlerType = avaloniaHandler.GetType().FullName ?? avaloniaHandler.GetType().Name;
+            }
+            else if (link.Handler is not null)
+            {
+                handlerType = link.Handler.GetType().FullName ?? link.Handler.GetType().Name;
+            }
+
+            chain[i] = new RemoteEventChainLinkSnapshot(
+                HandlerName: link.HandlerName,
+                Route: link.Route.ToString(),
+                Handled: link.Handled,
+                BeginsNewRoute: link.BeginsNewRoute,
+                NodeId: nodeId,
+                NodePath: nodePath,
+                HandlerType: handlerType ?? link.RemoteHandlerType);
+        }
+
+        return chain;
     }
 
     private RemoteBreakpointSnapshot MapBreakpoint(BreakpointEntry entry, TreeLookup lookup)

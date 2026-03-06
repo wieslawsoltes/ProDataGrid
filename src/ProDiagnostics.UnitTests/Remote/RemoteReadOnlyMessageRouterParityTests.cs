@@ -9,6 +9,7 @@ using Avalonia.Diagnostics.Remote;
 using Avalonia.Diagnostics.Services;
 using Avalonia.Diagnostics.ViewModels;
 using Avalonia.Headless.XUnit;
+using Avalonia.Interactivity;
 using Avalonia.Media;
 using Avalonia.Styling;
 using Xunit;
@@ -334,6 +335,8 @@ public class RemoteReadOnlyMessageRouterParityTests
         var breakpointService = new BreakpointService();
         using var eventsPage = new EventsPageViewModel(mainViewModel: null, breakpointService: breakpointService);
         using var logsPage = new LogsPageViewModel();
+        var button = ((StackPanel)window.Content!).Children.OfType<Button>().First();
+        button.RaiseEvent(new RoutedEventArgs(Button.ClickEvent, button));
         var source = new InProcessRemoteReadOnlyDiagnosticsSource(
             window,
             breakpointService: breakpointService,
@@ -345,6 +348,9 @@ public class RemoteReadOnlyMessageRouterParityTests
         var expected = await source.GetEventsSnapshotAsync(request, CancellationToken.None);
         var actual = await SendRequestAsync<RemoteEventsSnapshot>(router, RemoteReadOnlyMethods.EventsSnapshotGet, request);
 
+        var recorded = Assert.Single(expected.RecordedEvents);
+        Assert.True(recorded.EventChain.Count >= 2, "Expected a full routed-event chain in the remote snapshot.");
+        Assert.Contains(recorded.EventChain, link => !string.IsNullOrWhiteSpace(link.NodePath));
         AssertSnapshotsEqual(expected, actual);
     }
 
