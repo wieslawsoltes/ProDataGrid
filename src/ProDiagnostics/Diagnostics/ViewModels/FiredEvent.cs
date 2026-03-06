@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.ObjectModel;
 using Avalonia;
 using Avalonia.Diagnostics.Models;
@@ -8,9 +8,13 @@ namespace Avalonia.Diagnostics.ViewModels
 {
     internal class FiredEvent : ViewModelBase
     {
-        private readonly RoutedEventArgs _eventArgs;
+        private readonly RoutedEventArgs? _eventArgs;
         private readonly RoutedEvent? _originalEvent;
         private readonly AvaloniaObject? _source;
+        private readonly string _eventName;
+        private readonly string? _eventOwnerType;
+        private readonly string? _remoteSourceNodePath;
+        private readonly RoutingStrategies? _observedRoutesOverride;
         private EventChainLink? _handledBy;
 
         public FiredEvent(RoutedEventArgs eventArgs, EventChainLink originator, DateTime triggerTime)
@@ -18,35 +22,84 @@ namespace Avalonia.Diagnostics.ViewModels
             _eventArgs = eventArgs ?? throw new ArgumentNullException(nameof(eventArgs));
             Originator = originator ?? throw new ArgumentNullException(nameof(originator));
             _originalEvent = _eventArgs.RoutedEvent;
+            _eventName = _originalEvent?.Name ?? string.Empty;
+            _eventOwnerType = _originalEvent?.OwnerType.FullName ?? _originalEvent?.OwnerType.Name;
             _source = _eventArgs.Source as AvaloniaObject;
             AddToChain(originator);
             TriggerTime = triggerTime;
         }
 
+        public FiredEvent(
+            string? recordId,
+            DateTime triggerTime,
+            string eventName,
+            string? eventOwnerType,
+            string sourceDisplay,
+            string originatorDisplay,
+            string? handledByDisplay,
+            RoutingStrategies observedRoutes,
+            bool isHandled,
+            string? sourceNodePath)
+        {
+            RecordId = recordId;
+            TriggerTime = triggerTime;
+            _eventName = eventName ?? throw new ArgumentNullException(nameof(eventName));
+            _eventOwnerType = eventOwnerType;
+            _remoteSourceNodePath = sourceNodePath;
+            _observedRoutesOverride = observedRoutes;
+            Originator = new EventChainLink(handler: null, handled: false, observedRoutes, handlerNameOverride: originatorDisplay);
+            AddToChain(Originator);
+
+            if (!string.IsNullOrWhiteSpace(handledByDisplay))
+            {
+                AddToChain(new EventChainLink(handler: null, handled: true, observedRoutes, handlerNameOverride: handledByDisplay));
+            }
+            else if (isHandled)
+            {
+                Originator.Handled = true;
+                HandledBy = Originator;
+            }
+
+            SourceDisplay = sourceDisplay;
+        }
+
         public bool IsPartOfSameEventChain(RoutedEventArgs e)
         {
-            // Note, Avalonia might reuse RoutedEventArgs for different events to avoid extra allocations.
-            // Like, PointerEntered and PointerExited will use the same instance of RoutedEventArgs. 
-            return e == _eventArgs && e.RoutedEvent == _originalEvent;
+            return _eventArgs is not null && e == _eventArgs && e.RoutedEvent == _originalEvent;
         }
+
+        public string? RecordId { get; }
 
         public DateTime TriggerTime { get; }
 
-        public RoutedEvent Event => _originalEvent!;
+        public RoutedEvent? Event => _originalEvent;
+
+        public string EventName => _eventName;
+
+        public string? EventOwnerType => _eventOwnerType;
 
         public AvaloniaObject? Source => _source;
+
+        public string? RemoteSourceNodePath => _remoteSourceNodePath;
+
+        public string SourceDisplay { get; } = string.Empty;
 
         public RoutingStrategies ObservedRoutes
         {
             get
             {
-                RoutingStrategies routes = 0;
-                for (var i = 0; i < EventChain.Count; i++)
+                if (_observedRoutesOverride is { } routes)
                 {
-                    routes |= EventChain[i].Route;
+                    return routes;
                 }
 
-                return routes;
+                RoutingStrategies accumulatedRoutes = 0;
+                for (var i = 0; i < EventChain.Count; i++)
+                {
+                    accumulatedRoutes |= EventChain[i].Route;
+                }
+
+                return accumulatedRoutes;
             }
         }
 
@@ -60,11 +113,11 @@ namespace Avalonia.Diagnostics.ViewModels
             {
                 if (IsHandled)
                 {
-                    return $"{Event.Name} on {Originator.HandlerName};" + Environment.NewLine +
+                    return $"{EventName} on {Originator.HandlerName};" + Environment.NewLine +
                            $"strategies: {ObservedRoutes}; handled by: {HandledBy!.HandlerName}";
                 }
 
-                return $"{Event.Name} on {Originator.HandlerName}; strategies: {ObservedRoutes}";
+                return $"{EventName} on {Originator.HandlerName}; strategies: {ObservedRoutes}";
             }
         }
 
@@ -102,7 +155,9 @@ namespace Avalonia.Diagnostics.ViewModels
             RaisePropertyChanged(nameof(DisplayText));
 
             if (HandledBy == null && link.Handled)
+            {
                 HandledBy = link;
+            }
         }
     }
 }

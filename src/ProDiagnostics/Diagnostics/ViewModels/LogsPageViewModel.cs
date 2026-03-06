@@ -26,8 +26,12 @@ internal sealed class LogsPageViewModel : ViewModelBase, IDisposable
     private bool _showFatal = true;
     private LogEntryViewModel? _selectedEntry;
     private string _collectorName;
+    private IRemoteReadOnlyDiagnosticsDomainService? _remoteReadOnly;
     private IRemoteMutationDiagnosticsDomainService? _remoteMutation;
     private bool _isApplyingRemoteSettings;
+    private bool _isRemoteRefreshScheduled;
+    private int _remoteEntryCount;
+    private int _remoteVisibleEntryCount;
 
     public LogsPageViewModel()
         : this(InProcessDevToolsLogCollector.Instance)
@@ -56,9 +60,9 @@ internal sealed class LogsPageViewModel : ViewModelBase, IDisposable
 
     public FilterViewModel LogsFilter { get; }
 
-    public int EntryCount => _entries.Count;
+    public int EntryCount => _remoteReadOnly is null ? _entries.Count : _remoteEntryCount;
 
-    public int VisibleEntryCount => _entriesView.Count;
+    public int VisibleEntryCount => _remoteReadOnly is null ? _entriesView.Count : _remoteVisibleEntryCount;
 
     public string CollectorName
     {
@@ -192,9 +196,38 @@ internal sealed class LogsPageViewModel : ViewModelBase, IDisposable
         _remoteMutation = mutation;
     }
 
+    internal void SetRemoteReadOnlySource(IRemoteReadOnlyDiagnosticsDomainService? readOnly, bool refreshNow = true)
+    {
+        _remoteReadOnly = readOnly;
+        _remoteEntryCount = 0;
+        _remoteVisibleEntryCount = 0;
+        if (readOnly is null)
+        {
+            RefreshEntries();
+            return;
+        }
+
+        if (refreshNow)
+        {
+            _ = RefreshRemoteSnapshotAsync();
+        }
+    }
+
     internal void ClearEntriesLocal()
     {
         ClearLocalEntries();
+    }
+
+    internal void ApplyRemoteStreamPayload(RemoteLogStreamPayload payload)
+    {
+        if (Dispatcher.UIThread.CheckAccess())
+        {
+            ApplyRemoteStreamPayloadCore(payload);
+        }
+        else
+        {
+            Dispatcher.UIThread.Post(() => ApplyRemoteStreamPayloadCore(payload), DispatcherPriority.Background);
+        }
     }
 
     internal int ApplyLogSettingsFromRemote(RemoteSetLogLevelsRequest request)
@@ -302,6 +335,12 @@ internal sealed class LogsPageViewModel : ViewModelBase, IDisposable
 
     public void Refresh()
     {
+        if (_remoteReadOnly is not null)
+        {
+            QueueRemoteRefresh();
+            return;
+        }
+
         RefreshEntries();
     }
 
@@ -331,6 +370,11 @@ internal sealed class LogsPageViewModel : ViewModelBase, IDisposable
 
     private void OnLogCaptured(DevToolsLogEvent capturedEvent)
     {
+        if (_remoteReadOnly is not null)
+        {
+            return;
+        }
+
         if (Dispatcher.UIThread.CheckAccess())
         {
             AddEntry(capturedEvent);
@@ -358,6 +402,8 @@ internal sealed class LogsPageViewModel : ViewModelBase, IDisposable
     {
         _entries.Clear();
         SelectedEntry = null;
+        _remoteEntryCount = 0;
+        _remoteVisibleEntryCount = 0;
         Refresh();
     }
 
@@ -488,6 +534,154 @@ internal sealed class LogsPageViewModel : ViewModelBase, IDisposable
         {
             // Keep local log filtering responsive when remote settings update fails.
         }
+    }
+
+    private void QueueRemoteRefresh()
+    {
+        if (_remoteReadOnly is null || _isRemoteRefreshScheduled)
+        {
+            return;
+        }
+
+        _isRemoteRefreshScheduled = true;
+        _ = RefreshRemoteSnapshotAsync();
+    }
+
+    private async Task RefreshRemoteSnapshotAsync()
+    {
+        var readOnly = _remoteReadOnly;
+        if (readOnly is null)
+        {
+            _isRemoteRefreshScheduled = false;
+            return;
+        }
+
+        try
+        {
+            var snapshot = await readOnly.GetLogsSnapshotAsync(
+                new RemoteLogsSnapshotRequest
+                {
+                    IncludeEntries = true,
+                }).ConfigureAwait(false);
+
+            await Dispatcher.UIThread.InvokeAsync(() =>
+            {
+                if (!ReferenceEquals(_remoteReadOnly, readOnly))
+                {
+                    return;
+                }
+
+                ApplyRemoteSnapshot(snapshot);
+            });
+        }
+        catch
+        {
+            // Keep the last successfully applied remote state when refresh fails.
+        }
+        finally
+        {
+            _isRemoteRefreshScheduled = false;
+        }
+    }
+
+    private void ApplyRemoteSnapshot(RemoteLogsSnapshot snapshot)
+    {
+        var selectedEntryId = SelectedEntry is null
+            ? null
+            : BuildRemoteEntryIdentity(
+                SelectedEntry.Timestamp,
+                SelectedEntry.Level,
+                SelectedEntry.Area,
+                SelectedEntry.Source,
+                SelectedEntry.Message);
+
+        CollectorName = snapshot.CollectorName;
+        _remoteEntryCount = snapshot.EntryCount;
+        _remoteVisibleEntryCount = snapshot.VisibleEntryCount;
+
+        var wasApplying = _isApplyingRemoteSettings;
+        _isApplyingRemoteSettings = true;
+        try
+        {
+            ShowVerbose = snapshot.ShowVerbose;
+            ShowDebug = snapshot.ShowDebug;
+            ShowInformation = snapshot.ShowInformation;
+            ShowWarning = snapshot.ShowWarning;
+            ShowError = snapshot.ShowError;
+            ShowFatal = snapshot.ShowFatal;
+            MaxEntries = snapshot.MaxEntries > 0 ? snapshot.MaxEntries : MaxEntries;
+            LogsFilter.FilterString = snapshot.FilterText ?? string.Empty;
+        }
+        finally
+        {
+            _isApplyingRemoteSettings = wasApplying;
+        }
+
+        _entries.Clear();
+        LogEntryViewModel? selectedEntry = null;
+        for (var i = 0; i < snapshot.Entries.Count; i++)
+        {
+            var remoteEntry = snapshot.Entries[i];
+            var level = ParseLogLevel(remoteEntry.Level);
+            var entry = new LogEntryViewModel(
+                remoteEntry.Timestamp,
+                level,
+                remoteEntry.Area,
+                remoteEntry.Source,
+                remoteEntry.Message);
+            _entries.Add(entry);
+
+            if (selectedEntryId is not null &&
+                string.Equals(
+                    selectedEntryId,
+                    BuildRemoteEntryIdentity(entry.Timestamp, entry.Level, entry.Area, entry.Source, entry.Message),
+                    StringComparison.Ordinal))
+            {
+                selectedEntry = entry;
+            }
+        }
+
+        SelectedEntry = selectedEntry;
+        RefreshEntries();
+    }
+
+    private void ApplyRemoteStreamPayloadCore(RemoteLogStreamPayload payload)
+    {
+        if (_remoteReadOnly is null)
+        {
+            return;
+        }
+
+        _entries.Add(new LogEntryViewModel(
+            payload.TimestampUtc,
+            ParseLogLevel(payload.Level),
+            payload.Area,
+            payload.Source,
+            payload.Message));
+        TrimToMaxEntries();
+        _entriesView.Filter = FilterEntry;
+        _entriesView.Refresh();
+        _remoteEntryCount = _entries.Count;
+        _remoteVisibleEntryCount = _entriesView.Count;
+        RaisePropertyChanged(nameof(EntryCount));
+        RaisePropertyChanged(nameof(VisibleEntryCount));
+    }
+
+    private static LogEventLevel ParseLogLevel(string? level)
+    {
+        return Enum.TryParse(level, ignoreCase: true, out LogEventLevel parsed)
+            ? parsed
+            : LogEventLevel.Information;
+    }
+
+    private static string BuildRemoteEntryIdentity(
+        DateTimeOffset timestamp,
+        LogEventLevel level,
+        string area,
+        string source,
+        string message)
+    {
+        return FormattableString.Invariant($"{timestamp.UtcTicks}|{level}|{area}|{source}|{message}");
     }
 
     private async Task InvokeRemoteMutationAsync(

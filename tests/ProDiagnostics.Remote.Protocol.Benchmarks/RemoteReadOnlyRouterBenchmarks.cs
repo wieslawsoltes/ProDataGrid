@@ -183,6 +183,7 @@ public class RemoteReadOnlyRouterBenchmarks
                         IsReadOnly: false,
                         ValueText: "120"),
                 },
+                PseudoClasses: Array.Empty<RemotePseudoClassSnapshot>(),
                 Frames: Array.Empty<RemoteValueFrameSnapshot>(),
                 Source: s_emptySource);
         }

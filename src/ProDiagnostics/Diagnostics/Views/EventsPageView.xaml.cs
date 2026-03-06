@@ -38,6 +38,11 @@ namespace Avalonia.Diagnostics.Views
                         vm.RequestTreeNavigateTo(chainLink);
                         break;
                     }
+                    case FiredEvent firedEvent:
+                    {
+                        vm.SelectEventByRecord(firedEvent);
+                        break;
+                    }
                     case RoutedEvent evt:
                     {
                         vm.SelectEventByType(evt);

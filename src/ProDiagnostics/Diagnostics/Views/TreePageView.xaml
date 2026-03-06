@@ -23,7 +23,8 @@
               PointerMoved="UpdateAdorner"
               PointerExited="RemoveAdorner">
       <DataGrid.Columns>
-        <DataGridHierarchicalColumn Width="SizeToCells"
+        <DataGridHierarchicalColumn Width="*"
+                                    MinWidth="220"
                                     x:CompileBindings="False"
                                     Binding="{Binding Item}">
           <DataGridHierarchicalColumn.CellTemplate>

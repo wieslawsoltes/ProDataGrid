@@ -12,6 +12,7 @@ using Avalonia.Diagnostics.Models;
 using Avalonia.Diagnostics.Services;
 using Avalonia.Input;
 using Avalonia.Interactivity;
+using Avalonia.Threading;
 
 namespace Avalonia.Diagnostics.ViewModels
 {
@@ -31,6 +32,7 @@ namespace Avalonia.Diagnostics.ViewModels
         private readonly MainViewModel? _mainViewModel;
         private readonly BreakpointService _breakpointService;
         private readonly DataGridCollectionView _recordedEventsView;
+        private readonly EventTreeNodeBase[] _localNodes;
         private FiredEvent? _selectedEvent;
         private EventTreeNodeBase? _selectedNode;
         private bool _includeBubbleRoutes = true;
@@ -40,9 +42,11 @@ namespace Avalonia.Diagnostics.ViewModels
         private bool _includeUnhandledEvents = true;
         private int _maxRecordedEvents = 100;
         private bool _autoScrollToLatest = true;
+        private IRemoteReadOnlyDiagnosticsDomainService? _remoteReadOnly;
         private IRemoteMutationDiagnosticsDomainService? _remoteMutation;
         private Func<AvaloniaObject?, (string Scope, string? NodePath, string? ControlName)>? _remoteTargetContextAccessor;
         private bool _isApplyingRemoteMutations;
+        private bool _isRemoteRefreshScheduled;
 
         public EventsPageViewModel(MainViewModel? mainViewModel, BreakpointService? breakpointService = null)
         {
@@ -50,11 +54,12 @@ namespace Avalonia.Diagnostics.ViewModels
             _defaultEvents = new HashSet<RoutedEvent>(s_builtInDefaultEvents);
             _breakpointService = breakpointService ?? mainViewModel?.BreakpointService ?? new BreakpointService();
 
-            Nodes = RoutedEventRegistry.Instance.GetAllRegistered()
+            _localNodes = RoutedEventRegistry.Instance.GetAllRegistered()
                 .GroupBy(e => e.OwnerType)
                 .OrderBy(e => e.Key.Name)
                 .Select(g => new EventOwnerTreeNode(g.Key, g, this))
                 .ToArray();
+            Nodes = _localNodes;
 
             EventsFilter = new FilterViewModel();
             EventsFilter.RefreshFilter += (s, e) => UpdateEventFilters();
@@ -69,7 +74,7 @@ namespace Avalonia.Diagnostics.ViewModels
 
         public string Name => "Events";
 
-        public EventTreeNodeBase[] Nodes { get; }
+        public EventTreeNodeBase[] Nodes { get; private set; }
 
         public ObservableCollection<FiredEvent> RecordedEvents { get; } = new ObservableCollection<FiredEvent>();
 
@@ -289,11 +294,24 @@ namespace Avalonia.Diagnostics.ViewModels
 
             RecordedEvents.Add(firedEvent);
             TrimRecordedEvents();
-            RefreshRecordedEvents();
+            if (_remoteReadOnly is not null)
+            {
+                RefreshRecordedEventsLocal();
+            }
+            else
+            {
+                RefreshRecordedEvents();
+            }
         }
 
         public void RefreshRecordedEvents()
         {
+            if (_remoteReadOnly is not null)
+            {
+                QueueRemoteRefresh();
+                return;
+            }
+
             _recordedEventsView.Refresh();
             RaisePropertyChanged(nameof(TotalRecordedEvents));
             RaisePropertyChanged(nameof(VisibleRecordedEvents));
@@ -346,13 +364,42 @@ namespace Avalonia.Diagnostics.ViewModels
             }
         }
 
-        private void EvaluateNodeEnabled(Func<EventTreeNode, bool> eval)
+        public void SelectEventByRecord(FiredEvent firedEvent)
+        {
+            if (firedEvent is null)
+            {
+                return;
+            }
+
+            SelectedEvent = firedEvent;
+            if (firedEvent.Event is { } routedEvent)
+            {
+                SelectEventByType(routedEvent);
+            }
+
+            if (firedEvent.Source is Control sourceControl)
+            {
+                _mainViewModel?.RequestTreeNavigateTo(sourceControl, isVisualTree: true);
+                return;
+            }
+
+            if (!string.IsNullOrWhiteSpace(firedEvent.RemoteSourceNodePath))
+            {
+                _mainViewModel?.RequestTreeNavigateTo(firedEvent.RemoteSourceNodePath);
+            }
+        }
+
+        private void EvaluateNodeEnabled(Func<EventTreeNode, bool> evalLocal, Func<RemoteEventTreeNode, bool>? evalRemote = null)
         {
             void ProcessNode(EventTreeNodeBase node)
             {
                 if (node is EventTreeNode eventNode)
                 {
-                    node.IsEnabled = eval(eventNode);
+                    node.IsEnabled = evalLocal(eventNode);
+                }
+                else if (node is RemoteEventTreeNode remoteEventNode && evalRemote is not null)
+                {
+                    node.IsEnabled = evalRemote(remoteEventNode);
                 }
 
                 if (node.Children != null)
@@ -397,6 +444,26 @@ namespace Avalonia.Diagnostics.ViewModels
         }
 
         public MainViewModel? MainView => _mainViewModel;
+
+        internal void SetRemoteReadOnlySource(IRemoteReadOnlyDiagnosticsDomainService? readOnly, bool refreshNow = true)
+        {
+            _remoteReadOnly = readOnly;
+            _isRemoteRefreshScheduled = false;
+
+            if (readOnly is null)
+            {
+                ReplaceNodes(_localNodes);
+                EnableDefaultLocal();
+                RefreshRecordedEventsLocal();
+                return;
+            }
+
+            DisableAllEventNodes(_localNodes);
+            if (refreshNow)
+            {
+                QueueRemoteRefresh();
+            }
+        }
 
         internal void SetRemoteMutationSource(
             IRemoteMutationDiagnosticsDomainService? mutation,
@@ -443,7 +510,14 @@ namespace Avalonia.Diagnostics.ViewModels
             var source = firedEvent.Source;
             if (_remoteMutation is not null)
             {
-                var context = ResolveRemoteTargetContext(source);
+                var context = ResolveRemoteTargetContext(firedEvent, source);
+                var eventName = firedEvent.Event?.Name ?? firedEvent.EventName;
+                var eventOwnerType = firedEvent.Event?.OwnerType.FullName ?? firedEvent.Event?.OwnerType.Name ?? firedEvent.EventOwnerType;
+                if (string.IsNullOrWhiteSpace(eventName) || string.IsNullOrWhiteSpace(eventOwnerType))
+                {
+                    return;
+                }
+
                 _ = InvokeRemoteMutationAsync(
                     mutation => mutation.AddEventBreakpointAsync(
                         new RemoteAddEventBreakpointRequest
@@ -451,20 +525,31 @@ namespace Avalonia.Diagnostics.ViewModels
                             Scope = context.Scope,
                             NodePath = context.NodePath,
                             ControlName = context.ControlName,
-                            EventName = firedEvent.Event.Name,
-                            EventOwnerType = firedEvent.Event.OwnerType.FullName ?? firedEvent.Event.OwnerType.Name,
+                            EventName = eventName,
+                            EventOwnerType = eventOwnerType,
                             IsGlobal = false,
                         }),
-                    fallback: () => _breakpointService.AddEventBreakpoint(
-                        firedEvent.Event,
-                        source,
-                        source != null ? DescribeTarget(source) : "(source unavailable)"));
+                    fallback: () =>
+                    {
+                        if (firedEvent.Event is { } localEvent)
+                        {
+                            _breakpointService.AddEventBreakpoint(
+                                localEvent,
+                                source,
+                                source != null ? DescribeTarget(source) : "(source unavailable)");
+                        }
+                    });
                 _mainViewModel?.ShowBreakpoints();
                 return;
             }
 
+            if (firedEvent.Event is not { } routedEvent)
+            {
+                return;
+            }
+
             _breakpointService.AddEventBreakpoint(
-                firedEvent.Event,
+                routedEvent,
                 source,
                 source != null ? DescribeTarget(source) : "(source unavailable)");
             _mainViewModel?.ShowBreakpoints();
@@ -472,12 +557,20 @@ namespace Avalonia.Diagnostics.ViewModels
 
         public void AddChainEventBreakpoint(object? parameter)
         {
-            if (parameter is not EventChainLink chainLink || SelectedEvent?.Event is not { } routedEvent)
+            if (parameter is not EventChainLink chainLink || SelectedEvent is not { } selectedEvent)
             {
                 return;
             }
 
             if (chainLink.Handler is not AvaloniaObject target)
+            {
+                return;
+            }
+
+            var routedEvent = selectedEvent.Event;
+            var eventName = routedEvent?.Name ?? selectedEvent.EventName;
+            var eventOwnerType = routedEvent?.OwnerType.FullName ?? routedEvent?.OwnerType.Name ?? selectedEvent.EventOwnerType;
+            if (string.IsNullOrWhiteSpace(eventName) || string.IsNullOrWhiteSpace(eventOwnerType))
             {
                 return;
             }
@@ -492,12 +585,23 @@ namespace Avalonia.Diagnostics.ViewModels
                             Scope = context.Scope,
                             NodePath = context.NodePath,
                             ControlName = context.ControlName,
-                            EventName = routedEvent.Name,
-                            EventOwnerType = routedEvent.OwnerType.FullName ?? routedEvent.OwnerType.Name,
+                            EventName = eventName,
+                            EventOwnerType = eventOwnerType,
                             IsGlobal = false,
                         }),
-                    fallback: () => _breakpointService.AddEventBreakpoint(routedEvent, target, DescribeTarget(target)));
+                    fallback: () =>
+                    {
+                        if (routedEvent is not null)
+                        {
+                            _breakpointService.AddEventBreakpoint(routedEvent, target, DescribeTarget(target));
+                        }
+                    });
                 _mainViewModel?.ShowBreakpoints();
+                return;
+            }
+
+            if (routedEvent is null)
+            {
                 return;
             }
 
@@ -506,6 +610,14 @@ namespace Avalonia.Diagnostics.ViewModels
         }
 
         internal void NotifyEventNodeIsEnabledChanged(EventTreeNode eventNode, bool isEnabled)
+        {
+            NotifyEventNodeIsEnabledChanged(
+                eventNode.Event.Name,
+                eventNode.Event.OwnerType.FullName ?? eventNode.Event.OwnerType.Name,
+                isEnabled);
+        }
+
+        internal void NotifyEventNodeIsEnabledChanged(string eventName, string? eventOwnerType, bool isEnabled)
         {
             if (_remoteMutation is null || _isApplyingRemoteMutations)
             {
@@ -517,8 +629,8 @@ namespace Avalonia.Diagnostics.ViewModels
                     new RemoteSetEventEnabledRequest
                     {
                         EventId = string.Empty,
-                        EventName = eventNode.Event.Name,
-                        EventOwnerType = eventNode.Event.OwnerType.FullName ?? eventNode.Event.OwnerType.Name,
+                        EventName = eventName,
+                        EventOwnerType = eventOwnerType ?? string.Empty,
                         IsEnabled = isEnabled,
                     }),
                 fallback: () => { });
@@ -529,21 +641,49 @@ namespace Avalonia.Diagnostics.ViewModels
             RunWithoutRemoteMutations(() => eventNode.IsEnabled = isEnabled);
         }
 
+        internal void SetEventEnabledLocal(string eventName, string? eventOwnerType, bool isEnabled)
+        {
+            if (string.IsNullOrWhiteSpace(eventName))
+            {
+                return;
+            }
+
+            RunWithoutRemoteMutations(() =>
+            {
+                foreach (var node in Nodes)
+                {
+                    if (FindMatchingNode(node, eventName, eventOwnerType) is RemoteEventTreeNode remoteNode)
+                    {
+                        remoteNode.IsEnabled = isEnabled;
+                        break;
+                    }
+                }
+            });
+        }
+
         internal void EnableDefaultLocal()
         {
-            RunWithoutRemoteMutations(() => EvaluateNodeEnabled(node => _defaultEvents.Contains(node.Event)));
+            RunWithoutRemoteMutations(() => EvaluateNodeEnabled(
+                node => _defaultEvents.Contains(node.Event),
+                remoteNode => _defaultEvents.Any(
+                    routedEvent =>
+                        string.Equals(routedEvent.Name, remoteNode.EventName, StringComparison.Ordinal) &&
+                        string.Equals(
+                            routedEvent.OwnerType.FullName ?? routedEvent.OwnerType.Name,
+                            remoteNode.EventOwnerType,
+                            StringComparison.Ordinal))));
         }
 
         internal void DisableAllLocal()
         {
-            RunWithoutRemoteMutations(() => EvaluateNodeEnabled(_ => false));
+            RunWithoutRemoteMutations(() => EvaluateNodeEnabled(_ => false, _ => false));
         }
 
         internal void ClearRecordedEventsLocal()
         {
             RecordedEvents.Clear();
             SelectedEvent = null;
-            RefreshRecordedEvents();
+            RefreshRecordedEventsLocal();
         }
 
         public void Dispose()
@@ -647,6 +787,203 @@ namespace Avalonia.Diagnostics.ViewModels
             }
         }
 
+        private void ReplaceNodes(EventTreeNodeBase[] nodes)
+        {
+            if (ReferenceEquals(Nodes, nodes))
+            {
+                return;
+            }
+
+            if (!ReferenceEquals(Nodes, _localNodes))
+            {
+                foreach (var node in Nodes)
+                {
+                    DisposeNode(node);
+                }
+            }
+
+            Nodes = nodes;
+            SelectedNode = null;
+            RaisePropertyChanged(nameof(Nodes));
+            UpdateEventFilters();
+        }
+
+        private void DisableAllEventNodes(IEnumerable<EventTreeNodeBase> nodes)
+        {
+            RunWithoutRemoteMutations(() =>
+            {
+                foreach (var node in nodes)
+                {
+                    DisableNode(node);
+                }
+            });
+
+            static void DisableNode(EventTreeNodeBase node)
+            {
+                if (node.IsEnabled != null)
+                {
+                    node.IsEnabled = false;
+                }
+
+                if (node.Children is null)
+                {
+                    return;
+                }
+
+                foreach (var child in node.Children)
+                {
+                    DisableNode(child);
+                }
+            }
+        }
+
+        private void RefreshRecordedEventsLocal()
+        {
+            _recordedEventsView.Refresh();
+            RaisePropertyChanged(nameof(TotalRecordedEvents));
+            RaisePropertyChanged(nameof(VisibleRecordedEvents));
+        }
+
+        internal void ApplyRemoteStreamPayload(RemoteEventStreamPayload payload)
+        {
+            if (Dispatcher.UIThread.CheckAccess())
+            {
+                ApplyRemoteStreamPayloadCore(payload);
+            }
+            else
+            {
+                Dispatcher.UIThread.Post(() => ApplyRemoteStreamPayloadCore(payload), DispatcherPriority.Background);
+            }
+        }
+
+        private void ApplyRemoteStreamPayloadCore(RemoteEventStreamPayload payload)
+        {
+            if (_remoteReadOnly is null)
+            {
+                return;
+            }
+
+            var observedRoutes = ParseRoutingStrategies(payload.ObservedRoutes);
+            var firedEvent = new FiredEvent(
+                recordId: null,
+                triggerTime: payload.TimestampUtc.LocalDateTime,
+                eventName: payload.EventName,
+                eventOwnerType: null,
+                sourceDisplay: payload.Source,
+                originatorDisplay: payload.Originator,
+                handledByDisplay: payload.HandledBy,
+                observedRoutes,
+                isHandled: payload.IsHandled,
+                sourceNodePath: null);
+            AddRecordedEvent(firedEvent);
+        }
+
+        private void QueueRemoteRefresh()
+        {
+            if (_remoteReadOnly is null || _isRemoteRefreshScheduled)
+            {
+                return;
+            }
+
+            _isRemoteRefreshScheduled = true;
+            _ = RefreshRemoteSnapshotAsync();
+        }
+
+        private async Task RefreshRemoteSnapshotAsync()
+        {
+            var readOnly = _remoteReadOnly;
+            if (readOnly is null)
+            {
+                _isRemoteRefreshScheduled = false;
+                return;
+            }
+
+            try
+            {
+                var snapshot = await readOnly.GetEventsSnapshotAsync(
+                    new RemoteEventsSnapshotRequest
+                    {
+                        Scope = "combined",
+                        IncludeRecordedEvents = true,
+                    }).ConfigureAwait(false);
+
+                await Dispatcher.UIThread.InvokeAsync(() =>
+                {
+                    if (!ReferenceEquals(_remoteReadOnly, readOnly))
+                    {
+                        return;
+                    }
+
+                    ApplyRemoteSnapshot(snapshot);
+                });
+            }
+            catch
+            {
+                // Preserve the last applied remote events snapshot when refresh fails.
+            }
+            finally
+            {
+                _isRemoteRefreshScheduled = false;
+            }
+        }
+
+        private void ApplyRemoteSnapshot(RemoteEventsSnapshot snapshot)
+        {
+            var previousSelectedRecordId = SelectedEvent?.RecordId;
+            var previousSelectedEventName = SelectedEvent?.EventName;
+            var previousSelectedTriggerTime = SelectedEvent?.TriggerTime;
+
+            var wasApplying = _isApplyingRemoteMutations;
+            _isApplyingRemoteMutations = true;
+            try
+            {
+                IncludeBubbleRoutes = snapshot.IncludeBubbleRoutes;
+                IncludeTunnelRoutes = snapshot.IncludeTunnelRoutes;
+                IncludeDirectRoutes = snapshot.IncludeDirectRoutes;
+                IncludeHandledEvents = snapshot.IncludeHandledEvents;
+                IncludeUnhandledEvents = snapshot.IncludeUnhandledEvents;
+                MaxRecordedEvents = snapshot.MaxRecordedEvents > 0 ? snapshot.MaxRecordedEvents : MaxRecordedEvents;
+                AutoScrollToLatest = snapshot.AutoScrollToLatest;
+            }
+            finally
+            {
+                _isApplyingRemoteMutations = wasApplying;
+            }
+
+            ReplaceNodes(BuildRemoteNodes(snapshot, this));
+            RecordedEvents.Clear();
+
+            FiredEvent? selectedEvent = null;
+            for (var i = 0; i < snapshot.RecordedEvents.Count; i++)
+            {
+                var record = snapshot.RecordedEvents[i];
+                var firedEvent = new FiredEvent(
+                    record.Id,
+                    record.TriggerTime.LocalDateTime,
+                    record.EventName,
+                    eventOwnerType: FindEventOwnerType(Nodes, record.EventName),
+                    sourceDisplay: record.Source,
+                    originatorDisplay: record.Originator,
+                    handledByDisplay: record.HandledBy,
+                    observedRoutes: ParseRoutingStrategies(record.ObservedRoutes),
+                    isHandled: record.IsHandled,
+                    sourceNodePath: record.SourceNodePath);
+                RecordedEvents.Add(firedEvent);
+
+                if ((previousSelectedRecordId is not null && string.Equals(previousSelectedRecordId, record.Id, StringComparison.Ordinal)) ||
+                    (previousSelectedRecordId is null &&
+                     previousSelectedTriggerTime.HasValue &&
+                     previousSelectedTriggerTime.Value == firedEvent.TriggerTime &&
+                     string.Equals(previousSelectedEventName, firedEvent.EventName, StringComparison.Ordinal)))
+                {
+                    selectedEvent = firedEvent;
+                }
+            }
+
+            SelectedEvent = selectedEvent;
+            RefreshRecordedEventsLocal();
+        }
+
         internal void EvaluateEventBreakpoints(RoutedEvent routedEvent, object? sender, object? source)
         {
             _breakpointService.EvaluateEvent(routedEvent, sender as AvaloniaObject, source as AvaloniaObject);
@@ -660,7 +997,7 @@ namespace Avalonia.Diagnostics.ViewModels
                     routedEvent = evt;
                     return true;
 
-                case FiredEvent firedEvent:
+                case FiredEvent { Event: not null } firedEvent:
                     routedEvent = firedEvent.Event;
                     return true;
 
@@ -693,6 +1030,16 @@ namespace Avalonia.Diagnostics.ViewModels
             }
 
             return ("combined", null, (target as INamed)?.Name);
+        }
+
+        private (string Scope, string? NodePath, string? ControlName) ResolveRemoteTargetContext(FiredEvent firedEvent, AvaloniaObject? target)
+        {
+            if (!string.IsNullOrWhiteSpace(firedEvent.RemoteSourceNodePath))
+            {
+                return ("combined", firedEvent.RemoteSourceNodePath, (target as INamed)?.Name);
+            }
+
+            return ResolveRemoteTargetContext(target);
         }
 
         private async Task InvokeRemoteMutationAsync(
@@ -770,6 +1117,219 @@ namespace Avalonia.Diagnostics.ViewModels
 
             SelectedEvent = visible[nextIndex];
             return true;
+        }
+
+        private static EventTreeNodeBase[] BuildRemoteNodes(RemoteEventsSnapshot snapshot, EventsPageViewModel owner)
+        {
+            if (snapshot.Nodes.Count == 0)
+            {
+                return Array.Empty<EventTreeNodeBase>();
+            }
+
+            var childrenByParentId = new Dictionary<string, List<RemoteEventNodeSnapshot>>(StringComparer.Ordinal);
+            var roots = new List<EventTreeNodeBase>();
+
+            for (var i = 0; i < snapshot.Nodes.Count; i++)
+            {
+                var node = snapshot.Nodes[i];
+                if (string.IsNullOrWhiteSpace(node.ParentId))
+                {
+                    continue;
+                }
+
+                if (!childrenByParentId.TryGetValue(node.ParentId, out var children))
+                {
+                    children = new List<RemoteEventNodeSnapshot>();
+                    childrenByParentId[node.ParentId] = children;
+                }
+
+                children.Add(node);
+            }
+
+            for (var i = 0; i < snapshot.Nodes.Count; i++)
+            {
+                var root = snapshot.Nodes[i];
+                if (!string.IsNullOrWhiteSpace(root.ParentId))
+                {
+                    continue;
+                }
+
+                roots.Add(BuildRemoteNode(root, parent: null, owner, childrenByParentId));
+            }
+
+            return roots.ToArray();
+        }
+
+        private static EventTreeNodeBase BuildRemoteNode(
+            RemoteEventNodeSnapshot snapshot,
+            EventTreeNodeBase? parent,
+            EventsPageViewModel owner,
+            IReadOnlyDictionary<string, List<RemoteEventNodeSnapshot>> childrenByParentId)
+        {
+            EventTreeNodeBase node = string.Equals(snapshot.NodeKind, "event", StringComparison.Ordinal)
+                ? new RemoteEventTreeNode(parent, owner, snapshot)
+                : new RemoteEventOwnerTreeNode(parent, snapshot);
+
+            if (childrenByParentId.TryGetValue(snapshot.Id, out var children) && children.Count > 0)
+            {
+                var childNodes = new AvaloniaList<EventTreeNodeBase>(children.Count);
+                for (var i = 0; i < children.Count; i++)
+                {
+                    childNodes.Add(BuildRemoteNode(children[i], node, owner, childrenByParentId));
+                }
+
+                if (node is RemoteEventOwnerTreeNode ownerNode)
+                {
+                    ownerNode.SetChildren(childNodes);
+                }
+            }
+
+            return node;
+        }
+
+        private static string? FindEventOwnerType(IEnumerable<EventTreeNodeBase> nodes, string eventName)
+        {
+            foreach (var node in nodes)
+            {
+                if (FindMatchingNode(node, eventName, eventOwnerType: null) is { } matched)
+                {
+                    return matched.EventOwnerType;
+                }
+            }
+
+            return null;
+        }
+
+        private static RemoteEventTreeNode? FindMatchingNode(EventTreeNodeBase node, string eventName, string? eventOwnerType)
+        {
+            if (node is RemoteEventTreeNode remoteNode &&
+                string.Equals(remoteNode.EventName, eventName, StringComparison.Ordinal) &&
+                (string.IsNullOrWhiteSpace(eventOwnerType) ||
+                 string.Equals(remoteNode.EventOwnerType, eventOwnerType, StringComparison.Ordinal)))
+            {
+                return remoteNode;
+            }
+
+            if (node.Children is null)
+            {
+                return null;
+            }
+
+            foreach (var child in node.Children)
+            {
+                if (FindMatchingNode(child, eventName, eventOwnerType) is { } match)
+                {
+                    return match;
+                }
+            }
+
+            return null;
+        }
+
+        private static RoutingStrategies ParseRoutingStrategies(string? text)
+        {
+            return Enum.TryParse(text, ignoreCase: true, out RoutingStrategies routes)
+                ? routes
+                : RoutingStrategies.Direct;
+        }
+
+        private sealed class RemoteEventOwnerTreeNode : EventTreeNodeBase
+        {
+            public RemoteEventOwnerTreeNode(EventTreeNodeBase? parent, RemoteEventNodeSnapshot snapshot)
+                : base(parent, snapshot.Text)
+            {
+                IsExpanded = snapshot.IsExpanded;
+                IsVisible = snapshot.IsVisible;
+                base.IsEnabled = snapshot.IsEnabled;
+            }
+
+            public void SetChildren(IAvaloniaReadOnlyList<EventTreeNodeBase> children)
+            {
+                Children = children;
+                UpdateChecked();
+            }
+
+            public override bool? IsEnabled
+            {
+                get => base.IsEnabled;
+                set
+                {
+                    if (base.IsEnabled == value)
+                    {
+                        return;
+                    }
+
+                    base.IsEnabled = value;
+                    if (!_updateChildren || value is null || Children is null)
+                    {
+                        return;
+                    }
+
+                    foreach (var child in Children)
+                    {
+                        try
+                        {
+                            child._updateParent = false;
+                            child.IsEnabled = value;
+                        }
+                        finally
+                        {
+                            child._updateParent = true;
+                        }
+                    }
+                }
+            }
+        }
+
+        private sealed class RemoteEventTreeNode : EventTreeNodeBase
+        {
+            private readonly EventsPageViewModel _owner;
+
+            public RemoteEventTreeNode(EventTreeNodeBase? parent, EventsPageViewModel owner, RemoteEventNodeSnapshot snapshot)
+                : base(parent, snapshot.Text)
+            {
+                _owner = owner;
+                EventOwnerType = snapshot.OwnerType;
+                EventName = snapshot.EventName ?? string.Empty;
+                IsVisible = snapshot.IsVisible;
+                IsExpanded = snapshot.IsExpanded;
+                base.IsEnabled = snapshot.IsEnabled;
+            }
+
+            public string? EventOwnerType { get; }
+
+            public string EventName { get; }
+
+            public override bool? IsEnabled
+            {
+                get => base.IsEnabled;
+                set
+                {
+                    if (base.IsEnabled == value)
+                    {
+                        return;
+                    }
+
+                    base.IsEnabled = value;
+                    if (value is bool isEnabled)
+                    {
+                        _owner.NotifyEventNodeIsEnabledChanged(EventName, EventOwnerType, isEnabled);
+                    }
+
+                    if (Parent is not null && _updateParent)
+                    {
+                        try
+                        {
+                            Parent._updateChildren = false;
+                            Parent.UpdateChecked();
+                        }
+                        finally
+                        {
+                            Parent._updateChildren = true;
+                        }
+                    }
+                }
+            }
         }
     }
 }

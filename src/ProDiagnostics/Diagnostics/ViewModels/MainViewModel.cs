@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using Avalonia.Controls;
@@ -20,6 +21,10 @@ namespace Avalonia.Diagnostics.ViewModels
 {
     internal class MainViewModel : ViewModelBase, IDisposable
     {
+        private static readonly bool TraceEnabled = string.Equals(
+            Environment.GetEnvironmentVariable("PRODIAG_TRACE"),
+            "1",
+            StringComparison.Ordinal);
         private const int LastVisibleTabIndex = 16;
         private const int LastTabIndex = 17;
         private const int LastRightPanelTabIndex = LastTabIndex - 3;
@@ -91,12 +96,22 @@ namespace Avalonia.Diagnostics.ViewModels
         private ControlDetailsViewModel? _visualDetailsSubscription;
         private ControlDetailsViewModel? _combinedDetailsSubscription;
         private DevToolsRemoteLoopbackSession? _remoteLoopbackSession;
+        private DevToolsRemoteClientSession? _remoteClientSession;
         private IRemoteReadOnlyDiagnosticsDomainService? _remoteReadOnly;
         private IRemoteMutationDiagnosticsDomainService? _remoteMutation;
         private IDisposable? _remoteSelectionStreamSubscription;
+        private IDisposable? _remoteLogsStreamSubscription;
+        private IDisposable? _remoteEventsStreamSubscription;
+        private IDisposable? _remoteMetricsStreamSubscription;
+        private IDisposable? _remoteProfilerStreamSubscription;
         private bool _remoteLoopbackInitializationRequested;
+        private bool _remoteClientInitializationRequested;
         private bool _isApplyingSelectionSnapshot;
         private bool _suppressRemoteSelectionPush;
+        private bool _disableLocalFallbackInRemoteRuntime;
+        private RemoteTreeSnapshot? _preconnectedCombinedTreeSnapshot;
+        private RemoteSelectionSnapshot? _preconnectedCombinedSelectionSnapshot;
+        private string _remoteStreamDemandSignature = string.Empty;
         private readonly Dictionary<int, DeferredRefreshState> _deferredRightTabRefreshStates = new();
         private bool _isDisposed;
 
@@ -146,6 +161,8 @@ namespace Avalonia.Diagnostics.ViewModels
             _resources.PropertyChanged += ResourcesPagePropertyChanged;
             _assets.PropertyChanged += AssetsPagePropertyChanged;
             _elements3D.PropertyChanged += Elements3DPropertyChanged;
+            _metrics.PropertyChanged += MetricsPagePropertyChanged;
+            _profiler.PropertyChanged += ProfilerPagePropertyChanged;
             _selectionStore.SelectionChanged += SelectionStoreSelectionChanged;
 
             UpdateFocusedControl();
@@ -470,6 +487,7 @@ namespace Avalonia.Diagnostics.ViewModels
 
                 Content = IsTreeTab(normalized) ? TreeContent : RightContent;
                 RaisePropertyChanged();
+                QueueRemoteStreamDemandSync();
             }
         }
 
@@ -792,9 +810,19 @@ namespace Avalonia.Diagnostics.ViewModels
             _resources.PropertyChanged -= ResourcesPagePropertyChanged;
             _assets.PropertyChanged -= AssetsPagePropertyChanged;
             _elements3D.PropertyChanged -= Elements3DPropertyChanged;
+            _metrics.PropertyChanged -= MetricsPagePropertyChanged;
+            _profiler.PropertyChanged -= ProfilerPagePropertyChanged;
             _selectionStore.SelectionChanged -= SelectionStoreSelectionChanged;
             _remoteSelectionStreamSubscription?.Dispose();
             _remoteSelectionStreamSubscription = null;
+            _remoteLogsStreamSubscription?.Dispose();
+            _remoteLogsStreamSubscription = null;
+            _remoteEventsStreamSubscription?.Dispose();
+            _remoteEventsStreamSubscription = null;
+            _remoteMetricsStreamSubscription?.Dispose();
+            _remoteMetricsStreamSubscription = null;
+            _remoteProfilerStreamSubscription?.Dispose();
+            _remoteProfilerStreamSubscription = null;
 
             _pointerOverSubscription.Dispose();
             _breakpointService.Clear();
@@ -830,6 +858,20 @@ namespace Avalonia.Diagnostics.ViewModels
                 }
 
                 _remoteLoopbackSession = null;
+            }
+
+            if (_remoteClientSession is not null)
+            {
+                try
+                {
+                    _remoteClientSession.DisposeAsync().AsTask().GetAwaiter().GetResult();
+                }
+                catch
+                {
+                    // Best-effort cleanup for diagnostics remote client transport.
+                }
+
+                _remoteClientSession = null;
             }
         }
 
@@ -907,6 +949,18 @@ namespace Avalonia.Diagnostics.ViewModels
             }
         }
 
+        internal void RequestTreeNavigateTo(string? combinedNodePath)
+        {
+            if (string.IsNullOrWhiteSpace(combinedNodePath))
+            {
+                return;
+            }
+
+            SelectedTreeTab = 0;
+            SelectedTab = 0;
+            _combinedTree.TrySelectNodeByPath(combinedNodePath);
+        }
+
         public int? StartupScreenIndex { get; private set; }
 
         [DependsOn(nameof(TreePageViewModel.SelectedNode))]
@@ -956,20 +1010,125 @@ namespace Avalonia.Diagnostics.ViewModels
             _transportSettings.SetOptions(options);
             _hotKeys.SetOptions(options);
 
-            if (options.UseRemoteRuntime)
+            ConfigureRemoteTreeFallback(options);
+            SelectedTab = GetTabIndex(options.LaunchView);
+
+            if (options.UseRemoteRuntime &&
+                !TryApplyPreconnectedRemoteBootstrap() &&
+                options.ConnectOnStartup)
             {
-                _ = EnsureRemoteReadOnlyLoopbackAsync(options);
+                _ = EnsureRemoteReadOnlyRuntimeAsync(options);
+            }
+        }
+
+        internal void SetPreconnectedRemoteClientSession(
+            DevToolsRemoteClientSession session,
+            RemoteTreeSnapshot? combinedTreeSnapshot = null,
+            RemoteSelectionSnapshot? combinedSelectionSnapshot = null)
+        {
+            ArgumentNullException.ThrowIfNull(session);
+
+            if (_remoteClientSession is not null && !ReferenceEquals(_remoteClientSession, session))
+            {
+                try
+                {
+                    _remoteClientSession.DisposeAsync().AsTask().GetAwaiter().GetResult();
+                }
+                catch
+                {
+                    // Best-effort cleanup for replaced diagnostics remote client transport.
+                }
             }
 
-            SelectedTab = GetTabIndex(options.LaunchView);
+            if (_remoteLoopbackSession is not null)
+            {
+                try
+                {
+                    _remoteLoopbackSession.DisposeAsync().AsTask().GetAwaiter().GetResult();
+                }
+                catch
+                {
+                    // Best-effort cleanup for replaced diagnostics loopback transport.
+                }
+
+                _remoteLoopbackSession = null;
+            }
+
+            _remoteClientSession = session;
+            _preconnectedCombinedTreeSnapshot = combinedTreeSnapshot;
+            _preconnectedCombinedSelectionSnapshot = combinedSelectionSnapshot;
+            _remoteClientInitializationRequested = false;
+            _remoteLoopbackInitializationRequested = false;
+        }
+
+        private bool TryApplyPreconnectedRemoteBootstrap()
+        {
+            var session = _remoteClientSession;
+            if (session is null)
+            {
+                return false;
+            }
+
+            var activeTree = GetActiveTreeViewModel();
+            var combinedTreeSnapshot = _preconnectedCombinedTreeSnapshot;
+            var combinedSelectionSnapshot = _preconnectedCombinedSelectionSnapshot;
+            var hasCombinedTreeSnapshot = combinedTreeSnapshot is not null;
+
+            if (combinedTreeSnapshot is not null)
+            {
+                _combinedTree.ApplyPreloadedRemoteTreeSnapshot(combinedTreeSnapshot);
+            }
+
+            if (TraceEnabled)
+            {
+                Console.WriteLine(
+                    $"[MainViewModel] TryApplyPreconnectedRemoteBootstrap activeTree={activeTree.GetType().Name} " +
+                    $"hasCombinedTreeSnapshot={hasCombinedTreeSnapshot} " +
+                    $"hasCombinedSelectionSnapshot={combinedSelectionSnapshot is not null}");
+            }
+
+            BindRemoteReadOnlyTabs(session.Domains, refreshActiveTree: false, refreshSelectionNow: false);
+
+            if (combinedSelectionSnapshot is { } selectionSnapshot)
+            {
+                ApplyRemoteSelectionSnapshot(selectionSnapshot);
+            }
+            else if (_combinedTree.SelectedNode is not null)
+            {
+                PublishSelectionToStore(
+                    _combinedTree.SelectedNode.Visual,
+                    combinedNodePathHint: _combinedTree.SelectedNodePath,
+                    combinedNodeIdHint: _combinedTree.SelectedNodeId,
+                    pushRemote: false);
+            }
+
+            _ = BootstrapRemoteRuntimeAsync(
+                session.Domains,
+                combinedTreeAlreadyLoaded: false);
+
+            _preconnectedCombinedTreeSnapshot = null;
+            _preconnectedCombinedSelectionSnapshot = null;
+            return true;
+        }
+
+        private void ConfigureRemoteTreeFallback(DevToolsOptions options)
+        {
+            _disableLocalFallbackInRemoteRuntime = options.UseRemoteRuntime && options.DisableLocalFallbackInRemoteRuntime;
+            _logicalTree.SetRemoteDisconnectedFallbackDisabled(_disableLocalFallbackInRemoteRuntime);
+            _visualTree.SetRemoteDisconnectedFallbackDisabled(_disableLocalFallbackInRemoteRuntime);
+            _combinedTree.SetRemoteDisconnectedFallbackDisabled(_disableLocalFallbackInRemoteRuntime);
         }
 
         internal void NotifyTreeSelectionChanged(
             AvaloniaObject? selectedObject,
             string? scope = null,
-            string? nodePath = null)
+            string? nodePath = null,
+            string? nodeId = null)
         {
-            PublishSelectionToStore(selectedObject, combinedNodePathHint: ResolveCombinedNodePath(nodePath, scope, selectedObject));
+            PublishSelectionToStore(
+                selectedObject,
+                combinedNodePathHint: ResolveCombinedNodePath(nodePath, scope, selectedObject, nodeId),
+                combinedNodeIdHint: ResolveCombinedNodeId(nodeId, scope, selectedObject));
         }
 
         private void SelectionStoreSelectionChanged(RemoteSelectionSnapshot snapshot)
@@ -983,20 +1142,29 @@ namespace Avalonia.Diagnostics.ViewModels
             ApplySelectionSnapshot(snapshot);
         }
 
-        private void PublishSelectionToStore(AvaloniaObject? selectedObject, string? combinedNodePathHint, bool pushRemote = true)
+        private void PublishSelectionToStore(
+            AvaloniaObject? selectedObject,
+            string? combinedNodePathHint,
+            string? combinedNodeIdHint = null,
+            bool pushRemote = true)
         {
-            var resolvedSelection = selectedObject
-                ?? _selectedDiagnosticsObject
-                ?? _combinedTree.SelectedNode?.Visual
-                ?? _logicalTree.SelectedNode?.Visual
-                ?? _visualTree.SelectedNode?.Visual
-                ?? TryGetFocusedDiagnosticsObject()
-                ?? TryGetPointerOverDiagnosticsObject()
-                ?? TryGetFirstNonDevToolsTopLevel()
-                ?? _root;
-            var combinedPath = ResolveCombinedNodePath(combinedNodePathHint, scope: null, resolvedSelection);
-            var target = DescribeSelectionTarget(resolvedSelection);
-            var targetType = resolvedSelection.GetType().FullName ?? resolvedSelection.GetType().Name;
+            var resolvedSelection = selectedObject;
+            if (resolvedSelection is null && !_disableLocalFallbackInRemoteRuntime)
+            {
+                resolvedSelection = _selectedDiagnosticsObject
+                    ?? _combinedTree.SelectedNode?.Visual
+                    ?? _logicalTree.SelectedNode?.Visual
+                    ?? _visualTree.SelectedNode?.Visual
+                    ?? TryGetFocusedDiagnosticsObject()
+                    ?? TryGetPointerOverDiagnosticsObject()
+                    ?? TryGetFirstNonDevToolsTopLevel()
+                    ?? _root;
+            }
+
+            var combinedNodeId = ResolveCombinedNodeId(combinedNodeIdHint, scope: null, selectedObject: resolvedSelection);
+            var combinedPath = ResolveCombinedNodePath(combinedNodePathHint, scope: null, resolvedSelection, combinedNodeId);
+            var target = resolvedSelection is null ? null : DescribeSelectionTarget(resolvedSelection);
+            var targetType = resolvedSelection?.GetType().FullName ?? resolvedSelection?.GetType().Name;
 
             var previousSuppress = _suppressRemoteSelectionPush;
             if (!pushRemote)
@@ -1008,7 +1176,7 @@ namespace Avalonia.Diagnostics.ViewModels
             {
                 _selectionStore.SetSelection(
                     scope: "combined",
-                    nodeId: null,
+                    nodeId: combinedNodeId,
                     nodePath: combinedPath,
                     target: target,
                     targetType: targetType);
@@ -1035,12 +1203,18 @@ namespace Avalonia.Diagnostics.ViewModels
             PublishSelectionToStore(selectedObject, combinedNodePathHint: nodePath);
         }
 
-        private string? ResolveCombinedNodePath(string? nodePath, string? scope, AvaloniaObject? selectedObject)
+        private string? ResolveCombinedNodePath(string? nodePath, string? scope, AvaloniaObject? selectedObject, string? nodeId = null)
         {
             if (!string.IsNullOrWhiteSpace(nodePath) &&
                 string.Equals(NormalizeScope(scope), "combined", StringComparison.Ordinal))
             {
                 return nodePath;
+            }
+
+            if (!string.IsNullOrWhiteSpace(nodeId) &&
+                _combinedTree.TryGetNodePathById(nodeId, out var pathFromNodeId))
+            {
+                return pathFromNodeId;
             }
 
             if (selectedObject is not null &&
@@ -1049,9 +1223,29 @@ namespace Avalonia.Diagnostics.ViewModels
                 return pathFromObject;
             }
 
+            if (!string.IsNullOrWhiteSpace(nodePath) &&
+                !string.Equals(NormalizeScope(scope), "combined", StringComparison.Ordinal))
+            {
+                var sourceTree = GetTreeViewModelForScope(scope);
+                if (sourceTree.TryGetNodeByPath(nodePath, out var sourceNode) &&
+                    sourceNode is not null)
+                {
+                    var sourceNodeId = sourceTree.SelectedNode == sourceNode
+                        ? sourceTree.SelectedNodeId
+                        : sourceNode is RemoteTreeNode remoteTreeNode
+                            ? remoteTreeNode.Snapshot.NodeId
+                            : null;
+                    if (!string.IsNullOrWhiteSpace(sourceNodeId) &&
+                        _combinedTree.TryGetNodePathById(sourceNodeId, out var combinedPathFromNodeId))
+                    {
+                        return combinedPathFromNodeId;
+                    }
+                }
+            }
+
             if (string.IsNullOrWhiteSpace(nodePath))
             {
-                return _combinedTree.SelectedNodePath;
+                return _disableLocalFallbackInRemoteRuntime ? null : _combinedTree.SelectedNodePath;
             }
 
             if (_combinedTree.TryGetNodeByPath(nodePath, out _))
@@ -1059,7 +1253,32 @@ namespace Avalonia.Diagnostics.ViewModels
                 return nodePath;
             }
 
-            return _combinedTree.SelectedNodePath;
+            return _disableLocalFallbackInRemoteRuntime ? null : _combinedTree.SelectedNodePath;
+        }
+
+        private string? ResolveCombinedNodeId(string? nodeId, string? scope, AvaloniaObject? selectedObject)
+        {
+            if (!string.IsNullOrWhiteSpace(nodeId) &&
+                string.Equals(NormalizeScope(scope), "combined", StringComparison.Ordinal))
+            {
+                return nodeId;
+            }
+
+            if (!string.IsNullOrWhiteSpace(nodeId) &&
+                _combinedTree.TryGetNodeById(nodeId, out _))
+            {
+                return nodeId;
+            }
+
+            if (selectedObject is not null &&
+                _combinedTree.TryGetNodePathForObject(selectedObject, out var combinedPath) &&
+                _combinedTree.TryGetNodeByPath(combinedPath, out var combinedNode) &&
+                combinedNode is RemoteTreeNode remoteTreeNode)
+            {
+                return remoteTreeNode.Snapshot.NodeId;
+            }
+
+            return null;
         }
 
         private void ApplySelectionSnapshot(RemoteSelectionSnapshot snapshot)
@@ -1072,21 +1291,46 @@ namespace Avalonia.Diagnostics.ViewModels
             _isApplyingSelectionSnapshot = true;
             try
             {
+                var selectionNodeId = snapshot.NodeId;
+                var selectionNodePath = snapshot.NodePath;
+                var snapshotHasExplicitTarget = !string.IsNullOrWhiteSpace(selectionNodeId) ||
+                                                !string.IsNullOrWhiteSpace(selectionNodePath);
                 AvaloniaObject? resolvedSelection = null;
-                if (!string.IsNullOrWhiteSpace(snapshot.NodePath) &&
-                    _combinedTree.TrySelectNodeByPath(snapshot.NodePath, notifyMainSelection: false))
+                if (!string.IsNullOrWhiteSpace(selectionNodePath) &&
+                    _combinedTree.TrySelectNodeByPath(selectionNodePath, notifyMainSelection: false))
                 {
                     resolvedSelection = _combinedTree.SelectedNode?.Visual;
+                    selectionNodeId ??= _combinedTree.SelectedNodeId;
+                    selectionNodePath = _combinedTree.SelectedNodePath;
+                }
+                else if (!string.IsNullOrWhiteSpace(selectionNodeId) &&
+                         _combinedTree.TrySelectNodeById(selectionNodeId, notifyMainSelection: false))
+                {
+                    resolvedSelection = _combinedTree.SelectedNode?.Visual;
+                    selectionNodeId = _combinedTree.SelectedNodeId;
+                    selectionNodePath ??= _combinedTree.SelectedNodePath;
                 }
 
-                resolvedSelection ??= _combinedTree.SelectedNode?.Visual
-                    ?? _selectedDiagnosticsObject
-                    ?? TryGetFocusedDiagnosticsObject()
-                    ?? TryGetPointerOverDiagnosticsObject()
-                    ?? TryGetFirstNonDevToolsTopLevel()
-                    ?? _root;
+                if (_disableLocalFallbackInRemoteRuntime &&
+                    resolvedSelection is null &&
+                    _combinedTree.EnsureSelection(notifyMainSelection: false))
+                {
+                    resolvedSelection = _combinedTree.SelectedNode?.Visual;
+                    selectionNodeId = _combinedTree.SelectedNodeId;
+                    selectionNodePath = _combinedTree.SelectedNodePath;
+                }
 
-                SynchronizeTreeSelections(resolvedSelection);
+                if (!_disableLocalFallbackInRemoteRuntime)
+                {
+                    resolvedSelection ??= _combinedTree.SelectedNode?.Visual
+                        ?? _selectedDiagnosticsObject
+                        ?? TryGetFocusedDiagnosticsObject()
+                        ?? TryGetPointerOverDiagnosticsObject()
+                        ?? TryGetFirstNonDevToolsTopLevel()
+                        ?? _root;
+                }
+
+                SynchronizeTreeSelections(selectionNodeId, selectionNodePath, resolvedSelection);
                 _selectedDiagnosticsObject = resolvedSelection;
                 if (resolvedSelection is Control selectedControl &&
                     RightContent is ResourcesPageViewModel resourcesPage)
@@ -1122,7 +1366,7 @@ namespace Avalonia.Diagnostics.ViewModels
                 }
                 UpdateInspectionHighlight();
 
-                if (!_suppressRemoteSelectionPush)
+                if (!_suppressRemoteSelectionPush && snapshotHasExplicitTarget)
                 {
                     _ = PushRemoteSelectionAsync(snapshot);
                 }
@@ -1133,9 +1377,10 @@ namespace Avalonia.Diagnostics.ViewModels
             }
         }
 
-        private void SynchronizeTreeSelections(AvaloniaObject selection)
+        private void SynchronizeTreeSelections(string? nodeId, string? nodePath, AvaloniaObject? selection)
         {
-            if (!_isSynchronizingCombinedTreeSelection &&
+            if (selection is not null &&
+                !_isSynchronizingCombinedTreeSelection &&
                 selection is Control control &&
                 !ReferenceEquals(_combinedTree.SelectedNode?.Visual, control))
             {
@@ -1150,9 +1395,59 @@ namespace Avalonia.Diagnostics.ViewModels
                 }
             }
 
+            if (_disableLocalFallbackInRemoteRuntime)
+            {
+                var selectedAny = false;
+                selectedAny |= SelectRemoteTreeNode(_combinedTree, nodeId, nodePath);
+                selectedAny |= SelectRemoteTreeNode(_logicalTree, nodeId, nodePath);
+                selectedAny |= SelectRemoteTreeNode(_visualTree, nodeId, nodePath);
+
+                if (!selectedAny)
+                {
+                    _combinedTree.ClearSelection();
+                    _logicalTree.ClearSelection();
+                    _visualTree.ClearSelection();
+                }
+
+                return;
+            }
+
+            if (selection is null)
+            {
+                return;
+            }
+
             _combinedTree.SelectObject(selection, notifyMainSelection: false);
             _logicalTree.SelectObject(selection, notifyMainSelection: false);
             _visualTree.SelectObject(selection, notifyMainSelection: false);
+        }
+
+        private TreePageViewModel GetTreeViewModelForScope(string? scope)
+        {
+            return NormalizeScope(scope) switch
+            {
+                "logical" => _logicalTree,
+                "visual" => _visualTree,
+                _ => _combinedTree,
+            };
+        }
+
+        private bool SelectRemoteTreeNode(TreePageViewModel tree, string? nodeId, string? combinedNodePath)
+        {
+            if (!string.IsNullOrWhiteSpace(nodeId) &&
+                tree.TrySelectNodeById(nodeId, notifyMainSelection: false))
+            {
+                return true;
+            }
+
+            if (ReferenceEquals(tree, _combinedTree) &&
+                !string.IsNullOrWhiteSpace(combinedNodePath) &&
+                tree.TrySelectNodeByPath(combinedNodePath, notifyMainSelection: false))
+            {
+                return true;
+            }
+
+            return false;
         }
 
         private static string DescribeSelectionTarget(AvaloniaObject selection)
@@ -1182,6 +1477,7 @@ namespace Avalonia.Diagnostics.ViewModels
 
         internal BreakpointService BreakpointService => _breakpointService;
         internal bool HasRemoteMutation => _remoteMutation is not null;
+        internal bool AllowLocalInspectFallback => !_disableLocalFallbackInRemoteRuntime;
 
         public bool ShowImplementedInterfaces
         {
@@ -1355,6 +1651,72 @@ namespace Avalonia.Diagnostics.ViewModels
             }
 
             FlushDeferredRightTabRefresh(activeRightGlobalTab, force: false);
+        }
+
+        private void QueueRemoteStreamDemandSync(bool force = false)
+        {
+            if (_isDisposed || _remoteMutation is null)
+            {
+                return;
+            }
+
+            _ = SyncRemoteStreamDemandAsync(force);
+        }
+
+        private async Task SyncRemoteStreamDemandAsync(bool force)
+        {
+            var mutation = _remoteMutation;
+            if (mutation is null)
+            {
+                return;
+            }
+
+            var topics = ResolveRemoteStreamDemandTopics().ToArray();
+            var signature = string.Join("|", topics);
+            if (!force && string.Equals(signature, _remoteStreamDemandSignature, StringComparison.Ordinal))
+            {
+                return;
+            }
+
+            try
+            {
+                await mutation.SetStreamDemandAsync(
+                    new RemoteSetStreamDemandRequest
+                    {
+                        Topics = topics,
+                    }).ConfigureAwait(false);
+                _remoteStreamDemandSignature = signature;
+            }
+            catch
+            {
+                // Keep the last successfully applied demand signature when update fails.
+            }
+        }
+
+        private IEnumerable<string> ResolveRemoteStreamDemandTopics()
+        {
+            yield return RemoteStreamTopics.Selection;
+
+            if (IsTreeTab(SelectedTab))
+            {
+                yield break;
+            }
+
+            switch (SelectedTab)
+            {
+                case 8:
+                    yield return RemoteStreamTopics.Events;
+                    break;
+                case 10:
+                    yield return RemoteStreamTopics.Logs;
+                    break;
+                case 11 when !_metrics.IsUpdatesPaused:
+                    yield return RemoteStreamTopics.Metrics;
+                    break;
+                case 13 when _profiler.IsSampling:
+                    yield return RemoteStreamTopics.Profiler;
+                    break;
+            }
         }
 
         private DeferredRefreshState GetDeferredRefreshState(int globalTabIndex)
@@ -1557,12 +1919,32 @@ namespace Avalonia.Diagnostics.ViewModels
 
                     return _assets;
                 case 8:
+                    if (inspectSelection)
+                    {
+                        _events.RefreshRecordedEvents();
+                    }
+
                     return _events;
                 case 9:
+                    if (inspectSelection)
+                    {
+                        _breakpoints.Refresh();
+                    }
+
                     return _breakpoints;
                 case 10:
+                    if (inspectSelection)
+                    {
+                        _logs.Refresh();
+                    }
+
                     return _logs;
                 case 11:
+                    if (inspectSelection)
+                    {
+                        _metrics.Refresh();
+                    }
+
                     return _metrics;
                 case 12:
                     if (inspectSelection)
@@ -1572,6 +1954,11 @@ namespace Avalonia.Diagnostics.ViewModels
 
                     return _viewModelsBindings;
                 case 13:
+                    if (inspectSelection)
+                    {
+                        _profiler.Refresh();
+                    }
+
                     return _profiler;
                 case 14:
                     if (inspectSelection)
@@ -1617,6 +2004,10 @@ namespace Avalonia.Diagnostics.ViewModels
             if (!ReferenceEquals(RightContent, propertiesContent))
             {
                 RightContent = propertiesContent;
+                if (TraceEnabled)
+                {
+                    Console.WriteLine($"[MainViewModel] RightContent -> {RightContent?.GetType().Name ?? "(null)"}");
+                }
             }
 
             if (SelectedTab == 3)
@@ -1635,6 +2026,10 @@ namespace Avalonia.Diagnostics.ViewModels
             if (e.PropertyName == nameof(TreePageViewModel.Details))
             {
                 AttachDetailsSubscription(treeViewModel);
+                if (ReferenceEquals(treeViewModel, GetActiveTreeViewModel()))
+                {
+                    RefreshPropertiesTabContent();
+                }
             }
         }
 
@@ -1757,6 +2152,22 @@ namespace Avalonia.Diagnostics.ViewModels
             if (e.PropertyName == nameof(AssetsPageViewModel.SelectedAsset))
             {
                 SyncCodeFromCurrentContext();
+            }
+        }
+
+        private void MetricsPagePropertyChanged(object? sender, PropertyChangedEventArgs e)
+        {
+            if (e.PropertyName == nameof(MetricsPageViewModel.IsUpdatesPaused))
+            {
+                QueueRemoteStreamDemandSync(force: true);
+            }
+        }
+
+        private void ProfilerPagePropertyChanged(object? sender, PropertyChangedEventArgs e)
+        {
+            if (e.PropertyName == nameof(ProfilerPageViewModel.IsSampling))
+            {
+                QueueRemoteStreamDemandSync(force: true);
             }
         }
 
@@ -1918,6 +2329,15 @@ namespace Avalonia.Diagnostics.ViewModels
 
         private AvaloniaObject? GetSelectedDiagnosticsObject()
         {
+            if (_disableLocalFallbackInRemoteRuntime)
+            {
+                return _selectedDiagnosticsObject
+                    ?? (Content as TreePageViewModel)?.SelectedNode?.Visual
+                    ?? _combinedTree.SelectedNode?.Visual
+                    ?? _logicalTree.SelectedNode?.Visual
+                    ?? _visualTree.SelectedNode?.Visual;
+            }
+
             return _selectedDiagnosticsObject
                 ?? (Content as TreePageViewModel)?.SelectedNode?.Visual
                 ?? _combinedTree.SelectedNode?.Visual
@@ -1977,11 +2397,129 @@ namespace Avalonia.Diagnostics.ViewModels
             return null;
         }
 
+        private Task EnsureRemoteReadOnlyRuntimeAsync(DevToolsOptions options)
+        {
+            if (options.RemoteRuntimeEndpoint is not null)
+            {
+                return EnsureRemoteReadOnlyClientAsync(options.RemoteRuntimeEndpoint, options.RemoteRuntimeClientOptions);
+            }
+
+            return EnsureRemoteReadOnlyLoopbackAsync(options);
+        }
+
+        private async Task EnsureRemoteReadOnlyClientAsync(
+            Uri endpoint,
+            RemoteDiagnosticsClientOptions clientOptions)
+        {
+            if (TraceEnabled)
+            {
+                Console.WriteLine($"[MainViewModel] EnsureRemoteReadOnlyClientAsync start endpoint={endpoint}");
+            }
+            if (_remoteClientSession is not null && Uri.Compare(
+                    _remoteClientSession.Endpoint,
+                    endpoint,
+                    UriComponents.AbsoluteUri,
+                    UriFormat.SafeUnescaped,
+                    StringComparison.OrdinalIgnoreCase) != 0)
+            {
+                try
+                {
+                    await _remoteClientSession.DisposeAsync().ConfigureAwait(false);
+                }
+                catch
+                {
+                    // Best-effort cleanup for diagnostics remote client transport.
+                }
+
+                _remoteClientSession = null;
+            }
+
+            if (_remoteClientSession is not null)
+            {
+                BindRemoteReadOnlyTabs(_remoteClientSession.Domains, refreshActiveTree: false, refreshSelectionNow: false);
+                return;
+            }
+
+            if (_remoteClientInitializationRequested)
+            {
+                return;
+            }
+
+            _remoteClientInitializationRequested = true;
+            try
+            {
+                if (_remoteLoopbackSession is not null)
+                {
+                    try
+                    {
+                        await _remoteLoopbackSession.DisposeAsync().ConfigureAwait(false);
+                    }
+                    catch
+                    {
+                        // Best-effort cleanup for diagnostics local loopback transport.
+                    }
+
+                    _remoteLoopbackSession = null;
+                }
+
+                if (_disableLocalFallbackInRemoteRuntime)
+                {
+                    ApplyRemoteDisconnectedTreeState();
+                }
+
+                var session = await DevToolsRemoteClientSession.ConnectAsync(
+                    endpoint,
+                    clientOptions).ConfigureAwait(false);
+
+                await Dispatcher.UIThread.InvokeAsync(() =>
+                {
+                    if (TraceEnabled)
+                    {
+                        Console.WriteLine($"[MainViewModel] EnsureRemoteReadOnlyClientAsync connected endpoint={endpoint}");
+                    }
+                    _remoteClientSession = session;
+                    BindRemoteReadOnlyTabs(session.Domains, refreshActiveTree: false, refreshSelectionNow: false);
+                });
+
+                await BootstrapRemoteRuntimeAsync(session.Domains).ConfigureAwait(false);
+            }
+            catch (Exception ex)
+            {
+                if (TraceEnabled)
+                {
+                    Console.WriteLine($"[MainViewModel] EnsureRemoteReadOnlyClientAsync failed endpoint={endpoint} error={ex.GetType().Name}: {ex.Message}");
+                }
+                // Keep current local diagnostics state when remote client bootstrap fails.
+                if (_disableLocalFallbackInRemoteRuntime)
+                {
+                    ApplyRemoteDisconnectedTreeState();
+                }
+            }
+            finally
+            {
+                _remoteClientInitializationRequested = false;
+            }
+        }
+
         private async Task EnsureRemoteReadOnlyLoopbackAsync(DevToolsOptions options)
         {
+            if (_remoteClientSession is not null)
+            {
+                try
+                {
+                    await _remoteClientSession.DisposeAsync().ConfigureAwait(false);
+                }
+                catch
+                {
+                    // Best-effort cleanup for diagnostics remote client transport.
+                }
+
+                _remoteClientSession = null;
+            }
+
             if (_remoteLoopbackSession is not null)
             {
-                BindRemoteReadOnlyTabs(_remoteLoopbackSession);
+                BindRemoteReadOnlyTabs(_remoteLoopbackSession.Domains, refreshActiveTree: false, refreshSelectionNow: false);
                 return;
             }
 
@@ -1993,6 +2531,11 @@ namespace Avalonia.Diagnostics.ViewModels
             _remoteLoopbackInitializationRequested = true;
             try
             {
+                if (_disableLocalFallbackInRemoteRuntime)
+                {
+                    ApplyRemoteDisconnectedTreeState();
+                }
+
                 var session = await DevToolsRemoteLoopbackSession.StartAsync(
                     _root,
                     options.RemoteLoopbackOptions).ConfigureAwait(false);
@@ -2000,61 +2543,250 @@ namespace Avalonia.Diagnostics.ViewModels
                 await Dispatcher.UIThread.InvokeAsync(() =>
                 {
                     _remoteLoopbackSession = session;
-                    BindRemoteReadOnlyTabs(session);
+                    BindRemoteReadOnlyTabs(session.Domains, refreshActiveTree: false, refreshSelectionNow: false);
                 });
+
+                await BootstrapRemoteRuntimeAsync(session.Domains).ConfigureAwait(false);
             }
             catch
+            {
+                // Keep current in-process diagnostics state when remote loopback bootstrap fails.
+                if (_disableLocalFallbackInRemoteRuntime)
+                {
+                    ApplyRemoteDisconnectedTreeState();
+                }
+            }
+            finally
             {
                 _remoteLoopbackInitializationRequested = false;
             }
         }
 
-        private void BindRemoteReadOnlyTabs(DevToolsRemoteLoopbackSession session)
+        private void ApplyRemoteDisconnectedTreeState()
         {
-            _remoteReadOnly = session.ReadOnly;
-            _remoteMutation = session.Mutation;
             _remoteSelectionStreamSubscription?.Dispose();
-            _remoteSelectionStreamSubscription = session.Stream.Subscribe(
+            _remoteSelectionStreamSubscription = null;
+            _remoteLogsStreamSubscription?.Dispose();
+            _remoteLogsStreamSubscription = null;
+            _remoteEventsStreamSubscription?.Dispose();
+            _remoteEventsStreamSubscription = null;
+            _remoteMetricsStreamSubscription?.Dispose();
+            _remoteMetricsStreamSubscription = null;
+            _remoteProfilerStreamSubscription?.Dispose();
+            _remoteProfilerStreamSubscription = null;
+            _remoteStreamDemandSignature = string.Empty;
+            _remoteReadOnly = null;
+            _remoteMutation = null;
+            _selectedDiagnosticsObject = null;
+            _selectionStore.SetSelection("combined", null, null, null, null);
+            _logicalTree.SetRemoteReadOnlySource(null, refreshTreeNow: false);
+            _visualTree.SetRemoteReadOnlySource(null, refreshTreeNow: false);
+            _combinedTree.SetRemoteReadOnlySource(null, refreshTreeNow: false);
+            _logicalTree.SetRemoteMutationSource(null);
+            _visualTree.SetRemoteMutationSource(null);
+            _combinedTree.SetRemoteMutationSource(null);
+            _events.SetRemoteReadOnlySource(null, refreshNow: false);
+            _events.SetRemoteMutationSource(null, null);
+            _breakpoints.SetRemoteReadOnlySource(null, refreshNow: false);
+            _breakpoints.SetRemoteMutationSource(null);
+            _logs.SetRemoteReadOnlySource(null, refreshNow: false);
+            _logs.SetRemoteMutationSource(null);
+            _metrics.SetRemoteReadOnlySource(null, refreshNow: false);
+            _metrics.SetRemoteMutationSource(null);
+            _profiler.SetRemoteReadOnlySource(null, refreshNow: false);
+            _profiler.SetRemoteMutationSource(null);
+            if (_disableLocalFallbackInRemoteRuntime)
+            {
+                _events.DisableAllLocal();
+                _events.ClearRecordedEventsLocal();
+                _logs.ClearEntriesLocal();
+                _metrics.Clear();
+                _profiler.Clear();
+            }
+        }
+
+        private void BindRemoteReadOnlyTabs(
+            IRemoteDiagnosticsDomainServices domains,
+            bool refreshActiveTree = true,
+            bool refreshSelectionNow = true)
+        {
+            _remoteReadOnly = domains.ReadOnly;
+            _remoteMutation = domains.Mutation;
+            if (TraceEnabled)
+            {
+                Console.WriteLine($"[MainViewModel] BindRemoteReadOnlyTabs activeTree={GetActiveTreeViewModel().GetType().Name} selectedTab={SelectedTab} selectedTreeTab={SelectedTreeTab} selectedRightTab={SelectedRightTab}");
+            }
+            _remoteSelectionStreamSubscription?.Dispose();
+            _remoteLogsStreamSubscription?.Dispose();
+            _remoteEventsStreamSubscription?.Dispose();
+            _remoteMetricsStreamSubscription?.Dispose();
+            _remoteProfilerStreamSubscription?.Dispose();
+            _remoteSelectionStreamSubscription = domains.Stream.Subscribe(
                 RemoteStreamTopics.Selection,
                 RemoteJsonSerializerContext.Default.RemoteSelectionSnapshot,
                 OnRemoteSelectionStreamPayload);
+            _remoteLogsStreamSubscription = domains.Stream.Subscribe(
+                RemoteStreamTopics.Logs,
+                RemoteJsonSerializerContext.Default.RemoteLogStreamPayload,
+                OnRemoteLogsStreamPayload);
+            _remoteEventsStreamSubscription = domains.Stream.Subscribe(
+                RemoteStreamTopics.Events,
+                RemoteJsonSerializerContext.Default.RemoteEventStreamPayload,
+                OnRemoteEventsStreamPayload);
+            _remoteMetricsStreamSubscription = domains.Stream.Subscribe(
+                RemoteStreamTopics.Metrics,
+                RemoteJsonSerializerContext.Default.RemoteMetricStreamPayload,
+                OnRemoteMetricsStreamPayload);
+            _remoteProfilerStreamSubscription = domains.Stream.Subscribe(
+                RemoteStreamTopics.Profiler,
+                RemoteJsonSerializerContext.Default.RemoteProfilerStreamPayload,
+                OnRemoteProfilerStreamPayload);
             var activeTree = GetActiveTreeViewModel();
-            _logicalTree.SetRemoteReadOnlySource(session.ReadOnly, refreshTreeNow: ReferenceEquals(activeTree, _logicalTree));
-            _visualTree.SetRemoteReadOnlySource(session.ReadOnly, refreshTreeNow: ReferenceEquals(activeTree, _visualTree));
-            _combinedTree.SetRemoteReadOnlySource(session.ReadOnly, refreshTreeNow: ReferenceEquals(activeTree, _combinedTree));
-            _logicalTree.SetRemoteMutationSource(session.Mutation);
-            _visualTree.SetRemoteMutationSource(session.Mutation);
-            _combinedTree.SetRemoteMutationSource(session.Mutation);
-            _events.SetRemoteMutationSource(session.Mutation, GetRemoteTargetContext);
-            _breakpoints.SetRemoteMutationSource(session.Mutation);
-            _logs.SetRemoteMutationSource(session.Mutation);
-            _metrics.SetRemoteMutationSource(session.Mutation);
-            _profiler.SetRemoteMutationSource(session.Mutation);
-            var activeRightGlobalTab = MapRightTabToGlobalTab(SelectedRightTab);
+            var activeGlobalTab = SelectedTab;
+            _logicalTree.SetRemoteReadOnlySource(domains.ReadOnly, refreshTreeNow: refreshActiveTree && ReferenceEquals(activeTree, _logicalTree));
+            _visualTree.SetRemoteReadOnlySource(domains.ReadOnly, refreshTreeNow: refreshActiveTree && ReferenceEquals(activeTree, _visualTree));
+            _combinedTree.SetRemoteReadOnlySource(domains.ReadOnly, refreshTreeNow: refreshActiveTree && ReferenceEquals(activeTree, _combinedTree));
+            _logicalTree.SetRemoteMutationSource(domains.Mutation);
+            _visualTree.SetRemoteMutationSource(domains.Mutation);
+            _combinedTree.SetRemoteMutationSource(domains.Mutation);
+            _events.SetRemoteReadOnlySource(domains.ReadOnly, refreshNow: activeGlobalTab == 8);
+            _events.SetRemoteMutationSource(domains.Mutation, GetRemoteTargetContext);
+            _breakpoints.SetRemoteReadOnlySource(domains.ReadOnly, refreshNow: activeGlobalTab == 9);
+            _breakpoints.SetRemoteMutationSource(domains.Mutation);
+            _logs.SetRemoteReadOnlySource(domains.ReadOnly, refreshNow: activeGlobalTab == 10);
+            _logs.SetRemoteMutationSource(domains.Mutation);
+            _metrics.SetRemoteReadOnlySource(domains.ReadOnly, refreshNow: activeGlobalTab == 11);
+            _metrics.SetRemoteMutationSource(domains.Mutation);
+            _profiler.SetRemoteReadOnlySource(domains.ReadOnly, refreshNow: activeGlobalTab == 13);
+            _profiler.SetRemoteMutationSource(domains.Mutation);
             _code.SetRemoteReadOnlySource(
-                session.ReadOnly,
+                domains.ReadOnly,
                 GetRemoteSelectionContext,
-                refreshNow: activeRightGlobalTab == 4);
+                refreshNow: false);
             _viewModelsBindings.SetRemoteReadOnlySource(
-                session.ReadOnly,
+                domains.ReadOnly,
                 GetRemoteSelectionContext,
-                refreshNow: activeRightGlobalTab == 12);
+                refreshNow: false);
             _assets.SetRemoteReadOnlySource(
-                session.ReadOnly,
-                refreshNow: activeRightGlobalTab == 7);
+                domains.ReadOnly,
+                refreshNow: activeGlobalTab == 7);
             _resources.SetRemoteReadOnlySource(
-                session.ReadOnly,
-                refreshNow: activeRightGlobalTab == 6);
+                domains.ReadOnly,
+                refreshNow: activeGlobalTab == 6);
             _stylesDiagnostics.SetRemoteReadOnlySource(
-                session.ReadOnly,
+                domains.ReadOnly,
                 GetRemoteSelectionContext,
-                refreshNow: activeRightGlobalTab == 14);
+                refreshNow: false);
             _elements3D.SetRemoteReadOnlySource(
-                session.ReadOnly,
+                domains.ReadOnly,
                 GetRemoteSelectionContext,
-                refreshNow: activeRightGlobalTab == 5);
-            ApplyRightTabRuntimePolicies(activeRightGlobalTab, forceRefresh: false);
-            _ = RefreshRemoteSelectionSnapshotAsync();
+                refreshNow: false);
+            ApplyRightTabRuntimePolicies(activeGlobalTab, forceRefresh: false);
+            QueueRemoteStreamDemandSync(force: true);
+            if (refreshSelectionNow)
+            {
+                _ = RefreshRemoteSelectionSnapshotAsync();
+            }
+        }
+
+        private async Task BootstrapRemoteRuntimeAsync(
+            IRemoteDiagnosticsDomainServices domains,
+            bool combinedTreeAlreadyLoaded = false)
+        {
+            await RefreshRemoteBootstrapTreesAsync(combinedTreeAlreadyLoaded).ConfigureAwait(false);
+            await RefreshRemoteSelectionSnapshotAsync().ConfigureAwait(false);
+
+            await Dispatcher.UIThread.InvokeAsync(() =>
+            {
+                if (_isDisposed || !ReferenceEquals(_remoteReadOnly, domains.ReadOnly))
+                {
+                    return;
+                }
+
+                if (!IsTreeTab(SelectedTab))
+                {
+                    RefreshCurrentTool();
+                }
+            });
+
+            _ = PrefetchInactiveRemoteTreesAsync();
+        }
+
+        private async Task RefreshRemoteBootstrapTreesAsync(bool combinedTreeAlreadyLoaded)
+        {
+            if (!combinedTreeAlreadyLoaded)
+            {
+                await _combinedTree.RefreshRemoteTreeNowAsync().ConfigureAwait(false);
+            }
+
+            var activeTree = GetActiveTreeViewModel();
+            if (!ReferenceEquals(activeTree, _combinedTree))
+            {
+                await activeTree.RefreshRemoteTreeNowAsync().ConfigureAwait(false);
+            }
+        }
+
+        private async Task PrefetchInactiveRemoteTreesAsync()
+        {
+            var activeTree = GetActiveTreeViewModel();
+            if (!ReferenceEquals(activeTree, _combinedTree))
+            {
+                await _combinedTree.RefreshRemoteTreeNowAsync().ConfigureAwait(false);
+            }
+
+            if (!ReferenceEquals(activeTree, _logicalTree))
+            {
+                await _logicalTree.RefreshRemoteTreeNowAsync().ConfigureAwait(false);
+            }
+
+            if (!ReferenceEquals(activeTree, _visualTree))
+            {
+                await _visualTree.RefreshRemoteTreeNowAsync().ConfigureAwait(false);
+            }
+        }
+
+        private void OnRemoteLogsStreamPayload(RemoteTypedStreamPayload<RemoteLogStreamPayload> payload)
+        {
+            if (!payload.IsParsed)
+            {
+                return;
+            }
+
+            var entry = payload.Payload;
+            _logs.ApplyRemoteStreamPayload(entry);
+        }
+
+        private void OnRemoteEventsStreamPayload(RemoteTypedStreamPayload<RemoteEventStreamPayload> payload)
+        {
+            if (!payload.IsParsed)
+            {
+                return;
+            }
+
+            var entry = payload.Payload;
+            _events.ApplyRemoteStreamPayload(entry);
+        }
+
+        private void OnRemoteMetricsStreamPayload(RemoteTypedStreamPayload<RemoteMetricStreamPayload> payload)
+        {
+            if (!payload.IsParsed)
+            {
+                return;
+            }
+
+            var entry = payload.Payload;
+            _metrics.ApplyRemoteStreamPayload(entry);
+        }
+
+        private void OnRemoteProfilerStreamPayload(RemoteTypedStreamPayload<RemoteProfilerStreamPayload> payload)
+        {
+            if (!payload.IsParsed)
+            {
+                return;
+            }
+
+            var entry = payload.Payload;
+            _profiler.ApplyRemoteStreamPayload(entry);
         }
 
         private void OnRemoteSelectionStreamPayload(RemoteTypedStreamPayload<RemoteSelectionSnapshot> payload)

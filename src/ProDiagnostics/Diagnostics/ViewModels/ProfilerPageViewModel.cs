@@ -34,6 +34,7 @@ internal sealed class ProfilerPageViewModel : ViewModelBase, IDisposable
     private bool _isRemoteFlushScheduled;
     private bool _isRemoteStatusRefreshScheduled;
     private bool _isApplyingRemoteSettings;
+    private bool _isRemoteRefreshScheduled;
     private int _remotePort;
     private long _remotePacketCount;
     private long _droppedLocalPacketCount;
@@ -49,6 +50,7 @@ internal sealed class ProfilerPageViewModel : ViewModelBase, IDisposable
     private double _currentActivityDurationMs;
     private double _peakActivityDurationMs;
     private ProfilerSampleViewModel? _selectedSample;
+    private IRemoteReadOnlyDiagnosticsDomainService? _remoteReadOnly;
     private IRemoteMutationDiagnosticsDomainService? _remoteMutation;
     private bool _isTabActive = true;
     private bool _isAutoPausedByTabState;
@@ -175,6 +177,22 @@ internal sealed class ProfilerPageViewModel : ViewModelBase, IDisposable
         _remoteMutation = mutation;
     }
 
+    internal void SetRemoteReadOnlySource(IRemoteReadOnlyDiagnosticsDomainService? readOnly, bool refreshNow = true)
+    {
+        _remoteReadOnly = readOnly;
+        if (readOnly is not null)
+        {
+            StopRemoteListener();
+            _remoteSessions.Clear();
+            RaisePropertyChanged(nameof(RemoteSessionCount));
+        }
+
+        if (refreshNow && readOnly is not null)
+        {
+            QueueRemoteRefresh();
+        }
+    }
+
     internal void SetTabActive(bool isActive)
     {
         if (_isDisposed || _isTabActive == isActive)
@@ -252,7 +270,7 @@ internal sealed class ProfilerPageViewModel : ViewModelBase, IDisposable
     }
 
     public string ToggleSamplingText
-        => IsRemoteMode ? "Remote" : IsSampling ? "Pause" : "Resume";
+        => IsRemoteMode && _remoteMutation is null ? "Remote" : IsSampling ? "Pause" : "Resume";
 
     public double CurrentCpuPercent
     {
@@ -303,6 +321,11 @@ internal sealed class ProfilerPageViewModel : ViewModelBase, IDisposable
             return;
         }
 
+        if (_remoteReadOnly is not null)
+        {
+            return;
+        }
+
         var configuredPort = NormalizePort(options.TransportPort);
         if (configuredPort != _remotePort || _remoteReceiver is null)
         {
@@ -329,7 +352,7 @@ internal sealed class ProfilerPageViewModel : ViewModelBase, IDisposable
 
     public void RefreshNow()
     {
-        if (IsRemoteMode)
+        if (IsRemoteMode || _remoteReadOnly is not null)
         {
             return;
         }
@@ -339,6 +362,12 @@ internal sealed class ProfilerPageViewModel : ViewModelBase, IDisposable
 
     public void Refresh()
     {
+        if (_remoteReadOnly is not null)
+        {
+            QueueRemoteRefresh();
+            return;
+        }
+
         if (IsRemoteMode)
         {
             _samplesView.Refresh();
@@ -350,6 +379,12 @@ internal sealed class ProfilerPageViewModel : ViewModelBase, IDisposable
 
     public void RefreshRemoteActivities()
     {
+        if (_remoteReadOnly is not null)
+        {
+            QueueRemoteRefresh();
+            return;
+        }
+
         RestartRemoteListener(_remotePort);
     }
 
@@ -446,6 +481,18 @@ internal sealed class ProfilerPageViewModel : ViewModelBase, IDisposable
         }
     }
 
+    internal void ApplyRemoteStreamPayload(RemoteProfilerStreamPayload payload)
+    {
+        if (Dispatcher.UIThread.CheckAccess())
+        {
+            ApplyRemoteStreamPayloadCore(payload);
+        }
+        else
+        {
+            Dispatcher.UIThread.Post(() => ApplyRemoteStreamPayloadCore(payload), DispatcherPriority.Background);
+        }
+    }
+
     private void OnTimerTick(object? sender, EventArgs e)
     {
         if (!IsSampling || IsRemoteMode)
@@ -515,7 +562,7 @@ internal sealed class ProfilerPageViewModel : ViewModelBase, IDisposable
 
     private void HandleTelemetryPacketCore(TelemetryPacket packet)
     {
-        if (_isDisposed)
+        if (_isDisposed || _remoteReadOnly is not null)
         {
             return;
         }
@@ -745,6 +792,159 @@ internal sealed class ProfilerPageViewModel : ViewModelBase, IDisposable
         RaisePropertyChanged(nameof(DroppedQueueSampleCount));
         RaisePropertyChanged(nameof(DroppedSessionCount));
         UpdateRemoteStatusText();
+    }
+
+    private void QueueRemoteRefresh()
+    {
+        if (_remoteReadOnly is null || _isRemoteRefreshScheduled)
+        {
+            return;
+        }
+
+        _isRemoteRefreshScheduled = true;
+        _ = RefreshRemoteSnapshotAsync();
+    }
+
+    private async Task RefreshRemoteSnapshotAsync()
+    {
+        var readOnly = _remoteReadOnly;
+        if (readOnly is null)
+        {
+            _isRemoteRefreshScheduled = false;
+            return;
+        }
+
+        try
+        {
+            var snapshot = await readOnly.GetProfilerSnapshotAsync(
+                new RemoteProfilerSnapshotRequest
+                {
+                    IncludeSamples = true,
+                }).ConfigureAwait(false);
+
+            await Dispatcher.UIThread.InvokeAsync(() =>
+            {
+                if (!ReferenceEquals(_remoteReadOnly, readOnly))
+                {
+                    return;
+                }
+
+                ApplyRemoteSnapshot(snapshot);
+            });
+        }
+        catch
+        {
+            // Preserve the last applied remote snapshot when refresh fails.
+        }
+        finally
+        {
+            _isRemoteRefreshScheduled = false;
+        }
+    }
+
+    private void ApplyRemoteSnapshot(RemoteProfilerSnapshot snapshot)
+    {
+        var selectedTimestamp = SelectedSample?.Timestamp;
+        _pendingRemoteSamples.Clear();
+        _remoteSessions.Clear();
+        _remotePacketCount = snapshot.SampleCount;
+        _droppedLocalPacketCount = 0;
+        _droppedUnknownSessionActivityCount = 0;
+        _droppedQueueSampleCount = snapshot.DroppedSamples;
+        _droppedSessionCount = 0;
+
+        var wasApplying = _isApplyingRemoteSettings;
+        _isApplyingRemoteSettings = true;
+        try
+        {
+            if (snapshot.MaxRetainedSamples > 0)
+            {
+                MaxSamples = snapshot.MaxRetainedSamples;
+            }
+
+            _isRemotePaused = snapshot.IsPaused;
+            IsRemoteMode = true;
+            ApplySamplingState(isSampling: !snapshot.IsPaused, pausedByTabState: false);
+        }
+        finally
+        {
+            _isApplyingRemoteSettings = wasApplying;
+        }
+
+        _samples.Clear();
+        ProfilerSampleViewModel? selectedSample = null;
+        for (var i = 0; i < snapshot.Samples.Count; i++)
+        {
+            var remoteSample = snapshot.Samples[i];
+            var sample = new ProfilerSampleViewModel(
+                remoteSample.TimestampUtc,
+                remoteSample.CpuPercent,
+                remoteSample.WorkingSetMb,
+                remoteSample.PrivateMemoryMb,
+                remoteSample.ManagedHeapMb,
+                remoteSample.Gen0Collections,
+                remoteSample.Gen1Collections,
+                remoteSample.Gen2Collections,
+                remoteSample.ActivitySource,
+                remoteSample.ActivityName,
+                remoteSample.DurationMs,
+                remoteSample.Process);
+            _samples.Add(sample);
+
+            if (selectedTimestamp.HasValue && selectedTimestamp.Value == sample.Timestamp)
+            {
+                selectedSample = sample;
+            }
+        }
+
+        SelectedSample = selectedSample;
+        CurrentCpuPercent = snapshot.CurrentCpuPercent;
+        PeakCpuPercent = snapshot.PeakCpuPercent;
+        CurrentWorkingSetMb = snapshot.CurrentWorkingSetMb;
+        PeakWorkingSetMb = snapshot.PeakWorkingSetMb;
+        CurrentManagedHeapMb = snapshot.CurrentManagedHeapMb;
+        CurrentActivityDurationMs = snapshot.CurrentActivityDurationMs;
+        PeakActivityDurationMs = snapshot.PeakActivityDurationMs;
+        RemoteStatusText = string.IsNullOrWhiteSpace(snapshot.Status)
+            ? "Remote profiler snapshot loaded."
+            : snapshot.Status;
+        RaisePropertyChanged(nameof(SampleCount));
+        RaisePropertyChanged(nameof(RemoteSessionCount));
+        RaisePropertyChanged(nameof(RemotePacketCount));
+        RaisePropertyChanged(nameof(DroppedLocalPacketCount));
+        RaisePropertyChanged(nameof(DroppedUnknownSessionActivityCount));
+        RaisePropertyChanged(nameof(DroppedQueueSampleCount));
+        RaisePropertyChanged(nameof(DroppedSessionCount));
+        _samplesView.Refresh();
+    }
+
+    private void ApplyRemoteStreamPayloadCore(RemoteProfilerStreamPayload payload)
+    {
+        if (_remoteReadOnly is null)
+        {
+            return;
+        }
+
+        _remotePacketCount++;
+        _isRemotePaused = false;
+        IsRemoteMode = true;
+        ApplySamplingState(isSampling: true, pausedByTabState: false);
+        AddSampleCore(new ProfilerSampleViewModel(
+            payload.TimestampUtc,
+            payload.CpuPercent,
+            payload.WorkingSetMb,
+            payload.PrivateMemoryMb,
+            payload.ManagedHeapMb,
+            payload.Gen0Collections,
+            payload.Gen1Collections,
+            payload.Gen2Collections,
+            payload.ActivitySource,
+            payload.ActivityName,
+            payload.DurationMs,
+            payload.Process));
+        RemoteStatusText = "Remote profiler stream active.";
+        RaisePropertyChanged(nameof(RemotePacketCount));
+        _samplesView.Refresh();
     }
 
     private void UpdateRemoteStatusText()

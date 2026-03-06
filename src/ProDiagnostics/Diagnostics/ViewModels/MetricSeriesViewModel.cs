@@ -130,6 +130,26 @@ internal sealed class MetricSeriesViewModel : ViewModelBase
         Trend = ComputeTrend();
     }
 
+    internal void LoadSnapshot(
+        DateTimeOffset timestamp,
+        double lastValue,
+        double averageValue,
+        double minValue,
+        double maxValue,
+        int sampleCount,
+        string? trend = null)
+    {
+        _retainedValues.Clear();
+        LastTimestamp = timestamp;
+        LastValue = lastValue;
+        AverageValue = averageValue;
+        MinValue = minValue;
+        MaxValue = maxValue;
+        SampleCount = sampleCount;
+        _sum = averageValue * sampleCount;
+        Trend = string.IsNullOrWhiteSpace(trend) ? ComputeTrend() : trend;
+    }
+
     private string ComputeTrend()
     {
         if (_retainedValues.Count < 2)

@@ -247,6 +247,9 @@ public class RemoteMutationRoutingTests
             return Success(RemoteMutationMethods.ProfilerSettingsSet);
         }
 
+        public ValueTask<RemoteMutationResult> SetStreamDemandAsync(RemoteSetStreamDemandRequest request, CancellationToken cancellationToken = default) =>
+            Success(RemoteMutationMethods.StreamDemandSet);
+
         private static ValueTask<RemoteMutationResult> Success(string operation) =>
             ValueTask.FromResult(new RemoteMutationResult(operation, Changed: true, Message: "ok"));
     }

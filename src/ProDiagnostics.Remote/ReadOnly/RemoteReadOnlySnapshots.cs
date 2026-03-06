@@ -172,6 +172,13 @@ public sealed record class RemoteValueFrameSnapshot(
     string? ParentId = null);
 
 /// <summary>
+/// One pseudo-class state row from diagnostics properties.
+/// </summary>
+public sealed record class RemotePseudoClassSnapshot(
+    string Name,
+    bool IsActive);
+
+/// <summary>
 /// One source document for inspected element.
 /// </summary>
 public sealed record class RemoteCodeDocumentSnapshot(
@@ -229,6 +236,7 @@ public sealed record class RemotePropertiesSnapshot(
     string? TargetNodeId,
     string? TargetNodePath,
     IReadOnlyList<RemotePropertySnapshot> Properties,
+    IReadOnlyList<RemotePseudoClassSnapshot> PseudoClasses,
     IReadOnlyList<RemoteValueFrameSnapshot> Frames,
     RemoteSourceLocationSnapshot Source);
 

@@ -15,6 +15,10 @@ namespace Avalonia.Diagnostics.ViewModels
 {
     internal class TreePageViewModel : ViewModelBase, IDisposable
     {
+        private static readonly bool TraceEnabled = string.Equals(
+            Environment.GetEnvironmentVariable("PRODIAG_TRACE"),
+            "1",
+            StringComparison.Ordinal);
         private TreeNode? _selectedNode;
         private object? _selectedNodeItem;
         private ControlDetailsViewModel? _details;
@@ -25,6 +29,7 @@ namespace Avalonia.Diagnostics.ViewModels
         private readonly Dictionary<string, AvaloniaObject> _localVisualByPath = new(StringComparer.Ordinal);
         private readonly Dictionary<AvaloniaObject, string> _localPathByVisual = new();
         private readonly Dictionary<string, TreeNode> _currentNodesByPath = new(StringComparer.Ordinal);
+        private readonly Dictionary<string, TreeNode> _currentNodesById = new(StringComparer.Ordinal);
         private readonly string _remoteScope;
         private IRemoteReadOnlyDiagnosticsDomainService? _remoteReadOnly;
         private IRemoteMutationDiagnosticsDomainService? _remoteMutation;
@@ -33,6 +38,7 @@ namespace Avalonia.Diagnostics.ViewModels
         private bool _usingRemoteTree;
         private int _remoteTreeRefreshVersion;
         private bool _hasRemoteTreeSnapshot;
+        private bool _disableLocalFallbackWhileRemoteDisconnected;
 
         public TreePageViewModel(
             MainViewModel mainView,
@@ -93,13 +99,15 @@ namespace Avalonia.Diagnostics.ViewModels
                     {
                         // Notify after details are rebuilt so the Properties tab receives
                         // the current selection's details rather than the previous node.
-                        MainView.NotifyTreeSelectionChanged(value?.Visual, _remoteScope, GetNodePath(value));
+                        MainView.NotifyTreeSelectionChanged(value?.Visual, _remoteScope, GetNodePath(value), GetNodeId(value));
                     }
                 }
             }
         }
 
         internal string? SelectedNodePath => GetNodePath(SelectedNode);
+
+        internal string? SelectedNodeId => GetNodeId(SelectedNode);
 
         public object? SelectedNodeItem
         {
@@ -187,9 +195,20 @@ namespace Avalonia.Diagnostics.ViewModels
         {
             _remoteReadOnly = readOnly;
             _hasRemoteTreeSnapshot = false;
+            if (TraceEnabled)
+            {
+                Console.WriteLine($"[TreePage:{_remoteScope}] SetRemoteReadOnlySource readOnly={(readOnly is null ? "(null)" : readOnly.GetType().Name)} refreshNow={refreshTreeNow}");
+            }
             if (_remoteReadOnly is null)
             {
-                RestoreLocalTree();
+                if (_disableLocalFallbackWhileRemoteDisconnected)
+                {
+                    ShowRemoteDisconnectedTree();
+                }
+                else
+                {
+                    RestoreLocalTree();
+                }
             }
             else if (refreshTreeNow)
             {
@@ -215,10 +234,53 @@ namespace Avalonia.Diagnostics.ViewModels
             _ = RefreshRemoteTreeAsync();
         }
 
+        internal void ForceRefreshRemoteTree()
+        {
+            if (_remoteReadOnly is null)
+            {
+                return;
+            }
+
+            _ = RefreshRemoteTreeAsync();
+        }
+
+        internal Task RefreshRemoteTreeNowAsync()
+        {
+            return RefreshRemoteTreeAsync();
+        }
+
+        internal void ApplyPreloadedRemoteTreeSnapshot(RemoteTreeSnapshot snapshot)
+        {
+            ArgumentNullException.ThrowIfNull(snapshot);
+
+            if (!string.Equals(snapshot.Scope, _remoteScope, StringComparison.OrdinalIgnoreCase))
+            {
+                return;
+            }
+
+            ApplyRemoteTreeSnapshot(snapshot);
+        }
+
         internal void SetRemoteMutationSource(IRemoteMutationDiagnosticsDomainService? mutation)
         {
             _remoteMutation = mutation;
             RebuildDetails(SelectedNode);
+        }
+
+        internal void SetRemoteDisconnectedFallbackDisabled(bool disabled)
+        {
+            _disableLocalFallbackWhileRemoteDisconnected = disabled;
+            if (_remoteReadOnly is null)
+            {
+                if (_disableLocalFallbackWhileRemoteDisconnected)
+                {
+                    ShowRemoteDisconnectedTree();
+                }
+                else
+                {
+                    RestoreLocalTree();
+                }
+            }
         }
 
         public TreeNode? FindNode(Control control)
@@ -627,6 +689,61 @@ namespace Avalonia.Diagnostics.ViewModels
             return _currentNodesByPath.TryGetValue(nodePath, out node);
         }
 
+        internal bool TryGetNodeById(string? nodeId, out TreeNode? node)
+        {
+            node = null;
+            if (string.IsNullOrWhiteSpace(nodeId))
+            {
+                return false;
+            }
+
+            return _currentNodesById.TryGetValue(nodeId, out node);
+        }
+
+        internal bool TrySelectNodeById(string? nodeId, bool notifyMainSelection = true)
+        {
+            if (!TryGetNodeById(nodeId, out var node) || node is null)
+            {
+                return false;
+            }
+
+            SelectNodeCore(node, notifyMainSelection);
+            return true;
+        }
+
+        internal void ClearSelection(bool notifyMainSelection = false)
+        {
+            SelectNodeCore(null, notifyMainSelection);
+        }
+
+        internal bool EnsureSelection(bool notifyMainSelection = false)
+        {
+            if (SelectedNode is not null)
+            {
+                return true;
+            }
+
+            if (Nodes.Length == 0)
+            {
+                return false;
+            }
+
+            SelectNodeCore(Nodes[0], notifyMainSelection);
+            return true;
+        }
+
+        internal bool TryGetNodePathById(string? nodeId, out string? nodePath)
+        {
+            nodePath = null;
+            if (!TryGetNodeById(nodeId, out var node) || node is null)
+            {
+                return false;
+            }
+
+            nodePath = GetNodePath(node);
+            return !string.IsNullOrWhiteSpace(nodePath);
+        }
+
         internal bool TryGetNodePathForObject(AvaloniaObject? visual, out string? nodePath)
         {
             nodePath = null;
@@ -664,6 +781,10 @@ namespace Avalonia.Diagnostics.ViewModels
         {
             if (_remoteReadOnly is null)
             {
+                if (TraceEnabled)
+                {
+                    Console.WriteLine($"[TreePage:{_remoteScope}] RefreshRemoteTreeAsync skipped because remote source is null");
+                }
                 return;
             }
 
@@ -671,6 +792,10 @@ namespace Avalonia.Diagnostics.ViewModels
             RemoteTreeSnapshot snapshot;
             try
             {
+                if (TraceEnabled)
+                {
+                    Console.WriteLine($"[TreePage:{_remoteScope}] RefreshRemoteTreeAsync request version={refreshVersion}");
+                }
                 snapshot = await _remoteReadOnly.GetTreeSnapshotAsync(
                     new RemoteTreeSnapshotRequest
                     {
@@ -679,15 +804,27 @@ namespace Avalonia.Diagnostics.ViewModels
                         IncludeVisualDetails = false,
                     }).ConfigureAwait(false);
             }
-            catch
+            catch (Exception ex)
             {
+                if (TraceEnabled)
+                {
+                    Console.WriteLine($"[TreePage:{_remoteScope}] RefreshRemoteTreeAsync failed: {ex.GetType().Name}: {ex.Message}");
+                }
                 return;
             }
 
             await Dispatcher.UIThread.InvokeAsync(() =>
             {
+                if (TraceEnabled)
+                {
+                    Console.WriteLine($"[TreePage:{_remoteScope}] InvokeAsync apply version={refreshVersion} currentVersion={_remoteTreeRefreshVersion} remoteNull={_remoteReadOnly is null}");
+                }
                 if (_remoteReadOnly is null || refreshVersion != _remoteTreeRefreshVersion)
                 {
+                    if (TraceEnabled)
+                    {
+                        Console.WriteLine($"[TreePage:{_remoteScope}] InvokeAsync skipped");
+                    }
                     return;
                 }
 
@@ -699,9 +836,20 @@ namespace Avalonia.Diagnostics.ViewModels
         {
             var selectedPath = GetNodePath(SelectedNode);
             var (roots, map) = BuildRemoteNodes(snapshot.Nodes);
+            if (TraceEnabled)
+            {
+                Console.WriteLine($"[TreePage:{_remoteScope}] snapshot nodes={snapshot.Nodes.Count} roots={roots.Length} selectedPath={selectedPath ?? "(null)"}");
+            }
             if (roots.Length == 0)
             {
-                RestoreLocalTree();
+                if (_disableLocalFallbackWhileRemoteDisconnected)
+                {
+                    ShowRemoteDisconnectedTree();
+                }
+                else
+                {
+                    RestoreLocalTree();
+                }
                 return;
             }
 
@@ -710,12 +858,31 @@ namespace Avalonia.Diagnostics.ViewModels
             {
                 SelectNodeCore(selectedNode, notifyMainSelection: false);
             }
+            else if (roots.Length > 0)
+            {
+                SelectNodeCore(roots[0], notifyMainSelection: false);
+            }
             else
             {
                 SelectNodeCore(null, notifyMainSelection: false);
             }
 
+            if (TraceEnabled)
+            {
+                Console.WriteLine($"[TreePage:{_remoteScope}] selected={SelectedNode?.Type ?? "(null)"} details={(Details is null ? "(null)" : Details.GetType().Name)}");
+            }
+
             _hasRemoteTreeSnapshot = true;
+        }
+
+        private void ShowRemoteDisconnectedTree()
+        {
+            SwapTreeNodes(
+                Array.Empty<TreeNode>(),
+                new Dictionary<string, TreeNode>(StringComparer.Ordinal),
+                useRemoteTree: true);
+            SelectNodeCore(null, notifyMainSelection: false);
+            _hasRemoteTreeSnapshot = false;
         }
 
         private (TreeNode[] Roots, Dictionary<string, TreeNode> NodesByPath) BuildRemoteNodes(IReadOnlyList<RemoteTreeNodeSnapshot> snapshots)
@@ -794,9 +961,14 @@ namespace Avalonia.Diagnostics.ViewModels
             Nodes = nodes;
             _usingRemoteTree = useRemoteTree;
             _currentNodesByPath.Clear();
+            _currentNodesById.Clear();
             foreach (var (path, node) in nodesByPath)
             {
                 _currentNodesByPath[path] = node;
+                if (GetNodeId(node) is { Length: > 0 } nodeId)
+                {
+                    _currentNodesById[nodeId] = node;
+                }
             }
 
             _hierarchicalModel.SetRoots(nodes);
@@ -842,9 +1014,10 @@ namespace Avalonia.Diagnostics.ViewModels
         private void RebuildCurrentNodePathMap()
         {
             _currentNodesByPath.Clear();
+            _currentNodesById.Clear();
             for (var i = 0; i < Nodes.Length; i++)
             {
-                FillNodePathMap(Nodes[i], i.ToString(), _currentNodesByPath);
+                FillNodeMaps(Nodes[i], i.ToString(), _currentNodesByPath, _currentNodesById);
             }
         }
 
@@ -873,16 +1046,28 @@ namespace Avalonia.Diagnostics.ViewModels
             }
         }
 
-        private static void FillNodePathMap(
+        private static void FillNodeMaps(
             TreeNode node,
             string path,
-            IDictionary<string, TreeNode> nodesByPath)
+            IDictionary<string, TreeNode> nodesByPath,
+            IDictionary<string, TreeNode> nodesById)
         {
             nodesByPath[path] = node;
+            if (node is RemoteTreeNode remoteTreeNode &&
+                !string.IsNullOrWhiteSpace(remoteTreeNode.Snapshot.NodeId))
+            {
+                nodesById[remoteTreeNode.Snapshot.NodeId] = node;
+            }
+
             for (var i = 0; i < node.Children.Count; i++)
             {
-                FillNodePathMap(node.Children[i], path + "/" + i, nodesByPath);
+                FillNodeMaps(node.Children[i], path + "/" + i, nodesByPath, nodesById);
             }
+        }
+
+        private static string? GetNodeId(TreeNode? node)
+        {
+            return node is RemoteTreeNode remoteTreeNode ? remoteTreeNode.Snapshot.NodeId : null;
         }
 
         private sealed class TreeNodeReferenceComparer : IEqualityComparer<TreeNode>

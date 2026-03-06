@@ -5,14 +5,17 @@ namespace Avalonia.Diagnostics.Models
 {
     internal class EventChainLink
     {
-        public EventChainLink(object handler, bool handled, RoutingStrategies route)
+        public EventChainLink(object? handler, bool handled, RoutingStrategies route, string? handlerNameOverride = null)
         {
-            Handler = handler ?? throw new ArgumentNullException(nameof(handler));
+            Handler = handler;
             Handled = handled;
             Route = route;
+            _handlerNameOverride = handlerNameOverride;
         }
 
-        public object Handler { get; }
+        private readonly string? _handlerNameOverride;
+
+        public object? Handler { get; }
 
         public bool BeginsNewRoute { get; set; }
 
@@ -20,12 +23,22 @@ namespace Avalonia.Diagnostics.Models
         {
             get
             {
+                if (!string.IsNullOrWhiteSpace(_handlerNameOverride))
+                {
+                    return _handlerNameOverride;
+                }
+
+                if (Handler is string text && !string.IsNullOrWhiteSpace(text))
+                {
+                    return text;
+                }
+
                 if (Handler is INamed named && !string.IsNullOrEmpty(named.Name))
                 {
                     return named.Name + " (" + Handler.GetType().Name + ")";
                 }
 
-                return Handler.GetType().Name;
+                return Handler?.GetType().Name ?? "(unknown)";
             }
         }
 

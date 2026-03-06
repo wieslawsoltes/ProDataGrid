@@ -123,6 +123,8 @@ public interface IRemoteMutationDiagnosticsDomainService
     ValueTask<RemoteMutationResult> SetProfilerPausedAsync(RemoteSetPausedRequest request, CancellationToken cancellationToken = default);
 
     ValueTask<RemoteMutationResult> SetProfilerSettingsAsync(RemoteSetProfilerSettingsRequest request, CancellationToken cancellationToken = default);
+
+    ValueTask<RemoteMutationResult> SetStreamDemandAsync(RemoteSetStreamDemandRequest request, CancellationToken cancellationToken = default);
 }
 
 /// <summary>
@@ -409,6 +411,9 @@ internal sealed class RemoteMutationDiagnosticsDomainService : IRemoteMutationDi
 
     public ValueTask<RemoteMutationResult> SetProfilerSettingsAsync(RemoteSetProfilerSettingsRequest request, CancellationToken cancellationToken = default) =>
         Invoke(RemoteMutationMethods.ProfilerSettingsSet, request, RemoteJsonSerializerContext.Default.RemoteSetProfilerSettingsRequest, cancellationToken);
+
+    public ValueTask<RemoteMutationResult> SetStreamDemandAsync(RemoteSetStreamDemandRequest request, CancellationToken cancellationToken = default) =>
+        Invoke(RemoteMutationMethods.StreamDemandSet, request, RemoteJsonSerializerContext.Default.RemoteSetStreamDemandRequest, cancellationToken);
 
     private ValueTask<RemoteMutationResult> Invoke<TRequest>(
         string method,

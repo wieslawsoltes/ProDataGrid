@@ -54,6 +54,7 @@ namespace Avalonia.Diagnostics.Remote;
 [JsonSerializable(typeof(RemotePreviewCapabilitiesSnapshot))]
 [JsonSerializable(typeof(RemotePreviewSnapshot))]
 [JsonSerializable(typeof(RemotePreviewRectSnapshot))]
+[JsonSerializable(typeof(RemotePseudoClassSnapshot))]
 [JsonSerializable(typeof(RemotePropertiesSnapshot))]
 [JsonSerializable(typeof(RemoteElements3DSnapshot))]
 [JsonSerializable(typeof(RemoteOverlayOptionsSnapshot))]

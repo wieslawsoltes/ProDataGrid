@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using Avalonia.Diagnostics.Remote;
 using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.Media;
@@ -248,6 +249,23 @@ namespace Avalonia.Diagnostics
         /// When false, DevTools uses direct in-process diagnostics services.
         /// </summary>
         public bool UseRemoteRuntime { get; set; }
+
+        /// <summary>
+        /// Gets or sets whether local in-process tree fallback should be disabled while running in remote runtime mode.
+        /// When enabled, trees stay empty until a remote snapshot is received.
+        /// </summary>
+        public bool DisableLocalFallbackInRemoteRuntime { get; set; }
+
+        /// <summary>
+        /// Optional remote attach endpoint used when <see cref="UseRemoteRuntime"/> is enabled.
+        /// When set, DevTools connects to this external endpoint instead of starting local loopback host+client.
+        /// </summary>
+        public Uri? RemoteRuntimeEndpoint { get; set; }
+
+        /// <summary>
+        /// Remote client options used when connecting to an external endpoint via <see cref="RemoteRuntimeEndpoint"/>.
+        /// </summary>
+        public RemoteDiagnosticsClientOptions RemoteRuntimeClientOptions { get; set; } = RemoteDiagnosticsClientOptions.Default;
 
         internal DevToolsOptions Clone() => (DevToolsOptions)MemberwiseClone();
     }

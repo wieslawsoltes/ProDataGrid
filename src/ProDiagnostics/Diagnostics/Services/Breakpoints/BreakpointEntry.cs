@@ -23,8 +23,10 @@ internal sealed class BreakpointEntry : INotifyPropertyChanged
         RoutedEvent? routedEvent,
         AvaloniaProperty? property,
         AvaloniaObject? target,
-        string targetDescription)
+        string targetDescription,
+        string? id = null)
     {
+        Id = string.IsNullOrWhiteSpace(id) ? Guid.NewGuid().ToString("N") : id;
         Kind = kind;
         Name = name;
         RoutedEvent = routedEvent;
@@ -35,7 +37,7 @@ internal sealed class BreakpointEntry : INotifyPropertyChanged
 
     public event PropertyChangedEventHandler? PropertyChanged;
 
-    public string Id { get; } = Guid.NewGuid().ToString("N");
+    public string Id { get; }
 
     public BreakpointKind Kind { get; }
 

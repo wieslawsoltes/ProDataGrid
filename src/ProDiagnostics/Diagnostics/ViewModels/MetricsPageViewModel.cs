@@ -43,6 +43,7 @@ internal sealed class MetricsPageViewModel : ViewModelBase, IDisposable
     private bool _isRemoteStatusRefreshScheduled;
     private bool _isApplyingRemoteSettings;
     private bool _isDisposed;
+    private bool _isRemoteRefreshScheduled;
     private long _totalMeasurements;
     private long _remotePacketCount;
     private long _droppedLocalPacketCount;
@@ -51,6 +52,7 @@ internal sealed class MetricsPageViewModel : ViewModelBase, IDisposable
     private long _droppedSessionCount;
     private string _remoteStatusText = "Remote metrics listener is stopped.";
     private MetricSeriesViewModel? _selectedSeries;
+    private IRemoteReadOnlyDiagnosticsDomainService? _remoteReadOnly;
     private IRemoteMutationDiagnosticsDomainService? _remoteMutation;
     private bool _isTabActive = true;
     private bool _isAutoPausedByTabState;
@@ -180,7 +182,7 @@ internal sealed class MetricsPageViewModel : ViewModelBase, IDisposable
         private set => RaiseAndSetIfChanged(ref _remoteStatusText, value);
     }
 
-    public bool IsLocalCaptureEnabled => _isLocalCaptureEnabled;
+    public bool IsLocalCaptureEnabled => _remoteReadOnly is null && _isLocalCaptureEnabled;
 
     public bool IsUpdatesPaused
     {
@@ -234,6 +236,23 @@ internal sealed class MetricsPageViewModel : ViewModelBase, IDisposable
     internal void SetRemoteMutationSource(IRemoteMutationDiagnosticsDomainService? mutation)
     {
         _remoteMutation = mutation;
+    }
+
+    internal void SetRemoteReadOnlySource(IRemoteReadOnlyDiagnosticsDomainService? readOnly, bool refreshNow = true)
+    {
+        _remoteReadOnly = readOnly;
+        if (readOnly is not null)
+        {
+            StopRemoteListener();
+            _remoteSessions.Clear();
+            RaisePropertyChanged(nameof(RemoteSessionCount));
+            RaisePropertyChanged(nameof(IsLocalCaptureEnabled));
+        }
+
+        if (refreshNow && readOnly is not null)
+        {
+            QueueRemoteRefresh();
+        }
     }
 
     internal void SetTabActive(bool isActive)
@@ -343,6 +362,11 @@ internal sealed class MetricsPageViewModel : ViewModelBase, IDisposable
             return;
         }
 
+        if (_remoteReadOnly is not null)
+        {
+            return;
+        }
+
         var configuredPort = NormalizePort(options.TransportPort);
         if (configuredPort != _remotePort || _remoteReceiver is null)
         {
@@ -422,11 +446,23 @@ internal sealed class MetricsPageViewModel : ViewModelBase, IDisposable
 
     public void Refresh()
     {
+        if (_remoteReadOnly is not null)
+        {
+            QueueRemoteRefresh();
+            return;
+        }
+
         RefreshSeries();
     }
 
     public void RefreshObservableMetrics()
     {
+        if (_remoteReadOnly is not null)
+        {
+            QueueRemoteRefresh();
+            return;
+        }
+
         RestartRemoteListener(_remotePort);
     }
 
@@ -474,6 +510,18 @@ internal sealed class MetricsPageViewModel : ViewModelBase, IDisposable
         }
     }
 
+    internal void ApplyRemoteStreamPayload(RemoteMetricStreamPayload payload)
+    {
+        if (Dispatcher.UIThread.CheckAccess())
+        {
+            ApplyRemoteStreamPayloadCore(payload);
+        }
+        else
+        {
+            Dispatcher.UIThread.Post(() => ApplyRemoteStreamPayloadCore(payload), DispatcherPriority.Background);
+        }
+    }
+
     internal void HandleTelemetryPacket(TelemetryPacket packet)
     {
         if (Dispatcher.UIThread.CheckAccess())
@@ -493,12 +541,17 @@ internal sealed class MetricsPageViewModel : ViewModelBase, IDisposable
 
     private void OnLiveMeasurementCaptured(MetricCaptureService.MetricMeasurementEvent measurement)
     {
+        if (_remoteReadOnly is not null)
+        {
+            return;
+        }
+
         AddMeasurement(measurement);
     }
 
     private void HandleTelemetryPacketCore(TelemetryPacket packet)
     {
-        if (_isDisposed)
+        if (_isDisposed || _remoteReadOnly is not null)
         {
             return;
         }
@@ -799,6 +852,33 @@ internal sealed class MetricsPageViewModel : ViewModelBase, IDisposable
         return "Other";
     }
 
+    private static string ResolveSnapshotTrend(
+        double lastValue,
+        double averageValue,
+        double minValue,
+        double maxValue,
+        int sampleCount)
+    {
+        if (sampleCount < 2)
+        {
+            return "N/A";
+        }
+
+        var delta = lastValue - averageValue;
+        var epsilon = Math.Max(1e-9, (maxValue - minValue) * 0.01);
+        if (delta > epsilon)
+        {
+            return "Up";
+        }
+
+        if (delta < -epsilon)
+        {
+            return "Down";
+        }
+
+        return "Flat";
+    }
+
     private bool NavigateSelection(bool forward)
     {
         var visible = _seriesView.Cast<MetricSeriesViewModel>().ToArray();
@@ -915,6 +995,175 @@ internal sealed class MetricsPageViewModel : ViewModelBase, IDisposable
         RaisePropertyChanged(nameof(DroppedQueueMeasurementCount));
         RaisePropertyChanged(nameof(DroppedSessionCount));
         UpdateRemoteStatusText();
+    }
+
+    private void QueueRemoteRefresh()
+    {
+        if (_remoteReadOnly is null || _isRemoteRefreshScheduled)
+        {
+            return;
+        }
+
+        _isRemoteRefreshScheduled = true;
+        _ = RefreshRemoteSnapshotAsync();
+    }
+
+    private async Task RefreshRemoteSnapshotAsync()
+    {
+        var readOnly = _remoteReadOnly;
+        if (readOnly is null)
+        {
+            _isRemoteRefreshScheduled = false;
+            return;
+        }
+
+        try
+        {
+            var snapshot = await readOnly.GetMetricsSnapshotAsync(
+                new RemoteMetricsSnapshotRequest
+                {
+                    IncludeSeries = true,
+                    IncludeMeasurements = true,
+                }).ConfigureAwait(false);
+
+            await Dispatcher.UIThread.InvokeAsync(() =>
+            {
+                if (!ReferenceEquals(_remoteReadOnly, readOnly))
+                {
+                    return;
+                }
+
+                ApplyRemoteSnapshot(snapshot);
+            });
+        }
+        catch
+        {
+            // Preserve the last applied remote snapshot when refresh fails.
+        }
+        finally
+        {
+            _isRemoteRefreshScheduled = false;
+        }
+    }
+
+    private void ApplyRemoteSnapshot(RemoteMetricsSnapshot snapshot)
+    {
+        var selectedKey = SelectedSeries?.Key;
+        _pendingMeasurements.Clear();
+        _remoteSessions.Clear();
+        _remotePacketCount = snapshot.MeasurementCount;
+        _droppedLocalPacketCount = 0;
+        _droppedUnknownSessionMetricCount = 0;
+        _droppedQueueMeasurementCount = snapshot.DroppedMeasurements;
+        _droppedSessionCount = 0;
+        _totalMeasurements = snapshot.TotalMeasurements;
+
+        var wasApplying = _isApplyingRemoteSettings;
+        _isApplyingRemoteSettings = true;
+        try
+        {
+            if (snapshot.MaxSeries > 0)
+            {
+                MaxSeries = snapshot.MaxSeries;
+            }
+
+            if (snapshot.MaxSamplesPerSeries > 1)
+            {
+                MaxSamplesPerSeries = snapshot.MaxSamplesPerSeries;
+            }
+
+            ApplyPausedState(snapshot.IsPaused, pausedByTabState: false);
+        }
+        finally
+        {
+            _isApplyingRemoteSettings = wasApplying;
+        }
+
+        _series.Clear();
+        _seriesIndex.Clear();
+        MetricSeriesViewModel? selectedSeries = null;
+        for (var i = 0; i < snapshot.Series.Count; i++)
+        {
+            var remoteSeries = snapshot.Series[i];
+            var metricTags = remoteSeries.Tags
+                .Select(tag => new MetricCaptureService.MetricTag(tag.Key, tag.Value))
+                .ToArray();
+            var series = new MetricSeriesViewModel(
+                remoteSeries.Id,
+                remoteSeries.MeterName,
+                remoteSeries.InstrumentName,
+                remoteSeries.Description,
+                remoteSeries.Unit,
+                remoteSeries.InstrumentType,
+                ResolveCategory(remoteSeries.InstrumentType),
+                FormatTags(metricTags));
+            series.LoadSnapshot(
+                remoteSeries.UpdatedAt,
+                remoteSeries.LastValue,
+                remoteSeries.AverageValue,
+                remoteSeries.MinValue,
+                remoteSeries.MaxValue,
+                remoteSeries.SampleCount,
+                ResolveSnapshotTrend(
+                    remoteSeries.LastValue,
+                    remoteSeries.AverageValue,
+                    remoteSeries.MinValue,
+                    remoteSeries.MaxValue,
+                    remoteSeries.SampleCount));
+            _series.Add(series);
+            _seriesIndex.Add(series.Key, series);
+
+            if (selectedKey is not null && string.Equals(selectedKey, series.Key, StringComparison.Ordinal))
+            {
+                selectedSeries = series;
+            }
+        }
+
+        SelectedSeries = selectedSeries;
+        RemoteStatusText = string.IsNullOrWhiteSpace(snapshot.Status)
+            ? "Remote metrics snapshot loaded."
+            : snapshot.Status;
+        RaisePropertyChanged(nameof(TotalMeasurements));
+        RaisePropertyChanged(nameof(RemoteSessionCount));
+        RaisePropertyChanged(nameof(RemotePacketCount));
+        RaisePropertyChanged(nameof(DroppedLocalPacketCount));
+        RaisePropertyChanged(nameof(DroppedUnknownSessionMetricCount));
+        RaisePropertyChanged(nameof(DroppedQueueMeasurementCount));
+        RaisePropertyChanged(nameof(DroppedSessionCount));
+        RaisePropertyChanged(nameof(IsLocalCaptureEnabled));
+        RefreshSeries();
+    }
+
+    private void ApplyRemoteStreamPayloadCore(RemoteMetricStreamPayload payload)
+    {
+        if (_remoteReadOnly is null)
+        {
+            return;
+        }
+
+        var tags = new MetricCaptureService.MetricTag[payload.Tags.Count];
+        for (var i = 0; i < payload.Tags.Count; i++)
+        {
+            var tag = payload.Tags[i];
+            tags[i] = new MetricCaptureService.MetricTag(tag.Key, tag.Value);
+        }
+
+        var measurement = new MetricCaptureService.MetricMeasurementEvent(
+            payload.TimestampUtc,
+            payload.MeterName,
+            payload.InstrumentName,
+            payload.Description,
+            payload.Unit,
+            payload.InstrumentType,
+            payload.Value,
+            tags);
+
+        _remotePacketCount++;
+        AddMeasurementCore(measurement);
+        RemoteStatusText = "Remote metrics stream active.";
+        RaisePropertyChanged(nameof(TotalMeasurements));
+        RaisePropertyChanged(nameof(RemotePacketCount));
+        RefreshSeries();
     }
 
     private static int NormalizePort(int port)

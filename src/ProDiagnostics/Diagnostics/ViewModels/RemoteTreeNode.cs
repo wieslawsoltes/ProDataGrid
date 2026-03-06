@@ -37,7 +37,7 @@ internal sealed class RemoteTreeNode : TreeNode
             Name = snapshot.ElementName ?? string.Empty
         };
 
-        foreach (var className in ParseClasses(snapshot.Classes))
+        foreach (var className in ParseStyleClasses(snapshot.Classes))
         {
             visual.Classes.Add(className);
         }
@@ -45,7 +45,7 @@ internal sealed class RemoteTreeNode : TreeNode
         return visual;
     }
 
-    private static IEnumerable<string> ParseClasses(string classes)
+    private static IEnumerable<string> ParseStyleClasses(string classes)
     {
         if (string.IsNullOrWhiteSpace(classes))
         {
@@ -63,7 +63,13 @@ internal sealed class RemoteTreeNode : TreeNode
         var split = text.Split(' ', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
         for (var i = 0; i < split.Length; i++)
         {
-            yield return split[i];
+            var className = split[i];
+            if (className.StartsWith(":", StringComparison.Ordinal))
+            {
+                continue;
+            }
+
+            yield return className;
         }
     }
 

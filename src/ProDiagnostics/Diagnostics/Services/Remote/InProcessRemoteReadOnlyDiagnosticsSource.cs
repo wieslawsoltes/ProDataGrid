@@ -10,6 +10,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Avalonia;
 using Avalonia.Controls;
+using Avalonia.Controls.Metadata;
 using Avalonia.Controls.Templates;
 using Avalonia.Diagnostics.Remote;
 using Avalonia.Diagnostics.Services;
@@ -204,6 +205,7 @@ internal sealed class InProcessRemoteReadOnlyDiagnosticsSource : IRemoteReadOnly
                 var targetNodePath = ResolveTargetNodePath(request, targetLookup, target);
                 var targetNodeId = targetLookup.FindNodeId(target);
                 var properties = BuildPropertySnapshots(target, includeClrProperties: request.IncludeClrProperties);
+                var pseudoClasses = BuildPseudoClassSnapshots(target);
                 var frames = BuildValueFrameSnapshots(target, cancellationToken);
                 var source = ResolveSourceLocationSnapshot(target);
 
@@ -217,6 +219,7 @@ internal sealed class InProcessRemoteReadOnlyDiagnosticsSource : IRemoteReadOnly
                     TargetNodeId: targetNodeId,
                     TargetNodePath: targetNodePath,
                     Properties: properties,
+                    PseudoClasses: pseudoClasses,
                     Frames: frames,
                     Source: source);
                 _propertiesSnapshotCache[cacheKey] = snapshot;
@@ -2289,6 +2292,42 @@ internal sealed class InProcessRemoteReadOnlyDiagnosticsSource : IRemoteReadOnly
             CoercionStatus: "unknown",
             ValidationStatus: validationStatus,
             Source: source);
+    }
+
+    private IReadOnlyList<RemotePseudoClassSnapshot> BuildPseudoClassSnapshots(AvaloniaObject target)
+    {
+        if (target is not StyledElement styledElement)
+        {
+            return Array.Empty<RemotePseudoClassSnapshot>();
+        }
+
+        var pseudoClassNames = new HashSet<string>(StringComparer.Ordinal);
+        var pseudoClassAttributes = styledElement.GetType().GetCustomAttributes<PseudoClassesAttribute>(true);
+        foreach (var attribute in pseudoClassAttributes)
+        {
+            for (var j = 0; j < attribute.PseudoClasses.Count; j++)
+            {
+                pseudoClassNames.Add(attribute.PseudoClasses[j]);
+            }
+        }
+
+        foreach (var className in styledElement.Classes)
+        {
+            if (!string.IsNullOrWhiteSpace(className) && className[0] == ':')
+            {
+                pseudoClassNames.Add(className);
+            }
+        }
+
+        if (pseudoClassNames.Count == 0)
+        {
+            return Array.Empty<RemotePseudoClassSnapshot>();
+        }
+
+        return pseudoClassNames
+            .OrderBy(static name => name, StringComparer.Ordinal)
+            .Select(name => new RemotePseudoClassSnapshot(name, styledElement.Classes.Contains(name)))
+            .ToArray();
     }
 
     private IReadOnlyList<RemoteValueFrameSnapshot> BuildValueFrameSnapshots(

@@ -84,23 +84,19 @@ namespace Avalonia.Diagnostics.ViewModels
                 if (_remoteReadOnly is null)
                 {
                     styledElement.Classes.AddListener(this);
-                }
+                    var pseudoClassAttributes = styledElement.GetType().GetCustomAttributes<PseudoClassesAttribute>(true);
 
-                var pseudoClassAttributes = styledElement.GetType().GetCustomAttributes<PseudoClassesAttribute>(true);
-
-                foreach (var classAttribute in pseudoClassAttributes)
-                {
-                    foreach (var className in classAttribute.PseudoClasses)
+                    foreach (var classAttribute in pseudoClassAttributes)
                     {
-                        PseudoClasses.Add(new PseudoClassViewModel(
-                            className,
-                            styledElement,
-                            _remoteMutation is null ? null : QueueRemotePseudoClassMutation));
+                        foreach (var className in classAttribute.PseudoClasses)
+                        {
+                            PseudoClasses.Add(new PseudoClassViewModel(
+                                className,
+                                styledElement,
+                                _remoteMutation is null ? null : QueueRemotePseudoClassMutation));
+                        }
                     }
-                }
 
-                if (_remoteReadOnly is null)
-                {
                     var styleDiagnostics = styledElement.GetValueStoreDiagnostic();
 
                     var clipboard = TopLevel.GetTopLevel(_avaloniaObject as Visual)?.Clipboard;
@@ -798,6 +794,17 @@ namespace Avalonia.Diagnostics.ViewModels
 
             AppliedFrames.Clear();
             PseudoClasses.Clear();
+            for (var i = 0; i < snapshot.PseudoClasses.Count; i++)
+            {
+                var pseudoClass = snapshot.PseudoClasses[i];
+                PseudoClasses.Add(
+                    new PseudoClassViewModel(
+                        pseudoClass.Name,
+                        source: null,
+                        setStateOverride: _remoteMutation is null ? null : QueueRemotePseudoClassMutation,
+                        initialState: pseudoClass.IsActive));
+            }
+
             for (var i = 0; i < snapshot.Frames.Count; i++)
             {
                 var frame = snapshot.Frames[i];
@@ -929,6 +936,8 @@ namespace Avalonia.Diagnostics.ViewModels
                         PseudoClass = pseudoClass,
                         IsActive = isActive,
                     }).ConfigureAwait(false);
+
+                await RefreshFromRemoteAsync().ConfigureAwait(false);
             }
             catch
             {
