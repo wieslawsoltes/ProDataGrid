@@ -68,7 +68,7 @@ public sealed record class RemotePreviewInputRequest
 }
 
 /// <summary>
-/// Request to set an Avalonia property value on a target control/object.
+/// Request to set an Avalonia or CLR property value on a target control/object.
 /// </summary>
 public sealed record class RemoteSetPropertyRequest
 {
@@ -77,6 +77,8 @@ public sealed record class RemoteSetPropertyRequest
     public string? NodePath { get; init; }
     public string? ControlName { get; init; }
     public string PropertyName { get; init; } = string.Empty;
+    public string? PropertyKind { get; init; }
+    public string? PropertyDeclaringType { get; init; }
     public string? ValueText { get; init; }
     public bool ValueIsNull { get; init; }
     public bool ClearValue { get; init; }

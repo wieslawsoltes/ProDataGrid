@@ -4,12 +4,15 @@ using System.Linq;
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
+using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Diagnostics.Remote;
 using Avalonia.Diagnostics.Services;
 using Avalonia.Diagnostics.ViewModels;
 using Avalonia.Headless.XUnit;
+using Avalonia.Input;
 using Avalonia.Styling;
+using Avalonia.Threading;
 using Xunit;
 
 namespace Avalonia.Diagnostics.UnitTests.Remote;
@@ -130,11 +133,39 @@ public class RemoteMutationMessageRouterTests
                 Scope = "combined",
                 ControlName = "TestButton",
                 PropertyName = "IsEnabled",
+                PropertyKind = "avalonia",
+                PropertyDeclaringType = typeof(InputElement).AssemblyQualifiedName,
                 ValueText = "false",
             });
 
         Assert.True(result.Changed);
         Assert.False(button.IsEnabled);
+    }
+
+    [AvaloniaFact]
+    public async Task HandleAsync_PropertiesSet_Updates_Target_Clr_Property()
+    {
+        var (window, button) = CreateTestWindow();
+        var source = new InProcessRemoteMutationDiagnosticsSource(window);
+        var router = new RemoteMutationMessageRouter(source);
+
+        Assert.Equal("before", button.DiagnosticTag);
+
+        var result = await SendRequestAsync<RemoteMutationResult>(
+            router,
+            RemoteMutationMethods.PropertiesSet,
+            new RemoteSetPropertyRequest
+            {
+                Scope = "combined",
+                ControlName = "TestButton",
+                PropertyName = nameof(TestInspectableButton.DiagnosticTag),
+                PropertyKind = "clr",
+                PropertyDeclaringType = typeof(TestInspectableButton).AssemblyQualifiedName,
+                ValueText = "after",
+            });
+
+        Assert.True(result.Changed);
+        Assert.Equal("after", button.DiagnosticTag);
     }
 
     [AvaloniaFact]
@@ -210,6 +241,50 @@ public class RemoteMutationMessageRouterTests
 
         Assert.Equal(RemoteMutationMethods.InspectHovered, result.Operation);
         Assert.False(result.Changed);
+    }
+
+    [AvaloniaFact]
+    public async Task InspectHovered_WithLiveHoverEnabled_DoesNotChangeSelection_WithoutGesture()
+    {
+        var (window, button) = CreateTestWindow();
+        window.Width = 240;
+        window.Height = 120;
+        window.Show();
+        Dispatcher.UIThread.RunJobs();
+
+        var point = button.TranslatePoint(
+            new Point(button.Bounds.Width / 2d, button.Bounds.Height / 2d),
+            window);
+        Assert.True(point.HasValue);
+
+        var selectionState = new InProcessRemoteSelectionState();
+        var overlayState = new InProcessRemoteOverlayState();
+        var source = new InProcessRemoteMutationDiagnosticsSource(
+            window,
+            overlayState: overlayState,
+            selectionState: selectionState);
+
+        var pointerMove = await source.InjectPreviewInputAsync(new RemotePreviewInputRequest
+        {
+            EventType = "pointer_move",
+            X = point.Value.X,
+            Y = point.Value.Y,
+        });
+        Assert.True(pointerMove.Changed);
+        Assert.True(overlayState.IsLiveHoverEnabled);
+
+        var result = await source.InspectHoveredAsync(new RemoteInspectHoveredRequest
+        {
+            Scope = "combined",
+            RequireInspectGesture = true,
+        });
+
+        Assert.Equal(RemoteMutationMethods.InspectHovered, result.Operation);
+        Assert.False(result.Changed);
+        Assert.Null(selectionState.GetSnapshot("combined").NodePath);
+
+        window.Close();
+        source.Dispose();
     }
 
     [AvaloniaFact]
@@ -689,12 +764,13 @@ public class RemoteMutationMessageRouterTests
         return Assert.IsType<RemoteResponseMessage>(response);
     }
 
-    private static (Window window, Button button) CreateTestWindow()
+    private static (Window window, TestInspectableButton button) CreateTestWindow()
     {
-        var button = new Button
+        var button = new TestInspectableButton
         {
             Name = "TestButton",
             Content = "Click me",
+            DiagnosticTag = "before",
         };
 
         var rootPanel = new StackPanel
@@ -709,6 +785,11 @@ public class RemoteMutationMessageRouterTests
             Content = rootPanel,
         };
         return (window, button);
+    }
+
+    private sealed class TestInspectableButton : Button
+    {
+        public string? DiagnosticTag { get; set; }
     }
 
     private static EventTreeNode? FindEventNode(IEnumerable<EventTreeNodeBase> nodes, string ownerTypeName, string eventName)

@@ -137,13 +137,13 @@ namespace Avalonia.Diagnostics.Views
                 && sender is Control control 
                 && control.DataContext is EventChainLink chainLink
                 && chainLink.Handler is Visual visual
-                && vm.MainView?.HighlightElements != false)
+                && vm.MainView is { HighlightElements: true, ShouldRenderLocalHighlightAdorners: true })
             {
                 _adornedVisual = visual;
                 _adorner?.Dispose();
                 _adorner = Controls.ControlHighlightAdorner.Add(
                     visual,
-                    vm.MainView?.OverlayDisplayOptions ?? Controls.OverlayDisplayOptions.Default);
+                    vm.MainView.OverlayDisplayOptions);
             }
         }
 
@@ -157,6 +157,7 @@ namespace Avalonia.Diagnostics.Views
         private void OnMainViewPropertyChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e)
         {
             if (e.PropertyName is nameof(MainViewModel.HighlightElements)
+                or nameof(MainViewModel.ShouldRenderLocalHighlightAdorners)
                 or nameof(MainViewModel.ShouldVisualizeMarginPadding)
                 or nameof(MainViewModel.ShowOverlayInfo)
                 or nameof(MainViewModel.ShowOverlayRulers)
@@ -171,7 +172,7 @@ namespace Avalonia.Diagnostics.Views
             _adorner?.Dispose();
             _adorner = null;
 
-            if (_adornedVisual is null || _mainView is not { HighlightElements: true })
+            if (_adornedVisual is null || _mainView is not { HighlightElements: true, ShouldRenderLocalHighlightAdorners: true })
             {
                 return;
             }

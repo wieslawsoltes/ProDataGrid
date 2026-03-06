@@ -36,6 +36,7 @@ namespace Avalonia.Diagnostics.ViewModels
         private const int StylesGlobalTabIndex = 14;
         private static readonly TimeSpan DeferredRefreshCadence = TimeSpan.FromMilliseconds(140);
         private static readonly TimeSpan DeferredRefreshBurstWindow = TimeSpan.FromSeconds(4);
+        private static readonly TimeSpan RemoteInspectPollCadence = TimeSpan.FromMilliseconds(350);
         private const int DeferredRefreshBurstThreshold = 40;
 
         private readonly AvaloniaObject _root;
@@ -113,6 +114,9 @@ namespace Avalonia.Diagnostics.ViewModels
         private RemoteSelectionSnapshot? _preconnectedCombinedSelectionSnapshot;
         private string _remoteStreamDemandSignature = string.Empty;
         private readonly Dictionary<int, DeferredRefreshState> _deferredRightTabRefreshStates = new();
+        private DispatcherTimer? _remoteInspectTimer;
+        private bool _remoteInspectInFlight;
+        private bool _isApplyingRemoteOverlaySnapshot;
         private bool _isDisposed;
 
         public MainViewModel(AvaloniaObject root)
@@ -208,7 +212,7 @@ namespace Avalonia.Diagnostics.ViewModels
             {
                 if (RaiseAndSetIfChanged(ref _shouldVisualizeMarginPadding, value))
                 {
-                    UpdateInspectionHighlight();
+                    OnOverlaySettingsChanged();
                 }
             }
         }
@@ -220,7 +224,7 @@ namespace Avalonia.Diagnostics.ViewModels
             {
                 if (RaiseAndSetIfChanged(ref _showOverlayInfo, value))
                 {
-                    UpdateInspectionHighlight();
+                    OnOverlaySettingsChanged();
                 }
             }
         }
@@ -232,7 +236,7 @@ namespace Avalonia.Diagnostics.ViewModels
             {
                 if (RaiseAndSetIfChanged(ref _showOverlayRulers, value))
                 {
-                    UpdateInspectionHighlight();
+                    OnOverlaySettingsChanged();
                 }
             }
         }
@@ -244,7 +248,7 @@ namespace Avalonia.Diagnostics.ViewModels
             {
                 if (RaiseAndSetIfChanged(ref _showOverlayExtensionLines, value))
                 {
-                    UpdateInspectionHighlight();
+                    OnOverlaySettingsChanged();
                 }
             }
         }
@@ -256,7 +260,7 @@ namespace Avalonia.Diagnostics.ViewModels
             {
                 if (RaiseAndSetIfChanged(ref _highlightElements, value))
                 {
-                    UpdateInspectionHighlight();
+                    OnOverlaySettingsChanged();
                 }
             }
         }
@@ -268,7 +272,7 @@ namespace Avalonia.Diagnostics.ViewModels
             {
                 if (RaiseAndSetIfChanged(ref _liveHoverOverlay, value))
                 {
-                    UpdateInspectionHighlight();
+                    OnOverlaySettingsChanged();
                 }
             }
         }
@@ -509,7 +513,7 @@ namespace Avalonia.Diagnostics.ViewModels
             private set
             {
                 var changed = RaiseAndSetIfChanged(ref _pointerOverElement, value);
-                PointerOverElementName = value?.GetType()?.Name;
+                PointerOverElementName = ShouldRenderLocalHighlightAdorners ? value?.GetType()?.Name : null;
                 if (changed)
                 {
                     UpdateInspectionHighlight();
@@ -522,6 +526,8 @@ namespace Avalonia.Diagnostics.ViewModels
             get => _pointerOverElementName;
             private set => RaiseAndSetIfChanged(ref _pointerOverElementName, value);
         }
+
+        internal bool ShouldRenderLocalHighlightAdorners => _remoteReadOnly is null;
 
         public void ShowHotKeys() => SelectedTab = 17;
 
@@ -839,6 +845,11 @@ namespace Avalonia.Diagnostics.ViewModels
             _transportSettings.Dispose();
             _profiler.Dispose();
             _settings.Dispose();
+            if (_remoteInspectTimer is not null)
+            {
+                _remoteInspectTimer.Stop();
+                _remoteInspectTimer = null;
+            }
             _currentFocusHighlightAdorner?.Dispose();
             _currentInspectionHighlightAdorner?.Dispose();
             if (TryGetRenderer() is { } renderer)
@@ -878,12 +889,14 @@ namespace Avalonia.Diagnostics.ViewModels
         private void UpdateFocusedControl()
         {
             var element = KeyboardDevice.Instance?.FocusedElement;
-            FocusedControl = element?.GetType().Name;
+            FocusedControl = ShouldRenderLocalHighlightAdorners
+                ? element?.GetType().Name
+                : null;
 
             _currentFocusHighlightAdorner?.Dispose();
             _currentFocusHighlightAdorner = null;
 
-            if (!TrackFocusedControl)
+            if (!TrackFocusedControl || !ShouldRenderLocalHighlightAdorners)
             {
                 return;
             }
@@ -899,7 +912,7 @@ namespace Avalonia.Diagnostics.ViewModels
             _currentInspectionHighlightAdorner?.Dispose();
             _currentInspectionHighlightAdorner = null;
 
-            if (!HighlightElements)
+            if (!HighlightElements || !ShouldRenderLocalHighlightAdorners)
             {
                 return;
             }
@@ -928,6 +941,160 @@ namespace Avalonia.Diagnostics.ViewModels
             }
 
             return null;
+        }
+
+        private void OnOverlaySettingsChanged()
+        {
+            UpdateInspectionHighlight();
+
+            if (_isApplyingRemoteOverlaySnapshot || _remoteMutation is null)
+            {
+                return;
+            }
+
+            _ = SyncRemoteOverlaySettingsAsync();
+        }
+
+        private async Task SyncRemoteOverlaySettingsAsync()
+        {
+            var mutation = _remoteMutation;
+            if (mutation is null)
+            {
+                return;
+            }
+
+            try
+            {
+                await mutation.SetOverlayOptionsAsync(
+                    new RemoteSetOverlayOptionsRequest
+                    {
+                        VisualizeMarginPadding = ShouldVisualizeMarginPadding,
+                        ShowInfo = ShowOverlayInfo,
+                        ShowRulers = ShowOverlayRulers,
+                        ShowExtensionLines = ShowOverlayExtensionLines,
+                        HighlightElements = HighlightElements,
+                    }).ConfigureAwait(false);
+                await mutation.SetOverlayLiveHoverAsync(
+                    new RemoteSetOverlayLiveHoverRequest
+                    {
+                        IsEnabled = LiveHoverOverlay,
+                    }).ConfigureAwait(false);
+            }
+            catch
+            {
+                // Keep desktop overlay settings responsive even when remote sync fails.
+            }
+        }
+
+        private async Task RefreshRemoteOverlayOptionsSnapshotAsync()
+        {
+            var readOnly = _remoteReadOnly;
+            if (readOnly is null)
+            {
+                return;
+            }
+
+            try
+            {
+                var snapshot = await readOnly.GetOverlayOptionsSnapshotAsync().ConfigureAwait(false);
+                await Dispatcher.UIThread.InvokeAsync(() => ApplyRemoteOverlayOptionsSnapshot(snapshot));
+            }
+            catch
+            {
+                // Keep current overlay toggles when remote overlay bootstrap fails.
+            }
+        }
+
+        private void ApplyRemoteOverlayOptionsSnapshot(RemoteOverlayOptionsSnapshot snapshot)
+        {
+            _isApplyingRemoteOverlaySnapshot = true;
+            try
+            {
+                ShouldVisualizeMarginPadding = snapshot.VisualizeMarginPadding;
+                ShowOverlayInfo = snapshot.ShowInfo;
+                ShowOverlayRulers = snapshot.ShowRulers;
+                ShowOverlayExtensionLines = snapshot.ShowExtensionLines;
+                HighlightElements = snapshot.HighlightElements;
+                LiveHoverOverlay = snapshot.LiveHoverEnabled;
+            }
+            finally
+            {
+                _isApplyingRemoteOverlaySnapshot = false;
+            }
+        }
+
+        private void UpdateRemoteInspectLoopState()
+        {
+            if (_isDisposed)
+            {
+                return;
+            }
+
+            if (_remoteReadOnly is not null && _remoteMutation is not null && !ShouldRenderLocalHighlightAdorners)
+            {
+                _remoteInspectTimer ??= CreateRemoteInspectTimer();
+                if (!_remoteInspectTimer.IsEnabled)
+                {
+                    _remoteInspectTimer.Start();
+                }
+
+                return;
+            }
+
+            if (_remoteInspectTimer is not null)
+            {
+                _remoteInspectTimer.Stop();
+            }
+
+            _remoteInspectInFlight = false;
+        }
+
+        private DispatcherTimer CreateRemoteInspectTimer()
+        {
+            var timer = new DispatcherTimer
+            {
+                Interval = RemoteInspectPollCadence,
+            };
+            timer.Tick += (_, _) => _ = PollRemoteHoveredInspectAsync();
+            return timer;
+        }
+
+        private async Task PollRemoteHoveredInspectAsync()
+        {
+            if (_remoteInspectInFlight)
+            {
+                return;
+            }
+
+            var mutation = _remoteMutation;
+            if (mutation is null || _remoteReadOnly is null || ShouldRenderLocalHighlightAdorners)
+            {
+                return;
+            }
+
+            _remoteInspectInFlight = true;
+            try
+            {
+                var result = await mutation.InspectHoveredAsync(
+                    new RemoteInspectHoveredRequest
+                    {
+                        Scope = "combined",
+                        RequireInspectGesture = true,
+                        IncludeDevTools = false,
+                    }).ConfigureAwait(false);
+                if (result.Changed)
+                {
+                    await RefreshRemoteSelectionSnapshotAsync().ConfigureAwait(false);
+                }
+            }
+            catch
+            {
+                // Keep remote polling best-effort to match web client behavior.
+            }
+            finally
+            {
+                _remoteInspectInFlight = false;
+            }
         }
 
         private void KeyboardPropertyChanged(object? sender, PropertyChangedEventArgs e)
@@ -2603,6 +2770,12 @@ namespace Avalonia.Diagnostics.ViewModels
                 _metrics.Clear();
                 _profiler.Clear();
             }
+
+            PointerOverElementName = PointerOverElement?.GetType()?.Name;
+            RaisePropertyChanged(nameof(ShouldRenderLocalHighlightAdorners));
+            UpdateFocusedControl();
+            UpdateInspectionHighlight();
+            UpdateRemoteInspectLoopState();
         }
 
         private void BindRemoteReadOnlyTabs(
@@ -2681,8 +2854,14 @@ namespace Avalonia.Diagnostics.ViewModels
                 domains.ReadOnly,
                 GetRemoteSelectionContext,
                 refreshNow: false);
+            PointerOverElementName = null;
+            RaisePropertyChanged(nameof(ShouldRenderLocalHighlightAdorners));
+            UpdateFocusedControl();
+            UpdateInspectionHighlight();
             ApplyRightTabRuntimePolicies(activeGlobalTab, forceRefresh: false);
             QueueRemoteStreamDemandSync(force: true);
+            _ = RefreshRemoteOverlayOptionsSnapshotAsync();
+            UpdateRemoteInspectLoopState();
             if (refreshSelectionNow)
             {
                 _ = RefreshRemoteSelectionSnapshotAsync();
@@ -2955,7 +3134,7 @@ namespace Avalonia.Diagnostics.ViewModels
                     new RemoteInspectHoveredRequest
                     {
                         Scope = "combined",
-                        RequireInspectGesture = false,
+                        RequireInspectGesture = true,
                         IncludeDevTools = false,
                     }).ConfigureAwait(false);
                 if (!result.Changed)

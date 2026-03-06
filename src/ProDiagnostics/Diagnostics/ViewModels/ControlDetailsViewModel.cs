@@ -762,11 +762,18 @@ namespace Avalonia.Diagnostics.ViewModels
                     name: property.Name,
                     group: property.Group,
                     displayType: typeText,
+                    assignedTypeName: property.AssignedType,
+                    propertyTypeName: property.PropertyType,
                     declaringTypeName: property.DeclaringType,
                     priority: property.Priority,
                     isAttached: property.IsAttached,
                     isReadOnly: property.IsReadOnly,
                     valueText: property.ValueText,
+                    propertyKind: property.PropertyKind,
+                    editorKind: property.EditorKind,
+                    enumOptions: property.EnumOptions,
+                    canClearValue: property.CanClearValue,
+                    canSetNull: property.CanSetNull,
                     setValueCallback: OnRemotePropertyValueChanged);
                 propertyViewModel.IsPinned = _pinnedProperties.Contains(propertyViewModel.FullName);
                 properties[i] = propertyViewModel;
@@ -853,10 +860,10 @@ namespace Avalonia.Diagnostics.ViewModels
                 return;
             }
 
-            _ = ApplyRemotePropertyMutationAsync(property.Name, value);
+            _ = ApplyRemotePropertyMutationAsync(property, value);
         }
 
-        private async Task ApplyRemotePropertyMutationAsync(string propertyName, object? value)
+        private async Task ApplyRemotePropertyMutationAsync(RemotePropertyViewModel property, object? value)
         {
             var mutation = _remoteMutation;
             if (mutation is null)
@@ -870,12 +877,12 @@ namespace Avalonia.Diagnostics.ViewModels
                 ControlName: (_avaloniaObject as INamed)?.Name);
             try
             {
+                var clearValue = value is null && !property.CanSetNull && property.CanClearValue;
                 var valueText = value switch
                 {
                     null => null,
                     string text => text,
-                    IFormattable formattable => formattable.ToString(null, CultureInfo.InvariantCulture),
-                    _ => value.ToString(),
+                    _ => PropertyValueEditorStringConversion.ToString(value) ?? value.ToString(),
                 };
 
                 await mutation.SetPropertyAsync(
@@ -884,10 +891,12 @@ namespace Avalonia.Diagnostics.ViewModels
                         Scope = context.Scope,
                         NodePath = context.NodePath,
                         ControlName = context.ControlName,
-                        PropertyName = propertyName,
+                        PropertyName = property.Name,
+                        PropertyKind = property.PropertyKind,
+                        PropertyDeclaringType = property.DeclaringTypeName,
                         ValueText = valueText,
-                        ValueIsNull = value is null,
-                        ClearValue = false,
+                        ValueIsNull = value is null && !clearValue,
+                        ClearValue = clearValue,
                     }).ConfigureAwait(false);
 
                 await RefreshFromRemoteAsync().ConfigureAwait(false);

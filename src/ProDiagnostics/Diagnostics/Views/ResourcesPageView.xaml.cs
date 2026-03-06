@@ -51,7 +51,10 @@ namespace Avalonia.Diagnostics.Views
             var visual = ResolveVisual(node);
             _adornedVisual = visual;
 
-            if (visual is null || DataContext is not ResourcesPageViewModel vm || !vm.MainView.HighlightElements)
+            if (visual is null ||
+                DataContext is not ResourcesPageViewModel vm ||
+                !vm.MainView.HighlightElements ||
+                !vm.MainView.ShouldRenderLocalHighlightAdorners)
             {
                 return;
             }
@@ -142,6 +145,7 @@ namespace Avalonia.Diagnostics.Views
         private void OnMainViewPropertyChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e)
         {
             if (e.PropertyName is nameof(MainViewModel.HighlightElements)
+                or nameof(MainViewModel.ShouldRenderLocalHighlightAdorners)
                 or nameof(MainViewModel.ShouldVisualizeMarginPadding)
                 or nameof(MainViewModel.ShowOverlayInfo)
                 or nameof(MainViewModel.ShowOverlayRulers)
@@ -156,7 +160,7 @@ namespace Avalonia.Diagnostics.Views
             _adorner?.Dispose();
             _adorner = null;
 
-            if (_adornedVisual is null || _mainView is not { HighlightElements: true })
+            if (_adornedVisual is null || _mainView is not { HighlightElements: true, ShouldRenderLocalHighlightAdorners: true })
             {
                 return;
             }

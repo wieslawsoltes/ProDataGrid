@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Security.Cryptography;
 using System.Text;
 using System.Threading;
@@ -10,6 +11,7 @@ using Avalonia.Controls;
 using Avalonia.Controls.Diagnostics;
 using Avalonia.Controls.Primitives;
 using Avalonia.Diagnostics;
+using Avalonia.Diagnostics.Controls;
 using Avalonia.Input;
 using Avalonia.Input.Raw;
 using Avalonia.Diagnostics.Remote;
@@ -25,6 +27,8 @@ namespace Avalonia.Diagnostics.Services;
 internal sealed class InProcessRemoteMutationDiagnosticsSource : IRemoteMutationDiagnosticsSource, IDisposable
 {
     private const KeyModifiers InspectHoveredModifiers = KeyModifiers.Control | KeyModifiers.Shift;
+    private const string AvaloniaPropertyKind = "avalonia";
+    private const string ClrPropertyKind = "clr";
 
     private readonly AvaloniaObject _root;
     private readonly BreakpointService? _breakpointService;
@@ -39,6 +43,9 @@ internal sealed class InProcessRemoteMutationDiagnosticsSource : IRemoteMutation
     private readonly ITreeNodeProvider _logicalTreeProvider;
     private readonly ITreeNodeProvider _visualTreeProvider;
     private readonly IDisposable? _inputSubscription;
+    private IDisposable? _remoteOverlayAdorner;
+    private Visual? _remoteOverlayTargetVisual;
+    private OverlayDisplayOptions _remoteOverlayDisplayOptions;
     private TopLevel? _lastPointerRoot;
     private PixelPoint _lastPointerPosition;
     private KeyModifiers _lastKeyModifiers;
@@ -81,8 +88,7 @@ internal sealed class InProcessRemoteMutationDiagnosticsSource : IRemoteMutation
 
         return InvokeOnUiThreadAsync(() =>
         {
-            var requireInspectGesture = request.RequireInspectGesture && !_overlayState.IsLiveHoverEnabled;
-            if (requireInspectGesture && _lastKeyModifiers != InspectHoveredModifiers)
+            if (request.RequireInspectGesture && _lastKeyModifiers != InspectHoveredModifiers)
             {
                 return new RemoteMutationResult(
                     Operation: RemoteMutationMethods.InspectHovered,
@@ -135,6 +141,7 @@ internal sealed class InProcessRemoteMutationDiagnosticsSource : IRemoteMutation
                 nodePath: targetPath,
                 target: DescribeTarget(target),
                 targetType: target.GetType().FullName ?? target.GetType().Name);
+            RefreshRemoteOverlayAdorner(scope);
 
             return new RemoteMutationResult(
                 Operation: RemoteMutationMethods.InspectHovered,
@@ -165,6 +172,7 @@ internal sealed class InProcessRemoteMutationDiagnosticsSource : IRemoteMutation
                 string.IsNullOrWhiteSpace(request.ControlName))
             {
                 var cleared = _selectionState.SetSelection(scope, null, null, null, null);
+                RefreshRemoteOverlayAdorner(scope);
                 return new RemoteMutationResult(
                     Operation: RemoteMutationMethods.SelectionSet,
                     Changed: cleared.Generation != previous.Generation,
@@ -181,6 +189,7 @@ internal sealed class InProcessRemoteMutationDiagnosticsSource : IRemoteMutation
             var description = DescribeTarget(target);
             var targetType = target.GetType().FullName ?? target.GetType().Name;
             var selection = _selectionState.SetSelection(scope, targetNodeId, targetPath, description, targetType);
+            RefreshRemoteOverlayAdorner(scope);
             return new RemoteMutationResult(
                 Operation: RemoteMutationMethods.SelectionSet,
                 Changed: selection.Generation != previous.Generation,
@@ -216,31 +225,37 @@ internal sealed class InProcessRemoteMutationDiagnosticsSource : IRemoteMutation
             var scope = NormalizeScope(request.Scope);
             using var lookup = BuildTreeLookup(scope);
             var target = ResolveRequiredTarget(lookup, request.NodeId, request.NodePath, request.ControlName, out var targetPath);
-            var property = ResolvePropertyOrThrow(target, request.PropertyName);
+            var property = ResolvePropertyOrThrow(target, request.PropertyName, request.PropertyKind, request.PropertyDeclaringType);
 
             if (property.IsReadOnly)
             {
-                throw new RemoteMutationValidationException("Property '" + property.Name + "' is read-only.");
+                throw new RemoteMutationValidationException("Property '" + property.DisplayName + "' is read-only.");
             }
 
-            var before = target.GetValue(property);
+            var before = property.GetValue(target);
             if (request.ClearValue)
             {
-                target.ClearValue(property);
+                if (!property.CanClearValue)
+                {
+                    throw new RemoteMutationValidationException(
+                        "Property '" + property.DisplayName + "' does not support ClearValue.");
+                }
+
+                property.ClearValue(target);
             }
             else
             {
                 var converted = ConvertPropertyValue(request, property);
-                target.SetValue(property, converted);
+                property.SetValue(target, converted);
             }
 
-            var after = target.GetValue(property);
+            var after = property.GetValue(target);
             var changed = !Equals(before, after);
             var valueText = FormatValue(after);
             return new RemoteMutationResult(
                 Operation: RemoteMutationMethods.PropertiesSet,
                 Changed: changed,
-                Message: "Property '" + property.Name + "' set to '" + valueText + "'.",
+                Message: "Property '" + property.DisplayName + "' set to '" + valueText + "'.",
                 Target: DescribeTarget(target),
                 TargetNodePath: targetPath);
         }, cancellationToken);
@@ -581,6 +596,7 @@ internal sealed class InProcessRemoteMutationDiagnosticsSource : IRemoteMutation
             }
 
             var changed = _overlayState.ApplyOptions(request, out var snapshot);
+            RefreshRemoteOverlayAdorner(ResolveOverlaySelectionScope());
             return new RemoteMutationResult(
                 Operation: RemoteMutationMethods.OverlayOptionsSet,
                 Changed: changed > 0,
@@ -604,6 +620,7 @@ internal sealed class InProcessRemoteMutationDiagnosticsSource : IRemoteMutation
         return InvokeOnUiThreadAsync(() =>
         {
             var changed = _overlayState.SetLiveHoverEnabled(request.IsEnabled, out _);
+            RefreshRemoteOverlayAdorner(ResolveOverlaySelectionScope());
             return new RemoteMutationResult(
                 Operation: RemoteMutationMethods.OverlayLiveHoverSet,
                 Changed: changed,
@@ -612,6 +629,112 @@ internal sealed class InProcessRemoteMutationDiagnosticsSource : IRemoteMutation
                     : "Disabled live-hover overlay behavior.",
                 AffectedCount: changed ? 1 : 0);
         }, cancellationToken);
+    }
+
+    private void RefreshRemoteOverlayAdorner(string scope)
+    {
+        var overlaySnapshot = _overlayState.GetSnapshot();
+        if (!overlaySnapshot.HighlightElements)
+        {
+            ClearRemoteOverlayAdorner(dispatchIfRequired: false);
+            return;
+        }
+
+        var overlayDisplayOptions = BuildOverlayDisplayOptions(overlaySnapshot);
+        var targetVisual = ResolveRemoteOverlayTarget(scope, overlaySnapshot);
+        if (targetVisual is null)
+        {
+            ClearRemoteOverlayAdorner(dispatchIfRequired: false);
+            return;
+        }
+
+        if (_remoteOverlayAdorner is not null &&
+            ReferenceEquals(targetVisual, _remoteOverlayTargetVisual) &&
+            overlayDisplayOptions == _remoteOverlayDisplayOptions)
+        {
+            return;
+        }
+
+        ClearRemoteOverlayAdorner(dispatchIfRequired: false);
+        _remoteOverlayAdorner = ControlHighlightAdorner.Add(targetVisual, overlayDisplayOptions);
+        _remoteOverlayTargetVisual = _remoteOverlayAdorner is null ? null : targetVisual;
+        _remoteOverlayDisplayOptions = overlayDisplayOptions;
+    }
+
+    private Visual? ResolveRemoteOverlayTarget(string scope, RemoteOverlayOptionsSnapshot overlaySnapshot)
+    {
+        if (overlaySnapshot.LiveHoverEnabled &&
+            ResolveHoveredOverlayTarget() is { } hoveredTarget)
+        {
+            return hoveredTarget;
+        }
+
+        return ResolveSelectedOverlayTarget(scope);
+    }
+
+    private Visual? ResolveHoveredOverlayTarget()
+    {
+        var topLevel = ResolveInspectionRoot();
+        if (topLevel is null)
+        {
+            return null;
+        }
+
+        var hoveredControl = FindHoveredControl(topLevel);
+        return hoveredControl is Visual visual && !visual.DoesBelongToDevTool()
+            ? visual
+            : null;
+    }
+
+    private Visual? ResolveSelectedOverlayTarget(string scope)
+    {
+        var selectionSnapshot = _selectionState.GetSnapshot(scope);
+        if (string.IsNullOrWhiteSpace(selectionSnapshot.NodeId) &&
+            string.IsNullOrWhiteSpace(selectionSnapshot.NodePath))
+        {
+            return null;
+        }
+
+        using var lookup = BuildTreeLookup(scope);
+        AvaloniaObject? target = null;
+        if (!string.IsNullOrWhiteSpace(selectionSnapshot.NodeId) &&
+            lookup.TryGetByNodeId(selectionSnapshot.NodeId, out var targetByNodeId))
+        {
+            target = targetByNodeId;
+        }
+        else if (!string.IsNullOrWhiteSpace(selectionSnapshot.NodePath) &&
+                 lookup.TryGet(selectionSnapshot.NodePath, out var targetByPath))
+        {
+            target = targetByPath;
+        }
+
+        return target is Visual visual && !visual.DoesBelongToDevTool()
+            ? visual
+            : null;
+    }
+
+    private static OverlayDisplayOptions BuildOverlayDisplayOptions(RemoteOverlayOptionsSnapshot overlaySnapshot)
+    {
+        return new OverlayDisplayOptions(
+            VisualizeMarginPadding: overlaySnapshot.VisualizeMarginPadding,
+            ShowInfo: overlaySnapshot.ShowInfo,
+            ShowRulers: overlaySnapshot.ShowRulers,
+            ShowExtensionLines: overlaySnapshot.ShowExtensionLines);
+    }
+
+    private string ResolveOverlaySelectionScope()
+    {
+        foreach (var scope in new[] { "combined", "visual", "logical" })
+        {
+            var selection = _selectionState.GetSnapshot(scope);
+            if (!string.IsNullOrWhiteSpace(selection.NodeId) ||
+                !string.IsNullOrWhiteSpace(selection.NodePath))
+            {
+                return scope;
+            }
+        }
+
+        return "combined";
     }
 
     public ValueTask<RemoteMutationResult> OpenCodeDocumentAsync(
@@ -675,7 +798,8 @@ internal sealed class InProcessRemoteMutationDiagnosticsSource : IRemoteMutation
             var scope = NormalizeScope(request.Scope);
             using var lookup = BuildTreeLookup(scope);
             var target = ResolveRequiredTarget(lookup, request.NodeId, request.NodePath, request.ControlName, out var targetPath);
-            var property = ResolvePropertyOrThrow(target, request.PropertyName);
+            var property = ResolvePropertyOrThrow(target, request.PropertyName, AvaloniaPropertyKind, propertyDeclaringType: null)
+                .GetAvaloniaPropertyOrThrow();
 
             breakpointService.AddPropertyBreakpoint(property, target, DescribeTarget(target));
             return new RemoteMutationResult(
@@ -1302,7 +1426,42 @@ internal sealed class InProcessRemoteMutationDiagnosticsSource : IRemoteMutation
 
     public void Dispose()
     {
+        ClearRemoteOverlayAdorner(dispatchIfRequired: true);
         _inputSubscription?.Dispose();
+    }
+
+    private void ClearRemoteOverlayAdorner(bool dispatchIfRequired)
+    {
+        var adorner = _remoteOverlayAdorner;
+        _remoteOverlayAdorner = null;
+        _remoteOverlayTargetVisual = null;
+        _remoteOverlayDisplayOptions = default;
+        if (adorner is null)
+        {
+            return;
+        }
+
+        if (Dispatcher.UIThread.CheckAccess())
+        {
+            adorner.Dispose();
+            return;
+        }
+
+        if (!dispatchIfRequired)
+        {
+            return;
+        }
+
+        try
+        {
+            Dispatcher.UIThread.Post(
+                () => adorner.Dispose(),
+                DispatcherPriority.Send);
+        }
+        catch
+        {
+            // Best-effort cleanup during shutdown.
+        }
     }
 
     private void OnRawInput(RawInputEventArgs rawInput)
@@ -1310,6 +1469,12 @@ internal sealed class InProcessRemoteMutationDiagnosticsSource : IRemoteMutation
         switch (rawInput)
         {
             case RawPointerEventArgs pointerEventArgs:
+                if (pointerEventArgs.Root is Visual pointerRootVisual &&
+                    pointerRootVisual.DoesBelongToDevTool())
+                {
+                    break;
+                }
+
                 _lastKeyModifiers = pointerEventArgs.InputModifiers.ToKeyModifiers();
                 if (pointerEventArgs.Root is Visual visual)
                 {
@@ -1325,9 +1490,20 @@ internal sealed class InProcessRemoteMutationDiagnosticsSource : IRemoteMutation
                 {
                     _lastPointerRoot = topLevel;
                 }
+
+                if (_overlayState.IsLiveHoverEnabled)
+                {
+                    RefreshRemoteOverlayAdorner(ResolveOverlaySelectionScope());
+                }
                 break;
 
             case RawKeyEventArgs keyEventArgs:
+                if (keyEventArgs.Root is Visual keyRootVisual &&
+                    keyRootVisual.DoesBelongToDevTool())
+                {
+                    break;
+                }
+
                 var modifiers = keyEventArgs.Modifiers.ToKeyModifiers();
                 _lastKeyModifiers = keyEventArgs.Type switch
                 {
@@ -1675,29 +1851,56 @@ internal sealed class InProcessRemoteMutationDiagnosticsSource : IRemoteMutation
         return matches[0];
     }
 
-    private static AvaloniaProperty ResolvePropertyOrThrow(AvaloniaObject target, string propertyText)
+    private static ResolvedProperty ResolvePropertyOrThrow(
+        AvaloniaObject target,
+        string propertyText,
+        string? propertyKind,
+        string? propertyDeclaringType)
     {
         var parts = ParsePropertyText(propertyText);
-        var matches = AvaloniaPropertyRegistry.Instance.GetRegistered(target)
+        var ownerTypeHint = string.IsNullOrWhiteSpace(propertyDeclaringType)
+            ? parts.OwnerTypeHint
+            : propertyDeclaringType;
+        var normalizedKind = NormalizePropertyKind(propertyKind);
+
+        var avaloniaMatches = normalizedKind == ClrPropertyKind
+            ? Array.Empty<AvaloniaProperty>()
+            : AvaloniaPropertyRegistry.Instance.GetRegistered(target)
             .Union(AvaloniaPropertyRegistry.Instance.GetRegisteredAttached(target.GetType()))
             .Distinct()
             .Where(property =>
                 string.Equals(property.Name, parts.Name, StringComparison.OrdinalIgnoreCase) &&
-                (parts.OwnerTypeHint is null || TypeNameMatches(property.OwnerType, parts.OwnerTypeHint)))
+                (ownerTypeHint is null || TypeNameMatches(property.OwnerType, ownerTypeHint)))
             .ToArray();
 
-        if (matches.Length == 0)
+        var clrMatches = normalizedKind == AvaloniaPropertyKind
+            ? Array.Empty<PropertyInfo>()
+            : target.GetType()
+                .GetProperties(BindingFlags.Instance | BindingFlags.Public)
+                .Where(static property => property.GetIndexParameters().Length == 0)
+                .Where(property =>
+                    string.Equals(property.Name, parts.Name, StringComparison.OrdinalIgnoreCase) &&
+                    (ownerTypeHint is null || (property.DeclaringType is not null && TypeNameMatches(property.DeclaringType, ownerTypeHint))))
+                .ToArray();
+
+        var totalMatches = avaloniaMatches.Length + clrMatches.Length;
+        if (totalMatches == 0)
         {
             throw new RemoteMutationNotFoundException("Property '" + propertyText + "' was not found.");
         }
 
-        if (matches.Length > 1)
+        if (totalMatches > 1)
         {
             throw new RemoteMutationValidationException(
-                "Property '" + propertyText + "' is ambiguous. Use [OwnerType.PropertyName] format.");
+                "Property '" + propertyText + "' is ambiguous. Provide property kind or owner type.");
         }
 
-        return matches[0];
+        if (avaloniaMatches.Length == 1)
+        {
+            return ResolvedProperty.Create(avaloniaMatches[0]);
+        }
+
+        return ResolvedProperty.Create(clrMatches[0]);
     }
 
     private static (string Name, string? OwnerTypeHint) ParsePropertyText(string propertyText)
@@ -1719,11 +1922,12 @@ internal sealed class InProcessRemoteMutationDiagnosticsSource : IRemoteMutation
 
     private static bool TypeNameMatches(Type type, string typeNameHint)
     {
-        return string.Equals(type.FullName, typeNameHint, StringComparison.OrdinalIgnoreCase) ||
+        return string.Equals(type.AssemblyQualifiedName, typeNameHint, StringComparison.OrdinalIgnoreCase) ||
+               string.Equals(type.FullName, typeNameHint, StringComparison.OrdinalIgnoreCase) ||
                string.Equals(type.Name, typeNameHint, StringComparison.OrdinalIgnoreCase);
     }
 
-    private static object? ConvertPropertyValue(RemoteSetPropertyRequest request, AvaloniaProperty property)
+    private static object? ConvertPropertyValue(RemoteSetPropertyRequest request, ResolvedProperty property)
     {
         var propertyType = property.PropertyType;
         var nonNullableType = Nullable.GetUnderlyingType(propertyType) ?? propertyType;
@@ -1734,7 +1938,7 @@ internal sealed class InProcessRemoteMutationDiagnosticsSource : IRemoteMutation
             if (!allowsNull)
             {
                 throw new RemoteMutationValidationException(
-                    "Property '" + property.Name + "' does not allow null values.");
+                    "Property '" + property.DisplayName + "' does not allow null values.");
             }
 
             return null;
@@ -1758,10 +1962,10 @@ internal sealed class InProcessRemoteMutationDiagnosticsSource : IRemoteMutation
                 converted = PropertyValueEditorStringConversion.FromString(request.ValueText, nonNullableType);
             }
 
-            if (!property.IsValidValue(converted))
+            if (property.IsAvaloniaProperty && !property.IsValidValue(converted))
             {
                 throw new RemoteMutationValidationException(
-                    "Value '" + request.ValueText + "' is not valid for property '" + property.Name + "'.");
+                    "Value '" + request.ValueText + "' is not valid for property '" + property.DisplayName + "'.");
             }
 
             return converted;
@@ -1773,7 +1977,122 @@ internal sealed class InProcessRemoteMutationDiagnosticsSource : IRemoteMutation
         catch (Exception ex)
         {
             throw new RemoteMutationValidationException(
-                "Failed to convert '" + request.ValueText + "' for property '" + property.Name + "': " + ex.GetBaseException().Message);
+                "Failed to convert '" + request.ValueText + "' for property '" + property.DisplayName + "': " + ex.GetBaseException().Message);
+        }
+    }
+
+    private static string? NormalizePropertyKind(string? propertyKind)
+    {
+        if (string.IsNullOrWhiteSpace(propertyKind))
+        {
+            return null;
+        }
+
+        var normalized = propertyKind.Trim().ToLowerInvariant();
+        return normalized switch
+        {
+            AvaloniaPropertyKind => AvaloniaPropertyKind,
+            ClrPropertyKind => ClrPropertyKind,
+            _ => null,
+        };
+    }
+
+    private sealed class ResolvedProperty
+    {
+        private readonly AvaloniaProperty? _avaloniaProperty;
+        private readonly PropertyInfo? _clrProperty;
+
+        private ResolvedProperty(AvaloniaProperty avaloniaProperty)
+        {
+            _avaloniaProperty = avaloniaProperty;
+            DisplayName = avaloniaProperty.Name;
+            PropertyType = avaloniaProperty.PropertyType;
+            IsReadOnly = avaloniaProperty.IsReadOnly;
+            CanClearValue = true;
+        }
+
+        private ResolvedProperty(PropertyInfo clrProperty)
+        {
+            _clrProperty = clrProperty;
+            DisplayName = clrProperty.Name;
+            PropertyType = clrProperty.PropertyType;
+            IsReadOnly = !clrProperty.CanWrite;
+            CanClearValue = false;
+        }
+
+        public string DisplayName { get; }
+
+        public Type PropertyType { get; }
+
+        public bool IsReadOnly { get; }
+
+        public bool CanClearValue { get; }
+
+        public bool IsAvaloniaProperty => _avaloniaProperty is not null;
+
+        public static ResolvedProperty Create(AvaloniaProperty property) => new(property);
+
+        public static ResolvedProperty Create(PropertyInfo property) => new(property);
+
+        public AvaloniaProperty GetAvaloniaPropertyOrThrow()
+        {
+            if (_avaloniaProperty is null)
+            {
+                throw new RemoteMutationValidationException(
+                    "Property '" + DisplayName + "' is not an Avalonia property.");
+            }
+
+            return _avaloniaProperty;
+        }
+
+        public object? GetValue(AvaloniaObject target)
+        {
+            if (_avaloniaProperty is not null)
+            {
+                return target.GetValue(_avaloniaProperty);
+            }
+
+            return _clrProperty!.GetValue(target);
+        }
+
+        public void SetValue(AvaloniaObject target, object? value)
+        {
+            if (_avaloniaProperty is not null)
+            {
+                target.SetValue(_avaloniaProperty, value);
+                return;
+            }
+
+            try
+            {
+                _clrProperty!.SetValue(target, value);
+            }
+            catch (TargetInvocationException ex)
+            {
+                throw new RemoteMutationValidationException(
+                    "Failed to set property '" + DisplayName + "': " + ex.GetBaseException().Message);
+            }
+            catch (Exception ex)
+            {
+                throw new RemoteMutationValidationException(
+                    "Failed to set property '" + DisplayName + "': " + ex.GetBaseException().Message);
+            }
+        }
+
+        public void ClearValue(AvaloniaObject target)
+        {
+            if (_avaloniaProperty is null)
+            {
+                throw new RemoteMutationValidationException(
+                    "Property '" + DisplayName + "' does not support ClearValue.");
+            }
+
+            target.ClearValue(_avaloniaProperty);
+        }
+
+        public bool IsValidValue(object? value)
+        {
+            return _avaloniaProperty?.IsValidValue(value) ?? true;
         }
     }
 

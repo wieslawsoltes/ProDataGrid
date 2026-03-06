@@ -52,7 +52,7 @@ partial class ViewModelsBindingsPageView : UserControl
             return;
         }
 
-        if (pageViewModel.MainView is { HighlightElements: false })
+        if (pageViewModel.MainView is not { HighlightElements: true, ShouldRenderLocalHighlightAdorners: true })
         {
             return;
         }
@@ -130,6 +130,7 @@ partial class ViewModelsBindingsPageView : UserControl
     private void OnMainViewPropertyChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e)
     {
         if (e.PropertyName is nameof(MainViewModel.HighlightElements)
+            or nameof(MainViewModel.ShouldRenderLocalHighlightAdorners)
             or nameof(MainViewModel.ShouldVisualizeMarginPadding)
             or nameof(MainViewModel.ShowOverlayInfo)
             or nameof(MainViewModel.ShowOverlayRulers)
@@ -144,7 +145,7 @@ partial class ViewModelsBindingsPageView : UserControl
         _adorner?.Dispose();
         _adorner = null;
 
-        if (_adornedVisual is null || _mainView is not { HighlightElements: true })
+        if (_adornedVisual is null || _mainView is not { HighlightElements: true, ShouldRenderLocalHighlightAdorners: true })
         {
             return;
         }

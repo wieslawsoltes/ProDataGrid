@@ -369,7 +369,6 @@ namespace Avalonia.Diagnostics.Views
         {
             if (vm.HasRemoteMutation)
             {
-                _ = vm.InspectHoveredViaRemoteAsync();
                 return;
             }
 
