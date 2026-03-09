@@ -520,6 +520,8 @@ public sealed class DevToolsRemoteAttachHost : IAsyncDisposable
             SyncStreamDemandFromSessions();
         }
 
+        _mutationSource?.SetActiveRemoteSessionCount(_sessionManager.SessionCount);
+
         var enabledFeatures = SelectEnabledFeatures(
             includeMutation: _enableMutationApi,
             includeStreaming: _enableStreamingApi,
@@ -737,6 +739,7 @@ public sealed class DevToolsRemoteAttachHost : IAsyncDisposable
         _sessionManager.TryRemove(sessionId, out _);
         _streamHub?.TryUnregisterSession(sessionId);
         SyncStreamDemandFromSessions();
+        _mutationSource?.SetActiveRemoteSessionCount(_sessionManager.SessionCount);
     }
 
     private RemoteResponseMessage HandleStreamDemandSet(RemoteRequestMessage request, Guid activeSessionId)

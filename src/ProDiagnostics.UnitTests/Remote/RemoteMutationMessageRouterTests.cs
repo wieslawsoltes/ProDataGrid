@@ -6,6 +6,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Avalonia;
 using Avalonia.Controls;
+using Avalonia.Controls.Primitives;
 using Avalonia.Diagnostics.Remote;
 using Avalonia.Diagnostics.Services;
 using Avalonia.Diagnostics.ViewModels;
@@ -285,6 +286,73 @@ public class RemoteMutationMessageRouterTests
 
         window.Close();
         source.Dispose();
+    }
+
+    [AvaloniaFact]
+    public async Task LiveHoverOverlay_Remains_Inactive_Until_Remote_Session_Attaches()
+    {
+        var button = new Button
+        {
+            Name = "OverlayTarget",
+            Content = "Target",
+        };
+        var window = new Window
+        {
+            Width = 320,
+            Height = 180,
+            Content = new VisualLayerManager
+            {
+                Child = new Grid
+                {
+                    Children =
+                    {
+                        button,
+                    },
+                },
+            },
+        };
+        window.Show();
+        Dispatcher.UIThread.RunJobs();
+
+        var point = button.TranslatePoint(
+            new Point(button.Bounds.Width / 2d, button.Bounds.Height / 2d),
+            window);
+        Assert.True(point.HasValue);
+
+        var source = new InProcessRemoteMutationDiagnosticsSource(window);
+        try
+        {
+            var pointerMoveBeforeSession = await source.InjectPreviewInputAsync(new RemotePreviewInputRequest
+            {
+                EventType = "pointer_move",
+                X = point.Value.X,
+                Y = point.Value.Y,
+            });
+            Assert.True(pointerMoveBeforeSession.Changed);
+            Dispatcher.UIThread.RunJobs();
+            Assert.Equal(0, AdornerLayer.GetAdornerLayer(button)?.Children.Count ?? 0);
+
+            source.SetActiveRemoteSessionCount(1);
+            Dispatcher.UIThread.RunJobs();
+
+            var selectionAfterSession = await source.SetSelectionAsync(new RemoteSetSelectionRequest
+            {
+                Scope = "combined",
+                ControlName = "OverlayTarget",
+            });
+            Assert.True(selectionAfterSession.Changed);
+            Dispatcher.UIThread.RunJobs();
+            Assert.True((AdornerLayer.GetAdornerLayer(button)?.Children.Count ?? 0) > 0);
+
+            source.SetActiveRemoteSessionCount(0);
+            Dispatcher.UIThread.RunJobs();
+            Assert.Equal(0, AdornerLayer.GetAdornerLayer(button)?.Children.Count ?? 0);
+        }
+        finally
+        {
+            source.Dispose();
+            window.Close();
+        }
     }
 
     [AvaloniaFact]

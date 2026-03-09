@@ -49,6 +49,7 @@ internal sealed class InProcessRemoteMutationDiagnosticsSource : IRemoteMutation
     private TopLevel? _lastPointerRoot;
     private PixelPoint _lastPointerPosition;
     private KeyModifiers _lastKeyModifiers;
+    private int _activeRemoteSessionCount;
     private bool _hasPointerPosition;
 
     public InProcessRemoteMutationDiagnosticsSource(
@@ -75,6 +76,29 @@ internal sealed class InProcessRemoteMutationDiagnosticsSource : IRemoteMutation
         _logicalTreeProvider = new LogicalTreeNodeProvider();
         _visualTreeProvider = new VisualTreeNodeProvider();
         _inputSubscription = InputManager.Instance?.Process.Subscribe(OnRawInput);
+    }
+
+    internal void SetActiveRemoteSessionCount(int sessionCount)
+    {
+        var normalizedCount = Math.Max(0, sessionCount);
+        var previousCount = Interlocked.Exchange(ref _activeRemoteSessionCount, normalizedCount);
+        if (previousCount == normalizedCount)
+        {
+            return;
+        }
+
+        if (normalizedCount == 0)
+        {
+            _lastPointerRoot = null;
+            _hasPointerPosition = false;
+            _lastKeyModifiers = KeyModifiers.None;
+            ClearRemoteOverlayAdorner(dispatchIfRequired: true);
+            return;
+        }
+
+        Dispatcher.UIThread.Post(
+            () => RefreshRemoteOverlayAdorner(ResolveOverlaySelectionScope()),
+            DispatcherPriority.Send);
     }
 
     public ValueTask<RemoteMutationResult> InspectHoveredAsync(
@@ -633,6 +657,12 @@ internal sealed class InProcessRemoteMutationDiagnosticsSource : IRemoteMutation
 
     private void RefreshRemoteOverlayAdorner(string scope)
     {
+        if (Volatile.Read(ref _activeRemoteSessionCount) <= 0)
+        {
+            ClearRemoteOverlayAdorner(dispatchIfRequired: false);
+            return;
+        }
+
         var overlaySnapshot = _overlayState.GetSnapshot();
         if (!overlaySnapshot.HighlightElements)
         {
@@ -1324,6 +1354,13 @@ internal sealed class InProcessRemoteMutationDiagnosticsSource : IRemoteMutation
             _hasPointerPosition = true;
             _lastKeyModifiers = modifiers.ToKeyModifiers();
 
+            if (Volatile.Read(ref _activeRemoteSessionCount) > 0 &&
+                _overlayState.IsLiveHoverEnabled &&
+                eventType is "pointer_move" or "pointer_down" or "pointer_up")
+            {
+                RefreshRemoteOverlayAdorner(ResolveOverlaySelectionScope());
+            }
+
             return new RemoteMutationResult(
                 Operation: RemoteMutationMethods.PreviewInputInject,
                 Changed: true,
@@ -1466,6 +1503,11 @@ internal sealed class InProcessRemoteMutationDiagnosticsSource : IRemoteMutation
 
     private void OnRawInput(RawInputEventArgs rawInput)
     {
+        if (Volatile.Read(ref _activeRemoteSessionCount) <= 0)
+        {
+            return;
+        }
+
         switch (rawInput)
         {
             case RawPointerEventArgs pointerEventArgs:
