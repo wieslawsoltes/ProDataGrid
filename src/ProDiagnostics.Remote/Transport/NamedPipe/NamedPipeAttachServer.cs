@@ -99,8 +99,6 @@ public sealed class NamedPipeAttachServer : IAttachServer
 
     public async Task StopAsync(CancellationToken cancellationToken = default)
     {
-        List<NamedPipeAttachConnection> connections;
-        List<Task> clientTasks;
         Task? acceptLoop;
         Task? heartbeatLoop;
         CancellationTokenSource? lifecycleCts;
@@ -113,15 +111,9 @@ public sealed class NamedPipeAttachServer : IAttachServer
             }
 
             _isRunning = false;
-            connections = _connections.ToList();
-            clientTasks = _clientTasks.ToList();
             acceptLoop = _acceptLoopTask;
             heartbeatLoop = _heartbeatLoopTask;
             lifecycleCts = _lifecycleCts;
-
-            _connections.Clear();
-            RemoteRuntimeMetrics.SetActiveConnections(TransportName, 0);
-            _clientTasks.Clear();
             _acceptLoopTask = null;
             _heartbeatLoopTask = null;
             _lifecycleCts = null;
@@ -129,11 +121,6 @@ public sealed class NamedPipeAttachServer : IAttachServer
 
         lifecycleCts?.Cancel();
         await TryWakeAcceptLoopAsync().ConfigureAwait(false);
-
-        foreach (var connection in connections)
-        {
-            await ObserveConnectionShutdownAsync(connection, cancellationToken).ConfigureAwait(false);
-        }
 
         if (acceptLoop is not null)
         {
@@ -143,6 +130,22 @@ public sealed class NamedPipeAttachServer : IAttachServer
         if (heartbeatLoop is not null)
         {
             await ObserveShutdownTaskAsync(heartbeatLoop, "heartbeat-loop").ConfigureAwait(false);
+        }
+
+        List<NamedPipeAttachConnection> connections;
+        List<Task> clientTasks;
+        lock (_sync)
+        {
+            connections = _connections.ToList();
+            clientTasks = _clientTasks.ToList();
+            _connections.Clear();
+            RemoteRuntimeMetrics.SetActiveConnections(TransportName, 0);
+            _clientTasks.Clear();
+        }
+
+        foreach (var connection in connections)
+        {
+            await ObserveConnectionShutdownAsync(connection, cancellationToken).ConfigureAwait(false);
         }
 
         if (clientTasks.Count > 0)
@@ -179,6 +182,12 @@ public sealed class NamedPipeAttachServer : IAttachServer
             {
                 serverStream = CreateServerStream();
                 await serverStream.WaitForConnectionAsync(cancellationToken).ConfigureAwait(false);
+                if (cancellationToken.IsCancellationRequested)
+                {
+                    serverStream.Dispose();
+                    break;
+                }
+
                 var task = HandleConnectedStreamAsync(serverStream, cancellationToken);
                 TrackClientTask(task);
             }

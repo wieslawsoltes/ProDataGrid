@@ -250,6 +250,37 @@ public class NamedPipeAttachServerTests
     }
 
     [Fact]
+    public async Task NamedPipeAttachServer_Stop_Does_Not_Emit_Synthetic_Accepted_Connection()
+    {
+        if (!NamedPipeAttachServerOptions.IsPlatformSupported)
+        {
+            return;
+        }
+
+        var options = CreateOptions(receiveTimeoutMs: 1500, heartbeatMs: 500);
+        await using var server = new NamedPipeAttachServer(options);
+        await server.StartAsync();
+
+        var acceptedCount = 0;
+        var firstAccepted = new TaskCompletionSource<IAttachConnection>(TaskCreationOptions.RunContinuationsAsynchronously);
+        server.ConnectionAccepted += (_, args) =>
+        {
+            if (Interlocked.Increment(ref acceptedCount) == 1)
+            {
+                firstAccepted.TrySetResult(args.Connection);
+            }
+        };
+
+        await using var client = CreateClient(options.PipeName);
+        await ConnectClientAsync(client);
+        await using var acceptedConnection = await firstAccepted.Task.WaitAsync(TimeSpan.FromSeconds(5));
+
+        await server.StopAsync();
+
+        Assert.Equal(1, Volatile.Read(ref acceptedCount));
+    }
+
+    [Fact]
     public async Task NamedPipeAttachServer_Emits_Heartbeat_And_Honors_ReceiveTimeout()
     {
         if (!NamedPipeAttachServerOptions.IsPlatformSupported)
