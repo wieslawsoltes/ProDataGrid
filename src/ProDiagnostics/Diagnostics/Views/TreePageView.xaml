@@ -3,7 +3,7 @@
              xmlns:vm="using:Avalonia.Diagnostics.ViewModels"
              x:Class="Avalonia.Diagnostics.Views.TreePageView"
              x:DataType="vm:TreePageViewModel">
-  <Grid ColumnDefinitions="0.35*,4,0.65*">
+  <Grid>
     <DataGrid Name="tree"
               BorderThickness="0"
               AutoGenerateColumns="False"
@@ -19,11 +19,12 @@
               CanUserSortColumns="False"
               CanUserResizeColumns="False"
               CanUserReorderColumns="False"
-              SelectedItem="{Binding SelectedNode, Mode=TwoWay}"
+              SelectedItem="{Binding SelectedNodeItem, Mode=TwoWay}"
               PointerMoved="UpdateAdorner"
               PointerExited="RemoveAdorner">
       <DataGrid.Columns>
-        <DataGridHierarchicalColumn Width="SizeToCells"
+        <DataGridHierarchicalColumn Width="*"
+                                    MinWidth="220"
                                     x:CompileBindings="False"
                                     Binding="{Binding Item}">
           <DataGridHierarchicalColumn.CellTemplate>
@@ -52,8 +53,5 @@
         </MenuFlyout>
       </DataGrid.ContextFlyout>
     </DataGrid>
-
-    <GridSplitter Background="{DynamicResource ThemeControlMidBrush}" Width="1" Grid.Column="1"/>
-    <ContentControl Content="{Binding Details}" Grid.Column="2"/>
   </Grid>
 </UserControl>

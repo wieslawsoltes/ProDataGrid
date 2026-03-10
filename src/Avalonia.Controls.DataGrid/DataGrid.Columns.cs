@@ -1197,16 +1197,30 @@ internal
                     if (cx < displayWidth && _horizontalOffset > 0)
                     {
                         Debug.Assert(_negHorizontalOffset == 0);
-                        dataGridColumn = ColumnsInternal.GetPreviousVisibleScrollingColumn(ColumnsItemsInternal[firstDisplayedScrollingCol]);
-                        Debug.Assert(dataGridColumn != null);
-                        Debug.Assert(GetEdgedColumnWidth(dataGridColumn) > displayWidth - cx);
-                        firstDisplayedScrollingCol = dataGridColumn.Index;
-                        _negHorizontalOffset = GetEdgedColumnWidth(dataGridColumn) - displayWidth + cx;
-                        _horizontalOffset -= displayWidth - cx;
-                        visibleScrollingColumnsTmp++;
-                        invalidate = true;
-                        cx = displayWidth;
-                        Debug.Assert(_negHorizontalOffset == GetNegHorizontalOffsetFromHorizontalOffset(_horizontalOffset));
+                        DataGridColumn previousScrollingColumn = ColumnsInternal.GetPreviousVisibleScrollingColumn(ColumnsItemsInternal[firstDisplayedScrollingCol]);
+                        if (previousScrollingColumn == null)
+                        {
+                            // The horizontal offset can become stale during data source/view transitions.
+                            // If there is no previous scrolling column, clamp back to the first valid scrolling position.
+                            _horizontalOffset = 0;
+                            _negHorizontalOffset = 0;
+                            HorizontalAdjustment = 0;
+                            DataGridColumn firstVisibleScrollingColumn = ColumnsInternal.FirstVisibleScrollingColumn;
+                            firstDisplayedScrollingCol = firstVisibleScrollingColumn?.Index ?? -1;
+                            invalidate = true;
+                        }
+                        else
+                        {
+                            dataGridColumn = previousScrollingColumn;
+                            Debug.Assert(GetEdgedColumnWidth(dataGridColumn) > displayWidth - cx);
+                            firstDisplayedScrollingCol = dataGridColumn.Index;
+                            _negHorizontalOffset = GetEdgedColumnWidth(dataGridColumn) - displayWidth + cx;
+                            _horizontalOffset -= displayWidth - cx;
+                            visibleScrollingColumnsTmp++;
+                            invalidate = true;
+                            cx = displayWidth;
+                            Debug.Assert(_negHorizontalOffset == GetNegHorizontalOffsetFromHorizontalOffset(_horizontalOffset));
+                        }
                     }
 
                     // update the number of visible columns to the new reality
@@ -1232,8 +1246,13 @@ internal
                     dataGridColumn = ColumnsItemsInternal[firstDisplayedScrollingCol];
                     for (int jump = 0; jump < jumpFromFirstVisibleScrollingCol; jump++)
                     {
-                        dataGridColumn = ColumnsInternal.GetNextVisibleScrollingColumn(dataGridColumn);
-                        Debug.Assert(dataGridColumn != null);
+                        DataGridColumn nextColumn = ColumnsInternal.GetNextVisibleScrollingColumn(dataGridColumn);
+                        if (nextColumn == null)
+                        {
+                            break;
+                        }
+
+                        dataGridColumn = nextColumn;
                     }
                     DisplayData.LastTotallyDisplayedScrollingCol = dataGridColumn.Index;
                 }

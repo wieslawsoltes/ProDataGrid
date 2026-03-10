@@ -1,0 +1,161 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:Avalonia.Diagnostics.ViewModels"
+             x:Class="Avalonia.Diagnostics.Views.ViewModelsBindingsPageView"
+             x:DataType="vm:ViewModelsBindingsPageViewModel">
+  <Grid RowDefinitions="Auto,Auto,*,4,*">
+    <StackPanel Grid.Row="0"
+                Margin="8,6,8,4"
+                Orientation="Horizontal"
+                Spacing="12">
+      <TextBlock Text="{Binding InspectedElement, StringFormat=Selected: {0}}" />
+      <TextBlock Text="{Binding ViewModelCount, StringFormat=ViewModels: {0}}" />
+      <TextBlock Text="{Binding VisibleViewModelCount, StringFormat=Visible: {0}}" />
+      <TextBlock Text="{Binding BindingCount, StringFormat=Bindings: {0}}" />
+      <TextBlock Text="{Binding VisibleBindingCount, StringFormat=Visible Bindings: {0}}" />
+    </StackPanel>
+
+    <WrapPanel Grid.Row="1"
+               Margin="8,0,8,6"
+               Orientation="Horizontal"
+               ItemHeight="24">
+      <Button Content="Inspect selected"
+              Command="{Binding InspectSelection}" />
+      <Button Content="Refresh"
+              Margin="6,0,0,0"
+              Command="{Binding Refresh}" />
+      <Button Content="Clear"
+              Margin="6,0,0,0"
+              Command="{Binding Clear}" />
+      <CheckBox Content="Only binding errors"
+                Margin="12,0,0,0"
+                IsChecked="{Binding ShowOnlyBindingErrors}" />
+      <TextBlock Text="{Binding InspectedElementType}"
+                 Margin="12,0,0,0"
+                 Foreground="Gray"
+                 VerticalAlignment="Center" />
+    </WrapPanel>
+
+    <DockPanel Grid.Row="2"
+               Margin="8,0,8,4"
+               LastChildFill="True">
+      <FilterTextBox DockPanel.Dock="Top"
+                     Margin="0,0,0,4"
+                     DataContext="{Binding ViewModelsFilter}"
+                     Text="{Binding FilterString}"
+                     Watermark="Filter view models"
+                     UseCaseSensitiveFilter="{Binding UseCaseSensitiveFilter}"
+                     UseWholeWordFilter="{Binding UseWholeWordFilter}"
+                     UseRegexFilter="{Binding UseRegexFilter}" />
+
+      <DataGrid x:Name="viewModelsGrid"
+                ItemsSource="{Binding ViewModelEntriesView}"
+                AutoGenerateColumns="False"
+                HeadersVisibility="Column"
+                BorderThickness="0"
+                SelectionMode="Single"
+                CanUserResizeColumns="True"
+                CanUserSortColumns="True"
+                PointerMoved="UpdateAdorner"
+                PointerExited="RemoveAdorner">
+        <DataGrid.Columns>
+          <DataGridTextColumn Header="Level"
+                              Binding="{Binding Level}"
+                              Width="0.7*"
+                              IsReadOnly="True"
+                              x:DataType="vm:ViewModelContextEntryViewModel" />
+          <DataGridTextColumn Header="Element"
+                              Binding="{Binding Element}"
+                              Width="1.8*"
+                              IsReadOnly="True"
+                              x:DataType="vm:ViewModelContextEntryViewModel" />
+          <DataGridTextColumn Header="Priority"
+                              Binding="{Binding Priority}"
+                              Width="1*"
+                              IsReadOnly="True"
+                              x:DataType="vm:ViewModelContextEntryViewModel" />
+          <DataGridTextColumn Header="ViewModel Type"
+                              Binding="{Binding ViewModelType}"
+                              Width="2.2*"
+                              IsReadOnly="True"
+                              x:DataType="vm:ViewModelContextEntryViewModel" />
+          <DataGridTextColumn Header="Value"
+                              Binding="{Binding ValuePreview}"
+                              Width="2.3*"
+                              IsReadOnly="True"
+                              x:DataType="vm:ViewModelContextEntryViewModel" />
+        </DataGrid.Columns>
+      </DataGrid>
+    </DockPanel>
+
+    <GridSplitter Grid.Row="3"
+                  Height="4" />
+
+    <DockPanel Grid.Row="4"
+               Margin="8,0,8,6"
+               LastChildFill="True">
+      <FilterTextBox DockPanel.Dock="Top"
+                     Margin="0,0,0,4"
+                     DataContext="{Binding BindingsFilter}"
+                     Text="{Binding FilterString}"
+                     Watermark="Filter bindings"
+                     UseCaseSensitiveFilter="{Binding UseCaseSensitiveFilter}"
+                     UseWholeWordFilter="{Binding UseWholeWordFilter}"
+                     UseRegexFilter="{Binding UseRegexFilter}" />
+
+      <DataGrid x:Name="bindingsGrid"
+                ItemsSource="{Binding BindingEntriesView}"
+                AutoGenerateColumns="False"
+                HeadersVisibility="Column"
+                BorderThickness="0"
+                SelectionMode="Single"
+                CanUserResizeColumns="True"
+                CanUserSortColumns="True"
+                PointerMoved="UpdateAdorner"
+                PointerExited="RemoveAdorner">
+        <DataGrid.Columns>
+          <DataGridTextColumn Header="Property"
+                              Binding="{Binding PropertyName}"
+                              Width="1.3*"
+                              IsReadOnly="True"
+                              x:DataType="vm:BindingDiagnosticEntryViewModel" />
+          <DataGridTextColumn Header="Owner"
+                              Binding="{Binding OwnerType}"
+                              Width="1*"
+                              IsReadOnly="True"
+                              x:DataType="vm:BindingDiagnosticEntryViewModel" />
+          <DataGridTextColumn Header="Priority"
+                              Binding="{Binding Priority}"
+                              Width="1*"
+                              IsReadOnly="True"
+                              x:DataType="vm:BindingDiagnosticEntryViewModel" />
+          <DataGridTextColumn Header="Status"
+                              Binding="{Binding Status}"
+                              Width="1.5*"
+                              IsReadOnly="True"
+                              x:DataType="vm:BindingDiagnosticEntryViewModel" />
+          <DataGridTextColumn Header="Expression"
+                              Binding="{Binding BindingDescription}"
+                              Width="2.2*"
+                              IsReadOnly="True"
+                              x:DataType="vm:BindingDiagnosticEntryViewModel" />
+          <DataGridTextColumn Header="Value"
+                              Binding="{Binding ValuePreview}"
+                              Width="2*"
+                              IsReadOnly="True"
+                              x:DataType="vm:BindingDiagnosticEntryViewModel" />
+          <DataGridTextColumn Header="Type"
+                              Binding="{Binding ValueType}"
+                              Width="2.1*"
+                              IsReadOnly="True"
+                              x:DataType="vm:BindingDiagnosticEntryViewModel" />
+          <DataGridTextColumn Header="Diagnostic"
+                              Binding="{Binding Diagnostic}"
+                              Width="2.6*"
+                              IsReadOnly="True"
+                              x:DataType="vm:BindingDiagnosticEntryViewModel" />
+        </DataGrid.Columns>
+      </DataGrid>
+    </DockPanel>
+  </Grid>
+</UserControl>

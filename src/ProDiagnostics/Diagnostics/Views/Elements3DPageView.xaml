@@ -1,0 +1,257 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:controls="using:Avalonia.Diagnostics.Controls"
+             xmlns:conv="using:Avalonia.Diagnostics.Converters"
+             xmlns:vm="using:Avalonia.Diagnostics.ViewModels"
+             x:Class="Avalonia.Diagnostics.Views.Elements3DPageView"
+             x:DataType="vm:Elements3DPageViewModel">
+  <UserControl.Resources>
+    <conv:BoolToGridLengthConverter x:Key="ExplodedRowHeightConverter"
+                                    TrueLength="2*"
+                                    FalseLength="0" />
+    <conv:BoolToGridLengthConverter x:Key="ExplodedSplitterRowHeightConverter"
+                                    TrueLength="6"
+                                    FalseLength="0" />
+  </UserControl.Resources>
+
+  <Grid>
+    <Grid.RowDefinitions>
+      <RowDefinition Height="Auto" />
+      <RowDefinition Height="Auto" />
+      <RowDefinition Height="{Binding ShowExploded3DView, Converter={StaticResource ExplodedRowHeightConverter}}" MinHeight="0" />
+      <RowDefinition Height="{Binding ShowExploded3DView, Converter={StaticResource ExplodedSplitterRowHeightConverter}}" />
+      <RowDefinition Height="3*" MinHeight="160" />
+      <RowDefinition Height="Auto" />
+    </Grid.RowDefinitions>
+
+    <StackPanel Grid.Row="0"
+                Margin="8,6,8,4"
+                Orientation="Horizontal"
+                Spacing="12">
+      <TextBlock Text="{Binding InspectedRoot, StringFormat=Root: {0}}" />
+      <TextBlock Text="{Binding NodeCount, StringFormat=Nodes: {0}}" />
+      <TextBlock Text="{Binding VisibleNodeCount, StringFormat=Visible: {0}}" />
+    </StackPanel>
+
+    <DockPanel Grid.Row="1"
+               Margin="8,0,8,4"
+               LastChildFill="True">
+      <StackPanel Orientation="Horizontal"
+                  DockPanel.Dock="Right"
+                  Spacing="6">
+        <Button Content="Inspect selection"
+                Command="{Binding InspectSelection}" />
+        <Button Content="Set selected root"
+                Command="{Binding ScopeSelectedNodeAsRoot}"
+                IsEnabled="{Binding CanScopeSelectedNodeAsRoot}" />
+        <Button Content="Reset main root"
+                Command="{Binding ResetToMainRoot}"
+                IsEnabled="{Binding CanResetToMainRoot}" />
+        <Button Content="Inspect root"
+                Command="{Binding InspectRoot}" />
+        <Button Content="Reset view"
+                Command="{Binding ResetProjectionView}" />
+        <CheckBox Content="Show 3D view"
+                  IsChecked="{Binding ShowExploded3DView, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+        <CheckBox Content="Grid: all layers"
+                  IsChecked="{Binding ShowAllLayersInGrid, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+        <Button Content="Refresh"
+                Command="{Binding Refresh}" />
+      </StackPanel>
+
+      <FilterTextBox Margin="0,0,6,0"
+                     DataContext="{Binding Filter}"
+                     Text="{Binding FilterString}"
+                     Watermark="Filter 3D visual tree"
+                     UseCaseSensitiveFilter="{Binding UseCaseSensitiveFilter}"
+                     UseWholeWordFilter="{Binding UseWholeWordFilter}"
+                     UseRegexFilter="{Binding UseRegexFilter}" />
+    </DockPanel>
+
+    <Grid Grid.Row="2"
+          Margin="8,0,8,6"
+          IsVisible="{Binding ShowExploded3DView}"
+          ColumnDefinitions="*,Auto,280"
+          ColumnSpacing="0">
+      <Border BorderBrush="{DynamicResource ThemeBorderLowBrush}"
+              BorderThickness="1"
+              CornerRadius="3"
+              ClipToBounds="True"
+              Padding="0"
+              Margin="0,0,6,0"
+              MinHeight="220">
+        <controls:Elements3DExplodedView Items="{Binding VisibleNodes}"
+                                         SelectedItem="{Binding SelectedNode, Mode=TwoWay}"
+                                         FlattenTo2D="{Binding ShowAllLayersInGrid}"
+                                         Flat2DMaxLayersPerRow="{Binding Flat2DMaxLayersPerRow}"
+                                         DepthSpacing="{Binding DepthSpacing}"
+                                         Tilt="{Binding Tilt}"
+                                         Zoom="{Binding Zoom, Mode=TwoWay}"
+                                         OrbitYaw="{Binding OrbitYaw, Mode=TwoWay}"
+                                         OrbitPitch="{Binding OrbitPitch, Mode=TwoWay}"
+                                         OrbitRoll="{Binding OrbitRoll, Mode=TwoWay}"
+                                         ShowInvisible="{Binding ShowInvisibleNodes}" />
+      </Border>
+
+      <GridSplitter Grid.Column="1"
+                    Width="4"
+                    HorizontalAlignment="Stretch"
+                    Background="{DynamicResource ThemeControlMidBrush}" />
+
+      <Border Grid.Column="2"
+              Margin="6,0,0,0"
+              BorderBrush="{DynamicResource ThemeBorderLowBrush}"
+              BorderThickness="1"
+              CornerRadius="3"
+              Padding="8">
+        <StackPanel Spacing="8">
+          <TextBlock Text="Exploded View Controls" FontWeight="SemiBold" />
+          <CheckBox Content="Show invisible nodes"
+                    IsChecked="{Binding ShowInvisibleNodes}" />
+          <StackPanel Spacing="2">
+            <TextBlock Text="{Binding AvailableMaxDepth, StringFormat=Depth range (full): 0..{0}}" />
+            <Grid ColumnDefinitions="Auto,Auto,Auto,Auto,Auto"
+                  ColumnSpacing="6">
+              <TextBlock Grid.Column="0"
+                         VerticalAlignment="Center"
+                         Text="From" />
+              <NumericUpDown Grid.Column="1"
+                             Width="70"
+                             Minimum="{Binding AvailableMinDepth}"
+                             Maximum="{Binding AvailableMaxDepth}"
+                             Value="{Binding MinVisibleDepth, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+              <TextBlock Grid.Column="2"
+                         VerticalAlignment="Center"
+                         Text="to" />
+              <NumericUpDown Grid.Column="3"
+                             Width="70"
+                             Minimum="{Binding AvailableMinDepth}"
+                             Maximum="{Binding AvailableMaxDepth}"
+                             Value="{Binding MaxVisibleDepth, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+              <Button Grid.Column="4"
+                      Content="Full"
+                      Command="{Binding ResetLayerVisibilityFilters}" />
+            </Grid>
+          </StackPanel>
+          <StackPanel Spacing="2">
+            <TextBlock Text="Max layers (0 = all)" />
+            <NumericUpDown Minimum="0"
+                           Maximum="100000"
+                           Value="{Binding MaxVisibleElements, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+          </StackPanel>
+          <StackPanel Spacing="2">
+            <TextBlock Text="2D wrap rows (max layers per row, 0 = off)" />
+            <NumericUpDown Minimum="0"
+                           Maximum="512"
+                           Value="{Binding Flat2DMaxLayersPerRow, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+          </StackPanel>
+          <StackPanel Spacing="2">
+            <TextBlock Text="{Binding DepthSpacing, StringFormat=Depth spacing: {0:0.0}}" />
+            <Slider Minimum="0"
+                    Maximum="400"
+                    Value="{Binding DepthSpacing}"
+                    TickFrequency="20" />
+          </StackPanel>
+          <StackPanel Spacing="2">
+            <TextBlock Text="{Binding Tilt, StringFormat=Tilt: {0:0.00}}" />
+            <Slider Minimum="0"
+                    Maximum="1"
+                    Value="{Binding Tilt}"
+                    TickFrequency="0.1" />
+          </StackPanel>
+          <StackPanel Spacing="2">
+            <TextBlock Text="{Binding Zoom, StringFormat=Zoom: {0:0.00}}" />
+            <Slider Minimum="0.25"
+                    Maximum="24"
+                    Value="{Binding Zoom}"
+                    TickFrequency="0.5" />
+          </StackPanel>
+          <StackPanel Spacing="2">
+            <TextBlock Text="{Binding OrbitYaw, StringFormat=Orbit yaw: {0:0.0} deg}" />
+            <Slider Minimum="-180"
+                    Maximum="180"
+                    Value="{Binding OrbitYaw}"
+                    TickFrequency="15" />
+          </StackPanel>
+          <StackPanel Spacing="2">
+            <TextBlock Text="{Binding OrbitPitch, StringFormat=Orbit pitch: {0:0.0} deg}" />
+            <Slider Minimum="-180"
+                    Maximum="180"
+                    Value="{Binding OrbitPitch}"
+                    TickFrequency="15" />
+          </StackPanel>
+          <StackPanel Spacing="2">
+            <TextBlock Text="{Binding OrbitRoll, StringFormat=Orbit roll: {0:0.0} deg}" />
+            <Slider Minimum="-180"
+                    Maximum="180"
+                    Value="{Binding OrbitRoll}"
+                    TickFrequency="15" />
+          </StackPanel>
+          <TextBlock Text="{Binding SelectedNodeSummary, StringFormat=Selected: {0}}"
+                     TextWrapping="Wrap" />
+          <TextBlock Text="Use wheel or +/- to zoom to cursor, drag/arrows to pan, right-drag to orbit (Shift+right-drag rolls), and double-click/R/Home/Ctrl+0 to reset view."
+                     Foreground="Gray"
+                     TextWrapping="Wrap" />
+        </StackPanel>
+      </Border>
+    </Grid>
+
+    <GridSplitter Grid.Row="3"
+                  Height="6"
+                  IsVisible="{Binding ShowExploded3DView}"
+                  HorizontalAlignment="Stretch"
+                  VerticalAlignment="Center"
+                  Background="{DynamicResource ThemeControlMidBrush}" />
+
+    <DataGrid Grid.Row="4"
+              Margin="8,0,8,6"
+              ItemsSource="{Binding GridNodesView}"
+              SelectedItem="{Binding SelectedNode, Mode=TwoWay}"
+              AutoScrollToSelectedItem="True"
+              AutoGenerateColumns="False"
+              HeadersVisibility="Column"
+              BorderThickness="0"
+              SelectionMode="Single"
+              CanUserSortColumns="True"
+              CanUserReorderColumns="False"
+              CanUserResizeColumns="True">
+      <DataGrid.Columns>
+        <DataGridTextColumn Header="Node"
+                            Binding="{Binding Node}"
+                            Width="3.2*"
+                            IsReadOnly="True"
+                            x:DataType="vm:Elements3DNodeViewModel" />
+        <DataGridTextColumn Header="Depth"
+                            Binding="{Binding Depth}"
+                            Width="0.8*"
+                            IsReadOnly="True"
+                            x:DataType="vm:Elements3DNodeViewModel" />
+        <DataGridTextColumn Header="ZIndex"
+                            Binding="{Binding ZIndex}"
+                            Width="0.9*"
+                            IsReadOnly="True"
+                            x:DataType="vm:Elements3DNodeViewModel" />
+        <DataGridTextColumn Header="Bounds"
+                            Binding="{Binding Bounds}"
+                            Width="2.6*"
+                            IsReadOnly="True"
+                            x:DataType="vm:Elements3DNodeViewModel" />
+        <DataGridCheckBoxColumn Header="Visible"
+                                Binding="{Binding IsVisible}"
+                                Width="0.8*"
+                                IsReadOnly="True"
+                                x:DataType="vm:Elements3DNodeViewModel" />
+        <DataGridTextColumn Header="Opacity"
+                            Binding="{Binding Opacity, StringFormat={}{0:0.###}}"
+                            Width="0.9*"
+                            IsReadOnly="True"
+                            x:DataType="vm:Elements3DNodeViewModel" />
+      </DataGrid.Columns>
+    </DataGrid>
+
+    <TextBlock Grid.Row="5"
+               Margin="8,0,8,6"
+               Foreground="Gray"
+               Text="This view provides depth and stacking diagnostics with an interactive exploded projection of the visual tree." />
+  </Grid>
+</UserControl>

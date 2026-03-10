@@ -5,6 +5,8 @@ using System.Linq;
 using System.Threading.Tasks;
 using Avalonia.Collections;
 using Avalonia.Controls;
+using Avalonia.Diagnostics.Remote;
+using Avalonia.Diagnostics.Services;
 using Avalonia.Platform;
 using Avalonia.Threading;
 
@@ -12,15 +14,20 @@ namespace Avalonia.Diagnostics.ViewModels
 {
     internal sealed class AssetsPageViewModel : ViewModelBase
     {
+        private static readonly ISourceLocationService DefaultSourceLocationService = new PortablePdbSourceLocationService();
         private readonly AvaloniaList<AssetEntryViewModel> _assets = new();
         private readonly DataGridCollectionView _assetsView;
+        private readonly ISourceLocationService _sourceLocationService;
         private AssetEntryViewModel? _selectedAsset;
         private bool _isLoading;
         private string? _status;
+        private IRemoteReadOnlyDiagnosticsDomainService? _remoteReadOnly;
+        private long _remoteRefreshVersion;
 
-        public AssetsPageViewModel(MainViewModel mainView)
+        public AssetsPageViewModel(MainViewModel mainView, ISourceLocationService? sourceLocationService = null)
         {
             MainView = mainView;
+            _sourceLocationService = sourceLocationService ?? DefaultSourceLocationService;
             AssetsFilter = new FilterViewModel();
             AssetsFilter.RefreshFilter += (_, _) => _assetsView.Refresh();
 
@@ -79,6 +86,20 @@ namespace Avalonia.Diagnostics.ViewModels
 
         public int AssetCount => _assets.Count;
 
+        public void Refresh()
+        {
+            _ = LoadAssetsAsync();
+        }
+
+        internal void SetRemoteReadOnlySource(IRemoteReadOnlyDiagnosticsDomainService? readOnly, bool refreshNow = true)
+        {
+            _remoteReadOnly = readOnly;
+            if (refreshNow)
+            {
+                _ = LoadAssetsAsync();
+            }
+        }
+
         public void CopyAssetUri()
         {
             if (SelectedAsset != null)
@@ -105,6 +126,12 @@ namespace Avalonia.Diagnostics.ViewModels
 
         private async Task LoadAssetsAsync()
         {
+            if (_remoteReadOnly is not null)
+            {
+                await LoadRemoteAssetsAsync().ConfigureAwait(false);
+                return;
+            }
+
             await Dispatcher.UIThread.InvokeAsync(() =>
             {
                 IsLoading = true;
@@ -132,6 +159,7 @@ namespace Avalonia.Diagnostics.ViewModels
                 _assets.Clear();
                 for (var i = 0; i < assets.Count; i++)
                 {
+                    assets[i].SourceLocation = ResolveAssetSourceLocation(assets[i]);
                     _assets.Add(assets[i]);
                 }
 
@@ -140,6 +168,106 @@ namespace Avalonia.Diagnostics.ViewModels
                 Status = $"{assets.Count} assets";
                 IsLoading = false;
             });
+        }
+
+        private async Task LoadRemoteAssetsAsync()
+        {
+            var readOnly = _remoteReadOnly;
+            if (readOnly is null)
+            {
+                return;
+            }
+
+            var version = System.Threading.Interlocked.Increment(ref _remoteRefreshVersion);
+            await Dispatcher.UIThread.InvokeAsync(() =>
+            {
+                IsLoading = true;
+                Status = "Loading remote assets...";
+            });
+
+            try
+            {
+                var snapshot = await readOnly.GetAssetsSnapshotAsync(new RemoteAssetsSnapshotRequest()).ConfigureAwait(false);
+                await Dispatcher.UIThread.InvokeAsync(() =>
+                {
+                    if (version != _remoteRefreshVersion)
+                    {
+                        return;
+                    }
+
+                    _assets.Clear();
+                    for (var i = 0; i < snapshot.Assets.Count; i++)
+                    {
+                        var entry = snapshot.Assets[i];
+                        var kind = ParseRemoteKind(entry.Kind);
+                        _assets.Add(new AssetEntryViewModel(
+                            entry.Uri,
+                            entry.AssemblyName,
+                            entry.AssetPath,
+                            kind,
+                            entry.SourceLocation));
+                    }
+
+                    _assetsView.Refresh();
+                    RaisePropertyChanged(nameof(AssetCount));
+                    Status = snapshot.Assets.Count + " assets";
+                    IsLoading = false;
+                });
+            }
+            catch (Exception ex)
+            {
+                await Dispatcher.UIThread.InvokeAsync(() =>
+                {
+                    if (version != _remoteRefreshVersion)
+                    {
+                        return;
+                    }
+
+                    Status = "Remote asset load failed: " + ex.Message;
+                    IsLoading = false;
+                });
+            }
+        }
+
+        public bool TrySelectAssetBySourceLocation(SourceDocumentLocation location)
+        {
+            AssetEntryViewModel? best = null;
+            var bestScore = int.MaxValue;
+
+            for (var i = 0; i < _assets.Count; i++)
+            {
+                var asset = _assets[i];
+                if (!SourceLocationTextParser.TryParse(asset.SourceLocation, out var parsed))
+                {
+                    continue;
+                }
+
+                if (!SourceLocationTextParser.IsSameDocument(parsed.FilePath, location.FilePath))
+                {
+                    continue;
+                }
+
+                var score = Math.Abs(parsed.Line - location.Line) * 1000 + Math.Abs(parsed.Column - location.Column);
+                if (score >= bestScore)
+                {
+                    continue;
+                }
+
+                best = asset;
+                bestScore = score;
+                if (score == 0)
+                {
+                    break;
+                }
+            }
+
+            if (best is null || ReferenceEquals(best, SelectedAsset))
+            {
+                return false;
+            }
+
+            SelectedAsset = best;
+            return true;
         }
 
         private bool FilterAsset(object obj)
@@ -160,6 +288,11 @@ namespace Avalonia.Diagnostics.ViewModels
             }
 
             if (AssetsFilter.Filter(asset.AssemblyName))
+            {
+                return true;
+            }
+
+            if (AssetsFilter.Filter(asset.SourceLocation))
             {
                 return true;
             }
@@ -207,7 +340,7 @@ namespace Avalonia.Diagnostics.ViewModels
                     var assetPath = NormalizePath(assetUri);
                     var assemblyName = string.IsNullOrWhiteSpace(assetUri.Host) ? name : assetUri.Host;
                     var kind = ClassifyKind(assetPath);
-                    results.Add(new AssetEntryViewModel(assetUri, assemblyName, assetPath, kind));
+                    results.Add(new AssetEntryViewModel(assetUri, assembly, assemblyName, assetPath, kind));
                 }
             }
 
@@ -291,6 +424,38 @@ namespace Avalonia.Diagnostics.ViewModels
                 or ".yml"
                 or ".ini"
                 or ".config";
+        }
+
+        private string ResolveAssetSourceLocation(AssetEntryViewModel asset)
+        {
+            if (asset.Assembly is null)
+            {
+                return asset.SourceLocation;
+            }
+
+            var byPath = _sourceLocationService.ResolveDocument(asset.Assembly, asset.AssetPath, asset.AssetPath);
+            if (byPath is not null)
+            {
+                return byPath.DisplayText;
+            }
+
+            var byFileName = _sourceLocationService.ResolveDocument(asset.Assembly, asset.Name, asset.Name);
+            if (byFileName is not null)
+            {
+                return byFileName.DisplayText;
+            }
+
+            return string.Empty;
+        }
+
+        private static AssetKind ParseRemoteKind(string? kind)
+        {
+            if (Enum.TryParse<AssetKind>(kind, ignoreCase: true, out var parsed))
+            {
+                return parsed;
+            }
+
+            return AssetKind.Other;
         }
     }
 }

@@ -1,0 +1,101 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:Avalonia.Diagnostics.ViewModels"
+             xmlns:services="using:Avalonia.Diagnostics.Services"
+             x:Class="Avalonia.Diagnostics.Views.BreakpointsPageView"
+             x:DataType="vm:BreakpointsPageViewModel">
+  <Grid RowDefinitions="Auto,Auto,*,Auto">
+    <StackPanel Grid.Row="0"
+                Margin="8,6,8,4"
+                Orientation="Horizontal"
+                Spacing="12">
+      <TextBlock Text="{Binding BreakpointCount, StringFormat=Breakpoints: {0}}" />
+      <TextBlock Text="{Binding VisibleBreakpointCount, StringFormat=Visible: {0}}" />
+      <TextBlock Text="Tracks event/property changes and can log, suspend, or auto-remove."
+                 Foreground="Gray" />
+    </StackPanel>
+
+    <FilterTextBox Grid.Row="1"
+                   Margin="8,0,8,4"
+                   DataContext="{Binding BreakpointsFilter}"
+                   Text="{Binding FilterString}"
+                   Watermark="Filter breakpoints"
+                   UseCaseSensitiveFilter="{Binding UseCaseSensitiveFilter}"
+                   UseWholeWordFilter="{Binding UseWholeWordFilter}"
+                   UseRegexFilter="{Binding UseRegexFilter}" />
+
+    <DataGrid Grid.Row="2"
+              Margin="8,0,8,4"
+              ItemsSource="{Binding BreakpointsView}"
+              SelectedItem="{Binding SelectedBreakpoint, Mode=TwoWay}"
+              AutoGenerateColumns="False"
+              HeadersVisibility="Column"
+              BorderThickness="0"
+              CanUserSortColumns="True"
+              CanUserResizeColumns="True"
+              CanUserReorderColumns="False">
+      <DataGrid.Columns>
+        <DataGridCheckBoxColumn Header="On"
+                                Binding="{Binding IsEnabled}"
+                                Width="0.7*"
+                                x:DataType="services:BreakpointEntry" />
+        <DataGridTextColumn Header="Type"
+                            Binding="{Binding Kind}"
+                            Width="0.9*"
+                            IsReadOnly="True"
+                            x:DataType="services:BreakpointEntry" />
+        <DataGridTextColumn Header="Name"
+                            Binding="{Binding Name}"
+                            Width="1.4*"
+                            IsReadOnly="True"
+                            x:DataType="services:BreakpointEntry" />
+        <DataGridTextColumn Header="Target"
+                            Binding="{Binding TargetDescription}"
+                            Width="2*"
+                            IsReadOnly="True"
+                            x:DataType="services:BreakpointEntry" />
+        <DataGridTextColumn Header="Hits"
+                            Binding="{Binding HitCount}"
+                            Width="0.8*"
+                            IsReadOnly="True"
+                            x:DataType="services:BreakpointEntry" />
+        <DataGridTextColumn Header="After"
+                            Binding="{Binding TriggerAfterHits}"
+                            Width="0.9*"
+                            x:DataType="services:BreakpointEntry" />
+        <DataGridCheckBoxColumn Header="Suspend"
+                                Binding="{Binding SuspendExecution}"
+                                Width="1*"
+                                x:DataType="services:BreakpointEntry" />
+        <DataGridCheckBoxColumn Header="Log"
+                                Binding="{Binding LogMessage}"
+                                Width="0.8*"
+                                x:DataType="services:BreakpointEntry" />
+        <DataGridCheckBoxColumn Header="Remove"
+                                Binding="{Binding RemoveOnceHit}"
+                                Width="0.9*"
+                                x:DataType="services:BreakpointEntry" />
+        <DataGridTextColumn Header="Last Hit"
+                            Binding="{Binding LastHitAt, StringFormat={}{0:HH:mm:ss.fff}}"
+                            Width="1.2*"
+                            IsReadOnly="True"
+                            x:DataType="services:BreakpointEntry" />
+        <DataGridTextColumn Header="Last Details"
+                            Binding="{Binding LastHitDetails}"
+                            Width="3*"
+                            IsReadOnly="True"
+                            x:DataType="services:BreakpointEntry" />
+      </DataGrid.Columns>
+    </DataGrid>
+
+    <StackPanel Grid.Row="3"
+                Margin="8,0,8,6"
+                Orientation="Horizontal"
+                Spacing="8">
+      <Button Content="Enable all" Command="{Binding EnableAll}" />
+      <Button Content="Disable all" Command="{Binding DisableAll}" />
+      <Button Content="Remove selected" Command="{Binding RemoveSelected}" />
+      <Button Content="Clear all" Command="{Binding ClearAll}" />
+    </StackPanel>
+  </Grid>
+</UserControl>

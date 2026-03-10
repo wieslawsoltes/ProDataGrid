@@ -70,6 +70,13 @@ dotnet run --project src/DataGridSample/DataGridSample.csproj
 - **[Articles](articles/intro.md)**: Practical guides and feature-focused walkthroughs.
 - **[API Documentation](api/index.md)**: Reference for all public types and members.
 
+## Diagnostics Tooling
+
+`ProDiagnostics` ships alongside ProDataGrid for runtime inspection in managed and remote workflows:
+
+- **[ProDiagnostics](articles/prodiagnostics.md)**
+- **[Remote Diagnostics](articles/remote-diagnostics/index.md)**
+
 ## License
 
 ProDataGrid is licensed under the [MIT License](https://github.com/wieslawsoltes/ProDataGrid/blob/master/licence.md).

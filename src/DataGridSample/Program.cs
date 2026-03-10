@@ -3,11 +3,13 @@ using System.Diagnostics.CodeAnalysis;
 using Avalonia;
 using Avalonia.Collections;
 using Avalonia.Controls;
+using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Controls.DataGridHierarchical;
 using Avalonia.Controls.DataGridDragDrop;
 using Avalonia.Controls.DataGridFiltering;
 using Avalonia.Controls.DataGridSorting;
 using Avalonia.Controls.Primitives;
+using Avalonia.Diagnostics;
 using DataGridSample.Models;
 using DataGridSample.ViewModels;
 using ProDiagnostics.Transport;
@@ -20,6 +22,7 @@ public static class Program
     private const string DiagnosticsSwitchName = "ProDataGrid.Diagnostics.IsEnabled";
     private const string AvaloniaDiagnosticsSwitchName = "Avalonia.Diagnostics.Diagnostic.IsEnabled";
     private static DiagnosticsUdpExporter? _diagnosticsExporter;
+    private static DevToolsRemoteAttachHost? _remoteAttachHost;
 
     // Initialization code. Don't use any Avalonia, third-party APIs or any
     // SynchronizationContext-reliant code before AppMain is called: things aren't initialized
@@ -107,7 +110,7 @@ public static class Program
         // NOTE: Enable to use ProDiagnostics.Viewer
         // _diagnosticsExporter.Start();
 
-        BuildAvaloniaApp().StartWithClassicDesktopLifetime(args);
+        BuildAvaloniaApp().StartWithClassicDesktopLifetime(args, ConfigureDesktopLifetime);
 
         _diagnosticsExporter.Dispose();
         _diagnosticsExporter = null;
@@ -120,4 +123,42 @@ public static class Program
             .WithInterFont()
             .UseReactiveUI()
             .LogToTrace();
+
+    private static void ConfigureDesktopLifetime(IClassicDesktopStyleApplicationLifetime lifetime)
+    {
+        lifetime.Startup += OnDesktopStartup;
+        lifetime.Exit += OnDesktopExit;
+    }
+
+    private static void OnDesktopStartup(object? sender, ControlledApplicationLifetimeStartupEventArgs e)
+    {
+        if (sender is not IClassicDesktopStyleApplicationLifetime lifetime || lifetime.MainWindow is null)
+        {
+            return;
+        }
+
+        _remoteAttachHost = new DevToolsRemoteAttachHost(lifetime.MainWindow);
+        try
+        {
+            _remoteAttachHost.StartAsync().GetAwaiter().GetResult();
+            Console.WriteLine("[ProDiagnostics.Remote] attach endpoint: " + _remoteAttachHost.WebSocketEndpoint);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine("[ProDiagnostics.Remote] failed to start attach server: " + ex.Message);
+            _remoteAttachHost.DisposeAsync().AsTask().GetAwaiter().GetResult();
+            _remoteAttachHost = null;
+        }
+    }
+
+    private static void OnDesktopExit(object? sender, ControlledApplicationLifetimeExitEventArgs e)
+    {
+        if (_remoteAttachHost is null)
+        {
+            return;
+        }
+
+        _remoteAttachHost.DisposeAsync().AsTask().GetAwaiter().GetResult();
+        _remoteAttachHost = null;
+    }
 }

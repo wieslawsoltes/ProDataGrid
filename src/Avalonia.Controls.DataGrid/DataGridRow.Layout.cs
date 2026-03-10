@@ -123,12 +123,32 @@ namespace Avalonia.Controls
             return desiredSize.WithWidth(Math.Max(desiredSize.Width, OwningGrid.CellsWidth));
         }
 
-        internal void ApplyCellsState()
+        internal bool ApplyCellsState(bool force = false)
         {
+            if (!force &&
+                _hasAppliedCellsStateForMapping &&
+                _lastAppliedCellsStateSlot == Slot &&
+                _lastAppliedCellsStateIndex == Index)
+            {
+                return false;
+            }
+
             foreach (DataGridCell dataGridCell in Cells)
             {
                 dataGridCell.UpdatePseudoClasses();
             }
+
+            _hasAppliedCellsStateForMapping = true;
+            _lastAppliedCellsStateSlot = Slot;
+            _lastAppliedCellsStateIndex = Index;
+            return true;
+        }
+
+        internal void InvalidateCellsStateMapping()
+        {
+            _hasAppliedCellsStateForMapping = false;
+            _lastAppliedCellsStateSlot = -1;
+            _lastAppliedCellsStateIndex = -1;
         }
 
         internal void ApplyHeaderStatus()
@@ -214,6 +234,7 @@ namespace Avalonia.Controls
             }
 
             Slot = -1;
+            InvalidateCellsStateMapping();
             UpdateCurrentPseudoClass();
             PseudoClassesHelper.Set(PseudoClasses, ":pointerover", false);
             ClearDragDropState();

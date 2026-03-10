@@ -6,6 +6,7 @@ using Avalonia.Controls;
 using Avalonia.Controls.Diagnostics;
 using Avalonia.Controls.Primitives;
 using Avalonia.Data;
+using Avalonia.Diagnostics.Controls;
 using Avalonia.Diagnostics.ViewModels;
 using Avalonia.Input;
 using Avalonia.Input.Raw;
@@ -40,6 +41,7 @@ namespace Avalonia.Diagnostics.Views
                     if (x is RawPointerEventArgs pointerEventArgs)
                     {
                         _lastPointerPosition = ((Visual)x.Root).PointToScreen(pointerEventArgs.Position);
+                        RawPointerMoved(pointerEventArgs);
                     }
                     else if (x is RawKeyEventArgs keyEventArgs && keyEventArgs.Type == RawKeyEventType.KeyDown)
                     {
@@ -171,8 +173,13 @@ namespace Avalonia.Diagnostics.Views
         private void RawKeyDown(RawKeyEventArgs e)
         {
             if (_hotKeys is null ||
-                DataContext is not MainViewModel vm ||
-                vm.PointerOverRoot is not TopLevel root)
+                DataContext is not MainViewModel vm)
+            {
+                return;
+            }
+
+            var root = vm.PointerOverRoot as TopLevel ?? TopLevel.GetTopLevel(this);
+            if (root is null)
             {
                 return;
             }
@@ -183,6 +190,7 @@ namespace Avalonia.Diagnostics.Views
             }
 
             var modifiers = MergeModifiers(e.Key, e.Modifiers.ToKeyModifiers());
+            var isTextInputFocused = IsEditableTextInputFocused();
 
             if (IsMatched(_hotKeys.ValueFramesFreeze, e.Key, modifiers))
             {
@@ -204,10 +212,74 @@ namespace Avalonia.Diagnostics.Views
             {
                 InspectHoveredControl(root, vm);
             }
+            else if (IsMatched(_hotKeys.ToggleElementHighlight, e.Key, modifiers))
+            {
+                vm.ToggleHighlightElements();
+            }
+            else if (IsMatched(_hotKeys.ToggleFocusTracking, e.Key, modifiers))
+            {
+                vm.ToggleFocusTracking();
+            }
+            else if (IsMatched(_hotKeys.ToggleOverlayRulers, e.Key, modifiers))
+            {
+                vm.ToggleOverlayRulers();
+            }
+            else if (IsMatched(_hotKeys.ToggleOverlayInfo, e.Key, modifiers))
+            {
+                vm.ToggleOverlayInfo();
+            }
+            else if (IsMatched(_hotKeys.ToggleTopMost, e.Key, modifiers))
+            {
+                ToggleTopMost();
+            }
+            else if (IsMatched(_hotKeys.NextToolTab, e.Key, modifiers))
+            {
+                vm.SelectNextToolTab();
+            }
+            else if (IsMatched(_hotKeys.PreviousToolTab, e.Key, modifiers))
+            {
+                vm.SelectPreviousToolTab();
+            }
+            else if (IsMatched(_hotKeys.RefreshCurrentTool, e.Key, modifiers))
+            {
+                vm.RefreshCurrentTool();
+            }
+            else if (IsMatched(_hotKeys.ClearCurrentTool, e.Key, modifiers))
+            {
+                vm.ClearCurrentTool();
+            }
+            else if (IsMatched(_hotKeys.OpenSettings, e.Key, modifiers))
+            {
+                vm.ShowSettings();
+            }
+            else if (IsMatched(_hotKeys.SetBreakpoint, e.Key, modifiers))
+            {
+                vm.SetBreakpointFromContext();
+            }
+            else if (IsMatched(_hotKeys.FocusCurrentFilter, e.Key, modifiers))
+            {
+                FocusCurrentFilter();
+            }
+            else if (!isTextInputFocused && IsMatched(_hotKeys.NextSearchMatch, e.Key, modifiers))
+            {
+                vm.SelectNextSearchMatch();
+            }
+            else if (!isTextInputFocused && IsMatched(_hotKeys.PreviousSearchMatch, e.Key, modifiers))
+            {
+                vm.SelectPreviousSearchMatch();
+            }
+            else if (!isTextInputFocused && IsMatched(_hotKeys.ClearSelectionOrFilter, e.Key, modifiers))
+            {
+                vm.ClearSelectionOrFilter();
+            }
+            else if (!isTextInputFocused && IsMatched(_hotKeys.RemoveSelectedRecord, e.Key, modifiers))
+            {
+                vm.RemoveSelectedRecord();
+            }
 
             static bool IsMatched(KeyGesture gesture, Key key, KeyModifiers modifiers)
             {
-                return (gesture.Key == key || gesture.Key == Key.None) && modifiers.HasAllFlags(gesture.KeyModifiers);
+                return (gesture.Key == key || gesture.Key == Key.None) && modifiers == gesture.KeyModifiers;
             }
 
             // When Control, Shift, or Alt are initially pressed, they are the Key and not part of Modifiers
@@ -222,6 +294,38 @@ namespace Avalonia.Diagnostics.Views
                     _ => modifiers
                 };
             }
+        }
+
+        private void RawPointerMoved(RawPointerEventArgs e)
+        {
+            if (_hotKeys is null || DataContext is not MainViewModel vm)
+            {
+                return;
+            }
+
+            var inspectGesture = _hotKeys.InspectHoveredControl;
+            if (inspectGesture.Key != Key.None || inspectGesture.KeyModifiers == KeyModifiers.None)
+            {
+                return;
+            }
+
+            var pointerModifiers = e.InputModifiers.ToKeyModifiers();
+            if (pointerModifiers != inspectGesture.KeyModifiers)
+            {
+                return;
+            }
+
+            if (e.Root is not TopLevel root)
+            {
+                return;
+            }
+
+            if (root is PopupRoot popupRoot && popupRoot.ParentTopLevel is { } parentTopLevel)
+            {
+                root = parentTopLevel;
+            }
+
+            InspectHoveredControl(root, vm);
         }
 
         private void FreezeValueFrames(MainViewModel vm)
@@ -263,6 +367,16 @@ namespace Avalonia.Diagnostics.Views
 
         private void InspectHoveredControl(TopLevel root, MainViewModel vm)
         {
+            if (vm.HasRemoteMutation)
+            {
+                return;
+            }
+
+            if (!vm.AllowLocalInspectFallback)
+            {
+                return;
+            }
+
             Control? control = null;
 
             foreach (var popupRoot in GetPopupRoots(root))
@@ -277,10 +391,40 @@ namespace Avalonia.Diagnostics.Views
 
             control ??= GetHoveredControl(root);
 
-            if (control != null)
+            if (control != null && !control.DoesBelongToDevTool())
             {
                 vm.SelectControl(control);
             }
+        }
+
+        private void ToggleTopMost()
+        {
+            Topmost = !Topmost;
+        }
+
+        private bool FocusCurrentFilter()
+        {
+            foreach (var filterTextBox in this.GetVisualDescendants().OfType<FilterTextBox>())
+            {
+                if (!filterTextBox.IsVisible || !filterTextBox.IsEffectivelyEnabled)
+                {
+                    continue;
+                }
+
+                if (filterTextBox.Focus())
+                {
+                    filterTextBox.SelectAll();
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        private bool IsEditableTextInputFocused()
+        {
+            var focusedElement = FocusManager?.GetFocusedElement() ?? KeyboardDevice.Instance?.FocusedElement;
+            return focusedElement is TextBox { IsReadOnly: false };
         }
 
         private void PopupOnClosing(object? sender, CancelEventArgs e)
@@ -297,6 +441,10 @@ namespace Avalonia.Diagnostics.Views
         public void SetOptions(DevToolsOptions options)
         {
             _hotKeys = options.HotKeys;
+            if (!string.IsNullOrWhiteSpace(options.ApplicationName))
+            {
+                Title = options.ApplicationName + " - ProDevTools for Avalonia";
+            }
 
             (DataContext as MainViewModel)?.SetOptions(options);
             if (options.ThemeVariant is { } themeVariant)

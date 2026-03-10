@@ -15,6 +15,7 @@
 
   <ItemGroup>
     <ProjectReference Include="../ProDiagnostics/ProDiagnostics.csproj" />
+    <ProjectReference Include="../ProDiagnostics.Remote/ProDiagnostics.Remote.csproj" />
     <ProjectReference Include="../ProDiagnostics.Transport/ProDiagnostics.Transport.csproj" />
     <ProjectReference Include="../ProDiagnostics.Viewer/ProDiagnostics.Viewer.csproj" />
   </ItemGroup>

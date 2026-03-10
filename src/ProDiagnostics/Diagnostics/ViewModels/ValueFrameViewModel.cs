@@ -1,8 +1,10 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using Avalonia.Controls;
 using Avalonia.Data;
+using Avalonia.Diagnostics.Services;
 using Avalonia.Input.Platform;
 using Avalonia.Markup.Xaml.MarkupExtensions;
 using Avalonia.Styling;
@@ -11,24 +13,31 @@ namespace Avalonia.Diagnostics.ViewModels
 {
     internal class ValueFrameViewModel : ViewModelBase
     {
-        private readonly IValueFrameDiagnostic _valueFrame;
+        private static readonly ISourceLocationService DefaultSourceLocationService = new PortablePdbSourceLocationService();
+        private readonly IValueFrameDiagnostic? _valueFrame;
         private bool _isActive;
         private bool _isVisible;
 
-        public ValueFrameViewModel(StyledElement styledElement, IValueFrameDiagnostic valueFrame, IClipboard? clipboard)
+        public ValueFrameViewModel(
+            StyledElement styledElement,
+            IValueFrameDiagnostic valueFrame,
+            IClipboard? clipboard,
+            ISourceLocationService? sourceLocationService = null)
         {
             _valueFrame = valueFrame;
             IsVisible = true;
 
+            var resolver = sourceLocationService ?? DefaultSourceLocationService;
             var source = SourceToString(_valueFrame.Source);
             Description = (_valueFrame.Type, source) switch
             {
                 (IValueFrameDiagnostic.FrameType.Local, _) => "Local Values " + source,
                 (IValueFrameDiagnostic.FrameType.Template, _) => "Template " + source,
                 (IValueFrameDiagnostic.FrameType.Theme, _) => "Theme " + source,
-                (_, {Length:>0}) => source,
+                (_, { Length: > 0 }) => source,
                 _ => _valueFrame.Priority.ToString()
             };
+            SourceLocation = ResolveSourceLocation(_valueFrame.Source, resolver);
 
             Setters = new List<SetterViewModel>();
 
@@ -43,8 +52,12 @@ namespace Avalonia.Diagnostics.ViewModels
                     var resourceKey = resourceInfo.Value.resourceKey;
                     var resourceValue = styledElement.FindResource(resourceKey);
 
-                    setterVm = new ResourceSetterViewModel(setterProperty, resourceKey, resourceValue,
-                        resourceInfo.Value.isDynamic, clipboard);
+                    setterVm = new ResourceSetterViewModel(
+                        setterProperty,
+                        resourceKey,
+                        resourceValue,
+                        resourceInfo.Value.isDynamic,
+                        clipboard);
                 }
                 else
                 {
@@ -59,11 +72,30 @@ namespace Avalonia.Diagnostics.ViewModels
                         setterVm = new SetterViewModel(setterProperty, setterValue, clipboard);
                     }
                 }
+
+                setterVm.SourceLocation = SourceLocation;
                 Setters.Add(setterVm);
             }
 
             Update();
         }
+
+        public ValueFrameViewModel(
+            string id,
+            string description,
+            bool isActive,
+            string sourceLocation,
+            IReadOnlyList<SetterViewModel> setters)
+        {
+            Id = id;
+            Description = description;
+            SourceLocation = sourceLocation ?? string.Empty;
+            Setters = setters?.ToList() ?? new List<SetterViewModel>();
+            IsActive = isActive;
+            IsVisible = true;
+        }
+
+        public string? Id { get; }
 
         public bool IsActive
         {
@@ -79,13 +111,20 @@ namespace Avalonia.Diagnostics.ViewModels
 
         public string? Description { get; }
 
+        public string SourceLocation { get; }
+
         public List<SetterViewModel> Setters { get; }
 
         public void Update()
         {
+            if (_valueFrame is null)
+            {
+                return;
+            }
+
             IsActive = _valueFrame.IsActive;
         }
-        
+
         private static (object resourceKey, bool isDynamic)? GetResourceInfo(object? value)
         {
             if (value is StaticResourceExtension staticResource
@@ -128,6 +167,7 @@ namespace Avalonia.Diagnostics.ViewModels
                     {
                         selectors.Push(selector.ToString());
                     }
+
                     if (currentStyle is ControlTheme theme)
                     {
                         selectors.Push("Theme " + theme.TargetType?.Name);
@@ -148,6 +188,55 @@ namespace Avalonia.Diagnostics.ViewModels
             }
 
             return null;
+        }
+
+        private static string ResolveSourceLocation(object? source, ISourceLocationService sourceLocationService)
+        {
+            if (source is null)
+            {
+                return string.Empty;
+            }
+
+            var sourceHint = TryGetSourceHint(source);
+            var lineHint = (source as StyledElement)?.Name;
+            var sourceInfo = sourceLocationService.ResolveObject(source, sourceHint, lineHint);
+            if (sourceInfo.XamlLocation is not null)
+            {
+                return sourceInfo.XamlLocation.DisplayText;
+            }
+
+            if (sourceInfo.CodeLocation is not null)
+            {
+                return sourceInfo.CodeLocation.DisplayText;
+            }
+
+            if (!string.IsNullOrWhiteSpace(sourceHint))
+            {
+                var hinted = sourceLocationService.ResolveDocument(source.GetType().Assembly, sourceHint, lineHint);
+                if (hinted is not null)
+                {
+                    return hinted.DisplayText;
+                }
+            }
+
+            return string.Empty;
+        }
+
+        private static string? TryGetSourceHint(object source)
+        {
+            var sourceProperty = source.GetType().GetProperty("Source", BindingFlags.Public | BindingFlags.Instance);
+            if (sourceProperty is null)
+            {
+                return null;
+            }
+
+            var value = sourceProperty.GetValue(source);
+            if (value is Uri uri)
+            {
+                return uri.ToString();
+            }
+
+            return value as string;
         }
     }
 }

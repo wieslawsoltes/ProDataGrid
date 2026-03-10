@@ -9,6 +9,7 @@ using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.Markup.Xaml;
 using Avalonia.Threading;
+using Avalonia.VisualTree;
 
 namespace Avalonia.Diagnostics.Views
 {
@@ -16,6 +17,9 @@ namespace Avalonia.Diagnostics.Views
     {
         private readonly ListBox _events;
         private IDisposable? _adorner;
+        private ObservableCollection<FiredEvent>? _recordedEvents;
+        private Visual? _adornedVisual;
+        private MainViewModel? _mainView;
 
         public EventsPageView()
         {
@@ -34,6 +38,11 @@ namespace Avalonia.Diagnostics.Views
                         vm.RequestTreeNavigateTo(chainLink);
                         break;
                     }
+                    case FiredEvent firedEvent:
+                    {
+                        vm.SelectEventByRecord(firedEvent);
+                        break;
+                    }
                     case RoutedEvent evt:
                     {
                         vm.SelectEventByType(evt);
@@ -48,17 +57,46 @@ namespace Avalonia.Diagnostics.Views
         {
             base.OnDataContextChanged(e);
 
+            if (_recordedEvents != null)
+            {
+                _recordedEvents.CollectionChanged -= OnRecordedEventsChanged;
+                _recordedEvents = null;
+            }
+
+            if (_mainView is not null)
+            {
+                _mainView.PropertyChanged -= OnMainViewPropertyChanged;
+                _mainView = null;
+            }
+
             if (DataContext is EventsPageViewModel vm)
             {
-                vm.RecordedEvents.CollectionChanged += OnRecordedEventsChanged;
+                _recordedEvents = vm.RecordedEvents;
+                _recordedEvents.CollectionChanged += OnRecordedEventsChanged;
+                _mainView = vm.MainView;
+                if (_mainView is not null)
+                {
+                    _mainView.PropertyChanged += OnMainViewPropertyChanged;
+                }
+            }
+            else
+            {
+                _adornedVisual = null;
+                _adorner?.Dispose();
+                _adorner = null;
             }
         }
 
         private void OnRecordedEventsChanged(object? sender, NotifyCollectionChangedEventArgs e)
         {
-            if (sender is ObservableCollection<FiredEvent> events)
+            if (DataContext is not EventsPageViewModel vm || !vm.AutoScrollToLatest)
             {
-                var evt = events.LastOrDefault();
+                return;
+            }
+
+            if (sender is ObservableCollection<FiredEvent>)
+            {
+                var evt = vm.RecordedEventsView.Cast<FiredEvent>().LastOrDefault();
 
                 if (evt is null)
                 {
@@ -67,6 +105,25 @@ namespace Avalonia.Diagnostics.Views
 
                 Dispatcher.UIThread.Post(() => _events.ScrollIntoView(evt));
             }
+        }
+
+        protected override void OnDetachedFromVisualTree(VisualTreeAttachmentEventArgs e)
+        {
+            if (_recordedEvents != null)
+            {
+                _recordedEvents.CollectionChanged -= OnRecordedEventsChanged;
+                _recordedEvents = null;
+            }
+
+            _adorner?.Dispose();
+            _adorner = null;
+            _adornedVisual = null;
+            if (_mainView is not null)
+            {
+                _mainView.PropertyChanged -= OnMainViewPropertyChanged;
+                _mainView = null;
+            }
+            base.OnDetachedFromVisualTree(e);
         }
 
         private void InitializeComponent()
@@ -79,15 +136,48 @@ namespace Avalonia.Diagnostics.Views
             if (DataContext is EventsPageViewModel vm 
                 && sender is Control control 
                 && control.DataContext is EventChainLink chainLink
-                && chainLink.Handler is Visual visual)
+                && chainLink.Handler is Visual visual
+                && vm.MainView is { HighlightElements: true, ShouldRenderLocalHighlightAdorners: true })
             {
-                _adorner = Controls.ControlHighlightAdorner.Add(visual, vm.MainView.ShouldVisualizeMarginPadding);
+                _adornedVisual = visual;
+                _adorner?.Dispose();
+                _adorner = Controls.ControlHighlightAdorner.Add(
+                    visual,
+                    vm.MainView.OverlayDisplayOptions);
             }
         }
 
         private void ListBoxItem_PointerExited(object? sender, PointerEventArgs e)
         {
             _adorner?.Dispose();
+            _adorner = null;
+            _adornedVisual = null;
+        }
+
+        private void OnMainViewPropertyChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e)
+        {
+            if (e.PropertyName is nameof(MainViewModel.HighlightElements)
+                or nameof(MainViewModel.ShouldRenderLocalHighlightAdorners)
+                or nameof(MainViewModel.ShouldVisualizeMarginPadding)
+                or nameof(MainViewModel.ShowOverlayInfo)
+                or nameof(MainViewModel.ShowOverlayRulers)
+                or nameof(MainViewModel.ShowOverlayExtensionLines))
+            {
+                RefreshAdornerFromCurrentVisual();
+            }
+        }
+
+        private void RefreshAdornerFromCurrentVisual()
+        {
+            _adorner?.Dispose();
+            _adorner = null;
+
+            if (_adornedVisual is null || _mainView is not { HighlightElements: true, ShouldRenderLocalHighlightAdorners: true })
+            {
+                return;
+            }
+
+            _adorner = Controls.ControlHighlightAdorner.Add(_adornedVisual, _mainView.OverlayDisplayOptions);
         }
     }
 }

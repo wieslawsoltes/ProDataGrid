@@ -70,16 +70,7 @@ namespace Avalonia.Controls
 
                 SetVerticalOffset(_verticalOffset + elementHeight);
             }
-            if (updateVerticalScrollBarOnly)
-            {
-                UpdateVerticalScrollBar();
-            }
-            else
-            {
-                ComputeScrollBarsLayout();
-                // Reposition rows in case we use a recycled one
-                InvalidateRowsArrange();
-            }
+            RequestRowsLayoutRefresh(updateVerticalScrollBarOnly);
         }
 
 
@@ -242,7 +233,7 @@ namespace Avalonia.Controls
                 if (slotDeleted >= DisplayData.LastScrollingSlot && elementDeleted == null)
                 {
                     // Deleted Row is below our Viewport, we just need to adjust the scrollbar
-                    UpdateVerticalScrollBar();
+                    RequestRowsLayoutRefresh(updateVerticalScrollBarOnly: true);
                 }
                 else
                 {
@@ -257,11 +248,53 @@ namespace Avalonia.Controls
                         SetVerticalOffset(Math.Max(0, _verticalOffset - RowHeightEstimate));
                     }
 
-                    ComputeScrollBarsLayout();
-                    // Reposition rows in case we use a recycled one
-                    InvalidateRowsArrange();
+                    RequestRowsLayoutRefresh(updateVerticalScrollBarOnly: false);
                 }
             }
+        }
+
+        private void BeginRowsLayoutUpdateBatch()
+        {
+            _deferRowsLayoutUpdates++;
+        }
+
+        private void EndRowsLayoutUpdateBatch()
+        {
+            if (_deferRowsLayoutUpdates <= 0)
+            {
+                _deferRowsLayoutUpdates = 0;
+                return;
+            }
+
+            _deferRowsLayoutUpdates--;
+            if (_deferRowsLayoutUpdates != 0 || !_pendingRowsLayoutRefresh)
+            {
+                return;
+            }
+
+            _pendingRowsLayoutRefresh = false;
+            ComputeScrollBarsLayout();
+            // Reposition rows in case we use a recycled one
+            InvalidateRowsArrange();
+        }
+
+        private void RequestRowsLayoutRefresh(bool updateVerticalScrollBarOnly)
+        {
+            if (_deferRowsLayoutUpdates > 0)
+            {
+                _pendingRowsLayoutRefresh = true;
+                return;
+            }
+
+            if (updateVerticalScrollBarOnly)
+            {
+                UpdateVerticalScrollBar();
+                return;
+            }
+
+            ComputeScrollBarsLayout();
+            // Reposition rows in case we use a recycled one
+            InvalidateRowsArrange();
         }
 
 

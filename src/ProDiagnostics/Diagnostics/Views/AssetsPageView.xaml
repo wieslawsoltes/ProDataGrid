@@ -1,5 +1,6 @@
 <UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:local="using:Avalonia.Diagnostics.Views"
              xmlns:vm="using:Avalonia.Diagnostics.ViewModels"
              x:Class="Avalonia.Diagnostics.Views.AssetsPageView"
              x:DataType="vm:AssetsPageViewModel">
@@ -49,6 +50,18 @@
                             Width="3*"
                             IsReadOnly="True"
                             x:DataType="vm:AssetEntryViewModel" />
+        <DataGridTemplateColumn Header="Source" Width="2*" ReuseCellContent="True">
+          <DataGridTemplateColumn.CellTemplate>
+            <DataTemplate x:DataType="vm:AssetEntryViewModel">
+              <TextBlock Text="{Binding SourceLocation}"
+                         TextTrimming="CharacterEllipsis">
+                <ToolTip.Tip>
+                  <local:SourceLocationToolTipView SourceLocation="{Binding SourceLocation}" />
+                </ToolTip.Tip>
+              </TextBlock>
+            </DataTemplate>
+          </DataGridTemplateColumn.CellTemplate>
+        </DataGridTemplateColumn>
         <DataGridTextColumn Header="Kind"
                             Binding="{Binding KindDisplay}"
                             Width="1*"

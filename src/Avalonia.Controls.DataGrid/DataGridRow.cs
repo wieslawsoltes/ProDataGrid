@@ -78,6 +78,9 @@ internal
         private bool _isSelected;
         internal object RecycledDataContext;
         internal bool RecycledIsPlaceholder;
+        private bool _hasAppliedCellsStateForMapping;
+        private int _lastAppliedCellsStateSlot = -1;
+        private int _lastAppliedCellsStateIndex = -1;
 
         // Locally cache whether or not details are visible so we don't run redundant storyboards
         // The Details Template that is actually applied to the Row

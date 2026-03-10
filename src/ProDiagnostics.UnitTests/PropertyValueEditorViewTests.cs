@@ -3,6 +3,7 @@ using System.Globalization;
 using System.Reflection;
 using Avalonia;
 using Avalonia.Controls;
+using Avalonia.Diagnostics.ViewModels;
 using Avalonia.Headless.XUnit;
 using Xunit;
 
@@ -45,6 +46,53 @@ public class PropertyValueEditorViewTests
 
         var editor = Assert.IsType<CheckBox>(view.Content);
         Assert.False(editor.IsEnabled);
+    }
+
+    [AvaloniaFact]
+    public void Remote_boolean_property_uses_editable_checkbox()
+    {
+        var view = CreateView();
+        view.DataContext = new RemotePropertyViewModel(
+            name: "IsEnabled",
+            group: "Properties",
+            displayType: "Boolean",
+            assignedTypeName: typeof(bool).AssemblyQualifiedName,
+            propertyTypeName: typeof(bool).AssemblyQualifiedName,
+            declaringTypeName: typeof(Button).AssemblyQualifiedName,
+            priority: "LocalValue",
+            isAttached: false,
+            isReadOnly: false,
+            valueText: "false",
+            propertyKind: "avalonia",
+            editorKind: "boolean");
+
+        var editor = Assert.IsType<CheckBox>(view.Content);
+        Assert.True(editor.IsEnabled);
+        Assert.False(editor.IsChecked);
+    }
+
+    [AvaloniaFact]
+    public void Remote_enum_property_without_resolved_type_uses_editable_combo_box()
+    {
+        var view = CreateView();
+        view.DataContext = new RemotePropertyViewModel(
+            name: "Mode",
+            group: "CLR Properties",
+            displayType: "SampleMode",
+            assignedTypeName: "TestHost.SampleMode, Missing.Assembly",
+            propertyTypeName: "TestHost.SampleMode, Missing.Assembly",
+            declaringTypeName: typeof(TestTarget).AssemblyQualifiedName,
+            priority: string.Empty,
+            isAttached: false,
+            isReadOnly: false,
+            valueText: "Advanced",
+            propertyKind: "clr",
+            editorKind: "enum",
+            enumOptions: new[] { "Basic", "Advanced" });
+
+        var editor = Assert.IsType<ComboBox>(view.Content);
+        Assert.True(editor.IsEnabled);
+        Assert.Equal("Advanced", editor.SelectedItem);
     }
 
     private static UserControl CreateView()

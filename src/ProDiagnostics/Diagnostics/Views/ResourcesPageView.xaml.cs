@@ -13,6 +13,8 @@ namespace Avalonia.Diagnostics.Views
         private DataGridRow? _hovered;
         private DataGrid _tree;
         private System.IDisposable? _adorner;
+        private Visual? _adornedVisual;
+        private MainViewModel? _mainView;
 
         public ResourcesPageView()
         {
@@ -34,10 +36,12 @@ namespace Avalonia.Diagnostics.Views
             }
 
             _adorner?.Dispose();
+            _adorner = null;
 
             if (row is null || row.OwningGrid != _tree)
             {
                 _hovered = null;
+                _adornedVisual = null;
                 return;
             }
 
@@ -45,19 +49,24 @@ namespace Avalonia.Diagnostics.Views
 
             var node = ResolveNode(row.DataContext);
             var visual = ResolveVisual(node);
-            var shouldVisualizeMarginPadding = (DataContext as ResourcesPageViewModel)?.MainView.ShouldVisualizeMarginPadding;
-            if (visual is null || shouldVisualizeMarginPadding is null)
+            _adornedVisual = visual;
+
+            if (visual is null ||
+                DataContext is not ResourcesPageViewModel vm ||
+                !vm.MainView.HighlightElements ||
+                !vm.MainView.ShouldRenderLocalHighlightAdorners)
             {
                 return;
             }
 
-            _adorner = Controls.ControlHighlightAdorner.Add(visual, visualizeMarginPadding: shouldVisualizeMarginPadding == true);
+            _adorner = Controls.ControlHighlightAdorner.Add(visual, vm.MainView.OverlayDisplayOptions);
         }
 
         private void RemoveAdorner(object? sender, PointerEventArgs e)
         {
             _adorner?.Dispose();
             _adorner = null;
+            _adornedVisual = null;
         }
 
         private static ResourceTreeNode? ResolveNode(object? dataContext)
@@ -88,6 +97,75 @@ namespace Avalonia.Diagnostics.Views
         private void InitializeComponent()
         {
             AvaloniaXamlLoader.Load(this);
+        }
+
+        protected override void OnPropertyChanged(AvaloniaPropertyChangedEventArgs change)
+        {
+            base.OnPropertyChanged(change);
+
+            if (change.Property != DataContextProperty)
+            {
+                return;
+            }
+
+            if (change.GetOldValue<object?>() is ResourcesPageViewModel oldViewModel)
+            {
+                oldViewModel.MainView.PropertyChanged -= OnMainViewPropertyChanged;
+            }
+
+            if (change.GetNewValue<object?>() is ResourcesPageViewModel newViewModel)
+            {
+                _mainView = newViewModel.MainView;
+                _mainView.PropertyChanged += OnMainViewPropertyChanged;
+                RefreshAdornerFromCurrentVisual();
+            }
+            else
+            {
+                _mainView = null;
+                _adornedVisual = null;
+                _adorner?.Dispose();
+                _adorner = null;
+            }
+        }
+
+        protected override void OnDetachedFromVisualTree(VisualTreeAttachmentEventArgs e)
+        {
+            if (_mainView is not null)
+            {
+                _mainView.PropertyChanged -= OnMainViewPropertyChanged;
+            }
+
+            _adorner?.Dispose();
+            _adorner = null;
+            _adornedVisual = null;
+            _mainView = null;
+            base.OnDetachedFromVisualTree(e);
+        }
+
+        private void OnMainViewPropertyChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e)
+        {
+            if (e.PropertyName is nameof(MainViewModel.HighlightElements)
+                or nameof(MainViewModel.ShouldRenderLocalHighlightAdorners)
+                or nameof(MainViewModel.ShouldVisualizeMarginPadding)
+                or nameof(MainViewModel.ShowOverlayInfo)
+                or nameof(MainViewModel.ShowOverlayRulers)
+                or nameof(MainViewModel.ShowOverlayExtensionLines))
+            {
+                RefreshAdornerFromCurrentVisual();
+            }
+        }
+
+        private void RefreshAdornerFromCurrentVisual()
+        {
+            _adorner?.Dispose();
+            _adorner = null;
+
+            if (_adornedVisual is null || _mainView is not { HighlightElements: true, ShouldRenderLocalHighlightAdorners: true })
+            {
+                return;
+            }
+
+            _adorner = Controls.ControlHighlightAdorner.Add(_adornedVisual, _mainView.OverlayDisplayOptions);
         }
     }
 }

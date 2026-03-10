@@ -56,5 +56,15 @@ public class DiagnosticsUdpReceiverTests
         Assert.False(tcs.Task.IsCompleted);
     }
 
+    [Fact]
+    public void DiagnosticsUdpReceiver_Allows_Multiple_Bindings_On_Same_Port()
+    {
+        using var first = new DiagnosticsUdpReceiver(0);
+        var port = first.LocalEndPoint.Port;
+
+        using var second = new DiagnosticsUdpReceiver(port);
+        Assert.Equal(port, second.LocalEndPoint.Port);
+    }
+
     // Port selection handled by DiagnosticsUdpReceiver(0).
 }
