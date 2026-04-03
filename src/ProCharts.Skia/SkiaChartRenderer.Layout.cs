@@ -124,6 +124,7 @@ namespace ProCharts.Skia
                     maxValue,
                     style.ValueAxisKind,
                     style.AxisLabelFormatter,
+                    style.AxisValueFormat,
                     style,
                     horizontal: barOnly,
                     availableLength: barOnly ? availableWidth : availableHeight,
@@ -150,6 +151,7 @@ namespace ProCharts.Skia
                     maxSecondaryValue,
                     style.SecondaryValueAxisKind,
                     style.SecondaryAxisLabelFormatter,
+                    style.SecondaryAxisValueFormat,
                     style,
                     horizontal: barOnly,
                     availableLength: barOnly ? availableWidth : availableHeight,
@@ -179,6 +181,7 @@ namespace ProCharts.Skia
                     maxCategory,
                     style.CategoryAxisKind,
                     style.CategoryAxisLabelFormatter,
+                    style.CategoryAxisValueFormat,
                     horizontal: !barOnly,
                     availableLength: !barOnly ? availableWidth : availableHeight,
                     out var maxWidth,
@@ -208,6 +211,7 @@ namespace ProCharts.Skia
                     maxCategory,
                     style.SecondaryCategoryAxisKind,
                     style.SecondaryCategoryAxisLabelFormatter,
+                    style.SecondaryCategoryAxisValueFormat,
                     horizontal: !barOnly,
                     availableLength: !barOnly ? availableWidth : availableHeight,
                     out var maxWidth,
@@ -335,6 +339,7 @@ namespace ProCharts.Skia
             double maxValue,
             ChartAxisKind axisKind,
             Func<double, string>? formatter,
+            ChartValueFormat? valueFormat,
             SkiaChartStyle style,
             bool horizontal,
             float availableLength,
@@ -360,7 +365,7 @@ namespace ProCharts.Skia
                 {
                     foreach (var value in ticks)
                     {
-                        labels.Add(FormatAxisValue(value, axisKind, formatter, dateTimeFormat));
+                        labels.Add(FormatAxisValue(value, axisKind, formatter, valueFormat, dateTimeFormat));
                     }
 
                     var spacing = GetAxisLabelSpacing(ticks.Count, availableLength, useBands: false);
@@ -390,6 +395,7 @@ namespace ProCharts.Skia
             double maxCategory,
             ChartAxisKind axisKind,
             Func<double, string>? formatter,
+            ChartValueFormat? valueFormat,
             bool horizontal,
             float availableLength,
             out float maxWidth,
@@ -417,7 +423,7 @@ namespace ProCharts.Skia
                     {
                         foreach (var value in ticks)
                         {
-                            labels.Add(FormatCategoryAxisValue(value, axisKind, formatter, dateTimeFormat));
+                            labels.Add(FormatCategoryAxisValue(value, axisKind, formatter, valueFormat, dateTimeFormat));
                         }
 
                         var spacing = GetAxisLabelSpacing(ticks.Count, availableLength, useBands: false);

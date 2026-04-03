@@ -69,6 +69,234 @@ namespace Avalonia.Controls.DataGridTests.Charting
             Assert.Equal(value, result.Value);
         }
 
+        [Fact]
+        public void HitTest_Returns_Candlestick_Point_With_Financial_Values()
+        {
+            var snapshot = CreateFinancialSnapshot(ChartSeriesKind.Candlestick);
+            var style = CreateFinancialStyle();
+            var renderer = new SkiaChartRenderer();
+            var bounds = new SKRect(0, 0, 400, 300);
+
+            Assert.True(renderer.TryGetViewportInfo(bounds, snapshot, style, out var viewport));
+
+            var series = snapshot.Series[0];
+            const int pointIndex = 1;
+            var range = GetFinancialRange(series);
+            var centerX = MapX(viewport.Plot, pointIndex, series.Values.Count);
+            var open = series.OpenValues![pointIndex]!.Value;
+            var close = series.Values[pointIndex]!.Value;
+            var point = new SKPoint(centerX, (MapY(viewport.Plot, open, range.Min, range.Max, ChartAxisKind.Value) + MapY(viewport.Plot, close, range.Min, range.Max, ChartAxisKind.Value)) / 2f);
+
+            var hit = renderer.HitTest(point, bounds, snapshot, style);
+
+            Assert.True(hit.HasValue);
+            var result = hit!.Value;
+            Assert.Equal(ChartSeriesKind.Candlestick, result.SeriesKind);
+            Assert.Equal(pointIndex, result.PointIndex);
+            Assert.Equal("B", result.Category);
+            Assert.Equal(open, result.OpenValue);
+            Assert.Equal(series.HighValues![pointIndex], result.HighValue);
+            Assert.Equal(series.LowValues![pointIndex], result.LowValue);
+            Assert.Equal(close, result.CloseValue);
+            Assert.Equal(close, result.Value);
+        }
+
+        [Fact]
+        public void HitTest_Returns_Ohlc_Point_With_Financial_Values()
+        {
+            var snapshot = CreateFinancialSnapshot(ChartSeriesKind.Ohlc);
+            var style = CreateFinancialStyle();
+            var renderer = new SkiaChartRenderer();
+            var bounds = new SKRect(0, 0, 400, 300);
+
+            Assert.True(renderer.TryGetViewportInfo(bounds, snapshot, style, out var viewport));
+
+            var series = snapshot.Series[0];
+            const int pointIndex = 1;
+            var range = GetFinancialRange(series);
+            var centerX = MapX(viewport.Plot, pointIndex, series.Values.Count);
+            var close = series.Values[pointIndex]!.Value;
+            var point = new SKPoint(centerX, MapY(viewport.Plot, close, range.Min, range.Max, ChartAxisKind.Value));
+
+            var hit = renderer.HitTest(point, bounds, snapshot, style);
+
+            Assert.True(hit.HasValue);
+            var result = hit!.Value;
+            Assert.Equal(ChartSeriesKind.Ohlc, result.SeriesKind);
+            Assert.Equal(pointIndex, result.PointIndex);
+            Assert.Equal("B", result.Category);
+            Assert.Equal(series.OpenValues![pointIndex], result.OpenValue);
+            Assert.Equal(series.HighValues![pointIndex], result.HighValue);
+            Assert.Equal(series.LowValues![pointIndex], result.LowValue);
+            Assert.Equal(close, result.CloseValue);
+            Assert.Equal(close, result.Value);
+        }
+
+        [Fact]
+        public void HitTest_Returns_Hlc_Point_With_Financial_Values()
+        {
+            var snapshot = CreateFinancialSnapshot(ChartSeriesKind.Hlc);
+            var style = CreateFinancialStyle();
+            var renderer = new SkiaChartRenderer();
+            var bounds = new SKRect(0, 0, 400, 300);
+
+            Assert.True(renderer.TryGetViewportInfo(bounds, snapshot, style, out var viewport));
+
+            var series = snapshot.Series[0];
+            const int pointIndex = 1;
+            var range = GetFinancialRange(series);
+            var centerX = MapX(viewport.Plot, pointIndex, series.Values.Count);
+            var close = series.Values[pointIndex]!.Value;
+            var point = new SKPoint(centerX, MapY(viewport.Plot, close, range.Min, range.Max, ChartAxisKind.Value));
+
+            var hit = renderer.HitTest(point, bounds, snapshot, style);
+
+            Assert.True(hit.HasValue);
+            var result = hit!.Value;
+            Assert.Equal(ChartSeriesKind.Hlc, result.SeriesKind);
+            Assert.Equal(pointIndex, result.PointIndex);
+            Assert.Equal("B", result.Category);
+            Assert.Null(result.OpenValue);
+            Assert.Equal(series.HighValues![pointIndex], result.HighValue);
+            Assert.Equal(series.LowValues![pointIndex], result.LowValue);
+            Assert.Equal(close, result.CloseValue);
+            Assert.Equal(close, result.Value);
+        }
+
+        [Theory]
+        [InlineData(ChartSeriesKind.HollowCandlestick)]
+        [InlineData(ChartSeriesKind.HeikinAshi)]
+        [InlineData(ChartSeriesKind.Range)]
+        [InlineData(ChartSeriesKind.Renko)]
+        [InlineData(ChartSeriesKind.LineBreak)]
+        [InlineData(ChartSeriesKind.Kagi)]
+        [InlineData(ChartSeriesKind.PointFigure)]
+        public void HitTest_Returns_FinancialBodySeries_Point_With_Financial_Values(ChartSeriesKind kind)
+        {
+            var snapshot = CreateFinancialSnapshot(kind);
+            var style = CreateFinancialStyle();
+            var renderer = new SkiaChartRenderer();
+            var bounds = new SKRect(0, 0, 400, 300);
+
+            Assert.True(renderer.TryGetViewportInfo(bounds, snapshot, style, out var viewport));
+
+            var series = snapshot.Series[0];
+            const int pointIndex = 1;
+            var range = GetFinancialRange(series);
+            var centerX = MapX(viewport.Plot, pointIndex, series.Values.Count);
+            var open = series.OpenValues![pointIndex]!.Value;
+            var close = series.Values[pointIndex]!.Value;
+            var point = new SKPoint(centerX, (MapY(viewport.Plot, open, range.Min, range.Max, ChartAxisKind.Value) + MapY(viewport.Plot, close, range.Min, range.Max, ChartAxisKind.Value)) / 2f);
+
+            var hit = renderer.HitTest(point, bounds, snapshot, style);
+
+            Assert.True(hit.HasValue);
+            var result = hit!.Value;
+            Assert.Equal(kind, result.SeriesKind);
+            Assert.Equal(pointIndex, result.PointIndex);
+            Assert.Equal("B", result.Category);
+            Assert.Equal(open, result.OpenValue);
+            Assert.Equal(series.HighValues![pointIndex], result.HighValue);
+            Assert.Equal(series.LowValues![pointIndex], result.LowValue);
+            Assert.Equal(close, result.CloseValue);
+            Assert.Equal(close, result.Value);
+        }
+
+        [Fact]
+        public void Render_Draws_FinancialLastPriceLabel_Inside_Tight_Right_Bounds()
+        {
+            var snapshot = CreateFinancialSnapshot(ChartSeriesKind.Candlestick);
+            var style = CreateFinancialStyle();
+            style.FinancialShowLastPriceLine = true;
+            style.FinancialIncreaseColor = new SKColor(30, 212, 171);
+            style.FinancialDecreaseColor = new SKColor(255, 89, 111);
+            var renderer = new SkiaChartRenderer();
+            var bounds = new SKRect(0, 0, 92, 64);
+
+            using var bitmap = new SKBitmap((int)bounds.Width, (int)bounds.Height);
+            using var canvas = new SKCanvas(bitmap);
+            canvas.Clear(SKColors.Transparent);
+
+            renderer.Render(canvas, bounds, snapshot, style);
+
+            var maxVerticalRun = 0;
+            for (var x = bitmap.Width - 22; x < bitmap.Width; x++)
+            {
+                var currentRun = 0;
+                for (var y = 0; y < bitmap.Height; y++)
+                {
+                    if (bitmap.GetPixel(x, y).Alpha > 0)
+                    {
+                        currentRun++;
+                        if (currentRun > maxVerticalRun)
+                        {
+                            maxVerticalRun = currentRun;
+                        }
+                    }
+                    else
+                    {
+                        currentRun = 0;
+                    }
+                }
+            }
+
+            Assert.True(maxVerticalRun >= 6);
+        }
+
+        private static ChartDataSnapshot CreateFinancialSnapshot(ChartSeriesKind kind)
+        {
+            double?[]? openValues = kind == ChartSeriesKind.Hlc
+                ? null
+                : new double?[] { 9d, 10d, 8.5d };
+
+            return new ChartDataSnapshot(
+                new[] { "A", "B", "C" },
+                new[]
+                {
+                    new ChartSeriesSnapshot(
+                        "Price",
+                        kind,
+                        new double?[] { 10d, 12d, 9d },
+                        openValues: openValues,
+                        highValues: new double?[] { 11d, 13d, 10d },
+                        lowValues: new double?[] { 8d, 9d, 8d })
+                });
+        }
+
+        private static SkiaChartStyle CreateFinancialStyle()
+        {
+            return new SkiaChartStyle
+            {
+                ShowLegend = false,
+                ShowAxisLabels = false,
+                ShowCategoryLabels = false,
+                ShowCategoryAxisLine = false,
+                ShowValueAxisLine = false,
+                PaddingLeft = 0,
+                PaddingRight = 0,
+                PaddingTop = 0,
+                PaddingBottom = 0
+            };
+        }
+
+        private static (double Min, double Max) GetFinancialRange(ChartSeriesSnapshot series)
+        {
+            var min = series.LowValues!.Min(v => v ?? 0d);
+            var max = series.HighValues!.Max(v => v ?? 0d);
+            return (min, max);
+        }
+
+        private static float MapX(SKRect plot, int index, int count)
+        {
+            if (count <= 1)
+            {
+                return plot.MidX;
+            }
+
+            var step = plot.Width / (count - 1);
+            return plot.Left + (index * step);
+        }
+
         private static float MapY(SKRect plot, double value, double minValue, double maxValue, ChartAxisKind axisKind)
         {
             var normalized = NormalizeAxisValue(value, minValue, maxValue, axisKind);

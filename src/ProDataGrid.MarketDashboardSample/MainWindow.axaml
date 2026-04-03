@@ -1,0 +1,1685 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:charts="clr-namespace:ProCharts.Avalonia;assembly=ProCharts.Avalonia"
+        xmlns:core="clr-namespace:ProCharts;assembly=ProCharts"
+        xmlns:models="clr-namespace:ProDataGrid.MarketDashboardSample.Models"
+        xmlns:viewModels="clr-namespace:ProDataGrid.MarketDashboardSample.ViewModels"
+        x:Class="ProDataGrid.MarketDashboardSample.MainWindow"
+        x:Name="Root"
+        x:DataType="viewModels:MarketDashboardViewModel"
+        Title="ProCharts Market Terminal Sample"
+        Width="1600"
+        Height="900"
+        MinWidth="1500"
+        MinHeight="860"
+        ClipToBounds="False"
+        WindowStartupLocation="CenterScreen">
+
+  <Grid RowDefinitions="Auto,*">
+    <Grid Margin="34,14,0,10"
+          ColumnDefinitions="Auto,*">
+      <Border Width="42"
+              Height="42"
+              CornerRadius="12"
+              Background="#0F1830"
+              BorderBrush="#4A68FF"
+              BorderThickness="1">
+        <TextBlock HorizontalAlignment="Center"
+                   VerticalAlignment="Center"
+                   FontSize="22"
+                   FontWeight="Bold"
+                   Foreground="#7EA0FF"
+                   Text="P" />
+      </Border>
+
+      <StackPanel Grid.Column="1"
+                  Margin="12,0,0,0"
+                  VerticalAlignment="Center"
+                  Spacing="0">
+        <TextBlock Classes="brand-title"
+                   Text="ProCharts" />
+        <TextBlock Classes="metric-subtle"
+                   Text="Financial terminal sample powered by ProDataGrid" />
+      </StackPanel>
+    </Grid>
+
+    <Border Grid.Row="1"
+            x:Name="MarketTerminalFrame"
+            Margin="14,0,14,14"
+            Classes="terminal-frame">
+      <Grid RowDefinitions="28,*"
+            ClipToBounds="False">
+        <Border Grid.Row="0"
+                Classes="top-strip">
+          <Grid Margin="10,0"
+                ColumnDefinitions="Auto,Auto,Auto,Auto,*,Auto,Auto,Auto"
+                ColumnSpacing="18"
+                VerticalAlignment="Center">
+            <Button Classes="top-nav-chip-button"
+                    Classes.active="{Binding IsDexScanTokensSectionSelected}"
+                    Command="{Binding SelectTerminalSectionCommand}"
+                    CommandParameter="{x:Static models:MarketTerminalSection.DexScanTokens}"
+                    ToolTip.Tip="Focus the main token discovery terminal view.">
+              <StackPanel Orientation="Horizontal"
+                          Spacing="4">
+                <Viewbox Width="12"
+                         Height="12">
+                  <Path Classes="fluent-icon"
+                        Data="{StaticResource FluentArrowTrending16RegularGeometry}" />
+                </Viewbox>
+                <TextBlock Text="DexScan Tokens" />
+              </StackPanel>
+            </Button>
+            <Button Grid.Column="1"
+                    Classes="top-nav-chip-button"
+                    Classes.active="{Binding IsSignalsSectionSelected}"
+                    Command="{Binding SelectTerminalSectionCommand}"
+                    CommandParameter="{x:Static models:MarketTerminalSection.Signals}"
+                    ToolTip.Tip="Switch the terminal to the signals-focused market workflow."
+                    Content="Signals" />
+            <Button Grid.Column="2"
+                    Classes="top-nav-chip-button"
+                    Classes.active="{Binding IsMemeExplorerSectionSelected}"
+                    Command="{Binding SelectTerminalSectionCommand}"
+                    CommandParameter="{x:Static models:MarketTerminalSection.MemeExplorer}"
+                    ToolTip.Tip="Switch the terminal to the meme-explorer market workflow."
+                    Content="Meme Explorer" />
+            <Button Grid.Column="3"
+                    Classes="top-nav-chip-button"
+                    Classes.active="{Binding IsTopTradersSectionSelected}"
+                    Command="{Binding SelectTerminalSectionCommand}"
+                    CommandParameter="{x:Static models:MarketTerminalSection.TopTraders}"
+                    ToolTip.Tip="Switch the terminal to the top-traders workflow."
+                    Content="Top Traders" />
+
+            <Button Grid.Column="5"
+                    Classes="strip-icon-button"
+                    Command="{Binding ApplyCurrentSelectionCommand}"
+                    ToolTip.Tip="Reload the selected market and refresh the live interval feed."
+                    ContentTemplate="{x:Null}">
+              <Viewbox Width="16"
+                       Height="16"
+                       Stretch="Uniform">
+                <Path Classes="fluent-icon"
+                      Data="{StaticResource FluentSend16RegularGeometry}" />
+              </Viewbox>
+            </Button>
+            <Button Grid.Column="6"
+                    Classes="strip-icon-button"
+                    Command="{Binding ShowLatestWindowCommand}"
+                    ToolTip.Tip="Jump to the latest visible candle range and enable follow-latest mode."
+                    ContentTemplate="{x:Null}">
+              <Viewbox Width="16"
+                       Height="16"
+                       Stretch="Uniform">
+                <Path Classes="fluent-icon"
+                      Data="{StaticResource FluentArrowCounterclockwise16RegularGeometry}" />
+              </Viewbox>
+            </Button>
+            <Button Grid.Column="7"
+                    Classes="strip-icon-button"
+                    Command="{Binding ToggleLabelGuideCommand}"
+                    ToolTip.Tip="Show or hide the contextual guide for the active lower panel."
+                    ContentTemplate="{x:Null}">
+              <Viewbox Width="16"
+                       Height="16"
+                       Stretch="Uniform">
+                <Path Classes="fluent-icon"
+                      Data="{StaticResource FluentMoreHorizontal16RegularGeometry}" />
+              </Viewbox>
+            </Button>
+          </Grid>
+        </Border>
+
+        <Grid Grid.Row="1"
+              ClipToBounds="False">
+          <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="240"
+                              MinWidth="228" />
+            <ColumnDefinition Width="4" />
+            <ColumnDefinition Width="*"
+                              MinWidth="720" />
+            <ColumnDefinition Width="4" />
+            <ColumnDefinition Width="302"
+                              MinWidth="286" />
+          </Grid.ColumnDefinitions>
+          <Border Grid.Column="0"
+                  Classes="side-panel"
+                  Padding="8,9,8,0">
+            <Grid RowDefinitions="Auto,Auto,Auto,*"
+                  RowSpacing="8">
+              <StackPanel Orientation="Horizontal"
+                          Spacing="8">
+                <Button Classes="watchlist-mode-button"
+                        Classes.active="{Binding IsTrendingWatchlistSelected}"
+                        Command="{Binding SelectWatchlistModeCommand}"
+                        CommandParameter="{x:Static models:MarketWatchlistViewMode.Trending}"
+                        ToolTip.Tip="Show the broad trending token tape for the current quote-asset scope."
+                        Content="Trending" />
+                <Button Classes="watchlist-mode-button"
+                        Classes.active="{Binding IsWatchlistWatchlistSelected}"
+                        Command="{Binding SelectWatchlistModeCommand}"
+                        CommandParameter="{x:Static models:MarketWatchlistViewMode.Watchlist}"
+                        ToolTip.Tip="Show only instruments you have starred as favorites."
+                        Content="Watchlist" />
+                <Button Classes="watchlist-mode-button"
+                        Classes.active="{Binding IsSignalsWatchlistSelected}"
+                        Command="{Binding SelectWatchlistModeCommand}"
+                        CommandParameter="{x:Static models:MarketWatchlistViewMode.Signals}"
+                        ToolTip.Tip="Bias the list toward signal-driven movers and indicator-heavy setups."
+                        Content="Signals" />
+              </StackPanel>
+
+              <Grid Grid.Row="1"
+                    ColumnDefinitions="Auto,Auto,Auto,Auto,*,Auto"
+                    ColumnSpacing="6">
+                <Button Classes="watchlist-range-button"
+                        Classes.active="{Binding IsFiveMinuteRangeSelected}"
+                        Command="{Binding SelectWatchlistRangeCommand}"
+                        CommandParameter="{x:Static models:MarketWatchlistRange.FiveMinutes}"
+                        ToolTip.Tip="Sort and color the watchlist by five-minute change."
+                        Content="5m" />
+                <Button Grid.Column="1"
+                        Classes="watchlist-range-button"
+                        Classes.active="{Binding IsOneHourRangeSelected}"
+                        Command="{Binding SelectWatchlistRangeCommand}"
+                        CommandParameter="{x:Static models:MarketWatchlistRange.OneHour}"
+                        ToolTip.Tip="Sort and color the watchlist by one-hour change."
+                        Content="1h" />
+                <Button Grid.Column="2"
+                        Classes="watchlist-range-button"
+                        Classes.active="{Binding IsFourHourRangeSelected}"
+                        Command="{Binding SelectWatchlistRangeCommand}"
+                        CommandParameter="{x:Static models:MarketWatchlistRange.FourHours}"
+                        ToolTip.Tip="Sort and color the watchlist by four-hour change."
+                        Content="4h" />
+                <Button Grid.Column="3"
+                        Classes="watchlist-range-button"
+                        Classes.active="{Binding IsTwentyFourHourRangeSelected}"
+                        Command="{Binding SelectWatchlistRangeCommand}"
+                        CommandParameter="{x:Static models:MarketWatchlistRange.TwentyFourHours}"
+                        ToolTip.Tip="Sort and color the watchlist by 24-hour change."
+                        Content="24h" />
+                <ComboBox Grid.Column="5"
+                          Classes="watchlist-scope-box"
+                          ItemsSource="{Binding WatchlistScopes}"
+                          ToolTip.Tip="Filter the left watchlist by quote asset."
+                          SelectedItem="{Binding SelectedWatchlistScope}" />
+              </Grid>
+
+              <Grid Grid.Row="2"
+                    ColumnDefinitions="*,86,72"
+                    ColumnSpacing="6">
+                <TextBlock Classes="metric-subtle"
+                           Text="Token / FDV" />
+                <TextBlock Grid.Column="1"
+                           Classes="metric-subtle"
+                           Text="Price" />
+                <TextBlock Grid.Column="2"
+                           Classes="metric-subtle"
+                           Text="/ Change" />
+              </Grid>
+
+              <DataGrid x:Name="WatchlistGrid"
+                        Grid.Row="3"
+                        Classes="terminal-grid watchlist-grid"
+                        ItemsSource="{Binding Watchlist}"
+                        SelectedItem="{Binding SelectedWatchlistItem, Mode=TwoWay}"
+                        AutoGenerateColumns="False"
+                        HeadersVisibility="None"
+                        IsReadOnly="True"
+                        CanUserResizeColumns="False"
+                        CanUserReorderColumns="False"
+                        CanUserSortColumns="False"
+                        GridLinesVisibility="Horizontal"
+                        RowHeight="40">
+                <DataGrid.Columns>
+                  <DataGridTemplateColumn Width="18"
+                                          x:DataType="models:WatchlistItem">
+                    <DataGridTemplateColumn.CellTemplate>
+                      <DataTemplate x:DataType="models:WatchlistItem">
+                        <Button Classes="watchlist-favorite-button"
+                                Classes.active="{Binding IsFavorite}"
+                                Command="{Binding ((viewModels:MarketDashboardViewModel)DataContext).ToggleFavoriteWatchlistItemCommand, ElementName=Root}"
+                                CommandParameter="{Binding}"
+                                ToolTip.Tip="Add or remove this instrument from your favorites watchlist.">
+                          <Viewbox Width="14"
+                                   Height="14">
+                            <Path Classes="fluent-icon"
+                                  Data="{StaticResource FluentStar16RegularGeometry}" />
+                          </Viewbox>
+                        </Button>
+                      </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                  </DataGridTemplateColumn>
+
+                  <DataGridTemplateColumn Width="*"
+                                          x:DataType="models:WatchlistItem">
+                    <DataGridTemplateColumn.CellTemplate>
+                      <DataTemplate x:DataType="models:WatchlistItem">
+                        <Grid ColumnDefinitions="Auto,*"
+                              ColumnSpacing="6">
+                          <Border Width="20"
+                                  Height="20"
+                                  CornerRadius="10"
+                                  Background="{Binding IconBackground}"
+                                  VerticalAlignment="Center">
+                            <TextBlock HorizontalAlignment="Center"
+                                       VerticalAlignment="Center"
+                                       FontSize="9"
+                                       FontWeight="Bold"
+                                       Foreground="#0A1222"
+                                       Text="{Binding IconText}" />
+                          </Border>
+
+                          <StackPanel Grid.Column="1"
+                                      Spacing="1">
+                            <StackPanel Orientation="Horizontal"
+                                        Spacing="4">
+                              <TextBlock FontSize="10"
+                                         FontWeight="SemiBold"
+                                         Text="{Binding Symbol}" />
+                              <TextBlock Classes="metric-subtle"
+                                         Text="{Binding Badges}" />
+                            </StackPanel>
+                            <TextBlock Classes="metric-subtle"
+                                       Text="{Binding MarketCap}" />
+                          </StackPanel>
+                        </Grid>
+                      </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                  </DataGridTemplateColumn>
+
+                  <DataGridTextColumn Width="Auto"
+                                      Binding="{Binding PriceText}"
+                                      x:DataType="models:WatchlistItem" />
+
+                  <DataGridTemplateColumn Width="72"
+                                          x:DataType="models:WatchlistItem">
+                    <DataGridTemplateColumn.CellTemplate>
+                      <DataTemplate x:DataType="models:WatchlistItem">
+                        <Grid>
+                          <TextBlock Classes="positive"
+                                     Text="{Binding ChangeText}"
+                                     IsVisible="{Binding IsPositive}" />
+                          <TextBlock Classes="negative"
+                                     Text="{Binding ChangeText}"
+                                     IsVisible="{Binding IsNegative}" />
+                        </Grid>
+                      </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                  </DataGridTemplateColumn>
+                </DataGrid.Columns>
+              </DataGrid>
+            </Grid>
+          </Border>
+
+          <GridSplitter x:Name="LeftPanelSplitter"
+                        Grid.Column="1"
+                        Classes="terminal-splitter"
+                        HorizontalAlignment="Stretch"
+                        ResizeDirection="Columns"
+                        ResizeBehavior="PreviousAndNext" />
+
+          <Grid Grid.Column="2">
+            <Grid.RowDefinitions>
+              <RowDefinition Height="46" />
+              <RowDefinition Height="Auto" />
+              <RowDefinition Height="*"
+                             MinHeight="308" />
+              <RowDefinition Height="4" />
+              <RowDefinition Height="286"
+                             MinHeight="224" />
+            </Grid.RowDefinitions>
+            <Border BorderBrush="{StaticResource DashboardSeparatorBrush}"
+                    BorderThickness="0,0,0,1">
+              <Grid Margin="12,0"
+                    ColumnDefinitions="Auto,*,Auto,Auto,Auto"
+                    ColumnSpacing="16">
+                <Grid ColumnDefinitions="Auto,*"
+                      ColumnSpacing="10">
+                  <Border Width="32"
+                          Height="32"
+                          CornerRadius="8"
+                          Background="#16305B"
+                          VerticalAlignment="Center">
+                    <Viewbox Width="18"
+                             Height="18"
+                             HorizontalAlignment="Center"
+                             VerticalAlignment="Center">
+                      <Path Data="{StaticResource FluentHexagon16RegularGeometry}"
+                            Fill="#4C88FF" />
+                    </Viewbox>
+                  </Border>
+
+                  <StackPanel Grid.Column="1"
+                              VerticalAlignment="Center"
+                              Spacing="1">
+                    <StackPanel Orientation="Horizontal"
+                                Spacing="4">
+                      <TextBlock Classes="section-title"
+                                 Text="{Binding PairTicker}" />
+                      <TextBlock Classes="metric-subtle"
+                                 Text="{Binding PairName}" />
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal"
+                                Spacing="6">
+                      <TextBlock Classes="metric-subtle"
+                                 Text="{Binding PairAddressText}" />
+                      <TextBlock Classes="subtle"
+                                 Text="{Binding PairMetaText}" />
+                    </StackPanel>
+                  </StackPanel>
+                </Grid>
+
+                <StackPanel Grid.Column="1"
+                            Orientation="Horizontal"
+                            HorizontalAlignment="Center"
+                            VerticalAlignment="Center"
+                            Spacing="8">
+                  <TextBlock Classes="hero-price"
+                             Text="{Binding CurrentPriceText}" />
+                  <TextBlock Classes="positive"
+                             FontWeight="Bold"
+                             Text="{Binding PriceChangeText}"
+                             IsVisible="{Binding PriceChangePositive}" />
+                  <TextBlock Classes="negative"
+                             FontWeight="Bold"
+                             Text="{Binding PriceChangeText}"
+                             IsVisible="{Binding PriceChangeNegative}" />
+                </StackPanel>
+
+                <StackPanel Grid.Column="2"
+                            VerticalAlignment="Center"
+                            Spacing="1">
+                  <TextBlock Classes="metric-subtle"
+                             Text="{Binding SecurityHeaderText}" />
+                  <StackPanel Orientation="Horizontal"
+                              Spacing="4">
+                    <Viewbox Width="13"
+                             Height="13"
+                             VerticalAlignment="Center">
+                      <Path Classes="inline-icon positive"
+                            Data="{StaticResource FluentShieldCheckmark16RegularGeometry}" />
+                    </Viewbox>
+                    <TextBlock Classes="positive"
+                               Text="{Binding SecurityStatusText}" />
+                  </StackPanel>
+                </StackPanel>
+
+                <StackPanel Grid.Column="3"
+                            VerticalAlignment="Center"
+                            Spacing="1">
+                  <TextBlock Classes="metric-subtle"
+                             Text="Bid / Ask" />
+                  <StackPanel Orientation="Horizontal"
+                              Spacing="4">
+                    <TextBlock Classes="positive"
+                               Text="{Binding BuyTaxText}" />
+                    <TextBlock Classes="negative"
+                               Text="{Binding SellTaxText}" />
+                  </StackPanel>
+                </StackPanel>
+
+                <Border Grid.Column="4"
+                        VerticalAlignment="Center">
+                  <ToggleButton Classes="dex-mode-toggle"
+                                ToolTip.Tip="Toggle the market strip between DEX-oriented and standard routing mode."
+                                Command="{Binding ToggleDexModeCommand}"
+                                IsChecked="{Binding IsDexModeEnabled}">
+                    <StackPanel Orientation="Horizontal"
+                                Spacing="8">
+                      <TextBlock Classes="linkish"
+                                 FontWeight="SemiBold"
+                                 Text="{Binding DexModeStatusText}" />
+                      <Border Width="28"
+                              Height="16"
+                              CornerRadius="8"
+                              Background="#4967FF">
+                        <Border Width="12"
+                                Height="12"
+                                CornerRadius="6"
+                                Margin="14,2,2,2"
+                                Background="White" />
+                      </Border>
+                    </StackPanel>
+                  </ToggleButton>
+                </Border>
+              </Grid>
+            </Border>
+
+            <Border Grid.Row="1"
+                    BorderBrush="{StaticResource DashboardSeparatorBrush}"
+                    BorderThickness="0,0,0,1">
+              <Grid Margin="12,0"
+                    RowDefinitions="32,Auto"
+                    RowSpacing="6">
+                <Grid ColumnDefinitions="Auto,Auto,Auto,Auto,Auto,Auto,Auto,*,Auto,Auto,Auto"
+                      ColumnSpacing="10">
+                  <Button Classes="toolbar-link-button"
+                          Classes.active="{Binding IsInterval1sSelected}"
+                          Command="{Binding SelectChartIntervalCommand}"
+                          CommandParameter="1s"
+                          ToolTip.Tip="Switch the live candle interval to one second."
+                          Content="1s" />
+                  <Button Grid.Column="1"
+                          Classes="toolbar-link-button"
+                          Classes.active="{Binding IsInterval1mSelected}"
+                          Command="{Binding SelectChartIntervalCommand}"
+                          CommandParameter="1m"
+                          ToolTip.Tip="Switch the live candle interval to one minute."
+                          Content="1m" />
+                  <Button Grid.Column="2"
+                          Classes="toolbar-link-button"
+                          Classes.active="{Binding IsInterval5mSelected}"
+                          Command="{Binding SelectChartIntervalCommand}"
+                          CommandParameter="5m"
+                          ToolTip.Tip="Switch the live candle interval to five minutes."
+                          Content="5m" />
+                  <Button Grid.Column="3"
+                          Classes="toolbar-link-button"
+                          Classes.active="{Binding IsInterval1hSelected}"
+                          Command="{Binding SelectChartIntervalCommand}"
+                          CommandParameter="1h"
+                          ToolTip.Tip="Switch the live candle interval to one hour."
+                          Content="1h" />
+                  <Button Grid.Column="4"
+                          Classes="toolbar-link-button"
+                          Classes.active="{Binding IsInterval4hSelected}"
+                          Command="{Binding SelectChartIntervalCommand}"
+                          CommandParameter="4h"
+                          ToolTip.Tip="Switch the live candle interval to four hours."
+                          Content="4h" />
+                  <Button Grid.Column="5"
+                          Classes="toolbar-link-button"
+                          Command="{Binding ToggleChartIntervalMenuCommand}"
+                          ToolTip.Tip="Open the extended interval picker."
+                          ContentTemplate="{x:Null}">
+                    <Grid Width="12"
+                          Height="12">
+                      <Viewbox Width="12"
+                               Height="12"
+                               IsVisible="{Binding IsChartIntervalMenuOpen}">
+                        <Path Classes="fluent-icon"
+                              Data="{StaticResource FluentChevronUp16RegularGeometry}" />
+                      </Viewbox>
+                      <Viewbox Width="12"
+                               Height="12"
+                               IsVisible="{Binding IsChartIntervalMenuClosed}">
+                        <Path Classes="fluent-icon"
+                              Data="{StaticResource FluentChevronDown16RegularGeometry}" />
+                      </Viewbox>
+                    </Grid>
+                  </Button>
+                  <Button Grid.Column="6"
+                          Classes="toolbar-link-button"
+                          Classes.active="{Binding AreIndicatorsVisible}"
+                          Command="{Binding ToggleIndicatorsCommand}"
+                          ToolTip.Tip="Toggle overlay indicators on the active price chart."
+                          Content="{Binding IndicatorsButtonText}" />
+                  <Grid Grid.Column="7"
+                        ColumnDefinitions="*,Auto,Auto,Auto,Auto"
+                        ColumnSpacing="10">
+                    <TextBlock VerticalAlignment="Center"
+                               Classes="metric-subtle"
+                               Text="{Binding HoveredPriceSummaryText}" />
+                    <StackPanel Grid.Column="1"
+                                Orientation="Horizontal"
+                                HorizontalAlignment="Right"
+                                Spacing="6">
+                              <RadioButton Classes="chart-toggle"
+                                           GroupName="ChartModes"
+                                           Content="Candles"
+                                           ToolTip.Tip="Render classic candlesticks."
+                                           IsChecked="{Binding IsCandlestickSelected}" />
+                      <RadioButton Classes="chart-toggle"
+                                   GroupName="ChartModes"
+                                   Content="Hollow"
+                                   ToolTip.Tip="Render hollow bullish candles and filled bearish candles."
+                                   IsChecked="{Binding IsHollowCandlestickSelected}" />
+                      <RadioButton Classes="chart-toggle"
+                                   GroupName="ChartModes"
+                                   Content="Heikin"
+                                   ToolTip.Tip="Render Heikin-Ashi smoothing for trend reading."
+                                   IsChecked="{Binding IsHeikinAshiSelected}" />
+                      <RadioButton Classes="chart-toggle"
+                                   GroupName="ChartModes"
+                                   Content="OHLC"
+                                   ToolTip.Tip="Render classic OHLC bars."
+                                   IsChecked="{Binding IsOhlcSelected}" />
+                      <RadioButton Classes="chart-toggle"
+                                   GroupName="ChartModes"
+                                   Content="HLC"
+                                   ToolTip.Tip="Render high-low-close bars."
+                                   IsChecked="{Binding IsHlcSelected}" />
+                    </StackPanel>
+                    <Button Grid.Column="2"
+                            Classes="chart-nav-button"
+                            Command="{Binding ShowLatestWindowCommand}"
+                            ToolTip.Tip="Jump to the latest window and re-enable follow mode."
+                            Content="Latest" />
+                    <Button Grid.Column="3"
+                            Classes="chart-nav-button"
+                            Command="{Binding ToggleFollowLatestCommand}"
+                            ToolTip.Tip="Toggle whether incoming live candles keep the chart pinned to the right edge."
+                            Content="{Binding FollowLatestButtonText}" />
+                    <Button Grid.Column="4"
+                            Classes="chart-nav-button"
+                            Command="{Binding ResetChartWindowCommand}"
+                            ToolTip.Tip="Reset the viewport to the full loaded range."
+                            Content="Reset" />
+                  </Grid>
+                  <Button x:Name="UndoChartWindowButton"
+                          Grid.Column="8"
+                          Classes="strip-icon-button"
+                          IsEnabled="{Binding CanUndoChartWindow}"
+                          Command="{Binding UndoChartWindowCommand}"
+                          ToolTip.Tip="Undo the previous pan or zoom operation."
+                          ContentTemplate="{x:Null}">
+                    <Viewbox Width="16"
+                             Height="16"
+                             Stretch="Uniform">
+                      <Path Classes="fluent-icon"
+                            Data="{StaticResource FluentArrowCounterclockwise16RegularGeometry}" />
+                    </Viewbox>
+                  </Button>
+                  <Button x:Name="RedoChartWindowButton"
+                          Grid.Column="9"
+                          Classes="strip-icon-button"
+                          IsEnabled="{Binding CanRedoChartWindow}"
+                          Command="{Binding RedoChartWindowCommand}"
+                          ToolTip.Tip="Redo the previously undone pan or zoom operation."
+                          ContentTemplate="{x:Null}">
+                    <Viewbox Width="16"
+                             Height="16"
+                             Stretch="Uniform">
+                      <Path Classes="fluent-icon"
+                            Data="{StaticResource FluentArrowClockwise16RegularGeometry}" />
+                    </Viewbox>
+                  </Button>
+                  <Button x:Name="ResetChartWindowIconButton"
+                          Grid.Column="10"
+                          Classes="strip-icon-button"
+                          Command="{Binding ResetChartWindowCommand}"
+                          ToolTip.Tip="Reset the viewport to the full loaded range."
+                          ContentTemplate="{x:Null}">
+                    <Viewbox Width="16"
+                             Height="16"
+                             Stretch="Uniform">
+                      <Path Classes="fluent-icon"
+                            Data="{StaticResource FluentHome16RegularGeometry}" />
+                    </Viewbox>
+                  </Button>
+                </Grid>
+
+                <StackPanel Grid.Row="1"
+                            Orientation="Horizontal"
+                            Spacing="8"
+                            IsVisible="{Binding IsChartIntervalMenuOpen}">
+                  <Button Classes="toolbar-link-button"
+                          Classes.active="{Binding IsInterval15mSelected}"
+                          Command="{Binding SelectChartIntervalCommand}"
+                          CommandParameter="15m"
+                          ToolTip.Tip="Switch the live candle interval to fifteen minutes."
+                          Content="15m" />
+                  <Button Classes="toolbar-link-button"
+                          Classes.active="{Binding IsInterval1dSelected}"
+                          Command="{Binding SelectChartIntervalCommand}"
+                          CommandParameter="1d"
+                          ToolTip.Tip="Switch the live candle interval to one day."
+                          Content="1d" />
+                </StackPanel>
+              </Grid>
+            </Border>
+
+            <Grid Grid.Row="2"
+                  ColumnDefinitions="40,*"
+                  ClipToBounds="False">
+              <Border BorderBrush="{StaticResource DashboardSeparatorBrush}"
+                      BorderThickness="0,0,1,0">
+                <StackPanel Margin="0,12,0,0"
+                            HorizontalAlignment="Center"
+                            Spacing="12">
+                  <Button x:Name="CrosshairToolButton"
+                          Classes="tool-rail-button"
+                          Classes.active="{Binding IsCrosshairToolSelected}"
+                          Command="{Binding SelectPointerToolCommand}"
+                          CommandParameter="{x:Static core:ChartPointerTool.Crosshair}"
+                          ToolTip.Tip="Crosshair mode. Hover to inspect candles, then drag with the left mouse button to pan."
+                          ContentTemplate="{x:Null}">
+                    <Viewbox Width="22"
+                             Height="22"
+                             Stretch="Uniform">
+                      <Path Classes="fluent-icon"
+                            Data="{StaticResource FluentAdd16RegularGeometry}" />
+                    </Viewbox>
+                  </Button>
+                  <Button x:Name="PanToolButton"
+                          Classes="tool-rail-button"
+                          Classes.active="{Binding IsPanToolSelected}"
+                          Command="{Binding SelectPointerToolCommand}"
+                          CommandParameter="{x:Static core:ChartPointerTool.Pan}"
+                          ToolTip.Tip="Dedicated hand mode for left-mouse panning across the shared price, volume, and trader panes."
+                          ContentTemplate="{x:Null}">
+                    <Viewbox Width="22"
+                             Height="22"
+                             Stretch="Uniform">
+                      <Path Classes="fluent-icon"
+                            Data="{StaticResource FluentCursorClick20RegularGeometry}" />
+                    </Viewbox>
+                  </Button>
+                  <Button x:Name="ZoomToolButton"
+                          Classes="tool-rail-button"
+                          Classes.active="{Binding IsZoomToolSelected}"
+                          Command="{Binding SelectPointerToolCommand}"
+                          CommandParameter="{x:Static core:ChartPointerTool.Zoom}"
+                          ToolTip.Tip="Drag a selection box to zoom into a specific candle range."
+                          ContentTemplate="{x:Null}">
+                    <Viewbox Width="22"
+                             Height="22"
+                             Stretch="Uniform">
+                      <Path Classes="fluent-icon"
+                            Data="{StaticResource FluentAppsListDetail20RegularGeometry}" />
+                    </Viewbox>
+                  </Button>
+                  <Button x:Name="MeasureToolButton"
+                          Classes="tool-rail-button"
+                          Classes.active="{Binding IsMeasureToolSelected}"
+                          Command="{Binding SelectPointerToolCommand}"
+                          CommandParameter="{x:Static core:ChartPointerTool.Measure}"
+                          ToolTip.Tip="Measure price and bar distance between two points."
+                          ContentTemplate="{x:Null}">
+                    <Viewbox Width="22"
+                             Height="22"
+                             Stretch="Uniform">
+                      <Path Classes="fluent-icon"
+                            Data="{StaticResource FluentRuler16RegularGeometry}" />
+                    </Viewbox>
+                  </Button>
+                  <Button Classes="tool-rail-button"
+                          Classes.active="{Binding AreIndicatorsVisible}"
+                          Command="{Binding ToggleIndicatorsCommand}"
+                          ToolTip.Tip="Toggle indicator overlays on the active price chart."
+                          ContentTemplate="{x:Null}">
+                    <Viewbox Width="22"
+                             Height="22"
+                             Stretch="Uniform">
+                      <Path Classes="fluent-icon"
+                            Data="{StaticResource FluentPulse20RegularGeometry}" />
+                    </Viewbox>
+                  </Button>
+                  <Button Classes="tool-rail-button"
+                          Classes.active="{Binding IsLabelGuideVisible}"
+                          Command="{Binding ToggleLabelGuideCommand}"
+                          ToolTip.Tip="Show or hide the contextual guide for the active lower panel."
+                          ContentTemplate="{x:Null}">
+                    <Viewbox Width="22"
+                             Height="22"
+                             Stretch="Uniform">
+                      <Path Classes="fluent-icon"
+                            Data="{StaticResource FluentTextT16RegularGeometry}" />
+                    </Viewbox>
+                  </Button>
+                  <Button Classes="tool-rail-button"
+                          Command="{Binding ApplyCurrentSelectionCommand}"
+                          ToolTip.Tip="Reload the currently selected symbol and interval."
+                          ContentTemplate="{x:Null}">
+                    <Viewbox Width="22"
+                             Height="22"
+                             Stretch="Uniform">
+                      <Path Classes="fluent-icon"
+                            Data="{StaticResource FluentArrowClockwise16RegularGeometry}" />
+                    </Viewbox>
+                  </Button>
+                  <Button Classes="tool-rail-button"
+                          Command="{Binding ShowLatestWindowCommand}"
+                          ToolTip.Tip="Jump to the latest loaded candles."
+                          ContentTemplate="{x:Null}">
+                    <Viewbox Width="22"
+                             Height="22"
+                             Stretch="Uniform">
+                      <Path Classes="fluent-icon"
+                            Data="{StaticResource FluentArrowCounterclockwise16RegularGeometry}" />
+                    </Viewbox>
+                  </Button>
+                  <Button Classes="tool-rail-button"
+                          Command="{Binding ResetChartWindowCommand}"
+                          ToolTip.Tip="Reset the chart to the full loaded range."
+                          ContentTemplate="{x:Null}">
+                    <Viewbox Width="22"
+                             Height="22"
+                             Stretch="Uniform">
+                      <Path Classes="fluent-icon"
+                            Data="{StaticResource FluentHome16RegularGeometry}" />
+                    </Viewbox>
+                  </Button>
+                </StackPanel>
+              </Border>
+
+              <Grid Grid.Column="1"
+                    RowDefinitions="*,48,22">
+                <charts:ProChartView x:Name="PriceChartView"
+                                     Margin="4,0,0,0"
+                                     ChartModel="{Binding PriceChart}"
+                                     PanButton="Left"
+                                     PanModifiers="None"
+                                     ChartStyle="{Binding PriceChartStyle}"
+                                     ToolTipFormatter="{Binding PriceToolTipFormatter}" />
+
+                <Grid Grid.Row="1"
+                      Margin="0,2,0,0"
+                      ColumnDefinitions="Auto,*"
+                      ColumnSpacing="10">
+                  <StackPanel Margin="8,2,0,0"
+                              Spacing="1"
+                              VerticalAlignment="Top">
+                    <TextBlock Classes="metric-subtle"
+                               Text="Volume" />
+                    <TextBlock FontWeight="SemiBold"
+                               Text="{Binding VolumePaneValueText}" />
+                  </StackPanel>
+                  <charts:ProChartView x:Name="VolumeChartView"
+                                       Grid.Column="1"
+                                       EnableHoverTracking="False"
+                                       ShowToolTips="False"
+                                       PanButton="Left"
+                                       PanModifiers="None"
+                                       ChartModel="{Binding VolumeChart}"
+                                       ViewportChartModel="{Binding PriceChart}"
+                                       ChartStyle="{Binding VolumeChartStyle}" />
+                </Grid>
+
+                <Grid Grid.Row="2"
+                      ColumnDefinitions="Auto,*"
+                      ColumnSpacing="10">
+                    <TextBlock Margin="8,0,0,0"
+                               Classes="metric-subtle"
+                               VerticalAlignment="Center"
+                               Text="{Binding TraderPaneSummaryText}" />
+                  <charts:ProChartView x:Name="TraderChartView"
+                                       Grid.Column="1"
+                                       EnableHoverTracking="False"
+                                       ShowToolTips="False"
+                                       PanButton="Left"
+                                       PanModifiers="None"
+                                       ChartModel="{Binding TraderChart}"
+                                       ViewportChartModel="{Binding PriceChart}"
+                                       ChartStyle="{Binding TraderChartStyle}" />
+                </Grid>
+              </Grid>
+            </Grid>
+
+            <GridSplitter x:Name="ChartTradeSplitter"
+                          Grid.Row="3"
+                          Classes="terminal-splitter terminal-horizontal-splitter"
+                          VerticalAlignment="Stretch"
+                          HorizontalAlignment="Stretch"
+                          ResizeDirection="Rows"
+                          ResizeBehavior="PreviousAndNext" />
+
+            <Border Grid.Row="4"
+                    BorderBrush="{StaticResource DashboardSeparatorBrush}"
+                    BorderThickness="0,1,0,0"
+                    Padding="10,8,10,0">
+              <Grid RowDefinitions="Auto,Auto,Auto,*"
+                    RowSpacing="8">
+                <Grid ColumnDefinitions="Auto,Auto,Auto,Auto,Auto,*,Auto"
+                      ColumnSpacing="14">
+                  <Button Classes="panel-tab-button"
+                          Classes.active="{Binding IsTradeHistoryPanelSelected}"
+                          Command="{Binding SelectTradePanelCommand}"
+                          CommandParameter="{x:Static models:MarketTradePanel.TradeHistory}"
+                          ToolTip.Tip="Show the live trade history tape."
+                          Content="Trade History" />
+                  <Button Grid.Column="1"
+                          Classes="panel-tab-button"
+                          Classes.active="{Binding IsHolderPanelSelected}"
+                          Command="{Binding SelectTradePanelCommand}"
+                          CommandParameter="{x:Static models:MarketTradePanel.Holders}"
+                          ToolTip.Tip="Show the current holder breakdown."
+                          Content="Holders" />
+                  <Button Grid.Column="2"
+                          Classes="panel-tab-button"
+                          Classes.active="{Binding IsLiquidityPanelSelected}"
+                          Command="{Binding SelectTradePanelCommand}"
+                          CommandParameter="{x:Static models:MarketTradePanel.Liquidity}"
+                          ToolTip.Tip="Show liquidity venue and spread details."
+                          Content="Liquidity" />
+                  <Button Grid.Column="3"
+                          Classes="panel-tab-button"
+                          Classes.active="{Binding IsPositionsPanelSelected}"
+                          Command="{Binding SelectTradePanelCommand}"
+                          CommandParameter="{x:Static models:MarketTradePanel.Positions}"
+                          ToolTip.Tip="Show simulated open positions."
+                          Content="My Positions" />
+                  <Button Grid.Column="4"
+                          Classes="panel-tab-button"
+                          Classes.active="{Binding IsOrdersPanelSelected}"
+                          Command="{Binding SelectTradePanelCommand}"
+                          CommandParameter="{x:Static models:MarketTradePanel.Orders}"
+                          ToolTip.Tip="Show the simulated order ledger."
+                          Content="My Orders" />
+                  <Button Grid.Column="6"
+                          Classes="toolbar-link-button"
+                          Classes.active="{Binding IsLabelGuideVisible}"
+                          Command="{Binding ToggleLabelGuideCommand}"
+                          ToolTip.Tip="Show or hide the panel guide for the lower workspace.">
+                    <StackPanel Orientation="Horizontal"
+                                Spacing="4">
+                      <Viewbox Width="12"
+                               Height="12">
+                        <Path Classes="fluent-icon"
+                              Data="{StaticResource FluentInfo16RegularGeometry}" />
+                      </Viewbox>
+                      <TextBlock Text="Label Guide" />
+                    </StackPanel>
+                  </Button>
+                </Grid>
+
+                <StackPanel Grid.Row="1"
+                            Orientation="Horizontal"
+                            Spacing="8"
+                            IsVisible="{Binding IsTradeHistoryPanelSelected}">
+                  <RadioButton Classes="trade-toggle"
+                               GroupName="TradeHistoryView"
+                               Content="All"
+                               ToolTip.Tip="Show all recent trades in the selected market."
+                               IsChecked="{Binding IsAllTradesSelected}" />
+                  <RadioButton Classes="trade-toggle"
+                               GroupName="TradeHistoryView"
+                               Content="My Trades"
+                               ToolTip.Tip="Show only locally simulated orders and fills."
+                               IsChecked="{Binding IsMyTradesSelected}" />
+                </StackPanel>
+
+                <Border Grid.Row="2"
+                        Classes="panel-box"
+                        Padding="10,8"
+                        IsVisible="{Binding IsLabelGuideVisible}">
+                  <TextBlock Classes="metric-subtle"
+                             Text="{Binding LabelGuideText}"
+                             TextWrapping="Wrap" />
+                </Border>
+
+                <Grid Grid.Row="3">
+                  <DataGrid x:Name="TradeHistoryGrid"
+                            Classes="terminal-grid trade-grid"
+                            ItemsSource="{Binding TradeHistory}"
+                            AutoGenerateColumns="False"
+                            HeadersVisibility="Column"
+                            IsReadOnly="True"
+                            CanUserResizeColumns="False"
+                            CanUserReorderColumns="False"
+                            CanUserSortColumns="False"
+                            RowHeight="46"
+                            IsVisible="{Binding IsTradeHistoryPanelSelected}">
+                    <DataGrid.Columns>
+                      <DataGridTextColumn Header="Date"
+                                          Width="98"
+                                          Binding="{Binding RelativeTime}"
+                                          x:DataType="models:TradeHistoryItem" />
+
+                      <DataGridTemplateColumn Header="Type"
+                                              Width="100"
+                                              x:DataType="models:TradeHistoryItem">
+                        <DataGridTemplateColumn.CellTemplate>
+                          <DataTemplate x:DataType="models:TradeHistoryItem">
+                            <Grid>
+                              <Border Background="#14392E"
+                                      CornerRadius="10"
+                                      Padding="10,4"
+                                      HorizontalAlignment="Left"
+                                      IsVisible="{Binding IsBuy}">
+                                <TextBlock Classes="positive"
+                                           FontWeight="SemiBold"
+                                           Text="{Binding Side}" />
+                              </Border>
+                              <Border Background="#431D29"
+                                      CornerRadius="10"
+                                      Padding="10,4"
+                                      HorizontalAlignment="Left"
+                                      IsVisible="{Binding IsSell}">
+                                <TextBlock Classes="negative"
+                                           FontWeight="SemiBold"
+                                           Text="{Binding Side}" />
+                              </Border>
+                            </Grid>
+                          </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                      </DataGridTemplateColumn>
+
+                      <DataGridTemplateColumn Header="Amount"
+                                              Width="178"
+                                              x:DataType="models:TradeHistoryItem">
+                        <DataGridTemplateColumn.CellTemplate>
+                          <DataTemplate x:DataType="models:TradeHistoryItem">
+                            <StackPanel Spacing="1">
+                              <TextBlock Text="{Binding AmountText}" />
+                              <TextBlock Classes="metric-subtle"
+                                         Text="{Binding QuoteAmountText}" />
+                            </StackPanel>
+                          </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                      </DataGridTemplateColumn>
+
+                      <DataGridTextColumn Header="Price (USD)"
+                                          Width="110"
+                                          Binding="{Binding PriceText}"
+                                          x:DataType="models:TradeHistoryItem" />
+
+                      <DataGridTextColumn Header="Total (USD)"
+                                          Width="118"
+                                          Binding="{Binding TotalText}"
+                                          x:DataType="models:TradeHistoryItem" />
+
+                      <DataGridTemplateColumn Header="Maker"
+                                              Width="156"
+                                              x:DataType="models:TradeHistoryItem">
+                        <DataGridTemplateColumn.CellTemplate>
+                          <DataTemplate x:DataType="models:TradeHistoryItem">
+                            <StackPanel Orientation="Horizontal"
+                                        Spacing="6">
+                              <TextBlock Text="{Binding MakerText}" />
+                              <Border Background="#353848"
+                                      CornerRadius="8"
+                                      Padding="6,1">
+                                <TextBlock Classes="metric-subtle"
+                                           Text="{Binding MakerBadgeText}" />
+                              </Border>
+                            </StackPanel>
+                          </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                      </DataGridTemplateColumn>
+
+                      <DataGridTextColumn Header="Txn"
+                                          Width="56"
+                                          Binding="{Binding TransactionId}"
+                                          x:DataType="models:TradeHistoryItem" />
+                    </DataGrid.Columns>
+                  </DataGrid>
+
+                  <DataGrid Classes="terminal-grid trade-grid"
+                            ItemsSource="{Binding HolderBreakdown}"
+                            AutoGenerateColumns="False"
+                            HeadersVisibility="Column"
+                            IsReadOnly="True"
+                            CanUserResizeColumns="False"
+                            CanUserReorderColumns="False"
+                            CanUserSortColumns="False"
+                            RowHeight="42"
+                            IsVisible="{Binding IsHolderPanelSelected}">
+                    <DataGrid.Columns>
+                      <DataGridTextColumn Header="Segment"
+                                          Width="140"
+                                          Binding="{Binding Segment}"
+                                          x:DataType="models:HolderBreakdownItem" />
+                      <DataGridTextColumn Header="Wallets"
+                                          Width="140"
+                                          Binding="{Binding WalletsText}"
+                                          x:DataType="models:HolderBreakdownItem" />
+                      <DataGridTextColumn Header="Allocation"
+                                          Width="140"
+                                          Binding="{Binding AllocationText}"
+                                          x:DataType="models:HolderBreakdownItem" />
+                      <DataGridTextColumn Header="Activity"
+                                          Width="*"
+                                          Binding="{Binding ActivityText}"
+                                          x:DataType="models:HolderBreakdownItem" />
+                    </DataGrid.Columns>
+                  </DataGrid>
+
+                  <DataGrid Classes="terminal-grid trade-grid"
+                            ItemsSource="{Binding LiquidityVenues}"
+                            AutoGenerateColumns="False"
+                            HeadersVisibility="Column"
+                            IsReadOnly="True"
+                            CanUserResizeColumns="False"
+                            CanUserReorderColumns="False"
+                            CanUserSortColumns="False"
+                            RowHeight="42"
+                            IsVisible="{Binding IsLiquidityPanelSelected}">
+                    <DataGrid.Columns>
+                      <DataGridTextColumn Header="Venue"
+                                          Width="*"
+                                          Binding="{Binding Venue}"
+                                          x:DataType="models:LiquidityVenueItem" />
+                      <DataGridTextColumn Header="Bid"
+                                          Width="120"
+                                          Binding="{Binding BidText}"
+                                          x:DataType="models:LiquidityVenueItem" />
+                      <DataGridTextColumn Header="Ask"
+                                          Width="120"
+                                          Binding="{Binding AskText}"
+                                          x:DataType="models:LiquidityVenueItem" />
+                      <DataGridTextColumn Header="Spread"
+                                          Width="120"
+                                          Binding="{Binding SpreadText}"
+                                          x:DataType="models:LiquidityVenueItem" />
+                      <DataGridTextColumn Header="Depth"
+                                          Width="140"
+                                          Binding="{Binding DepthText}"
+                                          x:DataType="models:LiquidityVenueItem" />
+                    </DataGrid.Columns>
+                  </DataGrid>
+
+                  <DataGrid Classes="terminal-grid trade-grid"
+                            ItemsSource="{Binding PositionSummaries}"
+                            AutoGenerateColumns="False"
+                            HeadersVisibility="Column"
+                            IsReadOnly="True"
+                            CanUserResizeColumns="False"
+                            CanUserReorderColumns="False"
+                            CanUserSortColumns="False"
+                            RowHeight="42"
+                            IsVisible="{Binding IsPositionsPanelSelected}">
+                    <DataGrid.Columns>
+                      <DataGridTextColumn Header="Market"
+                                          Width="*"
+                                          Binding="{Binding MarketText}"
+                                          x:DataType="models:PositionSummaryItem" />
+                      <DataGridTextColumn Header="Balance"
+                                          Width="170"
+                                          Binding="{Binding BalanceText}"
+                                          x:DataType="models:PositionSummaryItem" />
+                      <DataGridTextColumn Header="Avg Entry"
+                                          Width="120"
+                                          Binding="{Binding AverageEntryText}"
+                                          x:DataType="models:PositionSummaryItem" />
+                      <DataGridTextColumn Header="Mark"
+                                          Width="120"
+                                          Binding="{Binding MarkText}"
+                                          x:DataType="models:PositionSummaryItem" />
+                      <DataGridTemplateColumn Header="PnL"
+                                              Width="120"
+                                              x:DataType="models:PositionSummaryItem">
+                        <DataGridTemplateColumn.CellTemplate>
+                          <DataTemplate x:DataType="models:PositionSummaryItem">
+                            <Grid>
+                              <TextBlock Classes="muted"
+                                         Text="{Binding PnlText}"
+                                         IsVisible="{Binding IsNeutral}" />
+                              <TextBlock Classes="positive"
+                                         Text="{Binding PnlText}"
+                                         IsVisible="{Binding IsPositive}" />
+                              <TextBlock Classes="negative"
+                                         Text="{Binding PnlText}"
+                                         IsVisible="{Binding IsNegative}" />
+                            </Grid>
+                          </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                      </DataGridTemplateColumn>
+                    </DataGrid.Columns>
+                  </DataGrid>
+
+                  <DataGrid Classes="terminal-grid trade-grid"
+                            ItemsSource="{Binding OrderLedger}"
+                            AutoGenerateColumns="False"
+                            HeadersVisibility="Column"
+                            IsReadOnly="True"
+                            CanUserResizeColumns="False"
+                            CanUserReorderColumns="False"
+                            CanUserSortColumns="False"
+                            RowHeight="42"
+                            IsVisible="{Binding IsOrdersPanelSelected}">
+                    <DataGrid.Columns>
+                      <DataGridTextColumn Header="Time"
+                                          Width="98"
+                                          Binding="{Binding TimeText}"
+                                          x:DataType="models:OrderLedgerItem" />
+                      <DataGridTextColumn Header="Market"
+                                          Width="*"
+                                          Binding="{Binding MarketText}"
+                                          x:DataType="models:OrderLedgerItem" />
+                      <DataGridTemplateColumn Header="Side"
+                                              Width="100"
+                                              x:DataType="models:OrderLedgerItem">
+                        <DataGridTemplateColumn.CellTemplate>
+                          <DataTemplate x:DataType="models:OrderLedgerItem">
+                            <Grid>
+                              <TextBlock Classes="muted"
+                                         Text="{Binding Side}"
+                                         IsVisible="{Binding IsNeutral}" />
+                              <TextBlock Classes="positive"
+                                         Text="{Binding Side}"
+                                         IsVisible="{Binding IsBuy}" />
+                              <TextBlock Classes="negative"
+                                         Text="{Binding Side}"
+                                         IsVisible="{Binding IsSell}" />
+                            </Grid>
+                          </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                      </DataGridTemplateColumn>
+                      <DataGridTextColumn Header="Amount"
+                                          Width="180"
+                                          Binding="{Binding AmountText}"
+                                          x:DataType="models:OrderLedgerItem" />
+                      <DataGridTextColumn Header="Quote"
+                                          Width="140"
+                                          Binding="{Binding QuoteText}"
+                                          x:DataType="models:OrderLedgerItem" />
+                      <DataGridTextColumn Header="Status"
+                                          Width="*"
+                                          Binding="{Binding StatusText}"
+                                          x:DataType="models:OrderLedgerItem" />
+                    </DataGrid.Columns>
+                  </DataGrid>
+                </Grid>
+              </Grid>
+            </Border>
+          </Grid>
+
+          <GridSplitter x:Name="RightPanelSplitter"
+                        Grid.Column="3"
+                        Classes="terminal-splitter"
+                        HorizontalAlignment="Stretch"
+                        ResizeDirection="Columns"
+                        ResizeBehavior="PreviousAndNext" />
+
+          <Border Grid.Column="4"
+                  Classes="right-panel"
+                  Padding="10,10,10,8">
+            <Grid RowDefinitions="Auto,Auto,*,Auto"
+                  ClipToBounds="False">
+              <Border x:Name="RightSearchStrip"
+                      Classes="strip-box"
+                      Padding="10,8">
+                <Grid ColumnDefinitions="*,Auto,Auto"
+                      ColumnSpacing="8">
+                  <TextBox Classes="strip-search-field"
+                           Watermark="Filter symbols"
+                           Text="{Binding WatchlistFilterText, Mode=TwoWay}" />
+                  <Border Grid.Column="1"
+                          Classes="metric-badge"
+                          Padding="10,4"
+                          VerticalAlignment="Center">
+                    <TextBlock Text="{Binding SocialMentions}" />
+                  </Border>
+                  <Button x:Name="OrderTicketToggleButton"
+                          Grid.Column="2"
+                          Classes="strip-action-button"
+                          Command="{Binding ToggleOrderTicketCommand}"
+                          ToolTip.Tip="Show or hide the floating order ticket."
+                          Content="{Binding OrderTicketToggleText}" />
+                </Grid>
+              </Border>
+
+              <Border Grid.Row="1"
+                      Margin="0,8,0,0"
+                      Classes="panel-box"
+                      Padding="10">
+                <Grid RowDefinitions="Auto,Auto,Auto"
+                      RowSpacing="12">
+                  <Border Classes="metric-strip"
+                          Padding="10,8">
+                    <Grid RowDefinitions="Auto,Auto"
+                          ColumnDefinitions="*,Auto"
+                          RowSpacing="2">
+                      <TextBlock Classes="panel-title"
+                                 Text="{Binding ActiveSectionTitleText}" />
+                      <TextBlock Grid.Row="1"
+                                 Classes="metric-subtle"
+                                 Text="{Binding ActiveSectionDescriptionText}"
+                                 TextWrapping="Wrap" />
+                      <Border Grid.Column="1"
+                              Grid.RowSpan="2"
+                              Classes="metric-badge">
+                        <TextBlock Text="{Binding SocialMentions}" />
+                      </Border>
+                    </Grid>
+                  </Border>
+
+                  <Grid Grid.Row="1"
+                        ColumnDefinitions="*,*,*,*"
+                        ColumnSpacing="8">
+                    <StackPanel Spacing="1">
+                      <StackPanel Orientation="Horizontal"
+                                  Spacing="4">
+                        <TextBlock Classes="metric-subtle"
+                                   Text="24h Open" />
+                        <Viewbox Width="10"
+                                 Height="10"
+                                 VerticalAlignment="Center">
+                          <Path Classes="inline-icon"
+                                Data="{StaticResource FluentInfo16RegularGeometry}" />
+                        </Viewbox>
+                      </StackPanel>
+                      <TextBlock Classes="metric-value"
+                                 Text="{Binding MarketCapText}" />
+                    </StackPanel>
+                    <StackPanel Grid.Column="1"
+                                Spacing="1">
+                      <StackPanel Orientation="Horizontal"
+                                  Spacing="4">
+                        <TextBlock Classes="metric-subtle"
+                                   Text="24h High" />
+                        <Viewbox Width="10"
+                                 Height="10"
+                                 VerticalAlignment="Center">
+                          <Path Classes="inline-icon"
+                                Data="{StaticResource FluentInfo16RegularGeometry}" />
+                        </Viewbox>
+                      </StackPanel>
+                      <TextBlock Classes="metric-value"
+                                 Text="{Binding FullyDilutedValueText}" />
+                    </StackPanel>
+                    <StackPanel Grid.Column="2"
+                                Spacing="1">
+                      <StackPanel Orientation="Horizontal"
+                                  Spacing="4">
+                        <TextBlock Classes="metric-subtle"
+                                   Text="24h Low" />
+                        <Viewbox Width="10"
+                                 Height="10"
+                                 VerticalAlignment="Center">
+                          <Path Classes="inline-icon"
+                                Data="{StaticResource FluentInfo16RegularGeometry}" />
+                        </Viewbox>
+                      </StackPanel>
+                      <TextBlock Classes="metric-value"
+                                 Text="{Binding LiquidityText}" />
+                    </StackPanel>
+                    <StackPanel Grid.Column="3"
+                                Spacing="1">
+                      <StackPanel Orientation="Horizontal"
+                                  Spacing="4">
+                        <TextBlock Classes="metric-subtle"
+                                   Text="24h Quote Vol" />
+                        <Viewbox Width="10"
+                                 Height="10"
+                                 VerticalAlignment="Center">
+                          <Path Classes="inline-icon"
+                                Data="{StaticResource FluentInfo16RegularGeometry}" />
+                        </Viewbox>
+                      </StackPanel>
+                      <TextBlock Classes="metric-value"
+                                 Text="{Binding TwentyFourHourVolumeText}" />
+                    </StackPanel>
+                  </Grid>
+
+                  <Grid Grid.Row="2"
+                        ColumnDefinitions="*,*,*,*"
+                        ColumnSpacing="8">
+                    <StackPanel Spacing="1">
+                      <TextBlock Classes="metric-subtle"
+                                 Text="Best Bid" />
+                      <TextBlock Classes="positive"
+                                 Text="{Binding HoneypotStatusText}" />
+                    </StackPanel>
+                    <StackPanel Grid.Column="1"
+                                Spacing="1">
+                      <TextBlock Classes="metric-subtle"
+                                 Text="Best Ask" />
+                      <TextBlock Classes="positive"
+                                 Text="{Binding VerifiedStatusText}" />
+                    </StackPanel>
+                    <StackPanel Grid.Column="2"
+                                Spacing="1">
+                      <TextBlock Classes="metric-subtle"
+                                 Text="24h Base Vol" />
+                      <TextBlock Classes="positive"
+                                 Text="{Binding RugPullStatusText}" />
+                    </StackPanel>
+                    <StackPanel Grid.Column="3"
+                                Spacing="1">
+                      <TextBlock Classes="metric-subtle"
+                                 Text="Trades" />
+                      <TextBlock Classes="positive"
+                                 Text="{Binding FakeTokenStatusText}" />
+                    </StackPanel>
+                  </Grid>
+                </Grid>
+              </Border>
+
+              <Border Grid.Row="2"
+                      Margin="0,250,0,0"
+                      Classes="panel-box"
+                      Padding="12"
+                      VerticalAlignment="Top">
+                <Grid RowDefinitions="Auto,Auto,Auto,*"
+                      RowSpacing="10">
+                  <TextBlock Classes="panel-title"
+                             Text="Market Flow" />
+
+                  <Grid Grid.Row="1"
+                        ColumnDefinitions="*,*,*"
+                        ColumnSpacing="12">
+                    <StackPanel Spacing="1">
+                      <TextBlock Classes="metric-subtle"
+                                 Text="Vol" />
+                      <TextBlock Text="{Binding VolumeBreakdownText}" />
+                    </StackPanel>
+                    <StackPanel Grid.Column="1"
+                                Spacing="1">
+                      <TextBlock Classes="metric-subtle"
+                                 Text="Buys" />
+                      <TextBlock Classes="positive"
+                                 Text="{Binding BuyerCountText}" />
+                    </StackPanel>
+                    <StackPanel Grid.Column="2"
+                                Spacing="1">
+                      <TextBlock Classes="metric-subtle"
+                                 Text="Sells" />
+                      <TextBlock Classes="negative"
+                                 Text="{Binding SellerCountText}" />
+                    </StackPanel>
+                  </Grid>
+
+                  <Grid Grid.Row="2"
+                        ColumnDefinitions="*,*"
+                        ColumnSpacing="12">
+                    <StackPanel Spacing="1">
+                      <TextBlock Classes="metric-subtle"
+                                 Text="Recent Trades" />
+                      <TextBlock Text="{Binding UniqueTraderText}" />
+                    </StackPanel>
+                    <StackPanel Grid.Column="1"
+                                Spacing="1">
+                      <TextBlock Classes="metric-subtle"
+                                 Text="5m Net Inflow" />
+                      <TextBlock Classes="positive"
+                                 Text="{Binding NetFlowText}" />
+                    </StackPanel>
+                  </Grid>
+
+                  <charts:ProChartView x:Name="FlowChartView"
+                                       Grid.Row="3"
+                                       EnablePanZoom="False"
+                                       ChartModel="{Binding FlowChart}"
+                                       ChartStyle="{Binding FlowChartStyle}"
+                                       ToolTipFormatter="{Binding FlowToolTipFormatter}" />
+                </Grid>
+              </Border>
+
+              <Grid Grid.Row="3"
+                    Margin="0,10,0,0"
+                    ColumnDefinitions="*,Auto,Auto,Auto"
+                    ColumnSpacing="8"
+                    VerticalAlignment="Bottom">
+                <TextBlock Classes="metric-subtle"
+                           VerticalAlignment="Center"
+                           Text="Flow Lens" />
+                <Button Grid.Column="1"
+                        Classes="flow-lens-button"
+                        Classes.active="{Binding IsNetFlowLensSelected}"
+                        Command="{Binding SelectFlowLensCommand}"
+                        CommandParameter="{x:Static models:MarketFlowLens.Net}"
+                        ToolTip.Tip="Show the net market-flow curve."
+                        Content="Net" />
+                <Button Grid.Column="2"
+                        Classes="flow-lens-button"
+                        Classes.active="{Binding IsBuyFlowLensSelected}"
+                        Command="{Binding SelectFlowLensCommand}"
+                        CommandParameter="{x:Static models:MarketFlowLens.BuyVolume}"
+                        ToolTip.Tip="Show the buy-side flow curve."
+                        Content="Buy" />
+                <Button Grid.Column="3"
+                        Classes="flow-lens-button"
+                        Classes.active="{Binding IsSellFlowLensSelected}"
+                        Command="{Binding SelectFlowLensCommand}"
+                        CommandParameter="{x:Static models:MarketFlowLens.SellVolume}"
+                        ToolTip.Tip="Show the sell-side flow curve."
+                        Content="Sell" />
+              </Grid>
+            </Grid>
+          </Border>
+
+          <Border x:Name="OrderTicket"
+                  Grid.Column="2"
+                  Grid.ColumnSpan="3"
+                  Width="330"
+                  Margin="0,180,-22,0"
+                  HorizontalAlignment="Right"
+                  VerticalAlignment="Top"
+                  IsVisible="{Binding IsOrderTicketVisible}"
+                  Classes="order-ticket-shell">
+            <Border Classes="order-ticket-inner"
+                    Padding="12">
+              <Grid RowDefinitions="Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto"
+                    RowSpacing="10">
+                <Grid ColumnDefinitions="*,Auto"
+                      ColumnSpacing="10">
+                  <TextBlock Classes="panel-title"
+                             VerticalAlignment="Center"
+                             Text="{Binding OrderTicketTitleText}" />
+                  <Button Grid.Column="1"
+                          Classes="ticket-close-button"
+                          Command="{Binding HideOrderTicketCommand}"
+                          ToolTip.Tip="Close the floating order ticket."
+                          ContentTemplate="{x:Null}">
+                    <Viewbox Width="12"
+                             Height="12">
+                      <Path Classes="fluent-icon"
+                            Data="{StaticResource FluentDismiss16RegularGeometry}" />
+                    </Viewbox>
+                  </Button>
+                </Grid>
+
+                <Grid Grid.Row="1"
+                      ColumnDefinitions="*,*"
+                      ColumnSpacing="10">
+                  <RadioButton x:Name="BuyOrderToggleButton"
+                               Classes="order-toggle"
+                               GroupName="OrderSide"
+                               Content="Buy"
+                               ToolTip.Tip="Prepare a simulated buy order for the selected market."
+                               IsChecked="{Binding IsBuyOrderSelected}" />
+                  <RadioButton Grid.Column="1"
+                               x:Name="SellOrderToggleButton"
+                               Classes="order-toggle"
+                               GroupName="OrderSide"
+                               Content="Sell"
+                               ToolTip.Tip="Prepare a simulated sell order for the selected market."
+                               IsChecked="{Binding IsSellOrderSelected}" />
+                </Grid>
+
+                <Grid Grid.Row="2"
+                      ColumnDefinitions="*,92"
+                      ColumnSpacing="10">
+                  <TextBox Classes="trade-field"
+                           Watermark="Amount"
+                           ToolTip.Tip="Enter the base-asset amount for the simulated order."
+                           Text="{Binding OrderAmountText, Mode=TwoWay}" />
+                  <ComboBox Grid.Column="1"
+                            Classes="trade-field"
+                            ItemsSource="{Binding QuoteAssets}"
+                            ToolTip.Tip="Choose the quote asset used for the simulated order."
+                            SelectedItem="{Binding SelectedQuoteAsset}" />
+                </Grid>
+
+                <TextBlock Grid.Row="3"
+                           Classes="metric-subtle"
+                           Text="{Binding OrderPreviewText}" />
+
+                <Grid Grid.Row="4"
+                      ColumnDefinitions="*,*,*,*"
+                      ColumnSpacing="8">
+                  <Button Classes="micro-pill"
+                          Command="{Binding QuickOrderAmountCommand}"
+                          CommandParameter="0.1"
+                          ToolTip.Tip="Set the order amount to 0.1 units."
+                          Content="0.1" />
+                  <Button Grid.Column="1"
+                          Classes="micro-pill"
+                          Command="{Binding QuickOrderAmountCommand}"
+                          CommandParameter="0.5"
+                          ToolTip.Tip="Set the order amount to 0.5 units."
+                          Content="0.5" />
+                  <Button Grid.Column="2"
+                          Classes="micro-pill"
+                          Command="{Binding QuickOrderAmountCommand}"
+                          CommandParameter="1"
+                          ToolTip.Tip="Set the order amount to 1 unit."
+                          Content="1" />
+                  <Button Grid.Column="3"
+                          Classes="micro-pill"
+                          Command="{Binding QuickOrderAmountCommand}"
+                          CommandParameter="2"
+                          ToolTip.Tip="Set the order amount to 2 units."
+                          Content="2" />
+                </Grid>
+
+                <Button Grid.Row="5"
+                        Classes="wallet-button"
+                        Command="{Binding PrimaryOrderActionCommand}"
+                        ToolTip.Tip="Connect the simulated wallet or place the configured order."
+                        Content="{Binding PrimaryOrderActionText}" />
+
+                <Grid Grid.Row="6"
+                      ColumnDefinitions="*,*"
+                      ColumnSpacing="10">
+                  <TextBlock Classes="muted"
+                             Text="{Binding FeePercentText, StringFormat='≈ {0}'}" />
+                  <TextBlock Grid.Column="1"
+                             Classes="muted"
+                             HorizontalAlignment="Right"
+                             Text="{Binding GasFeeText}" />
+                </Grid>
+
+                <Grid Grid.Row="7"
+                      RowDefinitions="Auto,Auto"
+                      RowSpacing="6">
+                  <Grid ColumnDefinitions="Auto,*">
+                    <TextBlock Classes="metric-subtle"
+                               Text="Wallet" />
+                    <TextBlock Grid.Column="1"
+                               Margin="8,0,0,0"
+                               Classes="muted"
+                               Text="{Binding WalletStatusText}" />
+                  </Grid>
+                  <Grid Grid.Row="1">
+                    <TextBlock Classes="metric-subtle"
+                               Text="{Binding OrderStatusText}"
+                               IsVisible="{Binding OrderStatusNeutral}" />
+                    <TextBlock Classes="positive"
+                               Text="{Binding OrderStatusText}"
+                               IsVisible="{Binding OrderStatusPositive}" />
+                    <TextBlock Classes="negative"
+                               Text="{Binding OrderStatusText}"
+                               IsVisible="{Binding OrderStatusNegative}" />
+                  </Grid>
+                </Grid>
+
+                <Border Grid.Row="8"
+                        BorderBrush="{StaticResource DashboardSeparatorBrush}"
+                        BorderThickness="0,1,0,1"
+                        Padding="0,10">
+                  <Grid ColumnDefinitions="*,*,*,*"
+                        ColumnSpacing="10">
+                    <StackPanel Spacing="1">
+                      <StackPanel Orientation="Horizontal"
+                                  Spacing="4">
+                        <TextBlock Classes="metric-subtle"
+                                   Text="Bought" />
+                        <Viewbox Width="10"
+                                 Height="10"
+                                 VerticalAlignment="Center">
+                          <Path Classes="inline-icon"
+                                Data="{StaticResource FluentInfo16RegularGeometry}" />
+                        </Viewbox>
+                      </StackPanel>
+                      <TextBlock Text="{Binding BoughtSummaryText}" />
+                    </StackPanel>
+                    <StackPanel Grid.Column="1"
+                                Spacing="1">
+                      <StackPanel Orientation="Horizontal"
+                                  Spacing="4">
+                        <TextBlock Classes="metric-subtle"
+                                   Text="Sold" />
+                        <Viewbox Width="10"
+                                 Height="10"
+                                 VerticalAlignment="Center">
+                          <Path Classes="inline-icon"
+                                Data="{StaticResource FluentInfo16RegularGeometry}" />
+                        </Viewbox>
+                      </StackPanel>
+                      <TextBlock Text="{Binding SoldSummaryText}" />
+                    </StackPanel>
+                    <StackPanel Grid.Column="2"
+                                Spacing="1">
+                      <StackPanel Orientation="Horizontal"
+                                  Spacing="4">
+                        <TextBlock Classes="metric-subtle"
+                                   Text="Balance" />
+                        <Viewbox Width="10"
+                                 Height="10"
+                                 VerticalAlignment="Center">
+                          <Path Classes="inline-icon"
+                                Data="{StaticResource FluentInfo16RegularGeometry}" />
+                        </Viewbox>
+                      </StackPanel>
+                      <TextBlock Text="{Binding BalanceSummaryText}" />
+                    </StackPanel>
+                    <StackPanel Grid.Column="3"
+                                Spacing="1">
+                      <StackPanel Orientation="Horizontal"
+                                  Spacing="4">
+                        <TextBlock Classes="metric-subtle"
+                                   Text="TPnL" />
+                        <Viewbox Width="10"
+                                 Height="10"
+                                 VerticalAlignment="Center">
+                          <Path Classes="inline-icon"
+                                Data="{StaticResource FluentInfo16RegularGeometry}" />
+                        </Viewbox>
+                      </StackPanel>
+                      <TextBlock Text="{Binding TpnlSummaryText}" />
+                    </StackPanel>
+                  </Grid>
+                </Border>
+
+                <Grid Grid.Row="9"
+                      RowDefinitions="Auto,Auto"
+                      RowSpacing="8">
+                  <Grid ColumnDefinitions="*,*,*"
+                        ColumnSpacing="12">
+                    <StackPanel Spacing="1">
+                      <TextBlock Classes="metric-subtle"
+                                 Text="Vol" />
+                      <TextBlock Text="{Binding VolumeBreakdownText}" />
+                    </StackPanel>
+                    <StackPanel Grid.Column="1"
+                                Spacing="1">
+                      <TextBlock Classes="metric-subtle"
+                                 Text="Buys" />
+                      <TextBlock Classes="positive"
+                                 Text="{Binding BuyerCountText}" />
+                    </StackPanel>
+                    <StackPanel Grid.Column="2"
+                                Spacing="1">
+                      <TextBlock Classes="metric-subtle"
+                                 Text="Sells" />
+                      <TextBlock Classes="negative"
+                                 Text="{Binding SellerCountText}" />
+                    </StackPanel>
+                  </Grid>
+
+                  <Grid Grid.Row="1"
+                        ColumnDefinitions="*,*,*"
+                        ColumnSpacing="12">
+                    <StackPanel Spacing="1">
+                      <TextBlock Classes="metric-subtle"
+                                 Text="Recent Trades" />
+                      <TextBlock Text="{Binding UniqueTraderText}" />
+                    </StackPanel>
+                    <StackPanel Grid.Column="1"
+                                Spacing="1">
+                      <TextBlock Classes="metric-subtle"
+                                 Text="Net Flow" />
+                      <TextBlock Text="{Binding NetFlowText}" />
+                    </StackPanel>
+                    <StackPanel Grid.Column="2"
+                                Spacing="1">
+                      <TextBlock Classes="metric-subtle"
+                                 Text="Pair" />
+                      <TextBlock Text="{Binding PairTicker}" />
+                    </StackPanel>
+                  </Grid>
+                </Grid>
+              </Grid>
+            </Border>
+          </Border>
+        </Grid>
+      </Grid>
+    </Border>
+  </Grid>
+</Window>

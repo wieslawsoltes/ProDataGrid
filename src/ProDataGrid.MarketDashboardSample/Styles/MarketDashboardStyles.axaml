@@ -1,0 +1,718 @@
+<Styles xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+  <Styles.Resources>
+    <LinearGradientBrush x:Key="DashboardWindowBrush" StartPoint="0,0" EndPoint="1,1">
+      <GradientStop Color="#4650A8" Offset="0" />
+      <GradientStop Color="#2B347B" Offset="0.52" />
+      <GradientStop Color="#1A214E" Offset="1" />
+    </LinearGradientBrush>
+
+    <SolidColorBrush x:Key="DashboardFrameBrush" Color="#0D1423" />
+    <SolidColorBrush x:Key="DashboardPanelBrush" Color="#101827" />
+    <SolidColorBrush x:Key="DashboardPanelSoftBrush" Color="#121B2D" />
+    <SolidColorBrush x:Key="DashboardInputBrush" Color="#2D3246" />
+    <SolidColorBrush x:Key="DashboardSeparatorBrush" Color="#263042" />
+    <SolidColorBrush x:Key="DashboardTextBrush" Color="#F2F5FF" />
+    <SolidColorBrush x:Key="DashboardMutedBrush" Color="#8A95B8" />
+    <SolidColorBrush x:Key="DashboardSubtleBrush" Color="#5A678B" />
+    <SolidColorBrush x:Key="DashboardPositiveBrush" Color="#1DE0A8" />
+    <SolidColorBrush x:Key="DashboardNegativeBrush" Color="#FF5E74" />
+    <SolidColorBrush x:Key="DashboardBlueBrush" Color="#4A68FF" />
+    <SolidColorBrush x:Key="DashboardBlueSoftBrush" Color="#253C82" />
+    <SolidColorBrush x:Key="DashboardGreenBrush" Color="#2CC98B" />
+    <SolidColorBrush x:Key="DashboardGreenSoftBrush" Color="#153E37" />
+    <SolidColorBrush x:Key="DashboardTicketGlowBrush" Color="#67E9F2" />
+
+    <LinearGradientBrush x:Key="SocialMentionsBrush" StartPoint="0,0" EndPoint="1,0">
+      <GradientStop Color="#1B2EA9" Offset="0" />
+      <GradientStop Color="#380045" Offset="1" />
+    </LinearGradientBrush>
+  </Styles.Resources>
+
+  <Style Selector="Window">
+    <Setter Property="Background" Value="{StaticResource DashboardWindowBrush}" />
+    <Setter Property="Foreground" Value="{StaticResource DashboardTextBrush}" />
+  </Style>
+
+  <Style Selector="Border.terminal-frame">
+    <Setter Property="Background" Value="{StaticResource DashboardFrameBrush}" />
+    <Setter Property="BorderBrush" Value="#F2E9AF" />
+    <Setter Property="BorderThickness" Value="1" />
+    <Setter Property="CornerRadius" Value="2" />
+  </Style>
+
+  <Style Selector="Border.top-strip">
+    <Setter Property="Background" Value="#0A111D" />
+    <Setter Property="BorderBrush" Value="{StaticResource DashboardSeparatorBrush}" />
+    <Setter Property="BorderThickness" Value="0,0,0,1" />
+  </Style>
+
+  <Style Selector="Border.side-panel">
+    <Setter Property="Background" Value="#09101A" />
+    <Setter Property="BorderBrush" Value="{StaticResource DashboardSeparatorBrush}" />
+    <Setter Property="BorderThickness" Value="0,0,1,0" />
+  </Style>
+
+  <Style Selector="Border.right-panel">
+    <Setter Property="Background" Value="#0F1726" />
+    <Setter Property="BorderBrush" Value="{StaticResource DashboardSeparatorBrush}" />
+    <Setter Property="BorderThickness" Value="1,0,0,0" />
+  </Style>
+
+  <Style Selector="GridSplitter.terminal-splitter">
+    <Setter Property="Background" Value="#111A2B" />
+    <Setter Property="Opacity" Value="0.9" />
+    <Setter Property="MinWidth" Value="4" />
+  </Style>
+
+  <Style Selector="GridSplitter.terminal-horizontal-splitter">
+    <Setter Property="MinHeight" Value="4" />
+  </Style>
+
+  <Style Selector="GridSplitter.terminal-splitter:pointerover">
+    <Setter Property="Background" Value="#243B7E" />
+  </Style>
+
+  <Style Selector="Border.panel-box">
+    <Setter Property="Background" Value="{StaticResource DashboardPanelSoftBrush}" />
+    <Setter Property="BorderBrush" Value="{StaticResource DashboardSeparatorBrush}" />
+    <Setter Property="BorderThickness" Value="1" />
+    <Setter Property="CornerRadius" Value="10" />
+  </Style>
+
+  <Style Selector="Border.strip-box">
+    <Setter Property="Background" Value="#0E1625" />
+    <Setter Property="BorderBrush" Value="{StaticResource DashboardSeparatorBrush}" />
+    <Setter Property="BorderThickness" Value="1" />
+    <Setter Property="CornerRadius" Value="8" />
+  </Style>
+
+  <Style Selector="Border.top-nav-chip">
+    <Setter Property="Background" Value="Transparent" />
+    <Setter Property="Padding" Value="0,0,0,0" />
+  </Style>
+
+  <Style Selector="Border.top-nav-chip TextBlock">
+    <Setter Property="Foreground" Value="{StaticResource DashboardTextBrush}" />
+    <Setter Property="FontSize" Value="11" />
+  </Style>
+
+  <Style Selector="Button.top-nav-chip-button">
+    <Setter Property="Background" Value="Transparent" />
+    <Setter Property="BorderBrush" Value="Transparent" />
+    <Setter Property="BorderThickness" Value="0" />
+    <Setter Property="Padding" Value="0,0,0,0" />
+    <Setter Property="FontSize" Value="11" />
+    <Setter Property="Foreground" Value="{StaticResource DashboardTextBrush}" />
+  </Style>
+
+  <Style Selector="Button.top-nav-chip-button.active">
+    <Setter Property="Foreground" Value="#FFFFFF" />
+    <Setter Property="FontWeight" Value="SemiBold" />
+  </Style>
+
+  <Style Selector="Button.top-nav-chip-button:pointerover">
+    <Setter Property="Foreground" Value="#B9C3FF" />
+  </Style>
+
+  <Style Selector="Button.strip-icon-button">
+    <Setter Property="Background" Value="Transparent" />
+    <Setter Property="BorderBrush" Value="Transparent" />
+    <Setter Property="BorderThickness" Value="0" />
+    <Setter Property="Padding" Value="0" />
+    <Setter Property="Foreground" Value="{StaticResource DashboardSubtleBrush}" />
+    <Setter Property="FontSize" Value="12" />
+    <Setter Property="MinWidth" Value="18" />
+    <Setter Property="MinHeight" Value="18" />
+    <Setter Property="HorizontalContentAlignment" Value="Center" />
+    <Setter Property="VerticalContentAlignment" Value="Center" />
+  </Style>
+
+  <Style Selector="Button.strip-icon-button:pointerover">
+    <Setter Property="Foreground" Value="{StaticResource DashboardTextBrush}" />
+  </Style>
+
+  <Style Selector="Button.strip-icon-button:disabled">
+    <Setter Property="Opacity" Value="0.45" />
+  </Style>
+
+  <Style Selector="Path.fluent-icon">
+    <Setter Property="Fill" Value="{StaticResource DashboardMutedBrush}" />
+    <Setter Property="Stretch" Value="Uniform" />
+  </Style>
+
+  <Style Selector="Button.top-nav-chip-button Path.fluent-icon">
+    <Setter Property="Fill" Value="{StaticResource DashboardTextBrush}" />
+  </Style>
+
+  <Style Selector="Button.top-nav-chip-button.active Path.fluent-icon">
+    <Setter Property="Fill" Value="#FFFFFF" />
+  </Style>
+
+  <Style Selector="Button.top-nav-chip-button:pointerover Path.fluent-icon">
+    <Setter Property="Fill" Value="#B9C3FF" />
+  </Style>
+
+  <Style Selector="Button.strip-icon-button Path.fluent-icon">
+    <Setter Property="Fill" Value="{StaticResource DashboardSubtleBrush}" />
+  </Style>
+
+  <Style Selector="Button.strip-icon-button:pointerover Path.fluent-icon">
+    <Setter Property="Fill" Value="{StaticResource DashboardTextBrush}" />
+  </Style>
+
+  <Style Selector="Button.watchlist-favorite-button">
+    <Setter Property="Background" Value="Transparent" />
+    <Setter Property="BorderBrush" Value="Transparent" />
+    <Setter Property="BorderThickness" Value="0" />
+    <Setter Property="Padding" Value="0" />
+    <Setter Property="MinWidth" Value="18" />
+    <Setter Property="MinHeight" Value="18" />
+    <Setter Property="HorizontalAlignment" Value="Center" />
+    <Setter Property="VerticalAlignment" Value="Center" />
+    <Setter Property="Foreground" Value="#7382A9" />
+    <Setter Property="FontSize" Value="13" />
+  </Style>
+
+  <Style Selector="Button.watchlist-favorite-button:pointerover">
+    <Setter Property="Foreground" Value="#F4C95D" />
+  </Style>
+
+  <Style Selector="Button.watchlist-favorite-button.active">
+    <Setter Property="Foreground" Value="#F4C95D" />
+  </Style>
+
+  <Style Selector="Button.watchlist-favorite-button Path.fluent-icon">
+    <Setter Property="Fill" Value="#7382A9" />
+  </Style>
+
+  <Style Selector="Button.watchlist-favorite-button:pointerover Path.fluent-icon">
+    <Setter Property="Fill" Value="#F4C95D" />
+  </Style>
+
+  <Style Selector="Button.watchlist-favorite-button.active Path.fluent-icon">
+    <Setter Property="Fill" Value="#F4C95D" />
+  </Style>
+
+  <Style Selector="Border.small-chip">
+    <Setter Property="Background" Value="#182238" />
+    <Setter Property="BorderBrush" Value="#25314A" />
+    <Setter Property="BorderThickness" Value="1" />
+    <Setter Property="CornerRadius" Value="8" />
+    <Setter Property="Padding" Value="8,4" />
+  </Style>
+
+  <Style Selector="Border.small-chip.active">
+    <Setter Property="Background" Value="#253569" />
+    <Setter Property="BorderBrush" Value="#3554CC" />
+  </Style>
+
+  <Style Selector="Border.small-chip.ghost">
+    <Setter Property="Background" Value="Transparent" />
+    <Setter Property="BorderBrush" Value="Transparent" />
+  </Style>
+
+  <Style Selector="Border.small-chip TextBlock">
+    <Setter Property="FontSize" Value="11" />
+    <Setter Property="FontWeight" Value="SemiBold" />
+  </Style>
+
+  <Style Selector="Button.small-chip-button">
+    <Setter Property="Background" Value="#182238" />
+    <Setter Property="BorderBrush" Value="#25314A" />
+    <Setter Property="BorderThickness" Value="1" />
+    <Setter Property="CornerRadius" Value="8" />
+    <Setter Property="Padding" Value="8,4" />
+    <Setter Property="FontSize" Value="11" />
+    <Setter Property="FontWeight" Value="SemiBold" />
+    <Setter Property="Foreground" Value="{StaticResource DashboardMutedBrush}" />
+  </Style>
+
+  <Style Selector="Button.small-chip-button.active">
+    <Setter Property="Background" Value="#253569" />
+    <Setter Property="BorderBrush" Value="#3554CC" />
+    <Setter Property="Foreground" Value="{StaticResource DashboardTextBrush}" />
+  </Style>
+
+  <Style Selector="Button.small-chip-button:pointerover">
+    <Setter Property="Foreground" Value="{StaticResource DashboardTextBrush}" />
+  </Style>
+
+  <Style Selector="ComboBox.watchlist-scope-box">
+    <Setter Property="Background" Value="#101726" />
+    <Setter Property="BorderBrush" Value="#1E2940" />
+    <Setter Property="BorderThickness" Value="1" />
+    <Setter Property="CornerRadius" Value="7" />
+    <Setter Property="Foreground" Value="{StaticResource DashboardMutedBrush}" />
+    <Setter Property="MinWidth" Value="66" />
+    <Setter Property="Padding" Value="6,2" />
+    <Setter Property="FontSize" Value="10" />
+  </Style>
+
+  <Style Selector="Border.micro-pill">
+    <Setter Property="Background" Value="#2A3040" />
+    <Setter Property="CornerRadius" Value="8" />
+    <Setter Property="Padding" Value="10,4" />
+  </Style>
+
+  <Style Selector="Border.micro-pill TextBlock">
+    <Setter Property="HorizontalAlignment" Value="Center" />
+    <Setter Property="FontWeight" Value="SemiBold" />
+  </Style>
+
+  <Style Selector="Button.micro-pill">
+    <Setter Property="Background" Value="#2A3040" />
+    <Setter Property="BorderBrush" Value="#2A3040" />
+    <Setter Property="BorderThickness" Value="1" />
+    <Setter Property="CornerRadius" Value="8" />
+    <Setter Property="Padding" Value="10,4" />
+    <Setter Property="FontWeight" Value="SemiBold" />
+  </Style>
+
+  <Style Selector="Button.micro-pill:pointerover">
+    <Setter Property="Background" Value="#39425A" />
+    <Setter Property="BorderBrush" Value="#4C5571" />
+  </Style>
+
+  <Style Selector="Border.metric-strip">
+    <Setter Property="Background" Value="{StaticResource SocialMentionsBrush}" />
+    <Setter Property="BorderBrush" Value="#2E3F74" />
+    <Setter Property="BorderThickness" Value="1" />
+    <Setter Property="CornerRadius" Value="8" />
+  </Style>
+
+  <Style Selector="Border.metric-badge">
+    <Setter Property="Background" Value="#4974FF" />
+    <Setter Property="CornerRadius" Value="10" />
+    <Setter Property="Padding" Value="10,2" />
+  </Style>
+
+  <Style Selector="Border.metric-badge TextBlock">
+    <Setter Property="FontWeight" Value="Bold" />
+  </Style>
+
+  <Style Selector="Border.metric-status-pill">
+    <Setter Property="Background" Value="Transparent" />
+    <Setter Property="CornerRadius" Value="8" />
+  </Style>
+
+  <Style Selector="Border.order-ticket-shell">
+    <Setter Property="Background" Value="#0D1322" />
+    <Setter Property="BorderBrush" Value="{StaticResource DashboardTicketGlowBrush}" />
+    <Setter Property="BorderThickness" Value="2" />
+    <Setter Property="CornerRadius" Value="16" />
+  </Style>
+
+  <Style Selector="Border.order-ticket-inner">
+    <Setter Property="Background" Value="#111A2B" />
+    <Setter Property="BorderBrush" Value="#7E4EF8" />
+    <Setter Property="BorderThickness" Value="1" />
+    <Setter Property="CornerRadius" Value="14" />
+  </Style>
+
+  <Style Selector="TextBlock.brand-title">
+    <Setter Property="FontSize" Value="25" />
+    <Setter Property="FontWeight" Value="Bold" />
+  </Style>
+
+  <Style Selector="TextBlock.panel-title">
+    <Setter Property="FontSize" Value="13" />
+    <Setter Property="FontWeight" Value="SemiBold" />
+  </Style>
+
+  <Style Selector="TextBlock.section-title">
+    <Setter Property="FontSize" Value="12" />
+    <Setter Property="FontWeight" Value="SemiBold" />
+  </Style>
+
+  <Style Selector="TextBlock.hero-price">
+    <Setter Property="FontSize" Value="17" />
+    <Setter Property="FontWeight" Value="Bold" />
+  </Style>
+
+  <Style Selector="TextBlock.metric-value">
+    <Setter Property="FontSize" Value="15" />
+    <Setter Property="FontWeight" Value="Bold" />
+  </Style>
+
+  <Style Selector="TextBlock.metric-subtle">
+    <Setter Property="Foreground" Value="{StaticResource DashboardMutedBrush}" />
+    <Setter Property="FontSize" Value="11" />
+  </Style>
+
+  <Style Selector="TextBlock.muted">
+    <Setter Property="Foreground" Value="{StaticResource DashboardMutedBrush}" />
+  </Style>
+
+  <Style Selector="TextBlock.subtle">
+    <Setter Property="Foreground" Value="{StaticResource DashboardSubtleBrush}" />
+  </Style>
+
+  <Style Selector="TextBlock.positive">
+    <Setter Property="Foreground" Value="{StaticResource DashboardPositiveBrush}" />
+  </Style>
+
+  <Style Selector="TextBlock.negative">
+    <Setter Property="Foreground" Value="{StaticResource DashboardNegativeBrush}" />
+  </Style>
+
+  <Style Selector="TextBlock.linkish">
+    <Setter Property="Foreground" Value="#8091FF" />
+  </Style>
+
+  <Style Selector="Button.panel-tab-button">
+    <Setter Property="Background" Value="Transparent" />
+    <Setter Property="BorderBrush" Value="Transparent" />
+    <Setter Property="BorderThickness" Value="0" />
+    <Setter Property="Padding" Value="0" />
+    <Setter Property="Foreground" Value="{StaticResource DashboardMutedBrush}" />
+    <Setter Property="FontSize" Value="12" />
+    <Setter Property="FontWeight" Value="SemiBold" />
+  </Style>
+
+  <Style Selector="Button.panel-tab-button.active">
+    <Setter Property="Foreground" Value="{StaticResource DashboardTextBrush}" />
+  </Style>
+
+  <Style Selector="Button.panel-tab-button:pointerover">
+    <Setter Property="Foreground" Value="#B9C3FF" />
+  </Style>
+
+  <Style Selector="Button.watchlist-mode-button">
+    <Setter Property="Background" Value="Transparent" />
+    <Setter Property="BorderBrush" Value="Transparent" />
+    <Setter Property="BorderThickness" Value="0,0,0,1" />
+    <Setter Property="Padding" Value="0,0,0,2" />
+    <Setter Property="Foreground" Value="{StaticResource DashboardMutedBrush}" />
+    <Setter Property="FontSize" Value="10" />
+    <Setter Property="FontWeight" Value="SemiBold" />
+  </Style>
+
+  <Style Selector="Button.watchlist-mode-button.active">
+    <Setter Property="Foreground" Value="{StaticResource DashboardTextBrush}" />
+    <Setter Property="BorderBrush" Value="#4971FF" />
+  </Style>
+
+  <Style Selector="Button.watchlist-mode-button:pointerover">
+    <Setter Property="Foreground" Value="#C9D3FF" />
+  </Style>
+
+  <Style Selector="Button.watchlist-range-button">
+    <Setter Property="Background" Value="Transparent" />
+    <Setter Property="BorderBrush" Value="Transparent" />
+    <Setter Property="BorderThickness" Value="1" />
+    <Setter Property="CornerRadius" Value="6" />
+    <Setter Property="Padding" Value="5,2" />
+    <Setter Property="FontSize" Value="10" />
+    <Setter Property="FontWeight" Value="SemiBold" />
+    <Setter Property="Foreground" Value="{StaticResource DashboardMutedBrush}" />
+    <Setter Property="MinWidth" Value="28" />
+  </Style>
+
+  <Style Selector="Button.watchlist-range-button.active">
+    <Setter Property="Background" Value="#203154" />
+    <Setter Property="BorderBrush" Value="#496EFF" />
+    <Setter Property="Foreground" Value="{StaticResource DashboardTextBrush}" />
+  </Style>
+
+  <Style Selector="Button.watchlist-range-button:pointerover">
+    <Setter Property="Foreground" Value="{StaticResource DashboardTextBrush}" />
+    <Setter Property="BorderBrush" Value="#2A3A5C" />
+  </Style>
+
+  <Style Selector="Button.toolbar-link-button">
+    <Setter Property="Background" Value="Transparent" />
+    <Setter Property="BorderBrush" Value="Transparent" />
+    <Setter Property="BorderThickness" Value="0" />
+    <Setter Property="Padding" Value="0" />
+    <Setter Property="Foreground" Value="{StaticResource DashboardTextBrush}" />
+    <Setter Property="FontSize" Value="11" />
+  </Style>
+
+  <Style Selector="Button.toolbar-link-button.active">
+    <Setter Property="Foreground" Value="#8091FF" />
+    <Setter Property="FontWeight" Value="SemiBold" />
+  </Style>
+
+  <Style Selector="Button.toolbar-link-button:pointerover">
+    <Setter Property="Foreground" Value="#B9C3FF" />
+  </Style>
+
+  <Style Selector="Button.toolbar-link-button Path.fluent-icon">
+    <Setter Property="Fill" Value="{StaticResource DashboardTextBrush}" />
+  </Style>
+
+  <Style Selector="Button.toolbar-link-button.active Path.fluent-icon">
+    <Setter Property="Fill" Value="#8091FF" />
+  </Style>
+
+  <Style Selector="Button.toolbar-link-button:pointerover Path.fluent-icon">
+    <Setter Property="Fill" Value="#B9C3FF" />
+  </Style>
+
+  <Style Selector="RadioButton.chart-toggle">
+    <Setter Property="Background" Value="#343A4E" />
+    <Setter Property="BorderBrush" Value="#343A4E" />
+    <Setter Property="BorderThickness" Value="1" />
+    <Setter Property="CornerRadius" Value="6" />
+    <Setter Property="Padding" Value="8,4" />
+    <Setter Property="FontWeight" Value="SemiBold" />
+    <Setter Property="FontSize" Value="11" />
+  </Style>
+
+  <Style Selector="RadioButton.chart-toggle:checked">
+    <Setter Property="Background" Value="{StaticResource DashboardBlueBrush}" />
+    <Setter Property="BorderBrush" Value="{StaticResource DashboardBlueBrush}" />
+  </Style>
+
+  <Style Selector="Button.chart-nav-button">
+    <Setter Property="Background" Value="#182238" />
+    <Setter Property="BorderBrush" Value="#25314A" />
+    <Setter Property="BorderThickness" Value="1" />
+    <Setter Property="CornerRadius" Value="6" />
+    <Setter Property="Padding" Value="8,4" />
+    <Setter Property="FontWeight" Value="SemiBold" />
+    <Setter Property="FontSize" Value="11" />
+  </Style>
+
+  <Style Selector="Button.chart-nav-button:pointerover">
+    <Setter Property="Background" Value="#253569" />
+    <Setter Property="BorderBrush" Value="#3554CC" />
+  </Style>
+
+  <Style Selector="ToggleButton.dex-mode-toggle">
+    <Setter Property="Background" Value="#0E1625" />
+    <Setter Property="BorderBrush" Value="{StaticResource DashboardSeparatorBrush}" />
+    <Setter Property="BorderThickness" Value="1" />
+    <Setter Property="CornerRadius" Value="8" />
+    <Setter Property="Padding" Value="10,6" />
+  </Style>
+
+  <Style Selector="ToggleButton.dex-mode-toggle:pointerover">
+    <Setter Property="Background" Value="#182238" />
+  </Style>
+
+  <Style Selector="Button.tool-rail-button">
+    <Setter Property="Background" Value="Transparent" />
+    <Setter Property="BorderBrush" Value="Transparent" />
+    <Setter Property="BorderThickness" Value="0" />
+    <Setter Property="Padding" Value="1" />
+    <Setter Property="Foreground" Value="{StaticResource DashboardSubtleBrush}" />
+    <Setter Property="HorizontalContentAlignment" Value="Center" />
+    <Setter Property="VerticalContentAlignment" Value="Center" />
+    <Setter Property="MinWidth" Value="24" />
+    <Setter Property="MinHeight" Value="24" />
+  </Style>
+
+  <Style Selector="Button.tool-rail-button.active">
+    <Setter Property="Foreground" Value="#7FA2FF" />
+    <Setter Property="FontWeight" Value="Bold" />
+  </Style>
+
+  <Style Selector="Button.tool-rail-button:pointerover">
+    <Setter Property="Foreground" Value="{StaticResource DashboardTextBrush}" />
+  </Style>
+
+  <Style Selector="Button.tool-rail-button Path.fluent-icon">
+    <Setter Property="Fill" Value="{StaticResource DashboardSubtleBrush}" />
+  </Style>
+
+  <Style Selector="Button.tool-rail-button:pointerover Path.fluent-icon">
+    <Setter Property="Fill" Value="{StaticResource DashboardTextBrush}" />
+  </Style>
+
+  <Style Selector="Button.tool-rail-button.active Path.fluent-icon">
+    <Setter Property="Fill" Value="#7FA2FF" />
+  </Style>
+
+  <Style Selector="Button.flow-lens-button">
+    <Setter Property="Background" Value="#202636" />
+    <Setter Property="BorderBrush" Value="#202636" />
+    <Setter Property="BorderThickness" Value="1" />
+    <Setter Property="CornerRadius" Value="9" />
+    <Setter Property="Padding" Value="6,2" />
+    <Setter Property="FontSize" Value="10" />
+    <Setter Property="FontWeight" Value="SemiBold" />
+    <Setter Property="Foreground" Value="{StaticResource DashboardMutedBrush}" />
+    <Setter Property="MinWidth" Value="32" />
+  </Style>
+
+  <Style Selector="Button.flow-lens-button.active">
+    <Setter Property="Background" Value="#2949B7" />
+    <Setter Property="BorderBrush" Value="#2949B7" />
+    <Setter Property="Foreground" Value="{StaticResource DashboardTextBrush}" />
+  </Style>
+
+  <Style Selector="RadioButton.order-toggle">
+    <Setter Property="Background" Value="#3B3D4F" />
+    <Setter Property="BorderBrush" Value="#3B3D4F" />
+    <Setter Property="BorderThickness" Value="1" />
+    <Setter Property="CornerRadius" Value="8" />
+    <Setter Property="Padding" Value="12,9" />
+    <Setter Property="FontWeight" Value="SemiBold" />
+  </Style>
+
+  <Style Selector="RadioButton.order-toggle:checked">
+    <Setter Property="Background" Value="{StaticResource DashboardGreenBrush}" />
+    <Setter Property="BorderBrush" Value="{StaticResource DashboardGreenBrush}" />
+    <Setter Property="Foreground" Value="#041310" />
+  </Style>
+
+  <Style Selector="RadioButton.trade-toggle">
+    <Setter Property="Background" Value="#182238" />
+    <Setter Property="BorderBrush" Value="#25314A" />
+    <Setter Property="BorderThickness" Value="1" />
+    <Setter Property="CornerRadius" Value="8" />
+    <Setter Property="Padding" Value="10,4" />
+    <Setter Property="FontWeight" Value="SemiBold" />
+    <Setter Property="FontSize" Value="11" />
+  </Style>
+
+  <Style Selector="RadioButton.trade-toggle:checked">
+    <Setter Property="Background" Value="#253569" />
+    <Setter Property="BorderBrush" Value="#3554CC" />
+  </Style>
+
+  <Style Selector="TextBox.trade-field">
+    <Setter Property="Background" Value="{StaticResource DashboardInputBrush}" />
+    <Setter Property="BorderBrush" Value="{StaticResource DashboardInputBrush}" />
+    <Setter Property="Foreground" Value="{StaticResource DashboardTextBrush}" />
+    <Setter Property="CornerRadius" Value="10" />
+    <Setter Property="Padding" Value="10,8" />
+  </Style>
+
+  <Style Selector="ComboBox.trade-field">
+    <Setter Property="Background" Value="{StaticResource DashboardInputBrush}" />
+    <Setter Property="BorderBrush" Value="{StaticResource DashboardInputBrush}" />
+    <Setter Property="Foreground" Value="{StaticResource DashboardTextBrush}" />
+    <Setter Property="CornerRadius" Value="10" />
+  </Style>
+
+  <Style Selector="TextBox.strip-search-field">
+    <Setter Property="Background" Value="#101827" />
+    <Setter Property="BorderBrush" Value="#101827" />
+    <Setter Property="Foreground" Value="{StaticResource DashboardTextBrush}" />
+    <Setter Property="CornerRadius" Value="8" />
+    <Setter Property="Padding" Value="10,6" />
+  </Style>
+
+  <Style Selector="Button.strip-action-button">
+    <Setter Property="Background" Value="#1A2D61" />
+    <Setter Property="BorderBrush" Value="#3554CC" />
+    <Setter Property="BorderThickness" Value="1" />
+    <Setter Property="CornerRadius" Value="8" />
+    <Setter Property="Padding" Value="10,6" />
+    <Setter Property="FontWeight" Value="SemiBold" />
+    <Setter Property="FontSize" Value="11" />
+  </Style>
+
+  <Style Selector="Button.strip-action-button:pointerover">
+    <Setter Property="Background" Value="#223B81" />
+  </Style>
+
+  <Style Selector="Button.ticket-close-button">
+    <Setter Property="Background" Value="Transparent" />
+    <Setter Property="BorderBrush" Value="#25314A" />
+    <Setter Property="BorderThickness" Value="1" />
+    <Setter Property="CornerRadius" Value="8" />
+    <Setter Property="Padding" Value="8,2" />
+    <Setter Property="MinWidth" Value="28" />
+    <Setter Property="MinHeight" Value="24" />
+  </Style>
+
+  <Style Selector="Button.ticket-close-button:pointerover">
+    <Setter Property="Background" Value="#182238" />
+  </Style>
+
+  <Style Selector="Button.ticket-close-button Path.fluent-icon">
+    <Setter Property="Fill" Value="{StaticResource DashboardMutedBrush}" />
+  </Style>
+
+  <Style Selector="Button.ticket-close-button:pointerover Path.fluent-icon">
+    <Setter Property="Fill" Value="{StaticResource DashboardTextBrush}" />
+  </Style>
+
+  <Style Selector="Path.inline-icon">
+    <Setter Property="Fill" Value="{StaticResource DashboardMutedBrush}" />
+    <Setter Property="Stretch" Value="Uniform" />
+  </Style>
+
+  <Style Selector="Path.inline-icon.positive">
+    <Setter Property="Fill" Value="{StaticResource DashboardPositiveBrush}" />
+  </Style>
+
+  <Style Selector="Button.wallet-button">
+    <Setter Property="Background" Value="{StaticResource DashboardBlueBrush}" />
+    <Setter Property="BorderBrush" Value="{StaticResource DashboardBlueBrush}" />
+    <Setter Property="BorderThickness" Value="1" />
+    <Setter Property="CornerRadius" Value="10" />
+    <Setter Property="Padding" Value="14,10" />
+    <Setter Property="FontWeight" Value="Bold" />
+  </Style>
+
+  <Style Selector="Button.wallet-button:pointerover">
+    <Setter Property="Background" Value="#5E7BFF" />
+  </Style>
+
+  <Style Selector="DataGrid.terminal-grid">
+    <Setter Property="Background" Value="Transparent" />
+    <Setter Property="BorderBrush" Value="Transparent" />
+    <Setter Property="BorderThickness" Value="0" />
+    <Setter Property="Foreground" Value="{StaticResource DashboardTextBrush}" />
+    <Setter Property="GridLinesVisibility" Value="Horizontal" />
+    <Setter Property="HeadersVisibility" Value="Column" />
+  </Style>
+
+  <Style Selector="DataGrid.terminal-grid DataGridColumnHeader">
+    <Setter Property="Background" Value="#0C1320" />
+    <Setter Property="Foreground" Value="{StaticResource DashboardMutedBrush}" />
+    <Setter Property="BorderBrush" Value="{StaticResource DashboardSeparatorBrush}" />
+    <Setter Property="BorderThickness" Value="0,0,0,1" />
+    <Setter Property="Padding" Value="8,8" />
+    <Setter Property="FontWeight" Value="SemiBold" />
+    <Setter Property="FontSize" Value="11" />
+  </Style>
+
+  <Style Selector="DataGrid.terminal-grid DataGridCell">
+    <Setter Property="Background" Value="Transparent" />
+    <Setter Property="BorderBrush" Value="{StaticResource DashboardSeparatorBrush}" />
+    <Setter Property="BorderThickness" Value="0,0,0,1" />
+    <Setter Property="Padding" Value="8,8" />
+  </Style>
+
+  <Style Selector="DataGrid.terminal-grid DataGridRow">
+    <Setter Property="Background" Value="Transparent" />
+  </Style>
+
+  <Style Selector="DataGrid.terminal-grid DataGridRow:pointerover">
+    <Setter Property="Background" Value="#131D30" />
+  </Style>
+
+  <Style Selector="DataGrid.watchlist-grid DataGridColumnHeader">
+    <Setter Property="Background" Value="#0E1523" />
+    <Setter Property="Padding" Value="4,6" />
+    <Setter Property="FontSize" Value="10" />
+  </Style>
+
+  <Style Selector="DataGrid.watchlist-grid DataGridCell">
+    <Setter Property="Padding" Value="3,5" />
+  </Style>
+
+  <Style Selector="DataGrid.watchlist-grid DataGridRow:pointerover">
+    <Setter Property="Background" Value="#111A29" />
+  </Style>
+
+  <Style Selector="DataGrid.watchlist-grid DataGridRow:selected">
+    <Setter Property="Background" Value="#141F31" />
+  </Style>
+
+  <Style Selector="DataGrid.watchlist-grid DataGridRow">
+    <Setter Property="MinHeight" Value="40" />
+  </Style>
+
+  <Style Selector="DataGrid.trade-grid DataGridCell">
+    <Setter Property="Padding" Value="8,9" />
+  </Style>
+
+</Styles>

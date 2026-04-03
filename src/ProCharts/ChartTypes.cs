@@ -11,6 +11,16 @@ namespace ProCharts
         Column,
         Bar,
         Area,
+        Candlestick,
+        HollowCandlestick,
+        Ohlc,
+        Hlc,
+        HeikinAshi,
+        Renko,
+        Range,
+        LineBreak,
+        Kagi,
+        PointFigure,
         Scatter,
         Bubble,
         Waterfall,
@@ -87,6 +97,27 @@ namespace ProCharts
         MinMax,
         Lttb,
         Adaptive
+    }
+
+    /// <summary>
+    /// Determines which guide lines are rendered for the active crosshair overlay.
+    /// </summary>
+    public enum ChartCrosshairMode
+    {
+        Both,
+        VerticalOnly,
+        HorizontalOnly
+    }
+
+    /// <summary>
+    /// Selects the primary pointer workflow for interactive chart hosts.
+    /// </summary>
+    public enum ChartPointerTool
+    {
+        Crosshair,
+        Pan,
+        Zoom,
+        Measure
     }
 
     public enum ChartLineInterpolation

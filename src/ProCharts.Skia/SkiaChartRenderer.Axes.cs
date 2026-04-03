@@ -900,7 +900,12 @@ namespace ProCharts.Skia
                 {
                     foreach (var value in ticks)
                     {
-                        labels.Add(FormatAxisValue(value, axisKind, formatter, dateTimeFormat));
+                        labels.Add(FormatAxisValue(
+                            value,
+                            axisKind,
+                            formatter,
+                            isSecondary ? style.SecondaryAxisValueFormat : style.AxisValueFormat,
+                            dateTimeFormat));
                     }
 
                     var spacing = GetAxisLabelSpacing(ticks.Count, barOnly ? plot.Width : plot.Height, useBands: false);
@@ -995,7 +1000,7 @@ namespace ProCharts.Skia
                     {
                         foreach (var value in ticks)
                         {
-                            labels.Add(FormatCategoryAxisValue(value, axisKind, formatter, dateTimeFormat));
+                            labels.Add(FormatCategoryAxisValue(value, axisKind, formatter, style.CategoryAxisValueFormat, dateTimeFormat));
                         }
 
                         var numericSpacing = GetAxisLabelSpacing(ticks.Count, barOnly ? plot.Height : plot.Width, useBands: false);
@@ -1211,23 +1216,29 @@ namespace ProCharts.Skia
 
         private static string FormatValue(double value)
         {
-            return value.ToString("G", CultureInfo.CurrentCulture);
+            return ChartValueFormatter.Format(value, null);
         }
 
         private static string FormatAxisValue(double value, SkiaChartStyle style)
         {
-            return FormatAxisValue(value, style.ValueAxisKind, style.AxisLabelFormatter, null);
+            return FormatAxisValue(value, style.ValueAxisKind, style.AxisLabelFormatter, style.AxisValueFormat, null);
         }
 
         private static string FormatAxisValue(double value, ChartAxisKind axisKind, Func<double, string>? formatter)
         {
-            return FormatAxisValue(value, axisKind, formatter, null);
+            return FormatAxisValue(value, axisKind, formatter, null, null);
+        }
+
+        private static string FormatAxisValue(double value, ChartAxisKind axisKind, Func<double, string>? formatter, ChartValueFormat? valueFormat)
+        {
+            return FormatAxisValue(value, axisKind, formatter, valueFormat, null);
         }
 
         private static string FormatAxisValue(
             double value,
             ChartAxisKind axisKind,
             Func<double, string>? formatter,
+            ChartValueFormat? valueFormat,
             DateTimeAxisFormat? dateTimeFormat)
         {
             if (formatter != null)
@@ -1240,23 +1251,24 @@ namespace ProCharts.Skia
                 return FormatDateTimeValue(value, dateTimeFormat);
             }
 
-            return FormatValue(value);
+            return ChartValueFormatter.Format(value, valueFormat);
         }
 
         private static string FormatCategoryAxisValue(double value, SkiaChartStyle style)
         {
-            return FormatCategoryAxisValue(value, style.CategoryAxisKind, style.CategoryAxisLabelFormatter, null);
+            return FormatCategoryAxisValue(value, style.CategoryAxisKind, style.CategoryAxisLabelFormatter, style.CategoryAxisValueFormat, null);
         }
 
         private static string FormatCategoryAxisValue(double value, SkiaChartStyle style, DateTimeAxisFormat? dateTimeFormat)
         {
-            return FormatCategoryAxisValue(value, style.CategoryAxisKind, style.CategoryAxisLabelFormatter, dateTimeFormat);
+            return FormatCategoryAxisValue(value, style.CategoryAxisKind, style.CategoryAxisLabelFormatter, style.CategoryAxisValueFormat, dateTimeFormat);
         }
 
         private static string FormatCategoryAxisValue(
             double value,
             ChartAxisKind axisKind,
             Func<double, string>? formatter,
+            ChartValueFormat? valueFormat,
             DateTimeAxisFormat? dateTimeFormat)
         {
             if (formatter != null)
@@ -1269,7 +1281,7 @@ namespace ProCharts.Skia
                 return FormatDateTimeValue(value, dateTimeFormat);
             }
 
-            return FormatValue(value);
+            return ChartValueFormatter.Format(value, valueFormat);
         }
 
         private static string FormatDateTimeValue(double value, DateTimeAxisFormat? dateTimeFormat)

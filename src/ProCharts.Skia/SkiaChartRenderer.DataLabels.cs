@@ -582,6 +582,18 @@ namespace ProCharts.Skia
                         DrawBoxWhiskerDataLabels(canvas, plot, boxWhiskerContext, seriesIndex, minValue, maxValue, valueAxisKind, style, textPaint, backgroundPaint, placed);
                     }
                     break;
+                case ChartSeriesKind.Candlestick:
+                case ChartSeriesKind.HollowCandlestick:
+                case ChartSeriesKind.Ohlc:
+                case ChartSeriesKind.Hlc:
+                case ChartSeriesKind.HeikinAshi:
+                case ChartSeriesKind.Renko:
+                case ChartSeriesKind.Range:
+                case ChartSeriesKind.LineBreak:
+                case ChartSeriesKind.Kagi:
+                case ChartSeriesKind.PointFigure:
+                    DrawFinancialDataLabels(canvas, plot, series, seriesIndex, minValue, maxValue, valueAxisKind, style, textPaint, backgroundPaint, placed);
+                    break;
                 case ChartSeriesKind.Scatter:
                     DrawScatterDataLabels(
                         canvas,
@@ -952,6 +964,34 @@ namespace ProCharts.Skia
                 var x = MapX(plot, i, count);
                 var y = MapY(plot, value.Value, minValue, maxValue, valueAxisKind);
                 var text = FormatDataLabel(series, seriesIndex, value.Value, style);
+                TryDrawLabelWithFallback(canvas, plot, placed, textPaint, backgroundPaint, text, x, y, false, style.DataLabelPadding, style.DataLabelOffset);
+            }
+        }
+
+        private static void DrawFinancialDataLabels(
+            SKCanvas canvas,
+            SKRect plot,
+            ChartSeriesSnapshot series,
+            int seriesIndex,
+            double minValue,
+            double maxValue,
+            ChartAxisKind valueAxisKind,
+            SkiaChartStyle style,
+            SKPaint textPaint,
+            SKPaint backgroundPaint,
+            List<SKRect> placed)
+        {
+            var count = GetFinancialPointCount(series, series.Kind);
+            for (var i = 0; i < count; i++)
+            {
+                if (!TryGetFinancialPoint(series, series.Kind, i, valueAxisKind, out _, out var high, out _, out var close))
+                {
+                    continue;
+                }
+
+                var x = MapX(plot, i, count);
+                var y = MapY(plot, high, minValue, maxValue, valueAxisKind);
+                var text = FormatDataLabel(series, seriesIndex, close, style);
                 TryDrawLabelWithFallback(canvas, plot, placed, textPaint, backgroundPaint, text, x, y, false, style.DataLabelPadding, style.DataLabelOffset);
             }
         }
@@ -1526,7 +1566,12 @@ namespace ProCharts.Skia
                 return style.SeriesDataLabelFormatter(seriesIndex, value);
             }
 
-            return style.DataLabelFormatter?.Invoke(value) ?? FormatValue(value);
+            return style.DataLabelFormatter?.Invoke(value) ??
+                   ChartValueFormatter.Format(
+                       value,
+                       series.ValueAxisAssignment == ChartValueAxisAssignment.Secondary
+                           ? style.SecondaryAxisValueFormat
+                           : style.AxisValueFormat);
         }
 
     }

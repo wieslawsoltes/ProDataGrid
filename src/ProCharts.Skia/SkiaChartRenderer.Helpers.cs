@@ -106,9 +106,13 @@ namespace ProCharts.Skia
                 hash = (hash * 31) + style.ShowSecondaryValueMinorTicks.GetHashCode();
                 hash = (hash * 31) + style.ShowSecondaryValueMinorGridlines.GetHashCode();
                 hash = (hash * 31) + (style.AxisLabelFormatter?.GetHashCode() ?? 0);
+                hash = (hash * 31) + (style.AxisValueFormat?.GetHashCode() ?? 0);
                 hash = (hash * 31) + (style.CategoryAxisLabelFormatter?.GetHashCode() ?? 0);
+                hash = (hash * 31) + (style.CategoryAxisValueFormat?.GetHashCode() ?? 0);
                 hash = (hash * 31) + (style.SecondaryAxisLabelFormatter?.GetHashCode() ?? 0);
+                hash = (hash * 31) + (style.SecondaryAxisValueFormat?.GetHashCode() ?? 0);
                 hash = (hash * 31) + (style.SecondaryCategoryAxisLabelFormatter?.GetHashCode() ?? 0);
+                hash = (hash * 31) + (style.SecondaryCategoryAxisValueFormat?.GetHashCode() ?? 0);
                 hash = (hash * 31) + (style.DataLabelFormatter?.GetHashCode() ?? 0);
                 hash = (hash * 31) + (style.SeriesDataLabelFormatter?.GetHashCode() ?? 0);
                 hash = (hash * 31) + style.PaddingLeft.GetHashCode();
@@ -139,6 +143,20 @@ namespace ProCharts.Skia
                 hash = (hash * 31) + style.BoxWhiskerFillOpacity.GetHashCode();
                 hash = (hash * 31) + style.BoxWhiskerOutlierRadius.GetHashCode();
                 hash = (hash * 31) + style.BoxWhiskerShowOutliers.GetHashCode();
+                hash = (hash * 31) + style.FinancialIncreaseColor.GetHashCode();
+                hash = (hash * 31) + style.FinancialDecreaseColor.GetHashCode();
+                hash = (hash * 31) + style.FinancialBodyFillOpacity.GetHashCode();
+                hash = (hash * 31) + style.FinancialBodyWidthRatio.GetHashCode();
+                hash = (hash * 31) + style.FinancialBoxWidthRatio.GetHashCode();
+                hash = (hash * 31) + style.FinancialTickWidthRatio.GetHashCode();
+                hash = (hash * 31) + style.FinancialWickStrokeWidth.GetHashCode();
+                hash = (hash * 31) + style.FinancialBodyStrokeWidth.GetHashCode();
+                hash = (hash * 31) + style.FinancialHollowBullishBodies.GetHashCode();
+                hash = (hash * 31) + style.FinancialShowLastPriceLine.GetHashCode();
+                hash = (hash * 31) + style.FinancialLastPriceLineColor.GetHashCode();
+                hash = (hash * 31) + style.FinancialLastPriceLineWidth.GetHashCode();
+                hash = (hash * 31) + style.FinancialLastPriceLabelText.GetHashCode();
+                hash = (hash * 31) + style.FinancialLastPriceLabelPadding.GetHashCode();
                 hash = (hash * 31) + style.RadarPointRadius.GetHashCode();
                 hash = (hash * 31) + style.FunnelGap.GetHashCode();
                 hash = (hash * 31) + style.FunnelMinWidthRatio.GetHashCode();
@@ -947,6 +965,165 @@ namespace ProCharts.Skia
             }
 
             return 0f;
+        }
+
+        private static bool IsFinancialSeriesKind(ChartSeriesKind kind)
+        {
+            return kind == ChartSeriesKind.Candlestick ||
+                   kind == ChartSeriesKind.HollowCandlestick ||
+                   kind == ChartSeriesKind.Ohlc ||
+                   kind == ChartSeriesKind.Hlc ||
+                   kind == ChartSeriesKind.HeikinAshi ||
+                   kind == ChartSeriesKind.Renko ||
+                   kind == ChartSeriesKind.Range ||
+                   kind == ChartSeriesKind.LineBreak ||
+                   kind == ChartSeriesKind.Kagi ||
+                   kind == ChartSeriesKind.PointFigure;
+        }
+
+        private static int GetFinancialPointCount(ChartSeriesSnapshot series, ChartSeriesKind kind)
+        {
+            if (kind == ChartSeriesKind.Hlc)
+            {
+                return GetHighLowClosePointCount(series);
+            }
+
+            if (series.OpenValues == null || series.HighValues == null || series.LowValues == null)
+            {
+                return 0;
+            }
+
+            return Math.Min(
+                series.Values.Count,
+                Math.Min(
+                    series.OpenValues.Count,
+                    Math.Min(series.HighValues.Count, series.LowValues.Count)));
+        }
+
+        private static int GetHighLowClosePointCount(ChartSeriesSnapshot series)
+        {
+            if (series.HighValues == null || series.LowValues == null)
+            {
+                return 0;
+            }
+
+            return Math.Min(series.Values.Count, Math.Min(series.HighValues.Count, series.LowValues.Count));
+        }
+
+        private static bool TryGetFinancialPoint(
+            ChartSeriesSnapshot series,
+            ChartSeriesKind kind,
+            int index,
+            ChartAxisKind valueAxisKind,
+            out double? open,
+            out double high,
+            out double low,
+            out double close)
+        {
+            open = null;
+            high = 0d;
+            low = 0d;
+            close = 0d;
+
+            if (kind == ChartSeriesKind.Hlc)
+            {
+                return TryGetHighLowClosePoint(series, index, valueAxisKind, out high, out low, out close);
+            }
+
+            if (index < 0 || index >= GetFinancialPointCount(series, kind))
+            {
+                return false;
+            }
+
+            var openValue = series.OpenValues![index];
+            var highValue = series.HighValues![index];
+            var lowValue = series.LowValues![index];
+            var closeValue = series.Values[index];
+            if (!openValue.HasValue ||
+                !highValue.HasValue ||
+                !lowValue.HasValue ||
+                !closeValue.HasValue)
+            {
+                return false;
+            }
+
+            open = openValue.Value;
+            high = highValue.Value;
+            low = lowValue.Value;
+            close = closeValue.Value;
+
+            if (IsInvalidAxisValue(open.Value, valueAxisKind) ||
+                IsInvalidAxisValue(high, valueAxisKind) ||
+                IsInvalidAxisValue(low, valueAxisKind) ||
+                IsInvalidAxisValue(close, valueAxisKind))
+            {
+                return false;
+            }
+
+            var normalizedHigh = Math.Max(high, Math.Max(open.Value, close));
+            var normalizedLow = Math.Min(low, Math.Min(open.Value, close));
+            high = normalizedHigh;
+            low = normalizedLow;
+            return true;
+        }
+
+        private static bool TryGetHighLowClosePoint(
+            ChartSeriesSnapshot series,
+            int index,
+            ChartAxisKind valueAxisKind,
+            out double high,
+            out double low,
+            out double close)
+        {
+            high = 0d;
+            low = 0d;
+            close = 0d;
+
+            if (index < 0 || index >= GetHighLowClosePointCount(series))
+            {
+                return false;
+            }
+
+            var highValue = series.HighValues![index];
+            var lowValue = series.LowValues![index];
+            var closeValue = series.Values[index];
+            if (!highValue.HasValue || !lowValue.HasValue || !closeValue.HasValue)
+            {
+                return false;
+            }
+
+            high = highValue.Value;
+            low = lowValue.Value;
+            close = closeValue.Value;
+
+            if (IsInvalidAxisValue(high, valueAxisKind) ||
+                IsInvalidAxisValue(low, valueAxisKind) ||
+                IsInvalidAxisValue(close, valueAxisKind))
+            {
+                return false;
+            }
+
+            if (high < close)
+            {
+                high = close;
+            }
+
+            if (low > close)
+            {
+                low = close;
+            }
+
+            return true;
+        }
+
+        private static float GetFinancialCategorySpan(SKRect plot, int count)
+        {
+            if (count <= 1)
+            {
+                return plot.Width;
+            }
+
+            return plot.Width / (count - 1);
         }
 
         private static double Clamp(double value, double min, double max)

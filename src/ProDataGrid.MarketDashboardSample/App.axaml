@@ -1,0 +1,13 @@
+<Application xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             x:Class="ProDataGrid.MarketDashboardSample.App"
+             RequestedThemeVariant="Dark">
+
+  <Application.Styles>
+    <FluentTheme />
+    <StyleInclude Source="avares://Avalonia.Controls.DataGrid/Themes/Fluent.v2.xaml" />
+    <StyleInclude Source="avares://ProDataGrid.MarketDashboardSample/Styles/MarketDashboardIcons.axaml" />
+    <StyleInclude Source="avares://ProDataGrid.MarketDashboardSample/Styles/MarketDashboardStyles.axaml" />
+  </Application.Styles>
+
+</Application>

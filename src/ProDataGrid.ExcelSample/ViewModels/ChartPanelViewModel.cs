@@ -508,10 +508,6 @@ public sealed class ChartPanelViewModel : ReactiveObject, IDisposable
     {
         return new SkiaChartStyle
         {
-            Background = new SKColor(255, 255, 255),
-            Axis = new SKColor(140, 140, 140),
-            Text = new SKColor(60, 60, 60),
-            Gridline = new SKColor(230, 230, 230),
             ShowGridlines = true,
             ShowCategoryGridlines = true,
             ShowDataLabels = false,

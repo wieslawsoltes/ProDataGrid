@@ -693,6 +693,209 @@ namespace ProCharts.Skia
                         canvas.DrawCircle(center, radius, linePaint);
                         break;
                     }
+                case ChartSeriesKind.Candlestick:
+                case ChartSeriesKind.HeikinAshi:
+                case ChartSeriesKind.Range:
+                    {
+                        using var wickPaint = new SKPaint
+                        {
+                            Color = style.FinancialIncreaseColor,
+                            StrokeWidth = Math.Max(1f, style.FinancialWickStrokeWidth),
+                            IsAntialias = true,
+                            Style = SKPaintStyle.Stroke
+                        };
+
+                        using var bodyFillPaint = new SKPaint
+                        {
+                            Color = ApplyOpacity(style.FinancialIncreaseColor, style.FinancialBodyFillOpacity),
+                            IsAntialias = true,
+                            Style = SKPaintStyle.Fill
+                        };
+
+                        using var bodyStrokePaint = new SKPaint
+                        {
+                            Color = style.FinancialIncreaseColor,
+                            StrokeWidth = Math.Max(1f, style.FinancialBodyStrokeWidth),
+                            IsAntialias = true,
+                            Style = SKPaintStyle.Stroke
+                        };
+
+                        var bodyWidth = rect.Width * 0.42f;
+                        var bodyRect = new SKRect(center.X - bodyWidth / 2f, rect.Top + rect.Height * 0.28f, center.X + bodyWidth / 2f, rect.Bottom - rect.Height * 0.28f);
+                        canvas.DrawLine(center.X, rect.Top + rect.Height * 0.1f, center.X, rect.Bottom - rect.Height * 0.1f, wickPaint);
+                        if (!style.FinancialHollowBullishBodies)
+                        {
+                            canvas.DrawRect(bodyRect, bodyFillPaint);
+                        }
+                        canvas.DrawRect(bodyRect, bodyStrokePaint);
+                        break;
+                    }
+                case ChartSeriesKind.HollowCandlestick:
+                    {
+                        using var bullishWickPaint = new SKPaint
+                        {
+                            Color = style.FinancialIncreaseColor,
+                            StrokeWidth = Math.Max(1f, style.FinancialWickStrokeWidth),
+                            IsAntialias = true,
+                            Style = SKPaintStyle.Stroke
+                        };
+
+                        using var bearishWickPaint = new SKPaint
+                        {
+                            Color = style.FinancialDecreaseColor,
+                            StrokeWidth = Math.Max(1f, style.FinancialWickStrokeWidth),
+                            IsAntialias = true,
+                            Style = SKPaintStyle.Stroke
+                        };
+
+                        using var bearishFillPaint = new SKPaint
+                        {
+                            Color = ApplyOpacity(style.FinancialDecreaseColor, style.FinancialBodyFillOpacity),
+                            IsAntialias = true,
+                            Style = SKPaintStyle.Fill
+                        };
+
+                        using var bullishBodyPaint = new SKPaint
+                        {
+                            Color = style.FinancialIncreaseColor,
+                            StrokeWidth = Math.Max(1f, style.FinancialBodyStrokeWidth),
+                            IsAntialias = true,
+                            Style = SKPaintStyle.Stroke
+                        };
+
+                        using var bearishBodyPaint = new SKPaint
+                        {
+                            Color = style.FinancialDecreaseColor,
+                            StrokeWidth = Math.Max(1f, style.FinancialBodyStrokeWidth),
+                            IsAntialias = true,
+                            Style = SKPaintStyle.Stroke
+                        };
+
+                        var bullishRect = new SKRect(center.X - rect.Width * 0.34f, rect.Top + rect.Height * 0.24f, center.X - rect.Width * 0.02f, rect.Bottom - rect.Height * 0.32f);
+                        var bearishRect = new SKRect(center.X + rect.Width * 0.02f, rect.Top + rect.Height * 0.34f, center.X + rect.Width * 0.34f, rect.Bottom - rect.Height * 0.22f);
+
+                        canvas.DrawLine(bullishRect.MidX, rect.Top + rect.Height * 0.1f, bullishRect.MidX, rect.Bottom - rect.Height * 0.14f, bullishWickPaint);
+                        canvas.DrawRect(bullishRect, bullishBodyPaint);
+
+                        canvas.DrawLine(bearishRect.MidX, rect.Top + rect.Height * 0.14f, bearishRect.MidX, rect.Bottom - rect.Height * 0.1f, bearishWickPaint);
+                        canvas.DrawRect(bearishRect, bearishFillPaint);
+                        canvas.DrawRect(bearishRect, bearishBodyPaint);
+                        break;
+                    }
+                case ChartSeriesKind.Ohlc:
+                    {
+                        using var financialPaint = new SKPaint
+                        {
+                            Color = style.FinancialIncreaseColor,
+                            StrokeWidth = Math.Max(1f, style.FinancialWickStrokeWidth),
+                            IsAntialias = true,
+                            Style = SKPaintStyle.Stroke
+                        };
+
+                        var tick = rect.Width * 0.18f;
+                        var high = rect.Top + rect.Height * 0.1f;
+                        var low = rect.Bottom - rect.Height * 0.1f;
+                        var open = rect.Top + rect.Height * 0.35f;
+                        var close = rect.Bottom - rect.Height * 0.35f;
+                        canvas.DrawLine(center.X, high, center.X, low, financialPaint);
+                        canvas.DrawLine(center.X - tick, open, center.X, open, financialPaint);
+                        canvas.DrawLine(center.X, close, center.X + tick, close, financialPaint);
+                        break;
+                    }
+                case ChartSeriesKind.Hlc:
+                    {
+                        using var financialPaint = new SKPaint
+                        {
+                            Color = style.FinancialIncreaseColor,
+                            StrokeWidth = Math.Max(1f, style.FinancialWickStrokeWidth),
+                            IsAntialias = true,
+                            Style = SKPaintStyle.Stroke
+                        };
+
+                        var tick = rect.Width * 0.18f;
+                        var high = rect.Top + rect.Height * 0.1f;
+                        var low = rect.Bottom - rect.Height * 0.1f;
+                        var close = rect.Bottom - rect.Height * 0.35f;
+                        canvas.DrawLine(center.X, high, center.X, low, financialPaint);
+                        canvas.DrawLine(center.X, close, center.X + tick, close, financialPaint);
+                        break;
+                    }
+                case ChartSeriesKind.Renko:
+                case ChartSeriesKind.LineBreak:
+                    {
+                        using var bodyFillPaint = new SKPaint
+                        {
+                            Color = ApplyOpacity(style.FinancialIncreaseColor, style.FinancialBodyFillOpacity),
+                            IsAntialias = true,
+                            Style = SKPaintStyle.Fill
+                        };
+
+                        using var bodyStrokePaint = new SKPaint
+                        {
+                            Color = style.FinancialIncreaseColor,
+                            StrokeWidth = Math.Max(1f, style.FinancialBodyStrokeWidth),
+                            IsAntialias = true,
+                            Style = SKPaintStyle.Stroke
+                        };
+
+                        var boxRect = new SKRect(rect.Left + rect.Width * 0.14f, rect.Top + rect.Height * 0.2f, rect.Right - rect.Width * 0.14f, rect.Bottom - rect.Height * 0.2f);
+                        if (!style.FinancialHollowBullishBodies)
+                        {
+                            canvas.DrawRect(boxRect, bodyFillPaint);
+                        }
+                        canvas.DrawRect(boxRect, bodyStrokePaint);
+                        break;
+                    }
+                case ChartSeriesKind.Kagi:
+                    {
+                        using var kagiPaint = new SKPaint
+                        {
+                            Color = style.FinancialIncreaseColor,
+                            StrokeWidth = Math.Max(1f, style.FinancialBodyStrokeWidth),
+                            IsAntialias = true,
+                            Style = SKPaintStyle.Stroke
+                        };
+
+                        var leftX = rect.Left + rect.Width * 0.2f;
+                        var rightX = rect.Right - rect.Width * 0.2f;
+                        var midX = rect.MidX;
+                        var top = rect.Top + rect.Height * 0.18f;
+                        var midHigh = rect.Top + rect.Height * 0.34f;
+                        var midLow = rect.Bottom - rect.Height * 0.34f;
+                        var bottom = rect.Bottom - rect.Height * 0.16f;
+
+                        canvas.DrawLine(leftX, midLow, midX, midLow, kagiPaint);
+                        canvas.DrawLine(midX, midLow, midX, top, kagiPaint);
+                        canvas.DrawLine(midX, midHigh, rightX, midHigh, kagiPaint);
+                        canvas.DrawLine(rightX, midHigh, rightX, bottom, kagiPaint);
+                        break;
+                    }
+                case ChartSeriesKind.PointFigure:
+                    {
+                        using var bullishPaint = new SKPaint
+                        {
+                            Color = style.FinancialIncreaseColor,
+                            StrokeWidth = Math.Max(1f, style.FinancialWickStrokeWidth),
+                            IsAntialias = true,
+                            Style = SKPaintStyle.Stroke
+                        };
+
+                        using var bearishPaint = new SKPaint
+                        {
+                            Color = style.FinancialDecreaseColor,
+                            StrokeWidth = Math.Max(1f, style.FinancialWickStrokeWidth),
+                            IsAntialias = true,
+                            Style = SKPaintStyle.Stroke
+                        };
+
+                        var xSize = Math.Min(rect.Width, rect.Height) * 0.24f;
+                        var leftCenter = new SKPoint(rect.Left + rect.Width * 0.32f, rect.MidY);
+                        var rightCenter = new SKPoint(rect.Right - rect.Width * 0.3f, rect.MidY);
+                        canvas.DrawLine(leftCenter.X - xSize, leftCenter.Y - xSize, leftCenter.X + xSize, leftCenter.Y + xSize, bullishPaint);
+                        canvas.DrawLine(leftCenter.X + xSize, leftCenter.Y - xSize, leftCenter.X - xSize, leftCenter.Y + xSize, bullishPaint);
+                        canvas.DrawOval(new SKRect(rightCenter.X - xSize, rightCenter.Y - xSize, rightCenter.X + xSize, rightCenter.Y + xSize), bearishPaint);
+                        break;
+                    }
                 case ChartSeriesKind.Pareto:
                     canvas.DrawRect(rect, fillPaint);
                     canvas.DrawLine(lineLeft, rect.Top + rect.Height * 0.25f, lineRight, rect.Top + rect.Height * 0.25f, linePaint);

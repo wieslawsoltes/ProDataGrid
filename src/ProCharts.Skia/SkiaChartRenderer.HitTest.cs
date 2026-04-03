@@ -90,6 +90,46 @@ namespace ProCharts.Skia
                             return barHit;
                         }
                         break;
+                    case ChartSeriesKind.Candlestick:
+                    case ChartSeriesKind.HollowCandlestick:
+                    case ChartSeriesKind.HeikinAshi:
+                    case ChartSeriesKind.Range:
+                        if (TryHitCandlestick(point, plot, categories, series, seriesIndex, axisMin, axisMax, axisKind, style, out var candlestickHit))
+                        {
+                            return candlestickHit;
+                        }
+                        break;
+                    case ChartSeriesKind.Ohlc:
+                        if (TryHitOhlc(point, plot, categories, series, seriesIndex, axisMin, axisMax, axisKind, style, out var ohlcHit))
+                        {
+                            return ohlcHit;
+                        }
+                        break;
+                    case ChartSeriesKind.Hlc:
+                        if (TryHitHlc(point, plot, categories, series, seriesIndex, axisMin, axisMax, axisKind, style, out var hlcHit))
+                        {
+                            return hlcHit;
+                        }
+                        break;
+                    case ChartSeriesKind.Renko:
+                    case ChartSeriesKind.LineBreak:
+                        if (TryHitFinancialBodySeries(point, plot, categories, series, seriesIndex, axisMin, axisMax, axisKind, style, useBoxWidth: true, includeWicks: false, out var financialBodyHit))
+                        {
+                            return financialBodyHit;
+                        }
+                        break;
+                    case ChartSeriesKind.Kagi:
+                        if (TryHitFinancialBodySeries(point, plot, categories, series, seriesIndex, axisMin, axisMax, axisKind, style, useBoxWidth: false, includeWicks: false, out var kagiHit))
+                        {
+                            return kagiHit;
+                        }
+                        break;
+                    case ChartSeriesKind.PointFigure:
+                        if (TryHitFinancialBodySeries(point, plot, categories, series, seriesIndex, axisMin, axisMax, axisKind, style, useBoxWidth: true, includeWicks: false, out var pointFigureHit))
+                        {
+                            return pointFigureHit;
+                        }
+                        break;
                     case ChartSeriesKind.Waterfall:
                         if (TryHitWaterfall(point, plot, categories, series, seriesIndex, axisMin, axisMax, axisKind, out var waterfallHit))
                         {
@@ -718,6 +758,232 @@ namespace ProCharts.Skia
                 }
 
                 running = end;
+            }
+
+            return false;
+        }
+
+        private static bool TryHitCandlestick(
+            SKPoint point,
+            SKRect plot,
+            IReadOnlyList<string?> categories,
+            ChartSeriesSnapshot series,
+            int seriesIndex,
+            double minValue,
+            double maxValue,
+            ChartAxisKind valueAxisKind,
+            SkiaChartStyle style,
+            out SkiaChartHitTestResult hit)
+        {
+            return TryHitFinancialBodySeries(point, plot, categories, series, seriesIndex, minValue, maxValue, valueAxisKind, style, useBoxWidth: false, includeWicks: true, out hit);
+        }
+
+        private static bool TryHitOhlc(
+            SKPoint point,
+            SKRect plot,
+            IReadOnlyList<string?> categories,
+            ChartSeriesSnapshot series,
+            int seriesIndex,
+            double minValue,
+            double maxValue,
+            ChartAxisKind valueAxisKind,
+            SkiaChartStyle style,
+            out SkiaChartHitTestResult hit)
+        {
+            hit = default;
+            var count = GetFinancialPointCount(series, series.Kind);
+            if (count == 0)
+            {
+                return false;
+            }
+
+            var span = GetFinancialCategorySpan(plot, count);
+            var tickHalfWidth = count <= 1
+                ? plot.Width * 0.08f
+                : span * (float)Clamp(style.FinancialTickWidthRatio, 0.08f, 0.45f);
+            tickHalfWidth = Math.Max(2f, Math.Min(plot.Width * 0.12f, tickHalfWidth));
+            var hitRadius = Math.Max(style.HitTestRadius, tickHalfWidth);
+
+            for (var i = 0; i < count; i++)
+            {
+                if (!TryGetFinancialPoint(series, series.Kind, i, valueAxisKind, out var open, out var high, out var low, out var close) ||
+                    !open.HasValue)
+                {
+                    continue;
+                }
+
+                var centerX = MapX(plot, i, count);
+                var yHigh = MapY(plot, high, minValue, maxValue, valueAxisKind);
+                var yLow = MapY(plot, low, minValue, maxValue, valueAxisKind);
+                var yOpen = MapY(plot, open.Value, minValue, maxValue, valueAxisKind);
+                var yClose = MapY(plot, close, minValue, maxValue, valueAxisKind);
+                var stemRect = new SKRect(centerX - style.HitTestRadius, Math.Min(yHigh, yLow), centerX + style.HitTestRadius, Math.Max(yHigh, yLow));
+                var openRect = new SKRect(centerX - tickHalfWidth, yOpen - hitRadius, centerX, yOpen + hitRadius);
+                var closeRect = new SKRect(centerX, yClose - hitRadius, centerX + tickHalfWidth, yClose + hitRadius);
+
+                if (!stemRect.Contains(point) && !openRect.Contains(point) && !closeRect.Contains(point))
+                {
+                    continue;
+                }
+
+                hit = new SkiaChartHitTestResult(
+                    seriesIndex,
+                    i,
+                    close,
+                    null,
+                    GetCategory(categories, i),
+                    series.Name,
+                    series.Kind,
+                    new SKPoint(centerX, yClose),
+                    open.Value,
+                    high,
+                    low,
+                    close);
+                return true;
+            }
+
+            return false;
+        }
+
+        private static bool TryHitHlc(
+            SKPoint point,
+            SKRect plot,
+            IReadOnlyList<string?> categories,
+            ChartSeriesSnapshot series,
+            int seriesIndex,
+            double minValue,
+            double maxValue,
+            ChartAxisKind valueAxisKind,
+            SkiaChartStyle style,
+            out SkiaChartHitTestResult hit)
+        {
+            hit = default;
+            var count = GetFinancialPointCount(series, series.Kind);
+            if (count == 0)
+            {
+                return false;
+            }
+
+            var span = GetFinancialCategorySpan(plot, count);
+            var tickHalfWidth = count <= 1
+                ? plot.Width * 0.08f
+                : span * (float)Clamp(style.FinancialTickWidthRatio, 0.08f, 0.45f);
+            tickHalfWidth = Math.Max(2f, Math.Min(plot.Width * 0.12f, tickHalfWidth));
+            var hitRadius = Math.Max(style.HitTestRadius, tickHalfWidth);
+
+            for (var i = 0; i < count; i++)
+            {
+                if (!TryGetFinancialPoint(series, series.Kind, i, valueAxisKind, out _, out var high, out var low, out var close))
+                {
+                    continue;
+                }
+
+                var centerX = MapX(plot, i, count);
+                var yHigh = MapY(plot, high, minValue, maxValue, valueAxisKind);
+                var yLow = MapY(plot, low, minValue, maxValue, valueAxisKind);
+                var yClose = MapY(plot, close, minValue, maxValue, valueAxisKind);
+                var stemRect = new SKRect(centerX - style.HitTestRadius, Math.Min(yHigh, yLow), centerX + style.HitTestRadius, Math.Max(yHigh, yLow));
+                var closeRect = new SKRect(centerX, yClose - hitRadius, centerX + tickHalfWidth, yClose + hitRadius);
+
+                if (!stemRect.Contains(point) && !closeRect.Contains(point))
+                {
+                    continue;
+                }
+
+                hit = new SkiaChartHitTestResult(
+                    seriesIndex,
+                    i,
+                    close,
+                    null,
+                    GetCategory(categories, i),
+                    series.Name,
+                    series.Kind,
+                    new SKPoint(centerX, yClose),
+                    null,
+                    high,
+                    low,
+                    close);
+                return true;
+            }
+
+            return false;
+        }
+
+        private static bool TryHitFinancialBodySeries(
+            SKPoint point,
+            SKRect plot,
+            IReadOnlyList<string?> categories,
+            ChartSeriesSnapshot series,
+            int seriesIndex,
+            double minValue,
+            double maxValue,
+            ChartAxisKind valueAxisKind,
+            SkiaChartStyle style,
+            bool useBoxWidth,
+            bool includeWicks,
+            out SkiaChartHitTestResult hit)
+        {
+            hit = default;
+            var count = GetFinancialPointCount(series, series.Kind);
+            if (count == 0)
+            {
+                return false;
+            }
+
+            var span = GetFinancialCategorySpan(plot, count);
+            var widthRatio = useBoxWidth ? style.FinancialBoxWidthRatio : style.FinancialBodyWidthRatio;
+            var bodyWidth = count <= 1
+                ? plot.Width * (useBoxWidth ? 0.28f : 0.18f)
+                : span * (float)Clamp(widthRatio, 0.1f, 0.95f);
+            bodyWidth = Math.Max(3f, Math.Min(plot.Width * (useBoxWidth ? 0.35f : 0.25f), bodyWidth));
+            var halfBodyWidth = bodyWidth / 2f;
+            var hitHalfWidth = Math.Max(halfBodyWidth, style.HitTestRadius);
+
+            for (var i = 0; i < count; i++)
+            {
+                if (!TryGetFinancialPoint(series, series.Kind, i, valueAxisKind, out var open, out var high, out var low, out var close))
+                {
+                    continue;
+                }
+
+                var openValue = open ?? close;
+                var centerX = MapX(plot, i, count);
+                var yHigh = MapY(plot, high, minValue, maxValue, valueAxisKind);
+                var yLow = MapY(plot, low, minValue, maxValue, valueAxisKind);
+                var yOpen = MapY(plot, openValue, minValue, maxValue, valueAxisKind);
+                var yClose = MapY(plot, close, minValue, maxValue, valueAxisKind);
+                var top = Math.Min(yOpen, yClose);
+                var bottom = Math.Max(yOpen, yClose);
+                if (bottom - top < 1f)
+                {
+                    top -= 0.5f;
+                    bottom += 0.5f;
+                }
+
+                var expandedBodyRect = new SKRect(centerX - hitHalfWidth, top, centerX + hitHalfWidth, bottom);
+                var wickRect = includeWicks
+                    ? new SKRect(centerX - style.HitTestRadius, Math.Min(yHigh, yLow), centerX + style.HitTestRadius, Math.Max(yHigh, yLow))
+                    : SKRect.Empty;
+
+                if (!expandedBodyRect.Contains(point) && (!includeWicks || !wickRect.Contains(point)))
+                {
+                    continue;
+                }
+
+                hit = new SkiaChartHitTestResult(
+                    seriesIndex,
+                    i,
+                    close,
+                    null,
+                    GetCategory(categories, i),
+                    series.Name,
+                    series.Kind,
+                    new SKPoint(centerX, (top + bottom) / 2f),
+                    open,
+                    high,
+                    low,
+                    close);
+                return true;
             }
 
             return false;

@@ -68,3 +68,4 @@ await chartView.CopyToClipboardAsync(ChartClipboardFormat.Png);
 - `procharts-series-types.md`
 - `procharts-axes-and-scales.md`
 - `procharts-data-sources.md`
+- `procharts-interaction.md`

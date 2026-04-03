@@ -32,6 +32,7 @@
     </Folder>
     <Folder Name="/samples/">
         <Project Path="src/DataGridSample/DataGridSample.csproj" />
+        <Project Path="src/ProDataGrid.MarketDashboardSample/ProDataGrid.MarketDashboardSample.csproj" />
         <Project Path="src/ProDataGrid.ExcelSample/ProDataGrid.ExcelSample.csproj" />
     </Folder>
     <Folder Name="/tools/">

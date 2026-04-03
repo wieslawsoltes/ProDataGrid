@@ -47,6 +47,16 @@ namespace ProCharts.Skia
                     series.Kind == ChartSeriesKind.Histogram ||
                     series.Kind == ChartSeriesKind.Pareto ||
                     series.Kind == ChartSeriesKind.BoxWhisker ||
+                    series.Kind == ChartSeriesKind.Candlestick ||
+                    series.Kind == ChartSeriesKind.HollowCandlestick ||
+                    series.Kind == ChartSeriesKind.Ohlc ||
+                    series.Kind == ChartSeriesKind.Hlc ||
+                    series.Kind == ChartSeriesKind.HeikinAshi ||
+                    series.Kind == ChartSeriesKind.Renko ||
+                    series.Kind == ChartSeriesKind.Range ||
+                    series.Kind == ChartSeriesKind.LineBreak ||
+                    series.Kind == ChartSeriesKind.Kagi ||
+                    series.Kind == ChartSeriesKind.PointFigure ||
                     series.Kind == ChartSeriesKind.Waterfall ||
                     series.Kind == ChartSeriesKind.Radar ||
                     series.Kind == ChartSeriesKind.Funnel)
@@ -146,6 +156,16 @@ namespace ProCharts.Skia
                     series.Kind == ChartSeriesKind.Histogram ||
                     series.Kind == ChartSeriesKind.Pareto ||
                     series.Kind == ChartSeriesKind.BoxWhisker ||
+                    series.Kind == ChartSeriesKind.Candlestick ||
+                    series.Kind == ChartSeriesKind.HollowCandlestick ||
+                    series.Kind == ChartSeriesKind.Ohlc ||
+                    series.Kind == ChartSeriesKind.Hlc ||
+                    series.Kind == ChartSeriesKind.HeikinAshi ||
+                    series.Kind == ChartSeriesKind.Renko ||
+                    series.Kind == ChartSeriesKind.Range ||
+                    series.Kind == ChartSeriesKind.LineBreak ||
+                    series.Kind == ChartSeriesKind.Kagi ||
+                    series.Kind == ChartSeriesKind.PointFigure ||
                     series.Kind == ChartSeriesKind.Waterfall ||
                     series.Kind == ChartSeriesKind.Radar ||
                     series.Kind == ChartSeriesKind.Funnel)

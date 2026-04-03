@@ -34,7 +34,11 @@ namespace ProCharts.Skia
             string? category,
             string? seriesName,
             ChartSeriesKind seriesKind,
-            SKPoint location)
+            SKPoint location,
+            double? openValue = null,
+            double? highValue = null,
+            double? lowValue = null,
+            double? closeValue = null)
         {
             SeriesIndex = seriesIndex;
             PointIndex = pointIndex;
@@ -44,6 +48,10 @@ namespace ProCharts.Skia
             SeriesName = seriesName;
             SeriesKind = seriesKind;
             Location = location;
+            OpenValue = openValue;
+            HighValue = highValue;
+            LowValue = lowValue;
+            CloseValue = closeValue;
         }
 
         public int SeriesIndex { get; }
@@ -62,6 +70,14 @@ namespace ProCharts.Skia
 
         public SKPoint Location { get; }
 
+        public double? OpenValue { get; }
+
+        public double? HighValue { get; }
+
+        public double? LowValue { get; }
+
+        public double? CloseValue { get; }
+
         public bool Equals(SkiaChartHitTestResult other)
         {
             return SeriesIndex == other.SeriesIndex &&
@@ -70,7 +86,11 @@ namespace ProCharts.Skia
                    Nullable.Equals(XValue, other.XValue) &&
                    string.Equals(Category, other.Category, StringComparison.Ordinal) &&
                    string.Equals(SeriesName, other.SeriesName, StringComparison.Ordinal) &&
-                   SeriesKind == other.SeriesKind;
+                   SeriesKind == other.SeriesKind &&
+                   Nullable.Equals(OpenValue, other.OpenValue) &&
+                   Nullable.Equals(HighValue, other.HighValue) &&
+                   Nullable.Equals(LowValue, other.LowValue) &&
+                   Nullable.Equals(CloseValue, other.CloseValue);
         }
 
         public static bool operator ==(SkiaChartHitTestResult left, SkiaChartHitTestResult right)
@@ -100,6 +120,10 @@ namespace ProCharts.Skia
                 hash = (hash * 31) + (Category?.GetHashCode() ?? 0);
                 hash = (hash * 31) + (SeriesName?.GetHashCode() ?? 0);
                 hash = (hash * 31) + SeriesKind.GetHashCode();
+                hash = (hash * 31) + (OpenValue?.GetHashCode() ?? 0);
+                hash = (hash * 31) + (HighValue?.GetHashCode() ?? 0);
+                hash = (hash * 31) + (LowValue?.GetHashCode() ?? 0);
+                hash = (hash * 31) + (CloseValue?.GetHashCode() ?? 0);
                 return hash;
             }
         }
@@ -200,9 +224,13 @@ namespace ProCharts.Skia
             ShowSecondaryValueMinorTicks = source.ShowSecondaryValueMinorTicks;
             ShowSecondaryValueMinorGridlines = source.ShowSecondaryValueMinorGridlines;
             AxisLabelFormatter = source.AxisLabelFormatter;
+            AxisValueFormat = source.AxisValueFormat;
             CategoryAxisLabelFormatter = source.CategoryAxisLabelFormatter;
+            CategoryAxisValueFormat = source.CategoryAxisValueFormat;
             SecondaryAxisLabelFormatter = source.SecondaryAxisLabelFormatter;
+            SecondaryAxisValueFormat = source.SecondaryAxisValueFormat;
             SecondaryCategoryAxisLabelFormatter = source.SecondaryCategoryAxisLabelFormatter;
+            SecondaryCategoryAxisValueFormat = source.SecondaryCategoryAxisValueFormat;
             DataLabelFormatter = source.DataLabelFormatter;
             SeriesDataLabelFormatter = source.SeriesDataLabelFormatter;
             PaddingLeft = source.PaddingLeft;
@@ -234,6 +262,20 @@ namespace ProCharts.Skia
             BoxWhiskerFillOpacity = source.BoxWhiskerFillOpacity;
             BoxWhiskerOutlierRadius = source.BoxWhiskerOutlierRadius;
             BoxWhiskerShowOutliers = source.BoxWhiskerShowOutliers;
+            FinancialIncreaseColor = source.FinancialIncreaseColor;
+            FinancialDecreaseColor = source.FinancialDecreaseColor;
+            FinancialBodyFillOpacity = source.FinancialBodyFillOpacity;
+            FinancialBodyWidthRatio = source.FinancialBodyWidthRatio;
+            FinancialBoxWidthRatio = source.FinancialBoxWidthRatio;
+            FinancialTickWidthRatio = source.FinancialTickWidthRatio;
+            FinancialWickStrokeWidth = source.FinancialWickStrokeWidth;
+            FinancialBodyStrokeWidth = source.FinancialBodyStrokeWidth;
+            FinancialHollowBullishBodies = source.FinancialHollowBullishBodies;
+            FinancialShowLastPriceLine = source.FinancialShowLastPriceLine;
+            FinancialLastPriceLineColor = source.FinancialLastPriceLineColor;
+            FinancialLastPriceLineWidth = source.FinancialLastPriceLineWidth;
+            FinancialLastPriceLabelText = source.FinancialLastPriceLabelText;
+            FinancialLastPriceLabelPadding = source.FinancialLastPriceLabelPadding;
             RadarPointRadius = source.RadarPointRadius;
             FunnelGap = source.FunnelGap;
             FunnelMinWidthRatio = source.FunnelMinWidthRatio;
@@ -315,6 +357,34 @@ namespace ProCharts.Skia
 
         public bool BoxWhiskerShowOutliers { get; set; } = true;
 
+        public SKColor FinancialIncreaseColor { get; set; } = new SKColor(42, 214, 168);
+
+        public SKColor FinancialDecreaseColor { get; set; } = new SKColor(255, 84, 104);
+
+        public float FinancialBodyFillOpacity { get; set; } = 0.45f;
+
+        public float FinancialBodyWidthRatio { get; set; } = 0.56f;
+
+        public float FinancialBoxWidthRatio { get; set; } = 0.82f;
+
+        public float FinancialTickWidthRatio { get; set; } = 0.22f;
+
+        public float FinancialWickStrokeWidth { get; set; } = 1f;
+
+        public float FinancialBodyStrokeWidth { get; set; } = 1f;
+
+        public bool FinancialHollowBullishBodies { get; set; }
+
+        public bool FinancialShowLastPriceLine { get; set; }
+
+        public SKColor FinancialLastPriceLineColor { get; set; } = SKColors.Transparent;
+
+        public float FinancialLastPriceLineWidth { get; set; } = 1f;
+
+        public SKColor FinancialLastPriceLabelText { get; set; } = SKColors.White;
+
+        public float FinancialLastPriceLabelPadding { get; set; } = 4f;
+
         public float RadarPointRadius { get; set; } = 3f;
 
         public float FunnelGap { get; set; } = 6f;
@@ -365,11 +435,19 @@ namespace ProCharts.Skia
 
         public Func<double, string>? AxisLabelFormatter { get; set; }
 
+        public ChartValueFormat? AxisValueFormat { get; set; }
+
         public Func<double, string>? CategoryAxisLabelFormatter { get; set; }
+
+        public ChartValueFormat? CategoryAxisValueFormat { get; set; }
 
         public Func<double, string>? SecondaryAxisLabelFormatter { get; set; }
 
+        public ChartValueFormat? SecondaryAxisValueFormat { get; set; }
+
         public Func<double, string>? SecondaryCategoryAxisLabelFormatter { get; set; }
+
+        public ChartValueFormat? SecondaryCategoryAxisValueFormat { get; set; }
 
         public Func<double, string>? DataLabelFormatter { get; set; }
 
@@ -624,7 +702,12 @@ namespace ProCharts.Skia
                 return false;
             }
 
-            info = new SkiaChartViewportInfo(context.Plot, context.BarOnly, context.HasCartesianSeries);
+            info = new SkiaChartViewportInfo(
+                context.Plot,
+                context.BarOnly,
+                context.HasCartesianSeries,
+                context.MinValue,
+                context.MaxValue);
             return true;
         }
 
@@ -1281,7 +1364,7 @@ namespace ProCharts.Skia
             switch (context.RenderKind)
             {
                 case RenderKind.Cartesian:
-                    RenderCartesianSeries(canvas, snapshot, style, context);
+                    RenderCartesianSeries(canvas, bounds, snapshot, style, context);
                     break;
                 case RenderKind.Pie:
                     DrawPieSeries(canvas, context.Plot, snapshot, style);
@@ -1991,6 +2074,39 @@ namespace ProCharts.Skia
                 case ChartSeriesKind.Bar:
                     DrawBarSeries(canvas, context.Plot, categoryCount, series, seriesIndex, seriesCount, axisMin, axisMax, axisKind, style);
                     break;
+                case ChartSeriesKind.Candlestick:
+                case ChartSeriesKind.HollowCandlestick:
+                case ChartSeriesKind.HeikinAshi:
+                    if (series.Kind == ChartSeriesKind.HollowCandlestick)
+                    {
+                        DrawHollowCandlestickSeries(canvas, context.Plot, series, axisMin, axisMax, axisKind, style);
+                    }
+                    else
+                    {
+                        DrawCandlestickSeries(canvas, context.Plot, series, axisMin, axisMax, axisKind, style);
+                    }
+                    break;
+                case ChartSeriesKind.Ohlc:
+                    DrawOhlcSeries(canvas, context.Plot, series, axisMin, axisMax, axisKind, style);
+                    break;
+                case ChartSeriesKind.Hlc:
+                    DrawHlcSeries(canvas, context.Plot, series, axisMin, axisMax, axisKind, style);
+                    break;
+                case ChartSeriesKind.Renko:
+                    DrawRenkoSeries(canvas, context.Plot, series, axisMin, axisMax, axisKind, style);
+                    break;
+                case ChartSeriesKind.Range:
+                    DrawRangeSeries(canvas, context.Plot, series, axisMin, axisMax, axisKind, style);
+                    break;
+                case ChartSeriesKind.LineBreak:
+                    DrawLineBreakSeries(canvas, context.Plot, series, axisMin, axisMax, axisKind, style);
+                    break;
+                case ChartSeriesKind.Kagi:
+                    DrawKagiSeries(canvas, context.Plot, series, axisMin, axisMax, axisKind, style);
+                    break;
+                case ChartSeriesKind.PointFigure:
+                    DrawPointFigureSeries(canvas, context.Plot, series, axisMin, axisMax, axisKind, style);
+                    break;
                 case ChartSeriesKind.Waterfall:
                     DrawWaterfallSeries(canvas, context.Plot, context.RenderCategories, series, axisMin, axisMax, axisKind, style);
                     break;
@@ -2175,6 +2291,7 @@ namespace ProCharts.Skia
 
         private static void RenderCartesianSeries(
             SKCanvas canvas,
+            SKRect bounds,
             ChartDataSnapshot snapshot,
             SkiaChartStyle style,
             RenderContext context)
@@ -2340,6 +2457,39 @@ namespace ProCharts.Skia
                     case ChartSeriesKind.Bar:
                         DrawBarSeries(canvas, context.Plot, categoryCount, series, seriesIndex, seriesCount, axisMin, axisMax, axisKind, style);
                         break;
+                    case ChartSeriesKind.Candlestick:
+                    case ChartSeriesKind.HollowCandlestick:
+                    case ChartSeriesKind.HeikinAshi:
+                        if (series.Kind == ChartSeriesKind.HollowCandlestick)
+                        {
+                            DrawHollowCandlestickSeries(canvas, context.Plot, series, axisMin, axisMax, axisKind, style);
+                        }
+                        else
+                        {
+                            DrawCandlestickSeries(canvas, context.Plot, series, axisMin, axisMax, axisKind, style);
+                        }
+                        break;
+                    case ChartSeriesKind.Ohlc:
+                        DrawOhlcSeries(canvas, context.Plot, series, axisMin, axisMax, axisKind, style);
+                        break;
+                    case ChartSeriesKind.Hlc:
+                        DrawHlcSeries(canvas, context.Plot, series, axisMin, axisMax, axisKind, style);
+                        break;
+                    case ChartSeriesKind.Renko:
+                        DrawRenkoSeries(canvas, context.Plot, series, axisMin, axisMax, axisKind, style);
+                        break;
+                    case ChartSeriesKind.Range:
+                        DrawRangeSeries(canvas, context.Plot, series, axisMin, axisMax, axisKind, style);
+                        break;
+                    case ChartSeriesKind.LineBreak:
+                        DrawLineBreakSeries(canvas, context.Plot, series, axisMin, axisMax, axisKind, style);
+                        break;
+                    case ChartSeriesKind.Kagi:
+                        DrawKagiSeries(canvas, context.Plot, series, axisMin, axisMax, axisKind, style);
+                        break;
+                    case ChartSeriesKind.PointFigure:
+                        DrawPointFigureSeries(canvas, context.Plot, series, axisMin, axisMax, axisKind, style);
+                        break;
                     case ChartSeriesKind.Waterfall:
                         DrawWaterfallSeries(canvas, context.Plot, context.RenderCategories, series, axisMin, axisMax, axisKind, style);
                         break;
@@ -2441,6 +2591,16 @@ namespace ProCharts.Skia
                 context.CategoryAxisKind,
                 context.MinCategory,
                 context.MaxCategory);
+            DrawFinancialLastPriceOverlay(
+                canvas,
+                bounds,
+                context.Plot,
+                snapshot,
+                style,
+                context.MinValue,
+                context.MaxValue,
+                context.MinSecondaryValue,
+                context.MaxSecondaryValue);
         }
 
         public SkiaChartHitTestResult? HitTest(SKPoint point, SKRect bounds, ChartDataSnapshot snapshot, SkiaChartStyle? style = null)
@@ -2804,6 +2964,25 @@ namespace ProCharts.Skia
                         }
                     }
                     hasValue = true;
+                    continue;
+                }
+
+                if (IsFinancialSeriesKind(series.Kind))
+                {
+                    var count = GetFinancialPointCount(series, series.Kind);
+                    for (var i = 0; i < count; i++)
+                    {
+                        if (!TryGetFinancialPoint(series, series.Kind, i, axisKind, out var open, out var high, out var low, out var close))
+                        {
+                            continue;
+                        }
+
+                        var openValue = open ?? close;
+                        minValue = Math.Min(minValue, Math.Min(low, Math.Min(openValue, close)));
+                        maxValue = Math.Max(maxValue, Math.Max(high, Math.Max(openValue, close)));
+                        hasValue = true;
+                    }
+
                     continue;
                 }
 

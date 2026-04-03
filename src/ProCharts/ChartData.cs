@@ -79,6 +79,235 @@ namespace ProCharts
         }
     }
 
+    /// <summary>
+    /// Represents transient chart interaction state such as visible crosshair position
+    /// and whether the window should remain pinned to the latest categories.
+    /// </summary>
+    public sealed class ChartInteractionState : INotifyPropertyChanged
+    {
+        private bool _followLatest;
+        private bool _isCrosshairVisible;
+        private int? _crosshairCategoryIndex;
+        private string? _crosshairCategoryLabel;
+        private double? _crosshairValue;
+        private double _crosshairHorizontalRatio = 0.5d;
+        private double _crosshairVerticalRatio = 0.5d;
+        private ChartCrosshairMode _crosshairMode = ChartCrosshairMode.Both;
+        private ChartPointerTool _pointerTool = ChartPointerTool.Crosshair;
+
+        /// <inheritdoc />
+        public event PropertyChangedEventHandler? PropertyChanged;
+
+        /// <summary>
+        /// Gets or sets a value indicating whether the chart should keep the window
+        /// aligned to the latest categories when new data arrives.
+        /// </summary>
+        public bool FollowLatest
+        {
+            get => _followLatest;
+            set
+            {
+                if (_followLatest == value)
+                {
+                    return;
+                }
+
+                _followLatest = value;
+                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(FollowLatest)));
+            }
+        }
+
+        /// <summary>
+        /// Gets a value indicating whether the crosshair is currently active.
+        /// </summary>
+        public bool IsCrosshairVisible
+        {
+            get => _isCrosshairVisible;
+            private set
+            {
+                if (_isCrosshairVisible == value)
+                {
+                    return;
+                }
+
+                _isCrosshairVisible = value;
+                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(IsCrosshairVisible)));
+            }
+        }
+
+        /// <summary>
+        /// Gets the hovered category index within the currently visible snapshot, when available.
+        /// </summary>
+        public int? CrosshairCategoryIndex
+        {
+            get => _crosshairCategoryIndex;
+            private set
+            {
+                if (_crosshairCategoryIndex == value)
+                {
+                    return;
+                }
+
+                _crosshairCategoryIndex = value;
+                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(CrosshairCategoryIndex)));
+            }
+        }
+
+        /// <summary>
+        /// Gets the hovered category label, when available.
+        /// </summary>
+        public string? CrosshairCategoryLabel
+        {
+            get => _crosshairCategoryLabel;
+            private set
+            {
+                if (_crosshairCategoryLabel == value)
+                {
+                    return;
+                }
+
+                _crosshairCategoryLabel = value;
+                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(CrosshairCategoryLabel)));
+            }
+        }
+
+        /// <summary>
+        /// Gets the hovered value, when available.
+        /// </summary>
+        public double? CrosshairValue
+        {
+            get => _crosshairValue;
+            private set
+            {
+                if (_crosshairValue == value)
+                {
+                    return;
+                }
+
+                _crosshairValue = value;
+                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(CrosshairValue)));
+            }
+        }
+
+        /// <summary>
+        /// Gets the horizontal crosshair position normalized to the current plot area.
+        /// </summary>
+        public double CrosshairHorizontalRatio
+        {
+            get => _crosshairHorizontalRatio;
+            private set
+            {
+                if (Math.Abs(_crosshairHorizontalRatio - value) < double.Epsilon)
+                {
+                    return;
+                }
+
+                _crosshairHorizontalRatio = value;
+                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(CrosshairHorizontalRatio)));
+            }
+        }
+
+        /// <summary>
+        /// Gets the vertical crosshair position normalized to the current plot area.
+        /// </summary>
+        public double CrosshairVerticalRatio
+        {
+            get => _crosshairVerticalRatio;
+            private set
+            {
+                if (Math.Abs(_crosshairVerticalRatio - value) < double.Epsilon)
+                {
+                    return;
+                }
+
+                _crosshairVerticalRatio = value;
+                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(CrosshairVerticalRatio)));
+            }
+        }
+
+        /// <summary>
+        /// Gets or sets which guide lines are rendered for the active crosshair.
+        /// </summary>
+        public ChartCrosshairMode CrosshairMode
+        {
+            get => _crosshairMode;
+            set
+            {
+                if (_crosshairMode == value)
+                {
+                    return;
+                }
+
+                _crosshairMode = value;
+                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(CrosshairMode)));
+            }
+        }
+
+        /// <summary>
+        /// Gets or sets the active pointer tool that interactive hosts should honor.
+        /// </summary>
+        public ChartPointerTool PointerTool
+        {
+            get => _pointerTool;
+            set
+            {
+                if (_pointerTool == value)
+                {
+                    return;
+                }
+
+                _pointerTool = value;
+                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(PointerTool)));
+            }
+        }
+
+        /// <summary>
+        /// Updates the active crosshair state.
+        /// </summary>
+        public void SetCrosshair(
+            int? categoryIndex,
+            string? categoryLabel,
+            double? value,
+            double horizontalRatio,
+            double verticalRatio)
+        {
+            IsCrosshairVisible = categoryIndex.HasValue || value.HasValue || !string.IsNullOrWhiteSpace(categoryLabel);
+            CrosshairCategoryIndex = categoryIndex;
+            CrosshairCategoryLabel = categoryLabel;
+            CrosshairValue = value;
+            CrosshairHorizontalRatio = ClampRatio(horizontalRatio);
+            CrosshairVerticalRatio = ClampRatio(verticalRatio);
+        }
+
+        /// <summary>
+        /// Clears the current crosshair state.
+        /// </summary>
+        public void ClearCrosshair()
+        {
+            IsCrosshairVisible = false;
+            CrosshairCategoryIndex = null;
+            CrosshairCategoryLabel = null;
+            CrosshairValue = null;
+            CrosshairHorizontalRatio = 0.5d;
+            CrosshairVerticalRatio = 0.5d;
+        }
+
+        private static double ClampRatio(double value)
+        {
+            if (value < 0d)
+            {
+                return 0d;
+            }
+
+            if (value > 1d)
+            {
+                return 1d;
+            }
+
+            return value;
+        }
+    }
+
     public sealed class ChartAxisDefinition : INotifyPropertyChanged
     {
         private ChartAxisKind _kind;
@@ -87,6 +316,7 @@ namespace ProCharts
         private double? _maximum;
         private bool _isVisible = true;
         private Func<double, string>? _labelFormatter;
+        private ChartValueFormat? _valueFormat;
         private ChartAxisCrossing _crossing = ChartAxisCrossing.Auto;
         private double? _crossingValue;
         private float _offset;
@@ -191,6 +421,34 @@ namespace ProCharts
             }
         }
 
+        /// <summary>
+        /// Gets or sets the numeric formatting policy used when <see cref="LabelFormatter"/> is not provided.
+        /// </summary>
+        public ChartValueFormat? ValueFormat
+        {
+            get => _valueFormat;
+            set
+            {
+                if (ReferenceEquals(_valueFormat, value))
+                {
+                    return;
+                }
+
+                if (_valueFormat != null)
+                {
+                    _valueFormat.PropertyChanged -= OnValueFormatChanged;
+                }
+
+                _valueFormat = value;
+                if (_valueFormat != null)
+                {
+                    _valueFormat.PropertyChanged += OnValueFormatChanged;
+                }
+
+                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(ValueFormat)));
+            }
+        }
+
         public ChartAxisCrossing Crossing
         {
             get => _crossing;
@@ -281,6 +539,11 @@ namespace ProCharts
                 PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(ShowMinorGridlines)));
             }
         }
+
+        private void OnValueFormatChanged(object? sender, PropertyChangedEventArgs e)
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(ValueFormat)));
+        }
     }
 
     public sealed class ChartLegendDefinition : INotifyPropertyChanged
@@ -335,7 +598,10 @@ namespace ProCharts
             int trendlinePeriod = 2,
             ChartErrorBarType errorBarType = ChartErrorBarType.None,
             double errorBarValue = 1d,
-            ChartSeriesStyle? style = null)
+            ChartSeriesStyle? style = null,
+            IReadOnlyList<double?>? openValues = null,
+            IReadOnlyList<double?>? highValues = null,
+            IReadOnlyList<double?>? lowValues = null)
         {
             Name = name;
             Kind = kind;
@@ -349,6 +615,9 @@ namespace ProCharts
             ErrorBarType = errorBarType;
             ErrorBarValue = errorBarValue;
             Style = style;
+            OpenValues = openValues;
+            HighValues = highValues;
+            LowValues = lowValues;
         }
 
         public string? Name { get; }
@@ -360,6 +629,12 @@ namespace ProCharts
         public IReadOnlyList<double>? XValues { get; }
 
         public IReadOnlyList<double?>? SizeValues { get; }
+
+        public IReadOnlyList<double?>? OpenValues { get; }
+
+        public IReadOnlyList<double?>? HighValues { get; }
+
+        public IReadOnlyList<double?>? LowValues { get; }
 
         public Func<double, string>? DataLabelFormatter { get; }
 

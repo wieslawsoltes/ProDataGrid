@@ -10,11 +10,18 @@ namespace ProCharts.Skia
 {
     public readonly struct SkiaChartViewportInfo : IEquatable<SkiaChartViewportInfo>
     {
-        public SkiaChartViewportInfo(SKRect plot, bool barOnly, bool hasCartesianSeries)
+        public SkiaChartViewportInfo(
+            SKRect plot,
+            bool barOnly,
+            bool hasCartesianSeries,
+            double minValue,
+            double maxValue)
         {
             Plot = plot;
             BarOnly = barOnly;
             HasCartesianSeries = hasCartesianSeries;
+            MinValue = minValue;
+            MaxValue = maxValue;
         }
 
         public SKRect Plot { get; }
@@ -23,11 +30,17 @@ namespace ProCharts.Skia
 
         public bool HasCartesianSeries { get; }
 
+        public double MinValue { get; }
+
+        public double MaxValue { get; }
+
         public bool Equals(SkiaChartViewportInfo other)
         {
             return Plot.Equals(other.Plot) &&
                    BarOnly == other.BarOnly &&
-                   HasCartesianSeries == other.HasCartesianSeries;
+                   HasCartesianSeries == other.HasCartesianSeries &&
+                   MinValue.Equals(other.MinValue) &&
+                   MaxValue.Equals(other.MaxValue);
         }
 
         public override bool Equals(object? obj)
@@ -46,6 +59,8 @@ namespace ProCharts.Skia
                 hash = (hash * 31) + Plot.Bottom.GetHashCode();
                 hash = (hash * 31) + BarOnly.GetHashCode();
                 hash = (hash * 31) + HasCartesianSeries.GetHashCode();
+                hash = (hash * 31) + MinValue.GetHashCode();
+                hash = (hash * 31) + MaxValue.GetHashCode();
                 return hash;
             }
         }

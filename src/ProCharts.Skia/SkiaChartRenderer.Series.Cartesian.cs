@@ -222,6 +222,584 @@ namespace ProCharts.Skia
             }
         }
 
+        private static void DrawCandlestickSeries(
+            SKCanvas canvas,
+            SKRect plot,
+            ChartSeriesSnapshot series,
+            double minValue,
+            double maxValue,
+            ChartAxisKind valueAxisKind,
+            SkiaChartStyle style)
+        {
+            DrawFinancialBodySeries(canvas, plot, series, minValue, maxValue, valueAxisKind, style, style.FinancialBodyWidthRatio, includeWicks: true);
+        }
+
+        private static void DrawHollowCandlestickSeries(
+            SKCanvas canvas,
+            SKRect plot,
+            ChartSeriesSnapshot series,
+            double minValue,
+            double maxValue,
+            ChartAxisKind valueAxisKind,
+            SkiaChartStyle style)
+        {
+            DrawFinancialBodySeries(canvas, plot, series, minValue, maxValue, valueAxisKind, style, style.FinancialBodyWidthRatio, includeWicks: true);
+        }
+
+        private static void DrawRenkoSeries(
+            SKCanvas canvas,
+            SKRect plot,
+            ChartSeriesSnapshot series,
+            double minValue,
+            double maxValue,
+            ChartAxisKind valueAxisKind,
+            SkiaChartStyle style)
+        {
+            DrawFinancialBodySeries(canvas, plot, series, minValue, maxValue, valueAxisKind, style, style.FinancialBoxWidthRatio, includeWicks: false);
+        }
+
+        private static void DrawRangeSeries(
+            SKCanvas canvas,
+            SKRect plot,
+            ChartSeriesSnapshot series,
+            double minValue,
+            double maxValue,
+            ChartAxisKind valueAxisKind,
+            SkiaChartStyle style)
+        {
+            DrawFinancialBodySeries(canvas, plot, series, minValue, maxValue, valueAxisKind, style, style.FinancialBodyWidthRatio, includeWicks: true);
+        }
+
+        private static void DrawLineBreakSeries(
+            SKCanvas canvas,
+            SKRect plot,
+            ChartSeriesSnapshot series,
+            double minValue,
+            double maxValue,
+            ChartAxisKind valueAxisKind,
+            SkiaChartStyle style)
+        {
+            DrawFinancialBodySeries(canvas, plot, series, minValue, maxValue, valueAxisKind, style, style.FinancialBoxWidthRatio, includeWicks: false);
+        }
+
+        private static void DrawKagiSeries(
+            SKCanvas canvas,
+            SKRect plot,
+            ChartSeriesSnapshot series,
+            double minValue,
+            double maxValue,
+            ChartAxisKind valueAxisKind,
+            SkiaChartStyle style)
+        {
+            var count = GetFinancialPointCount(series, series.Kind);
+            if (count == 0)
+            {
+                return;
+            }
+
+            var thinWidth = Math.Max(1f, style.FinancialWickStrokeWidth);
+            var thickWidth = Math.Max(thinWidth, style.FinancialBodyStrokeWidth + 0.35f);
+
+            using var paint = new SKPaint
+            {
+                IsAntialias = true,
+                Style = SKPaintStyle.Stroke
+            };
+
+            float? previousX = null;
+            double? previousClose = null;
+
+            for (var i = 0; i < count; i++)
+            {
+                if (!TryGetFinancialPoint(series, series.Kind, i, valueAxisKind, out var open, out _, out _, out var close))
+                {
+                    continue;
+                }
+
+                var openValue = open ?? close;
+                var centerX = MapX(plot, i, count);
+                var yOpen = MapY(plot, openValue, minValue, maxValue, valueAxisKind);
+                var yClose = MapY(plot, close, minValue, maxValue, valueAxisKind);
+                var isBullish = ResolveFinancialIncrease(series, series.Kind, i, valueAxisKind, open, 0d, 0d, close);
+
+                paint.Color = isBullish ? style.FinancialIncreaseColor : style.FinancialDecreaseColor;
+                paint.StrokeWidth = isBullish ? thickWidth : thinWidth;
+
+                if (previousX.HasValue && previousClose.HasValue)
+                {
+                    var connectorY = MapY(plot, openValue, minValue, maxValue, valueAxisKind);
+                    canvas.DrawLine(previousX.Value, connectorY, centerX, connectorY, paint);
+                }
+
+                canvas.DrawLine(centerX, yOpen, centerX, yClose, paint);
+                previousX = centerX;
+                previousClose = close;
+            }
+        }
+
+        private static void DrawPointFigureSeries(
+            SKCanvas canvas,
+            SKRect plot,
+            ChartSeriesSnapshot series,
+            double minValue,
+            double maxValue,
+            ChartAxisKind valueAxisKind,
+            SkiaChartStyle style)
+        {
+            var count = GetFinancialPointCount(series, series.Kind);
+            if (count == 0)
+            {
+                return;
+            }
+
+            var span = GetFinancialCategorySpan(plot, count);
+            var columnWidth = count <= 1
+                ? plot.Width * 0.28f
+                : span * (float)Clamp(style.FinancialBoxWidthRatio, 0.14f, 0.95f);
+            columnWidth = Math.Max(10f, Math.Min(plot.Width * 0.42f, columnWidth));
+            var strokeWidth = Math.Max(1f, style.FinancialWickStrokeWidth);
+
+            using var bullishPaint = new SKPaint
+            {
+                Color = style.FinancialIncreaseColor,
+                StrokeWidth = strokeWidth,
+                IsAntialias = true,
+                Style = SKPaintStyle.Stroke
+            };
+
+            using var bearishPaint = new SKPaint
+            {
+                Color = style.FinancialDecreaseColor,
+                StrokeWidth = strokeWidth,
+                IsAntialias = true,
+                Style = SKPaintStyle.Stroke
+            };
+
+            for (var i = 0; i < count; i++)
+            {
+                if (!TryGetFinancialPoint(series, series.Kind, i, valueAxisKind, out var open, out var high, out var low, out var close))
+                {
+                    continue;
+                }
+
+                var openValue = open ?? close;
+                var isBullish = close >= openValue;
+                var centerX = MapX(plot, i, count);
+                var yHigh = MapY(plot, high, minValue, maxValue, valueAxisKind);
+                var yLow = MapY(plot, low, minValue, maxValue, valueAxisKind);
+                var top = Math.Min(yHigh, yLow);
+                var bottom = Math.Max(yHigh, yLow);
+                var glyphCount = ResolvePointFigureGlyphCount(series, i, openValue, close, high, low);
+                if (glyphCount <= 0)
+                {
+                    continue;
+                }
+
+                var step = glyphCount <= 1 ? Math.Abs(bottom - top) : Math.Abs(bottom - top) / (glyphCount - 1);
+                var halfWidth = Math.Max(2f, Math.Min(columnWidth * 0.26f, step * 0.36f));
+                var halfHeight = Math.Max(2f, Math.Min(columnWidth * 0.26f, step * 0.36f));
+                var paint = isBullish ? bullishPaint : bearishPaint;
+
+                for (var glyphIndex = 0; glyphIndex < glyphCount; glyphIndex++)
+                {
+                    var fraction = glyphCount <= 1 ? 0.5f : glyphIndex / (float)(glyphCount - 1);
+                    var centerY = bottom + ((top - bottom) * fraction);
+                    DrawPointFigureGlyph(canvas, paint, isBullish, centerX, centerY, halfWidth, halfHeight);
+                }
+            }
+        }
+
+        private static void DrawFinancialBodySeries(
+            SKCanvas canvas,
+            SKRect plot,
+            ChartSeriesSnapshot series,
+            double minValue,
+            double maxValue,
+            ChartAxisKind valueAxisKind,
+            SkiaChartStyle style,
+            float widthRatio,
+            bool includeWicks)
+        {
+            var count = GetFinancialPointCount(series, series.Kind);
+            if (count == 0)
+            {
+                return;
+            }
+
+            var span = GetFinancialCategorySpan(plot, count);
+            var bodyWidth = count <= 1
+                ? plot.Width * (includeWicks ? 0.18f : 0.28f)
+                : span * (float)Clamp(widthRatio, 0.1f, 0.95f);
+            bodyWidth = Math.Max(3f, Math.Min(plot.Width * (includeWicks ? 0.25f : 0.35f), bodyWidth));
+            var halfBodyWidth = bodyWidth / 2f;
+            var wickStrokeWidth = Math.Max(1f, style.FinancialWickStrokeWidth);
+            var bodyStrokeWidth = Math.Max(1f, style.FinancialBodyStrokeWidth);
+
+            using var wickPaint = new SKPaint
+            {
+                IsAntialias = true,
+                Style = SKPaintStyle.Stroke,
+                StrokeWidth = wickStrokeWidth
+            };
+
+            using var fillPaint = new SKPaint
+            {
+                IsAntialias = true,
+                Style = SKPaintStyle.Fill
+            };
+
+            using var bodyStrokePaint = new SKPaint
+            {
+                IsAntialias = true,
+                Style = SKPaintStyle.Stroke,
+                StrokeWidth = bodyStrokeWidth
+            };
+
+            for (var i = 0; i < count; i++)
+            {
+                if (!TryGetFinancialPoint(series, series.Kind, i, valueAxisKind, out var open, out var high, out var low, out var close))
+                {
+                    continue;
+                }
+
+                var openValue = open ?? close;
+                var centerX = MapX(plot, i, count);
+                var yHigh = MapY(plot, high, minValue, maxValue, valueAxisKind);
+                var yLow = MapY(plot, low, minValue, maxValue, valueAxisKind);
+                var yOpen = MapY(plot, openValue, minValue, maxValue, valueAxisKind);
+                var yClose = MapY(plot, close, minValue, maxValue, valueAxisKind);
+                var isBullish = ResolveFinancialIncrease(series, series.Kind, i, valueAxisKind, open, high, low, close);
+                var color = isBullish ? style.FinancialIncreaseColor : style.FinancialDecreaseColor;
+                wickPaint.Color = color;
+                fillPaint.Color = ApplyOpacity(color, style.FinancialBodyFillOpacity);
+                bodyStrokePaint.Color = color;
+
+                if (includeWicks)
+                {
+                    canvas.DrawLine(centerX, yHigh, centerX, yLow, wickPaint);
+                }
+
+                var top = Math.Min(yOpen, yClose);
+                var bottom = Math.Max(yOpen, yClose);
+                if (bottom - top < 1f)
+                {
+                    top -= 0.5f;
+                    bottom += 0.5f;
+                }
+
+                var bodyRect = new SKRect(centerX - halfBodyWidth, top, centerX + halfBodyWidth, bottom);
+                var shouldFillBody = series.Kind == ChartSeriesKind.HollowCandlestick
+                    ? close < openValue
+                    : !(style.FinancialHollowBullishBodies && isBullish);
+                if (shouldFillBody)
+                {
+                    canvas.DrawRect(bodyRect, fillPaint);
+                }
+                canvas.DrawRect(bodyRect, bodyStrokePaint);
+            }
+        }
+
+        private static bool ResolveFinancialIncrease(
+            ChartSeriesSnapshot series,
+            ChartSeriesKind kind,
+            int index,
+            ChartAxisKind valueAxisKind,
+            double? open,
+            double high,
+            double low,
+            double close)
+        {
+            switch (kind)
+            {
+                case ChartSeriesKind.Hlc:
+                    if (TryGetPreviousFinancialClose(series, index, valueAxisKind, out var previousHlcClose))
+                    {
+                        return close >= previousHlcClose;
+                    }
+
+                    return close >= ((high + low) / 2d);
+                case ChartSeriesKind.HollowCandlestick:
+                    if (TryGetPreviousFinancialClose(series, index, valueAxisKind, out var previousClose))
+                    {
+                        return close >= previousClose;
+                    }
+
+                    break;
+            }
+
+            var openValue = open ?? close;
+            return close >= openValue;
+        }
+
+        private static bool TryGetPreviousFinancialClose(
+            ChartSeriesSnapshot series,
+            int index,
+            ChartAxisKind valueAxisKind,
+            out double previousClose)
+        {
+            previousClose = 0d;
+            for (var previousIndex = index - 1; previousIndex >= 0; previousIndex--)
+            {
+                if (previousIndex >= series.Values.Count)
+                {
+                    continue;
+                }
+
+                var closeValue = series.Values[previousIndex];
+                if (!closeValue.HasValue || IsInvalidAxisValue(closeValue.Value, valueAxisKind))
+                {
+                    continue;
+                }
+
+                previousClose = closeValue.Value;
+                return true;
+            }
+
+            return false;
+        }
+
+        private static int ResolvePointFigureGlyphCount(
+            ChartSeriesSnapshot series,
+            int index,
+            double open,
+            double close,
+            double high,
+            double low)
+        {
+            if (series.SizeValues != null &&
+                index >= 0 &&
+                index < series.SizeValues.Count)
+            {
+                var sizeValue = series.SizeValues[index];
+                if (sizeValue.HasValue &&
+                    !IsInvalidNumber(sizeValue.Value))
+                {
+                    return Math.Max(1, (int)Math.Round(sizeValue.Value));
+                }
+            }
+
+            var span = Math.Max(Math.Abs(high - low), Math.Abs(close - open));
+            return Math.Max(1, (int)Math.Round(span) + 1);
+        }
+
+        private static void DrawPointFigureGlyph(
+            SKCanvas canvas,
+            SKPaint paint,
+            bool isBullish,
+            float centerX,
+            float centerY,
+            float halfWidth,
+            float halfHeight)
+        {
+            if (isBullish)
+            {
+                canvas.DrawLine(centerX - halfWidth, centerY - halfHeight, centerX + halfWidth, centerY + halfHeight, paint);
+                canvas.DrawLine(centerX + halfWidth, centerY - halfHeight, centerX - halfWidth, centerY + halfHeight, paint);
+                return;
+            }
+
+            canvas.DrawOval(new SKRect(centerX - halfWidth, centerY - halfHeight, centerX + halfWidth, centerY + halfHeight), paint);
+        }
+
+        private static void DrawOhlcSeries(
+            SKCanvas canvas,
+            SKRect plot,
+            ChartSeriesSnapshot series,
+            double minValue,
+            double maxValue,
+            ChartAxisKind valueAxisKind,
+            SkiaChartStyle style)
+        {
+            var count = GetFinancialPointCount(series, series.Kind);
+            if (count == 0)
+            {
+                return;
+            }
+
+            var span = GetFinancialCategorySpan(plot, count);
+            var tickHalfWidth = count <= 1
+                ? plot.Width * 0.08f
+                : span * (float)Clamp(style.FinancialTickWidthRatio, 0.08f, 0.45f);
+            tickHalfWidth = Math.Max(2f, Math.Min(plot.Width * 0.12f, tickHalfWidth));
+            var strokeWidth = Math.Max(1f, style.FinancialWickStrokeWidth);
+
+            using var paint = new SKPaint
+            {
+                IsAntialias = true,
+                Style = SKPaintStyle.Stroke,
+                StrokeWidth = strokeWidth
+            };
+
+            for (var i = 0; i < count; i++)
+            {
+                if (!TryGetFinancialPoint(series, series.Kind, i, valueAxisKind, out var open, out var high, out var low, out var close) ||
+                    !open.HasValue)
+                {
+                    continue;
+                }
+
+                var centerX = MapX(plot, i, count);
+                var yHigh = MapY(plot, high, minValue, maxValue, valueAxisKind);
+                var yLow = MapY(plot, low, minValue, maxValue, valueAxisKind);
+                var yOpen = MapY(plot, open.Value, minValue, maxValue, valueAxisKind);
+                var yClose = MapY(plot, close, minValue, maxValue, valueAxisKind);
+                paint.Color = ResolveFinancialIncrease(series, series.Kind, i, valueAxisKind, open, high, low, close)
+                    ? style.FinancialIncreaseColor
+                    : style.FinancialDecreaseColor;
+
+                canvas.DrawLine(centerX, yHigh, centerX, yLow, paint);
+                canvas.DrawLine(centerX - tickHalfWidth, yOpen, centerX, yOpen, paint);
+                canvas.DrawLine(centerX, yClose, centerX + tickHalfWidth, yClose, paint);
+            }
+        }
+
+        private static void DrawHlcSeries(
+            SKCanvas canvas,
+            SKRect plot,
+            ChartSeriesSnapshot series,
+            double minValue,
+            double maxValue,
+            ChartAxisKind valueAxisKind,
+            SkiaChartStyle style)
+        {
+            var count = GetFinancialPointCount(series, series.Kind);
+            if (count == 0)
+            {
+                return;
+            }
+
+            var span = GetFinancialCategorySpan(plot, count);
+            var tickHalfWidth = count <= 1
+                ? plot.Width * 0.08f
+                : span * (float)Clamp(style.FinancialTickWidthRatio, 0.08f, 0.45f);
+            tickHalfWidth = Math.Max(2f, Math.Min(plot.Width * 0.12f, tickHalfWidth));
+            var strokeWidth = Math.Max(1f, style.FinancialWickStrokeWidth);
+
+            using var paint = new SKPaint
+            {
+                IsAntialias = true,
+                Style = SKPaintStyle.Stroke,
+                StrokeWidth = strokeWidth
+            };
+
+            for (var i = 0; i < count; i++)
+            {
+                if (!TryGetFinancialPoint(series, series.Kind, i, valueAxisKind, out _, out var high, out var low, out var close))
+                {
+                    continue;
+                }
+
+                var centerX = MapX(plot, i, count);
+                var yHigh = MapY(plot, high, minValue, maxValue, valueAxisKind);
+                var yLow = MapY(plot, low, minValue, maxValue, valueAxisKind);
+                var yClose = MapY(plot, close, minValue, maxValue, valueAxisKind);
+                paint.Color = ResolveFinancialIncrease(series, series.Kind, i, valueAxisKind, null, high, low, close)
+                    ? style.FinancialIncreaseColor
+                    : style.FinancialDecreaseColor;
+
+                canvas.DrawLine(centerX, yHigh, centerX, yLow, paint);
+                canvas.DrawLine(centerX, yClose, centerX + tickHalfWidth, yClose, paint);
+            }
+        }
+
+        private static void DrawFinancialLastPriceOverlay(
+            SKCanvas canvas,
+            SKRect bounds,
+            SKRect plot,
+            ChartDataSnapshot snapshot,
+            SkiaChartStyle style,
+            double minPrimaryValue,
+            double maxPrimaryValue,
+            double minSecondaryValue,
+            double maxSecondaryValue)
+        {
+            if (!style.FinancialShowLastPriceLine)
+            {
+                return;
+            }
+
+            for (var seriesIndex = snapshot.Series.Count - 1; seriesIndex >= 0; seriesIndex--)
+            {
+                var series = snapshot.Series[seriesIndex];
+                if (!IsFinancialSeriesKind(series.Kind))
+                {
+                    continue;
+                }
+
+                var axisKind = series.ValueAxisAssignment == ChartValueAxisAssignment.Secondary
+                    ? style.SecondaryValueAxisKind
+                    : style.ValueAxisKind;
+                var axisFormatter = series.ValueAxisAssignment == ChartValueAxisAssignment.Secondary
+                    ? style.SecondaryAxisLabelFormatter
+                    : style.AxisLabelFormatter;
+                var axisValueFormat = series.ValueAxisAssignment == ChartValueAxisAssignment.Secondary
+                    ? style.SecondaryAxisValueFormat
+                    : style.AxisValueFormat;
+                var axisMin = series.ValueAxisAssignment == ChartValueAxisAssignment.Secondary
+                    ? minSecondaryValue
+                    : minPrimaryValue;
+                var axisMax = series.ValueAxisAssignment == ChartValueAxisAssignment.Secondary
+                    ? maxSecondaryValue
+                    : maxPrimaryValue;
+
+                for (var pointIndex = GetFinancialPointCount(series, series.Kind) - 1; pointIndex >= 0; pointIndex--)
+                {
+                    if (!TryGetFinancialPoint(series, series.Kind, pointIndex, axisKind, out var open, out var high, out var low, out var close))
+                    {
+                        continue;
+                    }
+
+                    var y = MapY(plot, close, axisMin, axisMax, axisKind);
+                    var isBullish = ResolveFinancialIncrease(series, series.Kind, pointIndex, axisKind, open, high, low, close);
+                    var lineColor = style.FinancialLastPriceLineColor.Alpha == 0
+                        ? (isBullish ? style.FinancialIncreaseColor : style.FinancialDecreaseColor)
+                        : style.FinancialLastPriceLineColor;
+
+                    using var linePaint = new SKPaint
+                    {
+                        Color = lineColor,
+                        StrokeWidth = Math.Max(1f, style.FinancialLastPriceLineWidth),
+                        IsAntialias = true,
+                        Style = SKPaintStyle.Stroke,
+                        PathEffect = SKPathEffect.CreateDash(new[] { 4f, 4f }, 0f)
+                    };
+
+                    using var textPaint = CreateTextPaint(style.FinancialLastPriceLabelText, Math.Max(style.LabelSize, 10f));
+                    using var backgroundPaint = new SKPaint
+                    {
+                        Color = new SKColor(lineColor.Red, lineColor.Green, lineColor.Blue, 224),
+                        IsAntialias = true,
+                        Style = SKPaintStyle.Fill
+                    };
+
+                    canvas.DrawLine(plot.Left, y, plot.Right, y, linePaint);
+
+                    var label = FormatAxisValue(close, axisKind, axisFormatter, axisValueFormat, null);
+                    var textBounds = new SKRect();
+                    textPaint.MeasureText(label, ref textBounds);
+                    var padding = Math.Max(2f, style.FinancialLastPriceLabelPadding);
+                    var labelWidth = textBounds.Width + (padding * 2f);
+                    var labelHeight = textBounds.Height + (padding * 2f);
+                    var outsideLeft = plot.Right + 4f;
+                    var insideLeft = Math.Max(plot.Left + 2f, plot.Right - labelWidth - 2f);
+                    var maxLeft = Math.Max(bounds.Left, bounds.Right - labelWidth - 1f);
+                    var labelLeft = outsideLeft + labelWidth <= bounds.Right - 1f
+                        ? outsideLeft
+                        : Math.Min(insideLeft, maxLeft);
+                    var top = Clamp(y - (labelHeight * 0.5f), bounds.Top + 1f, Math.Max(bounds.Top + 1f, bounds.Bottom - labelHeight - 1f));
+                    var backgroundRect = new SKRect(
+                        labelLeft,
+                        top,
+                        Math.Min(bounds.Right - 1f, labelLeft + labelWidth),
+                        top + labelHeight);
+
+                    canvas.DrawRect(backgroundRect, backgroundPaint);
+                    canvas.DrawText(label, backgroundRect.Left + padding - textBounds.Left, backgroundRect.MidY - textBounds.MidY, textPaint);
+                    return;
+                }
+            }
+        }
+
         private static void DrawScatterSeries(
             SKCanvas canvas,
             SKRect plot,
