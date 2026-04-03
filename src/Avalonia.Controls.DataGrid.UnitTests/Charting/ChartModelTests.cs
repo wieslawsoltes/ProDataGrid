@@ -58,6 +58,184 @@ namespace Avalonia.Controls.DataGridTests.Charting
             Assert.Equal(1, source.BuildSnapshotCalls);
         }
 
+        [Fact]
+        public void ChartModel_ShowLatest_Follows_New_Data_When_Enabled()
+        {
+            var source = new WindowedSource(20);
+            var model = new ChartModel { AutoRefresh = false, DataSource = source };
+
+            model.Refresh();
+
+            Assert.True(model.ShowLatest(5, followLatest: true));
+            Assert.True(model.Interaction.FollowLatest);
+            Assert.Equal(15, model.Request.WindowStart);
+            Assert.Equal(5, model.Request.WindowCount);
+
+            source.TotalCategories = 23;
+            model.Refresh();
+
+            Assert.Equal(18, model.Request.WindowStart);
+            Assert.Equal(5, model.Request.WindowCount);
+            Assert.Equal(5, model.Snapshot.Categories.Count);
+            Assert.Equal("C19", model.Snapshot.Categories[0]);
+            Assert.Equal("C23", model.Snapshot.Categories[4]);
+        }
+
+        [Fact]
+        public void ChartModel_PanWindow_Disables_FollowLatest_And_Clamps()
+        {
+            var source = new WindowedSource(20);
+            var model = new ChartModel { AutoRefresh = false, DataSource = source };
+
+            model.Refresh();
+            model.ShowLatest(5, followLatest: true);
+
+            Assert.True(model.PanWindow(-3));
+            Assert.False(model.Interaction.FollowLatest);
+            Assert.Equal(12, model.Request.WindowStart);
+            Assert.Equal(5, model.Request.WindowCount);
+
+            Assert.True(model.PanWindow(-50));
+            Assert.Equal(0, model.Request.WindowStart);
+            Assert.Equal(5, model.Request.WindowCount);
+        }
+
+        [Fact]
+        public void ChartModel_ZoomWindow_Adjusts_Window_Count()
+        {
+            var source = new WindowedSource(20);
+            var model = new ChartModel { AutoRefresh = false, DataSource = source };
+
+            model.Refresh();
+            model.SetVisibleWindow(5, 10, false);
+
+            Assert.True(model.ZoomWindow(2d, 0d, minWindowCount: 2));
+            Assert.Equal(5, model.Request.WindowStart);
+            Assert.Equal(5, model.Request.WindowCount);
+        }
+
+        [Fact]
+        public void ChartModel_WindowHistory_Supports_Undo_And_Redo()
+        {
+            var source = new WindowedSource(20);
+            var model = new ChartModel { AutoRefresh = false, DataSource = source };
+
+            model.Refresh();
+
+            Assert.False(model.CanUndoWindow);
+            Assert.False(model.CanRedoWindow);
+
+            Assert.True(model.SetVisibleWindow(5, 10, false));
+            Assert.True(model.ZoomWindow(2d, 0d, minWindowCount: 2));
+
+            Assert.True(model.CanUndoWindow);
+            Assert.False(model.CanRedoWindow);
+            Assert.Equal(5, model.Request.WindowStart);
+            Assert.Equal(5, model.Request.WindowCount);
+
+            Assert.True(model.UndoWindow());
+            Assert.Equal(5, model.Request.WindowStart);
+            Assert.Equal(10, model.Request.WindowCount);
+            Assert.True(model.CanRedoWindow);
+
+            Assert.True(model.RedoWindow());
+            Assert.Equal(5, model.Request.WindowStart);
+            Assert.Equal(5, model.Request.WindowCount);
+        }
+
+        [Fact]
+        public void ChartModel_TryGetVisibleWindow_Returns_Clamped_Window_State()
+        {
+            var source = new WindowedSource(20);
+            var model = new ChartModel { AutoRefresh = false, DataSource = source };
+
+            model.Refresh();
+            model.SetVisibleWindow(17, 10, false);
+
+            Assert.True(model.TryGetVisibleWindow(out var total, out var start, out var count));
+            Assert.Equal(20, total);
+            Assert.Equal(10, count);
+            Assert.Equal(10, start);
+        }
+
+        [Fact]
+        public void ChartModel_ValueRangeHistory_Supports_Pan_Undo_And_Redo()
+        {
+            var source = new WindowedSource(20);
+            var model = new ChartModel { AutoRefresh = false, DataSource = source };
+
+            model.Refresh();
+
+            Assert.True(model.SetValueRange(10d, 20d));
+            Assert.Equal(10d, model.ValueAxis.Minimum);
+            Assert.Equal(20d, model.ValueAxis.Maximum);
+
+            Assert.True(model.PanValueRange(2.5d));
+            Assert.Equal(12.5d, model.ValueAxis.Minimum);
+            Assert.Equal(22.5d, model.ValueAxis.Maximum);
+
+            Assert.True(model.CanUndoWindow);
+            Assert.True(model.UndoWindow());
+            Assert.Equal(10d, model.ValueAxis.Minimum);
+            Assert.Equal(20d, model.ValueAxis.Maximum);
+
+            Assert.True(model.CanRedoWindow);
+            Assert.True(model.RedoWindow());
+            Assert.Equal(12.5d, model.ValueAxis.Minimum);
+            Assert.Equal(22.5d, model.ValueAxis.Maximum);
+
+            Assert.True(model.ResetValueRange());
+            Assert.Null(model.ValueAxis.Minimum);
+            Assert.Null(model.ValueAxis.Maximum);
+        }
+
+        [Fact]
+        public void ChartModel_TrackCrosshair_Updates_InteractionState()
+        {
+            var model = new ChartModel();
+
+            model.TrackCrosshair(2, "10:15", 91.1d, 0.25d, 0.75d);
+
+            Assert.True(model.Interaction.IsCrosshairVisible);
+            Assert.Equal(2, model.Interaction.CrosshairCategoryIndex);
+            Assert.Equal("10:15", model.Interaction.CrosshairCategoryLabel);
+            Assert.Equal(91.1d, model.Interaction.CrosshairValue);
+            Assert.Equal(0.25d, model.Interaction.CrosshairHorizontalRatio);
+            Assert.Equal(0.75d, model.Interaction.CrosshairVerticalRatio);
+
+            model.ClearCrosshair();
+
+            Assert.False(model.Interaction.IsCrosshairVisible);
+            Assert.Null(model.Interaction.CrosshairCategoryIndex);
+            Assert.Null(model.Interaction.CrosshairCategoryLabel);
+            Assert.Null(model.Interaction.CrosshairValue);
+        }
+
+        [Fact]
+        public void ChartModel_Raises_ValueAxis_Change_When_Nested_ValueFormat_Updates()
+        {
+            var model = new ChartModel();
+            var format = new ChartValueFormat
+            {
+                MaximumFractionDigits = 2
+            };
+            var propertyChanges = new List<string>();
+            model.PropertyChanged += (_, e) =>
+            {
+                if (!string.IsNullOrWhiteSpace(e.PropertyName))
+                {
+                    propertyChanges.Add(e.PropertyName!);
+                }
+            };
+
+            model.ValueAxis.ValueFormat = format;
+            propertyChanges.Clear();
+
+            format.MaximumFractionDigits = 4;
+
+            Assert.Contains(nameof(ChartModel.ValueAxis), propertyChanges);
+        }
+
         private sealed class CountingSource : IChartDataSource
         {
             private readonly ChartDataSnapshot _snapshot;
@@ -114,6 +292,55 @@ namespace Avalonia.Controls.DataGridTests.Charting
                 update = _update;
                 return true;
             }
+        }
+
+        private sealed class WindowedSource : IChartDataSource, IChartWindowInfoProvider
+        {
+            public WindowedSource(int totalCategories)
+            {
+                TotalCategories = totalCategories;
+            }
+
+            public int TotalCategories { get; set; }
+
+            public event EventHandler? DataInvalidated;
+
+            public int? GetTotalCategoryCount() => TotalCategories;
+
+            public ChartDataSnapshot BuildSnapshot(ChartDataRequest request)
+            {
+                var total = Math.Max(0, TotalCategories);
+                var count = request.WindowCount ?? total;
+                if (count <= 0 || count > total)
+                {
+                    count = total;
+                }
+
+                var start = request.WindowStart ?? Math.Max(0, total - count);
+                if (start < 0)
+                {
+                    start = 0;
+                }
+
+                if (start + count > total)
+                {
+                    start = Math.Max(0, total - count);
+                }
+
+                var categories = new string?[count];
+                var values = new double?[count];
+                for (var i = 0; i < count; i++)
+                {
+                    categories[i] = $"C{start + i + 1}";
+                    values[i] = start + i + 1;
+                }
+
+                return new ChartDataSnapshot(
+                    categories,
+                    new[] { new ChartSeriesSnapshot("Series", ChartSeriesKind.Line, values) });
+            }
+
+            public void Invalidate() => DataInvalidated?.Invoke(this, EventArgs.Empty);
         }
     }
 }

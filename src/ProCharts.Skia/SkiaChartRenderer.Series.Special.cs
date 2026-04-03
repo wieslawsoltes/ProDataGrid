@@ -1791,8 +1791,8 @@ namespace ProCharts.Skia
 
         private static string FormatHistogramLabel(double start, double end, SkiaChartStyle style)
         {
-            var startText = FormatAxisValue(start, style.CategoryAxisKind, style.CategoryAxisLabelFormatter);
-            var endText = FormatAxisValue(end, style.CategoryAxisKind, style.CategoryAxisLabelFormatter);
+            var startText = FormatAxisValue(start, style.CategoryAxisKind, style.CategoryAxisLabelFormatter, style.CategoryAxisValueFormat);
+            var endText = FormatAxisValue(end, style.CategoryAxisKind, style.CategoryAxisLabelFormatter, style.CategoryAxisValueFormat);
             return $"{startText} - {endText}";
         }
 
