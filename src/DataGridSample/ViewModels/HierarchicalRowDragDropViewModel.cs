@@ -13,6 +13,7 @@ namespace DataGridSample.ViewModels
         private DataGridRowDragHandle _rowDragHandle;
         private bool _showHandle = true;
         private bool _useMultipleRoots = true;
+        private bool _prioritizeDragGesture = true;
 
         public HierarchicalRowDragDropViewModel()
         {
@@ -29,10 +30,11 @@ namespace DataGridSample.ViewModels
 
             Options = new DataGridRowDragDropOptions
             {
-                AllowedEffects = DragDropEffects.Move
+                AllowedEffects = DragDropEffects.Move,
+                SuppressSelectionDragFromDragHandle = true
             };
 
-            DropHandler = new DataGridHierarchicalRowReorderHandler();
+            DropHandler = new TreeItemDropHandler();
             RowDragHandle = DataGridRowDragHandle.RowHeader;
             DragHandles = new[]
             {
@@ -66,6 +68,18 @@ namespace DataGridSample.ViewModels
         {
             get => _showHandle;
             set => SetProperty(ref _showHandle, value);
+        }
+
+        public bool PrioritizeDragGesture
+        {
+            get => _prioritizeDragGesture;
+            set
+            {
+                if (SetProperty(ref _prioritizeDragGesture, value))
+                {
+                    Options.SuppressSelectionDragFromDragHandle = value;
+                }
+            }
         }
 
         public bool UseMultipleRoots
@@ -102,39 +116,39 @@ namespace DataGridSample.ViewModels
 
         private static TreeItem CreateTree()
         {
-            return new TreeItem("Releases", new ObservableCollection<TreeItem>
+            return new TreeItem("Releases", true, new ObservableCollection<TreeItem>
             {
-                new("v1.0", new ObservableCollection<TreeItem>
+                new("v1.0", true, new ObservableCollection<TreeItem>
                 {
-                    new("Features", new ObservableCollection<TreeItem>
+                    new("Features", true, new ObservableCollection<TreeItem>
                     {
-                        new("Drag & drop rows"),
-                        new("Hierarchical preview")
+                        new("Drag & drop rows", acceptsChildren: false),
+                        new("Hierarchical preview", acceptsChildren: false)
                     }),
-                    new("Bugfixes", new ObservableCollection<TreeItem>
+                    new("Bugfixes", true, new ObservableCollection<TreeItem>
                     {
-                        new("Selection regression"),
-                        new("Cell templates")
+                        new("Selection regression", acceptsChildren: false),
+                        new("Cell templates", acceptsChildren: false)
                     })
                 }),
-                new("v2.0", new ObservableCollection<TreeItem>
+                new("v2.0", true, new ObservableCollection<TreeItem>
                 {
-                    new("Features", new ObservableCollection<TreeItem>
+                    new("Features", true, new ObservableCollection<TreeItem>
                     {
-                        new("Virtualization revamp"),
-                        new("Keyboard navigation")
+                        new("Virtualization revamp", acceptsChildren: false),
+                        new("Keyboard navigation", acceptsChildren: false)
                     }),
-                    new("Bugfixes", new ObservableCollection<TreeItem>
+                    new("Bugfixes", true, new ObservableCollection<TreeItem>
                     {
-                        new("Dark theme polish"),
-                        new("Scrolling jitter")
+                        new("Dark theme polish", acceptsChildren: false),
+                        new("Scrolling jitter", acceptsChildren: false)
                     })
                 }),
-                new("Backlog", new ObservableCollection<TreeItem>
+                new("Backlog", true, new ObservableCollection<TreeItem>
                 {
-                    new("Performance"),
-                    new("Docs & samples"),
-                    new("Accessibility")
+                    new("Performance", acceptsChildren: false),
+                    new("Docs & samples", acceptsChildren: false),
+                    new("Accessibility", acceptsChildren: false)
                 })
             });
         }
@@ -143,26 +157,26 @@ namespace DataGridSample.ViewModels
         {
             return new ObservableCollection<TreeItem>
             {
-                new("Project Alpha", new ObservableCollection<TreeItem>
+                new("Project Alpha", true, new ObservableCollection<TreeItem>
                 {
-                    new("Tasks", new ObservableCollection<TreeItem>
+                    new("Tasks", true, new ObservableCollection<TreeItem>
                     {
-                        new("Setup"),
-                        new("Implementation")
+                        new("Setup", acceptsChildren: false),
+                        new("Implementation", acceptsChildren: false)
                     }),
-                    new("Issues")
+                    new("Issues", acceptsChildren: false)
                 }),
-                new("Project Beta", new ObservableCollection<TreeItem>
+                new("Project Beta", true, new ObservableCollection<TreeItem>
                 {
-                    new("Design", new ObservableCollection<TreeItem>
+                    new("Design", true, new ObservableCollection<TreeItem>
                     {
-                        new("Wireframes"),
-                        new("Mockups")
+                        new("Wireframes", acceptsChildren: false),
+                        new("Mockups", acceptsChildren: false)
                     })
                 }),
-                new("Project Gamma", new ObservableCollection<TreeItem>
+                new("Project Gamma", true, new ObservableCollection<TreeItem>
                 {
-                    new("Research")
+                    new("Research", acceptsChildren: false)
                 })
             };
         }
@@ -170,15 +184,79 @@ namespace DataGridSample.ViewModels
         [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors | DynamicallyAccessedMemberTypes.PublicProperties)]
         public class TreeItem
         {
-            public TreeItem(string name, ObservableCollection<TreeItem>? children = null)
+            public TreeItem(string name, bool acceptsChildren = true, ObservableCollection<TreeItem>? children = null)
             {
                 Name = name;
+                AcceptsChildren = acceptsChildren;
                 Children = children ?? new ObservableCollection<TreeItem>();
             }
 
             public string Name { get; }
 
+            public bool AcceptsChildren { get; }
+
             public ObservableCollection<TreeItem> Children { get; }
+        }
+
+        private sealed class TreeItemDropHandler : IDataGridRowDropHandler
+        {
+            private readonly DataGridHierarchicalRowReorderHandler _reorder = new();
+
+            public bool Validate(DataGridRowDropEventArgs args)
+            {
+                var reorderValid = _reorder.Validate(args);
+                var leafOnlyTarget =
+                    args.Position == DataGridRowDropPosition.Inside &&
+                    args.TargetItem is HierarchicalNode node &&
+                    node.Item is TreeItem item &&
+                    !item.AcceptsChildren;
+
+                if (!reorderValid || leafOnlyTarget)
+                {
+                    args.EffectiveEffect = DragDropEffects.None;
+                    SetFeedbackCaption(
+                        args,
+                        leafOnlyTarget
+                            ? "This node only accepts before/after drops."
+                            : "Drop here is not allowed.");
+                    return false;
+                }
+
+                SetFeedbackCaption(args, BuildCaption(args));
+                return true;
+            }
+
+            public bool Execute(DataGridRowDropEventArgs args)
+            {
+                return _reorder.Execute(args);
+            }
+
+            private static void SetFeedbackCaption(DataGridRowDropEventArgs args, string caption)
+            {
+                if (args.Session != null)
+                {
+                    args.Session.FeedbackCaption = caption;
+                }
+            }
+
+            private static string BuildCaption(DataGridRowDropEventArgs args)
+            {
+                var target = args.TargetItem is HierarchicalNode node && node.Item is TreeItem item
+                    ? $"{DescribePosition(args.Position)} {item.Name}"
+                    : "at the end of this level";
+                var itemCount = args.Items.Count == 1 ? "1 node" : $"{args.Items.Count} nodes";
+                return $"Move {itemCount} {target}.";
+            }
+
+            private static string DescribePosition(DataGridRowDropPosition position)
+            {
+                return position switch
+                {
+                    DataGridRowDropPosition.After => "after",
+                    DataGridRowDropPosition.Inside => "inside",
+                    _ => "before"
+                };
+            }
         }
     }
 }

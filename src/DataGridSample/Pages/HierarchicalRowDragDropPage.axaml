@@ -11,13 +11,15 @@
                Text="Hierarchical row drag &amp; drop" />
     <TextBlock Grid.Row="1"
                TextWrapping="Wrap"
-               Text="Reorder nodes across the hierarchy. Drags are limited to move operations and respect the current parent/child structure." />
+               Text="Reorder nodes across the hierarchy and inspect the live drag session. Inside drops are rejected for leaf-only nodes, so you can see the operation change to None while the drag is already active." />
 
-    <StackPanel Grid.Row="2" Orientation="Horizontal" Spacing="8">
+    <StackPanel Grid.Row="2" Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
       <CheckBox Content="Show drag handle"
                 IsChecked="{Binding ShowHandle}" />
       <CheckBox Content="Multiple roots"
                 IsChecked="{Binding UseMultipleRoots}" />
+      <CheckBox Content="Prioritize drag over selection-drag"
+                IsChecked="{Binding PrioritizeDragGesture}" />
       <StackPanel Orientation="Horizontal" Spacing="4">
         <TextBlock VerticalAlignment="Center" Text="Drag handle:" />
         <ComboBox Width="180"
@@ -36,41 +38,117 @@
               Command="{Binding CollapseAllCommand}" />
     </StackPanel>
 
-    <DataGrid Grid.Row="3"
-              CanUserReorderRows="True"
-              HierarchicalRowsEnabled="True"
-              Classes="hierarchical"
-              RowDragHandle="{Binding RowDragHandle}"
-              RowDragHandleVisible="{Binding ShowHandle}"
-              RowDragDropOptions="{Binding Options}"
-              RowDropHandler="{Binding DropHandler}"
-              x:DataType="viewModels:HierarchicalRowDragDropViewModel"
-              AutoGenerateColumns="False"
-              HierarchicalModel="{Binding Model}"
-              HeadersVisibility="All"
-              RowHeaderWidth="28"
-              GridLinesVisibility="Horizontal"
-              SelectionMode="Extended">
-      <DataGrid.Columns>
-        <DataGridHierarchicalColumn Header="Name"
-                                    Width="3*"
-                                    x:CompileBindings="False"
-                                    Binding="{Binding Item}">
-          <DataGridHierarchicalColumn.CellTemplate>
-            <DataTemplate x:DataType="viewModels:HierarchicalRowDragDropViewModel+TreeItem">
-              <TextBlock Text="{Binding Name}" />
-            </DataTemplate>
-          </DataGridHierarchicalColumn.CellTemplate>
-        </DataGridHierarchicalColumn>
-        <DataGridTemplateColumn Header="Children"
-                                Width="120">
-          <DataGridTemplateColumn.CellTemplate>
-            <DataTemplate x:DataType="hier:HierarchicalNode">
-              <TextBlock Text="{Binding Children.Count}" />
-            </DataTemplate>
-          </DataGridTemplateColumn.CellTemplate>
-        </DataGridTemplateColumn>
-      </DataGrid.Columns>
-    </DataGrid>
+    <Grid Grid.Row="3"
+          ColumnDefinitions="2.5*,1*"
+          ColumnSpacing="14">
+      <DataGrid x:Name="TreeGrid"
+                CanUserReorderRows="True"
+                HierarchicalRowsEnabled="True"
+                Classes="hierarchical"
+                RowDragHandle="{Binding RowDragHandle}"
+                RowDragHandleVisible="{Binding ShowHandle}"
+                RowDragDropOptions="{Binding Options}"
+                RowDropHandler="{Binding DropHandler}"
+                RowDragFeedbackOffset="18,20"
+                x:DataType="viewModels:HierarchicalRowDragDropViewModel"
+                AutoGenerateColumns="False"
+                HierarchicalModel="{Binding Model}"
+                HeadersVisibility="All"
+                RowHeaderWidth="28"
+                GridLinesVisibility="Horizontal"
+                SelectionMode="Extended">
+        <DataGrid.RowDragFeedbackTemplate>
+          <DataTemplate x:DataType="DataGridDragDrop:DataGridRowDragSession">
+            <Border Background="#1E293B"
+                    BorderBrush="#22C55E"
+                    BorderThickness="1"
+                    CornerRadius="12"
+                    Padding="10,8">
+              <StackPanel Spacing="3">
+                <TextBlock Foreground="White"
+                           FontWeight="SemiBold"
+                           Text="{Binding EffectiveEffect}" />
+                <TextBlock Foreground="#BBF7D0"
+                           Text="{Binding FeedbackCaption}"
+                           MaxWidth="220"
+                           TextWrapping="Wrap" />
+              </StackPanel>
+            </Border>
+          </DataTemplate>
+        </DataGrid.RowDragFeedbackTemplate>
+        <DataGrid.Columns>
+          <DataGridHierarchicalColumn Header="Name"
+                                      Width="3*"
+                                      x:CompileBindings="False"
+                                      Binding="{Binding Item}">
+            <DataGridHierarchicalColumn.CellTemplate>
+              <DataTemplate x:DataType="viewModels:HierarchicalRowDragDropViewModel+TreeItem">
+                <TextBlock Text="{Binding Name}" />
+              </DataTemplate>
+            </DataGridHierarchicalColumn.CellTemplate>
+          </DataGridHierarchicalColumn>
+          <DataGridTemplateColumn Header="Accepts inside drops"
+                                  Width="150">
+            <DataGridTemplateColumn.CellTemplate>
+              <DataTemplate x:DataType="hier:HierarchicalNode"
+                            x:CompileBindings="False">
+                <CheckBox HorizontalAlignment="Center"
+                          IsEnabled="False"
+                          IsChecked="{Binding Item.AcceptsChildren}" />
+              </DataTemplate>
+            </DataGridTemplateColumn.CellTemplate>
+          </DataGridTemplateColumn>
+          <DataGridTemplateColumn Header="Children"
+                                  Width="100">
+            <DataGridTemplateColumn.CellTemplate>
+              <DataTemplate x:DataType="hier:HierarchicalNode">
+                <TextBlock Text="{Binding Children.Count}" />
+              </DataTemplate>
+            </DataGridTemplateColumn.CellTemplate>
+          </DataGridTemplateColumn>
+        </DataGrid.Columns>
+      </DataGrid>
+
+      <Border Grid.Column="1"
+              Padding="14"
+              CornerRadius="12"
+              Background="#F8FAFC"
+              BorderBrush="#CBD5E1"
+              BorderThickness="1">
+        <StackPanel Spacing="8">
+          <TextBlock FontSize="16"
+                     FontWeight="SemiBold"
+                     Text="Live Session" />
+          <TextBlock Foreground="#475569"
+                     TextWrapping="Wrap"
+                     Text="Leaf-only nodes reject inside drops. Watch DropPosition and EffectiveEffect change as you cross before/after/inside zones." />
+          <ContentControl Content="{Binding ElementName=TreeGrid, Path=ActiveRowDragSession}">
+            <ContentControl.DataTemplates>
+              <DataTemplate x:DataType="DataGridDragDrop:DataGridRowDragSession">
+                <StackPanel Spacing="6">
+                  <TextBlock Text="{Binding FeedbackCaption}" TextWrapping="Wrap" />
+                  <Grid ColumnDefinitions="Auto,*" RowDefinitions="Auto,Auto,Auto,Auto,Auto,Auto,Auto" ColumnSpacing="10" RowSpacing="4">
+                    <TextBlock Text="Items" />
+                    <TextBlock Grid.Column="1" Text="{Binding Items.Count}" />
+                    <TextBlock Grid.Row="1" Text="Effective" />
+                    <TextBlock Grid.Row="1" Grid.Column="1" Text="{Binding EffectiveEffect}" />
+                    <TextBlock Grid.Row="2" Text="Modifiers" />
+                    <TextBlock Grid.Row="2" Grid.Column="1" Text="{Binding KeyModifiers}" />
+                    <TextBlock Grid.Row="3" Text="Drop zone" />
+                    <TextBlock Grid.Row="3" Grid.Column="1" Text="{Binding DropPosition}" />
+                    <TextBlock Grid.Row="4" Text="Insert index" />
+                    <TextBlock Grid.Row="4" Grid.Column="1" Text="{Binding InsertIndex}" />
+                    <TextBlock Grid.Row="5" Text="Hovered node" />
+                    <TextBlock Grid.Row="5" Grid.Column="1" Text="{Binding HoveredItem}" TextWrapping="Wrap" />
+                    <TextBlock Grid.Row="6" Text="Valid target" />
+                    <TextBlock Grid.Row="6" Grid.Column="1" Text="{Binding IsValidTarget}" />
+                  </Grid>
+                </StackPanel>
+              </DataTemplate>
+            </ContentControl.DataTemplates>
+          </ContentControl>
+        </StackPanel>
+      </Border>
+    </Grid>
   </Grid>
 </UserControl>

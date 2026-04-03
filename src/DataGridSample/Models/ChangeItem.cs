@@ -8,6 +8,7 @@ namespace DataGridSample.Models
     {
         private int _id;
         private string _name = string.Empty;
+        private string _lane = string.Empty;
         private int _value;
 
         public int Id
@@ -20,6 +21,12 @@ namespace DataGridSample.Models
         {
             get => _name;
             set => SetProperty(ref _name, value);
+        }
+
+        public string Lane
+        {
+            get => _lane;
+            set => SetProperty(ref _lane, value);
         }
 
         public int Value
