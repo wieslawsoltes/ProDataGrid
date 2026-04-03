@@ -285,7 +285,10 @@ internal
                         bool allowEdit = !e.Handled && focusWithin && isSelected && !ctrl &&
                                          OwningGrid.ShouldBeginEditOnPointer(e);
                         var handled = OwningGrid.UpdateStateOnMouseLeftButtonDown(e, ColumnIndex, OwningRow.Slot, allowEdit);
-                        OwningGrid.TryBeginSelectionDrag(e, ColumnIndex, shouldHandleSelection);
+                        if (!OwningGrid.ShouldSuppressSelectionDragFromRowDragHandle(ColumnIndex))
+                        {
+                            OwningGrid.TryBeginSelectionDrag(e, ColumnIndex, shouldHandleSelection);
+                        }
 
                         // Do not handle PointerPressed with touch or pen,
                         // so we can start scroll gesture on the same event.

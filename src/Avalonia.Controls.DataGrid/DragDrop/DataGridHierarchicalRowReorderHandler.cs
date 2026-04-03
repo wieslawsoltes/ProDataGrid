@@ -118,11 +118,11 @@ namespace Avalonia.Controls.DataGridDragDrop
             // Only move is currently supported.
             if (!args.RequestedEffect.HasFlag(DragDropEffects.Move))
             {
-                args.RequestedEffect = DragDropEffects.None;
+                args.EffectiveEffect = DragDropEffects.None;
                 return false;
             }
 
-            args.RequestedEffect = DragDropEffects.Move;
+            args.EffectiveEffect = DragDropEffects.Move;
             return true;
         }
 

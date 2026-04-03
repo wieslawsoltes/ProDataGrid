@@ -194,6 +194,66 @@ public class DataGridInputMouseSelectionTests
     }
 
     [AvaloniaFact]
+    public void RowDragHandle_Row_Suppresses_SelectionDrag_When_Enabled()
+    {
+        var (grid, items) = CreateGrid(selectionUnit: DataGridSelectionUnit.FullRow, selectionMode: DataGridSelectionMode.Extended);
+        grid.CanUserReorderRows = true;
+        grid.RowDragHandle = DataGridRowDragHandle.Row;
+        grid.RowDragDropOptions = new DataGridRowDragDropOptions
+        {
+            SuppressSelectionDragFromDragHandle = true
+        };
+        grid.UpdateLayout();
+        Dispatcher.UIThread.RunJobs();
+
+        var slot = grid.SlotFromRowIndex(0);
+        var row = grid.DisplayData.GetDisplayedElement(slot) as DataGridRow;
+        Assert.NotNull(row);
+
+        var cell = row!.Cells[0];
+        var point = GetCenterPoint(cell, grid);
+        var pointer = new Pointer(Pointer.GetNextFreeId(), PointerType.Mouse, isPrimary: true);
+
+        cell.RaiseEvent(CreatePointerPressedArgs(cell, grid, pointer, point, KeyModifiers.None));
+
+        Assert.False(GetSelectionDragCapturePending(grid));
+        Assert.Single(grid.SelectedItems);
+        Assert.Contains(items[0], grid.SelectedItems.Cast<RowItem>());
+
+        grid.RaiseEvent(CreatePointerReleasedArgs(grid, grid, pointer, point, KeyModifiers.None));
+    }
+
+    [AvaloniaFact]
+    public void RowDragHandle_Row_Allows_SelectionDrag_When_Suppression_Disabled()
+    {
+        var (grid, items) = CreateGrid(selectionUnit: DataGridSelectionUnit.FullRow, selectionMode: DataGridSelectionMode.Extended);
+        grid.CanUserReorderRows = true;
+        grid.RowDragHandle = DataGridRowDragHandle.Row;
+        grid.RowDragDropOptions = new DataGridRowDragDropOptions
+        {
+            SuppressSelectionDragFromDragHandle = false
+        };
+        grid.UpdateLayout();
+        Dispatcher.UIThread.RunJobs();
+
+        var slot = grid.SlotFromRowIndex(0);
+        var row = grid.DisplayData.GetDisplayedElement(slot) as DataGridRow;
+        Assert.NotNull(row);
+
+        var cell = row!.Cells[0];
+        var point = GetCenterPoint(cell, grid);
+        var pointer = new Pointer(Pointer.GetNextFreeId(), PointerType.Mouse, isPrimary: true);
+
+        cell.RaiseEvent(CreatePointerPressedArgs(cell, grid, pointer, point, KeyModifiers.None));
+
+        Assert.True(GetSelectionDragCapturePending(grid));
+        Assert.Single(grid.SelectedItems);
+        Assert.Contains(items[0], grid.SelectedItems.Cast<RowItem>());
+
+        grid.RaiseEvent(CreatePointerReleasedArgs(grid, grid, pointer, point, KeyModifiers.None));
+    }
+
+    [AvaloniaFact]
     public void RowHeaderSelectionDrag_Defers_Pointer_Capture_Until_Threshold()
     {
         var (grid, _) = CreateGrid(selectionUnit: DataGridSelectionUnit.FullRow, selectionMode: DataGridSelectionMode.Extended);
@@ -219,6 +279,72 @@ public class DataGridInputMouseSelectionTests
         Assert.Same(grid, pointer.Captured);
 
         grid.RaiseEvent(CreatePointerReleasedArgs(grid, grid, pointer, movePoint, KeyModifiers.None));
+    }
+
+    [AvaloniaFact]
+    public void RowDragHandle_RowHeader_Suppresses_SelectionDrag_When_Enabled()
+    {
+        var (grid, items) = CreateGrid(selectionUnit: DataGridSelectionUnit.FullRow, selectionMode: DataGridSelectionMode.Extended);
+        grid.HeadersVisibility = DataGridHeadersVisibility.All;
+        grid.RowHeaderWidth = 28;
+        grid.CanUserReorderRows = true;
+        grid.RowDragHandle = DataGridRowDragHandle.RowHeader;
+        grid.RowDragDropOptions = new DataGridRowDragDropOptions
+        {
+            SuppressSelectionDragFromDragHandle = true
+        };
+        grid.UpdateLayout();
+        Dispatcher.UIThread.RunJobs();
+
+        var slot = grid.SlotFromRowIndex(0);
+        var row = grid.DisplayData.GetDisplayedElement(slot) as DataGridRow;
+        Assert.NotNull(row);
+        Assert.True(row!.HasHeaderCell);
+
+        var header = row.HeaderCell;
+        var point = GetCenterPoint(header, grid);
+        var pointer = new Pointer(Pointer.GetNextFreeId(), PointerType.Mouse, isPrimary: true);
+
+        header.RaiseEvent(CreatePointerPressedArgs(header, grid, pointer, point, KeyModifiers.None));
+
+        Assert.False(GetSelectionDragCapturePending(grid));
+        Assert.Single(grid.SelectedItems);
+        Assert.Contains(items[0], grid.SelectedItems.Cast<RowItem>());
+
+        grid.RaiseEvent(CreatePointerReleasedArgs(grid, grid, pointer, point, KeyModifiers.None));
+    }
+
+    [AvaloniaFact]
+    public void RowDragHandle_RowHeader_Allows_SelectionDrag_When_Suppression_Disabled()
+    {
+        var (grid, items) = CreateGrid(selectionUnit: DataGridSelectionUnit.FullRow, selectionMode: DataGridSelectionMode.Extended);
+        grid.HeadersVisibility = DataGridHeadersVisibility.All;
+        grid.RowHeaderWidth = 28;
+        grid.CanUserReorderRows = true;
+        grid.RowDragHandle = DataGridRowDragHandle.RowHeader;
+        grid.RowDragDropOptions = new DataGridRowDragDropOptions
+        {
+            SuppressSelectionDragFromDragHandle = false
+        };
+        grid.UpdateLayout();
+        Dispatcher.UIThread.RunJobs();
+
+        var slot = grid.SlotFromRowIndex(0);
+        var row = grid.DisplayData.GetDisplayedElement(slot) as DataGridRow;
+        Assert.NotNull(row);
+        Assert.True(row!.HasHeaderCell);
+
+        var header = row.HeaderCell;
+        var point = GetCenterPoint(header, grid);
+        var pointer = new Pointer(Pointer.GetNextFreeId(), PointerType.Mouse, isPrimary: true);
+
+        header.RaiseEvent(CreatePointerPressedArgs(header, grid, pointer, point, KeyModifiers.None));
+
+        Assert.True(GetSelectionDragCapturePending(grid));
+        Assert.Single(grid.SelectedItems);
+        Assert.Contains(items[0], grid.SelectedItems.Cast<RowItem>());
+
+        grid.RaiseEvent(CreatePointerReleasedArgs(grid, grid, pointer, point, KeyModifiers.None));
     }
 
     [AvaloniaFact]
@@ -2131,6 +2257,12 @@ public class DataGridInputMouseSelectionTests
     {
         var field = typeof(DataGrid).GetField("_executingLostFocusActions", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic);
         field?.SetValue(grid, value);
+    }
+
+    private static bool GetSelectionDragCapturePending(DataGrid grid)
+    {
+        var field = typeof(DataGrid).GetField("_dragCapturePending", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic);
+        return (bool?)field?.GetValue(grid) ?? false;
     }
 
     private static void CollapseSlot(DataGrid grid, int slot)
