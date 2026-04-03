@@ -16,6 +16,7 @@
 
   <ItemGroup>
     <ProjectReference Include="../DataGridSample/DataGridSample.csproj" />
+    <ProjectReference Include="../ProDataGrid.MarketDashboardSample/ProDataGrid.MarketDashboardSample.csproj" />
   </ItemGroup>
 
   <ItemGroup>
