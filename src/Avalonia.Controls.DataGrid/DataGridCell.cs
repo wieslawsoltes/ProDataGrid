@@ -282,9 +282,13 @@ internal
                     bool shouldHandleSelection = !e.Handled || !focusWithin || !isSelected || ctrl;
                     if (shouldHandleSelection)
                     {
+                        var preserveSelectionForRowDrag =
+                            OwningGrid.ShouldPreserveSelectionForRowDrag(ColumnIndex, OwningRow.Slot, isSelected, e.KeyModifiers);
                         bool allowEdit = !e.Handled && focusWithin && isSelected && !ctrl &&
                                          OwningGrid.ShouldBeginEditOnPointer(e);
-                        var handled = OwningGrid.UpdateStateOnMouseLeftButtonDown(e, ColumnIndex, OwningRow.Slot, allowEdit);
+                        var handled = preserveSelectionForRowDrag
+                            ? true
+                            : OwningGrid.UpdateStateOnMouseLeftButtonDown(e, ColumnIndex, OwningRow.Slot, allowEdit);
                         if (!OwningGrid.ShouldSuppressSelectionDragFromRowDragHandle(ColumnIndex))
                         {
                             OwningGrid.TryBeginSelectionDrag(e, ColumnIndex, shouldHandleSelection);

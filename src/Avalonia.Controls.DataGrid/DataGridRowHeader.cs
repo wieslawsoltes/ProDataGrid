@@ -290,7 +290,16 @@ internal
                         return;
                     }
 
-                    e.Handled = OwningGrid.UpdateStateOnMouseLeftButtonDown(e, -1, Slot, allowEdit: false, ignoreModifiers: dragHandleHit);
+                    var preserveSelectionForRowDrag =
+                        OwningGrid.ShouldPreserveSelectionForRowDrag(columnIndex: -1, Slot, OwningGrid.GetRowSelection(Slot), e.KeyModifiers);
+                    if (preserveSelectionForRowDrag)
+                    {
+                        e.Handled = true;
+                    }
+                    else
+                    {
+                        e.Handled = OwningGrid.UpdateStateOnMouseLeftButtonDown(e, -1, Slot, allowEdit: false, ignoreModifiers: dragHandleHit);
+                    }
                     if (!dragHandleHit &&
                         !OwningGrid.ShouldSuppressSelectionDragFromRowDragHandle(columnIndex: -1))
                     {

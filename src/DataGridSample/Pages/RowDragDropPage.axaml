@@ -10,7 +10,7 @@
                Text="Reorder rows with drag-and-drop" />
     <TextBlock Grid.Row="1"
                TextWrapping="Wrap"
-               Text="Use the row header grip or whole-row drag surface, hold Ctrl to switch to copy, and hover the pinned lane to see invalid-state feedback. The side panel binds to ActiveRowDragSession so you can inspect the live session while dragging." />
+               Text="Select multiple rows and drag them together from the row header grip or whole-row drag surface, hold Ctrl to switch to copy, and hover the pinned lane to see invalid-state feedback. The side panel binds to ActiveRowDragSession so you can inspect the live session while dragging." />
 
     <StackPanel Grid.Row="2" Orientation="Horizontal" Spacing="12" VerticalAlignment="Center">
       <CheckBox Content="Allow copy with Ctrl"

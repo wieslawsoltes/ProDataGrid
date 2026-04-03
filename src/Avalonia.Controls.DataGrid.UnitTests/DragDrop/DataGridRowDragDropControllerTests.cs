@@ -134,6 +134,54 @@ namespace Avalonia.Controls.DataGridTests.DragDrop;
     }
 
     [AvaloniaFact]
+    public void PointerPressed_On_Selected_Row_Uses_MultiSelection_For_DragInfo_When_Suppression_Is_Enabled()
+    {
+        var items = new ObservableCollection<RowItem>
+        {
+            new("A"),
+            new("B"),
+            new("C"),
+            new("D")
+        };
+        var (grid, window) = CreateGrid(items);
+        grid.CanUserReorderRows = true;
+        grid.RowDragHandle = DataGridRowDragHandle.Row;
+        var options = new DataGridRowDragDropOptions
+        {
+            SuppressSelectionDragFromDragHandle = true
+        };
+        grid.RowDragDropOptions = options;
+        grid.SelectedItems.Add(items[1]);
+        grid.SelectedItems.Add(items[2]);
+        grid.UpdateLayout();
+
+        var handler = new DataGridRowReorderHandler();
+        using var controller = new DataGridRowDragDropController(grid, handler, options);
+
+        var row = grid.GetVisualDescendants().OfType<DataGridRow>().Skip(1).First();
+        Assert.True(row.IsSelected);
+
+        var cell = row.Cells[0];
+        var point = cell.TranslatePoint(new Point(2, 2), grid) ?? new Point(2, 2);
+        var pointer = new Avalonia.Input.Pointer(Avalonia.Input.Pointer.GetNextFreeId(), PointerType.Mouse, isPrimary: true);
+
+        cell.RaiseEvent(CreatePointerPressedArgs(cell, window, pointer, point));
+
+        var dragInfo = InvokeTryCreateDragInfo(controller);
+
+        Assert.NotNull(dragInfo);
+        Assert.True(dragInfo!.FromSelection);
+        Assert.Collection(
+            dragInfo.Items,
+            item => Assert.Same(items[1], item),
+            item => Assert.Same(items[2], item));
+        Assert.Equal(new[] { 1, 2 }, dragInfo.Indices);
+
+        grid.RaiseEvent(CreatePointerReleasedArgs(grid, window, pointer, point));
+        window.Close();
+    }
+
+    [AvaloniaFact]
     public void RowHeader_DragHandle_Does_Not_Start_From_Cell()
     {
         var items = new ObservableCollection<RowItem>

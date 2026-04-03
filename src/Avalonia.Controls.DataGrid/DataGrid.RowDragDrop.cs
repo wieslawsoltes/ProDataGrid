@@ -4,6 +4,8 @@
 using System;
 using Avalonia;
 using Avalonia.Controls.DataGridDragDrop;
+using Avalonia.Controls.Utils;
+using Avalonia.Input;
 using Avalonia.Interactivity;
 
 namespace Avalonia.Controls
@@ -128,6 +130,22 @@ namespace Avalonia.Controls
             return RowDragHandle == DataGridRowDragHandle.RowHeader ||
                    RowDragHandle == DataGridRowDragHandle.Row ||
                    RowDragHandle == DataGridRowDragHandle.RowHeaderAndRow;
+        }
+
+        internal bool ShouldPreserveSelectionForRowDrag(int columnIndex, int slot, bool isSelected, KeyModifiers modifiers)
+        {
+            if (!ShouldSuppressSelectionDragFromRowDragHandle(columnIndex) ||
+                SelectionUnit != DataGridSelectionUnit.FullRow ||
+                SelectionMode != DataGridSelectionMode.Extended ||
+                !isSelected ||
+                slot < 0 ||
+                _selectedItems.Count <= 1)
+            {
+                return false;
+            }
+
+            KeyboardHelper.GetMetaKeyState(this, modifiers, out var ctrl, out _);
+            return !ctrl && !modifiers.HasFlag(KeyModifiers.Shift);
         }
 
         private void RefreshRowDragDropController()
