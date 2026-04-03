@@ -190,6 +190,8 @@
     href: row-details-and-templates.md
   - name: Drag and Drop
     href: drag-drop.md
+  - name: Row Drag Sessions
+    href: row-drag-sessions.md
   - name: State and Persistence
     href: state-persistence.md
   - name: Styling and Themes
