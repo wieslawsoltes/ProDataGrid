@@ -5,10 +5,12 @@ using System.Collections;
 using System.Collections.Generic;
 using Avalonia.Controls;
 using Avalonia.Input;
+using Avalonia;
 using Avalonia.Controls.DataGridDragDrop;
 
 namespace Avalonia.Controls.DataGridDragDrop
 {
+#nullable enable
 #if !DATAGRID_INTERNAL
     public
 #else
@@ -16,6 +18,10 @@ namespace Avalonia.Controls.DataGridDragDrop
 #endif
     sealed class DataGridRowDropEventArgs
     {
+        private DragDropEffects _requestedEffect;
+        private DragDropEffects _effectiveEffect;
+        private DataGridRowDragSession? _session;
+
 #if !DATAGRID_INTERNAL
         public
 #else
@@ -45,7 +51,8 @@ namespace Avalonia.Controls.DataGridDragDrop
             TargetRow = targetRow;
             Position = position;
             IsSameGrid = isSameGrid;
-            RequestedEffect = requestedEffect;
+            _requestedEffect = requestedEffect;
+            _effectiveEffect = requestedEffect;
             DragEventArgs = dragEventArgs;
         }
 
@@ -124,7 +131,68 @@ namespace Avalonia.Controls.DataGridDragDrop
 #else
         internal
 #endif
-        DragDropEffects RequestedEffect { get; set; }
+        DragDropEffects RequestedEffect
+        {
+            get => _session?.RequestedEffect ?? _requestedEffect;
+        }
+
+#if !DATAGRID_INTERNAL
+        public
+#else
+        internal
+#endif
+        DragDropEffects EffectiveEffect
+        {
+            get => _session?.EffectiveEffect ?? _effectiveEffect;
+            set
+            {
+                _effectiveEffect = value;
+
+                if (_session != null)
+                {
+                    _session.EffectiveEffect = value;
+                }
+            }
+        }
+
+#if !DATAGRID_INTERNAL
+        public
+#else
+        internal
+#endif
+        DataGridRowDragSession? Session
+        {
+            get => _session;
+            private set => _session = value;
+        }
+
+#if !DATAGRID_INTERNAL
+        public
+#else
+        internal
+#endif
+        Point PointerPosition => _session?.PointerPosition ?? DragEventArgs.GetPosition(Grid);
+
+#if !DATAGRID_INTERNAL
+        public
+#else
+        internal
+#endif
+        KeyModifiers KeyModifiers => _session?.KeyModifiers ?? DragEventArgs.KeyModifiers;
+
+#if !DATAGRID_INTERNAL
+        public
+#else
+        internal
+#endif
+        DataGridRow? HoveredRow => _session?.HoveredRow;
+
+#if !DATAGRID_INTERNAL
+        public
+#else
+        internal
+#endif
+        object? HoveredItem => _session?.HoveredItem;
 
 #if !DATAGRID_INTERNAL
         public
@@ -132,6 +200,16 @@ namespace Avalonia.Controls.DataGridDragDrop
         internal
 #endif
         DragEventArgs DragEventArgs { get; }
+
+        internal void SetSession(DataGridRowDragSession? session)
+        {
+            Session = session;
+            if (Session != null)
+            {
+                Session.SetRequestedEffect(_requestedEffect);
+                Session.EffectiveEffect = _effectiveEffect;
+            }
+        }
     }
 
 #if !DATAGRID_INTERNAL

@@ -6,6 +6,7 @@ using Avalonia.Input;
 
 namespace Avalonia.Controls.DataGridDragDrop
 {
+#nullable enable
     internal sealed class DataGridRowDragInfo
     {
         public const string DataFormat = "Avalonia.Controls.DataGrid.RowDragInfo";
@@ -17,11 +18,22 @@ namespace Avalonia.Controls.DataGridDragDrop
             IReadOnlyList<object> items,
             IReadOnlyList<int> indices,
             bool fromSelection)
+            : this(grid, items, indices, fromSelection, null)
+        {
+        }
+
+        public DataGridRowDragInfo(
+            DataGrid grid,
+            IReadOnlyList<object> items,
+            IReadOnlyList<int> indices,
+            bool fromSelection,
+            DataGridRowDragSession? session)
         {
             Grid = grid;
             Items = items;
             Indices = indices;
             FromSelection = fromSelection;
+            Session = session;
         }
 
         public DataGrid Grid { get; }
@@ -31,5 +43,8 @@ namespace Avalonia.Controls.DataGridDragDrop
         public IReadOnlyList<int> Indices { get; }
 
         public bool FromSelection { get; }
+
+        public DataGridRowDragSession? Session { get; }
     }
+#nullable restore
 }

@@ -344,6 +344,9 @@ internal
         private IDataGridRowDragDropController _rowDragDropController;
         private IDataGridRowDragDropControllerFactory _rowDragDropControllerFactory;
         private DataGridRowDragDropOptions _rowDragDropOptions;
+#nullable enable
+        private DataGridRowDragSession? _activeRowDragSession;
+#nullable restore
         private IList<DataGridColumn> _boundColumns;
         private IList<DataGridColumn> _boundColumnsList;
         private bool _pendingBoundColumnsApply;
