@@ -230,6 +230,36 @@
     <TabItem Header="ProCharts Combo">
       <pages:ChartingPage SampleKind="Combo" />
     </TabItem>
+    <TabItem Header="ProCharts Candlestick">
+      <pages:ChartingPage SampleKind="Candlestick" />
+    </TabItem>
+    <TabItem Header="ProCharts Hollow Candles">
+      <pages:ChartingPage SampleKind="HollowCandlestick" />
+    </TabItem>
+    <TabItem Header="ProCharts OHLC">
+      <pages:ChartingPage SampleKind="Ohlc" />
+    </TabItem>
+    <TabItem Header="ProCharts HLC">
+      <pages:ChartingPage SampleKind="Hlc" />
+    </TabItem>
+    <TabItem Header="ProCharts Heikin-Ashi">
+      <pages:ChartingPage SampleKind="HeikinAshi" />
+    </TabItem>
+    <TabItem Header="ProCharts Renko">
+      <pages:ChartingPage SampleKind="Renko" />
+    </TabItem>
+    <TabItem Header="ProCharts Range">
+      <pages:ChartingPage SampleKind="Range" />
+    </TabItem>
+    <TabItem Header="ProCharts Line Break">
+      <pages:ChartingPage SampleKind="LineBreak" />
+    </TabItem>
+    <TabItem Header="ProCharts Kagi">
+      <pages:ChartingPage SampleKind="Kagi" />
+    </TabItem>
+    <TabItem Header="ProCharts Point &amp; Figure">
+      <pages:ChartingPage SampleKind="PointFigure" />
+    </TabItem>
     <TabItem Header="ProCharts Calculated Measures">
       <pages:ChartingPage SampleKind="CalculatedMeasures" />
     </TabItem>

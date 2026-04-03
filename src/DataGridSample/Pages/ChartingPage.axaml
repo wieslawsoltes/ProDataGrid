@@ -48,7 +48,8 @@
               <TextBlock Classes="h3" Text="Axes" />
               <CheckBox Content="Show value axis" IsChecked="{Binding ShowValueAxis}" />
               <CheckBox Content="Show category axis" IsChecked="{Binding ShowCategoryAxis}" />
-              <StackPanel Spacing="4">
+              <StackPanel Spacing="4"
+                          IsVisible="{Binding SupportsCategoryAxisKind}">
                 <TextBlock Text="Category axis kind" />
                 <ComboBox ItemsSource="{Binding CategoryAxisKinds}"
                           SelectedItem="{Binding CategoryAxisKind}" />
@@ -70,7 +71,8 @@
                                Increment="1"
                                Value="{Binding AxisTickCount}" />
               </StackPanel>
-              <StackPanel Spacing="4">
+              <StackPanel Spacing="4"
+                          IsVisible="{Binding SupportsCategoryAxisRange}">
                 <TextBlock Text="Category axis min / max" />
                 <StackPanel Orientation="Horizontal" Spacing="6">
                   <TextBox Width="84"
@@ -191,19 +193,134 @@
               </StackPanel>
             </StackPanel>
 
+            <StackPanel Spacing="6"
+                        IsVisible="{Binding SupportsFinancialSettings}">
+              <TextBlock Classes="h3" Text="Financial" />
+              <CheckBox Content="Show last price line"
+                        IsChecked="{Binding FinancialShowLastPriceLine}" />
+              <StackPanel Spacing="4">
+                <TextBlock Text="Last price line width" />
+                <NumericUpDown Minimum="1"
+                               Maximum="4"
+                               Increment="0.25"
+                               Value="{Binding FinancialLastPriceLineWidth}" />
+              </StackPanel>
+              <StackPanel Spacing="4"
+                          IsVisible="{Binding SupportsFinancialBodyWidth}">
+                <TextBlock Text="Body width ratio" />
+                <NumericUpDown Minimum="0.2"
+                               Maximum="0.95"
+                               Increment="0.05"
+                               FormatString="N2"
+                               Value="{Binding FinancialBodyWidthRatio}" />
+              </StackPanel>
+              <StackPanel Spacing="4"
+                          IsVisible="{Binding SupportsFinancialBoxWidth}">
+                <TextBlock Text="Box width ratio" />
+                <NumericUpDown Minimum="0.2"
+                               Maximum="0.98"
+                               Increment="0.05"
+                               FormatString="N2"
+                               Value="{Binding FinancialBoxWidthRatio}" />
+              </StackPanel>
+              <StackPanel Spacing="4"
+                          IsVisible="{Binding SupportsFinancialTickWidth}">
+                <TextBlock Text="Tick width ratio" />
+                <NumericUpDown Minimum="0.08"
+                               Maximum="0.45"
+                               Increment="0.02"
+                               FormatString="N2"
+                               Value="{Binding FinancialTickWidthRatio}" />
+              </StackPanel>
+              <StackPanel Spacing="4"
+                          IsVisible="{Binding SupportsFinancialWickSettings}">
+                <TextBlock Text="{Binding FinancialPrimaryStrokeLabel}" />
+                <NumericUpDown Minimum="0.5"
+                               Maximum="4"
+                               Increment="0.25"
+                               Value="{Binding FinancialWickStrokeWidth}" />
+              </StackPanel>
+              <StackPanel Spacing="4"
+                          IsVisible="{Binding SupportsFinancialBodySettings}">
+                <TextBlock Text="Body stroke width" />
+                <NumericUpDown Minimum="0.5"
+                               Maximum="4"
+                               Increment="0.25"
+                               Value="{Binding FinancialBodyStrokeWidth}" />
+              </StackPanel>
+              <StackPanel Spacing="4"
+                          IsVisible="{Binding SupportsFinancialBodySettings}">
+                <TextBlock Text="Body fill opacity" />
+                <NumericUpDown Minimum="0"
+                               Maximum="1"
+                               Increment="0.05"
+                               FormatString="N2"
+                               Value="{Binding FinancialBodyFillOpacity}" />
+              </StackPanel>
+              <CheckBox Content="Hollow bullish bodies"
+                        IsVisible="{Binding SupportsFinancialHollowToggle}"
+                        IsChecked="{Binding FinancialHollowBullishBodies}" />
+              <StackPanel Spacing="4"
+                          IsVisible="{Binding SupportsBrickSize}">
+                <TextBlock Text="{Binding FinancialBrickSizeLabel}" />
+                <NumericUpDown Minimum="0.1"
+                               Maximum="10"
+                               Increment="0.1"
+                               FormatString="N1"
+                               Value="{Binding FinancialBrickSize}" />
+              </StackPanel>
+              <StackPanel Spacing="4"
+                          IsVisible="{Binding SupportsLineBreakPeriod}">
+                <TextBlock Text="Line break period" />
+                <NumericUpDown Minimum="2"
+                               Maximum="10"
+                               Increment="1"
+                               Value="{Binding FinancialLineBreakPeriod}" />
+              </StackPanel>
+              <StackPanel Spacing="4"
+                          IsVisible="{Binding SupportsKagiReversalAmount}">
+                <TextBlock Text="Kagi reversal amount" />
+                <NumericUpDown Minimum="0.1"
+                               Maximum="10"
+                               Increment="0.1"
+                               FormatString="N1"
+                               Value="{Binding FinancialKagiReversalAmount}" />
+              </StackPanel>
+              <StackPanel Spacing="4"
+                          IsVisible="{Binding SupportsPointFigureBoxSize}">
+                <TextBlock Text="{Binding FinancialBrickSizeLabel}" />
+                <NumericUpDown Minimum="0.1"
+                               Maximum="10"
+                               Increment="0.1"
+                               FormatString="N1"
+                               Value="{Binding FinancialPointFigureBoxSize}" />
+              </StackPanel>
+              <StackPanel Spacing="4"
+                          IsVisible="{Binding SupportsPointFigureReversalBoxes}">
+                <TextBlock Text="Point &amp; Figure reversal boxes" />
+                <NumericUpDown Minimum="1"
+                               Maximum="6"
+                               Increment="1"
+                               Value="{Binding FinancialPointFigureReversalBoxes}" />
+              </StackPanel>
+            </StackPanel>
+
             <StackPanel Spacing="6">
               <TextBlock Classes="h3" Text="Data" />
-              <StackPanel Spacing="4">
+              <StackPanel Spacing="4"
+                          IsVisible="{Binding SupportsGroupingOptions}">
                 <TextBlock Text="Group by" />
                 <ComboBox ItemsSource="{Binding GroupByOptions}"
                           SelectedItem="{Binding GroupBy}" />
               </StackPanel>
-              <StackPanel Spacing="4">
+              <StackPanel Spacing="4"
+                          IsVisible="{Binding SupportsDownsampleAggregation}">
                 <TextBlock Text="Downsample aggregation" />
                 <ComboBox ItemsSource="{Binding DownsampleAggregations}"
                           SelectedItem="{Binding DownsampleAggregation}" />
               </StackPanel>
-              <StackPanel Spacing="4">
+              <StackPanel Spacing="4"
+                          IsVisible="{Binding SupportsMaxPoints}">
                 <TextBlock Text="Max points (0 = all)" />
                 <NumericUpDown Minimum="0"
                                Maximum="1000"
@@ -232,11 +349,12 @@
       <Grid RowDefinitions="Auto,*" RowSpacing="8">
         <StackPanel Spacing="4">
           <TextBlock Classes="h2" Text="Source data" />
-          <TextBlock Text="Sort, filter, and group the grid to see the chart update."
+          <TextBlock Text="{Binding DataTabDescription}"
                      TextWrapping="Wrap" />
         </StackPanel>
 
         <DataGrid Grid.Row="1"
+                  IsVisible="{Binding IsSalesSample}"
                   ItemsSource="{Binding ItemsView}"
                   CanUserResizeColumns="True"
                   CanUserReorderColumns="True"
@@ -254,6 +372,26 @@
             <DataGridNumericColumn Header="Sales" Binding="{Binding Sales}" Width="*" x:DataType="models:SalesRecord" />
             <DataGridNumericColumn Header="Profit" Binding="{Binding Profit}" Width="*" x:DataType="models:SalesRecord" />
             <DataGridNumericColumn Header="Quantity" Binding="{Binding Quantity}" Width="*" x:DataType="models:SalesRecord" />
+          </DataGrid.Columns>
+        </DataGrid>
+
+        <DataGrid Grid.Row="1"
+                  IsVisible="{Binding IsFinancialSample}"
+                  ItemsSource="{Binding FinancialItems}"
+                  CanUserResizeColumns="True"
+                  CanUserReorderColumns="False"
+                  CanUserSortColumns="False"
+                  HeadersVisibility="All"
+                  IsReadOnly="False"
+                  CellEditEnded="OnCellEditEnded"
+                  RowHeight="28">
+          <DataGrid.Columns>
+            <DataGridTextColumn Header="Time" Binding="{Binding Timestamp, StringFormat=t}" Width="*" x:DataType="models:FinancialCandleRecord" />
+            <DataGridNumericColumn Header="Open" Binding="{Binding Open}" Width="*" x:DataType="models:FinancialCandleRecord" />
+            <DataGridNumericColumn Header="High" Binding="{Binding High}" Width="*" x:DataType="models:FinancialCandleRecord" />
+            <DataGridNumericColumn Header="Low" Binding="{Binding Low}" Width="*" x:DataType="models:FinancialCandleRecord" />
+            <DataGridNumericColumn Header="Close" Binding="{Binding Close}" Width="*" x:DataType="models:FinancialCandleRecord" />
+            <DataGridNumericColumn Header="Volume" Binding="{Binding Volume}" Width="*" x:DataType="models:FinancialCandleRecord" />
           </DataGrid.Columns>
         </DataGrid>
       </Grid>

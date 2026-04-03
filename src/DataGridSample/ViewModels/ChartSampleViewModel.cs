@@ -4,11 +4,12 @@ using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Globalization;
 using Avalonia.Collections;
+using DataGridSample.Charting;
+using DataGridSample.Models;
 using ProCharts;
 using ProCharts.Skia;
 using ProDataGrid.Charting;
 using SkiaSharp;
-using DataGridSample.Models;
 
 namespace DataGridSample.ViewModels
 {
@@ -32,7 +33,17 @@ namespace DataGridSample.ViewModels
         Pie,
         Donut,
         Combo,
-        CalculatedMeasures
+        CalculatedMeasures,
+        Candlestick,
+        HollowCandlestick,
+        Ohlc,
+        Hlc,
+        HeikinAshi,
+        Renko,
+        Range,
+        LineBreak,
+        Kagi,
+        PointFigure
     }
 
     public enum ChartGroupBy
@@ -74,8 +85,12 @@ namespace DataGridSample.ViewModels
         private readonly List<ChartSeriesFormat> _seriesFormats = new();
         private readonly CultureInfo _culture = CultureInfo.CurrentCulture;
         private readonly IReadOnlyList<ChartPalette> _palettes;
+        private readonly FinancialChartSampleDataSource _financialChartDataSource;
         private SkiaChartStyle _chartStyle = new();
         private ChartPalette _selectedPalette;
+        private bool _isFinancialSample;
+        private string _dataTabDescription = "Sort, filter, and group the grid to see the chart update.";
+        private int _seriesStyleCountHint;
 
         private bool _showLegend = true;
         private ChartLegendPosition _legendPosition = ChartLegendPosition.Right;
@@ -112,13 +127,29 @@ namespace DataGridSample.ViewModels
         private ChartGroupBy _groupBy = ChartGroupBy.None;
         private DataGridChartAggregation _downsampleAggregation = DataGridChartAggregation.Average;
         private int _maxPoints = 200;
+        private double _financialBodyWidthRatio = 0.56d;
+        private double _financialBoxWidthRatio = 0.82d;
+        private double _financialTickWidthRatio = 0.22d;
+        private double _financialWickStrokeWidth = 1.2d;
+        private double _financialBodyStrokeWidth = 1d;
+        private double _financialBodyFillOpacity = 0.45d;
+        private double _financialLastPriceLineWidth = 1.1d;
+        private double _financialBrickSize = 1.5d;
+        private int _financialLineBreakPeriod = 3;
+        private double _financialKagiReversalAmount = 1.8d;
+        private double _financialPointFigureBoxSize = 1.2d;
+        private int _financialPointFigureReversalBoxes = 3;
+        private bool _financialHollowBullishBodies;
+        private bool _financialShowLastPriceLine = true;
 
         public ChartSampleViewModel(ChartSampleKind kind)
         {
             Kind = kind;
             ToolTipFormatter = FormatToolTip;
             Items = new ObservableCollection<SalesRecord>(SalesRecordSampleData.CreateSalesRecords(400));
+            FinancialItems = new ObservableCollection<FinancialCandleRecord>(CreateFinancialCandles());
             ItemsView = new DataGridCollectionView(Items);
+            _financialChartDataSource = new FinancialChartSampleDataSource(FinancialItems, ChartSeriesKind.Candlestick);
 
             ChartData = new DataGridChartModel
             {
@@ -130,12 +161,7 @@ namespace DataGridSample.ViewModels
                 UseIncrementalUpdates = false
             };
 
-            Chart = new ChartModel
-            {
-                DataSource = ChartData
-            };
-
-            Chart.Request.MaxPoints = _maxPoints;
+            Chart = new ChartModel();
 
             _palettes = CreatePalettes();
             _selectedPalette = _palettes[0];
@@ -156,6 +182,8 @@ namespace DataGridSample.ViewModels
         public string Description { get; private set; } = string.Empty;
 
         public ObservableCollection<SalesRecord> Items { get; }
+
+        public ObservableCollection<FinancialCandleRecord> FinancialItems { get; }
 
         public DataGridCollectionView ItemsView { get; }
 
@@ -239,6 +267,82 @@ namespace DataGridSample.ViewModels
             DataGridChartAggregation.First,
             DataGridChartAggregation.Last
         };
+
+        public bool IsFinancialSample => _isFinancialSample;
+
+        public bool IsSalesSample => !_isFinancialSample;
+
+        public bool SupportsCategoryAxisKind => !_isFinancialSample;
+
+        public bool SupportsCategoryAxisRange => !_isFinancialSample;
+
+        public bool SupportsGroupingOptions => !_isFinancialSample;
+
+        public bool SupportsDownsampleAggregation => !_isFinancialSample;
+
+        public bool SupportsMaxPoints => !_isFinancialSample;
+
+        public bool SupportsFinancialSettings => _isFinancialSample;
+
+        public bool SupportsFinancialBodyWidth =>
+            Kind == ChartSampleKind.Candlestick ||
+            Kind == ChartSampleKind.HollowCandlestick ||
+            Kind == ChartSampleKind.HeikinAshi ||
+            Kind == ChartSampleKind.Range;
+
+        public bool SupportsFinancialBoxWidth =>
+            Kind == ChartSampleKind.Renko ||
+            Kind == ChartSampleKind.LineBreak ||
+            Kind == ChartSampleKind.PointFigure;
+
+        public bool SupportsFinancialTickWidth =>
+            Kind == ChartSampleKind.Ohlc || Kind == ChartSampleKind.Hlc;
+
+        public bool SupportsFinancialWickSettings =>
+            Kind == ChartSampleKind.Candlestick ||
+            Kind == ChartSampleKind.HollowCandlestick ||
+            Kind == ChartSampleKind.HeikinAshi ||
+            Kind == ChartSampleKind.Ohlc ||
+            Kind == ChartSampleKind.Hlc ||
+            Kind == ChartSampleKind.Range ||
+            Kind == ChartSampleKind.Kagi ||
+            Kind == ChartSampleKind.PointFigure;
+
+        public bool SupportsFinancialBodySettings =>
+            Kind == ChartSampleKind.Candlestick ||
+            Kind == ChartSampleKind.HollowCandlestick ||
+            Kind == ChartSampleKind.HeikinAshi ||
+            Kind == ChartSampleKind.Range ||
+            Kind == ChartSampleKind.Renko ||
+            Kind == ChartSampleKind.LineBreak;
+
+        public bool SupportsFinancialHollowToggle =>
+            SupportsFinancialBodySettings && Kind != ChartSampleKind.HollowCandlestick;
+
+        public bool SupportsBrickSize =>
+            Kind == ChartSampleKind.Renko || Kind == ChartSampleKind.Range;
+
+        public bool SupportsLineBreakPeriod => Kind == ChartSampleKind.LineBreak;
+
+        public bool SupportsKagiReversalAmount => Kind == ChartSampleKind.Kagi;
+
+        public bool SupportsPointFigureBoxSize => Kind == ChartSampleKind.PointFigure;
+
+        public bool SupportsPointFigureReversalBoxes => Kind == ChartSampleKind.PointFigure;
+
+        public string FinancialPrimaryStrokeLabel =>
+            Kind == ChartSampleKind.Kagi || Kind == ChartSampleKind.PointFigure
+                ? "Line stroke width"
+                : "Wick stroke width";
+
+        public string FinancialBrickSizeLabel =>
+            Kind == ChartSampleKind.Renko
+                ? "Renko brick size"
+                : Kind == ChartSampleKind.Range
+                    ? "Range bar size"
+                    : "Point & Figure box size";
+
+        public string DataTabDescription => _dataTabDescription;
 
         public Func<SkiaChartHitTestResult, string> ToolTipFormatter { get; }
 
@@ -727,8 +831,212 @@ namespace DataGridSample.ViewModels
             }
         }
 
+        public double FinancialBodyWidthRatio
+        {
+            get => _financialBodyWidthRatio;
+            set
+            {
+                if (!SetField(ref _financialBodyWidthRatio, value, nameof(FinancialBodyWidthRatio)))
+                {
+                    return;
+                }
+
+                UpdateChartStyle();
+            }
+        }
+
+        public double FinancialBoxWidthRatio
+        {
+            get => _financialBoxWidthRatio;
+            set
+            {
+                if (!SetField(ref _financialBoxWidthRatio, value, nameof(FinancialBoxWidthRatio)))
+                {
+                    return;
+                }
+
+                UpdateChartStyle();
+            }
+        }
+
+        public double FinancialTickWidthRatio
+        {
+            get => _financialTickWidthRatio;
+            set
+            {
+                if (!SetField(ref _financialTickWidthRatio, value, nameof(FinancialTickWidthRatio)))
+                {
+                    return;
+                }
+
+                UpdateChartStyle();
+            }
+        }
+
+        public double FinancialWickStrokeWidth
+        {
+            get => _financialWickStrokeWidth;
+            set
+            {
+                if (!SetField(ref _financialWickStrokeWidth, value, nameof(FinancialWickStrokeWidth)))
+                {
+                    return;
+                }
+
+                UpdateChartStyle();
+            }
+        }
+
+        public double FinancialBodyStrokeWidth
+        {
+            get => _financialBodyStrokeWidth;
+            set
+            {
+                if (!SetField(ref _financialBodyStrokeWidth, value, nameof(FinancialBodyStrokeWidth)))
+                {
+                    return;
+                }
+
+                UpdateChartStyle();
+            }
+        }
+
+        public double FinancialBodyFillOpacity
+        {
+            get => _financialBodyFillOpacity;
+            set
+            {
+                if (!SetField(ref _financialBodyFillOpacity, value, nameof(FinancialBodyFillOpacity)))
+                {
+                    return;
+                }
+
+                UpdateChartStyle();
+            }
+        }
+
+        public double FinancialLastPriceLineWidth
+        {
+            get => _financialLastPriceLineWidth;
+            set
+            {
+                if (!SetField(ref _financialLastPriceLineWidth, value, nameof(FinancialLastPriceLineWidth)))
+                {
+                    return;
+                }
+
+                UpdateChartStyle();
+            }
+        }
+
+        public bool FinancialHollowBullishBodies
+        {
+            get => _financialHollowBullishBodies;
+            set
+            {
+                if (!SetField(ref _financialHollowBullishBodies, value, nameof(FinancialHollowBullishBodies)))
+                {
+                    return;
+                }
+
+                UpdateChartStyle();
+            }
+        }
+
+        public bool FinancialShowLastPriceLine
+        {
+            get => _financialShowLastPriceLine;
+            set
+            {
+                if (!SetField(ref _financialShowLastPriceLine, value, nameof(FinancialShowLastPriceLine)))
+                {
+                    return;
+                }
+
+                UpdateChartStyle();
+            }
+        }
+
+        public double FinancialBrickSize
+        {
+            get => _financialBrickSize;
+            set
+            {
+                if (!SetField(ref _financialBrickSize, value, nameof(FinancialBrickSize)))
+                {
+                    return;
+                }
+
+                RefreshFinancialDataSource();
+            }
+        }
+
+        public int FinancialLineBreakPeriod
+        {
+            get => _financialLineBreakPeriod;
+            set
+            {
+                if (!SetField(ref _financialLineBreakPeriod, value, nameof(FinancialLineBreakPeriod)))
+                {
+                    return;
+                }
+
+                RefreshFinancialDataSource();
+            }
+        }
+
+        public double FinancialKagiReversalAmount
+        {
+            get => _financialKagiReversalAmount;
+            set
+            {
+                if (!SetField(ref _financialKagiReversalAmount, value, nameof(FinancialKagiReversalAmount)))
+                {
+                    return;
+                }
+
+                RefreshFinancialDataSource();
+            }
+        }
+
+        public double FinancialPointFigureBoxSize
+        {
+            get => _financialPointFigureBoxSize;
+            set
+            {
+                if (!SetField(ref _financialPointFigureBoxSize, value, nameof(FinancialPointFigureBoxSize)))
+                {
+                    return;
+                }
+
+                RefreshFinancialDataSource();
+            }
+        }
+
+        public int FinancialPointFigureReversalBoxes
+        {
+            get => _financialPointFigureReversalBoxes;
+            set
+            {
+                if (!SetField(ref _financialPointFigureReversalBoxes, value, nameof(FinancialPointFigureReversalBoxes)))
+                {
+                    return;
+                }
+
+                RefreshFinancialDataSource();
+            }
+        }
+
         private void ConfigureForKind(ChartSampleKind kind)
         {
+            ChartData.Series.Clear();
+            _seriesFormats.Clear();
+            _seriesStyleCountHint = 0;
+            _isFinancialSample = false;
+            _dataTabDescription = "Sort, filter, and group the grid to see the chart update.";
+            Chart.DataSource = ChartData;
+            Chart.Request.WindowStart = null;
+            Chart.Request.WindowCount = null;
             Chart.SecondaryValueAxis.IsVisible = false;
             Chart.SecondaryValueAxis.Title = null;
             Chart.SecondaryValueAxis.Minimum = null;
@@ -1039,12 +1347,72 @@ namespace DataGridSample.ViewModels
                         ChartSeriesFormat.Currency,
                         DataGridChartAggregation.Average);
                     break;
+                case ChartSampleKind.Candlestick:
+                    ConfigureFinancialSample(
+                        "Candlestick chart",
+                        "Intraday OHLC candles for a simulated trading instrument, with adjustable body width, hollow bullish candles, and a last-price line.",
+                        ChartSeriesKind.Candlestick);
+                    break;
+                case ChartSampleKind.HollowCandlestick:
+                    ConfigureFinancialSample(
+                        "Hollow candle chart",
+                        "Classic hollow candles use body fill for the session move and outline color for close-versus-previous-close direction.",
+                        ChartSeriesKind.HollowCandlestick);
+                    break;
+                case ChartSampleKind.Ohlc:
+                    ConfigureFinancialSample(
+                        "OHLC chart",
+                        "Open-high-low-close bars for the same intraday data set, using professional tick and wick styling controls.",
+                        ChartSeriesKind.Ohlc);
+                    break;
+                case ChartSampleKind.Hlc:
+                    ConfigureFinancialSample(
+                        "HLC chart",
+                        "High-low-close bars for compact range analysis when the open tick is not needed.",
+                        ChartSeriesKind.Hlc);
+                    break;
+                case ChartSampleKind.HeikinAshi:
+                    ConfigureFinancialSample(
+                        "Heikin-Ashi chart",
+                        "Derived candles smooth the raw session noise to emphasize directional runs and reversals.",
+                        ChartSeriesKind.HeikinAshi);
+                    break;
+                case ChartSampleKind.Renko:
+                    ConfigureFinancialSample(
+                        "Renko chart",
+                        "Price-only bricks derived from the source candles. Adjust brick size to tighten or loosen trend sensitivity.",
+                        ChartSeriesKind.Renko);
+                    break;
+                case ChartSampleKind.Range:
+                    ConfigureFinancialSample(
+                        "Range chart",
+                        "Derived price bars compress time and only print when the session moves far enough to complete a fixed trading range.",
+                        ChartSeriesKind.Range);
+                    break;
+                case ChartSampleKind.LineBreak:
+                    ConfigureFinancialSample(
+                        "Line break chart",
+                        "Three-line break style boxes derived from close direction, useful for trend confirmation without fixed time spacing.",
+                        ChartSeriesKind.LineBreak);
+                    break;
+                case ChartSampleKind.Kagi:
+                    ConfigureFinancialSample(
+                        "Kagi chart",
+                        "Reversal-threshold price lines compress repeated moves into stepped directional segments that emphasize supply and demand swings.",
+                        ChartSeriesKind.Kagi);
+                    break;
+                case ChartSampleKind.PointFigure:
+                    ConfigureFinancialSample(
+                        "Point & figure chart",
+                        "Column-based X/O price action that removes time and focuses on box-size and reversal-driven breakouts.",
+                        ChartSeriesKind.PointFigure);
+                    break;
                 default:
                     throw new ArgumentOutOfRangeException(nameof(kind), kind, "Unknown chart sample.");
             }
 
             ChartData.DownsampleAggregation = _downsampleAggregation;
-            Chart.Request.MaxPoints = _maxPoints > 0 ? _maxPoints : null;
+            Chart.Request.MaxPoints = !_isFinancialSample && _maxPoints > 0 ? _maxPoints : null;
         }
 
         private void ApplyAxisSettings()
@@ -1064,6 +1432,12 @@ namespace DataGridSample.ViewModels
 
         private void ApplyGrouping()
         {
+            if (_isFinancialSample)
+            {
+                Chart.Refresh();
+                return;
+            }
+
             ItemsView.GroupDescriptions.Clear();
             var path = ResolveGroupPath(_groupBy);
             if (!string.IsNullOrWhiteSpace(path))
@@ -1141,7 +1515,20 @@ namespace DataGridSample.ViewModels
                 DataLabelPadding = (float)_dataLabelPadding,
                 DataLabelOffset = (float)_dataLabelOffset,
                 SeriesColors = palette?.Colors ?? SkiaChartStyle.DefaultSeriesColors,
-                SeriesStyles = BuildSeriesStyles()
+                SeriesStyles = BuildSeriesStyles(),
+                FinancialIncreaseColor = new SKColor(42, 214, 168),
+                FinancialDecreaseColor = new SKColor(255, 84, 104),
+                FinancialBodyFillOpacity = (float)_financialBodyFillOpacity,
+                FinancialBodyWidthRatio = (float)_financialBodyWidthRatio,
+                FinancialBoxWidthRatio = (float)_financialBoxWidthRatio,
+                FinancialTickWidthRatio = (float)_financialTickWidthRatio,
+                FinancialWickStrokeWidth = (float)_financialWickStrokeWidth,
+                FinancialBodyStrokeWidth = (float)_financialBodyStrokeWidth,
+                FinancialHollowBullishBodies = _financialHollowBullishBodies,
+                FinancialShowLastPriceLine = _financialShowLastPriceLine,
+                FinancialLastPriceLineColor = SKColors.Transparent,
+                FinancialLastPriceLineWidth = (float)_financialLastPriceLineWidth,
+                FinancialLastPriceLabelText = new SKColor(10, 18, 28)
             };
 
             ChartStyle = style;
@@ -1149,14 +1536,14 @@ namespace DataGridSample.ViewModels
 
         private IReadOnlyList<SkiaChartSeriesStyle>? BuildSeriesStyles()
         {
-            if (ChartData.Series.Count == 0)
+            if (_seriesStyleCountHint == 0)
             {
                 return null;
             }
 
             var palette = _selectedPalette ?? (_palettes.Count > 0 ? _palettes[0] : null);
             var colors = palette?.Colors ?? SkiaChartStyle.DefaultSeriesColors;
-            var count = Math.Max(2, ChartData.Series.Count);
+            var count = Math.Max(2, _seriesStyleCountHint);
             var styles = new List<SkiaChartSeriesStyle>(count);
 
             for (var i = 0; i < count; i++)
@@ -1197,6 +1584,99 @@ namespace DataGridSample.ViewModels
             }
 
             return styles;
+        }
+
+        private void ConfigureFinancialSample(string title, string description, ChartSeriesKind kind)
+        {
+            Title = title;
+            Description = description;
+            _isFinancialSample = true;
+            _dataTabDescription = kind switch
+            {
+                ChartSeriesKind.Renko => "Edit the source OHLC rows below to refresh the derived Renko bricks.",
+                ChartSeriesKind.Range => "Edit the source OHLC rows below to refresh the derived range bars.",
+                ChartSeriesKind.LineBreak => "Edit the source OHLC rows below to refresh the derived line break boxes.",
+                ChartSeriesKind.HeikinAshi => "Edit the source OHLC rows below to refresh the derived Heikin-Ashi candles.",
+                ChartSeriesKind.HollowCandlestick => "Edit the source OHLC rows below to refresh the hollow candle session state and previous-close coloring.",
+                ChartSeriesKind.Kagi => "Edit the source OHLC rows below to refresh the derived Kagi reversal segments.",
+                ChartSeriesKind.PointFigure => "Edit the source OHLC rows below to refresh the derived Point & Figure columns.",
+                _ => "Edit OHLC and volume values below to refresh the chart."
+            };
+            _showLegend = false;
+            _showGridlines = true;
+            _showCategoryGridlines = true;
+            _showDataLabels = false;
+            _showCategoryAxis = true;
+            _showValueAxis = true;
+            _categoryAxisKind = ChartAxisKind.Category;
+            _categoryAxisTitle =
+                kind == ChartSeriesKind.Renko ||
+                kind == ChartSeriesKind.Range ||
+                kind == ChartSeriesKind.LineBreak ||
+                kind == ChartSeriesKind.Kagi ||
+                kind == ChartSeriesKind.PointFigure
+                    ? "Derived step"
+                    : "Time";
+            _valueAxisTitle = "Price";
+            _downsampleAggregation = DataGridChartAggregation.Average;
+            _maxPoints = 0;
+            _financialBodyWidthRatio = 0.56d;
+            _financialBoxWidthRatio = 0.82d;
+            _financialTickWidthRatio = 0.22d;
+            _financialWickStrokeWidth = 1.2d;
+            _financialBodyStrokeWidth = 1d;
+            _financialBodyFillOpacity =
+                kind == ChartSeriesKind.Renko || kind == ChartSeriesKind.LineBreak
+                    ? 0.62d
+                    : kind == ChartSeriesKind.Range
+                        ? 0.52d
+                    : 0.45d;
+            _financialLastPriceLineWidth = 1.1d;
+            _financialHollowBullishBodies =
+                kind == ChartSeriesKind.Candlestick ||
+                kind == ChartSeriesKind.HeikinAshi ||
+                kind == ChartSeriesKind.Range ||
+                kind == ChartSeriesKind.Renko ||
+                kind == ChartSeriesKind.LineBreak;
+            if (kind == ChartSeriesKind.HollowCandlestick)
+            {
+                _financialHollowBullishBodies = false;
+            }
+            _financialShowLastPriceLine = true;
+            _financialBrickSize = 1.5d;
+            _financialLineBreakPeriod = 3;
+            _financialKagiReversalAmount = 1.8d;
+            _financialPointFigureBoxSize = 1.2d;
+            _financialPointFigureReversalBoxes = 3;
+            AddSeriesFormat(ChartSeriesFormat.Currency);
+            _financialChartDataSource.SeriesKind = kind;
+            _financialChartDataSource.BrickSize = _financialBrickSize;
+            _financialChartDataSource.RangeSize = _financialBrickSize;
+            _financialChartDataSource.LineBreakPeriod = _financialLineBreakPeriod;
+            _financialChartDataSource.KagiReversalAmount = _financialKagiReversalAmount;
+            _financialChartDataSource.PointFigureBoxSize = _financialPointFigureBoxSize;
+            _financialChartDataSource.PointFigureReversalBoxes = _financialPointFigureReversalBoxes;
+            Chart.DataSource = _financialChartDataSource;
+            var windowCount = Math.Min(40, FinancialItems.Count);
+            Chart.Request.WindowCount = windowCount;
+            Chart.Request.WindowStart = Math.Max(0, FinancialItems.Count - windowCount);
+        }
+
+        private void RefreshFinancialDataSource()
+        {
+            if (!_isFinancialSample)
+            {
+                return;
+            }
+
+            _financialChartDataSource.BrickSize = _financialBrickSize;
+            _financialChartDataSource.RangeSize = _financialBrickSize;
+            _financialChartDataSource.LineBreakPeriod = _financialLineBreakPeriod;
+            _financialChartDataSource.KagiReversalAmount = _financialKagiReversalAmount;
+            _financialChartDataSource.PointFigureBoxSize = _financialPointFigureBoxSize;
+            _financialChartDataSource.PointFigureReversalBoxes = _financialPointFigureReversalBoxes;
+            _financialChartDataSource.Invalidate();
+            Chart.Refresh();
         }
 
         private static SKColor Blend(SKColor from, SKColor to, float t)
@@ -1246,7 +1726,7 @@ namespace DataGridSample.ViewModels
                 ErrorBarValue = errorBarValue
             };
 
-            _seriesFormats.Add(format);
+            AddSeriesFormat(format);
             ChartData.Series.Add(definition);
             return definition;
         }
@@ -1268,9 +1748,55 @@ namespace DataGridSample.ViewModels
                 ValueAxisAssignment = valueAxisAssignment
             };
 
-            _seriesFormats.Add(format);
+            AddSeriesFormat(format);
             ChartData.Series.Add(definition);
             return definition;
+        }
+
+        private void AddSeriesFormat(ChartSeriesFormat format)
+        {
+            _seriesFormats.Add(format);
+            _seriesStyleCountHint++;
+        }
+
+        private static IReadOnlyList<FinancialCandleRecord> CreateFinancialCandles()
+        {
+            var list = new List<FinancialCandleRecord>(64);
+            var timestamp = new DateTime(2026, 4, 2, 9, 30, 0, DateTimeKind.Local);
+            var price = 184.20d;
+
+            for (var i = 0; i < 64; i++)
+            {
+                var open = price;
+                var drift = i switch
+                {
+                    < 10 => 0.34d,
+                    < 22 => -0.48d,
+                    < 36 => 0.18d,
+                    < 50 => 0.41d,
+                    _ => -0.12d
+                };
+                var wave = Math.Sin(i * 0.45d) * 0.62d;
+                var pulse = i % 13 == 0 ? 1.15d : 0d;
+                var close = Math.Clamp(open + drift + wave + pulse - (i % 7 == 0 ? 0.55d : 0d), 176d, 192d);
+                var high = Math.Max(open, close) + 0.55d + Math.Abs(Math.Cos(i * 0.31d)) * 1.1d;
+                var low = Math.Min(open, close) - 0.48d - Math.Abs(Math.Sin(i * 0.38d)) * 0.92d;
+                var volume = 240000d + Math.Abs(close - open) * 145000d + (Math.Sin(i * 0.29d) + 1d) * 35000d;
+
+                list.Add(new FinancialCandleRecord
+                {
+                    Timestamp = timestamp.AddMinutes(i * 15),
+                    Open = Math.Round(open, 2),
+                    High = Math.Round(high, 2),
+                    Low = Math.Round(low, 2),
+                    Close = Math.Round(close, 2),
+                    Volume = Math.Round(volume, 0)
+                });
+
+                price = close;
+            }
+
+            return list;
         }
 
         private static IReadOnlyList<ChartPalette> CreatePalettes()
@@ -1318,6 +1844,44 @@ namespace DataGridSample.ViewModels
             if (hit.SeriesIndex >= 0 && hit.SeriesIndex < _seriesFormats.Count)
             {
                 valueFormat = _seriesFormats[hit.SeriesIndex];
+            }
+
+            if ((hit.SeriesKind == ChartSeriesKind.Candlestick ||
+                 hit.SeriesKind == ChartSeriesKind.HollowCandlestick ||
+                 hit.SeriesKind == ChartSeriesKind.Ohlc ||
+                 hit.SeriesKind == ChartSeriesKind.HeikinAshi ||
+                 hit.SeriesKind == ChartSeriesKind.Range ||
+                 hit.SeriesKind == ChartSeriesKind.Renko ||
+                 hit.SeriesKind == ChartSeriesKind.LineBreak ||
+                 hit.SeriesKind == ChartSeriesKind.Kagi ||
+                 hit.SeriesKind == ChartSeriesKind.PointFigure) &&
+                hit.OpenValue.HasValue &&
+                hit.HighValue.HasValue &&
+                hit.LowValue.HasValue &&
+                hit.CloseValue.HasValue)
+            {
+                var openText = FormatValue(valueFormat, hit.OpenValue.Value);
+                var highText = FormatValue(valueFormat, hit.HighValue.Value);
+                var lowText = FormatValue(valueFormat, hit.LowValue.Value);
+                var closeText = FormatValue(valueFormat, hit.CloseValue.Value);
+                var header = !string.IsNullOrWhiteSpace(hit.Category)
+                    ? $"{hit.SeriesName ?? "Series"} - {hit.Category}"
+                    : hit.SeriesName ?? "Series";
+                return $"{header}: O {openText}, H {highText}, L {lowText}, C {closeText}";
+            }
+
+            if (hit.SeriesKind == ChartSeriesKind.Hlc &&
+                hit.HighValue.HasValue &&
+                hit.LowValue.HasValue &&
+                hit.CloseValue.HasValue)
+            {
+                var highText = FormatValue(valueFormat, hit.HighValue.Value);
+                var lowText = FormatValue(valueFormat, hit.LowValue.Value);
+                var closeText = FormatValue(valueFormat, hit.CloseValue.Value);
+                var header = !string.IsNullOrWhiteSpace(hit.Category)
+                    ? $"{hit.SeriesName ?? "Series"} - {hit.Category}"
+                    : hit.SeriesName ?? "Series";
+                return $"{header}: H {highText}, L {lowText}, C {closeText}";
             }
 
             var valueText = FormatValue(valueFormat, hit.Value);
