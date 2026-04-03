@@ -109,6 +109,7 @@ var model = new ChartModel { DataSource = dataSource };
     public ChartDataSnapshot BuildSnapshot(ChartDataRequest request) =&gt; _snapshot;
 }
 </code></pre>
+<p>Financial data sources follow the same model. Use <code>ChartSeriesSnapshot.Values</code> for close prices and append <code>highValues</code> and <code>lowValues</code> for all financial series. Add <code>openValues</code> for <code>Candlestick</code>, <code>HollowCandlestick</code>, <code>Ohlc</code>, <code>HeikinAshi</code>, <code>Renko</code>, <code>Range</code>, <code>LineBreak</code>, <code>Kagi</code>, and <code>PointFigure</code>; omit it for <code>Hlc</code>. <code>PointFigure</code> can optionally use <code>sizeValues</code> to describe the box count for each rendered column.</p>
 <h2 id="data-requests">Data requests</h2>
 <p><code>ChartDataRequest</code> controls windowing and downsampling:</p>
 <ul>
@@ -120,6 +121,27 @@ var model = new ChartModel { DataSource = dataSource };
 model.Request.WindowStart = 5000;
 model.Request.WindowCount = 1000;
 </code></pre>
+<p>For interaction-driven charts, prefer the higher-level helpers on <code>ChartModel</code>:</p>
+<ul>
+<li><code>PanWindow(int deltaCategories)</code></li>
+<li><code>ZoomWindow(double scale, double anchorRatio, int minWindowCount = 10)</code></li>
+<li><code>ShowLatest(int preferredWindowCount, bool followLatest = true)</code></li>
+<li><code>SetVisibleWindow(int start, int count, bool followLatest = false)</code></li>
+<li><code>ResetWindow(bool followLatest = false)</code></li>
+</ul>
+<p>These methods keep viewport updates consistent with <code>ChartInteractionState.FollowLatest</code>.</p>
+<h2 id="interaction-state">Interaction state</h2>
+<p><code>ChartModel.Interaction</code> stores transient UI-oriented state that still needs to be shared across panes or view hosts:</p>
+<ul>
+<li><code>FollowLatest</code></li>
+<li><code>CrosshairCategoryIndex</code></li>
+<li><code>CrosshairCategoryLabel</code></li>
+<li><code>CrosshairValue</code></li>
+<li><code>CrosshairHorizontalRatio</code></li>
+<li><code>CrosshairVerticalRatio</code></li>
+<li><code>CrosshairMode</code></li>
+</ul>
+<p>Update crosshair state through <code>TrackCrosshair(...)</code> and clear it with <code>ClearCrosshair()</code>.</p>
 <h2 id="axes-and-legend">Axes and legend</h2>
 <p><code>ChartModel</code> exposes four axis definitions:</p>
 <ul>

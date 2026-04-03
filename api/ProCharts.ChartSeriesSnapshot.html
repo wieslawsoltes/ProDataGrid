@@ -85,7 +85,7 @@
 
 
   <h1 id="ProCharts_ChartSeriesSnapshot" data-uid="ProCharts.ChartSeriesSnapshot" class="text-break">
-Class ChartSeriesSnapshot  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/ProCharts/ChartData.cs/#L324"><i class="bi bi-code-slash"></i></a>
+Class ChartSeriesSnapshot  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/ProCharts/ChartData.cs/#L587"><i class="bi bi-code-slash"></i></a>
   </h1>
 
   <div class="facts text-secondary">
@@ -147,16 +147,16 @@ Class ChartSeriesSnapshot  <a class="header-action link-secondary" title="View s
 
   <a id="ProCharts_ChartSeriesSnapshot__ctor_" data-uid="ProCharts.ChartSeriesSnapshot.#ctor*"></a>
 
-  <h3 id="ProCharts_ChartSeriesSnapshot__ctor_System_String_ProCharts_ChartSeriesKind_System_Collections_Generic_IReadOnlyList_System_Nullable_System_Double___System_Collections_Generic_IReadOnlyList_System_Double__System_Collections_Generic_IReadOnlyList_System_Nullable_System_Double___System_Func_System_Double_System_String__ProCharts_ChartValueAxisAssignment_ProCharts_ChartTrendlineType_System_Int32_ProCharts_ChartErrorBarType_System_Double_ProCharts_ChartSeriesStyle_" data-uid="ProCharts.ChartSeriesSnapshot.#ctor(System.String,ProCharts.ChartSeriesKind,System.Collections.Generic.IReadOnlyList{System.Nullable{System.Double}},System.Collections.Generic.IReadOnlyList{System.Double},System.Collections.Generic.IReadOnlyList{System.Nullable{System.Double}},System.Func{System.Double,System.String},ProCharts.ChartValueAxisAssignment,ProCharts.ChartTrendlineType,System.Int32,ProCharts.ChartErrorBarType,System.Double,ProCharts.ChartSeriesStyle)">
-  ChartSeriesSnapshot(string?, ChartSeriesKind, IReadOnlyList&lt;double?&gt;, IReadOnlyList&lt;double&gt;?, IReadOnlyList&lt;double?&gt;?, Func&lt;double, string&gt;?, ChartValueAxisAssignment, ChartTrendlineType, int, ChartErrorBarType, double, ChartSeriesStyle?)
-  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/ProCharts/ChartData.cs/#L326"><i class="bi bi-code-slash"></i></a>
+  <h3 id="ProCharts_ChartSeriesSnapshot__ctor_System_String_ProCharts_ChartSeriesKind_System_Collections_Generic_IReadOnlyList_System_Nullable_System_Double___System_Collections_Generic_IReadOnlyList_System_Double__System_Collections_Generic_IReadOnlyList_System_Nullable_System_Double___System_Func_System_Double_System_String__ProCharts_ChartValueAxisAssignment_ProCharts_ChartTrendlineType_System_Int32_ProCharts_ChartErrorBarType_System_Double_ProCharts_ChartSeriesStyle_System_Collections_Generic_IReadOnlyList_System_Nullable_System_Double___System_Collections_Generic_IReadOnlyList_System_Nullable_System_Double___System_Collections_Generic_IReadOnlyList_System_Nullable_System_Double___" data-uid="ProCharts.ChartSeriesSnapshot.#ctor(System.String,ProCharts.ChartSeriesKind,System.Collections.Generic.IReadOnlyList{System.Nullable{System.Double}},System.Collections.Generic.IReadOnlyList{System.Double},System.Collections.Generic.IReadOnlyList{System.Nullable{System.Double}},System.Func{System.Double,System.String},ProCharts.ChartValueAxisAssignment,ProCharts.ChartTrendlineType,System.Int32,ProCharts.ChartErrorBarType,System.Double,ProCharts.ChartSeriesStyle,System.Collections.Generic.IReadOnlyList{System.Nullable{System.Double}},System.Collections.Generic.IReadOnlyList{System.Nullable{System.Double}},System.Collections.Generic.IReadOnlyList{System.Nullable{System.Double}})">
+  ChartSeriesSnapshot(string?, ChartSeriesKind, IReadOnlyList&lt;double?&gt;, IReadOnlyList&lt;double&gt;?, IReadOnlyList&lt;double?&gt;?, Func&lt;double, string&gt;?, ChartValueAxisAssignment, ChartTrendlineType, int, ChartErrorBarType, double, ChartSeriesStyle?, IReadOnlyList&lt;double?&gt;?, IReadOnlyList&lt;double?&gt;?, IReadOnlyList&lt;double?&gt;?)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/ProCharts/ChartData.cs/#L589"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"></div>
   <div class="markdown level1 conceptual"></div>
 
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public ChartSeriesSnapshot(string? name, ChartSeriesKind kind, IReadOnlyList&lt;double?&gt; values, IReadOnlyList&lt;double&gt;? xValues = null, IReadOnlyList&lt;double?&gt;? sizeValues = null, Func&lt;double, string&gt;? dataLabelFormatter = null, ChartValueAxisAssignment valueAxisAssignment = ChartValueAxisAssignment.Primary, ChartTrendlineType trendlineType = ChartTrendlineType.None, int trendlinePeriod = 2, ChartErrorBarType errorBarType = ChartErrorBarType.None, double errorBarValue = 1, ChartSeriesStyle? style = null)</code></pre>
+    <pre><code class="lang-csharp hljs">public ChartSeriesSnapshot(string? name, ChartSeriesKind kind, IReadOnlyList&lt;double?&gt; values, IReadOnlyList&lt;double&gt;? xValues = null, IReadOnlyList&lt;double?&gt;? sizeValues = null, Func&lt;double, string&gt;? dataLabelFormatter = null, ChartValueAxisAssignment valueAxisAssignment = ChartValueAxisAssignment.Primary, ChartTrendlineType trendlineType = ChartTrendlineType.None, int trendlinePeriod = 2, ChartErrorBarType errorBarType = ChartErrorBarType.None, double errorBarValue = 1, ChartSeriesStyle? style = null, IReadOnlyList&lt;double?&gt;? openValues = null, IReadOnlyList&lt;double?&gt;? highValues = null, IReadOnlyList&lt;double?&gt;? lowValues = null)</code></pre>
   </div>
 
   <h4 class="section">Parameters</h4>
@@ -185,6 +185,12 @@ Class ChartSeriesSnapshot  <a class="header-action link-secondary" title="View s
     <dd></dd>
     <dt><code>style</code> <a class="xref" href="ProCharts.ChartSeriesStyle.html">ChartSeriesStyle</a></dt>
     <dd></dd>
+    <dt><code>openValues</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.ireadonlylist-1">IReadOnlyList</a>&lt;<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.double">double</a>?&gt;</dt>
+    <dd></dd>
+    <dt><code>highValues</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.ireadonlylist-1">IReadOnlyList</a>&lt;<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.double">double</a>?&gt;</dt>
+    <dd></dd>
+    <dt><code>lowValues</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.ireadonlylist-1">IReadOnlyList</a>&lt;<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.double">double</a>?&gt;</dt>
+    <dd></dd>
   </dl>
 
 
@@ -206,7 +212,7 @@ Class ChartSeriesSnapshot  <a class="header-action link-secondary" title="View s
 
   <h3 id="ProCharts_ChartSeriesSnapshot_DataLabelFormatter" data-uid="ProCharts.ChartSeriesSnapshot.DataLabelFormatter">
   DataLabelFormatter
-  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/ProCharts/ChartData.cs/#L364"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/ProCharts/ChartData.cs/#L639"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"></div>
@@ -237,7 +243,7 @@ Class ChartSeriesSnapshot  <a class="header-action link-secondary" title="View s
 
   <h3 id="ProCharts_ChartSeriesSnapshot_ErrorBarType" data-uid="ProCharts.ChartSeriesSnapshot.ErrorBarType">
   ErrorBarType
-  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/ProCharts/ChartData.cs/#L372"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/ProCharts/ChartData.cs/#L647"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"></div>
@@ -268,7 +274,7 @@ Class ChartSeriesSnapshot  <a class="header-action link-secondary" title="View s
 
   <h3 id="ProCharts_ChartSeriesSnapshot_ErrorBarValue" data-uid="ProCharts.ChartSeriesSnapshot.ErrorBarValue">
   ErrorBarValue
-  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/ProCharts/ChartData.cs/#L374"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/ProCharts/ChartData.cs/#L649"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"></div>
@@ -295,11 +301,42 @@ Class ChartSeriesSnapshot  <a class="header-action link-secondary" title="View s
 
 
 
+  <a id="ProCharts_ChartSeriesSnapshot_HighValues_" data-uid="ProCharts.ChartSeriesSnapshot.HighValues*"></a>
+
+  <h3 id="ProCharts_ChartSeriesSnapshot_HighValues" data-uid="ProCharts.ChartSeriesSnapshot.HighValues">
+  HighValues
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/ProCharts/ChartData.cs/#L635"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public IReadOnlyList&lt;double?&gt;? HighValues { get; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.ireadonlylist-1">IReadOnlyList</a>&lt;<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.double">double</a>?&gt;</dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
   <a id="ProCharts_ChartSeriesSnapshot_Kind_" data-uid="ProCharts.ChartSeriesSnapshot.Kind*"></a>
 
   <h3 id="ProCharts_ChartSeriesSnapshot_Kind" data-uid="ProCharts.ChartSeriesSnapshot.Kind">
   Kind
-  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/ProCharts/ChartData.cs/#L356"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/ProCharts/ChartData.cs/#L625"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"></div>
@@ -326,11 +363,42 @@ Class ChartSeriesSnapshot  <a class="header-action link-secondary" title="View s
 
 
 
+  <a id="ProCharts_ChartSeriesSnapshot_LowValues_" data-uid="ProCharts.ChartSeriesSnapshot.LowValues*"></a>
+
+  <h3 id="ProCharts_ChartSeriesSnapshot_LowValues" data-uid="ProCharts.ChartSeriesSnapshot.LowValues">
+  LowValues
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/ProCharts/ChartData.cs/#L637"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public IReadOnlyList&lt;double?&gt;? LowValues { get; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.ireadonlylist-1">IReadOnlyList</a>&lt;<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.double">double</a>?&gt;</dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
   <a id="ProCharts_ChartSeriesSnapshot_Name_" data-uid="ProCharts.ChartSeriesSnapshot.Name*"></a>
 
   <h3 id="ProCharts_ChartSeriesSnapshot_Name" data-uid="ProCharts.ChartSeriesSnapshot.Name">
   Name
-  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/ProCharts/ChartData.cs/#L354"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/ProCharts/ChartData.cs/#L623"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"></div>
@@ -357,11 +425,42 @@ Class ChartSeriesSnapshot  <a class="header-action link-secondary" title="View s
 
 
 
+  <a id="ProCharts_ChartSeriesSnapshot_OpenValues_" data-uid="ProCharts.ChartSeriesSnapshot.OpenValues*"></a>
+
+  <h3 id="ProCharts_ChartSeriesSnapshot_OpenValues" data-uid="ProCharts.ChartSeriesSnapshot.OpenValues">
+  OpenValues
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/ProCharts/ChartData.cs/#L633"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public IReadOnlyList&lt;double?&gt;? OpenValues { get; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.ireadonlylist-1">IReadOnlyList</a>&lt;<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.double">double</a>?&gt;</dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
   <a id="ProCharts_ChartSeriesSnapshot_SizeValues_" data-uid="ProCharts.ChartSeriesSnapshot.SizeValues*"></a>
 
   <h3 id="ProCharts_ChartSeriesSnapshot_SizeValues" data-uid="ProCharts.ChartSeriesSnapshot.SizeValues">
   SizeValues
-  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/ProCharts/ChartData.cs/#L362"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/ProCharts/ChartData.cs/#L631"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"></div>
@@ -392,7 +491,7 @@ Class ChartSeriesSnapshot  <a class="header-action link-secondary" title="View s
 
   <h3 id="ProCharts_ChartSeriesSnapshot_Style" data-uid="ProCharts.ChartSeriesSnapshot.Style">
   Style
-  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/ProCharts/ChartData.cs/#L376"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/ProCharts/ChartData.cs/#L651"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"></div>
@@ -423,7 +522,7 @@ Class ChartSeriesSnapshot  <a class="header-action link-secondary" title="View s
 
   <h3 id="ProCharts_ChartSeriesSnapshot_TrendlinePeriod" data-uid="ProCharts.ChartSeriesSnapshot.TrendlinePeriod">
   TrendlinePeriod
-  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/ProCharts/ChartData.cs/#L370"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/ProCharts/ChartData.cs/#L645"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"></div>
@@ -454,7 +553,7 @@ Class ChartSeriesSnapshot  <a class="header-action link-secondary" title="View s
 
   <h3 id="ProCharts_ChartSeriesSnapshot_TrendlineType" data-uid="ProCharts.ChartSeriesSnapshot.TrendlineType">
   TrendlineType
-  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/ProCharts/ChartData.cs/#L368"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/ProCharts/ChartData.cs/#L643"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"></div>
@@ -485,7 +584,7 @@ Class ChartSeriesSnapshot  <a class="header-action link-secondary" title="View s
 
   <h3 id="ProCharts_ChartSeriesSnapshot_ValueAxisAssignment" data-uid="ProCharts.ChartSeriesSnapshot.ValueAxisAssignment">
   ValueAxisAssignment
-  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/ProCharts/ChartData.cs/#L366"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/ProCharts/ChartData.cs/#L641"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"></div>
@@ -516,7 +615,7 @@ Class ChartSeriesSnapshot  <a class="header-action link-secondary" title="View s
 
   <h3 id="ProCharts_ChartSeriesSnapshot_Values" data-uid="ProCharts.ChartSeriesSnapshot.Values">
   Values
-  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/ProCharts/ChartData.cs/#L358"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/ProCharts/ChartData.cs/#L627"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"></div>
@@ -547,7 +646,7 @@ Class ChartSeriesSnapshot  <a class="header-action link-secondary" title="View s
 
   <h3 id="ProCharts_ChartSeriesSnapshot_XValues" data-uid="ProCharts.ChartSeriesSnapshot.XValues">
   XValues
-  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/ProCharts/ChartData.cs/#L360"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/ProCharts/ChartData.cs/#L629"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"></div>
@@ -578,7 +677,7 @@ Class ChartSeriesSnapshot  <a class="header-action link-secondary" title="View s
 </article>
 
         <div class="contribution d-print-none">
-          <a href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/ProCharts/ChartData.cs/#L324" class="edit-link">Edit this page</a>
+          <a href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/ProCharts/ChartData.cs/#L587" class="edit-link">Edit this page</a>
         </div>
 
 

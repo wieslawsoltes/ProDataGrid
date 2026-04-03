@@ -140,8 +140,8 @@ Struct SkiaChartViewportInfo  <a class="header-action link-secondary" title="Vie
 
   <a id="ProCharts_Skia_SkiaChartViewportInfo__ctor_" data-uid="ProCharts.Skia.SkiaChartViewportInfo.#ctor*"></a>
 
-  <h3 id="ProCharts_Skia_SkiaChartViewportInfo__ctor_SkiaSharp_SKRect_System_Boolean_System_Boolean_" data-uid="ProCharts.Skia.SkiaChartViewportInfo.#ctor(SkiaSharp.SKRect,System.Boolean,System.Boolean)">
-  SkiaChartViewportInfo(SKRect, bool, bool)
+  <h3 id="ProCharts_Skia_SkiaChartViewportInfo__ctor_SkiaSharp_SKRect_System_Boolean_System_Boolean_System_Double_System_Double_" data-uid="ProCharts.Skia.SkiaChartViewportInfo.#ctor(SkiaSharp.SKRect,System.Boolean,System.Boolean,System.Double,System.Double)">
+  SkiaChartViewportInfo(SKRect, bool, bool, double, double)
   <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/ProCharts.Skia/SkiaChartViewportInfo.cs/#L13"><i class="bi bi-code-slash"></i></a>
   </h3>
 
@@ -149,7 +149,7 @@ Struct SkiaChartViewportInfo  <a class="header-action link-secondary" title="Vie
   <div class="markdown level1 conceptual"></div>
 
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public SkiaChartViewportInfo(SKRect plot, bool barOnly, bool hasCartesianSeries)</code></pre>
+    <pre><code class="lang-csharp hljs">public SkiaChartViewportInfo(SKRect plot, bool barOnly, bool hasCartesianSeries, double minValue, double maxValue)</code></pre>
   </div>
 
   <h4 class="section">Parameters</h4>
@@ -159,6 +159,10 @@ Struct SkiaChartViewportInfo  <a class="header-action link-secondary" title="Vie
     <dt><code>barOnly</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></dt>
     <dd></dd>
     <dt><code>hasCartesianSeries</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></dt>
+    <dd></dd>
+    <dt><code>minValue</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.double">double</a></dt>
+    <dd></dd>
+    <dt><code>maxValue</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.double">double</a></dt>
     <dd></dd>
   </dl>
 
@@ -181,7 +185,7 @@ Struct SkiaChartViewportInfo  <a class="header-action link-secondary" title="Vie
 
   <h3 id="ProCharts_Skia_SkiaChartViewportInfo_BarOnly" data-uid="ProCharts.Skia.SkiaChartViewportInfo.BarOnly">
   BarOnly
-  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/ProCharts.Skia/SkiaChartViewportInfo.cs/#L22"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/ProCharts.Skia/SkiaChartViewportInfo.cs/#L29"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"></div>
@@ -212,7 +216,7 @@ Struct SkiaChartViewportInfo  <a class="header-action link-secondary" title="Vie
 
   <h3 id="ProCharts_Skia_SkiaChartViewportInfo_HasCartesianSeries" data-uid="ProCharts.Skia.SkiaChartViewportInfo.HasCartesianSeries">
   HasCartesianSeries
-  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/ProCharts.Skia/SkiaChartViewportInfo.cs/#L24"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/ProCharts.Skia/SkiaChartViewportInfo.cs/#L31"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"></div>
@@ -239,11 +243,73 @@ Struct SkiaChartViewportInfo  <a class="header-action link-secondary" title="Vie
 
 
 
+  <a id="ProCharts_Skia_SkiaChartViewportInfo_MaxValue_" data-uid="ProCharts.Skia.SkiaChartViewportInfo.MaxValue*"></a>
+
+  <h3 id="ProCharts_Skia_SkiaChartViewportInfo_MaxValue" data-uid="ProCharts.Skia.SkiaChartViewportInfo.MaxValue">
+  MaxValue
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/ProCharts.Skia/SkiaChartViewportInfo.cs/#L35"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public double MaxValue { get; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.double">double</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="ProCharts_Skia_SkiaChartViewportInfo_MinValue_" data-uid="ProCharts.Skia.SkiaChartViewportInfo.MinValue*"></a>
+
+  <h3 id="ProCharts_Skia_SkiaChartViewportInfo_MinValue" data-uid="ProCharts.Skia.SkiaChartViewportInfo.MinValue">
+  MinValue
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/ProCharts.Skia/SkiaChartViewportInfo.cs/#L33"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public double MinValue { get; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.double">double</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
   <a id="ProCharts_Skia_SkiaChartViewportInfo_Plot_" data-uid="ProCharts.Skia.SkiaChartViewportInfo.Plot*"></a>
 
   <h3 id="ProCharts_Skia_SkiaChartViewportInfo_Plot" data-uid="ProCharts.Skia.SkiaChartViewportInfo.Plot">
   Plot
-  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/ProCharts.Skia/SkiaChartViewportInfo.cs/#L20"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/ProCharts.Skia/SkiaChartViewportInfo.cs/#L27"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"></div>
@@ -278,7 +344,7 @@ Struct SkiaChartViewportInfo  <a class="header-action link-secondary" title="Vie
 
   <h3 id="ProCharts_Skia_SkiaChartViewportInfo_Equals_ProCharts_Skia_SkiaChartViewportInfo_" data-uid="ProCharts.Skia.SkiaChartViewportInfo.Equals(ProCharts.Skia.SkiaChartViewportInfo)">
   Equals(SkiaChartViewportInfo)
-  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/ProCharts.Skia/SkiaChartViewportInfo.cs/#L26"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/ProCharts.Skia/SkiaChartViewportInfo.cs/#L37"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>Indicates whether the current object is equal to another object of the same type.</p>
@@ -317,7 +383,7 @@ Struct SkiaChartViewportInfo  <a class="header-action link-secondary" title="Vie
 
   <h3 id="ProCharts_Skia_SkiaChartViewportInfo_Equals_System_Object_" data-uid="ProCharts.Skia.SkiaChartViewportInfo.Equals(System.Object)">
   Equals(object?)
-  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/ProCharts.Skia/SkiaChartViewportInfo.cs/#L33"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/ProCharts.Skia/SkiaChartViewportInfo.cs/#L46"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>Indicates whether this instance and a specified object are equal.</p>
@@ -356,7 +422,7 @@ Struct SkiaChartViewportInfo  <a class="header-action link-secondary" title="Vie
 
   <h3 id="ProCharts_Skia_SkiaChartViewportInfo_GetHashCode" data-uid="ProCharts.Skia.SkiaChartViewportInfo.GetHashCode">
   GetHashCode()
-  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/ProCharts.Skia/SkiaChartViewportInfo.cs/#L38"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/ProCharts.Skia/SkiaChartViewportInfo.cs/#L51"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>Returns the hash code for this instance.</p>
@@ -393,7 +459,7 @@ Struct SkiaChartViewportInfo  <a class="header-action link-secondary" title="Vie
 
   <h3 id="ProCharts_Skia_SkiaChartViewportInfo_op_Equality_ProCharts_Skia_SkiaChartViewportInfo_ProCharts_Skia_SkiaChartViewportInfo_" data-uid="ProCharts.Skia.SkiaChartViewportInfo.op_Equality(ProCharts.Skia.SkiaChartViewportInfo,ProCharts.Skia.SkiaChartViewportInfo)">
   operator ==(SkiaChartViewportInfo, SkiaChartViewportInfo)
-  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/ProCharts.Skia/SkiaChartViewportInfo.cs/#L53"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/ProCharts.Skia/SkiaChartViewportInfo.cs/#L68"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"></div>
@@ -431,7 +497,7 @@ Struct SkiaChartViewportInfo  <a class="header-action link-secondary" title="Vie
 
   <h3 id="ProCharts_Skia_SkiaChartViewportInfo_op_Inequality_ProCharts_Skia_SkiaChartViewportInfo_ProCharts_Skia_SkiaChartViewportInfo_" data-uid="ProCharts.Skia.SkiaChartViewportInfo.op_Inequality(ProCharts.Skia.SkiaChartViewportInfo,ProCharts.Skia.SkiaChartViewportInfo)">
   operator !=(SkiaChartViewportInfo, SkiaChartViewportInfo)
-  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/ProCharts.Skia/SkiaChartViewportInfo.cs/#L58"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/ProCharts.Skia/SkiaChartViewportInfo.cs/#L73"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"></div>

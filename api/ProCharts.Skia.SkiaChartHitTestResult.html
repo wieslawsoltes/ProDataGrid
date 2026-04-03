@@ -140,8 +140,8 @@ Struct SkiaChartHitTestResult  <a class="header-action link-secondary" title="Vi
 
   <a id="ProCharts_Skia_SkiaChartHitTestResult__ctor_" data-uid="ProCharts.Skia.SkiaChartHitTestResult.#ctor*"></a>
 
-  <h3 id="ProCharts_Skia_SkiaChartHitTestResult__ctor_System_Int32_System_Int32_System_Double_System_Nullable_System_Double__System_String_System_String_ProCharts_ChartSeriesKind_SkiaSharp_SKPoint_" data-uid="ProCharts.Skia.SkiaChartHitTestResult.#ctor(System.Int32,System.Int32,System.Double,System.Nullable{System.Double},System.String,System.String,ProCharts.ChartSeriesKind,SkiaSharp.SKPoint)">
-  SkiaChartHitTestResult(int, int, double, double?, string?, string?, ChartSeriesKind, SKPoint)
+  <h3 id="ProCharts_Skia_SkiaChartHitTestResult__ctor_System_Int32_System_Int32_System_Double_System_Nullable_System_Double__System_String_System_String_ProCharts_ChartSeriesKind_SkiaSharp_SKPoint_System_Nullable_System_Double__System_Nullable_System_Double__System_Nullable_System_Double__System_Nullable_System_Double__" data-uid="ProCharts.Skia.SkiaChartHitTestResult.#ctor(System.Int32,System.Int32,System.Double,System.Nullable{System.Double},System.String,System.String,ProCharts.ChartSeriesKind,SkiaSharp.SKPoint,System.Nullable{System.Double},System.Nullable{System.Double},System.Nullable{System.Double},System.Nullable{System.Double})">
+  SkiaChartHitTestResult(int, int, double, double?, string?, string?, ChartSeriesKind, SKPoint, double?, double?, double?, double?)
   <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/ProCharts.Skia/SkiaChartRenderer.cs/#L29"><i class="bi bi-code-slash"></i></a>
   </h3>
 
@@ -149,7 +149,7 @@ Struct SkiaChartHitTestResult  <a class="header-action link-secondary" title="Vi
   <div class="markdown level1 conceptual"></div>
 
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public SkiaChartHitTestResult(int seriesIndex, int pointIndex, double value, double? xValue, string? category, string? seriesName, ChartSeriesKind seriesKind, SKPoint location)</code></pre>
+    <pre><code class="lang-csharp hljs">public SkiaChartHitTestResult(int seriesIndex, int pointIndex, double value, double? xValue, string? category, string? seriesName, ChartSeriesKind seriesKind, SKPoint location, double? openValue = null, double? highValue = null, double? lowValue = null, double? closeValue = null)</code></pre>
   </div>
 
   <h4 class="section">Parameters</h4>
@@ -169,6 +169,14 @@ Struct SkiaChartHitTestResult  <a class="header-action link-secondary" title="Vi
     <dt><code>seriesKind</code> <a class="xref" href="ProCharts.ChartSeriesKind.html">ChartSeriesKind</a></dt>
     <dd></dd>
     <dt><code>location</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/skiasharp.skpoint">SKPoint</a></dt>
+    <dd></dd>
+    <dt><code>openValue</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.double">double</a>?</dt>
+    <dd></dd>
+    <dt><code>highValue</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.double">double</a>?</dt>
+    <dd></dd>
+    <dt><code>lowValue</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.double">double</a>?</dt>
+    <dd></dd>
+    <dt><code>closeValue</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.double">double</a>?</dt>
     <dd></dd>
   </dl>
 
@@ -191,7 +199,7 @@ Struct SkiaChartHitTestResult  <a class="header-action link-secondary" title="Vi
 
   <h3 id="ProCharts_Skia_SkiaChartHitTestResult_Category" data-uid="ProCharts.Skia.SkiaChartHitTestResult.Category">
   Category
-  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/ProCharts.Skia/SkiaChartRenderer.cs/#L57"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/ProCharts.Skia/SkiaChartRenderer.cs/#L65"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"></div>
@@ -218,11 +226,73 @@ Struct SkiaChartHitTestResult  <a class="header-action link-secondary" title="Vi
 
 
 
+  <a id="ProCharts_Skia_SkiaChartHitTestResult_CloseValue_" data-uid="ProCharts.Skia.SkiaChartHitTestResult.CloseValue*"></a>
+
+  <h3 id="ProCharts_Skia_SkiaChartHitTestResult_CloseValue" data-uid="ProCharts.Skia.SkiaChartHitTestResult.CloseValue">
+  CloseValue
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/ProCharts.Skia/SkiaChartRenderer.cs/#L79"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public double? CloseValue { get; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.double">double</a>?</dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="ProCharts_Skia_SkiaChartHitTestResult_HighValue_" data-uid="ProCharts.Skia.SkiaChartHitTestResult.HighValue*"></a>
+
+  <h3 id="ProCharts_Skia_SkiaChartHitTestResult_HighValue" data-uid="ProCharts.Skia.SkiaChartHitTestResult.HighValue">
+  HighValue
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/ProCharts.Skia/SkiaChartRenderer.cs/#L75"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public double? HighValue { get; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.double">double</a>?</dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
   <a id="ProCharts_Skia_SkiaChartHitTestResult_Location_" data-uid="ProCharts.Skia.SkiaChartHitTestResult.Location*"></a>
 
   <h3 id="ProCharts_Skia_SkiaChartHitTestResult_Location" data-uid="ProCharts.Skia.SkiaChartHitTestResult.Location">
   Location
-  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/ProCharts.Skia/SkiaChartRenderer.cs/#L63"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/ProCharts.Skia/SkiaChartRenderer.cs/#L71"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"></div>
@@ -249,11 +319,73 @@ Struct SkiaChartHitTestResult  <a class="header-action link-secondary" title="Vi
 
 
 
+  <a id="ProCharts_Skia_SkiaChartHitTestResult_LowValue_" data-uid="ProCharts.Skia.SkiaChartHitTestResult.LowValue*"></a>
+
+  <h3 id="ProCharts_Skia_SkiaChartHitTestResult_LowValue" data-uid="ProCharts.Skia.SkiaChartHitTestResult.LowValue">
+  LowValue
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/ProCharts.Skia/SkiaChartRenderer.cs/#L77"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public double? LowValue { get; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.double">double</a>?</dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="ProCharts_Skia_SkiaChartHitTestResult_OpenValue_" data-uid="ProCharts.Skia.SkiaChartHitTestResult.OpenValue*"></a>
+
+  <h3 id="ProCharts_Skia_SkiaChartHitTestResult_OpenValue" data-uid="ProCharts.Skia.SkiaChartHitTestResult.OpenValue">
+  OpenValue
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/ProCharts.Skia/SkiaChartRenderer.cs/#L73"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public double? OpenValue { get; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.double">double</a>?</dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
   <a id="ProCharts_Skia_SkiaChartHitTestResult_PointIndex_" data-uid="ProCharts.Skia.SkiaChartHitTestResult.PointIndex*"></a>
 
   <h3 id="ProCharts_Skia_SkiaChartHitTestResult_PointIndex" data-uid="ProCharts.Skia.SkiaChartHitTestResult.PointIndex">
   PointIndex
-  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/ProCharts.Skia/SkiaChartRenderer.cs/#L51"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/ProCharts.Skia/SkiaChartRenderer.cs/#L59"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"></div>
@@ -284,7 +416,7 @@ Struct SkiaChartHitTestResult  <a class="header-action link-secondary" title="Vi
 
   <h3 id="ProCharts_Skia_SkiaChartHitTestResult_SeriesIndex" data-uid="ProCharts.Skia.SkiaChartHitTestResult.SeriesIndex">
   SeriesIndex
-  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/ProCharts.Skia/SkiaChartRenderer.cs/#L49"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/ProCharts.Skia/SkiaChartRenderer.cs/#L57"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"></div>
@@ -315,7 +447,7 @@ Struct SkiaChartHitTestResult  <a class="header-action link-secondary" title="Vi
 
   <h3 id="ProCharts_Skia_SkiaChartHitTestResult_SeriesKind" data-uid="ProCharts.Skia.SkiaChartHitTestResult.SeriesKind">
   SeriesKind
-  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/ProCharts.Skia/SkiaChartRenderer.cs/#L61"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/ProCharts.Skia/SkiaChartRenderer.cs/#L69"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"></div>
@@ -346,7 +478,7 @@ Struct SkiaChartHitTestResult  <a class="header-action link-secondary" title="Vi
 
   <h3 id="ProCharts_Skia_SkiaChartHitTestResult_SeriesName" data-uid="ProCharts.Skia.SkiaChartHitTestResult.SeriesName">
   SeriesName
-  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/ProCharts.Skia/SkiaChartRenderer.cs/#L59"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/ProCharts.Skia/SkiaChartRenderer.cs/#L67"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"></div>
@@ -377,7 +509,7 @@ Struct SkiaChartHitTestResult  <a class="header-action link-secondary" title="Vi
 
   <h3 id="ProCharts_Skia_SkiaChartHitTestResult_Value" data-uid="ProCharts.Skia.SkiaChartHitTestResult.Value">
   Value
-  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/ProCharts.Skia/SkiaChartRenderer.cs/#L53"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/ProCharts.Skia/SkiaChartRenderer.cs/#L61"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"></div>
@@ -408,7 +540,7 @@ Struct SkiaChartHitTestResult  <a class="header-action link-secondary" title="Vi
 
   <h3 id="ProCharts_Skia_SkiaChartHitTestResult_XValue" data-uid="ProCharts.Skia.SkiaChartHitTestResult.XValue">
   XValue
-  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/ProCharts.Skia/SkiaChartRenderer.cs/#L55"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/ProCharts.Skia/SkiaChartRenderer.cs/#L63"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"></div>
@@ -443,7 +575,7 @@ Struct SkiaChartHitTestResult  <a class="header-action link-secondary" title="Vi
 
   <h3 id="ProCharts_Skia_SkiaChartHitTestResult_Equals_ProCharts_Skia_SkiaChartHitTestResult_" data-uid="ProCharts.Skia.SkiaChartHitTestResult.Equals(ProCharts.Skia.SkiaChartHitTestResult)">
   Equals(SkiaChartHitTestResult)
-  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/ProCharts.Skia/SkiaChartRenderer.cs/#L65"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/ProCharts.Skia/SkiaChartRenderer.cs/#L81"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>Indicates whether the current object is equal to another object of the same type.</p>
@@ -482,7 +614,7 @@ Struct SkiaChartHitTestResult  <a class="header-action link-secondary" title="Vi
 
   <h3 id="ProCharts_Skia_SkiaChartHitTestResult_Equals_System_Object_" data-uid="ProCharts.Skia.SkiaChartHitTestResult.Equals(System.Object)">
   Equals(object?)
-  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/ProCharts.Skia/SkiaChartRenderer.cs/#L86"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/ProCharts.Skia/SkiaChartRenderer.cs/#L106"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>Indicates whether this instance and a specified object are equal.</p>
@@ -521,7 +653,7 @@ Struct SkiaChartHitTestResult  <a class="header-action link-secondary" title="Vi
 
   <h3 id="ProCharts_Skia_SkiaChartHitTestResult_GetHashCode" data-uid="ProCharts.Skia.SkiaChartHitTestResult.GetHashCode">
   GetHashCode()
-  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/ProCharts.Skia/SkiaChartRenderer.cs/#L91"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/ProCharts.Skia/SkiaChartRenderer.cs/#L111"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>Returns the hash code for this instance.</p>
@@ -558,7 +690,7 @@ Struct SkiaChartHitTestResult  <a class="header-action link-secondary" title="Vi
 
   <h3 id="ProCharts_Skia_SkiaChartHitTestResult_op_Equality_ProCharts_Skia_SkiaChartHitTestResult_ProCharts_Skia_SkiaChartHitTestResult_" data-uid="ProCharts.Skia.SkiaChartHitTestResult.op_Equality(ProCharts.Skia.SkiaChartHitTestResult,ProCharts.Skia.SkiaChartHitTestResult)">
   operator ==(SkiaChartHitTestResult, SkiaChartHitTestResult)
-  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/ProCharts.Skia/SkiaChartRenderer.cs/#L76"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/ProCharts.Skia/SkiaChartRenderer.cs/#L96"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"></div>
@@ -596,7 +728,7 @@ Struct SkiaChartHitTestResult  <a class="header-action link-secondary" title="Vi
 
   <h3 id="ProCharts_Skia_SkiaChartHitTestResult_op_Inequality_ProCharts_Skia_SkiaChartHitTestResult_ProCharts_Skia_SkiaChartHitTestResult_" data-uid="ProCharts.Skia.SkiaChartHitTestResult.op_Inequality(ProCharts.Skia.SkiaChartHitTestResult,ProCharts.Skia.SkiaChartHitTestResult)">
   operator !=(SkiaChartHitTestResult, SkiaChartHitTestResult)
-  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/ProCharts.Skia/SkiaChartRenderer.cs/#L81"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/ProCharts.Skia/SkiaChartRenderer.cs/#L101"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"></div>

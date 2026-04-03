@@ -83,11 +83,12 @@
         <article data-uid="">
 <h1 id="procharts-series-types">ProCharts Series Types</h1>
 
-<p>Series types are defined by <code>ChartSeriesKind</code>. Each series snapshot also includes optional X values, size values, and styles.</p>
+<p>Series types are defined by <code>ChartSeriesKind</code>. Each series snapshot also includes optional X values, size values, financial high/low/open/close values, and per-series styles.</p>
 <h2 id="cartesian-series">Cartesian series</h2>
 <ul>
 <li><code>Line</code>, <code>Area</code>, <code>Column</code>, <code>Bar</code></li>
 <li><code>Scatter</code>, <code>Bubble</code></li>
+<li><code>Candlestick</code>, <code>HollowCandlestick</code>, <code>Ohlc</code>, <code>Hlc</code>, <code>HeikinAshi</code>, <code>Renko</code>, <code>Range</code>, <code>LineBreak</code>, <code>Kagi</code>, <code>PointFigure</code></li>
 <li><code>StackedColumn</code>, <code>StackedBar</code>, <code>StackedArea</code></li>
 <li><code>StackedColumn100</code>, <code>StackedBar100</code>, <code>StackedArea100</code></li>
 <li><code>Waterfall</code></li>
@@ -110,6 +111,18 @@
     values: new double?[] { 4, 6, 7, 3 },
     xValues: new double[] { 1, 2, 3, 4 })
 </code></pre>
+<h2 id="financial-series">Financial series</h2>
+<p><code>Candlestick</code>, <code>HollowCandlestick</code>, <code>Ohlc</code>, <code>HeikinAshi</code>, <code>Renko</code>, <code>Range</code>, <code>LineBreak</code>, <code>Kagi</code>, and <code>PointFigure</code> use the <code>Values</code> collection for close prices and populate <code>OpenValues</code>, <code>HighValues</code>, and <code>LowValues</code> with matching category indexes. <code>Hlc</code> omits <code>OpenValues</code> and uses <code>HighValues</code>, <code>LowValues</code>, and <code>Values</code> for high/low/close. <code>PointFigure</code> can also use <code>SizeValues</code> to carry the box count per rendered column.</p>
+<pre><code class="lang-csharp">new ChartSeriesSnapshot(
+    name: &quot;LINK / USD&quot;,
+    kind: ChartSeriesKind.Candlestick,
+    values: new double?[] { 9.11, 9.08, 9.14 },
+    openValues: new double?[] { 9.02, 9.11, 9.08 },
+    highValues: new double?[] { 9.16, 9.13, 9.22 },
+    lowValues: new double?[] { 8.98, 9.01, 9.04 })
+</code></pre>
+<p>The Skia renderer uses these arrays for value-range calculation, hit testing, legend glyphs, and data labels.</p>
+<p>Financial styling in <code>SkiaChartStyle</code> also exposes chart-specific controls such as body width, box width, hollow bullish bodies, wick/tick widths, and a last-price overlay. The renderer now gives <code>HollowCandlestick</code> previous-close-aware color semantics, <code>Range</code> a candle-style derived bar treatment, <code>Kagi</code> a stepped line treatment, and <code>PointFigure</code> a proper X/O glyph treatment instead of reusing candlestick bodies.</p>
 <h2 id="trendlines-and-error-bars">Trendlines and error bars</h2>
 <p><code>ChartSeriesSnapshot</code> supports trendlines and error bars:</p>
 <ul>

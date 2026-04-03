@@ -83,7 +83,19 @@
         <article data-uid="">
 <h1 id="procharts-interaction">ProCharts Interaction</h1>
 
-<p><code>ProChartView</code> provides built-in interaction for tooltips, hit testing, and pan/zoom.</p>
+<p><code>ProChartView</code> provides built-in interaction for tooltips, hit testing, crosshair overlays, and category-window navigation. The interaction model is split between the Avalonia host and <code>ChartModel</code>, so views stay thin and dashboards can coordinate multiple panes.</p>
+<h2 id="fundamental-parity-plan">Fundamental parity plan</h2>
+<p>The current interaction baseline is aimed at the most important desktop trading-chart behaviors:</p>
+<ol>
+<li>Window navigation lives in <code>ChartModel</code>, not only in the view host.</li>
+<li>Wheel zoom and drag pan operate on <code>WindowStart</code> / <code>WindowCount</code>.</li>
+<li>Crosshair state is model-backed so multiple panes can stay synchronized.</li>
+<li>Follow-latest mode keeps streaming charts pinned to the newest candles until the user pans away.</li>
+<li>Reset and latest actions are available without rebuilding the data source.</li>
+<li>Tool-driven workflows such as crosshair, pan, zoom-box, and measure are selectable without rewriting the host.</li>
+<li>Viewport history supports undo and redo so dashboards can expose terminal-style navigation affordances.</li>
+</ol>
+<p>This does not attempt full TradingView feature parity. Drawing tools, y-axis drag scaling, saved viewport state, and advanced gesture customization remain future work.</p>
 <h2 id="tooltips-and-hit-testing">Tooltips and hit testing</h2>
 <p>Enable tooltips and provide a formatter:</p>
 <pre><code class="lang-csharp">chartView.ShowToolTips = true;
@@ -96,18 +108,66 @@ chartView.ToolTipFormatter = hit =&gt;
 <pre><code class="lang-csharp">chartView.EnablePanZoom = true;
 chartView.PanButton = MouseButton.Left;
 chartView.PanModifiers = KeyModifiers.None;
-chartView.ZoomModifiers = KeyModifiers.Control;
+chartView.ZoomModifiers = KeyModifiers.None;
 chartView.ZoomStep = 0.2;
 </code></pre>
 <p>Use <code>MinWindowCount</code> to prevent zooming in too far.</p>
+<p>For programmatic control, use the <code>ChartModel</code> APIs:</p>
+<pre><code class="lang-csharp">chartModel.ShowLatest(preferredWindowCount: 120, followLatest: true);
+chartModel.PanWindow(-12);
+chartModel.ZoomWindow(scale: 1.25, anchorRatio: 0.5, minWindowCount: 20);
+chartModel.ResetWindow();
+chartModel.UndoWindow();
+chartModel.RedoWindow();
+</code></pre>
+<p>These APIs are the preferred integration point for streaming dashboards because they keep the viewport logic inside <code>ProCharts</code>.</p>
+<p>Use <code>TryGetVisibleWindow(...)</code> when a dashboard needs to display the active range without directly reading raw request fields:</p>
+<pre><code class="lang-csharp">if (chartModel.TryGetVisibleWindow(out var total, out var start, out var count))
+{
+    // start/count are clamped to the current dataset size
+}
+</code></pre>
+<h2 id="pointer-tools">Pointer tools</h2>
+<p><code>ChartInteractionState.PointerTool</code> selects the primary pointer behavior:</p>
+<ul>
+<li><code>Crosshair</code> for hover inspection</li>
+<li><code>Pan</code> for drag panning</li>
+<li><code>Zoom</code> for drag-to-zoom selection</li>
+<li><code>Measure</code> for range measurement overlays</li>
+</ul>
+<p>This keeps dashboard toolbars declarative: the view model can switch tools by updating chart state, while the host remains passive.</p>
+<h2 id="crosshair-and-multi-pane-sync">Crosshair and multi-pane sync</h2>
+<p>Crosshair state lives on <code>ChartModel.Interaction</code>. That makes it possible to render one pane from pointer input and mirror the active candle position into related panes.</p>
+<pre><code class="lang-csharp">priceChart.TrackCrosshair(visibleIndex, categoryLabel, value, horizontalRatio, verticalRatio);
+volumeChart.Interaction.CrosshairMode = ChartCrosshairMode.VerticalOnly;
+volumeChart.TrackCrosshair(visibleIndex, categoryLabel, value: null, horizontalRatio, verticalRatio: 0.5);
+</code></pre>
+<p>Use <code>ChartCrosshairMode.VerticalOnly</code> for stacked companion panes such as volume or trade-count strips. Use <code>ClearCrosshair()</code> when the pointer leaves the primary chart.</p>
+<h2 id="follow-latest-behavior">Follow-latest behavior</h2>
+<p><code>ChartInteractionState.FollowLatest</code> keeps the visible window anchored to the newest categories as data arrives. Calling <code>PanWindow</code> or <code>SetVisibleWindow(..., followLatest: false)</code> turns it off, which matches how professional market terminals stop auto-follow when the user browses historical candles.</p>
 <h2 id="keyboard-and-mouse-settings">Keyboard and mouse settings</h2>
-<p>You can customize gesture behavior:</p>
+<p><code>ProChartView</code> supports these built-in behaviors:</p>
+<ul>
+<li>wheel zoom</li>
+<li>drag pan</li>
+<li>double-click to jump back to the latest visible window</li>
+<li>keyboard left/right pan</li>
+<li>keyboard <code>+</code> / <code>-</code> zoom</li>
+<li>keyboard <code>End</code> to jump to latest</li>
+<li>keyboard <code>Home</code> to reset the full window</li>
+<li>keyboard <code>Ctrl+Z</code> to undo viewport changes</li>
+<li>keyboard <code>Ctrl+Shift+Z</code> or <code>Ctrl+Y</code> to redo viewport changes</li>
+<li>keyboard <code>Escape</code> to clear the crosshair</li>
+</ul>
+<p>You can still customize gesture behavior with:</p>
 <ul>
 <li><code>PanButton</code> and <code>PanModifiers</code></li>
 <li><code>ZoomModifiers</code></li>
 <li><code>ZoomStep</code></li>
+<li><code>MinWindowCount</code></li>
+<li><code>ShowCrosshair</code></li>
+<li><code>EnableKeyboardNavigation</code></li>
 </ul>
-<p>These settings allow you to align ProCharts with your application's interaction conventions.</p>
 
 </article>
 

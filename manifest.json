@@ -6402,6 +6402,20 @@
     },
     {
       "type": "ManagedReference",
+      "source_relative_path": "api/ProCharts.ChartCrosshairMode.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/ProCharts.ChartCrosshairMode.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "ProCharts.ChartCrosshairMode",
+      "Summary": "<p sourcefile=\"api/ProCharts.ChartCrosshairMode.yml\" sourcestartlinenumber=\"1\">Determines which guide lines are rendered for the active crosshair overlay.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
       "source_relative_path": "api/ProCharts.ChartDataDelta.yml",
       "output": {
         ".html": {
@@ -6542,6 +6556,20 @@
     },
     {
       "type": "ManagedReference",
+      "source_relative_path": "api/ProCharts.ChartInteractionState.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/ProCharts.ChartInteractionState.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "ProCharts.ChartInteractionState",
+      "Summary": "<p sourcefile=\"api/ProCharts.ChartInteractionState.yml\" sourcestartlinenumber=\"1\">Represents transient chart interaction state such as visible crosshair position\nand whether the window should remain pinned to the latest categories.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
       "source_relative_path": "api/ProCharts.ChartLegendDefinition.yml",
       "output": {
         ".html": {
@@ -6626,6 +6654,20 @@
     },
     {
       "type": "ManagedReference",
+      "source_relative_path": "api/ProCharts.ChartPointerTool.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/ProCharts.ChartPointerTool.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "ProCharts.ChartPointerTool",
+      "Summary": "<p sourcefile=\"api/ProCharts.ChartPointerTool.yml\" sourcestartlinenumber=\"1\">Selects the primary pointer workflow for interactive chart hosts.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
       "source_relative_path": "api/ProCharts.ChartSeriesKind.yml",
       "output": {
         ".html": {
@@ -6707,6 +6749,34 @@
       "IsMRef": true,
       "Title": "ProCharts.ChartValueAxisAssignment",
       "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/ProCharts.ChartValueFormat.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/ProCharts.ChartValueFormat.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "ProCharts.ChartValueFormat",
+      "Summary": "<p sourcefile=\"api/ProCharts.ChartValueFormat.yml\" sourcestartlinenumber=\"1\">Defines numeric display formatting for chart values when a custom formatter delegate is not supplied.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/ProCharts.ChartValueFormatter.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/ProCharts.ChartValueFormatter.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "ProCharts.ChartValueFormatter",
+      "Summary": "<p sourcefile=\"api/ProCharts.ChartValueFormatter.yml\" sourcestartlinenumber=\"1\">Formats numeric chart values using <xref href=\"ProCharts.ChartValueFormat\" data-throw-if-not-resolved=\"false\"></xref>.</p>\n"
     },
     {
       "type": "ManagedReference",
