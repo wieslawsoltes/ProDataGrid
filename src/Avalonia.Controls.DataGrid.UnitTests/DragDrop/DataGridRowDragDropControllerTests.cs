@@ -28,7 +28,7 @@ namespace Avalonia.Controls.DataGridTests.DragDrop;
     public class DataGridRowDragDropControllerTests
     {
     [AvaloniaFact]
-    public void Row_DragHandle_Allows_Header_Start()
+    public void Row_DragHandle_Does_Not_Start_From_RowHeader()
     {
         var items = new ObservableCollection<RowItem>
         {
@@ -37,6 +37,8 @@ namespace Avalonia.Controls.DataGridTests.DragDrop;
         };
         var (grid, window) = CreateGrid(items);
         grid.CanUserReorderRows = true;
+        grid.HeadersVisibility = DataGridHeadersVisibility.All;
+        grid.RowHeaderWidth = 28;
         grid.RowDragHandle = DataGridRowDragHandle.Row;
         grid.UpdateLayout();
 
@@ -45,22 +47,14 @@ namespace Avalonia.Controls.DataGridTests.DragDrop;
 
         var header = grid.GetVisualDescendants().OfType<DataGridRowHeader>().First();
         var point = header.TranslatePoint(new Point(1, 1), grid) ?? new Point(1, 1);
+        var pointer = new Avalonia.Input.Pointer(Avalonia.Input.Pointer.GetNextFreeId(), PointerType.Mouse, isPrimary: true);
 
-        var dragInfo = new DataGridRowDragInfo(grid, new List<object> { items[0] }, new List<int> { 0 }, fromSelection: false);
-        var data = new DataObject();
-        var dragEvent = new DragEventArgs(
-            AvaloniaDragDrop.DragOverEvent,
-            data,
-            grid,
-            point,
-            KeyModifiers.None)
-        {
-            RoutedEvent = AvaloniaDragDrop.DragOverEvent,
-            Source = grid
-        };
+        header.RaiseEvent(CreatePointerPressedArgs(header, window, pointer, point));
 
-        var dropArgs = InvokeCreateDropArgs(controller, dragInfo, dragEvent, DragDropEffects.Move);
-        Assert.NotNull(dropArgs);
+        var pointerIdField = typeof(DataGridRowDragDropController).GetField("_pointerId", BindingFlags.NonPublic | BindingFlags.Instance);
+        var pointerId = (int?)pointerIdField!.GetValue(controller);
+        Assert.Null(pointerId);
+
         window.Close();
     }
 
@@ -630,6 +624,28 @@ namespace Avalonia.Controls.DataGridTests.DragDrop;
     }
 
     [AvaloniaFact]
+    public void UpdateSessionEffects_Recomputes_Requested_And_Effective_Effects_After_AllowedEffects_Override()
+    {
+        var items = new ObservableCollection<RowItem>
+        {
+            new("A"),
+            new("B")
+        };
+        var (grid, window) = CreateGrid(items);
+        var session = new DataGridRowDragSession(grid, new List<object> { items[0] }, new List<int> { 0 }, fromSelection: false);
+
+        InvokeUpdateSessionEffects(session, DragDropEffects.Move | DragDropEffects.Copy, KeyModifiers.Control);
+        Assert.Equal(DragDropEffects.Copy, session.RequestedEffect);
+        Assert.Equal(DragDropEffects.Copy, session.EffectiveEffect);
+
+        InvokeUpdateSessionEffects(session, DragDropEffects.Move, KeyModifiers.Control);
+        Assert.Equal(DragDropEffects.Move, session.RequestedEffect);
+        Assert.Equal(DragDropEffects.Move, session.EffectiveEffect);
+
+        window.Close();
+    }
+
+    [AvaloniaFact]
     public void TryPrepareSessionUpdate_Allows_Handler_To_Override_EffectiveEffect()
     {
         var items = new ObservableCollection<RowItem>
@@ -943,6 +959,15 @@ namespace Avalonia.Controls.DataGridTests.DragDrop;
     {
         var method = typeof(DataGridRowDragDropController).GetMethod("FinishDrag", BindingFlags.NonPublic | BindingFlags.Instance);
         method?.Invoke(controller, new object[] { info, data, session, result });
+    }
+
+    private static void InvokeUpdateSessionEffects(
+        DataGridRowDragSession session,
+        DragDropEffects allowedEffects,
+        KeyModifiers modifiers)
+    {
+        var method = typeof(DataGridRowDragDropController).GetMethod("UpdateSessionEffects", BindingFlags.NonPublic | BindingFlags.Static);
+        method?.Invoke(null, new object[] { session, allowedEffects, modifiers });
     }
 
     private static bool GetCapturePending(DataGridRowDragDropController controller)

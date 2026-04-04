@@ -128,7 +128,6 @@ namespace Avalonia.Controls
             }
 
             return RowDragHandle == DataGridRowDragHandle.RowHeader ||
-                   RowDragHandle == DataGridRowDragHandle.Row ||
                    RowDragHandle == DataGridRowDragHandle.RowHeaderAndRow;
         }
 

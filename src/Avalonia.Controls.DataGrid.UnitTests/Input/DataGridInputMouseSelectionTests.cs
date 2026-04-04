@@ -480,6 +480,41 @@ public class DataGridInputMouseSelectionTests
     }
 
     [AvaloniaFact]
+    public void RowDragHandle_Row_Does_Not_Suppress_RowHeader_SelectionDrag_When_Suppression_Is_Enabled()
+    {
+        var (grid, items) = CreateGrid(selectionUnit: DataGridSelectionUnit.FullRow, selectionMode: DataGridSelectionMode.Extended);
+        grid.HeadersVisibility = DataGridHeadersVisibility.All;
+        grid.RowHeaderWidth = 28;
+        grid.CanUserReorderRows = true;
+        grid.RowDragHandle = DataGridRowDragHandle.Row;
+        grid.RowDragDropOptions = new DataGridRowDragDropOptions
+        {
+            SuppressSelectionDragFromDragHandle = true
+        };
+        grid.SelectedItems.Add(items[0]);
+        grid.SelectedItems.Add(items[1]);
+        grid.UpdateLayout();
+        Dispatcher.UIThread.RunJobs();
+
+        var slot = grid.SlotFromRowIndex(0);
+        var row = grid.DisplayData.GetDisplayedElement(slot) as DataGridRow;
+        Assert.NotNull(row);
+        Assert.True(row!.HasHeaderCell);
+
+        var header = row.HeaderCell;
+        var point = GetCenterPoint(header, grid);
+        var pointer = new Pointer(Pointer.GetNextFreeId(), PointerType.Mouse, isPrimary: true);
+
+        header.RaiseEvent(CreatePointerPressedArgs(header, grid, pointer, point, KeyModifiers.None));
+
+        Assert.True(GetSelectionDragCapturePending(grid));
+        Assert.Single(grid.SelectedItems);
+        Assert.Contains(items[0], grid.SelectedItems.Cast<RowItem>());
+
+        grid.RaiseEvent(CreatePointerReleasedArgs(grid, grid, pointer, point, KeyModifiers.None));
+    }
+
+    [AvaloniaFact]
     public void RowHeader_Click_Does_Not_Select_When_CanUserSelectRows_False()
     {
         var (grid, _) = CreateGrid(selectionUnit: DataGridSelectionUnit.CellOrRowHeader, selectionMode: DataGridSelectionMode.Extended);

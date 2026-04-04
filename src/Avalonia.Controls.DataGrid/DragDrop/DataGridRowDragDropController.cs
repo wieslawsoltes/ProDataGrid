@@ -182,12 +182,7 @@ namespace Avalonia.Controls.DataGridDragDrop
 
             if (source is Control control && TryGetRowFromControl(control, out row, out var header))
             {
-                return _grid.RowDragHandle switch
-                {
-                    DataGridRowDragHandle.RowHeader => IsHeaderSurface(row, header, gridPoint),
-                    DataGridRowDragHandle.Row => true,
-                    _ => true
-                };
+                return IsDragHandleSurface(row, header, gridPoint);
             }
 
             if (source is not Visual visual)
@@ -207,12 +202,7 @@ namespace Avalonia.Controls.DataGridDragDrop
                 return false;
             }
 
-            return _grid.RowDragHandle switch
-            {
-                DataGridRowDragHandle.RowHeader => IsHeaderSurface(row, headerFallback, gridPoint),
-                DataGridRowDragHandle.Row => true,
-                _ => true
-            };
+            return IsDragHandleSurface(row, headerFallback, gridPoint);
         }
 
         private bool TryGetRowFromPoint(Point point, out DataGridRow? row)
@@ -270,12 +260,7 @@ namespace Avalonia.Controls.DataGridDragDrop
                 return false;
             }
 
-            return _grid.RowDragHandle switch
-            {
-                DataGridRowDragHandle.RowHeader => IsHeaderSurface(row, header, point),
-                DataGridRowDragHandle.Row => true,
-                _ => true
-            };
+            return IsDragHandleSurface(row, header, point);
         }
 
         private bool TryGetRowFromControl(Control? control, out DataGridRow? row, out DataGridRowHeader? header)
@@ -347,6 +332,18 @@ namespace Avalonia.Controls.DataGridDragDrop
             }
 
             return pointInRow.Value.X <= headerWidth;
+        }
+
+        private bool IsDragHandleSurface(DataGridRow row, DataGridRowHeader? header, Point gridPoint)
+        {
+            var isHeaderSurface = IsHeaderSurface(row, header, gridPoint);
+
+            return _grid.RowDragHandle switch
+            {
+                DataGridRowDragHandle.RowHeader => isHeaderSurface,
+                DataGridRowDragHandle.Row => !isHeaderSurface,
+                _ => true
+            };
         }
 
         private void OnPointerPressed(object? sender, PointerPressedEventArgs e)
@@ -456,12 +453,10 @@ namespace Avalonia.Controls.DataGridDragDrop
             }
 
             var session = new DataGridRowDragSession(_grid, info.Items, info.Indices, info.FromSelection);
-            session.SetAllowedEffects(_options.AllowedEffects);
             session.SetPointerPosition(triggerEvent.GetPosition(_grid));
             session.SetKeyModifiers(triggerEvent.KeyModifiers);
             session.SetTargetGrid(_grid);
-            session.SetRequestedEffect(GetRequestedEffect(_options, triggerEvent.KeyModifiers));
-            session.EffectiveEffect = GetRequestedEffect(_options, triggerEvent.KeyModifiers);
+            UpdateSessionEffects(session, _options.AllowedEffects, triggerEvent.KeyModifiers);
             session.SetIsActive(true);
             session.SetResultEffect(DragDropEffects.None);
             session.SetIsCanceled(false);
@@ -486,7 +481,7 @@ namespace Avalonia.Controls.DataGridDragDrop
                 return;
             }
 
-            session.SetAllowedEffects(startingArgs.AllowedEffects);
+            UpdateSessionEffects(session, startingArgs.AllowedEffects, triggerEvent.KeyModifiers);
             _grid.SetActiveRowDragSession(session);
             _grid.OnRowDragStarted(new DataGridRowDragStartedEventArgs(session));
 
@@ -768,6 +763,18 @@ namespace Avalonia.Controls.DataGridDragDrop
                 dropArgs?.TargetIndex ?? GetMaxInsertIndex(),
                 dropArgs?.InsertIndex ?? GetMaxInsertIndex(),
                 dropArgs?.Position);
+        }
+
+        private static void UpdateSessionEffects(
+            DataGridRowDragSession session,
+            DragDropEffects allowedEffects,
+            KeyModifiers modifiers)
+        {
+            session.SetAllowedEffects(allowedEffects);
+
+            var requestedEffect = GetRequestedEffect(allowedEffects, modifiers);
+            session.SetRequestedEffect(requestedEffect);
+            session.EffectiveEffect = CoerceEffect(allowedEffects, requestedEffect);
         }
 
         private bool TryPrepareSessionUpdate(
