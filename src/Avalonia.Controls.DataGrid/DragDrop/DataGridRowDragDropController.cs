@@ -40,7 +40,8 @@ namespace Avalonia.Controls.DataGridDragDrop
         private bool _capturePending;
         private readonly bool _setAllowDrop;
         private Canvas? _dropAdorner;
-        private bool _hideDropAdorner;
+        private Rectangle? _dropIndicator;
+        private ContentPresenter? _feedbackPresenter;
 
         public DataGridRowDragDropController(
             DataGrid grid,
@@ -87,7 +88,8 @@ namespace Avalonia.Controls.DataGridDragDrop
                 DragDrop.SetAllowDrop(_grid, false);
             }
 
-            HideDropAdorner();
+            HideAdorner();
+            _grid.SetActiveRowDragSession(null);
             _autoScrollTimer.Stop();
         }
 
@@ -180,12 +182,7 @@ namespace Avalonia.Controls.DataGridDragDrop
 
             if (source is Control control && TryGetRowFromControl(control, out row, out var header))
             {
-                return _grid.RowDragHandle switch
-                {
-                    DataGridRowDragHandle.RowHeader => IsHeaderSurface(row, header, gridPoint),
-                    DataGridRowDragHandle.Row => true,
-                    _ => true
-                };
+                return IsDragHandleSurface(row, header, gridPoint);
             }
 
             if (source is not Visual visual)
@@ -205,12 +202,7 @@ namespace Avalonia.Controls.DataGridDragDrop
                 return false;
             }
 
-            return _grid.RowDragHandle switch
-            {
-                DataGridRowDragHandle.RowHeader => IsHeaderSurface(row, headerFallback, gridPoint),
-                DataGridRowDragHandle.Row => true,
-                _ => true
-            };
+            return IsDragHandleSurface(row, headerFallback, gridPoint);
         }
 
         private bool TryGetRowFromPoint(Point point, out DataGridRow? row)
@@ -268,12 +260,7 @@ namespace Avalonia.Controls.DataGridDragDrop
                 return false;
             }
 
-            return _grid.RowDragHandle switch
-            {
-                DataGridRowDragHandle.RowHeader => IsHeaderSurface(row, header, point),
-                DataGridRowDragHandle.Row => true,
-                _ => true
-            };
+            return IsDragHandleSurface(row, header, point);
         }
 
         private bool TryGetRowFromControl(Control? control, out DataGridRow? row, out DataGridRowHeader? header)
@@ -345,6 +332,18 @@ namespace Avalonia.Controls.DataGridDragDrop
             }
 
             return pointInRow.Value.X <= headerWidth;
+        }
+
+        private bool IsDragHandleSurface(DataGridRow row, DataGridRowHeader? header, Point gridPoint)
+        {
+            var isHeaderSurface = IsHeaderSurface(row, header, gridPoint);
+
+            return _grid.RowDragHandle switch
+            {
+                DataGridRowDragHandle.RowHeader => isHeaderSurface,
+                DataGridRowDragHandle.Row => !isHeaderSurface,
+                _ => true
+            };
         }
 
         private void OnPointerPressed(object? sender, PointerPressedEventArgs e)
@@ -453,23 +452,41 @@ namespace Avalonia.Controls.DataGridDragDrop
                 return;
             }
 
+            var session = new DataGridRowDragSession(_grid, info.Items, info.Indices, info.FromSelection);
+            session.SetPointerPosition(triggerEvent.GetPosition(_grid));
+            session.SetKeyModifiers(triggerEvent.KeyModifiers);
+            session.SetTargetGrid(_grid);
+            UpdateSessionEffects(session, _options.AllowedEffects, triggerEvent.KeyModifiers);
+            session.SetIsActive(true);
+            session.SetResultEffect(DragDropEffects.None);
+            session.SetIsCanceled(false);
+
+            info = new DataGridRowDragInfo(_grid, info.Items, info.Indices, info.FromSelection, session);
             _dragInfo = info;
             SetDraggingRows(info.Items, true);
 
             var data = CreateDataTransfer(info);
+            session.SetData(data);
+
             var startingArgs = new DataGridRowDragStartingEventArgs(info.Items, info.Indices, data, _options.AllowedEffects);
+            startingArgs.SetSession(session);
             _grid.OnRowDragStarting(startingArgs);
 
-            if (startingArgs.Cancel)
+            if (startingArgs.Cancel || startingArgs.AllowedEffects == DragDropEffects.None)
             {
+                session.SetIsActive(false);
                 ClearDraggingRows();
                 (data as IDisposable)?.Dispose();
                 ResetPointerState();
                 return;
             }
 
+            UpdateSessionEffects(session, startingArgs.AllowedEffects, triggerEvent.KeyModifiers);
+            _grid.SetActiveRowDragSession(session);
+            _grid.OnRowDragStarted(new DataGridRowDragStartedEventArgs(session));
+
 #pragma warning disable CS4014
-            DoDragAsync(triggerEvent, data, startingArgs.AllowedEffects, info);
+            DoDragAsync(triggerEvent, data, startingArgs.AllowedEffects, info, session);
 #pragma warning restore CS4014
         }
 
@@ -477,14 +494,46 @@ namespace Avalonia.Controls.DataGridDragDrop
             PointerEventArgs triggerEvent,
             IDataTransfer data,
             DragDropEffects allowedEffects,
-            DataGridRowDragInfo info)
+            DataGridRowDragInfo info,
+            DataGridRowDragSession session)
         {
             var result = await DragDrop.DoDragDropAsync(triggerEvent, data, allowedEffects);
-            _grid.OnRowDragCompleted(new DataGridRowDragCompletedEventArgs(info.Items, result));
+            FinishDrag(info, data, session, result);
+        }
+
+        private void FinishDrag(
+            DataGridRowDragInfo info,
+            IDataTransfer data,
+            DataGridRowDragSession session,
+            DragDropEffects result)
+        {
+            session.SetResultEffect(result);
+            session.SetIsCanceled(result == DragDropEffects.None);
+            session.SetIsActive(false);
 
             ClearIndicator();
             ClearDraggingRows();
             ResetPointerState();
+            HideAdorner();
+
+            if (session.TargetGrid != null &&
+                !ReferenceEquals(session.TargetGrid, _grid))
+            {
+                session.TargetGrid.SetActiveRowDragSession(null);
+            }
+
+            _grid.SetActiveRowDragSession(null);
+
+            if (session.IsCanceled)
+            {
+                _grid.OnRowDragCanceled(new DataGridRowDragCanceledEventArgs(session));
+            }
+            else
+            {
+                var completedArgs = new DataGridRowDragCompletedEventArgs(info.Items, result);
+                completedArgs.SetSession(session);
+                _grid.OnRowDragCompleted(completedArgs);
+            }
 
             (data as IDisposable)?.Dispose();
         }
@@ -665,7 +714,11 @@ namespace Avalonia.Controls.DataGridDragDrop
 
         private static DragDropEffects GetRequestedEffect(DataGridRowDragDropOptions options, KeyModifiers modifiers)
         {
-            var allowed = options.AllowedEffects;
+            return GetRequestedEffect(options.AllowedEffects, modifiers);
+        }
+
+        private static DragDropEffects GetRequestedEffect(DragDropEffects allowed, KeyModifiers modifiers)
+        {
             if (allowed.HasFlag(DragDropEffects.Copy) && modifiers.HasFlag(KeyModifiers.Control))
             {
                 return DragDropEffects.Copy;
@@ -679,34 +732,133 @@ namespace Avalonia.Controls.DataGridDragDrop
             return allowed;
         }
 
+        private static DragDropEffects CoerceEffect(DragDropEffects allowedEffects, DragDropEffects effect)
+        {
+            if (effect == DragDropEffects.None || allowedEffects == DragDropEffects.None)
+            {
+                return DragDropEffects.None;
+            }
+
+            var coerced = effect & allowedEffects;
+            return coerced == 0 ? DragDropEffects.None : coerced;
+        }
+
+        private void UpdateSessionState(
+            DataGridRowDragSession session,
+            DragEventArgs dragEventArgs,
+            DataGridRow? hoveredRow,
+            object? hoveredItem,
+            DataGridRowDropEventArgs? dropArgs,
+            DragDropEffects suggestedEffect)
+        {
+            session.SetTargetGrid(_grid);
+            session.SetPointerPosition(dragEventArgs.GetPosition(_grid));
+            session.SetKeyModifiers(dragEventArgs.KeyModifiers);
+            session.SetHoveredState(hoveredRow ?? dropArgs?.TargetRow, hoveredItem ?? dropArgs?.TargetItem);
+            session.SetRequestedEffect(suggestedEffect);
+            session.EffectiveEffect = suggestedEffect;
+            session.SetTargetState(
+                dropArgs?.TargetRow,
+                dropArgs?.TargetItem,
+                dropArgs?.TargetIndex ?? GetMaxInsertIndex(),
+                dropArgs?.InsertIndex ?? GetMaxInsertIndex(),
+                dropArgs?.Position);
+        }
+
+        private static void UpdateSessionEffects(
+            DataGridRowDragSession session,
+            DragDropEffects allowedEffects,
+            KeyModifiers modifiers)
+        {
+            session.SetAllowedEffects(allowedEffects);
+
+            var requestedEffect = GetRequestedEffect(allowedEffects, modifiers);
+            session.SetRequestedEffect(requestedEffect);
+            session.EffectiveEffect = CoerceEffect(allowedEffects, requestedEffect);
+        }
+
+        private bool TryPrepareSessionUpdate(
+            DataGridRowDragInfo dragInfo,
+            DragEventArgs dragEventArgs,
+            out DataGridRowDragSession session,
+            out DataGridRowDropEventArgs? dropArgs)
+        {
+            session = dragInfo.Session ?? new DataGridRowDragSession(dragInfo.Grid, dragInfo.Items, dragInfo.Indices, dragInfo.FromSelection);
+            session.SetAllowedEffects(session.AllowedEffects == DragDropEffects.None ? _options.AllowedEffects : session.AllowedEffects);
+
+            _grid.SetActiveRowDragSession(session);
+
+            var hoveredRow = GetHoveredRow(dragEventArgs);
+            var hoveredItem = hoveredRow?.DataContext;
+            var isPlaceholder = IsPlaceholderRow(hoveredRow);
+            var suggestedEffect = GetRequestedEffect(session.AllowedEffects, dragEventArgs.KeyModifiers);
+
+            dropArgs = isPlaceholder ? null : CreateDropArgs(dragInfo, dragEventArgs, suggestedEffect);
+            if (dropArgs != null)
+            {
+                dropArgs.SetSession(session);
+            }
+
+            UpdateSessionState(session, dragEventArgs, hoveredRow, hoveredItem, dropArgs, suggestedEffect);
+
+            var valid = !isPlaceholder && dropArgs != null && _dropHandler.Validate(dropArgs);
+            if (!valid)
+            {
+                session.EffectiveEffect = DragDropEffects.None;
+            }
+
+            session.EffectiveEffect = CoerceEffect(session.AllowedEffects, session.EffectiveEffect);
+            session.SetIsValidTarget(valid && session.EffectiveEffect != DragDropEffects.None);
+
+            if (dropArgs != null)
+            {
+                dropArgs.EffectiveEffect = session.EffectiveEffect;
+            }
+
+            _grid.OnRowDragUpdated(new DataGridRowDragUpdatedEventArgs(session, dragEventArgs));
+
+            return session.IsValidTarget;
+        }
+
+        private void ClearSessionTarget(DataGridRowDragSession session, DragEventArgs? dragEventArgs)
+        {
+            if (dragEventArgs != null)
+            {
+                session.SetPointerPosition(dragEventArgs.GetPosition(_grid));
+                session.SetKeyModifiers(dragEventArgs.KeyModifiers);
+            }
+
+            session.SetTargetGrid(null);
+            session.SetHoveredState(null, null);
+            session.SetTargetState(null, null, GetMaxInsertIndex(), GetMaxInsertIndex(), null);
+            session.EffectiveEffect = DragDropEffects.None;
+            session.SetIsValidTarget(false);
+        }
+
         private void OnDragOver(object? sender, DragEventArgs e)
         {
             var dragInfo = GetDragInfo(e);
             if (dragInfo == null)
             {
                 ClearIndicator();
+                _grid.SetActiveRowDragSession(null);
                 return;
             }
 
-            if (IsOverPlaceholderRow(e))
+            var valid = TryPrepareSessionUpdate(dragInfo, e, out var session, out var dropArgs);
+            e.DragEffects = session.EffectiveEffect;
+
+            if (valid && dropArgs != null)
+            {
+                UpdateIndicator(dropArgs.TargetRow, dropArgs.Position);
+                AutoScrollIfNeeded(e);
+            }
+            else
             {
                 ClearIndicator();
-                e.DragEffects = DragDropEffects.None;
-                return;
             }
 
-            var requestedEffect = GetRequestedEffect(_options, e.KeyModifiers);
-            var dropArgs = CreateDropArgs(dragInfo, e, requestedEffect);
-            if (dropArgs == null || !_dropHandler.Validate(dropArgs))
-            {
-                ClearIndicator();
-                e.DragEffects = DragDropEffects.None;
-                return;
-            }
-
-            e.DragEffects = dropArgs.RequestedEffect;
-            UpdateIndicator(dropArgs.TargetRow, dropArgs.Position);
-            AutoScrollIfNeeded(e);
+            UpdateFeedbackAdorner(session);
         }
 
         private void OnDrop(object? sender, DragEventArgs e)
@@ -715,41 +867,48 @@ namespace Avalonia.Controls.DataGridDragDrop
             if (dragInfo == null)
             {
                 ClearIndicator();
+                _grid.SetActiveRowDragSession(null);
                 return;
             }
 
-            if (IsOverPlaceholderRow(e))
-            {
-                ClearIndicator();
-                e.DragEffects = DragDropEffects.None;
-                return;
-            }
+            var valid = TryPrepareSessionUpdate(dragInfo, e, out var session, out var dropArgs);
+            var executed = valid && dropArgs != null && _dropHandler.Execute(dropArgs);
+            e.DragEffects = executed ? dropArgs.EffectiveEffect : DragDropEffects.None;
 
-            var requestedEffect = GetRequestedEffect(_options, e.KeyModifiers);
-            var dropArgs = CreateDropArgs(dragInfo, e, requestedEffect);
-            if (dropArgs == null)
-            {
-                ClearIndicator();
-                e.DragEffects = DragDropEffects.None;
-                return;
-            }
-
-            var valid = _dropHandler.Validate(dropArgs);
-            var executed = valid && _dropHandler.Execute(dropArgs);
-            e.DragEffects = executed ? dropArgs.RequestedEffect : DragDropEffects.None;
-
-            if (executed)
+            if (executed && dropArgs != null)
             {
                 UpdateSelectionAfterDrop(dropArgs);
             }
 
             ClearIndicator();
             ClearDraggingRows();
+            UpdateFeedbackAdorner(null);
+
+            if (!ReferenceEquals(session.SourceGrid, _grid))
+            {
+                _grid.SetActiveRowDragSession(null);
+            }
         }
 
         private void OnDragLeave(object? sender, DragEventArgs e)
         {
             ClearIndicator();
+
+            var dragInfo = GetDragInfo(e);
+            if (dragInfo?.Session is { } session)
+            {
+                ClearSessionTarget(session, e);
+                UpdateFeedbackAdorner(ReferenceEquals(session.SourceGrid, _grid) ? session : null);
+
+                if (!ReferenceEquals(session.SourceGrid, _grid))
+                {
+                    _grid.SetActiveRowDragSession(null);
+                }
+            }
+            else if (_grid.ActiveRowDragSession != null)
+            {
+                UpdateFeedbackAdorner(null);
+            }
         }
 
         private static DataGridRowDragInfo? GetDragInfo(DragEventArgs e)
@@ -778,29 +937,18 @@ namespace Avalonia.Controls.DataGridDragDrop
             return null;
         }
 
-        private DataGridRow? GetRowFromEvent(DragEventArgs e)
+        private DataGridRow? GetHoveredRow(DragEventArgs e)
         {
             var position = e.GetPosition(_grid);
             var visual = _grid.GetVisualAt(position);
-            var row = visual?
+            return visual?
                 .GetSelfAndVisualAncestors()
                 .OfType<DataGridRow>()
                 .FirstOrDefault(r => r.OwningGrid == _grid);
-
-            return row != null && ReferenceEquals(row.DataContext, DataGridCollectionView.NewItemPlaceholder)
-                ? null
-                : row;
         }
 
-        private bool IsOverPlaceholderRow(DragEventArgs e)
+        private static bool IsPlaceholderRow(DataGridRow? row)
         {
-            var position = e.GetPosition(_grid);
-            var visual = _grid.GetVisualAt(position);
-            var row = visual?
-                .GetSelfAndVisualAncestors()
-                .OfType<DataGridRow>()
-                .FirstOrDefault(r => r.OwningGrid == _grid);
-
             return row != null && ReferenceEquals(row.DataContext, DataGridCollectionView.NewItemPlaceholder);
         }
 
@@ -825,7 +973,12 @@ namespace Avalonia.Controls.DataGridDragDrop
             DragEventArgs dragEventArgs,
             DragDropEffects requestedEffect)
         {
-            var row = GetRowFromEvent(dragEventArgs);
+            var row = GetHoveredRow(dragEventArgs);
+            if (IsPlaceholderRow(row))
+            {
+                return null;
+            }
+
             var presenter = GetRowsPresenter();
             var position = DataGridRowDropPosition.Before;
             var targetIndex = GetMaxInsertIndex();
@@ -1083,10 +1236,8 @@ namespace Avalonia.Controls.DataGridDragDrop
             _autoScrollDirection = 0;
         }
 
-        private Canvas? GetOrCreateDropAdorner()
+        private Canvas? GetOrCreateAdorner()
         {
-            _hideDropAdorner = false;
-
             if (_dropAdorner != null)
             {
                 return _dropAdorner;
@@ -1104,17 +1255,27 @@ namespace Avalonia.Controls.DataGridDragDrop
                 stroke = brush;
             }
 
+            _dropIndicator = new Rectangle
+            {
+                Stroke = stroke,
+                StrokeThickness = 3,
+                RadiusX = 2,
+                RadiusY = 2,
+                IsVisible = false
+            };
+
+            _feedbackPresenter = new ContentPresenter
+            {
+                IsHitTestVisible = false,
+                IsVisible = false
+            };
+
             _dropAdorner = new Canvas
             {
                 Children =
                 {
-                    new Rectangle
-                    {
-                        Stroke = stroke,
-                        StrokeThickness = 3,
-                        RadiusX = 2,
-                        RadiusY = 2
-                    }
+                    _dropIndicator,
+                    _feedbackPresenter
                 },
                 IsHitTestVisible = false
             };
@@ -1124,55 +1285,92 @@ namespace Avalonia.Controls.DataGridDragDrop
             return _dropAdorner;
         }
 
-        private void ShowDropAdorner(DataGridRow? row, DataGridRowDropPosition? position)
+        private void UpdateIndicatorAdorner(DataGridRow? row, DataGridRowDropPosition? position)
         {
+            var adorner = GetOrCreateAdorner();
+            if (adorner == null || _dropIndicator == null)
+            {
+                return;
+            }
+
             if (row == null || position == null || row.TransformToVisual(_grid) is not { } transform)
             {
-                HideDropAdorner();
+                _dropIndicator.IsVisible = false;
                 return;
             }
 
-            var adorner = GetOrCreateDropAdorner();
-            if (adorner == null)
-            {
-                return;
-            }
-
-            var rectangle = (Rectangle)adorner.Children[0];
             var rowBounds = new Rect(row.Bounds.Size).TransformToAABB(transform);
 
-            Canvas.SetLeft(rectangle, rowBounds.Left);
-            rectangle.Width = rowBounds.Width;
+            _dropIndicator.IsVisible = true;
+            Canvas.SetLeft(_dropIndicator, rowBounds.Left);
+            _dropIndicator.Width = rowBounds.Width;
 
             switch (position)
             {
                 case DataGridRowDropPosition.Before:
-                    Canvas.SetTop(rectangle, rowBounds.Top);
-                    rectangle.Height = 0;
+                    Canvas.SetTop(_dropIndicator, rowBounds.Top);
+                    _dropIndicator.Height = 0;
                     break;
                 case DataGridRowDropPosition.After:
-                    Canvas.SetTop(rectangle, rowBounds.Bottom);
-                    rectangle.Height = 0;
+                    Canvas.SetTop(_dropIndicator, rowBounds.Bottom);
+                    _dropIndicator.Height = 0;
                     break;
                 case DataGridRowDropPosition.Inside:
-                    Canvas.SetTop(rectangle, rowBounds.Top);
-                    rectangle.Height = rowBounds.Height;
+                    Canvas.SetTop(_dropIndicator, rowBounds.Top);
+                    _dropIndicator.Height = rowBounds.Height;
                     break;
             }
         }
 
-        private void HideDropAdorner()
+        private void UpdateFeedbackAdorner(DataGridRowDragSession? session)
         {
-            _hideDropAdorner = true;
-
-            DispatcherTimer.RunOnce(() =>
+            if (_feedbackPresenter == null && session == null)
             {
-                if (_hideDropAdorner && _dropAdorner?.Parent is AdornerLayer layer)
+                return;
+            }
+
+            if (session == null || _grid.RowDragFeedbackTemplate == null)
+            {
+                if (_feedbackPresenter != null)
                 {
-                    layer.Children.Remove(_dropAdorner);
-                    _dropAdorner = null;
+                    _feedbackPresenter.IsVisible = false;
+                    _feedbackPresenter.Content = null;
+                    _feedbackPresenter.ContentTemplate = null;
                 }
-            }, TimeSpan.FromMilliseconds(50));
+
+                if (_indicatorRow == null)
+                {
+                    HideAdorner();
+                }
+
+                return;
+            }
+
+            var adorner = GetOrCreateAdorner();
+            if (adorner == null || _feedbackPresenter == null)
+            {
+                return;
+            }
+
+            var offset = _grid.RowDragFeedbackOffset;
+            _feedbackPresenter.Content = session;
+            _feedbackPresenter.ContentTemplate = _grid.RowDragFeedbackTemplate;
+            _feedbackPresenter.IsVisible = true;
+            Canvas.SetLeft(_feedbackPresenter, session.PointerPosition.X + offset.X);
+            Canvas.SetTop(_feedbackPresenter, session.PointerPosition.Y + offset.Y);
+            _feedbackPresenter.InvalidateMeasure();
+        }
+
+        private void HideAdorner()
+        {
+            if (_dropAdorner?.Parent is AdornerLayer layer)
+            {
+                layer.Children.Remove(_dropAdorner);
+            }
+
+            _dropAdorner = null;
+            _dropIndicator = null;
+            _feedbackPresenter = null;
         }
 
         private void UpdateIndicator(DataGridRow? row, DataGridRowDropPosition position)
@@ -1192,7 +1390,7 @@ namespace Avalonia.Controls.DataGridDragDrop
                 _indicatorRow.SetDropPosition(position);
             }
 
-            ShowDropAdorner(_indicatorRow, _indicatorPosition);
+            UpdateIndicatorAdorner(_indicatorRow, _indicatorPosition);
         }
 
         private void ClearIndicator()
@@ -1205,7 +1403,16 @@ namespace Avalonia.Controls.DataGridDragDrop
             _indicatorRow = null;
             _indicatorPosition = null;
 
-            HideDropAdorner();
+            if (_dropIndicator != null)
+            {
+                _dropIndicator.IsVisible = false;
+            }
+
+            if (_feedbackPresenter?.IsVisible != true)
+            {
+                HideAdorner();
+            }
+
             StopAutoScroll();
         }
 

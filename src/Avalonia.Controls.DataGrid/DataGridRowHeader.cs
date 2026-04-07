@@ -279,7 +279,8 @@ internal
                     var dragHandleHit = IsDragGripHit(e.Source, e);
                     if (OwningGrid.TryHandleRowHeaderSelection(e, Slot, dragHandleHit))
                     {
-                        if (!dragHandleHit)
+                        if (!dragHandleHit &&
+                            !OwningGrid.ShouldSuppressSelectionDragFromRowDragHandle(columnIndex: -1))
                         {
                             var rowIndex = OwningGrid.RowIndexFromSlot(Slot);
                             OwningGrid.TryBeginRowHeaderSelectionDrag(e, rowIndex);
@@ -289,8 +290,18 @@ internal
                         return;
                     }
 
-                    e.Handled = OwningGrid.UpdateStateOnMouseLeftButtonDown(e, -1, Slot, allowEdit: false, ignoreModifiers: dragHandleHit);
-                    if (!dragHandleHit)
+                    var preserveSelectionForRowDrag =
+                        OwningGrid.ShouldPreserveSelectionForRowDrag(columnIndex: -1, Slot, OwningGrid.GetRowSelection(Slot), e.KeyModifiers);
+                    if (preserveSelectionForRowDrag)
+                    {
+                        e.Handled = true;
+                    }
+                    else
+                    {
+                        e.Handled = OwningGrid.UpdateStateOnMouseLeftButtonDown(e, -1, Slot, allowEdit: false, ignoreModifiers: dragHandleHit);
+                    }
+                    if (!dragHandleHit &&
+                        !OwningGrid.ShouldSuppressSelectionDragFromRowDragHandle(columnIndex: -1))
                     {
                         OwningGrid.TryBeginSelectionDrag(e, -1, startDragging: true);
                     }

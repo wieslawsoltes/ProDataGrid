@@ -10,13 +10,15 @@
                Text="Reorder rows with drag-and-drop" />
     <TextBlock Grid.Row="1"
                TextWrapping="Wrap"
-               Text="Use the row header grip (or the whole row if selected in the dropdown) to drag. Hold Ctrl to copy when enabled." />
+               Text="Select multiple rows and drag them together from the row header grip or whole-row drag surface, hold Ctrl to switch to copy, and hover the pinned lane to see invalid-state feedback. The side panel binds to ActiveRowDragSession so you can inspect the live session while dragging." />
 
-    <StackPanel Grid.Row="2" Orientation="Horizontal" Spacing="12">
+    <StackPanel Grid.Row="2" Orientation="Horizontal" Spacing="12" VerticalAlignment="Center">
       <CheckBox Content="Allow copy with Ctrl"
                 IsChecked="{Binding AllowCopy}" />
       <CheckBox Content="Show drag handle"
                 IsChecked="{Binding ShowHandle}" />
+      <CheckBox Content="Prioritize drag over selection-drag"
+                IsChecked="{Binding PrioritizeDragGesture}" />
       <StackPanel Orientation="Horizontal" Spacing="4">
         <TextBlock VerticalAlignment="Center" Text="Drag handle:" />
         <ComboBox Width="180"
@@ -31,28 +33,96 @@
       </StackPanel>
     </StackPanel>
 
-    <DataGrid Grid.Row="3"
-              Margin="0,4,0,0"
-              CanUserReorderRows="True"
-              RowDragHandle="{Binding RowDragHandle}"
-              RowDragHandleVisible="{Binding ShowHandle}"
-              RowDragDropOptions="{Binding Options}"
-              RowDropHandler="{Binding DropHandler}"
-              HeadersVisibility="All"
-              RowHeaderWidth="28"
-              AutoGenerateColumns="False"
-              ItemsSource="{Binding Items}">
-      <DataGrid.Columns>
-        <DataGridTextColumn Header="#"
-                            Binding="{Binding Id}"
-                            Width="1*" />
-        <DataGridTextColumn Header="Title"
-                            Binding="{Binding Name}"
-                            Width="3*" />
-        <DataGridTextColumn Header="Value"
-                            Binding="{Binding Value}"
-                            Width="1.2*" />
-      </DataGrid.Columns>
-    </DataGrid>
+    <Grid Grid.Row="3"
+          Margin="0,4,0,0"
+          ColumnDefinitions="2.4*,1*"
+          ColumnSpacing="14">
+      <DataGrid x:Name="RowsGrid"
+                CanUserReorderRows="True"
+                RowDragHandle="{Binding RowDragHandle}"
+                RowDragHandleVisible="{Binding ShowHandle}"
+                RowDragDropOptions="{Binding Options}"
+                RowDropHandler="{Binding DropHandler}"
+                RowDragFeedbackOffset="18,20"
+                HeadersVisibility="All"
+                RowHeaderWidth="28"
+                AutoGenerateColumns="False"
+                ItemsSource="{Binding Items}">
+        <DataGrid.RowDragFeedbackTemplate>
+          <DataTemplate x:DataType="DataGridDragDrop:DataGridRowDragSession">
+            <Border Background="#0F172A"
+                    BorderBrush="#38BDF8"
+                    BorderThickness="1"
+                    CornerRadius="12"
+                    Padding="10,8">
+              <StackPanel Spacing="3">
+                <TextBlock Foreground="White"
+                           FontWeight="SemiBold"
+                           Text="{Binding EffectiveEffect}" />
+                <TextBlock Foreground="#BAE6FD"
+                           Text="{Binding FeedbackCaption}"
+                           MaxWidth="220"
+                           TextWrapping="Wrap" />
+              </StackPanel>
+            </Border>
+          </DataTemplate>
+        </DataGrid.RowDragFeedbackTemplate>
+        <DataGrid.Columns>
+          <DataGridTextColumn Header="#"
+                              Binding="{Binding Id}"
+                              Width="0.9*" />
+          <DataGridTextColumn Header="Title"
+                              Binding="{Binding Name}"
+                              Width="2.6*" />
+          <DataGridTextColumn Header="Lane"
+                              Binding="{Binding Lane}"
+                              Width="1.2*" />
+          <DataGridTextColumn Header="Value"
+                              Binding="{Binding Value}"
+                              Width="1*" />
+        </DataGrid.Columns>
+      </DataGrid>
+
+      <Border Grid.Column="1"
+              Padding="14"
+              CornerRadius="12"
+              Background="#F8FAFC"
+              BorderBrush="#CBD5E1"
+              BorderThickness="1">
+        <StackPanel Spacing="8">
+          <TextBlock FontSize="16"
+                     FontWeight="SemiBold"
+                     Text="Live Session" />
+          <TextBlock Foreground="#475569"
+                     TextWrapping="Wrap"
+                     Text="Pinned rows reject drops before them. The feedback badge and this panel update from the live drag session." />
+          <ContentControl Content="{Binding ElementName=RowsGrid, Path=ActiveRowDragSession}">
+            <ContentControl.DataTemplates>
+              <DataTemplate x:DataType="DataGridDragDrop:DataGridRowDragSession">
+                <StackPanel Spacing="6">
+                  <TextBlock Text="{Binding FeedbackCaption}" TextWrapping="Wrap" />
+                  <Grid ColumnDefinitions="Auto,*" RowDefinitions="Auto,Auto,Auto,Auto,Auto,Auto,Auto" ColumnSpacing="10" RowSpacing="4">
+                    <TextBlock Text="Items" />
+                    <TextBlock Grid.Column="1" Text="{Binding Items.Count}" />
+                    <TextBlock Grid.Row="1" Text="Requested" />
+                    <TextBlock Grid.Row="1" Grid.Column="1" Text="{Binding RequestedEffect}" />
+                    <TextBlock Grid.Row="2" Text="Effective" />
+                    <TextBlock Grid.Row="2" Grid.Column="1" Text="{Binding EffectiveEffect}" />
+                    <TextBlock Grid.Row="3" Text="Modifiers" />
+                    <TextBlock Grid.Row="3" Grid.Column="1" Text="{Binding KeyModifiers}" />
+                    <TextBlock Grid.Row="4" Text="Drop zone" />
+                    <TextBlock Grid.Row="4" Grid.Column="1" Text="{Binding DropPosition}" />
+                    <TextBlock Grid.Row="5" Text="Insert index" />
+                    <TextBlock Grid.Row="5" Grid.Column="1" Text="{Binding InsertIndex}" />
+                    <TextBlock Grid.Row="6" Text="Hovered row" />
+                    <TextBlock Grid.Row="6" Grid.Column="1" Text="{Binding HoveredItem}" TextWrapping="Wrap" />
+                  </Grid>
+                </StackPanel>
+              </DataTemplate>
+            </ContentControl.DataTemplates>
+          </ContentControl>
+        </StackPanel>
+      </Border>
+    </Grid>
   </Grid>
 </UserControl>

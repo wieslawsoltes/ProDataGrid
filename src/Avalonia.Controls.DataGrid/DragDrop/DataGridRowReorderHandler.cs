@@ -6,6 +6,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using Avalonia.Collections;
+using Avalonia.Input;
 using Avalonia.Utilities;
 
 namespace Avalonia.Controls.DataGridDragDrop
@@ -71,6 +72,13 @@ namespace Avalonia.Controls.DataGridDragDrop
                 }
             }
 
+            if (!args.RequestedEffect.HasFlag(DragDropEffects.Move))
+            {
+                args.EffectiveEffect = DragDropEffects.None;
+                return false;
+            }
+
+            args.EffectiveEffect = DragDropEffects.Move;
             return true;
         }
 

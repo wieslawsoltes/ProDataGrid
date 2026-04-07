@@ -43,5 +43,7 @@ namespace Avalonia.Controls.DataGridDragDrop
         public double VerticalDragThreshold { get; set; } = 4;
 
         public bool DragSelectedRows { get; set; } = true;
+
+        public bool SuppressSelectionDragFromDragHandle { get; set; } = true;
     }
 }

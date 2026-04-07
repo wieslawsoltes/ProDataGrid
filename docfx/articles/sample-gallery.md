@@ -23,7 +23,8 @@ Highlights include:
 - Editing interaction model samples (custom edit triggers and input handling).
 - Fill handle auto-fill, including custom fill models.
 - Conditional formatting model samples (cell and row themes, Power Fx and Excel-like scenarios).
-- Hierarchical data, hierarchical drag/drop, and tree-like mimics.
+- Hierarchical data, hierarchical drag/drop, tree-like mimics, and live row-drag session inspection.
+- Row drag session samples with move/copy transitions, invalid-target feedback badges, and selection-drag coordination.
 - Virtualization and scrolling diagnostics (large datasets, row height estimators, recycling).
 - Variable-height scrolling with `DataGridCustomDrawingColumn`, composition custom-visual backend, Skia custom draw operations, shared text cache, and layout fast path.
 - Live custom-drawing updates with composition backend + factory-driven invalidation (`DataGridCustomDrawingColumn.InvalidateCustomDrawingCells` and `IDataGridCellDrawOperationInvalidationSource`).

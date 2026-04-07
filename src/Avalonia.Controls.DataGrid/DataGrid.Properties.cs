@@ -316,6 +316,56 @@ internal
         }
 
         /// <summary>
+        /// Identifies the <see cref="ActiveRowDragSession"/> direct property.
+        /// </summary>
+#nullable enable
+        public static readonly DirectProperty<DataGrid, DataGridRowDragSession?> ActiveRowDragSessionProperty =
+            AvaloniaProperty.RegisterDirect<DataGrid, DataGridRowDragSession?>(
+                nameof(ActiveRowDragSession),
+                o => o.ActiveRowDragSession);
+
+        /// <summary>
+        /// Gets the current active row drag session for this grid, or <c>null</c> when no row drag is active.
+        /// </summary>
+        public DataGridRowDragSession? ActiveRowDragSession
+        {
+            get => _activeRowDragSession;
+        }
+#nullable restore
+
+        /// <summary>
+        /// Identifies the <see cref="RowDragFeedbackTemplate"/> dependency property.
+        /// </summary>
+        public static readonly StyledProperty<IDataTemplate> RowDragFeedbackTemplateProperty =
+            AvaloniaProperty.Register<DataGrid, IDataTemplate>(nameof(RowDragFeedbackTemplate));
+
+        /// <summary>
+        /// Gets or sets the template used to render custom row drag feedback content.
+        /// </summary>
+        public IDataTemplate RowDragFeedbackTemplate
+        {
+            get => GetValue(RowDragFeedbackTemplateProperty);
+            set => SetValue(RowDragFeedbackTemplateProperty, value);
+        }
+
+        /// <summary>
+        /// Identifies the <see cref="RowDragFeedbackOffset"/> dependency property.
+        /// </summary>
+        public static readonly StyledProperty<Point> RowDragFeedbackOffsetProperty =
+            AvaloniaProperty.Register<DataGrid, Point>(
+                nameof(RowDragFeedbackOffset),
+                new Point(16, 16));
+
+        /// <summary>
+        /// Gets or sets the pointer-relative offset for the custom row drag feedback template.
+        /// </summary>
+        public Point RowDragFeedbackOffset
+        {
+            get => GetValue(RowDragFeedbackOffsetProperty);
+            set => SetValue(RowDragFeedbackOffsetProperty, value);
+        }
+
+        /// <summary>
         /// Identifies the <see cref="RowDropHandler"/> dependency property.
         /// </summary>
 #if !DATAGRID_INTERNAL

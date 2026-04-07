@@ -13,7 +13,9 @@ Common categories you can hook:
 - Row details: `LoadingRowDetails`, `UnloadingRowDetails`, `RowDetailsVisibilityChanged`.
 - Clipboard: `CopyingRowClipboardContent`.
 - Scrolling: `HorizontalScroll`, `VerticalScroll`.
-- Drag and drop: `RowDragStarting`, `RowDragCompleted`.
+- Drag and drop: `RowDragStarting`, `RowDragStarted`, `RowDragUpdated`, `RowDragCanceled`, `RowDragCompleted`.
+
+`RowDragUpdated` is the live session event for issue-299 style drag interaction. It exposes the fully recomputed `DataGridRowDragSession`, including pointer position, modifiers, hovered row, drop zone, and the current requested/effective drag effect. `RowDragCompleted` now represents committed drops only; canceled drags raise `RowDragCanceled`.
 
 ## Hooking Events in XAML
 

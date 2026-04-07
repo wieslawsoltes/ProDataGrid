@@ -780,6 +780,7 @@ internal
         public KeyModifiers KeyModifiers { get; }
     }
 
+#nullable enable
     #if !DATAGRID_INTERNAL
     public
     #else
@@ -792,8 +793,8 @@ internal
             IReadOnlyList<int> indices,
             IDataTransfer data,
             DragDropEffects allowedEffects,
-            RoutedEvent? routedEvent = null,
-            object? source = null)
+            RoutedEvent routedEvent = null,
+            object source = null)
             : base(routedEvent, source)
         {
             Items = items ?? Array.Empty<object>();
@@ -811,6 +812,13 @@ internal
         public DragDropEffects AllowedEffects { get; set; }
 
         public bool Cancel { get; set; }
+
+        public Avalonia.Controls.DataGridDragDrop.DataGridRowDragSession? Session { get; private set; }
+
+        internal void SetSession(Avalonia.Controls.DataGridDragDrop.DataGridRowDragSession session)
+        {
+            Session = session;
+        }
     }
 
     #if !DATAGRID_INTERNAL
@@ -823,8 +831,8 @@ internal
         public DataGridRowDragCompletedEventArgs(
             IReadOnlyList<object> items,
             DragDropEffects effect,
-            RoutedEvent? routedEvent = null,
-            object? source = null)
+            RoutedEvent routedEvent = null,
+            object source = null)
             : base(routedEvent, source)
         {
             Items = items ?? Array.Empty<object>();
@@ -834,5 +842,13 @@ internal
         public IReadOnlyList<object> Items { get; }
 
         public DragDropEffects Effect { get; }
+
+        public Avalonia.Controls.DataGridDragDrop.DataGridRowDragSession? Session { get; private set; }
+
+        internal void SetSession(Avalonia.Controls.DataGridDragDrop.DataGridRowDragSession session)
+        {
+            Session = session;
+        }
     }
+#nullable restore
 }
