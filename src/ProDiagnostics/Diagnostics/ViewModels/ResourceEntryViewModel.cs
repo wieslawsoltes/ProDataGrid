@@ -13,7 +13,8 @@ namespace Avalonia.Diagnostics.ViewModels
             ResourceEntryPropertyViewModel valueProperty,
             string scopeName,
             string scopePath,
-            string? themeVariant)
+            string? themeVariant,
+            string sourceLocation)
         {
             Key = key;
             Value = value;
@@ -26,6 +27,36 @@ namespace Avalonia.Diagnostics.ViewModels
             ScopeName = scopeName;
             ScopePath = scopePath;
             ThemeVariant = themeVariant;
+            SourceLocation = sourceLocation;
+        }
+
+        public ResourceEntryViewModel(
+            string keyDisplay,
+            string keyTypeName,
+            string valueTypeName,
+            string valuePreview,
+            bool isDeferred,
+            string scopePath,
+            string sourceLocation,
+            string? themeVariant)
+        {
+            Key = keyDisplay;
+            Value = valuePreview;
+            KeyDisplay = keyDisplay;
+            KeyTypeName = keyTypeName;
+            ValueTypeName = valueTypeName;
+            ValuePreview = valuePreview;
+            IsDeferred = isDeferred;
+            ScopeName = scopePath;
+            ScopePath = scopePath;
+            ThemeVariant = themeVariant;
+            SourceLocation = sourceLocation;
+            ValueProperty = new ResourceEntryPropertyViewModel(
+                name: keyDisplay,
+                propertyType: typeof(string),
+                getter: () => valuePreview,
+                setter: null,
+                declaringType: typeof(ResourceEntryViewModel));
         }
 
         public object Key { get; }
@@ -39,5 +70,6 @@ namespace Avalonia.Diagnostics.ViewModels
         public string ScopeName { get; }
         public string ScopePath { get; }
         public string? ThemeVariant { get; }
+        public string SourceLocation { get; }
     }
 }

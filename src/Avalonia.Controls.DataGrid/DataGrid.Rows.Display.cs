@@ -99,11 +99,17 @@ namespace Avalonia.Controls
 
             RemoveNonDisplayedRows(firstDisplayedScrollingSlot, lastDisplayedScrollingSlot);
 
+            if (DisplayData.FirstScrollingSlot != firstDisplayedScrollingSlot ||
+                DisplayData.LastScrollingSlot != lastDisplayedScrollingSlot)
+            {
+                ReconcileDisplayedRows(firstDisplayedScrollingSlot, lastDisplayedScrollingSlot);
+            }
+
             Debug.Assert(DisplayData.NumDisplayedScrollingElements >= 0, "the number of visible scrolling rows can't be negative");
             Debug.Assert(DisplayData.NumTotallyDisplayedScrollingElements >= 0, "the number of totally visible scrolling rows can't be negative");
             Debug.Assert(DisplayData.FirstScrollingSlot < SlotCount, "firstDisplayedScrollingRow larger than number of rows");
-            Debug.Assert(DisplayData.FirstScrollingSlot == firstDisplayedScrollingSlot);
-            Debug.Assert(DisplayData.LastScrollingSlot == lastDisplayedScrollingSlot);
+            Debug.Assert(DisplayData.FirstScrollingSlot == -1 || DisplayData.LastScrollingSlot >= DisplayData.FirstScrollingSlot);
+            Debug.Assert(DisplayData.LastScrollingSlot == -1 || DisplayData.LastScrollingSlot < SlotCount);
 
             activity?.SetTag(DataGridDiagnostics.Tags.FirstDisplayedSlot, DisplayData.FirstScrollingSlot);
             activity?.SetTag(DataGridDiagnostics.Tags.LastDisplayedSlot, DisplayData.LastScrollingSlot);
@@ -194,6 +200,12 @@ namespace Avalonia.Controls
 
             RemoveNonDisplayedRows(firstDisplayedScrollingRow, lastDisplayedScrollingRow);
 
+            if (DisplayData.FirstScrollingSlot != firstDisplayedScrollingRow ||
+                DisplayData.LastScrollingSlot != lastDisplayedScrollingRow)
+            {
+                ReconcileDisplayedRows(firstDisplayedScrollingRow, lastDisplayedScrollingRow);
+            }
+
             Debug.Assert(DisplayData.NumDisplayedScrollingElements >= 0, "the number of visible scrolling rows can't be negative");
             Debug.Assert(DisplayData.NumTotallyDisplayedScrollingElements >= 0, "the number of totally visible scrolling rows can't be negative");
             Debug.Assert(DisplayData.FirstScrollingSlot < SlotCount, "firstDisplayedScrollingRow larger than number of rows");
@@ -207,16 +219,61 @@ namespace Avalonia.Controls
 
         private void RemoveNonDisplayedRows(int newFirstDisplayedSlot, int newLastDisplayedSlot)
         {
-            while (DisplayData.FirstScrollingSlot < newFirstDisplayedSlot)
+            while (DisplayData.FirstScrollingSlot != -1 &&
+                   DisplayData.FirstScrollingSlot < newFirstDisplayedSlot)
             {
                 // Need to add rows above the lastDisplayedScrollingRow
                 RemoveDisplayedElement(DisplayData.FirstScrollingSlot, false /*wasDeleted*/, true /*updateSlotInformation*/);
             }
-            while (DisplayData.LastScrollingSlot > newLastDisplayedSlot)
+            while (DisplayData.LastScrollingSlot != -1 &&
+                   DisplayData.LastScrollingSlot > newLastDisplayedSlot)
             {
                 // Need to remove rows below the lastDisplayedScrollingRow
                 RemoveDisplayedElement(DisplayData.LastScrollingSlot, false /*wasDeleted*/, true /*updateSlotInformation*/);
             }
+        }
+
+        private void ReconcileDisplayedRows(int targetFirstDisplayedSlot, int targetLastDisplayedSlot)
+        {
+            if (targetFirstDisplayedSlot < 0 ||
+                targetLastDisplayedSlot < 0 ||
+                targetLastDisplayedSlot < targetFirstDisplayedSlot ||
+                targetLastDisplayedSlot >= SlotCount)
+            {
+                RemoveNonDisplayedRows(-1, -1);
+                return;
+            }
+
+            if (DisplayData.FirstScrollingSlot == -1 || DisplayData.LastScrollingSlot == -1)
+            {
+                InsertDisplayedElement(targetFirstDisplayedSlot, updateSlotInformation: true);
+            }
+
+            while (DisplayData.FirstScrollingSlot > targetFirstDisplayedSlot)
+            {
+                int previousSlot = GetPreviousVisibleSlot(DisplayData.FirstScrollingSlot);
+                if (previousSlot < 0 || previousSlot == DisplayData.FirstScrollingSlot)
+                {
+                    break;
+                }
+
+                InsertDisplayedElement(previousSlot, updateSlotInformation: true);
+            }
+
+            while (DisplayData.LastScrollingSlot < targetLastDisplayedSlot)
+            {
+                int nextSlot = GetNextVisibleSlot(DisplayData.LastScrollingSlot);
+                if (nextSlot < 0 ||
+                    nextSlot >= SlotCount ||
+                    nextSlot == DisplayData.LastScrollingSlot)
+                {
+                    break;
+                }
+
+                InsertDisplayedElement(nextSlot, updateSlotInformation: true);
+            }
+
+            RemoveNonDisplayedRows(targetFirstDisplayedSlot, targetLastDisplayedSlot);
         }
 
 
@@ -299,8 +356,10 @@ namespace Avalonia.Controls
             // If the row has been recycled, reapply the BackgroundBrush
             if (row.IsRecycled)
             {
-                row.ApplyCellsState();
-                _rowsPresenter?.InvalidateChildIndex(row);
+                if (row.ApplyCellsState())
+                {
+                    _rowsPresenter?.InvalidateChildIndex(row);
+                }
             }
             else if (row == EditingRow)
             {

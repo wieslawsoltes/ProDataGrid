@@ -203,3 +203,17 @@ services.AddOpenTelemetry()
 - Diagnostics are off by default; set the switch before any grid usage.
 - UDP is best-effort and can drop packets; it is intended for live observability, not guaranteed delivery.
 - Some metrics are nested (for example refresh includes filter/sort/group), so compare like-for-like scenarios.
+
+## ProDiagnostics Remote Attach Integration
+
+The remote attach runtime (`ProDiagnostics.Remote`) can expose metrics/profiler through WebSocket streams and snapshots in addition to UDP telemetry.
+
+Important runtime behavior:
+
+- Metrics and profiler streams can be paused/resumed through remote mutation methods.
+- When paused, managed remote stream publication is skipped to reduce memory and CPU pressure.
+- Remote hosts can start with preview/metrics/profiler paused by default (`DevToolsRemoteAttachHostOptions`).
+
+This allows opening diagnostics tooling without immediate high-frequency stream fanout, then opt-in to live data when needed.
+
+See [Remote Diagnostics Overview](remote-diagnostics/index.md) and [Remote Performance and Streaming](remote-diagnostics/performance-and-streaming.md).

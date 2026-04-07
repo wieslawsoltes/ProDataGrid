@@ -1,0 +1,105 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:Avalonia.Diagnostics.ViewModels"
+             x:Class="Avalonia.Diagnostics.Views.LogsPageView"
+             x:DataType="vm:LogsPageViewModel">
+  <Grid RowDefinitions="Auto,Auto,*,Auto">
+    <StackPanel Grid.Row="0"
+                Margin="8,6,8,4"
+                Orientation="Horizontal"
+                Spacing="12">
+      <TextBlock Text="{Binding CollectorSummary}" />
+      <TextBlock Text="{Binding EntryCount, StringFormat=Entries: {0}}" />
+      <TextBlock Text="{Binding VisibleEntryCount, StringFormat=Visible: {0}}" />
+      <TextBlock Text="DevTools/internal logs are excluded; info+ logs are captured by default when app logging is not configured."
+                 Foreground="Gray" />
+    </StackPanel>
+
+    <FilterTextBox Grid.Row="1"
+                   Margin="8,0,8,4"
+                   DataContext="{Binding LogsFilter}"
+                   Text="{Binding FilterString}"
+                   Watermark="Filter logs"
+                   UseCaseSensitiveFilter="{Binding UseCaseSensitiveFilter}"
+                   UseWholeWordFilter="{Binding UseWholeWordFilter}"
+                   UseRegexFilter="{Binding UseRegexFilter}" />
+
+    <DataGrid Grid.Row="2"
+              Margin="8,0,8,4"
+              ItemsSource="{Binding EntriesView}"
+              SelectedItem="{Binding SelectedEntry, Mode=TwoWay}"
+              AutoGenerateColumns="False"
+              HeadersVisibility="Column"
+              BorderThickness="0"
+              SelectionMode="Single"
+              CanUserResizeColumns="True"
+              CanUserReorderColumns="False"
+              CanUserSortColumns="True">
+      <DataGrid.Columns>
+        <DataGridTextColumn Header="Time"
+                            Binding="{Binding Timestamp, StringFormat={}{0:HH:mm:ss.fff}}"
+                            Width="1.5*"
+                            IsReadOnly="True"
+                            x:DataType="vm:LogEntryViewModel" />
+        <DataGridTextColumn Header="Level"
+                            Binding="{Binding Level}"
+                            Width="1*"
+                            IsReadOnly="True"
+                            x:DataType="vm:LogEntryViewModel" />
+        <DataGridTextColumn Header="Area"
+                            Binding="{Binding Area}"
+                            Width="1.4*"
+                            IsReadOnly="True"
+                            x:DataType="vm:LogEntryViewModel" />
+        <DataGridTextColumn Header="Source"
+                            Binding="{Binding Source}"
+                            Width="1.2*"
+                            IsReadOnly="True"
+                            x:DataType="vm:LogEntryViewModel" />
+        <DataGridTextColumn Header="Message"
+                            Binding="{Binding Message}"
+                            Width="4*"
+                            IsReadOnly="True"
+                            x:DataType="vm:LogEntryViewModel" />
+      </DataGrid.Columns>
+    </DataGrid>
+
+    <WrapPanel Grid.Row="3"
+               Margin="8,0,8,6"
+               Orientation="Horizontal">
+      <TextBlock Text="Levels:"
+                 Margin="0,0,6,0"
+                 VerticalAlignment="Center" />
+      <CheckBox Content="Verbose"
+                IsChecked="{Binding ShowVerbose, Mode=TwoWay}"
+                Margin="0,0,6,0" />
+      <CheckBox Content="Debug"
+                IsChecked="{Binding ShowDebug, Mode=TwoWay}"
+                Margin="0,0,6,0" />
+      <CheckBox Content="Info"
+                IsChecked="{Binding ShowInformation, Mode=TwoWay}"
+                Margin="0,0,6,0" />
+      <CheckBox Content="Warning"
+                IsChecked="{Binding ShowWarning, Mode=TwoWay}"
+                Margin="0,0,6,0" />
+      <CheckBox Content="Error"
+                IsChecked="{Binding ShowError, Mode=TwoWay}"
+                Margin="0,0,6,0" />
+      <CheckBox Content="Fatal"
+                IsChecked="{Binding ShowFatal, Mode=TwoWay}"
+                Margin="0,0,10,0" />
+      <TextBlock Text="Max entries"
+                 Margin="0,0,4,0"
+                 VerticalAlignment="Center" />
+      <NumericUpDown Width="100"
+                     Minimum="1"
+                     Maximum="50000"
+                     Value="{Binding MaxEntries, Mode=TwoWay}"
+                     VerticalAlignment="Center" />
+      <Button Content="Clear"
+              Margin="10,0,0,0"
+              Command="{Binding Clear}"
+              VerticalAlignment="Center" />
+    </WrapPanel>
+  </Grid>
+</UserControl>

@@ -43,14 +43,38 @@
     
     <Grid Grid.Column="0" RowDefinitions="Auto,Auto,*">
 
-      <Grid ColumnDefinitions="Auto, *" RowDefinitions="Auto, Auto">
-        <Button Grid.Column="0" Grid.RowSpan="2" Content="^" 
+      <Grid ColumnDefinitions="Auto, *" RowDefinitions="Auto, Auto, Auto">
+        <Button Grid.Column="0" Grid.RowSpan="3" Content="^" 
                 IsEnabled="{Binding CanNavigateToParentProperty}"
                 Margin="0 0 4 0"
                 ToolTip.Tip="Navigate to parent property"
                 Command="{Binding NavigateToParentProperty}" />
         <TextBlock Grid.Column="1" Grid.Row="0" Text="{Binding SelectedEntityName}" FontWeight="Bold" />
         <TextBlock Grid.Column="1" Grid.Row="1" Text="{Binding SelectedEntityType}" FontStyle="Italic" />
+        <StackPanel Grid.Column="1" Grid.Row="2" Spacing="2" Margin="0,2,0,0">
+          <TextBlock Text="{Binding XamlSourceText}"
+                     IsVisible="{Binding HasXamlSource}"
+                     Foreground="Gray"
+                     FontSize="11"
+                     TextTrimming="CharacterEllipsis">
+            <ToolTip.Tip>
+              <local:SourceLocationToolTipView SourceLocation="{Binding XamlSourceText}" />
+            </ToolTip.Tip>
+          </TextBlock>
+          <TextBlock Text="{Binding CodeSourceText}"
+                     IsVisible="{Binding HasCodeSource}"
+                     Foreground="Gray"
+                     FontSize="11"
+                     TextTrimming="CharacterEllipsis">
+            <ToolTip.Tip>
+              <local:SourceLocationToolTipView SourceLocation="{Binding CodeSourceText}" />
+            </ToolTip.Tip>
+          </TextBlock>
+          <TextBlock Text="{Binding SourceLocationStatus}"
+                     IsVisible="{Binding !HasAnySourceLocation}"
+                     Foreground="Gray"
+                     FontSize="11" />
+        </StackPanel>
       </Grid>
       
       <FilterTextBox Grid.Row="1"
@@ -71,6 +95,13 @@
                 SelectedItem="{Binding SelectedProperty, Mode=TwoWay}"
                 CanUserResizeColumns="true"
                 DoubleTapped="PropertiesGrid_OnDoubleTapped">
+        <DataGrid.ContextFlyout>
+          <MenuFlyout>
+            <MenuItem Header="Set Breakpoint"
+                      Command="{Binding SetPropertyBreakpoint}"
+                      CommandParameter="{Binding #DataGrid.SelectedItem}" />
+          </MenuFlyout>
+        </DataGrid.ContextFlyout>
         <DataGrid.FilteringModel>
           <filtering:FilteringModel OwnsViewFilter="False" />
         </DataGrid.FilteringModel>
@@ -114,7 +145,7 @@
               </DataTemplate>
             </DataGridTemplateColumn.CellTemplate>
           </DataGridTemplateColumn>
-          <DataGridTextColumn Header="Type" Binding="{Binding Type}"
+          <DataGridTextColumn Header="Type" Binding="{Binding DisplayType}"
                               IsReadOnly="True"
                               IsVisible="{Binding !$parent[UserControl;2].((vm:MainViewModel)DataContext).ShowDetailsPropertyType}"
                               x:DataType="vm:PropertyViewModel"
@@ -187,9 +218,13 @@
                       <Binding Path="IsVisible" />
                     </MultiBinding>
                   </Border.IsVisible>
-                  <Expander IsExpanded="True" Margin="0" Padding="8,0" ContentTransition="{x:Null}" >
+                    <Expander IsExpanded="True" Margin="0" Padding="8,0" ContentTransition="{x:Null}" >
                     <Expander.Header>
-                      <TextBlock Grid.Row="0" Text="{Binding Description}" />
+                      <TextBlock Grid.Row="0" Text="{Binding Description}">
+                        <ToolTip.Tip>
+                          <local:SourceLocationToolTipView SourceLocation="{Binding SourceLocation}" />
+                        </ToolTip.Tip>
+                      </TextBlock>
                     </Expander.Header>
 
                     <ItemsControl Margin="20,0,0,0" Grid.Row="1" ItemsSource="{Binding Setters}">
@@ -242,6 +277,9 @@
                               </ContextMenu>
                             </Panel.ContextMenu>
                             <StackPanel Orientation="Horizontal" Spacing="2">
+                              <ToolTip.Tip>
+                                <local:SourceLocationToolTipView SourceLocation="{Binding SourceLocation}" />
+                              </ToolTip.Tip>
                               <TextBlock Classes="property-name" PointerPressed="PropertyNamePressed" Text="{Binding Name}" />
                               <TextBlock Text=":" />
                               <TextBlock>{</TextBlock>
@@ -263,6 +301,9 @@
                               </ContextMenu>
                             </Panel.ContextMenu>
                             <StackPanel Orientation="Horizontal" Spacing="2" HorizontalAlignment="Left">
+                              <ToolTip.Tip>
+                                <local:SourceLocationToolTipView SourceLocation="{Binding SourceLocation}" />
+                              </ToolTip.Tip>
                               <TextBlock Classes="property-name" PointerPressed="PropertyNamePressed" Text="{Binding Name}" />
                               <TextBlock Text=":" />
                               <TextBlock Text="{Binding Value}" />
@@ -284,6 +325,9 @@
                               </ContextMenu>
                             </Panel.ContextMenu>
                             <StackPanel Orientation="Horizontal" Spacing="2">
+                              <ToolTip.Tip>
+                                <local:SourceLocationToolTipView SourceLocation="{Binding SourceLocation}" />
+                              </ToolTip.Tip>
                               <TextBlock Classes="property-name" PointerPressed="PropertyNamePressed" Text="{Binding Name}" />
                               <TextBlock Text=":" />
                               <TextBlock Text="{Binding Value}" />

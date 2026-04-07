@@ -34,7 +34,9 @@ namespace Avalonia.Diagnostics.Services
 
         public Control GetOrCreateEditor(PropertyViewModel viewModel, Type propertyType)
         {
-            var kind = PropertyValueEditorTypeHelper.GetEditorKind(propertyType);
+            var kind = TryGetRemoteEditorKind(viewModel, out var remoteKind)
+                ? remoteKind
+                : PropertyValueEditorTypeHelper.GetEditorKind(propertyType);
             if (!_editorCache.TryGetValue(kind, out var entry))
             {
                 entry = CreateEditorEntry(kind);
@@ -214,15 +216,30 @@ namespace Avalonia.Diagnostics.Services
                             SelectingItemsControl.SelectedItemProperty,
                             new GuardedValueConverter(new ValueConverter(), () => commitState.CanCommit));
                         Type? boundType = null;
+                        IReadOnlyList<string>? boundRemoteOptions = null;
                         return new EditorEntry(combo, (vm, type) =>
                         {
                             commitState.UpdateContext(vm);
-                            if (!ReferenceEquals(boundType, type))
+                            var remoteOptions = vm is RemotePropertyViewModel remoteViewModel &&
+                                                remoteViewModel.EnumOptions.Count > 0 &&
+                                                !PropertyValueEditorTypeHelper.TryGetEnumType(type, out _)
+                                ? remoteViewModel.EnumOptions
+                                : null;
+                            if (!ReferenceEquals(boundType, type) || !ReferenceEquals(boundRemoteOptions, remoteOptions))
                             {
-                                var enumType = PropertyValueEditorTypeHelper.TryGetEnumType(type, out var resolved) ? resolved : type;
-                                combo.ItemsSource = PropertyValueEditorTypeHelper.GetEnumValues(enumType);
+                                if (remoteOptions is not null)
+                                {
+                                    combo.ItemsSource = remoteOptions;
+                                }
+                                else
+                                {
+                                    var enumType = PropertyValueEditorTypeHelper.TryGetEnumType(type, out var resolved) ? resolved : type;
+                                    combo.ItemsSource = PropertyValueEditorTypeHelper.GetEnumValues(enumType);
+                                }
+
                                 bindingSlot.Bind(type);
                                 boundType = type;
+                                boundRemoteOptions = remoteOptions;
                             }
 
                             combo.IsEnabled = !vm.IsReadonly;
@@ -314,6 +331,40 @@ namespace Avalonia.Diagnostics.Services
                         });
                     }
             }
+        }
+
+        private static bool TryGetRemoteEditorKind(PropertyViewModel viewModel, out PropertyValueEditorKind kind)
+        {
+            if (viewModel is RemotePropertyViewModel remoteViewModel)
+            {
+                switch (remoteViewModel.EditorKindToken)
+                {
+                    case "boolean":
+                        kind = PropertyValueEditorKind.Boolean;
+                        return true;
+                    case "numeric":
+                        kind = PropertyValueEditorKind.Numeric;
+                        return true;
+                    case "color":
+                        kind = PropertyValueEditorKind.Color;
+                        return true;
+                    case "brush":
+                        kind = PropertyValueEditorKind.Brush;
+                        return true;
+                    case "image":
+                        kind = PropertyValueEditorKind.Image;
+                        return true;
+                    case "geometry":
+                        kind = PropertyValueEditorKind.Geometry;
+                        return true;
+                    case "enum":
+                        kind = PropertyValueEditorKind.Enum;
+                        return true;
+                }
+            }
+
+            kind = default;
+            return false;
         }
 
         private void BindValueControl(

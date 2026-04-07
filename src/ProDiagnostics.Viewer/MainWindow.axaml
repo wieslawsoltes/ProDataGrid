@@ -25,6 +25,7 @@
           <StackPanel Grid.Column="1" Spacing="2" VerticalAlignment="Center">
             <TextBlock Text="Live metrics and activity streams over UDP" Classes="subtitle" />
             <TextBlock Text="{Binding StatusText}" Classes="subtitle" />
+            <TextBlock Text="{Binding TargetSummary}" Classes="subtitle" />
           </StackPanel>
 
           <StackPanel Grid.Column="2" Orientation="Horizontal" Spacing="10" VerticalAlignment="Center">

@@ -384,7 +384,7 @@ internal
                 if (element is DataGridRow row)
                 {
                     row.ApplyState();
-                    row.ApplyCellsState();
+                    row.ApplyCellsState(force: true);
                 }
                 else if (element is DataGridRowGroupHeader groupHeader)
                 {

@@ -1,0 +1,185 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:Avalonia.Diagnostics.ViewModels"
+             x:Class="Avalonia.Diagnostics.Views.TransportSettingsPageView"
+             x:DataType="vm:TransportSettingsPageViewModel">
+  <Grid RowDefinitions="Auto,Auto,Auto,Auto,*"
+        ColumnDefinitions="Auto,*"
+        Margin="8,6,8,6">
+    <Border Grid.Row="0"
+            Grid.ColumnSpan="2"
+            Padding="10"
+            BorderThickness="1"
+            BorderBrush="{DynamicResource ThemeControlMidBrush}">
+      <Grid ColumnDefinitions="Auto,*"
+            RowDefinitions="Auto,Auto,Auto,Auto,Auto">
+        <TextBlock Grid.Row="0"
+                   Grid.Column="0"
+                   Text="Status:"
+                   Margin="0,0,8,0"
+                   FontWeight="SemiBold" />
+        <TextBlock Grid.Row="0"
+                   Grid.Column="1"
+                   Text="{Binding StatusText}" />
+
+        <TextBlock Grid.Row="1"
+                   Grid.Column="0"
+                   Text="Process:"
+                   Margin="0,4,8,0"
+                   FontWeight="SemiBold" />
+        <TextBlock Grid.Row="1"
+                   Grid.Column="1"
+                   Margin="0,4,0,0"
+                   Text="{Binding ProcessSummary}" />
+
+        <TextBlock Grid.Row="2"
+                   Grid.Column="0"
+                   Text="Runtime:"
+                   Margin="0,4,8,0"
+                   FontWeight="SemiBold" />
+        <TextBlock Grid.Row="2"
+                   Grid.Column="1"
+                   Margin="0,4,0,0"
+                   Text="{Binding RuntimeSummary}" />
+
+        <TextBlock Grid.Row="3"
+                   Grid.Column="0"
+                   Text="Protocol:"
+                   Margin="0,4,8,0"
+                   FontWeight="SemiBold" />
+        <TextBlock Grid.Row="3"
+                   Grid.Column="1"
+                   Margin="0,4,0,0"
+                   Text="{Binding ProtocolSummary}" />
+
+        <TextBlock Grid.Row="4"
+                   Grid.Column="0"
+                   Text="Packets:"
+                   Margin="0,4,8,0"
+                   FontWeight="SemiBold" />
+        <TextBlock Grid.Row="4"
+                   Grid.Column="1"
+                   Margin="0,4,0,0"
+                   Text="{Binding PacketSummary}" />
+      </Grid>
+    </Border>
+
+    <Grid Grid.Row="1"
+          Grid.ColumnSpan="2"
+          Margin="0,8,0,8"
+          ColumnDefinitions="Auto,120,Auto,240,Auto,120,Auto,120,Auto,120"
+          RowDefinitions="Auto,Auto"
+          ColumnSpacing="8"
+          RowSpacing="8">
+      <TextBlock Grid.Row="0" Grid.Column="0" VerticalAlignment="Center" Text="Protocol" />
+      <ComboBox Grid.Row="0" Grid.Column="1"
+                ItemsSource="{Binding SupportedTransportProtocols}"
+                SelectedItem="{Binding TransportProtocol}"
+                IsEnabled="False" />
+
+      <TextBlock Grid.Row="0" Grid.Column="2" VerticalAlignment="Center" Text="Host" />
+      <TextBox Grid.Row="0" Grid.Column="3" Text="{Binding Host}" />
+
+      <TextBlock Grid.Row="0" Grid.Column="4" VerticalAlignment="Center" Text="Port" />
+      <NumericUpDown Grid.Row="0" Grid.Column="5" Minimum="1" Maximum="65535" Value="{Binding Port}" />
+
+      <TextBlock Grid.Row="0" Grid.Column="6" VerticalAlignment="Center" Text="Max Tags" />
+      <NumericUpDown Grid.Row="0" Grid.Column="7" Minimum="0" Maximum="256" Value="{Binding MaxTagsPerMessage}" />
+
+      <TextBlock Grid.Row="0" Grid.Column="8" VerticalAlignment="Center" Text="Hello (s)" />
+      <NumericUpDown Grid.Row="0" Grid.Column="9" Minimum="1" Maximum="300" Increment="1" Value="{Binding HelloIntervalSeconds}" />
+
+      <CheckBox Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="3" Content="Include activity tags" IsChecked="{Binding IncludeActivityTags}" />
+      <CheckBox Grid.Row="1" Grid.Column="3" Grid.ColumnSpan="3" Content="Include metric tags" IsChecked="{Binding IncludeMetricTags}" />
+      <CheckBox Grid.Row="1" Grid.Column="6" Grid.ColumnSpan="4" Content="Start export when DevTools opens" IsChecked="{Binding StartTransportOnOpen}" />
+    </Grid>
+
+    <Grid Grid.Row="2"
+          Grid.ColumnSpan="2"
+          ColumnDefinitions="Auto,*"
+          RowDefinitions="Auto,Auto"
+          ColumnSpacing="8"
+          RowSpacing="8">
+      <TextBlock Grid.Row="0" Grid.Column="0" VerticalAlignment="Center" Text="Activity Sources" />
+      <TextBox Grid.Row="0" Grid.Column="1"
+               Text="{Binding ActivitySourcePatterns}"
+               Watermark="*, System.Net.*, MyCompany.*" />
+
+      <TextBlock Grid.Row="1" Grid.Column="0" VerticalAlignment="Center" Text="Meter Names" />
+      <TextBox Grid.Row="1" Grid.Column="1"
+               Text="{Binding MeterNamePatterns}"
+               Watermark="*, MyApp.Metrics, Avalonia.*" />
+    </Grid>
+
+    <Grid Grid.Row="3"
+          Grid.ColumnSpan="2"
+          Margin="0,8,0,0"
+          ColumnDefinitions="Auto,240,Auto,*,Auto"
+          RowDefinitions="Auto,Auto,Auto"
+          ColumnSpacing="8"
+          RowSpacing="8">
+      <TextBlock Grid.Row="0" Grid.Column="0" VerticalAlignment="Center" Text="Viewer Command" />
+      <TextBox Grid.Row="0" Grid.Column="1" Text="{Binding ViewerCommand}" />
+
+      <TextBlock Grid.Row="0" Grid.Column="2" VerticalAlignment="Center" Text="Arguments" />
+      <TextBox Grid.Row="0" Grid.Column="3"
+               Text="{Binding ViewerArguments}"
+               Watermark="--port 54831 --process-id 12345 --app-name MyApp" />
+
+      <Button Grid.Row="0" Grid.Column="4"
+              Content="Launch Viewer"
+              Command="{Binding LaunchViewer}" />
+
+      <CheckBox Grid.Row="1"
+                Grid.Column="0"
+                Grid.ColumnSpan="2"
+                Content="Launch external viewer when DevTools opens"
+                IsChecked="{Binding LaunchViewerOnOpen}" />
+
+      <TextBlock Grid.Row="1"
+                 Grid.Column="2"
+                 Grid.ColumnSpan="3"
+                 VerticalAlignment="Center"
+                 Foreground="Gray"
+                 Text="{Binding ViewerStatusText}" />
+
+      <Grid Grid.Row="2"
+            Grid.ColumnSpan="5"
+            ColumnDefinitions="Auto,180,Auto,180,Auto,120"
+            ColumnSpacing="8">
+        <TextBlock Grid.Column="0" VerticalAlignment="Center" Text="Target App" />
+        <TextBox Grid.Column="1"
+                 Text="{Binding ViewerTargetAppName}"
+                 Watermark="Optional app filter" />
+
+        <TextBlock Grid.Column="2" VerticalAlignment="Center" Text="Target Process" />
+        <TextBox Grid.Column="3"
+                 Text="{Binding ViewerTargetProcessName}"
+                 Watermark="Optional process filter" />
+
+        <TextBlock Grid.Column="4" VerticalAlignment="Center" Text="Target PID" />
+        <NumericUpDown Grid.Column="5"
+                       Minimum="0"
+                       Maximum="2147483647"
+                       Value="{Binding ViewerTargetProcessId}" />
+      </Grid>
+    </Grid>
+
+    <StackPanel Grid.Row="4"
+                Grid.ColumnSpan="2"
+                Orientation="Horizontal"
+                Spacing="8"
+                VerticalAlignment="Top"
+                Margin="0,10,0,0">
+      <Button Content="{Binding StartStopButtonText}"
+              Command="{Binding StartOrStop}" />
+      <Button Content="Apply Settings"
+              Command="{Binding Apply}" />
+      <Button Content="Reset Defaults"
+              Command="{Binding ResetDefaults}" />
+      <TextBlock VerticalAlignment="Center"
+                 Foreground="Gray"
+                 Text="Configure UDP export used by remote diagnostics viewers." />
+    </StackPanel>
+  </Grid>
+</UserControl>

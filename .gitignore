@@ -335,3 +335,5 @@ docfx/api/*.yml
 docfx/api/*.manifest
 /plan
 /.codex
+/.playwright-cli
+/output

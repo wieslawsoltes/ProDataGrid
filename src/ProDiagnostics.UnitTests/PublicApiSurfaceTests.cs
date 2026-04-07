@@ -22,6 +22,12 @@ public class PublicApiSurfaceTests
             typeof(DevToolsViewKind),
             typeof(HotKeyConfiguration),
             typeof(DevToolsOptions),
+            typeof(DevToolsRemoteAttachHost),
+            typeof(DevToolsRemoteAttachHostOptions),
+            typeof(DevToolsRemoteLoopbackOptions),
+            typeof(DevToolsRemoteLoopbackSession),
+            typeof(IDevToolsLogCollector),
+            typeof(DevToolsLogEvent),
             typeof(IScreenshotHandler),
             typeof(BaseRenderToStreamHandler),
             typeof(FilePickerHandler)

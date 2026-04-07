@@ -19,6 +19,8 @@ public sealed class DiagnosticsUdpExporter : IDisposable
     private bool _started;
     private bool _disposed;
     private Timer? _helloTimer;
+    private long _sentPacketCount;
+    private long _failedPacketCount;
 
     public DiagnosticsUdpExporter(DiagnosticsUdpOptions? options = null)
     {
@@ -62,6 +64,10 @@ public sealed class DiagnosticsUdpExporter : IDisposable
         SendHello();
         _helloTimer = new Timer(_ => SendHello(), null, _options.HelloInterval, _options.HelloInterval);
     }
+
+    public long SentPacketCount => Interlocked.Read(ref _sentPacketCount);
+
+    public long FailedPacketCount => Interlocked.Read(ref _failedPacketCount);
 
     public void Dispose()
     {
@@ -195,14 +201,18 @@ public sealed class DiagnosticsUdpExporter : IDisposable
             {
                 _socket.Send(payload);
             }
+
+            Interlocked.Increment(ref _sentPacketCount);
         }
         catch (SocketException)
         {
             // UDP can report connection refused if the receiver isn't listening yet.
+            Interlocked.Increment(ref _failedPacketCount);
         }
         catch (ObjectDisposedException)
         {
             // Shutdown raced with a send; ignore.
+            Interlocked.Increment(ref _failedPacketCount);
         }
     }
 

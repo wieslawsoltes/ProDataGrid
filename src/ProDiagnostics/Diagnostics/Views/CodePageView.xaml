@@ -1,0 +1,85 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:Avalonia.Diagnostics.ViewModels"
+             x:Class="Avalonia.Diagnostics.Views.CodePageView"
+             x:DataType="vm:CodePageViewModel">
+  <Grid RowDefinitions="Auto,Auto,*"
+        Margin="8,6,8,6">
+    <StackPanel Grid.Row="0"
+                Orientation="Horizontal"
+                Spacing="12">
+      <TextBlock Text="{Binding InspectedElement, StringFormat=Selected: {0}}" />
+      <TextBlock Text="{Binding InspectedElementType}"
+                 Foreground="Gray"
+                 TextTrimming="CharacterEllipsis" />
+    </StackPanel>
+
+    <TextBlock Grid.Row="1"
+               Margin="0,4,0,6"
+               Text="{Binding Status}"
+               Foreground="Gray"
+               TextWrapping="Wrap" />
+
+    <TabControl Grid.Row="2"
+                IsVisible="{Binding HasAnyDocument}"
+                SelectedIndex="{Binding SelectedDocumentTab, Mode=TwoWay}">
+      <TabItem Header="XAML"
+               IsVisible="{Binding HasXamlDocument}">
+        <Grid RowDefinitions="Auto,*">
+          <DockPanel Grid.Row="0"
+                     LastChildFill="False"
+                     Margin="0,0,0,4">
+            <TextBlock Text="{Binding XamlLocationText}"
+                       TextTrimming="CharacterEllipsis"
+                       VerticalAlignment="Center"
+                       Width="900" />
+            <Button Content="Open"
+                    Margin="8,0,0,0"
+                    Command="{Binding OpenSourceLocationCommand}"
+                    CommandParameter="{Binding XamlLocationText}" />
+          </DockPanel>
+          <TextBox Grid.Row="1"
+                   IsReadOnly="True"
+                   AcceptsReturn="True"
+                   TextWrapping="NoWrap"
+                   ScrollViewer.VerticalScrollBarVisibility="Auto"
+                   ScrollViewer.HorizontalScrollBarVisibility="Auto"
+                   FontFamily="Consolas"
+                   Text="{Binding XamlText}"
+                   CaretIndex="{Binding XamlCaretIndex, Mode=TwoWay}"
+                   SelectionStart="{Binding XamlSelectionStart, Mode=TwoWay}"
+                   SelectionEnd="{Binding XamlSelectionEnd, Mode=TwoWay}" />
+        </Grid>
+      </TabItem>
+
+      <TabItem Header="Code"
+               IsVisible="{Binding HasCodeDocument}">
+        <Grid RowDefinitions="Auto,*">
+          <DockPanel Grid.Row="0"
+                     LastChildFill="False"
+                     Margin="0,0,0,4">
+            <TextBlock Text="{Binding CodeLocationText}"
+                       TextTrimming="CharacterEllipsis"
+                       VerticalAlignment="Center"
+                       Width="900" />
+            <Button Content="Open"
+                    Margin="8,0,0,0"
+                    Command="{Binding OpenSourceLocationCommand}"
+                    CommandParameter="{Binding CodeLocationText}" />
+          </DockPanel>
+          <TextBox Grid.Row="1"
+                   IsReadOnly="True"
+                   AcceptsReturn="True"
+                   TextWrapping="NoWrap"
+                   ScrollViewer.VerticalScrollBarVisibility="Auto"
+                   ScrollViewer.HorizontalScrollBarVisibility="Auto"
+                   FontFamily="Consolas"
+                   Text="{Binding CodeText}"
+                   CaretIndex="{Binding CodeCaretIndex, Mode=TwoWay}"
+                   SelectionStart="{Binding CodeSelectionStart, Mode=TwoWay}"
+                   SelectionEnd="{Binding CodeSelectionEnd, Mode=TwoWay}" />
+        </Grid>
+      </TabItem>
+    </TabControl>
+  </Grid>
+</UserControl>

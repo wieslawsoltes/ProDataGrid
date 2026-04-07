@@ -1,0 +1,17 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFrameworks>net8.0;net10.0</TargetFrameworks>
+    <Nullable>enable</Nullable>
+    <IsPackable>true</IsPackable>
+    <PackageId>ProDiagnostics.Remote</PackageId>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <PackageDescription>Remote attach protocol and backend contracts for ProDiagnostics out-of-process diagnostics.</PackageDescription>
+    <PackageTags>diagnostics;devtools;remote;attach;prodiagnostics</PackageTags>
+  </PropertyGroup>
+
+  <Import Project="../../build/SharedVersion.props" />
+
+</Project>

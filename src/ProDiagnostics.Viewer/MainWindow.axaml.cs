@@ -5,6 +5,7 @@ using System.Linq;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.VisualTree;
+using ProDiagnostics.Transport;
 using ProDiagnostics.Viewer.ViewModels;
 
 namespace ProDiagnostics.Viewer;
@@ -18,9 +19,21 @@ public partial class MainWindow : Window
     private readonly List<(ColumnVisibilityOption option, PropertyChangedEventHandler handler)> _columnVisibilityHandlers = new();
 
     public MainWindow()
+        : this(portOverride: null, startListening: true, targetAppName: null, targetProcessName: null, targetProcessId: null)
+    {
+    }
+
+    public MainWindow(
+        int? portOverride,
+        bool startListening,
+        string? targetAppName,
+        string? targetProcessName,
+        int? targetProcessId)
     {
         InitializeComponent();
-        _viewModel = new MainViewModel();
+        _viewModel = portOverride is { } configuredPort
+            ? new MainViewModel(configuredPort, startListening, targetAppName, targetProcessName, targetProcessId)
+            : new MainViewModel(TelemetryProtocol.DefaultPort, startListening, targetAppName, targetProcessName, targetProcessId);
         DataContext = _viewModel;
         WireMetricsGridHandlers();
         WireColumnVisibility();

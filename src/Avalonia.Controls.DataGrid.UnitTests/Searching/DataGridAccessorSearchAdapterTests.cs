@@ -14,7 +14,7 @@ namespace Avalonia.Controls.DataGridTests.Searching;
 
 public class DataGridAccessorSearchAdapterTests
 {
-    [Fact]
+    [AvaloniaFact]
     public void AccessorAdapter_Uses_ValueAccessor()
     {
         var items = new[]
@@ -38,7 +38,7 @@ public class DataGridAccessorSearchAdapterTests
         Assert.Same(column, result.ColumnId);
     }
 
-    [Fact]
+    [AvaloniaFact]
     public void AccessorAdapter_Skips_PropertyPath_When_No_Accessor()
     {
         var items = new[]
@@ -59,7 +59,7 @@ public class DataGridAccessorSearchAdapterTests
         Assert.Empty(model.Results);
     }
 
-    [Fact]
+    [AvaloniaFact]
     public void AccessorAdapter_Throws_When_Missing_Accessor_And_Option_Set()
     {
         var items = new[]
@@ -80,7 +80,7 @@ public class DataGridAccessorSearchAdapterTests
             model.SetOrUpdate(new SearchDescriptor("Beta", comparison: StringComparison.OrdinalIgnoreCase)));
     }
 
-    [Fact]
+    [AvaloniaFact]
     public void AccessorAdapter_Raises_Diagnostics_When_Missing_Accessor()
     {
         var items = new[]
@@ -106,7 +106,7 @@ public class DataGridAccessorSearchAdapterTests
         Assert.Same(column, captured.Column);
     }
 
-    [Fact]
+    [AvaloniaFact]
     public void AccessorAdapter_Ignores_FillerColumns_In_StrictMode()
     {
         var items = new[]
@@ -129,7 +129,7 @@ public class DataGridAccessorSearchAdapterTests
         Assert.Empty(model.Results);
     }
 
-    [Fact]
+    [AvaloniaFact]
     public void AccessorAdapter_Uses_Column_Order_For_Fallback_Index()
     {
         var items = new[]
@@ -157,7 +157,7 @@ public class DataGridAccessorSearchAdapterTests
         Assert.Equal(1, result.ColumnIndex);
     }
 
-    [Fact]
+    [AvaloniaFact]
     public void AccessorAdapter_Uses_TextAccessor_When_Available()
     {
         var items = new[]
@@ -182,7 +182,7 @@ public class DataGridAccessorSearchAdapterTests
         Assert.Equal(0, accessor.ValueCalls);
     }
 
-    [Fact]
+    [AvaloniaFact]
     public void AccessorAdapter_Normalizes_Whitespace_And_Diacritics()
     {
         var items = new[]
@@ -208,7 +208,7 @@ public class DataGridAccessorSearchAdapterTests
         Assert.Equal(2, model.Results.Count);
     }
 
-    [Fact]
+    [AvaloniaFact]
     public void AccessorAdapter_WholeWord_Wildcard_Uses_Word_Boundaries()
     {
         var items = new[]
@@ -236,7 +236,7 @@ public class DataGridAccessorSearchAdapterTests
         Assert.DoesNotContain(model.Results, r => ReferenceEquals(r.Item, items[1]));
     }
 
-    [Fact]
+    [AvaloniaFact]
     public void AccessorAdapter_Wildcard_Default_Comparison_Is_CaseInsensitive()
     {
         var items = new[]
@@ -261,7 +261,7 @@ public class DataGridAccessorSearchAdapterTests
         Assert.Same(items[0], result.Item);
     }
 
-    [Fact]
+    [AvaloniaFact]
     public void AccessorAdapter_Wildcard_Default_Comparison_Is_CultureInvariant()
     {
         var originalCulture = CultureInfo.CurrentCulture;

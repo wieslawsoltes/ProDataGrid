@@ -14,7 +14,7 @@ public sealed class DiagnosticsUdpReceiver : IDisposable
 
     public DiagnosticsUdpReceiver(int port)
     {
-        _client = new UdpClient(port);
+        _client = CreateBoundClient(port);
     }
 
     public event Action<TelemetryPacket, IPEndPoint>? PacketReceived;
@@ -64,5 +64,14 @@ public sealed class DiagnosticsUdpReceiver : IDisposable
                 // Swallow malformed packets and transient socket errors.
             }
         }
+    }
+
+    private static UdpClient CreateBoundClient(int port)
+    {
+        var client = new UdpClient(AddressFamily.InterNetwork);
+        client.Client.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.ReuseAddress, true);
+        client.Client.ExclusiveAddressUse = false;
+        client.Client.Bind(new IPEndPoint(IPAddress.Any, port));
+        return client;
     }
 }

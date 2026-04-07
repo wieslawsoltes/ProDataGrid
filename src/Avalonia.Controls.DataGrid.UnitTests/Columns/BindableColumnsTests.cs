@@ -9,6 +9,7 @@ using System.Reflection;
 using System.Threading.Tasks;
 using Avalonia.Controls;
 using Avalonia.Markup.Xaml;
+using Avalonia.Headless.XUnit;
 using Avalonia.Data;
 using Xunit;
 
@@ -258,7 +259,7 @@ namespace Avalonia.Controls.DataGridTests.Columns
             Assert.Equal("Second", grid.ColumnsInternal.ItemsInternal.First(c => c is not DataGridFillerColumn).Header);
         }
 
-        [Fact]
+        [AvaloniaFact]
         public void Binding_OneWay_Replace_In_VM_Replaces_In_Grid()
         {
             var original = new DataGridTextColumn { Header = "First", Binding = new Binding("First") };

@@ -748,6 +748,126 @@ namespace Avalonia.Controls.DataGridTests.Hierarchical;
     }
 
     [Fact]
+    public void Incc_Add_WithSiblingComparer_RefreshesByDefault()
+    {
+        var root = new Item("root");
+        root.Children.Add(new Item("a"));
+        root.Children.Add(new Item("c"));
+
+        var model = new HierarchicalModel(new HierarchicalOptions
+        {
+            ChildrenSelector = item => ((Item)item).Children,
+            SiblingComparer = Comparer<object>.Create((x, y) =>
+                string.Compare(((Item)x).Name, ((Item)y).Name, StringComparison.Ordinal))
+        });
+
+        model.SetRoot(root);
+        model.Expand(model.Root!);
+
+        FlattenedChangedEventArgs? args = null;
+        model.FlattenedChanged += (_, e) => args = e;
+
+        root.Children.Add(new Item("d"));
+
+        var change = Assert.Single(args!.Changes);
+        Assert.Equal(1, change.Index);
+        Assert.Equal(2, change.OldCount);
+        Assert.Equal(3, change.NewCount);
+        Assert.Equal(new[] { "root", "a", "c", "d" }, model.Flattened.Select(node => ((Item)node.Item).Name).ToArray());
+    }
+
+    [Fact]
+    public void Incc_Add_WithSiblingComparerIncrementalMonotonic_UsesIncrementalChange()
+    {
+        var root = new Item("root");
+        root.Children.Add(new Item("a"));
+        root.Children.Add(new Item("c"));
+
+        var model = new HierarchicalModel(new HierarchicalOptions
+        {
+            ChildrenSelector = item => ((Item)item).Children,
+            SiblingComparer = Comparer<object>.Create((x, y) =>
+                string.Compare(((Item)x).Name, ((Item)y).Name, StringComparison.Ordinal)),
+            SiblingComparerCollectionChangeMode = SiblingComparerCollectionChangeMode.IncrementalMonotonic
+        });
+
+        model.SetRoot(root);
+        model.Expand(model.Root!);
+
+        FlattenedChangedEventArgs? args = null;
+        model.FlattenedChanged += (_, e) => args = e;
+
+        root.Children.Add(new Item("d"));
+
+        var change = Assert.Single(args!.Changes);
+        Assert.Equal(3, change.Index);
+        Assert.Equal(0, change.OldCount);
+        Assert.Equal(1, change.NewCount);
+        Assert.Equal(new[] { "root", "a", "c", "d" }, model.Flattened.Select(node => ((Item)node.Item).Name).ToArray());
+    }
+
+    [Fact]
+    public void Incc_Remove_WithSiblingComparerIncrementalMonotonic_UsesIncrementalChange()
+    {
+        var root = new Item("root");
+        root.Children.Add(new Item("a"));
+        root.Children.Add(new Item("c"));
+        root.Children.Add(new Item("d"));
+
+        var model = new HierarchicalModel(new HierarchicalOptions
+        {
+            ChildrenSelector = item => ((Item)item).Children,
+            SiblingComparer = Comparer<object>.Create((x, y) =>
+                string.Compare(((Item)x).Name, ((Item)y).Name, StringComparison.Ordinal)),
+            SiblingComparerCollectionChangeMode = SiblingComparerCollectionChangeMode.IncrementalMonotonic
+        });
+
+        model.SetRoot(root);
+        model.Expand(model.Root!);
+
+        FlattenedChangedEventArgs? args = null;
+        model.FlattenedChanged += (_, e) => args = e;
+
+        root.Children.RemoveAt(2);
+
+        var change = Assert.Single(args!.Changes);
+        Assert.Equal(3, change.Index);
+        Assert.Equal(1, change.OldCount);
+        Assert.Equal(0, change.NewCount);
+        Assert.Equal(new[] { "root", "a", "c" }, model.Flattened.Select(node => ((Item)node.Item).Name).ToArray());
+    }
+
+    [Fact]
+    public void Incc_Add_WithSiblingComparerIncrementalMonotonic_FallsBackToRefresh_WhenOrderBreaks()
+    {
+        var root = new Item("root");
+        root.Children.Add(new Item("a"));
+        root.Children.Add(new Item("c"));
+
+        var model = new HierarchicalModel(new HierarchicalOptions
+        {
+            ChildrenSelector = item => ((Item)item).Children,
+            SiblingComparer = Comparer<object>.Create((x, y) =>
+                string.Compare(((Item)x).Name, ((Item)y).Name, StringComparison.Ordinal)),
+            SiblingComparerCollectionChangeMode = SiblingComparerCollectionChangeMode.IncrementalMonotonic
+        });
+
+        model.SetRoot(root);
+        model.Expand(model.Root!);
+
+        FlattenedChangedEventArgs? args = null;
+        model.FlattenedChanged += (_, e) => args = e;
+
+        root.Children.Add(new Item("b"));
+
+        var change = Assert.Single(args!.Changes);
+        Assert.Equal(1, change.Index);
+        Assert.Equal(2, change.OldCount);
+        Assert.Equal(3, change.NewCount);
+        Assert.Equal(new[] { "root", "a", "b", "c" }, model.Flattened.Select(node => ((Item)node.Item).Name).ToArray());
+    }
+
+    [Fact]
     public void AutoExpandRoot_Respects_MaxDepth()
     {
         var root = new Item("root");
@@ -993,6 +1113,7 @@ namespace Avalonia.Controls.DataGridTests.Hierarchical;
         options.VirtualizeChildren = false;
         options.SiblingComparer = Comparer<Item>.Create((a, b) => string.Compare(a.Name, b.Name, StringComparison.Ordinal));
         options.SiblingComparerSelector = item => Comparer<Item>.Create((a, b) => string.Compare(a.Name, b.Name, StringComparison.Ordinal));
+        options.SiblingComparerCollectionChangeMode = SiblingComparerCollectionChangeMode.IncrementalMonotonic;
         options.IsLeafSelector = item => item.Children.Count == 0;
         options.ChildrenPropertyPath = nameof(Item.Children);
 
@@ -1000,6 +1121,7 @@ namespace Avalonia.Controls.DataGridTests.Hierarchical;
         Assert.False(model.Options.VirtualizeChildren);
         Assert.NotNull(model.Options.SiblingComparer);
         Assert.NotNull(model.Options.SiblingComparerSelector);
+        Assert.Equal(SiblingComparerCollectionChangeMode.IncrementalMonotonic, model.Options.SiblingComparerCollectionChangeMode);
         Assert.NotNull(model.Options.IsLeafSelector);
         Assert.Equal(nameof(Item.Children), model.Options.ChildrenPropertyPath);
     }

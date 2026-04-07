@@ -1,0 +1,165 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:Avalonia.Diagnostics.ViewModels"
+             x:Class="Avalonia.Diagnostics.Views.MetricsPageView"
+             x:DataType="vm:MetricsPageViewModel">
+  <Grid RowDefinitions="Auto,Auto,*,Auto">
+    <StackPanel Grid.Row="0"
+                Margin="8,6,8,4"
+                Orientation="Horizontal"
+                Spacing="12">
+      <TextBlock Text="{Binding SeriesCount, StringFormat=Series: {0}}" />
+      <TextBlock Text="{Binding VisibleSeriesCount, StringFormat=Visible: {0}}" />
+      <TextBlock Text="{Binding TotalMeasurements, StringFormat=Measurements: {0}}" />
+      <TextBlock Text="{Binding RemotePacketCount, StringFormat=Remote: {0}}"
+                 Foreground="Gray" />
+      <TextBlock Text="{Binding DroppedLocalPacketCount, StringFormat=Dropped Local: {0}}"
+                 Foreground="Gray" />
+      <TextBlock Text="{Binding DroppedUnknownSessionMetricCount, StringFormat=Dropped Unknown: {0}}"
+                 Foreground="Gray" />
+      <TextBlock Text="{Binding DroppedQueueMeasurementCount, StringFormat=Dropped Queue: {0}}"
+                 Foreground="Gray" />
+      <TextBlock Text="{Binding DroppedSessionCount, StringFormat=Dropped Sessions: {0}}"
+                 Foreground="Gray" />
+      <TextBlock Text="{Binding IsLocalCaptureEnabled, StringFormat=Local Capture: {0}}"
+                 Foreground="Gray" />
+      <TextBlock Text="{Binding RemoteStatusText}"
+                 Foreground="Gray" />
+    </StackPanel>
+
+    <FilterTextBox Grid.Row="1"
+                   Margin="8,0,8,4"
+                   DataContext="{Binding MetricsFilter}"
+                   Text="{Binding FilterString}"
+                   Watermark="Filter metrics"
+                   UseCaseSensitiveFilter="{Binding UseCaseSensitiveFilter}"
+                   UseWholeWordFilter="{Binding UseWholeWordFilter}"
+                   UseRegexFilter="{Binding UseRegexFilter}" />
+
+    <DataGrid Grid.Row="2"
+              Margin="8,0,8,4"
+              ItemsSource="{Binding SeriesView}"
+              SelectedItem="{Binding SelectedSeries, Mode=TwoWay}"
+              AutoGenerateColumns="False"
+              HeadersVisibility="Column"
+              BorderThickness="0"
+              SelectionMode="Single"
+              CanUserResizeColumns="True"
+              CanUserReorderColumns="False"
+              CanUserSortColumns="True">
+      <DataGrid.Columns>
+        <DataGridTextColumn Header="Metric"
+                            Binding="{Binding InstrumentName}"
+                            Width="2*"
+                            IsReadOnly="True"
+                            x:DataType="vm:MetricSeriesViewModel" />
+        <DataGridTextColumn Header="Meter"
+                            Binding="{Binding MeterName}"
+                            Width="1.4*"
+                            IsReadOnly="True"
+                            x:DataType="vm:MetricSeriesViewModel" />
+        <DataGridTextColumn Header="Type"
+                            Binding="{Binding InstrumentType}"
+                            Width="1.3*"
+                            IsReadOnly="True"
+                            x:DataType="vm:MetricSeriesViewModel" />
+        <DataGridTextColumn Header="Unit"
+                            Binding="{Binding Unit}"
+                            Width="0.8*"
+                            IsReadOnly="True"
+                            x:DataType="vm:MetricSeriesViewModel" />
+        <DataGridTextColumn Header="Last"
+                            Binding="{Binding LastValue, StringFormat={}{0:F3}}"
+                            Width="0.9*"
+                            IsReadOnly="True"
+                            x:DataType="vm:MetricSeriesViewModel" />
+        <DataGridTextColumn Header="Avg"
+                            Binding="{Binding AverageValue, StringFormat={}{0:F3}}"
+                            Width="0.9*"
+                            IsReadOnly="True"
+                            x:DataType="vm:MetricSeriesViewModel" />
+        <DataGridTextColumn Header="Min"
+                            Binding="{Binding MinValue, StringFormat={}{0:F3}}"
+                            Width="0.9*"
+                            IsReadOnly="True"
+                            x:DataType="vm:MetricSeriesViewModel" />
+        <DataGridTextColumn Header="Max"
+                            Binding="{Binding MaxValue, StringFormat={}{0:F3}}"
+                            Width="0.9*"
+                            IsReadOnly="True"
+                            x:DataType="vm:MetricSeriesViewModel" />
+        <DataGridTextColumn Header="Samples"
+                            Binding="{Binding SampleCount}"
+                            Width="0.9*"
+                            IsReadOnly="True"
+                            x:DataType="vm:MetricSeriesViewModel" />
+        <DataGridTextColumn Header="Trend"
+                            Binding="{Binding Trend}"
+                            Width="0.8*"
+                            IsReadOnly="True"
+                            x:DataType="vm:MetricSeriesViewModel" />
+        <DataGridTextColumn Header="Updated"
+                            Binding="{Binding LastTimestamp, StringFormat={}{0:HH:mm:ss.fff}}"
+                            Width="1.2*"
+                            IsReadOnly="True"
+                            x:DataType="vm:MetricSeriesViewModel" />
+        <DataGridTextColumn Header="Tags"
+                            Binding="{Binding TagsSummary}"
+                            Width="2.4*"
+                            IsReadOnly="True"
+                            x:DataType="vm:MetricSeriesViewModel" />
+      </DataGrid.Columns>
+    </DataGrid>
+
+    <WrapPanel Grid.Row="3"
+               Margin="8,0,8,6"
+               Orientation="Horizontal">
+      <TextBlock Text="Types:"
+                 Margin="0,0,6,0"
+                 VerticalAlignment="Center" />
+      <CheckBox Content="Counters"
+                IsChecked="{Binding ShowCounters}"
+                Margin="0,0,6,0" />
+      <CheckBox Content="Histograms"
+                IsChecked="{Binding ShowHistograms}"
+                Margin="0,0,6,0" />
+      <CheckBox Content="Gauges"
+                IsChecked="{Binding ShowGauges}"
+                Margin="0,0,6,0" />
+      <CheckBox Content="Observable"
+                IsChecked="{Binding ShowObservable}"
+                Margin="0,0,6,0" />
+      <CheckBox Content="Other"
+                IsChecked="{Binding ShowOther}"
+                Margin="0,0,10,0" />
+      <TextBlock Text="Max series"
+                 Margin="0,0,4,0"
+                 VerticalAlignment="Center" />
+      <NumericUpDown Width="90"
+                     Minimum="1"
+                     Maximum="10000"
+                     Value="{Binding MaxSeries}"
+                     VerticalAlignment="Center" />
+      <TextBlock Text="Max samples"
+                 Margin="10,0,4,0"
+                 VerticalAlignment="Center" />
+      <NumericUpDown Width="90"
+                     Minimum="2"
+                     Maximum="10000"
+                     Value="{Binding MaxSamplesPerSeries}"
+                     VerticalAlignment="Center" />
+      <Button Content="Reconnect"
+              Margin="10,0,0,0"
+              Command="{Binding RefreshObservableMetrics}"
+              VerticalAlignment="Center" />
+      <Button Content="{Binding ToggleUpdatesText}"
+              Margin="6,0,0,0"
+              Command="{Binding PauseOrResumeUpdates}"
+              VerticalAlignment="Center" />
+      <Button Content="Clear"
+              Margin="6,0,0,0"
+              Command="{Binding Clear}"
+              VerticalAlignment="Center" />
+    </WrapPanel>
+  </Grid>
+</UserControl>

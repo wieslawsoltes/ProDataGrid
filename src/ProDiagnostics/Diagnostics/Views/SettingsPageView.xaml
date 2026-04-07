@@ -1,0 +1,60 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:Avalonia.Diagnostics.ViewModels"
+             x:Class="Avalonia.Diagnostics.Views.SettingsPageView"
+             x:DataType="vm:SettingsPageViewModel">
+  <ScrollViewer HorizontalScrollBarVisibility="Disabled"
+                VerticalScrollBarVisibility="Auto">
+    <StackPanel Margin="12"
+                Spacing="10">
+      <TextBlock Text="DevTools Settings"
+                 FontSize="16"
+                 FontWeight="Bold" />
+
+      <TextBlock Text="Overlay"
+                 FontWeight="SemiBold" />
+      <WrapPanel Orientation="Horizontal"
+                 ItemHeight="26">
+        <CheckBox Content="Visualize margin/padding"
+                  IsChecked="{Binding VisualizeMarginPaddingOverlay}"
+                  Margin="0,0,12,0" />
+        <CheckBox Content="Show overlay info"
+                  IsChecked="{Binding ShowOverlayInfo}"
+                  Margin="0,0,12,0" />
+        <CheckBox Content="Show overlay rulers"
+                  IsChecked="{Binding ShowOverlayRulers}"
+                  Margin="0,0,12,0" />
+        <CheckBox Content="Show extension lines"
+                  IsChecked="{Binding ShowOverlayExtensionLines}"
+                  Margin="0,0,12,0" />
+      </WrapPanel>
+
+      <TextBlock Text="Inspection"
+                 FontWeight="SemiBold" />
+      <WrapPanel Orientation="Horizontal"
+                 ItemHeight="26">
+        <CheckBox Content="Highlight elements"
+                  IsChecked="{Binding HighlightElements}"
+                  Margin="0,0,12,0" />
+        <CheckBox Content="Live hover overlay"
+                  IsChecked="{Binding LiveHoverOverlay}"
+                  Margin="0,0,12,0" />
+        <CheckBox Content="Track focused control"
+                  IsChecked="{Binding TrackFocusedControl}"
+                  Margin="0,0,12,0" />
+        <CheckBox Content="Show implemented interfaces in details"
+                  IsChecked="{Binding ShowImplementedInterfaces}"
+                  Margin="0,0,12,0" />
+      </WrapPanel>
+
+      <StackPanel Orientation="Horizontal"
+                  Spacing="8">
+        <Button Content="Reset overlay defaults"
+                Command="{Binding ResetOverlayDefaults}" />
+      </StackPanel>
+
+      <TextBlock Foreground="Gray"
+                 Text="Settings are applied immediately and can also be configured using DevToolsOptions." />
+    </StackPanel>
+  </ScrollViewer>
+</UserControl>

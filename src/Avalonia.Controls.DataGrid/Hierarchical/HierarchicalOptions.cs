@@ -10,6 +10,28 @@ using System.Threading.Tasks;
 namespace Avalonia.Controls.DataGridHierarchical
 {
     /// <summary>
+    /// Controls how collection change notifications are handled when sibling comparers are active.
+    /// </summary>
+    #if !DATAGRID_INTERNAL
+    public
+    #else
+    internal
+    #endif
+    enum SiblingComparerCollectionChangeMode
+    {
+        /// <summary>
+        /// Always use refresh fallback when a comparer is active.
+        /// </summary>
+        RefreshFallback,
+
+        /// <summary>
+        /// Attempts incremental add/remove handling when the change keeps comparer order.
+        /// Falls back to refresh when order cannot be preserved safely.
+        /// </summary>
+        IncrementalMonotonic
+    }
+
+    /// <summary>
     /// Defines how expanded nodes are matched when restoring expansion state.
     /// </summary>
     #if !DATAGRID_INTERNAL
@@ -84,6 +106,11 @@ namespace Avalonia.Controls.DataGridHierarchical
         /// Optional selector for per-node sibling comparers. When provided, this takes precedence over <see cref="SiblingComparer"/>.
         /// </summary>
         public Func<object, IComparer<object>?>? SiblingComparerSelector { get; set; }
+
+        /// <summary>
+        /// Controls collection-change handling when a sibling comparer is active.
+        /// </summary>
+        public SiblingComparerCollectionChangeMode SiblingComparerCollectionChangeMode { get; set; }
 
         /// <summary>
         /// Optional delegate that determines whether an item should be treated as a leaf before

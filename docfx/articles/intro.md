@@ -19,7 +19,7 @@ ProDataGrid is a high-performance DataGrid control for Avalonia. It builds on th
 | Editing & navigation | In-place editing, commit/cancel flow, keyboard navigation, clipboard copy and export. |
 | Data operations | Sorting, filtering, grouping, paging, and search via `DataGridCollectionView` and model adapters. |
 | Styling & theming | Fluent/Simple v2 templates, theme resources, control themes, pseudo-classes for states. |
-| State & diagnostics | Capture/restore state, selection stability, row lifecycle hooks for diagnostics. |
+| State & diagnostics | Capture/restore state, selection stability, row lifecycle hooks, and ProDiagnostics (managed + remote attach/web diagnostics tooling). |
 
 ## Architecture Snapshot
 
