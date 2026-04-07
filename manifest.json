@@ -1628,6 +1628,20 @@
     },
     {
       "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.DataGridDragDrop.DataGridRowDragSession.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.DataGridDragDrop.DataGridRowDragSession.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.DataGridDragDrop.DataGridRowDragSession",
+      "Summary": "<p sourcefile=\"api/Avalonia.Controls.DataGridDragDrop.DataGridRowDragSession.yml\" sourcestartlinenumber=\"1\">Represents the live state of an active row drag operation.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
       "source_relative_path": "api/Avalonia.Controls.DataGridDragDrop.DataGridRowDropEventArgs.yml",
       "output": {
         ".html": {
@@ -4372,6 +4386,20 @@
     },
     {
       "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.DataGridRowDragCanceledEventArgs.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.DataGridRowDragCanceledEventArgs.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.DataGridRowDragCanceledEventArgs",
+      "Summary": "<p sourcefile=\"api/Avalonia.Controls.DataGridRowDragCanceledEventArgs.yml\" sourcestartlinenumber=\"1\">Provides data for the <xref href=\"Avalonia.Controls.DataGrid.RowDragCanceled\" data-throw-if-not-resolved=\"false\"></xref> event.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
       "source_relative_path": "api/Avalonia.Controls.DataGridRowDragCompletedEventArgs.yml",
       "output": {
         ".html": {
@@ -4386,6 +4414,20 @@
     },
     {
       "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.DataGridRowDragStartedEventArgs.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.DataGridRowDragStartedEventArgs.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.DataGridRowDragStartedEventArgs",
+      "Summary": "<p sourcefile=\"api/Avalonia.Controls.DataGridRowDragStartedEventArgs.yml\" sourcestartlinenumber=\"1\">Provides data for the <xref href=\"Avalonia.Controls.DataGrid.RowDragStarted\" data-throw-if-not-resolved=\"false\"></xref> event.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
       "source_relative_path": "api/Avalonia.Controls.DataGridRowDragStartingEventArgs.yml",
       "output": {
         ".html": {
@@ -4397,6 +4439,20 @@
       "IsMRef": true,
       "Title": "Avalonia.Controls.DataGridRowDragStartingEventArgs",
       "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.DataGridRowDragUpdatedEventArgs.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.DataGridRowDragUpdatedEventArgs.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.DataGridRowDragUpdatedEventArgs",
+      "Summary": "<p sourcefile=\"api/Avalonia.Controls.DataGridRowDragUpdatedEventArgs.yml\" sourcestartlinenumber=\"1\">Provides data for the <xref href=\"Avalonia.Controls.DataGrid.RowDragUpdated\" data-throw-if-not-resolved=\"false\"></xref> event.</p>\n"
     },
     {
       "type": "ManagedReference",
@@ -9577,6 +9633,16 @@
       "output": {
         ".html": {
           "relative_path": "articles/row-details-and-templates.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "Conceptual",
+      "source_relative_path": "articles/row-drag-sessions.md",
+      "output": {
+        ".html": {
+          "relative_path": "articles/row-drag-sessions.html"
         }
       },
       "version": ""

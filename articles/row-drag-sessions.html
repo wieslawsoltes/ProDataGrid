@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+      <title>Row Drag Sessions | ProDataGrid for Avalonia </title>
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <meta name="title" content="Row Drag Sessions | ProDataGrid for Avalonia ">
+      
+      
+      <link rel="icon" href="../favicon.ico">
+      <link rel="stylesheet" href="../public/docfx.min.css">
+      <link rel="stylesheet" href="../public/main.css">
+      <meta name="docfx:navrel" content="../toc.html">
+      <meta name="docfx:tocrel" content="toc.html">
+      
+      
+      
+      
+      <meta name="docfx:docurl" content="https://github.com/wieslawsoltes/ProDataGrid/blob/master/docfx/articles/row-drag-sessions.md/#L1">
+      <meta name="loc:inThisArticle" content="In this article">
+      <meta name="loc:searchResultsCount" content="{count} results for &quot;{query}&quot;">
+      <meta name="loc:searchNoResults" content="No results for &quot;{query}&quot;">
+      <meta name="loc:tocFilter" content="Filter by title">
+      <meta name="loc:nextArticle" content="Next">
+      <meta name="loc:prevArticle" content="Previous">
+      <meta name="loc:themeLight" content="Light">
+      <meta name="loc:themeDark" content="Dark">
+      <meta name="loc:themeAuto" content="Auto">
+      <meta name="loc:changeTheme" content="Change theme">
+      <meta name="loc:copy" content="Copy">
+      <meta name="loc:downloadPdf" content="Download PDF">
+
+      <script type="module" src="./../public/docfx.min.js"></script>
+
+      <script>
+        const theme = localStorage.getItem('theme') || 'auto'
+        document.documentElement.setAttribute('data-bs-theme', theme === 'auto' ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light') : theme)
+      </script>
+
+  </head>
+
+  <body class="tex2jax_ignore" data-layout="" data-yaml-mime="">
+    <header class="bg-body border-bottom">
+      <nav id="autocollapse" class="navbar navbar-expand-md" role="navigation">
+        <div class="container-xxl flex-nowrap">
+          <a class="navbar-brand" href="../index.html">
+            <img id="logo" class="svg" src="../images/logo.svg" alt="">
+            
+          </a>
+          <button class="btn btn-lg d-md-none border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navpanel" aria-controls="navpanel" aria-expanded="false" aria-label="Toggle navigation">
+            <i class="bi bi-three-dots"></i>
+          </button>
+          <div class="collapse navbar-collapse" id="navpanel">
+            <div id="navbar">
+            </div>
+          </div>
+        </div>
+      </nav>
+    </header>
+
+    <main class="container-xxl">
+      <div class="toc-offcanvas">
+        <div class="offcanvas-md offcanvas-start" tabindex="-1" id="tocOffcanvas" aria-labelledby="tocOffcanvasLabel">
+          <div class="offcanvas-header">
+            <h5 class="offcanvas-title" id="tocOffcanvasLabel">Table of Contents</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="offcanvas" data-bs-target="#tocOffcanvas" aria-label="Close"></button>
+          </div>
+          <div class="offcanvas-body">
+            <nav class="toc" id="toc"></nav>
+          </div>
+        </div>
+      </div>
+
+      <div class="content">
+        <div class="actionbar">
+          <button class="btn btn-lg border-0 d-md-none" type="button" data-bs-toggle="offcanvas" data-bs-target="#tocOffcanvas" aria-controls="tocOffcanvas" aria-expanded="false" aria-label="Show table of contents">
+            <i class="bi bi-list"></i>
+          </button>
+
+          <nav id="breadcrumb"></nav>
+        </div>
+
+        <article data-uid="">
+<h1 id="row-drag-sessions">Row Drag Sessions</h1>
+
+<p>Issue <a href="https://github.com/wieslawsoltes/ProDataGrid/issues/299">#299</a> requested a proper row drag session model with live operation updates, modifier handling, custom feedback support, and better coordination with selection drag.</p>
+<p>This article documents the resulting API and the deliberate divergences from the original proposal.</p>
+<h2 id="what-was-added">What Was Added</h2>
+<p>Public API additions:</p>
+<ul>
+<li><code>DataGridRowDragSession</code></li>
+<li><code>DataGrid.ActiveRowDragSession</code></li>
+<li><code>DataGrid.RowDragFeedbackTemplate</code></li>
+<li><code>DataGrid.RowDragFeedbackOffset</code></li>
+<li><code>DataGrid.RowDragStarted</code></li>
+<li><code>DataGrid.RowDragUpdated</code></li>
+<li><code>DataGrid.RowDragCanceled</code></li>
+</ul>
+<p>Existing APIs were enriched:</p>
+<ul>
+<li><code>DataGridRowDragStartingEventArgs.Session</code></li>
+<li><code>DataGridRowDragCompletedEventArgs.Session</code></li>
+<li><code>DataGridRowDropEventArgs.Session</code></li>
+<li><code>DataGridRowDropEventArgs.PointerPosition</code></li>
+<li><code>DataGridRowDropEventArgs.KeyModifiers</code></li>
+<li><code>DataGridRowDropEventArgs.HoveredRow</code></li>
+<li><code>DataGridRowDropEventArgs.HoveredItem</code></li>
+<li><code>DataGridRowDragDropOptions.SuppressSelectionDragFromDragHandle</code></li>
+</ul>
+<p>Existing drop handlers now use a corrected effect split:</p>
+<ul>
+<li><code>DataGridRowDropEventArgs.RequestedEffect</code>: modifier-derived request</li>
+<li><code>DataGridRowDropEventArgs.EffectiveEffect</code>: writable approved effect</li>
+</ul>
+<h2 id="session-semantics">Session Semantics</h2>
+<p><code>DataGridRowDragSession</code> is the single source of truth for the active drag.</p>
+<p>Use it for:</p>
+<ul>
+<li>source items and indices</li>
+<li>live pointer and modifier state</li>
+<li>hovered row vs actionable target row</li>
+<li>current drop zone and insert index</li>
+<li>modifier-requested effect vs application-approved effect</li>
+<li>custom feedback text through <code>FeedbackCaption</code></li>
+</ul>
+<p>Important distinction:</p>
+<ul>
+<li><code>RequestedEffect</code> is the modifier-derived request for the current moment.</li>
+<li><code>EffectiveEffect</code> is the effect that the application has approved after validation.</li>
+</ul>
+<p>That distinction is what allows the control to support real-time transitions such as <code>Copy -&gt; None -&gt; Move</code> in one drag.</p>
+<h2 id="terminal-lifecycle">Terminal Lifecycle</h2>
+<p>The terminal events are now disjoint:</p>
+<ul>
+<li><code>RowDragCompleted</code> means a drop committed.</li>
+<li><code>RowDragCanceled</code> means the drag ended without a committed drop.</li>
+</ul>
+<h2 id="update-flow">Update Flow</h2>
+<p>During <code>DragOver</code>, the controller:</p>
+<ol>
+<li>Resolves the shared session from the drag payload.</li>
+<li>Updates pointer, modifier, hovered row, target row, and drop zone state.</li>
+<li>Computes the modifier-derived <code>RequestedEffect</code>.</li>
+<li>Initializes the session <code>EffectiveEffect</code>.</li>
+<li>Calls <code>IDataGridRowDropHandler.Validate</code>.</li>
+<li>Lets the handler mutate <code>EffectiveEffect</code>.</li>
+<li>Finalizes <code>IsValidTarget</code> and the coerced effective effect.</li>
+<li>Raises <code>RowDragUpdated</code>.</li>
+<li>Applies the final <code>EffectiveEffect</code> to native feedback and in-grid visuals.</li>
+</ol>
+<h2 id="handler-pattern">Handler Pattern</h2>
+<p>Use <code>Validate</code> for continuous recomputation and <code>Execute</code> for the committed drop:</p>
+<pre><code class="lang-csharp">private sealed class MyDropHandler : IDataGridRowDropHandler
+{
+    private readonly DataGridRowReorderHandler _reorder = new();
+
+    public bool Validate(DataGridRowDropEventArgs args)
+    {
+        var valid = args.RequestedEffect == DragDropEffects.Copy
+            ? CanCopyHere(args)
+            : _reorder.Validate(args);
+
+        if (!valid)
+        {
+            args.EffectiveEffect = DragDropEffects.None;
+            if (args.Session != null)
+            {
+                args.Session.FeedbackCaption = &quot;Drop here is not allowed.&quot;;
+            }
+            return false;
+        }
+
+        args.EffectiveEffect = args.RequestedEffect == DragDropEffects.Copy
+            ? DragDropEffects.Copy
+            : DragDropEffects.Move;
+
+        if (args.Session != null)
+        {
+            args.Session.FeedbackCaption = $&quot;{args.EffectiveEffect} {args.Items.Count} row(s).&quot;;
+        }
+
+        return true;
+    }
+
+    public bool Execute(DataGridRowDropEventArgs args)
+    {
+        return _reorder.Execute(args);
+    }
+}
+</code></pre>
+<p>Built-in reorder handlers stay move-only. Copy scenarios are expected to use a custom handler that approves <code>EffectiveEffect = Copy</code> and performs the copy in <code>Execute</code>.</p>
+<h2 id="feedback-template">Feedback Template</h2>
+<p><code>RowDragFeedbackTemplate</code> renders inside the grid adorner layer and binds to the active session.</p>
+<p>Use it to show:</p>
+<ul>
+<li>the current effective operation</li>
+<li>invalid-target explanations</li>
+<li>target-specific captions</li>
+<li>item counts or domain-specific status</li>
+</ul>
+<p>Example:</p>
+<pre><code class="lang-xml">&lt;DataGrid RowDragFeedbackOffset=&quot;18,20&quot;&gt;
+  &lt;DataGrid.RowDragFeedbackTemplate&gt;
+    &lt;DataTemplate x:DataType=&quot;DataGridDragDrop:DataGridRowDragSession&quot;&gt;
+      &lt;Border Padding=&quot;10,8&quot;&gt;
+        &lt;StackPanel&gt;
+          &lt;TextBlock Text=&quot;{Binding EffectiveEffect}&quot; /&gt;
+          &lt;TextBlock Text=&quot;{Binding FeedbackCaption}&quot; /&gt;
+        &lt;/StackPanel&gt;
+      &lt;/Border&gt;
+    &lt;/DataTemplate&gt;
+  &lt;/DataGrid.RowDragFeedbackTemplate&gt;
+&lt;/DataGrid&gt;
+</code></pre>
+<h2 id="selection-coordination">Selection Coordination</h2>
+<p><code>SuppressSelectionDragFromDragHandle</code> exists to solve the gesture conflict raised in the issue:</p>
+<ul>
+<li>row drag should start from the configured drag surface</li>
+<li>press-to-select should still work</li>
+<li>selection range-drag should not take over the same gesture when drag intent is clear</li>
+</ul>
+<p>This is especially important when <code>RowDragHandle=&quot;Row&quot;</code> or <code>RowDragHandle=&quot;RowHeaderAndRow&quot;</code>.</p>
+<h2 id="divergences-from-issue-299">Divergences From Issue 299</h2>
+<p>There is one intentional divergence from the original proposal.</p>
+<p>No separate native source-side drag badge API was added.
+Reason: Avalonia exposes effect feedback through <code>DragEffects</code>, but not a public source-side custom drag-UI pipeline comparable to WPF <code>GiveFeedback</code>. The grid therefore adds a cross-platform templated in-grid feedback layer.</p>
+<h2 id="samples">Samples</h2>
+<p>The sample app contains two pages that exercise the full issue-299 scope:</p>
+<ul>
+<li><code>Row Drag &amp; Drop</code>: move/copy transitions, invalid pinned-lane targets, custom feedback badge, and the new selection-drag option.</li>
+<li><code>Hierarchical Row Drag &amp; Drop</code>: before/after/inside targeting, invalid inside drops for leaf-only nodes, and live session inspection.</li>
+</ul>
+
+</article>
+
+        <div class="contribution d-print-none">
+          <a href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/docfx/articles/row-drag-sessions.md/#L1" class="edit-link">Edit this page</a>
+        </div>
+
+        <div class="next-article d-print-none border-top" id="nextArticle"></div>
+
+      </div>
+
+      <div class="affix">
+        <nav id="affix"></nav>
+      </div>
+    </main>
+
+
+    <footer class="border-top text-secondary">
+      <div class="container-xxl">
+        <div class="flex-fill">
+          <span>Made with <a href="https://dotnet.github.io/docfx">docfx</a></span>
+        </div>
+      </div>
+    </footer>
+  </body>
+</html>

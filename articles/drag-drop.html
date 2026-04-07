@@ -83,66 +83,146 @@
         <article data-uid="">
 <h1 id="drag-and-drop">Drag and Drop</h1>
 
-<p>ProDataGrid provides opt-in row drag and drop with built-in visuals and auto-scroll. You can target flat or hierarchical lists with pluggable handlers.</p>
+<p>ProDataGrid provides opt-in row drag and drop with built-in visuals, auto-scroll, and a first-class live drag-session API. You can target flat or hierarchical lists with pluggable handlers and keep drag feedback synchronized with modifier changes and target validation.</p>
 <h2 id="row-drag-and-drop-quick-start">Row Drag and Drop Quick Start</h2>
 <ul>
-<li>Turn on <code>CanUserReorderRows=&quot;True&quot;</code> (default handle is the row header) and choose <code>RowDragHandle</code> (<code>RowHeader</code>, <code>Row</code>, or <code>RowHeaderAndRow</code>).</li>
-<li>Toggle <code>RowDragHandleVisible</code> to show or hide the drag handle glyph.</li>
-<li>Configure effects via <code>RowDragDropOptions</code> (<code>AllowedEffects</code>, <code>DragSelectedRows</code>, and drag thresholds) and plug in a drop handler when you need custom moves. Built-ins: <code>DataGridRowReorderHandler</code> (flat lists) and <code>DataGridHierarchicalRowReorderHandler</code> (hierarchical; supports before/after/inside like TreeDataGrid).</li>
-<li><code>RowDragStarting</code>/<code>RowDragCompleted</code> are routed events for telemetry/customization; the grid auto-updates selection after a successful drop.</li>
-<li>Dropping in the top/bottom thirds of a hierarchical row inserts before/after; the middle inserts inside that node's children.</li>
+<li>Turn on <code>CanUserReorderRows=&quot;True&quot;</code> and choose <code>RowDragHandle</code> (<code>RowHeader</code>, <code>Row</code>, or <code>RowHeaderAndRow</code>).</li>
+<li>Toggle <code>RowDragHandleVisible</code> to show or hide the grip.</li>
+<li>Configure <code>RowDragDropOptions</code> for allowed effects, thresholds, multi-row drag behavior, and selection-drag coordination.</li>
+<li>Use a <code>RowDropHandler</code> when you need custom validation or copy/move logic.</li>
+<li>Bind to <code>ActiveRowDragSession</code> or subscribe to <code>RowDragStarted</code> / <code>RowDragUpdated</code> / <code>RowDragCanceled</code> / <code>RowDragCompleted</code> when you need live state.</li>
 </ul>
 <pre><code class="lang-xml">&lt;DataGrid ItemsSource=&quot;{Binding Items}&quot;
           CanUserReorderRows=&quot;True&quot;
           RowDragHandle=&quot;RowHeaderAndRow&quot;
           RowDragHandleVisible=&quot;{Binding ShowHandle}&quot;
           RowDragDropOptions=&quot;{Binding Options}&quot;
-          RowDropHandler=&quot;{Binding DropHandler}&quot; /&gt;
+          RowDropHandler=&quot;{Binding DropHandler}&quot;
+          RowDragFeedbackOffset=&quot;18,20&quot;&gt;
+  &lt;DataGrid.RowDragFeedbackTemplate&gt;
+    &lt;DataTemplate x:DataType=&quot;DataGridDragDrop:DataGridRowDragSession&quot;&gt;
+      &lt;Border Padding=&quot;10,8&quot;&gt;
+        &lt;StackPanel&gt;
+          &lt;TextBlock Text=&quot;{Binding EffectiveEffect}&quot; /&gt;
+          &lt;TextBlock Text=&quot;{Binding FeedbackCaption}&quot; /&gt;
+        &lt;/StackPanel&gt;
+      &lt;/Border&gt;
+    &lt;/DataTemplate&gt;
+  &lt;/DataGrid.RowDragFeedbackTemplate&gt;
+&lt;/DataGrid&gt;
 </code></pre>
 <pre><code class="lang-csharp">using Avalonia.Controls.DataGridDragDrop;
 using Avalonia.Input;
 
-public DataGridRowDragDropOptions Options { get; } = new DataGridRowDragDropOptions
+public DataGridRowDragDropOptions Options { get; } = new()
 {
     AllowedEffects = DragDropEffects.Move | DragDropEffects.Copy,
-    DragSelectedRows = true
+    DragSelectedRows = true,
+    SuppressSelectionDragFromDragHandle = true
 };
 
-public IDataGridRowDropHandler DropHandler { get; } = new DataGridRowReorderHandler();
+public IDataGridRowDropHandler DropHandler { get; } = new CustomRowDropHandler();
 </code></pre>
-<h2 id="drop-visuals-and-styling">Drop Visuals and Styling</h2>
+<h2 id="session-api">Session API</h2>
+<p><code>DataGridRowDragSession</code> represents the live state of one active drag operation.</p>
+<p>Key properties include:</p>
+<ul>
+<li><code>Items</code>, <code>SourceIndices</code>, <code>FromSelection</code></li>
+<li><code>PointerPosition</code>, <code>KeyModifiers</code></li>
+<li><code>HoveredRow</code>, <code>HoveredItem</code>, <code>TargetRow</code>, <code>TargetItem</code></li>
+<li><code>DropPosition</code>, <code>InsertIndex</code></li>
+<li><code>RequestedEffect</code>, <code>EffectiveEffect</code></li>
+<li><code>IsValidTarget</code>, <code>IsCanceled</code>, <code>ResultEffect</code></li>
+<li><code>FeedbackCaption</code></li>
+</ul>
+<p><code>ActiveRowDragSession</code> is a read-only direct property on <code>DataGrid</code>. It is <code>null</code> when no drag is active.</p>
+<h2 id="lifecycle-events">Lifecycle Events</h2>
+<p>Row drag/drop now exposes the full lifecycle:</p>
+<ul>
+<li><code>RowDragStarting</code></li>
+<li><code>RowDragStarted</code></li>
+<li><code>RowDragUpdated</code></li>
+<li><code>RowDragCanceled</code></li>
+<li><code>RowDragCompleted</code></li>
+</ul>
+<p><code>RowDragCompleted</code> now means a committed drop. Canceled or aborted drags raise only <code>RowDragCanceled</code>.</p>
+<h2 id="live-operation-recalculation">Live Operation Recalculation</h2>
+<p><code>IDataGridRowDropHandler.Validate</code> is called continuously during drag-over. The handler receives a <code>DataGridRowDropEventArgs</code> instance with:</p>
+<ul>
+<li><code>RequestedEffect</code>: the modifier-derived effect before application validation</li>
+<li><code>EffectiveEffect</code>: the writable application-approved effect</li>
+<li><code>Session</code>: the active <code>DataGridRowDragSession</code></li>
+<li><code>PointerPosition</code>, <code>KeyModifiers</code>, <code>HoveredRow</code>, <code>HoveredItem</code></li>
+</ul>
+<p>Typical pattern:</p>
+<pre><code class="lang-csharp">public bool Validate(DataGridRowDropEventArgs args)
+{
+    var valid = args.RequestedEffect == DragDropEffects.Copy
+        ? CanCopyHere(args)
+        : _reorder.Validate(args);
+
+    if (!valid)
+    {
+        args.EffectiveEffect = DragDropEffects.None;
+        if (args.Session != null)
+        {
+            args.Session.FeedbackCaption = &quot;Drop here is not allowed.&quot;;
+        }
+        return false;
+    }
+
+    args.EffectiveEffect = args.RequestedEffect == DragDropEffects.Copy
+        ? DragDropEffects.Copy
+        : DragDropEffects.Move;
+
+    if (args.Session != null)
+    {
+        args.Session.FeedbackCaption = args.EffectiveEffect == DragDropEffects.Copy
+            ? &quot;Copy rows here.&quot;
+            : &quot;Move rows here.&quot;;
+    }
+
+    return true;
+}
+</code></pre>
+<p>This allows transitions such as <code>Move -&gt; Copy -&gt; None -&gt; Move</code> during the same drag.</p>
+<p>Built-in <code>DataGridRowReorderHandler</code> and <code>DataGridHierarchicalRowReorderHandler</code> remain move-only. If you want <code>Copy</code> semantics, provide a custom <code>IDataGridRowDropHandler</code> that validates copy targets and performs the copy operation.</p>
+<h2 id="selection-drag-coordination">Selection-Drag Coordination</h2>
+<p><code>DataGridRowDragDropOptions.SuppressSelectionDragFromDragHandle</code> controls whether the row-drag gesture wins over range-selection drag when the press starts on a configured row drag surface.</p>
+<ul>
+<li><code>true</code> keeps click-to-select but prevents range-selection drag from taking over the intended row drag gesture.</li>
+<li><code>false</code> restores the older behavior where selection drag can begin from the same surface.</li>
+</ul>
+<h2 id="drop-visuals-and-feedback">Drop Visuals and Feedback</h2>
 <p>Drag/drop exposes pseudo-classes you can style:</p>
 <ul>
 <li><code>DataGrid:row-drag-enabled</code>, <code>DataGrid:row-drag-handle-visible</code></li>
 <li><code>DataGridRow:dragging</code></li>
 <li><code>DataGridRow:drag-over-before</code>, <code>DataGridRow:drag-over-after</code>, <code>DataGridRow:drag-over-inside</code></li>
 </ul>
+<p>Feedback layers:</p>
+<ul>
+<li>native cursor feedback from <code>DragEventArgs.DragEffects</code></li>
+<li>built-in row/drop indicators</li>
+<li>optional <code>RowDragFeedbackTemplate</code> bound to the active session</li>
+</ul>
 <p>The drop indicator uses <code>DropLocationIndicatorTemplate</code> and theme resources like <code>DataGridDropLocationIndicatorBrush</code> and <code>DataGridDropLocationIndicatorWidth</code> (see <code>Themes/Generic.xaml</code>).</p>
 <h2 id="advanced-customization">Advanced Customization</h2>
 <ul>
-<li>Use <code>RowDragDropControllerFactory</code> to supply a custom controller (for example, to integrate custom drag data or hit-testing).</li>
+<li>Use <code>RowDragDropControllerFactory</code> to supply a custom controller when you need custom drag data or hit-testing.</li>
 <li>Implement <code>IDataGridRowDropHandler</code> to validate or reroute drops while keeping the built-in visuals and auto-scroll.</li>
+<li>See <a href="row-drag-sessions.html">Row Drag Sessions</a> for the full session contract and the issue-299 design notes.</li>
 </ul>
 <h2 id="hierarchical-drag-and-drop">Hierarchical Drag and Drop</h2>
 <p>Use <code>DataGridHierarchicalRowReorderHandler</code> to support before/after/inside drop targets in tree-like data sets.</p>
-<pre><code class="lang-xml">&lt;DataGrid ItemsSource=&quot;{Binding HierarchicalItems}&quot;
-          CanUserReorderRows=&quot;True&quot;
+<pre><code class="lang-xml">&lt;DataGrid CanUserReorderRows=&quot;True&quot;
           HierarchicalRowsEnabled=&quot;True&quot;
           RowDragHandle=&quot;RowHeaderAndRow&quot;
           RowDragDropOptions=&quot;{Binding Options}&quot;
-          RowDropHandler=&quot;{Binding DropHandler}&quot; /&gt;
+          RowDropHandler=&quot;{Binding DropHandler}&quot;
+          HierarchicalModel=&quot;{Binding Model}&quot; /&gt;
 </code></pre>
-<pre><code class="lang-csharp">using Avalonia.Controls.DataGridDragDrop;
-using Avalonia.Input;
-
-public DataGridRowDragDropOptions Options { get; } = new DataGridRowDragDropOptions
-{
-    AllowedEffects = DragDropEffects.Move | DragDropEffects.Copy,
-    DragSelectedRows = true
-};
-
-public IDataGridRowDropHandler DropHandler { get; } = new DataGridHierarchicalRowReorderHandler();
-</code></pre>
+<p>The top and bottom thirds of a hierarchical row resolve to <code>Before</code> / <code>After</code>; the middle resolves to <code>Inside</code>.</p>
 
 </article>
 

@@ -94,8 +94,9 @@
 <li>Row details: <code>LoadingRowDetails</code>, <code>UnloadingRowDetails</code>, <code>RowDetailsVisibilityChanged</code>.</li>
 <li>Clipboard: <code>CopyingRowClipboardContent</code>.</li>
 <li>Scrolling: <code>HorizontalScroll</code>, <code>VerticalScroll</code>.</li>
-<li>Drag and drop: <code>RowDragStarting</code>, <code>RowDragCompleted</code>.</li>
+<li>Drag and drop: <code>RowDragStarting</code>, <code>RowDragStarted</code>, <code>RowDragUpdated</code>, <code>RowDragCanceled</code>, <code>RowDragCompleted</code>.</li>
 </ul>
+<p><code>RowDragUpdated</code> is the live session event for issue-299 style drag interaction. It exposes the fully recomputed <code>DataGridRowDragSession</code>, including pointer position, modifiers, hovered row, drop zone, and the current requested/effective drag effect. <code>RowDragCompleted</code> now represents committed drops only; canceled drags raise <code>RowDragCanceled</code>.</p>
 <h2 id="hooking-events-in-xaml">Hooking Events in XAML</h2>
 <pre><code class="lang-xml">&lt;DataGrid LoadingRow=&quot;OnLoadingRow&quot;
           AutoGeneratingColumn=&quot;OnAutoGeneratingColumn&quot;
