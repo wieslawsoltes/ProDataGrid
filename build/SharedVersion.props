@@ -3,8 +3,8 @@
 
   <PropertyGroup>
     <Product>ProDataGrid</Product>
-    <VersionPrefix>11.3.11</VersionPrefix>
-    <VersionSuffix></VersionSuffix>
+    <VersionPrefix>12.0.0</VersionPrefix>
+    <VersionSuffix>preview.1</VersionSuffix>
     <Authors>Wiesław Šoltés</Authors>
     <Copyright>Copyright $([System.DateTime]::Now.ToString(`yyyy`)) &#169; Wiesław Šoltés</Copyright>
     <PackageProjectUrl>https://github.com/wieslawsoltes/ProDataGrid</PackageProjectUrl>
