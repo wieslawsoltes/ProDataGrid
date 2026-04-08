@@ -269,11 +269,15 @@ public class DataGridMouseOverRowTests
             var rowPoint = row.TranslatePoint(new Point(5, 5), grid);
             Assert.NotNull(rowPoint);
 
-            var headerPoint = header.TranslatePoint(new Point(5, Math.Max(1, header.Bounds.Height / 2)), grid);
+            var headerPoint = header.TranslatePoint(
+                new Point(
+                    Math.Max(1, header.Bounds.Width / 2),
+                    Math.Max(1, header.Bounds.Height / 2)),
+                grid);
             Assert.NotNull(headerPoint);
 
             root.SetPointerOverElementForTests(row);
-            RaisePointerMovedActivity(grid, rowPoint.Value);
+            RaisePointerMovedActivity(row, grid, rowPoint.Value);
             grid.MouseOverRowIndex = row.Index;
 
             Assert.Equal(row.Index, grid.MouseOverRowIndex);
@@ -281,7 +285,7 @@ public class DataGridMouseOverRowTests
             AssertSinglePointerOverRow(grid, row);
 
             root.SetPointerOverElementForTests(header);
-            RaisePointerMovedActivity(grid, headerPoint.Value);
+            RaisePointerMovedActivity(header, grid, headerPoint.Value);
             RefreshPointerOverRow(grid);
 
             Assert.Null(grid.MouseOverRowIndex);
@@ -479,10 +483,15 @@ public class DataGridMouseOverRowTests
 
     private static void RaisePointerMovedActivity(DataGrid grid, Point point)
     {
+        RaisePointerMovedActivity(grid, grid, point);
+    }
+
+    private static void RaisePointerMovedActivity(InputElement source, Visual relativeTo, Point point)
+    {
         var pointer = new Pointer(Pointer.GetNextFreeId(), PointerType.Mouse, isPrimary: true);
         var properties = new PointerPointProperties(RawInputModifiers.None, PointerUpdateKind.Other);
-        var args = new PointerEventArgs(InputElement.PointerMovedEvent, grid, pointer, grid, point, 0, properties, KeyModifiers.None);
-        grid.RaiseEvent(args);
+        var args = new PointerEventArgs(InputElement.PointerMovedEvent, source, pointer, relativeTo, point, 0, properties, KeyModifiers.None);
+        source.RaiseEvent(args);
     }
 
     private static void PumpLayout(Control control)
