@@ -1,5 +1,6 @@
 using System.Linq;
 using System.Reactive.Concurrency;
+using Avalonia.Headless.XUnit;
 using ProDataGrid.ExcelSample.Models;
 using ProDataGrid.ExcelSample.ViewModels;
 using Xunit;
@@ -8,7 +9,7 @@ namespace ProDataGrid.ExcelSample.Tests;
 
 public sealed class ChartPanelViewModelTests
 {
-    [Fact]
+    [AvaloniaFact]
     public void ChartPanelViewModel_MapsSelectionToSeries()
     {
         var selection = new SpreadsheetSelectionState();
@@ -28,7 +29,7 @@ public sealed class ChartPanelViewModelTests
         Assert.Equal("B", viewModel.ChartData.Series[0].Name);
     }
 
-    [Fact]
+    [AvaloniaFact]
     public void ChartPanelViewModel_UsesSingleSeriesForPie()
     {
         var selection = new SpreadsheetSelectionState();
