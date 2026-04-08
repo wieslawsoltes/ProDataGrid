@@ -31,8 +31,8 @@ public class DataGridToggleSwitchColumnHeadlessTests
 
         var column = AvaloniaRuntimeXamlLoader.Parse<DataGridToggleSwitchColumn>(xaml, typeof(DataGridToggleSwitchColumn).Assembly);
 
-        Assert.IsAssignableFrom<IBinding>(column.OnContent);
-        Assert.IsAssignableFrom<IBinding>(column.OffContent);
+        Assert.IsAssignableFrom<BindingBase>(column.OnContent);
+        Assert.IsAssignableFrom<BindingBase>(column.OffContent);
     }
 
     [Fact]

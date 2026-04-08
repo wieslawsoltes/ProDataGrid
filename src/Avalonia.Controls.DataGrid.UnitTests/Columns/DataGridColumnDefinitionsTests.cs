@@ -102,8 +102,8 @@ public class DataGridColumnDefinitionsTests
 
         var definition = AvaloniaRuntimeXamlLoader.Parse<DataGridButtonColumnDefinition>(xaml, typeof(DataGridButtonColumnDefinition).Assembly);
 
-        Assert.IsAssignableFrom<IBinding>(definition.Content);
-        Assert.IsAssignableFrom<IBinding>(definition.CommandParameter);
+        Assert.IsAssignableFrom<BindingBase>(definition.Content);
+        Assert.IsAssignableFrom<BindingBase>(definition.CommandParameter);
     }
 
     [Fact]
@@ -127,9 +127,9 @@ public class DataGridColumnDefinitionsTests
 
         var definition = AvaloniaRuntimeXamlLoader.Parse<DataGridToggleButtonColumnDefinition>(xaml, typeof(DataGridToggleButtonColumnDefinition).Assembly);
 
-        Assert.IsAssignableFrom<IBinding>(definition.Content);
-        Assert.IsAssignableFrom<IBinding>(definition.CheckedContent);
-        Assert.IsAssignableFrom<IBinding>(definition.UncheckedContent);
+        Assert.IsAssignableFrom<BindingBase>(definition.Content);
+        Assert.IsAssignableFrom<BindingBase>(definition.CheckedContent);
+        Assert.IsAssignableFrom<BindingBase>(definition.UncheckedContent);
     }
 
     [Fact]
@@ -151,8 +151,8 @@ public class DataGridColumnDefinitionsTests
 
         var definition = AvaloniaRuntimeXamlLoader.Parse<DataGridToggleSwitchColumnDefinition>(xaml, typeof(DataGridToggleSwitchColumnDefinition).Assembly);
 
-        Assert.IsAssignableFrom<IBinding>(definition.OnContent);
-        Assert.IsAssignableFrom<IBinding>(definition.OffContent);
+        Assert.IsAssignableFrom<BindingBase>(definition.OnContent);
+        Assert.IsAssignableFrom<BindingBase>(definition.OffContent);
     }
 
     [AvaloniaFact]

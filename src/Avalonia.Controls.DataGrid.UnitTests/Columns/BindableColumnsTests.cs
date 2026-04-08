@@ -8,15 +8,16 @@ using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
 using Avalonia.Controls;
-using Avalonia.Markup.Xaml;
 using Avalonia.Data;
+using Avalonia.Headless.XUnit;
+using Avalonia.Markup.Xaml;
 using Xunit;
 
 namespace Avalonia.Controls.DataGridTests.Columns
 {
     public class BindableColumnsTests
     {
-        [Fact]
+        [AvaloniaFact]
         public void Binding_Columns_Populates_Grid()
         {
             var columns = new ObservableCollection<DataGridColumn>
@@ -35,7 +36,7 @@ namespace Avalonia.Controls.DataGridTests.Columns
             Assert.Contains(columns[1], grid.ColumnsInternal.ItemsInternal);
         }
 
-        [Fact]
+        [AvaloniaFact]
         public void Unbound_Columns_Raise_All_INCC_Actions()
         {
             var grid = new DataGrid();
@@ -61,7 +62,7 @@ namespace Avalonia.Controls.DataGridTests.Columns
             Assert.Contains(NotifyCollectionChangedAction.Reset, actions);
         }
 
-        [Fact]
+        [AvaloniaFact]
         public void Bound_Columns_Raise_All_INCC_Actions()
         {
             var source = new ObservableCollection<DataGridColumn>();
@@ -92,7 +93,7 @@ namespace Avalonia.Controls.DataGridTests.Columns
             Assert.Empty(grid.Columns.Where(c => c is not DataGridFillerColumn));
         }
 
-        [Fact]
+        [AvaloniaFact]
         public void Binding_Columns_Add_Reflects_In_Grid()
         {
             var columns = new ObservableCollection<DataGridColumn>
@@ -111,7 +112,7 @@ namespace Avalonia.Controls.DataGridTests.Columns
             Assert.Contains(added, grid.ColumnsInternal.ItemsInternal);
         }
 
-        [Fact]
+        [AvaloniaFact]
         public void Columns_Property_Is_IList_And_Allows_Add_When_Unbound()
         {
             var grid = new DataGrid();
@@ -124,7 +125,7 @@ namespace Avalonia.Controls.DataGridTests.Columns
             Assert.Contains(added, grid.ColumnsInternal.ItemsInternal);
         }
 
-        [Fact]
+        [AvaloniaFact]
         public void Binding_List_Applies_Snapshot_When_No_INCC()
         {
             var first = new DataGridTextColumn { Header = "First", Binding = new Binding("First") };
@@ -164,7 +165,7 @@ namespace Avalonia.Controls.DataGridTests.Columns
             Assert.Contains(second, grid.ColumnsInternal.ItemsInternal);
         }
 
-        [Fact]
+        [AvaloniaFact]
         public void Binding_OneTime_Does_Not_Refresh_On_Property_Replace()
         {
             var initial = new ObservableCollection<DataGridColumn>
@@ -189,7 +190,7 @@ namespace Avalonia.Controls.DataGridTests.Columns
             Assert.Contains(initial[0], grid.ColumnsInternal.ItemsInternal);
         }
 
-        [Fact]
+        [AvaloniaFact]
         public void Binding_TwoWay_Updates_ViewModel_When_Grid_Assigned()
         {
             var vm = new ColumnsHolder(new ObservableCollection<DataGridColumn>
@@ -216,7 +217,7 @@ namespace Avalonia.Controls.DataGridTests.Columns
             Assert.Contains(replacement[0], grid.ColumnsInternal.ItemsInternal);
         }
 
-        [Fact]
+        [AvaloniaFact]
         public void Binding_OneWay_To_List_Snapshot_Only()
         {
             var list = new List<DataGridColumn>
@@ -258,7 +259,7 @@ namespace Avalonia.Controls.DataGridTests.Columns
             Assert.Equal("Second", grid.ColumnsInternal.ItemsInternal.First(c => c is not DataGridFillerColumn).Header);
         }
 
-        [Fact]
+        [AvaloniaFact]
         public void Binding_OneWay_Replace_In_VM_Replaces_In_Grid()
         {
             var original = new DataGridTextColumn { Header = "First", Binding = new Binding("First") };
@@ -276,7 +277,7 @@ namespace Avalonia.Controls.DataGridTests.Columns
             Assert.Contains(replacement, grid.ColumnsInternal.ItemsInternal);
         }
 
-        [Fact]
+        [AvaloniaFact]
         public void Binding_OneWay_Move_In_VM_Reorders_Grid()
         {
             var collection = new ObservableCollection<DataGridColumn>
@@ -296,7 +297,7 @@ namespace Avalonia.Controls.DataGridTests.Columns
             Assert.Equal(new[] { "Second", "First" }, ordered.Select(c => c.Header));
         }
 
-        [Fact]
+        [AvaloniaFact]
         public void Binding_OneWay_Reset_In_VM_Reloads_Grid()
         {
             var vm = new ColumnsHolder(new TestColumnsCollection
@@ -317,7 +318,7 @@ namespace Avalonia.Controls.DataGridTests.Columns
             Assert.Equal("Two", nonFiller.Header);
         }
 
-        [Fact]
+        [AvaloniaFact]
         public void Binding_List_TwoWay_Falls_Back_To_OneWay()
         {
             var first = new DataGridTextColumn { Header = "First", Binding = new Binding("First") };
@@ -335,7 +336,7 @@ namespace Avalonia.Controls.DataGridTests.Columns
             Assert.Same(first, columns[0]);
         }
 
-        [Fact]
+        [AvaloniaFact]
         public void Binding_Xaml_Binding_Is_Parsed()
         {
             const string xaml = @"<DataGrid xmlns=""https://github.com/avaloniaui""
@@ -358,7 +359,7 @@ namespace Avalonia.Controls.DataGridTests.Columns
             Assert.Contains(vm.Columns[0], grid.ColumnsInternal.ItemsInternal);
         }
 
-        [Fact]
+        [AvaloniaFact]
         public void Binding_Columns_Remove_Reflects_In_Grid()
         {
             var first = new DataGridTextColumn { Header = "First", Binding = new Binding("First") };
@@ -377,7 +378,7 @@ namespace Avalonia.Controls.DataGridTests.Columns
             Assert.Contains(last, grid.ColumnsInternal.ItemsInternal);
         }
 
-        [Fact]
+        [AvaloniaFact]
         public void Binding_Move_Reflects_In_Grid()
         {
             var first = new DataGridTextColumn { Header = "First", Binding = new Binding("First") };
@@ -395,7 +396,7 @@ namespace Avalonia.Controls.DataGridTests.Columns
             Assert.Equal(new[] { "Last", "First" }, ordered.Select(c => c.Header));
         }
 
-        [Fact]
+        [AvaloniaFact]
         public void Binding_Replace_Reflects_In_Grid()
         {
             var original = new DataGridTextColumn { Header = "First", Binding = new Binding("First") };
@@ -413,7 +414,7 @@ namespace Avalonia.Controls.DataGridTests.Columns
             Assert.Contains(replacement, grid.ColumnsInternal.ItemsInternal);
         }
 
-        [Fact]
+        [AvaloniaFact]
         public void TwoWay_Remove_From_Grid_Removes_From_Bound_Collection()
         {
             var columns = new ObservableCollection<DataGridColumn>
@@ -434,7 +435,7 @@ namespace Avalonia.Controls.DataGridTests.Columns
             Assert.Equal("Last", columns[0].Header);
         }
 
-        [Fact]
+        [AvaloniaFact]
         public void TwoWay_Move_In_Grid_Reorders_Bound_Collection()
         {
             var first = new DataGridTextColumn { Header = "First", Binding = new Binding("First") };
@@ -453,7 +454,7 @@ namespace Avalonia.Controls.DataGridTests.Columns
             Assert.Same(first, columns[1]);
         }
 
-        [Fact]
+        [AvaloniaFact]
         public void TwoWay_Add_In_Grid_Adds_To_Bound_Source()
         {
             var first = new DataGridTextColumn { Header = "First", Binding = new Binding("First") };
@@ -472,7 +473,7 @@ namespace Avalonia.Controls.DataGridTests.Columns
             Assert.Same(added, columns[0]);
         }
 
-        [Fact]
+        [AvaloniaFact]
         public void TwoWay_Does_Not_Push_AutoGenerated_To_Bound_Source()
         {
             var manual = new DataGridTextColumn { Header = "Manual", Binding = new Binding("Value") };
@@ -492,7 +493,7 @@ namespace Avalonia.Controls.DataGridTests.Columns
             Assert.Contains(grid.ColumnsInternal.ItemsInternal, c => c.IsAutoGenerated);
         }
 
-        [Fact]
+        [AvaloniaFact]
         public void Binding_Throws_When_Inline_Columns_Exist()
         {
             var grid = new DataGrid();
@@ -503,7 +504,7 @@ namespace Avalonia.Controls.DataGridTests.Columns
             Assert.Throws<InvalidOperationException>(() => grid.Columns = columns);
         }
 
-        [Fact]
+        [AvaloniaFact]
         public void Binding_Null_Clears_Columns()
         {
             var grid = new DataGrid();
@@ -520,7 +521,7 @@ namespace Avalonia.Controls.DataGridTests.Columns
             Assert.DoesNotContain(grid.ColumnsInternal.ItemsInternal, c => c is not DataGridFillerColumn);
         }
 
-        [Fact]
+        [AvaloniaFact]
         public void Binding_Reset_Reloads_When_Behavior_Reload()
         {
             var columns = new TestColumnsCollection
@@ -544,7 +545,7 @@ namespace Avalonia.Controls.DataGridTests.Columns
             Assert.Equal("Three", grid.ColumnsInternal.ItemsInternal.First(c => c is not DataGridFillerColumn).Header);
         }
 
-        [Fact]
+        [AvaloniaFact]
         public void Binding_Reset_Ignored_When_Behavior_Ignore()
         {
             var initial = new DataGridTextColumn { Header = "One", Binding = new Binding("One") };
@@ -564,7 +565,7 @@ namespace Avalonia.Controls.DataGridTests.Columns
             Assert.Same(initial, grid.ColumnsInternal.ItemsInternal.First(c => c is not DataGridFillerColumn));
         }
 
-        [Fact]
+        [AvaloniaFact]
         public void AutoGenerated_Placement_BeforeSource_Inserts_Before()
         {
             var columns = new ObservableCollection<DataGridColumn>
@@ -587,7 +588,7 @@ namespace Avalonia.Controls.DataGridTests.Columns
             Assert.Equal("Manual", ordered.Last().Header);
         }
 
-        [Fact]
+        [AvaloniaFact]
         public void AutoGenerated_Placement_None_Removes_Generated()
         {
             var columns = new ObservableCollection<DataGridColumn>
@@ -609,7 +610,7 @@ namespace Avalonia.Controls.DataGridTests.Columns
             Assert.Equal("Manual", ordered[0].Header);
         }
 
-        [Fact]
+        [AvaloniaFact]
         public void Binding_Adding_Null_Throws()
         {
             var columns = new ObservableCollection<DataGridColumn>
@@ -625,7 +626,7 @@ namespace Avalonia.Controls.DataGridTests.Columns
             Assert.Throws<ArgumentNullException>(() => columns.Add(null!));
         }
 
-        [Fact]
+        [AvaloniaFact]
         public void Binding_Adding_Column_From_Other_Grid_Throws()
         {
             var other = new DataGrid
@@ -644,7 +645,7 @@ namespace Avalonia.Controls.DataGridTests.Columns
             Assert.Throws<InvalidOperationException>(() => columns.Add(column));
         }
 
-        [Fact]
+        [AvaloniaFact]
         public async Task Binding_CrossThread_Change_Throws()
         {
             var tcs = new TaskCompletionSource<Exception?>();
@@ -661,7 +662,7 @@ namespace Avalonia.Controls.DataGridTests.Columns
             Assert.DoesNotContain(columns[0], grid.ColumnsInternal.ItemsInternal);
         }
 
-        [Fact]
+        [AvaloniaFact]
         public void Binding_Enumeration_Exception_Leaves_Grid_Intact()
         {
             var grid = new DataGrid();
@@ -671,7 +672,7 @@ namespace Avalonia.Controls.DataGridTests.Columns
             Assert.DoesNotContain(grid.ColumnsInternal.ItemsInternal, c => c is DataGridTextColumn);
         }
 
-        [Fact]
+        [AvaloniaFact]
         public void Binding_Pending_During_AutoGen_Reapplies()
         {
             var grid = CreateMeasuredGrid();
@@ -697,7 +698,7 @@ namespace Avalonia.Controls.DataGridTests.Columns
             Assert.Contains(columns[0], grid.ColumnsInternal.ItemsInternal);
         }
 
-        [Fact]
+        [AvaloniaFact]
         public void UpdateColumnDisplayIndexesFromCollectionOrder_Reorders_Unbound_Columns()
         {
             var grid = new DataGrid();

@@ -20,9 +20,7 @@ namespace Avalonia.Controls.DataGridTests
 
         private static IPropertyAccessor StartAccessor(object target, string path)
         {
-            var plugin = BindingPlugins.PropertyAccessors.First(p => p.GetType().Name.Contains("TypeDescriptor"));
-            return plugin.Start(new WeakReference<object?>(target), path)
-                   ?? throw new InvalidOperationException("TypeDescriptorPropertyAccessorPlugin did not return an accessor.");
+            return Avalonia12TestCompat.StartPropertyAccessor(target, path);
         }
 
         [AvaloniaTheory]

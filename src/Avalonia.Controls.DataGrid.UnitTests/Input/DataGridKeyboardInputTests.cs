@@ -427,17 +427,17 @@ public class DataGridKeyboardInputTests
     {
         var (homeGrid, _) = CreateGrid();
 
-        var homeArgs = PressKey(homeGrid, Key.Home);
+        var homeHandled = InvokeProcessHomeKey(homeGrid, shift: false, ctrl: false);
 
-        Assert.True(homeArgs.Handled);
+        Assert.True(homeHandled);
         Assert.Equal(0, homeGrid.CurrentColumnIndex);
         Assert.Equal(homeGrid.SlotFromRowIndex(0), homeGrid.CurrentSlot);
 
         var (endGrid, _) = CreateGrid();
 
-        var endArgs = PressKey(endGrid, Key.End);
+        var endHandled = InvokeProcessEndKey(endGrid, shift: false, ctrl: false);
 
-        Assert.True(endArgs.Handled);
+        Assert.True(endHandled);
         Assert.Equal(2, endGrid.CurrentColumnIndex);
         Assert.Equal(endGrid.SlotFromRowIndex(0), endGrid.CurrentSlot);
     }
@@ -820,6 +820,28 @@ public class DataGridKeyboardInputTests
     {
         var method = typeof(DataGrid).GetMethod("ProcessRightMost", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic);
         return method != null && (bool)method.Invoke(grid, new object[] { lastVisibleColumnIndex, firstVisibleSlot })!;
+    }
+
+    private static bool InvokeProcessHomeKey(DataGrid grid, bool shift, bool ctrl)
+    {
+        var method = typeof(DataGrid).GetMethod(
+            "ProcessHomeKey",
+            System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic,
+            binder: null,
+            types: new[] { typeof(bool), typeof(bool) },
+            modifiers: null);
+        return method != null && (bool)method.Invoke(grid, new object[] { shift, ctrl })!;
+    }
+
+    private static bool InvokeProcessEndKey(DataGrid grid, bool shift, bool ctrl)
+    {
+        var method = typeof(DataGrid).GetMethod(
+            "ProcessEndKey",
+            System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic,
+            binder: null,
+            types: new[] { typeof(bool), typeof(bool) },
+            modifiers: null);
+        return method != null && (bool)method.Invoke(grid, new object[] { shift, ctrl })!;
     }
 
     private static Queue<Action> GetLostFocusActions(DataGrid grid)

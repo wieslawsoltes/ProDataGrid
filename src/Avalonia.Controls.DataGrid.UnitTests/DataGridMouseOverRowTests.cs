@@ -62,7 +62,7 @@ public class DataGridMouseOverRowTests
             var row = FindRow(root2, grid);
             var point = row.TranslatePoint(new Point(5, 5), grid)!.Value;
 
-            ((IInputRoot)root).PointerOverElement = grid;
+            root.SetPointerOverElementForTests(grid);
             RaisePointerActivity(grid, point);
             grid.MouseOverRowIndex = row.Index;
 
@@ -112,7 +112,7 @@ public class DataGridMouseOverRowTests
             var point = root2Row.TranslatePoint(new Point(5, 5), grid)!.Value;
             var initialIndex = root2Row.Index;
 
-            ((IInputRoot)root).PointerOverElement = grid;
+            root.SetPointerOverElementForTests(grid);
             RaisePointerActivity(grid, point);
             grid.MouseOverRowIndex = root2Row.Index;
 
@@ -168,7 +168,7 @@ public class DataGridMouseOverRowTests
             var point = childRow.TranslatePoint(new Point(5, 5), grid)!.Value;
             var initialIndex = childRow.Index;
 
-            ((IInputRoot)root).PointerOverElement = grid;
+            root.SetPointerOverElementForTests(grid);
             RaisePointerActivity(grid, point);
             grid.MouseOverRowIndex = childRow.Index;
 
@@ -222,7 +222,7 @@ public class DataGridMouseOverRowTests
             var root3Row = FindRow(root3, grid);
             var point = root3Row.TranslatePoint(new Point(5, 5), grid)!.Value;
 
-            ((IInputRoot)root).PointerOverElement = grid;
+            root.SetPointerOverElementForTests(grid);
             RaisePointerActivity(grid, point);
             grid.MouseOverRowIndex = root3Row.Index;
 
@@ -272,7 +272,7 @@ public class DataGridMouseOverRowTests
             var headerPoint = header.TranslatePoint(new Point(5, Math.Max(1, header.Bounds.Height / 2)), grid);
             Assert.NotNull(headerPoint);
 
-            ((IInputRoot)root).PointerOverElement = row;
+            root.SetPointerOverElementForTests(row);
             RaisePointerMovedActivity(grid, rowPoint.Value);
             grid.MouseOverRowIndex = row.Index;
 
@@ -280,7 +280,7 @@ public class DataGridMouseOverRowTests
             Assert.True(((IPseudoClasses)row.Classes).Contains(":pointerover"));
             AssertSinglePointerOverRow(grid, row);
 
-            ((IInputRoot)root).PointerOverElement = header;
+            root.SetPointerOverElementForTests(header);
             RaisePointerMovedActivity(grid, headerPoint.Value);
             grid.RequestPointerOverRefreshFromRow();
             PumpLayout(grid);

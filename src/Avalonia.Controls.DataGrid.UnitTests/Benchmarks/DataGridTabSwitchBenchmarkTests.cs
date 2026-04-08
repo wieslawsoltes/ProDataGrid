@@ -8,7 +8,6 @@ using Avalonia.Data;
 using Avalonia.Headless.XUnit;
 using Avalonia.Threading;
 using Xunit;
-using Xunit.Abstractions;
 
 namespace Avalonia.Controls.DataGridTests.Benchmarks;
 

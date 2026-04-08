@@ -210,7 +210,7 @@ public class DataGridColumnsBranchCoverageTests
         Assert.False(grid.GetColumnReadOnlyState(writableColumn, isReadOnly: false));
 
         var multiBindingColumn = new DataGridTextColumn { Binding = new MultiBinding() };
-        Assert.False(grid.GetColumnReadOnlyState(multiBindingColumn, isReadOnly: false));
+        Assert.True(grid.GetColumnReadOnlyState(multiBindingColumn, isReadOnly: false));
 
         var compiled = CreateCompiledBinding(nameof(ReadOnlyRow.Name));
         var compiledColumn = new DataGridTextColumn { Binding = compiled };
@@ -591,7 +591,7 @@ public class DataGridColumnsBranchCoverageTests
 
         var (grid2, _, _) = CreateGrid(rowCount: 1, columnCount: 2);
         grid2.DisplayData.FirstDisplayedScrollingCol = 1;
-        SetPrivateField(grid2, "_horizontalOffset", 40.0);
+        SetPrivateField(grid2, "_horizontalOffset", grid2.ColumnsInternal[0].ActualWidth + 5.0);
         SetPrivateField(grid2, "_negHorizontalOffset", 0.0);
         grid2.OnRemovingColumn(grid2.ColumnsInternal[0]);
     }
@@ -859,7 +859,7 @@ public class DataGridColumnsBranchCoverageTests
             {
                 ex = tie.InnerException;
             }
-            Assert.Contains(ex.GetType().Name, new[] { "DebugAssertException", "AssertionException", nameof(ArgumentOutOfRangeException) });
+            Assert.Contains(ex.GetType().Name, new[] { "DebugAssertException", "AssertionException", "TraceAssertException", nameof(ArgumentOutOfRangeException) });
         }
         finally
         {

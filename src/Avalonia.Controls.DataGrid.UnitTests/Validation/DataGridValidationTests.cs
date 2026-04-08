@@ -582,7 +582,7 @@ public class DataGridValidationTests
                 testCase.SetValue(editingElement, false);
                 UpdateEditingElementSource(editingElement);
 
-                Assert.False(grid.CommitEdit());
+                Assert.False(grid.CommitEdit(), $"Column '{column.Header}' should reject an invalid edit.");
                 grid.UpdateLayout();
 
                 Assert.False(cell.IsValid);
@@ -654,7 +654,7 @@ public class DataGridValidationTests
         ["Active"] = new ColumnValidationCase((control, valid) =>
         {
             var toggle = (ToggleSwitch)control;
-            toggle.IsChecked = valid;
+            toggle.SetCurrentValue(ToggleSwitch.IsCheckedProperty, valid);
         }),
         ["Pinned"] = new ColumnValidationCase((control, valid) =>
         {
@@ -1210,17 +1210,8 @@ public class DataGridValidationTests
 
     private static void EnsureValidationPlugins()
     {
-        var validators = BindingPlugins.DataValidators;
-
-        if (!validators.Any(plugin => plugin is ExceptionValidationPlugin))
-        {
-            validators.Add(new ExceptionValidationPlugin());
-        }
-
-        if (!validators.Any(plugin => plugin is IndeiValidationPlugin))
-        {
-            validators.Add(new IndeiValidationPlugin());
-        }
+        Avalonia12TestCompat.EnsureDataValidator("ExceptionValidationPlugin");
+        Avalonia12TestCompat.EnsureDataValidator("IndeiValidationPlugin");
     }
 
     private static bool ErrorContainsMessage(object? error, string message)
