@@ -26,7 +26,7 @@ internal
     {
 
         //TODO: Make override?
-        private void DataGrid_GotFocus(object sender, RoutedEventArgs e)
+        private void DataGrid_GotFocus(object sender, FocusChangedEventArgs e)
         {
             DetachExternalEditingElement();
             if (!ContainsFocus)
@@ -61,42 +61,18 @@ internal
 
 
         //TODO: Make override?
-        private void DataGrid_LostFocus(object sender, RoutedEventArgs e)
+        private void DataGrid_LostFocus(object sender, FocusChangedEventArgs e)
         {
             var previousFocusedObject = _focusedObject as Visual;
             _focusedObject = null;
             DetachExternalEditingElement();
             if (ContainsFocus)
             {
-                bool focusLeftDataGrid = true;
-                bool dataGridWillReceiveRoutedEvent = true;
                 var focusManager = FocusManager.GetFocusManager(this);
-                Visual focusedObject = focusManager?.GetFocusedElement() as Visual;
+                Visual focusedObject = e.NewFocusedElement as Visual ?? focusManager?.GetFocusedElement() as Visual;
                 var newFocusedObject = focusedObject;
+                var focusLeftDataGrid = !IsFocusWithinDataGrid(focusedObject, out var dataGridWillReceiveRoutedEvent);
                 DataGridColumn editingColumn = null;
-
-                while (focusedObject != null)
-                {
-                    if (focusedObject == this)
-                    {
-                        focusLeftDataGrid = false;
-                        break;
-                    }
-
-                    // Walk up the visual tree.  If we hit the root, try using the framework element's
-                    // parent.  We do this because Popups behave differently with respect to the visual tree,
-                    // and it could have a parent even if the VisualTreeHelper doesn't find it.
-                    var parent = focusedObject.Parent as Visual;
-                    if (parent == null)
-                    {
-                        parent = focusedObject.GetVisualParent();
-                    }
-                    else
-                    {
-                        dataGridWillReceiveRoutedEvent = false;
-                    }
-                    focusedObject = parent;
-                }
 
                 if (focusLeftDataGrid
                     && previousFocusedObject != null
@@ -137,7 +113,7 @@ internal
                 }
                 else if (!dataGridWillReceiveRoutedEvent)
                 {
-                    if (focusedObject is Control focusedElement)
+                    if (newFocusedObject is Control focusedElement)
                     {
                         if (!ReferenceEquals(_externalEditingElement, focusedElement))
                         {
@@ -151,7 +127,7 @@ internal
         }
 
 
-        private void ExternalEditingElement_LostFocus(object sender, RoutedEventArgs e)
+        private void ExternalEditingElement_LostFocus(object sender, FocusChangedEventArgs e)
         {
             if (sender is Control element)
             {
@@ -164,7 +140,7 @@ internal
             }
         }
 
-        private void DataGrid_DescendantLostFocus(object sender, RoutedEventArgs e)
+        private void DataGrid_DescendantLostFocus(object sender, FocusChangedEventArgs e)
         {
             if (e.Source is not Visual source || !this.ContainsChild(source))
             {
@@ -172,7 +148,7 @@ internal
             }
 
             var focusManager = FocusManager.GetFocusManager(this);
-            var focusedElement = focusManager?.GetFocusedElement() as Visual;
+            var focusedElement = e.NewFocusedElement as Visual ?? focusManager?.GetFocusedElement() as Visual;
             if (focusedElement != null && focusedElement.IsAttachedToVisualTree)
             {
                 return;
@@ -262,6 +238,45 @@ internal
                 _externalEditingElement.LostFocus -= ExternalEditingElement_LostFocus;
                 _externalEditingElement = null;
             }
+        }
+
+        internal bool IsFocusWithinDataGrid(Visual focusedObject, out bool dataGridWillReceiveRoutedEvent)
+        {
+            dataGridWillReceiveRoutedEvent = true;
+
+            if (focusedObject == null)
+            {
+                return false;
+            }
+
+            if (ReferenceEquals(focusedObject, this) || this.IsVisualAncestorOf(focusedObject))
+            {
+                return true;
+            }
+
+            if (focusedObject is not StyledElement styledElement)
+            {
+                return false;
+            }
+
+            // Avalonia 12 exposes a richer logical-parent chain; guard against popup/template cycles
+            // while still treating logically-parented editors as part of the grid focus scope.
+            var visited = new HashSet<StyledElement>();
+            var logicalAncestor = styledElement.Parent;
+
+            while (logicalAncestor != null && visited.Add(logicalAncestor))
+            {
+                if (ReferenceEquals(logicalAncestor, this) ||
+                    logicalAncestor is Visual logicalVisual && this.IsVisualAncestorOf(logicalVisual))
+                {
+                    dataGridWillReceiveRoutedEvent = false;
+                    return true;
+                }
+
+                logicalAncestor = logicalAncestor.Parent;
+            }
+
+            return false;
         }
 
         private Visual _focusedObject;
