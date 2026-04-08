@@ -2,9 +2,10 @@
 
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
-    <TargetFrameworks>net8.0;net10.0</TargetFrameworks>
+    <TargetFrameworks>net10.0</TargetFrameworks>
     <IsPackable>true</IsPackable>
     <PackAsTool>true</PackAsTool>
+    <CopyOutputSymbolsToPublishDirectory>false</CopyOutputSymbolsToPublishDirectory>
     <ToolCommandName>prodiagnostics-viewer</ToolCommandName>
     <PackageDescription>Avalonia-based viewer for streaming metrics and activities over UDP.</PackageDescription>
     <PackageTags>diagnostics;metrics;activity;telemetry;udp;avalonia;prodiagnostics</PackageTags>
@@ -31,6 +32,18 @@
     </Content>
   </ItemGroup>
 
+  <Target Name="RemovePdbsFromPublishOutput"
+          AfterTargets="ComputeResolvedFilesToPublishList">
+    <ItemGroup>
+      <ResolvedFileToPublish Remove="@(ResolvedFileToPublish)"
+                             Condition="'%(ResolvedFileToPublish.Extension)' == '.pdb'" />
+    </ItemGroup>
+  </Target>
+
   <Import Project="../../build/SharedVersion.props" />
+
+  <PropertyGroup>
+    <IncludeSymbols>false</IncludeSymbols>
+  </PropertyGroup>
 
 </Project>
