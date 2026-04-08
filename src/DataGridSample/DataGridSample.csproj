@@ -16,6 +16,7 @@
     <PackageReference Include="Avalonia.Fonts.Inter" />
     <PackageReference Include="Avalonia.Themes.Simple" />
     <PackageReference Include="Avalonia.Themes.Fluent" />
+    <PackageReference Include="ReactiveUI" />
     <PackageReference Include="ReactiveUI.Avalonia" />
     <PackageReference Include="DynamicData" />
     <PackageReference Include="Microsoft.PowerFx.Interpreter" />
