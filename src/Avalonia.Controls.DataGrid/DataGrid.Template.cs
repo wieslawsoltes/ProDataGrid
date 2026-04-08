@@ -285,9 +285,9 @@ internal
 
             DisposeSummaryService();
             DataGridColumnHeader.ResetStaticState();
-            UpdateKeyboardGestureSubscriptions();
 
             base.OnDetachedFromVisualTree(e);
+            DisposeKeyboardGestureSubscriptions();
         }
 
         private void RequestRecycledChildrenCleanup()

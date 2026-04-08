@@ -134,7 +134,7 @@ namespace Avalonia.Controls
             return Create(path, getter, setter);
         }
 
-        internal IBinding CreateBinding()
+        internal BindingBase CreateBinding()
         {
             var binding = new CompiledBindingExtension
             {

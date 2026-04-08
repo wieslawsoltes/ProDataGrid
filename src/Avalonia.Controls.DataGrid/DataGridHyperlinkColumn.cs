@@ -11,6 +11,7 @@ using Avalonia.Interactivity;
 using Avalonia.Layout;
 using Avalonia.Media;
 using Avalonia.Styling;
+using Avalonia.Controls.Utils;
 
 namespace Avalonia.Controls
 {
@@ -24,7 +25,7 @@ internal
 #endif
     class DataGridHyperlinkColumn : DataGridBoundColumn
     {
-        private IBinding _contentBinding;
+        private BindingBase _contentBinding;
         private readonly Lazy<ControlTheme> _cellHyperlinkButtonTheme;
         private readonly Lazy<ControlTheme> _cellTextBoxTheme;
         /// <summary>
@@ -83,7 +84,7 @@ internal
         /// Gets or sets the binding for the displayed hyperlink content.
         /// </summary>
         [AssignBinding]
-        public IBinding ContentBinding
+        public BindingBase ContentBinding
         {
             get => _contentBinding;
             set
@@ -99,7 +100,7 @@ internal
         /// <summary>
         /// The binding that will be used to get or set cell content for the clipboard.
         /// </summary>
-        public override IBinding ClipboardContentBinding
+        public override BindingBase ClipboardContentBinding
         {
             get
             {
@@ -290,23 +291,19 @@ internal
             }
         }
 
-        private static void ApplyBinding(AvaloniaObject target, AvaloniaProperty property, IBinding binding)
+        private static void ApplyBinding(AvaloniaObject target, AvaloniaProperty property, BindingBase binding)
         {
             if (binding == null)
             {
                 return;
             }
 
-            var result = binding.Initiate(target, property, enableDataValidation: true);
-            if (result != null)
-            {
-                BindingOperations.Apply(target, property, result, null);
-            }
+            target.Bind(property, binding);
         }
 
-        private static IBinding PrepareBinding(IBinding binding)
+        private static BindingBase PrepareBinding(BindingBase binding)
         {
-            if (binding is BindingBase bindingBase && bindingBase.Mode == BindingMode.OneWayToSource)
+            if (binding != null && BindingCloneHelper.GetMode(binding) == BindingMode.OneWayToSource)
             {
                 throw new InvalidOperationException("DataGridHyperlinkColumn does not support BindingMode.OneWayToSource. Use BindingMode.TwoWay instead.");
             }

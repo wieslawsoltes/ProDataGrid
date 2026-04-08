@@ -347,7 +347,7 @@ internal
             return OwningGrid == null ? null : themeCache.Value;
         }
 
-        private static IBinding CreateDisplayBinding(IBinding binding)
+        private static BindingBase CreateDisplayBinding(BindingBase binding)
         {
             return binding switch
             {

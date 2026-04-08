@@ -5,8 +5,8 @@
 
 using System;
 using System.Runtime.CompilerServices;
+using Avalonia.Data;
 using Avalonia.Data.Core;
-using Avalonia.Markup.Xaml.MarkupExtensions.CompiledBindings;
 
 namespace Avalonia.Controls
 {

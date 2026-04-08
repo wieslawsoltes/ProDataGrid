@@ -5,6 +5,7 @@
 
 using Avalonia.Input;
 using Avalonia.Input.Platform;
+using Avalonia.VisualTree;
 
 namespace Avalonia.Controls.Utils
 {
@@ -25,8 +26,8 @@ namespace Avalonia.Controls.Utils
 
         public static KeyModifiers GetPlatformCtrlOrCmdKeyModifier(Control target)
         {
-            var topLevel = TopLevel.GetTopLevel(target);
-            return topLevel?.PlatformSettings?.HotkeyConfiguration.CommandModifiers ?? KeyModifiers.Control;
+            var keymap = TopLevel.GetTopLevel(target)?.GetPlatformSettings()?.HotkeyConfiguration;
+            return keymap?.CommandModifiers ?? KeyModifiers.Control;
         }
     }
 }

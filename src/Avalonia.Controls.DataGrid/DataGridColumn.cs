@@ -48,9 +48,9 @@ internal
         private IDisposable _headerTemplateBinding;
         private Control _editingElement;
         private ICellEditBinding _editBinding;
-        private IBinding _clipboardContentBinding;
-        private IBinding _cellBackgroundBinding;
-        private IBinding _cellForegroundBinding;
+        private BindingBase _clipboardContentBinding;
+        private BindingBase _cellBackgroundBinding;
+        private BindingBase _cellForegroundBinding;
         private ControlTheme _headerTheme;
         private ControlTheme _cellTheme;
         private ControlTheme _filterTheme;
@@ -538,7 +538,7 @@ internal
 
         [AssignBinding]
         [InheritDataTypeFromItems(nameof(DataGrid.ItemsSource), AncestorType = typeof(DataGrid))]
-        public IBinding CellBackgroundBinding
+        public BindingBase CellBackgroundBinding
         {
             get => _cellBackgroundBinding;
             set
@@ -553,7 +553,7 @@ internal
 
         [AssignBinding]
         [InheritDataTypeFromItems(nameof(DataGrid.ItemsSource), AncestorType = typeof(DataGrid))]
-        public IBinding CellForegroundBinding
+        public BindingBase CellForegroundBinding
         {
             get => _cellForegroundBinding;
             set
@@ -901,7 +901,7 @@ internal
         /// <summary>
         /// The binding that will be used to get or set cell content for the clipboard.
         /// </summary>
-        public virtual IBinding ClipboardContentBinding
+        public virtual BindingBase ClipboardContentBinding
         {
             get
             {

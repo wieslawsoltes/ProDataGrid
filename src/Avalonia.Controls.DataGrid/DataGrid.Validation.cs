@@ -495,7 +495,7 @@ internal
             _collectionValidationItemsWithError.Clear();
         }
 
-        private static string GetBindingPath(IBinding binding)
+        private static string GetBindingPath(BindingBase binding)
         {
             if (binding is Binding avaloniaBinding)
             {

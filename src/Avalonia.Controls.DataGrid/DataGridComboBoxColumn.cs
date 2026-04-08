@@ -31,9 +31,9 @@ internal
 #endif
     class DataGridComboBoxColumn : DataGridColumn
     {
-        private IBinding _selectedItemBinding;
-        private IBinding _selectedValueBinding;
-        private IBinding _textBinding;
+        private BindingBase _selectedItemBinding;
+        private BindingBase _selectedValueBinding;
+        private BindingBase _textBinding;
         private readonly Lazy<ControlTheme> _cellComboBoxTheme;
         private readonly Lazy<ControlTheme> _cellComboBoxDisplayTheme;
         /// <summary>
@@ -168,7 +168,7 @@ internal
         /// The binding applied to <see cref="Avalonia.Controls.Primitives.SelectingItemsControl.SelectedItem"/>.
         /// </summary>
         [AssignBinding]
-        public IBinding SelectedItemBinding
+        public BindingBase SelectedItemBinding
         {
             get => _selectedItemBinding;
             set
@@ -186,7 +186,7 @@ internal
         /// The binding applied to <see cref="Avalonia.Controls.Primitives.SelectingItemsControl.SelectedValue"/>.
         /// </summary>
         [AssignBinding]
-        public IBinding SelectedValueBinding
+        public BindingBase SelectedValueBinding
         {
             get => _selectedValueBinding;
             set
@@ -204,7 +204,7 @@ internal
         /// The binding applied to <see cref="ComboBox.Text"/>.
         /// </summary>
         [AssignBinding]
-        public IBinding TextBinding
+        public BindingBase TextBinding
         {
             get => _textBinding;
             set
@@ -221,7 +221,7 @@ internal
         /// <summary>
         /// The binding that will be used to get or set cell content for the clipboard.
         /// </summary>
-        public override IBinding ClipboardContentBinding
+        public override BindingBase ClipboardContentBinding
         {
             get => base.ClipboardContentBinding ?? EffectiveBinding;
             set => base.ClipboardContentBinding = value;
@@ -230,7 +230,7 @@ internal
         /// <summary>
         /// Gets the binding that should be used for edit/clipboard operations.
         /// </summary>
-        internal IBinding EffectiveBinding
+        internal BindingBase EffectiveBinding
         {
             get
             {
@@ -503,7 +503,7 @@ internal
             return comboBox;
         }
 
-        private IBinding CreateDisplayMemberBinding()
+        private BindingBase CreateDisplayMemberBinding()
         {
             if (!string.IsNullOrWhiteSpace(DisplayMemberPath))
             {
@@ -513,7 +513,7 @@ internal
             return null;
         }
 
-        private IBinding CreateSelectedValuePathBinding()
+        private BindingBase CreateSelectedValuePathBinding()
         {
             if (!string.IsNullOrWhiteSpace(SelectedValuePath))
             {
@@ -559,42 +559,46 @@ internal
             return false;
         }
 
-        private static bool IsOneWayBinding(IBinding binding)
+        private static bool IsOneWayBinding(BindingBase binding)
         {
-            if (binding is BindingBase bindingBase)
+            if (binding != null)
             {
-                return bindingBase.Mode == BindingMode.OneWay ||
-                       bindingBase.Mode == BindingMode.OneTime ||
-                       bindingBase.Mode == BindingMode.OneWayToSource;
+                var mode = BindingCloneHelper.GetMode(binding);
+                return mode == BindingMode.OneWay ||
+                       mode == BindingMode.OneTime ||
+                       mode == BindingMode.OneWayToSource;
             }
 
             return false;
         }
 
-        private static IBinding PrepareBinding(IBinding binding, bool applyValueConverter)
+        private static BindingBase PrepareBinding(BindingBase binding, bool applyValueConverter)
         {
-            if (binding is BindingBase bindingBase)
+            if (binding != null)
             {
-                if (bindingBase.Mode == BindingMode.OneWayToSource)
+                var mode = BindingCloneHelper.GetMode(binding);
+                if (mode == BindingMode.OneWayToSource)
                 {
                     throw new InvalidOperationException("DataGridComboBoxColumn does not support BindingMode.OneWayToSource. Use BindingMode.TwoWay instead.");
                 }
 
-                if (bindingBase.Mode == BindingMode.Default)
+                if (mode == BindingMode.Default)
                 {
-                    bindingBase.Mode = BindingMode.TwoWay;
+                    BindingCloneHelper.TrySetMode(binding, BindingMode.TwoWay);
                 }
 
-                if (applyValueConverter && bindingBase.Converter == null && string.IsNullOrEmpty(bindingBase.StringFormat))
+                if (applyValueConverter &&
+                    BindingCloneHelper.GetConverter(binding) == null &&
+                    string.IsNullOrEmpty(BindingCloneHelper.GetStringFormat(binding)))
                 {
-                    bindingBase.Converter = DataGridValueConverter.Instance;
+                    BindingCloneHelper.TrySetConverter(binding, DataGridValueConverter.Instance);
                 }
             }
 
             return binding;
         }
 
-        private void UpdateSortMemberPath(IBinding binding)
+        private void UpdateSortMemberPath(BindingBase binding)
         {
             if (!string.IsNullOrEmpty(SortMemberPath) || binding == null)
             {
@@ -608,59 +612,31 @@ internal
             }
         }
 
-        private static string GetBindingPath(IBinding binding)
+        private static string GetBindingPath(BindingBase binding)
         {
-            return binding switch
-            {
-                Binding avaloniaBinding => avaloniaBinding.Path,
-                CompiledBindingExtension compiled => compiled.Path?.ToString(),
-                _ => null
-            };
+            return BindingCloneHelper.GetPath(binding);
         }
 
-        private static void ApplyBinding(AvaloniaObject target, AvaloniaProperty property, IBinding binding)
+        private static void ApplyBinding(AvaloniaObject target, AvaloniaProperty property, BindingBase binding)
         {
             if (binding == null)
             {
                 return;
             }
 
-            var result = binding.Initiate(target, property, enableDataValidation: true);
-            if (result != null)
-            {
-                BindingOperations.Apply(target, property, result, null);
-            }
+            target.Bind(property, binding);
         }
 
-        private static ICellEditBinding BindEditingElement(AvaloniaObject target, AvaloniaProperty property, IBinding binding)
+        private static ICellEditBinding BindEditingElement(AvaloniaObject target, AvaloniaProperty property, BindingBase binding)
         {
             if (BindingCloneHelper.TryCreateExplicitBinding(binding, out var explicitBinding))
             {
-                var explicitResult = explicitBinding.Initiate(target, property, enableDataValidation: true);
-                if (explicitResult != null)
-                {
-                    BindingOperations.Apply(target, property, explicitResult, null);
-                    return new ExplicitCellEditBinding(target, property);
-                }
+                target.Bind(property, explicitBinding);
+                return new ExplicitCellEditBinding(target, property, binding);
             }
 
-            var result = binding?.Initiate(target, property, enableDataValidation: true);
-
-            if (result != null)
-            {
-                if (result.Source is IAvaloniaSubject<object> subject)
-                {
-                    var bindingHelper = new CellEditBinding(subject, result.Expression, () => target.GetValue(property));
-                    var instanceBinding = new InstancedBinding(bindingHelper.InternalSubject, result.Mode, result.Priority);
-
-                    BindingOperations.Apply(target, property, instanceBinding, null);
-                    return bindingHelper;
-                }
-
-                BindingOperations.Apply(target, property, result, null);
-            }
-
-            return null;
+            target.Bind(property, binding);
+            return new CellEditBinding(target, property, binding);
         }
 
     }
