@@ -15,7 +15,7 @@ public class SearchAdapterFactoryTests
         var grid = new DataGrid();
         var model = new SearchModel();
 
-        var adapter = factory.Create(grid, model);
+        using var adapter = factory.Create(grid, model);
 
         Assert.IsType<DataGridAccessorSearchAdapter>(adapter);
     }
@@ -27,7 +27,7 @@ public class SearchAdapterFactoryTests
         var grid = new DataGrid();
         var model = new SearchModel();
 
-        var adapter = factory.Create(grid, model);
+        using var adapter = factory.Create(grid, model);
 
         Assert.IsType<DataGridAccessorSearchAdapter>(adapter);
     }

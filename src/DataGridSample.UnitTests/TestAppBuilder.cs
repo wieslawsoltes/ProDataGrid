@@ -3,6 +3,7 @@ using Avalonia;
 using Avalonia.Headless;
 using Avalonia.Markup.Xaml.Styling;
 using Avalonia.Themes.Fluent;
+using ReactiveUI.Avalonia;
 
 [assembly: Avalonia.Headless.AvaloniaTestApplication(typeof(DataGridSample.Tests.UnitTestAppBuilder))]
 
@@ -18,7 +19,8 @@ internal static class UnitTestAppBuilder
         };
 
         return AppBuilder.Configure<UnitTestApp>()
-            .UseHeadless(options);
+            .UseHeadless(options)
+            .UseReactiveUI(static _ => { });
     }
 }
 

@@ -282,8 +282,7 @@ public class DataGridMouseOverRowTests
 
             root.SetPointerOverElementForTests(header);
             RaisePointerMovedActivity(grid, headerPoint.Value);
-            grid.RequestPointerOverRefreshFromRow();
-            PumpLayout(grid);
+            RefreshPointerOverRow(grid);
 
             Assert.Null(grid.MouseOverRowIndex);
             Assert.False(((IPseudoClasses)row.Classes).Contains(":pointerover"));
@@ -499,6 +498,16 @@ public class DataGridMouseOverRowTests
         Dispatcher.UIThread.RunJobs();
         control.UpdateLayout();
         Dispatcher.UIThread.RunJobs();
+    }
+
+    private static void RefreshPointerOverRow(DataGrid grid)
+    {
+        var method = typeof(DataGrid).GetMethod(
+            "RefreshPointerOverRow",
+            System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic)
+            ?? throw new InvalidOperationException("DataGrid.RefreshPointerOverRow was not found.");
+
+        method.Invoke(grid, null);
     }
 
     private sealed class TreeItem
