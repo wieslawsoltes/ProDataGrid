@@ -2,6 +2,7 @@
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using Avalonia.Controls;
+using Avalonia.Diagnostics;
 using Avalonia.Input;
 using Avalonia.Metadata;
 using Avalonia.Threading;
@@ -73,10 +74,11 @@ namespace Avalonia.Diagnostics.ViewModels
                 .Subscribe(e =>
                 {
                     if (e is Input.Raw.RawPointerEventArgs pointerEventArgs &&
-                        pointerEventArgs.Root is TopLevel currentTopLevel)
+                        pointerEventArgs.Root.GetInputTopLevel() is { } currentTopLevel &&
+                        pointerEventArgs.Root.GetScreenPoint(pointerEventArgs.Position) is { } screenPoint)
                     {
                         PointerOverRoot = currentTopLevel;
-                        PointerOverElement = currentTopLevel.InputHitTest(pointerEventArgs.Position);
+                        PointerOverElement = currentTopLevel.InputHitTest(currentTopLevel.PointToClient(screenPoint));
                     }
                 });
         }

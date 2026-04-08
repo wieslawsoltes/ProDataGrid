@@ -6,6 +6,7 @@ using Avalonia.Controls;
 using Avalonia.Controls.Diagnostics;
 using Avalonia.Controls.Primitives;
 using Avalonia.Data;
+using Avalonia.Diagnostics;
 using Avalonia.Diagnostics.ViewModels;
 using Avalonia.Input;
 using Avalonia.Input.Raw;
@@ -39,7 +40,10 @@ namespace Avalonia.Diagnostics.Views
                 {
                     if (x is RawPointerEventArgs pointerEventArgs)
                     {
-                        _lastPointerPosition = ((Visual)x.Root).PointToScreen(pointerEventArgs.Position);
+                        if (pointerEventArgs.Root.GetScreenPoint(pointerEventArgs.Position) is { } screenPoint)
+                        {
+                            _lastPointerPosition = screenPoint;
+                        }
                     }
                     else if (x is RawKeyEventArgs keyEventArgs && keyEventArgs.Type == RawKeyEventType.KeyDown)
                     {
