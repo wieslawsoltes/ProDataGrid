@@ -34,7 +34,7 @@ namespace Avalonia.Diagnostics.Controls
             RendererRoot = application.ApplicationLifetime switch
             {
                 Lifetimes.IClassicDesktopStyleApplicationLifetime classic => classic.MainWindow?.Renderer,
-                Lifetimes.ISingleViewApplicationLifetime single => single.MainView?.VisualRoot?.Renderer,
+                Lifetimes.ISingleViewApplicationLifetime single => TopLevel.GetTopLevel(single.MainView) ?.Renderer,
                 _ => null
             };
 

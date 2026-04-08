@@ -40,7 +40,7 @@
       <FilterTextBox Grid.Row="0" Margin="0,0,0,2"
                               DataContext="{Binding EventsFilter}"
                               Text="{Binding FilterString}"
-                              Watermark="Filter events"
+                              PlaceholderText="Filter events"
                               UseCaseSensitiveFilter="{Binding UseCaseSensitiveFilter}"
                               UseWholeWordFilter="{Binding UseWholeWordFilter}"
                               UseRegexFilter="{Binding UseRegexFilter}" />

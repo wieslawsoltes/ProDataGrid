@@ -78,7 +78,7 @@
             <TabItem Header="Metrics">
               <Grid RowDefinitions="Auto,*,Auto" RowSpacing="12">
                 <Grid ColumnDefinitions="*,Auto,Auto,Auto" ColumnSpacing="12">
-                  <TextBox Watermark="Filter metrics" Text="{Binding MetricsFilter}" />
+                  <TextBox PlaceholderText="Filter metrics" Text="{Binding MetricsFilter}" />
                   <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="6" VerticalAlignment="Center">
                     <TextBlock Text="Trend" Classes="subtitle" VerticalAlignment="Center" />
                     <ComboBox Width="110" ItemsSource="{Binding TrendRanges}" SelectedItem="{Binding SelectedTrendRange}">
@@ -209,7 +209,7 @@
             <TabItem Header="Activities">
               <Grid RowDefinitions="Auto,*" RowSpacing="12">
                 <Grid ColumnDefinitions="*,Auto,Auto" ColumnSpacing="12">
-                  <TextBox Watermark="Filter activities" Text="{Binding ActivitiesFilter}" />
+                  <TextBox PlaceholderText="Filter activities" Text="{Binding ActivitiesFilter}" />
                   <Button Grid.Column="1" Content="Columns">
                     <Button.Flyout>
                       <Flyout Placement="Bottom">

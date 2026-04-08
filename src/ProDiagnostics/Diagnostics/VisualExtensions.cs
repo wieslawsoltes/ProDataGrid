@@ -17,19 +17,17 @@ namespace Avalonia.Diagnostics
         /// <param name="dpi">Dpi quality.</param>
         public static void RenderTo(this Control source, Stream destination, double dpi = 96)
         {
-            var transform = source.CompositionVisual?.TryGetServerGlobalTransform();
+            var root = TopLevel.GetTopLevel(source) as Control ?? source;
+            var transform = source.TransformToVisual(root);
             if (transform == null)
+            {
                 return;
+            }
 
             var rect = new Rect(source.Bounds.Size).TransformToAABB(transform.Value);
             var top = rect.TopLeft;
             var pixelSize = new PixelSize((int)rect.Width, (int)rect.Height);
             var dpiVector = new Vector(dpi, dpi);
-
-            // get Visual root
-            var root = (source.VisualRoot
-                ?? source.GetVisualRoot())
-                as Control ?? source;
 
             IDisposable? clipSetter = default;
             IDisposable? clipToBoundsSetter = default;
