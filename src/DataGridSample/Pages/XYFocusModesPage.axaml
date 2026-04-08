@@ -43,7 +43,7 @@
             <Button Content="C3" />
           </UniformGrid>
           <StackPanel Orientation="Horizontal" Spacing="6">
-            <TextBox Width="140" Watermark="Focusable text" />
+            <TextBox Width="140" PlaceholderText="Focusable text" />
             <ToggleButton Content="Toggle me" />
             <Button Content="Action" />
           </StackPanel>

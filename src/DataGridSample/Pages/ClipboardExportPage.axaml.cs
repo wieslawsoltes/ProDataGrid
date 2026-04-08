@@ -50,6 +50,11 @@ public partial class ClipboardExportPage : UserControl
 
     private void UpdateExportSettings(object? sender, RoutedEventArgs? e)
     {
+        if (sender is RadioButton { IsChecked: false })
+        {
+            return;
+        }
+
         var format = sender switch
         {
             RadioButton { IsChecked: true } radio when ReferenceEquals(radio, TextFormatRadioButton) => DataGridClipboardExportFormat.Text,
@@ -102,7 +107,6 @@ public partial class ClipboardExportPage : UserControl
             return DataGridClipboardExportFormat.Json;
         }
 
-        TextFormatRadioButton.IsChecked = true;
         return DataGridClipboardExportFormat.Text;
     }
 

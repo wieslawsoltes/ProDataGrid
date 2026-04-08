@@ -980,7 +980,7 @@ public sealed partial class MarketDashboardViewModel : ReactiveObject
 
     private void OnSnapshotChanged(MarketDashboardDataSnapshot snapshot)
     {
-        RxApp.MainThreadScheduler.Schedule(
+        ReactiveUI.RxSchedulers.MainThreadScheduler.Schedule(
             snapshot,
             (_, state) =>
             {

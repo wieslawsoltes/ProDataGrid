@@ -1186,7 +1186,7 @@
                 <Grid ColumnDefinitions="*,Auto,Auto"
                       ColumnSpacing="8">
                   <TextBox Classes="strip-search-field"
-                           Watermark="Filter symbols"
+                           PlaceholderText="Filter symbols"
                            Text="{Binding WatchlistFilterText, Mode=TwoWay}" />
                   <Border Grid.Column="1"
                           Classes="metric-badge"
@@ -1476,7 +1476,7 @@
                       ColumnDefinitions="*,92"
                       ColumnSpacing="10">
                   <TextBox Classes="trade-field"
-                           Watermark="Amount"
+                           PlaceholderText="Amount"
                            ToolTip.Tip="Enter the base-asset amount for the simulated order."
                            Text="{Binding OrderAmountText, Mode=TwoWay}" />
                   <ComboBox Grid.Column="1"

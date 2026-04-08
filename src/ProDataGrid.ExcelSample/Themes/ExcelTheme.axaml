@@ -188,7 +188,7 @@
                           Padding="12,2"
                           HorizontalAlignment="Center">
                     <TextBox Text="{Binding SearchText, RelativeSource={RelativeSource TemplatedParent}, Mode=TwoWay}"
-                             Watermark="Search for tools, help, and more (Option + Q)"
+                             PlaceholderText="Search for tools, help, and more (Option + Q)"
                              BorderThickness="0"
                              Background="Transparent"
                              Width="360" />
@@ -307,7 +307,7 @@
 
                 <Border Grid.Column="3" Classes="FormulaField">
                   <TextBox Text="{Binding FormulaText, RelativeSource={RelativeSource TemplatedParent}, Mode=TwoWay}"
-                           Watermark="Enter formula"
+                           PlaceholderText="Enter formula"
                            BorderThickness="0"
                            Background="Transparent"
                            Classes="FormulaTextBox"
@@ -323,7 +323,7 @@
 
                 <Border Grid.Column="4" Classes="FormulaField" MinWidth="160">
                   <TextBox Text="{Binding FilterText, RelativeSource={RelativeSource TemplatedParent}, Mode=TwoWay}"
-                           Watermark="Filter"
+                           PlaceholderText="Filter"
                            BorderThickness="0"
                            Background="Transparent"
                            Classes="FormulaTextBox"

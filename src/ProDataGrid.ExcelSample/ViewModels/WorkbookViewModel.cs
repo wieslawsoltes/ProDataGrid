@@ -38,7 +38,7 @@ public sealed class WorkbookViewModel : ReactiveObject, IDisposable
     private readonly SpreadsheetClipboardState _clipboardState;
 
     public WorkbookViewModel()
-        : this(RxApp.MainThreadScheduler, RxApp.TaskpoolScheduler, startLiveUpdates: false)
+        : this(ReactiveUI.RxSchedulers.MainThreadScheduler, ReactiveUI.RxSchedulers.TaskpoolScheduler, startLiveUpdates: false)
     {
     }
 

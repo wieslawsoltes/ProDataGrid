@@ -79,8 +79,7 @@ namespace DataGridSample.Controls
 
         private KeyModifiers GetCommandModifiers()
         {
-            var topLevel = TopLevel.GetTopLevel(this);
-            return topLevel?.PlatformSettings?.HotkeyConfiguration.CommandModifiers ?? KeyModifiers.Control;
+            return this.GetPlatformSettings()?.HotkeyConfiguration.CommandModifiers ?? KeyModifiers.Control;
         }
 
         private static string FormatOverride(KeyGesture? gesture)

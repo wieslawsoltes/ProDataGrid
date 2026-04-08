@@ -38,31 +38,31 @@
                          GroupName="ClipboardFormat"
                          Content="Text (tab separated)"
                          IsChecked="True"
-                         Checked="UpdateExportSettings" />
+                         IsCheckedChanged="UpdateExportSettings" />
             <RadioButton x:Name="CsvFormatRadioButton"
                          GroupName="ClipboardFormat"
                          Content="CSV (text/csv)"
-                         Checked="UpdateExportSettings" />
+                         IsCheckedChanged="UpdateExportSettings" />
             <RadioButton x:Name="HtmlFormatRadioButton"
                          GroupName="ClipboardFormat"
                          Content="HTML table (CF_HTML + text/html)"
-                         Checked="UpdateExportSettings" />
+                         IsCheckedChanged="UpdateExportSettings" />
             <RadioButton x:Name="MarkdownFormatRadioButton"
                          GroupName="ClipboardFormat"
                          Content="Markdown (text/markdown)"
-                         Checked="UpdateExportSettings" />
+                         IsCheckedChanged="UpdateExportSettings" />
             <RadioButton x:Name="XmlFormatRadioButton"
                          GroupName="ClipboardFormat"
                          Content="XML (text/xml)"
-                         Checked="UpdateExportSettings" />
+                         IsCheckedChanged="UpdateExportSettings" />
             <RadioButton x:Name="YamlFormatRadioButton"
                          GroupName="ClipboardFormat"
                          Content="YAML (text/yaml)"
-                         Checked="UpdateExportSettings" />
+                         IsCheckedChanged="UpdateExportSettings" />
             <RadioButton x:Name="JsonFormatRadioButton"
                          GroupName="ClipboardFormat"
                          Content="JSON (application/json)"
-                         Checked="UpdateExportSettings" />
+                         IsCheckedChanged="UpdateExportSettings" />
           </StackPanel>
         </StackPanel>
       </Border>

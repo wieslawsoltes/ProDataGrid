@@ -18,6 +18,7 @@ using Avalonia.Media.Imaging;
 using Avalonia.Platform;
 using Avalonia.Styling;
 using Avalonia.Utilities;
+using Avalonia.VisualTree;
 using ProCharts;
 using ProCharts.Skia;
 using SkiaSharp;
@@ -552,7 +553,7 @@ namespace ProCharts.Avalonia
         private void EnsureBitmap()
         {
             var size = Bounds.Size;
-            var scaling = VisualRoot?.RenderScaling ?? 1d;
+            var scaling = this.GetPresentationSource()?.RenderScaling ?? 1d;
             if (_bitmap != null && size.Equals(_lastSize) && Math.Abs(_lastScaling - scaling) < double.Epsilon)
             {
                 return;
@@ -789,7 +790,7 @@ namespace ProCharts.Avalonia
                 return false;
             }
 
-            var scaling = VisualRoot?.RenderScaling ?? 1d;
+            var scaling = this.GetPresentationSource()?.RenderScaling ?? 1d;
             pixelWidth = Math.Max(1, (int)Math.Round(size.Width * scaling));
             pixelHeight = Math.Max(1, (int)Math.Round(size.Height * scaling));
             width = Math.Max(1, (int)Math.Round(size.Width));

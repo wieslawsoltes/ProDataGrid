@@ -43,6 +43,7 @@ public sealed class SheetTabStrip : TemplatedControl
     private object? _dragItem;
     private Point? _dragStart;
     private int _dragPointerId;
+    private PointerPressedEventArgs? _dragStartEventArgs;
     private bool _dragPending;
     private bool _isDragging;
 
@@ -127,6 +128,7 @@ public sealed class SheetTabStrip : TemplatedControl
 
         _dragStart = point;
         _dragPointerId = e.Pointer.Id;
+        _dragStartEventArgs = e;
         _dragPending = true;
     }
 
@@ -149,7 +151,10 @@ public sealed class SheetTabStrip : TemplatedControl
         }
 
         _dragPending = false;
-        BeginDrag(e);
+        if (_dragStartEventArgs != null)
+        {
+            BeginDrag(_dragStartEventArgs);
+        }
     }
 
     private void OnPointerReleased(object? sender, PointerReleasedEventArgs e)
@@ -207,7 +212,7 @@ public sealed class SheetTabStrip : TemplatedControl
         e.Handled = true;
     }
 
-    private async void BeginDrag(PointerEventArgs e)
+    private async void BeginDrag(PointerPressedEventArgs e)
     {
         if (_listBox == null || _dragItem == null || _isDragging)
         {
@@ -244,6 +249,7 @@ public sealed class SheetTabStrip : TemplatedControl
         _isDragging = false;
         _dragStart = null;
         _dragPointerId = 0;
+        _dragStartEventArgs = null;
         _dragItem = null;
     }
 
