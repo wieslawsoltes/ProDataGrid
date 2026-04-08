@@ -359,6 +359,30 @@ public class DataGridValidationTests
     }
 
     [AvaloniaFact]
+    public void INotifyDataErrorInfo_reflection_binding_surfaces_cell_validation()
+    {
+        var binding = new ReflectionBinding(nameof(NotifyValidationItem.Code))
+        {
+            Mode = BindingMode.TwoWay,
+            UpdateSourceTrigger = UpdateSourceTrigger.PropertyChanged
+        };
+
+        var (grid, root, item, column) = CreateNotifyValidationGrid(binding);
+
+        try
+        {
+            var cell = FindCell(grid, item, column.Index);
+
+            Assert.Equal(DataGridValidationSeverity.Warning, cell.ValidationSeverity);
+            Assert.True(DataValidationErrors.GetHasErrors(cell));
+        }
+        finally
+        {
+            root.Close();
+        }
+    }
+
+    [AvaloniaFact]
     public void INotifyDataErrorInfo_edit_clears_cell_errors_while_editing()
     {
         var (grid, root, item, column) = CreateNotifyValidationGrid();
@@ -806,6 +830,11 @@ public class DataGridValidationTests
 
     private static (DataGrid grid, Window root, NotifyValidationItem item, DataGridTextColumn column) CreateNotifyValidationGrid()
     {
+        return CreateNotifyValidationGrid(TwoWayBinding(nameof(NotifyValidationItem.Code)));
+    }
+
+    private static (DataGrid grid, Window root, NotifyValidationItem item, DataGridTextColumn column) CreateNotifyValidationGrid(BindingBase binding)
+    {
         var item = new NotifyValidationItem
         {
             Code = "X"
@@ -830,7 +859,7 @@ public class DataGridValidationTests
         var codeColumn = new DataGridTextColumn
         {
             Header = "Code",
-            Binding = TwoWayBinding(nameof(NotifyValidationItem.Code))
+            Binding = binding
         };
 
         grid.ColumnsInternal.Add(codeColumn);

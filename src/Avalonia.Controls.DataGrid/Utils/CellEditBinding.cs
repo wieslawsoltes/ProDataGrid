@@ -18,6 +18,7 @@ public
 internal
 #endif
     interface ICellEditBinding
+        : IDisposable
     {
         bool IsValid { get; }
         IEnumerable<Exception> ValidationErrors { get; }
@@ -30,15 +31,20 @@ internal
         private readonly AvaloniaObject _target;
         private readonly AvaloniaProperty _property;
         private readonly string _bindingPath;
+        private readonly bool _supportsDirectSourceWriteFallback;
         private readonly LightweightSubject<bool> _changedSubject = new();
         private readonly List<Exception> _validationErrors = new();
         private DataGridValidationSeverity _validationSeverity = DataGridValidationSeverity.None;
+        private bool _disposed;
 
         protected CellEditBindingBase(AvaloniaObject target, AvaloniaProperty property, BindingBase binding)
         {
             _target = target ?? throw new ArgumentNullException(nameof(target));
             _property = property ?? throw new ArgumentNullException(nameof(property));
-            _bindingPath = binding != null ? BindingCloneHelper.GetPath(binding) : null;
+            _supportsDirectSourceWriteFallback = BindingCloneHelper.SupportsDirectDataContextMemberWrite(binding);
+            _bindingPath = _supportsDirectSourceWriteFallback && binding != null
+                ? BindingCloneHelper.GetPath(binding)
+                : null;
             _target.PropertyChanged += OnTargetPropertyChanged;
             RefreshValidationState();
         }
@@ -52,6 +58,10 @@ internal
             Exception commitError = null;
             var expression = BindingOperations.GetBindingExpressionBase(_target, _property);
             var preCommitValidationErrors = CaptureValidationErrors(expression);
+            var shouldPreservePreCommitValidation = preCommitValidationErrors.Count > 0 &&
+                                                   expression is IValueEntry preCommitValueEntry &&
+                                                   TryGetSourceValue(preCommitValueEntry, out var preCommitSourceValue) &&
+                                                   Equals(_target.GetValue(_property), preCommitSourceValue);
             if (expression != null)
             {
                 try
@@ -74,6 +84,7 @@ internal
                 UpdateValidationErrorsFromTarget(expression);
 
                 if (_validationErrors.Count == 0 &&
+                    _supportsDirectSourceWriteFallback &&
                     _target is ToggleButton &&
                     expression is IValueEntry writeValueEntry &&
                     TryGetSourceValue(writeValueEntry, out var currentSourceValue))
@@ -94,7 +105,7 @@ internal
                     }
                 }
 
-                if (_validationErrors.Count == 0 && preCommitValidationErrors.Count > 0)
+                if (_validationErrors.Count == 0 && shouldPreservePreCommitValidation)
                 {
                     AlterValidationErrors(list =>
                     {
@@ -118,6 +129,17 @@ internal
             }
 
             return IsValid;
+        }
+
+        public void Dispose()
+        {
+            if (_disposed)
+            {
+                return;
+            }
+
+            _disposed = true;
+            _target.PropertyChanged -= OnTargetPropertyChanged;
         }
 
         private void OnTargetPropertyChanged(object sender, AvaloniaPropertyChangedEventArgs e)

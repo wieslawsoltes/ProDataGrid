@@ -4,6 +4,8 @@
 #nullable disable
 
 using System.Globalization;
+using Avalonia;
+using Avalonia.Controls;
 using Avalonia.Data;
 using Avalonia.Data.Converters;
 using Avalonia.Markup.Xaml.MarkupExtensions;
@@ -38,7 +40,9 @@ namespace Avalonia.Controls.Utils
         {
             return binding switch
             {
+                Binding avaloniaBinding => avaloniaBinding.Path,
                 ReflectionBinding reflectionBinding => reflectionBinding.Path,
+                CompiledBindingExtension compiledBindingExtension => compiledBindingExtension.Path?.ToString(),
                 CompiledBinding compiledBinding => compiledBinding.Path?.ToString(),
                 _ => null
             };
@@ -48,7 +52,9 @@ namespace Avalonia.Controls.Utils
         {
             return binding switch
             {
+                Binding avaloniaBinding => avaloniaBinding.Mode,
                 ReflectionBinding reflectionBinding => reflectionBinding.Mode,
+                CompiledBindingExtension compiledBindingExtension => compiledBindingExtension.Mode,
                 CompiledBinding compiledBinding => compiledBinding.Mode,
                 MultiBinding multiBinding => multiBinding.Mode,
                 _ => BindingMode.Default
@@ -59,8 +65,14 @@ namespace Avalonia.Controls.Utils
         {
             switch (binding)
             {
+                case Binding avaloniaBinding:
+                    avaloniaBinding.Mode = mode;
+                    return true;
                 case ReflectionBinding reflectionBinding:
                     reflectionBinding.Mode = mode;
+                    return true;
+                case CompiledBindingExtension compiledBindingExtension:
+                    compiledBindingExtension.Mode = mode;
                     return true;
                 case CompiledBinding compiledBinding:
                     compiledBinding.Mode = mode;
@@ -77,7 +89,9 @@ namespace Avalonia.Controls.Utils
         {
             return binding switch
             {
+                Binding avaloniaBinding => avaloniaBinding.Converter,
                 ReflectionBinding reflectionBinding => reflectionBinding.Converter,
+                CompiledBindingExtension compiledBindingExtension => compiledBindingExtension.Converter,
                 CompiledBinding compiledBinding => compiledBinding.Converter,
                 _ => null
             };
@@ -87,8 +101,14 @@ namespace Avalonia.Controls.Utils
         {
             switch (binding)
             {
+                case Binding avaloniaBinding:
+                    avaloniaBinding.Converter = converter;
+                    return true;
                 case ReflectionBinding reflectionBinding:
                     reflectionBinding.Converter = converter;
+                    return true;
+                case CompiledBindingExtension compiledBindingExtension:
+                    compiledBindingExtension.Converter = converter;
                     return true;
                 case CompiledBinding compiledBinding:
                     compiledBinding.Converter = converter;
@@ -102,7 +122,9 @@ namespace Avalonia.Controls.Utils
         {
             return binding switch
             {
+                Binding avaloniaBinding => avaloniaBinding.ConverterCulture,
                 ReflectionBinding reflectionBinding => reflectionBinding.ConverterCulture,
+                CompiledBindingExtension compiledBindingExtension => compiledBindingExtension.ConverterCulture,
                 CompiledBinding compiledBinding => compiledBinding.ConverterCulture,
                 MultiBinding multiBinding => multiBinding.ConverterCulture,
                 _ => null
@@ -113,7 +135,9 @@ namespace Avalonia.Controls.Utils
         {
             return binding switch
             {
+                Binding avaloniaBinding => avaloniaBinding.ConverterParameter,
                 ReflectionBinding reflectionBinding => reflectionBinding.ConverterParameter,
+                CompiledBindingExtension compiledBindingExtension => compiledBindingExtension.ConverterParameter,
                 CompiledBinding compiledBinding => compiledBinding.ConverterParameter,
                 MultiBinding multiBinding => multiBinding.ConverterParameter,
                 _ => null
@@ -124,11 +148,46 @@ namespace Avalonia.Controls.Utils
         {
             return binding switch
             {
+                Binding avaloniaBinding => avaloniaBinding.StringFormat,
                 ReflectionBinding reflectionBinding => reflectionBinding.StringFormat,
+                CompiledBindingExtension compiledBindingExtension => compiledBindingExtension.StringFormat,
                 CompiledBinding compiledBinding => compiledBinding.StringFormat,
                 MultiBinding multiBinding => multiBinding.StringFormat,
                 _ => null
             };
+        }
+
+        public static bool SupportsDirectDataContextMemberWrite(BindingBase? binding)
+        {
+            var mode = GetMode(binding);
+            var converter = GetConverter(binding);
+            if (string.IsNullOrWhiteSpace(GetPath(binding)) ||
+                mode == BindingMode.OneWay ||
+                mode == BindingMode.OneWayToSource ||
+                mode == BindingMode.OneTime ||
+                (converter != null && !ReferenceEquals(converter, DataGridValueConverter.Instance)) ||
+                !string.IsNullOrWhiteSpace(GetStringFormat(binding)))
+            {
+                return false;
+            }
+
+            return binding switch
+            {
+                Binding avaloniaBinding => HasImplicitSource(avaloniaBinding.Source) &&
+                                           string.IsNullOrWhiteSpace(avaloniaBinding.ElementName) &&
+                                           avaloniaBinding.RelativeSource is null,
+                ReflectionBinding reflectionBinding => HasImplicitSource(reflectionBinding.Source) &&
+                                                       string.IsNullOrWhiteSpace(reflectionBinding.ElementName) &&
+                                                       reflectionBinding.RelativeSource is null,
+                CompiledBindingExtension compiledBindingExtension => HasImplicitSource(compiledBindingExtension.Source),
+                CompiledBinding compiledBinding => HasImplicitSource(compiledBinding.Source),
+                _ => false
+            };
+        }
+
+        private static bool HasImplicitSource(object? source)
+        {
+            return source is null || ReferenceEquals(source, AvaloniaProperty.UnsetValue);
         }
 
         private static Binding CloneBinding(Binding source)

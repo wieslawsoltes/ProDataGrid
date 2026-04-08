@@ -299,6 +299,8 @@ namespace Avalonia.Controls
         internal void RemoveEditingElement()
         {
             _editingElement = null;
+            _editBinding?.Dispose();
+            _editBinding = null;
         }
 
         /// <summary>
@@ -307,7 +309,6 @@ namespace Avalonia.Controls
         internal virtual void ClearElementCache()
         {
             RemoveEditingElement();
-            _editBinding = null;
             if (_headerContentBinding != null)
             {
                 _headerContentBinding.Dispose();

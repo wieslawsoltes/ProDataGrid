@@ -924,6 +924,10 @@ public class DataGridKeyboardInputTests
         public IObservable<bool> ValidationChanged { get; } = new EmptyObservable();
 
         public bool CommitEdit() => false;
+
+        public void Dispose()
+        {
+        }
     }
 
     private sealed class EmptyObservable : IObservable<bool>
