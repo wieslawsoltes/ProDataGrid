@@ -1297,8 +1297,14 @@ internal
         {
             int? newRowIndex = null;
             var isPointerOverGrid = IsPointerOverSelfOrDescendant();
-            var isPointerOverGroupSlot = IsPointerOverGroupHeaderOrFooter();
-            if (isPointerOverGrid && DisplayData.FirstScrollingSlot < 0 && _mouseOverRowIndex.HasValue && SlotCount > 0)
+            var isPointerOverGroupSlot =
+                IsPointerOverGroupHeaderOrFooter() ||
+                (_lastPointerPosition != null && IsPointOverGroupHeaderOrFooter(_lastPointerPosition.Value));
+            if (isPointerOverGrid && isPointerOverGroupSlot)
+            {
+                newRowIndex = null;
+            }
+            else if (isPointerOverGrid && DisplayData.FirstScrollingSlot < 0 && _mouseOverRowIndex.HasValue && SlotCount > 0)
             {
                 newRowIndex = _mouseOverRowIndex;
             }

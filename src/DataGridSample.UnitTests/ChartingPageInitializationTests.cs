@@ -28,14 +28,14 @@ public sealed class ChartingPageInitializationTests
         {
             window.Show();
             PumpLayout(window);
+
+            var viewModel = Assert.IsType<ChartSampleViewModel>(page.DataContext);
+            Assert.Equal(ChartSampleKind.Line, viewModel.Kind);
         }
         finally
         {
             window.Close();
         }
-
-        var viewModel = Assert.IsType<ChartSampleViewModel>(page.DataContext);
-        Assert.Equal(ChartSampleKind.Line, viewModel.Kind);
     }
 
     [AvaloniaFact]
@@ -53,14 +53,14 @@ public sealed class ChartingPageInitializationTests
         {
             window.Show();
             PumpLayout(window);
+
+            var viewModelAfterAttach = Assert.IsType<ChartSampleViewModel>(page.DataContext);
+            Assert.Equal(ChartSampleKind.Pie, viewModelAfterAttach.Kind);
         }
         finally
         {
             window.Close();
         }
-
-        var viewModelAfterAttach = Assert.IsType<ChartSampleViewModel>(page.DataContext);
-        Assert.Equal(ChartSampleKind.Pie, viewModelAfterAttach.Kind);
     }
 
     [AvaloniaFact]
@@ -78,14 +78,14 @@ public sealed class ChartingPageInitializationTests
         {
             window.Show();
             PumpLayout(window);
+
+            var viewModelAfterAttach = Assert.IsType<ChartSampleViewModel>(page.DataContext);
+            Assert.Equal(ChartSampleKind.Candlestick, viewModelAfterAttach.Kind);
         }
         finally
         {
             window.Close();
         }
-
-        var viewModelAfterAttach = Assert.IsType<ChartSampleViewModel>(page.DataContext);
-        Assert.Equal(ChartSampleKind.Candlestick, viewModelAfterAttach.Kind);
     }
 
     [AvaloniaFact]
@@ -103,14 +103,14 @@ public sealed class ChartingPageInitializationTests
         {
             window.Show();
             PumpLayout(window);
+
+            var viewModelAfterAttach = Assert.IsType<ChartSampleViewModel>(page.DataContext);
+            Assert.Equal(ChartSampleKind.PointFigure, viewModelAfterAttach.Kind);
         }
         finally
         {
             window.Close();
         }
-
-        var viewModelAfterAttach = Assert.IsType<ChartSampleViewModel>(page.DataContext);
-        Assert.Equal(ChartSampleKind.PointFigure, viewModelAfterAttach.Kind);
     }
 
     [AvaloniaFact]

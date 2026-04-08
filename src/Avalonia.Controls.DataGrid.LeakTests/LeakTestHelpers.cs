@@ -8,6 +8,7 @@ using Avalonia.Controls;
 using Avalonia.Headless;
 using Avalonia.Input;
 using Avalonia.Threading;
+using Avalonia.VisualTree;
 using Xunit;
 
 namespace Avalonia.Controls.DataGridTests;
@@ -38,6 +39,10 @@ internal static class LeakTestHelpers
     internal static void CleanupWindow(Window window)
     {
         TryClearFocus(window.FocusManager);
+        foreach (var grid in window.GetSelfAndVisualDescendants().OfType<DataGrid>())
+        {
+            grid.FormulaModel?.Detach();
+        }
         window.Content = null;
         window.DataContext = null;
         TryClearPointerOverElement(window);
@@ -47,9 +52,7 @@ internal static class LeakTestHelpers
             RunJobsAndRender();
         }
         window.Close();
-        Dispatcher.UIThread.RunJobs(DispatcherPriority.Background);
-        Dispatcher.UIThread.RunJobs(DispatcherPriority.Loaded);
-        RunJobsAndRender();
+        DrainDispatcher();
     }
 
     internal static void ShowWindow(Window window)
@@ -94,10 +97,10 @@ internal static class LeakTestHelpers
             new[] { typeof(IInputElement), typeof(NavigationMethod), typeof(KeyModifiers) });
         setFocusedElement?.Invoke(keyboard, new object?[] { null, NavigationMethod.Unspecified, KeyModifiers.None });
         Dispatcher.UIThread.RunJobs(DispatcherPriority.Loaded);
-        RunJobsAndRender();
+        DrainDispatcher();
         GC.Collect();
         GC.WaitForPendingFinalizers();
-        RunJobsAndRender();
+        DrainDispatcher();
         GC.Collect();
     }
 
@@ -180,6 +183,16 @@ internal static class LeakTestHelpers
             }
         }
         dispatcher.RunJobs();
+    }
+
+    internal static void DrainDispatcher()
+    {
+        for (var i = 0; i < 5; i++)
+        {
+            Dispatcher.UIThread.RunJobs(DispatcherPriority.Background);
+            Dispatcher.UIThread.RunJobs(DispatcherPriority.Loaded);
+            RunJobsAndRender();
+        }
     }
 
     internal static void PumpLayout(Control control)

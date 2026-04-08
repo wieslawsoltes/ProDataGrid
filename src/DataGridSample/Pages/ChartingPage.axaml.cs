@@ -1,5 +1,7 @@
+using System;
 using Avalonia;
 using Avalonia.Controls;
+using Avalonia.VisualTree;
 using DataGridSample.ViewModels;
 
 namespace DataGridSample.Pages
@@ -17,7 +19,6 @@ namespace DataGridSample.Pages
         public ChartingPage()
         {
             InitializeComponent();
-            AttachedToVisualTree += (_, _) => UpdateViewModel();
         }
 
         public ChartSampleKind SampleKind
@@ -39,6 +40,18 @@ namespace DataGridSample.Pages
             }
         }
 
+        protected override void OnAttachedToVisualTree(VisualTreeAttachmentEventArgs e)
+        {
+            base.OnAttachedToVisualTree(e);
+            UpdateViewModel();
+        }
+
+        protected override void OnDetachedFromVisualTree(VisualTreeAttachmentEventArgs e)
+        {
+            DisposeCurrentViewModel();
+            base.OnDetachedFromVisualTree(e);
+        }
+
         private void UpdateViewModel()
         {
             if (VisualRoot is null)
@@ -51,7 +64,18 @@ namespace DataGridSample.Pages
                 return;
             }
 
+            DisposeCurrentViewModel();
             DataContext = new ChartSampleViewModel(SampleKind);
+        }
+
+        private void DisposeCurrentViewModel()
+        {
+            if (DataContext is IDisposable disposable)
+            {
+                disposable.Dispose();
+            }
+
+            DataContext = null;
         }
     }
 }
