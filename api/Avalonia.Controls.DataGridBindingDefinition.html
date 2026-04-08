@@ -508,21 +508,21 @@ Class DataGridBindingDefinition  <a class="header-action link-secondary" title="
 
   <a id="Avalonia_Controls_DataGridBindingDefinition_Create_" data-uid="Avalonia.Controls.DataGridBindingDefinition.Create*"></a>
 
-  <h3 id="Avalonia_Controls_DataGridBindingDefinition_Create__2_Avalonia_Data_Core_IPropertyInfo_System_Func___0___1__System_Action___0___1__" data-uid="Avalonia.Controls.DataGridBindingDefinition.Create``2(Avalonia.Data.Core.IPropertyInfo,System.Func{``0,``1},System.Action{``0,``1})">
-  Create&lt;TItem, TValue&gt;(IPropertyInfo, Func&lt;TItem, TValue&gt;, Action&lt;TItem, TValue&gt;)
-  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/ColumnDefinitions/DataGridBindingDefinition.cs/#L119"><i class="bi bi-code-slash"></i></a>
+  <h3 id="Avalonia_Controls_DataGridBindingDefinition_Create__2_Avalonia_Data_CompiledBindingPath_System_Func___0___1__System_Action___0___1__" data-uid="Avalonia.Controls.DataGridBindingDefinition.Create``2(Avalonia.Data.CompiledBindingPath,System.Func{``0,``1},System.Action{``0,``1})">
+  Create&lt;TItem, TValue&gt;(CompiledBindingPath, Func&lt;TItem, TValue&gt;, Action&lt;TItem, TValue&gt;)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/ColumnDefinitions/DataGridBindingDefinition.cs/#L100"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"></div>
   <div class="markdown level1 conceptual"></div>
 
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public static DataGridBindingDefinition Create&lt;TItem, TValue&gt;(IPropertyInfo property, Func&lt;TItem, TValue&gt; getter, Action&lt;TItem, TValue&gt; setter = null)</code></pre>
+    <pre><code class="lang-csharp hljs">public static DataGridBindingDefinition Create&lt;TItem, TValue&gt;(CompiledBindingPath path, Func&lt;TItem, TValue&gt; getter, Action&lt;TItem, TValue&gt; setter = null)</code></pre>
   </div>
 
   <h4 class="section">Parameters</h4>
   <dl class="parameters">
-    <dt><code>property</code> <span class="xref">IPropertyInfo</span></dt>
+    <dt><code>path</code> <span class="xref">CompiledBindingPath</span></dt>
     <dd></dd>
     <dt><code>getter</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.func-2">Func</a>&lt;TItem, TValue&gt;</dt>
     <dd></dd>
@@ -555,21 +555,21 @@ Class DataGridBindingDefinition  <a class="header-action link-secondary" title="
 
   <a id="Avalonia_Controls_DataGridBindingDefinition_Create_" data-uid="Avalonia.Controls.DataGridBindingDefinition.Create*"></a>
 
-  <h3 id="Avalonia_Controls_DataGridBindingDefinition_Create__2_Avalonia_Markup_Xaml_MarkupExtensions_CompiledBindings_CompiledBindingPath_System_Func___0___1__System_Action___0___1__" data-uid="Avalonia.Controls.DataGridBindingDefinition.Create``2(Avalonia.Markup.Xaml.MarkupExtensions.CompiledBindings.CompiledBindingPath,System.Func{``0,``1},System.Action{``0,``1})">
-  Create&lt;TItem, TValue&gt;(CompiledBindingPath, Func&lt;TItem, TValue&gt;, Action&lt;TItem, TValue&gt;)
-  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/ColumnDefinitions/DataGridBindingDefinition.cs/#L100"><i class="bi bi-code-slash"></i></a>
+  <h3 id="Avalonia_Controls_DataGridBindingDefinition_Create__2_Avalonia_Data_Core_IPropertyInfo_System_Func___0___1__System_Action___0___1__" data-uid="Avalonia.Controls.DataGridBindingDefinition.Create``2(Avalonia.Data.Core.IPropertyInfo,System.Func{``0,``1},System.Action{``0,``1})">
+  Create&lt;TItem, TValue&gt;(IPropertyInfo, Func&lt;TItem, TValue&gt;, Action&lt;TItem, TValue&gt;)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/ColumnDefinitions/DataGridBindingDefinition.cs/#L119"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"></div>
   <div class="markdown level1 conceptual"></div>
 
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public static DataGridBindingDefinition Create&lt;TItem, TValue&gt;(CompiledBindingPath path, Func&lt;TItem, TValue&gt; getter, Action&lt;TItem, TValue&gt; setter = null)</code></pre>
+    <pre><code class="lang-csharp hljs">public static DataGridBindingDefinition Create&lt;TItem, TValue&gt;(IPropertyInfo property, Func&lt;TItem, TValue&gt; getter, Action&lt;TItem, TValue&gt; setter = null)</code></pre>
   </div>
 
   <h4 class="section">Parameters</h4>
   <dl class="parameters">
-    <dt><code>path</code> <span class="xref">CompiledBindingPath</span></dt>
+    <dt><code>property</code> <span class="xref">IPropertyInfo</span></dt>
     <dd></dd>
     <dt><code>getter</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.func-2">Func</a>&lt;TItem, TValue&gt;</dt>
     <dd></dd>

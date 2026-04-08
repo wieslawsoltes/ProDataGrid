@@ -375,7 +375,7 @@ Class DataGridComboBoxColumn  <a class="header-action link-secondary" title="Vie
       <span class="xref">AvaloniaObject.SetCurrentValue&lt;T&gt;(StyledProperty&lt;T&gt;, T)</span>
     </div>
     <div>
-      <span class="xref">AvaloniaObject.Bind(AvaloniaProperty, IBinding)</span>
+      <span class="xref">AvaloniaObject.Bind(AvaloniaProperty, BindingBase)</span>
     </div>
     <div>
       <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.iobservable-1">AvaloniaObject.Bind(AvaloniaProperty, IObservable&lt;object&gt;, BindingPriority)</a>
@@ -421,6 +421,9 @@ Class DataGridComboBoxColumn  <a class="header-action link-secondary" title="Vie
     </div>
     <div>
       <span class="xref">AvaloniaObject.this[IndexerDescriptor]</span>
+    </div>
+    <div>
+      <span class="xref">AvaloniaObject.Dispatcher</span>
     </div>
     <div>
       <span class="xref">AvaloniaObject.PropertyChanged</span>
@@ -782,7 +785,7 @@ May return null when no matching resource is found.</p>
   <div class="markdown level1 conceptual"></div>
 
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public override IBinding ClipboardContentBinding { get; set; }</code></pre>
+    <pre><code class="lang-csharp hljs">public override BindingBase ClipboardContentBinding { get; set; }</code></pre>
   </div>
 
 
@@ -791,7 +794,7 @@ May return null when no matching resource is found.</p>
 
   <h4 class="section">Property Value</h4>
   <dl class="parameters">
-    <dt><span class="xref">IBinding</span></dt>
+    <dt><span class="xref">BindingBase</span></dt>
     <dd></dd>
   </dl>
 
@@ -1006,7 +1009,7 @@ May return null when no matching resource is found.</p>
 
   <div class="codewrapper">
     <pre><code class="lang-csharp hljs">[AssignBinding]
-public IBinding SelectedItemBinding { get; set; }</code></pre>
+public BindingBase SelectedItemBinding { get; set; }</code></pre>
   </div>
 
 
@@ -1015,7 +1018,7 @@ public IBinding SelectedItemBinding { get; set; }</code></pre>
 
   <h4 class="section">Property Value</h4>
   <dl class="parameters">
-    <dt><span class="xref">IBinding</span></dt>
+    <dt><span class="xref">BindingBase</span></dt>
     <dd></dd>
   </dl>
 
@@ -1039,7 +1042,7 @@ public IBinding SelectedItemBinding { get; set; }</code></pre>
 
   <div class="codewrapper">
     <pre><code class="lang-csharp hljs">[AssignBinding]
-public IBinding SelectedValueBinding { get; set; }</code></pre>
+public BindingBase SelectedValueBinding { get; set; }</code></pre>
   </div>
 
 
@@ -1048,7 +1051,7 @@ public IBinding SelectedValueBinding { get; set; }</code></pre>
 
   <h4 class="section">Property Value</h4>
   <dl class="parameters">
-    <dt><span class="xref">IBinding</span></dt>
+    <dt><span class="xref">BindingBase</span></dt>
     <dd></dd>
   </dl>
 
@@ -1105,7 +1108,7 @@ public IBinding SelectedValueBinding { get; set; }</code></pre>
 
   <div class="codewrapper">
     <pre><code class="lang-csharp hljs">[AssignBinding]
-public IBinding TextBinding { get; set; }</code></pre>
+public BindingBase TextBinding { get; set; }</code></pre>
   </div>
 
 
@@ -1114,7 +1117,7 @@ public IBinding TextBinding { get; set; }</code></pre>
 
   <h4 class="section">Property Value</h4>
   <dl class="parameters">
-    <dt><span class="xref">IBinding</span></dt>
+    <dt><span class="xref">BindingBase</span></dt>
     <dd></dd>
   </dl>
 

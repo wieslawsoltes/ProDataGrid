@@ -99,7 +99,7 @@ location in the control's visual tree where the rows are to be added.</p>
   <div class="markdown conceptual"></div>
 
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public sealed class DataGridRowsPresenter : Panel, INotifyPropertyChanged, IDataContextProvider, ILogical, IThemeVariantHost, IResourceHost, IResourceNode, IStyleHost, ISetLogicalParent, ISetInheritanceParent, ISupportInitialize, IStyleable, INamed, IInputElement, IDataTemplateHost, ISetterValue, IChildIndexProvider, ILogicalScrollable, IScrollable, IScrollAnchorProvider, IScrollSnapPointsInfo</code></pre>
+    <pre><code class="lang-csharp hljs">public sealed class DataGridRowsPresenter : Panel, INotifyPropertyChanged, IDataContextProvider, ILogical, IThemeVariantHost, IResourceHost, IResourceNode, IStyleHost, ISetLogicalParent, ISetInheritanceParent, ISupportInitialize, INamed, IInputElement, IDataTemplateHost, ISetterValue, IChildIndexProvider, ILogicalScrollable, IScrollable, IScrollAnchorProvider, IScrollSnapPointsInfo</code></pre>
   </div>
 
 
@@ -135,7 +135,6 @@ location in the control's visual tree where the rows are to be added.</p>
       <div><span class="xref">ISetLogicalParent</span></div>
       <div><span class="xref">ISetInheritanceParent</span></div>
       <div><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.componentmodel.isupportinitialize">ISupportInitialize</a></div>
-      <div><span class="xref">IStyleable</span></div>
       <div><span class="xref">INamed</span></div>
       <div><span class="xref">IInputElement</span></div>
       <div><span class="xref">IDataTemplateHost</span></div>
@@ -183,9 +182,6 @@ location in the control's visual tree where the rows are to be added.</p>
       <span class="xref">Control.RequestBringIntoViewEvent</span>
     </div>
     <div>
-      <span class="xref">Control.ContextRequestedEvent</span>
-    </div>
-    <div>
       <span class="xref">Control.LoadedEvent</span>
     </div>
     <div>
@@ -211,9 +207,6 @@ location in the control's visual tree where the rows are to be added.</p>
     </div>
     <div>
       <span class="xref">Control.Tag</span>
-    </div>
-    <div>
-      <span class="xref">Control.ContextRequested</span>
     </div>
     <div>
       <span class="xref">Control.Loaded</span>
@@ -255,7 +248,13 @@ location in the control's visual tree where the rows are to be added.</p>
       <span class="xref">InputElement.GotFocusEvent</span>
     </div>
     <div>
+      <span class="xref">InputElement.GettingFocusEvent</span>
+    </div>
+    <div>
       <span class="xref">InputElement.LostFocusEvent</span>
+    </div>
+    <div>
+      <span class="xref">InputElement.LosingFocusEvent</span>
     </div>
     <div>
       <span class="xref">InputElement.KeyDownEvent</span>
@@ -294,7 +293,58 @@ location in the control's visual tree where the rows are to be added.</p>
       <span class="xref">InputElement.PointerWheelChangedEvent</span>
     </div>
     <div>
+      <span class="xref">InputElement.ContextRequestedEvent</span>
+    </div>
+    <div>
+      <span class="xref">InputElement.ContextCanceledEvent</span>
+    </div>
+    <div>
+      <span class="xref">InputElement.IsHoldingEnabledProperty</span>
+    </div>
+    <div>
+      <span class="xref">InputElement.IsHoldWithMouseEnabledProperty</span>
+    </div>
+    <div>
+      <span class="xref">InputElement.PinchEvent</span>
+    </div>
+    <div>
+      <span class="xref">InputElement.PinchEndedEvent</span>
+    </div>
+    <div>
+      <span class="xref">InputElement.PullGestureEvent</span>
+    </div>
+    <div>
+      <span class="xref">InputElement.PullGestureEndedEvent</span>
+    </div>
+    <div>
+      <span class="xref">InputElement.SwipeGestureEvent</span>
+    </div>
+    <div>
+      <span class="xref">InputElement.SwipeGestureEndedEvent</span>
+    </div>
+    <div>
+      <span class="xref">InputElement.ScrollGestureEvent</span>
+    </div>
+    <div>
+      <span class="xref">InputElement.ScrollGestureInertiaStartingEvent</span>
+    </div>
+    <div>
+      <span class="xref">InputElement.ScrollGestureEndedEvent</span>
+    </div>
+    <div>
+      <span class="xref">InputElement.PointerTouchPadGestureMagnifyEvent</span>
+    </div>
+    <div>
+      <span class="xref">InputElement.PointerTouchPadGestureRotateEvent</span>
+    </div>
+    <div>
+      <span class="xref">InputElement.PointerTouchPadGestureSwipeEvent</span>
+    </div>
+    <div>
       <span class="xref">InputElement.TappedEvent</span>
+    </div>
+    <div>
+      <span class="xref">InputElement.RightTappedEvent</span>
     </div>
     <div>
       <span class="xref">InputElement.HoldingEvent</span>
@@ -304,6 +354,18 @@ location in the control's visual tree where the rows are to be added.</p>
     </div>
     <div>
       <span class="xref">InputElement.Focus(NavigationMethod, KeyModifiers)</span>
+    </div>
+    <div>
+      <span class="xref">InputElement.GetIsHoldingEnabled(StyledElement)</span>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">InputElement.SetIsHoldingEnabled(StyledElement, bool)</a>
+    </div>
+    <div>
+      <span class="xref">InputElement.GetIsHoldWithMouseEnabled(StyledElement)</span>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">InputElement.SetIsHoldWithMouseEnabled(StyledElement, bool)</a>
     </div>
     <div>
       <span class="xref">InputElement.Focusable</span>
@@ -345,7 +407,13 @@ location in the control's visual tree where the rows are to be added.</p>
       <span class="xref">InputElement.GotFocus</span>
     </div>
     <div>
+      <span class="xref">InputElement.GettingFocus</span>
+    </div>
+    <div>
       <span class="xref">InputElement.LostFocus</span>
+    </div>
+    <div>
+      <span class="xref">InputElement.LosingFocus</span>
     </div>
     <div>
       <span class="xref">InputElement.KeyDown</span>
@@ -381,7 +449,52 @@ location in the control's visual tree where the rows are to be added.</p>
       <span class="xref">InputElement.PointerWheelChanged</span>
     </div>
     <div>
+      <span class="xref">InputElement.ContextRequested</span>
+    </div>
+    <div>
+      <span class="xref">InputElement.ContextCanceled</span>
+    </div>
+    <div>
+      <span class="xref">InputElement.Pinch</span>
+    </div>
+    <div>
+      <span class="xref">InputElement.PinchEnded</span>
+    </div>
+    <div>
+      <span class="xref">InputElement.PullGesture</span>
+    </div>
+    <div>
+      <span class="xref">InputElement.PullGestureEnded</span>
+    </div>
+    <div>
+      <span class="xref">InputElement.ScrollGesture</span>
+    </div>
+    <div>
+      <span class="xref">InputElement.ScrollGestureInertiaStarting</span>
+    </div>
+    <div>
+      <span class="xref">InputElement.ScrollGestureEnded</span>
+    </div>
+    <div>
+      <span class="xref">InputElement.PointerTouchPadGestureMagnify</span>
+    </div>
+    <div>
+      <span class="xref">InputElement.PointerTouchPadGestureRotate</span>
+    </div>
+    <div>
+      <span class="xref">InputElement.SwipeGesture</span>
+    </div>
+    <div>
+      <span class="xref">InputElement.SwipeGestureEnded</span>
+    </div>
+    <div>
+      <span class="xref">InputElement.PointerTouchPadGestureSwipe</span>
+    </div>
+    <div>
       <span class="xref">InputElement.Tapped</span>
+    </div>
+    <div>
+      <span class="xref">InputElement.RightTapped</span>
     </div>
     <div>
       <span class="xref">InputElement.Holding</span>
@@ -519,6 +632,9 @@ location in the control's visual tree where the rows are to be added.</p>
       <span class="xref">Visual.OpacityMaskProperty</span>
     </div>
     <div>
+      <span class="xref">Visual.CacheModeProperty</span>
+    </div>
+    <div>
       <span class="xref">Visual.EffectProperty</span>
     </div>
     <div>
@@ -568,6 +684,9 @@ location in the control's visual tree where the rows are to be added.</p>
     </div>
     <div>
       <span class="xref">Visual.OpacityMask</span>
+    </div>
+    <div>
+      <span class="xref">Visual.CacheMode</span>
     </div>
     <div>
       <span class="xref">Visual.Effect</span>
@@ -735,7 +854,7 @@ location in the control's visual tree where the rows are to be added.</p>
       <span class="xref">AvaloniaObject.SetCurrentValue&lt;T&gt;(StyledProperty&lt;T&gt;, T)</span>
     </div>
     <div>
-      <span class="xref">AvaloniaObject.Bind(AvaloniaProperty, IBinding)</span>
+      <span class="xref">AvaloniaObject.Bind(AvaloniaProperty, BindingBase)</span>
     </div>
     <div>
       <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.iobservable-1">AvaloniaObject.Bind(AvaloniaProperty, IObservable&lt;object&gt;, BindingPriority)</a>
@@ -766,6 +885,9 @@ location in the control's visual tree where the rows are to be added.</p>
     </div>
     <div>
       <span class="xref">AvaloniaObject.this[IndexerDescriptor]</span>
+    </div>
+    <div>
+      <span class="xref">AvaloniaObject.Dispatcher</span>
     </div>
     <div>
       <span class="xref">AvaloniaObject.PropertyChanged</span>
@@ -801,7 +923,7 @@ DataGridRowsPresenter.Scrollable.cs for clean separation of concerns.</p>
 
   <h3 id="Avalonia_Controls_Primitives_DataGridRowsPresenter__ctor" data-uid="Avalonia.Controls.Primitives.DataGridRowsPresenter.#ctor">
   DataGridRowsPresenter()
-  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/Primitives/DataGridRowsPresenter.cs/#L44"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/Primitives/DataGridRowsPresenter.cs/#L45"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"></div>
@@ -861,7 +983,7 @@ DataGridRowsPresenter.Scrollable.cs for clean separation of concerns.</p>
 
   <h3 id="Avalonia_Controls_Primitives_DataGridRowsPresenter_OwningGridProperty" data-uid="Avalonia.Controls.Primitives.DataGridRowsPresenter.OwningGridProperty">
   OwningGridProperty
-  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/Primitives/DataGridRowsPresenter.cs/#L49"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/Primitives/DataGridRowsPresenter.cs/#L50"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"></div>
@@ -1189,7 +1311,7 @@ indicating this control handles its own scrolling via ILogicalScrollable.</p>
 
   <h3 id="Avalonia_Controls_Primitives_DataGridRowsPresenter_OwningGrid" data-uid="Avalonia.Controls.Primitives.DataGridRowsPresenter.OwningGrid">
   OwningGrid
-  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/Primitives/DataGridRowsPresenter.cs/#L58"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/Primitives/DataGridRowsPresenter.cs/#L59"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>Gets the grid that owns this rows presenter.</p>
@@ -1321,7 +1443,7 @@ indicating this control handles its own scrolling via ILogicalScrollable.</p>
 
   <h3 id="Avalonia_Controls_Primitives_DataGridRowsPresenter_ArrangeOverride_Avalonia_Size_" data-uid="Avalonia.Controls.Primitives.DataGridRowsPresenter.ArrangeOverride(Avalonia.Size)">
   ArrangeOverride(Size)
-  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/Primitives/DataGridRowsPresenter.cs/#L123"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/Primitives/DataGridRowsPresenter.cs/#L136"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>Arranges the content of the <a class="xref" href="Avalonia.Controls.Primitives.DataGridRowsPresenter.html">DataGridRowsPresenter</a>.</p>
@@ -1534,7 +1656,7 @@ For vertical scrolling with uniform row heights, returns the row height.</p>
 
   <h3 id="Avalonia_Controls_Primitives_DataGridRowsPresenter_MeasureOverride_Avalonia_Size_" data-uid="Avalonia.Controls.Primitives.DataGridRowsPresenter.MeasureOverride(Avalonia.Size)">
   MeasureOverride(Size)
-  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/Primitives/DataGridRowsPresenter.cs/#L321"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/Primitives/DataGridRowsPresenter.cs/#L323"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>Measures the children of a <a class="xref" href="Avalonia.Controls.Primitives.DataGridRowsPresenter.html">DataGridRowsPresenter</a> to
@@ -1559,6 +1681,72 @@ prepare for arranging them during the <span class="xref">System.Windows.Framewor
     <dd><p>The size that the <a class="xref" href="Avalonia.Controls.Primitives.DataGridRowsPresenter.html">DataGridRowsPresenter</a> determines it needs during layout, based on its calculations of child object allocated sizes.</p>
 </dd>
   </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Avalonia_Controls_Primitives_DataGridRowsPresenter_OnAttachedToVisualTree_" data-uid="Avalonia.Controls.Primitives.DataGridRowsPresenter.OnAttachedToVisualTree*"></a>
+
+  <h3 id="Avalonia_Controls_Primitives_DataGridRowsPresenter_OnAttachedToVisualTree_Avalonia_VisualTreeAttachmentEventArgs_" data-uid="Avalonia.Controls.Primitives.DataGridRowsPresenter.OnAttachedToVisualTree(Avalonia.VisualTreeAttachmentEventArgs)">
+  OnAttachedToVisualTree(VisualTreeAttachmentEventArgs)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/Primitives/DataGridRowsPresenter.cs/#L82"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Called when the control is added to a rooted visual tree.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">protected override void OnAttachedToVisualTree(VisualTreeAttachmentEventArgs e)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>e</code> <span class="xref">VisualTreeAttachmentEventArgs</span></dt>
+    <dd><p>The event args.</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Avalonia_Controls_Primitives_DataGridRowsPresenter_OnDetachedFromVisualTree_" data-uid="Avalonia.Controls.Primitives.DataGridRowsPresenter.OnDetachedFromVisualTree*"></a>
+
+  <h3 id="Avalonia_Controls_Primitives_DataGridRowsPresenter_OnDetachedFromVisualTree_Avalonia_VisualTreeAttachmentEventArgs_" data-uid="Avalonia.Controls.Primitives.DataGridRowsPresenter.OnDetachedFromVisualTree(Avalonia.VisualTreeAttachmentEventArgs)">
+  OnDetachedFromVisualTree(VisualTreeAttachmentEventArgs)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/Primitives/DataGridRowsPresenter.cs/#L88"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Called when the control is removed from a rooted visual tree.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">protected override void OnDetachedFromVisualTree(VisualTreeAttachmentEventArgs e)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>e</code> <span class="xref">VisualTreeAttachmentEventArgs</span></dt>
+    <dd><p>The event args.</p>
+</dd>
+  </dl>
+
 
 
 

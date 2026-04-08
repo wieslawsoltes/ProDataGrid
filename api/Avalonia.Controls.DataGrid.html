@@ -113,7 +113,7 @@ Class DataGrid  <a class="header-action link-secondary" title="View source" href
 [TemplatePart(&quot;PART_VerticalScrollbar&quot;, typeof(ScrollBar))]
 [PseudoClasses(new string[] { &quot;:invalid&quot;, &quot;:empty-rows&quot;, &quot;:empty-columns&quot; })]
 [RequiresUnreferencedCode(&quot;DataGrid inspects data items via reflection and is not compatible with trimming.&quot;)]
-public class DataGrid : TemplatedControl, INotifyPropertyChanged, IDataContextProvider, ILogical, IThemeVariantHost, IResourceHost, IResourceNode, IStyleHost, ISetLogicalParent, ISetInheritanceParent, ISupportInitialize, IStyleable, INamed, IInputElement, IDataTemplateHost, ISetterValue</code></pre>
+public class DataGrid : TemplatedControl, INotifyPropertyChanged, IDataContextProvider, ILogical, IThemeVariantHost, IResourceHost, IResourceNode, IStyleHost, ISetLogicalParent, ISetInheritanceParent, ISupportInitialize, INamed, IInputElement, IDataTemplateHost, ISetterValue</code></pre>
   </div>
 
 
@@ -149,7 +149,6 @@ public class DataGrid : TemplatedControl, INotifyPropertyChanged, IDataContextPr
       <div><span class="xref">ISetLogicalParent</span></div>
       <div><span class="xref">ISetInheritanceParent</span></div>
       <div><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.componentmodel.isupportinitialize">ISupportInitialize</a></div>
-      <div><span class="xref">IStyleable</span></div>
       <div><span class="xref">INamed</span></div>
       <div><span class="xref">IInputElement</span></div>
       <div><span class="xref">IDataTemplateHost</span></div>
@@ -196,6 +195,9 @@ public class DataGrid : TemplatedControl, INotifyPropertyChanged, IDataContextPr
     </div>
     <div>
       <span class="xref">TemplatedControl.ForegroundProperty</span>
+    </div>
+    <div>
+      <span class="xref">TemplatedControl.LetterSpacingProperty</span>
     </div>
     <div>
       <span class="xref">TemplatedControl.PaddingProperty</span>
@@ -267,6 +269,9 @@ public class DataGrid : TemplatedControl, INotifyPropertyChanged, IDataContextPr
       <span class="xref">TemplatedControl.Foreground</span>
     </div>
     <div>
+      <span class="xref">TemplatedControl.LetterSpacing</span>
+    </div>
+    <div>
       <span class="xref">TemplatedControl.Padding</span>
     </div>
     <div>
@@ -289,9 +294,6 @@ public class DataGrid : TemplatedControl, INotifyPropertyChanged, IDataContextPr
     </div>
     <div>
       <span class="xref">Control.RequestBringIntoViewEvent</span>
-    </div>
-    <div>
-      <span class="xref">Control.ContextRequestedEvent</span>
     </div>
     <div>
       <span class="xref">Control.LoadedEvent</span>
@@ -318,10 +320,10 @@ public class DataGrid : TemplatedControl, INotifyPropertyChanged, IDataContextPr
       <span class="xref">Control.OnDetachedFromVisualTreeCore(VisualTreeAttachmentEventArgs)</span>
     </div>
     <div>
-      <span class="xref">Control.OnGotFocus(GotFocusEventArgs)</span>
+      <span class="xref">Control.OnGotFocus(FocusChangedEventArgs)</span>
     </div>
     <div>
-      <span class="xref">Control.OnLostFocus(RoutedEventArgs)</span>
+      <span class="xref">Control.OnLostFocus(FocusChangedEventArgs)</span>
     </div>
     <div>
       <span class="xref">Control.OnPointerReleased(PointerReleasedEventArgs)</span>
@@ -331,6 +333,9 @@ public class DataGrid : TemplatedControl, INotifyPropertyChanged, IDataContextPr
     </div>
     <div>
       <span class="xref">Control.OnPropertyChanged(AvaloniaPropertyChangedEventArgs)</span>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.exception">Control.UpdateDataValidation(AvaloniaProperty, BindingValueType, Exception)</a>
     </div>
     <div>
       <span class="xref">Control.FocusAdorner</span>
@@ -349,9 +354,6 @@ public class DataGrid : TemplatedControl, INotifyPropertyChanged, IDataContextPr
     </div>
     <div>
       <span class="xref">Control.Tag</span>
-    </div>
-    <div>
-      <span class="xref">Control.ContextRequested</span>
     </div>
     <div>
       <span class="xref">Control.Loaded</span>
@@ -393,7 +395,13 @@ public class DataGrid : TemplatedControl, INotifyPropertyChanged, IDataContextPr
       <span class="xref">InputElement.GotFocusEvent</span>
     </div>
     <div>
+      <span class="xref">InputElement.GettingFocusEvent</span>
+    </div>
+    <div>
       <span class="xref">InputElement.LostFocusEvent</span>
+    </div>
+    <div>
+      <span class="xref">InputElement.LosingFocusEvent</span>
     </div>
     <div>
       <span class="xref">InputElement.KeyDownEvent</span>
@@ -432,7 +440,58 @@ public class DataGrid : TemplatedControl, INotifyPropertyChanged, IDataContextPr
       <span class="xref">InputElement.PointerWheelChangedEvent</span>
     </div>
     <div>
+      <span class="xref">InputElement.ContextRequestedEvent</span>
+    </div>
+    <div>
+      <span class="xref">InputElement.ContextCanceledEvent</span>
+    </div>
+    <div>
+      <span class="xref">InputElement.IsHoldingEnabledProperty</span>
+    </div>
+    <div>
+      <span class="xref">InputElement.IsHoldWithMouseEnabledProperty</span>
+    </div>
+    <div>
+      <span class="xref">InputElement.PinchEvent</span>
+    </div>
+    <div>
+      <span class="xref">InputElement.PinchEndedEvent</span>
+    </div>
+    <div>
+      <span class="xref">InputElement.PullGestureEvent</span>
+    </div>
+    <div>
+      <span class="xref">InputElement.PullGestureEndedEvent</span>
+    </div>
+    <div>
+      <span class="xref">InputElement.SwipeGestureEvent</span>
+    </div>
+    <div>
+      <span class="xref">InputElement.SwipeGestureEndedEvent</span>
+    </div>
+    <div>
+      <span class="xref">InputElement.ScrollGestureEvent</span>
+    </div>
+    <div>
+      <span class="xref">InputElement.ScrollGestureInertiaStartingEvent</span>
+    </div>
+    <div>
+      <span class="xref">InputElement.ScrollGestureEndedEvent</span>
+    </div>
+    <div>
+      <span class="xref">InputElement.PointerTouchPadGestureMagnifyEvent</span>
+    </div>
+    <div>
+      <span class="xref">InputElement.PointerTouchPadGestureRotateEvent</span>
+    </div>
+    <div>
+      <span class="xref">InputElement.PointerTouchPadGestureSwipeEvent</span>
+    </div>
+    <div>
       <span class="xref">InputElement.TappedEvent</span>
+    </div>
+    <div>
+      <span class="xref">InputElement.RightTappedEvent</span>
     </div>
     <div>
       <span class="xref">InputElement.HoldingEvent</span>
@@ -445,6 +504,12 @@ public class DataGrid : TemplatedControl, INotifyPropertyChanged, IDataContextPr
     </div>
     <div>
       <span class="xref">InputElement.OnAccessKey(RoutedEventArgs)</span>
+    </div>
+    <div>
+      <span class="xref">InputElement.OnGettingFocus(FocusChangingEventArgs)</span>
+    </div>
+    <div>
+      <span class="xref">InputElement.OnLosingFocus(FocusChangingEventArgs)</span>
     </div>
     <div>
       <span class="xref">InputElement.OnKeyDown(KeyEventArgs)</span>
@@ -462,10 +527,52 @@ public class DataGrid : TemplatedControl, INotifyPropertyChanged, IDataContextPr
       <span class="xref">InputElement.OnPointerPressed(PointerPressedEventArgs)</span>
     </div>
     <div>
+      <span class="xref">InputElement.GetNextTabStopOverride()</span>
+    </div>
+    <div>
+      <span class="xref">InputElement.GetPreviousTabStopOverride()</span>
+    </div>
+    <div>
+      <span class="xref">InputElement.GetFirstFocusableElementOverride()</span>
+    </div>
+    <div>
+      <span class="xref">InputElement.GetLastFocusableElementOverride()</span>
+    </div>
+    <div>
       <span class="xref">InputElement.OnPointerCaptureLost(PointerCaptureLostEventArgs)</span>
     </div>
     <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">InputElement.ProcessTabStopOverride(IInputElement, IInputElement, bool, bool, ref IInputElement)</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">InputElement.ProcessCandidateTabStopOverride(IInputElement, IInputElement, IInputElement, bool, ref IInputElement)</a>
+    </div>
+    <div>
+      <span class="xref">InputElement.OnTapped(TappedEventArgs)</span>
+    </div>
+    <div>
+      <span class="xref">InputElement.OnRightTapped(TappedEventArgs)</span>
+    </div>
+    <div>
+      <span class="xref">InputElement.OnDoubleTapped(TappedEventArgs)</span>
+    </div>
+    <div>
+      <span class="xref">InputElement.OnHolding(HoldingRoutedEventArgs)</span>
+    </div>
+    <div>
       <span class="xref">InputElement.UpdateIsEffectivelyEnabled()</span>
+    </div>
+    <div>
+      <span class="xref">InputElement.GetIsHoldingEnabled(StyledElement)</span>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">InputElement.SetIsHoldingEnabled(StyledElement, bool)</a>
+    </div>
+    <div>
+      <span class="xref">InputElement.GetIsHoldWithMouseEnabled(StyledElement)</span>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">InputElement.SetIsHoldWithMouseEnabled(StyledElement, bool)</a>
     </div>
     <div>
       <span class="xref">InputElement.Focusable</span>
@@ -510,7 +617,13 @@ public class DataGrid : TemplatedControl, INotifyPropertyChanged, IDataContextPr
       <span class="xref">InputElement.GotFocus</span>
     </div>
     <div>
+      <span class="xref">InputElement.GettingFocus</span>
+    </div>
+    <div>
       <span class="xref">InputElement.LostFocus</span>
+    </div>
+    <div>
+      <span class="xref">InputElement.LosingFocus</span>
     </div>
     <div>
       <span class="xref">InputElement.KeyDown</span>
@@ -546,7 +659,52 @@ public class DataGrid : TemplatedControl, INotifyPropertyChanged, IDataContextPr
       <span class="xref">InputElement.PointerWheelChanged</span>
     </div>
     <div>
+      <span class="xref">InputElement.ContextRequested</span>
+    </div>
+    <div>
+      <span class="xref">InputElement.ContextCanceled</span>
+    </div>
+    <div>
+      <span class="xref">InputElement.Pinch</span>
+    </div>
+    <div>
+      <span class="xref">InputElement.PinchEnded</span>
+    </div>
+    <div>
+      <span class="xref">InputElement.PullGesture</span>
+    </div>
+    <div>
+      <span class="xref">InputElement.PullGestureEnded</span>
+    </div>
+    <div>
+      <span class="xref">InputElement.ScrollGesture</span>
+    </div>
+    <div>
+      <span class="xref">InputElement.ScrollGestureInertiaStarting</span>
+    </div>
+    <div>
+      <span class="xref">InputElement.ScrollGestureEnded</span>
+    </div>
+    <div>
+      <span class="xref">InputElement.PointerTouchPadGestureMagnify</span>
+    </div>
+    <div>
+      <span class="xref">InputElement.PointerTouchPadGestureRotate</span>
+    </div>
+    <div>
+      <span class="xref">InputElement.SwipeGesture</span>
+    </div>
+    <div>
+      <span class="xref">InputElement.SwipeGestureEnded</span>
+    </div>
+    <div>
+      <span class="xref">InputElement.PointerTouchPadGestureSwipe</span>
+    </div>
+    <div>
       <span class="xref">InputElement.Tapped</span>
+    </div>
+    <div>
+      <span class="xref">InputElement.RightTapped</span>
     </div>
     <div>
       <span class="xref">InputElement.Holding</span>
@@ -702,6 +860,9 @@ public class DataGrid : TemplatedControl, INotifyPropertyChanged, IDataContextPr
       <span class="xref">Visual.OpacityMaskProperty</span>
     </div>
     <div>
+      <span class="xref">Visual.CacheModeProperty</span>
+    </div>
+    <div>
       <span class="xref">Visual.EffectProperty</span>
     </div>
     <div>
@@ -763,6 +924,9 @@ public class DataGrid : TemplatedControl, INotifyPropertyChanged, IDataContextPr
     </div>
     <div>
       <span class="xref">Visual.OpacityMask</span>
+    </div>
+    <div>
+      <span class="xref">Visual.CacheMode</span>
     </div>
     <div>
       <span class="xref">Visual.Effect</span>
@@ -960,7 +1124,7 @@ public class DataGrid : TemplatedControl, INotifyPropertyChanged, IDataContextPr
       <span class="xref">AvaloniaObject.SetCurrentValue&lt;T&gt;(StyledProperty&lt;T&gt;, T)</span>
     </div>
     <div>
-      <span class="xref">AvaloniaObject.Bind(AvaloniaProperty, IBinding)</span>
+      <span class="xref">AvaloniaObject.Bind(AvaloniaProperty, BindingBase)</span>
     </div>
     <div>
       <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.iobservable-1">AvaloniaObject.Bind(AvaloniaProperty, IObservable&lt;object&gt;, BindingPriority)</a>
@@ -987,9 +1151,6 @@ public class DataGrid : TemplatedControl, INotifyPropertyChanged, IDataContextPr
       <span class="xref">AvaloniaObject.CoerceValue(AvaloniaProperty)</span>
     </div>
     <div>
-      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.exception">AvaloniaObject.UpdateDataValidation(AvaloniaProperty, BindingValueType, Exception)</a>
-    </div>
-    <div>
       <span class="xref">AvaloniaObject.RaisePropertyChanged&lt;T&gt;(DirectPropertyBase&lt;T&gt;, T, T)</span>
     </div>
     <div>
@@ -1003,6 +1164,9 @@ public class DataGrid : TemplatedControl, INotifyPropertyChanged, IDataContextPr
     </div>
     <div>
       <span class="xref">AvaloniaObject.this[IndexerDescriptor]</span>
+    </div>
+    <div>
+      <span class="xref">AvaloniaObject.Dispatcher</span>
     </div>
     <div>
       <span class="xref">AvaloniaObject.PropertyChanged</span>
@@ -1037,7 +1201,7 @@ public class DataGrid : TemplatedControl, INotifyPropertyChanged, IDataContextPr
 
   <h3 id="Avalonia_Controls_DataGrid__ctor" data-uid="Avalonia.Controls.DataGrid.#ctor">
   DataGrid()
-  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/DataGrid.cs/#L572"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/DataGrid.cs/#L573"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>Initializes a new instance of the <a class="xref" href="Avalonia.Controls.DataGrid.html">DataGrid</a> class.</p>
@@ -3075,7 +3239,7 @@ hierarchical model is created.</p>
 
   <h3 id="Avalonia_Controls_DataGrid_HorizontalScrollEvent" data-uid="Avalonia.Controls.DataGrid.HorizontalScrollEvent">
   HorizontalScrollEvent
-  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/DataGrid.cs/#L441"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/DataGrid.cs/#L442"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>Identifies the <a class="xref" href="Avalonia.Controls.DataGrid.html#Avalonia_Controls_DataGrid_HorizontalScroll">HorizontalScroll</a> routed event.</p>
@@ -5162,7 +5326,7 @@ sorting model is created.</p>
 
   <h3 id="Avalonia_Controls_DataGrid_VerticalScrollEvent" data-uid="Avalonia.Controls.DataGrid.VerticalScrollEvent">
   VerticalScrollEvent
-  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/DataGrid.cs/#L452"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/DataGrid.cs/#L453"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>Identifies the <a class="xref" href="Avalonia.Controls.DataGrid.html#Avalonia_Controls_DataGrid_VerticalScroll">VerticalScroll</a> routed event.</p>
@@ -6006,7 +6170,7 @@ If unset, built-in exporters (text, CSV, HTML) are used.</p>
 
   <h3 id="Avalonia_Controls_DataGrid_ClipboardImportModel" data-uid="Avalonia.Controls.DataGrid.ClipboardImportModel">
   ClipboardImportModel
-  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/DataGrid.cs/#L2442"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/DataGrid.cs/#L2458"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>Gets or sets the clipboard import model that drives paste behavior.</p>
@@ -6038,7 +6202,7 @@ If unset, built-in exporters (text, CSV, HTML) are used.</p>
 
   <h3 id="Avalonia_Controls_DataGrid_ClipboardImportModelFactory" data-uid="Avalonia.Controls.DataGrid.ClipboardImportModelFactory">
   ClipboardImportModelFactory
-  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/DataGrid.cs/#L2121"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/DataGrid.cs/#L2137"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>Optional factory used when creating the default clipboard import model.</p>
@@ -6102,7 +6266,7 @@ If unset, built-in exporters (text, CSV, HTML) are used.</p>
 
   <h3 id="Avalonia_Controls_DataGrid_ColumnDefinitions" data-uid="Avalonia.Controls.DataGrid.ColumnDefinitions">
   ColumnDefinitions
-  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/DataGrid.cs/#L727"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/DataGrid.cs/#L728"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>Gets the columns collection used for inline or programmatic column definitions.</p>
@@ -6134,7 +6298,7 @@ If unset, built-in exporters (text, CSV, HTML) are used.</p>
 
   <h3 id="Avalonia_Controls_DataGrid_ColumnDefinitionsSource" data-uid="Avalonia.Controls.DataGrid.ColumnDefinitionsSource">
   ColumnDefinitionsSource
-  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/DataGrid.cs/#L713"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/DataGrid.cs/#L714"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>Gets or sets the bound column definitions source (IList + INotifyCollectionChanged enables live updates).</p>
@@ -6422,7 +6586,7 @@ If unset, built-in exporters (text, CSV, HTML) are used.</p>
 
   <h3 id="Avalonia_Controls_DataGrid_Columns" data-uid="Avalonia.Controls.DataGrid.Columns">
   Columns
-  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/DataGrid.cs/#L699"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/DataGrid.cs/#L700"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>Gets or sets the bound columns source (IList + INotifyCollectionChanged enables TwoWay sync).</p>
@@ -6518,7 +6682,7 @@ If unset, built-in exporters (text, CSV, HTML) are used.</p>
 
   <h3 id="Avalonia_Controls_DataGrid_ConditionalFormattingAdapterFactory" data-uid="Avalonia.Controls.DataGrid.ConditionalFormattingAdapterFactory">
   ConditionalFormattingAdapterFactory
-  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/DataGrid.cs/#L2303"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/DataGrid.cs/#L2319"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>Optional factory for creating the conditional formatting adapter. Use this to plug in a custom
@@ -6551,7 +6715,7 @@ adapter without subclassing <a class="xref" href="Avalonia.Controls.DataGrid.htm
 
   <h3 id="Avalonia_Controls_DataGrid_ConditionalFormattingModel" data-uid="Avalonia.Controls.DataGrid.ConditionalFormattingModel">
   ConditionalFormattingModel
-  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/DataGrid.cs/#L2409"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/DataGrid.cs/#L2425"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>Gets or sets the conditional formatting model that drives cell and row styling.</p>
@@ -6583,7 +6747,7 @@ adapter without subclassing <a class="xref" href="Avalonia.Controls.DataGrid.htm
 
   <h3 id="Avalonia_Controls_DataGrid_ConditionalFormattingModelFactory" data-uid="Avalonia.Controls.DataGrid.ConditionalFormattingModelFactory">
   ConditionalFormattingModelFactory
-  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/DataGrid.cs/#L2094"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/DataGrid.cs/#L2110"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>Optional factory used when creating the default conditional formatting model.</p>
@@ -6775,7 +6939,7 @@ adapter without subclassing <a class="xref" href="Avalonia.Controls.DataGrid.htm
 
   <h3 id="Avalonia_Controls_DataGrid_EditingInteractionModel" data-uid="Avalonia.Controls.DataGrid.EditingInteractionModel">
   EditingInteractionModel
-  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/DataGrid.cs/#L2451"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/DataGrid.cs/#L2467"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>Gets or sets the editing interaction model that drives edit triggers and text input behavior.</p>
@@ -6807,7 +6971,7 @@ adapter without subclassing <a class="xref" href="Avalonia.Controls.DataGrid.htm
 
   <h3 id="Avalonia_Controls_DataGrid_EditingInteractionModelFactory" data-uid="Avalonia.Controls.DataGrid.EditingInteractionModelFactory">
   EditingInteractionModelFactory
-  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/DataGrid.cs/#L2130"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/DataGrid.cs/#L2146"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>Optional factory used when creating the default editing interaction model.</p>
@@ -6839,7 +7003,7 @@ adapter without subclassing <a class="xref" href="Avalonia.Controls.DataGrid.htm
 
   <h3 id="Avalonia_Controls_DataGrid_FastPathOptions" data-uid="Avalonia.Controls.DataGrid.FastPathOptions">
   FastPathOptions
-  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/DataGrid.cs/#L2262"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/DataGrid.cs/#L2278"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>Options for enabling accessor-only fast paths in sorting, filtering, and searching.</p>
@@ -6871,7 +7035,7 @@ adapter without subclassing <a class="xref" href="Avalonia.Controls.DataGrid.htm
 
   <h3 id="Avalonia_Controls_DataGrid_FillModel" data-uid="Avalonia.Controls.DataGrid.FillModel">
   FillModel
-  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/DataGrid.cs/#L2424"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/DataGrid.cs/#L2440"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>Gets or sets the fill model that drives the fill handle behavior.</p>
@@ -6903,7 +7067,7 @@ adapter without subclassing <a class="xref" href="Avalonia.Controls.DataGrid.htm
 
   <h3 id="Avalonia_Controls_DataGrid_FillModelFactory" data-uid="Avalonia.Controls.DataGrid.FillModelFactory">
   FillModelFactory
-  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/DataGrid.cs/#L2103"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/DataGrid.cs/#L2119"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>Optional factory used when creating the default fill model.</p>
@@ -6935,7 +7099,7 @@ adapter without subclassing <a class="xref" href="Avalonia.Controls.DataGrid.htm
 
   <h3 id="Avalonia_Controls_DataGrid_FilteringAdapterFactory" data-uid="Avalonia.Controls.DataGrid.FilteringAdapterFactory">
   FilteringAdapterFactory
-  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/DataGrid.cs/#L2218"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/DataGrid.cs/#L2234"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>Optional factory for creating the filtering adapter. Use this to plug in a custom adapter
@@ -6968,7 +7132,7 @@ adapter without subclassing <a class="xref" href="Avalonia.Controls.DataGrid.htm
 
   <h3 id="Avalonia_Controls_DataGrid_FilteringModel" data-uid="Avalonia.Controls.DataGrid.FilteringModel">
   FilteringModel
-  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/DataGrid.cs/#L2391"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/DataGrid.cs/#L2407"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>Gets or sets the filtering model that drives column filtering.</p>
@@ -7000,7 +7164,7 @@ adapter without subclassing <a class="xref" href="Avalonia.Controls.DataGrid.htm
 
   <h3 id="Avalonia_Controls_DataGrid_FilteringModelFactory" data-uid="Avalonia.Controls.DataGrid.FilteringModelFactory">
   FilteringModelFactory
-  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/DataGrid.cs/#L2076"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/DataGrid.cs/#L2092"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>Optional factory used when creating the default filtering model.</p>
@@ -7032,7 +7196,7 @@ adapter without subclassing <a class="xref" href="Avalonia.Controls.DataGrid.htm
 
   <h3 id="Avalonia_Controls_DataGrid_FormulaModel" data-uid="Avalonia.Controls.DataGrid.FormulaModel">
   FormulaModel
-  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/DataGrid.cs/#L2415"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/DataGrid.cs/#L2431"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"></div>
@@ -7223,7 +7387,7 @@ adapter without subclassing <a class="xref" href="Avalonia.Controls.DataGrid.htm
 
   <h3 id="Avalonia_Controls_DataGrid_HierarchicalAdapterFactory" data-uid="Avalonia.Controls.DataGrid.HierarchicalAdapterFactory">
   HierarchicalAdapterFactory
-  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/DataGrid.cs/#L2148"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/DataGrid.cs/#L2164"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>Optional factory for creating the hierarchical adapter.</p>
@@ -7255,7 +7419,7 @@ adapter without subclassing <a class="xref" href="Avalonia.Controls.DataGrid.htm
 
   <h3 id="Avalonia_Controls_DataGrid_HierarchicalModel" data-uid="Avalonia.Controls.DataGrid.HierarchicalModel">
   HierarchicalModel
-  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/DataGrid.cs/#L2460"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/DataGrid.cs/#L2476"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>Gets or sets the hierarchical model that drives tree-like rows.</p>
@@ -7287,7 +7451,7 @@ adapter without subclassing <a class="xref" href="Avalonia.Controls.DataGrid.htm
 
   <h3 id="Avalonia_Controls_DataGrid_HierarchicalModelFactory" data-uid="Avalonia.Controls.DataGrid.HierarchicalModelFactory">
   HierarchicalModelFactory
-  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/DataGrid.cs/#L2139"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/DataGrid.cs/#L2155"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>Optional factory used when creating the default hierarchical model.</p>
@@ -7319,7 +7483,7 @@ adapter without subclassing <a class="xref" href="Avalonia.Controls.DataGrid.htm
 
   <h3 id="Avalonia_Controls_DataGrid_HierarchicalRowsEnabled" data-uid="Avalonia.Controls.DataGrid.HierarchicalRowsEnabled">
   HierarchicalRowsEnabled
-  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/DataGrid.cs/#L2157"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/DataGrid.cs/#L2173"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>Enables hierarchical row rendering through <a class="xref" href="Avalonia.Controls.DataGrid.html#Avalonia_Controls_DataGrid_HierarchicalModel">HierarchicalModel</a>.</p>
@@ -7415,7 +7579,7 @@ adapter without subclassing <a class="xref" href="Avalonia.Controls.DataGrid.htm
 
   <h3 id="Avalonia_Controls_DataGrid_IsMultiSortEnabled" data-uid="Avalonia.Controls.DataGrid.IsMultiSortEnabled">
   IsMultiSortEnabled
-  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/DataGrid.cs/#L2336"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/DataGrid.cs/#L2352"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>Enables or disables multi-column sorting (Shift + click).</p>
@@ -7511,7 +7675,7 @@ adapter without subclassing <a class="xref" href="Avalonia.Controls.DataGrid.htm
 
   <h3 id="Avalonia_Controls_DataGrid_IsValid" data-uid="Avalonia.Controls.DataGrid.IsValid">
   IsValid
-  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/DataGrid.Validation.cs/#L567"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/DataGrid.Validation.cs/#L557"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"></div>
@@ -7708,7 +7872,7 @@ Use <span class="xref">Avalonia.Input.KeyGesture.Key</span> set to <span class="
 
   <h3 id="Avalonia_Controls_DataGrid_OwnsSortDescriptions" data-uid="Avalonia.Controls.DataGrid.OwnsSortDescriptions">
   OwnsSortDescriptions
-  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/DataGrid.cs/#L2366"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/DataGrid.cs/#L2382"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>When true the sorting model overwrites the view's SortDescriptions; when false it observes external changes.</p>
@@ -7740,7 +7904,7 @@ Use <span class="xref">Avalonia.Input.KeyGesture.Key</span> set to <span class="
 
   <h3 id="Avalonia_Controls_DataGrid_RangeInteractionModel" data-uid="Avalonia.Controls.DataGrid.RangeInteractionModel">
   RangeInteractionModel
-  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/DataGrid.cs/#L2433"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/DataGrid.cs/#L2449"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>Gets or sets the range interaction model that drives selection drag and fill handle ranges.</p>
@@ -7772,7 +7936,7 @@ Use <span class="xref">Avalonia.Input.KeyGesture.Key</span> set to <span class="
 
   <h3 id="Avalonia_Controls_DataGrid_RangeInteractionModelFactory" data-uid="Avalonia.Controls.DataGrid.RangeInteractionModelFactory">
   RangeInteractionModelFactory
-  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/DataGrid.cs/#L2112"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/DataGrid.cs/#L2128"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>Optional factory used when creating the default range interaction model.</p>
@@ -7837,7 +8001,7 @@ marked invisible. Defaults to offscreen.</p>
 
   <h3 id="Avalonia_Controls_DataGrid_ReferenceIndexResolver" data-uid="Avalonia.Controls.DataGrid.ReferenceIndexResolver">
   ReferenceIndexResolver
-  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/DataGrid.cs/#L1986"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/DataGrid.cs/#L2002"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>Optional hook used to resolve an item index for reference-based selection lookups.
@@ -8385,7 +8549,7 @@ If not set, a default average-based estimator is used.</p>
 
   <h3 id="Avalonia_Controls_DataGrid_SearchAdapterFactory" data-uid="Avalonia.Controls.DataGrid.SearchAdapterFactory">
   SearchAdapterFactory
-  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/DataGrid.cs/#L2233"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/DataGrid.cs/#L2249"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>Optional factory for creating the search adapter. Use this to plug in a custom adapter
@@ -8418,7 +8582,7 @@ If not set, a default average-based estimator is used.</p>
 
   <h3 id="Avalonia_Controls_DataGrid_SearchModel" data-uid="Avalonia.Controls.DataGrid.SearchModel">
   SearchModel
-  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/DataGrid.cs/#L2400"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/DataGrid.cs/#L2416"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>Gets or sets the search model that drives global search.</p>
@@ -8450,7 +8614,7 @@ If not set, a default average-based estimator is used.</p>
 
   <h3 id="Avalonia_Controls_DataGrid_SearchModelFactory" data-uid="Avalonia.Controls.DataGrid.SearchModelFactory">
   SearchModelFactory
-  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/DataGrid.cs/#L2085"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/DataGrid.cs/#L2101"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>Optional factory used when creating the default search model.</p>
@@ -8482,7 +8646,7 @@ If not set, a default average-based estimator is used.</p>
 
   <h3 id="Avalonia_Controls_DataGrid_SelectedCells" data-uid="Avalonia.Controls.DataGrid.SelectedCells">
   SelectedCells
-  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/DataGrid.cs/#L759"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/DataGrid.cs/#L760"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>Gets or sets the collection of selected cells.</p>
@@ -8514,7 +8678,7 @@ If not set, a default average-based estimator is used.</p>
 
   <h3 id="Avalonia_Controls_DataGrid_SelectedColumns" data-uid="Avalonia.Controls.DataGrid.SelectedColumns">
   SelectedColumns
-  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/DataGrid.cs/#L791"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/DataGrid.cs/#L792"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>Gets or sets the collection of selected columns.</p>
@@ -8611,7 +8775,7 @@ If not set, a default average-based estimator is used.</p>
 
   <h3 id="Avalonia_Controls_DataGrid_SelectedItems" data-uid="Avalonia.Controls.DataGrid.SelectedItems">
   SelectedItems
-  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/DataGrid.cs/#L736"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/DataGrid.cs/#L737"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>Gets a list that contains the data items corresponding to the selected rows.</p>
@@ -8643,7 +8807,7 @@ If not set, a default average-based estimator is used.</p>
 
   <h3 id="Avalonia_Controls_DataGrid_Selection" data-uid="Avalonia.Controls.DataGrid.Selection">
   Selection
-  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/DataGrid.cs/#L822"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/DataGrid.cs/#L823"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>Gets or sets the selection model that drives row selection.</p>
@@ -8707,7 +8871,7 @@ If not set, a default average-based estimator is used.</p>
 
   <h3 id="Avalonia_Controls_DataGrid_SelectionModelFactory" data-uid="Avalonia.Controls.DataGrid.SelectionModelFactory">
   SelectionModelFactory
-  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/DataGrid.cs/#L1975"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/DataGrid.cs/#L1991"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>Optional factory used when creating the default selection model.</p>
@@ -8867,7 +9031,7 @@ If not set, a default average-based estimator is used.</p>
 
   <h3 id="Avalonia_Controls_DataGrid_SortCycleMode" data-uid="Avalonia.Controls.DataGrid.SortCycleMode">
   SortCycleMode
-  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/DataGrid.cs/#L2351"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/DataGrid.cs/#L2367"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>Controls the sort direction cycle (two-state or three-state).</p>
@@ -8899,7 +9063,7 @@ If not set, a default average-based estimator is used.</p>
 
   <h3 id="Avalonia_Controls_DataGrid_SortingAdapterFactory" data-uid="Avalonia.Controls.DataGrid.SortingAdapterFactory">
   SortingAdapterFactory
-  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/DataGrid.cs/#L2188"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/DataGrid.cs/#L2204"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>Optional factory for creating the sorting adapter. Use this to plug in a custom adapter
@@ -8932,7 +9096,7 @@ If not set, a default average-based estimator is used.</p>
 
   <h3 id="Avalonia_Controls_DataGrid_SortingModel" data-uid="Avalonia.Controls.DataGrid.SortingModel">
   SortingModel
-  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/DataGrid.cs/#L2382"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/DataGrid.cs/#L2398"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>Gets or sets the sorting model that drives column sorting.</p>
@@ -8964,7 +9128,7 @@ If not set, a default average-based estimator is used.</p>
 
   <h3 id="Avalonia_Controls_DataGrid_SortingModelFactory" data-uid="Avalonia.Controls.DataGrid.SortingModelFactory">
   SortingModelFactory
-  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/DataGrid.cs/#L2067"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/DataGrid.cs/#L2083"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>Optional factory used when creating the default sorting model.</p>
@@ -9978,7 +10142,7 @@ Setting this to true enables:</p>
 
   <h3 id="Avalonia_Controls_DataGrid_ClearFilter_Avalonia_Controls_DataGridColumn_" data-uid="Avalonia.Controls.DataGrid.ClearFilter(Avalonia.Controls.DataGridColumn)">
   ClearFilter(DataGridColumn)
-  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/DataGrid.cs/#L5741"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/DataGrid.cs/#L5757"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>Clears the active filter for the provided column.</p>
@@ -10017,7 +10181,7 @@ Setting this to true enables:</p>
 
   <h3 id="Avalonia_Controls_DataGrid_ClearFilterByColumnId_System_Object_" data-uid="Avalonia.Controls.DataGrid.ClearFilterByColumnId(System.Object)">
   ClearFilterByColumnId(object)
-  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/DataGrid.cs/#L5762"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/DataGrid.cs/#L5778"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>Clears the active filter for the provided column id.</p>
@@ -10308,7 +10472,7 @@ Setting this to true enables:</p>
 
   <h3 id="Avalonia_Controls_DataGrid_CreateClipboardImportModel" data-uid="Avalonia.Controls.DataGrid.CreateClipboardImportModel">
   CreateClipboardImportModel()
-  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/DataGrid.cs/#L2050"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/DataGrid.cs/#L2066"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>Creates the default clipboard import model for the grid. Override or set
@@ -10341,7 +10505,7 @@ Setting this to true enables:</p>
 
   <h3 id="Avalonia_Controls_DataGrid_CreateConditionalFormattingAdapter_Avalonia_Controls_DataGridConditionalFormatting_IConditionalFormattingModel_" data-uid="Avalonia.Controls.DataGrid.CreateConditionalFormattingAdapter(Avalonia.Controls.DataGridConditionalFormatting.IConditionalFormattingModel)">
   CreateConditionalFormattingAdapter(IConditionalFormattingModel)
-  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/DataGrid.cs/#L2628"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/DataGrid.cs/#L2644"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>Creates the adapter that connects the conditional formatting model to the grid.</p>
@@ -10380,7 +10544,7 @@ Setting this to true enables:</p>
 
   <h3 id="Avalonia_Controls_DataGrid_CreateConditionalFormattingModel" data-uid="Avalonia.Controls.DataGrid.CreateConditionalFormattingModel">
   CreateConditionalFormattingModel()
-  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/DataGrid.cs/#L2018"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/DataGrid.cs/#L2034"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"></div>
@@ -10411,7 +10575,7 @@ Setting this to true enables:</p>
 
   <h3 id="Avalonia_Controls_DataGrid_CreateEditingInteractionModel" data-uid="Avalonia.Controls.DataGrid.CreateEditingInteractionModel">
   CreateEditingInteractionModel()
-  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/DataGrid.cs/#L2059"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/DataGrid.cs/#L2075"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>Creates the default editing interaction model for the grid. Override or set
@@ -10444,7 +10608,7 @@ Setting this to true enables:</p>
 
   <h3 id="Avalonia_Controls_DataGrid_CreateFillModel" data-uid="Avalonia.Controls.DataGrid.CreateFillModel">
   CreateFillModel()
-  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/DataGrid.cs/#L2032"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/DataGrid.cs/#L2048"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>Creates the default fill model for the grid. Override or set <a class="xref" href="Avalonia.Controls.DataGrid.html#Avalonia_Controls_DataGrid_FillModelFactory">FillModelFactory</a>
@@ -10477,7 +10641,7 @@ before construction completes to supply a custom implementation.</p>
 
   <h3 id="Avalonia_Controls_DataGrid_CreateFilteringAdapter_Avalonia_Controls_DataGridFiltering_IFilteringModel_" data-uid="Avalonia.Controls.DataGrid.CreateFilteringAdapter(Avalonia.Controls.DataGridFiltering.IFilteringModel)">
   CreateFilteringAdapter(IFilteringModel)
-  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/DataGrid.cs/#L2529"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/DataGrid.cs/#L2545"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>Creates the adapter that connects the filtering model to the grid.</p>
@@ -10516,7 +10680,7 @@ before construction completes to supply a custom implementation.</p>
 
   <h3 id="Avalonia_Controls_DataGrid_CreateFilteringModel" data-uid="Avalonia.Controls.DataGrid.CreateFilteringModel">
   CreateFilteringModel()
-  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/DataGrid.cs/#L2008"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/DataGrid.cs/#L2024"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"></div>
@@ -10547,7 +10711,7 @@ before construction completes to supply a custom implementation.</p>
 
   <h3 id="Avalonia_Controls_DataGrid_CreateFormulaModel" data-uid="Avalonia.Controls.DataGrid.CreateFormulaModel">
   CreateFormulaModel()
-  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/DataGrid.cs/#L2023"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/DataGrid.cs/#L2039"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"></div>
@@ -10578,7 +10742,7 @@ before construction completes to supply a custom implementation.</p>
 
   <h3 id="Avalonia_Controls_DataGrid_CreateHierarchicalAdapter_Avalonia_Controls_DataGridHierarchical_IHierarchicalModel_" data-uid="Avalonia.Controls.DataGrid.CreateHierarchicalAdapter(Avalonia.Controls.DataGridHierarchical.IHierarchicalModel)">
   CreateHierarchicalAdapter(IHierarchicalModel)
-  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/DataGrid.cs/#L2653"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/DataGrid.cs/#L2669"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>Creates the adapter that connects the hierarchical model to the grid.</p>
@@ -10617,7 +10781,7 @@ before construction completes to supply a custom implementation.</p>
 
   <h3 id="Avalonia_Controls_DataGrid_CreateHierarchicalModel" data-uid="Avalonia.Controls.DataGrid.CreateHierarchicalModel">
   CreateHierarchicalModel()
-  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/DataGrid.cs/#L1997"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/DataGrid.cs/#L2013"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"></div>
@@ -10648,7 +10812,7 @@ before construction completes to supply a custom implementation.</p>
 
   <h3 id="Avalonia_Controls_DataGrid_CreateRangeInteractionModel" data-uid="Avalonia.Controls.DataGrid.CreateRangeInteractionModel">
   CreateRangeInteractionModel()
-  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/DataGrid.cs/#L2041"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/DataGrid.cs/#L2057"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>Creates the default range interaction model for the grid. Override or set
@@ -10681,7 +10845,7 @@ before construction completes to supply a custom implementation.</p>
 
   <h3 id="Avalonia_Controls_DataGrid_CreateSearchAdapter_Avalonia_Controls_DataGridSearching_ISearchModel_" data-uid="Avalonia.Controls.DataGrid.CreateSearchAdapter(Avalonia.Controls.DataGridSearching.ISearchModel)">
   CreateSearchAdapter(ISearchModel)
-  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/DataGrid.cs/#L2564"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/DataGrid.cs/#L2580"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>Creates the adapter that connects the search model to the grid.</p>
@@ -10720,7 +10884,7 @@ before construction completes to supply a custom implementation.</p>
 
   <h3 id="Avalonia_Controls_DataGrid_CreateSearchModel" data-uid="Avalonia.Controls.DataGrid.CreateSearchModel">
   CreateSearchModel()
-  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/DataGrid.cs/#L2013"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/DataGrid.cs/#L2029"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"></div>
@@ -10751,7 +10915,7 @@ before construction completes to supply a custom implementation.</p>
 
   <h3 id="Avalonia_Controls_DataGrid_CreateSelectionModel" data-uid="Avalonia.Controls.DataGrid.CreateSelectionModel">
   CreateSelectionModel()
-  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/DataGrid.cs/#L1967"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/DataGrid.cs/#L1983"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>Creates the default selection model for the grid. Override to supply a custom model or
@@ -10784,7 +10948,7 @@ set <a class="xref" href="Avalonia.Controls.DataGrid.html#Avalonia_Controls_Data
 
   <h3 id="Avalonia_Controls_DataGrid_CreateSelectionModelAdapter_Avalonia_Controls_Selection_ISelectionModel_" data-uid="Avalonia.Controls.DataGrid.CreateSelectionModelAdapter(Avalonia.Controls.Selection.ISelectionModel)">
   CreateSelectionModelAdapter(ISelectionModel)
-  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/DataGrid.cs/#L5900"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/DataGrid.cs/#L5916"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>Creates the adapter that wraps an <span class="xref">Avalonia.Controls.Selection.ISelectionModel</span> for this grid. Override
@@ -10823,7 +10987,7 @@ to customize index/slot mapping or SelectedItems projection.</p>
 
   <h3 id="Avalonia_Controls_DataGrid_CreateSortingAdapter_Avalonia_Controls_DataGridSorting_ISortingModel_" data-uid="Avalonia.Controls.DataGrid.CreateSortingAdapter(Avalonia.Controls.DataGridSorting.ISortingModel)">
   CreateSortingAdapter(ISortingModel)
-  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/DataGrid.cs/#L2482"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/DataGrid.cs/#L2498"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>Creates the adapter that connects the sorting model to the grid.</p>
@@ -10862,7 +11026,7 @@ to customize index/slot mapping or SelectedItems projection.</p>
 
   <h3 id="Avalonia_Controls_DataGrid_CreateSortingModel" data-uid="Avalonia.Controls.DataGrid.CreateSortingModel">
   CreateSortingModel()
-  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/DataGrid.cs/#L1992"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/DataGrid.cs/#L2008"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>Creates the default sorting model for the grid. Override or set <a class="xref" href="Avalonia.Controls.DataGrid.html#Avalonia_Controls_DataGrid_SortingModelFactory">SortingModelFactory</a>
@@ -11536,7 +11700,7 @@ child elements should not exceed.</p>
 
   <h3 id="Avalonia_Controls_DataGrid_OnCreateAutomationPeer" data-uid="Avalonia.Controls.DataGrid.OnCreateAutomationPeer">
   OnCreateAutomationPeer()
-  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/DataGrid.Template.cs/#L382"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/DataGrid.Template.cs/#L384"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>Returns a new, type-specific <span class="xref">Avalonia.Automation.Peers.AutomationPeer</span> implementation for the control.</p>
@@ -11601,7 +11765,7 @@ child elements should not exceed.</p>
 
   <h3 id="Avalonia_Controls_DataGrid_OnDataContextBeginUpdate" data-uid="Avalonia.Controls.DataGrid.OnDataContextBeginUpdate">
   OnDataContextBeginUpdate()
-  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/DataGrid.cs/#L1850"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/DataGrid.cs/#L1866"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>Called when the <span class="xref">Avalonia.StyledElement.DataContext</span> begins updating.</p>
@@ -11628,7 +11792,7 @@ child elements should not exceed.</p>
 
   <h3 id="Avalonia_Controls_DataGrid_OnDataContextEndUpdate" data-uid="Avalonia.Controls.DataGrid.OnDataContextEndUpdate">
   OnDataContextEndUpdate()
-  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/DataGrid.cs/#L1858"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/DataGrid.cs/#L1874"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>Called when the <span class="xref">Avalonia.StyledElement.DataContext</span> finishes updating.</p>
@@ -11655,7 +11819,7 @@ child elements should not exceed.</p>
 
   <h3 id="Avalonia_Controls_DataGrid_OnDetachedFromVisualTree_Avalonia_VisualTreeAttachmentEventArgs_" data-uid="Avalonia.Controls.DataGrid.OnDetachedFromVisualTree(Avalonia.VisualTreeAttachmentEventArgs)">
   OnDetachedFromVisualTree(VisualTreeAttachmentEventArgs)
-  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/DataGrid.Template.cs/#L219"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/DataGrid.Template.cs/#L220"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>Called when the control is removed from a rooted visual tree.</p>
@@ -11688,7 +11852,7 @@ child elements should not exceed.</p>
 
   <h3 id="Avalonia_Controls_DataGrid_OnHorizontalScroll_Avalonia_Controls_DataGridScrollEventArgs_" data-uid="Avalonia.Controls.DataGrid.OnHorizontalScroll(Avalonia.Controls.DataGridScrollEventArgs)">
   OnHorizontalScroll(DataGridScrollEventArgs)
-  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/DataGrid.cs/#L482"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/DataGrid.cs/#L483"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>Raises the <a class="xref" href="Avalonia.Controls.DataGrid.html#Avalonia_Controls_DataGrid_HorizontalScroll">HorizontalScroll</a> event.</p>
@@ -12048,7 +12212,7 @@ This event won't get raised again until after _selectionChanged is set back to t
 
   <h3 id="Avalonia_Controls_DataGrid_OnTextInput_Avalonia_Input_TextInputEventArgs_" data-uid="Avalonia.Controls.DataGrid.OnTextInput(Avalonia.Input.TextInputEventArgs)">
   OnTextInput(TextInputEventArgs)
-  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/DataGrid.Input.cs/#L974"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/DataGrid.Input.cs/#L978"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>Invoked when an unhandled <span class="xref">Avalonia.Input.InputElement.TextInputEvent</span> reaches an element in its
@@ -12179,7 +12343,7 @@ for this event.</p>
 
   <h3 id="Avalonia_Controls_DataGrid_OnVerticalScroll_Avalonia_Controls_DataGridScrollEventArgs_" data-uid="Avalonia.Controls.DataGrid.OnVerticalScroll(Avalonia.Controls.DataGridScrollEventArgs)">
   OnVerticalScroll(DataGridScrollEventArgs)
-  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/DataGrid.cs/#L498"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/DataGrid.cs/#L499"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>Raises the <a class="xref" href="Avalonia.Controls.DataGrid.html#Avalonia_Controls_DataGrid_VerticalScroll">VerticalScroll</a> event.</p>
@@ -12733,7 +12897,7 @@ If both item and column are null, the method returns without scrolling.</p>
 
   <h3 id="Avalonia_Controls_DataGrid_SelectionIndexFromSlot_System_Int32_" data-uid="Avalonia.Controls.DataGrid.SelectionIndexFromSlot(System.Int32)">
   SelectionIndexFromSlot(int)
-  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/DataGrid.cs/#L5909"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/DataGrid.cs/#L5925"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>Maps a visual slot to a selection-model index. Override to customize mapping for grouped
@@ -12771,7 +12935,7 @@ or hierarchical scenarios.</p>
 
   <h3 id="Avalonia_Controls_DataGrid_SlotFromSelectionIndex_System_Int32_" data-uid="Avalonia.Controls.DataGrid.SlotFromSelectionIndex(System.Int32)">
   SlotFromSelectionIndex(int)
-  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/DataGrid.cs/#L5934"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/DataGrid.cs/#L5950"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>Maps a selection-model index back to a visual slot. Override to customize mapping for
@@ -12847,7 +13011,7 @@ grouped or hierarchical scenarios.</p>
 
   <h3 id="Avalonia_Controls_DataGrid_TryShowFilterFlyout_System_Object_" data-uid="Avalonia.Controls.DataGrid.TryShowFilterFlyout(System.Object)">
   TryShowFilterFlyout(object)
-  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/DataGrid.cs/#L5777"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/DataGrid.cs/#L5793"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>Attempts to display the filter flyout for the provided column id.</p>
@@ -13044,7 +13208,7 @@ been reordered via collection operations instead of setting <a class="xref" href
 
   <h3 id="Avalonia_Controls_DataGrid_CellPointerPressed" data-uid="Avalonia.Controls.DataGrid.CellPointerPressed">
   CellPointerPressed
-  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/DataGrid.Input.cs/#L1432"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/DataGrid.Input.cs/#L1436"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>Occurs when cell is mouse-pressed.</p>
@@ -13234,7 +13398,7 @@ Event listeners can modify or add to the row clipboard content.</p>
 
   <h3 id="Avalonia_Controls_DataGrid_HorizontalScroll" data-uid="Avalonia.Controls.DataGrid.HorizontalScroll">
   HorizontalScroll
-  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/DataGrid.cs/#L456"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/DataGrid.cs/#L457"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"></div>
@@ -13634,7 +13798,7 @@ property value changes.</p>
 
   <h3 id="Avalonia_Controls_DataGrid_SelectedCellsChanged" data-uid="Avalonia.Controls.DataGrid.SelectedCellsChanged">
   SelectedCellsChanged
-  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/DataGrid.cs/#L785"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/DataGrid.cs/#L786"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>Raised when the set of selected cells changes.</p>
@@ -13665,7 +13829,7 @@ property value changes.</p>
 
   <h3 id="Avalonia_Controls_DataGrid_SelectedColumnsChanged" data-uid="Avalonia.Controls.DataGrid.SelectedColumnsChanged">
   SelectedColumnsChanged
-  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/DataGrid.cs/#L817"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/DataGrid.cs/#L818"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>Raised when the set of selected columns changes.</p>
@@ -13884,7 +14048,7 @@ object becomes available for reuse.</p>
 
   <h3 id="Avalonia_Controls_DataGrid_VerticalScroll" data-uid="Avalonia.Controls.DataGrid.VerticalScroll">
   VerticalScroll
-  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/DataGrid.cs/#L467"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/DataGrid.cs/#L468"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"></div>

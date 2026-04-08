@@ -190,7 +190,7 @@ Class DataGridColumn  <a class="header-action link-secondary" title="View source
       <span class="xref">AvaloniaObject.SetCurrentValue&lt;T&gt;(StyledProperty&lt;T&gt;, T)</span>
     </div>
     <div>
-      <span class="xref">AvaloniaObject.Bind(AvaloniaProperty, IBinding)</span>
+      <span class="xref">AvaloniaObject.Bind(AvaloniaProperty, BindingBase)</span>
     </div>
     <div>
       <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.iobservable-1">AvaloniaObject.Bind(AvaloniaProperty, IObservable&lt;object&gt;, BindingPriority)</a>
@@ -236,6 +236,9 @@ Class DataGridColumn  <a class="header-action link-secondary" title="View source
     </div>
     <div>
       <span class="xref">AvaloniaObject.this[IndexerDescriptor]</span>
+    </div>
+    <div>
+      <span class="xref">AvaloniaObject.Dispatcher</span>
     </div>
     <div>
       <span class="xref">AvaloniaObject.PropertyChanged</span>
@@ -975,7 +978,7 @@ dragging the column header.</p>
   <div class="codewrapper">
     <pre><code class="lang-csharp hljs">[AssignBinding]
 [InheritDataTypeFromItems(&quot;ItemsSource&quot;, AncestorType = typeof(DataGrid))]
-public IBinding CellBackgroundBinding { get; set; }</code></pre>
+public BindingBase CellBackgroundBinding { get; set; }</code></pre>
   </div>
 
 
@@ -984,7 +987,7 @@ public IBinding CellBackgroundBinding { get; set; }</code></pre>
 
   <h4 class="section">Property Value</h4>
   <dl class="parameters">
-    <dt><span class="xref">IBinding</span></dt>
+    <dt><span class="xref">BindingBase</span></dt>
     <dd></dd>
   </dl>
 
@@ -1008,7 +1011,7 @@ public IBinding CellBackgroundBinding { get; set; }</code></pre>
   <div class="codewrapper">
     <pre><code class="lang-csharp hljs">[AssignBinding]
 [InheritDataTypeFromItems(&quot;ItemsSource&quot;, AncestorType = typeof(DataGrid))]
-public IBinding CellForegroundBinding { get; set; }</code></pre>
+public BindingBase CellForegroundBinding { get; set; }</code></pre>
   </div>
 
 
@@ -1017,7 +1020,7 @@ public IBinding CellForegroundBinding { get; set; }</code></pre>
 
   <h4 class="section">Property Value</h4>
   <dl class="parameters">
-    <dt><span class="xref">IBinding</span></dt>
+    <dt><span class="xref">BindingBase</span></dt>
     <dd></dd>
   </dl>
 
@@ -1103,7 +1106,7 @@ public IBinding CellForegroundBinding { get; set; }</code></pre>
   <div class="markdown level1 conceptual"></div>
 
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public virtual IBinding ClipboardContentBinding { get; set; }</code></pre>
+    <pre><code class="lang-csharp hljs">public virtual BindingBase ClipboardContentBinding { get; set; }</code></pre>
   </div>
 
 
@@ -1112,7 +1115,7 @@ public IBinding CellForegroundBinding { get; set; }</code></pre>
 
   <h4 class="section">Property Value</h4>
   <dl class="parameters">
-    <dt><span class="xref">IBinding</span></dt>
+    <dt><span class="xref">BindingBase</span></dt>
     <dd></dd>
   </dl>
 
