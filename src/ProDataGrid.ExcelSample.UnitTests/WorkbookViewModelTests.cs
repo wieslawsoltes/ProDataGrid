@@ -2,6 +2,7 @@ using System;
 using System.Reactive;
 using System.Reactive.Concurrency;
 using Avalonia.Controls.DataGridFiltering;
+using Avalonia.Headless.XUnit;
 using ProDataGrid.ExcelSample.Models;
 using ProDataGrid.ExcelSample.ViewModels;
 using Xunit;
@@ -10,7 +11,7 @@ namespace ProDataGrid.ExcelSample.Tests;
 
 public sealed class WorkbookViewModelTests
 {
-    [Fact]
+    [AvaloniaFact]
     public void SearchText_UpdatesSearchDescriptors()
     {
         using var viewModel = new WorkbookViewModel(ImmediateScheduler.Instance, ImmediateScheduler.Instance, startLiveUpdates: false);
@@ -25,7 +26,7 @@ public sealed class WorkbookViewModelTests
         Assert.Empty(viewModel.SearchModel.Descriptors);
     }
 
-    [Fact]
+    [AvaloniaFact]
     public void FilterText_UpdatesFilteringDescriptors()
     {
         using var viewModel = new WorkbookViewModel(ImmediateScheduler.Instance, ImmediateScheduler.Instance, startLiveUpdates: false);
@@ -42,7 +43,7 @@ public sealed class WorkbookViewModelTests
         Assert.Empty(viewModel.FilteringModel.Descriptors);
     }
 
-    [Fact]
+    [AvaloniaFact]
     public void ReorderSheetCommand_MovesSheets()
     {
         using var viewModel = new WorkbookViewModel(ImmediateScheduler.Instance, ImmediateScheduler.Instance, startLiveUpdates: false);
@@ -59,7 +60,7 @@ public sealed class WorkbookViewModelTests
         Assert.Equal(first, viewModel.SelectedSheet);
     }
 
-    [Fact]
+    [AvaloniaFact]
     public void CancelFormulaCommand_RestoresFormulaText()
     {
         using var viewModel = new WorkbookViewModel(ImmediateScheduler.Instance, ImmediateScheduler.Instance, startLiveUpdates: false);
@@ -74,7 +75,7 @@ public sealed class WorkbookViewModelTests
         Assert.Equal(original, viewModel.FormulaText);
     }
 
-    [Fact]
+    [AvaloniaFact]
     public void FormulaBarVisibility_Toggles()
     {
         using var viewModel = new WorkbookViewModel(ImmediateScheduler.Instance, ImmediateScheduler.Instance, startLiveUpdates: false);

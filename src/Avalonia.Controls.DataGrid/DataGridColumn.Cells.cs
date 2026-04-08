@@ -38,7 +38,7 @@ namespace Avalonia.Controls
         /// <param name="item">The item associated with a cell.</param>
         /// <param name="binding">The binding to get the value of.</param>
         /// <returns>The resultant cell value.</returns>
-        internal object GetCellValue(object item, IBinding binding)
+        internal object GetCellValue(object item, BindingBase binding)
         {
             Debug.Assert(OwningGrid != null);
 
@@ -250,7 +250,7 @@ namespace Avalonia.Controls
         private static void ApplyCellBinding(
             DataGridCell cell,
             AvaloniaProperty property,
-            IBinding binding,
+            BindingBase binding,
             AttachedProperty<bool> appliedProperty)
         {
             if (binding != null)
@@ -299,6 +299,8 @@ namespace Avalonia.Controls
         internal void RemoveEditingElement()
         {
             _editingElement = null;
+            _editBinding?.Dispose();
+            _editBinding = null;
         }
 
         /// <summary>
@@ -307,7 +309,6 @@ namespace Avalonia.Controls
         internal virtual void ClearElementCache()
         {
             RemoveEditingElement();
-            _editBinding = null;
             if (_headerContentBinding != null)
             {
                 _headerContentBinding.Dispose();

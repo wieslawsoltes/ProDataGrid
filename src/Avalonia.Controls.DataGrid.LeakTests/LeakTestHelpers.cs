@@ -8,6 +8,7 @@ using Avalonia.Controls;
 using Avalonia.Headless;
 using Avalonia.Input;
 using Avalonia.Threading;
+using Avalonia.VisualTree;
 using Xunit;
 
 namespace Avalonia.Controls.DataGridTests;
@@ -37,22 +38,21 @@ internal static class LeakTestHelpers
 
     internal static void CleanupWindow(Window window)
     {
-        window.FocusManager?.ClearFocus();
+        TryClearFocus(window.FocusManager);
+        foreach (var grid in window.GetSelfAndVisualDescendants().OfType<DataGrid>())
+        {
+            grid.FormulaModel?.Detach();
+        }
         window.Content = null;
         window.DataContext = null;
-        if (window is IInputRoot inputRoot)
-        {
-            inputRoot.PointerOverElement = null;
-        }
+        TryClearPointerOverElement(window);
         for (var i = 0; i < 3; i++)
         {
             ExecuteLayoutPass(window);
             RunJobsAndRender();
         }
         window.Close();
-        Dispatcher.UIThread.RunJobs(DispatcherPriority.Background);
-        Dispatcher.UIThread.RunJobs(DispatcherPriority.Loaded);
-        RunJobsAndRender();
+        DrainDispatcher();
     }
 
     internal static void ShowWindow(Window window)
@@ -97,10 +97,10 @@ internal static class LeakTestHelpers
             new[] { typeof(IInputElement), typeof(NavigationMethod), typeof(KeyModifiers) });
         setFocusedElement?.Invoke(keyboard, new object?[] { null, NavigationMethod.Unspecified, KeyModifiers.None });
         Dispatcher.UIThread.RunJobs(DispatcherPriority.Loaded);
-        RunJobsAndRender();
+        DrainDispatcher();
         GC.Collect();
         GC.WaitForPendingFinalizers();
-        RunJobsAndRender();
+        DrainDispatcher();
         GC.Collect();
     }
 
@@ -185,6 +185,16 @@ internal static class LeakTestHelpers
         dispatcher.RunJobs();
     }
 
+    internal static void DrainDispatcher()
+    {
+        for (var i = 0; i < 5; i++)
+        {
+            Dispatcher.UIThread.RunJobs(DispatcherPriority.Background);
+            Dispatcher.UIThread.RunJobs(DispatcherPriority.Loaded);
+            RunJobsAndRender();
+        }
+    }
+
     internal static void PumpLayout(Control control)
     {
         control.UpdateLayout();
@@ -216,5 +226,41 @@ internal static class LeakTestHelpers
             modifiers: null);
         Assert.NotNull(method);
         method!.Invoke(instance, arguments);
+    }
+
+    private static void TryClearFocus(IFocusManager? focusManager)
+    {
+        if (focusManager == null)
+        {
+            return;
+        }
+
+        var clearFocus = focusManager.GetType().GetMethod(
+            "ClearFocus",
+            BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
+        if (clearFocus != null)
+        {
+            clearFocus.Invoke(focusManager, null);
+            return;
+        }
+
+        var setFocusedElement = focusManager.GetType().GetMethod(
+            "SetFocusedElement",
+            BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic,
+            binder: null,
+            types: [typeof(IInputElement), typeof(NavigationMethod), typeof(KeyModifiers)],
+            modifiers: null);
+        setFocusedElement?.Invoke(focusManager, [null, NavigationMethod.Unspecified, KeyModifiers.None]);
+    }
+
+    private static void TryClearPointerOverElement(Window window)
+    {
+        var pointerOverElement = window.GetType().GetProperty(
+            "PointerOverElement",
+            BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
+        if (pointerOverElement?.CanWrite == true)
+        {
+            pointerOverElement.SetValue(window, null);
+        }
     }
 }

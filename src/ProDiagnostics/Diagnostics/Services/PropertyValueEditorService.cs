@@ -126,7 +126,7 @@ namespace Avalonia.Diagnostics.Services
 
                             picker.Bind(
                                     ColorView.ColorProperty,
-                                    new Binding(nameof(PropertyViewModel.Value), BindingMode.TwoWay) { Converter = Color2Brush })
+                                    new Binding(nameof(PropertyViewModel.Value)) { Mode = BindingMode.TwoWay, Converter = Color2Brush })
                                 .DisposeWith(_subscriptions);
 
                             flyout.Content = picker;
@@ -329,8 +329,9 @@ namespace Avalonia.Diagnostics.Services
             }
 
             control.Bind(valueProperty,
-                    new Binding(nameof(PropertyViewModel.Value), BindingMode.TwoWay)
+                    new Binding(nameof(PropertyViewModel.Value))
                     {
+                        Mode = BindingMode.TwoWay,
                         Converter = converter,
                         ConverterParameter = propertyType
                     })
@@ -374,8 +375,9 @@ namespace Avalonia.Diagnostics.Services
             public void Bind(Type propertyType)
             {
                 _binding?.Dispose();
-                var binding = new Binding(nameof(PropertyViewModel.Value), BindingMode.TwoWay)
+                var binding = new Binding(nameof(PropertyViewModel.Value))
                 {
+                    Mode = BindingMode.TwoWay,
                     Converter = _converter,
                     ConverterParameter = propertyType
                 };

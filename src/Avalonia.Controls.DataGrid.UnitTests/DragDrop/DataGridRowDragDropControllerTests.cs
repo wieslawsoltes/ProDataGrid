@@ -329,7 +329,7 @@ namespace Avalonia.Controls.DataGridTests.DragDrop;
         var rowPoint = firstRow.TranslatePoint(new Point(1, 1), grid) ?? new Point(1, 1);
 
         var dragInfo = new DataGridRowDragInfo(grid, new List<object> { items[0] }, new List<int> { 0 }, fromSelection: false);
-        var data = new DataObject();
+        var data = new DataTransfer();
         var dragEvent = new DragEventArgs(
             AvaloniaDragDrop.DragOverEvent,
             data,
@@ -371,7 +371,7 @@ namespace Avalonia.Controls.DataGridTests.DragDrop;
         var abovePoint = new Point(top.X + 1, Math.Max(0, top.Y - 2));
 
         var dragInfo = new DataGridRowDragInfo(grid, new List<object> { items[1] }, new List<int> { 1 }, fromSelection: false);
-        var data = new DataObject();
+        var data = new DataTransfer();
         var dragEvent = new DragEventArgs(
             AvaloniaDragDrop.DragOverEvent,
             data,
@@ -435,7 +435,7 @@ namespace Avalonia.Controls.DataGridTests.DragDrop;
 
         var dragged = firstRow.DataContext!;
         var dragInfo = new DataGridRowDragInfo(grid, new List<object> { dragged }, new List<int> { firstRow.Index }, fromSelection: false);
-        var data = new DataObject();
+        var data = new DataTransfer();
         var dragEvent = new DragEventArgs(
             AvaloniaDragDrop.DragOverEvent,
             data,

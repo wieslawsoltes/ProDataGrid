@@ -73,7 +73,7 @@ namespace DataGridSample.ViewModels
         }
     }
 
-    public sealed class ChartSampleViewModel : INotifyPropertyChanged
+    public sealed class ChartSampleViewModel : INotifyPropertyChanged, IDisposable
     {
         private enum ChartSeriesFormat
         {
@@ -1979,6 +1979,12 @@ namespace DataGridSample.ViewModels
             field = value;
             OnPropertyChanged(propertyName);
             return true;
+        }
+
+        public void Dispose()
+        {
+            Chart.Dispose();
+            ChartData.Dispose();
         }
 
         private void OnPropertyChanged(string propertyName)

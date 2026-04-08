@@ -25,7 +25,7 @@ internal
 #endif
     abstract class DataGridBoundColumn : DataGridColumn
     {
-        private IBinding _binding; 
+        private BindingBase _binding; 
 
         /// <summary>
         /// Gets or sets the binding that associates the column with a property in the data source.
@@ -33,7 +33,7 @@ internal
         //TODO Binding
         [AssignBinding]
         [InheritDataTypeFromItems(nameof(DataGrid.ItemsSource), AncestorType = typeof(DataGrid))]
-        public virtual IBinding Binding
+        public virtual BindingBase Binding
         {
             get
             {
@@ -53,24 +53,26 @@ internal
 
                     if (_binding != null)
                     {
-                        if(_binding is BindingBase binding)
+                        if (_binding != null)
                         {
-                            if (binding.Mode == BindingMode.OneWayToSource)
+                            var mode = BindingCloneHelper.GetMode(_binding);
+                            if (mode == BindingMode.OneWayToSource)
                             {
                                 throw new InvalidOperationException("DataGridColumn doesn't support BindingMode.OneWayToSource. Use BindingMode.TwoWay instead.");
                             }
 
-                            var path = (binding as Binding)?.Path ?? (binding as CompiledBindingExtension)?.Path.ToString();
-                            if (!string.IsNullOrEmpty(path) && binding.Mode == BindingMode.Default)
+                            var path = BindingCloneHelper.GetPath(_binding);
+                            if (!string.IsNullOrEmpty(path) && mode == BindingMode.Default)
                             {
-                                binding.Mode = BindingMode.TwoWay;
-                            } 
-
-                            if (binding.Converter == null && string.IsNullOrEmpty(binding.StringFormat))
-                            {
-                                binding.Converter = DataGridValueConverter.Instance;
+                                BindingCloneHelper.TrySetMode(_binding, BindingMode.TwoWay);
                             }
-                        }  
+
+                            if (BindingCloneHelper.GetConverter(_binding) == null &&
+                                string.IsNullOrEmpty(BindingCloneHelper.GetStringFormat(_binding)))
+                            {
+                                BindingCloneHelper.TrySetConverter(_binding, DataGridValueConverter.Instance);
+                            }
+                        }
 
                         // Apply the new Binding to existing rows in the DataGrid
                         if (OwningGrid != null)
@@ -88,7 +90,7 @@ internal
         /// The binding that will be used to get or set cell content for the clipboard.
         /// If the base ClipboardContentBinding is not explicitly set, this will return the value of Binding.
         /// </summary>
-        public override IBinding ClipboardContentBinding
+        public override BindingBase ClipboardContentBinding
         {
             get
             {
@@ -123,35 +125,16 @@ internal
             }
         }
 
-        private static ICellEditBinding BindEditingElement(AvaloniaObject target, AvaloniaProperty property, IBinding binding)
+        private static ICellEditBinding BindEditingElement(AvaloniaObject target, AvaloniaProperty property, BindingBase binding)
         {
             if (BindingCloneHelper.TryCreateExplicitBinding(binding, out var explicitBinding))
             {
-                var explicitResult = explicitBinding.Initiate(target, property, enableDataValidation: true);
-                if (explicitResult != null)
-                {
-                    BindingOperations.Apply(target, property, explicitResult, null);
-                    return new ExplicitCellEditBinding(target, property);
-                }
+                target.Bind(property, explicitBinding);
+                return new ExplicitCellEditBinding(target, property, binding);
             }
 
-            var result = binding.Initiate(target, property, enableDataValidation: true); 
-
-            if (result != null)
-            {
-                if(result.Source is IAvaloniaSubject<object> subject)
-                {
-                    var bindingHelper = new CellEditBinding(subject, result.Expression, () => target.GetValue(property));
-                    var instanceBinding = new InstancedBinding(bindingHelper.InternalSubject, result.Mode, result.Priority); 
-
-                    BindingOperations.Apply(target, property, instanceBinding, null);
-                    return bindingHelper;
-                } 
-
-                BindingOperations.Apply(target, property, result, null);
-            } 
-
-            return null;
+            target.Bind(property, binding);
+            return new CellEditBinding(target, property, binding);
         } 
 
         protected abstract Control GenerateEditingElementDirect(DataGridCell cell, object dataItem); 
@@ -162,9 +145,9 @@ internal
         internal void SetHeaderFromBinding()
         {
             if (OwningGrid != null && OwningGrid.DataConnection.DataType != null
-                && Header == null && Binding != null && Binding is BindingBase binding)
+                && Header == null && Binding != null)
             {
-                var path = (binding as Binding)?.Path ?? (binding as CompiledBindingExtension)?.Path.ToString();
+                var path = BindingCloneHelper.GetPath(Binding);
                 if (!string.IsNullOrWhiteSpace(path))
                 {
                     var header = OwningGrid.DataConnection.DataType.GetDisplayName(path);

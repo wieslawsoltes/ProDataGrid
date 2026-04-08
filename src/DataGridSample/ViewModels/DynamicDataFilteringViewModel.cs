@@ -81,7 +81,7 @@ namespace DataGridSample.ViewModels
 
             var serviceFilterSubscription = _serviceFilterSubject
                 .Throttle(TimeSpan.FromMilliseconds(250))
-                .ObserveOn(RxApp.MainThreadScheduler)
+                .ObserveOn(RxSchedulers.MainThreadScheduler)
                 .Subscribe(ApplyServiceFilter);
             _cleanup.Add(serviceFilterSubscription);
         }

@@ -115,7 +115,7 @@ namespace Avalonia.Controls
             return false;
         }
 
-        private static IBinding CreateFormulaBinding(DataGrid grid, DataGridFormulaColumnDefinition definition)
+        private static BindingBase CreateFormulaBinding(DataGrid grid, DataGridFormulaColumnDefinition definition)
         {
             if (grid == null)
             {

@@ -45,7 +45,7 @@
             <TextBox Width="110"
                      Grid.Column="0"
                      Text="{Binding NameBoxText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                     Watermark="A1"
+                     PlaceholderText="A1"
                      KeyDown="OnNameBoxKeyDown"
                      LostFocus="OnNameBoxLostFocus" />
             <Border Background="{DynamicResource SystemControlBackgroundBaseLowBrush}"
@@ -56,7 +56,7 @@
             </Border>
             <TextBox Text="{Binding SelectedCell.Input, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                      Grid.Column="2"
-                     Watermark="Type values or formulas (e.g. =A + B)"
+                     PlaceholderText="Type values or formulas (e.g. =A + B)"
                      ToolTip.Tip="{Binding SelectedErrorMessage}"
                      ToolTip.IsEnabled="{Binding SelectedHasError}" />
             <Border Background="#FCE8E6"

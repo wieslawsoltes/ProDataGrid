@@ -1,12 +1,14 @@
-﻿#nullable disable
+#nullable disable
 
+using System;
+using System.Collections.Generic;
+using System.Globalization;
+using System.Reflection;
 using Avalonia.Controls;
+using Avalonia.Controls.Primitives;
 using Avalonia.Data;
 using Avalonia.PropertyStore;
 using Avalonia.Reactive;
-using System;
-using System.Collections;
-using System.Collections.Generic;
 
 namespace Avalonia.Controls.Utils
 {
@@ -16,6 +18,7 @@ public
 internal
 #endif
     interface ICellEditBinding
+        : IDisposable
     {
         bool IsValid { get; }
         IEnumerable<Exception> ValidationErrors { get; }
@@ -23,238 +26,27 @@ internal
         bool CommitEdit();
     }
 
-    internal class CellEditBinding : ICellEditBinding
-    {
-        private readonly LightweightSubject<bool> _changedSubject = new();
-        private readonly List<Exception> _validationErrors = new List<Exception>();
-        private readonly SubjectWrapper _inner;
-        private readonly IValueEntry _valueEntry;
-        private readonly Func<object> _getTargetValue;
-        private DataGridValidationSeverity _validationSeverity = DataGridValidationSeverity.None;
-
-        public bool IsValid => _validationSeverity != DataGridValidationSeverity.Error;
-        public IEnumerable<Exception> ValidationErrors => _validationErrors;
-        public IObservable<bool> ValidationChanged => _changedSubject;
-        public IAvaloniaSubject<object> InternalSubject => _inner;
-
-        public CellEditBinding(IAvaloniaSubject<object> bindingSourceSubject, IValueEntry valueEntry = null, Func<object> getTargetValue = null)
-        {
-            _inner = new SubjectWrapper(bindingSourceSubject, this);
-            _valueEntry = valueEntry;
-            _getTargetValue = getTargetValue;
-        }
-
-        private void AlterValidationErrors(Action<List<Exception>> action)
-        {
-            var hadErrors = _validationErrors.Count > 0;
-
-            action(_validationErrors);
-            _validationSeverity = _validationErrors.Count == 0
-                ? DataGridValidationSeverity.None
-                : ValidationUtil.GetValidationSeverity(_validationErrors);
-            var hasErrors = _validationErrors.Count > 0;
-
-            if (hadErrors || hasErrors)
-            {
-                _changedSubject.OnNext(IsValid);
-            }
-        }
-
-        public bool CommitEdit()
-        {
-            _inner.CommitEdit(_getTargetValue);
-            UpdateValidationErrorsFromEntry();
-            return IsValid;
-        }
-
-        private void UpdateValidationErrorsFromEntry()
-        {
-            if (_valueEntry == null)
-            {
-                return;
-            }
-
-            _valueEntry.GetDataValidationState(out var state, out var error);
-            if ((state & BindingValueType.HasError) != 0 && error != null)
-            {
-                AlterValidationErrors(errors =>
-                {
-                    errors.Clear();
-                    errors.AddRange(ValidationUtil.UnpackException(error));
-                });
-            }
-            else
-            {
-                AlterValidationErrors(errors => errors.Clear());
-            }
-        }
-
-        class SubjectWrapper : LightweightObservableBase<object>, IAvaloniaSubject<object>, IDisposable
-        {
-            private readonly IAvaloniaSubject<object> _sourceSubject;
-            private readonly CellEditBinding _editBinding;
-            private IDisposable _subscription;
-            private object _controlValue;
-            private bool _isControlValueSet = false;
-            private bool _settingSourceValue = false;
-
-            public SubjectWrapper(IAvaloniaSubject<object> bindingSourceSubject, CellEditBinding editBinding)
-            {
-                _sourceSubject = bindingSourceSubject;
-                _editBinding = editBinding;
-            }
-
-            private void SetSourceValue(object value)
-            {
-                if (!_settingSourceValue)
-                {
-                    _settingSourceValue = true;
-
-                    try
-                    {
-                        _sourceSubject.OnNext(value);
-                    }
-                    catch (Exception ex)
-                    {
-                        _editBinding.AlterValidationErrors(errors =>
-                        {
-                            errors.Clear();
-                            errors.AddRange(ValidationUtil.UnpackException(ex));
-                        });
-                    }
-
-                    _settingSourceValue = false;
-                }
-            }
-            private void SetControlValue(object value)
-            {
-                PublishNext(value);
-            }
-
-            private void OnValidationError(BindingNotification notification)
-            {
-                if (notification.HasValue && IsDataValidationException(notification.Error))
-                {
-                    SetControlValue(notification.Value);
-                }
-
-                if (notification.Error != null)
-                {
-                    _editBinding.AlterValidationErrors(errors =>
-                    {
-                        errors.Clear();
-                        var unpackedErrors = ValidationUtil.UnpackException(notification.Error);
-                        if (unpackedErrors != null)
-                            errors.AddRange(unpackedErrors);
-                    });
-                }
-            }
-
-            private static bool IsDataValidationException(Exception exception)
-            {
-                if (exception is DataValidationException)
-                {
-                    return true;
-                }
-
-                if (exception is AggregateException aggregate)
-                {
-                    foreach (var inner in aggregate.InnerExceptions)
-                    {
-                        if (inner is DataValidationException)
-                        {
-                            return true;
-                        }
-                    }
-                }
-
-                return false;
-            }
-            private void OnControlValueUpdated(object value)
-            {
-                _controlValue = value;
-                _isControlValueSet = true;
-
-                if (!_editBinding.IsValid)
-                {
-                    SetSourceValue(value);
-                }
-            }
-            private void OnSourceValueUpdated(object value)
-            {
-                void OnValidValue(object val)
-                {
-                    SetControlValue(val);
-                    _editBinding.AlterValidationErrors(errors => errors.Clear());
-                }
-
-                if (value is BindingNotification notification)
-                {
-                    if (notification.ErrorType != BindingErrorType.None)
-                        OnValidationError(notification);
-                    else
-                        OnValidValue(value);
-                }
-                else
-                {
-                    OnValidValue(value);
-                }
-            }
-
-            protected override void Deinitialize()
-            {
-                _subscription?.Dispose();
-                _subscription = null;
-            }
-            protected override void Initialize()
-            {
-                _subscription = _sourceSubject.Subscribe(OnSourceValueUpdated);
-            }
-
-            void IObserver<object>.OnCompleted()
-            {
-                throw new NotImplementedException();
-            }
-            void IObserver<object>.OnError(Exception error)
-            {
-                throw new NotImplementedException();
-            }
-            void IObserver<object>.OnNext(object value)
-            {
-                OnControlValueUpdated(value);
-            }
-
-            public void Dispose()
-            {
-                _subscription?.Dispose();
-                _subscription = null;
-            }
-            public void CommitEdit(Func<object> getValue)
-            {
-                if (_isControlValueSet)
-                {
-                    SetSourceValue(_controlValue);
-                }
-                else if (getValue != null)
-                {
-                    SetSourceValue(getValue());
-                }
-            }
-        }
-    }
-
-    internal class ExplicitCellEditBinding : ICellEditBinding
+    internal abstract class CellEditBindingBase : ICellEditBinding
     {
         private readonly AvaloniaObject _target;
         private readonly AvaloniaProperty _property;
+        private readonly string _bindingPath;
+        private readonly bool _supportsDirectSourceWriteFallback;
         private readonly LightweightSubject<bool> _changedSubject = new();
-        private readonly List<Exception> _validationErrors = new List<Exception>();
+        private readonly List<Exception> _validationErrors = new();
         private DataGridValidationSeverity _validationSeverity = DataGridValidationSeverity.None;
+        private bool _disposed;
 
-        public ExplicitCellEditBinding(AvaloniaObject target, AvaloniaProperty property)
+        protected CellEditBindingBase(AvaloniaObject target, AvaloniaProperty property, BindingBase binding)
         {
-            _target = target;
-            _property = property;
+            _target = target ?? throw new ArgumentNullException(nameof(target));
+            _property = property ?? throw new ArgumentNullException(nameof(property));
+            _supportsDirectSourceWriteFallback = BindingCloneHelper.SupportsDirectDataContextMemberWrite(binding);
+            _bindingPath = _supportsDirectSourceWriteFallback && binding != null
+                ? BindingCloneHelper.GetPath(binding)
+                : null;
+            _target.PropertyChanged += OnTargetPropertyChanged;
+            RefreshValidationState();
         }
 
         public bool IsValid => _validationSeverity != DataGridValidationSeverity.Error;
@@ -265,6 +57,11 @@ internal
         {
             Exception commitError = null;
             var expression = BindingOperations.GetBindingExpressionBase(_target, _property);
+            var preCommitValidationErrors = CaptureValidationErrors(expression);
+            var shouldPreservePreCommitValidation = preCommitValidationErrors.Count > 0 &&
+                                                   expression is IValueEntry preCommitValueEntry &&
+                                                   TryGetSourceValue(preCommitValueEntry, out var preCommitSourceValue) &&
+                                                   Equals(_target.GetValue(_property), preCommitSourceValue);
             if (expression != null)
             {
                 try
@@ -283,9 +80,44 @@ internal
             }
             else
             {
+                var usedToggleSwitchFallback = false;
                 UpdateValidationErrorsFromTarget(expression);
 
-                if (!IsValid && expression is IValueEntry valueEntry && TryGetSourceValue(valueEntry, out var sourceValue))
+                if (_validationErrors.Count == 0 &&
+                    _supportsDirectSourceWriteFallback &&
+                    _target is ToggleButton &&
+                    expression is IValueEntry writeValueEntry &&
+                    TryGetSourceValue(writeValueEntry, out var currentSourceValue))
+                {
+                    var targetValue = _target.GetValue(_property);
+                    if (!Equals(targetValue, currentSourceValue) &&
+                        TryWriteTargetValueToSource(targetValue, out var writeError))
+                    {
+                        usedToggleSwitchFallback = true;
+                        if (writeError != null)
+                        {
+                            UpdateValidationErrorsFromException(writeError);
+                        }
+                        else
+                        {
+                            UpdateValidationErrorsFromTarget(expression);
+                        }
+                    }
+                }
+
+                if (_validationErrors.Count == 0 && shouldPreservePreCommitValidation)
+                {
+                    AlterValidationErrors(list =>
+                    {
+                        list.Clear();
+                        list.AddRange(preCommitValidationErrors);
+                    });
+                }
+
+                if (!IsValid &&
+                    !usedToggleSwitchFallback &&
+                    expression is IValueEntry valueEntry &&
+                    TryGetSourceValue(valueEntry, out var sourceValue))
                 {
                     var targetValue = _target.GetValue(_property);
                     if (Equals(targetValue, sourceValue))
@@ -299,6 +131,53 @@ internal
             return IsValid;
         }
 
+        public void Dispose()
+        {
+            if (_disposed)
+            {
+                return;
+            }
+
+            _disposed = true;
+            _target.PropertyChanged -= OnTargetPropertyChanged;
+        }
+
+        private void OnTargetPropertyChanged(object sender, AvaloniaPropertyChangedEventArgs e)
+        {
+            if (e.Property == _property ||
+                e.Property == DataValidationErrors.ErrorsProperty ||
+                e.Property == DataValidationErrors.HasErrorsProperty)
+            {
+                RefreshValidationState();
+            }
+        }
+
+        private void RefreshValidationState()
+        {
+            UpdateValidationErrorsFromTarget(BindingOperations.GetBindingExpressionBase(_target, _property));
+        }
+
+        private List<Exception> CaptureValidationErrors(BindingExpressionBase? expression)
+        {
+            var result = new List<Exception>();
+
+            if (expression is IValueEntry valueEntry)
+            {
+                valueEntry.GetDataValidationState(out _, out var error);
+                if (error != null)
+                {
+                    result.AddRange(ValidationUtil.UnpackException(error));
+                }
+            }
+
+            if (result.Count == 0 && _target is Control control)
+            {
+                AppendControlValidationErrors(control, result);
+            }
+
+            return result;
+        }
+
         private void UpdateValidationErrorsFromException(Exception error)
         {
             AlterValidationErrors(errors =>
@@ -310,24 +189,18 @@ internal
 
         private void UpdateValidationErrorsFromTarget(BindingExpressionBase expression)
         {
-            var valueEntry = expression as IValueEntry;
-            if (valueEntry != null)
+            if (expression is IValueEntry valueEntry)
             {
                 valueEntry.GetDataValidationState(out var state, out var error);
-                if ((state & BindingValueType.HasError) != 0 && error != null)
+                if (error != null)
                 {
                     AlterValidationErrors(list =>
                     {
                         list.Clear();
                         list.AddRange(ValidationUtil.UnpackException(error));
                     });
+                    return;
                 }
-                else
-                {
-                    AlterValidationErrors(list => list.Clear());
-                }
-
-                return;
             }
 
             if (_target is not Control control)
@@ -336,32 +209,37 @@ internal
                 return;
             }
 
-            var errors = DataValidationErrors.GetErrors(control);
             AlterValidationErrors(list =>
             {
                 list.Clear();
-                if (errors == null)
-                {
-                    return;
-                }
-
-                foreach (var error in errors)
-                {
-                    if (error == null)
-                    {
-                        continue;
-                    }
-
-                    if (error is Exception exception)
-                    {
-                        list.AddRange(ValidationUtil.UnpackException(exception));
-                    }
-                    else
-                    {
-                        list.Add(new DataValidationException(error));
-                    }
-                }
+                AppendControlValidationErrors(control, list);
             });
+        }
+
+        private static void AppendControlValidationErrors(Control control, List<Exception> list)
+        {
+            var errors = DataValidationErrors.GetErrors(control);
+            if (errors == null)
+            {
+                return;
+            }
+
+            foreach (var error in errors)
+            {
+                if (error == null)
+                {
+                    continue;
+                }
+
+                if (error is Exception exception)
+                {
+                    list.AddRange(ValidationUtil.UnpackException(exception));
+                }
+                else
+                {
+                    list.Add(new DataValidationException(error));
+                }
+            }
         }
 
         private void AlterValidationErrors(Action<List<Exception>> action)
@@ -398,6 +276,128 @@ internal
             {
                 return false;
             }
+        }
+
+        private bool TryWriteTargetValueToSource(object targetValue, out Exception? error)
+        {
+            error = null;
+
+            if (string.IsNullOrWhiteSpace(_bindingPath) ||
+                _target is not Control control ||
+                control.DataContext == null)
+            {
+                return false;
+            }
+
+            object current = control.DataContext;
+            var segments = _bindingPath.Split('.');
+
+            for (var i = 0; i < segments.Length - 1; i++)
+            {
+                if (!TryGetMemberValue(current, segments[i], out current) || current == null)
+                {
+                    return false;
+                }
+            }
+
+            return TrySetMemberValue(current, segments[^1], targetValue, out error);
+        }
+
+        private static bool TryGetMemberValue(object instance, string memberName, out object? value)
+        {
+            value = null;
+
+            var type = instance.GetType();
+            var property = type.GetProperty(memberName, BindingFlags.Instance | BindingFlags.Public);
+            if (property != null)
+            {
+                value = property.GetValue(instance);
+                return true;
+            }
+
+            var field = type.GetField(memberName, BindingFlags.Instance | BindingFlags.Public);
+            if (field != null)
+            {
+                value = field.GetValue(instance);
+                return true;
+            }
+
+            return false;
+        }
+
+        private static bool TrySetMemberValue(object instance, string memberName, object? value, out Exception? error)
+        {
+            error = null;
+
+            var type = instance.GetType();
+            var property = type.GetProperty(memberName, BindingFlags.Instance | BindingFlags.Public);
+            if (property != null)
+            {
+                try
+                {
+                    property.SetValue(instance, ConvertValue(value, property.PropertyType));
+                    return true;
+                }
+                catch (TargetInvocationException ex)
+                {
+                    error = ex.InnerException ?? ex;
+                    return true;
+                }
+                catch (Exception ex)
+                {
+                    error = ex;
+                    return true;
+                }
+            }
+
+            var field = type.GetField(memberName, BindingFlags.Instance | BindingFlags.Public);
+            if (field != null)
+            {
+                try
+                {
+                    field.SetValue(instance, ConvertValue(value, field.FieldType));
+                    return true;
+                }
+                catch (Exception ex)
+                {
+                    error = ex;
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        private static object? ConvertValue(object? value, Type targetType)
+        {
+            if (value == null)
+            {
+                return null;
+            }
+
+            if (targetType.IsInstanceOfType(value))
+            {
+                return value;
+            }
+
+            var underlyingType = Nullable.GetUnderlyingType(targetType) ?? targetType;
+            return Convert.ChangeType(value, underlyingType, CultureInfo.InvariantCulture);
+        }
+    }
+
+    internal sealed class CellEditBinding : CellEditBindingBase
+    {
+        public CellEditBinding(AvaloniaObject target, AvaloniaProperty property, BindingBase binding)
+            : base(target, property, binding)
+        {
+        }
+    }
+
+    internal sealed class ExplicitCellEditBinding : CellEditBindingBase
+    {
+        public ExplicitCellEditBinding(AvaloniaObject target, AvaloniaProperty property, BindingBase binding)
+            : base(target, property, binding)
+        {
         }
     }
 }

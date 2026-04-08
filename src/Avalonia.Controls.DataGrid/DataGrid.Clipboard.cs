@@ -276,7 +276,7 @@ internal
                 return;
             }
 
-            var text = await clipboard.GetTextAsync();
+            var text = await clipboard.TryGetTextAsync();
             if (string.IsNullOrEmpty(text))
             {
                 return;
@@ -342,17 +342,17 @@ internal
             return TypeHelper.TrySetNestedPropertyValue(item, bindingPath, converted, out _);
         }
 
-        private bool TryConvertClipboardText(IBinding binding, string text, Type propertyType, out object converted)
+        private bool TryConvertClipboardText(BindingBase binding, string text, Type propertyType, out object converted)
         {
             converted = null;
 
-            var bindingBase = binding as BindingBase;
-            if (bindingBase?.Converter != null)
+            var converter = BindingCloneHelper.GetConverter(binding);
+            if (converter != null)
             {
-                var culture = bindingBase.ConverterCulture ?? CultureInfo.CurrentCulture;
+                var culture = BindingCloneHelper.GetConverterCulture(binding) ?? CultureInfo.CurrentCulture;
                 try
                 {
-                    converted = bindingBase.Converter.ConvertBack(text, propertyType, bindingBase.ConverterParameter, culture);
+                    converted = converter.ConvertBack(text, propertyType, BindingCloneHelper.GetConverterParameter(binding), culture);
                 }
                 catch
                 {

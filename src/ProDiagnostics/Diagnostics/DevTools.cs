@@ -47,9 +47,9 @@ namespace Avalonia.Diagnostics
 
         internal static IDisposable Attach(Application application, DevToolsOptions options)
         {
-            var openedDisposable = new SerialDisposableValue();
+            IDisposable openedDisposable = Disposable.Empty;
             var result = new CompositeDisposable(2);
-            result.Add(openedDisposable);
+            result.Add(Disposable.Create(() => openedDisposable.Dispose()));
 
             // Skip if call on Design Mode
             if (!Design.IsDesignMode)
@@ -72,9 +72,12 @@ namespace Avalonia.Diagnostics
                             && keyEventArgs.Type == RawKeyEventType.KeyUp
                             && options.Gesture.Matches(keyEventArgs))
                         {
-                            openedDisposable.Disposable =
-                                Open(new ClassicDesktopStyleApplicationLifetimeTopLevelGroup(lifeTime), options,
-                                    owner, application);
+                            openedDisposable.Dispose();
+                            openedDisposable = Open(
+                                new ClassicDesktopStyleApplicationLifetimeTopLevelGroup(lifeTime),
+                                options,
+                                owner,
+                                application);
                             e.Handled = true;
                         }
                     }));

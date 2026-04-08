@@ -146,7 +146,7 @@ internal
         {
             if (editingElement is ToggleSwitch toggleSwitch)
             {
-                toggleSwitch.IsChecked = (bool?)uneditedValue;
+                toggleSwitch.SetCurrentValue(ToggleSwitch.IsCheckedProperty, (bool?)uneditedValue);
             }
         }
 
@@ -224,19 +224,19 @@ internal
                         switch (toggleSwitch.IsChecked)
                         {
                             case false:
-                                toggleSwitch.IsChecked = true;
+                                toggleSwitch.SetCurrentValue(ToggleSwitch.IsCheckedProperty, true);
                                 break;
                             case true:
-                                toggleSwitch.IsChecked = null;
+                                toggleSwitch.SetCurrentValue(ToggleSwitch.IsCheckedProperty, null);
                                 break;
                             case null:
-                                toggleSwitch.IsChecked = false;
+                                toggleSwitch.SetCurrentValue(ToggleSwitch.IsCheckedProperty, false);
                                 break;
                         }
                     }
                     else
                     {
-                        toggleSwitch.IsChecked = !toggleSwitch.IsChecked;
+                        toggleSwitch.SetCurrentValue(ToggleSwitch.IsCheckedProperty, !toggleSwitch.IsChecked);
                     }
                 }
 
@@ -345,7 +345,7 @@ internal
         {
             target.ClearValue(property);
 
-            if (value is IBinding binding)
+            if (value is BindingBase binding)
             {
                 ApplyBinding(target, property, binding);
                 return;
@@ -357,18 +357,14 @@ internal
             }
         }
 
-        private static void ApplyBinding(AvaloniaObject target, AvaloniaProperty property, IBinding binding)
+        private static void ApplyBinding(AvaloniaObject target, AvaloniaProperty property, BindingBase binding)
         {
             if (binding == null)
             {
                 return;
             }
 
-            var result = binding.Initiate(target, property, enableDataValidation: true);
-            if (result != null)
-            {
-                BindingOperations.Apply(target, property, result, null);
-            }
+            target.Bind(property, binding);
         }
 
         internal override void ClearElementCache()
@@ -435,19 +431,19 @@ internal
                         switch (_currentToggleSwitch.IsChecked)
                         {
                             case false:
-                                _currentToggleSwitch.IsChecked = true;
+                                _currentToggleSwitch.SetCurrentValue(ToggleSwitch.IsCheckedProperty, true);
                                 break;
                             case true:
-                                _currentToggleSwitch.IsChecked = null;
+                                _currentToggleSwitch.SetCurrentValue(ToggleSwitch.IsCheckedProperty, null);
                                 break;
                             case null:
-                                _currentToggleSwitch.IsChecked = false;
+                                _currentToggleSwitch.SetCurrentValue(ToggleSwitch.IsCheckedProperty, false);
                                 break;
                         }
                     }
                     else
                     {
-                        _currentToggleSwitch.IsChecked = !_currentToggleSwitch.IsChecked;
+                        _currentToggleSwitch.SetCurrentValue(ToggleSwitch.IsCheckedProperty, !_currentToggleSwitch.IsChecked);
                     }
                     e.Handled = true;
                 }

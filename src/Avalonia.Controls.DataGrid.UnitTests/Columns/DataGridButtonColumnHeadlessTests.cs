@@ -33,8 +33,8 @@ public class DataGridButtonColumnHeadlessTests
 
         var column = AvaloniaRuntimeXamlLoader.Parse<DataGridButtonColumn>(xaml, typeof(DataGridButtonColumn).Assembly);
 
-        Assert.IsAssignableFrom<IBinding>(column.Content);
-        Assert.IsAssignableFrom<IBinding>(column.CommandParameter);
+        Assert.IsAssignableFrom<BindingBase>(column.Content);
+        Assert.IsAssignableFrom<BindingBase>(column.CommandParameter);
     }
 
     [Fact]

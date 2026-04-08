@@ -418,7 +418,7 @@ public class DataGridScrollingTests
         var initialRecycled = GetRecycledRowCount(target);
 
         // Act - expand viewport significantly
-        root.Height = 900;
+        Avalonia12TestCompat.ResizeWindow(root, height: 900);
         root.UpdateLayout();
         var expandedVisible = GetRows(target).Count;
         var expandedChildren = presenter.Children.OfType<DataGridRow>().Count();
@@ -429,7 +429,7 @@ public class DataGridScrollingTests
             $"Expected more realized rows after expansion. Initial: {initialVisible}, Expanded: {expandedVisible}, RootHeight: {root.Bounds.Height}, GridHeight: {target.Bounds.Height}, Viewport: {presenter.Viewport.Height}, Available: {target.RowsPresenterAvailableSize?.Height}");
 
         // Act - shrink back to original height
-        root.Height = 300;
+        Avalonia12TestCompat.ResizeWindow(root, height: 300);
         root.UpdateLayout();
         var shrunkVisible = GetRows(target).Count;
         var shrunkChildren = presenter.Children.OfType<DataGridRow>().Count();
@@ -464,11 +464,11 @@ public class DataGridScrollingTests
         var initialRecycled = GetRecycledRowCount(target);
 
         // Act - expand then shrink
-        root.Height = 900;
+        Avalonia12TestCompat.ResizeWindow(root, height: 900);
         root.UpdateLayout();
         var expandedRecycled = GetRecycledRowCount(target);
 
-        root.Height = 300;
+        Avalonia12TestCompat.ResizeWindow(root, height: 300);
         root.UpdateLayout();
         var shrunkRecycled = GetRecycledRowCount(target);
 
@@ -598,13 +598,13 @@ public class DataGridScrollingTests
         root.UpdateLayout();
 
         // Gradually shrink the host height
-        root.Height = 250;
+        Avalonia12TestCompat.ResizeWindow(root, height: 250);
         root.UpdateLayout();
 
-        root.Height = 120;
+        Avalonia12TestCompat.ResizeWindow(root, height: 120);
         root.UpdateLayout();
 
-        root.Height = 1;
+        Avalonia12TestCompat.ResizeWindow(root, height: 1);
         root.UpdateLayout();
         target.UpdateLayout(); // ensure measure reruns after arrange change
 
@@ -772,7 +772,7 @@ public class DataGridScrollingTests
         root.UpdateLayout();
 
         // Shrink to force recycling
-        root.Height = 1;
+        Avalonia12TestCompat.ResizeWindow(root, height: 1);
         root.UpdateLayout();
         target.UpdateLayout();
 
@@ -798,7 +798,7 @@ public class DataGridScrollingTests
         root.UpdateLayout();
 
         // Shrink to force recycling
-        root.Height = 1;
+        Avalonia12TestCompat.ResizeWindow(root, height: 1);
         root.UpdateLayout();
         target.UpdateLayout();
 
@@ -822,10 +822,10 @@ public class DataGridScrollingTests
         var presenter = GetRowsPresenter(target);
 
         root.UpdateLayout();
-        root.Height = 700;
+        Avalonia12TestCompat.ResizeWindow(root, height: 700);
         root.UpdateLayout();
 
-        root.Height = 200;
+        Avalonia12TestCompat.ResizeWindow(root, height: 200);
         root.UpdateLayout();
         target.UpdateLayout();
 

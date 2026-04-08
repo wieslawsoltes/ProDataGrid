@@ -26,13 +26,12 @@
                  Text="Filter tabs" />
       <TextBox x:Name="TabFilterBox"
                Width="240"
-               Watermark="Type to filter sample pages"
+               PlaceholderText="Type to filter sample pages"
                TextChanged="OnTabFilterChanged" />
-      <ToggleButton x:Name="ThemeToggle"
-                    VerticalAlignment="Center"
-                    Background="Transparent"
-                    Checked="OnThemeToggleChanged"
-                    Unchecked="OnThemeToggleChanged">
+       <ToggleButton x:Name="ThemeToggle"
+                     VerticalAlignment="Center"
+                     Background="Transparent"
+                     IsCheckedChanged="OnThemeToggleChanged">
         <ToggleButton.Resources>
           <SolidColorBrush x:Key="ToggleButtonBackgroundChecked" Color="Transparent" />
           <SolidColorBrush x:Key="ToggleButtonBackgroundCheckedPointerOver" Color="Transparent" />

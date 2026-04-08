@@ -359,6 +359,30 @@ public class DataGridValidationTests
     }
 
     [AvaloniaFact]
+    public void INotifyDataErrorInfo_reflection_binding_surfaces_cell_validation()
+    {
+        var binding = new ReflectionBinding(nameof(NotifyValidationItem.Code))
+        {
+            Mode = BindingMode.TwoWay,
+            UpdateSourceTrigger = UpdateSourceTrigger.PropertyChanged
+        };
+
+        var (grid, root, item, column) = CreateNotifyValidationGrid(binding);
+
+        try
+        {
+            var cell = FindCell(grid, item, column.Index);
+
+            Assert.Equal(DataGridValidationSeverity.Warning, cell.ValidationSeverity);
+            Assert.True(DataValidationErrors.GetHasErrors(cell));
+        }
+        finally
+        {
+            root.Close();
+        }
+    }
+
+    [AvaloniaFact]
     public void INotifyDataErrorInfo_edit_clears_cell_errors_while_editing()
     {
         var (grid, root, item, column) = CreateNotifyValidationGrid();
@@ -582,7 +606,7 @@ public class DataGridValidationTests
                 testCase.SetValue(editingElement, false);
                 UpdateEditingElementSource(editingElement);
 
-                Assert.False(grid.CommitEdit());
+                Assert.False(grid.CommitEdit(), $"Column '{column.Header}' should reject an invalid edit.");
                 grid.UpdateLayout();
 
                 Assert.False(cell.IsValid);
@@ -654,7 +678,7 @@ public class DataGridValidationTests
         ["Active"] = new ColumnValidationCase((control, valid) =>
         {
             var toggle = (ToggleSwitch)control;
-            toggle.IsChecked = valid;
+            toggle.SetCurrentValue(ToggleSwitch.IsCheckedProperty, valid);
         }),
         ["Pinned"] = new ColumnValidationCase((control, valid) =>
         {
@@ -806,6 +830,11 @@ public class DataGridValidationTests
 
     private static (DataGrid grid, Window root, NotifyValidationItem item, DataGridTextColumn column) CreateNotifyValidationGrid()
     {
+        return CreateNotifyValidationGrid(TwoWayBinding(nameof(NotifyValidationItem.Code)));
+    }
+
+    private static (DataGrid grid, Window root, NotifyValidationItem item, DataGridTextColumn column) CreateNotifyValidationGrid(BindingBase binding)
+    {
         var item = new NotifyValidationItem
         {
             Code = "X"
@@ -830,7 +859,7 @@ public class DataGridValidationTests
         var codeColumn = new DataGridTextColumn
         {
             Header = "Code",
-            Binding = TwoWayBinding(nameof(NotifyValidationItem.Code))
+            Binding = binding
         };
 
         grid.ColumnsInternal.Add(codeColumn);
@@ -1210,17 +1239,8 @@ public class DataGridValidationTests
 
     private static void EnsureValidationPlugins()
     {
-        var validators = BindingPlugins.DataValidators;
-
-        if (!validators.Any(plugin => plugin is ExceptionValidationPlugin))
-        {
-            validators.Add(new ExceptionValidationPlugin());
-        }
-
-        if (!validators.Any(plugin => plugin is IndeiValidationPlugin))
-        {
-            validators.Add(new IndeiValidationPlugin());
-        }
+        Avalonia12TestCompat.EnsureDataValidator("ExceptionValidationPlugin");
+        Avalonia12TestCompat.EnsureDataValidator("IndeiValidationPlugin");
     }
 
     private static bool ErrorContainsMessage(object? error, string message)

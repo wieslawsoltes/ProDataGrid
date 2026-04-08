@@ -57,12 +57,12 @@
               <StackPanel Spacing="4">
                 <TextBlock Text="Category axis title" />
                 <TextBox Text="{Binding CategoryAxisTitle}"
-                         Watermark="Category axis title" />
+                         PlaceholderText="Category axis title" />
               </StackPanel>
               <StackPanel Spacing="4">
                 <TextBlock Text="Value axis title" />
                 <TextBox Text="{Binding ValueAxisTitle}"
-                         Watermark="Value axis title" />
+                         PlaceholderText="Value axis title" />
               </StackPanel>
               <StackPanel Spacing="4">
                 <TextBlock Text="Axis tick count" />
@@ -76,10 +76,10 @@
                 <TextBlock Text="Category axis min / max" />
                 <StackPanel Orientation="Horizontal" Spacing="6">
                   <TextBox Width="84"
-                           Watermark="Min"
+                           PlaceholderText="Min"
                            Text="{Binding CategoryAxisMinimumText}" />
                   <TextBox Width="84"
-                           Watermark="Max"
+                           PlaceholderText="Max"
                            Text="{Binding CategoryAxisMaximumText}" />
                 </StackPanel>
               </StackPanel>
@@ -87,10 +87,10 @@
                 <TextBlock Text="Value axis min / max" />
                 <StackPanel Orientation="Horizontal" Spacing="6">
                   <TextBox Width="84"
-                           Watermark="Min"
+                           PlaceholderText="Min"
                            Text="{Binding ValueAxisMinimumText}" />
                   <TextBox Width="84"
-                           Watermark="Max"
+                           PlaceholderText="Max"
                            Text="{Binding ValueAxisMaximumText}" />
                 </StackPanel>
               </StackPanel>

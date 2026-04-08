@@ -216,7 +216,7 @@ namespace Avalonia.Diagnostics.ViewModels
                 .Where(c => !c.StartsWith(":"))
                 .Select(c => '.' + c));
             var pseudo = string.Concat(visual.Classes.Where(c => c[0] == ':').Select(c => c));
-            var type = StyledElement.GetStyleKey(visual);
+            var type = (visual as StyledElement)?.StyleKey ?? visual.GetType();
             return $$"""{{{type.Assembly.FullName}}}{{type.Namespace}}|{{type.Name}}{{name}}{{classes}}{{pseudo}}""";
         }
 

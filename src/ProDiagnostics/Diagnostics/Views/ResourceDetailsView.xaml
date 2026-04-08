@@ -27,7 +27,7 @@
     <FilterTextBox Grid.Row="1"
                    Margin="0,8,0,4"
                    Text="{Binding PropertiesFilter.FilterString}"
-                   Watermark="Filter properties"
+                   PlaceholderText="Filter properties"
                    UseCaseSensitiveFilter="{Binding PropertiesFilter.UseCaseSensitiveFilter}"
                    UseWholeWordFilter="{Binding PropertiesFilter.UseWholeWordFilter}"
                    UseRegexFilter="{Binding PropertiesFilter.UseRegexFilter}"

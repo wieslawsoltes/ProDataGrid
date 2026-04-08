@@ -34,6 +34,7 @@ internal
     sealed partial class DataGridRowsPresenter : Panel, IChildIndexProvider
     {
         private EventHandler<ChildIndexChangedEventArgs>? _childIndexChanged;
+        private TopLevel? _observedTopLevel;
         private int _virtualizationGuardDepth;
         private DataGrid? _owningGrid;
         private double _lastArrangeHeight;
@@ -43,7 +44,7 @@ internal
 
         public DataGridRowsPresenter()
         {
-            AddHandler(Gestures.ScrollGestureEvent, OnScrollGesture);
+            ScrollGesture += OnScrollGesture;
         }
 
         public static readonly DirectProperty<DataGridRowsPresenter, DataGrid?> OwningGridProperty =
@@ -76,6 +77,18 @@ internal
                     InvalidateMeasure();
                 }
             });
+        }
+
+        protected override void OnAttachedToVisualTree(VisualTreeAttachmentEventArgs e)
+        {
+            base.OnAttachedToVisualTree(e);
+            HookTopLevel(e.Root as TopLevel ?? TopLevel.GetTopLevel(this));
+        }
+
+        protected override void OnDetachedFromVisualTree(VisualTreeAttachmentEventArgs e)
+        {
+            UnhookTopLevel();
+            base.OnDetachedFromVisualTree(e);
         }
 
         #region IChildIndexProvider Implementation
@@ -164,18 +177,7 @@ internal
             }
 
             var effectiveRowsHeight = finalSize.Height;
-            var headerHeight = 0.0;
-            if (OwningGrid.AreColumnHeadersVisible)
-            {
-                if (OwningGrid.ColumnHeaders != null && OwningGrid.ColumnHeaders.Bounds.Height > 0)
-                {
-                    headerHeight = OwningGrid.ColumnHeaders.Bounds.Height;
-                }
-                else if (!double.IsNaN(OwningGrid.ColumnHeaderHeight))
-                {
-                    headerHeight = OwningGrid.ColumnHeaderHeight;
-                }
-            }
+            var headerHeight = GetColumnHeadersHeight();
 
             if (hasTopLevelMismatch && rootLevel != null)
             {
@@ -326,6 +328,7 @@ internal
                 var allowInfiniteHeight = grid != null &&
                                           double.IsNaN(grid.Height) &&
                                           double.IsInfinity(grid.MaxHeight);
+                ScrollViewer? externalScrollViewer = null;
 
                 if (allowInfiniteHeight && grid != null)
                 {
@@ -342,6 +345,7 @@ internal
                             if (!hasItemsPresenter)
                             {
                                 allowInfiniteHeight = false;
+                                externalScrollViewer = (ScrollViewer)ancestor;
                             }
 
                             break;
@@ -352,6 +356,20 @@ internal
                 if (!allowInfiniteHeight)
                 {
                     double? constrainedHeight = null;
+
+                    if (externalScrollViewer != null)
+                    {
+                        if (!double.IsNaN(externalScrollViewer.Height) &&
+                            !double.IsInfinity(externalScrollViewer.Height) &&
+                            externalScrollViewer.Height > 0)
+                        {
+                            constrainedHeight = externalScrollViewer.Height;
+                        }
+                        else if (externalScrollViewer.Bounds.Height > 0)
+                        {
+                            constrainedHeight = externalScrollViewer.Bounds.Height;
+                        }
+                    }
 
                     if (!_lastArrangeMatchesDesired &&
                         !double.IsNaN(_lastArrangeHeight) &&
@@ -428,11 +446,13 @@ internal
                 !double.IsNaN(availableSize.Height))
             {
                 var threshold = Math.Max(OwningGrid.RowHeightEstimate, 1);
-                if (Math.Abs(availableSize.Height - rootLevel.Bounds.Height) <= threshold &&
+                var headerHeight = GetColumnHeadersHeight();
+                var rootBoundsRowsHeight = Math.Max(0, rootLevel.Bounds.Height - headerHeight);
+                if (Math.Abs(availableSize.Height - rootBoundsRowsHeight) <= threshold &&
                     Math.Abs(rootLevel.Height - rootLevel.Bounds.Height) > threshold &&
                     Math.Abs(OwningGrid.Bounds.Height - rootLevel.Bounds.Height) <= threshold)
                 {
-                    availableSize = availableSize.WithHeight(rootLevel.Height);
+                    availableSize = availableSize.WithHeight(Math.Max(0, rootLevel.Height - headerHeight));
                 }
             }
 
@@ -537,6 +557,106 @@ internal
             }
 
             e.Handled = e.Handled || OwningGrid.UpdateScroll(-e.Delta);
+        }
+
+        private void HookTopLevel(TopLevel? topLevel)
+        {
+            if (ReferenceEquals(_observedTopLevel, topLevel))
+            {
+                return;
+            }
+
+            UnhookTopLevel();
+            _observedTopLevel = topLevel;
+
+            if (_observedTopLevel != null)
+            {
+                _observedTopLevel.PropertyChanged += OnTopLevelPropertyChanged;
+            }
+        }
+
+        private void UnhookTopLevel()
+        {
+            if (_observedTopLevel != null)
+            {
+                _observedTopLevel.PropertyChanged -= OnTopLevelPropertyChanged;
+                _observedTopLevel = null;
+            }
+        }
+
+        private void OnTopLevelPropertyChanged(object? sender, AvaloniaPropertyChangedEventArgs e)
+        {
+            if (e.Property != Layoutable.HeightProperty &&
+                e.Property != Layoutable.WidthProperty &&
+                e.Property != Visual.BoundsProperty)
+            {
+                return;
+            }
+
+            if (sender is TopLevel topLevel && OwningGrid?.UseLogicalScrollable == true)
+            {
+                RefreshViewportFromTopLevel(topLevel);
+            }
+
+            InvalidateMeasure();
+            InvalidateArrange();
+        }
+
+        private double GetColumnHeadersHeight()
+        {
+            if (OwningGrid?.AreColumnHeadersVisible != true)
+            {
+                return 0;
+            }
+
+            if (OwningGrid.ColumnHeaders != null)
+            {
+                if (OwningGrid.ColumnHeaders.Bounds.Height > 0)
+                {
+                    return OwningGrid.ColumnHeaders.Bounds.Height;
+                }
+
+                if (OwningGrid.ColumnHeaders.DesiredSize.Height > 0)
+                {
+                    return OwningGrid.ColumnHeaders.DesiredSize.Height;
+                }
+            }
+
+            if (!double.IsNaN(OwningGrid.ColumnHeaderHeight))
+            {
+                return OwningGrid.ColumnHeaderHeight;
+            }
+
+            return 0;
+        }
+
+        private void RefreshViewportFromTopLevel(TopLevel topLevel)
+        {
+            if (OwningGrid == null)
+            {
+                return;
+            }
+
+            var headerHeight = GetColumnHeadersHeight();
+            var viewportHeight = topLevel.Height;
+            if (double.IsNaN(viewportHeight) || double.IsInfinity(viewportHeight) || viewportHeight <= 0)
+            {
+                viewportHeight = topLevel.Bounds.Height;
+            }
+
+            viewportHeight = Math.Max(0, viewportHeight - headerHeight);
+
+            if (OwningGrid.RowsPresenterAvailableSize is { } availableSize)
+            {
+                OwningGrid.RowsPresenterAvailableSize = availableSize.WithHeight(viewportHeight);
+            }
+
+            var viewportWidth = _viewport.Width > 0 ? _viewport.Width : Bounds.Width;
+            if (!double.IsNaN(viewportWidth) && !double.IsInfinity(viewportWidth) &&
+                !double.IsNaN(viewportHeight) && !double.IsInfinity(viewportHeight))
+            {
+                UpdateScrollInfo(_extent, new Size(Math.Max(0, viewportWidth), viewportHeight));
+            }
         }
 
         private sealed class ActionDisposable : IDisposable

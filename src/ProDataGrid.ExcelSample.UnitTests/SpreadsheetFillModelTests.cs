@@ -5,6 +5,7 @@ using Avalonia.Controls.DataGridFilling;
 using Avalonia.Data;
 using Avalonia.Headless.XUnit;
 using Avalonia.Markup.Xaml.Styling;
+using Avalonia.Threading;
 using Avalonia.Themes.Fluent;
 using ProDataGrid.ExcelSample.Models;
 using Xunit;
@@ -39,7 +40,10 @@ public sealed class SpreadsheetFillModelTests
         }
         finally
         {
+            grid.FillModel = null;
+            window.Content = null;
             window.Close();
+            Dispatcher.UIThread.RunJobs();
         }
     }
 

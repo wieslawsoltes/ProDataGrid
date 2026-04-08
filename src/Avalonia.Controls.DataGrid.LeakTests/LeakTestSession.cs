@@ -17,6 +17,7 @@ internal static class LeakTestSession
         {
             session = HeadlessUnitTestSession.StartNew(appType);
             session.Dispatch(action, CancellationToken.None).GetAwaiter().GetResult();
+            DrainSession(session);
         }
         finally
         {
@@ -36,7 +37,9 @@ internal static class LeakTestSession
         try
         {
             session = HeadlessUnitTestSession.StartNew(appType);
-            return session.Dispatch(action, CancellationToken.None).GetAwaiter().GetResult();
+            var result = session.Dispatch(action, CancellationToken.None).GetAwaiter().GetResult();
+            DrainSession(session);
+            return result;
         }
         finally
         {
@@ -57,6 +60,7 @@ internal static class LeakTestSession
         {
             session = HeadlessUnitTestSession.StartNew(appType);
             await session.Dispatch(action, CancellationToken.None);
+            DrainSession(session);
         }
         finally
         {
@@ -76,7 +80,9 @@ internal static class LeakTestSession
         try
         {
             session = HeadlessUnitTestSession.StartNew(appType);
-            return await session.Dispatch(action, CancellationToken.None);
+            var result = await session.Dispatch(action, CancellationToken.None);
+            DrainSession(session);
+            return result;
         }
         finally
         {
@@ -85,5 +91,14 @@ internal static class LeakTestSession
             LeakTestHelpers.ResetLoadedQueueForUnitTests();
             LeakTestHelpers.StopDispatcherTimers();
         }
+    }
+
+    private static void DrainSession(HeadlessUnitTestSession session)
+    {
+        session.Dispatch(static () =>
+        {
+            LeakTestHelpers.StopDispatcherTimers();
+            LeakTestHelpers.DrainDispatcher();
+        }, CancellationToken.None).GetAwaiter().GetResult();
     }
 }

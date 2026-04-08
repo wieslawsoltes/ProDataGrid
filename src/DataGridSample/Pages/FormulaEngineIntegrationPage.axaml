@@ -15,7 +15,7 @@
                  Classes.error="{Binding HasErrors}"
                  ToolTip.Tip="{Binding ErrorMessage}"
                  ToolTip.IsEnabled="{Binding HasErrors}"
-                 Watermark="Enter formula" />
+                 PlaceholderText="Enter formula" />
       </Grid>
     </DataTemplate>
   </UserControl.Resources>

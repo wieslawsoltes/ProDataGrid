@@ -538,60 +538,33 @@ public class LeakTests
     [ReleaseFact]
     public void DataGrid_BoundColumns_DoesNotLeak()
     {
-        var columns = new ObservableCollection<DataGridColumn>
-        {
-            new DataGridTextColumn
-            {
-                Header = "Name",
-                Binding = new Binding(nameof(RowItem.Name))
-            }
-        };
-
         var items = new ObservableCollection<RowItem>
         {
             new RowItem("A"),
             new RowItem("B")
         };
-        var gridRef = RunInSession(() => RunBoundColumns(columns, items));
+        var result = RunInSession(() => RunBoundColumns(items));
 
-        AssertCollected(gridRef);
+        AssertCollected(result.GridRef);
 
-        GC.KeepAlive(columns);
+        GC.KeepAlive(result.Columns);
         GC.KeepAlive(items);
     }
 
     [ReleaseFact]
     public void DataGrid_ColumnsSwap_WithSpecializedColumns_DoesNotLeak()
     {
-        var columnsA = new ObservableCollection<DataGridColumn>
-        {
-            new DataGridCheckBoxColumn
-            {
-                Header = "Check",
-                Binding = new Binding(nameof(BoolRowItem.IsChecked))
-            }
-        };
-
-        var columnsB = new ObservableCollection<DataGridColumn>
-        {
-            new DataGridToggleSwitchColumn
-            {
-                Header = "Toggle",
-                Binding = new Binding(nameof(BoolRowItem.IsChecked))
-            }
-        };
-
         var items = new ObservableCollection<BoolRowItem>
         {
             new BoolRowItem(true),
             new BoolRowItem(false)
         };
-        var gridRef = RunInSession(() => RunColumnsSwapWithSpecializedColumns(columnsA, columnsB, items));
+        var result = RunInSession(() => RunColumnsSwapWithSpecializedColumns(items));
 
-        AssertCollected(gridRef);
+        AssertCollected(result.GridRef);
 
-        GC.KeepAlive(columnsA);
-        GC.KeepAlive(columnsB);
+        GC.KeepAlive(result.ColumnsA);
+        GC.KeepAlive(result.ColumnsB);
         GC.KeepAlive(items);
     }
 
@@ -1301,26 +1274,26 @@ public class LeakTests
     [ReleaseFact]
     public void DataGrid_SummaryRows_WithExternalColumns_DoesNotLeak()
     {
-        var columns = new ObservableCollection<DataGridColumn>();
-        var nameColumn = new DataGridTextColumn
-        {
-            Header = "Name",
-            Binding = new Binding(nameof(RowItem.Name))
-        };
-        nameColumn.Summaries.Add(new DataGridAggregateSummaryDescription
-        {
-            Aggregate = DataGridAggregateType.Count,
-            Scope = DataGridSummaryScope.Both
-        });
-        columns.Add(nameColumn);
-
         var items = new ObservableCollection<RowItem>
         {
             new RowItem("A"),
             new RowItem("B")
         };
-        WeakReference Run()
+        (WeakReference GridRef, ObservableCollection<DataGridColumn> Columns) Run()
         {
+            var columns = new ObservableCollection<DataGridColumn>();
+            var nameColumn = new DataGridTextColumn
+            {
+                Header = "Name",
+                Binding = new Binding(nameof(RowItem.Name))
+            };
+            nameColumn.Summaries.Add(new DataGridAggregateSummaryDescription
+            {
+                Aggregate = DataGridAggregateType.Count,
+                Scope = DataGridSummaryScope.Both
+            });
+            columns.Add(nameColumn);
+
             var grid = new DataGrid
             {
                 AutoGenerateColumns = false,
@@ -1354,40 +1327,40 @@ public class LeakTests
 
             CleanupWindow(window);
 
-            return gridRef;
+            return (gridRef, columns);
         }
 
-        var gridRef = RunInSession(Run);
+        var result = RunInSession(Run);
 
-        AssertCollected(gridRef);
+        AssertCollected(result.GridRef);
 
-        GC.KeepAlive(columns);
+        GC.KeepAlive(result.Columns);
         GC.KeepAlive(items);
     }
 
     [ReleaseFact]
     public void DataGrid_SummaryRows_ToggleVisibility_DoesNotLeak()
     {
-        var columns = new ObservableCollection<DataGridColumn>();
-        var nameColumn = new DataGridTextColumn
-        {
-            Header = "Name",
-            Binding = new Binding(nameof(RowItem.Name))
-        };
-        nameColumn.Summaries.Add(new DataGridAggregateSummaryDescription
-        {
-            Aggregate = DataGridAggregateType.Count,
-            Scope = DataGridSummaryScope.Both
-        });
-        columns.Add(nameColumn);
-
         var items = new ObservableCollection<RowItem>
         {
             new RowItem("A"),
             new RowItem("B")
         };
-        WeakReference Run()
+        (WeakReference GridRef, ObservableCollection<DataGridColumn> Columns) Run()
         {
+            var columns = new ObservableCollection<DataGridColumn>();
+            var nameColumn = new DataGridTextColumn
+            {
+                Header = "Name",
+                Binding = new Binding(nameof(RowItem.Name))
+            };
+            nameColumn.Summaries.Add(new DataGridAggregateSummaryDescription
+            {
+                Aggregate = DataGridAggregateType.Count,
+                Scope = DataGridSummaryScope.Both
+            });
+            columns.Add(nameColumn);
+
             var grid = new DataGrid
             {
                 AutoGenerateColumns = false,
@@ -1429,14 +1402,14 @@ public class LeakTests
 
             CleanupWindow(window);
 
-            return gridRef;
+            return (gridRef, columns);
         }
 
-        var gridRef = RunInSession(Run);
+        var result = RunInSession(Run);
 
-        AssertCollected(gridRef);
+        AssertCollected(result.GridRef);
 
-        GC.KeepAlive(columns);
+        GC.KeepAlive(result.Columns);
         GC.KeepAlive(items);
     }
 
@@ -1746,10 +1719,18 @@ public class LeakTests
     }
 
     [MethodImpl(MethodImplOptions.NoInlining)]
-    private static WeakReference RunBoundColumns(
-        ObservableCollection<DataGridColumn> columns,
+    private static (WeakReference GridRef, ObservableCollection<DataGridColumn> Columns) RunBoundColumns(
         ObservableCollection<RowItem> items)
     {
+        var columns = new ObservableCollection<DataGridColumn>
+        {
+            new DataGridTextColumn
+            {
+                Header = "Name",
+                Binding = new Binding(nameof(RowItem.Name))
+            }
+        };
+
         var grid = new DataGrid
         {
             AutoGenerateColumns = false,
@@ -1772,7 +1753,7 @@ public class LeakTests
         CleanupWindow(window);
         Assert.Null(columns[0].OwningGrid);
 
-        return gridRef;
+        return (gridRef, columns);
     }
 
     [MethodImpl(MethodImplOptions.NoInlining)]
@@ -1842,11 +1823,30 @@ public class LeakTests
     }
 
     [MethodImpl(MethodImplOptions.NoInlining)]
-    private static WeakReference RunColumnsSwapWithSpecializedColumns(
-        ObservableCollection<DataGridColumn> columnsA,
-        ObservableCollection<DataGridColumn> columnsB,
+    private static (
+        WeakReference GridRef,
+        ObservableCollection<DataGridColumn> ColumnsA,
+        ObservableCollection<DataGridColumn> ColumnsB) RunColumnsSwapWithSpecializedColumns(
         ObservableCollection<BoolRowItem> items)
     {
+        var columnsA = new ObservableCollection<DataGridColumn>
+        {
+            new DataGridCheckBoxColumn
+            {
+                Header = "Check",
+                Binding = new Binding(nameof(BoolRowItem.IsChecked))
+            }
+        };
+
+        var columnsB = new ObservableCollection<DataGridColumn>
+        {
+            new DataGridToggleSwitchColumn
+            {
+                Header = "Toggle",
+                Binding = new Binding(nameof(BoolRowItem.IsChecked))
+            }
+        };
+
         var grid = new DataGrid
         {
             AutoGenerateColumns = false,
@@ -1879,7 +1879,7 @@ public class LeakTests
         Assert.Null(columnsA[0].OwningGrid);
         Assert.Null(columnsB[0].OwningGrid);
 
-        return gridRef;
+        return (gridRef, columnsA, columnsB);
     }
 
     [MethodImpl(MethodImplOptions.NoInlining)]

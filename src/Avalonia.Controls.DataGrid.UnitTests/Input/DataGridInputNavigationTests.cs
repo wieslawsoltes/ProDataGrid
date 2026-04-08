@@ -207,11 +207,20 @@ public class DataGridInputNavigationTests
         var (grid, _) = CreateGrid(columnCount: 2);
         SetCurrentCell(grid, rowIndex: 0, columnIndex: 0);
         Assert.True(grid.BeginEdit());
-        CollapseSlot(grid, grid.CurrentSlot);
+        try
+        {
+            CollapseSlot(grid, grid.CurrentSlot);
 
-        var handled = InvokeKeyHandler(grid, "ProcessTabKey", Key.Tab, KeyModifiers.None);
+            var handled = InvokeKeyHandler(grid, "ProcessTabKey", Key.Tab, KeyModifiers.None);
 
-        Assert.True(handled);
+            Assert.True(handled);
+        }
+        finally
+        {
+            ClearCollapsedSlots(grid);
+            Dispatcher.UIThread.RunJobs();
+            grid.UpdateLayout();
+        }
     }
 
     [AvaloniaFact]
@@ -1210,6 +1219,14 @@ public class DataGridInputNavigationTests
         var table = field?.GetValue(grid);
         var addMethod = table?.GetType().GetMethod("AddValue");
         addMethod?.Invoke(table, new object[] { slot, true });
+    }
+
+    private static void ClearCollapsedSlots(DataGrid grid)
+    {
+        var field = typeof(DataGrid).GetField("_collapsedSlotsTable", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic);
+        var table = field?.GetValue(grid);
+        var clearMethod = table?.GetType().GetMethod("Clear");
+        clearMethod?.Invoke(table, null);
     }
 
     private static object AddRowGroupHeaderSlot(DataGrid grid, int slot, bool isVisible)

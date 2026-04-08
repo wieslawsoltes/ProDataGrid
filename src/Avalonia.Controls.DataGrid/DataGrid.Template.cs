@@ -178,6 +178,7 @@ internal
                 InitializeSummaryService();
                 OnDataSourceChangedForSummaries();
             }
+            _formulaModel?.Attach(this);
             EnsureTotalSummaryRow();
             OnDataSourceChangedForValidation();
             if (DataConnection.DataSource != null && !DataConnection.EventsWired)
@@ -234,6 +235,7 @@ internal
                 _suppressCellContentUpdates = false;
             }
 
+            _formulaModel?.Detach();
             DetachExternalSubscriptions();
 
             if (_rowDragDropController != null)
@@ -285,9 +287,9 @@ internal
 
             DisposeSummaryService();
             DataGridColumnHeader.ResetStaticState();
-            UpdateKeyboardGestureSubscriptions();
 
             base.OnDetachedFromVisualTree(e);
+            DisposeKeyboardGestureSubscriptions();
         }
 
         private void RequestRecycledChildrenCleanup()

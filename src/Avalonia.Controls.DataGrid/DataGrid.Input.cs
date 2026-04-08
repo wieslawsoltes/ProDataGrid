@@ -154,8 +154,7 @@ internal
 
         private KeyModifiers GetCommandModifiers()
         {
-            var topLevel = TopLevel.GetTopLevel(this);
-            return topLevel?.PlatformSettings?.HotkeyConfiguration.CommandModifiers ?? KeyModifiers.Control;
+            return this.GetPlatformSettings()?.HotkeyConfiguration.CommandModifiers ?? KeyModifiers.Control;
         }
 
         private static KeyGesture ResolveGesture(KeyGesture overrideGesture, KeyGesture defaultGesture)
@@ -898,11 +897,7 @@ internal
 
         private void UpdateKeyboardGestureSubscriptions()
         {
-            _keyDownRouteFinishedSubscription?.Dispose();
-            _keyDownRouteFinishedSubscription = null;
-            _keyUpRouteFinishedSubscription?.Dispose();
-            _keyUpRouteFinishedSubscription = null;
-            KeyDown -= DataGrid_KeyDownDirectional;
+            DisposeKeyboardGestureSubscriptions();
 
             if (!IsAttachedToVisualTree)
             {
@@ -913,6 +908,15 @@ internal
             KeyDown += DataGrid_KeyDownDirectional;
             _keyDownRouteFinishedSubscription = InputElement.KeyDownEvent.RouteFinished.Subscribe(OnKeyDownRouteFinished);
             _keyUpRouteFinishedSubscription = InputElement.KeyUpEvent.RouteFinished.Subscribe(OnKeyUpRouteFinished);
+        }
+
+        private void DisposeKeyboardGestureSubscriptions()
+        {
+            _keyDownRouteFinishedSubscription?.Dispose();
+            _keyDownRouteFinishedSubscription = null;
+            _keyUpRouteFinishedSubscription?.Dispose();
+            _keyUpRouteFinishedSubscription = null;
+            KeyDown -= DataGrid_KeyDownDirectional;
         }
 
         private void OnKeyDownRouteFinished(RoutedEventArgs e)

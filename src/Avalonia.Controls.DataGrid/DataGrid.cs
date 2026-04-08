@@ -370,6 +370,7 @@ internal
         // prevents reentry into the VerticalScroll event handler
         private int? _mouseOverRowIndex;    // -1 is used for the 'new row'
         private Point? _lastPointerPosition;
+        private Visual? _lastPointerActivityVisual;
         private bool _pendingPointerOverRefresh;
         private double[] _rowGroupHeightsByLevel;
         private double _rowHeaderDesiredWidth;
@@ -1132,6 +1133,7 @@ internal
                 return;
             }
 
+            _lastPointerActivityVisual = e.Source as Visual;
             _lastPointerPosition = e.GetPosition(this);
         }
 
@@ -1143,6 +1145,7 @@ internal
                 {
                     if (ReferenceEquals(current, this))
                     {
+                        _lastPointerActivityVisual = visual;
                         _lastPointerPosition = e.GetPosition(this);
                         RequestPointerOverRefresh();
                         return;
@@ -1150,6 +1153,7 @@ internal
                 }
             }
 
+            _lastPointerActivityVisual = null;
             _lastPointerPosition = null;
             RequestPointerOverRefresh();
         }
@@ -1297,8 +1301,15 @@ internal
         {
             int? newRowIndex = null;
             var isPointerOverGrid = IsPointerOverSelfOrDescendant();
-            var isPointerOverGroupSlot = IsPointerOverGroupHeaderOrFooter();
-            if (isPointerOverGrid && DisplayData.FirstScrollingSlot < 0 && _mouseOverRowIndex.HasValue && SlotCount > 0)
+            var isPointerOverGroupSlot =
+                IsPointerOverGroupHeaderOrFooter() ||
+                IsVisualInGroupHeaderOrFooter(_lastPointerActivityVisual) ||
+                (_lastPointerPosition != null && IsPointOverGroupHeaderOrFooter(_lastPointerPosition.Value));
+            if (isPointerOverGrid && isPointerOverGroupSlot)
+            {
+                newRowIndex = null;
+            }
+            else if (isPointerOverGrid && DisplayData.FirstScrollingSlot < 0 && _mouseOverRowIndex.HasValue && SlotCount > 0)
             {
                 newRowIndex = _mouseOverRowIndex;
             }
@@ -1336,7 +1347,12 @@ internal
                 return false;
             }
 
-            if (visual.VisualRoot == null)
+            return IsVisualInGroupHeaderOrFooter(visual);
+        }
+
+        private bool IsVisualInGroupHeaderOrFooter(Visual? visual)
+        {
+            if (visual?.VisualRoot == null)
             {
                 return false;
             }

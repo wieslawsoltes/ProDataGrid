@@ -32,6 +32,7 @@ namespace Avalonia.Controls.DataGridDragDrop
         private Point _pointerStart;
         private DataGridRow? _dragStartRow;
         private DataGridRowDragInfo? _dragInfo;
+        private PointerPressedEventArgs? _pointerPressedEventArgs;
         private readonly List<DataGridRow> _draggingRows = new();
         private DataGridRow? _indicatorRow;
         private DataGridRowDropPosition? _indicatorPosition;
@@ -374,6 +375,7 @@ namespace Avalonia.Controls.DataGridDragDrop
             _pointerId = e.Pointer.Id;
             _pointerStart = gridPoint;
             _dragStartRow = row;
+            _pointerPressedEventArgs = e;
             _capturePending = true;
         }
 
@@ -438,6 +440,7 @@ namespace Avalonia.Controls.DataGridDragDrop
             _pointerStart = default;
             _dragStartRow = null;
             _dragInfo = null;
+            _pointerPressedEventArgs = null;
             _capturePending = false;
             _capturedPointer?.Capture(null);
             _capturedPointer = null;
@@ -445,6 +448,12 @@ namespace Avalonia.Controls.DataGridDragDrop
 
         private void StartDragAsync(PointerEventArgs triggerEvent)
         {
+            if (_pointerPressedEventArgs == null)
+            {
+                ResetPointerState();
+                return;
+            }
+
             var info = TryCreateDragInfo();
             if (info == null)
             {
@@ -486,12 +495,12 @@ namespace Avalonia.Controls.DataGridDragDrop
             _grid.OnRowDragStarted(new DataGridRowDragStartedEventArgs(session));
 
 #pragma warning disable CS4014
-            DoDragAsync(triggerEvent, data, startingArgs.AllowedEffects, info, session);
+            DoDragAsync(_pointerPressedEventArgs, data, startingArgs.AllowedEffects, info, session);
 #pragma warning restore CS4014
         }
 
         private async System.Threading.Tasks.Task DoDragAsync(
-            PointerEventArgs triggerEvent,
+            PointerPressedEventArgs triggerEvent,
             IDataTransfer data,
             DragDropEffects allowedEffects,
             DataGridRowDragInfo info,
@@ -913,7 +922,7 @@ namespace Avalonia.Controls.DataGridDragDrop
 
         private static DataGridRowDragInfo? GetDragInfo(DragEventArgs e)
         {
-            var transfer = e.DataTransfer ?? e.Data as IDataTransfer;
+            var transfer = e.DataTransfer;
             if (transfer != null)
             {
                 foreach (var item in transfer.Items)
@@ -925,14 +934,6 @@ namespace Avalonia.Controls.DataGridDragDrop
                     }
                 }
             }
-
-#pragma warning disable CS0618
-            if (e.Data is IDataObject dataObject &&
-                dataObject.Contains(DataGridRowDragInfo.DataFormat))
-            {
-                return dataObject.Get(DataGridRowDragInfo.DataFormat) as DataGridRowDragInfo;
-            }
-#pragma warning restore CS0618
 
             return null;
         }

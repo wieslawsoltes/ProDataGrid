@@ -108,6 +108,7 @@ namespace Avalonia.Controls.DataGridFormulas
         private bool _columnsDirty = true;
         private bool _formulasDirty = true;
         private bool _invalidatePending;
+        private DispatcherOperation? _invalidateOperation;
         private bool _requiresRefresh;
         private bool _suppressDefinitionUpdates;
         private DataGrid? _grid;
@@ -245,6 +246,10 @@ namespace Avalonia.Controls.DataGridFormulas
             _spillValues.Clear();
             _dirtyCells.Clear();
             _dirtyItems.Clear();
+            _invalidateOperation?.Abort();
+            _invalidateOperation = null;
+            _invalidatePending = false;
+            _requiresRefresh = false;
             _columnsDirty = true;
             _formulasDirty = true;
         }
@@ -767,13 +772,14 @@ namespace Avalonia.Controls.DataGridFormulas
 
             _invalidatePending = true;
             var weakSelf = new WeakReference<DataGridFormulaModel>(this);
-            Dispatcher.UIThread.Post(() =>
+            _invalidateOperation = Dispatcher.UIThread.InvokeAsync(() =>
             {
                 if (!weakSelf.TryGetTarget(out var model))
                 {
                     return;
                 }
 
+                model._invalidateOperation = null;
                 model._invalidatePending = false;
                 model.ProcessInvalidation();
             }, DispatcherPriority.Background);

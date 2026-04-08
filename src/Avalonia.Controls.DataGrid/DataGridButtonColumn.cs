@@ -276,7 +276,7 @@ internal
         {
             target.ClearValue(property);
 
-            if (value is IBinding binding)
+            if (value is BindingBase binding)
             {
                 ApplyBinding(target, property, binding);
                 return;
@@ -289,18 +289,14 @@ internal
             }
         }
 
-        private static void ApplyBinding(AvaloniaObject target, AvaloniaProperty property, IBinding binding)
+        private static void ApplyBinding(AvaloniaObject target, AvaloniaProperty property, BindingBase binding)
         {
             if (binding == null)
             {
                 return;
             }
 
-            var result = binding.Initiate(target, property, enableDataValidation: true);
-            if (result != null)
-            {
-                BindingOperations.Apply(target, property, result, null);
-            }
+            target.Bind(property, binding);
         }
 
         private ControlTheme GetThemeValue(Lazy<ControlTheme> themeCache)

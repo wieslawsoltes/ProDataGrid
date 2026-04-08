@@ -10,6 +10,7 @@ using System.Linq.Expressions;
 using System.Reflection;
 using System.Threading.Tasks;
 using Avalonia;
+using Avalonia.Data;
 using Avalonia.Data.Core;
 using Avalonia.Markup.Xaml.MarkupExtensions.CompiledBindings;
 

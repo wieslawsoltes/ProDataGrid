@@ -34,7 +34,7 @@
         <StackPanel Spacing="{DynamicResource DataGridFilterEditorSpacing}"
                     Width="{DynamicResource DataGridFilterTextEditorWidth}">
           <TextBlock Text="{Binding Label, FallbackValue=Text filter}" FontWeight="SemiBold" />
-          <TextBox Watermark="Contains"
+          <TextBox PlaceholderText="Contains"
                    Text="{Binding Text, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
           <StackPanel Orientation="Horizontal"
                       Spacing="{DynamicResource DataGridFilterEditorActionSpacing}">

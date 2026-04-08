@@ -1316,9 +1316,9 @@ public class DataGridInputMouseSelectionTests
         grid.UpdateLayout();
         Dispatcher.UIThread.RunJobs();
 
-        var inputRoot = grid.GetVisualRoot() as IInputRoot;
+        var inputRoot = grid.GetVisualRoot();
         Assert.NotNull(inputRoot);
-        inputRoot!.PointerOverElement = grid;
+        inputRoot!.SetPointerOverElementForTests(grid);
 
         var startSlot = grid.SlotFromRowIndex(0);
         var endSlot = grid.SlotFromRowIndex(2);
@@ -1356,9 +1356,9 @@ public class DataGridInputMouseSelectionTests
         grid.UpdateLayout();
         Dispatcher.UIThread.RunJobs();
 
-        var inputRoot = grid.GetVisualRoot() as IInputRoot;
+        var inputRoot = grid.GetVisualRoot();
         Assert.NotNull(inputRoot);
-        inputRoot!.PointerOverElement = grid;
+        inputRoot!.SetPointerOverElementForTests(grid);
 
         var startSlot = grid.SlotFromRowIndex(0);
         var startRow = grid.DisplayData.GetDisplayedElement(startSlot) as DataGridRow;
@@ -1375,7 +1375,7 @@ public class DataGridInputMouseSelectionTests
 
         startCell.RaiseEvent(CreatePointerPressedArgs(startCell, grid, pointer, startPoint, KeyModifiers.None));
         grid.RaiseEvent(CreatePointerMovedArgs(grid, grid, pointer, outsidePoint, KeyModifiers.None));
-        inputRoot.PointerOverElement = null;
+        inputRoot.SetPointerOverElementForTests(null);
         grid.RaiseEvent(CreatePointerReleasedArgs(grid, grid, pointer, outsidePoint, KeyModifiers.None));
 
         grid.UpdateLayout();

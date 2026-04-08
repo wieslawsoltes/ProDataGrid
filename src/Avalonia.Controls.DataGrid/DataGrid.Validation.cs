@@ -495,19 +495,9 @@ internal
             _collectionValidationItemsWithError.Clear();
         }
 
-        private static string GetBindingPath(IBinding binding)
+        private static string GetBindingPath(BindingBase binding)
         {
-            if (binding is Binding avaloniaBinding)
-            {
-                return avaloniaBinding.Path;
-            }
-
-            if (binding is CompiledBindingExtension compiledBinding)
-            {
-                return compiledBinding.Path?.ToString();
-            }
-
-            return null;
+            return BindingCloneHelper.GetPath(binding);
         }
 
         private static string GetColumnBindingPath(DataGridColumn column)

@@ -31,7 +31,7 @@
           <TextBlock Text="Formula" VerticalAlignment="Center" FontWeight="Bold" />
           <TextBox Grid.Column="1"
                    Text="{Binding Formula, UpdateSourceTrigger=PropertyChanged}"
-                   Watermark="e.g. Revenue - Cost" />
+                   PlaceholderText="e.g. Revenue - Cost" />
 
           <TextBlock Grid.Row="1"
                      Text="Rule"
@@ -40,7 +40,7 @@
           <TextBox Grid.Row="1"
                    Grid.Column="1"
                    Text="{Binding RuleFormula, UpdateSourceTrigger=PropertyChanged}"
-                   Watermark="e.g. Result &lt; 0 || Revenue &lt; Target" />
+                   PlaceholderText="e.g. Result &lt; 0 || Revenue &lt; Target" />
         </Grid>
       </Border>
     </StackPanel>

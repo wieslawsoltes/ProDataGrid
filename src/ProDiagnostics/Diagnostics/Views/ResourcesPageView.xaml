@@ -100,7 +100,7 @@
                      Margin="8,0,8,4"
                      DataContext="{Binding ResourcesFilter}"
                      Text="{Binding FilterString}"
-                     Watermark="Search resources"
+                     PlaceholderText="Search resources"
                      UseCaseSensitiveFilter="{Binding UseCaseSensitiveFilter}"
                      UseWholeWordFilter="{Binding UseWholeWordFilter}"
                      UseRegexFilter="{Binding UseRegexFilter}"/>

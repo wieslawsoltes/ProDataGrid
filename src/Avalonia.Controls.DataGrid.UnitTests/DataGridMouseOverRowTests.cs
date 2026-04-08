@@ -62,7 +62,7 @@ public class DataGridMouseOverRowTests
             var row = FindRow(root2, grid);
             var point = row.TranslatePoint(new Point(5, 5), grid)!.Value;
 
-            ((IInputRoot)root).PointerOverElement = grid;
+            root.SetPointerOverElementForTests(grid);
             RaisePointerActivity(grid, point);
             grid.MouseOverRowIndex = row.Index;
 
@@ -112,7 +112,7 @@ public class DataGridMouseOverRowTests
             var point = root2Row.TranslatePoint(new Point(5, 5), grid)!.Value;
             var initialIndex = root2Row.Index;
 
-            ((IInputRoot)root).PointerOverElement = grid;
+            root.SetPointerOverElementForTests(grid);
             RaisePointerActivity(grid, point);
             grid.MouseOverRowIndex = root2Row.Index;
 
@@ -168,7 +168,7 @@ public class DataGridMouseOverRowTests
             var point = childRow.TranslatePoint(new Point(5, 5), grid)!.Value;
             var initialIndex = childRow.Index;
 
-            ((IInputRoot)root).PointerOverElement = grid;
+            root.SetPointerOverElementForTests(grid);
             RaisePointerActivity(grid, point);
             grid.MouseOverRowIndex = childRow.Index;
 
@@ -222,7 +222,7 @@ public class DataGridMouseOverRowTests
             var root3Row = FindRow(root3, grid);
             var point = root3Row.TranslatePoint(new Point(5, 5), grid)!.Value;
 
-            ((IInputRoot)root).PointerOverElement = grid;
+            root.SetPointerOverElementForTests(grid);
             RaisePointerActivity(grid, point);
             grid.MouseOverRowIndex = root3Row.Index;
 
@@ -269,21 +269,24 @@ public class DataGridMouseOverRowTests
             var rowPoint = row.TranslatePoint(new Point(5, 5), grid);
             Assert.NotNull(rowPoint);
 
-            var headerPoint = header.TranslatePoint(new Point(5, Math.Max(1, header.Bounds.Height / 2)), grid);
+            var headerPoint = header.TranslatePoint(
+                new Point(
+                    Math.Max(1, header.Bounds.Width / 2),
+                    Math.Max(1, header.Bounds.Height / 2)),
+                grid);
             Assert.NotNull(headerPoint);
 
-            ((IInputRoot)root).PointerOverElement = row;
-            RaisePointerMovedActivity(grid, rowPoint.Value);
+            root.SetPointerOverElementForTests(row);
+            RaisePointerMovedActivity(row, grid, rowPoint.Value);
             grid.MouseOverRowIndex = row.Index;
 
             Assert.Equal(row.Index, grid.MouseOverRowIndex);
             Assert.True(((IPseudoClasses)row.Classes).Contains(":pointerover"));
             AssertSinglePointerOverRow(grid, row);
 
-            ((IInputRoot)root).PointerOverElement = header;
-            RaisePointerMovedActivity(grid, headerPoint.Value);
-            grid.RequestPointerOverRefreshFromRow();
-            PumpLayout(grid);
+            root.SetPointerOverElementForTests(header);
+            RaisePointerMovedActivity(header, grid, headerPoint.Value);
+            RefreshPointerOverRow(grid);
 
             Assert.Null(grid.MouseOverRowIndex);
             Assert.False(((IPseudoClasses)row.Classes).Contains(":pointerover"));
@@ -480,10 +483,15 @@ public class DataGridMouseOverRowTests
 
     private static void RaisePointerMovedActivity(DataGrid grid, Point point)
     {
+        RaisePointerMovedActivity(grid, grid, point);
+    }
+
+    private static void RaisePointerMovedActivity(InputElement source, Visual relativeTo, Point point)
+    {
         var pointer = new Pointer(Pointer.GetNextFreeId(), PointerType.Mouse, isPrimary: true);
         var properties = new PointerPointProperties(RawInputModifiers.None, PointerUpdateKind.Other);
-        var args = new PointerEventArgs(InputElement.PointerMovedEvent, grid, pointer, grid, point, 0, properties, KeyModifiers.None);
-        grid.RaiseEvent(args);
+        var args = new PointerEventArgs(InputElement.PointerMovedEvent, source, pointer, relativeTo, point, 0, properties, KeyModifiers.None);
+        source.RaiseEvent(args);
     }
 
     private static void PumpLayout(Control control)
@@ -499,6 +507,16 @@ public class DataGridMouseOverRowTests
         Dispatcher.UIThread.RunJobs();
         control.UpdateLayout();
         Dispatcher.UIThread.RunJobs();
+    }
+
+    private static void RefreshPointerOverRow(DataGrid grid)
+    {
+        var method = typeof(DataGrid).GetMethod(
+            "RefreshPointerOverRow",
+            System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic)
+            ?? throw new InvalidOperationException("DataGrid.RefreshPointerOverRow was not found.");
+
+        method.Invoke(grid, null);
     }
 
     private sealed class TreeItem
