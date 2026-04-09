@@ -86,6 +86,11 @@ namespace Avalonia.Controls.DataGridFiltering
 
         public StringComparison? StringComparisonMode { get; }
 
+        /// <summary>
+        /// True = <see cref="DataGridColumnDefinition" />, False = <see cref="DataGridColumn" />, Null = unknown
+        /// </summary>
+        internal bool? ColumnIdIsColumnDefinition { get; set; }
+
         public bool HasPredicate => Predicate != null;
 
         public override bool Equals(object obj)
