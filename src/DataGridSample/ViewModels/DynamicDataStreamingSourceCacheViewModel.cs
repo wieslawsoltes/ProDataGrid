@@ -2,11 +2,14 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
+using System.ComponentModel;
 using System.Linq;
 using System.Reactive.Disposables;
 using System.Reactive.Subjects;
 using Avalonia.Controls.DataGridFiltering;
 using Avalonia.Controls.DataGridSorting;
+using Avalonia.Controls.DataGridSelection;
+using Avalonia.Controls.Selection;
 using Avalonia.Threading;
 using DataGridSample.Adapters;
 using DataGridSample.Models;
@@ -41,6 +44,8 @@ namespace DataGridSample.ViewModels
         private IFilteringModel? _filteringModel;
         private bool _multiSortEnabled = true;
         private SortCycleMode _sortCycleMode = SortCycleMode.AscendingDescendingNone;
+        private int? _expectedSelectedId;
+        private string _selectionStatus = "No selection.";
 
         public DynamicDataStreamingSourceCacheViewModel()
         {
@@ -52,12 +57,21 @@ namespace DataGridSample.ViewModels
 
             var subscription = _source.Connect()
                 .Filter(_filterSubject)
-                .SortAndBind(out _view, _sortSubject)
+                .SortAndBind(out _view, _sortSubject, new()
+                {
+                    UseReplaceForUpdates = true
+                })
                 .Subscribe();
             _cleanup.Add(subscription);
 
             _viewNotifications = _view;
             _viewNotifications.CollectionChanged += ViewCollectionChanged;
+
+            SelectionModel = new IdentitySelectionModel(item => item is StreamingItem stream ? stream.Id : item)
+            {
+                SingleSelect = true
+            };
+            SelectionModel.SelectionChanged += SelectionModelOnSelectionChanged;
 
             SortingModel = new SortingModel
             {
@@ -84,6 +98,10 @@ namespace DataGridSample.ViewModels
             ResetCommand = new RelayCommand(_ => ResetItems());
             ClearSortsCommand = new RelayCommand(_ => SortingModel.Clear());
             ClearFiltersCommand = new RelayCommand(_ => ClearFilters());
+            LoadSelectionReproCommand = new RelayCommand(_ => LoadSelectionRepro());
+            SelectMiddleRowCommand = new RelayCommand(_ => SelectMiddleRow());
+            ReplaceSelectedAndMoveCommand = new RelayCommand(_ => ReplaceSelectedAndMove());
+            RunSelectionDriftReproCommand = new RelayCommand(_ => RunSelectionDriftRepro());
 
             ResetItems();
         }
@@ -93,6 +111,8 @@ namespace DataGridSample.ViewModels
         public DynamicDataStreamingSortingAdapterFactory SortingAdapterFactory => _sortingAdapterFactory;
 
         public DynamicDataStreamingFilteringAdapterFactory FilteringAdapterFactory => _filteringAdapterFactory;
+
+        public ISelectionModel SelectionModel { get; }
 
         public ISortingModel SortingModel
         {
@@ -123,6 +143,14 @@ namespace DataGridSample.ViewModels
         public RelayCommand ClearSortsCommand { get; }
 
         public RelayCommand ClearFiltersCommand { get; }
+
+        public RelayCommand LoadSelectionReproCommand { get; }
+
+        public RelayCommand SelectMiddleRowCommand { get; }
+
+        public RelayCommand ReplaceSelectedAndMoveCommand { get; }
+
+        public RelayCommand RunSelectionDriftReproCommand { get; }
 
         public int TargetCount
         {
@@ -179,6 +207,20 @@ namespace DataGridSample.ViewModels
         public int ItemsCount => _view.Count;
 
         public string RunState => IsRunning ? "Running" : "Stopped";
+
+        public int? ExpectedSelectedId
+        {
+            get => _expectedSelectedId;
+            private set => SetProperty(ref _expectedSelectedId, value);
+        }
+
+        public int? SelectedId => SelectionModel.SelectedItem is StreamingItem item ? item.Id : null;
+
+        public string SelectionStatus
+        {
+            get => _selectionStatus;
+            private set => SetProperty(ref _selectionStatus, value);
+        }
 
         public string? SymbolFilter
         {
@@ -279,6 +321,8 @@ namespace DataGridSample.ViewModels
             });
 
             Updates = 0;
+            ExpectedSelectedId = null;
+            UpdateSelectionStatus();
         }
 
         private void ApplyUpdates()
@@ -394,6 +438,74 @@ namespace DataGridSample.ViewModels
             FilteringModel.Clear();
         }
 
+        private void LoadSelectionRepro()
+        {
+            Stop();
+            SymbolFilter = string.Empty;
+            MinPrice = null;
+            MaxPrice = null;
+            FilteringModel.Clear();
+            SortingModel.Apply(new[]
+            {
+                new SortingDescriptor(nameof(StreamingItem.Price), ListSortDirection.Ascending, nameof(StreamingItem.Price))
+            });
+
+            _source.Edit(cache =>
+            {
+                cache.Clear();
+                cache.AddOrUpdate(new StreamingItem { Id = 1, Symbol = "AAA", Price = 10, PriceDisplay = "10.00", UpdatedAt = DateTime.Today, UpdatedAtDisplay = "10:00:00" });
+                cache.AddOrUpdate(new StreamingItem { Id = 2, Symbol = "BBB", Price = 20, PriceDisplay = "20.00", UpdatedAt = DateTime.Today, UpdatedAtDisplay = "10:00:01" });
+                cache.AddOrUpdate(new StreamingItem { Id = 3, Symbol = "CCC", Price = 30, PriceDisplay = "30.00", UpdatedAt = DateTime.Today, UpdatedAtDisplay = "10:00:02" });
+            });
+
+            SelectionModel.Clear();
+            ExpectedSelectedId = null;
+            Updates = 0;
+            UpdateSelectionStatus();
+        }
+
+        private void SelectMiddleRow()
+        {
+            if (_view.Count < 2)
+            {
+                return;
+            }
+
+            SelectionModel.Select(1);
+            ExpectedSelectedId = SelectedId;
+            UpdateSelectionStatus();
+        }
+
+        private void ReplaceSelectedAndMove()
+        {
+            if (SelectionModel.SelectedItem is not StreamingItem selected)
+            {
+                return;
+            }
+
+            ExpectedSelectedId = selected.Id;
+
+            var replacement = new StreamingItem
+            {
+                Id = selected.Id,
+                Symbol = selected.Symbol,
+                Price = 999,
+                PriceDisplay = "999.00",
+                UpdatedAt = DateTime.Today.AddSeconds(30),
+                UpdatedAtDisplay = "10:00:30"
+            };
+
+            _source.AddOrUpdate(replacement);
+            UpdateSelectionStatus();
+        }
+
+        private void RunSelectionDriftRepro()
+        {
+            LoadSelectionRepro();
+            SelectMiddleRow();
+            ReplaceSelectedAndMove();
+        }
+
         private void SortingModelOnSortingChanged(object? sender, SortingChangedEventArgs e)
         {
             UpdateSortSummaries(e.NewDescriptors);
@@ -464,6 +576,7 @@ namespace DataGridSample.ViewModels
             Stop();
             SortingModel.SortingChanged -= SortingModelOnSortingChanged;
             FilteringModel.FilteringChanged -= FilteringModelOnFilteringChanged;
+            SelectionModel.SelectionChanged -= SelectionModelOnSelectionChanged;
             _viewNotifications.CollectionChanged -= ViewCollectionChanged;
             _sortSubject.Dispose();
             _filterSubject.Dispose();
@@ -475,6 +588,34 @@ namespace DataGridSample.ViewModels
         public record FilterDescriptorSummary(string Column, string Operator, string Value);
 
         private void ViewCollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
-            => OnPropertyChanged(nameof(ItemsCount));
+        {
+            OnPropertyChanged(nameof(ItemsCount));
+            OnPropertyChanged(nameof(SelectedId));
+            UpdateSelectionStatus();
+        }
+
+        private void SelectionModelOnSelectionChanged(object? sender, SelectionModelSelectionChangedEventArgs e)
+        {
+            OnPropertyChanged(nameof(SelectedId));
+            UpdateSelectionStatus();
+        }
+
+        private void UpdateSelectionStatus()
+        {
+            var selectedId = SelectedId;
+            var expectedId = ExpectedSelectedId;
+
+            if (expectedId == null)
+            {
+                SelectionStatus = selectedId == null
+                    ? "No selection."
+                    : $"Selected Id {selectedId}.";
+                return;
+            }
+
+            SelectionStatus = selectedId == expectedId
+                ? $"Selection stayed on Id {selectedId}."
+                : $"Selection drifted. Expected Id {expectedId}, actual Id {(selectedId?.ToString() ?? "none")}.";
+        }
     }
 }
