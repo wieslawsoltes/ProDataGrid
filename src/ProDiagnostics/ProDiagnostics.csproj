@@ -57,6 +57,11 @@
     <AvaloniaResource Include="**\*.xaml">
       <SubType>Designer</SubType>
     </AvaloniaResource>
+    <AvaloniaXaml Remove="Diagnostics\Controls\*.axaml" />
+    <None Remove="Diagnostics\Controls\*.axaml" />
+    <AvaloniaResource Include="Diagnostics\Controls\*.axaml">
+      <SubType>Designer</SubType>
+    </AvaloniaResource>
   </ItemGroup>
 
 </Project>
