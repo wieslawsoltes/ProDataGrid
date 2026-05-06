@@ -85,7 +85,7 @@ jobs:
         run: dotnet build -c Release --no-restore
 
       - name: Test
-        run: dotnet test -c Release --no-build --logger trx --results-directory artifacts/test --filter FullyQualifiedName!~LeakTests
+        run: dotnet test -c Release --no-build --settings build/ci.runsettings --logger trx --results-directory artifacts/test --filter FullyQualifiedName!~LeakTests -p:TestTfmsInParallel=false
 
       - name: Upload test results
         uses: actions/upload-artifact@v4

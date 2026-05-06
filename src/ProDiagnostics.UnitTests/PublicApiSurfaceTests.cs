@@ -19,6 +19,7 @@ public class PublicApiSurfaceTests
         {
             typeof(DevToolsExtensions),
             typeof(VisualTreeDebug),
+            typeof(DevToolsView),
             typeof(DevToolsViewKind),
             typeof(HotKeyConfiguration),
             typeof(DevToolsOptions),
