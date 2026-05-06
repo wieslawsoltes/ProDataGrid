@@ -21,7 +21,7 @@
     </Style>
   </UserControl.Styles>
   <Grid Name="rootGrid" RowDefinitions="Auto,Auto,Auto,*,Auto,Auto">
-    <Menu>
+    <Menu IsVisible="{Binding ShowMenu}">
       <MenuItem Header="_File">
         <MenuItem Header="E_xit" Command="{Binding $parent[Window].Close}" />
         <MenuItem Header="Screenshot" Command="{Binding Shot}" HotKey="F8">
@@ -259,9 +259,9 @@
       <TabStripItem Content="Combined Tree" />
       <TabStripItem Content="Logical Tree" />
       <TabStripItem Content="Visual Tree" />
-      <TabStripItem Content="Resources" />
-      <TabStripItem Content="Assets" />
-      <TabStripItem Content="Events" />
+      <TabStripItem Content="Resources" IsVisible="{Binding ShowResourcesTab}" />
+      <TabStripItem Content="Assets" IsVisible="{Binding ShowAssetsTab}" />
+      <TabStripItem Content="Events" IsVisible="{Binding ShowEventsTab}" />
       <TabStripItem Content="HotKeys" IsVisible="False" />
     </TabStrip>
 

@@ -59,6 +59,31 @@ namespace Avalonia.Diagnostics
         public DevToolsViewKind LaunchView { get; init; } = DevToolsViewKind.CombinedTree;
 
         /// <summary>
+        /// Gets or sets a value indicating whether the DevTools menu should be visible.
+        /// </summary>
+        public bool ShowMenu { get; set; } = true;
+
+        /// <summary>
+        /// Gets or sets a value indicating whether the Resources diagnostic tab should be visible.
+        /// </summary>
+        public bool ShowResourcesTab { get; set; } = true;
+
+        /// <summary>
+        /// Gets or sets a value indicating whether the Assets diagnostic tab should be visible.
+        /// </summary>
+        public bool ShowAssetsTab { get; set; } = true;
+
+        /// <summary>
+        /// Gets or sets a value indicating whether the Events diagnostic tab should be visible.
+        /// </summary>
+        public bool ShowEventsTab { get; set; } = true;
+
+        /// <summary>
+        /// Gets or sets a value indicating whether recorded events should be limited to the inspected root.
+        /// </summary>
+        public bool ScopeEventsToRoot { get; set; } = true;
+
+        /// <summary>
         /// Gets or inits the <see cref="HotKeyConfiguration" /> used to activate DevTools features
         /// </summary>
         public HotKeyConfiguration HotKeys { get; init; } = new();

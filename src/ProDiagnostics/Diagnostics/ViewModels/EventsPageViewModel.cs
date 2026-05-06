@@ -6,6 +6,7 @@ using Avalonia.Controls;
 using Avalonia.Diagnostics.Models;
 using Avalonia.Input;
 using Avalonia.Interactivity;
+using Avalonia.VisualTree;
 
 namespace Avalonia.Diagnostics.ViewModels
 {
@@ -173,6 +174,31 @@ namespace Avalonia.Diagnostics.ViewModels
         }
 
         public MainViewModel MainView => _mainViewModel;
+
+        public bool ShouldRecordEvent(object? sender, RoutedEventArgs e)
+        {
+            if (sender is Visual senderVisual && senderVisual.DoesBelongToDevTool())
+            {
+                return false;
+            }
+
+            if (e.Source is Visual sourceVisual && sourceVisual.DoesBelongToDevTool())
+            {
+                return false;
+            }
+
+            return _mainViewModel.ShouldRecordEvent(sender, e);
+        }
+
+        public bool ShouldRecordRouteFinished(RoutedEventArgs e)
+        {
+            if (e.Source is Visual sourceVisual && sourceVisual.DoesBelongToDevTool())
+            {
+                return false;
+            }
+
+            return _mainViewModel.ShouldRecordRouteFinished(e);
+        }
 
         public void Dispose()
         {

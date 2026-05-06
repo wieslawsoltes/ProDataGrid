@@ -9,8 +9,11 @@ using Avalonia.Threading;
 using Avalonia.Reactive;
 using Avalonia.Rendering;
 using System.Collections.Generic;
+using System.Linq;
 using Avalonia.Media;
 using Avalonia.Diagnostics.Services;
+using Avalonia.Interactivity;
+using Avalonia.VisualTree;
 
 namespace Avalonia.Diagnostics.ViewModels
 {
@@ -36,6 +39,11 @@ namespace Avalonia.Diagnostics.ViewModels
         private IScreenshotHandler? _screenshotHandler;
         private bool _showPropertyType;
         private bool _showImplementedInterfaces;
+        private bool _showMenu = true;
+        private bool _showResourcesTab = true;
+        private bool _showAssetsTab = true;
+        private bool _showEventsTab = true;
+        private bool _scopeEventsToRoot = true;
         private readonly HashSet<string> _pinnedProperties = new();
         private IBrush? _FocusHighlighter;
         private IDisposable? _currentFocusHighlightAdorner = default;
@@ -210,19 +218,20 @@ namespace Avalonia.Diagnostics.ViewModels
                     case 2:
                         Content = _visualTree;
                         break;
-                    case 3:
+                    case 3 when ShowResourcesTab:
                         Content = _resources;
                         break;
-                    case 4:
+                    case 4 when ShowAssetsTab:
                         Content = _assets;
                         break;
-                    case 5:
+                    case 5 when ShowEventsTab:
                         Content = _events;
                         break;
                     case 6:
                         Content = _hotKeys;
                         break;
                     default:
+                        _selectedTab = 0;
                         Content = _combinedTree;
                         break;
                 }
@@ -372,11 +381,81 @@ namespace Avalonia.Diagnostics.ViewModels
         {
             _screenshotHandler = options.ScreenshotHandler;
             StartupScreenIndex = options.StartupScreenIndex;
+            ShowMenu = options.ShowMenu;
+            ShowResourcesTab = options.ShowResourcesTab;
+            ShowAssetsTab = options.ShowAssetsTab;
+            ShowEventsTab = options.ShowEventsTab;
+            ScopeEventsToRoot = options.ScopeEventsToRoot;
             ShowImplementedInterfaces = options.ShowImplementedInterfaces;
             FocusHighlighter = options.FocusHighlighterBrush;
             SelectedTab = GetTabIndex(options.LaunchView);
 
             _hotKeys.SetOptions(options);
+        }
+
+        public bool ShowMenu
+        {
+            get => _showMenu;
+            private set => RaiseAndSetIfChanged(ref _showMenu, value);
+        }
+
+        public bool ShowResourcesTab
+        {
+            get => _showResourcesTab;
+            private set => RaiseAndSetIfChanged(ref _showResourcesTab, value);
+        }
+
+        public bool ShowAssetsTab
+        {
+            get => _showAssetsTab;
+            private set => RaiseAndSetIfChanged(ref _showAssetsTab, value);
+        }
+
+        public bool ShowEventsTab
+        {
+            get => _showEventsTab;
+            private set => RaiseAndSetIfChanged(ref _showEventsTab, value);
+        }
+
+        public bool ScopeEventsToRoot
+        {
+            get => _scopeEventsToRoot;
+            private set => RaiseAndSetIfChanged(ref _scopeEventsToRoot, value);
+        }
+
+        public bool ShouldRecordEvent(object? sender, RoutedEventArgs e)
+        {
+            if (!ScopeEventsToRoot || _root is not Visual)
+            {
+                return true;
+            }
+
+            return IsInEventScope(e.Source) && IsInEventScope(sender);
+        }
+
+        public bool ShouldRecordRouteFinished(RoutedEventArgs e)
+        {
+            if (!ScopeEventsToRoot || _root is not Visual)
+            {
+                return true;
+            }
+
+            return IsInEventScope(e.Source);
+        }
+
+        private bool IsInEventScope(object? value)
+        {
+            if (!ScopeEventsToRoot || _root is not Visual rootVisual)
+            {
+                return true;
+            }
+
+            return value switch
+            {
+                null => true,
+                Visual visual => visual == rootVisual || visual.GetVisualAncestors().Contains(rootVisual),
+                _ => ReferenceEquals(value, _root)
+            };
         }
 
         public bool ShowImplementedInterfaces

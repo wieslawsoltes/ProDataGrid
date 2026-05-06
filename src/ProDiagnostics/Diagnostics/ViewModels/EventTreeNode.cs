@@ -85,7 +85,7 @@ namespace Avalonia.Diagnostics.ViewModels
         {
             if (!_isRegistered || IsEnabled == false)
                 return;
-            if (sender is Visual v && v.DoesBelongToDevTool())
+            if (!_parentViewModel.ShouldRecordEvent(sender, e))
                 return;
 
             var s = sender!;
@@ -120,7 +120,7 @@ namespace Avalonia.Diagnostics.ViewModels
         {
             if (!_isRegistered || IsEnabled == false)
                 return;
-            if (e.Source is Visual v && v.DoesBelongToDevTool())
+            if (!_parentViewModel.ShouldRecordRouteFinished(e))
                 return;
 
             var s = e.Source;
