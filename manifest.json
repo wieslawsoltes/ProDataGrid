@@ -6220,6 +6220,20 @@
     },
     {
       "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Diagnostics.DevToolsView.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Diagnostics.DevToolsView.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Diagnostics.DevToolsView",
+      "Summary": "<p sourcefile=\"api/Avalonia.Diagnostics.DevToolsView.yml\" sourcestartlinenumber=\"1\">Hosts the Avalonia diagnostics tools inside an existing view.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
       "source_relative_path": "api/Avalonia.Diagnostics.DevToolsViewKind.yml",
       "output": {
         ".html": {
