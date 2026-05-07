@@ -6220,6 +6220,48 @@
     },
     {
       "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Diagnostics.DevToolsSegmentView.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Diagnostics.DevToolsSegmentView.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Diagnostics.DevToolsSegmentView",
+      "Summary": "<p sourcefile=\"api/Avalonia.Diagnostics.DevToolsSegmentView.yml\" sourcestartlinenumber=\"1\">Hosts one standalone segment of a logical, visual, or combined diagnostics tree page.\nMultiple segment views can share one <xref href=\"Avalonia.Diagnostics.DevToolsSession\" data-throw-if-not-resolved=\"false\"></xref> so tree selection\ndrives the properties and layout/style analyzer panels.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Diagnostics.DevToolsSession.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Diagnostics.DevToolsSession.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Diagnostics.DevToolsSession",
+      "Summary": "<p sourcefile=\"api/Avalonia.Diagnostics.DevToolsSession.yml\" sourcestartlinenumber=\"1\">Owns diagnostics state that can be shared by multiple standalone diagnostics segment views.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Diagnostics.DevToolsTreeSegmentKind.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Diagnostics.DevToolsTreeSegmentKind.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Diagnostics.DevToolsTreeSegmentKind",
+      "Summary": "<p sourcefile=\"api/Avalonia.Diagnostics.DevToolsTreeSegmentKind.yml\" sourcestartlinenumber=\"1\">Selects which tree diagnostics segment a standalone diagnostics view should host.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
       "source_relative_path": "api/Avalonia.Diagnostics.DevToolsView.yml",
       "output": {
         ".html": {
@@ -6314,6 +6356,76 @@
       "Uid": null,
       "IsMRef": true,
       "Title": "Avalonia.Diagnostics.Screenshots",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Diagnostics.Views.ControlLayoutStylesView.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Diagnostics.Views.ControlLayoutStylesView.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Diagnostics.Views.ControlLayoutStylesView",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Diagnostics.Views.ControlPropertiesView.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Diagnostics.Views.ControlPropertiesView.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Diagnostics.Views.ControlPropertiesView",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Diagnostics.Views.DevToolsStatusBarView.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Diagnostics.Views.DevToolsStatusBarView.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Diagnostics.Views.DevToolsStatusBarView",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Diagnostics.Views.TreePageTreeView.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Diagnostics.Views.TreePageTreeView.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Diagnostics.Views.TreePageTreeView",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Diagnostics.Views.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Diagnostics.Views.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Diagnostics.Views",
       "Summary": null
     },
     {
