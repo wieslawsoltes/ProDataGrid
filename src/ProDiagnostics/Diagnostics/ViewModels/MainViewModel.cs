@@ -202,6 +202,26 @@ namespace Avalonia.Diagnostics.ViewModels
             }
         }
 
+        public ViewModelBase GetContent(DevToolsViewKind viewKind)
+        {
+            return viewKind switch
+            {
+                DevToolsViewKind.LogicalTree => _logicalTree,
+                DevToolsViewKind.VisualTree => _visualTree,
+                DevToolsViewKind.Events => _events,
+                DevToolsViewKind.Resources => _resources,
+                DevToolsViewKind.Assets => _assets,
+                _ => _combinedTree
+            };
+        }
+
+        public void SelectContent(DevToolsViewKind viewKind)
+        {
+            _selectedTab = GetTabIndex(viewKind);
+            Content = GetContent(viewKind);
+            RaisePropertyChanged(nameof(SelectedTab));
+        }
+
         public int SelectedTab
         {
             get { return _selectedTab; }

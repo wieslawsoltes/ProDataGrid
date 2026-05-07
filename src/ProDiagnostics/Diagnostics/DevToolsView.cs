@@ -26,6 +26,9 @@ namespace Avalonia.Diagnostics
         public static readonly StyledProperty<DevToolsOptions?> OptionsProperty =
             AvaloniaProperty.Register<DevToolsView, DevToolsOptions?>(nameof(Options));
 
+        public static readonly StyledProperty<DevToolsViewKind?> ViewKindProperty =
+            AvaloniaProperty.Register<DevToolsView, DevToolsViewKind?>(nameof(ViewKind));
+
         private readonly HashSet<Popup> _frozenPopupStates = new();
         private readonly ContentControl _content;
         private readonly TextBlock _emptyView;
@@ -63,6 +66,16 @@ namespace Avalonia.Diagnostics
             set => SetValue(OptionsProperty, value);
         }
 
+        /// <summary>
+        /// Gets or sets the diagnostics page to host directly.
+        /// When unset, the complete tabbed diagnostics view is shown.
+        /// </summary>
+        public DevToolsViewKind? ViewKind
+        {
+            get => GetValue(ViewKindProperty);
+            set => SetValue(ViewKindProperty, value);
+        }
+
         protected override void OnAttachedToVisualTree(VisualTreeAttachmentEventArgs e)
         {
             base.OnAttachedToVisualTree(e);
@@ -94,6 +107,10 @@ namespace Avalonia.Diagnostics
             {
                 ApplyOptions();
             }
+            else if (change.Property == ViewKindProperty)
+            {
+                UpdateContent();
+            }
         }
 
         private void UpdateRoot(AvaloniaObject? root)
@@ -107,13 +124,8 @@ namespace Avalonia.Diagnostics
             }
 
             _viewModel = new MainViewModel(root);
-            _mainView = new MainView
-            {
-                DataContext = _viewModel
-            };
 
             ApplyOptions();
-            _content.Content = _mainView;
         }
 
         private void ApplyOptions()
@@ -121,6 +133,43 @@ namespace Avalonia.Diagnostics
             var options = Options ?? new DevToolsOptions();
             _hotKeys = options.HotKeys;
             _viewModel?.SetOptions(options);
+            UpdateContent();
+        }
+
+        private void UpdateContent()
+        {
+            if (_viewModel is null)
+            {
+                _content.Content = _emptyView;
+                return;
+            }
+
+            if (ViewKind is { } viewKind)
+            {
+                ClearMainView();
+                _viewModel.SelectContent(viewKind);
+                _content.Content = _viewModel.Content;
+                return;
+            }
+
+            if (_mainView is null)
+            {
+                _mainView = new MainView
+                {
+                    DataContext = _viewModel
+                };
+            }
+
+            _content.Content = _mainView;
+        }
+
+        private void ClearMainView()
+        {
+            if (_mainView is not null)
+            {
+                _mainView.DataContext = null;
+                _mainView = null;
+            }
         }
 
         private void DisposeDiagnostics()
@@ -132,11 +181,7 @@ namespace Avalonia.Diagnostics
 
             _frozenPopupStates.Clear();
 
-            if (_mainView is not null)
-            {
-                _mainView.DataContext = null;
-                _mainView = null;
-            }
+            ClearMainView();
 
             _viewModel?.Dispose();
             _viewModel = null;
