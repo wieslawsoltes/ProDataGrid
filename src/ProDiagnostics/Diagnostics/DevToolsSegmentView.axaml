@@ -1,0 +1,19 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:diag="using:Avalonia.Diagnostics"
+             x:Class="Avalonia.Diagnostics.DevToolsSegmentView">
+  <UserControl.DataTemplates>
+    <diag:ViewLocator />
+  </UserControl.DataTemplates>
+
+  <UserControl.Styles>
+    <SimpleTheme />
+    <StyleInclude Source="/Themes/Simple.v2.xaml" />
+    <StyleInclude Source="avares://Avalonia.Diagnostics/Diagnostics/Controls/ThicknessEditor.axaml" />
+    <StyleInclude Source="avares://Avalonia.Diagnostics/Diagnostics/Controls/FilterTextBox.axaml" />
+    <StyleInclude Source="avares://Avalonia.Diagnostics/Diagnostics/Controls/BrushEditor.axaml" />
+    <StyleInclude Source="avares://Avalonia.Controls.ColorPicker/Themes/Simple/Simple.xaml" />
+  </UserControl.Styles>
+
+  <ContentControl x:Name="PART_Content" />
+</UserControl>

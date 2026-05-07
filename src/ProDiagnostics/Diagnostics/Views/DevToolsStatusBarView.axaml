@@ -1,0 +1,26 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:Avalonia.Diagnostics.ViewModels"
+             x:Class="Avalonia.Diagnostics.Views.DevToolsStatusBarView"
+             x:DataType="vm:MainViewModel">
+  <Border BorderBrush="{DynamicResource ThemeControlMidBrush}"
+          BorderThickness="0,1,0,0">
+    <Grid ColumnDefinitions="*, Auto">
+      <StackPanel Grid.Column="0" Spacing="4" Orientation="Horizontal">
+        <TextBlock>Hold Ctrl+Shift over a control to inspect.</TextBlock>
+        <Separator Width="8" />
+        <TextBlock>Focused:</TextBlock>
+        <TextBlock Text="{Binding FocusedControl}" />
+        <Separator Width="8" />
+        <TextBlock>Pointer Over:</TextBlock>
+        <TextBlock Text="{Binding PointerOverElementName}" />
+      </StackPanel>
+
+      <TextBlock Grid.Column="1"
+                 Foreground="Gray"
+                 Margin="2 0"
+                 Text="Popups frozen"
+                 IsVisible="{Binding FreezePopups}" />
+    </Grid>
+  </Border>
+</UserControl>

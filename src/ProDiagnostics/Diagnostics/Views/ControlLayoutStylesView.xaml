@@ -1,0 +1,189 @@
+﻿<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:conv="using:Avalonia.Diagnostics.Converters"
+             xmlns:local="using:Avalonia.Diagnostics.Views"
+             xmlns:vm="using:Avalonia.Diagnostics.ViewModels"
+             x:Class="Avalonia.Diagnostics.Views.ControlLayoutStylesView"
+             x:Name="Main"
+             x:DataType="vm:ControlDetailsViewModel"
+             IsVisible="{Binding Layout, Converter={x:Static ObjectConverters.IsNotNull}}">
+
+  <UserControl.Resources>
+    <conv:BoolToOpacityConverter x:Key="BoolToOpacity" Opacity="0.6"/>
+  </UserControl.Resources>
+
+  <Grid RowDefinitions="*,Auto,*">
+    <Grid RowDefinitions="Auto,*" Grid.Row="0">
+      <TextBlock FontWeight="Bold" Grid.Row="0" Text="Layout Visualizer" Margin="4" />
+      <local:LayoutExplorerView Grid.Row="1" DataContext="{Binding Layout}" />
+    </Grid>
+
+    <GridSplitter Grid.Row="1" />
+
+    <Grid RowDefinitions="Auto,*,Auto" Grid.Row="2">
+
+      <Grid Grid.Row="0" Margin="4" RowDefinitions="Auto,Auto">
+
+        <Grid Grid.Row="0" Margin="2" ColumnDefinitions="Auto,*,Auto,Auto">
+          <TextBlock FontWeight="Bold" Grid.Column="0" Text="{Binding FramesStatus}" VerticalAlignment="Center" />
+          <CheckBox Margin="2,0,0,0" Grid.Column="2" Content="Show inactive" IsChecked="{Binding ShowInactiveFrames}" ToolTip.Tip="Show values that are currently inactive" />
+          <ToggleButton Margin="2,0,0,0" Grid.Column="3" ToolTip.Tip="Snapshot current values (Alt+S/Alt+D to enable/disable within debugged window)" Content="Snapshot" IsChecked="{Binding SnapshotFrames}" />
+        </Grid>
+
+        <FilterTextBox Grid.Row="1" Margin="2" Grid.Column="0"
+                       DataContext="{Binding TreePage.SettersFilter}"
+                       Text="{Binding FilterString}"
+                       PlaceholderText="Filter values"
+                       UseCaseSensitiveFilter="{Binding UseCaseSensitiveFilter}"
+                       UseWholeWordFilter="{Binding UseWholeWordFilter}"
+                       UseRegexFilter="{Binding UseRegexFilter}" />
+      </Grid>
+
+      <ScrollViewer Grid.Row="1" HorizontalScrollBarVisibility="Disabled">
+        <ItemsControl ItemsSource="{Binding AppliedFrames}" >
+          <ItemsControl.ItemTemplate>
+            <DataTemplate>
+              <Border BorderThickness="0,0,0,1" BorderBrush="#6C6C6C" Opacity="{Binding IsActive, Converter={StaticResource BoolToOpacity}}">
+                <Border.IsVisible>
+                  <MultiBinding Converter="{x:Static BoolConverters.And}">
+                    <MultiBinding Converter="{x:Static BoolConverters.Or}" >
+                      <Binding Path="IsActive" />
+                      <!-- Rider marks it as an error, because it doesn't know about new binding rules yet. -->
+                      <Binding Path="#Main.((vm:ControlDetailsViewModel)DataContext).ShowInactiveFrames" />
+                    </MultiBinding>
+                    <Binding Path="IsVisible" />
+                  </MultiBinding>
+                </Border.IsVisible>
+                <Expander IsExpanded="True" Margin="0" Padding="8,0" ContentTransition="{x:Null}" >
+                  <Expander.Header>
+                    <TextBlock Grid.Row="0" Text="{Binding Description}" />
+                  </Expander.Header>
+
+                  <ItemsControl Margin="20,0,0,0" Grid.Row="1" ItemsSource="{Binding Setters}">
+
+                    <ItemsControl.Styles>
+                      <Style Selector="TextBlock.property-name">
+                        <Setter Property="FontWeight" Value="SemiBold" />
+                        <Setter Property="Background" Value="Transparent" />
+                      </Style>
+
+                      <Style Selector="TextBlock.property-name:pointerover">
+                        <Setter Property="TextDecorations" Value="Underline" />
+                      </Style>
+
+                      <Style Selector="Rectangle.property-inactive">
+                        <Setter Property="IsHitTestVisible" Value="False" />
+                        <Setter Property="Height" Value="1" />
+                        <Setter Property="Fill" Value="#6C6C6C" />
+                        <Setter Property="VerticalAlignment" Value="Center" />
+                      </Style>
+
+                    </ItemsControl.Styles>
+
+                    <ItemsControl.DataTemplates>
+
+                      <DataTemplate DataType="IBrush">
+                        <StackPanel Orientation="Horizontal" Spacing="2">
+                          <Border BorderThickness="1" BorderBrush="Black" Background="{Binding}" Width="8" Height="8"/>
+                          <TextBlock Text="{Binding}" />
+                        </StackPanel>
+                      </DataTemplate>
+
+                      <DataTemplate DataType="Color">
+                        <StackPanel Orientation="Horizontal" Spacing="2">
+                          <Border BorderThickness="1" BorderBrush="Black" Width="8" Height="8">
+                            <Border.Background>
+                              <SolidColorBrush Color="{Binding}" />
+                            </Border.Background>
+                          </Border>
+                          <TextBlock Text="{Binding}" />
+                        </StackPanel>
+                      </DataTemplate>
+
+                      <DataTemplate DataType="vm:BindingSetterViewModel">
+                        <Panel Opacity="{Binding IsActive, Converter={StaticResource BoolToOpacity}}" IsVisible="{Binding IsVisible}" HorizontalAlignment="Left">
+                          <Panel.ContextMenu>
+                            <ContextMenu>
+                              <MenuItem Header="Copy property name" Command="{Binding CopyPropertyName} "/>
+                              <MenuItem Header="Copy value" Command="{Binding CopyValue} "/>
+                            </ContextMenu>
+                          </Panel.ContextMenu>
+                          <StackPanel Orientation="Horizontal" Spacing="2">
+                            <TextBlock Classes="property-name" PointerPressed="PropertyNamePressed" Text="{Binding Name}" />
+                            <TextBlock Text=":" />
+                            <TextBlock>{</TextBlock>
+                            <Rectangle Height="8" Width="8" VerticalAlignment="Center" Fill="{Binding Tint}" ToolTip.Tip="{Binding ValueTypeTooltip}"/>
+                            <TextBlock Text="{Binding Path}" />
+                            <TextBlock>}</TextBlock>
+                          </StackPanel>
+                          <Rectangle Classes="property-inactive" IsVisible="{Binding !IsActive}" />
+                        </Panel>
+                      </DataTemplate>
+
+                      <DataTemplate DataType="vm:ResourceSetterViewModel">
+                        <Panel Opacity="{Binding IsActive, Converter={StaticResource BoolToOpacity}}" IsVisible="{Binding IsVisible}" HorizontalAlignment="Left">
+                          <Panel.ContextMenu>
+                            <ContextMenu>
+                              <MenuItem Header="Copy property name" Command="{Binding CopyPropertyName} "/>
+                              <MenuItem Header="Copy value" Command="{Binding CopyValue} "/>
+                              <MenuItem Header="Copy resource key" Command="{Binding CopyResourceKey}" />
+                            </ContextMenu>
+                          </Panel.ContextMenu>
+                          <StackPanel Orientation="Horizontal" Spacing="2" HorizontalAlignment="Left">
+                            <TextBlock Classes="property-name" PointerPressed="PropertyNamePressed" Text="{Binding Name}" />
+                            <TextBlock Text=":" />
+                            <TextBlock Text="{Binding Value}" />
+                            <TextBlock>(</TextBlock>
+                            <Ellipse Height="8" Width="8" VerticalAlignment="Center" Fill="{Binding Tint}" ToolTip.Tip="{Binding ValueTypeTooltip}"/>
+                            <TextBlock FontStyle="Italic" Text="{Binding Key}" />
+                            <TextBlock>)</TextBlock>
+                          </StackPanel>
+                          <Rectangle Classes="property-inactive" IsVisible="{Binding !IsActive}" />
+                        </Panel>
+                      </DataTemplate>
+
+                      <DataTemplate DataType="vm:SetterViewModel">
+                        <Panel Opacity="{Binding IsActive, Converter={StaticResource BoolToOpacity}}" IsVisible="{Binding IsVisible}" HorizontalAlignment="Left">
+                          <Panel.ContextMenu>
+                            <ContextMenu>
+                              <MenuItem Header="Copy property name" Command="{Binding CopyPropertyName} "/>
+                              <MenuItem Header="Copy value" Command="{Binding CopyValue} "/>
+                            </ContextMenu>
+                          </Panel.ContextMenu>
+                          <StackPanel Orientation="Horizontal" Spacing="2">
+                            <TextBlock Classes="property-name" PointerPressed="PropertyNamePressed" Text="{Binding Name}" />
+                            <TextBlock Text=":" />
+                            <TextBlock Text="{Binding Value}" />
+                          </StackPanel>
+                          <Rectangle Classes="property-inactive" IsVisible="{Binding !IsActive}" />
+                        </Panel>
+                      </DataTemplate>
+
+                    </ItemsControl.DataTemplates>
+                  </ItemsControl>
+
+                </Expander>
+              </Border>
+            </DataTemplate>
+          </ItemsControl.ItemTemplate>
+        </ItemsControl>
+      </ScrollViewer>
+
+      <Expander Header="Pseudo Classes" Grid.Row="2">
+        <ItemsControl ItemsSource="{Binding PseudoClasses}">
+          <ItemsControl.ItemsPanel>
+            <ItemsPanelTemplate>
+              <WrapPanel />
+            </ItemsPanelTemplate>
+          </ItemsControl.ItemsPanel>
+          <ItemsControl.ItemTemplate>
+            <DataTemplate>
+              <CheckBox Margin="2" Content="{Binding Name}" IsChecked="{Binding IsActive, Mode=TwoWay}" />
+            </DataTemplate>
+          </ItemsControl.ItemTemplate>
+        </ItemsControl>
+      </Expander>
+
+    </Grid>
+  </Grid>
+</UserControl>

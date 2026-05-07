@@ -1,0 +1,121 @@
+﻿<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:conv="using:Avalonia.Diagnostics.Converters"
+             xmlns:local="using:Avalonia.Diagnostics.Views"
+             xmlns:vm="using:Avalonia.Diagnostics.ViewModels"
+             xmlns:filtering="using:Avalonia.Controls.DataGridFiltering"
+             x:Class="Avalonia.Diagnostics.Views.ControlPropertiesView"
+             x:Name="Main"
+             x:DataType="vm:ControlDetailsViewModel">
+
+  <UserControl.Resources>
+    <ResourceDictionary>
+      <ResourceDictionary.MergedDictionaries>
+        <ResourceInclude Source="/Assets/Icons.axaml"/>
+      </ResourceDictionary.MergedDictionaries>
+      <conv:GetTypeNameConverter x:Key="GetTypeName"/>
+      <conv:BoolToImageConverter x:Key="pc"
+                                 TrueImage="{StaticResource PinIcon}"
+                                 FalseImage="{StaticResource UnpinIcon}"/>
+    </ResourceDictionary>
+  </UserControl.Resources>
+
+  <UserControl.Styles>
+    <Style Selector="TextBlock.Pinned">
+      <Setter Property="FontWeight" Value="Bold"/>
+    </Style>
+  </UserControl.Styles>
+
+  <Grid RowDefinitions="Auto,Auto,*">
+    <Grid ColumnDefinitions="Auto, *" RowDefinitions="Auto, Auto">
+      <Button Grid.Column="0" Grid.RowSpan="2" Content="^"
+              IsEnabled="{Binding CanNavigateToParentProperty}"
+              Margin="0 0 4 0"
+              ToolTip.Tip="Navigate to parent property"
+              Command="{Binding NavigateToParentProperty}" />
+      <TextBlock Grid.Column="1" Grid.Row="0" Text="{Binding SelectedEntityName}" FontWeight="Bold" />
+      <TextBlock Grid.Column="1" Grid.Row="1" Text="{Binding SelectedEntityType}" FontStyle="Italic" />
+    </Grid>
+
+    <FilterTextBox Grid.Row="1"
+                   BorderThickness="0"
+                   DataContext="{Binding TreePage.PropertiesFilter}"
+                   Text="{Binding FilterString}"
+                   PlaceholderText="Filter properties"
+                   UseCaseSensitiveFilter="{Binding UseCaseSensitiveFilter}"
+                   UseWholeWordFilter="{Binding UseWholeWordFilter}"
+                   UseRegexFilter="{Binding UseRegexFilter}" />
+
+    <DataGrid x:Name="DataGrid"
+              ItemsSource="{Binding PropertiesView}"
+              Grid.Row="2"
+              BorderThickness="0"
+              RowBackground="Transparent"
+              SelectedItem="{Binding SelectedProperty, Mode=TwoWay}"
+              CanUserResizeColumns="true"
+              DoubleTapped="PropertiesGrid_OnDoubleTapped">
+      <DataGrid.FilteringModel>
+        <filtering:FilteringModel OwnsViewFilter="False" />
+      </DataGrid.FilteringModel>
+      <DataGrid.Columns>
+        <DataGridTemplateColumn Header="Property"  IsReadOnly="True" x:DataType="vm:PropertyViewModel">
+          <DataGridTemplateColumn.CellTemplate>
+            <DataTemplate DataType="vm:PropertyViewModel">
+              <!--
+              Do not remove the DockPanel background set to Transparent
+              because if Background is null HitTest on empty space returns false.
+              -->
+              <DockPanel Background="Transparent">
+                <DockPanel.Styles>
+                  <Style Selector="DockPanel[IsPointerOver=False] > ToggleButton">
+                    <Setter Property="IsVisible" Value="False"/>
+                  </Style>
+                </DockPanel.Styles>
+                <ToggleButton
+                  IsChecked="{Binding IsPinned}"
+                  Background="Transparent"
+                  BorderBrush="Transparent"
+                  DockPanel.Dock="Right"
+                  Command="{Binding #Main.((vm:ControlDetailsViewModel)DataContext).TogglePinnedProperty}"
+                  CommandParameter="{Binding}">
+                  <Image Source="{Binding IsPinned, Converter={StaticResource pc}}"
+                         Width="12"
+                         Height="12"/>
+                </ToggleButton>
+                <TextBlock Text="{Binding Name}"
+                           Classes.Pinned="{Binding IsPinned}"
+                           VerticalAlignment="Center" />
+              </DockPanel>
+            </DataTemplate>
+          </DataGridTemplateColumn.CellTemplate>
+        </DataGridTemplateColumn>
+        <DataGridTemplateColumn Header="Value" Width="100" ReuseCellContent="True">
+          <DataGridTemplateColumn.CellTemplate>
+            <DataTemplate DataType="vm:PropertyViewModel">
+              <local:PropertyValueEditorView />
+            </DataTemplate>
+          </DataGridTemplateColumn.CellTemplate>
+        </DataGridTemplateColumn>
+        <DataGridTextColumn Header="Type" Binding="{Binding Type}"
+                            IsReadOnly="True"
+                            IsVisible="{Binding !#Main.((vm:ControlDetailsViewModel)DataContext).TreePage.MainView.ShowDetailsPropertyType}"
+                            x:DataType="vm:PropertyViewModel" />
+        <DataGridTextColumn Header="Assigned Type" Binding="{Binding AssignedType, Converter={StaticResource GetTypeName}}"
+                            IsReadOnly="True"
+                            IsVisible="{Binding #Main.((vm:ControlDetailsViewModel)DataContext).TreePage.MainView.ShowDetailsPropertyType}"
+                            x:DataType="vm:PropertyViewModel" />
+        <DataGridTextColumn Header="Property Type" Binding="{Binding PropertyType, Converter={StaticResource GetTypeName}}"
+                            IsReadOnly="True"
+                            IsVisible="{Binding #Main.((vm:ControlDetailsViewModel)DataContext).TreePage.MainView.ShowDetailsPropertyType}"
+                            x:DataType="vm:PropertyViewModel" />
+        <DataGridTextColumn Header="Priority" Binding="{Binding Priority}" IsReadOnly="True" x:DataType="vm:PropertyViewModel" />
+      </DataGrid.Columns>
+
+      <DataGrid.Styles>
+        <Style Selector="DataGridRow TextBox">
+          <Setter Property="SelectionBrush" Value="LightBlue" />
+        </Style>
+      </DataGrid.Styles>
+    </DataGrid>
+  </Grid>
+</UserControl>

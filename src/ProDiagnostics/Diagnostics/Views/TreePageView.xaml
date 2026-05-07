@@ -1,58 +1,11 @@
 <UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:local="using:Avalonia.Diagnostics.Views"
              xmlns:vm="using:Avalonia.Diagnostics.ViewModels"
              x:Class="Avalonia.Diagnostics.Views.TreePageView"
              x:DataType="vm:TreePageViewModel">
   <Grid ColumnDefinitions="0.35*,4,0.65*">
-    <DataGrid Name="tree"
-              BorderThickness="0"
-              AutoGenerateColumns="False"
-              HierarchicalModel="{Binding HierarchicalModel}"
-              HierarchicalRowsEnabled="True"
-              HeadersVisibility="None"
-              GridLinesVisibility="None"
-              SelectionMode="Single"
-              IsReadOnly="True"
-              HorizontalScrollBarVisibility="Auto"
-              AutoExpandSelectedItem="True"
-              AutoScrollToSelectedItem="True"
-              CanUserSortColumns="False"
-              CanUserResizeColumns="False"
-              CanUserReorderColumns="False"
-              SelectedItem="{Binding SelectedNode, Mode=TwoWay}"
-              PointerMoved="UpdateAdorner"
-              PointerExited="RemoveAdorner">
-      <DataGrid.Columns>
-        <DataGridHierarchicalColumn Width="SizeToCells"
-                                    x:CompileBindings="False"
-                                    Binding="{Binding Item}">
-          <DataGridHierarchicalColumn.CellTemplate>
-            <DataTemplate x:DataType="vm:TreeNode">
-              <StackPanel Orientation="Horizontal" Spacing="8">
-                <TextBlock Text="{Binding Type}" FontWeight="{Binding FontWeight}"/>
-                <TextBlock Text="{Binding Classes}" IsVisible="{Binding ShowDecorations}"/>
-                <TextBlock Foreground="Gray" Text="{Binding ElementName}" IsVisible="{Binding ShowDecorations}"/>
-              </StackPanel>
-            </DataTemplate>
-          </DataGridHierarchicalColumn.CellTemplate>
-        </DataGridHierarchicalColumn>
-      </DataGrid.Columns>
-      <DataGrid.ContextFlyout>
-        <MenuFlyout>
-          <MenuItem Header="Copy">
-            <MenuItem Header="Copy individual node selector" Command="{Binding CopySelector}" />
-            <MenuItem Header="Copy selector from template parent" Command="{Binding CopySelectorFromTemplateParent}" />
-          </MenuItem>
-          <MenuItem Header="-" />
-          <MenuItem Header="Expand recursively" Command="{Binding ExpandRecursively}" />
-          <MenuItem Header="Collapse children" Command="{Binding CollapseChildren}" />
-          <MenuItem Header="Capture node screenshot" Command="{Binding CaptureNodeScreenshot}" />
-          <MenuItem Header="Bring into view" Command="{Binding BringIntoView}" />
-          <MenuItem Header="Focus" Command="{Binding Focus}" />
-        </MenuFlyout>
-      </DataGrid.ContextFlyout>
-    </DataGrid>
-
+    <local:TreePageTreeView />
     <GridSplitter Background="{DynamicResource ThemeControlMidBrush}" Width="1" Grid.Column="1"/>
     <ContentControl Content="{Binding Details}" Grid.Column="2"/>
   </Grid>
