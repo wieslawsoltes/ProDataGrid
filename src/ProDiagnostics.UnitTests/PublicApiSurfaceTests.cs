@@ -1,6 +1,7 @@
 using System;
 using System.Linq;
 using Avalonia.Diagnostics.Screenshots;
+using Avalonia.Diagnostics.Views;
 using Xunit;
 
 namespace Avalonia.Diagnostics.UnitTests;
@@ -21,6 +22,13 @@ public class PublicApiSurfaceTests
             typeof(VisualTreeDebug),
             typeof(DevToolsView),
             typeof(DevToolsViewKind),
+            typeof(DevToolsTreeSegmentKind),
+            typeof(DevToolsSession),
+            typeof(DevToolsSegmentView),
+            typeof(TreePageTreeView),
+            typeof(ControlPropertiesView),
+            typeof(ControlLayoutStylesView),
+            typeof(DevToolsStatusBarView),
             typeof(HotKeyConfiguration),
             typeof(DevToolsOptions),
             typeof(IScreenshotHandler),
