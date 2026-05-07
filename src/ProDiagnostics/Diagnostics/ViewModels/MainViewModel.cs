@@ -295,14 +295,13 @@ namespace Avalonia.Diagnostics.ViewModels
 
         public void SelectControl(Control control)
         {
-            switch (Content)
+            _combinedTree.SelectControl(control);
+            _logicalTree.SelectControl(control);
+            _visualTree.SelectControl(control);
+
+            if (Content is ResourcesPageViewModel resources)
             {
-                case TreePageViewModel tree:
-                    tree.SelectControl(control);
-                    break;
-                case ResourcesPageViewModel resources:
-                    resources.SelectResourceHost(control);
-                    break;
+                resources.SelectResourceHost(control);
             }
         }
 

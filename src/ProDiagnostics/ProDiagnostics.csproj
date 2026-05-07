@@ -47,6 +47,10 @@
     <ProjectReference Include="..\\ProDataGrid.FormulaEngine.Excel\\ProDataGrid.FormulaEngine.Excel.csproj" />
   </ItemGroup>
 
+  <ItemGroup Label="InternalsVisibleTo">
+    <InternalsVisibleTo Include="ProDiagnostics.UnitTests, PublicKey=$(AvaloniaPublicKey)" />
+  </ItemGroup>
+
   <Import Project="../../build/SharedVersion.props" />
 
   <ItemGroup>
