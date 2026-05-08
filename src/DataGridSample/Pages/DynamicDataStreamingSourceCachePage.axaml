@@ -52,6 +52,10 @@
                      Increment="1"
                      Value="{Binding MaxPrice, Mode=TwoWay}" />
       <Button Content="Clear filters" Command="{Binding ClearFiltersCommand}" />
+      <Button Content="Load selection repro" Command="{Binding LoadSelectionReproCommand}" />
+      <Button Content="Select middle row" Command="{Binding SelectMiddleRowCommand}" />
+      <Button Content="Replace selected" Command="{Binding ReplaceSelectedAndMoveCommand}" />
+      <Button Content="Run drift repro" Command="{Binding RunSelectionDriftReproCommand}" />
       <CheckBox Content="Multi-sort with Shift"
                 IsChecked="{Binding MultiSortEnabled}" />
       <StackPanel Orientation="Horizontal" Spacing="6">
@@ -74,6 +78,7 @@
               RowHeightEstimator="{x:Null}"
               SelectionMode="Single"
               SelectionUnit="FullRow"
+              Selection="{Binding SelectionModel}"
               AutoGenerateColumns="False"
               CanUserReorderColumns="False"
               CanUserResizeColumns="False"
@@ -116,6 +121,9 @@
           <TextBlock Text="{Binding ItemsCount, StringFormat='Items: {0}'}" />
           <TextBlock Text="{Binding Updates, StringFormat='Updates: {0}'}" />
           <TextBlock Text="{Binding RunState, StringFormat='State: {0}'}" />
+          <TextBlock Text="{Binding ExpectedSelectedId, StringFormat='Expected selected Id: {0}'}" />
+          <TextBlock Text="{Binding SelectedId, StringFormat='Actual selected Id: {0}'}" />
+          <TextBlock Text="{Binding SelectionStatus}" TextWrapping="Wrap" />
         </StackPanel>
       </Border>
 
