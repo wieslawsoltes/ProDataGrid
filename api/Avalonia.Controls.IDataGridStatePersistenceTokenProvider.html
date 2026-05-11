@@ -119,21 +119,21 @@ Interface IDataGridStatePersistenceTokenProvider  <a class="header-action link-s
 
   <a id="Avalonia_Controls_IDataGridStatePersistenceTokenProvider_TryGetConditionalFormattingPredicateToken_" data-uid="Avalonia.Controls.IDataGridStatePersistenceTokenProvider.TryGetConditionalFormattingPredicateToken*"></a>
 
-  <h3 id="Avalonia_Controls_IDataGridStatePersistenceTokenProvider_TryGetConditionalFormattingPredicateToken_System_Func_Avalonia_Controls_DataGridConditionalFormatting_ConditionalFormattingContext_System_Boolean__System_String__" data-uid="Avalonia.Controls.IDataGridStatePersistenceTokenProvider.TryGetConditionalFormattingPredicateToken(System.Func{Avalonia.Controls.DataGridConditionalFormatting.ConditionalFormattingContext,System.Boolean},System.String@)">
-  TryGetConditionalFormattingPredicateToken(Func&lt;ConditionalFormattingContext, bool&gt;, out string)
-  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/StatePersistence/DataGridStatePersistenceModels.cs/#L134"><i class="bi bi-code-slash"></i></a>
+  <h3 id="Avalonia_Controls_IDataGridStatePersistenceTokenProvider_TryGetConditionalFormattingPredicateToken_Avalonia_Controls_DataGridConditionalFormatting_ConditionalFormattingDescriptor_System_String__" data-uid="Avalonia.Controls.IDataGridStatePersistenceTokenProvider.TryGetConditionalFormattingPredicateToken(Avalonia.Controls.DataGridConditionalFormatting.ConditionalFormattingDescriptor,System.String@)">
+  TryGetConditionalFormattingPredicateToken(ConditionalFormattingDescriptor, out string)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/StatePersistence/DataGridStatePersistenceModels.cs/#L136"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"></div>
   <div class="markdown level1 conceptual"></div>
 
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">bool TryGetConditionalFormattingPredicateToken(Func&lt;ConditionalFormattingContext, bool&gt; predicate, out string token)</code></pre>
+    <pre><code class="lang-csharp hljs">bool TryGetConditionalFormattingPredicateToken(ConditionalFormattingDescriptor descriptor, out string token)</code></pre>
   </div>
 
   <h4 class="section">Parameters</h4>
   <dl class="parameters">
-    <dt><code>predicate</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.func-2">Func</a>&lt;<a class="xref" href="Avalonia.Controls.DataGridConditionalFormatting.ConditionalFormattingContext.html">ConditionalFormattingContext</a>, <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a>&gt;</dt>
+    <dt><code>descriptor</code> <a class="xref" href="Avalonia.Controls.DataGridConditionalFormatting.ConditionalFormattingDescriptor.html">ConditionalFormattingDescriptor</a></dt>
     <dd></dd>
     <dt><code>token</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></dt>
     <dd></dd>
@@ -157,21 +157,21 @@ Interface IDataGridStatePersistenceTokenProvider  <a class="header-action link-s
 
   <a id="Avalonia_Controls_IDataGridStatePersistenceTokenProvider_TryGetConditionalFormattingThemeToken_" data-uid="Avalonia.Controls.IDataGridStatePersistenceTokenProvider.TryGetConditionalFormattingThemeToken*"></a>
 
-  <h3 id="Avalonia_Controls_IDataGridStatePersistenceTokenProvider_TryGetConditionalFormattingThemeToken_Avalonia_Styling_ControlTheme_System_String__" data-uid="Avalonia.Controls.IDataGridStatePersistenceTokenProvider.TryGetConditionalFormattingThemeToken(Avalonia.Styling.ControlTheme,System.String@)">
-  TryGetConditionalFormattingThemeToken(ControlTheme, out string)
-  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/StatePersistence/DataGridStatePersistenceModels.cs/#L136"><i class="bi bi-code-slash"></i></a>
+  <h3 id="Avalonia_Controls_IDataGridStatePersistenceTokenProvider_TryGetConditionalFormattingThemeToken_Avalonia_Controls_DataGridConditionalFormatting_ConditionalFormattingDescriptor_System_String__" data-uid="Avalonia.Controls.IDataGridStatePersistenceTokenProvider.TryGetConditionalFormattingThemeToken(Avalonia.Controls.DataGridConditionalFormatting.ConditionalFormattingDescriptor,System.String@)">
+  TryGetConditionalFormattingThemeToken(ConditionalFormattingDescriptor, out string)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/StatePersistence/DataGridStatePersistenceModels.cs/#L138"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"></div>
   <div class="markdown level1 conceptual"></div>
 
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">bool TryGetConditionalFormattingThemeToken(ControlTheme theme, out string token)</code></pre>
+    <pre><code class="lang-csharp hljs">bool TryGetConditionalFormattingThemeToken(ConditionalFormattingDescriptor descriptor, out string token)</code></pre>
   </div>
 
   <h4 class="section">Parameters</h4>
   <dl class="parameters">
-    <dt><code>theme</code> <span class="xref">ControlTheme</span></dt>
+    <dt><code>descriptor</code> <a class="xref" href="Avalonia.Controls.DataGridConditionalFormatting.ConditionalFormattingDescriptor.html">ConditionalFormattingDescriptor</a></dt>
     <dd></dd>
     <dt><code>token</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></dt>
     <dd></dd>
@@ -195,8 +195,8 @@ Interface IDataGridStatePersistenceTokenProvider  <a class="header-action link-s
 
   <a id="Avalonia_Controls_IDataGridStatePersistenceTokenProvider_TryGetFilteringPredicateToken_" data-uid="Avalonia.Controls.IDataGridStatePersistenceTokenProvider.TryGetFilteringPredicateToken*"></a>
 
-  <h3 id="Avalonia_Controls_IDataGridStatePersistenceTokenProvider_TryGetFilteringPredicateToken_System_Func_System_Object_System_Boolean__System_String__" data-uid="Avalonia.Controls.IDataGridStatePersistenceTokenProvider.TryGetFilteringPredicateToken(System.Func{System.Object,System.Boolean},System.String@)">
-  TryGetFilteringPredicateToken(Func&lt;object, bool&gt;, out string)
+  <h3 id="Avalonia_Controls_IDataGridStatePersistenceTokenProvider_TryGetFilteringPredicateToken_Avalonia_Controls_DataGridFiltering_FilteringDescriptor_System_String__" data-uid="Avalonia.Controls.IDataGridStatePersistenceTokenProvider.TryGetFilteringPredicateToken(Avalonia.Controls.DataGridFiltering.FilteringDescriptor,System.String@)">
+  TryGetFilteringPredicateToken(FilteringDescriptor, out string)
   <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/StatePersistence/DataGridStatePersistenceModels.cs/#L132"><i class="bi bi-code-slash"></i></a>
   </h3>
 
@@ -204,12 +204,52 @@ Interface IDataGridStatePersistenceTokenProvider  <a class="header-action link-s
   <div class="markdown level1 conceptual"></div>
 
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">bool TryGetFilteringPredicateToken(Func&lt;object, bool&gt; predicate, out string token)</code></pre>
+    <pre><code class="lang-csharp hljs">bool TryGetFilteringPredicateToken(FilteringDescriptor descriptor, out string token)</code></pre>
   </div>
 
   <h4 class="section">Parameters</h4>
   <dl class="parameters">
-    <dt><code>predicate</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.func-2">Func</a>&lt;<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object">object</a>, <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a>&gt;</dt>
+    <dt><code>descriptor</code> <a class="xref" href="Avalonia.Controls.DataGridFiltering.FilteringDescriptor.html">FilteringDescriptor</a></dt>
+    <dd></dd>
+    <dt><code>token</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></dt>
+    <dd></dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Avalonia_Controls_IDataGridStatePersistenceTokenProvider_TryGetFilteringValueToken_" data-uid="Avalonia.Controls.IDataGridStatePersistenceTokenProvider.TryGetFilteringValueToken*"></a>
+
+  <h3 id="Avalonia_Controls_IDataGridStatePersistenceTokenProvider_TryGetFilteringValueToken_Avalonia_Controls_DataGridFiltering_FilteringDescriptor_System_Object_System_String__" data-uid="Avalonia.Controls.IDataGridStatePersistenceTokenProvider.TryGetFilteringValueToken(Avalonia.Controls.DataGridFiltering.FilteringDescriptor,System.Object,System.String@)">
+  TryGetFilteringValueToken(FilteringDescriptor, object, out string)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/StatePersistence/DataGridStatePersistenceModels.cs/#L134"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">bool TryGetFilteringValueToken(FilteringDescriptor descriptor, object value, out string token)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>descriptor</code> <a class="xref" href="Avalonia.Controls.DataGridFiltering.FilteringDescriptor.html">FilteringDescriptor</a></dt>
+    <dd></dd>
+    <dt><code>value</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object">object</a></dt>
     <dd></dd>
     <dt><code>token</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></dt>
     <dd></dd>
@@ -235,7 +275,7 @@ Interface IDataGridStatePersistenceTokenProvider  <a class="header-action link-s
 
   <h3 id="Avalonia_Controls_IDataGridStatePersistenceTokenProvider_TryGetGroupingValueConverterToken_Avalonia_Data_Converters_IValueConverter_System_String__" data-uid="Avalonia.Controls.IDataGridStatePersistenceTokenProvider.TryGetGroupingValueConverterToken(Avalonia.Data.Converters.IValueConverter,System.String@)">
   TryGetGroupingValueConverterToken(IValueConverter, out string)
-  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/StatePersistence/DataGridStatePersistenceModels.cs/#L138"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/StatePersistence/DataGridStatePersistenceModels.cs/#L140"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"></div>
@@ -271,8 +311,8 @@ Interface IDataGridStatePersistenceTokenProvider  <a class="header-action link-s
 
   <a id="Avalonia_Controls_IDataGridStatePersistenceTokenProvider_TryGetSortingComparerToken_" data-uid="Avalonia.Controls.IDataGridStatePersistenceTokenProvider.TryGetSortingComparerToken*"></a>
 
-  <h3 id="Avalonia_Controls_IDataGridStatePersistenceTokenProvider_TryGetSortingComparerToken_System_Collections_IComparer_System_String__" data-uid="Avalonia.Controls.IDataGridStatePersistenceTokenProvider.TryGetSortingComparerToken(System.Collections.IComparer,System.String@)">
-  TryGetSortingComparerToken(IComparer, out string)
+  <h3 id="Avalonia_Controls_IDataGridStatePersistenceTokenProvider_TryGetSortingComparerToken_Avalonia_Controls_DataGridSorting_SortingDescriptor_System_String__" data-uid="Avalonia.Controls.IDataGridStatePersistenceTokenProvider.TryGetSortingComparerToken(Avalonia.Controls.DataGridSorting.SortingDescriptor,System.String@)">
+  TryGetSortingComparerToken(SortingDescriptor, out string)
   <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/StatePersistence/DataGridStatePersistenceModels.cs/#L130"><i class="bi bi-code-slash"></i></a>
   </h3>
 
@@ -280,12 +320,12 @@ Interface IDataGridStatePersistenceTokenProvider  <a class="header-action link-s
   <div class="markdown level1 conceptual"></div>
 
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">bool TryGetSortingComparerToken(IComparer comparer, out string token)</code></pre>
+    <pre><code class="lang-csharp hljs">bool TryGetSortingComparerToken(SortingDescriptor descriptor, out string token)</code></pre>
   </div>
 
   <h4 class="section">Parameters</h4>
   <dl class="parameters">
-    <dt><code>comparer</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.icomparer">IComparer</a></dt>
+    <dt><code>descriptor</code> <a class="xref" href="Avalonia.Controls.DataGridSorting.SortingDescriptor.html">SortingDescriptor</a></dt>
     <dd></dd>
     <dt><code>token</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></dt>
     <dd></dd>
