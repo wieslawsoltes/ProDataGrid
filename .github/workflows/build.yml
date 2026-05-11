@@ -58,6 +58,9 @@ jobs:
     name: Test (${{ matrix.os }})
     runs-on: ${{ matrix.os }}
     needs: build
+    permissions:
+      contents: read
+      checks: write
     strategy:
       fail-fast: false
       matrix:
@@ -91,7 +94,7 @@ jobs:
 
       - name: Publish test results
         uses: dorny/test-reporter@v1
-        if: always()
+        if: ${{ always() && (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository) }}
         with:
           name: Test Results (${{ matrix.os }})
           path: artifacts/test/**/*.trx
