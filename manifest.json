@@ -6234,6 +6234,20 @@
     },
     {
       "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Diagnostics.DevToolsPropertyEdit.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Diagnostics.DevToolsPropertyEdit.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Diagnostics.DevToolsPropertyEdit",
+      "Summary": "<p sourcefile=\"api/Avalonia.Diagnostics.DevToolsPropertyEdit.yml\" sourcestartlinenumber=\"1\">Describes a committed DevTools property editor change.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
       "source_relative_path": "api/Avalonia.Diagnostics.DevToolsSegmentView.yml",
       "output": {
         ".html": {
@@ -6315,6 +6329,20 @@
       "IsMRef": true,
       "Title": "Avalonia.Diagnostics.HotKeyConfiguration",
       "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Diagnostics.IDevToolsPropertyEditHandler.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Diagnostics.IDevToolsPropertyEditHandler.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Diagnostics.IDevToolsPropertyEditHandler",
+      "Summary": "<p sourcefile=\"api/Avalonia.Diagnostics.IDevToolsPropertyEditHandler.yml\" sourcestartlinenumber=\"1\">Receives committed property edits made by DevTools property editors.</p>\n"
     },
     {
       "type": "ManagedReference",
@@ -8948,11 +8976,11 @@
       "type": "Toc",
       "source_relative_path": "api/toc.yml",
       "output": {
-        ".html": {
-          "relative_path": "api/toc.html"
-        },
         ".json": {
           "relative_path": "api/toc.json"
+        },
+        ".html": {
+          "relative_path": "api/toc.html"
         }
       },
       "version": ""
@@ -9911,11 +9939,11 @@
       "type": "Toc",
       "source_relative_path": "articles/toc.yml",
       "output": {
-        ".html": {
-          "relative_path": "articles/toc.html"
-        },
         ".json": {
           "relative_path": "articles/toc.json"
+        },
+        ".html": {
+          "relative_path": "articles/toc.html"
         }
       },
       "version": ""
@@ -9954,11 +9982,11 @@
       "type": "Toc",
       "source_relative_path": "toc.yml",
       "output": {
-        ".html": {
-          "relative_path": "toc.html"
-        },
         ".json": {
           "relative_path": "toc.json"
+        },
+        ".html": {
+          "relative_path": "toc.html"
         }
       },
       "version": ""
