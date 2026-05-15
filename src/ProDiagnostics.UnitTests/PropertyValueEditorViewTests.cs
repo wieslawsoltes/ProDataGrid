@@ -288,6 +288,7 @@ public class PropertyValueEditorViewTests
                 window.GetVisualDescendants().OfType<Control>(),
                 static control => control.GetType().FullName == "Avalonia.Controls.DataGrid");
             AssertResourceGridConfiguration(resourcesGrid);
+            AssertGridHasColumn(resourcesGrid, "Preview");
 
             filterTextBox.Text = "Accent";
             Dispatcher.UIThread.RunJobs();
@@ -394,6 +395,7 @@ public class PropertyValueEditorViewTests
             var resourcesGrid = view.GetControl<Control>("resourcesGrid");
             AssertGridAllowsColumnResize(resourcesTree);
             AssertResourceGridConfiguration(resourcesGrid);
+            AssertGridHasColumn(resourcesGrid, "Preview");
 
             filterTextBox.Text = "Accent";
             Dispatcher.UIThread.RunJobs();
@@ -572,6 +574,26 @@ public class PropertyValueEditorViewTests
         var gridType = grid.GetType();
         Assert.Equal("Avalonia.Controls.DataGrid", gridType.FullName);
         Assert.Equal(true, gridType.GetProperty("CanUserResizeColumns")!.GetValue(grid));
+    }
+
+    private static void AssertGridHasColumn(Control grid, object header)
+    {
+        var gridType = grid.GetType();
+        var columnsProperty = gridType.GetProperty(
+            "Columns",
+            BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
+        Assert.NotNull(columnsProperty);
+
+        var columns = Assert.IsAssignableFrom<System.Collections.IEnumerable>(
+            columnsProperty!.GetValue(grid));
+
+        Assert.Contains(columns.Cast<object>(), column =>
+        {
+            var headerProperty = column.GetType().GetProperty(
+                "Header",
+                BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
+            return headerProperty is not null && Equals(headerProperty.GetValue(column), header);
+        });
     }
 
     private sealed class TestTarget

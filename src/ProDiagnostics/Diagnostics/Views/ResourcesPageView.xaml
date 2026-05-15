@@ -127,7 +127,14 @@
                                 IsReadOnly="True"
                                 Width="2*"
                                 x:DataType="vm:ResourceEntryViewModel"/>
-            <DataGridTemplateColumn Header="Value" Width="3*" SortMemberPath="ValuePreview">
+            <DataGridTextColumn Header="Value"
+                                Binding="{Binding ValuePreview}"
+                                IsReadOnly="True"
+                                Width="2*"
+                                x:DataType="vm:ResourceEntryViewModel"/>
+            <DataGridTemplateColumn Header="Preview"
+                                    Width="1.4*"
+                                    SortMemberPath="ValuePreview">
               <DataGridTemplateColumn.CellTemplate>
                 <DataTemplate x:DataType="vm:ResourceEntryViewModel">
                   <views:PropertyValueEditorView DataContext="{Binding ValueProperty}" />

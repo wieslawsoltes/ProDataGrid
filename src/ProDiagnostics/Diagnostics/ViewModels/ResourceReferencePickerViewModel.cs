@@ -167,10 +167,17 @@ namespace Avalonia.Diagnostics.ViewModels
                     var dynamicCandidate = group.FirstOrDefault(static candidate => candidate.Kind == DevToolsResourceReferenceKind.Dynamic);
                     var candidate = staticCandidate ?? dynamicCandidate!;
                     var descriptor = formatter.DescribeValue(candidate.Value);
+                    var valueProperty = new ResourceEntryPropertyViewModel(
+                        candidate.KeyText,
+                        candidate.ValueType,
+                        () => candidate.Value,
+                        setter: null,
+                        candidate.ValueType);
                     return new ResourceReferenceEntryViewModel(
                         candidate.Key,
                         candidate.KeyText,
                         descriptor,
+                        valueProperty,
                         candidate.ScopePath,
                         candidate.ThemeVariant,
                         staticCandidate,
@@ -209,6 +216,7 @@ namespace Avalonia.Diagnostics.ViewModels
             object key,
             string keyDisplay,
             ResourceValueDescriptor valueDescriptor,
+            ResourceEntryPropertyViewModel valueProperty,
             string scopePath,
             string? themeVariant,
             ResourceReferenceCandidate? staticCandidate,
@@ -218,6 +226,7 @@ namespace Avalonia.Diagnostics.ViewModels
             KeyDisplay = keyDisplay;
             ValueTypeName = valueDescriptor.TypeName;
             ValuePreview = valueDescriptor.Preview;
+            ValueProperty = valueProperty;
             ScopePath = scopePath;
             ThemeVariant = themeVariant;
             StaticCandidate = staticCandidate;
@@ -234,6 +243,8 @@ namespace Avalonia.Diagnostics.ViewModels
         public string ValueTypeName { get; }
 
         public string ValuePreview { get; }
+
+        public ResourceEntryPropertyViewModel ValueProperty { get; }
 
         public string ScopePath { get; }
 
