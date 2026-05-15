@@ -6248,6 +6248,20 @@
     },
     {
       "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Diagnostics.DevToolsResourceReferenceKind.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Diagnostics.DevToolsResourceReferenceKind.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Diagnostics.DevToolsResourceReferenceKind",
+      "Summary": "<p sourcefile=\"api/Avalonia.Diagnostics.DevToolsResourceReferenceKind.yml\" sourcestartlinenumber=\"1\">Describes whether a committed DevTools property edit used a XAML resource reference.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
       "source_relative_path": "api/Avalonia.Diagnostics.DevToolsSegmentView.yml",
       "output": {
         ".html": {
@@ -8976,11 +8990,11 @@
       "type": "Toc",
       "source_relative_path": "api/toc.yml",
       "output": {
-        ".json": {
-          "relative_path": "api/toc.json"
-        },
         ".html": {
           "relative_path": "api/toc.html"
+        },
+        ".json": {
+          "relative_path": "api/toc.json"
         }
       },
       "version": ""
@@ -9939,11 +9953,11 @@
       "type": "Toc",
       "source_relative_path": "articles/toc.yml",
       "output": {
-        ".json": {
-          "relative_path": "articles/toc.json"
-        },
         ".html": {
           "relative_path": "articles/toc.html"
+        },
+        ".json": {
+          "relative_path": "articles/toc.json"
         }
       },
       "version": ""
@@ -9982,11 +9996,11 @@
       "type": "Toc",
       "source_relative_path": "toc.yml",
       "output": {
-        ".json": {
-          "relative_path": "toc.json"
-        },
         ".html": {
           "relative_path": "toc.html"
+        },
+        ".json": {
+          "relative_path": "toc.json"
         }
       },
       "version": ""

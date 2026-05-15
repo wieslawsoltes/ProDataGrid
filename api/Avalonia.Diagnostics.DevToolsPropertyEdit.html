@@ -85,7 +85,7 @@
 
 
   <h1 id="Avalonia_Diagnostics_DevToolsPropertyEdit" data-uid="Avalonia.Diagnostics.DevToolsPropertyEdit" class="text-break">
-Class DevToolsPropertyEdit  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/ProDiagnostics/Diagnostics/DevToolsPropertyEdit.cs/#L20"><i class="bi bi-code-slash"></i></a>
+Class DevToolsPropertyEdit  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/ProDiagnostics/Diagnostics/DevToolsPropertyEdit.cs/#L41"><i class="bi bi-code-slash"></i></a>
   </h1>
 
   <div class="facts text-secondary">
@@ -148,9 +148,9 @@ Class DevToolsPropertyEdit  <a class="header-action link-secondary" title="View 
 
   <a id="Avalonia_Diagnostics_DevToolsPropertyEdit__ctor_" data-uid="Avalonia.Diagnostics.DevToolsPropertyEdit.#ctor*"></a>
 
-  <h3 id="Avalonia_Diagnostics_DevToolsPropertyEdit__ctor_Avalonia_AvaloniaObject_System_Object_System_String_System_String_System_Type_System_Type_System_Object_System_Object_System_String_System_String_System_Boolean_System_Boolean_" data-uid="Avalonia.Diagnostics.DevToolsPropertyEdit.#ctor(Avalonia.AvaloniaObject,System.Object,System.String,System.String,System.Type,System.Type,System.Object,System.Object,System.String,System.String,System.Boolean,System.Boolean)">
-  DevToolsPropertyEdit(AvaloniaObject, object, string, string, Type, Type?, object?, object?, string?, string?, bool, bool)
-  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/ProDiagnostics/Diagnostics/DevToolsPropertyEdit.cs/#L37"><i class="bi bi-code-slash"></i></a>
+  <h3 id="Avalonia_Diagnostics_DevToolsPropertyEdit__ctor_Avalonia_AvaloniaObject_System_Object_System_String_System_String_System_Type_System_Type_System_Object_System_Object_System_String_System_String_System_Boolean_System_Boolean_Avalonia_Diagnostics_DevToolsResourceReferenceKind_System_Object_System_String_" data-uid="Avalonia.Diagnostics.DevToolsPropertyEdit.#ctor(Avalonia.AvaloniaObject,System.Object,System.String,System.String,System.Type,System.Type,System.Object,System.Object,System.String,System.String,System.Boolean,System.Boolean,Avalonia.Diagnostics.DevToolsResourceReferenceKind,System.Object,System.String)">
+  DevToolsPropertyEdit(AvaloniaObject, object, string, string, Type, Type?, object?, object?, string?, string?, bool, bool, DevToolsResourceReferenceKind, object?, string?)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/ProDiagnostics/Diagnostics/DevToolsPropertyEdit.cs/#L61"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>Initializes a new instance of the <a class="xref" href="Avalonia.Diagnostics.DevToolsPropertyEdit.html">DevToolsPropertyEdit</a> class.</p>
@@ -158,7 +158,7 @@ Class DevToolsPropertyEdit  <a class="header-action link-secondary" title="View 
   <div class="markdown level1 conceptual"></div>
 
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public DevToolsPropertyEdit(AvaloniaObject inspectedObject, object target, string propertyName, string xamlPropertyName, Type propertyType, Type? declaringType, object? oldValue, object? newValue, string? oldValueText, string? newValueText, bool isAttached, bool isAvaloniaProperty)</code></pre>
+    <pre><code class="lang-csharp hljs">public DevToolsPropertyEdit(AvaloniaObject inspectedObject, object target, string propertyName, string xamlPropertyName, Type propertyType, Type? declaringType, object? oldValue, object? newValue, string? oldValueText, string? newValueText, bool isAttached, bool isAvaloniaProperty, DevToolsResourceReferenceKind resourceReferenceKind = DevToolsResourceReferenceKind.None, object? resourceKey = null, string? resourceKeyText = null)</code></pre>
   </div>
 
   <h4 class="section">Parameters</h4>
@@ -199,6 +199,15 @@ Class DevToolsPropertyEdit  <a class="header-action link-secondary" title="View 
     <dt><code>isAvaloniaProperty</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></dt>
     <dd><p>Whether the edited property is an Avalonia property.</p>
 </dd>
+    <dt><code>resourceReferenceKind</code> <a class="xref" href="Avalonia.Diagnostics.DevToolsResourceReferenceKind.html">DevToolsResourceReferenceKind</a></dt>
+    <dd><p>The resource reference kind used by the edit.</p>
+</dd>
+    <dt><code>resourceKey</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object">object</a></dt>
+    <dd><p>The resource key used by the edit, when available.</p>
+</dd>
+    <dt><code>resourceKeyText</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></dt>
+    <dd><p>The XAML resource key text used by the edit, when available.</p>
+</dd>
   </dl>
 
 
@@ -220,7 +229,7 @@ Class DevToolsPropertyEdit  <a class="header-action link-secondary" title="View 
 
   <h3 id="Avalonia_Diagnostics_DevToolsPropertyEdit_DeclaringType" data-uid="Avalonia.Diagnostics.DevToolsPropertyEdit.DeclaringType">
   DeclaringType
-  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/ProDiagnostics/Diagnostics/DevToolsPropertyEdit.cs/#L93"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/ProDiagnostics/Diagnostics/DevToolsPropertyEdit.cs/#L123"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>Gets the declaring type, when available.</p>
@@ -252,7 +261,7 @@ Class DevToolsPropertyEdit  <a class="header-action link-secondary" title="View 
 
   <h3 id="Avalonia_Diagnostics_DevToolsPropertyEdit_InspectedObject" data-uid="Avalonia.Diagnostics.DevToolsPropertyEdit.InspectedObject">
   InspectedObject
-  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/ProDiagnostics/Diagnostics/DevToolsPropertyEdit.cs/#L68"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/ProDiagnostics/Diagnostics/DevToolsPropertyEdit.cs/#L98"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>Gets the object selected in the diagnostics tree.</p>
@@ -284,7 +293,7 @@ Class DevToolsPropertyEdit  <a class="header-action link-secondary" title="View 
 
   <h3 id="Avalonia_Diagnostics_DevToolsPropertyEdit_IsAttached" data-uid="Avalonia.Diagnostics.DevToolsPropertyEdit.IsAttached">
   IsAttached
-  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/ProDiagnostics/Diagnostics/DevToolsPropertyEdit.cs/#L118"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/ProDiagnostics/Diagnostics/DevToolsPropertyEdit.cs/#L148"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>Gets a value indicating whether the edited property is an attached Avalonia property.</p>
@@ -316,7 +325,7 @@ Class DevToolsPropertyEdit  <a class="header-action link-secondary" title="View 
 
   <h3 id="Avalonia_Diagnostics_DevToolsPropertyEdit_IsAvaloniaProperty" data-uid="Avalonia.Diagnostics.DevToolsPropertyEdit.IsAvaloniaProperty">
   IsAvaloniaProperty
-  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/ProDiagnostics/Diagnostics/DevToolsPropertyEdit.cs/#L123"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/ProDiagnostics/Diagnostics/DevToolsPropertyEdit.cs/#L153"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>Gets a value indicating whether the edited property is an Avalonia property.</p>
@@ -348,7 +357,7 @@ Class DevToolsPropertyEdit  <a class="header-action link-secondary" title="View 
 
   <h3 id="Avalonia_Diagnostics_DevToolsPropertyEdit_NewValue" data-uid="Avalonia.Diagnostics.DevToolsPropertyEdit.NewValue">
   NewValue
-  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/ProDiagnostics/Diagnostics/DevToolsPropertyEdit.cs/#L103"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/ProDiagnostics/Diagnostics/DevToolsPropertyEdit.cs/#L133"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>Gets the value after the edit.</p>
@@ -380,7 +389,7 @@ Class DevToolsPropertyEdit  <a class="header-action link-secondary" title="View 
 
   <h3 id="Avalonia_Diagnostics_DevToolsPropertyEdit_NewValueText" data-uid="Avalonia.Diagnostics.DevToolsPropertyEdit.NewValueText">
   NewValueText
-  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/ProDiagnostics/Diagnostics/DevToolsPropertyEdit.cs/#L113"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/ProDiagnostics/Diagnostics/DevToolsPropertyEdit.cs/#L143"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>Gets the invariant text representation after the edit, when available.</p>
@@ -412,7 +421,7 @@ Class DevToolsPropertyEdit  <a class="header-action link-secondary" title="View 
 
   <h3 id="Avalonia_Diagnostics_DevToolsPropertyEdit_OldValue" data-uid="Avalonia.Diagnostics.DevToolsPropertyEdit.OldValue">
   OldValue
-  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/ProDiagnostics/Diagnostics/DevToolsPropertyEdit.cs/#L98"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/ProDiagnostics/Diagnostics/DevToolsPropertyEdit.cs/#L128"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>Gets the value before the edit.</p>
@@ -444,7 +453,7 @@ Class DevToolsPropertyEdit  <a class="header-action link-secondary" title="View 
 
   <h3 id="Avalonia_Diagnostics_DevToolsPropertyEdit_OldValueText" data-uid="Avalonia.Diagnostics.DevToolsPropertyEdit.OldValueText">
   OldValueText
-  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/ProDiagnostics/Diagnostics/DevToolsPropertyEdit.cs/#L108"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/ProDiagnostics/Diagnostics/DevToolsPropertyEdit.cs/#L138"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>Gets the invariant text representation before the edit, when available.</p>
@@ -476,7 +485,7 @@ Class DevToolsPropertyEdit  <a class="header-action link-secondary" title="View 
 
   <h3 id="Avalonia_Diagnostics_DevToolsPropertyEdit_PropertyName" data-uid="Avalonia.Diagnostics.DevToolsPropertyEdit.PropertyName">
   PropertyName
-  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/ProDiagnostics/Diagnostics/DevToolsPropertyEdit.cs/#L78"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/ProDiagnostics/Diagnostics/DevToolsPropertyEdit.cs/#L108"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>Gets the display property name.</p>
@@ -508,7 +517,7 @@ Class DevToolsPropertyEdit  <a class="header-action link-secondary" title="View 
 
   <h3 id="Avalonia_Diagnostics_DevToolsPropertyEdit_PropertyType" data-uid="Avalonia.Diagnostics.DevToolsPropertyEdit.PropertyType">
   PropertyType
-  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/ProDiagnostics/Diagnostics/DevToolsPropertyEdit.cs/#L88"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/ProDiagnostics/Diagnostics/DevToolsPropertyEdit.cs/#L118"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>Gets the declared property type.</p>
@@ -536,11 +545,107 @@ Class DevToolsPropertyEdit  <a class="header-action link-secondary" title="View 
 
 
 
+  <a id="Avalonia_Diagnostics_DevToolsPropertyEdit_ResourceKey_" data-uid="Avalonia.Diagnostics.DevToolsPropertyEdit.ResourceKey*"></a>
+
+  <h3 id="Avalonia_Diagnostics_DevToolsPropertyEdit_ResourceKey" data-uid="Avalonia.Diagnostics.DevToolsPropertyEdit.ResourceKey">
+  ResourceKey
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/ProDiagnostics/Diagnostics/DevToolsPropertyEdit.cs/#L163"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Gets the resource key used by the edit, when available.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public object? ResourceKey { get; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object">object</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="Avalonia_Diagnostics_DevToolsPropertyEdit_ResourceKeyText_" data-uid="Avalonia.Diagnostics.DevToolsPropertyEdit.ResourceKeyText*"></a>
+
+  <h3 id="Avalonia_Diagnostics_DevToolsPropertyEdit_ResourceKeyText" data-uid="Avalonia.Diagnostics.DevToolsPropertyEdit.ResourceKeyText">
+  ResourceKeyText
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/ProDiagnostics/Diagnostics/DevToolsPropertyEdit.cs/#L168"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Gets the XAML resource key text used by the edit, when available.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public string? ResourceKeyText { get; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="Avalonia_Diagnostics_DevToolsPropertyEdit_ResourceReferenceKind_" data-uid="Avalonia.Diagnostics.DevToolsPropertyEdit.ResourceReferenceKind*"></a>
+
+  <h3 id="Avalonia_Diagnostics_DevToolsPropertyEdit_ResourceReferenceKind" data-uid="Avalonia.Diagnostics.DevToolsPropertyEdit.ResourceReferenceKind">
+  ResourceReferenceKind
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/ProDiagnostics/Diagnostics/DevToolsPropertyEdit.cs/#L158"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Gets the resource reference kind used by the edit.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public DevToolsResourceReferenceKind ResourceReferenceKind { get; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="Avalonia.Diagnostics.DevToolsResourceReferenceKind.html">DevToolsResourceReferenceKind</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
   <a id="Avalonia_Diagnostics_DevToolsPropertyEdit_Target_" data-uid="Avalonia.Diagnostics.DevToolsPropertyEdit.Target*"></a>
 
   <h3 id="Avalonia_Diagnostics_DevToolsPropertyEdit_Target" data-uid="Avalonia.Diagnostics.DevToolsPropertyEdit.Target">
   Target
-  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/ProDiagnostics/Diagnostics/DevToolsPropertyEdit.cs/#L73"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/ProDiagnostics/Diagnostics/DevToolsPropertyEdit.cs/#L103"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>Gets the object that owns the edited property.</p>
@@ -572,7 +677,7 @@ Class DevToolsPropertyEdit  <a class="header-action link-secondary" title="View 
 
   <h3 id="Avalonia_Diagnostics_DevToolsPropertyEdit_XamlPropertyName" data-uid="Avalonia.Diagnostics.DevToolsPropertyEdit.XamlPropertyName">
   XamlPropertyName
-  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/ProDiagnostics/Diagnostics/DevToolsPropertyEdit.cs/#L83"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/ProDiagnostics/Diagnostics/DevToolsPropertyEdit.cs/#L113"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>Gets the property name suitable for XAML attribute mutation.</p>
@@ -604,7 +709,7 @@ Class DevToolsPropertyEdit  <a class="header-action link-secondary" title="View 
 </article>
 
         <div class="contribution d-print-none">
-          <a href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/ProDiagnostics/Diagnostics/DevToolsPropertyEdit.cs/#L20" class="edit-link">Edit this page</a>
+          <a href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/ProDiagnostics/Diagnostics/DevToolsPropertyEdit.cs/#L41" class="edit-link">Edit this page</a>
         </div>
 
 
