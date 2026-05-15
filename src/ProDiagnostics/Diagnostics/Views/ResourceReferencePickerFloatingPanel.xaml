@@ -1,0 +1,43 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:Avalonia.Diagnostics.ViewModels"
+             xmlns:views="using:Avalonia.Diagnostics.Views"
+             x:Class="Avalonia.Diagnostics.Views.ResourceReferencePickerFloatingPanel"
+             x:DataType="vm:ResourceReferencePickerViewModel"
+             Width="920"
+             Height="620"
+             MinWidth="720"
+             MinHeight="480">
+  <Border Background="{DynamicResource ThemeBackgroundBrush}"
+          BorderBrush="{DynamicResource ThemeControlMidBrush}"
+          BorderThickness="1"
+          ClipToBounds="True"
+          BoxShadow="0 8 28 #66000000">
+    <Grid RowDefinitions="32,*">
+      <Border Name="PART_TitleBar"
+              Background="{DynamicResource ThemeControlLowBrush}"
+              BorderBrush="{DynamicResource ThemeControlMidBrush}"
+              BorderThickness="0,0,0,1"
+              PointerPressed="OnTitleBarPointerPressed"
+              PointerMoved="OnTitleBarPointerMoved"
+              PointerReleased="OnTitleBarPointerReleased">
+        <Grid ColumnDefinitions="*,Auto">
+          <TextBlock Text="{Binding Title}"
+                     VerticalAlignment="Center"
+                     Margin="10,0,8,0"
+                     FontWeight="SemiBold"
+                     TextTrimming="CharacterEllipsis"/>
+          <Button Grid.Column="1"
+                  Width="32"
+                  MinWidth="32"
+                  Padding="0"
+                  Content="x"
+                  Click="OnClose"/>
+        </Grid>
+      </Border>
+
+      <views:ResourceReferencePickerView Grid.Row="1"
+                                         Name="PART_Picker"/>
+    </Grid>
+  </Border>
+</UserControl>

@@ -10,6 +10,7 @@ using Avalonia.Diagnostics.Controls;
 using Avalonia.Diagnostics.Services;
 using Avalonia.Diagnostics.Views;
 using Avalonia.Headless.XUnit;
+using Avalonia.Interactivity;
 using Avalonia.Layout;
 using Avalonia.Media;
 using Avalonia.Threading;
@@ -295,6 +296,66 @@ public class PropertyValueEditorViewTests
             Assert.Equal(1, picker.ResourceCount);
             Assert.Equal("AccentBrush", Assert.Single(
                 picker.ResourcesView.Cast<Avalonia.Diagnostics.ViewModels.ResourceReferenceEntryViewModel>()).KeyDisplay);
+        }
+        finally
+        {
+            window.Close();
+        }
+    }
+
+    [AvaloniaFact]
+    public void Resource_reference_picker_view_completes_selected_candidate()
+    {
+        var target = new Button { Background = Brushes.Blue };
+        using var mainViewModel = new Avalonia.Diagnostics.ViewModels.MainViewModel(target);
+        mainViewModel.SelectControl(target);
+        var tree = Assert.IsType<Avalonia.Diagnostics.ViewModels.TreePageViewModel>(
+            mainViewModel.GetContent(DevToolsViewKind.CombinedTree));
+        var property = Assert.IsType<Avalonia.Diagnostics.ViewModels.AvaloniaPropertyViewModel>(
+            tree.Details!.PropertiesView!.Cast<object>()
+                .Single(item => item is Avalonia.Diagnostics.ViewModels.AvaloniaPropertyViewModel property &&
+                                property.Property == TemplatedControl.BackgroundProperty));
+        var candidate = new ResourceReferenceCandidate(
+            "AccentBrush",
+            "AccentBrush",
+            Brushes.Red,
+            typeof(ISolidColorBrush),
+            "Application / Resources",
+            null,
+            DevToolsResourceReferenceKind.Static);
+        var picker = new Avalonia.Diagnostics.ViewModels.ResourceReferencePickerViewModel(
+            property,
+            new[] { candidate },
+            new ResourceNodeFormatter());
+        var view = new ResourceReferencePickerView
+        {
+            DataContext = picker
+        };
+        var window = new Window
+        {
+            Content = view,
+            Width = 800,
+            Height = 600
+        };
+
+        try
+        {
+            window.Show();
+            Dispatcher.UIThread.RunJobs();
+
+            picker.SelectedResource = Assert.Single(
+                picker.ResourcesView.Cast<Avalonia.Diagnostics.ViewModels.ResourceReferenceEntryViewModel>());
+            ResourceReferenceCandidate? completedCandidate = null;
+            view.Completed += (_, completed) => completedCandidate = completed;
+
+            var staticButton = view.GetVisualDescendants()
+                .OfType<Button>()
+                .Single(button => Equals(button.Content, "StaticResource"));
+            staticButton.RaiseEvent(new RoutedEventArgs(Button.ClickEvent));
+            Dispatcher.UIThread.RunJobs();
+
+            Assert.Same(candidate, completedCandidate);
+            Assert.Same(candidate, view.SelectedCandidate);
         }
         finally
         {

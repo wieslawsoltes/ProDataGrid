@@ -124,20 +124,9 @@ namespace Avalonia.Diagnostics.Services
             IReadOnlyList<ResourceReferenceCandidate> candidates)
         {
             var formatter = new ResourceNodeFormatter();
-            var picker = new ResourceReferencePickerWindow
-            {
-                DataContext = new ResourceReferencePickerViewModel(viewModel, candidates, formatter)
-            };
-
-            if (TopLevel.GetTopLevel(ownerControl) is Window owner)
-            {
-                return await picker.ShowDialog<ResourceReferenceCandidate?>(owner);
-            }
-
-            var completion = new TaskCompletionSource<ResourceReferenceCandidate?>();
-            picker.Closed += (_, _) => completion.TrySetResult(picker.SelectedCandidate);
-            picker.Show();
-            return await completion.Task;
+            return await ResourceReferencePickerHost.ShowAsync(
+                ownerControl,
+                new ResourceReferencePickerViewModel(viewModel, candidates, formatter));
         }
 
         private static void DetachFromResourceReferenceHost(Control editor)

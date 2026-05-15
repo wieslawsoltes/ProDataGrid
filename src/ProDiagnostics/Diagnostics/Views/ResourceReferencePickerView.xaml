@@ -1,0 +1,168 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:filtering="using:Avalonia.Controls.DataGridFiltering"
+             xmlns:vm="using:Avalonia.Diagnostics.ViewModels"
+             x:Class="Avalonia.Diagnostics.Views.ResourceReferencePickerView"
+             x:DataType="vm:ResourceReferencePickerViewModel">
+  <UserControl.Styles>
+    <SimpleTheme />
+    <StyleInclude Source="/Themes/Simple.v2.xaml" />
+    <StyleInclude Source="avares://Avalonia.Diagnostics/Diagnostics/Controls/FilterTextBox.axaml" />
+  </UserControl.Styles>
+
+  <Grid RowDefinitions="Auto,*,Auto">
+    <Border Padding="12,10"
+            BorderBrush="{DynamicResource ThemeControlMidBrush}"
+            BorderThickness="0,0,0,1">
+      <Grid ColumnDefinitions="*,Auto" RowDefinitions="Auto,Auto">
+        <TextBlock Text="{Binding TargetProperty}"
+                   FontSize="16"
+                   FontWeight="SemiBold"/>
+        <TextBlock Grid.Column="1"
+                   Text="{Binding ResourceCount, StringFormat=Matches: {0}}"
+                   Foreground="Gray"
+                   VerticalAlignment="Center"/>
+        <TextBlock Grid.Row="1"
+                   Grid.ColumnSpan="2"
+                   Text="{Binding TargetType, StringFormat=Compatible with {0}}"
+                   Foreground="Gray"/>
+      </Grid>
+    </Border>
+
+    <Grid Grid.Row="1"
+          ColumnDefinitions="300,4,*">
+      <Grid RowDefinitions="Auto,*">
+        <TextBlock Text="Scopes"
+                   FontWeight="SemiBold"
+                   Margin="10,8,10,4"/>
+        <TreeView Grid.Row="1"
+                  ItemsSource="{Binding Scopes}"
+                  SelectedItem="{Binding SelectedScope, Mode=TwoWay}"
+                  Margin="4,0,0,4">
+          <TreeView.DataTemplates>
+            <TreeDataTemplate DataType="vm:ResourceReferenceScopeViewModel"
+                              ItemsSource="{Binding Children}">
+              <Grid ColumnDefinitions="*,Auto">
+                <TextBlock Text="{Binding Name}"
+                           TextTrimming="CharacterEllipsis"/>
+                <TextBlock Grid.Column="1"
+                           Text="{Binding ResourceCount, StringFormat=({0})}"
+                           Foreground="Gray"
+                           Margin="8,0,0,0"/>
+              </Grid>
+            </TreeDataTemplate>
+          </TreeView.DataTemplates>
+          <TreeView.Styles>
+            <Style Selector="TreeViewItem" x:DataType="vm:ResourceReferenceScopeViewModel">
+              <Setter Property="IsExpanded" Value="{Binding IsExpanded, Mode=TwoWay}" />
+            </Style>
+          </TreeView.Styles>
+        </TreeView>
+      </Grid>
+
+      <GridSplitter Grid.Column="1"
+                    Background="{DynamicResource ThemeControlMidBrush}"
+                    Width="1"/>
+
+      <Grid Grid.Column="2"
+            RowDefinitions="Auto,Auto,*">
+        <Grid ColumnDefinitions="*,Auto"
+              Margin="10,8,10,4">
+          <TextBlock Text="Resources"
+                     FontWeight="SemiBold"
+                     VerticalAlignment="Center"/>
+          <TextBlock Grid.Column="1"
+                     Text="{Binding ResourceCount, StringFormat={}{0} shown}"
+                     Foreground="Gray"
+                     VerticalAlignment="Center"/>
+        </Grid>
+
+        <FilterTextBox Grid.Row="1"
+                       Margin="10,0,10,6"
+                       Text="{Binding ResourcesFilter.FilterString, Mode=TwoWay}"
+                       PlaceholderText="Search resources"
+                       UseCaseSensitiveFilter="{Binding ResourcesFilter.UseCaseSensitiveFilter, Mode=TwoWay}"
+                       UseWholeWordFilter="{Binding ResourcesFilter.UseWholeWordFilter, Mode=TwoWay}"
+                       UseRegexFilter="{Binding ResourcesFilter.UseRegexFilter, Mode=TwoWay}"/>
+
+        <Grid Grid.Row="2">
+          <DataGrid ItemsSource="{Binding ResourcesView}"
+                    SelectedItem="{Binding SelectedResource, Mode=TwoWay}"
+                    AutoGenerateColumns="False"
+                    HeadersVisibility="Column"
+                    BorderThickness="0"
+                    SelectionMode="Single"
+                    HorizontalScrollBarVisibility="Auto"
+                    CanUserResizeColumns="True"
+                    CanUserReorderColumns="False"
+                    CanUserSortColumns="True"
+                    OwnsSortDescriptions="False"
+                    DoubleTapped="OnResourceDoubleTapped">
+            <DataGrid.FilteringModel>
+              <filtering:FilteringModel OwnsViewFilter="False" />
+            </DataGrid.FilteringModel>
+            <DataGrid.Columns>
+              <DataGridTextColumn Header="Key"
+                                  Binding="{Binding KeyDisplay}"
+                                  IsReadOnly="True"
+                                  Width="2*"
+                                  x:DataType="vm:ResourceReferenceEntryViewModel"/>
+              <DataGridTextColumn Header="Value"
+                                  Binding="{Binding ValuePreview}"
+                                  IsReadOnly="True"
+                                  Width="2*"
+                                  x:DataType="vm:ResourceReferenceEntryViewModel"/>
+              <DataGridTextColumn Header="Type"
+                                  Binding="{Binding ValueTypeName}"
+                                  IsReadOnly="True"
+                                  Width="1.5*"
+                                  x:DataType="vm:ResourceReferenceEntryViewModel"/>
+              <DataGridTextColumn Header="Reference"
+                                  Binding="{Binding ReferenceKinds}"
+                                  IsReadOnly="True"
+                                  Width="2*"
+                                  x:DataType="vm:ResourceReferenceEntryViewModel"/>
+              <DataGridTextColumn Header="Scope"
+                                  Binding="{Binding ScopePath}"
+                                  IsReadOnly="True"
+                                  Width="3*"
+                                  x:DataType="vm:ResourceReferenceEntryViewModel"/>
+              <DataGridTextColumn Header="Theme"
+                                  Binding="{Binding ThemeVariant}"
+                                  IsReadOnly="True"
+                                  Width="1.2*"
+                                  x:DataType="vm:ResourceReferenceEntryViewModel"/>
+            </DataGrid.Columns>
+          </DataGrid>
+
+          <TextBlock Text="No compatible resources found."
+                     HorizontalAlignment="Center"
+                     VerticalAlignment="Center"
+                     Foreground="Gray"
+                     IsVisible="{Binding ShowNoResourcesMessage}"/>
+        </Grid>
+      </Grid>
+    </Grid>
+
+    <Border Grid.Row="2"
+            Padding="10"
+            BorderBrush="{DynamicResource ThemeControlMidBrush}"
+            BorderThickness="0,1,0,0">
+      <StackPanel Orientation="Horizontal"
+                  HorizontalAlignment="Right"
+                  Spacing="8">
+        <Button Content="StaticResource"
+                MinWidth="116"
+                IsEnabled="{Binding CanUseStatic}"
+                Click="OnUseStaticResource"/>
+        <Button Content="DynamicResource"
+                MinWidth="128"
+                IsEnabled="{Binding CanUseDynamic}"
+                Click="OnUseDynamicResource"/>
+        <Button Content="Cancel"
+                MinWidth="86"
+                Click="OnCancel"/>
+      </StackPanel>
+    </Border>
+  </Grid>
+</UserControl>
