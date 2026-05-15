@@ -33,6 +33,7 @@ public class PublicApiSurfaceTests
             typeof(DevToolsOptions),
             typeof(IDevToolsPropertyEditHandler),
             typeof(DevToolsPropertyEdit),
+            typeof(DevToolsResourceReferenceKind),
             typeof(IScreenshotHandler),
             typeof(BaseRenderToStreamHandler),
             typeof(FilePickerHandler)

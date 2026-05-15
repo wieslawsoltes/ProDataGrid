@@ -4,8 +4,11 @@ using System.Linq;
 using System.Reflection;
 using Avalonia;
 using Avalonia.Controls;
+using Avalonia.Controls.Primitives;
+using Avalonia.Diagnostics.Services;
 using Avalonia.Headless.XUnit;
 using Avalonia.Layout;
+using Avalonia.Media;
 using Xunit;
 
 namespace Avalonia.Diagnostics.UnitTests;
@@ -79,6 +82,53 @@ public class PropertyValueEditorViewTests
         Assert.Equal("120", edit.NewValueText);
         Assert.False(edit.IsAttached);
         Assert.True(edit.IsAvaloniaProperty);
+        Assert.Equal(DevToolsResourceReferenceKind.None, edit.ResourceReferenceKind);
+        Assert.Null(edit.ResourceKey);
+        Assert.Null(edit.ResourceKeyText);
+    }
+
+    [AvaloniaFact]
+    public void Property_editor_can_apply_dynamic_resource_reference()
+    {
+        var target = new Button
+        {
+            Background = Brushes.Blue
+        };
+        target.Resources["AccentBrush"] = Brushes.Red;
+
+        using var mainViewModel = new Avalonia.Diagnostics.ViewModels.MainViewModel(target);
+        var handler = new RecordingPropertyEditHandler();
+        mainViewModel.SetOptions(new DevToolsOptions { PropertyEditHandler = handler });
+        mainViewModel.SelectControl(target);
+        var tree = Assert.IsType<Avalonia.Diagnostics.ViewModels.TreePageViewModel>(
+            mainViewModel.GetContent(DevToolsViewKind.CombinedTree));
+        var property = Assert.IsType<Avalonia.Diagnostics.ViewModels.AvaloniaPropertyViewModel>(
+            tree.Details!.PropertiesView!.Cast<object>()
+                .Single(item => item is Avalonia.Diagnostics.ViewModels.AvaloniaPropertyViewModel property &&
+                                property.Property == TemplatedControl.BackgroundProperty));
+
+        var view = CreateView();
+        view.DataContext = property;
+        var host = Assert.IsType<DockPanel>(view.Content);
+        var picker = Assert.IsType<ComboBox>(host.Children[0]);
+        var dynamicResource = picker.Items
+            .Cast<ResourceReferenceCandidate>()
+            .Single(candidate => candidate.Kind == DevToolsResourceReferenceKind.Dynamic &&
+                                 candidate.KeyText == "AccentBrush");
+
+        picker.SelectedItem = dynamicResource;
+
+        Assert.NotNull(handler.Edit);
+        var edit = handler.Edit!;
+        Assert.Equal(DevToolsResourceReferenceKind.Dynamic, edit.ResourceReferenceKind);
+        Assert.Equal("AccentBrush", edit.ResourceKey);
+        Assert.Equal("AccentBrush", edit.ResourceKeyText);
+        Assert.Equal("{DynamicResource AccentBrush}", edit.NewValueText);
+        Assert.Equal(Brushes.Red, target.Background);
+
+        target.Resources["AccentBrush"] = Brushes.Green;
+
+        Assert.Equal(Brushes.Green, target.Background);
     }
 
     [AvaloniaFact]

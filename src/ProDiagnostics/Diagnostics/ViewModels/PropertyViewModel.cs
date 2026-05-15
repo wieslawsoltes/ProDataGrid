@@ -41,9 +41,23 @@ internal abstract class PropertyViewModel : ViewModelBase
 
     protected abstract bool IsAvaloniaProperty { get; }
 
-    protected void NotifyPropertyEdited(object? oldValue, object? newValue)
+    internal virtual bool SupportsDynamicResourceReferences => false;
+
+    internal virtual bool TrySetResourceReference(ResourceReferenceCandidate candidate, out string? error)
     {
-        if (Equals(oldValue, newValue))
+        error = "This property cannot be set from a resource reference.";
+        return false;
+    }
+
+    protected void NotifyPropertyEdited(
+        object? oldValue,
+        object? newValue,
+        DevToolsResourceReferenceKind resourceReferenceKind = DevToolsResourceReferenceKind.None,
+        object? resourceKey = null,
+        string? resourceKeyText = null)
+    {
+        if (resourceReferenceKind == DevToolsResourceReferenceKind.None &&
+            Equals(oldValue, newValue))
         {
             return;
         }
@@ -66,9 +80,14 @@ internal abstract class PropertyViewModel : ViewModelBase
                 oldValue,
                 newValue,
                 ConvertValueToText(oldValue),
-                ConvertValueToText(newValue),
+                resourceReferenceKind == DevToolsResourceReferenceKind.None || resourceKeyText is null
+                    ? ConvertValueToText(newValue)
+                    : ResourceReferenceTextFormatter.Format(resourceReferenceKind, resourceKeyText),
                 IsAttached == true,
-                IsAvaloniaProperty));
+                IsAvaloniaProperty,
+                resourceReferenceKind,
+                resourceKey,
+                resourceKeyText));
         }
         catch (Exception ex)
         {

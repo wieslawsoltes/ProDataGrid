@@ -2,6 +2,7 @@
 using System.ComponentModel;
 using System.Reflection;
 using Avalonia.Data;
+using Avalonia.Diagnostics.Services;
 
 namespace Avalonia.Diagnostics.ViewModels
 {
@@ -73,6 +74,37 @@ namespace Avalonia.Diagnostics.ViewModels
         public override bool? IsAttached => default;
 
         public override Type? DeclaringType { get; }
+
+        internal override bool TrySetResourceReference(ResourceReferenceCandidate candidate, out string? error)
+        {
+            error = null;
+
+            if (candidate.Kind == DevToolsResourceReferenceKind.Dynamic)
+            {
+                error = "DynamicResource can only be applied to Avalonia properties.";
+                return false;
+            }
+
+            if (!Property.CanWrite)
+            {
+                error = "The selected property is read-only.";
+                return false;
+            }
+
+            try
+            {
+                var oldValue = _value;
+                Property.SetValue(_target, candidate.Value);
+                Update();
+                NotifyPropertyEdited(oldValue, _value, candidate.Kind, candidate.Key, candidate.KeyText);
+                return true;
+            }
+            catch (Exception ex)
+            {
+                error = ex.GetBaseException().Message;
+                return false;
+            }
+        }
 
         // [MemberNotNull(nameof(_type))]
         public override void Update()

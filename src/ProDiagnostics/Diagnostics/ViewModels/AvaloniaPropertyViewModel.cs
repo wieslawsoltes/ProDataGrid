@@ -1,6 +1,8 @@
 using System;
 using System.ComponentModel;
 using Avalonia.Data;
+using Avalonia.Diagnostics.Services;
+using Avalonia.Markup.Xaml.MarkupExtensions;
 
 namespace Avalonia.Diagnostics.ViewModels
 {
@@ -40,6 +42,7 @@ namespace Avalonia.Diagnostics.ViewModels
             ? $"{Property.OwnerType.Name}.{Property.Name}"
             : Property.Name;
         protected override bool IsAvaloniaProperty => true;
+        internal override bool SupportsDynamicResourceReferences => !Property.IsReadOnly;
 
         public override object? Value
         {
@@ -72,6 +75,46 @@ namespace Avalonia.Diagnostics.ViewModels
         public override Type? DeclaringType { get; }
         public override Type PropertyType => _propertyType;
         public override bool IsReadonly => Property.IsReadOnly;
+
+        internal override bool TrySetResourceReference(ResourceReferenceCandidate candidate, out string? error)
+        {
+            error = null;
+
+            if (Property.IsReadOnly)
+            {
+                error = "The selected property is read-only.";
+                return false;
+            }
+
+            try
+            {
+                var oldValue = _value;
+
+                if (candidate.Kind == DevToolsResourceReferenceKind.Dynamic)
+                {
+                    _target.Bind(Property, new DynamicResourceExtension(candidate.Key));
+                }
+                else
+                {
+                    if (!Property.IsValidValue(candidate.Value))
+                    {
+                        error = $"Resource '{candidate.KeyText}' is not valid for {Property.Name}.";
+                        return false;
+                    }
+
+                    _target.SetValue(Property, candidate.Value);
+                }
+
+                Update();
+                NotifyPropertyEdited(oldValue, _value, candidate.Kind, candidate.Key, candidate.KeyText);
+                return true;
+            }
+            catch (Exception ex)
+            {
+                error = ex.GetBaseException().Message;
+                return false;
+            }
+        }
 
         // [MemberNotNull(nameof(_type), nameof(_group), nameof(_priority))]
         public override void Update()

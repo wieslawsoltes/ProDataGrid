@@ -31,6 +31,7 @@ namespace Avalonia.Diagnostics.Services
 
         private readonly CompositeDisposable _subscriptions = new();
         private readonly Dictionary<PropertyValueEditorKind, EditorEntry> _editorCache = new();
+        private readonly ResourceReferenceSuggestionService _resourceReferenceSuggestions = new();
 
         public Control GetOrCreateEditor(PropertyViewModel viewModel, Type propertyType)
         {
@@ -42,7 +43,64 @@ namespace Avalonia.Diagnostics.Services
             }
 
             entry.Update(viewModel, propertyType);
-            return entry.Control;
+            return CreateResourceReferenceHost(viewModel, entry.Control);
+        }
+
+        private Control CreateResourceReferenceHost(PropertyViewModel viewModel, Control editor)
+        {
+            var candidates = _resourceReferenceSuggestions.GetCandidates(viewModel);
+            if (candidates.Count == 0)
+            {
+                return editor;
+            }
+
+            var picker = new ComboBox
+            {
+                ItemsSource = candidates,
+                MinWidth = 72,
+                MaxWidth = 160,
+                PlaceholderText = "Resource",
+                IsEnabled = !viewModel.IsReadonly
+            };
+            ToolTip.SetTip(picker, "Set StaticResource or DynamicResource");
+
+            var isUpdating = false;
+            picker.SelectionChanged += (_, _) =>
+            {
+                if (isUpdating ||
+                    picker.SelectedItem is not ResourceReferenceCandidate candidate)
+                {
+                    return;
+                }
+
+                if (!viewModel.TrySetResourceReference(candidate, out var error))
+                {
+                    DataValidationErrors.SetError(picker, new InvalidOperationException(error ?? "Could not apply resource reference."));
+                    return;
+                }
+
+                DataValidationErrors.ClearErrors(picker);
+
+                try
+                {
+                    isUpdating = true;
+                    picker.SelectedItem = null;
+                }
+                finally
+                {
+                    isUpdating = false;
+                }
+            };
+
+            var host = new DockPanel
+            {
+                LastChildFill = true
+            };
+
+            DockPanel.SetDock(picker, Dock.Right);
+            host.Children.Add(picker);
+            host.Children.Add(editor);
+            return host;
         }
 
         private EditorEntry CreateEditorEntry(PropertyValueEditorKind kind)
