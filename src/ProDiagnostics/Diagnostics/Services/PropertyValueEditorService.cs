@@ -49,6 +49,8 @@ namespace Avalonia.Diagnostics.Services
         private Control CreateResourceReferenceHost(PropertyViewModel viewModel, Control editor)
         {
             var candidates = _resourceReferenceSuggestions.GetCandidates(viewModel);
+            DetachFromResourceReferenceHost(editor);
+
             if (candidates.Count == 0)
             {
                 return editor;
@@ -101,6 +103,14 @@ namespace Avalonia.Diagnostics.Services
             host.Children.Add(picker);
             host.Children.Add(editor);
             return host;
+        }
+
+        private static void DetachFromResourceReferenceHost(Control editor)
+        {
+            if (editor.Parent is DockPanel parent)
+            {
+                parent.Children.Remove(editor);
+            }
         }
 
         private EditorEntry CreateEditorEntry(PropertyValueEditorKind kind)

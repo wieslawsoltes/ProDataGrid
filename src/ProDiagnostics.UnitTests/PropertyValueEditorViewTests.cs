@@ -163,6 +163,40 @@ public class PropertyValueEditorViewTests
     }
 
     [AvaloniaFact]
+    public void Resource_wrapped_editor_can_be_reused_for_same_property_type()
+    {
+        var target = new Button
+        {
+            Background = Brushes.Blue,
+            BorderBrush = Brushes.Gray
+        };
+        target.Resources["AccentBrush"] = Brushes.Red;
+
+        using var mainViewModel = new Avalonia.Diagnostics.ViewModels.MainViewModel(target);
+        mainViewModel.SelectControl(target);
+        var tree = Assert.IsType<Avalonia.Diagnostics.ViewModels.TreePageViewModel>(
+            mainViewModel.GetContent(DevToolsViewKind.CombinedTree));
+        var properties = tree.Details!.PropertiesView!.Cast<object>().ToArray();
+        var backgroundProperty = Assert.IsType<Avalonia.Diagnostics.ViewModels.AvaloniaPropertyViewModel>(
+            properties.Single(item => item is Avalonia.Diagnostics.ViewModels.AvaloniaPropertyViewModel property &&
+                                      property.Property == TemplatedControl.BackgroundProperty));
+        var borderBrushProperty = Assert.IsType<Avalonia.Diagnostics.ViewModels.AvaloniaPropertyViewModel>(
+            properties.Single(item => item is Avalonia.Diagnostics.ViewModels.AvaloniaPropertyViewModel property &&
+                                      property.Property == TemplatedControl.BorderBrushProperty));
+        var view = CreateView();
+
+        view.DataContext = backgroundProperty;
+        var firstHost = Assert.IsType<DockPanel>(view.Content);
+        var editor = firstHost.Children[1];
+
+        view.DataContext = borderBrushProperty;
+
+        var secondHost = Assert.IsType<DockPanel>(view.Content);
+        Assert.Same(editor, secondHost.Children[1]);
+        Assert.DoesNotContain(editor, firstHost.Children);
+    }
+
+    [AvaloniaFact]
     public void Property_edit_handler_is_applied_to_existing_property_rows()
     {
         var target = new Button { Width = 24 };
