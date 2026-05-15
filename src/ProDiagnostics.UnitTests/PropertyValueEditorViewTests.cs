@@ -6,10 +6,14 @@ using System.Reflection;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.Primitives;
+using Avalonia.Diagnostics.Controls;
 using Avalonia.Diagnostics.Services;
+using Avalonia.Diagnostics.Views;
 using Avalonia.Headless.XUnit;
 using Avalonia.Layout;
 using Avalonia.Media;
+using Avalonia.Threading;
+using Avalonia.VisualTree;
 using Xunit;
 
 namespace Avalonia.Diagnostics.UnitTests;
@@ -234,6 +238,112 @@ public class PropertyValueEditorViewTests
     }
 
     [AvaloniaFact]
+    public void Resource_reference_picker_window_filter_updates_view_model()
+    {
+        var target = new Button { Background = Brushes.Blue };
+        using var mainViewModel = new Avalonia.Diagnostics.ViewModels.MainViewModel(target);
+        mainViewModel.SelectControl(target);
+        var tree = Assert.IsType<Avalonia.Diagnostics.ViewModels.TreePageViewModel>(
+            mainViewModel.GetContent(DevToolsViewKind.CombinedTree));
+        var property = Assert.IsType<Avalonia.Diagnostics.ViewModels.AvaloniaPropertyViewModel>(
+            tree.Details!.PropertiesView!.Cast<object>()
+                .Single(item => item is Avalonia.Diagnostics.ViewModels.AvaloniaPropertyViewModel property &&
+                                property.Property == TemplatedControl.BackgroundProperty));
+        var candidates = new[]
+        {
+            new ResourceReferenceCandidate(
+                "AccentBrush",
+                "AccentBrush",
+                Brushes.Red,
+                typeof(ISolidColorBrush),
+                "Application / Resources",
+                null,
+                DevToolsResourceReferenceKind.Static),
+            new ResourceReferenceCandidate(
+                "PanelBrush",
+                "PanelBrush",
+                Brushes.Gray,
+                typeof(ISolidColorBrush),
+                "Application / Styles",
+                null,
+                DevToolsResourceReferenceKind.Static)
+        };
+        var picker = new Avalonia.Diagnostics.ViewModels.ResourceReferencePickerViewModel(
+            property,
+            candidates,
+            new ResourceNodeFormatter());
+        var window = new ResourceReferencePickerWindow
+        {
+            DataContext = picker
+        };
+
+        try
+        {
+            window.Show();
+            Dispatcher.UIThread.RunJobs();
+
+            var filterTextBox = Assert.Single(window.GetVisualDescendants().OfType<FilterTextBox>());
+            var resourcesGrid = Assert.Single(
+                window.GetVisualDescendants().OfType<Control>(),
+                static control => control.GetType().FullName == "Avalonia.Controls.DataGrid");
+            AssertResourceGridConfiguration(resourcesGrid);
+
+            filterTextBox.Text = "Accent";
+            Dispatcher.UIThread.RunJobs();
+
+            Assert.Equal("Accent", picker.ResourcesFilter.FilterString);
+            Assert.Equal(1, picker.ResourceCount);
+            Assert.Equal("AccentBrush", Assert.Single(
+                picker.ResourcesView.Cast<Avalonia.Diagnostics.ViewModels.ResourceReferenceEntryViewModel>()).KeyDisplay);
+        }
+        finally
+        {
+            window.Close();
+        }
+    }
+
+    [AvaloniaFact]
+    public void Resources_page_filter_updates_view_model()
+    {
+        using var mainViewModel = new Avalonia.Diagnostics.ViewModels.MainViewModel(new Button());
+        var formatter = new ResourceNodeFormatter();
+        using var resources = new Avalonia.Diagnostics.ViewModels.ResourcesPageViewModel(
+            mainViewModel,
+            Array.Empty<Avalonia.Diagnostics.ViewModels.ResourceTreeNode>(),
+            new ResourceHierarchyModelFactory(),
+            formatter);
+        var view = new ResourcesPageView
+        {
+            DataContext = resources
+        };
+        var window = new Window
+        {
+            Content = view,
+            Width = 800,
+            Height = 600
+        };
+
+        try
+        {
+            window.Show();
+            Dispatcher.UIThread.RunJobs();
+
+            var filterTextBox = Assert.Single(view.GetVisualDescendants().OfType<FilterTextBox>());
+            var resourcesGrid = view.GetControl<Control>("resourcesGrid");
+            AssertResourceGridConfiguration(resourcesGrid);
+
+            filterTextBox.Text = "Accent";
+            Dispatcher.UIThread.RunJobs();
+
+            Assert.Equal("Accent", resources.ResourcesFilter.FilterString);
+        }
+        finally
+        {
+            window.Close();
+        }
+    }
+
+    [AvaloniaFact]
     public void Resource_wrapped_editor_can_be_reused_for_same_property_type()
     {
         var target = new Button
@@ -347,6 +457,18 @@ public class PropertyValueEditorViewTests
         }
 
         return null;
+    }
+
+    private static void AssertResourceGridConfiguration(Control grid)
+    {
+        var gridType = grid.GetType();
+        Assert.Equal("Avalonia.Controls.DataGrid", gridType.FullName);
+        Assert.Equal(true, gridType.GetProperty("CanUserSortColumns")!.GetValue(grid));
+        Assert.Equal(false, gridType.GetProperty("OwnsSortDescriptions")!.GetValue(grid));
+
+        var filteringModel = gridType.GetProperty("FilteringModel")!.GetValue(grid);
+        Assert.NotNull(filteringModel);
+        Assert.Equal(false, filteringModel!.GetType().GetProperty("OwnsViewFilter")!.GetValue(filteringModel));
     }
 
     private sealed class TestTarget

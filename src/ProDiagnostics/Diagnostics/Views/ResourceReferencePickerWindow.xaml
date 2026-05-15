@@ -1,5 +1,6 @@
 <Window xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:filtering="using:Avalonia.Controls.DataGridFiltering"
         xmlns:vm="using:Avalonia.Diagnostics.ViewModels"
         x:Class="Avalonia.Diagnostics.Views.ResourceReferencePickerWindow"
         x:DataType="vm:ResourceReferencePickerViewModel"
@@ -83,12 +84,11 @@
 
         <FilterTextBox Grid.Row="1"
                        Margin="10,0,10,6"
-                       DataContext="{Binding ResourcesFilter}"
-                       Text="{Binding FilterString}"
+                       Text="{Binding ResourcesFilter.FilterString, Mode=TwoWay}"
                        PlaceholderText="Search resources"
-                       UseCaseSensitiveFilter="{Binding UseCaseSensitiveFilter}"
-                       UseWholeWordFilter="{Binding UseWholeWordFilter}"
-                       UseRegexFilter="{Binding UseRegexFilter}"/>
+                       UseCaseSensitiveFilter="{Binding ResourcesFilter.UseCaseSensitiveFilter, Mode=TwoWay}"
+                       UseWholeWordFilter="{Binding ResourcesFilter.UseWholeWordFilter, Mode=TwoWay}"
+                       UseRegexFilter="{Binding ResourcesFilter.UseRegexFilter, Mode=TwoWay}"/>
 
         <Grid Grid.Row="2">
           <DataGrid ItemsSource="{Binding ResourcesView}"
@@ -100,8 +100,12 @@
                     HorizontalScrollBarVisibility="Auto"
                     CanUserResizeColumns="True"
                     CanUserReorderColumns="False"
-                    CanUserSortColumns="False"
+                    CanUserSortColumns="True"
+                    OwnsSortDescriptions="False"
                     DoubleTapped="OnResourceDoubleTapped">
+            <DataGrid.FilteringModel>
+              <filtering:FilteringModel OwnsViewFilter="False" />
+            </DataGrid.FilteringModel>
             <DataGrid.Columns>
               <DataGridTextColumn Header="Key"
                                   Binding="{Binding KeyDisplay}"

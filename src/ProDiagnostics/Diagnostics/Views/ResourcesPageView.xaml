@@ -1,5 +1,6 @@
 <UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:filtering="using:Avalonia.Controls.DataGridFiltering"
              xmlns:vm="using:Avalonia.Diagnostics.ViewModels"
              xmlns:views="using:Avalonia.Diagnostics.Views"
              x:Class="Avalonia.Diagnostics.Views.ResourcesPageView"
@@ -98,15 +99,15 @@
 
       <FilterTextBox Grid.Row="3"
                      Margin="8,0,8,4"
-                     DataContext="{Binding ResourcesFilter}"
-                     Text="{Binding FilterString}"
+                     Text="{Binding ResourcesFilter.FilterString, Mode=TwoWay}"
                      PlaceholderText="Search resources"
-                     UseCaseSensitiveFilter="{Binding UseCaseSensitiveFilter}"
-                     UseWholeWordFilter="{Binding UseWholeWordFilter}"
-                     UseRegexFilter="{Binding UseRegexFilter}"/>
+                     UseCaseSensitiveFilter="{Binding ResourcesFilter.UseCaseSensitiveFilter, Mode=TwoWay}"
+                     UseWholeWordFilter="{Binding ResourcesFilter.UseWholeWordFilter, Mode=TwoWay}"
+                     UseRegexFilter="{Binding ResourcesFilter.UseRegexFilter, Mode=TwoWay}"/>
 
       <Grid Grid.Row="4">
-        <DataGrid ItemsSource="{Binding ResourcesView}"
+        <DataGrid Name="resourcesGrid"
+                  ItemsSource="{Binding ResourcesView}"
                   SelectedItem="{Binding SelectedResource, Mode=TwoWay}"
                   AutoGenerateColumns="False"
                   HeadersVisibility="Column"
@@ -115,14 +116,18 @@
                   HorizontalScrollBarVisibility="Auto"
                   CanUserResizeColumns="True"
                   CanUserReorderColumns="False"
-                  CanUserSortColumns="False">
+                  CanUserSortColumns="True"
+                  OwnsSortDescriptions="False">
+          <DataGrid.FilteringModel>
+            <filtering:FilteringModel OwnsViewFilter="False" />
+          </DataGrid.FilteringModel>
           <DataGrid.Columns>
             <DataGridTextColumn Header="Key"
                                 Binding="{Binding KeyDisplay}"
                                 IsReadOnly="True"
                                 Width="2*"
                                 x:DataType="vm:ResourceEntryViewModel"/>
-            <DataGridTemplateColumn Header="Value" Width="3*">
+            <DataGridTemplateColumn Header="Value" Width="3*" SortMemberPath="ValuePreview">
               <DataGridTemplateColumn.CellTemplate>
                 <DataTemplate x:DataType="vm:ResourceEntryViewModel">
                   <views:PropertyValueEditorView DataContext="{Binding ValueProperty}" />
