@@ -144,6 +144,8 @@ namespace Avalonia.Diagnostics
             s_open.Remove((IDevToolsTopLevelGroup)window.Tag!);
         }
 
+        internal static int OpenWindowCount => s_open.Count;
+
         internal static bool SharesTopLevel(IDevToolsTopLevelGroup left, IDevToolsTopLevelGroup right)
         {
             foreach (var leftItem in left.Items)

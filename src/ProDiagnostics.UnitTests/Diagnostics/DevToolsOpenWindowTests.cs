@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Reflection;
 using Avalonia.Controls;
 using Avalonia.Headless.XUnit;
 using Xunit;
@@ -12,27 +11,25 @@ public class DevToolsOpenWindowTests
     [AvaloniaFact]
     public void Open_Focuses_Existing_Window_When_New_Group_Shares_Inspected_TopLevel()
     {
-        CloseOpenDevToolsWindows();
-
         var owner = new Window();
         var secondary = new Window();
         var options = new DevToolsOptions();
+        var initialOpenWindowCount = DevTools.OpenWindowCount;
         IDisposable? firstOpen = null;
 
         try
         {
             firstOpen = DevTools.Open(new SingleViewTopLevelGroup(owner), options);
 
-            Assert.Equal(1, GetOpenDevToolsWindowCount());
+            Assert.Equal(initialOpenWindowCount + 1, DevTools.OpenWindowCount);
 
             using var secondOpen = DevTools.Open(new TestTopLevelGroup(owner, secondary), options);
 
-            Assert.Equal(1, GetOpenDevToolsWindowCount());
+            Assert.Equal(initialOpenWindowCount + 1, DevTools.OpenWindowCount);
         }
         finally
         {
             firstOpen?.Dispose();
-            CloseOpenDevToolsWindows();
         }
     }
 
@@ -75,35 +72,5 @@ public class DevToolsOpenWindowTests
         }
 
         public IReadOnlyList<TopLevel> Items { get; }
-    }
-
-    private static int GetOpenDevToolsWindowCount()
-    {
-        return GetOpenDevToolsWindows().Count;
-    }
-
-    private static void CloseOpenDevToolsWindows()
-    {
-        var windows = GetOpenDevToolsWindows();
-
-        for (int i = 0; i < windows.Count; i++)
-        {
-            windows[i].Close();
-        }
-    }
-
-    private static IReadOnlyList<Window> GetOpenDevToolsWindows()
-    {
-        var field = typeof(DevTools).GetField("s_open", BindingFlags.Static | BindingFlags.NonPublic)
-            ?? throw new InvalidOperationException("Unable to locate DevTools open-window registry.");
-        var dictionary = (System.Collections.IDictionary)field.GetValue(null)!;
-        var windows = new List<Window>(dictionary.Count);
-
-        foreach (Window window in dictionary.Values)
-        {
-            windows.Add(window);
-        }
-
-        return windows;
     }
 }
