@@ -1,5 +1,6 @@
 using System.ComponentModel;
 using Avalonia.Controls.DataGridSorting;
+using Avalonia.Headless.XUnit;
 using DataGridSample.ViewModels;
 using Xunit;
 
@@ -7,7 +8,7 @@ namespace DataGridSample.Tests;
 
 public sealed class ColumnDefinitionsHierarchicalStreamingViewModelTests
 {
-    [Fact]
+    [AvaloniaFact]
     public void SiblingComparer_IsDisabled_ByDefault_And_After_Clearing_Sorts()
     {
         var viewModel = new ColumnDefinitionsHierarchicalStreamingViewModel();

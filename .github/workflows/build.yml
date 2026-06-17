@@ -49,8 +49,6 @@ jobs:
           echo "version=$VERSION" >> $GITHUB_OUTPUT
 
       - name: Restore
-        env:
-          DOTNET_NUGET_SIGNATURE_VERIFICATION: 'false'
         run: dotnet restore
 
       - name: Build
@@ -76,14 +74,7 @@ jobs:
         with:
           global-json-file: global.json
 
-      - name: Restore (Linux)
-        if: runner.os == 'Linux'
-        env:
-          DOTNET_NUGET_SIGNATURE_VERIFICATION: 'false'
-        run: dotnet restore
-
       - name: Restore
-        if: runner.os != 'Linux'
         run: dotnet restore
 
       - name: Build
@@ -124,8 +115,6 @@ jobs:
           global-json-file: global.json
 
       - name: Restore
-        env:
-          DOTNET_NUGET_SIGNATURE_VERIFICATION: 'false'
         run: dotnet restore
 
       - name: Build
