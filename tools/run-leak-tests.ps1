@@ -53,7 +53,7 @@ $startTime = Get-Date
 if ($HeartbeatSeconds -gt 0) {
     while (-not $process.WaitForExit($HeartbeatSeconds * 1000)) {
         $elapsed = (Get-Date) - $startTime
-        Write-Host ("Leak tests still running... elapsed {0:hh\\:mm\\:ss}" -f $elapsed)
+        Write-Host ("Leak tests still running... elapsed {0:hh\:mm\:ss}" -f $elapsed)
     }
 } else {
     $process.WaitForExit()
