@@ -1894,6 +1894,20 @@
     },
     {
       "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.DataGridEnterKeyNavigationMode.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.DataGridEnterKeyNavigationMode.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.DataGridEnterKeyNavigationMode",
+      "Summary": "<p sourcefile=\"api/Avalonia.Controls.DataGridEnterKeyNavigationMode.yml\" sourcestartlinenumber=\"1\">Specifies how the ENTER key moves the current cell while a cell is being edited.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
       "source_relative_path": "api/Avalonia.Controls.DataGridFastPathFeature.yml",
       "output": {
         ".html": {

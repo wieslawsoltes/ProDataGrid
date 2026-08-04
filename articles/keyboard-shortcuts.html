@@ -141,7 +141,7 @@
 <tr>
 <td>Enter</td>
 <td><code>Enter</code></td>
-<td>Commits edits and moves down one row. <code>Ctrl+Enter</code> commits without moving.</td>
+<td>Commits edits and moves according to <code>EnterKeyNavigationMode</code>. <code>Ctrl+Enter</code> commits without moving.</td>
 </tr>
 <tr>
 <td>CancelEdit</td>
@@ -191,6 +191,23 @@
     ExpandAll = new KeyGesture(Key.E)
 };
 </code></pre>
+<h2 id="continuous-editing">Continuous Editing</h2>
+<p><code>Tab</code> and <code>Shift+Tab</code> always commit the active cell and open the editor in the next or previous writable cell. When <code>CanUserAddRows=&quot;True&quot;</code> and the collection view supports <code>AddNew</code>, pressing <code>Tab</code> in the last writable cell commits the row, creates a new item, and opens its first writable cell.</p>
+<p>Use the Enter navigation properties when a data-entry workflow should also keep editing after Enter:</p>
+<pre><code class="lang-xml">&lt;DataGrid ItemsSource=&quot;{Binding Items}&quot;
+          CanUserAddRows=&quot;True&quot;
+          EnterKeyNavigationMode=&quot;NextCell&quot;
+          ContinueEditingOnEnter=&quot;True&quot; /&gt;
+</code></pre>
+<p><code>EnterKeyNavigationMode=&quot;Down&quot;</code> keeps the current column and moves to the row below. <code>NextCell</code> follows the same writable-cell order as Tab and wraps to the next row. <code>ContinueEditingOnEnter</code> defaults to <code>False</code>, preserving the standard commit-and-navigate behavior.</p>
+<p>Built-in compound editors are configured as a single tab stop:</p>
+<ul>
+<li><code>DataGridNumericColumn</code> selects its text when editing begins, and Tab leaves the spinner as one editor instead of visiting its internal buttons.</li>
+<li><code>DataGridComboBoxColumn</code> supports direct text entry with <code>IsEditable=&quot;True&quot;</code>; Tab commits the current selection or text and advances the grid.</li>
+<li><code>DataGridAutoCompleteColumn</code> is the filtering editor for suggestion lists. Configure <code>FilterMode</code>, <code>MinimumPrefixLength</code>, and <code>IsTextCompletionEnabled</code>, then use Tab to commit the completed text and advance.</li>
+<li><code>DataGridDatePickerColumn</code> focuses its editable text input, so dates can be typed directly without opening the calendar.</li>
+</ul>
+<p>If row creation is unavailable for the source, Tab from the last cell leaves the grid normally after the current edit is committed.</p>
 
 </article>
 

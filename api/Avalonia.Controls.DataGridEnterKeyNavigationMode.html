@@ -2,11 +2,11 @@
 <html>
   <head>
     <meta charset="utf-8">
-      <title>Enum ColumnsSynchronizationMode | ProDataGrid for Avalonia </title>
+      <title>Enum DataGridEnterKeyNavigationMode | ProDataGrid for Avalonia </title>
       <meta name="viewport" content="width=device-width, initial-scale=1.0">
-      <meta name="title" content="Enum ColumnsSynchronizationMode | ProDataGrid for Avalonia ">
+      <meta name="title" content="Enum DataGridEnterKeyNavigationMode | ProDataGrid for Avalonia ">
       
-      <meta name="description" content="Determines how a bound columns source synchronizes with the grid.">
+      <meta name="description" content="Specifies how the ENTER key moves the current cell while a cell is being edited.">
       <link rel="icon" href="../favicon.ico">
       <link rel="stylesheet" href="../public/docfx.min.css">
       <link rel="stylesheet" href="../public/main.css">
@@ -16,7 +16,7 @@
       
       
       
-      <meta name="docfx:docurl" content="https://github.com/wieslawsoltes/ProDataGrid/new/master/apiSpec/new?filename=Avalonia_Controls_ColumnsSynchronizationMode.md&amp;value=---%0Auid%3A%20Avalonia.Controls.ColumnsSynchronizationMode%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">
+      <meta name="docfx:docurl" content="https://github.com/wieslawsoltes/ProDataGrid/new/master/apiSpec/new?filename=Avalonia_Controls_DataGridEnterKeyNavigationMode.md&amp;value=---%0Auid%3A%20Avalonia.Controls.DataGridEnterKeyNavigationMode%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">
       <meta name="loc:inThisArticle" content="In this article">
       <meta name="loc:searchResultsCount" content="{count} results for &quot;{query}&quot;">
       <meta name="loc:searchNoResults" content="No results for &quot;{query}&quot;">
@@ -80,13 +80,13 @@
           <nav id="breadcrumb"></nav>
         </div>
 
-        <article data-uid="Avalonia.Controls.ColumnsSynchronizationMode">
+        <article data-uid="Avalonia.Controls.DataGridEnterKeyNavigationMode">
 
 
 
 
-  <h1 id="Avalonia_Controls_ColumnsSynchronizationMode" data-uid="Avalonia.Controls.ColumnsSynchronizationMode" class="text-break">
-Enum ColumnsSynchronizationMode  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/DataGridEnumerations.cs/#L195"><i class="bi bi-code-slash"></i></a>
+  <h1 id="Avalonia_Controls_DataGridEnterKeyNavigationMode" data-uid="Avalonia.Controls.DataGridEnterKeyNavigationMode" class="text-break">
+Enum DataGridEnterKeyNavigationMode  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/DataGridEnumerations.cs/#L90"><i class="bi bi-code-slash"></i></a>
   </h1>
 
   <div class="facts text-secondary">
@@ -94,12 +94,12 @@ Enum ColumnsSynchronizationMode  <a class="header-action link-secondary" title="
   <dl><dt>Assembly</dt><dd>Avalonia.Controls.DataGrid.dll</dd></dl>
   </div>
 
-  <div class="markdown summary"><p>Determines how a bound columns source synchronizes with the grid.</p>
+  <div class="markdown summary"><p>Specifies how the ENTER key moves the current cell while a cell is being edited.</p>
 </div>
   <div class="markdown conceptual"></div>
 
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public enum ColumnsSynchronizationMode</code></pre>
+    <pre><code class="lang-csharp hljs">public enum DataGridEnterKeyNavigationMode</code></pre>
   </div>
 
 
@@ -113,13 +113,13 @@ Enum ColumnsSynchronizationMode  <a class="header-action link-secondary" title="
   <h2 id="fields">Fields
 </h2>
   <dl class="parameters">
-    <dt id="Avalonia_Controls_ColumnsSynchronizationMode_OneWayToGrid"><code>OneWayToGrid = 0</code></dt>
+    <dt id="Avalonia_Controls_DataGridEnterKeyNavigationMode_Down"><code>Down = 0</code></dt>
   
-  <dd><p>Changes in the source flow to the grid; grid structural changes do not mutate the source.</p>
+  <dd><p>Move to the cell below in the current column.</p>
 </dd>
-    <dt id="Avalonia_Controls_ColumnsSynchronizationMode_TwoWay"><code>TwoWay = 1</code></dt>
+    <dt id="Avalonia_Controls_DataGridEnterKeyNavigationMode_NextCell"><code>NextCell = 1</code></dt>
   
-  <dd><p>Structural changes in the grid are mirrored back to the bound source when supported.</p>
+  <dd><p>Move to the next writable cell, wrapping to the first writable cell in the next row.</p>
 </dd>
   </dl>
 
@@ -128,7 +128,7 @@ Enum ColumnsSynchronizationMode  <a class="header-action link-secondary" title="
 </article>
 
         <div class="contribution d-print-none">
-          <a href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/DataGridEnumerations.cs/#L195" class="edit-link">Edit this page</a>
+          <a href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/DataGridEnumerations.cs/#L90" class="edit-link">Edit this page</a>
         </div>
 
 

@@ -4194,6 +4194,25 @@ references:
   commentId: F:Avalonia.Controls.DataGrid.ConditionalFormattingModelProperty
   fullName: Avalonia.Controls.DataGrid.ConditionalFormattingModelProperty
   nameWithType: DataGrid.ConditionalFormattingModelProperty
+- uid: Avalonia.Controls.DataGrid.ContinueEditingOnEnter
+  name: ContinueEditingOnEnter
+  href: api/Avalonia.Controls.DataGrid.html#Avalonia_Controls_DataGrid_ContinueEditingOnEnter
+  commentId: P:Avalonia.Controls.DataGrid.ContinueEditingOnEnter
+  fullName: Avalonia.Controls.DataGrid.ContinueEditingOnEnter
+  nameWithType: DataGrid.ContinueEditingOnEnter
+- uid: Avalonia.Controls.DataGrid.ContinueEditingOnEnter*
+  name: ContinueEditingOnEnter
+  href: api/Avalonia.Controls.DataGrid.html#Avalonia_Controls_DataGrid_ContinueEditingOnEnter_
+  commentId: Overload:Avalonia.Controls.DataGrid.ContinueEditingOnEnter
+  isSpec: "True"
+  fullName: Avalonia.Controls.DataGrid.ContinueEditingOnEnter
+  nameWithType: DataGrid.ContinueEditingOnEnter
+- uid: Avalonia.Controls.DataGrid.ContinueEditingOnEnterProperty
+  name: ContinueEditingOnEnterProperty
+  href: api/Avalonia.Controls.DataGrid.html#Avalonia_Controls_DataGrid_ContinueEditingOnEnterProperty
+  commentId: F:Avalonia.Controls.DataGrid.ContinueEditingOnEnterProperty
+  fullName: Avalonia.Controls.DataGrid.ContinueEditingOnEnterProperty
+  nameWithType: DataGrid.ContinueEditingOnEnterProperty
 - uid: Avalonia.Controls.DataGrid.CopySelectionToClipboard
   name: CopySelectionToClipboard()
   href: api/Avalonia.Controls.DataGrid.html#Avalonia_Controls_DataGrid_CopySelectionToClipboard
@@ -4588,6 +4607,25 @@ references:
   commentId: F:Avalonia.Controls.DataGrid.EditingInteractionModelProperty
   fullName: Avalonia.Controls.DataGrid.EditingInteractionModelProperty
   nameWithType: DataGrid.EditingInteractionModelProperty
+- uid: Avalonia.Controls.DataGrid.EnterKeyNavigationMode
+  name: EnterKeyNavigationMode
+  href: api/Avalonia.Controls.DataGrid.html#Avalonia_Controls_DataGrid_EnterKeyNavigationMode
+  commentId: P:Avalonia.Controls.DataGrid.EnterKeyNavigationMode
+  fullName: Avalonia.Controls.DataGrid.EnterKeyNavigationMode
+  nameWithType: DataGrid.EnterKeyNavigationMode
+- uid: Avalonia.Controls.DataGrid.EnterKeyNavigationMode*
+  name: EnterKeyNavigationMode
+  href: api/Avalonia.Controls.DataGrid.html#Avalonia_Controls_DataGrid_EnterKeyNavigationMode_
+  commentId: Overload:Avalonia.Controls.DataGrid.EnterKeyNavigationMode
+  isSpec: "True"
+  fullName: Avalonia.Controls.DataGrid.EnterKeyNavigationMode
+  nameWithType: DataGrid.EnterKeyNavigationMode
+- uid: Avalonia.Controls.DataGrid.EnterKeyNavigationModeProperty
+  name: EnterKeyNavigationModeProperty
+  href: api/Avalonia.Controls.DataGrid.html#Avalonia_Controls_DataGrid_EnterKeyNavigationModeProperty
+  commentId: F:Avalonia.Controls.DataGrid.EnterKeyNavigationModeProperty
+  fullName: Avalonia.Controls.DataGrid.EnterKeyNavigationModeProperty
+  nameWithType: DataGrid.EnterKeyNavigationModeProperty
 - uid: Avalonia.Controls.DataGrid.ExpandAllGroups
   name: ExpandAllGroups()
   href: api/Avalonia.Controls.DataGrid.html#Avalonia_Controls_DataGrid_ExpandAllGroups
@@ -19312,6 +19350,24 @@ references:
   commentId: F:Avalonia.Controls.DataGridEditingUnit.Row
   fullName: Avalonia.Controls.DataGridEditingUnit.Row
   nameWithType: DataGridEditingUnit.Row
+- uid: Avalonia.Controls.DataGridEnterKeyNavigationMode
+  name: DataGridEnterKeyNavigationMode
+  href: api/Avalonia.Controls.DataGridEnterKeyNavigationMode.html
+  commentId: T:Avalonia.Controls.DataGridEnterKeyNavigationMode
+  fullName: Avalonia.Controls.DataGridEnterKeyNavigationMode
+  nameWithType: DataGridEnterKeyNavigationMode
+- uid: Avalonia.Controls.DataGridEnterKeyNavigationMode.Down
+  name: Down
+  href: api/Avalonia.Controls.DataGridEnterKeyNavigationMode.html#Avalonia_Controls_DataGridEnterKeyNavigationMode_Down
+  commentId: F:Avalonia.Controls.DataGridEnterKeyNavigationMode.Down
+  fullName: Avalonia.Controls.DataGridEnterKeyNavigationMode.Down
+  nameWithType: DataGridEnterKeyNavigationMode.Down
+- uid: Avalonia.Controls.DataGridEnterKeyNavigationMode.NextCell
+  name: NextCell
+  href: api/Avalonia.Controls.DataGridEnterKeyNavigationMode.html#Avalonia_Controls_DataGridEnterKeyNavigationMode_NextCell
+  commentId: F:Avalonia.Controls.DataGridEnterKeyNavigationMode.NextCell
+  fullName: Avalonia.Controls.DataGridEnterKeyNavigationMode.NextCell
+  nameWithType: DataGridEnterKeyNavigationMode.NextCell
 - uid: Avalonia.Controls.DataGridFastPathFeature
   name: DataGridFastPathFeature
   href: api/Avalonia.Controls.DataGridFastPathFeature.html
