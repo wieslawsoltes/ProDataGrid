@@ -215,7 +215,7 @@
           HeadersVisibility=&quot;All&quot; /&gt;
 </code></pre>
 <h2 id="mvvm-column-definitions">MVVM Column Definitions</h2>
-<p><code>ColumnDefinitionsSource</code> lets you define columns in view-models without creating Avalonia controls. Bind an <code>IList&lt;DataGridColumnDefinition&gt;</code> and the grid materializes the corresponding built-in columns. Use <code>DataGridColumnDefinitionList</code> when you want <code>AddRange</code> and <code>SuspendNotifications()</code> for batch updates.</p>
+<p><code>ColumnDefinitionsSource</code> lets you define columns in view-models without creating Avalonia controls. Bind an <code>IList&lt;DataGridColumnDefinition&gt;</code> and the grid materializes the corresponding built-in columns. Unlike <code>DataGridColumn</code> controls, one definition list can be shared by multiple grids because each grid materializes its own column instances. Use <code>DataGridColumnDefinitionList</code> when you want <code>AddRange</code> and <code>SuspendNotifications()</code> for batch updates.</p>
 <p>For a full walkthrough, see <a href="column-definitions.html">Column Definitions</a> and <a href="column-definitions-aot.html">Column Definitions: AOT-Friendly Bindings</a>.</p>
 <ul>
 <li>Use <code>DataGridTextColumnDefinition</code>, <code>DataGridCheckBoxColumnDefinition</code>, and the other <code>*ColumnDefinition</code> types.</li>

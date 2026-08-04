@@ -126,6 +126,25 @@
     }
 };
 </code></pre>
+<h2 id="share-definitions-across-multiple-grids">Share definitions across multiple grids</h2>
+<p><code>DataGridColumn</code> objects are controls and can belong to only one <code>DataGrid</code>. Do not bind the same <code>Columns</code> collection to multiple grids. Bind the same definition collection to <code>ColumnDefinitionsSource</code> instead:</p>
+<pre><code class="lang-xml">&lt;UserControl xmlns=&quot;https://github.com/avaloniaui&quot;
+             xmlns:x=&quot;http://schemas.microsoft.com/winfx/2006/xaml&quot;
+             xmlns:vm=&quot;using:MyApp.ViewModels&quot;
+             x:DataType=&quot;vm:ComparisonViewModel&quot;&gt;
+  &lt;Grid ColumnDefinitions=&quot;*,*&quot;&gt;
+    &lt;DataGrid Grid.Column=&quot;0&quot;
+              ItemsSource=&quot;{CompiledBinding CurrentItems}&quot;
+              ColumnDefinitionsSource=&quot;{CompiledBinding ColumnDefinitions}&quot;
+              AutoGenerateColumns=&quot;False&quot; /&gt;
+    &lt;DataGrid Grid.Column=&quot;1&quot;
+              ItemsSource=&quot;{CompiledBinding ComparisonItems}&quot;
+              ColumnDefinitionsSource=&quot;{CompiledBinding ColumnDefinitions}&quot;
+              AutoGenerateColumns=&quot;False&quot; /&gt;
+  &lt;/Grid&gt;
+&lt;/UserControl&gt;
+</code></pre>
+<p>Each grid creates and owns a distinct <code>DataGridColumn</code> for every shared definition. Collection changes and <code>DataGridColumnDefinition</code> property changes are applied to every connected grid, while no column control instance is reused or reparented.</p>
 <h2 id="typed-builder">Typed builder</h2>
 <p>If you prefer a strongly typed builder, use <code>DataGridColumnDefinitionBuilder</code>:</p>
 <pre><code class="lang-csharp">var nameProperty = new ClrPropertyInfo(
