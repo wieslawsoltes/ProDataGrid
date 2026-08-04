@@ -305,6 +305,7 @@ var aotColumns = new ObservableCollection&lt;DataGridColumnDefinition&gt;
 </code></pre>
 <h2 id="datatable-binding">DataTable Binding</h2>
 <p>When binding to <code>DataTable.DefaultView</code>, ProDataGrid binds cells via <code>TypeDescriptor</code> so you do not need manual indexers.</p>
+<p>With <code>CanUserAddRows=&quot;True&quot;</code> and <code>EditTriggers=&quot;TextInput&quot;</code>, typing in a new-row placeholder cell starts editing in that same column and applies the initial text there. Existing auto-generated columns are preserved while the new <code>DataRowView</code> is materialized.</p>
 <h2 id="custom-columns">Custom Columns</h2>
 <p>Derive from a built-in column to customize element creation while still reusing the grid's theme resources:</p>
 <pre><code class="lang-csharp">using Avalonia.Controls;
