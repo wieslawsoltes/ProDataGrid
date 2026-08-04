@@ -2090,6 +2090,48 @@
     },
     {
       "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.DataGridFiltering.DataGridDistinctValueFilterContext.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.DataGridFiltering.DataGridDistinctValueFilterContext.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.DataGridFiltering.DataGridDistinctValueFilterContext",
+      "Summary": "<p sourcefile=\"api/Avalonia.Controls.DataGridFiltering.DataGridDistinctValueFilterContext.yml\" sourcestartlinenumber=\"1\">Maintains the values, counts, search state, and selection for an Excel-style column filter.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.DataGridFiltering.DataGridDistinctValueFilterFlyout.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.DataGridFiltering.DataGridDistinctValueFilterFlyout.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.DataGridFiltering.DataGridDistinctValueFilterFlyout",
+      "Summary": "<p sourcefile=\"api/Avalonia.Controls.DataGridFiltering.DataGridDistinctValueFilterFlyout.yml\" sourcestartlinenumber=\"1\">A column filter flyout that lists distinct values, row counts, and a substring search box.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.DataGridFiltering.DataGridDistinctValueFilterOption.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.DataGridFiltering.DataGridDistinctValueFilterOption.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.DataGridFiltering.DataGridDistinctValueFilterOption",
+      "Summary": "<p sourcefile=\"api/Avalonia.Controls.DataGridFiltering.DataGridDistinctValueFilterOption.yml\" sourcestartlinenumber=\"1\">Represents one distinct source value and its count.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
       "source_relative_path": "api/Avalonia.Controls.DataGridFiltering.DataGridFilteringAdapter.yml",
       "output": {
         ".html": {
@@ -2241,6 +2283,34 @@
       "IsMRef": true,
       "Title": "Avalonia.Controls.DataGridFiltering.IFilterDateContext",
       "Summary": "<p sourcefile=\"api/Avalonia.Controls.DataGridFiltering.IFilterDateContext.yml\" sourcestartlinenumber=\"1\">Minimal contract for date range filter contexts.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.DataGridFiltering.IFilterDistinctValueOption.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.DataGridFiltering.IFilterDistinctValueOption.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.DataGridFiltering.IFilterDistinctValueOption",
+      "Summary": "<p sourcefile=\"api/Avalonia.Controls.DataGridFiltering.IFilterDistinctValueOption.yml\" sourcestartlinenumber=\"1\">Represents one value in a distinct-value filter.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.DataGridFiltering.IFilterDistinctValuesContext.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.DataGridFiltering.IFilterDistinctValuesContext.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.DataGridFiltering.IFilterDistinctValuesContext",
+      "Summary": "<p sourcefile=\"api/Avalonia.Controls.DataGridFiltering.IFilterDistinctValuesContext.yml\" sourcestartlinenumber=\"1\">Contract consumed by the built-in distinct-value filter template.</p>\n"
     },
     {
       "type": "ManagedReference",
@@ -9215,6 +9285,16 @@
       "output": {
         ".html": {
           "relative_path": "articles/diagnostics-and-tooling.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "Conceptual",
+      "source_relative_path": "articles/distinct-value-column-filtering.md",
+      "output": {
+        ".html": {
+          "relative_path": "articles/distinct-value-column-filtering.html"
         }
       },
       "version": ""

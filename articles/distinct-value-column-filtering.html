@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+      <title>Distinct-Value Column Filtering | ProDataGrid for Avalonia </title>
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <meta name="title" content="Distinct-Value Column Filtering | ProDataGrid for Avalonia ">
+      
+      
+      <link rel="icon" href="../favicon.ico">
+      <link rel="stylesheet" href="../public/docfx.min.css">
+      <link rel="stylesheet" href="../public/main.css">
+      <meta name="docfx:navrel" content="../toc.html">
+      <meta name="docfx:tocrel" content="toc.html">
+      
+      
+      
+      
+      <meta name="docfx:docurl" content="https://github.com/wieslawsoltes/ProDataGrid/blob/master/docfx/articles/distinct-value-column-filtering.md/#L1">
+      <meta name="loc:inThisArticle" content="In this article">
+      <meta name="loc:searchResultsCount" content="{count} results for &quot;{query}&quot;">
+      <meta name="loc:searchNoResults" content="No results for &quot;{query}&quot;">
+      <meta name="loc:tocFilter" content="Filter by title">
+      <meta name="loc:nextArticle" content="Next">
+      <meta name="loc:prevArticle" content="Previous">
+      <meta name="loc:themeLight" content="Light">
+      <meta name="loc:themeDark" content="Dark">
+      <meta name="loc:themeAuto" content="Auto">
+      <meta name="loc:changeTheme" content="Change theme">
+      <meta name="loc:copy" content="Copy">
+      <meta name="loc:downloadPdf" content="Download PDF">
+
+      <script type="module" src="./../public/docfx.min.js"></script>
+
+      <script>
+        const theme = localStorage.getItem('theme') || 'auto'
+        document.documentElement.setAttribute('data-bs-theme', theme === 'auto' ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light') : theme)
+      </script>
+
+  </head>
+
+  <body class="tex2jax_ignore" data-layout="" data-yaml-mime="">
+    <header class="bg-body border-bottom">
+      <nav id="autocollapse" class="navbar navbar-expand-md" role="navigation">
+        <div class="container-xxl flex-nowrap">
+          <a class="navbar-brand" href="../index.html">
+            <img id="logo" class="svg" src="../images/logo.svg" alt="">
+            
+          </a>
+          <button class="btn btn-lg d-md-none border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navpanel" aria-controls="navpanel" aria-expanded="false" aria-label="Toggle navigation">
+            <i class="bi bi-three-dots"></i>
+          </button>
+          <div class="collapse navbar-collapse" id="navpanel">
+            <div id="navbar">
+            </div>
+          </div>
+        </div>
+      </nav>
+    </header>
+
+    <main class="container-xxl">
+      <div class="toc-offcanvas">
+        <div class="offcanvas-md offcanvas-start" tabindex="-1" id="tocOffcanvas" aria-labelledby="tocOffcanvasLabel">
+          <div class="offcanvas-header">
+            <h5 class="offcanvas-title" id="tocOffcanvasLabel">Table of Contents</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="offcanvas" data-bs-target="#tocOffcanvas" aria-label="Close"></button>
+          </div>
+          <div class="offcanvas-body">
+            <nav class="toc" id="toc"></nav>
+          </div>
+        </div>
+      </div>
+
+      <div class="content">
+        <div class="actionbar">
+          <button class="btn btn-lg border-0 d-md-none" type="button" data-bs-toggle="offcanvas" data-bs-target="#tocOffcanvas" aria-controls="tocOffcanvas" aria-expanded="false" aria-label="Show table of contents">
+            <i class="bi bi-list"></i>
+          </button>
+
+          <nav id="breadcrumb"></nav>
+        </div>
+
+        <article data-uid="">
+<h1 id="distinct-value-column-filtering">Distinct-Value Column Filtering</h1>
+
+<p><code>DataGridDistinctValueFilterFlyout</code> provides an Excel/DataGrip-style filter surface for a column. The popup contains a substring search box and a <code>ListBox</code>; each row shows a checkbox, the formatted value, and its source-row count.</p>
+<p>Selections update the grid's central <code>IFilteringModel</code> immediately:</p>
+<ul>
+<li>No checked values means no descriptor and therefore no filter.</li>
+<li>One or more checked values produce a <code>FilteringOperator.In</code> descriptor.</li>
+<li>Unchecking the final selected value removes that column's descriptor.</li>
+<li>Searching changes only the visible options. Selections hidden by the search remain selected.</li>
+<li>Reopening the popup rebuilds counts from the collection view's underlying <code>SourceCollection</code>, so values do not disappear merely because the current column is already filtered.</li>
+</ul>
+<h2 id="configure-a-typed-column-definition">Configure a typed column definition</h2>
+<p>The distinct-value popup reads values through <code>IDataGridColumnValueAccessor</code>. Typed column definitions create this accessor as part of their binding, so they are the recommended reflection-free setup.</p>
+<p>Declare the reusable flyout in XAML:</p>
+<pre><code class="lang-xml">&lt;UserControl
+    xmlns=&quot;https://github.com/avaloniaui&quot;
+    xmlns:x=&quot;http://schemas.microsoft.com/winfx/2006/xaml&quot;
+    xmlns:filtering=&quot;clr-namespace:Avalonia.Controls.DataGridFiltering;assembly=Avalonia.Controls.DataGrid&quot;&gt;
+  &lt;UserControl.Resources&gt;
+    &lt;filtering:DataGridDistinctValueFilterFlyout
+        x:Key=&quot;StatusDistinctValueFilter&quot;
+        Placement=&quot;Bottom&quot; /&gt;
+  &lt;/UserControl.Resources&gt;
+
+  &lt;DataGrid ItemsSource=&quot;{Binding View}&quot;
+            FilteringModel=&quot;{Binding FilteringModel}&quot;
+            ColumnDefinitionsSource=&quot;{Binding ColumnDefinitions}&quot; /&gt;
+&lt;/UserControl&gt;
+</code></pre>
+<p>Point the typed definition at that resource key:</p>
+<pre><code class="lang-csharp">var statusColumn = new DataGridTextColumnDefinition
+{
+    ColumnKey = &quot;Status&quot;,
+    Header = &quot;Status&quot;,
+    Binding = DataGridBindingDefinition.Create&lt;Order, string&gt;(order =&gt; order.Status),
+    FilterFlyoutKey = &quot;StatusDistinctValueFilter&quot;
+};
+</code></pre>
+<p>The definition owns no view object; it only carries a stable resource key. The view resolves the flyout while materializing the column.</p>
+<h2 id="configure-an-existing-column">Configure an existing column</h2>
+<p>If a column was not produced from a typed definition, register a value accessor explicitly in the composition layer:</p>
+<pre><code class="lang-csharp">DataGridColumnFilter.SetValueAccessor(
+    statusColumn,
+    new DataGridColumnValueAccessor&lt;Order, string&gt;(order =&gt; order.Status));
+</code></pre>
+<p>Then assign the flyout in XAML:</p>
+<pre><code class="lang-xml">&lt;DataGridTextColumn Header=&quot;Status&quot;
+                    ColumnKey=&quot;Status&quot;
+                    Binding=&quot;{Binding Status}&quot;
+                    SortMemberPath=&quot;Status&quot;&gt;
+  &lt;DataGridTextColumn.FilterFlyout&gt;
+    &lt;filtering:DataGridDistinctValueFilterFlyout /&gt;
+  &lt;/DataGridTextColumn.FilterFlyout&gt;
+&lt;/DataGridTextColumn&gt;
+</code></pre>
+<p>The flyout deliberately does not reflect over <code>SortMemberPath</code> or the binding path to read values. If no typed accessor is available, opening is canceled and <code>LastError</code> explains the missing requirement.</p>
+<h2 id="formatting-and-equality">Formatting and equality</h2>
+<p>Use <code>DisplayFormatter</code> to customize visible text. Null values display as <code>(Empty)</code> by default. Use <code>ValueComparer</code> when grouping and membership should use custom equality, such as case-insensitive string equality:</p>
+<pre><code class="lang-csharp">var flyout = new DataGridDistinctValueFilterFlyout
+{
+    ValueComparer = StringComparer.OrdinalIgnoreCase,
+    DisplayFormatter = value =&gt; value?.ToString() ?? &quot;(No value)&quot;
+};
+</code></pre>
+<p>When a custom comparer is supplied, the generated descriptor carries a typed predicate so the popup's grouping semantics and the actual row filter remain consistent.</p>
+<h2 id="custom-presentation">Custom presentation</h2>
+<p>The default compiled-binding template is <code>DataGridFilterDistinctValuesEditorTemplate</code> in <code>Themes/Generic.xaml</code>. It consumes the small <code>IFilterDistinctValuesContext</code> and <code>IFilterDistinctValueOption</code> contracts. Applications can replace <code>ContentTemplate</code> on the flyout while retaining the built-in counting, searching, selection, and filtering behavior.</p>
+<p>The standard template uses these theme tokens:</p>
+<ul>
+<li><code>DataGridFilterDistinctValuesEditorWidth</code></li>
+<li><code>DataGridFilterDistinctValuesListMaxHeight</code></li>
+<li><code>DataGridFilterEditorSpacing</code></li>
+<li><code>DataGridFilterEditorActionSpacing</code></li>
+</ul>
+
+</article>
+
+        <div class="contribution d-print-none">
+          <a href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/docfx/articles/distinct-value-column-filtering.md/#L1" class="edit-link">Edit this page</a>
+        </div>
+
+        <div class="next-article d-print-none border-top" id="nextArticle"></div>
+
+      </div>
+
+      <div class="affix">
+        <nav id="affix"></nav>
+      </div>
+    </main>
+
+
+    <footer class="border-top text-secondary">
+      <div class="container-xxl">
+        <div class="flex-fill">
+          <span>Made with <a href="https://dotnet.github.io/docfx">docfx</a></span>
+        </div>
+      </div>
+    </footer>
+  </body>
+</html>

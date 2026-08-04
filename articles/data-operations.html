@@ -187,6 +187,7 @@ grid.SortingAdapterFactory = adapterFactory;
 <li>Use stable column ids (<code>ColumnKey</code>, definition instance, or definition <code>ColumnKey</code>) and include <code>propertyPath</code> when you are not using a custom predicate.</li>
 <li>Adapter guarantees: descriptor to predicate for string/between/in/custom cases, duplicate guards, observer-mode reconciliation, and selection stability are covered by unit tests.</li>
 <li>The filter button glyphs and default editor templates (text/number/date/enum) live in <code>Themes/Generic.xaml</code> and can be reused across themes and samples.</li>
+<li><code>DataGridDistinctValueFilterFlyout</code> adds a built-in searchable checkbox/value/count popup that writes <code>FilteringOperator.In</code> descriptors through the same model. See <a href="distinct-value-column-filtering.html">Distinct-Value Column Filtering</a>.</li>
 </ul>
 <p><code>FilteringModelFactory</code> and <code>FilteringAdapterFactory</code> are CLR properties; set them in code before the grid is loaded if you need custom creation.</p>
 <pre><code class="lang-xml">&lt;DataGrid ItemsSource=&quot;{Binding Items}&quot;
@@ -236,6 +237,12 @@ DataGridColumnFilter.SetPredicateFactory(ScoreColumn, descriptor =&gt;
                     FilterFlyout=&quot;{StaticResource StatusFilterFlyout}&quot; /&gt;
 </code></pre>
 <p>Use <code>ShowFilterButton=&quot;True&quot;</code> if you want a filter glyph without a flyout (for example, to open an external panel).</p>
+<p>For an Excel/DataGrip-style popup backed by a typed value accessor:</p>
+<pre><code class="lang-xml">&lt;DataGridTextColumn.FilterFlyout&gt;
+  &lt;filtering:DataGridDistinctValueFilterFlyout /&gt;
+&lt;/DataGridTextColumn.FilterFlyout&gt;
+</code></pre>
+<p>The popup provides substring search and distinct values with row counts; checking values immediately creates an <code>In</code> descriptor, while clearing all checks removes the descriptor. See <a href="distinct-value-column-filtering.html">Distinct-Value Column Filtering</a> for the reflection-free accessor setup.</p>
 <h3 id="dynamicdata-integration-filtering">DynamicData Integration (Filtering)</h3>
 <p>Keep filtering upstream in a DynamicData pipeline while the grid shows filter glyphs from <code>FilteringModel</code>. The <code>DynamicDataFilteringAdapterFactory</code> in <code>src/DataGridSample</code> is a reference implementation you can copy:</p>
 <pre><code class="lang-csharp">var source = new SourceList&lt;Deployment&gt;();

@@ -85,6 +85,7 @@
 
 <p>This guide covers header context menus, programmatic filter flyout display, and filter status indicators for ProDataGrid.</p>
 <p>For complete <code>FilteringModel</code> wiring (descriptors, column ids, flyout templates, and adapter behavior), see <a href="filtering-model-end-to-end.html">Filtering Model: End-to-End Usage</a>.</p>
+<p>For the built-in searchable checkbox/value/count popup, see <a href="distinct-value-column-filtering.html">Distinct-Value Column Filtering</a>.</p>
 <h2 id="ux-reference-common-grids">UX Reference (Common Grids)</h2>
 <p>In mature grid controls, column headers typically support:</p>
 <ul>
@@ -102,6 +103,7 @@
 <li><code>DataGrid.ClearFilter(DataGridColumn column)</code>: clear the active filter for a column.</li>
 <li><code>DataGridColumn.ClearFilter()</code>: clear the active filter for the column instance.</li>
 <li><code>DataGridColumnDefinition.FilterFlyout</code> / <code>FilterFlyoutKey</code>: configure per-column flyouts when using <code>ColumnDefinitionsSource</code>.</li>
+<li><code>DataGridDistinctValueFilterFlyout</code>: generate distinct values and counts through a typed accessor and update the central filtering model with <code>In</code> descriptors.</li>
 </ul>
 <h2 id="context-menu-with-filter-actions">Context Menu with Filter Actions</h2>
 <p>Define a shared header context menu and use <code>DataGrid.ColumnHeaderContextMenuColumnId</code> as the command parameter. This works for right-clicks on the header surface and on header icons:</p>
