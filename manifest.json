@@ -476,7 +476,21 @@
       "Uid": null,
       "IsMRef": true,
       "Title": "Avalonia.Controls.DataGridBanding.ColumnBandHeader",
-      "Summary": null
+      "Summary": "<p sourcefile=\"api/Avalonia.Controls.DataGridBanding.ColumnBandHeader.yml\" sourcestartlinenumber=\"1\">Describes the root-to-leaf path presented for a materialized banded column.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.DataGridBanding.ColumnBandHeaderLayout.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.DataGridBanding.ColumnBandHeaderLayout.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.DataGridBanding.ColumnBandHeaderLayout",
+      "Summary": "<p sourcefile=\"api/Avalonia.Controls.DataGridBanding.ColumnBandHeaderLayout.yml\" sourcestartlinenumber=\"1\">Specifies how a column-band path is presented in the grid header area.</p>\n"
     },
     {
       "type": "ManagedReference",
@@ -505,6 +519,20 @@
       "IsMRef": true,
       "Title": "Avalonia.Controls.DataGridBanding.ColumnBandObservableCollection<T>",
       "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.DataGridBanding.DataGridColumnBandHeaderCell.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.DataGridBanding.DataGridColumnBandHeaderCell.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.DataGridBanding.DataGridColumnBandHeaderCell",
+      "Summary": "<p sourcefile=\"api/Avalonia.Controls.DataGridBanding.DataGridColumnBandHeaderCell.yml\" sourcestartlinenumber=\"1\">Presents a non-interactive grouped column-band header spanning one or more leaf columns.</p>\n"
     },
     {
       "type": "ManagedReference",

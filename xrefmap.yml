@@ -7799,6 +7799,15 @@ references:
   fullName.vb: Avalonia.Controls.DataGridBanding.ColumnBandHeader.New(System.Collections.Generic.IReadOnlyList(Of String))
   nameWithType: ColumnBandHeader.ColumnBandHeader(IReadOnlyList<string>)
   nameWithType.vb: ColumnBandHeader.New(IReadOnlyList(Of String))
+- uid: Avalonia.Controls.DataGridBanding.ColumnBandHeader.#ctor(System.Collections.Generic.IReadOnlyList{System.String},Avalonia.Controls.DataGridBanding.ColumnBandHeaderLayout)
+  name: ColumnBandHeader(IReadOnlyList<string>, ColumnBandHeaderLayout)
+  href: api/Avalonia.Controls.DataGridBanding.ColumnBandHeader.html#Avalonia_Controls_DataGridBanding_ColumnBandHeader__ctor_System_Collections_Generic_IReadOnlyList_System_String__Avalonia_Controls_DataGridBanding_ColumnBandHeaderLayout_
+  commentId: M:Avalonia.Controls.DataGridBanding.ColumnBandHeader.#ctor(System.Collections.Generic.IReadOnlyList{System.String},Avalonia.Controls.DataGridBanding.ColumnBandHeaderLayout)
+  name.vb: New(IReadOnlyList(Of String), ColumnBandHeaderLayout)
+  fullName: Avalonia.Controls.DataGridBanding.ColumnBandHeader.ColumnBandHeader(System.Collections.Generic.IReadOnlyList<string>, Avalonia.Controls.DataGridBanding.ColumnBandHeaderLayout)
+  fullName.vb: Avalonia.Controls.DataGridBanding.ColumnBandHeader.New(System.Collections.Generic.IReadOnlyList(Of String), Avalonia.Controls.DataGridBanding.ColumnBandHeaderLayout)
+  nameWithType: ColumnBandHeader.ColumnBandHeader(IReadOnlyList<string>, ColumnBandHeaderLayout)
+  nameWithType.vb: ColumnBandHeader.New(IReadOnlyList(Of String), ColumnBandHeaderLayout)
 - uid: Avalonia.Controls.DataGridBanding.ColumnBandHeader.#ctor*
   name: ColumnBandHeader
   href: api/Avalonia.Controls.DataGridBanding.ColumnBandHeader.html#Avalonia_Controls_DataGridBanding_ColumnBandHeader__ctor_
@@ -7809,6 +7818,32 @@ references:
   fullName.vb: Avalonia.Controls.DataGridBanding.ColumnBandHeader.New
   nameWithType: ColumnBandHeader.ColumnBandHeader
   nameWithType.vb: ColumnBandHeader.New
+- uid: Avalonia.Controls.DataGridBanding.ColumnBandHeader.DisplaySegments
+  name: DisplaySegments
+  href: api/Avalonia.Controls.DataGridBanding.ColumnBandHeader.html#Avalonia_Controls_DataGridBanding_ColumnBandHeader_DisplaySegments
+  commentId: P:Avalonia.Controls.DataGridBanding.ColumnBandHeader.DisplaySegments
+  fullName: Avalonia.Controls.DataGridBanding.ColumnBandHeader.DisplaySegments
+  nameWithType: ColumnBandHeader.DisplaySegments
+- uid: Avalonia.Controls.DataGridBanding.ColumnBandHeader.DisplaySegments*
+  name: DisplaySegments
+  href: api/Avalonia.Controls.DataGridBanding.ColumnBandHeader.html#Avalonia_Controls_DataGridBanding_ColumnBandHeader_DisplaySegments_
+  commentId: Overload:Avalonia.Controls.DataGridBanding.ColumnBandHeader.DisplaySegments
+  isSpec: "True"
+  fullName: Avalonia.Controls.DataGridBanding.ColumnBandHeader.DisplaySegments
+  nameWithType: ColumnBandHeader.DisplaySegments
+- uid: Avalonia.Controls.DataGridBanding.ColumnBandHeader.Layout
+  name: Layout
+  href: api/Avalonia.Controls.DataGridBanding.ColumnBandHeader.html#Avalonia_Controls_DataGridBanding_ColumnBandHeader_Layout
+  commentId: P:Avalonia.Controls.DataGridBanding.ColumnBandHeader.Layout
+  fullName: Avalonia.Controls.DataGridBanding.ColumnBandHeader.Layout
+  nameWithType: ColumnBandHeader.Layout
+- uid: Avalonia.Controls.DataGridBanding.ColumnBandHeader.Layout*
+  name: Layout
+  href: api/Avalonia.Controls.DataGridBanding.ColumnBandHeader.html#Avalonia_Controls_DataGridBanding_ColumnBandHeader_Layout_
+  commentId: Overload:Avalonia.Controls.DataGridBanding.ColumnBandHeader.Layout
+  isSpec: "True"
+  fullName: Avalonia.Controls.DataGridBanding.ColumnBandHeader.Layout
+  nameWithType: ColumnBandHeader.Layout
 - uid: Avalonia.Controls.DataGridBanding.ColumnBandHeader.Segments
   name: Segments
   href: api/Avalonia.Controls.DataGridBanding.ColumnBandHeader.html#Avalonia_Controls_DataGridBanding_ColumnBandHeader_Segments
@@ -7822,6 +7857,24 @@ references:
   isSpec: "True"
   fullName: Avalonia.Controls.DataGridBanding.ColumnBandHeader.Segments
   nameWithType: ColumnBandHeader.Segments
+- uid: Avalonia.Controls.DataGridBanding.ColumnBandHeaderLayout
+  name: ColumnBandHeaderLayout
+  href: api/Avalonia.Controls.DataGridBanding.ColumnBandHeaderLayout.html
+  commentId: T:Avalonia.Controls.DataGridBanding.ColumnBandHeaderLayout
+  fullName: Avalonia.Controls.DataGridBanding.ColumnBandHeaderLayout
+  nameWithType: ColumnBandHeaderLayout
+- uid: Avalonia.Controls.DataGridBanding.ColumnBandHeaderLayout.Grouped
+  name: Grouped
+  href: api/Avalonia.Controls.DataGridBanding.ColumnBandHeaderLayout.html#Avalonia_Controls_DataGridBanding_ColumnBandHeaderLayout_Grouped
+  commentId: F:Avalonia.Controls.DataGridBanding.ColumnBandHeaderLayout.Grouped
+  fullName: Avalonia.Controls.DataGridBanding.ColumnBandHeaderLayout.Grouped
+  nameWithType: ColumnBandHeaderLayout.Grouped
+- uid: Avalonia.Controls.DataGridBanding.ColumnBandHeaderLayout.Stacked
+  name: Stacked
+  href: api/Avalonia.Controls.DataGridBanding.ColumnBandHeaderLayout.html#Avalonia_Controls_DataGridBanding_ColumnBandHeaderLayout_Stacked
+  commentId: F:Avalonia.Controls.DataGridBanding.ColumnBandHeaderLayout.Stacked
+  fullName: Avalonia.Controls.DataGridBanding.ColumnBandHeaderLayout.Stacked
+  nameWithType: ColumnBandHeaderLayout.Stacked
 - uid: Avalonia.Controls.DataGridBanding.ColumnBandModel
   name: ColumnBandModel
   href: api/Avalonia.Controls.DataGridBanding.ColumnBandModel.html
@@ -7938,6 +7991,19 @@ references:
   isSpec: "True"
   fullName: Avalonia.Controls.DataGridBanding.ColumnBandModel.EndUpdate
   nameWithType: ColumnBandModel.EndUpdate
+- uid: Avalonia.Controls.DataGridBanding.ColumnBandModel.HeaderLayout
+  name: HeaderLayout
+  href: api/Avalonia.Controls.DataGridBanding.ColumnBandModel.html#Avalonia_Controls_DataGridBanding_ColumnBandModel_HeaderLayout
+  commentId: P:Avalonia.Controls.DataGridBanding.ColumnBandModel.HeaderLayout
+  fullName: Avalonia.Controls.DataGridBanding.ColumnBandModel.HeaderLayout
+  nameWithType: ColumnBandModel.HeaderLayout
+- uid: Avalonia.Controls.DataGridBanding.ColumnBandModel.HeaderLayout*
+  name: HeaderLayout
+  href: api/Avalonia.Controls.DataGridBanding.ColumnBandModel.html#Avalonia_Controls_DataGridBanding_ColumnBandModel_HeaderLayout_
+  commentId: Overload:Avalonia.Controls.DataGridBanding.ColumnBandModel.HeaderLayout
+  isSpec: "True"
+  fullName: Avalonia.Controls.DataGridBanding.ColumnBandModel.HeaderLayout
+  nameWithType: ColumnBandModel.HeaderLayout
 - uid: Avalonia.Controls.DataGridBanding.ColumnBandModel.HeaderTemplateKey
   name: HeaderTemplateKey
   href: api/Avalonia.Controls.DataGridBanding.ColumnBandModel.html#Avalonia_Controls_DataGridBanding_ColumnBandModel_HeaderTemplateKey
@@ -7997,6 +8063,31 @@ references:
   fullName.vb: Avalonia.Controls.DataGridBanding.ColumnBandObservableCollection(Of T).ResetWith
   nameWithType: ColumnBandObservableCollection<T>.ResetWith
   nameWithType.vb: ColumnBandObservableCollection(Of T).ResetWith
+- uid: Avalonia.Controls.DataGridBanding.DataGridColumnBandHeaderCell
+  name: DataGridColumnBandHeaderCell
+  href: api/Avalonia.Controls.DataGridBanding.DataGridColumnBandHeaderCell.html
+  commentId: T:Avalonia.Controls.DataGridBanding.DataGridColumnBandHeaderCell
+  fullName: Avalonia.Controls.DataGridBanding.DataGridColumnBandHeaderCell
+  nameWithType: DataGridColumnBandHeaderCell
+- uid: Avalonia.Controls.DataGridBanding.DataGridColumnBandHeaderCell.#ctor
+  name: DataGridColumnBandHeaderCell()
+  href: api/Avalonia.Controls.DataGridBanding.DataGridColumnBandHeaderCell.html#Avalonia_Controls_DataGridBanding_DataGridColumnBandHeaderCell__ctor
+  commentId: M:Avalonia.Controls.DataGridBanding.DataGridColumnBandHeaderCell.#ctor
+  name.vb: New()
+  fullName: Avalonia.Controls.DataGridBanding.DataGridColumnBandHeaderCell.DataGridColumnBandHeaderCell()
+  fullName.vb: Avalonia.Controls.DataGridBanding.DataGridColumnBandHeaderCell.New()
+  nameWithType: DataGridColumnBandHeaderCell.DataGridColumnBandHeaderCell()
+  nameWithType.vb: DataGridColumnBandHeaderCell.New()
+- uid: Avalonia.Controls.DataGridBanding.DataGridColumnBandHeaderCell.#ctor*
+  name: DataGridColumnBandHeaderCell
+  href: api/Avalonia.Controls.DataGridBanding.DataGridColumnBandHeaderCell.html#Avalonia_Controls_DataGridBanding_DataGridColumnBandHeaderCell__ctor_
+  commentId: Overload:Avalonia.Controls.DataGridBanding.DataGridColumnBandHeaderCell.#ctor
+  isSpec: "True"
+  name.vb: New
+  fullName: Avalonia.Controls.DataGridBanding.DataGridColumnBandHeaderCell.DataGridColumnBandHeaderCell
+  fullName.vb: Avalonia.Controls.DataGridBanding.DataGridColumnBandHeaderCell.New
+  nameWithType: DataGridColumnBandHeaderCell.DataGridColumnBandHeaderCell
+  nameWithType.vb: DataGridColumnBandHeaderCell.New
 - uid: Avalonia.Controls.DataGridBeginningEditEventArgs
   name: DataGridBeginningEditEventArgs
   href: api/Avalonia.Controls.DataGridBeginningEditEventArgs.html

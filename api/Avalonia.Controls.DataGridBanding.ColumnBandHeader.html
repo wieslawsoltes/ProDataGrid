@@ -6,7 +6,7 @@
       <meta name="viewport" content="width=device-width, initial-scale=1.0">
       <meta name="title" content="Class ColumnBandHeader | ProDataGrid for Avalonia ">
       
-      
+      <meta name="description" content="Describes the root-to-leaf path presented for a materialized banded column.">
       <link rel="icon" href="../favicon.ico">
       <link rel="stylesheet" href="../public/docfx.min.css">
       <link rel="stylesheet" href="../public/main.css">
@@ -85,7 +85,7 @@
 
 
   <h1 id="Avalonia_Controls_DataGridBanding_ColumnBandHeader" data-uid="Avalonia.Controls.DataGridBanding.ColumnBandHeader" class="text-break">
-Class ColumnBandHeader  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/Banding/ColumnBandModels.cs/#L15"><i class="bi bi-code-slash"></i></a>
+Class ColumnBandHeader  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/Banding/ColumnBandModels.cs/#L39"><i class="bi bi-code-slash"></i></a>
   </h1>
 
   <div class="facts text-secondary">
@@ -93,7 +93,8 @@ Class ColumnBandHeader  <a class="header-action link-secondary" title="View sour
   <dl><dt>Assembly</dt><dd>Avalonia.Controls.DataGrid.dll</dd></dl>
   </div>
 
-  <div class="markdown summary"></div>
+  <div class="markdown summary"><p>Describes the root-to-leaf path presented for a materialized banded column.</p>
+</div>
   <div class="markdown conceptual"></div>
 
   <div class="codewrapper">
@@ -149,10 +150,11 @@ Class ColumnBandHeader  <a class="header-action link-secondary" title="View sour
 
   <h3 id="Avalonia_Controls_DataGridBanding_ColumnBandHeader__ctor_System_Collections_Generic_IReadOnlyList_System_String__" data-uid="Avalonia.Controls.DataGridBanding.ColumnBandHeader.#ctor(System.Collections.Generic.IReadOnlyList{System.String})">
   ColumnBandHeader(IReadOnlyList&lt;string&gt;)
-  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/Banding/ColumnBandModels.cs/#L21"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/Banding/ColumnBandModels.cs/#L49"><i class="bi bi-code-slash"></i></a>
   </h3>
 
-  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 summary"><p>Initializes a stacked header from the specified path segments.</p>
+</div>
   <div class="markdown level1 conceptual"></div>
 
   <div class="codewrapper">
@@ -162,7 +164,44 @@ Class ColumnBandHeader  <a class="header-action link-secondary" title="View sour
   <h4 class="section">Parameters</h4>
   <dl class="parameters">
     <dt><code>segments</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.ireadonlylist-1">IReadOnlyList</a>&lt;<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a>&gt;</dt>
-    <dd></dd>
+    <dd><p>The root-to-leaf header path.</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Avalonia_Controls_DataGridBanding_ColumnBandHeader__ctor_" data-uid="Avalonia.Controls.DataGridBanding.ColumnBandHeader.#ctor*"></a>
+
+  <h3 id="Avalonia_Controls_DataGridBanding_ColumnBandHeader__ctor_System_Collections_Generic_IReadOnlyList_System_String__Avalonia_Controls_DataGridBanding_ColumnBandHeaderLayout_" data-uid="Avalonia.Controls.DataGridBanding.ColumnBandHeader.#ctor(System.Collections.Generic.IReadOnlyList{System.String},Avalonia.Controls.DataGridBanding.ColumnBandHeaderLayout)">
+  ColumnBandHeader(IReadOnlyList&lt;string&gt;, ColumnBandHeaderLayout)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/Banding/ColumnBandModels.cs/#L59"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Initializes a header from the specified path segments and layout mode.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public ColumnBandHeader(IReadOnlyList&lt;string&gt; segments, ColumnBandHeaderLayout layout)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>segments</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.ireadonlylist-1">IReadOnlyList</a>&lt;<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a>&gt;</dt>
+    <dd><p>The root-to-leaf header path.</p>
+</dd>
+    <dt><code>layout</code> <a class="xref" href="Avalonia.Controls.DataGridBanding.ColumnBandHeaderLayout.html">ColumnBandHeaderLayout</a></dt>
+    <dd><p>The header layout mode.</p>
+</dd>
   </dl>
 
 
@@ -180,14 +219,79 @@ Class ColumnBandHeader  <a class="header-action link-secondary" title="View sour
 </h2>
 
 
+  <a id="Avalonia_Controls_DataGridBanding_ColumnBandHeader_DisplaySegments_" data-uid="Avalonia.Controls.DataGridBanding.ColumnBandHeader.DisplaySegments*"></a>
+
+  <h3 id="Avalonia_Controls_DataGridBanding_ColumnBandHeader_DisplaySegments" data-uid="Avalonia.Controls.DataGridBanding.ColumnBandHeader.DisplaySegments">
+  DisplaySegments
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/Banding/ColumnBandModels.cs/#L87"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Gets the segments displayed inside the owning leaf column header.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public IReadOnlyList&lt;string&gt; DisplaySegments { get; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.ireadonlylist-1">IReadOnlyList</a>&lt;<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a>&gt;</dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="Avalonia_Controls_DataGridBanding_ColumnBandHeader_Layout_" data-uid="Avalonia.Controls.DataGridBanding.ColumnBandHeader.Layout*"></a>
+
+  <h3 id="Avalonia_Controls_DataGridBanding_ColumnBandHeader_Layout" data-uid="Avalonia.Controls.DataGridBanding.ColumnBandHeader.Layout">
+  Layout
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/Banding/ColumnBandModels.cs/#L92"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Gets the layout mode used to present this header.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public ColumnBandHeaderLayout Layout { get; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="Avalonia.Controls.DataGridBanding.ColumnBandHeaderLayout.html">ColumnBandHeaderLayout</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
   <a id="Avalonia_Controls_DataGridBanding_ColumnBandHeader_Segments_" data-uid="Avalonia.Controls.DataGridBanding.ColumnBandHeader.Segments*"></a>
 
   <h3 id="Avalonia_Controls_DataGridBanding_ColumnBandHeader_Segments" data-uid="Avalonia.Controls.DataGridBanding.ColumnBandHeader.Segments">
   Segments
-  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/Banding/ColumnBandModels.cs/#L26"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/Banding/ColumnBandModels.cs/#L80"><i class="bi bi-code-slash"></i></a>
   </h3>
 
-  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 summary"><p>Gets the complete root-to-leaf header path.</p>
+</div>
   <div class="markdown level1 conceptual"></div>
 
   <div class="codewrapper">
@@ -215,7 +319,7 @@ Class ColumnBandHeader  <a class="header-action link-secondary" title="View sour
 </article>
 
         <div class="contribution d-print-none">
-          <a href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/Banding/ColumnBandModels.cs/#L15" class="edit-link">Edit this page</a>
+          <a href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/Banding/ColumnBandModels.cs/#L39" class="edit-link">Edit this page</a>
         </div>
 
 

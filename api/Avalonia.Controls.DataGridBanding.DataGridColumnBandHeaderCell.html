@@ -2,11 +2,11 @@
 <html>
   <head>
     <meta charset="utf-8">
-      <title>Class DataGridColumnHeadersPresenter | ProDataGrid for Avalonia </title>
+      <title>Class DataGridColumnBandHeaderCell | ProDataGrid for Avalonia </title>
       <meta name="viewport" content="width=device-width, initial-scale=1.0">
-      <meta name="title" content="Class DataGridColumnHeadersPresenter | ProDataGrid for Avalonia ">
+      <meta name="title" content="Class DataGridColumnBandHeaderCell | ProDataGrid for Avalonia ">
       
-      <meta name="description" content="Used within the template of a  to specify the location in the control&#39;s visual tree where the column headers are to be added.">
+      <meta name="description" content="Presents a non-interactive grouped column-band header spanning one or more leaf columns.">
       <link rel="icon" href="../favicon.ico">
       <link rel="stylesheet" href="../public/docfx.min.css">
       <link rel="stylesheet" href="../public/main.css">
@@ -16,7 +16,7 @@
       
       
       
-      <meta name="docfx:docurl" content="https://github.com/wieslawsoltes/ProDataGrid/new/master/apiSpec/new?filename=Avalonia_Controls_Primitives_DataGridColumnHeadersPresenter.md&amp;value=---%0Auid%3A%20Avalonia.Controls.Primitives.DataGridColumnHeadersPresenter%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">
+      <meta name="docfx:docurl" content="https://github.com/wieslawsoltes/ProDataGrid/new/master/apiSpec/new?filename=Avalonia_Controls_DataGridBanding_DataGridColumnBandHeaderCell.md&amp;value=---%0Auid%3A%20Avalonia.Controls.DataGridBanding.DataGridColumnBandHeaderCell%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">
       <meta name="loc:inThisArticle" content="In this article">
       <meta name="loc:searchResultsCount" content="{count} results for &quot;{query}&quot;">
       <meta name="loc:searchNoResults" content="No results for &quot;{query}&quot;">
@@ -80,26 +80,25 @@
           <nav id="breadcrumb"></nav>
         </div>
 
-        <article data-uid="Avalonia.Controls.Primitives.DataGridColumnHeadersPresenter">
+        <article data-uid="Avalonia.Controls.DataGridBanding.DataGridColumnBandHeaderCell">
 
 
 
-  <h1 id="Avalonia_Controls_Primitives_DataGridColumnHeadersPresenter" data-uid="Avalonia.Controls.Primitives.DataGridColumnHeadersPresenter" class="text-break">
-Class DataGridColumnHeadersPresenter  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/Primitives/DataGridColumnHeadersPresenter.cs/#L26"><i class="bi bi-code-slash"></i></a>
+  <h1 id="Avalonia_Controls_DataGridBanding_DataGridColumnBandHeaderCell" data-uid="Avalonia.Controls.DataGridBanding.DataGridColumnBandHeaderCell" class="text-break">
+Class DataGridColumnBandHeaderCell  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/Banding/DataGridColumnBandHeaderCell.cs/#L12"><i class="bi bi-code-slash"></i></a>
   </h1>
 
   <div class="facts text-secondary">
-    <dl><dt>Namespace</dt><dd><a class="xref" href="Avalonia.html">Avalonia</a>.<a class="xref" href="Avalonia.Controls.html">Controls</a>.<a class="xref" href="Avalonia.Controls.Primitives.html">Primitives</a></dd></dl>
+    <dl><dt>Namespace</dt><dd><a class="xref" href="Avalonia.html">Avalonia</a>.<a class="xref" href="Avalonia.Controls.html">Controls</a>.<a class="xref" href="Avalonia.Controls.DataGridBanding.html">DataGridBanding</a></dd></dl>
   <dl><dt>Assembly</dt><dd>Avalonia.Controls.DataGrid.dll</dd></dl>
   </div>
 
-  <div class="markdown summary"><p>Used within the template of a <a class="xref" href="Avalonia.Controls.DataGrid.html">DataGrid</a> to specify the
-location in the control's visual tree where the column headers are to be added.</p>
+  <div class="markdown summary"><p>Presents a non-interactive grouped column-band header spanning one or more leaf columns.</p>
 </div>
   <div class="markdown conceptual"></div>
 
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public sealed class DataGridColumnHeadersPresenter : Panel, INotifyPropertyChanged, IDataContextProvider, ILogical, IThemeVariantHost, IResourceHost, IResourceNode, IStyleHost, ISetLogicalParent, ISetInheritanceParent, ISupportInitialize, INamed, IInputElement, IDataTemplateHost, ISetterValue, IChildIndexProvider</code></pre>
+    <pre><code class="lang-csharp hljs">public sealed class DataGridColumnBandHeaderCell : ContentControl, INotifyPropertyChanged, IDataContextProvider, ILogical, IThemeVariantHost, IResourceHost, IResourceNode, IStyleHost, ISetLogicalParent, ISetInheritanceParent, ISupportInitialize, INamed, IInputElement, IDataTemplateHost, ISetterValue</code></pre>
   </div>
 
 
@@ -117,8 +116,9 @@ location in the control's visual tree where the column headers are to be added.<
       <div><span class="xref">Interactive</span></div>
       <div><span class="xref">InputElement</span></div>
       <div><span class="xref">Control</span></div>
-      <div><span class="xref">Panel</span></div>
-      <div><span class="xref">DataGridColumnHeadersPresenter</span></div>
+      <div><span class="xref">TemplatedControl</span></div>
+      <div><span class="xref">ContentControl</span></div>
+      <div><span class="xref">DataGridColumnBandHeaderCell</span></div>
     </dd>
   </dl>
 
@@ -139,7 +139,6 @@ location in the control's visual tree where the column headers are to be added.<
       <div><span class="xref">IInputElement</span></div>
       <div><span class="xref">IDataTemplateHost</span></div>
       <div><span class="xref">ISetterValue</span></div>
-      <div><span class="xref">IChildIndexProvider</span></div>
     </dd>
   </dl>
 
@@ -148,19 +147,139 @@ location in the control's visual tree where the column headers are to be added.<
     <dt>Inherited Members</dt>
     <dd>
     <div>
-      <span class="xref">Panel.BackgroundProperty</span>
+      <span class="xref">ContentControl.ContentProperty</span>
     </div>
     <div>
-      <span class="xref">Panel.Render(DrawingContext)</span>
+      <span class="xref">ContentControl.ContentTemplateProperty</span>
     </div>
     <div>
-      <span class="xref">Panel.Children</span>
+      <span class="xref">ContentControl.HorizontalContentAlignmentProperty</span>
     </div>
     <div>
-      <span class="xref">Panel.Background</span>
+      <span class="xref">ContentControl.VerticalContentAlignmentProperty</span>
     </div>
     <div>
-      <span class="xref">Panel.IsItemsHost</span>
+      <span class="xref">ContentControl.Content</span>
+    </div>
+    <div>
+      <span class="xref">ContentControl.ContentTemplate</span>
+    </div>
+    <div>
+      <span class="xref">ContentControl.Presenter</span>
+    </div>
+    <div>
+      <span class="xref">ContentControl.HorizontalContentAlignment</span>
+    </div>
+    <div>
+      <span class="xref">ContentControl.VerticalContentAlignment</span>
+    </div>
+    <div>
+      <span class="xref">TemplatedControl.BackgroundProperty</span>
+    </div>
+    <div>
+      <span class="xref">TemplatedControl.BackgroundSizingProperty</span>
+    </div>
+    <div>
+      <span class="xref">TemplatedControl.BorderBrushProperty</span>
+    </div>
+    <div>
+      <span class="xref">TemplatedControl.BorderThicknessProperty</span>
+    </div>
+    <div>
+      <span class="xref">TemplatedControl.CornerRadiusProperty</span>
+    </div>
+    <div>
+      <span class="xref">TemplatedControl.FontFamilyProperty</span>
+    </div>
+    <div>
+      <span class="xref">TemplatedControl.FontFeaturesProperty</span>
+    </div>
+    <div>
+      <span class="xref">TemplatedControl.FontSizeProperty</span>
+    </div>
+    <div>
+      <span class="xref">TemplatedControl.FontStyleProperty</span>
+    </div>
+    <div>
+      <span class="xref">TemplatedControl.FontWeightProperty</span>
+    </div>
+    <div>
+      <span class="xref">TemplatedControl.FontStretchProperty</span>
+    </div>
+    <div>
+      <span class="xref">TemplatedControl.ForegroundProperty</span>
+    </div>
+    <div>
+      <span class="xref">TemplatedControl.LetterSpacingProperty</span>
+    </div>
+    <div>
+      <span class="xref">TemplatedControl.PaddingProperty</span>
+    </div>
+    <div>
+      <span class="xref">TemplatedControl.TemplateProperty</span>
+    </div>
+    <div>
+      <span class="xref">TemplatedControl.IsTemplateFocusTargetProperty</span>
+    </div>
+    <div>
+      <span class="xref">TemplatedControl.TemplateAppliedEvent</span>
+    </div>
+    <div>
+      <span class="xref">TemplatedControl.GetIsTemplateFocusTarget(Control)</span>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">TemplatedControl.SetIsTemplateFocusTarget(Control, bool)</a>
+    </div>
+    <div>
+      <span class="xref">TemplatedControl.ApplyTemplate()</span>
+    </div>
+    <div>
+      <span class="xref">TemplatedControl.Background</span>
+    </div>
+    <div>
+      <span class="xref">TemplatedControl.BackgroundSizing</span>
+    </div>
+    <div>
+      <span class="xref">TemplatedControl.BorderBrush</span>
+    </div>
+    <div>
+      <span class="xref">TemplatedControl.BorderThickness</span>
+    </div>
+    <div>
+      <span class="xref">TemplatedControl.CornerRadius</span>
+    </div>
+    <div>
+      <span class="xref">TemplatedControl.FontFamily</span>
+    </div>
+    <div>
+      <span class="xref">TemplatedControl.FontFeatures</span>
+    </div>
+    <div>
+      <span class="xref">TemplatedControl.FontSize</span>
+    </div>
+    <div>
+      <span class="xref">TemplatedControl.FontStyle</span>
+    </div>
+    <div>
+      <span class="xref">TemplatedControl.FontWeight</span>
+    </div>
+    <div>
+      <span class="xref">TemplatedControl.FontStretch</span>
+    </div>
+    <div>
+      <span class="xref">TemplatedControl.Foreground</span>
+    </div>
+    <div>
+      <span class="xref">TemplatedControl.LetterSpacing</span>
+    </div>
+    <div>
+      <span class="xref">TemplatedControl.Padding</span>
+    </div>
+    <div>
+      <span class="xref">TemplatedControl.Template</span>
+    </div>
+    <div>
+      <span class="xref">TemplatedControl.TemplateApplied</span>
     </div>
     <div>
       <span class="xref">Control.FocusAdornerProperty</span>
@@ -550,9 +669,6 @@ location in the control's visual tree where the column headers are to be added.<
       <span class="xref">Layoutable.UpdateLayout()</span>
     </div>
     <div>
-      <span class="xref">Layoutable.ApplyTemplate()</span>
-    </div>
-    <div>
       <span class="xref">Layoutable.Measure(Size)</span>
     </div>
     <div>
@@ -659,6 +775,9 @@ location in the control's visual tree where the column headers are to be added.<
     </div>
     <div>
       <span class="xref">Visual.InvalidateVisual()</span>
+    </div>
+    <div>
+      <span class="xref">Visual.Render(DrawingContext)</span>
     </div>
     <div>
       <span class="xref">Visual.Bounds</span>
@@ -907,147 +1026,26 @@ location in the control's visual tree where the column headers are to be added.<
 
 
 
-  <h2 class="section" id="methods">Methods
+  <h2 class="section" id="constructors">Constructors
 </h2>
 
 
-  <a id="Avalonia_Controls_Primitives_DataGridColumnHeadersPresenter_ArrangeOverride_" data-uid="Avalonia.Controls.Primitives.DataGridColumnHeadersPresenter.ArrangeOverride*"></a>
+  <a id="Avalonia_Controls_DataGridBanding_DataGridColumnBandHeaderCell__ctor_" data-uid="Avalonia.Controls.DataGridBanding.DataGridColumnBandHeaderCell.#ctor*"></a>
 
-  <h3 id="Avalonia_Controls_Primitives_DataGridColumnHeadersPresenter_ArrangeOverride_Avalonia_Size_" data-uid="Avalonia.Controls.Primitives.DataGridColumnHeadersPresenter.ArrangeOverride(Avalonia.Size)">
-  ArrangeOverride(Size)
-  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/Primitives/DataGridColumnHeadersPresenter.cs/#L175"><i class="bi bi-code-slash"></i></a>
+  <h3 id="Avalonia_Controls_DataGridBanding_DataGridColumnBandHeaderCell__ctor" data-uid="Avalonia.Controls.DataGridBanding.DataGridColumnBandHeaderCell.#ctor">
+  DataGridColumnBandHeaderCell()
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/Banding/DataGridColumnBandHeaderCell.cs/#L21"><i class="bi bi-code-slash"></i></a>
   </h3>
 
-  <div class="markdown level1 summary"><p>Arranges the content of the <a class="xref" href="Avalonia.Controls.Primitives.DataGridColumnHeadersPresenter.html">DataGridColumnHeadersPresenter</a>.</p>
+  <div class="markdown level1 summary"><p>Initializes a new instance of the <a class="xref" href="Avalonia.Controls.DataGridBanding.DataGridColumnBandHeaderCell.html">DataGridColumnBandHeaderCell</a> class.</p>
 </div>
   <div class="markdown level1 conceptual"></div>
 
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">protected override Size ArrangeOverride(Size finalSize)</code></pre>
-  </div>
-
-  <h4 class="section">Parameters</h4>
-  <dl class="parameters">
-    <dt><code>finalSize</code> <span class="xref">Size</span></dt>
-    <dd><p>The final area within the parent that this element should use to arrange itself and its children.</p>
-</dd>
-  </dl>
-
-  <h4 class="section">Returns</h4>
-  <dl class="parameters">
-    <dt><span class="xref">Size</span></dt>
-    <dd><p>The actual size used by the <a class="xref" href="Avalonia.Controls.Primitives.DataGridColumnHeadersPresenter.html">DataGridColumnHeadersPresenter</a>.</p>
-</dd>
-  </dl>
-
-
-
-
-
-
-
-
-
-
-
-  <a id="Avalonia_Controls_Primitives_DataGridColumnHeadersPresenter_ChildrenChanged_" data-uid="Avalonia.Controls.Primitives.DataGridColumnHeadersPresenter.ChildrenChanged*"></a>
-
-  <h3 id="Avalonia_Controls_Primitives_DataGridColumnHeadersPresenter_ChildrenChanged_System_Object_System_Collections_Specialized_NotifyCollectionChangedEventArgs_" data-uid="Avalonia.Controls.Primitives.DataGridColumnHeadersPresenter.ChildrenChanged(System.Object,System.Collections.Specialized.NotifyCollectionChangedEventArgs)">
-  ChildrenChanged(object, NotifyCollectionChangedEventArgs)
-  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/Primitives/DataGridColumnHeadersPresenter.cs/#L789"><i class="bi bi-code-slash"></i></a>
-  </h3>
-
-  <div class="markdown level1 summary"><p>Called when the <span class="xref">Avalonia.Controls.Panel.Children</span> collection changes.</p>
-</div>
-  <div class="markdown level1 conceptual"></div>
-
-  <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">protected override void ChildrenChanged(object sender, NotifyCollectionChangedEventArgs e)</code></pre>
-  </div>
-
-  <h4 class="section">Parameters</h4>
-  <dl class="parameters">
-    <dt><code>sender</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object">object</a></dt>
-    <dd><p>The event sender.</p>
-</dd>
-    <dt><code>e</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.specialized.notifycollectionchangedeventargs">NotifyCollectionChangedEventArgs</a></dt>
-    <dd><p>The event args.</p>
-</dd>
-  </dl>
-
-
-
-
-
-
-
-
-
-
-
-
-  <a id="Avalonia_Controls_Primitives_DataGridColumnHeadersPresenter_MeasureOverride_" data-uid="Avalonia.Controls.Primitives.DataGridColumnHeadersPresenter.MeasureOverride*"></a>
-
-  <h3 id="Avalonia_Controls_Primitives_DataGridColumnHeadersPresenter_MeasureOverride_Avalonia_Size_" data-uid="Avalonia.Controls.Primitives.DataGridColumnHeadersPresenter.MeasureOverride(Avalonia.Size)">
-  MeasureOverride(Size)
-  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/Primitives/DataGridColumnHeadersPresenter.cs/#L370"><i class="bi bi-code-slash"></i></a>
-  </h3>
-
-  <div class="markdown level1 summary"><p>Measures the children of a <a class="xref" href="Avalonia.Controls.Primitives.DataGridColumnHeadersPresenter.html">DataGridColumnHeadersPresenter</a> to
-prepare for arranging them during the <span class="xref">System.Windows.FrameworkElement.ArrangeOverride(System.Windows.Size)</span> pass.</p>
-</div>
-  <div class="markdown level1 conceptual"></div>
-
-  <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">protected override Size MeasureOverride(Size availableSize)</code></pre>
-  </div>
-
-  <h4 class="section">Parameters</h4>
-  <dl class="parameters">
-    <dt><code>availableSize</code> <span class="xref">Size</span></dt>
-    <dd><p>The available size that this element can give to child elements. Indicates an upper limit that child elements should not exceed.</p>
-</dd>
-  </dl>
-
-  <h4 class="section">Returns</h4>
-  <dl class="parameters">
-    <dt><span class="xref">Size</span></dt>
-    <dd><p>The size that the <a class="xref" href="Avalonia.Controls.Primitives.DataGridColumnHeadersPresenter.html">DataGridColumnHeadersPresenter</a> determines it needs during layout, based on its calculations of child object allocated sizes.</p>
-</dd>
-  </dl>
-
-
-
-
-
-
-
-
-
-
-
-  <a id="Avalonia_Controls_Primitives_DataGridColumnHeadersPresenter_OnCreateAutomationPeer_" data-uid="Avalonia.Controls.Primitives.DataGridColumnHeadersPresenter.OnCreateAutomationPeer*"></a>
-
-  <h3 id="Avalonia_Controls_Primitives_DataGridColumnHeadersPresenter_OnCreateAutomationPeer" data-uid="Avalonia.Controls.Primitives.DataGridColumnHeadersPresenter.OnCreateAutomationPeer">
-  OnCreateAutomationPeer()
-  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/Primitives/DataGridColumnHeadersPresenter.cs/#L161"><i class="bi bi-code-slash"></i></a>
-  </h3>
-
-  <div class="markdown level1 summary"><p>Returns a new, type-specific <span class="xref">Avalonia.Automation.Peers.AutomationPeer</span> implementation for the control.</p>
-</div>
-  <div class="markdown level1 conceptual"></div>
-
-  <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">protected override AutomationPeer OnCreateAutomationPeer()</code></pre>
+    <pre><code class="lang-csharp hljs">public DataGridColumnBandHeaderCell()</code></pre>
   </div>
 
 
-  <h4 class="section">Returns</h4>
-  <dl class="parameters">
-    <dt><span class="xref">AutomationPeer</span></dt>
-    <dd><p>The type-specific <span class="xref">Avalonia.Automation.Peers.AutomationPeer</span> implementation.</p>
-</dd>
-  </dl>
 
 
 
@@ -1063,7 +1061,7 @@ prepare for arranging them during the <span class="xref">System.Windows.Framewor
 </article>
 
         <div class="contribution d-print-none">
-          <a href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/Primitives/DataGridColumnHeadersPresenter.cs/#L26" class="edit-link">Edit this page</a>
+          <a href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/Banding/DataGridColumnBandHeaderCell.cs/#L12" class="edit-link">Edit this page</a>
         </div>
 
 
