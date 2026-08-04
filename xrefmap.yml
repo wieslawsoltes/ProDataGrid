@@ -48536,6 +48536,19 @@ references:
   isSpec: "True"
   fullName: Avalonia.Controls.Utils.ICellEditBinding.CommitEdit
   nameWithType: ICellEditBinding.CommitEdit
+- uid: Avalonia.Controls.Utils.ICellEditBinding.HasSourceWriteError
+  name: HasSourceWriteError
+  href: api/Avalonia.Controls.Utils.ICellEditBinding.html#Avalonia_Controls_Utils_ICellEditBinding_HasSourceWriteError
+  commentId: P:Avalonia.Controls.Utils.ICellEditBinding.HasSourceWriteError
+  fullName: Avalonia.Controls.Utils.ICellEditBinding.HasSourceWriteError
+  nameWithType: ICellEditBinding.HasSourceWriteError
+- uid: Avalonia.Controls.Utils.ICellEditBinding.HasSourceWriteError*
+  name: HasSourceWriteError
+  href: api/Avalonia.Controls.Utils.ICellEditBinding.html#Avalonia_Controls_Utils_ICellEditBinding_HasSourceWriteError_
+  commentId: Overload:Avalonia.Controls.Utils.ICellEditBinding.HasSourceWriteError
+  isSpec: "True"
+  fullName: Avalonia.Controls.Utils.ICellEditBinding.HasSourceWriteError
+  nameWithType: ICellEditBinding.HasSourceWriteError
 - uid: Avalonia.Controls.Utils.ICellEditBinding.IsValid
   name: IsValid
   href: api/Avalonia.Controls.Utils.ICellEditBinding.html#Avalonia_Controls_Utils_ICellEditBinding_IsValid
