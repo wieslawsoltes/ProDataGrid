@@ -193,6 +193,7 @@ public IDataGridRowDropHandler DropHandler { get; } = new CustomRowDropHandler()
 <li><code>true</code> keeps click-to-select but prevents range-selection drag from taking over the intended row drag gesture.</li>
 <li><code>false</code> restores the older behavior where selection drag can begin from the same surface.</li>
 </ul>
+<p>With suppression enabled and extended full-row selection active, pressing an already selected row keeps the complete selection available for drag detection. Crossing the drag threshold starts one drag containing all selected rows. Releasing without starting a drag applies the normal click behavior and collapses the selection to the clicked row.</p>
 <h2 id="drop-visuals-and-feedback">Drop Visuals and Feedback</h2>
 <p>Drag/drop exposes pseudo-classes you can style:</p>
 <ul>
