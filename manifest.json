@@ -5128,6 +5128,48 @@
     },
     {
       "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.DataGridSizing.DataGridColumnWidthSharing.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.DataGridSizing.DataGridColumnWidthSharing.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.DataGridSizing.DataGridColumnWidthSharing",
+      "Summary": "<p sourcefile=\"api/Avalonia.Controls.DataGridSizing.DataGridColumnWidthSharing.yml\" sourcestartlinenumber=\"1\">Provides the attached column group used by <xref href=\"Avalonia.Controls.DataGridSizing.DataGridColumnWidthSharingScope\" data-throw-if-not-resolved=\"false\"></xref>.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.DataGridSizing.DataGridColumnWidthSharingScope.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.DataGridSizing.DataGridColumnWidthSharingScope.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.DataGridSizing.DataGridColumnWidthSharingScope",
+      "Summary": "<p sourcefile=\"api/Avalonia.Controls.DataGridSizing.DataGridColumnWidthSharingScope.yml\" sourcestartlinenumber=\"1\">Synchronizes the display widths of columns that share the same group name across DataGrid controls.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.DataGridSizing.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.DataGridSizing.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.DataGridSizing",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
       "source_relative_path": "api/Avalonia.Controls.DataGridSliderColumn.yml",
       "output": {
         ".html": {

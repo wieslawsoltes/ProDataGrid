@@ -4051,6 +4051,25 @@ references:
   commentId: F:Avalonia.Controls.DataGrid.ColumnWidthProperty
   fullName: Avalonia.Controls.DataGrid.ColumnWidthProperty
   nameWithType: DataGrid.ColumnWidthProperty
+- uid: Avalonia.Controls.DataGrid.ColumnWidthSharingScope
+  name: ColumnWidthSharingScope
+  href: api/Avalonia.Controls.DataGrid.html#Avalonia_Controls_DataGrid_ColumnWidthSharingScope
+  commentId: P:Avalonia.Controls.DataGrid.ColumnWidthSharingScope
+  fullName: Avalonia.Controls.DataGrid.ColumnWidthSharingScope
+  nameWithType: DataGrid.ColumnWidthSharingScope
+- uid: Avalonia.Controls.DataGrid.ColumnWidthSharingScope*
+  name: ColumnWidthSharingScope
+  href: api/Avalonia.Controls.DataGrid.html#Avalonia_Controls_DataGrid_ColumnWidthSharingScope_
+  commentId: Overload:Avalonia.Controls.DataGrid.ColumnWidthSharingScope
+  isSpec: "True"
+  fullName: Avalonia.Controls.DataGrid.ColumnWidthSharingScope
+  nameWithType: DataGrid.ColumnWidthSharingScope
+- uid: Avalonia.Controls.DataGrid.ColumnWidthSharingScopeProperty
+  name: ColumnWidthSharingScopeProperty
+  href: api/Avalonia.Controls.DataGrid.html#Avalonia_Controls_DataGrid_ColumnWidthSharingScopeProperty
+  commentId: F:Avalonia.Controls.DataGrid.ColumnWidthSharingScopeProperty
+  fullName: Avalonia.Controls.DataGrid.ColumnWidthSharingScopeProperty
+  nameWithType: DataGrid.ColumnWidthSharingScopeProperty
 - uid: Avalonia.Controls.DataGrid.Columns
   name: Columns
   href: api/Avalonia.Controls.DataGrid.html#Avalonia_Controls_DataGrid_Columns
@@ -12666,6 +12685,19 @@ references:
   isSpec: "True"
   fullName: Avalonia.Controls.DataGridColumnDefinition.Width
   nameWithType: DataGridColumnDefinition.Width
+- uid: Avalonia.Controls.DataGridColumnDefinition.WidthSharingGroup
+  name: WidthSharingGroup
+  href: api/Avalonia.Controls.DataGridColumnDefinition.html#Avalonia_Controls_DataGridColumnDefinition_WidthSharingGroup
+  commentId: P:Avalonia.Controls.DataGridColumnDefinition.WidthSharingGroup
+  fullName: Avalonia.Controls.DataGridColumnDefinition.WidthSharingGroup
+  nameWithType: DataGridColumnDefinition.WidthSharingGroup
+- uid: Avalonia.Controls.DataGridColumnDefinition.WidthSharingGroup*
+  name: WidthSharingGroup
+  href: api/Avalonia.Controls.DataGridColumnDefinition.html#Avalonia_Controls_DataGridColumnDefinition_WidthSharingGroup_
+  commentId: Overload:Avalonia.Controls.DataGridColumnDefinition.WidthSharingGroup
+  isSpec: "True"
+  fullName: Avalonia.Controls.DataGridColumnDefinition.WidthSharingGroup
+  nameWithType: DataGridColumnDefinition.WidthSharingGroup
 - uid: Avalonia.Controls.DataGridColumnDefinitionBuilder
   name: DataGridColumnDefinitionBuilder
   href: api/Avalonia.Controls.DataGridColumnDefinitionBuilder.html
@@ -41163,6 +41195,91 @@ references:
   commentId: F:Avalonia.Controls.DataGridSelectionUnit.FullRow
   fullName: Avalonia.Controls.DataGridSelectionUnit.FullRow
   nameWithType: DataGridSelectionUnit.FullRow
+- uid: Avalonia.Controls.DataGridSizing
+  name: Avalonia.Controls.DataGridSizing
+  href: api/Avalonia.Controls.DataGridSizing.html
+  commentId: N:Avalonia.Controls.DataGridSizing
+  fullName: Avalonia.Controls.DataGridSizing
+  nameWithType: Avalonia.Controls.DataGridSizing
+- uid: Avalonia.Controls.DataGridSizing.DataGridColumnWidthSharing
+  name: DataGridColumnWidthSharing
+  href: api/Avalonia.Controls.DataGridSizing.DataGridColumnWidthSharing.html
+  commentId: T:Avalonia.Controls.DataGridSizing.DataGridColumnWidthSharing
+  fullName: Avalonia.Controls.DataGridSizing.DataGridColumnWidthSharing
+  nameWithType: DataGridColumnWidthSharing
+- uid: Avalonia.Controls.DataGridSizing.DataGridColumnWidthSharing.GetGroup(Avalonia.AvaloniaObject)
+  name: GetGroup(AvaloniaObject)
+  href: api/Avalonia.Controls.DataGridSizing.DataGridColumnWidthSharing.html#Avalonia_Controls_DataGridSizing_DataGridColumnWidthSharing_GetGroup_Avalonia_AvaloniaObject_
+  commentId: M:Avalonia.Controls.DataGridSizing.DataGridColumnWidthSharing.GetGroup(Avalonia.AvaloniaObject)
+  fullName: Avalonia.Controls.DataGridSizing.DataGridColumnWidthSharing.GetGroup(Avalonia.AvaloniaObject)
+  nameWithType: DataGridColumnWidthSharing.GetGroup(AvaloniaObject)
+- uid: Avalonia.Controls.DataGridSizing.DataGridColumnWidthSharing.GetGroup*
+  name: GetGroup
+  href: api/Avalonia.Controls.DataGridSizing.DataGridColumnWidthSharing.html#Avalonia_Controls_DataGridSizing_DataGridColumnWidthSharing_GetGroup_
+  commentId: Overload:Avalonia.Controls.DataGridSizing.DataGridColumnWidthSharing.GetGroup
+  isSpec: "True"
+  fullName: Avalonia.Controls.DataGridSizing.DataGridColumnWidthSharing.GetGroup
+  nameWithType: DataGridColumnWidthSharing.GetGroup
+- uid: Avalonia.Controls.DataGridSizing.DataGridColumnWidthSharing.GroupProperty
+  name: GroupProperty
+  href: api/Avalonia.Controls.DataGridSizing.DataGridColumnWidthSharing.html#Avalonia_Controls_DataGridSizing_DataGridColumnWidthSharing_GroupProperty
+  commentId: F:Avalonia.Controls.DataGridSizing.DataGridColumnWidthSharing.GroupProperty
+  fullName: Avalonia.Controls.DataGridSizing.DataGridColumnWidthSharing.GroupProperty
+  nameWithType: DataGridColumnWidthSharing.GroupProperty
+- uid: Avalonia.Controls.DataGridSizing.DataGridColumnWidthSharing.SetGroup(Avalonia.AvaloniaObject,System.String)
+  name: SetGroup(AvaloniaObject, string)
+  href: api/Avalonia.Controls.DataGridSizing.DataGridColumnWidthSharing.html#Avalonia_Controls_DataGridSizing_DataGridColumnWidthSharing_SetGroup_Avalonia_AvaloniaObject_System_String_
+  commentId: M:Avalonia.Controls.DataGridSizing.DataGridColumnWidthSharing.SetGroup(Avalonia.AvaloniaObject,System.String)
+  name.vb: SetGroup(AvaloniaObject, String)
+  fullName: Avalonia.Controls.DataGridSizing.DataGridColumnWidthSharing.SetGroup(Avalonia.AvaloniaObject, string)
+  fullName.vb: Avalonia.Controls.DataGridSizing.DataGridColumnWidthSharing.SetGroup(Avalonia.AvaloniaObject, String)
+  nameWithType: DataGridColumnWidthSharing.SetGroup(AvaloniaObject, string)
+  nameWithType.vb: DataGridColumnWidthSharing.SetGroup(AvaloniaObject, String)
+- uid: Avalonia.Controls.DataGridSizing.DataGridColumnWidthSharing.SetGroup*
+  name: SetGroup
+  href: api/Avalonia.Controls.DataGridSizing.DataGridColumnWidthSharing.html#Avalonia_Controls_DataGridSizing_DataGridColumnWidthSharing_SetGroup_
+  commentId: Overload:Avalonia.Controls.DataGridSizing.DataGridColumnWidthSharing.SetGroup
+  isSpec: "True"
+  fullName: Avalonia.Controls.DataGridSizing.DataGridColumnWidthSharing.SetGroup
+  nameWithType: DataGridColumnWidthSharing.SetGroup
+- uid: Avalonia.Controls.DataGridSizing.DataGridColumnWidthSharingScope
+  name: DataGridColumnWidthSharingScope
+  href: api/Avalonia.Controls.DataGridSizing.DataGridColumnWidthSharingScope.html
+  commentId: T:Avalonia.Controls.DataGridSizing.DataGridColumnWidthSharingScope
+  fullName: Avalonia.Controls.DataGridSizing.DataGridColumnWidthSharingScope
+  nameWithType: DataGridColumnWidthSharingScope
+- uid: Avalonia.Controls.DataGridSizing.DataGridColumnWidthSharingScope.#ctor
+  name: DataGridColumnWidthSharingScope()
+  href: api/Avalonia.Controls.DataGridSizing.DataGridColumnWidthSharingScope.html#Avalonia_Controls_DataGridSizing_DataGridColumnWidthSharingScope__ctor
+  commentId: M:Avalonia.Controls.DataGridSizing.DataGridColumnWidthSharingScope.#ctor
+  name.vb: New()
+  fullName: Avalonia.Controls.DataGridSizing.DataGridColumnWidthSharingScope.DataGridColumnWidthSharingScope()
+  fullName.vb: Avalonia.Controls.DataGridSizing.DataGridColumnWidthSharingScope.New()
+  nameWithType: DataGridColumnWidthSharingScope.DataGridColumnWidthSharingScope()
+  nameWithType.vb: DataGridColumnWidthSharingScope.New()
+- uid: Avalonia.Controls.DataGridSizing.DataGridColumnWidthSharingScope.#ctor*
+  name: DataGridColumnWidthSharingScope
+  href: api/Avalonia.Controls.DataGridSizing.DataGridColumnWidthSharingScope.html#Avalonia_Controls_DataGridSizing_DataGridColumnWidthSharingScope__ctor_
+  commentId: Overload:Avalonia.Controls.DataGridSizing.DataGridColumnWidthSharingScope.#ctor
+  isSpec: "True"
+  name.vb: New
+  fullName: Avalonia.Controls.DataGridSizing.DataGridColumnWidthSharingScope.DataGridColumnWidthSharingScope
+  fullName.vb: Avalonia.Controls.DataGridSizing.DataGridColumnWidthSharingScope.New
+  nameWithType: DataGridColumnWidthSharingScope.DataGridColumnWidthSharingScope
+  nameWithType.vb: DataGridColumnWidthSharingScope.New
+- uid: Avalonia.Controls.DataGridSizing.DataGridColumnWidthSharingScope.Synchronize
+  name: Synchronize()
+  href: api/Avalonia.Controls.DataGridSizing.DataGridColumnWidthSharingScope.html#Avalonia_Controls_DataGridSizing_DataGridColumnWidthSharingScope_Synchronize
+  commentId: M:Avalonia.Controls.DataGridSizing.DataGridColumnWidthSharingScope.Synchronize
+  fullName: Avalonia.Controls.DataGridSizing.DataGridColumnWidthSharingScope.Synchronize()
+  nameWithType: DataGridColumnWidthSharingScope.Synchronize()
+- uid: Avalonia.Controls.DataGridSizing.DataGridColumnWidthSharingScope.Synchronize*
+  name: Synchronize
+  href: api/Avalonia.Controls.DataGridSizing.DataGridColumnWidthSharingScope.html#Avalonia_Controls_DataGridSizing_DataGridColumnWidthSharingScope_Synchronize_
+  commentId: Overload:Avalonia.Controls.DataGridSizing.DataGridColumnWidthSharingScope.Synchronize
+  isSpec: "True"
+  fullName: Avalonia.Controls.DataGridSizing.DataGridColumnWidthSharingScope.Synchronize
+  nameWithType: DataGridColumnWidthSharingScope.Synchronize
 - uid: Avalonia.Controls.DataGridSliderColumn
   name: DataGridSliderColumn
   href: api/Avalonia.Controls.DataGridSliderColumn.html

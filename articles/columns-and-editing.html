@@ -138,6 +138,53 @@
           CanUserResizeColumns=&quot;True&quot;
           CanUserReorderColumns=&quot;True&quot; /&gt;
 </code></pre>
+<h3 id="sharing-widths-across-grids">Sharing widths across grids</h3>
+<p>Use one <code>DataGridColumnWidthSharingScope</code> resource for every grid that should participate, then assign the same <code>WidthSharingGroup</code> to corresponding column definitions. The scope starts a group at its largest registered width and propagates later programmatic, automatic, and user-initiated width changes in either direction.</p>
+<pre><code class="lang-xml">&lt;UserControl xmlns=&quot;https://github.com/avaloniaui&quot;
+             xmlns:x=&quot;http://schemas.microsoft.com/winfx/2006/xaml&quot;
+             xmlns:sizing=&quot;using:Avalonia.Controls.DataGridSizing&quot;
+             xmlns:vm=&quot;using:MyApp.ViewModels&quot;
+             x:DataType=&quot;vm:ComparisonViewModel&quot;&gt;
+  &lt;UserControl.Resources&gt;
+    &lt;sizing:DataGridColumnWidthSharingScope x:Key=&quot;ComparisonColumnWidths&quot; /&gt;
+  &lt;/UserControl.Resources&gt;
+
+  &lt;Grid RowDefinitions=&quot;*,*&quot;&gt;
+    &lt;DataGrid ItemsSource=&quot;{CompiledBinding CurrentItems}&quot;
+              ColumnDefinitionsSource=&quot;{CompiledBinding CurrentColumns}&quot;
+              ColumnWidthSharingScope=&quot;{StaticResource ComparisonColumnWidths}&quot;
+              AutoGenerateColumns=&quot;False&quot; /&gt;
+    &lt;DataGrid Grid.Row=&quot;1&quot;
+              ItemsSource=&quot;{CompiledBinding BaselineItems}&quot;
+              ColumnDefinitionsSource=&quot;{CompiledBinding BaselineColumns}&quot;
+              ColumnWidthSharingScope=&quot;{StaticResource ComparisonColumnWidths}&quot;
+              AutoGenerateColumns=&quot;False&quot; /&gt;
+  &lt;/Grid&gt;
+&lt;/UserControl&gt;
+</code></pre>
+<pre><code class="lang-csharp">public sealed class ComparisonViewModel : ReactiveObject
+{
+    public DataGridColumnDefinitionList CurrentColumns { get; } = CreateColumns();
+    public DataGridColumnDefinitionList BaselineColumns { get; } = CreateColumns();
+
+    private static DataGridColumnDefinitionList CreateColumns() =&gt; new()
+    {
+        new DataGridTextColumnDefinition
+        {
+            Header = &quot;Name&quot;,
+            Width = DataGridLength.Auto,
+            WidthSharingGroup = &quot;name&quot;
+        },
+        new DataGridNumericColumnDefinition
+        {
+            Header = &quot;Amount&quot;,
+            Width = new DataGridLength(120),
+            WidthSharingGroup = &quot;amount&quot;
+        }
+    };
+}
+</code></pre>
+<p>For columns declared directly in XAML, set <code>sizing:DataGridColumnWidthSharing.Group=&quot;name&quot;</code> instead. Group names are case-sensitive. Pixel columns remain pixel-sized, intrinsic sizing modes such as <code>Auto</code> are preserved, and star columns become pixel columns when synchronized because an exact width must be shared across grids with potentially different available space. The scope respects the common <code>MinWidth</code>/<code>MaxWidth</code> range; if constraints do not overlap, each column is clamped to its own range. Remove the group or scope to stop synchronization. Call <code>Synchronize()</code> when you need to recompute a group from the largest current width explicitly.</p>
 <h2 id="headers-sorting-and-filters">Headers, Sorting, and Filters</h2>
 <p>Columns expose header content and sorting metadata:</p>
 <ul>
