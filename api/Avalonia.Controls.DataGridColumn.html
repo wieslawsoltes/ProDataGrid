@@ -644,7 +644,7 @@ Class DataGridColumn  <a class="header-action link-secondary" title="View source
 
   <h3 id="Avalonia_Controls_DataGridColumn_SortDirectionProperty" data-uid="Avalonia.Controls.DataGridColumn.SortDirectionProperty">
   SortDirectionProperty
-  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/DataGridColumn.cs/#L999"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/DataGridColumn.cs/#L1001"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>Gets or sets the current sort direction for this column.</p>
@@ -1106,7 +1106,9 @@ public BindingBase CellForegroundBinding { get; set; }</code></pre>
   <div class="markdown level1 conceptual"></div>
 
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public virtual BindingBase ClipboardContentBinding { get; set; }</code></pre>
+    <pre><code class="lang-csharp hljs">[AssignBinding]
+[InheritDataTypeFromItems(&quot;ItemsSource&quot;, AncestorType = typeof(DataGrid))]
+public virtual BindingBase ClipboardContentBinding { get; set; }</code></pre>
   </div>
 
 
@@ -1130,7 +1132,7 @@ public BindingBase CellForegroundBinding { get; set; }</code></pre>
 
   <h3 id="Avalonia_Controls_DataGridColumn_ColumnKey" data-uid="Avalonia.Controls.DataGridColumn.ColumnKey">
   ColumnKey
-  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/DataGridColumn.cs/#L1105"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/DataGridColumn.cs/#L1107"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>Gets or sets a stable column identifier for filtering, sorting, and commands.</p>
@@ -1162,7 +1164,7 @@ public BindingBase CellForegroundBinding { get; set; }</code></pre>
 
   <h3 id="Avalonia_Controls_DataGridColumn_CustomSortComparer" data-uid="Avalonia.Controls.DataGridColumn.CustomSortComparer">
   CustomSortComparer
-  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/DataGridColumn.cs/#L1123"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/DataGridColumn.cs/#L1125"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>Holds a Comparer to use for sorting, if not using the default.</p>
@@ -1714,7 +1716,7 @@ public BindingBase CellForegroundBinding { get; set; }</code></pre>
 
   <h3 id="Avalonia_Controls_DataGridColumn_SortDirection" data-uid="Avalonia.Controls.DataGridColumn.SortDirection">
   SortDirection
-  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/DataGridColumn.cs/#L1006"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/DataGridColumn.cs/#L1008"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>Gets or sets the current sort direction for this column. Setting this property updates
@@ -1747,7 +1749,7 @@ the owning grid's sorting model; clearing it removes the column from sorting.</p
 
   <h3 id="Avalonia_Controls_DataGridColumn_SortMemberPath" data-uid="Avalonia.Controls.DataGridColumn.SortMemberPath">
   SortMemberPath
-  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/DataGridColumn.cs/#L1096"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/DataGridColumn.cs/#L1098"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>Holds the name of the member to use for sorting, if not using the default.</p>
@@ -1907,7 +1909,7 @@ the owning grid's sorting model; clearing it removes the column from sorting.</p
 
   <h3 id="Avalonia_Controls_DataGridColumn_Tag" data-uid="Avalonia.Controls.DataGridColumn.Tag">
   Tag
-  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/DataGridColumn.cs/#L1114"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/DataGridColumn.cs/#L1116"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>Gets or sets an object associated with this column.</p>
@@ -2097,7 +2099,7 @@ the owning grid's sorting model; clearing it removes the column from sorting.</p
 
   <h3 id="Avalonia_Controls_DataGridColumn_GenerateEditingElement_Avalonia_Controls_DataGridCell_System_Object_Avalonia_Controls_Utils_ICellEditBinding__" data-uid="Avalonia.Controls.DataGridColumn.GenerateEditingElement(Avalonia.Controls.DataGridCell,System.Object,Avalonia.Controls.Utils.ICellEditBinding@)">
   GenerateEditingElement(DataGridCell, object, out ICellEditBinding)
-  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/DataGridColumn.cs/#L1026"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/DataGridColumn.cs/#L1028"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>When overridden in a derived class, gets an editing element that is bound to the column's <a class="xref" href="Avalonia.Controls.DataGridBoundColumn.html#Avalonia_Controls_DataGridBoundColumn_Binding">Binding</a> property value.</p>
@@ -2142,7 +2144,7 @@ the owning grid's sorting model; clearing it removes the column from sorting.</p
 
   <h3 id="Avalonia_Controls_DataGridColumn_GenerateElement_Avalonia_Controls_DataGridCell_System_Object_" data-uid="Avalonia.Controls.DataGridColumn.GenerateElement(Avalonia.Controls.DataGridCell,System.Object)">
   GenerateElement(DataGridCell, object)
-  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/DataGridColumn.cs/#L1041"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/DataGridColumn.cs/#L1043"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>When overridden in a derived class, gets a read-only element that is bound to the column's
@@ -2221,7 +2223,7 @@ the owning grid's sorting model; clearing it removes the column from sorting.</p
 
   <h3 id="Avalonia_Controls_DataGridColumn_GetCellContent_System_Object_" data-uid="Avalonia.Controls.DataGridColumn.GetCellContent(System.Object)">
   GetCellContent(object)
-  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/DataGridColumn.cs/#L960"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/DataGridColumn.cs/#L962"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"></div>
@@ -2296,7 +2298,7 @@ the owning grid's sorting model; clearing it removes the column from sorting.</p
 
   <h3 id="Avalonia_Controls_DataGridColumn_GetColumnControlTheme_System_String_" data-uid="Avalonia.Controls.DataGridColumn.GetColumnControlTheme(System.String)">
   GetColumnControlTheme(string)
-  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/DataGridColumn.cs/#L936"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/DataGridColumn.cs/#L938"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>Resolves a <span class="xref">Avalonia.Styling.ControlTheme</span> from the owning grid's resources for the given key.
@@ -2336,7 +2338,7 @@ Returns <code>null</code> when the grid is unavailable, the resource is missing,
 
   <h3 id="Avalonia_Controls_DataGridColumn_NotifyPropertyChanged_System_String_" data-uid="Avalonia.Controls.DataGridColumn.NotifyPropertyChanged(System.String)">
   NotifyPropertyChanged(string)
-  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/DataGridColumn.cs/#L1048"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/DataGridColumn.cs/#L1050"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>Called by a specific column type when one of its properties changed,
@@ -2403,7 +2405,7 @@ and its current cells need to be updated.</p>
 
   <h3 id="Avalonia_Controls_DataGridColumn_PrepareCellForEdit_Avalonia_Controls_Control_Avalonia_Interactivity_RoutedEventArgs_" data-uid="Avalonia.Controls.DataGridColumn.PrepareCellForEdit(Avalonia.Controls.Control,Avalonia.Interactivity.RoutedEventArgs)">
   PrepareCellForEdit(Control, RoutedEventArgs)
-  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/DataGridColumn.cs/#L1065"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/DataGridColumn.cs/#L1067"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>When overridden in a derived class, called when a cell in the column enters editing mode.</p>
@@ -2445,7 +2447,7 @@ and its current cells need to be updated.</p>
 
   <h3 id="Avalonia_Controls_DataGridColumn_RefreshCellContent_Avalonia_Controls_Control_System_String_" data-uid="Avalonia.Controls.DataGridColumn.RefreshCellContent(Avalonia.Controls.Control,System.String)">
   RefreshCellContent(Control, string)
-  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/DataGridColumn.cs/#L1073"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/DataGridColumn.cs/#L1075"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>Called by the DataGrid control when a column asked for its
@@ -2513,7 +2515,7 @@ elements to be refreshed, typically because one of its properties changed.</p>
 
   <h3 id="Avalonia_Controls_DataGridColumn_Sort" data-uid="Avalonia.Controls.DataGridColumn.Sort">
   Sort()
-  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/DataGridColumn.cs/#L980"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/DataGridColumn.cs/#L982"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>Switches the current state of sort direction</p>
@@ -2540,7 +2542,7 @@ elements to be refreshed, typically because one of its properties changed.</p>
 
   <h3 id="Avalonia_Controls_DataGridColumn_Sort_System_ComponentModel_ListSortDirection_" data-uid="Avalonia.Controls.DataGridColumn.Sort(System.ComponentModel.ListSortDirection)">
   Sort(ListSortDirection)
-  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/DataGridColumn.cs/#L990"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/DataGridColumn.cs/#L992"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>Changes the sort direction of this column</p>

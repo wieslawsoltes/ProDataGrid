@@ -528,7 +528,7 @@ public virtual BindingBase Binding { get; set; }</code></pre>
 
   <h3 id="Avalonia_Controls_DataGridBoundColumn_BindingTarget" data-uid="Avalonia.Controls.DataGridBoundColumn.BindingTarget">
   BindingTarget
-  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/DataGridBoundColumn.cs/#L143"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/DataGridBoundColumn.cs/#L145"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"></div>
@@ -568,7 +568,9 @@ If the base ClipboardContentBinding is not explicitly set, this will return the 
   <div class="markdown level1 conceptual"></div>
 
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public override BindingBase ClipboardContentBinding { get; set; }</code></pre>
+    <pre><code class="lang-csharp hljs">[AssignBinding]
+[InheritDataTypeFromItems(&quot;ItemsSource&quot;, AncestorType = typeof(DataGrid))]
+public override BindingBase ClipboardContentBinding { get; set; }</code></pre>
   </div>
 
 
@@ -596,7 +598,7 @@ If the base ClipboardContentBinding is not explicitly set, this will return the 
 
   <h3 id="Avalonia_Controls_DataGridBoundColumn_GenerateEditingElement_Avalonia_Controls_DataGridCell_System_Object_Avalonia_Controls_Utils_ICellEditBinding__" data-uid="Avalonia.Controls.DataGridBoundColumn.GenerateEditingElement(Avalonia.Controls.DataGridCell,System.Object,Avalonia.Controls.Utils.ICellEditBinding@)">
   GenerateEditingElement(DataGridCell, object, out ICellEditBinding)
-  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/DataGridBoundColumn.cs/#L107"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/DataGridBoundColumn.cs/#L109"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>When overridden in a derived class, gets an editing element that is bound to the column's <a class="xref" href="Avalonia.Controls.DataGridBoundColumn.html#Avalonia_Controls_DataGridBoundColumn_Binding">Binding</a> property value.</p>
@@ -640,7 +642,7 @@ If the base ClipboardContentBinding is not explicitly set, this will return the 
 
   <h3 id="Avalonia_Controls_DataGridBoundColumn_GenerateEditingElementDirect_Avalonia_Controls_DataGridCell_System_Object_" data-uid="Avalonia.Controls.DataGridBoundColumn.GenerateEditingElementDirect(Avalonia.Controls.DataGridCell,System.Object)">
   GenerateEditingElementDirect(DataGridCell, object)
-  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/DataGridBoundColumn.cs/#L140"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/DataGridBoundColumn.cs/#L142"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"></div>
@@ -678,7 +680,7 @@ If the base ClipboardContentBinding is not explicitly set, this will return the 
 
   <h3 id="Avalonia_Controls_DataGridBoundColumn_RefreshEditingElement_Avalonia_Controls_Control_" data-uid="Avalonia.Controls.DataGridBoundColumn.RefreshEditingElement(Avalonia.Controls.Control)">
   RefreshEditingElement(Control)
-  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/DataGridBoundColumn.cs/#L120"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/DataGridBoundColumn.cs/#L122"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"></div>
