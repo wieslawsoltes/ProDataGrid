@@ -27657,6 +27657,19 @@ references:
   fullName.vb: Avalonia.Controls.DataGridHierarchicalColumn.New
   nameWithType: DataGridHierarchicalColumn.DataGridHierarchicalColumn
   nameWithType.vb: DataGridHierarchicalColumn.New
+- uid: Avalonia.Controls.DataGridHierarchicalColumn.Binding
+  name: Binding
+  href: api/Avalonia.Controls.DataGridHierarchicalColumn.html#Avalonia_Controls_DataGridHierarchicalColumn_Binding
+  commentId: P:Avalonia.Controls.DataGridHierarchicalColumn.Binding
+  fullName: Avalonia.Controls.DataGridHierarchicalColumn.Binding
+  nameWithType: DataGridHierarchicalColumn.Binding
+- uid: Avalonia.Controls.DataGridHierarchicalColumn.Binding*
+  name: Binding
+  href: api/Avalonia.Controls.DataGridHierarchicalColumn.html#Avalonia_Controls_DataGridHierarchicalColumn_Binding_
+  commentId: Overload:Avalonia.Controls.DataGridHierarchicalColumn.Binding
+  isSpec: "True"
+  fullName: Avalonia.Controls.DataGridHierarchicalColumn.Binding
+  nameWithType: DataGridHierarchicalColumn.Binding
 - uid: Avalonia.Controls.DataGridHierarchicalColumn.CellTemplate
   name: CellTemplate
   href: api/Avalonia.Controls.DataGridHierarchicalColumn.html#Avalonia_Controls_DataGridHierarchicalColumn_CellTemplate
