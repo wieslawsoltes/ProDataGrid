@@ -1,6 +1,6 @@
-using System;
 using Avalonia.Controls;
 using Avalonia.Controls.Templates;
+using Avalonia.Diagnostics.Generated;
 using Avalonia.Diagnostics.ViewModels;
 
 namespace Avalonia.Diagnostics
@@ -12,17 +12,12 @@ namespace Avalonia.Diagnostics
             if (data is null)
                 return null;
 
-            var name = data.GetType().FullName!.Replace("ViewModel", "View");
-            var type = Type.GetType(name);
+            if (ProDiagnosticsGeneratedSchemas.TryCreateView(data, out Control? view))
+            {
+                return view;
+            }
 
-            if (type != null)
-            {
-                return (Control)Activator.CreateInstance(type)!;
-            }
-            else
-            {
-                return new TextBlock { Text = name };
-            }
+            return new TextBlock { Text = $"No generated view registration for {data.GetType().FullName}." };
         }
 
         public bool Match(object? data)

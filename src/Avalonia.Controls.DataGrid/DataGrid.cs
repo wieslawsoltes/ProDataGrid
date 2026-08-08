@@ -2306,6 +2306,7 @@ internal
                         FastPathOptions_PropertyChanged);
                 }
 
+                DataGridFastPathOptions oldValue = _fastPathOptions;
                 _fastPathOptions = value;
 
                 if (_fastPathOptions != null)
@@ -2317,6 +2318,7 @@ internal
                 }
 
                 RefreshFastPathAdapters();
+                RaisePropertyChanged(FastPathOptionsProperty, oldValue, value);
             }
         }
 

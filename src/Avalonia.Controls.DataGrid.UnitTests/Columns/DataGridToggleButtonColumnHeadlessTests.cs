@@ -45,6 +45,8 @@ public class DataGridToggleButtonColumnHeadlessTests
         AssertHasAssignBinding(nameof(DataGridToggleButtonColumn.Content));
         AssertHasAssignBinding(nameof(DataGridToggleButtonColumn.CheckedContent));
         AssertHasAssignBinding(nameof(DataGridToggleButtonColumn.UncheckedContent));
+        AssertHasAssignBinding(nameof(DataGridToggleButtonColumn.CommandBinding));
+        AssertHasAssignBinding(nameof(DataGridToggleButtonColumn.CommandParameter));
     }
 
     [AvaloniaFact]

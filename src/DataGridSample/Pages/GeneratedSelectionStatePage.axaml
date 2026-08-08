@@ -1,0 +1,37 @@
+<UserControl
+    x:Class="DataGridSample.Pages.GeneratedSelectionStatePage"
+    xmlns="https://github.com/avaloniaui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:pages="clr-namespace:DataGridSample.Pages"
+    xmlns:viewModels="clr-namespace:DataGridSample.ViewModels"
+    x:DataType="viewModels:GeneratedSelectionStateViewModel">
+  <Grid Margin="12" RowDefinitions="Auto,Auto,Auto,*" RowSpacing="8">
+    <StackPanel Spacing="4">
+      <TextBlock Classes="h2" Text="Generated keyed selection and full state" />
+      <TextBlock TextWrapping="Wrap"
+                 Text="One generated key accessor drives the fast item index, off-page selection, replacement identity, versioned JSON state, column aliases, and migration." />
+    </StackPanel>
+    <WrapPanel Grid.Row="1">
+      <Button Content="Select keys 1 + 4" Command="{Binding SelectStableKeysCommand}" />
+      <Button Content="Page 1" Command="{Binding FirstPageCommand}" />
+      <Button Content="Page 2" Command="{Binding NextPageCommand}" />
+      <Button Content="Replace + reverse" Command="{Binding ReplaceAndReorderCommand}" />
+      <Button Content="Prepare state" Command="{Binding PrepareStateCommand}" />
+      <Button Content="Capture" Command="{Binding CaptureStateCommand}" />
+      <Button Content="Scramble" Command="{Binding ScrambleStateCommand}" />
+      <Button Content="Restore" Command="{Binding RestoreStateCommand}" />
+      <Button Content="Round trip" Command="{Binding RoundTripStateCommand}" />
+      <Button Content="Legacy v1 round trip" Command="{Binding LegacyRoundTripCommand}" />
+    </WrapPanel>
+    <Border Grid.Row="2" Padding="8" Background="{DynamicResource ThemeControlLowBrush}" CornerRadius="4">
+      <Grid ColumnDefinitions="*,Auto,Auto,Auto,Auto" ColumnSpacing="14">
+        <TextBlock Text="{Binding Status}" TextTrimming="CharacterEllipsis" />
+        <TextBlock Grid.Column="1" Text="{Binding PageNumber, StringFormat='Page: {0}'}" />
+        <TextBlock Grid.Column="2" Text="{Binding SelectedKeys, StringFormat='Keys: {0}'}" />
+        <TextBlock Grid.Column="3" Text="{Binding LoadedSelectedCount, StringFormat='Loaded: {0}'}" />
+        <TextBlock Grid.Column="4" Text="{Binding StatePayloadLength, StringFormat='JSON: {0}'}" />
+      </Grid>
+    </Border>
+    <pages:GeneratedSelectionStateGrid Grid.Row="3" />
+  </Grid>
+</UserControl>

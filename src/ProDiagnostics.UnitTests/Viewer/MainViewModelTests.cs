@@ -2,6 +2,7 @@ using System;
 using System.Linq;
 using Avalonia.Headless.XUnit;
 using ProDiagnostics.Transport;
+using ProDiagnostics.Viewer.Generated;
 using ProDiagnostics.Viewer.Models;
 using ProDiagnostics.Viewer.ViewModels;
 using Xunit;
@@ -27,6 +28,19 @@ public class MainViewModelTests
         Assert.True(viewModel.GetMetricColumn("metric")?.IsVisible);
         Assert.False(viewModel.GetMetricColumn("description")?.IsVisible);
         Assert.True(viewModel.GetActivityColumn("activity")?.IsVisible);
+
+        Assert.False(viewModel.MetricColumnDefinitions.Single(
+            static column => column.ColumnKey == "description").IsVisible);
+        Assert.True(viewModel.MetricColumnDefinitions.Single(
+            static column => column.ColumnKey == "metric").IsVisible);
+    }
+
+    [Fact]
+    public void Viewer_registry_contains_both_streaming_schemas()
+    {
+        Assert.Equal(2, ProDiagnosticsViewerGeneratedSchemas.Schemas.Count);
+        Assert.True(ProDiagnosticsViewerGeneratedSchemas.TryGetSchema(typeof(MetricSeriesViewModel), out _));
+        Assert.True(ProDiagnosticsViewerGeneratedSchemas.TryGetSchema(typeof(ActivityEventViewModel), out _));
     }
 
     [AvaloniaFact]

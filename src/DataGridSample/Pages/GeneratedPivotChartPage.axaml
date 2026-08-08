@@ -1,0 +1,72 @@
+<UserControl
+    x:Class="DataGridSample.Pages.GeneratedPivotChartPage"
+    xmlns="https://github.com/avaloniaui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:charts="clr-namespace:ProCharts.Avalonia;assembly=ProCharts.Avalonia"
+    xmlns:pages="clr-namespace:DataGridSample.Pages"
+    xmlns:viewModels="clr-namespace:DataGridSample.ViewModels"
+    x:DataType="viewModels:GeneratedPivotChartViewModel">
+  <Grid Margin="12" RowDefinitions="Auto,Auto,Auto,*" RowSpacing="8">
+    <StackPanel Spacing="3">
+      <TextBlock Classes="h2" Text="Generated pivot and chart projections" />
+      <TextBlock TextWrapping="Wrap" Text="One canonical generated schema supplies typed pivot axes, values, filter metadata, grouped chart selectors, source columns, and fast-path options without property paths." />
+    </StackPanel>
+
+    <WrapPanel Grid.Row="1">
+      <Button Content="Add period" Command="{Binding AddPeriodCommand}" />
+      <Button Content="Remove period" Command="{Binding RemovePeriodCommand}" />
+      <Button Content="Toggle pivot metric" Command="{Binding ToggleMetricCommand}" />
+      <Button Content="Toggle series source" Command="{Binding ToggleSeriesSourceCommand}" />
+      <Button Content="Restore baseline" Command="{Binding RestoreCommand}" />
+    </WrapPanel>
+
+    <Border Grid.Row="2" Padding="8" Background="{DynamicResource ThemeControlLowBrush}" CornerRadius="4">
+      <Grid ColumnDefinitions="3*,Auto,Auto,Auto,Auto" ColumnSpacing="16">
+        <TextBlock Text="{Binding Status}" TextWrapping="Wrap" />
+        <TextBlock Grid.Column="1" Text="{Binding SourceRowCount, StringFormat='Rows: {0}'}" />
+        <TextBlock Grid.Column="2" Text="{Binding PivotRowCount, StringFormat='Pivot rows: {0}'}" />
+        <TextBlock Grid.Column="3" Text="{Binding PivotColumnCount, StringFormat='Pivot columns: {0}'}" />
+        <TextBlock Grid.Column="4" Text="{Binding SelectedMetric, StringFormat='Metric: {0}'}" />
+      </Grid>
+    </Border>
+
+    <TabControl Grid.Row="3">
+      <TabItem Header="Generated grouped source">
+        <Grid ColumnDefinitions="3*,2*" ColumnSpacing="10" Margin="0,8,0,0">
+          <pages:GeneratedPivotChartGrid />
+          <Border Grid.Column="1" Padding="8" BorderBrush="{DynamicResource ThemeBorderLowBrush}" BorderThickness="1" CornerRadius="5">
+            <Grid RowDefinitions="Auto,*" RowSpacing="6">
+              <StackPanel>
+                <TextBlock FontWeight="SemiBold" Text="Generated direct chart adapter" />
+                <TextBlock TextWrapping="Wrap" Text="The grouped collection view aggregates generated Revenue and Profit selectors by period." />
+              </StackPanel>
+              <charts:ProChartView Grid.Row="1" ChartModel="{Binding DirectChartModel}" ChartStyle="{Binding ChartStyle}" />
+            </Grid>
+          </Border>
+        </Grid>
+      </TabItem>
+
+      <TabItem Header="Generated pivot chart">
+        <Grid ColumnDefinitions="3*,2*" ColumnSpacing="10" Margin="0,8,0,0">
+          <DataGrid ItemsSource="{Binding Pivot.Rows}"
+                    ColumnDefinitionsSource="{Binding Pivot.ColumnDefinitions}"
+                    AutoGenerateColumns="False"
+                    IsReadOnly="True"
+                    HeadersVisibility="All"
+                    CanUserResizeColumns="True"
+                    CanUserReorderColumns="True"
+                    RowHeight="28" />
+          <Border Grid.Column="1" Padding="8" BorderBrush="{DynamicResource ThemeBorderLowBrush}" BorderThickness="1" CornerRadius="5">
+            <Grid RowDefinitions="Auto,*" RowSpacing="6">
+              <StackPanel>
+                <TextBlock FontWeight="SemiBold" Text="Pivot-derived chart" />
+                <TextBlock TextWrapping="Wrap" Text="Switch value fields and row/column series at runtime while the generated selectors remain cached." />
+              </StackPanel>
+              <charts:ProChartView Grid.Row="1" ChartModel="{Binding PivotChartModel}" ChartStyle="{Binding ChartStyle}" />
+            </Grid>
+          </Border>
+        </Grid>
+      </TabItem>
+    </TabControl>
+  </Grid>
+</UserControl>

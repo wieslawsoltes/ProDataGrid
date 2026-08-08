@@ -1,0 +1,50 @@
+<UserControl
+    x:Class="DataGridSample.Pages.GeneratedEditingClipboardFillPage"
+    xmlns="https://github.com/avaloniaui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:viewModels="clr-namespace:DataGridSample.ViewModels"
+    xmlns:pages="clr-namespace:DataGridSample.Pages"
+    x:DataType="viewModels:GeneratedEditingClipboardFillViewModel">
+  <Grid Margin="12" RowDefinitions="Auto,Auto,Auto,Auto,*" RowSpacing="8">
+    <StackPanel Spacing="3">
+      <TextBlock Classes="h2" Text="Generated editing, clipboard, fill, and undo" />
+      <TextBlock TextWrapping="Wrap"
+                 Text="Typed parsers, DataAnnotations, custom validation/coercion, revisioned async approval, keyed undo/redo, bounded export, DataGrid paste, and numeric/date fill run without property reflection." />
+    </StackPanel>
+
+    <WrapPanel Grid.Row="1">
+      <Button Content="Valid edit" Command="{Binding ApplyValidEditCommand}" />
+      <Button Content="Invalid + locked" Command="{Binding ApplyInvalidEditCommand}" />
+      <Button Content="Async approval" Command="{Binding ValidateAsyncCommand}" />
+      <Button Content="Paste payload" Command="{Binding PasteCommand}" />
+      <Button Content="Fill quantity series" Command="{Binding FillSeriesCommand}" />
+      <Button Content="Undo" Command="{Binding UndoCommand}" IsEnabled="{Binding CanUndo}" />
+      <Button Content="Redo" Command="{Binding RedoCommand}" IsEnabled="{Binding CanRedo}" />
+      <Button Content="Next export format" Command="{Binding ExportCommand}" />
+    </WrapPanel>
+
+    <Grid Grid.Row="2" ColumnDefinitions="2*,*" ColumnSpacing="8">
+      <TextBox AcceptsReturn="True"
+               MinHeight="54"
+               PlaceholderText="Tab-delimited paste payload"
+               Text="{Binding PasteText, Mode=TwoWay}" />
+      <Border Grid.Column="1" Padding="8" Background="{DynamicResource ThemeControlLowBrush}" CornerRadius="4">
+        <StackPanel Spacing="2">
+          <TextBlock Text="{Binding Status}" TextWrapping="Wrap" />
+          <StackPanel Orientation="Horizontal" Spacing="12">
+            <TextBlock Text="{Binding LastAppliedCells, StringFormat='Applied: {0}'}" />
+            <TextBlock Text="{Binding LastErrorCount, StringFormat='Errors: {0}'}" />
+          </StackPanel>
+        </StackPanel>
+      </Border>
+    </Grid>
+
+    <TextBox Grid.Row="3"
+             MinHeight="42"
+             IsReadOnly="True"
+             TextWrapping="Wrap"
+             Text="{Binding ExportPreview}" />
+
+    <pages:GeneratedEditingClipboardFillGrid Grid.Row="4" />
+  </Grid>
+</UserControl>

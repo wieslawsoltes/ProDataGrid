@@ -5,6 +5,11 @@
              xmlns:views="using:Avalonia.Diagnostics.Views"
              x:Class="Avalonia.Diagnostics.Views.ResourceReferencePickerView"
              x:DataType="vm:ResourceReferencePickerViewModel">
+  <UserControl.Resources>
+    <DataTemplate x:Key="ResourceValuePreviewCellTemplate" x:DataType="vm:ResourceReferenceEntryViewModel">
+      <views:PropertyValueEditorView DataContext="{Binding ValueProperty}" />
+    </DataTemplate>
+  </UserControl.Resources>
   <UserControl.Styles>
     <SimpleTheme />
     <StyleInclude Source="/Themes/Simple.v2.xaml" />
@@ -88,6 +93,8 @@
 
         <Grid Grid.Row="2">
           <DataGrid ItemsSource="{Binding ResourcesView}"
+                    ColumnDefinitionsSource="{Binding ColumnDefinitions}"
+                    FastPathOptions="{Binding FastPathOptions}"
                     SelectedItem="{Binding SelectedResource, Mode=TwoWay}"
                     AutoGenerateColumns="False"
                     HeadersVisibility="Column"
@@ -102,47 +109,6 @@
             <DataGrid.FilteringModel>
               <filtering:FilteringModel OwnsViewFilter="False" />
             </DataGrid.FilteringModel>
-            <DataGrid.Columns>
-              <DataGridTextColumn Header="Key"
-                                  Binding="{Binding KeyDisplay}"
-                                  IsReadOnly="True"
-                                  Width="2*"
-                                  x:DataType="vm:ResourceReferenceEntryViewModel"/>
-              <DataGridTextColumn Header="Value"
-                                  Binding="{Binding ValuePreview}"
-                                  IsReadOnly="True"
-                                  Width="2*"
-                                  x:DataType="vm:ResourceReferenceEntryViewModel"/>
-              <DataGridTemplateColumn Header="Preview"
-                                      Width="1.4*"
-                                      SortMemberPath="ValuePreview">
-                <DataGridTemplateColumn.CellTemplate>
-                  <DataTemplate x:DataType="vm:ResourceReferenceEntryViewModel">
-                    <views:PropertyValueEditorView DataContext="{Binding ValueProperty}" />
-                  </DataTemplate>
-                </DataGridTemplateColumn.CellTemplate>
-              </DataGridTemplateColumn>
-              <DataGridTextColumn Header="Type"
-                                  Binding="{Binding ValueTypeName}"
-                                  IsReadOnly="True"
-                                  Width="1.5*"
-                                  x:DataType="vm:ResourceReferenceEntryViewModel"/>
-              <DataGridTextColumn Header="Reference"
-                                  Binding="{Binding ReferenceKinds}"
-                                  IsReadOnly="True"
-                                  Width="2*"
-                                  x:DataType="vm:ResourceReferenceEntryViewModel"/>
-              <DataGridTextColumn Header="Scope"
-                                  Binding="{Binding ScopePath}"
-                                  IsReadOnly="True"
-                                  Width="3*"
-                                  x:DataType="vm:ResourceReferenceEntryViewModel"/>
-              <DataGridTextColumn Header="Theme"
-                                  Binding="{Binding ThemeVariant}"
-                                  IsReadOnly="True"
-                                  Width="1.2*"
-                                  x:DataType="vm:ResourceReferenceEntryViewModel"/>
-            </DataGrid.Columns>
           </DataGrid>
 
           <TextBlock Text="No compatible resources found."

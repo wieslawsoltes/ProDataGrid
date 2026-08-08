@@ -3,6 +3,7 @@
 
 #nullable disable
 
+using System.Windows.Input;
 using Avalonia.Controls.Templates;
 using Avalonia.Data;
 
@@ -20,6 +21,12 @@ namespace Avalonia.Controls
         private string _onContentTemplateKey;
         private string _offContentTemplateKey;
         private bool? _isThreeState;
+        private ICommand _command;
+        private object _commandParameter;
+        private DataGridBindingDefinition _onContentBinding;
+        private DataGridBindingDefinition _offContentBinding;
+        private DataGridBindingDefinition _commandBinding;
+        private DataGridBindingDefinition _commandParameterBinding;
 
         [AssignBinding]
         public object OnContent
@@ -28,11 +35,54 @@ namespace Avalonia.Controls
             set => SetProperty(ref _onContent, value);
         }
 
+        /// <summary>Gets or sets the compiled row binding used to resolve on content.</summary>
+        public DataGridBindingDefinition OnContentBinding
+        {
+            get => _onContentBinding;
+            set => SetProperty(ref _onContentBinding, value);
+        }
+
         [AssignBinding]
         public object OffContent
         {
             get => _offContent;
             set => SetProperty(ref _offContent, value);
+        }
+
+        /// <summary>Gets or sets the compiled row binding used to resolve off content.</summary>
+        public DataGridBindingDefinition OffContentBinding
+        {
+            get => _offContentBinding;
+            set => SetProperty(ref _offContentBinding, value);
+        }
+
+        /// <summary>Gets or sets the fallback command used for every row.</summary>
+        public ICommand Command
+        {
+            get => _command;
+            set => SetProperty(ref _command, value);
+        }
+
+        /// <summary>Gets or sets the compiled row binding used to resolve the command.</summary>
+        public DataGridBindingDefinition CommandBinding
+        {
+            get => _commandBinding;
+            set => SetProperty(ref _commandBinding, value);
+        }
+
+        /// <summary>Gets or sets the fallback command parameter. The row item is used when unset.</summary>
+        [AssignBinding]
+        public object CommandParameter
+        {
+            get => _commandParameter;
+            set => SetProperty(ref _commandParameter, value);
+        }
+
+        /// <summary>Gets or sets the compiled row binding used to resolve the command parameter.</summary>
+        public DataGridBindingDefinition CommandParameterBinding
+        {
+            get => _commandParameterBinding;
+            set => SetProperty(ref _commandParameterBinding, value);
         }
 
         public string OnContentTemplateKey
@@ -64,7 +114,11 @@ namespace Avalonia.Controls
 
             if (column is DataGridToggleSwitchColumn toggleColumn)
             {
-                if (OnContent != null)
+                if (OnContentBinding != null)
+                {
+                    toggleColumn.OnContent = OnContentBinding.CreateBinding();
+                }
+                else if (OnContent != null)
                 {
                     toggleColumn.OnContent = OnContent;
                 }
@@ -73,7 +127,11 @@ namespace Avalonia.Controls
                     toggleColumn.ClearValue(DataGridToggleSwitchColumn.OnContentProperty);
                 }
 
-                if (OffContent != null)
+                if (OffContentBinding != null)
+                {
+                    toggleColumn.OffContent = OffContentBinding.CreateBinding();
+                }
+                else if (OffContent != null)
                 {
                     toggleColumn.OffContent = OffContent;
                 }
@@ -81,6 +139,8 @@ namespace Avalonia.Controls
                 {
                     toggleColumn.ClearValue(DataGridToggleSwitchColumn.OffContentProperty);
                 }
+
+                ApplyCommandProperties(toggleColumn);
 
                 if (OnContentTemplateKey != null)
                 {
@@ -129,7 +189,12 @@ namespace Avalonia.Controls
             switch (propertyName)
             {
                 case nameof(OnContent):
-                    if (OnContent != null)
+                case nameof(OnContentBinding):
+                    if (OnContentBinding != null)
+                    {
+                        toggleColumn.OnContent = OnContentBinding.CreateBinding();
+                    }
+                    else if (OnContent != null)
                     {
                         toggleColumn.OnContent = OnContent;
                     }
@@ -139,7 +204,12 @@ namespace Avalonia.Controls
                     }
                     return true;
                 case nameof(OffContent):
-                    if (OffContent != null)
+                case nameof(OffContentBinding):
+                    if (OffContentBinding != null)
+                    {
+                        toggleColumn.OffContent = OffContentBinding.CreateBinding();
+                    }
+                    else if (OffContent != null)
                     {
                         toggleColumn.OffContent = OffContent;
                     }
@@ -147,6 +217,12 @@ namespace Avalonia.Controls
                     {
                         toggleColumn.ClearValue(DataGridToggleSwitchColumn.OffContentProperty);
                     }
+                    return true;
+                case nameof(Command):
+                case nameof(CommandBinding):
+                case nameof(CommandParameter):
+                case nameof(CommandParameterBinding):
+                    ApplyCommandProperties(toggleColumn);
                     return true;
                 case nameof(OnContentTemplateKey):
                     if (OnContentTemplateKey != null)
@@ -181,6 +257,38 @@ namespace Avalonia.Controls
             }
 
             return false;
+        }
+
+        private void ApplyCommandProperties(DataGridToggleSwitchColumn toggleColumn)
+        {
+            if (CommandBinding != null)
+            {
+                toggleColumn.CommandBinding = CommandBinding.CreateBinding();
+                toggleColumn.ClearValue(DataGridToggleSwitchColumn.CommandProperty);
+            }
+            else if (Command != null)
+            {
+                toggleColumn.ClearValue(DataGridToggleSwitchColumn.CommandBindingProperty);
+                toggleColumn.Command = Command;
+            }
+            else
+            {
+                toggleColumn.ClearValue(DataGridToggleSwitchColumn.CommandBindingProperty);
+                toggleColumn.ClearValue(DataGridToggleSwitchColumn.CommandProperty);
+            }
+
+            if (CommandParameterBinding != null)
+            {
+                toggleColumn.CommandParameter = CommandParameterBinding.CreateBinding();
+            }
+            else if (CommandParameter != null)
+            {
+                toggleColumn.CommandParameter = CommandParameter;
+            }
+            else
+            {
+                toggleColumn.ClearValue(DataGridToggleSwitchColumn.CommandParameterProperty);
+            }
         }
     }
 }

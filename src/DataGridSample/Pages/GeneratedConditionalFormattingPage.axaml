@@ -1,0 +1,66 @@
+<UserControl
+    x:Class="DataGridSample.Pages.GeneratedConditionalFormattingPage"
+    xmlns="https://github.com/avaloniaui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:pages="clr-namespace:DataGridSample.Pages"
+    xmlns:viewModels="clr-namespace:DataGridSample.ViewModels"
+    x:DataType="viewModels:GeneratedConditionalFormattingViewModel">
+  <UserControl.Resources>
+    <ControlTheme x:Key="GeneratedScoreHighCellTheme" TargetType="DataGridCell" BasedOn="{StaticResource {x:Type DataGridCell}}">
+      <Setter Property="Background" Value="#2834C759" />
+      <Setter Property="Foreground" Value="#0D5428" />
+      <Setter Property="FontWeight" Value="SemiBold" />
+    </ControlTheme>
+    <ControlTheme x:Key="GeneratedScoreLowCellTheme" TargetType="DataGridCell" BasedOn="{StaticResource {x:Type DataGridCell}}">
+      <Setter Property="Background" Value="#30E5484D" />
+      <Setter Property="Foreground" Value="#8E1C22" />
+      <Setter Property="FontWeight" Value="SemiBold" />
+    </ControlTheme>
+    <ControlTheme x:Key="GeneratedScoreBelowTargetCellTheme" TargetType="DataGridCell" BasedOn="{StaticResource {x:Type DataGridCell}}">
+      <Setter Property="Background" Value="#30FFB020" />
+      <Setter Property="Foreground" Value="#704000" />
+    </ControlTheme>
+    <ControlTheme x:Key="GeneratedChangeNegativeCellTheme" TargetType="DataGridCell" BasedOn="{StaticResource {x:Type DataGridCell}}">
+      <Setter Property="Foreground" Value="#C42B1C" />
+      <Setter Property="FontWeight" Value="SemiBold" />
+    </ControlTheme>
+    <ControlTheme x:Key="GeneratedTargetStretchCellTheme" TargetType="DataGridCell" BasedOn="{StaticResource {x:Type DataGridCell}}">
+      <Setter Property="Background" Value="#282B88D8" />
+      <Setter Property="Foreground" Value="#174A7E" />
+    </ControlTheme>
+    <ControlTheme x:Key="GeneratedRowWarningTheme" TargetType="DataGridRow" BasedOn="{StaticResource {x:Type DataGridRow}}">
+      <Style Selector="^ /template/ Rectangle#BackgroundRectangle">
+        <Setter Property="Fill" Value="#18FFB020" />
+        <Setter Property="Opacity" Value="1" />
+      </Style>
+    </ControlTheme>
+    <ControlTheme x:Key="GeneratedRowAlertTheme" TargetType="DataGridRow" BasedOn="{StaticResource {x:Type DataGridRow}}">
+      <Style Selector="^ /template/ Rectangle#BackgroundRectangle">
+        <Setter Property="Fill" Value="#20E5484D" />
+        <Setter Property="Opacity" Value="1" />
+      </Style>
+    </ControlTheme>
+  </UserControl.Resources>
+
+  <Grid Margin="12" RowDefinitions="Auto,Auto,Auto,*" RowSpacing="8">
+    <StackPanel Spacing="3">
+      <TextBlock Classes="h2" Text="Generated conditional formatting" />
+      <TextBlock TextWrapping="Wrap" Text="Attributes emit typed predicates, priorities, stop rules, cell/row targets, and theme keys. The generated factory adapts them to the runtime model without property reflection." />
+    </StackPanel>
+    <WrapPanel Grid.Row="1">
+      <Button Content="Randomize reactive values" Command="{Binding RandomizeCommand}" />
+      <Button Content="Toggle generated rules" Command="{Binding ToggleRulesCommand}" />
+      <Button Content="Restore baseline" Command="{Binding RestoreCommand}" />
+      <TextBlock Margin="12,5,0,0" Text="{Binding RulesEnabled, StringFormat='Rules enabled: {0}'}" />
+    </WrapPanel>
+    <Border Grid.Row="2" Padding="8" Background="{DynamicResource ThemeControlLowBrush}" CornerRadius="4">
+      <Grid ColumnDefinitions="3*,Auto,Auto,Auto" ColumnSpacing="16">
+        <TextBlock Text="{Binding Status}" TextWrapping="Wrap" />
+        <TextBlock Grid.Column="1" Text="{Binding HighScoreCount, StringFormat='High: {0}'}" />
+        <TextBlock Grid.Column="2" Text="{Binding BelowTargetCount, StringFormat='Below target: {0}'}" />
+        <TextBlock Grid.Column="3" Text="{Binding AtRiskCount, StringFormat='Risk rows: {0}'}" />
+      </Grid>
+    </Border>
+    <pages:GeneratedConditionalFormattingGrid Grid.Row="3" />
+  </Grid>
+</UserControl>

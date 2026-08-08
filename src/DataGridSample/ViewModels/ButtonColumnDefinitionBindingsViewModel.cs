@@ -1,146 +1,168 @@
-using System;
 using System.Collections.ObjectModel;
-using Avalonia.Controls;
-using Avalonia.Data;
-using Avalonia.Data.Core;
-using DataGridSample.Mvvm;
+using ProDataGrid.SourceGeneration;
+using ReactiveUI;
+using RxVoid = ReactiveUI.Primitives.RxVoid;
 
-namespace DataGridSample.ViewModels
+namespace DataGridSample.ViewModels;
+
+[GenerateDataGridViewModel(
+    typeof(ButtonColumnDefinitionBindingsItem),
+    ProviderName = "ButtonColumnDefinitionBindingsSchema")]
+[GenerateDataGridView(
+    typeof(ButtonColumnDefinitionBindingsItem),
+    ViewName = "ButtonColumnDefinitionBindingsPage",
+    ViewNamespace = "DataGridSample.Pages",
+    Framework = DataGridViewFramework.ReactiveUI,
+    Recipe = DataGridViewRecipe.Explorer,
+    Title = "Generated row actions and toggles",
+    AutomationId = "generated-row-actions-grid")]
+public sealed partial class ButtonColumnDefinitionBindingsViewModel : ReactiveObject
 {
-    public class ButtonColumnDefinitionBindingsViewModel : ObservableObject
+    public ButtonColumnDefinitionBindingsViewModel()
     {
-        private string _lastActionMessage = "No actions yet.";
-
-        public ButtonColumnDefinitionBindingsViewModel()
+        Items = new ObservableCollection<ButtonColumnDefinitionBindingsItem>
         {
-            RunActionCommand = new RelayCommand(RunAction, CanRunAction);
-            ClearClicksCommand = new RelayCommand(ClearClicks, CanClearClicks);
-
-            Items = new ObservableCollection<ButtonColumnDefinitionBindingsItem>
-            {
-                new() { Name = "Alpha", ActionLabel = "Run", ClickCount = 0 },
-                new() { Name = "Beta", ActionLabel = "Run", ClickCount = 2 },
-                new() { Name = "Gamma", ActionLabel = "Run", ClickCount = 5 }
-            };
-
-            ColumnDefinitions = new ObservableCollection<DataGridColumnDefinition>
-            {
-                new DataGridTextColumnDefinition
-                {
-                    Header = "Name",
-                    Binding = CreateBinding(nameof(ButtonColumnDefinitionBindingsItem.Name), item => item.Name),
-                    IsReadOnly = true
-                },
-                new DataGridTextColumnDefinition
-                {
-                    Header = "Clicks",
-                    Binding = CreateBinding(nameof(ButtonColumnDefinitionBindingsItem.ClickCount), item => item.ClickCount),
-                    IsReadOnly = true
-                },
-                new DataGridButtonColumnDefinition
-                {
-                    Header = "Bound Action",
-                    Content = new Binding(nameof(ButtonColumnDefinitionBindingsItem.ActionLabel)),
-                    Command = RunActionCommand,
-                    CommandParameter = new Binding(".")
-                },
-                new DataGridButtonColumnDefinition
-                {
-                    Header = "Fallback Parameter",
-                    Content = "Clear Clicks",
-                    Command = ClearClicksCommand
-                }
-            };
-        }
-
-        public ObservableCollection<ButtonColumnDefinitionBindingsItem> Items { get; }
-
-        public ObservableCollection<DataGridColumnDefinition> ColumnDefinitions { get; }
-
-        public RelayCommand RunActionCommand { get; }
-
-        public RelayCommand ClearClicksCommand { get; }
-
-        public string LastActionMessage
-        {
-            get => _lastActionMessage;
-            private set => SetProperty(ref _lastActionMessage, value);
-        }
-
-        private static bool CanRunAction(object? parameter) => parameter is ButtonColumnDefinitionBindingsItem;
-
-        private void RunAction(object? parameter)
-        {
-            if (parameter is not ButtonColumnDefinitionBindingsItem item)
-            {
-                return;
-            }
-
-            item.ClickCount++;
-            item.ActionLabel = item.ClickCount % 2 == 0 ? "Run" : "Pause";
-            LastActionMessage = $"RunAction executed for {item.Name} (count: {item.ClickCount}).";
-        }
-
-        private static bool CanClearClicks(object? parameter) => parameter is ButtonColumnDefinitionBindingsItem;
-
-        private void ClearClicks(object? parameter)
-        {
-            if (parameter is not ButtonColumnDefinitionBindingsItem item)
-            {
-                return;
-            }
-
-            item.ClickCount = 0;
-            item.ActionLabel = "Run";
-            LastActionMessage = $"ClearClicks executed for {item.Name}.";
-        }
-
-        private static DataGridBindingDefinition CreateBinding<TValue>(
-            string name,
-            Func<ButtonColumnDefinitionBindingsItem, TValue> getter,
-            Action<ButtonColumnDefinitionBindingsItem, TValue>? setter = null)
-        {
-            var propertyInfo = new ClrPropertyInfo(
-                name,
-                target => target is ButtonColumnDefinitionBindingsItem item ? getter(item) : default,
-                setter == null
-                    ? null
-                    : (target, value) =>
-                    {
-                        if (target is ButtonColumnDefinitionBindingsItem item)
-                        {
-                            TValue typedValue = value is TValue castValue ? castValue : default!;
-                            setter(item, typedValue);
-                        }
-                    },
-                typeof(TValue));
-
-            return DataGridBindingDefinition.Create<ButtonColumnDefinitionBindingsItem, TValue>(propertyInfo, getter, setter);
-        }
+            new("Alpha", 0, isFavorite: false, isOnline: true),
+            new("Beta", 2, isFavorite: true, isOnline: false),
+            new("Gamma", 5, isFavorite: false, isOnline: true)
+        };
     }
 
-    public class ButtonColumnDefinitionBindingsItem : ObservableObject
+    public ObservableCollection<ButtonColumnDefinitionBindingsItem> Items { get; }
+}
+
+[GenerateDataGridColumns(
+    ProviderName = "ButtonColumnDefinitionBindingsSchema",
+    Discovery = DataGridColumnDiscovery.AttributedOnly)]
+public sealed class ButtonColumnDefinitionBindingsItem : ReactiveObject
+{
+    private string _actionLabel = "Run";
+    private int _clickCount;
+    private bool _isFavorite;
+    private bool _isOnline;
+    private string _lastEvent = "Ready";
+
+    public ButtonColumnDefinitionBindingsItem(
+        string name,
+        int clickCount,
+        bool isFavorite,
+        bool isOnline)
     {
-        private string _name = string.Empty;
-        private string _actionLabel = string.Empty;
-        private int _clickCount;
-
-        public string Name
-        {
-            get => _name;
-            set => SetProperty(ref _name, value);
-        }
-
-        public string ActionLabel
-        {
-            get => _actionLabel;
-            set => SetProperty(ref _actionLabel, value);
-        }
-
-        public int ClickCount
-        {
-            get => _clickCount;
-            set => SetProperty(ref _clickCount, value);
-        }
+        Name = name;
+        _clickCount = clickCount;
+        _isFavorite = isFavorite;
+        _isOnline = isOnline;
+        RunActionCommand = ReactiveCommand.Create<string>(RunAction);
+        ClearClicksCommand = ReactiveCommand.Create<ButtonColumnDefinitionBindingsItem>(ClearClicks);
+        FavoriteChangedCommand = ReactiveCommand.Create<string>(OnFavoriteChanged);
+        OnlineChangedCommand = ReactiveCommand.Create<string>(OnOnlineChanged);
     }
+
+    [DataGridColumn(Header = "Name", Order = 0, Width = "1.2*", IsReadOnly = true)]
+    public string Name { get; }
+
+    [DataGridColumn(Header = "Clicks", Order = 1, Width = "90", IsReadOnly = true)]
+    public int ClickCount
+    {
+        get => _clickCount;
+        private set => this.RaiseAndSetIfChanged(ref _clickCount, value);
+    }
+
+    [DataGridColumn(
+        Kind = DataGridColumnKind.Button,
+        Header = "Row action",
+        Order = 2,
+        Width = "130",
+        ContentMember = nameof(ActionLabel),
+        CommandMember = nameof(RunActionCommand),
+        CommandParameterMember = nameof(Name))]
+    public string Action => Name;
+
+    [DataGridColumn(
+        Kind = DataGridColumnKind.Button,
+        Header = "Fallback row",
+        Order = 3,
+        Width = "130",
+        Content = "Clear clicks",
+        CommandMember = nameof(ClearClicksCommand))]
+    public string ClearAction => Name;
+
+    [DataGridColumn(
+        Kind = DataGridColumnKind.ToggleButton,
+        Header = "Favorite",
+        Order = 4,
+        Width = "130",
+        CheckedContentMember = nameof(FavoriteOnLabel),
+        UncheckedContentMember = nameof(FavoriteOffLabel),
+        CommandMember = nameof(FavoriteChangedCommand),
+        CommandParameterMember = nameof(Name))]
+    public bool IsFavorite
+    {
+        get => _isFavorite;
+        set => this.RaiseAndSetIfChanged(ref _isFavorite, value);
+    }
+
+    [DataGridColumn(
+        Kind = DataGridColumnKind.ToggleSwitch,
+        Header = "Presence",
+        Order = 5,
+        Width = "140",
+        OnContentMember = nameof(OnlineLabel),
+        OffContentMember = nameof(OfflineLabel),
+        CommandMember = nameof(OnlineChangedCommand),
+        CommandParameterMember = nameof(Name))]
+    public bool IsOnline
+    {
+        get => _isOnline;
+        set => this.RaiseAndSetIfChanged(ref _isOnline, value);
+    }
+
+    [DataGridColumn(Header = "Last event", Order = 6, Width = "2*", IsReadOnly = true)]
+    public string LastEvent
+    {
+        get => _lastEvent;
+        private set => this.RaiseAndSetIfChanged(ref _lastEvent, value);
+    }
+
+    public string ActionLabel
+    {
+        get => _actionLabel;
+        private set => this.RaiseAndSetIfChanged(ref _actionLabel, value);
+    }
+
+    public string FavoriteOnLabel => "★ Favorite";
+
+    public string FavoriteOffLabel => "☆ Favorite";
+
+    public string OnlineLabel => "Online";
+
+    public string OfflineLabel => "Offline";
+
+    public ReactiveCommand<string, RxVoid> RunActionCommand { get; }
+
+    public ReactiveCommand<ButtonColumnDefinitionBindingsItem, RxVoid> ClearClicksCommand { get; }
+
+    public ReactiveCommand<string, RxVoid> FavoriteChangedCommand { get; }
+
+    public ReactiveCommand<string, RxVoid> OnlineChangedCommand { get; }
+
+    private void RunAction(string name)
+    {
+        ClickCount++;
+        ActionLabel = ClickCount % 2 == 0 ? "Run" : "Pause";
+        LastEvent = $"Action executed for {name} ({ClickCount})";
+    }
+
+    private static void ClearClicks(ButtonColumnDefinitionBindingsItem item)
+    {
+        item.ClickCount = 0;
+        item.ActionLabel = "Run";
+        item.LastEvent = $"Cleared {item.Name} using the default row parameter";
+    }
+
+    private void OnFavoriteChanged(string name) =>
+        LastEvent = $"{name} favorite is now {IsFavorite}";
+
+    private void OnOnlineChanged(string name) =>
+        LastEvent = $"{name} presence is now {(IsOnline ? "online" : "offline")}";
 }

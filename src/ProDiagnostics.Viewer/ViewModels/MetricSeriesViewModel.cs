@@ -1,11 +1,20 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using Avalonia.Controls;
 using Avalonia.Media;
+using ProDataGrid.SourceGeneration;
 using ProDiagnostics.Viewer.Models;
 
 namespace ProDiagnostics.Viewer.ViewModels;
 
+[GenerateDataGridColumns(
+    ProviderName = "MetricSeriesGridSchema",
+    SchemaId = "prodiagnostics/viewer/metric/v1",
+    Discovery = DataGridColumnDiscovery.AttributedOnly,
+    Strict = true,
+    Streaming = true,
+    PerformanceProfile = DataGridGeneratedPerformanceProfile.HighFrequencyStreaming)]
 public sealed class MetricSeriesViewModel : ObservableObject
 {
     private const int MaxSampleCount = 600;
@@ -42,51 +51,65 @@ public sealed class MetricSeriesViewModel : ObservableObject
     }
 
     public string Key { get; }
+    [DataGridColumn(DataGridColumnKind.Text, Header = "Meter", ColumnKey = "meter", Order = 2, Width = "*", IsReadOnly = true, CanUserSort = true, CanUserHide = true)]
     public string MeterName { get; }
     public string Name { get; }
+    [DataGridColumn(DataGridColumnKind.Text, Header = "Description", ColumnKey = "description", Order = 1, Width = "3*", IsReadOnly = true, CanUserSort = true, CanUserHide = true)]
     public string Description { get; }
+
+    [DataGridColumn(DataGridColumnKind.Text, Header = "Unit", ColumnKey = "unit", Order = 3, Width = "80", IsReadOnly = true, CanUserSort = true, CanUserHide = true)]
     public string Unit { get; }
     public string InstrumentType { get; }
+    [DataGridColumn(DataGridColumnKind.Text, Header = "Tags", ColumnKey = "tags", Order = 10, Width = "2*", IsReadOnly = true, CanUserSort = true, CanUserHide = true)]
     public string TagsSummary { get; }
     public IBrush AccentBrush { get; }
     public ObservableCollection<MetricSample> Samples => _samples;
     public ObservableCollection<MetricSample> TimelineSamples => _timelineSamples;
 
+    [DataGridColumn(DataGridColumnKind.Text, Header = "Metric", ColumnKey = "metric", Order = 0, Width = "2*", IsReadOnly = true, CanUserSort = true, CanUserHide = true)]
     public string DisplayName
     {
         get => _displayName;
         private set => SetProperty(ref _displayName, value);
     }
 
+    [DataGridColumn(DataGridColumnKind.Numeric, Header = "Last", ColumnKey = "last", Order = 4, Width = "80", FormatString = "0.###", IsReadOnly = true, CanUserSort = true, CanUserHide = true)]
     public double LastValue
     {
         get => _lastValue;
         private set => SetProperty(ref _lastValue, value);
     }
 
+    [DataGridColumn(DataGridColumnKind.Numeric, Header = "Min", ColumnKey = "min", Order = 6, Width = "80", FormatString = "0.###", IsReadOnly = true, CanUserSort = true, CanUserHide = true)]
     public double MinValue
     {
         get => _minValue;
         private set => SetProperty(ref _minValue, value);
     }
 
+    [DataGridColumn(DataGridColumnKind.Numeric, Header = "Max", ColumnKey = "max", Order = 7, Width = "80", FormatString = "0.###", IsReadOnly = true, CanUserSort = true, CanUserHide = true)]
     public double MaxValue
     {
         get => _maxValue;
         private set => SetProperty(ref _maxValue, value);
     }
 
+    [DataGridColumn(DataGridColumnKind.Numeric, Header = "Avg", ColumnKey = "avg", Order = 5, Width = "80", FormatString = "0.###", IsReadOnly = true, CanUserSort = true, CanUserHide = true)]
     public double Average
     {
         get => _average;
         private set => SetProperty(ref _average, value);
     }
 
+    [DataGridColumn(DataGridColumnKind.Numeric, Header = "Samples", ColumnKey = "samples", Order = 8, Width = "80", IsReadOnly = true, CanUserSort = true, CanUserHide = true)]
     public int SampleCount
     {
         get => _sampleCount;
         private set => SetProperty(ref _sampleCount, value);
     }
+
+    [DataGridColumn(DataGridColumnKind.Template, Header = "Trend", ColumnKey = "trend", Order = 9, Width = "120", TemplateKey = "MetricTrendCellTemplate", IsReadOnly = true, CanUserHide = true)]
+    public MetricSeriesViewModel Trend => this;
 
     public void ApplyAlias(string? alias)
         => DisplayName = string.IsNullOrWhiteSpace(alias) ? Name : alias;

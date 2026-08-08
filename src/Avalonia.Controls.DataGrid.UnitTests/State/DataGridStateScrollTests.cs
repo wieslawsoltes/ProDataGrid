@@ -3,7 +3,9 @@
 
 using System.Collections.ObjectModel;
 using Avalonia.Controls;
+using Avalonia.Data;
 using Avalonia.Headless.XUnit;
+using Avalonia.Threading;
 using Xunit;
 
 namespace Avalonia.Controls.DataGridTests.State;
@@ -168,5 +170,63 @@ public class DataGridStateScrollTests
         {
             root.Close();
         }
+    }
+
+    [AvaloniaFact]
+    public void CaptureScrollState_DoesNotPassNewItemPlaceholderToTypedKeySelector()
+    {
+        var items = new ObservableCollection<EditableScrollItem>
+        {
+            new() { Id = 1, Name = "one" },
+            new() { Id = 2, Name = "two" }
+        };
+        var grid = new DataGrid
+        {
+            ItemsSource = items,
+            AutoGenerateColumns = false,
+            CanUserAddRows = true,
+            HeadersVisibility = DataGridHeadersVisibility.Column
+        };
+        grid.ColumnsInternal.Add(new DataGridTextColumn
+        {
+            Header = "Name",
+            Binding = new Binding(nameof(EditableScrollItem.Name))
+        });
+        var root = new Window
+        {
+            Width = 320,
+            Height = 140
+        };
+        root.SetThemeStyles();
+        root.Content = grid;
+        root.Show();
+        Dispatcher.UIThread.RunJobs();
+        root.UpdateLayout();
+        grid.UpdateLayout();
+
+        try
+        {
+            var options = new DataGridStateOptions
+            {
+                ItemKeySelector = static item => ((EditableScrollItem)item).Id
+            };
+
+            DataGridScrollState state = grid.CaptureScrollState(options);
+
+            Assert.NotNull(state);
+            Assert.NotEmpty(state.Samples);
+            Assert.All(state.Samples, static sample => Assert.IsType<int>(sample.ItemKey));
+        }
+        finally
+        {
+            root.Close();
+        }
+    }
+
+    public sealed class EditableScrollItem
+    {
+        public int Id { get; set; }
+
+        public string Name { get; set; } = string.Empty;
     }
 }

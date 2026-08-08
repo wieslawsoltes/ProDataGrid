@@ -18,6 +18,9 @@ namespace Avalonia.Controls
         private string _cellTemplateKey;
         private string _cellEditingTemplateKey;
         private string _newRowCellTemplateKey;
+        private IDataTemplate _cellTemplate;
+        private IDataTemplate _cellEditingTemplate;
+        private IDataTemplate _newRowCellTemplate;
         private bool? _reuseCellContent;
 
         public string CellTemplateKey
@@ -36,6 +39,27 @@ namespace Avalonia.Controls
         {
             get => _newRowCellTemplateKey;
             set => SetProperty(ref _newRowCellTemplateKey, value);
+        }
+
+        /// <summary>Gets or sets a direct display template. This takes precedence over <see cref="CellTemplateKey"/>.</summary>
+        public IDataTemplate CellTemplate
+        {
+            get => _cellTemplate;
+            set => SetProperty(ref _cellTemplate, value);
+        }
+
+        /// <summary>Gets or sets a direct editing template. This takes precedence over <see cref="CellEditingTemplateKey"/>.</summary>
+        public IDataTemplate CellEditingTemplate
+        {
+            get => _cellEditingTemplate;
+            set => SetProperty(ref _cellEditingTemplate, value);
+        }
+
+        /// <summary>Gets or sets a direct new-row template. This takes precedence over <see cref="NewRowCellTemplateKey"/>.</summary>
+        public IDataTemplate NewRowCellTemplate
+        {
+            get => _newRowCellTemplate;
+            set => SetProperty(ref _newRowCellTemplate, value);
         }
 
         public bool? ReuseCellContent
@@ -63,9 +87,9 @@ namespace Avalonia.Controls
                 }
 
                 var reuseCellContent = templateColumn.ReuseCellContent;
-                templateColumn.CellTemplate = ResolveTemplate(context, CellTemplateKey, reuseCellContent);
-                templateColumn.CellEditingTemplate = ResolveTemplate(context, CellEditingTemplateKey, reuseCellContent);
-                templateColumn.NewRowCellTemplate = ResolveTemplate(context, NewRowCellTemplateKey, reuseCellContent);
+                templateColumn.CellTemplate = CellTemplate ?? ResolveTemplate(context, CellTemplateKey, reuseCellContent);
+                templateColumn.CellEditingTemplate = CellEditingTemplate ?? ResolveTemplate(context, CellEditingTemplateKey, reuseCellContent);
+                templateColumn.NewRowCellTemplate = NewRowCellTemplate ?? ResolveTemplate(context, NewRowCellTemplateKey, reuseCellContent);
             }
         }
 
@@ -81,20 +105,23 @@ namespace Avalonia.Controls
 
             switch (propertyName)
             {
+                case nameof(CellTemplate):
                 case nameof(CellTemplateKey):
-                    templateColumn.CellTemplate = ResolveTemplate(
+                    templateColumn.CellTemplate = CellTemplate ?? ResolveTemplate(
                         context,
                         CellTemplateKey,
                         ReuseCellContent ?? templateColumn.ReuseCellContent);
                     return true;
+                case nameof(CellEditingTemplate):
                 case nameof(CellEditingTemplateKey):
-                    templateColumn.CellEditingTemplate = ResolveTemplate(
+                    templateColumn.CellEditingTemplate = CellEditingTemplate ?? ResolveTemplate(
                         context,
                         CellEditingTemplateKey,
                         ReuseCellContent ?? templateColumn.ReuseCellContent);
                     return true;
+                case nameof(NewRowCellTemplate):
                 case nameof(NewRowCellTemplateKey):
-                    templateColumn.NewRowCellTemplate = ResolveTemplate(
+                    templateColumn.NewRowCellTemplate = NewRowCellTemplate ?? ResolveTemplate(
                         context,
                         NewRowCellTemplateKey,
                         ReuseCellContent ?? templateColumn.ReuseCellContent);
@@ -110,9 +137,9 @@ namespace Avalonia.Controls
                     }
 
                     var reuseCellContent = templateColumn.ReuseCellContent;
-                    templateColumn.CellTemplate = ResolveTemplate(context, CellTemplateKey, reuseCellContent);
-                    templateColumn.CellEditingTemplate = ResolveTemplate(context, CellEditingTemplateKey, reuseCellContent);
-                    templateColumn.NewRowCellTemplate = ResolveTemplate(context, NewRowCellTemplateKey, reuseCellContent);
+                    templateColumn.CellTemplate = CellTemplate ?? ResolveTemplate(context, CellTemplateKey, reuseCellContent);
+                    templateColumn.CellEditingTemplate = CellEditingTemplate ?? ResolveTemplate(context, CellEditingTemplateKey, reuseCellContent);
+                    templateColumn.NewRowCellTemplate = NewRowCellTemplate ?? ResolveTemplate(context, NewRowCellTemplateKey, reuseCellContent);
                     return true;
             }
 

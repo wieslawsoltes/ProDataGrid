@@ -43,6 +43,9 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="../ProDataGrid.SourceGenerators/ProDataGrid.SourceGenerators.csproj"
+                      OutputItemType="Analyzer"
+                      ReferenceOutputAssembly="false" />
     <ProjectReference Include="..\\ProDataGrid.FormulaEngine\\ProDataGrid.FormulaEngine.csproj" />
     <ProjectReference Include="..\\ProDataGrid.FormulaEngine.Excel\\ProDataGrid.FormulaEngine.Excel.csproj" />
   </ItemGroup>

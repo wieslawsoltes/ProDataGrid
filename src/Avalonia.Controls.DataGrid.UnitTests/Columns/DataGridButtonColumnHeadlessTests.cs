@@ -41,6 +41,7 @@ public class DataGridButtonColumnHeadlessTests
     public void ButtonColumn_Content_Properties_Use_AssignBinding()
     {
         AssertHasAssignBinding(nameof(DataGridButtonColumn.Content));
+        AssertHasAssignBinding(nameof(DataGridButtonColumn.CommandBinding));
         AssertHasAssignBinding(nameof(DataGridButtonColumn.CommandParameter));
     }
 

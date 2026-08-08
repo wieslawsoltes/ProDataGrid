@@ -1,7 +1,14 @@
 using System;
+using ProDataGrid.SourceGeneration;
 
 namespace Avalonia.Diagnostics.ViewModels
 {
+    [GenerateDataGridColumns(
+        ProviderName = "ResourceTreeGridSchema",
+        SchemaId = "prodiagnostics/resource-tree/v1",
+        Discovery = DataGridColumnDiscovery.AttributedOnly,
+        Strict = true,
+        HierarchicalRows = true)]
     internal abstract class ResourceTreeNode : ViewModelBase, IDisposable
     {
         private bool _isExpanded;
@@ -28,6 +35,17 @@ namespace Avalonia.Diagnostics.ViewModels
         public string? ValuePreview { get; }
         public string? ValueType { get; }
         public object? Source { get; }
+
+        [DataGridColumn(
+            DataGridColumnKind.Hierarchical,
+            Header = "Resource",
+            ColumnKey = "resource",
+            Order = 0,
+            Width = "*",
+            SortMemberPath = nameof(Name),
+            TemplateKey = "ResourceTreeNodeCellTemplate",
+            IsReadOnly = true)]
+        public ResourceTreeNode Item => this;
 
         public abstract ResourceTreeNodeCollection Children { get; }
 

@@ -1,0 +1,21 @@
+<UserControl
+    x:Class="DataGridSample.Pages.GeneratedColumnsAttributesPage"
+    xmlns="https://github.com/avaloniaui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:viewModels="clr-namespace:DataGridSample.ViewModels"
+    x:DataType="viewModels:GeneratedColumnsAttributesViewModel">
+  <Grid Margin="12" RowDefinitions="Auto,*" RowSpacing="8">
+    <StackPanel Spacing="4">
+      <TextBlock Classes="h2" Text="Generated columns: property attributes" />
+      <TextBlock TextWrapping="Wrap"
+                 Text="The view model receives columns, typed accessors, data operations, and strict fast-path options from the incremental generator." />
+    </StackPanel>
+    <DataGrid Grid.Row="1"
+              AutoGenerateColumns="False"
+              ItemsSource="{Binding Items}"
+              ColumnDefinitionsSource="{Binding ColumnDefinitions}"
+              FastPathOptions="{Binding FastPathOptions}"
+              CanUserSortColumns="True"
+              GridLinesVisibility="Horizontal" />
+  </Grid>
+</UserControl>

@@ -112,6 +112,7 @@ public class DataGridColumnDefinitionsTests
         AssertHasAssignBinding(typeof(DataGridToggleButtonColumnDefinition), nameof(DataGridToggleButtonColumnDefinition.Content));
         AssertHasAssignBinding(typeof(DataGridToggleButtonColumnDefinition), nameof(DataGridToggleButtonColumnDefinition.CheckedContent));
         AssertHasAssignBinding(typeof(DataGridToggleButtonColumnDefinition), nameof(DataGridToggleButtonColumnDefinition.UncheckedContent));
+        AssertHasAssignBinding(typeof(DataGridToggleButtonColumnDefinition), nameof(DataGridToggleButtonColumnDefinition.CommandParameter));
     }
 
     [Fact]
@@ -137,6 +138,7 @@ public class DataGridColumnDefinitionsTests
     {
         AssertHasAssignBinding(typeof(DataGridToggleSwitchColumnDefinition), nameof(DataGridToggleSwitchColumnDefinition.OnContent));
         AssertHasAssignBinding(typeof(DataGridToggleSwitchColumnDefinition), nameof(DataGridToggleSwitchColumnDefinition.OffContent));
+        AssertHasAssignBinding(typeof(DataGridToggleSwitchColumnDefinition), nameof(DataGridToggleSwitchColumnDefinition.CommandParameter));
     }
 
     [Fact]
@@ -285,6 +287,85 @@ public class DataGridColumnDefinitionsTests
             var toggleSwitch = Assert.IsType<ToggleSwitch>(cell.Content);
             Assert.Equal(items[0].OnLabel, toggleSwitch.OnContent);
             Assert.Equal(items[0].OffLabel, toggleSwitch.OffContent);
+        }
+        finally
+        {
+            window.Close();
+        }
+    }
+
+    [AvaloniaFact]
+    public void ButtonAndToggleColumnDefinitions_CompiledAuxiliaryBindings_Use_RowItem()
+    {
+        var command = new UntypedDefinitionBindingCommand();
+        var item = new DefinitionBindingItem
+        {
+            Name = "Alpha",
+            ActionLabel = "Execute Alpha",
+            CheckedLabel = "Pinned",
+            UncheckedLabel = "Unpinned",
+            IsFavorite = true,
+            IsOnline = false,
+            OnLabel = "Available",
+            OffLabel = "Unavailable",
+            ActionCommand = command,
+            ActionParameter = "alpha-key"
+        };
+        var items = new ObservableCollection<DefinitionBindingItem> { item };
+        var definitions = new ObservableCollection<DataGridColumnDefinition>
+        {
+            new DataGridButtonColumnDefinition
+            {
+                Header = "Action",
+                ContentBinding = DataGridBindingDefinition.Create<DefinitionBindingItem, string>(row => row.ActionLabel),
+                CommandBinding = DataGridBindingDefinition.Create<DefinitionBindingItem, ICommand>(row => row.ActionCommand),
+                CommandParameterBinding = DataGridBindingDefinition.Create<DefinitionBindingItem, object>(row => row.ActionParameter)
+            },
+            new DataGridToggleButtonColumnDefinition
+            {
+                Header = "Favorite",
+                Binding = DataGridBindingDefinition.Create<DefinitionBindingItem, bool>(row => row.IsFavorite),
+                CheckedContentBinding = DataGridBindingDefinition.Create<DefinitionBindingItem, string>(row => row.CheckedLabel),
+                UncheckedContentBinding = DataGridBindingDefinition.Create<DefinitionBindingItem, string>(row => row.UncheckedLabel),
+                CommandBinding = DataGridBindingDefinition.Create<DefinitionBindingItem, ICommand>(row => row.ActionCommand),
+                CommandParameterBinding = DataGridBindingDefinition.Create<DefinitionBindingItem, object>(row => row.ActionParameter)
+            },
+            new DataGridToggleSwitchColumnDefinition
+            {
+                Header = "Online",
+                Binding = DataGridBindingDefinition.Create<DefinitionBindingItem, bool>(row => row.IsOnline),
+                OnContentBinding = DataGridBindingDefinition.Create<DefinitionBindingItem, string>(row => row.OnLabel),
+                OffContentBinding = DataGridBindingDefinition.Create<DefinitionBindingItem, string>(row => row.OffLabel),
+                CommandBinding = DataGridBindingDefinition.Create<DefinitionBindingItem, ICommand>(row => row.ActionCommand),
+                CommandParameterBinding = DataGridBindingDefinition.Create<DefinitionBindingItem, object>(row => row.ActionParameter)
+            }
+        };
+
+        var (window, grid) = CreateDefinitionsWindow(items, definitions);
+        window.Show();
+        grid.ApplyTemplate();
+        grid.UpdateLayout();
+        Dispatcher.UIThread.RunJobs();
+
+        try
+        {
+            var button = Assert.IsType<Button>(GetCell(grid, "Action", 0).Content);
+            Assert.Equal(item.ActionLabel, button.Content);
+            Assert.Same(command, button.Command);
+            Assert.Equal(item.ActionParameter, button.CommandParameter);
+            button.Command.Execute(button.CommandParameter);
+            Assert.Equal(item.ActionParameter, command.LastParameter);
+
+            var toggleButton = Assert.IsType<ToggleButton>(GetCell(grid, "Favorite", 0).Content);
+            Assert.Equal(item.CheckedLabel, toggleButton.Content);
+            Assert.Same(command, toggleButton.Command);
+            Assert.Equal(item.ActionParameter, toggleButton.CommandParameter);
+
+            var toggleSwitch = Assert.IsType<ToggleSwitch>(GetCell(grid, "Online", 0).Content);
+            Assert.Equal(item.OnLabel, toggleSwitch.OnContent);
+            Assert.Equal(item.OffLabel, toggleSwitch.OffContent);
+            Assert.Same(command, toggleSwitch.Command);
+            Assert.Equal(item.ActionParameter, toggleSwitch.CommandParameter);
         }
         finally
         {
@@ -1817,9 +1898,28 @@ public class DataGridColumnDefinitionsTests
 
         public string ActionLabel { get; set; } = string.Empty;
 
+        public string CheckedLabel { get; set; } = string.Empty;
+
+        public string UncheckedLabel { get; set; } = string.Empty;
+
         public string OnLabel { get; set; } = string.Empty;
 
         public string OffLabel { get; set; } = string.Empty;
+
+        public ICommand ActionCommand { get; set; } = null!;
+
+        public object ActionParameter { get; set; } = null!;
+    }
+
+    private sealed class UntypedDefinitionBindingCommand : ICommand
+    {
+        public object? LastParameter { get; private set; }
+
+        public event EventHandler? CanExecuteChanged;
+
+        public bool CanExecute(object? parameter) => true;
+
+        public void Execute(object? parameter) => LastParameter = parameter;
     }
 
     private sealed class TypedDefinitionBindingCommand : ICommand

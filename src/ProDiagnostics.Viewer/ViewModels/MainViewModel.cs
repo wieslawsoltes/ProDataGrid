@@ -2,20 +2,37 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+using Avalonia.Controls;
 using Avalonia.Threading;
+using ProDataGrid.SourceGeneration;
 using ProDiagnostics.Transport;
 using ProDiagnostics.Viewer.Models;
 using ProDiagnostics.Viewer.Services;
 
 namespace ProDiagnostics.Viewer.ViewModels;
 
-public sealed class MainViewModel : ObservableObject, IDisposable
+[GenerateDataGridViewModel(
+    typeof(MetricSeriesViewModel),
+    ProviderName = "MetricSeriesGridSchema",
+    ColumnDefinitionsPropertyName = "MetricColumnDefinitions",
+    SchemaPropertyName = "MetricDataGridSchema",
+    FastPathOptionsPropertyName = "MetricFastPathOptions",
+    Streaming = true)]
+[GenerateDataGridViewModel(
+    typeof(ActivityEventViewModel),
+    ProviderName = "ActivityEventGridSchema",
+    ColumnDefinitionsPropertyName = "ActivityColumnDefinitions",
+    SchemaPropertyName = "ActivityDataGridSchema",
+    FastPathOptionsPropertyName = "ActivityFastPathOptions",
+    Streaming = true)]
+public sealed partial class MainViewModel : ObservableObject, IDisposable
 {
     private readonly Dictionary<string, ColumnVisibilityOption> _metricColumnsByKey = new(StringComparer.OrdinalIgnoreCase);
     private readonly Dictionary<string, ColumnVisibilityOption> _activityColumnsByKey = new(StringComparer.OrdinalIgnoreCase);
     private readonly Dictionary<Guid, SessionViewModel> _sessionsById = new();
     private DiagnosticsUdpReceiver? _receiver;
     private SessionViewModel? _selectedSession;
+    private MetricSeriesViewModel? _selectedMetric;
     private PresetDefinition? _selectedPreset;
     private TrendRangeOption? _selectedTrendRange;
     private string _metricsFilter = string.Empty;
@@ -23,6 +40,8 @@ public sealed class MainViewModel : ObservableObject, IDisposable
     private int _port = TelemetryProtocol.DefaultPort;
     private bool _isListening;
     private string _statusText = string.Empty;
+    private readonly DataGridGeneratedColumnLayoutController _metricColumnLayout;
+    private readonly DataGridGeneratedColumnLayoutController _activityColumnLayout;
 
     public MainViewModel()
         : this(startListening: true)
@@ -36,11 +55,14 @@ public sealed class MainViewModel : ObservableObject, IDisposable
         MetricColumns = new ObservableCollection<ColumnVisibilityOption>();
         ActivityColumns = new ObservableCollection<ColumnVisibilityOption>();
         TrendRanges = new ObservableCollection<TrendRangeOption>();
+        _metricColumnLayout = new DataGridGeneratedColumnLayoutController(MetricColumnDefinitions);
+        _activityColumnLayout = new DataGridGeneratedColumnLayoutController(ActivityColumnDefinitions);
         InitializeColumnOptions();
         InitializeTrendRanges();
         SelectedPreset = Presets.FirstOrDefault();
         ToggleListeningCommand = new RelayCommand(ToggleListening);
         ReloadPresetsCommand = new RelayCommand(ReloadPresets);
+        OpenMetricCommand = new RelayCommand(OpenSelectedMetric, () => SelectedMetric != null);
         if (startListening)
         {
             StartListening();
@@ -55,6 +77,7 @@ public sealed class MainViewModel : ObservableObject, IDisposable
 
     public RelayCommand ToggleListeningCommand { get; }
     public RelayCommand ReloadPresetsCommand { get; }
+    public RelayCommand OpenMetricCommand { get; }
 
     public SessionViewModel? SelectedSession
     {
@@ -63,7 +86,20 @@ public sealed class MainViewModel : ObservableObject, IDisposable
         {
             if (SetProperty(ref _selectedSession, value))
             {
+                SelectedMetric = null;
                 ApplyFilters();
+            }
+        }
+    }
+
+    public MetricSeriesViewModel? SelectedMetric
+    {
+        get => _selectedMetric;
+        set
+        {
+            if (SetProperty(ref _selectedMetric, value))
+            {
+                OpenMetricCommand.RaiseCanExecuteChanged();
             }
         }
     }
@@ -153,6 +189,14 @@ public sealed class MainViewModel : ObservableObject, IDisposable
         SelectedSession?.OpenMetricTab(series);
     }
 
+    private void OpenSelectedMetric()
+    {
+        if (SelectedMetric != null)
+        {
+            OpenMetricTab(SelectedMetric);
+        }
+    }
+
     public ColumnVisibilityOption? GetMetricColumn(string key)
         => _metricColumnsByKey.TryGetValue(key, out var option) ? option : null;
 
@@ -162,6 +206,8 @@ public sealed class MainViewModel : ObservableObject, IDisposable
     public void Dispose()
     {
         StopListening();
+        _metricColumnLayout.Dispose();
+        _activityColumnLayout.Dispose();
     }
 
     private void StartListening()
@@ -406,14 +452,22 @@ public sealed class MainViewModel : ObservableObject, IDisposable
 
     private void AddMetricColumn(string key, string title, bool isVisible)
     {
-        var option = new ColumnVisibilityOption(key, title, isVisible);
+        var option = new ColumnVisibilityOption(
+            key,
+            title,
+            isVisible,
+            visible => _metricColumnLayout.SetVisible(key, visible));
         _metricColumnsByKey[key] = option;
         MetricColumns.Add(option);
     }
 
     private void AddActivityColumn(string key, string title, bool isVisible)
     {
-        var option = new ColumnVisibilityOption(key, title, isVisible);
+        var option = new ColumnVisibilityOption(
+            key,
+            title,
+            isVisible,
+            visible => _activityColumnLayout.SetVisible(key, visible));
         _activityColumnsByKey[key] = option;
         ActivityColumns.Add(option);
     }

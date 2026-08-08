@@ -8,6 +8,7 @@ using Avalonia.Collections;
 using Avalonia.Controls;
 using Avalonia.Controls.Templates;
 using Avalonia.Styling;
+using ProDataGrid.SourceGeneration;
 
 namespace Avalonia.Diagnostics.ViewModels
 {
@@ -23,17 +24,23 @@ namespace Avalonia.Diagnostics.ViewModels
         public string? Value { get; }
     }
 
-    internal sealed class ResourceDetailsViewModel : ViewModelBase, IDisposable
+    [GenerateDataGridViewModel(typeof(PropertyViewModel), ProviderName = "PropertyGridSchema")]
+    internal sealed partial class ResourceDetailsViewModel : ViewModelBase, IDisposable
     {
         private object? _inspectedObject;
         private DataGridCollectionView? _propertiesView;
         private PropertyViewModel? _selectedProperty;
         private Dictionary<object, PropertyViewModel[]>? _propertyIndex;
         private readonly bool _showProperties;
+        private readonly DataGridGeneratedColumnLayoutController _propertyColumnLayout;
 
         public ResourceDetailsViewModel(ResourceTreeNode node, bool showImplementedInterfaces, bool showProperties = true)
         {
             _showProperties = showProperties;
+            _propertyColumnLayout = new DataGridGeneratedColumnLayoutController(ColumnDefinitions);
+            _propertyColumnLayout.SetVisible("assigned-type", false);
+            _propertyColumnLayout.SetVisible("property-type", false);
+            _propertyColumnLayout.SetVisible("priority", false);
             Title = node.Name;
             Subtitle = node.SecondaryText;
             Items = BuildItems(node);
@@ -85,6 +92,7 @@ namespace Avalonia.Diagnostics.ViewModels
         public void Dispose()
         {
             DetachPropertyNotifications();
+            _propertyColumnLayout.Dispose();
         }
 
         private void Inspect(object? target, bool showImplementedInterfaces)

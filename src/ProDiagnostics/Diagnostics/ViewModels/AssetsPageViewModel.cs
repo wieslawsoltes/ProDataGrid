@@ -7,10 +7,12 @@ using Avalonia.Collections;
 using Avalonia.Controls;
 using Avalonia.Platform;
 using Avalonia.Threading;
+using ProDataGrid.SourceGeneration;
 
 namespace Avalonia.Diagnostics.ViewModels
 {
-    internal sealed class AssetsPageViewModel : ViewModelBase
+    [GenerateDataGridViewModel(typeof(AssetEntryViewModel), ProviderName = "AssetEntryGridSchema")]
+    internal sealed partial class AssetsPageViewModel : ViewModelBase
     {
         private readonly AvaloniaList<AssetEntryViewModel> _assets = new();
         private readonly DataGridCollectionView _assetsView;

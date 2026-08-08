@@ -251,6 +251,7 @@ definition.EndUpdate();
 Expression-based binding creation requires dynamic code generation. For AOT-friendly bindings and zero-reflection paths, use the overloads that accept a prebuilt `CompiledBindingPath` or `IPropertyInfo`. See:
 
 - [Column Definitions: AOT-Friendly Bindings](column-definitions-aot.md)
+- [Column Definitions: Source Generators](column-definitions-source-generators.md)
 - [Column Definitions: Model Integration and Fast Path](column-definitions-models.md)
 - [Column Definitions: Hot Path Integration](column-definitions-hot-path.md)
 - [Column Definitions: Hierarchical Columns](column-definitions-hierarchical.md)

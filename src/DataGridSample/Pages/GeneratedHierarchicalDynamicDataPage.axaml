@@ -1,0 +1,44 @@
+<UserControl
+    x:Class="DataGridSample.Pages.GeneratedHierarchicalDynamicDataPage"
+    xmlns="https://github.com/avaloniaui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:models="clr-namespace:DataGridSample.Models"
+    xmlns:pages="clr-namespace:DataGridSample.Pages"
+    xmlns:viewModels="clr-namespace:DataGridSample.ViewModels"
+    x:DataType="viewModels:GeneratedHierarchicalDynamicDataViewModel">
+  <UserControl.Resources>
+    <DataTemplate x:Key="GeneratedHierarchyNodeTemplate" x:DataType="models:GeneratedHierarchyNode">
+      <Border Padding="4,1" CornerRadius="3" Background="{DynamicResource ThemeControlLowBrush}">
+        <TextBlock Text="{Binding Kind}" FontWeight="SemiBold" />
+      </Border>
+    </DataTemplate>
+  </UserControl.Resources>
+  <Grid Margin="12" RowDefinitions="Auto,Auto,Auto,*" RowSpacing="8">
+    <StackPanel Spacing="4">
+      <TextBlock Classes="h2" Text="Generated hierarchical DynamicData" />
+      <TextBlock TextWrapping="Wrap"
+                 Text="A generated SourceCache owns root operations while generated typed children, expansion keys, HierarchicalNode.Item bindings, and a code-only ReactiveUI view render the complete tree without reflection bindings." />
+    </StackPanel>
+    <WrapPanel Grid.Row="1">
+      <Button Content="Add 2 roots" Command="{Binding AddRootBatchCommand}" />
+      <Button Content="Add live child" Command="{Binding AddChildCommand}" />
+      <Button Content="Refresh roots" Command="{Binding RefreshRootsCommand}" />
+      <Button Content="Expand all" Command="{Binding ExpandAllCommand}" />
+      <Button Content="Collapse all" Command="{Binding CollapseAllCommand}" />
+      <Button Content="Price descending" Command="{Binding SortPriceDescendingCommand}" />
+      <Button Content="Warsaw price ≥ 80" Command="{Binding ApplyWarsawFilterCommand}" />
+      <Button Content="Clear operations" Command="{Binding ClearOperationsCommand}" />
+    </WrapPanel>
+    <Border Grid.Row="2" Padding="8" Background="{DynamicResource ThemeControlLowBrush}" CornerRadius="4">
+      <Grid ColumnDefinitions="*,Auto,Auto,Auto,Auto,Auto" ColumnSpacing="14">
+        <TextBlock Text="{Binding Status}" TextTrimming="CharacterEllipsis" />
+        <TextBlock Grid.Column="1" Text="{Binding SourceRootCount, StringFormat='Source roots: {0}'}" />
+        <TextBlock Grid.Column="2" Text="{Binding VisibleRootCount, StringFormat='Visible roots: {0}'}" />
+        <TextBlock Grid.Column="3" Text="{Binding NodeCount, StringFormat='Nodes: {0}'}" />
+        <TextBlock Grid.Column="4" Text="{Binding VisibleNodeCount, StringFormat='Visible: {0}'}" />
+        <TextBlock Grid.Column="5" Text="{Binding ErrorCount, StringFormat='Errors: {0}'}" />
+      </Grid>
+    </Border>
+    <pages:GeneratedHierarchicalDynamicDataGrid Grid.Row="3" />
+  </Grid>
+</UserControl>

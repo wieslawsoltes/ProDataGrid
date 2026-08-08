@@ -101,6 +101,20 @@ namespace Avalonia.Controls.DataGridSelection
         public void SelectAll() => _inner.SelectAll();
         public void Clear() => _inner.Clear();
 
+        /// <summary>
+        /// Cancels a queued identity restoration so that the next explicit selection update becomes authoritative.
+        /// </summary>
+        public void SupersedePendingIdentityRestore()
+        {
+            if (_sourceMutationInProgress)
+            {
+                _sourceMutationInProgress = false;
+                _sourceChangeVersion++;
+            }
+
+            UpdateSelectionSnapshot();
+        }
+
         private void InnerSelectionChanged(object sender, SelectionModelSelectionChangedEventArgs e)
         {
             if (!_sourceMutationInProgress && !_suppressSnapshotUpdates)
@@ -204,13 +218,13 @@ namespace Avalonia.Controls.DataGridSelection
 
             if (snapshot.Count == 1)
             {
-                return Equals(GetIdentity(snapshot[0]), GetIdentity(_inner.SelectedItems[0]));
+                return Equals(snapshot[0], GetIdentity(_inner.SelectedItems[0]));
             }
 
             var matched = new bool[_inner.SelectedItems.Count];
             foreach (var snapshotItem in snapshot)
             {
-                var identity = GetIdentity(snapshotItem);
+                var identity = snapshotItem;
                 var found = false;
                 for (var i = 0; i < _inner.SelectedItems.Count; i++)
                 {
@@ -245,7 +259,7 @@ namespace Avalonia.Controls.DataGridSelection
             {
                 foreach (var snapshotItem in snapshot)
                 {
-                    var identity = GetIdentity(snapshotItem);
+                    var identity = snapshotItem;
                     for (var i = 0; i < list.Count; i++)
                     {
                         if (!Equals(identity, GetIdentity(list[i])))
@@ -263,7 +277,7 @@ namespace Avalonia.Controls.DataGridSelection
 
             foreach (var snapshotItem in snapshot)
             {
-                var identity = GetIdentity(snapshotItem);
+                var identity = snapshotItem;
                 var index = 0;
                 foreach (var candidate in Source)
                 {

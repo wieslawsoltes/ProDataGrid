@@ -10,6 +10,15 @@
         Height="820"
         Title="ProDiagnostics Viewer">
 
+  <Window.Resources>
+    <DataTemplate x:Key="MetricTrendCellTemplate" x:DataType="vm:MetricSeriesViewModel">
+      <controls:Sparkline Height="28"
+                          Samples="{Binding TimelineSamples}"
+                          Stroke="{Binding AccentBrush}"
+                          TimeRange="{Binding DataContext.SelectedSession.TrendRange, ElementName=Root}" />
+    </DataTemplate>
+  </Window.Resources>
+
   <Grid>
     <Canvas IsHitTestVisible="False">
       <Ellipse Width="420" Height="420" Fill="#1AE07A5F" Canvas.Left="-120" Canvas.Top="-140" />
@@ -77,7 +86,7 @@
           <TabControl>
             <TabItem Header="Metrics">
               <Grid RowDefinitions="Auto,*,Auto" RowSpacing="12">
-                <Grid ColumnDefinitions="*,Auto,Auto,Auto" ColumnSpacing="12">
+                <Grid ColumnDefinitions="*,Auto,Auto,Auto,Auto" ColumnSpacing="12">
                   <TextBox PlaceholderText="Filter metrics" Text="{Binding MetricsFilter}" />
                   <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="6" VerticalAlignment="Center">
                     <TextBlock Text="Trend" Classes="subtitle" VerticalAlignment="Center" />
@@ -111,33 +120,24 @@
                       </Flyout>
                     </Button.Flyout>
                   </Button>
-                  <TextBlock Grid.Column="3" Text="{Binding SelectedSession.Metrics.Count}" Classes="subtitle" VerticalAlignment="Center" />
+                  <Button Grid.Column="3"
+                          Content="Open metric"
+                          Command="{Binding OpenMetricCommand}" />
+                  <TextBlock Grid.Column="4" Text="{Binding SelectedSession.Metrics.Count}" Classes="subtitle" VerticalAlignment="Center" />
                 </Grid>
 
-                <DataGrid x:Name="MetricsGrid" Grid.Row="1" ItemsSource="{Binding SelectedSession.MetricsView}" AutoGenerateColumns="False" IsReadOnly="True" HeadersVisibility="Column" RowHeight="34" CanUserResizeColumns="True" CanUserReorderColumns="True" x:CompileBindings="False">
-                  <DataGrid.Columns>
-                    <DataGridTextColumn Header="Metric" Binding="{Binding DisplayName}" Width="2*" />
-                    <DataGridTextColumn Header="Description" Binding="{Binding Description}" Width="3*" />
-                    <DataGridTextColumn Header="Meter" Binding="{Binding MeterName}" Width="*" />
-                    <DataGridTextColumn Header="Unit" Binding="{Binding Unit}" Width="80" />
-                    <DataGridTextColumn Header="Last" Binding="{Binding LastValue, StringFormat=0.###}" Width="80" />
-                    <DataGridTextColumn Header="Avg" Binding="{Binding Average, StringFormat=0.###}" Width="80" />
-                    <DataGridTextColumn Header="Min" Binding="{Binding MinValue, StringFormat=0.###}" Width="80" />
-                    <DataGridTextColumn Header="Max" Binding="{Binding MaxValue, StringFormat=0.###}" Width="80" />
-                    <DataGridTextColumn Header="Samples" Binding="{Binding SampleCount}" Width="80" />
-                    <DataGridTemplateColumn Header="Trend" Width="120">
-                      <DataGridTemplateColumn.CellTemplate>
-                        <DataTemplate x:DataType="vm:MetricSeriesViewModel">
-                          <controls:Sparkline Height="28"
-                                              Samples="{Binding TimelineSamples}"
-                                              Stroke="{Binding AccentBrush}"
-                                              TimeRange="{Binding DataContext.SelectedSession.TrendRange, ElementName=Root}" />
-                        </DataTemplate>
-                      </DataGridTemplateColumn.CellTemplate>
-                    </DataGridTemplateColumn>
-                    <DataGridTextColumn Header="Tags" Binding="{Binding TagsSummary}" Width="2*" />
-                  </DataGrid.Columns>
-                </DataGrid>
+                <DataGrid x:Name="MetricsGrid"
+                          Grid.Row="1"
+                          ItemsSource="{Binding SelectedSession.MetricsView}"
+                          SelectedItem="{Binding SelectedMetric, Mode=TwoWay}"
+                          ColumnDefinitionsSource="{Binding MetricColumnDefinitions}"
+                          FastPathOptions="{Binding MetricFastPathOptions}"
+                          AutoGenerateColumns="False"
+                          IsReadOnly="True"
+                          HeadersVisibility="Column"
+                          RowHeight="34"
+                          CanUserResizeColumns="True"
+                          CanUserReorderColumns="True" />
 
                 <Border Grid.Row="2" Background="{StaticResource SurfaceAltBrush}" BorderBrush="{StaticResource StrokeBrush}" BorderThickness="1" CornerRadius="10" Padding="12" IsVisible="{Binding SelectedSession.HasMetricTabs}">
                   <TabControl ItemsSource="{Binding SelectedSession.MetricTabs}" SelectedItem="{Binding SelectedSession.SelectedMetricTab}">
@@ -235,15 +235,17 @@
                   <TextBlock Grid.Column="2" Text="{Binding SelectedSession.Activities.Count}" Classes="subtitle" VerticalAlignment="Center" />
                 </Grid>
 
-                <DataGrid x:Name="ActivitiesGrid" Grid.Row="1" ItemsSource="{Binding SelectedSession.ActivitiesView}" AutoGenerateColumns="False" IsReadOnly="True" HeadersVisibility="Column" RowHeight="34" CanUserResizeColumns="True" CanUserReorderColumns="True" x:CompileBindings="False">
-                  <DataGrid.Columns>
-                    <DataGridTextColumn Header="Started" Binding="{Binding StartTime, StringFormat={}{0:HH:mm:ss.fff}}" Width="140" />
-                    <DataGridTextColumn Header="Activity" Binding="{Binding DisplayName}" Width="2*" />
-                    <DataGridTextColumn Header="Duration (ms)" Binding="{Binding Duration.TotalMilliseconds, StringFormat=0.###}" Width="120" />
-                    <DataGridTextColumn Header="Source" Binding="{Binding SourceName}" Width="*" />
-                    <DataGridTextColumn Header="Tags" Binding="{Binding TagsSummary}" Width="2*" />
-                  </DataGrid.Columns>
-                </DataGrid>
+                <DataGrid x:Name="ActivitiesGrid"
+                          Grid.Row="1"
+                          ItemsSource="{Binding SelectedSession.ActivitiesView}"
+                          ColumnDefinitionsSource="{Binding ActivityColumnDefinitions}"
+                          FastPathOptions="{Binding ActivityFastPathOptions}"
+                          AutoGenerateColumns="False"
+                          IsReadOnly="True"
+                          HeadersVisibility="Column"
+                          RowHeight="34"
+                          CanUserResizeColumns="True"
+                          CanUserReorderColumns="True" />
               </Grid>
             </TabItem>
           </TabControl>

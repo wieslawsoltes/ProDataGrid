@@ -8,10 +8,23 @@ using Avalonia.Controls.DataGridHierarchical;
 using Avalonia.Diagnostics.Services;
 using Avalonia.Reactive;
 using Avalonia.Styling;
+using ProDataGrid.SourceGeneration;
 
 namespace Avalonia.Diagnostics.ViewModels
 {
-    internal sealed class ResourcesPageViewModel : ViewModelBase, IDisposable
+    [GenerateDataGridViewModel(
+        typeof(ResourceEntryViewModel),
+        ProviderName = "ResourceEntryGridSchema",
+        ColumnDefinitionsPropertyName = "ResourceColumnDefinitions",
+        SchemaPropertyName = "ResourceDataGridSchema",
+        FastPathOptionsPropertyName = "ResourceFastPathOptions")]
+    [GenerateDataGridViewModel(
+        typeof(ResourceTreeNode),
+        ProviderName = "ResourceTreeGridSchema",
+        ColumnDefinitionsPropertyName = "TreeColumnDefinitions",
+        SchemaPropertyName = "TreeDataGridSchema",
+        FastPathOptionsPropertyName = "TreeFastPathOptions")]
+    internal sealed partial class ResourcesPageViewModel : ViewModelBase, IDisposable
     {
         private readonly IResourceNodeFormatter _formatter;
         private readonly AvaloniaList<ResourceEntryViewModel> _resourceEntries = new();

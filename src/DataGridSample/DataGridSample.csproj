@@ -18,6 +18,8 @@
     <PackageReference Include="Avalonia.Themes.Fluent" />
     <PackageReference Include="ReactiveUI" />
     <PackageReference Include="ReactiveUI.Avalonia" />
+    <PackageReference Include="ReactiveUI.SourceGenerators" PrivateAssets="all" />
+    <PackageReference Include="ReactiveUI.Primitives.Avalonia.Reactive" />
     <PackageReference Include="System.Reactive" />
     <PackageReference Include="DynamicData" />
     <PackageReference Include="Microsoft.PowerFx.Interpreter" />
@@ -25,6 +27,9 @@
 
   <ItemGroup>
     <ProjectReference Include="../Avalonia.Controls.DataGrid/Avalonia.Controls.DataGrid.csproj" />
+    <ProjectReference Include="../ProDataGrid.SourceGenerators/ProDataGrid.SourceGenerators.csproj"
+                      OutputItemType="Analyzer"
+                      ReferenceOutputAssembly="false" />
     <ProjectReference Include="../ProCharts.Avalonia/ProCharts.Avalonia.csproj" />
     <ProjectReference Include="../ProDataGrid.Charting/ProDataGrid.Charting.csproj" />
     <ProjectReference Include="../ProDataGrid.FormulaEngine/ProDataGrid.FormulaEngine.csproj" />

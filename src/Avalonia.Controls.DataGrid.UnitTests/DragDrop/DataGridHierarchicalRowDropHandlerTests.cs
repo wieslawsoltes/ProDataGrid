@@ -9,6 +9,7 @@ using Avalonia.Controls;
 using Avalonia.Controls.DataGridDragDrop;
 using Avalonia.Controls.DataGridHierarchical;
 using Avalonia.Data;
+using Avalonia.Headless.XUnit;
 using Avalonia.Input;
 using Xunit;
 using AvaloniaDragDrop = Avalonia.Input.DragDrop;
@@ -17,7 +18,7 @@ namespace Avalonia.Controls.DataGridTests.DragDrop;
 
 public class DataGridHierarchicalRowDropHandlerTests
 {
-    [Fact]
+    [AvaloniaFact]
     public void Execute_Moves_Node_Within_Same_Parent()
     {
         var (grid, model, root, _, handler) = CreateGrid();
@@ -30,7 +31,7 @@ public class DataGridHierarchicalRowDropHandlerTests
         Assert.Equal(new[] { "B", "C", "A" }, GetChildNames(root));
     }
 
-    [Fact]
+    [AvaloniaFact]
     public void Execute_Moves_Node_To_Different_Parent()
     {
         var (grid, model, root, secondary, handler) = CreateGrid();
@@ -44,7 +45,7 @@ public class DataGridHierarchicalRowDropHandlerTests
         Assert.Equal(new[] { "A1", "B1" }, GetChildNames(secondary));
     }
 
-    [Fact]
+    [AvaloniaFact]
     public void Validate_Fails_When_Target_Is_Descendant()
     {
         var (grid, model, root, _, handler) = CreateGrid();
@@ -57,7 +58,7 @@ public class DataGridHierarchicalRowDropHandlerTests
         Assert.False(handler.Execute(args));
     }
 
-    [Fact]
+    [AvaloniaFact]
     public void Execute_Drops_Node_Inside_Target()
     {
         var (grid, model, root, _, handler) = CreateGrid();
@@ -165,7 +166,7 @@ public class DataGridHierarchicalRowDropHandlerTests
         return node.MutableChildren.Select(x => x.Item).OfType<TreeNode>().Select(x => x.Name).ToList();
     }
 
-    [Fact]
+    [AvaloniaFact]
     public void Execute_MultiRoot_Moves_Node_To_Root_Level()
     {
         var (grid, model, items, handler) = CreateMultiRootGrid();
@@ -187,7 +188,7 @@ public class DataGridHierarchicalRowDropHandlerTests
         Assert.Equal("A1", items[2].Name);
     }
 
-    [Fact]
+    [AvaloniaFact]
     public void Execute_MultiRoot_Moves_Root_Item_Between_Siblings()
     {
         var (grid, model, items, handler) = CreateMultiRootGrid();
@@ -201,7 +202,7 @@ public class DataGridHierarchicalRowDropHandlerTests
         Assert.Equal(new[] { "B", "A" }, items.Select(x => x.Name).ToArray());
     }
 
-    [Fact]
+    [AvaloniaFact]
     public void Execute_MultiRoot_Moves_Node_Into_Another_Root()
     {
         var (grid, model, items, handler) = CreateMultiRootGrid();
@@ -222,7 +223,7 @@ public class DataGridHierarchicalRowDropHandlerTests
         Assert.Equal(new[] { "A1" }, targetB.MutableChildren.Select(x => ((TreeNode)x.Item).Name).ToArray());
     }
 
-    [Fact]
+    [AvaloniaFact]
     public void Validate_MultiRoot_Fails_For_VirtualRoot_Drag()
     {
         var (grid, model, _, handler) = CreateMultiRootGrid();

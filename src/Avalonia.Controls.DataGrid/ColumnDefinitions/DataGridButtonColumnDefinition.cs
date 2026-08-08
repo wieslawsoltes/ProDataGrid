@@ -22,6 +22,9 @@ namespace Avalonia.Controls
         private string _contentTemplateKey;
         private ICommand _command;
         private object _commandParameter;
+        private DataGridBindingDefinition _contentBinding;
+        private DataGridBindingDefinition _commandBinding;
+        private DataGridBindingDefinition _commandParameterBinding;
         private ClickMode? _clickMode;
         private KeyGesture _hotKey;
 
@@ -30,6 +33,13 @@ namespace Avalonia.Controls
         {
             get => _content;
             set => SetProperty(ref _content, value);
+        }
+
+        /// <summary>Gets or sets the compiled row binding used to resolve button content.</summary>
+        public DataGridBindingDefinition ContentBinding
+        {
+            get => _contentBinding;
+            set => SetProperty(ref _contentBinding, value);
         }
 
         public string ContentTemplateKey
@@ -44,11 +54,25 @@ namespace Avalonia.Controls
             set => SetProperty(ref _command, value);
         }
 
+        /// <summary>Gets or sets the compiled row binding used to resolve the command.</summary>
+        public DataGridBindingDefinition CommandBinding
+        {
+            get => _commandBinding;
+            set => SetProperty(ref _commandBinding, value);
+        }
+
         [AssignBinding]
         public object CommandParameter
         {
             get => _commandParameter;
             set => SetProperty(ref _commandParameter, value);
+        }
+
+        /// <summary>Gets or sets the compiled row binding used to resolve the command parameter.</summary>
+        public DataGridBindingDefinition CommandParameterBinding
+        {
+            get => _commandParameterBinding;
+            set => SetProperty(ref _commandParameterBinding, value);
         }
 
         public ClickMode? ClickMode
@@ -72,7 +96,11 @@ namespace Avalonia.Controls
         {
             if (column is DataGridButtonColumn buttonColumn)
             {
-                if (Content != null)
+                if (ContentBinding != null)
+                {
+                    buttonColumn.Content = ContentBinding.CreateBinding();
+                }
+                else if (Content != null)
                 {
                     buttonColumn.Content = Content;
                 }
@@ -90,16 +118,27 @@ namespace Avalonia.Controls
                     buttonColumn.ClearValue(DataGridButtonColumn.ContentTemplateProperty);
                 }
 
-                if (Command != null)
+                if (CommandBinding != null)
                 {
+                    buttonColumn.CommandBinding = CommandBinding.CreateBinding();
+                    buttonColumn.ClearValue(DataGridButtonColumn.CommandProperty);
+                }
+                else if (Command != null)
+                {
+                    buttonColumn.ClearValue(DataGridButtonColumn.CommandBindingProperty);
                     buttonColumn.Command = Command;
                 }
                 else
                 {
+                    buttonColumn.ClearValue(DataGridButtonColumn.CommandBindingProperty);
                     buttonColumn.ClearValue(DataGridButtonColumn.CommandProperty);
                 }
 
-                if (CommandParameter != null)
+                if (CommandParameterBinding != null)
+                {
+                    buttonColumn.CommandParameter = CommandParameterBinding.CreateBinding();
+                }
+                else if (CommandParameter != null)
                 {
                     buttonColumn.CommandParameter = CommandParameter;
                 }
@@ -141,7 +180,12 @@ namespace Avalonia.Controls
             switch (propertyName)
             {
                 case nameof(Content):
-                    if (Content != null)
+                case nameof(ContentBinding):
+                    if (ContentBinding != null)
+                    {
+                        buttonColumn.Content = ContentBinding.CreateBinding();
+                    }
+                    else if (Content != null)
                     {
                         buttonColumn.Content = Content;
                     }
@@ -161,17 +205,30 @@ namespace Avalonia.Controls
                     }
                     return true;
                 case nameof(Command):
-                    if (Command != null)
+                case nameof(CommandBinding):
+                    if (CommandBinding != null)
                     {
+                        buttonColumn.CommandBinding = CommandBinding.CreateBinding();
+                        buttonColumn.ClearValue(DataGridButtonColumn.CommandProperty);
+                    }
+                    else if (Command != null)
+                    {
+                        buttonColumn.ClearValue(DataGridButtonColumn.CommandBindingProperty);
                         buttonColumn.Command = Command;
                     }
                     else
                     {
+                        buttonColumn.ClearValue(DataGridButtonColumn.CommandBindingProperty);
                         buttonColumn.ClearValue(DataGridButtonColumn.CommandProperty);
                     }
                     return true;
                 case nameof(CommandParameter):
-                    if (CommandParameter != null)
+                case nameof(CommandParameterBinding):
+                    if (CommandParameterBinding != null)
+                    {
+                        buttonColumn.CommandParameter = CommandParameterBinding.CreateBinding();
+                    }
+                    else if (CommandParameter != null)
                     {
                         buttonColumn.CommandParameter = CommandParameter;
                     }

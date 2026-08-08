@@ -1,0 +1,40 @@
+<UserControl
+    x:Class="DataGridSample.Pages.GeneratedRemoteQueryPage"
+    xmlns="https://github.com/avaloniaui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:pages="clr-namespace:DataGridSample.Pages"
+    xmlns:viewModels="clr-namespace:DataGridSample.ViewModels"
+    x:DataType="viewModels:GeneratedRemoteQueryViewModel">
+  <Grid Margin="12" RowDefinitions="Auto,Auto,Auto,*" RowSpacing="8">
+    <StackPanel Spacing="4">
+      <TextBlock Classes="h2" Text="Generated remote queries" />
+      <TextBlock TextWrapping="Wrap"
+                 Text="Generated immutable query revisions carry typed sort, filter, and search descriptors to a deterministic remote provider with paging, debounce, cache, cancellation, stale suppression, and ReactiveUI state projection." />
+    </StackPanel>
+    <WrapPanel Grid.Row="1">
+      <Button Content="Search / first page" Command="{Binding LoadFirstPageCommand}" />
+      <Button Content="Previous" Command="{Binding PreviousPageCommand}" />
+      <Button Content="Next" Command="{Binding NextPageCommand}" />
+      <Button Content="Refresh" Command="{Binding RefreshCommand}" />
+      <Button Content="Europe total ≥ 250" Command="{Binding ApplyEuropeFilterCommand}" />
+      <Button Content="Total descending" Command="{Binding SortTotalDescendingCommand}" />
+      <Button Content="Clear query" Command="{Binding ClearQueryCommand}" />
+      <Button Content="Run stale race" Command="{Binding RunStaleScenarioCommand}" />
+      <Button Content="Simulate error" Command="{Binding SimulateErrorCommand}" />
+    </WrapPanel>
+    <Border Grid.Row="2" Padding="8" Background="{DynamicResource ThemeControlLowBrush}" CornerRadius="4">
+      <Grid ColumnDefinitions="*,Auto,Auto,Auto,Auto,Auto" ColumnSpacing="14">
+        <StackPanel>
+          <TextBlock Text="{Binding Status}" TextTrimming="CharacterEllipsis" />
+          <TextBlock Text="{Binding TranslatedField}" Opacity="0.72" />
+        </StackPanel>
+        <TextBlock Grid.Column="1" Text="{Binding PageNumber, StringFormat='Page: {0}'}" />
+        <TextBlock Grid.Column="2" Text="{Binding TotalCount, StringFormat='Total: {0}'}" />
+        <TextBlock Grid.Column="3" Text="{Binding RequestCount, StringFormat='Requests: {0}'}" />
+        <TextBlock Grid.Column="4" Text="{Binding CancellationCount, StringFormat='Canceled: {0}'}" />
+        <TextBlock Grid.Column="5" Text="{Binding StaleResponseCount, StringFormat='Stale: {0}'}" />
+      </Grid>
+    </Border>
+    <pages:GeneratedRemoteQueryGrid Grid.Row="3" />
+  </Grid>
+</UserControl>

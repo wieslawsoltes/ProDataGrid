@@ -1,0 +1,44 @@
+<UserControl
+    x:Class="DataGridSample.Pages.GeneratedReactiveViewRecipesPage"
+    xmlns="https://github.com/avaloniaui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:pages="clr-namespace:DataGridSample.Pages"
+    xmlns:viewModels="clr-namespace:DataGridSample.ViewModels"
+    x:DataType="viewModels:GeneratedReactiveViewRecipesViewModel">
+  <Grid Margin="12" RowDefinitions="Auto,Auto,Auto,*" RowSpacing="8">
+    <StackPanel Spacing="3">
+      <TextBlock Classes="h2" Text="Generated ReactiveUI view recipes" />
+      <TextBlock TextWrapping="Wrap" Text="Compare four independently generated code-only views. Each uses compiled binding indexers, deterministic automation metadata, the same strict schema, and ReactiveUI activation." />
+    </StackPanel>
+
+    <WrapPanel Grid.Row="1">
+      <Button Content="Add shared row" Command="{Binding AddRowCommand}" />
+      <Button Content="Advance first row" Command="{Binding AdvanceCommand}" />
+      <Button Content="Clear generated search" Command="{Binding ClearSearchCommand}" />
+      <Button Content="Restore baseline" Command="{Binding RestoreCommand}" />
+    </WrapPanel>
+
+    <Border Grid.Row="2" Padding="8" Background="{DynamicResource ThemeControlLowBrush}" CornerRadius="4">
+      <Grid ColumnDefinitions="*,Auto,Auto" ColumnSpacing="16">
+        <TextBlock Text="{Binding Status}" TextWrapping="Wrap" />
+        <TextBlock Grid.Column="1" Text="{Binding SourceRowCount, StringFormat='Source rows: {0}'}" />
+        <TextBlock Grid.Column="2" Text="{Binding VisibleRowCount, StringFormat='Visible: {0}'}" />
+      </Grid>
+    </Border>
+
+    <TabControl Grid.Row="3">
+      <TabItem Header="Grid only">
+        <pages:GeneratedRecipeGridOnlyView />
+      </TabItem>
+      <TabItem Header="Explorer">
+        <pages:GeneratedRecipeExplorerView />
+      </TabItem>
+      <TabItem Header="Spreadsheet">
+        <pages:GeneratedRecipeSpreadsheetView />
+      </TabItem>
+      <TabItem Header="Analytics">
+        <pages:GeneratedRecipeAnalyticsView />
+      </TabItem>
+    </TabControl>
+  </Grid>
+</UserControl>

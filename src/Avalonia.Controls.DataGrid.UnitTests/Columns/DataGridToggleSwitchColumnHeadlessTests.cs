@@ -40,6 +40,8 @@ public class DataGridToggleSwitchColumnHeadlessTests
     {
         AssertHasAssignBinding(nameof(DataGridToggleSwitchColumn.OnContent));
         AssertHasAssignBinding(nameof(DataGridToggleSwitchColumn.OffContent));
+        AssertHasAssignBinding(nameof(DataGridToggleSwitchColumn.CommandBinding));
+        AssertHasAssignBinding(nameof(DataGridToggleSwitchColumn.CommandParameter));
     }
 
     [AvaloniaFact]

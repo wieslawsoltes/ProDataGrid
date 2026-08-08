@@ -12,13 +12,16 @@ using Avalonia.Data;
 using Avalonia.Markup.Xaml.MarkupExtensions;
 using Avalonia.Styling;
 using Avalonia.Threading;
+using ProDataGrid.SourceGeneration;
 
 namespace Avalonia.Diagnostics.ViewModels
 {
-    internal class ControlDetailsViewModel : ViewModelBase, IDisposable, IClassesChangedListener
+    [GenerateDataGridViewModel(typeof(PropertyViewModel), ProviderName = "PropertyGridSchema")]
+    internal partial class ControlDetailsViewModel : ViewModelBase, IDisposable, IClassesChangedListener
     {
         private readonly AvaloniaObject _avaloniaObject;
         private readonly ISet<string> _pinnedProperties;
+        private readonly DataGridGeneratedColumnLayoutController _propertyColumnLayout;
         private IDictionary<object, PropertyViewModel[]>? _propertyIndex;
         private PropertyViewModel? _selectedProperty;
         private DataGridCollectionView? _propertiesView;
@@ -45,6 +48,7 @@ namespace Avalonia.Diagnostics.ViewModels
         {
             _avaloniaObject = avaloniaObject;
             _pinnedProperties = pinnedProperties;
+            _propertyColumnLayout = new DataGridGeneratedColumnLayoutController(ColumnDefinitions);
             TreePage = treePage;
             Layout = avaloniaObject is Visual visual
                 ? new ControlLayoutViewModel(visual)
@@ -80,6 +84,25 @@ namespace Avalonia.Diagnostics.ViewModels
 
                 UpdateStyles();
             }
+
+            TreePage.MainView.PropertyChanged += MainViewOnPropertyChanged;
+            UpdatePropertyTypeColumns();
+        }
+
+        private void MainViewOnPropertyChanged(object? sender, PropertyChangedEventArgs e)
+        {
+            if (e.PropertyName == nameof(MainViewModel.ShowDetailsPropertyType))
+            {
+                UpdatePropertyTypeColumns();
+            }
+        }
+
+        private void UpdatePropertyTypeColumns()
+        {
+            bool showDetails = TreePage.MainView.ShowDetailsPropertyType;
+            _propertyColumnLayout.SetVisible("type", !showDetails);
+            _propertyColumnLayout.SetVisible("assigned-type", showDetails);
+            _propertyColumnLayout.SetVisible("property-type", showDetails);
         }
 
         public bool CanNavigateToParentProperty => _selectedEntitiesStack.Count >= 1;
@@ -172,6 +195,9 @@ namespace Avalonia.Diagnostics.ViewModels
 
         public void Dispose()
         {
+            TreePage.MainView.PropertyChanged -= MainViewOnPropertyChanged;
+            _propertyColumnLayout.Dispose();
+
             if (_avaloniaObject is INotifyPropertyChanged inpc)
             {
                 inpc.PropertyChanged -= ControlPropertyChanged;

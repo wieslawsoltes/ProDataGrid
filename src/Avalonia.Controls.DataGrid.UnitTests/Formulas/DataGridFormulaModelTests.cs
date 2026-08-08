@@ -171,6 +171,52 @@ namespace Avalonia.Controls.DataGridTests.Formulas
         }
 
         [AvaloniaFact]
+        public void FormulaModel_Evaluates_Cell_Formula_Override()
+        {
+            var items = new ObservableCollection<RowItem>
+            {
+                new("A", 10d)
+            };
+
+            var builder = DataGridColumnDefinitionBuilder.For<RowItem>();
+            var amountProperty = CreateProperty(nameof(RowItem.Amount), row => row.Amount, (row, value) => row.Amount = value);
+            var amountDefinition = builder.Numeric(
+                header: "Amount",
+                property: amountProperty,
+                getter: row => row.Amount,
+                setter: (row, value) => row.Amount = value,
+                configure: column => column.ColumnKey = "Amount");
+            var formulaDefinition = builder.Formula(
+                header: "Calc",
+                formula: "=[@Amount]*2",
+                formulaName: "Calc",
+                configure: column =>
+                {
+                    column.ColumnKey = "Calc";
+                    column.AllowCellFormulas = true;
+                });
+            var grid = new DataGrid
+            {
+                Name = "SalesTable",
+                ItemsSource = items,
+                ColumnDefinitionsSource = new ObservableCollection<DataGridColumnDefinition>
+                {
+                    amountDefinition,
+                    formulaDefinition
+                },
+                AutoGenerateColumns = false
+            };
+            var model = (DataGridFormulaModel)grid.FormulaModel;
+            model.Recalculate();
+
+            bool success = model.TrySetCellFormula(items[0], formulaDefinition, "=[@Amount]*3", out string? error);
+            model.Recalculate();
+
+            Assert.True(success, error);
+            Assert.Equal(30d, model.Evaluate(items[0], formulaDefinition));
+        }
+
+        [AvaloniaFact]
         public void FormulaModel_Resolves_Named_Ranges_In_Formulas()
         {
             var items = new ObservableCollection<RowItem>

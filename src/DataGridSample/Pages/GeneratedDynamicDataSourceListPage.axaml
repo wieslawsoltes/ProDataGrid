@@ -1,0 +1,30 @@
+<UserControl
+    x:Class="DataGridSample.Pages.GeneratedDynamicDataSourceListPage"
+    xmlns="https://github.com/avaloniaui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:pages="clr-namespace:DataGridSample.Pages"
+    xmlns:viewModels="clr-namespace:DataGridSample.ViewModels"
+    x:DataType="viewModels:GeneratedDynamicDataSourceListViewModel">
+  <Grid Margin="12" RowDefinitions="Auto,Auto,Auto,*" RowSpacing="8">
+    <StackPanel Spacing="4">
+      <TextBlock Classes="h2" Text="Generated DynamicData SourceList" />
+      <TextBlock TextWrapping="Wrap"
+                 Text="One generated owner connects batched list changes to compiled sort, filter, and search predicates, then disposes every subscription deterministically." />
+    </StackPanel>
+    <WrapPanel Grid.Row="1">
+      <Button Content="Add 12-row batch" Command="{Binding AddBatchCommand}" />
+      <Button Content="Price descending" Command="{Binding SortPriceDescendingCommand}" />
+      <Button Content="Warsaw price ≥ 100" Command="{Binding ApplyWarsawFilterCommand}" />
+      <Button Content="Clear operations" Command="{Binding ClearOperationsCommand}" />
+    </WrapPanel>
+    <Border Grid.Row="2" Padding="8" Background="{DynamicResource ThemeControlLowBrush}" CornerRadius="4">
+      <Grid ColumnDefinitions="*,Auto,Auto,Auto" ColumnSpacing="16">
+        <TextBlock Text="{Binding Status}" TextTrimming="CharacterEllipsis" />
+        <TextBlock Grid.Column="1" Text="{Binding PublishedItemCount, StringFormat='Published: {0}'}" />
+        <TextBlock Grid.Column="2" Text="{Binding BatchCount, StringFormat='Batches: {0}'}" />
+        <TextBlock Grid.Column="3" Text="{Binding ErrorCount, StringFormat='Errors: {0}'}" />
+      </Grid>
+    </Border>
+    <pages:GeneratedDynamicDataSourceListGrid Grid.Row="3" />
+  </Grid>
+</UserControl>

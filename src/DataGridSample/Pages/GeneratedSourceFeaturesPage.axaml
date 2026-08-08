@@ -1,0 +1,37 @@
+<UserControl
+    x:Class="DataGridSample.Pages.GeneratedSourceFeaturesPage"
+    xmlns="https://github.com/avaloniaui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:viewModels="clr-namespace:DataGridSample.ViewModels"
+    x:DataType="viewModels:GeneratedSourceFeaturesViewModel">
+  <Grid Margin="12" RowDefinitions="Auto,Auto,Auto,*" RowSpacing="8">
+    <StackPanel Spacing="4">
+      <TextBlock Classes="h2" Text="Generated complex-app features" />
+      <TextBlock TextWrapping="Wrap"
+                 Text="One canonical schema drives typed grouping, incremental summaries, conditional rules, bands, editing/validation, clipboard, fill, undo, distinct values, collection views, and performance profiles." />
+    </StackPanel>
+    <WrapPanel Grid.Row="1">
+      <Button Content="Add row" Command="{Binding AddCommand}" />
+      <Button Content="Fill amounts" Command="{Binding FillCommand}" />
+      <Button Content="Undo" Command="{Binding UndoCommand}" />
+      <Button Content="Export CSV" Command="{Binding ExportCommand}" />
+      <Button Content="Summaries" Command="{Binding SummarizeCommand}" />
+      <Button Content="Amount descending" Command="{Binding AmountHeaderCommands.SortDescending}" />
+      <Button Content="Clear amount sort" Command="{Binding AmountHeaderCommands.ClearSort}" />
+      <Button Content="Hide amount" Command="{Binding AmountHeaderCommands.HideColumn}" />
+      <Button Content="Reset layout" Command="{Binding AmountHeaderCommands.ResetLayout}" />
+    </WrapPanel>
+    <Border Grid.Row="2" Padding="8" Background="{DynamicResource ThemeControlLowBrush}" CornerRadius="4">
+      <TextBlock TextWrapping="Wrap" Text="{Binding Status}" />
+    </Border>
+    <DataGrid Grid.Row="3"
+              AutoGenerateColumns="False"
+              ItemsSource="{Binding ItemsView}"
+              ColumnDefinitionsSource="{Binding ColumnDefinitions}"
+              FastPathOptions="{Binding FastPathOptions}"
+              SortingModel="{Binding SortingModel}"
+              FilteringModel="{Binding FilteringModel}"
+              CanUserSortColumns="True"
+              GridLinesVisibility="Horizontal" />
+  </Grid>
+</UserControl>

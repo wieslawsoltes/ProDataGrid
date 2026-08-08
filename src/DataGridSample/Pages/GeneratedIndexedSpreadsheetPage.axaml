@@ -1,0 +1,33 @@
+<UserControl
+    x:Class="DataGridSample.Pages.GeneratedIndexedSpreadsheetPage"
+    xmlns="https://github.com/avaloniaui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:pages="clr-namespace:DataGridSample.Pages"
+    xmlns:viewModels="clr-namespace:DataGridSample.ViewModels"
+    x:DataType="viewModels:GeneratedIndexedSpreadsheetViewModel">
+  <Grid Margin="12" RowDefinitions="Auto,Auto,Auto,*" RowSpacing="8">
+    <StackPanel Spacing="3">
+      <TextBlock Classes="h2" Text="Generated runtime indexed spreadsheet" />
+      <TextBlock TextWrapping="Wrap"
+                 Text="One generated method-backed family materializes a runtime column count, typed text/numeric slots, structured formulas, and per-cell formula overrides without property reflection or handwritten IPropertyInfo adapters." />
+    </StackPanel>
+
+    <WrapPanel Grid.Row="1">
+      <Button Content="Add runtime column" Command="{Binding AddColumnCommand}" />
+      <Button Content="Remove runtime column" Command="{Binding RemoveColumnCommand}" />
+      <Button Content="Randomize typed inputs" Command="{Binding RandomizeInputsCommand}" />
+      <Button Content="Set H1 formula" Command="{Binding ApplyCellFormulaCommand}" />
+      <Button Content="Recalculate" Command="{Binding RecalculateCommand}" />
+      <TextBlock Margin="12,5,0,0" Text="{Binding VisibleColumnCount, StringFormat='Visible slots: {0}'}" />
+    </WrapPanel>
+
+    <Border Grid.Row="2" Padding="8" Background="{DynamicResource ThemeControlLowBrush}" CornerRadius="4">
+      <Grid ColumnDefinitions="2*,3*" ColumnSpacing="12">
+        <TextBlock Text="{Binding Status}" TextWrapping="Wrap" />
+        <TextBlock Grid.Column="1" Text="{Binding FormulaPreview}" TextWrapping="Wrap" />
+      </Grid>
+    </Border>
+
+    <pages:GeneratedIndexedSpreadsheetGrid Grid.Row="3" />
+  </Grid>
+</UserControl>

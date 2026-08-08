@@ -506,6 +506,12 @@ namespace Avalonia.Controls
                 }
 
                 var item = _owner.DataConnection.GetDataItem(index);
+                if (item == null ||
+                    ReferenceEquals(item, global::Avalonia.Collections.DataGridCollectionView.NewItemPlaceholder))
+                {
+                    return;
+                }
+
                 var key = options?.ItemKeySelector != null ? options.ItemKeySelector(item) : item;
                 samples ??= new List<DataGridScrollSample>(4);
                 samples.Add(new DataGridScrollSample(index, key));

@@ -1,0 +1,16 @@
+<UserControl
+    x:Class="DataGridSample.Pages.GeneratedColumnsCustomPage"
+    xmlns="https://github.com/avaloniaui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:viewModels="clr-namespace:DataGridSample.ViewModels"
+    x:DataType="viewModels:GeneratedColumnsCustomViewModel">
+  <Grid Margin="12" RowDefinitions="Auto,*" RowSpacing="8">
+    <StackPanel Spacing="4">
+      <TextBlock Classes="h2" Text="Generated columns: user-defined implementation" />
+      <TextBlock TextWrapping="Wrap" Text="The generator emits a stable schema facade while a user implementation owns column construction and each reflection-free data operation." />
+    </StackPanel>
+    <DataGrid Grid.Row="1" AutoGenerateColumns="False" ItemsSource="{Binding Items}"
+              ColumnDefinitionsSource="{Binding ColumnDefinitions}" FastPathOptions="{Binding FastPathOptions}"
+              CanUserSortColumns="True" />
+  </Grid>
+</UserControl>

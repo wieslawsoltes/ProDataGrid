@@ -91,6 +91,23 @@ internal
         }
 
         /// <summary>
+        /// Defines the <see cref="CommandBinding"/> property.
+        /// </summary>
+        public static readonly StyledProperty<object> CommandBindingProperty =
+            AvaloniaProperty.Register<DataGridButtonColumn, object>(nameof(CommandBinding));
+
+        /// <summary>
+        /// Gets or sets a row-scoped binding that resolves the command for each button.
+        /// When set, this takes precedence over <see cref="Command"/>.
+        /// </summary>
+        [AssignBinding]
+        public object CommandBinding
+        {
+            get => GetValue(CommandBindingProperty);
+            set => SetValue(CommandBindingProperty, value);
+        }
+
+        /// <summary>
         /// Defines the <see cref="CommandParameter"/> property.
         /// </summary>
         public static readonly StyledProperty<object> CommandParameterProperty =
@@ -155,6 +172,7 @@ internal
             if (change.Property == ContentProperty
                 || change.Property == ContentTemplateProperty
                 || change.Property == CommandProperty
+                || change.Property == CommandBindingProperty
                 || change.Property == CommandParameterProperty
                 || change.Property == ClickModeProperty
                 || change.Property == HotKeyProperty)
@@ -244,7 +262,11 @@ internal
                 button.ClearValue(ContentControl.ContentTemplateProperty);
             }
 
-            if (Command != null)
+            if (CommandBinding != null)
+            {
+                ApplyValueOrBinding(button, Button.CommandProperty, CommandBinding, fallbackValue: null);
+            }
+            else if (Command != null)
             {
                 button.Command = Command;
             }

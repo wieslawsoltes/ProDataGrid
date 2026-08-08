@@ -5,6 +5,7 @@
 
 using System;
 using System.Collections.Specialized;
+using System.Windows.Input;
 using Avalonia.Collections;
 using Avalonia.Controls.Templates;
 using Avalonia.Data;
@@ -77,6 +78,41 @@ internal
             set => SetValue(OffContentProperty, value);
         }
 
+        /// <summary>Defines the <see cref="Command"/> property.</summary>
+        public static readonly StyledProperty<ICommand> CommandProperty =
+            Button.CommandProperty.AddOwner<DataGridToggleSwitchColumn>();
+
+        /// <summary>Gets or sets the command executed when the switch is invoked.</summary>
+        public ICommand Command
+        {
+            get => GetValue(CommandProperty);
+            set => SetValue(CommandProperty, value);
+        }
+
+        /// <summary>Defines the <see cref="CommandBinding"/> property.</summary>
+        public static readonly StyledProperty<object> CommandBindingProperty =
+            AvaloniaProperty.Register<DataGridToggleSwitchColumn, object>(nameof(CommandBinding));
+
+        /// <summary>Gets or sets a row-scoped command binding.</summary>
+        [AssignBinding]
+        public object CommandBinding
+        {
+            get => GetValue(CommandBindingProperty);
+            set => SetValue(CommandBindingProperty, value);
+        }
+
+        /// <summary>Defines the <see cref="CommandParameter"/> property.</summary>
+        public static readonly StyledProperty<object> CommandParameterProperty =
+            Button.CommandParameterProperty.AddOwner<DataGridToggleSwitchColumn>();
+
+        /// <summary>Gets or sets the command parameter. The row item is used when unset.</summary>
+        [AssignBinding]
+        public object CommandParameter
+        {
+            get => GetValue(CommandParameterProperty);
+            set => SetValue(CommandParameterProperty, value);
+        }
+
         /// <summary>
         /// Defines the <see cref="OnContentTemplate"/> property.
         /// </summary>
@@ -131,6 +167,9 @@ internal
 
             if (change.Property == OnContentProperty
                 || change.Property == OffContentProperty
+                || change.Property == CommandProperty
+                || change.Property == CommandBindingProperty
+                || change.Property == CommandParameterProperty
                 || change.Property == OnContentTemplateProperty
                 || change.Property == OffContentTemplateProperty
                 || change.Property == IsThreeStateProperty)
@@ -165,7 +204,7 @@ internal
                 toggleSwitch.Theme = theme;
             }
 
-            ConfigureToggleSwitch(toggleSwitch);
+            ConfigureToggleSwitch(toggleSwitch, dataItem);
             return toggleSwitch;
         }
 
@@ -200,7 +239,7 @@ internal
 
             toggleSwitch.IsEnabled = isEnabled;
             toggleSwitch.IsHitTestVisible = false;
-            ConfigureToggleSwitch(toggleSwitch);
+            ConfigureToggleSwitch(toggleSwitch, dataItem);
 
             if (Binding != null && dataItem != DataGridCollectionView.NewItemPlaceholder)
             {
@@ -291,7 +330,7 @@ internal
 
             if (element is ToggleSwitch toggleSwitch)
             {
-                ConfigureToggleSwitch(toggleSwitch);
+                ConfigureToggleSwitch(toggleSwitch, toggleSwitch.DataContext);
             }
             else
             {
@@ -311,7 +350,7 @@ internal
             }
         }
 
-        private void ConfigureToggleSwitch(ToggleSwitch toggleSwitch)
+        private void ConfigureToggleSwitch(ToggleSwitch toggleSwitch, object dataItem)
         {
             toggleSwitch.HorizontalAlignment = HorizontalAlignment.Center;
             toggleSwitch.VerticalAlignment = VerticalAlignment.Center;
@@ -319,6 +358,21 @@ internal
             ApplyValueOrBinding(toggleSwitch, ToggleSwitch.OnContentProperty, OnContent);
 
             ApplyValueOrBinding(toggleSwitch, ToggleSwitch.OffContentProperty, OffContent);
+
+            if (CommandBinding != null)
+            {
+                ApplyValueOrBinding(toggleSwitch, Button.CommandProperty, CommandBinding);
+            }
+            else if (Command != null)
+            {
+                toggleSwitch.Command = Command;
+            }
+            else
+            {
+                toggleSwitch.ClearValue(Button.CommandProperty);
+            }
+
+            ApplyValueOrBinding(toggleSwitch, Button.CommandParameterProperty, CommandParameter, dataItem);
 
             if (OnContentTemplate != null)
             {
@@ -341,7 +395,11 @@ internal
             toggleSwitch.IsThreeState = IsThreeState;
         }
 
-        private static void ApplyValueOrBinding(AvaloniaObject target, AvaloniaProperty property, object value)
+        private static void ApplyValueOrBinding(
+            AvaloniaObject target,
+            AvaloniaProperty property,
+            object value,
+            object fallbackValue = null)
         {
             target.ClearValue(property);
 
@@ -351,9 +409,10 @@ internal
                 return;
             }
 
-            if (value != null)
+            object resolvedValue = value ?? fallbackValue;
+            if (resolvedValue != null)
             {
-                target.SetValue(property, value);
+                target.SetValue(property, resolvedValue);
             }
         }
 

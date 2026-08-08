@@ -96,6 +96,7 @@ namespace Avalonia.Controls
         private IDataGridColumnValueAccessor _valueAccessor;
         private Type _valueType;
         private DataGridColumnDefinitionOptions _options;
+        private IReadOnlyList<DataGridSummaryDefinition> _summaryDefinitions = Array.Empty<DataGridSummaryDefinition>();
         private int _updateNesting;
         private bool _hasPendingChange;
 
@@ -332,6 +333,15 @@ namespace Avalonia.Controls
 
                 NotifyPropertyChanged(nameof(Options));
             }
+        }
+
+        /// <summary>
+        /// Gets or sets the summaries to materialize for each column created from this definition.
+        /// </summary>
+        public IReadOnlyList<DataGridSummaryDefinition> SummaryDefinitions
+        {
+            get => _summaryDefinitions;
+            set => SetProperty(ref _summaryDefinitions, value ?? Array.Empty<DataGridSummaryDefinition>());
         }
 
         public void BeginUpdate()
@@ -578,6 +588,7 @@ namespace Avalonia.Controls
             }
 
             ApplyOptions(column);
+            ApplySummaryDefinitions(column);
         }
 
         protected virtual bool ApplyPropertyChangeCore(
@@ -594,6 +605,12 @@ namespace Avalonia.Controls
                 handled = true;
             }
 
+            if (!handled && string.Equals(propertyName, nameof(SummaryDefinitions), StringComparison.Ordinal))
+            {
+                ApplySummaryDefinitions(column);
+                handled = true;
+            }
+
             if (ApplyColumnPropertyChange(column, context, propertyName))
             {
                 return true;
@@ -606,6 +623,17 @@ namespace Avalonia.Controls
             }
 
             return handled;
+        }
+
+        private void ApplySummaryDefinitions(DataGridColumn column)
+        {
+            column.Summaries.Clear();
+            for (int index = 0; index < _summaryDefinitions.Count; index++)
+            {
+                DataGridSummaryDefinition definition = _summaryDefinitions[index]
+                    ?? throw new InvalidOperationException("SummaryDefinitions cannot contain null values.");
+                column.Summaries.Add(definition.CreateDescription());
+            }
         }
 
         private bool ApplyBasePropertyChange(DataGridColumn column, DataGridColumnDefinitionContext context, string propertyName)

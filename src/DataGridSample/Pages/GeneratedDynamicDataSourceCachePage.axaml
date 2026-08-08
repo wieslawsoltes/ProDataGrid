@@ -1,0 +1,34 @@
+<UserControl
+    x:Class="DataGridSample.Pages.GeneratedDynamicDataSourceCachePage"
+    xmlns="https://github.com/avaloniaui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:pages="clr-namespace:DataGridSample.Pages"
+    xmlns:viewModels="clr-namespace:DataGridSample.ViewModels"
+    x:DataType="viewModels:GeneratedDynamicDataSourceCacheViewModel">
+  <Grid Margin="12" RowDefinitions="Auto,Auto,Auto,*" RowSpacing="8">
+    <StackPanel Spacing="4">
+      <TextBlock Classes="h2" Text="Generated DynamicData SourceCache" />
+      <TextBlock TextWrapping="Wrap"
+                 Text="Generated stable keys, replace-aware sorting, and identity selection keep the selected trade attached when an updated cache item moves to a new row." />
+    </StackPanel>
+    <WrapPanel Grid.Row="1">
+      <Button Content="Run keyed replacement" Command="{Binding RunReplacementScenarioCommand}" />
+      <Button Content="Select key 8" Command="{Binding SelectTrackedTradeCommand}" />
+      <Button Content="Replace selected" Command="{Binding ReplaceSelectedTradeCommand}" />
+      <Button Content="Add 6-row batch" Command="{Binding AddBatchCommand}" />
+      <Button Content="Price descending" Command="{Binding SortPriceDescendingCommand}" />
+      <Button Content="London price ≥ 70" Command="{Binding ApplyLondonFilterCommand}" />
+      <Button Content="Clear operations" Command="{Binding ClearOperationsCommand}" />
+    </WrapPanel>
+    <Border Grid.Row="2" Padding="8" Background="{DynamicResource ThemeControlLowBrush}" CornerRadius="4">
+      <Grid ColumnDefinitions="*,Auto,Auto,Auto,Auto" ColumnSpacing="14">
+        <TextBlock Text="{Binding Status}" TextTrimming="CharacterEllipsis" />
+        <TextBlock Grid.Column="1" Text="{Binding CacheItemCount, StringFormat='Cache: {0}'}" />
+        <TextBlock Grid.Column="2" Text="{Binding ReplacementCount, StringFormat='Replacements: {0}'}" />
+        <TextBlock Grid.Column="3" Text="{Binding SelectedKey, StringFormat='Selected key: {0}'}" />
+        <TextBlock Grid.Column="4" Text="{Binding ErrorCount, StringFormat='Errors: {0}'}" />
+      </Grid>
+    </Border>
+    <pages:GeneratedDynamicDataSourceCacheGrid Grid.Row="3" />
+  </Grid>
+</UserControl>

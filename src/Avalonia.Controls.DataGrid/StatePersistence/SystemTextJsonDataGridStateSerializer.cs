@@ -97,6 +97,7 @@ namespace Avalonia.Controls
         PropertyNamingPolicy = JsonKnownNamingPolicy.CamelCase,
         WriteIndented = false)]
     [JsonSerializable(typeof(DataGridPersistedState))]
+    [JsonSerializable(typeof(DataGridGeneratedStateEnvelope))]
     [JsonSerializable(typeof(DataGridPersistedState.CellState))]
     [JsonSerializable(typeof(DataGridPersistedState.ColumnLayoutState))]
     [JsonSerializable(typeof(DataGridPersistedState.ColumnState))]

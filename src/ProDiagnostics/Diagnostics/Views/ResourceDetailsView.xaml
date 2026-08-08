@@ -4,6 +4,14 @@
              xmlns:views="using:Avalonia.Diagnostics.Views"
              x:Class="Avalonia.Diagnostics.Views.ResourceDetailsView"
              x:DataType="vm:ResourceDetailsViewModel">
+  <UserControl.Resources>
+    <DataTemplate x:Key="PropertyNameCellTemplate" x:DataType="vm:PropertyViewModel">
+      <TextBlock Text="{Binding Name}" />
+    </DataTemplate>
+    <DataTemplate x:Key="PropertyValueCellTemplate" x:DataType="vm:PropertyViewModel">
+      <views:PropertyValueEditorView />
+    </DataTemplate>
+  </UserControl.Resources>
   <Grid RowDefinitions="Auto,Auto,*" Margin="8">
     <StackPanel Grid.Row="0" Spacing="6">
       <TextBlock Text="{Binding Title}" FontWeight="Bold"/>
@@ -35,6 +43,8 @@
 
     <DataGrid Grid.Row="2"
               ItemsSource="{Binding PropertiesView}"
+              ColumnDefinitionsSource="{Binding ColumnDefinitions}"
+              FastPathOptions="{Binding FastPathOptions}"
               SelectedItem="{Binding SelectedProperty, Mode=TwoWay}"
               AutoGenerateColumns="False"
               HeadersVisibility="Column"
@@ -42,23 +52,6 @@
               CanUserResizeColumns="True"
               IsReadOnly="False"
               IsVisible="{Binding HasProperties}">
-      <DataGrid.Columns>
-        <DataGridTextColumn Header="Property"
-                            Binding="{Binding Name}"
-                            IsReadOnly="True"
-                            x:DataType="vm:PropertyViewModel"/>
-        <DataGridTemplateColumn Header="Value">
-          <DataGridTemplateColumn.CellTemplate>
-            <DataTemplate x:DataType="vm:PropertyViewModel">
-              <views:PropertyValueEditorView />
-            </DataTemplate>
-          </DataGridTemplateColumn.CellTemplate>
-        </DataGridTemplateColumn>
-        <DataGridTextColumn Header="Type"
-                            Binding="{Binding Type}"
-                            IsReadOnly="True"
-                            x:DataType="vm:PropertyViewModel"/>
-      </DataGrid.Columns>
     </DataGrid>
   </Grid>
 </UserControl>

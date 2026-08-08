@@ -5,10 +5,12 @@ using Avalonia.Controls.DataGridHierarchical;
 using Avalonia.Diagnostics.Services;
 using Avalonia.Controls;
 using Avalonia.VisualTree;
+using ProDataGrid.SourceGeneration;
 
 namespace Avalonia.Diagnostics.ViewModels
 {
-    internal class TreePageViewModel : ViewModelBase, IDisposable
+    [GenerateDataGridViewModel(typeof(TreeNode), ProviderName = "VisualTreeGridSchema")]
+    internal partial class TreePageViewModel : ViewModelBase, IDisposable
     {
         private TreeNode? _selectedNode;
         private ControlDetailsViewModel? _details;

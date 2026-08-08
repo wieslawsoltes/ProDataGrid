@@ -22,6 +22,9 @@
 
   <ItemGroup>
     <ProjectReference Include="../Avalonia.Controls.DataGrid/Avalonia.Controls.DataGrid.csproj" />
+    <ProjectReference Include="../ProDataGrid.SourceGenerators/ProDataGrid.SourceGenerators.csproj"
+                      OutputItemType="Analyzer"
+                      ReferenceOutputAssembly="false" />
     <ProjectReference Include="../ProDiagnostics.Transport/ProDiagnostics.Transport.csproj" />
   </ItemGroup>
 

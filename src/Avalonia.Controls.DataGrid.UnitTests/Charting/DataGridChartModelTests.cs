@@ -3,7 +3,9 @@
 
 #nullable enable
 
+using System;
 using System.Collections.ObjectModel;
+using Avalonia.Controls;
 using ProCharts;
 using ProDataGrid.Charting;
 using Xunit;
@@ -12,6 +14,39 @@ namespace Avalonia.Controls.DataGridTests.Charting
 {
     public sealed class DataGridChartModelTests
     {
+        [Fact]
+        public void GeneratedChartAdapter_Uses_Direct_Category_Value_And_Companion_Selectors()
+        {
+            Func<object, double?> directRevenue = static item => item is SampleRow row ? row.Revenue : null;
+            var fields = new IDataGridGeneratedAnalyticsField[]
+            {
+                new DataGridGeneratedAnalyticsField<SampleRow, string>(
+                    "category", DataGridGeneratedAnalyticsRole.ChartCategory, 0, static row => row.Category),
+                new DataGridGeneratedAnalyticsField<SampleRow, double>(
+                    "revenue", DataGridGeneratedAnalyticsRole.ChartValue, 0, static row => row.Revenue,
+                    name: "Revenue", format: "N1", aggregate: (int)DataGridAggregateType.Average,
+                    numericValueSelector: directRevenue),
+                new DataGridGeneratedAnalyticsField<SampleRow, double>(
+                    "cost", DataGridGeneratedAnalyticsRole.ChartXValue, 0, static row => row.Cost,
+                    name: "Revenue")
+            };
+            var items = new[]
+            {
+                new SampleRow { Category = "A", Revenue = 10d, Cost = 3d },
+                new SampleRow { Category = "B", Revenue = 20d, Cost = 8d }
+            };
+
+            DataGridChartModel model = DataGridGeneratedChartAdapter.CreateModel(items, fields);
+            ChartDataSnapshot snapshot = model.BuildSnapshot(new ChartDataRequest());
+
+            Assert.Equal(new[] { "A", "B" }, snapshot.Categories);
+            Assert.Equal(new double?[] { 10d, 20d }, snapshot.Series[0].Values);
+            Assert.Equal(new[] { 3d, 8d }, snapshot.Series[0].XValues);
+            Assert.Same(directRevenue, model.Series[0].ValueSelector);
+            Assert.Equal(DataGridChartAggregation.Average, model.Series[0].Aggregation);
+            Assert.Equal(10d.ToString("N1", System.Globalization.CultureInfo.CurrentCulture), model.Series[0].DataLabelFormatter!(10d));
+        }
+
         [Fact]
         public void BuildSnapshot_Uses_Category_And_Value_Paths()
         {

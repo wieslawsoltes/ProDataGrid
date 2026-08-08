@@ -6,9 +6,16 @@ using Avalonia.Controls.Primitives;
 using Avalonia.LogicalTree;
 using Avalonia.Media;
 using Avalonia.Reactive;
+using ProDataGrid.SourceGeneration;
 
 namespace Avalonia.Diagnostics.ViewModels
 {
+    [GenerateDataGridColumns(
+        ProviderName = "VisualTreeGridSchema",
+        SchemaId = "prodiagnostics/visual-tree/v1",
+        Discovery = DataGridColumnDiscovery.AttributedOnly,
+        Strict = true,
+        HierarchicalRows = true)]
     internal abstract class TreeNode : ViewModelBase, IDisposable
     {
         private readonly IDisposable? _classesSubscription;
@@ -89,6 +96,17 @@ namespace Avalonia.Diagnostics.ViewModels
         }
 
         public bool ShowDecorations { get; }
+
+        [DataGridColumn(
+            DataGridColumnKind.Hierarchical,
+            Header = "Visual",
+            ColumnKey = "visual",
+            Order = 0,
+            Width = "SizeToCells",
+            SortMemberPath = nameof(Type),
+            TemplateKey = "VisualTreeNodeCellTemplate",
+            IsReadOnly = true)]
+        public TreeNode Item => this;
 
         public void Dispose()
         {

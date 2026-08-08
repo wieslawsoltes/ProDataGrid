@@ -1,0 +1,34 @@
+<UserControl
+    x:Class="DataGridSample.Pages.GeneratedGroupingSummariesPage"
+    xmlns="https://github.com/avaloniaui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:pages="clr-namespace:DataGridSample.Pages"
+    xmlns:viewModels="clr-namespace:DataGridSample.ViewModels"
+    x:DataType="viewModels:GeneratedGroupingSummariesViewModel">
+  <Grid Margin="12" RowDefinitions="Auto,Auto,Auto,*" RowSpacing="8">
+    <StackPanel Spacing="4">
+      <TextBlock Classes="h2" Text="Generated grouping and incremental summaries" />
+      <TextBlock TextWrapping="Wrap"
+                 Text="Typed group selectors replace property paths. Generated summary definitions render group footers and the total row while the same typed accessors maintain Add, Remove, Replace, and Reset aggregates." />
+    </StackPanel>
+    <WrapPanel Grid.Row="1">
+      <Button Content="Add three" Command="{Binding AddBatchCommand}" />
+      <Button Content="Replace middle" Command="{Binding ReplaceOrderCommand}" />
+      <Button Content="Remove last" Command="{Binding RemoveOrderCommand}" />
+      <Button Content="Reset" Command="{Binding ResetCommand}" />
+    </WrapPanel>
+    <Border Grid.Row="2" Padding="8" Background="{DynamicResource ThemeControlLowBrush}" CornerRadius="4">
+      <Grid RowDefinitions="Auto,Auto" RowSpacing="6">
+        <Grid ColumnDefinitions="Auto,Auto,Auto,Auto,Auto" ColumnSpacing="18">
+          <TextBlock Text="{Binding OrderCount, StringFormat='Orders: {0}'}" />
+          <TextBlock Grid.Column="1" Text="{Binding GroupCount, StringFormat='Leaf groups: {0}'}" />
+          <TextBlock Grid.Column="2" Text="{Binding UniqueCustomerCount, StringFormat='Customers: {0}'}" />
+          <TextBlock Grid.Column="3" Text="{Binding TotalQuantity, StringFormat='Quantity: {0:N0}'}" />
+          <TextBlock Grid.Column="4" Text="{Binding TotalRevenue, StringFormat='Revenue: {0:C2}'}" />
+        </Grid>
+        <TextBlock Grid.Row="1" Text="{Binding Status}" TextTrimming="CharacterEllipsis" />
+      </Grid>
+    </Border>
+    <pages:GeneratedGroupingSummariesGrid Grid.Row="3" />
+  </Grid>
+</UserControl>

@@ -1,0 +1,16 @@
+<UserControl
+    x:Class="DataGridSample.Pages.GeneratedColumnsAssemblyPage"
+    xmlns="https://github.com/avaloniaui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:viewModels="clr-namespace:DataGridSample.ViewModels"
+    x:DataType="viewModels:GeneratedColumnsAssemblyViewModel">
+  <Grid Margin="12" RowDefinitions="Auto,*" RowSpacing="8">
+    <StackPanel Spacing="4">
+      <TextBlock Classes="h2" Text="Generated columns: assembly target" />
+      <TextBlock TextWrapping="Wrap" Text="Both the schema and view-model augmentation are requested with assembly attributes, including a custom provider namespace." />
+    </StackPanel>
+    <DataGrid Grid.Row="1" AutoGenerateColumns="False" ItemsSource="{Binding Items}"
+              ColumnDefinitionsSource="{Binding ColumnDefinitions}" FastPathOptions="{Binding FastPathOptions}"
+              CanUserSortColumns="True" />
+  </Grid>
+</UserControl>

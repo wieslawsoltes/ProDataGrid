@@ -132,6 +132,10 @@
     href: column-definitions.md
   - name: Column Definitions (AOT-Friendly Bindings)
     href: column-definitions-aot.md
+  - name: Column Definitions (Source Generators)
+    href: column-definitions-source-generators.md
+  - name: Source Generators (Feature Specification)
+    href: source-generators-feature-spec.md
   - name: Column Definitions (Fast Path Overview)
     href: column-definitions-fast-path-overview.md
   - name: Column Definitions (Model Integration)

@@ -23,6 +23,8 @@
     <DataGrid Grid.Row="2"
               Name="assetsGrid"
               ItemsSource="{Binding AssetsView}"
+              ColumnDefinitionsSource="{Binding ColumnDefinitions}"
+              FastPathOptions="{Binding FastPathOptions}"
               SelectedItem="{Binding SelectedAsset, Mode=TwoWay}"
               AutoGenerateColumns="False"
               HeadersVisibility="Column"
@@ -33,33 +35,6 @@
               CanUserReorderColumns="False"
               CanUserSortColumns="True"
               DoubleTapped="OnAssetDoubleTapped">
-      <DataGrid.Columns>
-        <DataGridTextColumn Header="Name"
-                            Binding="{Binding Name}"
-                            Width="2*"
-                            IsReadOnly="True"
-                            x:DataType="vm:AssetEntryViewModel" />
-        <DataGridTextColumn Header="Assembly"
-                            Binding="{Binding AssemblyName}"
-                            Width="2*"
-                            IsReadOnly="True"
-                            x:DataType="vm:AssetEntryViewModel" />
-        <DataGridTextColumn Header="Path"
-                            Binding="{Binding AssetPath}"
-                            Width="3*"
-                            IsReadOnly="True"
-                            x:DataType="vm:AssetEntryViewModel" />
-        <DataGridTextColumn Header="Kind"
-                            Binding="{Binding KindDisplay}"
-                            Width="1*"
-                            IsReadOnly="True"
-                            x:DataType="vm:AssetEntryViewModel" />
-        <DataGridTextColumn Header="Ext"
-                            Binding="{Binding Extension}"
-                            Width="0.8*"
-                            IsReadOnly="True"
-                            x:DataType="vm:AssetEntryViewModel" />
-      </DataGrid.Columns>
       <DataGrid.ContextFlyout>
         <MenuFlyout>
           <MenuItem Header="Preview"

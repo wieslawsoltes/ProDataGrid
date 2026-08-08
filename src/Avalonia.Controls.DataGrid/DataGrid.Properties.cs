@@ -1301,6 +1301,21 @@ internal
                 defaultBindingMode: BindingMode.TwoWay);
 
         /// <summary>
+        /// Gets or sets the accessor-only fast-path options used by sorting, filtering, and searching.
+        /// </summary>
+#if !DATAGRID_INTERNAL
+        public
+#else
+        internal
+#endif
+        static readonly DirectProperty<DataGrid, DataGridFastPathOptions> FastPathOptionsProperty =
+            AvaloniaProperty.RegisterDirect<DataGrid, DataGridFastPathOptions>(
+                nameof(FastPathOptions),
+                o => o.FastPathOptions,
+                (o, v) => o.FastPathOptions = v,
+                defaultBindingMode: BindingMode.OneWay);
+
+        /// <summary>
         /// Gets or sets the conditional formatting model that drives cell/row styling. If not provided, a default
         /// model is created.
         /// </summary>

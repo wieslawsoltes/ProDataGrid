@@ -133,7 +133,11 @@
       <pages:ContentControlRowDetailsSwapPage />
     </TabItem>
     <TabItem Header="Row Details Selection">
-      <pages:RowDetailsSelectionPage />
+      <pages:RowDetailsSelectionPage>
+        <pages:RowDetailsSelectionPage.DataContext>
+          <viewModels:RowDetailsSelectionViewModel />
+        </pages:RowDetailsSelectionPage.DataContext>
+      </pages:RowDetailsSelectionPage>
     </TabItem>
     <TabItem Header="Detach While Editing">
       <pages:DetachWhileEditingPage />
@@ -505,6 +509,167 @@
     <TabItem Header="Column Definitions - Hierarchical Streaming">
       <pages:ColumnDefinitionsHierarchicalStreamingPage />
     </TabItem>
+    <TabItem Header="Generated Columns - Attributes">
+      <pages:GeneratedColumnsAttributesPage>
+        <pages:GeneratedColumnsAttributesPage.DataContext>
+          <viewModels:GeneratedColumnsAttributesViewModel />
+        </pages:GeneratedColumnsAttributesPage.DataContext>
+      </pages:GeneratedColumnsAttributesPage>
+    </TabItem>
+    <TabItem Header="Generated Columns - Assembly">
+      <pages:GeneratedColumnsAssemblyPage>
+        <pages:GeneratedColumnsAssemblyPage.DataContext>
+          <viewModels:GeneratedColumnsAssemblyViewModel />
+        </pages:GeneratedColumnsAssemblyPage.DataContext>
+      </pages:GeneratedColumnsAssemblyPage>
+    </TabItem>
+    <TabItem Header="Generated Columns - All Kinds">
+      <pages:GeneratedAllColumnKindsPage>
+        <pages:GeneratedAllColumnKindsPage.DataContext>
+          <viewModels:GeneratedAllColumnKindsViewModel />
+        </pages:GeneratedAllColumnKindsPage.DataContext>
+      </pages:GeneratedAllColumnKindsPage>
+    </TabItem>
+    <TabItem Header="Generated Columns - Custom">
+      <pages:GeneratedColumnsCustomPage>
+        <pages:GeneratedColumnsCustomPage.DataContext>
+          <viewModels:GeneratedColumnsCustomViewModel />
+        </pages:GeneratedColumnsCustomPage.DataContext>
+      </pages:GeneratedColumnsCustomPage>
+    </TabItem>
+    <TabItem Header="Generated Columns - Reactive DynamicData">
+      <pages:GeneratedColumnsDynamicDataPage>
+        <pages:GeneratedColumnsDynamicDataPage.DataContext>
+          <viewModels:GeneratedColumnsDynamicDataViewModel />
+        </pages:GeneratedColumnsDynamicDataPage.DataContext>
+      </pages:GeneratedColumnsDynamicDataPage>
+    </TabItem>
+    <TabItem Header="Generated C# View - Custom Base">
+      <pages:GeneratedColumnsCodeView>
+        <pages:GeneratedColumnsCodeView.DataContext>
+          <viewModels:GeneratedColumnsAttributesViewModel />
+        </pages:GeneratedColumnsCodeView.DataContext>
+      </pages:GeneratedColumnsCodeView>
+    </TabItem>
+    <TabItem Header="Generated C# View - ReactiveUI">
+      <pages:GeneratedReactiveDataGridView>
+        <pages:GeneratedReactiveDataGridView.DataContext>
+          <viewModels:GeneratedColumnsDynamicDataViewModel />
+        </pages:GeneratedReactiveDataGridView.DataContext>
+      </pages:GeneratedReactiveDataGridView>
+    </TabItem>
+    <TabItem Header="Generated C# View - Reactive States">
+      <pages:GeneratedReactiveViewStatesPage>
+        <pages:GeneratedReactiveViewStatesPage.DataContext>
+          <viewModels:GeneratedReactiveViewStatesViewModel />
+        </pages:GeneratedReactiveViewStatesPage.DataContext>
+      </pages:GeneratedReactiveViewStatesPage>
+    </TabItem>
+    <TabItem Header="Generated C# View - Event Commands">
+      <pages:GeneratedReactiveEventCommandsPage>
+        <pages:GeneratedReactiveEventCommandsPage.DataContext>
+          <viewModels:GeneratedReactiveEventCommandsViewModel />
+        </pages:GeneratedReactiveEventCommandsPage.DataContext>
+      </pages:GeneratedReactiveEventCommandsPage>
+    </TabItem>
+    <TabItem Header="Generated C# View - Virtualization Profile">
+      <pages:GeneratedVirtualizationProfilePage>
+        <pages:GeneratedVirtualizationProfilePage.DataContext>
+          <viewModels:GeneratedVirtualizationProfileViewModel />
+        </pages:GeneratedVirtualizationProfilePage.DataContext>
+      </pages:GeneratedVirtualizationProfilePage>
+    </TabItem>
+    <TabItem Header="Generated Operations Controller">
+      <pages:GeneratedOperationsControllerPage>
+        <pages:GeneratedOperationsControllerPage.DataContext>
+          <viewModels:GeneratedOperationsControllerViewModel />
+        </pages:GeneratedOperationsControllerPage.DataContext>
+      </pages:GeneratedOperationsControllerPage>
+    </TabItem>
+    <TabItem Header="Generated DynamicData SourceList">
+      <pages:GeneratedDynamicDataSourceListPage>
+        <pages:GeneratedDynamicDataSourceListPage.DataContext>
+          <viewModels:GeneratedDynamicDataSourceListViewModel />
+        </pages:GeneratedDynamicDataSourceListPage.DataContext>
+      </pages:GeneratedDynamicDataSourceListPage>
+    </TabItem>
+    <TabItem Header="Generated DynamicData SourceCache">
+      <pages:GeneratedDynamicDataSourceCachePage>
+        <pages:GeneratedDynamicDataSourceCachePage.DataContext>
+          <viewModels:GeneratedDynamicDataSourceCacheViewModel />
+        </pages:GeneratedDynamicDataSourceCachePage.DataContext>
+      </pages:GeneratedDynamicDataSourceCachePage>
+    </TabItem>
+    <TabItem Header="Generated Hierarchical DynamicData">
+      <pages:GeneratedHierarchicalDynamicDataPage>
+        <pages:GeneratedHierarchicalDynamicDataPage.DataContext>
+          <viewModels:GeneratedHierarchicalDynamicDataViewModel />
+        </pages:GeneratedHierarchicalDynamicDataPage.DataContext>
+      </pages:GeneratedHierarchicalDynamicDataPage>
+    </TabItem>
+    <TabItem Header="Generated Remote Query">
+      <pages:GeneratedRemoteQueryPage>
+        <pages:GeneratedRemoteQueryPage.DataContext>
+          <viewModels:GeneratedRemoteQueryViewModel />
+        </pages:GeneratedRemoteQueryPage.DataContext>
+      </pages:GeneratedRemoteQueryPage>
+    </TabItem>
+    <TabItem Header="Generated Selection + State">
+      <pages:GeneratedSelectionStatePage>
+        <pages:GeneratedSelectionStatePage.DataContext>
+          <viewModels:GeneratedSelectionStateViewModel />
+        </pages:GeneratedSelectionStatePage.DataContext>
+      </pages:GeneratedSelectionStatePage>
+    </TabItem>
+    <TabItem Header="Generated Grouping + Summaries">
+      <pages:GeneratedGroupingSummariesPage>
+        <pages:GeneratedGroupingSummariesPage.DataContext>
+          <viewModels:GeneratedGroupingSummariesViewModel />
+        </pages:GeneratedGroupingSummariesPage.DataContext>
+      </pages:GeneratedGroupingSummariesPage>
+    </TabItem>
+    <TabItem Header="Generated Editing + Clipboard + Fill">
+      <pages:GeneratedEditingClipboardFillPage>
+        <pages:GeneratedEditingClipboardFillPage.DataContext>
+          <viewModels:GeneratedEditingClipboardFillViewModel />
+        </pages:GeneratedEditingClipboardFillPage.DataContext>
+      </pages:GeneratedEditingClipboardFillPage>
+    </TabItem>
+    <TabItem Header="Generated Indexed Spreadsheet">
+      <pages:GeneratedIndexedSpreadsheetPage>
+        <pages:GeneratedIndexedSpreadsheetPage.DataContext>
+          <viewModels:GeneratedIndexedSpreadsheetViewModel />
+        </pages:GeneratedIndexedSpreadsheetPage.DataContext>
+      </pages:GeneratedIndexedSpreadsheetPage>
+    </TabItem>
+    <TabItem Header="Generated Conditional Formatting">
+      <pages:GeneratedConditionalFormattingPage>
+        <pages:GeneratedConditionalFormattingPage.DataContext>
+          <viewModels:GeneratedConditionalFormattingViewModel />
+        </pages:GeneratedConditionalFormattingPage.DataContext>
+      </pages:GeneratedConditionalFormattingPage>
+    </TabItem>
+    <TabItem Header="Generated Pivot + Chart">
+      <pages:GeneratedPivotChartPage>
+        <pages:GeneratedPivotChartPage.DataContext>
+          <viewModels:GeneratedPivotChartViewModel />
+        </pages:GeneratedPivotChartPage.DataContext>
+      </pages:GeneratedPivotChartPage>
+    </TabItem>
+    <TabItem Header="Generated View Recipes">
+      <pages:GeneratedReactiveViewRecipesPage>
+        <pages:GeneratedReactiveViewRecipesPage.DataContext>
+          <viewModels:GeneratedReactiveViewRecipesViewModel />
+        </pages:GeneratedReactiveViewRecipesPage.DataContext>
+      </pages:GeneratedReactiveViewRecipesPage>
+    </TabItem>
+    <TabItem Header="Generated Features - Complex App">
+      <pages:GeneratedSourceFeaturesPage>
+        <pages:GeneratedSourceFeaturesPage.DataContext>
+          <viewModels:GeneratedSourceFeaturesViewModel />
+        </pages:GeneratedSourceFeaturesPage.DataContext>
+      </pages:GeneratedSourceFeaturesPage>
+    </TabItem>
     <TabItem Header="Column Banding">
       <pages:ColumnBandingPage />
     </TabItem>
@@ -527,7 +692,11 @@
       <pages:ToggleSwitchColumnBindingsPage />
     </TabItem>
     <TabItem Header="Button Definition Bindings">
-      <pages:ButtonColumnDefinitionBindingsPage />
+      <pages:ButtonColumnDefinitionBindingsPage>
+        <pages:ButtonColumnDefinitionBindingsPage.DataContext>
+          <viewModels:ButtonColumnDefinitionBindingsViewModel />
+        </pages:ButtonColumnDefinitionBindingsPage.DataContext>
+      </pages:ButtonColumnDefinitionBindingsPage>
     </TabItem>
     <TabItem Header="ToggleButton Definition Bindings">
       <pages:ToggleButtonColumnDefinitionBindingsPage />
