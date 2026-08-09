@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+      <title>Cell realization and committed-value events | ProDataGrid for Avalonia </title>
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <meta name="title" content="Cell realization and committed-value events | ProDataGrid for Avalonia ">
+      
+      
+      <link rel="icon" href="../favicon.ico">
+      <link rel="stylesheet" href="../public/docfx.min.css">
+      <link rel="stylesheet" href="../public/main.css">
+      <meta name="docfx:navrel" content="../toc.html">
+      <meta name="docfx:tocrel" content="toc.html">
+      
+      
+      
+      
+      <meta name="docfx:docurl" content="https://github.com/wieslawsoltes/ProDataGrid/blob/master/docfx/articles/cell-lifecycle-events.md/#L1">
+      <meta name="loc:inThisArticle" content="In this article">
+      <meta name="loc:searchResultsCount" content="{count} results for &quot;{query}&quot;">
+      <meta name="loc:searchNoResults" content="No results for &quot;{query}&quot;">
+      <meta name="loc:tocFilter" content="Filter by title">
+      <meta name="loc:nextArticle" content="Next">
+      <meta name="loc:prevArticle" content="Previous">
+      <meta name="loc:themeLight" content="Light">
+      <meta name="loc:themeDark" content="Dark">
+      <meta name="loc:themeAuto" content="Auto">
+      <meta name="loc:changeTheme" content="Change theme">
+      <meta name="loc:copy" content="Copy">
+      <meta name="loc:downloadPdf" content="Download PDF">
+
+      <script type="module" src="./../public/docfx.min.js"></script>
+
+      <script>
+        const theme = localStorage.getItem('theme') || 'auto'
+        document.documentElement.setAttribute('data-bs-theme', theme === 'auto' ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light') : theme)
+      </script>
+
+  </head>
+
+  <body class="tex2jax_ignore" data-layout="" data-yaml-mime="">
+    <header class="bg-body border-bottom">
+      <nav id="autocollapse" class="navbar navbar-expand-md" role="navigation">
+        <div class="container-xxl flex-nowrap">
+          <a class="navbar-brand" href="../index.html">
+            <img id="logo" class="svg" src="../images/logo.svg" alt="">
+            
+          </a>
+          <button class="btn btn-lg d-md-none border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navpanel" aria-controls="navpanel" aria-expanded="false" aria-label="Toggle navigation">
+            <i class="bi bi-three-dots"></i>
+          </button>
+          <div class="collapse navbar-collapse" id="navpanel">
+            <div id="navbar">
+            </div>
+          </div>
+        </div>
+      </nav>
+    </header>
+
+    <main class="container-xxl">
+      <div class="toc-offcanvas">
+        <div class="offcanvas-md offcanvas-start" tabindex="-1" id="tocOffcanvas" aria-labelledby="tocOffcanvasLabel">
+          <div class="offcanvas-header">
+            <h5 class="offcanvas-title" id="tocOffcanvasLabel">Table of Contents</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="offcanvas" data-bs-target="#tocOffcanvas" aria-label="Close"></button>
+          </div>
+          <div class="offcanvas-body">
+            <nav class="toc" id="toc"></nav>
+          </div>
+        </div>
+      </div>
+
+      <div class="content">
+        <div class="actionbar">
+          <button class="btn btn-lg border-0 d-md-none" type="button" data-bs-toggle="offcanvas" data-bs-target="#tocOffcanvas" aria-controls="tocOffcanvas" aria-expanded="false" aria-label="Show table of contents">
+            <i class="bi bi-list"></i>
+          </button>
+
+          <nav id="breadcrumb"></nav>
+        </div>
+
+        <article data-uid="">
+<h1 id="cell-realization-and-committed-value-events">Cell realization and committed-value events</h1>
+
+<p><code>DataGrid</code> exposes three opt-in events for integrations that need to associate
+state with virtualized cell containers or observe successful editor commits:</p>
+<ul>
+<li><code>CellPrepared</code> is raised once after each cell container is assigned to a
+realized row item. It is raised again when the same container is recycled for
+another item.</li>
+<li><code>CellClearing</code> is raised once before the row data context, slot, column, and
+automation associations are cleared or reused.</li>
+<li><code>CellValueChanged</code> is raised when a changed value is successfully committed
+through a grid cell editor.</li>
+</ul>
+<p>The realization events are dormant when they have no subscribers, so the normal
+scrolling path does not allocate event arguments or hierarchy paths.</p>
+<h2 id="lifecycle-sample">Lifecycle sample</h2>
+<pre><code class="lang-csharp">grid.CellPrepared += (_, e) =&gt;
+{
+    // e.Cell and e.Row are valid and e.Row.DataContext is still e.RowDataContext.
+    telemetry.CellRealized(e.Item, e.Column, e.HierarchyPath);
+};
+
+grid.CellClearing += (_, e) =&gt;
+{
+    // Remove state before the recycled cell receives a different row context.
+    telemetry.CellUnrealized(e.Item, e.Column, e.HierarchyPath);
+};
+</code></pre>
+<p>For flat rows, <code>Item</code> and <code>RowDataContext</code> are the same object and
+<code>HierarchyPath</code> is empty. For hierarchical rows, <code>RowDataContext</code> is the
+<code>HierarchicalNode</code>, <code>Item</code> is <code>HierarchicalNode.Item</code>, and <code>HierarchyPath</code>
+contains visible nodes from the root item to the current node. A model's hidden
+virtual root is not included.</p>
+<p>One logical cell container produces one event per assignment. Frozen and
+scrolling column regions do not generate duplicate events for the same logical
+cell.</p>
+<h2 id="committed-value-sample">Committed value sample</h2>
+<pre><code class="lang-csharp">grid.CellValueChanged += (_, e) =&gt;
+{
+    audit.Write(
+        e.Item,
+        e.Column,
+        e.OldValue,
+        e.NewValue,
+        e.Origin,
+        e.HierarchyPath);
+};
+</code></pre>
+<p>The initial contract is deliberately limited to changed values committed by a
+DataGrid editor. The event is raised after source update and validation succeed,
+after the display content has been restored, and immediately before
+<code>CellEditEnded</code>. Text, numeric, CheckBox, and other built-in columns that use the
+normal edit transaction share this contract.</p>
+<p>An editable <code>DataGridTemplateColumn</code> participates when the column has a stable
+source-value accessor (for example, <code>DataGridColumnMetadata.SetValueAccessor</code>)
+and its editing template updates that source before commit. This lets the grid
+compare typed old/new values without inspecting the template or using
+reflection.</p>
+<p>The following cases do not raise <code>CellValueChanged</code>:</p>
+<ul>
+<li>a cancelled edit;</li>
+<li>a commit rejected by validation;</li>
+<li>a successful commit whose source value compares equal to its original value;</li>
+<li>a direct programmatic model-property update;</li>
+<li>formula recalculation;</li>
+<li>undo or redo performed outside a cell edit transaction.</li>
+</ul>
+<p>Use model notifications or the formula/undo subsystem events when those broader
+change origins are required. This boundary prevents duplicate and inconsistent
+notifications from bindings while keeping the commit event deterministic.</p>
+<p>The focused contract tests cover successful text, CheckBox, and editable-template
+commits; cancelled and no-op edits; validation rejection; direct programmatic
+updates; formula recalculation; and model-level undo/redo after a grid commit.
+Only the three successful grid edit transactions raise the event.</p>
+<h2 id="compatibility">Compatibility</h2>
+<p>These events are additive. Existing <code>LoadingRow</code>, <code>UnloadingRow</code>, editing,
+templates, themes, and retained-cell behavior are unchanged. Applications that
+do not subscribe remain on the allocation-free event fast path.</p>
+<h2 id="sample">Sample</h2>
+<p>The <a href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/DataGridSample/Pages/HierarchyFeatureContractsPage.axaml">Hierarchy Feature Contracts sample</a>
+routes all three events through an attached behavior to a ReactiveUI command.
+It keeps the view passive, uses retained Avalonia cell templates, and shows the
+prepare/clear/commit ordering in a bounded event log.</p>
+
+</article>
+
+        <div class="contribution d-print-none">
+          <a href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/docfx/articles/cell-lifecycle-events.md/#L1" class="edit-link">Edit this page</a>
+        </div>
+
+        <div class="next-article d-print-none border-top" id="nextArticle"></div>
+
+      </div>
+
+      <div class="affix">
+        <nav id="affix"></nav>
+      </div>
+    </main>
+
+
+    <footer class="border-top text-secondary">
+      <div class="container-xxl">
+        <div class="flex-fill">
+          <span>Made with <a href="https://dotnet.github.io/docfx">docfx</a></span>
+        </div>
+      </div>
+    </footer>
+  </body>
+</html>

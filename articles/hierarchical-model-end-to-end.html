@@ -102,6 +102,8 @@
 <pre><code class="lang-csharp">using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Threading;
+using System.Threading.Tasks;
 using Avalonia.Controls.DataGridHierarchical;
 using Avalonia.Controls.DataGridSorting;
 
@@ -132,6 +134,8 @@ public sealed class FilesViewModel
     }
 
     public void ExpandAll() =&gt; Model.ExpandAll();
+    public Task ExpandAllAsync(CancellationToken cancellationToken) =&gt;
+        Model.ExpandAllAsync(cancellationToken: cancellationToken);
     public void CollapseAll() =&gt; Model.CollapseAll();
     public void RefreshRoot() =&gt; Model.Refresh(Model.Root);
 
@@ -188,6 +192,16 @@ public sealed class FilesViewModel
 <p>When <code>HierarchicalRowsEnabled</code> is true and <code>ItemsSource</code> is omitted, the grid binds to the hierarchical model output automatically.</p>
 <h2 id="3-expansion-and-path-behavior">3. Expansion and path behavior</h2>
 <p>Use model commands (<code>Expand</code>, <code>Collapse</code>, <code>ExpandAll</code>, <code>CollapseAll</code>) rather than manipulating row containers directly.</p>
+<p>When children come from <code>ChildrenSelectorAsync</code>, use <code>ExpandAllAsync</code>. It resolves one
+selector at a time to preserve sibling order and selector thread safety, then publishes
+one coherent flattened-list change. <code>maxDepth</code> uses the same relative, inclusive
+semantics as synchronous <code>ExpandAll</code>.</p>
+<p>Cancellation before the final commit leaves expansion state and visible rows unchanged;
+children that finished loading remain cached for a later retry. A selector failure keeps
+that branch collapsed with <code>LoadError</code> set while other successfully loaded branches can
+commit. <code>NodeLoading</code>/<code>NodeLoaded</code> occur as each load completes, followed by the single
+<code>FlattenedChanged</code> notification and preorder <code>NodeExpanded</code> events. Concurrent bulk
+operations are serialized. The typed and untyped models and adapters expose the same API.</p>
 <p>For persistent expansion/selection scenarios, configure:</p>
 <ul>
 <li><code>ExpandedStateKeyMode</code> (<code>Item</code>, <code>Path</code>, <code>Custom</code>)</li>
@@ -202,15 +216,47 @@ public sealed class FilesViewModel
 <li>Keep <code>VirtualizeChildren=true</code> for large trees to avoid retaining collapsed child nodes.</li>
 </ul>
 <h2 id="5-filteringsearching-with-hierarchical-data">5. Filtering/searching with hierarchical data</h2>
-<p>You can combine hierarchical data with filtering/search models. Common pattern:</p>
-<ol>
-<li>Translate descriptors to predicates (often via custom adapter factories).</li>
-<li>Apply tree-aware predicates in your pipeline.</li>
-<li>Refresh the hierarchical model after predicate changes.</li>
-</ol>
+<p>Use the built-in accessor-only hierarchy filtering adapter when descriptors should
+target each node's underlying item while keeping a meaningful tree shape:</p>
+<pre><code class="lang-xml">&lt;UserControl xmlns:filtering=&quot;clr-namespace:Avalonia.Controls.DataGridFiltering;assembly=Avalonia.Controls.DataGrid&quot;&gt;
+  &lt;UserControl.Resources&gt;
+    &lt;filtering:DataGridHierarchicalFilteringAdapterFactory
+        x:Key=&quot;HierarchyFiltering&quot;
+        Policy=&quot;KeepAncestorsOfMatches&quot; /&gt;
+  &lt;/UserControl.Resources&gt;
+
+  &lt;DataGrid HierarchicalModel=&quot;{Binding Model}&quot;
+            HierarchicalRowsEnabled=&quot;True&quot;
+            FilteringModel=&quot;{Binding FilteringModel}&quot;
+            FilteringAdapterFactory=&quot;{StaticResource HierarchyFiltering}&quot; /&gt;
+&lt;/UserControl&gt;
+</code></pre>
+<p><code>Policy</code> is explicit and composable:</p>
+<ul>
+<li><code>SelfOnly</code> keeps only direct matches and can show a descendant without its path.</li>
+<li><code>KeepAncestorsOfMatches</code> (the default) keeps the materialized path to each match.</li>
+<li><code>KeepDescendantsOfMatches</code> keeps the materialized subtree below a matching node.</li>
+<li>Combine both flags to keep complete paths and matching subtrees.</li>
+</ul>
+<p>The adapter evaluates only already-materialized nodes. It never expands nodes or
+starts synchronous/async child loading. With <code>VirtualizeChildren=true</code>, collapsed
+children may be dematerialized and therefore cannot match until loaded again. With
+<code>VirtualizeChildren=false</code>, collapsed materialized descendants participate while
+the expansion state remains unchanged. Observable child changes and completed async
+loads rebuild one coherent match set and refresh the view once per model notification.</p>
+<p>Filtering preserves a selected item when that identity remains visible; its row
+and cell coordinates are remapped to the filtered view. If a filter hides the
+selected identity, the grid clears that selection. Clearing the filter does not
+resurrect the hidden selection. Filtering never changes expansion state, so
+clearing the descriptor restores the same expanded/collapsed branches while
+selection follows this visible-identity policy.</p>
+<p>Column value accessors receive the underlying item by default. Existing accessors
+explicitly typed to <code>HierarchicalNode</code> remain supported. No reflection fallback is
+used by this adapter.</p>
 <p>Reference implementations:</p>
 <ul>
-<li><code>src/DataGridSample/Adapters/HierarchicalFilteringAdapterFactory.cs</code></li>
+<li><code>src/DataGridSample/Pages/ColumnDefinitionsHierarchicalPage.axaml</code></li>
+<li><code>src/DataGridSample/Pages/HierarchyFeatureContractsPage.axaml</code></li>
 <li><code>src/DataGridSample/Adapters/HierarchicalSearchAdapterFactory.cs</code></li>
 <li><code>src/DataGridSample/Adapters/HierarchicalSortingAdapterFactory.cs</code></li>
 </ul>
@@ -233,6 +279,7 @@ Apply sibling comparer changes in <code>SortingChanged</code> (or use a hierarch
 <ul>
 <li><a href="hierarchical-data.html">Hierarchical Data</a></li>
 <li><a href="hierarchical-high-frequency-updates.html">Hierarchical High-Frequency Updates</a></li>
+<li><a href="hierarchical-automation.html">Hierarchical UI Automation</a></li>
 <li><a href="sorting-model-end-to-end.html">Sorting Model: End-to-End Usage</a></li>
 <li><a href="filtering-model-end-to-end.html">Filtering Model: End-to-End Usage</a></li>
 </ul>

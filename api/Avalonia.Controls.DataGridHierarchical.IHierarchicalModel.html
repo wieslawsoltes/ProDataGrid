@@ -518,7 +518,7 @@ When false, returns the single root item.</p>
 
   <h3 id="Avalonia_Controls_DataGridHierarchical_IHierarchicalModel_CollapseAll_Avalonia_Controls_DataGridHierarchical_HierarchicalNode_System_Nullable_System_Int32__" data-uid="Avalonia.Controls.DataGridHierarchical.IHierarchicalModel.CollapseAll(Avalonia.Controls.DataGridHierarchical.HierarchicalNode,System.Nullable{System.Int32})">
   CollapseAll(HierarchicalNode?, int?)
-  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/Hierarchical/HierarchicalModel.cs/#L455"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/Hierarchical/HierarchicalModel.cs/#L468"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>Collapses the specified node's descendants (or the root subtree) starting at the provided depth.
@@ -684,6 +684,52 @@ Depth is relative to the starting node; null expands the full subtree.</p>
 </dd>
   </dl>
 
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Avalonia_Controls_DataGridHierarchical_IHierarchicalModel_ExpandAllAsync_" data-uid="Avalonia.Controls.DataGridHierarchical.IHierarchicalModel.ExpandAllAsync*"></a>
+
+  <h3 id="Avalonia_Controls_DataGridHierarchical_IHierarchicalModel_ExpandAllAsync_Avalonia_Controls_DataGridHierarchical_HierarchicalNode_System_Nullable_System_Int32__System_Threading_CancellationToken_" data-uid="Avalonia.Controls.DataGridHierarchical.IHierarchicalModel.ExpandAllAsync(Avalonia.Controls.DataGridHierarchical.HierarchicalNode,System.Nullable{System.Int32},System.Threading.CancellationToken)">
+  ExpandAllAsync(HierarchicalNode?, int?, CancellationToken)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/Hierarchical/HierarchicalModel.cs/#L457"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Asynchronously expands the specified node (or root when null) and all descendants up to the provided depth.
+Child selectors are resolved sequentially and visible nodes are committed once after loading completes.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">Task ExpandAllAsync(HierarchicalNode? node = null, int? maxDepth = null, CancellationToken cancellationToken = default)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>node</code> <a class="xref" href="Avalonia.Controls.DataGridHierarchical.HierarchicalNode.html">HierarchicalNode</a></dt>
+    <dd><p>Starting node; null for root.</p>
+</dd>
+    <dt><code>maxDepth</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a>?</dt>
+    <dd><p>Maximum depth to expand (inclusive), or null for no limit.</p>
+</dd>
+    <dt><code>cancellationToken</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.threading.cancellationtoken">CancellationToken</a></dt>
+    <dd><p>Cancellation token.</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.threading.tasks.task">Task</a></dt>
+    <dd><p>A task that completes after the coherent visible-node commit.</p>
+</dd>
+  </dl>
 
 
 

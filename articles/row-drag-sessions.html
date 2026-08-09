@@ -83,10 +83,10 @@
         <article data-uid="">
 <h1 id="row-drag-sessions">Row Drag Sessions</h1>
 
-<p>Issue <a href="https://github.com/wieslawsoltes/ProDataGrid/issues/299">#299</a> requested a proper row drag session model with live operation updates, modifier handling, custom feedback support, and better coordination with selection drag.</p>
-<p>This article documents the resulting API and the deliberate divergences from the original proposal.</p>
-<h2 id="what-was-added">What Was Added</h2>
-<p>Public API additions:</p>
+<p>Use the row drag session model for live operation updates, modifier handling,
+custom feedback, and coordination with selection drag.</p>
+<h2 id="public-api">Public API</h2>
+<p>The session API consists of:</p>
 <ul>
 <li><code>DataGridRowDragSession</code></li>
 <li><code>DataGrid.ActiveRowDragSession</code></li>
@@ -96,7 +96,7 @@
 <li><code>DataGrid.RowDragUpdated</code></li>
 <li><code>DataGrid.RowDragCanceled</code></li>
 </ul>
-<p>Existing APIs were enriched:</p>
+<p>The related event arguments expose:</p>
 <ul>
 <li><code>DataGridRowDragStartingEventArgs.Session</code></li>
 <li><code>DataGridRowDragCompletedEventArgs.Session</code></li>
@@ -107,7 +107,7 @@
 <li><code>DataGridRowDropEventArgs.HoveredItem</code></li>
 <li><code>DataGridRowDragDropOptions.SuppressSelectionDragFromDragHandle</code></li>
 </ul>
-<p>Existing drop handlers now use a corrected effect split:</p>
+<p>Drop handlers use separate requested and effective effects:</p>
 <ul>
 <li><code>DataGridRowDropEventArgs.RequestedEffect</code>: modifier-derived request</li>
 <li><code>DataGridRowDropEventArgs.EffectiveEffect</code>: writable approved effect</li>
@@ -130,7 +130,7 @@
 </ul>
 <p>That distinction is what allows the control to support real-time transitions such as <code>Copy -&gt; None -&gt; Move</code> in one drag.</p>
 <h2 id="terminal-lifecycle">Terminal Lifecycle</h2>
-<p>The terminal events are now disjoint:</p>
+<p>The terminal events are disjoint:</p>
 <ul>
 <li><code>RowDragCompleted</code> means a drop committed.</li>
 <li><code>RowDragCanceled</code> means the drag ended without a committed drop.</li>
@@ -213,21 +213,22 @@
 &lt;/DataGrid&gt;
 </code></pre>
 <h2 id="selection-coordination">Selection Coordination</h2>
-<p><code>SuppressSelectionDragFromDragHandle</code> exists to solve the gesture conflict raised in the issue:</p>
+<p><code>SuppressSelectionDragFromDragHandle</code> resolves the gesture conflict between row dragging and selection dragging:</p>
 <ul>
 <li>row drag should start from the configured drag surface</li>
 <li>press-to-select should still work</li>
 <li>selection range-drag should not take over the same gesture when drag intent is clear</li>
 </ul>
 <p>This is especially important when <code>RowDragHandle=&quot;Row&quot;</code> or <code>RowDragHandle=&quot;RowHeaderAndRow&quot;</code>.</p>
-<h2 id="divergences-from-issue-299">Divergences From Issue 299</h2>
-<p>There is one intentional divergence from the original proposal.</p>
-<p>No separate native source-side drag badge API was added.
-Reason: Avalonia exposes effect feedback through <code>DragEffects</code>, but not a public source-side custom drag-UI pipeline comparable to WPF <code>GiveFeedback</code>. The grid therefore adds a cross-platform templated in-grid feedback layer.</p>
+<h2 id="cross-platform-drag-feedback">Cross-platform drag feedback</h2>
+<p>Avalonia exposes native effect feedback through <code>DragEffects</code>, but does not expose a
+public source-side custom drag-UI pipeline comparable to WPF <code>GiveFeedback</code>.
+<code>RowDragFeedbackTemplate</code> provides a cross-platform, templated feedback layer inside
+the grid.</p>
 <h2 id="samples">Samples</h2>
-<p>The sample app contains two pages that exercise the full issue-299 scope:</p>
+<p>The sample app contains two pages that demonstrate row drag sessions:</p>
 <ul>
-<li><code>Row Drag &amp; Drop</code>: move/copy transitions, invalid pinned-lane targets, custom feedback badge, and the new selection-drag option.</li>
+<li><code>Row Drag &amp; Drop</code>: move/copy transitions, invalid pinned-lane targets, custom feedback badge, and selection-drag coordination.</li>
 <li><code>Hierarchical Row Drag &amp; Drop</code>: before/after/inside targeting, invalid inside drops for leaf-only nodes, and live session inspection.</li>
 </ul>
 

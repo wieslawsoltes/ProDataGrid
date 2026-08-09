@@ -298,6 +298,20 @@
     },
     {
       "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.Automation.Peers.DataGridUnrealizedRowAutomationPeer.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.Automation.Peers.DataGridUnrealizedRowAutomationPeer.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.Automation.Peers.DataGridUnrealizedRowAutomationPeer",
+      "Summary": "<p sourcefile=\"api/Avalonia.Controls.Automation.Peers.DataGridUnrealizedRowAutomationPeer.yml\" sourcestartlinenumber=\"1\">Represents a selected data-grid row that is outside the realized visual range.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
       "source_relative_path": "api/Avalonia.Controls.Automation.Peers.yml",
       "output": {
         ".html": {
@@ -746,6 +760,20 @@
     },
     {
       "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.DataGridCellLifecycleEventArgs.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.DataGridCellLifecycleEventArgs.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.DataGridCellLifecycleEventArgs",
+      "Summary": "<p sourcefile=\"api/Avalonia.Controls.DataGridCellLifecycleEventArgs.yml\" sourcestartlinenumber=\"1\">Provides data for cell realization lifecycle events.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
       "source_relative_path": "api/Avalonia.Controls.DataGridCellPointerPressedEventArgs.yml",
       "output": {
         ".html": {
@@ -785,6 +813,34 @@
       "IsMRef": true,
       "Title": "Avalonia.Controls.DataGridCellState",
       "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.DataGridCellValueChangeOrigin.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.DataGridCellValueChangeOrigin.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.DataGridCellValueChangeOrigin",
+      "Summary": "<p sourcefile=\"api/Avalonia.Controls.DataGridCellValueChangeOrigin.yml\" sourcestartlinenumber=\"1\">Identifies the source of a committed value reported by\n<xref href=\"Avalonia.Controls.DataGrid.CellValueChanged\" data-throw-if-not-resolved=\"false\"></xref>.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.DataGridCellValueChangedEventArgs.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.DataGridCellValueChangedEventArgs.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.DataGridCellValueChangedEventArgs",
+      "Summary": "<p sourcefile=\"api/Avalonia.Controls.DataGridCellValueChangedEventArgs.yml\" sourcestartlinenumber=\"1\">Provides data for a committed grid-originated cell value change.</p>\n"
     },
     {
       "type": "ManagedReference",
@@ -1079,6 +1135,20 @@
       "IsMRef": true,
       "Title": "Avalonia.Controls.DataGridColumnDefinitionOptions",
       "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.DataGridColumnDisplayMode.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.DataGridColumnDisplayMode.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.DataGridColumnDisplayMode",
+      "Summary": "<p sourcefile=\"api/Avalonia.Controls.DataGridColumnDisplayMode.yml\" sourcestartlinenumber=\"1\">Selects how a supported column realizes its display cells.</p>\n"
     },
     {
       "type": "ManagedReference",
@@ -1611,6 +1681,34 @@
       "IsMRef": true,
       "Title": "Avalonia.Controls.DataGridDatePickerColumnDefinition",
       "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.DataGridDirectHierarchicalCell.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.DataGridDirectHierarchicalCell.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.DataGridDirectHierarchicalCell",
+      "Summary": "<p sourcefile=\"api/Avalonia.Controls.DataGridDirectHierarchicalCell.yml\" sourcestartlinenumber=\"1\">A retained hierarchical cell that combines the DataGrid cell and expander presenter roles.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.DataGridDirectTextCell.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.DataGridDirectTextCell.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.DataGridDirectTextCell",
+      "Summary": "<p sourcefile=\"api/Avalonia.Controls.DataGridDirectTextCell.yml\" sourcestartlinenumber=\"1\">A retained, template-driven text cell that binds its display value directly to the cell.</p>\n"
     },
     {
       "type": "ManagedReference",
@@ -2185,6 +2283,48 @@
       "IsMRef": true,
       "Title": "Avalonia.Controls.DataGridFiltering.DataGridFilteringAdapter",
       "Summary": "<p sourcefile=\"api/Avalonia.Controls.DataGridFiltering.DataGridFilteringAdapter.yml\" sourcestartlinenumber=\"1\">Bridges filtering descriptors to the view's Filter predicate.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.DataGridFiltering.DataGridHierarchicalFilteringAdapter.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.DataGridFiltering.DataGridHierarchicalFilteringAdapter.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.DataGridFiltering.DataGridHierarchicalFilteringAdapter",
+      "Summary": "<p sourcefile=\"api/Avalonia.Controls.DataGridFiltering.DataGridHierarchicalFilteringAdapter.yml\" sourcestartlinenumber=\"1\">Applies <xref href=\"Avalonia.Controls.DataGridFiltering.FilteringDescriptor\" data-throw-if-not-resolved=\"false\"></xref> instances to the underlying items of a\n<xref href=\"Avalonia.Controls.DataGridHierarchical.IHierarchicalModel\" data-throw-if-not-resolved=\"false\"></xref> while preserving an explicitly selected set of\nmaterialized relatives.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.DataGridFiltering.DataGridHierarchicalFilteringAdapterFactory.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.DataGridFiltering.DataGridHierarchicalFilteringAdapterFactory.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.DataGridFiltering.DataGridHierarchicalFilteringAdapterFactory",
+      "Summary": "<p sourcefile=\"api/Avalonia.Controls.DataGridFiltering.DataGridHierarchicalFilteringAdapterFactory.yml\" sourcestartlinenumber=\"1\">Creates accessor-only hierarchy-aware filtering adapters for a DataGrid.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.DataGridFiltering.DataGridHierarchyFilterPolicy.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.DataGridFiltering.DataGridHierarchyFilterPolicy.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.DataGridFiltering.DataGridHierarchyFilterPolicy",
+      "Summary": "<p sourcefile=\"api/Avalonia.Controls.DataGridFiltering.DataGridHierarchyFilterPolicy.yml\" sourcestartlinenumber=\"1\">Controls which materialized hierarchy relatives remain visible when a node matches a filter.</p>\n"
     },
     {
       "type": "ManagedReference",
@@ -5086,6 +5226,20 @@
     },
     {
       "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.DataGridSelectionAnchorInfo.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.DataGridSelectionAnchorInfo.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.DataGridSelectionAnchorInfo",
+      "Summary": "<p sourcefile=\"api/Avalonia.Controls.DataGridSelectionAnchorInfo.yml\" sourcestartlinenumber=\"1\">Describes the proposed selection anchor.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
       "source_relative_path": "api/Avalonia.Controls.DataGridSelectionChangeSource.yml",
       "output": {
         ".html": {
@@ -5114,6 +5268,34 @@
     },
     {
       "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.DataGridSelectionChangingEventArgs.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.DataGridSelectionChangingEventArgs.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.DataGridSelectionChangingEventArgs",
+      "Summary": "<p sourcefile=\"api/Avalonia.Controls.DataGridSelectionChangingEventArgs.yml\" sourcestartlinenumber=\"1\">Provides a complete, cancellable selection proposal. <xref href=\"Avalonia.Controls.DataGridSelectionChangingEventArgs.Guarantee\" data-throw-if-not-resolved=\"false\"></xref> identifies\nwhether the proposal is an atomic preflight or reconciliation of a change already\npublished by a caller-owned producer.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.DataGridSelectionChangingGuarantee.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.DataGridSelectionChangingGuarantee.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.DataGridSelectionChangingGuarantee",
+      "Summary": "<p sourcefile=\"api/Avalonia.Controls.DataGridSelectionChangingGuarantee.yml\" sourcestartlinenumber=\"1\">Describes where a <xref href=\"Avalonia.Controls.DataGrid.SelectionChanging\" data-throw-if-not-resolved=\"false\"></xref> proposal sits relative to\nthe state change that produced it.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
       "source_relative_path": "api/Avalonia.Controls.DataGridSelectionMode.yml",
       "output": {
         ".html": {
@@ -5139,6 +5321,20 @@
       "IsMRef": true,
       "Title": "Avalonia.Controls.DataGridSelectionOverlay",
       "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.DataGridSelectionRowInfo.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.DataGridSelectionRowInfo.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.DataGridSelectionRowInfo",
+      "Summary": "<p sourcefile=\"api/Avalonia.Controls.DataGridSelectionRowInfo.yml\" sourcestartlinenumber=\"1\">Describes a row participating in a proposed selection delta.</p>\n"
     },
     {
       "type": "ManagedReference",
@@ -9165,6 +9361,16 @@
     },
     {
       "type": "Conceptual",
+      "source_relative_path": "articles/cell-lifecycle-events.md",
+      "output": {
+        ".html": {
+          "relative_path": "articles/cell-lifecycle-events.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "Conceptual",
       "source_relative_path": "articles/cell-template-reuse.md",
       "output": {
         ".html": {
@@ -9329,6 +9535,16 @@
       "output": {
         ".html": {
           "relative_path": "articles/conditional-formatting.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "Conceptual",
+      "source_relative_path": "articles/container-customization.md",
+      "output": {
+        ".html": {
+          "relative_path": "articles/container-customization.html"
         }
       },
       "version": ""
@@ -9645,6 +9861,16 @@
     },
     {
       "type": "Conceptual",
+      "source_relative_path": "articles/hierarchical-automation.md",
+      "output": {
+        ".html": {
+          "relative_path": "articles/hierarchical-automation.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "Conceptual",
       "source_relative_path": "articles/hierarchical-data.md",
       "output": {
         ".html": {
@@ -9759,6 +9985,16 @@
       "output": {
         ".html": {
           "relative_path": "articles/observable-range-collection.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "Conceptual",
+      "source_relative_path": "articles/optimized-cell-paths.md",
+      "output": {
+        ".html": {
+          "relative_path": "articles/optimized-cell-paths.html"
         }
       },
       "version": ""
@@ -10039,6 +10275,16 @@
       "output": {
         ".html": {
           "relative_path": "articles/selection-and-navigation.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "Conceptual",
+      "source_relative_path": "articles/selection-changing.md",
+      "output": {
+        ".html": {
+          "relative_path": "articles/selection-changing.html"
         }
       },
       "version": ""

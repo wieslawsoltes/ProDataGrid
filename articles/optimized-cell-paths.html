@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+      <title>Optimized retained and drawn cell paths | ProDataGrid for Avalonia </title>
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <meta name="title" content="Optimized retained and drawn cell paths | ProDataGrid for Avalonia ">
+      
+      
+      <link rel="icon" href="../favicon.ico">
+      <link rel="stylesheet" href="../public/docfx.min.css">
+      <link rel="stylesheet" href="../public/main.css">
+      <meta name="docfx:navrel" content="../toc.html">
+      <meta name="docfx:tocrel" content="toc.html">
+      
+      
+      
+      
+      <meta name="docfx:docurl" content="https://github.com/wieslawsoltes/ProDataGrid/blob/master/docfx/articles/optimized-cell-paths.md/#L1">
+      <meta name="loc:inThisArticle" content="In this article">
+      <meta name="loc:searchResultsCount" content="{count} results for &quot;{query}&quot;">
+      <meta name="loc:searchNoResults" content="No results for &quot;{query}&quot;">
+      <meta name="loc:tocFilter" content="Filter by title">
+      <meta name="loc:nextArticle" content="Next">
+      <meta name="loc:prevArticle" content="Previous">
+      <meta name="loc:themeLight" content="Light">
+      <meta name="loc:themeDark" content="Dark">
+      <meta name="loc:themeAuto" content="Auto">
+      <meta name="loc:changeTheme" content="Change theme">
+      <meta name="loc:copy" content="Copy">
+      <meta name="loc:downloadPdf" content="Download PDF">
+
+      <script type="module" src="./../public/docfx.min.js"></script>
+
+      <script>
+        const theme = localStorage.getItem('theme') || 'auto'
+        document.documentElement.setAttribute('data-bs-theme', theme === 'auto' ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light') : theme)
+      </script>
+
+  </head>
+
+  <body class="tex2jax_ignore" data-layout="" data-yaml-mime="">
+    <header class="bg-body border-bottom">
+      <nav id="autocollapse" class="navbar navbar-expand-md" role="navigation">
+        <div class="container-xxl flex-nowrap">
+          <a class="navbar-brand" href="../index.html">
+            <img id="logo" class="svg" src="../images/logo.svg" alt="">
+            
+          </a>
+          <button class="btn btn-lg d-md-none border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navpanel" aria-controls="navpanel" aria-expanded="false" aria-label="Toggle navigation">
+            <i class="bi bi-three-dots"></i>
+          </button>
+          <div class="collapse navbar-collapse" id="navpanel">
+            <div id="navbar">
+            </div>
+          </div>
+        </div>
+      </nav>
+    </header>
+
+    <main class="container-xxl">
+      <div class="toc-offcanvas">
+        <div class="offcanvas-md offcanvas-start" tabindex="-1" id="tocOffcanvas" aria-labelledby="tocOffcanvasLabel">
+          <div class="offcanvas-header">
+            <h5 class="offcanvas-title" id="tocOffcanvasLabel">Table of Contents</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="offcanvas" data-bs-target="#tocOffcanvas" aria-label="Close"></button>
+          </div>
+          <div class="offcanvas-body">
+            <nav class="toc" id="toc"></nav>
+          </div>
+        </div>
+      </div>
+
+      <div class="content">
+        <div class="actionbar">
+          <button class="btn btn-lg border-0 d-md-none" type="button" data-bs-toggle="offcanvas" data-bs-target="#tocOffcanvas" aria-controls="tocOffcanvas" aria-expanded="false" aria-label="Show table of contents">
+            <i class="bi bi-list"></i>
+          </button>
+
+          <nav id="breadcrumb"></nav>
+        </div>
+
+        <article data-uid="">
+<h1 id="optimized-retained-and-drawn-cell-paths">Optimized retained and drawn cell paths</h1>
+
+<p>ProDataGrid keeps the normal generic themes and retained Avalonia cell templates as
+the compatibility default. Performance-sensitive grids can opt into smaller partial
+themes, direct typed value access, or drawn display cells independently. Editing always
+returns to the normal retained editor path.</p>
+<h2 id="choose-the-smallest-change-that-fits">Choose the smallest change that fits</h2>
+<table>
+<thead>
+<tr>
+<th>Path</th>
+<th>Cell representation</th>
+<th>Best fit</th>
+<th>Main trade-off</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Standard retained</td>
+<td><code>DataGridCell</code> plus normal Avalonia content/template</td>
+<td>Existing applications, arbitrary templates, converters, validation, and dynamic resources</td>
+<td>Highest visual-tree and binding cost</td>
+</tr>
+<tr>
+<td>Optimized retained theme</td>
+<td><code>DataGridCell</code> plus normal retained content</td>
+<td>Applications that require Avalonia controls and layout but want fewer chrome and presenter controls</td>
+<td>Explicit theme opt-in; choose lean or feature-preserving row/header variants</td>
+</tr>
+<tr>
+<td>Retained direct text</td>
+<td>A retained cell and <code>TextBlock</code>, with a compatible typed accessor</td>
+<td>Large read-mostly text grids that still require retained controls</td>
+<td>Incompatible binding features automatically fall back to the normal binding path</td>
+</tr>
+<tr>
+<td>Direct retained text cell</td>
+<td><code>DataGridDirectTextCell</code> with a compatible typed accessor</td>
+<td>Dense read-mostly flat grids that require retained input, automation, and editing</td>
+<td>Uses the optimized direct-cell theme; incompatible accessors fall back to a value binding</td>
+</tr>
+<tr>
+<td>Direct hierarchy presenter</td>
+<td>One retained hierarchy cell containing the expander and optional <code>TextBlock</code></td>
+<td>Large tree grids that need normal controls, input, automation, and editing</td>
+<td>Custom cell templates continue to use the standard hierarchy presenter</td>
+</tr>
+<tr>
+<td>Drawn display</td>
+<td>A <code>DataGridCustomDrawingCell</code> or a supported built-in column in <code>Drawn</code> mode</td>
+<td>Very dense read-mostly grids where the smallest display tree matters most</td>
+<td>Display is drawn; editing still uses retained controls</td>
+</tr>
+</tbody>
+</table>
+<p>Start with the optimized retained theme. It improves proper Avalonia-layout cells and
+does not require custom drawing.</p>
+<h2 id="load-the-partial-optimized-resources">Load the partial optimized resources</h2>
+<p>Load a normal ProDataGrid theme first, then the optimized resource dictionary:</p>
+<pre><code class="lang-xml">&lt;Application.Styles&gt;
+  &lt;FluentTheme /&gt;
+  &lt;StyleInclude Source=&quot;avares://Avalonia.Controls.DataGrid/Themes/Fluent.v2.xaml&quot; /&gt;
+  &lt;StyleInclude Source=&quot;avares://Avalonia.Controls.DataGrid/Themes/Optimized.xaml&quot; /&gt;
+&lt;/Application.Styles&gt;
+</code></pre>
+<p><code>Themes/Optimized.xaml</code> is additive. It does not replace or modify
+<code>Themes/Generic.xaml</code>, so existing applications remain on their current templates until
+they assign an optimized theme or enable an optimized column property.</p>
+<h2 id="optimize-ordinary-retained-avalonia-cells">Optimize ordinary retained Avalonia cells</h2>
+<p>For a feature-complete grid with no frozen columns, use the feature-preserving row and
+header variants:</p>
+<pre><code class="lang-xml">&lt;DataGrid RowTheme=&quot;{StaticResource DataGridOptimizedFeatureUnfrozenRowTheme}&quot;
+          CellTheme=&quot;{StaticResource DataGridOptimizedCellTheme}&quot;
+          ColumnHeaderTheme=&quot;{StaticResource DataGridOptimizedFeatureColumnHeaderTheme}&quot;
+          UseLightweightFiller=&quot;True&quot; /&gt;
+</code></pre>
+<p>Use <code>DataGridOptimizedFeatureRowTheme</code> when left or right frozen columns are enabled.
+These variants retain row headers, row details, grid lines, current/focus/selection
+chrome, sort and filter indicators, resize handles, and column dragging.</p>
+<p>For fixed-height, read-mostly surfaces that do not need those row/header features, use
+<code>DataGridOptimizedUnfrozenRowTheme</code> (or <code>DataGridOptimizedRowTheme</code> with frozen
+columns) and <code>DataGridOptimizedColumnHeaderTheme</code>. The lean variants intentionally omit
+row-header/details presenters and the generic header's feature controls.</p>
+<p>Arbitrary <code>DataGridTemplateColumn</code> content remains an ordinary retained Avalonia
+control tree. The optimized cell theme only removes redundant cell chrome and hosts the
+content directly.</p>
+<h2 id="avoid-a-display-binding-without-giving-up-retained-controls">Avoid a display binding without giving up retained controls</h2>
+<p><code>DataGridTextColumn.UseDirectTextContent=&quot;True&quot;</code> keeps the ordinary retained
+<code>DataGridCell</code> and text element. When the column has compatible typed accessor metadata,
+the text element reads that accessor without creating a binding expression per realized
+cell:</p>
+<pre><code class="lang-xml">&lt;DataGridTextColumn Header=&quot;Name&quot;
+                    Binding=&quot;{Binding Name}&quot;
+                    UseDirectTextContent=&quot;True&quot;
+                    TrackDirectTextValueChanges=&quot;True&quot; /&gt;
+</code></pre>
+<p>The equivalent column-definition properties are
+<code>DataGridTextColumnDefinition.UseDirectTextContent</code> and
+<code>TrackDirectTextValueChanges</code>. Set change tracking to <code>False</code> only when the displayed
+value is immutable; recycled cells still refresh for a new row item.</p>
+<p>Direct access is decided for each realized item. A converter, explicit binding source,
+fallback/target-null behavior, incompatible runtime item type, or missing typed accessor
+uses the normal Avalonia binding path. This fallback preserves binding semantics for
+heterogeneous and templated grids.</p>
+<p>Set <code>UseDirectTextCell=&quot;True&quot;</code> when the retained display can use
+<code>DataGridDirectTextCell</code> instead of a <code>DataGridCell</code> containing a text element. The
+column still creates the normal retained editor when editing begins. Column definitions
+use <code>DataGridTextColumnDefinition.UseDirectTextCell</code>.</p>
+<h2 id="optimize-retained-hierarchy-cells">Optimize retained hierarchy cells</h2>
+<p><code>DataGridHierarchicalColumn</code> offers two retained-control optimizations:</p>
+<pre><code class="lang-xml">&lt;DataGridHierarchicalColumn Header=&quot;Name&quot;
+                            Binding=&quot;{Binding Item.Name}&quot;
+                            UseOptimizedPresenter=&quot;True&quot;
+                            UseDirectTextContent=&quot;True&quot;
+                            TrackDirectTextValueChanges=&quot;True&quot; /&gt;
+</code></pre>
+<p><code>UseOptimizedPresenter</code> combines the cell and expander-presenter roles while retaining a
+normal Avalonia text control, hierarchy input, UI Automation, focus, and editing
+behavior. <code>UseDirectTextContent</code> additionally uses a compatible typed accessor. Set
+<code>UseDirectCell=&quot;True&quot;</code> for the leanest retained hierarchy container. Custom hierarchy
+cell templates automatically stay on the standard presenter path.</p>
+<h2 id="opt-into-drawn-display-cells">Opt into drawn display cells</h2>
+<p>Supported built-in columns accept <code>DisplayMode=&quot;Drawn&quot;</code>:</p>
+<pre><code class="lang-xml">&lt;DataGridTextColumn Header=&quot;Name&quot;
+                    Binding=&quot;{Binding Name}&quot;
+                    DisplayMode=&quot;Drawn&quot; /&gt;
+&lt;DataGridNumericColumn Header=&quot;Total&quot;
+                       Binding=&quot;{Binding Total}&quot;
+                       DisplayMode=&quot;Drawn&quot; /&gt;
+</code></pre>
+<p>Unsupported configurations fall back to <code>Retained</code>. Use
+<code>DataGridCustomDrawingColumn</code> for a custom drawing operation or renderer. Drawn cells
+preserve selection/current/focus chrome and automation names, and switch to the normal
+retained editor when editing starts.</p>
+<h2 id="sample-gallery-workloads">Sample gallery workloads</h2>
+<p>The sample gallery contains two dedicated workload pages:</p>
+<ul>
+<li><strong>Optimized Cell Paths (Flat)</strong> switches one grid between standard retained,
+optimized retained theme, retained direct accessor, direct retained text cell,
+built-in drawn text, and custom Skia draw-operation paths. It starts with a 1,000-row
+preview and can generate up to 1,000,000 immutable rows; the default profiling target
+is 250,000 rows across seven columns.</li>
+<li><strong>Optimized Cell Paths (Hierarchy)</strong> switches one tree grid between standard retained,
+optimized retained theme, optimized hierarchy presenter, direct retained hierarchy,
+built-in drawn companion cells, and custom Skia companion cells. Its default target is
+149,792 nodes with separate load, expand-all, collapse-all, and equal-distance jump
+actions.</li>
+</ul>
+<p>Each page displays the active container type and exact configuration, uses typed column
+definitions, and reports a whole-process managed-heap snapshot. Run one path per fresh
+process with the same window and dataset settings when comparing memory or frame
+behavior. The pages are exploratory profiling surfaces; use the benchmark harness for
+controlled elapsed-time and allocation results.</p>
+<h2 id="validate-the-chosen-path">Validate the chosen path</h2>
+<p>Benchmark first layout, an equal-distance scroll/jump workload, and the application's
+actual templates separately. Record both elapsed time and allocated bytes. A drawn-cell
+win does not prove that a retained template improved, which is why ProDataGrid's
+benchmark matrix keeps standard retained, optimized retained, and drawn modes as
+separate lanes.</p>
+<p>Keep the generic path when runtime resource replacement, an application-specific control
+template, or a binding feature is more important than the extra realized controls. The
+optimized paths are explicit options, not global behavior changes.</p>
+<h2 id="related-articles">Related articles</h2>
+<ul>
+<li><a href="column-definitions-hot-path.html">Column Definitions: Hot Path Integration</a></li>
+<li><a href="custom-drawing-columns.html">Custom Drawing Columns and Skia</a></li>
+<li><a href="hierarchical-model-end-to-end.html">Hierarchical Model: End-to-End</a></li>
+<li><a href="scrolling-virtualization.html">Scrolling and Virtualization</a></li>
+</ul>
+
+</article>
+
+        <div class="contribution d-print-none">
+          <a href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/docfx/articles/optimized-cell-paths.md/#L1" class="edit-link">Edit this page</a>
+        </div>
+
+        <div class="next-article d-print-none border-top" id="nextArticle"></div>
+
+      </div>
+
+      <div class="affix">
+        <nav id="affix"></nav>
+      </div>
+    </main>
+
+
+    <footer class="border-top text-secondary">
+      <div class="container-xxl">
+        <div class="flex-fill">
+          <span>Made with <a href="https://dotnet.github.io/docfx">docfx</a></span>
+        </div>
+      </div>
+    </footer>
+  </body>
+</html>

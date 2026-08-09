@@ -85,7 +85,7 @@
 
 
   <h1 id="Avalonia_Controls_DataGridCustomDrawingCell" data-uid="Avalonia.Controls.DataGridCustomDrawingCell" class="text-break">
-Class DataGridCustomDrawingCell  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/DataGridCustomDrawingCell.cs/#L22"><i class="bi bi-code-slash"></i></a>
+Class DataGridCustomDrawingCell  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/DataGridCustomDrawingCell.cs/#L24"><i class="bi bi-code-slash"></i></a>
   </h1>
 
   <div class="facts text-secondary">
@@ -98,7 +98,7 @@ Class DataGridCustomDrawingCell  <a class="header-action link-secondary" title="
   <div class="markdown conceptual"></div>
 
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public sealed class DataGridCustomDrawingCell : Control, INotifyPropertyChanged, IDataContextProvider, ILogical, IThemeVariantHost, IResourceHost, IResourceNode, IStyleHost, ISetLogicalParent, ISetInheritanceParent, ISupportInitialize, INamed, IInputElement, IDataTemplateHost, ISetterValue</code></pre>
+    <pre><code class="lang-csharp hljs">public sealed class DataGridCustomDrawingCell : DataGridCell, INotifyPropertyChanged, IDataContextProvider, ILogical, IThemeVariantHost, IResourceHost, IResourceNode, IStyleHost, ISetLogicalParent, ISetInheritanceParent, ISupportInitialize, INamed, IInputElement, IDataTemplateHost, ISetterValue</code></pre>
   </div>
 
 
@@ -116,6 +116,9 @@ Class DataGridCustomDrawingCell  <a class="header-action link-secondary" title="
       <div><span class="xref">Interactive</span></div>
       <div><span class="xref">InputElement</span></div>
       <div><span class="xref">Control</span></div>
+      <div><span class="xref">TemplatedControl</span></div>
+      <div><span class="xref">ContentControl</span></div>
+      <div><a class="xref" href="Avalonia.Controls.DataGridCell.html">DataGridCell</a></div>
       <div><span class="xref">DataGridCustomDrawingCell</span></div>
     </dd>
   </dl>
@@ -144,6 +147,141 @@ Class DataGridCustomDrawingCell  <a class="header-action link-secondary" title="
   <dl class="typelist inheritedMembers">
     <dt>Inherited Members</dt>
     <dd>
+    <div>
+      <a class="xref" href="Avalonia.Controls.DataGridCell.html#Avalonia_Controls_DataGridCell_IsValidProperty">DataGridCell.IsValidProperty</a>
+    </div>
+    <div>
+      <a class="xref" href="Avalonia.Controls.DataGridCell.html#Avalonia_Controls_DataGridCell_ValidationSeverityProperty">DataGridCell.ValidationSeverityProperty</a>
+    </div>
+    <div>
+      <a class="xref" href="Avalonia.Controls.DataGridCell.html#Avalonia_Controls_DataGridCell_OwningColumnProperty">DataGridCell.OwningColumnProperty</a>
+    </div>
+    <div>
+      <a class="xref" href="Avalonia.Controls.DataGridCell.html#Avalonia_Controls_DataGridCell_OwningRowProperty">DataGridCell.OwningRowProperty</a>
+    </div>
+    <div>
+      <a class="xref" href="Avalonia.Controls.DataGridCell.html#Avalonia_Controls_DataGridCell_UseDirectChromeProperty">DataGridCell.UseDirectChromeProperty</a>
+    </div>
+    <div>
+      <a class="xref" href="Avalonia.Controls.DataGridCell.html#Avalonia_Controls_DataGridCell_UseDirectContentHostProperty">DataGridCell.UseDirectContentHostProperty</a>
+    </div>
+    <div>
+      <a class="xref" href="Avalonia.Controls.DataGridCell.html#Avalonia_Controls_DataGridCell_IsValid">DataGridCell.IsValid</a>
+    </div>
+    <div>
+      <a class="xref" href="Avalonia.Controls.DataGridCell.html#Avalonia_Controls_DataGridCell_ValidationSeverity">DataGridCell.ValidationSeverity</a>
+    </div>
+    <div>
+      <a class="xref" href="Avalonia.Controls.DataGridCell.html#Avalonia_Controls_DataGridCell_UseDirectChrome">DataGridCell.UseDirectChrome</a>
+    </div>
+    <div>
+      <a class="xref" href="Avalonia.Controls.DataGridCell.html#Avalonia_Controls_DataGridCell_UseDirectContentHost">DataGridCell.UseDirectContentHost</a>
+    </div>
+    <div>
+      <a class="xref" href="Avalonia.Controls.DataGridCell.html#Avalonia_Controls_DataGridCell_OwningColumn">DataGridCell.OwningColumn</a>
+    </div>
+    <div>
+      <a class="xref" href="Avalonia.Controls.DataGridCell.html#Avalonia_Controls_DataGridCell_OwningRow">DataGridCell.OwningRow</a>
+    </div>
+    <div>
+      <span class="xref">ContentControl.ContentProperty</span>
+    </div>
+    <div>
+      <span class="xref">ContentControl.ContentTemplateProperty</span>
+    </div>
+    <div>
+      <span class="xref">ContentControl.HorizontalContentAlignmentProperty</span>
+    </div>
+    <div>
+      <span class="xref">ContentControl.VerticalContentAlignmentProperty</span>
+    </div>
+    <div>
+      <span class="xref">ContentControl.Content</span>
+    </div>
+    <div>
+      <span class="xref">ContentControl.ContentTemplate</span>
+    </div>
+    <div>
+      <span class="xref">ContentControl.Presenter</span>
+    </div>
+    <div>
+      <span class="xref">ContentControl.HorizontalContentAlignment</span>
+    </div>
+    <div>
+      <span class="xref">ContentControl.VerticalContentAlignment</span>
+    </div>
+    <div>
+      <span class="xref">TemplatedControl.BackgroundProperty</span>
+    </div>
+    <div>
+      <span class="xref">TemplatedControl.BackgroundSizingProperty</span>
+    </div>
+    <div>
+      <span class="xref">TemplatedControl.BorderBrushProperty</span>
+    </div>
+    <div>
+      <span class="xref">TemplatedControl.BorderThicknessProperty</span>
+    </div>
+    <div>
+      <span class="xref">TemplatedControl.CornerRadiusProperty</span>
+    </div>
+    <div>
+      <span class="xref">TemplatedControl.FontFeaturesProperty</span>
+    </div>
+    <div>
+      <span class="xref">TemplatedControl.LetterSpacingProperty</span>
+    </div>
+    <div>
+      <span class="xref">TemplatedControl.PaddingProperty</span>
+    </div>
+    <div>
+      <span class="xref">TemplatedControl.TemplateProperty</span>
+    </div>
+    <div>
+      <span class="xref">TemplatedControl.IsTemplateFocusTargetProperty</span>
+    </div>
+    <div>
+      <span class="xref">TemplatedControl.TemplateAppliedEvent</span>
+    </div>
+    <div>
+      <span class="xref">TemplatedControl.GetIsTemplateFocusTarget(Control)</span>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">TemplatedControl.SetIsTemplateFocusTarget(Control, bool)</a>
+    </div>
+    <div>
+      <span class="xref">TemplatedControl.ApplyTemplate()</span>
+    </div>
+    <div>
+      <span class="xref">TemplatedControl.Background</span>
+    </div>
+    <div>
+      <span class="xref">TemplatedControl.BackgroundSizing</span>
+    </div>
+    <div>
+      <span class="xref">TemplatedControl.BorderBrush</span>
+    </div>
+    <div>
+      <span class="xref">TemplatedControl.BorderThickness</span>
+    </div>
+    <div>
+      <span class="xref">TemplatedControl.CornerRadius</span>
+    </div>
+    <div>
+      <span class="xref">TemplatedControl.FontFeatures</span>
+    </div>
+    <div>
+      <span class="xref">TemplatedControl.LetterSpacing</span>
+    </div>
+    <div>
+      <span class="xref">TemplatedControl.Padding</span>
+    </div>
+    <div>
+      <span class="xref">TemplatedControl.Template</span>
+    </div>
+    <div>
+      <span class="xref">TemplatedControl.TemplateApplied</span>
+    </div>
     <div>
       <span class="xref">Control.FocusAdornerProperty</span>
     </div>
@@ -532,9 +670,6 @@ Class DataGridCustomDrawingCell  <a class="header-action link-secondary" title="
       <span class="xref">Layoutable.UpdateLayout()</span>
     </div>
     <div>
-      <span class="xref">Layoutable.ApplyTemplate()</span>
-    </div>
-    <div>
       <span class="xref">Layoutable.Measure(Size)</span>
     </div>
     <div>
@@ -889,6 +1024,36 @@ Class DataGridCustomDrawingCell  <a class="header-action link-secondary" title="
 
 
 
+  <h2 class="section" id="constructors">Constructors
+</h2>
+
+
+  <a id="Avalonia_Controls_DataGridCustomDrawingCell__ctor_" data-uid="Avalonia.Controls.DataGridCustomDrawingCell.#ctor*"></a>
+
+  <h3 id="Avalonia_Controls_DataGridCustomDrawingCell__ctor" data-uid="Avalonia.Controls.DataGridCustomDrawingCell.#ctor">
+  DataGridCustomDrawingCell()
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/DataGridCustomDrawingCell.cs/#L133"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public DataGridCustomDrawingCell()</code></pre>
+  </div>
+
+
+
+
+
+
+
+
+
+
+
+
+
   <h2 class="section" id="fields">Fields
 </h2>
 
@@ -896,7 +1061,7 @@ Class DataGridCustomDrawingCell  <a class="header-action link-secondary" title="
 
   <h3 id="Avalonia_Controls_DataGridCustomDrawingCell_DrawOperationFactoryProperty" data-uid="Avalonia.Controls.DataGridCustomDrawingCell.DrawOperationFactoryProperty">
   DrawOperationFactoryProperty
-  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/DataGridCustomDrawingCell.cs/#L49"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/DataGridCustomDrawingCell.cs/#L59"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"></div>
@@ -926,7 +1091,7 @@ Class DataGridCustomDrawingCell  <a class="header-action link-secondary" title="
 
   <h3 id="Avalonia_Controls_DataGridCustomDrawingCell_DrawOperationLayoutFastPathProperty" data-uid="Avalonia.Controls.DataGridCustomDrawingCell.DrawOperationLayoutFastPathProperty">
   DrawOperationLayoutFastPathProperty
-  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/DataGridCustomDrawingCell.cs/#L97"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/DataGridCustomDrawingCell.cs/#L107"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"></div>
@@ -956,7 +1121,7 @@ Class DataGridCustomDrawingCell  <a class="header-action link-secondary" title="
 
   <h3 id="Avalonia_Controls_DataGridCustomDrawingCell_DrawingModeProperty" data-uid="Avalonia.Controls.DataGridCustomDrawingCell.DrawingModeProperty">
   DrawingModeProperty
-  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/DataGridCustomDrawingCell.cs/#L53"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/DataGridCustomDrawingCell.cs/#L63"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"></div>
@@ -986,7 +1151,7 @@ Class DataGridCustomDrawingCell  <a class="header-action link-secondary" title="
 
   <h3 id="Avalonia_Controls_DataGridCustomDrawingCell_FontFamilyProperty" data-uid="Avalonia.Controls.DataGridCustomDrawingCell.FontFamilyProperty">
   FontFamilyProperty
-  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/DataGridCustomDrawingCell.cs/#L63"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/DataGridCustomDrawingCell.cs/#L73"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"></div>
@@ -1016,7 +1181,7 @@ Class DataGridCustomDrawingCell  <a class="header-action link-secondary" title="
 
   <h3 id="Avalonia_Controls_DataGridCustomDrawingCell_FontSizeProperty" data-uid="Avalonia.Controls.DataGridCustomDrawingCell.FontSizeProperty">
   FontSizeProperty
-  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/DataGridCustomDrawingCell.cs/#L66"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/DataGridCustomDrawingCell.cs/#L76"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"></div>
@@ -1046,7 +1211,7 @@ Class DataGridCustomDrawingCell  <a class="header-action link-secondary" title="
 
   <h3 id="Avalonia_Controls_DataGridCustomDrawingCell_FontStretchProperty" data-uid="Avalonia.Controls.DataGridCustomDrawingCell.FontStretchProperty">
   FontStretchProperty
-  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/DataGridCustomDrawingCell.cs/#L75"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/DataGridCustomDrawingCell.cs/#L85"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"></div>
@@ -1076,7 +1241,7 @@ Class DataGridCustomDrawingCell  <a class="header-action link-secondary" title="
 
   <h3 id="Avalonia_Controls_DataGridCustomDrawingCell_FontStyleProperty" data-uid="Avalonia.Controls.DataGridCustomDrawingCell.FontStyleProperty">
   FontStyleProperty
-  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/DataGridCustomDrawingCell.cs/#L69"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/DataGridCustomDrawingCell.cs/#L79"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"></div>
@@ -1106,7 +1271,7 @@ Class DataGridCustomDrawingCell  <a class="header-action link-secondary" title="
 
   <h3 id="Avalonia_Controls_DataGridCustomDrawingCell_FontWeightProperty" data-uid="Avalonia.Controls.DataGridCustomDrawingCell.FontWeightProperty">
   FontWeightProperty
-  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/DataGridCustomDrawingCell.cs/#L72"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/DataGridCustomDrawingCell.cs/#L82"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"></div>
@@ -1136,7 +1301,7 @@ Class DataGridCustomDrawingCell  <a class="header-action link-secondary" title="
 
   <h3 id="Avalonia_Controls_DataGridCustomDrawingCell_ForegroundProperty" data-uid="Avalonia.Controls.DataGridCustomDrawingCell.ForegroundProperty">
   ForegroundProperty
-  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/DataGridCustomDrawingCell.cs/#L78"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/DataGridCustomDrawingCell.cs/#L88"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"></div>
@@ -1166,7 +1331,7 @@ Class DataGridCustomDrawingCell  <a class="header-action link-secondary" title="
 
   <h3 id="Avalonia_Controls_DataGridCustomDrawingCell_LayoutInvalidationTokenProperty" data-uid="Avalonia.Controls.DataGridCustomDrawingCell.LayoutInvalidationTokenProperty">
   LayoutInvalidationTokenProperty
-  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/DataGridCustomDrawingCell.cs/#L107"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/DataGridCustomDrawingCell.cs/#L117"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"></div>
@@ -1196,7 +1361,7 @@ Class DataGridCustomDrawingCell  <a class="header-action link-secondary" title="
 
   <h3 id="Avalonia_Controls_DataGridCustomDrawingCell_RenderBackendProperty" data-uid="Avalonia.Controls.DataGridCustomDrawingCell.RenderBackendProperty">
   RenderBackendProperty
-  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/DataGridCustomDrawingCell.cs/#L58"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/DataGridCustomDrawingCell.cs/#L68"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"></div>
@@ -1226,7 +1391,7 @@ Class DataGridCustomDrawingCell  <a class="header-action link-secondary" title="
 
   <h3 id="Avalonia_Controls_DataGridCustomDrawingCell_RenderInvalidationTokenProperty" data-uid="Avalonia.Controls.DataGridCustomDrawingCell.RenderInvalidationTokenProperty">
   RenderInvalidationTokenProperty
-  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/DataGridCustomDrawingCell.cs/#L102"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/DataGridCustomDrawingCell.cs/#L112"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"></div>
@@ -1256,7 +1421,7 @@ Class DataGridCustomDrawingCell  <a class="header-action link-secondary" title="
 
   <h3 id="Avalonia_Controls_DataGridCustomDrawingCell_SharedTextLayoutCacheCapacityProperty" data-uid="Avalonia.Controls.DataGridCustomDrawingCell.SharedTextLayoutCacheCapacityProperty">
   SharedTextLayoutCacheCapacityProperty
-  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/DataGridCustomDrawingCell.cs/#L92"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/DataGridCustomDrawingCell.cs/#L102"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"></div>
@@ -1286,7 +1451,7 @@ Class DataGridCustomDrawingCell  <a class="header-action link-secondary" title="
 
   <h3 id="Avalonia_Controls_DataGridCustomDrawingCell_TextAlignmentProperty" data-uid="Avalonia.Controls.DataGridCustomDrawingCell.TextAlignmentProperty">
   TextAlignmentProperty
-  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/DataGridCustomDrawingCell.cs/#L81"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/DataGridCustomDrawingCell.cs/#L91"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"></div>
@@ -1316,7 +1481,7 @@ Class DataGridCustomDrawingCell  <a class="header-action link-secondary" title="
 
   <h3 id="Avalonia_Controls_DataGridCustomDrawingCell_TextLayoutCacheModeProperty" data-uid="Avalonia.Controls.DataGridCustomDrawingCell.TextLayoutCacheModeProperty">
   TextLayoutCacheModeProperty
-  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/DataGridCustomDrawingCell.cs/#L87"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/DataGridCustomDrawingCell.cs/#L97"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"></div>
@@ -1346,7 +1511,7 @@ Class DataGridCustomDrawingCell  <a class="header-action link-secondary" title="
 
   <h3 id="Avalonia_Controls_DataGridCustomDrawingCell_TextTrimmingProperty" data-uid="Avalonia.Controls.DataGridCustomDrawingCell.TextTrimmingProperty">
   TextTrimmingProperty
-  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/DataGridCustomDrawingCell.cs/#L84"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/DataGridCustomDrawingCell.cs/#L94"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"></div>
@@ -1376,7 +1541,7 @@ Class DataGridCustomDrawingCell  <a class="header-action link-secondary" title="
 
   <h3 id="Avalonia_Controls_DataGridCustomDrawingCell_ValueProperty" data-uid="Avalonia.Controls.DataGridCustomDrawingCell.ValueProperty">
   ValueProperty
-  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/DataGridCustomDrawingCell.cs/#L43"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/DataGridCustomDrawingCell.cs/#L53"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"></div>
@@ -1411,7 +1576,7 @@ Class DataGridCustomDrawingCell  <a class="header-action link-secondary" title="
 
   <h3 id="Avalonia_Controls_DataGridCustomDrawingCell_DrawOperationFactory" data-uid="Avalonia.Controls.DataGridCustomDrawingCell.DrawOperationFactory">
   DrawOperationFactory
-  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/DataGridCustomDrawingCell.cs/#L129"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/DataGridCustomDrawingCell.cs/#L152"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>Gets or sets the factory that creates custom draw operations.</p>
@@ -1443,7 +1608,7 @@ Class DataGridCustomDrawingCell  <a class="header-action link-secondary" title="
 
   <h3 id="Avalonia_Controls_DataGridCustomDrawingCell_DrawOperationLayoutFastPath" data-uid="Avalonia.Controls.DataGridCustomDrawingCell.DrawOperationLayoutFastPath">
   DrawOperationLayoutFastPath
-  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/DataGridCustomDrawingCell.cs/#L222"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/DataGridCustomDrawingCell.cs/#L245"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>Gets or sets a value indicating whether draw-operation layout fast path is enabled.</p>
@@ -1475,7 +1640,7 @@ Class DataGridCustomDrawingCell  <a class="header-action link-secondary" title="
 
   <h3 id="Avalonia_Controls_DataGridCustomDrawingCell_DrawingMode" data-uid="Avalonia.Controls.DataGridCustomDrawingCell.DrawingMode">
   DrawingMode
-  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/DataGridCustomDrawingCell.cs/#L138"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/DataGridCustomDrawingCell.cs/#L161"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>Gets or sets the rendering mode for this cell.</p>
@@ -1507,7 +1672,7 @@ Class DataGridCustomDrawingCell  <a class="header-action link-secondary" title="
 
   <h3 id="Avalonia_Controls_DataGridCustomDrawingCell_FontFamily" data-uid="Avalonia.Controls.DataGridCustomDrawingCell.FontFamily">
   FontFamily
-  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/DataGridCustomDrawingCell.cs/#L153"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/DataGridCustomDrawingCell.cs/#L176"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"></div>
@@ -1538,7 +1703,7 @@ Class DataGridCustomDrawingCell  <a class="header-action link-secondary" title="
 
   <h3 id="Avalonia_Controls_DataGridCustomDrawingCell_FontSize" data-uid="Avalonia.Controls.DataGridCustomDrawingCell.FontSize">
   FontSize
-  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/DataGridCustomDrawingCell.cs/#L159"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/DataGridCustomDrawingCell.cs/#L182"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"></div>
@@ -1569,7 +1734,7 @@ Class DataGridCustomDrawingCell  <a class="header-action link-secondary" title="
 
   <h3 id="Avalonia_Controls_DataGridCustomDrawingCell_FontStretch" data-uid="Avalonia.Controls.DataGridCustomDrawingCell.FontStretch">
   FontStretch
-  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/DataGridCustomDrawingCell.cs/#L177"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/DataGridCustomDrawingCell.cs/#L200"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"></div>
@@ -1600,7 +1765,7 @@ Class DataGridCustomDrawingCell  <a class="header-action link-secondary" title="
 
   <h3 id="Avalonia_Controls_DataGridCustomDrawingCell_FontStyle" data-uid="Avalonia.Controls.DataGridCustomDrawingCell.FontStyle">
   FontStyle
-  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/DataGridCustomDrawingCell.cs/#L165"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/DataGridCustomDrawingCell.cs/#L188"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"></div>
@@ -1631,7 +1796,7 @@ Class DataGridCustomDrawingCell  <a class="header-action link-secondary" title="
 
   <h3 id="Avalonia_Controls_DataGridCustomDrawingCell_FontWeight" data-uid="Avalonia.Controls.DataGridCustomDrawingCell.FontWeight">
   FontWeight
-  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/DataGridCustomDrawingCell.cs/#L171"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/DataGridCustomDrawingCell.cs/#L194"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"></div>
@@ -1662,7 +1827,7 @@ Class DataGridCustomDrawingCell  <a class="header-action link-secondary" title="
 
   <h3 id="Avalonia_Controls_DataGridCustomDrawingCell_Foreground" data-uid="Avalonia.Controls.DataGridCustomDrawingCell.Foreground">
   Foreground
-  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/DataGridCustomDrawingCell.cs/#L183"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/DataGridCustomDrawingCell.cs/#L206"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"></div>
@@ -1693,7 +1858,7 @@ Class DataGridCustomDrawingCell  <a class="header-action link-secondary" title="
 
   <h3 id="Avalonia_Controls_DataGridCustomDrawingCell_LayoutInvalidationToken" data-uid="Avalonia.Controls.DataGridCustomDrawingCell.LayoutInvalidationToken">
   LayoutInvalidationToken
-  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/DataGridCustomDrawingCell.cs/#L242"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/DataGridCustomDrawingCell.cs/#L265"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>Gets or sets the layout invalidation token for this realized cell.
@@ -1726,7 +1891,7 @@ Incrementing this value forces measure/arrange and redraw.</p>
 
   <h3 id="Avalonia_Controls_DataGridCustomDrawingCell_RenderBackend" data-uid="Avalonia.Controls.DataGridCustomDrawingCell.RenderBackend">
   RenderBackend
-  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/DataGridCustomDrawingCell.cs/#L147"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/DataGridCustomDrawingCell.cs/#L170"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>Gets or sets draw-operation rendering backend for this cell.</p>
@@ -1758,7 +1923,7 @@ Incrementing this value forces measure/arrange and redraw.</p>
 
   <h3 id="Avalonia_Controls_DataGridCustomDrawingCell_RenderInvalidationToken" data-uid="Avalonia.Controls.DataGridCustomDrawingCell.RenderInvalidationToken">
   RenderInvalidationToken
-  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/DataGridCustomDrawingCell.cs/#L232"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/DataGridCustomDrawingCell.cs/#L255"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>Gets or sets the render invalidation token for this realized cell.
@@ -1791,7 +1956,7 @@ Incrementing this value forces redraw for the custom drawing content.</p>
 
   <h3 id="Avalonia_Controls_DataGridCustomDrawingCell_SharedTextLayoutCacheCapacity" data-uid="Avalonia.Controls.DataGridCustomDrawingCell.SharedTextLayoutCacheCapacity">
   SharedTextLayoutCacheCapacity
-  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/DataGridCustomDrawingCell.cs/#L213"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/DataGridCustomDrawingCell.cs/#L236"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>Gets or sets the maximum shared text layout cache entry count.</p>
@@ -1823,7 +1988,7 @@ Incrementing this value forces redraw for the custom drawing content.</p>
 
   <h3 id="Avalonia_Controls_DataGridCustomDrawingCell_TextAlignment" data-uid="Avalonia.Controls.DataGridCustomDrawingCell.TextAlignment">
   TextAlignment
-  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/DataGridCustomDrawingCell.cs/#L189"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/DataGridCustomDrawingCell.cs/#L212"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"></div>
@@ -1854,7 +2019,7 @@ Incrementing this value forces redraw for the custom drawing content.</p>
 
   <h3 id="Avalonia_Controls_DataGridCustomDrawingCell_TextLayoutCacheMode" data-uid="Avalonia.Controls.DataGridCustomDrawingCell.TextLayoutCacheMode">
   TextLayoutCacheMode
-  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/DataGridCustomDrawingCell.cs/#L204"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/DataGridCustomDrawingCell.cs/#L227"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>Gets or sets text layout cache mode for this cell.</p>
@@ -1886,7 +2051,7 @@ Incrementing this value forces redraw for the custom drawing content.</p>
 
   <h3 id="Avalonia_Controls_DataGridCustomDrawingCell_TextTrimming" data-uid="Avalonia.Controls.DataGridCustomDrawingCell.TextTrimming">
   TextTrimming
-  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/DataGridCustomDrawingCell.cs/#L195"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/DataGridCustomDrawingCell.cs/#L218"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"></div>
@@ -1917,7 +2082,7 @@ Incrementing this value forces redraw for the custom drawing content.</p>
 
   <h3 id="Avalonia_Controls_DataGridCustomDrawingCell_Value" data-uid="Avalonia.Controls.DataGridCustomDrawingCell.Value">
   Value
-  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/DataGridCustomDrawingCell.cs/#L120"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/DataGridCustomDrawingCell.cs/#L143"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>Gets or sets the bound value used for rendering.</p>
@@ -1953,7 +2118,7 @@ Incrementing this value forces redraw for the custom drawing content.</p>
 
   <h3 id="Avalonia_Controls_DataGridCustomDrawingCell_ArrangeOverride_Avalonia_Size_" data-uid="Avalonia.Controls.DataGridCustomDrawingCell.ArrangeOverride(Avalonia.Size)">
   ArrangeOverride(Size)
-  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/DataGridCustomDrawingCell.cs/#L288"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/DataGridCustomDrawingCell.cs/#L410"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>Positions child elements as part of a layout pass.</p>
@@ -1992,7 +2157,7 @@ Incrementing this value forces redraw for the custom drawing content.</p>
 
   <h3 id="Avalonia_Controls_DataGridCustomDrawingCell_MeasureOverride_Avalonia_Size_" data-uid="Avalonia.Controls.DataGridCustomDrawingCell.MeasureOverride(Avalonia.Size)">
   MeasureOverride(Size)
-  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/DataGridCustomDrawingCell.cs/#L266"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/DataGridCustomDrawingCell.cs/#L373"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>Measures the control and its child elements as part of a layout pass.</p>
@@ -2031,7 +2196,7 @@ Incrementing this value forces redraw for the custom drawing content.</p>
 
   <h3 id="Avalonia_Controls_DataGridCustomDrawingCell_OnAttachedToVisualTree_Avalonia_VisualTreeAttachmentEventArgs_" data-uid="Avalonia.Controls.DataGridCustomDrawingCell.OnAttachedToVisualTree(Avalonia.VisualTreeAttachmentEventArgs)">
   OnAttachedToVisualTree(VisualTreeAttachmentEventArgs)
-  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/DataGridCustomDrawingCell.cs/#L345"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/DataGridCustomDrawingCell.cs/#L486"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>Called when the control is added to a rooted visual tree.</p>
@@ -2060,11 +2225,44 @@ Incrementing this value forces redraw for the custom drawing content.</p>
 
 
 
+  <a id="Avalonia_Controls_DataGridCustomDrawingCell_OnDataContextChanged_" data-uid="Avalonia.Controls.DataGridCustomDrawingCell.OnDataContextChanged*"></a>
+
+  <h3 id="Avalonia_Controls_DataGridCustomDrawingCell_OnDataContextChanged_System_EventArgs_" data-uid="Avalonia.Controls.DataGridCustomDrawingCell.OnDataContextChanged(System.EventArgs)">
+  OnDataContextChanged(EventArgs)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/DataGridCustomDrawingCell.cs/#L503"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Called when the <span class="xref">Avalonia.StyledElement.DataContext</span> property changes.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">protected override void OnDataContextChanged(EventArgs e)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>e</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.eventargs">EventArgs</a></dt>
+    <dd><p>The event args.</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+
   <a id="Avalonia_Controls_DataGridCustomDrawingCell_OnDetachedFromVisualTree_" data-uid="Avalonia.Controls.DataGridCustomDrawingCell.OnDetachedFromVisualTree*"></a>
 
   <h3 id="Avalonia_Controls_DataGridCustomDrawingCell_OnDetachedFromVisualTree_Avalonia_VisualTreeAttachmentEventArgs_" data-uid="Avalonia.Controls.DataGridCustomDrawingCell.OnDetachedFromVisualTree(Avalonia.VisualTreeAttachmentEventArgs)">
   OnDetachedFromVisualTree(VisualTreeAttachmentEventArgs)
-  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/DataGridCustomDrawingCell.cs/#L353"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/DataGridCustomDrawingCell.cs/#L495"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>Called when the control is removed from a rooted visual tree.</p>
@@ -2097,7 +2295,7 @@ Incrementing this value forces redraw for the custom drawing content.</p>
 
   <h3 id="Avalonia_Controls_DataGridCustomDrawingCell_OnPropertyChanged_Avalonia_AvaloniaPropertyChangedEventArgs_" data-uid="Avalonia.Controls.DataGridCustomDrawingCell.OnPropertyChanged(Avalonia.AvaloniaPropertyChangedEventArgs)">
   OnPropertyChanged(AvaloniaPropertyChangedEventArgs)
-  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/DataGridCustomDrawingCell.cs/#L360"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/DataGridCustomDrawingCell.cs/#L509"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>Called when a avalonia property changes on the object.</p>
@@ -2130,7 +2328,7 @@ Incrementing this value forces redraw for the custom drawing content.</p>
 
   <h3 id="Avalonia_Controls_DataGridCustomDrawingCell_Render_Avalonia_Media_DrawingContext_" data-uid="Avalonia.Controls.DataGridCustomDrawingCell.Render(Avalonia.Media.DrawingContext)">
   Render(DrawingContext)
-  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/DataGridCustomDrawingCell.cs/#L302"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/DataGridCustomDrawingCell.cs/#L429"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>Renders the visual to a <span class="xref">Avalonia.Media.DrawingContext</span>.</p>
@@ -2163,7 +2361,7 @@ Incrementing this value forces redraw for the custom drawing content.</p>
 </article>
 
         <div class="contribution d-print-none">
-          <a href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/DataGridCustomDrawingCell.cs/#L22" class="edit-link">Edit this page</a>
+          <a href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/DataGridCustomDrawingCell.cs/#L24" class="edit-link">Edit this page</a>
         </div>
 
 

@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+      <title>Transactional selection veto | ProDataGrid for Avalonia </title>
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <meta name="title" content="Transactional selection veto | ProDataGrid for Avalonia ">
+      
+      
+      <link rel="icon" href="../favicon.ico">
+      <link rel="stylesheet" href="../public/docfx.min.css">
+      <link rel="stylesheet" href="../public/main.css">
+      <meta name="docfx:navrel" content="../toc.html">
+      <meta name="docfx:tocrel" content="toc.html">
+      
+      
+      
+      
+      <meta name="docfx:docurl" content="https://github.com/wieslawsoltes/ProDataGrid/blob/master/docfx/articles/selection-changing.md/#L1">
+      <meta name="loc:inThisArticle" content="In this article">
+      <meta name="loc:searchResultsCount" content="{count} results for &quot;{query}&quot;">
+      <meta name="loc:searchNoResults" content="No results for &quot;{query}&quot;">
+      <meta name="loc:tocFilter" content="Filter by title">
+      <meta name="loc:nextArticle" content="Next">
+      <meta name="loc:prevArticle" content="Previous">
+      <meta name="loc:themeLight" content="Light">
+      <meta name="loc:themeDark" content="Dark">
+      <meta name="loc:themeAuto" content="Auto">
+      <meta name="loc:changeTheme" content="Change theme">
+      <meta name="loc:copy" content="Copy">
+      <meta name="loc:downloadPdf" content="Download PDF">
+
+      <script type="module" src="./../public/docfx.min.js"></script>
+
+      <script>
+        const theme = localStorage.getItem('theme') || 'auto'
+        document.documentElement.setAttribute('data-bs-theme', theme === 'auto' ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light') : theme)
+      </script>
+
+  </head>
+
+  <body class="tex2jax_ignore" data-layout="" data-yaml-mime="">
+    <header class="bg-body border-bottom">
+      <nav id="autocollapse" class="navbar navbar-expand-md" role="navigation">
+        <div class="container-xxl flex-nowrap">
+          <a class="navbar-brand" href="../index.html">
+            <img id="logo" class="svg" src="../images/logo.svg" alt="">
+            
+          </a>
+          <button class="btn btn-lg d-md-none border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navpanel" aria-controls="navpanel" aria-expanded="false" aria-label="Toggle navigation">
+            <i class="bi bi-three-dots"></i>
+          </button>
+          <div class="collapse navbar-collapse" id="navpanel">
+            <div id="navbar">
+            </div>
+          </div>
+        </div>
+      </nav>
+    </header>
+
+    <main class="container-xxl">
+      <div class="toc-offcanvas">
+        <div class="offcanvas-md offcanvas-start" tabindex="-1" id="tocOffcanvas" aria-labelledby="tocOffcanvasLabel">
+          <div class="offcanvas-header">
+            <h5 class="offcanvas-title" id="tocOffcanvasLabel">Table of Contents</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="offcanvas" data-bs-target="#tocOffcanvas" aria-label="Close"></button>
+          </div>
+          <div class="offcanvas-body">
+            <nav class="toc" id="toc"></nav>
+          </div>
+        </div>
+      </div>
+
+      <div class="content">
+        <div class="actionbar">
+          <button class="btn btn-lg border-0 d-md-none" type="button" data-bs-toggle="offcanvas" data-bs-target="#tocOffcanvas" aria-controls="tocOffcanvas" aria-expanded="false" aria-label="Show table of contents">
+            <i class="bi bi-list"></i>
+          </button>
+
+          <nav id="breadcrumb"></nav>
+        </div>
+
+        <article data-uid="">
+<h1 id="transactional-selection-veto">Transactional selection veto</h1>
+
+<p><code>DataGrid.SelectionChanging</code> exposes one complete selection proposal. For
+DataGrid-controlled operations, the event is raised before the grid changes
+selected rows, cells or columns, the current cell, selection anchor,
+collection-view currency, focus, or scroll position. Set <code>Cancel</code> to <code>true</code> to
+reject the entire proposal.</p>
+<p><code>DataGridSelectionChangingEventArgs.Guarantee</code> states which boundary applies.
+<code>AtomicPreflight</code> means none of the proposed DataGrid state has committed.
+<code>PostChangeReconciliation</code> means a caller-owned source, collection, or selection
+model published its change before the DataGrid could observe it; the grid is
+reconciling that external proposal with its last committed state.</p>
+<pre><code class="lang-csharp">grid.SelectionChanging += (_, e) =&gt;
+{
+    if (e.AddedItems.Any(item =&gt; !authorization.CanSelect(item)))
+    {
+        e.Cancel = true;
+    }
+};
+</code></pre>
+<p>The existing <code>SelectionChanged</code>, <code>SelectedCellsChanged</code>, and
+<code>SelectedColumnsChanged</code> events are raised only after an accepted proposal has
+committed. They are not raised for a vetoed proposal.</p>
+<h2 id="proposal-data">Proposal data</h2>
+<p>The event arguments contain:</p>
+<ul>
+<li><code>AddedItems</code> and <code>RemovedItems</code>, projected to the underlying data items;</li>
+<li><code>AddedRows</code> and <code>RemovedRows</code>, including row indexes and hierarchy context;</li>
+<li><code>AddedCells</code> and <code>RemovedCells</code>;</li>
+<li><code>AddedColumns</code> and <code>RemovedColumns</code> when a whole column becomes selected or
+unselected;</li>
+<li><code>ProposedCurrentItem</code>, <code>ProposedCurrentCell</code>, and <code>ProposedAnchor</code>;</li>
+<li><code>HierarchyNode</code> and the root-to-node <code>HierarchyPath</code> for a hierarchical
+current item;</li>
+<li><code>Source</code>, <code>Guarantee</code>, <code>IsUserInitiated</code>, and the triggering routed event when
+one exists.</li>
+</ul>
+<p><code>Source</code> is a flags value. Pointer range drags combine <code>Pointer</code> and
+<code>DragInteraction</code>. Keyboard navigation, commands such as select-all,
+programmatic properties and collections, items-source currency changes, and
+external <code>ISelectionModel</code> synchronization report their corresponding origin.</p>
+<p>For a materialized descendant hidden below a collapsed ancestor, the proposal
+contains an added row with <code>RowIndex == -1</code> and a complete hierarchy path. The
+event is raised before automatic ancestor expansion, so cancellation leaves the
+tree collapsed. The preview does not load or materialize children.</p>
+<h2 id="guarantee-by-origin">Guarantee by origin</h2>
+<p><code>Source</code> identifies why selection is changing. <code>Guarantee</code> identifies whether
+the DataGrid can preview the operation before its producer changes state. The
+same <code>Source</code> flag can therefore appear with different guarantees.</p>
+<table>
+<thead>
+<tr>
+<th>Origin or entry point</th>
+<th>Guarantee</th>
+<th>Boundary</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Pointer, keyboard, commands, row/column headers, range drag, and select-all</td>
+<td><code>AtomicPreflight</code></td>
+<td>The proposal precedes selection, current cell, anchor, currency, focus, capture/auto-scroll, and scrolling changes.</td>
+</tr>
+<tr>
+<td><code>SelectedItem</code>, <code>SelectedIndex</code>, <code>CurrentCell</code>, DataGrid-owned selected collections, row <code>IsSelected</code>, and selection-state restore</td>
+<td><code>AtomicPreflight</code></td>
+<td>The DataGrid computes and previews the complete proposal before committing it.</td>
+</tr>
+<tr>
+<td><code>ItemsSource</code> replacement and all externally initiated item-source/view notifications, including those entering through the built-in <code>DataGridCollectionView</code> boundary</td>
+<td><code>PostChangeReconciliation</code></td>
+<td>The upstream source or property change is already observable. The built-in view hook still produces one coherent proposal before its own selection/currency reconciliation.</td>
+</tr>
+<tr>
+<td>Incremental changes made directly to a caller-owned bound <code>SelectedItems</code>, <code>SelectedCells</code>, or <code>SelectedColumns</code> collection</td>
+<td><code>PostChangeReconciliation</code></td>
+<td>The external collection has already notified its observers; the DataGrid still exposes its last committed selection while it evaluates the proposal.</td>
+</tr>
+<tr>
+<td>Changes made directly to a caller-owned <code>ISelectionModel</code></td>
+<td><code>PostChangeReconciliation</code></td>
+<td>The model has already published its change; the DataGrid evaluates it before committing matching grid state.</td>
+</tr>
+<tr>
+<td>Custom collection views, hierarchy sources, or other external producers without a supported preflight hook</td>
+<td><code>PostChangeReconciliation</code></td>
+<td>The producer mutation is already observable, so the DataGrid can only reconcile it with committed grid state.</td>
+</tr>
+</tbody>
+</table>
+<p>For <code>AtomicPreflight</code>, cancellation commits none of the proposed DataGrid state
+and no post-selection event is raised. An accepted proposal commits first; the
+existing <code>SelectionChanged</code>, <code>SelectedCellsChanged</code>, and
+<code>SelectedColumnsChanged</code> events follow the final state.</p>
+<h2 id="external-producer-boundary">External-producer boundary</h2>
+<p>A DataGrid cannot run code before an arbitrary caller-owned collection,
+<code>ISelectionModel</code>, or custom view notifies its observers. It also cannot erase a
+notification those observers already received. Such proposals therefore report
+<code>PostChangeReconciliation</code> rather than claiming atomic preflight.</p>
+<p>During reconciliation, DataGrid selection, current cell, anchor, focus, and
+scrolling remain at their last committed values until the grid computes the
+coherent final state allowed by the changed producer. A veto synchronously
+restores a mutable external <em>selection</em> producer to that committed selection
+when supported. External observers can consequently see both the producer's
+original notification and the compensating notification. This is convergence
+after an external change, not rollback of external observation history.</p>
+<p>The guarantee concerns selection state. Vetoing selection after an item-source
+remove, reset, replacement, filter, or sort does not undo that data/view
+operation. Surviving selected items are reconciled by identity and their
+row/cell coordinates can change with the new view. A selected identity that is
+no longer present cannot be retained merely because the selection proposal was
+vetoed.</p>
+<p>Changing selection again from inside a <code>SelectionChanging</code> handler is not
+supported and throws <code>InvalidOperationException</code>. Schedule a follow-up change
+on the UI dispatcher after the handler returns when a replacement selection is
+required.</p>
+<h2 id="compatibility-and-performance">Compatibility and performance</h2>
+<p><code>SelectionChanging</code> is additive. Existing themes, templates, selection events,
+and retained/drawn cell behavior are unchanged. With no subscribers, proposal
+collections, hierarchy paths, and event arguments are not created; the normal
+selection and scrolling hot paths retain their previous allocation behavior.</p>
+<h2 id="mvvm-sample">MVVM sample</h2>
+<p>The <a href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/DataGridSample/Pages/HierarchyFeatureContractsPage.axaml">Hierarchy Feature Contracts sample</a>
+uses an attached behavior to map <code>SelectionChanging</code> to a ReactiveUI command.
+The command vetoes restricted items synchronously without putting an event
+handler in the view's code-behind, and the same page demonstrates how accepted
+and rejected proposals appear alongside lifecycle and filtering events.</p>
+
+</article>
+
+        <div class="contribution d-print-none">
+          <a href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/docfx/articles/selection-changing.md/#L1" class="edit-link">Edit this page</a>
+        </div>
+
+        <div class="next-article d-print-none border-top" id="nextArticle"></div>
+
+      </div>
+
+      <div class="affix">
+        <nav id="affix"></nav>
+      </div>
+    </main>
+
+
+    <footer class="border-top text-secondary">
+      <div class="container-xxl">
+        <div class="flex-fill">
+          <span>Made with <a href="https://dotnet.github.io/docfx">docfx</a></span>
+        </div>
+      </div>
+    </footer>
+  </body>
+</html>

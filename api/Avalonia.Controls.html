@@ -194,6 +194,11 @@ for triggering actions (e.g., Delete, Edit, View) per row.</p>
 </dd>
     </dl>
     <dl class="jumplist">
+      <dt><a class="xref" href="Avalonia.Controls.DataGridCellLifecycleEventArgs.html">DataGridCellLifecycleEventArgs</a></dt>
+      <dd><p>Provides data for cell realization lifecycle events.</p>
+</dd>
+    </dl>
+    <dl class="jumplist">
       <dt><a class="xref" href="Avalonia.Controls.DataGridCellPointerPressedEventArgs.html">DataGridCellPointerPressedEventArgs</a></dt>
       <dd><p>Provides information after the cell has been pressed.</p>
 </dd>
@@ -201,6 +206,11 @@ for triggering actions (e.g., Delete, Edit, View) per row.</p>
     <dl class="jumplist">
       <dt><a class="xref" href="Avalonia.Controls.DataGridCellState.html">DataGridCellState</a></dt>
       <dd></dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="Avalonia.Controls.DataGridCellValueChangedEventArgs.html">DataGridCellValueChangedEventArgs</a></dt>
+      <dd><p>Provides data for a committed grid-originated cell value change.</p>
+</dd>
     </dl>
     <dl class="jumplist">
       <dt><a class="xref" href="Avalonia.Controls.DataGridCheckBoxColumn.html">DataGridCheckBoxColumn</a></dt>
@@ -353,6 +363,16 @@ for editing date values.</p>
     <dl class="jumplist">
       <dt><a class="xref" href="Avalonia.Controls.DataGridDatePickerColumnDefinition.html">DataGridDatePickerColumnDefinition</a></dt>
       <dd></dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="Avalonia.Controls.DataGridDirectHierarchicalCell.html">DataGridDirectHierarchicalCell</a></dt>
+      <dd><p>A retained hierarchical cell that combines the DataGrid cell and expander presenter roles.</p>
+</dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="Avalonia.Controls.DataGridDirectTextCell.html">DataGridDirectTextCell</a></dt>
+      <dd><p>A retained, template-driven text cell that binds its display value directly to the cell.</p>
+</dd>
     </dl>
     <dl class="jumplist">
       <dt><a class="xref" href="Avalonia.Controls.DataGridFastPathMissingAccessorEventArgs.html">DataGridFastPathMissingAccessorEventArgs</a></dt>
@@ -659,8 +679,20 @@ and <a class="xref" href="Avalonia.Controls.DataGrid.html#Avalonia_Controls_Data
 </dd>
     </dl>
     <dl class="jumplist">
+      <dt><a class="xref" href="Avalonia.Controls.DataGridSelectionChangingEventArgs.html">DataGridSelectionChangingEventArgs</a></dt>
+      <dd><p>Provides a complete, cancellable selection proposal. <a class="xref" href="Avalonia.Controls.DataGridSelectionChangingEventArgs.html#Avalonia_Controls_DataGridSelectionChangingEventArgs_Guarantee">Guarantee</a> identifies
+whether the proposal is an atomic preflight or reconciliation of a change already
+published by a caller-owned producer.</p>
+</dd>
+    </dl>
+    <dl class="jumplist">
       <dt><a class="xref" href="Avalonia.Controls.DataGridSelectionOverlay.html">DataGridSelectionOverlay</a></dt>
       <dd></dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="Avalonia.Controls.DataGridSelectionRowInfo.html">DataGridSelectionRowInfo</a></dt>
+      <dd><p>Describes a row participating in a proposed selection delta.</p>
+</dd>
     </dl>
     <dl class="jumplist">
       <dt><a class="xref" href="Avalonia.Controls.DataGridSelectionState.html">DataGridSelectionState</a></dt>
@@ -832,6 +864,11 @@ Structs
       <dd><p>Represents the lengths of elements within the <a class="xref" href="Avalonia.Controls.DataGrid.html">DataGrid</a> control.</p>
 </dd>
     </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="Avalonia.Controls.DataGridSelectionAnchorInfo.html">DataGridSelectionAnchorInfo</a></dt>
+      <dd><p>Describes the proposed selection anchor.</p>
+</dd>
+    </dl>
     <h3 id="interfaces">
 Interfaces
 </h3>
@@ -945,6 +982,12 @@ Enums
 </dd>
     </dl>
     <dl class="jumplist">
+      <dt><a class="xref" href="Avalonia.Controls.DataGridCellValueChangeOrigin.html">DataGridCellValueChangeOrigin</a></dt>
+      <dd><p>Identifies the source of a committed value reported by
+<a class="xref" href="Avalonia.Controls.DataGrid.html#Avalonia_Controls_DataGrid_CellValueChanged">CellValueChanged</a>.</p>
+</dd>
+    </dl>
+    <dl class="jumplist">
       <dt><a class="xref" href="Avalonia.Controls.DataGridClipboardCopyMode.html">DataGridClipboardCopyMode</a></dt>
       <dd><p>Defines modes that indicates how DataGrid content is copied to the Clipboard.</p>
 </dd>
@@ -952,6 +995,11 @@ Enums
     <dl class="jumplist">
       <dt><a class="xref" href="Avalonia.Controls.DataGridClipboardExportFormat.html">DataGridClipboardExportFormat</a></dt>
       <dd><p>Defines formats that can be exported to the clipboard.</p>
+</dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="Avalonia.Controls.DataGridColumnDisplayMode.html">DataGridColumnDisplayMode</a></dt>
+      <dd><p>Selects how a supported column realizes its display cells.</p>
 </dd>
     </dl>
     <dl class="jumplist">
@@ -1024,6 +1072,12 @@ Enums
     <dl class="jumplist">
       <dt><a class="xref" href="Avalonia.Controls.DataGridSelectionChangeSource.html">DataGridSelectionChangeSource</a></dt>
       <dd><p>Describes the origin of a selection change.</p>
+</dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="Avalonia.Controls.DataGridSelectionChangingGuarantee.html">DataGridSelectionChangingGuarantee</a></dt>
+      <dd><p>Describes where a <a class="xref" href="Avalonia.Controls.DataGrid.html#Avalonia_Controls_DataGrid_SelectionChanging">SelectionChanging</a> proposal sits relative to
+the state change that produced it.</p>
 </dd>
     </dl>
     <dl class="jumplist">

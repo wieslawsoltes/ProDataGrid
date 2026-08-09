@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+      <title>Hierarchical UI Automation | ProDataGrid for Avalonia </title>
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <meta name="title" content="Hierarchical UI Automation | ProDataGrid for Avalonia ">
+      
+      
+      <link rel="icon" href="../favicon.ico">
+      <link rel="stylesheet" href="../public/docfx.min.css">
+      <link rel="stylesheet" href="../public/main.css">
+      <meta name="docfx:navrel" content="../toc.html">
+      <meta name="docfx:tocrel" content="toc.html">
+      
+      
+      
+      
+      <meta name="docfx:docurl" content="https://github.com/wieslawsoltes/ProDataGrid/blob/master/docfx/articles/hierarchical-automation.md/#L1">
+      <meta name="loc:inThisArticle" content="In this article">
+      <meta name="loc:searchResultsCount" content="{count} results for &quot;{query}&quot;">
+      <meta name="loc:searchNoResults" content="No results for &quot;{query}&quot;">
+      <meta name="loc:tocFilter" content="Filter by title">
+      <meta name="loc:nextArticle" content="Next">
+      <meta name="loc:prevArticle" content="Previous">
+      <meta name="loc:themeLight" content="Light">
+      <meta name="loc:themeDark" content="Dark">
+      <meta name="loc:themeAuto" content="Auto">
+      <meta name="loc:changeTheme" content="Change theme">
+      <meta name="loc:copy" content="Copy">
+      <meta name="loc:downloadPdf" content="Download PDF">
+
+      <script type="module" src="./../public/docfx.min.js"></script>
+
+      <script>
+        const theme = localStorage.getItem('theme') || 'auto'
+        document.documentElement.setAttribute('data-bs-theme', theme === 'auto' ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light') : theme)
+      </script>
+
+  </head>
+
+  <body class="tex2jax_ignore" data-layout="" data-yaml-mime="">
+    <header class="bg-body border-bottom">
+      <nav id="autocollapse" class="navbar navbar-expand-md" role="navigation">
+        <div class="container-xxl flex-nowrap">
+          <a class="navbar-brand" href="../index.html">
+            <img id="logo" class="svg" src="../images/logo.svg" alt="">
+            
+          </a>
+          <button class="btn btn-lg d-md-none border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navpanel" aria-controls="navpanel" aria-expanded="false" aria-label="Toggle navigation">
+            <i class="bi bi-three-dots"></i>
+          </button>
+          <div class="collapse navbar-collapse" id="navpanel">
+            <div id="navbar">
+            </div>
+          </div>
+        </div>
+      </nav>
+    </header>
+
+    <main class="container-xxl">
+      <div class="toc-offcanvas">
+        <div class="offcanvas-md offcanvas-start" tabindex="-1" id="tocOffcanvas" aria-labelledby="tocOffcanvasLabel">
+          <div class="offcanvas-header">
+            <h5 class="offcanvas-title" id="tocOffcanvasLabel">Table of Contents</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="offcanvas" data-bs-target="#tocOffcanvas" aria-label="Close"></button>
+          </div>
+          <div class="offcanvas-body">
+            <nav class="toc" id="toc"></nav>
+          </div>
+        </div>
+      </div>
+
+      <div class="content">
+        <div class="actionbar">
+          <button class="btn btn-lg border-0 d-md-none" type="button" data-bs-toggle="offcanvas" data-bs-target="#tocOffcanvas" aria-controls="tocOffcanvas" aria-expanded="false" aria-label="Show table of contents">
+            <i class="bi bi-list"></i>
+          </button>
+
+          <nav id="breadcrumb"></nav>
+        </div>
+
+        <article data-uid="">
+<h1 id="hierarchical-ui-automation">Hierarchical UI Automation</h1>
+
+<p>Hierarchical <code>DataGrid</code> rows expose the standard UI Automation
+Expand/Collapse pattern when the realized row represents a non-leaf
+<code>HierarchicalNode</code>. The grid keeps its existing selection-provider surface, so
+assistive technology can use expansion and row selection together.</p>
+<h2 id="grid-setup">Grid setup</h2>
+<p>No automation-specific template is required. Configure the hierarchy normally
+and give the grid and important columns useful accessible names:</p>
+<pre><code class="lang-xml">&lt;DataGrid AutomationProperties.Name=&quot;Project hierarchy&quot;
+          HierarchicalModel=&quot;{Binding Model}&quot;
+          HierarchicalRowsEnabled=&quot;True&quot;
+          SelectionUnit=&quot;FullRow&quot;
+          UseLogicalScrollable=&quot;True&quot; /&gt;
+</code></pre>
+<p>The <a href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/DataGridSample/Pages/HierarchyFeatureContractsPage.axaml">Hierarchy Feature Contracts sample</a>
+is an inspectable, retained-cell example with synchronous filtering, editable
+values, and transactional selection veto enabled at the same time.</p>
+<h2 id="provider-behavior">Provider behavior</h2>
+<ul>
+<li>A non-leaf row exposes <code>IExpandCollapseProvider</code>.</li>
+<li>A leaf row does not advertise an expand/collapse provider and reports the
+leaf state through an already obtained provider.</li>
+<li><code>Expand()</code> and <code>Collapse()</code> call the current <code>IHierarchicalModel</code>; they do not
+manipulate expander visuals.</li>
+<li>Collapsed and expanded nodes report the corresponding standard states.</li>
+<li>An async node that is loading reports <code>PartiallyExpanded</code> until loading
+completes.</li>
+<li>A disabled row rejects provider actions with the standard
+<code>ElementNotEnabledException</code>.</li>
+</ul>
+<p>Expansion-state changes raise the standard Expand/Collapse property-change
+notification. A visible-descendant change invalidates the grid automation
+children, including changes caused by expansion, collapse, refresh, filtering,
+sorting, and completed async loading.</p>
+<h2 id="virtualization-and-recycling">Virtualization and recycling</h2>
+<p>Automation identity follows the row's current hierarchy assignment. When a row
+container is recycled, its peer detaches from the old node and exposes provider
+state for the new node only. A queued worker-thread notification from the old
+node is ignored, while current node changes are marshalled to the UI thread.</p>
+<p><code>ISelectionProvider.GetSelection()</code> reports the complete row selection, not
+only rows that currently have realized containers. A selected virtualized or
+deep descendant is represented by a lightweight logical row peer. Creating
+that peer does not create a <code>DataGridRow</code>, cells, templates, or other visuals.
+Repeated queries return the same logical peer while the item remains selected
+and virtualized; once the row is realized, a subsequent query returns its real
+row peer.</p>
+<p>Logical row peers expose the same applicable row contracts as realized rows:</p>
+<ul>
+<li>row-selection operations still pass through the grid's selection validation
+and transactional veto pipeline;</li>
+<li>a non-leaf hierarchy node exposes <code>IExpandCollapseProvider</code> without requiring
+an expander visual;</li>
+<li>a leaf does not advertise the expand/collapse pattern; and</li>
+<li>disabled grids reject logical-peer actions with the standard
+<code>ElementNotEnabledException</code>.</li>
+</ul>
+<p>Automation clients should not cache a row provider across arbitrary scrolling,
+sorting, filtering, or source replacement. Re-query the grid after a structure
+change, just as for other virtualized item controls.</p>
+<p>Row-selection patterns are exposed for <code>FullRow</code>, <code>CellOrRowHeader</code>, and
+<code>CellOrRowOrColumnHeader</code> selection units. Cell-only selection does not claim a
+row-selection provider.</p>
+<h2 id="async-children">Async children</h2>
+<p>Calling <code>Expand()</code> can start the model's configured asynchronous child load.
+The call does not block until the data source completes. Clients should observe
+the Expand/Collapse state and structure-change notifications, then re-query the
+children. Loading does not manufacture a selectable placeholder automation
+item.</p>
+<h2 id="compatibility">Compatibility</h2>
+<p>The automation support is additive. Existing row and cell templates, generic
+themes, retained cells, drawn cells, keyboard navigation, and programmatic
+hierarchy APIs keep their existing contracts.</p>
+<h2 id="related-articles">Related articles</h2>
+<ul>
+<li><a href="hierarchical-model-end-to-end.html">Hierarchical Model: End-to-End Usage</a></li>
+<li><a href="selection-and-navigation.html">Selection and Navigation</a></li>
+<li><a href="selection-changing.html">Transactional Selection Veto</a></li>
+<li><a href="scrolling-virtualization.html">Scrolling and Virtualization</a></li>
+</ul>
+
+</article>
+
+        <div class="contribution d-print-none">
+          <a href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/docfx/articles/hierarchical-automation.md/#L1" class="edit-link">Edit this page</a>
+        </div>
+
+        <div class="next-article d-print-none border-top" id="nextArticle"></div>
+
+      </div>
+
+      <div class="affix">
+        <nav id="affix"></nav>
+      </div>
+    </main>
+
+
+    <footer class="border-top text-secondary">
+      <div class="container-xxl">
+        <div class="flex-fill">
+          <span>Made with <a href="https://dotnet.github.io/docfx">docfx</a></span>
+        </div>
+      </div>
+    </footer>
+  </body>
+</html>

@@ -85,7 +85,7 @@
 
 
   <h1 id="Avalonia_Controls_DataGridFiltering_DataGridFilteringAdapter" data-uid="Avalonia.Controls.DataGridFiltering.DataGridFilteringAdapter" class="text-break">
-Class DataGridFilteringAdapter  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/Filtering/DataGridFilteringAdapter.cs/#L22"><i class="bi bi-code-slash"></i></a>
+Class DataGridFilteringAdapter  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/Filtering/DataGridFilteringAdapter.cs/#L24"><i class="bi bi-code-slash"></i></a>
   </h1>
 
   <div class="facts text-secondary">
@@ -166,7 +166,7 @@ public class DataGridFilteringAdapter : IDisposable</code></pre>
 
   <h3 id="Avalonia_Controls_DataGridFiltering_DataGridFilteringAdapter__ctor_Avalonia_Controls_DataGridFiltering_IFilteringModel_System_Func_System_Collections_Generic_IEnumerable_Avalonia_Controls_DataGridColumn___System_Action_System_Action_" data-uid="Avalonia.Controls.DataGridFiltering.DataGridFilteringAdapter.#ctor(Avalonia.Controls.DataGridFiltering.IFilteringModel,System.Func{System.Collections.Generic.IEnumerable{Avalonia.Controls.DataGridColumn}},System.Action,System.Action)">
   DataGridFilteringAdapter(IFilteringModel, Func&lt;IEnumerable&lt;DataGridColumn&gt;&gt;, Action, Action)
-  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/Filtering/DataGridFilteringAdapter.cs/#L43"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/Filtering/DataGridFilteringAdapter.cs/#L54"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"></div>
@@ -207,7 +207,7 @@ public class DataGridFilteringAdapter : IDisposable</code></pre>
 
   <h3 id="Avalonia_Controls_DataGridFiltering_DataGridFilteringAdapter_View" data-uid="Avalonia.Controls.DataGridFiltering.DataGridFilteringAdapter.View">
   View
-  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/Filtering/DataGridFilteringAdapter.cs/#L71"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/Filtering/DataGridFilteringAdapter.cs/#L116"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"></div>
@@ -242,7 +242,7 @@ public class DataGridFilteringAdapter : IDisposable</code></pre>
 
   <h3 id="Avalonia_Controls_DataGridFiltering_DataGridFilteringAdapter_AttachView_Avalonia_Collections_IDataGridCollectionView_" data-uid="Avalonia.Controls.DataGridFiltering.DataGridFilteringAdapter.AttachView(Avalonia.Collections.IDataGridCollectionView)">
   AttachView(IDataGridCollectionView)
-  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/Filtering/DataGridFilteringAdapter.cs/#L78"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/Filtering/DataGridFilteringAdapter.cs/#L123"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"></div>
@@ -273,7 +273,7 @@ public class DataGridFilteringAdapter : IDisposable</code></pre>
 
   <h3 id="Avalonia_Controls_DataGridFiltering_DataGridFilteringAdapter_Dispose" data-uid="Avalonia.Controls.DataGridFiltering.DataGridFilteringAdapter.Dispose">
   Dispose()
-  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/Filtering/DataGridFilteringAdapter.cs/#L106"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/Filtering/DataGridFilteringAdapter.cs/#L152"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.</p>
@@ -281,9 +281,99 @@ public class DataGridFilteringAdapter : IDisposable</code></pre>
   <div class="markdown level1 conceptual"></div>
 
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public void Dispose()</code></pre>
+    <pre><code class="lang-csharp hljs">public virtual void Dispose()</code></pre>
   </div>
 
+
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Avalonia_Controls_DataGridFiltering_DataGridFilteringAdapter_InvokeAfterViewRefresh_" data-uid="Avalonia.Controls.DataGridFiltering.DataGridFilteringAdapter.InvokeAfterViewRefresh*"></a>
+
+  <h3 id="Avalonia_Controls_DataGridFiltering_DataGridFilteringAdapter_InvokeAfterViewRefresh" data-uid="Avalonia.Controls.DataGridFiltering.DataGridFilteringAdapter.InvokeAfterViewRefresh">
+  InvokeAfterViewRefresh()
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/Filtering/DataGridFilteringAdapter.cs/#L110"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Invokes the owning grid's post-refresh lifecycle callback, when configured.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">protected void InvokeAfterViewRefresh()</code></pre>
+  </div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Avalonia_Controls_DataGridFiltering_DataGridFilteringAdapter_InvokeBeforeViewRefresh_" data-uid="Avalonia.Controls.DataGridFiltering.DataGridFilteringAdapter.InvokeBeforeViewRefresh*"></a>
+
+  <h3 id="Avalonia_Controls_DataGridFiltering_DataGridFilteringAdapter_InvokeBeforeViewRefresh" data-uid="Avalonia.Controls.DataGridFiltering.DataGridFilteringAdapter.InvokeBeforeViewRefresh">
+  InvokeBeforeViewRefresh()
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/Filtering/DataGridFilteringAdapter.cs/#L102"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Invokes the owning grid's pre-refresh lifecycle callback, when configured.
+Derived adapters should pair this with <a class="xref" href="Avalonia.Controls.DataGridFiltering.DataGridFilteringAdapter.html#Avalonia_Controls_DataGridFiltering_DataGridFilteringAdapter_InvokeAfterViewRefresh">InvokeAfterViewRefresh()</a>
+around refreshes initiated outside descriptor application.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">protected void InvokeBeforeViewRefresh()</code></pre>
+  </div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Avalonia_Controls_DataGridFiltering_DataGridFilteringAdapter_PostToViewThread_" data-uid="Avalonia.Controls.DataGridFiltering.DataGridFilteringAdapter.PostToViewThread*"></a>
+
+  <h3 id="Avalonia_Controls_DataGridFiltering_DataGridFilteringAdapter_PostToViewThread_System_Action_" data-uid="Avalonia.Controls.DataGridFiltering.DataGridFilteringAdapter.PostToViewThread(System.Action)">
+  PostToViewThread(Action)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/Filtering/DataGridFilteringAdapter.cs/#L92"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Posts work across the adapter's view-affinity boundary. Derived adapters use the
+same boundary so tests and headless hosts cannot accidentally execute producer
+callbacks inline merely because the dispatcher reports access.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">protected void PostToViewThread(Action action)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>action</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.action">Action</a></dt>
+    <dd></dd>
+  </dl>
 
 
 
@@ -300,7 +390,7 @@ public class DataGridFilteringAdapter : IDisposable</code></pre>
 
   <h3 id="Avalonia_Controls_DataGridFiltering_DataGridFilteringAdapter_TryApplyModelToView_System_Collections_Generic_IReadOnlyList_Avalonia_Controls_DataGridFiltering_FilteringDescriptor__System_Collections_Generic_IReadOnlyList_Avalonia_Controls_DataGridFiltering_FilteringDescriptor__System_Boolean__" data-uid="Avalonia.Controls.DataGridFiltering.DataGridFilteringAdapter.TryApplyModelToView(System.Collections.Generic.IReadOnlyList{Avalonia.Controls.DataGridFiltering.FilteringDescriptor},System.Collections.Generic.IReadOnlyList{Avalonia.Controls.DataGridFiltering.FilteringDescriptor},System.Boolean@)">
   TryApplyModelToView(IReadOnlyList&lt;FilteringDescriptor&gt;, IReadOnlyList&lt;FilteringDescriptor&gt;, out bool)
-  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/Filtering/DataGridFilteringAdapter.cs/#L115"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/Filtering/DataGridFilteringAdapter.cs/#L161"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"></div>
@@ -340,7 +430,7 @@ public class DataGridFilteringAdapter : IDisposable</code></pre>
 </article>
 
         <div class="contribution d-print-none">
-          <a href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/Filtering/DataGridFilteringAdapter.cs/#L22" class="edit-link">Edit this page</a>
+          <a href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/Filtering/DataGridFilteringAdapter.cs/#L24" class="edit-link">Edit this page</a>
         </div>
 
 

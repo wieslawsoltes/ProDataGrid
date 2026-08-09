@@ -137,7 +137,7 @@ public IDataGridRowDropHandler DropHandler { get; } = new CustomRowDropHandler()
 </ul>
 <p><code>ActiveRowDragSession</code> is a read-only direct property on <code>DataGrid</code>. It is <code>null</code> when no drag is active.</p>
 <h2 id="lifecycle-events">Lifecycle Events</h2>
-<p>Row drag/drop now exposes the full lifecycle:</p>
+<p>Row drag/drop exposes the full lifecycle:</p>
 <ul>
 <li><code>RowDragStarting</code></li>
 <li><code>RowDragStarted</code></li>
@@ -145,7 +145,7 @@ public IDataGridRowDropHandler DropHandler { get; } = new CustomRowDropHandler()
 <li><code>RowDragCanceled</code></li>
 <li><code>RowDragCompleted</code></li>
 </ul>
-<p><code>RowDragCompleted</code> now means a committed drop. Canceled or aborted drags raise only <code>RowDragCanceled</code>.</p>
+<p><code>RowDragCompleted</code> means a committed drop. Canceled or aborted drags raise only <code>RowDragCanceled</code>.</p>
 <h2 id="live-operation-recalculation">Live Operation Recalculation</h2>
 <p><code>IDataGridRowDropHandler.Validate</code> is called continuously during drag-over. The handler receives a <code>DataGridRowDropEventArgs</code> instance with:</p>
 <ul>

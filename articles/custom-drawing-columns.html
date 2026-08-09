@@ -92,6 +92,38 @@
 <li>shared text layout caching for high-frequency text scenarios.</li>
 </ul>
 <p>Use this column when you need lower render overhead than template columns and you want full control over drawing behavior.</p>
+<h2 id="built-in-drawn-display-mode">Built-in drawn display mode</h2>
+<p>Ordinary text, numeric, progress, and deterministically sized image columns can opt into
+the same coalesced drawing-cell path without changing column type:</p>
+<pre><code class="lang-xml">&lt;DataGridTextColumn Header=&quot;Name&quot;
+                    Binding=&quot;{Binding Name}&quot;
+                    DisplayMode=&quot;Drawn&quot; /&gt;
+&lt;DataGridNumericColumn Header=&quot;Amount&quot;
+                       Binding=&quot;{Binding Amount}&quot;
+                       FormatString=&quot;N2&quot;
+                       DisplayMode=&quot;Drawn&quot; /&gt;
+&lt;DataGridProgressBarColumn Header=&quot;Progress&quot;
+                           Binding=&quot;{Binding Progress}&quot;
+                           Minimum=&quot;0&quot;
+                           Maximum=&quot;100&quot;
+                           DisplayMode=&quot;Drawn&quot; /&gt;
+&lt;DataGridImageColumn Header=&quot;Icon&quot;
+                     Binding=&quot;{Binding Icon}&quot;
+                     ImageWidth=&quot;16&quot;
+                     ImageHeight=&quot;16&quot;
+                     DisplayMode=&quot;Drawn&quot; /&gt;
+</code></pre>
+<p><code>Retained</code> remains the default. The drawn display cell is still the real grid cell, so
+selection, hit testing, frozen regions, validation, automation, clipboard, search,
+conditional formatting, tooltips, context menus, and diagnostics retain their normal
+container. Only the nested display control is removed. When editing begins, text,
+numeric, and editable image columns materialize their normal retained editor; commit or
+cancel returns the same container to drawing mode.</p>
+<p>Progress columns with <code>ShowProgressText=True</code> and image columns without explicit
+<code>ImageWidth</code> and <code>ImageHeight</code> fall back to retained display because those configurations
+need template measurement/content semantics. Other interactive and templated columns
+remain retained. <code>DataGridColumnDefinition.DisplayMode</code> provides the equivalent opt-in
+for <code>ColumnDefinitionsSource</code>.</p>
 <h2 id="api-surface">API Surface</h2>
 <p>Core types:</p>
 <ul>
@@ -173,6 +205,18 @@
 <td><code>int</code></td>
 <td><code>0</code></td>
 <td>Increment to force measure/arrange + redraw of realized custom drawing display cells.</td>
+</tr>
+<tr>
+<td><code>UseDirectValueAccessor</code></td>
+<td><code>bool</code></td>
+<td><code>false</code></td>
+<td>Uses compatible typed accessor metadata directly instead of creating a display binding expression.</td>
+</tr>
+<tr>
+<td><code>TrackDirectValueChanges</code></td>
+<td><code>bool</code></td>
+<td><code>true</code></td>
+<td>Subscribes direct-accessor cells to row-item property changes; disable only for immutable values.</td>
 </tr>
 <tr>
 <td><code>FontFamily</code>, <code>FontSize</code>, <code>FontStyle</code>, <code>FontWeight</code>, <code>FontStretch</code>, <code>Foreground</code>, <code>TextAlignment</code>, <code>TextTrimming</code></td>
@@ -324,7 +368,9 @@ public MyViewModel(IDataGridCellDrawOperationFactory factory)
             DrawOperationFactory = factory,
             TextLayoutCacheMode = DataGridCustomDrawingTextLayoutCacheMode.Shared,
             SharedTextLayoutCacheCapacity = 4096,
-            DrawOperationLayoutFastPath = true
+            DrawOperationLayoutFastPath = true,
+            UseDirectValueAccessor = true,
+            TrackDirectValueChanges = false
         }
     };
 }
@@ -349,8 +395,14 @@ var definition = builder.CustomDrawing(
         d.TextLayoutCacheMode = DataGridCustomDrawingTextLayoutCacheMode.Shared;
         d.SharedTextLayoutCacheCapacity = 4096;
         d.DrawOperationLayoutFastPath = true;
+        d.UseDirectValueAccessor = true;
+        d.TrackDirectValueChanges = false;
     });
 </code></pre>
+<p>The direct accessor option requires compatible typed metadata, such as the accessor
+created by <code>DataGridBindingDefinition</code> or the typed builder. Keep change tracking at
+its default for mutable rows. Unsupported bindings preserve the normal Avalonia
+binding path.</p>
 <h2 id="text-layout-caching">Text Layout Caching</h2>
 <p><code>TextLayoutCacheMode</code> controls <code>FormattedText</code> reuse:</p>
 <ul>
@@ -434,7 +486,7 @@ var definition = builder.CustomDrawing(
 <h2 id="explicit-invalidation-for-custom-draw">Explicit Invalidation for Custom Draw</h2>
 <p>When draw output depends on external mutable state (animation phase, external diagnostics values, etc.) and bound row values do not change, use explicit invalidation.</p>
 <h3 id="column-api">Column API</h3>
-<p><code>DataGridCustomDrawingColumn</code> now exposes:</p>
+<p><code>DataGridCustomDrawingColumn</code> exposes:</p>
 <ul>
 <li><code>InvalidateCustomDrawingCells(bool invalidateMeasure = false, bool clearSharedTextLayoutCache = false)</code></li>
 <li><code>RenderInvalidationToken</code></li>

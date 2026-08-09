@@ -85,7 +85,7 @@
 
 
   <h1 id="Avalonia_Controls_DataGridCell" data-uid="Avalonia.Controls.DataGridCell" class="text-break">
-Class DataGridCell  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/DataGridCell.cs/#L26"><i class="bi bi-code-slash"></i></a>
+Class DataGridCell  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/DataGridCell.cs/#L29"><i class="bi bi-code-slash"></i></a>
   </h1>
 
   <div class="facts text-secondary">
@@ -144,6 +144,14 @@ public class DataGridCell : ContentControl, INotifyPropertyChanged, IDataContext
     </dd>
   </dl>
 
+  <dl class="typelist derived">
+    <dt>Derived</dt>
+    <dd>
+      <div><a class="xref" href="Avalonia.Controls.DataGridCustomDrawingCell.html">DataGridCustomDrawingCell</a></div>
+      <div><a class="xref" href="Avalonia.Controls.DataGridDirectHierarchicalCell.html">DataGridDirectHierarchicalCell</a></div>
+      <div><a class="xref" href="Avalonia.Controls.DataGridDirectTextCell.html">DataGridDirectTextCell</a></div>
+    </dd>
+  </dl>
 
   <dl class="typelist inheritedMembers">
     <dt>Inherited Members</dt>
@@ -159,9 +167,6 @@ public class DataGridCell : ContentControl, INotifyPropertyChanged, IDataContext
     </div>
     <div>
       <span class="xref">ContentControl.VerticalContentAlignmentProperty</span>
-    </div>
-    <div>
-      <span class="xref">ContentControl.OnPropertyChanged(AvaloniaPropertyChangedEventArgs)</span>
     </div>
     <div>
       <span class="xref">ContentControl.RegisterContentPresenter(ContentPresenter)</span>
@@ -524,9 +529,6 @@ public class DataGridCell : ContentControl, INotifyPropertyChanged, IDataContext
       <span class="xref">InputElement.OnAccessKey(RoutedEventArgs)</span>
     </div>
     <div>
-      <span class="xref">InputElement.OnGettingFocus(FocusChangingEventArgs)</span>
-    </div>
-    <div>
       <span class="xref">InputElement.OnLosingFocus(FocusChangingEventArgs)</span>
     </div>
     <div>
@@ -806,13 +808,7 @@ public class DataGridCell : ContentControl, INotifyPropertyChanged, IDataContext
       <span class="xref">Layoutable.MeasureCore(Size)</span>
     </div>
     <div>
-      <span class="xref">Layoutable.MeasureOverride(Size)</span>
-    </div>
-    <div>
       <span class="xref">Layoutable.ArrangeCore(Rect)</span>
-    </div>
-    <div>
-      <span class="xref">Layoutable.ArrangeOverride(Size)</span>
     </div>
     <div>
       <span class="xref">Layoutable.OnMeasureInvalidated()</span>
@@ -915,9 +911,6 @@ public class DataGridCell : ContentControl, INotifyPropertyChanged, IDataContext
     </div>
     <div>
       <span class="xref">Visual.InvalidateVisual()</span>
-    </div>
-    <div>
-      <span class="xref">Visual.Render(DrawingContext)</span>
     </div>
     <div>
       <span class="xref">Visual.AffectsRender&lt;T&gt;(params AvaloniaProperty[])</span>
@@ -1237,7 +1230,7 @@ public class DataGridCell : ContentControl, INotifyPropertyChanged, IDataContext
 
   <h3 id="Avalonia_Controls_DataGridCell__ctor" data-uid="Avalonia.Controls.DataGridCell.#ctor">
   DataGridCell()
-  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/DataGridCell.cs/#L94"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/DataGridCell.cs/#L134"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"></div>
@@ -1266,7 +1259,7 @@ public class DataGridCell : ContentControl, INotifyPropertyChanged, IDataContext
 
   <h3 id="Avalonia_Controls_DataGridCell_IsValidProperty" data-uid="Avalonia.Controls.DataGridCell.IsValidProperty">
   IsValidProperty
-  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/DataGridCell.cs/#L63"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/DataGridCell.cs/#L80"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"></div>
@@ -1296,7 +1289,7 @@ public class DataGridCell : ContentControl, INotifyPropertyChanged, IDataContext
 
   <h3 id="Avalonia_Controls_DataGridCell_OwningColumnProperty" data-uid="Avalonia.Controls.DataGridCell.OwningColumnProperty">
   OwningColumnProperty
-  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/DataGridCell.cs/#L73"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/DataGridCell.cs/#L90"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"></div>
@@ -1326,7 +1319,7 @@ public class DataGridCell : ContentControl, INotifyPropertyChanged, IDataContext
 
   <h3 id="Avalonia_Controls_DataGridCell_OwningRowProperty" data-uid="Avalonia.Controls.DataGridCell.OwningRowProperty">
   OwningRowProperty
-  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/DataGridCell.cs/#L79"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/DataGridCell.cs/#L96"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"></div>
@@ -1354,9 +1347,71 @@ public class DataGridCell : ContentControl, INotifyPropertyChanged, IDataContext
 
 
 
+  <h3 id="Avalonia_Controls_DataGridCell_UseDirectChromeProperty" data-uid="Avalonia.Controls.DataGridCell.UseDirectChromeProperty">
+  UseDirectChromeProperty
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/DataGridCell.cs/#L105"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Defines the <a class="xref" href="Avalonia.Controls.DataGridCell.html#Avalonia_Controls_DataGridCell_UseDirectChrome">UseDirectChrome</a> property.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static readonly StyledProperty&lt;bool&gt; UseDirectChromeProperty</code></pre>
+  </div>
+
+
+
+
+  <h4 class="section">Field Value</h4>
+  <dl class="parameters">
+    <dt><span class="xref">StyledProperty</span>&lt;<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a>&gt;</dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+  <h3 id="Avalonia_Controls_DataGridCell_UseDirectContentHostProperty" data-uid="Avalonia.Controls.DataGridCell.UseDirectContentHostProperty">
+  UseDirectContentHostProperty
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/DataGridCell.cs/#L111"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Defines the <a class="xref" href="Avalonia.Controls.DataGridCell.html#Avalonia_Controls_DataGridCell_UseDirectContentHost">UseDirectContentHost</a> property.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static readonly StyledProperty&lt;bool&gt; UseDirectContentHostProperty</code></pre>
+  </div>
+
+
+
+
+  <h4 class="section">Field Value</h4>
+  <dl class="parameters">
+    <dt><span class="xref">StyledProperty</span>&lt;<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a>&gt;</dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
   <h3 id="Avalonia_Controls_DataGridCell_ValidationSeverityProperty" data-uid="Avalonia.Controls.DataGridCell.ValidationSeverityProperty">
   ValidationSeverityProperty
-  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/DataGridCell.cs/#L68"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/DataGridCell.cs/#L85"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"></div>
@@ -1391,7 +1446,7 @@ public class DataGridCell : ContentControl, INotifyPropertyChanged, IDataContext
 
   <h3 id="Avalonia_Controls_DataGridCell_IsValid" data-uid="Avalonia.Controls.DataGridCell.IsValid">
   IsValid
-  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/DataGridCell.cs/#L97"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/DataGridCell.cs/#L137"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"></div>
@@ -1422,7 +1477,7 @@ public class DataGridCell : ContentControl, INotifyPropertyChanged, IDataContext
 
   <h3 id="Avalonia_Controls_DataGridCell_OwningColumn" data-uid="Avalonia.Controls.DataGridCell.OwningColumn">
   OwningColumn
-  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/DataGridCell.cs/#L112"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/DataGridCell.cs/#L177"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>Gets the column that owns this cell.</p>
@@ -1454,7 +1509,7 @@ public class DataGridCell : ContentControl, INotifyPropertyChanged, IDataContext
 
   <h3 id="Avalonia_Controls_DataGridCell_OwningRow" data-uid="Avalonia.Controls.DataGridCell.OwningRow">
   OwningRow
-  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/DataGridCell.cs/#L128"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/DataGridCell.cs/#L193"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>Gets the row that owns this cell.</p>
@@ -1482,11 +1537,82 @@ public class DataGridCell : ContentControl, INotifyPropertyChanged, IDataContext
 
 
 
+  <a id="Avalonia_Controls_DataGridCell_UseDirectChrome_" data-uid="Avalonia.Controls.DataGridCell.UseDirectChrome*"></a>
+
+  <h3 id="Avalonia_Controls_DataGridCell_UseDirectChrome" data-uid="Avalonia.Controls.DataGridCell.UseDirectChrome">
+  UseDirectChrome
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/DataGridCell.cs/#L157"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Gets or sets whether the cell paints its background, border, and vertical grid line
+directly instead of requiring those chrome visuals in its control template.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public bool UseDirectChrome { get; set; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+  <h4 class="section" id="Avalonia_Controls_DataGridCell_UseDirectChrome_remarks">Remarks</h4>
+  <div class="markdown level1 remarks"><p>This is an opt-in template optimization. A theme that enables it should avoid drawing
+the same chrome in the template.</p>
+</div>
+
+
+
+
+  <a id="Avalonia_Controls_DataGridCell_UseDirectContentHost_" data-uid="Avalonia.Controls.DataGridCell.UseDirectContentHost*"></a>
+
+  <h3 id="Avalonia_Controls_DataGridCell_UseDirectContentHost" data-uid="Avalonia.Controls.DataGridCell.UseDirectContentHost">
+  UseDirectContentHost
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/DataGridCell.cs/#L168"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Gets or sets whether generated retained control content is hosted directly by the
+cell instead of through a nested <span class="xref">Avalonia.Controls.Presenters.ContentPresenter</span>.
+Column templates and editors remain ordinary retained Avalonia controls.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public bool UseDirectContentHost { get; set; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
   <a id="Avalonia_Controls_DataGridCell_ValidationSeverity_" data-uid="Avalonia.Controls.DataGridCell.ValidationSeverity*"></a>
 
   <h3 id="Avalonia_Controls_DataGridCell_ValidationSeverity" data-uid="Avalonia.Controls.DataGridCell.ValidationSeverity">
   ValidationSeverity
-  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/DataGridCell.cs/#L103"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/DataGridCell.cs/#L143"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"></div>
@@ -1517,11 +1643,89 @@ public class DataGridCell : ContentControl, INotifyPropertyChanged, IDataContext
 </h2>
 
 
+  <a id="Avalonia_Controls_DataGridCell_ArrangeOverride_" data-uid="Avalonia.Controls.DataGridCell.ArrangeOverride*"></a>
+
+  <h3 id="Avalonia_Controls_DataGridCell_ArrangeOverride_Avalonia_Size_" data-uid="Avalonia.Controls.DataGridCell.ArrangeOverride(Avalonia.Size)">
+  ArrangeOverride(Size)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/DataGridCell.cs/#L363"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Positions child elements as part of a layout pass.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">protected override Size ArrangeOverride(Size finalSize)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>finalSize</code> <span class="xref">Size</span></dt>
+    <dd><p>The size available to the control.</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><span class="xref">Size</span></dt>
+    <dd><p>The actual size used.</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Avalonia_Controls_DataGridCell_MeasureOverride_" data-uid="Avalonia.Controls.DataGridCell.MeasureOverride*"></a>
+
+  <h3 id="Avalonia_Controls_DataGridCell_MeasureOverride_Avalonia_Size_" data-uid="Avalonia.Controls.DataGridCell.MeasureOverride(Avalonia.Size)">
+  MeasureOverride(Size)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/DataGridCell.cs/#L351"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Measures the control and its child elements as part of a layout pass.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">protected override Size MeasureOverride(Size availableSize)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>availableSize</code> <span class="xref">Size</span></dt>
+    <dd><p>The size available to the control.</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><span class="xref">Size</span></dt>
+    <dd><p>The desired size for the control.</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
   <a id="Avalonia_Controls_DataGridCell_OnApplyTemplate_" data-uid="Avalonia.Controls.DataGridCell.OnApplyTemplate*"></a>
 
   <h3 id="Avalonia_Controls_DataGridCell_OnApplyTemplate_Avalonia_Controls_Primitives_TemplateAppliedEventArgs_" data-uid="Avalonia.Controls.DataGridCell.OnApplyTemplate(Avalonia.Controls.Primitives.TemplateAppliedEventArgs)">
   OnApplyTemplate(TemplateAppliedEventArgs)
-  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/DataGridCell.cs/#L221"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/DataGridCell.cs/#L332"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>Builds the visual tree for the cell control when a new template is applied.</p>
@@ -1553,7 +1757,7 @@ public class DataGridCell : ContentControl, INotifyPropertyChanged, IDataContext
 
   <h3 id="Avalonia_Controls_DataGridCell_OnCreateAutomationPeer" data-uid="Avalonia.Controls.DataGridCell.OnCreateAutomationPeer">
   OnCreateAutomationPeer()
-  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/DataGridCell.cs/#L213"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/DataGridCell.cs/#L278"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>Returns a new, type-specific <span class="xref">Avalonia.Automation.Peers.AutomationPeer</span> implementation for the control.</p>
@@ -1582,11 +1786,42 @@ public class DataGridCell : ContentControl, INotifyPropertyChanged, IDataContext
 
 
 
+  <a id="Avalonia_Controls_DataGridCell_OnGettingFocus_" data-uid="Avalonia.Controls.DataGridCell.OnGettingFocus*"></a>
+
+  <h3 id="Avalonia_Controls_DataGridCell_OnGettingFocus_Avalonia_Input_FocusChangingEventArgs_" data-uid="Avalonia.Controls.DataGridCell.OnGettingFocus(Avalonia.Input.FocusChangingEventArgs)">
+  OnGettingFocus(FocusChangingEventArgs)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/DataGridCell.cs/#L451"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">protected override void OnGettingFocus(FocusChangingEventArgs e)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>e</code> <span class="xref">FocusChangingEventArgs</span></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+
   <a id="Avalonia_Controls_DataGridCell_OnPointerEntered_" data-uid="Avalonia.Controls.DataGridCell.OnPointerEntered*"></a>
 
   <h3 id="Avalonia_Controls_DataGridCell_OnPointerEntered_Avalonia_Input_PointerEventArgs_" data-uid="Avalonia.Controls.DataGridCell.OnPointerEntered(Avalonia.Input.PointerEventArgs)">
   OnPointerEntered(PointerEventArgs)
-  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/DataGridCell.cs/#L236"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/DataGridCell.cs/#L432"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>Invoked when an unhandled <span class="xref">Avalonia.Input.InputElement.PointerEnteredEvent</span> reaches an element in its
@@ -1621,7 +1856,7 @@ for this event.</p>
 
   <h3 id="Avalonia_Controls_DataGridCell_OnPointerExited_Avalonia_Input_PointerEventArgs_" data-uid="Avalonia.Controls.DataGridCell.OnPointerExited(Avalonia.Input.PointerEventArgs)">
   OnPointerExited(PointerEventArgs)
-  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/DataGridCell.cs/#L245"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/DataGridCell.cs/#L441"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>Invoked when an unhandled <span class="xref">Avalonia.Input.InputElement.PointerExitedEvent</span> reaches an element in its
@@ -1652,11 +1887,77 @@ for this event.</p>
 
 
 
+  <a id="Avalonia_Controls_DataGridCell_OnPropertyChanged_" data-uid="Avalonia.Controls.DataGridCell.OnPropertyChanged*"></a>
+
+  <h3 id="Avalonia_Controls_DataGridCell_OnPropertyChanged_Avalonia_AvaloniaPropertyChangedEventArgs_" data-uid="Avalonia.Controls.DataGridCell.OnPropertyChanged(Avalonia.AvaloniaPropertyChangedEventArgs)">
+  OnPropertyChanged(AvaloniaPropertyChangedEventArgs)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/DataGridCell.cs/#L299"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Called when a avalonia property changes on the object.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">protected override void OnPropertyChanged(AvaloniaPropertyChangedEventArgs change)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>change</code> <span class="xref">AvaloniaPropertyChangedEventArgs</span></dt>
+    <dd><p>The property change details.</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Avalonia_Controls_DataGridCell_Render_" data-uid="Avalonia.Controls.DataGridCell.Render*"></a>
+
+  <h3 id="Avalonia_Controls_DataGridCell_Render_Avalonia_Media_DrawingContext_" data-uid="Avalonia.Controls.DataGridCell.Render(Avalonia.Media.DrawingContext)">
+  Render(DrawingContext)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/DataGridCell.cs/#L284"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Renders the visual to a <span class="xref">Avalonia.Media.DrawingContext</span>.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public override void Render(DrawingContext context)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>context</code> <span class="xref">DrawingContext</span></dt>
+    <dd><p>The drawing context.</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+
 
 </article>
 
         <div class="contribution d-print-none">
-          <a href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/DataGridCell.cs/#L26" class="edit-link">Edit this page</a>
+          <a href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/DataGridCell.cs/#L29" class="edit-link">Edit this page</a>
         </div>
 
 

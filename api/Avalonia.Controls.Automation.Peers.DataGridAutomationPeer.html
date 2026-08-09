@@ -85,7 +85,7 @@
 
 
   <h1 id="Avalonia_Controls_Automation_Peers_DataGridAutomationPeer" data-uid="Avalonia.Controls.Automation.Peers.DataGridAutomationPeer" class="text-break">
-Class DataGridAutomationPeer  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/Automation/Peers/DataGridAutomationPeer.cs/#L6"><i class="bi bi-code-slash"></i></a>
+Class DataGridAutomationPeer  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/Automation/Peers/DataGridAutomationPeer.cs/#L14"><i class="bi bi-code-slash"></i></a>
   </h1>
 
   <div class="facts text-secondary">
@@ -97,7 +97,7 @@ Class DataGridAutomationPeer  <a class="header-action link-secondary" title="Vie
   <div class="markdown conceptual"></div>
 
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public class DataGridAutomationPeer : ControlAutomationPeer</code></pre>
+    <pre><code class="lang-csharp hljs">public class DataGridAutomationPeer : ControlAutomationPeer, ISelectionProvider</code></pre>
   </div>
 
 
@@ -113,6 +113,12 @@ Class DataGridAutomationPeer  <a class="header-action link-secondary" title="Vie
     </dd>
   </dl>
 
+  <dl class="typelist implements">
+    <dt>Implements</dt>
+    <dd>
+      <div><span class="xref">ISelectionProvider</span></div>
+    </dd>
+  </dl>
 
 
   <dl class="typelist inheritedMembers">
@@ -323,9 +329,6 @@ Class DataGridAutomationPeer  <a class="header-action link-secondary" title="Vie
       <span class="xref">AutomationPeer.GetPlaceholderTextCore()</span>
     </div>
     <div>
-      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.type">AutomationPeer.GetProviderCore(Type)</a>
-    </div>
-    <div>
       <span class="xref">AutomationPeer.EnsureEnabled()</span>
     </div>
     <div>
@@ -370,7 +373,7 @@ Class DataGridAutomationPeer  <a class="header-action link-secondary" title="Vie
 
   <h3 id="Avalonia_Controls_Automation_Peers_DataGridAutomationPeer__ctor_Avalonia_Controls_DataGrid_" data-uid="Avalonia.Controls.Automation.Peers.DataGridAutomationPeer.#ctor(Avalonia.Controls.DataGrid)">
   DataGridAutomationPeer(DataGrid)
-  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/Automation/Peers/DataGridAutomationPeer.cs/#L12"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/Automation/Peers/DataGridAutomationPeer.cs/#L24"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"></div>
@@ -401,11 +404,83 @@ Class DataGridAutomationPeer  <a class="header-action link-secondary" title="Vie
 </h2>
 
 
+  <a id="Avalonia_Controls_Automation_Peers_DataGridAutomationPeer_CanSelectMultiple_" data-uid="Avalonia.Controls.Automation.Peers.DataGridAutomationPeer.CanSelectMultiple*"></a>
+
+  <h3 id="Avalonia_Controls_Automation_Peers_DataGridAutomationPeer_CanSelectMultiple" data-uid="Avalonia.Controls.Automation.Peers.DataGridAutomationPeer.CanSelectMultiple">
+  CanSelectMultiple
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/Automation/Peers/DataGridAutomationPeer.cs/#L34"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Gets a value that indicates whether the provider allows more than one child element
+to be selected concurrently.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public bool CanSelectMultiple { get; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+  <h4 class="section" id="Avalonia_Controls_Automation_Peers_DataGridAutomationPeer_CanSelectMultiple_remarks">Remarks</h4>
+  <div class="markdown level1 remarks"><table><tbody><tr><td class="term">Windows</td><td class="description"><code>ISelectionProvider.CanSelectMultiple</code></td></tr><tr><td class="term">macOS</td><td class="description">No mapping.</td></tr></tbody></table>
+</div>
+
+
+
+
+  <a id="Avalonia_Controls_Automation_Peers_DataGridAutomationPeer_IsSelectionRequired_" data-uid="Avalonia.Controls.Automation.Peers.DataGridAutomationPeer.IsSelectionRequired*"></a>
+
+  <h3 id="Avalonia_Controls_Automation_Peers_DataGridAutomationPeer_IsSelectionRequired" data-uid="Avalonia.Controls.Automation.Peers.DataGridAutomationPeer.IsSelectionRequired">
+  IsSelectionRequired
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/Automation/Peers/DataGridAutomationPeer.cs/#L39"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Gets a value that indicates whether the provider requires at least one child element
+to be selected.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public bool IsSelectionRequired { get; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+  <h4 class="section" id="Avalonia_Controls_Automation_Peers_DataGridAutomationPeer_IsSelectionRequired_remarks">Remarks</h4>
+  <div class="markdown level1 remarks"><table><tbody><tr><td class="term">Windows</td><td class="description"><code>ISelectionProvider.IsSelectionRequired</code></td></tr><tr><td class="term">macOS</td><td class="description">No mapping.</td></tr></tbody></table>
+</div>
+
+
+
+
   <a id="Avalonia_Controls_Automation_Peers_DataGridAutomationPeer_Owner_" data-uid="Avalonia.Controls.Automation.Peers.DataGridAutomationPeer.Owner*"></a>
 
   <h3 id="Avalonia_Controls_Automation_Peers_DataGridAutomationPeer_Owner" data-uid="Avalonia.Controls.Automation.Peers.DataGridAutomationPeer.Owner">
   Owner
-  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/Automation/Peers/DataGridAutomationPeer.cs/#L17"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/Automation/Peers/DataGridAutomationPeer.cs/#L31"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"></div>
@@ -440,7 +515,7 @@ Class DataGridAutomationPeer  <a class="header-action link-secondary" title="Vie
 
   <h3 id="Avalonia_Controls_Automation_Peers_DataGridAutomationPeer_GetAutomationControlTypeCore" data-uid="Avalonia.Controls.Automation.Peers.DataGridAutomationPeer.GetAutomationControlTypeCore">
   GetAutomationControlTypeCore()
-  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/Automation/Peers/DataGridAutomationPeer.cs/#L19"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/Automation/Peers/DataGridAutomationPeer.cs/#L96"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"></div>
@@ -467,11 +542,84 @@ Class DataGridAutomationPeer  <a class="header-action link-secondary" title="Vie
 
 
 
+  <a id="Avalonia_Controls_Automation_Peers_DataGridAutomationPeer_GetProviderCore_" data-uid="Avalonia.Controls.Automation.Peers.DataGridAutomationPeer.GetProviderCore*"></a>
+
+  <h3 id="Avalonia_Controls_Automation_Peers_DataGridAutomationPeer_GetProviderCore_System_Type_" data-uid="Avalonia.Controls.Automation.Peers.DataGridAutomationPeer.GetProviderCore(System.Type)">
+  GetProviderCore(Type)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/Automation/Peers/DataGridAutomationPeer.cs/#L101"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">protected override object? GetProviderCore(Type providerType)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>providerType</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.type">Type</a></dt>
+    <dd></dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object">object</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Avalonia_Controls_Automation_Peers_DataGridAutomationPeer_GetSelection_" data-uid="Avalonia.Controls.Automation.Peers.DataGridAutomationPeer.GetSelection*"></a>
+
+  <h3 id="Avalonia_Controls_Automation_Peers_DataGridAutomationPeer_GetSelection" data-uid="Avalonia.Controls.Automation.Peers.DataGridAutomationPeer.GetSelection">
+  GetSelection()
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/Automation/Peers/DataGridAutomationPeer.cs/#L42"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Retrieves a provider for each child element that is selected.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public IReadOnlyList&lt;AutomationPeer&gt; GetSelection()</code></pre>
+  </div>
+
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.ireadonlylist-1">IReadOnlyList</a>&lt;<span class="xref">AutomationPeer</span>&gt;</dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+  <h4 class="section" id="Avalonia_Controls_Automation_Peers_DataGridAutomationPeer_GetSelection_remarks">Remarks</h4>
+  <div class="markdown level1 remarks"><table><tbody><tr><td class="term">Windows</td><td class="description"><code>ISelectionProvider.GetSelection</code></td></tr><tr><td class="term">macOS</td><td class="description">
+      <code>NSAccessibilityProtocol.accessibilitySelectedChildren</code> (not implemented).
+    </td></tr></tbody></table>
+</div>
+
+
+
+
 
 </article>
 
         <div class="contribution d-print-none">
-          <a href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/Automation/Peers/DataGridAutomationPeer.cs/#L6" class="edit-link">Edit this page</a>
+          <a href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/Automation/Peers/DataGridAutomationPeer.cs/#L14" class="edit-link">Edit this page</a>
         </div>
 
 

@@ -221,6 +221,9 @@ Class DataGridHierarchicalColumnDefinition  <a class="header-action link-seconda
       <a class="xref" href="Avalonia.Controls.DataGridColumnDefinition.html#Avalonia_Controls_DataGridColumnDefinition_ColumnKey">DataGridColumnDefinition.ColumnKey</a>
     </div>
     <div>
+      <a class="xref" href="Avalonia.Controls.DataGridColumnDefinition.html#Avalonia_Controls_DataGridColumnDefinition_DisplayMode">DataGridColumnDefinition.DisplayMode</a>
+    </div>
+    <div>
       <a class="xref" href="Avalonia.Controls.DataGridColumnDefinition.html#Avalonia_Controls_DataGridColumnDefinition_WidthSharingGroup">DataGridColumnDefinition.WidthSharingGroup</a>
     </div>
     <div>
@@ -274,7 +277,7 @@ Class DataGridHierarchicalColumnDefinition  <a class="header-action link-seconda
 
   <h3 id="Avalonia_Controls_DataGridHierarchicalColumnDefinition_CellTemplateKey" data-uid="Avalonia.Controls.DataGridHierarchicalColumnDefinition.CellTemplateKey">
   CellTemplateKey
-  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/ColumnDefinitions/DataGridHierarchicalColumnDefinition.cs/#L26"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/ColumnDefinitions/DataGridHierarchicalColumnDefinition.cs/#L30"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"></div>
@@ -305,7 +308,7 @@ Class DataGridHierarchicalColumnDefinition  <a class="header-action link-seconda
 
   <h3 id="Avalonia_Controls_DataGridHierarchicalColumnDefinition_Indent" data-uid="Avalonia.Controls.DataGridHierarchicalColumnDefinition.Indent">
   Indent
-  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/ColumnDefinitions/DataGridHierarchicalColumnDefinition.cs/#L20"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/ColumnDefinitions/DataGridHierarchicalColumnDefinition.cs/#L24"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"></div>
@@ -332,6 +335,137 @@ Class DataGridHierarchicalColumnDefinition  <a class="header-action link-seconda
 
 
 
+  <a id="Avalonia_Controls_DataGridHierarchicalColumnDefinition_TrackDirectTextValueChanges_" data-uid="Avalonia.Controls.DataGridHierarchicalColumnDefinition.TrackDirectTextValueChanges*"></a>
+
+  <h3 id="Avalonia_Controls_DataGridHierarchicalColumnDefinition_TrackDirectTextValueChanges" data-uid="Avalonia.Controls.DataGridHierarchicalColumnDefinition.TrackDirectTextValueChanges">
+  TrackDirectTextValueChanges
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/ColumnDefinitions/DataGridHierarchicalColumnDefinition.cs/#L69"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Gets or sets whether the generated optimized hierarchy text cells subscribe to
+wrapped-item property changes. Disable this only for immutable display values.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public bool TrackDirectTextValueChanges { get; set; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="Avalonia_Controls_DataGridHierarchicalColumnDefinition_UseDirectCell_" data-uid="Avalonia.Controls.DataGridHierarchicalColumnDefinition.UseDirectCell*"></a>
+
+  <h3 id="Avalonia_Controls_DataGridHierarchicalColumnDefinition_UseDirectCell" data-uid="Avalonia.Controls.DataGridHierarchicalColumnDefinition.UseDirectCell">
+  UseDirectCell
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/ColumnDefinitions/DataGridHierarchicalColumnDefinition.cs/#L39"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Gets or sets whether the generated hierarchical column uses the optimized retained direct cell.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public bool UseDirectCell { get; set; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="Avalonia_Controls_DataGridHierarchicalColumnDefinition_UseDirectTextContent_" data-uid="Avalonia.Controls.DataGridHierarchicalColumnDefinition.UseDirectTextContent*"></a>
+
+  <h3 id="Avalonia_Controls_DataGridHierarchicalColumnDefinition_UseDirectTextContent" data-uid="Avalonia.Controls.DataGridHierarchicalColumnDefinition.UseDirectTextContent">
+  UseDirectTextContent
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/ColumnDefinitions/DataGridHierarchicalColumnDefinition.cs/#L49"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Gets or sets whether compatible hierarchy cells use their typed accessor directly.
+Ordinary retained cells keep their presenter and Avalonia content template.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public bool UseDirectTextContent { get; set; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="Avalonia_Controls_DataGridHierarchicalColumnDefinition_UseOptimizedPresenter_" data-uid="Avalonia.Controls.DataGridHierarchicalColumnDefinition.UseOptimizedPresenter*"></a>
+
+  <h3 id="Avalonia_Controls_DataGridHierarchicalColumnDefinition_UseOptimizedPresenter" data-uid="Avalonia.Controls.DataGridHierarchicalColumnDefinition.UseOptimizedPresenter">
+  UseOptimizedPresenter
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/ColumnDefinitions/DataGridHierarchicalColumnDefinition.cs/#L59"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Gets or sets whether retained hierarchy cells combine the cell and expander-presenter
+roles while retaining normal Avalonia control content.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public bool UseOptimizedPresenter { get; set; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
   <h2 class="section" id="methods">Methods
 </h2>
 
@@ -340,7 +474,7 @@ Class DataGridHierarchicalColumnDefinition  <a class="header-action link-seconda
 
   <h3 id="Avalonia_Controls_DataGridHierarchicalColumnDefinition_ApplyColumnProperties_Avalonia_Controls_DataGridColumn_Avalonia_Controls_DataGridColumnDefinitionContext_" data-uid="Avalonia.Controls.DataGridHierarchicalColumnDefinition.ApplyColumnProperties(Avalonia.Controls.DataGridColumn,Avalonia.Controls.DataGridColumnDefinitionContext)">
   ApplyColumnProperties(DataGridColumn, DataGridColumnDefinitionContext)
-  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/ColumnDefinitions/DataGridHierarchicalColumnDefinition.cs/#L37"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/ColumnDefinitions/DataGridHierarchicalColumnDefinition.cs/#L80"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"></div>
@@ -373,7 +507,7 @@ Class DataGridHierarchicalColumnDefinition  <a class="header-action link-seconda
 
   <h3 id="Avalonia_Controls_DataGridHierarchicalColumnDefinition_ApplyColumnPropertyChange_Avalonia_Controls_DataGridColumn_Avalonia_Controls_DataGridColumnDefinitionContext_System_String_" data-uid="Avalonia.Controls.DataGridHierarchicalColumnDefinition.ApplyColumnPropertyChange(Avalonia.Controls.DataGridColumn,Avalonia.Controls.DataGridColumnDefinitionContext,System.String)">
   ApplyColumnPropertyChange(DataGridColumn, DataGridColumnDefinitionContext, string)
-  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/ColumnDefinitions/DataGridHierarchicalColumnDefinition.cs/#L58"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/ColumnDefinitions/DataGridHierarchicalColumnDefinition.cs/#L105"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"></div>
@@ -413,7 +547,7 @@ Class DataGridHierarchicalColumnDefinition  <a class="header-action link-seconda
 
   <h3 id="Avalonia_Controls_DataGridHierarchicalColumnDefinition_CreateColumnCore" data-uid="Avalonia.Controls.DataGridHierarchicalColumnDefinition.CreateColumnCore">
   CreateColumnCore()
-  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/ColumnDefinitions/DataGridHierarchicalColumnDefinition.cs/#L32"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/ColumnDefinitions/DataGridHierarchicalColumnDefinition.cs/#L75"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"></div>

@@ -214,8 +214,52 @@ view.SortDescriptions.Add(DataGridSortDescription.FromAccessor(ageAccessor, prop
 </ul>
 <h2 id="8-grouping-and-other-view-operations">8. Grouping and other view operations</h2>
 <p><code>DataGridPathGroupDescription</code> uses property paths and reflection. For AOT scenarios, implement a custom <code>DataGridGroupDescription</code> that reads values through your accessors.</p>
+<h2 id="9-optimized-retained-display-path">9. Optimized retained display path</h2>
+<p>For immutable display data, <code>DataGridTextColumnDefinition.UseDirectTextCell=true</code>
+removes the nested retained presenter and
+<code>TrackDirectTextValueChanges=false</code> avoids a per-realized-cell property-change
+subscription. Leave change tracking enabled for mutable values; recycled cells still
+refresh when their row data changes.</p>
+<p><code>DataGridCustomDrawingColumnDefinition.UseDirectValueAccessor=true</code> lets a custom
+drawing cell read compatible typed accessor metadata without creating a display
+binding expression. Set <code>TrackDirectValueChanges=false</code> only when the displayed value
+is immutable.</p>
+<p>Direct access is selected per realized item. If a recycled row has a different runtime
+type, or a binding uses a converter, explicit source, fallback value, or target-null
+value whose semantics cannot be reproduced directly, the cell automatically uses the
+normal retained binding path. This keeps heterogeneous sources and ordinary Avalonia
+binding behavior correct while preserving the allocation-free path for compatible
+items.</p>
+<p>The normal generic themes remain the compatibility default. Applications with simple,
+fixed-height data surfaces can opt into the partial themes from <code>Themes/Optimized.xaml</code>:</p>
+<pre><code class="lang-xml">&lt;DataGrid RowTheme=&quot;{StaticResource DataGridOptimizedUnfrozenRowTheme}&quot;
+          CellTheme=&quot;{StaticResource DataGridOptimizedCellTheme}&quot;
+          ColumnHeaderTheme=&quot;{StaticResource DataGridOptimizedColumnHeaderTheme}&quot;
+          UseLightweightFiller=&quot;True&quot; /&gt;
+</code></pre>
+<p><code>DataGridOptimizedUnfrozenRowTheme</code> uses one normal
+<code>DataGridCellsPresenter</code> and is intended only when both frozen-column counts are zero.
+Use <code>DataGridOptimizedRowTheme</code> when left or right frozen columns are enabled. These
+themes preserve Avalonia controls and layout; they do not switch cells to custom
+drawing. Editing, arbitrary templates, and the original generic themes remain
+available. Optimized resources use static resource lookup, so use the generic themes
+when application code must replace theme resources dynamically at runtime.</p>
+<p>The row and header themes above are intentionally lean: they omit row-header/details
+presenters and the generic header's sort/filter/drag visual tree. For applications that
+need those surfaces while still reducing the cell template, use the feature-preserving
+variants:</p>
+<pre><code class="lang-xml">&lt;DataGrid RowTheme=&quot;{StaticResource DataGridOptimizedFeatureUnfrozenRowTheme}&quot;
+          CellTheme=&quot;{StaticResource DataGridOptimizedCellTheme}&quot;
+          ColumnHeaderTheme=&quot;{StaticResource DataGridOptimizedFeatureColumnHeaderTheme}&quot; /&gt;
+</code></pre>
+<p><code>DataGridOptimizedFeatureRowTheme</code> is the corresponding frozen-column variant. These
+themes retain row headers, details, grid lines, sort/filter indicators, resize handles,
+and column drag behavior. The direct and drawn cell types honor normal cell padding,
+selection/current/focus states, corner radii, borders, automation names, and editing;
+variable-height measurement includes padding as well.</p>
 <h2 id="related-articles">Related articles</h2>
 <ul>
+<li><a href="optimized-cell-paths.html">Optimized Retained and Drawn Cell Paths</a></li>
 <li><a href="column-definitions.html">Column Definitions</a></li>
 <li><a href="column-definitions-aot.html">Column Definitions (AOT-Friendly Bindings)</a></li>
 <li><a href="column-definitions-models.html">Column Definitions (Model Integration)</a></li>

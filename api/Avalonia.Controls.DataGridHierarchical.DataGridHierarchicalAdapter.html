@@ -326,7 +326,7 @@ Class DataGridHierarchicalAdapter  <a class="header-action link-secondary" title
 
   <h3 id="Avalonia_Controls_DataGridHierarchical_DataGridHierarchicalAdapter_CollapseAll_Avalonia_Controls_DataGridHierarchical_HierarchicalNode_System_Nullable_System_Int32__" data-uid="Avalonia.Controls.DataGridHierarchical.DataGridHierarchicalAdapter.CollapseAll(Avalonia.Controls.DataGridHierarchical.HierarchicalNode,System.Nullable{System.Int32})">
   CollapseAll(HierarchicalNode?, int?)
-  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/Hierarchical/DataGridHierarchicalAdapter.cs/#L187"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/Hierarchical/DataGridHierarchicalAdapter.cs/#L206"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"></div>
@@ -435,6 +435,51 @@ Class DataGridHierarchicalAdapter  <a class="header-action link-secondary" title
     <dd></dd>
   </dl>
 
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Avalonia_Controls_DataGridHierarchical_DataGridHierarchicalAdapter_ExpandAllAsync_" data-uid="Avalonia.Controls.DataGridHierarchical.DataGridHierarchicalAdapter.ExpandAllAsync*"></a>
+
+  <h3 id="Avalonia_Controls_DataGridHierarchical_DataGridHierarchicalAdapter_ExpandAllAsync_Avalonia_Controls_DataGridHierarchical_HierarchicalNode_System_Nullable_System_Int32__System_Threading_CancellationToken_" data-uid="Avalonia.Controls.DataGridHierarchical.DataGridHierarchicalAdapter.ExpandAllAsync(Avalonia.Controls.DataGridHierarchical.HierarchicalNode,System.Nullable{System.Int32},System.Threading.CancellationToken)">
+  ExpandAllAsync(HierarchicalNode?, int?, CancellationToken)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/Hierarchical/DataGridHierarchicalAdapter.cs/#L194"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Asynchronously expands a subtree while retaining the virtualization guard through the coherent commit.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public Task ExpandAllAsync(HierarchicalNode? node = null, int? maxDepth = null, CancellationToken cancellationToken = default)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>node</code> <a class="xref" href="Avalonia.Controls.DataGridHierarchical.HierarchicalNode.html">HierarchicalNode</a></dt>
+    <dd><p>Starting node; null for the root.</p>
+</dd>
+    <dt><code>maxDepth</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a>?</dt>
+    <dd><p>Maximum relative depth to expand, or null for no limit.</p>
+</dd>
+    <dt><code>cancellationToken</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.threading.cancellationtoken">CancellationToken</a></dt>
+    <dd><p>Cancellation token.</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.threading.tasks.task">Task</a></dt>
+    <dd><p>A task that completes after the visible-node commit.</p>
+</dd>
+  </dl>
 
 
 
