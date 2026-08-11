@@ -15,6 +15,7 @@ using Avalonia.Data;
 using Avalonia.Layout;
 using Avalonia.Markup.Xaml.MarkupExtensions;
 using Avalonia.Controls.Documents;
+using Avalonia.Controls.DataGridHierarchical;
 using Avalonia.Controls.Utils;
 using Avalonia.Styling;
 using System.Globalization;
@@ -120,9 +121,12 @@ internal
         internal bool CanUseDirectValueAccessorFor(object item)
         {
             var accessor = DataGridColumnMetadata.GetValueAccessor(this);
-            return CanUseDirectValueAccessor &&
+            return BindingCloneHelper.SupportsDirectTextDataContextRead(
+                       Binding,
+                       item is IHierarchicalNodeItem) &&
                    item != null &&
                    accessor != null &&
+                   accessor is IDataGridColumnTextAccessor &&
                    accessor.ItemType.IsInstanceOfType(item);
         }
 

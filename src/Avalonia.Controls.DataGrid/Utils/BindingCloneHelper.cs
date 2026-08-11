@@ -201,13 +201,16 @@ namespace Avalonia.Controls.Utils
             };
         }
 
-        public static bool SupportsDirectTextDataContextRead(BindingBase? binding)
+        public static bool SupportsDirectTextDataContextRead(
+            BindingBase? binding,
+            bool observesWrappedHierarchyItem = false)
         {
             if (!SupportsDirectDataContextRead(binding) ||
                 !HasSupportedDirectReadMode(binding) ||
                 !HasDefaultDirectReadAnchorAndPriority(binding) ||
                 !HasDefaultFallbackValues(binding) ||
-                HasReadDelay(binding))
+                HasReadDelay(binding) ||
+                !HasObservableDirectReadPath(binding, observesWrappedHierarchyItem))
             {
                 return false;
             }
@@ -218,6 +221,29 @@ namespace Avalonia.Controls.Utils
             // only the standard value-to-string conversion reproduced by the typed accessor.
             var converter = GetConverter(binding);
             return converter == null || ReferenceEquals(converter, DataGridValueConverter.Instance);
+        }
+
+        private static bool HasObservableDirectReadPath(
+            BindingBase? binding,
+            bool observesWrappedHierarchyItem)
+        {
+            var path = GetPath(binding);
+            if (string.IsNullOrWhiteSpace(path))
+            {
+                return true;
+            }
+
+            path = path.Trim();
+            if (path.IndexOf('.') < 0 && path.IndexOf('[') < 0)
+            {
+                return true;
+            }
+
+            const string wrappedItemPrefix = "Item.";
+            return observesWrappedHierarchyItem &&
+                   path.StartsWith(wrappedItemPrefix, System.StringComparison.Ordinal) &&
+                   path.IndexOf('.', wrappedItemPrefix.Length) < 0 &&
+                   path.IndexOf('[', wrappedItemPrefix.Length) < 0;
         }
 
         public static bool SupportsDirectRawDataContextRead(BindingBase? binding)
