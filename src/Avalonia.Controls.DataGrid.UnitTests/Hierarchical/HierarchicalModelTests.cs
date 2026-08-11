@@ -2035,6 +2035,84 @@ namespace Avalonia.Controls.DataGridTests.Hierarchical;
     }
 
     [Fact]
+    public async Task ExpandAllAsync_Failed_Reload_Clears_Pending_Collapsed_Descendant()
+    {
+        var root = new Item("root");
+        var child = new Item("child");
+        var grandchild = new Item("grandchild");
+        child.Children.Add(grandchild);
+        root.Children.Add(child);
+        var failChildLoad = false;
+        var model = new HierarchicalModel(new HierarchicalOptions
+        {
+            VirtualizeChildren = true,
+            ChildrenSelectorAsync = (item, _) =>
+            {
+                if (failChildLoad && ReferenceEquals(item, child))
+                {
+                    return Task.FromException<IEnumerable?>(new InvalidOperationException("child load failed"));
+                }
+
+                return Task.FromResult<IEnumerable?>(((Item)item).Children);
+            }
+        });
+        model.SetRoot(root);
+        await model.ExpandAllAsync(
+            maxDepth: 1,
+            cancellationToken: TestContext.Current.CancellationToken);
+
+        var childNode = Assert.Single(model.Root!.Children);
+        Assert.True(childNode.IsExpanded);
+        Assert.True(childNode.HasMaterializedChildren);
+
+        failChildLoad = true;
+        await model.RefreshAsync(childNode, TestContext.Current.CancellationToken);
+        Assert.True(childNode.IsExpanded);
+        Assert.False(childNode.HasMaterializedChildren);
+        Assert.NotNull(childNode.LoadError);
+
+        failChildLoad = false;
+        using var cts = new CancellationTokenSource();
+        model.NodeLoaded += CancelAfterChildMaterializes;
+        try
+        {
+            Task canceledExpansion = model.ExpandAllAsync(maxDepth: 1, cancellationToken: cts.Token);
+            await Assert.ThrowsAnyAsync<OperationCanceledException>(() => canceledExpansion);
+        }
+        finally
+        {
+            model.NodeLoaded -= CancelAfterChildMaterializes;
+        }
+
+        Assert.True(childNode.IsExpanded);
+        Assert.True(childNode.HasMaterializedChildren);
+        Assert.True(childNode.HasPendingBulkMaterializationCommit);
+
+        model.Collapse(childNode);
+        Assert.False(childNode.IsExpanded);
+        Assert.False(childNode.HasMaterializedChildren);
+        Assert.True(childNode.HasPendingBulkMaterializationCommit);
+
+        failChildLoad = true;
+        await model.ExpandAllAsync(
+            maxDepth: 1,
+            cancellationToken: TestContext.Current.CancellationToken);
+
+        Assert.NotNull(childNode.LoadError);
+        Assert.False(childNode.IsExpanded);
+        Assert.False(childNode.HasMaterializedChildren);
+        Assert.False(childNode.HasPendingBulkMaterializationCommit);
+
+        void CancelAfterChildMaterializes(object? sender, HierarchicalNodeEventArgs args)
+        {
+            if (ReferenceEquals(args.Node, childNode))
+            {
+                cts.Cancel();
+            }
+        }
+    }
+
+    [Fact]
     public async Task ExpandAsync_Reinserting_Expanded_Descendant_Clears_Its_Pending_Materialization()
     {
         var root = new Item("root");

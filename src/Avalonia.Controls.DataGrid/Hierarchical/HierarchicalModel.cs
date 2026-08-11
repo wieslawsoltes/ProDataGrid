@@ -1809,7 +1809,10 @@ namespace Avalonia.Controls.DataGridHierarchical
                     materializationChanged = true;
                     current.PendingBulkMaterializationCommitGeneration =
                         materializationCommitGeneration;
-                    if ((current.IsExpanded || isVirtualRoot) &&
+                    if ((current.IsExpanded ||
+                         isVirtualRoot ||
+                         current.LoadError != null ||
+                         !current.HasMaterializedChildren) &&
                         !ReferenceEquals(current, start))
                     {
                         requiresVisibleMaterializationCommitClear = true;
