@@ -2849,6 +2849,7 @@ namespace Avalonia.Controls.DataGridHierarchical
                     DetachHierarchy(removed);
                 }
                 ApplyExpandedCountDelta(parent, 0);
+                OnHierarchyChanged(parent, NotifyCollectionChangedAction.Remove);
                 return;
             }
 

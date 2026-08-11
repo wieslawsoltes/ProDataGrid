@@ -95,6 +95,27 @@ public class DataGridHierarchicalFilteringAdapterTests
         Assert.False(branch.IsExpanded);
     }
 
+    [AvaloniaFact]
+    public void Removing_Only_Matching_Descendant_From_Collapsed_Branch_Removes_Retained_Ancestors()
+    {
+        TreeItem root = CreateTree();
+        TreeItem branchItem = root.Children[0];
+        HierarchicalModel hierarchy = CreateModel(root, virtualizeChildren: false);
+        HierarchicalNode branch = hierarchy.Root!.Children[0];
+        hierarchy.Collapse(branch);
+        using AdapterFixture fixture = CreateFixture(
+            hierarchy,
+            DataGridHierarchyFilterPolicy.KeepAncestorsOfMatches);
+        fixture.Filter("needle");
+        Assert.Equal(new[] { "root", "branch" }, fixture.VisibleNames());
+
+        branchItem.Children.RemoveAt(0);
+        Dispatcher.UIThread.RunJobs();
+
+        Assert.Empty(fixture.VisibleNames());
+        Assert.False(branch.IsExpanded);
+    }
+
     [Fact]
     public void Filtering_Does_Not_Implicitly_Load_Unmaterialized_Children()
     {
