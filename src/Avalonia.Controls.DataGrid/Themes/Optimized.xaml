@@ -241,7 +241,6 @@
 
       <ControlTheme x:Key="DataGridOptimizedRowTheme" TargetType="DataGridRow">
         <Setter Property="Background"
-                x:DataType="DataGridRow"
                 Value="{CompiledBinding $parent[DataGrid].RowBackground}" />
         <Setter Property="Template">
           <ControlTemplate>
