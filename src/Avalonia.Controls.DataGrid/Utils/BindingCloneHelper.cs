@@ -205,12 +205,27 @@ namespace Avalonia.Controls.Utils
             BindingBase? binding,
             bool observesWrappedHierarchyItem = false)
         {
+            return SupportsDirectTextDataContextRead(
+                binding,
+                observesWrappedHierarchyItem,
+                out _);
+        }
+
+        public static bool SupportsDirectTextDataContextRead(
+            BindingBase? binding,
+            bool observesWrappedHierarchyItem,
+            out bool requiresWrappedHierarchyItemObservation)
+        {
+            requiresWrappedHierarchyItemObservation = false;
             if (!SupportsDirectDataContextRead(binding) ||
                 !HasSupportedDirectReadMode(binding) ||
                 !HasDefaultDirectReadAnchorAndPriority(binding) ||
                 !HasDefaultFallbackValues(binding) ||
                 HasReadDelay(binding) ||
-                !HasObservableDirectReadPath(binding, observesWrappedHierarchyItem))
+                !HasObservableDirectReadPath(
+                    binding,
+                    observesWrappedHierarchyItem,
+                    out requiresWrappedHierarchyItemObservation))
             {
                 return false;
             }
@@ -220,13 +235,21 @@ namespace Avalonia.Controls.Utils
             // Avalonia's retained binding path. The grid's default converter is known to perform
             // only the standard value-to-string conversion reproduced by the typed accessor.
             var converter = GetConverter(binding);
-            return converter == null || ReferenceEquals(converter, DataGridValueConverter.Instance);
+            if (converter == null || ReferenceEquals(converter, DataGridValueConverter.Instance))
+            {
+                return true;
+            }
+
+            requiresWrappedHierarchyItemObservation = false;
+            return false;
         }
 
         private static bool HasObservableDirectReadPath(
             BindingBase? binding,
-            bool observesWrappedHierarchyItem)
+            bool observesWrappedHierarchyItem,
+            out bool requiresWrappedHierarchyItemObservation)
         {
+            requiresWrappedHierarchyItemObservation = false;
             var path = GetPath(binding);
             if (string.IsNullOrWhiteSpace(path))
             {
@@ -240,10 +263,13 @@ namespace Avalonia.Controls.Utils
             }
 
             const string wrappedItemPrefix = "Item.";
-            return observesWrappedHierarchyItem &&
-                   path.StartsWith(wrappedItemPrefix, System.StringComparison.Ordinal) &&
-                   path.IndexOf('.', wrappedItemPrefix.Length) < 0 &&
-                   path.IndexOf('[', wrappedItemPrefix.Length) < 0;
+            requiresWrappedHierarchyItemObservation = observesWrappedHierarchyItem &&
+                                                       path.StartsWith(
+                                                           wrappedItemPrefix,
+                                                           System.StringComparison.Ordinal) &&
+                                                       path.IndexOf('.', wrappedItemPrefix.Length) < 0 &&
+                                                       path.IndexOf('[', wrappedItemPrefix.Length) < 0;
+            return requiresWrappedHierarchyItemObservation;
         }
 
         public static bool SupportsDirectRawDataContextRead(BindingBase? binding)

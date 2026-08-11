@@ -324,9 +324,15 @@ internal
                     drawingCell.ClearValue(DataGridCustomDrawingCell.ValueProperty);
 
                     var accessor = DataGridColumnMetadata.GetValueAccessor(this);
-                    if (CanUseDrawnValueAccessor(accessor, dataItem))
+                    if (CanUseDrawnValueAccessor(
+                            accessor,
+                            dataItem,
+                            out bool observeWrappedItemValueChanges))
                     {
-                        drawingCell.ConfigureBuiltInRenderer(this, renderer: null);
+                        drawingCell.ConfigureBuiltInRenderer(
+                            this,
+                            renderer: null,
+                            observeWrappedItemValueChanges: observeWrappedItemValueChanges);
                     }
                     else
                     {
@@ -542,12 +548,19 @@ internal
                 : null;
         }
 
-        private bool CanUseDrawnValueAccessor(IDataGridColumnValueAccessor accessor, object dataItem)
+        private bool CanUseDrawnValueAccessor(
+            IDataGridColumnValueAccessor accessor,
+            object dataItem,
+            out bool observeWrappedItemValueChanges)
         {
+            observeWrappedItemValueChanges = false;
             return accessor is IDataGridColumnTextAccessor &&
                    dataItem != null &&
                    accessor.ItemType.IsInstanceOfType(dataItem) &&
-                   BindingCloneHelper.SupportsDirectTextDataContextRead(Binding);
+                   BindingCloneHelper.SupportsDirectTextDataContextRead(
+                       Binding,
+                       dataItem is IHierarchicalNodeItem,
+                       out observeWrappedItemValueChanges);
         }
 
         private void SyncProperties(AvaloniaObject content)

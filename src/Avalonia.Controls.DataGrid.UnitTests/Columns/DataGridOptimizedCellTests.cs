@@ -668,6 +668,280 @@ public sealed class DataGridOptimizedCellTests
     }
 
     [AvaloniaFact]
+    public void DrawnText_HierarchicalNodeAccessor_WithoutTracking_RefreshesOnlyOnRecycle()
+    {
+        var oldItem = new NotifyItem("Old");
+        var oldNode = new HierarchicalNode(oldItem, isLeaf: true);
+        var currentItem = new NotifyItem("Current");
+        var currentNode = new HierarchicalNode(currentItem, isLeaf: true);
+        var column = new TestTextColumn
+        {
+            Binding = new Binding("Item.Name"),
+            DisplayMode = DataGridColumnDisplayMode.Drawn,
+            TrackDirectTextValueChanges = false
+        };
+        DataGridColumnMetadata.SetValueAccessor(
+            column,
+            new DataGridColumnValueAccessor<HierarchicalNode, string>(
+                node => $"accessor:{((NotifyItem)node.Item).Name}"));
+
+        var cell = Assert.IsType<DataGridCustomDrawingCell>(column.CreateCell());
+        cell.DataContext = oldNode;
+        Assert.Null(column.GenerateDisplay(cell, oldNode));
+        Assert.True(cell.UsesValueProvider);
+        Assert.Equal("accessor:Old", cell.Value);
+
+        var window = AttachCell(cell);
+        try
+        {
+            oldItem.Name = "Ignored";
+            Assert.Equal("accessor:Old", cell.Value);
+
+            cell.DataContext = currentNode;
+            Assert.Equal("accessor:Current", cell.Value);
+        }
+        finally
+        {
+            window.Close();
+        }
+    }
+
+    [AvaloniaFact]
+    public void DrawnText_HierarchicalNodeAccessor_TracksWrappedItem_AndIgnoresStaleOrDetachedItem()
+    {
+        var oldItem = new NotifyItem("Old");
+        var oldNode = new HierarchicalNode(oldItem, isLeaf: true);
+        var currentItem = new NotifyItem("Current");
+        var currentNode = new HierarchicalNode(currentItem, isLeaf: true);
+        var column = new TestTextColumn
+        {
+            Binding = new Binding("Item.Name"),
+            DisplayMode = DataGridColumnDisplayMode.Drawn
+        };
+        DataGridColumnMetadata.SetValueAccessor(
+            column,
+            new DataGridColumnValueAccessor<HierarchicalNode, string>(
+                node => $"accessor:{((NotifyItem)node.Item).Name}"));
+
+        var cell = Assert.IsType<DataGridCustomDrawingCell>(column.CreateCell());
+        cell.DataContext = oldNode;
+        Assert.Null(column.GenerateDisplay(cell, oldNode));
+        Assert.True(cell.UsesValueProvider);
+
+        var window = AttachCell(cell);
+        try
+        {
+            oldItem.Name = "Old updated";
+            Assert.Equal("accessor:Old updated", cell.Value);
+
+            cell.DataContext = currentNode;
+            Assert.Equal("accessor:Current", cell.Value);
+
+            oldItem.Name = "Stale";
+            Assert.Equal("accessor:Current", cell.Value);
+
+            currentItem.Name = "Current updated";
+            Assert.Equal("accessor:Current updated", cell.Value);
+
+            window.Content = null;
+            Dispatcher.UIThread.RunJobs();
+
+            currentItem.Name = "Detached";
+            Assert.Equal("accessor:Current updated", cell.Value);
+
+            window.Content = cell;
+            Dispatcher.UIThread.RunJobs();
+            window.UpdateLayout();
+            Assert.Equal("accessor:Detached", cell.Value);
+
+            currentItem.Name = "Reattached";
+            Assert.Equal("accessor:Reattached", cell.Value);
+        }
+        finally
+        {
+            window.Close();
+        }
+    }
+
+    [AvaloniaFact]
+    public void DrawnText_SelfWrappedHierarchyNotifier_RefreshesAccessorOncePerChange()
+    {
+        var item = new SelfWrappedNotifyItem("First");
+        var column = new TestTextColumn
+        {
+            Binding = new Binding("Item.Name"),
+            DisplayMode = DataGridColumnDisplayMode.Drawn
+        };
+        int accessorReads = 0;
+        DataGridColumnMetadata.SetValueAccessor(
+            column,
+            new DataGridColumnValueAccessor<SelfWrappedNotifyItem, string>(value =>
+            {
+                accessorReads++;
+                return value.Name;
+            }));
+
+        var cell = Assert.IsType<DataGridCustomDrawingCell>(column.CreateCell());
+        cell.DataContext = item;
+        Assert.Null(column.GenerateDisplay(cell, item));
+        Assert.True(cell.UsesValueProvider);
+
+        var window = AttachCell(cell);
+        try
+        {
+            int readsBeforeChange = accessorReads;
+
+            item.Name = "Second";
+
+            Assert.Equal(readsBeforeChange + 1, accessorReads);
+            Assert.Equal("Second", cell.Value);
+        }
+        finally
+        {
+            window.Close();
+        }
+    }
+
+    [AvaloniaFact]
+    public void DrawnText_RuntimeTrackingEnable_SubscribesToWrappedHierarchyItem()
+    {
+        var item = new NotifyItem("First");
+        var node = new HierarchicalNode(item, isLeaf: true);
+        var column = new DataGridTextColumn
+        {
+            Binding = new Binding("Item.Name"),
+            DisplayMode = DataGridColumnDisplayMode.Drawn,
+            TrackDirectTextValueChanges = false,
+            Width = new DataGridLength(160)
+        };
+        DataGridColumnMetadata.SetValueAccessor(
+            column,
+            new DataGridColumnValueAccessor<HierarchicalNode, string>(
+                value => $"accessor:{((NotifyItem)value.Item).Name}"));
+        var grid = new DataGrid
+        {
+            Width = 240,
+            Height = 120,
+            RowHeight = 24,
+            ItemsSource = new[] { node },
+            AutoGenerateColumns = false
+        };
+        grid.ColumnsInternal.Add(column);
+
+        var window = new Window { Width = 280, Height = 160 };
+        window.SetThemeStyles(DataGridTheme.FluentV2);
+        window.Content = grid;
+        try
+        {
+            window.Show();
+            grid.ApplyTemplate();
+            Dispatcher.UIThread.RunJobs();
+            window.UpdateLayout();
+            grid.UpdateLayout();
+
+            var row = Assert.Single(GetRealizedRows(grid));
+            var cell = Assert.IsType<DataGridCustomDrawingCell>(row.Cells[0]);
+            Assert.True(cell.UsesValueProvider);
+            Assert.Equal("accessor:First", cell.Value);
+
+            item.Name = "Ignored";
+            Assert.Equal("accessor:First", cell.Value);
+
+            column.TrackDirectTextValueChanges = true;
+            Assert.Equal("accessor:Ignored", cell.Value);
+
+            item.Name = "Tracked";
+            Assert.Equal("accessor:Tracked", cell.Value);
+        }
+        finally
+        {
+            window.Close();
+        }
+    }
+
+    [AvaloniaFact]
+    public void DrawnText_DirectHierarchyMember_TracksNodeButNotWrappedItem()
+    {
+        var item = new NotifyItem("First");
+        var node = new HierarchicalNode(item, isLeaf: true);
+        var column = new TestTextColumn
+        {
+            Binding = new Binding(nameof(HierarchicalNode.Level)),
+            DisplayMode = DataGridColumnDisplayMode.Drawn
+        };
+        int accessorReads = 0;
+        DataGridColumnMetadata.SetValueAccessor(
+            column,
+            new DataGridColumnValueAccessor<HierarchicalNode, string>(value =>
+            {
+                accessorReads++;
+                return $"accessor:{value.Level}";
+            }));
+
+        var cell = Assert.IsType<DataGridCustomDrawingCell>(column.CreateCell());
+        cell.DataContext = node;
+        Assert.Null(column.GenerateDisplay(cell, node));
+        Assert.True(cell.UsesValueProvider);
+        Assert.Equal("accessor:0", cell.Value);
+
+        var window = AttachCell(cell);
+        try
+        {
+            int readsAfterAttach = accessorReads;
+
+            item.Name = "Wrapped change";
+
+            Assert.Equal(readsAfterAttach, accessorReads);
+            Assert.Equal("accessor:0", cell.Value);
+
+            node.Level = 1;
+
+            Assert.Equal(readsAfterAttach + 1, accessorReads);
+            Assert.Equal("accessor:1", cell.Value);
+        }
+        finally
+        {
+            window.Close();
+        }
+    }
+
+    [AvaloniaFact]
+    public void DrawnText_NestedHierarchyPath_UsesBindingAndTracksLeaf_WhenDirectTrackingDisabled()
+    {
+        var address = new NotifyAddress("First");
+        var node = new HierarchicalNode(new AddressItem(address), isLeaf: true);
+        var column = new TestTextColumn
+        {
+            Binding = new Binding("Item.Address.City"),
+            DisplayMode = DataGridColumnDisplayMode.Drawn,
+            TrackDirectTextValueChanges = false
+        };
+        DataGridColumnMetadata.SetValueAccessor(
+            column,
+            new DataGridColumnValueAccessor<HierarchicalNode, string>(
+                value => $"accessor:{((AddressItem)value.Item).Address.City}"));
+
+        var cell = Assert.IsType<DataGridCustomDrawingCell>(column.CreateCell());
+        cell.DataContext = node;
+        Assert.Null(column.GenerateDisplay(cell, node));
+
+        var window = AttachCell(cell);
+        try
+        {
+            Assert.False(cell.UsesValueProvider);
+            Assert.Equal("First", cell.Value);
+
+            address.City = "Second";
+            Dispatcher.UIThread.RunJobs();
+            Assert.Equal("Second", cell.Value);
+        }
+        finally
+        {
+            window.Close();
+        }
+    }
+
+    [AvaloniaFact]
     public void CustomDrawingCell_Can_Use_Typed_Accessor_Without_Change_Subscription()
     {
         var item = new NotifyItem("First");
@@ -691,6 +965,53 @@ public sealed class DataGridOptimizedCellTests
 
         cell.DataContext = new NotifyItem("Third");
         Assert.Equal("Third", cell.Value);
+    }
+
+    [AvaloniaFact]
+    public void CustomDrawingCell_TracksHierarchyNodeButNotWrappedItem()
+    {
+        var item = new NotifyItem("First");
+        var node = new HierarchicalNode(item, isLeaf: true);
+        var column = new TestCustomDrawingColumn
+        {
+            Binding = new Binding(nameof(HierarchicalNode.Level)),
+            UseDirectValueAccessor = true,
+            TrackDirectValueChanges = true
+        };
+        int accessorReads = 0;
+        DataGridColumnMetadata.SetValueAccessor(
+            column,
+            new DataGridColumnValueAccessor<HierarchicalNode, string>(value =>
+            {
+                accessorReads++;
+                return $"provider:{value.Level}";
+            }));
+
+        var cell = Assert.IsType<DataGridCustomDrawingCell>(column.CreateCell());
+        cell.DataContext = node;
+        Assert.Null(column.GenerateDisplay(cell, node));
+        Assert.True(cell.UsesValueProvider);
+        Assert.Equal("provider:0", cell.Value);
+
+        var window = AttachCell(cell);
+        try
+        {
+            int readsAfterAttach = accessorReads;
+
+            item.Name = "Wrapped change";
+
+            Assert.Equal(readsAfterAttach, accessorReads);
+            Assert.Equal("provider:0", cell.Value);
+
+            node.Level = 1;
+
+            Assert.Equal(readsAfterAttach + 1, accessorReads);
+            Assert.Equal("provider:1", cell.Value);
+        }
+        finally
+        {
+            window.Close();
+        }
     }
 
     [AvaloniaFact]
@@ -1742,6 +2063,65 @@ public sealed class DataGridOptimizedCellTests
                 PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Name)));
             }
         }
+
+        public event PropertyChangedEventHandler? PropertyChanged;
+    }
+
+    private sealed record AddressItem(NotifyAddress Address);
+
+    private sealed class NotifyAddress : INotifyPropertyChanged
+    {
+        private string _city;
+
+        public NotifyAddress(string city) => _city = city;
+
+        public string City
+        {
+            get => _city;
+            set
+            {
+                if (_city == value)
+                {
+                    return;
+                }
+
+                _city = value;
+                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(City)));
+            }
+        }
+
+        public event PropertyChangedEventHandler? PropertyChanged;
+    }
+
+    private sealed class SelfWrappedNotifyItem : INotifyPropertyChanged, IHierarchicalNodeItem
+    {
+        private readonly HierarchicalNode _node;
+        private string _name;
+
+        public SelfWrappedNotifyItem(string name)
+        {
+            _name = name;
+            _node = new HierarchicalNode(this, isLeaf: true);
+        }
+
+        public string Name
+        {
+            get => _name;
+            set
+            {
+                if (_name == value)
+                {
+                    return;
+                }
+
+                _name = value;
+                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Name)));
+            }
+        }
+
+        object IHierarchicalNodeItem.Item => this;
+
+        HierarchicalNode IHierarchicalNodeItem.Node => _node;
 
         public event PropertyChangedEventHandler? PropertyChanged;
     }
