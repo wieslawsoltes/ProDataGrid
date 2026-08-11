@@ -295,6 +295,27 @@ namespace Avalonia.Controls.DataGridHierarchical
         /// </summary>
         internal bool HasMaterializedChildren { get; set; }
 
+        /// <summary>
+        /// Tracks materialization completed by a transactional bulk expansion that has not yet
+        /// committed its flattened snapshot.
+        /// </summary>
+        internal bool HasPendingBulkMaterializationCommit
+        {
+            get => _loadInfo?.PendingBulkMaterializationCommit ?? false;
+            set
+            {
+                if (value)
+                {
+                    (_loadInfo ??= new NodeLoadInfo()).PendingBulkMaterializationCommit = true;
+                }
+                else if (_loadInfo != null)
+                {
+                    _loadInfo.PendingBulkMaterializationCommit = false;
+                    TrimLoadInfo();
+                }
+            }
+        }
+
         public event PropertyChangedEventHandler? PropertyChanged;
 
         /// <summary>
@@ -353,7 +374,12 @@ namespace Avalonia.Controls.DataGridHierarchical
 
         private void TrimLoadInfo()
         {
-            if (_loadInfo is { Error: null, Cancellation: null })
+            if (_loadInfo is
+                {
+                    Error: null,
+                    Cancellation: null,
+                    PendingBulkMaterializationCommit: false
+                })
             {
                 _loadInfo = null;
             }
@@ -377,6 +403,7 @@ namespace Avalonia.Controls.DataGridHierarchical
         {
             public Exception? Error;
             public CancellationTokenSource? Cancellation;
+            public bool PendingBulkMaterializationCommit;
         }
 
         private sealed class NodeConnectionInfo

@@ -1037,11 +1037,17 @@ namespace Avalonia.Controls.DataGridHierarchical
                 {
                     if (node.IsLeaf || parentIndex < 0)
                     {
+                        if (node.IsLeaf && parentIndex >= 0)
+                        {
+                            node.HasPendingBulkMaterializationCommit = false;
+                        }
+
                         return;
                     }
 
                     if (node.HasMaterializedChildren && hasVisibleDescendants)
                     {
+                        node.HasPendingBulkMaterializationCommit = false;
                         return;
                     }
                 }
@@ -1070,13 +1076,17 @@ namespace Avalonia.Controls.DataGridHierarchical
 
                 parentIndex = GetFlattenedIndex(node);
                 var inserted = 0;
+                List<HierarchicalNode>? visibleMaterializationCommits = null;
 
                 if (parentIndex >= 0 && !node.IsLeaf)
                 {
                     var hasVisible = GetVisibleDescendantCount(node, parentIndex) > 0;
                     if (!hasVisible)
                     {
-                        inserted = InsertVisibleChildren(node, parentIndex + 1);
+                        inserted = InsertVisibleChildren(
+                            node,
+                            parentIndex + 1,
+                            ref visibleMaterializationCommits);
                         if (inserted > 0)
                         {
                             OnFlattenedChanged(new[] { new FlattenedChange(parentIndex + 1, 0, inserted) });
@@ -1087,6 +1097,11 @@ namespace Avalonia.Controls.DataGridHierarchical
                 SetNodeExpandedState(node, true);
                 RecalculateExpandedCountsFrom(node);
                 OnNodeExpanded(node);
+                if (parentIndex >= 0)
+                {
+                    node.HasPendingBulkMaterializationCommit = false;
+                    SetPendingBulkMaterializationCommit(visibleMaterializationCommits, value: false);
+                }
             }
             finally
             {
@@ -1299,6 +1314,7 @@ namespace Avalonia.Controls.DataGridHierarchical
             }
 
             RecalculateExpandedCountsFrom(target);
+            target.HasPendingBulkMaterializationCommit = false;
         }
 
         public HierarchicalNode? FindNode(object item)
@@ -1746,83 +1762,98 @@ namespace Avalonia.Controls.DataGridHierarchical
             }
             var stack = new Stack<(HierarchicalNode Node, int Depth, bool Exit)>();
             var materializationChanged = false;
+            List<HierarchicalNode>? materializationCommits = null;
             var traversedNodeCount = 0;
             stack.Push((start, 0, false));
 
-            while (stack.Count > 0)
+            try
             {
+                while (stack.Count > 0)
+                {
+                    cancellationToken.ThrowIfCancellationRequested();
+                    var (current, depth, exit) = stack.Pop();
+                    if (exit)
+                    {
+                        ancestors.Remove(current.Item);
+                        continue;
+                    }
+
+                    if (depth > limit)
+                    {
+                        continue;
+                    }
+
+                    traversedNodeCount++;
+                    ancestors.Add(current.Item);
+                    var isVirtualRoot = _isVirtualRoot && ReferenceEquals(current, Root);
+                    var hadMaterializedChildren = current.HasMaterializedChildren;
+
+                    if (!isVirtualRoot &&
+                        (!current.HasMaterializedChildren || current.LoadError != null))
+                    {
+                        await EnsureChildrenMaterializedAsync(
+                                current,
+                                forceReload: false,
+                                cancellationToken,
+                                ancestors,
+                                continueOnCapturedContext)
+                            .ConfigureAwait(continueOnCapturedContext);
+                    }
+
+                    var materializedDuringOperation =
+                        !hadMaterializedChildren && current.HasMaterializedChildren;
+
+                    if (materializedDuringOperation || current.HasPendingBulkMaterializationCommit)
+                    {
+                        materializationChanged = true;
+                        (materializationCommits ??= new List<HierarchicalNode>()).Add(current);
+                    }
+
+                    if (current.LoadError != null || !current.HasMaterializedChildren)
+                    {
+                        ancestors.Remove(current.Item);
+                        continue;
+                    }
+
+                    if (!current.IsExpanded && !isVirtualRoot)
+                    {
+                        nodesToExpand.Add(current);
+                    }
+
+                    if (current.IsLeaf || depth >= limit)
+                    {
+                        ancestors.Remove(current.Item);
+                        continue;
+                    }
+
+                    var children = current.Children;
+                    stack.Push((current, depth, true));
+                    for (int i = children.Count - 1; i >= 0; i--)
+                    {
+                        stack.Push((children[i], depth + 1, false));
+                    }
+                }
+
                 cancellationToken.ThrowIfCancellationRequested();
-                var (current, depth, exit) = stack.Pop();
-                if (exit)
+                if (nodesToExpand.Count == 0 && !materializationChanged)
                 {
-                    ancestors.Remove(current.Item);
-                    continue;
+                    return;
                 }
 
-                if (depth > limit)
-                {
-                    continue;
-                }
-
-                traversedNodeCount++;
-                ancestors.Add(current.Item);
-                var isVirtualRoot = _isVirtualRoot && ReferenceEquals(current, Root);
-                var hadMaterializedChildren = current.HasMaterializedChildren;
-
-                if (!isVirtualRoot &&
-                    (!current.HasMaterializedChildren || current.LoadError != null))
-                {
-                    await EnsureChildrenMaterializedAsync(
-                            current,
-                            forceReload: false,
-                            cancellationToken,
-                            ancestors,
-                            continueOnCapturedContext)
-                        .ConfigureAwait(continueOnCapturedContext);
-                }
-
-                if (!hadMaterializedChildren && current.HasMaterializedChildren)
-                {
-                    materializationChanged = true;
-                }
-
-                if (current.LoadError != null || !current.HasMaterializedChildren)
-                {
-                    ancestors.Remove(current.Item);
-                    continue;
-                }
-
-                if (!current.IsExpanded && !isVirtualRoot)
-                {
-                    nodesToExpand.Add(current);
-                }
-
-                if (current.IsLeaf || depth >= limit)
-                {
-                    ancestors.Remove(current.Item);
-                    continue;
-                }
-
-                var children = current.Children;
-                stack.Push((current, depth, true));
-                for (int i = children.Count - 1; i >= 0; i--)
-                {
-                    stack.Push((children[i], depth + 1, false));
-                }
+                CommitBulkExpansion(
+                    start,
+                    nodesToExpand,
+                    expansionStatesAlreadyApplied: false,
+                    materializationChanged,
+                    traversedNodeCount);
             }
-
-            cancellationToken.ThrowIfCancellationRequested();
-            if (nodesToExpand.Count == 0 && !materializationChanged)
+            catch
             {
-                return;
+                SetPendingBulkMaterializationCommit(materializationCommits, value: true);
+                throw;
             }
 
-            CommitBulkExpansion(
-                start,
-                nodesToExpand,
-                expansionStatesAlreadyApplied: false,
-                materializationChanged,
-                traversedNodeCount);
+            SetPendingBulkMaterializationCommit(materializationCommits, value: false);
         }
 
         private SemaphoreSlim GetBulkExpandGate()
@@ -1850,6 +1881,7 @@ namespace Avalonia.Controls.DataGridHierarchical
             bool resolveAsyncChildrenOffContext = false)
         {
             List<HierarchicalNode>? expandedNodes = null;
+            List<HierarchicalNode>? materializationCommits = null;
             const int hashedCycleDepth = 32;
             HashSet<object>? ancestors = null;
             if (start.Level >= hashedCycleDepth)
@@ -1868,52 +1900,12 @@ namespace Avalonia.Controls.DataGridHierarchical
             var traversedNodeCount = 0;
             stack.Push((start, 0, false));
 
-            while (stack.Count > 0)
+            try
             {
-                var (current, depth, exit) = stack.Pop();
-                if (exit)
+                while (stack.Count > 0)
                 {
-                    if (current.Level >= hashedCycleDepth)
-                    {
-                        ancestors!.Remove(current.Item);
-                    }
-                    continue;
-                }
-
-                if (depth > limit)
-                {
-                    continue;
-                }
-                traversedNodeCount++;
-                if (current.Level >= hashedCycleDepth)
-                {
-                    if (ancestors == null)
-                    {
-                        ancestors = new HashSet<object>(ReferenceEqualityComparer.Instance);
-                        var ancestor = current.Parent;
-                        while (ancestor != null)
-                        {
-                            ancestors.Add(ancestor.Item);
-                            ancestor = ancestor.Parent;
-                        }
-                    }
-
-                    ancestors.Add(current.Item);
-                }
-
-                bool isVirtualRoot = _isVirtualRoot && ReferenceEquals(current, Root);
-                bool wasExpanded = current.IsExpanded;
-                bool hadMaterializedChildren = current.HasMaterializedChildren;
-
-                if (!isVirtualRoot &&
-                    (!current.HasMaterializedChildren || current.LoadError != null))
-                {
-                    EnsureChildrenMaterializedSynchronously(
-                        current,
-                        forceReload: false,
-                        current.Level >= hashedCycleDepth ? ancestors : null,
-                        resolveAsyncChildrenOffContext);
-                    if (current.LoadError != null || !current.HasMaterializedChildren)
+                    var (current, depth, exit) = stack.Pop();
+                    if (exit)
                     {
                         if (current.Level >= hashedCycleDepth)
                         {
@@ -1921,79 +1913,153 @@ namespace Avalonia.Controls.DataGridHierarchical
                         }
                         continue;
                     }
-                }
 
-                if (!hadMaterializedChildren && current.HasMaterializedChildren)
-                {
-                    materializationChanged = true;
-                }
-
-                if (!wasExpanded && !isVirtualRoot)
-                {
-                    anyExpanded = true;
-                    (expandedNodes ??= new List<HierarchicalNode>()).Add(current);
-                }
-
-                if (current.IsLeaf || depth >= limit)
-                {
+                    if (depth > limit)
+                    {
+                        continue;
+                    }
+                    traversedNodeCount++;
                     if (current.Level >= hashedCycleDepth)
                     {
-                        ancestors!.Remove(current.Item);
-                    }
-                    continue;
-                }
-
-                var children = current.MutableChildren;
-                var allChildrenAreLeaves = children.Count > 0;
-                for (int i = 0; i < children.Count; i++)
-                {
-                    if (!children[i].IsLeaf)
-                    {
-                        allChildrenAreLeaves = false;
-                        break;
-                    }
-                }
-
-                if (allChildrenAreLeaves)
-                {
-                    // Preserve leaf expansion state and preorder events without pushing a stack
-                    // frame for every terminal node in wide hierarchies.
-                    traversedNodeCount += children.Count;
-                    for (int i = 0; i < children.Count; i++)
-                    {
-                        var child = children[i];
-                        if (!child.IsExpanded)
+                        if (ancestors == null)
                         {
-                            anyExpanded = true;
-                            (expandedNodes ??= new List<HierarchicalNode>()).Add(child);
+                            ancestors = new HashSet<object>(ReferenceEqualityComparer.Instance);
+                            var ancestor = current.Parent;
+                            while (ancestor != null)
+                            {
+                                ancestors.Add(ancestor.Item);
+                                ancestor = ancestor.Parent;
+                            }
+                        }
+
+                        ancestors.Add(current.Item);
+                    }
+
+                    bool isVirtualRoot = _isVirtualRoot && ReferenceEquals(current, Root);
+                    bool wasExpanded = current.IsExpanded;
+                    bool hadMaterializedChildren = current.HasMaterializedChildren;
+
+                    if (!isVirtualRoot &&
+                        (!current.HasMaterializedChildren || current.LoadError != null))
+                    {
+                        EnsureChildrenMaterializedSynchronously(
+                            current,
+                            forceReload: false,
+                            current.Level >= hashedCycleDepth ? ancestors : null,
+                            resolveAsyncChildrenOffContext);
+                        if (current.LoadError != null || !current.HasMaterializedChildren)
+                        {
+                            if (current.Level >= hashedCycleDepth)
+                            {
+                                ancestors!.Remove(current.Item);
+                            }
+                            continue;
                         }
                     }
 
-                    if (current.Level >= hashedCycleDepth)
+                    var materializedDuringOperation =
+                        !hadMaterializedChildren && current.HasMaterializedChildren;
+                    if (materializedDuringOperation || current.HasPendingBulkMaterializationCommit)
                     {
-                        ancestors!.Remove(current.Item);
+                        materializationChanged = true;
+                        (materializationCommits ??= new List<HierarchicalNode>()).Add(current);
                     }
-                    continue;
+
+                    if (!wasExpanded && !isVirtualRoot)
+                    {
+                        anyExpanded = true;
+                        (expandedNodes ??= new List<HierarchicalNode>()).Add(current);
+                    }
+
+                    if (current.IsLeaf || depth >= limit)
+                    {
+                        if (current.Level >= hashedCycleDepth)
+                        {
+                            ancestors!.Remove(current.Item);
+                        }
+                        continue;
+                    }
+
+                    var children = current.MutableChildren;
+                    var allChildrenAreLeaves = children.Count > 0;
+                    for (int i = 0; i < children.Count; i++)
+                    {
+                        if (!children[i].IsLeaf)
+                        {
+                            allChildrenAreLeaves = false;
+                            break;
+                        }
+                    }
+
+                    if (allChildrenAreLeaves)
+                    {
+                        // Preserve leaf expansion state and preorder events without pushing a stack
+                        // frame for every terminal node in wide hierarchies.
+                        traversedNodeCount += children.Count;
+                        for (int i = 0; i < children.Count; i++)
+                        {
+                            var child = children[i];
+                            if (child.HasPendingBulkMaterializationCommit)
+                            {
+                                materializationChanged = true;
+                                (materializationCommits ??= new List<HierarchicalNode>()).Add(child);
+                            }
+
+                            if (!child.IsExpanded)
+                            {
+                                anyExpanded = true;
+                                (expandedNodes ??= new List<HierarchicalNode>()).Add(child);
+                            }
+                        }
+
+                        if (current.Level >= hashedCycleDepth)
+                        {
+                            ancestors!.Remove(current.Item);
+                        }
+                        continue;
+                    }
+
+                    stack.Push((current, depth, true));
+                    for (int i = children.Count - 1; i >= 0; i--)
+                    {
+                        stack.Push((children[i], depth + 1, false));
+                    }
                 }
 
-                stack.Push((current, depth, true));
-                for (int i = children.Count - 1; i >= 0; i--)
+                if (!anyExpanded && !materializationChanged)
                 {
-                    stack.Push((children[i], depth + 1, false));
+                    return;
                 }
+
+                CommitBulkExpansion(
+                    start,
+                    expandedNodes,
+                    expansionStatesAlreadyApplied: false,
+                    materializationChanged,
+                    traversedNodeCount);
+            }
+            catch
+            {
+                SetPendingBulkMaterializationCommit(materializationCommits, value: true);
+                throw;
             }
 
-            if (!anyExpanded && !materializationChanged)
+            SetPendingBulkMaterializationCommit(materializationCommits, value: false);
+        }
+
+        private static void SetPendingBulkMaterializationCommit(
+            IList<HierarchicalNode>? nodes,
+            bool value)
+        {
+            if (nodes == null)
             {
                 return;
             }
 
-            CommitBulkExpansion(
-                start,
-                expandedNodes,
-                expansionStatesAlreadyApplied: false,
-                materializationChanged,
-                traversedNodeCount);
+            for (int i = 0; i < nodes.Count; i++)
+            {
+                nodes[i].HasPendingBulkMaterializationCommit = value;
+            }
         }
 
         private void CommitBulkExpansion(
@@ -2300,8 +2366,38 @@ namespace Avalonia.Controls.DataGridHierarchical
 
         private int InsertVisibleChildren(HierarchicalNode parent, int insertIndex)
         {
+            List<HierarchicalNode>? ignoredMaterializationCommits = null;
+            return InsertVisibleChildren(
+                parent,
+                insertIndex,
+                collectMaterializationCommits: false,
+                ref ignoredMaterializationCommits);
+        }
+
+        private int InsertVisibleChildren(
+            HierarchicalNode parent,
+            int insertIndex,
+            ref List<HierarchicalNode>? materializationCommits)
+        {
+            return InsertVisibleChildren(
+                parent,
+                insertIndex,
+                collectMaterializationCommits: true,
+                ref materializationCommits);
+        }
+
+        private int InsertVisibleChildren(
+            HierarchicalNode parent,
+            int insertIndex,
+            bool collectMaterializationCommits,
+            ref List<HierarchicalNode>? materializationCommits)
+        {
             var buffer = new List<HierarchicalNode>();
-            CollectVisibleChildren(parent, buffer);
+            CollectVisibleChildren(
+                parent,
+                buffer,
+                collectMaterializationCommits,
+                ref materializationCommits);
 
             if (buffer.Count > 0)
             {
@@ -2311,7 +2407,23 @@ namespace Avalonia.Controls.DataGridHierarchical
             return buffer.Count;
         }
 
-        private void CollectVisibleChildren(HierarchicalNode parent, List<HierarchicalNode> buffer)
+        private void CollectVisibleChildren(
+            HierarchicalNode parent,
+            List<HierarchicalNode> buffer)
+        {
+            List<HierarchicalNode>? ignoredMaterializationCommits = null;
+            CollectVisibleChildren(
+                parent,
+                buffer,
+                collectMaterializationCommits: false,
+                ref ignoredMaterializationCommits);
+        }
+
+        private void CollectVisibleChildren(
+            HierarchicalNode parent,
+            List<HierarchicalNode> buffer,
+            bool collectMaterializationCommits,
+            ref List<HierarchicalNode>? materializationCommits)
         {
             if (!parent.IsExpanded || parent.IsLeaf)
             {
@@ -2334,6 +2446,10 @@ namespace Avalonia.Controls.DataGridHierarchical
             {
                 var current = stack.Pop();
                 buffer.Add(current);
+                if (collectMaterializationCommits && current.HasPendingBulkMaterializationCommit)
+                {
+                    (materializationCommits ??= new List<HierarchicalNode>()).Add(current);
+                }
 
                 if (!current.IsExpanded || current.IsLeaf)
                 {
