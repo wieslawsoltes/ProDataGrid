@@ -1,0 +1,952 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+      <title>Class DataGridGeneratedAnalyticsField&lt;TItem, TValue&gt; | ProDataGrid for Avalonia </title>
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <meta name="title" content="Class DataGridGeneratedAnalyticsField&lt;TItem, TValue&gt; | ProDataGrid for Avalonia ">
+      
+      <meta name="description" content="Contains a typed direct getter and capability metadata for one generated field role.">
+      <link rel="icon" href="../favicon.ico">
+      <link rel="stylesheet" href="../public/docfx.min.css">
+      <link rel="stylesheet" href="../public/main.css">
+      <meta name="docfx:navrel" content="../toc.html">
+      <meta name="docfx:tocrel" content="toc.html">
+      
+      
+      
+      
+      <meta name="docfx:docurl" content="https://github.com/wieslawsoltes/ProDataGrid/new/master/apiSpec/new?filename=Avalonia_Controls_DataGridGeneratedAnalyticsField_2.md&amp;value=---%0Auid%3A%20Avalonia.Controls.DataGridGeneratedAnalyticsField%602%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">
+      <meta name="loc:inThisArticle" content="In this article">
+      <meta name="loc:searchResultsCount" content="{count} results for &quot;{query}&quot;">
+      <meta name="loc:searchNoResults" content="No results for &quot;{query}&quot;">
+      <meta name="loc:tocFilter" content="Filter by title">
+      <meta name="loc:nextArticle" content="Next">
+      <meta name="loc:prevArticle" content="Previous">
+      <meta name="loc:themeLight" content="Light">
+      <meta name="loc:themeDark" content="Dark">
+      <meta name="loc:themeAuto" content="Auto">
+      <meta name="loc:changeTheme" content="Change theme">
+      <meta name="loc:copy" content="Copy">
+      <meta name="loc:downloadPdf" content="Download PDF">
+
+      <script type="module" src="./../public/docfx.min.js"></script>
+
+      <script>
+        const theme = localStorage.getItem('theme') || 'auto'
+        document.documentElement.setAttribute('data-bs-theme', theme === 'auto' ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light') : theme)
+      </script>
+
+  </head>
+
+  <body class="tex2jax_ignore" data-layout="" data-yaml-mime="ManagedReference">
+    <header class="bg-body border-bottom">
+      <nav id="autocollapse" class="navbar navbar-expand-md" role="navigation">
+        <div class="container-xxl flex-nowrap">
+          <a class="navbar-brand" href="../index.html">
+            <img id="logo" class="svg" src="../images/logo.svg" alt="">
+            
+          </a>
+          <button class="btn btn-lg d-md-none border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navpanel" aria-controls="navpanel" aria-expanded="false" aria-label="Toggle navigation">
+            <i class="bi bi-three-dots"></i>
+          </button>
+          <div class="collapse navbar-collapse" id="navpanel">
+            <div id="navbar">
+            </div>
+          </div>
+        </div>
+      </nav>
+    </header>
+
+    <main class="container-xxl">
+      <div class="toc-offcanvas">
+        <div class="offcanvas-md offcanvas-start" tabindex="-1" id="tocOffcanvas" aria-labelledby="tocOffcanvasLabel">
+          <div class="offcanvas-header">
+            <h5 class="offcanvas-title" id="tocOffcanvasLabel">Table of Contents</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="offcanvas" data-bs-target="#tocOffcanvas" aria-label="Close"></button>
+          </div>
+          <div class="offcanvas-body">
+            <nav class="toc" id="toc"></nav>
+          </div>
+        </div>
+      </div>
+
+      <div class="content">
+        <div class="actionbar">
+          <button class="btn btn-lg border-0 d-md-none" type="button" data-bs-toggle="offcanvas" data-bs-target="#tocOffcanvas" aria-controls="tocOffcanvas" aria-expanded="false" aria-label="Show table of contents">
+            <i class="bi bi-list"></i>
+          </button>
+
+          <nav id="breadcrumb"></nav>
+        </div>
+
+        <article data-uid="Avalonia.Controls.DataGridGeneratedAnalyticsField`2">
+
+
+
+  <h1 id="Avalonia_Controls_DataGridGeneratedAnalyticsField_2" data-uid="Avalonia.Controls.DataGridGeneratedAnalyticsField`2" class="text-break">
+Class DataGridGeneratedAnalyticsField&lt;TItem, TValue&gt;  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/ColumnDefinitions/DataGridGeneratedCapabilityMetadata.cs/#L139"><i class="bi bi-code-slash"></i></a>
+  </h1>
+
+  <div class="facts text-secondary">
+    <dl><dt>Namespace</dt><dd><a class="xref" href="Avalonia.html">Avalonia</a>.<a class="xref" href="Avalonia.Controls.html">Controls</a></dd></dl>
+  <dl><dt>Assembly</dt><dd>Avalonia.Controls.DataGrid.dll</dd></dl>
+  </div>
+
+  <div class="markdown summary"><p>Contains a typed direct getter and capability metadata for one generated field role.</p>
+</div>
+  <div class="markdown conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public sealed class DataGridGeneratedAnalyticsField&lt;TItem, TValue&gt; : IDataGridGeneratedNumericAnalyticsField, IDataGridGeneratedAdvancedAnalyticsField, IDataGridGeneratedAnalyticsField</code></pre>
+  </div>
+
+
+
+  <h4 class="section">Type Parameters</h4>
+  <dl class="parameters">
+    <dt><code>TItem</code></dt>
+    <dd><p>The row item type.</p>
+</dd>
+    <dt><code>TValue</code></dt>
+    <dd><p>The field value type.</p>
+</dd>
+  </dl>
+
+  <dl class="typelist inheritance">
+    <dt>Inheritance</dt>
+    <dd>
+      <div><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object">object</a></div>
+      <div><span class="xref">DataGridGeneratedAnalyticsField&lt;TItem, TValue&gt;</span></div>
+    </dd>
+  </dl>
+
+  <dl class="typelist implements">
+    <dt>Implements</dt>
+    <dd>
+      <div><a class="xref" href="Avalonia.Controls.IDataGridGeneratedNumericAnalyticsField.html">IDataGridGeneratedNumericAnalyticsField</a></div>
+      <div><a class="xref" href="Avalonia.Controls.IDataGridGeneratedAdvancedAnalyticsField.html">IDataGridGeneratedAdvancedAnalyticsField</a></div>
+      <div><a class="xref" href="Avalonia.Controls.IDataGridGeneratedAnalyticsField.html">IDataGridGeneratedAnalyticsField</a></div>
+    </dd>
+  </dl>
+
+
+  <dl class="typelist inheritedMembers">
+    <dt>Inherited Members</dt>
+    <dd>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object)">object.Equals(object)</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object-system-object)">object.Equals(object, object)</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.gethashcode">object.GetHashCode()</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.gettype">object.GetType()</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.referenceequals">object.ReferenceEquals(object, object)</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.tostring">object.ToString()</a>
+    </div>
+  </dd></dl>
+
+
+
+
+
+
+  <h2 class="section" id="constructors">Constructors
+</h2>
+
+
+  <a id="Avalonia_Controls_DataGridGeneratedAnalyticsField_2__ctor_" data-uid="Avalonia.Controls.DataGridGeneratedAnalyticsField`2.#ctor*"></a>
+
+  <h3 id="Avalonia_Controls_DataGridGeneratedAnalyticsField_2__ctor_System_String_Avalonia_Controls_DataGridGeneratedAnalyticsRole_System_Int32_System_Func__0__1__Avalonia_Controls_DataGridGeneratedAdvancedAnalyticsOptions_System_String_System_String_System_Int32_Avalonia_Controls_DataGridPivoting_PivotValueDisplayMode_System_Collections_Generic_IReadOnlyList_System_String__" data-uid="Avalonia.Controls.DataGridGeneratedAnalyticsField`2.#ctor(System.String,Avalonia.Controls.DataGridGeneratedAnalyticsRole,System.Int32,System.Func{`0,`1},Avalonia.Controls.DataGridGeneratedAdvancedAnalyticsOptions,System.String,System.String,System.Int32,Avalonia.Controls.DataGridPivoting.PivotValueDisplayMode,System.Collections.Generic.IReadOnlyList{System.String})">
+  DataGridGeneratedAnalyticsField(string, DataGridGeneratedAnalyticsRole, int, Func&lt;TItem, TValue&gt;, DataGridGeneratedAdvancedAnalyticsOptions, string, string, int, PivotValueDisplayMode, IReadOnlyList&lt;string&gt;)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/ColumnDefinitions/DataGridGeneratedCapabilityMetadata.cs/#L176"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Initializes capability metadata with additive advanced analytics options.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public DataGridGeneratedAnalyticsField(string columnKey, DataGridGeneratedAnalyticsRole role, int order, Func&lt;TItem, TValue&gt; getter, DataGridGeneratedAdvancedAnalyticsOptions advanced, string name = null, string format = null, int aggregate = 0, PivotValueDisplayMode pivotDisplayMode = PivotValueDisplayMode.Value, IReadOnlyList&lt;string&gt; dependencies = null)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>columnKey</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></dt>
+    <dd></dd>
+    <dt><code>role</code> <a class="xref" href="Avalonia.Controls.DataGridGeneratedAnalyticsRole.html">DataGridGeneratedAnalyticsRole</a></dt>
+    <dd></dd>
+    <dt><code>order</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a></dt>
+    <dd></dd>
+    <dt><code>getter</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.func-2">Func</a>&lt;TItem, TValue&gt;</dt>
+    <dd></dd>
+    <dt><code>advanced</code> <a class="xref" href="Avalonia.Controls.DataGridGeneratedAdvancedAnalyticsOptions.html">DataGridGeneratedAdvancedAnalyticsOptions</a></dt>
+    <dd></dd>
+    <dt><code>name</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></dt>
+    <dd></dd>
+    <dt><code>format</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></dt>
+    <dd></dd>
+    <dt><code>aggregate</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a></dt>
+    <dd></dd>
+    <dt><code>pivotDisplayMode</code> <a class="xref" href="Avalonia.Controls.DataGridPivoting.PivotValueDisplayMode.html">PivotValueDisplayMode</a></dt>
+    <dd></dd>
+    <dt><code>dependencies</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.ireadonlylist-1">IReadOnlyList</a>&lt;<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a>&gt;</dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Avalonia_Controls_DataGridGeneratedAnalyticsField_2__ctor_" data-uid="Avalonia.Controls.DataGridGeneratedAnalyticsField`2.#ctor*"></a>
+
+  <h3 id="Avalonia_Controls_DataGridGeneratedAnalyticsField_2__ctor_System_String_Avalonia_Controls_DataGridGeneratedAnalyticsRole_System_Int32_System_Func__0__1__System_Func_System_Object_System_Nullable_System_Double___Avalonia_Controls_DataGridGeneratedAdvancedAnalyticsOptions_System_String_System_String_System_Int32_Avalonia_Controls_DataGridPivoting_PivotValueDisplayMode_System_Collections_Generic_IReadOnlyList_System_String__" data-uid="Avalonia.Controls.DataGridGeneratedAnalyticsField`2.#ctor(System.String,Avalonia.Controls.DataGridGeneratedAnalyticsRole,System.Int32,System.Func{`0,`1},System.Func{System.Object,System.Nullable{System.Double}},Avalonia.Controls.DataGridGeneratedAdvancedAnalyticsOptions,System.String,System.String,System.Int32,Avalonia.Controls.DataGridPivoting.PivotValueDisplayMode,System.Collections.Generic.IReadOnlyList{System.String})">
+  DataGridGeneratedAnalyticsField(string, DataGridGeneratedAnalyticsRole, int, Func&lt;TItem, TValue&gt;, Func&lt;object, double?&gt;, DataGridGeneratedAdvancedAnalyticsOptions, string, string, int, PivotValueDisplayMode, IReadOnlyList&lt;string&gt;)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/ColumnDefinitions/DataGridGeneratedCapabilityMetadata.cs/#L230"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Initializes capability metadata with a numeric selector and additive advanced analytics options.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public DataGridGeneratedAnalyticsField(string columnKey, DataGridGeneratedAnalyticsRole role, int order, Func&lt;TItem, TValue&gt; getter, Func&lt;object, double?&gt; numericValueSelector, DataGridGeneratedAdvancedAnalyticsOptions advanced, string name = null, string format = null, int aggregate = 0, PivotValueDisplayMode pivotDisplayMode = PivotValueDisplayMode.Value, IReadOnlyList&lt;string&gt; dependencies = null)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>columnKey</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></dt>
+    <dd></dd>
+    <dt><code>role</code> <a class="xref" href="Avalonia.Controls.DataGridGeneratedAnalyticsRole.html">DataGridGeneratedAnalyticsRole</a></dt>
+    <dd></dd>
+    <dt><code>order</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a></dt>
+    <dd></dd>
+    <dt><code>getter</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.func-2">Func</a>&lt;TItem, TValue&gt;</dt>
+    <dd></dd>
+    <dt><code>numericValueSelector</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.func-2">Func</a>&lt;<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object">object</a>, <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.double">double</a>?&gt;</dt>
+    <dd></dd>
+    <dt><code>advanced</code> <a class="xref" href="Avalonia.Controls.DataGridGeneratedAdvancedAnalyticsOptions.html">DataGridGeneratedAdvancedAnalyticsOptions</a></dt>
+    <dd></dd>
+    <dt><code>name</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></dt>
+    <dd></dd>
+    <dt><code>format</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></dt>
+    <dd></dd>
+    <dt><code>aggregate</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a></dt>
+    <dd></dd>
+    <dt><code>pivotDisplayMode</code> <a class="xref" href="Avalonia.Controls.DataGridPivoting.PivotValueDisplayMode.html">PivotValueDisplayMode</a></dt>
+    <dd></dd>
+    <dt><code>dependencies</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.ireadonlylist-1">IReadOnlyList</a>&lt;<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a>&gt;</dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Avalonia_Controls_DataGridGeneratedAnalyticsField_2__ctor_" data-uid="Avalonia.Controls.DataGridGeneratedAnalyticsField`2.#ctor*"></a>
+
+  <h3 id="Avalonia_Controls_DataGridGeneratedAnalyticsField_2__ctor_System_String_Avalonia_Controls_DataGridGeneratedAnalyticsRole_System_Int32_System_Func__0__1__System_Func_System_Object_System_Nullable_System_Double___System_String_System_String_System_Int32_Avalonia_Controls_DataGridPivoting_PivotValueDisplayMode_System_Collections_Generic_IReadOnlyList_System_String__" data-uid="Avalonia.Controls.DataGridGeneratedAnalyticsField`2.#ctor(System.String,Avalonia.Controls.DataGridGeneratedAnalyticsRole,System.Int32,System.Func{`0,`1},System.Func{System.Object,System.Nullable{System.Double}},System.String,System.String,System.Int32,Avalonia.Controls.DataGridPivoting.PivotValueDisplayMode,System.Collections.Generic.IReadOnlyList{System.String})">
+  DataGridGeneratedAnalyticsField(string, DataGridGeneratedAnalyticsRole, int, Func&lt;TItem, TValue&gt;, Func&lt;object, double?&gt;, string, string, int, PivotValueDisplayMode, IReadOnlyList&lt;string&gt;)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/ColumnDefinitions/DataGridGeneratedCapabilityMetadata.cs/#L203"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Initializes capability metadata with a direct numeric chart selector.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public DataGridGeneratedAnalyticsField(string columnKey, DataGridGeneratedAnalyticsRole role, int order, Func&lt;TItem, TValue&gt; getter, Func&lt;object, double?&gt; numericValueSelector, string name = null, string format = null, int aggregate = 0, PivotValueDisplayMode pivotDisplayMode = PivotValueDisplayMode.Value, IReadOnlyList&lt;string&gt; dependencies = null)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>columnKey</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></dt>
+    <dd></dd>
+    <dt><code>role</code> <a class="xref" href="Avalonia.Controls.DataGridGeneratedAnalyticsRole.html">DataGridGeneratedAnalyticsRole</a></dt>
+    <dd></dd>
+    <dt><code>order</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a></dt>
+    <dd></dd>
+    <dt><code>getter</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.func-2">Func</a>&lt;TItem, TValue&gt;</dt>
+    <dd></dd>
+    <dt><code>numericValueSelector</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.func-2">Func</a>&lt;<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object">object</a>, <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.double">double</a>?&gt;</dt>
+    <dd></dd>
+    <dt><code>name</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></dt>
+    <dd></dd>
+    <dt><code>format</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></dt>
+    <dd></dd>
+    <dt><code>aggregate</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a></dt>
+    <dd></dd>
+    <dt><code>pivotDisplayMode</code> <a class="xref" href="Avalonia.Controls.DataGridPivoting.PivotValueDisplayMode.html">PivotValueDisplayMode</a></dt>
+    <dd></dd>
+    <dt><code>dependencies</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.ireadonlylist-1">IReadOnlyList</a>&lt;<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a>&gt;</dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Avalonia_Controls_DataGridGeneratedAnalyticsField_2__ctor_" data-uid="Avalonia.Controls.DataGridGeneratedAnalyticsField`2.#ctor*"></a>
+
+  <h3 id="Avalonia_Controls_DataGridGeneratedAnalyticsField_2__ctor_System_String_Avalonia_Controls_DataGridGeneratedAnalyticsRole_System_Int32_System_Func__0__1__System_String_System_String_System_Int32_Avalonia_Controls_DataGridPivoting_PivotValueDisplayMode_System_Collections_Generic_IReadOnlyList_System_String__" data-uid="Avalonia.Controls.DataGridGeneratedAnalyticsField`2.#ctor(System.String,Avalonia.Controls.DataGridGeneratedAnalyticsRole,System.Int32,System.Func{`0,`1},System.String,System.String,System.Int32,Avalonia.Controls.DataGridPivoting.PivotValueDisplayMode,System.Collections.Generic.IReadOnlyList{System.String})">
+  DataGridGeneratedAnalyticsField(string, DataGridGeneratedAnalyticsRole, int, Func&lt;TItem, TValue&gt;, string, string, int, PivotValueDisplayMode, IReadOnlyList&lt;string&gt;)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/ColumnDefinitions/DataGridGeneratedCapabilityMetadata.cs/#L151"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Initializes capability metadata.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public DataGridGeneratedAnalyticsField(string columnKey, DataGridGeneratedAnalyticsRole role, int order, Func&lt;TItem, TValue&gt; getter, string name = null, string format = null, int aggregate = 0, PivotValueDisplayMode pivotDisplayMode = PivotValueDisplayMode.Value, IReadOnlyList&lt;string&gt; dependencies = null)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>columnKey</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></dt>
+    <dd></dd>
+    <dt><code>role</code> <a class="xref" href="Avalonia.Controls.DataGridGeneratedAnalyticsRole.html">DataGridGeneratedAnalyticsRole</a></dt>
+    <dd></dd>
+    <dt><code>order</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a></dt>
+    <dd></dd>
+    <dt><code>getter</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.func-2">Func</a>&lt;TItem, TValue&gt;</dt>
+    <dd></dd>
+    <dt><code>name</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></dt>
+    <dd></dd>
+    <dt><code>format</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></dt>
+    <dd></dd>
+    <dt><code>aggregate</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a></dt>
+    <dd></dd>
+    <dt><code>pivotDisplayMode</code> <a class="xref" href="Avalonia.Controls.DataGridPivoting.PivotValueDisplayMode.html">PivotValueDisplayMode</a></dt>
+    <dd></dd>
+    <dt><code>dependencies</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.ireadonlylist-1">IReadOnlyList</a>&lt;<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a>&gt;</dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+
+  <h2 class="section" id="properties">Properties
+</h2>
+
+
+  <a id="Avalonia_Controls_DataGridGeneratedAnalyticsField_2_Aggregate_" data-uid="Avalonia.Controls.DataGridGeneratedAnalyticsField`2.Aggregate*"></a>
+
+  <h3 id="Avalonia_Controls_DataGridGeneratedAnalyticsField_2_Aggregate" data-uid="Avalonia.Controls.DataGridGeneratedAnalyticsField`2.Aggregate">
+  Aggregate
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/ColumnDefinitions/DataGridGeneratedCapabilityMetadata.cs/#L283"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Gets aggregate identity encoded by the declaring integration.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public int Aggregate { get; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="Avalonia_Controls_DataGridGeneratedAnalyticsField_2_ColumnKey_" data-uid="Avalonia.Controls.DataGridGeneratedAnalyticsField`2.ColumnKey*"></a>
+
+  <h3 id="Avalonia_Controls_DataGridGeneratedAnalyticsField_2_ColumnKey" data-uid="Avalonia.Controls.DataGridGeneratedAnalyticsField`2.ColumnKey">
+  ColumnKey
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/ColumnDefinitions/DataGridGeneratedCapabilityMetadata.cs/#L273"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Gets the stable column key.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public string ColumnKey { get; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="Avalonia_Controls_DataGridGeneratedAnalyticsField_2_ConfigureOutlineGroup_" data-uid="Avalonia.Controls.DataGridGeneratedAnalyticsField`2.ConfigureOutlineGroup*"></a>
+
+  <h3 id="Avalonia_Controls_DataGridGeneratedAnalyticsField_2_ConfigureOutlineGroup" data-uid="Avalonia.Controls.DataGridGeneratedAnalyticsField`2.ConfigureOutlineGroup">
+  ConfigureOutlineGroup
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/ColumnDefinitions/DataGridGeneratedCapabilityMetadata.cs/#L297"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Gets an optional outline-group configuration hook.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public Action&lt;OutlineGroupField&gt; ConfigureOutlineGroup { get; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.action-1">Action</a>&lt;<a class="xref" href="Avalonia.Controls.DataGridReporting.OutlineGroupField.html">OutlineGroupField</a>&gt;</dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="Avalonia_Controls_DataGridGeneratedAnalyticsField_2_ConfigureOutlineValue_" data-uid="Avalonia.Controls.DataGridGeneratedAnalyticsField`2.ConfigureOutlineValue*"></a>
+
+  <h3 id="Avalonia_Controls_DataGridGeneratedAnalyticsField_2_ConfigureOutlineValue" data-uid="Avalonia.Controls.DataGridGeneratedAnalyticsField`2.ConfigureOutlineValue">
+  ConfigureOutlineValue
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/ColumnDefinitions/DataGridGeneratedCapabilityMetadata.cs/#L299"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Gets an optional outline-value configuration hook.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public Action&lt;OutlineValueField&gt; ConfigureOutlineValue { get; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.action-1">Action</a>&lt;<a class="xref" href="Avalonia.Controls.DataGridReporting.OutlineValueField.html">OutlineValueField</a>&gt;</dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="Avalonia_Controls_DataGridGeneratedAnalyticsField_2_ConfigurePivotAxis_" data-uid="Avalonia.Controls.DataGridGeneratedAnalyticsField`2.ConfigurePivotAxis*"></a>
+
+  <h3 id="Avalonia_Controls_DataGridGeneratedAnalyticsField_2_ConfigurePivotAxis" data-uid="Avalonia.Controls.DataGridGeneratedAnalyticsField`2.ConfigurePivotAxis">
+  ConfigurePivotAxis
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/ColumnDefinitions/DataGridGeneratedCapabilityMetadata.cs/#L293"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Gets an optional pivot-axis configuration hook.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public Action&lt;PivotAxisField&gt; ConfigurePivotAxis { get; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.action-1">Action</a>&lt;<a class="xref" href="Avalonia.Controls.DataGridPivoting.PivotAxisField.html">PivotAxisField</a>&gt;</dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="Avalonia_Controls_DataGridGeneratedAnalyticsField_2_ConfigurePivotValue_" data-uid="Avalonia.Controls.DataGridGeneratedAnalyticsField`2.ConfigurePivotValue*"></a>
+
+  <h3 id="Avalonia_Controls_DataGridGeneratedAnalyticsField_2_ConfigurePivotValue" data-uid="Avalonia.Controls.DataGridGeneratedAnalyticsField`2.ConfigurePivotValue">
+  ConfigurePivotValue
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/ColumnDefinitions/DataGridGeneratedCapabilityMetadata.cs/#L295"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Gets an optional pivot-value configuration hook.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public Action&lt;PivotValueField&gt; ConfigurePivotValue { get; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.action-1">Action</a>&lt;<a class="xref" href="Avalonia.Controls.DataGridPivoting.PivotValueField.html">PivotValueField</a>&gt;</dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="Avalonia_Controls_DataGridGeneratedAnalyticsField_2_CustomAggregatorFactory_" data-uid="Avalonia.Controls.DataGridGeneratedAnalyticsField`2.CustomAggregatorFactory*"></a>
+
+  <h3 id="Avalonia_Controls_DataGridGeneratedAnalyticsField_2_CustomAggregatorFactory" data-uid="Avalonia.Controls.DataGridGeneratedAnalyticsField`2.CustomAggregatorFactory">
+  CustomAggregatorFactory
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/ColumnDefinitions/DataGridGeneratedCapabilityMetadata.cs/#L291"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Gets an optional direct custom pivot/outline aggregator factory.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public Func&lt;IPivotAggregator&gt; CustomAggregatorFactory { get; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.func-1">Func</a>&lt;<a class="xref" href="Avalonia.Controls.DataGridPivoting.IPivotAggregator.html">IPivotAggregator</a>&gt;</dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="Avalonia_Controls_DataGridGeneratedAnalyticsField_2_Dependencies_" data-uid="Avalonia.Controls.DataGridGeneratedAnalyticsField`2.Dependencies*"></a>
+
+  <h3 id="Avalonia_Controls_DataGridGeneratedAnalyticsField_2_Dependencies" data-uid="Avalonia.Controls.DataGridGeneratedAnalyticsField`2.Dependencies">
+  Dependencies
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/ColumnDefinitions/DataGridGeneratedCapabilityMetadata.cs/#L287"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Gets stable formula dependency keys.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public IReadOnlyList&lt;string&gt; Dependencies { get; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.ireadonlylist-1">IReadOnlyList</a>&lt;<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a>&gt;</dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="Avalonia_Controls_DataGridGeneratedAnalyticsField_2_Format_" data-uid="Avalonia.Controls.DataGridGeneratedAnalyticsField`2.Format*"></a>
+
+  <h3 id="Avalonia_Controls_DataGridGeneratedAnalyticsField_2_Format" data-uid="Avalonia.Controls.DataGridGeneratedAnalyticsField`2.Format">
+  Format
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/ColumnDefinitions/DataGridGeneratedCapabilityMetadata.cs/#L281"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Gets an optional display format.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public string Format { get; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="Avalonia_Controls_DataGridGeneratedAnalyticsField_2_Formula_" data-uid="Avalonia.Controls.DataGridGeneratedAnalyticsField`2.Formula*"></a>
+
+  <h3 id="Avalonia_Controls_DataGridGeneratedAnalyticsField_2_Formula" data-uid="Avalonia.Controls.DataGridGeneratedAnalyticsField`2.Formula">
+  Formula
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/ColumnDefinitions/DataGridGeneratedCapabilityMetadata.cs/#L289"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Gets an optional calculated pivot formula.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public string Formula { get; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="Avalonia_Controls_DataGridGeneratedAnalyticsField_2_Name_" data-uid="Avalonia.Controls.DataGridGeneratedAnalyticsField`2.Name*"></a>
+
+  <h3 id="Avalonia_Controls_DataGridGeneratedAnalyticsField_2_Name" data-uid="Avalonia.Controls.DataGridGeneratedAnalyticsField`2.Name">
+  Name
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/ColumnDefinitions/DataGridGeneratedCapabilityMetadata.cs/#L279"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Gets an optional series or formula name.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public string Name { get; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="Avalonia_Controls_DataGridGeneratedAnalyticsField_2_NumericValueSelector_" data-uid="Avalonia.Controls.DataGridGeneratedAnalyticsField`2.NumericValueSelector*"></a>
+
+  <h3 id="Avalonia_Controls_DataGridGeneratedAnalyticsField_2_NumericValueSelector" data-uid="Avalonia.Controls.DataGridGeneratedAnalyticsField`2.NumericValueSelector">
+  NumericValueSelector
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/ColumnDefinitions/DataGridGeneratedCapabilityMetadata.cs/#L301"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Gets an optional generated numeric selector for allocation-conscious chart hot paths.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public Func&lt;object, double?&gt; NumericValueSelector { get; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.func-2">Func</a>&lt;<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object">object</a>, <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.double">double</a>?&gt;</dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="Avalonia_Controls_DataGridGeneratedAnalyticsField_2_Order_" data-uid="Avalonia.Controls.DataGridGeneratedAnalyticsField`2.Order*"></a>
+
+  <h3 id="Avalonia_Controls_DataGridGeneratedAnalyticsField_2_Order" data-uid="Avalonia.Controls.DataGridGeneratedAnalyticsField`2.Order">
+  Order
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/ColumnDefinitions/DataGridGeneratedCapabilityMetadata.cs/#L277"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Gets precedence within its role.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public int Order { get; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="Avalonia_Controls_DataGridGeneratedAnalyticsField_2_PivotDisplayMode_" data-uid="Avalonia.Controls.DataGridGeneratedAnalyticsField`2.PivotDisplayMode*"></a>
+
+  <h3 id="Avalonia_Controls_DataGridGeneratedAnalyticsField_2_PivotDisplayMode" data-uid="Avalonia.Controls.DataGridGeneratedAnalyticsField`2.PivotDisplayMode">
+  PivotDisplayMode
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/ColumnDefinitions/DataGridGeneratedCapabilityMetadata.cs/#L285"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Gets pivot display mode.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public PivotValueDisplayMode PivotDisplayMode { get; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="Avalonia.Controls.DataGridPivoting.PivotValueDisplayMode.html">PivotValueDisplayMode</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="Avalonia_Controls_DataGridGeneratedAnalyticsField_2_Role_" data-uid="Avalonia.Controls.DataGridGeneratedAnalyticsField`2.Role*"></a>
+
+  <h3 id="Avalonia_Controls_DataGridGeneratedAnalyticsField_2_Role" data-uid="Avalonia.Controls.DataGridGeneratedAnalyticsField`2.Role">
+  Role
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/ColumnDefinitions/DataGridGeneratedCapabilityMetadata.cs/#L275"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Gets assigned roles.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public DataGridGeneratedAnalyticsRole Role { get; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="Avalonia.Controls.DataGridGeneratedAnalyticsRole.html">DataGridGeneratedAnalyticsRole</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <h2 class="section" id="methods">Methods
+</h2>
+
+
+  <a id="Avalonia_Controls_DataGridGeneratedAnalyticsField_2_GetTypedValue_" data-uid="Avalonia.Controls.DataGridGeneratedAnalyticsField`2.GetTypedValue*"></a>
+
+  <h3 id="Avalonia_Controls_DataGridGeneratedAnalyticsField_2_GetTypedValue__0_" data-uid="Avalonia.Controls.DataGridGeneratedAnalyticsField`2.GetTypedValue(`0)">
+  GetTypedValue(TItem)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/ColumnDefinitions/DataGridGeneratedCapabilityMetadata.cs/#L303"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Reads a typed value.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public TValue GetTypedValue(TItem item)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>item</code> <span class="xref">TItem</span></dt>
+    <dd></dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><span class="xref">TValue</span></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Avalonia_Controls_DataGridGeneratedAnalyticsField_2_GetValue_" data-uid="Avalonia.Controls.DataGridGeneratedAnalyticsField`2.GetValue*"></a>
+
+  <h3 id="Avalonia_Controls_DataGridGeneratedAnalyticsField_2_GetValue_System_Object_" data-uid="Avalonia.Controls.DataGridGeneratedAnalyticsField`2.GetValue(System.Object)">
+  GetValue(object)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/ColumnDefinitions/DataGridGeneratedCapabilityMetadata.cs/#L305"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Reads a value without reflection.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public object GetValue(object item)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>item</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object">object</a></dt>
+    <dd></dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object">object</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+
+</article>
+
+        <div class="contribution d-print-none">
+          <a href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/ColumnDefinitions/DataGridGeneratedCapabilityMetadata.cs/#L139" class="edit-link">Edit this page</a>
+        </div>
+
+
+      </div>
+
+      <div class="affix">
+        <nav id="affix"></nav>
+      </div>
+    </main>
+
+
+    <footer class="border-top text-secondary">
+      <div class="container-xxl">
+        <div class="flex-fill">
+          <span>Made with <a href="https://dotnet.github.io/docfx">docfx</a></span>
+        </div>
+      </div>
+    </footer>
+  </body>
+</html>

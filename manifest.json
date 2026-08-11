@@ -802,6 +802,20 @@
     },
     {
       "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.DataGridCellRealizationContext.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.DataGridCellRealizationContext.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.DataGridCellRealizationContext",
+      "Summary": "<p sourcefile=\"api/Avalonia.Controls.DataGridCellRealizationContext.yml\" sourcestartlinenumber=\"1\">Describes a cell container realization request.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
       "source_relative_path": "api/Avalonia.Controls.DataGridCellState.yml",
       "output": {
         ".html": {
@@ -1012,6 +1026,20 @@
     },
     {
       "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.DataGridColumnAccessorRegistration.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.DataGridColumnAccessorRegistration.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.DataGridColumnAccessorRegistration",
+      "Summary": "<p sourcefile=\"api/Avalonia.Controls.DataGridColumnAccessorRegistration.yml\" sourcestartlinenumber=\"1\">Associates a stable model identifier with a generated value accessor.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
       "source_relative_path": "api/Avalonia.Controls.DataGridColumnChooser.yml",
       "output": {
         ".html": {
@@ -1205,6 +1233,20 @@
       "IsMRef": true,
       "Title": "Avalonia.Controls.DataGridColumnHeaderClickEventArgs",
       "Summary": "<p sourcefile=\"api/Avalonia.Controls.DataGridColumnHeaderClickEventArgs.yml\" sourcestartlinenumber=\"1\">Provides data for DataGrid column header click events.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.DataGridColumnHeaderRealizationContext.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.DataGridColumnHeaderRealizationContext.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.DataGridColumnHeaderRealizationContext",
+      "Summary": "<p sourcefile=\"api/Avalonia.Controls.DataGridColumnHeaderRealizationContext.yml\" sourcestartlinenumber=\"1\">Describes a column-header container realization request.</p>\n"
     },
     {
       "type": "ManagedReference",
@@ -1905,6 +1947,48 @@
       "IsMRef": true,
       "Title": "Avalonia.Controls.DataGridEditing.DataGridEditingInteractionModel",
       "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.DataGridEditing.DataGridGeneratedEditingInteractionModel.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.DataGridEditing.DataGridGeneratedEditingInteractionModel.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.DataGridEditing.DataGridGeneratedEditingInteractionModel",
+      "Summary": "<p sourcefile=\"api/Avalonia.Controls.DataGridEditing.DataGridGeneratedEditingInteractionModel.yml\" sourcestartlinenumber=\"1\">Applies a generated editing activation profile through the DataGrid interaction boundary.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.DataGridEditing.DataGridGeneratedEditingInteractionModelFactory.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.DataGridEditing.DataGridGeneratedEditingInteractionModelFactory.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.DataGridEditing.DataGridGeneratedEditingInteractionModelFactory",
+      "Summary": "<p sourcefile=\"api/Avalonia.Controls.DataGridEditing.DataGridGeneratedEditingInteractionModelFactory.yml\" sourcestartlinenumber=\"1\">Creates generated editing interaction models from one immutable profile.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.DataGridEditing.DataGridGeneratedEditingInteractionProfile.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.DataGridEditing.DataGridGeneratedEditingInteractionProfile.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.DataGridEditing.DataGridGeneratedEditingInteractionProfile",
+      "Summary": "<p sourcefile=\"api/Avalonia.Controls.DataGridEditing.DataGridGeneratedEditingInteractionProfile.yml\" sourcestartlinenumber=\"1\">Describes a reflection-free generated editing activation profile.</p>\n"
     },
     {
       "type": "ManagedReference",
@@ -2675,6 +2759,1630 @@
       "IsMRef": true,
       "Title": "Avalonia.Controls.DataGridFormulas",
       "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.DataGridGeneratedAdvancedAnalyticsOptions.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.DataGridGeneratedAdvancedAnalyticsOptions.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.DataGridGeneratedAdvancedAnalyticsOptions",
+      "Summary": "<p sourcefile=\"api/Avalonia.Controls.DataGridGeneratedAdvancedAnalyticsOptions.yml\" sourcestartlinenumber=\"1\">Contains additive calculated-field, custom-aggregate, and field-configuration metadata.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.DataGridGeneratedAnalyticsField-2.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.DataGridGeneratedAnalyticsField-2.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.DataGridGeneratedAnalyticsField<TItem, TValue>",
+      "Summary": "<p sourcefile=\"api/Avalonia.Controls.DataGridGeneratedAnalyticsField-2.yml\" sourcestartlinenumber=\"1\">Contains a typed direct getter and capability metadata for one generated field role.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.DataGridGeneratedAnalyticsRole.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.DataGridGeneratedAnalyticsRole.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.DataGridGeneratedAnalyticsRole",
+      "Summary": "<p sourcefile=\"api/Avalonia.Controls.DataGridGeneratedAnalyticsRole.yml\" sourcestartlinenumber=\"1\">Identifies analytics and projection roles assigned to a generated field.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.DataGridGeneratedAsyncStreamPump-2.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.DataGridGeneratedAsyncStreamPump-2.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.DataGridGeneratedAsyncStreamPump<TItem, TKey>",
+      "Summary": "<p sourcefile=\"api/Avalonia.Controls.DataGridGeneratedAsyncStreamPump-2.yml\" sourcestartlinenumber=\"1\">Pumps asynchronous item sources through a bounded generated buffer and one callback per batch.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.DataGridGeneratedBandField.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.DataGridGeneratedBandField.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.DataGridGeneratedBandField",
+      "Summary": "<p sourcefile=\"api/Avalonia.Controls.DataGridGeneratedBandField.yml\" sourcestartlinenumber=\"1\">Describes one generated leaf in a stable column-band path.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.DataGridGeneratedBandNode.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.DataGridGeneratedBandNode.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.DataGridGeneratedBandNode",
+      "Summary": "<p sourcefile=\"api/Avalonia.Controls.DataGridGeneratedBandNode.yml\" sourcestartlinenumber=\"1\">Represents one immutable node in a generated column-band tree.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.DataGridGeneratedCellKey-1.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.DataGridGeneratedCellKey-1.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.DataGridGeneratedCellKey<TKey>",
+      "Summary": "<p sourcefile=\"api/Avalonia.Controls.DataGridGeneratedCellKey-1.yml\" sourcestartlinenumber=\"1\">Identifies a cell without retaining an item or column instance.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.DataGridGeneratedClipboardController-2.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.DataGridGeneratedClipboardController-2.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.DataGridGeneratedClipboardController<TItem, TKey>",
+      "Summary": "<p sourcefile=\"api/Avalonia.Controls.DataGridGeneratedClipboardController-2.yml\" sourcestartlinenumber=\"1\">Exports and imports generated fields without reflection.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.DataGridGeneratedClipboardImportModel-2.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.DataGridGeneratedClipboardImportModel-2.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.DataGridGeneratedClipboardImportModel<TItem, TKey>",
+      "Summary": "<p sourcefile=\"api/Avalonia.Controls.DataGridGeneratedClipboardImportModel-2.yml\" sourcestartlinenumber=\"1\">Adapts a generated typed clipboard controller to the DataGrid paste pipeline without property paths or reflection.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.DataGridGeneratedCollectionMutationService-1.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.DataGridGeneratedCollectionMutationService-1.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.DataGridGeneratedCollectionMutationService<TItem>",
+      "Summary": "<p sourcefile=\"api/Avalonia.Controls.DataGridGeneratedCollectionMutationService-1.yml\" sourcestartlinenumber=\"1\">Validates and forwards bounded range mutations to an application-owned handler.\nThe service does not own or inspect the destination collection.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.DataGridGeneratedCollectionViewController-2.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.DataGridGeneratedCollectionViewController-2.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.DataGridGeneratedCollectionViewController<TItem, TKey>",
+      "Summary": "<p sourcefile=\"api/Avalonia.Controls.DataGridGeneratedCollectionViewController-2.yml\" sourcestartlinenumber=\"1\">Coordinates a typed <xref href=\"Avalonia.Collections.DataGridCollectionView\" data-throw-if-not-resolved=\"false\"></xref> with stable-key currency and selection.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.DataGridGeneratedCollectionViewOperations.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.DataGridGeneratedCollectionViewOperations.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.DataGridGeneratedCollectionViewOperations",
+      "Summary": "<p sourcefile=\"api/Avalonia.Controls.DataGridGeneratedCollectionViewOperations.yml\" sourcestartlinenumber=\"1\">Applies generated typed operations to a <xref href=\"Avalonia.Collections.DataGridCollectionView\" data-throw-if-not-resolved=\"false\"></xref>.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.DataGridGeneratedCollectionViewSnapshot-1.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.DataGridGeneratedCollectionViewSnapshot-1.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.DataGridGeneratedCollectionViewSnapshot<TKey>",
+      "Summary": "<p sourcefile=\"api/Avalonia.Controls.DataGridGeneratedCollectionViewSnapshot-1.yml\" sourcestartlinenumber=\"1\">Captures generated collection-view paging, currency, and selection state by stable key.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.DataGridGeneratedColumnChoice.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.DataGridGeneratedColumnChoice.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.DataGridGeneratedColumnChoice",
+      "Summary": "<p sourcefile=\"api/Avalonia.Controls.DataGridGeneratedColumnChoice.yml\" sourcestartlinenumber=\"1\">Represents a generated column chooser entry backed by a live definition.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.DataGridGeneratedColumnLayoutController.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.DataGridGeneratedColumnLayoutController.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.DataGridGeneratedColumnLayoutController",
+      "Summary": "<p sourcefile=\"api/Avalonia.Controls.DataGridGeneratedColumnLayoutController.yml\" sourcestartlinenumber=\"1\">Owns generated column chooser, order, visibility, width reset, and band-tree state.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.DataGridGeneratedComparableField-2.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.DataGridGeneratedComparableField-2.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.DataGridGeneratedComparableField<TItem, TValue>",
+      "Summary": "<p sourcefile=\"api/Avalonia.Controls.DataGridGeneratedComparableField-2.yml\" sourcestartlinenumber=\"1\">Adds ordered comparison operations to a generated field.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.DataGridGeneratedConditionalFormatting.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.DataGridGeneratedConditionalFormatting.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.DataGridGeneratedConditionalFormatting",
+      "Summary": "<p sourcefile=\"api/Avalonia.Controls.DataGridGeneratedConditionalFormatting.yml\" sourcestartlinenumber=\"1\">Creates runtime conditional-formatting models from generated typed rules.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.DataGridGeneratedConditionalRule-2.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.DataGridGeneratedConditionalRule-2.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.DataGridGeneratedConditionalRule<TItem, TValue>",
+      "Summary": "<p sourcefile=\"api/Avalonia.Controls.DataGridGeneratedConditionalRule-2.yml\" sourcestartlinenumber=\"1\">Represents a generated conditional-format predicate and style metadata.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.DataGridGeneratedControllerContext-1.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.DataGridGeneratedControllerContext-1.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.DataGridGeneratedControllerContext<TItem>",
+      "Summary": "<p sourcefile=\"api/Avalonia.Controls.DataGridGeneratedControllerContext-1.yml\" sourcestartlinenumber=\"1\">Supplies a generated schema and validated options to a custom controller factory.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.DataGridGeneratedControllerOptions-1.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.DataGridGeneratedControllerOptions-1.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.DataGridGeneratedControllerOptions<TItem>",
+      "Summary": "<p sourcefile=\"api/Avalonia.Controls.DataGridGeneratedControllerOptions-1.yml\" sourcestartlinenumber=\"1\">Configures construction of a generated operation controller.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.DataGridGeneratedDataOperations-1.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.DataGridGeneratedDataOperations-1.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.DataGridGeneratedDataOperations<TItem>",
+      "Summary": "<p sourcefile=\"api/Avalonia.Controls.DataGridGeneratedDataOperations-1.yml\" sourcestartlinenumber=\"1\">Compiles descriptor models to accessor-based delegates suitable for collection views,\nstreaming sources, server-side adapters, and DynamicData pipelines.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.DataGridGeneratedDiagnosticField.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.DataGridGeneratedDiagnosticField.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.DataGridGeneratedDiagnosticField",
+      "Summary": "<p sourcefile=\"api/Avalonia.Controls.DataGridGeneratedDiagnosticField.yml\" sourcestartlinenumber=\"1\">Describes generated fast-path coverage for one field.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.DataGridGeneratedDiagnosticsManifest.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.DataGridGeneratedDiagnosticsManifest.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.DataGridGeneratedDiagnosticsManifest",
+      "Summary": "<p sourcefile=\"api/Avalonia.Controls.DataGridGeneratedDiagnosticsManifest.yml\" sourcestartlinenumber=\"1\">Provides immutable generated schema, fast-path, fallback, and performance diagnostics.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.DataGridGeneratedDistinctValueProvider-2.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.DataGridGeneratedDistinctValueProvider-2.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.DataGridGeneratedDistinctValueProvider<TItem, TValue>",
+      "Summary": "<p sourcefile=\"api/Avalonia.Controls.DataGridGeneratedDistinctValueProvider-2.yml\" sourcestartlinenumber=\"1\">Provides bounded local distinct values through a direct generated getter.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.DataGridGeneratedDistinctValueQuery.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.DataGridGeneratedDistinctValueQuery.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.DataGridGeneratedDistinctValueQuery",
+      "Summary": "<p sourcefile=\"api/Avalonia.Controls.DataGridGeneratedDistinctValueQuery.yml\" sourcestartlinenumber=\"1\">Contains context for a remote generated distinct-value query.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.DataGridGeneratedDragDropController-1.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.DataGridGeneratedDragDropController-1.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.DataGridGeneratedDragDropController<TKey>",
+      "Summary": "<p sourcefile=\"api/Avalonia.Controls.DataGridGeneratedDragDropController-1.yml\" sourcestartlinenumber=\"1\">Coordinates keyed drag/drop validation, cancellation, and domain mutation requests.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.DataGridGeneratedDropOperation.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.DataGridGeneratedDropOperation.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.DataGridGeneratedDropOperation",
+      "Summary": "<p sourcefile=\"api/Avalonia.Controls.DataGridGeneratedDropOperation.yml\" sourcestartlinenumber=\"1\">Identifies a requested generated drag/drop mutation.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.DataGridGeneratedDropPosition.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.DataGridGeneratedDropPosition.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.DataGridGeneratedDropPosition",
+      "Summary": "<p sourcefile=\"api/Avalonia.Controls.DataGridGeneratedDropPosition.yml\" sourcestartlinenumber=\"1\">Identifies the target-relative drop position.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.DataGridGeneratedDropRequest-1.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.DataGridGeneratedDropRequest-1.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.DataGridGeneratedDropRequest<TKey>",
+      "Summary": "<p sourcefile=\"api/Avalonia.Controls.DataGridGeneratedDropRequest-1.yml\" sourcestartlinenumber=\"1\">Contains a stable-key drag/drop request without prescribing domain mutation.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.DataGridGeneratedDropStatus.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.DataGridGeneratedDropStatus.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.DataGridGeneratedDropStatus",
+      "Summary": "<p sourcefile=\"api/Avalonia.Controls.DataGridGeneratedDropStatus.yml\" sourcestartlinenumber=\"1\">Reports generated drag/drop session status.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.DataGridGeneratedEditChangedEventArgs.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.DataGridGeneratedEditChangedEventArgs.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.DataGridGeneratedEditChangedEventArgs",
+      "Summary": "<p sourcefile=\"api/Avalonia.Controls.DataGridGeneratedEditChangedEventArgs.yml\" sourcestartlinenumber=\"1\">Reports an edit, undo, or redo operation.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.DataGridGeneratedEditController-2.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.DataGridGeneratedEditController-2.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.DataGridGeneratedEditController<TItem, TKey>",
+      "Summary": "<p sourcefile=\"api/Avalonia.Controls.DataGridGeneratedEditController-2.yml\" sourcestartlinenumber=\"1\">Coordinates generated fields, cancellable async validation, and keyed undo/redo batches.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.DataGridGeneratedEditField-2.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.DataGridGeneratedEditField-2.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.DataGridGeneratedEditField<TItem, TValue>",
+      "Summary": "<p sourcefile=\"api/Avalonia.Controls.DataGridGeneratedEditField-2.yml\" sourcestartlinenumber=\"1\">Provides typed parsing, formatting, validation, coercion, eligibility, and assignment for one generated field.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.DataGridGeneratedEditResult.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.DataGridGeneratedEditResult.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.DataGridGeneratedEditResult",
+      "Summary": "<p sourcefile=\"api/Avalonia.Controls.DataGridGeneratedEditResult.yml\" sourcestartlinenumber=\"1\">Represents a structured generated edit outcome.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.DataGridGeneratedEditStatus.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.DataGridGeneratedEditStatus.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.DataGridGeneratedEditStatus",
+      "Summary": "<p sourcefile=\"api/Avalonia.Controls.DataGridGeneratedEditStatus.yml\" sourcestartlinenumber=\"1\">Describes a generated edit result.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.DataGridGeneratedExportFormat.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.DataGridGeneratedExportFormat.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.DataGridGeneratedExportFormat",
+      "Summary": "<p sourcefile=\"api/Avalonia.Controls.DataGridGeneratedExportFormat.yml\" sourcestartlinenumber=\"1\">Identifies a generated tabular export representation.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.DataGridGeneratedFeatures.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.DataGridGeneratedFeatures.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.DataGridGeneratedFeatures",
+      "Summary": "<p sourcefile=\"api/Avalonia.Controls.DataGridGeneratedFeatures.yml\" sourcestartlinenumber=\"1\">Selects generated controller capabilities while keeping optional feature work out of hot paths.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.DataGridGeneratedField-2.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.DataGridGeneratedField-2.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.DataGridGeneratedField<TItem, TValue>",
+      "Summary": "<p sourcefile=\"api/Avalonia.Controls.DataGridGeneratedField-2.yml\" sourcestartlinenumber=\"1\">Describes a generated field with its item/value types and creates type-safe operation descriptors.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.DataGridGeneratedField.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.DataGridGeneratedField.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.DataGridGeneratedField",
+      "Summary": "<p sourcefile=\"api/Avalonia.Controls.DataGridGeneratedField.yml\" sourcestartlinenumber=\"1\">Describes one field in a generated schema using stable identifiers and its compiled accessor.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.DataGridGeneratedFieldMetadata.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.DataGridGeneratedFieldMetadata.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.DataGridGeneratedFieldMetadata",
+      "Summary": "<p sourcefile=\"api/Avalonia.Controls.DataGridGeneratedFieldMetadata.yml\" sourcestartlinenumber=\"1\">Contains canonical export, remote, localization, editor, and accessibility metadata for a generated field.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.DataGridGeneratedFillController-2.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.DataGridGeneratedFillController-2.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.DataGridGeneratedFillController<TItem, TKey>",
+      "Summary": "<p sourcefile=\"api/Avalonia.Controls.DataGridGeneratedFillController-2.yml\" sourcestartlinenumber=\"1\">Applies reflection-free copy, series, or custom fill values as one undo unit.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.DataGridGeneratedFillModel-2.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.DataGridGeneratedFillModel-2.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.DataGridGeneratedFillModel<TItem, TKey>",
+      "Summary": "<p sourcefile=\"api/Avalonia.Controls.DataGridGeneratedFillModel-2.yml\" sourcestartlinenumber=\"1\">Adapts generated typed edit fields to the DataGrid fill handle with copy and numeric/date sequence support.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.DataGridGeneratedFilterEditorKind.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.DataGridGeneratedFilterEditorKind.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.DataGridGeneratedFilterEditorKind",
+      "Summary": "<p sourcefile=\"api/Avalonia.Controls.DataGridGeneratedFilterEditorKind.yml\" sourcestartlinenumber=\"1\">Identifies the standard filter editor suggested by generated field metadata.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.DataGridGeneratedFuncDataTemplate-1.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.DataGridGeneratedFuncDataTemplate-1.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.DataGridGeneratedFuncDataTemplate<TItem>",
+      "Summary": "<p sourcefile=\"api/Avalonia.Controls.DataGridGeneratedFuncDataTemplate-1.yml\" sourcestartlinenumber=\"1\">Builds and recycles typed generated template controls through a validated direct factory.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.DataGridGeneratedGroupDescription-2.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.DataGridGeneratedGroupDescription-2.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.DataGridGeneratedGroupDescription<TItem, TValue>",
+      "Summary": "<p sourcefile=\"api/Avalonia.Controls.DataGridGeneratedGroupDescription-2.yml\" sourcestartlinenumber=\"1\">Adapts a typed generated grouping getter to <xref href=\"Avalonia.Collections.DataGridGroupDescription\" data-throw-if-not-resolved=\"false\"></xref>.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.DataGridGeneratedGroupField-2.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.DataGridGeneratedGroupField-2.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.DataGridGeneratedGroupField<TItem, TValue>",
+      "Summary": "<p sourcefile=\"api/Avalonia.Controls.DataGridGeneratedGroupField-2.yml\" sourcestartlinenumber=\"1\">Provides a typed generated grouping field and adapter.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.DataGridGeneratedHeaderCommandController-1.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.DataGridGeneratedHeaderCommandController-1.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.DataGridGeneratedHeaderCommandController<TItem>",
+      "Summary": "<p sourcefile=\"api/Avalonia.Controls.DataGridGeneratedHeaderCommandController-1.yml\" sourcestartlinenumber=\"1\">Coordinates generated header commands without reflection or a DataGrid reference in the ViewModel.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.DataGridGeneratedHeaderCommandKind.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.DataGridGeneratedHeaderCommandKind.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.DataGridGeneratedHeaderCommandKind",
+      "Summary": "<p sourcefile=\"api/Avalonia.Controls.DataGridGeneratedHeaderCommandKind.yml\" sourcestartlinenumber=\"1\">Identifies a generated header-menu operation.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.DataGridGeneratedHeaderCommandRequest.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.DataGridGeneratedHeaderCommandRequest.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.DataGridGeneratedHeaderCommandRequest",
+      "Summary": "<p sourcefile=\"api/Avalonia.Controls.DataGridGeneratedHeaderCommandRequest.yml\" sourcestartlinenumber=\"1\">Contains a stable generated header-command request.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.DataGridGeneratedHeaderCommandSet.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.DataGridGeneratedHeaderCommandSet.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.DataGridGeneratedHeaderCommandSet",
+      "Summary": "<p sourcefile=\"api/Avalonia.Controls.DataGridGeneratedHeaderCommandSet.yml\" sourcestartlinenumber=\"1\">Provides the complete command group for one generated field.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.DataGridGeneratedHierarchyController-2.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.DataGridGeneratedHierarchyController-2.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.DataGridGeneratedHierarchyController<TItem, TKey>",
+      "Summary": "<p sourcefile=\"api/Avalonia.Controls.DataGridGeneratedHierarchyController-2.yml\" sourcestartlinenumber=\"1\">Executes reflection-free hierarchy traversal, expansion persistence, filtering, and typed projection.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.DataGridGeneratedHierarchyFilterMode.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.DataGridGeneratedHierarchyFilterMode.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.DataGridGeneratedHierarchyFilterMode",
+      "Summary": "<p sourcefile=\"api/Avalonia.Controls.DataGridGeneratedHierarchyFilterMode.yml\" sourcestartlinenumber=\"1\">Selects which related nodes remain visible for a hierarchical filter.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.DataGridGeneratedHierarchySortMode.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.DataGridGeneratedHierarchySortMode.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.DataGridGeneratedHierarchySortMode",
+      "Summary": "<p sourcefile=\"api/Avalonia.Controls.DataGridGeneratedHierarchySortMode.yml\" sourcestartlinenumber=\"1\">Selects where a generated hierarchy comparer is applied.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.DataGridGeneratedIndexedColumnFactory.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.DataGridGeneratedIndexedColumnFactory.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.DataGridGeneratedIndexedColumnFactory",
+      "Summary": "<p sourcefile=\"api/Avalonia.Controls.DataGridGeneratedIndexedColumnFactory.yml\" sourcestartlinenumber=\"1\">Creates reflection-free column definitions around generated method-backed accessors.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.DataGridGeneratedIndexedColumnKind.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.DataGridGeneratedIndexedColumnKind.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.DataGridGeneratedIndexedColumnKind",
+      "Summary": "<p sourcefile=\"api/Avalonia.Controls.DataGridGeneratedIndexedColumnKind.yml\" sourcestartlinenumber=\"1\">Identifies the standard definition used for a generated indexed column.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.DataGridGeneratedIndexedColumnOptions-1.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.DataGridGeneratedIndexedColumnOptions-1.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.DataGridGeneratedIndexedColumnOptions<TValue>",
+      "Summary": "<p sourcefile=\"api/Avalonia.Controls.DataGridGeneratedIndexedColumnOptions-1.yml\" sourcestartlinenumber=\"1\">Configures one column created from a generated indexed accessor family.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.DataGridGeneratedInitialCurrency.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.DataGridGeneratedInitialCurrency.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.DataGridGeneratedInitialCurrency",
+      "Summary": "<p sourcefile=\"api/Avalonia.Controls.DataGridGeneratedInitialCurrency.yml\" sourcestartlinenumber=\"1\">Controls the initial currency of a generated collection view.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.DataGridGeneratedInputAction.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.DataGridGeneratedInputAction.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.DataGridGeneratedInputAction",
+      "Summary": "<p sourcefile=\"api/Avalonia.Controls.DataGridGeneratedInputAction.yml\" sourcestartlinenumber=\"1\">Identifies command-oriented actions exposed by a generated DataGrid input map.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.DataGridGeneratedInputEvent-1.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.DataGridGeneratedInputEvent-1.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.DataGridGeneratedInputEvent<TItem>",
+      "Summary": "<p sourcefile=\"api/Avalonia.Controls.DataGridGeneratedInputEvent-1.yml\" sourcestartlinenumber=\"1\">Describes a typed generated input command without exposing a DataGrid to the ViewModel.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.DataGridGeneratedInputMap.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.DataGridGeneratedInputMap.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.DataGridGeneratedInputMap",
+      "Summary": "<p sourcefile=\"api/Avalonia.Controls.DataGridGeneratedInputMap.yml\" sourcestartlinenumber=\"1\">Provides the default generated keyboard map for an explicit performance profile.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.DataGridGeneratedItemIndex-2.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.DataGridGeneratedItemIndex-2.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.DataGridGeneratedItemIndex<TItem, TKey>",
+      "Summary": "<p sourcefile=\"api/Avalonia.Controls.DataGridGeneratedItemIndex-2.yml\" sourcestartlinenumber=\"1\">Maintains reflection-free key-to-item and key-to-index lookup for a mutable row sequence.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.DataGridGeneratedItemList-1.Enumerator.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.DataGridGeneratedItemList-1.Enumerator.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.DataGridGeneratedItemList<TItem>.Enumerator",
+      "Summary": "<p sourcefile=\"api/Avalonia.Controls.DataGridGeneratedItemList-1.Enumerator.yml\" sourcestartlinenumber=\"1\">Enumerates a generated item-list projection.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.DataGridGeneratedItemList-1.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.DataGridGeneratedItemList-1.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.DataGridGeneratedItemList<TItem>",
+      "Summary": "<p sourcefile=\"api/Avalonia.Controls.DataGridGeneratedItemList-1.yml\" sourcestartlinenumber=\"1\">Provides a zero-copy typed view over the item lists supplied by a selection event.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.DataGridGeneratedMetricKind.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.DataGridGeneratedMetricKind.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.DataGridGeneratedMetricKind",
+      "Summary": "<p sourcefile=\"api/Avalonia.Controls.DataGridGeneratedMetricKind.yml\" sourcestartlinenumber=\"1\">Identifies the runtime instrument that produced a generated metric sample.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.DataGridGeneratedMetricMeasurement.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.DataGridGeneratedMetricMeasurement.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.DataGridGeneratedMetricMeasurement",
+      "Summary": "<p sourcefile=\"api/Avalonia.Controls.DataGridGeneratedMetricMeasurement.yml\" sourcestartlinenumber=\"1\">Contains one allocation-free renderer metric measurement and generated schema context.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.DataGridGeneratedMetricsBridge.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.DataGridGeneratedMetricsBridge.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.DataGridGeneratedMetricsBridge",
+      "Summary": "<p sourcefile=\"api/Avalonia.Controls.DataGridGeneratedMetricsBridge.yml\" sourcestartlinenumber=\"1\">Bridges the existing ProDataGrid meter to a generated, replaceable typed sink.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.DataGridGeneratedNavigationAction.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.DataGridGeneratedNavigationAction.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.DataGridGeneratedNavigationAction",
+      "Summary": "<p sourcefile=\"api/Avalonia.Controls.DataGridGeneratedNavigationAction.yml\" sourcestartlinenumber=\"1\">Identifies a navigation operation requested through a generated view interaction.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.DataGridGeneratedNavigationHandler-1.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.DataGridGeneratedNavigationHandler-1.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.DataGridGeneratedNavigationHandler<TItem>",
+      "Summary": "<p sourcefile=\"api/Avalonia.Controls.DataGridGeneratedNavigationHandler-1.yml\" sourcestartlinenumber=\"1\">Executes generated current-cell and scroll requests at the view boundary without exposing a\n<xref href=\"Avalonia.Controls.DataGrid\" data-throw-if-not-resolved=\"false\"></xref> instance to the ViewModel.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.DataGridGeneratedNavigationRequest-1.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.DataGridGeneratedNavigationRequest-1.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.DataGridGeneratedNavigationRequest<TItem>",
+      "Summary": "<p sourcefile=\"api/Avalonia.Controls.DataGridGeneratedNavigationRequest-1.yml\" sourcestartlinenumber=\"1\">Carries a typed navigation request from a ViewModel to an activation-scoped generated view.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.DataGridGeneratedNavigationResult-1.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.DataGridGeneratedNavigationResult-1.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.DataGridGeneratedNavigationResult<TItem>",
+      "Summary": "<p sourcefile=\"api/Avalonia.Controls.DataGridGeneratedNavigationResult-1.yml\" sourcestartlinenumber=\"1\">Returns a typed current-cell or scroll-state snapshot from a generated navigation interaction.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.DataGridGeneratedNavigationStatus.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.DataGridGeneratedNavigationStatus.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.DataGridGeneratedNavigationStatus",
+      "Summary": "<p sourcefile=\"api/Avalonia.Controls.DataGridGeneratedNavigationStatus.yml\" sourcestartlinenumber=\"1\">Describes the outcome of a generated navigation request without allocating an error message.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.DataGridGeneratedNewRowService-1.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.DataGridGeneratedNewRowService-1.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.DataGridGeneratedNewRowService<TItem>",
+      "Summary": "<p sourcefile=\"api/Avalonia.Controls.DataGridGeneratedNewRowService-1.yml\" sourcestartlinenumber=\"1\">Executes an application-owned new-row policy.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.DataGridGeneratedNode-2.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.DataGridGeneratedNode-2.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.DataGridGeneratedNode<TItem, TKey>",
+      "Summary": "<p sourcefile=\"api/Avalonia.Controls.DataGridGeneratedNode-2.yml\" sourcestartlinenumber=\"1\">Provides a public typed hierarchical projection suitable for compiled bindings.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.DataGridGeneratedOperationChange.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.DataGridGeneratedOperationChange.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.DataGridGeneratedOperationChange",
+      "Summary": "<p sourcefile=\"api/Avalonia.Controls.DataGridGeneratedOperationChange.yml\" sourcestartlinenumber=\"1\">Identifies which compiled operation changed.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.DataGridGeneratedOperationCommandSet-1.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.DataGridGeneratedOperationCommandSet-1.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.DataGridGeneratedOperationCommandSet<TItem>",
+      "Summary": "<p sourcefile=\"api/Avalonia.Controls.DataGridGeneratedOperationCommandSet-1.yml\" sourcestartlinenumber=\"1\">Exposes reusable framework-neutral commands for a generated operation controller.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.DataGridGeneratedOperationController-1.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.DataGridGeneratedOperationController-1.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.DataGridGeneratedOperationController<TItem>",
+      "Summary": "<p sourcefile=\"api/Avalonia.Controls.DataGridGeneratedOperationController-1.yml\" sourcestartlinenumber=\"1\">Owns reflection-free column, model, and compiled operation state for one grid.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.DataGridGeneratedOperationDescriptor.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.DataGridGeneratedOperationDescriptor.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.DataGridGeneratedOperationDescriptor",
+      "Summary": "<p sourcefile=\"api/Avalonia.Controls.DataGridGeneratedOperationDescriptor.yml\" sourcestartlinenumber=\"1\">Provides immutable presentation metadata for one active operation descriptor.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.DataGridGeneratedOperationDescriptorKind.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.DataGridGeneratedOperationDescriptorKind.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.DataGridGeneratedOperationDescriptorKind",
+      "Summary": "<p sourcefile=\"api/Avalonia.Controls.DataGridGeneratedOperationDescriptorKind.yml\" sourcestartlinenumber=\"1\">Identifies the model owning one generated operation descriptor.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.DataGridGeneratedOperationPreset.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.DataGridGeneratedOperationPreset.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.DataGridGeneratedOperationPreset",
+      "Summary": "<p sourcefile=\"api/Avalonia.Controls.DataGridGeneratedOperationPreset.yml\" sourcestartlinenumber=\"1\">Stores a reusable immutable sorting, filtering, and searching configuration.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.DataGridGeneratedOperationsChangedEventArgs.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.DataGridGeneratedOperationsChangedEventArgs.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.DataGridGeneratedOperationsChangedEventArgs",
+      "Summary": "<p sourcefile=\"api/Avalonia.Controls.DataGridGeneratedOperationsChangedEventArgs.yml\" sourcestartlinenumber=\"1\">Reports a compiled generated-operation update.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.DataGridGeneratedOutlineAdapter.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.DataGridGeneratedOutlineAdapter.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.DataGridGeneratedOutlineAdapter",
+      "Summary": "<p sourcefile=\"api/Avalonia.Controls.DataGridGeneratedOutlineAdapter.yml\" sourcestartlinenumber=\"1\">Adapts canonical generated analytics fields to reflection-free outline reports.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.DataGridGeneratedPerformanceOptions.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.DataGridGeneratedPerformanceOptions.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.DataGridGeneratedPerformanceOptions",
+      "Summary": "<p sourcefile=\"api/Avalonia.Controls.DataGridGeneratedPerformanceOptions.yml\" sourcestartlinenumber=\"1\">Contains explicit settings selected by a generated performance profile.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.DataGridGeneratedPerformanceProfile.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.DataGridGeneratedPerformanceProfile.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.DataGridGeneratedPerformanceProfile",
+      "Summary": "<p sourcefile=\"api/Avalonia.Controls.DataGridGeneratedPerformanceProfile.yml\" sourcestartlinenumber=\"1\">Identifies explicit generated DataGrid performance presets.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.DataGridGeneratedPivotAdapter.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.DataGridGeneratedPivotAdapter.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.DataGridGeneratedPivotAdapter",
+      "Summary": "<p sourcefile=\"api/Avalonia.Controls.DataGridGeneratedPivotAdapter.yml\" sourcestartlinenumber=\"1\">Adapts canonical generated analytics fields to reflection-free pivot fields.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.DataGridGeneratedRemoteDistinctValueController-1.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.DataGridGeneratedRemoteDistinctValueController-1.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.DataGridGeneratedRemoteDistinctValueController<TValue>",
+      "Summary": "<p sourcefile=\"api/Avalonia.Controls.DataGridGeneratedRemoteDistinctValueController-1.yml\" sourcestartlinenumber=\"1\">Coordinates cancellable, stale-safe remote distinct-value requests.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.DataGridGeneratedRemoteQueryController-2.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.DataGridGeneratedRemoteQueryController-2.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.DataGridGeneratedRemoteQueryController<TItem, TKey>",
+      "Summary": "<p sourcefile=\"api/Avalonia.Controls.DataGridGeneratedRemoteQueryController-2.yml\" sourcestartlinenumber=\"1\">Coordinates cancellation, debounce, stale suppression, field translation, and optional page caching.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.DataGridGeneratedSchemaManifest.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.DataGridGeneratedSchemaManifest.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.DataGridGeneratedSchemaManifest",
+      "Summary": "<p sourcefile=\"api/Avalonia.Controls.DataGridGeneratedSchemaManifest.yml\" sourcestartlinenumber=\"1\">Provides stable schema identity and the canonical generated field collection.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.DataGridGeneratedSelectionChangedEventArgs.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.DataGridGeneratedSelectionChangedEventArgs.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.DataGridGeneratedSelectionChangedEventArgs",
+      "Summary": "<p sourcefile=\"api/Avalonia.Controls.DataGridGeneratedSelectionChangedEventArgs.yml\" sourcestartlinenumber=\"1\">Reports a generated keyed selection change.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.DataGridGeneratedSelectionController-2.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.DataGridGeneratedSelectionController-2.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.DataGridGeneratedSelectionController<TItem, TKey>",
+      "Summary": "<p sourcefile=\"api/Avalonia.Controls.DataGridGeneratedSelectionController-2.yml\" sourcestartlinenumber=\"1\">Maintains row, column, cell, and current-cell selection by stable keys and bridges it to Avalonia selection models.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.DataGridGeneratedSelectionOrigin.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.DataGridGeneratedSelectionOrigin.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.DataGridGeneratedSelectionOrigin",
+      "Summary": "<p sourcefile=\"api/Avalonia.Controls.DataGridGeneratedSelectionOrigin.yml\" sourcestartlinenumber=\"1\">Identifies the producer of a generated selection change.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.DataGridGeneratedSelectionProfile.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.DataGridGeneratedSelectionProfile.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.DataGridGeneratedSelectionProfile",
+      "Summary": "<p sourcefile=\"api/Avalonia.Controls.DataGridGeneratedSelectionProfile.yml\" sourcestartlinenumber=\"1\">Configures a generated keyed selection controller.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.DataGridGeneratedSelectionSnapshot-1.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.DataGridGeneratedSelectionSnapshot-1.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.DataGridGeneratedSelectionSnapshot<TKey>",
+      "Summary": "<p sourcefile=\"api/Avalonia.Controls.DataGridGeneratedSelectionSnapshot-1.yml\" sourcestartlinenumber=\"1\">Represents an immutable keyed selection snapshot.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.DataGridGeneratedSnapshotMetrics.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.DataGridGeneratedSnapshotMetrics.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.DataGridGeneratedSnapshotMetrics",
+      "Summary": "<p sourcefile=\"api/Avalonia.Controls.DataGridGeneratedSnapshotMetrics.yml\" sourcestartlinenumber=\"1\">Reports the result of one keyed snapshot reconciliation.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.DataGridGeneratedSnapshotReconciler-2.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.DataGridGeneratedSnapshotReconciler-2.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.DataGridGeneratedSnapshotReconciler<TItem, TKey>",
+      "Summary": "<p sourcefile=\"api/Avalonia.Controls.DataGridGeneratedSnapshotReconciler-2.yml\" sourcestartlinenumber=\"1\">Reconciles complete snapshots into an existing list by stable key without clearing the collection.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.DataGridGeneratedSourceKind.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.DataGridGeneratedSourceKind.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.DataGridGeneratedSourceKind",
+      "Summary": "<p sourcefile=\"api/Avalonia.Controls.DataGridGeneratedSourceKind.yml\" sourcestartlinenumber=\"1\">Identifies the source shape consumed by a generated controller adapter.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.DataGridGeneratedStateController.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.DataGridGeneratedStateController.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.DataGridGeneratedStateController",
+      "Summary": "<p sourcefile=\"api/Avalonia.Controls.DataGridGeneratedStateController.yml\" sourcestartlinenumber=\"1\">Captures, validates, aliases, migrates, serializes, and restores state for one generated schema.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.DataGridGeneratedStateDescriptor.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.DataGridGeneratedStateDescriptor.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.DataGridGeneratedStateDescriptor",
+      "Summary": "<p sourcefile=\"api/Avalonia.Controls.DataGridGeneratedStateDescriptor.yml\" sourcestartlinenumber=\"1\">Describes stable generated state identity, supported sections, and column-key aliases.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.DataGridGeneratedStateEnvelope.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.DataGridGeneratedStateEnvelope.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.DataGridGeneratedStateEnvelope",
+      "Summary": "<p sourcefile=\"api/Avalonia.Controls.DataGridGeneratedStateEnvelope.yml\" sourcestartlinenumber=\"1\">Wraps persisted DataGrid state with generated schema identity.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.DataGridGeneratedStateMigration.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.DataGridGeneratedStateMigration.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.DataGridGeneratedStateMigration",
+      "Summary": "<p sourcefile=\"api/Avalonia.Controls.DataGridGeneratedStateMigration.yml\" sourcestartlinenumber=\"1\">Migrates a generated persisted state between schema versions.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.DataGridGeneratedStreamBuffer-2.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.DataGridGeneratedStreamBuffer-2.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.DataGridGeneratedStreamBuffer<TItem, TKey>",
+      "Summary": "<p sourcefile=\"api/Avalonia.Controls.DataGridGeneratedStreamBuffer-2.yml\" sourcestartlinenumber=\"1\">Provides a bounded, thread-safe queue with keyed coalescing for generated streaming adapters.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.DataGridGeneratedStreamMetrics.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.DataGridGeneratedStreamMetrics.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.DataGridGeneratedStreamMetrics",
+      "Summary": "<p sourcefile=\"api/Avalonia.Controls.DataGridGeneratedStreamMetrics.yml\" sourcestartlinenumber=\"1\">Provides a consistent snapshot of generated stream counters.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.DataGridGeneratedStreamOverflowPolicy.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.DataGridGeneratedStreamOverflowPolicy.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.DataGridGeneratedStreamOverflowPolicy",
+      "Summary": "<p sourcefile=\"api/Avalonia.Controls.DataGridGeneratedStreamOverflowPolicy.yml\" sourcestartlinenumber=\"1\">Defines behavior when a generated stream buffer reaches its capacity.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.DataGridGeneratedStreamUpdate-2.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.DataGridGeneratedStreamUpdate-2.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.DataGridGeneratedStreamUpdate<TItem, TKey>",
+      "Summary": "<p sourcefile=\"api/Avalonia.Controls.DataGridGeneratedStreamUpdate-2.yml\" sourcestartlinenumber=\"1\">Represents an immutable generated streaming update.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.DataGridGeneratedStreamUpdateKind.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.DataGridGeneratedStreamUpdateKind.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.DataGridGeneratedStreamUpdateKind",
+      "Summary": "<p sourcefile=\"api/Avalonia.Controls.DataGridGeneratedStreamUpdateKind.yml\" sourcestartlinenumber=\"1\">Identifies one update entering a generated streaming pipeline.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.DataGridGeneratedStringField-2.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.DataGridGeneratedStringField-2.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.DataGridGeneratedStringField<TItem, TValue>",
+      "Summary": "<p sourcefile=\"api/Avalonia.Controls.DataGridGeneratedStringField-2.yml\" sourcestartlinenumber=\"1\">Adds string-specific filter operations to a generated field.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.DataGridGeneratedSummary-2.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.DataGridGeneratedSummary-2.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.DataGridGeneratedSummary<TItem, TValue>",
+      "Summary": "<p sourcefile=\"api/Avalonia.Controls.DataGridGeneratedSummary-2.yml\" sourcestartlinenumber=\"1\">Maintains count, distinct, sum, average, min, max, first, or last through a typed accessor.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.DataGridGeneratedTransferError-1.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.DataGridGeneratedTransferError-1.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.DataGridGeneratedTransferError<TKey>",
+      "Summary": "<p sourcefile=\"api/Avalonia.Controls.DataGridGeneratedTransferError-1.yml\" sourcestartlinenumber=\"1\">Describes one generated paste or fill failure.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.DataGridGeneratedTransferLimits.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.DataGridGeneratedTransferLimits.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.DataGridGeneratedTransferLimits",
+      "Summary": "<p sourcefile=\"api/Avalonia.Controls.DataGridGeneratedTransferLimits.yml\" sourcestartlinenumber=\"1\">Defines generated clipboard/import safety limits.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.DataGridGeneratedTransferResult-1.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.DataGridGeneratedTransferResult-1.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.DataGridGeneratedTransferResult<TKey>",
+      "Summary": "<p sourcefile=\"api/Avalonia.Controls.DataGridGeneratedTransferResult-1.yml\" sourcestartlinenumber=\"1\">Summarizes a generated paste or fill operation.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.DataGridGeneratedTryParse-1.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.DataGridGeneratedTryParse-1.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.DataGridGeneratedTryParse<TValue>",
+      "Summary": "<p sourcefile=\"api/Avalonia.Controls.DataGridGeneratedTryParse-1.yml\" sourcestartlinenumber=\"1\">Parses a span into a typed generated field value.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.DataGridGeneratedValidationChange-1.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.DataGridGeneratedValidationChange-1.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.DataGridGeneratedValidationChange<TKey>",
+      "Summary": "<p sourcefile=\"api/Avalonia.Controls.DataGridGeneratedValidationChange-1.yml\" sourcestartlinenumber=\"1\">Describes one generated validation projection update.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.DataGridGeneratedValidationProjection-2.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.DataGridGeneratedValidationProjection-2.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.DataGridGeneratedValidationProjection<TItem, TKey>",
+      "Summary": "<p sourcefile=\"api/Avalonia.Controls.DataGridGeneratedValidationProjection-2.yml\" sourcestartlinenumber=\"1\">Projects generated edit results as keyed errors, <xref href=\"System.ComponentModel.INotifyDataErrorInfo\" data-throw-if-not-resolved=\"false\"></xref>, and an\n<xref href=\"System.IObservable%601\" data-throw-if-not-resolved=\"false\"></xref> stream that ReactiveUI and other reactive frameworks can consume.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.DataGridGeneratedViewEvent-1.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.DataGridGeneratedViewEvent-1.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.DataGridGeneratedViewEvent<TItem>",
+      "Summary": "<p sourcefile=\"api/Avalonia.Controls.DataGridGeneratedViewEvent-1.yml\" sourcestartlinenumber=\"1\">Carries a typed, reflection-free snapshot from a generated DataGrid routed-event bridge.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.DataGridGeneratedViewEventKinds.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.DataGridGeneratedViewEventKinds.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.DataGridGeneratedViewEventKinds",
+      "Summary": "<p sourcefile=\"api/Avalonia.Controls.DataGridGeneratedViewEventKinds.yml\" sourcestartlinenumber=\"1\">Identifies DataGrid routed events that a generated view can forward to a ViewModel command.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.DataGridGeneratedViewInteractionContext-1.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.DataGridGeneratedViewInteractionContext-1.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.DataGridGeneratedViewInteractionContext<TInput>",
+      "Summary": "<p sourcefile=\"api/Avalonia.Controls.DataGridGeneratedViewInteractionContext-1.yml\" sourcestartlinenumber=\"1\">Supplies a generated view interaction handler with its typed input and activation context.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.DataGridGeneratedViewState.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.DataGridGeneratedViewState.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.DataGridGeneratedViewState",
+      "Summary": "<p sourcefile=\"api/Avalonia.Controls.DataGridGeneratedViewState.yml\" sourcestartlinenumber=\"1\">Identifies the active content projection for a generated DataGrid view.</p>\n"
     },
     {
       "type": "ManagedReference",
@@ -3588,6 +5296,48 @@
     },
     {
       "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.DataGridOperationExecution.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.DataGridOperationExecution.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.DataGridOperationExecution",
+      "Summary": "<p sourcefile=\"api/Avalonia.Controls.DataGridOperationExecution.yml\" sourcestartlinenumber=\"1\">Selects which layer executes generated sorting and filtering operations.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.DataGridPageMode.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.DataGridPageMode.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.DataGridPageMode",
+      "Summary": "<p sourcefile=\"api/Avalonia.Controls.DataGridPageMode.yml\" sourcestartlinenumber=\"1\">Identifies the paging strategy for a generated remote query.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.DataGridPageRequest.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.DataGridPageRequest.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.DataGridPageRequest",
+      "Summary": "<p sourcefile=\"api/Avalonia.Controls.DataGridPageRequest.yml\" sourcestartlinenumber=\"1\">Describes one offset- or cursor-based page request.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
       "source_relative_path": "api/Avalonia.Controls.DataGridPersistedState.CellState.yml",
       "output": {
         ".html": {
@@ -4428,6 +6178,34 @@
     },
     {
       "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.DataGridQueryPage-2.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.DataGridQueryPage-2.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.DataGridQueryPage<TItem, TKey>",
+      "Summary": "<p sourcefile=\"api/Avalonia.Controls.DataGridQueryPage-2.yml\" sourcestartlinenumber=\"1\">Contains one page returned by a generated remote provider.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.DataGridRealizationFactory.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.DataGridRealizationFactory.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.DataGridRealizationFactory",
+      "Summary": "<p sourcefile=\"api/Avalonia.Controls.DataGridRealizationFactory.yml\" sourcestartlinenumber=\"1\">Creates the outer row, cell, and column-header containers realized by a <xref href=\"Avalonia.Controls.DataGrid\" data-throw-if-not-resolved=\"false\"></xref>.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
       "source_relative_path": "api/Avalonia.Controls.DataGridRecycleHidingMode.yml",
       "output": {
         ".html": {
@@ -4439,6 +6217,34 @@
       "IsMRef": true,
       "Title": "Avalonia.Controls.DataGridRecycleHidingMode",
       "Summary": "<p sourcefile=\"api/Avalonia.Controls.DataGridRecycleHidingMode.yml\" sourcestartlinenumber=\"1\">Controls how recycled containers are hidden when removed from the viewport.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.DataGridRemoteQuery-1.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.DataGridRemoteQuery-1.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.DataGridRemoteQuery<TItem>",
+      "Summary": "<p sourcefile=\"api/Avalonia.Controls.DataGridRemoteQuery-1.yml\" sourcestartlinenumber=\"1\">Contains one immutable generated remote query.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.DataGridRemoteQueryStateChangedEventArgs.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.DataGridRemoteQueryStateChangedEventArgs.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.DataGridRemoteQueryStateChangedEventArgs",
+      "Summary": "<p sourcefile=\"api/Avalonia.Controls.DataGridRemoteQueryStateChangedEventArgs.yml\" sourcestartlinenumber=\"1\">Reports remote-query loading, result, error, and stale-response state.</p>\n"
     },
     {
       "type": "ManagedReference",
@@ -4789,6 +6595,48 @@
       "IsMRef": true,
       "Title": "Avalonia.Controls.DataGridRowGroupHeaderEventArgs",
       "Summary": "<p sourcefile=\"api/Avalonia.Controls.DataGridRowGroupHeaderEventArgs.yml\" sourcestartlinenumber=\"1\">EventArgs used for the DataGrid's LoadingRowGroup and UnloadingRowGroup events</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.DataGridRowRealizationContext.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.DataGridRowRealizationContext.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.DataGridRowRealizationContext",
+      "Summary": "<p sourcefile=\"api/Avalonia.Controls.DataGridRowRealizationContext.yml\" sourcestartlinenumber=\"1\">Describes a row container realization request.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.DataGridRuntimeSchemaAdapter-1.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.DataGridRuntimeSchemaAdapter-1.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.DataGridRuntimeSchemaAdapter<TItem>",
+      "Summary": "<p sourcefile=\"api/Avalonia.Controls.DataGridRuntimeSchemaAdapter-1.yml\" sourcestartlinenumber=\"1\">Adapts an explicit runtime field provider to the same column, operation, manifest, and fast-path\ncontracts used by generated schemas.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.DataGridRuntimeSchemaField-1.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.DataGridRuntimeSchemaField-1.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.DataGridRuntimeSchemaField<TItem>",
+      "Summary": "<p sourcefile=\"api/Avalonia.Controls.DataGridRuntimeSchemaField-1.yml\" sourcestartlinenumber=\"1\">Defines one runtime field while preserving an explicit accessor and a fresh-column factory.</p>\n"
     },
     {
       "type": "ManagedReference",
@@ -5744,6 +7592,20 @@
     },
     {
       "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.DataGridSummaryDefinition.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.DataGridSummaryDefinition.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.DataGridSummaryDefinition",
+      "Summary": "<p sourcefile=\"api/Avalonia.Controls.DataGridSummaryDefinition.yml\" sourcestartlinenumber=\"1\">Describes a summary that is materialized independently for every column created from a\n<xref href=\"Avalonia.Controls.DataGridColumnDefinition\" data-throw-if-not-resolved=\"false\"></xref>.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
       "source_relative_path": "api/Avalonia.Controls.DataGridSummaryDescription.yml",
       "output": {
         ".html": {
@@ -6108,6 +7970,20 @@
     },
     {
       "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.IDataGridColumnDefinitionProvider-1.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.IDataGridColumnDefinitionProvider-1.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.IDataGridColumnDefinitionProvider<TItem>",
+      "Summary": "<p sourcefile=\"api/Avalonia.Controls.IDataGridColumnDefinitionProvider-1.yml\" sourcestartlinenumber=\"1\">Creates reflection-free column definitions for items of a known type.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
       "source_relative_path": "api/Avalonia.Controls.IDataGridColumnFilterAccessor.yml",
       "output": {
         ".html": {
@@ -6164,6 +8040,300 @@
     },
     {
       "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.IDataGridFastPathOptionsProvider.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.IDataGridFastPathOptionsProvider.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.IDataGridFastPathOptionsProvider",
+      "Summary": "<p sourcefile=\"api/Avalonia.Controls.IDataGridFastPathOptionsProvider.yml\" sourcestartlinenumber=\"1\">Creates grid fast-path options associated with a generated or user-defined schema.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.IDataGridFilteringCompiler-1.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.IDataGridFilteringCompiler-1.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.IDataGridFilteringCompiler<TItem>",
+      "Summary": "<p sourcefile=\"api/Avalonia.Controls.IDataGridFilteringCompiler-1.yml\" sourcestartlinenumber=\"1\">Compiles filtering descriptors into a typed predicate without property-path reflection.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.IDataGridGeneratedAdvancedAnalyticsField.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.IDataGridGeneratedAdvancedAnalyticsField.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.IDataGridGeneratedAdvancedAnalyticsField",
+      "Summary": "<p sourcefile=\"api/Avalonia.Controls.IDataGridGeneratedAdvancedAnalyticsField.yml\" sourcestartlinenumber=\"1\">Exposes optional advanced pivot and outline configuration without changing the base analytics contract.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.IDataGridGeneratedAnalyticsField.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.IDataGridGeneratedAnalyticsField.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.IDataGridGeneratedAnalyticsField",
+      "Summary": "<p sourcefile=\"api/Avalonia.Controls.IDataGridGeneratedAnalyticsField.yml\" sourcestartlinenumber=\"1\">Provides non-generic access to generated analytics metadata.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.IDataGridGeneratedCollectionMutationHandler-1.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.IDataGridGeneratedCollectionMutationHandler-1.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.IDataGridGeneratedCollectionMutationHandler<TItem>",
+      "Summary": "<p sourcefile=\"api/Avalonia.Controls.IDataGridGeneratedCollectionMutationHandler-1.yml\" sourcestartlinenumber=\"1\">Applies range-aware collection mutations to an application-owned data source.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.IDataGridGeneratedConditionalRule.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.IDataGridGeneratedConditionalRule.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.IDataGridGeneratedConditionalRule",
+      "Summary": "<p sourcefile=\"api/Avalonia.Controls.IDataGridGeneratedConditionalRule.yml\" sourcestartlinenumber=\"1\">Provides a non-generic reflection-free conditional-format rule contract.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.IDataGridGeneratedControllerFactory-1.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.IDataGridGeneratedControllerFactory-1.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.IDataGridGeneratedControllerFactory<TItem>",
+      "Summary": "<p sourcefile=\"api/Avalonia.Controls.IDataGridGeneratedControllerFactory-1.yml\" sourcestartlinenumber=\"1\">Creates a user-defined generated operation controller.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.IDataGridGeneratedDropHandler-1.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.IDataGridGeneratedDropHandler-1.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.IDataGridGeneratedDropHandler<TKey>",
+      "Summary": "<p sourcefile=\"api/Avalonia.Controls.IDataGridGeneratedDropHandler-1.yml\" sourcestartlinenumber=\"1\">Applies a generated keyed drop request in domain-owned code.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.IDataGridGeneratedEditField-1.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.IDataGridGeneratedEditField-1.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.IDataGridGeneratedEditField<TItem>",
+      "Summary": "<p sourcefile=\"api/Avalonia.Controls.IDataGridGeneratedEditField-1.yml\" sourcestartlinenumber=\"1\">Provides non-generic access to a heterogeneous generated edit field collection.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.IDataGridGeneratedGroupField-1.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.IDataGridGeneratedGroupField-1.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.IDataGridGeneratedGroupField<TItem>",
+      "Summary": "<p sourcefile=\"api/Avalonia.Controls.IDataGridGeneratedGroupField-1.yml\" sourcestartlinenumber=\"1\">Describes a reflection-free generated grouping field.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.IDataGridGeneratedHeaderCommandHandler.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.IDataGridGeneratedHeaderCommandHandler.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.IDataGridGeneratedHeaderCommandHandler",
+      "Summary": "<p sourcefile=\"api/Avalonia.Controls.IDataGridGeneratedHeaderCommandHandler.yml\" sourcestartlinenumber=\"1\">Executes and invalidates generated header commands.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.IDataGridGeneratedHeaderInteraction.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.IDataGridGeneratedHeaderInteraction.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.IDataGridGeneratedHeaderInteraction",
+      "Summary": "<p sourcefile=\"api/Avalonia.Controls.IDataGridGeneratedHeaderInteraction.yml\" sourcestartlinenumber=\"1\">Handles grid-instance operations that cannot be owned by a reflection-free ViewModel controller.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.IDataGridGeneratedInputMap.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.IDataGridGeneratedInputMap.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.IDataGridGeneratedInputMap",
+      "Summary": "<p sourcefile=\"api/Avalonia.Controls.IDataGridGeneratedInputMap.yml\" sourcestartlinenumber=\"1\">Creates built-in gesture overrides and matches command-oriented generated gestures.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.IDataGridGeneratedMetricsSink.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.IDataGridGeneratedMetricsSink.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.IDataGridGeneratedMetricsSink",
+      "Summary": "<p sourcefile=\"api/Avalonia.Controls.IDataGridGeneratedMetricsSink.yml\" sourcestartlinenumber=\"1\">Consumes typed ProDataGrid renderer metrics while a generated view is active.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.IDataGridGeneratedNewRowFactory-1.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.IDataGridGeneratedNewRowFactory-1.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.IDataGridGeneratedNewRowFactory<TItem>",
+      "Summary": "<p sourcefile=\"api/Avalonia.Controls.IDataGridGeneratedNewRowFactory-1.yml\" sourcestartlinenumber=\"1\">Creates new rows through an application-owned policy.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.IDataGridGeneratedNumericAnalyticsField.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.IDataGridGeneratedNumericAnalyticsField.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.IDataGridGeneratedNumericAnalyticsField",
+      "Summary": "<p sourcefile=\"api/Avalonia.Controls.IDataGridGeneratedNumericAnalyticsField.yml\" sourcestartlinenumber=\"1\">Exposes an optional direct numeric selector without changing the base analytics contract.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.IDataGridGeneratedRemoteDistinctValueProvider-1.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.IDataGridGeneratedRemoteDistinctValueProvider-1.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.IDataGridGeneratedRemoteDistinctValueProvider<TValue>",
+      "Summary": "<p sourcefile=\"api/Avalonia.Controls.IDataGridGeneratedRemoteDistinctValueProvider-1.yml\" sourcestartlinenumber=\"1\">Loads typed remote distinct values.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.IDataGridGeneratedSchema-1.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.IDataGridGeneratedSchema-1.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.IDataGridGeneratedSchema<TItem>",
+      "Summary": "<p sourcefile=\"api/Avalonia.Controls.IDataGridGeneratedSchema-1.yml\" sourcestartlinenumber=\"1\">Combines column creation, descriptor compilation, and fast-path configuration for an item type.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.IDataGridGeneratedSchemaManifestProvider.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.IDataGridGeneratedSchemaManifestProvider.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.IDataGridGeneratedSchemaManifestProvider",
+      "Summary": "<p sourcefile=\"api/Avalonia.Controls.IDataGridGeneratedSchemaManifestProvider.yml\" sourcestartlinenumber=\"1\">Exposes the canonical, versioned manifest associated with a generated schema.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.IDataGridGeneratedSummary-1.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.IDataGridGeneratedSummary-1.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.IDataGridGeneratedSummary<TItem>",
+      "Summary": "<p sourcefile=\"api/Avalonia.Controls.IDataGridGeneratedSummary-1.yml\" sourcestartlinenumber=\"1\">Provides an incrementally maintained generated summary.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.IDataGridGeneratedViewInteractionHandler-2.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.IDataGridGeneratedViewInteractionHandler-2.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.IDataGridGeneratedViewInteractionHandler<TInput, TOutput>",
+      "Summary": "<p sourcefile=\"api/Avalonia.Controls.IDataGridGeneratedViewInteractionHandler-2.yml\" sourcestartlinenumber=\"1\">Implements a typed, reflection-free response adapter for a generated ReactiveUI view interaction.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
       "source_relative_path": "api/Avalonia.Controls.IDataGridIndexOf.yml",
       "output": {
         ".html": {
@@ -6175,6 +8345,34 @@
       "IsMRef": true,
       "Title": "Avalonia.Controls.IDataGridIndexOf",
       "Summary": "<p sourcefile=\"api/Avalonia.Controls.IDataGridIndexOf.yml\" sourcestartlinenumber=\"1\">Provides a fast item-to-index lookup path for <xref href=\"Avalonia.Controls.DataGrid\" data-throw-if-not-resolved=\"false\"></xref> selection and currency operations.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.IDataGridItemKey-2.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.IDataGridItemKey-2.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.IDataGridItemKey<TItem, TKey>",
+      "Summary": "<p sourcefile=\"api/Avalonia.Controls.IDataGridItemKey-2.yml\" sourcestartlinenumber=\"1\">Gets a stable, strongly typed item key without reflection or boxing.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.IDataGridQueryProvider-2.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.IDataGridQueryProvider-2.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.IDataGridQueryProvider<TItem, TKey>",
+      "Summary": "<p sourcefile=\"api/Avalonia.Controls.IDataGridQueryProvider-2.yml\" sourcestartlinenumber=\"1\">Executes generated queries without prescribing networking or persistence.</p>\n"
     },
     {
       "type": "ManagedReference",
@@ -6203,6 +8401,76 @@
       "IsMRef": true,
       "Title": "Avalonia.Controls.IDataGridRowHeightEstimatorStateful",
       "Summary": "<p sourcefile=\"api/Avalonia.Controls.IDataGridRowHeightEstimatorStateful.yml\" sourcestartlinenumber=\"1\">Extends <xref href=\"Avalonia.Controls.IDataGridRowHeightEstimator\" data-throw-if-not-resolved=\"false\"></xref> with state capture/restore support.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.IDataGridRuntimeDefinedSchema.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.IDataGridRuntimeDefinedSchema.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.IDataGridRuntimeDefinedSchema",
+      "Summary": "<p sourcefile=\"api/Avalonia.Controls.IDataGridRuntimeDefinedSchema.yml\" sourcestartlinenumber=\"1\">Marks a schema whose field shape is supplied explicitly at runtime rather than inferred by a source generator.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.IDataGridRuntimeSchemaField.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.IDataGridRuntimeSchemaField.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.IDataGridRuntimeSchemaField",
+      "Summary": "<p sourcefile=\"api/Avalonia.Controls.IDataGridRuntimeSchemaField.yml\" sourcestartlinenumber=\"1\">Describes a runtime-defined field backed by an explicit value accessor.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.IDataGridRuntimeSchemaProvider-1.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.IDataGridRuntimeSchemaProvider-1.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.IDataGridRuntimeSchemaProvider<TItem>",
+      "Summary": "<p sourcefile=\"api/Avalonia.Controls.IDataGridRuntimeSchemaProvider-1.yml\" sourcestartlinenumber=\"1\">Supplies a bounded runtime schema without assembly scanning or property discovery.\nImplementations own any dynamic-shape inspection and must return explicit accessors.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.IDataGridSearchingCompiler-1.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.IDataGridSearchingCompiler-1.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.IDataGridSearchingCompiler<TItem>",
+      "Summary": "<p sourcefile=\"api/Avalonia.Controls.IDataGridSearchingCompiler-1.yml\" sourcestartlinenumber=\"1\">Compiles search descriptors into a typed predicate without property-path reflection.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.IDataGridSortingCompiler-1.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.IDataGridSortingCompiler-1.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.IDataGridSortingCompiler<TItem>",
+      "Summary": "<p sourcefile=\"api/Avalonia.Controls.IDataGridSortingCompiler-1.yml\" sourcestartlinenumber=\"1\">Compiles sorting descriptors into a typed comparer without property-path reflection.</p>\n"
     },
     {
       "type": "ManagedReference",
@@ -7704,6 +9972,90 @@
     },
     {
       "type": "ManagedReference",
+      "source_relative_path": "api/ProDataGrid.Charting.DataGridGeneratedChartAdapter.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/ProDataGrid.Charting.DataGridGeneratedChartAdapter.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "ProDataGrid.Charting.DataGridGeneratedChartAdapter",
+      "Summary": "<p sourcefile=\"api/ProDataGrid.Charting.DataGridGeneratedChartAdapter.yml\" sourcestartlinenumber=\"1\">Adapts canonical source-generated analytics fields to a reflection-free chart model.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/ProDataGrid.Charting.DataGridGeneratedChartRangeProjection.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/ProDataGrid.Charting.DataGridGeneratedChartRangeProjection.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "ProDataGrid.Charting.DataGridGeneratedChartRangeProjection",
+      "Summary": "<p sourcefile=\"api/ProDataGrid.Charting.DataGridGeneratedChartRangeProjection.yml\" sourcestartlinenumber=\"1\">Owns a reflection-free chart projection for an inclusive spreadsheet cell range.\nGenerated column keys select series and the chart request windows the source rows.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/ProDataGrid.Charting.DataGridGeneratedChartSelectionSynchronizer-2.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/ProDataGrid.Charting.DataGridGeneratedChartSelectionSynchronizer-2.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "ProDataGrid.Charting.DataGridGeneratedChartSelectionSynchronizer<TItem, TKey>",
+      "Summary": "<p sourcefile=\"api/ProDataGrid.Charting.DataGridGeneratedChartSelectionSynchronizer-2.yml\" sourcestartlinenumber=\"1\">Synchronizes stable generated grid selection with a chart category interaction.\nIndex projection delegates keep grouped, windowed, or user-defined chart sources first-class.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/ProDataGrid.Charting.DataGridGeneratedListChartKeyMap-2.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/ProDataGrid.Charting.DataGridGeneratedListChartKeyMap-2.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "ProDataGrid.Charting.DataGridGeneratedListChartKeyMap<TItem, TKey>",
+      "Summary": "<p sourcefile=\"api/ProDataGrid.Charting.DataGridGeneratedListChartKeyMap-2.yml\" sourcestartlinenumber=\"1\">Maintains an incremental reflection-free key map over an observable list.\nAdd, remove, replace, and single-item move notifications update the generated index directly.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/ProDataGrid.Charting.DataGridGeneratedLongFormChartDataSource.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/ProDataGrid.Charting.DataGridGeneratedLongFormChartDataSource.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "ProDataGrid.Charting.DataGridGeneratedLongFormChartDataSource",
+      "Summary": "<p sourcefile=\"api/ProDataGrid.Charting.DataGridGeneratedLongFormChartDataSource.yml\" sourcestartlinenumber=\"1\">Builds aligned chart series from long-form rows using generated category,\nseries-discriminator, and numeric value selectors without property paths.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/ProDataGrid.Charting.IDataGridGeneratedChartKeyMap-1.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/ProDataGrid.Charting.IDataGridGeneratedChartKeyMap-1.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "ProDataGrid.Charting.IDataGridGeneratedChartKeyMap<TKey>",
+      "Summary": "<p sourcefile=\"api/ProDataGrid.Charting.IDataGridGeneratedChartKeyMap-1.yml\" sourcestartlinenumber=\"1\">Maps rendered chart categories to stable generated item keys.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
       "source_relative_path": "api/ProDataGrid.Charting.PivotChartDataSource.yml",
       "output": {
         ".html": {
@@ -7746,6 +10098,20 @@
     },
     {
       "type": "ManagedReference",
+      "source_relative_path": "api/ProDataGrid.FormulaEngine.Excel.ExcelFormulaFillTranslator.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/ProDataGrid.FormulaEngine.Excel.ExcelFormulaFillTranslator.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "ProDataGrid.FormulaEngine.Excel.ExcelFormulaFillTranslator",
+      "Summary": "<p sourcefile=\"api/ProDataGrid.FormulaEngine.Excel.ExcelFormulaFillTranslator.yml\" sourcestartlinenumber=\"1\">Translates Excel A1 or R1C1 formula text for copy/fill operations.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
       "source_relative_path": "api/ProDataGrid.FormulaEngine.Excel.ExcelFormulaFormatter.yml",
       "output": {
         ".html": {
@@ -7771,6 +10137,34 @@
       "IsMRef": true,
       "Title": "ProDataGrid.FormulaEngine.Excel.ExcelFormulaParser",
       "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/ProDataGrid.FormulaEngine.Excel.ExcelFormulaSyntaxError.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/ProDataGrid.FormulaEngine.Excel.ExcelFormulaSyntaxError.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "ProDataGrid.FormulaEngine.Excel.ExcelFormulaSyntaxError",
+      "Summary": "<p sourcefile=\"api/ProDataGrid.FormulaEngine.Excel.ExcelFormulaSyntaxError.yml\" sourcestartlinenumber=\"1\">Describes a formula syntax error without requiring an expression tree.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/ProDataGrid.FormulaEngine.Excel.ExcelFormulaSyntaxValidator.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/ProDataGrid.FormulaEngine.Excel.ExcelFormulaSyntaxValidator.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "ProDataGrid.FormulaEngine.Excel.ExcelFormulaSyntaxValidator",
+      "Summary": "<p sourcefile=\"api/ProDataGrid.FormulaEngine.Excel.ExcelFormulaSyntaxValidator.yml\" sourcestartlinenumber=\"1\">Validates Excel formula syntax using the production tokenizer without allocating an expression tree.\nThis is suitable for analyzers, editors, and other latency-sensitive validation paths.</p>\n"
     },
     {
       "type": "ManagedReference",
@@ -8218,7 +10612,7 @@
       "Uid": null,
       "IsMRef": true,
       "Title": "ProDataGrid.FormulaEngine.FormulaParseException",
-      "Summary": null
+      "Summary": "<p sourcefile=\"api/ProDataGrid.FormulaEngine.FormulaParseException.yml\" sourcestartlinenumber=\"1\">Represents a formula syntax error at a character position.</p>\n"
     },
     {
       "type": "ManagedReference",
@@ -8232,7 +10626,7 @@
       "Uid": null,
       "IsMRef": true,
       "Title": "ProDataGrid.FormulaEngine.FormulaParseOptions",
-      "Summary": null
+      "Summary": "<p sourcefile=\"api/ProDataGrid.FormulaEngine.FormulaParseOptions.yml\" sourcestartlinenumber=\"1\">Configures formula tokenization and parsing.</p>\n"
     },
     {
       "type": "ManagedReference",
@@ -8330,7 +10724,7 @@
       "Uid": null,
       "IsMRef": true,
       "Title": "ProDataGrid.FormulaEngine.FormulaReferenceMode",
-      "Summary": null
+      "Summary": "<p sourcefile=\"api/ProDataGrid.FormulaEngine.FormulaReferenceMode.yml\" sourcestartlinenumber=\"1\">Identifies the reference notation accepted by a formula parser.</p>\n"
     },
     {
       "type": "ManagedReference",
@@ -8359,6 +10753,20 @@
       "IsMRef": true,
       "Title": "ProDataGrid.FormulaEngine.FormulaReferenceShiftResult",
       "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/ProDataGrid.FormulaEngine.FormulaReferenceTranslator.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/ProDataGrid.FormulaEngine.FormulaReferenceTranslator.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "ProDataGrid.FormulaEngine.FormulaReferenceTranslator",
+      "Summary": "<p sourcefile=\"api/ProDataGrid.FormulaEngine.FormulaReferenceTranslator.yml\" sourcestartlinenumber=\"1\">Translates relative references in parsed formula expressions for copy/fill operations.</p>\n"
     },
     {
       "type": "ManagedReference",
@@ -8541,6 +10949,20 @@
       "IsMRef": true,
       "Title": "ProDataGrid.FormulaEngine.IFormulaCell",
       "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/ProDataGrid.FormulaEngine.IFormulaFillTranslator.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/ProDataGrid.FormulaEngine.IFormulaFillTranslator.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "ProDataGrid.FormulaEngine.IFormulaFillTranslator",
+      "Summary": "<p sourcefile=\"api/ProDataGrid.FormulaEngine.IFormulaFillTranslator.yml\" sourcestartlinenumber=\"1\">Translates formula text when a cell is copied to another row and column.</p>\n"
     },
     {
       "type": "ManagedReference",
@@ -8751,6 +11173,34 @@
       "IsMRef": true,
       "Title": "ProDataGrid.FormulaEngine.ILazyFormulaFunction",
       "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/ProDataGrid.FormulaEngine.IPreparedFormulaFillTranslation.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/ProDataGrid.FormulaEngine.IPreparedFormulaFillTranslation.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "ProDataGrid.FormulaEngine.IPreparedFormulaFillTranslation",
+      "Summary": "<p sourcefile=\"api/ProDataGrid.FormulaEngine.IPreparedFormulaFillTranslation.yml\" sourcestartlinenumber=\"1\">Represents one parsed source formula prepared for multiple fill targets.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/ProDataGrid.FormulaEngine.IPreparedFormulaFillTranslator.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/ProDataGrid.FormulaEngine.IPreparedFormulaFillTranslator.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "ProDataGrid.FormulaEngine.IPreparedFormulaFillTranslator",
+      "Summary": "<p sourcefile=\"api/ProDataGrid.FormulaEngine.IPreparedFormulaFillTranslator.yml\" sourcestartlinenumber=\"1\">Prepares source formulas once for allocation-conscious multi-cell fills.</p>\n"
     },
     {
       "type": "ManagedReference",
@@ -9076,6 +11526,34 @@
     },
     {
       "type": "ManagedReference",
+      "source_relative_path": "api/ProDiagnostics.Viewer.Generated.ProDiagnosticsViewerGeneratedSchemas.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/ProDiagnostics.Viewer.Generated.ProDiagnosticsViewerGeneratedSchemas.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "ProDiagnostics.Viewer.Generated.ProDiagnosticsViewerGeneratedSchemas",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/ProDiagnostics.Viewer.Generated.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/ProDiagnostics.Viewer.Generated.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "ProDiagnostics.Viewer.Generated",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
       "source_relative_path": "api/ProDiagnostics.Viewer.MainWindow.yml",
       "output": {
         ".html": {
@@ -9174,6 +11652,20 @@
     },
     {
       "type": "ManagedReference",
+      "source_relative_path": "api/ProDiagnostics.Viewer.ViewModels.ActivityEventGridSchema.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/ProDiagnostics.Viewer.ViewModels.ActivityEventGridSchema.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "ProDiagnostics.Viewer.ViewModels.ActivityEventGridSchema",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
       "source_relative_path": "api/ProDiagnostics.Viewer.ViewModels.ActivityEventViewModel.yml",
       "output": {
         ".html": {
@@ -9226,6 +11718,20 @@
       "Uid": null,
       "IsMRef": true,
       "Title": "ProDiagnostics.Viewer.ViewModels.MetricDetailTabViewModel",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/ProDiagnostics.Viewer.ViewModels.MetricSeriesGridSchema.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/ProDiagnostics.Viewer.ViewModels.MetricSeriesGridSchema.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "ProDiagnostics.Viewer.ViewModels.MetricSeriesGridSchema",
       "Summary": null
     },
     {
@@ -9475,6 +11981,16 @@
       "output": {
         ".html": {
           "relative_path": "articles/column-definitions-models.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "Conceptual",
+      "source_relative_path": "articles/column-definitions-source-generators.md",
+      "output": {
+        ".html": {
+          "relative_path": "articles/column-definitions-source-generators.html"
         }
       },
       "version": ""
@@ -10325,6 +12841,156 @@
       "output": {
         ".html": {
           "relative_path": "articles/sorting-model-end-to-end.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "Conceptual",
+      "source_relative_path": "articles/source-generators-feature-spec.md",
+      "output": {
+        ".html": {
+          "relative_path": "articles/source-generators-feature-spec.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "Conceptual",
+      "source_relative_path": "articles/source-generators/analytics-and-formulas.md",
+      "output": {
+        ".html": {
+          "relative_path": "articles/source-generators/analytics-and-formulas.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "Conceptual",
+      "source_relative_path": "articles/source-generators/attribute-reference.md",
+      "output": {
+        ".html": {
+          "relative_path": "articles/source-generators/attribute-reference.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "Conceptual",
+      "source_relative_path": "articles/source-generators/diagnostics-performance-testing.md",
+      "output": {
+        ".html": {
+          "relative_path": "articles/source-generators/diagnostics-performance-testing.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "Conceptual",
+      "source_relative_path": "articles/source-generators/editing-and-data-workflows.md",
+      "output": {
+        ".html": {
+          "relative_path": "articles/source-generators/editing-and-data-workflows.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "Conceptual",
+      "source_relative_path": "articles/source-generators/generated-views.md",
+      "output": {
+        ".html": {
+          "relative_path": "articles/source-generators/generated-views.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "Conceptual",
+      "source_relative_path": "articles/source-generators/getting-started.md",
+      "output": {
+        ".html": {
+          "relative_path": "articles/source-generators/getting-started.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "Conceptual",
+      "source_relative_path": "articles/source-generators/hierarchy.md",
+      "output": {
+        ".html": {
+          "relative_path": "articles/source-generators/hierarchy.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "Conceptual",
+      "source_relative_path": "articles/source-generators/layout-templates-rendering.md",
+      "output": {
+        ".html": {
+          "relative_path": "articles/source-generators/layout-templates-rendering.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "Conceptual",
+      "source_relative_path": "articles/source-generators/operations-and-controllers.md",
+      "output": {
+        ".html": {
+          "relative_path": "articles/source-generators/operations-and-controllers.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "Conceptual",
+      "source_relative_path": "articles/source-generators/reactive-streaming-remote.md",
+      "output": {
+        ".html": {
+          "relative_path": "articles/source-generators/reactive-streaming-remote.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "Conceptual",
+      "source_relative_path": "articles/source-generators/registries-and-customization.md",
+      "output": {
+        ".html": {
+          "relative_path": "articles/source-generators/registries-and-customization.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "Conceptual",
+      "source_relative_path": "articles/source-generators/samples-and-production-validation.md",
+      "output": {
+        ".html": {
+          "relative_path": "articles/source-generators/samples-and-production-validation.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "Conceptual",
+      "source_relative_path": "articles/source-generators/schemas-and-columns.md",
+      "output": {
+        ".html": {
+          "relative_path": "articles/source-generators/schemas-and-columns.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "Conceptual",
+      "source_relative_path": "articles/source-generators/selection-navigation-state.md",
+      "output": {
+        ".html": {
+          "relative_path": "articles/source-generators/selection-navigation-state.html"
         }
       },
       "version": ""

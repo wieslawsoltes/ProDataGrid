@@ -1,0 +1,1559 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+      <title>Class DataGridGeneratedViewEvent&lt;TItem&gt; | ProDataGrid for Avalonia </title>
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <meta name="title" content="Class DataGridGeneratedViewEvent&lt;TItem&gt; | ProDataGrid for Avalonia ">
+      
+      <meta name="description" content="Carries a typed, reflection-free snapshot from a generated DataGrid routed-event bridge.">
+      <link rel="icon" href="../favicon.ico">
+      <link rel="stylesheet" href="../public/docfx.min.css">
+      <link rel="stylesheet" href="../public/main.css">
+      <meta name="docfx:navrel" content="../toc.html">
+      <meta name="docfx:tocrel" content="toc.html">
+      
+      
+      
+      
+      <meta name="docfx:docurl" content="https://github.com/wieslawsoltes/ProDataGrid/new/master/apiSpec/new?filename=Avalonia_Controls_DataGridGeneratedViewEvent_1.md&amp;value=---%0Auid%3A%20Avalonia.Controls.DataGridGeneratedViewEvent%601%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">
+      <meta name="loc:inThisArticle" content="In this article">
+      <meta name="loc:searchResultsCount" content="{count} results for &quot;{query}&quot;">
+      <meta name="loc:searchNoResults" content="No results for &quot;{query}&quot;">
+      <meta name="loc:tocFilter" content="Filter by title">
+      <meta name="loc:nextArticle" content="Next">
+      <meta name="loc:prevArticle" content="Previous">
+      <meta name="loc:themeLight" content="Light">
+      <meta name="loc:themeDark" content="Dark">
+      <meta name="loc:themeAuto" content="Auto">
+      <meta name="loc:changeTheme" content="Change theme">
+      <meta name="loc:copy" content="Copy">
+      <meta name="loc:downloadPdf" content="Download PDF">
+
+      <script type="module" src="./../public/docfx.min.js"></script>
+
+      <script>
+        const theme = localStorage.getItem('theme') || 'auto'
+        document.documentElement.setAttribute('data-bs-theme', theme === 'auto' ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light') : theme)
+      </script>
+
+  </head>
+
+  <body class="tex2jax_ignore" data-layout="" data-yaml-mime="ManagedReference">
+    <header class="bg-body border-bottom">
+      <nav id="autocollapse" class="navbar navbar-expand-md" role="navigation">
+        <div class="container-xxl flex-nowrap">
+          <a class="navbar-brand" href="../index.html">
+            <img id="logo" class="svg" src="../images/logo.svg" alt="">
+            
+          </a>
+          <button class="btn btn-lg d-md-none border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navpanel" aria-controls="navpanel" aria-expanded="false" aria-label="Toggle navigation">
+            <i class="bi bi-three-dots"></i>
+          </button>
+          <div class="collapse navbar-collapse" id="navpanel">
+            <div id="navbar">
+            </div>
+          </div>
+        </div>
+      </nav>
+    </header>
+
+    <main class="container-xxl">
+      <div class="toc-offcanvas">
+        <div class="offcanvas-md offcanvas-start" tabindex="-1" id="tocOffcanvas" aria-labelledby="tocOffcanvasLabel">
+          <div class="offcanvas-header">
+            <h5 class="offcanvas-title" id="tocOffcanvasLabel">Table of Contents</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="offcanvas" data-bs-target="#tocOffcanvas" aria-label="Close"></button>
+          </div>
+          <div class="offcanvas-body">
+            <nav class="toc" id="toc"></nav>
+          </div>
+        </div>
+      </div>
+
+      <div class="content">
+        <div class="actionbar">
+          <button class="btn btn-lg border-0 d-md-none" type="button" data-bs-toggle="offcanvas" data-bs-target="#tocOffcanvas" aria-controls="tocOffcanvas" aria-expanded="false" aria-label="Show table of contents">
+            <i class="bi bi-list"></i>
+          </button>
+
+          <nav id="breadcrumb"></nav>
+        </div>
+
+        <article data-uid="Avalonia.Controls.DataGridGeneratedViewEvent`1">
+
+
+
+  <h1 id="Avalonia_Controls_DataGridGeneratedViewEvent_1" data-uid="Avalonia.Controls.DataGridGeneratedViewEvent`1" class="text-break">
+Class DataGridGeneratedViewEvent&lt;TItem&gt;  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/ColumnDefinitions/DataGridGeneratedViewEvents.cs/#L189"><i class="bi bi-code-slash"></i></a>
+  </h1>
+
+  <div class="facts text-secondary">
+    <dl><dt>Namespace</dt><dd><a class="xref" href="Avalonia.html">Avalonia</a>.<a class="xref" href="Avalonia.Controls.html">Controls</a></dd></dl>
+  <dl><dt>Assembly</dt><dd>Avalonia.Controls.DataGrid.dll</dd></dl>
+  </div>
+
+  <div class="markdown summary"><p>Carries a typed, reflection-free snapshot from a generated DataGrid routed-event bridge.</p>
+</div>
+  <div class="markdown conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public sealed class DataGridGeneratedViewEvent&lt;TItem&gt;</code></pre>
+  </div>
+
+
+
+  <h4 class="section">Type Parameters</h4>
+  <dl class="parameters">
+    <dt><code>TItem</code></dt>
+    <dd><p>The generated grid item type.</p>
+</dd>
+  </dl>
+
+  <dl class="typelist inheritance">
+    <dt>Inheritance</dt>
+    <dd>
+      <div><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object">object</a></div>
+      <div><span class="xref">DataGridGeneratedViewEvent&lt;TItem&gt;</span></div>
+    </dd>
+  </dl>
+
+
+
+  <dl class="typelist inheritedMembers">
+    <dt>Inherited Members</dt>
+    <dd>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object)">object.Equals(object)</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object-system-object)">object.Equals(object, object)</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.gethashcode">object.GetHashCode()</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.gettype">object.GetType()</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.referenceequals">object.ReferenceEquals(object, object)</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.tostring">object.ToString()</a>
+    </div>
+  </dd></dl>
+
+
+
+
+
+
+  <h2 class="section" id="properties">Properties
+</h2>
+
+
+  <a id="Avalonia_Controls_DataGridGeneratedViewEvent_1_AddedCells_" data-uid="Avalonia.Controls.DataGridGeneratedViewEvent`1.AddedCells*"></a>
+
+  <h3 id="Avalonia_Controls_DataGridGeneratedViewEvent_1_AddedCells" data-uid="Avalonia.Controls.DataGridGeneratedViewEvent`1.AddedCells">
+  AddedCells
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/ColumnDefinitions/DataGridGeneratedViewEvents.cs/#L237"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Gets cells participating in a transactional selection proposal.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public IReadOnlyList&lt;DataGridCellInfo&gt; AddedCells { get; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.ireadonlylist-1">IReadOnlyList</a>&lt;<a class="xref" href="Avalonia.Controls.DataGridCellInfo.html">DataGridCellInfo</a>&gt;</dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="Avalonia_Controls_DataGridGeneratedViewEvent_1_AddedColumns_" data-uid="Avalonia.Controls.DataGridGeneratedViewEvent`1.AddedColumns*"></a>
+
+  <h3 id="Avalonia_Controls_DataGridGeneratedViewEvent_1_AddedColumns" data-uid="Avalonia.Controls.DataGridGeneratedViewEvent`1.AddedColumns">
+  AddedColumns
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/ColumnDefinitions/DataGridGeneratedViewEvents.cs/#L243"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Gets columns participating in a transactional selection proposal.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public IReadOnlyList&lt;DataGridColumn&gt; AddedColumns { get; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.ireadonlylist-1">IReadOnlyList</a>&lt;<a class="xref" href="Avalonia.Controls.DataGridColumn.html">DataGridColumn</a>&gt;</dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="Avalonia_Controls_DataGridGeneratedViewEvent_1_AddedItems_" data-uid="Avalonia.Controls.DataGridGeneratedViewEvent`1.AddedItems*"></a>
+
+  <h3 id="Avalonia_Controls_DataGridGeneratedViewEvent_1_AddedItems" data-uid="Avalonia.Controls.DataGridGeneratedViewEvent`1.AddedItems">
+  AddedItems
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/ColumnDefinitions/DataGridGeneratedViewEvents.cs/#L225"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Gets the items added by a selection change without copying the source list.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public DataGridGeneratedItemList&lt;TItem&gt; AddedItems { get; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="Avalonia.Controls.DataGridGeneratedItemList-1.html">DataGridGeneratedItemList</a>&lt;TItem&gt;</dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="Avalonia_Controls_DataGridGeneratedViewEvent_1_AddedRows_" data-uid="Avalonia.Controls.DataGridGeneratedViewEvent`1.AddedRows*"></a>
+
+  <h3 id="Avalonia_Controls_DataGridGeneratedViewEvent_1_AddedRows" data-uid="Avalonia.Controls.DataGridGeneratedViewEvent`1.AddedRows">
+  AddedRows
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/ColumnDefinitions/DataGridGeneratedViewEvents.cs/#L231"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Gets rows participating in a transactional selection proposal.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public IReadOnlyList&lt;DataGridSelectionRowInfo&gt; AddedRows { get; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.ireadonlylist-1">IReadOnlyList</a>&lt;<a class="xref" href="Avalonia.Controls.DataGridSelectionRowInfo.html">DataGridSelectionRowInfo</a>&gt;</dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="Avalonia_Controls_DataGridGeneratedViewEvent_1_Cancel_" data-uid="Avalonia.Controls.DataGridGeneratedViewEvent`1.Cancel*"></a>
+
+  <h3 id="Avalonia_Controls_DataGridGeneratedViewEvent_1_Cancel" data-uid="Avalonia.Controls.DataGridGeneratedViewEvent`1.Cancel">
+  Cancel
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/ColumnDefinitions/DataGridGeneratedViewEvents.cs/#L312"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Gets or sets whether a cancellable edit event should be canceled. Generated views copy this
+value back after the command executes.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public bool Cancel { get; set; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="Avalonia_Controls_DataGridGeneratedViewEvent_1_Cell_" data-uid="Avalonia.Controls.DataGridGeneratedViewEvent`1.Cell*"></a>
+
+  <h3 id="Avalonia_Controls_DataGridGeneratedViewEvent_1_Cell" data-uid="Avalonia.Controls.DataGridGeneratedViewEvent`1.Cell">
+  Cell
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/ColumnDefinitions/DataGridGeneratedViewEvents.cs/#L273"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Gets the realized cell associated with a cell event.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public DataGridCell? Cell { get; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="Avalonia.Controls.DataGridCell.html">DataGridCell</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="Avalonia_Controls_DataGridGeneratedViewEvent_1_CellValueChangeOrigin_" data-uid="Avalonia.Controls.DataGridGeneratedViewEvent`1.CellValueChangeOrigin*"></a>
+
+  <h3 id="Avalonia_Controls_DataGridGeneratedViewEvent_1_CellValueChangeOrigin" data-uid="Avalonia.Controls.DataGridGeneratedViewEvent`1.CellValueChangeOrigin">
+  CellValueChangeOrigin
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/ColumnDefinitions/DataGridGeneratedViewEvents.cs/#L294"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Gets the origin of a committed cell value change.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public DataGridCellValueChangeOrigin? CellValueChangeOrigin { get; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="Avalonia.Controls.DataGridCellValueChangeOrigin.html">DataGridCellValueChangeOrigin</a>?</dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="Avalonia_Controls_DataGridGeneratedViewEvent_1_ColumnKey_" data-uid="Avalonia.Controls.DataGridGeneratedViewEvent`1.ColumnKey*"></a>
+
+  <h3 id="Avalonia_Controls_DataGridGeneratedViewEvent_1_ColumnKey" data-uid="Avalonia.Controls.DataGridGeneratedViewEvent`1.ColumnKey">
+  ColumnKey
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/ColumnDefinitions/DataGridGeneratedViewEvents.cs/#L261"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Gets the stable column key associated with the event.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public string ColumnKey { get; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="Avalonia_Controls_DataGridGeneratedViewEvent_1_EditAction_" data-uid="Avalonia.Controls.DataGridGeneratedViewEvent`1.EditAction*"></a>
+
+  <h3 id="Avalonia_Controls_DataGridGeneratedViewEvent_1_EditAction" data-uid="Avalonia.Controls.DataGridGeneratedViewEvent`1.EditAction">
+  EditAction
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/ColumnDefinitions/DataGridGeneratedViewEvents.cs/#L300"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Gets the edit action when the event belongs to the editing lifecycle.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public DataGridEditAction? EditAction { get; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="Avalonia.Controls.DataGridEditAction.html">DataGridEditAction</a>?</dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="Avalonia_Controls_DataGridGeneratedViewEvent_1_Handled_" data-uid="Avalonia.Controls.DataGridGeneratedViewEvent`1.Handled*"></a>
+
+  <h3 id="Avalonia_Controls_DataGridGeneratedViewEvent_1_Handled" data-uid="Avalonia.Controls.DataGridGeneratedViewEvent`1.Handled">
+  Handled
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/ColumnDefinitions/DataGridGeneratedViewEvents.cs/#L317"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Gets or sets whether the originating routed event should be marked handled.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public bool Handled { get; set; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="Avalonia_Controls_DataGridGeneratedViewEvent_1_HierarchicalNode_" data-uid="Avalonia.Controls.DataGridGeneratedViewEvent`1.HierarchicalNode*"></a>
+
+  <h3 id="Avalonia_Controls_DataGridGeneratedViewEvent_1_HierarchicalNode" data-uid="Avalonia.Controls.DataGridGeneratedViewEvent`1.HierarchicalNode">
+  HierarchicalNode
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/ColumnDefinitions/DataGridGeneratedViewEvents.cs/#L282"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Gets the hierarchy node associated with the event.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public HierarchicalNode? HierarchicalNode { get; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="Avalonia.Controls.DataGridHierarchical.HierarchicalNode.html">HierarchicalNode</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="Avalonia_Controls_DataGridGeneratedViewEvent_1_HierarchyPath_" data-uid="Avalonia.Controls.DataGridGeneratedViewEvent`1.HierarchyPath*"></a>
+
+  <h3 id="Avalonia_Controls_DataGridGeneratedViewEvent_1_HierarchyPath" data-uid="Avalonia.Controls.DataGridGeneratedViewEvent`1.HierarchyPath">
+  HierarchyPath
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/ColumnDefinitions/DataGridGeneratedViewEvents.cs/#L285"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Gets the root-to-node hierarchy path associated with the event.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public IReadOnlyList&lt;HierarchicalNode&gt; HierarchyPath { get; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.ireadonlylist-1">IReadOnlyList</a>&lt;<a class="xref" href="Avalonia.Controls.DataGridHierarchical.HierarchicalNode.html">HierarchicalNode</a>&gt;</dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="Avalonia_Controls_DataGridGeneratedViewEvent_1_IsUserInitiated_" data-uid="Avalonia.Controls.DataGridGeneratedViewEvent`1.IsUserInitiated*"></a>
+
+  <h3 id="Avalonia_Controls_DataGridGeneratedViewEvent_1_IsUserInitiated" data-uid="Avalonia.Controls.DataGridGeneratedViewEvent`1.IsUserInitiated">
+  IsUserInitiated
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/ColumnDefinitions/DataGridGeneratedViewEvents.cs/#L306"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Gets a value indicating whether a selection change originated from user input.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public bool IsUserInitiated { get; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="Avalonia_Controls_DataGridGeneratedViewEvent_1_Item_" data-uid="Avalonia.Controls.DataGridGeneratedViewEvent`1.Item*"></a>
+
+  <h3 id="Avalonia_Controls_DataGridGeneratedViewEvent_1_Item" data-uid="Avalonia.Controls.DataGridGeneratedViewEvent`1.Item">
+  Item
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/ColumnDefinitions/DataGridGeneratedViewEvents.cs/#L216"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Gets the row item associated with an edit event.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public TItem? Item { get; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><span class="xref">TItem</span></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="Avalonia_Controls_DataGridGeneratedViewEvent_1_Kind_" data-uid="Avalonia.Controls.DataGridGeneratedViewEvent`1.Kind*"></a>
+
+  <h3 id="Avalonia_Controls_DataGridGeneratedViewEvent_1_Kind" data-uid="Avalonia.Controls.DataGridGeneratedViewEvent`1.Kind">
+  Kind
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/ColumnDefinitions/DataGridGeneratedViewEvents.cs/#L213"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Gets the single routed-event kind represented by this snapshot.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public DataGridGeneratedViewEventKinds Kind { get; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="Avalonia.Controls.DataGridGeneratedViewEventKinds.html">DataGridGeneratedViewEventKinds</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="Avalonia_Controls_DataGridGeneratedViewEvent_1_NewColumnKey_" data-uid="Avalonia.Controls.DataGridGeneratedViewEvent`1.NewColumnKey*"></a>
+
+  <h3 id="Avalonia_Controls_DataGridGeneratedViewEvent_1_NewColumnKey" data-uid="Avalonia.Controls.DataGridGeneratedViewEvent`1.NewColumnKey">
+  NewColumnKey
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/ColumnDefinitions/DataGridGeneratedViewEvents.cs/#L267"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Gets the new current-cell column key.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public string NewColumnKey { get; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="Avalonia_Controls_DataGridGeneratedViewEvent_1_NewItem_" data-uid="Avalonia.Controls.DataGridGeneratedViewEvent`1.NewItem*"></a>
+
+  <h3 id="Avalonia_Controls_DataGridGeneratedViewEvent_1_NewItem" data-uid="Avalonia.Controls.DataGridGeneratedViewEvent`1.NewItem">
+  NewItem
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/ColumnDefinitions/DataGridGeneratedViewEvents.cs/#L222"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Gets the new current-cell item.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public TItem? NewItem { get; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><span class="xref">TItem</span></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="Avalonia_Controls_DataGridGeneratedViewEvent_1_NewValue_" data-uid="Avalonia.Controls.DataGridGeneratedViewEvent`1.NewValue*"></a>
+
+  <h3 id="Avalonia_Controls_DataGridGeneratedViewEvent_1_NewValue" data-uid="Avalonia.Controls.DataGridGeneratedViewEvent`1.NewValue">
+  NewValue
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/ColumnDefinitions/DataGridGeneratedViewEvents.cs/#L291"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Gets the value after a committed cell edit.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public object? NewValue { get; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object">object</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="Avalonia_Controls_DataGridGeneratedViewEvent_1_OldColumnKey_" data-uid="Avalonia.Controls.DataGridGeneratedViewEvent`1.OldColumnKey*"></a>
+
+  <h3 id="Avalonia_Controls_DataGridGeneratedViewEvent_1_OldColumnKey" data-uid="Avalonia.Controls.DataGridGeneratedViewEvent`1.OldColumnKey">
+  OldColumnKey
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/ColumnDefinitions/DataGridGeneratedViewEvents.cs/#L264"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Gets the previous current-cell column key.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public string OldColumnKey { get; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="Avalonia_Controls_DataGridGeneratedViewEvent_1_OldItem_" data-uid="Avalonia.Controls.DataGridGeneratedViewEvent`1.OldItem*"></a>
+
+  <h3 id="Avalonia_Controls_DataGridGeneratedViewEvent_1_OldItem" data-uid="Avalonia.Controls.DataGridGeneratedViewEvent`1.OldItem">
+  OldItem
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/ColumnDefinitions/DataGridGeneratedViewEvents.cs/#L219"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Gets the previous current-cell item.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public TItem? OldItem { get; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><span class="xref">TItem</span></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="Avalonia_Controls_DataGridGeneratedViewEvent_1_OldValue_" data-uid="Avalonia.Controls.DataGridGeneratedViewEvent`1.OldValue*"></a>
+
+  <h3 id="Avalonia_Controls_DataGridGeneratedViewEvent_1_OldValue" data-uid="Avalonia.Controls.DataGridGeneratedViewEvent`1.OldValue">
+  OldValue
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/ColumnDefinitions/DataGridGeneratedViewEvents.cs/#L288"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Gets the value before a committed cell edit.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public object? OldValue { get; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object">object</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="Avalonia_Controls_DataGridGeneratedViewEvent_1_ProposedAnchor_" data-uid="Avalonia.Controls.DataGridGeneratedViewEvent`1.ProposedAnchor*"></a>
+
+  <h3 id="Avalonia_Controls_DataGridGeneratedViewEvent_1_ProposedAnchor" data-uid="Avalonia.Controls.DataGridGeneratedViewEvent`1.ProposedAnchor">
+  ProposedAnchor
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/ColumnDefinitions/DataGridGeneratedViewEvents.cs/#L255"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Gets the proposed selection anchor.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public DataGridSelectionAnchorInfo ProposedAnchor { get; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="Avalonia.Controls.DataGridSelectionAnchorInfo.html">DataGridSelectionAnchorInfo</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="Avalonia_Controls_DataGridGeneratedViewEvent_1_ProposedCurrentCell_" data-uid="Avalonia.Controls.DataGridGeneratedViewEvent`1.ProposedCurrentCell*"></a>
+
+  <h3 id="Avalonia_Controls_DataGridGeneratedViewEvent_1_ProposedCurrentCell" data-uid="Avalonia.Controls.DataGridGeneratedViewEvent`1.ProposedCurrentCell">
+  ProposedCurrentCell
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/ColumnDefinitions/DataGridGeneratedViewEvents.cs/#L252"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Gets the proposed current cell.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public DataGridCellInfo ProposedCurrentCell { get; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="Avalonia.Controls.DataGridCellInfo.html">DataGridCellInfo</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="Avalonia_Controls_DataGridGeneratedViewEvent_1_ProposedCurrentItem_" data-uid="Avalonia.Controls.DataGridGeneratedViewEvent`1.ProposedCurrentItem*"></a>
+
+  <h3 id="Avalonia_Controls_DataGridGeneratedViewEvent_1_ProposedCurrentItem" data-uid="Avalonia.Controls.DataGridGeneratedViewEvent`1.ProposedCurrentItem">
+  ProposedCurrentItem
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/ColumnDefinitions/DataGridGeneratedViewEvents.cs/#L249"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Gets the proposed current item.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public TItem? ProposedCurrentItem { get; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><span class="xref">TItem</span></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="Avalonia_Controls_DataGridGeneratedViewEvent_1_RemovedCells_" data-uid="Avalonia.Controls.DataGridGeneratedViewEvent`1.RemovedCells*"></a>
+
+  <h3 id="Avalonia_Controls_DataGridGeneratedViewEvent_1_RemovedCells" data-uid="Avalonia.Controls.DataGridGeneratedViewEvent`1.RemovedCells">
+  RemovedCells
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/ColumnDefinitions/DataGridGeneratedViewEvents.cs/#L240"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Gets cells removed by a transactional selection proposal.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public IReadOnlyList&lt;DataGridCellInfo&gt; RemovedCells { get; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.ireadonlylist-1">IReadOnlyList</a>&lt;<a class="xref" href="Avalonia.Controls.DataGridCellInfo.html">DataGridCellInfo</a>&gt;</dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="Avalonia_Controls_DataGridGeneratedViewEvent_1_RemovedColumns_" data-uid="Avalonia.Controls.DataGridGeneratedViewEvent`1.RemovedColumns*"></a>
+
+  <h3 id="Avalonia_Controls_DataGridGeneratedViewEvent_1_RemovedColumns" data-uid="Avalonia.Controls.DataGridGeneratedViewEvent`1.RemovedColumns">
+  RemovedColumns
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/ColumnDefinitions/DataGridGeneratedViewEvents.cs/#L246"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Gets columns removed by a transactional selection proposal.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public IReadOnlyList&lt;DataGridColumn&gt; RemovedColumns { get; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.ireadonlylist-1">IReadOnlyList</a>&lt;<a class="xref" href="Avalonia.Controls.DataGridColumn.html">DataGridColumn</a>&gt;</dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="Avalonia_Controls_DataGridGeneratedViewEvent_1_RemovedItems_" data-uid="Avalonia.Controls.DataGridGeneratedViewEvent`1.RemovedItems*"></a>
+
+  <h3 id="Avalonia_Controls_DataGridGeneratedViewEvent_1_RemovedItems" data-uid="Avalonia.Controls.DataGridGeneratedViewEvent`1.RemovedItems">
+  RemovedItems
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/ColumnDefinitions/DataGridGeneratedViewEvents.cs/#L228"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Gets the items removed by a selection change without copying the source list.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public DataGridGeneratedItemList&lt;TItem&gt; RemovedItems { get; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="Avalonia.Controls.DataGridGeneratedItemList-1.html">DataGridGeneratedItemList</a>&lt;TItem&gt;</dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="Avalonia_Controls_DataGridGeneratedViewEvent_1_RemovedRows_" data-uid="Avalonia.Controls.DataGridGeneratedViewEvent`1.RemovedRows*"></a>
+
+  <h3 id="Avalonia_Controls_DataGridGeneratedViewEvent_1_RemovedRows" data-uid="Avalonia.Controls.DataGridGeneratedViewEvent`1.RemovedRows">
+  RemovedRows
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/ColumnDefinitions/DataGridGeneratedViewEvents.cs/#L234"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Gets rows removed by a transactional selection proposal.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public IReadOnlyList&lt;DataGridSelectionRowInfo&gt; RemovedRows { get; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.ireadonlylist-1">IReadOnlyList</a>&lt;<a class="xref" href="Avalonia.Controls.DataGridSelectionRowInfo.html">DataGridSelectionRowInfo</a>&gt;</dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="Avalonia_Controls_DataGridGeneratedViewEvent_1_Row_" data-uid="Avalonia.Controls.DataGridGeneratedViewEvent`1.Row*"></a>
+
+  <h3 id="Avalonia_Controls_DataGridGeneratedViewEvent_1_Row" data-uid="Avalonia.Controls.DataGridGeneratedViewEvent`1.Row">
+  Row
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/ColumnDefinitions/DataGridGeneratedViewEvents.cs/#L276"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Gets the realized row associated with a cell event.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public DataGridRow? Row { get; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="Avalonia.Controls.DataGridRow.html">DataGridRow</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="Avalonia_Controls_DataGridGeneratedViewEvent_1_RowDataContext_" data-uid="Avalonia.Controls.DataGridGeneratedViewEvent`1.RowDataContext*"></a>
+
+  <h3 id="Avalonia_Controls_DataGridGeneratedViewEvent_1_RowDataContext" data-uid="Avalonia.Controls.DataGridGeneratedViewEvent`1.RowDataContext">
+  RowDataContext
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/ColumnDefinitions/DataGridGeneratedViewEvents.cs/#L279"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Gets the row data context associated with a cell event.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public object? RowDataContext { get; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object">object</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="Avalonia_Controls_DataGridGeneratedViewEvent_1_RowIndex_" data-uid="Avalonia.Controls.DataGridGeneratedViewEvent`1.RowIndex*"></a>
+
+  <h3 id="Avalonia_Controls_DataGridGeneratedViewEvent_1_RowIndex" data-uid="Avalonia.Controls.DataGridGeneratedViewEvent`1.RowIndex">
+  RowIndex
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/ColumnDefinitions/DataGridGeneratedViewEvents.cs/#L270"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Gets the realized row index for an edit event, or -1 when unavailable.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public int RowIndex { get; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="Avalonia_Controls_DataGridGeneratedViewEvent_1_SelectionGuarantee_" data-uid="Avalonia.Controls.DataGridGeneratedViewEvent`1.SelectionGuarantee*"></a>
+
+  <h3 id="Avalonia_Controls_DataGridGeneratedViewEvent_1_SelectionGuarantee" data-uid="Avalonia.Controls.DataGridGeneratedViewEvent`1.SelectionGuarantee">
+  SelectionGuarantee
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/ColumnDefinitions/DataGridGeneratedViewEvents.cs/#L258"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Gets the guarantee supplied for a transactional selection proposal.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public DataGridSelectionChangingGuarantee? SelectionGuarantee { get; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="Avalonia.Controls.DataGridSelectionChangingGuarantee.html">DataGridSelectionChangingGuarantee</a>?</dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="Avalonia_Controls_DataGridGeneratedViewEvent_1_SelectionSource_" data-uid="Avalonia.Controls.DataGridGeneratedViewEvent`1.SelectionSource*"></a>
+
+  <h3 id="Avalonia_Controls_DataGridGeneratedViewEvent_1_SelectionSource" data-uid="Avalonia.Controls.DataGridGeneratedViewEvent`1.SelectionSource">
+  SelectionSource
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/ColumnDefinitions/DataGridGeneratedViewEvents.cs/#L303"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Gets the origin of a selection change.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public DataGridSelectionChangeSource SelectionSource { get; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="Avalonia.Controls.DataGridSelectionChangeSource.html">DataGridSelectionChangeSource</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="Avalonia_Controls_DataGridGeneratedViewEvent_1_TriggerEvent_" data-uid="Avalonia.Controls.DataGridGeneratedViewEvent`1.TriggerEvent*"></a>
+
+  <h3 id="Avalonia_Controls_DataGridGeneratedViewEvent_1_TriggerEvent" data-uid="Avalonia.Controls.DataGridGeneratedViewEvent`1.TriggerEvent">
+  TriggerEvent
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/ColumnDefinitions/DataGridGeneratedViewEvents.cs/#L297"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Gets the routed input event that triggered a selection proposal, when present.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public RoutedEventArgs? TriggerEvent { get; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><span class="xref">RoutedEventArgs</span></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <h2 class="section" id="methods">Methods
+</h2>
+
+
+  <a id="Avalonia_Controls_DataGridGeneratedViewEvent_1_CreateCellLifecycle_" data-uid="Avalonia.Controls.DataGridGeneratedViewEvent`1.CreateCellLifecycle*"></a>
+
+  <h3 id="Avalonia_Controls_DataGridGeneratedViewEvent_1_CreateCellLifecycle_Avalonia_Controls_DataGridGeneratedViewEventKinds_Avalonia_Controls_DataGridCellLifecycleEventArgs_System_String_" data-uid="Avalonia.Controls.DataGridGeneratedViewEvent`1.CreateCellLifecycle(Avalonia.Controls.DataGridGeneratedViewEventKinds,Avalonia.Controls.DataGridCellLifecycleEventArgs,System.String)">
+  CreateCellLifecycle(DataGridGeneratedViewEventKinds, DataGridCellLifecycleEventArgs, string)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/ColumnDefinitions/DataGridGeneratedViewEvents.cs/#L368"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Creates a cell realization lifecycle snapshot.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static DataGridGeneratedViewEvent&lt;TItem&gt; CreateCellLifecycle(DataGridGeneratedViewEventKinds kind, DataGridCellLifecycleEventArgs args, string columnKey)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>kind</code> <a class="xref" href="Avalonia.Controls.DataGridGeneratedViewEventKinds.html">DataGridGeneratedViewEventKinds</a></dt>
+    <dd></dd>
+    <dt><code>args</code> <a class="xref" href="Avalonia.Controls.DataGridCellLifecycleEventArgs.html">DataGridCellLifecycleEventArgs</a></dt>
+    <dd></dd>
+    <dt><code>columnKey</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></dt>
+    <dd></dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="Avalonia.Controls.DataGridGeneratedViewEvent-1.html">DataGridGeneratedViewEvent</a>&lt;TItem&gt;</dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Avalonia_Controls_DataGridGeneratedViewEvent_1_CreateCellValueChanged_" data-uid="Avalonia.Controls.DataGridGeneratedViewEvent`1.CreateCellValueChanged*"></a>
+
+  <h3 id="Avalonia_Controls_DataGridGeneratedViewEvent_1_CreateCellValueChanged_Avalonia_Controls_DataGridCellValueChangedEventArgs_System_String_" data-uid="Avalonia.Controls.DataGridGeneratedViewEvent`1.CreateCellValueChanged(Avalonia.Controls.DataGridCellValueChangedEventArgs,System.String)">
+  CreateCellValueChanged(DataGridCellValueChangedEventArgs, string)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/ColumnDefinitions/DataGridGeneratedViewEvents.cs/#L397"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Creates a committed cell-value snapshot.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static DataGridGeneratedViewEvent&lt;TItem&gt; CreateCellValueChanged(DataGridCellValueChangedEventArgs args, string columnKey)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>args</code> <a class="xref" href="Avalonia.Controls.DataGridCellValueChangedEventArgs.html">DataGridCellValueChangedEventArgs</a></dt>
+    <dd></dd>
+    <dt><code>columnKey</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></dt>
+    <dd></dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="Avalonia.Controls.DataGridGeneratedViewEvent-1.html">DataGridGeneratedViewEvent</a>&lt;TItem&gt;</dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Avalonia_Controls_DataGridGeneratedViewEvent_1_CreateCurrentCellChanged_" data-uid="Avalonia.Controls.DataGridGeneratedViewEvent`1.CreateCurrentCellChanged*"></a>
+
+  <h3 id="Avalonia_Controls_DataGridGeneratedViewEvent_1_CreateCurrentCellChanged__0_System_String__0_System_String_" data-uid="Avalonia.Controls.DataGridGeneratedViewEvent`1.CreateCurrentCellChanged(`0,System.String,`0,System.String)">
+  CreateCurrentCellChanged(TItem, string, TItem, string)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/ColumnDefinitions/DataGridGeneratedViewEvents.cs/#L423"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Creates a current-cell-change snapshot.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static DataGridGeneratedViewEvent&lt;TItem&gt; CreateCurrentCellChanged(TItem oldItem, string oldColumnKey, TItem newItem, string newColumnKey)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>oldItem</code> <span class="xref">TItem</span></dt>
+    <dd></dd>
+    <dt><code>oldColumnKey</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></dt>
+    <dd></dd>
+    <dt><code>newItem</code> <span class="xref">TItem</span></dt>
+    <dd></dd>
+    <dt><code>newColumnKey</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></dt>
+    <dd></dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="Avalonia.Controls.DataGridGeneratedViewEvent-1.html">DataGridGeneratedViewEvent</a>&lt;TItem&gt;</dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Avalonia_Controls_DataGridGeneratedViewEvent_1_CreateEdit_" data-uid="Avalonia.Controls.DataGridGeneratedViewEvent`1.CreateEdit*"></a>
+
+  <h3 id="Avalonia_Controls_DataGridGeneratedViewEvent_1_CreateEdit_Avalonia_Controls_DataGridGeneratedViewEventKinds__0_System_Int32_System_String_System_Nullable_Avalonia_Controls_DataGridEditAction__System_Boolean_" data-uid="Avalonia.Controls.DataGridGeneratedViewEvent`1.CreateEdit(Avalonia.Controls.DataGridGeneratedViewEventKinds,`0,System.Int32,System.String,System.Nullable{Avalonia.Controls.DataGridEditAction},System.Boolean)">
+  CreateEdit(DataGridGeneratedViewEventKinds, TItem, int, string, DataGridEditAction?, bool)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/ColumnDefinitions/DataGridGeneratedViewEvents.cs/#L448"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Creates an editing-lifecycle snapshot.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static DataGridGeneratedViewEvent&lt;TItem&gt; CreateEdit(DataGridGeneratedViewEventKinds kind, TItem item, int rowIndex, string columnKey, DataGridEditAction? editAction, bool cancel)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>kind</code> <a class="xref" href="Avalonia.Controls.DataGridGeneratedViewEventKinds.html">DataGridGeneratedViewEventKinds</a></dt>
+    <dd></dd>
+    <dt><code>item</code> <span class="xref">TItem</span></dt>
+    <dd></dd>
+    <dt><code>rowIndex</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a></dt>
+    <dd></dd>
+    <dt><code>columnKey</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></dt>
+    <dd></dd>
+    <dt><code>editAction</code> <a class="xref" href="Avalonia.Controls.DataGridEditAction.html">DataGridEditAction</a>?</dt>
+    <dd></dd>
+    <dt><code>cancel</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></dt>
+    <dd></dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="Avalonia.Controls.DataGridGeneratedViewEvent-1.html">DataGridGeneratedViewEvent</a>&lt;TItem&gt;</dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Avalonia_Controls_DataGridGeneratedViewEvent_1_CreateSelectionChanged_" data-uid="Avalonia.Controls.DataGridGeneratedViewEvent`1.CreateSelectionChanged*"></a>
+
+  <h3 id="Avalonia_Controls_DataGridGeneratedViewEvent_1_CreateSelectionChanged_System_Collections_IList_System_Collections_IList_Avalonia_Controls_DataGridSelectionChangeSource_System_Boolean_" data-uid="Avalonia.Controls.DataGridGeneratedViewEvent`1.CreateSelectionChanged(System.Collections.IList,System.Collections.IList,Avalonia.Controls.DataGridSelectionChangeSource,System.Boolean)">
+  CreateSelectionChanged(IList, IList, DataGridSelectionChangeSource, bool)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/ColumnDefinitions/DataGridGeneratedViewEvents.cs/#L320"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Creates a selection-change snapshot.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static DataGridGeneratedViewEvent&lt;TItem&gt; CreateSelectionChanged(IList addedItems, IList removedItems, DataGridSelectionChangeSource source, bool isUserInitiated)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>addedItems</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.ilist">IList</a></dt>
+    <dd></dd>
+    <dt><code>removedItems</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.ilist">IList</a></dt>
+    <dd></dd>
+    <dt><code>source</code> <a class="xref" href="Avalonia.Controls.DataGridSelectionChangeSource.html">DataGridSelectionChangeSource</a></dt>
+    <dd></dd>
+    <dt><code>isUserInitiated</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></dt>
+    <dd></dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="Avalonia.Controls.DataGridGeneratedViewEvent-1.html">DataGridGeneratedViewEvent</a>&lt;TItem&gt;</dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Avalonia_Controls_DataGridGeneratedViewEvent_1_CreateSelectionChanging_" data-uid="Avalonia.Controls.DataGridGeneratedViewEvent`1.CreateSelectionChanging*"></a>
+
+  <h3 id="Avalonia_Controls_DataGridGeneratedViewEvent_1_CreateSelectionChanging_Avalonia_Controls_DataGridSelectionChangingEventArgs_" data-uid="Avalonia.Controls.DataGridGeneratedViewEvent`1.CreateSelectionChanging(Avalonia.Controls.DataGridSelectionChangingEventArgs)">
+  CreateSelectionChanging(DataGridSelectionChangingEventArgs)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/ColumnDefinitions/DataGridGeneratedViewEvents.cs/#L336"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Creates a complete transactional selection-proposal snapshot.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static DataGridGeneratedViewEvent&lt;TItem&gt; CreateSelectionChanging(DataGridSelectionChangingEventArgs args)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>args</code> <a class="xref" href="Avalonia.Controls.DataGridSelectionChangingEventArgs.html">DataGridSelectionChangingEventArgs</a></dt>
+    <dd></dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="Avalonia.Controls.DataGridGeneratedViewEvent-1.html">DataGridGeneratedViewEvent</a>&lt;TItem&gt;</dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Avalonia_Controls_DataGridGeneratedViewEvent_1_CreateSorting_" data-uid="Avalonia.Controls.DataGridGeneratedViewEvent`1.CreateSorting*"></a>
+
+  <h3 id="Avalonia_Controls_DataGridGeneratedViewEvent_1_CreateSorting_System_String_" data-uid="Avalonia.Controls.DataGridGeneratedViewEvent`1.CreateSorting(System.String)">
+  CreateSorting(string)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/ColumnDefinitions/DataGridGeneratedViewEvents.cs/#L439"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Creates a sorting-request snapshot.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static DataGridGeneratedViewEvent&lt;TItem&gt; CreateSorting(string columnKey)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>columnKey</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></dt>
+    <dd></dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="Avalonia.Controls.DataGridGeneratedViewEvent-1.html">DataGridGeneratedViewEvent</a>&lt;TItem&gt;</dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+
+</article>
+
+        <div class="contribution d-print-none">
+          <a href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/ColumnDefinitions/DataGridGeneratedViewEvents.cs/#L189" class="edit-link">Edit this page</a>
+        </div>
+
+
+      </div>
+
+      <div class="affix">
+        <nav id="affix"></nav>
+      </div>
+    </main>
+
+
+    <footer class="border-top text-secondary">
+      <div class="container-xxl">
+        <div class="flex-fill">
+          <span>Made with <a href="https://dotnet.github.io/docfx">docfx</a></span>
+        </div>
+      </div>
+    </footer>
+  </body>
+</html>

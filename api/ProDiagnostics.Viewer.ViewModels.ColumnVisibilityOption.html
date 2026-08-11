@@ -85,7 +85,7 @@
 
 
   <h1 id="ProDiagnostics_Viewer_ViewModels_ColumnVisibilityOption" data-uid="ProDiagnostics.Viewer.ViewModels.ColumnVisibilityOption" class="text-break">
-Class ColumnVisibilityOption  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/ProDiagnostics.Viewer/ViewModels/ColumnVisibilityOption.cs/#L3"><i class="bi bi-code-slash"></i></a>
+Class ColumnVisibilityOption  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/ProDiagnostics.Viewer/ViewModels/ColumnVisibilityOption.cs/#L5"><i class="bi bi-code-slash"></i></a>
   </h1>
 
   <div class="facts text-secondary">
@@ -157,16 +157,16 @@ Class ColumnVisibilityOption  <a class="header-action link-secondary" title="Vie
 
   <a id="ProDiagnostics_Viewer_ViewModels_ColumnVisibilityOption__ctor_" data-uid="ProDiagnostics.Viewer.ViewModels.ColumnVisibilityOption.#ctor*"></a>
 
-  <h3 id="ProDiagnostics_Viewer_ViewModels_ColumnVisibilityOption__ctor_System_String_System_String_System_Boolean_" data-uid="ProDiagnostics.Viewer.ViewModels.ColumnVisibilityOption.#ctor(System.String,System.String,System.Boolean)">
-  ColumnVisibilityOption(string, string, bool)
-  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/ProDiagnostics.Viewer/ViewModels/ColumnVisibilityOption.cs/#L7"><i class="bi bi-code-slash"></i></a>
+  <h3 id="ProDiagnostics_Viewer_ViewModels_ColumnVisibilityOption__ctor_System_String_System_String_System_Boolean_System_Action_System_Boolean__" data-uid="ProDiagnostics.Viewer.ViewModels.ColumnVisibilityOption.#ctor(System.String,System.String,System.Boolean,System.Action{System.Boolean})">
+  ColumnVisibilityOption(string, string, bool, Action&lt;bool&gt;?)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/ProDiagnostics.Viewer/ViewModels/ColumnVisibilityOption.cs/#L10"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"></div>
   <div class="markdown level1 conceptual"></div>
 
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public ColumnVisibilityOption(string key, string title, bool isVisible)</code></pre>
+    <pre><code class="lang-csharp hljs">public ColumnVisibilityOption(string key, string title, bool isVisible, Action&lt;bool&gt;? visibilityChanged = null)</code></pre>
   </div>
 
   <h4 class="section">Parameters</h4>
@@ -176,6 +176,8 @@ Class ColumnVisibilityOption  <a class="header-action link-secondary" title="Vie
     <dt><code>title</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></dt>
     <dd></dd>
     <dt><code>isVisible</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></dt>
+    <dd></dd>
+    <dt><code>visibilityChanged</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.action-1">Action</a>&lt;<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a>&gt;</dt>
     <dd></dd>
   </dl>
 
@@ -198,7 +200,7 @@ Class ColumnVisibilityOption  <a class="header-action link-secondary" title="Vie
 
   <h3 id="ProDiagnostics_Viewer_ViewModels_ColumnVisibilityOption_IsVisible" data-uid="ProDiagnostics.Viewer.ViewModels.ColumnVisibilityOption.IsVisible">
   IsVisible
-  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/ProDiagnostics.Viewer/ViewModels/ColumnVisibilityOption.cs/#L18"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/ProDiagnostics.Viewer/ViewModels/ColumnVisibilityOption.cs/#L27"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"></div>
@@ -229,7 +231,7 @@ Class ColumnVisibilityOption  <a class="header-action link-secondary" title="Vie
 
   <h3 id="ProDiagnostics_Viewer_ViewModels_ColumnVisibilityOption_Key" data-uid="ProDiagnostics.Viewer.ViewModels.ColumnVisibilityOption.Key">
   Key
-  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/ProDiagnostics.Viewer/ViewModels/ColumnVisibilityOption.cs/#L14"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/ProDiagnostics.Viewer/ViewModels/ColumnVisibilityOption.cs/#L23"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"></div>
@@ -260,7 +262,7 @@ Class ColumnVisibilityOption  <a class="header-action link-secondary" title="Vie
 
   <h3 id="ProDiagnostics_Viewer_ViewModels_ColumnVisibilityOption_Title" data-uid="ProDiagnostics.Viewer.ViewModels.ColumnVisibilityOption.Title">
   Title
-  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/ProDiagnostics.Viewer/ViewModels/ColumnVisibilityOption.cs/#L16"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/ProDiagnostics.Viewer/ViewModels/ColumnVisibilityOption.cs/#L25"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"></div>
@@ -291,7 +293,7 @@ Class ColumnVisibilityOption  <a class="header-action link-secondary" title="Vie
 </article>
 
         <div class="contribution d-print-none">
-          <a href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/ProDiagnostics.Viewer/ViewModels/ColumnVisibilityOption.cs/#L3" class="edit-link">Edit this page</a>
+          <a href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/ProDiagnostics.Viewer/ViewModels/ColumnVisibilityOption.cs/#L5" class="edit-link">Edit this page</a>
         </div>
 
 

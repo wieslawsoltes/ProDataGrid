@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+      <title>Registries and customization | ProDataGrid for Avalonia </title>
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <meta name="title" content="Registries and customization | ProDataGrid for Avalonia ">
+      
+      
+      <link rel="icon" href="../../favicon.ico">
+      <link rel="stylesheet" href="../../public/docfx.min.css">
+      <link rel="stylesheet" href="../../public/main.css">
+      <meta name="docfx:navrel" content="../../toc.html">
+      <meta name="docfx:tocrel" content="../toc.html">
+      
+      
+      
+      
+      <meta name="docfx:docurl" content="https://github.com/wieslawsoltes/ProDataGrid/blob/master/docfx/articles/source-generators/registries-and-customization.md/#L1">
+      <meta name="loc:inThisArticle" content="In this article">
+      <meta name="loc:searchResultsCount" content="{count} results for &quot;{query}&quot;">
+      <meta name="loc:searchNoResults" content="No results for &quot;{query}&quot;">
+      <meta name="loc:tocFilter" content="Filter by title">
+      <meta name="loc:nextArticle" content="Next">
+      <meta name="loc:prevArticle" content="Previous">
+      <meta name="loc:themeLight" content="Light">
+      <meta name="loc:themeDark" content="Dark">
+      <meta name="loc:themeAuto" content="Auto">
+      <meta name="loc:changeTheme" content="Change theme">
+      <meta name="loc:copy" content="Copy">
+      <meta name="loc:downloadPdf" content="Download PDF">
+
+      <script type="module" src="./../../public/docfx.min.js"></script>
+
+      <script>
+        const theme = localStorage.getItem('theme') || 'auto'
+        document.documentElement.setAttribute('data-bs-theme', theme === 'auto' ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light') : theme)
+      </script>
+
+  </head>
+
+  <body class="tex2jax_ignore" data-layout="" data-yaml-mime="">
+    <header class="bg-body border-bottom">
+      <nav id="autocollapse" class="navbar navbar-expand-md" role="navigation">
+        <div class="container-xxl flex-nowrap">
+          <a class="navbar-brand" href="../../index.html">
+            <img id="logo" class="svg" src="../../images/logo.svg" alt="">
+            
+          </a>
+          <button class="btn btn-lg d-md-none border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navpanel" aria-controls="navpanel" aria-expanded="false" aria-label="Toggle navigation">
+            <i class="bi bi-three-dots"></i>
+          </button>
+          <div class="collapse navbar-collapse" id="navpanel">
+            <div id="navbar">
+            </div>
+          </div>
+        </div>
+      </nav>
+    </header>
+
+    <main class="container-xxl">
+      <div class="toc-offcanvas">
+        <div class="offcanvas-md offcanvas-start" tabindex="-1" id="tocOffcanvas" aria-labelledby="tocOffcanvasLabel">
+          <div class="offcanvas-header">
+            <h5 class="offcanvas-title" id="tocOffcanvasLabel">Table of Contents</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="offcanvas" data-bs-target="#tocOffcanvas" aria-label="Close"></button>
+          </div>
+          <div class="offcanvas-body">
+            <nav class="toc" id="toc"></nav>
+          </div>
+        </div>
+      </div>
+
+      <div class="content">
+        <div class="actionbar">
+          <button class="btn btn-lg border-0 d-md-none" type="button" data-bs-toggle="offcanvas" data-bs-target="#tocOffcanvas" aria-controls="tocOffcanvas" aria-expanded="false" aria-label="Show table of contents">
+            <i class="bi bi-list"></i>
+          </button>
+
+          <nav id="breadcrumb"></nav>
+        </div>
+
+        <article data-uid="">
+<h1 id="registries-and-customization">Registries and customization</h1>
+
+<p>The generator supports granular factories and hooks, complete implementation replacement, assembly/namespace defaults, reflection-free schema/view registries, optional Microsoft DI registration, and custom generated-view bases.</p>
+<h2 id="customization-levels">Customization levels</h2>
+<p>Choose the smallest boundary that owns the required policy:</p>
+<table>
+<thead>
+<tr>
+<th>Requirement</th>
+<th>Boundary</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Adjust one generated column</td>
+<td><code>DataGridColumn.ConfigureMethod</code></td>
+</tr>
+<tr>
+<td>Replace one column definition</td>
+<td><code>DataGridColumn.FactoryMethod</code></td>
+</tr>
+<tr>
+<td>Adjust the completed definition list</td>
+<td><code>GenerateDataGridColumns.ConfigureMethod</code></td>
+</tr>
+<tr>
+<td>Replace schema implementation</td>
+<td><code>GenerateDataGridColumns.ImplementationType</code></td>
+</tr>
+<tr>
+<td>Configure a named controller</td>
+<td><code>GenerateDataGridController.ConfigureMethod</code></td>
+</tr>
+<tr>
+<td>Replace controller construction</td>
+<td><code>GenerateDataGridController.ImplementationType</code></td>
+</tr>
+<tr>
+<td>Replace a generated view section</td>
+<td>Protected virtual view hook</td>
+</tr>
+<tr>
+<td>Share view infrastructure</td>
+<td><code>GenerateDataGridView.BaseType</code></td>
+</tr>
+<tr>
+<td>Resolve DI-backed feature services</td>
+<td>Override protected generated factory</td>
+</tr>
+</tbody>
+</table>
+<p>Invalid hooks fail at compile time; the generator does not activate a method/type by name at runtime.</p>
+<h2 id="per-column-configure-method">Per-column configure method</h2>
+<pre><code class="lang-csharp">[DataGridColumn(
+    DataGridColumnKind.Text,
+    ConfigureMethod = nameof(ConfigureSymbol))]
+public string Symbol { get; set; } = string.Empty;
+
+public static void ConfigureSymbol(DataGridTextColumnDefinition column)
+{
+    column.Watermark = &quot;Ticker&quot;;
+}
+</code></pre>
+<p>The parameter type must match the concrete generated definition kind.</p>
+<h2 id="column-factory">Column factory</h2>
+<p><code>FactoryMethod</code> replaces construction of one definition. If it returns a bound definition, it also owns that definition's initial binding. Use <code>DataGridColumnDefinitionBuilder.For&lt;TItem&gt;()</code>, <code>ClrPropertyInfo</code>, and typed delegates for a custom compiled-bound definition.</p>
+<p>After factory construction, the generator applies canonical key/accessor metadata and declared options, then calls the per-column and schema-list configure hooks.</p>
+<h2 id="completed-list-configuration">Completed-list configuration</h2>
+<pre><code class="lang-csharp">[GenerateDataGridColumns(
+    ProviderName = &quot;TradeSchema&quot;,
+    ConfigureMethod = nameof(ConfigureColumns))]
+public sealed class Trade
+{
+    private static void ConfigureColumns(
+        DataGridColumnDefinitionList columns)
+    {
+        for (int index = 0; index &lt; columns.Count; index++)
+        {
+            columns[index].CanUserResize = true;
+        }
+    }
+}
+</code></pre>
+<p>Use this for cross-column policy. Prefer declarative property metadata for stable schema semantics because it participates directly in diagnostics and hashing.</p>
+<h2 id="full-schema-implementation">Full schema implementation</h2>
+<pre><code class="lang-csharp">[GenerateDataGridColumns(
+    ProviderName = &quot;TradeSchema&quot;,
+    ImplementationType = typeof(CustomTradeSchema))]
+public sealed class Trade { }
+
+public sealed class CustomTradeSchema : IDataGridGeneratedSchema&lt;Trade&gt;
+{
+    // Implement the focused provider/compiler contracts.
+}
+</code></pre>
+<p>The emitted <code>TradeSchema</code> remains the public stable facade and forwards to the implementation. This keeps consumers insulated from application implementation type names. Contract mismatches report <code>PDGSG007</code>.</p>
+<h2 id="controller-factories">Controller factories</h2>
+<p><code>GenerateDataGridController.ImplementationType</code> must implement <code>IDataGridGeneratedControllerFactory&lt;TItem&gt;</code>. Use this when creation depends on an application service abstraction.</p>
+<p>For option-only policy, use a static method:</p>
+<pre><code class="lang-csharp">[GenerateDataGridController(
+    typeof(Trade),
+    &quot;Trades&quot;,
+    ConfigureMethod = nameof(ConfigureTrades))]
+public sealed partial class TradesViewModel
+{
+    private static void ConfigureTrades(
+        ref DataGridGeneratedControllerOptions&lt;Trade&gt; options)
+    {
+        options.OperationExecution = DataGridOperationExecution.ExternalPipeline;
+    }
+}
+</code></pre>
+<h2 id="assembly-and-namespace-defaults">Assembly and namespace defaults</h2>
+<pre><code class="lang-csharp">[assembly: GenerateDataGridColumnsForNamespace(
+    &quot;MyApp.Models&quot;,
+    Discovery = DataGridColumnDiscovery.AttributedOnly,
+    Strict = true,
+    Streaming = true)]
+
+[assembly: GenerateDataGridViewModelsForNamespace(
+    &quot;MyApp.ViewModels&quot;)]
+
+[assembly: GenerateDataGridViewsForNamespace(
+    &quot;MyApp.ViewModels&quot;,
+    Framework = DataGridViewFramework.ReactiveUI,
+    Recipe = DataGridViewRecipe.SearchableGrid)]
+</code></pre>
+<p><code>IncludeNestedNamespaces</code> controls recursive matching. Namespace policies are defaults; explicit type/assembly requests replace options they own. Direct property metadata remains most specific.</p>
+<p>Compilation-wide policies are intentionally opt-in. Direct attributes use isolated incremental pipelines and do not enumerate unrelated source types.</p>
+<h2 id="generate-a-reflection-free-registry">Generate a reflection-free registry</h2>
+<pre><code class="lang-csharp">[assembly: GenerateDataGridRegistry(
+    RegistryName = &quot;ApplicationGridRegistry&quot;,
+    RegistryNamespace = &quot;MyApp.Generated&quot;)]
+</code></pre>
+<p>The registry exposes all generated manifest providers and supports lookup by:</p>
+<ul>
+<li>item <code>Type</code>;</li>
+<li>stable schema ID;</li>
+<li>registered ViewModel type/view construction.</li>
+</ul>
+<pre><code class="lang-csharp">if (ApplicationGridRegistry.TryGetSchema(
+    typeof(Trade),
+    out IDataGridGeneratedSchemaManifestProvider? schema))
+{
+    // No Type.GetType or Activator.CreateInstance.
+}
+</code></pre>
+<p>Registry cases are emitted as direct typed references and deterministic type switches.</p>
+<h2 id="register-existing-xaml-views">Register existing XAML views</h2>
+<pre><code class="lang-csharp">[assembly: DataGridViewRegistration(
+    typeof(TradesViewModel),
+    typeof(TradesView))]
+
+if (ApplicationGridRegistry.TryCreateView(
+    viewModel,
+    out Control? view))
+{
+    return view;
+}
+</code></pre>
+<p>The view must derive from <code>Control</code> and have an accessible parameterless constructor. One ViewModel may have at most one registry mapping. The generated switch constructs the view and assigns <code>DataContext</code> directly.</p>
+<p>This is suitable for reflection-free XAML view lookup when the view itself remains handwritten XAML.</p>
+<h2 id="optional-microsoft-di-integration">Optional Microsoft DI integration</h2>
+<p>When <code>Microsoft.Extensions.DependencyInjection</code> is referenced, the generated registry also emits:</p>
+<pre><code class="lang-csharp">services.AddGeneratedProDataGrids();
+</code></pre>
+<p>Microsoft DI is optional. The generator emits no DI dependency when the abstractions are absent. Application-owned mutation handlers, query providers, interaction handlers, and other services should still be registered in the application composition root.</p>
+<h2 id="custom-generated-view-bases">Custom generated-view bases</h2>
+<pre><code class="lang-csharp">public abstract class ApplicationGridViewBase&lt;TViewModel&gt; :
+    ReactiveUserControl&lt;TViewModel&gt;,
+    IActivatableView
+    where TViewModel : class
+{
+    protected ApplicationGridViewBase()
+    {
+        Activator = new ViewModelActivator();
+    }
+
+    public ViewModelActivator Activator { get; }
+}
+</code></pre>
+<p>Apply the base with <code>BaseType</code>. It must be accessible, non-sealed, constructible, and compatible with the selected framework. ReactiveUI activation-scoped features require <code>IActivatableView</code>; violations report <code>PDGSG013</code>.</p>
+<h2 id="protected-view-factories">Protected view factories</h2>
+<p>Generated views expose general layout hooks plus feature-specific factories. Common examples:</p>
+<pre><code class="lang-csharp">protected virtual DataGrid CreateGeneratedDataGrid();
+protected virtual void ConfigureGeneratedDataGrid(DataGrid dataGrid);
+protected virtual Control? CreateGeneratedToolbar();
+protected virtual Control? CreateGeneratedRecipeContent();
+protected virtual IDataGridEditingInteractionModelFactory
+    CreateGeneratedEditingInteractionModelFactory();
+protected virtual IDataGridFilteringAdapterFactory
+    CreateGeneratedHierarchicalFilteringAdapterFactory();
+protected virtual IDataGridGeneratedInputMap CreateGeneratedInputMap();
+protected virtual IDataGridGeneratedMetricsSink CreateGeneratedMetricsSink();
+</code></pre>
+<p>Interaction and navigation handlers receive their own protected factories. Override these factories in a derived generated view to resolve scoped services while retaining compile-time contracts and generated disposal.</p>
+<h2 id="customization-precedence">Customization precedence</h2>
+<p>The effective precedence is:</p>
+<ol>
+<li>Explicit implementation/factory type or view override.</li>
+<li>Validated static factory/configure method.</li>
+<li>Generated default.</li>
+<li>Explicitly permitted compatibility fallback.</li>
+</ol>
+<p>An explicit replacement owns the behavior it replaces. For example, a custom column factory owns the initial binding, and a custom interaction handler owns the response semantics.</p>
+<h2 id="preserve-the-mvvm-boundary">Preserve the MVVM boundary</h2>
+<p>Customization of visual composition belongs in view bases/derived views. Commands, state transitions, query logic, validation, and domain mutation belong in ViewModels or services. Generated views should not become a service locator.</p>
+<h2 id="production-example">Production example</h2>
+<p><code>GeneratedCustomImplementationsPage</code> combines:</p>
+<ul>
+<li>a custom compiled column factory;</li>
+<li>schema-list policy;</li>
+<li>domain comparer and validator;</li>
+<li>custom summary calculator;</li>
+<li>ReactiveUI base class;</li>
+<li>derived generated page with toolbar/content overrides;</li>
+<li>compiled custom command/status bindings.</li>
+</ul>
+<p>The ProDiagnostics migration uses generated registries and explicit XAML view registrations across multiple assemblies without runtime view-location reflection.</p>
+
+</article>
+
+        <div class="contribution d-print-none">
+          <a href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/docfx/articles/source-generators/registries-and-customization.md/#L1" class="edit-link">Edit this page</a>
+        </div>
+
+        <div class="next-article d-print-none border-top" id="nextArticle"></div>
+
+      </div>
+
+      <div class="affix">
+        <nav id="affix"></nav>
+      </div>
+    </main>
+
+
+    <footer class="border-top text-secondary">
+      <div class="container-xxl">
+        <div class="flex-fill">
+          <span>Made with <a href="https://dotnet.github.io/docfx">docfx</a></span>
+        </div>
+      </div>
+    </footer>
+  </body>
+</html>

@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+      <title>Getting started and schema discovery | ProDataGrid for Avalonia </title>
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <meta name="title" content="Getting started and schema discovery | ProDataGrid for Avalonia ">
+      
+      
+      <link rel="icon" href="../../favicon.ico">
+      <link rel="stylesheet" href="../../public/docfx.min.css">
+      <link rel="stylesheet" href="../../public/main.css">
+      <meta name="docfx:navrel" content="../../toc.html">
+      <meta name="docfx:tocrel" content="../toc.html">
+      
+      
+      
+      
+      <meta name="docfx:docurl" content="https://github.com/wieslawsoltes/ProDataGrid/blob/master/docfx/articles/source-generators/getting-started.md/#L1">
+      <meta name="loc:inThisArticle" content="In this article">
+      <meta name="loc:searchResultsCount" content="{count} results for &quot;{query}&quot;">
+      <meta name="loc:searchNoResults" content="No results for &quot;{query}&quot;">
+      <meta name="loc:tocFilter" content="Filter by title">
+      <meta name="loc:nextArticle" content="Next">
+      <meta name="loc:prevArticle" content="Previous">
+      <meta name="loc:themeLight" content="Light">
+      <meta name="loc:themeDark" content="Dark">
+      <meta name="loc:themeAuto" content="Auto">
+      <meta name="loc:changeTheme" content="Change theme">
+      <meta name="loc:copy" content="Copy">
+      <meta name="loc:downloadPdf" content="Download PDF">
+
+      <script type="module" src="./../../public/docfx.min.js"></script>
+
+      <script>
+        const theme = localStorage.getItem('theme') || 'auto'
+        document.documentElement.setAttribute('data-bs-theme', theme === 'auto' ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light') : theme)
+      </script>
+
+  </head>
+
+  <body class="tex2jax_ignore" data-layout="" data-yaml-mime="">
+    <header class="bg-body border-bottom">
+      <nav id="autocollapse" class="navbar navbar-expand-md" role="navigation">
+        <div class="container-xxl flex-nowrap">
+          <a class="navbar-brand" href="../../index.html">
+            <img id="logo" class="svg" src="../../images/logo.svg" alt="">
+            
+          </a>
+          <button class="btn btn-lg d-md-none border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navpanel" aria-controls="navpanel" aria-expanded="false" aria-label="Toggle navigation">
+            <i class="bi bi-three-dots"></i>
+          </button>
+          <div class="collapse navbar-collapse" id="navpanel">
+            <div id="navbar">
+            </div>
+          </div>
+        </div>
+      </nav>
+    </header>
+
+    <main class="container-xxl">
+      <div class="toc-offcanvas">
+        <div class="offcanvas-md offcanvas-start" tabindex="-1" id="tocOffcanvas" aria-labelledby="tocOffcanvasLabel">
+          <div class="offcanvas-header">
+            <h5 class="offcanvas-title" id="tocOffcanvasLabel">Table of Contents</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="offcanvas" data-bs-target="#tocOffcanvas" aria-label="Close"></button>
+          </div>
+          <div class="offcanvas-body">
+            <nav class="toc" id="toc"></nav>
+          </div>
+        </div>
+      </div>
+
+      <div class="content">
+        <div class="actionbar">
+          <button class="btn btn-lg border-0 d-md-none" type="button" data-bs-toggle="offcanvas" data-bs-target="#tocOffcanvas" aria-controls="tocOffcanvas" aria-expanded="false" aria-label="Show table of contents">
+            <i class="bi bi-list"></i>
+          </button>
+
+          <nav id="breadcrumb"></nav>
+        </div>
+
+        <article data-uid="">
+<h1 id="getting-started-and-schema-discovery">Getting started and schema discovery</h1>
+
+<p>The source generator is distributed as <code>ProDataGrid.SourceGenerators</code>. It injects configuration attributes into the consuming compilation and emits code that depends on the normal <code>ProDataGrid</code> runtime package. There is no runtime attributes assembly to deploy.</p>
+<h2 id="install">Install</h2>
+<pre><code class="lang-xml">&lt;ItemGroup&gt;
+  &lt;PackageReference Include=&quot;ProDataGrid&quot; /&gt;
+  &lt;PackageReference Include=&quot;ProDataGrid.SourceGenerators&quot;
+                    PrivateAssets=&quot;all&quot; /&gt;
+&lt;/ItemGroup&gt;
+</code></pre>
+<p>When referencing the generator project directly, consume it as an analyzer:</p>
+<pre><code class="lang-xml">&lt;ProjectReference Include=&quot;..\ProDataGrid.SourceGenerators\ProDataGrid.SourceGenerators.csproj&quot;
+                  OutputItemType=&quot;Analyzer&quot;
+                  ReferenceOutputAssembly=&quot;false&quot; /&gt;
+</code></pre>
+<p>The generator is incremental. Direct schema, ViewModel, controller, view, indexed-column, and cell-cache requests are discovered independently. Compilation-wide type enumeration is enabled only by assembly/namespace policies or the generated registry.</p>
+<h2 id="generate-a-first-schema">Generate a first schema</h2>
+<pre><code class="lang-csharp">using ProDataGrid.SourceGeneration;
+
+[GenerateDataGridColumns(
+    ProviderName = &quot;OrderGridSchema&quot;,
+    SchemaId = &quot;orders/order/v1&quot;,
+    Strict = true)]
+public sealed class Order
+{
+    [DataGridKey]
+    [DataGridColumn(DataGridColumnKind.Numeric,
+        Header = &quot;Order&quot;, ColumnKey = &quot;order-id&quot;, Order = 0,
+        IsReadOnly = true)]
+    public long Id { get; init; }
+
+    [DataGridColumn(DataGridColumnKind.Text,
+        Header = &quot;Customer&quot;, ColumnKey = &quot;customer&quot;, Order = 1,
+        Width = &quot;2*&quot;)]
+    public string Customer { get; set; } = string.Empty;
+
+    [DataGridColumn(DataGridColumnKind.Numeric,
+        Header = &quot;Total&quot;, ColumnKey = &quot;total&quot;, Order = 2,
+        FormatString = &quot;C2&quot;)]
+    public decimal Total { get; set; }
+}
+</code></pre>
+<p>The default <code>PublicProperties</code> discovery mode includes eligible public instance properties. Choose <code>AttributedOnly</code> for explicit opt-in:</p>
+<pre><code class="lang-csharp">[GenerateDataGridColumns(
+    Discovery = DataGridColumnDiscovery.AttributedOnly)]
+public sealed class AuditRow
+{
+    [DataGridColumn(Header = &quot;Event&quot;)]
+    public string Event { get; init; } = string.Empty;
+
+    public object InternalPayload { get; init; } = new();
+}
+</code></pre>
+<p><code>[DataGridIgnoreColumn]</code> excludes one otherwise eligible public property. <code>IncludeInherited = false</code> restricts discovery to properties declared directly on the annotated type.</p>
+<h2 id="use-the-generated-provider-directly">Use the generated provider directly</h2>
+<p>The provider name defaults to a deterministic type-based name. Set <code>ProviderName</code> when application code, persisted configuration, or another assembly needs a stable source identifier.</p>
+<pre><code class="lang-csharp">DataGridColumnDefinitionList columns = OrderGridSchema.CreateColumnDefinitions();
+DataGridFastPathOptions fastPath = OrderGridSchema.CreateFastPathOptions();
+
+SortingDescriptor[] sorting =
+[
+    OrderGridSchema.Total.Descending(),
+    OrderGridSchema.Customer.Ascending()
+];
+</code></pre>
+<p>Every call to <code>CreateColumnDefinitions</code> returns a fresh mutable list. The provider and its field descriptors are immutable reusable metadata.</p>
+<h2 id="augment-an-existing-viewmodel">Augment an existing ViewModel</h2>
+<p>The target must be partial. It may inherit any framework-required base class, including <code>ReactiveObject</code>.</p>
+<pre><code class="lang-csharp">[GenerateDataGridViewModel(
+    typeof(Order),
+    ProviderName = &quot;OrderGridSchema&quot;)]
+public sealed partial class OrdersViewModel : ReactiveObject
+{
+    public IReadOnlyList&lt;Order&gt; Items { get; } = LoadOrders();
+}
+</code></pre>
+<p>The generated members are:</p>
+<pre><code class="lang-csharp">public IDataGridGeneratedSchema&lt;Order&gt; DataGridSchema { get; }
+public DataGridColumnDefinitionList ColumnDefinitions { get; }
+public DataGridFastPathOptions FastPathOptions { get; }
+</code></pre>
+<p>All names can be changed with <code>SchemaPropertyName</code>, <code>ColumnDefinitionsPropertyName</code>, and <code>FastPathOptionsPropertyName</code>. Multiple projections on one partial type are supported when every generated member name is distinct.</p>
+<p>Bind with compiled XAML:</p>
+<pre><code class="lang-xml">&lt;DataGrid ItemsSource=&quot;{Binding Items}&quot;
+          ColumnDefinitionsSource=&quot;{Binding ColumnDefinitions}&quot;
+          FastPathOptions=&quot;{Binding FastPathOptions}&quot;
+          AutoGenerateColumns=&quot;False&quot; /&gt;
+</code></pre>
+<p><code>FastPathOptions</code> is a direct Avalonia property, so no attached behavior or view code is necessary.</p>
+<h2 id="class-struct-and-interface-contracts">Class, struct, and interface contracts</h2>
+<p>Schemas can target classes, structs, and interfaces. Interface discovery walks inherited interfaces deterministically:</p>
+<pre><code class="lang-csharp">public interface IEntity
+{
+    [DataGridKey]
+    int Id { get; }
+}
+
+[GenerateDataGridColumns(ProviderName = &quot;TradeContractSchema&quot;)]
+public interface ITrade : IEntity
+{
+    string Symbol { get; set; }
+    decimal Price { get; }
+}
+</code></pre>
+<p>If unrelated parent interfaces declare the same property name, redeclare the property on the target interface to select the contract. Otherwise <code>PDGSG132</code> reports the ambiguity.</p>
+<p>Class schemas support statically resolvable explicit-interface properties. The generated accessor uses a direct interface cast. A public property with the same name wins. Ambiguous unrelated explicit implementations produce <code>PDGSG133</code> rather than an unstable generated name.</p>
+<h2 id="generate-for-a-model-you-cannot-modify">Generate for a model you cannot modify</h2>
+<p>Apply a type request at assembly level:</p>
+<pre><code class="lang-csharp">using ProDataGrid.SourceGeneration;
+
+[assembly: GenerateDataGridColumns(
+    typeof(ExternalModels.Order),
+    ProviderName = &quot;ExternalOrderSchema&quot;,
+    ProviderNamespace = &quot;MyApp.Generated&quot;)]
+
+[assembly: GenerateDataGridViewModel(
+    typeof(OrdersViewModel),
+    typeof(ExternalModels.Order),
+    ProviderName = &quot;ExternalOrderSchema&quot;)]
+</code></pre>
+<p>Assembly requests support the same strictness, discovery, schema, streaming, performance, paging, identity, and customization options as type requests where applicable.</p>
+<h2 id="namespace-policies">Namespace policies</h2>
+<p>Use namespace policies for a deliberate application-wide convention:</p>
+<pre><code class="lang-csharp">[assembly: GenerateDataGridColumnsForNamespace(
+    &quot;MyApp.Models&quot;,
+    IncludeNestedNamespaces = true,
+    Discovery = DataGridColumnDiscovery.AttributedOnly,
+    Strict = true)]
+
+[assembly: GenerateDataGridViewModelsForNamespace(
+    &quot;MyApp.ViewModels&quot;,
+    ItemsPropertyName = &quot;Items&quot;)]
+</code></pre>
+<p>ViewModel namespace generation infers the item type from the configured items property. An absent or ambiguous item type reports <code>PDGSG011</code>.</p>
+<p>Namespace policies establish defaults. Explicit assembly/type requests replace the settings they own. Property attributes remain the most specific column metadata.</p>
+<p>Use a namespace policy only when matching future types is intended. Direct type requests have a smaller incremental invalidation surface.</p>
+<h2 id="strict-mode">Strict mode</h2>
+<p><code>Strict = true</code> is recommended for reflection-free applications. Strict generation reports unsupported shapes, inaccessible members, incomplete factories, and missing accessors at compile time. It does not silently fall back to property discovery.</p>
+<p>Strict generation does not make arbitrary domain objects statically knowable. Dictionary rows, <code>DataRowView</code>, <code>IDataRecord</code>, <code>ICustomTypeDescriptor</code>, and dynamic meta-object shapes require an explicit runtime schema adapter; see <a href="schemas-and-columns.html#runtime-defined-shapes">runtime-defined shapes</a>.</p>
+<h2 id="inspect-generated-code">Inspect generated code</h2>
+<p>Enable compiler-generated file output in the consuming project when diagnosing build behavior:</p>
+<pre><code class="lang-xml">&lt;PropertyGroup&gt;
+  &lt;EmitCompilerGeneratedFiles&gt;true&lt;/EmitCompilerGeneratedFiles&gt;
+  &lt;CompilerGeneratedFilesOutputPath&gt;$(BaseIntermediateOutputPath)Generated&lt;/CompilerGeneratedFilesOutputPath&gt;
+&lt;/PropertyGroup&gt;
+</code></pre>
+<p>Generated hint names are stable and include the provider or generated member owner. Do not compile the output directory as ordinary source; it is diagnostic output from the analyzer pipeline.</p>
+<h2 id="next-steps">Next steps</h2>
+<ul>
+<li><a href="schemas-and-columns.html">Schemas, columns, accessors, and manifests</a></li>
+<li><a href="operations-and-controllers.html">Operations and controllers</a></li>
+<li><a href="generated-views.html">Generate code-only views</a></li>
+<li><a href="attribute-reference.html">Attribute reference</a></li>
+</ul>
+
+</article>
+
+        <div class="contribution d-print-none">
+          <a href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/docfx/articles/source-generators/getting-started.md/#L1" class="edit-link">Edit this page</a>
+        </div>
+
+        <div class="next-article d-print-none border-top" id="nextArticle"></div>
+
+      </div>
+
+      <div class="affix">
+        <nav id="affix"></nav>
+      </div>
+    </main>
+
+
+    <footer class="border-top text-secondary">
+      <div class="container-xxl">
+        <div class="flex-fill">
+          <span>Made with <a href="https://dotnet.github.io/docfx">docfx</a></span>
+        </div>
+      </div>
+    </footer>
+  </body>
+</html>

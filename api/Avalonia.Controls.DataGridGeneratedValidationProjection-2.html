@@ -1,0 +1,674 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+      <title>Class DataGridGeneratedValidationProjection&lt;TItem, TKey&gt; | ProDataGrid for Avalonia </title>
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <meta name="title" content="Class DataGridGeneratedValidationProjection&lt;TItem, TKey&gt; | ProDataGrid for Avalonia ">
+      
+      <meta name="description" content="Projects generated edit results as keyed errors, , and an  stream that ReactiveUI and other reactive frameworks can consume.">
+      <link rel="icon" href="../favicon.ico">
+      <link rel="stylesheet" href="../public/docfx.min.css">
+      <link rel="stylesheet" href="../public/main.css">
+      <meta name="docfx:navrel" content="../toc.html">
+      <meta name="docfx:tocrel" content="toc.html">
+      
+      
+      
+      
+      <meta name="docfx:docurl" content="https://github.com/wieslawsoltes/ProDataGrid/new/master/apiSpec/new?filename=Avalonia_Controls_DataGridGeneratedValidationProjection_2.md&amp;value=---%0Auid%3A%20Avalonia.Controls.DataGridGeneratedValidationProjection%602%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">
+      <meta name="loc:inThisArticle" content="In this article">
+      <meta name="loc:searchResultsCount" content="{count} results for &quot;{query}&quot;">
+      <meta name="loc:searchNoResults" content="No results for &quot;{query}&quot;">
+      <meta name="loc:tocFilter" content="Filter by title">
+      <meta name="loc:nextArticle" content="Next">
+      <meta name="loc:prevArticle" content="Previous">
+      <meta name="loc:themeLight" content="Light">
+      <meta name="loc:themeDark" content="Dark">
+      <meta name="loc:themeAuto" content="Auto">
+      <meta name="loc:changeTheme" content="Change theme">
+      <meta name="loc:copy" content="Copy">
+      <meta name="loc:downloadPdf" content="Download PDF">
+
+      <script type="module" src="./../public/docfx.min.js"></script>
+
+      <script>
+        const theme = localStorage.getItem('theme') || 'auto'
+        document.documentElement.setAttribute('data-bs-theme', theme === 'auto' ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light') : theme)
+      </script>
+
+  </head>
+
+  <body class="tex2jax_ignore" data-layout="" data-yaml-mime="ManagedReference">
+    <header class="bg-body border-bottom">
+      <nav id="autocollapse" class="navbar navbar-expand-md" role="navigation">
+        <div class="container-xxl flex-nowrap">
+          <a class="navbar-brand" href="../index.html">
+            <img id="logo" class="svg" src="../images/logo.svg" alt="">
+            
+          </a>
+          <button class="btn btn-lg d-md-none border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navpanel" aria-controls="navpanel" aria-expanded="false" aria-label="Toggle navigation">
+            <i class="bi bi-three-dots"></i>
+          </button>
+          <div class="collapse navbar-collapse" id="navpanel">
+            <div id="navbar">
+            </div>
+          </div>
+        </div>
+      </nav>
+    </header>
+
+    <main class="container-xxl">
+      <div class="toc-offcanvas">
+        <div class="offcanvas-md offcanvas-start" tabindex="-1" id="tocOffcanvas" aria-labelledby="tocOffcanvasLabel">
+          <div class="offcanvas-header">
+            <h5 class="offcanvas-title" id="tocOffcanvasLabel">Table of Contents</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="offcanvas" data-bs-target="#tocOffcanvas" aria-label="Close"></button>
+          </div>
+          <div class="offcanvas-body">
+            <nav class="toc" id="toc"></nav>
+          </div>
+        </div>
+      </div>
+
+      <div class="content">
+        <div class="actionbar">
+          <button class="btn btn-lg border-0 d-md-none" type="button" data-bs-toggle="offcanvas" data-bs-target="#tocOffcanvas" aria-controls="tocOffcanvas" aria-expanded="false" aria-label="Show table of contents">
+            <i class="bi bi-list"></i>
+          </button>
+
+          <nav id="breadcrumb"></nav>
+        </div>
+
+        <article data-uid="Avalonia.Controls.DataGridGeneratedValidationProjection`2">
+
+
+
+  <h1 id="Avalonia_Controls_DataGridGeneratedValidationProjection_2" data-uid="Avalonia.Controls.DataGridGeneratedValidationProjection`2" class="text-break">
+Class DataGridGeneratedValidationProjection&lt;TItem, TKey&gt;  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/ColumnDefinitions/DataGridGeneratedValidationProjection.cs/#L93"><i class="bi bi-code-slash"></i></a>
+  </h1>
+
+  <div class="facts text-secondary">
+    <dl><dt>Namespace</dt><dd><a class="xref" href="Avalonia.html">Avalonia</a>.<a class="xref" href="Avalonia.Controls.html">Controls</a></dd></dl>
+  <dl><dt>Assembly</dt><dd>Avalonia.Controls.DataGrid.dll</dd></dl>
+  </div>
+
+  <div class="markdown summary"><p>Projects generated edit results as keyed errors, <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.componentmodel.inotifydataerrorinfo">INotifyDataErrorInfo</a>, and an
+<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.iobservable-1">IObservable&lt;T&gt;</a> stream that ReactiveUI and other reactive frameworks can consume.</p>
+</div>
+  <div class="markdown conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public sealed class DataGridGeneratedValidationProjection&lt;TItem, TKey&gt; : INotifyDataErrorInfo, IObservable&lt;DataGridGeneratedValidationChange&lt;TKey&gt;&gt;, IDisposable</code></pre>
+  </div>
+
+
+
+  <h4 class="section">Type Parameters</h4>
+  <dl class="parameters">
+    <dt><code>TItem</code></dt>
+    <dd><p>The row item type.</p>
+</dd>
+    <dt><code>TKey</code></dt>
+    <dd><p>The stable row key type.</p>
+</dd>
+  </dl>
+
+  <dl class="typelist inheritance">
+    <dt>Inheritance</dt>
+    <dd>
+      <div><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object">object</a></div>
+      <div><span class="xref">DataGridGeneratedValidationProjection&lt;TItem, TKey&gt;</span></div>
+    </dd>
+  </dl>
+
+  <dl class="typelist implements">
+    <dt>Implements</dt>
+    <dd>
+      <div><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.componentmodel.inotifydataerrorinfo">INotifyDataErrorInfo</a></div>
+      <div><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.iobservable-1">IObservable</a>&lt;<a class="xref" href="Avalonia.Controls.DataGridGeneratedValidationChange-1.html">DataGridGeneratedValidationChange</a>&lt;TKey&gt;&gt;</div>
+      <div><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.idisposable">IDisposable</a></div>
+    </dd>
+  </dl>
+
+
+  <dl class="typelist inheritedMembers">
+    <dt>Inherited Members</dt>
+    <dd>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object)">object.Equals(object)</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object-system-object)">object.Equals(object, object)</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.gethashcode">object.GetHashCode()</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.gettype">object.GetType()</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.referenceequals">object.ReferenceEquals(object, object)</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.tostring">object.ToString()</a>
+    </div>
+  </dd></dl>
+
+
+
+
+
+
+  <h2 class="section" id="constructors">Constructors
+</h2>
+
+
+  <a id="Avalonia_Controls_DataGridGeneratedValidationProjection_2__ctor_" data-uid="Avalonia.Controls.DataGridGeneratedValidationProjection`2.#ctor*"></a>
+
+  <h3 id="Avalonia_Controls_DataGridGeneratedValidationProjection_2__ctor_Avalonia_Controls_IDataGridItemKey__0__1__Avalonia_Controls_DataGridGeneratedEditController__0__1__System_Collections_Generic_IEqualityComparer__1__System_Boolean_" data-uid="Avalonia.Controls.DataGridGeneratedValidationProjection`2.#ctor(Avalonia.Controls.IDataGridItemKey{`0,`1},Avalonia.Controls.DataGridGeneratedEditController{`0,`1},System.Collections.Generic.IEqualityComparer{`1},System.Boolean)">
+  DataGridGeneratedValidationProjection(IDataGridItemKey&lt;TItem, TKey&gt;, DataGridGeneratedEditController&lt;TItem, TKey&gt;, IEqualityComparer&lt;TKey&gt;, bool)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/ColumnDefinitions/DataGridGeneratedValidationProjection.cs/#L112"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Initializes a generated validation projection.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public DataGridGeneratedValidationProjection(IDataGridItemKey&lt;TItem, TKey&gt; keyAccessor, DataGridGeneratedEditController&lt;TItem, TKey&gt; controller, IEqualityComparer&lt;TKey&gt; keyComparer = null, bool ownsController = false)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>keyAccessor</code> <a class="xref" href="Avalonia.Controls.IDataGridItemKey-2.html">IDataGridItemKey</a>&lt;TItem, TKey&gt;</dt>
+    <dd></dd>
+    <dt><code>controller</code> <a class="xref" href="Avalonia.Controls.DataGridGeneratedEditController-2.html">DataGridGeneratedEditController</a>&lt;TItem, TKey&gt;</dt>
+    <dd></dd>
+    <dt><code>keyComparer</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.iequalitycomparer-1">IEqualityComparer</a>&lt;TKey&gt;</dt>
+    <dd></dd>
+    <dt><code>ownsController</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+
+  <h2 class="section" id="properties">Properties
+</h2>
+
+
+  <a id="Avalonia_Controls_DataGridGeneratedValidationProjection_2_Controller_" data-uid="Avalonia.Controls.DataGridGeneratedValidationProjection`2.Controller*"></a>
+
+  <h3 id="Avalonia_Controls_DataGridGeneratedValidationProjection_2_Controller" data-uid="Avalonia.Controls.DataGridGeneratedValidationProjection`2.Controller">
+  Controller
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/ColumnDefinitions/DataGridGeneratedValidationProjection.cs/#L129"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Gets the wrapped generated edit controller.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public DataGridGeneratedEditController&lt;TItem, TKey&gt; Controller { get; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="Avalonia.Controls.DataGridGeneratedEditController-2.html">DataGridGeneratedEditController</a>&lt;TItem, TKey&gt;</dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="Avalonia_Controls_DataGridGeneratedValidationProjection_2_HasErrors_" data-uid="Avalonia.Controls.DataGridGeneratedValidationProjection`2.HasErrors*"></a>
+
+  <h3 id="Avalonia_Controls_DataGridGeneratedValidationProjection_2_HasErrors" data-uid="Avalonia.Controls.DataGridGeneratedValidationProjection`2.HasErrors">
+  HasErrors
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/ColumnDefinitions/DataGridGeneratedValidationProjection.cs/#L132"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Gets a value that indicates whether the entity has validation errors.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public bool HasErrors { get; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></dt>
+    <dd><p><a href="https://learn.microsoft.com/dotnet/csharp/language-reference/builtin-types/bool">true</a> if the entity currently has validation errors; otherwise, <a href="https://learn.microsoft.com/dotnet/csharp/language-reference/builtin-types/bool">false</a>.</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <h2 class="section" id="methods">Methods
+</h2>
+
+
+  <a id="Avalonia_Controls_DataGridGeneratedValidationProjection_2_ClearError_" data-uid="Avalonia.Controls.DataGridGeneratedValidationProjection`2.ClearError*"></a>
+
+  <h3 id="Avalonia_Controls_DataGridGeneratedValidationProjection_2_ClearError__1_System_String_" data-uid="Avalonia.Controls.DataGridGeneratedValidationProjection`2.ClearError(`1,System.String)">
+  ClearError(TKey, string)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/ColumnDefinitions/DataGridGeneratedValidationProjection.cs/#L205"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Clears the projected error for one row and column.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public bool ClearError(TKey itemKey, string columnKey)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>itemKey</code> <span class="xref">TKey</span></dt>
+    <dd></dd>
+    <dt><code>columnKey</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></dt>
+    <dd></dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Avalonia_Controls_DataGridGeneratedValidationProjection_2_ClearErrors_" data-uid="Avalonia.Controls.DataGridGeneratedValidationProjection`2.ClearErrors*"></a>
+
+  <h3 id="Avalonia_Controls_DataGridGeneratedValidationProjection_2_ClearErrors" data-uid="Avalonia.Controls.DataGridGeneratedValidationProjection`2.ClearErrors">
+  ClearErrors()
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/ColumnDefinitions/DataGridGeneratedValidationProjection.cs/#L234"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Clears all projected validation errors.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public void ClearErrors()</code></pre>
+  </div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Avalonia_Controls_DataGridGeneratedValidationProjection_2_Dispose_" data-uid="Avalonia.Controls.DataGridGeneratedValidationProjection`2.Dispose*"></a>
+
+  <h3 id="Avalonia_Controls_DataGridGeneratedValidationProjection_2_Dispose" data-uid="Avalonia.Controls.DataGridGeneratedValidationProjection`2.Dispose">
+  Dispose()
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/ColumnDefinitions/DataGridGeneratedValidationProjection.cs/#L318"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public void Dispose()</code></pre>
+  </div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Avalonia_Controls_DataGridGeneratedValidationProjection_2_GetError_" data-uid="Avalonia.Controls.DataGridGeneratedValidationProjection`2.GetError*"></a>
+
+  <h3 id="Avalonia_Controls_DataGridGeneratedValidationProjection_2_GetError__1_System_String_" data-uid="Avalonia.Controls.DataGridGeneratedValidationProjection`2.GetError(`1,System.String)">
+  GetError(TKey, string)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/ColumnDefinitions/DataGridGeneratedValidationProjection.cs/#L190"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Gets the current error for one stable row and column, or <a href="https://learn.microsoft.com/dotnet/csharp/language-reference/keywords/null">null</a>.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public string GetError(TKey itemKey, string columnKey)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>itemKey</code> <span class="xref">TKey</span></dt>
+    <dd></dd>
+    <dt><code>columnKey</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></dt>
+    <dd></dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Avalonia_Controls_DataGridGeneratedValidationProjection_2_GetErrors_" data-uid="Avalonia.Controls.DataGridGeneratedValidationProjection`2.GetErrors*"></a>
+
+  <h3 id="Avalonia_Controls_DataGridGeneratedValidationProjection_2_GetErrors_System_String_" data-uid="Avalonia.Controls.DataGridGeneratedValidationProjection`2.GetErrors(System.String)">
+  GetErrors(string)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/ColumnDefinitions/DataGridGeneratedValidationProjection.cs/#L277"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Gets the validation errors for a specified property or for the entire entity.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public IEnumerable GetErrors(string propertyName)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>propertyName</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></dt>
+    <dd><p>The name of the property to retrieve validation errors for; or <a href="https://learn.microsoft.com/dotnet/csharp/language-reference/keywords/null">null</a> or <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string.empty">Empty</a>, to retrieve entity-level errors.</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.ienumerable">IEnumerable</a></dt>
+    <dd><p>The validation errors for the property or entity.</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Avalonia_Controls_DataGridGeneratedValidationProjection_2_Subscribe_" data-uid="Avalonia.Controls.DataGridGeneratedValidationProjection`2.Subscribe*"></a>
+
+  <h3 id="Avalonia_Controls_DataGridGeneratedValidationProjection_2_Subscribe_System_IObserver_Avalonia_Controls_DataGridGeneratedValidationChange__1___" data-uid="Avalonia.Controls.DataGridGeneratedValidationProjection`2.Subscribe(System.IObserver{Avalonia.Controls.DataGridGeneratedValidationChange{`1}})">
+  Subscribe(IObserver&lt;DataGridGeneratedValidationChange&lt;TKey&gt;&gt;)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/ColumnDefinitions/DataGridGeneratedValidationProjection.cs/#L299"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Notifies the provider that an observer is to receive notifications.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public IDisposable Subscribe(IObserver&lt;DataGridGeneratedValidationChange&lt;TKey&gt;&gt; observer)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>observer</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.iobserver-1">IObserver</a>&lt;<a class="xref" href="Avalonia.Controls.DataGridGeneratedValidationChange-1.html">DataGridGeneratedValidationChange</a>&lt;TKey&gt;&gt;</dt>
+    <dd><p>The object that is to receive notifications.</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.idisposable">IDisposable</a></dt>
+    <dd><p>A reference to an interface that allows observers to stop receiving notifications before the provider has finished sending them.</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Avalonia_Controls_DataGridGeneratedValidationProjection_2_TrySetText_" data-uid="Avalonia.Controls.DataGridGeneratedValidationProjection`2.TrySetText*"></a>
+
+  <h3 id="Avalonia_Controls_DataGridGeneratedValidationProjection_2_TrySetText__0_System_String_System_ReadOnlySpan_System_Char__System_IFormatProvider_" data-uid="Avalonia.Controls.DataGridGeneratedValidationProjection`2.TrySetText(`0,System.String,System.ReadOnlySpan{System.Char},System.IFormatProvider)">
+  TrySetText(TItem, string, ReadOnlySpan&lt;char&gt;, IFormatProvider)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/ColumnDefinitions/DataGridGeneratedValidationProjection.cs/#L144"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Parses, validates, applies, and projects a generated text edit.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public DataGridGeneratedEditResult TrySetText(TItem item, string columnKey, ReadOnlySpan&lt;char&gt; text, IFormatProvider formatProvider = null)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>item</code> <span class="xref">TItem</span></dt>
+    <dd></dd>
+    <dt><code>columnKey</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></dt>
+    <dd></dd>
+    <dt><code>text</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.readonlyspan-1">ReadOnlySpan</a>&lt;<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.char">char</a>&gt;</dt>
+    <dd></dd>
+    <dt><code>formatProvider</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.iformatprovider">IFormatProvider</a></dt>
+    <dd></dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="Avalonia.Controls.DataGridGeneratedEditResult.html">DataGridGeneratedEditResult</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Avalonia_Controls_DataGridGeneratedValidationProjection_2_TrySetValue_" data-uid="Avalonia.Controls.DataGridGeneratedValidationProjection`2.TrySetValue*"></a>
+
+  <h3 id="Avalonia_Controls_DataGridGeneratedValidationProjection_2_TrySetValue__0_System_String_System_Object_" data-uid="Avalonia.Controls.DataGridGeneratedValidationProjection`2.TrySetValue(`0,System.String,System.Object)">
+  TrySetValue(TItem, string, object)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/ColumnDefinitions/DataGridGeneratedValidationProjection.cs/#L161"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Validates, applies, and projects a generated typed or boxed edit.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public DataGridGeneratedEditResult TrySetValue(TItem item, string columnKey, object value)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>item</code> <span class="xref">TItem</span></dt>
+    <dd></dd>
+    <dt><code>columnKey</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></dt>
+    <dd></dd>
+    <dt><code>value</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object">object</a></dt>
+    <dd></dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="Avalonia.Controls.DataGridGeneratedEditResult.html">DataGridGeneratedEditResult</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Avalonia_Controls_DataGridGeneratedValidationProjection_2_TrySetValueAsync_" data-uid="Avalonia.Controls.DataGridGeneratedValidationProjection`2.TrySetValueAsync*"></a>
+
+  <h3 id="Avalonia_Controls_DataGridGeneratedValidationProjection_2_TrySetValueAsync__0_System_String_System_Object_System_Threading_CancellationToken_" data-uid="Avalonia.Controls.DataGridGeneratedValidationProjection`2.TrySetValueAsync(`0,System.String,System.Object,System.Threading.CancellationToken)">
+  TrySetValueAsync(TItem, string, object, CancellationToken)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/ColumnDefinitions/DataGridGeneratedValidationProjection.cs/#L170"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Runs revisioned asynchronous validation and projects only the terminal current result.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public ValueTask&lt;DataGridGeneratedEditResult&gt; TrySetValueAsync(TItem item, string columnKey, object value, CancellationToken cancellationToken = default)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>item</code> <span class="xref">TItem</span></dt>
+    <dd></dd>
+    <dt><code>columnKey</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></dt>
+    <dd></dd>
+    <dt><code>value</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object">object</a></dt>
+    <dd></dd>
+    <dt><code>cancellationToken</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.threading.cancellationtoken">CancellationToken</a></dt>
+    <dd></dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.threading.tasks.valuetask-1">ValueTask</a>&lt;<a class="xref" href="Avalonia.Controls.DataGridGeneratedEditResult.html">DataGridGeneratedEditResult</a>&gt;</dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <h2 class="section" id="events">Events
+</h2>
+
+
+
+  <h3 id="Avalonia_Controls_DataGridGeneratedValidationProjection_2_ErrorsChanged" data-uid="Avalonia.Controls.DataGridGeneratedValidationProjection`2.ErrorsChanged">
+  ErrorsChanged
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/ColumnDefinitions/DataGridGeneratedValidationProjection.cs/#L126"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Occurs when the validation errors have changed for a property or for the entire entity.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public event EventHandler&lt;DataErrorsChangedEventArgs&gt; ErrorsChanged</code></pre>
+  </div>
+
+
+
+
+
+
+  <h4 class="section">Event Type</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.eventhandler-1">EventHandler</a>&lt;<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.componentmodel.dataerrorschangedeventargs">DataErrorsChangedEventArgs</a>&gt;</dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+</article>
+
+        <div class="contribution d-print-none">
+          <a href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/ColumnDefinitions/DataGridGeneratedValidationProjection.cs/#L93" class="edit-link">Edit this page</a>
+        </div>
+
+
+      </div>
+
+      <div class="affix">
+        <nav id="affix"></nav>
+      </div>
+    </main>
+
+
+    <footer class="border-top text-secondary">
+      <div class="container-xxl">
+        <div class="flex-fill">
+          <span>Made with <a href="https://dotnet.github.io/docfx">docfx</a></span>
+        </div>
+      </div>
+    </footer>
+  </body>
+</html>

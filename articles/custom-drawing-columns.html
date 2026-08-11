@@ -469,6 +469,17 @@ binding path.</p>
 }
 </code></pre>
 <p>Sample page wiring (<code>VariableHeightSkiaCustomDrawPage.axaml</code>) uses separate slots per column factory (<code>0..4</code>) and enables <code>UseItemCacheContract=&quot;True&quot;</code> on each resource.</p>
+<h3 id="source-generated-bounded-item-caches">Source-generated bounded item caches</h3>
+<p>With <code>ProDataGrid.SourceGenerators</code>, a partial row type can opt into the same contract without handwritten storage:</p>
+<pre><code class="lang-csharp">[GenerateDataGridCellDrawCache(InitialCapacity = 4, MaximumCapacity = 16)]
+public sealed partial class RowItem
+{
+    [DataGridColumn(DataGridColumnKind.CustomDrawing, Order = 0)]
+    public string Title { get; set; } = string.Empty;
+}
+</code></pre>
+<p>The generated type implements <code>IDataGridCellDrawOperationItemCache</code>, exposes <code>TitleCellDrawCacheSlot</code>, and provides <code>ClearGeneratedCellDrawCache()</code> plus a per-slot overload. Storage is an array with O(1) access and never grows beyond <code>MaximumCapacity</code>. The cache key supplied by the factory determines freshness; clear a slot explicitly when output changes without changing that key.</p>
+<p>Custom-drawing column attributes also accept <code>DrawOperationFactoryType</code> or <code>DrawOperationFactoryMethod</code> together with <code>DrawingMode</code>, <code>RenderBackend</code>, <code>TextLayoutCacheMode</code>, <code>SharedTextLayoutCacheCapacity</code>, and <code>DrawOperationLayoutFastPath</code>. A factory method can use the generated slot constant when configuring <code>ItemCacheSlot</code>.</p>
 <h2 id="fast-path-guidance">Fast Path Guidance</h2>
 <p>Enable <code>DrawOperationLayoutFastPath</code> only when:</p>
 <ul>

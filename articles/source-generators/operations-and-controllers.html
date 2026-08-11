@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+      <title>Operations and controllers | ProDataGrid for Avalonia </title>
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <meta name="title" content="Operations and controllers | ProDataGrid for Avalonia ">
+      
+      
+      <link rel="icon" href="../../favicon.ico">
+      <link rel="stylesheet" href="../../public/docfx.min.css">
+      <link rel="stylesheet" href="../../public/main.css">
+      <meta name="docfx:navrel" content="../../toc.html">
+      <meta name="docfx:tocrel" content="../toc.html">
+      
+      
+      
+      
+      <meta name="docfx:docurl" content="https://github.com/wieslawsoltes/ProDataGrid/blob/master/docfx/articles/source-generators/operations-and-controllers.md/#L1">
+      <meta name="loc:inThisArticle" content="In this article">
+      <meta name="loc:searchResultsCount" content="{count} results for &quot;{query}&quot;">
+      <meta name="loc:searchNoResults" content="No results for &quot;{query}&quot;">
+      <meta name="loc:tocFilter" content="Filter by title">
+      <meta name="loc:nextArticle" content="Next">
+      <meta name="loc:prevArticle" content="Previous">
+      <meta name="loc:themeLight" content="Light">
+      <meta name="loc:themeDark" content="Dark">
+      <meta name="loc:themeAuto" content="Auto">
+      <meta name="loc:changeTheme" content="Change theme">
+      <meta name="loc:copy" content="Copy">
+      <meta name="loc:downloadPdf" content="Download PDF">
+
+      <script type="module" src="./../../public/docfx.min.js"></script>
+
+      <script>
+        const theme = localStorage.getItem('theme') || 'auto'
+        document.documentElement.setAttribute('data-bs-theme', theme === 'auto' ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light') : theme)
+      </script>
+
+  </head>
+
+  <body class="tex2jax_ignore" data-layout="" data-yaml-mime="">
+    <header class="bg-body border-bottom">
+      <nav id="autocollapse" class="navbar navbar-expand-md" role="navigation">
+        <div class="container-xxl flex-nowrap">
+          <a class="navbar-brand" href="../../index.html">
+            <img id="logo" class="svg" src="../../images/logo.svg" alt="">
+            
+          </a>
+          <button class="btn btn-lg d-md-none border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navpanel" aria-controls="navpanel" aria-expanded="false" aria-label="Toggle navigation">
+            <i class="bi bi-three-dots"></i>
+          </button>
+          <div class="collapse navbar-collapse" id="navpanel">
+            <div id="navbar">
+            </div>
+          </div>
+        </div>
+      </nav>
+    </header>
+
+    <main class="container-xxl">
+      <div class="toc-offcanvas">
+        <div class="offcanvas-md offcanvas-start" tabindex="-1" id="tocOffcanvas" aria-labelledby="tocOffcanvasLabel">
+          <div class="offcanvas-header">
+            <h5 class="offcanvas-title" id="tocOffcanvasLabel">Table of Contents</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="offcanvas" data-bs-target="#tocOffcanvas" aria-label="Close"></button>
+          </div>
+          <div class="offcanvas-body">
+            <nav class="toc" id="toc"></nav>
+          </div>
+        </div>
+      </div>
+
+      <div class="content">
+        <div class="actionbar">
+          <button class="btn btn-lg border-0 d-md-none" type="button" data-bs-toggle="offcanvas" data-bs-target="#tocOffcanvas" aria-controls="tocOffcanvas" aria-expanded="false" aria-label="Show table of contents">
+            <i class="bi bi-list"></i>
+          </button>
+
+          <nav id="breadcrumb"></nav>
+        </div>
+
+        <article data-uid="">
+<h1 id="operations-and-controllers">Operations and controllers</h1>
+
+<p>Generated operations compile sorting, filtering, searching, grouping, summaries, paging, currency, distinct values, and header commands against the canonical typed fields. A controller owns the mutable models and their subscriptions; the schema remains immutable reusable metadata.</p>
+<h2 id="choose-the-operation-owner">Choose the operation owner</h2>
+<p>Sorting, filtering, and searching must have exactly one execution owner:</p>
+<table>
+<thead>
+<tr>
+<th>Owner</th>
+<th>Use when</th>
+<th>Controller setting</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Collection view</td>
+<td><code>DataGridCollectionView</code> owns local operations</td>
+<td><code>DataGridOperationExecution.View</code></td>
+</tr>
+<tr>
+<td>External pipeline</td>
+<td>DynamicData or another local reactive pipeline applies descriptors</td>
+<td><code>DataGridOperationExecution.ExternalPipeline</code></td>
+</tr>
+<tr>
+<td>Remote provider</td>
+<td>A service or database executes the query</td>
+<td><code>DataGridOperationExecution.Remote</code></td>
+</tr>
+</tbody>
+</table>
+<p>The generator rejects combinations that would apply operations twice with <code>PDGSG104</code>.</p>
+<h2 id="typed-descriptors">Typed descriptors</h2>
+<p>Generated fields create descriptors without property-path strings:</p>
+<pre><code class="lang-csharp">SortingDescriptor[] sorting =
+[
+    TradeSchema.Price.Descending(),
+    TradeSchema.Symbol.Ascending()
+];
+
+FilteringDescriptor[] filtering =
+[
+    TradeSchema.Price.GreaterThanOrEqual(100m),
+    TradeSchema.Symbol.Contains(&quot;AVLN&quot;, StringComparison.OrdinalIgnoreCase)
+];
+
+SearchDescriptor search = TradeSchema.Symbol.Search(
+    &quot;A*&quot;,
+    SearchMatchMode.Wildcard);
+</code></pre>
+<p><code>CreateSortComparer</code>, <code>CreateFilterPredicate</code>, and <code>CreateSearchPredicate</code> compile descriptor collections through generated accessors. Unknown stable field IDs fail deterministically.</p>
+<h2 id="schema-owned-operation-controller">Schema-owned operation controller</h2>
+<p>Create a framework-neutral controller directly from the provider:</p>
+<pre><code class="lang-csharp">using DataGridGeneratedOperationController&lt;Trade&gt; controller =
+    TradeSchema.CreateController(DataGridOperationExecution.ExternalPipeline);
+
+controller.OperationsChanged += (_, args) =&gt;
+{
+    if ((args.Change &amp; DataGridGeneratedOperationChange.Filtering) != 0)
+    {
+        filterSubject.OnNext(controller.FilterPredicate);
+    }
+};
+
+controller.SortingModel.SetOrUpdate(TradeSchema.Price.Descending());
+controller.FilteringModel.SetOrUpdate(TradeSchema.Symbol.Contains(&quot;AVLN&quot;));
+</code></pre>
+<p>The controller owns column definitions, fast-path options, sorting/filtering/search models, compiled delegates, revisions, and model subscriptions. It depends on ProDataGrid operation models, not ReactiveUI or DynamicData.</p>
+<h2 id="named-viewmodel-controllers">Named ViewModel controllers</h2>
+<p>Use <code>[GenerateDataGridController]</code> when a ViewModel should receive a complete named lifetime:</p>
+<pre><code class="lang-csharp">[GenerateDataGridController(
+    typeof(Trade),
+    &quot;Trades&quot;,
+    SourceMember = nameof(_source),
+    SourceKind = DataGridGeneratedSourceKind.DynamicDataSourceCache,
+    OperationExecution = DataGridOperationExecution.ExternalPipeline,
+    Features = DataGridGeneratedFeatures.Columns |
+               DataGridGeneratedFeatures.Operations |
+               DataGridGeneratedFeatures.Selection,
+    Streaming = true)]
+public sealed partial class TradesViewModel : ReactiveObject, IDisposable
+{
+    private readonly SourceCache&lt;Trade, int&gt; _source =
+        new(static trade =&gt; trade.Id);
+
+    public TradesViewModel()
+    {
+        InitializeTrades(CreateTradesController());
+        Items = ConnectTradesPipeline(
+            ReactiveUI.Primitives.Reactive.Concurrency.AvaloniaScheduler.Instance);
+    }
+
+    public ReadOnlyObservableCollection&lt;Trade&gt; Items { get; }
+
+    public void Dispose()
+    {
+        DisposeTrades();
+        _source.Dispose();
+    }
+}
+</code></pre>
+<p>The group contains <code>Trades</code>, <code>CreateTradesController</code>, <code>InitializeTrades</code>, and <code>DisposeTrades</code>. Source-specific members are added for DynamicData, streams, or remote queries. Multiple named controllers can coexist on one partial ViewModel.</p>
+<p>The <code>Features</code> flags let a controller request only the capabilities it owns. <code>SourceMember</code>, <code>SourceKind</code>, and <code>OperationExecution</code> are validated together.</p>
+<h2 id="controller-customization">Controller customization</h2>
+<p><code>ImplementationType</code> accepts an <code>IDataGridGeneratedControllerFactory&lt;TItem&gt;</code>. <code>ConfigureMethod</code> names a static method on the partial ViewModel with a <code>ref DataGridGeneratedControllerOptions&lt;TItem&gt;</code> parameter.</p>
+<pre><code class="lang-csharp">[GenerateDataGridController(
+    typeof(Trade),
+    &quot;Trades&quot;,
+    ConfigureMethod = nameof(ConfigureTrades))]
+public sealed partial class TradesViewModel
+{
+    private static void ConfigureTrades(
+        ref DataGridGeneratedControllerOptions&lt;Trade&gt; options)
+    {
+        options.OperationExecution = DataGridOperationExecution.View;
+    }
+}
+</code></pre>
+<p>Invalid factories or configure signatures produce <code>PDGSG004</code>.</p>
+<h2 id="presets-and-command-surfaces">Presets and command surfaces</h2>
+<p>Apply a group of descriptors as one revision:</p>
+<pre><code class="lang-csharp">DataGridGeneratedOperationPreset riskPreset = new(
+    &quot;High-value AVLN&quot;,
+    sorting: [TradeSchema.Price.Descending()],
+    filtering:
+    [
+        TradeSchema.Symbol.EqualTo(&quot;AVLN&quot;),
+        TradeSchema.Price.GreaterThanOrEqual(100m)
+    ]);
+
+Trades.ApplyPreset(riskPreset);
+</code></pre>
+<p>Shared presets can be declared as validated static factories:</p>
+<pre><code class="lang-csharp">[GenerateDataGridColumns(
+    OperationPresetMethods = [nameof(CreateRiskPreset)])]
+public sealed class Trade
+{
+    public static DataGridGeneratedOperationPreset CreateRiskPreset() =&gt; new(
+        &quot;risk&quot;,
+        sorting: [TradeSchema.Price.Descending()],
+        filtering: [TradeSchema.Price.GreaterThanOrEqual(100m)]);
+}
+</code></pre>
+<p>Preset factories are evaluated lazily once and names must be unique. <code>TryGetOperationPreset</code> performs ordinal lookup.</p>
+<p>Named controllers expose descriptor projections, operation commands, and presets. The framework-neutral <code>ICommand</code> surface includes applying presets, removing descriptors, clearing individual/all operations, and search navigation.</p>
+<h2 id="collection-views-paging-and-currency">Collection views, paging, and currency</h2>
+<p>Configure defaults on the schema:</p>
+<pre><code class="lang-csharp">[GenerateDataGridColumns(
+    DefaultPageSize = 100,
+    InitialPageIndex = 0,
+    InitialCurrency = DataGridGeneratedInitialCurrency.First,
+    PreserveCurrentItemByKey = true,
+    PreserveSelectionByKey = true)]
+public sealed class Trade
+{
+    [DataGridKey]
+    public long Id { get; init; }
+}
+</code></pre>
+<p><code>CreateCollectionView</code> installs generated grouping, paging, and initial currency in one typed factory. A keyed provider also emits <code>CreateCollectionViewController</code>. The controller maintains a global key index, identity selection, and sticky current-item key across refreshes, page changes, and replacement instances.</p>
+<p><code>Refresh</code>, <code>SetPageSize</code>, <code>ReplaceView</code>, <code>Capture</code>, <code>Restore</code>, and <code>TryMoveCurrentToKey</code> preserve only keys, not unloaded row instances. Invalid paging/currency defaults report <code>PDGSG140</code>.</p>
+<p>Use generated comparer-based sorting rather than path lookup:</p>
+<pre><code class="lang-csharp">TradeSchema.ApplyCollectionViewSorting(
+    view,
+    [
+        TradeSchema.Symbol.Ascending(),
+        TradeSchema.Price.Descending(customPriceComparer)
+    ]);
+</code></pre>
+<p>Passing an empty descriptor list clears sorting.</p>
+<h2 id="typed-grouping">Typed grouping</h2>
+<p><code>[DataGridGroup]</code> creates ordered fields and direct group descriptions:</p>
+<pre><code class="lang-csharp">[DataGridColumn(Header = &quot;Region&quot;, ColumnKey = &quot;region&quot;)]
+[DataGridGroup(Order = 0)]
+public string Region { get; init; } = string.Empty;
+</code></pre>
+<p><code>CreateCollectionView</code> installs the group descriptions without <code>DataGridPathGroupDescription</code>. An optional <code>FormatterMethod</code> customizes the generated group label through a validated static delegate.</p>
+<h2 id="rendered-and-incremental-summaries">Rendered and incremental summaries</h2>
+<pre><code class="lang-csharp">[DataGridColumn(DataGridColumnKind.Numeric,
+    Header = &quot;Revenue&quot;, ColumnKey = &quot;revenue&quot;,
+    SummaryCellThemeKey = &quot;RevenueSummaryCellTheme&quot;)]
+[DataGridSummary(
+    DataGridAggregateType.Sum,
+    Scope = DataGridSummaryScope.Both,
+    Format = &quot;C2&quot;,
+    Title = &quot;Revenue: &quot;)]
+public decimal Revenue { get; init; }
+</code></pre>
+<p>Each summary produces:</p>
+<ul>
+<li>an incremental <code>IDataGridGeneratedSummary&lt;TItem&gt;</code>;</li>
+<li>a <code>DataGridSummaryDefinition</code> attached to the generated column;</li>
+<li>fresh runtime <code>DataGridSummaryDescription</code> instances for each materialized grid.</li>
+</ul>
+<p>Built-in sum, average, count, distinct-count, minimum, maximum, first, and last calculations use the generated accessor. Incremental aggregates support <code>Add</code>, <code>Remove</code>, <code>Replace</code>, and <code>Reset</code>.</p>
+<p>Generated views can enable summary surfaces:</p>
+<pre><code class="lang-csharp">[GenerateDataGridView(
+    typeof(Order),
+    ShowTotalSummary = true,
+    ShowGroupSummary = true,
+    TotalSummaryPosition = DataGridSummaryRowPosition.Bottom,
+    GroupSummaryPosition = DataGridGroupSummaryPosition.Footer)]
+public sealed partial class OrdersViewModel { }
+</code></pre>
+<p>For custom calculations, assign <code>DataGridSummaryDefinition.Factory</code> from a column configure method. The factory must return a new description per materialized column.</p>
+<h2 id="filter-editor-metadata-and-distinct-values">Filter editor metadata and distinct values</h2>
+<p><code>DataGridColumn.FilterEditor</code> can be <code>Text</code>, <code>Numeric</code>, <code>DateTime</code>, <code>Boolean</code>, <code>Enum</code>, <code>Range</code>, <code>Distinct</code>, or <code>Custom</code>. <code>FilterFlyoutKey</code> leaves visual composition in Avalonia resources.</p>
+<p>Every generated field provides:</p>
+<ul>
+<li>a bounded local distinct-value provider;</li>
+<li>a cancellable, revisioned remote distinct-value controller;</li>
+<li>stable backend-field metadata for server translation.</li>
+</ul>
+<p>Local scans require source/result limits. A remote controller cancels prior work, rejects stale responses, and publishes values/loading/error state.</p>
+<h2 id="header-commands">Header commands</h2>
+<p><code>CreateHeaderCommandController</code> returns one cached command set per stable field. It coordinates:</p>
+<ul>
+<li>ascending/descending/clear sort;</li>
+<li>clear or show filter;</li>
+<li>visibility and layout reset;</li>
+<li>pin, freeze, autosize, and grid-instance operations.</li>
+</ul>
+<p>Model-only commands call generated sorting/filtering/layout contracts directly. Filter flyouts use <code>IFilteringModelInteraction</code>; grid-instance actions use <code>IDataGridGeneratedHeaderInteraction</code>. A generated ReactiveUI interaction handler can own the actual grid without exposing Avalonia controls to the ViewModel.</p>
+<p>Command availability follows live sorting, filtering, and layout changes even when another controller initiated them.</p>
+<h2 id="domain-owned-collection-mutations-and-new-rows">Domain-owned collection mutations and new rows</h2>
+<p>The generator does not infer domain mutation semantics. Inject focused services:</p>
+<pre><code class="lang-csharp">[GenerateDataGridColumns(
+    MutationHandlerType = typeof(OrderMutations),
+    NewRowFactoryType = typeof(OrderFactory))]
+public sealed class Order { }
+
+public sealed class OrderMutations :
+    IDataGridGeneratedCollectionMutationHandler&lt;Order&gt;
+{
+    public ValueTask AddAsync(
+        int index,
+        ReadOnlyMemory&lt;Order&gt; items,
+        CancellationToken token) =&gt; SaveAddedAsync(index, items, token);
+
+    public ValueTask RemoveAsync(
+        int index,
+        ReadOnlyMemory&lt;Order&gt; items,
+        CancellationToken token) =&gt; DeleteAsync(items, token);
+
+    // ReplaceAsync, MoveAsync, and ResetAsync follow the same range contract.
+}
+
+public sealed class OrderFactory : IDataGridGeneratedNewRowFactory&lt;Order&gt;
+{
+    public ValueTask&lt;Order&gt; CreateAsync(CancellationToken token) =&gt;
+        ValueTask.FromResult(new Order());
+}
+</code></pre>
+<p><code>CreateCollectionMutationService(handler)</code> and <code>CreateNewRowService(factory)</code> preserve DI ownership. Configured implementation types additionally enable parameterless <code>CreateConfigured...</code> factories. Range operations use one <code>ReadOnlyMemory&lt;TItem&gt;</code> and one <code>ValueTask</code> per mutation and enforce explicit bounds.</p>
+<h2 id="related-articles">Related articles</h2>
+<ul>
+<li><a href="reactive-streaming-remote.html">Reactive, streaming, and remote data</a></li>
+<li><a href="selection-navigation-state.html">Selection, navigation, and state</a></li>
+<li><a href="editing-and-data-workflows.html">Editing and data workflows</a></li>
+</ul>
+
+</article>
+
+        <div class="contribution d-print-none">
+          <a href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/docfx/articles/source-generators/operations-and-controllers.md/#L1" class="edit-link">Edit this page</a>
+        </div>
+
+        <div class="next-article d-print-none border-top" id="nextArticle"></div>
+
+      </div>
+
+      <div class="affix">
+        <nav id="affix"></nav>
+      </div>
+    </main>
+
+
+    <footer class="border-top text-secondary">
+      <div class="container-xxl">
+        <div class="flex-fill">
+          <span>Made with <a href="https://dotnet.github.io/docfx">docfx</a></span>
+        </div>
+      </div>
+    </footer>
+  </body>
+</html>

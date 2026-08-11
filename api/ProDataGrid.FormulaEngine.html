@@ -172,11 +172,13 @@ Classes
     </dl>
     <dl class="jumplist">
       <dt><a class="xref" href="ProDataGrid.FormulaEngine.FormulaParseException.html">FormulaParseException</a></dt>
-      <dd></dd>
+      <dd><p>Represents a formula syntax error at a character position.</p>
+</dd>
     </dl>
     <dl class="jumplist">
       <dt><a class="xref" href="ProDataGrid.FormulaEngine.FormulaParseOptions.html">FormulaParseOptions</a></dt>
-      <dd></dd>
+      <dd><p>Configures formula tokenization and parsing.</p>
+</dd>
     </dl>
     <dl class="jumplist">
       <dt><a class="xref" href="ProDataGrid.FormulaEngine.FormulaRecalculationResult.html">FormulaRecalculationResult</a></dt>
@@ -193,6 +195,11 @@ Classes
     <dl class="jumplist">
       <dt><a class="xref" href="ProDataGrid.FormulaEngine.FormulaReferenceShiftResult.html">FormulaReferenceShiftResult</a></dt>
       <dd></dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="ProDataGrid.FormulaEngine.FormulaReferenceTranslator.html">FormulaReferenceTranslator</a></dt>
+      <dd><p>Translates relative references in parsed formula expressions for copy/fill operations.</p>
+</dd>
     </dl>
     <dl class="jumplist">
       <dt><a class="xref" href="ProDataGrid.FormulaEngine.FormulaStructuredReferenceExpression.html">FormulaStructuredReferenceExpression</a></dt>
@@ -261,6 +268,11 @@ Interfaces
       <dd></dd>
     </dl>
     <dl class="jumplist">
+      <dt><a class="xref" href="ProDataGrid.FormulaEngine.IFormulaFillTranslator.html">IFormulaFillTranslator</a></dt>
+      <dd><p>Translates formula text when a cell is copied to another row and column.</p>
+</dd>
+    </dl>
+    <dl class="jumplist">
       <dt><a class="xref" href="ProDataGrid.FormulaEngine.IFormulaFormatter.html">IFormulaFormatter</a></dt>
       <dd></dd>
     </dl>
@@ -320,6 +332,16 @@ Interfaces
       <dt><a class="xref" href="ProDataGrid.FormulaEngine.ILazyFormulaFunction.html">ILazyFormulaFunction</a></dt>
       <dd></dd>
     </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="ProDataGrid.FormulaEngine.IPreparedFormulaFillTranslation.html">IPreparedFormulaFillTranslation</a></dt>
+      <dd><p>Represents one parsed source formula prepared for multiple fill targets.</p>
+</dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="ProDataGrid.FormulaEngine.IPreparedFormulaFillTranslator.html">IPreparedFormulaFillTranslator</a></dt>
+      <dd><p>Prepares source formulas once for allocation-conscious multi-cell fills.</p>
+</dd>
+    </dl>
     <h3 id="enums">
 Enums
 </h3>
@@ -353,7 +375,8 @@ Enums
     </dl>
     <dl class="jumplist">
       <dt><a class="xref" href="ProDataGrid.FormulaEngine.FormulaReferenceMode.html">FormulaReferenceMode</a></dt>
-      <dd></dd>
+      <dd><p>Identifies the reference notation accepted by a formula parser.</p>
+</dd>
     </dl>
     <dl class="jumplist">
       <dt><a class="xref" href="ProDataGrid.FormulaEngine.FormulaStructuredReferenceScope.html">FormulaStructuredReferenceScope</a></dt>

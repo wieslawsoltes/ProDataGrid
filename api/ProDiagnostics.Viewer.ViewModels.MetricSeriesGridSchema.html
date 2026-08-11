@@ -1,0 +1,2699 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+      <title>Class MetricSeriesGridSchema | ProDataGrid for Avalonia </title>
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <meta name="title" content="Class MetricSeriesGridSchema | ProDataGrid for Avalonia ">
+      
+      
+      <link rel="icon" href="../favicon.ico">
+      <link rel="stylesheet" href="../public/docfx.min.css">
+      <link rel="stylesheet" href="../public/main.css">
+      <meta name="docfx:navrel" content="../toc.html">
+      <meta name="docfx:tocrel" content="toc.html">
+      
+      
+      
+      
+      <meta name="docfx:docurl" content="https://github.com/wieslawsoltes/ProDataGrid/new/master/apiSpec/new?filename=ProDiagnostics_Viewer_ViewModels_MetricSeriesGridSchema.md&amp;value=---%0Auid%3A%20ProDiagnostics.Viewer.ViewModels.MetricSeriesGridSchema%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">
+      <meta name="loc:inThisArticle" content="In this article">
+      <meta name="loc:searchResultsCount" content="{count} results for &quot;{query}&quot;">
+      <meta name="loc:searchNoResults" content="No results for &quot;{query}&quot;">
+      <meta name="loc:tocFilter" content="Filter by title">
+      <meta name="loc:nextArticle" content="Next">
+      <meta name="loc:prevArticle" content="Previous">
+      <meta name="loc:themeLight" content="Light">
+      <meta name="loc:themeDark" content="Dark">
+      <meta name="loc:themeAuto" content="Auto">
+      <meta name="loc:changeTheme" content="Change theme">
+      <meta name="loc:copy" content="Copy">
+      <meta name="loc:downloadPdf" content="Download PDF">
+
+      <script type="module" src="./../public/docfx.min.js"></script>
+
+      <script>
+        const theme = localStorage.getItem('theme') || 'auto'
+        document.documentElement.setAttribute('data-bs-theme', theme === 'auto' ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light') : theme)
+      </script>
+
+  </head>
+
+  <body class="tex2jax_ignore" data-layout="" data-yaml-mime="ManagedReference">
+    <header class="bg-body border-bottom">
+      <nav id="autocollapse" class="navbar navbar-expand-md" role="navigation">
+        <div class="container-xxl flex-nowrap">
+          <a class="navbar-brand" href="../index.html">
+            <img id="logo" class="svg" src="../images/logo.svg" alt="">
+            
+          </a>
+          <button class="btn btn-lg d-md-none border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navpanel" aria-controls="navpanel" aria-expanded="false" aria-label="Toggle navigation">
+            <i class="bi bi-three-dots"></i>
+          </button>
+          <div class="collapse navbar-collapse" id="navpanel">
+            <div id="navbar">
+            </div>
+          </div>
+        </div>
+      </nav>
+    </header>
+
+    <main class="container-xxl">
+      <div class="toc-offcanvas">
+        <div class="offcanvas-md offcanvas-start" tabindex="-1" id="tocOffcanvas" aria-labelledby="tocOffcanvasLabel">
+          <div class="offcanvas-header">
+            <h5 class="offcanvas-title" id="tocOffcanvasLabel">Table of Contents</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="offcanvas" data-bs-target="#tocOffcanvas" aria-label="Close"></button>
+          </div>
+          <div class="offcanvas-body">
+            <nav class="toc" id="toc"></nav>
+          </div>
+        </div>
+      </div>
+
+      <div class="content">
+        <div class="actionbar">
+          <button class="btn btn-lg border-0 d-md-none" type="button" data-bs-toggle="offcanvas" data-bs-target="#tocOffcanvas" aria-controls="tocOffcanvas" aria-expanded="false" aria-label="Show table of contents">
+            <i class="bi bi-list"></i>
+          </button>
+
+          <nav id="breadcrumb"></nav>
+        </div>
+
+        <article data-uid="ProDiagnostics.Viewer.ViewModels.MetricSeriesGridSchema">
+
+
+
+  <h1 id="ProDiagnostics_Viewer_ViewModels_MetricSeriesGridSchema" data-uid="ProDiagnostics.Viewer.ViewModels.MetricSeriesGridSchema" class="text-break">
+Class MetricSeriesGridSchema  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/ProDiagnostics.Viewer/obj/Release/net10.0/ProDataGrid.SourceGenerators/ProDataGrid.SourceGenerators.ProDataGridGenerator/ProDiagnostics_Viewer_ViewModels_MetricSeriesGridSchema_Schema.g.cs/#L6"><i class="bi bi-code-slash"></i></a>
+  </h1>
+
+  <div class="facts text-secondary">
+    <dl><dt>Namespace</dt><dd><a class="xref" href="ProDiagnostics.html">ProDiagnostics</a>.<a class="xref" href="ProDiagnostics.Viewer.html">Viewer</a>.<a class="xref" href="ProDiagnostics.Viewer.ViewModels.html">ViewModels</a></dd></dl>
+  <dl><dt>Assembly</dt><dd>ProDiagnostics.Viewer.dll</dd></dl>
+  </div>
+
+  <div class="markdown summary"></div>
+  <div class="markdown conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public sealed class MetricSeriesGridSchema : IDataGridGeneratedSchema&lt;MetricSeriesViewModel&gt;, IDataGridColumnDefinitionProvider&lt;MetricSeriesViewModel&gt;, IDataGridSortingCompiler&lt;MetricSeriesViewModel&gt;, IDataGridFilteringCompiler&lt;MetricSeriesViewModel&gt;, IDataGridSearchingCompiler&lt;MetricSeriesViewModel&gt;, IDataGridFastPathOptionsProvider, IDataGridGeneratedSchemaManifestProvider</code></pre>
+  </div>
+
+
+
+
+  <dl class="typelist inheritance">
+    <dt>Inheritance</dt>
+    <dd>
+      <div><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object">object</a></div>
+      <div><span class="xref">MetricSeriesGridSchema</span></div>
+    </dd>
+  </dl>
+
+  <dl class="typelist implements">
+    <dt>Implements</dt>
+    <dd>
+      <div><a class="xref" href="Avalonia.Controls.IDataGridGeneratedSchema-1.html">IDataGridGeneratedSchema</a>&lt;<a class="xref" href="ProDiagnostics.Viewer.ViewModels.MetricSeriesViewModel.html">MetricSeriesViewModel</a>&gt;</div>
+      <div><a class="xref" href="Avalonia.Controls.IDataGridColumnDefinitionProvider-1.html">IDataGridColumnDefinitionProvider</a>&lt;<a class="xref" href="ProDiagnostics.Viewer.ViewModels.MetricSeriesViewModel.html">MetricSeriesViewModel</a>&gt;</div>
+      <div><a class="xref" href="Avalonia.Controls.IDataGridSortingCompiler-1.html">IDataGridSortingCompiler</a>&lt;<a class="xref" href="ProDiagnostics.Viewer.ViewModels.MetricSeriesViewModel.html">MetricSeriesViewModel</a>&gt;</div>
+      <div><a class="xref" href="Avalonia.Controls.IDataGridFilteringCompiler-1.html">IDataGridFilteringCompiler</a>&lt;<a class="xref" href="ProDiagnostics.Viewer.ViewModels.MetricSeriesViewModel.html">MetricSeriesViewModel</a>&gt;</div>
+      <div><a class="xref" href="Avalonia.Controls.IDataGridSearchingCompiler-1.html">IDataGridSearchingCompiler</a>&lt;<a class="xref" href="ProDiagnostics.Viewer.ViewModels.MetricSeriesViewModel.html">MetricSeriesViewModel</a>&gt;</div>
+      <div><a class="xref" href="Avalonia.Controls.IDataGridFastPathOptionsProvider.html">IDataGridFastPathOptionsProvider</a></div>
+      <div><a class="xref" href="Avalonia.Controls.IDataGridGeneratedSchemaManifestProvider.html">IDataGridGeneratedSchemaManifestProvider</a></div>
+    </dd>
+  </dl>
+
+
+  <dl class="typelist inheritedMembers">
+    <dt>Inherited Members</dt>
+    <dd>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object)">object.Equals(object)</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object-system-object)">object.Equals(object, object)</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.gethashcode">object.GetHashCode()</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.gettype">object.GetType()</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.referenceequals">object.ReferenceEquals(object, object)</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.tostring">object.ToString()</a>
+    </div>
+  </dd></dl>
+
+
+
+
+
+
+  <h2 class="section" id="fields">Fields
+</h2>
+
+
+
+  <h3 id="ProDiagnostics_Viewer_ViewModels_MetricSeriesGridSchema_DefaultPageSize" data-uid="ProDiagnostics.Viewer.ViewModels.MetricSeriesGridSchema.DefaultPageSize">
+  DefaultPageSize
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/ProDiagnostics.Viewer/obj/Release/net10.0/ProDataGrid.SourceGenerators/ProDataGrid.SourceGenerators.ProDataGridGenerator/ProDiagnostics_Viewer_ViewModels_MetricSeriesGridSchema_Schema.g.cs/#L134"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public const int DefaultPageSize = 0</code></pre>
+  </div>
+
+
+
+
+  <h4 class="section">Field Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+  <h3 id="ProDiagnostics_Viewer_ViewModels_MetricSeriesGridSchema_InitialCurrency" data-uid="ProDiagnostics.Viewer.ViewModels.MetricSeriesGridSchema.InitialCurrency">
+  InitialCurrency
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/ProDiagnostics.Viewer/obj/Release/net10.0/ProDataGrid.SourceGenerators/ProDataGrid.SourceGenerators.ProDataGridGenerator/ProDiagnostics_Viewer_ViewModels_MetricSeriesGridSchema_Schema.g.cs/#L136"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public const DataGridGeneratedInitialCurrency InitialCurrency = Unchanged</code></pre>
+  </div>
+
+
+
+
+  <h4 class="section">Field Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="Avalonia.Controls.DataGridGeneratedInitialCurrency.html">DataGridGeneratedInitialCurrency</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+  <h3 id="ProDiagnostics_Viewer_ViewModels_MetricSeriesGridSchema_InitialPageIndex" data-uid="ProDiagnostics.Viewer.ViewModels.MetricSeriesGridSchema.InitialPageIndex">
+  InitialPageIndex
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/ProDiagnostics.Viewer/obj/Release/net10.0/ProDataGrid.SourceGenerators/ProDataGrid.SourceGenerators.ProDataGridGenerator/ProDiagnostics_Viewer_ViewModels_MetricSeriesGridSchema_Schema.g.cs/#L135"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public const int InitialPageIndex = 0</code></pre>
+  </div>
+
+
+
+
+  <h4 class="section">Field Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+  <h3 id="ProDiagnostics_Viewer_ViewModels_MetricSeriesGridSchema_ManifestVersion" data-uid="ProDiagnostics.Viewer.ViewModels.MetricSeriesGridSchema.ManifestVersion">
+  ManifestVersion
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/ProDiagnostics.Viewer/obj/Release/net10.0/ProDataGrid.SourceGenerators/ProDataGrid.SourceGenerators.ProDataGridGenerator/ProDiagnostics_Viewer_ViewModels_MetricSeriesGridSchema_Schema.g.cs/#L132"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public const int ManifestVersion = 1</code></pre>
+  </div>
+
+
+
+
+  <h4 class="section">Field Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+  <h3 id="ProDiagnostics_Viewer_ViewModels_MetricSeriesGridSchema_PreserveCurrentItemByKey" data-uid="ProDiagnostics.Viewer.ViewModels.MetricSeriesGridSchema.PreserveCurrentItemByKey">
+  PreserveCurrentItemByKey
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/ProDiagnostics.Viewer/obj/Release/net10.0/ProDataGrid.SourceGenerators/ProDataGrid.SourceGenerators.ProDataGridGenerator/ProDiagnostics_Viewer_ViewModels_MetricSeriesGridSchema_Schema.g.cs/#L137"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public const bool PreserveCurrentItemByKey = true</code></pre>
+  </div>
+
+
+
+
+  <h4 class="section">Field Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+  <h3 id="ProDiagnostics_Viewer_ViewModels_MetricSeriesGridSchema_PreserveSelectionByKey" data-uid="ProDiagnostics.Viewer.ViewModels.MetricSeriesGridSchema.PreserveSelectionByKey">
+  PreserveSelectionByKey
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/ProDiagnostics.Viewer/obj/Release/net10.0/ProDataGrid.SourceGenerators/ProDataGrid.SourceGenerators.ProDataGridGenerator/ProDiagnostics_Viewer_ViewModels_MetricSeriesGridSchema_Schema.g.cs/#L138"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public const bool PreserveSelectionByKey = true</code></pre>
+  </div>
+
+
+
+
+  <h4 class="section">Field Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+  <h3 id="ProDiagnostics_Viewer_ViewModels_MetricSeriesGridSchema_SchemaHash" data-uid="ProDiagnostics.Viewer.ViewModels.MetricSeriesGridSchema.SchemaHash">
+  SchemaHash
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/ProDiagnostics.Viewer/obj/Release/net10.0/ProDataGrid.SourceGenerators/ProDataGrid.SourceGenerators.ProDataGridGenerator/ProDiagnostics_Viewer_ViewModels_MetricSeriesGridSchema_Schema.g.cs/#L140"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public const string SchemaHash = &quot;25cb99117bc816c9&quot;</code></pre>
+  </div>
+
+
+
+
+  <h4 class="section">Field Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+  <h3 id="ProDiagnostics_Viewer_ViewModels_MetricSeriesGridSchema_SchemaId" data-uid="ProDiagnostics.Viewer.ViewModels.MetricSeriesGridSchema.SchemaId">
+  SchemaId
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/ProDiagnostics.Viewer/obj/Release/net10.0/ProDataGrid.SourceGenerators/ProDataGrid.SourceGenerators.ProDataGridGenerator/ProDiagnostics_Viewer_ViewModels_MetricSeriesGridSchema_Schema.g.cs/#L139"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public const string SchemaId = &quot;prodiagnostics/viewer/metric/v1&quot;</code></pre>
+  </div>
+
+
+
+
+  <h4 class="section">Field Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+  <h3 id="ProDiagnostics_Viewer_ViewModels_MetricSeriesGridSchema_StateVersion" data-uid="ProDiagnostics.Viewer.ViewModels.MetricSeriesGridSchema.StateVersion">
+  StateVersion
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/ProDiagnostics.Viewer/obj/Release/net10.0/ProDataGrid.SourceGenerators/ProDataGrid.SourceGenerators.ProDataGridGenerator/ProDiagnostics_Viewer_ViewModels_MetricSeriesGridSchema_Schema.g.cs/#L133"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public const int StateVersion = 1</code></pre>
+  </div>
+
+
+
+
+  <h4 class="section">Field Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+  <h2 class="section" id="properties">Properties
+</h2>
+
+
+  <a id="ProDiagnostics_Viewer_ViewModels_MetricSeriesGridSchema_AnalyticsFields_" data-uid="ProDiagnostics.Viewer.ViewModels.MetricSeriesGridSchema.AnalyticsFields*"></a>
+
+  <h3 id="ProDiagnostics_Viewer_ViewModels_MetricSeriesGridSchema_AnalyticsFields" data-uid="ProDiagnostics.Viewer.ViewModels.MetricSeriesGridSchema.AnalyticsFields">
+  AnalyticsFields
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/ProDiagnostics.Viewer/obj/Release/net10.0/ProDataGrid.SourceGenerators/ProDataGrid.SourceGenerators.ProDataGridGenerator/ProDiagnostics_Viewer_ViewModels_MetricSeriesGridSchema_Schema.g.cs/#L565"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static IReadOnlyList&lt;IDataGridGeneratedAnalyticsField&gt; AnalyticsFields { get; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.ireadonlylist-1">IReadOnlyList</a>&lt;<a class="xref" href="Avalonia.Controls.IDataGridGeneratedAnalyticsField.html">IDataGridGeneratedAnalyticsField</a>&gt;</dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="ProDiagnostics_Viewer_ViewModels_MetricSeriesGridSchema_Average_" data-uid="ProDiagnostics.Viewer.ViewModels.MetricSeriesGridSchema.Average*"></a>
+
+  <h3 id="ProDiagnostics_Viewer_ViewModels_MetricSeriesGridSchema_Average" data-uid="ProDiagnostics.Viewer.ViewModels.MetricSeriesGridSchema.Average">
+  Average
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/ProDiagnostics.Viewer/obj/Release/net10.0/ProDataGrid.SourceGenerators/ProDataGrid.SourceGenerators.ProDataGridGenerator/ProDiagnostics_Viewer_ViewModels_MetricSeriesGridSchema_Schema.g.cs/#L227"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static DataGridGeneratedComparableField&lt;MetricSeriesViewModel, double&gt; Average { get; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="Avalonia.Controls.DataGridGeneratedComparableField-2.html">DataGridGeneratedComparableField</a>&lt;<a class="xref" href="ProDiagnostics.Viewer.ViewModels.MetricSeriesViewModel.html">MetricSeriesViewModel</a>, <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.double">double</a>&gt;</dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="ProDiagnostics_Viewer_ViewModels_MetricSeriesGridSchema_AverageDistinctValues_" data-uid="ProDiagnostics.Viewer.ViewModels.MetricSeriesGridSchema.AverageDistinctValues*"></a>
+
+  <h3 id="ProDiagnostics_Viewer_ViewModels_MetricSeriesGridSchema_AverageDistinctValues" data-uid="ProDiagnostics.Viewer.ViewModels.MetricSeriesGridSchema.AverageDistinctValues">
+  AverageDistinctValues
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/ProDiagnostics.Viewer/obj/Release/net10.0/ProDataGrid.SourceGenerators/ProDataGrid.SourceGenerators.ProDataGridGenerator/ProDiagnostics_Viewer_ViewModels_MetricSeriesGridSchema_Schema.g.cs/#L434"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static DataGridGeneratedDistinctValueProvider&lt;MetricSeriesViewModel, double&gt; AverageDistinctValues { get; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="Avalonia.Controls.DataGridGeneratedDistinctValueProvider-2.html">DataGridGeneratedDistinctValueProvider</a>&lt;<a class="xref" href="ProDiagnostics.Viewer.ViewModels.MetricSeriesViewModel.html">MetricSeriesViewModel</a>, <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.double">double</a>&gt;</dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="ProDiagnostics_Viewer_ViewModels_MetricSeriesGridSchema_BandFields_" data-uid="ProDiagnostics.Viewer.ViewModels.MetricSeriesGridSchema.BandFields*"></a>
+
+  <h3 id="ProDiagnostics_Viewer_ViewModels_MetricSeriesGridSchema_BandFields" data-uid="ProDiagnostics.Viewer.ViewModels.MetricSeriesGridSchema.BandFields">
+  BandFields
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/ProDiagnostics.Viewer/obj/Release/net10.0/ProDataGrid.SourceGenerators/ProDataGrid.SourceGenerators.ProDataGridGenerator/ProDiagnostics_Viewer_ViewModels_MetricSeriesGridSchema_Schema.g.cs/#L555"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static IReadOnlyList&lt;DataGridGeneratedBandField&gt; BandFields { get; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.ireadonlylist-1">IReadOnlyList</a>&lt;<a class="xref" href="Avalonia.Controls.DataGridGeneratedBandField.html">DataGridGeneratedBandField</a>&gt;</dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="ProDiagnostics_Viewer_ViewModels_MetricSeriesGridSchema_ConditionalRules_" data-uid="ProDiagnostics.Viewer.ViewModels.MetricSeriesGridSchema.ConditionalRules*"></a>
+
+  <h3 id="ProDiagnostics_Viewer_ViewModels_MetricSeriesGridSchema_ConditionalRules" data-uid="ProDiagnostics.Viewer.ViewModels.MetricSeriesGridSchema.ConditionalRules">
+  ConditionalRules
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/ProDiagnostics.Viewer/obj/Release/net10.0/ProDataGrid.SourceGenerators/ProDataGrid.SourceGenerators.ProDataGridGenerator/ProDiagnostics_Viewer_ViewModels_MetricSeriesGridSchema_Schema.g.cs/#L547"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static IReadOnlyList&lt;IDataGridGeneratedConditionalRule&gt; ConditionalRules { get; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.ireadonlylist-1">IReadOnlyList</a>&lt;<a class="xref" href="Avalonia.Controls.IDataGridGeneratedConditionalRule.html">IDataGridGeneratedConditionalRule</a>&gt;</dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="ProDiagnostics_Viewer_ViewModels_MetricSeriesGridSchema_Description_" data-uid="ProDiagnostics.Viewer.ViewModels.MetricSeriesGridSchema.Description*"></a>
+
+  <h3 id="ProDiagnostics_Viewer_ViewModels_MetricSeriesGridSchema_Description" data-uid="ProDiagnostics.Viewer.ViewModels.MetricSeriesGridSchema.Description">
+  Description
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/ProDiagnostics.Viewer/obj/Release/net10.0/ProDataGrid.SourceGenerators/ProDataGrid.SourceGenerators.ProDataGridGenerator/ProDiagnostics_Viewer_ViewModels_MetricSeriesGridSchema_Schema.g.cs/#L159"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static DataGridGeneratedStringField&lt;MetricSeriesViewModel, string&gt; Description { get; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="Avalonia.Controls.DataGridGeneratedStringField-2.html">DataGridGeneratedStringField</a>&lt;<a class="xref" href="ProDiagnostics.Viewer.ViewModels.MetricSeriesViewModel.html">MetricSeriesViewModel</a>, <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a>&gt;</dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="ProDiagnostics_Viewer_ViewModels_MetricSeriesGridSchema_DescriptionDistinctValues_" data-uid="ProDiagnostics.Viewer.ViewModels.MetricSeriesGridSchema.DescriptionDistinctValues*"></a>
+
+  <h3 id="ProDiagnostics_Viewer_ViewModels_MetricSeriesGridSchema_DescriptionDistinctValues" data-uid="ProDiagnostics.Viewer.ViewModels.MetricSeriesGridSchema.DescriptionDistinctValues">
+  DescriptionDistinctValues
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/ProDiagnostics.Viewer/obj/Release/net10.0/ProDataGrid.SourceGenerators/ProDataGrid.SourceGenerators.ProDataGridGenerator/ProDiagnostics_Viewer_ViewModels_MetricSeriesGridSchema_Schema.g.cs/#L406"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static DataGridGeneratedDistinctValueProvider&lt;MetricSeriesViewModel, string&gt; DescriptionDistinctValues { get; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="Avalonia.Controls.DataGridGeneratedDistinctValueProvider-2.html">DataGridGeneratedDistinctValueProvider</a>&lt;<a class="xref" href="ProDiagnostics.Viewer.ViewModels.MetricSeriesViewModel.html">MetricSeriesViewModel</a>, <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a>&gt;</dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="ProDiagnostics_Viewer_ViewModels_MetricSeriesGridSchema_Diagnostics_" data-uid="ProDiagnostics.Viewer.ViewModels.MetricSeriesGridSchema.Diagnostics*"></a>
+
+  <h3 id="ProDiagnostics_Viewer_ViewModels_MetricSeriesGridSchema_Diagnostics" data-uid="ProDiagnostics.Viewer.ViewModels.MetricSeriesGridSchema.Diagnostics">
+  Diagnostics
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/ProDiagnostics.Viewer/obj/Release/net10.0/ProDataGrid.SourceGenerators/ProDataGrid.SourceGenerators.ProDataGridGenerator/ProDiagnostics_Viewer_ViewModels_MetricSeriesGridSchema_Schema.g.cs/#L601"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static DataGridGeneratedDiagnosticsManifest Diagnostics { get; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="Avalonia.Controls.DataGridGeneratedDiagnosticsManifest.html">DataGridGeneratedDiagnosticsManifest</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="ProDiagnostics_Viewer_ViewModels_MetricSeriesGridSchema_DisplayName_" data-uid="ProDiagnostics.Viewer.ViewModels.MetricSeriesGridSchema.DisplayName*"></a>
+
+  <h3 id="ProDiagnostics_Viewer_ViewModels_MetricSeriesGridSchema_DisplayName" data-uid="ProDiagnostics.Viewer.ViewModels.MetricSeriesGridSchema.DisplayName">
+  DisplayName
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/ProDiagnostics.Viewer/obj/Release/net10.0/ProDataGrid.SourceGenerators/ProDataGrid.SourceGenerators.ProDataGridGenerator/ProDiagnostics_Viewer_ViewModels_MetricSeriesGridSchema_Schema.g.cs/#L142"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static DataGridGeneratedStringField&lt;MetricSeriesViewModel, string&gt; DisplayName { get; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="Avalonia.Controls.DataGridGeneratedStringField-2.html">DataGridGeneratedStringField</a>&lt;<a class="xref" href="ProDiagnostics.Viewer.ViewModels.MetricSeriesViewModel.html">MetricSeriesViewModel</a>, <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a>&gt;</dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="ProDiagnostics_Viewer_ViewModels_MetricSeriesGridSchema_DisplayNameDistinctValues_" data-uid="ProDiagnostics.Viewer.ViewModels.MetricSeriesGridSchema.DisplayNameDistinctValues*"></a>
+
+  <h3 id="ProDiagnostics_Viewer_ViewModels_MetricSeriesGridSchema_DisplayNameDistinctValues" data-uid="ProDiagnostics.Viewer.ViewModels.MetricSeriesGridSchema.DisplayNameDistinctValues">
+  DisplayNameDistinctValues
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/ProDiagnostics.Viewer/obj/Release/net10.0/ProDataGrid.SourceGenerators/ProDataGrid.SourceGenerators.ProDataGridGenerator/ProDiagnostics_Viewer_ViewModels_MetricSeriesGridSchema_Schema.g.cs/#L399"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static DataGridGeneratedDistinctValueProvider&lt;MetricSeriesViewModel, string&gt; DisplayNameDistinctValues { get; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="Avalonia.Controls.DataGridGeneratedDistinctValueProvider-2.html">DataGridGeneratedDistinctValueProvider</a>&lt;<a class="xref" href="ProDiagnostics.Viewer.ViewModels.MetricSeriesViewModel.html">MetricSeriesViewModel</a>, <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a>&gt;</dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="ProDiagnostics_Viewer_ViewModels_MetricSeriesGridSchema_EditFields_" data-uid="ProDiagnostics.Viewer.ViewModels.MetricSeriesGridSchema.EditFields*"></a>
+
+  <h3 id="ProDiagnostics_Viewer_ViewModels_MetricSeriesGridSchema_EditFields" data-uid="ProDiagnostics.Viewer.ViewModels.MetricSeriesGridSchema.EditFields">
+  EditFields
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/ProDiagnostics.Viewer/obj/Release/net10.0/ProDataGrid.SourceGenerators/ProDataGrid.SourceGenerators.ProDataGridGenerator/ProDiagnostics_Viewer_ViewModels_MetricSeriesGridSchema_Schema.g.cs/#L368"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static IReadOnlyList&lt;IDataGridGeneratedEditField&lt;MetricSeriesViewModel&gt;&gt; EditFields { get; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.ireadonlylist-1">IReadOnlyList</a>&lt;<a class="xref" href="Avalonia.Controls.IDataGridGeneratedEditField-1.html">IDataGridGeneratedEditField</a>&lt;<a class="xref" href="ProDiagnostics.Viewer.ViewModels.MetricSeriesViewModel.html">MetricSeriesViewModel</a>&gt;&gt;</dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="ProDiagnostics_Viewer_ViewModels_MetricSeriesGridSchema_Fields_" data-uid="ProDiagnostics.Viewer.ViewModels.MetricSeriesGridSchema.Fields*"></a>
+
+  <h3 id="ProDiagnostics_Viewer_ViewModels_MetricSeriesGridSchema_Fields" data-uid="ProDiagnostics.Viewer.ViewModels.MetricSeriesGridSchema.Fields">
+  Fields
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/ProDiagnostics.Viewer/obj/Release/net10.0/ProDataGrid.SourceGenerators/ProDataGrid.SourceGenerators.ProDataGridGenerator/ProDiagnostics_Viewer_ViewModels_MetricSeriesGridSchema_Schema.g.cs/#L361"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static IReadOnlyList&lt;DataGridGeneratedField&gt; Fields { get; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.ireadonlylist-1">IReadOnlyList</a>&lt;<a class="xref" href="Avalonia.Controls.DataGridGeneratedField.html">DataGridGeneratedField</a>&gt;</dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="ProDiagnostics_Viewer_ViewModels_MetricSeriesGridSchema_GroupFields_" data-uid="ProDiagnostics.Viewer.ViewModels.MetricSeriesGridSchema.GroupFields*"></a>
+
+  <h3 id="ProDiagnostics_Viewer_ViewModels_MetricSeriesGridSchema_GroupFields" data-uid="ProDiagnostics.Viewer.ViewModels.MetricSeriesGridSchema.GroupFields">
+  GroupFields
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/ProDiagnostics.Viewer/obj/Release/net10.0/ProDataGrid.SourceGenerators/ProDataGrid.SourceGenerators.ProDataGridGenerator/ProDiagnostics_Viewer_ViewModels_MetricSeriesGridSchema_Schema.g.cs/#L481"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static IReadOnlyList&lt;IDataGridGeneratedGroupField&lt;MetricSeriesViewModel&gt;&gt; GroupFields { get; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.ireadonlylist-1">IReadOnlyList</a>&lt;<a class="xref" href="Avalonia.Controls.IDataGridGeneratedGroupField-1.html">IDataGridGeneratedGroupField</a>&lt;<a class="xref" href="ProDiagnostics.Viewer.ViewModels.MetricSeriesViewModel.html">MetricSeriesViewModel</a>&gt;&gt;</dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="ProDiagnostics_Viewer_ViewModels_MetricSeriesGridSchema_Instance_" data-uid="ProDiagnostics.Viewer.ViewModels.MetricSeriesGridSchema.Instance*"></a>
+
+  <h3 id="ProDiagnostics_Viewer_ViewModels_MetricSeriesGridSchema_Instance" data-uid="ProDiagnostics.Viewer.ViewModels.MetricSeriesGridSchema.Instance">
+  Instance
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/ProDiagnostics.Viewer/obj/Release/net10.0/ProDataGrid.SourceGenerators/ProDataGrid.SourceGenerators.ProDataGridGenerator/ProDiagnostics_Viewer_ViewModels_MetricSeriesGridSchema_Schema.g.cs/#L9"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static MetricSeriesGridSchema Instance { get; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="ProDiagnostics.Viewer.ViewModels.MetricSeriesGridSchema.html">MetricSeriesGridSchema</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="ProDiagnostics_Viewer_ViewModels_MetricSeriesGridSchema_LastValue_" data-uid="ProDiagnostics.Viewer.ViewModels.MetricSeriesGridSchema.LastValue*"></a>
+
+  <h3 id="ProDiagnostics_Viewer_ViewModels_MetricSeriesGridSchema_LastValue" data-uid="ProDiagnostics.Viewer.ViewModels.MetricSeriesGridSchema.LastValue">
+  LastValue
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/ProDiagnostics.Viewer/obj/Release/net10.0/ProDataGrid.SourceGenerators/ProDataGrid.SourceGenerators.ProDataGridGenerator/ProDiagnostics_Viewer_ViewModels_MetricSeriesGridSchema_Schema.g.cs/#L210"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static DataGridGeneratedComparableField&lt;MetricSeriesViewModel, double&gt; LastValue { get; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="Avalonia.Controls.DataGridGeneratedComparableField-2.html">DataGridGeneratedComparableField</a>&lt;<a class="xref" href="ProDiagnostics.Viewer.ViewModels.MetricSeriesViewModel.html">MetricSeriesViewModel</a>, <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.double">double</a>&gt;</dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="ProDiagnostics_Viewer_ViewModels_MetricSeriesGridSchema_LastValueDistinctValues_" data-uid="ProDiagnostics.Viewer.ViewModels.MetricSeriesGridSchema.LastValueDistinctValues*"></a>
+
+  <h3 id="ProDiagnostics_Viewer_ViewModels_MetricSeriesGridSchema_LastValueDistinctValues" data-uid="ProDiagnostics.Viewer.ViewModels.MetricSeriesGridSchema.LastValueDistinctValues">
+  LastValueDistinctValues
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/ProDiagnostics.Viewer/obj/Release/net10.0/ProDataGrid.SourceGenerators/ProDataGrid.SourceGenerators.ProDataGridGenerator/ProDiagnostics_Viewer_ViewModels_MetricSeriesGridSchema_Schema.g.cs/#L427"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static DataGridGeneratedDistinctValueProvider&lt;MetricSeriesViewModel, double&gt; LastValueDistinctValues { get; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="Avalonia.Controls.DataGridGeneratedDistinctValueProvider-2.html">DataGridGeneratedDistinctValueProvider</a>&lt;<a class="xref" href="ProDiagnostics.Viewer.ViewModels.MetricSeriesViewModel.html">MetricSeriesViewModel</a>, <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.double">double</a>&gt;</dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="ProDiagnostics_Viewer_ViewModels_MetricSeriesGridSchema_Manifest_" data-uid="ProDiagnostics.Viewer.ViewModels.MetricSeriesGridSchema.Manifest*"></a>
+
+  <h3 id="ProDiagnostics_Viewer_ViewModels_MetricSeriesGridSchema_Manifest" data-uid="ProDiagnostics.Viewer.ViewModels.MetricSeriesGridSchema.Manifest">
+  Manifest
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/ProDiagnostics.Viewer/obj/Release/net10.0/ProDataGrid.SourceGenerators/ProDataGrid.SourceGenerators.ProDataGridGenerator/ProDiagnostics_Viewer_ViewModels_MetricSeriesGridSchema_Schema.g.cs/#L359"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Gets the immutable schema manifest.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public DataGridGeneratedSchemaManifest Manifest { get; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="Avalonia.Controls.DataGridGeneratedSchemaManifest.html">DataGridGeneratedSchemaManifest</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="ProDiagnostics_Viewer_ViewModels_MetricSeriesGridSchema_MaxValue_" data-uid="ProDiagnostics.Viewer.ViewModels.MetricSeriesGridSchema.MaxValue*"></a>
+
+  <h3 id="ProDiagnostics_Viewer_ViewModels_MetricSeriesGridSchema_MaxValue" data-uid="ProDiagnostics.Viewer.ViewModels.MetricSeriesGridSchema.MaxValue">
+  MaxValue
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/ProDiagnostics.Viewer/obj/Release/net10.0/ProDataGrid.SourceGenerators/ProDataGrid.SourceGenerators.ProDataGridGenerator/ProDiagnostics_Viewer_ViewModels_MetricSeriesGridSchema_Schema.g.cs/#L261"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static DataGridGeneratedComparableField&lt;MetricSeriesViewModel, double&gt; MaxValue { get; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="Avalonia.Controls.DataGridGeneratedComparableField-2.html">DataGridGeneratedComparableField</a>&lt;<a class="xref" href="ProDiagnostics.Viewer.ViewModels.MetricSeriesViewModel.html">MetricSeriesViewModel</a>, <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.double">double</a>&gt;</dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="ProDiagnostics_Viewer_ViewModels_MetricSeriesGridSchema_MaxValueDistinctValues_" data-uid="ProDiagnostics.Viewer.ViewModels.MetricSeriesGridSchema.MaxValueDistinctValues*"></a>
+
+  <h3 id="ProDiagnostics_Viewer_ViewModels_MetricSeriesGridSchema_MaxValueDistinctValues" data-uid="ProDiagnostics.Viewer.ViewModels.MetricSeriesGridSchema.MaxValueDistinctValues">
+  MaxValueDistinctValues
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/ProDiagnostics.Viewer/obj/Release/net10.0/ProDataGrid.SourceGenerators/ProDataGrid.SourceGenerators.ProDataGridGenerator/ProDiagnostics_Viewer_ViewModels_MetricSeriesGridSchema_Schema.g.cs/#L448"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static DataGridGeneratedDistinctValueProvider&lt;MetricSeriesViewModel, double&gt; MaxValueDistinctValues { get; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="Avalonia.Controls.DataGridGeneratedDistinctValueProvider-2.html">DataGridGeneratedDistinctValueProvider</a>&lt;<a class="xref" href="ProDiagnostics.Viewer.ViewModels.MetricSeriesViewModel.html">MetricSeriesViewModel</a>, <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.double">double</a>&gt;</dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="ProDiagnostics_Viewer_ViewModels_MetricSeriesGridSchema_MeterName_" data-uid="ProDiagnostics.Viewer.ViewModels.MetricSeriesGridSchema.MeterName*"></a>
+
+  <h3 id="ProDiagnostics_Viewer_ViewModels_MetricSeriesGridSchema_MeterName" data-uid="ProDiagnostics.Viewer.ViewModels.MetricSeriesGridSchema.MeterName">
+  MeterName
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/ProDiagnostics.Viewer/obj/Release/net10.0/ProDataGrid.SourceGenerators/ProDataGrid.SourceGenerators.ProDataGridGenerator/ProDiagnostics_Viewer_ViewModels_MetricSeriesGridSchema_Schema.g.cs/#L176"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static DataGridGeneratedStringField&lt;MetricSeriesViewModel, string&gt; MeterName { get; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="Avalonia.Controls.DataGridGeneratedStringField-2.html">DataGridGeneratedStringField</a>&lt;<a class="xref" href="ProDiagnostics.Viewer.ViewModels.MetricSeriesViewModel.html">MetricSeriesViewModel</a>, <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a>&gt;</dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="ProDiagnostics_Viewer_ViewModels_MetricSeriesGridSchema_MeterNameDistinctValues_" data-uid="ProDiagnostics.Viewer.ViewModels.MetricSeriesGridSchema.MeterNameDistinctValues*"></a>
+
+  <h3 id="ProDiagnostics_Viewer_ViewModels_MetricSeriesGridSchema_MeterNameDistinctValues" data-uid="ProDiagnostics.Viewer.ViewModels.MetricSeriesGridSchema.MeterNameDistinctValues">
+  MeterNameDistinctValues
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/ProDiagnostics.Viewer/obj/Release/net10.0/ProDataGrid.SourceGenerators/ProDataGrid.SourceGenerators.ProDataGridGenerator/ProDiagnostics_Viewer_ViewModels_MetricSeriesGridSchema_Schema.g.cs/#L413"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static DataGridGeneratedDistinctValueProvider&lt;MetricSeriesViewModel, string&gt; MeterNameDistinctValues { get; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="Avalonia.Controls.DataGridGeneratedDistinctValueProvider-2.html">DataGridGeneratedDistinctValueProvider</a>&lt;<a class="xref" href="ProDiagnostics.Viewer.ViewModels.MetricSeriesViewModel.html">MetricSeriesViewModel</a>, <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a>&gt;</dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="ProDiagnostics_Viewer_ViewModels_MetricSeriesGridSchema_MinValue_" data-uid="ProDiagnostics.Viewer.ViewModels.MetricSeriesGridSchema.MinValue*"></a>
+
+  <h3 id="ProDiagnostics_Viewer_ViewModels_MetricSeriesGridSchema_MinValue" data-uid="ProDiagnostics.Viewer.ViewModels.MetricSeriesGridSchema.MinValue">
+  MinValue
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/ProDiagnostics.Viewer/obj/Release/net10.0/ProDataGrid.SourceGenerators/ProDataGrid.SourceGenerators.ProDataGridGenerator/ProDiagnostics_Viewer_ViewModels_MetricSeriesGridSchema_Schema.g.cs/#L244"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static DataGridGeneratedComparableField&lt;MetricSeriesViewModel, double&gt; MinValue { get; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="Avalonia.Controls.DataGridGeneratedComparableField-2.html">DataGridGeneratedComparableField</a>&lt;<a class="xref" href="ProDiagnostics.Viewer.ViewModels.MetricSeriesViewModel.html">MetricSeriesViewModel</a>, <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.double">double</a>&gt;</dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="ProDiagnostics_Viewer_ViewModels_MetricSeriesGridSchema_MinValueDistinctValues_" data-uid="ProDiagnostics.Viewer.ViewModels.MetricSeriesGridSchema.MinValueDistinctValues*"></a>
+
+  <h3 id="ProDiagnostics_Viewer_ViewModels_MetricSeriesGridSchema_MinValueDistinctValues" data-uid="ProDiagnostics.Viewer.ViewModels.MetricSeriesGridSchema.MinValueDistinctValues">
+  MinValueDistinctValues
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/ProDiagnostics.Viewer/obj/Release/net10.0/ProDataGrid.SourceGenerators/ProDataGrid.SourceGenerators.ProDataGridGenerator/ProDiagnostics_Viewer_ViewModels_MetricSeriesGridSchema_Schema.g.cs/#L441"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static DataGridGeneratedDistinctValueProvider&lt;MetricSeriesViewModel, double&gt; MinValueDistinctValues { get; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="Avalonia.Controls.DataGridGeneratedDistinctValueProvider-2.html">DataGridGeneratedDistinctValueProvider</a>&lt;<a class="xref" href="ProDiagnostics.Viewer.ViewModels.MetricSeriesViewModel.html">MetricSeriesViewModel</a>, <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.double">double</a>&gt;</dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="ProDiagnostics_Viewer_ViewModels_MetricSeriesGridSchema_OperationPresets_" data-uid="ProDiagnostics.Viewer.ViewModels.MetricSeriesGridSchema.OperationPresets*"></a>
+
+  <h3 id="ProDiagnostics_Viewer_ViewModels_MetricSeriesGridSchema_OperationPresets" data-uid="ProDiagnostics.Viewer.ViewModels.MetricSeriesGridSchema.OperationPresets">
+  OperationPresets
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/ProDiagnostics.Viewer/obj/Release/net10.0/ProDataGrid.SourceGenerators/ProDataGrid.SourceGenerators.ProDataGridGenerator/ProDiagnostics_Viewer_ViewModels_MetricSeriesGridSchema_Schema.g.cs/#L372"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static IReadOnlyList&lt;DataGridGeneratedOperationPreset&gt; OperationPresets { get; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.ireadonlylist-1">IReadOnlyList</a>&lt;<a class="xref" href="Avalonia.Controls.DataGridGeneratedOperationPreset.html">DataGridGeneratedOperationPreset</a>&gt;</dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="ProDiagnostics_Viewer_ViewModels_MetricSeriesGridSchema_SampleCount_" data-uid="ProDiagnostics.Viewer.ViewModels.MetricSeriesGridSchema.SampleCount*"></a>
+
+  <h3 id="ProDiagnostics_Viewer_ViewModels_MetricSeriesGridSchema_SampleCount" data-uid="ProDiagnostics.Viewer.ViewModels.MetricSeriesGridSchema.SampleCount">
+  SampleCount
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/ProDiagnostics.Viewer/obj/Release/net10.0/ProDataGrid.SourceGenerators/ProDataGrid.SourceGenerators.ProDataGridGenerator/ProDiagnostics_Viewer_ViewModels_MetricSeriesGridSchema_Schema.g.cs/#L278"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static DataGridGeneratedComparableField&lt;MetricSeriesViewModel, int&gt; SampleCount { get; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="Avalonia.Controls.DataGridGeneratedComparableField-2.html">DataGridGeneratedComparableField</a>&lt;<a class="xref" href="ProDiagnostics.Viewer.ViewModels.MetricSeriesViewModel.html">MetricSeriesViewModel</a>, <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a>&gt;</dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="ProDiagnostics_Viewer_ViewModels_MetricSeriesGridSchema_SampleCountDistinctValues_" data-uid="ProDiagnostics.Viewer.ViewModels.MetricSeriesGridSchema.SampleCountDistinctValues*"></a>
+
+  <h3 id="ProDiagnostics_Viewer_ViewModels_MetricSeriesGridSchema_SampleCountDistinctValues" data-uid="ProDiagnostics.Viewer.ViewModels.MetricSeriesGridSchema.SampleCountDistinctValues">
+  SampleCountDistinctValues
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/ProDiagnostics.Viewer/obj/Release/net10.0/ProDataGrid.SourceGenerators/ProDataGrid.SourceGenerators.ProDataGridGenerator/ProDiagnostics_Viewer_ViewModels_MetricSeriesGridSchema_Schema.g.cs/#L455"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static DataGridGeneratedDistinctValueProvider&lt;MetricSeriesViewModel, int&gt; SampleCountDistinctValues { get; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="Avalonia.Controls.DataGridGeneratedDistinctValueProvider-2.html">DataGridGeneratedDistinctValueProvider</a>&lt;<a class="xref" href="ProDiagnostics.Viewer.ViewModels.MetricSeriesViewModel.html">MetricSeriesViewModel</a>, <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a>&gt;</dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="ProDiagnostics_Viewer_ViewModels_MetricSeriesGridSchema_TagsSummary_" data-uid="ProDiagnostics.Viewer.ViewModels.MetricSeriesGridSchema.TagsSummary*"></a>
+
+  <h3 id="ProDiagnostics_Viewer_ViewModels_MetricSeriesGridSchema_TagsSummary" data-uid="ProDiagnostics.Viewer.ViewModels.MetricSeriesGridSchema.TagsSummary">
+  TagsSummary
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/ProDiagnostics.Viewer/obj/Release/net10.0/ProDataGrid.SourceGenerators/ProDataGrid.SourceGenerators.ProDataGridGenerator/ProDiagnostics_Viewer_ViewModels_MetricSeriesGridSchema_Schema.g.cs/#L312"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static DataGridGeneratedStringField&lt;MetricSeriesViewModel, string&gt; TagsSummary { get; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="Avalonia.Controls.DataGridGeneratedStringField-2.html">DataGridGeneratedStringField</a>&lt;<a class="xref" href="ProDiagnostics.Viewer.ViewModels.MetricSeriesViewModel.html">MetricSeriesViewModel</a>, <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a>&gt;</dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="ProDiagnostics_Viewer_ViewModels_MetricSeriesGridSchema_TagsSummaryDistinctValues_" data-uid="ProDiagnostics.Viewer.ViewModels.MetricSeriesGridSchema.TagsSummaryDistinctValues*"></a>
+
+  <h3 id="ProDiagnostics_Viewer_ViewModels_MetricSeriesGridSchema_TagsSummaryDistinctValues" data-uid="ProDiagnostics.Viewer.ViewModels.MetricSeriesGridSchema.TagsSummaryDistinctValues">
+  TagsSummaryDistinctValues
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/ProDiagnostics.Viewer/obj/Release/net10.0/ProDataGrid.SourceGenerators/ProDataGrid.SourceGenerators.ProDataGridGenerator/ProDiagnostics_Viewer_ViewModels_MetricSeriesGridSchema_Schema.g.cs/#L469"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static DataGridGeneratedDistinctValueProvider&lt;MetricSeriesViewModel, string&gt; TagsSummaryDistinctValues { get; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="Avalonia.Controls.DataGridGeneratedDistinctValueProvider-2.html">DataGridGeneratedDistinctValueProvider</a>&lt;<a class="xref" href="ProDiagnostics.Viewer.ViewModels.MetricSeriesViewModel.html">MetricSeriesViewModel</a>, <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a>&gt;</dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="ProDiagnostics_Viewer_ViewModels_MetricSeriesGridSchema_Trend_" data-uid="ProDiagnostics.Viewer.ViewModels.MetricSeriesGridSchema.Trend*"></a>
+
+  <h3 id="ProDiagnostics_Viewer_ViewModels_MetricSeriesGridSchema_Trend" data-uid="ProDiagnostics.Viewer.ViewModels.MetricSeriesGridSchema.Trend">
+  Trend
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/ProDiagnostics.Viewer/obj/Release/net10.0/ProDataGrid.SourceGenerators/ProDataGrid.SourceGenerators.ProDataGridGenerator/ProDiagnostics_Viewer_ViewModels_MetricSeriesGridSchema_Schema.g.cs/#L295"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static DataGridGeneratedField&lt;MetricSeriesViewModel, MetricSeriesViewModel&gt; Trend { get; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="Avalonia.Controls.DataGridGeneratedField-2.html">DataGridGeneratedField</a>&lt;<a class="xref" href="ProDiagnostics.Viewer.ViewModels.MetricSeriesViewModel.html">MetricSeriesViewModel</a>, <a class="xref" href="ProDiagnostics.Viewer.ViewModels.MetricSeriesViewModel.html">MetricSeriesViewModel</a>&gt;</dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="ProDiagnostics_Viewer_ViewModels_MetricSeriesGridSchema_TrendDistinctValues_" data-uid="ProDiagnostics.Viewer.ViewModels.MetricSeriesGridSchema.TrendDistinctValues*"></a>
+
+  <h3 id="ProDiagnostics_Viewer_ViewModels_MetricSeriesGridSchema_TrendDistinctValues" data-uid="ProDiagnostics.Viewer.ViewModels.MetricSeriesGridSchema.TrendDistinctValues">
+  TrendDistinctValues
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/ProDiagnostics.Viewer/obj/Release/net10.0/ProDataGrid.SourceGenerators/ProDataGrid.SourceGenerators.ProDataGridGenerator/ProDiagnostics_Viewer_ViewModels_MetricSeriesGridSchema_Schema.g.cs/#L462"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static DataGridGeneratedDistinctValueProvider&lt;MetricSeriesViewModel, MetricSeriesViewModel&gt; TrendDistinctValues { get; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="Avalonia.Controls.DataGridGeneratedDistinctValueProvider-2.html">DataGridGeneratedDistinctValueProvider</a>&lt;<a class="xref" href="ProDiagnostics.Viewer.ViewModels.MetricSeriesViewModel.html">MetricSeriesViewModel</a>, <a class="xref" href="ProDiagnostics.Viewer.ViewModels.MetricSeriesViewModel.html">MetricSeriesViewModel</a>&gt;</dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="ProDiagnostics_Viewer_ViewModels_MetricSeriesGridSchema_Unit_" data-uid="ProDiagnostics.Viewer.ViewModels.MetricSeriesGridSchema.Unit*"></a>
+
+  <h3 id="ProDiagnostics_Viewer_ViewModels_MetricSeriesGridSchema_Unit" data-uid="ProDiagnostics.Viewer.ViewModels.MetricSeriesGridSchema.Unit">
+  Unit
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/ProDiagnostics.Viewer/obj/Release/net10.0/ProDataGrid.SourceGenerators/ProDataGrid.SourceGenerators.ProDataGridGenerator/ProDiagnostics_Viewer_ViewModels_MetricSeriesGridSchema_Schema.g.cs/#L193"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static DataGridGeneratedStringField&lt;MetricSeriesViewModel, string&gt; Unit { get; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="Avalonia.Controls.DataGridGeneratedStringField-2.html">DataGridGeneratedStringField</a>&lt;<a class="xref" href="ProDiagnostics.Viewer.ViewModels.MetricSeriesViewModel.html">MetricSeriesViewModel</a>, <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a>&gt;</dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="ProDiagnostics_Viewer_ViewModels_MetricSeriesGridSchema_UnitDistinctValues_" data-uid="ProDiagnostics.Viewer.ViewModels.MetricSeriesGridSchema.UnitDistinctValues*"></a>
+
+  <h3 id="ProDiagnostics_Viewer_ViewModels_MetricSeriesGridSchema_UnitDistinctValues" data-uid="ProDiagnostics.Viewer.ViewModels.MetricSeriesGridSchema.UnitDistinctValues">
+  UnitDistinctValues
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/ProDiagnostics.Viewer/obj/Release/net10.0/ProDataGrid.SourceGenerators/ProDataGrid.SourceGenerators.ProDataGridGenerator/ProDiagnostics_Viewer_ViewModels_MetricSeriesGridSchema_Schema.g.cs/#L420"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static DataGridGeneratedDistinctValueProvider&lt;MetricSeriesViewModel, string&gt; UnitDistinctValues { get; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="Avalonia.Controls.DataGridGeneratedDistinctValueProvider-2.html">DataGridGeneratedDistinctValueProvider</a>&lt;<a class="xref" href="ProDiagnostics.Viewer.ViewModels.MetricSeriesViewModel.html">MetricSeriesViewModel</a>, <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a>&gt;</dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <h2 class="section" id="methods">Methods
+</h2>
+
+
+  <a id="ProDiagnostics_Viewer_ViewModels_MetricSeriesGridSchema_ApplyCollectionViewSorting_" data-uid="ProDiagnostics.Viewer.ViewModels.MetricSeriesGridSchema.ApplyCollectionViewSorting*"></a>
+
+  <h3 id="ProDiagnostics_Viewer_ViewModels_MetricSeriesGridSchema_ApplyCollectionViewSorting_Avalonia_Collections_DataGridCollectionView_System_Collections_Generic_IReadOnlyList_Avalonia_Controls_DataGridSorting_SortingDescriptor__" data-uid="ProDiagnostics.Viewer.ViewModels.MetricSeriesGridSchema.ApplyCollectionViewSorting(Avalonia.Collections.DataGridCollectionView,System.Collections.Generic.IReadOnlyList{Avalonia.Controls.DataGridSorting.SortingDescriptor})">
+  ApplyCollectionViewSorting(DataGridCollectionView, IReadOnlyList&lt;SortingDescriptor&gt;)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/ProDiagnostics.Viewer/obj/Release/net10.0/ProDataGrid.SourceGenerators/ProDataGrid.SourceGenerators.ProDataGridGenerator/ProDiagnostics_Viewer_ViewModels_MetricSeriesGridSchema_Schema.g.cs/#L526"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static void ApplyCollectionViewSorting(DataGridCollectionView view, IReadOnlyList&lt;SortingDescriptor&gt; descriptors)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>view</code> <a class="xref" href="Avalonia.Collections.DataGridCollectionView.html">DataGridCollectionView</a></dt>
+    <dd></dd>
+    <dt><code>descriptors</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.ireadonlylist-1">IReadOnlyList</a>&lt;<a class="xref" href="Avalonia.Controls.DataGridSorting.SortingDescriptor.html">SortingDescriptor</a>&gt;</dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+
+  <a id="ProDiagnostics_Viewer_ViewModels_MetricSeriesGridSchema_CreateAverageRemoteDistinctValues_" data-uid="ProDiagnostics.Viewer.ViewModels.MetricSeriesGridSchema.CreateAverageRemoteDistinctValues*"></a>
+
+  <h3 id="ProDiagnostics_Viewer_ViewModels_MetricSeriesGridSchema_CreateAverageRemoteDistinctValues_Avalonia_Controls_IDataGridGeneratedRemoteDistinctValueProvider_System_Double__" data-uid="ProDiagnostics.Viewer.ViewModels.MetricSeriesGridSchema.CreateAverageRemoteDistinctValues(Avalonia.Controls.IDataGridGeneratedRemoteDistinctValueProvider{System.Double})">
+  CreateAverageRemoteDistinctValues(IDataGridGeneratedRemoteDistinctValueProvider&lt;double&gt;)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/ProDiagnostics.Viewer/obj/Release/net10.0/ProDataGrid.SourceGenerators/ProDataGrid.SourceGenerators.ProDataGridGenerator/ProDiagnostics_Viewer_ViewModels_MetricSeriesGridSchema_Schema.g.cs/#L437"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static DataGridGeneratedRemoteDistinctValueController&lt;double&gt; CreateAverageRemoteDistinctValues(IDataGridGeneratedRemoteDistinctValueProvider&lt;double&gt; provider)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>provider</code> <a class="xref" href="Avalonia.Controls.IDataGridGeneratedRemoteDistinctValueProvider-1.html">IDataGridGeneratedRemoteDistinctValueProvider</a>&lt;<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.double">double</a>&gt;</dt>
+    <dd></dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="Avalonia.Controls.DataGridGeneratedRemoteDistinctValueController-1.html">DataGridGeneratedRemoteDistinctValueController</a>&lt;<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.double">double</a>&gt;</dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="ProDiagnostics_Viewer_ViewModels_MetricSeriesGridSchema_CreateCollectionMutationService_" data-uid="ProDiagnostics.Viewer.ViewModels.MetricSeriesGridSchema.CreateCollectionMutationService*"></a>
+
+  <h3 id="ProDiagnostics_Viewer_ViewModels_MetricSeriesGridSchema_CreateCollectionMutationService_Avalonia_Controls_IDataGridGeneratedCollectionMutationHandler_ProDiagnostics_Viewer_ViewModels_MetricSeriesViewModel__System_Int32_" data-uid="ProDiagnostics.Viewer.ViewModels.MetricSeriesGridSchema.CreateCollectionMutationService(Avalonia.Controls.IDataGridGeneratedCollectionMutationHandler{ProDiagnostics.Viewer.ViewModels.MetricSeriesViewModel},System.Int32)">
+  CreateCollectionMutationService(IDataGridGeneratedCollectionMutationHandler&lt;MetricSeriesViewModel&gt;, int)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/ProDiagnostics.Viewer/obj/Release/net10.0/ProDataGrid.SourceGenerators/ProDataGrid.SourceGenerators.ProDataGridGenerator/ProDiagnostics_Viewer_ViewModels_MetricSeriesGridSchema_Schema.g.cs/#L531"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static DataGridGeneratedCollectionMutationService&lt;MetricSeriesViewModel&gt; CreateCollectionMutationService(IDataGridGeneratedCollectionMutationHandler&lt;MetricSeriesViewModel&gt; handler, int maximumItemsPerMutation = 65536)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>handler</code> <a class="xref" href="Avalonia.Controls.IDataGridGeneratedCollectionMutationHandler-1.html">IDataGridGeneratedCollectionMutationHandler</a>&lt;<a class="xref" href="ProDiagnostics.Viewer.ViewModels.MetricSeriesViewModel.html">MetricSeriesViewModel</a>&gt;</dt>
+    <dd></dd>
+    <dt><code>maximumItemsPerMutation</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a></dt>
+    <dd></dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="Avalonia.Controls.DataGridGeneratedCollectionMutationService-1.html">DataGridGeneratedCollectionMutationService</a>&lt;<a class="xref" href="ProDiagnostics.Viewer.ViewModels.MetricSeriesViewModel.html">MetricSeriesViewModel</a>&gt;</dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="ProDiagnostics_Viewer_ViewModels_MetricSeriesGridSchema_CreateCollectionView_" data-uid="ProDiagnostics.Viewer.ViewModels.MetricSeriesGridSchema.CreateCollectionView*"></a>
+
+  <h3 id="ProDiagnostics_Viewer_ViewModels_MetricSeriesGridSchema_CreateCollectionView_System_Collections_Generic_IEnumerable_ProDiagnostics_Viewer_ViewModels_MetricSeriesViewModel__System_Int32_System_Boolean_System_Boolean_System_Int32_Avalonia_Controls_DataGridGeneratedInitialCurrency_" data-uid="ProDiagnostics.Viewer.ViewModels.MetricSeriesGridSchema.CreateCollectionView(System.Collections.Generic.IEnumerable{ProDiagnostics.Viewer.ViewModels.MetricSeriesViewModel},System.Int32,System.Boolean,System.Boolean,System.Int32,Avalonia.Controls.DataGridGeneratedInitialCurrency)">
+  CreateCollectionView(IEnumerable&lt;MetricSeriesViewModel&gt;, int, bool, bool, int, DataGridGeneratedInitialCurrency)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/ProDiagnostics.Viewer/obj/Release/net10.0/ProDataGrid.SourceGenerators/ProDataGrid.SourceGenerators.ProDataGridGenerator/ProDiagnostics_Viewer_ViewModels_MetricSeriesGridSchema_Schema.g.cs/#L483"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">[UnconditionalSuppressMessage(&quot;Trimming&quot;, &quot;IL2026&quot;, Justification = &quot;Generated collection views install typed group and sort descriptions and do not invoke the TypeDescriptor compatibility endpoint.&quot;)]
+public static DataGridCollectionView CreateCollectionView(IEnumerable&lt;MetricSeriesViewModel&gt; source, int pageSize = 0, bool sourceIsSorted = false, bool sourceIsInGroupOrder = false, int initialPageIndex = 0, DataGridGeneratedInitialCurrency initialCurrency = DataGridGeneratedInitialCurrency.Unchanged)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>source</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.ienumerable-1">IEnumerable</a>&lt;<a class="xref" href="ProDiagnostics.Viewer.ViewModels.MetricSeriesViewModel.html">MetricSeriesViewModel</a>&gt;</dt>
+    <dd></dd>
+    <dt><code>pageSize</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a></dt>
+    <dd></dd>
+    <dt><code>sourceIsSorted</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></dt>
+    <dd></dd>
+    <dt><code>sourceIsInGroupOrder</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></dt>
+    <dd></dd>
+    <dt><code>initialPageIndex</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a></dt>
+    <dd></dd>
+    <dt><code>initialCurrency</code> <a class="xref" href="Avalonia.Controls.DataGridGeneratedInitialCurrency.html">DataGridGeneratedInitialCurrency</a></dt>
+    <dd></dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="Avalonia.Collections.DataGridCollectionView.html">DataGridCollectionView</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="ProDiagnostics_Viewer_ViewModels_MetricSeriesGridSchema_CreateColumnDefinitions_" data-uid="ProDiagnostics.Viewer.ViewModels.MetricSeriesGridSchema.CreateColumnDefinitions*"></a>
+
+  <h3 id="ProDiagnostics_Viewer_ViewModels_MetricSeriesGridSchema_CreateColumnDefinitions" data-uid="ProDiagnostics.Viewer.ViewModels.MetricSeriesGridSchema.CreateColumnDefinitions">
+  CreateColumnDefinitions()
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/ProDiagnostics.Viewer/obj/Release/net10.0/ProDataGrid.SourceGenerators/ProDataGrid.SourceGenerators.ProDataGridGenerator/ProDiagnostics_Viewer_ViewModels_MetricSeriesGridSchema_Schema.g.cs/#L676"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Creates a mutable set of column definitions for a grid instance.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public DataGridColumnDefinitionList CreateColumnDefinitions()</code></pre>
+  </div>
+
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="Avalonia.Controls.DataGridColumnDefinitionList.html">DataGridColumnDefinitionList</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="ProDiagnostics_Viewer_ViewModels_MetricSeriesGridSchema_CreateColumnLayoutController_" data-uid="ProDiagnostics.Viewer.ViewModels.MetricSeriesGridSchema.CreateColumnLayoutController*"></a>
+
+  <h3 id="ProDiagnostics_Viewer_ViewModels_MetricSeriesGridSchema_CreateColumnLayoutController" data-uid="ProDiagnostics.Viewer.ViewModels.MetricSeriesGridSchema.CreateColumnLayoutController">
+  CreateColumnLayoutController()
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/ProDiagnostics.Viewer/obj/Release/net10.0/ProDataGrid.SourceGenerators/ProDataGrid.SourceGenerators.ProDataGridGenerator/ProDiagnostics_Viewer_ViewModels_MetricSeriesGridSchema_Schema.g.cs/#L637"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static DataGridGeneratedColumnLayoutController CreateColumnLayoutController()</code></pre>
+  </div>
+
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="Avalonia.Controls.DataGridGeneratedColumnLayoutController.html">DataGridGeneratedColumnLayoutController</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="ProDiagnostics_Viewer_ViewModels_MetricSeriesGridSchema_CreateConditionalFormattingModel_" data-uid="ProDiagnostics.Viewer.ViewModels.MetricSeriesGridSchema.CreateConditionalFormattingModel*"></a>
+
+  <h3 id="ProDiagnostics_Viewer_ViewModels_MetricSeriesGridSchema_CreateConditionalFormattingModel" data-uid="ProDiagnostics.Viewer.ViewModels.MetricSeriesGridSchema.CreateConditionalFormattingModel">
+  CreateConditionalFormattingModel()
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/ProDiagnostics.Viewer/obj/Release/net10.0/ProDataGrid.SourceGenerators/ProDataGrid.SourceGenerators.ProDataGridGenerator/ProDiagnostics_Viewer_ViewModels_MetricSeriesGridSchema_Schema.g.cs/#L552"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static IConditionalFormattingModel CreateConditionalFormattingModel()</code></pre>
+  </div>
+
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="Avalonia.Controls.DataGridConditionalFormatting.IConditionalFormattingModel.html">IConditionalFormattingModel</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="ProDiagnostics_Viewer_ViewModels_MetricSeriesGridSchema_CreateController_" data-uid="ProDiagnostics.Viewer.ViewModels.MetricSeriesGridSchema.CreateController*"></a>
+
+  <h3 id="ProDiagnostics_Viewer_ViewModels_MetricSeriesGridSchema_CreateController_Avalonia_Controls_DataGridOperationExecution_" data-uid="ProDiagnostics.Viewer.ViewModels.MetricSeriesGridSchema.CreateController(Avalonia.Controls.DataGridOperationExecution)">
+  CreateController(DataGridOperationExecution)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/ProDiagnostics.Viewer/obj/Release/net10.0/ProDataGrid.SourceGenerators/ProDataGrid.SourceGenerators.ProDataGridGenerator/ProDiagnostics_Viewer_ViewModels_MetricSeriesGridSchema_Schema.g.cs/#L649"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static DataGridGeneratedOperationController&lt;MetricSeriesViewModel&gt; CreateController(DataGridOperationExecution execution = DataGridOperationExecution.View)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>execution</code> <a class="xref" href="Avalonia.Controls.DataGridOperationExecution.html">DataGridOperationExecution</a></dt>
+    <dd></dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="Avalonia.Controls.DataGridGeneratedOperationController-1.html">DataGridGeneratedOperationController</a>&lt;<a class="xref" href="ProDiagnostics.Viewer.ViewModels.MetricSeriesViewModel.html">MetricSeriesViewModel</a>&gt;</dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="ProDiagnostics_Viewer_ViewModels_MetricSeriesGridSchema_CreateController_" data-uid="ProDiagnostics.Viewer.ViewModels.MetricSeriesGridSchema.CreateController*"></a>
+
+  <h3 id="ProDiagnostics_Viewer_ViewModels_MetricSeriesGridSchema_CreateController_Avalonia_Controls_DataGridOperationExecution_Avalonia_Controls_DataGridGeneratedFeatures_" data-uid="ProDiagnostics.Viewer.ViewModels.MetricSeriesGridSchema.CreateController(Avalonia.Controls.DataGridOperationExecution,Avalonia.Controls.DataGridGeneratedFeatures)">
+  CreateController(DataGridOperationExecution, DataGridGeneratedFeatures)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/ProDiagnostics.Viewer/obj/Release/net10.0/ProDataGrid.SourceGenerators/ProDataGrid.SourceGenerators.ProDataGridGenerator/ProDiagnostics_Viewer_ViewModels_MetricSeriesGridSchema_Schema.g.cs/#L652"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static DataGridGeneratedOperationController&lt;MetricSeriesViewModel&gt; CreateController(DataGridOperationExecution execution, DataGridGeneratedFeatures features)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>execution</code> <a class="xref" href="Avalonia.Controls.DataGridOperationExecution.html">DataGridOperationExecution</a></dt>
+    <dd></dd>
+    <dt><code>features</code> <a class="xref" href="Avalonia.Controls.DataGridGeneratedFeatures.html">DataGridGeneratedFeatures</a></dt>
+    <dd></dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="Avalonia.Controls.DataGridGeneratedOperationController-1.html">DataGridGeneratedOperationController</a>&lt;<a class="xref" href="ProDiagnostics.Viewer.ViewModels.MetricSeriesViewModel.html">MetricSeriesViewModel</a>&gt;</dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="ProDiagnostics_Viewer_ViewModels_MetricSeriesGridSchema_CreateDescriptionRemoteDistinctValues_" data-uid="ProDiagnostics.Viewer.ViewModels.MetricSeriesGridSchema.CreateDescriptionRemoteDistinctValues*"></a>
+
+  <h3 id="ProDiagnostics_Viewer_ViewModels_MetricSeriesGridSchema_CreateDescriptionRemoteDistinctValues_Avalonia_Controls_IDataGridGeneratedRemoteDistinctValueProvider_System_String__" data-uid="ProDiagnostics.Viewer.ViewModels.MetricSeriesGridSchema.CreateDescriptionRemoteDistinctValues(Avalonia.Controls.IDataGridGeneratedRemoteDistinctValueProvider{System.String})">
+  CreateDescriptionRemoteDistinctValues(IDataGridGeneratedRemoteDistinctValueProvider&lt;string&gt;)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/ProDiagnostics.Viewer/obj/Release/net10.0/ProDataGrid.SourceGenerators/ProDataGrid.SourceGenerators.ProDataGridGenerator/ProDiagnostics_Viewer_ViewModels_MetricSeriesGridSchema_Schema.g.cs/#L409"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static DataGridGeneratedRemoteDistinctValueController&lt;string&gt; CreateDescriptionRemoteDistinctValues(IDataGridGeneratedRemoteDistinctValueProvider&lt;string&gt; provider)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>provider</code> <a class="xref" href="Avalonia.Controls.IDataGridGeneratedRemoteDistinctValueProvider-1.html">IDataGridGeneratedRemoteDistinctValueProvider</a>&lt;<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a>&gt;</dt>
+    <dd></dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="Avalonia.Controls.DataGridGeneratedRemoteDistinctValueController-1.html">DataGridGeneratedRemoteDistinctValueController</a>&lt;<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a>&gt;</dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="ProDiagnostics_Viewer_ViewModels_MetricSeriesGridSchema_CreateDisplayNameRemoteDistinctValues_" data-uid="ProDiagnostics.Viewer.ViewModels.MetricSeriesGridSchema.CreateDisplayNameRemoteDistinctValues*"></a>
+
+  <h3 id="ProDiagnostics_Viewer_ViewModels_MetricSeriesGridSchema_CreateDisplayNameRemoteDistinctValues_Avalonia_Controls_IDataGridGeneratedRemoteDistinctValueProvider_System_String__" data-uid="ProDiagnostics.Viewer.ViewModels.MetricSeriesGridSchema.CreateDisplayNameRemoteDistinctValues(Avalonia.Controls.IDataGridGeneratedRemoteDistinctValueProvider{System.String})">
+  CreateDisplayNameRemoteDistinctValues(IDataGridGeneratedRemoteDistinctValueProvider&lt;string&gt;)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/ProDiagnostics.Viewer/obj/Release/net10.0/ProDataGrid.SourceGenerators/ProDataGrid.SourceGenerators.ProDataGridGenerator/ProDiagnostics_Viewer_ViewModels_MetricSeriesGridSchema_Schema.g.cs/#L402"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static DataGridGeneratedRemoteDistinctValueController&lt;string&gt; CreateDisplayNameRemoteDistinctValues(IDataGridGeneratedRemoteDistinctValueProvider&lt;string&gt; provider)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>provider</code> <a class="xref" href="Avalonia.Controls.IDataGridGeneratedRemoteDistinctValueProvider-1.html">IDataGridGeneratedRemoteDistinctValueProvider</a>&lt;<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a>&gt;</dt>
+    <dd></dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="Avalonia.Controls.DataGridGeneratedRemoteDistinctValueController-1.html">DataGridGeneratedRemoteDistinctValueController</a>&lt;<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a>&gt;</dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="ProDiagnostics_Viewer_ViewModels_MetricSeriesGridSchema_CreateFastPathOptions_" data-uid="ProDiagnostics.Viewer.ViewModels.MetricSeriesGridSchema.CreateFastPathOptions*"></a>
+
+  <h3 id="ProDiagnostics_Viewer_ViewModels_MetricSeriesGridSchema_CreateFastPathOptions" data-uid="ProDiagnostics.Viewer.ViewModels.MetricSeriesGridSchema.CreateFastPathOptions">
+  CreateFastPathOptions()
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/ProDiagnostics.Viewer/obj/Release/net10.0/ProDataGrid.SourceGenerators/ProDataGrid.SourceGenerators.ProDataGridGenerator/ProDiagnostics_Viewer_ViewModels_MetricSeriesGridSchema_Schema.g.cs/#L904"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Creates fast-path options appropriate for the generated schema.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public DataGridFastPathOptions CreateFastPathOptions()</code></pre>
+  </div>
+
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="Avalonia.Controls.DataGridFastPathOptions.html">DataGridFastPathOptions</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="ProDiagnostics_Viewer_ViewModels_MetricSeriesGridSchema_CreateFilterPredicate_" data-uid="ProDiagnostics.Viewer.ViewModels.MetricSeriesGridSchema.CreateFilterPredicate*"></a>
+
+  <h3 id="ProDiagnostics_Viewer_ViewModels_MetricSeriesGridSchema_CreateFilterPredicate_System_Collections_Generic_IReadOnlyList_Avalonia_Controls_DataGridFiltering_FilteringDescriptor__" data-uid="ProDiagnostics.Viewer.ViewModels.MetricSeriesGridSchema.CreateFilterPredicate(System.Collections.Generic.IReadOnlyList{Avalonia.Controls.DataGridFiltering.FilteringDescriptor})">
+  CreateFilterPredicate(IReadOnlyList&lt;FilteringDescriptor&gt;)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/ProDiagnostics.Viewer/obj/Release/net10.0/ProDataGrid.SourceGenerators/ProDataGrid.SourceGenerators.ProDataGridGenerator/ProDiagnostics_Viewer_ViewModels_MetricSeriesGridSchema_Schema.g.cs/#L898"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Compiles model descriptors into a reflection-free item predicate.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public Func&lt;MetricSeriesViewModel, bool&gt; CreateFilterPredicate(IReadOnlyList&lt;FilteringDescriptor&gt; descriptors)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>descriptors</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.ireadonlylist-1">IReadOnlyList</a>&lt;<a class="xref" href="Avalonia.Controls.DataGridFiltering.FilteringDescriptor.html">FilteringDescriptor</a>&gt;</dt>
+    <dd></dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.func-2">Func</a>&lt;<a class="xref" href="ProDiagnostics.Viewer.ViewModels.MetricSeriesViewModel.html">MetricSeriesViewModel</a>, <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a>&gt;</dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="ProDiagnostics_Viewer_ViewModels_MetricSeriesGridSchema_CreateHeaderCommandController_" data-uid="ProDiagnostics.Viewer.ViewModels.MetricSeriesGridSchema.CreateHeaderCommandController*"></a>
+
+  <h3 id="ProDiagnostics_Viewer_ViewModels_MetricSeriesGridSchema_CreateHeaderCommandController_Avalonia_Controls_DataGridGeneratedOperationController_ProDiagnostics_Viewer_ViewModels_MetricSeriesViewModel__Avalonia_Controls_DataGridGeneratedColumnLayoutController_Avalonia_Controls_IDataGridGeneratedHeaderInteraction_" data-uid="ProDiagnostics.Viewer.ViewModels.MetricSeriesGridSchema.CreateHeaderCommandController(Avalonia.Controls.DataGridGeneratedOperationController{ProDiagnostics.Viewer.ViewModels.MetricSeriesViewModel},Avalonia.Controls.DataGridGeneratedColumnLayoutController,Avalonia.Controls.IDataGridGeneratedHeaderInteraction)">
+  CreateHeaderCommandController(DataGridGeneratedOperationController&lt;MetricSeriesViewModel&gt;, DataGridGeneratedColumnLayoutController, IDataGridGeneratedHeaderInteraction?)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/ProDiagnostics.Viewer/obj/Release/net10.0/ProDataGrid.SourceGenerators/ProDataGrid.SourceGenerators.ProDataGridGenerator/ProDiagnostics_Viewer_ViewModels_MetricSeriesGridSchema_Schema.g.cs/#L640"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static DataGridGeneratedHeaderCommandController&lt;MetricSeriesViewModel&gt; CreateHeaderCommandController(DataGridGeneratedOperationController&lt;MetricSeriesViewModel&gt; operations, DataGridGeneratedColumnLayoutController layout, IDataGridGeneratedHeaderInteraction? interaction = null)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>operations</code> <a class="xref" href="Avalonia.Controls.DataGridGeneratedOperationController-1.html">DataGridGeneratedOperationController</a>&lt;<a class="xref" href="ProDiagnostics.Viewer.ViewModels.MetricSeriesViewModel.html">MetricSeriesViewModel</a>&gt;</dt>
+    <dd></dd>
+    <dt><code>layout</code> <a class="xref" href="Avalonia.Controls.DataGridGeneratedColumnLayoutController.html">DataGridGeneratedColumnLayoutController</a></dt>
+    <dd></dd>
+    <dt><code>interaction</code> <a class="xref" href="Avalonia.Controls.IDataGridGeneratedHeaderInteraction.html">IDataGridGeneratedHeaderInteraction</a></dt>
+    <dd></dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="Avalonia.Controls.DataGridGeneratedHeaderCommandController-1.html">DataGridGeneratedHeaderCommandController</a>&lt;<a class="xref" href="ProDiagnostics.Viewer.ViewModels.MetricSeriesViewModel.html">MetricSeriesViewModel</a>&gt;</dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="ProDiagnostics_Viewer_ViewModels_MetricSeriesGridSchema_CreateLastValueRemoteDistinctValues_" data-uid="ProDiagnostics.Viewer.ViewModels.MetricSeriesGridSchema.CreateLastValueRemoteDistinctValues*"></a>
+
+  <h3 id="ProDiagnostics_Viewer_ViewModels_MetricSeriesGridSchema_CreateLastValueRemoteDistinctValues_Avalonia_Controls_IDataGridGeneratedRemoteDistinctValueProvider_System_Double__" data-uid="ProDiagnostics.Viewer.ViewModels.MetricSeriesGridSchema.CreateLastValueRemoteDistinctValues(Avalonia.Controls.IDataGridGeneratedRemoteDistinctValueProvider{System.Double})">
+  CreateLastValueRemoteDistinctValues(IDataGridGeneratedRemoteDistinctValueProvider&lt;double&gt;)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/ProDiagnostics.Viewer/obj/Release/net10.0/ProDataGrid.SourceGenerators/ProDataGrid.SourceGenerators.ProDataGridGenerator/ProDiagnostics_Viewer_ViewModels_MetricSeriesGridSchema_Schema.g.cs/#L430"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static DataGridGeneratedRemoteDistinctValueController&lt;double&gt; CreateLastValueRemoteDistinctValues(IDataGridGeneratedRemoteDistinctValueProvider&lt;double&gt; provider)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>provider</code> <a class="xref" href="Avalonia.Controls.IDataGridGeneratedRemoteDistinctValueProvider-1.html">IDataGridGeneratedRemoteDistinctValueProvider</a>&lt;<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.double">double</a>&gt;</dt>
+    <dd></dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="Avalonia.Controls.DataGridGeneratedRemoteDistinctValueController-1.html">DataGridGeneratedRemoteDistinctValueController</a>&lt;<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.double">double</a>&gt;</dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="ProDiagnostics_Viewer_ViewModels_MetricSeriesGridSchema_CreateMaxValueRemoteDistinctValues_" data-uid="ProDiagnostics.Viewer.ViewModels.MetricSeriesGridSchema.CreateMaxValueRemoteDistinctValues*"></a>
+
+  <h3 id="ProDiagnostics_Viewer_ViewModels_MetricSeriesGridSchema_CreateMaxValueRemoteDistinctValues_Avalonia_Controls_IDataGridGeneratedRemoteDistinctValueProvider_System_Double__" data-uid="ProDiagnostics.Viewer.ViewModels.MetricSeriesGridSchema.CreateMaxValueRemoteDistinctValues(Avalonia.Controls.IDataGridGeneratedRemoteDistinctValueProvider{System.Double})">
+  CreateMaxValueRemoteDistinctValues(IDataGridGeneratedRemoteDistinctValueProvider&lt;double&gt;)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/ProDiagnostics.Viewer/obj/Release/net10.0/ProDataGrid.SourceGenerators/ProDataGrid.SourceGenerators.ProDataGridGenerator/ProDiagnostics_Viewer_ViewModels_MetricSeriesGridSchema_Schema.g.cs/#L451"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static DataGridGeneratedRemoteDistinctValueController&lt;double&gt; CreateMaxValueRemoteDistinctValues(IDataGridGeneratedRemoteDistinctValueProvider&lt;double&gt; provider)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>provider</code> <a class="xref" href="Avalonia.Controls.IDataGridGeneratedRemoteDistinctValueProvider-1.html">IDataGridGeneratedRemoteDistinctValueProvider</a>&lt;<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.double">double</a>&gt;</dt>
+    <dd></dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="Avalonia.Controls.DataGridGeneratedRemoteDistinctValueController-1.html">DataGridGeneratedRemoteDistinctValueController</a>&lt;<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.double">double</a>&gt;</dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="ProDiagnostics_Viewer_ViewModels_MetricSeriesGridSchema_CreateMeterNameRemoteDistinctValues_" data-uid="ProDiagnostics.Viewer.ViewModels.MetricSeriesGridSchema.CreateMeterNameRemoteDistinctValues*"></a>
+
+  <h3 id="ProDiagnostics_Viewer_ViewModels_MetricSeriesGridSchema_CreateMeterNameRemoteDistinctValues_Avalonia_Controls_IDataGridGeneratedRemoteDistinctValueProvider_System_String__" data-uid="ProDiagnostics.Viewer.ViewModels.MetricSeriesGridSchema.CreateMeterNameRemoteDistinctValues(Avalonia.Controls.IDataGridGeneratedRemoteDistinctValueProvider{System.String})">
+  CreateMeterNameRemoteDistinctValues(IDataGridGeneratedRemoteDistinctValueProvider&lt;string&gt;)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/ProDiagnostics.Viewer/obj/Release/net10.0/ProDataGrid.SourceGenerators/ProDataGrid.SourceGenerators.ProDataGridGenerator/ProDiagnostics_Viewer_ViewModels_MetricSeriesGridSchema_Schema.g.cs/#L416"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static DataGridGeneratedRemoteDistinctValueController&lt;string&gt; CreateMeterNameRemoteDistinctValues(IDataGridGeneratedRemoteDistinctValueProvider&lt;string&gt; provider)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>provider</code> <a class="xref" href="Avalonia.Controls.IDataGridGeneratedRemoteDistinctValueProvider-1.html">IDataGridGeneratedRemoteDistinctValueProvider</a>&lt;<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a>&gt;</dt>
+    <dd></dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="Avalonia.Controls.DataGridGeneratedRemoteDistinctValueController-1.html">DataGridGeneratedRemoteDistinctValueController</a>&lt;<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a>&gt;</dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="ProDiagnostics_Viewer_ViewModels_MetricSeriesGridSchema_CreateMinValueRemoteDistinctValues_" data-uid="ProDiagnostics.Viewer.ViewModels.MetricSeriesGridSchema.CreateMinValueRemoteDistinctValues*"></a>
+
+  <h3 id="ProDiagnostics_Viewer_ViewModels_MetricSeriesGridSchema_CreateMinValueRemoteDistinctValues_Avalonia_Controls_IDataGridGeneratedRemoteDistinctValueProvider_System_Double__" data-uid="ProDiagnostics.Viewer.ViewModels.MetricSeriesGridSchema.CreateMinValueRemoteDistinctValues(Avalonia.Controls.IDataGridGeneratedRemoteDistinctValueProvider{System.Double})">
+  CreateMinValueRemoteDistinctValues(IDataGridGeneratedRemoteDistinctValueProvider&lt;double&gt;)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/ProDiagnostics.Viewer/obj/Release/net10.0/ProDataGrid.SourceGenerators/ProDataGrid.SourceGenerators.ProDataGridGenerator/ProDiagnostics_Viewer_ViewModels_MetricSeriesGridSchema_Schema.g.cs/#L444"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static DataGridGeneratedRemoteDistinctValueController&lt;double&gt; CreateMinValueRemoteDistinctValues(IDataGridGeneratedRemoteDistinctValueProvider&lt;double&gt; provider)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>provider</code> <a class="xref" href="Avalonia.Controls.IDataGridGeneratedRemoteDistinctValueProvider-1.html">IDataGridGeneratedRemoteDistinctValueProvider</a>&lt;<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.double">double</a>&gt;</dt>
+    <dd></dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="Avalonia.Controls.DataGridGeneratedRemoteDistinctValueController-1.html">DataGridGeneratedRemoteDistinctValueController</a>&lt;<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.double">double</a>&gt;</dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="ProDiagnostics_Viewer_ViewModels_MetricSeriesGridSchema_CreateNewRowService_" data-uid="ProDiagnostics.Viewer.ViewModels.MetricSeriesGridSchema.CreateNewRowService*"></a>
+
+  <h3 id="ProDiagnostics_Viewer_ViewModels_MetricSeriesGridSchema_CreateNewRowService_Avalonia_Controls_IDataGridGeneratedNewRowFactory_ProDiagnostics_Viewer_ViewModels_MetricSeriesViewModel__" data-uid="ProDiagnostics.Viewer.ViewModels.MetricSeriesGridSchema.CreateNewRowService(Avalonia.Controls.IDataGridGeneratedNewRowFactory{ProDiagnostics.Viewer.ViewModels.MetricSeriesViewModel})">
+  CreateNewRowService(IDataGridGeneratedNewRowFactory&lt;MetricSeriesViewModel&gt;)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/ProDiagnostics.Viewer/obj/Release/net10.0/ProDataGrid.SourceGenerators/ProDataGrid.SourceGenerators.ProDataGridGenerator/ProDiagnostics_Viewer_ViewModels_MetricSeriesGridSchema_Schema.g.cs/#L536"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static DataGridGeneratedNewRowService&lt;MetricSeriesViewModel&gt; CreateNewRowService(IDataGridGeneratedNewRowFactory&lt;MetricSeriesViewModel&gt; factory)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>factory</code> <a class="xref" href="Avalonia.Controls.IDataGridGeneratedNewRowFactory-1.html">IDataGridGeneratedNewRowFactory</a>&lt;<a class="xref" href="ProDiagnostics.Viewer.ViewModels.MetricSeriesViewModel.html">MetricSeriesViewModel</a>&gt;</dt>
+    <dd></dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="Avalonia.Controls.DataGridGeneratedNewRowService-1.html">DataGridGeneratedNewRowService</a>&lt;<a class="xref" href="ProDiagnostics.Viewer.ViewModels.MetricSeriesViewModel.html">MetricSeriesViewModel</a>&gt;</dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="ProDiagnostics_Viewer_ViewModels_MetricSeriesGridSchema_CreateOutlineGroupFields_" data-uid="ProDiagnostics.Viewer.ViewModels.MetricSeriesGridSchema.CreateOutlineGroupFields*"></a>
+
+  <h3 id="ProDiagnostics_Viewer_ViewModels_MetricSeriesGridSchema_CreateOutlineGroupFields" data-uid="ProDiagnostics.Viewer.ViewModels.MetricSeriesGridSchema.CreateOutlineGroupFields">
+  CreateOutlineGroupFields()
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/ProDiagnostics.Viewer/obj/Release/net10.0/ProDataGrid.SourceGenerators/ProDataGrid.SourceGenerators.ProDataGridGenerator/ProDiagnostics_Viewer_ViewModels_MetricSeriesGridSchema_Schema.g.cs/#L585"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static IReadOnlyList&lt;OutlineGroupField&gt; CreateOutlineGroupFields()</code></pre>
+  </div>
+
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.ireadonlylist-1">IReadOnlyList</a>&lt;<a class="xref" href="Avalonia.Controls.DataGridReporting.OutlineGroupField.html">OutlineGroupField</a>&gt;</dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="ProDiagnostics_Viewer_ViewModels_MetricSeriesGridSchema_CreateOutlineReportModel_" data-uid="ProDiagnostics.Viewer.ViewModels.MetricSeriesGridSchema.CreateOutlineReportModel*"></a>
+
+  <h3 id="ProDiagnostics_Viewer_ViewModels_MetricSeriesGridSchema_CreateOutlineReportModel_System_Collections_IEnumerable_System_Action_Avalonia_Controls_DataGridReporting_OutlineReportModel__" data-uid="ProDiagnostics.Viewer.ViewModels.MetricSeriesGridSchema.CreateOutlineReportModel(System.Collections.IEnumerable,System.Action{Avalonia.Controls.DataGridReporting.OutlineReportModel})">
+  CreateOutlineReportModel(IEnumerable, Action&lt;OutlineReportModel&gt;?)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/ProDiagnostics.Viewer/obj/Release/net10.0/ProDataGrid.SourceGenerators/ProDataGrid.SourceGenerators.ProDataGridGenerator/ProDiagnostics_Viewer_ViewModels_MetricSeriesGridSchema_Schema.g.cs/#L591"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static OutlineReportModel CreateOutlineReportModel(IEnumerable items, Action&lt;OutlineReportModel&gt;? configure = null)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>items</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.ienumerable">IEnumerable</a></dt>
+    <dd></dd>
+    <dt><code>configure</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.action-1">Action</a>&lt;<a class="xref" href="Avalonia.Controls.DataGridReporting.OutlineReportModel.html">OutlineReportModel</a>&gt;</dt>
+    <dd></dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="Avalonia.Controls.DataGridReporting.OutlineReportModel.html">OutlineReportModel</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="ProDiagnostics_Viewer_ViewModels_MetricSeriesGridSchema_CreateOutlineValueFields_" data-uid="ProDiagnostics.Viewer.ViewModels.MetricSeriesGridSchema.CreateOutlineValueFields*"></a>
+
+  <h3 id="ProDiagnostics_Viewer_ViewModels_MetricSeriesGridSchema_CreateOutlineValueFields" data-uid="ProDiagnostics.Viewer.ViewModels.MetricSeriesGridSchema.CreateOutlineValueFields">
+  CreateOutlineValueFields()
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/ProDiagnostics.Viewer/obj/Release/net10.0/ProDataGrid.SourceGenerators/ProDataGrid.SourceGenerators.ProDataGridGenerator/ProDiagnostics_Viewer_ViewModels_MetricSeriesGridSchema_Schema.g.cs/#L588"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static IReadOnlyList&lt;OutlineValueField&gt; CreateOutlineValueFields()</code></pre>
+  </div>
+
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.ireadonlylist-1">IReadOnlyList</a>&lt;<a class="xref" href="Avalonia.Controls.DataGridReporting.OutlineValueField.html">OutlineValueField</a>&gt;</dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="ProDiagnostics_Viewer_ViewModels_MetricSeriesGridSchema_CreatePerformanceOptions_" data-uid="ProDiagnostics.Viewer.ViewModels.MetricSeriesGridSchema.CreatePerformanceOptions*"></a>
+
+  <h3 id="ProDiagnostics_Viewer_ViewModels_MetricSeriesGridSchema_CreatePerformanceOptions" data-uid="ProDiagnostics.Viewer.ViewModels.MetricSeriesGridSchema.CreatePerformanceOptions">
+  CreatePerformanceOptions()
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/ProDiagnostics.Viewer/obj/Release/net10.0/ProDataGrid.SourceGenerators/ProDataGrid.SourceGenerators.ProDataGridGenerator/ProDiagnostics_Viewer_ViewModels_MetricSeriesGridSchema_Schema.g.cs/#L915"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static DataGridGeneratedPerformanceOptions CreatePerformanceOptions()</code></pre>
+  </div>
+
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="Avalonia.Controls.DataGridGeneratedPerformanceOptions.html">DataGridGeneratedPerformanceOptions</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="ProDiagnostics_Viewer_ViewModels_MetricSeriesGridSchema_CreatePivotAxisFields_" data-uid="ProDiagnostics.Viewer.ViewModels.MetricSeriesGridSchema.CreatePivotAxisFields*"></a>
+
+  <h3 id="ProDiagnostics_Viewer_ViewModels_MetricSeriesGridSchema_CreatePivotAxisFields_Avalonia_Controls_DataGridGeneratedAnalyticsRole_" data-uid="ProDiagnostics.Viewer.ViewModels.MetricSeriesGridSchema.CreatePivotAxisFields(Avalonia.Controls.DataGridGeneratedAnalyticsRole)">
+  CreatePivotAxisFields(DataGridGeneratedAnalyticsRole)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/ProDiagnostics.Viewer/obj/Release/net10.0/ProDataGrid.SourceGenerators/ProDataGrid.SourceGenerators.ProDataGridGenerator/ProDiagnostics_Viewer_ViewModels_MetricSeriesGridSchema_Schema.g.cs/#L568"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static IReadOnlyList&lt;PivotAxisField&gt; CreatePivotAxisFields(DataGridGeneratedAnalyticsRole roles = DataGridGeneratedAnalyticsRole.PivotRow | DataGridGeneratedAnalyticsRole.PivotColumn | DataGridGeneratedAnalyticsRole.PivotFilter)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>roles</code> <a class="xref" href="Avalonia.Controls.DataGridGeneratedAnalyticsRole.html">DataGridGeneratedAnalyticsRole</a></dt>
+    <dd></dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.ireadonlylist-1">IReadOnlyList</a>&lt;<a class="xref" href="Avalonia.Controls.DataGridPivoting.PivotAxisField.html">PivotAxisField</a>&gt;</dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="ProDiagnostics_Viewer_ViewModels_MetricSeriesGridSchema_CreatePivotTableModel_" data-uid="ProDiagnostics.Viewer.ViewModels.MetricSeriesGridSchema.CreatePivotTableModel*"></a>
+
+  <h3 id="ProDiagnostics_Viewer_ViewModels_MetricSeriesGridSchema_CreatePivotTableModel_System_Collections_IEnumerable_System_Action_Avalonia_Controls_DataGridPivoting_PivotTableModel__" data-uid="ProDiagnostics.Viewer.ViewModels.MetricSeriesGridSchema.CreatePivotTableModel(System.Collections.IEnumerable,System.Action{Avalonia.Controls.DataGridPivoting.PivotTableModel})">
+  CreatePivotTableModel(IEnumerable, Action&lt;PivotTableModel&gt;?)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/ProDiagnostics.Viewer/obj/Release/net10.0/ProDataGrid.SourceGenerators/ProDataGrid.SourceGenerators.ProDataGridGenerator/ProDiagnostics_Viewer_ViewModels_MetricSeriesGridSchema_Schema.g.cs/#L575"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static PivotTableModel CreatePivotTableModel(IEnumerable items, Action&lt;PivotTableModel&gt;? configure = null)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>items</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.ienumerable">IEnumerable</a></dt>
+    <dd></dd>
+    <dt><code>configure</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.action-1">Action</a>&lt;<a class="xref" href="Avalonia.Controls.DataGridPivoting.PivotTableModel.html">PivotTableModel</a>&gt;</dt>
+    <dd></dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="Avalonia.Controls.DataGridPivoting.PivotTableModel.html">PivotTableModel</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="ProDiagnostics_Viewer_ViewModels_MetricSeriesGridSchema_CreatePivotValueFields_" data-uid="ProDiagnostics.Viewer.ViewModels.MetricSeriesGridSchema.CreatePivotValueFields*"></a>
+
+  <h3 id="ProDiagnostics_Viewer_ViewModels_MetricSeriesGridSchema_CreatePivotValueFields" data-uid="ProDiagnostics.Viewer.ViewModels.MetricSeriesGridSchema.CreatePivotValueFields">
+  CreatePivotValueFields()
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/ProDiagnostics.Viewer/obj/Release/net10.0/ProDataGrid.SourceGenerators/ProDataGrid.SourceGenerators.ProDataGridGenerator/ProDiagnostics_Viewer_ViewModels_MetricSeriesGridSchema_Schema.g.cs/#L572"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static IReadOnlyList&lt;PivotValueField&gt; CreatePivotValueFields()</code></pre>
+  </div>
+
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.ireadonlylist-1">IReadOnlyList</a>&lt;<a class="xref" href="Avalonia.Controls.DataGridPivoting.PivotValueField.html">PivotValueField</a>&gt;</dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="ProDiagnostics_Viewer_ViewModels_MetricSeriesGridSchema_CreateSampleCountRemoteDistinctValues_" data-uid="ProDiagnostics.Viewer.ViewModels.MetricSeriesGridSchema.CreateSampleCountRemoteDistinctValues*"></a>
+
+  <h3 id="ProDiagnostics_Viewer_ViewModels_MetricSeriesGridSchema_CreateSampleCountRemoteDistinctValues_Avalonia_Controls_IDataGridGeneratedRemoteDistinctValueProvider_System_Int32__" data-uid="ProDiagnostics.Viewer.ViewModels.MetricSeriesGridSchema.CreateSampleCountRemoteDistinctValues(Avalonia.Controls.IDataGridGeneratedRemoteDistinctValueProvider{System.Int32})">
+  CreateSampleCountRemoteDistinctValues(IDataGridGeneratedRemoteDistinctValueProvider&lt;int&gt;)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/ProDiagnostics.Viewer/obj/Release/net10.0/ProDataGrid.SourceGenerators/ProDataGrid.SourceGenerators.ProDataGridGenerator/ProDiagnostics_Viewer_ViewModels_MetricSeriesGridSchema_Schema.g.cs/#L458"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static DataGridGeneratedRemoteDistinctValueController&lt;int&gt; CreateSampleCountRemoteDistinctValues(IDataGridGeneratedRemoteDistinctValueProvider&lt;int&gt; provider)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>provider</code> <a class="xref" href="Avalonia.Controls.IDataGridGeneratedRemoteDistinctValueProvider-1.html">IDataGridGeneratedRemoteDistinctValueProvider</a>&lt;<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a>&gt;</dt>
+    <dd></dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="Avalonia.Controls.DataGridGeneratedRemoteDistinctValueController-1.html">DataGridGeneratedRemoteDistinctValueController</a>&lt;<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a>&gt;</dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="ProDiagnostics_Viewer_ViewModels_MetricSeriesGridSchema_CreateSearchPredicate_" data-uid="ProDiagnostics.Viewer.ViewModels.MetricSeriesGridSchema.CreateSearchPredicate*"></a>
+
+  <h3 id="ProDiagnostics_Viewer_ViewModels_MetricSeriesGridSchema_CreateSearchPredicate_System_Collections_Generic_IReadOnlyList_Avalonia_Controls_DataGridSearching_SearchDescriptor__" data-uid="ProDiagnostics.Viewer.ViewModels.MetricSeriesGridSchema.CreateSearchPredicate(System.Collections.Generic.IReadOnlyList{Avalonia.Controls.DataGridSearching.SearchDescriptor})">
+  CreateSearchPredicate(IReadOnlyList&lt;SearchDescriptor&gt;)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/ProDiagnostics.Viewer/obj/Release/net10.0/ProDataGrid.SourceGenerators/ProDataGrid.SourceGenerators.ProDataGridGenerator/ProDiagnostics_Viewer_ViewModels_MetricSeriesGridSchema_Schema.g.cs/#L901"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Compiles model descriptors into a reflection-free item predicate.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public Func&lt;MetricSeriesViewModel, bool&gt; CreateSearchPredicate(IReadOnlyList&lt;SearchDescriptor&gt; descriptors)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>descriptors</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.ireadonlylist-1">IReadOnlyList</a>&lt;<a class="xref" href="Avalonia.Controls.DataGridSearching.SearchDescriptor.html">SearchDescriptor</a>&gt;</dt>
+    <dd></dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.func-2">Func</a>&lt;<a class="xref" href="ProDiagnostics.Viewer.ViewModels.MetricSeriesViewModel.html">MetricSeriesViewModel</a>, <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a>&gt;</dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="ProDiagnostics_Viewer_ViewModels_MetricSeriesGridSchema_CreateSortComparer_" data-uid="ProDiagnostics.Viewer.ViewModels.MetricSeriesGridSchema.CreateSortComparer*"></a>
+
+  <h3 id="ProDiagnostics_Viewer_ViewModels_MetricSeriesGridSchema_CreateSortComparer_System_Collections_Generic_IReadOnlyList_Avalonia_Controls_DataGridSorting_SortingDescriptor__" data-uid="ProDiagnostics.Viewer.ViewModels.MetricSeriesGridSchema.CreateSortComparer(System.Collections.Generic.IReadOnlyList{Avalonia.Controls.DataGridSorting.SortingDescriptor})">
+  CreateSortComparer(IReadOnlyList&lt;SortingDescriptor&gt;)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/ProDiagnostics.Viewer/obj/Release/net10.0/ProDataGrid.SourceGenerators/ProDataGrid.SourceGenerators.ProDataGridGenerator/ProDiagnostics_Viewer_ViewModels_MetricSeriesGridSchema_Schema.g.cs/#L895"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Compiles model descriptors into a reflection-free item comparer.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public IComparer&lt;MetricSeriesViewModel&gt; CreateSortComparer(IReadOnlyList&lt;SortingDescriptor&gt; descriptors)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>descriptors</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.ireadonlylist-1">IReadOnlyList</a>&lt;<a class="xref" href="Avalonia.Controls.DataGridSorting.SortingDescriptor.html">SortingDescriptor</a>&gt;</dt>
+    <dd></dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.icomparer-1">IComparer</a>&lt;<a class="xref" href="ProDiagnostics.Viewer.ViewModels.MetricSeriesViewModel.html">MetricSeriesViewModel</a>&gt;</dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="ProDiagnostics_Viewer_ViewModels_MetricSeriesGridSchema_CreateSummaries_" data-uid="ProDiagnostics.Viewer.ViewModels.MetricSeriesGridSchema.CreateSummaries*"></a>
+
+  <h3 id="ProDiagnostics_Viewer_ViewModels_MetricSeriesGridSchema_CreateSummaries" data-uid="ProDiagnostics.Viewer.ViewModels.MetricSeriesGridSchema.CreateSummaries">
+  CreateSummaries()
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/ProDiagnostics.Viewer/obj/Release/net10.0/ProDataGrid.SourceGenerators/ProDataGrid.SourceGenerators.ProDataGridGenerator/ProDiagnostics_Viewer_ViewModels_MetricSeriesGridSchema_Schema.g.cs/#L540"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static IReadOnlyList&lt;IDataGridGeneratedSummary&lt;MetricSeriesViewModel&gt;&gt; CreateSummaries()</code></pre>
+  </div>
+
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.ireadonlylist-1">IReadOnlyList</a>&lt;<a class="xref" href="Avalonia.Controls.IDataGridGeneratedSummary-1.html">IDataGridGeneratedSummary</a>&lt;<a class="xref" href="ProDiagnostics.Viewer.ViewModels.MetricSeriesViewModel.html">MetricSeriesViewModel</a>&gt;&gt;</dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="ProDiagnostics_Viewer_ViewModels_MetricSeriesGridSchema_CreateTagsSummaryRemoteDistinctValues_" data-uid="ProDiagnostics.Viewer.ViewModels.MetricSeriesGridSchema.CreateTagsSummaryRemoteDistinctValues*"></a>
+
+  <h3 id="ProDiagnostics_Viewer_ViewModels_MetricSeriesGridSchema_CreateTagsSummaryRemoteDistinctValues_Avalonia_Controls_IDataGridGeneratedRemoteDistinctValueProvider_System_String__" data-uid="ProDiagnostics.Viewer.ViewModels.MetricSeriesGridSchema.CreateTagsSummaryRemoteDistinctValues(Avalonia.Controls.IDataGridGeneratedRemoteDistinctValueProvider{System.String})">
+  CreateTagsSummaryRemoteDistinctValues(IDataGridGeneratedRemoteDistinctValueProvider&lt;string&gt;)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/ProDiagnostics.Viewer/obj/Release/net10.0/ProDataGrid.SourceGenerators/ProDataGrid.SourceGenerators.ProDataGridGenerator/ProDiagnostics_Viewer_ViewModels_MetricSeriesGridSchema_Schema.g.cs/#L472"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static DataGridGeneratedRemoteDistinctValueController&lt;string&gt; CreateTagsSummaryRemoteDistinctValues(IDataGridGeneratedRemoteDistinctValueProvider&lt;string&gt; provider)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>provider</code> <a class="xref" href="Avalonia.Controls.IDataGridGeneratedRemoteDistinctValueProvider-1.html">IDataGridGeneratedRemoteDistinctValueProvider</a>&lt;<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a>&gt;</dt>
+    <dd></dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="Avalonia.Controls.DataGridGeneratedRemoteDistinctValueController-1.html">DataGridGeneratedRemoteDistinctValueController</a>&lt;<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a>&gt;</dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="ProDiagnostics_Viewer_ViewModels_MetricSeriesGridSchema_CreateTrendRemoteDistinctValues_" data-uid="ProDiagnostics.Viewer.ViewModels.MetricSeriesGridSchema.CreateTrendRemoteDistinctValues*"></a>
+
+  <h3 id="ProDiagnostics_Viewer_ViewModels_MetricSeriesGridSchema_CreateTrendRemoteDistinctValues_Avalonia_Controls_IDataGridGeneratedRemoteDistinctValueProvider_ProDiagnostics_Viewer_ViewModels_MetricSeriesViewModel__" data-uid="ProDiagnostics.Viewer.ViewModels.MetricSeriesGridSchema.CreateTrendRemoteDistinctValues(Avalonia.Controls.IDataGridGeneratedRemoteDistinctValueProvider{ProDiagnostics.Viewer.ViewModels.MetricSeriesViewModel})">
+  CreateTrendRemoteDistinctValues(IDataGridGeneratedRemoteDistinctValueProvider&lt;MetricSeriesViewModel&gt;)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/ProDiagnostics.Viewer/obj/Release/net10.0/ProDataGrid.SourceGenerators/ProDataGrid.SourceGenerators.ProDataGridGenerator/ProDiagnostics_Viewer_ViewModels_MetricSeriesGridSchema_Schema.g.cs/#L465"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static DataGridGeneratedRemoteDistinctValueController&lt;MetricSeriesViewModel&gt; CreateTrendRemoteDistinctValues(IDataGridGeneratedRemoteDistinctValueProvider&lt;MetricSeriesViewModel&gt; provider)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>provider</code> <a class="xref" href="Avalonia.Controls.IDataGridGeneratedRemoteDistinctValueProvider-1.html">IDataGridGeneratedRemoteDistinctValueProvider</a>&lt;<a class="xref" href="ProDiagnostics.Viewer.ViewModels.MetricSeriesViewModel.html">MetricSeriesViewModel</a>&gt;</dt>
+    <dd></dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="Avalonia.Controls.DataGridGeneratedRemoteDistinctValueController-1.html">DataGridGeneratedRemoteDistinctValueController</a>&lt;<a class="xref" href="ProDiagnostics.Viewer.ViewModels.MetricSeriesViewModel.html">MetricSeriesViewModel</a>&gt;</dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="ProDiagnostics_Viewer_ViewModels_MetricSeriesGridSchema_CreateUnitRemoteDistinctValues_" data-uid="ProDiagnostics.Viewer.ViewModels.MetricSeriesGridSchema.CreateUnitRemoteDistinctValues*"></a>
+
+  <h3 id="ProDiagnostics_Viewer_ViewModels_MetricSeriesGridSchema_CreateUnitRemoteDistinctValues_Avalonia_Controls_IDataGridGeneratedRemoteDistinctValueProvider_System_String__" data-uid="ProDiagnostics.Viewer.ViewModels.MetricSeriesGridSchema.CreateUnitRemoteDistinctValues(Avalonia.Controls.IDataGridGeneratedRemoteDistinctValueProvider{System.String})">
+  CreateUnitRemoteDistinctValues(IDataGridGeneratedRemoteDistinctValueProvider&lt;string&gt;)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/ProDiagnostics.Viewer/obj/Release/net10.0/ProDataGrid.SourceGenerators/ProDataGrid.SourceGenerators.ProDataGridGenerator/ProDiagnostics_Viewer_ViewModels_MetricSeriesGridSchema_Schema.g.cs/#L423"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static DataGridGeneratedRemoteDistinctValueController&lt;string&gt; CreateUnitRemoteDistinctValues(IDataGridGeneratedRemoteDistinctValueProvider&lt;string&gt; provider)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>provider</code> <a class="xref" href="Avalonia.Controls.IDataGridGeneratedRemoteDistinctValueProvider-1.html">IDataGridGeneratedRemoteDistinctValueProvider</a>&lt;<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a>&gt;</dt>
+    <dd></dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="Avalonia.Controls.DataGridGeneratedRemoteDistinctValueController-1.html">DataGridGeneratedRemoteDistinctValueController</a>&lt;<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a>&gt;</dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="ProDiagnostics_Viewer_ViewModels_MetricSeriesGridSchema_TryGetField_" data-uid="ProDiagnostics.Viewer.ViewModels.MetricSeriesGridSchema.TryGetField*"></a>
+
+  <h3 id="ProDiagnostics_Viewer_ViewModels_MetricSeriesGridSchema_TryGetField_System_String_Avalonia_Controls_DataGridGeneratedField__" data-uid="ProDiagnostics.Viewer.ViewModels.MetricSeriesGridSchema.TryGetField(System.String,Avalonia.Controls.DataGridGeneratedField@)">
+  TryGetField(string, out DataGridGeneratedField)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/ProDiagnostics.Viewer/obj/Release/net10.0/ProDataGrid.SourceGenerators/ProDataGrid.SourceGenerators.ProDataGridGenerator/ProDiagnostics_Viewer_ViewModels_MetricSeriesGridSchema_Schema.g.cs/#L646"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static bool TryGetField(string key, out DataGridGeneratedField field)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>key</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></dt>
+    <dd></dd>
+    <dt><code>field</code> <a class="xref" href="Avalonia.Controls.DataGridGeneratedField.html">DataGridGeneratedField</a></dt>
+    <dd></dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="ProDiagnostics_Viewer_ViewModels_MetricSeriesGridSchema_TryGetOperationPreset_" data-uid="ProDiagnostics.Viewer.ViewModels.MetricSeriesGridSchema.TryGetOperationPreset*"></a>
+
+  <h3 id="ProDiagnostics_Viewer_ViewModels_MetricSeriesGridSchema_TryGetOperationPreset_System_String_Avalonia_Controls_DataGridGeneratedOperationPreset__" data-uid="ProDiagnostics.Viewer.ViewModels.MetricSeriesGridSchema.TryGetOperationPreset(System.String,Avalonia.Controls.DataGridGeneratedOperationPreset@)">
+  TryGetOperationPreset(string, out DataGridGeneratedOperationPreset)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/ProDiagnostics.Viewer/obj/Release/net10.0/ProDataGrid.SourceGenerators/ProDataGrid.SourceGenerators.ProDataGridGenerator/ProDiagnostics_Viewer_ViewModels_MetricSeriesGridSchema_Schema.g.cs/#L374"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static bool TryGetOperationPreset(string name, out DataGridGeneratedOperationPreset preset)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>name</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></dt>
+    <dd></dd>
+    <dt><code>preset</code> <a class="xref" href="Avalonia.Controls.DataGridGeneratedOperationPreset.html">DataGridGeneratedOperationPreset</a></dt>
+    <dd></dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+
+</article>
+
+        <div class="contribution d-print-none">
+          <a href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/ProDiagnostics.Viewer/obj/Release/net10.0/ProDataGrid.SourceGenerators/ProDataGrid.SourceGenerators.ProDataGridGenerator/ProDiagnostics_Viewer_ViewModels_MetricSeriesGridSchema_Schema.g.cs/#L6" class="edit-link">Edit this page</a>
+        </div>
+
+
+      </div>
+
+      <div class="affix">
+        <nav id="affix"></nav>
+      </div>
+    </main>
+
+
+    <footer class="border-top text-secondary">
+      <div class="container-xxl">
+        <div class="flex-fill">
+          <span>Made with <a href="https://dotnet.github.io/docfx">docfx</a></span>
+        </div>
+      </div>
+    </footer>
+  </body>
+</html>

@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+      <title>Reactive, streaming, and remote data | ProDataGrid for Avalonia </title>
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <meta name="title" content="Reactive, streaming, and remote data | ProDataGrid for Avalonia ">
+      
+      
+      <link rel="icon" href="../../favicon.ico">
+      <link rel="stylesheet" href="../../public/docfx.min.css">
+      <link rel="stylesheet" href="../../public/main.css">
+      <meta name="docfx:navrel" content="../../toc.html">
+      <meta name="docfx:tocrel" content="../toc.html">
+      
+      
+      
+      
+      <meta name="docfx:docurl" content="https://github.com/wieslawsoltes/ProDataGrid/blob/master/docfx/articles/source-generators/reactive-streaming-remote.md/#L1">
+      <meta name="loc:inThisArticle" content="In this article">
+      <meta name="loc:searchResultsCount" content="{count} results for &quot;{query}&quot;">
+      <meta name="loc:searchNoResults" content="No results for &quot;{query}&quot;">
+      <meta name="loc:tocFilter" content="Filter by title">
+      <meta name="loc:nextArticle" content="Next">
+      <meta name="loc:prevArticle" content="Previous">
+      <meta name="loc:themeLight" content="Light">
+      <meta name="loc:themeDark" content="Dark">
+      <meta name="loc:themeAuto" content="Auto">
+      <meta name="loc:changeTheme" content="Change theme">
+      <meta name="loc:copy" content="Copy">
+      <meta name="loc:downloadPdf" content="Download PDF">
+
+      <script type="module" src="./../../public/docfx.min.js"></script>
+
+      <script>
+        const theme = localStorage.getItem('theme') || 'auto'
+        document.documentElement.setAttribute('data-bs-theme', theme === 'auto' ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light') : theme)
+      </script>
+
+  </head>
+
+  <body class="tex2jax_ignore" data-layout="" data-yaml-mime="">
+    <header class="bg-body border-bottom">
+      <nav id="autocollapse" class="navbar navbar-expand-md" role="navigation">
+        <div class="container-xxl flex-nowrap">
+          <a class="navbar-brand" href="../../index.html">
+            <img id="logo" class="svg" src="../../images/logo.svg" alt="">
+            
+          </a>
+          <button class="btn btn-lg d-md-none border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navpanel" aria-controls="navpanel" aria-expanded="false" aria-label="Toggle navigation">
+            <i class="bi bi-three-dots"></i>
+          </button>
+          <div class="collapse navbar-collapse" id="navpanel">
+            <div id="navbar">
+            </div>
+          </div>
+        </div>
+      </nav>
+    </header>
+
+    <main class="container-xxl">
+      <div class="toc-offcanvas">
+        <div class="offcanvas-md offcanvas-start" tabindex="-1" id="tocOffcanvas" aria-labelledby="tocOffcanvasLabel">
+          <div class="offcanvas-header">
+            <h5 class="offcanvas-title" id="tocOffcanvasLabel">Table of Contents</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="offcanvas" data-bs-target="#tocOffcanvas" aria-label="Close"></button>
+          </div>
+          <div class="offcanvas-body">
+            <nav class="toc" id="toc"></nav>
+          </div>
+        </div>
+      </div>
+
+      <div class="content">
+        <div class="actionbar">
+          <button class="btn btn-lg border-0 d-md-none" type="button" data-bs-toggle="offcanvas" data-bs-target="#tocOffcanvas" aria-controls="tocOffcanvas" aria-expanded="false" aria-label="Show table of contents">
+            <i class="bi bi-list"></i>
+          </button>
+
+          <nav id="breadcrumb"></nav>
+        </div>
+
+        <article data-uid="">
+<h1 id="reactive-streaming-and-remote-data">Reactive, streaming, and remote data</h1>
+
+<p>Named generated controllers can own DynamicData pipelines, bounded async ingestion, keyed snapshot reconciliation, and remote query lifetimes. Operation descriptors remain canonical; the source kind decides where they execute.</p>
+<h2 id="dynamicdata-sourcelist">DynamicData <code>SourceList</code></h2>
+<pre><code class="lang-csharp">[GenerateDataGridController(
+    typeof(Quote),
+    &quot;Quotes&quot;,
+    SourceMember = nameof(_source),
+    SourceKind = DataGridGeneratedSourceKind.DynamicDataSourceList,
+    OperationExecution = DataGridOperationExecution.ExternalPipeline,
+    Streaming = true)]
+public sealed partial class QuotesViewModel : ReactiveObject, IDisposable
+{
+    private readonly SourceList&lt;Quote&gt; _source = new();
+
+    public QuotesViewModel()
+    {
+        InitializeQuotes(CreateQuotesController());
+        Items = ConnectQuotesPipeline(
+            ReactiveUI.Primitives.Reactive.Concurrency.AvaloniaScheduler.Instance);
+    }
+
+    public ReadOnlyObservableCollection&lt;Quote&gt; Items { get; }
+
+    public void Dispose()
+    {
+        DisposeQuotes();
+        _source.Dispose();
+    }
+}
+</code></pre>
+<p>The emitted pipeline owns:</p>
+<ul>
+<li>one <code>Connect()</code> subscription;</li>
+<li>sorting, filtering, and searching propagation;</li>
+<li>replace-aware ordering;</li>
+<li>one optional final scheduler boundary;</li>
+<li>errors and completion;</li>
+<li>idempotent disconnection/disposal.</li>
+</ul>
+<p>Batch source edits remain batches. Generated code does not expand changes into per-row callbacks.</p>
+<h2 id="dynamicdata-sourcecache">DynamicData <code>SourceCache</code></h2>
+<p>A cache source requires a generated key whose type matches the source key:</p>
+<pre><code class="lang-csharp">[GenerateDataGridController(
+    typeof(Trade),
+    &quot;Trades&quot;,
+    SourceMember = nameof(_source),
+    SourceKind = DataGridGeneratedSourceKind.DynamicDataSourceCache,
+    OperationExecution = DataGridOperationExecution.ExternalPipeline,
+    Features = DataGridGeneratedFeatures.Columns |
+               DataGridGeneratedFeatures.Operations |
+               DataGridGeneratedFeatures.Selection)]
+public sealed partial class TradesViewModel : ReactiveObject, IDisposable
+{
+    private readonly SourceCache&lt;Trade, int&gt; _source =
+        new(static trade =&gt; trade.Id);
+}
+</code></pre>
+<p>The pipeline reuses the same identity selector for cache updates, selection, indexes, snapshots, and state. Replacing a selected instance with the same key preserves identity even when the active sort moves it.</p>
+<h2 id="insert-an-application-transform">Insert an application transform</h2>
+<p><code>PipelineTransformMethod</code> runs once after <code>Connect()</code> and before generated filtering/sorting:</p>
+<pre><code class="lang-csharp">[GenerateDataGridController(
+    typeof(Trade),
+    &quot;Trades&quot;,
+    SourceMember = nameof(_source),
+    SourceKind = DataGridGeneratedSourceKind.DynamicDataSourceCache,
+    OperationExecution = DataGridOperationExecution.ExternalPipeline,
+    PipelineTransformMethod = nameof(TransformTrades))]
+public sealed partial class TradesViewModel
+{
+    private IObservable&lt;IChangeSet&lt;Trade, int&gt;&gt; TransformTrades(
+        IObservable&lt;IChangeSet&lt;Trade, int&gt;&gt; changes) =&gt;
+        changes.Do(_ =&gt; SourceBatchCount++);
+}
+</code></pre>
+<p>The method must accept and return the exact list/cache change-set shape. It may be private, static, or instance. Use it for domain transforms, telemetry, grouping projections, or summary taps—not untyped property access.</p>
+<h2 id="bounded-async-streams-and-channels">Bounded async streams and channels</h2>
+<p>For <code>IAsyncEnumerable&lt;T&gt;</code> or <code>ChannelReader&lt;T&gt;</code>, the controller emits:</p>
+<ul>
+<li><code>Run{Name}StreamAsync</code>;</li>
+<li><code>Stop{Name}Stream</code>;</li>
+<li><code>{Name}StreamPump</code>;</li>
+<li><code>{Name}StreamMetrics</code>.</li>
+</ul>
+<p>Ingestion uses a bounded buffer and one callback per drained batch. Choose an overflow policy deliberately:</p>
+<table>
+<thead>
+<tr>
+<th>Policy</th>
+<th>Behavior</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>Wait</code></td>
+<td>Backpressure the producer until capacity is available.</td>
+</tr>
+<tr>
+<td><code>DropNewest</code></td>
+<td>Reject the arriving item while full.</td>
+</tr>
+<tr>
+<td><code>DropOldest</code></td>
+<td>Make room by removing the oldest pending item.</td>
+</tr>
+<tr>
+<td><code>CoalesceByKey</code></td>
+<td>Retain only the latest pending update for each stable key.</td>
+</tr>
+</tbody>
+</table>
+<p>Disposal cancels active enumeration and wakes blocked writers/readers. Metrics expose accepted, dropped, coalesced, and drained counts.</p>
+<p>Keyed schemas also expose lower-level <code>CreateStreamBuffer</code> and <code>CreateAsyncStreamPump</code> factories for custom application lifetimes.</p>
+<h2 id="snapshot-reconciliation">Snapshot reconciliation</h2>
+<p>Use snapshot reconciliation when a service periodically returns a complete keyed snapshot:</p>
+<pre><code class="lang-csharp">DataGridGeneratedSnapshotReconciler&lt;Trade, int&gt; reconciler =
+    TradeSchema.CreateSnapshotReconciler();
+
+DataGridGeneratedSnapshotMetrics metrics = reconciler.Reconcile(
+    visibleTrades,
+    serviceSnapshot,
+    revision);
+</code></pre>
+<p>The reconciler applies keyed add/remove/move/replace changes without clearing the target collection. It validates duplicate keys before mutation and ignores a stale revision. This preserves row containers, selection, current cell, and scroll position more effectively than reset-based updates.</p>
+<h2 id="remote-query-controllers">Remote query controllers</h2>
+<p>Use a remote source and remote operation ownership:</p>
+<pre><code class="lang-csharp">[GenerateDataGridController(
+    typeof(Order),
+    &quot;Orders&quot;,
+    ProviderName = &quot;OrderSchema&quot;,
+    SourceMember = nameof(_provider),
+    SourceKind = DataGridGeneratedSourceKind.Remote,
+    OperationExecution = DataGridOperationExecution.Remote,
+    Features = DataGridGeneratedFeatures.Columns |
+               DataGridGeneratedFeatures.Sorting |
+               DataGridGeneratedFeatures.Filtering |
+               DataGridGeneratedFeatures.Searching)]
+public sealed partial class OrdersViewModel : ReactiveObject, IDisposable
+{
+    private readonly IDataGridQueryProvider&lt;Order, int&gt; _provider;
+
+    private void InitializeQueries()
+    {
+        InitializeOrders(CreateOrdersController());
+        InitializeOrdersRemoteQuery(CreateOrdersRemoteQueryController(
+            debounce: TimeSpan.FromMilliseconds(50),
+            pageCacheCapacity: 4,
+            fieldNameTranslator: TranslateBackendField));
+    }
+}
+</code></pre>
+<p>Generated members include:</p>
+<ul>
+<li><code>Create{Name}RemoteQueryController</code>;</li>
+<li><code>Initialize{Name}RemoteQuery</code> and <code>Dispose{Name}RemoteQuery</code>;</li>
+<li><code>Query{Name}Async</code> and <code>Prefetch{Name}Async</code>;</li>
+<li><code>{Name}RemoteQuery</code> state.</li>
+</ul>
+<p>The controller builds immutable <code>DataGridRemoteQuery&lt;TItem&gt;</code> requests from the current descriptors. Network and persistence details stay behind <code>IDataGridQueryProvider&lt;TItem,TKey&gt;</code>.</p>
+<h2 id="revisions-cancellation-and-stale-responses">Revisions, cancellation, and stale responses</h2>
+<p>Each foreground request receives a monotonically increasing revision. A new request cancels the prior foreground request. A response is accepted only when both its response revision and the controller's current revision match.</p>
+<p>This rule also rejects providers that ignore cancellation. A stale or canceled result returns <code>null</code> and cannot overwrite visible rows.</p>
+<p><code>StateChanged</code> reports loading, error, accepted content, and stale suppression. Generated views can bind these states to loading/empty/error surfaces.</p>
+<h2 id="paging-and-cache-keys">Paging and cache keys</h2>
+<p><code>DataGridPageRequest</code> supports offset and opaque-cursor paging. The optional page cache is bounded by entry count and uses caller-provided stable keys. Include every operation/data revision that affects the page:</p>
+<pre><code class="lang-csharp">string cacheKey = $&quot;v{Orders.Version}:page:{pageIndex}&quot;;
+</code></pre>
+<p><code>Prefetch{Name}Async</code> is cache-only: it does not cancel foreground work or change loading/error/content state. It requires a stable cache key and returns <code>false</code> if caching is disabled or disposal wins.</p>
+<h2 id="backend-field-translation">Backend field translation</h2>
+<p>Generated descriptors carry stable schema field IDs. Configure <code>BackendFieldName</code> per column or supply a translator when backend names differ:</p>
+<pre><code class="lang-csharp">private static string TranslateBackendField(string stableFieldId) =&gt;
+    stableFieldId switch
+    {
+        &quot;order-id&quot; =&gt; &quot;order_id&quot;,
+        &quot;total&quot; =&gt; &quot;gross_total&quot;,
+        _ =&gt; stableFieldId
+    };
+</code></pre>
+<p>Translation changes query serialization, not schema identity or persisted state.</p>
+<h2 id="scheduling-and-lifetime">Scheduling and lifetime</h2>
+<p>Generated pipelines perform application operations before the final UI scheduler boundary. The ViewModel selects the scheduler when connecting; the schema and controller remain UI-framework neutral.</p>
+<p>Every generated source lifetime has explicit initialize/connect/stop/disconnect/dispose methods. Dispose generated lifetimes from the owning ViewModel. Do not independently subscribe to the same source and operation models unless a separate projection is intentionally required.</p>
+<h2 id="sample-coverage">Sample coverage</h2>
+<ul>
+<li><code>GeneratedDynamicDataSourceListPage</code>: batched list operations and upstream sort/filter/search.</li>
+<li><code>GeneratedDynamicDataSourceCachePage</code>: keyed replacement and stable selection.</li>
+<li><code>GeneratedRemoteQueryPage</code>: offset paging, cache reuse, field translation, stale suppression, retry, and view-state projection.</li>
+<li><code>GeneratedHierarchicalDynamicDataPage</code>: DynamicData roots and hierarchy operations.</li>
+</ul>
+<p>See <a href="samples-and-production-validation.html">samples and production validation</a> for the complete map.</p>
+
+</article>
+
+        <div class="contribution d-print-none">
+          <a href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/docfx/articles/source-generators/reactive-streaming-remote.md/#L1" class="edit-link">Edit this page</a>
+        </div>
+
+        <div class="next-article d-print-none border-top" id="nextArticle"></div>
+
+      </div>
+
+      <div class="affix">
+        <nav id="affix"></nav>
+      </div>
+    </main>
+
+
+    <footer class="border-top text-secondary">
+      <div class="container-xxl">
+        <div class="flex-fill">
+          <span>Made with <a href="https://dotnet.github.io/docfx">docfx</a></span>
+        </div>
+      </div>
+    </footer>
+  </body>
+</html>

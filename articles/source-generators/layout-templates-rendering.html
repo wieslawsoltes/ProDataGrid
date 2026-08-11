@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+      <title>Layout, templates, and rendering | ProDataGrid for Avalonia </title>
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <meta name="title" content="Layout, templates, and rendering | ProDataGrid for Avalonia ">
+      
+      
+      <link rel="icon" href="../../favicon.ico">
+      <link rel="stylesheet" href="../../public/docfx.min.css">
+      <link rel="stylesheet" href="../../public/main.css">
+      <meta name="docfx:navrel" content="../../toc.html">
+      <meta name="docfx:tocrel" content="../toc.html">
+      
+      
+      
+      
+      <meta name="docfx:docurl" content="https://github.com/wieslawsoltes/ProDataGrid/blob/master/docfx/articles/source-generators/layout-templates-rendering.md/#L1">
+      <meta name="loc:inThisArticle" content="In this article">
+      <meta name="loc:searchResultsCount" content="{count} results for &quot;{query}&quot;">
+      <meta name="loc:searchNoResults" content="No results for &quot;{query}&quot;">
+      <meta name="loc:tocFilter" content="Filter by title">
+      <meta name="loc:nextArticle" content="Next">
+      <meta name="loc:prevArticle" content="Previous">
+      <meta name="loc:themeLight" content="Light">
+      <meta name="loc:themeDark" content="Dark">
+      <meta name="loc:themeAuto" content="Auto">
+      <meta name="loc:changeTheme" content="Change theme">
+      <meta name="loc:copy" content="Copy">
+      <meta name="loc:downloadPdf" content="Download PDF">
+
+      <script type="module" src="./../../public/docfx.min.js"></script>
+
+      <script>
+        const theme = localStorage.getItem('theme') || 'auto'
+        document.documentElement.setAttribute('data-bs-theme', theme === 'auto' ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light') : theme)
+      </script>
+
+  </head>
+
+  <body class="tex2jax_ignore" data-layout="" data-yaml-mime="">
+    <header class="bg-body border-bottom">
+      <nav id="autocollapse" class="navbar navbar-expand-md" role="navigation">
+        <div class="container-xxl flex-nowrap">
+          <a class="navbar-brand" href="../../index.html">
+            <img id="logo" class="svg" src="../../images/logo.svg" alt="">
+            
+          </a>
+          <button class="btn btn-lg d-md-none border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navpanel" aria-controls="navpanel" aria-expanded="false" aria-label="Toggle navigation">
+            <i class="bi bi-three-dots"></i>
+          </button>
+          <div class="collapse navbar-collapse" id="navpanel">
+            <div id="navbar">
+            </div>
+          </div>
+        </div>
+      </nav>
+    </header>
+
+    <main class="container-xxl">
+      <div class="toc-offcanvas">
+        <div class="offcanvas-md offcanvas-start" tabindex="-1" id="tocOffcanvas" aria-labelledby="tocOffcanvasLabel">
+          <div class="offcanvas-header">
+            <h5 class="offcanvas-title" id="tocOffcanvasLabel">Table of Contents</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="offcanvas" data-bs-target="#tocOffcanvas" aria-label="Close"></button>
+          </div>
+          <div class="offcanvas-body">
+            <nav class="toc" id="toc"></nav>
+          </div>
+        </div>
+      </div>
+
+      <div class="content">
+        <div class="actionbar">
+          <button class="btn btn-lg border-0 d-md-none" type="button" data-bs-toggle="offcanvas" data-bs-target="#tocOffcanvas" aria-controls="tocOffcanvas" aria-expanded="false" aria-label="Show table of contents">
+            <i class="bi bi-list"></i>
+          </button>
+
+          <nav id="breadcrumb"></nav>
+        </div>
+
+        <article data-uid="">
+<h1 id="layout-templates-and-rendering">Layout, templates, and rendering</h1>
+
+<p>Generated layout and rendering metadata covers column bands, chooser state, frozen placement, runtime indexed families, recycling templates, row details, direct/drawn cells, and custom drawing caches. Visual resources and application-specific control composition remain user-owned.</p>
+<h2 id="column-layout-metadata">Column layout metadata</h2>
+<p>Use stable keys for all persisted and interactive layout operations:</p>
+<pre><code class="lang-csharp">[DataGridColumn(
+    Header = &quot;Symbol&quot;,
+    ColumnKey = &quot;symbol&quot;,
+    DisplayIndex = 0,
+    FrozenPlacement = DataGridFrozenPlacement.Left,
+    Width = &quot;2*&quot;,
+    MinWidth = 100,
+    CanUserHide = false,
+    CanUserResize = true,
+    CanUserReorder = true,
+    WidthSharingGroup = &quot;identity&quot;)]
+public string Symbol { get; set; } = string.Empty;
+</code></pre>
+<p><code>DataGridGeneratedColumnLayoutController</code> coordinates visibility, ordering, widths, frozen placement, reset, chooser entries, and header commands. It observes live definition changes and never uses property paths for identity.</p>
+<h2 id="column-bands">Column bands</h2>
+<p>Attach one or more band paths to a field:</p>
+<pre><code class="lang-csharp">[DataGridColumn(Header = &quot;Bid&quot;, ColumnKey = &quot;bid&quot;)]
+[DataGridBand(&quot;Market/Prices&quot;, Order = 0)]
+public decimal Bid { get; set; }
+
+[DataGridColumn(Header = &quot;Ask&quot;, ColumnKey = &quot;ask&quot;)]
+[DataGridBand(&quot;Market/Prices&quot;, Order = 1)]
+public decimal Ask { get; set; }
+</code></pre>
+<p>Generated band paths form a deterministic nested tree. Duplicate or conflicting placements fail at generation time. The tree can drive column-band presentation, chooser grouping, and layout reset while column definitions retain their stable keys.</p>
+<h2 id="runtime-indexed-column-families">Runtime indexed column families</h2>
+<p>Use <code>[GenerateDataGridIndexedColumns]</code> when a bounded family is stored by slot instead of CLR property:</p>
+<pre><code class="lang-csharp">[GenerateDataGridIndexedColumns(
+    Name = &quot;Cells&quot;,
+    GetterMethod = nameof(GetCell),
+    SetterMethod = nameof(SetCell),
+    NotificationNameMethod = nameof(GetCellPropertyName))]
+public sealed class SpreadsheetRow : ReactiveObject
+{
+    private readonly object?[] _cells = new object?[32];
+
+    public object? GetCell(int index) =&gt; _cells[index];
+
+    public void SetCell(int index, object? value)
+    {
+        _cells[index] = value;
+        this.RaisePropertyChanged(GetCellPropertyName(index));
+    }
+
+    public static string GetCellPropertyName(int index) =&gt;
+        SpreadsheetNames.FromIndex(index);
+}
+</code></pre>
+<p>The generated <code>SpreadsheetRowCells.CreateColumn&lt;TValue&gt;</code> accepts typed options:</p>
+<pre><code class="lang-csharp">DataGridGeneratedIndexedColumnOptions&lt;double&gt; amount = new()
+{
+    Header = &quot;B&quot;,
+    ColumnKey = &quot;B&quot;,
+    PropertyName = &quot;B&quot;,
+    Kind = DataGridGeneratedIndexedColumnKind.Numeric,
+    FormatString = &quot;N2&quot;,
+    Width = new DataGridLength(105)
+};
+
+columns.Add(SpreadsheetRowCells.CreateColumn&lt;double&gt;(1, in amount));
+</code></pre>
+<p>The factory supports text, numeric, checkbox, date/time, progress, slider, hyperlink, image, hierarchical, custom-drawing, and formula definitions. Non-formula definitions receive cached compiled binding metadata and typed accessors.</p>
+<p>Formula slots bypass the row getter:</p>
+<pre><code class="lang-csharp">DataGridGeneratedIndexedColumnOptions&lt;double&gt; total = new()
+{
+    Header = &quot;E&quot;,
+    ColumnKey = &quot;E&quot;,
+    PropertyName = &quot;E&quot;,
+    Kind = DataGridGeneratedIndexedColumnKind.Formula,
+    Formula = &quot;=([@B]*[@C])*(1-[@D])&quot;,
+    FormulaName = &quot;E&quot;,
+    IsReadOnly = true
+};
+
+columns.Add(SpreadsheetRowCells.CreateColumn&lt;double&gt;(4, in total));
+</code></pre>
+<p>The getter, optional setter, notification method, and generic value types are validated at compile time.</p>
+<h2 id="recycling-cell-templates">Recycling cell templates</h2>
+<p>Template columns may name static factories for display, edit, and new-row cells:</p>
+<pre><code class="lang-csharp">[DataGridColumn(
+    DataGridColumnKind.Template,
+    TemplateFactoryMethod = nameof(CreateDisplayCell),
+    EditingTemplateFactoryMethod = nameof(CreateEditingCell),
+    NewRowTemplateFactoryMethod = nameof(CreateNewRowCell),
+    ReuseCellContent = true)]
+public string Status { get; set; } = string.Empty;
+
+public static Control CreateDisplayCell(StatusRow item, Control? existing)
+{
+    TextBlock text = existing as TextBlock ?? new TextBlock();
+    text.Text = item.Status;
+    return text;
+}
+</code></pre>
+<p>Factories use the exact <code>(TItem, Control?) -&gt; Control</code> contract. The existing control is supplied during recycling. No runtime XAML loading, view-location convention, or reflection is involved.</p>
+<p>Resource-backed <code>TemplateKey</code> and <code>EditingTemplateKey</code> remain available when the visual tree belongs in an Avalonia resource dictionary.</p>
+<h2 id="row-details-and-nested-grids">Row details and nested grids</h2>
+<p>Generated views support four mutually exclusive detail sources:</p>
+<ol>
+<li>A dynamic resource key.</li>
+<li>A validated <code>IDataTemplate</code> implementation type.</li>
+<li>A static <code>(TItem, Control?) -&gt; Control</code> factory.</li>
+<li>A typed nested-grid recipe.</li>
+</ol>
+<p>Nested-grid example:</p>
+<pre><code class="lang-csharp">[GenerateDataGridView(
+    typeof(Book),
+    Framework = DataGridViewFramework.ReactiveUI,
+    RowDetailsVisibilityMode =
+        DataGridRowDetailsVisibilityMode.VisibleWhenSelected,
+    RowDetailsNestedItemType = typeof(Author),
+    RowDetailsNestedItemsMember = nameof(Book.Authors),
+    RowDetailsNestedProviderName = &quot;AuthorSchema&quot;,
+    RowDetailsSummaryMember = nameof(Book.Summary),
+    RowDetailsAutomationId = &quot;book-authors-grid&quot;)]
+public sealed partial class BooksViewModel : ReactiveObject { }
+</code></pre>
+<p>The nested items member must be <code>IEnumerable&lt;TNested&gt;</code>. The presenter creates nested definitions/fast-path options once and updates only the summary and items source when recycled. It references the nested generated provider directly.</p>
+<p><code>AreRowDetailsFrozen</code> and <code>RowDetailsVisibilityMode</code> configure the owning grid. <code>PDGSG123</code> reports conflicting or incompatible detail sources.</p>
+<h2 id="built-in-retained-and-drawn-display-modes">Built-in retained and drawn display modes</h2>
+<p><code>DisplayMode</code> selects the runtime retained/drawn lane:</p>
+<pre><code class="lang-csharp">[DataGridColumn(
+    DataGridColumnKind.Numeric,
+    DisplayMode = DataGridColumnDisplayMode.Drawn)]
+public decimal Amount { get; set; }
+</code></pre>
+<p>The option is common metadata. Runtime columns that cannot use the requested drawn path retain their supported fallback.</p>
+<p>Text columns can opt into direct cells and direct text content:</p>
+<pre><code class="lang-csharp">[DataGridColumn(
+    DataGridColumnKind.Text,
+    UseDirectTextCell = true,
+    UseDirectTextContent = true,
+    TrackDirectTextValueChanges = false)]
+public string ImmutableSymbol { get; init; } = string.Empty;
+</code></pre>
+<p>Hierarchical columns support <code>UseDirectCell</code>, <code>UseDirectTextContent</code>, <code>UseOptimizedPresenter</code>, and <code>TrackDirectTextValueChanges</code>. Custom-drawing columns support <code>UseDirectValueAccessor</code> and <code>TrackDirectValueChanges</code>.</p>
+<p>Disable tracking only for immutable values or sources that replace/recycle rows when the value changes. Kind-incompatible options report <code>PDGSG009</code>.</p>
+<h2 id="custom-drawing-factories">Custom drawing factories</h2>
+<pre><code class="lang-csharp">[GenerateDataGridCellDrawCache(
+    InitialCapacity = 4,
+    MaximumCapacity = 16)]
+public sealed partial class Quote
+{
+    [DataGridColumn(
+        DataGridColumnKind.CustomDrawing,
+        DrawOperationFactoryMethod = nameof(CreatePriceFactory),
+        DrawingMode = DataGridCustomDrawingMode.DrawOperation,
+        RenderBackend =
+            DataGridCustomDrawingRenderBackend.CompositionCustomVisual,
+        TextLayoutCacheMode =
+            DataGridCustomDrawingTextLayoutCacheMode.Shared,
+        SharedTextLayoutCacheCapacity = 1024,
+        DrawOperationLayoutFastPath = true,
+        UseDirectValueAccessor = true,
+        TrackDirectValueChanges = false)]
+    public decimal Price { get; set; }
+
+    public static IDataGridCellDrawOperationFactory CreatePriceFactory() =&gt;
+        new PriceDrawOperationFactory
+        {
+            UseItemCacheContract = true,
+            ItemCacheSlot = PriceCellDrawCacheSlot
+        };
+}
+</code></pre>
+<p>Use <code>DrawOperationFactoryType</code> for a stateless accessible parameterless factory. Use <code>DrawOperationFactoryMethod</code> for configured instances. Both must produce <code>IDataGridCellDrawOperationFactory</code>; invalid combinations report <code>PDGSG122</code>.</p>
+<p>Assigning the generated factory preserves automatic subscription to <code>IDataGridCellDrawOperationInvalidationSource</code>.</p>
+<h2 id="generated-item-draw-cache">Generated item draw cache</h2>
+<p><code>[GenerateDataGridCellDrawCache]</code> is an independent incremental pipeline for partial row classes. It emits:</p>
+<ul>
+<li><code>IDataGridCellDrawOperationItemCache</code> implementation;</li>
+<li>deterministic <code>{Property}CellDrawCacheSlot</code> constants;</li>
+<li>array-backed O(1) cache storage;</li>
+<li>whole-cache and per-slot clear methods.</li>
+</ul>
+<p><code>InitialCapacity</code> avoids first-use growth. <code>MaximumCapacity</code> bounds retained entries and rejects invalid slots without allocation. Set <code>GenerateSlotConstants = false</code> when an external component owns slot assignment.</p>
+<h2 id="dynamic-commandcontent-bindings">Dynamic command/content bindings</h2>
+<p>Button, toggle-button, and toggle-switch definitions can bind command, parameter, and state-specific text through generated binding definitions:</p>
+<pre><code class="lang-csharp">[DataGridColumn(
+    DataGridColumnKind.ToggleButton,
+    CheckedContentMember = nameof(PinnedLabel),
+    UncheckedContentMember = nameof(UnpinnedLabel),
+    CommandMember = nameof(PinChangedCommand),
+    CommandParameterMember = nameof(Id))]
+public bool IsPinned { get; set; }
+</code></pre>
+<p>This path avoids per-cell binding discovery and preserves the existing static content/command APIs for application-wide commands.</p>
+<h2 id="performance-guidance">Performance guidance</h2>
+<ul>
+<li>Prefer typed accessors and generated fast-path options before selecting a specialized realization path.</li>
+<li>Use drawn/direct paths for measured high-density scenarios, not as a universal replacement for templated controls.</li>
+<li>Bound shared text-layout and per-item caches.</li>
+<li>Use recycling templates for interactive content.</li>
+<li>Avoid <code>RowDetailsVisibilityMode.Visible</code> with <code>HighFrequencyStreaming</code>; the generator reports <code>PDGSG128</code> because details would be realized for every row.</li>
+</ul>
+<h2 id="related-articles">Related articles</h2>
+<ul>
+<li><a href="../optimized-cell-paths.html">Optimized retained and drawn cells</a></li>
+<li><a href="../custom-drawing-columns.html">Custom drawing columns</a></li>
+<li><a href="../column-banding.html">Column banding</a></li>
+<li><a href="../column-chooser.html">Column chooser</a></li>
+<li><a href="../column-definitions-fast-path-overview.html">Fast-path overview</a></li>
+</ul>
+
+</article>
+
+        <div class="contribution d-print-none">
+          <a href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/docfx/articles/source-generators/layout-templates-rendering.md/#L1" class="edit-link">Edit this page</a>
+        </div>
+
+        <div class="next-article d-print-none border-top" id="nextArticle"></div>
+
+      </div>
+
+      <div class="affix">
+        <nav id="affix"></nav>
+      </div>
+    </main>
+
+
+    <footer class="border-top text-secondary">
+      <div class="container-xxl">
+        <div class="flex-fill">
+          <span>Made with <a href="https://dotnet.github.io/docfx">docfx</a></span>
+        </div>
+      </div>
+    </footer>
+  </body>
+</html>

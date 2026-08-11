@@ -1,0 +1,737 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+      <title>Class DataGridGeneratedRemoteQueryController&lt;TItem, TKey&gt; | ProDataGrid for Avalonia </title>
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <meta name="title" content="Class DataGridGeneratedRemoteQueryController&lt;TItem, TKey&gt; | ProDataGrid for Avalonia ">
+      
+      <meta name="description" content="Coordinates cancellation, debounce, stale suppression, field translation, and optional page caching.">
+      <link rel="icon" href="../favicon.ico">
+      <link rel="stylesheet" href="../public/docfx.min.css">
+      <link rel="stylesheet" href="../public/main.css">
+      <meta name="docfx:navrel" content="../toc.html">
+      <meta name="docfx:tocrel" content="toc.html">
+      
+      
+      
+      
+      <meta name="docfx:docurl" content="https://github.com/wieslawsoltes/ProDataGrid/new/master/apiSpec/new?filename=Avalonia_Controls_DataGridGeneratedRemoteQueryController_2.md&amp;value=---%0Auid%3A%20Avalonia.Controls.DataGridGeneratedRemoteQueryController%602%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">
+      <meta name="loc:inThisArticle" content="In this article">
+      <meta name="loc:searchResultsCount" content="{count} results for &quot;{query}&quot;">
+      <meta name="loc:searchNoResults" content="No results for &quot;{query}&quot;">
+      <meta name="loc:tocFilter" content="Filter by title">
+      <meta name="loc:nextArticle" content="Next">
+      <meta name="loc:prevArticle" content="Previous">
+      <meta name="loc:themeLight" content="Light">
+      <meta name="loc:themeDark" content="Dark">
+      <meta name="loc:themeAuto" content="Auto">
+      <meta name="loc:changeTheme" content="Change theme">
+      <meta name="loc:copy" content="Copy">
+      <meta name="loc:downloadPdf" content="Download PDF">
+
+      <script type="module" src="./../public/docfx.min.js"></script>
+
+      <script>
+        const theme = localStorage.getItem('theme') || 'auto'
+        document.documentElement.setAttribute('data-bs-theme', theme === 'auto' ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light') : theme)
+      </script>
+
+  </head>
+
+  <body class="tex2jax_ignore" data-layout="" data-yaml-mime="ManagedReference">
+    <header class="bg-body border-bottom">
+      <nav id="autocollapse" class="navbar navbar-expand-md" role="navigation">
+        <div class="container-xxl flex-nowrap">
+          <a class="navbar-brand" href="../index.html">
+            <img id="logo" class="svg" src="../images/logo.svg" alt="">
+            
+          </a>
+          <button class="btn btn-lg d-md-none border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navpanel" aria-controls="navpanel" aria-expanded="false" aria-label="Toggle navigation">
+            <i class="bi bi-three-dots"></i>
+          </button>
+          <div class="collapse navbar-collapse" id="navpanel">
+            <div id="navbar">
+            </div>
+          </div>
+        </div>
+      </nav>
+    </header>
+
+    <main class="container-xxl">
+      <div class="toc-offcanvas">
+        <div class="offcanvas-md offcanvas-start" tabindex="-1" id="tocOffcanvas" aria-labelledby="tocOffcanvasLabel">
+          <div class="offcanvas-header">
+            <h5 class="offcanvas-title" id="tocOffcanvasLabel">Table of Contents</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="offcanvas" data-bs-target="#tocOffcanvas" aria-label="Close"></button>
+          </div>
+          <div class="offcanvas-body">
+            <nav class="toc" id="toc"></nav>
+          </div>
+        </div>
+      </div>
+
+      <div class="content">
+        <div class="actionbar">
+          <button class="btn btn-lg border-0 d-md-none" type="button" data-bs-toggle="offcanvas" data-bs-target="#tocOffcanvas" aria-controls="tocOffcanvas" aria-expanded="false" aria-label="Show table of contents">
+            <i class="bi bi-list"></i>
+          </button>
+
+          <nav id="breadcrumb"></nav>
+        </div>
+
+        <article data-uid="Avalonia.Controls.DataGridGeneratedRemoteQueryController`2">
+
+
+
+  <h1 id="Avalonia_Controls_DataGridGeneratedRemoteQueryController_2" data-uid="Avalonia.Controls.DataGridGeneratedRemoteQueryController`2" class="text-break">
+Class DataGridGeneratedRemoteQueryController&lt;TItem, TKey&gt;  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/ColumnDefinitions/DataGridGeneratedRemoteQuery.cs/#L218"><i class="bi bi-code-slash"></i></a>
+  </h1>
+
+  <div class="facts text-secondary">
+    <dl><dt>Namespace</dt><dd><a class="xref" href="Avalonia.html">Avalonia</a>.<a class="xref" href="Avalonia.Controls.html">Controls</a></dd></dl>
+  <dl><dt>Assembly</dt><dd>Avalonia.Controls.DataGrid.dll</dd></dl>
+  </div>
+
+  <div class="markdown summary"><p>Coordinates cancellation, debounce, stale suppression, field translation, and optional page caching.</p>
+</div>
+  <div class="markdown conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public sealed class DataGridGeneratedRemoteQueryController&lt;TItem, TKey&gt; : IDisposable</code></pre>
+  </div>
+
+
+
+  <h4 class="section">Type Parameters</h4>
+  <dl class="parameters">
+    <dt><code>TItem</code></dt>
+    <dd><p>The row item type.</p>
+</dd>
+    <dt><code>TKey</code></dt>
+    <dd><p>The stable key type.</p>
+</dd>
+  </dl>
+
+  <dl class="typelist inheritance">
+    <dt>Inheritance</dt>
+    <dd>
+      <div><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object">object</a></div>
+      <div><span class="xref">DataGridGeneratedRemoteQueryController&lt;TItem, TKey&gt;</span></div>
+    </dd>
+  </dl>
+
+  <dl class="typelist implements">
+    <dt>Implements</dt>
+    <dd>
+      <div><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.idisposable">IDisposable</a></div>
+    </dd>
+  </dl>
+
+
+  <dl class="typelist inheritedMembers">
+    <dt>Inherited Members</dt>
+    <dd>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object)">object.Equals(object)</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object-system-object)">object.Equals(object, object)</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.gethashcode">object.GetHashCode()</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.gettype">object.GetType()</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.referenceequals">object.ReferenceEquals(object, object)</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.tostring">object.ToString()</a>
+    </div>
+  </dd></dl>
+
+
+
+
+
+
+  <h2 class="section" id="constructors">Constructors
+</h2>
+
+
+  <a id="Avalonia_Controls_DataGridGeneratedRemoteQueryController_2__ctor_" data-uid="Avalonia.Controls.DataGridGeneratedRemoteQueryController`2.#ctor*"></a>
+
+  <h3 id="Avalonia_Controls_DataGridGeneratedRemoteQueryController_2__ctor_Avalonia_Controls_IDataGridQueryProvider__0__1__System_TimeSpan_System_Int32_System_Func_System_String_System_String__" data-uid="Avalonia.Controls.DataGridGeneratedRemoteQueryController`2.#ctor(Avalonia.Controls.IDataGridQueryProvider{`0,`1},System.TimeSpan,System.Int32,System.Func{System.String,System.String})">
+  DataGridGeneratedRemoteQueryController(IDataGridQueryProvider&lt;TItem, TKey&gt;, TimeSpan, int, Func&lt;string, string&gt;)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/ColumnDefinitions/DataGridGeneratedRemoteQuery.cs/#L235"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Initializes a remote query controller.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public DataGridGeneratedRemoteQueryController(IDataGridQueryProvider&lt;TItem, TKey&gt; provider, TimeSpan debounce = default, int pageCacheCapacity = 0, Func&lt;string, string&gt; fieldNameTranslator = null)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>provider</code> <a class="xref" href="Avalonia.Controls.IDataGridQueryProvider-2.html">IDataGridQueryProvider</a>&lt;TItem, TKey&gt;</dt>
+    <dd></dd>
+    <dt><code>debounce</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.timespan">TimeSpan</a></dt>
+    <dd></dd>
+    <dt><code>pageCacheCapacity</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a></dt>
+    <dd></dd>
+    <dt><code>fieldNameTranslator</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.func-2">Func</a>&lt;<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a>, <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a>&gt;</dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+
+  <h2 class="section" id="properties">Properties
+</h2>
+
+
+  <a id="Avalonia_Controls_DataGridGeneratedRemoteQueryController_2_Debounce_" data-uid="Avalonia.Controls.DataGridGeneratedRemoteQueryController`2.Debounce*"></a>
+
+  <h3 id="Avalonia_Controls_DataGridGeneratedRemoteQueryController_2_Debounce" data-uid="Avalonia.Controls.DataGridGeneratedRemoteQueryController`2.Debounce">
+  Debounce
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/ColumnDefinitions/DataGridGeneratedRemoteQuery.cs/#L257"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Gets the request debounce interval.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public TimeSpan Debounce { get; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.timespan">TimeSpan</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="Avalonia_Controls_DataGridGeneratedRemoteQueryController_2_FieldNameTranslator_" data-uid="Avalonia.Controls.DataGridGeneratedRemoteQueryController`2.FieldNameTranslator*"></a>
+
+  <h3 id="Avalonia_Controls_DataGridGeneratedRemoteQueryController_2_FieldNameTranslator" data-uid="Avalonia.Controls.DataGridGeneratedRemoteQueryController`2.FieldNameTranslator">
+  FieldNameTranslator
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/ColumnDefinitions/DataGridGeneratedRemoteQuery.cs/#L261"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Gets the stable-field to backend-field translator.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public Func&lt;string, string&gt; FieldNameTranslator { get; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.func-2">Func</a>&lt;<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a>, <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a>&gt;</dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="Avalonia_Controls_DataGridGeneratedRemoteQueryController_2_IsLoading_" data-uid="Avalonia.Controls.DataGridGeneratedRemoteQueryController`2.IsLoading*"></a>
+
+  <h3 id="Avalonia_Controls_DataGridGeneratedRemoteQueryController_2_IsLoading" data-uid="Avalonia.Controls.DataGridGeneratedRemoteQueryController`2.IsLoading">
+  IsLoading
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/ColumnDefinitions/DataGridGeneratedRemoteQuery.cs/#L263"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Gets whether the current revision is loading.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public bool IsLoading { get; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="Avalonia_Controls_DataGridGeneratedRemoteQueryController_2_IssuedRevision_" data-uid="Avalonia.Controls.DataGridGeneratedRemoteQueryController`2.IssuedRevision*"></a>
+
+  <h3 id="Avalonia_Controls_DataGridGeneratedRemoteQueryController_2_IssuedRevision" data-uid="Avalonia.Controls.DataGridGeneratedRemoteQueryController`2.IssuedRevision">
+  IssuedRevision
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/ColumnDefinitions/DataGridGeneratedRemoteQuery.cs/#L271"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Gets the latest foreground or prefetch revision reserved from the monotonic sequence.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public long IssuedRevision { get; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int64">long</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="Avalonia_Controls_DataGridGeneratedRemoteQueryController_2_LastError_" data-uid="Avalonia.Controls.DataGridGeneratedRemoteQueryController`2.LastError*"></a>
+
+  <h3 id="Avalonia_Controls_DataGridGeneratedRemoteQueryController_2_LastError" data-uid="Avalonia.Controls.DataGridGeneratedRemoteQueryController`2.LastError">
+  LastError
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/ColumnDefinitions/DataGridGeneratedRemoteQuery.cs/#L265"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Gets the latest current provider error.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public Exception LastError { get; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.exception">Exception</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="Avalonia_Controls_DataGridGeneratedRemoteQueryController_2_LastPage_" data-uid="Avalonia.Controls.DataGridGeneratedRemoteQueryController`2.LastPage*"></a>
+
+  <h3 id="Avalonia_Controls_DataGridGeneratedRemoteQueryController_2_LastPage" data-uid="Avalonia.Controls.DataGridGeneratedRemoteQueryController`2.LastPage">
+  LastPage
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/ColumnDefinitions/DataGridGeneratedRemoteQuery.cs/#L267"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Gets the latest accepted page.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public DataGridQueryPage&lt;TItem, TKey&gt; LastPage { get; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="Avalonia.Controls.DataGridQueryPage-2.html">DataGridQueryPage</a>&lt;TItem, TKey&gt;</dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="Avalonia_Controls_DataGridGeneratedRemoteQueryController_2_PageCacheCapacity_" data-uid="Avalonia.Controls.DataGridGeneratedRemoteQueryController`2.PageCacheCapacity*"></a>
+
+  <h3 id="Avalonia_Controls_DataGridGeneratedRemoteQueryController_2_PageCacheCapacity" data-uid="Avalonia.Controls.DataGridGeneratedRemoteQueryController`2.PageCacheCapacity">
+  PageCacheCapacity
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/ColumnDefinitions/DataGridGeneratedRemoteQuery.cs/#L259"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Gets the maximum cached page count.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public int PageCacheCapacity { get; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="Avalonia_Controls_DataGridGeneratedRemoteQueryController_2_Revision_" data-uid="Avalonia.Controls.DataGridGeneratedRemoteQueryController`2.Revision*"></a>
+
+  <h3 id="Avalonia_Controls_DataGridGeneratedRemoteQueryController_2_Revision" data-uid="Avalonia.Controls.DataGridGeneratedRemoteQueryController`2.Revision">
+  Revision
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/ColumnDefinitions/DataGridGeneratedRemoteQuery.cs/#L269"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Gets the latest foreground revision.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public long Revision { get; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int64">long</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <h2 class="section" id="methods">Methods
+</h2>
+
+
+  <a id="Avalonia_Controls_DataGridGeneratedRemoteQueryController_2_ClearCache_" data-uid="Avalonia.Controls.DataGridGeneratedRemoteQueryController`2.ClearCache*"></a>
+
+  <h3 id="Avalonia_Controls_DataGridGeneratedRemoteQueryController_2_ClearCache" data-uid="Avalonia.Controls.DataGridGeneratedRemoteQueryController`2.ClearCache">
+  ClearCache()
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/ColumnDefinitions/DataGridGeneratedRemoteQuery.cs/#L453"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Clears all cached remote pages.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public void ClearCache()</code></pre>
+  </div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Avalonia_Controls_DataGridGeneratedRemoteQueryController_2_Dispose_" data-uid="Avalonia.Controls.DataGridGeneratedRemoteQueryController`2.Dispose*"></a>
+
+  <h3 id="Avalonia_Controls_DataGridGeneratedRemoteQueryController_2_Dispose" data-uid="Avalonia.Controls.DataGridGeneratedRemoteQueryController`2.Dispose">
+  Dispose()
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/ColumnDefinitions/DataGridGeneratedRemoteQuery.cs/#L463"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Cancels current work and releases the controller.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public void Dispose()</code></pre>
+  </div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Avalonia_Controls_DataGridGeneratedRemoteQueryController_2_ExecuteLatestAsync_" data-uid="Avalonia.Controls.DataGridGeneratedRemoteQueryController`2.ExecuteLatestAsync*"></a>
+
+  <h3 id="Avalonia_Controls_DataGridGeneratedRemoteQueryController_2_ExecuteLatestAsync_System_Func_System_Int64_Avalonia_Controls_DataGridRemoteQuery__0___System_String_System_Threading_CancellationToken_" data-uid="Avalonia.Controls.DataGridGeneratedRemoteQueryController`2.ExecuteLatestAsync(System.Func{System.Int64,Avalonia.Controls.DataGridRemoteQuery{`0}},System.String,System.Threading.CancellationToken)">
+  ExecuteLatestAsync(Func&lt;long, DataGridRemoteQuery&lt;TItem&gt;&gt;, string, CancellationToken)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/ColumnDefinitions/DataGridGeneratedRemoteQuery.cs/#L281"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Executes the latest query and returns null for canceled or stale work.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public ValueTask&lt;DataGridQueryPage&lt;TItem, TKey&gt;&gt; ExecuteLatestAsync(Func&lt;long, DataGridRemoteQuery&lt;TItem&gt;&gt; queryFactory, string cacheKey = null, CancellationToken cancellationToken = default)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>queryFactory</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.func-2">Func</a>&lt;<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int64">long</a>, <a class="xref" href="Avalonia.Controls.DataGridRemoteQuery-1.html">DataGridRemoteQuery</a>&lt;TItem&gt;&gt;</dt>
+    <dd></dd>
+    <dt><code>cacheKey</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></dt>
+    <dd></dd>
+    <dt><code>cancellationToken</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.threading.cancellationtoken">CancellationToken</a></dt>
+    <dd></dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.threading.tasks.valuetask-1">ValueTask</a>&lt;<a class="xref" href="Avalonia.Controls.DataGridQueryPage-2.html">DataGridQueryPage</a>&lt;TItem, TKey&gt;&gt;</dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Avalonia_Controls_DataGridGeneratedRemoteQueryController_2_PrefetchAsync_" data-uid="Avalonia.Controls.DataGridGeneratedRemoteQueryController`2.PrefetchAsync*"></a>
+
+  <h3 id="Avalonia_Controls_DataGridGeneratedRemoteQueryController_2_PrefetchAsync_System_Func_System_Int64_Avalonia_Controls_DataGridRemoteQuery__0___System_String_System_Threading_CancellationToken_" data-uid="Avalonia.Controls.DataGridGeneratedRemoteQueryController`2.PrefetchAsync(System.Func{System.Int64,Avalonia.Controls.DataGridRemoteQuery{`0}},System.String,System.Threading.CancellationToken)">
+  PrefetchAsync(Func&lt;long, DataGridRemoteQuery&lt;TItem&gt;&gt;, string, CancellationToken)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/ColumnDefinitions/DataGridGeneratedRemoteQuery.cs/#L380"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Executes a cache-only prefetch without canceling, superseding, or changing observable foreground state.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public ValueTask&lt;bool&gt; PrefetchAsync(Func&lt;long, DataGridRemoteQuery&lt;TItem&gt;&gt; queryFactory, string cacheKey, CancellationToken cancellationToken = default)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>queryFactory</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.func-2">Func</a>&lt;<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int64">long</a>, <a class="xref" href="Avalonia.Controls.DataGridRemoteQuery-1.html">DataGridRemoteQuery</a>&lt;TItem&gt;&gt;</dt>
+    <dd></dd>
+    <dt><code>cacheKey</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></dt>
+    <dd></dd>
+    <dt><code>cancellationToken</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.threading.cancellationtoken">CancellationToken</a></dt>
+    <dd></dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.threading.tasks.valuetask-1">ValueTask</a>&lt;<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a>&gt;</dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Avalonia_Controls_DataGridGeneratedRemoteQueryController_2_TranslateField_" data-uid="Avalonia.Controls.DataGridGeneratedRemoteQueryController`2.TranslateField*"></a>
+
+  <h3 id="Avalonia_Controls_DataGridGeneratedRemoteQueryController_2_TranslateField_System_String_" data-uid="Avalonia.Controls.DataGridGeneratedRemoteQueryController`2.TranslateField(System.String)">
+  TranslateField(string)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/ColumnDefinitions/DataGridGeneratedRemoteQuery.cs/#L277"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Translates one stable generated field ID for the backend.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public string TranslateField(string stableFieldId)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>stableFieldId</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></dt>
+    <dd></dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Avalonia_Controls_DataGridGeneratedRemoteQueryController_2_TryGetCachedPage_" data-uid="Avalonia.Controls.DataGridGeneratedRemoteQueryController`2.TryGetCachedPage*"></a>
+
+  <h3 id="Avalonia_Controls_DataGridGeneratedRemoteQueryController_2_TryGetCachedPage_System_String_Avalonia_Controls_DataGridQueryPage__0__1___" data-uid="Avalonia.Controls.DataGridGeneratedRemoteQueryController`2.TryGetCachedPage(System.String,Avalonia.Controls.DataGridQueryPage{`0,`1}@)">
+  TryGetCachedPage(string, out DataGridQueryPage&lt;TItem, TKey&gt;)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/ColumnDefinitions/DataGridGeneratedRemoteQuery.cs/#L438"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Attempts to get a cached page by caller-defined stable key.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public bool TryGetCachedPage(string cacheKey, out DataGridQueryPage&lt;TItem, TKey&gt; page)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>cacheKey</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></dt>
+    <dd></dd>
+    <dt><code>page</code> <a class="xref" href="Avalonia.Controls.DataGridQueryPage-2.html">DataGridQueryPage</a>&lt;TItem, TKey&gt;</dt>
+    <dd></dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <h2 class="section" id="events">Events
+</h2>
+
+
+
+  <h3 id="Avalonia_Controls_DataGridGeneratedRemoteQueryController_2_StateChanged" data-uid="Avalonia.Controls.DataGridGeneratedRemoteQueryController`2.StateChanged">
+  StateChanged
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/ColumnDefinitions/DataGridGeneratedRemoteQuery.cs/#L274"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Occurs whenever observable remote-query state changes.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public event EventHandler&lt;DataGridRemoteQueryStateChangedEventArgs&gt; StateChanged</code></pre>
+  </div>
+
+
+
+
+
+
+  <h4 class="section">Event Type</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.eventhandler-1">EventHandler</a>&lt;<a class="xref" href="Avalonia.Controls.DataGridRemoteQueryStateChangedEventArgs.html">DataGridRemoteQueryStateChangedEventArgs</a>&gt;</dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+</article>
+
+        <div class="contribution d-print-none">
+          <a href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/ColumnDefinitions/DataGridGeneratedRemoteQuery.cs/#L218" class="edit-link">Edit this page</a>
+        </div>
+
+
+      </div>
+
+      <div class="affix">
+        <nav id="affix"></nav>
+      </div>
+    </main>
+
+
+    <footer class="border-top text-secondary">
+      <div class="container-xxl">
+        <div class="flex-fill">
+          <span>Made with <a href="https://dotnet.github.io/docfx">docfx</a></span>
+        </div>
+      </div>
+    </footer>
+  </body>
+</html>

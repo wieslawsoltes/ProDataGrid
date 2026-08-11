@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+      <title>ProDataGrid source generators | ProDataGrid for Avalonia </title>
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <meta name="title" content="ProDataGrid source generators | ProDataGrid for Avalonia ">
+      
+      
+      <link rel="icon" href="../favicon.ico">
+      <link rel="stylesheet" href="../public/docfx.min.css">
+      <link rel="stylesheet" href="../public/main.css">
+      <meta name="docfx:navrel" content="../toc.html">
+      <meta name="docfx:tocrel" content="toc.html">
+      
+      
+      
+      
+      <meta name="docfx:docurl" content="https://github.com/wieslawsoltes/ProDataGrid/blob/master/docfx/articles/source-generators-feature-spec.md/#L1">
+      <meta name="loc:inThisArticle" content="In this article">
+      <meta name="loc:searchResultsCount" content="{count} results for &quot;{query}&quot;">
+      <meta name="loc:searchNoResults" content="No results for &quot;{query}&quot;">
+      <meta name="loc:tocFilter" content="Filter by title">
+      <meta name="loc:nextArticle" content="Next">
+      <meta name="loc:prevArticle" content="Previous">
+      <meta name="loc:themeLight" content="Light">
+      <meta name="loc:themeDark" content="Dark">
+      <meta name="loc:themeAuto" content="Auto">
+      <meta name="loc:changeTheme" content="Change theme">
+      <meta name="loc:copy" content="Copy">
+      <meta name="loc:downloadPdf" content="Download PDF">
+
+      <script type="module" src="./../public/docfx.min.js"></script>
+
+      <script>
+        const theme = localStorage.getItem('theme') || 'auto'
+        document.documentElement.setAttribute('data-bs-theme', theme === 'auto' ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light') : theme)
+      </script>
+
+  </head>
+
+  <body class="tex2jax_ignore" data-layout="" data-yaml-mime="">
+    <header class="bg-body border-bottom">
+      <nav id="autocollapse" class="navbar navbar-expand-md" role="navigation">
+        <div class="container-xxl flex-nowrap">
+          <a class="navbar-brand" href="../index.html">
+            <img id="logo" class="svg" src="../images/logo.svg" alt="">
+            
+          </a>
+          <button class="btn btn-lg d-md-none border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navpanel" aria-controls="navpanel" aria-expanded="false" aria-label="Toggle navigation">
+            <i class="bi bi-three-dots"></i>
+          </button>
+          <div class="collapse navbar-collapse" id="navpanel">
+            <div id="navbar">
+            </div>
+          </div>
+        </div>
+      </nav>
+    </header>
+
+    <main class="container-xxl">
+      <div class="toc-offcanvas">
+        <div class="offcanvas-md offcanvas-start" tabindex="-1" id="tocOffcanvas" aria-labelledby="tocOffcanvasLabel">
+          <div class="offcanvas-header">
+            <h5 class="offcanvas-title" id="tocOffcanvasLabel">Table of Contents</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="offcanvas" data-bs-target="#tocOffcanvas" aria-label="Close"></button>
+          </div>
+          <div class="offcanvas-body">
+            <nav class="toc" id="toc"></nav>
+          </div>
+        </div>
+      </div>
+
+      <div class="content">
+        <div class="actionbar">
+          <button class="btn btn-lg border-0 d-md-none" type="button" data-bs-toggle="offcanvas" data-bs-target="#tocOffcanvas" aria-controls="tocOffcanvas" aria-expanded="false" aria-label="Show table of contents">
+            <i class="bi bi-list"></i>
+          </button>
+
+          <nav id="breadcrumb"></nav>
+        </div>
+
+        <article data-uid="">
+<h1 id="prodatagrid-source-generators">ProDataGrid source generators</h1>
+
+<p><code>ProDataGrid.SourceGenerators</code> produces reflection-free grid schemas, typed data-operation adapters, application controllers, and optional Avalonia or ReactiveUI views. Generated code uses direct delegates and compiled Avalonia binding metadata, so the same contracts work with trimming and NativeAOT.</p>
+<p>This page is the entry point for the complete source-generator documentation. The former expansion specification has been replaced by task-focused articles that describe the implemented APIs.</p>
+<h2 id="what-the-generator-can-own">What the generator can own</h2>
+<pre><code class="lang-mermaid">flowchart LR
+    M[&quot;Attributed item model&quot;] --&gt; S[&quot;Generated schema and manifest&quot;]
+    S --&gt; C[&quot;Column definitions and fast-path accessors&quot;]
+    S --&gt; O[&quot;Sorting, filtering, search, grouping, editing, and state&quot;]
+    S --&gt; P[&quot;DynamicData, streaming, hierarchy, and remote adapters&quot;]
+    C --&gt; V[&quot;Generated Avalonia or ReactiveUI view&quot;]
+    O --&gt; V
+    P --&gt; V
+    V --&gt; G[&quot;ProDataGrid&quot;]
+</code></pre>
+<p>The generated schema is the canonical source for column keys, typed fields, item identity, operation delegates, transfer metadata, analytics roles, and persisted-state compatibility. This prevents individual features from rediscovering properties with reflection or adopting incompatible key conventions.</p>
+<p>The generator does not own domain rules, persistence, networking, authentication, retry policy, visual branding, arbitrary formula evaluation, or application-specific shells. Those remain user code behind typed interfaces and customization hooks.</p>
+<h2 id="start-here">Start here</h2>
+<table>
+<thead>
+<tr>
+<th>Goal</th>
+<th>Article</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Install the analyzer and generate a first grid</td>
+<td><a href="source-generators/getting-started.html">Getting started and schema discovery</a></td>
+</tr>
+<tr>
+<td>Configure column kinds, typed fields, fast paths, and runtime shapes</td>
+<td><a href="source-generators/schemas-and-columns.html">Schemas, columns, accessors, and manifests</a></td>
+</tr>
+<tr>
+<td>Generate sorting, filtering, searching, grouping, summaries, paging, and controllers</td>
+<td><a href="source-generators/operations-and-controllers.html">Operations and controllers</a></td>
+</tr>
+<tr>
+<td>Connect DynamicData, async streams, channels, snapshots, or remote data</td>
+<td><a href="source-generators/reactive-streaming-remote.html">Reactive, streaming, and remote data</a></td>
+</tr>
+<tr>
+<td>Generate tree metadata, filtering, expansion, and wrapper-aware bindings</td>
+<td><a href="source-generators/hierarchy.html">Hierarchical data</a></td>
+</tr>
+<tr>
+<td>Preserve selection, current cell, layout, and state by stable key</td>
+<td><a href="source-generators/selection-navigation-state.html">Selection, navigation, and state</a></td>
+</tr>
+<tr>
+<td>Generate editing, validation, undo, clipboard, fill, formatting, and drag/drop adapters</td>
+<td><a href="source-generators/editing-and-data-workflows.html">Editing and data workflows</a></td>
+</tr>
+<tr>
+<td>Configure bands, indexed columns, templates, details, direct cells, and drawing</td>
+<td><a href="source-generators/layout-templates-rendering.html">Layout, templates, and rendering</a></td>
+</tr>
+<tr>
+<td>Generate pivot, outline, formula, and chart metadata</td>
+<td><a href="source-generators/analytics-and-formulas.html">Analytics and formulas</a></td>
+</tr>
+<tr>
+<td>Generate code-only Avalonia and ReactiveUI views</td>
+<td><a href="source-generators/generated-views.html">Generated views</a></td>
+</tr>
+<tr>
+<td>Apply assembly policies, registries, DI, custom implementations, and base classes</td>
+<td><a href="source-generators/registries-and-customization.html">Registries and customization</a></td>
+</tr>
+<tr>
+<td>Configure localization, automation, diagnostics, performance, AOT, and tests</td>
+<td><a href="source-generators/diagnostics-performance-testing.html">Accessibility, diagnostics, and validation</a></td>
+</tr>
+<tr>
+<td>Look up every generator attribute and important option</td>
+<td><a href="source-generators/attribute-reference.html">Attribute reference</a></td>
+</tr>
+<tr>
+<td>Find complete sample and production-validation scenarios</td>
+<td><a href="source-generators/samples-and-production-validation.html">Samples and production validation</a></td>
+</tr>
+</tbody>
+</table>
+<h2 id="minimal-example">Minimal example</h2>
+<p>Reference the generator as a private analyzer dependency:</p>
+<pre><code class="lang-xml">&lt;ItemGroup&gt;
+  &lt;PackageReference Include=&quot;ProDataGrid&quot; /&gt;
+  &lt;PackageReference Include=&quot;ProDataGrid.SourceGenerators&quot;
+                    PrivateAssets=&quot;all&quot; /&gt;
+&lt;/ItemGroup&gt;
+</code></pre>
+<p>Describe the row contract and augment a partial ViewModel:</p>
+<pre><code class="lang-csharp">using ProDataGrid.SourceGeneration;
+
+[GenerateDataGridColumns(
+    ProviderName = &quot;TradeGridSchema&quot;,
+    SchemaId = &quot;trading/trade/v1&quot;,
+    Strict = true)]
+public sealed class Trade
+{
+    [DataGridKey]
+    [DataGridColumn(DataGridColumnKind.Numeric,
+        Header = &quot;ID&quot;, ColumnKey = &quot;trade-id&quot;, Order = 0,
+        IsReadOnly = true)]
+    public int Id { get; init; }
+
+    [DataGridColumn(DataGridColumnKind.Text,
+        Header = &quot;Symbol&quot;, ColumnKey = &quot;trade-symbol&quot;, Order = 1,
+        Width = &quot;2*&quot;)]
+    public string Symbol { get; init; } = string.Empty;
+
+    [DataGridColumn(DataGridColumnKind.Numeric,
+        Header = &quot;Price&quot;, ColumnKey = &quot;trade-price&quot;, Order = 2,
+        FormatString = &quot;N2&quot;)]
+    public decimal Price { get; init; }
+}
+
+[GenerateDataGridViewModel(typeof(Trade), ProviderName = &quot;TradeGridSchema&quot;)]
+public sealed partial class TradesViewModel
+{
+    public IReadOnlyList&lt;Trade&gt; Items { get; } = LoadTrades();
+}
+</code></pre>
+<p>Bind the generated members with compiled XAML bindings:</p>
+<pre><code class="lang-xml">&lt;DataGrid ItemsSource=&quot;{Binding Items}&quot;
+          ColumnDefinitionsSource=&quot;{Binding ColumnDefinitions}&quot;
+          FastPathOptions=&quot;{Binding FastPathOptions}&quot;
+          AutoGenerateColumns=&quot;False&quot; /&gt;
+</code></pre>
+<p>The generated ViewModel members are <code>DataGridSchema</code>, <code>ColumnDefinitions</code>, and <code>FastPathOptions</code>. Their names are configurable.</p>
+<h2 id="feature-coverage">Feature coverage</h2>
+<p>All major feature families from the expansion design are implemented. The table maps the original feature identifiers to their user documentation.</p>
+<table>
+<thead>
+<tr>
+<th>Feature</th>
+<th>Implemented capability</th>
+<th>Documentation</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>F01</td>
+<td>Isolated incremental discovery, deterministic emission, compatibility manifest</td>
+<td><a href="source-generators/getting-started.html">Getting started</a>, <a href="source-generators/diagnostics-performance-testing.html">validation</a></td>
+</tr>
+<tr>
+<td>F02</td>
+<td>Stable keys, typed item indexes, reference and composite identity</td>
+<td><a href="source-generators/schemas-and-columns.html">Schemas and columns</a></td>
+</tr>
+<tr>
+<td>F03–F04</td>
+<td>Typed descriptors, presets, operation models, named controllers and commands</td>
+<td><a href="source-generators/operations-and-controllers.html">Operations and controllers</a></td>
+</tr>
+<tr>
+<td>F05–F07</td>
+<td>DynamicData, bounded streams, snapshot reconciliation, revisioned remote queries</td>
+<td><a href="source-generators/reactive-streaming-remote.html">Reactive, streaming, and remote data</a></td>
+</tr>
+<tr>
+<td>F08</td>
+<td>Hierarchy metadata, wrapper-aware bindings, filtering, async expansion</td>
+<td><a href="source-generators/hierarchy.html">Hierarchical data</a></td>
+</tr>
+<tr>
+<td>F09</td>
+<td>Typed grouping and rendered or incremental summaries</td>
+<td><a href="source-generators/operations-and-controllers.html">Operations and controllers</a></td>
+</tr>
+<tr>
+<td>F10–F11</td>
+<td>Stable-key selection, current cell, navigation, state capture and migration</td>
+<td><a href="source-generators/selection-navigation-state.html">Selection, navigation, and state</a></td>
+</tr>
+<tr>
+<td>F12–F14</td>
+<td>Editing, conversion, validation, undo, clipboard, fill, conditional formatting</td>
+<td><a href="source-generators/editing-and-data-workflows.html">Editing and data workflows</a></td>
+</tr>
+<tr>
+<td>F15–F16</td>
+<td>Bands, chooser/layout, indexed columns, templates, row details, custom drawing</td>
+<td><a href="source-generators/layout-templates-rendering.html">Layout, templates, and rendering</a></td>
+</tr>
+<tr>
+<td>F17</td>
+<td>Keyed flat and hierarchical drag/drop adapters</td>
+<td><a href="source-generators/editing-and-data-workflows.html">Editing and data workflows</a></td>
+</tr>
+<tr>
+<td>F18</td>
+<td>Pivot, outline, chart and formula metadata and adapters</td>
+<td><a href="source-generators/analytics-and-formulas.html">Analytics and formulas</a></td>
+</tr>
+<tr>
+<td>F19</td>
+<td>Code-only Avalonia/ReactiveUI views, recipes, events and interactions</td>
+<td><a href="source-generators/generated-views.html">Generated views</a></td>
+</tr>
+<tr>
+<td>F20</td>
+<td>Localization, automation metadata and diagnostics manifests</td>
+<td><a href="source-generators/diagnostics-performance-testing.html">Accessibility, diagnostics, and validation</a></td>
+</tr>
+<tr>
+<td>F21</td>
+<td>Collection views, paging/currency, mutation services and runtime-defined shapes</td>
+<td><a href="source-generators/operations-and-controllers.html">Operations and controllers</a>, <a href="source-generators/schemas-and-columns.html">schemas and columns</a></td>
+</tr>
+<tr>
+<td>F22</td>
+<td>Filter-editor metadata, distinct values and cached header commands</td>
+<td><a href="source-generators/operations-and-controllers.html">Operations and controllers</a></td>
+</tr>
+<tr>
+<td>F23</td>
+<td>Performance profiles, input maps, navigation and renderer metric sinks</td>
+<td><a href="source-generators/diagnostics-performance-testing.html">Accessibility, diagnostics, and validation</a></td>
+</tr>
+<tr>
+<td>F24</td>
+<td>Drawn/direct realization, transactional selection/cell events, hierarchy-aware filtering and expansion</td>
+<td><a href="source-generators/layout-templates-rendering.html">Layout and rendering</a>, <a href="source-generators/generated-views.html">generated views</a>, <a href="source-generators/hierarchy.html">hierarchy</a></td>
+</tr>
+</tbody>
+</table>
+<h2 id="generated-layers">Generated layers</h2>
+<p>The public generation surface has four cooperating layers:</p>
+<ol>
+<li><strong>Schema generation</strong> produces immutable field metadata, stable identity, fresh mutable column-definition lists, operation compilers, and runtime factories.</li>
+<li><strong>ViewModel augmentation</strong> exposes selected schema artifacts on an existing partial type without requiring a particular ViewModel base class.</li>
+<li><strong>Controller generation</strong> owns operation models, pipelines, state, commands, errors, completion, and disposal for a named grid.</li>
+<li><strong>View generation</strong> creates an optional C# control tree with compiled binding indexers. Avalonia and ReactiveUI strategies share the same schema and controller contracts.</li>
+</ol>
+<p>Assembly and namespace policies are optional compilation-wide coordination features. Direct type/property attributes remain in isolated incremental pipelines and do not enumerate unrelated source types.</p>
+<h2 id="customization-precedence">Customization precedence</h2>
+<p>When an extensible feature offers more than one path, the effective precedence is:</p>
+<ol>
+<li>An explicit implementation or factory type.</li>
+<li>A validated static factory/configuration method or generated protected factory override.</li>
+<li>The generated default.</li>
+<li>A compatible runtime fallback only when strict mode permits it.</li>
+</ol>
+<p>Property metadata overrides type-level configuration; type requests override namespace defaults; namespace defaults override assembly defaults. Invalid or ambiguous combinations produce <code>PDGSG</code> diagnostics instead of silently switching to reflection.</p>
+<h2 id="related-documentation">Related documentation</h2>
+<ul>
+<li><a href="column-definitions.html">Column definitions</a></li>
+<li><a href="column-definitions-aot.html">AOT-friendly column bindings</a></li>
+<li><a href="column-definitions-fast-path-overview.html">Fast-path overview</a></li>
+<li><a href="optimized-cell-paths.html">Optimized retained and drawn cells</a></li>
+<li><a href="dynamicdata-streaming-sourcelist.html">DynamicData streaming</a></li>
+<li><a href="hierarchical-data.html">Hierarchical data</a></li>
+<li><a href="state-persistence.html">State persistence</a></li>
+<li><a href="metrics-and-activities.html">Metrics and activities</a></li>
+</ul>
+
+</article>
+
+        <div class="contribution d-print-none">
+          <a href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/docfx/articles/source-generators-feature-spec.md/#L1" class="edit-link">Edit this page</a>
+        </div>
+
+        <div class="next-article d-print-none border-top" id="nextArticle"></div>
+
+      </div>
+
+      <div class="affix">
+        <nav id="affix"></nav>
+      </div>
+    </main>
+
+
+    <footer class="border-top text-secondary">
+      <div class="container-xxl">
+        <div class="flex-fill">
+          <span>Made with <a href="https://dotnet.github.io/docfx">docfx</a></span>
+        </div>
+      </div>
+    </footer>
+  </body>
+</html>

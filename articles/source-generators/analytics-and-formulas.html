@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+      <title>Analytics and formulas | ProDataGrid for Avalonia </title>
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <meta name="title" content="Analytics and formulas | ProDataGrid for Avalonia ">
+      
+      
+      <link rel="icon" href="../../favicon.ico">
+      <link rel="stylesheet" href="../../public/docfx.min.css">
+      <link rel="stylesheet" href="../../public/main.css">
+      <meta name="docfx:navrel" content="../../toc.html">
+      <meta name="docfx:tocrel" content="../toc.html">
+      
+      
+      
+      
+      <meta name="docfx:docurl" content="https://github.com/wieslawsoltes/ProDataGrid/blob/master/docfx/articles/source-generators/analytics-and-formulas.md/#L1">
+      <meta name="loc:inThisArticle" content="In this article">
+      <meta name="loc:searchResultsCount" content="{count} results for &quot;{query}&quot;">
+      <meta name="loc:searchNoResults" content="No results for &quot;{query}&quot;">
+      <meta name="loc:tocFilter" content="Filter by title">
+      <meta name="loc:nextArticle" content="Next">
+      <meta name="loc:prevArticle" content="Previous">
+      <meta name="loc:themeLight" content="Light">
+      <meta name="loc:themeDark" content="Dark">
+      <meta name="loc:themeAuto" content="Auto">
+      <meta name="loc:changeTheme" content="Change theme">
+      <meta name="loc:copy" content="Copy">
+      <meta name="loc:downloadPdf" content="Download PDF">
+
+      <script type="module" src="./../../public/docfx.min.js"></script>
+
+      <script>
+        const theme = localStorage.getItem('theme') || 'auto'
+        document.documentElement.setAttribute('data-bs-theme', theme === 'auto' ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light') : theme)
+      </script>
+
+  </head>
+
+  <body class="tex2jax_ignore" data-layout="" data-yaml-mime="">
+    <header class="bg-body border-bottom">
+      <nav id="autocollapse" class="navbar navbar-expand-md" role="navigation">
+        <div class="container-xxl flex-nowrap">
+          <a class="navbar-brand" href="../../index.html">
+            <img id="logo" class="svg" src="../../images/logo.svg" alt="">
+            
+          </a>
+          <button class="btn btn-lg d-md-none border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navpanel" aria-controls="navpanel" aria-expanded="false" aria-label="Toggle navigation">
+            <i class="bi bi-three-dots"></i>
+          </button>
+          <div class="collapse navbar-collapse" id="navpanel">
+            <div id="navbar">
+            </div>
+          </div>
+        </div>
+      </nav>
+    </header>
+
+    <main class="container-xxl">
+      <div class="toc-offcanvas">
+        <div class="offcanvas-md offcanvas-start" tabindex="-1" id="tocOffcanvas" aria-labelledby="tocOffcanvasLabel">
+          <div class="offcanvas-header">
+            <h5 class="offcanvas-title" id="tocOffcanvasLabel">Table of Contents</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="offcanvas" data-bs-target="#tocOffcanvas" aria-label="Close"></button>
+          </div>
+          <div class="offcanvas-body">
+            <nav class="toc" id="toc"></nav>
+          </div>
+        </div>
+      </div>
+
+      <div class="content">
+        <div class="actionbar">
+          <button class="btn btn-lg border-0 d-md-none" type="button" data-bs-toggle="offcanvas" data-bs-target="#tocOffcanvas" aria-controls="tocOffcanvas" aria-expanded="false" aria-label="Show table of contents">
+            <i class="bi bi-list"></i>
+          </button>
+
+          <nav id="breadcrumb"></nav>
+        </div>
+
+        <article data-uid="">
+<h1 id="analytics-and-formulas">Analytics and formulas</h1>
+
+<p>Analytics attributes reuse the canonical grid fields for pivot tables, outline reports, charts, formula dependencies, and spreadsheet projections. Generated selectors call typed accessors directly and keep stable ordering independent of CLR property order.</p>
+<h2 id="declare-analytics-roles">Declare analytics roles</h2>
+<pre><code class="lang-csharp">[GenerateDataGridColumns(
+    ProviderName = &quot;SalesSchema&quot;,
+    Discovery = DataGridColumnDiscovery.AttributedOnly,
+    Strict = true,
+    PivotConfigureMethod = nameof(ConfigurePivot),
+    OutlineConfigureMethod = nameof(ConfigureOutline))]
+public sealed class Sale
+{
+    [DataGridColumn(Header = &quot;Period&quot;, ColumnKey = &quot;period&quot;)]
+    [DataGridPivotAxis(
+        DataGridGeneratedAnalyticsRole.PivotColumn,
+        Order = 0)]
+    [DataGridChartField(
+        DataGridGeneratedAnalyticsRole.ChartCategory,
+        Order = 0)]
+    public string Period { get; init; } = string.Empty;
+
+    [DataGridColumn(Header = &quot;Region&quot;, ColumnKey = &quot;region&quot;)]
+    [DataGridPivotAxis(
+        DataGridGeneratedAnalyticsRole.PivotRow,
+        Order = 0,
+        ConfigureMethod = nameof(ConfigurePivotAxis))]
+    [DataGridOutlineField(
+        DataGridGeneratedAnalyticsRole.OutlineGroup,
+        Order = 0,
+        ConfigureMethod = nameof(ConfigureOutlineGroup))]
+    public string Region { get; init; } = string.Empty;
+
+    [DataGridColumn(
+        DataGridColumnKind.Numeric,
+        Header = &quot;Revenue&quot;,
+        ColumnKey = &quot;revenue&quot;)]
+    [DataGridPivotValue(
+        PivotAggregateType.Sum,
+        Order = 0,
+        Format = &quot;C0&quot;)]
+    [DataGridChartField(
+        DataGridGeneratedAnalyticsRole.ChartValue,
+        Order = 0,
+        Series = &quot;Revenue&quot;,
+        Format = &quot;C0&quot;,
+        Aggregate = DataGridAggregateType.Sum)]
+    [DataGridOutlineField(
+        DataGridGeneratedAnalyticsRole.OutlineDetail,
+        Order = 0,
+        Name = &quot;Revenue&quot;,
+        Format = &quot;C0&quot;,
+        Aggregate = DataGridAggregateType.Sum)]
+    public double Revenue { get; init; }
+
+    public static void ConfigurePivotAxis(PivotAxisField field) =&gt;
+        field.ShowSubtotals = false;
+
+    public static void ConfigureOutlineGroup(OutlineGroupField field) =&gt;
+        field.ShowSubtotals = true;
+
+    public static void ConfigurePivot(PivotTableModel model) =&gt;
+        model.Layout.RowLayout = PivotRowLayout.Tabular;
+
+    public static void ConfigureOutline(OutlineReportModel model) =&gt;
+        model.Layout.ShowGrandTotal = true;
+}
+</code></pre>
+<p>Roles are ordered globally by <code>Order</code>, then stable column key. Generated fields leave runtime property paths unset.</p>
+<h2 id="pivot-factories">Pivot factories</h2>
+<p>The provider exposes:</p>
+<ul>
+<li><code>AnalyticsFields</code>;</li>
+<li><code>CreatePivotAxisFields</code>;</li>
+<li><code>CreatePivotValueFields</code>;</li>
+<li><code>CreatePivotTableModel</code>.</li>
+</ul>
+<pre><code class="lang-csharp">PivotTableModel pivot = SalesSchema.CreatePivotTableModel(
+    items,
+    static model =&gt;
+    {
+        model.Layout.RowLayout = PivotRowLayout.Tabular;
+        model.Layout.ValuesPosition = PivotValuesPosition.Columns;
+        model.Layout.ShowRowSubtotals = false;
+    });
+</code></pre>
+<p>The factory suspends auto-refresh while installing rows, columns, filters, values, generated policy, and the optional caller callback. Refresh is enabled only after configuration succeeds.</p>
+<p>Per-field configure methods must accept the exact <code>PivotAxisField</code> or <code>PivotValueField</code> type. <code>PivotConfigureMethod</code> accepts <code>PivotTableModel</code>.</p>
+<h2 id="calculated-and-custom-pivot-values">Calculated and custom pivot values</h2>
+<pre><code class="lang-csharp">[DataGridColumn(
+    DataGridColumnKind.Numeric,
+    Header = &quot;Margin&quot;,
+    ColumnKey = &quot;margin&quot;)]
+[DataGridPivotValue(
+    PivotAggregateType.None,
+    Order = 1,
+    Format = &quot;P1&quot;,
+    Formula = &quot;[revenue] * 0.2&quot;,
+    Dependencies = [&quot;revenue&quot;])]
+public double Margin { get; init; }
+</code></pre>
+<p>Dependencies use stable generated column keys. Missing or duplicate formula metadata reports <code>PDGSG121</code>.</p>
+<p>For <code>PivotAggregateType.Custom</code>, set <code>CustomAggregatorFactoryMethod</code> to an accessible static parameterless factory returning <code>IPivotAggregator</code>. Formula/custom-aggregate conflicts report <code>PDGSG009</code>.</p>
+<h2 id="outline-reports">Outline reports</h2>
+<p>The provider emits <code>CreateOutlineGroupFields</code>, <code>CreateOutlineValueFields</code>, and <code>CreateOutlineReportModel</code>:</p>
+<pre><code class="lang-csharp">OutlineReportModel outline = SalesSchema.CreateOutlineReportModel(
+    items,
+    static report =&gt;
+    {
+        report.Layout.ShowSubtotals = true;
+        report.Layout.ShowGrandTotal = true;
+        report.Layout.ShowDetailRows = true;
+        report.Layout.DetailLabelSelector =
+            static item =&gt; ((Sale)item).Period;
+    });
+</code></pre>
+<p>Group roles create <code>OutlineGroupField</code>; detail roles create aggregated <code>OutlineValueField</code>. Custom outline aggregation uses the same <code>IPivotAggregator</code> factory boundary.</p>
+<h2 id="chart-models">Chart models</h2>
+<p>Projects referencing <code>ProDataGrid.Charting</code> can create direct chart projections:</p>
+<pre><code class="lang-csharp">DataGridChartModel chart = DataGridGeneratedChartAdapter.CreateModel(
+    items,
+    SalesSchema.AnalyticsFields);
+</code></pre>
+<p>Generated numeric fields provide a cached <code>Func&lt;object, double?&gt;</code>, avoiding boxed value extraction and runtime numeric conversion in the chart hot path. User-defined/non-numeric fields retain the compatible conversion path.</p>
+<h2 id="spreadsheet-range-charts">Spreadsheet range charts</h2>
+<p>Project only generated value columns inside a bounded inclusive grid range:</p>
+<pre><code class="lang-csharp">DataGridGeneratedChartRangeProjection rangeChart =
+    DataGridGeneratedChartAdapter.CreateRangeProjection(
+        items,
+        SalesSchema.AnalyticsFields,
+        columnDefinitions,
+        new DataGridCellRange(20, 99, 1, 4),
+        maximumRows: 4096);
+
+rangeChart.UpdateRange(new DataGridCellRange(100, 179, 1, 4));
+</code></pre>
+<p>The adapter includes selected stable-key chart-value columns, chooses a selected/first category, preserves exact indexes by disabling downsampling, and rejects ranges above the bound.</p>
+<h2 id="stable-key-chartgrid-selection">Stable-key chart/grid selection</h2>
+<pre><code class="lang-csharp">DataGridGeneratedSelectionController&lt;Sale, int&gt; selection =
+    SalesSchema.CreateSelectionController();
+
+DataGridGeneratedListChartKeyMap&lt;Sale, int&gt; keyMap = new(
+    items,
+    SalesSchema.Instance);
+
+DataGridGeneratedChartSelectionSynchronizer&lt;Sale, int&gt; sync = new(
+    keyMap,
+    selection,
+    rangeChart.Model.Interaction,
+    categoryToSourceIndex:
+        index =&gt; rangeChart.Range.StartRow + index,
+    sourceToCategoryIndex:
+        index =&gt; index &gt;= rangeChart.Range.StartRow &amp;&amp;
+                 index &lt;= rangeChart.Range.EndRow
+            ? index - rangeChart.Range.StartRow
+            : -1);
+</code></pre>
+<p>The key map applies observable list changes to the generated item index. Malformed/coalesced notifications fall back to an atomic reset. Origin tagging prevents chart/grid feedback loops.</p>
+<p><code>IDataGridGeneratedChartKeyMap&lt;TKey&gt;</code> is the customization boundary for grouped, remote, or downsampled sources.</p>
+<h2 id="long-form-series">Long-form series</h2>
+<pre><code class="lang-csharp">using DataGridGeneratedLongFormChartDataSource longForm =
+    DataGridGeneratedChartAdapter.CreateLongFormSource(
+        items,
+        SalesSchema.AnalyticsFields,
+        maximumItems: 65_536,
+        maximumSeries: 256);
+
+ChartModel model = new() { DataSource = longForm };
+</code></pre>
+<p>The source walks input once, uses generated numeric selectors, preserves first category/series order, aggregates duplicate pairs, observes collection/item changes, and bounds input plus emitted series.</p>
+<h2 id="formula-columns">Formula columns</h2>
+<pre><code class="lang-csharp">[DataGridColumn(
+    DataGridColumnKind.Formula,
+    Header = &quot;Total&quot;,
+    ColumnKey = &quot;total&quot;,
+    FormulaName = &quot;total&quot;,
+    Formula = &quot;=SUM([@Amount], [@Tax])&quot;,
+    IsReadOnly = true)]
+[DataGridFormulaField(
+    &quot;total&quot;,
+    Dependencies = [&quot;amount&quot;, &quot;tax&quot;],
+    Order = 0,
+    Format = &quot;C2&quot;)]
+public decimal Total { get; set; }
+</code></pre>
+<p>Literal formulas are validated during compilation. <code>PDGSG138</code> reports the source property, formula position, and parser message. The analyzer uses the production Excel tokenizer/parser support for functions, arrays, operators, A1/R1C1, sheets, external references, and structured references.</p>
+<p>Dynamic formula text remains a runtime responsibility. Applications and editors can call <code>ExcelFormulaSyntaxValidator.TryValidate</code> directly.</p>
+<h2 id="bind-a-formula-model">Bind a formula model</h2>
+<pre><code class="lang-csharp">[GenerateDataGridView(
+    typeof(SpreadsheetRow),
+    Framework = DataGridViewFramework.ReactiveUI,
+    Recipe = DataGridViewRecipe.Spreadsheet,
+    FormulaModelPropertyName = nameof(FormulaModel))]
+public sealed partial class SpreadsheetViewModel : ReactiveObject
+{
+    public IDataGridFormulaModel FormulaModel { get; } =
+        new DataGridFormulaModel();
+}
+</code></pre>
+<p>The member must implement <code>IDataGridFormulaModel</code>; otherwise the generator reports <code>PDGSG130</code>.</p>
+<h2 id="schema-compatibility">Schema compatibility</h2>
+<p>Analytics roles, calculated dependencies, factories, and configure hooks participate in <code>SchemaHash</code>. Persisted layouts/state can therefore reject or migrate when analytical meaning changes even if the visible CLR property list did not.</p>
+<h2 id="related-articles">Related articles</h2>
+<ul>
+<li><a href="../pivot-tables.html">Pivot tables</a></li>
+<li><a href="../pivot-calculated-measures.html">Pivot calculated measures</a></li>
+<li><a href="../pivot-charts.html">Pivot charts</a></li>
+<li><a href="../formula-engine-integration.html">Formula engine integration</a></li>
+<li><a href="../procharts-datagrid-integration.html">ProCharts integration</a></li>
+</ul>
+
+</article>
+
+        <div class="contribution d-print-none">
+          <a href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/docfx/articles/source-generators/analytics-and-formulas.md/#L1" class="edit-link">Edit this page</a>
+        </div>
+
+        <div class="next-article d-print-none border-top" id="nextArticle"></div>
+
+      </div>
+
+      <div class="affix">
+        <nav id="affix"></nav>
+      </div>
+    </main>
+
+
+    <footer class="border-top text-secondary">
+      <div class="container-xxl">
+        <div class="flex-fill">
+          <span>Made with <a href="https://dotnet.github.io/docfx">docfx</a></span>
+        </div>
+      </div>
+    </footer>
+  </body>
+</html>

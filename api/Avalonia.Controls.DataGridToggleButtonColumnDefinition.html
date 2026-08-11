@@ -85,7 +85,7 @@
 
 
   <h1 id="Avalonia_Controls_DataGridToggleButtonColumnDefinition" data-uid="Avalonia.Controls.DataGridToggleButtonColumnDefinition" class="text-break">
-Class DataGridToggleButtonColumnDefinition  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/ColumnDefinitions/DataGridToggleButtonColumnDefinition.cs/#L12"><i class="bi bi-code-slash"></i></a>
+Class DataGridToggleButtonColumnDefinition  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/ColumnDefinitions/DataGridToggleButtonColumnDefinition.cs/#L13"><i class="bi bi-code-slash"></i></a>
   </h1>
 
   <div class="facts text-secondary">
@@ -239,6 +239,9 @@ Class DataGridToggleButtonColumnDefinition  <a class="header-action link-seconda
       <a class="xref" href="Avalonia.Controls.DataGridColumnDefinition.html#Avalonia_Controls_DataGridColumnDefinition_Options">DataGridColumnDefinition.Options</a>
     </div>
     <div>
+      <a class="xref" href="Avalonia.Controls.DataGridColumnDefinition.html#Avalonia_Controls_DataGridColumnDefinition_SummaryDefinitions">DataGridColumnDefinition.SummaryDefinitions</a>
+    </div>
+    <div>
       <a class="xref" href="Avalonia.Controls.DataGridColumnDefinition.html#Avalonia_Controls_DataGridColumnDefinition_BeginUpdate">DataGridColumnDefinition.BeginUpdate()</a>
     </div>
     <div>
@@ -277,7 +280,7 @@ Class DataGridToggleButtonColumnDefinition  <a class="header-action link-seconda
 
   <h3 id="Avalonia_Controls_DataGridToggleButtonColumnDefinition_CheckedContent" data-uid="Avalonia.Controls.DataGridToggleButtonColumnDefinition.CheckedContent">
   CheckedContent
-  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/ColumnDefinitions/DataGridToggleButtonColumnDefinition.cs/#L31"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/ColumnDefinitions/DataGridToggleButtonColumnDefinition.cs/#L46"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"></div>
@@ -305,11 +308,43 @@ public object CheckedContent { get; set; }</code></pre>
 
 
 
+  <a id="Avalonia_Controls_DataGridToggleButtonColumnDefinition_CheckedContentBinding_" data-uid="Avalonia.Controls.DataGridToggleButtonColumnDefinition.CheckedContentBinding*"></a>
+
+  <h3 id="Avalonia_Controls_DataGridToggleButtonColumnDefinition_CheckedContentBinding" data-uid="Avalonia.Controls.DataGridToggleButtonColumnDefinition.CheckedContentBinding">
+  CheckedContentBinding
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/ColumnDefinitions/DataGridToggleButtonColumnDefinition.cs/#L54"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Gets or sets the compiled row binding used to resolve checked content.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public DataGridBindingDefinition CheckedContentBinding { get; set; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="Avalonia.Controls.DataGridBindingDefinition.html">DataGridBindingDefinition</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
   <a id="Avalonia_Controls_DataGridToggleButtonColumnDefinition_ClickMode_" data-uid="Avalonia.Controls.DataGridToggleButtonColumnDefinition.ClickMode*"></a>
 
   <h3 id="Avalonia_Controls_DataGridToggleButtonColumnDefinition_ClickMode" data-uid="Avalonia.Controls.DataGridToggleButtonColumnDefinition.ClickMode">
   ClickMode
-  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/ColumnDefinitions/DataGridToggleButtonColumnDefinition.cs/#L51"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/ColumnDefinitions/DataGridToggleButtonColumnDefinition.cs/#L109"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"></div>
@@ -336,11 +371,140 @@ public object CheckedContent { get; set; }</code></pre>
 
 
 
+  <a id="Avalonia_Controls_DataGridToggleButtonColumnDefinition_Command_" data-uid="Avalonia.Controls.DataGridToggleButtonColumnDefinition.Command*"></a>
+
+  <h3 id="Avalonia_Controls_DataGridToggleButtonColumnDefinition_Command" data-uid="Avalonia.Controls.DataGridToggleButtonColumnDefinition.Command">
+  Command
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/ColumnDefinitions/DataGridToggleButtonColumnDefinition.cs/#L75"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Gets or sets the fallback command used for every row.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public ICommand Command { get; set; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.windows.input.icommand">ICommand</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="Avalonia_Controls_DataGridToggleButtonColumnDefinition_CommandBinding_" data-uid="Avalonia.Controls.DataGridToggleButtonColumnDefinition.CommandBinding*"></a>
+
+  <h3 id="Avalonia_Controls_DataGridToggleButtonColumnDefinition_CommandBinding" data-uid="Avalonia.Controls.DataGridToggleButtonColumnDefinition.CommandBinding">
+  CommandBinding
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/ColumnDefinitions/DataGridToggleButtonColumnDefinition.cs/#L82"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Gets or sets the compiled row binding used to resolve the command.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public DataGridBindingDefinition CommandBinding { get; set; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="Avalonia.Controls.DataGridBindingDefinition.html">DataGridBindingDefinition</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="Avalonia_Controls_DataGridToggleButtonColumnDefinition_CommandParameter_" data-uid="Avalonia.Controls.DataGridToggleButtonColumnDefinition.CommandParameter*"></a>
+
+  <h3 id="Avalonia_Controls_DataGridToggleButtonColumnDefinition_CommandParameter" data-uid="Avalonia.Controls.DataGridToggleButtonColumnDefinition.CommandParameter">
+  CommandParameter
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/ColumnDefinitions/DataGridToggleButtonColumnDefinition.cs/#L89"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Gets or sets the fallback command parameter. The row item is used when unset.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">[AssignBinding]
+public object CommandParameter { get; set; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object">object</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="Avalonia_Controls_DataGridToggleButtonColumnDefinition_CommandParameterBinding_" data-uid="Avalonia.Controls.DataGridToggleButtonColumnDefinition.CommandParameterBinding*"></a>
+
+  <h3 id="Avalonia_Controls_DataGridToggleButtonColumnDefinition_CommandParameterBinding" data-uid="Avalonia.Controls.DataGridToggleButtonColumnDefinition.CommandParameterBinding">
+  CommandParameterBinding
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/ColumnDefinitions/DataGridToggleButtonColumnDefinition.cs/#L97"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Gets or sets the compiled row binding used to resolve the command parameter.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public DataGridBindingDefinition CommandParameterBinding { get; set; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="Avalonia.Controls.DataGridBindingDefinition.html">DataGridBindingDefinition</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
   <a id="Avalonia_Controls_DataGridToggleButtonColumnDefinition_Content_" data-uid="Avalonia.Controls.DataGridToggleButtonColumnDefinition.Content*"></a>
 
   <h3 id="Avalonia_Controls_DataGridToggleButtonColumnDefinition_Content" data-uid="Avalonia.Controls.DataGridToggleButtonColumnDefinition.Content">
   Content
-  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/ColumnDefinitions/DataGridToggleButtonColumnDefinition.cs/#L24"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/ColumnDefinitions/DataGridToggleButtonColumnDefinition.cs/#L32"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"></div>
@@ -368,11 +532,43 @@ public object Content { get; set; }</code></pre>
 
 
 
+  <a id="Avalonia_Controls_DataGridToggleButtonColumnDefinition_ContentBinding_" data-uid="Avalonia.Controls.DataGridToggleButtonColumnDefinition.ContentBinding*"></a>
+
+  <h3 id="Avalonia_Controls_DataGridToggleButtonColumnDefinition_ContentBinding" data-uid="Avalonia.Controls.DataGridToggleButtonColumnDefinition.ContentBinding">
+  ContentBinding
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/ColumnDefinitions/DataGridToggleButtonColumnDefinition.cs/#L40"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Gets or sets the compiled row binding used to resolve the default content.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public DataGridBindingDefinition ContentBinding { get; set; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="Avalonia.Controls.DataGridBindingDefinition.html">DataGridBindingDefinition</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
   <a id="Avalonia_Controls_DataGridToggleButtonColumnDefinition_IsThreeState_" data-uid="Avalonia.Controls.DataGridToggleButtonColumnDefinition.IsThreeState*"></a>
 
   <h3 id="Avalonia_Controls_DataGridToggleButtonColumnDefinition_IsThreeState" data-uid="Avalonia.Controls.DataGridToggleButtonColumnDefinition.IsThreeState">
   IsThreeState
-  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/ColumnDefinitions/DataGridToggleButtonColumnDefinition.cs/#L45"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/ColumnDefinitions/DataGridToggleButtonColumnDefinition.cs/#L103"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"></div>
@@ -403,7 +599,7 @@ public object Content { get; set; }</code></pre>
 
   <h3 id="Avalonia_Controls_DataGridToggleButtonColumnDefinition_UncheckedContent" data-uid="Avalonia.Controls.DataGridToggleButtonColumnDefinition.UncheckedContent">
   UncheckedContent
-  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/ColumnDefinitions/DataGridToggleButtonColumnDefinition.cs/#L38"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/ColumnDefinitions/DataGridToggleButtonColumnDefinition.cs/#L60"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"></div>
@@ -431,6 +627,38 @@ public object UncheckedContent { get; set; }</code></pre>
 
 
 
+  <a id="Avalonia_Controls_DataGridToggleButtonColumnDefinition_UncheckedContentBinding_" data-uid="Avalonia.Controls.DataGridToggleButtonColumnDefinition.UncheckedContentBinding*"></a>
+
+  <h3 id="Avalonia_Controls_DataGridToggleButtonColumnDefinition_UncheckedContentBinding" data-uid="Avalonia.Controls.DataGridToggleButtonColumnDefinition.UncheckedContentBinding">
+  UncheckedContentBinding
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/ColumnDefinitions/DataGridToggleButtonColumnDefinition.cs/#L68"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Gets or sets the compiled row binding used to resolve unchecked content.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public DataGridBindingDefinition UncheckedContentBinding { get; set; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="Avalonia.Controls.DataGridBindingDefinition.html">DataGridBindingDefinition</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
   <h2 class="section" id="methods">Methods
 </h2>
 
@@ -439,7 +667,7 @@ public object UncheckedContent { get; set; }</code></pre>
 
   <h3 id="Avalonia_Controls_DataGridToggleButtonColumnDefinition_ApplyColumnProperties_Avalonia_Controls_DataGridColumn_Avalonia_Controls_DataGridColumnDefinitionContext_" data-uid="Avalonia.Controls.DataGridToggleButtonColumnDefinition.ApplyColumnProperties(Avalonia.Controls.DataGridColumn,Avalonia.Controls.DataGridColumnDefinitionContext)">
   ApplyColumnProperties(DataGridColumn, DataGridColumnDefinitionContext)
-  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/ColumnDefinitions/DataGridToggleButtonColumnDefinition.cs/#L62"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/ColumnDefinitions/DataGridToggleButtonColumnDefinition.cs/#L120"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"></div>
@@ -472,7 +700,7 @@ public object UncheckedContent { get; set; }</code></pre>
 
   <h3 id="Avalonia_Controls_DataGridToggleButtonColumnDefinition_ApplyColumnPropertyChange_Avalonia_Controls_DataGridColumn_Avalonia_Controls_DataGridColumnDefinitionContext_System_String_" data-uid="Avalonia.Controls.DataGridToggleButtonColumnDefinition.ApplyColumnPropertyChange(Avalonia.Controls.DataGridColumn,Avalonia.Controls.DataGridColumnDefinitionContext,System.String)">
   ApplyColumnPropertyChange(DataGridColumn, DataGridColumnDefinitionContext, string)
-  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/ColumnDefinitions/DataGridToggleButtonColumnDefinition.cs/#L115"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/ColumnDefinitions/DataGridToggleButtonColumnDefinition.cs/#L187"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"></div>
@@ -512,7 +740,7 @@ public object UncheckedContent { get; set; }</code></pre>
 
   <h3 id="Avalonia_Controls_DataGridToggleButtonColumnDefinition_CreateColumnCore" data-uid="Avalonia.Controls.DataGridToggleButtonColumnDefinition.CreateColumnCore">
   CreateColumnCore()
-  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/ColumnDefinitions/DataGridToggleButtonColumnDefinition.cs/#L57"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/ColumnDefinitions/DataGridToggleButtonColumnDefinition.cs/#L115"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"></div>
@@ -543,7 +771,7 @@ public object UncheckedContent { get; set; }</code></pre>
 </article>
 
         <div class="contribution d-print-none">
-          <a href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/ColumnDefinitions/DataGridToggleButtonColumnDefinition.cs/#L12" class="edit-link">Edit this page</a>
+          <a href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/ColumnDefinitions/DataGridToggleButtonColumnDefinition.cs/#L13" class="edit-link">Edit this page</a>
         </div>
 
 

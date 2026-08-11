@@ -1,0 +1,1005 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+      <title>Class DataGridGeneratedOperationController&lt;TItem&gt; | ProDataGrid for Avalonia </title>
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <meta name="title" content="Class DataGridGeneratedOperationController&lt;TItem&gt; | ProDataGrid for Avalonia ">
+      
+      <meta name="description" content="Owns reflection-free column, model, and compiled operation state for one grid.">
+      <link rel="icon" href="../favicon.ico">
+      <link rel="stylesheet" href="../public/docfx.min.css">
+      <link rel="stylesheet" href="../public/main.css">
+      <meta name="docfx:navrel" content="../toc.html">
+      <meta name="docfx:tocrel" content="toc.html">
+      
+      
+      
+      
+      <meta name="docfx:docurl" content="https://github.com/wieslawsoltes/ProDataGrid/new/master/apiSpec/new?filename=Avalonia_Controls_DataGridGeneratedOperationController_1.md&amp;value=---%0Auid%3A%20Avalonia.Controls.DataGridGeneratedOperationController%601%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">
+      <meta name="loc:inThisArticle" content="In this article">
+      <meta name="loc:searchResultsCount" content="{count} results for &quot;{query}&quot;">
+      <meta name="loc:searchNoResults" content="No results for &quot;{query}&quot;">
+      <meta name="loc:tocFilter" content="Filter by title">
+      <meta name="loc:nextArticle" content="Next">
+      <meta name="loc:prevArticle" content="Previous">
+      <meta name="loc:themeLight" content="Light">
+      <meta name="loc:themeDark" content="Dark">
+      <meta name="loc:themeAuto" content="Auto">
+      <meta name="loc:changeTheme" content="Change theme">
+      <meta name="loc:copy" content="Copy">
+      <meta name="loc:downloadPdf" content="Download PDF">
+
+      <script type="module" src="./../public/docfx.min.js"></script>
+
+      <script>
+        const theme = localStorage.getItem('theme') || 'auto'
+        document.documentElement.setAttribute('data-bs-theme', theme === 'auto' ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light') : theme)
+      </script>
+
+  </head>
+
+  <body class="tex2jax_ignore" data-layout="" data-yaml-mime="ManagedReference">
+    <header class="bg-body border-bottom">
+      <nav id="autocollapse" class="navbar navbar-expand-md" role="navigation">
+        <div class="container-xxl flex-nowrap">
+          <a class="navbar-brand" href="../index.html">
+            <img id="logo" class="svg" src="../images/logo.svg" alt="">
+            
+          </a>
+          <button class="btn btn-lg d-md-none border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navpanel" aria-controls="navpanel" aria-expanded="false" aria-label="Toggle navigation">
+            <i class="bi bi-three-dots"></i>
+          </button>
+          <div class="collapse navbar-collapse" id="navpanel">
+            <div id="navbar">
+            </div>
+          </div>
+        </div>
+      </nav>
+    </header>
+
+    <main class="container-xxl">
+      <div class="toc-offcanvas">
+        <div class="offcanvas-md offcanvas-start" tabindex="-1" id="tocOffcanvas" aria-labelledby="tocOffcanvasLabel">
+          <div class="offcanvas-header">
+            <h5 class="offcanvas-title" id="tocOffcanvasLabel">Table of Contents</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="offcanvas" data-bs-target="#tocOffcanvas" aria-label="Close"></button>
+          </div>
+          <div class="offcanvas-body">
+            <nav class="toc" id="toc"></nav>
+          </div>
+        </div>
+      </div>
+
+      <div class="content">
+        <div class="actionbar">
+          <button class="btn btn-lg border-0 d-md-none" type="button" data-bs-toggle="offcanvas" data-bs-target="#tocOffcanvas" aria-controls="tocOffcanvas" aria-expanded="false" aria-label="Show table of contents">
+            <i class="bi bi-list"></i>
+          </button>
+
+          <nav id="breadcrumb"></nav>
+        </div>
+
+        <article data-uid="Avalonia.Controls.DataGridGeneratedOperationController`1">
+
+
+
+  <h1 id="Avalonia_Controls_DataGridGeneratedOperationController_1" data-uid="Avalonia.Controls.DataGridGeneratedOperationController`1" class="text-break">
+Class DataGridGeneratedOperationController&lt;TItem&gt;  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/ColumnDefinitions/DataGridGeneratedOperationController.cs/#L322"><i class="bi bi-code-slash"></i></a>
+  </h1>
+
+  <div class="facts text-secondary">
+    <dl><dt>Namespace</dt><dd><a class="xref" href="Avalonia.html">Avalonia</a>.<a class="xref" href="Avalonia.Controls.html">Controls</a></dd></dl>
+  <dl><dt>Assembly</dt><dd>Avalonia.Controls.DataGrid.dll</dd></dl>
+  </div>
+
+  <div class="markdown summary"><p>Owns reflection-free column, model, and compiled operation state for one grid.</p>
+</div>
+  <div class="markdown conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public sealed class DataGridGeneratedOperationController&lt;TItem&gt; : IDisposable</code></pre>
+  </div>
+
+
+
+  <h4 class="section">Type Parameters</h4>
+  <dl class="parameters">
+    <dt><code>TItem</code></dt>
+    <dd><p>The row item type.</p>
+</dd>
+  </dl>
+
+  <dl class="typelist inheritance">
+    <dt>Inheritance</dt>
+    <dd>
+      <div><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object">object</a></div>
+      <div><span class="xref">DataGridGeneratedOperationController&lt;TItem&gt;</span></div>
+    </dd>
+  </dl>
+
+  <dl class="typelist implements">
+    <dt>Implements</dt>
+    <dd>
+      <div><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.idisposable">IDisposable</a></div>
+    </dd>
+  </dl>
+
+
+  <dl class="typelist inheritedMembers">
+    <dt>Inherited Members</dt>
+    <dd>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object)">object.Equals(object)</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object-system-object)">object.Equals(object, object)</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.gethashcode">object.GetHashCode()</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.gettype">object.GetType()</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.referenceequals">object.ReferenceEquals(object, object)</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.tostring">object.ToString()</a>
+    </div>
+  </dd></dl>
+
+
+
+
+
+
+  <h2 class="section" id="constructors">Constructors
+</h2>
+
+
+  <a id="Avalonia_Controls_DataGridGeneratedOperationController_1__ctor_" data-uid="Avalonia.Controls.DataGridGeneratedOperationController`1.#ctor*"></a>
+
+  <h3 id="Avalonia_Controls_DataGridGeneratedOperationController_1__ctor_Avalonia_Controls_IDataGridGeneratedSchema__0__Avalonia_Controls_DataGridOperationExecution_Avalonia_Controls_DataGridGeneratedFeatures_" data-uid="Avalonia.Controls.DataGridGeneratedOperationController`1.#ctor(Avalonia.Controls.IDataGridGeneratedSchema{`0},Avalonia.Controls.DataGridOperationExecution,Avalonia.Controls.DataGridGeneratedFeatures)">
+  DataGridGeneratedOperationController(IDataGridGeneratedSchema&lt;TItem&gt;, DataGridOperationExecution, DataGridGeneratedFeatures)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/ColumnDefinitions/DataGridGeneratedOperationController.cs/#L336"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Initializes a controller and creates its operation models.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public DataGridGeneratedOperationController(IDataGridGeneratedSchema&lt;TItem&gt; schema, DataGridOperationExecution execution = DataGridOperationExecution.View, DataGridGeneratedFeatures features = DataGridGeneratedFeatures.Columns | DataGridGeneratedFeatures.Operations)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>schema</code> <a class="xref" href="Avalonia.Controls.IDataGridGeneratedSchema-1.html">IDataGridGeneratedSchema</a>&lt;TItem&gt;</dt>
+    <dd></dd>
+    <dt><code>execution</code> <a class="xref" href="Avalonia.Controls.DataGridOperationExecution.html">DataGridOperationExecution</a></dt>
+    <dd></dd>
+    <dt><code>features</code> <a class="xref" href="Avalonia.Controls.DataGridGeneratedFeatures.html">DataGridGeneratedFeatures</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Avalonia_Controls_DataGridGeneratedOperationController_1__ctor_" data-uid="Avalonia.Controls.DataGridGeneratedOperationController`1.#ctor*"></a>
+
+  <h3 id="Avalonia_Controls_DataGridGeneratedOperationController_1__ctor_Avalonia_Controls_IDataGridGeneratedSchema__0__Avalonia_Controls_DataGridSorting_SortingModel_Avalonia_Controls_DataGridFiltering_FilteringModel_Avalonia_Controls_DataGridSearching_SearchModel_Avalonia_Controls_DataGridOperationExecution_Avalonia_Controls_DataGridGeneratedFeatures_" data-uid="Avalonia.Controls.DataGridGeneratedOperationController`1.#ctor(Avalonia.Controls.IDataGridGeneratedSchema{`0},Avalonia.Controls.DataGridSorting.SortingModel,Avalonia.Controls.DataGridFiltering.FilteringModel,Avalonia.Controls.DataGridSearching.SearchModel,Avalonia.Controls.DataGridOperationExecution,Avalonia.Controls.DataGridGeneratedFeatures)">
+  DataGridGeneratedOperationController(IDataGridGeneratedSchema&lt;TItem&gt;, SortingModel, FilteringModel, SearchModel, DataGridOperationExecution, DataGridGeneratedFeatures)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/ColumnDefinitions/DataGridGeneratedOperationController.cs/#L347"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Initializes a controller with caller-provided operation models.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public DataGridGeneratedOperationController(IDataGridGeneratedSchema&lt;TItem&gt; schema, SortingModel sortingModel, FilteringModel filteringModel, SearchModel searchModel, DataGridOperationExecution execution = DataGridOperationExecution.View, DataGridGeneratedFeatures features = DataGridGeneratedFeatures.Columns | DataGridGeneratedFeatures.Operations)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>schema</code> <a class="xref" href="Avalonia.Controls.IDataGridGeneratedSchema-1.html">IDataGridGeneratedSchema</a>&lt;TItem&gt;</dt>
+    <dd></dd>
+    <dt><code>sortingModel</code> <a class="xref" href="Avalonia.Controls.DataGridSorting.SortingModel.html">SortingModel</a></dt>
+    <dd></dd>
+    <dt><code>filteringModel</code> <a class="xref" href="Avalonia.Controls.DataGridFiltering.FilteringModel.html">FilteringModel</a></dt>
+    <dd></dd>
+    <dt><code>searchModel</code> <a class="xref" href="Avalonia.Controls.DataGridSearching.SearchModel.html">SearchModel</a></dt>
+    <dd></dd>
+    <dt><code>execution</code> <a class="xref" href="Avalonia.Controls.DataGridOperationExecution.html">DataGridOperationExecution</a></dt>
+    <dd></dd>
+    <dt><code>features</code> <a class="xref" href="Avalonia.Controls.DataGridGeneratedFeatures.html">DataGridGeneratedFeatures</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+
+  <h2 class="section" id="properties">Properties
+</h2>
+
+
+  <a id="Avalonia_Controls_DataGridGeneratedOperationController_1_Columns_" data-uid="Avalonia.Controls.DataGridGeneratedOperationController`1.Columns*"></a>
+
+  <h3 id="Avalonia_Controls_DataGridGeneratedOperationController_1_Columns" data-uid="Avalonia.Controls.DataGridGeneratedOperationController`1.Columns">
+  Columns
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/ColumnDefinitions/DataGridGeneratedOperationController.cs/#L399"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Gets the grid-instance column definitions.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public DataGridColumnDefinitionList Columns { get; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="Avalonia.Controls.DataGridColumnDefinitionList.html">DataGridColumnDefinitionList</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="Avalonia_Controls_DataGridGeneratedOperationController_1_Commands_" data-uid="Avalonia.Controls.DataGridGeneratedOperationController`1.Commands*"></a>
+
+  <h3 id="Avalonia_Controls_DataGridGeneratedOperationController_1_Commands" data-uid="Avalonia.Controls.DataGridGeneratedOperationController`1.Commands">
+  Commands
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/ColumnDefinitions/DataGridGeneratedOperationController.cs/#L426"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Gets reusable framework-neutral operation commands.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public DataGridGeneratedOperationCommandSet&lt;TItem&gt; Commands { get; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="Avalonia.Controls.DataGridGeneratedOperationCommandSet-1.html">DataGridGeneratedOperationCommandSet</a>&lt;TItem&gt;</dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="Avalonia_Controls_DataGridGeneratedOperationController_1_Descriptors_" data-uid="Avalonia.Controls.DataGridGeneratedOperationController`1.Descriptors*"></a>
+
+  <h3 id="Avalonia_Controls_DataGridGeneratedOperationController_1_Descriptors" data-uid="Avalonia.Controls.DataGridGeneratedOperationController`1.Descriptors">
+  Descriptors
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/ColumnDefinitions/DataGridGeneratedOperationController.cs/#L423"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Gets immutable chip-ready projections of all active descriptors.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public IReadOnlyList&lt;DataGridGeneratedOperationDescriptor&gt; Descriptors { get; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.ireadonlylist-1">IReadOnlyList</a>&lt;<a class="xref" href="Avalonia.Controls.DataGridGeneratedOperationDescriptor.html">DataGridGeneratedOperationDescriptor</a>&gt;</dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="Avalonia_Controls_DataGridGeneratedOperationController_1_Execution_" data-uid="Avalonia.Controls.DataGridGeneratedOperationController`1.Execution*"></a>
+
+  <h3 id="Avalonia_Controls_DataGridGeneratedOperationController_1_Execution" data-uid="Avalonia.Controls.DataGridGeneratedOperationController`1.Execution">
+  Execution
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/ColumnDefinitions/DataGridGeneratedOperationController.cs/#L393"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Gets the operation execution owner.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public DataGridOperationExecution Execution { get; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="Avalonia.Controls.DataGridOperationExecution.html">DataGridOperationExecution</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="Avalonia_Controls_DataGridGeneratedOperationController_1_FastPathOptions_" data-uid="Avalonia.Controls.DataGridGeneratedOperationController`1.FastPathOptions*"></a>
+
+  <h3 id="Avalonia_Controls_DataGridGeneratedOperationController_1_FastPathOptions" data-uid="Avalonia.Controls.DataGridGeneratedOperationController`1.FastPathOptions">
+  FastPathOptions
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/ColumnDefinitions/DataGridGeneratedOperationController.cs/#L402"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Gets the generated fast-path options.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public DataGridFastPathOptions FastPathOptions { get; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="Avalonia.Controls.DataGridFastPathOptions.html">DataGridFastPathOptions</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="Avalonia_Controls_DataGridGeneratedOperationController_1_Features_" data-uid="Avalonia.Controls.DataGridGeneratedOperationController`1.Features*"></a>
+
+  <h3 id="Avalonia_Controls_DataGridGeneratedOperationController_1_Features" data-uid="Avalonia.Controls.DataGridGeneratedOperationController`1.Features">
+  Features
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/ColumnDefinitions/DataGridGeneratedOperationController.cs/#L396"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Gets the capabilities enabled for this controller.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public DataGridGeneratedFeatures Features { get; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="Avalonia.Controls.DataGridGeneratedFeatures.html">DataGridGeneratedFeatures</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="Avalonia_Controls_DataGridGeneratedOperationController_1_FilterPredicate_" data-uid="Avalonia.Controls.DataGridGeneratedOperationController`1.FilterPredicate*"></a>
+
+  <h3 id="Avalonia_Controls_DataGridGeneratedOperationController_1_FilterPredicate" data-uid="Avalonia.Controls.DataGridGeneratedOperationController`1.FilterPredicate">
+  FilterPredicate
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/ColumnDefinitions/DataGridGeneratedOperationController.cs/#L417"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Gets the latest compiled filter predicate.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public Func&lt;TItem, bool&gt; FilterPredicate { get; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.func-2">Func</a>&lt;TItem, <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a>&gt;</dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="Avalonia_Controls_DataGridGeneratedOperationController_1_FilteringModel_" data-uid="Avalonia.Controls.DataGridGeneratedOperationController`1.FilteringModel*"></a>
+
+  <h3 id="Avalonia_Controls_DataGridGeneratedOperationController_1_FilteringModel" data-uid="Avalonia.Controls.DataGridGeneratedOperationController`1.FilteringModel">
+  FilteringModel
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/ColumnDefinitions/DataGridGeneratedOperationController.cs/#L408"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Gets the filtering model.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public FilteringModel FilteringModel { get; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="Avalonia.Controls.DataGridFiltering.FilteringModel.html">FilteringModel</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="Avalonia_Controls_DataGridGeneratedOperationController_1_Schema_" data-uid="Avalonia.Controls.DataGridGeneratedOperationController`1.Schema*"></a>
+
+  <h3 id="Avalonia_Controls_DataGridGeneratedOperationController_1_Schema" data-uid="Avalonia.Controls.DataGridGeneratedOperationController`1.Schema">
+  Schema
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/ColumnDefinitions/DataGridGeneratedOperationController.cs/#L390"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Gets the generated schema.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public IDataGridGeneratedSchema&lt;TItem&gt; Schema { get; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="Avalonia.Controls.IDataGridGeneratedSchema-1.html">IDataGridGeneratedSchema</a>&lt;TItem&gt;</dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="Avalonia_Controls_DataGridGeneratedOperationController_1_SearchModel_" data-uid="Avalonia.Controls.DataGridGeneratedOperationController`1.SearchModel*"></a>
+
+  <h3 id="Avalonia_Controls_DataGridGeneratedOperationController_1_SearchModel" data-uid="Avalonia.Controls.DataGridGeneratedOperationController`1.SearchModel">
+  SearchModel
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/ColumnDefinitions/DataGridGeneratedOperationController.cs/#L411"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Gets the search model.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public SearchModel SearchModel { get; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="Avalonia.Controls.DataGridSearching.SearchModel.html">SearchModel</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="Avalonia_Controls_DataGridGeneratedOperationController_1_SearchPredicate_" data-uid="Avalonia.Controls.DataGridGeneratedOperationController`1.SearchPredicate*"></a>
+
+  <h3 id="Avalonia_Controls_DataGridGeneratedOperationController_1_SearchPredicate" data-uid="Avalonia.Controls.DataGridGeneratedOperationController`1.SearchPredicate">
+  SearchPredicate
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/ColumnDefinitions/DataGridGeneratedOperationController.cs/#L420"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Gets the latest compiled search predicate.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public Func&lt;TItem, bool&gt; SearchPredicate { get; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.func-2">Func</a>&lt;TItem, <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a>&gt;</dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="Avalonia_Controls_DataGridGeneratedOperationController_1_SortComparer_" data-uid="Avalonia.Controls.DataGridGeneratedOperationController`1.SortComparer*"></a>
+
+  <h3 id="Avalonia_Controls_DataGridGeneratedOperationController_1_SortComparer" data-uid="Avalonia.Controls.DataGridGeneratedOperationController`1.SortComparer">
+  SortComparer
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/ColumnDefinitions/DataGridGeneratedOperationController.cs/#L414"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Gets the latest compiled sort comparer.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public IComparer&lt;TItem&gt; SortComparer { get; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.icomparer-1">IComparer</a>&lt;TItem&gt;</dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="Avalonia_Controls_DataGridGeneratedOperationController_1_SortingModel_" data-uid="Avalonia.Controls.DataGridGeneratedOperationController`1.SortingModel*"></a>
+
+  <h3 id="Avalonia_Controls_DataGridGeneratedOperationController_1_SortingModel" data-uid="Avalonia.Controls.DataGridGeneratedOperationController`1.SortingModel">
+  SortingModel
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/ColumnDefinitions/DataGridGeneratedOperationController.cs/#L405"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Gets the sorting model.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public SortingModel SortingModel { get; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="Avalonia.Controls.DataGridSorting.SortingModel.html">SortingModel</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="Avalonia_Controls_DataGridGeneratedOperationController_1_Version_" data-uid="Avalonia.Controls.DataGridGeneratedOperationController`1.Version*"></a>
+
+  <h3 id="Avalonia_Controls_DataGridGeneratedOperationController_1_Version" data-uid="Avalonia.Controls.DataGridGeneratedOperationController`1.Version">
+  Version
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/ColumnDefinitions/DataGridGeneratedOperationController.cs/#L429"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Gets the monotonic compiled-operation version.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public long Version { get; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int64">long</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <h2 class="section" id="methods">Methods
+</h2>
+
+
+  <a id="Avalonia_Controls_DataGridGeneratedOperationController_1_ApplyPreset_" data-uid="Avalonia.Controls.DataGridGeneratedOperationController`1.ApplyPreset*"></a>
+
+  <h3 id="Avalonia_Controls_DataGridGeneratedOperationController_1_ApplyPreset_Avalonia_Controls_DataGridGeneratedOperationPreset_" data-uid="Avalonia.Controls.DataGridGeneratedOperationController`1.ApplyPreset(Avalonia.Controls.DataGridGeneratedOperationPreset)">
+  ApplyPreset(DataGridGeneratedOperationPreset)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/ColumnDefinitions/DataGridGeneratedOperationController.cs/#L459"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Applies all parts of a reusable preset as one controller revision.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public void ApplyPreset(DataGridGeneratedOperationPreset preset)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>preset</code> <a class="xref" href="Avalonia.Controls.DataGridGeneratedOperationPreset.html">DataGridGeneratedOperationPreset</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Avalonia_Controls_DataGridGeneratedOperationController_1_ClearOperations_" data-uid="Avalonia.Controls.DataGridGeneratedOperationController`1.ClearOperations*"></a>
+
+  <h3 id="Avalonia_Controls_DataGridGeneratedOperationController_1_ClearOperations" data-uid="Avalonia.Controls.DataGridGeneratedOperationController`1.ClearOperations">
+  ClearOperations()
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/ColumnDefinitions/DataGridGeneratedOperationController.cs/#L487"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Clears every enabled operation as one controller revision.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public void ClearOperations()</code></pre>
+  </div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Avalonia_Controls_DataGridGeneratedOperationController_1_DeferRefresh_" data-uid="Avalonia.Controls.DataGridGeneratedOperationController`1.DeferRefresh*"></a>
+
+  <h3 id="Avalonia_Controls_DataGridGeneratedOperationController_1_DeferRefresh" data-uid="Avalonia.Controls.DataGridGeneratedOperationController`1.DeferRefresh">
+  DeferRefresh()
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/ColumnDefinitions/DataGridGeneratedOperationController.cs/#L528"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Defers model events and publishes one combined controller revision.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public IDisposable DeferRefresh()</code></pre>
+  </div>
+
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.idisposable">IDisposable</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Avalonia_Controls_DataGridGeneratedOperationController_1_Dispose_" data-uid="Avalonia.Controls.DataGridGeneratedOperationController`1.Dispose*"></a>
+
+  <h3 id="Avalonia_Controls_DataGridGeneratedOperationController_1_Dispose" data-uid="Avalonia.Controls.DataGridGeneratedOperationController`1.Dispose">
+  Dispose()
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/ColumnDefinitions/DataGridGeneratedOperationController.cs/#L541"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Releases model subscriptions. Caller-provided models are not disposed.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public void Dispose()</code></pre>
+  </div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Avalonia_Controls_DataGridGeneratedOperationController_1_RemoveDescriptor_" data-uid="Avalonia.Controls.DataGridGeneratedOperationController`1.RemoveDescriptor*"></a>
+
+  <h3 id="Avalonia_Controls_DataGridGeneratedOperationController_1_RemoveDescriptor_Avalonia_Controls_DataGridGeneratedOperationDescriptor_" data-uid="Avalonia.Controls.DataGridGeneratedOperationController`1.RemoveDescriptor(Avalonia.Controls.DataGridGeneratedOperationDescriptor)">
+  RemoveDescriptor(DataGridGeneratedOperationDescriptor)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/ColumnDefinitions/DataGridGeneratedOperationController.cs/#L510"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Removes the exact descriptor represented by a generated projection.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public bool RemoveDescriptor(DataGridGeneratedOperationDescriptor descriptor)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>descriptor</code> <a class="xref" href="Avalonia.Controls.DataGridGeneratedOperationDescriptor.html">DataGridGeneratedOperationDescriptor</a></dt>
+    <dd></dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Avalonia_Controls_DataGridGeneratedOperationController_1_SetFiltering_" data-uid="Avalonia.Controls.DataGridGeneratedOperationController`1.SetFiltering*"></a>
+
+  <h3 id="Avalonia_Controls_DataGridGeneratedOperationController_1_SetFiltering_System_Collections_Generic_IEnumerable_Avalonia_Controls_DataGridFiltering_FilteringDescriptor__" data-uid="Avalonia.Controls.DataGridGeneratedOperationController`1.SetFiltering(System.Collections.Generic.IEnumerable{Avalonia.Controls.DataGridFiltering.FilteringDescriptor})">
+  SetFiltering(IEnumerable&lt;FilteringDescriptor&gt;)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/ColumnDefinitions/DataGridGeneratedOperationController.cs/#L443"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Replaces all filter descriptors.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public void SetFiltering(IEnumerable&lt;FilteringDescriptor&gt; descriptors)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>descriptors</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.ienumerable-1">IEnumerable</a>&lt;<a class="xref" href="Avalonia.Controls.DataGridFiltering.FilteringDescriptor.html">FilteringDescriptor</a>&gt;</dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Avalonia_Controls_DataGridGeneratedOperationController_1_SetSearching_" data-uid="Avalonia.Controls.DataGridGeneratedOperationController`1.SetSearching*"></a>
+
+  <h3 id="Avalonia_Controls_DataGridGeneratedOperationController_1_SetSearching_System_Collections_Generic_IEnumerable_Avalonia_Controls_DataGridSearching_SearchDescriptor__" data-uid="Avalonia.Controls.DataGridGeneratedOperationController`1.SetSearching(System.Collections.Generic.IEnumerable{Avalonia.Controls.DataGridSearching.SearchDescriptor})">
+  SetSearching(IEnumerable&lt;SearchDescriptor&gt;)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/ColumnDefinitions/DataGridGeneratedOperationController.cs/#L451"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Replaces all search descriptors.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public void SetSearching(IEnumerable&lt;SearchDescriptor&gt; descriptors)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>descriptors</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.ienumerable-1">IEnumerable</a>&lt;<a class="xref" href="Avalonia.Controls.DataGridSearching.SearchDescriptor.html">SearchDescriptor</a>&gt;</dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Avalonia_Controls_DataGridGeneratedOperationController_1_SetSorting_" data-uid="Avalonia.Controls.DataGridGeneratedOperationController`1.SetSorting*"></a>
+
+  <h3 id="Avalonia_Controls_DataGridGeneratedOperationController_1_SetSorting_System_Collections_Generic_IEnumerable_Avalonia_Controls_DataGridSorting_SortingDescriptor__" data-uid="Avalonia.Controls.DataGridGeneratedOperationController`1.SetSorting(System.Collections.Generic.IEnumerable{Avalonia.Controls.DataGridSorting.SortingDescriptor})">
+  SetSorting(IEnumerable&lt;SortingDescriptor&gt;)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/ColumnDefinitions/DataGridGeneratedOperationController.cs/#L435"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Replaces all sort descriptors.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public void SetSorting(IEnumerable&lt;SortingDescriptor&gt; descriptors)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>descriptors</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.ienumerable-1">IEnumerable</a>&lt;<a class="xref" href="Avalonia.Controls.DataGridSorting.SortingDescriptor.html">SortingDescriptor</a>&gt;</dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+
+  <h2 class="section" id="events">Events
+</h2>
+
+
+
+  <h3 id="Avalonia_Controls_DataGridGeneratedOperationController_1_OperationsChanged" data-uid="Avalonia.Controls.DataGridGeneratedOperationController`1.OperationsChanged">
+  OperationsChanged
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/ColumnDefinitions/DataGridGeneratedOperationController.cs/#L432"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Occurs after one of the compiled operations changes.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public event EventHandler&lt;DataGridGeneratedOperationsChangedEventArgs&gt; OperationsChanged</code></pre>
+  </div>
+
+
+
+
+
+
+  <h4 class="section">Event Type</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.eventhandler-1">EventHandler</a>&lt;<a class="xref" href="Avalonia.Controls.DataGridGeneratedOperationsChangedEventArgs.html">DataGridGeneratedOperationsChangedEventArgs</a>&gt;</dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+</article>
+
+        <div class="contribution d-print-none">
+          <a href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/ColumnDefinitions/DataGridGeneratedOperationController.cs/#L322" class="edit-link">Edit this page</a>
+        </div>
+
+
+      </div>
+
+      <div class="affix">
+        <nav id="affix"></nav>
+      </div>
+    </main>
+
+
+    <footer class="border-top text-secondary">
+      <div class="container-xxl">
+        <div class="flex-fill">
+          <span>Made with <a href="https://dotnet.github.io/docfx">docfx</a></span>
+        </div>
+      </div>
+    </footer>
+  </body>
+</html>

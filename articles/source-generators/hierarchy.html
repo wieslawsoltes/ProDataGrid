@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+      <title>Hierarchical data | ProDataGrid for Avalonia </title>
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <meta name="title" content="Hierarchical data | ProDataGrid for Avalonia ">
+      
+      
+      <link rel="icon" href="../../favicon.ico">
+      <link rel="stylesheet" href="../../public/docfx.min.css">
+      <link rel="stylesheet" href="../../public/main.css">
+      <meta name="docfx:navrel" content="../../toc.html">
+      <meta name="docfx:tocrel" content="../toc.html">
+      
+      
+      
+      
+      <meta name="docfx:docurl" content="https://github.com/wieslawsoltes/ProDataGrid/blob/master/docfx/articles/source-generators/hierarchy.md/#L1">
+      <meta name="loc:inThisArticle" content="In this article">
+      <meta name="loc:searchResultsCount" content="{count} results for &quot;{query}&quot;">
+      <meta name="loc:searchNoResults" content="No results for &quot;{query}&quot;">
+      <meta name="loc:tocFilter" content="Filter by title">
+      <meta name="loc:nextArticle" content="Next">
+      <meta name="loc:prevArticle" content="Previous">
+      <meta name="loc:themeLight" content="Light">
+      <meta name="loc:themeDark" content="Dark">
+      <meta name="loc:themeAuto" content="Auto">
+      <meta name="loc:changeTheme" content="Change theme">
+      <meta name="loc:copy" content="Copy">
+      <meta name="loc:downloadPdf" content="Download PDF">
+
+      <script type="module" src="./../../public/docfx.min.js"></script>
+
+      <script>
+        const theme = localStorage.getItem('theme') || 'auto'
+        document.documentElement.setAttribute('data-bs-theme', theme === 'auto' ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light') : theme)
+      </script>
+
+  </head>
+
+  <body class="tex2jax_ignore" data-layout="" data-yaml-mime="">
+    <header class="bg-body border-bottom">
+      <nav id="autocollapse" class="navbar navbar-expand-md" role="navigation">
+        <div class="container-xxl flex-nowrap">
+          <a class="navbar-brand" href="../../index.html">
+            <img id="logo" class="svg" src="../../images/logo.svg" alt="">
+            
+          </a>
+          <button class="btn btn-lg d-md-none border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navpanel" aria-controls="navpanel" aria-expanded="false" aria-label="Toggle navigation">
+            <i class="bi bi-three-dots"></i>
+          </button>
+          <div class="collapse navbar-collapse" id="navpanel">
+            <div id="navbar">
+            </div>
+          </div>
+        </div>
+      </nav>
+    </header>
+
+    <main class="container-xxl">
+      <div class="toc-offcanvas">
+        <div class="offcanvas-md offcanvas-start" tabindex="-1" id="tocOffcanvas" aria-labelledby="tocOffcanvasLabel">
+          <div class="offcanvas-header">
+            <h5 class="offcanvas-title" id="tocOffcanvasLabel">Table of Contents</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="offcanvas" data-bs-target="#tocOffcanvas" aria-label="Close"></button>
+          </div>
+          <div class="offcanvas-body">
+            <nav class="toc" id="toc"></nav>
+          </div>
+        </div>
+      </div>
+
+      <div class="content">
+        <div class="actionbar">
+          <button class="btn btn-lg border-0 d-md-none" type="button" data-bs-toggle="offcanvas" data-bs-target="#tocOffcanvas" aria-controls="tocOffcanvas" aria-expanded="false" aria-label="Show table of contents">
+            <i class="bi bi-list"></i>
+          </button>
+
+          <nav id="breadcrumb"></nav>
+        </div>
+
+        <article data-uid="">
+<h1 id="hierarchical-data">Hierarchical data</h1>
+
+<p>Generated hierarchy support keeps the domain item type canonical while adapting ProDataGrid's flattened <code>HierarchicalNode</code> rows. It covers children/expansion metadata, wrapper-aware compiled bindings, DynamicData roots, filtering, stable-key state, and transactional asynchronous expansion.</p>
+<h2 id="declare-the-hierarchy">Declare the hierarchy</h2>
+<pre><code class="lang-csharp">[GenerateDataGridColumns(
+    ProviderName = &quot;NodeSchema&quot;,
+    Discovery = DataGridColumnDiscovery.AttributedOnly,
+    HierarchicalRows = true,
+    Strict = true)]
+public sealed class Node
+{
+    [DataGridKey]
+    [DataGridColumn(DataGridColumnKind.Numeric,
+        Header = &quot;ID&quot;, ColumnKey = &quot;id&quot;, IsReadOnly = true)]
+    public int Id { get; init; }
+
+    [DataGridColumn(DataGridColumnKind.Hierarchical,
+        Header = &quot;Name&quot;, ColumnKey = &quot;name&quot;, Width = &quot;2*&quot;)]
+    public string Name { get; set; } = string.Empty;
+
+    [DataGridChildren(LoaderMethod = nameof(LoadChildrenAsync))]
+    public ObservableCollection&lt;Node&gt; Children { get; } = new();
+
+    [DataGridExpanded]
+    public bool IsExpanded { get; set; }
+
+    [DataGridParentKey]
+    public int? ParentId { get; init; }
+
+    private ValueTask&lt;IReadOnlyList&lt;Node&gt;&gt; LoadChildrenAsync(
+        CancellationToken cancellationToken) =&gt;
+        nodeService.LoadChildrenAsync(Id, cancellationToken);
+}
+</code></pre>
+<p>One property may carry <code>[DataGridChildren]</code>. <code>[DataGridExpanded]</code> identifies an optional writable Boolean expansion property. <code>[DataGridParentKey]</code> provides optional direct parent identity for keyed operations. Invalid or ambiguous members report <code>PDGSG109</code>.</p>
+<h2 id="domain-rows-and-flattened-rows">Domain rows and flattened rows</h2>
+<p>With <code>HierarchicalRows = true</code>:</p>
+<ul>
+<li>the manifest and all data-operation accessors remain typed to <code>TItem</code>;</li>
+<li>generated column bindings are typed to <code>HierarchicalNode</code>;</li>
+<li>binding delegates unwrap <code>node.Item</code> directly;</li>
+<li>generated sort paths are prefixed with <code>Item.</code> where a path identifier is required.</li>
+</ul>
+<p>This removes the need to disable compiled XAML bindings for hierarchical pages. Filtering, searching, selection, state, and DynamicData continue to use the domain item contract.</p>
+<h2 id="create-the-model-and-adapter">Create the model and adapter</h2>
+<pre><code class="lang-csharp">HierarchicalModel&lt;Node&gt; hierarchy = NodeSchema.CreateHierarchicalModel();
+DataGridHierarchicalAdapter&lt;Node&gt; operations =
+    NodeSchema.CreateHierarchicalAdapter(hierarchy);
+</code></pre>
+<p>Equivalent lower-level construction is available through <code>CreateHierarchicalOptions()</code>.</p>
+<p>The options include direct children, expansion, loading, and key delegates. The adapter owns coherent hierarchy mutations and expansion operations.</p>
+<h2 id="bind-a-generated-view">Bind a generated view</h2>
+<pre><code class="lang-csharp">[GenerateDataGridViewModel(typeof(Node), ProviderName = &quot;NodeSchema&quot;)]
+[GenerateDataGridView(
+    typeof(Node),
+    Framework = DataGridViewFramework.ReactiveUI,
+    Recipe = DataGridViewRecipe.Explorer,
+    HierarchicalModelPropertyName = nameof(Hierarchy))]
+public sealed partial class ExplorerViewModel : ReactiveObject
+{
+    public ExplorerViewModel()
+    {
+        Hierarchy = NodeSchema.CreateHierarchicalModel();
+        HierarchyOperations = NodeSchema.CreateHierarchicalAdapter(Hierarchy);
+    }
+
+    public HierarchicalModel&lt;Node&gt; Hierarchy { get; }
+    public DataGridHierarchicalAdapter&lt;Node&gt; HierarchyOperations { get; }
+}
+</code></pre>
+<p>The generated view binds <code>DataGrid.HierarchicalModel</code>, enables hierarchical rows, and adds the <code>hierarchical</code> class. It deliberately omits the ordinary root <code>ItemsSource</code> binding: the hierarchical model exclusively owns the flattened wrapper list.</p>
+<h2 id="hierarchy-aware-filtering">Hierarchy-aware filtering</h2>
+<p>When a generated view names both hierarchy and filtering models, it creates and installs a <code>DataGridHierarchicalFilteringAdapterFactory</code> before the filter binding becomes active:</p>
+<pre><code class="lang-csharp">[GenerateDataGridView(
+    typeof(Node),
+    HierarchicalModelPropertyName = nameof(Hierarchy),
+    FilteringModelPropertyName = nameof(Filtering),
+    HierarchyFilterPolicy =
+        DataGridHierarchyFilterPolicy.KeepAncestorsOfMatches |
+        DataGridHierarchyFilterPolicy.KeepDescendantsOfMatches)]
+public sealed partial class ExplorerViewModel : ReactiveObject
+{
+    public HierarchicalModel&lt;Node&gt; Hierarchy { get; }
+    public FilteringModel Filtering { get; }
+}
+</code></pre>
+<p>The default policy is <code>KeepAncestorsOfMatches</code>, which preserves the path required to reach each matching item. Add <code>KeepDescendantsOfMatches</code> when a matching group/node should retain its subtree.</p>
+<p>Schema factories are also available directly:</p>
+<pre><code class="lang-csharp">DataGridHierarchicalFilteringAdapter&lt;Node&gt; adapter =
+    NodeSchema.CreateHierarchicalFilteringAdapter(
+        hierarchy,
+        filteringModel,
+        DataGridHierarchyFilterPolicy.KeepAncestorsOfMatches);
+</code></pre>
+<p>An overload/factory accepts before/after refresh callbacks and defaults to strict generated fast-path options. Override <code>CreateGeneratedHierarchicalFilteringAdapterFactory</code> in a generated-view base when construction requires application services.</p>
+<h2 id="transactional-asynchronous-expansion">Transactional asynchronous expansion</h2>
+<p>Use the adapter's asynchronous bulk operation:</p>
+<pre><code class="lang-csharp">await HierarchyOperations.ExpandAllAsync(
+    node: null,
+    maxDepth: 4,
+    cancellationToken);
+</code></pre>
+<p>Expansion remains behind the hierarchy's virtualization guard until a coherent visible-node commit is ready. Cancellation prevents an incomplete bulk operation from leaking a sequence of partially refreshed flattened lists.</p>
+<p>Collapse and individual expansion continue to use the same adapter/model, so generated and user-triggered operations share one owner.</p>
+<h2 id="dynamicdata-roots">DynamicData roots</h2>
+<p>A named controller can own a DynamicData root source while the generated hierarchical model owns flattening. Use external-pipeline operation ownership for root sorting/filtering/searching and preserve the same generated key selector for hierarchy resets.</p>
+<p>The formal <code>GeneratedHierarchicalDynamicDataPage</code> sample combines:</p>
+<ul>
+<li>a generated strict hierarchical schema;</li>
+<li>DynamicData root updates;</li>
+<li>generated hierarchy model and adapter factories;</li>
+<li>asynchronous expand-all;</li>
+<li>ancestor/descendant-aware filtering;</li>
+<li>wrapper-aware compiled columns;</li>
+<li>deterministic disposal.</li>
+</ul>
+<h2 id="stable-selection-and-state">Stable selection and state</h2>
+<p>Hierarchy selection and persisted expansion state reuse the schema key. Do not introduce a separate node identity convention in the ViewModel.</p>
+<p>For state restoration, set an explicit <code>SchemaId</code> and increment <code>StateVersion</code> when hierarchy-relevant persisted metadata changes. Use <code>PreviousColumnKeys</code> for renamed columns.</p>
+<h2 id="direct-hierarchical-cell-options">Direct hierarchical cell options</h2>
+<p>Hierarchical columns can opt into optimized realization:</p>
+<pre><code class="lang-csharp">[DataGridColumn(DataGridColumnKind.Hierarchical,
+    UseDirectCell = true,
+    UseDirectTextContent = true,
+    UseOptimizedPresenter = true,
+    TrackDirectTextValueChanges = false)]
+public string Name { get; init; } = string.Empty;
+</code></pre>
+<p>Disable value tracking only when the displayed value is immutable or the row is replaced/recycled on change. Applying hierarchical-only options to another column kind reports <code>PDGSG009</code>.</p>
+<h2 id="customization-boundaries">Customization boundaries</h2>
+<p>Generated hierarchy code owns typed metadata and standard adapters. User code continues to own:</p>
+<ul>
+<li>domain loading and authorization;</li>
+<li>retry policy and error presentation;</li>
+<li>domain-specific sort/filter semantics beyond generated field comparisons;</li>
+<li>drag/drop validation and mutation;</li>
+<li>application-specific hierarchy filtering construction through the protected factory override.</li>
+</ul>
+<h2 id="related-articles">Related articles</h2>
+<ul>
+<li><a href="../hierarchical-data.html">Hierarchical data runtime guide</a></li>
+<li><a href="../hierarchical-model-end-to-end.html">Hierarchical model end-to-end</a></li>
+<li><a href="../hierarchical-high-frequency-updates.html">Hierarchical high-frequency updates</a></li>
+<li><a href="reactive-streaming-remote.html">Reactive, streaming, and remote data</a></li>
+</ul>
+
+</article>
+
+        <div class="contribution d-print-none">
+          <a href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/docfx/articles/source-generators/hierarchy.md/#L1" class="edit-link">Edit this page</a>
+        </div>
+
+        <div class="next-article d-print-none border-top" id="nextArticle"></div>
+
+      </div>
+
+      <div class="affix">
+        <nav id="affix"></nav>
+      </div>
+    </main>
+
+
+    <footer class="border-top text-secondary">
+      <div class="container-xxl">
+        <div class="flex-fill">
+          <span>Made with <a href="https://dotnet.github.io/docfx">docfx</a></span>
+        </div>
+      </div>
+    </footer>
+  </body>
+</html>

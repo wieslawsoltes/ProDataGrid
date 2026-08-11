@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+      <title>Schemas, columns, accessors, and manifests | ProDataGrid for Avalonia </title>
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <meta name="title" content="Schemas, columns, accessors, and manifests | ProDataGrid for Avalonia ">
+      
+      
+      <link rel="icon" href="../../favicon.ico">
+      <link rel="stylesheet" href="../../public/docfx.min.css">
+      <link rel="stylesheet" href="../../public/main.css">
+      <meta name="docfx:navrel" content="../../toc.html">
+      <meta name="docfx:tocrel" content="../toc.html">
+      
+      
+      
+      
+      <meta name="docfx:docurl" content="https://github.com/wieslawsoltes/ProDataGrid/blob/master/docfx/articles/source-generators/schemas-and-columns.md/#L1">
+      <meta name="loc:inThisArticle" content="In this article">
+      <meta name="loc:searchResultsCount" content="{count} results for &quot;{query}&quot;">
+      <meta name="loc:searchNoResults" content="No results for &quot;{query}&quot;">
+      <meta name="loc:tocFilter" content="Filter by title">
+      <meta name="loc:nextArticle" content="Next">
+      <meta name="loc:prevArticle" content="Previous">
+      <meta name="loc:themeLight" content="Light">
+      <meta name="loc:themeDark" content="Dark">
+      <meta name="loc:themeAuto" content="Auto">
+      <meta name="loc:changeTheme" content="Change theme">
+      <meta name="loc:copy" content="Copy">
+      <meta name="loc:downloadPdf" content="Download PDF">
+
+      <script type="module" src="./../../public/docfx.min.js"></script>
+
+      <script>
+        const theme = localStorage.getItem('theme') || 'auto'
+        document.documentElement.setAttribute('data-bs-theme', theme === 'auto' ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light') : theme)
+      </script>
+
+  </head>
+
+  <body class="tex2jax_ignore" data-layout="" data-yaml-mime="">
+    <header class="bg-body border-bottom">
+      <nav id="autocollapse" class="navbar navbar-expand-md" role="navigation">
+        <div class="container-xxl flex-nowrap">
+          <a class="navbar-brand" href="../../index.html">
+            <img id="logo" class="svg" src="../../images/logo.svg" alt="">
+            
+          </a>
+          <button class="btn btn-lg d-md-none border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navpanel" aria-controls="navpanel" aria-expanded="false" aria-label="Toggle navigation">
+            <i class="bi bi-three-dots"></i>
+          </button>
+          <div class="collapse navbar-collapse" id="navpanel">
+            <div id="navbar">
+            </div>
+          </div>
+        </div>
+      </nav>
+    </header>
+
+    <main class="container-xxl">
+      <div class="toc-offcanvas">
+        <div class="offcanvas-md offcanvas-start" tabindex="-1" id="tocOffcanvas" aria-labelledby="tocOffcanvasLabel">
+          <div class="offcanvas-header">
+            <h5 class="offcanvas-title" id="tocOffcanvasLabel">Table of Contents</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="offcanvas" data-bs-target="#tocOffcanvas" aria-label="Close"></button>
+          </div>
+          <div class="offcanvas-body">
+            <nav class="toc" id="toc"></nav>
+          </div>
+        </div>
+      </div>
+
+      <div class="content">
+        <div class="actionbar">
+          <button class="btn btn-lg border-0 d-md-none" type="button" data-bs-toggle="offcanvas" data-bs-target="#tocOffcanvas" aria-controls="tocOffcanvas" aria-expanded="false" aria-label="Show table of contents">
+            <i class="bi bi-list"></i>
+          </button>
+
+          <nav id="breadcrumb"></nav>
+        </div>
+
+        <article data-uid="">
+<h1 id="schemas-columns-accessors-and-manifests">Schemas, columns, accessors, and manifests</h1>
+
+<p>A generated schema is the reflection-free contract shared by column creation, sorting, filtering, searching, identity, editing, transfer, hierarchy, state, and analytics. Configure the row once; downstream generated features reuse the same accessors and stable keys.</p>
+<h2 id="generated-schema-contracts">Generated schema contracts</h2>
+<p>The provider implements <code>IDataGridGeneratedSchema&lt;TItem&gt;</code>, which composes focused interfaces:</p>
+<ul>
+<li><code>IDataGridColumnDefinitionProvider&lt;TItem&gt;</code> creates fresh column-definition lists.</li>
+<li><code>IDataGridSortingCompiler&lt;TItem&gt;</code> compiles descriptor lists into comparers.</li>
+<li><code>IDataGridFilteringCompiler&lt;TItem&gt;</code> compiles descriptors into predicates.</li>
+<li><code>IDataGridSearchingCompiler&lt;TItem&gt;</code> compiles search descriptors into predicates.</li>
+<li><code>IDataGridFastPathOptionsProvider</code> creates accessor-only fast-path options.</li>
+<li><code>IDataGridGeneratedSchemaManifestProvider</code> exposes stable schema and field metadata.</li>
+</ul>
+<p>Descriptor column IDs and paths are identifiers only. Generated operations resolve them through the manifest and never call runtime property lookup.</p>
+<h2 id="column-kinds">Column kinds</h2>
+<p><code>DataGridColumnKind</code> covers the current definition builders:</p>
+<table>
+<thead>
+<tr>
+<th>Family</th>
+<th>Kinds</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Basic bound</td>
+<td><code>Text</code>, <code>CheckBox</code>, <code>Hyperlink</code>, <code>Image</code></td>
+</tr>
+<tr>
+<td>Numeric and range</td>
+<td><code>Numeric</code>, <code>ProgressBar</code>, <code>Slider</code></td>
+</tr>
+<tr>
+<td>Date and text input</td>
+<td><code>DatePicker</code>, <code>TimePicker</code>, <code>MaskedText</code>, <code>AutoComplete</code></td>
+</tr>
+<tr>
+<td>Toggle and commands</td>
+<td><code>ToggleButton</code>, <code>ToggleSwitch</code>, <code>Button</code></td>
+</tr>
+<tr>
+<td>Selection</td>
+<td><code>ComboBoxSelectedItem</code>, <code>ComboBoxSelectedValue</code>, <code>ComboBoxText</code></td>
+</tr>
+<tr>
+<td>Advanced</td>
+<td><code>Hierarchical</code>, <code>CustomDrawing</code>, <code>Template</code>, <code>Formula</code></td>
+</tr>
+<tr>
+<td>Inferred</td>
+<td><code>Auto</code></td>
+</tr>
+</tbody>
+</table>
+<p>Example:</p>
+<pre><code class="lang-csharp">[GenerateDataGridColumns(
+    ProviderName = &quot;ProductSchema&quot;,
+    Discovery = DataGridColumnDiscovery.AttributedOnly)]
+public sealed class Product
+{
+    [DataGridKey]
+    [DataGridColumn(DataGridColumnKind.Numeric,
+        Header = &quot;ID&quot;, ColumnKey = &quot;id&quot;, IsReadOnly = true)]
+    public int Id { get; init; }
+
+    [DataGridColumn(DataGridColumnKind.Text,
+        Header = &quot;Product&quot;, ColumnKey = &quot;name&quot;, Width = &quot;2*&quot;)]
+    public string Name { get; set; } = string.Empty;
+
+    [DataGridColumn(DataGridColumnKind.Numeric,
+        Header = &quot;Price&quot;, ColumnKey = &quot;price&quot;, FormatString = &quot;C2&quot;,
+        Minimum = 0, Increment = 0.25)]
+    public decimal Price { get; set; }
+
+    [DataGridColumn(DataGridColumnKind.CheckBox,
+        Header = &quot;Active&quot;, ColumnKey = &quot;active&quot;)]
+    public bool IsActive { get; set; }
+}
+</code></pre>
+<h2 id="common-column-options">Common column options</h2>
+<p>The common metadata surface controls:</p>
+<ul>
+<li>identity: <code>ColumnKey</code>, <code>PreviousColumnKeys</code>;</li>
+<li>presentation: <code>Header</code>, <code>Description</code>, <code>Order</code>, <code>DisplayIndex</code>, <code>Width</code>, <code>MinWidth</code>, <code>MaxWidth</code>, <code>FormatString</code>, <code>Watermark</code>;</li>
+<li>behavior: <code>CanUserSort</code>, <code>CanUserHide</code>, <code>CanUserResize</code>, <code>CanUserReorder</code>, <code>IsReadOnly</code>, <code>IsVisible</code>, <code>ShowFilterButton</code>;</li>
+<li>layout: <code>FrozenPlacement</code>, <code>WidthSharingGroup</code>;</li>
+<li>resources: header/cell/summary/filter themes, templates, filter flyouts, resource keys;</li>
+<li>operations: <code>SortMemberPath</code>, <code>SearchMemberPath</code>, <code>IsSearchable</code>, <code>BackendFieldName</code>, <code>FilterEditor</code>;</li>
+<li>transfer and security: export formatting, null text, automation metadata, and <code>IsSensitive</code>.</li>
+</ul>
+<p>Kind-specific options are validated. For example, a numeric bound applies <code>Minimum</code>, <code>Maximum</code>, and <code>Increment</code>; a masked-text column uses <code>Mask</code>; a combo box uses items/display/value members; a button uses content/command members. Incompatible options report <code>PDGSG009</code>.</p>
+<p>For an exhaustive property list, see the <a href="attribute-reference.html#datagridcolumn">attribute reference</a>.</p>
+<h2 id="stable-typed-fields">Stable typed fields</h2>
+<p>Each generated column is also a static strongly typed field descriptor:</p>
+<pre><code class="lang-csharp">SortingDescriptor[] sorting =
+[
+    ProductSchema.Price.Descending(),
+    ProductSchema.Name.Ascending()
+];
+
+FilteringDescriptor[] filtering =
+[
+    ProductSchema.Price.Between(10m, 100m),
+    ProductSchema.Name.Contains(&quot;pro&quot;, StringComparison.OrdinalIgnoreCase)
+];
+
+SearchDescriptor search = ProductSchema.Name.Search(
+    &quot;desk*&quot;,
+    SearchMatchMode.Wildcard);
+</code></pre>
+<p>Field ordinals and stable keys are deterministic. The same field provides the typed accessor used by columns, operations, summaries, editing, export, conditional formatting, and analytics.</p>
+<h2 id="stable-identity-and-item-indexes">Stable identity and item indexes</h2>
+<p>Mark one accessible, non-nullable field or property with <code>[DataGridKey]</code>:</p>
+<pre><code class="lang-csharp">[DataGridKey]
+public long Id { get; init; }
+</code></pre>
+<p>For composite identity, name a static selector:</p>
+<pre><code class="lang-csharp">[GenerateDataGridColumns(KeySelectorMethod = nameof(CreateGridKey))]
+public sealed class Order
+{
+    public int TenantId { get; init; }
+    public long OrderId { get; init; }
+
+    public static (int TenantId, long OrderId) CreateGridKey(Order item) =&gt;
+        (item.TenantId, item.OrderId);
+}
+</code></pre>
+<p>Reference types whose identity intentionally is the object instance may set <code>UseReferenceIdentityKey = true</code>. Key members, selector methods, and reference identity are mutually exclusive.</p>
+<p>A keyed provider implements <code>IDataGridItemKey&lt;TItem,TKey&gt;</code> and creates an incrementally maintained index:</p>
+<pre><code class="lang-csharp">DataGridGeneratedItemIndex&lt;Order, (int, long)&gt; index =
+    OrderDataGridSchema.CreateItemIndex(items);
+
+if (index.TryGetIndex((tenantId, orderId), out int rowIndex))
+{
+    // Coordinate selection, state, drag/drop, or chart focus.
+}
+</code></pre>
+<p>The index applies insert, remove, move, replace, and reset changes. It captures keys at insertion and rejects duplicates so accidental key mutation cannot corrupt lookup.</p>
+<h2 id="canonical-manifest">Canonical manifest</h2>
+<p><code>Manifest</code> contains:</p>
+<ul>
+<li>a manifest format version;</li>
+<li><code>SchemaId</code>, <code>StateVersion</code>, and deterministic <code>SchemaHash</code>;</li>
+<li>item and key types;</li>
+<li>ordered fields, stable column keys, previous-key aliases, and accessors;</li>
+<li>capability metadata used by operations, workflows, hierarchy, and analytics.</li>
+</ul>
+<p>Set <code>SchemaId</code> explicitly for persisted or cross-assembly schemas. Increment <code>StateVersion</code> for a migration boundary. The schema hash changes when behaviorally significant column, grouping, summary, band, analytics, formula, factory, or configuration metadata changes.</p>
+<h2 id="column-factories-and-configure-hooks">Column factories and configure hooks</h2>
+<p>Use a static configure method for last-mile changes:</p>
+<pre><code class="lang-csharp">[DataGridColumn(DataGridColumnKind.Text,
+    ConfigureMethod = nameof(ConfigureSymbol))]
+public string Symbol { get; set; } = string.Empty;
+
+public static void ConfigureSymbol(DataGridTextColumnDefinition column)
+{
+    column.Watermark = &quot;Ticker&quot;;
+}
+</code></pre>
+<p><code>FactoryMethod</code> replaces construction for one column. A replacement factory owns the initial binding and concrete definition type. After it returns, the generator applies canonical keys/accessors, attribute options, summary metadata, and the optional per-column configure method.</p>
+<p><code>GenerateDataGridColumns.ConfigureMethod</code> receives the completed definition list and runs after individual columns. The ordering is:</p>
+<ol>
+<li>Generated or user factory construction.</li>
+<li>Canonical generated metadata.</li>
+<li>Per-column configure method.</li>
+<li>Schema-list configure method.</li>
+</ol>
+<h2 id="full-schema-implementations">Full schema implementations</h2>
+<p>Set <code>ImplementationType</code> to an accessible implementation of <code>IDataGridGeneratedSchema&lt;TItem&gt;</code> for complete ownership:</p>
+<pre><code class="lang-csharp">[GenerateDataGridColumns(
+    ProviderName = &quot;TradeSchema&quot;,
+    ImplementationType = typeof(CustomTradeSchema))]
+public sealed class Trade
+{
+    public string Symbol { get; set; } = string.Empty;
+}
+</code></pre>
+<p>The emitted provider remains a stable facade and forwards the schema contracts to the implementation. <code>PDGSG007</code> reports an invalid implementation shape.</p>
+<h2 id="runtime-defined-shapes">Runtime-defined shapes</h2>
+<p>Compile-time generation cannot discover arbitrary dictionary keys or dynamic descriptors. Use <code>DataGridRuntimeSchemaAdapter&lt;TItem&gt;</code> and an explicit <code>IDataGridRuntimeSchemaProvider&lt;TItem&gt;</code>:</p>
+<pre><code class="lang-csharp">[GenerateDataGridColumns(
+    Discovery = DataGridColumnDiscovery.AttributedOnly,
+    ImplementationType = typeof(RuntimeRowSchema),
+    ProviderName = &quot;RuntimeRowFacade&quot;,
+    SchemaId = &quot;orders/runtime/v1&quot;)]
+public sealed class RuntimeRow : Dictionary&lt;string, object?&gt; { }
+
+public sealed class RuntimeRowSchema : DataGridRuntimeSchemaAdapter&lt;RuntimeRow&gt;
+{
+    public RuntimeRowSchema() : base(new Provider()) { }
+
+    private sealed class Provider : IDataGridRuntimeSchemaProvider&lt;RuntimeRow&gt;
+    {
+        public string SchemaId =&gt; &quot;orders/runtime/v1&quot;;
+
+        public IReadOnlyList&lt;DataGridRuntimeSchemaField&lt;RuntimeRow&gt;&gt; CreateFields() =&gt;
+        [
+            new(
+                &quot;symbol&quot;,
+                &quot;Symbol&quot;,
+                new DataGridColumnValueAccessor&lt;RuntimeRow, string&gt;(
+                    static row =&gt; (string)row[&quot;Symbol&quot;]!,
+                    static (row, value) =&gt; row[&quot;Symbol&quot;] = value),
+                static () =&gt; new DataGridTextColumnDefinition { Header = &quot;Symbol&quot; })
+        ];
+
+        public DataGridFastPathOptions CreateFastPathOptions() =&gt; new()
+        {
+            UseAccessorsOnly = true,
+            ThrowOnMissingAccessor = true,
+            EnableHighPerformanceSearching = true
+        };
+    }
+}
+</code></pre>
+<p>The adapter validates and freezes the field shape once, creates fresh definition lists, builds a runtime manifest, and reuses the normal accessor-based operation engine. Any necessary discovery of an external shape belongs inside the explicit provider. Known dictionary keys can remain completely reflection-free.</p>
+<p>Without <code>ImplementationType</code>, a known dynamic shape produces <code>PDGSG134</code>.</p>
+<h2 id="fast-path-policy">Fast-path policy</h2>
+<p>Generated schemas create strict accessor-only options. This avoids expression compilation and property lookup in sorting, filtering, searching, editing, and rendering paths.</p>
+<p>Use <code>Strict = false</code> only when an application intentionally permits a compatibility fallback. A generated strict path reports missing or incompatible metadata rather than silently changing execution strategy.</p>
+<p>For direct and drawn cell realization, custom-drawing caches, and indexed families, see <a href="layout-templates-rendering.html">layout, templates, and rendering</a>.</p>
+
+</article>
+
+        <div class="contribution d-print-none">
+          <a href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/docfx/articles/source-generators/schemas-and-columns.md/#L1" class="edit-link">Edit this page</a>
+        </div>
+
+        <div class="next-article d-print-none border-top" id="nextArticle"></div>
+
+      </div>
+
+      <div class="affix">
+        <nav id="affix"></nav>
+      </div>
+    </main>
+
+
+    <footer class="border-top text-secondary">
+      <div class="container-xxl">
+        <div class="flex-fill">
+          <span>Made with <a href="https://dotnet.github.io/docfx">docfx</a></span>
+        </div>
+      </div>
+    </footer>
+  </body>
+</html>

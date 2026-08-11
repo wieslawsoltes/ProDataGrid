@@ -1,0 +1,475 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+      <title>Accessibility, diagnostics, performance, and validation | ProDataGrid for Avalonia </title>
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <meta name="title" content="Accessibility, diagnostics, performance, and validation | ProDataGrid for Avalonia ">
+      
+      
+      <link rel="icon" href="../../favicon.ico">
+      <link rel="stylesheet" href="../../public/docfx.min.css">
+      <link rel="stylesheet" href="../../public/main.css">
+      <meta name="docfx:navrel" content="../../toc.html">
+      <meta name="docfx:tocrel" content="../toc.html">
+      
+      
+      
+      
+      <meta name="docfx:docurl" content="https://github.com/wieslawsoltes/ProDataGrid/blob/master/docfx/articles/source-generators/diagnostics-performance-testing.md/#L1">
+      <meta name="loc:inThisArticle" content="In this article">
+      <meta name="loc:searchResultsCount" content="{count} results for &quot;{query}&quot;">
+      <meta name="loc:searchNoResults" content="No results for &quot;{query}&quot;">
+      <meta name="loc:tocFilter" content="Filter by title">
+      <meta name="loc:nextArticle" content="Next">
+      <meta name="loc:prevArticle" content="Previous">
+      <meta name="loc:themeLight" content="Light">
+      <meta name="loc:themeDark" content="Dark">
+      <meta name="loc:themeAuto" content="Auto">
+      <meta name="loc:changeTheme" content="Change theme">
+      <meta name="loc:copy" content="Copy">
+      <meta name="loc:downloadPdf" content="Download PDF">
+
+      <script type="module" src="./../../public/docfx.min.js"></script>
+
+      <script>
+        const theme = localStorage.getItem('theme') || 'auto'
+        document.documentElement.setAttribute('data-bs-theme', theme === 'auto' ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light') : theme)
+      </script>
+
+  </head>
+
+  <body class="tex2jax_ignore" data-layout="" data-yaml-mime="">
+    <header class="bg-body border-bottom">
+      <nav id="autocollapse" class="navbar navbar-expand-md" role="navigation">
+        <div class="container-xxl flex-nowrap">
+          <a class="navbar-brand" href="../../index.html">
+            <img id="logo" class="svg" src="../../images/logo.svg" alt="">
+            
+          </a>
+          <button class="btn btn-lg d-md-none border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navpanel" aria-controls="navpanel" aria-expanded="false" aria-label="Toggle navigation">
+            <i class="bi bi-three-dots"></i>
+          </button>
+          <div class="collapse navbar-collapse" id="navpanel">
+            <div id="navbar">
+            </div>
+          </div>
+        </div>
+      </nav>
+    </header>
+
+    <main class="container-xxl">
+      <div class="toc-offcanvas">
+        <div class="offcanvas-md offcanvas-start" tabindex="-1" id="tocOffcanvas" aria-labelledby="tocOffcanvasLabel">
+          <div class="offcanvas-header">
+            <h5 class="offcanvas-title" id="tocOffcanvasLabel">Table of Contents</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="offcanvas" data-bs-target="#tocOffcanvas" aria-label="Close"></button>
+          </div>
+          <div class="offcanvas-body">
+            <nav class="toc" id="toc"></nav>
+          </div>
+        </div>
+      </div>
+
+      <div class="content">
+        <div class="actionbar">
+          <button class="btn btn-lg border-0 d-md-none" type="button" data-bs-toggle="offcanvas" data-bs-target="#tocOffcanvas" aria-controls="tocOffcanvas" aria-expanded="false" aria-label="Show table of contents">
+            <i class="bi bi-list"></i>
+          </button>
+
+          <nav id="breadcrumb"></nav>
+        </div>
+
+        <article data-uid="">
+<h1 id="accessibility-diagnostics-performance-and-validation">Accessibility, diagnostics, performance, and validation</h1>
+
+<p>Generated metadata makes reflection-free behavior inspectable and testable. This article covers localization/accessibility, performance profiles, renderer metrics, generator diagnostics, incremental behavior, NativeAOT, benchmarks, and recommended tests.</p>
+<h2 id="localization-providers">Localization providers</h2>
+<p>Use resource keys when Avalonia resources own localization, or direct validated methods for strongly typed localization:</p>
+<pre><code class="lang-csharp">[DataGridColumn(
+    Header = &quot;Amount&quot;,
+    Description = &quot;Order amount&quot;,
+    HeaderProviderMethod = nameof(GetAmountHeader),
+    DescriptionProviderMethod = nameof(GetAmountDescription),
+    HeaderResourceKey = &quot;OrderAmountHeader&quot;,
+    DescriptionResourceKey = &quot;OrderAmountDescription&quot;)]
+public decimal Amount { get; set; }
+
+public static string GetAmountHeader(IFormatProvider provider) =&gt;
+    TradingResources.Amount;
+
+public static string GetAmountDescription() =&gt;
+    TradingResources.AmountDescription;
+</code></pre>
+<p>Providers are called directly with <code>CurrentUICulture</code> where an <code>IFormatProvider</code> parameter is declared. <code>ResolveHeader</code> and <code>ResolveDescription</code> expose the same generated behavior to other UI surfaces.</p>
+<h2 id="accessibility-metadata">Accessibility metadata</h2>
+<p>Column metadata supports stable <code>AutomationId</code>, <code>AutomationName</code>, and <code>AutomationHelpText</code>. Generated views derive deterministic IDs for the view, grid, title, search, state surfaces, recipe slots, retry command, and built-in nested row details.</p>
+<p>The title is exposed as a level-one automation heading. The DataGrid receives an accessible name/help text. Generated template roots should use the provided stable metadata rather than visual-tree position.</p>
+<p>Headless tests can locate generated surfaces by automation ID without reflection or fragile tree indexes.</p>
+<h2 id="diagnostics-manifest">Diagnostics manifest</h2>
+<p>Every generated schema exposes an immutable <code>DataGridGeneratedDiagnosticsManifest</code> containing:</p>
+<ul>
+<li>schema ID and hash;</li>
+<li>item type;</li>
+<li>strict/streaming configuration;</li>
+<li>selected performance profile;</li>
+<li>stable-key availability;</li>
+<li>field keys, value types, write/search/filter/analytics coverage;</li>
+<li>explicitly active compatibility fallbacks;</li>
+<li>generated/runtime metric names.</li>
+</ul>
+<p>Use <code>HasFallbacks</code> as a production assertion for strict schemas:</p>
+<pre><code class="lang-csharp">DataGridGeneratedDiagnosticsManifest diagnostics =
+    TradeSchema.Diagnostics;
+
+Debug.Assert(diagnostics.Strict);
+Debug.Assert(!diagnostics.HasFallbacks);
+</code></pre>
+<h2 id="performance-profiles">Performance profiles</h2>
+<p><code>DataGridGeneratedPerformanceProfile</code> selects explicit runtime settings:</p>
+<table>
+<thead>
+<tr>
+<th>Profile</th>
+<th>Intended workload</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>Balanced</code></td>
+<td>General-purpose logical scrolling with variable-height estimation.</td>
+</tr>
+<tr>
+<td><code>UniformRows</code></td>
+<td>Fixed 28-pixel rows.</td>
+</tr>
+<tr>
+<td><code>VariableHeightEstimated</code></td>
+<td>Highly variable rows with advanced estimation.</td>
+</tr>
+<tr>
+<td><code>VariableHeightMeasured</code></td>
+<td>Variable rows with measured-height caching.</td>
+</tr>
+<tr>
+<td><code>Spreadsheet</code></td>
+<td>Dense fixed 24-pixel rows and spreadsheet input map.</td>
+</tr>
+<tr>
+<td><code>Tree</code></td>
+<td>Hierarchical flattening and variable-height estimation.</td>
+</tr>
+<tr>
+<td><code>HighFrequencyStreaming</code></td>
+<td>Fixed 26-pixel rows and reduced search-change tracking.</td>
+</tr>
+</tbody>
+</table>
+<p>Apply on a schema or generated view:</p>
+<pre><code class="lang-csharp">[GenerateDataGridColumns(
+    PerformanceProfile =
+        DataGridGeneratedPerformanceProfile.HighFrequencyStreaming,
+    Streaming = true)]
+public sealed class Quote { }
+
+[GenerateDataGridView(
+    typeof(Quote),
+    PerformanceProfile =
+        DataGridGeneratedPerformanceProfile.HighFrequencyStreaming)]
+public sealed partial class QuotesViewModel { }
+</code></pre>
+<p>The generated view applies the profile before <code>ConfigureGeneratedDataGrid</code>, so an explicit application override wins. Override <code>CreateGeneratedPerformanceOptions</code> for a custom estimator or scrolling policy.</p>
+<p><code>HighFrequencyStreaming</code> with row details always visible reports <code>PDGSG128</code> because realizing details for every row contradicts the bounded profile.</p>
+<h2 id="input-maps">Input maps</h2>
+<p><code>InputMapType</code> must implement <code>IDataGridGeneratedInputMap</code>. The built-in map always exposes platform-command+F for search; <code>Spreadsheet</code> additionally maps fill-down, fill-right, undo, and redo.</p>
+<p><code>DataGridGeneratedInputEvent&lt;TItem&gt;</code> forwards action, key/modifiers, typed current item, row/display-column indexes, and handled feedback to the ViewModel command.</p>
+<h2 id="renderer-metric-sinks">Renderer metric sinks</h2>
+<pre><code class="lang-csharp">[GenerateDataGridView(
+    typeof(Trade),
+    Framework = DataGridViewFramework.ReactiveUI,
+    DiagnosticsSinkType = typeof(TradeMetricsSink))]
+public sealed partial class TradesViewModel : ReactiveObject { }
+
+public sealed class TradeMetricsSink : IDataGridGeneratedMetricsSink
+{
+    public void Record(
+        in DataGridGeneratedMetricMeasurement measurement,
+        ReadOnlySpan&lt;KeyValuePair&lt;string, object&gt;&gt; tags)
+    {
+        // Copy only data that must outlive this callback.
+    }
+
+    public void Dispose() { }
+}
+</code></pre>
+<p><code>DataGridGeneratedMetricsBridge</code> observes only <code>ProDataGrid.Diagnostic.Meter</code>. It forwards counter, up/down-counter, and histogram samples with schema ID and active profile. Metric tags remain a <code>ReadOnlySpan</code>; the bridge does not allocate a tag collection.</p>
+<p>ReactiveUI views scope the subscription to activation. Plain Avalonia views scope it to visual-tree attachment. The subscription owns and disposes the sink.</p>
+<p>Enable built-in instruments before DataGrid initialization:</p>
+<pre><code class="lang-csharp">AppContext.SetSwitch(&quot;ProDataGrid.Diagnostics.IsEnabled&quot;, true);
+</code></pre>
+<p>The meter is process-wide. Generated schema/profile context identifies the subscribing view configuration, not necessarily the individual DataGrid that produced a built-in measurement.</p>
+<h2 id="compile-time-diagnostics">Compile-time diagnostics</h2>
+<table>
+<thead>
+<tr>
+<th>Code</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>PDGSG001</code></td>
+<td>Unsupported target type.</td>
+</tr>
+<tr>
+<td><code>PDGSG002</code></td>
+<td>No eligible columns.</td>
+</tr>
+<tr>
+<td><code>PDGSG003</code></td>
+<td>Unsupported attributed property shape.</td>
+</tr>
+<tr>
+<td><code>PDGSG004</code></td>
+<td>Invalid configuration/factory method.</td>
+</tr>
+<tr>
+<td><code>PDGSG005</code></td>
+<td>Required target/containing type is not partial.</td>
+</tr>
+<tr>
+<td><code>PDGSG006</code></td>
+<td>Requested generated member already exists.</td>
+</tr>
+<tr>
+<td><code>PDGSG007</code></td>
+<td>Custom schema implementation does not satisfy its contract.</td>
+</tr>
+<tr>
+<td><code>PDGSG008</code></td>
+<td>Namespace request matched no eligible types.</td>
+</tr>
+<tr>
+<td><code>PDGSG009</code></td>
+<td>Required, conflicting, or kind-incompatible column configuration.</td>
+</tr>
+<tr>
+<td><code>PDGSG010</code></td>
+<td>Requested item property is inaccessible.</td>
+</tr>
+<tr>
+<td><code>PDGSG011</code></td>
+<td>Namespace ViewModel policy cannot infer one item type.</td>
+</tr>
+<tr>
+<td><code>PDGSG012</code></td>
+<td>Generated-view binding member is missing.</td>
+</tr>
+<tr>
+<td><code>PDGSG013</code></td>
+<td>Generated-view custom base is invalid.</td>
+</tr>
+<tr>
+<td><code>PDGSG014</code></td>
+<td>Requested view framework is not referenced.</td>
+</tr>
+<tr>
+<td><code>PDGSG100</code></td>
+<td>Empty or duplicate stable column key.</td>
+</tr>
+<tr>
+<td><code>PDGSG101</code></td>
+<td>Invalid/ambiguous/conflicting key configuration.</td>
+</tr>
+<tr>
+<td><code>PDGSG103</code></td>
+<td>Named-controller source member is missing/incompatible.</td>
+</tr>
+<tr>
+<td><code>PDGSG104</code></td>
+<td>Source kind and operation owner conflict.</td>
+</tr>
+<tr>
+<td><code>PDGSG109</code></td>
+<td>Invalid/ambiguous hierarchy metadata.</td>
+</tr>
+<tr>
+<td><code>PDGSG117</code></td>
+<td>Named-controller collision.</td>
+</tr>
+<tr>
+<td><code>PDGSG118</code></td>
+<td>Invalid persisted schema/state metadata.</td>
+</tr>
+<tr>
+<td><code>PDGSG121</code></td>
+<td>Invalid formula name or stable-key dependency.</td>
+</tr>
+<tr>
+<td><code>PDGSG122</code></td>
+<td>Invalid/conflicting custom-drawing factory.</td>
+</tr>
+<tr>
+<td><code>PDGSG123</code></td>
+<td>Invalid/conflicting row-details/nested-grid source.</td>
+</tr>
+<tr>
+<td><code>PDGSG124</code></td>
+<td>Invalid/conflicting row command or content member.</td>
+</tr>
+<tr>
+<td><code>PDGSG125</code></td>
+<td>Invalid generated view-state projection.</td>
+</tr>
+<tr>
+<td><code>PDGSG126</code></td>
+<td>Invalid generated event flags or command member.</td>
+</tr>
+<tr>
+<td><code>PDGSG127</code></td>
+<td>Invalid ReactiveUI interaction/navigation declaration.</td>
+</tr>
+<tr>
+<td><code>PDGSG128</code></td>
+<td>Invalid performance/input/metrics configuration or incompatible high-frequency setting.</td>
+</tr>
+<tr>
+<td><code>PDGSG129</code></td>
+<td>Missing/incompatible clipboard or fill model.</td>
+</tr>
+<tr>
+<td><code>PDGSG130</code></td>
+<td>Missing/incompatible formula model.</td>
+</tr>
+<tr>
+<td><code>PDGSG131</code></td>
+<td>Missing/incompatible conditional-formatting model.</td>
+</tr>
+<tr>
+<td><code>PDGSG132</code></td>
+<td>Ambiguous same-name inherited interface property.</td>
+</tr>
+<tr>
+<td><code>PDGSG133</code></td>
+<td>Ambiguous same-name explicit-interface implementations.</td>
+</tr>
+<tr>
+<td><code>PDGSG134</code></td>
+<td>Runtime-defined shape lacks an explicit adapter.</td>
+</tr>
+<tr>
+<td><code>PDGSG135</code></td>
+<td>Invalid configured collection mutation handler.</td>
+</tr>
+<tr>
+<td><code>PDGSG136</code></td>
+<td>Invalid configured new-row factory.</td>
+</tr>
+<tr>
+<td><code>PDGSG137</code></td>
+<td>Invalid configured formula-fill translator.</td>
+</tr>
+<tr>
+<td><code>PDGSG138</code></td>
+<td>Invalid statically declared formula syntax.</td>
+</tr>
+<tr>
+<td><code>PDGSG139</code></td>
+<td>Invalid generated-view theme/class/status metadata.</td>
+</tr>
+<tr>
+<td><code>PDGSG140</code></td>
+<td>Invalid paging or initial-currency defaults.</td>
+</tr>
+</tbody>
+</table>
+<p>Diagnostics are attached to the configuration attribute/property where possible. Treat warnings/errors as contract feedback; do not suppress them to preserve a reflection-free claim.</p>
+<h2 id="incremental-behavior">Incremental behavior</h2>
+<p>The generator uses isolated attributed pipelines for direct requests. Equatable normalized models and stable hint names keep output deterministic. Expensive schema discovery/emission is cached per schema.</p>
+<p>Assembly/namespace policies and registries activate the compilation-wide coordination lane. An empty-policy gate prevents global source-type enumeration for ordinary direct-only consumers.</p>
+<p>When measuring incremental behavior, distinguish:</p>
+<ul>
+<li>cold generator execution;</li>
+<li>unchanged compilation reuse;</li>
+<li>one-schema semantic edit;</li>
+<li>assembly/namespace policy edits that intentionally affect many owners.</li>
+</ul>
+<h2 id="generator-unit-tests">Generator unit tests</h2>
+<p>Use <code>GeneratorDriver</code> tests to cover:</p>
+<ul>
+<li>emitted source and compilation;</li>
+<li>every attribute family and generated member collision;</li>
+<li>diagnostics and exact source locations;</li>
+<li>class/struct/interface and explicit-interface schemas;</li>
+<li>customization method/type validation;</li>
+<li>assembly/namespace precedence and registry output;</li>
+<li>generated Avalonia and ReactiveUI view source;</li>
+<li>deterministic output and incremental changes.</li>
+</ul>
+<p>Repository suite:</p>
+<pre><code class="lang-bash">dotnet test src/ProDataGrid.SourceGenerators.UnitTests/ProDataGrid.SourceGenerators.UnitTests.csproj -c Release
+</code></pre>
+<h2 id="runtime-and-headless-tests">Runtime and headless tests</h2>
+<p>Runtime tests should execute generated factories/controllers—not only inspect strings. Cover operation equivalence, keyed selection/state, mutations, streaming bounds, stale remote responses, hierarchy transactions, editing/transfer, layouts, analytics, and event feedback.</p>
+<p>Avalonia Headless tests should instantiate generated views, set typed DataContexts, activate ReactiveUI views, and verify:</p>
+<ul>
+<li>compiled bindings and model ownership;</li>
+<li>automation IDs and recipe slots;</li>
+<li>view-state and event/interaction lifetimes;</li>
+<li>hierarchy/model binding order;</li>
+<li>direct/drawn/template/detail configuration;</li>
+<li>deterministic screenshots for representative views.</li>
+</ul>
+<h2 id="nativeaot-validation">NativeAOT validation</h2>
+<p><code>tests/ProDataGrid.SourceGeneration.AotSmoke</code> publishes and executes a generated-only NativeAOT app covering schema, controller, Avalonia view, ReactiveUI view, custom base, fast paths, and registry.</p>
+<p>It enables trimming/AOT analysis and promotes generated-code <code>IL2026</code>, <code>IL2070</code>, <code>IL2075</code>, and <code>IL3050</code> warnings to failures.</p>
+<p>Example for macOS Arm64:</p>
+<pre><code class="lang-bash">dotnet restore tests/ProDataGrid.SourceGeneration.AotSmoke/ProDataGrid.SourceGeneration.AotSmoke.csproj -r osx-arm64
+dotnet build tests/ProDataGrid.SourceGeneration.AotSmoke/ProDataGrid.SourceGeneration.AotSmoke.csproj -c Release -r osx-arm64 --no-restore
+dotnet publish tests/ProDataGrid.SourceGeneration.AotSmoke/ProDataGrid.SourceGeneration.AotSmoke.csproj -c Release -r osx-arm64 --self-contained true --no-restore -p:WarningsAsErrors=
+./tests/ProDataGrid.SourceGeneration.AotSmoke/bin/Release/net10.0/osx-arm64/publish/ProDataGrid.SourceGeneration.AotSmoke
+</code></pre>
+<p>Use the appropriate runtime identifier on other platforms.</p>
+<h2 id="benchmarks">Benchmarks</h2>
+<p><code>tests/ProDataGrid.SourceGeneration.Benchmarks</code> measures generated columns/accessors/operations against an equivalent handwritten compiled provider and measures cold/no-op/one-schema generator executions.</p>
+<pre><code class="lang-bash">dotnet run -c Release --project tests/ProDataGrid.SourceGeneration.Benchmarks -- --validate
+dotnet run -c Release --project tests/ProDataGrid.SourceGeneration.Benchmarks -- --anyCategories Runtime
+dotnet run -c Release --project tests/ProDataGrid.SourceGeneration.Benchmarks -- --anyCategories Generator
+</code></pre>
+<p>CI runs correctness guards, not timing thresholds. For meaningful comparisons, record commit/dirty state, SDK/runtime, OS/architecture, hardware/power state, command, BenchmarkDotNet version, distributions, and allocation columns. Retain <code>BenchmarkDotNet.Artifacts</code>.</p>
+<h2 id="production-audit-checks">Production audit checks</h2>
+<p>For generated-only projects, add repository checks that prevent regression to:</p>
+<ul>
+<li>inline DataGrid columns where a generated schema owns them;</li>
+<li>disabled compiled-binding scopes;</li>
+<li><code>Type.GetProperty</code>, expression compilation, <code>DynamicInvoke</code>, runtime XAML loading, or reflection-based view location in generated integration code;</li>
+<li>unbounded channels/caches;</li>
+<li>event handlers in passive views.</li>
+</ul>
+<p>ProDiagnostics is the production validation lane for these rules; see <a href="samples-and-production-validation.html">samples and production validation</a>.</p>
+
+</article>
+
+        <div class="contribution d-print-none">
+          <a href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/docfx/articles/source-generators/diagnostics-performance-testing.md/#L1" class="edit-link">Edit this page</a>
+        </div>
+
+        <div class="next-article d-print-none border-top" id="nextArticle"></div>
+
+      </div>
+
+      <div class="affix">
+        <nav id="affix"></nav>
+      </div>
+    </main>
+
+
+    <footer class="border-top text-secondary">
+      <div class="container-xxl">
+        <div class="flex-fill">
+          <span>Made with <a href="https://dotnet.github.io/docfx">docfx</a></span>
+        </div>
+      </div>
+    </footer>
+  </body>
+</html>

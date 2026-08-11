@@ -1,0 +1,433 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+      <title>Samples and production validation | ProDataGrid for Avalonia </title>
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <meta name="title" content="Samples and production validation | ProDataGrid for Avalonia ">
+      
+      
+      <link rel="icon" href="../../favicon.ico">
+      <link rel="stylesheet" href="../../public/docfx.min.css">
+      <link rel="stylesheet" href="../../public/main.css">
+      <meta name="docfx:navrel" content="../../toc.html">
+      <meta name="docfx:tocrel" content="../toc.html">
+      
+      
+      
+      
+      <meta name="docfx:docurl" content="https://github.com/wieslawsoltes/ProDataGrid/blob/master/docfx/articles/source-generators/samples-and-production-validation.md/#L1">
+      <meta name="loc:inThisArticle" content="In this article">
+      <meta name="loc:searchResultsCount" content="{count} results for &quot;{query}&quot;">
+      <meta name="loc:searchNoResults" content="No results for &quot;{query}&quot;">
+      <meta name="loc:tocFilter" content="Filter by title">
+      <meta name="loc:nextArticle" content="Next">
+      <meta name="loc:prevArticle" content="Previous">
+      <meta name="loc:themeLight" content="Light">
+      <meta name="loc:themeDark" content="Dark">
+      <meta name="loc:themeAuto" content="Auto">
+      <meta name="loc:changeTheme" content="Change theme">
+      <meta name="loc:copy" content="Copy">
+      <meta name="loc:downloadPdf" content="Download PDF">
+
+      <script type="module" src="./../../public/docfx.min.js"></script>
+
+      <script>
+        const theme = localStorage.getItem('theme') || 'auto'
+        document.documentElement.setAttribute('data-bs-theme', theme === 'auto' ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light') : theme)
+      </script>
+
+  </head>
+
+  <body class="tex2jax_ignore" data-layout="" data-yaml-mime="">
+    <header class="bg-body border-bottom">
+      <nav id="autocollapse" class="navbar navbar-expand-md" role="navigation">
+        <div class="container-xxl flex-nowrap">
+          <a class="navbar-brand" href="../../index.html">
+            <img id="logo" class="svg" src="../../images/logo.svg" alt="">
+            
+          </a>
+          <button class="btn btn-lg d-md-none border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navpanel" aria-controls="navpanel" aria-expanded="false" aria-label="Toggle navigation">
+            <i class="bi bi-three-dots"></i>
+          </button>
+          <div class="collapse navbar-collapse" id="navpanel">
+            <div id="navbar">
+            </div>
+          </div>
+        </div>
+      </nav>
+    </header>
+
+    <main class="container-xxl">
+      <div class="toc-offcanvas">
+        <div class="offcanvas-md offcanvas-start" tabindex="-1" id="tocOffcanvas" aria-labelledby="tocOffcanvasLabel">
+          <div class="offcanvas-header">
+            <h5 class="offcanvas-title" id="tocOffcanvasLabel">Table of Contents</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="offcanvas" data-bs-target="#tocOffcanvas" aria-label="Close"></button>
+          </div>
+          <div class="offcanvas-body">
+            <nav class="toc" id="toc"></nav>
+          </div>
+        </div>
+      </div>
+
+      <div class="content">
+        <div class="actionbar">
+          <button class="btn btn-lg border-0 d-md-none" type="button" data-bs-toggle="offcanvas" data-bs-target="#tocOffcanvas" aria-controls="tocOffcanvas" aria-expanded="false" aria-label="Show table of contents">
+            <i class="bi bi-list"></i>
+          </button>
+
+          <nav id="breadcrumb"></nav>
+        </div>
+
+        <article data-uid="">
+<h1 id="samples-and-production-validation">Samples and production validation</h1>
+
+<p>The repository validates generated APIs in focused sample pages, ProDiagnostics production applications, generator/runtime/headless tests, NativeAOT, and benchmarks. Use these scenarios as starting points for application designs.</p>
+<h2 id="core-schema-and-column-scenarios">Core schema and column scenarios</h2>
+<table>
+<thead>
+<tr>
+<th>Scenario</th>
+<th>Sample</th>
+<th>Demonstrates</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Basic generated schema</td>
+<td><code>GeneratedColumnsDynamicDataPage</code></td>
+<td>Attributed columns, models, DynamicData, generated fast paths.</td>
+</tr>
+<tr>
+<td>Assembly/namespace policy</td>
+<td><code>GeneratedAssemblyNamespacePolicyPage</code></td>
+<td>Namespace defaults, explicit overrides, registry, existing XAML view registration.</td>
+</tr>
+<tr>
+<td>Interface contracts</td>
+<td>Generator tests</td>
+<td>Inherited interfaces, explicit implementations, ambiguity diagnostics.</td>
+</tr>
+<tr>
+<td>Runtime-defined rows</td>
+<td>Generator/runtime tests</td>
+<td><code>DataGridRuntimeSchemaAdapter&lt;TItem&gt;</code> and explicit providers.</td>
+</tr>
+<tr>
+<td>Custom implementations</td>
+<td><code>GeneratedCustomImplementationsPage</code></td>
+<td>Custom column factory, schema hook, comparer, validation, summary, base/derived generated views.</td>
+</tr>
+</tbody>
+</table>
+<h2 id="operations-and-data-sources">Operations and data sources</h2>
+<table>
+<thead>
+<tr>
+<th>Scenario</th>
+<th>Sample</th>
+<th>Demonstrates</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Named operations</td>
+<td><code>GeneratedOperationsControllerPage</code></td>
+<td>Generated controller, presets, descriptor projections, commands, compiled view.</td>
+</tr>
+<tr>
+<td>DynamicData list</td>
+<td><code>GeneratedDynamicDataSourceListPage</code></td>
+<td>Batch-aware <code>SourceList</code>, upstream sort/filter/search, errors and lifetime.</td>
+</tr>
+<tr>
+<td>DynamicData cache</td>
+<td><code>GeneratedDynamicDataSourceCachePage</code></td>
+<td>Keyed replacement, replace-aware sorting, preserved selection.</td>
+</tr>
+<tr>
+<td>Remote queries</td>
+<td><code>GeneratedRemoteQueryPage</code></td>
+<td>Offset paging, bounded cache, translation, cancellation, stale suppression, retry/view state.</td>
+</tr>
+<tr>
+<td>Paging and currency</td>
+<td><code>PagingSelectionPage</code></td>
+<td>Generated collection-view defaults, identity/currency across pages and replacements.</td>
+</tr>
+<tr>
+<td>Grouping/summaries</td>
+<td><code>GeneratedGroupingSummariesPage</code></td>
+<td>Typed groups, rendered totals/group summaries, incremental aggregate changes.</td>
+</tr>
+<tr>
+<td>Header filtering</td>
+<td><code>GeneratedHeaderFiltersPage</code></td>
+<td>Editor profiles, local/remote distinct values, cached commands, grid-scoped interactions.</td>
+</tr>
+</tbody>
+</table>
+<h2 id="hierarchy-and-selectionstate">Hierarchy and selection/state</h2>
+<table>
+<thead>
+<tr>
+<th>Scenario</th>
+<th>Sample</th>
+<th>Demonstrates</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Hierarchical DynamicData</td>
+<td><code>GeneratedHierarchicalDynamicDataPage</code></td>
+<td>Generated hierarchy model/adapter, async expansion, filtering policy, compiled wrapper bindings.</td>
+</tr>
+<tr>
+<td>Selection/state</td>
+<td><code>GeneratedSelectionStatePage</code></td>
+<td>Extended selection, paging/replacement, all state sections, aliases and migration.</td>
+</tr>
+<tr>
+<td>Shared grouped selection</td>
+<td><code>GeneratedGroupedSharedSelectionPage</code></td>
+<td>One generated identity selection model shared by DataGrid and ListBox.</td>
+</tr>
+</tbody>
+</table>
+<h2 id="editing-transfer-layout-and-rendering">Editing, transfer, layout, and rendering</h2>
+<table>
+<thead>
+<tr>
+<th>Scenario</th>
+<th>Sample</th>
+<th>Demonstrates</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Editing/clipboard/fill</td>
+<td><code>GeneratedEditingClipboardFillPage</code></td>
+<td>Typed edit fields, sync/async validation, projection, paste, series, formula fill, undo/export.</td>
+</tr>
+<tr>
+<td>Conditional formatting</td>
+<td><code>GeneratedConditionalFormattingPage</code></td>
+<td>Typed cell/row rules, priorities, custom predicates, runtime rule toggling.</td>
+</tr>
+<tr>
+<td>Indexed spreadsheet</td>
+<td><code>GeneratedIndexedSpreadsheetPage</code></td>
+<td>Runtime indexed family, typed slot notifications, formula slots, generated spreadsheet view.</td>
+</tr>
+<tr>
+<td>Custom drawing editing</td>
+<td><code>CustomDrawingEditingPage</code></td>
+<td>Drawn/direct columns, generated custom-drawing accessor/cache options.</td>
+</tr>
+<tr>
+<td>Row details</td>
+<td>Generated row-details tests/pages</td>
+<td>Resource, implementation, factory, and typed nested-grid recipes.</td>
+</tr>
+</tbody>
+</table>
+<h2 id="analytics-and-application-integration">Analytics and application integration</h2>
+<table>
+<thead>
+<tr>
+<th>Scenario</th>
+<th>Sample</th>
+<th>Demonstrates</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Pivot/chart</td>
+<td><code>GeneratedPivotChartPage</code></td>
+<td>Ordered fields, calculated measure, pivot result chart, range chart, long-form series, selection sync.</td>
+</tr>
+<tr>
+<td>Outline/drag-drop</td>
+<td><code>GeneratedOutlineDragDropPage</code></td>
+<td>Outline hooks, custom aggregate, domain-owned Move/Copy and refresh.</td>
+</tr>
+<tr>
+<td>Reactive view recipes</td>
+<td><code>GeneratedReactiveViewRecipesPage</code></td>
+<td>GridOnly, Explorer, Spreadsheet, Analytics over one ViewModel/schema.</td>
+</tr>
+<tr>
+<td>Virtualization/input/metrics</td>
+<td><code>GeneratedVirtualizationInputMetricsPage</code></td>
+<td>Performance profiles, input map, navigation, scroll state, renderer metrics.</td>
+</tr>
+<tr>
+<td>Reactive view states/events</td>
+<td>Generated remote/event samples</td>
+<td>Loading/error/empty states, selection/cell event bridges, interactions.</td>
+</tr>
+</tbody>
+</table>
+<h2 id="prodiagnostics-as-a-production-validation-lane">ProDiagnostics as a production validation lane</h2>
+<p>ProDiagnostics is intentionally not a synthetic demo. It validates generated schemas and reflection-free view mapping in a multi-grid diagnostics application with arbitrary-object inspection at its domain boundary.</p>
+<table>
+<thead>
+<tr>
+<th>Surface</th>
+<th>Generated contract</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Viewer metrics</td>
+<td>Streaming keyed template schema, fast path, layout controller</td>
+<td>High-frequency rows, numeric formatting, trend cells, chooser.</td>
+</tr>
+<tr>
+<td>Viewer activities</td>
+<td>Second named ViewModel projection</td>
+<td>Multiple schemas on one ViewModel.</td>
+</tr>
+<tr>
+<td>Assets</td>
+<td>Attributed-only schema</td>
+<td>Read-only sortable grid.</td>
+</tr>
+<tr>
+<td>Control properties</td>
+<td>Shared editable template schema/layout</td>
+<td>Recycling edit cells and runtime column profiles.</td>
+</tr>
+<tr>
+<td>Resource details</td>
+<td>Second projection of shared schema</td>
+<td>Per-view layout over one item schema.</td>
+</tr>
+<tr>
+<td>Resource picker</td>
+<td>Text/template schema</td>
+<td>External collection-view operations.</td>
+</tr>
+<tr>
+<td>Resources</td>
+<td>Flat and hierarchical schemas on one screen</td>
+<td>Multi-schema ViewModel and hierarchy.</td>
+</tr>
+<tr>
+<td>Visual/logical tree</td>
+<td>Hierarchical-row schema</td>
+<td><code>HierarchicalNode.Item</code> compiled bindings.</td>
+</tr>
+</tbody>
+</table>
+<p>ProDiagnostics uses a generated registry and explicit <code>[DataGridViewRegistration]</code> mappings. Its owned grids use generated definitions and compiled binding scopes. Reflection remains only where the diagnostics domain intentionally inspects unknown third-party runtime objects; it is not used for DataGrid binding or view location.</p>
+<h2 id="nativeaot-smoke-application">NativeAOT smoke application</h2>
+<p><code>tests/ProDataGrid.SourceGeneration.AotSmoke</code> is a generated-only self-contained executable. It covers:</p>
+<ul>
+<li>strict attributed schema and typed operations;</li>
+<li>generated Avalonia and ReactiveUI views;</li>
+<li>custom generated-view base;</li>
+<li>accessor-only fast paths;</li>
+<li>reflection-free registry;</li>
+<li>native executable startup and generated API execution.</li>
+</ul>
+<p>CI rejects trimming/AOT warnings originating in emitted generator code and runs the native binary after publishing.</p>
+<h2 id="benchmark-suite">Benchmark suite</h2>
+<p><code>tests/ProDataGrid.SourceGeneration.Benchmarks</code> provides:</p>
+<ul>
+<li>semantic equivalence guards;</li>
+<li>generated vs equivalent handwritten compiled column creation;</li>
+<li>typed accessor, sorting, filtering, and searching benchmarks;</li>
+<li>cold/no-op/one-schema-edit generator benchmarks;</li>
+<li>one-schema and multi-schema workloads.</li>
+</ul>
+<p>Run correctness validation before timing:</p>
+<pre><code class="lang-bash">dotnet run -c Release --project tests/ProDataGrid.SourceGeneration.Benchmarks -- --validate
+</code></pre>
+<h2 id="test-project-map">Test project map</h2>
+<table>
+<thead>
+<tr>
+<th>Project</th>
+<th>Coverage</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>src/ProDataGrid.SourceGenerators.UnitTests</code></td>
+<td>Discovery, model normalization, source output, diagnostics, compilation, incremental scenarios.</td>
+</tr>
+<tr>
+<td><code>src/Avalonia.Controls.DataGrid.UnitTests</code></td>
+<td>Generated runtime contracts, operations, identity/state, streams, remote queries, hierarchy, editing, transfer, analytics, metrics.</td>
+</tr>
+<tr>
+<td><code>src/DataGridSample.UnitTests</code></td>
+<td>Generated sample ViewModels and Avalonia Headless pages.</td>
+</tr>
+<tr>
+<td><code>src/ProDiagnostics.UnitTests</code></td>
+<td>Production schema registry, generated view creation, application behavior.</td>
+</tr>
+<tr>
+<td><code>tests/ProDataGrid.SourceGeneration.AotSmoke</code></td>
+<td>Trimming/NativeAOT publish and executable smoke.</td>
+</tr>
+<tr>
+<td><code>tests/ProDataGrid.SourceGeneration.Benchmarks</code></td>
+<td>Correctness and performance baselines.</td>
+</tr>
+</tbody>
+</table>
+<h2 id="repository-validation-commands">Repository validation commands</h2>
+<pre><code class="lang-bash">dotnet build -c Release --no-restore -p:VersionSuffix=-build.local
+
+dotnet test src/ProDataGrid.SourceGenerators.UnitTests/ProDataGrid.SourceGenerators.UnitTests.csproj -c Release --no-build
+
+dotnet test src/Avalonia.Controls.DataGrid.UnitTests/Avalonia.Controls.DataGrid.UnitTests.csproj -c Release --no-build
+
+dotnet test src/DataGridSample.UnitTests/DataGridSample.UnitTests.csproj -c Release --no-build
+
+dotnet test src/ProDiagnostics.UnitTests/ProDiagnostics.UnitTests.csproj -c Release --no-build
+
+dotnet run -c Release --no-build --no-restore --project tests/ProDataGrid.SourceGeneration.Benchmarks -- --validate
+</code></pre>
+<p>Use the dedicated AOT commands from <a href="diagnostics-performance-testing.html#nativeaot-validation">Accessibility, diagnostics, performance, and validation</a> for the current runtime identifier.</p>
+<h2 id="selecting-a-sample">Selecting a sample</h2>
+<ul>
+<li>Start with <code>GeneratedOperationsControllerPage</code> for an ordinary reactive grid.</li>
+<li>Use <code>GeneratedDynamicDataSourceCachePage</code> for keyed live data.</li>
+<li>Use <code>GeneratedRemoteQueryPage</code> for server-owned operations.</li>
+<li>Use <code>GeneratedHierarchicalDynamicDataPage</code> for trees.</li>
+<li>Use <code>GeneratedEditingClipboardFillPage</code> for spreadsheet-style editing.</li>
+<li>Use <code>GeneratedCustomImplementationsPage</code> when generated defaults need application ownership.</li>
+<li>Use the ProDiagnostics migration as the reference for multi-grid production adoption.</li>
+</ul>
+
+</article>
+
+        <div class="contribution d-print-none">
+          <a href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/docfx/articles/source-generators/samples-and-production-validation.md/#L1" class="edit-link">Edit this page</a>
+        </div>
+
+        <div class="next-article d-print-none border-top" id="nextArticle"></div>
+
+      </div>
+
+      <div class="affix">
+        <nav id="affix"></nav>
+      </div>
+    </main>
+
+
+    <footer class="border-top text-secondary">
+      <div class="container-xxl">
+        <div class="flex-fill">
+          <span>Made with <a href="https://dotnet.github.io/docfx">docfx</a></span>
+        </div>
+      </div>
+    </footer>
+  </body>
+</html>

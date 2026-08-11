@@ -1,0 +1,927 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+      <title>Source-generator attribute reference | ProDataGrid for Avalonia </title>
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <meta name="title" content="Source-generator attribute reference | ProDataGrid for Avalonia ">
+      
+      
+      <link rel="icon" href="../../favicon.ico">
+      <link rel="stylesheet" href="../../public/docfx.min.css">
+      <link rel="stylesheet" href="../../public/main.css">
+      <meta name="docfx:navrel" content="../../toc.html">
+      <meta name="docfx:tocrel" content="../toc.html">
+      
+      
+      
+      
+      <meta name="docfx:docurl" content="https://github.com/wieslawsoltes/ProDataGrid/blob/master/docfx/articles/source-generators/attribute-reference.md/#L1">
+      <meta name="loc:inThisArticle" content="In this article">
+      <meta name="loc:searchResultsCount" content="{count} results for &quot;{query}&quot;">
+      <meta name="loc:searchNoResults" content="No results for &quot;{query}&quot;">
+      <meta name="loc:tocFilter" content="Filter by title">
+      <meta name="loc:nextArticle" content="Next">
+      <meta name="loc:prevArticle" content="Previous">
+      <meta name="loc:themeLight" content="Light">
+      <meta name="loc:themeDark" content="Dark">
+      <meta name="loc:themeAuto" content="Auto">
+      <meta name="loc:changeTheme" content="Change theme">
+      <meta name="loc:copy" content="Copy">
+      <meta name="loc:downloadPdf" content="Download PDF">
+
+      <script type="module" src="./../../public/docfx.min.js"></script>
+
+      <script>
+        const theme = localStorage.getItem('theme') || 'auto'
+        document.documentElement.setAttribute('data-bs-theme', theme === 'auto' ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light') : theme)
+      </script>
+
+  </head>
+
+  <body class="tex2jax_ignore" data-layout="" data-yaml-mime="">
+    <header class="bg-body border-bottom">
+      <nav id="autocollapse" class="navbar navbar-expand-md" role="navigation">
+        <div class="container-xxl flex-nowrap">
+          <a class="navbar-brand" href="../../index.html">
+            <img id="logo" class="svg" src="../../images/logo.svg" alt="">
+            
+          </a>
+          <button class="btn btn-lg d-md-none border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navpanel" aria-controls="navpanel" aria-expanded="false" aria-label="Toggle navigation">
+            <i class="bi bi-three-dots"></i>
+          </button>
+          <div class="collapse navbar-collapse" id="navpanel">
+            <div id="navbar">
+            </div>
+          </div>
+        </div>
+      </nav>
+    </header>
+
+    <main class="container-xxl">
+      <div class="toc-offcanvas">
+        <div class="offcanvas-md offcanvas-start" tabindex="-1" id="tocOffcanvas" aria-labelledby="tocOffcanvasLabel">
+          <div class="offcanvas-header">
+            <h5 class="offcanvas-title" id="tocOffcanvasLabel">Table of Contents</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="offcanvas" data-bs-target="#tocOffcanvas" aria-label="Close"></button>
+          </div>
+          <div class="offcanvas-body">
+            <nav class="toc" id="toc"></nav>
+          </div>
+        </div>
+      </div>
+
+      <div class="content">
+        <div class="actionbar">
+          <button class="btn btn-lg border-0 d-md-none" type="button" data-bs-toggle="offcanvas" data-bs-target="#tocOffcanvas" aria-controls="tocOffcanvas" aria-expanded="false" aria-label="Show table of contents">
+            <i class="bi bi-list"></i>
+          </button>
+
+          <nav id="breadcrumb"></nav>
+        </div>
+
+        <article data-uid="">
+<h1 id="source-generator-attribute-reference">Source-generator attribute reference</h1>
+
+<p>The generator injects these internal configuration attributes into the consuming compilation under <code>ProDataGrid.SourceGeneration</code>. Add <code>using ProDataGrid.SourceGeneration;</code> in source files that use type/property attributes.</p>
+<h2 id="generation-attributes">Generation attributes</h2>
+<table>
+<thead>
+<tr>
+<th>Attribute</th>
+<th>Target</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>GenerateDataGridColumns</code></td>
+<td>class, struct, interface, assembly</td>
+<td>Generate one typed schema/provider.</td>
+</tr>
+<tr>
+<td><code>GenerateDataGridColumnsForNamespace</code></td>
+<td>assembly</td>
+<td>Generate schemas for eligible types in a namespace.</td>
+</tr>
+<tr>
+<td><code>GenerateDataGridViewModel</code></td>
+<td>class, assembly</td>
+<td>Add schema/column/fast-path properties to a partial ViewModel.</td>
+</tr>
+<tr>
+<td><code>GenerateDataGridViewModelsForNamespace</code></td>
+<td>assembly</td>
+<td>Augment eligible partial ViewModels in a namespace.</td>
+</tr>
+<tr>
+<td><code>GenerateDataGridController</code></td>
+<td>partial class</td>
+<td>Generate one named controller and optional source pipeline.</td>
+</tr>
+<tr>
+<td><code>GenerateDataGridView</code></td>
+<td>class, assembly</td>
+<td>Generate a code-only Avalonia or ReactiveUI view.</td>
+</tr>
+<tr>
+<td><code>GenerateDataGridViewsForNamespace</code></td>
+<td>assembly</td>
+<td>Generate views for eligible ViewModels in a namespace.</td>
+</tr>
+<tr>
+<td><code>GenerateDataGridRegistry</code></td>
+<td>assembly</td>
+<td>Generate reflection-free schema/view lookup and optional DI registration.</td>
+</tr>
+<tr>
+<td><code>DataGridViewRegistration</code></td>
+<td>assembly</td>
+<td>Register an existing XAML view in the generated registry.</td>
+</tr>
+<tr>
+<td><code>GenerateDataGridIndexedColumns</code></td>
+<td>class, struct</td>
+<td>Generate typed factories for a runtime indexed field family.</td>
+</tr>
+<tr>
+<td><code>GenerateDataGridCellDrawCache</code></td>
+<td>partial class</td>
+<td>Generate bounded per-item custom-drawing cache storage.</td>
+</tr>
+</tbody>
+</table>
+<h2 id="generatedatagridcolumns"><code>GenerateDataGridColumns</code></h2>
+<p>Constructors:</p>
+<pre><code class="lang-csharp">[GenerateDataGridColumns]
+[GenerateDataGridColumns(typeof(ExternalRow))]
+</code></pre>
+<table>
+<thead>
+<tr>
+<th>Option</th>
+<th>Default</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>ItemType</code></td>
+<td>annotated type</td>
+<td>External row type for assembly requests.</td>
+</tr>
+<tr>
+<td><code>ProviderName</code></td>
+<td>deterministic type-based name</td>
+<td>Emitted provider/facade type name.</td>
+</tr>
+<tr>
+<td><code>ProviderNamespace</code></td>
+<td>generated default</td>
+<td>Emitted provider namespace.</td>
+</tr>
+<tr>
+<td><code>SchemaId</code></td>
+<td>item metadata name + <code>/v1</code></td>
+<td>Stable persisted/cross-assembly schema identity.</td>
+</tr>
+<tr>
+<td><code>StateVersion</code></td>
+<td><code>1</code></td>
+<td>Persisted-state migration version.</td>
+</tr>
+<tr>
+<td><code>Discovery</code></td>
+<td><code>PublicProperties</code></td>
+<td>Public-property or attributed-only discovery.</td>
+</tr>
+<tr>
+<td><code>IncludeInherited</code></td>
+<td><code>true</code></td>
+<td>Include inherited class/interface properties.</td>
+</tr>
+<tr>
+<td><code>Strict</code></td>
+<td><code>true</code></td>
+<td>Require reflection-free compatible metadata.</td>
+</tr>
+<tr>
+<td><code>Streaming</code></td>
+<td><code>false</code></td>
+<td>Mark/configure the schema for streaming usage.</td>
+</tr>
+<tr>
+<td><code>HierarchicalRows</code></td>
+<td><code>false</code></td>
+<td>Emit <code>HierarchicalNode.Item</code>-aware compiled column bindings.</td>
+</tr>
+<tr>
+<td><code>PerformanceProfile</code></td>
+<td><code>Balanced</code></td>
+<td>Generated performance preset.</td>
+</tr>
+<tr>
+<td><code>DefaultPageSize</code></td>
+<td><code>0</code></td>
+<td>Collection-view page size; zero disables paging.</td>
+</tr>
+<tr>
+<td><code>InitialPageIndex</code></td>
+<td><code>0</code></td>
+<td>Initial collection-view page.</td>
+</tr>
+<tr>
+<td><code>InitialCurrency</code></td>
+<td>default enum value</td>
+<td>Initial collection-view current-item policy.</td>
+</tr>
+<tr>
+<td><code>PreserveCurrentItemByKey</code></td>
+<td><code>true</code></td>
+<td>Keep currency across refresh/page/replacement by key.</td>
+</tr>
+<tr>
+<td><code>PreserveSelectionByKey</code></td>
+<td><code>true</code></td>
+<td>Keep selection across refresh/page/replacement by key.</td>
+</tr>
+<tr>
+<td><code>ImplementationType</code></td>
+<td>none</td>
+<td>Complete <code>IDataGridGeneratedSchema&lt;TItem&gt;</code> replacement/runtime adapter.</td>
+</tr>
+<tr>
+<td><code>MutationHandlerType</code></td>
+<td>none</td>
+<td>Default <code>IDataGridGeneratedCollectionMutationHandler&lt;TItem&gt;</code>.</td>
+</tr>
+<tr>
+<td><code>NewRowFactoryType</code></td>
+<td>none</td>
+<td>Default <code>IDataGridGeneratedNewRowFactory&lt;TItem&gt;</code>.</td>
+</tr>
+<tr>
+<td><code>FormulaFillTranslatorType</code></td>
+<td>none</td>
+<td>Default <code>IFormulaFillTranslator</code>.</td>
+</tr>
+<tr>
+<td><code>OperationPresetMethods</code></td>
+<td>empty</td>
+<td>Validated static preset factory names.</td>
+</tr>
+<tr>
+<td><code>KeySelectorMethod</code></td>
+<td>none</td>
+<td>Static typed item-key selector.</td>
+</tr>
+<tr>
+<td><code>UseReferenceIdentityKey</code></td>
+<td><code>false</code></td>
+<td>Use reference identity for reference rows.</td>
+</tr>
+<tr>
+<td><code>ConfigureMethod</code></td>
+<td>none</td>
+<td>Static completed-column-list hook.</td>
+</tr>
+<tr>
+<td><code>PivotConfigureMethod</code></td>
+<td>none</td>
+<td>Static <code>PivotTableModel</code> policy hook.</td>
+</tr>
+<tr>
+<td><code>OutlineConfigureMethod</code></td>
+<td>none</td>
+<td>Static <code>OutlineReportModel</code> policy hook.</td>
+</tr>
+</tbody>
+</table>
+<p><code>KeySelectorMethod</code>, <code>[DataGridKey]</code>, and <code>UseReferenceIdentityKey</code> are mutually exclusive.</p>
+<h2 id="generatedatagridcolumnsfornamespace"><code>GenerateDataGridColumnsForNamespace</code></h2>
+<p>Constructor: <code>GenerateDataGridColumnsForNamespace(string namespaceName)</code>.</p>
+<p>It supports <code>IncludeNestedNamespaces</code> plus the discovery, strictness, streaming, hierarchy, performance, paging/currency, preservation, state-version, pivot, and outline defaults from <code>GenerateDataGridColumns</code>. Explicit item requests override namespace-owned settings.</p>
+<h2 id="generatedatagridviewmodel"><code>GenerateDataGridViewModel</code></h2>
+<p>Constructors:</p>
+<pre><code class="lang-csharp">[GenerateDataGridViewModel(typeof(Row))]
+[GenerateDataGridViewModel(typeof(MyViewModel), typeof(Row))]
+</code></pre>
+<table>
+<thead>
+<tr>
+<th>Option</th>
+<th>Default</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>ColumnDefinitionsPropertyName</code></td>
+<td><code>ColumnDefinitions</code></td>
+<td>Generated definitions property.</td>
+</tr>
+<tr>
+<td><code>SchemaPropertyName</code></td>
+<td><code>DataGridSchema</code></td>
+<td>Generated schema property.</td>
+</tr>
+<tr>
+<td><code>FastPathOptionsPropertyName</code></td>
+<td><code>FastPathOptions</code></td>
+<td>Generated fast-path options property.</td>
+</tr>
+<tr>
+<td><code>ProviderName</code></td>
+<td>inferred</td>
+<td>Existing/generated schema provider to use.</td>
+</tr>
+<tr>
+<td><code>Strict</code></td>
+<td><code>true</code></td>
+<td>Strict schema projection.</td>
+</tr>
+<tr>
+<td><code>Streaming</code></td>
+<td><code>false</code></td>
+<td>Streaming projection metadata.</td>
+</tr>
+</tbody>
+</table>
+<p>The ViewModel and all containing types must be partial. Existing requested members report <code>PDGSG006</code>.</p>
+<p><code>GenerateDataGridViewModelsForNamespace</code> additionally has <code>NamespaceName</code>, <code>IncludeNestedNamespaces</code>, and <code>ItemsPropertyName</code> for item-type inference.</p>
+<h2 id="generatedatagridcontroller"><code>GenerateDataGridController</code></h2>
+<p>Constructor: <code>GenerateDataGridController(Type itemType, string name)</code>.</p>
+<table>
+<thead>
+<tr>
+<th>Option</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>ProviderName</code></td>
+<td>Schema provider used by the named controller.</td>
+</tr>
+<tr>
+<td><code>SourceMember</code></td>
+<td>ViewModel source field/property.</td>
+</tr>
+<tr>
+<td><code>SourceKind</code></td>
+<td>Ordinary, DynamicData list/cache, async/channel, or remote source shape.</td>
+</tr>
+<tr>
+<td><code>Features</code></td>
+<td>Generated capability flags; defaults to columns + operations.</td>
+</tr>
+<tr>
+<td><code>OperationExecution</code></td>
+<td>View, external-pipeline, or remote execution owner.</td>
+</tr>
+<tr>
+<td><code>KeyMember</code></td>
+<td>Explicit controller key member.</td>
+</tr>
+<tr>
+<td><code>KeySelectorMethod</code></td>
+<td>Explicit static controller key selector.</td>
+</tr>
+<tr>
+<td><code>UseReferenceIdentityKey</code></td>
+<td>Reference identity for reference rows.</td>
+</tr>
+<tr>
+<td><code>ImplementationType</code></td>
+<td><code>IDataGridGeneratedControllerFactory&lt;TItem&gt;</code> implementation.</td>
+</tr>
+<tr>
+<td><code>ConfigureMethod</code></td>
+<td>Static <code>ref DataGridGeneratedControllerOptions&lt;TItem&gt;</code> hook.</td>
+</tr>
+<tr>
+<td><code>PipelineTransformMethod</code></td>
+<td>Exact-shape typed DynamicData transform.</td>
+</tr>
+<tr>
+<td><code>Strict</code></td>
+<td>Strict generation; default <code>true</code>.</td>
+</tr>
+<tr>
+<td><code>Streaming</code></td>
+<td>Streaming controller configuration.</td>
+</tr>
+</tbody>
+</table>
+<p>The generated member prefix is <code>Name</code>. Names must not collide (<code>PDGSG117</code>).</p>
+<h2 id="generatedatagridview"><code>GenerateDataGridView</code></h2>
+<p>Constructors:</p>
+<pre><code class="lang-csharp">[GenerateDataGridView(typeof(Row))]
+[GenerateDataGridView(typeof(MyViewModel), typeof(Row))]
+</code></pre>
+<h3 id="identity-and-framework">Identity and framework</h3>
+<table>
+<thead>
+<tr>
+<th>Option</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>ViewName</code>, <code>ViewNamespace</code></td>
+<td>Emitted type identity.</td>
+</tr>
+<tr>
+<td><code>Framework</code></td>
+<td><code>Avalonia</code> or <code>ReactiveUI</code>.</td>
+</tr>
+<tr>
+<td><code>BaseType</code></td>
+<td>Accessible compatible custom base type.</td>
+</tr>
+<tr>
+<td><code>Title</code>, <code>AutomationId</code></td>
+<td>View title and stable automation root.</td>
+</tr>
+<tr>
+<td><code>Recipe</code></td>
+<td><code>GridOnly</code>, <code>SearchableGrid</code>, <code>OperationsToolbar</code>, <code>Explorer</code>, <code>Spreadsheet</code>, <code>Analytics</code>, or <code>MasterDetail</code>.</td>
+</tr>
+<tr>
+<td><code>ControllerName</code></td>
+<td>Named controller associated with the view.</td>
+</tr>
+</tbody>
+</table>
+<h3 id="compiled-viewmodel-bindings">Compiled ViewModel bindings</h3>
+<table>
+<thead>
+<tr>
+<th>Option</th>
+<th>Bound member</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>ItemsPropertyName</code></td>
+<td>Item collection.</td>
+</tr>
+<tr>
+<td><code>ColumnDefinitionsPropertyName</code></td>
+<td>Generated/application definitions.</td>
+</tr>
+<tr>
+<td><code>FastPathOptionsPropertyName</code></td>
+<td>Strict/accessor fast-path options.</td>
+</tr>
+<tr>
+<td><code>SortingModelPropertyName</code></td>
+<td>Sorting model.</td>
+</tr>
+<tr>
+<td><code>FilteringModelPropertyName</code></td>
+<td>Filtering model.</td>
+</tr>
+<tr>
+<td><code>SearchModelPropertyName</code></td>
+<td>Search model.</td>
+</tr>
+<tr>
+<td><code>SearchTextPropertyName</code></td>
+<td>Two-way search text.</td>
+</tr>
+<tr>
+<td><code>SelectionModelPropertyName</code></td>
+<td>Selection model.</td>
+</tr>
+<tr>
+<td><code>ClipboardImportModelPropertyName</code></td>
+<td><code>IDataGridClipboardImportModel</code>.</td>
+</tr>
+<tr>
+<td><code>FillModelPropertyName</code></td>
+<td><code>IDataGridFillModel</code>.</td>
+</tr>
+<tr>
+<td><code>FormulaModelPropertyName</code></td>
+<td><code>IDataGridFormulaModel</code>.</td>
+</tr>
+<tr>
+<td><code>ConditionalFormattingModelPropertyName</code></td>
+<td><code>IConditionalFormattingModel</code>.</td>
+</tr>
+<tr>
+<td><code>HierarchicalModelPropertyName</code></td>
+<td>Typed hierarchy model.</td>
+</tr>
+<tr>
+<td><code>StateControllerPropertyName</code></td>
+<td>Generated state controller.</td>
+</tr>
+</tbody>
+</table>
+<h3 id="grid-behavior">Grid behavior</h3>
+<table>
+<thead>
+<tr>
+<th>Option</th>
+<th>Default/purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>HierarchyFilterPolicy</code></td>
+<td>Keep ancestors of matches.</td>
+</tr>
+<tr>
+<td><code>SelectionMode</code></td>
+<td><code>Single</code>.</td>
+</tr>
+<tr>
+<td><code>SelectionUnit</code></td>
+<td><code>FullRow</code>.</td>
+</tr>
+<tr>
+<td><code>EditTriggers</code></td>
+<td>ProDataGrid defaults.</td>
+</tr>
+<tr>
+<td><code>RestrictTextInputEditToCells</code></td>
+<td>Restrict text-input editing.</td>
+</tr>
+<tr>
+<td><code>RequiredPointerEditModifiers</code></td>
+<td>Required pointer modifiers.</td>
+</tr>
+<tr>
+<td><code>RequireExactPointerEditModifiers</code></td>
+<td>Require exact modifier set.</td>
+</tr>
+<tr>
+<td><code>ClipboardCopyMode</code></td>
+<td><code>ExcludeHeader</code>.</td>
+</tr>
+<tr>
+<td><code>IsReadOnly</code></td>
+<td>Generated grid read-only setting.</td>
+</tr>
+<tr>
+<td><code>CanUserAddRows</code>, <code>CanUserDeleteRows</code></td>
+<td>Disabled unless explicitly enabled.</td>
+</tr>
+<tr>
+<td><code>ShowTotalSummary</code>, <code>ShowGroupSummary</code></td>
+<td>Summary surface visibility.</td>
+</tr>
+<tr>
+<td><code>TotalSummaryPosition</code>, <code>GroupSummaryPosition</code></td>
+<td>Summary placement.</td>
+</tr>
+</tbody>
+</table>
+<h3 id="view-state-events-and-interactions">View state, events, and interactions</h3>
+<table>
+<thead>
+<tr>
+<th>Option</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>ViewStatePropertyName</code></td>
+<td><code>DataGridGeneratedViewState</code>.</td>
+</tr>
+<tr>
+<td><code>ErrorMessagePropertyName</code></td>
+<td>Optional dynamic error string.</td>
+</tr>
+<tr>
+<td><code>RetryCommandPropertyName</code></td>
+<td>Retry <code>ICommand</code>.</td>
+</tr>
+<tr>
+<td><code>LoadingText</code>, <code>EmptyText</code>, <code>ErrorText</code>, <code>RetryText</code></td>
+<td>Static fallback labels.</td>
+</tr>
+<tr>
+<td><code>RoutedEvents</code></td>
+<td>Generated DataGrid event flags.</td>
+</tr>
+<tr>
+<td><code>RoutedEventCommandPropertyName</code></td>
+<td>Command receiving <code>DataGridGeneratedViewEvent&lt;TItem&gt;</code>.</td>
+</tr>
+<tr>
+<td><code>InteractionPropertyNames</code></td>
+<td>ReactiveUI interaction member names.</td>
+</tr>
+<tr>
+<td><code>InteractionHandlerTypes</code></td>
+<td>Matching generated-view handler types.</td>
+</tr>
+<tr>
+<td><code>NavigationInteractionPropertyName</code></td>
+<td>Typed current-cell/scroll interaction.</td>
+</tr>
+</tbody>
+</table>
+<h3 id="performance-and-presentation">Performance and presentation</h3>
+<table>
+<thead>
+<tr>
+<th>Option</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>PerformanceProfile</code></td>
+<td>Generated performance preset.</td>
+</tr>
+<tr>
+<td><code>InputMapType</code></td>
+<td><code>IDataGridGeneratedInputMap</code> implementation.</td>
+</tr>
+<tr>
+<td><code>InputCommandPropertyName</code></td>
+<td>Command receiving typed input events.</td>
+</tr>
+<tr>
+<td><code>DiagnosticsSinkType</code></td>
+<td><code>IDataGridGeneratedMetricsSink</code> implementation.</td>
+</tr>
+<tr>
+<td><code>DiagnosticsStatusPropertyName</code></td>
+<td>Readable string status binding.</td>
+</tr>
+<tr>
+<td><code>ViewThemeKey</code>, <code>DataGridThemeKey</code>, <code>ToolbarThemeKey</code>, <code>RecipeContentThemeKey</code></td>
+<td>Dynamic resource keys.</td>
+</tr>
+<tr>
+<td><code>ViewClasses</code>, <code>DataGridClasses</code>, <code>ToolbarClasses</code>, <code>RecipeContentClasses</code></td>
+<td>Validated direct class tokens.</td>
+</tr>
+</tbody>
+</table>
+<h3 id="row-details">Row details</h3>
+<table>
+<thead>
+<tr>
+<th>Option</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>RowDetailsTemplateKey</code></td>
+<td>Dynamic resource template.</td>
+</tr>
+<tr>
+<td><code>RowDetailsTemplateImplementationType</code></td>
+<td>Accessible parameterless <code>IDataTemplate</code>.</td>
+</tr>
+<tr>
+<td><code>RowDetailsTemplateFactoryMethod</code></td>
+<td>Static recycling <code>(TItem, Control?) -&gt; Control</code> factory.</td>
+</tr>
+<tr>
+<td><code>RowDetailsVisibilityMode</code>, <code>AreRowDetailsFrozen</code></td>
+<td>Grid detail behavior.</td>
+</tr>
+<tr>
+<td><code>RowDetailsNestedItemType</code></td>
+<td>Nested row schema type.</td>
+</tr>
+<tr>
+<td><code>RowDetailsNestedItemsMember</code></td>
+<td><code>IEnumerable&lt;TNested&gt;</code> row property.</td>
+</tr>
+<tr>
+<td><code>RowDetailsNestedProviderName</code>, <code>RowDetailsNestedProviderNamespace</code></td>
+<td>Nested provider identity.</td>
+</tr>
+<tr>
+<td><code>RowDetailsSummaryMember</code></td>
+<td>Optional readable string summary.</td>
+</tr>
+<tr>
+<td><code>RowDetailsAutomationId</code></td>
+<td>Stable nested-details automation root.</td>
+</tr>
+</tbody>
+</table>
+<p><code>GenerateDataGridViewsForNamespace</code> exposes the same shared view settings plus namespace matching and item inference.</p>
+<h2 id="generatedatagridregistry"><code>GenerateDataGridRegistry</code></h2>
+<table>
+<thead>
+<tr>
+<th>Option</th>
+<th>Default</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>RegistryName</code></td>
+<td><code>GeneratedProDataGridRegistration</code></td>
+</tr>
+<tr>
+<td><code>RegistryNamespace</code></td>
+<td><code>ProDataGrid.Generated</code></td>
+</tr>
+</tbody>
+</table>
+<p>One registry request is allowed per assembly.</p>
+<h2 id="datagridviewregistration"><code>DataGridViewRegistration</code></h2>
+<p>Constructor: <code>DataGridViewRegistration(Type viewModelType, Type viewType)</code>. The view type must derive from <code>Control</code> and have an accessible parameterless constructor.</p>
+<h2 id="generatedatagridindexedcolumns"><code>GenerateDataGridIndexedColumns</code></h2>
+<table>
+<thead>
+<tr>
+<th>Option</th>
+<th>Default/purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>Name</code></td>
+<td><code>IndexedColumns</code>; emitted factory prefix.</td>
+</tr>
+<tr>
+<td><code>GetterMethod</code></td>
+<td>Required indexed getter.</td>
+</tr>
+<tr>
+<td><code>SetterMethod</code></td>
+<td>Optional indexed setter.</td>
+</tr>
+<tr>
+<td><code>NotificationNameMethod</code></td>
+<td>Optional slot-to-property-notification name.</td>
+</tr>
+</tbody>
+</table>
+<p>Multiple named indexed families may be generated for one class/struct when names do not collide.</p>
+<h2 id="generatedatagridcelldrawcache"><code>GenerateDataGridCellDrawCache</code></h2>
+<table>
+<thead>
+<tr>
+<th>Option</th>
+<th>Default/purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>InitialCapacity</code></td>
+<td>Initial array capacity.</td>
+</tr>
+<tr>
+<td><code>MaximumCapacity</code></td>
+<td><code>256</code>; hard retained-entry bound.</td>
+</tr>
+<tr>
+<td><code>GenerateSlotConstants</code></td>
+<td><code>true</code>; emit custom-drawing property slot constants.</td>
+</tr>
+</tbody>
+</table>
+<p>The target must be a partial class.</p>
+<h2 id="property-attributes">Property attributes</h2>
+<table>
+<thead>
+<tr>
+<th>Attribute</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>DataGridColumn</code></td>
+<td>Column, field, operation, rendering, transfer, localization, and accessibility metadata.</td>
+</tr>
+<tr>
+<td><code>DataGridIgnoreColumn</code></td>
+<td>Exclude a public property.</td>
+</tr>
+<tr>
+<td><code>DataGridKey</code></td>
+<td>Stable identity field/property.</td>
+</tr>
+<tr>
+<td><code>DataGridChildren</code></td>
+<td>Hierarchy children property and optional loader.</td>
+</tr>
+<tr>
+<td><code>DataGridExpanded</code></td>
+<td>Hierarchy expansion property.</td>
+</tr>
+<tr>
+<td><code>DataGridParentKey</code></td>
+<td>Optional parent identity.</td>
+</tr>
+<tr>
+<td><code>DataGridGroup</code></td>
+<td>Ordered typed grouping field.</td>
+</tr>
+<tr>
+<td><code>DataGridSummary</code></td>
+<td>One rendered/incremental aggregate. May repeat.</td>
+</tr>
+<tr>
+<td><code>DataGridConditionalFormat</code></td>
+<td>One generated conditional rule. May repeat.</td>
+</tr>
+<tr>
+<td><code>DataGridBand</code></td>
+<td>One nested band path. May repeat.</td>
+</tr>
+<tr>
+<td><code>DataGridPivotAxis</code></td>
+<td>Pivot row/column/filter role. May repeat.</td>
+</tr>
+<tr>
+<td><code>DataGridPivotValue</code></td>
+<td>Pivot value/calculated measure. May repeat.</td>
+</tr>
+<tr>
+<td><code>DataGridChartField</code></td>
+<td>Chart category/value/series role. May repeat.</td>
+</tr>
+<tr>
+<td><code>DataGridOutlineField</code></td>
+<td>Outline group/detail role. May repeat.</td>
+</tr>
+<tr>
+<td><code>DataGridFormulaField</code></td>
+<td>Stable formula name/dependencies.</td>
+</tr>
+</tbody>
+</table>
+<h2 id="datagridcolumn"><code>DataGridColumn</code></h2>
+<p><code>DataGridColumn</code> has a parameterless constructor and a constructor accepting <code>DataGridColumnKind</code>. The selected value is also available through the settable <code>Kind</code> property.</p>
+<h3 id="identity-order-and-sizing">Identity, order, and sizing</h3>
+<p><code>Header</code>, <code>Description</code>, <code>Order</code>, <code>DisplayIndex</code>, <code>FrozenPlacement</code>, <code>ColumnKey</code>, <code>PreviousColumnKeys</code>, <code>SortMemberPath</code>, <code>Width</code>, <code>MinWidth</code>, <code>MaxWidth</code>, and <code>WidthSharingGroup</code>.</p>
+<h3 id="user-behavior">User behavior</h3>
+<p><code>CanUserSort</code>, <code>CanUserHide</code>, <code>CanUserResize</code>, <code>CanUserReorder</code>, <code>IsReadOnly</code>, <code>IsVisible</code>, <code>ShowFilterButton</code>, <code>IsSearchable</code>, and <code>SearchMemberPath</code>.</p>
+<h3 id="themes-and-resources">Themes and resources</h3>
+<p><code>HeaderTemplateKey</code>, <code>HeaderThemeKey</code>, <code>CellThemeKey</code>, <code>SummaryCellThemeKey</code>, <code>FilterThemeKey</code>, <code>FilterFlyoutKey</code>, <code>FilterEditorResourceKey</code>, <code>HeaderResourceKey</code>, and <code>DescriptionResourceKey</code>.</p>
+<h3 id="formatting-and-realization">Formatting and realization</h3>
+<p><code>DisplayMode</code>, <code>FormatString</code>, <code>Watermark</code>, <code>UseDirectTextCell</code>, <code>UseDirectCell</code>, <code>UseDirectTextContent</code>, <code>UseOptimizedPresenter</code>, <code>TrackDirectTextValueChanges</code>, <code>UseDirectValueAccessor</code>, and <code>TrackDirectValueChanges</code>.</p>
+<h3 id="templates-and-custom-drawing">Templates and custom drawing</h3>
+<p><code>TemplateKey</code>, <code>EditingTemplateKey</code>, <code>TemplateFactoryMethod</code>, <code>EditingTemplateFactoryMethod</code>, <code>NewRowTemplateFactoryMethod</code>, <code>ReuseCellContent</code>, <code>DrawOperationFactoryType</code>, <code>DrawOperationFactoryMethod</code>, <code>DrawingMode</code>, <code>RenderBackend</code>, <code>TextLayoutCacheMode</code>, <code>SharedTextLayoutCacheCapacity</code>, and <code>DrawOperationLayoutFastPath</code>.</p>
+<h3 id="kind-specific-values">Kind-specific values</h3>
+<p><code>Formula</code>, <code>FormulaName</code>, <code>Mask</code>, <code>ItemsSourceMember</code>, <code>DisplayMemberPath</code>, <code>SelectedValuePath</code>, <code>Minimum</code>, <code>Maximum</code>, <code>Increment</code>, <code>IsThreeState</code>, and <code>IsEditable</code>.</p>
+<h3 id="button-and-toggle-contentcommands">Button and toggle content/commands</h3>
+<p><code>Content</code>, <code>CheckedContent</code>, <code>UncheckedContent</code>, <code>OnContent</code>, <code>OffContent</code>, <code>ContentMember</code>, <code>CheckedContentMember</code>, <code>UncheckedContentMember</code>, <code>OnContentMember</code>, <code>OffContentMember</code>, <code>CommandMember</code>, and <code>CommandParameterMember</code>.</p>
+<h3 id="parsing-validation-and-customization">Parsing, validation, and customization</h3>
+<p><code>ConfigureMethod</code>, <code>FactoryMethod</code>, <code>ParserMethod</code>, <code>FormatterMethod</code>, <code>ValidatorMethod</code>, <code>AsyncValidatorMethod</code>, <code>CoerceMethod</code>, and <code>CanEditMethod</code>.</p>
+<h3 id="transfer-backend-localization-and-accessibility">Transfer, backend, localization, and accessibility</h3>
+<p><code>ExportFormat</code>, <code>ExportNullText</code>, <code>BackendFieldName</code>, <code>FilterEditor</code>, <code>HeaderProviderMethod</code>, <code>DescriptionProviderMethod</code>, <code>AutomationId</code>, <code>AutomationName</code>, <code>AutomationHelpText</code>, and <code>IsSensitive</code>.</p>
+<h2 id="other-property-attribute-options">Other property-attribute options</h2>
+<ul>
+<li><code>DataGridChildren.LoaderMethod</code>: asynchronous/lazy children loader.</li>
+<li><code>DataGridGroup</code>: <code>Order</code>, direction, and formatter method.</li>
+<li><code>DataGridSummary</code>: aggregate constructor plus scope, format, and title.</li>
+<li><code>DataGridConditionalFormat</code>: condition constructor plus rule ID, two operands, string comparison, cell theme, priority, stop behavior, predicate, and cell/row target.</li>
+<li><code>DataGridBand</code>: path constructor and order.</li>
+<li><code>DataGridPivotAxis</code>: analytics-role constructor plus order, name, format, configure method.</li>
+<li><code>DataGridPivotValue</code>: aggregate constructor plus order, name, format, display mode, formula/dependencies, custom aggregator factory, and configure method.</li>
+<li><code>DataGridChartField</code>: role constructor plus order, series, format, aggregate.</li>
+<li><code>DataGridOutlineField</code>: role constructor plus order, name, format, aggregate, custom aggregator factory, configure method.</li>
+<li><code>DataGridFormulaField</code>: stable-name constructor plus dependencies, order, and format.</li>
+</ul>
+<h2 id="see-also">See also</h2>
+<ul>
+<li><a href="getting-started.html">Getting started and schema discovery</a></li>
+<li><a href="schemas-and-columns.html">Schemas and columns</a></li>
+<li><a href="generated-views.html">Generated views</a></li>
+<li><a href="diagnostics-performance-testing.html#compile-time-diagnostics">Compile-time diagnostics</a></li>
+</ul>
+
+</article>
+
+        <div class="contribution d-print-none">
+          <a href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/docfx/articles/source-generators/attribute-reference.md/#L1" class="edit-link">Edit this page</a>
+        </div>
+
+        <div class="next-article d-print-none border-top" id="nextArticle"></div>
+
+      </div>
+
+      <div class="affix">
+        <nav id="affix"></nav>
+      </div>
+    </main>
+
+
+    <footer class="border-top text-secondary">
+      <div class="container-xxl">
+        <div class="flex-fill">
+          <span>Made with <a href="https://dotnet.github.io/docfx">docfx</a></span>
+        </div>
+      </div>
+    </footer>
+  </body>
+</html>

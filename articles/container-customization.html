@@ -121,21 +121,101 @@ content, behavior, and lifecycle through the supported extension points below.</
 <td>Observe or veto grid state transitions</td>
 <td>editing, committed-value, and transactional selection events</td>
 </tr>
+<tr>
+<td>Replace the outer virtualized containers</td>
+<td><code>DataGrid.RealizationFactory</code></td>
+</tr>
 </tbody>
 </table>
-<p>These paths preserve the grid-owned <code>DataGridRow</code> and <code>DataGridCell</code> containers.
-That ownership is significant: the containers carry frozen-region membership,
-row/column indexes, selection and current-cell state, validation, automation,
-editing overlays, diagnostics, and recycle-pool identity.</p>
+<p>Prefer themes, templates, and columns when they can express the customization. A
+realization factory is the lower-level migration hook for applications that require
+<code>DataGridRow</code>, <code>DataGridCell</code>, or <code>DataGridColumnHeader</code> subclasses.</p>
 <h2 id="container-ownership">Container ownership</h2>
-<p>There is no public row or cell container factory. Grid-owned containers preserve
-keyboard navigation, validation, selection, row details, accessibility, diagnostics,
-frozen-region behavior, and recycling correctness. Use a template, theme, column,
-draw-operation, or lifecycle event from the table above instead of replacing the
-container itself.</p>
+<p><code>DataGridRealizationFactory</code> replaces only the outer containers. The grid still owns
+their lifetime, preparation, layout, selection, editing, validation, automation, and
+recycling. Columns still own display content, editors, values, sorting, filtering,
+search, grouping, clipboard/export data, and persistence semantics. Never derive a
+semantic value from a realized cell: virtualization means most cells do not exist.</p>
+<p>The request contexts expose:</p>
+<ul>
+<li>the owning grid;</li>
+<li>the row data context and normalized application item;</li>
+<li>the <code>HierarchicalNode</code>, flattened row index, and slot when applicable;</li>
+<li>the owning row and column for cells; and</li>
+<li>left/right frozen-region state for column headers.</li>
+</ul>
+<p>Call <code>CreateDefaultContainer()</code> from a context when a request does not need a custom
+container. The grid performs the normal preparation after the factory returns it.</p>
+<h2 id="recycling-keys">Recycling keys</h2>
+<p>Each container kind has a data-side key overload and an element-side key overload.
+Return equal, stable keys only when the existing element is compatible with the new
+request. The grid keeps row pools partitioned by key, rebuilds incompatible cells on
+a recycled row, and replaces an incompatible cached header. Return <code>null</code> on either
+side to disable reuse for that request or element.</p>
+<p>The shared <code>DataGridRealizationFactory.Default</code> keeps the legacy fast path. Assigning
+a different factory clears old pools and regenerates realized rows, cells, and headers,
+so containers from different factories cannot mix. Replacing a factory also ends an
+active edit through the grid's normal commit-or-cancel path.</p>
+<h2 id="example">Example</h2>
+<p>The following factory alternates row and cell subclasses by application item. The
+subclasses reuse the built-in themes through <code>StyleKeyOverride</code>; an application can
+instead provide dedicated control themes for its custom types.</p>
+<pre><code class="lang-csharp">public sealed record OrderRow(int Id);
+
+public sealed class EvenOrderRow : DataGridRow
+{
+    protected override Type StyleKeyOverride =&gt; typeof(DataGridRow);
+}
+
+public sealed class OddOrderRow : DataGridRow
+{
+    protected override Type StyleKeyOverride =&gt; typeof(DataGridRow);
+}
+
+public sealed class EvenOrderCell : DataGridCell
+{
+    protected override Type StyleKeyOverride =&gt; typeof(DataGridCell);
+}
+
+public sealed class OddOrderCell : DataGridCell
+{
+    protected override Type StyleKeyOverride =&gt; typeof(DataGridCell);
+}
+
+public sealed class OrderRealizationFactory : DataGridRealizationFactory
+{
+    public override DataGridRow CreateRow(DataGridRowRealizationContext context) =&gt;
+        IsEven(context.Item) ? new EvenOrderRow() : new OddOrderRow();
+
+    public override object? GetRowRecyclingKey(DataGridRowRealizationContext context) =&gt;
+        IsEven(context.Item) ? typeof(EvenOrderRow) : typeof(OddOrderRow);
+
+    public override object? GetRowRecyclingKey(DataGridRow row) =&gt; row.GetType();
+
+    public override DataGridCell CreateCell(DataGridCellRealizationContext context) =&gt;
+        IsEven(context.Item) ? new EvenOrderCell() : new OddOrderCell();
+
+    public override object? GetCellRecyclingKey(DataGridCellRealizationContext context) =&gt;
+        IsEven(context.Item) ? typeof(EvenOrderCell) : typeof(OddOrderCell);
+
+    public override object? GetCellRecyclingKey(DataGridCell cell) =&gt; cell.GetType();
+
+    private static bool IsEven(object? item) =&gt; item is OrderRow row &amp;&amp; (row.Id &amp; 1) == 0;
+}
+</code></pre>
+<p>Register the factory as a resource rather than constructing it in view code-behind:</p>
+<pre><code class="lang-xml">&lt;Window.Resources&gt;
+  &lt;local:OrderRealizationFactory x:Key=&quot;OrderRealizationFactory&quot; /&gt;
+&lt;/Window.Resources&gt;
+
+&lt;DataGrid RealizationFactory=&quot;{StaticResource OrderRealizationFactory}&quot; /&gt;
+</code></pre>
+<p>Items that are already <code>DataGridRow</code> containers keep the existing own-container
+behavior and do not require a factory-created row.</p>
 <h2 id="compatibility">Compatibility</h2>
-<p>No existing customization API changes. Existing themes and templates remain the
-compatibility default; optimized and drawn display paths are opt-in.</p>
+<p>No existing customization API changes. <code>DataGridRealizationFactory.Default</code>, existing
+themes and templates, and column-selected direct/drawn display paths remain the
+compatibility default.</p>
 
 </article>
 

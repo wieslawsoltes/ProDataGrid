@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+      <title>Generated views | ProDataGrid for Avalonia </title>
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <meta name="title" content="Generated views | ProDataGrid for Avalonia ">
+      
+      
+      <link rel="icon" href="../../favicon.ico">
+      <link rel="stylesheet" href="../../public/docfx.min.css">
+      <link rel="stylesheet" href="../../public/main.css">
+      <meta name="docfx:navrel" content="../../toc.html">
+      <meta name="docfx:tocrel" content="../toc.html">
+      
+      
+      
+      
+      <meta name="docfx:docurl" content="https://github.com/wieslawsoltes/ProDataGrid/blob/master/docfx/articles/source-generators/generated-views.md/#L1">
+      <meta name="loc:inThisArticle" content="In this article">
+      <meta name="loc:searchResultsCount" content="{count} results for &quot;{query}&quot;">
+      <meta name="loc:searchNoResults" content="No results for &quot;{query}&quot;">
+      <meta name="loc:tocFilter" content="Filter by title">
+      <meta name="loc:nextArticle" content="Next">
+      <meta name="loc:prevArticle" content="Previous">
+      <meta name="loc:themeLight" content="Light">
+      <meta name="loc:themeDark" content="Dark">
+      <meta name="loc:themeAuto" content="Auto">
+      <meta name="loc:changeTheme" content="Change theme">
+      <meta name="loc:copy" content="Copy">
+      <meta name="loc:downloadPdf" content="Download PDF">
+
+      <script type="module" src="./../../public/docfx.min.js"></script>
+
+      <script>
+        const theme = localStorage.getItem('theme') || 'auto'
+        document.documentElement.setAttribute('data-bs-theme', theme === 'auto' ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light') : theme)
+      </script>
+
+  </head>
+
+  <body class="tex2jax_ignore" data-layout="" data-yaml-mime="">
+    <header class="bg-body border-bottom">
+      <nav id="autocollapse" class="navbar navbar-expand-md" role="navigation">
+        <div class="container-xxl flex-nowrap">
+          <a class="navbar-brand" href="../../index.html">
+            <img id="logo" class="svg" src="../../images/logo.svg" alt="">
+            
+          </a>
+          <button class="btn btn-lg d-md-none border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navpanel" aria-controls="navpanel" aria-expanded="false" aria-label="Toggle navigation">
+            <i class="bi bi-three-dots"></i>
+          </button>
+          <div class="collapse navbar-collapse" id="navpanel">
+            <div id="navbar">
+            </div>
+          </div>
+        </div>
+      </nav>
+    </header>
+
+    <main class="container-xxl">
+      <div class="toc-offcanvas">
+        <div class="offcanvas-md offcanvas-start" tabindex="-1" id="tocOffcanvas" aria-labelledby="tocOffcanvasLabel">
+          <div class="offcanvas-header">
+            <h5 class="offcanvas-title" id="tocOffcanvasLabel">Table of Contents</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="offcanvas" data-bs-target="#tocOffcanvas" aria-label="Close"></button>
+          </div>
+          <div class="offcanvas-body">
+            <nav class="toc" id="toc"></nav>
+          </div>
+        </div>
+      </div>
+
+      <div class="content">
+        <div class="actionbar">
+          <button class="btn btn-lg border-0 d-md-none" type="button" data-bs-toggle="offcanvas" data-bs-target="#tocOffcanvas" aria-controls="tocOffcanvas" aria-expanded="false" aria-label="Show table of contents">
+            <i class="bi bi-list"></i>
+          </button>
+
+          <nav id="breadcrumb"></nav>
+        </div>
+
+        <article data-uid="">
+<h1 id="generated-views">Generated views</h1>
+
+<p><code>[GenerateDataGridView]</code> emits a code-only Avalonia control tree with compiled binding indexers. Source generators cannot add XAML to Avalonia's XAML compilation pipeline, so generated views use direct C# construction while preserving the same MVVM boundary: the ViewModel owns state and commands; the view owns controls and activation.</p>
+<h2 id="generate-an-avalonia-view">Generate an Avalonia view</h2>
+<pre><code class="lang-csharp">[GenerateDataGridViewModel(typeof(Trade), ProviderName = &quot;TradeSchema&quot;)]
+[GenerateDataGridView(
+    typeof(Trade),
+    ViewName = &quot;TradesView&quot;,
+    ViewNamespace = &quot;MyApp.Views&quot;,
+    Title = &quot;Trades&quot;,
+    SortingModelPropertyName = nameof(SortingModel),
+    FilteringModelPropertyName = nameof(FilteringModel),
+    SearchModelPropertyName = nameof(SearchModel),
+    SearchTextPropertyName = nameof(Query))]
+public sealed partial class TradesViewModel
+{
+    // Items and model properties remain ordinary ViewModel state.
+}
+</code></pre>
+<p>The emitted view binds item source, generated definitions, fast-path options, and configured models with generated <code>ClrPropertyInfo</code> delegates. It does not use string-path reflection bindings.</p>
+<p>The parameterless constructor supports XAML hosts, DI, and view locators. A second constructor accepts the typed ViewModel.</p>
+<h2 id="reactiveui-strategy">ReactiveUI strategy</h2>
+<pre><code class="lang-csharp">[GenerateDataGridView(
+    typeof(Trade),
+    Framework = DataGridViewFramework.ReactiveUI,
+    SearchTextPropertyName = nameof(Query))]
+public sealed partial class TradesViewModel : ReactiveObject { }
+</code></pre>
+<p>The generated type derives from <code>ReactiveUserControl&lt;TViewModel&gt;</code> and uses <code>WhenActivated</code> for subscriptions and handlers that require activation.</p>
+<p>The generator recognizes properties produced from ReactiveUI.SourceGenerators <code>[Reactive]</code> fields by inspecting the declared field. This is necessary because Roslyn generators cannot consume another generator's emitted output in the same run.</p>
+<p>Reference <code>ReactiveUI.Avalonia</code> and initialize current ReactiveUI with <code>UseReactiveUI</code> during Avalonia startup.</p>
+<h2 id="view-recipes">View recipes</h2>
+<p><code>Recipe</code> selects a stable layout contract:</p>
+<table>
+<thead>
+<tr>
+<th>Recipe</th>
+<th>Layout contract</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>GridOnly</code></td>
+<td>Title and grid.</td>
+</tr>
+<tr>
+<td><code>SearchableGrid</code></td>
+<td>Compact title/search/grid layout.</td>
+</tr>
+<tr>
+<td><code>OperationsToolbar</code></td>
+<td>Adds <code>GeneratedToolbarSlot</code>.</td>
+</tr>
+<tr>
+<td><code>Explorer</code></td>
+<td>Adds toolbar and <code>GeneratedExplorerSlot</code>.</td>
+</tr>
+<tr>
+<td><code>Spreadsheet</code></td>
+<td>Adds toolbar and <code>GeneratedFormulaBarSlot</code>.</td>
+</tr>
+<tr>
+<td><code>Analytics</code></td>
+<td>Adds toolbar and <code>GeneratedAnalyticsSlot</code>.</td>
+</tr>
+<tr>
+<td><code>MasterDetail</code></td>
+<td>Adds toolbar and <code>GeneratedDetailsSlot</code>.</td>
+</tr>
+</tbody>
+</table>
+<p>Search is emitted only when <code>SearchTextPropertyName</code> is supplied and is independent of recipe choice. The view exposes <code>GeneratedRecipe</code> and stable automation IDs for its slots.</p>
+<p>Override <code>CreateGeneratedToolbar</code> or <code>CreateGeneratedRecipeContent</code> to fill recipe slots.</p>
+<h2 id="multiple-views-for-one-viewmodel">Multiple views for one ViewModel</h2>
+<pre><code class="lang-csharp">[GenerateDataGridViewModel(typeof(WorkItem), ProviderName = &quot;WorkItemSchema&quot;)]
+[GenerateDataGridView(
+    typeof(WorkItem),
+    ViewName = &quot;WorkItemExplorerView&quot;,
+    Framework = DataGridViewFramework.ReactiveUI,
+    Recipe = DataGridViewRecipe.Explorer,
+    SearchTextPropertyName = nameof(Query))]
+[GenerateDataGridView(
+    typeof(WorkItem),
+    ViewName = &quot;WorkItemSpreadsheetView&quot;,
+    Framework = DataGridViewFramework.ReactiveUI,
+    Recipe = DataGridViewRecipe.Spreadsheet,
+    IsReadOnly = false)]
+public sealed partial class WorkItemsViewModel : ReactiveObject { }
+</code></pre>
+<p>Each view has independent framework, recipe, editability, title, automation, event, and interaction configuration while sharing one generated schema/ViewModel projection.</p>
+<h2 id="model-bindings">Model bindings</h2>
+<p>Generated views can bind these typed ViewModel members:</p>
+<ul>
+<li>items, column definitions, and fast-path options;</li>
+<li>sorting, filtering, searching, and two-way search text;</li>
+<li>identity selection;</li>
+<li>clipboard import, fill, formula, and conditional formatting models;</li>
+<li>hierarchical model and hierarchy-aware filter policy;</li>
+<li>generated state controller;</li>
+<li>loading/empty/error state and retry command;</li>
+<li>diagnostics status.</li>
+</ul>
+<p>Every named member is compile-time validated. Missing or incompatible members produce focused diagnostics; generated code does not add a runtime binding fallback.</p>
+<h2 id="loading-empty-and-error-states">Loading, empty, and error states</h2>
+<pre><code class="lang-csharp">[GenerateDataGridView(
+    typeof(Trade),
+    Framework = DataGridViewFramework.ReactiveUI,
+    ViewStatePropertyName = nameof(ViewState),
+    ErrorMessagePropertyName = nameof(ErrorMessage),
+    RetryCommandPropertyName = nameof(RetryCommand),
+    LoadingText = &quot;Loading trades…&quot;,
+    EmptyText = &quot;No trades match the current query.&quot;,
+    ErrorText = &quot;Trades could not be loaded.&quot;,
+    RetryText = &quot;Try again&quot;)]
+public sealed partial class TradesViewModel : ReactiveObject
+{
+    [Reactive]
+    private DataGridGeneratedViewState _viewState;
+
+    [Reactive]
+    private string? _errorMessage;
+
+    public ReactiveCommand&lt;Unit, Unit&gt; RetryCommand { get; }
+}
+</code></pre>
+<p>The state property must be <code>DataGridGeneratedViewState</code>; the error is an optional string and retry implements <code>ICommand</code>. <code>PDGSG125</code> reports an invalid state projection.</p>
+<p>The view keeps the DataGrid alive while hiding it, preserving loaded rows, columns, selection, and scroll position. Override:</p>
+<ul>
+<li><code>CreateGeneratedViewStateHost</code>;</li>
+<li><code>CreateGeneratedLoadingContent</code>;</li>
+<li><code>CreateGeneratedEmptyContent</code>;</li>
+<li><code>CreateGeneratedErrorContent</code>.</li>
+</ul>
+<h2 id="typed-grid-event-bridges">Typed grid event bridges</h2>
+<p>Forward selected events to one compile-time validated command:</p>
+<pre><code class="lang-csharp">[GenerateDataGridView(
+    typeof(Trade),
+    Framework = DataGridViewFramework.ReactiveUI,
+    RoutedEvents = DataGridGeneratedViewEventKinds.SelectionChanging |
+                   DataGridGeneratedViewEventKinds.SelectionChanged |
+                   DataGridGeneratedViewEventKinds.Sorting |
+                   DataGridGeneratedViewEventKinds.Editing |
+                   DataGridGeneratedViewEventKinds.CellLifecycle,
+    RoutedEventCommandPropertyName = nameof(GridEventCommand))]
+public sealed partial class TradesViewModel : ReactiveObject
+{
+    public ReactiveCommand&lt;DataGridGeneratedViewEvent&lt;Trade&gt;, Unit&gt;
+        GridEventCommand { get; }
+}
+</code></pre>
+<p>Supported flags:</p>
+<ul>
+<li><code>SelectionChanging</code> and <code>SelectionChanged</code>;</li>
+<li><code>CurrentCellChanged</code>;</li>
+<li><code>Sorting</code>;</li>
+<li><code>BeginningEdit</code>, <code>CellEditEnding</code>, <code>CellEditEnded</code>, <code>RowEditEnding</code>, <code>RowEditEnded</code>;</li>
+<li><code>CellPrepared</code>, <code>CellClearing</code>, <code>CellValueChanged</code>;</li>
+<li>combinations <code>Editing</code>, <code>CellLifecycle</code>, and <code>All</code>.</li>
+</ul>
+<p><code>DataGridGeneratedViewEvent&lt;TItem&gt;</code> exposes:</p>
+<ul>
+<li>typed current, row, and proposed items;</li>
+<li>stable current/proposed column keys and row indexes;</li>
+<li>edit action and trigger event;</li>
+<li>selection source/guarantee and zero-copy selected/proposed row, cell, and column projections;</li>
+<li>proposed current cell and anchor;</li>
+<li>hierarchy node/path;</li>
+<li>realized cell, row, and row data context;</li>
+<li>old/new value and cell-value change origin.</li>
+</ul>
+<p>For <code>SelectionChanging</code> and edit-ending events, set <code>Cancel</code> synchronously. Set <code>Handled</code> for supported routed triggers. The generated handler copies feedback back to the original event before ProDataGrid continues.</p>
+<p><code>CellValueChanged</code> reports successful DataGrid editor commits; it is not a general property-change observer. <code>CellPrepared</code> and <code>CellClearing</code> are suitable for bounded container-scoped services.</p>
+<p>ReactiveUI subscriptions attach during activation and detach on deactivation. Plain Avalonia views own subscriptions for the view lifetime. Invalid event flags or command types report <code>PDGSG126</code>.</p>
+<h2 id="typed-reactiveui-interactions">Typed ReactiveUI interactions</h2>
+<pre><code class="lang-csharp">[GenerateDataGridView(
+    typeof(Trade),
+    Framework = DataGridViewFramework.ReactiveUI,
+    InteractionPropertyNames = [nameof(ConfirmTrade)],
+    InteractionHandlerTypes = [typeof(ConfirmTradeHandler)])]
+public sealed partial class TradesViewModel : ReactiveObject
+{
+    public Interaction&lt;Trade, bool&gt; ConfirmTrade { get; } = new();
+}
+
+public sealed class ConfirmTradeHandler :
+    IDataGridGeneratedViewInteractionHandler&lt;Trade, bool&gt;
+{
+    public ValueTask&lt;bool&gt; HandleAsync(
+        DataGridGeneratedViewInteractionContext&lt;Trade&gt; context)
+    {
+        context.CancellationToken.ThrowIfCancellationRequested();
+        return ValueTask.FromResult(context.Input.Quantity &lt;= 1_000);
+    }
+}
+</code></pre>
+<p>Property and handler arrays are parallel. Every property must implement the exact <code>IInteraction&lt;TInput,TOutput&gt;</code> contract, and its handler must implement <code>IDataGridGeneratedViewInteractionHandler&lt;TInput,TOutput&gt;</code> with matching type arguments.</p>
+<p>The generated view observes <code>DataContext</code> only while active. Replacement unregisters/disposes old adapters, cancels their context token, and registers the new set. Disposable handlers are disposed. <code>PDGSG127</code> reports mismatches.</p>
+<p>Each interaction has a protected <code>CreateGeneratedInteractionHandlerN</code> factory for DI-backed construction.</p>
+<h2 id="navigation-interaction">Navigation interaction</h2>
+<p><code>NavigationInteractionPropertyName</code> binds the exact interaction:</p>
+<pre><code class="lang-csharp">Interaction&lt;
+    DataGridGeneratedNavigationRequest&lt;Trade&gt;,
+    DataGridGeneratedNavigationResult&lt;Trade&gt;&gt;
+</code></pre>
+<p>The built-in handler supports current-cell query/set, bring-into-view by stable item, XY movement, and scroll capture/restore. See <a href="selection-navigation-state.html#typed-current-cell-navigation">selection, navigation, and state</a>.</p>
+<h2 id="input-maps-and-command-feedback">Input maps and command feedback</h2>
+<pre><code class="lang-csharp">[GenerateDataGridView(
+    typeof(Trade),
+    Framework = DataGridViewFramework.ReactiveUI,
+    InputMapType = typeof(TradeGridInputMap),
+    InputCommandPropertyName = nameof(GridInputCommand))]
+public sealed partial class TradesViewModel : ReactiveObject
+{
+    public ReactiveCommand&lt;DataGridGeneratedInputEvent&lt;Trade&gt;, Unit&gt;
+        GridInputCommand { get; }
+}
+</code></pre>
+<p>The map implements <code>IDataGridGeneratedInputMap</code>. It can replace keyboard gesture overrides and map command-oriented input through allocation-free <code>TryMatch</code>. The generated event contains typed selected item, row/display column, physical key/modifiers, action, and mutable handled feedback.</p>
+<p>The platform command modifier comes from Avalonia with a Control fallback. The default map exposes command+F; the spreadsheet profile adds fill-down, fill-right, undo, and redo.</p>
+<p>Override <code>CreateGeneratedInputMap</code> for DI construction. Invalid map/command/profile combinations report <code>PDGSG128</code>.</p>
+<h2 id="themes-classes-and-diagnostics-status">Themes, classes, and diagnostics status</h2>
+<pre><code class="lang-csharp">[GenerateDataGridView(
+    typeof(Trade),
+    Recipe = DataGridViewRecipe.Analytics,
+    DiagnosticsStatusPropertyName = nameof(Status),
+    ViewThemeKey = &quot;TradeAnalyticsViewTheme&quot;,
+    DataGridThemeKey = &quot;TradeAnalyticsGridTheme&quot;,
+    ToolbarThemeKey = &quot;TradeAnalyticsToolbarTheme&quot;,
+    RecipeContentThemeKey = &quot;TradeAnalyticsContentTheme&quot;,
+    ViewClasses = [&quot;workspace-view&quot;, &quot;analytics&quot;],
+    DataGridClasses = [&quot;trade-grid&quot;, &quot;dense&quot;],
+    ToolbarClasses = [&quot;trade-toolbar&quot;],
+    RecipeContentClasses = [&quot;analytics-content&quot;])]
+public sealed partial class TradeAnalyticsViewModel
+{
+    public string Status =&gt; &quot;Streaming with generated accessors&quot;;
+}
+</code></pre>
+<p>Theme keys are Avalonia dynamic resources, preserving theme variants and runtime resource changes. Classes are direct <code>Classes</code> additions. The status member must be a readable string and uses a compiled binding.</p>
+<p>Empty keys, invalid/duplicate class tokens, or incompatible status members report <code>PDGSG139</code>. Generated views expose selected resource keys as constants for diagnostics/tests.</p>
+<h2 id="automation-metadata">Automation metadata</h2>
+<p><code>AutomationId</code> establishes deterministic IDs for the view, grid, title, search, recipe slots, state surfaces, and built-in nested details. The grid receives accessible name/help text; the title is a level-one automation heading.</p>
+<p>Column-level automation ID/name/help metadata comes from <code>DataGridColumnAttribute</code> and is reused by generated definitions.</p>
+<h2 id="hierarchical-views">Hierarchical views</h2>
+<p><code>HierarchicalModelPropertyName</code> binds a typed hierarchy and omits the ordinary root item binding. When a filtering model is also named, <code>HierarchyFilterPolicy</code> installs a generated hierarchy filter factory before filtering activates.</p>
+<p>See <a href="hierarchy.html">hierarchical data</a> for model/adapter factories and asynchronous expansion.</p>
+<h2 id="row-details">Row details</h2>
+<p>Generated views support resource, <code>IDataTemplate</code> implementation, static recycling factory, or typed nested-grid details. See <a href="layout-templates-rendering.html#row-details-and-nested-grids">layout, templates, and rendering</a>.</p>
+<h2 id="custom-base-classes">Custom base classes</h2>
+<pre><code class="lang-csharp">[GenerateDataGridView(
+    typeof(Trade),
+    Framework = DataGridViewFramework.ReactiveUI,
+    BaseType = typeof(MyGridViewBase))]
+public sealed partial class TradesViewModel : ReactiveObject { }
+</code></pre>
+<p>The base must be accessible, non-sealed, derive from the required Avalonia/ReactiveUI view type, and have an accessible parameterless constructor. A ReactiveUI custom base used by activation-scoped features must implement <code>IActivatableView</code>. Invalid bases report <code>PDGSG013</code>.</p>
+<p>Generated views are inheritable and expose protected virtual hooks including:</p>
+<pre><code class="lang-csharp">protected virtual Control CreateGeneratedContent();
+protected virtual DataGrid CreateGeneratedDataGrid();
+protected virtual void ConfigureGeneratedDataGrid(DataGrid dataGrid);
+protected virtual void ConfigureGeneratedRoutedEventCommands(DataGrid dataGrid);
+protected virtual Control CreateGeneratedViewStateHost(DataGrid dataGrid);
+protected virtual Control CreateGeneratedLoadingContent();
+protected virtual Control CreateGeneratedEmptyContent();
+protected virtual Control CreateGeneratedErrorContent();
+protected virtual Control? CreateGeneratedToolbar();
+protected virtual Control? CreateGeneratedRecipeContent();
+</code></pre>
+<p>Additional feature-specific factories cover editing, hierarchy filtering, interactions, navigation, input maps, performance options, and metric sinks.</p>
+<p>Subclass the generated view to replace layout or grid presentation while retaining generated compiled bindings. Keep business logic in the ViewModel/services.</p>
+<h2 id="assembly-and-namespace-view-generation">Assembly and namespace view generation</h2>
+<pre><code class="lang-csharp">[assembly: GenerateDataGridView(
+    typeof(TradesViewModel),
+    typeof(Trade),
+    Framework = DataGridViewFramework.ReactiveUI)]
+
+[assembly: GenerateDataGridViewsForNamespace(
+    &quot;MyApp.ViewModels&quot;,
+    Framework = DataGridViewFramework.ReactiveUI)]
+</code></pre>
+<p>Namespace generation infers item types from <code>ItemsPropertyName</code>. Explicit type requests can override framework, recipe, binding members, and presentation settings.</p>
+<h2 id="framework-extension-point">Framework extension point</h2>
+<p>Avalonia and ReactiveUI are separate internal emission strategies over the same view model. A future MVVM framework can add a strategy without changing schema/column discovery or controller APIs.</p>
+<h2 id="related-articles">Related articles</h2>
+<ul>
+<li><a href="registries-and-customization.html">Registries and customization</a></li>
+<li><a href="diagnostics-performance-testing.html">Accessibility, diagnostics, and validation</a></li>
+<li><a href="../getting-started.html">ReactiveUI setup and MVVM patterns</a></li>
+</ul>
+
+</article>
+
+        <div class="contribution d-print-none">
+          <a href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/docfx/articles/source-generators/generated-views.md/#L1" class="edit-link">Edit this page</a>
+        </div>
+
+        <div class="next-article d-print-none border-top" id="nextArticle"></div>
+
+      </div>
+
+      <div class="affix">
+        <nav id="affix"></nav>
+      </div>
+    </main>
+
+
+    <footer class="border-top text-secondary">
+      <div class="container-xxl">
+        <div class="flex-fill">
+          <span>Made with <a href="https://dotnet.github.io/docfx">docfx</a></span>
+        </div>
+      </div>
+    </footer>
+  </body>
+</html>
