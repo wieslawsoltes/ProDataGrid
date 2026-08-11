@@ -155,6 +155,11 @@ namespace Avalonia.Controls
             var target = new Size(
                 Math.Min(Math.Max(0d, column.ImageWidth), contentBounds.Width),
                 Math.Min(Math.Max(0d, column.ImageHeight), contentBounds.Height));
+            var targetViewport = new Rect(
+                contentBounds.X + (contentBounds.Width - target.Width) * 0.5d,
+                contentBounds.Y + (contentBounds.Height - target.Height) * 0.5d,
+                target.Width,
+                target.Height);
             var scaleX = target.Width / sourceSize.Width;
             var scaleY = target.Height / sourceSize.Height;
             var scale = column.Stretch switch
@@ -179,11 +184,14 @@ namespace Avalonia.Controls
             }
 
             var destination = new Rect(
-                contentBounds.X + Math.Max(0d, (contentBounds.Width - width) * 0.5d),
-                contentBounds.Y + Math.Max(0d, (contentBounds.Height - height) * 0.5d),
+                targetViewport.X + (targetViewport.Width - width) * 0.5d,
+                targetViewport.Y + (targetViewport.Height - height) * 0.5d,
                 Math.Max(0d, width),
                 Math.Max(0d, height));
-            context.DrawImage(image, new Rect(sourceSize), destination);
+            using (context.PushClip(targetViewport))
+            {
+                context.DrawImage(image, new Rect(sourceSize), destination);
+            }
         }
 
         private static double ApplyStretchDirection(double scale, StretchDirection direction)
