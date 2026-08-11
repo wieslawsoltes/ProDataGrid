@@ -1984,6 +1984,57 @@ namespace Avalonia.Controls.DataGridTests.Hierarchical;
     }
 
     [Fact]
+    public async Task ShallowExpandAllAsync_Does_Not_Clear_Deeper_Pending_Materialization()
+    {
+        var root = new Item("root");
+        var child = new Item("child");
+        root.Children.Add(child);
+        var model = new HierarchicalModel(new HierarchicalOptions
+        {
+            ChildrenSelectorAsync = static (item, _) =>
+                Task.FromResult<IEnumerable?>(((Item)item).Children)
+        });
+        model.SetRoot(root);
+
+        using var cts = new CancellationTokenSource();
+        model.NodeLoaded += CancelAfterChildMaterializes;
+        try
+        {
+            Task canceledExpansion = model.ExpandAllAsync(cancellationToken: cts.Token);
+            await Assert.ThrowsAnyAsync<OperationCanceledException>(() => canceledExpansion);
+        }
+        finally
+        {
+            model.NodeLoaded -= CancelAfterChildMaterializes;
+        }
+
+        var rootNode = model.Root!;
+        var childNode = Assert.Single(rootNode.Children);
+        Assert.True(rootNode.HasPendingBulkMaterializationCommit);
+        Assert.True(childNode.HasPendingBulkMaterializationCommit);
+
+        await model.ExpandAllAsync(
+            maxDepth: 0,
+            cancellationToken: TestContext.Current.CancellationToken);
+
+        Assert.False(rootNode.HasPendingBulkMaterializationCommit);
+        Assert.True(childNode.HasPendingBulkMaterializationCommit);
+
+        await model.ExpandAllAsync(cancellationToken: TestContext.Current.CancellationToken);
+
+        Assert.False(childNode.HasPendingBulkMaterializationCommit);
+        Assert.Equal(2, model.Count);
+
+        void CancelAfterChildMaterializes(object? sender, HierarchicalNodeEventArgs args)
+        {
+            if (ReferenceEquals(args.Node.Item, child))
+            {
+                cts.Cancel();
+            }
+        }
+    }
+
+    [Fact]
     public async Task ExpandAsync_Reinserting_Expanded_Descendant_Clears_Its_Pending_Materialization()
     {
         var root = new Item("root");

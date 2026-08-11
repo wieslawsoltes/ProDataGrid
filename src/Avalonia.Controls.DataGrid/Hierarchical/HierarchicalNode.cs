@@ -28,6 +28,7 @@ namespace Avalonia.Controls.DataGridHierarchical
         private bool _isLeaf;
         private int _level;
         private bool _isLoading;
+        private int _pendingBulkMaterializationCommitGeneration;
         private NodeLoadInfo? _loadInfo;
         // Collection and item notification state is absent for most nodes. Keeping it in a
         // sidecar avoids four unused references on every immutable hierarchy node.
@@ -301,19 +302,24 @@ namespace Avalonia.Controls.DataGridHierarchical
         /// </summary>
         internal bool HasPendingBulkMaterializationCommit
         {
-            get => _loadInfo?.PendingBulkMaterializationCommit ?? false;
+            get => _pendingBulkMaterializationCommitGeneration != 0;
             set
             {
-                if (value)
+                if (!value)
                 {
-                    (_loadInfo ??= new NodeLoadInfo()).PendingBulkMaterializationCommit = true;
+                    _pendingBulkMaterializationCommitGeneration = 0;
                 }
-                else if (_loadInfo != null)
+                else if (_pendingBulkMaterializationCommitGeneration == 0)
                 {
-                    _loadInfo.PendingBulkMaterializationCommit = false;
-                    TrimLoadInfo();
+                    _pendingBulkMaterializationCommitGeneration = -1;
                 }
             }
+        }
+
+        internal int PendingBulkMaterializationCommitGeneration
+        {
+            get => _pendingBulkMaterializationCommitGeneration;
+            set => _pendingBulkMaterializationCommitGeneration = value;
         }
 
         public event PropertyChangedEventHandler? PropertyChanged;
@@ -377,8 +383,7 @@ namespace Avalonia.Controls.DataGridHierarchical
             if (_loadInfo is
                 {
                     Error: null,
-                    Cancellation: null,
-                    PendingBulkMaterializationCommit: false
+                    Cancellation: null
                 })
             {
                 _loadInfo = null;
@@ -403,7 +408,6 @@ namespace Avalonia.Controls.DataGridHierarchical
         {
             public Exception? Error;
             public CancellationTokenSource? Cancellation;
-            public bool PendingBulkMaterializationCommit;
         }
 
         private sealed class NodeConnectionInfo
