@@ -120,9 +120,7 @@ internal
         internal bool CanUseDirectTextContent =>
             UseDirectTextContent &&
             CellTemplate == null &&
-            BindingCloneHelper.SupportsDirectTextDataContextRead(
-                Binding,
-                observesWrappedHierarchyItem: true) &&
+            BindingCloneHelper.SupportsDirectTextDataContextRead(Binding, observesWrappedHierarchyItem: true) &&
             DataGridColumnMetadata.GetValueAccessor(this) is IDataGridColumnTextAccessor;
 
         internal bool CanUseDirectTextContentFor(object? item)

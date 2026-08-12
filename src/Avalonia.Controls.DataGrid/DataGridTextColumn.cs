@@ -121,9 +121,7 @@ internal
         internal bool CanUseDirectValueAccessorFor(object item)
         {
             var accessor = DataGridColumnMetadata.GetValueAccessor(this);
-            return BindingCloneHelper.SupportsDirectTextDataContextRead(
-                       Binding,
-                       item is IHierarchicalNodeItem) &&
+            return BindingCloneHelper.SupportsDirectTextDataContextRead(Binding, item is IHierarchicalNodeItem) &&
                    item != null &&
                    accessor != null &&
                    accessor is IDataGridColumnTextAccessor &&
@@ -324,15 +322,9 @@ internal
                     drawingCell.ClearValue(DataGridCustomDrawingCell.ValueProperty);
 
                     var accessor = DataGridColumnMetadata.GetValueAccessor(this);
-                    if (CanUseDrawnValueAccessor(
-                            accessor,
-                            dataItem,
-                            out bool observeWrappedItemValueChanges))
+                    if (CanUseDrawnValueAccessor(accessor, dataItem, out bool observeWrappedItemValueChanges))
                     {
-                        drawingCell.ConfigureBuiltInRenderer(
-                            this,
-                            renderer: null,
-                            observeWrappedItemValueChanges: observeWrappedItemValueChanges);
+                        drawingCell.ConfigureBuiltInRenderer(this, renderer: null, observeWrappedItemValueChanges: observeWrappedItemValueChanges);
                     }
                     else
                     {
@@ -548,19 +540,13 @@ internal
                 : null;
         }
 
-        private bool CanUseDrawnValueAccessor(
-            IDataGridColumnValueAccessor accessor,
-            object dataItem,
-            out bool observeWrappedItemValueChanges)
+        private bool CanUseDrawnValueAccessor(IDataGridColumnValueAccessor accessor, object dataItem, out bool observeWrappedItemValueChanges)
         {
             observeWrappedItemValueChanges = false;
             return accessor is IDataGridColumnTextAccessor &&
                    dataItem != null &&
                    accessor.ItemType.IsInstanceOfType(dataItem) &&
-                   BindingCloneHelper.SupportsDirectTextDataContextRead(
-                       Binding,
-                       dataItem is IHierarchicalNodeItem,
-                       out observeWrappedItemValueChanges);
+                   BindingCloneHelper.SupportsDirectTextDataContextRead(Binding, dataItem is IHierarchicalNodeItem, out observeWrappedItemValueChanges);
         }
 
         private void SyncProperties(AvaloniaObject content)

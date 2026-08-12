@@ -380,11 +380,7 @@ namespace Avalonia.Controls.DataGridHierarchical
 
         private void TrimLoadInfo()
         {
-            if (_loadInfo is
-                {
-                    Error: null,
-                    Cancellation: null
-                })
+            if (_loadInfo is { Error: null, Cancellation: null })
             {
                 _loadInfo = null;
             }

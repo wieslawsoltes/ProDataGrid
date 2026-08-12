@@ -990,8 +990,7 @@ namespace Avalonia.Controls
 
         private void OnValueProviderPropertyChanged(object sender, PropertyChangedEventArgs e)
         {
-            if (ReferenceEquals(sender, _valueNotifier) ||
-                ReferenceEquals(sender, _wrappedItemNotifier))
+            if (ReferenceEquals(sender, _valueNotifier) || ReferenceEquals(sender, _wrappedItemNotifier))
             {
                 UpdateValueFromProvider();
             }

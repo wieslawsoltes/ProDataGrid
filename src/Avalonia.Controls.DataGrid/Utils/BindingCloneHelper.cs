@@ -201,9 +201,7 @@ namespace Avalonia.Controls.Utils
             };
         }
 
-        public static bool SupportsDirectTextDataContextRead(
-            BindingBase? binding,
-            bool observesWrappedHierarchyItem = false)
+        public static bool SupportsDirectTextDataContextRead(BindingBase? binding, bool observesWrappedHierarchyItem = false)
         {
             return SupportsDirectTextDataContextRead(
                 binding,

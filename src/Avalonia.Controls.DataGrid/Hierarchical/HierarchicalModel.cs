@@ -1084,10 +1084,7 @@ namespace Avalonia.Controls.DataGridHierarchical
                     var hasVisible = GetVisibleDescendantCount(node, parentIndex) > 0;
                     if (!hasVisible)
                     {
-                        inserted = InsertVisibleChildren(
-                            node,
-                            parentIndex + 1,
-                            ref visibleMaterializationCommits);
+                        inserted = InsertVisibleChildren(node, parentIndex + 1, ref visibleMaterializationCommits);
                         if (inserted > 0)
                         {
                             OnFlattenedChanged(new[] { new FlattenedChange(parentIndex + 1, 0, inserted) });
@@ -1801,8 +1798,7 @@ namespace Avalonia.Controls.DataGridHierarchical
                         .ConfigureAwait(continueOnCapturedContext);
                 }
 
-                var materializedDuringOperation =
-                    !hadMaterializedChildren && current.HasMaterializedChildren;
+                var materializedDuringOperation = !hadMaterializedChildren && current.HasMaterializedChildren;
 
                 if (materializedDuringOperation || current.HasPendingBulkMaterializationCommit)
                 {
@@ -1974,8 +1970,7 @@ namespace Avalonia.Controls.DataGridHierarchical
                     }
                 }
 
-                var materializedDuringOperation =
-                    !hadMaterializedChildren && current.HasMaterializedChildren;
+                var materializedDuringOperation = !hadMaterializedChildren && current.HasMaterializedChildren;
                 if (materializedDuringOperation || current.HasPendingBulkMaterializationCommit)
                 {
                     materializationChanged = true;
@@ -2460,11 +2455,7 @@ namespace Avalonia.Controls.DataGridHierarchical
             ref List<HierarchicalNode>? materializationCommits)
         {
             var buffer = new List<HierarchicalNode>();
-            CollectVisibleChildren(
-                parent,
-                buffer,
-                collectMaterializationCommits,
-                ref materializationCommits);
+            CollectVisibleChildren(parent, buffer, collectMaterializationCommits, ref materializationCommits);
 
             if (buffer.Count > 0)
             {
@@ -2474,9 +2465,7 @@ namespace Avalonia.Controls.DataGridHierarchical
             return buffer.Count;
         }
 
-        private void CollectVisibleChildren(
-            HierarchicalNode parent,
-            List<HierarchicalNode> buffer)
+        private void CollectVisibleChildren(HierarchicalNode parent, List<HierarchicalNode> buffer)
         {
             List<HierarchicalNode>? ignoredMaterializationCommits = null;
             CollectVisibleChildren(
