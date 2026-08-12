@@ -522,6 +522,7 @@ namespace Avalonia.Controls.DataGridHierarchical
         private readonly Dictionary<HierarchicalNode, NodeLoadState> _loadStates = new();
         private SemaphoreSlim? _bulkExpandGate;
         private int _synchronousBulkExpandActive;
+        private int _bulkMaterializationCommitGeneration;
         // Cached lookups for flattened items to avoid repeated linear scans.
         private int _flattenedLookupVersion = -1;
         private Dictionary<object, int>? _flattenedReferenceIndexLookup;
@@ -1038,11 +1039,17 @@ namespace Avalonia.Controls.DataGridHierarchical
                 {
                     if (node.IsLeaf || parentIndex < 0)
                     {
+                        if (node.IsLeaf && parentIndex >= 0)
+                        {
+                            node.HasPendingBulkMaterializationCommit = false;
+                        }
+
                         return;
                     }
 
                     if (node.HasMaterializedChildren && hasVisibleDescendants)
                     {
+                        node.HasPendingBulkMaterializationCommit = false;
                         return;
                     }
                 }
@@ -1071,13 +1078,14 @@ namespace Avalonia.Controls.DataGridHierarchical
 
                 parentIndex = GetFlattenedIndex(node);
                 var inserted = 0;
+                List<HierarchicalNode>? visibleMaterializationCommits = null;
 
                 if (parentIndex >= 0 && !node.IsLeaf)
                 {
                     var hasVisible = GetVisibleDescendantCount(node, parentIndex) > 0;
                     if (!hasVisible)
                     {
-                        inserted = InsertVisibleChildren(node, parentIndex + 1);
+                        inserted = InsertVisibleChildren(node, parentIndex + 1, ref visibleMaterializationCommits);
                         if (inserted > 0)
                         {
                             OnFlattenedChanged(new[] { new FlattenedChange(parentIndex + 1, 0, inserted) });
@@ -1088,6 +1096,11 @@ namespace Avalonia.Controls.DataGridHierarchical
                 SetNodeExpandedState(node, true);
                 RecalculateExpandedCountsFrom(node);
                 OnNodeExpanded(node);
+                if (parentIndex >= 0)
+                {
+                    node.HasPendingBulkMaterializationCommit = false;
+                    SetPendingBulkMaterializationCommit(visibleMaterializationCommits, value: false);
+                }
             }
             finally
             {
@@ -1300,6 +1313,7 @@ namespace Avalonia.Controls.DataGridHierarchical
             }
 
             RecalculateExpandedCountsFrom(target);
+            target.HasPendingBulkMaterializationCommit = false;
         }
 
         public HierarchicalNode? FindNode(object item)
@@ -1747,6 +1761,9 @@ namespace Avalonia.Controls.DataGridHierarchical
             }
             var stack = new Stack<(HierarchicalNode Node, int Depth, bool Exit)>();
             var materializationChanged = false;
+            var materializationCommitGeneration = GetNextBulkMaterializationCommitGeneration();
+            var requiresVisibleMaterializationCommitClear = false;
+            var expandedNodesHavePropertyObservers = false;
             var traversedNodeCount = 0;
             stack.Push((start, 0, false));
 
@@ -1782,9 +1799,21 @@ namespace Avalonia.Controls.DataGridHierarchical
                         .ConfigureAwait(continueOnCapturedContext);
                 }
 
-                if (!hadMaterializedChildren && current.HasMaterializedChildren)
+                var materializedDuringOperation = !hadMaterializedChildren && current.HasMaterializedChildren;
+
+                if (materializedDuringOperation || current.HasPendingBulkMaterializationCommit)
                 {
                     materializationChanged = true;
+                    current.PendingBulkMaterializationCommitGeneration =
+                        materializationCommitGeneration;
+                    if ((current.IsExpanded ||
+                         isVirtualRoot ||
+                         current.LoadError != null ||
+                         !current.HasMaterializedChildren) &&
+                        !ReferenceEquals(current, start))
+                    {
+                        requiresVisibleMaterializationCommitClear = true;
+                    }
                 }
 
                 if (current.LoadError != null || !current.HasMaterializedChildren)
@@ -1796,6 +1825,7 @@ namespace Avalonia.Controls.DataGridHierarchical
                 if (!current.IsExpanded && !isVirtualRoot)
                 {
                     nodesToExpand.Add(current);
+                    expandedNodesHavePropertyObservers |= current.HasPropertyChangedObservers;
                 }
 
                 if (current.IsLeaf || depth >= limit)
@@ -1823,7 +1853,10 @@ namespace Avalonia.Controls.DataGridHierarchical
                 nodesToExpand,
                 expansionStatesAlreadyApplied: false,
                 materializationChanged,
-                traversedNodeCount);
+                traversedNodeCount,
+                materializationCommitGeneration,
+                requiresVisibleMaterializationCommitClear,
+                expandedNodesHavePropertyObservers);
         }
 
         private SemaphoreSlim GetBulkExpandGate()
@@ -1845,6 +1878,17 @@ namespace Avalonia.Controls.DataGridHierarchical
             return created;
         }
 
+        private int GetNextBulkMaterializationCommitGeneration()
+        {
+            var generation = Interlocked.Increment(ref _bulkMaterializationCommitGeneration);
+            if (generation == 0)
+            {
+                generation = Interlocked.Increment(ref _bulkMaterializationCommitGeneration);
+            }
+
+            return generation;
+        }
+
         private void ExpandAllSynchronously(
             HierarchicalNode start,
             int limit,
@@ -1852,6 +1896,7 @@ namespace Avalonia.Controls.DataGridHierarchical
         {
             using var activity = Avalonia.Controls.DataGridDiagnostics.HierarchicalExpandAll();
             List<HierarchicalNode>? expandedNodes = null;
+            var materializationCommitGeneration = GetNextBulkMaterializationCommitGeneration();
             const int hashedCycleDepth = 32;
             HashSet<object>? ancestors = null;
             if (start.Level >= hashedCycleDepth)
@@ -1867,6 +1912,8 @@ namespace Avalonia.Controls.DataGridHierarchical
             var stack = new Stack<(HierarchicalNode Node, int Depth, bool Exit)>();
             var anyExpanded = false;
             var materializationChanged = false;
+            var requiresVisibleMaterializationCommitClear = false;
+            var expandedNodesHavePropertyObservers = false;
             var traversedNodeCount = 0;
             stack.Push((start, 0, false));
 
@@ -1925,15 +1972,24 @@ namespace Avalonia.Controls.DataGridHierarchical
                     }
                 }
 
-                if (!hadMaterializedChildren && current.HasMaterializedChildren)
+                var materializedDuringOperation = !hadMaterializedChildren && current.HasMaterializedChildren;
+                if (materializedDuringOperation || current.HasPendingBulkMaterializationCommit)
                 {
                     materializationChanged = true;
+                    current.PendingBulkMaterializationCommitGeneration =
+                        materializationCommitGeneration;
+                    if ((wasExpanded || isVirtualRoot) &&
+                        !ReferenceEquals(current, start))
+                    {
+                        requiresVisibleMaterializationCommitClear = true;
+                    }
                 }
 
                 if (!wasExpanded && !isVirtualRoot)
                 {
                     anyExpanded = true;
                     (expandedNodes ??= new List<HierarchicalNode>()).Add(current);
+                    expandedNodesHavePropertyObservers |= current.HasPropertyChangedObservers;
                 }
 
                 if (current.IsLeaf || depth >= limit)
@@ -1964,10 +2020,22 @@ namespace Avalonia.Controls.DataGridHierarchical
                     for (int i = 0; i < children.Count; i++)
                     {
                         var child = children[i];
+                        if (child.HasPendingBulkMaterializationCommit)
+                        {
+                            materializationChanged = true;
+                            child.PendingBulkMaterializationCommitGeneration =
+                                materializationCommitGeneration;
+                            if (child.IsExpanded)
+                            {
+                                requiresVisibleMaterializationCommitClear = true;
+                            }
+                        }
+
                         if (!child.IsExpanded)
                         {
                             anyExpanded = true;
                             (expandedNodes ??= new List<HierarchicalNode>()).Add(child);
+                            expandedNodesHavePropertyObservers |= child.HasPropertyChangedObservers;
                         }
                     }
 
@@ -1995,7 +2063,25 @@ namespace Avalonia.Controls.DataGridHierarchical
                 expandedNodes,
                 expansionStatesAlreadyApplied: false,
                 materializationChanged,
-                traversedNodeCount);
+                traversedNodeCount,
+                materializationCommitGeneration,
+                requiresVisibleMaterializationCommitClear,
+                expandedNodesHavePropertyObservers);
+        }
+
+        private static void SetPendingBulkMaterializationCommit(
+            IList<HierarchicalNode>? nodes,
+            bool value)
+        {
+            if (nodes == null)
+            {
+                return;
+            }
+
+            for (int i = 0; i < nodes.Count; i++)
+            {
+                nodes[i].HasPendingBulkMaterializationCommit = value;
+            }
         }
 
         private void CommitBulkExpansion(
@@ -2003,7 +2089,10 @@ namespace Avalonia.Controls.DataGridHierarchical
             IList<HierarchicalNode>? expandedNodes,
             bool expansionStatesAlreadyApplied,
             bool materializationChanged,
-            int traversedNodeCount)
+            int traversedNodeCount,
+            int materializationCommitGeneration,
+            bool requiresVisibleMaterializationCommitClear,
+            bool expandedNodesHavePropertyObservers)
         {
             var isVirtualRoot = IsVirtualRootNode(start);
             var startIndex = isVirtualRoot ? -1 : GetFlattenedIndex(start);
@@ -2057,24 +2146,63 @@ namespace Avalonia.Controls.DataGridHierarchical
                 InvalidateFlattenedLookup();
             }
 
-            if (expandedNodes == null)
+            if (expandedNodes != null)
             {
-                return;
+                var raiseNodeExpanded = HasNodeExpandedObservers;
+                var deferExpandedNodeMaterializationCommitClear =
+                    raiseNodeExpanded || expandedNodesHavePropertyObservers;
+                for (int i = 0; i < expandedNodes.Count; i++)
+                {
+                    var expandedNode = expandedNodes[i];
+                    if (expandedNode.HasPropertyChangedObservers)
+                    {
+                        expandedNode.RaiseExpandedChanged();
+                    }
+
+                    if (raiseNodeExpanded)
+                    {
+                        OnNodeExpanded(expandedNode);
+                    }
+
+                    if (!deferExpandedNodeMaterializationCommitClear)
+                    {
+                        ClearPendingBulkMaterializationCommit(
+                            expandedNode,
+                            materializationCommitGeneration);
+                    }
+                }
+
+                if (deferExpandedNodeMaterializationCommitClear)
+                {
+                    for (int i = 0; i < expandedNodes.Count; i++)
+                    {
+                        ClearPendingBulkMaterializationCommit(
+                            expandedNodes[i],
+                            materializationCommitGeneration);
+                    }
+                }
             }
 
-            var raiseNodeExpanded = HasNodeExpandedObservers;
-            for (int i = 0; i < expandedNodes.Count; i++)
+            ClearPendingBulkMaterializationCommit(start, materializationCommitGeneration);
+            if (requiresVisibleMaterializationCommitClear)
             {
-                var expandedNode = expandedNodes[i];
-                if (expandedNode.HasPropertyChangedObservers)
+                for (int i = 0; i < visibleNodes.Count; i++)
                 {
-                    expandedNode.RaiseExpandedChanged();
+                    ClearPendingBulkMaterializationCommit(
+                        visibleNodes[i],
+                        materializationCommitGeneration);
                 }
+            }
+        }
 
-                if (raiseNodeExpanded)
-                {
-                    OnNodeExpanded(expandedNode);
-                }
+        private static void ClearPendingBulkMaterializationCommit(
+            HierarchicalNode node,
+            int materializationCommitGeneration)
+        {
+            if (node.PendingBulkMaterializationCommitGeneration ==
+                materializationCommitGeneration)
+            {
+                node.PendingBulkMaterializationCommitGeneration = 0;
             }
         }
 
@@ -2481,8 +2609,34 @@ namespace Avalonia.Controls.DataGridHierarchical
 
         private int InsertVisibleChildren(HierarchicalNode parent, int insertIndex)
         {
+            List<HierarchicalNode>? ignoredMaterializationCommits = null;
+            return InsertVisibleChildren(
+                parent,
+                insertIndex,
+                collectMaterializationCommits: false,
+                ref ignoredMaterializationCommits);
+        }
+
+        private int InsertVisibleChildren(
+            HierarchicalNode parent,
+            int insertIndex,
+            ref List<HierarchicalNode>? materializationCommits)
+        {
+            return InsertVisibleChildren(
+                parent,
+                insertIndex,
+                collectMaterializationCommits: true,
+                ref materializationCommits);
+        }
+
+        private int InsertVisibleChildren(
+            HierarchicalNode parent,
+            int insertIndex,
+            bool collectMaterializationCommits,
+            ref List<HierarchicalNode>? materializationCommits)
+        {
             var buffer = new List<HierarchicalNode>();
-            CollectVisibleChildren(parent, buffer);
+            CollectVisibleChildren(parent, buffer, collectMaterializationCommits, ref materializationCommits);
 
             if (buffer.Count > 0)
             {
@@ -2493,6 +2647,20 @@ namespace Avalonia.Controls.DataGridHierarchical
         }
 
         private void CollectVisibleChildren(HierarchicalNode parent, List<HierarchicalNode> buffer)
+        {
+            List<HierarchicalNode>? ignoredMaterializationCommits = null;
+            CollectVisibleChildren(
+                parent,
+                buffer,
+                collectMaterializationCommits: false,
+                ref ignoredMaterializationCommits);
+        }
+
+        private void CollectVisibleChildren(
+            HierarchicalNode parent,
+            List<HierarchicalNode> buffer,
+            bool collectMaterializationCommits,
+            ref List<HierarchicalNode>? materializationCommits)
         {
             if (!parent.IsExpanded || parent.IsLeaf)
             {
@@ -2515,6 +2683,10 @@ namespace Avalonia.Controls.DataGridHierarchical
             {
                 var current = stack.Pop();
                 buffer.Add(current);
+                if (collectMaterializationCommits && current.HasPendingBulkMaterializationCommit)
+                {
+                    (materializationCommits ??= new List<HierarchicalNode>()).Add(current);
+                }
 
                 if (!current.IsExpanded || current.IsLeaf)
                 {
@@ -3030,6 +3202,7 @@ namespace Avalonia.Controls.DataGridHierarchical
                     DetachHierarchy(removed);
                 }
                 ApplyExpandedCountDelta(parent, 0);
+                OnHierarchyChanged(parent, NotifyCollectionChangedAction.Remove);
                 return;
             }
 

@@ -8,6 +8,7 @@ using System.ComponentModel;
 using System.Globalization;
 using System.Numerics;
 using System.Runtime.CompilerServices;
+using Avalonia.Controls.DataGridHierarchical;
 using Avalonia.Controls.Documents;
 using Avalonia.Controls.Utils;
 using Avalonia.Media;
@@ -43,7 +44,9 @@ namespace Avalonia.Controls
         private float _compositionVisualHeight;
         private IDataGridDrawnCellValueProvider _valueProvider;
         private IDataGridBuiltInCellRenderer _builtInRenderer;
+        private bool _observeWrappedItemValueChanges;
         private INotifyPropertyChanged _valueNotifier;
+        private INotifyPropertyChanged _wrappedItemNotifier;
         private int _configurationDepth;
         private bool _configurationDirty;
         private readonly WeakPropertyChangedListener<DataGridCustomDrawingCell> _valuePropertyChangedListener;
@@ -346,10 +349,12 @@ namespace Avalonia.Controls
 
         internal void ConfigureBuiltInRenderer(
             IDataGridDrawnCellValueProvider valueProvider,
-            IDataGridBuiltInCellRenderer renderer)
+            IDataGridBuiltInCellRenderer renderer,
+            bool observeWrappedItemValueChanges = false)
         {
             _valueProvider = valueProvider;
             _builtInRenderer = renderer;
+            _observeWrappedItemValueChanges = valueProvider != null && observeWrappedItemValueChanges;
             UseDrawingTemplate();
             UpdateValueProviderSubscription();
             if (_configurationDepth > 0)
@@ -367,6 +372,7 @@ namespace Avalonia.Controls
         {
             _valueProvider = null;
             _builtInRenderer = null;
+            _observeWrappedItemValueChanges = false;
             UpdateValueProviderSubscription();
         }
 
@@ -956,22 +962,35 @@ namespace Avalonia.Controls
                 _valueNotifier = notifier;
                 _valueNotifier.PropertyChanged += _valuePropertyChangedListener.Handler;
             }
+
+            if (_observeWrappedItemValueChanges &&
+                DataContext is IHierarchicalNodeItem node &&
+                node.Item is INotifyPropertyChanged itemNotifier &&
+                !ReferenceEquals(itemNotifier, _valueNotifier))
+            {
+                _wrappedItemNotifier = itemNotifier;
+                _wrappedItemNotifier.PropertyChanged += _valuePropertyChangedListener.Handler;
+            }
         }
 
         private void DetachValueProviderSubscription()
         {
-            if (_valueNotifier == null)
+            if (_valueNotifier != null)
             {
-                return;
+                _valueNotifier.PropertyChanged -= _valuePropertyChangedListener.Handler;
+                _valueNotifier = null;
             }
 
-            _valueNotifier.PropertyChanged -= _valuePropertyChangedListener.Handler;
-            _valueNotifier = null;
+            if (_wrappedItemNotifier != null)
+            {
+                _wrappedItemNotifier.PropertyChanged -= _valuePropertyChangedListener.Handler;
+                _wrappedItemNotifier = null;
+            }
         }
 
         private void OnValueProviderPropertyChanged(object sender, PropertyChangedEventArgs e)
         {
-            if (ReferenceEquals(sender, _valueNotifier))
+            if (ReferenceEquals(sender, _valueNotifier) || ReferenceEquals(sender, _wrappedItemNotifier))
             {
                 UpdateValueFromProvider();
             }

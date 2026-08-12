@@ -24,7 +24,7 @@ namespace Avalonia.Controls.DataGridTests.Filtering;
 
 public class DataGridHierarchicalFilteringAdapterTests
 {
-    [Theory]
+    [AvaloniaTheory]
     [InlineData(DataGridHierarchyFilterPolicy.SelfOnly, "needle")]
     [InlineData(DataGridHierarchyFilterPolicy.KeepAncestorsOfMatches, "root,branch,needle")]
     [InlineData(DataGridHierarchyFilterPolicy.KeepDescendantsOfMatches, "needle")]
@@ -47,7 +47,7 @@ public class DataGridHierarchicalFilteringAdapterTests
         Assert.True(hierarchy.Root!.IsExpanded);
     }
 
-    [Fact]
+    [AvaloniaFact]
     public void Descendant_Policy_Keeps_The_Materialized_Subtree_Of_A_Match()
     {
         TreeItem root = CreateTree();
@@ -61,7 +61,7 @@ public class DataGridHierarchicalFilteringAdapterTests
         Assert.Equal(new[] { "branch", "needle" }, fixture.VisibleNames());
     }
 
-    [Fact]
+    [AvaloniaFact]
     public void Clearing_Filter_Restores_View_Without_Changing_Expansion()
     {
         TreeItem root = CreateTree();
@@ -78,7 +78,7 @@ public class DataGridHierarchicalFilteringAdapterTests
         Assert.True(hierarchy.Root.Children[0].IsExpanded);
     }
 
-    [Fact]
+    [AvaloniaFact]
     public void Collapsed_Tree_Uses_Materialized_Descendants_Without_Expanding()
     {
         TreeItem root = CreateTree();
@@ -95,7 +95,28 @@ public class DataGridHierarchicalFilteringAdapterTests
         Assert.False(branch.IsExpanded);
     }
 
-    [Fact]
+    [AvaloniaFact]
+    public void Removing_Only_Matching_Descendant_From_Collapsed_Branch_Removes_Retained_Ancestors()
+    {
+        TreeItem root = CreateTree();
+        TreeItem branchItem = root.Children[0];
+        HierarchicalModel hierarchy = CreateModel(root, virtualizeChildren: false);
+        HierarchicalNode branch = hierarchy.Root!.Children[0];
+        hierarchy.Collapse(branch);
+        using AdapterFixture fixture = CreateFixture(
+            hierarchy,
+            DataGridHierarchyFilterPolicy.KeepAncestorsOfMatches);
+        fixture.Filter("needle");
+        Assert.Equal(new[] { "root", "branch" }, fixture.VisibleNames());
+
+        branchItem.Children.RemoveAt(0);
+        Dispatcher.UIThread.RunJobs();
+
+        Assert.Empty(fixture.VisibleNames());
+        Assert.False(branch.IsExpanded);
+    }
+
+    [AvaloniaFact]
     public void Filtering_Does_Not_Implicitly_Load_Unmaterialized_Children()
     {
         int loadCount = 0;
@@ -157,12 +178,21 @@ public class DataGridHierarchicalFilteringAdapterTests
             DataGridHierarchyFilterPolicy.KeepAncestorsOfMatches);
         fixture.Filter("needle");
         fixture.ResetRefreshCounts();
+        var queued = new Queue<Action>();
+        fixture.SetViewThreadPost(queued.Enqueue);
 
         Task expand = hierarchy.ExpandAsync(hierarchy.Root!);
         completion.SetResult(new[] { new TreeItem("needle") });
         await expand;
-        Dispatcher.UIThread.RunJobs();
 
+        Assert.Single(queued);
+        queued.Dequeue()();
+        Assert.Single(queued);
+        Assert.Equal(0, fixture.BeforeRefreshCount);
+        Assert.Equal(0, fixture.AfterRefreshCount);
+        queued.Dequeue()();
+
+        Assert.Empty(queued);
         Assert.Equal(new[] { "root", "needle" }, fixture.VisibleNames());
         Assert.Equal(1, fixture.BeforeRefreshCount);
         Assert.Equal(1, fixture.AfterRefreshCount);
@@ -295,7 +325,7 @@ public class DataGridHierarchicalFilteringAdapterTests
         Assert.Equal(1, fixture.AfterRefreshCount);
     }
 
-    [Fact]
+    [AvaloniaFact]
     public void Supports_Node_Typed_Column_Accessors_For_Compatibility()
     {
         TreeItem root = CreateTree();
@@ -315,7 +345,7 @@ public class DataGridHierarchicalFilteringAdapterTests
         Assert.Equal(new[] { "root", "branch", "needle" }, fixture.VisibleNames());
     }
 
-    [Fact]
+    [AvaloniaFact]
     public void Custom_Predicate_Receives_The_Underlying_Item()
     {
         TreeItem root = CreateTree();

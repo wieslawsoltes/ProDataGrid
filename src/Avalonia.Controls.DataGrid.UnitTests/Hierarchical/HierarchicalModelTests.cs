@@ -55,6 +55,11 @@ namespace Avalonia.Controls.DataGridTests.Hierarchical;
         }
     }
 
+    private sealed class Counter
+    {
+        public int Value { get; set; }
+    }
+
     private sealed class ExpandableItem : INotifyPropertyChanged
     {
         public ExpandableItem(string name)
@@ -1828,6 +1833,491 @@ namespace Avalonia.Controls.DataGridTests.Hierarchical;
         Assert.Equal(2, childAttempts);
         Assert.Equal(3, model.Count);
         Assert.All(model.Flattened, node => Assert.True(node.IsExpanded));
+    }
+
+    [Fact]
+    public async Task ExpandAllAsync_Canceled_After_Materializing_Expanded_Node_Commits_Children_On_Retry()
+    {
+        var root = new Item("root");
+        var child = new Item("child");
+        root.Children.Add(child);
+        bool failRefresh = false;
+        var model = new HierarchicalModel(new HierarchicalOptions
+        {
+            ChildrenSelectorAsync = (item, _) =>
+            {
+                if (failRefresh)
+                {
+                    return Task.FromException<IEnumerable?>(new InvalidOperationException("refresh failed"));
+                }
+
+                return Task.FromResult<IEnumerable?>(((Item)item).Children);
+            }
+        });
+        model.SetRoot(root);
+        await model.ExpandAllAsync(
+            maxDepth: 0,
+            cancellationToken: TestContext.Current.CancellationToken);
+        Assert.True(model.Root!.IsExpanded);
+        Assert.Equal(2, model.Count);
+
+        failRefresh = true;
+        await model.RefreshAsync(model.Root, TestContext.Current.CancellationToken);
+        Assert.True(model.Root.IsExpanded);
+        Assert.False(model.Root.HasMaterializedChildren);
+        Assert.Equal(1, model.Count);
+
+        failRefresh = false;
+        using var cts = new CancellationTokenSource();
+        model.NodeLoaded += CancelAfterRootMaterializes;
+        Task canceledExpansion = model.ExpandAllAsync(maxDepth: 0, cancellationToken: cts.Token);
+
+        await Assert.ThrowsAnyAsync<OperationCanceledException>(() => canceledExpansion);
+        model.NodeLoaded -= CancelAfterRootMaterializes;
+        Assert.True(model.Root.HasMaterializedChildren);
+        Assert.Equal(1, model.Count);
+
+        await model.ExpandAllAsync(
+            maxDepth: 0,
+            cancellationToken: TestContext.Current.CancellationToken);
+
+        Assert.Equal(2, model.Count);
+        Assert.Same(child, model.GetItem(1));
+
+        void CancelAfterRootMaterializes(object? sender, HierarchicalNodeEventArgs args)
+        {
+            if (ReferenceEquals(args.Node, model.Root))
+            {
+                cts.Cancel();
+            }
+        }
+    }
+
+    [Fact]
+    public Task ExpandAsync_Recovers_Pending_Bulk_Materialization_And_Clears_Marker()
+    {
+        return AssertPendingBulkMaterializationRecoveryAsync(
+            static (model, cancellationToken) => model.ExpandAsync(model.Root!, cancellationToken),
+            expectedSelectorCallsDuringRecovery: 0);
+    }
+
+    [Fact]
+    public Task RefreshAsync_Recovers_Pending_Bulk_Materialization_And_Clears_Marker()
+    {
+        return AssertPendingBulkMaterializationRecoveryAsync(
+            static (model, cancellationToken) => model.RefreshAsync(model.Root, cancellationToken),
+            expectedSelectorCallsDuringRecovery: 1);
+    }
+
+    [Fact]
+    public Task SynchronousExpandAll_Recovers_Pending_Bulk_Materialization_And_Clears_Marker()
+    {
+        return AssertPendingBulkMaterializationRecoveryAsync(
+            static (model, _) =>
+            {
+                model.ExpandAll(maxDepth: 0);
+                return Task.CompletedTask;
+            },
+            expectedSelectorCallsDuringRecovery: 0);
+    }
+
+    [Fact]
+    public async Task SynchronousExpandAll_Clears_Pending_Leaf_Materialized_By_Canceled_Bulk_Expansion()
+    {
+        var root = new Item("root");
+        var child = new Item("child");
+        root.Children.Add(child);
+        var selectorCalls = new Counter();
+        var model = new HierarchicalModel(new HierarchicalOptions
+        {
+            ChildrenSelectorAsync = (item, _) =>
+            {
+                selectorCalls.Value++;
+                return Task.FromResult<IEnumerable?>(((Item)item).Children);
+            }
+        });
+        model.SetRoot(root);
+        var observedInitiallyNonLeafChild = false;
+        model.NodeLoading += (_, args) =>
+        {
+            if (ReferenceEquals(args.Node.Item, child))
+            {
+                Assert.False(args.Node.IsLeaf);
+                Assert.False(args.Node.HasMaterializedChildren);
+                observedInitiallyNonLeafChild = true;
+            }
+        };
+
+        using var cts = new CancellationTokenSource();
+        model.NodeLoaded += CancelAfterChildMaterializes;
+        try
+        {
+            Task canceledExpansion = model.ExpandAllAsync(cancellationToken: cts.Token);
+            await Assert.ThrowsAnyAsync<OperationCanceledException>(() => canceledExpansion);
+        }
+        finally
+        {
+            model.NodeLoaded -= CancelAfterChildMaterializes;
+        }
+
+        var rootNode = model.Root!;
+        var childNode = Assert.Single(rootNode.Children);
+        Assert.True(observedInitiallyNonLeafChild);
+        Assert.True(rootNode.HasPendingBulkMaterializationCommit);
+        Assert.True(childNode.HasPendingBulkMaterializationCommit);
+        Assert.True(childNode.HasMaterializedChildren);
+        Assert.True(childNode.IsLeaf);
+        Assert.Single(model.Flattened);
+
+        var flattenedChanges = 0;
+        model.FlattenedChanged += (_, _) =>
+        {
+            Assert.True(rootNode.HasPendingBulkMaterializationCommit);
+            Assert.True(childNode.HasPendingBulkMaterializationCommit);
+            flattenedChanges++;
+        };
+
+        model.ExpandAll();
+
+        Assert.Equal(2, model.Count);
+        Assert.Same(child, model.GetItem(1));
+        Assert.False(rootNode.HasPendingBulkMaterializationCommit);
+        Assert.False(childNode.HasPendingBulkMaterializationCommit);
+        Assert.Equal(1, flattenedChanges);
+
+        var recoveredFlattenedVersion = model.FlattenedVersion;
+        var recoveredSelectorCalls = selectorCalls.Value;
+        await model.ExpandAllAsync(cancellationToken: TestContext.Current.CancellationToken);
+
+        Assert.Equal(recoveredFlattenedVersion, model.FlattenedVersion);
+        Assert.Equal(recoveredSelectorCalls, selectorCalls.Value);
+        Assert.Equal(1, flattenedChanges);
+        Assert.False(rootNode.HasPendingBulkMaterializationCommit);
+        Assert.False(childNode.HasPendingBulkMaterializationCommit);
+
+        void CancelAfterChildMaterializes(object? sender, HierarchicalNodeEventArgs args)
+        {
+            if (ReferenceEquals(args.Node.Item, child))
+            {
+                cts.Cancel();
+            }
+        }
+    }
+
+    [Fact]
+    public async Task ShallowExpandAllAsync_Does_Not_Clear_Deeper_Pending_Materialization()
+    {
+        var root = new Item("root");
+        var child = new Item("child");
+        root.Children.Add(child);
+        var model = new HierarchicalModel(new HierarchicalOptions
+        {
+            ChildrenSelectorAsync = static (item, _) =>
+                Task.FromResult<IEnumerable?>(((Item)item).Children)
+        });
+        model.SetRoot(root);
+
+        using var cts = new CancellationTokenSource();
+        model.NodeLoaded += CancelAfterChildMaterializes;
+        try
+        {
+            Task canceledExpansion = model.ExpandAllAsync(cancellationToken: cts.Token);
+            await Assert.ThrowsAnyAsync<OperationCanceledException>(() => canceledExpansion);
+        }
+        finally
+        {
+            model.NodeLoaded -= CancelAfterChildMaterializes;
+        }
+
+        var rootNode = model.Root!;
+        var childNode = Assert.Single(rootNode.Children);
+        Assert.True(rootNode.HasPendingBulkMaterializationCommit);
+        Assert.True(childNode.HasPendingBulkMaterializationCommit);
+
+        await model.ExpandAllAsync(
+            maxDepth: 0,
+            cancellationToken: TestContext.Current.CancellationToken);
+
+        Assert.False(rootNode.HasPendingBulkMaterializationCommit);
+        Assert.True(childNode.HasPendingBulkMaterializationCommit);
+
+        await model.ExpandAllAsync(cancellationToken: TestContext.Current.CancellationToken);
+
+        Assert.False(childNode.HasPendingBulkMaterializationCommit);
+        Assert.Equal(2, model.Count);
+
+        void CancelAfterChildMaterializes(object? sender, HierarchicalNodeEventArgs args)
+        {
+            if (ReferenceEquals(args.Node.Item, child))
+            {
+                cts.Cancel();
+            }
+        }
+    }
+
+    [Fact]
+    public async Task ExpandAllAsync_Failed_Reload_Clears_Pending_Collapsed_Descendant()
+    {
+        var root = new Item("root");
+        var child = new Item("child");
+        var grandchild = new Item("grandchild");
+        child.Children.Add(grandchild);
+        root.Children.Add(child);
+        var failChildLoad = false;
+        var model = new HierarchicalModel(new HierarchicalOptions
+        {
+            VirtualizeChildren = true,
+            ChildrenSelectorAsync = (item, _) =>
+            {
+                if (failChildLoad && ReferenceEquals(item, child))
+                {
+                    return Task.FromException<IEnumerable?>(new InvalidOperationException("child load failed"));
+                }
+
+                return Task.FromResult<IEnumerable?>(((Item)item).Children);
+            }
+        });
+        model.SetRoot(root);
+        await model.ExpandAllAsync(
+            maxDepth: 1,
+            cancellationToken: TestContext.Current.CancellationToken);
+
+        var childNode = Assert.Single(model.Root!.Children);
+        Assert.True(childNode.IsExpanded);
+        Assert.True(childNode.HasMaterializedChildren);
+
+        failChildLoad = true;
+        await model.RefreshAsync(childNode, TestContext.Current.CancellationToken);
+        Assert.True(childNode.IsExpanded);
+        Assert.False(childNode.HasMaterializedChildren);
+        Assert.NotNull(childNode.LoadError);
+
+        failChildLoad = false;
+        using var cts = new CancellationTokenSource();
+        model.NodeLoaded += CancelAfterChildMaterializes;
+        try
+        {
+            Task canceledExpansion = model.ExpandAllAsync(maxDepth: 1, cancellationToken: cts.Token);
+            await Assert.ThrowsAnyAsync<OperationCanceledException>(() => canceledExpansion);
+        }
+        finally
+        {
+            model.NodeLoaded -= CancelAfterChildMaterializes;
+        }
+
+        Assert.True(childNode.IsExpanded);
+        Assert.True(childNode.HasMaterializedChildren);
+        Assert.True(childNode.HasPendingBulkMaterializationCommit);
+
+        model.Collapse(childNode);
+        Assert.False(childNode.IsExpanded);
+        Assert.False(childNode.HasMaterializedChildren);
+        Assert.True(childNode.HasPendingBulkMaterializationCommit);
+
+        failChildLoad = true;
+        await model.ExpandAllAsync(
+            maxDepth: 1,
+            cancellationToken: TestContext.Current.CancellationToken);
+
+        Assert.NotNull(childNode.LoadError);
+        Assert.False(childNode.IsExpanded);
+        Assert.False(childNode.HasMaterializedChildren);
+        Assert.False(childNode.HasPendingBulkMaterializationCommit);
+
+        void CancelAfterChildMaterializes(object? sender, HierarchicalNodeEventArgs args)
+        {
+            if (ReferenceEquals(args.Node, childNode))
+            {
+                cts.Cancel();
+            }
+        }
+    }
+
+    [Fact]
+    public async Task ExpandAsync_Reinserting_Expanded_Descendant_Clears_Its_Pending_Materialization()
+    {
+        var root = new Item("root");
+        var child = new Item("child");
+        var grandchild = new Item("grandchild");
+        child.Children.Add(grandchild);
+        root.Children.Add(child);
+        var selectorCalls = new Counter();
+        var failChildRefresh = false;
+        var model = new HierarchicalModel(new HierarchicalOptions
+        {
+            VirtualizeChildren = false,
+            ChildrenSelectorAsync = (item, _) =>
+            {
+                selectorCalls.Value++;
+                if (failChildRefresh && ReferenceEquals(item, child))
+                {
+                    return Task.FromException<IEnumerable?>(new InvalidOperationException("refresh failed"));
+                }
+
+                return Task.FromResult<IEnumerable?>(((Item)item).Children);
+            }
+        });
+        model.SetRoot(root);
+        await model.ExpandAllAsync(
+            maxDepth: 1,
+            cancellationToken: TestContext.Current.CancellationToken);
+
+        var rootNode = model.Root!;
+        var childNode = Assert.Single(rootNode.Children);
+        Assert.True(childNode.IsExpanded);
+        Assert.Equal(3, model.Count);
+
+        failChildRefresh = true;
+        await model.RefreshAsync(childNode, TestContext.Current.CancellationToken);
+        Assert.False(childNode.HasMaterializedChildren);
+        Assert.Equal(2, model.Count);
+
+        failChildRefresh = false;
+        using var cts = new CancellationTokenSource();
+        model.NodeLoaded += CancelAfterChildMaterializes;
+        try
+        {
+            Task canceledExpansion = model.ExpandAllAsync(maxDepth: 1, cancellationToken: cts.Token);
+            await Assert.ThrowsAnyAsync<OperationCanceledException>(() => canceledExpansion);
+        }
+        finally
+        {
+            model.NodeLoaded -= CancelAfterChildMaterializes;
+        }
+
+        var reloadedGrandchildNode = Assert.Single(childNode.Children);
+        Assert.True(childNode.IsExpanded);
+        Assert.True(childNode.HasPendingBulkMaterializationCommit);
+        Assert.False(reloadedGrandchildNode.HasPendingBulkMaterializationCommit);
+        Assert.Equal(2, model.Count);
+
+        model.Collapse(rootNode);
+        Assert.Single(model.Flattened);
+        var flattenedChanges = 0;
+        model.FlattenedChanged += (_, _) =>
+        {
+            Assert.True(childNode.HasPendingBulkMaterializationCommit);
+            flattenedChanges++;
+        };
+
+        await model.ExpandAsync(rootNode, TestContext.Current.CancellationToken);
+
+        Assert.Equal(3, model.Count);
+        Assert.Same(child, model.GetItem(1));
+        Assert.Same(grandchild, model.GetItem(2));
+        Assert.False(rootNode.HasPendingBulkMaterializationCommit);
+        Assert.False(childNode.HasPendingBulkMaterializationCommit);
+        Assert.False(reloadedGrandchildNode.HasPendingBulkMaterializationCommit);
+        Assert.Equal(1, flattenedChanges);
+
+        var recoveredFlattenedVersion = model.FlattenedVersion;
+        var recoveredSelectorCalls = selectorCalls.Value;
+        await model.ExpandAllAsync(
+            maxDepth: 1,
+            cancellationToken: TestContext.Current.CancellationToken);
+
+        Assert.Equal(recoveredFlattenedVersion, model.FlattenedVersion);
+        Assert.Equal(recoveredSelectorCalls, selectorCalls.Value);
+        Assert.Equal(1, flattenedChanges);
+        Assert.False(childNode.HasPendingBulkMaterializationCommit);
+
+        void CancelAfterChildMaterializes(object? sender, HierarchicalNodeEventArgs args)
+        {
+            if (ReferenceEquals(args.Node, childNode))
+            {
+                cts.Cancel();
+            }
+        }
+    }
+
+    private static async Task AssertPendingBulkMaterializationRecoveryAsync(
+        Func<HierarchicalModel, CancellationToken, Task> recover,
+        int expectedSelectorCallsDuringRecovery)
+    {
+        var (model, child, selectorCalls) =
+            await CreatePendingBulkMaterializationFixtureAsync();
+        var flattenedChanges = 0;
+        model.FlattenedChanged += (_, _) => flattenedChanges++;
+        var initialFlattenedVersion = model.FlattenedVersion;
+        var initialSelectorCalls = selectorCalls.Value;
+
+        await recover(model, TestContext.Current.CancellationToken);
+
+        Assert.Equal(2, model.Count);
+        Assert.Same(child, model.GetItem(1));
+        Assert.Equal(1, model.Root!.ExpandedCount);
+        Assert.False(model.Root.HasPendingBulkMaterializationCommit);
+        Assert.Equal(initialFlattenedVersion + 1, model.FlattenedVersion);
+        Assert.Equal(1, flattenedChanges);
+        Assert.Equal(initialSelectorCalls + expectedSelectorCallsDuringRecovery, selectorCalls.Value);
+
+        var recoveredFlattenedVersion = model.FlattenedVersion;
+        var recoveredFlattenedChanges = flattenedChanges;
+        var recoveredSelectorCalls = selectorCalls.Value;
+
+        await model.ExpandAllAsync(
+            maxDepth: 0,
+            cancellationToken: TestContext.Current.CancellationToken);
+
+        Assert.Equal(recoveredFlattenedVersion, model.FlattenedVersion);
+        Assert.Equal(recoveredFlattenedChanges, flattenedChanges);
+        Assert.Equal(recoveredSelectorCalls, selectorCalls.Value);
+        Assert.False(model.Root.HasPendingBulkMaterializationCommit);
+    }
+
+    private static async Task<(HierarchicalModel Model, Item Child, Counter SelectorCalls)>
+        CreatePendingBulkMaterializationFixtureAsync()
+    {
+        var root = new Item("root");
+        var child = new Item("child");
+        root.Children.Add(child);
+        var failRefresh = false;
+        var selectorCalls = new Counter();
+        var model = new HierarchicalModel(new HierarchicalOptions
+        {
+            ChildrenSelectorAsync = (item, _) =>
+            {
+                selectorCalls.Value++;
+                return failRefresh
+                    ? Task.FromException<IEnumerable?>(new InvalidOperationException("refresh failed"))
+                    : Task.FromResult<IEnumerable?>(((Item)item).Children);
+            }
+        });
+        model.SetRoot(root);
+        await model.ExpandAllAsync(
+            maxDepth: 0,
+            cancellationToken: TestContext.Current.CancellationToken);
+
+        failRefresh = true;
+        await model.RefreshAsync(model.Root, TestContext.Current.CancellationToken);
+
+        failRefresh = false;
+        using var cts = new CancellationTokenSource();
+        model.NodeLoaded += CancelAfterRootMaterializes;
+        try
+        {
+            Task canceledExpansion = model.ExpandAllAsync(maxDepth: 0, cancellationToken: cts.Token);
+            await Assert.ThrowsAnyAsync<OperationCanceledException>(() => canceledExpansion);
+        }
+        finally
+        {
+            model.NodeLoaded -= CancelAfterRootMaterializes;
+        }
+
+        Assert.True(model.Root!.IsExpanded);
+        Assert.True(model.Root.HasMaterializedChildren);
+        Assert.True(model.Root.HasPendingBulkMaterializationCommit);
+        Assert.Equal(1, model.Count);
+
+        return (model, child, selectorCalls);
+
+        void CancelAfterRootMaterializes(object? sender, HierarchicalNodeEventArgs args)
+        {
+            if (ReferenceEquals(args.Node, model.Root))
+            {
+                cts.Cancel();
+            }
+        }
     }
 
     [Fact]
