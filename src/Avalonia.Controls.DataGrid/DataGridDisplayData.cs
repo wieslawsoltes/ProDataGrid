@@ -257,10 +257,12 @@ namespace Avalonia.Controls
             }
         }
 
-        private Control GetLogicalScrollingElement(int logicalIndex)
+        internal Control GetLogicalScrollingElement(int logicalIndex)
         {
             return _scrollingElements[(_headScrollingElements + logicalIndex) % _scrollingElements.Count];
         }
+
+        internal int ScrollingElementCount => _scrollingElements.Count;
 
         private void RecycleScrollingElement(Control element)
         {
