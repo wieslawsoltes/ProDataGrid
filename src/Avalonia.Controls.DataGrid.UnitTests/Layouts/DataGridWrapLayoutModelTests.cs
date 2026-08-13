@@ -96,6 +96,31 @@ public class DataGridWrapLayoutModelTests
         Assert.Equal(DataGridLayoutInvalidationKind.Measure, kind);
     }
 
+    [Fact]
+    public void Navigation_uses_variable_line_geometry_and_preserves_cross_axis_anchor()
+    {
+        var model = new DataGridWrapLayoutModel();
+        IDataGridLayoutAlgorithm algorithm = model.CreateAlgorithm();
+        var navigation = Assert.IsAssignableFrom<IDataGridLayoutNavigation>(algorithm);
+        Size[] sizes = { new(100, 20), new(40, 30), new(60, 20), new(50, 20), new(50, 20) };
+        var context = new TestContext(sizes.Length, index => sizes[index], new Rect(0, 0, 100, 100), default);
+        algorithm.Initialize(context);
+        algorithm.Measure(context, new Size(100, 100));
+
+        Assert.True(navigation.TryResolveNavigation(
+            context,
+            new DataGridLayoutNavigationRequest(0, DataGridLayoutNavigationDirection.Down, new Rect(0, 0, 100, 100), new Point(85, 10)),
+            out DataGridLayoutNavigationResult down));
+        Assert.Equal(2, down.ItemIndex);
+        Assert.Equal(context.GetLayoutBounds(2), down.EstimatedBounds);
+
+        Assert.True(navigation.TryResolveNavigation(
+            context,
+            new DataGridLayoutNavigationRequest(2, DataGridLayoutNavigationDirection.LineStart, new Rect(0, 0, 100, 100), new Point(85, 35)),
+            out DataGridLayoutNavigationResult lineStart));
+        Assert.Equal(1, lineStart.ItemIndex);
+    }
+
     private sealed class TestContext : IDataGridLayoutContext
     {
         private readonly Func<int, Size> _sizeSelector;

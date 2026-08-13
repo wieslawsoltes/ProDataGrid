@@ -7,7 +7,7 @@ using System.Collections.Specialized;
 
 namespace Avalonia.Controls.DataGridLayouts;
 
-internal sealed class DataGridUniformGridLayoutAlgorithm : IDataGridLayoutAlgorithm
+internal sealed class DataGridUniformGridLayoutAlgorithm : IDataGridLayoutAlgorithm, IDataGridLayoutNavigation
 {
     private readonly DataGridUniformGridLayoutModel _model;
 
@@ -98,6 +98,9 @@ internal sealed class DataGridUniformGridLayoutAlgorithm : IDataGridLayoutAlgori
         context.LayoutOrigin = default;
         state.CellSize = ToSize(cellU, cellV, flowOrientation);
         state.ItemsPerLine = itemsPerLine;
+        state.AvailableU = availableU;
+        state.SpacingU = spacingU;
+        state.SpacingV = spacingV;
 
         double extentU = IsFinitePositive(availableU)
             ? availableU
@@ -130,6 +133,155 @@ internal sealed class DataGridUniformGridLayoutAlgorithm : IDataGridLayoutAlgori
     public void Uninitialize(IDataGridLayoutContext context)
     {
     }
+
+    public bool TryResolveNavigation(
+        IDataGridLayoutContext context,
+        in DataGridLayoutNavigationRequest request,
+        out DataGridLayoutNavigationResult result)
+    {
+        result = default;
+        int itemCount = context.ItemCount;
+        int current = request.CurrentItemIndex;
+        if (current < 0 || current >= itemCount)
+        {
+            return false;
+        }
+
+        State state = GetState(context);
+        DataGridLayoutOrientation orientation = _model.Orientation;
+        int itemsPerLine = ResolveItemsPerLine(context, request.Viewport, state, orientation);
+        int line = current / itemsPerLine;
+        int lineIndex = current % itemsPerLine;
+        int target;
+
+        switch (request.Direction)
+        {
+            case DataGridLayoutNavigationDirection.Left when orientation == DataGridLayoutOrientation.Horizontal:
+            case DataGridLayoutNavigationDirection.Up when orientation == DataGridLayoutOrientation.Vertical:
+                target = lineIndex > 0 ? current - 1 : -1;
+                break;
+            case DataGridLayoutNavigationDirection.Right when orientation == DataGridLayoutOrientation.Horizontal:
+            case DataGridLayoutNavigationDirection.Down when orientation == DataGridLayoutOrientation.Vertical:
+                target = lineIndex + 1 < itemsPerLine && current + 1 < itemCount ? current + 1 : -1;
+                break;
+            case DataGridLayoutNavigationDirection.Up when orientation == DataGridLayoutOrientation.Horizontal:
+            case DataGridLayoutNavigationDirection.Left when orientation == DataGridLayoutOrientation.Vertical:
+                target = current - itemsPerLine;
+                break;
+            case DataGridLayoutNavigationDirection.Down when orientation == DataGridLayoutOrientation.Horizontal:
+            case DataGridLayoutNavigationDirection.Right when orientation == DataGridLayoutOrientation.Vertical:
+                target = current + itemsPerLine;
+                if (target >= itemCount)
+                {
+                    int lastLineStart = ((itemCount - 1) / itemsPerLine) * itemsPerLine;
+                    target = lastLineStart <= current ? -1 : itemCount - 1;
+                }
+                break;
+            case DataGridLayoutNavigationDirection.LineStart:
+                target = line * itemsPerLine;
+                break;
+            case DataGridLayoutNavigationDirection.LineEnd:
+                target = Math.Min(itemCount - 1, ((line + 1) * itemsPerLine) - 1);
+                break;
+            case DataGridLayoutNavigationDirection.PageUp:
+            case DataGridLayoutNavigationDirection.PageDown:
+                double cellV = Math.Max(1, GetV(ResolveCellSize(context, state, orientation), orientation));
+                double spacingV = ResolveSpacingV(state, orientation);
+                double viewportV = Math.Max(1, GetV(request.Viewport.Size, orientation));
+                int pageLines = Math.Max(1, (int)Math.Floor(viewportV / Math.Max(1, cellV + spacingV)));
+                target = current + (request.Direction == DataGridLayoutNavigationDirection.PageDown
+                    ? pageLines * itemsPerLine
+                    : -pageLines * itemsPerLine);
+                target = Math.Max(0, Math.Min(itemCount - 1, target));
+                break;
+            case DataGridLayoutNavigationDirection.First:
+                target = 0;
+                break;
+            case DataGridLayoutNavigationDirection.Last:
+                target = itemCount - 1;
+                break;
+            default:
+                return false;
+        }
+
+        if (target < 0 || target >= itemCount || target == current)
+        {
+            return false;
+        }
+
+        result = new DataGridLayoutNavigationResult(
+            target,
+            GetEstimatedBounds(context, request.Viewport, state, orientation, itemsPerLine, target));
+        return true;
+    }
+
+    private int ResolveItemsPerLine(
+        IDataGridLayoutContext context,
+        Rect viewport,
+        State state,
+        DataGridLayoutOrientation orientation)
+    {
+        if (state.ItemsPerLine > 0)
+        {
+            return state.ItemsPerLine;
+        }
+
+        Size cellSize = ResolveCellSize(context, state, orientation);
+        double cellU = Math.Max(1, GetU(cellSize, orientation));
+        double spacingU = Math.Max(0, GetSpacingU(orientation));
+        double availableU = Math.Max(1, GetU(viewport.Size, orientation));
+        int maximum = _model.MaximumRowsOrColumns <= 0 ? int.MaxValue : _model.MaximumRowsOrColumns;
+        return Math.Min(maximum, Math.Max(1, (int)Math.Floor((availableU + spacingU) / (cellU + spacingU))));
+    }
+
+    private Size ResolveCellSize(
+        IDataGridLayoutContext context,
+        State state,
+        DataGridLayoutOrientation orientation)
+    {
+        if (state.CellSize.Width > 0 && state.CellSize.Height > 0)
+        {
+            return state.CellSize;
+        }
+
+        Size estimate = context.GetEstimatedItemSize(0);
+        double width = IsFinitePositive(_model.MinItemWidth) ? _model.MinItemWidth : Math.Max(1, estimate.Width);
+        double height = IsFinitePositive(_model.MinItemHeight) ? _model.MinItemHeight : Math.Max(1, estimate.Height);
+        return new Size(width, height);
+    }
+
+    private Rect GetEstimatedBounds(
+        IDataGridLayoutContext context,
+        Rect viewport,
+        State state,
+        DataGridLayoutOrientation orientation,
+        int itemsPerLine,
+        int index)
+    {
+        if (context.TryGetLayoutBounds(index, out Rect bounds))
+        {
+            return bounds;
+        }
+
+        Size cellSize = ResolveCellSize(context, state, orientation);
+        double cellU = Math.Max(1, GetU(cellSize, orientation));
+        double cellV = Math.Max(1, GetV(cellSize, orientation));
+        double spacingU = state.SpacingU >= 0 ? state.SpacingU : Math.Max(0, GetSpacingU(orientation));
+        double spacingV = ResolveSpacingV(state, orientation);
+        double availableU = IsFinitePositive(state.AvailableU)
+            ? state.AvailableU
+            : Math.Max(1, GetU(viewport.Size, orientation));
+        int line = index / itemsPerLine;
+        int lineStart = line * itemsPerLine;
+        int lineItemCount = Math.Min(itemsPerLine, context.ItemCount - lineStart);
+        GetLineAlignment(availableU, cellU, spacingU, lineItemCount, out double startU, out double effectiveSpacingU);
+        double u = startU + ((index - lineStart) * (cellU + effectiveSpacingU));
+        double v = line * (cellV + spacingV);
+        return ToRect(u, v, cellU, cellV, orientation);
+    }
+
+    private double ResolveSpacingV(State state, DataGridLayoutOrientation orientation) =>
+        state.SpacingV >= 0 ? state.SpacingV : Math.Max(0, GetSpacingV(orientation));
 
     private Size ResolveBaseCellSize(IDataGridLayoutContext context, Size availableSize, State state)
     {
@@ -253,5 +405,8 @@ internal sealed class DataGridUniformGridLayoutAlgorithm : IDataGridLayoutAlgori
         public Size NaturalCellSize { get; set; }
         public Size CellSize { get; set; }
         public int ItemsPerLine { get; set; }
+        public double AvailableU { get; set; } = double.NaN;
+        public double SpacingU { get; set; } = -1;
+        public double SpacingV { get; set; } = -1;
     }
 }

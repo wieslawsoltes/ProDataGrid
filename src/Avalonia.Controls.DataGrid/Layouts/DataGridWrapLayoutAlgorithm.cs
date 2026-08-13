@@ -7,7 +7,7 @@ using System.Collections.Specialized;
 
 namespace Avalonia.Controls.DataGridLayouts;
 
-internal sealed class DataGridWrapLayoutAlgorithm : IDataGridLayoutAlgorithm
+internal sealed class DataGridWrapLayoutAlgorithm : IDataGridLayoutAlgorithm, IDataGridLayoutNavigation
 {
     private readonly DataGridWrapLayoutModel _model;
 
@@ -162,6 +162,264 @@ internal sealed class DataGridWrapLayoutAlgorithm : IDataGridLayoutAlgorithm
     {
     }
 
+    public bool TryResolveNavigation(
+        IDataGridLayoutContext context,
+        in DataGridLayoutNavigationRequest request,
+        out DataGridLayoutNavigationResult result)
+    {
+        result = default;
+        int itemCount = context.ItemCount;
+        int current = request.CurrentItemIndex;
+        if (current < 0 || current >= itemCount)
+        {
+            return false;
+        }
+
+        State state = GetState(context);
+        DataGridLayoutOrientation orientation = _model.Orientation;
+        double spacingU = Math.Max(0, GetSpacingU(orientation));
+        double spacingV = Math.Max(0, GetSpacingV(orientation));
+        double availableU = IsFinitePositive(state.AvailableU)
+            ? state.AvailableU
+            : Math.Max(1, GetU(request.Viewport.Size, orientation));
+        state.EnsureEstimates(context.GetEstimatedItemSize(current), orientation);
+        int estimatedItemsPerLine = Math.Max(
+            1,
+            (int)Math.Floor((availableU + spacingU) / (Math.Max(1, state.AverageItemU) + spacingU)));
+
+        LineInfo currentLine = state.TryFindLineForItem(current, out LineInfo cachedCurrentLine)
+            ? cachedCurrentLine
+            : EstimateLine(current, itemCount, estimatedItemsPerLine, state, spacingV);
+        int target;
+
+        switch (request.Direction)
+        {
+            case DataGridLayoutNavigationDirection.Left when orientation == DataGridLayoutOrientation.Horizontal:
+            case DataGridLayoutNavigationDirection.Up when orientation == DataGridLayoutOrientation.Vertical:
+                target = current > currentLine.FirstIndex ? current - 1 : -1;
+                break;
+            case DataGridLayoutNavigationDirection.Right when orientation == DataGridLayoutOrientation.Horizontal:
+            case DataGridLayoutNavigationDirection.Down when orientation == DataGridLayoutOrientation.Vertical:
+                target = current < currentLine.LastIndex ? current + 1 : -1;
+                break;
+            case DataGridLayoutNavigationDirection.Up when orientation == DataGridLayoutOrientation.Horizontal:
+            case DataGridLayoutNavigationDirection.Left when orientation == DataGridLayoutOrientation.Vertical:
+                target = FindCrossLineTarget(
+                    context,
+                    state,
+                    currentLine,
+                    previous: true,
+                    request.NavigationAnchor,
+                    orientation,
+                    estimatedItemsPerLine,
+                    itemCount,
+                    spacingU,
+                    spacingV);
+                break;
+            case DataGridLayoutNavigationDirection.Down when orientation == DataGridLayoutOrientation.Horizontal:
+            case DataGridLayoutNavigationDirection.Right when orientation == DataGridLayoutOrientation.Vertical:
+                target = FindCrossLineTarget(
+                    context,
+                    state,
+                    currentLine,
+                    previous: false,
+                    request.NavigationAnchor,
+                    orientation,
+                    estimatedItemsPerLine,
+                    itemCount,
+                    spacingU,
+                    spacingV);
+                break;
+            case DataGridLayoutNavigationDirection.LineStart:
+                target = currentLine.FirstIndex;
+                break;
+            case DataGridLayoutNavigationDirection.LineEnd:
+                target = currentLine.LastIndex;
+                break;
+            case DataGridLayoutNavigationDirection.PageUp:
+            case DataGridLayoutNavigationDirection.PageDown:
+                target = FindPageTarget(
+                    context,
+                    state,
+                    currentLine,
+                    request,
+                    orientation,
+                    estimatedItemsPerLine,
+                    itemCount,
+                    spacingU,
+                    spacingV);
+                break;
+            case DataGridLayoutNavigationDirection.First:
+                target = 0;
+                break;
+            case DataGridLayoutNavigationDirection.Last:
+                target = itemCount - 1;
+                break;
+            default:
+                return false;
+        }
+
+        if (target < 0 || target >= itemCount || target == current)
+        {
+            return false;
+        }
+
+        result = new DataGridLayoutNavigationResult(
+            target,
+            GetEstimatedBounds(
+                context,
+                state,
+                target,
+                orientation,
+                estimatedItemsPerLine,
+                itemCount,
+                spacingU,
+                spacingV));
+        return true;
+    }
+
+    private static int FindCrossLineTarget(
+        IDataGridLayoutContext context,
+        State state,
+        LineInfo currentLine,
+        bool previous,
+        Point navigationAnchor,
+        DataGridLayoutOrientation orientation,
+        int estimatedItemsPerLine,
+        int itemCount,
+        double spacingU,
+        double spacingV)
+    {
+        LineInfo targetLine;
+        if (!state.TryFindAdjacentLine(currentLine, previous, out targetLine))
+        {
+            int lineNumber = currentLine.FirstIndex / estimatedItemsPerLine + (previous ? -1 : 1);
+            if (lineNumber < 0 || lineNumber * estimatedItemsPerLine >= itemCount)
+            {
+                return -1;
+            }
+            targetLine = EstimateLine(lineNumber * estimatedItemsPerLine, itemCount, estimatedItemsPerLine, state, spacingV);
+        }
+
+        return FindClosestItemOnLine(
+            context,
+            state,
+            targetLine,
+            navigationAnchor,
+            orientation,
+            spacingU);
+    }
+
+    private static int FindPageTarget(
+        IDataGridLayoutContext context,
+        State state,
+        LineInfo currentLine,
+        in DataGridLayoutNavigationRequest request,
+        DataGridLayoutOrientation orientation,
+        int estimatedItemsPerLine,
+        int itemCount,
+        double spacingU,
+        double spacingV)
+    {
+        bool forward = request.Direction == DataGridLayoutNavigationDirection.PageDown;
+        double viewportV = Math.Max(1, GetV(request.Viewport.Size, orientation));
+        double desiredV = Math.Max(0, currentLine.V + (forward ? viewportV : -viewportV));
+        LineInfo targetLine;
+        if (!state.TryFindLineAt(desiredV, out targetLine))
+        {
+            double lineAdvance = Math.Max(1, state.AverageLineV) + spacingV;
+            int lineDelta = Math.Max(1, (int)Math.Round(viewportV / lineAdvance));
+            int currentLineNumber = currentLine.FirstIndex / estimatedItemsPerLine;
+            int targetLineNumber = Math.Max(0, currentLineNumber + (forward ? lineDelta : -lineDelta));
+            int firstIndex = Math.Min(itemCount - 1, targetLineNumber * estimatedItemsPerLine);
+            targetLine = EstimateLine(firstIndex, itemCount, estimatedItemsPerLine, state, spacingV);
+        }
+
+        return FindClosestItemOnLine(
+            context,
+            state,
+            targetLine,
+            request.NavigationAnchor,
+            orientation,
+            spacingU);
+    }
+
+    private static int FindClosestItemOnLine(
+        IDataGridLayoutContext context,
+        State state,
+        LineInfo line,
+        Point navigationAnchor,
+        DataGridLayoutOrientation orientation,
+        double spacingU)
+    {
+        double anchorU = orientation == DataGridLayoutOrientation.Horizontal
+            ? navigationAnchor.X
+            : navigationAnchor.Y;
+        int bestIndex = line.FirstIndex;
+        double bestDistance = double.PositiveInfinity;
+        for (int index = line.FirstIndex; index <= line.LastIndex; index++)
+        {
+            double centerU;
+            if (context.TryGetLayoutBounds(index, out Rect bounds))
+            {
+                centerU = orientation == DataGridLayoutOrientation.Horizontal
+                    ? bounds.Center.X
+                    : bounds.Center.Y;
+            }
+            else
+            {
+                centerU = ((index - line.FirstIndex) * (Math.Max(1, state.AverageItemU) + spacingU)) +
+                    (Math.Max(1, state.AverageItemU) / 2);
+            }
+
+            double distance = Math.Abs(centerU - anchorU);
+            if (distance < bestDistance)
+            {
+                bestDistance = distance;
+                bestIndex = index;
+            }
+        }
+        return bestIndex;
+    }
+
+    private static LineInfo EstimateLine(
+        int itemIndex,
+        int itemCount,
+        int itemsPerLine,
+        State state,
+        double spacingV)
+    {
+        int lineNumber = Math.Max(0, itemIndex / itemsPerLine);
+        int first = lineNumber * itemsPerLine;
+        int last = Math.Min(itemCount - 1, first + itemsPerLine - 1);
+        double lineV = Math.Max(1, state.AverageLineV);
+        return new LineInfo(first, last, lineNumber * (lineV + spacingV), lineV, last - first + 1);
+    }
+
+    private static Rect GetEstimatedBounds(
+        IDataGridLayoutContext context,
+        State state,
+        int itemIndex,
+        DataGridLayoutOrientation orientation,
+        int estimatedItemsPerLine,
+        int itemCount,
+        double spacingU,
+        double spacingV)
+    {
+        if (context.TryGetLayoutBounds(itemIndex, out Rect bounds))
+        {
+            return bounds;
+        }
+
+        LineInfo line = state.TryFindLineForItem(itemIndex, out LineInfo cachedLine)
+            ? cachedLine
+            : EstimateLine(itemIndex, itemCount, estimatedItemsPerLine, state, spacingV);
+        double sizeU = Math.Max(1, state.AverageItemU);
+        double sizeV = Math.Max(1, state.AverageItemV);
+        double u = (itemIndex - line.FirstIndex) * (sizeU + spacingU);
+        return ToRect(u, line.V, sizeU, sizeV, orientation);
+    }
+
     private double GetSpacingU(DataGridLayoutOrientation orientation) =>
         orientation == DataGridLayoutOrientation.Horizontal ? _model.HorizontalSpacing : _model.VerticalSpacing;
 
@@ -263,6 +521,56 @@ internal sealed class DataGridWrapLayoutAlgorithm : IDataGridLayoutAlgorithm
         public double AverageLineV { get; private set; }
         public double AverageItemsPerLine { get; private set; }
         public double MaximumUsedU { get; set; }
+        public double AvailableU => _availableU;
+
+        public bool TryFindLineForItem(int itemIndex, out LineInfo line)
+        {
+            for (int index = 0; index < _lines.Count; index++)
+            {
+                LineInfo candidate = _lines[index];
+                if (itemIndex >= candidate.FirstIndex && itemIndex <= candidate.LastIndex)
+                {
+                    line = candidate;
+                    return true;
+                }
+            }
+            line = default;
+            return false;
+        }
+
+        public bool TryFindAdjacentLine(LineInfo current, bool previous, out LineInfo line)
+        {
+            LineInfo? best = null;
+            for (int index = 0; index < _lines.Count; index++)
+            {
+                LineInfo candidate = _lines[index];
+                if (previous ? candidate.LastIndex < current.FirstIndex : candidate.FirstIndex > current.LastIndex)
+                {
+                    if (!best.HasValue ||
+                        (previous ? candidate.LastIndex > best.Value.LastIndex : candidate.FirstIndex < best.Value.FirstIndex))
+                    {
+                        best = candidate;
+                    }
+                }
+            }
+            line = best.GetValueOrDefault();
+            return best.HasValue;
+        }
+
+        public bool TryFindLineAt(double v, out LineInfo line)
+        {
+            for (int index = 0; index < _lines.Count; index++)
+            {
+                LineInfo candidate = _lines[index];
+                if (v >= candidate.V && v <= candidate.V + candidate.SizeV)
+                {
+                    line = candidate;
+                    return true;
+                }
+            }
+            line = default;
+            return false;
+        }
 
         public void EnsureParameters(
             DataGridLayoutOrientation orientation,

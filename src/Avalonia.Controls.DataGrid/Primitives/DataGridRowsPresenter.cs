@@ -94,6 +94,7 @@ internal
 
         protected override void OnDetachedFromVisualTree(VisualTreeAttachmentEventArgs e)
         {
+            OnLayoutPresenterDetached();
             UnhookTopLevel();
             _measureConstraints.Clear();
             base.OnDetachedFromVisualTree(e);
