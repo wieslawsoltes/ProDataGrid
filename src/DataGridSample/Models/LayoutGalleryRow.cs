@@ -12,4 +12,6 @@ public sealed class LayoutGalleryRow
     public string Title { get; init; } = string.Empty;
 
     public string Notes { get; init; } = string.Empty;
+
+    public double CardWidth { get; init; }
 }
