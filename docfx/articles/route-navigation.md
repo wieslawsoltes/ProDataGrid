@@ -186,6 +186,11 @@ model through a framework mapping matrix. It complements the end-to-end Reactive
 page and the production adapter recipes above without adding Prism or Toolkit
 dependencies to the core package.
 
+Key, pointer, remote, gamepad, or wheel gestures can also request these route
+operations through a bound `IDataGridNavigationInputModel`. The input layer returns
+`NavigateRoute(kind)`; route resolution and the native framework adapter remain in
+this asynchronous pipeline. See [navigation input model](navigation-input-model.md).
+
 ## Guards, cancellation, and concurrency
 
 - Use `NavigationChanging` for synchronous cancellation or route replacement.

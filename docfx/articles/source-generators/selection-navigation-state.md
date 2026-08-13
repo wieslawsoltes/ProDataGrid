@@ -149,33 +149,53 @@ Override `CreateGeneratedNavigationInteractionHandler` for application navigatio
 
 ## Navigation model generation
 
-Opt into a per-ViewModel cell navigation model and ask the generated view to bind
-both cell and application-route models:
+Opt into per-ViewModel cell and input navigation models and ask the generated view
+to bind cell, input, and application-route models:
 
 ```csharp
 [GenerateDataGridViewModel(
     typeof(Trade),
     ProviderName = "TradeSchema",
     GenerateNavigationModel = true,
-    NavigationModelPropertyName = nameof(NavigationModel))]
+    NavigationModelPropertyName = nameof(NavigationModel),
+    GenerateNavigationInputModel = true,
+    NavigationInputModelPropertyName = nameof(NavigationInputModel))]
 [GenerateDataGridView(
     typeof(Trade),
     NavigationModelPropertyName = nameof(NavigationModel),
+    NavigationInputModelPropertyName = nameof(NavigationInputModel),
     RouteNavigationModelPropertyName = nameof(RouteNavigationModel))]
 public sealed partial class TradesViewModel : ReactiveObject
 {
     public IDataGridRouteNavigationModel RouteNavigationModel { get; }
+
+    public TradesViewModel()
+    {
+        NavigationInputModel.SetBindings(
+            DataGridNavigationInputBinding.KeyDown(
+                DataGridNavigationInputKey.J,
+                DataGridNavigationInputResult.Navigate(
+                    DataGridNavigationCommand.Down)));
+    }
 }
 ```
 
 The generator emits:
 
 - `TradeSchema.CreateNavigationModel()`;
+- `TradeSchema.CreateNavigationInputModel()`;
 - `TradeSchema.CreateRouteNavigationModel(resolver, navigator)`;
 - the `NavigationModel` property when `GenerateNavigationModel = true`;
-- reflection-free compiled bindings to `DataGrid.NavigationModel` and
-  `DataGrid.RouteNavigationModel`;
+- the `NavigationInputModel` property when
+  `GenerateNavigationInputModel = true`;
+- reflection-free direct bindings to `DataGrid.NavigationModel`,
+  `DataGrid.NavigationInputModel`, and `DataGrid.RouteNavigationModel`;
 - `PDGSG141` when a configured member does not implement the required interface.
+
+`GenerateDataGridViewModelsForNamespace` and
+`GenerateDataGridViewsForNamespace` expose the same input-model options for
+namespace policy. A manual view-model property is accepted when it implements
+`IDataGridNavigationInputModel`.
 
 The route property stays application-owned because its resolver, native navigator,
 scope, and history lifetime belong in the composition root. The schema factory
@@ -190,8 +210,10 @@ multiple generated grids.
 above. It can coexist with the new model properties and should be retained when the
 ViewModel needs item-key current-cell lookup, bring-into-view, or scroll snapshots.
 
-The `GeneratedNavigationPage` sample exercises both generated models and both
-compiled bindings as a real application consumer.
+The `GeneratedNavigationPage` sample exercises generated cell/input models, the
+route factory, and all three generated bindings as a real application consumer. Its
+ViewModel configures logical and physical keys, dynamic resolution, pointer target
+navigation, and wheel-driven route history.
 
 ## Transactional selection events
 

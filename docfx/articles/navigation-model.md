@@ -51,6 +51,11 @@ Keyboard gestures are translated to these operations before policy runs. Existin
 `KeyboardGestureOverrides`, `EnterKeyNavigationMode`, and
 `ContinueEditingOnEnter` settings remain in effect.
 
+For ViewModel-owned key, pointer, physical-key, or wheel mappings, bind an
+`IDataGridNavigationInputModel`. It resolves framework-neutral input to one of these
+semantic commands before cell policy runs. See the
+[navigation input model](navigation-input-model.md).
+
 ## ViewModel commands
 
 `DataGridNavigationModel` implements `IDataGridNavigationController`. Its request
@@ -191,7 +196,9 @@ interaction inside a cell while preserving Avalonia focus and routed-input rules
 The gallery includes focused pages for basics, boundary and RTL policy, editing and
 selection, frozen/reordered/hidden columns, custom policy, hierarchy, state,
 framework-neutral routes, ReactiveUI routing, an executable MVVM framework wiring
-matrix, and source-generated navigation.
+matrix, and source-generated cell/input/route navigation. The generated sample maps
+logical and physical keys, pointer targets, and wheel history entirely in its
+ViewModel.
 
 ## Migrating existing grids
 
@@ -203,7 +210,8 @@ small steps:
 2. replace view event handlers with `RequestNavigate` calls from ViewModel commands;
 3. move boundary and Tab choices into model properties;
 4. override `ResolveCore` only for application-specific policy;
-5. add a separate `RouteNavigationModel` when row activation must change screens.
+5. add a bound `NavigationInputModel` when gestures must be ViewModel-owned; and
+6. add a separate `RouteNavigationModel` when row activation must change screens.
 
 `NavigationInteractionPropertyName` remains the source generator's legacy
 selection/current-cell callback. It can coexist with the new cell policy property
@@ -212,6 +220,7 @@ and application route property during migration.
 See also:
 
 - [Navigation model design](navigation-model-design.md)
+- [Navigation input model](navigation-input-model.md)
 - [Route navigation and MVVM frameworks](route-navigation.md)
 - [Source-generated navigation](source-generators/selection-navigation-state.md#navigation-model-generation)
 - [WAI-ARIA grid pattern](https://www.w3.org/WAI/ARIA/apg/patterns/grid/)

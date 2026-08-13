@@ -205,6 +205,8 @@
     href: selection-and-navigation.md
   - name: Navigation Model
     href: navigation-model.md
+  - name: Navigation Input Model
+    href: navigation-input-model.md
   - name: Route Navigation and MVVM Frameworks
     href: route-navigation.md
   - name: Navigation Model Design

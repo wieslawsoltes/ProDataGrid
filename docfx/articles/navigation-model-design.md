@@ -4,12 +4,13 @@ Status: implemented architecture for the model-driven DataGrid navigation subsys
 
 ## Purpose
 
-ProDataGrid already has mature keyboard movement, current-cell, selection, editing,
+ProDataGrid already has mature input movement, current-cell, selection, editing,
 grouping, hierarchy, and virtualization behavior. The navigation model adds two
-composable boundaries around that engine:
+composable policy boundaries around that engine plus an optional input adapter:
 
-1. cell navigation resolves fast, synchronous movement inside the grid; and
-2. route navigation resolves a stable row/column context into an asynchronous
+1. input navigation normalizes key, pointer, and wheel events into semantic intent;
+2. cell navigation resolves fast, synchronous movement inside the grid; and
+3. route navigation resolves a stable row/column context into an asynchronous
    application route.
 
 Applications can observe, cancel, redirect, or programmatically issue either kind of
@@ -40,13 +41,28 @@ The public contract combines the strongest conventions from established grids:
   applications inject an application-defined navigation service and expose async
   commands, so no Toolkit-specific router type can be assumed.
 
-The resulting ProDataGrid contract is input-independent, model-driven, observable,
-and compatible with Avalonia routed input and focus management.
+The resulting ProDataGrid policy and route contracts remain input-independent. The
+optional input model consumes only normalized value objects, so all three layers are
+model-driven, observable, and compatible with Avalonia routed input and focus
+management without leaking UI objects into ViewModels.
 
 ## Architectural boundary
 
 ```text
-keyboard / command / application API
+key / pointer / wheel
+          |
+          v
+DataGridNavigationInputRequest
+          |
+          v
+IDataGridNavigationInputModel
+          |
+          v
+semantic command / explicit target / route operation
+          |
+          +-------------------------------+
+          v                               v
+command / application API       IDataGridRouteNavigationModel
                  |
                  v
        DataGridNavigationRequest
@@ -70,6 +86,12 @@ keyboard / command / application API
 The cell model decides policy; the grid owns mechanics. In particular, the model does not
 realize rows, mutate selection collections, commit editors, or calculate scroll
 offsets. This keeps virtualization and layout out of application ViewModels.
+
+The input request also contains no event args or visual objects. DataGrid performs
+routed-input normalization and semantic hit testing once, then delegates the stable
+request to the ViewModel model. `Ignore` preserves editor/legacy handling; handled
+semantic results enter the existing navigation pipeline once, so edit, boundary,
+selection, and layout policy are never double-resolved.
 
 Application routing is a separate, opt-in pipeline:
 
@@ -105,6 +127,12 @@ synchronous and allocation-free.
 ## Public API shape
 
 The new `Avalonia.Controls.DataGridNavigation` namespace contains:
+
+- `IDataGridNavigationInputModel`, `DataGridNavigationInputModel`, immutable input
+  requests/results, ordered key/pointer/wheel bindings, logical and physical keys,
+  modifiers, device kinds, and semantic target kinds. This optional layer translates
+  normalized input to cell commands, explicit targets, or route operations without
+  routed-event or visual-tree objects.
 
 - `DataGridNavigationCommand`: semantic operations such as Up, Down, Left, Right,
   PageUp, PageDown, RowStart, RowEnd, GridStart, GridEnd, Next, Previous, Enter,
@@ -153,6 +181,7 @@ The same namespace contains a distinct route family:
 
 `DataGrid` adds:
 
+- `NavigationInputModel` for key, pointer, and wheel policy binding.
 - `NavigationModel` for binding or direct assignment.
 - `NavigationModelFactory` and `CreateNavigationModel()` for composition roots and
   control subclasses.
@@ -162,7 +191,8 @@ The same namespace contains a distinct route family:
 The existing `KeyboardGestureOverrides`, `EnterKeyNavigationMode`, and
 `ContinueEditingOnEnter` APIs remain supported. Gesture mapping determines the
 semantic command; the navigation model determines policy; the existing movement
-engine applies the result.
+engine applies the result. An input-model `Ignore` decision deliberately falls back
+to those existing mappings.
 
 ## Framework adapter contract
 
@@ -205,6 +235,7 @@ The implementation and samples cover:
 | Focus | One tab stop, entry/exit, descendant editors, nested grids |
 | Accessibility | Current-cell focus, automation updates, no keyboard trap |
 | Programmatic | MVVM command navigation, cancellation, redirection, completion telemetry |
+| Input | Logical/physical keys, modifiers, key devices, pointer hit targets, wheel routes, editor fallback |
 | State | Optional current-cell/model policy capture with stable item/column keys |
 | Routes | Row/cell activation, stable paths, parameters, target regions, guards, cancellation |
 | History | Navigate, replace, reset, back, forward, deep-link restoration |
@@ -269,9 +300,10 @@ The gallery receives focused pages rather than one overloaded demo:
     route resolver and ViewModel tests.
 
 All pages use compiled bindings with explicit `x:DataType`; code-behind contains only
-`InitializeComponent()`.
+`InitializeComponent()`. The source-generated page also demonstrates a ViewModel-owned
+input table and dynamic resolver without a behavior or template override.
 
-The source generator additionally emits cell and route model factories, an opt-in
-cell-controller property, compiled bindings for both models, and `PDGSG141` contract
-validation. Its pre-existing `NavigationInteractionPropertyName` remains a separate
+The source generator additionally emits cell, input, and route model factories,
+opt-in cell/input properties, compiled bindings for all three models, and `PDGSG141`
+contract validation. Its pre-existing `NavigationInteractionPropertyName` remains a separate
 activated-view current-cell/scroll bridge and may coexist with both model bindings.
