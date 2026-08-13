@@ -156,6 +156,8 @@ All geometry in `DataGridLayoutNavigationRequest` and `DataGridLayoutNavigationR
 
 A supported direction that returns no target means a real layout boundary. An unsupported direction remains available to classic DataGrid cell navigation. This distinction is important for a vertical stack: it owns vertical/page movement but leaves horizontal cell movement intact.
 
+When the active boundary policy is `Wrap`, a layout-owned spatial boundary wraps in layout space: `Left` continues from `LineEnd`, `Right` from `LineStart`, `Up` from `Last`, and `Down` from `First`. An unsupported direction still uses classic DataGrid cell-axis wrapping. Logical RTL redirection resolves fresh layout geometry and does not apply the boundary policy a second time.
+
 The built-in uniform and wrap layouts preserve the cross-axis anchor while moving between lines. Page navigation uses viewport displacement and may return estimated bounds for a non-realized item. `ScrollIntoView` then uses the layout session to realize and refine the target.
 
 ## Grouping, selection, and editing
