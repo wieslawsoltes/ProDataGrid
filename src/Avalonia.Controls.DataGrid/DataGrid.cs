@@ -346,6 +346,7 @@ internal
         private IDataGridNavigationModelFactory _navigationModelFactory;
         private IDataGridNavigationInputModel _navigationInputModel;
         private IDataGridRouteNavigationModel _routeNavigationModel;
+        private IDataGridRouteContextFactory _routeContextFactory;
         private readonly Dictionary<SearchCellKey, SearchResult> _searchResultsMap = new();
         private readonly HashSet<int> _searchRowMatches = new();
         private SearchCellKey? _currentSearchCell;
@@ -2617,9 +2618,26 @@ internal
                     return;
                 }
 
-                IDataGridRouteNavigationModel oldModel = _routeNavigationModel;
-                _routeNavigationModel = value;
-                RaisePropertyChanged(RouteNavigationModelProperty, oldModel, value);
+                SetRouteNavigationModel(value);
+            }
+        }
+
+        /// <summary>
+        /// Gets or sets the optional factory that enriches route contexts with stable item keys.
+        /// </summary>
+        public IDataGridRouteContextFactory RouteContextFactory
+        {
+            get => _routeContextFactory;
+            set
+            {
+                if (ReferenceEquals(_routeContextFactory, value))
+                {
+                    return;
+                }
+
+                IDataGridRouteContextFactory oldFactory = _routeContextFactory;
+                _routeContextFactory = value;
+                RaisePropertyChanged(RouteContextFactoryProperty, oldFactory, value);
             }
         }
 
@@ -5839,6 +5857,61 @@ internal
                 e.Origin,
                 e.Modifiers,
                 allowCtrlForTab: false);
+        }
+
+        private void SetRouteNavigationModel(IDataGridRouteNavigationModel model)
+        {
+            IDataGridRouteNavigationModel oldModel = _routeNavigationModel;
+            if (ReferenceEquals(oldModel, model))
+            {
+                return;
+            }
+
+            if (oldModel is IDataGridRouteNavigationController oldController)
+            {
+                WeakEventHandlerManager.Unsubscribe<DataGridRouteNavigationRequestedEventArgs, DataGrid>(
+                    oldController,
+                    nameof(IDataGridRouteNavigationController.NavigationRequested),
+                    RouteNavigationController_NavigationRequested);
+            }
+
+            _routeNavigationModel = model;
+            if (model is IDataGridRouteNavigationController newController)
+            {
+                WeakEventHandlerManager.Subscribe<IDataGridRouteNavigationController, DataGridRouteNavigationRequestedEventArgs, DataGrid>(
+                    newController,
+                    nameof(IDataGridRouteNavigationController.NavigationRequested),
+                    RouteNavigationController_NavigationRequested);
+            }
+
+            RaisePropertyChanged(RouteNavigationModelProperty, oldModel, _routeNavigationModel);
+        }
+
+        private void RouteNavigationController_NavigationRequested(
+            object sender,
+            DataGridRouteNavigationRequestedEventArgs e)
+        {
+            if (e.Handled || _routeNavigationModel == null)
+            {
+                return;
+            }
+
+            DataGridRouteContext context = e.Kind is DataGridRouteNavigationKind.Back or DataGridRouteNavigationKind.Forward
+                ? new DataGridRouteContext(
+                    null,
+                    null,
+                    null,
+                    DataGridNavigationPosition.Unset,
+                    e.Origin,
+                    hasItem: false)
+                : GetCurrentRouteContext(e.Origin);
+            if (!_routeNavigationModel.CanNavigate(e.Kind, context))
+            {
+                return;
+            }
+
+            e.Handled = true;
+            _ = _routeNavigationModel.NavigateAsync(e.Kind, context);
         }
 
         private void FilteringModel_PropertyChanged(object sender, PropertyChangedEventArgs e)

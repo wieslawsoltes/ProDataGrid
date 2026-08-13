@@ -222,7 +222,7 @@ namespace Avalonia.Controls
                             result.Target);
                     break;
                 case DataGridNavigationInputDecision.NavigateRoute:
-                    navigationHandled = TryNavigateRouteFromInput(result.RouteKind, request.Kind);
+                    navigationHandled = TryNavigateRouteFromInput(result.RouteKind, request);
                     break;
                 default:
                     navigationHandled = false;
@@ -240,7 +240,7 @@ namespace Avalonia.Controls
 
         private bool TryNavigateRouteFromInput(
             DataGridRouteNavigationKind kind,
-            DataGridNavigationInputKind inputKind)
+            in DataGridNavigationInputRequest input)
         {
             IDataGridRouteNavigationModel model = RouteNavigationModel;
             if (model == null)
@@ -248,19 +248,36 @@ namespace Avalonia.Controls
                 return false;
             }
 
-            DataGridRouteNavigationOrigin origin = inputKind is DataGridNavigationInputKind.KeyDown or
+            DataGridRouteNavigationOrigin origin = input.Kind is DataGridNavigationInputKind.KeyDown or
                 DataGridNavigationInputKind.KeyUp
                     ? DataGridRouteNavigationOrigin.Keyboard
                     : DataGridRouteNavigationOrigin.Pointer;
-            DataGridRouteContext context = kind is DataGridRouteNavigationKind.Back or DataGridRouteNavigationKind.Forward
-                ? DataGridRouteContext.Empty
-                : GetCurrentRouteContext(origin);
+            DataGridRouteContext context;
+            if (kind is DataGridRouteNavigationKind.Back or DataGridRouteNavigationKind.Forward)
+            {
+                context = new DataGridRouteContext(
+                    null,
+                    null,
+                    null,
+                    DataGridNavigationPosition.Unset,
+                    origin,
+                    hasItem: false);
+            }
+            else
+            {
+                bool pointerInput = input.Kind is DataGridNavigationInputKind.PointerPressed or
+                    DataGridNavigationInputKind.PointerReleased or
+                    DataGridNavigationInputKind.PointerWheel;
+                context = pointerInput && input.TargetPosition.IsValid
+                    ? GetRouteContext(input.TargetPosition, origin)
+                    : GetCurrentRouteContext(origin);
+            }
             if (!model.CanNavigate(kind, context))
             {
                 return false;
             }
 
-            _ = NavigateRouteAsync(kind, origin);
+            _ = model.NavigateAsync(kind, context);
             return true;
         }
 

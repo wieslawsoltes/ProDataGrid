@@ -280,6 +280,59 @@ public class DataGridRouteNavigationModelTests
     }
 
     [AvaloniaFact]
+    public void Grid_Route_Context_Factory_Enriches_Current_And_Explicit_Cell_Context()
+    {
+        (DataGrid grid, Row row) = CreateGrid();
+        grid.RouteContextFactory = new DataGridRouteContextFactory(item => ((Row)item).Id);
+
+        DataGridRouteContext current = grid.GetCurrentRouteContext(DataGridRouteNavigationOrigin.Command);
+        DataGridRouteContext explicitContext = grid.GetRouteContext(
+            new DataGridNavigationPosition(0, 0),
+            DataGridRouteNavigationOrigin.Pointer);
+
+        Assert.Equal(row.Id, current.ItemKey);
+        Assert.Equal(row.Id, explicitContext.ItemKey);
+        Assert.Equal(DataGridRouteNavigationOrigin.Pointer, explicitContext.Origin);
+    }
+
+    [AvaloniaFact]
+    public void ViewModel_Route_Request_Is_Executed_By_Grid_With_Current_Cell_Context()
+    {
+        (DataGrid grid, Row row) = CreateGrid();
+        DataGridRouteNavigationModel model = CreateModel(
+            DataGridRouteNavigationCapabilities.All,
+            out RecordingNavigator navigator);
+        grid.RouteContextFactory = new DataGridRouteContextFactory(item => ((Row)item).Id);
+        grid.RouteNavigationModel = model;
+
+        bool handled = model.RequestNavigate(DataGridRouteNavigationKind.Navigate);
+
+        Assert.True(handled);
+        Assert.Equal(row.Id, navigator.LastRequest.Context.ItemKey);
+        Assert.Equal(new DataGridNavigationPosition(0, 0), navigator.LastRequest.Context.Position);
+        Assert.Equal(DataGridRouteNavigationOrigin.Command, navigator.LastRequest.Context.Origin);
+    }
+
+    [AvaloniaFact]
+    public void Replacing_Route_Model_Detaches_Grid_Controller_From_Old_Model()
+    {
+        (DataGrid grid, _) = CreateGrid();
+        DataGridRouteNavigationModel oldModel = CreateModel(
+            DataGridRouteNavigationCapabilities.All,
+            out RecordingNavigator oldNavigator);
+        DataGridRouteNavigationModel newModel = CreateModel(
+            DataGridRouteNavigationCapabilities.All,
+            out RecordingNavigator newNavigator);
+        grid.RouteNavigationModel = oldModel;
+        grid.RouteNavigationModel = newModel;
+
+        Assert.False(oldModel.RequestNavigate(DataGridRouteNavigationKind.Navigate));
+        Assert.True(newModel.RequestNavigate(DataGridRouteNavigationKind.Navigate));
+        Assert.Equal(0, oldNavigator.CallCount);
+        Assert.Equal(1, newNavigator.CallCount);
+    }
+
+    [AvaloniaFact]
     public async Task Grid_NavigateRouteAsync_Uses_Bound_Model()
     {
         (DataGrid grid, _) = CreateGrid();

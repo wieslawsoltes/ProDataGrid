@@ -252,6 +252,62 @@ namespace Avalonia.Controls.DataGridNavigation
     }
 
     /// <summary>
+    /// Creates route contexts for a DataGrid without coupling ViewModels to the control instance.
+    /// </summary>
+#if !DATAGRID_INTERNAL
+    public
+#else
+    internal
+#endif
+    interface IDataGridRouteContextFactory
+    {
+        /// <summary>Creates a context for a data item and cell position.</summary>
+        DataGridRouteContext Create(
+            object item,
+            object columnKey,
+            DataGridNavigationPosition position,
+            DataGridRouteNavigationOrigin origin,
+            bool hasItem = true);
+    }
+
+    /// <summary>
+    /// Creates route contexts through an optional AOT-safe item-key selector.
+    /// </summary>
+#if !DATAGRID_INTERNAL
+    public
+#else
+    internal
+#endif
+    sealed class DataGridRouteContextFactory : IDataGridRouteContextFactory
+    {
+        private readonly Func<object, object> _itemKeySelector;
+
+        /// <summary>Initializes a context factory that preserves item references without a stable key.</summary>
+        public DataGridRouteContextFactory()
+        {
+        }
+
+        /// <summary>Initializes a context factory with a stable item-key selector.</summary>
+        /// <param name="itemKeySelector">Returns the stable key for a data item.</param>
+        public DataGridRouteContextFactory(Func<object, object> itemKeySelector)
+        {
+            _itemKeySelector = itemKeySelector ?? throw new ArgumentNullException(nameof(itemKeySelector));
+        }
+
+        /// <inheritdoc />
+        public DataGridRouteContext Create(
+            object item,
+            object columnKey,
+            DataGridNavigationPosition position,
+            DataGridRouteNavigationOrigin origin,
+            bool hasItem = true)
+        {
+            object itemKey = hasItem && item != null && _itemKeySelector != null ? _itemKeySelector(item) : null;
+            return new DataGridRouteContext(item, itemKey, columnKey, position, origin, hasItem);
+        }
+    }
+
+    /// <summary>
     /// Describes an application-route operation after grid context has been resolved.
     /// </summary>
 #if !DATAGRID_INTERNAL
@@ -422,6 +478,56 @@ namespace Avalonia.Controls.DataGridNavigation
     }
 
     /// <summary>
+    /// Lets a ViewModel request route navigation from the DataGrid bound to the model so the grid
+    /// supplies the authoritative current item, stable keys, and cell position.
+    /// </summary>
+#if !DATAGRID_INTERNAL
+    public
+#else
+    internal
+#endif
+    interface IDataGridRouteNavigationController
+    {
+        /// <summary>Raised when application code requests a grid-contextual route operation.</summary>
+        event EventHandler<DataGridRouteNavigationRequestedEventArgs> NavigationRequested;
+
+        /// <summary>Requests a route operation from the DataGrid bound to this model.</summary>
+        /// <param name="kind">The route or history operation.</param>
+        /// <param name="origin">The source of the request.</param>
+        /// <returns><see langword="true"/> when a bound DataGrid accepted the request.</returns>
+        bool RequestNavigate(
+            DataGridRouteNavigationKind kind,
+            DataGridRouteNavigationOrigin origin = DataGridRouteNavigationOrigin.Command);
+    }
+
+    /// <summary>Carries a ViewModel-issued route request to a bound DataGrid.</summary>
+#if !DATAGRID_INTERNAL
+    public
+#else
+    internal
+#endif
+    sealed class DataGridRouteNavigationRequestedEventArgs : EventArgs
+    {
+        /// <summary>Initializes a grid-contextual route request.</summary>
+        public DataGridRouteNavigationRequestedEventArgs(
+            DataGridRouteNavigationKind kind,
+            DataGridRouteNavigationOrigin origin)
+        {
+            Kind = kind;
+            Origin = origin;
+        }
+
+        /// <summary>Gets the requested operation.</summary>
+        public DataGridRouteNavigationKind Kind { get; }
+
+        /// <summary>Gets the request origin.</summary>
+        public DataGridRouteNavigationOrigin Origin { get; }
+
+        /// <summary>Gets or sets whether a bound DataGrid accepted the request.</summary>
+        public bool Handled { get; set; }
+    }
+
+    /// <summary>
     /// Provides cancelable preview data for a resolved application-route request.
     /// </summary>
 #if !DATAGRID_INTERNAL
@@ -478,7 +584,7 @@ namespace Avalonia.Controls.DataGridNavigation
 #else
     internal
 #endif
-    sealed class DataGridRouteNavigationModel : IDataGridRouteNavigationModel
+    sealed class DataGridRouteNavigationModel : IDataGridRouteNavigationModel, IDataGridRouteNavigationController
     {
         private readonly IDataGridRouteResolver _resolver;
         private readonly IDataGridRouteNavigator _navigator;
@@ -506,6 +612,9 @@ namespace Avalonia.Controls.DataGridNavigation
         public event EventHandler<DataGridRouteNavigationChangedEventArgs> NavigationChanged;
 
         /// <inheritdoc />
+        public event EventHandler<DataGridRouteNavigationRequestedEventArgs> NavigationRequested;
+
+        /// <inheritdoc />
         public event PropertyChangedEventHandler PropertyChanged;
 
         /// <inheritdoc />
@@ -516,6 +625,22 @@ namespace Avalonia.Controls.DataGridNavigation
 
         /// <inheritdoc />
         public DataGridRouteNavigationResult LastResult => _lastResult;
+
+        /// <inheritdoc />
+        public bool RequestNavigate(
+            DataGridRouteNavigationKind kind,
+            DataGridRouteNavigationOrigin origin = DataGridRouteNavigationOrigin.Command)
+        {
+            EventHandler<DataGridRouteNavigationRequestedEventArgs> handler = NavigationRequested;
+            if (handler == null)
+            {
+                return false;
+            }
+
+            var args = new DataGridRouteNavigationRequestedEventArgs(kind, origin);
+            handler(this, args);
+            return args.Handled;
+        }
 
         /// <inheritdoc />
         public bool CanNavigate(DataGridRouteNavigationKind kind, DataGridRouteContext context)

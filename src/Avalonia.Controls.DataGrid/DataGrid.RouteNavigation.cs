@@ -33,18 +33,55 @@ namespace Avalonia.Controls
                     hasItem: false);
             }
 
-            object columnKey = cell.Column.ColumnKey;
-            if (columnKey == null && !string.IsNullOrWhiteSpace(cell.Column.SortMemberPath))
-            {
-                columnKey = cell.Column.SortMemberPath;
-            }
-
-            return new DataGridRouteContext(
-                cell.Item,
-                null,
-                columnKey,
+            return GetRouteContext(
                 new DataGridNavigationPosition(cell.RowIndex, cell.Column.DisplayIndex),
                 origin);
+        }
+
+        /// <summary>Creates a framework-neutral route context for an explicit data-cell position.</summary>
+        /// <param name="position">The collection-view row and display-column indexes.</param>
+        /// <param name="origin">The route activation source.</param>
+        /// <returns>A context for the requested cell, or an empty context when it is invalid.</returns>
+        public DataGridRouteContext GetRouteContext(
+            DataGridNavigationPosition position,
+            DataGridRouteNavigationOrigin origin)
+        {
+            if (!position.IsValid || DataConnection == null ||
+                position.RowIndex >= DataConnection.Count ||
+                position.ColumnDisplayIndex >= ColumnsInternal.DisplayIndexMap.Count)
+            {
+                return new DataGridRouteContext(
+                    null,
+                    null,
+                    null,
+                    DataGridNavigationPosition.Unset,
+                    origin,
+                    hasItem: false);
+            }
+
+            DataGridColumn column = ColumnsInternal.GetColumnAtDisplayIndex(position.ColumnDisplayIndex);
+            if (column == null || column is DataGridFillerColumn || !column.IsVisible)
+            {
+                return new DataGridRouteContext(
+                    null,
+                    null,
+                    null,
+                    DataGridNavigationPosition.Unset,
+                    origin,
+                    hasItem: false);
+            }
+
+            object item = DataConnection.GetDataItem(position.RowIndex);
+            object columnKey = column.ColumnKey;
+            if (columnKey == null && !string.IsNullOrWhiteSpace(column.SortMemberPath))
+            {
+                columnKey = column.SortMemberPath;
+            }
+
+            IDataGridRouteContextFactory factory = RouteContextFactory;
+            return factory != null
+                ? factory.Create(item, columnKey, position, origin)
+                : new DataGridRouteContext(item, null, columnKey, position, origin);
         }
 
         /// <summary>

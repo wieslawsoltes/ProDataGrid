@@ -267,6 +267,51 @@ public class DataGridNavigationInputModelTests
     }
 
     [AvaloniaFact]
+    public void Pointer_Route_Uses_Clicked_Cell_Context_Instead_Of_Previous_Current_Cell()
+    {
+        Window window = CreateWindow(out DataGrid grid);
+        try
+        {
+            DataGridRouteNavigationRequest? routed = null;
+            var resolver = new DelegateDataGridRouteResolver(context =>
+                context.Item is Row row ? new DataGridRoute($"rows/{row.Id}") : null);
+            var navigator = new DelegateDataGridRouteNavigator(
+                DataGridRouteNavigationCapabilities.Navigate,
+                (request, _) =>
+                {
+                    routed = request;
+                    return ValueTask.FromResult(DataGridRouteNavigationResult.Success(request.Route));
+                });
+            grid.RouteNavigationModel = new DataGridRouteNavigationModel(resolver, navigator);
+            grid.RouteContextFactory = new DataGridRouteContextFactory(item => ((Row)item).Id);
+            grid.NavigationInputModel = new DataGridNavigationInputModel(
+                DataGridNavigationInputBinding.Pointer(
+                    DataGridNavigationInputKind.PointerReleased,
+                    DataGridNavigationPointerButton.Primary,
+                    DataGridNavigationInputResult.NavigateRoute(DataGridRouteNavigationKind.Navigate),
+                    targetKind: DataGridNavigationInputTargetKind.Cell));
+            SetCurrentCell(grid, 0, 0);
+            DataGridCell target = grid.GetVisualDescendants()
+                .OfType<DataGridCell>()
+                .Single(cell => cell.RowIndex == 2 && cell.OwningColumn?.DisplayIndex == 1);
+
+            PointerReleasedEventArgs args = CreatePointerReleasedArgs(target, window);
+            target.RaiseEvent(args);
+
+            Assert.True(args.Handled);
+            Assert.NotNull(routed);
+            Assert.Equal("rows/2", routed.Value.Route.Path);
+            Assert.Equal(2, routed.Value.Context.ItemKey);
+            Assert.Equal(new DataGridNavigationPosition(2, 1), routed.Value.Context.Position);
+            Assert.Equal(DataGridRouteNavigationOrigin.Pointer, routed.Value.Context.Origin);
+        }
+        finally
+        {
+            window.Close();
+        }
+    }
+
+    [AvaloniaFact]
     public void Wheel_Input_Can_Trigger_Application_History_Without_View_Code()
     {
         Window window = CreateWindow(out DataGrid grid);
@@ -388,6 +433,23 @@ public class DataGridNavigationInputModelTests
             properties,
             KeyModifiers.None,
             clickCount: 1);
+    }
+
+    private static PointerReleasedEventArgs CreatePointerReleasedArgs(Control source, Visual root)
+    {
+        var pointer = new Pointer(Pointer.GetNextFreeId(), PointerType.Mouse, isPrimary: true);
+        var properties = new PointerPointProperties(
+            RawInputModifiers.None,
+            PointerUpdateKind.LeftButtonReleased);
+        return new PointerReleasedEventArgs(
+            source,
+            pointer,
+            root,
+            new Point(source.Bounds.Width / 2, source.Bounds.Height / 2),
+            0,
+            properties,
+            KeyModifiers.None,
+            MouseButton.Left);
     }
 
     private sealed record Row(int Id, string Name);

@@ -1419,6 +1419,13 @@ internal
                 o => o.RouteNavigationModel,
                 (o, v) => o.RouteNavigationModel = v);
 
+        /// <summary>Identifies the <see cref="RouteContextFactory"/> direct property.</summary>
+        public static readonly DirectProperty<DataGrid, Avalonia.Controls.DataGridNavigation.IDataGridRouteContextFactory> RouteContextFactoryProperty =
+            AvaloniaProperty.RegisterDirect<DataGrid, Avalonia.Controls.DataGridNavigation.IDataGridRouteContextFactory>(
+                nameof(RouteContextFactory),
+                o => o.RouteContextFactory,
+                (o, v) => o.RouteContextFactory = v);
+
         /// <summary>
         /// Gets or sets the hierarchical model that drives tree-like rows. If not provided, a default
         /// hierarchical model is created.
