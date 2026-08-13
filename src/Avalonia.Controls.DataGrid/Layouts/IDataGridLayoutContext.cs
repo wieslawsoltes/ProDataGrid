@@ -21,7 +21,7 @@ interface IDataGridLayoutContext
     int ItemCount { get; }
 
     /// <summary>
-    /// Gets the viewport plus the configured realization cache in layout coordinates.
+    /// Gets the current realization window in layout coordinates.
     /// </summary>
     Rect RealizationRect { get; }
 
@@ -58,8 +58,13 @@ interface IDataGridLayoutContext
     Control GetOrCreateElementAt(int index);
 
     /// <summary>
-    /// Recycles a realized container that is no longer required.
+    /// Marks a realized container as no longer required by the algorithm.
     /// </summary>
+    /// <remarks>
+    /// DataGrid performs the actual container lifecycle work after measurement. Because its display
+    /// store is range-based, a marked container can remain realized when it lies between the lowest
+    /// and highest item indexes requested during the same measure pass.
+    /// </remarks>
     /// <param name="element">The container to recycle.</param>
     void RecycleElement(Control element);
 
