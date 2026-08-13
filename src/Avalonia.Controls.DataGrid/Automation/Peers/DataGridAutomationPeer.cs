@@ -32,7 +32,7 @@ class DataGridAutomationPeer : ControlAutomationPeer, ISelectionProvider
 
     /// <inheritdoc />
     public bool CanSelectMultiple =>
-        SupportsRowSelection(Owner.SelectionUnit) &&
+        SupportsRowSelection(Owner) &&
         Owner.SelectionMode == DataGridSelectionMode.Extended;
 
     /// <inheritdoc />
@@ -41,7 +41,7 @@ class DataGridAutomationPeer : ControlAutomationPeer, ISelectionProvider
     /// <inheritdoc />
     public IReadOnlyList<AutomationPeer> GetSelection()
     {
-        if (!SupportsRowSelection(Owner.SelectionUnit))
+        if (!SupportsRowSelection(Owner))
         {
             ReleaseAllUnrealizedPeers();
             return Array.Empty<AutomationPeer>();
@@ -62,19 +62,25 @@ class DataGridAutomationPeer : ControlAutomationPeer, ISelectionProvider
                 continue;
             }
 
-            DataGridRow? row = null;
+            Control? realizedElement = null;
             int slot = Owner.SlotFromRowIndex(rowIndex);
             if (slot >= Owner.DisplayData.FirstScrollingSlot &&
                 slot <= Owner.DisplayData.LastScrollingSlot &&
                 Owner.IsSlotVisible(slot))
             {
-                row = Owner.DisplayData.GetDisplayedElement(slot) as DataGridRow;
+                realizedElement = Owner.DisplayData.GetDisplayedElement(slot);
             }
 
             selected ??= new List<AutomationPeer>(selectedIndexes.Count);
-            if (row is { IsSelected: true } && row.IsAttachedToVisualTree())
+            if (realizedElement is DataGridRow { IsSelected: true } row && row.IsAttachedToVisualTree())
             {
                 selected.Add(GetOrCreate(row));
+                continue;
+            }
+            if (realizedElement is DataGridItemContainer { IsSelected: true } itemContainer &&
+                itemContainer.IsAttachedToVisualTree())
+            {
+                selected.Add(GetOrCreate(itemContainer));
                 continue;
             }
 
@@ -101,7 +107,7 @@ class DataGridAutomationPeer : ControlAutomationPeer, ISelectionProvider
     protected override object? GetProviderCore(Type providerType)
     {
         if (providerType == typeof(ISelectionProvider) &&
-            !SupportsRowSelection(Owner.SelectionUnit))
+            !SupportsRowSelection(Owner))
         {
             return null;
         }
@@ -144,7 +150,7 @@ class DataGridAutomationPeer : ControlAutomationPeer, ISelectionProvider
         if (e.Property == DataGrid.SelectionModeProperty ||
             e.Property == DataGrid.SelectionUnitProperty)
         {
-            if (!SupportsRowSelection(Owner.SelectionUnit))
+            if (!SupportsRowSelection(Owner))
             {
                 ReleaseAllUnrealizedPeers();
             }
@@ -180,6 +186,9 @@ class DataGridAutomationPeer : ControlAutomationPeer, ISelectionProvider
             selectionUnit == DataGridSelectionUnit.CellOrRowHeader ||
             selectionUnit == DataGridSelectionUnit.CellOrRowOrColumnHeader;
     }
+
+    internal static bool SupportsRowSelection(DataGrid owner) =>
+        owner.UsesLayoutItemPresentation || SupportsRowSelection(owner.SelectionUnit);
 
     private DataGridUnrealizedRowAutomationPeer GetOrCreateUnrealizedPeer(
         object item,

@@ -2,6 +2,7 @@
 // Licensed under the MIT license. See LICENSE file in the project root for details.
 
 using Avalonia.Automation;
+using Avalonia.Automation.Peers;
 using Avalonia.Controls.Metadata;
 using Avalonia.Controls.Templates;
 using Avalonia.Data;
@@ -112,6 +113,8 @@ sealed class DataGridItemContainer : ContentControl
         Index = index;
         Slot = slot;
         DataContext = item;
+        SetValue(AutomationProperties.PositionInSetProperty, index + 1);
+        SetValue(AutomationProperties.SizeOfSetProperty, owner.DataConnection.Count);
 
         Control? existing = ReferenceEquals(_appliedTemplate, template) ? Content as Control : null;
         Control? content = template is IRecyclingDataTemplate recycling
@@ -130,6 +133,23 @@ sealed class DataGridItemContainer : ContentControl
         Index = -1;
         Slot = -1;
         DataContext = null;
+        ClearValue(AutomationProperties.PositionInSetProperty);
+        ClearValue(AutomationProperties.SizeOfSetProperty);
+    }
+
+    /// <inheritdoc />
+    protected override AutomationPeer OnCreateAutomationPeer() =>
+        new DataGridItemContainerAutomationPeer(this);
+
+    /// <inheritdoc />
+    protected override void OnPropertyChanged(AvaloniaPropertyChangedEventArgs change)
+    {
+        if (change.Property == IsSelectedProperty && OwningGrid != null && Slot >= 0)
+        {
+            OwningGrid.SetRowSelection(Slot, change.GetNewValue<bool>(), setAnchorSlot: false);
+        }
+
+        base.OnPropertyChanged(change);
     }
 
     internal void ApplyState(bool? isSelectedOverride = null)

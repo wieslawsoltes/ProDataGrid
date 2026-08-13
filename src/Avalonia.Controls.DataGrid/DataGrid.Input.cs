@@ -1416,7 +1416,7 @@ internal
         {
             using var _ = BeginSelectionChangeScope(DataGridSelectionChangeSource.Pointer, pointerPressedEventArgs);
 
-            if (SelectionUnit != DataGridSelectionUnit.FullRow && columnIndex >= 0)
+            if (!UsesLayoutItemPresentation && SelectionUnit != DataGridSelectionUnit.FullRow && columnIndex >= 0)
             {
                 return UpdateCellSelectionOnMouseLeftButtonDown(pointerPressedEventArgs, columnIndex, slot, allowEdit, shift, ctrl);
             }
@@ -1718,7 +1718,7 @@ internal
 
             Debug.Assert(slot >= 0);
 
-            if (SelectionUnit != DataGridSelectionUnit.FullRow && columnIndex >= 0)
+            if (!UsesLayoutItemPresentation && SelectionUnit != DataGridSelectionUnit.FullRow && columnIndex >= 0)
             {
                 if (CurrentSlot != slot || CurrentColumnIndex != columnIndex)
                 {
