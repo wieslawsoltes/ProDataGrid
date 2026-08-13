@@ -254,6 +254,11 @@ internal static class GeneratorUtilities
         return arguments.TryGetValue(name, out TypedConstant value) && value.Value is int number ? number : fallback;
     }
 
+    public static double GetDouble(Dictionary<string, TypedConstant> arguments, string name, double fallback)
+    {
+        return arguments.TryGetValue(name, out TypedConstant value) && value.Value is double number ? number : fallback;
+    }
+
     public static bool IsPartial(INamedTypeSymbol type)
     {
         foreach (SyntaxReference reference in type.DeclaringSyntaxReferences)
