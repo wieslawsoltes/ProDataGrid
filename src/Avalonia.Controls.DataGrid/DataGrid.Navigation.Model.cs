@@ -130,7 +130,26 @@ namespace Avalonia.Controls
             switch (result.Decision)
             {
                 case DataGridNavigationDecision.Move:
-                    handled = TryApplyNavigationTarget(result.Target, modifiers);
+                    if (TryCreateSpatialBoundaryWrapPlan(
+                        command,
+                        modifiers,
+                        request,
+                        result,
+                        layoutPlan,
+                        out DataGridNavigationCommand wrapCommand,
+                        out LayoutNavigationPlan wrapPlan))
+                    {
+                        handled = ExecuteDefaultNavigation(
+                            wrapCommand,
+                            keyEventArgs,
+                            modifiers,
+                            allowCtrlForTab,
+                            wrapPlan);
+                    }
+                    else
+                    {
+                        handled = TryApplyNavigationTarget(result.Target, modifiers);
+                    }
                     if (!handled)
                     {
                         failureReason = DataGridNavigationFailureReason.InvalidTarget;
@@ -264,9 +283,70 @@ namespace Avalonia.Controls
                 lastRowIndex >= 0 ? 0 : -1,
                 lastRowIndex,
                 firstColumn?.DisplayIndex ?? -1,
-                lastColumn?.DisplayIndex ?? -1,
-                layoutPlan.IsOwned);
+                lastColumn?.DisplayIndex ?? -1);
         }
+
+        private bool TryCreateSpatialBoundaryWrapPlan(
+            DataGridNavigationCommand command,
+            KeyModifiers modifiers,
+            DataGridNavigationRequest request,
+            DataGridNavigationResult result,
+            LayoutNavigationPlan layoutPlan,
+            out DataGridNavigationCommand wrapCommand,
+            out LayoutNavigationPlan wrapPlan)
+        {
+            wrapCommand = DataGridNavigationCommand.None;
+            wrapPlan = default;
+            if (!layoutPlan.IsOwned || layoutPlan.HasTarget ||
+                NavigationModel is not DataGridNavigationModel policy ||
+                !TryGetSpatialBoundaryWrapCommand(command, policy, out wrapCommand) ||
+                result.Target != GetLegacyBoundaryWrapTarget(command, request))
+            {
+                return false;
+            }
+
+            wrapPlan = CreateLayoutNavigationPlan(wrapCommand, modifiers, request.CurrentPosition);
+            return wrapPlan.IsOwned;
+        }
+
+        private static bool TryGetSpatialBoundaryWrapCommand(
+            DataGridNavigationCommand command,
+            DataGridNavigationModel policy,
+            out DataGridNavigationCommand wrapCommand)
+        {
+            wrapCommand = command switch
+            {
+                DataGridNavigationCommand.Left when
+                    policy.HorizontalBoundaryMode == DataGridNavigationBoundaryMode.Wrap => DataGridNavigationCommand.RowEnd,
+                DataGridNavigationCommand.Right when
+                    policy.HorizontalBoundaryMode == DataGridNavigationBoundaryMode.Wrap => DataGridNavigationCommand.RowStart,
+                DataGridNavigationCommand.Up when
+                    policy.VerticalBoundaryMode == DataGridNavigationBoundaryMode.Wrap => DataGridNavigationCommand.ColumnEnd,
+                DataGridNavigationCommand.Down when
+                    policy.VerticalBoundaryMode == DataGridNavigationBoundaryMode.Wrap => DataGridNavigationCommand.ColumnStart,
+                _ => DataGridNavigationCommand.None
+            };
+            return wrapCommand != DataGridNavigationCommand.None;
+        }
+
+        private static DataGridNavigationPosition GetLegacyBoundaryWrapTarget(
+            DataGridNavigationCommand command,
+            DataGridNavigationRequest request) => command switch
+            {
+                DataGridNavigationCommand.Left => new DataGridNavigationPosition(
+                    request.CurrentPosition.RowIndex,
+                    request.LastColumnDisplayIndex),
+                DataGridNavigationCommand.Right => new DataGridNavigationPosition(
+                    request.CurrentPosition.RowIndex,
+                    request.FirstColumnDisplayIndex),
+                DataGridNavigationCommand.Up => new DataGridNavigationPosition(
+                    request.LastRowIndex,
+                    request.CurrentPosition.ColumnDisplayIndex),
+                DataGridNavigationCommand.Down => new DataGridNavigationPosition(
+                    request.FirstRowIndex,
+                    request.CurrentPosition.ColumnDisplayIndex),
+                _ => DataGridNavigationPosition.Unset
+            };
 
         private LayoutNavigationPlan CreateLayoutNavigationPlan(
             DataGridNavigationCommand command,
