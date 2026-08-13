@@ -235,6 +235,8 @@ public sealed partial class ProDataGridGenerator
                 public string FastPathOptionsPropertyName { get; set; } = "FastPathOptions";
                 public bool GenerateNavigationModel { get; set; }
                 public string NavigationModelPropertyName { get; set; } = "NavigationModel";
+                public bool GenerateNavigationInputModel { get; set; }
+                public string NavigationInputModelPropertyName { get; set; } = "NavigationInputModel";
                 public string? ProviderName { get; set; }
                 public bool Strict { get; set; } = true;
                 public bool Streaming { get; set; }
@@ -281,6 +283,8 @@ public sealed partial class ProDataGridGenerator
                 public string FastPathOptionsPropertyName { get; set; } = "FastPathOptions";
                 public bool GenerateNavigationModel { get; set; }
                 public string NavigationModelPropertyName { get; set; } = "NavigationModel";
+                public bool GenerateNavigationInputModel { get; set; }
+                public string NavigationInputModelPropertyName { get; set; } = "NavigationInputModel";
                 public bool Strict { get; set; } = true;
                 public bool Streaming { get; set; }
             }
@@ -314,6 +318,7 @@ public sealed partial class ProDataGridGenerator
                 public string? SelectionModelPropertyName { get; set; }
                 public string? NavigationModelPropertyName { get; set; }
                 public string? RouteNavigationModelPropertyName { get; set; }
+                public string? NavigationInputModelPropertyName { get; set; }
                 public global::Avalonia.Controls.DataGridSelectionMode SelectionMode { get; set; } =
                     global::Avalonia.Controls.DataGridSelectionMode.Single;
                 public global::Avalonia.Controls.DataGridSelectionUnit SelectionUnit { get; set; } =
@@ -403,6 +408,7 @@ public sealed partial class ProDataGridGenerator
                 public string? SelectionModelPropertyName { get; set; }
                 public string? NavigationModelPropertyName { get; set; }
                 public string? RouteNavigationModelPropertyName { get; set; }
+                public string? NavigationInputModelPropertyName { get; set; }
                 public global::Avalonia.Controls.DataGridSelectionMode SelectionMode { get; set; } =
                     global::Avalonia.Controls.DataGridSelectionMode.Single;
                 public global::Avalonia.Controls.DataGridSelectionUnit SelectionUnit { get; set; } =

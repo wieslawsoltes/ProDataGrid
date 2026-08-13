@@ -1256,11 +1256,14 @@ public sealed class ProDataGridGeneratorTests
                 [GenerateDataGridViewModel(
                     typeof(Row),
                     GenerateNavigationModel = true,
-                    NavigationModelPropertyName = nameof(CellNavigation))]
+                    NavigationModelPropertyName = nameof(CellNavigation),
+                    GenerateNavigationInputModel = true,
+                    NavigationInputModelPropertyName = nameof(InputNavigation))]
                 [GenerateDataGridView(
                     typeof(Row),
                     NavigationModelPropertyName = nameof(CellNavigation),
-                    RouteNavigationModelPropertyName = nameof(RouteNavigation))]
+                    RouteNavigationModelPropertyName = nameof(RouteNavigation),
+                    NavigationInputModelPropertyName = nameof(InputNavigation))]
                 public sealed partial class RowsViewModel
                 {
                     public IReadOnlyList<Row> Items { get; } = new List<Row>();
@@ -1272,11 +1275,15 @@ public sealed class ProDataGridGeneratorTests
         AssertNoErrors(result);
         Assert.Contains("DataGridNavigationModel CellNavigation", result.CombinedSource);
         Assert.Contains("CreateNavigationModel()", result.CombinedSource);
+        Assert.Contains("DataGridNavigationInputModel InputNavigation", result.CombinedSource);
+        Assert.Contains("CreateNavigationInputModel()", result.CombinedSource);
         Assert.Contains("CreateRouteNavigationModel(", result.CombinedSource);
         Assert.Contains("DataGrid.NavigationModelProperty", result.CombinedSource);
         Assert.Contains("DataGrid.RouteNavigationModelProperty", result.CombinedSource);
+        Assert.Contains("DataGrid.NavigationInputModelProperty", result.CombinedSource);
         Assert.Contains("viewModel.CellNavigation", result.CombinedSource);
         Assert.Contains("viewModel.RouteNavigation", result.CombinedSource);
+        Assert.Contains("viewModel.InputNavigation", result.CombinedSource);
     }
 
     [Fact]
@@ -1293,21 +1300,56 @@ public sealed class ProDataGridGeneratorTests
                 [GenerateDataGridView(
                     typeof(Row),
                     NavigationModelPropertyName = nameof(CellNavigation),
-                    RouteNavigationModelPropertyName = nameof(RouteNavigation))]
+                    RouteNavigationModelPropertyName = nameof(RouteNavigation),
+                    NavigationInputModelPropertyName = nameof(InputNavigation))]
                 public sealed partial class RowsViewModel
                 {
                     public IReadOnlyList<Row> Items { get; } = new List<Row>();
                     public object CellNavigation { get; } = new object();
                     public object RouteNavigation { get; } = new object();
+                    public object InputNavigation { get; } = new object();
                 }
             }
             """);
 
         Assert.Equal(
-            2,
+            3,
             result.GeneratorDiagnostics.Count(static diagnostic => diagnostic.Id == "PDGSG141"));
         Assert.DoesNotContain("DataGrid.NavigationModelProperty", result.CombinedSource);
         Assert.DoesNotContain("DataGrid.RouteNavigationModelProperty", result.CombinedSource);
+        Assert.DoesNotContain("DataGrid.NavigationInputModelProperty", result.CombinedSource);
+    }
+
+    [Fact]
+    public void Namespace_navigation_input_policy_generates_and_binds_input_model()
+    {
+        GeneratorTestResult result = GeneratorTestHelper.Run("""
+            using System.Collections.Generic;
+            using ProDataGrid.SourceGeneration;
+            [assembly: GenerateDataGridViewModelsForNamespace(
+                "Demo.ViewModels",
+                GenerateNavigationInputModel = true,
+                NavigationInputModelPropertyName = "GridInput")]
+            [assembly: GenerateDataGridViewsForNamespace(
+                "Demo.ViewModels",
+                NavigationInputModelPropertyName = "GridInput")]
+            namespace Demo.Models
+            {
+                public sealed class Row { public int Id { get; set; } }
+            }
+            namespace Demo.ViewModels
+            {
+                public sealed partial class RowsViewModel
+                {
+                    public IReadOnlyList<Demo.Models.Row> Items { get; } = new List<Demo.Models.Row>();
+                }
+            }
+            """);
+
+        AssertNoErrors(result);
+        Assert.Contains("DataGridNavigationInputModel GridInput", result.CombinedSource);
+        Assert.Contains("DataGrid.NavigationInputModelProperty", result.CombinedSource);
+        Assert.Contains("viewModel.GridInput", result.CombinedSource);
     }
 
     [Fact]

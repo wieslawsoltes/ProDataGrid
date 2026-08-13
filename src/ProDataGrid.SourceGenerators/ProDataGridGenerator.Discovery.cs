@@ -933,7 +933,8 @@ internal static partial class Discovery
             .Where(static model => model.GenerateColumnDefinitionsProperty ||
                                    model.GenerateSchemaProperty ||
                                    model.GenerateFastPathOptionsProperty ||
-                                   model.GenerateNavigationModelProperty)
+                                   model.GenerateNavigationModelProperty ||
+                                   model.GenerateNavigationInputModelProperty)
             .Select(Emitter.EmitViewModelSource)
             .ToImmutableArray();
 
@@ -985,6 +986,7 @@ internal static partial class Discovery
                 SchemaPropertyName = pending.SchemaPropertyName,
                 FastPathOptionsPropertyName = pending.FastPathOptionsPropertyName,
                 NavigationModelPropertyName = pending.NavigationModelPropertyName,
+                NavigationInputModelPropertyName = pending.NavigationInputModelPropertyName,
                 Location = pending.Location,
                 IsDirectIncremental = pending.IsDirectIncremental
             };
@@ -1009,6 +1011,12 @@ internal static partial class Discovery
             model.GenerateNavigationModelProperty = pending.GenerateNavigationModel && ValidateGeneratedViewModelMember(
                 pending.ViewModelType,
                 model.NavigationModelPropertyName,
+                generatedMembers,
+                viewModelDiagnostics,
+                pending.Location);
+            model.GenerateNavigationInputModelProperty = pending.GenerateNavigationInputModel && ValidateGeneratedViewModelMember(
+                pending.ViewModelType,
+                model.NavigationInputModelPropertyName,
                 generatedMembers,
                 viewModelDiagnostics,
                 pending.Location);
@@ -4082,6 +4090,8 @@ internal static partial class Discovery
             FastPathOptionsPropertyName = GeneratorUtilities.GetString(arguments, "FastPathOptionsPropertyName") ?? "FastPathOptions",
             GenerateNavigationModel = GeneratorUtilities.GetBoolean(arguments, "GenerateNavigationModel", false),
             NavigationModelPropertyName = GeneratorUtilities.GetString(arguments, "NavigationModelPropertyName") ?? "NavigationModel",
+            GenerateNavigationInputModel = GeneratorUtilities.GetBoolean(arguments, "GenerateNavigationInputModel", false),
+            NavigationInputModelPropertyName = GeneratorUtilities.GetString(arguments, "NavigationInputModelPropertyName") ?? "NavigationInputModel",
             Location = GetLocation(attribute)
         };
     }
@@ -4096,7 +4106,9 @@ internal static partial class Discovery
             pending.SchemaPropertyName + "|" +
             pending.FastPathOptionsPropertyName + "|" +
             pending.GenerateNavigationModel + "|" +
-            pending.NavigationModelPropertyName;
+            pending.NavigationModelPropertyName + "|" +
+            pending.GenerateNavigationInputModel + "|" +
+            pending.NavigationInputModelPropertyName;
         viewModels[key] = pending;
     }
 
@@ -4231,6 +4243,10 @@ internal static partial class Discovery
         public bool GenerateNavigationModel { get; set; }
 
         public string NavigationModelPropertyName { get; set; } = "NavigationModel";
+
+        public bool GenerateNavigationInputModel { get; set; }
+
+        public string NavigationInputModelPropertyName { get; set; } = "NavigationInputModel";
 
         public bool IsDirectIncremental { get; set; }
 
