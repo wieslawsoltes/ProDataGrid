@@ -105,6 +105,32 @@ internal sealed class ViewModelViewModel
 
     public ViewBindingModel FastPathOptions { get; set; } = null!;
 
+    public ViewBindingModel? LayoutModel { get; set; }
+
+    public int Layout { get; set; }
+
+    public int LayoutOrientation { get; set; }
+
+    public double LayoutSpacing { get; set; }
+
+    public double LayoutHorizontalSpacing { get; set; }
+
+    public double LayoutVerticalSpacing { get; set; }
+
+    public double LayoutMinItemWidth { get; set; } = double.NaN;
+
+    public double LayoutMinItemHeight { get; set; } = double.NaN;
+
+    public int LayoutMaximumRowsOrColumns { get; set; } = int.MaxValue;
+
+    public int LayoutItemsJustification { get; set; }
+
+    public int LayoutItemsStretch { get; set; }
+
+    public bool LayoutDisableVirtualization { get; set; }
+
+    public int LayoutMaximumCachedLines { get; set; } = 256;
+
     public ViewBindingModel? SortingModel { get; set; }
 
     public ViewBindingModel? FilteringModel { get; set; }

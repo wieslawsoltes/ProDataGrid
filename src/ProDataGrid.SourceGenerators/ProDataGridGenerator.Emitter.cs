@@ -3171,6 +3171,10 @@ internal static class Emitter
         EmitViewPropertyInfo(builder, model.Items, viewModelType, "Items");
         EmitViewPropertyInfo(builder, model.ColumnDefinitions, viewModelType, "ColumnDefinitions");
         EmitViewPropertyInfo(builder, model.FastPathOptions, viewModelType, "FastPathOptions");
+        if (model.LayoutModel != null)
+        {
+            EmitViewPropertyInfo(builder, model.LayoutModel, viewModelType, "LayoutModel");
+        }
         if (model.SortingModel != null)
         {
             EmitViewPropertyInfo(builder, model.SortingModel, viewModelType, "SortingModel");
@@ -3434,6 +3438,16 @@ internal static class Emitter
         builder
             .AppendLine("            dataGrid[!global::Avalonia.Controls.DataGrid.ColumnDefinitionsSourceProperty] = CreateBinding(s_columnDefinitionsProperty, global::Avalonia.Data.BindingMode.OneWay);")
             .AppendLine("            dataGrid[!global::Avalonia.Controls.DataGrid.FastPathOptionsProperty] = CreateBinding(s_fastPathOptionsProperty, global::Avalonia.Data.BindingMode.OneWay);");
+
+        if (model.LayoutModel != null)
+        {
+            builder.AppendLine("            dataGrid.UseLogicalScrollable = true;");
+            EmitOptionalGridBinding(builder, model.LayoutModel, "LayoutModel", "s_layoutModelProperty");
+        }
+        else
+        {
+            EmitGeneratedLayout(builder, model);
+        }
 
         EmitOptionalGridBinding(builder, model.SortingModel, "SortingModel", "s_sortingModelProperty");
         if (model.HierarchicalModel == null)
@@ -4703,6 +4717,73 @@ internal static class Emitter
         builder.Append("            dataGrid[!global::Avalonia.Controls.DataGrid.").Append(propertyName)
             .Append("Property] = CreateBinding(").Append(fieldName)
             .AppendLine(", global::Avalonia.Data.BindingMode.OneWay);");
+    }
+
+    private static void EmitGeneratedLayout(StringBuilder builder, ViewModelViewModel model)
+    {
+        if (model.Layout == 0)
+        {
+            return;
+        }
+
+        string typeName = model.Layout switch
+        {
+            1 => "DataGridStackLayoutModel",
+            2 => "DataGridNonVirtualizingStackLayoutModel",
+            3 => "DataGridUniformGridLayoutModel",
+            4 => "DataGridWrapLayoutModel",
+            _ => string.Empty
+        };
+        if (typeName.Length == 0)
+        {
+            return;
+        }
+
+        builder.Append("            dataGrid.LayoutModel = new global::Avalonia.Controls.DataGridLayouts.")
+            .Append(typeName).AppendLine()
+            .AppendLine("            {");
+        if (model.LayoutOrientation != 0)
+        {
+            builder.Append("                Orientation = global::Avalonia.Controls.DataGridLayouts.DataGridLayoutOrientation.")
+                .Append(model.LayoutOrientation == 1 ? "Horizontal" : "Vertical").AppendLine(",");
+        }
+
+        if (model.Layout is 1 or 2)
+        {
+            builder.Append("                Spacing = ").Append(GeneratorUtilities.FormatDouble(model.LayoutSpacing)).AppendLine(",");
+            if (model.Layout == 1)
+            {
+                builder.Append("                DisableVirtualization = ").Append(model.LayoutDisableVirtualization ? "true" : "false").AppendLine(",");
+            }
+        }
+        else if (model.Layout == 3)
+        {
+            builder.Append("                MinColumnSpacing = ").Append(GeneratorUtilities.FormatDouble(model.LayoutHorizontalSpacing)).AppendLine(",")
+                .Append("                MinRowSpacing = ").Append(GeneratorUtilities.FormatDouble(model.LayoutVerticalSpacing)).AppendLine(",");
+        }
+        else
+        {
+            builder.Append("                HorizontalSpacing = ").Append(GeneratorUtilities.FormatDouble(model.LayoutHorizontalSpacing)).AppendLine(",")
+                .Append("                VerticalSpacing = ").Append(GeneratorUtilities.FormatDouble(model.LayoutVerticalSpacing)).AppendLine(",");
+        }
+
+        if (model.Layout == 3)
+        {
+            builder.Append("                MinItemWidth = ").Append(GeneratorUtilities.FormatDouble(model.LayoutMinItemWidth)).AppendLine(",")
+                .Append("                MinItemHeight = ").Append(GeneratorUtilities.FormatDouble(model.LayoutMinItemHeight)).AppendLine(",")
+                .Append("                MaximumRowsOrColumns = ").Append(model.LayoutMaximumRowsOrColumns.ToString(CultureInfo.InvariantCulture)).AppendLine(",")
+                .Append("                ItemsJustification = (global::Avalonia.Controls.DataGridLayouts.DataGridUniformGridItemsJustification)")
+                .Append(model.LayoutItemsJustification.ToString(CultureInfo.InvariantCulture)).AppendLine(",")
+                .Append("                ItemsStretch = (global::Avalonia.Controls.DataGridLayouts.DataGridUniformGridItemsStretch)")
+                .Append(model.LayoutItemsStretch.ToString(CultureInfo.InvariantCulture)).AppendLine(",");
+        }
+        else if (model.Layout == 4)
+        {
+            builder.Append("                MaximumCachedLines = ").Append(model.LayoutMaximumCachedLines.ToString(CultureInfo.InvariantCulture)).AppendLine(",");
+        }
+
+        builder.AppendLine("            };")
+            .AppendLine("            dataGrid.UseLogicalScrollable = true;");
     }
 
     private static void EmitStringAssignment(StringBuilder builder, ImmutableDictionary<string, TypedConstant> options, string propertyName)
