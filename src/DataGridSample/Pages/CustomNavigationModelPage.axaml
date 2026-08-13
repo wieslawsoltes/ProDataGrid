@@ -1,0 +1,36 @@
+<!-- Copyright (c) Wieslaw Soltes. Licensed under the MIT license. -->
+<UserControl x:Class="DataGridSample.Pages.CustomNavigationModelPage"
+             xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="clr-namespace:DataGridSample.ViewModels"
+             x:DataType="vm:CustomNavigationModelViewModel">
+  <Grid Margin="12" RowDefinitions="Auto,Auto,*,Auto" RowSpacing="10">
+    <StackPanel Spacing="4">
+      <TextBlock FontSize="20" FontWeight="SemiBold" Text="Custom navigation policy" />
+      <TextBlock TextWrapping="Wrap"
+                 Text="A ViewModel-owned subclass redirects a semantic request and vetoes another. The view only binds commands and the model." />
+    </StackPanel>
+    <WrapPanel Grid.Row="1">
+      <Button Margin="0,0,6,0" Content="Down (skip protected)" Command="{CompiledBinding DownCommand}" />
+      <Button Content="Right (guard final column)" Command="{CompiledBinding RightCommand}" />
+    </WrapPanel>
+    <DataGrid Grid.Row="2"
+              ItemsSource="{CompiledBinding Items}"
+              NavigationModel="{CompiledBinding NavigationModel}"
+              AutoGenerateColumns="False"
+              CanUserAddRows="False"
+              SelectionUnit="Cell">
+      <DataGrid.Columns>
+        <DataGridTextColumn Header="ID" Width="90" ColumnKey="id"
+                            Binding="{CompiledBinding Id}" x:DataType="vm:CustomNavigationModelViewModel+CustomNavigationRow" />
+        <DataGridTextColumn Header="Name" Width="2*" ColumnKey="name"
+                            Binding="{CompiledBinding Name}" x:DataType="vm:CustomNavigationModelViewModel+CustomNavigationRow" />
+        <DataGridTextColumn Header="Access" Width="*" ColumnKey="access"
+                            Binding="{CompiledBinding Access}" x:DataType="vm:CustomNavigationModelViewModel+CustomNavigationRow" />
+      </DataGrid.Columns>
+    </DataGrid>
+    <Border Grid.Row="3" Padding="10" CornerRadius="6" Background="#100078D4">
+      <TextBlock Text="{CompiledBinding Status}" TextWrapping="Wrap" />
+    </Border>
+  </Grid>
+</UserControl>

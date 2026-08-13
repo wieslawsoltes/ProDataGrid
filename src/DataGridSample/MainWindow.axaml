@@ -455,6 +455,27 @@
         </pages:NavigationAdvancedLayoutPage.DataContext>
       </pages:NavigationAdvancedLayoutPage>
     </TabItem>
+    <TabItem Header="Navigation Custom Policy">
+      <pages:CustomNavigationModelPage>
+        <pages:CustomNavigationModelPage.DataContext>
+          <viewModels:CustomNavigationModelViewModel />
+        </pages:CustomNavigationModelPage.DataContext>
+      </pages:CustomNavigationModelPage>
+    </TabItem>
+    <TabItem Header="Navigation Hierarchy">
+      <pages:HierarchicalNavigationPage>
+        <pages:HierarchicalNavigationPage.DataContext>
+          <viewModels:HierarchicalNavigationViewModel />
+        </pages:HierarchicalNavigationPage.DataContext>
+      </pages:HierarchicalNavigationPage>
+    </TabItem>
+    <TabItem Header="Navigation State">
+      <pages:NavigationStatePage>
+        <pages:NavigationStatePage.DataContext>
+          <viewModels:NavigationStateViewModel />
+        </pages:NavigationStatePage.DataContext>
+      </pages:NavigationStatePage>
+    </TabItem>
     <TabItem Header="Navigation Application Routes">
       <pages:RouteNavigationPage>
         <pages:RouteNavigationPage.DataContext>

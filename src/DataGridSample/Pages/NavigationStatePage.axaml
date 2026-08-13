@@ -1,0 +1,38 @@
+<!-- Copyright (c) Wieslaw Soltes. Licensed under the MIT license. -->
+<UserControl x:Class="DataGridSample.Pages.NavigationStatePage"
+             xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="clr-namespace:DataGridSample.ViewModels"
+             x:DataType="vm:NavigationStateViewModel">
+  <Grid Margin="12" RowDefinitions="Auto,Auto,*,Auto" RowSpacing="10">
+    <StackPanel Spacing="4">
+      <TextBlock FontSize="20" FontWeight="SemiBold" Text="Navigation state" />
+      <TextBlock TextWrapping="Wrap"
+                 Text="Policy snapshots are detached and serializable. Current-cell identity is captured by the existing keyed selection-state contract, so filtering and column reorder remain safe." />
+    </StackPanel>
+    <WrapPanel Grid.Row="1">
+      <Button Margin="0,0,6,0" Content="Spreadsheet policy" Command="{CompiledBinding UseSpreadsheetPolicyCommand}" />
+      <Button Margin="0,0,14,0" Content="Contained policy" Command="{CompiledBinding UseContainedPolicyCommand}" />
+      <Button Margin="0,0,6,0" Content="Capture policy" Command="{CompiledBinding CaptureCommand}" />
+      <Button Content="Restore policy" Command="{CompiledBinding RestoreCommand}" />
+    </WrapPanel>
+    <DataGrid Grid.Row="2"
+              ItemsSource="{CompiledBinding Items}"
+              NavigationModel="{CompiledBinding NavigationModel}"
+              AutoGenerateColumns="False"
+              CanUserAddRows="False"
+              SelectionUnit="Cell">
+      <DataGrid.Columns>
+        <DataGridTextColumn Header="ID" Width="90" ColumnKey="id"
+                            Binding="{CompiledBinding Id}" x:DataType="vm:NavigationStateViewModel+NavigationStateRow" />
+        <DataGridTextColumn Header="Name" Width="2*" ColumnKey="name"
+                            Binding="{CompiledBinding Name}" x:DataType="vm:NavigationStateViewModel+NavigationStateRow" />
+        <DataGridTextColumn Header="Stable key" Width="*" ColumnKey="stable-key"
+                            Binding="{CompiledBinding StableKey}" x:DataType="vm:NavigationStateViewModel+NavigationStateRow" />
+      </DataGrid.Columns>
+    </DataGrid>
+    <Border Grid.Row="3" Padding="10" CornerRadius="6" Background="#100078D4">
+      <TextBlock Text="{CompiledBinding Status}" TextWrapping="Wrap" />
+    </Border>
+  </Grid>
+</UserControl>
