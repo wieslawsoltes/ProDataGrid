@@ -28,7 +28,7 @@ internal sealed class DataGridStackLayoutAlgorithm : IDataGridLayoutAlgorithm
 
     public void Initialize(IDataGridLayoutContext context)
     {
-        context.LayoutState = new State();
+        context.LayoutState ??= new State();
     }
 
     public Size Measure(IDataGridLayoutContext context, Size availableSize)
@@ -49,10 +49,17 @@ internal sealed class DataGridStackLayoutAlgorithm : IDataGridLayoutAlgorithm
         double realizationEnd = virtualizing ? GetMajorEnd(context.RealizationRect, orientation) : double.PositiveInfinity;
         realizationStart = Math.Max(0, realizationStart);
 
-        int firstIndex = virtualizing
-            ? FindFirstRealizedIndex(context, orientation, spacing, realizationStart, itemCount)
-            : 0;
+        int recommendedAnchor = context.RecommendedAnchorIndex;
+        int firstIndex = virtualizing && recommendedAnchor >= 0
+            ? Math.Min(itemCount - 1, recommendedAnchor)
+            : virtualizing
+                ? FindFirstRealizedIndex(context, orientation, spacing, realizationStart, itemCount)
+                : 0;
         double majorPosition = GetEstimatedOffset(context, firstIndex, orientation, spacing);
+        if (virtualizing && recommendedAnchor >= 0)
+        {
+            realizationEnd = majorPosition + Math.Max(1, GetMajor(context.RealizationRect.Size, orientation));
+        }
         int lastIndex = firstIndex - 1;
         double maxMinor = state.MaxMinor;
         Size measureConstraint = GetMeasureConstraint(availableSize, orientation);
