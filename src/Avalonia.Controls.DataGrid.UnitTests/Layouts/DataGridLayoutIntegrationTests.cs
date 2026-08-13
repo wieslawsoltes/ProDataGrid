@@ -10,6 +10,7 @@ using Avalonia.Controls.Primitives;
 using Avalonia.Data;
 using Avalonia.Headless.XUnit;
 using Avalonia.Input;
+using Avalonia.Media;
 using Avalonia.VisualTree;
 using Xunit;
 
@@ -253,6 +254,75 @@ public class DataGridLayoutIntegrationTests
         }
     }
 
+    [AvaloniaFact]
+    public void Semantic_commands_map_to_the_expected_layout_directions()
+    {
+        Window window = CreateWindow(out DataGrid grid, itemCount: 20);
+        try
+        {
+            var model = new NavigationTestLayoutModel();
+            model.Algorithm.SupportAllDirections = true;
+            grid.LayoutModel = model;
+            window.Show();
+            window.UpdateLayout();
+
+            var cases = new[]
+            {
+                (DataGridNavigationCommand.Up, KeyModifiers.None, DataGridLayoutNavigationDirection.Up),
+                (DataGridNavigationCommand.Up, KeyModifiers.Control, DataGridLayoutNavigationDirection.First),
+                (DataGridNavigationCommand.Down, KeyModifiers.None, DataGridLayoutNavigationDirection.Down),
+                (DataGridNavigationCommand.Down, KeyModifiers.Control, DataGridLayoutNavigationDirection.Last),
+                (DataGridNavigationCommand.Left, KeyModifiers.None, DataGridLayoutNavigationDirection.Left),
+                (DataGridNavigationCommand.Left, KeyModifiers.Control, DataGridLayoutNavigationDirection.LineStart),
+                (DataGridNavigationCommand.Right, KeyModifiers.None, DataGridLayoutNavigationDirection.Right),
+                (DataGridNavigationCommand.Right, KeyModifiers.Control, DataGridLayoutNavigationDirection.LineEnd),
+                (DataGridNavigationCommand.PageUp, KeyModifiers.None, DataGridLayoutNavigationDirection.PageUp),
+                (DataGridNavigationCommand.PageDown, KeyModifiers.None, DataGridLayoutNavigationDirection.PageDown),
+                (DataGridNavigationCommand.RowStart, KeyModifiers.None, DataGridLayoutNavigationDirection.LineStart),
+                (DataGridNavigationCommand.RowEnd, KeyModifiers.None, DataGridLayoutNavigationDirection.LineEnd),
+                (DataGridNavigationCommand.ColumnStart, KeyModifiers.None, DataGridLayoutNavigationDirection.First),
+                (DataGridNavigationCommand.ColumnEnd, KeyModifiers.None, DataGridLayoutNavigationDirection.Last),
+                (DataGridNavigationCommand.GridStart, KeyModifiers.None, DataGridLayoutNavigationDirection.First),
+                (DataGridNavigationCommand.GridEnd, KeyModifiers.None, DataGridLayoutNavigationDirection.Last)
+            };
+
+            foreach ((DataGridNavigationCommand command, KeyModifiers modifiers, DataGridLayoutNavigationDirection expected) in cases)
+            {
+                SetCurrentCell(grid, rowIndex: 0, columnIndex: 0);
+                Assert.True(grid.Navigate(command, modifiers));
+                Assert.Equal(expected, model.Algorithm.Directions[^1]);
+            }
+        }
+        finally
+        {
+            window.Close();
+        }
+    }
+
+    [AvaloniaFact]
+    public void Owned_layout_boundary_does_not_fall_back_to_linear_navigation()
+    {
+        Window window = CreateWindow(out DataGrid grid, itemCount: 20);
+        try
+        {
+            var model = new NavigationTestLayoutModel();
+            model.Algorithm.ResolveTargets = false;
+            grid.LayoutModel = model;
+            window.Show();
+            window.UpdateLayout();
+            SetCurrentCell(grid, rowIndex: 0, columnIndex: 0);
+
+            Assert.False(grid.CanNavigate(DataGridNavigationCommand.Down));
+            Assert.True(grid.Navigate(DataGridNavigationCommand.Down));
+            Assert.Equal(0, grid.CurrentCell.RowIndex);
+            Assert.Equal(2, model.Algorithm.ResolveCount);
+        }
+        finally
+        {
+            window.Close();
+        }
+    }
+
     private static Window CreateWindow(out DataGrid grid, int itemCount, int columnCount = 1)
     {
         var window = new Window { Width = 360, Height = 260 };
@@ -368,6 +438,12 @@ public class DataGridLayoutIntegrationTests
 
         public List<Point> NavigationAnchors { get; } = [];
 
+        public List<DataGridLayoutNavigationDirection> Directions { get; } = [];
+
+        public bool ResolveTargets { get; set; } = true;
+
+        public bool SupportAllDirections { get; set; }
+
         public void Initialize(IDataGridLayoutContext context)
         {
         }
@@ -404,7 +480,7 @@ public class DataGridLayoutIntegrationTests
         }
 
         public bool SupportsNavigation(DataGridLayoutNavigationDirection direction) =>
-            direction == DataGridLayoutNavigationDirection.Down;
+            SupportAllDirections || direction == DataGridLayoutNavigationDirection.Down;
 
         public bool TryGetNavigationBounds(
             IDataGridLayoutContext context,
@@ -423,6 +499,13 @@ public class DataGridLayoutIntegrationTests
         {
             ResolveCount++;
             NavigationAnchors.Add(request.NavigationAnchor);
+            Directions.Add(request.Direction);
+            if (!ResolveTargets)
+            {
+                result = default;
+                return false;
+            }
+
             int target = request.CurrentItemIndex + 2;
             result = new DataGridLayoutNavigationResult(target, GetBounds(target));
             return target < context.ItemCount;
