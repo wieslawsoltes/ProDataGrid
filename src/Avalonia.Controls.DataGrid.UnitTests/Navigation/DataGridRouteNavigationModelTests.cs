@@ -231,6 +231,40 @@ public class DataGridRouteNavigationModelTests
         Assert.Equal(DataGridRouteNavigationStatus.Canceled, result.Status);
     }
 
+    [Fact]
+    public async Task Overlapping_Request_Returns_Busy_Without_Second_Host_Call()
+    {
+        var completion = new TaskCompletionSource<DataGridRouteNavigationResult>(
+            TaskCreationOptions.RunContinuationsAsynchronously);
+        int callCount = 0;
+        var navigator = new DelegateDataGridRouteNavigator(
+            DataGridRouteNavigationCapabilities.All,
+            (request, _) =>
+            {
+                callCount++;
+                return new ValueTask<DataGridRouteNavigationResult>(completion.Task);
+            });
+        var model = new DataGridRouteNavigationModel(CreateResolver(), navigator);
+
+        ValueTask<DataGridRouteNavigationResult> first = model.NavigateAsync(
+            DataGridRouteNavigationKind.Navigate,
+            CreateContext(1),
+            TestContext.Current.CancellationToken);
+        DataGridRouteNavigationResult second = await model.NavigateAsync(
+            DataGridRouteNavigationKind.Navigate,
+            CreateContext(2),
+            TestContext.Current.CancellationToken);
+
+        Assert.True(model.IsNavigating);
+        Assert.False(model.CanNavigate(DataGridRouteNavigationKind.Navigate, CreateContext(3)));
+        Assert.Equal(DataGridRouteNavigationStatus.Busy, second.Status);
+        Assert.Equal(1, callCount);
+
+        completion.SetResult(DataGridRouteNavigationResult.Success(new DataGridRoute("orders/1")));
+        Assert.True((await first).Succeeded);
+        Assert.False(model.IsNavigating);
+    }
+
     [AvaloniaFact]
     public void Grid_Creates_Current_Route_Context_With_Stable_Column_Key()
     {

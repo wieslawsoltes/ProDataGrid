@@ -117,6 +117,9 @@ namespace Avalonia.Controls.DataGridNavigation
         /// <summary>The navigator does not support the requested operation.</summary>
         NotSupported,
 
+        /// <summary>Another route operation is already mutating this navigation scope.</summary>
+        Busy,
+
         /// <summary>The request or route was invalid.</summary>
         InvalidRequest,
 
@@ -479,6 +482,7 @@ namespace Avalonia.Controls.DataGridNavigation
     {
         private readonly IDataGridRouteResolver _resolver;
         private readonly IDataGridRouteNavigator _navigator;
+        private int _navigationInProgress;
         private bool _isNavigating;
         private DataGridRoute _currentRoute;
         private DataGridRouteNavigationResult _lastResult;
@@ -516,7 +520,7 @@ namespace Avalonia.Controls.DataGridNavigation
         /// <inheritdoc />
         public bool CanNavigate(DataGridRouteNavigationKind kind, DataGridRouteContext context)
         {
-            if (!Supports(kind))
+            if (IsNavigating || !Supports(kind))
             {
                 return false;
             }
@@ -576,6 +580,13 @@ namespace Avalonia.Controls.DataGridNavigation
                     DataGridRouteNavigationResult.FromStatus(DataGridRouteNavigationStatus.Canceled));
             }
 
+            if (Interlocked.CompareExchange(ref _navigationInProgress, 1, 0) != 0)
+            {
+                return Complete(
+                    request,
+                    DataGridRouteNavigationResult.FromStatus(DataGridRouteNavigationStatus.Busy));
+            }
+
             SetIsNavigating(true);
             DataGridRouteNavigationResult result;
             try
@@ -592,6 +603,7 @@ namespace Avalonia.Controls.DataGridNavigation
             }
             finally
             {
+                Interlocked.Exchange(ref _navigationInProgress, 0);
                 SetIsNavigating(false);
             }
 
