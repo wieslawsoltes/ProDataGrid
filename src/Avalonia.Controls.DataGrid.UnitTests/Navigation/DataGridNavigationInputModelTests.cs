@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Linq;
 using Avalonia.Controls;
+using Avalonia.Controls.DataGridLayouts;
 using Avalonia.Controls.DataGridNavigation;
 using Avalonia.Controls.Primitives;
 using Avalonia.Data;
@@ -257,6 +258,34 @@ public class DataGridNavigationInputModelTests
             Assert.Equal(1, grid.CurrentCell.RowIndex);
             Assert.Equal(1, grid.CurrentCell.Column.DisplayIndex);
             Assert.Equal(DataGridNavigationOrigin.Pointer, observed?.Origin);
+        }
+        finally
+        {
+            window.Close();
+        }
+    }
+
+    [AvaloniaFact]
+    public void Normalized_Key_Uses_Active_Spatial_Layout_Navigation()
+    {
+        Window window = CreateWindow(out DataGrid grid, rowCount: 100);
+        try
+        {
+            grid.LayoutModel = new DataGridUniformGridLayoutModel
+            {
+                MinItemWidth = 100,
+                MinItemHeight = 32
+            };
+            grid.NavigationInputModel = new DataGridNavigationInputModel(
+                DataGridNavigationInputBinding.KeyDown(
+                    DataGridNavigationInputKey.J,
+                    DataGridNavigationInputResult.Navigate(DataGridNavigationCommand.Down)));
+            window.UpdateLayout();
+            SetCurrentCell(grid, 0, 0);
+
+            RaiseKeyDown(grid, Key.J);
+
+            Assert.True(grid.CurrentCell.RowIndex > 1);
         }
         finally
         {
