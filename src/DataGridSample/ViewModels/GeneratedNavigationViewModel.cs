@@ -1,0 +1,127 @@
+// Copyright (c) Wieslaw Soltes. All rights reserved.
+// Licensed under the MIT license. See LICENSE file in the project root for details.
+
+using System.Collections.ObjectModel;
+using System.Threading.Tasks;
+using Avalonia.Controls.DataGridNavigation;
+using ProDataGrid.SourceGeneration;
+using ReactiveUI;
+using ReactiveUI.Primitives;
+
+namespace DataGridSample.ViewModels;
+
+[GenerateDataGridViewModel(
+    typeof(GeneratedNavigationRow),
+    ProviderName = "GeneratedNavigationRowSchema",
+    GenerateNavigationModel = true)]
+[GenerateDataGridView(
+    typeof(GeneratedNavigationRow),
+    ViewName = "GeneratedNavigationGridView",
+    ViewNamespace = "DataGridSample.Pages",
+    Recipe = DataGridViewRecipe.GridOnly,
+    Title = "Generated navigation grid",
+    AutomationId = "generated-navigation-grid",
+    NavigationModelPropertyName = nameof(NavigationModel),
+    RouteNavigationModelPropertyName = nameof(RouteNavigationModel))]
+public sealed partial class GeneratedNavigationViewModel : ReactiveObject
+{
+    private GeneratedNavigationRow? _selectedItem;
+    private string _status = "Both navigation models and their compiled bindings were source-generated.";
+
+    public GeneratedNavigationViewModel()
+    {
+        Items = new ObservableCollection<GeneratedNavigationRow>
+        {
+            new(301, "Accounts", "Finance", "Ready"),
+            new(302, "Incidents", "Operations", "Attention"),
+            new(303, "Identity", "Security", "Active"),
+            new(304, "Forecast", "Planning", "Draft")
+        };
+        SelectedItem = Items[0];
+
+        var resolver = new DelegateDataGridRouteResolver(context =>
+            context.Item is GeneratedNavigationRow row
+                ? new DataGridRoute($"generated/{row.Id}", row, "details")
+                : null);
+        RouteNavigationModel = GeneratedNavigationRowSchema.CreateRouteNavigationModel(
+            resolver,
+            new RouteNavigationSampleViewModel.InMemoryRouteNavigator());
+
+        NavigationModel.NavigationChanged += (_, e) =>
+            Status = e.Completed.Moved
+                ? $"Generated cell model: {e.Completed.Request.Command} → {e.Completed.NewPosition.RowIndex}:{e.Completed.NewPosition.ColumnDisplayIndex}"
+                : $"Generated cell model: {e.Completed.FailureReason}";
+        RouteNavigationModel.NavigationChanged += (_, e) =>
+            Status = $"Generated route model: {e.Result.Status} · {e.Result.CurrentRoute.Path}";
+
+        NextCellCommand = ReactiveCommand.Create(() =>
+            NavigationModel.RequestNavigate(DataGridNavigationCommand.Next));
+        PreviousCellCommand = ReactiveCommand.Create(() =>
+            NavigationModel.RequestNavigate(DataGridNavigationCommand.Previous));
+        OpenRouteCommand = ReactiveCommand.CreateFromTask(OpenRouteAsync);
+        BackCommand = ReactiveCommand.CreateFromTask(() =>
+            RouteNavigationModel.NavigateAsync(
+                DataGridRouteNavigationKind.Back,
+                DataGridRouteContext.Empty).AsTask());
+    }
+
+    public ObservableCollection<GeneratedNavigationRow> Items { get; }
+
+    public IDataGridRouteNavigationModel RouteNavigationModel { get; }
+
+    public ReactiveCommand<RxVoid, bool> NextCellCommand { get; }
+
+    public ReactiveCommand<RxVoid, bool> PreviousCellCommand { get; }
+
+    public ReactiveCommand<RxVoid, DataGridRouteNavigationResult> OpenRouteCommand { get; }
+
+    public ReactiveCommand<RxVoid, DataGridRouteNavigationResult> BackCommand { get; }
+
+    public GeneratedNavigationRow? SelectedItem
+    {
+        get => _selectedItem;
+        set => this.RaiseAndSetIfChanged(ref _selectedItem, value);
+    }
+
+    public string Status
+    {
+        get => _status;
+        private set => this.RaiseAndSetIfChanged(ref _status, value);
+    }
+
+    private Task<DataGridRouteNavigationResult> OpenRouteAsync()
+    {
+        GeneratedNavigationRow? selected = SelectedItem;
+        var context = new DataGridRouteContext(
+            selected,
+            selected?.Id,
+            "name",
+            DataGridNavigationPosition.Unset,
+            DataGridRouteNavigationOrigin.Command,
+            selected != null);
+        return RouteNavigationModel.NavigateAsync(DataGridRouteNavigationKind.Navigate, context).AsTask();
+    }
+}
+
+public sealed class GeneratedNavigationRow
+{
+    public GeneratedNavigationRow(int id, string name, string area, string state)
+    {
+        Id = id;
+        Name = name;
+        Area = area;
+        State = state;
+    }
+
+    [DataGridColumn(Order = 0, ColumnKey = "id", IsReadOnly = true)]
+    public int Id { get; set; }
+
+    [DataGridColumn(Order = 1, ColumnKey = "name")]
+    public string Name { get; set; }
+
+    [DataGridColumn(Order = 2, ColumnKey = "area")]
+    public string Area { get; set; }
+
+    [DataGridColumn(Order = 3, ColumnKey = "state")]
+    public string State { get; set; }
+}

@@ -1,0 +1,28 @@
+<!-- Copyright (c) Wieslaw Soltes. Licensed under the MIT license. -->
+<UserControl x:Class="DataGridSample.Pages.GeneratedNavigationPage"
+             xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:pages="clr-namespace:DataGridSample.Pages"
+             xmlns:vm="clr-namespace:DataGridSample.ViewModels"
+             x:DataType="vm:GeneratedNavigationViewModel">
+  <Grid Margin="12" RowDefinitions="Auto,Auto,*,Auto" RowSpacing="10">
+    <StackPanel Spacing="4">
+      <TextBlock FontSize="20" FontWeight="SemiBold" Text="Source-generated navigation" />
+      <TextBlock TextWrapping="Wrap"
+                 Text="The schema provider creates both model types, the partial ViewModel owns a generated cell controller, and the generated view uses reflection-free compiled bindings for both models." />
+    </StackPanel>
+
+    <WrapPanel Grid.Row="1">
+      <Button Margin="0,0,6,0" Content="Previous cell" Command="{CompiledBinding PreviousCellCommand}" />
+      <Button Margin="0,0,14,0" Content="Next cell" Command="{CompiledBinding NextCellCommand}" />
+      <Button Margin="0,0,6,0" Content="Open selected route" Command="{CompiledBinding OpenRouteCommand}" />
+      <Button Content="Back" Command="{CompiledBinding BackCommand}" />
+    </WrapPanel>
+
+    <pages:GeneratedNavigationGridView Grid.Row="2" />
+
+    <Border Grid.Row="3" Padding="10" CornerRadius="6" Background="#100078D4">
+      <TextBlock Text="{CompiledBinding Status}" TextWrapping="Wrap" />
+    </Border>
+  </Grid>
+</UserControl>

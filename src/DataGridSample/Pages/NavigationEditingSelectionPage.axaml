@@ -1,0 +1,50 @@
+<!-- Copyright (c) Wieslaw Soltes. Licensed under the MIT license. -->
+<UserControl x:Class="DataGridSample.Pages.NavigationEditingSelectionPage"
+             xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="clr-namespace:DataGridSample.ViewModels"
+             xmlns:nav="clr-namespace:Avalonia.Controls.DataGridNavigation;assembly=Avalonia.Controls.DataGrid"
+             x:DataType="vm:NavigationModelSampleViewModel">
+  <Grid Margin="12" RowDefinitions="Auto,Auto,*,Auto">
+    <StackPanel Spacing="4">
+      <TextBlock FontSize="20" FontWeight="SemiBold" Text="Editing, Tab, Enter, and selection" />
+      <TextBlock TextWrapping="Wrap"
+                 Text="F2/editor ownership, validation-aware movement, row-major Tab, Enter continuation, and Shift selection all pass through one semantic pipeline." />
+    </StackPanel>
+    <WrapPanel Grid.Row="1" Margin="0,10">
+      <Button Margin="0,0,6,6" Content="Begin edit (F2)" Command="{CompiledBinding BeginEditCommand}" />
+      <Button Margin="0,0,6,6" Content="Cancel edit (Esc)" Command="{CompiledBinding CancelEditCommand}" />
+      <Button Margin="0,0,6,6" Content="Previous (Shift+Tab)" Command="{CompiledBinding PreviousCommand}" />
+      <Button Margin="0,0,6,6" Content="Next (Tab)" Command="{CompiledBinding NextCommand}" />
+      <Button Margin="0,0,6,6" Content="Extend down (Shift+↓)" Command="{CompiledBinding ExtendDownCommand}" />
+      <ComboBox Width="130"
+                SelectedItem="{CompiledBinding NavigationModel.TabNavigationMode, Mode=TwoWay}">
+        <nav:DataGridTabNavigationMode>EditingOnly</nav:DataGridTabNavigationMode>
+        <nav:DataGridTabNavigationMode>Always</nav:DataGridTabNavigationMode>
+      </ComboBox>
+    </WrapPanel>
+    <DataGrid Grid.Row="2"
+              ItemsSource="{CompiledBinding Items}"
+              NavigationModel="{CompiledBinding NavigationModel}"
+              AutoGenerateColumns="False"
+              CanUserAddRows="False"
+              SelectionMode="Extended"
+              SelectionUnit="Cell"
+              EnterKeyNavigationMode="NextCell"
+              ContinueEditingOnEnter="True">
+      <DataGrid.Columns>
+        <DataGridTextColumn Header="Read-only ID" Width="110" IsReadOnly="True" ColumnKey="id"
+                            Binding="{CompiledBinding Id}" x:DataType="vm:NavigationModelSampleViewModel+NavigationRow" />
+        <DataGridTextColumn Header="Editable name" Width="2*" ColumnKey="name"
+                            Binding="{CompiledBinding Name}" x:DataType="vm:NavigationModelSampleViewModel+NavigationRow" />
+        <DataGridTextColumn Header="Editable status" Width="*" ColumnKey="status"
+                            Binding="{CompiledBinding Status}" x:DataType="vm:NavigationModelSampleViewModel+NavigationRow" />
+        <DataGridCheckBoxColumn Header="Enabled" Width="100" ColumnKey="enabled"
+                                Binding="{CompiledBinding Enabled}" x:DataType="vm:NavigationModelSampleViewModel+NavigationRow" />
+      </DataGrid.Columns>
+    </DataGrid>
+    <Border Grid.Row="3" Margin="0,10,0,0" Padding="10" Background="#100078D4" CornerRadius="6">
+      <TextBlock Text="{CompiledBinding Status}" />
+    </Border>
+  </Grid>
+</UserControl>

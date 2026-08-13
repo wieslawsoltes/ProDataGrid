@@ -427,6 +427,55 @@
     <TabItem Header="Routed events">
       <pages:RoutedEventsPage />
     </TabItem>
+    <TabItem Header="Navigation Model Basics">
+      <pages:NavigationModelBasicsPage>
+        <pages:NavigationModelBasicsPage.DataContext>
+          <viewModels:NavigationModelSampleViewModel />
+        </pages:NavigationModelBasicsPage.DataContext>
+      </pages:NavigationModelBasicsPage>
+    </TabItem>
+    <TabItem Header="Navigation Policies &amp; RTL">
+      <pages:NavigationPoliciesPage>
+        <pages:NavigationPoliciesPage.DataContext>
+          <viewModels:NavigationModelSampleViewModel />
+        </pages:NavigationPoliciesPage.DataContext>
+      </pages:NavigationPoliciesPage>
+    </TabItem>
+    <TabItem Header="Navigation Editing &amp; Selection">
+      <pages:NavigationEditingSelectionPage>
+        <pages:NavigationEditingSelectionPage.DataContext>
+          <viewModels:NavigationModelSampleViewModel />
+        </pages:NavigationEditingSelectionPage.DataContext>
+      </pages:NavigationEditingSelectionPage>
+    </TabItem>
+    <TabItem Header="Navigation Advanced Layout">
+      <pages:NavigationAdvancedLayoutPage>
+        <pages:NavigationAdvancedLayoutPage.DataContext>
+          <viewModels:NavigationModelSampleViewModel />
+        </pages:NavigationAdvancedLayoutPage.DataContext>
+      </pages:NavigationAdvancedLayoutPage>
+    </TabItem>
+    <TabItem Header="Navigation Application Routes">
+      <pages:RouteNavigationPage>
+        <pages:RouteNavigationPage.DataContext>
+          <viewModels:RouteNavigationSampleViewModel />
+        </pages:RouteNavigationPage.DataContext>
+      </pages:RouteNavigationPage>
+    </TabItem>
+    <TabItem Header="Navigation ReactiveUI Routes">
+      <pages:ReactiveUiRouteNavigationPage>
+        <pages:ReactiveUiRouteNavigationPage.DataContext>
+          <viewModels:ReactiveUiRouteNavigationViewModel />
+        </pages:ReactiveUiRouteNavigationPage.DataContext>
+      </pages:ReactiveUiRouteNavigationPage>
+    </TabItem>
+    <TabItem Header="Navigation Source Generator">
+      <pages:GeneratedNavigationPage>
+        <pages:GeneratedNavigationPage.DataContext>
+          <viewModels:GeneratedNavigationViewModel />
+        </pages:GeneratedNavigationPage.DataContext>
+      </pages:GeneratedNavigationPage>
+    </TabItem>
     <TabItem Header="Keyboard Overrides">
       <pages:KeyboardGestureHandlingPage />
     </TabItem>

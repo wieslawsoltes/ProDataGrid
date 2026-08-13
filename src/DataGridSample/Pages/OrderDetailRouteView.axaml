@@ -1,0 +1,17 @@
+<!-- Copyright (c) Wieslaw Soltes. Licensed under the MIT license. -->
+<rxui:ReactiveUserControl x:Class="DataGridSample.Pages.OrderDetailRouteView"
+                          x:TypeArguments="vm:OrderDetailRouteViewModel"
+                          xmlns="https://github.com/avaloniaui"
+                          xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                          xmlns:rxui="clr-namespace:ReactiveUI.Avalonia;assembly=ReactiveUI.Avalonia"
+                          xmlns:vm="clr-namespace:DataGridSample.ViewModels"
+                          x:DataType="vm:OrderDetailRouteViewModel">
+  <StackPanel Spacing="8">
+    <TextBlock FontSize="18" FontWeight="SemiBold" Text="Order details" />
+    <TextBlock FontSize="16" Text="{CompiledBinding Order.Customer}" />
+    <TextBlock Text="{CompiledBinding Order.Id, StringFormat=Order #{0}}" />
+    <TextBlock Text="{CompiledBinding Order.Total, StringFormat=Total: {0:C0}}" />
+    <TextBlock Text="{CompiledBinding Order.State, StringFormat=State: {0}}" />
+    <TextBlock Opacity="0.7" Text="{CompiledBinding UrlPathSegment, StringFormat=UrlPathSegment: {0}}" />
+  </StackPanel>
+</rxui:ReactiveUserControl>
