@@ -4989,6 +4989,43 @@ public sealed class ProDataGridGeneratorTests
     }
 
     [Fact]
+    public void Generated_view_binds_custom_item_layout_and_typed_template_reflection_free()
+    {
+        GeneratorTestResult result = GeneratorTestHelper.Run("""
+            using System.Collections.Generic;
+            using Avalonia.Controls;
+            using Avalonia.Controls.DataGridLayouts;
+            using ProDataGrid.SourceGeneration;
+            namespace Demo;
+            public sealed class Row
+            {
+                public int Value { get; set; }
+                public static Control CreateCard(Row item, Control existing) =>
+                    existing ?? new TextBlock { Text = item.Value.ToString() };
+            }
+            [GenerateDataGridViewModel(typeof(Row))]
+            [GenerateDataGridView(
+                typeof(Row),
+                LayoutModelPropertyName = nameof(Layout),
+                LayoutItemTemplateFactoryMethod = nameof(Row.CreateCard))]
+            public sealed partial class GridViewModel
+            {
+                public IReadOnlyList<Row> Items { get; } = System.Array.Empty<Row>();
+                public IDataGridLayoutModel Layout { get; } = new DataGridWrapLayoutModel
+                {
+                    PresentationMode = DataGridLayoutPresentationMode.Items,
+                    ItemSizeEstimate = new Avalonia.Size(180, 72)
+                };
+            }
+            """);
+
+        AssertNoErrors(result);
+        Assert.Contains("DataGrid.LayoutModelProperty", result.CombinedSource);
+        Assert.Contains("DataGridGeneratedFuncDataTemplate<global::Demo.Row>(global::Demo.Row.CreateCard)", result.CombinedSource);
+        Assert.DoesNotContain("new global::Avalonia.Controls.DataGridLayouts.DataGridWrapLayoutModel", result.CombinedSource);
+    }
+
+    [Fact]
     public void Generated_view_rejects_invalid_or_conflicting_layout_configuration()
     {
         GeneratorTestResult invalid = GeneratorTestHelper.Run("""

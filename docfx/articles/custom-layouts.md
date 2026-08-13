@@ -5,6 +5,7 @@ Applications can add layout types without deriving from DataGrid or replacing it
 - `IDataGridLayoutModel` owns serializable/bindable configuration and creates an algorithm;
 - `IDataGridLayoutAlgorithm` measures, records bounds, arranges, handles item changes, and releases session resources;
 - `IDataGridLayoutNavigation` is optional and adds geometry-aware navigation;
+- `IDataGridLayoutPresentationModel` is optional and selects row/cell or templated-item realization;
 - `IDataGridLayoutContext` is the only container/estimator service the algorithm should use.
 
 `DataGridLayoutModelBase` implements invalidation and allocation-free equality checks for property setters. Prefer it unless the model already has another base type.
@@ -93,9 +94,15 @@ The presenter calls `Initialize` once per activation of a retained session and `
 
 ## Context rules
 
-`GetOrCreateElementAt` prepares a normal DataGrid row/group container. The algorithm must never construct, reparent, cache, or dispose that control itself. `RecycleElement` marks a realized element as unnecessary; DataGrid performs the actual lifecycle work after measurement. Because the display store is range-based, a marked element between the lowest and highest indexes requested in the same pass can remain realized.
+`GetOrCreateElementAt` prepares the DataGrid-owned container selected by the model: a row, group header/footer, or templated `DataGridItemContainer`. The algorithm must never construct, reparent, cache, or dispose that control itself. `RecycleElement` marks a realized element as unnecessary; DataGrid performs the actual lifecycle work after measurement. Because the display store is range-based, a marked element between the lowest and highest indexes requested in the same pass can remain realized.
 
-`GetEstimatedItemSize` and `GetEstimatedItemOffset` must be preferred over realizing off-screen items. The vertical stack estimate is backed by the DataGrid row-height index and supports fixed and variable rows.
+`GetEstimatedItemSize` and `GetEstimatedItemOffset` must be preferred over realizing off-screen items. Row presentation uses the indexed fixed/variable row-height system. Item presentation uses `ItemSizeEstimate` before realization and measured template sizes afterward.
+
+## Optional item presentation
+
+Deriving from `DataGridLayoutModelBase` gives custom models `PresentationMode` and `ItemSizeEstimate`. Algorithms must not branch on the concrete container type: they measure and arrange the `Control` returned by the context, so the same algorithm can support both rows and item templates.
+
+If a model implements `IDataGridLayoutModel` directly, implement `IDataGridLayoutPresentationModel` to opt in. Raise a reset invalidation when the mode or estimate changes because the container kind and estimated coordinate space may change. See [Item-template layout presentation](item-layout-presentation.md).
 
 Only bounds recorded with `SetLayoutBounds` are arranged. Bounds use layout-content coordinates. The built-in algorithms subtract `ScrollOffset` exactly once during arrange.
 
@@ -159,5 +166,6 @@ Cover at least:
 8. supported, unsupported, boundary, page, and non-realized navigation;
 9. attach/detach and externally retained model leak behavior;
 10. runtime switching back to the same model instance.
+11. row/item presentation switching and bounded item-container recycling when supported.
 
 The complete custom implementation used by the sample is `DataGridSample/Layouts/IndentedStackLayoutModel.cs`.

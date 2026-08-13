@@ -239,6 +239,8 @@
   items:
   - name: Model-based Layouts
     href: model-based-layouts.md
+  - name: Item-template Layout Presentation
+    href: item-layout-presentation.md
   - name: Custom Layouts
     href: custom-layouts.md
   - name: Scrolling and Virtualization

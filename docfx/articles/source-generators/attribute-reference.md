@@ -213,6 +213,11 @@ Constructors:
 | `LayoutMaximumRowsOrColumns` | Uniform-grid line cap. |
 | `LayoutItemsJustification`, `LayoutItemsStretch` | Uniform-grid alignment/stretch. |
 | `LayoutMaximumCachedLines` | Variable-wrap exact-line cache bound. |
+| `LayoutPresentation` | `Rows` or `Items`; item mode realizes `DataGrid.ItemTemplate` instead of rows/cells. |
+| `LayoutItemWidthEstimate`, `LayoutItemHeightEstimate` | Positive finite off-screen size estimate for item presentation. |
+| `LayoutItemTemplateKey` | Dynamic-resource `IDataTemplate` used by item presentation. |
+| `LayoutItemTemplateImplementationType` | Accessible parameterless `IDataTemplate` implementation. |
+| `LayoutItemTemplateFactoryMethod` | Static recycling `(TItem, Control?) -> Control` factory. |
 
 See [Generated layouts](layouts.md) for emitted types, defaults, validation, and examples.
 

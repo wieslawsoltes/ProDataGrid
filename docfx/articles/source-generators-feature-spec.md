@@ -32,7 +32,7 @@ The generator does not own domain rules, persistence, networking, authentication
 | Connect DynamicData, async streams, channels, snapshots, or remote data | [Reactive, streaming, and remote data](source-generators/reactive-streaming-remote.md) |
 | Generate tree metadata, filtering, expansion, and wrapper-aware bindings | [Hierarchical data](source-generators/hierarchy.md) |
 | Preserve selection, current cell, layout, and state by stable key | [Selection, navigation, and state](source-generators/selection-navigation-state.md) |
-| Generate stack, uniform-grid, wrap, or custom model-based row layouts | [Generated layouts](source-generators/layouts.md) |
+| Generate stack, uniform-grid, wrap, or custom model-based row/item-template layouts | [Generated layouts](source-generators/layouts.md) |
 | Generate editing, validation, undo, clipboard, fill, formatting, and drag/drop adapters | [Editing and data workflows](source-generators/editing-and-data-workflows.md) |
 | Configure bands, indexed columns, templates, details, direct cells, and drawing | [Layout, templates, and rendering](source-generators/layout-templates-rendering.md) |
 | Generate pivot, outline, formula, and chart metadata | [Analytics and formulas](source-generators/analytics-and-formulas.md) |

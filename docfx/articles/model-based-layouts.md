@@ -1,8 +1,8 @@
 # Model-based layouts
 
-ProDataGrid can arrange its row containers as a virtualized stack, a non-virtualizing stack, a uniform grid, or a variable-size wrap layout. Set `DataGrid.LayoutModel` to opt in. A `null` model keeps the classic vertical-list implementation.
+ProDataGrid can arrange data as a virtualized stack, a non-virtualizing stack, a uniform grid, or a variable-size wrap layout. Set `DataGrid.LayoutModel` to opt in. A `null` model keeps the classic vertical-list implementation.
 
-The layout changes only spatial realization and arrangement. The same DataGrid continues to own columns, cells, selection, editing, filtering, sorting, grouping, row-height estimates, container preparation, and recycling.
+The layout changes spatial realization and arrangement. Its optional presentation contract also chooses traditional DataGrid rows/cells or lightweight custom item templates. The same DataGrid continues to own columns, selection, filtering, sorting, grouping, state, navigation, container preparation, and recycling.
 
 > [!IMPORTANT]
 > Model layouts use the logical scrolling presenter. Set `UseLogicalScrollable="True"`. Generated views do this automatically whenever they configure or bind a layout model.
@@ -15,8 +15,9 @@ flowchart LR
     Grid --> Session["Per-grid, per-model layout session"]
     Session --> Algorithm["IDataGridLayoutAlgorithm"]
     Algorithm --> Context["IDataGridLayoutContext"]
-    Context --> Generator["Existing row/group container generator"]
-    Context --> Estimator["Existing fixed/variable row estimator"]
+    Model -. optional .-> Presentation["IDataGridLayoutPresentationModel"]
+    Context --> Generator["DataGrid row/group/item container generator"]
+    Context --> Estimator["Row estimator or item-size estimate"]
     Context --> Recycler["Existing recycling pool"]
     Algorithm -. optional .-> Navigation["IDataGridLayoutNavigation"]
 ```
@@ -33,6 +34,14 @@ The layout context exposes only the mechanics needed by an algorithm:
 - one per-session `LayoutState` object.
 
 Layout item indices describe the visible layout sequence. When grouping is active, that sequence includes visible group headers and footers. DataGrid translates collection-view row indices at the navigation boundary; custom algorithms must not treat an index as a data-source identity.
+
+## Rows or item templates
+
+`DataGridLayoutModelBase` implements `IDataGridLayoutPresentationModel`. Its default `PresentationMode` is `Rows`, preserving the existing row, cell, header, row-height, editing, and column-virtualization behavior.
+
+Set `PresentationMode = DataGridLayoutPresentationMode.Items` and provide `DataGrid.ItemTemplate` for cards, tiles, or other custom item visuals. DataGrid then realizes recyclable `DataGridItemContainer` controls instead of rows/cells and automatically suppresses row and column headers. `ItemSizeEstimate` seeds off-screen geometry until actual template sizes are measured. Columns remain semantic metadata for the other DataGrid model systems.
+
+See [Item-template layout presentation](item-layout-presentation.md) for compiled XAML, recycling, editing, accessibility, and source-generator guidance.
 
 ## Runtime switching
 
@@ -164,7 +173,7 @@ The built-in uniform and wrap layouts preserve the cross-axis anchor while movin
 
 Collapsed group slots are removed from the visible layout sequence by the DataGrid adapter. Layouts can arrange group headers, group footers, and data rows without creating a second container system. Navigation translates a geometric target back to a collection-view row and skips group-only slots where a cell position is required.
 
-Selection identity, current cell, edit state, validation, conditional formatting, summaries, and column state do not live in the layout session. They therefore survive runtime layout changes.
+Selection identity, current cell, validation, conditional formatting, summaries, and column state do not live in the layout session. They therefore survive runtime layout changes. Row presentation retains normal cell editing; item presentation is display/template owned and does not enter DataGrid cell edit mode.
 
 ## Performance and memory checklist
 
@@ -177,5 +186,6 @@ Selection identity, current cell, edit state, validation, conditional formatting
 - Recycle through `IDataGridLayoutContext`; do not own row controls in the model or algorithm.
 - Use the non-virtualizing model only for bounded collections.
 - Profile representative item templates; layout cannot remove allocations inside templates.
+- Give item presentation a representative positive `ItemSizeEstimate`.
 
-See [Custom layouts](custom-layouts.md), [Generated layouts](source-generators/layouts.md), and the `Layout Gallery` page in `DataGridSample`.
+See [Item-template layout presentation](item-layout-presentation.md), [Custom layouts](custom-layouts.md), [Generated layouts](source-generators/layouts.md), and the `Layout Gallery` page in `DataGridSample`.
