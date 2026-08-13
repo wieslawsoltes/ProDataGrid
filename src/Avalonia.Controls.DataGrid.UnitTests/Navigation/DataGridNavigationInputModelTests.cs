@@ -312,6 +312,45 @@ public class DataGridNavigationInputModelTests
     }
 
     [AvaloniaFact]
+    public void Key_Route_Uses_Current_Cell_Context()
+    {
+        Window window = CreateWindow(out DataGrid grid);
+        try
+        {
+            DataGridRouteNavigationRequest? routed = null;
+            var resolver = new DelegateDataGridRouteResolver(context =>
+                context.Item is Row row ? new DataGridRoute($"rows/{row.Id}") : null);
+            var navigator = new DelegateDataGridRouteNavigator(
+                DataGridRouteNavigationCapabilities.Navigate,
+                (request, _) =>
+                {
+                    routed = request;
+                    return ValueTask.FromResult(DataGridRouteNavigationResult.Success(request.Route));
+                });
+            grid.RouteNavigationModel = new DataGridRouteNavigationModel(resolver, navigator);
+            grid.RouteContextFactory = new DataGridRouteContextFactory(item => ((Row)item).Id);
+            grid.NavigationInputModel = new DataGridNavigationInputModel(
+                DataGridNavigationInputBinding.KeyDown(
+                    DataGridNavigationInputKey.Enter,
+                    DataGridNavigationInputResult.NavigateRoute(DataGridRouteNavigationKind.Navigate)));
+            SetCurrentCell(grid, 1, 0);
+
+            KeyEventArgs args = RaiseKeyDown(grid, Key.Enter);
+
+            Assert.True(args.Handled);
+            Assert.NotNull(routed);
+            Assert.Equal("rows/1", routed.Value.Route.Path);
+            Assert.Equal(1, routed.Value.Context.ItemKey);
+            Assert.Equal(new DataGridNavigationPosition(1, 0), routed.Value.Context.Position);
+            Assert.Equal(DataGridRouteNavigationOrigin.Keyboard, routed.Value.Context.Origin);
+        }
+        finally
+        {
+            window.Close();
+        }
+    }
+
+    [AvaloniaFact]
     public void Wheel_Input_Can_Trigger_Application_History_Without_View_Code()
     {
         Window window = CreateWindow(out DataGrid grid);
