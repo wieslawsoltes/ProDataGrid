@@ -117,6 +117,10 @@ internal sealed class ViewModelViewModel
 
     public ViewBindingModel? SelectionModel { get; set; }
 
+    public ViewBindingModel? NavigationModel { get; set; }
+
+    public ViewBindingModel? RouteNavigationModel { get; set; }
+
     public int SelectionMode { get; set; }
 
     public int SelectionUnit { get; set; }
@@ -695,11 +699,15 @@ internal sealed class ViewModelModel
 
     public string FastPathOptionsPropertyName { get; set; } = "FastPathOptions";
 
+    public string NavigationModelPropertyName { get; set; } = "NavigationModel";
+
     public bool GenerateColumnDefinitionsProperty { get; set; } = true;
 
     public bool GenerateSchemaProperty { get; set; } = true;
 
     public bool GenerateFastPathOptionsProperty { get; set; } = true;
+
+    public bool GenerateNavigationModelProperty { get; set; }
 
     public bool IsDirectIncremental { get; set; }
 

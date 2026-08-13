@@ -215,6 +215,11 @@ internal static class GeneratorDiagnostics
         "Invalid generated collection-view defaults",
         "Generated collection-view defaults for item type '{0}' are invalid: {1}");
 
+    public static readonly DiagnosticDescriptor InvalidViewNavigationIntegration = Create(
+        "PDGSG141",
+        "Invalid generated view navigation integration",
+        "Generated navigation integration for view '{0}' is invalid: {1}");
+
     private static DiagnosticDescriptor Create(
         string id,
         string title,

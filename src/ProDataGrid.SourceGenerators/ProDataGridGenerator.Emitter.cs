@@ -34,7 +34,8 @@ internal static class Emitter
             if (viewModel.IsDirectIncremental ||
                 (!viewModel.GenerateColumnDefinitionsProperty &&
                  !viewModel.GenerateSchemaProperty &&
-                 !viewModel.GenerateFastPathOptionsProperty))
+                 !viewModel.GenerateFastPathOptionsProperty &&
+                 !viewModel.GenerateNavigationModelProperty))
             {
                 continue;
             }
@@ -696,7 +697,15 @@ internal static class Emitter
                 .Append("            => ").Append(GetKeyAccessExpression(schema, "item")).AppendLine(";");
         }
 
-        builder.AppendLine();
+        builder.AppendLine()
+            .AppendLine("        public static global::Avalonia.Controls.DataGridNavigation.DataGridNavigationModel CreateNavigationModel()")
+            .AppendLine("            => new global::Avalonia.Controls.DataGridNavigation.DataGridNavigationModel();")
+            .AppendLine()
+            .AppendLine("        public static global::Avalonia.Controls.DataGridNavigation.DataGridRouteNavigationModel CreateRouteNavigationModel(")
+            .AppendLine("            global::Avalonia.Controls.DataGridNavigation.IDataGridRouteResolver resolver,")
+            .AppendLine("            global::Avalonia.Controls.DataGridNavigation.IDataGridRouteNavigator navigator)")
+            .AppendLine("            => new global::Avalonia.Controls.DataGridNavigation.DataGridRouteNavigationModel(resolver, navigator);")
+            .AppendLine();
     }
 
     private static void EmitColumnAliasMap(StringBuilder builder, SchemaModel schema)
@@ -2602,6 +2611,18 @@ internal static class Emitter
                 .Append(" { get; } = ").Append(providerType).AppendLine(".Instance.CreateFastPathOptions();");
         }
 
+        if (model.GenerateNavigationModelProperty)
+        {
+            if (model.GenerateFastPathOptionsProperty)
+            {
+                builder.AppendLine();
+            }
+
+            builder.Append(prefix).Append("public global::Avalonia.Controls.DataGridNavigation.DataGridNavigationModel ")
+                .Append(GeneratorUtilities.EscapeIdentifier(model.NavigationModelPropertyName))
+                .Append(" { get; } = ").Append(providerType).AppendLine(".CreateNavigationModel();");
+        }
+
         for (int i = chain.Length - 1; i >= 0; i--)
         {
             indent--;
@@ -3191,6 +3212,14 @@ internal static class Emitter
         {
             EmitViewPropertyInfo(builder, model.SelectionModel, viewModelType, "SelectionModel");
         }
+        if (model.NavigationModel != null)
+        {
+            EmitViewPropertyInfo(builder, model.NavigationModel, viewModelType, "NavigationModel");
+        }
+        if (model.RouteNavigationModel != null)
+        {
+            EmitViewPropertyInfo(builder, model.RouteNavigationModel, viewModelType, "RouteNavigationModel");
+        }
         if (model.ClipboardImportModel != null)
         {
             EmitViewPropertyInfo(builder, model.ClipboardImportModel, viewModelType, "ClipboardImportModel");
@@ -3449,6 +3478,8 @@ internal static class Emitter
                 .Append(model.SelectionUnit.ToString(CultureInfo.InvariantCulture)).AppendLine(";");
         }
         EmitOptionalGridBinding(builder, model.SelectionModel, "Selection", "s_selectionModelProperty");
+        EmitOptionalGridBinding(builder, model.NavigationModel, "NavigationModel", "s_navigationModelProperty");
+        EmitOptionalGridBinding(builder, model.RouteNavigationModel, "RouteNavigationModel", "s_routeNavigationModelProperty");
         EmitOptionalGridBinding(builder, model.ClipboardImportModel, "ClipboardImportModel", "s_clipboardImportModelProperty");
         EmitOptionalGridBinding(builder, model.FillModel, "FillModel", "s_fillModelProperty");
         EmitOptionalGridBinding(builder, model.FormulaModel, "FormulaModel", "s_formulaModelProperty");

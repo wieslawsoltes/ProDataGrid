@@ -337,6 +337,8 @@ internal static partial class Discovery
             SearchModelPropertyName = GeneratorUtilities.GetString(arguments, "SearchModelPropertyName"),
             SearchTextPropertyName = GeneratorUtilities.GetString(arguments, "SearchTextPropertyName"),
             SelectionModelPropertyName = GeneratorUtilities.GetString(arguments, "SelectionModelPropertyName"),
+            NavigationModelPropertyName = GeneratorUtilities.GetString(arguments, "NavigationModelPropertyName"),
+            RouteNavigationModelPropertyName = GeneratorUtilities.GetString(arguments, "RouteNavigationModelPropertyName"),
             SelectionMode = GetEnumValue(arguments, "SelectionMode", 1),
             SelectionUnit = GetEnumValue(arguments, "SelectionUnit", 0),
             HasSelectionConfiguration = arguments.Keys.Any(static key =>
@@ -738,6 +740,18 @@ internal static partial class Discovery
             SearchModel = ResolveOptionalViewBinding(request, request.SearchModelPropertyName, diagnostics),
             SearchText = ResolveOptionalViewBinding(request, request.SearchTextPropertyName, diagnostics, requireSetter: true),
             SelectionModel = ResolveOptionalViewBinding(request, request.SelectionModelPropertyName, diagnostics),
+            NavigationModel = ResolveNavigationModelViewBinding(
+                request,
+                request.NavigationModelPropertyName,
+                "Avalonia.Controls.DataGridNavigation.IDataGridNavigationModel",
+                "IDataGridNavigationModel",
+                diagnostics),
+            RouteNavigationModel = ResolveNavigationModelViewBinding(
+                request,
+                request.RouteNavigationModelPropertyName,
+                "Avalonia.Controls.DataGridNavigation.IDataGridRouteNavigationModel",
+                "IDataGridRouteNavigationModel",
+                diagnostics),
             SelectionMode = request.SelectionMode,
             SelectionUnit = request.SelectionUnit,
             ConfigureSelection = request.HasSelectionConfiguration,
@@ -1389,6 +1403,108 @@ internal static partial class Discovery
         return null;
     }
 
+    private static ViewBindingModel? ResolveNavigationModelViewBinding(
+        ViewRequest request,
+        string? propertyName,
+        string interfaceMetadataName,
+        string interfaceDisplayName,
+        ImmutableArray<Diagnostic>.Builder diagnostics)
+    {
+        if (string.IsNullOrWhiteSpace(propertyName))
+        {
+            return null;
+        }
+
+        bool usesGeneratedCellModel = string.Equals(
+            interfaceMetadataName,
+            "Avalonia.Controls.DataGridNavigation.IDataGridNavigationModel",
+            StringComparison.Ordinal) &&
+            IsGeneratedNavigationModelProperty(request.ViewModelType, propertyName!);
+        ViewBindingModel? binding = ResolveViewBinding(
+            request,
+            propertyName!,
+            usesGeneratedCellModel
+                ? "global::Avalonia.Controls.DataGridNavigation.DataGridNavigationModel"
+                : null,
+            usesGeneratedCellModel,
+            diagnostics);
+        if (binding == null || usesGeneratedCellModel)
+        {
+            return binding;
+        }
+
+        ITypeSymbol? propertyType = FindViewBindingMemberType(request.ViewModelType, propertyName!);
+        ITypeSymbol? unwrappedType = propertyType == null ? null : UnwrapNullable(propertyType);
+        if (unwrappedType is INamedTypeSymbol namedType &&
+            (string.Equals(GeneratorUtilities.GetMetadataName(namedType), interfaceMetadataName, StringComparison.Ordinal) ||
+             namedType.AllInterfaces.Any(implemented => string.Equals(
+                 GeneratorUtilities.GetMetadataName(implemented),
+                 interfaceMetadataName,
+                 StringComparison.Ordinal))))
+        {
+            return binding;
+        }
+
+        diagnostics.Add(Diagnostic.Create(
+            GeneratorDiagnostics.InvalidViewNavigationIntegration,
+            request.Location,
+            request.ViewName,
+            $"member '{propertyName}' must implement {interfaceDisplayName}"));
+        return null;
+    }
+
+    private static bool IsGeneratedNavigationModelProperty(INamedTypeSymbol viewModelType, string propertyName)
+    {
+        foreach (AttributeData attribute in viewModelType.GetAttributes())
+        {
+            if (IsGeneratedNavigationModelProperty(attribute, propertyName))
+            {
+                return true;
+            }
+        }
+
+        foreach (AttributeData attribute in viewModelType.ContainingAssembly.GetAttributes())
+        {
+            if (IsAttribute(attribute, ProDataGridGenerator.GenerateViewModelAttributeName) &&
+                SymbolEqualityComparer.Default.Equals(GetConstructorType(attribute, 0), viewModelType) &&
+                IsGeneratedNavigationModelProperty(attribute, propertyName))
+            {
+                return true;
+            }
+
+            if (!IsAttribute(attribute, ProDataGridGenerator.GenerateViewModelsForNamespaceAttributeName))
+            {
+                continue;
+            }
+
+            string? namespaceName = attribute.ConstructorArguments.Length > 0
+                ? attribute.ConstructorArguments[0].Value as string
+                : null;
+            Dictionary<string, TypedConstant> arguments = GeneratorUtilities.GetNamedArguments(attribute);
+            if (!string.IsNullOrWhiteSpace(namespaceName) &&
+                NamespaceMatches(
+                    viewModelType,
+                    namespaceName!,
+                    GeneratorUtilities.GetBoolean(arguments, "IncludeNestedNamespaces", true)) &&
+                IsGeneratedNavigationModelProperty(attribute, propertyName))
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    private static bool IsGeneratedNavigationModelProperty(AttributeData attribute, string propertyName)
+    {
+        Dictionary<string, TypedConstant> arguments = GeneratorUtilities.GetNamedArguments(attribute);
+        return GeneratorUtilities.GetBoolean(arguments, "GenerateNavigationModel", false) &&
+            string.Equals(
+                GeneratorUtilities.GetString(arguments, "NavigationModelPropertyName") ?? "NavigationModel",
+                propertyName,
+                StringComparison.Ordinal);
+    }
+
     private static ViewBindingModel? ResolveFormulaViewBinding(
         ViewRequest request,
         ImmutableArray<Diagnostic>.Builder diagnostics)
@@ -1614,6 +1730,8 @@ internal static partial class Discovery
         public string? SearchModelPropertyName { get; set; }
         public string? SearchTextPropertyName { get; set; }
         public string? SelectionModelPropertyName { get; set; }
+        public string? NavigationModelPropertyName { get; set; }
+        public string? RouteNavigationModelPropertyName { get; set; }
         public int SelectionMode { get; set; } = 1;
         public int SelectionUnit { get; set; }
         public bool HasSelectionConfiguration { get; set; }

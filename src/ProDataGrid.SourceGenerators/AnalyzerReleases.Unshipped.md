@@ -43,3 +43,4 @@ PDGSG137 | ProDataGrid.SourceGeneration | Error | Invalid formula fill translato
 PDGSG138 | ProDataGrid.SourceGeneration | Error | Invalid generated formula syntax
 PDGSG139 | ProDataGrid.SourceGeneration | Error | Invalid generated view presentation
 PDGSG140 | ProDataGrid.SourceGeneration | Error | Invalid generated collection-view defaults
+PDGSG141 | ProDataGrid.SourceGeneration | Error | Invalid generated view navigation integration

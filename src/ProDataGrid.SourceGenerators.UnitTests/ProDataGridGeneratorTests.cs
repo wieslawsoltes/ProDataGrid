@@ -1242,6 +1242,75 @@ public sealed class ProDataGridGeneratorTests
     }
 
     [Fact]
+    public void Navigation_models_generate_factories_view_model_member_and_typed_view_bindings()
+    {
+        GeneratorTestResult result = GeneratorTestHelper.Run("""
+            using System.Collections.Generic;
+            using Avalonia.Controls;
+            using Avalonia.Controls.DataGridNavigation;
+            using ProDataGrid.SourceGeneration;
+            namespace Demo
+            {
+                public sealed class Row { public int Id { get; set; } }
+
+                [GenerateDataGridViewModel(
+                    typeof(Row),
+                    GenerateNavigationModel = true,
+                    NavigationModelPropertyName = nameof(CellNavigation))]
+                [GenerateDataGridView(
+                    typeof(Row),
+                    NavigationModelPropertyName = nameof(CellNavigation),
+                    RouteNavigationModelPropertyName = nameof(RouteNavigation))]
+                public sealed partial class RowsViewModel
+                {
+                    public IReadOnlyList<Row> Items { get; } = new List<Row>();
+                    public IDataGridRouteNavigationModel RouteNavigation { get; } = null!;
+                }
+            }
+            """);
+
+        AssertNoErrors(result);
+        Assert.Contains("DataGridNavigationModel CellNavigation", result.CombinedSource);
+        Assert.Contains("CreateNavigationModel()", result.CombinedSource);
+        Assert.Contains("CreateRouteNavigationModel(", result.CombinedSource);
+        Assert.Contains("DataGrid.NavigationModelProperty", result.CombinedSource);
+        Assert.Contains("DataGrid.RouteNavigationModelProperty", result.CombinedSource);
+        Assert.Contains("viewModel.CellNavigation", result.CombinedSource);
+        Assert.Contains("viewModel.RouteNavigation", result.CombinedSource);
+    }
+
+    [Fact]
+    public void Invalid_navigation_model_bindings_report_PDGSG141()
+    {
+        GeneratorTestResult result = GeneratorTestHelper.Run("""
+            using System.Collections.Generic;
+            using ProDataGrid.SourceGeneration;
+            namespace Demo
+            {
+                public sealed class Row { public int Id { get; set; } }
+
+                [GenerateDataGridViewModel(typeof(Row))]
+                [GenerateDataGridView(
+                    typeof(Row),
+                    NavigationModelPropertyName = nameof(CellNavigation),
+                    RouteNavigationModelPropertyName = nameof(RouteNavigation))]
+                public sealed partial class RowsViewModel
+                {
+                    public IReadOnlyList<Row> Items { get; } = new List<Row>();
+                    public object CellNavigation { get; } = new object();
+                    public object RouteNavigation { get; } = new object();
+                }
+            }
+            """);
+
+        Assert.Equal(
+            2,
+            result.GeneratorDiagnostics.Count(static diagnostic => diagnostic.Id == "PDGSG141"));
+        Assert.DoesNotContain("DataGrid.NavigationModelProperty", result.CombinedSource);
+        Assert.DoesNotContain("DataGrid.RouteNavigationModelProperty", result.CombinedSource);
+    }
+
+    [Fact]
     public void Invalid_navigation_contracts_and_unbounded_high_frequency_details_are_rejected()
     {
         GeneratorTestResult result = GeneratorTestHelper.Run("""
