@@ -1,6 +1,8 @@
 // Copyright (c) Wiesław Šoltés. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for details.
 
+using System.Collections.Generic;
+
 namespace Avalonia.Controls.DataGridLayouts;
 
 /// <summary>
@@ -24,6 +26,11 @@ interface IDataGridLayoutContext
     Rect RealizationRect { get; }
 
     /// <summary>
+    /// Gets the current logical scroll offset in layout coordinates.
+    /// </summary>
+    Vector ScrollOffset { get; }
+
+    /// <summary>
     /// Gets the preferred anchor index, or <c>-1</c> when no anchor is available.
     /// </summary>
     int RecommendedAnchorIndex { get; }
@@ -37,6 +44,11 @@ interface IDataGridLayoutContext
     /// Gets or sets per-grid state owned by the active layout algorithm.
     /// </summary>
     object? LayoutState { get; set; }
+
+    /// <summary>
+    /// Gets a live, allocation-free view of the currently realized containers.
+    /// </summary>
+    IReadOnlyList<Control> RealizedElements { get; }
 
     /// <summary>
     /// Gets or creates the row container for an item index.
@@ -64,6 +76,17 @@ interface IDataGridLayoutContext
     /// <param name="index">The zero-based layout item index.</param>
     /// <returns>The measured size when cached; otherwise the current estimate.</returns>
     Size GetEstimatedItemSize(int index);
+
+    /// <summary>
+    /// Gets the estimated major-axis offset to an item without forcing realization.
+    /// </summary>
+    /// <param name="index">
+    /// The zero-based item index. A value equal to <see cref="ItemCount"/> requests the estimated
+    /// end offset of the collection.
+    /// </param>
+    /// <param name="orientation">The stack orientation that selects the major axis.</param>
+    /// <returns>The estimated offset in device-independent pixels.</returns>
+    double GetEstimatedItemOffset(int index, DataGridLayoutOrientation orientation);
 
     /// <summary>
     /// Records layout bounds for a realized item.
