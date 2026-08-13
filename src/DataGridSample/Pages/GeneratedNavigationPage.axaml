@@ -5,11 +5,11 @@
              xmlns:pages="clr-namespace:DataGridSample.Pages"
              xmlns:vm="clr-namespace:DataGridSample.ViewModels"
              x:DataType="vm:GeneratedNavigationViewModel">
-  <Grid Margin="12" RowDefinitions="Auto,Auto,*,Auto" RowSpacing="10">
+  <Grid Margin="12" RowDefinitions="Auto,Auto,Auto,*,Auto" RowSpacing="10">
     <StackPanel Spacing="4">
       <TextBlock FontSize="20" FontWeight="SemiBold" Text="Source-generated navigation" />
       <TextBlock TextWrapping="Wrap"
-                 Text="The schema provider creates both model types, the partial ViewModel owns a generated cell controller, and the generated view uses reflection-free compiled bindings for both models." />
+                 Text="The provider generates cell and input models; the partial ViewModel owns the key, pointer, wheel, and route policy; and the generated view binds all models without reflection or event handlers." />
     </StackPanel>
 
     <WrapPanel Grid.Row="1">
@@ -19,9 +19,14 @@
       <Button Content="Back" Command="{CompiledBinding BackCommand}" />
     </WrapPanel>
 
-    <pages:GeneratedNavigationGridView Grid.Row="2" />
+    <Border Grid.Row="2" Padding="10" CornerRadius="6" Background="#0C605E5C">
+      <TextBlock TextWrapping="Wrap"
+                 Text="Input model: J/K move vertically, the physical H key moves left on every keyboard layout, G/Shift+G jump to grid start/end through ViewModel resolution, a primary cell press targets that cell, and Ctrl+wheel navigates route history." />
+    </Border>
 
-    <Border Grid.Row="3" Padding="10" CornerRadius="6" Background="#100078D4">
+    <pages:GeneratedNavigationGridView Grid.Row="3" />
+
+    <Border Grid.Row="4" Padding="10" CornerRadius="6" Background="#100078D4">
       <TextBlock Text="{CompiledBinding Status}" TextWrapping="Wrap" />
     </Border>
   </Grid>

@@ -43,7 +43,7 @@ public sealed class NavigationSampleTests
     }
 
     [AvaloniaFact]
-    public void Generated_view_binds_generated_cell_and_application_route_models()
+    public void Generated_view_binds_generated_cell_input_and_application_route_models()
     {
         var viewModel = new GeneratedNavigationViewModel();
         var view = new GeneratedNavigationGridView(viewModel);
@@ -58,6 +58,11 @@ public sealed class NavigationSampleTests
 
             Assert.Same(viewModel.NavigationModel, grid.NavigationModel);
             Assert.Same(viewModel.RouteNavigationModel, grid.RouteNavigationModel);
+            Assert.Same(viewModel.NavigationInputModel, grid.NavigationInputModel);
+            DataGridNavigationInputResult jResult = viewModel.NavigationInputModel.Resolve(
+                CreateKeyRequest(DataGridNavigationInputKey.J));
+            Assert.Equal(DataGridNavigationInputDecision.Navigate, jResult.Decision);
+            Assert.Equal(DataGridNavigationCommand.Down, jResult.Command);
             Assert.True(viewModel.NavigationModel.RequestNavigate(DataGridNavigationCommand.Down));
         }
         finally
@@ -65,6 +70,26 @@ public sealed class NavigationSampleTests
             window.Close();
         }
     }
+
+    private static DataGridNavigationInputRequest CreateKeyRequest(DataGridNavigationInputKey key) =>
+        new(
+            DataGridNavigationInputKind.KeyDown,
+            key,
+            key,
+            DataGridNavigationKeyDeviceKind.Keyboard,
+            DataGridNavigationInputModifiers.None,
+            DataGridNavigationPointerDeviceKind.Unknown,
+            DataGridNavigationPointerButton.None,
+            DataGridNavigationWheelDirection.None,
+            0,
+            double.NaN,
+            double.NaN,
+            0,
+            0,
+            DataGridNavigationInputTargetKind.Cell,
+            DataGridNavigationPosition.Unset,
+            DataGridNavigationPosition.Unset,
+            false);
 
     [AvaloniaFact]
     public void Extended_navigation_pages_bind_models_without_view_event_handlers()

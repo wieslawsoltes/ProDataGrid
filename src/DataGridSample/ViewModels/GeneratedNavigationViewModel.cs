@@ -13,7 +13,8 @@ namespace DataGridSample.ViewModels;
 [GenerateDataGridViewModel(
     typeof(GeneratedNavigationRow),
     ProviderName = "GeneratedNavigationRowSchema",
-    GenerateNavigationModel = true)]
+    GenerateNavigationModel = true,
+    GenerateNavigationInputModel = true)]
 [GenerateDataGridView(
     typeof(GeneratedNavigationRow),
     ViewName = "GeneratedNavigationGridView",
@@ -22,7 +23,8 @@ namespace DataGridSample.ViewModels;
     Title = "Generated navigation grid",
     AutomationId = "generated-navigation-grid",
     NavigationModelPropertyName = nameof(NavigationModel),
-    RouteNavigationModelPropertyName = nameof(RouteNavigationModel))]
+    RouteNavigationModelPropertyName = nameof(RouteNavigationModel),
+    NavigationInputModelPropertyName = nameof(NavigationInputModel))]
 public sealed partial class GeneratedNavigationViewModel : ReactiveObject
 {
     private GeneratedNavigationRow? _selectedItem;
@@ -46,6 +48,41 @@ public sealed partial class GeneratedNavigationViewModel : ReactiveObject
         RouteNavigationModel = GeneratedNavigationRowSchema.CreateRouteNavigationModel(
             resolver,
             new RouteNavigationSampleViewModel.InMemoryRouteNavigator());
+
+        NavigationInputModel.SetBindings(
+            DataGridNavigationInputBinding.KeyDown(
+                DataGridNavigationInputKey.J,
+                DataGridNavigationInputResult.Navigate(DataGridNavigationCommand.Down)),
+            DataGridNavigationInputBinding.KeyDown(
+                DataGridNavigationInputKey.K,
+                DataGridNavigationInputResult.Navigate(DataGridNavigationCommand.Up)),
+            DataGridNavigationInputBinding.PhysicalKeyDown(
+                DataGridNavigationInputKey.H,
+                DataGridNavigationInputResult.Navigate(DataGridNavigationCommand.Left)),
+            DataGridNavigationInputBinding.Pointer(
+                DataGridNavigationInputKind.PointerPressed,
+                DataGridNavigationPointerButton.Primary,
+                DataGridNavigationInputResult.NavigateToTarget(),
+                targetKind: DataGridNavigationInputTargetKind.Cell),
+            DataGridNavigationInputBinding.Wheel(
+                DataGridNavigationWheelDirection.Up,
+                DataGridNavigationInputResult.NavigateRoute(DataGridRouteNavigationKind.Back),
+                DataGridNavigationInputModifiers.Control),
+            DataGridNavigationInputBinding.Wheel(
+                DataGridNavigationWheelDirection.Down,
+                DataGridNavigationInputResult.NavigateRoute(DataGridRouteNavigationKind.Forward),
+                DataGridNavigationInputModifiers.Control));
+        NavigationInputModel.InputResolving += (_, e) =>
+        {
+            if (e.Request.Kind == DataGridNavigationInputKind.KeyDown &&
+                e.Request.Key == DataGridNavigationInputKey.G)
+            {
+                e.Result = DataGridNavigationInputResult.Navigate(
+                    (e.Request.Modifiers & DataGridNavigationInputModifiers.Shift) != 0
+                        ? DataGridNavigationCommand.GridEnd
+                        : DataGridNavigationCommand.GridStart);
+            }
+        };
 
         NavigationModel.NavigationChanged += (_, e) =>
             Status = e.Completed.Moved
