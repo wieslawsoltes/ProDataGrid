@@ -115,6 +115,34 @@ public class DataGridUniformGridLayoutModelTests
         Assert.Equal(2, context.RealizedIndices.Count);
     }
 
+    [Fact]
+    public void Navigation_follows_grid_geometry_and_reports_estimated_bounds()
+    {
+        var model = new DataGridUniformGridLayoutModel
+        {
+            MinItemWidth = 50,
+            MinItemHeight = 20
+        };
+        IDataGridLayoutAlgorithm algorithm = model.CreateAlgorithm();
+        var navigation = Assert.IsAssignableFrom<IDataGridLayoutNavigation>(algorithm);
+        var context = new TestContext(100, new Size(50, 20), new Rect(0, 0, 200, 20), default);
+        algorithm.Initialize(context);
+        algorithm.Measure(context, new Size(200, 20));
+
+        Assert.True(navigation.TryResolveNavigation(
+            context,
+            new DataGridLayoutNavigationRequest(2, DataGridLayoutNavigationDirection.Down, new Rect(0, 0, 200, 20), new Point(125, 10)),
+            out DataGridLayoutNavigationResult down));
+        Assert.Equal(6, down.ItemIndex);
+        Assert.Equal(new Rect(100, 20, 50, 20), down.EstimatedBounds);
+
+        Assert.True(navigation.TryResolveNavigation(
+            context,
+            new DataGridLayoutNavigationRequest(6, DataGridLayoutNavigationDirection.LineStart, new Rect(0, 0, 200, 20), new Point(125, 30)),
+            out DataGridLayoutNavigationResult lineStart));
+        Assert.Equal(4, lineStart.ItemIndex);
+    }
+
     private sealed class TestContext : IDataGridLayoutContext
     {
         private readonly Size _itemSize;
