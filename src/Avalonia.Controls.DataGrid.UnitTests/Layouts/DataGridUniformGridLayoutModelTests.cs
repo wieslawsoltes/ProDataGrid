@@ -103,6 +103,18 @@ public class DataGridUniformGridLayoutModelTests
     }
 
     [Fact]
+    public void Items_justification_invalidates_measure_because_it_changes_recorded_bounds()
+    {
+        var model = new DataGridUniformGridLayoutModel();
+        DataGridLayoutInvalidationKind? kind = null;
+        model.LayoutInvalidated += (_, args) => kind = args.Kind;
+
+        model.ItemsJustification = DataGridUniformGridItemsJustification.Center;
+
+        Assert.Equal(DataGridLayoutInvalidationKind.Measure, kind);
+    }
+
+    [Fact]
     public void Natural_cell_size_is_measured_when_minimums_are_unspecified()
     {
         var model = new DataGridUniformGridLayoutModel();

@@ -93,13 +93,13 @@ The presenter calls `Initialize` once per activation of a retained session and `
 
 ## Context rules
 
-`GetOrCreateElementAt` prepares a normal DataGrid row/group container. The algorithm must never construct, reparent, cache, or dispose that control itself. `RecycleElement` marks a realized element as unnecessary; DataGrid performs the actual lifecycle work.
+`GetOrCreateElementAt` prepares a normal DataGrid row/group container. The algorithm must never construct, reparent, cache, or dispose that control itself. `RecycleElement` marks a realized element as unnecessary; DataGrid performs the actual lifecycle work after measurement. Because the display store is range-based, a marked element between the lowest and highest indexes requested in the same pass can remain realized.
 
 `GetEstimatedItemSize` and `GetEstimatedItemOffset` must be preferred over realizing off-screen items. The vertical stack estimate is backed by the DataGrid row-height index and supports fixed and variable rows.
 
 Only bounds recorded with `SetLayoutBounds` are arranged. Bounds use layout-content coordinates. The built-in algorithms subtract `ScrollOffset` exactly once during arrange.
 
-The context expects a contiguous realized index interval because the current DataGrid display store is range-based. A custom algorithm may leave visual gaps inside that interval, but it should not request disconnected index islands in one pass.
+The context expects a contiguous realized index interval because the current DataGrid display store is range-based. A custom algorithm may leave visual gaps inside that interval, but it should not request disconnected index islands in one pass. Keep the requested minimum-to-maximum span close to the realization window so retained container memory stays bounded by visible content rather than item count.
 
 ## Optional spatial navigation
 

@@ -84,7 +84,7 @@ sealed class DataGridUniformGridLayoutModel : DataGridLayoutModelBase
     public DataGridUniformGridItemsJustification ItemsJustification
     {
         get => _itemsJustification;
-        set => SetProperty(ref _itemsJustification, value, DataGridLayoutInvalidationKind.Arrange);
+        set => SetProperty(ref _itemsJustification, value);
     }
 
     /// <summary>
