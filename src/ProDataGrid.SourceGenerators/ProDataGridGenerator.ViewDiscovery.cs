@@ -340,6 +340,7 @@ internal static partial class Discovery
             NavigationModelPropertyName = GeneratorUtilities.GetString(arguments, "NavigationModelPropertyName"),
             RouteNavigationModelPropertyName = GeneratorUtilities.GetString(arguments, "RouteNavigationModelPropertyName"),
             NavigationInputModelPropertyName = GeneratorUtilities.GetString(arguments, "NavigationInputModelPropertyName"),
+            RouteContextFactoryPropertyName = GeneratorUtilities.GetString(arguments, "RouteContextFactoryPropertyName"),
             SelectionMode = GetEnumValue(arguments, "SelectionMode", 1),
             SelectionUnit = GetEnumValue(arguments, "SelectionUnit", 0),
             HasSelectionConfiguration = arguments.Keys.Any(static key =>
@@ -760,6 +761,15 @@ internal static partial class Discovery
                 "IDataGridNavigationInputModel",
                 "GenerateNavigationInputModel",
                 "NavigationInputModelPropertyName",
+                true,
+                diagnostics),
+            RouteContextFactory = ResolveNavigationModelViewBinding(
+                request,
+                request.RouteContextFactoryPropertyName,
+                "Avalonia.Controls.DataGridNavigation.IDataGridRouteContextFactory",
+                "IDataGridRouteContextFactory",
+                "GenerateRouteContextFactory",
+                "RouteContextFactoryPropertyName",
                 true,
                 diagnostics),
             SelectionMode = request.SelectionMode,
@@ -1455,11 +1465,7 @@ internal static partial class Discovery
         ViewBindingModel? binding = ResolveViewBinding(
             request,
             propertyName!,
-            usesGeneratedModel
-                ? string.Equals(generatePropertyName, "GenerateNavigationInputModel", StringComparison.Ordinal)
-                    ? "global::Avalonia.Controls.DataGridNavigation.DataGridNavigationInputModel"
-                    : "global::Avalonia.Controls.DataGridNavigation.DataGridNavigationModel"
-                : null,
+            usesGeneratedModel ? GetGeneratedNavigationPropertyType(generatePropertyName) : null,
             usesGeneratedModel,
             diagnostics);
         if (binding == null || usesGeneratedModel)
@@ -1486,6 +1492,15 @@ internal static partial class Discovery
             $"member '{propertyName}' must implement {interfaceDisplayName}"));
         return null;
     }
+
+    private static string GetGeneratedNavigationPropertyType(string generatePropertyName) => generatePropertyName switch
+    {
+        "GenerateNavigationInputModel" =>
+            "global::Avalonia.Controls.DataGridNavigation.DataGridNavigationInputModel",
+        "GenerateRouteContextFactory" =>
+            "global::Avalonia.Controls.DataGridNavigation.DataGridRouteContextFactory",
+        _ => "global::Avalonia.Controls.DataGridNavigation.DataGridNavigationModel"
+    };
 
     private static bool IsGeneratedNavigationModelProperty(
         INamedTypeSymbol viewModelType,
@@ -1543,12 +1558,18 @@ internal static partial class Discovery
         return GeneratorUtilities.GetBoolean(arguments, generatePropertyName, false) &&
             string.Equals(
                 GeneratorUtilities.GetString(arguments, generatedPropertyName) ??
-                    (string.Equals(generatePropertyName, "GenerateNavigationInputModel", StringComparison.Ordinal)
-                        ? "NavigationInputModel"
-                        : "NavigationModel"),
+                    GetDefaultGeneratedNavigationPropertyName(generatePropertyName),
                 propertyName,
                 StringComparison.Ordinal);
     }
+
+    private static string GetDefaultGeneratedNavigationPropertyName(string generatePropertyName) =>
+        generatePropertyName switch
+        {
+            "GenerateNavigationInputModel" => "NavigationInputModel",
+            "GenerateRouteContextFactory" => "RouteContextFactory",
+            _ => "NavigationModel"
+        };
 
     private static ViewBindingModel? ResolveFormulaViewBinding(
         ViewRequest request,
@@ -1778,6 +1799,7 @@ internal static partial class Discovery
         public string? NavigationModelPropertyName { get; set; }
         public string? RouteNavigationModelPropertyName { get; set; }
         public string? NavigationInputModelPropertyName { get; set; }
+        public string? RouteContextFactoryPropertyName { get; set; }
         public int SelectionMode { get; set; } = 1;
         public int SelectionUnit { get; set; }
         public bool HasSelectionConfiguration { get; set; }

@@ -123,6 +123,8 @@ internal sealed class ViewModelViewModel
 
     public ViewBindingModel? NavigationInputModel { get; set; }
 
+    public ViewBindingModel? RouteContextFactory { get; set; }
+
     public int SelectionMode { get; set; }
 
     public int SelectionUnit { get; set; }
@@ -705,6 +707,8 @@ internal sealed class ViewModelModel
 
     public string NavigationInputModelPropertyName { get; set; } = "NavigationInputModel";
 
+    public string RouteContextFactoryPropertyName { get; set; } = "RouteContextFactory";
+
     public bool GenerateColumnDefinitionsProperty { get; set; } = true;
 
     public bool GenerateSchemaProperty { get; set; } = true;
@@ -714,6 +718,8 @@ internal sealed class ViewModelModel
     public bool GenerateNavigationModelProperty { get; set; }
 
     public bool GenerateNavigationInputModelProperty { get; set; }
+
+    public bool GenerateRouteContextFactoryProperty { get; set; }
 
     public bool IsDirectIncremental { get; set; }
 

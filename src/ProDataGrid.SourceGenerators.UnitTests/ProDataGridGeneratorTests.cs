@@ -1258,12 +1258,15 @@ public sealed class ProDataGridGeneratorTests
                     GenerateNavigationModel = true,
                     NavigationModelPropertyName = nameof(CellNavigation),
                     GenerateNavigationInputModel = true,
-                    NavigationInputModelPropertyName = nameof(InputNavigation))]
+                    NavigationInputModelPropertyName = nameof(InputNavigation),
+                    GenerateRouteContextFactory = true,
+                    RouteContextFactoryPropertyName = nameof(RouteContext))]
                 [GenerateDataGridView(
                     typeof(Row),
                     NavigationModelPropertyName = nameof(CellNavigation),
                     RouteNavigationModelPropertyName = nameof(RouteNavigation),
-                    NavigationInputModelPropertyName = nameof(InputNavigation))]
+                    NavigationInputModelPropertyName = nameof(InputNavigation),
+                    RouteContextFactoryPropertyName = nameof(RouteContext))]
                 public sealed partial class RowsViewModel
                 {
                     public IReadOnlyList<Row> Items { get; } = new List<Row>();
@@ -1277,13 +1280,17 @@ public sealed class ProDataGridGeneratorTests
         Assert.Contains("CreateNavigationModel()", result.CombinedSource);
         Assert.Contains("DataGridNavigationInputModel InputNavigation", result.CombinedSource);
         Assert.Contains("CreateNavigationInputModel()", result.CombinedSource);
+        Assert.Contains("DataGridRouteContextFactory RouteContext", result.CombinedSource);
+        Assert.Contains("CreateRouteContextFactory()", result.CombinedSource);
         Assert.Contains("CreateRouteNavigationModel(", result.CombinedSource);
         Assert.Contains("DataGrid.NavigationModelProperty", result.CombinedSource);
         Assert.Contains("DataGrid.RouteNavigationModelProperty", result.CombinedSource);
         Assert.Contains("DataGrid.NavigationInputModelProperty", result.CombinedSource);
+        Assert.Contains("DataGrid.RouteContextFactoryProperty", result.CombinedSource);
         Assert.Contains("viewModel.CellNavigation", result.CombinedSource);
         Assert.Contains("viewModel.RouteNavigation", result.CombinedSource);
         Assert.Contains("viewModel.InputNavigation", result.CombinedSource);
+        Assert.Contains("viewModel.RouteContext", result.CombinedSource);
     }
 
     [Fact]
@@ -1301,23 +1308,26 @@ public sealed class ProDataGridGeneratorTests
                     typeof(Row),
                     NavigationModelPropertyName = nameof(CellNavigation),
                     RouteNavigationModelPropertyName = nameof(RouteNavigation),
-                    NavigationInputModelPropertyName = nameof(InputNavigation))]
+                    NavigationInputModelPropertyName = nameof(InputNavigation),
+                    RouteContextFactoryPropertyName = nameof(RouteContext))]
                 public sealed partial class RowsViewModel
                 {
                     public IReadOnlyList<Row> Items { get; } = new List<Row>();
                     public object CellNavigation { get; } = new object();
                     public object RouteNavigation { get; } = new object();
                     public object InputNavigation { get; } = new object();
+                    public object RouteContext { get; } = new object();
                 }
             }
             """);
 
         Assert.Equal(
-            3,
+            4,
             result.GeneratorDiagnostics.Count(static diagnostic => diagnostic.Id == "PDGSG141"));
         Assert.DoesNotContain("DataGrid.NavigationModelProperty", result.CombinedSource);
         Assert.DoesNotContain("DataGrid.RouteNavigationModelProperty", result.CombinedSource);
         Assert.DoesNotContain("DataGrid.NavigationInputModelProperty", result.CombinedSource);
+        Assert.DoesNotContain("DataGrid.RouteContextFactoryProperty", result.CombinedSource);
     }
 
     [Fact]
@@ -1329,10 +1339,13 @@ public sealed class ProDataGridGeneratorTests
             [assembly: GenerateDataGridViewModelsForNamespace(
                 "Demo.ViewModels",
                 GenerateNavigationInputModel = true,
-                NavigationInputModelPropertyName = "GridInput")]
+                NavigationInputModelPropertyName = "GridInput",
+                GenerateRouteContextFactory = true,
+                RouteContextFactoryPropertyName = "GridRouteContext")]
             [assembly: GenerateDataGridViewsForNamespace(
                 "Demo.ViewModels",
-                NavigationInputModelPropertyName = "GridInput")]
+                NavigationInputModelPropertyName = "GridInput",
+                RouteContextFactoryPropertyName = "GridRouteContext")]
             namespace Demo.Models
             {
                 public sealed class Row { public int Id { get; set; } }
@@ -1348,8 +1361,34 @@ public sealed class ProDataGridGeneratorTests
 
         AssertNoErrors(result);
         Assert.Contains("DataGridNavigationInputModel GridInput", result.CombinedSource);
+        Assert.Contains("DataGridRouteContextFactory GridRouteContext", result.CombinedSource);
         Assert.Contains("DataGrid.NavigationInputModelProperty", result.CombinedSource);
         Assert.Contains("viewModel.GridInput", result.CombinedSource);
+        Assert.Contains("DataGrid.RouteContextFactoryProperty", result.CombinedSource);
+        Assert.Contains("viewModel.GridRouteContext", result.CombinedSource);
+    }
+
+    [Fact]
+    public void Generated_route_context_factory_uses_schema_key_without_reflection()
+    {
+        GeneratorTestResult result = GeneratorTestHelper.Run("""
+            using ProDataGrid.SourceGeneration;
+            namespace Demo
+            {
+                public sealed class Row
+                {
+                    [DataGridKey]
+                    public int Id { get; set; }
+                }
+
+                [GenerateDataGridColumns(typeof(Row))]
+                public sealed partial class RowsSchemaMarker { }
+            }
+            """);
+
+        AssertNoErrors(result);
+        Assert.Contains("CreateRouteContextFactory()", result.CombinedSource);
+        Assert.Contains("Instance.GetKey((global::Demo.Row)item)", result.CombinedSource);
     }
 
     [Fact]
