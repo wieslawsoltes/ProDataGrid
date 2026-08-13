@@ -49,9 +49,15 @@ internal
 
         //TODO TabStop
         //TODO FlowDirection
-        private bool ProcessDataGridKey(KeyEventArgs e)
+        private bool ProcessDataGridKey(KeyEventArgs e, bool navigationInputResolved = false)
         {
             using var _ = BeginSelectionChangeScope(DataGridSelectionChangeSource.Keyboard, e);
+
+            if (!navigationInputResolved &&
+                TryProcessKeyNavigationInput(e, DataGridNavigationInputKind.KeyDown, out bool inputHandled))
+            {
+                return inputHandled;
+            }
 
             var overrides = KeyboardGestureOverrides;
             var defaults = GetDefaultKeyboardGestures();
@@ -1073,16 +1079,6 @@ internal
 
         private void OnKeyDownRouteFinished(RoutedEventArgs e)
         {
-            if (e.Handled)
-            {
-                if (e is KeyEventArgs handledKeyEventArgs)
-                {
-                    ProcessHandledEditingTabKey(handledKeyEventArgs);
-                }
-
-                return;
-            }
-
             var route = e.Route;
             var isBubble = route.HasFlag(RoutingStrategies.Bubble);
             var isDirect = route == RoutingStrategies.Direct || route == 0;
@@ -1096,12 +1092,21 @@ internal
                 return;
             }
 
+            bool navigationInputResolved = TakeNavigationKeyInputResolved(
+                keyEventArgs,
+                DataGridNavigationInputKind.KeyDown);
+            if (e.Handled)
+            {
+                ProcessHandledEditingTabKey(keyEventArgs);
+                return;
+            }
+
             if (!IsKeyEventFromThisGrid(keyEventArgs))
             {
                 return;
             }
 
-            DataGrid_KeyDown(this, keyEventArgs);
+            ProcessDataGridKeyDown(keyEventArgs, navigationInputResolved);
         }
 
         private void ProcessHandledEditingTabKey(KeyEventArgs e)
@@ -1136,11 +1141,6 @@ internal
 
         private void OnKeyUpRouteFinished(RoutedEventArgs e)
         {
-            if (e.Handled)
-            {
-                return;
-            }
-
             var route = e.Route;
             var isBubble = route.HasFlag(RoutingStrategies.Bubble);
             var isDirect = route == RoutingStrategies.Direct || route == 0;
@@ -1151,6 +1151,12 @@ internal
 
             if (e is not KeyEventArgs keyEventArgs)
             {
+                return;
+            }
+
+            if (e.Handled)
+            {
+                TakeNavigationKeyInputResolved(keyEventArgs, DataGridNavigationInputKind.KeyUp);
                 return;
             }
 
@@ -1291,14 +1297,30 @@ internal
                 return;
             }
 
+            if (NavigationInputModel != null)
+            {
+                if (WasNavigationKeyInputResolved(e, DataGridNavigationInputKind.KeyDown))
+                {
+                    e.Handled = ProcessDataGridKey(e, navigationInputResolved: true);
+                }
+                return;
+            }
+
             e.Handled = ProcessDataGridKey(e);
         }
 
         private void DataGrid_KeyDown(object sender, KeyEventArgs e)
         {
+            ProcessDataGridKeyDown(
+                e,
+                TakeNavigationKeyInputResolved(e, DataGridNavigationInputKind.KeyDown));
+        }
+
+        private void ProcessDataGridKeyDown(KeyEventArgs e, bool navigationInputResolved)
+        {
             if (!e.Handled)
             {
-                e.Handled = ProcessDataGridKey(e);
+                e.Handled = ProcessDataGridKey(e, navigationInputResolved);
             }
         }
 
@@ -1310,8 +1332,18 @@ internal
 
         private void DataGrid_KeyUp(object sender, KeyEventArgs e)
         {
+            bool navigationInputResolved = TakeNavigationKeyInputResolved(
+                e,
+                DataGridNavigationInputKind.KeyUp);
             if (e.Handled)
             {
+                return;
+            }
+
+            if (!navigationInputResolved &&
+                TryProcessKeyNavigationInput(e, DataGridNavigationInputKind.KeyUp, out bool inputHandled))
+            {
+                e.Handled = inputHandled;
                 return;
             }
 
