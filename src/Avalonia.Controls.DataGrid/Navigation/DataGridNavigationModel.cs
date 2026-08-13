@@ -56,7 +56,11 @@ namespace Avalonia.Controls.DataGridNavigation
         BeginEdit,
         /// <summary>Cancels the current cell or row edit.</summary>
         CancelEdit,
-        /// <summary>Expands all expandable hierarchy nodes.</summary>
+        /// <summary>Expands the current hierarchy node or row group.</summary>
+        Expand,
+        /// <summary>Collapses the current hierarchy node or row group.</summary>
+        Collapse,
+        /// <summary>Expands the current hierarchy subtree.</summary>
         ExpandAll
     }
 
@@ -612,6 +616,55 @@ namespace Avalonia.Controls.DataGridNavigation
     }
 
     /// <summary>
+    /// Captures and restores serializable navigation policy without retaining a DataGrid or item.
+    /// </summary>
+#if !DATAGRID_INTERNAL
+    public
+#else
+    internal
+#endif
+    interface IDataGridNavigationStateModel
+    {
+        /// <summary>Captures the current policy settings.</summary>
+        /// <returns>A detached policy snapshot.</returns>
+        DataGridNavigationPolicyState CaptureState();
+
+        /// <summary>Restores policy settings from a detached snapshot.</summary>
+        /// <param name="state">The policy snapshot.</param>
+        void RestoreState(DataGridNavigationPolicyState state);
+    }
+
+    /// <summary>
+    /// Stores the serializable policy portion of a navigation model.
+    /// Current-cell identity remains part of <see cref="global::Avalonia.Controls.DataGridSelectionState"/> so it can use stable item and column keys.
+    /// </summary>
+#if !DATAGRID_INTERNAL
+    public
+#else
+    internal
+#endif
+    sealed class DataGridNavigationPolicyState
+    {
+        /// <summary>Gets or sets the state contract version.</summary>
+        public int Version { get; set; } = 1;
+
+        /// <summary>Gets or sets the Left/Right boundary policy.</summary>
+        public DataGridNavigationBoundaryMode HorizontalBoundaryMode { get; set; } = DataGridNavigationBoundaryMode.Contained;
+
+        /// <summary>Gets or sets the Up/Down boundary policy.</summary>
+        public DataGridNavigationBoundaryMode VerticalBoundaryMode { get; set; } = DataGridNavigationBoundaryMode.Contained;
+
+        /// <summary>Gets or sets the Tab/Shift+Tab boundary policy.</summary>
+        public DataGridNavigationBoundaryMode TabBoundaryMode { get; set; } = DataGridNavigationBoundaryMode.Exit;
+
+        /// <summary>Gets or sets when the grid manages Tab traversal.</summary>
+        public DataGridTabNavigationMode TabNavigationMode { get; set; } = DataGridTabNavigationMode.EditingOnly;
+
+        /// <summary>Gets or sets whether Left/Right are physical or flow-relative.</summary>
+        public DataGridHorizontalNavigationMode HorizontalNavigationMode { get; set; } = DataGridHorizontalNavigationMode.Physical;
+    }
+
+    /// <summary>
     /// Carries a ViewModel-issued semantic navigation request to a bound DataGrid.
     /// </summary>
 #if !DATAGRID_INTERNAL
@@ -675,6 +728,7 @@ namespace Avalonia.Controls.DataGridNavigation
         IDataGridNavigationModel,
         IDataGridNavigationQueryModel,
         IDataGridNavigationController,
+        IDataGridNavigationStateModel,
         INotifyPropertyChanged
     {
         private DataGridNavigationBoundaryMode _horizontalBoundaryMode = DataGridNavigationBoundaryMode.Contained;
@@ -778,6 +832,34 @@ namespace Avalonia.Controls.DataGridNavigation
             {
                 handler(this, new DataGridNavigationChangedEventArgs(completed));
             }
+        }
+
+        /// <inheritdoc />
+        public DataGridNavigationPolicyState CaptureState()
+        {
+            return new DataGridNavigationPolicyState
+            {
+                HorizontalBoundaryMode = HorizontalBoundaryMode,
+                VerticalBoundaryMode = VerticalBoundaryMode,
+                TabBoundaryMode = TabBoundaryMode,
+                TabNavigationMode = TabNavigationMode,
+                HorizontalNavigationMode = HorizontalNavigationMode
+            };
+        }
+
+        /// <inheritdoc />
+        public void RestoreState(DataGridNavigationPolicyState state)
+        {
+            if (state == null)
+            {
+                throw new ArgumentNullException(nameof(state));
+            }
+
+            HorizontalBoundaryMode = state.HorizontalBoundaryMode;
+            VerticalBoundaryMode = state.VerticalBoundaryMode;
+            TabBoundaryMode = state.TabBoundaryMode;
+            TabNavigationMode = state.TabNavigationMode;
+            HorizontalNavigationMode = state.HorizontalNavigationMode;
         }
 
         /// <summary>Resolves the reusable built-in policy before preview observers run.</summary>

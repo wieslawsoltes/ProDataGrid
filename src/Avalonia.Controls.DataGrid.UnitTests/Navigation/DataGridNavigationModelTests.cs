@@ -1,7 +1,9 @@
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
 using Avalonia.Controls;
+using Avalonia.Controls.DataGridHierarchical;
 using Avalonia.Controls.DataGridNavigation;
 using Avalonia.Data;
 using Avalonia.Headless.XUnit;
@@ -194,6 +196,29 @@ public class DataGridNavigationModelTests
         model.HorizontalBoundaryMode = DataGridNavigationBoundaryMode.Wrap;
 
         Assert.Equal(new[] { nameof(model.HorizontalBoundaryMode) }, changes);
+    }
+
+    [Fact]
+    public void Policy_State_Round_Trips_All_Settings()
+    {
+        var source = new DataGridNavigationModel
+        {
+            HorizontalBoundaryMode = DataGridNavigationBoundaryMode.Wrap,
+            VerticalBoundaryMode = DataGridNavigationBoundaryMode.Exit,
+            TabBoundaryMode = DataGridNavigationBoundaryMode.Wrap,
+            TabNavigationMode = DataGridTabNavigationMode.Always,
+            HorizontalNavigationMode = DataGridHorizontalNavigationMode.Logical
+        };
+        DataGridNavigationPolicyState state = source.CaptureState();
+        var restored = new DataGridNavigationModel();
+
+        restored.RestoreState(state);
+
+        Assert.Equal(source.HorizontalBoundaryMode, restored.HorizontalBoundaryMode);
+        Assert.Equal(source.VerticalBoundaryMode, restored.VerticalBoundaryMode);
+        Assert.Equal(source.TabBoundaryMode, restored.TabBoundaryMode);
+        Assert.Equal(source.TabNavigationMode, restored.TabNavigationMode);
+        Assert.Equal(source.HorizontalNavigationMode, restored.HorizontalNavigationMode);
     }
 
     [Fact]
@@ -446,6 +471,45 @@ public class DataGridNavigationModelTests
         Assert.Equal(0, grid.CurrentCell.RowIndex);
     }
 
+    [AvaloniaFact]
+    public void Programmatic_Expand_And_Collapse_Control_Current_Hierarchical_Node()
+    {
+        var root = new TreeRow("Root");
+        root.Children.Add(new TreeRow("Child"));
+        var hierarchy = new HierarchicalModel<TreeRow>(new HierarchicalOptions<TreeRow>
+        {
+            ItemsSelector = static item => item.Children
+        });
+        hierarchy.SetRoot(root);
+        var grid = new DataGrid
+        {
+            HierarchicalModel = hierarchy,
+            HierarchicalRowsEnabled = true,
+            ItemsSource = hierarchy.Flattened,
+            AutoGenerateColumns = false
+        };
+        var column = new DataGridHierarchicalColumn
+        {
+            Header = "Name"
+        };
+        grid.Columns.Add(column);
+        var window = new Window { Width = 480, Height = 320, Content = grid };
+        window.SetThemeStyles();
+        window.Show();
+        grid.UpdateLayout();
+        grid.CurrentCell = new DataGridCellInfo(
+            hierarchy.Flattened[0],
+            column,
+            rowIndex: 0,
+            columnIndex: 0,
+            isValid: true);
+
+        Assert.True(grid.Navigate(DataGridNavigationCommand.Expand));
+        Assert.True(hierarchy.Root!.Value.IsExpanded);
+        Assert.True(grid.Navigate(DataGridNavigationCommand.Collapse));
+        Assert.False(hierarchy.Root.Value.IsExpanded);
+    }
+
     private static DataGridNavigationRequest CreateRequest(
         DataGridNavigationCommand command,
         DataGridNavigationPosition? proposed = null,
@@ -513,6 +577,18 @@ public class DataGridNavigationModelTests
     }
 
     private sealed record Row(int Id, string Name, bool Active);
+
+    private sealed class TreeRow
+    {
+        public TreeRow(string name)
+        {
+            Name = name;
+        }
+
+        public string Name { get; }
+
+        public ObservableCollection<TreeRow> Children { get; } = [];
+    }
 
     private sealed class RedirectingNavigationModel : DataGridNavigationModel
     {

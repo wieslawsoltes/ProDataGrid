@@ -497,6 +497,84 @@ internal
             return true;
         }
 
+        private bool ProcessExpandCommand(bool subtree)
+        {
+            if (!_hierarchicalRowsEnabled || _hierarchicalAdapter == null)
+            {
+                return false;
+            }
+
+            if (WaitForLostFocus(() => ProcessExpandCommand(subtree)))
+            {
+                return true;
+            }
+
+            if (TryHandleGroupSlotAsNode(CurrentSlot, GroupSlotAction.Expand, subtree))
+            {
+                return true;
+            }
+
+            if (!TryGetHierarchicalIndexFromSlot(CurrentSlot, out var hierarchicalIndex) ||
+                !_hierarchicalAdapter.IsExpandable(hierarchicalIndex))
+            {
+                return false;
+            }
+
+            if (subtree)
+            {
+                var node = _hierarchicalAdapter.NodeAt(hierarchicalIndex);
+                RunHierarchicalAction(() => _hierarchicalAdapter.ExpandAll(node));
+                return true;
+            }
+
+            if (_hierarchicalAdapter.IsExpanded(hierarchicalIndex))
+            {
+                return false;
+            }
+
+            _hierarchicalAdapter.Expand(hierarchicalIndex);
+            return true;
+        }
+
+        private bool ProcessCollapseCommand(bool subtree)
+        {
+            if (!_hierarchicalRowsEnabled || _hierarchicalAdapter == null)
+            {
+                return false;
+            }
+
+            if (WaitForLostFocus(() => ProcessCollapseCommand(subtree)))
+            {
+                return true;
+            }
+
+            if (TryHandleGroupSlotAsNode(CurrentSlot, GroupSlotAction.Collapse, subtree))
+            {
+                return true;
+            }
+
+            if (!TryGetHierarchicalIndexFromSlot(CurrentSlot, out var hierarchicalIndex))
+            {
+                return false;
+            }
+
+            if (subtree)
+            {
+                var node = _hierarchicalAdapter.NodeAt(hierarchicalIndex);
+                RunHierarchicalAction(() => _hierarchicalAdapter.CollapseAll(node));
+                return true;
+            }
+
+            if (!_hierarchicalAdapter.IsExpandable(hierarchicalIndex) ||
+                !_hierarchicalAdapter.IsExpanded(hierarchicalIndex))
+            {
+                return false;
+            }
+
+            _hierarchicalAdapter.Collapse(hierarchicalIndex);
+            return true;
+        }
+
 
 
 

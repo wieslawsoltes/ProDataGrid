@@ -169,6 +169,8 @@ namespace Avalonia.Controls
                 DataGridNavigationCommand.Enter => ProcessEnterKey(keyEventArgs, shift, ctrl),
                 DataGridNavigationCommand.BeginEdit => ProcessF2Key(keyEventArgs),
                 DataGridNavigationCommand.CancelEdit => ProcessEscapeKey(),
+                DataGridNavigationCommand.Expand => ProcessExpandCommand(subtree: false),
+                DataGridNavigationCommand.Collapse => ProcessCollapseCommand(subtree: false),
                 DataGridNavigationCommand.ExpandAll => ProcessMultiplyKey(keyEventArgs),
                 _ => false
             };
@@ -424,6 +426,8 @@ namespace Avalonia.Controls
         private bool CanExecuteNavigationWithoutTarget(DataGridNavigationCommand command) =>
             command is DataGridNavigationCommand.BeginEdit or
                 DataGridNavigationCommand.CancelEdit or
+                DataGridNavigationCommand.Expand or
+                DataGridNavigationCommand.Collapse or
                 DataGridNavigationCommand.ExpandAll;
 
         private DataGridNavigationFailureReason ResolveUnavailableNavigationReason()
