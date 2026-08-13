@@ -1394,6 +1394,25 @@ internal
                 defaultBindingMode: BindingMode.TwoWay);
 
         /// <summary>
+        /// Gets or sets the model that resolves keyboard and programmatic navigation policy.
+        /// </summary>
+        public static readonly DirectProperty<DataGrid, Avalonia.Controls.DataGridNavigation.IDataGridNavigationModel> NavigationModelProperty =
+            AvaloniaProperty.RegisterDirect<DataGrid, Avalonia.Controls.DataGridNavigation.IDataGridNavigationModel>(
+                nameof(NavigationModel),
+                o => o.NavigationModel,
+                (o, v) => o.NavigationModel = v,
+                defaultBindingMode: BindingMode.TwoWay);
+
+        /// <summary>
+        /// Identifies the <see cref="RouteNavigationModel"/> direct property.
+        /// </summary>
+        public static readonly DirectProperty<DataGrid, Avalonia.Controls.DataGridNavigation.IDataGridRouteNavigationModel> RouteNavigationModelProperty =
+            AvaloniaProperty.RegisterDirect<DataGrid, Avalonia.Controls.DataGridNavigation.IDataGridRouteNavigationModel>(
+                nameof(RouteNavigationModel),
+                o => o.RouteNavigationModel,
+                (o, v) => o.RouteNavigationModel = v);
+
+        /// <summary>
         /// Gets or sets the hierarchical model that drives tree-like rows. If not provided, a default
         /// hierarchical model is created.
         /// </summary>

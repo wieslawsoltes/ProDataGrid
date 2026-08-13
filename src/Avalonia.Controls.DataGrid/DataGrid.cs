@@ -18,6 +18,7 @@ using Avalonia.Controls.DataGridConditionalFormatting;
 using Avalonia.Controls.DataGridClipboard;
 using Avalonia.Controls.DataGridEditing;
 using Avalonia.Controls.DataGridInteractions;
+using Avalonia.Controls.DataGridNavigation;
 using Avalonia.Controls.DataGridHierarchical;
 using Avalonia.Controls.DataGridDragDrop;
 using Avalonia.Input;
@@ -341,6 +342,9 @@ internal
         private Avalonia.Controls.DataGridClipboard.IDataGridClipboardImportModelFactory _clipboardImportModelFactory;
         private Avalonia.Controls.DataGridEditing.IDataGridEditingInteractionModel _editingInteractionModel;
         private Avalonia.Controls.DataGridEditing.IDataGridEditingInteractionModelFactory _editingInteractionModelFactory;
+        private IDataGridNavigationModel _navigationModel;
+        private IDataGridNavigationModelFactory _navigationModelFactory;
+        private IDataGridRouteNavigationModel _routeNavigationModel;
         private readonly Dictionary<SearchCellKey, SearchResult> _searchResultsMap = new();
         private readonly HashSet<int> _searchRowMatches = new();
         private SearchCellKey? _currentSearchCell;
@@ -647,6 +651,7 @@ internal
             SetRangeInteractionModel(CreateRangeInteractionModel());
             SetClipboardImportModel(CreateClipboardImportModel());
             SetEditingInteractionModel(CreateEditingInteractionModel());
+            SetNavigationModel(CreateNavigationModel());
 
             AnchorSlot = -1;
             _lastEstimatedRow = -1;
@@ -2134,6 +2139,15 @@ internal
         }
 
         /// <summary>
+        /// Creates the default navigation model for the grid. Override or set
+        /// <see cref="NavigationModelFactory"/> before construction completes to supply a custom implementation.
+        /// </summary>
+        protected virtual IDataGridNavigationModel CreateNavigationModel()
+        {
+            return _navigationModelFactory?.Create() ?? new DataGridNavigationModel();
+        }
+
+        /// <summary>
         /// Optional factory used when creating the default sorting model.
         /// </summary>
         public IDataGridSortingModelFactory SortingModelFactory
@@ -2203,6 +2217,15 @@ internal
         {
             get => _editingInteractionModelFactory;
             set => _editingInteractionModelFactory = value;
+        }
+
+        /// <summary>
+        /// Gets or sets the optional factory used to create the default navigation model.
+        /// </summary>
+        public IDataGridNavigationModelFactory NavigationModelFactory
+        {
+            get => _navigationModelFactory;
+            set => _navigationModelFactory = value;
         }
 
         /// <summary>
@@ -2540,6 +2563,38 @@ internal
         {
             get => _editingInteractionModel;
             set => SetEditingInteractionModel(value);
+        }
+
+        /// <summary>
+        /// Gets or sets the model that resolves keyboard and programmatic navigation policy.
+        /// </summary>
+        public IDataGridNavigationModel NavigationModel
+        {
+            get => _navigationModel;
+            set => SetNavigationModel(value);
+        }
+
+        /// <summary>
+        /// Gets or sets the optional framework-neutral application-route model associated with this grid.
+        /// </summary>
+        /// <remarks>
+        /// The model can be shared with a ViewModel command. The grid does not require ReactiveUI,
+        /// Prism, CommunityToolkit.Mvvm, or another navigation framework.
+        /// </remarks>
+        public IDataGridRouteNavigationModel RouteNavigationModel
+        {
+            get => _routeNavigationModel;
+            set
+            {
+                if (ReferenceEquals(_routeNavigationModel, value))
+                {
+                    return;
+                }
+
+                IDataGridRouteNavigationModel oldModel = _routeNavigationModel;
+                _routeNavigationModel = value;
+                RaisePropertyChanged(RouteNavigationModelProperty, oldModel, value);
+            }
         }
 
         /// <summary>
@@ -5716,6 +5771,20 @@ internal
 
             _editingInteractionModel = newModel;
             RaisePropertyChanged(EditingInteractionModelProperty, oldModel, _editingInteractionModel);
+        }
+
+        private void SetNavigationModel(IDataGridNavigationModel model)
+        {
+            IDataGridNavigationModel oldModel = _navigationModel;
+            IDataGridNavigationModel newModel = model ?? CreateNavigationModel();
+
+            if (ReferenceEquals(oldModel, newModel))
+            {
+                return;
+            }
+
+            _navigationModel = newModel;
+            RaisePropertyChanged(NavigationModelProperty, oldModel, _navigationModel);
         }
 
         private void FilteringModel_PropertyChanged(object sender, PropertyChangedEventArgs e)
