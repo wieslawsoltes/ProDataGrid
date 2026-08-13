@@ -197,6 +197,62 @@ public class DataGridLayoutIntegrationTests
         }
     }
 
+    [AvaloniaFact]
+    public void Navigation_query_does_not_mutate_the_persistent_layout_anchor()
+    {
+        Window window = CreateWindow(out DataGrid grid, itemCount: 20);
+        try
+        {
+            var model = new NavigationTestLayoutModel();
+            grid.LayoutModel = model;
+            window.Show();
+            window.UpdateLayout();
+            SetCurrentCell(grid, rowIndex: 0, columnIndex: 0);
+
+            Assert.True(grid.CanNavigate(DataGridNavigationCommand.Down));
+            Assert.True(grid.Navigate(DataGridNavigationCommand.Down));
+            Assert.True(grid.Navigate(DataGridNavigationCommand.Down));
+
+            Assert.Equal(3, model.Algorithm.NavigationAnchors.Count);
+            Assert.Equal(new Point(50, 15), model.Algorithm.NavigationAnchors[0]);
+            Assert.Equal(model.Algorithm.NavigationAnchors[0], model.Algorithm.NavigationAnchors[1]);
+            Assert.Equal(new Point(50, 75), model.Algorithm.NavigationAnchors[2]);
+        }
+        finally
+        {
+            window.Close();
+        }
+    }
+
+    [AvaloniaFact]
+    public void Logical_rtl_redirect_is_re_resolved_by_the_layout()
+    {
+        Window window = CreateWindow(out DataGrid grid, itemCount: 20);
+        try
+        {
+            grid.LayoutModel = new DataGridUniformGridLayoutModel
+            {
+                MinItemWidth = 100,
+                MinItemHeight = 32
+            };
+            grid.FlowDirection = FlowDirection.RightToLeft;
+            grid.NavigationModel = new DataGridNavigationModel
+            {
+                HorizontalNavigationMode = DataGridHorizontalNavigationMode.Logical
+            };
+            window.Show();
+            window.UpdateLayout();
+            SetCurrentCell(grid, rowIndex: 1, columnIndex: 0);
+
+            Assert.True(grid.Navigate(DataGridNavigationCommand.Left));
+            Assert.Equal(2, grid.CurrentCell.RowIndex);
+        }
+        finally
+        {
+            window.Close();
+        }
+    }
+
     private static Window CreateWindow(out DataGrid grid, int itemCount, int columnCount = 1)
     {
         var window = new Window { Width = 360, Height = 260 };
@@ -310,6 +366,8 @@ public class DataGridLayoutIntegrationTests
     {
         public int ResolveCount { get; private set; }
 
+        public List<Point> NavigationAnchors { get; } = [];
+
         public void Initialize(IDataGridLayoutContext context)
         {
         }
@@ -364,6 +422,7 @@ public class DataGridLayoutIntegrationTests
             out DataGridLayoutNavigationResult result)
         {
             ResolveCount++;
+            NavigationAnchors.Add(request.NavigationAnchor);
             int target = request.CurrentItemIndex + 2;
             result = new DataGridLayoutNavigationResult(target, GetBounds(target));
             return target < context.ItemCount;
