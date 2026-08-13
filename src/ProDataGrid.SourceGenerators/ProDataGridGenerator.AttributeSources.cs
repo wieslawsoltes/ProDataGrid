@@ -116,6 +116,12 @@ public sealed partial class ProDataGridGenerator
                 Vertical
             }
 
+            internal enum DataGridGeneratedLayoutPresentation
+            {
+                Rows,
+                Items
+            }
+
             internal enum DataGridCondition
             {
                 Equals,
@@ -342,6 +348,12 @@ public sealed partial class ProDataGridGenerator
                 public global::Avalonia.Controls.DataGridLayouts.DataGridUniformGridItemsStretch LayoutItemsStretch { get; set; }
                 public bool LayoutDisableVirtualization { get; set; }
                 public int LayoutMaximumCachedLines { get; set; } = 256;
+                public DataGridGeneratedLayoutPresentation LayoutPresentation { get; set; }
+                public double LayoutItemWidthEstimate { get; set; } = 100;
+                public double LayoutItemHeightEstimate { get; set; } = 32;
+                public string? LayoutItemTemplateKey { get; set; }
+                public Type? LayoutItemTemplateImplementationType { get; set; }
+                public string? LayoutItemTemplateFactoryMethod { get; set; }
                 public string? SortingModelPropertyName { get; set; }
                 public string? FilteringModelPropertyName { get; set; }
                 public global::Avalonia.Controls.DataGridFiltering.DataGridHierarchyFilterPolicy HierarchyFilterPolicy { get; set; } =
@@ -446,6 +458,12 @@ public sealed partial class ProDataGridGenerator
                 public global::Avalonia.Controls.DataGridLayouts.DataGridUniformGridItemsStretch LayoutItemsStretch { get; set; }
                 public bool LayoutDisableVirtualization { get; set; }
                 public int LayoutMaximumCachedLines { get; set; } = 256;
+                public DataGridGeneratedLayoutPresentation LayoutPresentation { get; set; }
+                public double LayoutItemWidthEstimate { get; set; } = 100;
+                public double LayoutItemHeightEstimate { get; set; } = 32;
+                public string? LayoutItemTemplateKey { get; set; }
+                public Type? LayoutItemTemplateImplementationType { get; set; }
+                public string? LayoutItemTemplateFactoryMethod { get; set; }
                 public string? SortingModelPropertyName { get; set; }
                 public string? FilteringModelPropertyName { get; set; }
                 public global::Avalonia.Controls.DataGridFiltering.DataGridHierarchyFilterPolicy HierarchyFilterPolicy { get; set; } =

@@ -4838,6 +4838,135 @@ public sealed class ProDataGridGeneratorTests
     }
 
     [Fact]
+    public void Generated_item_layout_emits_presentation_estimate_and_typed_factory()
+    {
+        GeneratorTestResult result = GeneratorTestHelper.Run("""
+            using System.Collections.Generic;
+            using Avalonia.Controls;
+            using ProDataGrid.SourceGeneration;
+            namespace Demo;
+            public sealed class Row
+            {
+                public int Id { get; set; }
+                public static Control CreateCard(Row item, Control existing) =>
+                    existing ?? new TextBlock { Text = item.Id.ToString() };
+            }
+            [GenerateDataGridViewModel(typeof(Row))]
+            [GenerateDataGridView(
+                typeof(Row),
+                Layout = DataGridGeneratedLayout.UniformGrid,
+                LayoutPresentation = DataGridGeneratedLayoutPresentation.Items,
+                LayoutItemWidthEstimate = 180,
+                LayoutItemHeightEstimate = 72,
+                LayoutItemTemplateFactoryMethod = nameof(Row.CreateCard))]
+            public sealed partial class RowsViewModel
+            {
+                public IReadOnlyList<Row> Items { get; } = new List<Row>();
+            }
+            """);
+
+        AssertNoErrors(result);
+        Assert.Contains("PresentationMode = global::Avalonia.Controls.DataGridLayouts.DataGridLayoutPresentationMode.Items", result.CombinedSource);
+        Assert.Contains("ItemSizeEstimate = new global::Avalonia.Size(180, 72)", result.CombinedSource);
+        Assert.Contains("DataGridGeneratedFuncDataTemplate<global::Demo.Row>(global::Demo.Row.CreateCard)", result.CombinedSource);
+    }
+
+    [Fact]
+    public void Generated_item_layout_supports_resource_and_implementation_templates()
+    {
+        GeneratorTestResult result = GeneratorTestHelper.Run("""
+            using System.Collections.Generic;
+            using Avalonia.Controls;
+            using Avalonia.Controls.Templates;
+            using ProDataGrid.SourceGeneration;
+            namespace Demo;
+            public sealed class Row { public int Id { get; set; } }
+            public sealed class CardTemplate : IDataTemplate
+            {
+                public Control Build(object data) => new TextBlock();
+                public bool Match(object data) => data is Row;
+            }
+            [GenerateDataGridViewModel(typeof(Row))]
+            [GenerateDataGridView(
+                typeof(Row), ViewName = "ResourceCards",
+                Layout = DataGridGeneratedLayout.Wrap,
+                LayoutPresentation = DataGridGeneratedLayoutPresentation.Items,
+                LayoutItemTemplateKey = "RowCard")]
+            [GenerateDataGridView(
+                typeof(Row), ViewName = "ImplementationCards",
+                Layout = DataGridGeneratedLayout.Stack,
+                LayoutPresentation = DataGridGeneratedLayoutPresentation.Items,
+                LayoutItemTemplateImplementationType = typeof(CardTemplate))]
+            public sealed partial class RowsViewModel
+            {
+                public IReadOnlyList<Row> Items { get; } = new List<Row>();
+            }
+            """);
+
+        AssertNoErrors(result);
+        Assert.Contains("DataGrid.ItemTemplateProperty, new global::Avalonia.Markup.Xaml.MarkupExtensions.DynamicResourceExtension(\"RowCard\")", result.CombinedSource);
+        Assert.Contains("dataGrid.ItemTemplate = new global::Demo.CardTemplate()", result.CombinedSource);
+    }
+
+    [Fact]
+    public void Generated_item_layout_rejects_missing_conflicting_and_invalid_configuration()
+    {
+        GeneratorTestResult missing = GeneratorTestHelper.Run("""
+            using System.Collections.Generic;
+            using ProDataGrid.SourceGeneration;
+            namespace Demo;
+            public sealed class Row { public int Id { get; set; } }
+            [GenerateDataGridViewModel(typeof(Row))]
+            [GenerateDataGridView(
+                typeof(Row),
+                Layout = DataGridGeneratedLayout.Wrap,
+                LayoutPresentation = DataGridGeneratedLayoutPresentation.Items)]
+            public sealed partial class RowsViewModel
+            {
+                public IReadOnlyList<Row> Items { get; } = new List<Row>();
+            }
+            """);
+        GeneratorTestResult conflicting = GeneratorTestHelper.Run("""
+            using System.Collections.Generic;
+            using ProDataGrid.SourceGeneration;
+            namespace Demo;
+            public sealed class Row { public int Id { get; set; } }
+            [GenerateDataGridViewModel(typeof(Row))]
+            [GenerateDataGridView(
+                typeof(Row),
+                Layout = DataGridGeneratedLayout.Wrap,
+                LayoutPresentation = DataGridGeneratedLayoutPresentation.Items,
+                LayoutItemTemplateKey = "Card",
+                LayoutItemTemplateFactoryMethod = "CreateCard")]
+            public sealed partial class RowsViewModel
+            {
+                public IReadOnlyList<Row> Items { get; } = new List<Row>();
+            }
+            """);
+        GeneratorTestResult invalidEstimate = GeneratorTestHelper.Run("""
+            using System.Collections.Generic;
+            using ProDataGrid.SourceGeneration;
+            namespace Demo;
+            public sealed class Row { public int Id { get; set; } }
+            [GenerateDataGridViewModel(typeof(Row))]
+            [GenerateDataGridView(
+                typeof(Row),
+                Layout = DataGridGeneratedLayout.Wrap,
+                LayoutPresentation = DataGridGeneratedLayoutPresentation.Items,
+                LayoutItemWidthEstimate = 0,
+                LayoutItemTemplateKey = "Card")]
+            public sealed partial class RowsViewModel
+            {
+                public IReadOnlyList<Row> Items { get; } = new List<Row>();
+            }
+            """);
+
+        Assert.Contains(missing.GeneratorDiagnostics, static diagnostic => diagnostic.Id == "PDGSG139");
+        Assert.Contains(conflicting.GeneratorDiagnostics, static diagnostic => diagnostic.Id == "PDGSG139");
+        Assert.Contains(invalidEstimate.GeneratorDiagnostics, static diagnostic => diagnostic.Id == "PDGSG139");
+    }
+
+    [Fact]
     public void Generated_view_binds_custom_layout_model_reflection_free()
     {
         GeneratorTestResult result = GeneratorTestHelper.Run("""
@@ -4932,6 +5061,43 @@ public sealed class ProDataGridGeneratorTests
         Assert.Contains("VerticalSpacing = 9", result.CombinedSource);
         Assert.Contains("MaximumCachedLines = 32", result.CombinedSource);
         Assert.Contains("dataGrid.UseLogicalScrollable = true", result.CombinedSource);
+    }
+
+    [Fact]
+    public void Namespace_view_policy_creates_item_layout_with_resource_template()
+    {
+        GeneratorTestResult result = GeneratorTestHelper.Run("""
+            using System;
+            using System.Collections.Generic;
+            using Avalonia.Controls;
+            using ProDataGrid.SourceGeneration;
+            [assembly: GenerateDataGridViewsForNamespace(
+                "Demo.ViewModels",
+                IncludeNestedNamespaces = false,
+                Layout = DataGridGeneratedLayout.UniformGrid,
+                LayoutPresentation = DataGridGeneratedLayoutPresentation.Items,
+                LayoutItemWidthEstimate = 144,
+                LayoutItemHeightEstimate = 64,
+                LayoutItemTemplateKey = "GalleryCard")]
+            namespace Demo.Models
+            {
+                public sealed class Row { public int Id { get; set; } }
+            }
+            namespace Demo.ViewModels
+            {
+                public sealed class RowsViewModel
+                {
+                    public IReadOnlyList<Demo.Models.Row> Items { get; } = Array.Empty<Demo.Models.Row>();
+                    public DataGridColumnDefinitionList ColumnDefinitions { get; } = new();
+                    public DataGridFastPathOptions FastPathOptions { get; } = new();
+                }
+            }
+            """);
+
+        AssertNoErrors(result);
+        Assert.Contains("DataGridLayoutPresentationMode.Items", result.CombinedSource);
+        Assert.Contains("ItemSizeEstimate = new global::Avalonia.Size(144, 64)", result.CombinedSource);
+        Assert.Contains("DynamicResourceExtension(\"GalleryCard\")", result.CombinedSource);
     }
 
     [Fact]

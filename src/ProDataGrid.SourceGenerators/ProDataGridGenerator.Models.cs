@@ -131,6 +131,14 @@ internal sealed class ViewModelViewModel
 
     public int LayoutMaximumCachedLines { get; set; } = 256;
 
+    public int LayoutPresentation { get; set; }
+
+    public double LayoutItemWidthEstimate { get; set; } = 100;
+
+    public double LayoutItemHeightEstimate { get; set; } = 32;
+
+    public LayoutItemTemplateViewModel? LayoutItemTemplate { get; set; }
+
     public ViewBindingModel? SortingModel { get; set; }
 
     public ViewBindingModel? FilteringModel { get; set; }
@@ -252,6 +260,24 @@ internal enum RowDetailsTemplateSourceModel
     Implementation,
     FactoryMethod,
     NestedGrid
+}
+
+internal enum LayoutItemTemplateSourceModel
+{
+    Resource,
+    Implementation,
+    FactoryMethod
+}
+
+internal sealed class LayoutItemTemplateViewModel
+{
+    public LayoutItemTemplateSourceModel Source { get; set; }
+
+    public string? ResourceKey { get; set; }
+
+    public INamedTypeSymbol? ImplementationType { get; set; }
+
+    public string? FactoryMethod { get; set; }
 }
 
 internal sealed class RowDetailsViewModel

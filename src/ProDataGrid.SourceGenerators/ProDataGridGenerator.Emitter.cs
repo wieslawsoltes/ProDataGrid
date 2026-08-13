@@ -3531,6 +3531,7 @@ internal static class Emitter
         {
             EmitGeneratedLayout(builder, model);
         }
+        EmitLayoutItemTemplateConfiguration(builder, model);
 
         EmitOptionalGridBinding(builder, model.SortingModel, "SortingModel", "s_sortingModelProperty");
         if (model.HierarchicalModel == null)
@@ -4829,6 +4830,13 @@ internal static class Emitter
         builder.Append("            dataGrid.LayoutModel = new global::Avalonia.Controls.DataGridLayouts.")
             .Append(typeName).AppendLine()
             .AppendLine("            {");
+        if (model.LayoutPresentation == 1)
+        {
+            builder.AppendLine("                PresentationMode = global::Avalonia.Controls.DataGridLayouts.DataGridLayoutPresentationMode.Items,")
+                .Append("                ItemSizeEstimate = new global::Avalonia.Size(")
+                .Append(GeneratorUtilities.FormatDouble(model.LayoutItemWidthEstimate)).Append(", ")
+                .Append(GeneratorUtilities.FormatDouble(model.LayoutItemHeightEstimate)).AppendLine("),");
+        }
         if (model.LayoutOrientation != 0)
         {
             builder.Append("                Orientation = global::Avalonia.Controls.DataGridLayouts.DataGridLayoutOrientation.")
@@ -4871,6 +4879,34 @@ internal static class Emitter
 
         builder.AppendLine("            };")
             .AppendLine("            dataGrid.UseLogicalScrollable = true;");
+    }
+
+    private static void EmitLayoutItemTemplateConfiguration(StringBuilder builder, ViewModelViewModel model)
+    {
+        LayoutItemTemplateViewModel? template = model.LayoutItemTemplate;
+        if (template == null)
+        {
+            return;
+        }
+
+        string itemType = model.ItemType.ToDisplayString(GeneratorUtilities.FullyQualifiedNullableFormat);
+        switch (template.Source)
+        {
+            case LayoutItemTemplateSourceModel.Resource:
+                builder.Append("            dataGrid.Bind(global::Avalonia.Controls.DataGrid.ItemTemplateProperty, new global::Avalonia.Markup.Xaml.MarkupExtensions.DynamicResourceExtension(")
+                    .Append(GeneratorUtilities.EscapeString(template.ResourceKey)).AppendLine("));");
+                break;
+            case LayoutItemTemplateSourceModel.Implementation:
+                builder.Append("            dataGrid.ItemTemplate = new ")
+                    .Append(template.ImplementationType!.ToDisplayString(GeneratorUtilities.FullyQualifiedNullableFormat))
+                    .AppendLine("();");
+                break;
+            case LayoutItemTemplateSourceModel.FactoryMethod:
+                builder.Append("            dataGrid.ItemTemplate = new global::Avalonia.Controls.DataGridGeneratedFuncDataTemplate<")
+                    .Append(itemType).Append(">(").Append(itemType).Append('.')
+                    .Append(GeneratorUtilities.EscapeIdentifier(template.FactoryMethod!)).AppendLine(");");
+                break;
+        }
     }
 
     private static void EmitStringAssignment(StringBuilder builder, ImmutableDictionary<string, TypedConstant> options, string propertyName)
