@@ -4812,6 +4812,83 @@ public sealed class ProDataGridGeneratorTests
     }
 
     [Fact]
+    public void Namespace_view_policy_creates_configured_builtin_layout()
+    {
+        GeneratorTestResult result = GeneratorTestHelper.Run("""
+            using System;
+            using System.Collections.Generic;
+            using Avalonia.Controls;
+            using Avalonia.Controls.DataGridLayouts;
+            using ProDataGrid.SourceGeneration;
+            [assembly: GenerateDataGridViewsForNamespace(
+                "Demo.ViewModels",
+                IncludeNestedNamespaces = false,
+                Layout = DataGridGeneratedLayout.Wrap,
+                LayoutOrientation = DataGridGeneratedLayoutOrientation.Vertical,
+                LayoutHorizontalSpacing = 7,
+                LayoutVerticalSpacing = 9,
+                LayoutMaximumCachedLines = 32)]
+            namespace Demo.Models
+            {
+                public sealed class Row { public int Id { get; set; } }
+            }
+            namespace Demo.ViewModels
+            {
+                public sealed class RowsViewModel
+                {
+                    public IReadOnlyList<Demo.Models.Row> Items { get; } = Array.Empty<Demo.Models.Row>();
+                    public DataGridColumnDefinitionList ColumnDefinitions { get; } = new();
+                    public DataGridFastPathOptions FastPathOptions { get; } = new();
+                }
+            }
+            """);
+
+        AssertNoErrors(result);
+        Assert.Contains("class RowsView", result.CombinedSource);
+        Assert.Contains("new global::Avalonia.Controls.DataGridLayouts.DataGridWrapLayoutModel", result.CombinedSource);
+        Assert.Contains("Orientation = global::Avalonia.Controls.DataGridLayouts.DataGridLayoutOrientation.Vertical", result.CombinedSource);
+        Assert.Contains("HorizontalSpacing = 7", result.CombinedSource);
+        Assert.Contains("VerticalSpacing = 9", result.CombinedSource);
+        Assert.Contains("MaximumCachedLines = 32", result.CombinedSource);
+        Assert.Contains("dataGrid.UseLogicalScrollable = true", result.CombinedSource);
+    }
+
+    [Fact]
+    public void Namespace_view_policy_binds_custom_layout_model_reflection_free()
+    {
+        GeneratorTestResult result = GeneratorTestHelper.Run("""
+            using System;
+            using System.Collections.Generic;
+            using Avalonia.Controls;
+            using Avalonia.Controls.DataGridLayouts;
+            using ProDataGrid.SourceGeneration;
+            [assembly: GenerateDataGridViewsForNamespace(
+                "Demo.ViewModels",
+                IncludeNestedNamespaces = false,
+                LayoutModelPropertyName = nameof(Demo.ViewModels.RowsViewModel.LayoutModel))]
+            namespace Demo.Models
+            {
+                public sealed class Row { public int Id { get; set; } }
+            }
+            namespace Demo.ViewModels
+            {
+                public sealed class RowsViewModel
+                {
+                    public IReadOnlyList<Demo.Models.Row> Items { get; } = Array.Empty<Demo.Models.Row>();
+                    public DataGridColumnDefinitionList ColumnDefinitions { get; } = new();
+                    public DataGridFastPathOptions FastPathOptions { get; } = new();
+                    public IDataGridLayoutModel LayoutModel { get; } = new DataGridStackLayoutModel();
+                }
+            }
+            """);
+
+        AssertNoErrors(result);
+        Assert.Contains("DataGrid.LayoutModelProperty", result.CombinedSource);
+        Assert.Contains("s_layoutModelProperty", result.CombinedSource);
+        Assert.Contains("dataGrid.UseLogicalScrollable = true", result.CombinedSource);
+    }
+
+    [Fact]
     public void Generated_view_binds_reflection_free_clipboard_and_fill_models()
     {
         GeneratorTestResult result = GeneratorTestHelper.Run("""
