@@ -160,6 +160,26 @@ internal
 #endif
 interface IDataGridLayoutNavigation
 {
+    /// <summary>Gets whether this algorithm owns the specified spatial direction.</summary>
+    /// <param name="direction">The direction to query.</param>
+    /// <returns>
+    /// <c>true</c> when the algorithm owns the direction. If resolution then returns
+    /// <c>false</c>, the request is at a layout boundary and must not fall back to linear navigation.
+    /// </returns>
+    bool SupportsNavigation(DataGridLayoutNavigationDirection direction);
+
+    /// <summary>Attempts to get exact or estimated item bounds without forcing realization.</summary>
+    /// <param name="context">The active per-grid layout context.</param>
+    /// <param name="itemIndex">The zero-based layout item index.</param>
+    /// <param name="viewport">The visible viewport in layout-content coordinates.</param>
+    /// <param name="bounds">Receives bounds in layout-content coordinates.</param>
+    /// <returns><c>true</c> when the index is valid and bounds can be estimated.</returns>
+    bool TryGetNavigationBounds(
+        IDataGridLayoutContext context,
+        int itemIndex,
+        Rect viewport,
+        out Rect bounds);
+
     /// <summary>Attempts to resolve a spatial target without forcing item realization.</summary>
     /// <param name="context">The active per-grid layout context.</param>
     /// <param name="request">The spatial request.</param>

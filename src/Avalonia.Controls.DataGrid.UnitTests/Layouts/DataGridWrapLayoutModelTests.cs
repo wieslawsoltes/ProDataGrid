@@ -107,6 +107,11 @@ public class DataGridWrapLayoutModelTests
         algorithm.Initialize(context);
         algorithm.Measure(context, new Size(100, 100));
 
+        Assert.All(Enum.GetValues<DataGridLayoutNavigationDirection>(), direction =>
+            Assert.True(navigation.SupportsNavigation(direction)));
+        Assert.True(navigation.TryGetNavigationBounds(context, 4, new Rect(0, 0, 100, 100), out Rect bounds));
+        Assert.Equal(context.GetLayoutBounds(4), bounds);
+
         Assert.True(navigation.TryResolveNavigation(
             context,
             new DataGridLayoutNavigationRequest(0, DataGridLayoutNavigationDirection.Down, new Rect(0, 0, 100, 100), new Point(85, 10)),

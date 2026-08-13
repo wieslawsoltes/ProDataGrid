@@ -135,12 +135,49 @@ internal sealed class DataGridStackLayoutAlgorithm : IDataGridLayoutAlgorithm, I
     {
     }
 
+    public bool SupportsNavigation(DataGridLayoutNavigationDirection direction)
+    {
+        DataGridLayoutOrientation orientation = GetOrientation();
+        return direction is DataGridLayoutNavigationDirection.PageUp or
+            DataGridLayoutNavigationDirection.PageDown or
+            DataGridLayoutNavigationDirection.First or
+            DataGridLayoutNavigationDirection.Last ||
+            orientation == DataGridLayoutOrientation.Vertical &&
+                direction is DataGridLayoutNavigationDirection.Up or DataGridLayoutNavigationDirection.Down ||
+            orientation == DataGridLayoutOrientation.Horizontal &&
+                direction is DataGridLayoutNavigationDirection.Left or DataGridLayoutNavigationDirection.Right;
+    }
+
+    public bool TryGetNavigationBounds(
+        IDataGridLayoutContext context,
+        int itemIndex,
+        Rect viewport,
+        out Rect bounds)
+    {
+        if (itemIndex < 0 || itemIndex >= context.ItemCount)
+        {
+            bounds = default;
+            return false;
+        }
+
+        bounds = GetEstimatedBounds(
+            context,
+            itemIndex,
+            GetOrientation(),
+            Math.Max(0, GetSpacing()));
+        return true;
+    }
+
     public bool TryResolveNavigation(
         IDataGridLayoutContext context,
         in DataGridLayoutNavigationRequest request,
         out DataGridLayoutNavigationResult result)
     {
         result = default;
+        if (!SupportsNavigation(request.Direction))
+        {
+            return false;
+        }
         int itemCount = context.ItemCount;
         int current = request.CurrentItemIndex;
         if (current < 0 || current >= itemCount)

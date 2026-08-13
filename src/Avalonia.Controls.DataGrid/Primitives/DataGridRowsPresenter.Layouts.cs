@@ -74,6 +74,36 @@ namespace Avalonia.Controls.Primitives
                 navigation.TryResolveNavigation(session.Context, request, out result);
         }
 
+        internal bool SupportsLayoutNavigation(DataGridLayoutNavigationDirection direction)
+        {
+            if (OwningGrid?.LayoutModel is not IDataGridLayoutModel model)
+            {
+                return false;
+            }
+
+            LayoutSession session = GetLayoutSession(model);
+            return session.Algorithm is IDataGridLayoutNavigation navigation &&
+                navigation.SupportsNavigation(direction);
+        }
+
+        internal bool TryGetLayoutNavigationBounds(int layoutIndex, out Rect bounds)
+        {
+            bounds = default;
+            if (OwningGrid?.LayoutModel is not IDataGridLayoutModel model)
+            {
+                return false;
+            }
+
+            LayoutSession session = GetLayoutSession(model);
+            Rect viewport = new(
+                Offset.X,
+                Offset.Y,
+                Viewport.Width,
+                Viewport.Height);
+            return session.Algorithm is IDataGridLayoutNavigation navigation &&
+                navigation.TryGetNavigationBounds(session.Context, layoutIndex, viewport, out bounds);
+        }
+
         internal bool TryGetLayoutBounds(int layoutIndex, out Rect bounds)
         {
             bounds = default;
