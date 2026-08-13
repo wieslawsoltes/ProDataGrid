@@ -219,6 +219,19 @@ Interaction<
 
 The built-in handler supports current-cell query/set, bring-into-view by stable item, XY movement, and scroll capture/restore. See [selection, navigation, and state](selection-navigation-state.md#typed-current-cell-navigation).
 
+This legacy generated-view bridge is intentionally distinct from
+`NavigationModelPropertyName` and `RouteNavigationModelPropertyName`:
+
+- the interaction asynchronously reaches an activated view to perform precise
+  current-cell and scroll operations by typed item/key;
+- the cell navigation model synchronously decides policy for keyboard, command, and
+  programmatic operations and exposes a ViewModel-to-grid controller;
+- the route navigation model asynchronously leaves the grid workflow and invokes an
+  application router.
+
+They may be configured together. The generated names, subscriptions, and lifetimes
+do not overlap.
+
 ## Input maps and command feedback
 
 ```csharp

@@ -1,6 +1,6 @@
 # Navigation Model Design
 
-Status: implementation design for the model-driven DataGrid navigation subsystem.
+Status: implemented architecture for the model-driven DataGrid navigation subsystem.
 
 ## Purpose
 
@@ -218,8 +218,9 @@ The implementation and samples cover:
 3. Centralize explicit-target application and programmatic navigation.
 4. Move reusable wrapping, boundary, RTL, and traversal policies into the default
    model without changing existing defaults.
-5. Add state persistence only for opt-in navigation policy/current-cell sections;
-   existing state payloads remain readable.
+5. Capture opt-in navigation policy with `IDataGridNavigationStateModel`; retain
+   current-cell identity in the existing stable-key selection state so existing
+   state payloads remain readable.
 6. Add route adapters and recipes without adding framework dependencies to the core
    package or coupling cell navigation to an application router.
 
@@ -269,3 +270,8 @@ The gallery receives focused pages rather than one overloaded demo:
 
 All pages use compiled bindings with explicit `x:DataType`; code-behind contains only
 `InitializeComponent()`.
+
+The source generator additionally emits cell and route model factories, an opt-in
+cell-controller property, compiled bindings for both models, and `PDGSG141` contract
+validation. Its pre-existing `NavigationInteractionPropertyName` remains a separate
+activated-view current-cell/scroll bridge and may coexist with both model bindings.
