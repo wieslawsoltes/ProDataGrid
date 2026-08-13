@@ -281,39 +281,6 @@ namespace Avalonia.Controls.DataGridNavigation
             int lastRowIndex,
             int firstColumnDisplayIndex,
             int lastColumnDisplayIndex)
-            : this(
-                command,
-                origin,
-                currentPosition,
-                proposedPosition,
-                modifiers,
-                isEditing,
-                selectionMode,
-                selectionUnit,
-                flowDirection,
-                firstRowIndex,
-                lastRowIndex,
-                firstColumnDisplayIndex,
-                lastColumnDisplayIndex,
-                isLayoutNavigationOwned: false)
-        {
-        }
-
-        internal DataGridNavigationRequest(
-            DataGridNavigationCommand command,
-            DataGridNavigationOrigin origin,
-            DataGridNavigationPosition currentPosition,
-            DataGridNavigationPosition? proposedPosition,
-            KeyModifiers modifiers,
-            bool isEditing,
-            DataGridSelectionMode selectionMode,
-            DataGridSelectionUnit selectionUnit,
-            FlowDirection flowDirection,
-            int firstRowIndex,
-            int lastRowIndex,
-            int firstColumnDisplayIndex,
-            int lastColumnDisplayIndex,
-            bool isLayoutNavigationOwned)
         {
             Command = command;
             Origin = origin;
@@ -328,7 +295,6 @@ namespace Avalonia.Controls.DataGridNavigation
             LastRowIndex = lastRowIndex;
             FirstColumnDisplayIndex = firstColumnDisplayIndex;
             LastColumnDisplayIndex = lastColumnDisplayIndex;
-            IsLayoutNavigationOwned = isLayoutNavigationOwned;
         }
 
         /// <summary>Gets the semantic operation.</summary>
@@ -369,8 +335,6 @@ namespace Avalonia.Controls.DataGridNavigation
 
         /// <summary>Gets the last navigable column display index.</summary>
         public int LastColumnDisplayIndex { get; }
-
-        internal bool IsLayoutNavigationOwned { get; }
 
         /// <summary>Gets whether the request describes at least one navigable row.</summary>
         public bool HasRows => FirstRowIndex >= 0 && LastRowIndex >= FirstRowIndex;
@@ -960,9 +924,6 @@ namespace Avalonia.Controls.DataGridNavigation
         {
             return HorizontalBoundaryMode switch
             {
-                DataGridNavigationBoundaryMode.Wrap when request.IsLayoutNavigationOwned =>
-                    DataGridNavigationResult.RedirectTo(
-                        moveToEnd ? DataGridNavigationCommand.RowEnd : DataGridNavigationCommand.RowStart),
                 DataGridNavigationBoundaryMode.Wrap when request.HasColumns =>
                     DataGridNavigationResult.MoveTo(new DataGridNavigationPosition(
                         request.CurrentPosition.RowIndex,
@@ -978,9 +939,6 @@ namespace Avalonia.Controls.DataGridNavigation
         {
             return VerticalBoundaryMode switch
             {
-                DataGridNavigationBoundaryMode.Wrap when request.IsLayoutNavigationOwned =>
-                    DataGridNavigationResult.RedirectTo(
-                        moveToEnd ? DataGridNavigationCommand.ColumnEnd : DataGridNavigationCommand.ColumnStart),
                 DataGridNavigationBoundaryMode.Wrap when request.HasRows =>
                     DataGridNavigationResult.MoveTo(new DataGridNavigationPosition(
                         moveToEnd ? request.LastRowIndex : request.FirstRowIndex,
