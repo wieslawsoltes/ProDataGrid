@@ -148,7 +148,7 @@ internal
         /// <returns>True if operation was successful. False otherwise.</returns>
         public bool BeginEdit(RoutedEventArgs editingEventArgs)
         {
-            if (CurrentColumnIndex == -1 || !CanEditSlot(CurrentSlot))
+            if (UsesLayoutItemPresentation || CurrentColumnIndex == -1 || !CanEditSlot(CurrentSlot))
             {
                 return false;
             }

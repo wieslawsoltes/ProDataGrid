@@ -126,6 +126,7 @@ public class DataGridLayoutIntegrationTests
         Window window = CreateWindow(out DataGrid grid, itemCount: 100);
         try
         {
+            grid.KeepRecycledContainersInVisualTree = false;
             var rows = new DataGridStackLayoutModel();
             var items = new DataGridUniformGridLayoutModel
             {
@@ -144,6 +145,7 @@ public class DataGridLayoutIntegrationTests
             window.UpdateLayout();
             Assert.NotEmpty(GetRealizedRows(grid));
             Assert.Empty(GetRealizedItems(grid));
+            Assert.Empty(grid.GetVisualDescendants().OfType<DataGridItemContainer>());
 
             grid.LayoutModel = items;
             window.UpdateLayout();
@@ -151,6 +153,61 @@ public class DataGridLayoutIntegrationTests
 
             Assert.NotEmpty(secondItems);
             Assert.Contains(secondItems, candidate => firstItems.Contains(candidate));
+        }
+        finally
+        {
+            window.Close();
+        }
+    }
+
+    [AvaloniaFact]
+    public void Item_presentation_uses_model_estimate_before_realization()
+    {
+        Window window = CreateWindow(out DataGrid grid, itemCount: 100);
+        try
+        {
+            var model = new EstimateProbeLayoutModel
+            {
+                PresentationMode = DataGridLayoutPresentationMode.Items,
+                ItemSizeEstimate = new Size(123, 57)
+            };
+            grid.ItemTemplate = new FuncDataTemplate<Item>(
+                (item, _) => new TextBlock { Text = item.Name });
+            grid.LayoutModel = model;
+
+            window.Show();
+            window.UpdateLayout();
+
+            Assert.Equal(new Size(123, 57), model.Algorithm.FirstEstimate);
+            Assert.Equal(285, model.Algorithm.FifthOffset);
+        }
+        finally
+        {
+            window.Close();
+        }
+    }
+
+    [AvaloniaFact]
+    public void Item_presentation_rejects_cell_editing_without_creating_rows()
+    {
+        Window window = CreateWindow(out DataGrid grid, itemCount: 20);
+        try
+        {
+            grid.ItemTemplate = new FuncDataTemplate<Item>(
+                (item, _) => new TextBlock { Height = 30, Text = item.Name });
+            grid.LayoutModel = new DataGridStackLayoutModel
+            {
+                PresentationMode = DataGridLayoutPresentationMode.Items,
+                ItemSizeEstimate = new Size(100, 30)
+            };
+            window.Show();
+            window.UpdateLayout();
+            SetCurrentCell(grid, rowIndex: 0, columnIndex: 0);
+
+            Assert.False(grid.BeginEdit());
+            Assert.Null(grid.EditingRow);
+            Assert.Empty(GetRealizedRows(grid));
+            Assert.Empty(grid.GetVisualDescendants().OfType<DataGridCell>());
         }
         finally
         {
@@ -624,6 +681,57 @@ public class DataGridLayoutIntegrationTests
         public TestLayoutAlgorithm Algorithm { get; } = new();
 
         public override IDataGridLayoutAlgorithm CreateAlgorithm() => Algorithm;
+    }
+
+    private sealed class EstimateProbeLayoutModel : DataGridLayoutModelBase
+    {
+        public EstimateProbeLayoutAlgorithm Algorithm { get; } = new();
+
+        public override IDataGridLayoutAlgorithm CreateAlgorithm() => Algorithm;
+    }
+
+    private sealed class EstimateProbeLayoutAlgorithm : IDataGridLayoutAlgorithm
+    {
+        private bool _capturedInitialEstimate;
+
+        public Size FirstEstimate { get; private set; }
+
+        public double FifthOffset { get; private set; }
+
+        public void Initialize(IDataGridLayoutContext context)
+        {
+        }
+
+        public Size Measure(IDataGridLayoutContext context, Size availableSize)
+        {
+            if (!_capturedInitialEstimate)
+            {
+                FirstEstimate = context.GetEstimatedItemSize(0);
+                FifthOffset = context.GetEstimatedItemOffset(5, DataGridLayoutOrientation.Vertical);
+                _capturedInitialEstimate = true;
+            }
+            Control element = context.GetOrCreateElementAt(0);
+            element.Measure(FirstEstimate);
+            context.SetLayoutBounds(0, new Rect(0, 0, FirstEstimate.Width, FirstEstimate.Height));
+            return new Size(FirstEstimate.Width, FifthOffset + FirstEstimate.Height);
+        }
+
+        public Size Arrange(IDataGridLayoutContext context, Size finalSize)
+        {
+            if (context.RealizedElements.Count > 0)
+            {
+                context.RealizedElements[0].Arrange(new Rect(0, 0, FirstEstimate.Width, FirstEstimate.Height));
+            }
+            return finalSize;
+        }
+
+        public void OnItemsChanged(IDataGridLayoutContext context, NotifyCollectionChangedEventArgs change)
+        {
+        }
+
+        public void Uninitialize(IDataGridLayoutContext context)
+        {
+        }
     }
 
     private sealed class TestLayoutAlgorithm : IDataGridLayoutAlgorithm

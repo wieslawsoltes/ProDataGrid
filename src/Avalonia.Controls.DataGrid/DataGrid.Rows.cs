@@ -6,6 +6,7 @@
 #nullable disable
 
 using Avalonia.Collections;
+using Avalonia.Controls.DataGridLayouts;
 using Avalonia.Controls.Utils;
 using Avalonia.Interactivity;
 using Avalonia.LogicalTree;
@@ -1532,6 +1533,13 @@ internal
                 return element is DataGridRow row && row.HasDeferredHeight
                     ? row.DeferredHeight
                     : element.DesiredSize.Height;
+            }
+
+            if (UsesLayoutItemPresentation &&
+                !IsGroupSlot(slot) &&
+                LayoutModel is IDataGridLayoutPresentationModel presentation)
+            {
+                return Math.Max(1, presentation.ItemSizeEstimate.Height);
             }
 
             return GetSlotElementHeight(slot);

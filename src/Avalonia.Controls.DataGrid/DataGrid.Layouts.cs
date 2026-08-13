@@ -211,8 +211,15 @@ namespace Avalonia.Controls
             if (UsesLayoutItemPresentation && LayoutModel is IDataGridLayoutPresentationModel presentation)
             {
                 Size estimate = presentation.ItemSizeEstimate;
-                double height = GetSlotElementHeight(slot);
-                return new Size(Math.Max(1, estimate.Width), Math.Max(1, height > 0 ? height : estimate.Height));
+                if (IsSlotVisible(slot))
+                {
+                    Size desired = DisplayData.GetDisplayedElement(slot).DesiredSize;
+                    return new Size(
+                        Math.Max(1, desired.Width > 0 ? desired.Width : estimate.Width),
+                        Math.Max(1, desired.Height > 0 ? desired.Height : estimate.Height));
+                }
+
+                return new Size(Math.Max(1, estimate.Width), Math.Max(1, estimate.Height));
             }
 
             double width = RowHeadersDesiredWidth + ColumnsInternal.VisibleEdgedColumnsWidth +
