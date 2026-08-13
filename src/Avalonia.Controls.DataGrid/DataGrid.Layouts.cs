@@ -53,6 +53,7 @@ namespace Avalonia.Controls
                 }
 
                 SetAndRaise(LayoutModelProperty, ref _layoutModel, value);
+                ResetLayoutNavigationAnchor();
 
                 if (value != null)
                 {
@@ -287,6 +288,7 @@ namespace Avalonia.Controls
 
         private void OnLayoutModelInvalidated(object? sender, DataGridLayoutInvalidatedEventArgs e)
         {
+            ResetLayoutNavigationAnchor();
             if (sender is IDataGridLayoutModel model)
             {
                 _rowsPresenter?.OnLayoutModelInvalidated(model, e.Kind);
