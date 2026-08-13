@@ -399,6 +399,17 @@ namespace Avalonia.Controls
                     dataGridRow.Clip = new RectangleGeometry();
                 }
             }
+            else if (element is DataGridItemContainer itemContainer)
+            {
+                if (itemContainer.IsKeyboardFocusWithin || CurrentSlot == slot)
+                {
+                    Focus(NavigationMethod.Unspecified, KeyModifiers.None);
+                    RequestFocusAfterRowRecycle();
+                }
+
+                HideRecycledElement(itemContainer);
+                DisplayData.RecycleItemContainer(itemContainer);
+            }
             else if (element is DataGridRowGroupHeader groupHeader)
             {
                 OnUnloadingRowGroup(new DataGridRowGroupHeaderEventArgs(groupHeader));
@@ -499,6 +510,13 @@ namespace Avalonia.Controls
 
                 HideRecycledElement(row);
                 return false;
+            }
+
+            if (element is DataGridItemContainer itemContainer)
+            {
+                HideRecycledElement(itemContainer);
+                DisplayData.RecycleItemContainer(itemContainer);
+                return true;
             }
 
             if (element is DataGridRowGroupHeader groupHeader)

@@ -16,10 +16,12 @@ public
 #else
 internal
 #endif
-abstract class DataGridLayoutModelBase : IDataGridLayoutModel
+abstract class DataGridLayoutModelBase : IDataGridLayoutModel, IDataGridLayoutPresentationModel
 {
     private int _updateNesting;
     private DataGridLayoutInvalidationKind? _pendingInvalidation;
+    private DataGridLayoutPresentationMode _presentationMode;
+    private Size _itemSizeEstimate = new(100, 32);
 
     /// <inheritdoc/>
     public event PropertyChangedEventHandler? PropertyChanged;
@@ -29,6 +31,20 @@ abstract class DataGridLayoutModelBase : IDataGridLayoutModel
 
     /// <inheritdoc/>
     public abstract IDataGridLayoutAlgorithm CreateAlgorithm();
+
+    /// <inheritdoc/>
+    public DataGridLayoutPresentationMode PresentationMode
+    {
+        get => _presentationMode;
+        set => SetProperty(ref _presentationMode, value, DataGridLayoutInvalidationKind.Reset);
+    }
+
+    /// <inheritdoc/>
+    public Size ItemSizeEstimate
+    {
+        get => _itemSizeEstimate;
+        set => SetProperty(ref _itemSizeEstimate, SanitizeItemSize(value), DataGridLayoutInvalidationKind.Reset);
+    }
 
     /// <summary>
     /// Defers layout invalidation until the returned scope is disposed.
@@ -97,6 +113,17 @@ abstract class DataGridLayoutModelBase : IDataGridLayoutModel
             _pendingInvalidation = null;
             LayoutInvalidated?.Invoke(this, new DataGridLayoutInvalidatedEventArgs(kind));
         }
+    }
+
+    private static Size SanitizeItemSize(Size value)
+    {
+        double width = double.IsNaN(value.Width) || double.IsInfinity(value.Width)
+            ? 100
+            : Math.Max(1, value.Width);
+        double height = double.IsNaN(value.Height) || double.IsInfinity(value.Height)
+            ? 32
+            : Math.Max(1, value.Height);
+        return new Size(width, height);
     }
 
     private sealed class InvalidationScope : IDisposable

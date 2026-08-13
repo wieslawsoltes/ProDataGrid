@@ -269,6 +269,10 @@ namespace Avalonia.Controls
             {
                 slotElement = GenerateRowGroupFooter(slot, rowGroupInfo: RowGroupFootersTable.GetValueAt(slot));
             }
+            else if (UsesLayoutItemPresentation)
+            {
+                slotElement = GenerateLayoutItemContainer(slot);
+            }
             else
             {
                 // If we're grouping, the GroupLevel needs to be fixed later by methods calling this
@@ -292,6 +296,7 @@ namespace Avalonia.Controls
             Debug.Assert(element != null);
 
             DataGridRow row = null;
+            DataGridItemContainer itemContainer = null;
             DataGridRowGroupHeader groupHeader = null;
             DataGridRowGroupFooter groupFooter = null;
             double elementHeight = 0;
@@ -315,6 +320,13 @@ namespace Avalonia.Controls
                         {
                             element.Clip = null;
                             Debug.Assert(row.Index == RowIndexFromSlot(slot));
+                        }
+                    }
+                    else if ((itemContainer = element as DataGridItemContainer) != null)
+                    {
+                        if (!ReferenceEquals(itemContainer.Parent, _rowsPresenter))
+                        {
+                            _rowsPresenter.Children.Add(itemContainer);
                         }
                     }
                     else
@@ -351,6 +363,10 @@ namespace Avalonia.Controls
                     if (row != null)
                     {
                         _rowsPresenter.RegisterAnchorCandidate(row);
+                    }
+                    else if (itemContainer != null)
+                    {
+                        _rowsPresenter.RegisterAnchorCandidate(itemContainer);
                     }
                     else if (groupHeader != null)
                     {

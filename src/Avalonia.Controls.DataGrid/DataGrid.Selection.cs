@@ -473,6 +473,10 @@ internal
                     row.ApplyState();
                     row.ApplyCellsState();
                 }
+                else if (element is DataGridItemContainer itemContainer)
+                {
+                    itemContainer.ApplyState();
+                }
                 else if (element is DataGridRowGroupHeader groupHeader)
                 {
                     groupHeader.UpdatePseudoClasses();

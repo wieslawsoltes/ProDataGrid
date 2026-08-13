@@ -3,6 +3,8 @@
 
 using System;
 using Avalonia.Controls.DataGridLayouts;
+using Avalonia.Controls.Templates;
+using Avalonia.Metadata;
 using Avalonia.Utilities;
 
 namespace Avalonia.Controls
@@ -15,6 +17,13 @@ namespace Avalonia.Controls
     partial class DataGrid
     {
         private IDataGridLayoutModel? _layoutModel;
+        private DataGridLayoutPresentationMode _activeLayoutPresentationMode;
+
+        /// <summary>
+        /// Identifies the <see cref="ItemTemplate"/> styled property.
+        /// </summary>
+        public static readonly StyledProperty<IDataTemplate?> ItemTemplateProperty =
+            ItemsControl.ItemTemplateProperty.AddOwner<DataGrid>();
 
         /// <summary>
         /// Identifies the <see cref="LayoutModel"/> direct property.
@@ -52,7 +61,10 @@ namespace Avalonia.Controls
                         OnLayoutModelInvalidated);
                 }
 
+                DataGridLayoutPresentationMode oldPresentation = GetLayoutPresentationMode(oldValue);
+                DataGridLayoutPresentationMode newPresentation = GetLayoutPresentationMode(value);
                 SetAndRaise(LayoutModelProperty, ref _layoutModel, value);
+                _activeLayoutPresentationMode = newPresentation;
                 ResetLayoutNavigationAnchor();
 
                 if (value != null)
@@ -63,10 +75,35 @@ namespace Avalonia.Controls
                         OnLayoutModelInvalidated);
                 }
 
+                if (oldPresentation != newPresentation)
+                {
+                    ResetDisplayedRows();
+                    EnsureTopLeftCornerHeader();
+                    InvalidateColumnHeadersMeasure();
+                }
+
                 _rowsPresenter?.OnLayoutModelChanged(oldValue, value);
                 InvalidateMeasure();
             }
         }
+
+        /// <summary>
+        /// Gets or sets the template used to present data items when the active layout model uses
+        /// <see cref="DataGridLayoutPresentationMode.Items"/>.
+        /// </summary>
+        /// <remarks>
+        /// The explicit template is resolved before templates declared in the logical tree and the
+        /// application. Recycling templates receive the previous content root when a container is reused.
+        /// </remarks>
+        [InheritDataTypeFromItems(nameof(ItemsSource))]
+        public IDataTemplate? ItemTemplate
+        {
+            get => GetValue(ItemTemplateProperty);
+            set => SetValue(ItemTemplateProperty, value);
+        }
+
+        internal bool UsesLayoutItemPresentation =>
+            LayoutModel != null && _activeLayoutPresentationMode == DataGridLayoutPresentationMode.Items;
 
         internal int LayoutItemCount => VisibleSlotCount;
 
@@ -132,7 +169,14 @@ namespace Avalonia.Controls
                 ResetDisplayedRows();
             }
 
-            GetDisplayedSlotElementHeight(slot);
+            if (UsesLayoutItemPresentation && !IsGroupSlot(slot))
+            {
+                InsertDisplayedElement(slot, GenerateLayoutItemContainer(slot), wasNewlyAdded: false, updateSlotInformation: true);
+            }
+            else
+            {
+                GetDisplayedSlotElementHeight(slot);
+            }
             return DisplayData.GetDisplayedElement(slot);
         }
 
@@ -164,6 +208,13 @@ namespace Avalonia.Controls
                 return default;
             }
 
+            if (UsesLayoutItemPresentation && LayoutModel is IDataGridLayoutPresentationModel presentation)
+            {
+                Size estimate = presentation.ItemSizeEstimate;
+                double height = GetSlotElementHeight(slot);
+                return new Size(Math.Max(1, estimate.Width), Math.Max(1, height > 0 ? height : estimate.Height));
+            }
+
             double width = RowHeadersDesiredWidth + ColumnsInternal.VisibleEdgedColumnsWidth +
                 ColumnsInternal.FillerColumn.FillerWidth;
             return new Size(Math.Max(0, width), Math.Max(0, GetSlotElementHeight(slot)));
@@ -191,6 +242,7 @@ namespace Avalonia.Controls
             int slot = element switch
             {
                 DataGridRow row => row.Slot,
+                DataGridItemContainer item => item.Slot,
                 DataGridRowGroupHeader header => header.RowGroupInfo?.Slot ?? -1,
                 DataGridRowGroupFooter footer => footer.RowGroupInfo?.Slot ?? -1,
                 _ => -1
@@ -291,6 +343,14 @@ namespace Avalonia.Controls
             ResetLayoutNavigationAnchor();
             if (sender is IDataGridLayoutModel model)
             {
+                DataGridLayoutPresentationMode presentation = GetLayoutPresentationMode(model);
+                if (presentation != _activeLayoutPresentationMode)
+                {
+                    _activeLayoutPresentationMode = presentation;
+                    ResetDisplayedRows();
+                    EnsureTopLeftCornerHeader();
+                    InvalidateColumnHeadersMeasure();
+                }
                 _rowsPresenter?.OnLayoutModelInvalidated(model, e.Kind);
             }
 
@@ -303,6 +363,36 @@ namespace Avalonia.Controls
                 _rowsPresenter?.InvalidateMeasure();
                 InvalidateMeasure();
             }
+        }
+
+        internal bool IsLayoutItemSelected(int slot) => slot >= 0 && _selectedItems.ContainsSlot(slot);
+
+        private static DataGridLayoutPresentationMode GetLayoutPresentationMode(IDataGridLayoutModel? model) =>
+            model is IDataGridLayoutPresentationModel presentation
+                ? presentation.PresentationMode
+                : DataGridLayoutPresentationMode.Rows;
+
+        private DataGridItemContainer GenerateLayoutItemContainer(int slot)
+        {
+            int rowIndex = RowIndexFromSlot(slot);
+            object item = DataConnection.GetDataItem(rowIndex);
+            DataGridItemContainer container = DisplayData.GetRecycledItemContainer() ?? new DataGridItemContainer();
+            IDataTemplate template = this.FindDataTemplate(item, ItemTemplate) ?? FuncDataTemplate.Default;
+            container.Prepare(this, rowIndex, slot, item, template);
+            return container;
+        }
+
+        private void OnItemTemplateChanged()
+        {
+            if (!UsesLayoutItemPresentation)
+            {
+                return;
+            }
+
+            _rowsPresenter?.OnLayoutModelInvalidated(LayoutModel!, DataGridLayoutInvalidationKind.Reset);
+            ResetDisplayedRows();
+            _rowsPresenter?.InvalidateMeasure();
+            InvalidateMeasure();
         }
     }
 }

@@ -223,6 +223,12 @@ internal
                 return;
             }
 
+            if (LayoutModel != null)
+            {
+                _rowsPresenter.InvalidateMeasure();
+                return;
+            }
+
             var effectiveHeight = newViewport.Height;
             if (!double.IsNaN(Height) && !double.IsInfinity(Height) && Height > 0)
             {
@@ -543,6 +549,7 @@ internal
                 VerticalScrollBarVisibilityProperty);
 
             ItemsSourceProperty.Changed.AddClassHandler<DataGrid>((x, e) => x.OnItemsSourcePropertyChanged(e));
+            ItemTemplateProperty.Changed.AddClassHandler<DataGrid>(static (x, _) => x.OnItemTemplateChanged());
             CanUserResizeColumnsProperty.Changed.AddClassHandler<DataGrid>((x, e) => x.OnCanUserResizeColumnsChanged(e));
             ColumnWidthProperty.Changed.AddClassHandler<DataGrid>((x, e) => x.OnColumnWidthChanged(e));
             ColumnWidthSharingScopeProperty.Changed.AddClassHandler<DataGrid>((x, e) => x.OnColumnWidthSharingScopeChanged(e));
@@ -924,7 +931,8 @@ internal
         {
             get
             {
-                return (HeadersVisibility & DataGridHeadersVisibility.Column) == DataGridHeadersVisibility.Column;
+                return !UsesLayoutItemPresentation &&
+                    (HeadersVisibility & DataGridHeadersVisibility.Column) == DataGridHeadersVisibility.Column;
             }
         }
 
@@ -932,7 +940,8 @@ internal
         {
             get
             {
-                return (HeadersVisibility & DataGridHeadersVisibility.Row) == DataGridHeadersVisibility.Row;
+                return !UsesLayoutItemPresentation &&
+                    (HeadersVisibility & DataGridHeadersVisibility.Row) == DataGridHeadersVisibility.Row;
             }
         }
 

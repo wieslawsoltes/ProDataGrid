@@ -7,6 +7,7 @@ using System.Linq;
 using Avalonia.Controls.DataGridLayouts;
 using Avalonia.Controls.DataGridNavigation;
 using Avalonia.Controls.Primitives;
+using Avalonia.Controls.Templates;
 using Avalonia.Data;
 using Avalonia.Headless.XUnit;
 using Avalonia.Input;
@@ -69,6 +70,149 @@ public class DataGridLayoutIntegrationTests
             grid.LayoutModel = stack;
             window.UpdateLayout();
             Assert.All(GetRealizedRows(grid), row => Assert.Equal(0, row.Bounds.X));
+        }
+        finally
+        {
+            window.Close();
+        }
+    }
+
+    [AvaloniaFact]
+    public void Item_presentation_realizes_templates_without_rows_cells_or_headers()
+    {
+        Window window = CreateWindow(out DataGrid grid, itemCount: 10_000);
+        try
+        {
+            grid.ItemTemplate = new FuncDataTemplate<Item>(
+                (item, _) => new Border
+                {
+                    Width = 96,
+                    Height = 40,
+                    Child = new TextBlock { Text = item.Name }
+                });
+            grid.LayoutModel = new DataGridUniformGridLayoutModel
+            {
+                PresentationMode = DataGridLayoutPresentationMode.Items,
+                ItemSizeEstimate = new Size(96, 40),
+                MinItemWidth = 96,
+                MinItemHeight = 40,
+                MinColumnSpacing = 4,
+                MinRowSpacing = 4
+            };
+
+            window.Show();
+            window.UpdateLayout();
+
+            DataGridItemContainer[] items = GetRealizedItems(grid);
+            DataGridColumnHeadersPresenter headers = grid.GetVisualDescendants()
+                .OfType<DataGridColumnHeadersPresenter>()
+                .Single();
+            Assert.NotEmpty(items);
+            Assert.True(items.Length < 40);
+            Assert.Empty(GetRealizedRows(grid));
+            Assert.Empty(grid.GetVisualDescendants().OfType<DataGridCell>());
+            Assert.False(headers.IsVisible);
+            Assert.Equal("Item 0", ((TextBlock)((Border)items[0].Content!).Child!).Text);
+        }
+        finally
+        {
+            window.Close();
+        }
+    }
+
+    [AvaloniaFact]
+    public void Runtime_switch_between_row_and_item_presentation_reuses_item_containers()
+    {
+        Window window = CreateWindow(out DataGrid grid, itemCount: 100);
+        try
+        {
+            var rows = new DataGridStackLayoutModel();
+            var items = new DataGridUniformGridLayoutModel
+            {
+                PresentationMode = DataGridLayoutPresentationMode.Items,
+                MinItemWidth = 90,
+                MinItemHeight = 36
+            };
+            grid.ItemTemplate = new FuncDataTemplate<Item>(
+                (item, _) => new TextBlock { Width = 90, Height = 36, Text = item.Name });
+            grid.LayoutModel = items;
+            window.Show();
+            window.UpdateLayout();
+            DataGridItemContainer[] firstItems = GetRealizedItems(grid);
+
+            grid.LayoutModel = rows;
+            window.UpdateLayout();
+            Assert.NotEmpty(GetRealizedRows(grid));
+            Assert.Empty(GetRealizedItems(grid));
+
+            grid.LayoutModel = items;
+            window.UpdateLayout();
+            DataGridItemContainer[] secondItems = GetRealizedItems(grid);
+
+            Assert.NotEmpty(secondItems);
+            Assert.Contains(secondItems, candidate => firstItems.Contains(candidate));
+        }
+        finally
+        {
+            window.Close();
+        }
+    }
+
+    [AvaloniaFact]
+    public void Item_presentation_preserves_spatial_navigation_and_selection_state()
+    {
+        Window window = CreateWindow(out DataGrid grid, itemCount: 100);
+        try
+        {
+            grid.ItemTemplate = new FuncDataTemplate<Item>(
+                (item, _) => new TextBlock { Width = 90, Height = 36, Text = item.Name });
+            grid.LayoutModel = new DataGridUniformGridLayoutModel
+            {
+                PresentationMode = DataGridLayoutPresentationMode.Items,
+                MinItemWidth = 90,
+                MinItemHeight = 36
+            };
+            window.Show();
+            window.UpdateLayout();
+            SetCurrentCell(grid, rowIndex: 0, columnIndex: 0);
+
+            Assert.True(grid.Navigate(DataGridNavigationCommand.Right));
+            window.UpdateLayout();
+
+            Assert.Equal(1, grid.CurrentCell.RowIndex);
+            DataGridItemContainer current = GetRealizedItems(grid).Single(item => item.Index == 1);
+            Assert.True(current.IsCurrent);
+            Assert.True(current.IsSelected);
+        }
+        finally
+        {
+            window.Close();
+        }
+    }
+
+    [AvaloniaFact]
+    public void Changing_item_template_reprepares_recycled_containers()
+    {
+        Window window = CreateWindow(out DataGrid grid, itemCount: 20);
+        try
+        {
+            grid.LayoutModel = new DataGridStackLayoutModel
+            {
+                PresentationMode = DataGridLayoutPresentationMode.Items
+            };
+            grid.ItemTemplate = new FuncDataTemplate<Item>(
+                (item, _) => new TextBlock { Height = 30, Text = "First " + item.Name });
+            window.Show();
+            window.UpdateLayout();
+            DataGridItemContainer[] before = GetRealizedItems(grid);
+
+            grid.ItemTemplate = new FuncDataTemplate<Item>(
+                (item, _) => new TextBlock { Height = 30, Text = "Second " + item.Name });
+            window.UpdateLayout();
+
+            DataGridItemContainer after = GetRealizedItems(grid).Single(item => item.Index == 0);
+            Assert.Contains(after, before);
+            Assert.Equal("Second Item 0", ((TextBlock)after.Content!).Text);
         }
         finally
         {
@@ -461,6 +605,15 @@ public class DataGridLayoutIntegrationTests
             .OfType<DataGridRow>()
             .Where(row => !row.IsRecycled && row.Slot >= 0)
             .OrderBy(row => row.Slot)
+            .ToArray();
+    }
+
+    private static DataGridItemContainer[] GetRealizedItems(DataGrid grid)
+    {
+        return grid.GetVisualDescendants()
+            .OfType<DataGridItemContainer>()
+            .Where(item => item.Index >= 0)
+            .OrderBy(item => item.Index)
             .ToArray();
     }
 

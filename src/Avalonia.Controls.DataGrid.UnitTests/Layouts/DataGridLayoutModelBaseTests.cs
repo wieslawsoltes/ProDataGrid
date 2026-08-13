@@ -1,6 +1,7 @@
 // Copyright (c) Wiesław Šoltés. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for details.
 
+using System.Collections.Generic;
 using System.Collections.Specialized;
 using Avalonia.Controls.DataGridLayouts;
 using Xunit;
@@ -87,6 +88,23 @@ public class DataGridLayoutModelBaseTests
         var model = new TestLayoutModel();
 
         Assert.IsType<TestLayoutAlgorithm>(model.CreateAlgorithm());
+    }
+
+    [Fact]
+    public void Presentation_properties_are_sanitized_and_raise_reset_invalidation()
+    {
+        var model = new TestLayoutModel();
+        var invalidations = new List<DataGridLayoutInvalidationKind>();
+        model.LayoutInvalidated += (_, e) => invalidations.Add(e.Kind);
+
+        model.PresentationMode = DataGridLayoutPresentationMode.Items;
+        model.ItemSizeEstimate = new Size(double.NaN, -12);
+
+        Assert.Equal(DataGridLayoutPresentationMode.Items, model.PresentationMode);
+        Assert.Equal(new Size(100, 1), model.ItemSizeEstimate);
+        Assert.Equal(
+            [DataGridLayoutInvalidationKind.Reset, DataGridLayoutInvalidationKind.Reset],
+            invalidations);
     }
 
     private sealed class TestLayoutModel : DataGridLayoutModelBase
