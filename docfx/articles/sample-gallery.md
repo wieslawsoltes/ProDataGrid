@@ -26,6 +26,7 @@ Highlights include:
 - Hierarchical data, hierarchical drag/drop, tree-like mimics, and live row-drag session inspection.
 - Row drag session samples with move/copy transitions, invalid-target feedback badges, and selection-drag coordination.
 - Virtualization and scrolling diagnostics (large datasets, row height estimators, recycling).
+- Runtime-switchable stack, uniform-grid, variable-wrap, non-virtualizing, and custom layouts in the `Layout Gallery` page.
 - Variable-height scrolling with `DataGridCustomDrawingColumn`, composition custom-visual backend, Skia custom draw operations, shared text cache, and layout fast path.
 - Live custom-drawing updates with composition backend + factory-driven invalidation (`DataGridCustomDrawingColumn.InvalidateCustomDrawingCells` and `IDataGridCellDrawOperationInvalidationSource`).
 - Styling showcases and column theme usage.

@@ -164,6 +164,11 @@ internal
                 }
             }
 
+            if (LayoutModel != null && _rowsPresenter != null)
+            {
+                return _rowsPresenter.ScrollLayoutIndexIntoView(GetLayoutIndexFromSlot(slot));
+            }
+
             double oldHorizontalOffset = HorizontalOffset;
 
             //scroll horizontally unless we're on a RowGroupHeader and we're not forcing horizontal scrolling

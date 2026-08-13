@@ -898,6 +898,11 @@ internal
         {
             Debug.Assert(_collapsedSlotsTable.Contains(slot) || !IsSlotOutOfBounds(slot));
 
+            if (LayoutModel != null && _rowsPresenter != null)
+            {
+                return _rowsPresenter.ScrollLayoutIndexIntoView(GetLayoutIndexFromSlot(slot));
+            }
+
             if (DisplayData.FirstScrollingSlot == -1)
             {
                 if (SlotCount == 0 || ColumnsItemsInternal.Count == 0 || MathUtilities.LessThanOrClose(CellsEstimatedHeight, 0))

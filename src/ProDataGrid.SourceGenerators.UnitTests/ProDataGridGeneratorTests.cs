@@ -4723,6 +4723,95 @@ public sealed class ProDataGridGeneratorTests
     }
 
     [Fact]
+    public void Generated_views_create_all_builtin_layout_models()
+    {
+        GeneratorTestResult result = GeneratorTestHelper.Run("""
+            using Avalonia.Controls.DataGridLayouts;
+            using ProDataGrid.SourceGeneration;
+            namespace Demo;
+            public sealed class Row { public int Value { get; set; } }
+            [GenerateDataGridViewModel(typeof(Row))]
+            [GenerateDataGridView(typeof(Row), ViewName = "StackView", Layout = DataGridGeneratedLayout.Stack,
+                LayoutOrientation = DataGridGeneratedLayoutOrientation.Horizontal, LayoutSpacing = 4, LayoutDisableVirtualization = true)]
+            [GenerateDataGridView(typeof(Row), ViewName = "NonVirtualView", Layout = DataGridGeneratedLayout.NonVirtualizingStack)]
+            [GenerateDataGridView(typeof(Row), ViewName = "UniformView", Layout = DataGridGeneratedLayout.UniformGrid,
+                LayoutMinItemWidth = 120, LayoutMinItemHeight = 36, LayoutMaximumRowsOrColumns = 3,
+                LayoutItemsJustification = DataGridUniformGridItemsJustification.Center,
+                LayoutItemsStretch = DataGridUniformGridItemsStretch.Fill)]
+            [GenerateDataGridView(typeof(Row), ViewName = "WrapView", Layout = DataGridGeneratedLayout.Wrap,
+                LayoutHorizontalSpacing = 8, LayoutVerticalSpacing = 6, LayoutMaximumCachedLines = 64)]
+            public sealed partial class GridViewModel
+            {
+                public System.Collections.Generic.IReadOnlyList<Row> Items { get; } = System.Array.Empty<Row>();
+            }
+            """);
+
+        AssertNoErrors(result);
+        Assert.Contains("new global::Avalonia.Controls.DataGridLayouts.DataGridStackLayoutModel", result.CombinedSource);
+        Assert.Contains("new global::Avalonia.Controls.DataGridLayouts.DataGridNonVirtualizingStackLayoutModel", result.CombinedSource);
+        Assert.Contains("new global::Avalonia.Controls.DataGridLayouts.DataGridUniformGridLayoutModel", result.CombinedSource);
+        Assert.Contains("new global::Avalonia.Controls.DataGridLayouts.DataGridWrapLayoutModel", result.CombinedSource);
+        Assert.Contains("DisableVirtualization = true", result.CombinedSource);
+        Assert.Contains("MaximumRowsOrColumns = 3", result.CombinedSource);
+        Assert.Contains("MaximumCachedLines = 64", result.CombinedSource);
+    }
+
+    [Fact]
+    public void Generated_view_binds_custom_layout_model_reflection_free()
+    {
+        GeneratorTestResult result = GeneratorTestHelper.Run("""
+            using Avalonia.Controls.DataGridLayouts;
+            using ProDataGrid.SourceGeneration;
+            namespace Demo;
+            public sealed class Row { public int Value { get; set; } }
+            [GenerateDataGridViewModel(typeof(Row))]
+            [GenerateDataGridView(typeof(Row), LayoutModelPropertyName = nameof(Layout))]
+            public sealed partial class GridViewModel
+            {
+                public System.Collections.Generic.IReadOnlyList<Row> Items { get; } = System.Array.Empty<Row>();
+                public IDataGridLayoutModel Layout { get; } = new DataGridWrapLayoutModel();
+            }
+            """);
+
+        AssertNoErrors(result);
+        Assert.Contains("DataGrid.LayoutModelProperty", result.CombinedSource);
+        Assert.Contains("s_layoutModelProperty", result.CombinedSource);
+    }
+
+    [Fact]
+    public void Generated_view_rejects_invalid_or_conflicting_layout_configuration()
+    {
+        GeneratorTestResult invalid = GeneratorTestHelper.Run("""
+            using ProDataGrid.SourceGeneration;
+            namespace Demo;
+            public sealed class Row { public int Value { get; set; } }
+            [GenerateDataGridViewModel(typeof(Row))]
+            [GenerateDataGridView(typeof(Row), LayoutModelPropertyName = nameof(Layout))]
+            public sealed partial class GridViewModel
+            {
+                public System.Collections.Generic.IReadOnlyList<Row> Items { get; } = System.Array.Empty<Row>();
+                public object Layout { get; } = new();
+            }
+            """);
+        GeneratorTestResult conflicting = GeneratorTestHelper.Run("""
+            using Avalonia.Controls.DataGridLayouts;
+            using ProDataGrid.SourceGeneration;
+            namespace Demo;
+            public sealed class Row { public int Value { get; set; } }
+            [GenerateDataGridViewModel(typeof(Row))]
+            [GenerateDataGridView(typeof(Row), Layout = DataGridGeneratedLayout.Stack, LayoutModelPropertyName = nameof(LayoutModel))]
+            public sealed partial class GridViewModel
+            {
+                public System.Collections.Generic.IReadOnlyList<Row> Items { get; } = System.Array.Empty<Row>();
+                public IDataGridLayoutModel LayoutModel { get; } = new DataGridStackLayoutModel();
+            }
+            """);
+
+        Assert.Contains(invalid.GeneratorDiagnostics, diagnostic => diagnostic.Id == "PDGSG125");
+        Assert.Contains(conflicting.GeneratorDiagnostics, diagnostic => diagnostic.Id == "PDGSG139");
+    }
+
+    [Fact]
     public void Generated_view_binds_reflection_free_clipboard_and_fill_models()
     {
         GeneratorTestResult result = GeneratorTestHelper.Run("""
