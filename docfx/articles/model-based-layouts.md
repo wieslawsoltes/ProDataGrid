@@ -58,8 +58,9 @@ public sealed class ResultsViewModel
 ```
 
 ```xml
-<DataGrid ItemsSource="{Binding Items}"
-          LayoutModel="{Binding LayoutModel}"
+<DataGrid x:DataType="viewModels:ResultsViewModel"
+          ItemsSource="{CompiledBinding Items}"
+          LayoutModel="{CompiledBinding LayoutModel}"
           UseLogicalScrollable="True" />
 ```
 
