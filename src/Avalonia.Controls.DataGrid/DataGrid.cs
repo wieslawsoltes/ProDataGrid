@@ -344,6 +344,7 @@ internal
         private Avalonia.Controls.DataGridEditing.IDataGridEditingInteractionModelFactory _editingInteractionModelFactory;
         private IDataGridNavigationModel _navigationModel;
         private IDataGridNavigationModelFactory _navigationModelFactory;
+        private IDataGridNavigationInputModel _navigationInputModel;
         private IDataGridRouteNavigationModel _routeNavigationModel;
         private readonly Dictionary<SearchCellKey, SearchResult> _searchResultsMap = new();
         private readonly HashSet<int> _searchRowMatches = new();
@@ -606,6 +607,11 @@ internal
             AddHandler(InputElement.PointerMovedEvent, DataGrid_PointerActivity, RoutingStrategies.Tunnel, handledEventsToo: true);
             AddHandler(InputElement.PointerPressedEvent, DataGrid_PointerActivity, RoutingStrategies.Tunnel, handledEventsToo: true);
             AddHandler(InputElement.PointerReleasedEvent, DataGrid_PointerActivity, RoutingStrategies.Tunnel, handledEventsToo: true);
+            AddHandler(InputElement.KeyDownEvent, DataGrid_NavigationKeyDown, RoutingStrategies.Tunnel);
+            AddHandler(InputElement.KeyUpEvent, DataGrid_NavigationKeyUp, RoutingStrategies.Tunnel);
+            AddHandler(InputElement.PointerPressedEvent, DataGrid_NavigationPointerPressed, RoutingStrategies.Tunnel);
+            AddHandler(InputElement.PointerReleasedEvent, DataGrid_NavigationPointerReleased, RoutingStrategies.Tunnel);
+            AddHandler(InputElement.PointerWheelChangedEvent, DataGrid_NavigationPointerWheel, RoutingStrategies.Tunnel);
             AddHandler(InputElement.PointerExitedEvent, DataGrid_PointerExited, handledEventsToo: true);
             AddHandler(InputElement.PointerMovedEvent, DataGrid_DragSelectionPointerMoved, RoutingStrategies.Tunnel, handledEventsToo: true);
             AddHandler(InputElement.PointerReleasedEvent, DataGrid_DragSelectionPointerReleased, RoutingStrategies.Tunnel, handledEventsToo: true);
@@ -2572,6 +2578,26 @@ internal
         {
             get => _navigationModel;
             set => SetNavigationModel(value);
+        }
+
+        /// <summary>
+        /// Gets or sets the optional framework-neutral model that maps normalized key and pointer
+        /// input to cell or application-route navigation.
+        /// </summary>
+        public IDataGridNavigationInputModel NavigationInputModel
+        {
+            get => _navigationInputModel;
+            set
+            {
+                if (ReferenceEquals(_navigationInputModel, value))
+                {
+                    return;
+                }
+
+                IDataGridNavigationInputModel oldModel = _navigationInputModel;
+                _navigationInputModel = value;
+                RaisePropertyChanged(NavigationInputModelProperty, oldModel, value);
+            }
         }
 
         /// <summary>

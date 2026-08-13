@@ -270,6 +270,18 @@ public class DataGridNavigationModelTests
     }
 
     [AvaloniaFact]
+    public void Programmatic_NavigateTo_Can_Establish_First_Current_Cell()
+    {
+        DataGrid grid = CreateGrid();
+
+        bool handled = grid.NavigateTo(new DataGridNavigationPosition(1, 1));
+
+        Assert.True(handled);
+        Assert.Equal(1, grid.CurrentCell.RowIndex);
+        Assert.Equal(1, grid.CurrentCell.Column.DisplayIndex);
+    }
+
+    [AvaloniaFact]
     public void Model_Controller_Request_Moves_Bound_Grid()
     {
         DataGrid grid = CreateGrid();

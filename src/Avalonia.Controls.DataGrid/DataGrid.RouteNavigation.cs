@@ -68,7 +68,13 @@ namespace Avalonia.Controls
 
             DataGridRouteContext context = kind is DataGridRouteNavigationKind.Back or
                 DataGridRouteNavigationKind.Forward
-                    ? DataGridRouteContext.Empty
+                    ? new DataGridRouteContext(
+                        null,
+                        null,
+                        null,
+                        DataGridNavigationPosition.Unset,
+                        origin,
+                        hasItem: false)
                     : GetCurrentRouteContext(origin);
             return model.NavigateAsync(kind, context, cancellationToken);
         }

@@ -1403,6 +1403,13 @@ internal
                 (o, v) => o.NavigationModel = v,
                 defaultBindingMode: BindingMode.TwoWay);
 
+        /// <summary>Identifies the <see cref="NavigationInputModel"/> direct property.</summary>
+        public static readonly DirectProperty<DataGrid, Avalonia.Controls.DataGridNavigation.IDataGridNavigationInputModel> NavigationInputModelProperty =
+            AvaloniaProperty.RegisterDirect<DataGrid, Avalonia.Controls.DataGridNavigation.IDataGridNavigationInputModel>(
+                nameof(NavigationInputModel),
+                o => o.NavigationInputModel,
+                (o, v) => o.NavigationInputModel = v);
+
         /// <summary>
         /// Identifies the <see cref="RouteNavigationModel"/> direct property.
         /// </summary>

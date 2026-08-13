@@ -50,6 +50,8 @@ namespace Avalonia.Controls.DataGridNavigation
         Next,
         /// <summary>Moves to the previous cell in row-major order.</summary>
         Previous,
+        /// <summary>Moves to an explicit data-cell position supplied by an input or programmatic request.</summary>
+        GoTo,
         /// <summary>Commits editing and applies the configured Enter behavior.</summary>
         Enter,
         /// <summary>Begins editing the current cell.</summary>
@@ -76,6 +78,8 @@ namespace Avalonia.Controls.DataGridNavigation
     {
         /// <summary>A keyboard gesture initiated the request.</summary>
         Keyboard,
+        /// <summary>A pointer gesture initiated the request.</summary>
+        Pointer,
         /// <summary>The DataGrid programmatic API initiated the request.</summary>
         Programmatic,
         /// <summary>An MVVM command initiated the request.</summary>
@@ -879,6 +883,13 @@ namespace Avalonia.Controls.DataGridNavigation
                 {
                     return DataGridNavigationResult.RedirectTo(DataGridNavigationCommand.Left);
                 }
+            }
+
+            if (request.Command == DataGridNavigationCommand.GoTo)
+            {
+                return request.ProposedPosition is { } target && target.IsValid
+                    ? DataGridNavigationResult.MoveTo(target)
+                    : DataGridNavigationResult.Stay();
             }
 
             if (!request.CurrentPosition.IsValid)

@@ -40,6 +40,28 @@ namespace Avalonia.Controls
                 allowCtrlForTab: false);
         }
 
+        /// <summary>Attempts to move to an explicit data-cell position through the current navigation model.</summary>
+        /// <param name="target">The collection-view row and column display indexes to activate.</param>
+        /// <param name="modifiers">Modifiers used for selection extension.</param>
+        /// <returns><see langword="true"/> when the request was handled by the grid.</returns>
+        public bool NavigateTo(
+            DataGridNavigationPosition target,
+            KeyModifiers modifiers = KeyModifiers.None)
+        {
+            if (!target.IsValid)
+            {
+                return false;
+            }
+
+            return ProcessNavigationCommand(
+                DataGridNavigationCommand.GoTo,
+                null,
+                DataGridNavigationOrigin.Programmatic,
+                modifiers,
+                allowCtrlForTab: false,
+                target);
+        }
+
         /// <summary>
         /// Determines whether a semantic navigation command currently has a valid route.
         /// </summary>
@@ -91,9 +113,15 @@ namespace Avalonia.Controls
             KeyEventArgs keyEventArgs,
             DataGridNavigationOrigin origin,
             KeyModifiers modifiers,
-            bool allowCtrlForTab)
+            bool allowCtrlForTab,
+            DataGridNavigationPosition? proposedPosition = null)
         {
-            DataGridNavigationRequest request = CreateNavigationRequest(command, origin, modifiers, out LayoutNavigationPlan layoutPlan);
+            DataGridNavigationRequest request = CreateNavigationRequest(
+                command,
+                origin,
+                modifiers,
+                out LayoutNavigationPlan layoutPlan,
+                proposedPosition);
             DataGridNavigationPosition oldPosition = request.CurrentPosition;
             DataGridNavigationResult result = NavigationModel.Resolve(request);
             bool handled;
@@ -228,15 +256,16 @@ namespace Avalonia.Controls
             DataGridNavigationCommand command,
             DataGridNavigationOrigin origin,
             KeyModifiers modifiers,
-            out LayoutNavigationPlan layoutPlan)
+            out LayoutNavigationPlan layoutPlan,
+            DataGridNavigationPosition? proposedPosition = null)
         {
             DataGridNavigationPosition current = CreateNavigationPosition();
             layoutPlan = CreateLayoutNavigationPlan(command, modifiers, current);
-            DataGridNavigationPosition? proposed = layoutPlan.IsOwned
+            DataGridNavigationPosition? proposed = proposedPosition ?? (layoutPlan.IsOwned
                 ? layoutPlan.HasTarget ? layoutPlan.Target : null
                 : TryGetProposedNavigationPosition(command, modifiers, out DataGridNavigationPosition target)
                     ? target
-                    : null;
+                    : null);
             DataGridColumn firstColumn = ColumnsInternal.FirstVisibleNonFillerColumn;
             DataGridColumn lastColumn = GetLastVisibleNonFillerNavigationColumn();
             int lastRowIndex = DataConnection?.Count > 0 ? DataConnection.Count - 1 : -1;
