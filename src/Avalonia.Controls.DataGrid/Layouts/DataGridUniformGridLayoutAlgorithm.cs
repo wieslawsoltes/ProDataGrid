@@ -18,7 +18,7 @@ internal sealed class DataGridUniformGridLayoutAlgorithm : IDataGridLayoutAlgori
 
     public void Initialize(IDataGridLayoutContext context)
     {
-        context.LayoutState = new State();
+        context.LayoutState ??= new State();
     }
 
     public Size Measure(IDataGridLayoutContext context, Size availableSize)
@@ -66,8 +66,13 @@ internal sealed class DataGridUniformGridLayoutAlgorithm : IDataGridLayoutAlgori
         int lineCount = (itemCount + itemsPerLine - 1) / itemsPerLine;
         double realizationStart = Math.Max(0, GetVStart(context.RealizationRect, flowOrientation));
         double realizationEnd = Math.Max(realizationStart, GetVEnd(context.RealizationRect, flowOrientation));
-        int firstLine = Math.Min(lineCount - 1, Math.Max(0, (int)Math.Floor(realizationStart / lineAdvance)));
-        int lastLine = Math.Min(lineCount - 1, Math.Max(firstLine, (int)Math.Floor(Math.Max(0, realizationEnd - 0.001) / lineAdvance)));
+        int recommendedAnchor = context.RecommendedAnchorIndex;
+        int firstLine = recommendedAnchor >= 0
+            ? Math.Min(lineCount - 1, recommendedAnchor / itemsPerLine)
+            : Math.Min(lineCount - 1, Math.Max(0, (int)Math.Floor(realizationStart / lineAdvance)));
+        int lastLine = recommendedAnchor >= 0
+            ? Math.Min(lineCount - 1, firstLine + Math.Max(0, (int)Math.Ceiling(GetV(context.RealizationRect.Size, flowOrientation) / lineAdvance)))
+            : Math.Min(lineCount - 1, Math.Max(firstLine, (int)Math.Floor(Math.Max(0, realizationEnd - 0.001) / lineAdvance)));
         int firstIndex = firstLine * itemsPerLine;
         int lastIndex = Math.Min(itemCount - 1, ((lastLine + 1) * itemsPerLine) - 1);
         Size measureSize = ToSize(cellU, cellV, flowOrientation);

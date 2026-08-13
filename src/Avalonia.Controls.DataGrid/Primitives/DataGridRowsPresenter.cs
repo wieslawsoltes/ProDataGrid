@@ -166,6 +166,11 @@ internal
                 return base.ArrangeOverride(finalSize);
             }
 
+            if (UsesLayoutModel)
+            {
+                return ArrangeLayoutModel(finalSize);
+            }
+
             if (finalSize.Height <= 0)
             {
                 var viewportHeight = Math.Max(0, finalSize.Height);
@@ -550,6 +555,11 @@ internal
             // The DataGrid uses the RowsPresenter available size in order to autogrow
             // and calculate the scrollbars
             OwningGrid.RowsPresenterAvailableSize = availableSize;
+
+            if (UsesLayoutModel)
+            {
+                return MeasureLayoutModel(availableSize);
+            }
 
             OwningGrid.OnRowsMeasure();
 

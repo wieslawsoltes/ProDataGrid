@@ -404,6 +404,14 @@ internal
             if (OwningGrid == null)
                 return;
 
+            if (UsesLayoutModel)
+            {
+                CancelPrefetch();
+                InvalidateMeasure();
+                InvalidateArrange();
+                return;
+            }
+
             // Calculate the delta and delegate to the DataGrid's scroll handling
             var deltaY = newOffset.Y - oldOffset.Y;
             var deltaX = newOffset.X - oldOffset.X;

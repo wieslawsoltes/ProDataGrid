@@ -18,7 +18,7 @@ internal sealed class DataGridWrapLayoutAlgorithm : IDataGridLayoutAlgorithm
 
     public void Initialize(IDataGridLayoutContext context)
     {
-        context.LayoutState = new State();
+        context.LayoutState ??= new State();
     }
 
     public Size Measure(IDataGridLayoutContext context, Size availableSize)
@@ -54,7 +54,13 @@ internal sealed class DataGridWrapLayoutAlgorithm : IDataGridLayoutAlgorithm
         Anchor anchor = state.FindAnchor(realizationStart, context.RecommendedAnchorIndex);
         if (!anchor.IsValid)
         {
-            anchor = state.EstimateAnchor(realizationStart, itemCount, availableU, spacingU, spacingV);
+            anchor = context.RecommendedAnchorIndex >= 0
+                ? state.EstimateAnchorForIndex(context.RecommendedAnchorIndex, itemCount, availableU, spacingU, spacingV)
+                : state.EstimateAnchor(realizationStart, itemCount, availableU, spacingU, spacingV);
+        }
+        if (context.RecommendedAnchorIndex >= 0)
+        {
+            realizationEnd = anchor.V + Math.Max(1, GetV(context.RealizationRect.Size, orientation));
         }
 
         int firstIndex = Math.Max(0, Math.Min(itemCount - 1, anchor.ItemIndex));
@@ -329,6 +335,18 @@ internal sealed class DataGridWrapLayoutAlgorithm : IDataGridLayoutAlgorithm
             int line = Math.Max(0, (int)Math.Floor(realizationStart / lineAdvance));
             int itemIndex = Math.Min(itemCount - 1, line * itemsPerLine);
             return new Anchor(itemIndex, line * lineAdvance);
+        }
+
+        public Anchor EstimateAnchorForIndex(
+            int recommendedIndex,
+            int itemCount,
+            double availableU,
+            double spacingU,
+            double spacingV)
+        {
+            int itemsPerLine = Math.Max(1, (int)Math.Floor((availableU + spacingU) / (Math.Max(1, AverageItemU) + spacingU)));
+            int line = Math.Max(0, Math.Min(itemCount - 1, recommendedIndex)) / itemsPerLine;
+            return new Anchor(line * itemsPerLine, line * (Math.Max(1, AverageLineV) + spacingV));
         }
 
         public void RecordItem(double u, double v)
