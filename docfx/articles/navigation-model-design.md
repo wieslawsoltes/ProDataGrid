@@ -126,6 +126,9 @@ The new `Avalonia.Controls.DataGridNavigation` namespace contains:
 - `IDataGridNavigationModel`: resolves requests and publishes preview/completion.
 - `IDataGridNavigationQueryModel`: optional side-effect-free policy queries for
   command CanExecute evaluation.
+- `IDataGridNavigationController`: optional ViewModel-to-grid request channel used by
+  ReactiveCommand, RelayCommand, DelegateCommand, and plain `ICommand` without a
+  control reference.
 - `IDataGridNavigationModelFactory`: creates the per-grid default model.
 - `DataGridNavigationModel`: extensible default implementation and the home for
   reusable boundary, wrapping, RTL, editing, and traversal policies.

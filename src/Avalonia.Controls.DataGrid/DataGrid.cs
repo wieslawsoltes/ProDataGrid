@@ -5783,8 +5783,36 @@ internal
                 return;
             }
 
+            if (oldModel is IDataGridNavigationController oldController)
+            {
+                WeakEventHandlerManager.Unsubscribe<DataGridNavigationRequestedEventArgs, DataGrid>(
+                    oldController,
+                    nameof(IDataGridNavigationController.NavigationRequested),
+                    NavigationController_NavigationRequested);
+            }
+
             _navigationModel = newModel;
+            if (newModel is IDataGridNavigationController newController)
+            {
+                WeakEventHandlerManager.Subscribe<IDataGridNavigationController, DataGridNavigationRequestedEventArgs, DataGrid>(
+                    newController,
+                    nameof(IDataGridNavigationController.NavigationRequested),
+                    NavigationController_NavigationRequested);
+            }
+
             RaisePropertyChanged(NavigationModelProperty, oldModel, _navigationModel);
+        }
+
+        private void NavigationController_NavigationRequested(
+            object sender,
+            DataGridNavigationRequestedEventArgs e)
+        {
+            e.Handled = ProcessNavigationCommand(
+                e.Command,
+                null,
+                e.Origin,
+                e.Modifiers,
+                allowCtrlForTab: false);
         }
 
         private void FilteringModel_PropertyChanged(object sender, PropertyChangedEventArgs e)

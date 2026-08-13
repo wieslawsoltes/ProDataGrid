@@ -588,6 +588,67 @@ namespace Avalonia.Controls.DataGridNavigation
     }
 
     /// <summary>
+    /// Issues semantic navigation requests from ViewModel commands without exposing a DataGrid instance.
+    /// </summary>
+#if !DATAGRID_INTERNAL
+    public
+#else
+    internal
+#endif
+    interface IDataGridNavigationController
+    {
+        /// <summary>Raised when application code requests grid navigation.</summary>
+        event EventHandler<DataGridNavigationRequestedEventArgs> NavigationRequested;
+
+        /// <summary>Requests a semantic operation from the DataGrid bound to this model.</summary>
+        /// <param name="command">The semantic navigation command.</param>
+        /// <param name="modifiers">Modifiers used for selection extension and edge movement.</param>
+        /// <param name="origin">The source of the request.</param>
+        /// <returns><see langword="true"/> when a bound DataGrid handled the request.</returns>
+        bool RequestNavigate(
+            DataGridNavigationCommand command,
+            KeyModifiers modifiers = KeyModifiers.None,
+            DataGridNavigationOrigin origin = DataGridNavigationOrigin.Command);
+    }
+
+    /// <summary>
+    /// Carries a ViewModel-issued semantic navigation request to a bound DataGrid.
+    /// </summary>
+#if !DATAGRID_INTERNAL
+    public
+#else
+    internal
+#endif
+    sealed class DataGridNavigationRequestedEventArgs : EventArgs
+    {
+        /// <summary>Initializes a ViewModel-issued navigation request.</summary>
+        /// <param name="command">The semantic navigation command.</param>
+        /// <param name="modifiers">Modifiers used for selection extension and edge movement.</param>
+        /// <param name="origin">The source of the request.</param>
+        public DataGridNavigationRequestedEventArgs(
+            DataGridNavigationCommand command,
+            KeyModifiers modifiers,
+            DataGridNavigationOrigin origin)
+        {
+            Command = command;
+            Modifiers = modifiers;
+            Origin = origin;
+        }
+
+        /// <summary>Gets the semantic navigation command.</summary>
+        public DataGridNavigationCommand Command { get; }
+
+        /// <summary>Gets modifiers used for selection extension and edge movement.</summary>
+        public KeyModifiers Modifiers { get; }
+
+        /// <summary>Gets the source of the request.</summary>
+        public DataGridNavigationOrigin Origin { get; }
+
+        /// <summary>Gets or sets whether a bound DataGrid handled the request.</summary>
+        public bool Handled { get; set; }
+    }
+
+    /// <summary>
     /// Creates a navigation model for a DataGrid instance.
     /// </summary>
 #if !DATAGRID_INTERNAL
@@ -610,7 +671,11 @@ namespace Avalonia.Controls.DataGridNavigation
 #else
     internal
 #endif
-    class DataGridNavigationModel : IDataGridNavigationModel, IDataGridNavigationQueryModel, INotifyPropertyChanged
+    class DataGridNavigationModel :
+        IDataGridNavigationModel,
+        IDataGridNavigationQueryModel,
+        IDataGridNavigationController,
+        INotifyPropertyChanged
     {
         private DataGridNavigationBoundaryMode _horizontalBoundaryMode = DataGridNavigationBoundaryMode.Contained;
         private DataGridNavigationBoundaryMode _verticalBoundaryMode = DataGridNavigationBoundaryMode.Contained;
@@ -626,6 +691,9 @@ namespace Avalonia.Controls.DataGridNavigation
 
         /// <inheritdoc />
         public event PropertyChangedEventHandler PropertyChanged;
+
+        /// <inheritdoc />
+        public event EventHandler<DataGridNavigationRequestedEventArgs> NavigationRequested;
 
         /// <summary>Gets or sets the Left/Right boundary policy.</summary>
         public DataGridNavigationBoundaryMode HorizontalBoundaryMode
@@ -679,6 +747,28 @@ namespace Avalonia.Controls.DataGridNavigation
 
         /// <inheritdoc />
         public DataGridNavigationResult Query(DataGridNavigationRequest request) => ResolveCore(request);
+
+        /// <inheritdoc />
+        public bool RequestNavigate(
+            DataGridNavigationCommand command,
+            KeyModifiers modifiers = KeyModifiers.None,
+            DataGridNavigationOrigin origin = DataGridNavigationOrigin.Command)
+        {
+            if (command == DataGridNavigationCommand.None)
+            {
+                return false;
+            }
+
+            EventHandler<DataGridNavigationRequestedEventArgs> handler = NavigationRequested;
+            if (handler == null)
+            {
+                return false;
+            }
+
+            var args = new DataGridNavigationRequestedEventArgs(command, modifiers, origin);
+            handler(this, args);
+            return args.Handled;
+        }
 
         /// <inheritdoc />
         public void NotifyCompleted(DataGridNavigationCompleted completed)

@@ -176,6 +176,14 @@ public class DataGridNavigationModelTests
     }
 
     [Fact]
+    public void RequestNavigate_Returns_False_Without_Bound_Grid()
+    {
+        var model = new DataGridNavigationModel();
+
+        Assert.False(model.RequestNavigate(DataGridNavigationCommand.Down));
+    }
+
+    [Fact]
     public void Settings_Raise_PropertyChanged_Only_For_Real_Changes()
     {
         var model = new DataGridNavigationModel();
@@ -234,6 +242,35 @@ public class DataGridNavigationModelTests
 
         Assert.True(handled);
         Assert.Equal(1, grid.CurrentCell.RowIndex);
+    }
+
+    [AvaloniaFact]
+    public void Model_Controller_Request_Moves_Bound_Grid()
+    {
+        DataGrid grid = CreateGrid();
+        SetCurrentCell(grid, rowIndex: 0, columnDisplayIndex: 0);
+        var model = new DataGridNavigationModel();
+        grid.NavigationModel = model;
+
+        bool handled = model.RequestNavigate(DataGridNavigationCommand.Down);
+
+        Assert.True(handled);
+        Assert.Equal(1, grid.CurrentCell.RowIndex);
+    }
+
+    [AvaloniaFact]
+    public void Replacing_Model_Detaches_Controller_Request()
+    {
+        DataGrid grid = CreateGrid();
+        SetCurrentCell(grid, rowIndex: 0, columnDisplayIndex: 0);
+        var oldModel = new DataGridNavigationModel();
+        grid.NavigationModel = oldModel;
+        grid.NavigationModel = new DataGridNavigationModel();
+
+        bool handled = oldModel.RequestNavigate(DataGridNavigationCommand.Down);
+
+        Assert.False(handled);
+        Assert.Equal(0, grid.CurrentCell.RowIndex);
     }
 
     [AvaloniaFact]
