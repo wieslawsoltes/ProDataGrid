@@ -131,6 +131,11 @@ public class DataGridStackLayoutModelTests
         algorithm.Initialize(context);
         algorithm.Measure(context, new Size(100, 100));
 
+        Assert.True(navigation.SupportsNavigation(DataGridLayoutNavigationDirection.Down));
+        Assert.False(navigation.SupportsNavigation(DataGridLayoutNavigationDirection.Left));
+        Assert.True(navigation.TryGetNavigationBounds(context, 50, context.RealizationRect, out Rect estimated));
+        Assert.Equal(1250, estimated.Y);
+
         bool movedDown = navigation.TryResolveNavigation(
             context,
             new DataGridLayoutNavigationRequest(10, DataGridLayoutNavigationDirection.Down, context.RealizationRect, new Point(50, 260)),

@@ -98,6 +98,8 @@ Override the estimator per grid:
 
 For very large sources, keep `UseLogicalScrollable="True"` and prefer uniform row heights where possible. The sample app includes `LargeUniform` and `LargeVariableHeight` pages that stress-test scrolling with hundreds of thousands of rows.
 
+For multi-line, tiled, horizontal, or application-defined row arrangements, see [Model-based layouts](model-based-layouts.md). Those layouts reuse the same logical scrolling presenter, estimator, container generator, and recycling pipeline described here.
+
 ## Migrating Existing Usage
 
 - Prefer the v2 theme or update your template to use the ScrollViewer pattern; legacy scroll bars remain available when `UseLogicalScrollable="False"`.

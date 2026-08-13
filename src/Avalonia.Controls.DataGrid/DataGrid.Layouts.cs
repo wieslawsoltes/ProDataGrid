@@ -256,6 +256,22 @@ namespace Avalonia.Controls
             return false;
         }
 
+        internal bool SupportsLayoutNavigation(DataGridLayoutNavigationDirection direction) =>
+            _rowsPresenter?.SupportsLayoutNavigation(direction) == true;
+
+        internal bool TryGetLayoutNavigationBounds(int currentRowIndex, out Rect bounds)
+        {
+            bounds = default;
+            if (_rowsPresenter == null || currentRowIndex < 0)
+            {
+                return false;
+            }
+
+            int slot = SlotFromRowIndex(currentRowIndex);
+            int layoutIndex = GetLayoutIndexFromSlot(slot);
+            return layoutIndex >= 0 && _rowsPresenter.TryGetLayoutNavigationBounds(layoutIndex, out bounds);
+        }
+
         private static int GetNavigationScanStep(
             DataGridLayoutNavigationDirection direction,
             int currentLayoutIndex,

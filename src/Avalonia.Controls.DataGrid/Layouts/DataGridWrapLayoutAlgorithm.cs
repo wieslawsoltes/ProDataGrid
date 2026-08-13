@@ -162,6 +162,43 @@ internal sealed class DataGridWrapLayoutAlgorithm : IDataGridLayoutAlgorithm, ID
     {
     }
 
+    public bool SupportsNavigation(DataGridLayoutNavigationDirection direction) => true;
+
+    public bool TryGetNavigationBounds(
+        IDataGridLayoutContext context,
+        int itemIndex,
+        Rect viewport,
+        out Rect bounds)
+    {
+        if (itemIndex < 0 || itemIndex >= context.ItemCount)
+        {
+            bounds = default;
+            return false;
+        }
+
+        State state = GetState(context);
+        DataGridLayoutOrientation orientation = _model.Orientation;
+        double spacingU = Math.Max(0, GetSpacingU(orientation));
+        double spacingV = Math.Max(0, GetSpacingV(orientation));
+        double availableU = IsFinitePositive(state.AvailableU)
+            ? state.AvailableU
+            : Math.Max(1, GetU(viewport.Size, orientation));
+        state.EnsureEstimates(context.GetEstimatedItemSize(itemIndex), orientation);
+        int itemsPerLine = Math.Max(
+            1,
+            (int)Math.Floor((availableU + spacingU) / (Math.Max(1, state.AverageItemU) + spacingU)));
+        bounds = GetEstimatedBounds(
+            context,
+            state,
+            itemIndex,
+            orientation,
+            itemsPerLine,
+            context.ItemCount,
+            spacingU,
+            spacingV);
+        return true;
+    }
+
     public bool TryResolveNavigation(
         IDataGridLayoutContext context,
         in DataGridLayoutNavigationRequest request,

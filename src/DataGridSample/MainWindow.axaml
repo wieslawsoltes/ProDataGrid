@@ -424,6 +424,13 @@
     <TabItem Header="Logical Scroll Performance">
       <pages:LogicalScrollPerformancePage />
     </TabItem>
+    <TabItem Header="Layout Gallery">
+      <pages:LayoutGalleryPage>
+        <pages:LayoutGalleryPage.DataContext>
+          <viewModels:LayoutGalleryViewModel />
+        </pages:LayoutGalleryPage.DataContext>
+      </pages:LayoutGalleryPage>
+    </TabItem>
     <TabItem Header="Routed events">
       <pages:RoutedEventsPage />
     </TabItem>

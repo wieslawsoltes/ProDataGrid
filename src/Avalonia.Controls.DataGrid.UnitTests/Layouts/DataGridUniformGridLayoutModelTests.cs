@@ -129,6 +129,15 @@ public class DataGridUniformGridLayoutModelTests
         algorithm.Initialize(context);
         algorithm.Measure(context, new Size(200, 20));
 
+        Assert.All(Enum.GetValues<DataGridLayoutNavigationDirection>(), direction =>
+            Assert.True(navigation.SupportsNavigation(direction)));
+        Assert.True(navigation.TryGetNavigationBounds(
+            context,
+            42,
+            new Rect(0, 0, 200, 20),
+            out Rect nonRealized));
+        Assert.Equal(new Rect(100, 200, 50, 20), nonRealized);
+
         Assert.True(navigation.TryResolveNavigation(
             context,
             new DataGridLayoutNavigationRequest(2, DataGridLayoutNavigationDirection.Down, new Rect(0, 0, 200, 20), new Point(125, 10)),

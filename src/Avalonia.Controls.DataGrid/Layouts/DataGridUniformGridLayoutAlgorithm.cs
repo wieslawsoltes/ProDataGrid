@@ -134,6 +134,27 @@ internal sealed class DataGridUniformGridLayoutAlgorithm : IDataGridLayoutAlgori
     {
     }
 
+    public bool SupportsNavigation(DataGridLayoutNavigationDirection direction) => true;
+
+    public bool TryGetNavigationBounds(
+        IDataGridLayoutContext context,
+        int itemIndex,
+        Rect viewport,
+        out Rect bounds)
+    {
+        if (itemIndex < 0 || itemIndex >= context.ItemCount)
+        {
+            bounds = default;
+            return false;
+        }
+
+        State state = GetState(context);
+        DataGridLayoutOrientation orientation = _model.Orientation;
+        int itemsPerLine = ResolveItemsPerLine(context, viewport, state, orientation);
+        bounds = GetEstimatedBounds(context, viewport, state, orientation, itemsPerLine, itemIndex);
+        return true;
+    }
+
     public bool TryResolveNavigation(
         IDataGridLayoutContext context,
         in DataGridLayoutNavigationRequest request,

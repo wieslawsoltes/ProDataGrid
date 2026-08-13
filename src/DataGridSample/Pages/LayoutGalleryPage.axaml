@@ -1,0 +1,78 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:models="clr-namespace:DataGridSample.Models"
+             xmlns:viewModels="clr-namespace:DataGridSample.ViewModels"
+             x:Class="DataGridSample.Pages.LayoutGalleryPage"
+             x:DataType="viewModels:LayoutGalleryViewModel">
+  <Grid RowDefinitions="Auto,Auto,*"
+        RowSpacing="10"
+        Margin="12">
+    <StackPanel Spacing="4">
+      <TextBlock Classes="h2" Text="Model-based row layouts" />
+      <TextBlock TextWrapping="Wrap"
+                 Text="Switch among every built-in layout and an application-defined layout. Model instances and their bounded sessions are retained, while row containers, selection, editing, filtering, and columns stay owned by the same DataGrid." />
+    </StackPanel>
+
+    <Grid Grid.Row="1"
+          ColumnDefinitions="Auto,280,Auto,Auto,*"
+          ColumnSpacing="8">
+      <TextBlock VerticalAlignment="Center" Text="Layout:" />
+      <ComboBox Grid.Column="1"
+                ItemsSource="{CompiledBinding Layouts}"
+                SelectedItem="{CompiledBinding SelectedLayout, Mode=TwoWay}">
+        <ComboBox.ItemTemplate>
+          <DataTemplate x:DataType="viewModels:DataGridLayoutChoice">
+            <TextBlock Text="{CompiledBinding Name}" />
+          </DataTemplate>
+        </ComboBox.ItemTemplate>
+      </ComboBox>
+      <Button Grid.Column="2"
+              Command="{CompiledBinding NextLayoutCommand}"
+              Content="Next layout" />
+      <TextBlock Grid.Column="3"
+                 VerticalAlignment="Center"
+                 Text="{CompiledBinding SwitchCount, StringFormat='Switches: {0}'}" />
+      <TextBlock Grid.Column="4"
+                 VerticalAlignment="Center"
+                 TextWrapping="Wrap"
+                 Text="{CompiledBinding Description}" />
+    </Grid>
+
+    <DataGrid Grid.Row="2"
+              ItemsSource="{CompiledBinding Rows}"
+              LayoutModel="{CompiledBinding LayoutModel}"
+              UseLogicalScrollable="True"
+              AutoGenerateColumns="False"
+              IsReadOnly="True"
+              CanUserSortColumns="True"
+              HeadersVisibility="All"
+              GridLinesVisibility="All"
+              SelectionMode="Extended"
+              SelectionUnit="CellOrRowHeader">
+      <DataGrid.Columns>
+        <DataGridTextColumn Header="Id"
+                            Width="54"
+                            Binding="{CompiledBinding Id}"
+                            x:DataType="models:LayoutGalleryRow" />
+        <DataGridTextColumn Header="Category"
+                            Width="88"
+                            Binding="{CompiledBinding Category}"
+                            x:DataType="models:LayoutGalleryRow" />
+        <DataGridTextColumn Header="Title"
+                            Width="118"
+                            Binding="{CompiledBinding Title}"
+                            x:DataType="models:LayoutGalleryRow" />
+        <DataGridTemplateColumn Header="Notes" Width="190">
+          <DataGridTemplateColumn.CellTemplate>
+            <DataTemplate x:DataType="models:LayoutGalleryRow">
+              <TextBlock Margin="4,2"
+                         MaxWidth="180"
+                         TextWrapping="Wrap"
+                         Text="{CompiledBinding Notes}" />
+            </DataTemplate>
+          </DataGridTemplateColumn.CellTemplate>
+        </DataGridTemplateColumn>
+      </DataGrid.Columns>
+    </DataGrid>
+  </Grid>
+</UserControl>
