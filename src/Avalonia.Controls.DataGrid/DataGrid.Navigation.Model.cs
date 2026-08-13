@@ -235,7 +235,8 @@ namespace Avalonia.Controls
                 lastRowIndex >= 0 ? 0 : -1,
                 lastRowIndex,
                 firstColumn?.DisplayIndex ?? -1,
-                lastColumn?.DisplayIndex ?? -1);
+                lastColumn?.DisplayIndex ?? -1,
+                layoutPlan.IsOwned);
         }
 
         private LayoutNavigationPlan CreateLayoutNavigationPlan(

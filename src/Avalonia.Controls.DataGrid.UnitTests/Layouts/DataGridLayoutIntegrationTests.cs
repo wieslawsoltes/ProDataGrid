@@ -323,6 +323,99 @@ public class DataGridLayoutIntegrationTests
         }
     }
 
+    [AvaloniaTheory]
+    [InlineData(DataGridNavigationCommand.Right, 2, 0)]
+    [InlineData(DataGridNavigationCommand.Left, 3, 5)]
+    [InlineData(DataGridNavigationCommand.Down, 19, 0)]
+    [InlineData(DataGridNavigationCommand.Up, 0, 19)]
+    public void Owned_layout_boundary_wraps_through_spatial_geometry(
+        DataGridNavigationCommand command,
+        int sourceRowIndex,
+        int expectedRowIndex)
+    {
+        Window window = CreateWindow(out DataGrid grid, itemCount: 20);
+        try
+        {
+            grid.LayoutModel = new DataGridUniformGridLayoutModel
+            {
+                MinItemWidth = 100,
+                MinItemHeight = 32,
+                MaximumRowsOrColumns = 3
+            };
+            grid.NavigationModel = new DataGridNavigationModel
+            {
+                HorizontalBoundaryMode = DataGridNavigationBoundaryMode.Wrap,
+                VerticalBoundaryMode = DataGridNavigationBoundaryMode.Wrap
+            };
+            window.Show();
+            window.UpdateLayout();
+            SetCurrentCell(grid, sourceRowIndex, columnIndex: 0);
+
+            Assert.True(grid.Navigate(command));
+            Assert.Equal(expectedRowIndex, grid.CurrentCell.RowIndex);
+        }
+        finally
+        {
+            window.Close();
+        }
+    }
+
+    [AvaloniaFact]
+    public void Unsupported_stack_cross_axis_keeps_column_wrap()
+    {
+        Window window = CreateWindow(out DataGrid grid, itemCount: 20, columnCount: 2);
+        try
+        {
+            grid.LayoutModel = new DataGridStackLayoutModel();
+            grid.NavigationModel = new DataGridNavigationModel
+            {
+                HorizontalBoundaryMode = DataGridNavigationBoundaryMode.Wrap
+            };
+            window.Show();
+            window.UpdateLayout();
+            SetCurrentCell(grid, rowIndex: 4, columnIndex: 1);
+
+            Assert.True(grid.Navigate(DataGridNavigationCommand.Right));
+            Assert.Equal(4, grid.CurrentCell.RowIndex);
+            Assert.Equal(0, grid.CurrentCell.Column.DisplayIndex);
+        }
+        finally
+        {
+            window.Close();
+        }
+    }
+
+    [AvaloniaFact]
+    public void Logical_rtl_redirect_does_not_run_spatial_boundary_policy_twice()
+    {
+        Window window = CreateWindow(out DataGrid grid, itemCount: 20);
+        try
+        {
+            grid.LayoutModel = new DataGridUniformGridLayoutModel
+            {
+                MinItemWidth = 100,
+                MinItemHeight = 32,
+                MaximumRowsOrColumns = 3
+            };
+            grid.FlowDirection = FlowDirection.RightToLeft;
+            grid.NavigationModel = new DataGridNavigationModel
+            {
+                HorizontalNavigationMode = DataGridHorizontalNavigationMode.Logical,
+                HorizontalBoundaryMode = DataGridNavigationBoundaryMode.Wrap
+            };
+            window.Show();
+            window.UpdateLayout();
+            SetCurrentCell(grid, rowIndex: 2, columnIndex: 0);
+
+            Assert.False(grid.Navigate(DataGridNavigationCommand.Left));
+            Assert.Equal(2, grid.CurrentCell.RowIndex);
+        }
+        finally
+        {
+            window.Close();
+        }
+    }
+
     private static Window CreateWindow(out DataGrid grid, int itemCount, int columnCount = 1)
     {
         var window = new Window { Width = 360, Height = 260 };
