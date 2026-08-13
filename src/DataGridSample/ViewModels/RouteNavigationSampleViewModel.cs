@@ -15,7 +15,7 @@ namespace DataGridSample.ViewModels;
 public sealed class RouteNavigationSampleViewModel : ReactiveObject
 {
     private RouteRow? _selectedItem;
-    private string _status = "Select a row, then navigate.";
+    private string _status = "Click a cell or press Enter to route with its full grid context.";
 
     public RouteNavigationSampleViewModel()
     {
@@ -34,31 +34,37 @@ public sealed class RouteNavigationSampleViewModel : ReactiveObject
                 : null);
         RouteNavigator = new InMemoryRouteNavigator();
         RouteNavigationModel = new DataGridRouteNavigationModel(resolver, RouteNavigator);
+        RouteContextFactory = new DataGridRouteContextFactory(item => ((RouteRow)item).Id);
+        NavigationInputModel = CreateRouteInputModel();
         RouteNavigationModel.NavigationChanged += (_, e) =>
-            Status = $"{e.Request.Kind}: {e.Result.Status} · {e.Result.CurrentRoute.Path}";
+            Status = $"{e.Request.Kind}: {e.Result.Status} · {e.Result.CurrentRoute.Path} · key {e.Request.Context.ItemKey} · cell {e.Request.Context.Position.RowIndex}:{e.Request.Context.Position.ColumnDisplayIndex}";
 
-        NavigateCommand = ReactiveCommand.CreateFromTask(() => NavigateAsync(DataGridRouteNavigationKind.Navigate));
-        ReplaceCommand = ReactiveCommand.CreateFromTask(() => NavigateAsync(DataGridRouteNavigationKind.Replace));
-        ResetCommand = ReactiveCommand.CreateFromTask(() => NavigateAsync(DataGridRouteNavigationKind.Reset));
-        BackCommand = ReactiveCommand.CreateFromTask(() => NavigateAsync(DataGridRouteNavigationKind.Back));
-        ForwardCommand = ReactiveCommand.CreateFromTask(() => NavigateAsync(DataGridRouteNavigationKind.Forward));
+        NavigateCommand = CreateRouteCommand(DataGridRouteNavigationKind.Navigate);
+        ReplaceCommand = CreateRouteCommand(DataGridRouteNavigationKind.Replace);
+        ResetCommand = CreateRouteCommand(DataGridRouteNavigationKind.Reset);
+        BackCommand = CreateRouteCommand(DataGridRouteNavigationKind.Back);
+        ForwardCommand = CreateRouteCommand(DataGridRouteNavigationKind.Forward);
     }
 
     public ObservableCollection<RouteRow> Items { get; }
 
     public DataGridRouteNavigationModel RouteNavigationModel { get; }
 
+    public DataGridRouteContextFactory RouteContextFactory { get; }
+
+    public DataGridNavigationInputModel NavigationInputModel { get; }
+
     public InMemoryRouteNavigator RouteNavigator { get; }
 
-    public ReactiveCommand<RxVoid, RxVoid> NavigateCommand { get; }
+    public ReactiveCommand<RxVoid, bool> NavigateCommand { get; }
 
-    public ReactiveCommand<RxVoid, RxVoid> ReplaceCommand { get; }
+    public ReactiveCommand<RxVoid, bool> ReplaceCommand { get; }
 
-    public ReactiveCommand<RxVoid, RxVoid> ResetCommand { get; }
+    public ReactiveCommand<RxVoid, bool> ResetCommand { get; }
 
-    public ReactiveCommand<RxVoid, RxVoid> BackCommand { get; }
+    public ReactiveCommand<RxVoid, bool> BackCommand { get; }
 
-    public ReactiveCommand<RxVoid, RxVoid> ForwardCommand { get; }
+    public ReactiveCommand<RxVoid, bool> ForwardCommand { get; }
 
     public RouteRow? SelectedItem
     {
@@ -72,19 +78,19 @@ public sealed class RouteNavigationSampleViewModel : ReactiveObject
         private set => this.RaiseAndSetIfChanged(ref _status, value);
     }
 
-    private async Task NavigateAsync(DataGridRouteNavigationKind kind)
-    {
-        DataGridRouteContext context = kind is DataGridRouteNavigationKind.Back or DataGridRouteNavigationKind.Forward
-            ? DataGridRouteContext.Empty
-            : new DataGridRouteContext(
-                SelectedItem,
-                SelectedItem?.Id,
-                "name",
-                DataGridNavigationPosition.Unset,
-                DataGridRouteNavigationOrigin.Command,
-                SelectedItem != null);
-        await RouteNavigationModel.NavigateAsync(kind, context);
-    }
+    private ReactiveCommand<RxVoid, bool> CreateRouteCommand(DataGridRouteNavigationKind kind) =>
+        ReactiveCommand.Create(() => RouteNavigationModel.RequestNavigate(kind));
+
+    private static DataGridNavigationInputModel CreateRouteInputModel() =>
+        new(
+            DataGridNavigationInputBinding.Pointer(
+                DataGridNavigationInputKind.PointerReleased,
+                DataGridNavigationPointerButton.Primary,
+                DataGridNavigationInputResult.NavigateRoute(DataGridRouteNavigationKind.Navigate),
+                targetKind: DataGridNavigationInputTargetKind.Cell),
+            DataGridNavigationInputBinding.KeyDown(
+                DataGridNavigationInputKey.Enter,
+                DataGridNavigationInputResult.NavigateRoute(DataGridRouteNavigationKind.Navigate)));
 
     public sealed record RouteRow(int Id, string Name, string Area, string State);
 

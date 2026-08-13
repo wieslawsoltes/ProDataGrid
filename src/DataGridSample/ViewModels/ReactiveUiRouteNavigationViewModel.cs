@@ -35,12 +35,22 @@ public sealed class ReactiveUiRouteNavigationViewModel : ReactiveObject, IScreen
                 ? new DataGridRoute($"orders/{order.Id}", order, "order-details")
                 : null);
         RouteNavigationModel = new DataGridRouteNavigationModel(resolver, navigator);
+        RouteContextFactory = new DataGridRouteContextFactory(item => ((OrderRouteRow)item).Id);
+        NavigationInputModel = new DataGridNavigationInputModel(
+            DataGridNavigationInputBinding.Pointer(
+                DataGridNavigationInputKind.PointerReleased,
+                DataGridNavigationPointerButton.Primary,
+                DataGridNavigationInputResult.NavigateRoute(DataGridRouteNavigationKind.Navigate),
+                targetKind: DataGridNavigationInputTargetKind.Cell),
+            DataGridNavigationInputBinding.KeyDown(
+                DataGridNavigationInputKey.Enter,
+                DataGridNavigationInputResult.NavigateRoute(DataGridRouteNavigationKind.Navigate)));
         RouteNavigationModel.NavigationChanged += (_, e) =>
-            Status = $"{e.Request.Kind}: {e.Result.Status} · stack depth {Router.NavigationStack.Count}";
+            Status = $"{e.Request.Kind}: {e.Result.Status} · key {e.Request.Context.ItemKey} · cell {e.Request.Context.Position.RowIndex}:{e.Request.Context.Position.ColumnDisplayIndex} · stack depth {Router.NavigationStack.Count}";
 
-        OpenOrderCommand = ReactiveCommand.CreateFromTask(OpenOrderAsync);
-        BackCommand = ReactiveCommand.CreateFromTask(BackAsync);
-        ResetCommand = ReactiveCommand.CreateFromTask(ResetAsync);
+        OpenOrderCommand = ReactiveCommand.Create(() => RouteNavigationModel.RequestNavigate(DataGridRouteNavigationKind.Navigate));
+        BackCommand = ReactiveCommand.Create(() => RouteNavigationModel.RequestNavigate(DataGridRouteNavigationKind.Back));
+        ResetCommand = ReactiveCommand.Create(() => RouteNavigationModel.RequestNavigate(DataGridRouteNavigationKind.Reset));
 
         Router.NavigateAndReset.Execute(new OrderListRouteViewModel(this)).Subscribe();
     }
@@ -53,11 +63,15 @@ public sealed class ReactiveUiRouteNavigationViewModel : ReactiveObject, IScreen
 
     public DataGridRouteNavigationModel RouteNavigationModel { get; }
 
-    public ReactiveCommand<RxVoid, RxVoid> OpenOrderCommand { get; }
+    public DataGridRouteContextFactory RouteContextFactory { get; }
 
-    public ReactiveCommand<RxVoid, RxVoid> BackCommand { get; }
+    public DataGridNavigationInputModel NavigationInputModel { get; }
 
-    public ReactiveCommand<RxVoid, RxVoid> ResetCommand { get; }
+    public ReactiveCommand<RxVoid, bool> OpenOrderCommand { get; }
+
+    public ReactiveCommand<RxVoid, bool> BackCommand { get; }
+
+    public ReactiveCommand<RxVoid, bool> ResetCommand { get; }
 
     public OrderRouteRow? SelectedOrder
     {
@@ -69,37 +83,6 @@ public sealed class ReactiveUiRouteNavigationViewModel : ReactiveObject, IScreen
     {
         get => _status;
         private set => this.RaiseAndSetIfChanged(ref _status, value);
-    }
-
-    private async Task OpenOrderAsync()
-    {
-        OrderRouteRow? order = SelectedOrder;
-        var context = new DataGridRouteContext(
-            order,
-            order?.Id,
-            "customer",
-            DataGridNavigationPosition.Unset,
-            DataGridRouteNavigationOrigin.Command,
-            order != null);
-        await RouteNavigationModel.NavigateAsync(DataGridRouteNavigationKind.Navigate, context);
-    }
-
-    private async Task BackAsync() =>
-        await RouteNavigationModel.NavigateAsync(
-            DataGridRouteNavigationKind.Back,
-            DataGridRouteContext.Empty);
-
-    private async Task ResetAsync()
-    {
-        OrderRouteRow? order = SelectedOrder;
-        var context = new DataGridRouteContext(
-            order,
-            order?.Id,
-            "customer",
-            DataGridNavigationPosition.Unset,
-            DataGridRouteNavigationOrigin.Command,
-            order != null);
-        await RouteNavigationModel.NavigateAsync(DataGridRouteNavigationKind.Reset, context);
     }
 
     private IRoutableViewModel? CreateRouteViewModel(DataGridRoute route) =>

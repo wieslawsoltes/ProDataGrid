@@ -1,11 +1,15 @@
 using System;
 using System.Linq;
 using System.Reactive.Linq;
+using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.DataGridNavigation;
 using Avalonia.Headless.XUnit;
+using Avalonia.Input;
+using Avalonia.Input.Raw;
 using Avalonia.LogicalTree;
 using Avalonia.Threading;
+using Avalonia.VisualTree;
 using DataGridSample.Pages;
 using DataGridSample.ViewModels;
 using Xunit;
@@ -28,6 +32,8 @@ public sealed class NavigationSampleTests
         {
             DataGrid grid = view.GetLogicalDescendants().OfType<DataGrid>().Single();
             Assert.Same(viewModel.RouteNavigationModel, grid.RouteNavigationModel);
+            Assert.Same(viewModel.RouteContextFactory, grid.RouteContextFactory);
+            Assert.Same(viewModel.NavigationInputModel, grid.NavigationInputModel);
 
             viewModel.NavigateCommand.Execute().Subscribe();
             Assert.Contains("RoutingState.Navigate", viewModel.Status, StringComparison.Ordinal);
@@ -59,16 +65,86 @@ public sealed class NavigationSampleTests
             Assert.Same(viewModel.NavigationModel, grid.NavigationModel);
             Assert.Same(viewModel.RouteNavigationModel, grid.RouteNavigationModel);
             Assert.Same(viewModel.NavigationInputModel, grid.NavigationInputModel);
+            Assert.Same(viewModel.RouteContextFactory, grid.RouteContextFactory);
             DataGridNavigationInputResult jResult = viewModel.NavigationInputModel.Resolve(
                 CreateKeyRequest(DataGridNavigationInputKey.J));
             Assert.Equal(DataGridNavigationInputDecision.Navigate, jResult.Decision);
             Assert.Equal(DataGridNavigationCommand.Down, jResult.Command);
             Assert.True(viewModel.NavigationModel.RequestNavigate(DataGridNavigationCommand.Down));
+
+            DataGridCell target = grid.GetVisualDescendants()
+                .OfType<DataGridCell>()
+                .Single(cell => ReferenceEquals(cell.DataContext, viewModel.Items[2]) && cell.OwningColumn?.DisplayIndex == 1);
+            RaisePrimaryClick(target, window);
+
+            Assert.Contains("generated/303", viewModel.Status, StringComparison.Ordinal);
+            Assert.Contains("key 303", viewModel.Status, StringComparison.Ordinal);
+            Assert.Contains("cell 2:1", viewModel.Status, StringComparison.Ordinal);
         }
         finally
         {
             window.Close();
         }
+    }
+
+    [AvaloniaFact]
+    public void Route_page_click_routes_the_exact_cell_context_inside_the_grid()
+    {
+        var viewModel = new RouteNavigationSampleViewModel();
+        var view = new RouteNavigationPage { DataContext = viewModel };
+        var window = new Window { Width = 900, Height = 560, Content = view };
+        window.ApplySampleTheme();
+        window.Show();
+        Dispatcher.UIThread.RunJobs();
+
+        try
+        {
+            DataGrid grid = view.GetLogicalDescendants().OfType<DataGrid>().Single();
+            DataGridCell target = grid.GetVisualDescendants()
+                .OfType<DataGridCell>()
+                .Single(cell => ReferenceEquals(cell.DataContext, viewModel.Items[2]) && cell.OwningColumn?.DisplayIndex == 2);
+
+            RaisePrimaryClick(target, window);
+
+            Assert.Contains("work-items/108", viewModel.Status, StringComparison.Ordinal);
+            Assert.Contains("key 108", viewModel.Status, StringComparison.Ordinal);
+            Assert.Contains("cell 2:2", viewModel.Status, StringComparison.Ordinal);
+        }
+        finally
+        {
+            window.Close();
+        }
+    }
+
+    private static void RaisePrimaryClick(Control source, Visual root)
+    {
+        var pointer = new Pointer(Pointer.GetNextFreeId(), PointerType.Mouse, isPrimary: true);
+        var position = new Point(source.Bounds.Width / 2, source.Bounds.Height / 2);
+        var pressedProperties = new PointerPointProperties(
+            RawInputModifiers.LeftMouseButton,
+            PointerUpdateKind.LeftButtonPressed);
+        source.RaiseEvent(new PointerPressedEventArgs(
+            source,
+            pointer,
+            root,
+            position,
+            0,
+            pressedProperties,
+            KeyModifiers.None,
+            clickCount: 1));
+        var releasedProperties = new PointerPointProperties(
+            RawInputModifiers.None,
+            PointerUpdateKind.LeftButtonReleased);
+        source.RaiseEvent(new PointerReleasedEventArgs(
+            source,
+            pointer,
+            root,
+            position,
+            0,
+            releasedProperties,
+            KeyModifiers.None,
+            MouseButton.Left));
+        Dispatcher.UIThread.RunJobs();
     }
 
     private static DataGridNavigationInputRequest CreateKeyRequest(DataGridNavigationInputKey key) =>

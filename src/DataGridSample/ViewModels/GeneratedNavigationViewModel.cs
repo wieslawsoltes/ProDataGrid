@@ -14,7 +14,8 @@ namespace DataGridSample.ViewModels;
     typeof(GeneratedNavigationRow),
     ProviderName = "GeneratedNavigationRowSchema",
     GenerateNavigationModel = true,
-    GenerateNavigationInputModel = true)]
+    GenerateNavigationInputModel = true,
+    GenerateRouteContextFactory = true)]
 [GenerateDataGridView(
     typeof(GeneratedNavigationRow),
     ViewName = "GeneratedNavigationGridView",
@@ -24,7 +25,8 @@ namespace DataGridSample.ViewModels;
     AutomationId = "generated-navigation-grid",
     NavigationModelPropertyName = nameof(NavigationModel),
     RouteNavigationModelPropertyName = nameof(RouteNavigationModel),
-    NavigationInputModelPropertyName = nameof(NavigationInputModel))]
+    NavigationInputModelPropertyName = nameof(NavigationInputModel),
+    RouteContextFactoryPropertyName = nameof(RouteContextFactory))]
 public sealed partial class GeneratedNavigationViewModel : ReactiveObject
 {
     private GeneratedNavigationRow? _selectedItem;
@@ -64,6 +66,14 @@ public sealed partial class GeneratedNavigationViewModel : ReactiveObject
                 DataGridNavigationPointerButton.Primary,
                 DataGridNavigationInputResult.NavigateToTarget(),
                 targetKind: DataGridNavigationInputTargetKind.Cell),
+            DataGridNavigationInputBinding.Pointer(
+                DataGridNavigationInputKind.PointerReleased,
+                DataGridNavigationPointerButton.Primary,
+                DataGridNavigationInputResult.NavigateRoute(DataGridRouteNavigationKind.Navigate),
+                targetKind: DataGridNavigationInputTargetKind.Cell),
+            DataGridNavigationInputBinding.KeyDown(
+                DataGridNavigationInputKey.Enter,
+                DataGridNavigationInputResult.NavigateRoute(DataGridRouteNavigationKind.Navigate)),
             DataGridNavigationInputBinding.Wheel(
                 DataGridNavigationWheelDirection.Up,
                 DataGridNavigationInputResult.NavigateRoute(DataGridRouteNavigationKind.Back),
@@ -89,30 +99,29 @@ public sealed partial class GeneratedNavigationViewModel : ReactiveObject
                 ? $"Generated cell model: {e.Completed.Request.Command} → {e.Completed.NewPosition.RowIndex}:{e.Completed.NewPosition.ColumnDisplayIndex}"
                 : $"Generated cell model: {e.Completed.FailureReason}";
         RouteNavigationModel.NavigationChanged += (_, e) =>
-            Status = $"Generated route model: {e.Result.Status} · {e.Result.CurrentRoute.Path}";
+            Status = $"Generated route model: {e.Result.Status} · {e.Result.CurrentRoute.Path} · key {e.Request.Context.ItemKey} · cell {e.Request.Context.Position.RowIndex}:{e.Request.Context.Position.ColumnDisplayIndex}";
 
         NextCellCommand = ReactiveCommand.Create(() =>
             NavigationModel.RequestNavigate(DataGridNavigationCommand.Next));
         PreviousCellCommand = ReactiveCommand.Create(() =>
             NavigationModel.RequestNavigate(DataGridNavigationCommand.Previous));
-        OpenRouteCommand = ReactiveCommand.CreateFromTask(OpenRouteAsync);
-        BackCommand = ReactiveCommand.CreateFromTask(() =>
-            RouteNavigationModel.NavigateAsync(
-                DataGridRouteNavigationKind.Back,
-                DataGridRouteContext.Empty).AsTask());
+        OpenRouteCommand = ReactiveCommand.Create(() =>
+            RouteNavigationModel.RequestNavigate(DataGridRouteNavigationKind.Navigate));
+        BackCommand = ReactiveCommand.Create(() =>
+            RouteNavigationModel.RequestNavigate(DataGridRouteNavigationKind.Back));
     }
 
     public ObservableCollection<GeneratedNavigationRow> Items { get; }
 
-    public IDataGridRouteNavigationModel RouteNavigationModel { get; }
+    public DataGridRouteNavigationModel RouteNavigationModel { get; }
 
     public ReactiveCommand<RxVoid, bool> NextCellCommand { get; }
 
     public ReactiveCommand<RxVoid, bool> PreviousCellCommand { get; }
 
-    public ReactiveCommand<RxVoid, DataGridRouteNavigationResult> OpenRouteCommand { get; }
+    public ReactiveCommand<RxVoid, bool> OpenRouteCommand { get; }
 
-    public ReactiveCommand<RxVoid, DataGridRouteNavigationResult> BackCommand { get; }
+    public ReactiveCommand<RxVoid, bool> BackCommand { get; }
 
     public GeneratedNavigationRow? SelectedItem
     {
@@ -126,18 +135,6 @@ public sealed partial class GeneratedNavigationViewModel : ReactiveObject
         private set => this.RaiseAndSetIfChanged(ref _status, value);
     }
 
-    private Task<DataGridRouteNavigationResult> OpenRouteAsync()
-    {
-        GeneratedNavigationRow? selected = SelectedItem;
-        var context = new DataGridRouteContext(
-            selected,
-            selected?.Id,
-            "name",
-            DataGridNavigationPosition.Unset,
-            DataGridRouteNavigationOrigin.Command,
-            selected != null);
-        return RouteNavigationModel.NavigateAsync(DataGridRouteNavigationKind.Navigate, context).AsTask();
-    }
 }
 
 public sealed class GeneratedNavigationRow
@@ -150,6 +147,7 @@ public sealed class GeneratedNavigationRow
         State = state;
     }
 
+    [DataGridKey]
     [DataGridColumn(Order = 0, ColumnKey = "id", IsReadOnly = true)]
     public int Id { get; set; }
 

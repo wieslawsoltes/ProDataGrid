@@ -56,25 +56,39 @@ public sealed class MvvmRouteFrameworksViewModel : ReactiveObject
                 : null);
         var navigator = new FrameworkRecipeNavigator(() => SelectedRecipe);
         RouteNavigationModel = new DataGridRouteNavigationModel(resolver, navigator);
+        RouteContextFactory = new DataGridRouteContextFactory(item => ((FrameworkRouteRecipe)item).Name);
+        NavigationInputModel = new DataGridNavigationInputModel(
+            DataGridNavigationInputBinding.Pointer(
+                DataGridNavigationInputKind.PointerReleased,
+                DataGridNavigationPointerButton.Primary,
+                DataGridNavigationInputResult.NavigateRoute(DataGridRouteNavigationKind.Navigate),
+                targetKind: DataGridNavigationInputTargetKind.Cell),
+            DataGridNavigationInputBinding.KeyDown(
+                DataGridNavigationInputKey.Enter,
+                DataGridNavigationInputResult.NavigateRoute(DataGridRouteNavigationKind.Navigate)));
         RouteNavigationModel.NavigationChanged += (_, e) =>
             Status = e.Result.Succeeded
                 ? $"{e.Result.CurrentRoute.Path}: {navigator.LastNativeOperation}"
                 : $"{e.Request.Kind}: {e.Result.Status}";
 
-        NavigateCommand = ReactiveCommand.CreateFromTask(() => NavigateAsync(DataGridRouteNavigationKind.Navigate));
-        ResetCommand = ReactiveCommand.CreateFromTask(() => NavigateAsync(DataGridRouteNavigationKind.Reset));
-        BackCommand = ReactiveCommand.CreateFromTask(() => NavigateAsync(DataGridRouteNavigationKind.Back));
+        NavigateCommand = ReactiveCommand.Create(() => RouteNavigationModel.RequestNavigate(DataGridRouteNavigationKind.Navigate));
+        ResetCommand = ReactiveCommand.Create(() => RouteNavigationModel.RequestNavigate(DataGridRouteNavigationKind.Reset));
+        BackCommand = ReactiveCommand.Create(() => RouteNavigationModel.RequestNavigate(DataGridRouteNavigationKind.Back));
     }
 
     public ObservableCollection<FrameworkRouteRecipe> Recipes { get; }
 
     public DataGridRouteNavigationModel RouteNavigationModel { get; }
 
-    public ReactiveCommand<RxVoid, RxVoid> NavigateCommand { get; }
+    public DataGridRouteContextFactory RouteContextFactory { get; }
 
-    public ReactiveCommand<RxVoid, RxVoid> ResetCommand { get; }
+    public DataGridNavigationInputModel NavigationInputModel { get; }
 
-    public ReactiveCommand<RxVoid, RxVoid> BackCommand { get; }
+    public ReactiveCommand<RxVoid, bool> NavigateCommand { get; }
+
+    public ReactiveCommand<RxVoid, bool> ResetCommand { get; }
+
+    public ReactiveCommand<RxVoid, bool> BackCommand { get; }
 
     public FrameworkRouteRecipe? SelectedRecipe
     {
@@ -86,21 +100,6 @@ public sealed class MvvmRouteFrameworksViewModel : ReactiveObject
     {
         get => _status;
         private set => this.RaiseAndSetIfChanged(ref _status, value);
-    }
-
-    private async Task NavigateAsync(DataGridRouteNavigationKind kind)
-    {
-        FrameworkRouteRecipe? recipe = SelectedRecipe;
-        DataGridRouteContext context = kind == DataGridRouteNavigationKind.Back
-            ? DataGridRouteContext.Empty
-            : new DataGridRouteContext(
-                recipe,
-                recipe?.Name,
-                "framework",
-                DataGridNavigationPosition.Unset,
-                DataGridRouteNavigationOrigin.Command,
-                recipe != null);
-        await RouteNavigationModel.NavigateAsync(kind, context);
     }
 
     public sealed record FrameworkRouteRecipe(

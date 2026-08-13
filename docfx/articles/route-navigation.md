@@ -40,25 +40,66 @@ RouteNavigationModel = new DataGridRouteNavigationModel(
 
 ```xml
 <DataGrid ItemsSource="{CompiledBinding Orders}"
-          RouteNavigationModel="{CompiledBinding RouteNavigationModel}" />
+          RouteNavigationModel="{CompiledBinding RouteNavigationModel}"
+          RouteContextFactory="{CompiledBinding RouteContextFactory}"
+          NavigationInputModel="{CompiledBinding NavigationInputModel}" />
 ```
 
-An application command can construct context from stable ViewModel state and call
-the model directly. A control behavior can call `DataGrid.NavigateRouteAsync`, which
-uses `GetCurrentRouteContext` for the current cell.
+Prefer `IDataGridRouteNavigationController.RequestNavigate` for toolbar, menu,
+automation, and ViewModel commands. `DataGridRouteNavigationModel` implements this
+optional controller interface. The request is raised back into the bound DataGrid,
+which supplies its authoritative current item, item key, column key, cell position,
+and origin. This avoids reconstructing context from `SelectedItem` and does not
+require a control reference in the ViewModel:
 
 ```csharp
-DataGridRouteNavigationResult result = await RouteNavigationModel.NavigateAsync(
-    DataGridRouteNavigationKind.Navigate,
-    new DataGridRouteContext(
-        selectedOrder,
-        selectedOrder?.Id,
-        "name",
-        DataGridNavigationPosition.Unset,
-        DataGridRouteNavigationOrigin.Command,
-        hasItem: selectedOrder is not null),
-    cancellationToken);
+OpenOrderCommand = ReactiveCommand.Create(() =>
+    RouteNavigationModel.RequestNavigate(DataGridRouteNavigationKind.Navigate));
 ```
+
+Direct orchestration remains available for background workflows that already own a
+detached context. `DataGrid.NavigateRouteAsync` routes the current cell, while
+`GetRouteContext(position, origin)` builds context for an explicit cell.
+
+## Route from a click or key inside the grid
+
+Bind pointer release rather than pointer press when ordinary click selection should
+complete first. The input request still carries its hit-tested target, so the grid
+routes the clicked cell even if `CurrentCell` has not changed or another handler
+consumes the bubbling event:
+
+```csharp
+NavigationInputModel.SetBindings(
+    DataGridNavigationInputBinding.Pointer(
+        DataGridNavigationInputKind.PointerReleased,
+        DataGridNavigationPointerButton.Primary,
+        DataGridNavigationInputResult.NavigateRoute(
+            DataGridRouteNavigationKind.Navigate),
+        targetKind: DataGridNavigationInputTargetKind.Cell),
+    DataGridNavigationInputBinding.KeyDown(
+        DataGridNavigationInputKey.Enter,
+        DataGridNavigationInputResult.NavigateRoute(
+            DataGridRouteNavigationKind.Navigate)));
+```
+
+Pointer route execution uses `TargetPosition`; key and ViewModel-controller requests
+use the current cell. Back and Forward intentionally use an item-less history
+context while retaining the correct keyboard, pointer, or command origin.
+
+## Stable context identity
+
+`IDataGridRouteContextFactory` is the optional identity boundary used by DataGrid.
+The default context preserves item reference, column key, and position. Supply
+`DataGridRouteContextFactory` with an AOT-safe selector when route state must survive
+sorting, filtering, paging, reload, or virtualization:
+
+```csharp
+RouteContextFactory = new DataGridRouteContextFactory(
+    item => ((Order)item).Id);
+```
+
+The factory runs only for valid data-cell positions and does not inspect item
+members through reflection.
 
 Ordinary outcomes do not throw. Inspect `Succeeded`, `Canceled`, `RouteNotFound`,
 `NotSupported`, `Busy`, `InvalidRequest`, or `Failed`, plus the optional exception
@@ -137,28 +178,20 @@ ViewModels and the grid package. See Prism's official
 ## CommunityToolkit.Mvvm
 
 CommunityToolkit.Mvvm deliberately provides MVVM primitives rather than a router.
-Inject the application's navigation service or `IDataGridRouteNavigationModel` and
-invoke it from `AsyncRelayCommand`:
+Inject the grid-contextual controller implemented by the default route model and
+invoke it from a generated relay command:
 
 ```csharp
 public sealed partial class OrdersViewModel : ObservableObject
 {
-    private readonly IDataGridRouteNavigationModel _routes;
+    private readonly IDataGridRouteNavigationController _routes;
 
-    public OrdersViewModel(IDataGridRouteNavigationModel routes) =>
+    public OrdersViewModel(IDataGridRouteNavigationController routes) =>
         _routes = routes;
 
     [RelayCommand]
-    private async Task OpenOrderAsync(Order order, CancellationToken token)
-    {
-        var context = new DataGridRouteContext(
-            order, order.Id, "name", DataGridNavigationPosition.Unset,
-            DataGridRouteNavigationOrigin.Command);
-        await _routes.NavigateAsync(
-            DataGridRouteNavigationKind.Navigate,
-            context,
-            token);
-    }
+    private void OpenOrder() =>
+        _routes.RequestNavigate(DataGridRouteNavigationKind.Navigate);
 }
 ```
 
@@ -210,7 +243,11 @@ containers; sorting, filtering, paging, and virtualization make them transient.
 
 ## Source generation
 
-Generated schema providers expose `CreateRouteNavigationModel(resolver, navigator)`.
-Generated views validate and compile-bind an application-owned route property with
-`RouteNavigationModelPropertyName`. See
+Generated schema providers expose `CreateRouteNavigationModel(resolver, navigator)`
+and `CreateRouteContextFactory()`. When the row has `[DataGridKey]`, the latter uses
+the generated typed key accessor; otherwise it preserves reference/position context
+without inventing identity. `GenerateRouteContextFactory` emits a ViewModel
+property, and `RouteContextFactoryPropertyName` validates and compile-binds it to the
+generated DataGrid. Generated views also validate and compile-bind an
+application-owned route property with `RouteNavigationModelPropertyName`. See
 [source-generated navigation](source-generators/selection-navigation-state.md#navigation-model-generation).

@@ -159,11 +159,14 @@ to bind cell, input, and application-route models:
     GenerateNavigationModel = true,
     NavigationModelPropertyName = nameof(NavigationModel),
     GenerateNavigationInputModel = true,
-    NavigationInputModelPropertyName = nameof(NavigationInputModel))]
+    NavigationInputModelPropertyName = nameof(NavigationInputModel),
+    GenerateRouteContextFactory = true,
+    RouteContextFactoryPropertyName = nameof(RouteContextFactory))]
 [GenerateDataGridView(
     typeof(Trade),
     NavigationModelPropertyName = nameof(NavigationModel),
     NavigationInputModelPropertyName = nameof(NavigationInputModel),
+    RouteContextFactoryPropertyName = nameof(RouteContextFactory),
     RouteNavigationModelPropertyName = nameof(RouteNavigationModel))]
 public sealed partial class TradesViewModel : ReactiveObject
 {
@@ -184,18 +187,22 @@ The generator emits:
 
 - `TradeSchema.CreateNavigationModel()`;
 - `TradeSchema.CreateNavigationInputModel()`;
+- `TradeSchema.CreateRouteContextFactory()` using the typed `[DataGridKey]` accessor;
 - `TradeSchema.CreateRouteNavigationModel(resolver, navigator)`;
 - the `NavigationModel` property when `GenerateNavigationModel = true`;
 - the `NavigationInputModel` property when
   `GenerateNavigationInputModel = true`;
+- the `RouteContextFactory` property when
+  `GenerateRouteContextFactory = true`;
 - reflection-free direct bindings to `DataGrid.NavigationModel`,
-  `DataGrid.NavigationInputModel`, and `DataGrid.RouteNavigationModel`;
+  `DataGrid.NavigationInputModel`, `DataGrid.RouteContextFactory`, and
+  `DataGrid.RouteNavigationModel`;
 - `PDGSG141` when a configured member does not implement the required interface.
 
 `GenerateDataGridViewModelsForNamespace` and
-`GenerateDataGridViewsForNamespace` expose the same input-model options for
-namespace policy. A manual view-model property is accepted when it implements
-`IDataGridNavigationInputModel`.
+`GenerateDataGridViewsForNamespace` expose the same input-model and route-context
+options for namespace policy. Manual ViewModel properties are accepted when they
+implement `IDataGridNavigationInputModel` or `IDataGridRouteContextFactory`.
 
 The route property stays application-owned because its resolver, native navigator,
 scope, and history lifetime belong in the composition root. The schema factory
@@ -211,9 +218,10 @@ above. It can coexist with the new model properties and should be retained when 
 ViewModel needs item-key current-cell lookup, bring-into-view, or scroll snapshots.
 
 The `GeneratedNavigationPage` sample exercises generated cell/input models, the
-route factory, and all three generated bindings as a real application consumer. Its
+route/context factories, and all four generated bindings as a real application consumer. Its
 ViewModel configures logical and physical keys, dynamic resolution, pointer target
-navigation, and wheel-driven route history.
+navigation, click/Enter route activation, stable-key context, and wheel-driven route
+history.
 
 ## Transactional selection events
 

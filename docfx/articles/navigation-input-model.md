@@ -147,6 +147,13 @@ NavigationInputModel.SetBindings(
 Ordinary unmodified wheel input is ignored by this table and continues through the
 normal scrolling path.
 
+For route activation, pointer input is target-aware. A matching pointer press or
+release routes the hit-tested `TargetPosition`, not a possibly stale current cell.
+Keyboard input routes the current cell. This keeps item, stable item key, column key,
+position, and input origin together across the asynchronous route boundary. Use
+pointer release for ordinary single-click activation when selection should run on
+press first.
+
 ## Dynamic ViewModel policy
 
 Use `InputResolving` when a decision depends on normalized request state. The table
@@ -183,7 +190,7 @@ The model can return:
 | `Navigate` | Execute one semantic `DataGridNavigationCommand`. |
 | `NavigateToTarget` | Activate the cell or row under pointer input. |
 | `NavigateToPosition` | Activate an explicit row/display-column position. |
-| `NavigateRoute` | Execute Navigate, Replace, Reset, Back, or Forward in the route model. |
+| `NavigateRoute` | Execute Navigate, Replace, Reset, Back, or Forward with target/current grid context. |
 
 Navigation results default to `consumeWhenNavigationFails: false`. If a target is
 unavailable or a boundary policy exits, the input remains available to normal
@@ -236,6 +243,11 @@ The core type has no dependency on an MVVM framework:
 
 Do not register a mutable input model as a singleton unless every grid intentionally
 shares one binding table and resolving event.
+
+Toolbar and framework commands should call
+`IDataGridRouteNavigationController.RequestNavigate`. The bound DataGrid then creates
+the same context used by key and pointer activation; commands do not need to copy
+`SelectedItem` or guess the current column.
 
 ## Source generation
 

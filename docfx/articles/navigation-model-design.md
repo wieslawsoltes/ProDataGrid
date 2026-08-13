@@ -165,6 +165,8 @@ The same namespace contains a distinct route family:
 
 - `DataGridRouteContext`: item, stable item key, stable column key, grid position,
   and activation origin without a `DataGrid` or control reference.
+- `IDataGridRouteContextFactory` and `DataGridRouteContextFactory`: optional AOT-safe
+  stable-key enrichment for contexts created by the grid.
 - `DataGridRoute`: stable path, optional immutable parameter/state, and optional
   target region/outlet/screen identifier.
 - `DataGridRouteNavigationKind`: Navigate, Replace, Reset, Back, and Forward.
@@ -175,6 +177,8 @@ The same namespace contains a distinct route family:
   `ValueTask` and `CancellationToken`.
 - `IDataGridRouteNavigationModel`: exposes command enablement, busy/current state,
   cancelable preview, execution, and completion telemetry.
+- `IDataGridRouteNavigationController`: sends ViewModel route requests back through
+  the bound grid so current item/column/position context is not reconstructed or lost.
 - `DataGridRouteNavigationModel`: the default orchestration implementation.
 - `DelegateDataGridRouteResolver` and `DelegateDataGridRouteNavigator`: AOT-safe
   composition seams for adapters and application-defined navigation services.
@@ -182,6 +186,9 @@ The same namespace contains a distinct route family:
 `DataGrid` adds:
 
 - `NavigationInputModel` for key, pointer, and wheel policy binding.
+- `RouteContextFactory` for stable item identity on grid-originated routes.
+- `GetRouteContext(position, origin)` for explicit target context and
+  `GetCurrentRouteContext(origin)` for current-cell context.
 - `NavigationModel` for binding or direct assignment.
 - `NavigationModelFactory` and `CreateNavigationModel()` for composition roots and
   control subclasses.

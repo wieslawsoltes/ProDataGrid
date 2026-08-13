@@ -9,7 +9,7 @@
     <StackPanel Spacing="4">
       <TextBlock FontSize="20" FontWeight="SemiBold" Text="Source-generated navigation" />
       <TextBlock TextWrapping="Wrap"
-                 Text="The provider generates cell and input models; the partial ViewModel owns the key, pointer, wheel, and route policy; and the generated view binds all models without reflection or event handlers." />
+                 Text="The provider generates cell, input, and stable-key route-context models. The generated view binds them without reflection or event handlers, so click and Enter routes originate inside the grid with the exact cell context." />
     </StackPanel>
 
     <WrapPanel Grid.Row="1">
@@ -21,7 +21,7 @@
 
     <Border Grid.Row="2" Padding="10" CornerRadius="6" Background="#0C605E5C">
       <TextBlock TextWrapping="Wrap"
-                 Text="Input model: J/K move vertically, the physical H key moves left on every keyboard layout, G/Shift+G jump to grid start/end through ViewModel resolution, a primary cell press targets that cell, and Ctrl+wheel navigates route history." />
+                 Text="Input model: J/K move vertically, physical H moves left, G/Shift+G jump to grid edges, primary press targets a cell, release or Enter opens its route with generated stable identity, and Ctrl+wheel navigates history." />
     </Border>
 
     <pages:GeneratedNavigationGridView Grid.Row="3" />

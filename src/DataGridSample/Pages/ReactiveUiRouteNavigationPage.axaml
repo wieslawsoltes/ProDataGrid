@@ -10,7 +10,7 @@
     <StackPanel Grid.ColumnSpan="2" Spacing="4">
       <TextBlock FontSize="20" FontWeight="SemiBold" Text="ReactiveUI route adapter" />
       <TextBlock TextWrapping="Wrap"
-                 Text="The grid resolves an opaque route; the adapter creates IRoutableViewModel instances and executes RoutingState.Navigate, NavigateAndReset, or NavigateBack. RoutedViewHost uses an explicit AOT-safe view locator." />
+                 Text="Click a cell or press Enter: the DataGrid captures that exact item key, column, and position before the adapter executes RoutingState.Navigate. Toolbar commands use the same grid-owned context path; RoutedViewHost uses an explicit AOT-safe view locator." />
     </StackPanel>
     <WrapPanel Grid.Row="1" Grid.ColumnSpan="2" Margin="0,10">
       <Button Margin="0,0,6,6" Content="Open selected order" Command="{CompiledBinding OpenOrderCommand}" />
@@ -21,6 +21,8 @@
               ItemsSource="{CompiledBinding Orders}"
               SelectedItem="{CompiledBinding SelectedOrder, Mode=TwoWay}"
               RouteNavigationModel="{CompiledBinding RouteNavigationModel}"
+              RouteContextFactory="{CompiledBinding RouteContextFactory}"
+              NavigationInputModel="{CompiledBinding NavigationInputModel}"
               AutoGenerateColumns="False"
               CanUserAddRows="False">
       <DataGrid.Columns>
