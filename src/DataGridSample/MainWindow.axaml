@@ -490,6 +490,13 @@
         </pages:ReactiveUiRouteNavigationPage.DataContext>
       </pages:ReactiveUiRouteNavigationPage>
     </TabItem>
+    <TabItem Header="Navigation MVVM Frameworks">
+      <pages:MvvmRouteFrameworksPage>
+        <pages:MvvmRouteFrameworksPage.DataContext>
+          <viewModels:MvvmRouteFrameworksViewModel />
+        </pages:MvvmRouteFrameworksPage.DataContext>
+      </pages:MvvmRouteFrameworksPage>
+    </TabItem>
     <TabItem Header="Navigation Source Generator">
       <pages:GeneratedNavigationPage>
         <pages:GeneratedNavigationPage.DataContext>

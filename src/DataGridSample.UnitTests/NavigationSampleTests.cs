@@ -15,6 +15,34 @@ namespace DataGridSample.Tests;
 public sealed class NavigationSampleTests
 {
     [AvaloniaFact]
+    public void Mvvm_framework_page_runs_framework_neutral_route_recipes()
+    {
+        var viewModel = new MvvmRouteFrameworksViewModel();
+        var view = new MvvmRouteFrameworksPage { DataContext = viewModel };
+        var window = new Window { Width = 1000, Height = 620, Content = view };
+        window.ApplySampleTheme();
+        window.Show();
+        Dispatcher.UIThread.RunJobs();
+
+        try
+        {
+            DataGrid grid = view.GetLogicalDescendants().OfType<DataGrid>().Single();
+            Assert.Same(viewModel.RouteNavigationModel, grid.RouteNavigationModel);
+
+            viewModel.NavigateCommand.Execute().Subscribe();
+            Assert.Contains("RoutingState.Navigate", viewModel.Status, StringComparison.Ordinal);
+
+            viewModel.SelectedRecipe = viewModel.Recipes[1];
+            viewModel.ResetCommand.Execute().Subscribe();
+            Assert.Contains("NavigateAsync(absoluteUri", viewModel.Status, StringComparison.Ordinal);
+        }
+        finally
+        {
+            window.Close();
+        }
+    }
+
+    [AvaloniaFact]
     public void Generated_view_binds_generated_cell_and_application_route_models()
     {
         var viewModel = new GeneratedNavigationViewModel();
