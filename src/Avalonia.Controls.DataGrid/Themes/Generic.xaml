@@ -1427,6 +1427,40 @@
         </Setter>
       </ControlTheme>
 
+      <!-- DataGrid item-template container -->
+      <ControlTheme x:Key="{x:Type DataGridItemContainer}" TargetType="DataGridItemContainer">
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="BorderBrush" Value="Transparent" />
+        <Setter Property="BorderThickness" Value="1" />
+        <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+        <Setter Property="VerticalContentAlignment" Value="Stretch" />
+        <Setter Property="Template">
+          <ControlTemplate>
+            <Border Background="{TemplateBinding Background}"
+                    BorderBrush="{TemplateBinding BorderBrush}"
+                    BorderThickness="{TemplateBinding BorderThickness}"
+                    CornerRadius="{TemplateBinding CornerRadius}"
+                    Padding="{TemplateBinding Padding}">
+              <ContentPresenter Content="{TemplateBinding Content}"
+                                HorizontalContentAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                VerticalContentAlignment="{TemplateBinding VerticalContentAlignment}" />
+            </Border>
+          </ControlTemplate>
+        </Setter>
+        <Style Selector="^:pointerover">
+          <Setter Property="Background" Value="{DynamicResource DataGridRowHoveredBackgroundBrush}" />
+        </Style>
+        <Style Selector="^:selected">
+          <Setter Property="Background" Value="{DynamicResource DataGridRowSelectedBackgroundBrush}" />
+        </Style>
+        <Style Selector="^:selected:pointerover">
+          <Setter Property="Background" Value="{DynamicResource DataGridRowSelectedHoveredBackgroundBrush}" />
+        </Style>
+        <Style Selector="^:current">
+          <Setter Property="BorderBrush" Value="{DynamicResource DataGridSelectionOutlineBrush}" />
+        </Style>
+      </ControlTheme>
+
       <!-- DataGrid -->
       <ControlTheme x:Key="{x:Type DataGrid}" TargetType="DataGrid">
         <Setter Property="RowBackground" Value="{DynamicResource DataGridRowBackgroundBrush}" />

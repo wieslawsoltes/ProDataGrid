@@ -248,6 +248,10 @@ internal
                     cell.UpdatePseudoClasses();
                 }
             }
+            else if (displayedElement is DataGridItemContainer itemContainer)
+            {
+                itemContainer.ApplyState();
+            }
             else if (displayedElement is DataGridRowGroupHeader groupHeader)
             {
                 groupHeader.UpdatePseudoClasses();

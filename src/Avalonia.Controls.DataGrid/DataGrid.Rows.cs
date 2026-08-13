@@ -6,6 +6,7 @@
 #nullable disable
 
 using Avalonia.Collections;
+using Avalonia.Controls.DataGridLayouts;
 using Avalonia.Controls.Utils;
 using Avalonia.Interactivity;
 using Avalonia.LogicalTree;
@@ -898,6 +899,11 @@ internal
         {
             Debug.Assert(_collapsedSlotsTable.Contains(slot) || !IsSlotOutOfBounds(slot));
 
+            if (LayoutModel != null && _rowsPresenter != null)
+            {
+                return _rowsPresenter.ScrollLayoutIndexIntoView(GetLayoutIndexFromSlot(slot));
+            }
+
             if (DisplayData.FirstScrollingSlot == -1)
             {
                 if (SlotCount == 0 || ColumnsItemsInternal.Count == 0 || MathUtilities.LessThanOrClose(CellsEstimatedHeight, 0))
@@ -1527,6 +1533,13 @@ internal
                 return element is DataGridRow row && row.HasDeferredHeight
                     ? row.DeferredHeight
                     : element.DesiredSize.Height;
+            }
+
+            if (UsesLayoutItemPresentation &&
+                !IsGroupSlot(slot) &&
+                LayoutModel is IDataGridLayoutPresentationModel presentation)
+            {
+                return Math.Max(1, presentation.ItemSizeEstimate.Height);
             }
 
             return GetSlotElementHeight(slot);

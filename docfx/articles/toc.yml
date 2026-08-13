@@ -155,6 +155,8 @@
       href: source-generators/hierarchy.md
     - name: Selection, Navigation, and State
       href: source-generators/selection-navigation-state.md
+    - name: Layouts
+      href: source-generators/layouts.md
     - name: Editing and Data Workflows
       href: source-generators/editing-and-data-workflows.md
     - name: Layout, Templates, and Rendering
@@ -235,6 +237,12 @@
     href: keyboard-shortcuts.md
 - name: Layout and Behavior
   items:
+  - name: Model-based Layouts
+    href: model-based-layouts.md
+  - name: Item-template Layout Presentation
+    href: item-layout-presentation.md
+  - name: Custom Layouts
+    href: custom-layouts.md
   - name: Scrolling and Virtualization
     href: scrolling-virtualization.md
   - name: Cell Template Reuse

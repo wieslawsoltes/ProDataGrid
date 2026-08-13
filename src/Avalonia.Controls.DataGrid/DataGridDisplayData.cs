@@ -20,6 +20,7 @@ namespace Avalonia.Controls
     internal class DataGridDisplayData
     {
         private readonly Stack<DataGridRow> _recycledRows;
+        private readonly Stack<DataGridItemContainer> _recycledItemContainers;
         private readonly Dictionary<object, Stack<DataGridRow>> _keyedRecycledRows;
         private readonly Stack<DataGridRowGroupHeader> _recycledGroupHeaders;
         private readonly Stack<DataGridRowGroupFooter> _recycledGroupFooters;
@@ -36,6 +37,7 @@ namespace Avalonia.Controls
             _owner = owner;
             _scrollingElements = new List<Control>();
             _recycledRows = new Stack<DataGridRow>();
+            _recycledItemContainers = new Stack<DataGridItemContainer>();
             _keyedRecycledRows = new Dictionary<object, Stack<DataGridRow>>();
             _recycledGroupHeaders = new Stack<DataGridRowGroupHeader>();
             _recycledGroupFooters = new Stack<DataGridRowGroupFooter>();
@@ -114,6 +116,18 @@ namespace Avalonia.Controls
             return row;
         }
 
+        internal void RecycleItemContainer(DataGridItemContainer container)
+        {
+            container.DetachFromDataGrid();
+            HideElement(container);
+            PushToRecyclePool(_recycledItemContainers, container);
+        }
+
+        internal DataGridItemContainer? GetRecycledItemContainer()
+        {
+            return PopFromRecyclePool(_recycledItemContainers, RestoreElementForReuse);
+        }
+
         internal void TrimRecycledPools(DataGridRowsPresenter owner, int maxRecycledRows, int maxRecycledGroupHeaders, int maxRecycledGroupFooters)
         {
             while (_recycledRows.Count > maxRecycledRows)
@@ -121,6 +135,13 @@ namespace Avalonia.Controls
                 var row = _recycledRows.Pop();
                 owner.UnregisterAnchorCandidate(row);
                 owner.RemoveTrackedChild(row);
+            }
+
+            while (_recycledItemContainers.Count > maxRecycledRows)
+            {
+                DataGridItemContainer container = _recycledItemContainers.Pop();
+                owner.UnregisterAnchorCandidate(container);
+                owner.RemoveTrackedChild(container);
             }
 
             int keyedRowCount = 0;
@@ -221,6 +242,7 @@ namespace Avalonia.Controls
             else
             {
                 _recycledRows.Clear();
+                _recycledItemContainers.Clear();
                 _keyedRecycledRows.Clear();
                 _recycledGroupHeaders.Clear();
                 _recycledGroupFooters.Clear();
@@ -257,10 +279,12 @@ namespace Avalonia.Controls
             }
         }
 
-        private Control GetLogicalScrollingElement(int logicalIndex)
+        internal Control GetLogicalScrollingElement(int logicalIndex)
         {
             return _scrollingElements[(_headScrollingElements + logicalIndex) % _scrollingElements.Count];
         }
+
+        internal int ScrollingElementCount => _scrollingElements.Count;
 
         private void RecycleScrollingElement(Control element)
         {
@@ -280,6 +304,10 @@ namespace Avalonia.Controls
                         HideElement(row);
                         row.Clip = new RectangleGeometry();
                     }
+                    break;
+
+                case DataGridItemContainer itemContainer:
+                    RecycleItemContainer(itemContainer);
                     break;
 
                 case DataGridRowGroupHeader groupHeader:
@@ -458,6 +486,7 @@ namespace Avalonia.Controls
         internal void ClearRecyclePools()
         {
             _recycledRows.Clear();
+            _recycledItemContainers.Clear();
             _keyedRecycledRows.Clear();
             _recycledGroupHeaders.Clear();
             _recycledGroupFooters.Clear();

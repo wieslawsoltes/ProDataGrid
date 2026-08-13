@@ -173,7 +173,8 @@ internal
             if (_rowsPresenter != null)
             {
                 // RowCount doesn't need to be considered, doing so might cause extra Visibility changes
-                _rowsPresenter.IsVisible = (ColumnsInternal.FirstVisibleNonFillerColumn != null);
+                _rowsPresenter.IsVisible = UsesLayoutItemPresentation ||
+                    (ColumnsInternal.FirstVisibleNonFillerColumn != null);
             }
         }
 
@@ -182,7 +183,8 @@ internal
         {
             if (_topLeftCornerHeader != null)
             {
-                _topLeftCornerHeader.IsVisible = (HeadersVisibility == DataGridHeadersVisibility.All);
+                _topLeftCornerHeader.IsVisible = !UsesLayoutItemPresentation &&
+                    (HeadersVisibility == DataGridHeadersVisibility.All);
 
                 if (_topLeftCornerHeader.IsVisible)
                 {

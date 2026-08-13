@@ -137,6 +137,12 @@ behavior; `Always` provides spreadsheet traversal outside edit mode.
 frozen-right columns, and filler exclusion continue through the existing column
 navigation engine.
 
+With a spatial layout, a direction advertised by `IDataGridLayoutNavigation` wraps in
+layout space at a boundary: Left to layout line end, Right to layout line start, Up to
+the last layout item, and Down to the first. Directions not advertised by the layout
+retain classic DataGrid cell-axis wrapping. Logical RTL redirection re-resolves the
+layout target without applying the boundary policy twice.
+
 ## Editing, selection, and hierarchy
 
 The model never commits an editor itself. `Enter`, `Next`, `Previous`, `BeginEdit`,

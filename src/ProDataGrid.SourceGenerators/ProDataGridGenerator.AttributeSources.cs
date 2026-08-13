@@ -100,6 +100,28 @@ public sealed partial class ProDataGridGenerator
                 MasterDetail
             }
 
+            internal enum DataGridGeneratedLayout
+            {
+                None,
+                Stack,
+                NonVirtualizingStack,
+                UniformGrid,
+                Wrap
+            }
+
+            internal enum DataGridGeneratedLayoutOrientation
+            {
+                Default,
+                Horizontal,
+                Vertical
+            }
+
+            internal enum DataGridGeneratedLayoutPresentation
+            {
+                Rows,
+                Items
+            }
+
             internal enum DataGridCondition
             {
                 Equals,
@@ -313,6 +335,25 @@ public sealed partial class ProDataGridGenerator
                 public string ItemsPropertyName { get; set; } = "Items";
                 public string ColumnDefinitionsPropertyName { get; set; } = "ColumnDefinitions";
                 public string FastPathOptionsPropertyName { get; set; } = "FastPathOptions";
+                public string? LayoutModelPropertyName { get; set; }
+                public DataGridGeneratedLayout Layout { get; set; }
+                public DataGridGeneratedLayoutOrientation LayoutOrientation { get; set; }
+                public double LayoutSpacing { get; set; }
+                public double LayoutHorizontalSpacing { get; set; }
+                public double LayoutVerticalSpacing { get; set; }
+                public double LayoutMinItemWidth { get; set; } = double.NaN;
+                public double LayoutMinItemHeight { get; set; } = double.NaN;
+                public int LayoutMaximumRowsOrColumns { get; set; } = int.MaxValue;
+                public global::Avalonia.Controls.DataGridLayouts.DataGridUniformGridItemsJustification LayoutItemsJustification { get; set; }
+                public global::Avalonia.Controls.DataGridLayouts.DataGridUniformGridItemsStretch LayoutItemsStretch { get; set; }
+                public bool LayoutDisableVirtualization { get; set; }
+                public int LayoutMaximumCachedLines { get; set; } = 256;
+                public DataGridGeneratedLayoutPresentation LayoutPresentation { get; set; }
+                public double LayoutItemWidthEstimate { get; set; } = 100;
+                public double LayoutItemHeightEstimate { get; set; } = 32;
+                public string? LayoutItemTemplateKey { get; set; }
+                public Type? LayoutItemTemplateImplementationType { get; set; }
+                public string? LayoutItemTemplateFactoryMethod { get; set; }
                 public string? SortingModelPropertyName { get; set; }
                 public string? FilteringModelPropertyName { get; set; }
                 public global::Avalonia.Controls.DataGridFiltering.DataGridHierarchyFilterPolicy HierarchyFilterPolicy { get; set; } =
@@ -404,6 +445,25 @@ public sealed partial class ProDataGridGenerator
                 public string ItemsPropertyName { get; set; } = "Items";
                 public string ColumnDefinitionsPropertyName { get; set; } = "ColumnDefinitions";
                 public string FastPathOptionsPropertyName { get; set; } = "FastPathOptions";
+                public string? LayoutModelPropertyName { get; set; }
+                public DataGridGeneratedLayout Layout { get; set; }
+                public DataGridGeneratedLayoutOrientation LayoutOrientation { get; set; }
+                public double LayoutSpacing { get; set; }
+                public double LayoutHorizontalSpacing { get; set; }
+                public double LayoutVerticalSpacing { get; set; }
+                public double LayoutMinItemWidth { get; set; } = double.NaN;
+                public double LayoutMinItemHeight { get; set; } = double.NaN;
+                public int LayoutMaximumRowsOrColumns { get; set; } = int.MaxValue;
+                public global::Avalonia.Controls.DataGridLayouts.DataGridUniformGridItemsJustification LayoutItemsJustification { get; set; }
+                public global::Avalonia.Controls.DataGridLayouts.DataGridUniformGridItemsStretch LayoutItemsStretch { get; set; }
+                public bool LayoutDisableVirtualization { get; set; }
+                public int LayoutMaximumCachedLines { get; set; } = 256;
+                public DataGridGeneratedLayoutPresentation LayoutPresentation { get; set; }
+                public double LayoutItemWidthEstimate { get; set; } = 100;
+                public double LayoutItemHeightEstimate { get; set; } = 32;
+                public string? LayoutItemTemplateKey { get; set; }
+                public Type? LayoutItemTemplateImplementationType { get; set; }
+                public string? LayoutItemTemplateFactoryMethod { get; set; }
                 public string? SortingModelPropertyName { get; set; }
                 public string? FilteringModelPropertyName { get; set; }
                 public global::Avalonia.Controls.DataGridFiltering.DataGridHierarchyFilterPolicy HierarchyFilterPolicy { get; set; } =

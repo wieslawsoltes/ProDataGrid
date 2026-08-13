@@ -217,7 +217,7 @@ sealed class DataGridUnrealizedRowAutomationPeer : UnrealizedElementAutomationPe
 
         if (providerType == typeof(ISelectionItemProvider) &&
             (!TryGetCurrentRowIndex(out _) ||
-             !DataGridAutomationPeer.SupportsRowSelection(_owner.Owner.SelectionUnit)))
+             !DataGridAutomationPeer.SupportsRowSelection(_owner.Owner)))
         {
             return null;
         }

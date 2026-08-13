@@ -331,6 +331,23 @@ internal static partial class Discovery
             ItemsPropertyName = GeneratorUtilities.GetString(arguments, "ItemsPropertyName") ?? "Items",
             ColumnDefinitionsPropertyName = GeneratorUtilities.GetString(arguments, "ColumnDefinitionsPropertyName") ?? "ColumnDefinitions",
             FastPathOptionsPropertyName = GeneratorUtilities.GetString(arguments, "FastPathOptionsPropertyName") ?? "FastPathOptions",
+            LayoutModelPropertyName = GeneratorUtilities.GetString(arguments, "LayoutModelPropertyName"),
+            Layout = GetEnumValue(arguments, "Layout", 0),
+            LayoutOrientation = GetEnumValue(arguments, "LayoutOrientation", 0),
+            LayoutSpacing = GeneratorUtilities.GetDouble(arguments, "LayoutSpacing", 0),
+            LayoutHorizontalSpacing = GeneratorUtilities.GetDouble(arguments, "LayoutHorizontalSpacing", 0),
+            LayoutVerticalSpacing = GeneratorUtilities.GetDouble(arguments, "LayoutVerticalSpacing", 0),
+            LayoutMinItemWidth = GeneratorUtilities.GetDouble(arguments, "LayoutMinItemWidth", double.NaN),
+            LayoutMinItemHeight = GeneratorUtilities.GetDouble(arguments, "LayoutMinItemHeight", double.NaN),
+            LayoutMaximumRowsOrColumns = GeneratorUtilities.GetInt32(arguments, "LayoutMaximumRowsOrColumns", int.MaxValue),
+            LayoutItemsJustification = GetEnumValue(arguments, "LayoutItemsJustification", 0),
+            LayoutItemsStretch = GetEnumValue(arguments, "LayoutItemsStretch", 0),
+            LayoutDisableVirtualization = GeneratorUtilities.GetBoolean(arguments, "LayoutDisableVirtualization", false),
+            LayoutMaximumCachedLines = GeneratorUtilities.GetInt32(arguments, "LayoutMaximumCachedLines", 256),
+            LayoutPresentation = GetEnumValue(arguments, "LayoutPresentation", 0),
+            LayoutItemWidthEstimate = GeneratorUtilities.GetDouble(arguments, "LayoutItemWidthEstimate", 100),
+            LayoutItemHeightEstimate = GeneratorUtilities.GetDouble(arguments, "LayoutItemHeightEstimate", 32),
+            LayoutItemTemplateArguments = arguments,
             SortingModelPropertyName = GeneratorUtilities.GetString(arguments, "SortingModelPropertyName"),
             FilteringModelPropertyName = GeneratorUtilities.GetString(arguments, "FilteringModelPropertyName"),
             HierarchyFilterPolicy = GetEnumValue(arguments, "HierarchyFilterPolicy", 1),
@@ -509,6 +526,61 @@ internal static partial class Discovery
             diagnostics);
         if (items == null || columns == null || fastOptions == null)
         {
+            return null;
+        }
+
+        ViewBindingModel? layoutModel = null;
+        if (!string.IsNullOrWhiteSpace(request.LayoutModelPropertyName))
+        {
+            if (request.Layout != 0)
+            {
+                ReportInvalidViewPresentation(request, diagnostics, "Layout and LayoutModelPropertyName cannot be used together");
+                return null;
+            }
+            layoutModel = ResolveValidatedViewBinding(
+                request,
+                request.LayoutModelPropertyName!,
+                static type => ImplementsMetadataName(type, "Avalonia.Controls.DataGridLayouts.IDataGridLayoutModel"),
+                "must be an accessible readable IDataGridLayoutModel property",
+                diagnostics);
+            if (layoutModel == null)
+            {
+                return null;
+            }
+        }
+        else if (request.LayoutModelPropertyName != null)
+        {
+            ReportInvalidViewPresentation(request, diagnostics, "LayoutModelPropertyName cannot be empty or whitespace");
+            return null;
+        }
+
+        if (request.Layout < 0 || request.Layout > 4 || request.LayoutOrientation < 0 || request.LayoutOrientation > 2 ||
+            request.LayoutPresentation < 0 || request.LayoutPresentation > 1 ||
+            request.LayoutMaximumRowsOrColumns <= 0 || request.LayoutMaximumCachedLines <= 0 ||
+            !IsPositiveFinite(request.LayoutItemWidthEstimate) || !IsPositiveFinite(request.LayoutItemHeightEstimate))
+        {
+            ReportInvalidViewPresentation(request, diagnostics, "layout configuration contains an unsupported value");
+            return null;
+        }
+
+        LayoutItemTemplateViewModel? layoutItemTemplate = ResolveLayoutItemTemplate(request, diagnostics);
+        if (request.HasLayoutItemTemplateConfiguration && layoutItemTemplate == null)
+        {
+            return null;
+        }
+        if (request.LayoutPresentation == 1 && request.Layout == 0)
+        {
+            ReportInvalidViewPresentation(request, diagnostics, "LayoutPresentation.Items requires a generated built-in Layout");
+            return null;
+        }
+        if (request.LayoutPresentation == 1 && layoutItemTemplate == null)
+        {
+            ReportInvalidViewPresentation(request, diagnostics, "LayoutPresentation.Items requires one layout item template source");
+            return null;
+        }
+        if (layoutItemTemplate != null && request.LayoutPresentation == 0 && layoutModel == null)
+        {
+            ReportInvalidViewPresentation(request, diagnostics, "a layout item template requires LayoutPresentation.Items or LayoutModelPropertyName");
             return null;
         }
 
@@ -736,6 +808,23 @@ internal static partial class Discovery
             Items = items,
             ColumnDefinitions = columns,
             FastPathOptions = fastOptions,
+            LayoutModel = layoutModel,
+            Layout = request.Layout,
+            LayoutOrientation = request.LayoutOrientation,
+            LayoutSpacing = request.LayoutSpacing,
+            LayoutHorizontalSpacing = request.LayoutHorizontalSpacing,
+            LayoutVerticalSpacing = request.LayoutVerticalSpacing,
+            LayoutMinItemWidth = request.LayoutMinItemWidth,
+            LayoutMinItemHeight = request.LayoutMinItemHeight,
+            LayoutMaximumRowsOrColumns = request.LayoutMaximumRowsOrColumns,
+            LayoutItemsJustification = request.LayoutItemsJustification,
+            LayoutItemsStretch = request.LayoutItemsStretch,
+            LayoutDisableVirtualization = request.LayoutDisableVirtualization,
+            LayoutMaximumCachedLines = request.LayoutMaximumCachedLines,
+            LayoutPresentation = request.LayoutPresentation,
+            LayoutItemWidthEstimate = request.LayoutItemWidthEstimate,
+            LayoutItemHeightEstimate = request.LayoutItemHeightEstimate,
+            LayoutItemTemplate = layoutItemTemplate,
             SortingModel = ResolveOptionalViewBinding(request, request.SortingModelPropertyName, diagnostics),
             FilteringModel = ResolveOptionalViewBinding(request, request.FilteringModelPropertyName, diagnostics),
             HierarchyFilterPolicy = request.HierarchyFilterPolicy,
@@ -1020,6 +1109,75 @@ internal static partial class Discovery
             constructor.Parameters.Length == 0 && GeneratorUtilities.IsAccessibleFromGeneratedCode(constructor));
         return hasConstructor && ImplementsMetadataName(implementationType, interfaceMetadataName);
     }
+
+    private static LayoutItemTemplateViewModel? ResolveLayoutItemTemplate(
+        ViewRequest request,
+        ImmutableArray<Diagnostic>.Builder diagnostics)
+    {
+        Dictionary<string, TypedConstant> arguments = request.LayoutItemTemplateArguments;
+        string? resourceKey = GeneratorUtilities.GetString(arguments, "LayoutItemTemplateKey");
+        INamedTypeSymbol? implementationType = GeneratorUtilities.GetType(arguments, "LayoutItemTemplateImplementationType");
+        string? factoryMethod = GeneratorUtilities.GetString(arguments, "LayoutItemTemplateFactoryMethod");
+        int sourceCount = (!string.IsNullOrWhiteSpace(resourceKey) ? 1 : 0) +
+                          (implementationType != null ? 1 : 0) +
+                          (!string.IsNullOrWhiteSpace(factoryMethod) ? 1 : 0);
+
+        if (sourceCount == 0)
+        {
+            if (request.HasLayoutItemTemplateConfiguration)
+            {
+                ReportInvalidViewPresentation(request, diagnostics, "a non-empty layout item template key, implementation type, or factory method is required");
+            }
+            return null;
+        }
+        if (sourceCount != 1)
+        {
+            ReportInvalidViewPresentation(request, diagnostics, "layout item template key, implementation type, and factory method are mutually exclusive");
+            return null;
+        }
+
+        if (!string.IsNullOrWhiteSpace(resourceKey))
+        {
+            return new LayoutItemTemplateViewModel
+            {
+                Source = LayoutItemTemplateSourceModel.Resource,
+                ResourceKey = resourceKey
+            };
+        }
+        if (implementationType != null)
+        {
+            if (!ValidateRowDetailsImplementation(implementationType))
+            {
+                ReportInvalidViewPresentation(
+                    request,
+                    diagnostics,
+                    $"layout item template type '{implementationType.ToDisplayString()}' must be accessible, non-abstract, parameterless, and implement IDataTemplate");
+                return null;
+            }
+            return new LayoutItemTemplateViewModel
+            {
+                Source = LayoutItemTemplateSourceModel.Implementation,
+                ImplementationType = implementationType
+            };
+        }
+
+        if (!HasRowDetailsFactoryMethod(request.ItemType, factoryMethod!))
+        {
+            ReportInvalidViewPresentation(
+                request,
+                diagnostics,
+                $"layout item template factory '{factoryMethod}' must be accessible, static, non-generic, accept ({request.ItemType.Name}, Control), and return Control");
+            return null;
+        }
+        return new LayoutItemTemplateViewModel
+        {
+            Source = LayoutItemTemplateSourceModel.FactoryMethod,
+            FactoryMethod = factoryMethod
+        };
+    }
+
+    private static bool IsPositiveFinite(double value) =>
+        value > 0 && !double.IsNaN(value) && !double.IsInfinity(value);
 
     private static RowDetailsViewModel? ResolveRowDetails(
         ViewRequest request,
@@ -1790,6 +1948,25 @@ internal static partial class Discovery
         public string ItemsPropertyName { get; set; } = "Items";
         public string ColumnDefinitionsPropertyName { get; set; } = "ColumnDefinitions";
         public string FastPathOptionsPropertyName { get; set; } = "FastPathOptions";
+        public string? LayoutModelPropertyName { get; set; }
+        public int Layout { get; set; }
+        public int LayoutOrientation { get; set; }
+        public double LayoutSpacing { get; set; }
+        public double LayoutHorizontalSpacing { get; set; }
+        public double LayoutVerticalSpacing { get; set; }
+        public double LayoutMinItemWidth { get; set; } = double.NaN;
+        public double LayoutMinItemHeight { get; set; } = double.NaN;
+        public int LayoutMaximumRowsOrColumns { get; set; } = int.MaxValue;
+        public int LayoutItemsJustification { get; set; }
+        public int LayoutItemsStretch { get; set; }
+        public bool LayoutDisableVirtualization { get; set; }
+        public int LayoutMaximumCachedLines { get; set; } = 256;
+        public int LayoutPresentation { get; set; }
+        public double LayoutItemWidthEstimate { get; set; } = 100;
+        public double LayoutItemHeightEstimate { get; set; } = 32;
+        public Dictionary<string, TypedConstant> LayoutItemTemplateArguments { get; set; } = new(StringComparer.Ordinal);
+        public bool HasLayoutItemTemplateConfiguration =>
+            LayoutItemTemplateArguments.Keys.Any(static key => key.StartsWith("LayoutItemTemplate", StringComparison.Ordinal));
         public string? SortingModelPropertyName { get; set; }
         public string? FilteringModelPropertyName { get; set; }
         public int HierarchyFilterPolicy { get; set; } = 1;

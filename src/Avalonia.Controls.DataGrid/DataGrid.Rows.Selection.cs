@@ -28,6 +28,10 @@ namespace Avalonia.Controls
                 row.ApplyCellsState();
                 EnsureRowDetailsVisibility(row, raiseNotification: true, animate: true, isSelectedOverride: isSelectedOverride);
             }
+            else if (element is DataGridItemContainer itemContainer)
+            {
+                itemContainer.ApplyState(isSelectedOverride);
+            }
             else
             {
                 // Assume it's a RowGroupHeader
@@ -124,12 +128,16 @@ namespace Avalonia.Controls
                     slot > -1 && slot <= DisplayData.LastScrollingSlot;
                     slot++)
                     {
-                        if (DisplayData.GetDisplayedElement(slot) is DataGridRow row)
+                        Control element = DisplayData.GetDisplayedElement(slot);
+                        int selectedSlot = element switch
                         {
-                            if (_selectedItems.ContainsSlot(row.Slot))
-                            {
-                                SelectSlot(row.Slot, false);
-                            }
+                            DataGridRow row => row.Slot,
+                            DataGridItemContainer itemContainer => itemContainer.Slot,
+                            _ => -1
+                        };
+                        if (selectedSlot >= 0 && _selectedItems.ContainsSlot(selectedSlot))
+                        {
+                            SelectSlot(selectedSlot, false);
                         }
                     }
                     _selectedItems.ClearRows();

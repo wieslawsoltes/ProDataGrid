@@ -19,6 +19,7 @@ using Avalonia.Controls.DataGridClipboard;
 using Avalonia.Controls.DataGridConditionalFormatting;
 using Avalonia.Controls.DataGridFiltering;
 using Avalonia.Controls.DataGridHierarchical;
+using Avalonia.Controls.DataGridLayouts;
 using Avalonia.Controls.DataGridPivoting;
 using Avalonia.Controls.DataGridSearching;
 using Avalonia.Controls.DataGridSorting;
@@ -973,6 +974,47 @@ public class LeakTests
         GC.KeepAlive(formattingModel);
         GC.KeepAlive(hierarchicalModel);
         GC.KeepAlive(fastPathOptions);
+        GC.KeepAlive(items);
+    }
+
+    [ReleaseFact]
+    public void DataGrid_ExternalLayoutModel_DoesNotLeak()
+    {
+        var layoutModel = new DataGridWrapLayoutModel();
+        var items = new ObservableCollection<RowItem>
+        {
+            new RowItem("A"),
+            new RowItem("B")
+        };
+
+        WeakReference Run()
+        {
+            var grid = new DataGrid
+            {
+                AutoGenerateColumns = false,
+                ItemsSource = items,
+                LayoutModel = layoutModel,
+                UseLogicalScrollable = true
+            };
+            grid.Columns.Add(new DataGridTextColumn
+            {
+                Header = "Name",
+                Binding = new Binding(nameof(RowItem.Name))
+            });
+
+            var window = new Window { Content = grid };
+            window.SetThemeStyles();
+            ShowWindow(window);
+            var gridRef = new WeakReference(grid);
+            CleanupWindow(window);
+            return gridRef;
+        }
+
+        WeakReference gridRef = RunInSession(Run);
+        layoutModel.HorizontalSpacing = 4;
+
+        AssertCollected(gridRef);
+        GC.KeepAlive(layoutModel);
         GC.KeepAlive(items);
     }
 

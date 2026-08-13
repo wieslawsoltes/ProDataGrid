@@ -2,6 +2,27 @@
 
 Generated layout and rendering metadata covers column bands, chooser state, frozen placement, runtime indexed families, recycling templates, row details, direct/drawn cells, and custom drawing caches. Visual resources and application-specific control composition remain user-owned.
 
+## Layout item templates
+
+Generated built-in or custom layouts can use `DataGridItemContainer` presentation instead of row/cell visuals. Set `LayoutPresentation = DataGridGeneratedLayoutPresentation.Items`, provide positive item estimates, and select exactly one item-template source:
+
+```csharp
+[GenerateDataGridView(
+    typeof(Product),
+    ViewName = "ProductCardsView",
+    Layout = DataGridGeneratedLayout.Wrap,
+    LayoutPresentation = DataGridGeneratedLayoutPresentation.Items,
+    LayoutItemWidthEstimate = 240,
+    LayoutItemHeightEstimate = 92,
+    LayoutHorizontalSpacing = 8,
+    LayoutVerticalSpacing = 8,
+    LayoutItemTemplateFactoryMethod = nameof(Product.CreateCard))]
+```
+
+`LayoutItemTemplateKey`, `LayoutItemTemplateImplementationType`, and `LayoutItemTemplateFactoryMethod` follow the same resource/implementation/typed-factory choices as other generated templates. The factory contract is `(TItem, Control?) -> Control`; generated code emits a recycling template and passes the existing root back on reuse. The generator reports `PDGSG139` for a missing or conflicting template source, a non-positive/non-finite estimate, or item presentation without a layout model.
+
+Columns are still generated as semantic metadata but their headers/cells are not realized in item mode. See [Generated layouts](layouts.md) and [Item-template layout presentation](../item-layout-presentation.md).
+
 ## Column layout metadata
 
 Use stable keys for all persisted and interactive layout operations:

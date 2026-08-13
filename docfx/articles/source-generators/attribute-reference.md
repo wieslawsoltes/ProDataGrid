@@ -200,6 +200,27 @@ Constructors:
 | `ViewThemeKey`, `DataGridThemeKey`, `ToolbarThemeKey`, `RecipeContentThemeKey` | Dynamic resource keys. |
 | `ViewClasses`, `DataGridClasses`, `ToolbarClasses`, `RecipeContentClasses` | Validated direct class tokens. |
 
+### Layouts
+
+| Option | Meaning |
+| --- | --- |
+| `LayoutModelPropertyName` | Compiled binding to a readable `IDataGridLayoutModel`; mutually exclusive with `Layout`. |
+| `Layout` | `None`, `Stack`, `NonVirtualizingStack`, `UniformGrid`, or `Wrap`. |
+| `LayoutOrientation` | Keep the model default, or select horizontal/vertical fill. |
+| `LayoutSpacing`, `LayoutDisableVirtualization` | Stack configuration. |
+| `LayoutHorizontalSpacing`, `LayoutVerticalSpacing` | Uniform-grid/wrap spacing. |
+| `LayoutMinItemWidth`, `LayoutMinItemHeight` | Uniform-grid cell minimums. |
+| `LayoutMaximumRowsOrColumns` | Uniform-grid line cap. |
+| `LayoutItemsJustification`, `LayoutItemsStretch` | Uniform-grid alignment/stretch. |
+| `LayoutMaximumCachedLines` | Variable-wrap exact-line cache bound. |
+| `LayoutPresentation` | `Rows` or `Items`; item mode realizes `DataGrid.ItemTemplate` instead of rows/cells. |
+| `LayoutItemWidthEstimate`, `LayoutItemHeightEstimate` | Positive finite off-screen size estimate for item presentation. |
+| `LayoutItemTemplateKey` | Dynamic-resource `IDataTemplate` used by item presentation. |
+| `LayoutItemTemplateImplementationType` | Accessible parameterless `IDataTemplate` implementation. |
+| `LayoutItemTemplateFactoryMethod` | Static recycling `(TItem, Control?) -> Control` factory. |
+
+See [Generated layouts](layouts.md) for emitted types, defaults, validation, and examples.
+
 ### Row details
 
 | Option | Meaning |

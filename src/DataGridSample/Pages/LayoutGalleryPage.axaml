@@ -1,0 +1,125 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:models="clr-namespace:DataGridSample.Models"
+             xmlns:viewModels="clr-namespace:DataGridSample.ViewModels"
+             x:Class="DataGridSample.Pages.LayoutGalleryPage"
+             x:DataType="viewModels:LayoutGalleryViewModel">
+  <Grid RowDefinitions="Auto,Auto,*"
+        RowSpacing="10"
+        Margin="12">
+    <StackPanel Spacing="4">
+      <TextBlock Classes="h2" Text="Model-based layouts and item views" />
+      <TextBlock TextWrapping="Wrap"
+                 Text="The table layout uses DataGrid rows, cells, and headers. Card layouts use one compiled item template with lightweight recyclable containers; headers and cell visuals are not realized. Selection, navigation, filtering, sorting, and retained layout sessions stay on the same DataGrid while switching at runtime." />
+    </StackPanel>
+
+    <Grid Grid.Row="1"
+          ColumnDefinitions="Auto,280,Auto,Auto,Auto,*"
+          ColumnSpacing="8">
+      <TextBlock VerticalAlignment="Center" Text="Layout:" />
+      <ComboBox Grid.Column="1"
+                ItemsSource="{CompiledBinding Layouts}"
+                SelectedItem="{CompiledBinding SelectedLayout, Mode=TwoWay}">
+        <ComboBox.ItemTemplate>
+          <DataTemplate x:DataType="viewModels:DataGridLayoutChoice">
+            <TextBlock Text="{CompiledBinding Name}" />
+          </DataTemplate>
+        </ComboBox.ItemTemplate>
+      </ComboBox>
+      <Button Grid.Column="2"
+              Command="{CompiledBinding NextLayoutCommand}"
+              Content="Next layout" />
+      <TextBlock Grid.Column="3"
+                 VerticalAlignment="Center"
+                 Text="{CompiledBinding SwitchCount, StringFormat='Switches: {0}'}" />
+      <TextBlock Grid.Column="4"
+                 VerticalAlignment="Center"
+                 Text="{CompiledBinding SelectedLayout.Presentation}" />
+      <TextBlock Grid.Column="5"
+                 VerticalAlignment="Center"
+                 TextWrapping="Wrap"
+                 Text="{CompiledBinding Description}" />
+    </Grid>
+
+    <DataGrid Grid.Row="2"
+              ItemsSource="{CompiledBinding Rows}"
+              LayoutModel="{CompiledBinding LayoutModel}"
+              UseLogicalScrollable="True"
+              AutoGenerateColumns="False"
+              IsReadOnly="True"
+              CanUserSortColumns="True"
+              HeadersVisibility="All"
+              GridLinesVisibility="All"
+              SelectionMode="Extended"
+              SelectionUnit="FullRow">
+      <DataGrid.ItemTemplate>
+        <DataTemplate x:DataType="models:LayoutGalleryRow">
+          <Border Width="{CompiledBinding CardWidth}"
+                  Height="88"
+                  Margin="4"
+                  Padding="10,8"
+                  CornerRadius="5"
+                  Background="{DynamicResource ThemeControlLowBrush}"
+                  BorderBrush="{DynamicResource SystemControlForegroundBaseMediumBrush}"
+                  BorderThickness="1"
+                  AutomationProperties.Name="{CompiledBinding Title}">
+            <Grid RowDefinitions="Auto,Auto,*"
+                  ColumnDefinitions="Auto,*"
+                  ColumnSpacing="10">
+              <Border Grid.RowSpan="2"
+                      Width="32"
+                      Height="32"
+                      CornerRadius="16"
+                      Background="{DynamicResource SystemControlHighlightAccentBrush}">
+                <TextBlock HorizontalAlignment="Center"
+                           VerticalAlignment="Center"
+                           FontWeight="SemiBold"
+                           Foreground="White"
+                           Text="{CompiledBinding Id}" />
+              </Border>
+              <TextBlock Grid.Column="1"
+                         FontWeight="SemiBold"
+                         TextTrimming="CharacterEllipsis"
+                         Text="{CompiledBinding Title}" />
+              <TextBlock Grid.Row="1"
+                         Grid.Column="1"
+                         Opacity="0.72"
+                         Text="{CompiledBinding Category}" />
+              <TextBlock Grid.Row="2"
+                         Grid.ColumnSpan="2"
+                         Margin="0,5,0,0"
+                         MaxHeight="34"
+                         TextWrapping="Wrap"
+                         TextTrimming="CharacterEllipsis"
+                         Text="{CompiledBinding Notes}" />
+            </Grid>
+          </Border>
+        </DataTemplate>
+      </DataGrid.ItemTemplate>
+      <DataGrid.Columns>
+        <DataGridTextColumn Header="Id"
+                            Width="54"
+                            Binding="{CompiledBinding Id}"
+                            x:DataType="models:LayoutGalleryRow" />
+        <DataGridTextColumn Header="Category"
+                            Width="88"
+                            Binding="{CompiledBinding Category}"
+                            x:DataType="models:LayoutGalleryRow" />
+        <DataGridTextColumn Header="Title"
+                            Width="118"
+                            Binding="{CompiledBinding Title}"
+                            x:DataType="models:LayoutGalleryRow" />
+        <DataGridTemplateColumn Header="Notes" Width="190">
+          <DataGridTemplateColumn.CellTemplate>
+            <DataTemplate x:DataType="models:LayoutGalleryRow">
+              <TextBlock Margin="4,2"
+                         MaxWidth="180"
+                         TextWrapping="Wrap"
+                         Text="{CompiledBinding Notes}" />
+            </DataTemplate>
+          </DataGridTemplateColumn.CellTemplate>
+        </DataGridTemplateColumn>
+      </DataGrid.Columns>
+    </DataGrid>
+  </Grid>
+</UserControl>

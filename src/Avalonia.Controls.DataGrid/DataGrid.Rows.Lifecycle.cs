@@ -520,6 +520,7 @@ namespace Avalonia.Controls
             for (int i = _rowsPresenter.Children.Count - 1; i >= 0; i--)
             {
                 if (_rowsPresenter.Children[i] is DataGridRow
+                    or DataGridItemContainer
                     or DataGridRowGroupHeader
                     or DataGridRowGroupFooter)
                 {

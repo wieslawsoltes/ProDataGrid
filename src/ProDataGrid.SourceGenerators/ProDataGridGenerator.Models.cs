@@ -105,6 +105,40 @@ internal sealed class ViewModelViewModel
 
     public ViewBindingModel FastPathOptions { get; set; } = null!;
 
+    public ViewBindingModel? LayoutModel { get; set; }
+
+    public int Layout { get; set; }
+
+    public int LayoutOrientation { get; set; }
+
+    public double LayoutSpacing { get; set; }
+
+    public double LayoutHorizontalSpacing { get; set; }
+
+    public double LayoutVerticalSpacing { get; set; }
+
+    public double LayoutMinItemWidth { get; set; } = double.NaN;
+
+    public double LayoutMinItemHeight { get; set; } = double.NaN;
+
+    public int LayoutMaximumRowsOrColumns { get; set; } = int.MaxValue;
+
+    public int LayoutItemsJustification { get; set; }
+
+    public int LayoutItemsStretch { get; set; }
+
+    public bool LayoutDisableVirtualization { get; set; }
+
+    public int LayoutMaximumCachedLines { get; set; } = 256;
+
+    public int LayoutPresentation { get; set; }
+
+    public double LayoutItemWidthEstimate { get; set; } = 100;
+
+    public double LayoutItemHeightEstimate { get; set; } = 32;
+
+    public LayoutItemTemplateViewModel? LayoutItemTemplate { get; set; }
+
     public ViewBindingModel? SortingModel { get; set; }
 
     public ViewBindingModel? FilteringModel { get; set; }
@@ -226,6 +260,24 @@ internal enum RowDetailsTemplateSourceModel
     Implementation,
     FactoryMethod,
     NestedGrid
+}
+
+internal enum LayoutItemTemplateSourceModel
+{
+    Resource,
+    Implementation,
+    FactoryMethod
+}
+
+internal sealed class LayoutItemTemplateViewModel
+{
+    public LayoutItemTemplateSourceModel Source { get; set; }
+
+    public string? ResourceKey { get; set; }
+
+    public INamedTypeSymbol? ImplementationType { get; set; }
+
+    public string? FactoryMethod { get; set; }
 }
 
 internal sealed class RowDetailsViewModel
