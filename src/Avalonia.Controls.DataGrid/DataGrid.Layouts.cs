@@ -3,6 +3,7 @@
 
 using System;
 using Avalonia.Controls.DataGridLayouts;
+using Avalonia.Utilities;
 
 namespace Avalonia.Controls
 {
@@ -45,14 +46,20 @@ namespace Avalonia.Controls
                 IDataGridLayoutModel? oldValue = _layoutModel;
                 if (oldValue != null)
                 {
-                    oldValue.LayoutInvalidated -= OnLayoutModelInvalidated;
+                    WeakEventHandlerManager.Unsubscribe<DataGridLayoutInvalidatedEventArgs, DataGrid>(
+                        oldValue,
+                        nameof(IDataGridLayoutModel.LayoutInvalidated),
+                        OnLayoutModelInvalidated);
                 }
 
                 SetAndRaise(LayoutModelProperty, ref _layoutModel, value);
 
                 if (value != null)
                 {
-                    value.LayoutInvalidated += OnLayoutModelInvalidated;
+                    WeakEventHandlerManager.Subscribe<IDataGridLayoutModel, DataGridLayoutInvalidatedEventArgs, DataGrid>(
+                        value,
+                        nameof(IDataGridLayoutModel.LayoutInvalidated),
+                        OnLayoutModelInvalidated);
                 }
 
                 _rowsPresenter?.OnLayoutModelChanged(oldValue, value);
@@ -188,6 +195,78 @@ namespace Avalonia.Controls
                 _ => -1
             };
             return GetLayoutIndexFromSlot(slot);
+        }
+
+        internal bool TryResolveLayoutNavigation(
+            int currentRowIndex,
+            DataGridLayoutNavigationDirection direction,
+            Point navigationAnchor,
+            out int targetRowIndex,
+            out Rect estimatedBounds)
+        {
+            targetRowIndex = -1;
+            estimatedBounds = default;
+            if (_rowsPresenter == null || LayoutModel == null || currentRowIndex < 0)
+            {
+                return false;
+            }
+
+            int currentSlot = SlotFromRowIndex(currentRowIndex);
+            int currentLayoutIndex = GetLayoutIndexFromSlot(currentSlot);
+            if (currentLayoutIndex < 0)
+            {
+                return false;
+            }
+
+            Rect viewport = new(
+                _rowsPresenter.Offset.X,
+                _rowsPresenter.Offset.Y,
+                _rowsPresenter.Viewport.Width,
+                _rowsPresenter.Viewport.Height);
+            DataGridLayoutNavigationRequest request = new(
+                currentLayoutIndex,
+                direction,
+                viewport,
+                navigationAnchor);
+            if (!_rowsPresenter.TryResolveLayoutNavigation(request, out DataGridLayoutNavigationResult result))
+            {
+                return false;
+            }
+
+            int targetLayoutIndex = result.ItemIndex;
+            int scanStep = GetNavigationScanStep(direction, currentLayoutIndex, targetLayoutIndex);
+            while (targetLayoutIndex >= 0 && targetLayoutIndex < LayoutItemCount)
+            {
+                int targetSlot = GetLayoutSlot(targetLayoutIndex);
+                int rowIndex = targetSlot >= 0 && !IsGroupSlot(targetSlot)
+                    ? RowIndexFromSlot(targetSlot)
+                    : -1;
+                if (rowIndex >= 0)
+                {
+                    targetRowIndex = rowIndex;
+                    estimatedBounds = _rowsPresenter.TryGetLayoutBounds(targetLayoutIndex, out Rect exactBounds)
+                        ? exactBounds
+                        : result.EstimatedBounds;
+                    return targetRowIndex != currentRowIndex;
+                }
+
+                targetLayoutIndex += scanStep;
+            }
+
+            return false;
+        }
+
+        private static int GetNavigationScanStep(
+            DataGridLayoutNavigationDirection direction,
+            int currentLayoutIndex,
+            int targetLayoutIndex)
+        {
+            return direction switch
+            {
+                DataGridLayoutNavigationDirection.First or DataGridLayoutNavigationDirection.LineStart => 1,
+                DataGridLayoutNavigationDirection.Last or DataGridLayoutNavigationDirection.LineEnd => -1,
+                _ => targetLayoutIndex >= currentLayoutIndex ? 1 : -1
+            };
         }
 
         private void OnLayoutModelInvalidated(object? sender, DataGridLayoutInvalidatedEventArgs e)

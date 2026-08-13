@@ -7,7 +7,7 @@ using System.Collections.Specialized;
 
 namespace Avalonia.Controls.DataGridLayouts;
 
-internal sealed class DataGridStackLayoutAlgorithm : IDataGridLayoutAlgorithm
+internal sealed class DataGridStackLayoutAlgorithm : IDataGridLayoutAlgorithm, IDataGridLayoutNavigation
 {
     private readonly IDataGridLayoutModel _model;
     private readonly bool _forceNonVirtualizing;
@@ -133,6 +133,115 @@ internal sealed class DataGridStackLayoutAlgorithm : IDataGridLayoutAlgorithm
 
     public void Uninitialize(IDataGridLayoutContext context)
     {
+    }
+
+    public bool TryResolveNavigation(
+        IDataGridLayoutContext context,
+        in DataGridLayoutNavigationRequest request,
+        out DataGridLayoutNavigationResult result)
+    {
+        result = default;
+        int itemCount = context.ItemCount;
+        int current = request.CurrentItemIndex;
+        if (current < 0 || current >= itemCount)
+        {
+            return false;
+        }
+
+        DataGridLayoutOrientation orientation = GetOrientation();
+        int target;
+        switch (request.Direction)
+        {
+            case DataGridLayoutNavigationDirection.Up when orientation == DataGridLayoutOrientation.Vertical:
+            case DataGridLayoutNavigationDirection.Left when orientation == DataGridLayoutOrientation.Horizontal:
+                target = current - 1;
+                break;
+            case DataGridLayoutNavigationDirection.Down when orientation == DataGridLayoutOrientation.Vertical:
+            case DataGridLayoutNavigationDirection.Right when orientation == DataGridLayoutOrientation.Horizontal:
+                target = current + 1;
+                break;
+            case DataGridLayoutNavigationDirection.PageUp:
+            case DataGridLayoutNavigationDirection.PageDown:
+                target = FindPageTarget(context, request, orientation);
+                break;
+            case DataGridLayoutNavigationDirection.First:
+                target = 0;
+                break;
+            case DataGridLayoutNavigationDirection.Last:
+                target = itemCount - 1;
+                break;
+            default:
+                return false;
+        }
+
+        if (target < 0 || target >= itemCount || target == current)
+        {
+            return false;
+        }
+
+        result = new DataGridLayoutNavigationResult(
+            target,
+            GetEstimatedBounds(context, target, orientation, Math.Max(0, GetSpacing())));
+        return true;
+    }
+
+    private int FindPageTarget(
+        IDataGridLayoutContext context,
+        in DataGridLayoutNavigationRequest request,
+        DataGridLayoutOrientation orientation)
+    {
+        double spacing = Math.Max(0, GetSpacing());
+        Rect currentBounds = context.TryGetLayoutBounds(request.CurrentItemIndex, out Rect exactBounds)
+            ? exactBounds
+            : GetEstimatedBounds(context, request.CurrentItemIndex, orientation, spacing);
+        double viewportMajor = GetMajor(request.Viewport.Size, orientation);
+        if (!IsFinite(viewportMajor) || viewportMajor <= 0)
+        {
+            viewportMajor = Math.Max(1, GetMajor(currentBounds.Size, orientation));
+        }
+
+        bool forward = request.Direction == DataGridLayoutNavigationDirection.PageDown;
+        double coordinate = Math.Max(0, GetMajorStart(currentBounds, orientation) + (forward ? viewportMajor : -viewportMajor));
+        int low = 0;
+        int high = context.ItemCount - 1;
+        while (low < high)
+        {
+            int middle = low + ((high - low) / 2);
+            Rect bounds = GetEstimatedBounds(context, middle, orientation, spacing);
+            double end = GetMajorStart(bounds, orientation) + Math.Max(1, GetMajor(bounds.Size, orientation));
+            if (end < coordinate)
+            {
+                low = middle + 1;
+            }
+            else
+            {
+                high = middle;
+            }
+        }
+
+        if (low == request.CurrentItemIndex)
+        {
+            low += forward ? 1 : -1;
+        }
+        return Math.Max(0, Math.Min(context.ItemCount - 1, low));
+    }
+
+    private static Rect GetEstimatedBounds(
+        IDataGridLayoutContext context,
+        int index,
+        DataGridLayoutOrientation orientation,
+        double spacing)
+    {
+        if (context.TryGetLayoutBounds(index, out Rect bounds))
+        {
+            return bounds;
+        }
+
+        Size estimated = context.GetEstimatedItemSize(index);
+        double major = Math.Max(1, GetMajor(estimated, orientation));
+        double minor = Math.Max(1, GetMinor(estimated, orientation));
+        double offset = GetEstimatedOffset(context, index, orientation, spacing);
+        return CreateRect(offset, 0, major, minor, orientation);
     }
 
     private DataGridLayoutOrientation GetOrientation()

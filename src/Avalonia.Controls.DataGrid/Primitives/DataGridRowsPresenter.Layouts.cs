@@ -59,6 +59,40 @@ namespace Avalonia.Controls.Primitives
             return true;
         }
 
+        internal bool TryResolveLayoutNavigation(
+            in DataGridLayoutNavigationRequest request,
+            out DataGridLayoutNavigationResult result)
+        {
+            result = default;
+            if (OwningGrid?.LayoutModel is not IDataGridLayoutModel model)
+            {
+                return false;
+            }
+
+            LayoutSession session = GetLayoutSession(model);
+            return session.Algorithm is IDataGridLayoutNavigation navigation &&
+                navigation.TryResolveNavigation(session.Context, request, out result);
+        }
+
+        internal bool TryGetLayoutBounds(int layoutIndex, out Rect bounds)
+        {
+            bounds = default;
+            return _activeLayoutSession != null &&
+                _activeLayoutSession.Bounds.TryGetValue(layoutIndex, out bounds);
+        }
+
+        internal void OnLayoutPresenterDetached()
+        {
+            if (_activeLayoutSession == null)
+            {
+                return;
+            }
+
+            _activeLayoutSession.Algorithm.Uninitialize(_activeLayoutSession.Context);
+            _activeLayoutSession.IsInitialized = false;
+            _activeLayoutSession = null;
+        }
+
         private Size MeasureLayoutModel(Size availableSize)
         {
             DataGrid grid = OwningGrid!;

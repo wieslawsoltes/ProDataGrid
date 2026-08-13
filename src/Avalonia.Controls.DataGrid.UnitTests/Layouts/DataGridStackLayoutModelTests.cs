@@ -117,6 +117,36 @@ public class DataGridStackLayoutModelTests
         Assert.Equal(Enumerable.Range(0, 12), context.RealizedIndices);
     }
 
+    [Fact]
+    public void Navigation_resolves_adjacent_and_non_realized_page_targets()
+    {
+        var model = new DataGridStackLayoutModel { Spacing = 5 };
+        IDataGridLayoutAlgorithm algorithm = model.CreateAlgorithm();
+        var navigation = Assert.IsAssignableFrom<IDataGridLayoutNavigation>(algorithm);
+        var context = new TestLayoutContext(
+            itemCount: 100,
+            itemSize: new Size(100, 20),
+            realizationRect: new Rect(0, 250, 100, 100),
+            scrollOffset: new Vector(0, 250));
+        algorithm.Initialize(context);
+        algorithm.Measure(context, new Size(100, 100));
+
+        bool movedDown = navigation.TryResolveNavigation(
+            context,
+            new DataGridLayoutNavigationRequest(10, DataGridLayoutNavigationDirection.Down, context.RealizationRect, new Point(50, 260)),
+            out DataGridLayoutNavigationResult down);
+        bool paged = navigation.TryResolveNavigation(
+            context,
+            new DataGridLayoutNavigationRequest(10, DataGridLayoutNavigationDirection.PageDown, context.RealizationRect, new Point(50, 260)),
+            out DataGridLayoutNavigationResult page);
+
+        Assert.True(movedDown);
+        Assert.Equal(11, down.ItemIndex);
+        Assert.True(paged);
+        Assert.True(page.ItemIndex > 11);
+        Assert.True(page.EstimatedBounds.Y >= 300);
+    }
+
     private sealed class TestLayoutContext : IDataGridLayoutContext
     {
         private readonly Size _itemSize;
