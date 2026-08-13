@@ -593,29 +593,9 @@ internal
                 return true;
             }
 
-            if (_hierarchicalRowsEnabled && _hierarchicalAdapter != null)
+            if (TryProcessHierarchyLeft(alt))
             {
-                if (TryHandleGroupSlotAsNode(CurrentSlot, GroupSlotAction.Collapse, subtree: alt))
-                {
-                    return true;
-                }
-
-                if (TryGetHierarchicalIndexFromSlot(CurrentSlot, out var hierarchicalIndex))
-                {
-                    if (alt)
-                    {
-                        var node = _hierarchicalAdapter.NodeAt(hierarchicalIndex);
-                        RunHierarchicalAction(() => _hierarchicalAdapter.CollapseAll(node));
-                        return true;
-                    }
-
-                    if (_hierarchicalAdapter.IsExpandable(hierarchicalIndex) &&
-                        _hierarchicalAdapter.IsExpanded(hierarchicalIndex))
-                    {
-                        _hierarchicalAdapter.Collapse(hierarchicalIndex);
-                        return true;
-                    }
-                }
+                return true;
             }
 
             int previousVisibleColumnIndex = -1;
@@ -689,29 +669,9 @@ internal
                 return true;
             }
 
-            if (_hierarchicalRowsEnabled && _hierarchicalAdapter != null)
+            if (TryProcessHierarchyRight(alt))
             {
-                if (TryHandleGroupSlotAsNode(CurrentSlot, GroupSlotAction.Expand, subtree: alt))
-                {
-                    return true;
-                }
-
-                if (TryGetHierarchicalIndexFromSlot(CurrentSlot, out var hierarchicalIndex) &&
-                    _hierarchicalAdapter.IsExpandable(hierarchicalIndex))
-                {
-                    if (alt)
-                    {
-                        var node = _hierarchicalAdapter.NodeAt(hierarchicalIndex);
-                        RunHierarchicalAction(() => _hierarchicalAdapter.ExpandAll(node));
-                        return true;
-                    }
-
-                    if (!_hierarchicalAdapter.IsExpanded(hierarchicalIndex))
-                    {
-                        _hierarchicalAdapter.Expand(hierarchicalIndex);
-                        return true;
-                    }
-                }
+                return true;
             }
 
             int nextVisibleColumnIndex = -1;
@@ -768,6 +728,74 @@ internal
                 NoSelectionChangeCount--;
             }
             return _successfullyUpdatedSelection;
+        }
+
+        private bool TryProcessHierarchyLeft(bool subtree)
+        {
+            if (!_hierarchicalRowsEnabled || _hierarchicalAdapter == null)
+            {
+                return false;
+            }
+
+            if (TryHandleGroupSlotAsNode(CurrentSlot, GroupSlotAction.Collapse, subtree))
+            {
+                return true;
+            }
+
+            if (!TryGetHierarchicalIndexFromSlot(CurrentSlot, out var hierarchicalIndex))
+            {
+                return false;
+            }
+
+            if (subtree)
+            {
+                var node = _hierarchicalAdapter.NodeAt(hierarchicalIndex);
+                RunHierarchicalAction(() => _hierarchicalAdapter.CollapseAll(node));
+                return true;
+            }
+
+            if (!_hierarchicalAdapter.IsExpandable(hierarchicalIndex) ||
+                !_hierarchicalAdapter.IsExpanded(hierarchicalIndex))
+            {
+                return false;
+            }
+
+            _hierarchicalAdapter.Collapse(hierarchicalIndex);
+            return true;
+        }
+
+        private bool TryProcessHierarchyRight(bool subtree)
+        {
+            if (!_hierarchicalRowsEnabled || _hierarchicalAdapter == null)
+            {
+                return false;
+            }
+
+            if (TryHandleGroupSlotAsNode(CurrentSlot, GroupSlotAction.Expand, subtree))
+            {
+                return true;
+            }
+
+            if (!TryGetHierarchicalIndexFromSlot(CurrentSlot, out var hierarchicalIndex) ||
+                !_hierarchicalAdapter.IsExpandable(hierarchicalIndex))
+            {
+                return false;
+            }
+
+            if (subtree)
+            {
+                var node = _hierarchicalAdapter.NodeAt(hierarchicalIndex);
+                RunHierarchicalAction(() => _hierarchicalAdapter.ExpandAll(node));
+                return true;
+            }
+
+            if (_hierarchicalAdapter.IsExpanded(hierarchicalIndex))
+            {
+                return false;
+            }
+
+            _hierarchicalAdapter.Expand(hierarchicalIndex);
+            return true;
         }
 
 
