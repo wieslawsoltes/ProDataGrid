@@ -113,17 +113,17 @@
 <tr>
 <td><code>DataGridComboBoxColumn</code></td>
 <td><code>ComboBox</code></td>
-<td><code>ItemsSource</code> plus <code>SelectedItemBinding</code>/<code>SelectedValueBinding</code>/<code>TextBinding</code>.</td>
+<td><code>ItemsSource</code> plus <code>SelectedItemBinding</code>/<code>SelectedValueBinding</code>/<code>TextBinding</code>; compatible typed editable <code>TextBinding</code> display can use the virtual surface.</td>
 </tr>
 <tr>
 <td><code>DataGridAutoCompleteColumn</code></td>
-<td><code>AutoCompleteBox</code></td>
-<td><code>ItemsSource</code>, <code>FilterMode</code>, <code>MinimumPrefixLength</code>, <code>Binding</code> to text.</td>
+<td><code>AutoCompleteBox</code> / <code>TextBlock</code></td>
+<td><code>ItemsSource</code>, <code>FilterMode</code>, <code>MinimumPrefixLength</code>, and text binding; compatible typed raw text can use the virtual surface.</td>
 </tr>
 <tr>
 <td><code>DataGridMaskedTextColumn</code></td>
-<td><code>MaskedTextBox</code></td>
-<td><code>Mask</code>, <code>PromptChar</code>, and other mask options.</td>
+<td><code>MaskedTextBox</code> / <code>TextBlock</code></td>
+<td><code>Mask</code>, <code>PromptChar</code>, and other editor options; compatible typed raw text can use the virtual surface.</td>
 </tr>
 <tr>
 <td><code>DataGridDatePickerColumn</code></td>
@@ -142,8 +142,8 @@
 </tr>
 <tr>
 <td><code>DataGridSliderColumn</code></td>
-<td><code>Slider</code></td>
-<td><code>Binding</code> to value; <code>Minimum</code>/<code>Maximum</code>/<code>SmallChange</code>/<code>LargeChange</code>.</td>
+<td><code>Slider</code> / optional <code>TextBlock</code></td>
+<td><code>Binding</code> to value; <code>Minimum</code>/<code>Maximum</code>/<code>SmallChange</code>/<code>LargeChange</code>; compatible typed <code>ShowValueText</code> display can use the virtual surface.</td>
 </tr>
 <tr>
 <td><code>DataGridProgressBarColumn</code></td>

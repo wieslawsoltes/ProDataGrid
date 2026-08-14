@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+      <title>Layout performance benchmark methodology | ProDataGrid for Avalonia </title>
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <meta name="title" content="Layout performance benchmark methodology | ProDataGrid for Avalonia ">
+      
+      
+      <link rel="icon" href="../favicon.ico">
+      <link rel="stylesheet" href="../public/docfx.min.css">
+      <link rel="stylesheet" href="../public/main.css">
+      <meta name="docfx:navrel" content="../toc.html">
+      <meta name="docfx:tocrel" content="toc.html">
+      
+      
+      
+      
+      <meta name="docfx:docurl" content="https://github.com/wieslawsoltes/ProDataGrid/blob/master/docfx/articles/layout-performance-benchmarking.md/#L1">
+      <meta name="loc:inThisArticle" content="In this article">
+      <meta name="loc:searchResultsCount" content="{count} results for &quot;{query}&quot;">
+      <meta name="loc:searchNoResults" content="No results for &quot;{query}&quot;">
+      <meta name="loc:tocFilter" content="Filter by title">
+      <meta name="loc:nextArticle" content="Next">
+      <meta name="loc:prevArticle" content="Previous">
+      <meta name="loc:themeLight" content="Light">
+      <meta name="loc:themeDark" content="Dark">
+      <meta name="loc:themeAuto" content="Auto">
+      <meta name="loc:changeTheme" content="Change theme">
+      <meta name="loc:copy" content="Copy">
+      <meta name="loc:downloadPdf" content="Download PDF">
+
+      <script type="module" src="./../public/docfx.min.js"></script>
+
+      <script>
+        const theme = localStorage.getItem('theme') || 'auto'
+        document.documentElement.setAttribute('data-bs-theme', theme === 'auto' ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light') : theme)
+      </script>
+
+  </head>
+
+  <body class="tex2jax_ignore" data-layout="" data-yaml-mime="">
+    <header class="bg-body border-bottom">
+      <nav id="autocollapse" class="navbar navbar-expand-md" role="navigation">
+        <div class="container-xxl flex-nowrap">
+          <a class="navbar-brand" href="../index.html">
+            <img id="logo" class="svg" src="../images/logo.svg" alt="">
+            
+          </a>
+          <button class="btn btn-lg d-md-none border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navpanel" aria-controls="navpanel" aria-expanded="false" aria-label="Toggle navigation">
+            <i class="bi bi-three-dots"></i>
+          </button>
+          <div class="collapse navbar-collapse" id="navpanel">
+            <div id="navbar">
+            </div>
+          </div>
+        </div>
+      </nav>
+    </header>
+
+    <main class="container-xxl">
+      <div class="toc-offcanvas">
+        <div class="offcanvas-md offcanvas-start" tabindex="-1" id="tocOffcanvas" aria-labelledby="tocOffcanvasLabel">
+          <div class="offcanvas-header">
+            <h5 class="offcanvas-title" id="tocOffcanvasLabel">Table of Contents</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="offcanvas" data-bs-target="#tocOffcanvas" aria-label="Close"></button>
+          </div>
+          <div class="offcanvas-body">
+            <nav class="toc" id="toc"></nav>
+          </div>
+        </div>
+      </div>
+
+      <div class="content">
+        <div class="actionbar">
+          <button class="btn btn-lg border-0 d-md-none" type="button" data-bs-toggle="offcanvas" data-bs-target="#tocOffcanvas" aria-controls="tocOffcanvas" aria-expanded="false" aria-label="Show table of contents">
+            <i class="bi bi-list"></i>
+          </button>
+
+          <nav id="breadcrumb"></nav>
+        </div>
+
+        <article data-uid="">
+<h1 id="layout-performance-benchmark-methodology">Layout performance benchmark methodology</h1>
+
+<p>ProDataGrid's layout work spans model mutation, row realization, Avalonia layout,
+UI render recording, the compositor, and display-clock pacing. A single wall-clock
+number cannot identify which owner changed. This methodology defines the benchmark
+lanes, phase boundaries, structural checks, and acceptance rules used for the flat
+and virtual architectures.</p>
+<h2 id="questions-the-benchmark-matrix-answers">Questions the benchmark matrix answers</h2>
+<p>The repository uses several complementary experiments:</p>
+<table>
+<thead>
+<tr>
+<th>Lane</th>
+<th>Question</th>
+<th>Primary evidence</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Model BenchmarkDotNet</td>
+<td>Did hierarchy mutation itself change?</td>
+<td>CPU time and managed allocation</td>
+</tr>
+<tr>
+<td>Headless component/layout</td>
+<td>Did presenter layout and realization change?</td>
+<td>Pending layout time, allocation, structure</td>
+</tr>
+<tr>
+<td>Native application macrobenchmark</td>
+<td>Did the complete interactive path improve?</td>
+<td>Mutation, layout, render attribution, wall time, tails</td>
+</tr>
+<tr>
+<td>Source comparison</td>
+<td>How do equivalent ProDataGrid and TreeDataGrid workloads compare?</td>
+<td>Independent native processes and structural validation</td>
+</tr>
+<tr>
+<td>Matched A/B</td>
+<td>Did one candidate change improve its intended owner?</td>
+<td>Interleaved baseline/candidate process pairs</td>
+</tr>
+<tr>
+<td>Memory stress</td>
+<td>Did caching/pooling change process footprint?</td>
+<td>Managed heap plus RSS/private/peak observations</td>
+</tr>
+<tr>
+<td>Trace/capture</td>
+<td>Which method, runtime, compositor, or scheduler owns a cost?</td>
+<td>Managed/native stacks and Avalonia diagnostics</td>
+</tr>
+</tbody>
+</table>
+<p>No lane substitutes for another. A model benchmark cannot prove smooth scrolling,
+and an application benchmark alone may not identify the responsible code.</p>
+<h2 id="reference-workload">Reference workload</h2>
+<p>The native hierarchy scroll workload uses:</p>
+<ul>
+<li>an 800 × 500 native window at 2× render scale;</li>
+<li>fixed 24-pixel rows;</li>
+<li>five matched explicit-width columns;</li>
+<li>an expanded 4,094-row binary hierarchy;</li>
+<li>32 deterministic scroll operations per iteration using one declared pattern; and</li>
+<li>a fully rendered and aligned state before each measured sample.</li>
+</ul>
+<p>The native harness exposes three scroll patterns. <code>discontinuous</code> is the default
+worst-case projection workload and jumps to deterministic distant rows. <code>line</code>
+prepositions outside measurement and then advances exactly one fixed-height row per
+operation, so 19 of 20 visible item references normally overlap. <code>fractional</code>
+alternates fractional offsets inside one row, so the visible slot range is unchanged
+and all visible item references overlap. Reports must name the pattern; results from
+different patterns answer different ownership questions and are not pooled.</p>
+<p>The larger collapse workload expands 149,792 nodes before setup and collapses to 32
+roots. BenchmarkDotNet and sample-specific suites document their own viewport and
+input differences in their READMEs and reports.</p>
+<h2 id="phase-model">Phase model</h2>
+<p>Every native scroll sample records:</p>
+<pre><code class="lang-text">total wall time = mutation + explicit layout + frame wait
+</code></pre>
+<ul>
+<li><strong>mutation</strong> changes the scroll offset and performs synchronous DataGrid work.</li>
+<li><strong>explicit layout</strong> is the measured <code>UpdateLayout()</code> boundary.</li>
+<li><strong>frame wait</strong> crosses the harness's two animation callbacks.</li>
+</ul>
+<p>A separate diagnostic process enables Avalonia meters and records:</p>
+<ul>
+<li>UI render-recording duration;</li>
+<li>compositor update duration; and</li>
+<li>compositor render duration.</li>
+</ul>
+<p>The rowless surface additionally records visible-value cache hits and misses.
+These counters prove whether an overlap optimization executed; they are not timing
+phases and are never added to Active work.</p>
+<p>The diagnostic process is not used as a clean timing gate because meter collection
+adds overhead.</p>
+<h2 id="active-work-attribution">Active-work attribution</h2>
+<p>Optimization reports use this attribution score:</p>
+<pre><code class="lang-text">active work = mutation + explicit layout + UI render recording
+            + compositor update + compositor render
+</code></pre>
+<p>This excludes the deliberately awaited idle animation interval. It is not literal
+single-thread CPU time: UI and render-thread work can overlap, and compositor values
+are maximum instrumented pass durations associated with a sample. It is useful for
+ownership comparisons, not for billing CPU milliseconds.</p>
+<p>Full wall time and full frame wait remain reported. They detect a frame-band or
+scheduling regression even when they are not attributed to DataGrid execution.</p>
+<h2 id="why-frame-wait-is-not-treated-as-grid-work">Why frame wait is not treated as grid work</h2>
+<p><code>RequestAnimationFrame</code> schedules work on Avalonia's animation clock. The harness
+registers callback 1 before synchronous mutation. Mutation and layout occupy the UI
+thread, so callback 1 cannot run until they yield. Callback 1 schedules callback 2,
+which must run on a later pulse.</p>
+<p>The interval can therefore include render recording, composition submission,
+render-thread processing, scheduler delay, and refresh pacing. It is not a GPU
+presentation fence. The JSON splits it into:</p>
+<ul>
+<li>layout completion to callback 1 (pickup);</li>
+<li>callback 1 to callback 2; and</li>
+<li>measured animation-tick interval.</li>
+</ul>
+<p>When callback 1→2 matches the animation interval and pickup is only microseconds,
+the dominant portion is clock pacing. Row recycling or layout optimization cannot
+halve that idle interval. Reports must say so instead of relabeling it as CPU work.</p>
+<h2 id="pre-sample-alignment">Pre-sample alignment</h2>
+<p>Before each sample the harness:</p>
+<ol>
+<li>completes a full managed collection outside the timed operation;</li>
+<li>waits through a three-callback alignment barrier; and</li>
+<li>arms the timed two-callback barrier before mutation.</li>
+</ol>
+<p>Three alignment callbacks are required because the second alignment callback runs
+before the remainder of Avalonia's media pass. Starting after only two can leave an
+unrelated composition batch pending and move the next sample into another refresh
+band.</p>
+<h2 id="structural-validation">Structural validation</h2>
+<p>Timing is accepted only after semantic and structural checks. The native harness
+verifies:</p>
+<ul>
+<li>the expected row count;</li>
+<li>a bounded realized-row count;</li>
+<li>the realized cell, visual, and control counts;</li>
+<li>extent and viewport geometry; and</li>
+<li>zero retained display cells for a surface lane unless a baseline experiment
+explicitly permits retained fallback.</li>
+</ul>
+<p>Feature-specific tests additionally verify editing, selection, hit testing, value
+invalidation, recycling identity, fallback transitions, and cleanup. A faster run
+that omitted required cells or failed to activate the requested backend is invalid.</p>
+<h2 id="clean-comparison-protocol">Clean comparison protocol</h2>
+<p>For a source-mode comparison, CI runs each mode in an independent process. It uses
+two warmups and ten measured iterations, reverses complete mode order in alternating
+processes, aggregates four process means, and reports a Student-t 95% confidence
+interval. Raw JSON and <code>aggregate.json</code> are uploaded as an artifact.</p>
+<p>For a focused candidate A/B:</p>
+<ol>
+<li>create clean baseline and candidate worktrees or published binaries;</li>
+<li>record both commit IDs and dirty state;</li>
+<li>build both in <code>Release</code> before timing;</li>
+<li>keep runtime, architecture, window, dataset, and environment identical;</li>
+<li>run at least three process pairs with alternating order (<code>B A</code>, <code>A B</code>, <code>B A</code>);</li>
+<li>warm both variants before measurement;</li>
+<li>retain every raw sample; and</li>
+<li>compare process-level means, tails, allocation, structure, and regressions.</li>
+</ol>
+<p>Do not choose the fastest process. Exclude a run only by a rule declared before
+examining the result.</p>
+<h2 id="runtime-and-deployment-controls">Runtime and deployment controls</h2>
+<p>The benchmark report records:</p>
+<ul>
+<li>source commit and dirty state;</li>
+<li>build configuration and target framework;</li>
+<li>SDK and runtime versions;</li>
+<li>OS, architecture, hardware, and logical CPU count;</li>
+<li>Avalonia version, renderer, window dimensions, and render scale;</li>
+<li>warmup, iteration, jump, and alignment counts; and</li>
+<li>environment overrides such as <code>DOTNET_TieredCompilation=0</code> or runtime roll-forward.</li>
+</ul>
+<p>Short native comparisons disable tiered compilation so a process does not change
+generated-code tier midway through the small workload. If the shipping tiering/PGO
+behavior is the subject, run it as a separate deployment experiment.</p>
+<h2 id="allocation-and-memory-interpretation">Allocation and memory interpretation</h2>
+<p>Native JSON allocation is <code>GC.GetTotalAllocatedBytes</code> traffic during the sample.
+BenchmarkDotNet's memory diagnoser also reports managed allocation traffic. Neither
+proves retained heap size or measures native, Skia, compositor, or GPU allocation.</p>
+<p>Cache and pooling changes require a separate stress run at equivalent lifecycle
+points. Compare at least:</p>
+<ul>
+<li>managed live/committed heap;</li>
+<li>total allocated bytes;</li>
+<li>process RSS/working set and private or peak footprint where available;</li>
+<li>cache count/capacity and eviction behavior; and</li>
+<li>state after detach or window close.</li>
+</ul>
+<p>RSS alone is never labeled a managed leak.</p>
+<h2 id="acceptance-rules">Acceptance rules</h2>
+<p>A performance change is accepted when:</p>
+<ol>
+<li>profiler or phase evidence identifies the intended owner;</li>
+<li>baseline and candidate preserve behavior and structure;</li>
+<li>multiple paired processes show a practically meaningful improvement;</li>
+<li>allocation, tails, startup, and memory lifetime have no unexplained regression;</li>
+<li>the application-level workload confirms the focused result; and</li>
+<li>raw artifacts, exact commands, limitations, and residual risks are preserved.</li>
+</ol>
+<p>Small sub-0.01 ms movements and shared-runner percentage changes are reported as
+noise unless repeated evidence proves otherwise. A whole-frame wall-time movement
+is not attributed to layout without pickup/callback evidence.</p>
+<h2 id="commands-and-artifacts">Commands and artifacts</h2>
+<p>Build the native ProDataGrid application:</p>
+<pre><code class="lang-bash">dotnet build \
+  tests/ProDataGrid.Hierarchy.NativeBenchmarks/Native.Pro/Native.Pro.csproj \
+  -c Release
+</code></pre>
+<p>Run a focused virtual scroll process:</p>
+<pre><code class="lang-bash">DOTNET_TieredCompilation=0 \
+GRID_BENCH_PRO_MODE=virtual \
+dotnet \
+  tests/ProDataGrid.Hierarchy.NativeBenchmarks/Native.Pro/bin/Release/net8.0/Native.Pro.dll \
+  --scroll-only --scroll-pattern line --scroll-jumps 32 \
+  --warmup 2 --iterations 10 \
+  --output artifacts/performance/virtual-scroll.json
+</code></pre>
+<p>Add <code>--avalonia-diagnostics</code> only for the separate active-work attribution run.
+Add <code>--prodatagrid-diagnostics</code> to a ProDataGrid-only attribution run when the
+virtual layout pipeline needs finer ownership: the JSON records per-jump means and
+raw samples for scrolling, displayed-row update, generation phases, recycling
+phases, retarget eligibility/validation/bind phases, element insertion, and row
+realization/recycling/retargeting counts. Retarget probes also expose
+<code>prodatagrid.rows.retarget.apply.time</code>,
+<code>prodatagrid.rows.retarget.child-index.time</code>, and
+<code>prodatagrid.rows.retarget.layout-validity.time</code> inside the enclosing bind phase.
+Use these nested phases to distinguish observable row identity/state work from
+logical-tree bookkeeping and the layout-reuse guard; do not add nested phase
+values to their enclosing bind time. Retarget probes also expose
+<code>prodatagrid.rows.retarget.measure.reused.count</code> and
+<code>prodatagrid.rows.retarget.arrange.reused.count</code>; compare them with the realized
+row count to prove whether the guarded geometry-reuse path actually ran. Both
+diagnostic switches add measurement overhead and remain outside the clean A/B gate.
+For the rowless surface, the same switch records
+<code>prodatagrid.virtual.surface.render.time</code> plus aggregate rendered-row, rendered-cell,
+clip, vertical-grid-line, hierarchy-expander, text-layout cache hit/miss, text scene
+operation, and immutable glyph-run counts.
+Use those counters to prove which drawing path ran. In particular, a workload with
+zero vertical-grid-line operations cannot validate a grid-line batching hypothesis,
+and a warm-cache workload must not attribute render time to text shaping without
+cache-miss evidence.
+When optimizing the virtual surface inner loop, prepare immutable-per-pass column
+state outside the row loop and compare discontinuous, line, and fractional patterns
+separately. Report the directly nested surface timer and the non-overlapping Active
+sum. A surface-stage improvement is not automatically a whole-frame claim when
+compositor render varies in the opposite direction.
+Text batching must be evaluated with both UI render recording and compositor
+render. A UI-stage reduction is accepted only when the render-stage aggregate does
+not show an equivalent transfer of work to the compositor. Scene-operation and
+glyph-run counters prove that the candidate path was active.
+When a transactional path reports additive counters for every row, batch the
+counter additions only after the transaction succeeds and prove that the aggregate
+values are unchanged. This reduces diagnostic observer cost without moving phase
+boundaries or weakening lifecycle accounting.
+For fixed-height virtual-scroll work, compare
+<code>prodatagrid.rows.scroll.slots.by.height.time</code> with mutation plus layout and the
+complete active-work score. A faster target lookup is accepted only when the
+application-level active components also improve; full frame wait remains a
+separate refresh-pacing diagnostic.
+Use discontinuous, line, and fractional processes to separate complete projection
+replacement, adjacent overlap, and same-range geometry updates. The eligible
+rowless lane must continue to validate zero realized rows and zero realized cells in
+all three cases.
+Use <code>virtual-checkbox</code> to exercise the mixed text/hierarchy/checkbox surface lane.
+Use <code>virtual-autocomplete</code> to compare retained autocomplete display text with its
+typed zero-cell surface path; suggestion/filter behavior remains outside the
+read-only scrolling workload and is covered by editing tests.
+Use <code>virtual-slider-text</code> to compare retained centered slider value text with its
+typed zero-cell surface path; the graphical display mode is intentionally outside
+the contract and slider interaction is covered by editing tests.
+Use <code>virtual-combobox-text</code> to compare an editable retained ComboBox <code>TextBinding</code>
+display with its typed zero-cell text-and-glyph surface path. Selected-item/value
+display remains outside the contract; editing and dropdown interaction are covered
+by focused tests.
+<code>GRID_BENCH_ALLOW_VIRTUAL_FALLBACK=1</code> exists only for controlled baseline
+experiments and must not be set when validating the candidate surface.</p>
+<p>Large generated traces, dumps, and benchmark output stay under the gitignored
+<code>artifacts/performance</code> tree or CI artifacts. Checked-in reports contain summarized
+results and point to the raw artifact location.</p>
+<p>See the <a href="https://github.com/wieslawsoltes/ProDataGrid/blob/main/tests/ProDataGrid.Hierarchy.NativeBenchmarks/README.md">native source benchmark README</a>
+and the <a href="https://github.com/wieslawsoltes/ProDataGrid/blob/main/tests/ProDataGrid.FlatLayout.Benchmarks/SCROLL-RESULTS-2026-08-12.md">focused scroll report</a>
+and the <a href="https://github.com/wieslawsoltes/ProDataGrid/blob/main/tests/ProDataGrid.FlatLayout.Benchmarks/VIRTUAL-RETARGET-RESULTS-2026-08-13.md">virtual retarget-buffer report</a>
+and the <a href="https://github.com/wieslawsoltes/ProDataGrid/blob/main/tests/ProDataGrid.FlatLayout.Benchmarks/VIRTUAL-ROW-BATCH-RESULTS-2026-08-13.md">virtual row lifecycle batch report</a>
+and the <a href="https://github.com/wieslawsoltes/ProDataGrid/blob/main/tests/ProDataGrid.FlatLayout.Benchmarks/VIRTUAL-ROW-APPLY-RESULTS-2026-08-13.md">virtual row retarget-apply report</a>
+and the <a href="https://github.com/wieslawsoltes/ProDataGrid/blob/main/tests/ProDataGrid.FlatLayout.Benchmarks/VIRTUAL-SURFACE-RENDER-RESULTS-2026-08-13.md">virtual surface render report</a>
+for current commands and results.</p>
+
+</article>
+
+        <div class="contribution d-print-none">
+          <a href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/docfx/articles/layout-performance-benchmarking.md/#L1" class="edit-link">Edit this page</a>
+        </div>
+
+        <div class="next-article d-print-none border-top" id="nextArticle"></div>
+
+      </div>
+
+      <div class="affix">
+        <nav id="affix"></nav>
+      </div>
+    </main>
+
+
+    <footer class="border-top text-secondary">
+      <div class="container-xxl">
+        <div class="flex-fill">
+          <span>Made with <a href="https://dotnet.github.io/docfx">docfx</a></span>
+        </div>
+      </div>
+    </footer>
+  </body>
+</html>

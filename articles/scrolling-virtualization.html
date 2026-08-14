@@ -139,6 +139,19 @@ dataGrid.TemplateApplied += (_, __) =&gt;
           RecycledContainerHidingMode=&quot;SetIsVisibleOnly&quot; /&gt;
 </code></pre>
 <p>A sample toggle UI is available on the &quot;Resize recycling diagnostics&quot; page in the sample app.</p>
+<h2 id="fixed-height-flat-row-retargeting">Fixed-height Flat Row Retargeting</h2>
+<p>For an eligible retained <code>Flat</code> grid with fixed row height and reusable direct
+cells, an overlapping scroll window stays attached. Line scrolling rotates the
+existing rows and rebinds only the entering row instead of detaching, pooling,
+acquiring, preparing, and reinserting it. Fractional movement that remains within
+the same slot range keeps the extra realized row as overscan and performs no row
+bind, generation, or recycle work.</p>
+<p>This is a guarded optimization. Drawn cells, discontinuous jumps, active lifecycle
+handlers, row headers/details, grouping, search or conditional formatting,
+auto-sized columns, custom factories, and derived row/grid types continue through
+the established recycling path. See the
+<a href="../../tests/ProDataGrid.FlatLayout.Benchmarks/FLAT-ROW-RETARGET-RESULTS-2026-08-13.md">flat retained-row benchmark report</a>
+for the exact guards and paired results.</p>
 <h2 id="row-height-estimators">Row Height Estimators</h2>
 <p>Scrolling with variable row heights is driven by pluggable estimators via <code>RowHeightEstimator</code>:</p>
 <ul>

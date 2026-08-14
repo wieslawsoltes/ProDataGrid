@@ -7858,6 +7858,20 @@
     },
     {
       "type": "ManagedReference",
+      "source_relative_path": "api/Avalonia.Controls.DataGridVisualLayoutMode.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Avalonia.Controls.DataGridVisualLayoutMode.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Avalonia.Controls.DataGridVisualLayoutMode",
+      "Summary": "<p sourcefile=\"api/Avalonia.Controls.DataGridVisualLayoutMode.yml\" sourcestartlinenumber=\"1\">Selects how realized rows and cells are attached to the grid visual tree.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
       "source_relative_path": "api/Avalonia.Controls.DefaultRowHeightEstimator.yml",
       "output": {
         ".html": {
@@ -11846,11 +11860,11 @@
       "type": "Toc",
       "source_relative_path": "api/toc.yml",
       "output": {
-        ".html": {
-          "relative_path": "api/toc.html"
-        },
         ".json": {
           "relative_path": "api/toc.json"
+        },
+        ".html": {
+          "relative_path": "api/toc.html"
         }
       },
       "version": ""
@@ -12217,6 +12231,16 @@
     },
     {
       "type": "Conceptual",
+      "source_relative_path": "articles/flat-row-cell-layout.md",
+      "output": {
+        ".html": {
+          "relative_path": "articles/flat-row-cell-layout.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "Conceptual",
       "source_relative_path": "articles/formula-engine-architecture.md",
       "output": {
         ".html": {
@@ -12461,6 +12485,16 @@
       "output": {
         ".html": {
           "relative_path": "articles/keyboard-shortcuts.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "Conceptual",
+      "source_relative_path": "articles/layout-performance-benchmarking.md",
+      "output": {
+        ".html": {
+          "relative_path": "articles/layout-performance-benchmarking.html"
         }
       },
       "version": ""
@@ -13029,11 +13063,11 @@
       "type": "Toc",
       "source_relative_path": "articles/toc.yml",
       "output": {
-        ".html": {
-          "relative_path": "articles/toc.html"
-        },
         ".json": {
           "relative_path": "articles/toc.json"
+        },
+        ".html": {
+          "relative_path": "articles/toc.html"
         }
       },
       "version": ""
@@ -13044,6 +13078,16 @@
       "output": {
         ".html": {
           "relative_path": "articles/validation-and-errors.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "Conceptual",
+      "source_relative_path": "articles/virtual-surface-architecture.md",
+      "output": {
+        ".html": {
+          "relative_path": "articles/virtual-surface-architecture.html"
         }
       },
       "version": ""
@@ -13072,11 +13116,11 @@
       "type": "Toc",
       "source_relative_path": "toc.yml",
       "output": {
-        ".html": {
-          "relative_path": "toc.html"
-        },
         ".json": {
           "relative_path": "toc.json"
+        },
+        ".html": {
+          "relative_path": "toc.html"
         }
       },
       "version": ""

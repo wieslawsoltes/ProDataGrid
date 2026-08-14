@@ -1,0 +1,524 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+      <title>Virtual cell-surface architecture | ProDataGrid for Avalonia </title>
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <meta name="title" content="Virtual cell-surface architecture | ProDataGrid for Avalonia ">
+      
+      
+      <link rel="icon" href="../favicon.ico">
+      <link rel="stylesheet" href="../public/docfx.min.css">
+      <link rel="stylesheet" href="../public/main.css">
+      <meta name="docfx:navrel" content="../toc.html">
+      <meta name="docfx:tocrel" content="toc.html">
+      
+      
+      
+      
+      <meta name="docfx:docurl" content="https://github.com/wieslawsoltes/ProDataGrid/blob/master/docfx/articles/virtual-surface-architecture.md/#L1">
+      <meta name="loc:inThisArticle" content="In this article">
+      <meta name="loc:searchResultsCount" content="{count} results for &quot;{query}&quot;">
+      <meta name="loc:searchNoResults" content="No results for &quot;{query}&quot;">
+      <meta name="loc:tocFilter" content="Filter by title">
+      <meta name="loc:nextArticle" content="Next">
+      <meta name="loc:prevArticle" content="Previous">
+      <meta name="loc:themeLight" content="Light">
+      <meta name="loc:themeDark" content="Dark">
+      <meta name="loc:themeAuto" content="Auto">
+      <meta name="loc:changeTheme" content="Change theme">
+      <meta name="loc:copy" content="Copy">
+      <meta name="loc:downloadPdf" content="Download PDF">
+
+      <script type="module" src="./../public/docfx.min.js"></script>
+
+      <script>
+        const theme = localStorage.getItem('theme') || 'auto'
+        document.documentElement.setAttribute('data-bs-theme', theme === 'auto' ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light') : theme)
+      </script>
+
+  </head>
+
+  <body class="tex2jax_ignore" data-layout="" data-yaml-mime="">
+    <header class="bg-body border-bottom">
+      <nav id="autocollapse" class="navbar navbar-expand-md" role="navigation">
+        <div class="container-xxl flex-nowrap">
+          <a class="navbar-brand" href="../index.html">
+            <img id="logo" class="svg" src="../images/logo.svg" alt="">
+            
+          </a>
+          <button class="btn btn-lg d-md-none border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navpanel" aria-controls="navpanel" aria-expanded="false" aria-label="Toggle navigation">
+            <i class="bi bi-three-dots"></i>
+          </button>
+          <div class="collapse navbar-collapse" id="navpanel">
+            <div id="navbar">
+            </div>
+          </div>
+        </div>
+      </nav>
+    </header>
+
+    <main class="container-xxl">
+      <div class="toc-offcanvas">
+        <div class="offcanvas-md offcanvas-start" tabindex="-1" id="tocOffcanvas" aria-labelledby="tocOffcanvasLabel">
+          <div class="offcanvas-header">
+            <h5 class="offcanvas-title" id="tocOffcanvasLabel">Table of Contents</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="offcanvas" data-bs-target="#tocOffcanvas" aria-label="Close"></button>
+          </div>
+          <div class="offcanvas-body">
+            <nav class="toc" id="toc"></nav>
+          </div>
+        </div>
+      </div>
+
+      <div class="content">
+        <div class="actionbar">
+          <button class="btn btn-lg border-0 d-md-none" type="button" data-bs-toggle="offcanvas" data-bs-target="#tocOffcanvas" aria-controls="tocOffcanvas" aria-expanded="false" aria-label="Show table of contents">
+            <i class="bi bi-list"></i>
+          </button>
+
+          <nav id="breadcrumb"></nav>
+        </div>
+
+        <article data-uid="">
+<h1 id="virtual-cell-surface-architecture">Virtual cell-surface architecture</h1>
+
+<p><code>DataGridVisualLayoutMode.Virtualized</code> is ProDataGrid's control-free display-cell
+architecture. Its default fixed-height path preserves the DataGrid data, selection,
+editing, and column models while replacing both the realized display-cell matrix and
+the scrolling <code>DataGridRow</code> window with presenter-owned lightweight row records and
+one drawing surface. Retained controls are materialized only when a feature requires
+their semantics, most notably editing and automation.</p>
+<p>This article describes the implementation contract. For setup and mode selection,
+see <a href="flat-row-cell-layout.html">Flat row and cell layout</a>. For measurement rules, see
+<a href="layout-performance-benchmarking.html">Layout performance benchmark methodology</a>.</p>
+<h2 id="goals-and-boundaries">Goals and boundaries</h2>
+<p>The architecture is designed for large, fixed-height, read-mostly grids whose
+visible columns can read values through typed accessors. Its goals are to:</p>
+<ul>
+<li>keep the public DataGrid, slot, selection, and editing models unchanged;</li>
+<li>make fixed-height scrolling direct slot arithmetic instead of a row-container
+recycle/generate operation;</li>
+<li>remove per-cell controls, presenters, bindings, and layout calls from display;</li>
+<li>compute visible column geometry once per presenter pass;</li>
+<li>share bounded text-shaping state across rows and recycling cycles;</li>
+<li>preserve selection, current-cell, frozen-column, hierarchy, pointer, and editing
+behavior; and</li>
+<li>fall back to retained cells when the surface cannot preserve a feature exactly.</li>
+</ul>
+<p>It is not a general replacement for arbitrary Avalonia cell templates. The normal
+<code>Nested</code> mode remains the compatibility default. <code>Flat</code> is the retained-control
+middle ground.</p>
+<h2 id="three-visual-topologies">Three visual topologies</h2>
+<pre><code class="lang-text">Nested
+DataGridRowsPresenter
+└─ DataGridRow
+   └─ DataGridCellsPresenter
+      └─ DataGridCell × visible columns
+
+Flat
+DataGridRowsPresenter
+├─ DataGridRow × realized rows
+└─ DataGridCell × realized rows × visible columns
+
+Virtualized
+DataGridRowsPresenter
+├─ DataGridVirtualCellSurface × 1
+└─ DataGridVirtualRowInfo × visible rows (non-visual value records)
+</code></pre>
+<p>The steady-state eligible path has zero <code>DataGridRow</code> and zero <code>DataGridCell</code>
+controls. <code>DataGridRowsPresenter</code> owns reusable <code>DataGridVirtualRowInfo</code> records
+containing slot, row index, item, top, and fixed height. Selection, current-cell,
+pointer, hierarchy-expander, value-notification, render, measure, and arrange logic
+consume those records directly.</p>
+<p>Compatibility is deliberate rather than partial. Editing materializes the retained
+visible row window and the existing editor cell pipeline for the duration of the
+edit. Creating the grid automation peer permanently selects retained rows for that
+grid instance so existing row peers and automation contracts remain valid. Row
+headers, row numbers, row details, loading/unloading handlers, grouped or collapsed
+slot tables, custom grids/factories, and item-owned <code>DataGridRow</code> containers also use
+the retained-row path.</p>
+<h2 id="backend-selection-and-retained-fallback">Backend selection and retained fallback</h2>
+<p><code>DataGrid.UsesVirtualCellSurface</code> is true only when the requested mode is
+<code>Virtualized</code> and every visible column and grid-wide feature satisfies the surface
+contract. Eligibility is reevaluated when columns, bindings, display modes, themes,
+or relevant feature state change.</p>
+<p>The surface currently requires:</p>
+<ul>
+<li>a finite <code>RowHeight</code>;</li>
+<li>at least one visible column;</li>
+<li>no grid-wide or column-specific cell theme;</li>
+<li>no active conditional-formatting or search descriptors;</li>
+<li>no <code>CellPrepared</code> or <code>CellClearing</code> handlers;</li>
+<li>no <code>Auto</code> or <code>SizeToCells</code> visible-column widths; and</li>
+<li>surface support and compatible typed accessor metadata for every visible column.</li>
+</ul>
+<p>If any condition fails, the requested <code>Virtualized</code> mode remains visible through
+the public property, while <code>UsesVirtualCellSurfaceFallback</code> becomes true and the
+presenter uses flat retained cells. This is an all-visible-columns decision: the
+grid never mixes an incomplete drawn representation with retained display cells.
+When eligibility returns, the presenter unloads the fallback cells and attaches
+the single surface again.</p>
+<h2 id="supported-display-columns">Supported display columns</h2>
+<p>The surface currently draws these built-in column configurations:</p>
+<table>
+<thead>
+<tr>
+<th>Column</th>
+<th>Surface contract</th>
+<th>Display behavior</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>DataGridTextColumn</code></td>
+<td>Compatible typed text accessor</td>
+<td>Typography, trimming, foreground, and left alignment</td>
+</tr>
+<tr>
+<td><code>DataGridNumericColumn</code></td>
+<td>Direct raw binding and typed accessor</td>
+<td>Column formatting and right-aligned text</td>
+</tr>
+<tr>
+<td><code>DataGridCheckBoxColumn</code></td>
+<td>Direct raw binding and typed accessor</td>
+<td>Centered two- or three-state indicator</td>
+</tr>
+<tr>
+<td><code>DataGridDatePickerColumn</code></td>
+<td>Direct raw binding and typed <code>DateTime</code> accessor</td>
+<td>Short, long, or custom formatted date text with column alignment</td>
+</tr>
+<tr>
+<td><code>DataGridTimePickerColumn</code></td>
+<td>Direct raw binding and typed <code>TimeSpan</code> accessor</td>
+<td>12/24-hour, optional-seconds, or custom formatted time text</td>
+</tr>
+<tr>
+<td><code>DataGridMaskedTextColumn</code></td>
+<td>Direct text binding and compatible typed text accessor</td>
+<td>Raw bound display text; mask, prompts, culture, and watermark remain editor concerns</td>
+</tr>
+<tr>
+<td><code>DataGridAutoCompleteColumn</code></td>
+<td>Direct text binding and compatible typed text accessor</td>
+<td>Raw bound display text; suggestions, filtering, completion, item templates, and watermark remain editor concerns</td>
+</tr>
+<tr>
+<td><code>DataGridSliderColumn</code></td>
+<td><code>ShowValueText</code>, direct <code>Binding</code>, and compatible typed text accessor</td>
+<td>Centered <code>ValueTextFormat</code> display; graphical slider display remains retained and the interactive slider remains the editor</td>
+</tr>
+<tr>
+<td><code>DataGridComboBoxColumn</code></td>
+<td><code>IsEditable</code>, direct <code>TextBinding</code>, no selected-item/value binding, and compatible typed text accessor</td>
+<td>Formatted text and dropdown glyph; items, templates, free-form input, selection, and dropdown interaction remain on the editor</td>
+</tr>
+<tr>
+<td><code>DataGridImageColumn</code></td>
+<td>Fixed image dimensions, direct raw binding, typed accessor</td>
+<td>Stretch and stretch-direction geometry</td>
+</tr>
+<tr>
+<td><code>DataGridProgressBarColumn</code></td>
+<td>No progress text, direct raw binding, typed accessor</td>
+<td>Background, foreground, min/max, and fixed bar height</td>
+</tr>
+<tr>
+<td><code>DataGridHierarchicalColumn</code></td>
+<td>No custom cell template and compatible typed text accessor</td>
+<td>Indentation, expander, and hierarchy text</td>
+</tr>
+</tbody>
+</table>
+<p>Derived columns remain conservative unless their exact implementation participates
+in the surface contract. Combo-box selected-item/value display, template columns,
+buttons, toggle controls with custom content or commands, arbitrary converters
+requiring the binding engine, and custom draw operations currently use retained
+fallback.</p>
+<h2 id="sample-pages">Sample pages</h2>
+<p>The sample gallery has dedicated rowless pages rather than relying on the keyed flat
+theme's <code>Flat</code> default:</p>
+<ul>
+<li><a href="../../src/DataGridSample/Pages/VirtualSurfaceFlatDataPage.axaml"><code>VirtualSurfaceFlatDataPage</code></a>
+loads up to one million flat rows;</li>
+<li><a href="../../src/DataGridSample/Pages/VirtualSurfaceHierarchyPage.axaml"><code>VirtualSurfaceHierarchyPage</code></a>
+uses the same 149,792-node representative hierarchy as the retained comparison
+pages.</li>
+</ul>
+<p>Both pages set <code>Theme=&quot;{StaticResource DataGridFlatTheme}&quot;</code> and override it with
+<code>VisualLayoutMode=&quot;Virtualized&quot;</code>, a finite <code>RowHeight</code>, column-only headers, typed
+column-definition accessors, and finite pixel/star widths. Their default text mode is the fastest
+benchmark endpoint. The selector also exposes checkbox, date, time, masked,
+autocomplete, slider-text, ComboBox-text, and an all-supported mixed mode.</p>
+<h2 id="end-to-end-pipeline">End-to-end pipeline</h2>
+<h3 id="1-model-projection-and-slot-geometry">1. Model projection and slot geometry</h3>
+<p>Flat and hierarchical sources both enter the existing DataGrid slot model.
+<code>HierarchicalModel</code> owns expansion and exposes a flattened sequence of
+<code>HierarchicalNode</code> objects. The visual backend does not traverse the domain tree.</p>
+<p>Vertical scrolling still enters through <code>ScrollSlotsByHeight</code>. When the lightweight
+fixed-height guards pass, it clamps the offset, derives the first slot and fractional
+offset arithmetically, updates the displayed virtual range, and rewrites the existing
+presenter-owned row-record list. It does not unload, pool, retarget, generate, attach,
+measure, or arrange <code>DataGridRow</code> controls. Unsupported cases continue through the
+existing retained scrolling, anchoring, collapsed-slot, and variable-height paths.</p>
+<p>For the supported fixed-height surface workload, total extent can be calculated
+without visiting every slot. This keeps extent calculation independent of the
+expanded row count.</p>
+<h3 id="2-lightweight-row-projection-and-compatibility-realization">2. Lightweight row projection and compatibility realization</h3>
+<p><code>DataGridDisplayData</code> can represent a virtual scrolling range without owning a
+matching circular list of controls. <code>DataGridRowsPresenter</code> keeps one bounded list
+of <code>DataGridVirtualRowInfo</code> structs, reuses its storage across jumps, and projects
+the target items directly from the slot model. The list is the sole visible-row
+input for virtual rendering, hit testing, notification tracking, measure, and
+arrange.</p>
+<p>The steady-state scroll entry calls the lightweight projector directly instead of
+re-entering the general displayed-row dispatcher. Because eligibility already
+proves that the range is ungrouped and uncollapsed, slot and row indexes are equal
+and the range is contiguous. A reusable staging buffer preserves list identity and
+transactional publication. Overlapping slots reuse their existing item references;
+only entering slots query the data connection. General refreshes request a full
+projection so source changes cannot reuse stale items.</p>
+<p>The projection is enabled only for the exact built-in grid and realization factory
+with a finite fixed row height and no row-level compatibility feature. Discovering
+an item-owned <code>DataGridRow</code> aborts the projection before publishing the range and
+selects the normal retained lifecycle. That keeps custom cleanup, derived types,
+headers, details, grouping, automation, and editing on the established container
+contracts.</p>
+<h3 id="3-presenter-measure-and-arrange">3. Presenter measure and arrange</h3>
+<p><code>DataGridRowsPresenter</code> remains the single layout owner.</p>
+<p>During measure it:</p>
+<ol>
+<li>updates the realized row range;</li>
+<li>attaches or detaches the virtual surface;</li>
+<li>computes visible column layouts once;</li>
+<li>computes the fixed row-record range and logical-scroll extent; and</li>
+<li>measures the surface to the viewport.</li>
+</ol>
+<p>During arrange it:</p>
+<ol>
+<li>assigns row-record tops from <code>-NegVerticalOffset</code> and fixed row height;</li>
+<li>arranges the surface across the presenter; and</li>
+<li>synchronizes visible value-change subscriptions.</li>
+</ol>
+<p>Column layout records contain the resolved column, its presenter-relative left
+edge, horizontal visibility, and the final visible left edge and width after cells-
+viewport and frozen-region clipping. Frozen-left, scrolling, and frozen-right
+regions are resolved once per column-layout pass rather than once per visible cell
+during rendering, hit testing, and bounds lookup.</p>
+<p>Immediately before recording the surface, the presenter derives a compact render
+plan for each visible column. A plan snapshots the column layout, renderer kind,
+typed value provider/accessor, text converter/parameter/format/culture, text style
+and alignment, and brush cache-key identity for that render pass. The row loop
+traverses the plans as a contiguous read-only span and consumes each value by
+reference. Column type selection, attached-property metadata lookup, and binding
+formatter lookup therefore happen once per column, not once per row/cell. The plan
+is transient prepared state: the DataGrid column remains the source of truth and
+property changes are observed on the next render.</p>
+<p>The presenter also owns a value cache aligned to the bounded lightweight row
+window. A cache entry contains only the projected item reference and one value per
+visible render plan; it does not contain a row, cell, binding, or visual. Slot and
+item identity preserve entries across overlapping scroll projections. Entering
+rows reuse storage released by leaving rows. A render-plan version invalidates the
+window when visible column state changes, while the tracked value-change version
+invalidates it when a subscribed item reports a display-value change. Detaching
+the surface, entering retained fallback, or clearing lightweight rows clears both
+item and value references.</p>
+<h3 id="discontinuous-fixed-height-scrolling">Discontinuous fixed-height scrolling</h3>
+<p>Large logical jumps in retained modes unload or retarget the displayed container
+window. The lightweight path has no window of controls to preserve. It updates the
+first/last virtual slots, rebinds a bounded list of value records, invalidates the
+surface, and requests pointer-over refresh. Fixed row height makes top and extent
+calculation arithmetic; selection remains in the grid model and is read during
+drawing rather than copied into row properties.</p>
+<p>The retained-row retarget path remains available to compatibility states and is
+still protected by its transactional validation, lifecycle, and layout-validity
+guards. It is no longer paid by the normal rowless virtual scroll workload.</p>
+<p>Separately, the exact built-in retained <code>Flat</code> path can rotate an overlapping
+fixed-height row window without detaching and reacquiring its controls. It rebinds
+only entering rows; a same-slot fractional move keeps the extra realized row as
+overscan without row lifecycle work. Drawn cells, discontinuous jumps, and
+feature-rich compatibility states continue through the normal guarded fallback.
+The component and clean-process results are recorded in the
+<a href="https://github.com/wieslawsoltes/ProDataGrid/blob/main/tests/ProDataGrid.FlatLayout.Benchmarks/FLAT-ROW-RETARGET-RESULTS-2026-08-13.md">flat retained-row report</a>.</p>
+<p>The focused evidence for the typed retarget-entry buffer is recorded in the
+<a href="https://github.com/wieslawsoltes/ProDataGrid/blob/main/tests/ProDataGrid.FlatLayout.Benchmarks/VIRTUAL-RETARGET-RESULTS-2026-08-13.md">virtual retarget-buffer report</a>.
+The follow-up evidence for batched lifecycle counters is recorded in the
+<a href="https://github.com/wieslawsoltes/ProDataGrid/blob/main/tests/ProDataGrid.FlatLayout.Benchmarks/VIRTUAL-ROW-BATCH-RESULTS-2026-08-13.md">virtual row lifecycle batch report</a>.
+The retarget-apply ownership and sparse-state evidence is recorded in the
+<a href="https://github.com/wieslawsoltes/ProDataGrid/blob/main/tests/ProDataGrid.FlatLayout.Benchmarks/VIRTUAL-ROW-APPLY-RESULTS-2026-08-13.md">virtual row retarget-apply report</a>.
+The rowless follow-up is recorded in the
+<a href="https://github.com/wieslawsoltes/ProDataGrid/blob/main/tests/ProDataGrid.FlatLayout.Benchmarks/VIRTUAL-LIGHTWEIGHT-ROWS-RESULTS-2026-08-13.md">lightweight virtual-row report</a>.
+The direct scroll projection and overlapping-item reuse follow-up is recorded in the
+<a href="https://github.com/wieslawsoltes/ProDataGrid/blob/main/tests/ProDataGrid.FlatLayout.Benchmarks/VIRTUAL-LAYOUT-PROJECTION-RESULTS-2026-08-13.md">virtual layout projection report</a>.
+Surface render attribution and the empty-selection fast path are recorded in the
+<a href="https://github.com/wieslawsoltes/ProDataGrid/blob/main/tests/ProDataGrid.FlatLayout.Benchmarks/VIRTUAL-SURFACE-RENDER-RESULTS-2026-08-13.md">virtual surface render report</a>.
+The follow-up text command ownership and measurement are recorded in the
+<a href="https://github.com/wieslawsoltes/ProDataGrid/blob/main/tests/ProDataGrid.FlatLayout.Benchmarks/VIRTUAL-SURFACE-TEXT-BATCH-RESULTS-2026-08-13.md">virtual surface text-batch report</a>.
+Smooth-scroll workload coverage and the precomputed cell-clip evidence are recorded
+in the
+<a href="https://github.com/wieslawsoltes/ProDataGrid/blob/main/tests/ProDataGrid.FlatLayout.Benchmarks/VIRTUAL-SMOOTH-SCROLL-RESULTS-2026-08-13.md">virtual smooth-scroll report</a>.
+The prepared per-column renderer/accessor/style evidence is recorded in the
+<a href="https://github.com/wieslawsoltes/ProDataGrid/blob/main/tests/ProDataGrid.FlatLayout.Benchmarks/VIRTUAL-COLUMN-RENDER-PLAN-RESULTS-2026-08-13.md">virtual column render-plan report</a>.
+The overlapping-row value reuse and formatter-plan evidence is recorded in the
+<a href="https://github.com/wieslawsoltes/ProDataGrid/blob/main/tests/ProDataGrid.FlatLayout.Benchmarks/VIRTUAL-ROW-VALUE-CACHE-RESULTS-2026-08-13.md">virtual row-value cache report</a>.
+The same-commit legacy-retained versus current-virtual comparison is recorded in
+the
+<a href="https://github.com/wieslawsoltes/ProDataGrid/blob/main/tests/ProDataGrid.FlatLayout.Benchmarks/VIRTUAL-ENDPOINT-RESULTS-2026-08-13.md">current virtual endpoint report</a>.
+It measures median paired Active-work reductions of 81.1% for discontinuous,
+51.3% for line, and 58.9% for fractional scrolling while preserving the same
+4,094-row extent and viewport.</p>
+<h3 id="4-surface-rendering">4. Surface rendering</h3>
+<p><code>DataGridVirtualCellSurface</code> is deliberately stateless. Its <code>Render</code> method calls
+back into the presenter, which owns all geometry and caches. Rendering iterates the
+lightweight visible-row records and prepared visible-column render plans.</p>
+<p>For each cell the presenter:</p>
+<ol>
+<li>derives its rectangle from record top/height and the precomputed column layout;</li>
+<li>reads the plan's precomputed cells-viewport and frozen-region clip;</li>
+<li>draws selection background when selected;</li>
+<li>reads the value from the row-aligned cache, resolving it through the plan's
+typed provider/accessor only on a cache miss;</li>
+<li>draws text, checkbox, date/time text, image, progress, or hierarchy content;</li>
+<li>draws current-cell chrome; and</li>
+<li>draws a vertical grid line when enabled.</li>
+</ol>
+<p>The presenter snapshots whether any selected cells exist once per surface pass. An
+empty selection therefore skips all per-cell selection-dictionary lookups. It also
+resolves the current column once per visible row; only that row can draw current-cell
+chrome. These are lookup fast paths, not alternate selection or currency models.</p>
+<p>A clip scope is created only when the visible rectangle differs from the complete
+cell rectangle. The surface skips the active editor cell so the retained overlay is
+the only representation while editing.</p>
+<h2 id="text-shaping-and-cache-ownership">Text shaping and cache ownership</h2>
+<p>Text is the dominant allocation source for many read-only grids. The surface owns a
+bounded disposable LRU of text-layout entries. Each entry keeps the <code>TextLayout</code>
+and, when all runs and brushes support it, immutable glyph-run render data. Its key
+includes:</p>
+<ul>
+<li>text and culture;</li>
+<li>font family, size, style, weight, and stretch;</li>
+<li>alignment, trimming, wrapping, and flow direction;</li>
+<li>maximum width and height; and</li>
+<li>brush kind, color, opacity, or reference identity.</li>
+</ul>
+<p>The virtual cache holds 4,096 entries, enough for several benchmark viewports and
+discontinuous jumps. Supported glyph runs are collected into one custom scene
+operation per surface pass; partial-cell clips are replayed per command and cell
+chrome is recorded afterward so draw order is unchanged. Unsupported text or brush
+features use <code>TextLayout.Draw</code> directly.</p>
+<p>Eviction disposes the layout and releases the cache's immutable render-data
+reference. A queued scene operation owns a separate reference until Avalonia
+disposes it, so clearing the cache cannot invalidate render-thread work already in
+flight. Detaching the surface clears the cache. The larger bound is
+surface-specific; retained drawn-cell cache defaults are not changed.</p>
+<h2 id="value-invalidation">Value invalidation</h2>
+<p>The surface has no per-cell binding expressions. When a participating column opts
+into change tracking, the presenter subscribes once to each visible
+<code>INotifyPropertyChanged</code> row item and, for hierarchy rows, the wrapped item. The two
+reference-identity sets are swapped during arrange so entering items are subscribed
+and leaving items are unsubscribed without rebuilding unrelated state.</p>
+<p>Any relevant property notification invalidates the surface. Notifications arriving
+off the UI thread are posted at render priority. Immutable workloads can disable
+tracking on supported text and hierarchy columns to remove these subscriptions.</p>
+<h2 id="hit-testing-selection-hierarchy-and-editing">Hit testing, selection, hierarchy, and editing</h2>
+<p>The surface implements custom hit testing. Pointer coordinates are resolved against
+lightweight row geometry and visible column geometry. A hierarchy-expander hit toggles
+the node directly; other hits route through the DataGrid's existing selection,
+currency, and edit-trigger logic.</p>
+<p>Editing does not introduce a second editor model:</p>
+<ol>
+<li>the grid temporarily requires retained virtual rows and materializes the visible window;</li>
+<li><code>CompleteCellsCollection</code> materializes normal cells for the editing row;</li>
+<li>the selected cell becomes a flat presenter child above the surface;</li>
+<li>the existing column creates its normal retained editor and binding;</li>
+<li>commit, validation, or cancel uses the existing editing pipeline; and</li>
+<li>leaving edit mode releases the requirement so a following layout can return to
+zero rows and zero display cells.</li>
+</ol>
+<p>Programmatic <code>GetCellContent</code> can also request this compatibility materialization.
+Applications should not call it repeatedly while profiling the zero-cell display
+path.</p>
+<p>Creating a <code>DataGridAutomationPeer</code> switches that grid instance to retained rows,
+so row-level selection, hierarchy, and existing unrealized-row automation contracts
+remain provided by the established peers. The surface does not expose one peer per
+drawn display cell.</p>
+<h2 id="invalidation-and-mode-transitions">Invalidation and mode transitions</h2>
+<p>Changes that only affect drawn values invalidate the surface visual. Geometry or
+eligibility changes reset flat ownership, invalidate presenter measure, and may
+transition between the surface and retained fallback. Changing
+<code>VisualLayoutMode</code> after first measure unloads realized elements, refreshes rows and
+columns, restores selection, and remeasures headers and rows.</p>
+<p>The implementation avoids calling <code>UpdateLayout</code> from production paths. Layout is
+driven by Avalonia invalidation; explicit <code>UpdateLayout</code> is confined to tests and
+benchmark phase boundaries.</p>
+<h2 id="retained-row-compatibility-path">Retained-row compatibility path</h2>
+<p>When a row-level feature requires control semantics, the presenter returns to the
+existing recycle/generate or guarded retarget pipeline. This preserves arbitrary
+row types, lifecycle handlers, templates, automation peers, editing, validation,
+headers, details, and custom factories. The rowless path never attempts to simulate
+those contracts.</p>
+<h2 id="structural-and-behavioral-invariants">Structural and behavioral invariants</h2>
+<p>A valid surface state must satisfy all of these conditions:</p>
+<ul>
+<li>exactly one <code>DataGridVirtualCellSurface</code> is attached;</li>
+<li>retained realized row count is zero in the eligible steady-state path;</li>
+<li>lightweight row-record count remains bounded by the viewport and prefetch policy;</li>
+<li>no display <code>DataGridCell</code> exists outside an active compatibility operation;</li>
+<li>editing or automation materializes retained rows before using row semantics;</li>
+<li>surface bounds and logical-scroll extent match the presenter viewport and data;</li>
+<li>frozen clipping, selection geometry, and hit testing use the same column layout;</li>
+<li>leaving the mode unsubscribes value notifiers and disposes cached layouts; and</li>
+<li>retained fallback preserves the normal cell lifecycle instead of simulating it.</li>
+</ul>
+<p>Headless tests assert these invariants across initial layout, large scrolling,
+recycling, pointer selection, value changes, editing, eligibility transitions, and
+unsupported columns.</p>
+<h2 id="extension-checklist">Extension checklist</h2>
+<p>Adding another surface-rendered column requires more than drawing a similar shape.
+The implementation and tests must prove:</p>
+<ol>
+<li>direct typed value access with no reflection;</li>
+<li>exact display formatting and null-state behavior;</li>
+<li>correct property-change invalidation policy;</li>
+<li>selection/current/grid-line and frozen clipping composition;</li>
+<li>pointer and keyboard behavior;</li>
+<li>normal retained editor materialization, commit, cancel, and validation;</li>
+<li>conservative fallback for derived or unsupported configurations;</li>
+<li>zero display-cell structural validation; and</li>
+<li>matched application-level timing, allocation, and memory evidence.</li>
+</ol>
+<h2 id="current-design-limits">Current design limits</h2>
+<p>Use <code>Flat</code> or <code>Nested</code> when the grid depends on arbitrary cell templates, custom
+cell themes, cell lifecycle handlers, search/conditional-formatting cell visuals,
+cell automation peers, auto/size-to-cells measurement, or unsupported interactive
+display controls. Variable row heights, row details, and collection-view group rows
+share the general row machinery but are not the optimized surface contract and
+should be validated on the application's exact templates before adoption.</p>
+
+</article>
+
+        <div class="contribution d-print-none">
+          <a href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/docfx/articles/virtual-surface-architecture.md/#L1" class="edit-link">Edit this page</a>
+        </div>
+
+        <div class="next-article d-print-none border-top" id="nextArticle"></div>
+
+      </div>
+
+      <div class="affix">
+        <nav id="affix"></nav>
+      </div>
+    </main>
+
+
+    <footer class="border-top text-secondary">
+      <div class="container-xxl">
+        <div class="flex-fill">
+          <span>Made with <a href="https://dotnet.github.io/docfx">docfx</a></span>
+        </div>
+      </div>
+    </footer>
+  </body>
+</html>

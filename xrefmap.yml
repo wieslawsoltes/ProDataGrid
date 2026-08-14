@@ -7624,6 +7624,25 @@ references:
   commentId: F:Avalonia.Controls.DataGrid.VerticalScrollEvent
   fullName: Avalonia.Controls.DataGrid.VerticalScrollEvent
   nameWithType: DataGrid.VerticalScrollEvent
+- uid: Avalonia.Controls.DataGrid.VisualLayoutMode
+  name: VisualLayoutMode
+  href: api/Avalonia.Controls.DataGrid.html#Avalonia_Controls_DataGrid_VisualLayoutMode
+  commentId: P:Avalonia.Controls.DataGrid.VisualLayoutMode
+  fullName: Avalonia.Controls.DataGrid.VisualLayoutMode
+  nameWithType: DataGrid.VisualLayoutMode
+- uid: Avalonia.Controls.DataGrid.VisualLayoutMode*
+  name: VisualLayoutMode
+  href: api/Avalonia.Controls.DataGrid.html#Avalonia_Controls_DataGrid_VisualLayoutMode_
+  commentId: Overload:Avalonia.Controls.DataGrid.VisualLayoutMode
+  isSpec: "True"
+  fullName: Avalonia.Controls.DataGrid.VisualLayoutMode
+  nameWithType: DataGrid.VisualLayoutMode
+- uid: Avalonia.Controls.DataGrid.VisualLayoutModeProperty
+  name: VisualLayoutModeProperty
+  href: api/Avalonia.Controls.DataGrid.html#Avalonia_Controls_DataGrid_VisualLayoutModeProperty
+  commentId: F:Avalonia.Controls.DataGrid.VisualLayoutModeProperty
+  fullName: Avalonia.Controls.DataGrid.VisualLayoutModeProperty
+  nameWithType: DataGrid.VisualLayoutModeProperty
 - uid: Avalonia.Controls.DataGridAggregateSummaryDescription
   name: DataGridAggregateSummaryDescription
   href: api/Avalonia.Controls.DataGridAggregateSummaryDescription.html
@@ -54616,6 +54635,19 @@ references:
   commentId: F:Avalonia.Controls.DataGridRow.OwningGridProperty
   fullName: Avalonia.Controls.DataGridRow.OwningGridProperty
   nameWithType: DataGridRow.OwningGridProperty
+- uid: Avalonia.Controls.DataGridRow.Render(Avalonia.Media.DrawingContext)
+  name: Render(DrawingContext)
+  href: api/Avalonia.Controls.DataGridRow.html#Avalonia_Controls_DataGridRow_Render_Avalonia_Media_DrawingContext_
+  commentId: M:Avalonia.Controls.DataGridRow.Render(Avalonia.Media.DrawingContext)
+  fullName: Avalonia.Controls.DataGridRow.Render(Avalonia.Media.DrawingContext)
+  nameWithType: DataGridRow.Render(DrawingContext)
+- uid: Avalonia.Controls.DataGridRow.Render*
+  name: Render
+  href: api/Avalonia.Controls.DataGridRow.html#Avalonia_Controls_DataGridRow_Render_
+  commentId: Overload:Avalonia.Controls.DataGridRow.Render
+  isSpec: "True"
+  fullName: Avalonia.Controls.DataGridRow.Render
+  nameWithType: DataGridRow.Render
 - uid: Avalonia.Controls.DataGridRow.ValidationSeverity
   name: ValidationSeverity
   href: api/Avalonia.Controls.DataGridRow.html#Avalonia_Controls_DataGridRow_ValidationSeverity
@@ -64736,6 +64768,30 @@ references:
   commentId: F:Avalonia.Controls.DataGridValidationSeverity.Warning
   fullName: Avalonia.Controls.DataGridValidationSeverity.Warning
   nameWithType: DataGridValidationSeverity.Warning
+- uid: Avalonia.Controls.DataGridVisualLayoutMode
+  name: DataGridVisualLayoutMode
+  href: api/Avalonia.Controls.DataGridVisualLayoutMode.html
+  commentId: T:Avalonia.Controls.DataGridVisualLayoutMode
+  fullName: Avalonia.Controls.DataGridVisualLayoutMode
+  nameWithType: DataGridVisualLayoutMode
+- uid: Avalonia.Controls.DataGridVisualLayoutMode.Flat
+  name: Flat
+  href: api/Avalonia.Controls.DataGridVisualLayoutMode.html#Avalonia_Controls_DataGridVisualLayoutMode_Flat
+  commentId: F:Avalonia.Controls.DataGridVisualLayoutMode.Flat
+  fullName: Avalonia.Controls.DataGridVisualLayoutMode.Flat
+  nameWithType: DataGridVisualLayoutMode.Flat
+- uid: Avalonia.Controls.DataGridVisualLayoutMode.Nested
+  name: Nested
+  href: api/Avalonia.Controls.DataGridVisualLayoutMode.html#Avalonia_Controls_DataGridVisualLayoutMode_Nested
+  commentId: F:Avalonia.Controls.DataGridVisualLayoutMode.Nested
+  fullName: Avalonia.Controls.DataGridVisualLayoutMode.Nested
+  nameWithType: DataGridVisualLayoutMode.Nested
+- uid: Avalonia.Controls.DataGridVisualLayoutMode.Virtualized
+  name: Virtualized
+  href: api/Avalonia.Controls.DataGridVisualLayoutMode.html#Avalonia_Controls_DataGridVisualLayoutMode_Virtualized
+  commentId: F:Avalonia.Controls.DataGridVisualLayoutMode.Virtualized
+  fullName: Avalonia.Controls.DataGridVisualLayoutMode.Virtualized
+  nameWithType: DataGridVisualLayoutMode.Virtualized
 - uid: Avalonia.Controls.DefaultRowHeightEstimator
   name: DefaultRowHeightEstimator
   href: api/Avalonia.Controls.DefaultRowHeightEstimator.html
