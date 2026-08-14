@@ -1242,6 +1242,22 @@ references:
   isSpec: "True"
   fullName: Avalonia.Collections.DataGridComparerSortDescription.Direction
   nameWithType: DataGridComparerSortDescription.Direction
+- uid: Avalonia.Collections.DataGridComparerSortDescription.OrderBy(System.Collections.Generic.IEnumerable{System.Object})
+  name: OrderBy(IEnumerable<object>)
+  href: api/Avalonia.Collections.DataGridComparerSortDescription.html#Avalonia_Collections_DataGridComparerSortDescription_OrderBy_System_Collections_Generic_IEnumerable_System_Object__
+  commentId: M:Avalonia.Collections.DataGridComparerSortDescription.OrderBy(System.Collections.Generic.IEnumerable{System.Object})
+  name.vb: OrderBy(IEnumerable(Of Object))
+  fullName: Avalonia.Collections.DataGridComparerSortDescription.OrderBy(System.Collections.Generic.IEnumerable<object>)
+  fullName.vb: Avalonia.Collections.DataGridComparerSortDescription.OrderBy(System.Collections.Generic.IEnumerable(Of Object))
+  nameWithType: DataGridComparerSortDescription.OrderBy(IEnumerable<object>)
+  nameWithType.vb: DataGridComparerSortDescription.OrderBy(IEnumerable(Of Object))
+- uid: Avalonia.Collections.DataGridComparerSortDescription.OrderBy*
+  name: OrderBy
+  href: api/Avalonia.Collections.DataGridComparerSortDescription.html#Avalonia_Collections_DataGridComparerSortDescription_OrderBy_
+  commentId: Overload:Avalonia.Collections.DataGridComparerSortDescription.OrderBy
+  isSpec: "True"
+  fullName: Avalonia.Collections.DataGridComparerSortDescription.OrderBy
+  nameWithType: DataGridComparerSortDescription.OrderBy
 - uid: Avalonia.Collections.DataGridComparerSortDescription.PropertyPath
   name: PropertyPath
   href: api/Avalonia.Collections.DataGridComparerSortDescription.html#Avalonia_Collections_DataGridComparerSortDescription_PropertyPath
@@ -1281,6 +1297,22 @@ references:
   isSpec: "True"
   fullName: Avalonia.Collections.DataGridComparerSortDescription.SwitchSortDirection
   nameWithType: DataGridComparerSortDescription.SwitchSortDirection
+- uid: Avalonia.Collections.DataGridComparerSortDescription.ThenBy(System.Linq.IOrderedEnumerable{System.Object})
+  name: ThenBy(IOrderedEnumerable<object>)
+  href: api/Avalonia.Collections.DataGridComparerSortDescription.html#Avalonia_Collections_DataGridComparerSortDescription_ThenBy_System_Linq_IOrderedEnumerable_System_Object__
+  commentId: M:Avalonia.Collections.DataGridComparerSortDescription.ThenBy(System.Linq.IOrderedEnumerable{System.Object})
+  name.vb: ThenBy(IOrderedEnumerable(Of Object))
+  fullName: Avalonia.Collections.DataGridComparerSortDescription.ThenBy(System.Linq.IOrderedEnumerable<object>)
+  fullName.vb: Avalonia.Collections.DataGridComparerSortDescription.ThenBy(System.Linq.IOrderedEnumerable(Of Object))
+  nameWithType: DataGridComparerSortDescription.ThenBy(IOrderedEnumerable<object>)
+  nameWithType.vb: DataGridComparerSortDescription.ThenBy(IOrderedEnumerable(Of Object))
+- uid: Avalonia.Collections.DataGridComparerSortDescription.ThenBy*
+  name: ThenBy
+  href: api/Avalonia.Collections.DataGridComparerSortDescription.html#Avalonia_Collections_DataGridComparerSortDescription_ThenBy_
+  commentId: Overload:Avalonia.Collections.DataGridComparerSortDescription.ThenBy
+  isSpec: "True"
+  fullName: Avalonia.Collections.DataGridComparerSortDescription.ThenBy
+  nameWithType: DataGridComparerSortDescription.ThenBy
 - uid: Avalonia.Collections.DataGridCurrentChangingEventArgs
   name: DataGridCurrentChangingEventArgs
   href: api/Avalonia.Collections.DataGridCurrentChangingEventArgs.html
