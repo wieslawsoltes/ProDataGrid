@@ -932,7 +932,10 @@ internal static partial class Discovery
                 suppressDirectDiagnostics: false)
             .Where(static model => model.GenerateColumnDefinitionsProperty ||
                                    model.GenerateSchemaProperty ||
-                                   model.GenerateFastPathOptionsProperty)
+                                   model.GenerateFastPathOptionsProperty ||
+                                   model.GenerateNavigationModelProperty ||
+                                   model.GenerateNavigationInputModelProperty ||
+                                   model.GenerateRouteContextFactoryProperty)
             .Select(Emitter.EmitViewModelSource)
             .ToImmutableArray();
 
@@ -983,6 +986,9 @@ internal static partial class Discovery
                 ColumnDefinitionsPropertyName = pending.ColumnDefinitionsPropertyName,
                 SchemaPropertyName = pending.SchemaPropertyName,
                 FastPathOptionsPropertyName = pending.FastPathOptionsPropertyName,
+                NavigationModelPropertyName = pending.NavigationModelPropertyName,
+                NavigationInputModelPropertyName = pending.NavigationInputModelPropertyName,
+                RouteContextFactoryPropertyName = pending.RouteContextFactoryPropertyName,
                 Location = pending.Location,
                 IsDirectIncremental = pending.IsDirectIncremental
             };
@@ -1001,6 +1007,24 @@ internal static partial class Discovery
             model.GenerateFastPathOptionsProperty = ValidateGeneratedViewModelMember(
                 pending.ViewModelType,
                 model.FastPathOptionsPropertyName,
+                generatedMembers,
+                viewModelDiagnostics,
+                pending.Location);
+            model.GenerateNavigationModelProperty = pending.GenerateNavigationModel && ValidateGeneratedViewModelMember(
+                pending.ViewModelType,
+                model.NavigationModelPropertyName,
+                generatedMembers,
+                viewModelDiagnostics,
+                pending.Location);
+            model.GenerateNavigationInputModelProperty = pending.GenerateNavigationInputModel && ValidateGeneratedViewModelMember(
+                pending.ViewModelType,
+                model.NavigationInputModelPropertyName,
+                generatedMembers,
+                viewModelDiagnostics,
+                pending.Location);
+            model.GenerateRouteContextFactoryProperty = pending.GenerateRouteContextFactory && ValidateGeneratedViewModelMember(
+                pending.ViewModelType,
+                model.RouteContextFactoryPropertyName,
                 generatedMembers,
                 viewModelDiagnostics,
                 pending.Location);
@@ -4072,6 +4096,12 @@ internal static partial class Discovery
             ColumnDefinitionsPropertyName = GeneratorUtilities.GetString(arguments, "ColumnDefinitionsPropertyName") ?? "ColumnDefinitions",
             SchemaPropertyName = GeneratorUtilities.GetString(arguments, "SchemaPropertyName") ?? "DataGridSchema",
             FastPathOptionsPropertyName = GeneratorUtilities.GetString(arguments, "FastPathOptionsPropertyName") ?? "FastPathOptions",
+            GenerateNavigationModel = GeneratorUtilities.GetBoolean(arguments, "GenerateNavigationModel", false),
+            NavigationModelPropertyName = GeneratorUtilities.GetString(arguments, "NavigationModelPropertyName") ?? "NavigationModel",
+            GenerateNavigationInputModel = GeneratorUtilities.GetBoolean(arguments, "GenerateNavigationInputModel", false),
+            NavigationInputModelPropertyName = GeneratorUtilities.GetString(arguments, "NavigationInputModelPropertyName") ?? "NavigationInputModel",
+            GenerateRouteContextFactory = GeneratorUtilities.GetBoolean(arguments, "GenerateRouteContextFactory", false),
+            RouteContextFactoryPropertyName = GeneratorUtilities.GetString(arguments, "RouteContextFactoryPropertyName") ?? "RouteContextFactory",
             Location = GetLocation(attribute)
         };
     }
@@ -4084,7 +4114,13 @@ internal static partial class Discovery
             GeneratorUtilities.GetMetadataName(pending.ItemType) + "|" +
             pending.ColumnDefinitionsPropertyName + "|" +
             pending.SchemaPropertyName + "|" +
-            pending.FastPathOptionsPropertyName;
+            pending.FastPathOptionsPropertyName + "|" +
+            pending.GenerateNavigationModel + "|" +
+            pending.NavigationModelPropertyName + "|" +
+            pending.GenerateNavigationInputModel + "|" +
+            pending.NavigationInputModelPropertyName + "|" +
+            pending.GenerateRouteContextFactory + "|" +
+            pending.RouteContextFactoryPropertyName;
         viewModels[key] = pending;
     }
 
@@ -4215,6 +4251,18 @@ internal static partial class Discovery
         public string SchemaPropertyName { get; set; } = "DataGridSchema";
 
         public string FastPathOptionsPropertyName { get; set; } = "FastPathOptions";
+
+        public bool GenerateNavigationModel { get; set; }
+
+        public string NavigationModelPropertyName { get; set; } = "NavigationModel";
+
+        public bool GenerateNavigationInputModel { get; set; }
+
+        public string NavigationInputModelPropertyName { get; set; } = "NavigationInputModel";
+
+        public bool GenerateRouteContextFactory { get; set; }
+
+        public string RouteContextFactoryPropertyName { get; set; } = "RouteContextFactory";
 
         public bool IsDirectIncremental { get; set; }
 

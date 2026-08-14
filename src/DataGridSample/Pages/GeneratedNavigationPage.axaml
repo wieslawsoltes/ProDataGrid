@@ -1,0 +1,33 @@
+<!-- Copyright (c) Wieslaw Soltes. Licensed under the MIT license. -->
+<UserControl x:Class="DataGridSample.Pages.GeneratedNavigationPage"
+             xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:pages="clr-namespace:DataGridSample.Pages"
+             xmlns:vm="clr-namespace:DataGridSample.ViewModels"
+             x:DataType="vm:GeneratedNavigationViewModel">
+  <Grid Margin="12" RowDefinitions="Auto,Auto,Auto,*,Auto" RowSpacing="10">
+    <StackPanel Spacing="4">
+      <TextBlock FontSize="20" FontWeight="SemiBold" Text="Source-generated navigation" />
+      <TextBlock TextWrapping="Wrap"
+                 Text="The provider generates cell, input, and stable-key route-context models. The generated view binds them without reflection or event handlers, so click and Enter routes originate inside the grid with the exact cell context." />
+    </StackPanel>
+
+    <WrapPanel Grid.Row="1">
+      <Button Margin="0,0,6,0" Content="Previous cell" Command="{CompiledBinding PreviousCellCommand}" />
+      <Button Margin="0,0,14,0" Content="Next cell" Command="{CompiledBinding NextCellCommand}" />
+      <Button Margin="0,0,6,0" Content="Open selected route" Command="{CompiledBinding OpenRouteCommand}" />
+      <Button Content="Back" Command="{CompiledBinding BackCommand}" />
+    </WrapPanel>
+
+    <Border Grid.Row="2" Padding="10" CornerRadius="6" Background="#0C605E5C">
+      <TextBlock TextWrapping="Wrap"
+                 Text="Input model: J/K move vertically, physical H moves left, G/Shift+G jump to grid edges, primary press targets a cell, release or Enter opens its route with generated stable identity, and Ctrl+wheel navigates history." />
+    </Border>
+
+    <pages:GeneratedNavigationGridView Grid.Row="3" />
+
+    <Border Grid.Row="4" Padding="10" CornerRadius="6" Background="#100078D4">
+      <TextBlock Text="{CompiledBinding Status}" TextWrapping="Wrap" />
+    </Border>
+  </Grid>
+</UserControl>

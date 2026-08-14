@@ -18,6 +18,7 @@ using Avalonia.Controls.DataGridConditionalFormatting;
 using Avalonia.Controls.DataGridClipboard;
 using Avalonia.Controls.DataGridEditing;
 using Avalonia.Controls.DataGridInteractions;
+using Avalonia.Controls.DataGridNavigation;
 using Avalonia.Controls.DataGridHierarchical;
 using Avalonia.Controls.DataGridDragDrop;
 using Avalonia.Input;
@@ -397,6 +398,11 @@ internal
         private Avalonia.Controls.DataGridClipboard.IDataGridClipboardImportModelFactory _clipboardImportModelFactory;
         private Avalonia.Controls.DataGridEditing.IDataGridEditingInteractionModel _editingInteractionModel;
         private Avalonia.Controls.DataGridEditing.IDataGridEditingInteractionModelFactory _editingInteractionModelFactory;
+        private IDataGridNavigationModel _navigationModel;
+        private IDataGridNavigationModelFactory _navigationModelFactory;
+        private IDataGridNavigationInputModel _navigationInputModel;
+        private IDataGridRouteNavigationModel _routeNavigationModel;
+        private IDataGridRouteContextFactory _routeContextFactory;
         private readonly Dictionary<SearchCellKey, SearchResult> _searchResultsMap = new();
         private readonly HashSet<int> _searchRowMatches = new();
         private SearchCellKey? _currentSearchCell;
@@ -660,6 +666,11 @@ internal
             AddHandler(InputElement.PointerMovedEvent, DataGrid_PointerActivity, RoutingStrategies.Tunnel, handledEventsToo: true);
             AddHandler(InputElement.PointerPressedEvent, DataGrid_PointerActivity, RoutingStrategies.Tunnel, handledEventsToo: true);
             AddHandler(InputElement.PointerReleasedEvent, DataGrid_PointerActivity, RoutingStrategies.Tunnel, handledEventsToo: true);
+            AddHandler(InputElement.KeyDownEvent, DataGrid_NavigationKeyDown, RoutingStrategies.Tunnel);
+            AddHandler(InputElement.KeyUpEvent, DataGrid_NavigationKeyUp, RoutingStrategies.Tunnel);
+            AddHandler(InputElement.PointerPressedEvent, DataGrid_NavigationPointerPressed, RoutingStrategies.Tunnel);
+            AddHandler(InputElement.PointerReleasedEvent, DataGrid_NavigationPointerReleased, RoutingStrategies.Tunnel);
+            AddHandler(InputElement.PointerWheelChangedEvent, DataGrid_NavigationPointerWheel, RoutingStrategies.Tunnel);
             AddHandler(InputElement.PointerExitedEvent, DataGrid_PointerExited, handledEventsToo: true);
             AddHandler(InputElement.PointerMovedEvent, DataGrid_DragSelectionPointerMoved, RoutingStrategies.Tunnel, handledEventsToo: true);
             AddHandler(InputElement.PointerReleasedEvent, DataGrid_DragSelectionPointerReleased, RoutingStrategies.Tunnel, handledEventsToo: true);
@@ -705,6 +716,7 @@ internal
             SetRangeInteractionModel(CreateRangeInteractionModel());
             SetClipboardImportModel(CreateClipboardImportModel());
             SetEditingInteractionModel(CreateEditingInteractionModel());
+            SetNavigationModel(CreateNavigationModel());
 
             AnchorSlot = -1;
             _lastEstimatedRow = -1;
@@ -2192,6 +2204,15 @@ internal
         }
 
         /// <summary>
+        /// Creates the default navigation model for the grid. Override or set
+        /// <see cref="NavigationModelFactory"/> before construction completes to supply a custom implementation.
+        /// </summary>
+        protected virtual IDataGridNavigationModel CreateNavigationModel()
+        {
+            return _navigationModelFactory?.Create() ?? new DataGridNavigationModel();
+        }
+
+        /// <summary>
         /// Optional factory used when creating the default sorting model.
         /// </summary>
         public IDataGridSortingModelFactory SortingModelFactory
@@ -2261,6 +2282,15 @@ internal
         {
             get => _editingInteractionModelFactory;
             set => _editingInteractionModelFactory = value;
+        }
+
+        /// <summary>
+        /// Gets or sets the optional factory used to create the default navigation model.
+        /// </summary>
+        public IDataGridNavigationModelFactory NavigationModelFactory
+        {
+            get => _navigationModelFactory;
+            set => _navigationModelFactory = value;
         }
 
         /// <summary>
@@ -2598,6 +2628,75 @@ internal
         {
             get => _editingInteractionModel;
             set => SetEditingInteractionModel(value);
+        }
+
+        /// <summary>
+        /// Gets or sets the model that resolves keyboard and programmatic navigation policy.
+        /// </summary>
+        public IDataGridNavigationModel NavigationModel
+        {
+            get => _navigationModel;
+            set => SetNavigationModel(value);
+        }
+
+        /// <summary>
+        /// Gets or sets the optional framework-neutral model that maps normalized key and pointer
+        /// input to cell or application-route navigation.
+        /// </summary>
+        public IDataGridNavigationInputModel NavigationInputModel
+        {
+            get => _navigationInputModel;
+            set
+            {
+                if (ReferenceEquals(_navigationInputModel, value))
+                {
+                    return;
+                }
+
+                IDataGridNavigationInputModel oldModel = _navigationInputModel;
+                _navigationInputModel = value;
+                RaisePropertyChanged(NavigationInputModelProperty, oldModel, value);
+            }
+        }
+
+        /// <summary>
+        /// Gets or sets the optional framework-neutral application-route model associated with this grid.
+        /// </summary>
+        /// <remarks>
+        /// The model can be shared with a ViewModel command. The grid does not require ReactiveUI,
+        /// Prism, CommunityToolkit.Mvvm, or another navigation framework.
+        /// </remarks>
+        public IDataGridRouteNavigationModel RouteNavigationModel
+        {
+            get => _routeNavigationModel;
+            set
+            {
+                if (ReferenceEquals(_routeNavigationModel, value))
+                {
+                    return;
+                }
+
+                SetRouteNavigationModel(value);
+            }
+        }
+
+        /// <summary>
+        /// Gets or sets the optional factory that enriches route contexts with stable item keys.
+        /// </summary>
+        public IDataGridRouteContextFactory RouteContextFactory
+        {
+            get => _routeContextFactory;
+            set
+            {
+                if (ReferenceEquals(_routeContextFactory, value))
+                {
+                    return;
+                }
+
+                IDataGridRouteContextFactory oldFactory = _routeContextFactory;
+                _routeContextFactory = value;
+                RaisePropertyChanged(RouteContextFactoryProperty, oldFactory, value);
+            }
         }
 
         /// <summary>
@@ -5811,6 +5910,103 @@ internal
 
             _editingInteractionModel = newModel;
             RaisePropertyChanged(EditingInteractionModelProperty, oldModel, _editingInteractionModel);
+        }
+
+        private void SetNavigationModel(IDataGridNavigationModel model)
+        {
+            IDataGridNavigationModel oldModel = _navigationModel;
+            IDataGridNavigationModel newModel = model ?? CreateNavigationModel();
+
+            if (ReferenceEquals(oldModel, newModel))
+            {
+                return;
+            }
+
+            if (oldModel is IDataGridNavigationController oldController)
+            {
+                WeakEventHandlerManager.Unsubscribe<DataGridNavigationRequestedEventArgs, DataGrid>(
+                    oldController,
+                    nameof(IDataGridNavigationController.NavigationRequested),
+                    NavigationController_NavigationRequested);
+            }
+
+            _navigationModel = newModel;
+            if (newModel is IDataGridNavigationController newController)
+            {
+                WeakEventHandlerManager.Subscribe<IDataGridNavigationController, DataGridNavigationRequestedEventArgs, DataGrid>(
+                    newController,
+                    nameof(IDataGridNavigationController.NavigationRequested),
+                    NavigationController_NavigationRequested);
+            }
+
+            RaisePropertyChanged(NavigationModelProperty, oldModel, _navigationModel);
+        }
+
+        private void NavigationController_NavigationRequested(
+            object sender,
+            DataGridNavigationRequestedEventArgs e)
+        {
+            e.Handled = ProcessNavigationCommand(
+                e.Command,
+                null,
+                e.Origin,
+                e.Modifiers,
+                allowCtrlForTab: false);
+        }
+
+        private void SetRouteNavigationModel(IDataGridRouteNavigationModel model)
+        {
+            IDataGridRouteNavigationModel oldModel = _routeNavigationModel;
+            if (ReferenceEquals(oldModel, model))
+            {
+                return;
+            }
+
+            if (oldModel is IDataGridRouteNavigationController oldController)
+            {
+                WeakEventHandlerManager.Unsubscribe<DataGridRouteNavigationRequestedEventArgs, DataGrid>(
+                    oldController,
+                    nameof(IDataGridRouteNavigationController.NavigationRequested),
+                    RouteNavigationController_NavigationRequested);
+            }
+
+            _routeNavigationModel = model;
+            if (model is IDataGridRouteNavigationController newController)
+            {
+                WeakEventHandlerManager.Subscribe<IDataGridRouteNavigationController, DataGridRouteNavigationRequestedEventArgs, DataGrid>(
+                    newController,
+                    nameof(IDataGridRouteNavigationController.NavigationRequested),
+                    RouteNavigationController_NavigationRequested);
+            }
+
+            RaisePropertyChanged(RouteNavigationModelProperty, oldModel, _routeNavigationModel);
+        }
+
+        private void RouteNavigationController_NavigationRequested(
+            object sender,
+            DataGridRouteNavigationRequestedEventArgs e)
+        {
+            if (e.Handled || _routeNavigationModel == null)
+            {
+                return;
+            }
+
+            DataGridRouteContext context = e.Kind is DataGridRouteNavigationKind.Back or DataGridRouteNavigationKind.Forward
+                ? new DataGridRouteContext(
+                    null,
+                    null,
+                    null,
+                    DataGridNavigationPosition.Unset,
+                    e.Origin,
+                    hasItem: false)
+                : GetCurrentRouteContext(e.Origin);
+            if (!_routeNavigationModel.CanNavigate(e.Kind, context))
+            {
+                return;
+            }
+
+            e.Handled = true;
+            _ = _routeNavigationModel.NavigateAsync(e.Kind, context);
         }
 
         private void FilteringModel_PropertyChanged(object sender, PropertyChangedEventArgs e)

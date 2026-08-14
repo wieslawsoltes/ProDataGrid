@@ -1,0 +1,46 @@
+<!-- Copyright (c) Wieslaw Soltes. Licensed under the MIT license. -->
+<UserControl x:Class="DataGridSample.Pages.RouteNavigationPage"
+             xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="clr-namespace:DataGridSample.ViewModels"
+             x:DataType="vm:RouteNavigationSampleViewModel">
+  <Grid Margin="12" RowDefinitions="Auto,Auto,*,Auto,Auto">
+    <StackPanel Spacing="4">
+      <TextBlock FontSize="20" FontWeight="SemiBold" Text="Framework-neutral route navigation" />
+      <TextBlock TextWrapping="Wrap"
+                 Text="Click any cell or press Enter to route from inside the DataGrid. The grid preserves the clicked item key, column key, position, and origin before the framework-neutral host executes Navigate, Replace, Reset, Back, or Forward." />
+    </StackPanel>
+    <WrapPanel Grid.Row="1" Margin="0,10">
+      <Button Margin="0,0,6,6" Content="Navigate" Command="{CompiledBinding NavigateCommand}" />
+      <Button Margin="0,0,6,6" Content="Replace" Command="{CompiledBinding ReplaceCommand}" />
+      <Button Margin="0,0,14,6" Content="Reset" Command="{CompiledBinding ResetCommand}" />
+      <Button Margin="0,0,6,6" Content="Back" Command="{CompiledBinding BackCommand}" />
+      <Button Margin="0,0,6,6" Content="Forward" Command="{CompiledBinding ForwardCommand}" />
+    </WrapPanel>
+    <DataGrid Grid.Row="2"
+              ItemsSource="{CompiledBinding Items}"
+              SelectedItem="{CompiledBinding SelectedItem, Mode=TwoWay}"
+              RouteNavigationModel="{CompiledBinding RouteNavigationModel}"
+              RouteContextFactory="{CompiledBinding RouteContextFactory}"
+              NavigationInputModel="{CompiledBinding NavigationInputModel}"
+              AutoGenerateColumns="False"
+              CanUserAddRows="False"
+              SelectionMode="Single">
+      <DataGrid.Columns>
+        <DataGridTextColumn Header="ID" Width="80" ColumnKey="id"
+                            Binding="{CompiledBinding Id}" x:DataType="vm:RouteNavigationSampleViewModel+RouteRow" />
+        <DataGridTextColumn Header="Work item" Width="2*" ColumnKey="name"
+                            Binding="{CompiledBinding Name}" x:DataType="vm:RouteNavigationSampleViewModel+RouteRow" />
+        <DataGridTextColumn Header="Area" Width="*" ColumnKey="area"
+                            Binding="{CompiledBinding Area}" x:DataType="vm:RouteNavigationSampleViewModel+RouteRow" />
+        <DataGridTextColumn Header="State" Width="*" ColumnKey="state"
+                            Binding="{CompiledBinding State}" x:DataType="vm:RouteNavigationSampleViewModel+RouteRow" />
+      </DataGrid.Columns>
+    </DataGrid>
+    <TextBlock Grid.Row="3" Margin="0,10,0,0" FontWeight="SemiBold"
+               Text="{CompiledBinding RouteNavigator.HistorySummary}" />
+    <Border Grid.Row="4" Margin="0,8,0,0" Padding="10" Background="#100078D4" CornerRadius="6">
+      <TextBlock Text="{CompiledBinding Status}" />
+    </Border>
+  </Grid>
+</UserControl>

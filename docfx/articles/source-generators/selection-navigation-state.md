@@ -147,6 +147,82 @@ Results return a status enum, typed item, row index, display-column index, stabl
 
 Override `CreateGeneratedNavigationInteractionHandler` for application navigation policy or DI-backed construction.
 
+## Navigation model generation
+
+Opt into per-ViewModel cell and input navigation models and ask the generated view
+to bind cell, input, and application-route models:
+
+```csharp
+[GenerateDataGridViewModel(
+    typeof(Trade),
+    ProviderName = "TradeSchema",
+    GenerateNavigationModel = true,
+    NavigationModelPropertyName = nameof(NavigationModel),
+    GenerateNavigationInputModel = true,
+    NavigationInputModelPropertyName = nameof(NavigationInputModel),
+    GenerateRouteContextFactory = true,
+    RouteContextFactoryPropertyName = nameof(RouteContextFactory))]
+[GenerateDataGridView(
+    typeof(Trade),
+    NavigationModelPropertyName = nameof(NavigationModel),
+    NavigationInputModelPropertyName = nameof(NavigationInputModel),
+    RouteContextFactoryPropertyName = nameof(RouteContextFactory),
+    RouteNavigationModelPropertyName = nameof(RouteNavigationModel))]
+public sealed partial class TradesViewModel : ReactiveObject
+{
+    public IDataGridRouteNavigationModel RouteNavigationModel { get; }
+
+    public TradesViewModel()
+    {
+        NavigationInputModel.SetBindings(
+            DataGridNavigationInputBinding.KeyDown(
+                DataGridNavigationInputKey.J,
+                DataGridNavigationInputResult.Navigate(
+                    DataGridNavigationCommand.Down)));
+    }
+}
+```
+
+The generator emits:
+
+- `TradeSchema.CreateNavigationModel()`;
+- `TradeSchema.CreateNavigationInputModel()`;
+- `TradeSchema.CreateRouteContextFactory()` using the typed `[DataGridKey]` accessor;
+- `TradeSchema.CreateRouteNavigationModel(resolver, navigator)`;
+- the `NavigationModel` property when `GenerateNavigationModel = true`;
+- the `NavigationInputModel` property when
+  `GenerateNavigationInputModel = true`;
+- the `RouteContextFactory` property when
+  `GenerateRouteContextFactory = true`;
+- reflection-free direct bindings to `DataGrid.NavigationModel`,
+  `DataGrid.NavigationInputModel`, `DataGrid.RouteContextFactory`, and
+  `DataGrid.RouteNavigationModel`;
+- `PDGSG141` when a configured member does not implement the required interface.
+
+`GenerateDataGridViewModelsForNamespace` and
+`GenerateDataGridViewsForNamespace` expose the same input-model and route-context
+options for namespace policy. Manual ViewModel properties are accepted when they
+implement `IDataGridNavigationInputModel` or `IDataGridRouteContextFactory`.
+
+The route property stays application-owned because its resolver, native navigator,
+scope, and history lifetime belong in the composition root. The schema factory
+constructs the framework-neutral orchestration model after those dependencies are
+selected.
+
+Generation is opt-in so existing ViewModels and snapshots do not gain an unexpected
+controller or change behavior. Use unique property names when one ViewModel declares
+multiple generated grids.
+
+`NavigationInteractionPropertyName` remains the activated-view bridge documented
+above. It can coexist with the new model properties and should be retained when the
+ViewModel needs item-key current-cell lookup, bring-into-view, or scroll snapshots.
+
+The `GeneratedNavigationPage` sample exercises generated cell/input models, the
+route/context factories, and all four generated bindings as a real application consumer. Its
+ViewModel configures logical and physical keys, dynamic resolution, pointer target
+navigation, click/Enter route activation, stable-key context, and wheel-driven route
+history.
+
 ## Transactional selection events
 
 Generated view event bridges can forward the pre-commit `SelectionChanging` event:
@@ -176,3 +252,4 @@ Generated scroll sampling excludes the new-item placeholder before invoking the 
 - `GeneratedGroupedSharedSelectionPage`: one identity model shared by a grouped DataGrid and ListBox.
 - `PagingSelectionPage`: page/currency defaults and off-page key preservation.
 - `GeneratedVirtualizationInputMetricsPage`: current-cell, XY navigation, and scroll interactions.
+- `GeneratedNavigationPage`: generated cell model, route factory, compiled view bindings, and ViewModel commands.

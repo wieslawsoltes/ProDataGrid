@@ -1266,7 +1266,7 @@ public class DataGridInputNavigationTests
     {
         var method = typeof(DataGrid).GetMethod("ProcessDataGridKey", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic);
         var args = CreateKeyArgs(grid, key, modifiers, InputElement.KeyDownEvent);
-        return method != null && (bool)method.Invoke(grid, new object[] { args })!;
+        return method != null && (bool)method.Invoke(grid, new object[] { args, false })!;
     }
 
     private static bool InvokeKeyHandler(DataGrid grid, string methodName, Key key, KeyModifiers modifiers)

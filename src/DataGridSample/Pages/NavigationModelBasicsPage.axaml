@@ -1,0 +1,48 @@
+<!-- Copyright (c) Wieslaw Soltes. Licensed under the MIT license. -->
+<UserControl x:Class="DataGridSample.Pages.NavigationModelBasicsPage"
+             xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="clr-namespace:DataGridSample.ViewModels"
+             x:DataType="vm:NavigationModelSampleViewModel">
+  <Grid Margin="12" RowDefinitions="Auto,Auto,*,Auto">
+    <StackPanel Spacing="4">
+      <TextBlock FontSize="20" FontWeight="SemiBold" Text="Navigation model basics" />
+      <TextBlock TextWrapping="Wrap"
+                 Text="Semantic movement is independent of gestures. These ReactiveCommands request navigation through the model bound to the grid." />
+    </StackPanel>
+    <WrapPanel Grid.Row="1" Margin="0,10" VerticalAlignment="Center">
+      <Button Margin="0,0,6,6" Content="↑" Command="{CompiledBinding UpCommand}" />
+      <Button Margin="0,0,6,6" Content="↓" Command="{CompiledBinding DownCommand}" />
+      <Button Margin="0,0,6,6" Content="←" Command="{CompiledBinding LeftCommand}" />
+      <Button Margin="0,0,14,6" Content="→" Command="{CompiledBinding RightCommand}" />
+      <Button Margin="0,0,6,6" Content="Row start" Command="{CompiledBinding RowStartCommand}" />
+      <Button Margin="0,0,6,6" Content="Row end" Command="{CompiledBinding RowEndCommand}" />
+      <Button Margin="0,0,6,6" Content="Grid start" Command="{CompiledBinding GridStartCommand}" />
+      <Button Margin="0,0,6,6" Content="Grid end" Command="{CompiledBinding GridEndCommand}" />
+      <Button Margin="0,0,6,6" Content="Page up" Command="{CompiledBinding PageUpCommand}" />
+      <Button Margin="0,0,6,6" Content="Page down" Command="{CompiledBinding PageDownCommand}" />
+    </WrapPanel>
+    <DataGrid Grid.Row="2"
+              ItemsSource="{CompiledBinding Items}"
+              NavigationModel="{CompiledBinding NavigationModel}"
+              AutoGenerateColumns="False"
+              CanUserAddRows="False"
+              SelectionUnit="Cell">
+      <DataGrid.Columns>
+        <DataGridTextColumn Header="ID" Width="90" ColumnKey="id"
+                            Binding="{CompiledBinding Id}" x:DataType="vm:NavigationModelSampleViewModel+NavigationRow" />
+        <DataGridTextColumn Header="Name" Width="2*" ColumnKey="name"
+                            Binding="{CompiledBinding Name}" x:DataType="vm:NavigationModelSampleViewModel+NavigationRow" />
+        <DataGridTextColumn Header="Status" Width="*" ColumnKey="status"
+                            Binding="{CompiledBinding Status}" x:DataType="vm:NavigationModelSampleViewModel+NavigationRow" />
+        <DataGridTextColumn Header="Progress" Width="*" ColumnKey="progress"
+                            Binding="{CompiledBinding Progress, StringFormat={}{0:P0}}" x:DataType="vm:NavigationModelSampleViewModel+NavigationRow" />
+        <DataGridCheckBoxColumn Header="Enabled" Width="100" ColumnKey="enabled"
+                                Binding="{CompiledBinding Enabled}" x:DataType="vm:NavigationModelSampleViewModel+NavigationRow" />
+      </DataGrid.Columns>
+    </DataGrid>
+    <Border Grid.Row="3" Margin="0,10,0,0" Padding="10" CornerRadius="6" Background="#100078D4">
+      <TextBlock Text="{CompiledBinding Status}" TextWrapping="Wrap" />
+    </Border>
+  </Grid>
+</UserControl>

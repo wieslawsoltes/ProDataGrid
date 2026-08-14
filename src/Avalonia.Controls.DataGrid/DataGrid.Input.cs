@@ -8,6 +8,7 @@ using Avalonia.Controls.Primitives;
 using Avalonia.Controls.Utils;
 using Avalonia.Controls.DataGridInteractions;
 using Avalonia.Controls.DataGridEditing;
+using Avalonia.Controls.DataGridNavigation;
 using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.Reactive;
@@ -48,9 +49,15 @@ internal
 
         //TODO TabStop
         //TODO FlowDirection
-        private bool ProcessDataGridKey(KeyEventArgs e)
+        private bool ProcessDataGridKey(KeyEventArgs e, bool navigationInputResolved = false)
         {
             using var _ = BeginSelectionChangeScope(DataGridSelectionChangeSource.Keyboard, e);
+
+            if (!navigationInputResolved &&
+                TryProcessKeyNavigationInput(e, DataGridNavigationInputKind.KeyDown, out bool inputHandled))
+            {
+                return inputHandled;
+            }
 
             var overrides = KeyboardGestureOverrides;
             var defaults = GetDefaultKeyboardGestures();
@@ -59,7 +66,12 @@ internal
             var beginEditGesture = ResolveGesture(overrides?.BeginEdit, defaults.BeginEdit);
             if (MatchesGesture(tabGesture, e, allowAdditionalModifiers: true))
             {
-                return ProcessTabKey(e, allowCtrl: AllowsCtrlModifier(tabGesture));
+                KeyboardHelper.GetMetaKeyState(this, e.KeyModifiers, out bool tabCtrl, out bool shift);
+                return ProcessNavigationCommand(
+                    shift ? DataGridNavigationCommand.Previous : DataGridNavigationCommand.Next,
+                    e,
+                    DataGridNavigationOrigin.Keyboard,
+                    allowCtrlForTab: AllowsCtrlModifier(tabGesture));
             }
             else if (UsesVirtualCellSurface &&
                      e.Key == Key.Space &&
@@ -74,47 +86,55 @@ internal
 
             if (MatchesGesture(ResolveGesture(overrides?.MoveUp, defaults.MoveUp), e, allowAdditionalModifiers: true))
             {
-                focusDataGrid = ProcessUpKey(e);
+                focusDataGrid = ProcessNavigationCommand(DataGridNavigationCommand.Up, e, DataGridNavigationOrigin.Keyboard);
             }
             else if (MatchesGesture(ResolveGesture(overrides?.MoveDown, defaults.MoveDown), e, allowAdditionalModifiers: true))
             {
-                focusDataGrid = ProcessDownKey(e);
+                focusDataGrid = ProcessNavigationCommand(DataGridNavigationCommand.Down, e, DataGridNavigationOrigin.Keyboard);
             }
             else if (MatchesGesture(ResolveGesture(overrides?.MovePageDown, defaults.MovePageDown), e, allowAdditionalModifiers: true))
             {
-                focusDataGrid = ProcessNextKey(e);
+                focusDataGrid = ProcessNavigationCommand(DataGridNavigationCommand.PageDown, e, DataGridNavigationOrigin.Keyboard);
             }
             else if (MatchesGesture(ResolveGesture(overrides?.MovePageUp, defaults.MovePageUp), e, allowAdditionalModifiers: true))
             {
-                focusDataGrid = ProcessPriorKey(e);
+                focusDataGrid = ProcessNavigationCommand(DataGridNavigationCommand.PageUp, e, DataGridNavigationOrigin.Keyboard);
             }
             else if (MatchesGesture(ResolveGesture(overrides?.MoveLeft, defaults.MoveLeft), e, allowAdditionalModifiers: true))
             {
-                focusDataGrid = ProcessLeftKey(e);
+                focusDataGrid = ProcessNavigationCommand(DataGridNavigationCommand.Left, e, DataGridNavigationOrigin.Keyboard);
             }
             else if (MatchesGesture(ResolveGesture(overrides?.MoveRight, defaults.MoveRight), e, allowAdditionalModifiers: true))
             {
-                focusDataGrid = ProcessRightKey(e);
+                focusDataGrid = ProcessNavigationCommand(DataGridNavigationCommand.Right, e, DataGridNavigationOrigin.Keyboard);
             }
             else if (MatchesGesture(beginEditGesture, e, allowAdditionalModifiers: false))
             {
-                return ProcessF2Key(e);
+                return ProcessNavigationCommand(DataGridNavigationCommand.BeginEdit, e, DataGridNavigationOrigin.Keyboard);
             }
             else if (MatchesDefaultBeginEditWithAlt(e, overrides, beginEditGesture))
             {
-                return ProcessF2Key(e);
+                return ProcessNavigationCommand(DataGridNavigationCommand.BeginEdit, e, DataGridNavigationOrigin.Keyboard);
             }
             else if (MatchesGesture(ResolveGesture(overrides?.MoveHome, defaults.MoveHome), e, allowAdditionalModifiers: true))
             {
-                focusDataGrid = ProcessHomeKey(e);
+                KeyboardHelper.GetMetaKeyState(this, e.KeyModifiers, out bool ctrl, out bool homeShift);
+                focusDataGrid = ProcessNavigationCommand(
+                    ctrl ? DataGridNavigationCommand.GridStart : DataGridNavigationCommand.RowStart,
+                    e,
+                    DataGridNavigationOrigin.Keyboard);
             }
             else if (MatchesGesture(ResolveGesture(overrides?.MoveEnd, defaults.MoveEnd), e, allowAdditionalModifiers: true))
             {
-                focusDataGrid = ProcessEndKey(e);
+                KeyboardHelper.GetMetaKeyState(this, e.KeyModifiers, out bool ctrl, out bool endShift);
+                focusDataGrid = ProcessNavigationCommand(
+                    ctrl ? DataGridNavigationCommand.GridEnd : DataGridNavigationCommand.RowEnd,
+                    e,
+                    DataGridNavigationOrigin.Keyboard);
             }
             else if (MatchesGesture(ResolveGesture(overrides?.Enter, defaults.Enter), e, allowAdditionalModifiers: true))
             {
-                focusDataGrid = ProcessEnterKey(e);
+                focusDataGrid = ProcessNavigationCommand(DataGridNavigationCommand.Enter, e, DataGridNavigationOrigin.Keyboard);
                 if (focusDataGrid && _editingColumnIndex != -1)
                 {
                     return true;
@@ -122,7 +142,7 @@ internal
             }
             else if (MatchesGesture(ResolveGesture(overrides?.CancelEdit, defaults.CancelEdit), e, allowAdditionalModifiers: true))
             {
-                return ProcessEscapeKey();
+                return ProcessNavigationCommand(DataGridNavigationCommand.CancelEdit, e, DataGridNavigationOrigin.Keyboard);
             }
             else if (MatchesGesture(ResolveGesture(overrides?.SelectAll, defaults.SelectAll), e, allowAdditionalModifiers: false))
             {
@@ -144,7 +164,7 @@ internal
             }
             else if (MatchesGesture(ResolveGesture(overrides?.ExpandAll, defaults.ExpandAll), e, allowAdditionalModifiers: true))
             {
-                focusDataGrid = ProcessMultiplyKey(e);
+                focusDataGrid = ProcessNavigationCommand(DataGridNavigationCommand.ExpandAll, e, DataGridNavigationOrigin.Keyboard);
             }
 
             if (focusDataGrid)
@@ -488,6 +508,84 @@ internal
 
             var node = _hierarchicalAdapter.NodeAt(hierarchicalIndex);
             RunHierarchicalAction(() => _hierarchicalAdapter.ExpandAll(node));
+            return true;
+        }
+
+        private bool ProcessExpandCommand(bool subtree)
+        {
+            if (!_hierarchicalRowsEnabled || _hierarchicalAdapter == null)
+            {
+                return false;
+            }
+
+            if (WaitForLostFocus(() => ProcessExpandCommand(subtree)))
+            {
+                return true;
+            }
+
+            if (TryHandleGroupSlotAsNode(CurrentSlot, GroupSlotAction.Expand, subtree))
+            {
+                return true;
+            }
+
+            if (!TryGetHierarchicalIndexFromSlot(CurrentSlot, out var hierarchicalIndex) ||
+                !_hierarchicalAdapter.IsExpandable(hierarchicalIndex))
+            {
+                return false;
+            }
+
+            if (subtree)
+            {
+                var node = _hierarchicalAdapter.NodeAt(hierarchicalIndex);
+                RunHierarchicalAction(() => _hierarchicalAdapter.ExpandAll(node));
+                return true;
+            }
+
+            if (_hierarchicalAdapter.IsExpanded(hierarchicalIndex))
+            {
+                return false;
+            }
+
+            _hierarchicalAdapter.Expand(hierarchicalIndex);
+            return true;
+        }
+
+        private bool ProcessCollapseCommand(bool subtree)
+        {
+            if (!_hierarchicalRowsEnabled || _hierarchicalAdapter == null)
+            {
+                return false;
+            }
+
+            if (WaitForLostFocus(() => ProcessCollapseCommand(subtree)))
+            {
+                return true;
+            }
+
+            if (TryHandleGroupSlotAsNode(CurrentSlot, GroupSlotAction.Collapse, subtree))
+            {
+                return true;
+            }
+
+            if (!TryGetHierarchicalIndexFromSlot(CurrentSlot, out var hierarchicalIndex))
+            {
+                return false;
+            }
+
+            if (subtree)
+            {
+                var node = _hierarchicalAdapter.NodeAt(hierarchicalIndex);
+                RunHierarchicalAction(() => _hierarchicalAdapter.CollapseAll(node));
+                return true;
+            }
+
+            if (!_hierarchicalAdapter.IsExpandable(hierarchicalIndex) ||
+                !_hierarchicalAdapter.IsExpanded(hierarchicalIndex))
+            {
+                return false;
+            }
+
+            _hierarchicalAdapter.Collapse(hierarchicalIndex);
             return true;
         }
 
@@ -989,16 +1087,6 @@ internal
 
         private void OnKeyDownRouteFinished(RoutedEventArgs e)
         {
-            if (e.Handled)
-            {
-                if (e is KeyEventArgs handledKeyEventArgs)
-                {
-                    ProcessHandledEditingTabKey(handledKeyEventArgs);
-                }
-
-                return;
-            }
-
             var route = e.Route;
             var isBubble = route.HasFlag(RoutingStrategies.Bubble);
             var isDirect = route == RoutingStrategies.Direct || route == 0;
@@ -1012,12 +1100,21 @@ internal
                 return;
             }
 
+            bool navigationInputResolved = TakeNavigationKeyInputResolved(
+                keyEventArgs,
+                DataGridNavigationInputKind.KeyDown);
+            if (e.Handled)
+            {
+                ProcessHandledEditingTabKey(keyEventArgs);
+                return;
+            }
+
             if (!IsKeyEventFromThisGrid(keyEventArgs))
             {
                 return;
             }
 
-            DataGrid_KeyDown(this, keyEventArgs);
+            ProcessDataGridKeyDown(keyEventArgs, navigationInputResolved);
         }
 
         private void ProcessHandledEditingTabKey(KeyEventArgs e)
@@ -1052,11 +1149,6 @@ internal
 
         private void OnKeyUpRouteFinished(RoutedEventArgs e)
         {
-            if (e.Handled)
-            {
-                return;
-            }
-
             var route = e.Route;
             var isBubble = route.HasFlag(RoutingStrategies.Bubble);
             var isDirect = route == RoutingStrategies.Direct || route == 0;
@@ -1067,6 +1159,12 @@ internal
 
             if (e is not KeyEventArgs keyEventArgs)
             {
+                return;
+            }
+
+            if (e.Handled)
+            {
+                TakeNavigationKeyInputResolved(keyEventArgs, DataGridNavigationInputKind.KeyUp);
                 return;
             }
 
@@ -1207,14 +1305,30 @@ internal
                 return;
             }
 
+            if (NavigationInputModel != null)
+            {
+                if (WasNavigationKeyInputResolved(e, DataGridNavigationInputKind.KeyDown))
+                {
+                    e.Handled = ProcessDataGridKey(e, navigationInputResolved: true);
+                }
+                return;
+            }
+
             e.Handled = ProcessDataGridKey(e);
         }
 
         private void DataGrid_KeyDown(object sender, KeyEventArgs e)
         {
+            ProcessDataGridKeyDown(
+                e,
+                TakeNavigationKeyInputResolved(e, DataGridNavigationInputKind.KeyDown));
+        }
+
+        private void ProcessDataGridKeyDown(KeyEventArgs e, bool navigationInputResolved)
+        {
             if (!e.Handled)
             {
-                e.Handled = ProcessDataGridKey(e);
+                e.Handled = ProcessDataGridKey(e, navigationInputResolved);
             }
         }
 
@@ -1226,8 +1340,18 @@ internal
 
         private void DataGrid_KeyUp(object sender, KeyEventArgs e)
         {
+            bool navigationInputResolved = TakeNavigationKeyInputResolved(
+                e,
+                DataGridNavigationInputKind.KeyUp);
             if (e.Handled)
             {
+                return;
+            }
+
+            if (!navigationInputResolved &&
+                TryProcessKeyNavigationInput(e, DataGridNavigationInputKind.KeyUp, out bool inputHandled))
+            {
+                e.Handled = inputHandled;
                 return;
             }
 

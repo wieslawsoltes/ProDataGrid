@@ -78,6 +78,12 @@ Constructors:
 | `ColumnDefinitionsPropertyName` | `ColumnDefinitions` | Generated definitions property. |
 | `SchemaPropertyName` | `DataGridSchema` | Generated schema property. |
 | `FastPathOptionsPropertyName` | `FastPathOptions` | Generated fast-path options property. |
+| `GenerateNavigationModel` | `false` | Generate one `DataGridNavigationModel` controller property for this grid/ViewModel declaration. |
+| `NavigationModelPropertyName` | `NavigationModel` | Generated cell navigation model property name. |
+| `GenerateNavigationInputModel` | `false` | Generate one normalized `DataGridNavigationInputModel`. |
+| `NavigationInputModelPropertyName` | `NavigationInputModel` | Generated input-policy property name. |
+| `GenerateRouteContextFactory` | `false` | Generate an AOT-safe route-context factory using `[DataGridKey]` when available. |
+| `RouteContextFactoryPropertyName` | `RouteContextFactory` | Generated route-context factory property name. |
 | `ProviderName` | inferred | Existing/generated schema provider to use. |
 | `Strict` | `true` | Strict schema projection. |
 | `Streaming` | `false` | Streaming projection metadata. |
@@ -140,6 +146,10 @@ Constructors:
 | `SearchModelPropertyName` | Search model. |
 | `SearchTextPropertyName` | Two-way search text. |
 | `SelectionModelPropertyName` | Selection model. |
+| `NavigationModelPropertyName` | `IDataGridNavigationModel` cell policy/controller. |
+| `RouteNavigationModelPropertyName` | `IDataGridRouteNavigationModel` application router. |
+| `NavigationInputModelPropertyName` | `IDataGridNavigationInputModel` normalized input policy. |
+| `RouteContextFactoryPropertyName` | `IDataGridRouteContextFactory` stable-key route context factory. |
 | `ClipboardImportModelPropertyName` | `IDataGridClipboardImportModel`. |
 | `FillModelPropertyName` | `IDataGridFillModel`. |
 | `FormulaModelPropertyName` | `IDataGridFormulaModel`. |
@@ -176,7 +186,7 @@ Constructors:
 | `RoutedEventCommandPropertyName` | Command receiving `DataGridGeneratedViewEvent<TItem>`. |
 | `InteractionPropertyNames` | ReactiveUI interaction member names. |
 | `InteractionHandlerTypes` | Matching generated-view handler types. |
-| `NavigationInteractionPropertyName` | Typed current-cell/scroll interaction. |
+| `NavigationInteractionPropertyName` | ReactiveUI-only typed current-cell/scroll bridge; distinct from both navigation models. |
 
 ### Performance and presentation
 
