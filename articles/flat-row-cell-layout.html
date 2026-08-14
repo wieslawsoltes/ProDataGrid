@@ -2,9 +2,9 @@
 <html>
   <head>
     <meta charset="utf-8">
-      <title>Flat row and cell layout | ProDataGrid for Avalonia </title>
+      <title>Visual layout modes | ProDataGrid for Avalonia </title>
       <meta name="viewport" content="width=device-width, initial-scale=1.0">
-      <meta name="title" content="Flat row and cell layout | ProDataGrid for Avalonia ">
+      <meta name="title" content="Visual layout modes | ProDataGrid for Avalonia ">
       
       
       <link rel="icon" href="../favicon.ico">
@@ -81,223 +81,198 @@
         </div>
 
         <article data-uid="">
-<h1 id="flat-row-and-cell-layout">Flat row and cell layout</h1>
+<h1 id="visual-layout-modes">Visual layout modes</h1>
 
-<p>The flat row and cell layout is an opt-in rendering architecture for large,
-fixed-height grids. <code>Flat</code> keeps the existing row and cell containers but places
-them directly under one <code>DataGridRowsPresenter</code>. The eligible fixed-height
-<code>Virtualized</code> path keeps neither row nor display-cell controls: it projects visible
-items into lightweight presenter-owned records and draws them on one surface.
-Editing, automation, and row-level compatibility features materialize retained rows;
-unsupported columns fall back to flat retained cells.</p>
-<p>The default is still <code>DataGridVisualLayoutMode.Nested</code>. Existing applications do
-not change unless they select the keyed <code>DataGridFlatTheme</code> or set
-<code>VisualLayoutMode=&quot;Flat&quot;</code> or <code>VisualLayoutMode=&quot;Virtualized&quot;</code> with a compatible
-row theme.</p>
-<div class="IMPORTANT">
-<h5>Important</h5>
-<p>The initial flat-layout contract requires a finite <code>RowHeight</code>, pixel or star
-visible-column widths, and <code>HeadersVisibility=&quot;Column&quot;</code>. Row details, row
-headers, and collection-view group rows should continue to use the nested
-layout.</p>
-</div>
-<h2 id="why-this-architecture-exists">Why this architecture exists</h2>
-<p>The retained and drawn cell paths reduce the visual subtree <em>inside</em> each cell,
-but the standard layout still creates a nested presenter for every realized row:</p>
-<pre><code class="lang-text">DataGridRowsPresenter
-└─ DataGridRow
-   └─ DataGridCellsPresenter
-      ├─ DataGridCell
-      ├─ DataGridCell
-      └─ ...
-</code></pre>
-<p>The flat mode removes that repeated layout boundary:</p>
-<pre><code class="lang-text">DataGridRowsPresenter
-├─ DataGridRow
-├─ DataGridCell  (row 0, column 0)
-├─ DataGridCell  (row 0, column 1)
-├─ DataGridRow
-├─ DataGridCell  (row 1, column 0)
-└─ ...
-</code></pre>
-<p>The virtual cell mode removes the display-cell controls as well:</p>
-<pre><code class="lang-text">DataGridRowsPresenter
-├─ DataGridVirtualCellSurface  (all compatible display cells)
-└─ DataGridVirtualRowInfo      (non-visual record per visible row)
-</code></pre>
-<p>This follows the central idea used by CDP's <code>FlatSplitPanel</code>: keep the semantic
-model intact, compute geometry centrally, and arrange the realized controls as
-siblings on one surface. In ProDataGrid, the data model can be either a flat
-collection or a <code>HierarchicalModel</code>; visual flattening is independent of data
-hierarchy.</p>
-<h2 id="architecture-contract">Architecture contract</h2>
-<p><code>DataGridRowsPresenter</code> is the single visual-layout owner in flat mode. During
-its measure pass it synchronizes the cells belonging to the realized scrolling
-rows and measures them with the owning column's resolved width and the row's
-fixed height. Column positions, rounded widths, and horizontal visibility are
-computed once per presenter pass rather than once per row. Recycled cells remain
-in a bounded, hidden presenter-owned pool so
-collapse and scroll cycles do not repeatedly detach and rebuild their visual and
-logical relationships. During arrange it
-computes each cell rectangle from:</p>
-<ul>
-<li>the row's vertical slot;</li>
-<li>the column's resolved width;</li>
-<li>horizontal scroll offset;</li>
-<li>left- and right-frozen column regions; and</li>
-<li>the visible cells viewport.</li>
-</ul>
-<p>The implementation preserves these invariants:</p>
+<p>ProDataGrid provides three visual layout modes. The mode is selected per grid, so
+an application can use the compatibility layout for feature-rich grids and a
+lighter layout for large, fixed-height grids.</p>
 <table>
 <thead>
 <tr>
-<th>Concern</th>
-<th>Invariant</th>
+<th>Mode</th>
+<th>Display representation</th>
+<th>Recommended use</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td>Semantic ownership</td>
-<td><code>DataGridCell.OwningRow</code> and <code>OwningColumn</code> remain authoritative; each cell remains a logical child of its row.</td>
+<td><code>Nested</code></td>
+<td>Each realized row owns a cells presenter and retained cell controls.</td>
+<td>Default choice for arbitrary templates, variable row heights, row details, group rows, and custom row features.</td>
 </tr>
 <tr>
-<td>Container lifecycle</td>
-<td>The existing display-data and realization-factory paths create, recycle, and unload rows and cells. Eligible overlapping fixed-height <code>Flat</code> scrolls keep retained rows attached, rotate their logical order, and rebind only entering rows.</td>
+<td><code>Flat</code></td>
+<td>Realized rows and cells are retained controls arranged by one rows presenter.</td>
+<td>Fixed-height grids that need retained cell controls with a smaller visual tree.</td>
 </tr>
 <tr>
-<td>Visual ownership</td>
-<td>Every realized scrolling cell has <code>DataGridRowsPresenter</code> as its direct visual parent.</td>
-</tr>
-<tr>
-<td>Data context</td>
-<td>A promoted cell mirrors its logical owning row's data context through a guarded local value; recycling updates it only when the item changes.</td>
-</tr>
-<tr>
-<td>Virtualization</td>
-<td>Cells outside the realization window remain hidden in the bounded recycled pool; horizontally hidden cells are not measured or arranged.</td>
-</tr>
-<tr>
-<td>Drawn text</td>
-<td>One presenter-owned text-layout cache reuses shaping results across rows and recycling cycles; original cell cache settings are restored when flat ownership ends.</td>
-</tr>
-<tr>
-<td>Grid lines</td>
-<td>Fixed row content keeps <code>RowHeight</code>; a horizontal line contributes the same extra pixel as nested layout and is drawn directly without another visual.</td>
-</tr>
-<tr>
-<td>Frozen columns</td>
-<td>Left, scrolling, and right-frozen regions use the same column metadata as the nested path.</td>
-</tr>
-<tr>
-<td>Compatibility</td>
-<td>Nested layout remains the default and retains its existing templates and behavior.</td>
-</tr>
-<tr>
-<td>AOT</td>
-<td>The path uses ordinary typed APIs and introduces no reflection.</td>
+<td><code>Virtualized</code></td>
+<td>Compatible display cells are drawn by one virtual surface. Editors and compatibility controls are created when required.</td>
+<td>Large, read-mostly grids with fixed row heights, explicit column widths, and typed value accessors.</td>
 </tr>
 </tbody>
 </table>
-<p>In <code>Flat</code>, rows and cells remain controls. In the eligible <code>Virtualized</code> steady
-state, the surface centrally owns row/cell geometry, drawing, clipping, hit testing,
-selection, current-cell state, frozen regions, hierarchy expanders, and shared text
-layout. Editing temporarily materializes the retained visible row window and its
-normal editor; automation permanently selects retained rows for that grid instance.
-Visible model objects implementing <code>INotifyPropertyChanged</code> invalidate the surface
-without creating bindings or cell controls.</p>
-<p>The virtual surface supports text, masked text, autocomplete text, editable combo-box text,
-slider value text, numeric, checkbox, date, time, image, progress, and hierarchical columns
-when they have compatible typed accessors. Text, masked/autocomplete/combo-box binding
-formatting, numeric, date, time and slider-value formatting, text column typography,
-combo-box dropdown glyphs, image stretch, progress styling,
-hierarchy indentation, selection, grid lines, and frozen clipping are drawn directly. It deliberately
-falls back to <code>Flat</code> for arbitrary templates, interactive display controls,
-custom grid or column cell themes, auto/size-to-cells columns, progress text, custom converters
-that need the binding engine, conditional formatting/search descriptors, and
-cell lifecycle event handlers. This fallback is the compatibility mechanism;
-the grid never presents an incomplete drawn substitute for those features.</p>
-<h2 id="enable-the-flat-layout">Enable the flat layout</h2>
-<p>Include one base theme and the optional flat resources:</p>
+<p><code>Nested</code> remains the default. Existing grids are unchanged until they opt into a
+different mode.</p>
+<h2 id="load-the-flat-layout-resources">Load the flat-layout resources</h2>
+<p>Load one Avalonia theme, the matching ProDataGrid v2 theme, and the flat resource
+dictionary:</p>
 <pre><code class="lang-xml">&lt;Application.Styles&gt;
   &lt;FluentTheme /&gt;
   &lt;StyleInclude Source=&quot;avares://Avalonia.Controls.DataGrid/Themes/Fluent.v2.xaml&quot; /&gt;
   &lt;StyleInclude Source=&quot;avares://Avalonia.Controls.DataGrid/Themes/Flat.xaml&quot; /&gt;
 &lt;/Application.Styles&gt;
 </code></pre>
-<p><code>Fluent.Flat.xaml</code> and <code>Simple.Flat.xaml</code> are convenience includes that combine
-the corresponding v2 DataGrid theme with <code>Flat.xaml</code>. The application must still
-include Avalonia's <code>FluentTheme</code> or <code>SimpleTheme</code>.</p>
-<p>Apply the keyed theme only to grids intended for the fast path:</p>
+<p>For the Simple theme, replace <code>FluentTheme</code> and <code>Fluent.v2.xaml</code> with
+<code>SimpleTheme</code> and <code>Simple.v2.xaml</code>.</p>
+<p><code>Flat.xaml</code> is additive. Loading it does not change existing grids. It provides
+the keyed <code>DataGridFlatTheme</code>, which supplies the flat row template and selects
+<code>Flat</code> by default.</p>
+<h2 id="use-flat-mode">Use Flat mode</h2>
+<p>Apply <code>DataGridFlatTheme</code> to a grid with a finite row height and explicit pixel or
+star column widths:</p>
 <pre><code class="lang-xml">&lt;DataGrid Theme=&quot;{StaticResource DataGridFlatTheme}&quot;
-          RowHeight=&quot;32&quot;
-          HeadersVisibility=&quot;Column&quot;
+          VisualLayoutMode=&quot;Flat&quot;
+          ItemsSource=&quot;{CompiledBinding Rows}&quot;
           AutoGenerateColumns=&quot;False&quot;
-          ItemsSource=&quot;{CompiledBinding Rows}&quot;&gt;
+          HeadersVisibility=&quot;Column&quot;
+          RowHeight=&quot;32&quot;&gt;
   &lt;DataGrid.Columns&gt;
     &lt;DataGridTextColumn Header=&quot;Id&quot;
                         Width=&quot;80&quot;
-                        Binding=&quot;{Binding Id}&quot; /&gt;
+                        x:DataType=&quot;models:Person&quot;
+                        Binding=&quot;{CompiledBinding Id}&quot; /&gt;
     &lt;DataGridTextColumn Header=&quot;Name&quot;
-                        Width=&quot;240&quot;
-                        Binding=&quot;{Binding Name}&quot; /&gt;
+                        Width=&quot;*&quot;
+                        x:DataType=&quot;models:Person&quot;
+                        Binding=&quot;{CompiledBinding Name}&quot; /&gt;
   &lt;/DataGrid.Columns&gt;
 &lt;/DataGrid&gt;
 </code></pre>
-<p>Select the fully drawn display path explicitly after applying the same flat
-theme:</p>
+<p>The example assumes that the view declares the <code>models</code> XML namespace.</p>
+<p>Flat mode keeps normal row and cell controls. Selection, editing, validation,
+keyboard input, and automation continue to use the retained control model. The
+main restriction is the flat row template: it is intended for column-only headers
+and does not host row headers or row details.</p>
+<h2 id="use-virtualized-mode">Use Virtualized mode</h2>
+<p>Use the same theme and set <code>VisualLayoutMode=&quot;Virtualized&quot;</code>:</p>
 <pre><code class="lang-xml">&lt;DataGrid Theme=&quot;{StaticResource DataGridFlatTheme}&quot;
           VisualLayoutMode=&quot;Virtualized&quot;
+          ItemsSource=&quot;{CompiledBinding Rows}&quot;
+          ColumnDefinitionsSource=&quot;{CompiledBinding Columns}&quot;
+          AutoGenerateColumns=&quot;False&quot;
+          HeadersVisibility=&quot;Column&quot;
           RowHeight=&quot;32&quot; /&gt;
 </code></pre>
-<p>Use column definitions with compiled/typed value accessors. A hand-created
-column can opt in by assigning <code>DataGridColumnMetadata.ValueAccessor</code>; the
-surface does not introduce reflection to evaluate binding paths.</p>
-<p>The keyed theme sets:</p>
+<p>Virtualized mode also requires compatible typed value accessors. Column
+definitions created with <code>DataGridBindingDefinition</code> provide both the compiled
+binding and the accessor metadata needed by the surface. See
+<a href="virtual-surface-architecture.html">Virtualized cell surface</a> for supported columns,
+configuration, and fallback behavior.</p>
+<h2 id="choose-a-mode">Choose a mode</h2>
+<p>Start with <code>Nested</code> when compatibility is the priority. Choose <code>Flat</code> when all of
+the following are true:</p>
 <ul>
-<li><code>VisualLayoutMode=&quot;Flat&quot;</code>;</li>
-<li>a row theme without <code>DataGridCellsPresenter</code>;</li>
-<li><code>RowHeight=&quot;32&quot;</code>;</li>
-<li><code>UseLightweightFiller=&quot;True&quot;</code>.</li>
+<li>rows have a fixed, finite height;</li>
+<li>visible columns use pixel or star widths;</li>
+<li>row headers and row details are not required; and</li>
+<li>retained controls or templates are still needed for display.</li>
 </ul>
-<p>Including <code>Flat.xaml</code> alone never changes the default theme of another grid.</p>
-<h2 id="smooth-retained-row-scrolling">Smooth retained-row scrolling</h2>
-<p>The exact built-in <code>Flat</code> row path has a narrow optimization for fixed-height
-overlapping scroll windows. A one-row line scroll preserves every overlapping row
-identity, rotates the leaving row to the entering edge, and rebinds only that row.
-When a fractional move does not cross a slot boundary, the already-realized extra
-row remains attached as overscan and no row is rebound, generated, or recycled.</p>
-<p>The optimization is disabled for drawn cells, discontinuous jumps, current or
-focused leaving rows, derived grids or rows, custom factories, lifecycle handlers,
-row details or headers, grouping, search and conditional formatting, auto-sized
-columns, and non-reusable content. Those cases retain the established
-recycle/generate behavior. The paired component and clean-process evidence is in
-the <a href="../../tests/ProDataGrid.FlatLayout.Benchmarks/FLAT-ROW-RETARGET-RESULTS-2026-08-13.md">flat retained-row report</a>.</p>
-<h2 id="flat-data-and-hierarchical-data">Flat data and hierarchical data</h2>
-<p>For ordinary flat data, bind <code>ItemsSource</code> as usual. For hierarchical data,
-continue to configure <code>HierarchicalModel</code>, <code>HierarchicalRowsEnabled</code>, and a
-<code>DataGridHierarchicalColumn</code>. The hierarchy model owns expansion and exposes its
-flattened node sequence; the flat visual layout only changes where realized cell
-controls live.</p>
-<p>This distinction is deliberate:</p>
-<pre><code class="lang-text">hierarchical domain model ──flattened nodes──► row virtualization
-                                                   │
-                                                   ▼
-                                  flat sibling visual surface
-</code></pre>
-<p>Collapsing a branch changes the flattened node sequence. Normal DataGrid
-realization then unloads the affected rows, and the flat surface hides their
-cells during the next synchronized layout pass so the containers can be reused
-without reconstructing the flat relationships.</p>
-<h2 id="comparison-samples">Comparison samples</h2>
-<p>The sample application contains six standalone pages so the visual layout and
-the data shape can be varied independently:</p>
+<p>Choose <code>Virtualized</code> when the Flat requirements are met and the visible columns
+can use the supported surface renderers and typed accessors.</p>
+<table>
+<thead>
+<tr>
+<th>Requirement or feature</th>
+<th style="text-align: right;"><code>Nested</code></th>
+<th style="text-align: right;"><code>Flat</code></th>
+<th style="text-align: right;"><code>Virtualized</code></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Fixed-height rows</td>
+<td style="text-align: right;">Supported</td>
+<td style="text-align: right;">Required</td>
+<td style="text-align: right;">Required for the optimized rowless path</td>
+</tr>
+<tr>
+<td>Pixel and star column widths</td>
+<td style="text-align: right;">Supported</td>
+<td style="text-align: right;">Supported</td>
+<td style="text-align: right;">Supported</td>
+</tr>
+<tr>
+<td>Auto or size-to-cells widths</td>
+<td style="text-align: right;">Supported</td>
+<td style="text-align: right;">Use with care</td>
+<td style="text-align: right;">Retained fallback</td>
+</tr>
+<tr>
+<td>Row headers and row details</td>
+<td style="text-align: right;">Supported</td>
+<td style="text-align: right;">Use <code>Nested</code></td>
+<td style="text-align: right;">Retained compatibility path; prefer <code>Nested</code></td>
+</tr>
+<tr>
+<td>Collection-view group rows</td>
+<td style="text-align: right;">Supported</td>
+<td style="text-align: right;">Use <code>Nested</code></td>
+<td style="text-align: right;">Retained compatibility path; prefer <code>Nested</code></td>
+</tr>
+<tr>
+<td>Arbitrary cell templates and themes</td>
+<td style="text-align: right;">Supported</td>
+<td style="text-align: right;">Supported</td>
+<td style="text-align: right;">Retained fallback</td>
+</tr>
+<tr>
+<td>Selection and current cell</td>
+<td style="text-align: right;">Supported</td>
+<td style="text-align: right;">Supported</td>
+<td style="text-align: right;">Supported</td>
+</tr>
+<tr>
+<td>Editing and validation</td>
+<td style="text-align: right;">Supported</td>
+<td style="text-align: right;">Supported</td>
+<td style="text-align: right;">Supported through retained editors</td>
+</tr>
+<tr>
+<td>UI Automation</td>
+<td style="text-align: right;">Supported</td>
+<td style="text-align: right;">Supported</td>
+<td style="text-align: right;">Supported through retained compatibility rows</td>
+</tr>
+<tr>
+<td>Hierarchical rows</td>
+<td style="text-align: right;">Supported</td>
+<td style="text-align: right;">Supported</td>
+<td style="text-align: right;">Supported for compatible columns</td>
+</tr>
+</tbody>
+</table>
+<p>Fallback is intentional. If a visible column or grid feature cannot be represented
+faithfully by the virtual surface, ProDataGrid keeps the requested mode but uses
+retained flat cells for display.</p>
+<h2 id="hierarchical-data">Hierarchical data</h2>
+<p>Visual layout does not replace the hierarchy model. Configure
+<code>HierarchicalModel</code>, <code>HierarchicalRowsEnabled</code>, and a
+<code>DataGridHierarchicalColumn</code> as usual, then choose the visual mode independently.
+Expansion, collapse, and selection remain owned by the hierarchy and selection
+models.</p>
+<p>For the Virtualized path, the hierarchy column must use a compatible typed text
+accessor and the grid must otherwise satisfy the surface requirements. A custom
+hierarchy cell template uses retained fallback.</p>
+<h2 id="sample-pages">Sample pages</h2>
+<p>The sample gallery provides matched pages for both flat and hierarchical data:</p>
 <table>
 <thead>
 <tr>
 <th>Data shape</th>
-<th>Nested baseline</th>
-<th>Flat retained siblings</th>
-<th>Rowless virtual cell surface</th>
+<th><code>Nested</code></th>
+<th><code>Flat</code></th>
+<th><code>Virtualized</code></th>
 </tr>
 </thead>
 <tbody>
@@ -315,174 +290,30 @@ the data shape can be varied independently:</p>
 </tr>
 </tbody>
 </table>
-<p>The matched pages use the same ViewModels, data generators, 520-pixel grid viewport,
-and navigation controls. The flat-data pages can load up to one million items. The
-hierarchy pages' representative workload expands to 149,792 nodes.</p>
-<p>The two virtual pages select <code>VisualLayoutMode=&quot;Virtualized&quot;</code> explicitly and default
-to the fastest typed-text benchmark endpoint. Their mode selector covers the complete
-native benchmark matrix: text, checkbox, date, time, masked text, autocomplete text,
-slider value text, and editable ComboBox text. An &quot;all supported renderers&quot; choice
-combines them in one horizontally scrollable grid.</p>
-<h2 id="compatibility-matrix">Compatibility matrix</h2>
-<table>
-<thead>
-<tr>
-<th>Feature</th>
-<th style="text-align: right;">Initial flat mode</th>
-<th>Guidance</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>Fixed-height flat rows</td>
-<td style="text-align: right;">Supported</td>
-<td>Preferred workload.</td>
-</tr>
-<tr>
-<td><code>HierarchicalModel</code> rows</td>
-<td style="text-align: right;">Supported</td>
-<td>Use fixed heights and explicit column widths.</td>
-</tr>
-<tr>
-<td>Text, checkbox, template, direct, retained, and drawn cells</td>
-<td style="text-align: right;">Supported by <code>Flat</code></td>
-<td>Cell controls keep their existing behavior.</td>
-</tr>
-<tr>
-<td>Typed text, masked/autocomplete/editable-combo-box/slider text, numeric, checkbox, date, time, image, progress, hierarchy display</td>
-<td style="text-align: right;">Drawn by <code>Virtualized</code></td>
-<td>Uses one surface and zero display-cell controls.</td>
-</tr>
-<tr>
-<td>Editing and validation</td>
-<td style="text-align: right;">Supported</td>
-<td><code>Virtualized</code> temporarily materializes retained rows and the normal active editor.</td>
-</tr>
-<tr>
-<td>Automation peers</td>
-<td style="text-align: right;">Supported through compatibility rows</td>
-<td>Creating the grid peer selects retained rows for the grid instance.</td>
-</tr>
-<tr>
-<td>Templates, interactive display controls, custom themes</td>
-<td style="text-align: right;">Retained fallback</td>
-<td><code>Virtualized</code> automatically uses flat retained cells.</td>
-</tr>
-<tr>
-<td>Frozen left/right columns</td>
-<td style="text-align: right;">Supported</td>
-<td>Geometry and clipping are computed centrally.</td>
-</tr>
-<tr>
-<td>Selection, current cell, fill geometry</td>
-<td style="text-align: right;">Supported</td>
-<td>Virtual geometry is used when no cell control exists.</td>
-</tr>
-<tr>
-<td>Pixel and star column sizing</td>
-<td style="text-align: right;">Supported</td>
-<td>Columns must resolve to finite widths.</td>
-</tr>
-<tr>
-<td>Auto/size-to-cells column sizing</td>
-<td style="text-align: right;">Retained fallback</td>
-<td>Resolve columns to pixel or star widths for the virtual surface.</td>
-</tr>
-<tr>
-<td>Variable/auto row heights</td>
-<td style="text-align: right;">Not in the initial contract</td>
-<td>Use <code>Nested</code>.</td>
-</tr>
-<tr>
-<td>Row headers</td>
-<td style="text-align: right;">Not in the initial flat theme</td>
-<td>Use <code>HeadersVisibility=&quot;Column&quot;</code> or <code>Nested</code>.</td>
-</tr>
-<tr>
-<td>Row details</td>
-<td style="text-align: right;">Not in the initial flat theme</td>
-<td>Use <code>Nested</code>.</td>
-</tr>
-<tr>
-<td>Collection-view group headers</td>
-<td style="text-align: right;">Not optimized</td>
-<td>Use <code>Nested</code> for grouped views.</td>
-</tr>
-</tbody>
-</table>
-<p>If an application needs a feature outside this table, keep that grid on the
-default nested mode. The mode is per-grid, so both architectures can coexist in
-the same view.</p>
-<h2 id="performance-validation">Performance validation</h2>
-<p>Treat the flat mode as a performance option, not an assumption that every grid
-will be faster. Compare identical datasets, viewport sizes, columns, cell modes,
-and scroll traces.</p>
-<p>At minimum, record:</p>
+<p>The Virtualized pages include a mode selector for supported display columns. Use
+these pages to verify appearance and interaction before adapting the configuration
+to an application.</p>
+<h2 id="troubleshooting">Troubleshooting</h2>
+<p>If Virtualized mode appears to use retained cells, check that:</p>
 <ol>
-<li>realized row and cell counts after initial layout and after a long scroll;</li>
-<li>visual and logical descendant counts and maximum visual depth;</li>
-<li>layout-pass duration and allocation rate during repeated vertical and
-horizontal scrolling; and</li>
-<li>retained objects after recycling and closing the host window.</li>
+<li><code>DataGridFlatTheme</code> is applied;</li>
+<li><code>RowHeight</code> is finite and greater than zero;</li>
+<li>every visible column uses a pixel or star width;</li>
+<li>every visible column is supported by the surface;</li>
+<li>every surface-rendered column has a compatible typed value accessor; and</li>
+<li>the grid does not use a custom cell theme, row details, group rows, cell
+lifecycle handlers, conditional formatting, or search highlighting.</li>
 </ol>
-<p>The structural headless tests assert that flat cells are direct presenter
-children, nested grids retain per-row presenters, and scrolling removes stale
-direct children. Benchmark numbers should be published only with runtime,
-platform, viewport, dataset, and build configuration attached.</p>
-<p>The matched hierarchy benchmark is
-<code>OptimizedHierarchyFlatLayoutPerformanceTests</code>. It expands the representative
-149,792-node model, collapses it, pumps layout, captures a headless frame, and
-writes the raw samples to
-<code>artifacts/performance/optimized-hierarchy-layout/optimized-hierarchy-layout-comparison.json</code>.
-Run it with:</p>
-<pre><code class="lang-bash">dotnet test src/DataGridSample.UnitTests/DataGridSample.UnitTests.csproj \
-  -c Release \
-  --filter 'FullyQualifiedName~OptimizedHierarchyFlatLayoutPerformanceTests'
-</code></pre>
-<p>The model-only <code>HierarchyCollapseBenchmarks</code> remains useful for separating
-hierarchy mutation cost from UI work:</p>
-<pre><code class="lang-bash">dotnet run --project tests/ProDataGrid.Hierarchy.Benchmarks/ProDataGrid.Hierarchy.Benchmarks.csproj \
-  -c Release -- --filter '*HierarchyCollapseBenchmarks*' --job short
-</code></pre>
-<h3 id="representative-local-result">Representative local result</h3>
-<p>The authoritative 2026-08-12 run uses BenchmarkDotNet 0.15.8, three independent
-launches, managed-allocation diagnostics, tiered compilation disabled, .NET
-10.0.5 Arm64, macOS 26.6, and an Apple M3 Pro. The complete distributions and
-all six cell paths are recorded in the
-<a href="https://github.com/wieslawsoltes/Avalonia.Controls.DataGrid/blob/master/tests/ProDataGrid.FlatLayout.Benchmarks/RESULTS-2026-08-12.md">checked-in benchmark report</a>.</p>
-<p>For built-in drawn text, pending layout measured 4.085 ms nested and 2.702 ms
-flat: 34% faster with 41% less allocation. The complete collapse, layout, and
-render operation improved from 10.135 to 8.643 ms (15%) with 39% less
-allocation. Retained paths improved by 1–6%; they retain the same cell content
-tree and therefore cannot get a major gain merely from removing one presenter
-per realized row. The model-only 149,792-node <code>CollapseAll</code> run remained
-independent of the visual architecture at 4.39 KB allocated.</p>
-<p>The later virtual-surface comparison on the same machine and built-in-drawn
-149,792-node path measured pending collapse layout at 4.193 ms nested, 3.039 ms
-flat, and 2.772 ms virtualized. End-to-end collapse plus layout measured 10.130,
-8.411, and 8.306 ms respectively. The ShortRun samples are directional because
-each iteration is shorter than BenchmarkDotNet's recommended 100 ms; the native
-source comparison below supplies the broader first-render, expand, collapse,
-scroll, allocation, and structural evidence.</p>
-<p>The full <a href="https://github.com/wieslawsoltes/ProDataGrid/blob/main/tests/ProDataGrid.FlatLayout.Benchmarks/VIRTUAL-SURFACE-RESULTS-2026-08-12.md">virtual-surface report</a>,
-including the matched ProDataGrid retained, drawn-cell, and Wieslaw TreeDataGrid
-source runs, is checked in with the benchmark harness. Raw output remains under
-the gitignored <code>artifacts/virtual-cell-surface</code> directory.</p>
-<h2 id="design-boundaries-and-extension-path">Design boundaries and extension path</h2>
-<p>The initial implementation intentionally does not create a second row/cell
-lifecycle or a parallel column model. New container types should continue to use
-<code>IDataGridRealizationFactory</code>; new cell renderers should continue to use the
-existing column contracts. Future support for auto sizing, row headers, or row
-details belongs behind focused geometry/decoration abstractions rather than
-special cases in cell controls.</p>
-<p>The approach is inspired by the sibling-surface layout in the
-<a href="https://github.com/wieslawsoltes/CDP">CDP project</a>. See also
-<a href="scrolling-virtualization.html">Scrolling and virtualization</a>,
-<a href="optimized-cell-paths.html">Optimized retained and drawn cells</a>, and
-<a href="hierarchical-data.html">Hierarchical data</a>. The implementation-level contracts are
-documented in <a href="virtual-surface-architecture.html">Virtual cell-surface architecture</a>,
-and the phase model and acceptance rules are in
-<a href="layout-performance-benchmarking.html">Layout performance benchmark methodology</a>.</p>
+<p>Use <code>Nested</code> for a grid whose required behavior is outside the flat-layout
+contract. Layout mode is a per-grid choice, not an application-wide setting.</p>
+<h2 id="related-articles">Related articles</h2>
+<ul>
+<li><a href="virtual-surface-architecture.html">Virtualized cell surface</a></li>
+<li><a href="scrolling-virtualization.html">Scrolling and virtualization</a></li>
+<li><a href="optimized-cell-paths.html">Optimized retained and drawn cells</a></li>
+<li><a href="column-definitions-aot.html">Column definitions: AOT-friendly bindings</a></li>
+<li><a href="layout-performance-benchmarking.html">Benchmarking layout performance</a></li>
+</ul>
 
 </article>
 
