@@ -210,14 +210,13 @@ sealed class DataGridUnrealizedRowAutomationPeer : UnrealizedElementAutomationPe
     protected override object? GetProviderCore(Type providerType)
     {
         if (providerType == typeof(IExpandCollapseProvider) &&
-            !TryGetActiveNode(out _))
+            _owner.Owner.HierarchicalModel is null)
         {
             return null;
         }
 
         if (providerType == typeof(ISelectionItemProvider) &&
-            (!TryGetCurrentRowIndex(out _) ||
-             !DataGridAutomationPeer.SupportsRowSelection(_owner.Owner.SelectionUnit)))
+            !DataGridAutomationPeer.SupportsRowSelection(_owner.Owner.SelectionUnit))
         {
             return null;
         }

@@ -64,7 +64,7 @@ public sealed class DataGridRowAutomationPeerTests
     }
 
     [AvaloniaFact]
-    public void Provider_Is_Conditional_And_Follows_Recycled_Row_Data()
+    public void Provider_Is_Stable_While_Hierarchical_Row_Data_Is_Recycled()
     {
         var model = CreateModel(new TreeItem("Root", new TreeItem("Child")));
         model.Expand(model.Root!);
@@ -76,17 +76,22 @@ public sealed class DataGridRowAutomationPeerTests
         };
         var peer = new DataGridRowAutomationPeer(row);
 
-        Assert.Null(peer.GetProvider<IExpandCollapseProvider>());
+        IExpandCollapseProvider provider = Assert.IsAssignableFrom<IExpandCollapseProvider>(
+            peer.GetProvider<IExpandCollapseProvider>());
+        ISelectionItemProvider selectionProvider = Assert.IsAssignableFrom<ISelectionItemProvider>(
+            peer.GetProvider<ISelectionItemProvider>());
+        Assert.Equal(ExpandCollapseState.LeafNode, provider.ExpandCollapseState);
 
         row.DataContext = model.Root;
 
-        IExpandCollapseProvider provider = Assert.IsAssignableFrom<IExpandCollapseProvider>(
-            peer.GetProvider<IExpandCollapseProvider>());
         Assert.Equal(ExpandCollapseState.Expanded, provider.ExpandCollapseState);
 
         row.DataContext = "flat row";
 
-        Assert.Null(peer.GetProvider<IExpandCollapseProvider>());
+        Assert.Same(provider, peer.GetProvider<IExpandCollapseProvider>());
+        Assert.Same(selectionProvider, peer.GetProvider<ISelectionItemProvider>());
+        Assert.Equal(ExpandCollapseState.LeafNode, provider.ExpandCollapseState);
+        Assert.False(selectionProvider.IsSelected);
     }
 
     [AvaloniaFact]
@@ -106,7 +111,7 @@ public sealed class DataGridRowAutomationPeerTests
 
         grid.HierarchicalModel = newModel;
 
-        Assert.Null(peer.GetProvider<IExpandCollapseProvider>());
+        Assert.Same(staleProvider, peer.GetProvider<IExpandCollapseProvider>());
         Assert.Equal(ExpandCollapseState.LeafNode, staleProvider.ExpandCollapseState);
         staleProvider.Expand();
         Assert.False(oldModel.Root!.IsExpanded);
@@ -427,7 +432,7 @@ public sealed class DataGridRowAutomationPeerTests
     }
 
     [AvaloniaFact]
-    public void OffscreenLeaf_DoesNotExposeExpandCollapseProvider()
+    public void OffscreenLeaf_ExposesStableLeafExpandCollapseProvider()
     {
         var children = Enumerable.Range(0, 80)
             .Select(index => new TreeItem($"Leaf {index}"))
@@ -468,7 +473,9 @@ public sealed class DataGridRowAutomationPeerTests
             Assert.Single(selectionProvider.GetSelection()));
 
         Assert.Equal(AutomationControlType.TreeItem, leafPeer.GetAutomationControlType());
-        Assert.Null(leafPeer.GetProvider<IExpandCollapseProvider>());
+        IExpandCollapseProvider expandCollapse = Assert.IsAssignableFrom<
+            IExpandCollapseProvider>(leafPeer.GetProvider<IExpandCollapseProvider>());
+        Assert.Equal(ExpandCollapseState.LeafNode, expandCollapse.ExpandCollapseState);
         Assert.NotNull(leafPeer.GetProvider<ISelectionItemProvider>());
 
         window.Close();
@@ -681,7 +688,10 @@ public sealed class DataGridRowAutomationPeerTests
         Dispatcher.UIThread.RunJobs();
 
         Assert.Equal(0, stateNotifications);
-        Assert.Null(rowPeer.GetProvider<IExpandCollapseProvider>());
+        Assert.Equal(
+            ExpandCollapseState.LeafNode,
+            Assert.IsAssignableFrom<IExpandCollapseProvider>(
+                rowPeer.GetProvider<IExpandCollapseProvider>()).ExpandCollapseState);
 
         row.DataContext = model.Root;
         stateNotifications = 0;

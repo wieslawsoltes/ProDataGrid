@@ -122,13 +122,14 @@ internal
         protected override object? GetProviderCore(Type providerType)
         {
             if (providerType == typeof(IExpandCollapseProvider) &&
-                !TryGetActiveNode(out _, out _))
+                _row.OwningGrid?.HierarchicalModel is null)
             {
                 return null;
             }
 
             if (providerType == typeof(ISelectionItemProvider) &&
-                !TryGetSelectableRow(out _))
+                (_row.OwningGrid is not DataGrid selectionGrid ||
+                 !DataGridAutomationPeer.SupportsRowSelection(selectionGrid.SelectionUnit)))
             {
                 return null;
             }
