@@ -1012,15 +1012,32 @@ namespace Avalonia.Controls.DataGridHierarchical
 
         public void Expand(HierarchicalNode node)
         {
-            ExpandAsync(node, CancellationToken.None).GetAwaiter().GetResult();
+            ExpandAsyncCore(
+                node,
+                CancellationToken.None,
+                continueOnCapturedContext: false).GetAwaiter().GetResult();
         }
 
         public void Expand(IEnumerable items)
         {
-            ExpandAsync(items, CancellationToken.None).GetAwaiter().GetResult();
+            ExpandAsyncCore(
+                items,
+                CancellationToken.None,
+                continueOnCapturedContext: false).GetAwaiter().GetResult();
         }
 
-        public async Task ExpandAsync(HierarchicalNode node, CancellationToken cancellationToken = default)
+        public Task ExpandAsync(
+            HierarchicalNode node,
+            CancellationToken cancellationToken = default) =>
+            ExpandAsyncCore(
+                node,
+                cancellationToken,
+                SynchronizationContext.Current != null);
+
+        private async Task ExpandAsyncCore(
+            HierarchicalNode node,
+            CancellationToken cancellationToken,
+            bool continueOnCapturedContext)
         {
             if (node == null)
             {
@@ -1028,7 +1045,8 @@ namespace Avalonia.Controls.DataGridHierarchical
             }
 
             var loadState = GetLoadState(node);
-            await loadState.ExpandGate.WaitAsync(cancellationToken).ConfigureAwait(false);
+            await loadState.ExpandGate.WaitAsync(cancellationToken)
+                .ConfigureAwait(continueOnCapturedContext);
             try
             {
                 var parentIndex = GetFlattenedIndex(node);
@@ -1055,7 +1073,9 @@ namespace Avalonia.Controls.DataGridHierarchical
 
                 try
                 {
-                    await EnsureChildrenMaterializedAsync(node, forceReload: false, cancellationToken).ConfigureAwait(false);
+                    await EnsureChildrenMaterializedAsync(
+                            node, forceReload: false, cancellationToken)
+                        .ConfigureAwait(continueOnCapturedContext);
                 }
                 catch
                 {
@@ -1095,7 +1115,18 @@ namespace Avalonia.Controls.DataGridHierarchical
             }
         }
 
-        public async Task ExpandAsync(IEnumerable items, CancellationToken cancellationToken = default)
+        public Task ExpandAsync(
+            IEnumerable items,
+            CancellationToken cancellationToken = default) =>
+            ExpandAsyncCore(
+                items,
+                cancellationToken,
+                SynchronizationContext.Current != null);
+
+        private async Task ExpandAsyncCore(
+            IEnumerable items,
+            CancellationToken cancellationToken,
+            bool continueOnCapturedContext)
         {
             if (items == null)
             {
@@ -1117,7 +1148,9 @@ namespace Avalonia.Controls.DataGridHierarchical
                     continue;
                 }
 
-                await ExpandAsync(node, cancellationToken).ConfigureAwait(false);
+                await ExpandAsyncCore(
+                        node, cancellationToken, continueOnCapturedContext)
+                    .ConfigureAwait(continueOnCapturedContext);
             }
         }
 

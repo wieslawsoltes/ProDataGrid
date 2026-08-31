@@ -19,8 +19,8 @@ namespace Avalonia.Controls.DataGridTests.Hierarchical;
 
     public class HierarchicalModelTests
     {
-        private class Item
-        {
+    private class Item
+    {
             public Item(string name)
         {
             Name = name;
@@ -30,6 +30,32 @@ namespace Avalonia.Controls.DataGridTests.Hierarchical;
         public string Name { get; }
 
         public ObservableCollection<Item> Children { get; set; }
+    }
+
+    private sealed class TrackingSynchronizationContext : SynchronizationContext
+    {
+        private int _postCount;
+
+        public int PostCount => Volatile.Read(ref _postCount);
+
+        public override void Post(SendOrPostCallback callback, object? state)
+        {
+            ArgumentNullException.ThrowIfNull(callback);
+            Interlocked.Increment(ref _postCount);
+            ThreadPool.QueueUserWorkItem(_ =>
+            {
+                var previousContext = Current;
+                SetSynchronizationContext(this);
+                try
+                {
+                    callback(state);
+                }
+                finally
+                {
+                    SetSynchronizationContext(previousContext);
+                }
+            });
+        }
     }
 
     private sealed class DuplicateItem
@@ -2292,6 +2318,39 @@ namespace Avalonia.Controls.DataGridTests.Hierarchical;
         Assert.Equal(2, model.Count);
         Assert.False(model.Root!.IsLoading);
         Assert.True(model.Root!.IsExpanded);
+    }
+
+    [Fact]
+    public async Task ChildrenSelectorAsync_PreservesCallerSynchronizationContext()
+    {
+        var root = new Item("root");
+        root.Children.Add(new Item("child"));
+        var model = new HierarchicalModel(new HierarchicalOptions
+        {
+            ChildrenSelectorAsync = async (item, ct) =>
+            {
+                await Task.Delay(10, ct).ConfigureAwait(false);
+                return ((Item)item).Children;
+            }
+        });
+        var context = new TrackingSynchronizationContext();
+        var previousContext = SynchronizationContext.Current;
+        SynchronizationContext? notificationContext = null;
+
+        model.SetRoot(root);
+        model.FlattenedChanged += (_, _) => notificationContext = SynchronizationContext.Current;
+
+        SynchronizationContext.SetSynchronizationContext(context);
+        try
+        {
+            await model.ExpandAsync(model.Root!);
+            Assert.Same(context, notificationContext);
+            Assert.True(context.PostCount > 0);
+        }
+        finally
+        {
+            SynchronizationContext.SetSynchronizationContext(previousContext);
+        }
     }
 
     [Fact]
