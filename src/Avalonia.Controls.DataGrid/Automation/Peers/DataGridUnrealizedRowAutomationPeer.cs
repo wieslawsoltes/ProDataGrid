@@ -34,6 +34,7 @@ sealed class DataGridUnrealizedRowAutomationPeer : UnrealizedElementAutomationPe
     private int _rowIndex;
     private ExpandCollapseState _lastExpandCollapseState;
     private bool _lastIsSelected;
+    private bool _isExpandCollapseProviderExposed;
 
     internal DataGridUnrealizedRowAutomationPeer(
         DataGridAutomationPeer owner,
@@ -209,14 +210,20 @@ sealed class DataGridUnrealizedRowAutomationPeer : UnrealizedElementAutomationPe
 
     protected override object? GetProviderCore(Type providerType)
     {
-        if (providerType == typeof(IExpandCollapseProvider) &&
-            _owner.Owner.HierarchicalModel is null)
+        if (providerType == typeof(IExpandCollapseProvider))
         {
-            return null;
+            if (!_isExpandCollapseProviderExposed &&
+                !TryGetActiveNode(out _))
+            {
+                return null;
+            }
+
+            _isExpandCollapseProviderExposed = true;
         }
 
         if (providerType == typeof(ISelectionItemProvider) &&
-            !DataGridAutomationPeer.SupportsRowSelection(_owner.Owner.SelectionUnit))
+            (!TryGetCurrentRowIndex(out _) ||
+             !DataGridAutomationPeer.SupportsRowSelection(_owner.Owner.SelectionUnit)))
         {
             return null;
         }

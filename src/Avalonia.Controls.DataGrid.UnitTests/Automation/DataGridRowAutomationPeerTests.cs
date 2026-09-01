@@ -72,26 +72,23 @@ public sealed class DataGridRowAutomationPeerTests
         var row = new DataGridRow
         {
             OwningGrid = grid,
-            DataContext = model.GetNode(1)
+            DataContext = model.Root
         };
         var peer = new DataGridRowAutomationPeer(row);
 
         IExpandCollapseProvider provider = Assert.IsAssignableFrom<IExpandCollapseProvider>(
             peer.GetProvider<IExpandCollapseProvider>());
-        ISelectionItemProvider selectionProvider = Assert.IsAssignableFrom<ISelectionItemProvider>(
-            peer.GetProvider<ISelectionItemProvider>());
-        Assert.Equal(ExpandCollapseState.LeafNode, provider.ExpandCollapseState);
-
-        row.DataContext = model.Root;
-
         Assert.Equal(ExpandCollapseState.Expanded, provider.ExpandCollapseState);
+
+        row.DataContext = model.GetNode(1);
+
+        Assert.Same(provider, peer.GetProvider<IExpandCollapseProvider>());
+        Assert.Equal(ExpandCollapseState.LeafNode, provider.ExpandCollapseState);
 
         row.DataContext = "flat row";
 
         Assert.Same(provider, peer.GetProvider<IExpandCollapseProvider>());
-        Assert.Same(selectionProvider, peer.GetProvider<ISelectionItemProvider>());
         Assert.Equal(ExpandCollapseState.LeafNode, provider.ExpandCollapseState);
-        Assert.False(selectionProvider.IsSelected);
     }
 
     [AvaloniaFact]
@@ -432,7 +429,7 @@ public sealed class DataGridRowAutomationPeerTests
     }
 
     [AvaloniaFact]
-    public void OffscreenLeaf_ExposesStableLeafExpandCollapseProvider()
+    public void OffscreenLeaf_DoesNotExposeExpandCollapseProvider()
     {
         var children = Enumerable.Range(0, 80)
             .Select(index => new TreeItem($"Leaf {index}"))
@@ -473,9 +470,7 @@ public sealed class DataGridRowAutomationPeerTests
             Assert.Single(selectionProvider.GetSelection()));
 
         Assert.Equal(AutomationControlType.TreeItem, leafPeer.GetAutomationControlType());
-        IExpandCollapseProvider expandCollapse = Assert.IsAssignableFrom<
-            IExpandCollapseProvider>(leafPeer.GetProvider<IExpandCollapseProvider>());
-        Assert.Equal(ExpandCollapseState.LeafNode, expandCollapse.ExpandCollapseState);
+        Assert.Null(leafPeer.GetProvider<IExpandCollapseProvider>());
         Assert.NotNull(leafPeer.GetProvider<ISelectionItemProvider>());
 
         window.Close();
@@ -688,10 +683,7 @@ public sealed class DataGridRowAutomationPeerTests
         Dispatcher.UIThread.RunJobs();
 
         Assert.Equal(0, stateNotifications);
-        Assert.Equal(
-            ExpandCollapseState.LeafNode,
-            Assert.IsAssignableFrom<IExpandCollapseProvider>(
-                rowPeer.GetProvider<IExpandCollapseProvider>()).ExpandCollapseState);
+        Assert.Null(rowPeer.GetProvider<IExpandCollapseProvider>());
 
         row.DataContext = model.Root;
         stateNotifications = 0;
