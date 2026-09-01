@@ -964,7 +964,9 @@ public class HierarchicalHeadlessTests
         Assert.False(leafRelease.Handled);
         Assert.Equal(2, model.Count);
         Assert.Equal(-1, grid.SelectedIndex);
-        Assert.Null(new DataGridRowAutomationPeer(leafRow).GetProvider<IExpandCollapseProvider>());
+        IExpandCollapseProvider leafProvider = Assert.IsAssignableFrom<IExpandCollapseProvider>(
+            new DataGridRowAutomationPeer(leafRow).GetProvider<IExpandCollapseProvider>());
+        Assert.Equal(ExpandCollapseState.LeafNode, leafProvider.ExpandCollapseState);
         window.Close();
     }
 
