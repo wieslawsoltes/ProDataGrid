@@ -125,7 +125,7 @@ internal
             if (providerType == typeof(IExpandCollapseProvider))
             {
                 if (!_isExpandCollapseProviderExposed &&
-                    !TryGetActiveNode(out _, out _))
+                    !TryGetOwnedNode(out _, out _))
                 {
                     return null;
                 }

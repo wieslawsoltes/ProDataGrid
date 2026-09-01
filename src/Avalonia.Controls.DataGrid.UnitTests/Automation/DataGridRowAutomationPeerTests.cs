@@ -64,6 +64,35 @@ public sealed class DataGridRowAutomationPeerTests
     }
 
     [AvaloniaFact]
+    public void HierarchicalLeafRow_ExposesLeafExpandCollapseProvider()
+    {
+        HierarchicalModel model = CreateModel(new TreeItem("Leaf"));
+        var grid = new DataGrid
+        {
+            HierarchicalModel = model,
+            HierarchicalRowsEnabled = true,
+        };
+        var row = new DataGridRow
+        {
+            OwningGrid = grid,
+            DataContext = model.Root,
+        };
+        var peer = new DataGridRowAutomationPeer(row);
+
+        IExpandCollapseProvider provider = Assert.IsAssignableFrom<IExpandCollapseProvider>(
+            peer.GetProvider<IExpandCollapseProvider>());
+
+        Assert.Equal(AutomationControlType.TreeItem, peer.GetAutomationControlType());
+        Assert.Equal(ExpandCollapseState.LeafNode, provider.ExpandCollapseState);
+
+        provider.Expand();
+        provider.Collapse();
+
+        Assert.False(model.Root!.IsExpanded);
+        Assert.Equal(ExpandCollapseState.LeafNode, provider.ExpandCollapseState);
+    }
+
+    [AvaloniaFact]
     public void Provider_Is_Stable_While_Hierarchical_Row_Data_Is_Recycled()
     {
         var model = CreateModel(new TreeItem("Root", new TreeItem("Child")));
@@ -429,7 +458,7 @@ public sealed class DataGridRowAutomationPeerTests
     }
 
     [AvaloniaFact]
-    public void OffscreenLeaf_DoesNotExposeExpandCollapseProvider()
+    public void OffscreenLeaf_ExposesLeafExpandCollapseProvider()
     {
         var children = Enumerable.Range(0, 80)
             .Select(index => new TreeItem($"Leaf {index}"))
@@ -470,8 +499,15 @@ public sealed class DataGridRowAutomationPeerTests
             Assert.Single(selectionProvider.GetSelection()));
 
         Assert.Equal(AutomationControlType.TreeItem, leafPeer.GetAutomationControlType());
-        Assert.Null(leafPeer.GetProvider<IExpandCollapseProvider>());
+        IExpandCollapseProvider provider = Assert.IsAssignableFrom<IExpandCollapseProvider>(
+            leafPeer.GetProvider<IExpandCollapseProvider>());
+        Assert.Equal(ExpandCollapseState.LeafNode, provider.ExpandCollapseState);
         Assert.NotNull(leafPeer.GetProvider<ISelectionItemProvider>());
+
+        provider.Expand();
+        provider.Collapse();
+
+        Assert.Equal(ExpandCollapseState.LeafNode, provider.ExpandCollapseState);
 
         window.Close();
     }

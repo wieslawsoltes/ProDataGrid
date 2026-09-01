@@ -213,7 +213,7 @@ sealed class DataGridUnrealizedRowAutomationPeer : UnrealizedElementAutomationPe
         if (providerType == typeof(IExpandCollapseProvider))
         {
             if (!_isExpandCollapseProviderExposed &&
-                !TryGetActiveNode(out _))
+                !TryGetOwnedNode(out _))
             {
                 return null;
             }
