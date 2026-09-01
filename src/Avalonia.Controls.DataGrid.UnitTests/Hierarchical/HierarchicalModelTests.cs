@@ -2335,16 +2335,21 @@ namespace Avalonia.Controls.DataGridTests.Hierarchical;
         });
         var context = new TrackingSynchronizationContext();
         var previousContext = SynchronizationContext.Current;
-        SynchronizationContext? notificationContext = null;
+        var notificationContexts = new List<SynchronizationContext?>();
 
         model.SetRoot(root);
-        model.FlattenedChanged += (_, _) => notificationContext = SynchronizationContext.Current;
+        model.Root!.PropertyChanged += (_, _) => notificationContexts.Add(SynchronizationContext.Current);
+        model.NodeLoading += (_, _) => notificationContexts.Add(SynchronizationContext.Current);
+        model.NodeLoaded += (_, _) => notificationContexts.Add(SynchronizationContext.Current);
+        model.NodeExpanded += (_, _) => notificationContexts.Add(SynchronizationContext.Current);
+        model.FlattenedChanged += (_, _) => notificationContexts.Add(SynchronizationContext.Current);
 
         SynchronizationContext.SetSynchronizationContext(context);
         try
         {
             await model.ExpandAsync(model.Root!);
-            Assert.Same(context, notificationContext);
+            Assert.NotEmpty(notificationContexts);
+            Assert.All(notificationContexts, notificationContext => Assert.Same(context, notificationContext));
             Assert.True(context.PostCount > 0);
         }
         finally

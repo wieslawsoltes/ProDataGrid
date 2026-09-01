@@ -1074,7 +1074,10 @@ namespace Avalonia.Controls.DataGridHierarchical
                 try
                 {
                     await EnsureChildrenMaterializedAsync(
-                            node, forceReload: false, cancellationToken)
+                            node,
+                            forceReload: false,
+                            cancellationToken,
+                            continueOnCapturedContext: continueOnCapturedContext)
                         .ConfigureAwait(continueOnCapturedContext);
                 }
                 catch
