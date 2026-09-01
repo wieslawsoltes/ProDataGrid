@@ -382,7 +382,7 @@ sealed class DataGridUnrealizedRowAutomationPeer : UnrealizedElementAutomationPe
         ExpandCollapseState oldState,
         ExpandCollapseState newState)
     {
-        if (oldState != newState)
+        if (_isExpandCollapseProviderExposed && oldState != newState)
         {
             RaisePropertyChangedEvent(
                 ExpandCollapsePatternIdentifiers.ExpandCollapseStateProperty,

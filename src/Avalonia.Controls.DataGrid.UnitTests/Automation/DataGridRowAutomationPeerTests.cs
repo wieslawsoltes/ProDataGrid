@@ -93,6 +93,33 @@ public sealed class DataGridRowAutomationPeerTests
     }
 
     [AvaloniaFact]
+    public void UnexposedHierarchyProvider_DoesNotRaisePatternChangeWhileRowRecycles()
+    {
+        HierarchicalModel model = CreateModel(new TreeItem("Root", new TreeItem("Child")));
+        var grid = new DataGrid { HierarchicalModel = model };
+        var row = new DataGridRow
+        {
+            OwningGrid = grid,
+            DataContext = model.Root,
+        };
+        var peer = new DataGridRowAutomationPeer(row);
+        int notifications = 0;
+        peer.PropertyChanged += (_, e) =>
+        {
+            if (e.Property == ExpandCollapsePatternIdentifiers.ExpandCollapseStateProperty)
+            {
+                notifications++;
+            }
+        };
+
+        row.DataContext = null;
+
+        Assert.Equal(0, notifications);
+        Assert.Null(peer.GetProvider<IExpandCollapseProvider>());
+        Assert.Equal(AutomationControlType.DataItem, peer.GetAutomationControlType());
+    }
+
+    [AvaloniaFact]
     public void Provider_Is_Stable_While_Hierarchical_Row_Data_Is_Recycled()
     {
         var model = CreateModel(new TreeItem("Root", new TreeItem("Child")));
@@ -536,6 +563,8 @@ public sealed class DataGridRowAutomationPeerTests
         Assert.True(grid.IsAttachedToVisualTree());
         var gridPeer = new DataGridAutomationPeer(grid);
         var peer = new DataGridUnrealizedRowAutomationPeer(gridPeer, model.Root!, rowIndex: 0);
+        _ = Assert.IsAssignableFrom<IExpandCollapseProvider>(
+            peer.GetProvider<IExpandCollapseProvider>());
         int callbackThreadId = -1;
         int stateNotifications = 0;
         peer.PropertyChanged += (_, e) =>
@@ -722,6 +751,8 @@ public sealed class DataGridRowAutomationPeerTests
         Assert.Null(rowPeer.GetProvider<IExpandCollapseProvider>());
 
         row.DataContext = model.Root;
+        _ = Assert.IsAssignableFrom<IExpandCollapseProvider>(
+            rowPeer.GetProvider<IExpandCollapseProvider>());
         stateNotifications = 0;
         callbackThreadId = -1;
 

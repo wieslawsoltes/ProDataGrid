@@ -294,7 +294,7 @@ internal
 
         private void RaiseExpandCollapseChanges(ExpandCollapseState oldState, ExpandCollapseState newState)
         {
-            if (oldState == newState)
+            if (!_isExpandCollapseProviderExposed || oldState == newState)
             {
                 return;
             }
