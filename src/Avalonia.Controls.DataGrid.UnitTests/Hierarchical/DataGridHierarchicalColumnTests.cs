@@ -1,7 +1,9 @@
 // Copyright (c) Wiesław Šoltés. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for details.
 
+using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.DataGridHierarchical;
@@ -87,6 +89,55 @@ public class DataGridHierarchicalColumnTests
     }
 
     [AvaloniaFact]
+    public async Task Presenter_Toggle_Preserves_UI_Context_During_Async_Expansion()
+    {
+        var root = new AsyncItem("root");
+        root.Children.Add(new AsyncItem("child"));
+        var model = new HierarchicalModel(new HierarchicalOptions
+        {
+            ChildrenSelectorAsync = async (item, cancellationToken) =>
+            {
+                await Task.Delay(10, cancellationToken).ConfigureAwait(false);
+                return ((AsyncItem)item).Children;
+            }
+        });
+        model.SetRoot(root);
+
+        var grid = new DataGrid
+        {
+            AutoGenerateColumns = false,
+            HierarchicalModel = model,
+            HierarchicalRowsEnabled = true,
+            ItemsSource = model.ObservableFlattened
+        };
+        var column = new TestHierarchicalColumn
+        {
+            Binding = new Binding(nameof(HierarchicalNode.Item))
+        };
+        grid.ColumnsInternal.Add(column);
+        grid.ApplyTemplate();
+        grid.UpdateLayout();
+
+        var cell = new DataGridCell { DataContext = model.Root };
+        var presenter = Assert.IsType<DataGridHierarchicalPresenter>(
+            column.Generate(cell, model.Root!));
+        cell.Content = presenter;
+        presenter.DataContext = model.Root;
+
+        presenter.RaiseEvent(new RoutedEventArgs(
+            DataGridHierarchicalPresenter.ToggleRequestedEvent,
+            presenter));
+
+        for (var attempt = 0; attempt < 100 && model.Count < 2; attempt++)
+        {
+            await Task.Delay(10, TestContext.Current.CancellationToken);
+        }
+
+        Assert.True(model.Root!.IsExpanded);
+        Assert.Equal(2, model.Count);
+    }
+
+    [AvaloniaFact]
     public void ReusedPresenterRebindsContent()
     {
         var column = new TestHierarchicalColumn
@@ -112,5 +163,12 @@ public class DataGridHierarchicalColumnTests
     private sealed class TestHierarchicalColumn : DataGridHierarchicalColumn
     {
         public Control Generate(DataGridCell cell, object item) => GenerateElement(cell, item);
+    }
+
+    private sealed class AsyncItem(string name)
+    {
+        public string Name { get; } = name;
+
+        public List<AsyncItem> Children { get; } = [];
     }
 }
