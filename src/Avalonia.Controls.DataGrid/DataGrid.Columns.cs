@@ -1573,7 +1573,12 @@ internal
                 double oldValue = (double)e.OldValue;
                 foreach (DataGridColumn column in ColumnsInternal.GetDisplayedColumns())
                 {
-                    OnColumnMinWidthChanged(column, Math.Max(column.MinWidth, oldValue));
+                    // Detached grids retain their columns but release column ownership.
+                    // Width coercion will apply the new constraint when they are attached again.
+                    if (ReferenceEquals(column.OwningGrid, this))
+                    {
+                        OnColumnMinWidthChanged(column, Math.Max(column.MinWidth, oldValue));
+                    }
                 }
             }
         }
@@ -1585,7 +1590,10 @@ internal
                 var oldValue = (double)e.OldValue;
                 foreach (DataGridColumn column in ColumnsInternal.GetDisplayedColumns())
                 {
-                    OnColumnMaxWidthChanged(column, Math.Min(column.MaxWidth, oldValue));
+                    if (ReferenceEquals(column.OwningGrid, this))
+                    {
+                        OnColumnMaxWidthChanged(column, Math.Min(column.MaxWidth, oldValue));
+                    }
                 }
             }
         }

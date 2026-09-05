@@ -34,6 +34,7 @@ sealed class DataGridUnrealizedRowAutomationPeer : UnrealizedElementAutomationPe
     private int _rowIndex;
     private ExpandCollapseState _lastExpandCollapseState;
     private bool _lastIsSelected;
+    private bool _isExpandCollapseProviderExposed;
 
     internal DataGridUnrealizedRowAutomationPeer(
         DataGridAutomationPeer owner,
@@ -209,10 +210,15 @@ sealed class DataGridUnrealizedRowAutomationPeer : UnrealizedElementAutomationPe
 
     protected override object? GetProviderCore(Type providerType)
     {
-        if (providerType == typeof(IExpandCollapseProvider) &&
-            !TryGetActiveNode(out _))
+        if (providerType == typeof(IExpandCollapseProvider))
         {
-            return null;
+            if (!_isExpandCollapseProviderExposed &&
+                !TryGetOwnedNode(out _))
+            {
+                return null;
+            }
+
+            _isExpandCollapseProviderExposed = true;
         }
 
         if (providerType == typeof(ISelectionItemProvider) &&
@@ -376,7 +382,7 @@ sealed class DataGridUnrealizedRowAutomationPeer : UnrealizedElementAutomationPe
         ExpandCollapseState oldState,
         ExpandCollapseState newState)
     {
-        if (oldState != newState)
+        if (_isExpandCollapseProviderExposed && oldState != newState)
         {
             RaisePropertyChangedEvent(
                 ExpandCollapsePatternIdentifiers.ExpandCollapseStateProperty,

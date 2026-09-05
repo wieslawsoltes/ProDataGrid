@@ -411,7 +411,7 @@ internal
                 : null;
         }
 
-        private void PresenterOnToggleRequested(object? sender, EventArgs e)
+        private async void PresenterOnToggleRequested(object? sender, EventArgs e)
         {
             if (OwningGrid?.HierarchicalModel == null)
             {
@@ -437,7 +437,7 @@ internal
                     OwningGrid.PrepareHierarchicalAnchor(row.Slot);
                 }
 
-                OwningGrid.HierarchicalModel.Toggle(node);
+                await OwningGrid.HierarchicalModel.ToggleAsync(node);
             }
         }
 
