@@ -1,0 +1,69 @@
+name: Apply chart presentation corrections
+on:
+  push:
+    branches: [charting/advanced-chart-families]
+    paths: [.github/workflows/charting-presentation-fix.yml]
+permissions:
+  contents: write
+jobs:
+  fix:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: charting/advanced-chart-families
+      - name: Apply checked corrections and remove the temporary workflow
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          def once(t, old, new):
+              if t.count(old) != 1:
+                  raise RuntimeError('Expected one reviewed anchor: ' + old[:140])
+              return t.replace(old, new, 1)
+          p = Path('src/ProCharts.Skia/SkiaChartRenderer.Advanced.cs')
+          t = p.read_text()
+          t = once(t, 'cached.Options == style.Advanced)', 'cached.Options == style.Advanced &&\n                cached.GaugeMinimumOverride == style.ValueAxisMinimum && cached.GaugeMaximumOverride == style.ValueAxisMaximum)')
+          t = once(t, 'AdvancedChartContext result = new(snapshot, bounds, hash, style.Advanced, kind);', 'AdvancedChartContext result = new(snapshot, bounds, hash, style.Advanced, kind)\n            {\n                GaugeMinimumOverride = style.ValueAxisMinimum,\n                GaugeMaximumOverride = style.ValueAxisMaximum\n            };')
+          t = once(t, '            public double Minimum { get; set; }', '            public double? GaugeMinimumOverride { get; init; }\n            public double? GaugeMaximumOverride { get; init; }\n            public ChartDataSnapshot LegendSnapshot { get; set; } = ChartDataSnapshot.Empty;\n            public double Minimum { get; set; }')
+          t = once(t, 'DrawLegend(canvas, legend, snapshot, style);', 'DrawLegend(canvas, legend, context.LegendSnapshot, style);')
+          t = once(t, '            result.Plot = CalculatePlotRect(bounds, snapshot, snapshot.Categories, style,', '''            result.LegendSnapshot = snapshot;
+                      if (kind is ChartSeriesKind.Treemap or ChartSeriesKind.Sunburst)
+                      {
+                          result.Hierarchy = snapshot.Hierarchy ?? ChartHierarchySnapshot.FromChartData(snapshot);
+                          ChartHierarchyNode root = result.Hierarchy.Root;
+                          int count = root.IsLeaf ? 1 : root.Children.Count;
+                          ChartSeriesSnapshot[] entries = new ChartSeriesSnapshot[count];
+                          for (int i = 0; i < count; i++)
+                          {
+                              ChartHierarchyNode node = root.IsLeaf ? root : root.Children[i];
+                              entries[i] = new ChartSeriesSnapshot(node.Label ?? node.Id, kind, Array.Empty<double?>());
+                          }
+                          result.LegendSnapshot = new ChartDataSnapshot(Array.Empty<string?>(), Array.AsReadOnly(entries));
+                      }
+                      // Heatmaps use the continuous color scale, not unrelated per-row series colors.
+                      SkiaChartStyle layoutStyle = kind == ChartSeriesKind.Heatmap ? new SkiaChartStyle(style) { ShowLegend = false } : style;
+                      result.Plot = CalculatePlotRect(bounds, result.LegendSnapshot, snapshot.Categories, layoutStyle,'''.replace('\n          ', '\n'))
+          # The hierarchy is already indexed for the matching legend before plot measurement.
+          t = once(t, '                result.Hierarchy = snapshot.Hierarchy ?? ChartHierarchySnapshot.FromChartData(snapshot);\n                if (kind == ChartSeriesKind.Treemap)', '                if (kind == ChartSeriesKind.Treemap)')
+          t = once(t, '                    DrawAdvancedLabel(canvas, rect, node.Label ?? node.Id, text, font, false);', '''                {
+                              SKRect labelRect = rect;
+                              labelRect.Bottom = Math.Min(rect.Bottom, rect.Top + font.Size + 10);
+                              DrawAdvancedLabel(canvas, labelRect, node.Label ?? node.Id, text, font, false);
+                          }'''.replace('\n          ', '\n'))
+          t = once(t, '                    rect.Top += font.Size + 8;\n                    DrawAdvancedLabel', '                    rect.Top += style.ShowCategoryLabels ? font.Size + 10 : 0;\n                    rect.Bottom = Math.Min(rect.Bottom, rect.Top + font.Size + 10);\n                    DrawAdvancedLabel')
+          t = once(t, '                DrawAdvancedLabel(canvas, new SKRect(context.Plot.MidX, top + height,\n                    context.Plot.Right, top + height + font.Size + 6), context.Maximum.ToString("G5", CultureInfo.InvariantCulture), text, font, false);', '                string maximumLabel = context.Maximum.ToString("G5", CultureInfo.InvariantCulture);\n                float maximumWidth = font.MeasureText(maximumLabel, text) + 6;\n                DrawAdvancedLabel(canvas, new SKRect(Math.Max(context.Plot.MidX, context.Plot.Right - maximumWidth), top + height,\n                    context.Plot.Right, top + height + font.Size + 6), maximumLabel, text, font, false);')
+          p.write_text(t)
+          p = Path('src/Avalonia.Controls.DataGrid.UnitTests/Charting/AdvancedChartTests.cs')
+          t = p.read_text()
+          t = once(t, 'renderer.HitTest(new SKPoint(x, y), bounds, snapshot, style)', 'renderer.HitTest(new SKPoint(x + 0.5f, y + 0.5f), bounds, snapshot, style)')
+          p.write_text(t)
+          Path('.github/workflows/charting-presentation-fix.yml').unlink()
+          PY
+          git diff --check
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add src/ProCharts.Skia/SkiaChartRenderer.Advanced.cs src/Avalonia.Controls.DataGrid.UnitTests/Charting/AdvancedChartTests.cs .github/workflows/charting-presentation-fix.yml
+          git commit -m 'Correct gauge range cache keys, pixel-center validation, hierarchy legends and label placement'
+          git push origin HEAD:refs/heads/charting/advanced-chart-families
