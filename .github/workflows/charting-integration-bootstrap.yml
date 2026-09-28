@@ -1,0 +1,52 @@
+name: Prepare chart-family integration hooks
+on:
+  push:
+    branches: [charting/advanced-chart-families]
+    paths: [.github/workflows/charting-integration-bootstrap.yml]
+permissions:
+  contents: write
+jobs:
+  integrate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: charting/advanced-chart-families
+      - name: Apply checked integration hooks
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          def once(text, old, new):
+              if text.count(old) != 1:
+                  raise RuntimeError(f'Expected exactly one integration anchor: {old[:100]}')
+              return text.replace(old, new, 1)
+          p = Path('src/ProCharts/ChartData.cs')
+          text = p.read_text()
+          text = once(text, 'public sealed class ChartDataSnapshot\n', 'public sealed partial class ChartDataSnapshot\n')
+          p.write_text(text)
+          p = Path('src/ProCharts/ChartTypes.cs')
+          text = p.read_text()
+          text = once(text, '        StackedArea100\n', '        StackedArea100,\n        /// <summary>A categorical matrix colored by cell value.</summary>\n        Heatmap,\n        /// <summary>A weighted rectangular hierarchy.</summary>\n        Treemap,\n        /// <summary>A weighted radial hierarchy.</summary>\n        Sunburst,\n        /// <summary>A radial value indicator over a configured interval.</summary>\n        Gauge\n')
+          p.write_text(text)
+          p = Path('src/ProCharts.Skia/SkiaChartRenderer.cs')
+          text = p.read_text()
+          text = once(text, 'public sealed class SkiaChartStyle\n', 'public sealed partial class SkiaChartStyle\n')
+          text = once(text, '            Background = source.Background;\n', '            Advanced = source.Advanced;\n            Background = source.Background;\n')
+          text = once(text, '            style = ResolveStyle(style);\n\n            if (cache != null)', '            style = ResolveStyle(style);\n\n            if (TryRenderAdvanced(canvas, bounds, snapshot, style, delta))\n            {\n                cache?.Invalidate();\n                return;\n            }\n\n            if (cache != null)')
+          def inject_method(text, marker, code):
+              start = text.index(marker)
+              anchor = '            style = ResolveStyle(style);\n'
+              pos = text.index(anchor, start) + len(anchor)
+              return text[:pos] + code + text[pos:]
+          text = inject_method(text, '        public bool TryGetViewportInfo(', '\n            if (IsAdvancedChart(snapshot))\n            {\n                return TryGetAdvancedViewport(bounds, snapshot, style, out info);\n            }\n')
+          text = inject_method(text, '        public SkiaChartHitTestResult? HitTest(SKPoint point,', '            if (IsAdvancedChart(snapshot))\n            {\n                return HitTestAdvanced(point, bounds, snapshot, style);\n            }\n')
+          p.write_text(text)
+          PY
+          git diff --check
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add src/ProCharts/ChartData.cs src/ProCharts/ChartTypes.cs src/ProCharts.Skia/SkiaChartRenderer.cs
+          git commit -m 'Integrate advanced chart families into standard render, export and hit-test entry points'
+          git push origin HEAD:refs/heads/charting/advanced-chart-families
