@@ -79512,6 +79512,19 @@ references:
   isSpec: "True"
   fullName: ProDataGrid.FormulaEngine.FormulaCalculationSettings.MaxDegreeOfParallelism
   nameWithType: FormulaCalculationSettings.MaxDegreeOfParallelism
+- uid: ProDataGrid.FormulaEngine.FormulaCalculationSettings.MaximumArrayCellCount
+  name: MaximumArrayCellCount
+  href: api/ProDataGrid.FormulaEngine.FormulaCalculationSettings.html#ProDataGrid_FormulaEngine_FormulaCalculationSettings_MaximumArrayCellCount
+  commentId: P:ProDataGrid.FormulaEngine.FormulaCalculationSettings.MaximumArrayCellCount
+  fullName: ProDataGrid.FormulaEngine.FormulaCalculationSettings.MaximumArrayCellCount
+  nameWithType: FormulaCalculationSettings.MaximumArrayCellCount
+- uid: ProDataGrid.FormulaEngine.FormulaCalculationSettings.MaximumArrayCellCount*
+  name: MaximumArrayCellCount
+  href: api/ProDataGrid.FormulaEngine.FormulaCalculationSettings.html#ProDataGrid_FormulaEngine_FormulaCalculationSettings_MaximumArrayCellCount_
+  commentId: Overload:ProDataGrid.FormulaEngine.FormulaCalculationSettings.MaximumArrayCellCount
+  isSpec: "True"
+  fullName: ProDataGrid.FormulaEngine.FormulaCalculationSettings.MaximumArrayCellCount
+  nameWithType: FormulaCalculationSettings.MaximumArrayCellCount
 - uid: ProDataGrid.FormulaEngine.FormulaCalculationSettings.NumberPrecisionDigits
   name: NumberPrecisionDigits
   href: api/ProDataGrid.FormulaEngine.FormulaCalculationSettings.html#ProDataGrid_FormulaEngine_FormulaCalculationSettings_NumberPrecisionDigits

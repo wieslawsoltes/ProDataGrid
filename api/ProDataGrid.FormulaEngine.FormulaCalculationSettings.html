@@ -517,6 +517,50 @@ Class FormulaCalculationSettings  <a class="header-action link-secondary" title=
 
 
 
+  <a id="ProDataGrid_FormulaEngine_FormulaCalculationSettings_MaximumArrayCellCount_" data-uid="ProDataGrid.FormulaEngine.FormulaCalculationSettings.MaximumArrayCellCount*"></a>
+
+  <h3 id="ProDataGrid_FormulaEngine_FormulaCalculationSettings_MaximumArrayCellCount" data-uid="ProDataGrid.FormulaEngine.FormulaCalculationSettings.MaximumArrayCellCount">
+  MaximumArrayCellCount
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/ProDataGrid.FormulaEngine/FormulaCalculationSettings.ArrayLimits.cs/#L24"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Gets or sets the maximum number of cells allocated by SEQUENCE and the modern
+Excel array-shaping functions. The default is 1,048,576 cells per result.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public int MaximumArrayCellCount { get; set; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+  <h4 class="section" id="ProDataGrid_FormulaEngine_FormulaCalculationSettings_MaximumArrayCellCount_remarks">Remarks</h4>
+  <div class="markdown level1 remarks"><p>This bounds individual function outputs, not total workbook memory. Existing
+reference materialization and other evaluator operations have separate costs.
+Excel row/column limits still apply even when this value is increased.</p>
+</div>
+
+  <h4 class="section">Exceptions</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.argumentoutofrangeexception">ArgumentOutOfRangeException</a></dt>
+    <dd><p>The value is less than one.</p>
+</dd>
+  </dl>
+
+
+
   <a id="ProDataGrid_FormulaEngine_FormulaCalculationSettings_NumberPrecisionDigits_" data-uid="ProDataGrid.FormulaEngine.FormulaCalculationSettings.NumberPrecisionDigits*"></a>
 
   <h3 id="ProDataGrid_FormulaEngine_FormulaCalculationSettings_NumberPrecisionDigits" data-uid="ProDataGrid.FormulaEngine.FormulaCalculationSettings.NumberPrecisionDigits">
