@@ -32,12 +32,14 @@ namespace ProDataGrid.Charting
 
         public static void Return(List<T> list)
         {
-            list.Clear();
+            // Discard oversized storage. Shrinking it would allocate a replacement array
+            // merely to return the list, even when the pool is already full.
             if (list.Capacity > MaxCapacity)
             {
-                list.Capacity = MaxCapacity;
+                return;
             }
 
+            list.Clear();
             lock (Gate)
             {
                 if (Items.Count < MaxPoolSize)

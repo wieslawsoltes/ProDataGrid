@@ -4,6 +4,7 @@
 #nullable enable
 
 using System;
+using System.Buffers;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 
@@ -319,10 +320,21 @@ namespace ProDataGrid.FormulaEngine
             }
 
             var observer = context.Workbook.Settings.CalculationObserver;
-            if (context.Workbook.Settings.EnableCompiledExpressions && !ContainsReferenceOperators(expression))
+            if (context.Workbook.Settings.EnableCompiledExpressions)
             {
-                var compiled = GetCompiledExpression(expression, context.FunctionRegistry, observer);
-                return EvaluateCompiled(compiled, context, resolver);
+                // The cached plan already passed the reference-operator eligibility check.
+                // Do not walk the AST (or allocate a traversal stack) on every cache hit.
+                if (_compiledCache.TryGetValue(expression, out var cached) && cached.IsCompatibleWith(context.FunctionRegistry))
+                {
+                    observer?.OnExpressionCompiled(expression, cached.Instructions.Length, TimeSpan.Zero, fromCache: true);
+                    return EvaluateCompiled(cached, context, resolver);
+                }
+
+                if (!ContainsReferenceOperators(expression))
+                {
+                    var compiled = GetCompiledExpression(expression, context.FunctionRegistry, observer);
+                    return EvaluateCompiled(compiled, context, resolver);
+                }
             }
 
             return EvaluateCore(expression, context, resolver);
@@ -380,7 +392,7 @@ namespace ProDataGrid.FormulaEngine
         {
             if (_compiledCache.TryGetValue(expression, out var compiled))
             {
-                if (ReferenceEquals(compiled.FunctionRegistry, functionRegistry))
+                if (compiled.IsCompatibleWith(functionRegistry))
                 {
                     observer?.OnExpressionCompiled(expression, compiled.Instructions.Length, TimeSpan.Zero, fromCache: true);
                     return compiled;
@@ -408,99 +420,111 @@ namespace ProDataGrid.FormulaEngine
         {
             var instructions = compiled.Instructions;
             var stack = compiled.MaxStackDepth > 0
-                ? new FormulaValue[compiled.MaxStackDepth]
+                ? ArrayPool<FormulaValue>.Shared.Rent(compiled.MaxStackDepth)
                 : Array.Empty<FormulaValue>();
-            var sp = 0;
-
-            foreach (var instruction in instructions)
+            try
             {
-                switch (instruction.Kind)
+                var sp = 0;
+
+                foreach (var instruction in instructions)
                 {
-                    case FormulaInstructionKind.Literal:
-                        var literal = instruction.Literal;
-                        if (literal.Kind == FormulaValueKind.Number)
-                        {
-                            literal = CreateNumber(context, literal.AsNumber());
-                        }
-                        stack[sp++] = literal;
-                        break;
-                    case FormulaInstructionKind.Name:
-                        stack[sp++] = EvaluateName(instruction.Name ?? string.Empty, context, resolver);
-                        break;
-                    case FormulaInstructionKind.Reference:
-                        stack[sp++] = EvaluateReference(instruction.Reference, context, resolver);
-                        break;
-                    case FormulaInstructionKind.StructuredReference:
-                        stack[sp++] = EvaluateStructuredReference(instruction.StructuredReference, context, resolver);
-                        break;
-                    case FormulaInstructionKind.Unary:
-                        if (sp == 0)
-                        {
-                            return FormulaValue.FromError(new FormulaError(FormulaErrorType.Calc));
-                        }
-                        var operand = stack[--sp];
-                        stack[sp++] = ApplyUnaryOperator(instruction.UnaryOperator, operand, context);
-                        break;
-                    case FormulaInstructionKind.Binary:
-                        if (sp < 2)
-                        {
-                            return FormulaValue.FromError(new FormulaError(FormulaErrorType.Calc));
-                        }
-                        var right = stack[--sp];
-                        var left = stack[--sp];
-                        stack[sp++] = EvaluateBinaryOperator(instruction.BinaryOperator, left, right, context, resolver);
-                        break;
-                    case FormulaInstructionKind.FunctionCall:
-                        if (sp < instruction.ArgCount)
-                        {
-                            return FormulaValue.FromError(new FormulaError(FormulaErrorType.Calc));
-                        }
-                        var args = new FormulaValue[instruction.ArgCount];
-                        for (var i = instruction.ArgCount - 1; i >= 0; i--)
-                        {
-                            args[i] = stack[--sp];
-                        }
-                        stack[sp++] = InvokeFunction(instruction.Name ?? string.Empty, args, context);
-                        break;
-                    case FormulaInstructionKind.LazyFunctionCall:
-                        stack[sp++] = InvokeLazyFunction(
-                            instruction.Name ?? string.Empty,
-                            instruction.LazyArguments ?? Array.Empty<FormulaExpression>(),
-                            context,
-                            resolver);
-                        break;
-                    case FormulaInstructionKind.ArrayLiteral:
-                        if (sp < instruction.RowCount * instruction.ColumnCount)
-                        {
-                            return FormulaValue.FromError(new FormulaError(FormulaErrorType.Calc));
-                        }
-                        var array = new FormulaArray(instruction.RowCount, instruction.ColumnCount);
-                        for (var row = instruction.RowCount - 1; row >= 0; row--)
-                        {
-                            for (var column = instruction.ColumnCount - 1; column >= 0; column--)
+                    switch (instruction.Kind)
+                    {
+                        case FormulaInstructionKind.Literal:
+                            var literal = instruction.Literal;
+                            if (literal.Kind == FormulaValueKind.Number)
                             {
-                                var value = stack[--sp];
-                                if (value.Kind == FormulaValueKind.Array)
-                                {
-                                    value = FormulaValue.FromError(new FormulaError(FormulaErrorType.Value));
-                                }
-                                array[row, column] = value;
+                                literal = CreateNumber(context, literal.AsNumber());
                             }
-                        }
-                        stack[sp++] = FormulaValue.FromArray(array);
-                        break;
-                    default:
-                        stack[sp++] = FormulaValue.FromError(new FormulaError(FormulaErrorType.Calc));
-                        break;
+                            stack[sp++] = literal;
+                            break;
+                        case FormulaInstructionKind.Name:
+                            stack[sp++] = EvaluateName(instruction.Name ?? string.Empty, context, resolver);
+                            break;
+                        case FormulaInstructionKind.Reference:
+                            stack[sp++] = EvaluateReference(instruction.Reference, context, resolver);
+                            break;
+                        case FormulaInstructionKind.StructuredReference:
+                            stack[sp++] = EvaluateStructuredReference(instruction.StructuredReference, context, resolver);
+                            break;
+                        case FormulaInstructionKind.Unary:
+                            if (sp == 0)
+                            {
+                                return FormulaValue.FromError(new FormulaError(FormulaErrorType.Calc));
+                            }
+                            var operand = stack[--sp];
+                            stack[sp++] = ApplyUnaryOperator(instruction.UnaryOperator, operand, context);
+                            break;
+                        case FormulaInstructionKind.Binary:
+                            if (sp < 2)
+                            {
+                                return FormulaValue.FromError(new FormulaError(FormulaErrorType.Calc));
+                            }
+                            var right = stack[--sp];
+                            var left = stack[--sp];
+                            stack[sp++] = EvaluateBinaryOperator(instruction.BinaryOperator, left, right, context, resolver);
+                            break;
+                        case FormulaInstructionKind.FunctionCall:
+                            if (sp < instruction.ArgCount)
+                            {
+                                return FormulaValue.FromError(new FormulaError(FormulaErrorType.Calc));
+                            }
+                            var args = instruction.ArgCount == 0 ? Array.Empty<FormulaValue>() : new FormulaValue[instruction.ArgCount];
+                            for (var i = instruction.ArgCount - 1; i >= 0; i--)
+                            {
+                                args[i] = stack[--sp];
+                            }
+                            stack[sp++] = InvokeFunction(instruction.Name ?? string.Empty, args, context);
+                            break;
+                        case FormulaInstructionKind.LazyFunctionCall:
+                            stack[sp++] = InvokeLazyFunction(
+                                instruction.Name ?? string.Empty,
+                                instruction.LazyArguments ?? Array.Empty<FormulaExpression>(),
+                                context,
+                                resolver);
+                            break;
+                        case FormulaInstructionKind.ArrayLiteral:
+                            if (sp < instruction.RowCount * instruction.ColumnCount)
+                            {
+                                return FormulaValue.FromError(new FormulaError(FormulaErrorType.Calc));
+                            }
+                            var array = new FormulaArray(instruction.RowCount, instruction.ColumnCount);
+                            for (var row = instruction.RowCount - 1; row >= 0; row--)
+                            {
+                                for (var column = instruction.ColumnCount - 1; column >= 0; column--)
+                                {
+                                    var value = stack[--sp];
+                                    if (value.Kind == FormulaValueKind.Array)
+                                    {
+                                        value = FormulaValue.FromError(new FormulaError(FormulaErrorType.Value));
+                                    }
+                                    array[row, column] = value;
+                                }
+                            }
+                            stack[sp++] = FormulaValue.FromArray(array);
+                            break;
+                        default:
+                            stack[sp++] = FormulaValue.FromError(new FormulaError(FormulaErrorType.Calc));
+                            break;
+                    }
+                }
+
+                if (sp != 1)
+                {
+                    return FormulaValue.FromError(new FormulaError(FormulaErrorType.Calc));
+                }
+
+                return stack[0];
+            }
+            finally
+            {
+                if (stack.Length > 0)
+                {
+                    // FormulaValue can retain strings, arrays and workbook references.
+                    // Each invocation rents independently, including reentrant UDF calls.
+                    ArrayPool<FormulaValue>.Shared.Return(stack, clearArray: true);
                 }
             }
-
-            if (sp != 1)
-            {
-                return FormulaValue.FromError(new FormulaError(FormulaErrorType.Calc));
-            }
-
-            return stack[0];
         }
 
         private FormulaValue EvaluateCore(
