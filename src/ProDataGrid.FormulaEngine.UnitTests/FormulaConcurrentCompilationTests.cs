@@ -53,7 +53,7 @@ namespace ProDataGrid.FormulaEngine.Tests
             var first = new ExcelFunctionRegistry();
             var second = new ExcelFunctionRegistry();
             first.Register(new ConstantFunction(17));
-            second.Register(new ConstantFunction(31));
+            second.Register(new LazyConstantFunction());
             var firstContext = Context(first);
             var secondContext = Context(second);
             var evaluator = new FormulaEvaluator();
@@ -95,6 +95,16 @@ namespace ProDataGrid.FormulaEngine.Tests
             public string Name => "CUSTOM";
             public FormulaFunctionInfo Info { get; } = new FormulaFunctionInfo(0, 0);
             public FormulaValue Invoke(FormulaFunctionContext context, IReadOnlyList<FormulaValue> args) => FormulaValue.FromNumber(_value);
+        }
+
+        private sealed class LazyConstantFunction : ILazyFormulaFunction
+        {
+            public string Name => "CUSTOM";
+            public FormulaFunctionInfo Info { get; } = new FormulaFunctionInfo(0, 0);
+            public FormulaValue Invoke(FormulaFunctionContext context, IReadOnlyList<FormulaValue> args)
+                => FormulaValue.FromError(new FormulaError(FormulaErrorType.Calc));
+            public FormulaValue InvokeLazy(FormulaFunctionContext context, IReadOnlyList<FormulaExpression> args,
+                FormulaEvaluator evaluator, IFormulaValueResolver resolver) => FormulaValue.FromNumber(31);
         }
 
         private sealed class ReentrantObserver : IFormulaCalculationObserver
