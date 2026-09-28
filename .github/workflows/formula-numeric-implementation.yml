@@ -1,4 +1,4 @@
-name: Formula numeric fast-path validation
+name: Formula numeric final integration validation
 on:
   push:
     branches: [work/formula-numeric-fast-path]
@@ -8,9 +8,7 @@ jobs:
   validate:
     if: github.repository == 'wieslawsoltes/ProDataGrid'
     runs-on: ubuntu-latest
-    timeout-minutes: 20
-    env:
-      DOTNET_TieredCompilation: '0'
+    timeout-minutes: 15
     steps:
       - uses: actions/checkout@v4
         with:
@@ -19,43 +17,45 @@ jobs:
       - uses: actions/setup-dotnet@v4
         with:
           global-json-file: global.json
-      - name: Integrate master and apply guarded numeric edits
+      - name: Integrate master, strengthen lazy registry regression and remove scaffolding
         run: |
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
           git fetch origin master
           git merge --no-edit origin/master
-          python3 tools/apply-formula-numeric.py
-      - name: Execute integrated formula regressions
+          python3 - <<'PY'
+          from pathlib import Path
+          file = Path('src/ProDataGrid.FormulaEngine.UnitTests/FormulaConcurrentCompilationTests.cs')
+          text = file.read_text(encoding='utf-8')
+          old = 'second.Register(new ConstantFunction(31));'
+          assert text.count(old) == 1
+          text = text.replace(old, 'second.Register(new LazyConstantFunction());')
+          marker = '        private sealed class ReentrantObserver'
+          assert text.count(marker) == 1
+          text = text.replace(marker, '''        private sealed class LazyConstantFunction : ILazyFormulaFunction
+                  {
+                      public string Name => "CUSTOM";
+                      public FormulaFunctionInfo Info { get; } = new FormulaFunctionInfo(0, 0);
+                      public FormulaValue Invoke(FormulaFunctionContext context, IReadOnlyList<FormulaValue> args)
+                          => FormulaValue.FromError(new FormulaError(FormulaErrorType.Calc));
+                      public FormulaValue InvokeLazy(FormulaFunctionContext context, IReadOnlyList<FormulaExpression> args,
+                          FormulaEvaluator evaluator, IFormulaValueResolver resolver) => FormulaValue.FromNumber(31);
+                  }
+
+          '''.replace('                  ', '        ').replace('                      ', '            ').replace('                          ', '                ') + marker)
+          file.write_text(text, encoding='utf-8')
+          PY
+          git rm tools/apply-formula-numeric.py .github/workflows/formula-numeric-implementation.yml
+          git add src/ProDataGrid.FormulaEngine.UnitTests/FormulaConcurrentCompilationTests.cs
+          git commit -m 'Finalize numeric and concurrent compilation regressions without implementation scaffolding'
+      - name: Validate integrated production source
         run: |
-          git diff --check
+          git diff HEAD^ --check
           dotnet test src/ProDataGrid.FormulaEngine.UnitTests/ProDataGrid.FormulaEngine.UnitTests.csproj -c Release --logger trx --results-directory artifacts/formula
-      - name: Commit validated implementation
-        run: |
-          git add src/ProDataGrid.FormulaEngine/FormulaEvaluation.cs tools/formula-benchmarks/Program.cs
-          git commit -m 'Specialize numeric operations while preserving general coercion behavior'
-      - name: Build identical benchmark harness against baseline and current source
-        run: |
-          BASE="$RUNNER_TEMP/formula-numeric-baseline"
-          git worktree add --detach "$BASE" d64efcb07798334d2d742d1ee538ebe955fad5be
-          cp tools/formula-benchmarks/Program.cs "$BASE/tools/formula-benchmarks/Program.cs"
-          dotnet build tools/formula-benchmarks/FormulaBenchmarks.csproj -c Release
-          dotnet build "$BASE/tools/formula-benchmarks/FormulaBenchmarks.csproj" -c Release
-          lscpu > artifacts/formula/cpu.txt
-          dotnet --info > artifacts/formula/runtime.txt
-          printf 'baseline=d64efcb07798334d2d742d1ee538ebe955fad5be\nhead=%s\nDOTNET_TieredCompilation=0\norder=baseline,current,current,baseline\n' "$(git rev-parse HEAD)" > artifacts/formula/revisions.txt
-      - name: Run measured baseline-current-current-baseline comparison
-        run: |
-          BASE="$RUNNER_TEMP/formula-numeric-baseline"
-          ROOT="$PWD"
-          dotnet run --no-build -c Release --project "$BASE/tools/formula-benchmarks/FormulaBenchmarks.csproj" -- "$ROOT/artifacts/formula/baseline-1.csv" baseline-1
-          dotnet run --no-build -c Release --project tools/formula-benchmarks/FormulaBenchmarks.csproj -- "$ROOT/artifacts/formula/current-1.csv" current-1
-          dotnet run --no-build -c Release --project tools/formula-benchmarks/FormulaBenchmarks.csproj -- "$ROOT/artifacts/formula/current-2.csv" current-2
-          dotnet run --no-build -c Release --project "$BASE/tools/formula-benchmarks/FormulaBenchmarks.csproj" -- "$ROOT/artifacts/formula/baseline-2.csv" baseline-2
-      - name: Push validated implementation
+      - name: Push validated clean branch
         run: git push origin HEAD:work/formula-numeric-fast-path
       - uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: formula-numeric-validation-and-benchmarks
-          path: artifacts/formula/*
+          name: formula-numeric-final-integration
+          path: artifacts/formula/*.trx
