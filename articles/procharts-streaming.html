@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+      <title>Bounded streaming charts and decimation | ProDataGrid for Avalonia </title>
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <meta name="title" content="Bounded streaming charts and decimation | ProDataGrid for Avalonia ">
+      
+      
+      <link rel="icon" href="../favicon.ico">
+      <link rel="stylesheet" href="../public/docfx.min.css">
+      <link rel="stylesheet" href="../public/main.css">
+      <meta name="docfx:navrel" content="../toc.html">
+      <meta name="docfx:tocrel" content="toc.html">
+      
+      
+      
+      
+      <meta name="docfx:docurl" content="https://github.com/wieslawsoltes/ProDataGrid/blob/master/docfx/articles/procharts-streaming.md/#L1">
+      <meta name="loc:inThisArticle" content="In this article">
+      <meta name="loc:searchResultsCount" content="{count} results for &quot;{query}&quot;">
+      <meta name="loc:searchNoResults" content="No results for &quot;{query}&quot;">
+      <meta name="loc:tocFilter" content="Filter by title">
+      <meta name="loc:nextArticle" content="Next">
+      <meta name="loc:prevArticle" content="Previous">
+      <meta name="loc:themeLight" content="Light">
+      <meta name="loc:themeDark" content="Dark">
+      <meta name="loc:themeAuto" content="Auto">
+      <meta name="loc:changeTheme" content="Change theme">
+      <meta name="loc:copy" content="Copy">
+      <meta name="loc:downloadPdf" content="Download PDF">
+
+      <script type="module" src="./../public/docfx.min.js"></script>
+
+      <script>
+        const theme = localStorage.getItem('theme') || 'auto'
+        document.documentElement.setAttribute('data-bs-theme', theme === 'auto' ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light') : theme)
+      </script>
+
+  </head>
+
+  <body class="tex2jax_ignore" data-layout="" data-yaml-mime="">
+    <header class="bg-body border-bottom">
+      <nav id="autocollapse" class="navbar navbar-expand-md" role="navigation">
+        <div class="container-xxl flex-nowrap">
+          <a class="navbar-brand" href="../index.html">
+            <img id="logo" class="svg" src="../images/logo.svg" alt="">
+            
+          </a>
+          <button class="btn btn-lg d-md-none border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navpanel" aria-controls="navpanel" aria-expanded="false" aria-label="Toggle navigation">
+            <i class="bi bi-three-dots"></i>
+          </button>
+          <div class="collapse navbar-collapse" id="navpanel">
+            <div id="navbar">
+            </div>
+          </div>
+        </div>
+      </nav>
+    </header>
+
+    <main class="container-xxl">
+      <div class="toc-offcanvas">
+        <div class="offcanvas-md offcanvas-start" tabindex="-1" id="tocOffcanvas" aria-labelledby="tocOffcanvasLabel">
+          <div class="offcanvas-header">
+            <h5 class="offcanvas-title" id="tocOffcanvasLabel">Table of Contents</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="offcanvas" data-bs-target="#tocOffcanvas" aria-label="Close"></button>
+          </div>
+          <div class="offcanvas-body">
+            <nav class="toc" id="toc"></nav>
+          </div>
+        </div>
+      </div>
+
+      <div class="content">
+        <div class="actionbar">
+          <button class="btn btn-lg border-0 d-md-none" type="button" data-bs-toggle="offcanvas" data-bs-target="#tocOffcanvas" aria-controls="tocOffcanvas" aria-expanded="false" aria-label="Show table of contents">
+            <i class="bi bi-list"></i>
+          </button>
+
+          <nav id="breadcrumb"></nav>
+        </div>
+
+        <article data-uid="">
+<h1 id="bounded-streaming-charts-and-decimation">Bounded streaming charts and decimation</h1>
+
+<p><code>StreamingChartDataSource</code> supplies a single numeric series through the same <code>IChartDataSource</code> contract used by the grid adapters. It does not depend on Avalonia, SkiaSharp, reflection, or an application-specific dispatcher.</p>
+<pre><code class="lang-csharp">var source = new StreamingChartDataSource(capacity: 100_000, name: &quot;Sensor&quot;);
+source.AppendRange(new[]
+{
+    new ChartSample(0.0, 12.0),
+    new ChartSample(0.1, 12.4),
+    new ChartSample(0.2, null), // a real discontinuity
+    new ChartSample(0.3, 13.2)
+});
+var snapshot = source.BuildSnapshot(new ChartDataRequest
+{
+    WindowStart = 0,
+    WindowCount = 20_000,
+    MaxPoints = 2_000,
+    DownsampleMode = ChartDownsampleMode.MinMax
+});
+</code></pre>
+<p>Assign the source to a <code>ChartModel</code> as with any other data source. Configure the category axis as numeric (<code>ChartAxisKind.Value</code>) or date/time when using X coordinates. Category labels are optional and remain null unless supplied, avoiding a string allocation for every ingested sample. Date/time X coordinates use the renderer's existing OLE Automation date convention.</p>
+<h2 id="ownership-and-scheduling">Ownership and scheduling</h2>
+<p>The capacity is fixed. Appending replaces the oldest retained sample in constant time, rather than shifting an array. A batch validates every X coordinate before changing history and emits one invalidation. A batch larger than capacity retains only its tail, while <code>TotalSamples</code> counts every input sample. Non-finite X coordinates reject the append; non-finite Y values become gaps.</p>
+<p>Append, clear, counters, and snapshot construction are protected by a lock. Notifications occur <strong>outside</strong> that lock, synchronously on the calling thread. Applications that ingest on a worker thread must marshal chart/model notifications to the UI thread. The library intentionally does not select a UI dispatcher. Building a large snapshot holds the lock while selecting samples, so the intended high-throughput pattern is batched ingestion and bounded display windows, not a snapshot per individual append.</p>
+<p>Snapshots own read-only arrays. An already returned snapshot remains unchanged after appends, wraparound, and clear. Repeating an unchanged request reuses the snapshot. Request windows are indexed within currently retained history, not lifetime sample numbers. <code>Clear</code> releases retained category references and resets the lifetime counter.</p>
+<h2 id="selection-policies">Selection policies</h2>
+<p><code>ChartSampleDecimator.SelectIndices</code> can also be used independently. It returns increasing original source indices; it never manufactures X coordinates or averages away a discontinuity.</p>
+<table>
+<thead>
+<tr>
+<th>Mode</th>
+<th>Policy</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>None</td>
+<td>Keep every sample.</td>
+</tr>
+<tr>
+<td>Bucket</td>
+<td>Select representative original samples at regular index intervals.</td>
+</tr>
+<tr>
+<td>MinMax</td>
+<td>Retain each bucket's extrema in their original order.</td>
+</tr>
+<tr>
+<td>Lttb</td>
+<td>Select points by largest-triangle area relative to the next bucket.</td>
+</tr>
+<tr>
+<td>Adaptive</td>
+<td>Use MinMax for this streaming source.</td>
+</tr>
+</tbody>
+</table>
+<p>A budget of three within a finite run uses triangle selection to retain one interior representative. A budget of one in a streaming request is promoted to two. Null or nonpositive <code>MaxPoints</code> disables selection. Independent <code>SelectIndices</code> calls require at least two points as the budget.</p>
+<p><strong>The point budget is soft when preserving gaps requires more output.</strong> Every finite run keeps its endpoints and every missing-data run keeps a separator. Alternating finite/missing data can therefore remain larger than <code>MaxPoints</code>; silently connecting disconnected runs would misrepresent the data. For gap-free input, output is bounded by the requested count. MinMax can return fewer points when extrema coincide or the budget is odd.</p>
+<p>The source supplies value/X/category channels. It does not synthesize OHLC or multi-channel financial data, aggregate histogram distributions, or synchronize multiple independent series. Existing grid adapters retain their own downsampling semantics; this new selector is not silently substituted into them.</p>
+<h2 id="reproducible-performance-checks">Reproducible performance checks</h2>
+<pre><code class="lang-bash">dotnet test src/Avalonia.Controls.DataGrid.UnitTests/Avalonia.Controls.DataGrid.UnitTests.csproj -c Release -p:CollectCoverage=false --filter FullyQualifiedName~Charting
+dotnet run --project tests/ProCharts.Benchmarks/ProCharts.Benchmarks.csproj -c Release
+</code></pre>
+<p>The benchmark records runtime/OS, two warmups, and medians of seven measured repetitions. It compares 100,000 appends into a 4,096-sample ring with a deliberately shifting <code>List&lt;T&gt;</code> reference implementation, checks retained-tail equivalence, measures cached window reads, and selects one million samples down to a 2,000-point budget. Managed allocations are reported separately. Timing thresholds are not imposed on shared CI machines; semantic and allocation regressions are covered by tests.</p>
+<p>This reference comparison is <strong>not</strong> a before/after measurement of the previous grid adapter, nor a GPU rendering or UI frame-rate claim. The <code>Charting regression and performance</code> workflow publishes the actual run output as an artifact alongside test results. Oversized grid/Skia list pools also now discard large buffers rather than allocating smaller replacement arrays merely to return them to the pool.</p>
+
+</article>
+
+        <div class="contribution d-print-none">
+          <a href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/docfx/articles/procharts-streaming.md/#L1" class="edit-link">Edit this page</a>
+        </div>
+
+        <div class="next-article d-print-none border-top" id="nextArticle"></div>
+
+      </div>
+
+      <div class="affix">
+        <nav id="affix"></nav>
+      </div>
+    </main>
+
+
+    <footer class="border-top text-secondary">
+      <div class="container-xxl">
+        <div class="flex-fill">
+          <span>Made with <a href="https://dotnet.github.io/docfx">docfx</a></span>
+        </div>
+      </div>
+    </footer>
+  </body>
+</html>

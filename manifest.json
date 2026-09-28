@@ -9538,6 +9538,34 @@
     },
     {
       "type": "ManagedReference",
+      "source_relative_path": "api/ProCharts.ChartSample.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/ProCharts.ChartSample.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "ProCharts.ChartSample",
+      "Summary": "<p sourcefile=\"api/ProCharts.ChartSample.yml\" sourcestartlinenumber=\"1\">A numeric chart sample. A null or non-finite value represents a gap.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/ProCharts.ChartSampleDecimator.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/ProCharts.ChartSampleDecimator.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "ProCharts.ChartSampleDecimator",
+      "Summary": "<p sourcefile=\"api/ProCharts.ChartSampleDecimator.yml\" sourcestartlinenumber=\"1\">Selects original samples without changing their coordinates or bridging missing data.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
       "source_relative_path": "api/ProCharts.ChartSeriesKind.yml",
       "output": {
         ".html": {
@@ -9913,6 +9941,20 @@
       "IsMRef": true,
       "Title": "ProCharts.Skia",
       "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/ProCharts.StreamingChartDataSource.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/ProCharts.StreamingChartDataSource.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "ProCharts.StreamingChartDataSource",
+      "Summary": "<p sourcefile=\"api/ProCharts.StreamingChartDataSource.yml\" sourcestartlinenumber=\"1\">A bounded, thread-safe, single-series data source for live numeric charts.</p>\n"
     },
     {
       "type": "ManagedReference",
@@ -12725,6 +12767,16 @@
       "output": {
         ".html": {
           "relative_path": "articles/procharts-skia-style-reference.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "Conceptual",
+      "source_relative_path": "articles/procharts-streaming.md",
+      "output": {
+        ".html": {
+          "relative_path": "articles/procharts-streaming.html"
         }
       },
       "version": ""

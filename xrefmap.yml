@@ -72857,6 +72857,92 @@ references:
   commentId: F:ProCharts.ChartPointerTool.Zoom
   fullName: ProCharts.ChartPointerTool.Zoom
   nameWithType: ChartPointerTool.Zoom
+- uid: ProCharts.ChartSample
+  name: ChartSample
+  href: api/ProCharts.ChartSample.html
+  commentId: T:ProCharts.ChartSample
+  fullName: ProCharts.ChartSample
+  nameWithType: ChartSample
+- uid: ProCharts.ChartSample.#ctor(System.Double,System.Nullable{System.Double},System.String)
+  name: ChartSample(double, double?, string?)
+  href: api/ProCharts.ChartSample.html#ProCharts_ChartSample__ctor_System_Double_System_Nullable_System_Double__System_String_
+  commentId: M:ProCharts.ChartSample.#ctor(System.Double,System.Nullable{System.Double},System.String)
+  name.vb: New(Double, Double?, String)
+  fullName: ProCharts.ChartSample.ChartSample(double, double?, string?)
+  fullName.vb: ProCharts.ChartSample.New(Double, Double?, String)
+  nameWithType: ChartSample.ChartSample(double, double?, string?)
+  nameWithType.vb: ChartSample.New(Double, Double?, String)
+- uid: ProCharts.ChartSample.#ctor*
+  name: ChartSample
+  href: api/ProCharts.ChartSample.html#ProCharts_ChartSample__ctor_
+  commentId: Overload:ProCharts.ChartSample.#ctor
+  isSpec: "True"
+  name.vb: New
+  fullName: ProCharts.ChartSample.ChartSample
+  fullName.vb: ProCharts.ChartSample.New
+  nameWithType: ChartSample.ChartSample
+  nameWithType.vb: ChartSample.New
+- uid: ProCharts.ChartSample.Category
+  name: Category
+  href: api/ProCharts.ChartSample.html#ProCharts_ChartSample_Category
+  commentId: P:ProCharts.ChartSample.Category
+  fullName: ProCharts.ChartSample.Category
+  nameWithType: ChartSample.Category
+- uid: ProCharts.ChartSample.Category*
+  name: Category
+  href: api/ProCharts.ChartSample.html#ProCharts_ChartSample_Category_
+  commentId: Overload:ProCharts.ChartSample.Category
+  isSpec: "True"
+  fullName: ProCharts.ChartSample.Category
+  nameWithType: ChartSample.Category
+- uid: ProCharts.ChartSample.Value
+  name: Value
+  href: api/ProCharts.ChartSample.html#ProCharts_ChartSample_Value
+  commentId: P:ProCharts.ChartSample.Value
+  fullName: ProCharts.ChartSample.Value
+  nameWithType: ChartSample.Value
+- uid: ProCharts.ChartSample.Value*
+  name: Value
+  href: api/ProCharts.ChartSample.html#ProCharts_ChartSample_Value_
+  commentId: Overload:ProCharts.ChartSample.Value
+  isSpec: "True"
+  fullName: ProCharts.ChartSample.Value
+  nameWithType: ChartSample.Value
+- uid: ProCharts.ChartSample.X
+  name: X
+  href: api/ProCharts.ChartSample.html#ProCharts_ChartSample_X
+  commentId: P:ProCharts.ChartSample.X
+  fullName: ProCharts.ChartSample.X
+  nameWithType: ChartSample.X
+- uid: ProCharts.ChartSample.X*
+  name: X
+  href: api/ProCharts.ChartSample.html#ProCharts_ChartSample_X_
+  commentId: Overload:ProCharts.ChartSample.X
+  isSpec: "True"
+  fullName: ProCharts.ChartSample.X
+  nameWithType: ChartSample.X
+- uid: ProCharts.ChartSampleDecimator
+  name: ChartSampleDecimator
+  href: api/ProCharts.ChartSampleDecimator.html
+  commentId: T:ProCharts.ChartSampleDecimator
+  fullName: ProCharts.ChartSampleDecimator
+  nameWithType: ChartSampleDecimator
+- uid: ProCharts.ChartSampleDecimator.SelectIndices(System.Collections.Generic.IReadOnlyList{ProCharts.ChartSample},System.Int32,ProCharts.ChartDownsampleMode)
+  name: SelectIndices(IReadOnlyList<ChartSample>, int, ChartDownsampleMode)
+  href: api/ProCharts.ChartSampleDecimator.html#ProCharts_ChartSampleDecimator_SelectIndices_System_Collections_Generic_IReadOnlyList_ProCharts_ChartSample__System_Int32_ProCharts_ChartDownsampleMode_
+  commentId: M:ProCharts.ChartSampleDecimator.SelectIndices(System.Collections.Generic.IReadOnlyList{ProCharts.ChartSample},System.Int32,ProCharts.ChartDownsampleMode)
+  name.vb: SelectIndices(IReadOnlyList(Of ChartSample), Integer, ChartDownsampleMode)
+  fullName: ProCharts.ChartSampleDecimator.SelectIndices(System.Collections.Generic.IReadOnlyList<ProCharts.ChartSample>, int, ProCharts.ChartDownsampleMode)
+  fullName.vb: ProCharts.ChartSampleDecimator.SelectIndices(System.Collections.Generic.IReadOnlyList(Of ProCharts.ChartSample), Integer, ProCharts.ChartDownsampleMode)
+  nameWithType: ChartSampleDecimator.SelectIndices(IReadOnlyList<ChartSample>, int, ChartDownsampleMode)
+  nameWithType.vb: ChartSampleDecimator.SelectIndices(IReadOnlyList(Of ChartSample), Integer, ChartDownsampleMode)
+- uid: ProCharts.ChartSampleDecimator.SelectIndices*
+  name: SelectIndices
+  href: api/ProCharts.ChartSampleDecimator.html#ProCharts_ChartSampleDecimator_SelectIndices_
+  commentId: Overload:ProCharts.ChartSampleDecimator.SelectIndices
+  isSpec: "True"
+  fullName: ProCharts.ChartSampleDecimator.SelectIndices
+  nameWithType: ChartSampleDecimator.SelectIndices
 - uid: ProCharts.ChartSeriesKind
   name: ChartSeriesKind
   href: api/ProCharts.ChartSeriesKind.html
@@ -76797,6 +76883,170 @@ references:
   commentId: F:ProCharts.Skia.SkiaPieLabelPlacement.Outside
   fullName: ProCharts.Skia.SkiaPieLabelPlacement.Outside
   nameWithType: SkiaPieLabelPlacement.Outside
+- uid: ProCharts.StreamingChartDataSource
+  name: StreamingChartDataSource
+  href: api/ProCharts.StreamingChartDataSource.html
+  commentId: T:ProCharts.StreamingChartDataSource
+  fullName: ProCharts.StreamingChartDataSource
+  nameWithType: StreamingChartDataSource
+- uid: ProCharts.StreamingChartDataSource.#ctor(System.Int32,System.String,ProCharts.ChartSeriesKind)
+  name: StreamingChartDataSource(int, string?, ChartSeriesKind)
+  href: api/ProCharts.StreamingChartDataSource.html#ProCharts_StreamingChartDataSource__ctor_System_Int32_System_String_ProCharts_ChartSeriesKind_
+  commentId: M:ProCharts.StreamingChartDataSource.#ctor(System.Int32,System.String,ProCharts.ChartSeriesKind)
+  name.vb: New(Integer, String, ChartSeriesKind)
+  fullName: ProCharts.StreamingChartDataSource.StreamingChartDataSource(int, string?, ProCharts.ChartSeriesKind)
+  fullName.vb: ProCharts.StreamingChartDataSource.New(Integer, String, ProCharts.ChartSeriesKind)
+  nameWithType: StreamingChartDataSource.StreamingChartDataSource(int, string?, ChartSeriesKind)
+  nameWithType.vb: StreamingChartDataSource.New(Integer, String, ChartSeriesKind)
+- uid: ProCharts.StreamingChartDataSource.#ctor*
+  name: StreamingChartDataSource
+  href: api/ProCharts.StreamingChartDataSource.html#ProCharts_StreamingChartDataSource__ctor_
+  commentId: Overload:ProCharts.StreamingChartDataSource.#ctor
+  isSpec: "True"
+  name.vb: New
+  fullName: ProCharts.StreamingChartDataSource.StreamingChartDataSource
+  fullName.vb: ProCharts.StreamingChartDataSource.New
+  nameWithType: StreamingChartDataSource.StreamingChartDataSource
+  nameWithType.vb: StreamingChartDataSource.New
+- uid: ProCharts.StreamingChartDataSource.Append(ProCharts.ChartSample)
+  name: Append(ChartSample)
+  href: api/ProCharts.StreamingChartDataSource.html#ProCharts_StreamingChartDataSource_Append_ProCharts_ChartSample_
+  commentId: M:ProCharts.StreamingChartDataSource.Append(ProCharts.ChartSample)
+  fullName: ProCharts.StreamingChartDataSource.Append(ProCharts.ChartSample)
+  nameWithType: StreamingChartDataSource.Append(ChartSample)
+- uid: ProCharts.StreamingChartDataSource.Append*
+  name: Append
+  href: api/ProCharts.StreamingChartDataSource.html#ProCharts_StreamingChartDataSource_Append_
+  commentId: Overload:ProCharts.StreamingChartDataSource.Append
+  isSpec: "True"
+  fullName: ProCharts.StreamingChartDataSource.Append
+  nameWithType: StreamingChartDataSource.Append
+- uid: ProCharts.StreamingChartDataSource.AppendRange(System.ReadOnlySpan{ProCharts.ChartSample})
+  name: AppendRange(ReadOnlySpan<ChartSample>)
+  href: api/ProCharts.StreamingChartDataSource.html#ProCharts_StreamingChartDataSource_AppendRange_System_ReadOnlySpan_ProCharts_ChartSample__
+  commentId: M:ProCharts.StreamingChartDataSource.AppendRange(System.ReadOnlySpan{ProCharts.ChartSample})
+  name.vb: AppendRange(ReadOnlySpan(Of ChartSample))
+  fullName: ProCharts.StreamingChartDataSource.AppendRange(System.ReadOnlySpan<ProCharts.ChartSample>)
+  fullName.vb: ProCharts.StreamingChartDataSource.AppendRange(System.ReadOnlySpan(Of ProCharts.ChartSample))
+  nameWithType: StreamingChartDataSource.AppendRange(ReadOnlySpan<ChartSample>)
+  nameWithType.vb: StreamingChartDataSource.AppendRange(ReadOnlySpan(Of ChartSample))
+- uid: ProCharts.StreamingChartDataSource.AppendRange*
+  name: AppendRange
+  href: api/ProCharts.StreamingChartDataSource.html#ProCharts_StreamingChartDataSource_AppendRange_
+  commentId: Overload:ProCharts.StreamingChartDataSource.AppendRange
+  isSpec: "True"
+  fullName: ProCharts.StreamingChartDataSource.AppendRange
+  nameWithType: StreamingChartDataSource.AppendRange
+- uid: ProCharts.StreamingChartDataSource.BuildSnapshot(ProCharts.ChartDataRequest)
+  name: BuildSnapshot(ChartDataRequest)
+  href: api/ProCharts.StreamingChartDataSource.html#ProCharts_StreamingChartDataSource_BuildSnapshot_ProCharts_ChartDataRequest_
+  commentId: M:ProCharts.StreamingChartDataSource.BuildSnapshot(ProCharts.ChartDataRequest)
+  fullName: ProCharts.StreamingChartDataSource.BuildSnapshot(ProCharts.ChartDataRequest)
+  nameWithType: StreamingChartDataSource.BuildSnapshot(ChartDataRequest)
+- uid: ProCharts.StreamingChartDataSource.BuildSnapshot*
+  name: BuildSnapshot
+  href: api/ProCharts.StreamingChartDataSource.html#ProCharts_StreamingChartDataSource_BuildSnapshot_
+  commentId: Overload:ProCharts.StreamingChartDataSource.BuildSnapshot
+  isSpec: "True"
+  fullName: ProCharts.StreamingChartDataSource.BuildSnapshot
+  nameWithType: StreamingChartDataSource.BuildSnapshot
+- uid: ProCharts.StreamingChartDataSource.Capacity
+  name: Capacity
+  href: api/ProCharts.StreamingChartDataSource.html#ProCharts_StreamingChartDataSource_Capacity
+  commentId: P:ProCharts.StreamingChartDataSource.Capacity
+  fullName: ProCharts.StreamingChartDataSource.Capacity
+  nameWithType: StreamingChartDataSource.Capacity
+- uid: ProCharts.StreamingChartDataSource.Capacity*
+  name: Capacity
+  href: api/ProCharts.StreamingChartDataSource.html#ProCharts_StreamingChartDataSource_Capacity_
+  commentId: Overload:ProCharts.StreamingChartDataSource.Capacity
+  isSpec: "True"
+  fullName: ProCharts.StreamingChartDataSource.Capacity
+  nameWithType: StreamingChartDataSource.Capacity
+- uid: ProCharts.StreamingChartDataSource.Clear
+  name: Clear()
+  href: api/ProCharts.StreamingChartDataSource.html#ProCharts_StreamingChartDataSource_Clear
+  commentId: M:ProCharts.StreamingChartDataSource.Clear
+  fullName: ProCharts.StreamingChartDataSource.Clear()
+  nameWithType: StreamingChartDataSource.Clear()
+- uid: ProCharts.StreamingChartDataSource.Clear*
+  name: Clear
+  href: api/ProCharts.StreamingChartDataSource.html#ProCharts_StreamingChartDataSource_Clear_
+  commentId: Overload:ProCharts.StreamingChartDataSource.Clear
+  isSpec: "True"
+  fullName: ProCharts.StreamingChartDataSource.Clear
+  nameWithType: StreamingChartDataSource.Clear
+- uid: ProCharts.StreamingChartDataSource.Count
+  name: Count
+  href: api/ProCharts.StreamingChartDataSource.html#ProCharts_StreamingChartDataSource_Count
+  commentId: P:ProCharts.StreamingChartDataSource.Count
+  fullName: ProCharts.StreamingChartDataSource.Count
+  nameWithType: StreamingChartDataSource.Count
+- uid: ProCharts.StreamingChartDataSource.Count*
+  name: Count
+  href: api/ProCharts.StreamingChartDataSource.html#ProCharts_StreamingChartDataSource_Count_
+  commentId: Overload:ProCharts.StreamingChartDataSource.Count
+  isSpec: "True"
+  fullName: ProCharts.StreamingChartDataSource.Count
+  nameWithType: StreamingChartDataSource.Count
+- uid: ProCharts.StreamingChartDataSource.DataInvalidated
+  name: DataInvalidated
+  href: api/ProCharts.StreamingChartDataSource.html#ProCharts_StreamingChartDataSource_DataInvalidated
+  commentId: E:ProCharts.StreamingChartDataSource.DataInvalidated
+  fullName: ProCharts.StreamingChartDataSource.DataInvalidated
+  nameWithType: StreamingChartDataSource.DataInvalidated
+- uid: ProCharts.StreamingChartDataSource.GetTotalCategoryCount
+  name: GetTotalCategoryCount()
+  href: api/ProCharts.StreamingChartDataSource.html#ProCharts_StreamingChartDataSource_GetTotalCategoryCount
+  commentId: M:ProCharts.StreamingChartDataSource.GetTotalCategoryCount
+  fullName: ProCharts.StreamingChartDataSource.GetTotalCategoryCount()
+  nameWithType: StreamingChartDataSource.GetTotalCategoryCount()
+- uid: ProCharts.StreamingChartDataSource.GetTotalCategoryCount*
+  name: GetTotalCategoryCount
+  href: api/ProCharts.StreamingChartDataSource.html#ProCharts_StreamingChartDataSource_GetTotalCategoryCount_
+  commentId: Overload:ProCharts.StreamingChartDataSource.GetTotalCategoryCount
+  isSpec: "True"
+  fullName: ProCharts.StreamingChartDataSource.GetTotalCategoryCount
+  nameWithType: StreamingChartDataSource.GetTotalCategoryCount
+- uid: ProCharts.StreamingChartDataSource.Kind
+  name: Kind
+  href: api/ProCharts.StreamingChartDataSource.html#ProCharts_StreamingChartDataSource_Kind
+  commentId: P:ProCharts.StreamingChartDataSource.Kind
+  fullName: ProCharts.StreamingChartDataSource.Kind
+  nameWithType: StreamingChartDataSource.Kind
+- uid: ProCharts.StreamingChartDataSource.Kind*
+  name: Kind
+  href: api/ProCharts.StreamingChartDataSource.html#ProCharts_StreamingChartDataSource_Kind_
+  commentId: Overload:ProCharts.StreamingChartDataSource.Kind
+  isSpec: "True"
+  fullName: ProCharts.StreamingChartDataSource.Kind
+  nameWithType: StreamingChartDataSource.Kind
+- uid: ProCharts.StreamingChartDataSource.Name
+  name: Name
+  href: api/ProCharts.StreamingChartDataSource.html#ProCharts_StreamingChartDataSource_Name
+  commentId: P:ProCharts.StreamingChartDataSource.Name
+  fullName: ProCharts.StreamingChartDataSource.Name
+  nameWithType: StreamingChartDataSource.Name
+- uid: ProCharts.StreamingChartDataSource.Name*
+  name: Name
+  href: api/ProCharts.StreamingChartDataSource.html#ProCharts_StreamingChartDataSource_Name_
+  commentId: Overload:ProCharts.StreamingChartDataSource.Name
+  isSpec: "True"
+  fullName: ProCharts.StreamingChartDataSource.Name
+  nameWithType: StreamingChartDataSource.Name
+- uid: ProCharts.StreamingChartDataSource.TotalSamples
+  name: TotalSamples
+  href: api/ProCharts.StreamingChartDataSource.html#ProCharts_StreamingChartDataSource_TotalSamples
+  commentId: P:ProCharts.StreamingChartDataSource.TotalSamples
+  fullName: ProCharts.StreamingChartDataSource.TotalSamples
+  nameWithType: StreamingChartDataSource.TotalSamples
+- uid: ProCharts.StreamingChartDataSource.TotalSamples*
+  name: TotalSamples
+  href: api/ProCharts.StreamingChartDataSource.html#ProCharts_StreamingChartDataSource_TotalSamples_
+  commentId: Overload:ProCharts.StreamingChartDataSource.TotalSamples
+  isSpec: "True"
+  fullName: ProCharts.StreamingChartDataSource.TotalSamples
+  nameWithType: StreamingChartDataSource.TotalSamples
 - uid: ProDataGrid.Charting
   name: ProDataGrid.Charting
   href: api/ProDataGrid.Charting.html
