@@ -49,6 +49,7 @@ internal static class Program
             Measure(output, "cached_128_additions", 5000, () => evaluator.Evaluate(arithmetic, context, resolver).AsNumber(), 129);
             Measure(output, "xmatch_binary_100000", 32, () => xmatch.Invoke(functionContext, lookupArgs).AsNumber(), 100000);
             Measure(output, "unique_distinct_5000", 1, () => unique.Invoke(functionContext, uniqueArgs).AsArray().RowCount, 5000);
+            ValueStorageBenchmarks.Run(output);
             Console.Write(output.ToString());
             if (args.Length > 0)
             {
