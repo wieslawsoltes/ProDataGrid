@@ -7503,6 +7503,22 @@ references:
   isSpec: "True"
   fullName: Avalonia.Controls.DataGrid.TryRestoreScrollState
   nameWithType: DataGrid.TryRestoreScrollState
+- uid: Avalonia.Controls.DataGrid.TrySetCurrentCell(Avalonia.Controls.DataGridCellInfo,System.Boolean)
+  name: TrySetCurrentCell(DataGridCellInfo, bool)
+  href: api/Avalonia.Controls.DataGrid.html#Avalonia_Controls_DataGrid_TrySetCurrentCell_Avalonia_Controls_DataGridCellInfo_System_Boolean_
+  commentId: M:Avalonia.Controls.DataGrid.TrySetCurrentCell(Avalonia.Controls.DataGridCellInfo,System.Boolean)
+  name.vb: TrySetCurrentCell(DataGridCellInfo, Boolean)
+  fullName: Avalonia.Controls.DataGrid.TrySetCurrentCell(Avalonia.Controls.DataGridCellInfo, bool)
+  fullName.vb: Avalonia.Controls.DataGrid.TrySetCurrentCell(Avalonia.Controls.DataGridCellInfo, Boolean)
+  nameWithType: DataGrid.TrySetCurrentCell(DataGridCellInfo, bool)
+  nameWithType.vb: DataGrid.TrySetCurrentCell(DataGridCellInfo, Boolean)
+- uid: Avalonia.Controls.DataGrid.TrySetCurrentCell*
+  name: TrySetCurrentCell
+  href: api/Avalonia.Controls.DataGrid.html#Avalonia_Controls_DataGrid_TrySetCurrentCell_
+  commentId: Overload:Avalonia.Controls.DataGrid.TrySetCurrentCell
+  isSpec: "True"
+  fullName: Avalonia.Controls.DataGrid.TrySetCurrentCell
+  nameWithType: DataGrid.TrySetCurrentCell
 - uid: Avalonia.Controls.DataGrid.TryShowFilterFlyout(System.Object)
   name: TryShowFilterFlyout(object)
   href: api/Avalonia.Controls.DataGrid.html#Avalonia_Controls_DataGrid_TryShowFilterFlyout_System_Object_
