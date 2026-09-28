@@ -90,36 +90,30 @@ namespace ProDataGrid.FormulaEngine
         }
     }
 
+    /// <summary>
+    /// An immutable tagged value used by formula evaluation and array storage.
+    /// </summary>
+    /// <remarks>
+    /// Numeric, Boolean and error metadata share the numeric slot. Text, array and
+    /// reference payloads share one managed-reference slot. Reference descriptors are
+    /// boxed on construction; other factories do not allocate a payload wrapper.
+    /// The private physical layout is not a serialization or interop contract.
+    /// </remarks>
     public readonly struct FormulaValue : IEquatable<FormulaValue>
     {
         private readonly double _number;
-        private readonly bool _boolean;
-        private readonly string? _text;
-        private readonly FormulaError _error;
-        private readonly FormulaArray? _array;
-        private readonly FormulaReference _reference;
+        private readonly object? _payload;
 
-        private FormulaValue(
-            FormulaValueKind kind,
-            double number = 0,
-            bool boolean = false,
-            string? text = null,
-            FormulaError error = default,
-            FormulaArray? array = null,
-            FormulaReference reference = default)
+        private FormulaValue(FormulaValueKind kind, double number = 0, object? payload = null)
         {
             Kind = kind;
             _number = number;
-            _boolean = boolean;
-            _text = text;
-            _error = error;
-            _array = array;
-            _reference = reference;
+            _payload = payload;
         }
 
         public FormulaValueKind Kind { get; }
 
-        public static FormulaValue Blank => new(FormulaValueKind.Blank);
+        public static FormulaValue Blank => default;
 
         public static FormulaValue FromNumber(double value) => new(FormulaValueKind.Number, number: value);
 
@@ -129,13 +123,13 @@ namespace ProDataGrid.FormulaEngine
             {
                 throw new ArgumentNullException(nameof(value));
             }
-
-            return new FormulaValue(FormulaValueKind.Text, text: value);
+            return new FormulaValue(FormulaValueKind.Text, payload: value);
         }
 
-        public static FormulaValue FromBoolean(bool value) => new(FormulaValueKind.Boolean, boolean: value);
+        public static FormulaValue FromBoolean(bool value) => new(FormulaValueKind.Boolean, number: value ? 1 : 0);
 
-        public static FormulaValue FromError(FormulaError error) => new(FormulaValueKind.Error, error: error);
+        public static FormulaValue FromError(FormulaError error)
+            => new(FormulaValueKind.Error, number: (int)error.Type, payload: error.Message);
 
         public static FormulaValue FromArray(FormulaArray array)
         {
@@ -143,11 +137,11 @@ namespace ProDataGrid.FormulaEngine
             {
                 throw new ArgumentNullException(nameof(array));
             }
-
-            return new FormulaValue(FormulaValueKind.Array, array: array);
+            return new FormulaValue(FormulaValueKind.Array, payload: array);
         }
 
-        public static FormulaValue FromReference(FormulaReference reference) => new(FormulaValueKind.Reference, reference: reference);
+        public static FormulaValue FromReference(FormulaReference reference)
+            => new(FormulaValueKind.Reference, payload: reference);
 
         public double AsNumber()
         {
@@ -164,7 +158,7 @@ namespace ProDataGrid.FormulaEngine
             {
                 throw new InvalidOperationException($"Cannot access {Kind} as boolean.");
             }
-            return _boolean;
+            return _number != 0;
         }
 
         public string AsText()
@@ -173,7 +167,7 @@ namespace ProDataGrid.FormulaEngine
             {
                 throw new InvalidOperationException($"Cannot access {Kind} as text.");
             }
-            return _text ?? string.Empty;
+            return (string?)_payload ?? string.Empty;
         }
 
         public FormulaError AsError()
@@ -182,7 +176,7 @@ namespace ProDataGrid.FormulaEngine
             {
                 throw new InvalidOperationException($"Cannot access {Kind} as error.");
             }
-            return _error;
+            return new FormulaError((FormulaErrorType)(int)_number, (string?)_payload);
         }
 
         public FormulaArray AsArray()
@@ -191,7 +185,7 @@ namespace ProDataGrid.FormulaEngine
             {
                 throw new InvalidOperationException($"Cannot access {Kind} as array.");
             }
-            return _array!;
+            return (FormulaArray)_payload!;
         }
 
         public FormulaReference AsReference()
@@ -200,7 +194,7 @@ namespace ProDataGrid.FormulaEngine
             {
                 throw new InvalidOperationException($"Cannot access {Kind} as reference.");
             }
-            return _reference;
+            return (FormulaReference)_payload!;
         }
 
         public bool Equals(FormulaValue other)
@@ -209,24 +203,20 @@ namespace ProDataGrid.FormulaEngine
             {
                 return false;
             }
-
             return Kind switch
             {
                 FormulaValueKind.Blank => true,
                 FormulaValueKind.Number => _number.Equals(other._number),
-                FormulaValueKind.Text => string.Equals(_text, other._text, StringComparison.Ordinal),
-                FormulaValueKind.Boolean => _boolean == other._boolean,
-                FormulaValueKind.Error => _error.Equals(other._error),
-                FormulaValueKind.Array => ReferenceEquals(_array, other._array),
-                FormulaValueKind.Reference => _reference.Equals(other._reference),
+                FormulaValueKind.Text => string.Equals((string?)_payload, (string?)other._payload, StringComparison.Ordinal),
+                FormulaValueKind.Boolean => _number.Equals(other._number),
+                FormulaValueKind.Error => AsError().Equals(other.AsError()),
+                FormulaValueKind.Array => ReferenceEquals(_payload, other._payload),
+                FormulaValueKind.Reference => AsReference().Equals(other.AsReference()),
                 _ => false
             };
         }
 
-        public override bool Equals(object? obj)
-        {
-            return obj is FormulaValue other && Equals(other);
-        }
+        public override bool Equals(object? obj) => obj is FormulaValue other && Equals(other);
 
         public override int GetHashCode()
         {
@@ -240,22 +230,21 @@ namespace ProDataGrid.FormulaEngine
                         hash = (hash * 31) + _number.GetHashCode();
                         break;
                     case FormulaValueKind.Text:
-                        hash = (hash * 31) + (_text?.GetHashCode() ?? 0);
+                        hash = (hash * 31) + (_payload?.GetHashCode() ?? 0);
                         break;
                     case FormulaValueKind.Boolean:
-                        hash = (hash * 31) + _boolean.GetHashCode();
+                        hash = (hash * 31) + AsBoolean().GetHashCode();
                         break;
                     case FormulaValueKind.Error:
-                        hash = (hash * 31) + _error.GetHashCode();
+                        hash = (hash * 31) + AsError().GetHashCode();
                         break;
                     case FormulaValueKind.Array:
-                        hash = (hash * 31) + (_array?.GetHashCode() ?? 0);
+                        hash = (hash * 31) + (_payload?.GetHashCode() ?? 0);
                         break;
                     case FormulaValueKind.Reference:
-                        hash = (hash * 31) + _reference.GetHashCode();
+                        hash = (hash * 31) + AsReference().GetHashCode();
                         break;
                 }
-
                 return hash;
             }
         }
@@ -266,27 +255,17 @@ namespace ProDataGrid.FormulaEngine
             {
                 FormulaValueKind.Blank => string.Empty,
                 FormulaValueKind.Number => _number.ToString(),
-                FormulaValueKind.Text => _text ?? string.Empty,
-                FormulaValueKind.Boolean => _boolean ? "TRUE" : "FALSE",
-                FormulaValueKind.Error => _error.ToString(),
-                FormulaValueKind.Array => $"Array({RowCount}x{ColumnCount})",
-                FormulaValueKind.Reference => _reference.ToString(),
+                FormulaValueKind.Text => (string?)_payload ?? string.Empty,
+                FormulaValueKind.Boolean => AsBoolean() ? "TRUE" : "FALSE",
+                FormulaValueKind.Error => AsError().ToString(),
+                FormulaValueKind.Array => $"Array({AsArray().RowCount}x{AsArray().ColumnCount})",
+                FormulaValueKind.Reference => AsReference().ToString(),
                 _ => string.Empty
             };
         }
 
-        private int RowCount => _array?.RowCount ?? 0;
+        public static bool operator ==(FormulaValue left, FormulaValue right) => left.Equals(right);
 
-        private int ColumnCount => _array?.ColumnCount ?? 0;
-
-        public static bool operator ==(FormulaValue left, FormulaValue right)
-        {
-            return left.Equals(right);
-        }
-
-        public static bool operator !=(FormulaValue left, FormulaValue right)
-        {
-            return !left.Equals(right);
-        }
+        public static bool operator !=(FormulaValue left, FormulaValue right) => !left.Equals(right);
     }
 }

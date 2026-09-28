@@ -1,0 +1,61 @@
+name: Formula compact-value validation
+on:
+  push:
+    branches: [work/formula-compact-values]
+permissions:
+  contents: write
+jobs:
+  validate:
+    if: github.repository == 'wieslawsoltes/ProDataGrid'
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      DOTNET_TieredCompilation: '0'
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: work/formula-compact-values
+          fetch-depth: 0
+      - uses: actions/setup-dotnet@v4
+        with:
+          global-json-file: global.json
+      - name: Integrate master and extend benchmark coverage
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git fetch origin master
+          git merge --no-edit origin/master
+          python3 tools/apply-formula-storage.py
+      - name: Execute integrated formula regressions
+        run: |
+          git diff --check
+          dotnet test src/ProDataGrid.FormulaEngine.UnitTests/ProDataGrid.FormulaEngine.UnitTests.csproj -c Release --logger trx --results-directory artifacts/formula
+      - name: Commit validated benchmark integration
+        run: |
+          git add tools/formula-benchmarks/Program.cs
+          git commit -m 'Measure compact value storage and escaped reference factory costs'
+      - name: Build identical harness against the old representation and compact representation
+        run: |
+          BASE="$RUNNER_TEMP/formula-storage-baseline"
+          git worktree add --detach "$BASE" d64efcb07798334d2d742d1ee538ebe955fad5be
+          cp tools/formula-benchmarks/*.cs "$BASE/tools/formula-benchmarks/"
+          dotnet build tools/formula-benchmarks/FormulaBenchmarks.csproj -c Release
+          dotnet build "$BASE/tools/formula-benchmarks/FormulaBenchmarks.csproj" -c Release
+          lscpu > artifacts/formula/cpu.txt
+          dotnet --info > artifacts/formula/runtime.txt
+          printf 'baseline=d64efcb07798334d2d742d1ee538ebe955fad5be\nhead=%s\nDOTNET_TieredCompilation=0\norder=baseline,current,current,baseline\n' "$(git rev-parse HEAD)" > artifacts/formula/revisions.txt
+      - name: Run measured baseline-current-current-baseline comparison
+        run: |
+          BASE="$RUNNER_TEMP/formula-storage-baseline"
+          ROOT="$PWD"
+          dotnet run --no-build -c Release --project "$BASE/tools/formula-benchmarks/FormulaBenchmarks.csproj" -- "$ROOT/artifacts/formula/baseline-1.csv" baseline-1
+          dotnet run --no-build -c Release --project tools/formula-benchmarks/FormulaBenchmarks.csproj -- "$ROOT/artifacts/formula/current-1.csv" current-1
+          dotnet run --no-build -c Release --project tools/formula-benchmarks/FormulaBenchmarks.csproj -- "$ROOT/artifacts/formula/current-2.csv" current-2
+          dotnet run --no-build -c Release --project "$BASE/tools/formula-benchmarks/FormulaBenchmarks.csproj" -- "$ROOT/artifacts/formula/baseline-2.csv" baseline-2
+      - name: Push validated integration
+        run: git push origin HEAD:work/formula-compact-values
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: formula-storage-validation-and-benchmarks
+          path: artifacts/formula/*
