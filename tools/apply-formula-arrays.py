@@ -9,8 +9,8 @@ def edit(path, old, new):
 edit('src/ProDataGrid.FormulaEngine/FormulaWorkbook.cs',
      'public sealed class FormulaCalculationSettings', 'public sealed partial class FormulaCalculationSettings')
 edit('src/ProDataGrid.FormulaEngine.Excel/ExcelDynamicArrayFunctions.cs',
-     '            var result = new FormulaArray(rows, columns);',
-     '''            if (!ExcelArrayShapeUtilities.TryCreate(context, rows, columns, out var result, out error))
+     '            var array = new FormulaArray(rows, columns);',
+     '''            if (!ExcelArrayShapeUtilities.TryCreate(context, rows, columns, out var array, out error))
             {
                 return FormulaValue.FromError(error);
             }''')
