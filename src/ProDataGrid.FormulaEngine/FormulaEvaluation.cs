@@ -300,6 +300,7 @@ namespace ProDataGrid.FormulaEngine
     public sealed partial class FormulaEvaluator
     {
         private readonly ConditionalWeakTable<FormulaExpression, FormulaCompiledExpression> _compiledCache = new();
+        private readonly object _compilationGate = new();
 
         public FormulaValue Evaluate(
             FormulaExpression expression,
@@ -390,26 +391,36 @@ namespace ProDataGrid.FormulaEngine
             IFormulaFunctionRegistry functionRegistry,
             IFormulaCalculationObserver? observer)
         {
-            if (_compiledCache.TryGetValue(expression, out var compiled))
+            FormulaCompiledExpression compiled;
+            var fromCache = false;
+            var duration = TimeSpan.Zero;
+            // Only cold compilation/publication is serialized. The common compatible
+            // cache-hit path in Evaluate remains lock-free and allocation-free.
+            lock (_compilationGate)
             {
-                if (compiled.IsCompatibleWith(functionRegistry))
+                if (_compiledCache.TryGetValue(expression, out var existing) && existing.IsCompatibleWith(functionRegistry))
                 {
-                    observer?.OnExpressionCompiled(expression, compiled.Instructions.Length, TimeSpan.Zero, fromCache: true);
-                    return compiled;
+                    compiled = existing;
+                    fromCache = true;
                 }
-
-                _compiledCache.Remove(expression);
+                else
+                {
+                    var compiler = new FormulaExpressionCompiler(functionRegistry);
+                    var watch = observer != null ? System.Diagnostics.Stopwatch.StartNew() : null;
+                    compiled = compiler.Compile(expression);
+                    if (watch != null)
+                    {
+                        watch.Stop();
+                        duration = watch.Elapsed;
+                    }
+                    _compiledCache.Remove(expression);
+                    _compiledCache.Add(expression, compiled);
+                }
             }
 
-            var compiler = new FormulaExpressionCompiler(functionRegistry);
-            var watch = observer != null ? System.Diagnostics.Stopwatch.StartNew() : null;
-            compiled = compiler.Compile(expression);
-            if (watch != null)
-            {
-                watch.Stop();
-                observer!.OnExpressionCompiled(expression, compiled.Instructions.Length, watch.Elapsed, fromCache: false);
-            }
-            _compiledCache.Add(expression, compiled);
+            // Publish before notifying host code; observers may reenter evaluation.
+            // Host callbacks must not run while holding the compilation gate.
+            observer?.OnExpressionCompiled(expression, compiled.Instructions.Length, duration, fromCache);
             return compiled;
         }
 
