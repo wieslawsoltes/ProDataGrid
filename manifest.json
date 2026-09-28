@@ -9258,6 +9258,20 @@
     },
     {
       "type": "ManagedReference",
+      "source_relative_path": "api/ProCharts.ChartBandSeries.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/ProCharts.ChartBandSeries.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "ProCharts.ChartBandSeries",
+      "Summary": "<p sourcefile=\"api/ProCharts.ChartBandSeries.yml\" sourcestartlinenumber=\"1\">Three aligned, independently renderable series describing a lower, middle and upper band.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
       "source_relative_path": "api/ProCharts.ChartColor.yml",
       "output": {
         ".html": {
@@ -9468,6 +9482,20 @@
     },
     {
       "type": "ManagedReference",
+      "source_relative_path": "api/ProCharts.ChartIndicators.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/ProCharts.ChartIndicators.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "ProCharts.ChartIndicators",
+      "Summary": "<p sourcefile=\"api/ProCharts.ChartIndicators.yml\" sourcestartlinenumber=\"1\">UI-independent, gap-aware statistical and technical chart transforms.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
       "source_relative_path": "api/ProCharts.ChartInteractionState.yml",
       "output": {
         ".html": {
@@ -9549,6 +9577,20 @@
       "IsMRef": true,
       "Title": "ProCharts.ChartLineStyle",
       "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/ProCharts.ChartMacdSeries.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/ProCharts.ChartMacdSeries.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "ProCharts.ChartMacdSeries",
+      "Summary": "<p sourcefile=\"api/ProCharts.ChartMacdSeries.yml\" sourcestartlinenumber=\"1\">Aligned moving-average convergence/divergence line, signal and histogram series.</p>\n"
     },
     {
       "type": "ManagedReference",
@@ -12833,6 +12875,16 @@
       "output": {
         ".html": {
           "relative_path": "articles/procharts-export-clipboard.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "Conceptual",
+      "source_relative_path": "articles/procharts-indicators.md",
+      "output": {
+        ".html": {
+          "relative_path": "articles/procharts-indicators.html"
         }
       },
       "version": ""

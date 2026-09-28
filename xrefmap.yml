@@ -71175,6 +71175,51 @@ references:
   commentId: F:ProCharts.ChartAxisKind.Value
   fullName: ProCharts.ChartAxisKind.Value
   nameWithType: ChartAxisKind.Value
+- uid: ProCharts.ChartBandSeries
+  name: ChartBandSeries
+  href: api/ProCharts.ChartBandSeries.html
+  commentId: T:ProCharts.ChartBandSeries
+  fullName: ProCharts.ChartBandSeries
+  nameWithType: ChartBandSeries
+- uid: ProCharts.ChartBandSeries.Lower
+  name: Lower
+  href: api/ProCharts.ChartBandSeries.html#ProCharts_ChartBandSeries_Lower
+  commentId: P:ProCharts.ChartBandSeries.Lower
+  fullName: ProCharts.ChartBandSeries.Lower
+  nameWithType: ChartBandSeries.Lower
+- uid: ProCharts.ChartBandSeries.Lower*
+  name: Lower
+  href: api/ProCharts.ChartBandSeries.html#ProCharts_ChartBandSeries_Lower_
+  commentId: Overload:ProCharts.ChartBandSeries.Lower
+  isSpec: "True"
+  fullName: ProCharts.ChartBandSeries.Lower
+  nameWithType: ChartBandSeries.Lower
+- uid: ProCharts.ChartBandSeries.Middle
+  name: Middle
+  href: api/ProCharts.ChartBandSeries.html#ProCharts_ChartBandSeries_Middle
+  commentId: P:ProCharts.ChartBandSeries.Middle
+  fullName: ProCharts.ChartBandSeries.Middle
+  nameWithType: ChartBandSeries.Middle
+- uid: ProCharts.ChartBandSeries.Middle*
+  name: Middle
+  href: api/ProCharts.ChartBandSeries.html#ProCharts_ChartBandSeries_Middle_
+  commentId: Overload:ProCharts.ChartBandSeries.Middle
+  isSpec: "True"
+  fullName: ProCharts.ChartBandSeries.Middle
+  nameWithType: ChartBandSeries.Middle
+- uid: ProCharts.ChartBandSeries.Upper
+  name: Upper
+  href: api/ProCharts.ChartBandSeries.html#ProCharts_ChartBandSeries_Upper
+  commentId: P:ProCharts.ChartBandSeries.Upper
+  fullName: ProCharts.ChartBandSeries.Upper
+  nameWithType: ChartBandSeries.Upper
+- uid: ProCharts.ChartBandSeries.Upper*
+  name: Upper
+  href: api/ProCharts.ChartBandSeries.html#ProCharts_ChartBandSeries_Upper_
+  commentId: Overload:ProCharts.ChartBandSeries.Upper
+  isSpec: "True"
+  fullName: ProCharts.ChartBandSeries.Upper
+  nameWithType: ChartBandSeries.Upper
 - uid: ProCharts.ChartColor
   name: ChartColor
   href: api/ProCharts.ChartColor.html
@@ -72338,6 +72383,156 @@ references:
   isSpec: "True"
   fullName: ProCharts.ChartHierarchySnapshot.TryGetNodeIndex
   nameWithType: ChartHierarchySnapshot.TryGetNodeIndex
+- uid: ProCharts.ChartIndicators
+  name: ChartIndicators
+  href: api/ProCharts.ChartIndicators.html
+  commentId: T:ProCharts.ChartIndicators
+  fullName: ProCharts.ChartIndicators
+  nameWithType: ChartIndicators
+- uid: ProCharts.ChartIndicators.AverageTrueRange(ProCharts.ChartSeriesSnapshot,System.Int32)
+  name: AverageTrueRange(ChartSeriesSnapshot, int)
+  href: api/ProCharts.ChartIndicators.html#ProCharts_ChartIndicators_AverageTrueRange_ProCharts_ChartSeriesSnapshot_System_Int32_
+  commentId: M:ProCharts.ChartIndicators.AverageTrueRange(ProCharts.ChartSeriesSnapshot,System.Int32)
+  name.vb: AverageTrueRange(ChartSeriesSnapshot, Integer)
+  fullName: ProCharts.ChartIndicators.AverageTrueRange(ProCharts.ChartSeriesSnapshot, int)
+  fullName.vb: ProCharts.ChartIndicators.AverageTrueRange(ProCharts.ChartSeriesSnapshot, Integer)
+  nameWithType: ChartIndicators.AverageTrueRange(ChartSeriesSnapshot, int)
+  nameWithType.vb: ChartIndicators.AverageTrueRange(ChartSeriesSnapshot, Integer)
+- uid: ProCharts.ChartIndicators.AverageTrueRange*
+  name: AverageTrueRange
+  href: api/ProCharts.ChartIndicators.html#ProCharts_ChartIndicators_AverageTrueRange_
+  commentId: Overload:ProCharts.ChartIndicators.AverageTrueRange
+  isSpec: "True"
+  fullName: ProCharts.ChartIndicators.AverageTrueRange
+  nameWithType: ChartIndicators.AverageTrueRange
+- uid: ProCharts.ChartIndicators.BollingerBands(ProCharts.ChartSeriesSnapshot,System.Int32,System.Double,System.Boolean)
+  name: BollingerBands(ChartSeriesSnapshot, int, double, bool)
+  href: api/ProCharts.ChartIndicators.html#ProCharts_ChartIndicators_BollingerBands_ProCharts_ChartSeriesSnapshot_System_Int32_System_Double_System_Boolean_
+  commentId: M:ProCharts.ChartIndicators.BollingerBands(ProCharts.ChartSeriesSnapshot,System.Int32,System.Double,System.Boolean)
+  name.vb: BollingerBands(ChartSeriesSnapshot, Integer, Double, Boolean)
+  fullName: ProCharts.ChartIndicators.BollingerBands(ProCharts.ChartSeriesSnapshot, int, double, bool)
+  fullName.vb: ProCharts.ChartIndicators.BollingerBands(ProCharts.ChartSeriesSnapshot, Integer, Double, Boolean)
+  nameWithType: ChartIndicators.BollingerBands(ChartSeriesSnapshot, int, double, bool)
+  nameWithType.vb: ChartIndicators.BollingerBands(ChartSeriesSnapshot, Integer, Double, Boolean)
+- uid: ProCharts.ChartIndicators.BollingerBands*
+  name: BollingerBands
+  href: api/ProCharts.ChartIndicators.html#ProCharts_ChartIndicators_BollingerBands_
+  commentId: Overload:ProCharts.ChartIndicators.BollingerBands
+  isSpec: "True"
+  fullName: ProCharts.ChartIndicators.BollingerBands
+  nameWithType: ChartIndicators.BollingerBands
+- uid: ProCharts.ChartIndicators.DonchianChannels(ProCharts.ChartSeriesSnapshot,System.Int32)
+  name: DonchianChannels(ChartSeriesSnapshot, int)
+  href: api/ProCharts.ChartIndicators.html#ProCharts_ChartIndicators_DonchianChannels_ProCharts_ChartSeriesSnapshot_System_Int32_
+  commentId: M:ProCharts.ChartIndicators.DonchianChannels(ProCharts.ChartSeriesSnapshot,System.Int32)
+  name.vb: DonchianChannels(ChartSeriesSnapshot, Integer)
+  fullName: ProCharts.ChartIndicators.DonchianChannels(ProCharts.ChartSeriesSnapshot, int)
+  fullName.vb: ProCharts.ChartIndicators.DonchianChannels(ProCharts.ChartSeriesSnapshot, Integer)
+  nameWithType: ChartIndicators.DonchianChannels(ChartSeriesSnapshot, int)
+  nameWithType.vb: ChartIndicators.DonchianChannels(ChartSeriesSnapshot, Integer)
+- uid: ProCharts.ChartIndicators.DonchianChannels*
+  name: DonchianChannels
+  href: api/ProCharts.ChartIndicators.html#ProCharts_ChartIndicators_DonchianChannels_
+  commentId: Overload:ProCharts.ChartIndicators.DonchianChannels
+  isSpec: "True"
+  fullName: ProCharts.ChartIndicators.DonchianChannels
+  nameWithType: ChartIndicators.DonchianChannels
+- uid: ProCharts.ChartIndicators.ExponentialMovingAverage(ProCharts.ChartSeriesSnapshot,System.Int32)
+  name: ExponentialMovingAverage(ChartSeriesSnapshot, int)
+  href: api/ProCharts.ChartIndicators.html#ProCharts_ChartIndicators_ExponentialMovingAverage_ProCharts_ChartSeriesSnapshot_System_Int32_
+  commentId: M:ProCharts.ChartIndicators.ExponentialMovingAverage(ProCharts.ChartSeriesSnapshot,System.Int32)
+  name.vb: ExponentialMovingAverage(ChartSeriesSnapshot, Integer)
+  fullName: ProCharts.ChartIndicators.ExponentialMovingAverage(ProCharts.ChartSeriesSnapshot, int)
+  fullName.vb: ProCharts.ChartIndicators.ExponentialMovingAverage(ProCharts.ChartSeriesSnapshot, Integer)
+  nameWithType: ChartIndicators.ExponentialMovingAverage(ChartSeriesSnapshot, int)
+  nameWithType.vb: ChartIndicators.ExponentialMovingAverage(ChartSeriesSnapshot, Integer)
+- uid: ProCharts.ChartIndicators.ExponentialMovingAverage*
+  name: ExponentialMovingAverage
+  href: api/ProCharts.ChartIndicators.html#ProCharts_ChartIndicators_ExponentialMovingAverage_
+  commentId: Overload:ProCharts.ChartIndicators.ExponentialMovingAverage
+  isSpec: "True"
+  fullName: ProCharts.ChartIndicators.ExponentialMovingAverage
+  nameWithType: ChartIndicators.ExponentialMovingAverage
+- uid: ProCharts.ChartIndicators.MovingAverageConvergenceDivergence(ProCharts.ChartSeriesSnapshot,System.Int32,System.Int32,System.Int32)
+  name: MovingAverageConvergenceDivergence(ChartSeriesSnapshot, int, int, int)
+  href: api/ProCharts.ChartIndicators.html#ProCharts_ChartIndicators_MovingAverageConvergenceDivergence_ProCharts_ChartSeriesSnapshot_System_Int32_System_Int32_System_Int32_
+  commentId: M:ProCharts.ChartIndicators.MovingAverageConvergenceDivergence(ProCharts.ChartSeriesSnapshot,System.Int32,System.Int32,System.Int32)
+  name.vb: MovingAverageConvergenceDivergence(ChartSeriesSnapshot, Integer, Integer, Integer)
+  fullName: ProCharts.ChartIndicators.MovingAverageConvergenceDivergence(ProCharts.ChartSeriesSnapshot, int, int, int)
+  fullName.vb: ProCharts.ChartIndicators.MovingAverageConvergenceDivergence(ProCharts.ChartSeriesSnapshot, Integer, Integer, Integer)
+  nameWithType: ChartIndicators.MovingAverageConvergenceDivergence(ChartSeriesSnapshot, int, int, int)
+  nameWithType.vb: ChartIndicators.MovingAverageConvergenceDivergence(ChartSeriesSnapshot, Integer, Integer, Integer)
+- uid: ProCharts.ChartIndicators.MovingAverageConvergenceDivergence*
+  name: MovingAverageConvergenceDivergence
+  href: api/ProCharts.ChartIndicators.html#ProCharts_ChartIndicators_MovingAverageConvergenceDivergence_
+  commentId: Overload:ProCharts.ChartIndicators.MovingAverageConvergenceDivergence
+  isSpec: "True"
+  fullName: ProCharts.ChartIndicators.MovingAverageConvergenceDivergence
+  nameWithType: ChartIndicators.MovingAverageConvergenceDivergence
+- uid: ProCharts.ChartIndicators.RelativeStrengthIndex(ProCharts.ChartSeriesSnapshot,System.Int32)
+  name: RelativeStrengthIndex(ChartSeriesSnapshot, int)
+  href: api/ProCharts.ChartIndicators.html#ProCharts_ChartIndicators_RelativeStrengthIndex_ProCharts_ChartSeriesSnapshot_System_Int32_
+  commentId: M:ProCharts.ChartIndicators.RelativeStrengthIndex(ProCharts.ChartSeriesSnapshot,System.Int32)
+  name.vb: RelativeStrengthIndex(ChartSeriesSnapshot, Integer)
+  fullName: ProCharts.ChartIndicators.RelativeStrengthIndex(ProCharts.ChartSeriesSnapshot, int)
+  fullName.vb: ProCharts.ChartIndicators.RelativeStrengthIndex(ProCharts.ChartSeriesSnapshot, Integer)
+  nameWithType: ChartIndicators.RelativeStrengthIndex(ChartSeriesSnapshot, int)
+  nameWithType.vb: ChartIndicators.RelativeStrengthIndex(ChartSeriesSnapshot, Integer)
+- uid: ProCharts.ChartIndicators.RelativeStrengthIndex*
+  name: RelativeStrengthIndex
+  href: api/ProCharts.ChartIndicators.html#ProCharts_ChartIndicators_RelativeStrengthIndex_
+  commentId: Overload:ProCharts.ChartIndicators.RelativeStrengthIndex
+  isSpec: "True"
+  fullName: ProCharts.ChartIndicators.RelativeStrengthIndex
+  nameWithType: ChartIndicators.RelativeStrengthIndex
+- uid: ProCharts.ChartIndicators.RollingStandardDeviation(ProCharts.ChartSeriesSnapshot,System.Int32,System.Boolean)
+  name: RollingStandardDeviation(ChartSeriesSnapshot, int, bool)
+  href: api/ProCharts.ChartIndicators.html#ProCharts_ChartIndicators_RollingStandardDeviation_ProCharts_ChartSeriesSnapshot_System_Int32_System_Boolean_
+  commentId: M:ProCharts.ChartIndicators.RollingStandardDeviation(ProCharts.ChartSeriesSnapshot,System.Int32,System.Boolean)
+  name.vb: RollingStandardDeviation(ChartSeriesSnapshot, Integer, Boolean)
+  fullName: ProCharts.ChartIndicators.RollingStandardDeviation(ProCharts.ChartSeriesSnapshot, int, bool)
+  fullName.vb: ProCharts.ChartIndicators.RollingStandardDeviation(ProCharts.ChartSeriesSnapshot, Integer, Boolean)
+  nameWithType: ChartIndicators.RollingStandardDeviation(ChartSeriesSnapshot, int, bool)
+  nameWithType.vb: ChartIndicators.RollingStandardDeviation(ChartSeriesSnapshot, Integer, Boolean)
+- uid: ProCharts.ChartIndicators.RollingStandardDeviation*
+  name: RollingStandardDeviation
+  href: api/ProCharts.ChartIndicators.html#ProCharts_ChartIndicators_RollingStandardDeviation_
+  commentId: Overload:ProCharts.ChartIndicators.RollingStandardDeviation
+  isSpec: "True"
+  fullName: ProCharts.ChartIndicators.RollingStandardDeviation
+  nameWithType: ChartIndicators.RollingStandardDeviation
+- uid: ProCharts.ChartIndicators.SimpleMovingAverage(ProCharts.ChartSeriesSnapshot,System.Int32)
+  name: SimpleMovingAverage(ChartSeriesSnapshot, int)
+  href: api/ProCharts.ChartIndicators.html#ProCharts_ChartIndicators_SimpleMovingAverage_ProCharts_ChartSeriesSnapshot_System_Int32_
+  commentId: M:ProCharts.ChartIndicators.SimpleMovingAverage(ProCharts.ChartSeriesSnapshot,System.Int32)
+  name.vb: SimpleMovingAverage(ChartSeriesSnapshot, Integer)
+  fullName: ProCharts.ChartIndicators.SimpleMovingAverage(ProCharts.ChartSeriesSnapshot, int)
+  fullName.vb: ProCharts.ChartIndicators.SimpleMovingAverage(ProCharts.ChartSeriesSnapshot, Integer)
+  nameWithType: ChartIndicators.SimpleMovingAverage(ChartSeriesSnapshot, int)
+  nameWithType.vb: ChartIndicators.SimpleMovingAverage(ChartSeriesSnapshot, Integer)
+- uid: ProCharts.ChartIndicators.SimpleMovingAverage*
+  name: SimpleMovingAverage
+  href: api/ProCharts.ChartIndicators.html#ProCharts_ChartIndicators_SimpleMovingAverage_
+  commentId: Overload:ProCharts.ChartIndicators.SimpleMovingAverage
+  isSpec: "True"
+  fullName: ProCharts.ChartIndicators.SimpleMovingAverage
+  nameWithType: ChartIndicators.SimpleMovingAverage
+- uid: ProCharts.ChartIndicators.WeightedMovingAverage(ProCharts.ChartSeriesSnapshot,System.Int32)
+  name: WeightedMovingAverage(ChartSeriesSnapshot, int)
+  href: api/ProCharts.ChartIndicators.html#ProCharts_ChartIndicators_WeightedMovingAverage_ProCharts_ChartSeriesSnapshot_System_Int32_
+  commentId: M:ProCharts.ChartIndicators.WeightedMovingAverage(ProCharts.ChartSeriesSnapshot,System.Int32)
+  name.vb: WeightedMovingAverage(ChartSeriesSnapshot, Integer)
+  fullName: ProCharts.ChartIndicators.WeightedMovingAverage(ProCharts.ChartSeriesSnapshot, int)
+  fullName.vb: ProCharts.ChartIndicators.WeightedMovingAverage(ProCharts.ChartSeriesSnapshot, Integer)
+  nameWithType: ChartIndicators.WeightedMovingAverage(ChartSeriesSnapshot, int)
+  nameWithType.vb: ChartIndicators.WeightedMovingAverage(ChartSeriesSnapshot, Integer)
+- uid: ProCharts.ChartIndicators.WeightedMovingAverage*
+  name: WeightedMovingAverage
+  href: api/ProCharts.ChartIndicators.html#ProCharts_ChartIndicators_WeightedMovingAverage_
+  commentId: Overload:ProCharts.ChartIndicators.WeightedMovingAverage
+  isSpec: "True"
+  fullName: ProCharts.ChartIndicators.WeightedMovingAverage
+  nameWithType: ChartIndicators.WeightedMovingAverage
 - uid: ProCharts.ChartInteractionState
   name: ChartInteractionState
   href: api/ProCharts.ChartInteractionState.html
@@ -72749,6 +72944,51 @@ references:
   commentId: F:ProCharts.ChartLineStyle.Solid
   fullName: ProCharts.ChartLineStyle.Solid
   nameWithType: ChartLineStyle.Solid
+- uid: ProCharts.ChartMacdSeries
+  name: ChartMacdSeries
+  href: api/ProCharts.ChartMacdSeries.html
+  commentId: T:ProCharts.ChartMacdSeries
+  fullName: ProCharts.ChartMacdSeries
+  nameWithType: ChartMacdSeries
+- uid: ProCharts.ChartMacdSeries.Histogram
+  name: Histogram
+  href: api/ProCharts.ChartMacdSeries.html#ProCharts_ChartMacdSeries_Histogram
+  commentId: P:ProCharts.ChartMacdSeries.Histogram
+  fullName: ProCharts.ChartMacdSeries.Histogram
+  nameWithType: ChartMacdSeries.Histogram
+- uid: ProCharts.ChartMacdSeries.Histogram*
+  name: Histogram
+  href: api/ProCharts.ChartMacdSeries.html#ProCharts_ChartMacdSeries_Histogram_
+  commentId: Overload:ProCharts.ChartMacdSeries.Histogram
+  isSpec: "True"
+  fullName: ProCharts.ChartMacdSeries.Histogram
+  nameWithType: ChartMacdSeries.Histogram
+- uid: ProCharts.ChartMacdSeries.Line
+  name: Line
+  href: api/ProCharts.ChartMacdSeries.html#ProCharts_ChartMacdSeries_Line
+  commentId: P:ProCharts.ChartMacdSeries.Line
+  fullName: ProCharts.ChartMacdSeries.Line
+  nameWithType: ChartMacdSeries.Line
+- uid: ProCharts.ChartMacdSeries.Line*
+  name: Line
+  href: api/ProCharts.ChartMacdSeries.html#ProCharts_ChartMacdSeries_Line_
+  commentId: Overload:ProCharts.ChartMacdSeries.Line
+  isSpec: "True"
+  fullName: ProCharts.ChartMacdSeries.Line
+  nameWithType: ChartMacdSeries.Line
+- uid: ProCharts.ChartMacdSeries.Signal
+  name: Signal
+  href: api/ProCharts.ChartMacdSeries.html#ProCharts_ChartMacdSeries_Signal
+  commentId: P:ProCharts.ChartMacdSeries.Signal
+  fullName: ProCharts.ChartMacdSeries.Signal
+  nameWithType: ChartMacdSeries.Signal
+- uid: ProCharts.ChartMacdSeries.Signal*
+  name: Signal
+  href: api/ProCharts.ChartMacdSeries.html#ProCharts_ChartMacdSeries_Signal_
+  commentId: Overload:ProCharts.ChartMacdSeries.Signal
+  isSpec: "True"
+  fullName: ProCharts.ChartMacdSeries.Signal
+  nameWithType: ChartMacdSeries.Signal
 - uid: ProCharts.ChartMarkerShape
   name: ChartMarkerShape
   href: api/ProCharts.ChartMarkerShape.html

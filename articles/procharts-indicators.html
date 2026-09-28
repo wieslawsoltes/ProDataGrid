@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+      <title>Statistical and technical indicators | ProDataGrid for Avalonia </title>
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <meta name="title" content="Statistical and technical indicators | ProDataGrid for Avalonia ">
+      
+      
+      <link rel="icon" href="../favicon.ico">
+      <link rel="stylesheet" href="../public/docfx.min.css">
+      <link rel="stylesheet" href="../public/main.css">
+      <meta name="docfx:navrel" content="../toc.html">
+      <meta name="docfx:tocrel" content="toc.html">
+      
+      
+      
+      
+      <meta name="docfx:docurl" content="https://github.com/wieslawsoltes/ProDataGrid/blob/master/docfx/articles/procharts-indicators.md/#L1">
+      <meta name="loc:inThisArticle" content="In this article">
+      <meta name="loc:searchResultsCount" content="{count} results for &quot;{query}&quot;">
+      <meta name="loc:searchNoResults" content="No results for &quot;{query}&quot;">
+      <meta name="loc:tocFilter" content="Filter by title">
+      <meta name="loc:nextArticle" content="Next">
+      <meta name="loc:prevArticle" content="Previous">
+      <meta name="loc:themeLight" content="Light">
+      <meta name="loc:themeDark" content="Dark">
+      <meta name="loc:themeAuto" content="Auto">
+      <meta name="loc:changeTheme" content="Change theme">
+      <meta name="loc:copy" content="Copy">
+      <meta name="loc:downloadPdf" content="Download PDF">
+
+      <script type="module" src="./../public/docfx.min.js"></script>
+
+      <script>
+        const theme = localStorage.getItem('theme') || 'auto'
+        document.documentElement.setAttribute('data-bs-theme', theme === 'auto' ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light') : theme)
+      </script>
+
+  </head>
+
+  <body class="tex2jax_ignore" data-layout="" data-yaml-mime="">
+    <header class="bg-body border-bottom">
+      <nav id="autocollapse" class="navbar navbar-expand-md" role="navigation">
+        <div class="container-xxl flex-nowrap">
+          <a class="navbar-brand" href="../index.html">
+            <img id="logo" class="svg" src="../images/logo.svg" alt="">
+            
+          </a>
+          <button class="btn btn-lg d-md-none border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navpanel" aria-controls="navpanel" aria-expanded="false" aria-label="Toggle navigation">
+            <i class="bi bi-three-dots"></i>
+          </button>
+          <div class="collapse navbar-collapse" id="navpanel">
+            <div id="navbar">
+            </div>
+          </div>
+        </div>
+      </nav>
+    </header>
+
+    <main class="container-xxl">
+      <div class="toc-offcanvas">
+        <div class="offcanvas-md offcanvas-start" tabindex="-1" id="tocOffcanvas" aria-labelledby="tocOffcanvasLabel">
+          <div class="offcanvas-header">
+            <h5 class="offcanvas-title" id="tocOffcanvasLabel">Table of Contents</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="offcanvas" data-bs-target="#tocOffcanvas" aria-label="Close"></button>
+          </div>
+          <div class="offcanvas-body">
+            <nav class="toc" id="toc"></nav>
+          </div>
+        </div>
+      </div>
+
+      <div class="content">
+        <div class="actionbar">
+          <button class="btn btn-lg border-0 d-md-none" type="button" data-bs-toggle="offcanvas" data-bs-target="#tocOffcanvas" aria-controls="tocOffcanvas" aria-expanded="false" aria-label="Show table of contents">
+            <i class="bi bi-list"></i>
+          </button>
+
+          <nav id="breadcrumb"></nav>
+        </div>
+
+        <article data-uid="">
+<h1 id="statistical-and-technical-indicators">Statistical and technical indicators</h1>
+
+<p><code>ProCharts.ChartIndicators</code> transforms existing <code>ChartSeriesSnapshot</code> data into independently renderable series. It has no Avalonia or Skia dependency and does not modify the source. Calculations use observation order, not an assumed calendar spacing.</p>
+<pre><code class="lang-csharp">ChartSeriesSnapshot price = snapshot.Series[0];
+ChartSeriesSnapshot average = ChartIndicators.ExponentialMovingAverage(price, 20);
+ChartBandSeries bands = ChartIndicators.BollingerBands(price, 20, standardDeviations: 2);
+ChartMacdSeries macd = ChartIndicators.MovingAverageConvergenceDivergence(price, 12, 26, 9);
+ChartSeriesSnapshot rsi = ChartIndicators.RelativeStrengthIndex(price, 14);
+
+var pricePane = new ChartDataSnapshot(snapshot.Categories,
+    new[] { price, average, bands.Lower, bands.Middle, bands.Upper });
+var oscillatorPane = new ChartDataSnapshot(snapshot.Categories,
+    new[] { macd.Line, macd.Signal, macd.Histogram });
+</code></pre>
+<p>The existing chart model and renderer accept the returned line/column series. RSI and other differently scaled results should use their own pane or an explicitly configured secondary axis. Each result inherits the source value-axis assignment, but not its formatter, styling, error bars, OHLC channels, or trendline configuration. <code>ChartBandSeries</code> contains three boundary lines; it does not imply an area-fill-between-series renderer.</p>
+<h2 id="available-transforms-and-conventions">Available transforms and conventions</h2>
+<table>
+<thead>
+<tr>
+<th>Transform</th>
+<th>Definition and warmup</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>SimpleMovingAverage</td>
+<td>Arithmetic mean of the last <code>period</code> consecutive finite observations.</td>
+</tr>
+<tr>
+<td>ExponentialMovingAverage</td>
+<td>Seed with the first complete-window SMA, then alpha <code>2 / (period + 1)</code>.</td>
+</tr>
+<tr>
+<td>WeightedMovingAverage</td>
+<td>Linear weights from 1 for the oldest observation to <code>period</code> for the newest.</td>
+</tr>
+<tr>
+<td>RollingStandardDeviation</td>
+<td>Population divisor <code>period</code> by default; optional sample divisor <code>period - 1</code>.</td>
+</tr>
+<tr>
+<td>BollingerBands</td>
+<td>SMA plus/minus a configurable multiple of rolling standard deviation; population variance by default.</td>
+</tr>
+<tr>
+<td>RelativeStrengthIndex</td>
+<td>Wilder-smoothed average gains/losses after <code>period</code> price changes, requiring <code>period + 1</code> consecutive prices. Flat data returns 50, gains-only returns 100, losses-only returns zero.</td>
+</tr>
+<tr>
+<td>MovingAverageConvergenceDivergence</td>
+<td>Fast SMA-seeded EMA minus slow SMA-seeded EMA, an EMA of that difference as signal, and difference-minus-signal as a column histogram.</td>
+</tr>
+<tr>
+<td>AverageTrueRange</td>
+<td>Maximum of high-low and distances to preceding close, smoothed with alpha <code>1 / period</code> after an SMA seed. The first bar of a finite run uses high-low and counts toward the seed.</td>
+</tr>
+<tr>
+<td>DonchianChannels</td>
+<td>Rolling high maximum, low minimum and their midpoint; includes the current bar.</td>
+</tr>
+</tbody>
+</table>
+<p>Different products can use different initial seeds, flat-RSI conventions, or first-ATR-bar rules. These conventions are explicit and regression tested; vendor-by-vendor equivalence is not claimed.</p>
+<h2 id="gaps-ownership-and-channels">Gaps, ownership, and channels</h2>
+<p>Output values always have the same count and index alignment as the input. Warmup positions are null. Null and non-finite observations reset both state and warmup, rather than being treated as zero or joined across a missing-data interval. EMA/RSI/MACD/ATR therefore restart after a gap. No look-ahead observations are used by their recurrence formulas.</p>
+<p>ATR and Donchian channels require high/low lists aligned with every close/value. A missing or non-finite high, low or close resets the calculation. Finite high values below the corresponding low values are rejected. Open values are not required. Optional X coordinates must have the same count as values; they are copied without reordering, resampling, or generating replacement dates. The caller must keep source collections stable while a transform is running.</p>
+<p>Results own read-only arrays. Multi-series results share one owned X array. Changing a caller-owned input array after a call cannot change its already returned result. Periods must be positive; sample deviation requires a period of at least two. A period longer than the input produces aligned null output without allocating a period-sized rolling window. Invalid periods, incompatible channel lengths and non-finite band multipliers fail explicitly.</p>
+<h2 id="numerical-and-performance-behavior">Numerical and performance behavior</h2>
+<p>Calculations use locally offset, scaled coordinates to avoid overflowing sums of large finite numbers and to retain variance in data with a large common offset. An opposite-sign extreme range falls back to magnitude scaling. Final coordinate reconstruction uses fused multiply-add. Results that are genuinely outside the representable finite range become null, not infinity or clamped invented values. This is floating-point arithmetic, not arbitrary precision; extreme mixtures of vastly different magnitudes can still lose smaller details.</p>
+<p>Rolling moments use removable Welford updates and periodic full-window rebasing. Weighted averages use rolling sums with periodic rebasing. Donchian extrema use monotonic queues. Rebuilding once per period keeps total work linear rather than rescanning a full window for every output. The transforms are batch operations; normalized input and output arrays require O(n) memory, with O(period) working windows. They are not an incremental streaming indicator state machine, and no renderer/GPU performance gain is implied.</p>
+<p>The regression suite compares rolling statistics, weighted means, EMAs, MACD, and extrema against independent reference calculations. It also exercises gap restart, known Wilder values, source ownership, warmup alignment, large-offset variance, extreme finite values, missing channels and oversized periods.</p>
+
+</article>
+
+        <div class="contribution d-print-none">
+          <a href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/docfx/articles/procharts-indicators.md/#L1" class="edit-link">Edit this page</a>
+        </div>
+
+        <div class="next-article d-print-none border-top" id="nextArticle"></div>
+
+      </div>
+
+      <div class="affix">
+        <nav id="affix"></nav>
+      </div>
+    </main>
+
+
+    <footer class="border-top text-secondary">
+      <div class="container-xxl">
+        <div class="flex-fill">
+          <span>Made with <a href="https://dotnet.github.io/docfx">docfx</a></span>
+        </div>
+      </div>
+    </footer>
+  </body>
+</html>
