@@ -791,18 +791,13 @@ namespace ProDataGrid.Charting
 
             if (needsWindow || needsDownsample)
             {
-                var cloned = cache.Clone();
+                var cloned = cache.Clone(windowStart, windowCount);
                 categories = cloned.Categories;
                 seriesValues = cloned.SeriesValues;
                 seriesXValues = cloned.SeriesXValues;
                 seriesSizeValues = cloned.SeriesSizeValues;
                 hasXValues = cloned.HasXValues;
                 hasSizeValues = cloned.HasSizeValues;
-
-                if (needsWindow)
-                {
-                    ApplyWindow(categories, seriesValues, seriesXValues, seriesSizeValues, windowStart, windowCount);
-                }
 
                 if (needsDownsample)
                 {
@@ -2514,73 +2509,19 @@ namespace ProDataGrid.Charting
             return null;
         }
 
-        private void ApplyWindow(
-            List<string?> categories,
-            List<List<double?>> seriesValues,
-            List<List<double>?> seriesXValues,
-            List<List<double?>?> seriesSizeValues,
-            int? windowStart,
-            int? windowCount)
-        {
-            if (!windowStart.HasValue && !windowCount.HasValue)
-            {
-                return;
-            }
-
-            var total = categories.Count;
-            var start = Math.Max(0, windowStart ?? 0);
-            if (start > total)
-            {
-                start = total;
-            }
-
-            var count = windowCount ?? (total - start);
-            if (count < 0)
-            {
-                count = 0;
-            }
-
-            if (start + count > total)
-            {
-                count = total - start;
-            }
-
-            if (start == 0 && count == total)
-            {
-                return;
-            }
-
-            TrimList(categories, start, count);
-            for (var i = 0; i < seriesValues.Count; i++)
-            {
-                TrimList(seriesValues[i], start, count);
-                if (seriesXValues[i] != null)
-                {
-                    TrimList(seriesXValues[i]!, start, count);
-                }
-
-                if (seriesSizeValues[i] != null)
-                {
-                    TrimList(seriesSizeValues[i]!, start, count);
-                }
-            }
-        }
-
-        private static void TrimList<T>(List<T> list, int start, int count)
-        {
-            if (start > 0)
-            {
-                list.RemoveRange(0, start);
-            }
-
-            if (count < list.Count)
-            {
-                list.RemoveRange(count, list.Count - count);
-            }
-        }
-
         private ChartDownsampleMode ResolveDownsampleMode(ChartDownsampleMode requested)
         {
+            // Matrix cells, hierarchy weights, and gauge slots carry category identity.
+            // Sampling/averaging them as line observations would change their meaning.
+            for (var i = 0; i < Series.Count; i++)
+            {
+                if (Series[i].Kind is ChartSeriesKind.Heatmap or ChartSeriesKind.Treemap or
+                    ChartSeriesKind.Sunburst or ChartSeriesKind.Gauge)
+                {
+                    return ChartDownsampleMode.None;
+                }
+            }
+
             if (requested == ChartDownsampleMode.Adaptive)
             {
                 return ResolveAdaptiveDownsampleMode();
@@ -3728,26 +3669,30 @@ namespace ProDataGrid.Charting
 
             public bool HasSizeValues { get; }
 
-            public ChartDataCache Clone()
+            public ChartDataCache Clone() => Clone(null, null);
+
+            public ChartDataCache Clone(int? windowStart, int? windowCount)
             {
-                var categories = new List<string?>(Categories);
+                var start = Math.Clamp(windowStart ?? 0, 0, Categories.Count);
+                var count = Math.Clamp(windowCount ?? (Categories.Count - start), 0, Categories.Count - start);
+                var categories = Categories.GetRange(start, count);
                 var seriesValues = new List<List<double?>>(SeriesValues.Count);
                 var seriesXValues = new List<List<double>?>(SeriesXValues.Count);
                 var seriesSizeValues = new List<List<double?>?>(SeriesSizeValues.Count);
 
                 for (var i = 0; i < SeriesValues.Count; i++)
                 {
-                    seriesValues.Add(new List<double?>(SeriesValues[i]));
+                    seriesValues.Add(SeriesValues[i].GetRange(start, count));
                 }
 
                 for (var i = 0; i < SeriesXValues.Count; i++)
                 {
-                    seriesXValues.Add(SeriesXValues[i] != null ? new List<double>(SeriesXValues[i]!) : null);
+                    seriesXValues.Add(SeriesXValues[i] != null ? SeriesXValues[i]!.GetRange(start, count) : null);
                 }
 
                 for (var i = 0; i < SeriesSizeValues.Count; i++)
                 {
-                    seriesSizeValues.Add(SeriesSizeValues[i] != null ? new List<double?>(SeriesSizeValues[i]!) : null);
+                    seriesSizeValues.Add(SeriesSizeValues[i] != null ? SeriesSizeValues[i]!.GetRange(start, count) : null);
                 }
 
                 return new ChartDataCache(categories, seriesValues, seriesXValues, seriesSizeValues, HasXValues, HasSizeValues);
