@@ -10,7 +10,7 @@ using ProDataGrid.FormulaEngine;
 
 namespace ProDataGrid.FormulaEngine.Excel
 {
-    public sealed class ExcelFunctionRegistry : IFormulaFunctionRegistry
+    public sealed partial class ExcelFunctionRegistry : IFormulaFunctionRegistry, IFormulaFunctionRegistryVersion
     {
         private readonly Dictionary<string, IFormulaFunction> _functions;
 
@@ -18,6 +18,7 @@ namespace ProDataGrid.FormulaEngine.Excel
         {
             _functions = new Dictionary<string, IFormulaFunction>(StringComparer.OrdinalIgnoreCase);
             RegisterDefaults();
+            RegisterExtendedDefaults();
         }
 
         public bool TryGetFunction(string name, out IFormulaFunction function)
@@ -45,6 +46,7 @@ namespace ProDataGrid.FormulaEngine.Excel
             }
 
             _functions[function.Name] = function;
+            unchecked { Version++; }
         }
 
         private void RegisterDefaults()

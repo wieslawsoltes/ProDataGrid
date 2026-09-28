@@ -82,6 +82,7 @@ namespace ProDataGrid.FormulaEngine
             FunctionRegistry = functionRegistry ?? throw new ArgumentNullException(nameof(functionRegistry));
             Instructions = instructions ?? throw new ArgumentNullException(nameof(instructions));
             MaxStackDepth = maxStackDepth;
+            FunctionRegistryVersion = (functionRegistry as IFormulaFunctionRegistryVersion)?.Version;
         }
 
         public IFormulaFunctionRegistry FunctionRegistry { get; }
@@ -89,6 +90,14 @@ namespace ProDataGrid.FormulaEngine
         public FormulaInstruction[] Instructions { get; }
 
         public int MaxStackDepth { get; }
+
+        private long? FunctionRegistryVersion { get; }
+
+        public bool IsCompatibleWith(IFormulaFunctionRegistry registry)
+        {
+            return ReferenceEquals(FunctionRegistry, registry) &&
+                FunctionRegistryVersion == (registry as IFormulaFunctionRegistryVersion)?.Version;
+        }
     }
 
     internal sealed class FormulaExpressionCompiler
@@ -121,86 +130,107 @@ namespace ProDataGrid.FormulaEngine
 
         private void CompileExpression(FormulaExpression expression)
         {
-            switch (expression.Kind)
+            // Heap-backed frames avoid overflowing the CLR stack on long generated formulas.
+            // Children are pushed in reverse so evaluation remains strictly left-to-right.
+            var pending = new Stack<(FormulaExpression Expression, bool Expanded)>();
+            pending.Push((expression, false));
+            while (pending.Count > 0)
             {
-                case FormulaExpressionKind.Literal:
-                    var literal = ((FormulaLiteralExpression)expression).Value;
-                    Emit(new FormulaInstruction(FormulaInstructionKind.Literal, literal: literal), push: 1);
-                    break;
-                case FormulaExpressionKind.Name:
-                    var name = ((FormulaNameExpression)expression).Name;
-                    Emit(new FormulaInstruction(FormulaInstructionKind.Name, name: name), push: 1);
-                    break;
-                case FormulaExpressionKind.Reference:
-                    var reference = ((FormulaReferenceExpression)expression).Reference;
-                    Emit(new FormulaInstruction(FormulaInstructionKind.Reference, reference: reference), push: 1);
-                    break;
-                case FormulaExpressionKind.StructuredReference:
-                    var structuredReference = ((FormulaStructuredReferenceExpression)expression).Reference;
-                    Emit(new FormulaInstruction(FormulaInstructionKind.StructuredReference, structuredReference: structuredReference), push: 1);
-                    break;
-                case FormulaExpressionKind.Unary:
-                    var unary = (FormulaUnaryExpression)expression;
-                    CompileExpression(unary.Operand);
-                    Emit(new FormulaInstruction(FormulaInstructionKind.Unary, unaryOperator: unary.Operator), pop: 1, push: 1);
-                    break;
-                case FormulaExpressionKind.Binary:
-                    var binary = (FormulaBinaryExpression)expression;
-                    CompileExpression(binary.Left);
-                    CompileExpression(binary.Right);
-                    Emit(new FormulaInstruction(FormulaInstructionKind.Binary, binaryOperator: binary.Operator), pop: 2, push: 1);
-                    break;
-                case FormulaExpressionKind.FunctionCall:
-                    CompileFunctionCall((FormulaFunctionCallExpression)expression);
-                    break;
-                case FormulaExpressionKind.ArrayLiteral:
-                    var array = (FormulaArrayExpression)expression;
-                    for (var row = 0; row < array.RowCount; row++)
+                var frame = pending.Pop();
+                var current = frame.Expression;
+                if (frame.Expanded)
+                {
+                    switch (current.Kind)
                     {
-                        for (var column = 0; column < array.ColumnCount; column++)
-                        {
-                            CompileExpression(array[row, column]);
-                        }
+                        case FormulaExpressionKind.Unary:
+                            Emit(new FormulaInstruction(FormulaInstructionKind.Unary,
+                                unaryOperator: ((FormulaUnaryExpression)current).Operator), pop: 1, push: 1);
+                            break;
+                        case FormulaExpressionKind.Binary:
+                            Emit(new FormulaInstruction(FormulaInstructionKind.Binary,
+                                binaryOperator: ((FormulaBinaryExpression)current).Operator), pop: 2, push: 1);
+                            break;
+                        case FormulaExpressionKind.FunctionCall:
+                            var call = (FormulaFunctionCallExpression)current;
+                            Emit(new FormulaInstruction(FormulaInstructionKind.FunctionCall,
+                                name: call.Name, argCount: call.Arguments.Count), pop: call.Arguments.Count, push: 1);
+                            break;
+                        case FormulaExpressionKind.ArrayLiteral:
+                            var array = (FormulaArrayExpression)current;
+                            Emit(new FormulaInstruction(FormulaInstructionKind.ArrayLiteral,
+                                rowCount: array.RowCount, columnCount: array.ColumnCount),
+                                pop: checked(array.RowCount * array.ColumnCount), push: 1);
+                            break;
                     }
-                    Emit(new FormulaInstruction(
-                            FormulaInstructionKind.ArrayLiteral,
-                            rowCount: array.RowCount,
-                            columnCount: array.ColumnCount),
-                        pop: array.RowCount * array.ColumnCount,
-                        push: 1);
-                    break;
-                default:
-                    Emit(new FormulaInstruction(FormulaInstructionKind.Literal, literal: FormulaValue.FromError(new FormulaError(FormulaErrorType.Calc))), push: 1);
-                    break;
-            }
-        }
+                    continue;
+                }
 
-        private void CompileFunctionCall(FormulaFunctionCallExpression expression)
-        {
-            if (_functionRegistry.TryGetFunction(expression.Name, out var function) &&
-                function is ILazyFormulaFunction)
-            {
-                Emit(new FormulaInstruction(
-                        FormulaInstructionKind.LazyFunctionCall,
-                        name: expression.Name,
-                        lazyArguments: expression.Arguments is List<FormulaExpression> list
-                            ? list.ToArray()
-                            : new List<FormulaExpression>(expression.Arguments).ToArray()),
-                    push: 1);
-                return;
+                switch (current.Kind)
+                {
+                    case FormulaExpressionKind.Literal:
+                        Emit(new FormulaInstruction(FormulaInstructionKind.Literal,
+                            literal: ((FormulaLiteralExpression)current).Value), push: 1);
+                        break;
+                    case FormulaExpressionKind.Name:
+                        Emit(new FormulaInstruction(FormulaInstructionKind.Name,
+                            name: ((FormulaNameExpression)current).Name), push: 1);
+                        break;
+                    case FormulaExpressionKind.Reference:
+                        Emit(new FormulaInstruction(FormulaInstructionKind.Reference,
+                            reference: ((FormulaReferenceExpression)current).Reference), push: 1);
+                        break;
+                    case FormulaExpressionKind.StructuredReference:
+                        Emit(new FormulaInstruction(FormulaInstructionKind.StructuredReference,
+                            structuredReference: ((FormulaStructuredReferenceExpression)current).Reference), push: 1);
+                        break;
+                    case FormulaExpressionKind.Unary:
+                        pending.Push((current, true));
+                        pending.Push((((FormulaUnaryExpression)current).Operand, false));
+                        break;
+                    case FormulaExpressionKind.Binary:
+                        var binary = (FormulaBinaryExpression)current;
+                        pending.Push((current, true));
+                        pending.Push((binary.Right, false));
+                        pending.Push((binary.Left, false));
+                        break;
+                    case FormulaExpressionKind.FunctionCall:
+                        var call = (FormulaFunctionCallExpression)current;
+                        if (_functionRegistry.TryGetFunction(call.Name, out var function) && function is ILazyFormulaFunction)
+                        {
+                            var arguments = new FormulaExpression[call.Arguments.Count];
+                            for (var i = 0; i < arguments.Length; i++)
+                            {
+                                arguments[i] = call.Arguments[i];
+                            }
+                            Emit(new FormulaInstruction(FormulaInstructionKind.LazyFunctionCall,
+                                name: call.Name, lazyArguments: arguments), push: 1);
+                        }
+                        else
+                        {
+                            pending.Push((current, true));
+                            for (var i = call.Arguments.Count - 1; i >= 0; i--)
+                            {
+                                pending.Push((call.Arguments[i], false));
+                            }
+                        }
+                        break;
+                    case FormulaExpressionKind.ArrayLiteral:
+                        var array = (FormulaArrayExpression)current;
+                        pending.Push((current, true));
+                        for (var row = array.RowCount - 1; row >= 0; row--)
+                        {
+                            for (var column = array.ColumnCount - 1; column >= 0; column--)
+                            {
+                                pending.Push((array[row, column], false));
+                            }
+                        }
+                        break;
+                    default:
+                        Emit(new FormulaInstruction(FormulaInstructionKind.Literal,
+                            literal: FormulaValue.FromError(new FormulaError(FormulaErrorType.Calc))), push: 1);
+                        break;
+                }
             }
-
-            foreach (var argument in expression.Arguments)
-            {
-                CompileExpression(argument);
-            }
-
-            Emit(new FormulaInstruction(
-                    FormulaInstructionKind.FunctionCall,
-                    name: expression.Name,
-                    argCount: expression.Arguments.Count),
-                pop: expression.Arguments.Count,
-                push: 1);
         }
 
         private void Emit(FormulaInstruction instruction, int pop = 0, int push = 0)
