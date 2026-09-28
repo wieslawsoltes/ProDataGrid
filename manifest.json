@@ -12981,6 +12981,16 @@
     },
     {
       "type": "Conceptual",
+      "source_relative_path": "articles/procharts-windowing.md",
+      "output": {
+        ".html": {
+          "relative_path": "articles/procharts-windowing.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "Conceptual",
       "source_relative_path": "articles/prodiagnostics.md",
       "output": {
         ".html": {
