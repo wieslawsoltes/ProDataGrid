@@ -60,7 +60,10 @@ namespace ProDataGrid.FormulaEngine.Excel
                 }
             }
 
-            var array = new FormulaArray(rows, columns);
+            if (!ExcelArrayShapeUtilities.TryCreate(context, rows, columns, out var array, out error))
+            {
+                return FormulaValue.FromError(error);
+            }
             var index = 0;
             for (var row = 0; row < rows; row++)
             {
