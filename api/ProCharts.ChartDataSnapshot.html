@@ -85,7 +85,7 @@
 
 
   <h1 id="ProCharts_ChartDataSnapshot" data-uid="ProCharts.ChartDataSnapshot" class="text-break">
-Class ChartDataSnapshot  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/ProCharts/ChartData.cs/#L654"><i class="bi bi-code-slash"></i></a>
+Class ChartDataSnapshot  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/ProCharts/ChartHierarchySnapshot.cs/#L134"><i class="bi bi-code-slash"></i></a>
   </h1>
 
   <div class="facts text-secondary">
@@ -143,6 +143,42 @@ Class ChartDataSnapshot  <a class="header-action link-secondary" title="View sou
 
   <h2 class="section" id="constructors">Constructors
 </h2>
+
+
+  <a id="ProCharts_ChartDataSnapshot__ctor_" data-uid="ProCharts.ChartDataSnapshot.#ctor*"></a>
+
+  <h3 id="ProCharts_ChartDataSnapshot__ctor_ProCharts_ChartHierarchySnapshot_ProCharts_ChartSeriesKind_System_Int32_" data-uid="ProCharts.ChartDataSnapshot.#ctor(ProCharts.ChartHierarchySnapshot,ProCharts.ChartSeriesKind,System.Int32)">
+  ChartDataSnapshot(ChartHierarchySnapshot, ChartSeriesKind, int)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/ProCharts/ChartHierarchySnapshot.cs/#L137"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Creates a treemap or sunburst snapshot whose point indices are preorder node indices.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public ChartDataSnapshot(ChartHierarchySnapshot hierarchy, ChartSeriesKind kind, int version = 0)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>hierarchy</code> <a class="xref" href="ProCharts.ChartHierarchySnapshot.html">ChartHierarchySnapshot</a></dt>
+    <dd></dd>
+    <dt><code>kind</code> <a class="xref" href="ProCharts.ChartSeriesKind.html">ChartSeriesKind</a></dt>
+    <dd></dd>
+    <dt><code>version</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
 
 
   <a id="ProCharts_ChartDataSnapshot__ctor_" data-uid="ProCharts.ChartDataSnapshot.#ctor*"></a>
@@ -279,6 +315,38 @@ Class ChartDataSnapshot  <a class="header-action link-secondary" title="View sou
 
 
 
+  <a id="ProCharts_ChartDataSnapshot_Hierarchy_" data-uid="ProCharts.ChartDataSnapshot.Hierarchy*"></a>
+
+  <h3 id="ProCharts_ChartDataSnapshot_Hierarchy" data-uid="ProCharts.ChartDataSnapshot.Hierarchy">
+  Hierarchy
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/ProCharts/ChartHierarchySnapshot.cs/#L145"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Gets the optional typed hierarchy. Existing snapshot constructors remain unchanged.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public ChartHierarchySnapshot? Hierarchy { get; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="ProCharts.ChartHierarchySnapshot.html">ChartHierarchySnapshot</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
   <a id="ProCharts_ChartDataSnapshot_Series_" data-uid="ProCharts.ChartDataSnapshot.Series*"></a>
 
   <h3 id="ProCharts_ChartDataSnapshot_Series" data-uid="ProCharts.ChartDataSnapshot.Series">
@@ -345,7 +413,7 @@ Class ChartDataSnapshot  <a class="header-action link-secondary" title="View sou
 </article>
 
         <div class="contribution d-print-none">
-          <a href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/ProCharts/ChartData.cs/#L654" class="edit-link">Edit this page</a>
+          <a href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/ProCharts/ChartHierarchySnapshot.cs/#L134" class="edit-link">Edit this page</a>
         </div>
 
 

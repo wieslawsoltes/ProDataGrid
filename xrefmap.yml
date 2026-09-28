@@ -71660,6 +71660,15 @@ references:
   commentId: T:ProCharts.ChartDataSnapshot
   fullName: ProCharts.ChartDataSnapshot
   nameWithType: ChartDataSnapshot
+- uid: ProCharts.ChartDataSnapshot.#ctor(ProCharts.ChartHierarchySnapshot,ProCharts.ChartSeriesKind,System.Int32)
+  name: ChartDataSnapshot(ChartHierarchySnapshot, ChartSeriesKind, int)
+  href: api/ProCharts.ChartDataSnapshot.html#ProCharts_ChartDataSnapshot__ctor_ProCharts_ChartHierarchySnapshot_ProCharts_ChartSeriesKind_System_Int32_
+  commentId: M:ProCharts.ChartDataSnapshot.#ctor(ProCharts.ChartHierarchySnapshot,ProCharts.ChartSeriesKind,System.Int32)
+  name.vb: New(ChartHierarchySnapshot, ChartSeriesKind, Integer)
+  fullName: ProCharts.ChartDataSnapshot.ChartDataSnapshot(ProCharts.ChartHierarchySnapshot, ProCharts.ChartSeriesKind, int)
+  fullName.vb: ProCharts.ChartDataSnapshot.New(ProCharts.ChartHierarchySnapshot, ProCharts.ChartSeriesKind, Integer)
+  nameWithType: ChartDataSnapshot.ChartDataSnapshot(ChartHierarchySnapshot, ChartSeriesKind, int)
+  nameWithType.vb: ChartDataSnapshot.New(ChartHierarchySnapshot, ChartSeriesKind, Integer)
 - uid: ProCharts.ChartDataSnapshot.#ctor(System.Collections.Generic.IReadOnlyList{System.String},System.Collections.Generic.IReadOnlyList{ProCharts.ChartSeriesSnapshot})
   name: ChartDataSnapshot(IReadOnlyList<string?>, IReadOnlyList<ChartSeriesSnapshot>)
   href: api/ProCharts.ChartDataSnapshot.html#ProCharts_ChartDataSnapshot__ctor_System_Collections_Generic_IReadOnlyList_System_String__System_Collections_Generic_IReadOnlyList_ProCharts_ChartSeriesSnapshot__
@@ -71714,6 +71723,19 @@ references:
   isSpec: "True"
   fullName: ProCharts.ChartDataSnapshot.Empty
   nameWithType: ChartDataSnapshot.Empty
+- uid: ProCharts.ChartDataSnapshot.Hierarchy
+  name: Hierarchy
+  href: api/ProCharts.ChartDataSnapshot.html#ProCharts_ChartDataSnapshot_Hierarchy
+  commentId: P:ProCharts.ChartDataSnapshot.Hierarchy
+  fullName: ProCharts.ChartDataSnapshot.Hierarchy
+  nameWithType: ChartDataSnapshot.Hierarchy
+- uid: ProCharts.ChartDataSnapshot.Hierarchy*
+  name: Hierarchy
+  href: api/ProCharts.ChartDataSnapshot.html#ProCharts_ChartDataSnapshot_Hierarchy_
+  commentId: Overload:ProCharts.ChartDataSnapshot.Hierarchy
+  isSpec: "True"
+  fullName: ProCharts.ChartDataSnapshot.Hierarchy
+  nameWithType: ChartDataSnapshot.Hierarchy
 - uid: ProCharts.ChartDataSnapshot.Series
   name: Series
   href: api/ProCharts.ChartDataSnapshot.html#ProCharts_ChartDataSnapshot_Series
@@ -71976,6 +71998,346 @@ references:
   commentId: F:ProCharts.ChartGradientDirection.Vertical
   fullName: ProCharts.ChartGradientDirection.Vertical
   nameWithType: ChartGradientDirection.Vertical
+- uid: ProCharts.ChartHierarchyLayout
+  name: ChartHierarchyLayout
+  href: api/ProCharts.ChartHierarchyLayout.html
+  commentId: T:ProCharts.ChartHierarchyLayout
+  fullName: ProCharts.ChartHierarchyLayout
+  nameWithType: ChartHierarchyLayout
+- uid: ProCharts.ChartHierarchyLayout.CreateSunburst(ProCharts.ChartHierarchySnapshot,System.Double)
+  name: CreateSunburst(ChartHierarchySnapshot, double)
+  href: api/ProCharts.ChartHierarchyLayout.html#ProCharts_ChartHierarchyLayout_CreateSunburst_ProCharts_ChartHierarchySnapshot_System_Double_
+  commentId: M:ProCharts.ChartHierarchyLayout.CreateSunburst(ProCharts.ChartHierarchySnapshot,System.Double)
+  name.vb: CreateSunburst(ChartHierarchySnapshot, Double)
+  fullName: ProCharts.ChartHierarchyLayout.CreateSunburst(ProCharts.ChartHierarchySnapshot, double)
+  fullName.vb: ProCharts.ChartHierarchyLayout.CreateSunburst(ProCharts.ChartHierarchySnapshot, Double)
+  nameWithType: ChartHierarchyLayout.CreateSunburst(ChartHierarchySnapshot, double)
+  nameWithType.vb: ChartHierarchyLayout.CreateSunburst(ChartHierarchySnapshot, Double)
+- uid: ProCharts.ChartHierarchyLayout.CreateSunburst*
+  name: CreateSunburst
+  href: api/ProCharts.ChartHierarchyLayout.html#ProCharts_ChartHierarchyLayout_CreateSunburst_
+  commentId: Overload:ProCharts.ChartHierarchyLayout.CreateSunburst
+  isSpec: "True"
+  fullName: ProCharts.ChartHierarchyLayout.CreateSunburst
+  nameWithType: ChartHierarchyLayout.CreateSunburst
+- uid: ProCharts.ChartHierarchyLayout.CreateTreemap(ProCharts.ChartHierarchySnapshot,System.Double,System.Double,System.Double,System.Double)
+  name: CreateTreemap(ChartHierarchySnapshot, double, double, double, double)
+  href: api/ProCharts.ChartHierarchyLayout.html#ProCharts_ChartHierarchyLayout_CreateTreemap_ProCharts_ChartHierarchySnapshot_System_Double_System_Double_System_Double_System_Double_
+  commentId: M:ProCharts.ChartHierarchyLayout.CreateTreemap(ProCharts.ChartHierarchySnapshot,System.Double,System.Double,System.Double,System.Double)
+  name.vb: CreateTreemap(ChartHierarchySnapshot, Double, Double, Double, Double)
+  fullName: ProCharts.ChartHierarchyLayout.CreateTreemap(ProCharts.ChartHierarchySnapshot, double, double, double, double)
+  fullName.vb: ProCharts.ChartHierarchyLayout.CreateTreemap(ProCharts.ChartHierarchySnapshot, Double, Double, Double, Double)
+  nameWithType: ChartHierarchyLayout.CreateTreemap(ChartHierarchySnapshot, double, double, double, double)
+  nameWithType.vb: ChartHierarchyLayout.CreateTreemap(ChartHierarchySnapshot, Double, Double, Double, Double)
+- uid: ProCharts.ChartHierarchyLayout.CreateTreemap*
+  name: CreateTreemap
+  href: api/ProCharts.ChartHierarchyLayout.html#ProCharts_ChartHierarchyLayout_CreateTreemap_
+  commentId: Overload:ProCharts.ChartHierarchyLayout.CreateTreemap
+  isSpec: "True"
+  fullName: ProCharts.ChartHierarchyLayout.CreateTreemap
+  nameWithType: ChartHierarchyLayout.CreateTreemap
+- uid: ProCharts.ChartHierarchyLayout.HitTestSunburst(System.Collections.Generic.IReadOnlyList{ProCharts.ChartSunburstSector},System.Double,System.Double)
+  name: HitTestSunburst(IReadOnlyList<ChartSunburstSector>, double, double)
+  href: api/ProCharts.ChartHierarchyLayout.html#ProCharts_ChartHierarchyLayout_HitTestSunburst_System_Collections_Generic_IReadOnlyList_ProCharts_ChartSunburstSector__System_Double_System_Double_
+  commentId: M:ProCharts.ChartHierarchyLayout.HitTestSunburst(System.Collections.Generic.IReadOnlyList{ProCharts.ChartSunburstSector},System.Double,System.Double)
+  name.vb: HitTestSunburst(IReadOnlyList(Of ChartSunburstSector), Double, Double)
+  fullName: ProCharts.ChartHierarchyLayout.HitTestSunburst(System.Collections.Generic.IReadOnlyList<ProCharts.ChartSunburstSector>, double, double)
+  fullName.vb: ProCharts.ChartHierarchyLayout.HitTestSunburst(System.Collections.Generic.IReadOnlyList(Of ProCharts.ChartSunburstSector), Double, Double)
+  nameWithType: ChartHierarchyLayout.HitTestSunburst(IReadOnlyList<ChartSunburstSector>, double, double)
+  nameWithType.vb: ChartHierarchyLayout.HitTestSunburst(IReadOnlyList(Of ChartSunburstSector), Double, Double)
+- uid: ProCharts.ChartHierarchyLayout.HitTestSunburst*
+  name: HitTestSunburst
+  href: api/ProCharts.ChartHierarchyLayout.html#ProCharts_ChartHierarchyLayout_HitTestSunburst_
+  commentId: Overload:ProCharts.ChartHierarchyLayout.HitTestSunburst
+  isSpec: "True"
+  fullName: ProCharts.ChartHierarchyLayout.HitTestSunburst
+  nameWithType: ChartHierarchyLayout.HitTestSunburst
+- uid: ProCharts.ChartHierarchyLayout.HitTestTreemap(System.Collections.Generic.IReadOnlyList{ProCharts.ChartTreemapCell},System.Double,System.Double)
+  name: HitTestTreemap(IReadOnlyList<ChartTreemapCell>, double, double)
+  href: api/ProCharts.ChartHierarchyLayout.html#ProCharts_ChartHierarchyLayout_HitTestTreemap_System_Collections_Generic_IReadOnlyList_ProCharts_ChartTreemapCell__System_Double_System_Double_
+  commentId: M:ProCharts.ChartHierarchyLayout.HitTestTreemap(System.Collections.Generic.IReadOnlyList{ProCharts.ChartTreemapCell},System.Double,System.Double)
+  name.vb: HitTestTreemap(IReadOnlyList(Of ChartTreemapCell), Double, Double)
+  fullName: ProCharts.ChartHierarchyLayout.HitTestTreemap(System.Collections.Generic.IReadOnlyList<ProCharts.ChartTreemapCell>, double, double)
+  fullName.vb: ProCharts.ChartHierarchyLayout.HitTestTreemap(System.Collections.Generic.IReadOnlyList(Of ProCharts.ChartTreemapCell), Double, Double)
+  nameWithType: ChartHierarchyLayout.HitTestTreemap(IReadOnlyList<ChartTreemapCell>, double, double)
+  nameWithType.vb: ChartHierarchyLayout.HitTestTreemap(IReadOnlyList(Of ChartTreemapCell), Double, Double)
+- uid: ProCharts.ChartHierarchyLayout.HitTestTreemap*
+  name: HitTestTreemap
+  href: api/ProCharts.ChartHierarchyLayout.html#ProCharts_ChartHierarchyLayout_HitTestTreemap_
+  commentId: Overload:ProCharts.ChartHierarchyLayout.HitTestTreemap
+  isSpec: "True"
+  fullName: ProCharts.ChartHierarchyLayout.HitTestTreemap
+  nameWithType: ChartHierarchyLayout.HitTestTreemap
+- uid: ProCharts.ChartHierarchyNode
+  name: ChartHierarchyNode
+  href: api/ProCharts.ChartHierarchyNode.html
+  commentId: T:ProCharts.ChartHierarchyNode
+  fullName: ProCharts.ChartHierarchyNode
+  nameWithType: ChartHierarchyNode
+- uid: ProCharts.ChartHierarchyNode.#ctor(System.String,System.String,System.Collections.Generic.IReadOnlyList{ProCharts.ChartHierarchyNode})
+  name: ChartHierarchyNode(string, string?, IReadOnlyList<ChartHierarchyNode>)
+  href: api/ProCharts.ChartHierarchyNode.html#ProCharts_ChartHierarchyNode__ctor_System_String_System_String_System_Collections_Generic_IReadOnlyList_ProCharts_ChartHierarchyNode__
+  commentId: M:ProCharts.ChartHierarchyNode.#ctor(System.String,System.String,System.Collections.Generic.IReadOnlyList{ProCharts.ChartHierarchyNode})
+  name.vb: New(String, String, IReadOnlyList(Of ChartHierarchyNode))
+  fullName: ProCharts.ChartHierarchyNode.ChartHierarchyNode(string, string?, System.Collections.Generic.IReadOnlyList<ProCharts.ChartHierarchyNode>)
+  fullName.vb: ProCharts.ChartHierarchyNode.New(String, String, System.Collections.Generic.IReadOnlyList(Of ProCharts.ChartHierarchyNode))
+  nameWithType: ChartHierarchyNode.ChartHierarchyNode(string, string?, IReadOnlyList<ChartHierarchyNode>)
+  nameWithType.vb: ChartHierarchyNode.New(String, String, IReadOnlyList(Of ChartHierarchyNode))
+- uid: ProCharts.ChartHierarchyNode.#ctor(System.String,System.String,System.Double)
+  name: ChartHierarchyNode(string, string?, double)
+  href: api/ProCharts.ChartHierarchyNode.html#ProCharts_ChartHierarchyNode__ctor_System_String_System_String_System_Double_
+  commentId: M:ProCharts.ChartHierarchyNode.#ctor(System.String,System.String,System.Double)
+  name.vb: New(String, String, Double)
+  fullName: ProCharts.ChartHierarchyNode.ChartHierarchyNode(string, string?, double)
+  fullName.vb: ProCharts.ChartHierarchyNode.New(String, String, Double)
+  nameWithType: ChartHierarchyNode.ChartHierarchyNode(string, string?, double)
+  nameWithType.vb: ChartHierarchyNode.New(String, String, Double)
+- uid: ProCharts.ChartHierarchyNode.#ctor*
+  name: ChartHierarchyNode
+  href: api/ProCharts.ChartHierarchyNode.html#ProCharts_ChartHierarchyNode__ctor_
+  commentId: Overload:ProCharts.ChartHierarchyNode.#ctor
+  isSpec: "True"
+  name.vb: New
+  fullName: ProCharts.ChartHierarchyNode.ChartHierarchyNode
+  fullName.vb: ProCharts.ChartHierarchyNode.New
+  nameWithType: ChartHierarchyNode.ChartHierarchyNode
+  nameWithType.vb: ChartHierarchyNode.New
+- uid: ProCharts.ChartHierarchyNode.Children
+  name: Children
+  href: api/ProCharts.ChartHierarchyNode.html#ProCharts_ChartHierarchyNode_Children
+  commentId: P:ProCharts.ChartHierarchyNode.Children
+  fullName: ProCharts.ChartHierarchyNode.Children
+  nameWithType: ChartHierarchyNode.Children
+- uid: ProCharts.ChartHierarchyNode.Children*
+  name: Children
+  href: api/ProCharts.ChartHierarchyNode.html#ProCharts_ChartHierarchyNode_Children_
+  commentId: Overload:ProCharts.ChartHierarchyNode.Children
+  isSpec: "True"
+  fullName: ProCharts.ChartHierarchyNode.Children
+  nameWithType: ChartHierarchyNode.Children
+- uid: ProCharts.ChartHierarchyNode.Height
+  name: Height
+  href: api/ProCharts.ChartHierarchyNode.html#ProCharts_ChartHierarchyNode_Height
+  commentId: P:ProCharts.ChartHierarchyNode.Height
+  fullName: ProCharts.ChartHierarchyNode.Height
+  nameWithType: ChartHierarchyNode.Height
+- uid: ProCharts.ChartHierarchyNode.Height*
+  name: Height
+  href: api/ProCharts.ChartHierarchyNode.html#ProCharts_ChartHierarchyNode_Height_
+  commentId: Overload:ProCharts.ChartHierarchyNode.Height
+  isSpec: "True"
+  fullName: ProCharts.ChartHierarchyNode.Height
+  nameWithType: ChartHierarchyNode.Height
+- uid: ProCharts.ChartHierarchyNode.Id
+  name: Id
+  href: api/ProCharts.ChartHierarchyNode.html#ProCharts_ChartHierarchyNode_Id
+  commentId: P:ProCharts.ChartHierarchyNode.Id
+  fullName: ProCharts.ChartHierarchyNode.Id
+  nameWithType: ChartHierarchyNode.Id
+- uid: ProCharts.ChartHierarchyNode.Id*
+  name: Id
+  href: api/ProCharts.ChartHierarchyNode.html#ProCharts_ChartHierarchyNode_Id_
+  commentId: Overload:ProCharts.ChartHierarchyNode.Id
+  isSpec: "True"
+  fullName: ProCharts.ChartHierarchyNode.Id
+  nameWithType: ChartHierarchyNode.Id
+- uid: ProCharts.ChartHierarchyNode.IsLeaf
+  name: IsLeaf
+  href: api/ProCharts.ChartHierarchyNode.html#ProCharts_ChartHierarchyNode_IsLeaf
+  commentId: P:ProCharts.ChartHierarchyNode.IsLeaf
+  fullName: ProCharts.ChartHierarchyNode.IsLeaf
+  nameWithType: ChartHierarchyNode.IsLeaf
+- uid: ProCharts.ChartHierarchyNode.IsLeaf*
+  name: IsLeaf
+  href: api/ProCharts.ChartHierarchyNode.html#ProCharts_ChartHierarchyNode_IsLeaf_
+  commentId: Overload:ProCharts.ChartHierarchyNode.IsLeaf
+  isSpec: "True"
+  fullName: ProCharts.ChartHierarchyNode.IsLeaf
+  nameWithType: ChartHierarchyNode.IsLeaf
+- uid: ProCharts.ChartHierarchyNode.Label
+  name: Label
+  href: api/ProCharts.ChartHierarchyNode.html#ProCharts_ChartHierarchyNode_Label
+  commentId: P:ProCharts.ChartHierarchyNode.Label
+  fullName: ProCharts.ChartHierarchyNode.Label
+  nameWithType: ChartHierarchyNode.Label
+- uid: ProCharts.ChartHierarchyNode.Label*
+  name: Label
+  href: api/ProCharts.ChartHierarchyNode.html#ProCharts_ChartHierarchyNode_Label_
+  commentId: Overload:ProCharts.ChartHierarchyNode.Label
+  isSpec: "True"
+  fullName: ProCharts.ChartHierarchyNode.Label
+  nameWithType: ChartHierarchyNode.Label
+- uid: ProCharts.ChartHierarchyNode.TotalValue
+  name: TotalValue
+  href: api/ProCharts.ChartHierarchyNode.html#ProCharts_ChartHierarchyNode_TotalValue
+  commentId: P:ProCharts.ChartHierarchyNode.TotalValue
+  fullName: ProCharts.ChartHierarchyNode.TotalValue
+  nameWithType: ChartHierarchyNode.TotalValue
+- uid: ProCharts.ChartHierarchyNode.TotalValue*
+  name: TotalValue
+  href: api/ProCharts.ChartHierarchyNode.html#ProCharts_ChartHierarchyNode_TotalValue_
+  commentId: Overload:ProCharts.ChartHierarchyNode.TotalValue
+  isSpec: "True"
+  fullName: ProCharts.ChartHierarchyNode.TotalValue
+  nameWithType: ChartHierarchyNode.TotalValue
+- uid: ProCharts.ChartHierarchySnapshot
+  name: ChartHierarchySnapshot
+  href: api/ProCharts.ChartHierarchySnapshot.html
+  commentId: T:ProCharts.ChartHierarchySnapshot
+  fullName: ProCharts.ChartHierarchySnapshot
+  nameWithType: ChartHierarchySnapshot
+- uid: ProCharts.ChartHierarchySnapshot.#ctor(ProCharts.ChartHierarchyNode)
+  name: ChartHierarchySnapshot(ChartHierarchyNode)
+  href: api/ProCharts.ChartHierarchySnapshot.html#ProCharts_ChartHierarchySnapshot__ctor_ProCharts_ChartHierarchyNode_
+  commentId: M:ProCharts.ChartHierarchySnapshot.#ctor(ProCharts.ChartHierarchyNode)
+  name.vb: New(ChartHierarchyNode)
+  fullName: ProCharts.ChartHierarchySnapshot.ChartHierarchySnapshot(ProCharts.ChartHierarchyNode)
+  fullName.vb: ProCharts.ChartHierarchySnapshot.New(ProCharts.ChartHierarchyNode)
+  nameWithType: ChartHierarchySnapshot.ChartHierarchySnapshot(ChartHierarchyNode)
+  nameWithType.vb: ChartHierarchySnapshot.New(ChartHierarchyNode)
+- uid: ProCharts.ChartHierarchySnapshot.#ctor*
+  name: ChartHierarchySnapshot
+  href: api/ProCharts.ChartHierarchySnapshot.html#ProCharts_ChartHierarchySnapshot__ctor_
+  commentId: Overload:ProCharts.ChartHierarchySnapshot.#ctor
+  isSpec: "True"
+  name.vb: New
+  fullName: ProCharts.ChartHierarchySnapshot.ChartHierarchySnapshot
+  fullName.vb: ProCharts.ChartHierarchySnapshot.New
+  nameWithType: ChartHierarchySnapshot.ChartHierarchySnapshot
+  nameWithType.vb: ChartHierarchySnapshot.New
+- uid: ProCharts.ChartHierarchySnapshot.BranchIndices
+  name: BranchIndices
+  href: api/ProCharts.ChartHierarchySnapshot.html#ProCharts_ChartHierarchySnapshot_BranchIndices
+  commentId: P:ProCharts.ChartHierarchySnapshot.BranchIndices
+  fullName: ProCharts.ChartHierarchySnapshot.BranchIndices
+  nameWithType: ChartHierarchySnapshot.BranchIndices
+- uid: ProCharts.ChartHierarchySnapshot.BranchIndices*
+  name: BranchIndices
+  href: api/ProCharts.ChartHierarchySnapshot.html#ProCharts_ChartHierarchySnapshot_BranchIndices_
+  commentId: Overload:ProCharts.ChartHierarchySnapshot.BranchIndices
+  isSpec: "True"
+  fullName: ProCharts.ChartHierarchySnapshot.BranchIndices
+  nameWithType: ChartHierarchySnapshot.BranchIndices
+- uid: ProCharts.ChartHierarchySnapshot.Categories
+  name: Categories
+  href: api/ProCharts.ChartHierarchySnapshot.html#ProCharts_ChartHierarchySnapshot_Categories
+  commentId: P:ProCharts.ChartHierarchySnapshot.Categories
+  fullName: ProCharts.ChartHierarchySnapshot.Categories
+  nameWithType: ChartHierarchySnapshot.Categories
+- uid: ProCharts.ChartHierarchySnapshot.Categories*
+  name: Categories
+  href: api/ProCharts.ChartHierarchySnapshot.html#ProCharts_ChartHierarchySnapshot_Categories_
+  commentId: Overload:ProCharts.ChartHierarchySnapshot.Categories
+  isSpec: "True"
+  fullName: ProCharts.ChartHierarchySnapshot.Categories
+  nameWithType: ChartHierarchySnapshot.Categories
+- uid: ProCharts.ChartHierarchySnapshot.Depths
+  name: Depths
+  href: api/ProCharts.ChartHierarchySnapshot.html#ProCharts_ChartHierarchySnapshot_Depths
+  commentId: P:ProCharts.ChartHierarchySnapshot.Depths
+  fullName: ProCharts.ChartHierarchySnapshot.Depths
+  nameWithType: ChartHierarchySnapshot.Depths
+- uid: ProCharts.ChartHierarchySnapshot.Depths*
+  name: Depths
+  href: api/ProCharts.ChartHierarchySnapshot.html#ProCharts_ChartHierarchySnapshot_Depths_
+  commentId: Overload:ProCharts.ChartHierarchySnapshot.Depths
+  isSpec: "True"
+  fullName: ProCharts.ChartHierarchySnapshot.Depths
+  nameWithType: ChartHierarchySnapshot.Depths
+- uid: ProCharts.ChartHierarchySnapshot.FromChartData(ProCharts.ChartDataSnapshot)
+  name: FromChartData(ChartDataSnapshot)
+  href: api/ProCharts.ChartHierarchySnapshot.html#ProCharts_ChartHierarchySnapshot_FromChartData_ProCharts_ChartDataSnapshot_
+  commentId: M:ProCharts.ChartHierarchySnapshot.FromChartData(ProCharts.ChartDataSnapshot)
+  fullName: ProCharts.ChartHierarchySnapshot.FromChartData(ProCharts.ChartDataSnapshot)
+  nameWithType: ChartHierarchySnapshot.FromChartData(ChartDataSnapshot)
+- uid: ProCharts.ChartHierarchySnapshot.FromChartData*
+  name: FromChartData
+  href: api/ProCharts.ChartHierarchySnapshot.html#ProCharts_ChartHierarchySnapshot_FromChartData_
+  commentId: Overload:ProCharts.ChartHierarchySnapshot.FromChartData
+  isSpec: "True"
+  fullName: ProCharts.ChartHierarchySnapshot.FromChartData
+  nameWithType: ChartHierarchySnapshot.FromChartData
+- uid: ProCharts.ChartHierarchySnapshot.Nodes
+  name: Nodes
+  href: api/ProCharts.ChartHierarchySnapshot.html#ProCharts_ChartHierarchySnapshot_Nodes
+  commentId: P:ProCharts.ChartHierarchySnapshot.Nodes
+  fullName: ProCharts.ChartHierarchySnapshot.Nodes
+  nameWithType: ChartHierarchySnapshot.Nodes
+- uid: ProCharts.ChartHierarchySnapshot.Nodes*
+  name: Nodes
+  href: api/ProCharts.ChartHierarchySnapshot.html#ProCharts_ChartHierarchySnapshot_Nodes_
+  commentId: Overload:ProCharts.ChartHierarchySnapshot.Nodes
+  isSpec: "True"
+  fullName: ProCharts.ChartHierarchySnapshot.Nodes
+  nameWithType: ChartHierarchySnapshot.Nodes
+- uid: ProCharts.ChartHierarchySnapshot.ParentIndices
+  name: ParentIndices
+  href: api/ProCharts.ChartHierarchySnapshot.html#ProCharts_ChartHierarchySnapshot_ParentIndices
+  commentId: P:ProCharts.ChartHierarchySnapshot.ParentIndices
+  fullName: ProCharts.ChartHierarchySnapshot.ParentIndices
+  nameWithType: ChartHierarchySnapshot.ParentIndices
+- uid: ProCharts.ChartHierarchySnapshot.ParentIndices*
+  name: ParentIndices
+  href: api/ProCharts.ChartHierarchySnapshot.html#ProCharts_ChartHierarchySnapshot_ParentIndices_
+  commentId: Overload:ProCharts.ChartHierarchySnapshot.ParentIndices
+  isSpec: "True"
+  fullName: ProCharts.ChartHierarchySnapshot.ParentIndices
+  nameWithType: ChartHierarchySnapshot.ParentIndices
+- uid: ProCharts.ChartHierarchySnapshot.Root
+  name: Root
+  href: api/ProCharts.ChartHierarchySnapshot.html#ProCharts_ChartHierarchySnapshot_Root
+  commentId: P:ProCharts.ChartHierarchySnapshot.Root
+  fullName: ProCharts.ChartHierarchySnapshot.Root
+  nameWithType: ChartHierarchySnapshot.Root
+- uid: ProCharts.ChartHierarchySnapshot.Root*
+  name: Root
+  href: api/ProCharts.ChartHierarchySnapshot.html#ProCharts_ChartHierarchySnapshot_Root_
+  commentId: Overload:ProCharts.ChartHierarchySnapshot.Root
+  isSpec: "True"
+  fullName: ProCharts.ChartHierarchySnapshot.Root
+  nameWithType: ChartHierarchySnapshot.Root
+- uid: ProCharts.ChartHierarchySnapshot.SourcePointIndices
+  name: SourcePointIndices
+  href: api/ProCharts.ChartHierarchySnapshot.html#ProCharts_ChartHierarchySnapshot_SourcePointIndices
+  commentId: P:ProCharts.ChartHierarchySnapshot.SourcePointIndices
+  fullName: ProCharts.ChartHierarchySnapshot.SourcePointIndices
+  nameWithType: ChartHierarchySnapshot.SourcePointIndices
+- uid: ProCharts.ChartHierarchySnapshot.SourcePointIndices*
+  name: SourcePointIndices
+  href: api/ProCharts.ChartHierarchySnapshot.html#ProCharts_ChartHierarchySnapshot_SourcePointIndices_
+  commentId: Overload:ProCharts.ChartHierarchySnapshot.SourcePointIndices
+  isSpec: "True"
+  fullName: ProCharts.ChartHierarchySnapshot.SourcePointIndices
+  nameWithType: ChartHierarchySnapshot.SourcePointIndices
+- uid: ProCharts.ChartHierarchySnapshot.SourceSeriesIndices
+  name: SourceSeriesIndices
+  href: api/ProCharts.ChartHierarchySnapshot.html#ProCharts_ChartHierarchySnapshot_SourceSeriesIndices
+  commentId: P:ProCharts.ChartHierarchySnapshot.SourceSeriesIndices
+  fullName: ProCharts.ChartHierarchySnapshot.SourceSeriesIndices
+  nameWithType: ChartHierarchySnapshot.SourceSeriesIndices
+- uid: ProCharts.ChartHierarchySnapshot.SourceSeriesIndices*
+  name: SourceSeriesIndices
+  href: api/ProCharts.ChartHierarchySnapshot.html#ProCharts_ChartHierarchySnapshot_SourceSeriesIndices_
+  commentId: Overload:ProCharts.ChartHierarchySnapshot.SourceSeriesIndices
+  isSpec: "True"
+  fullName: ProCharts.ChartHierarchySnapshot.SourceSeriesIndices
+  nameWithType: ChartHierarchySnapshot.SourceSeriesIndices
+- uid: ProCharts.ChartHierarchySnapshot.TryGetNodeIndex(System.String,System.Int32@)
+  name: TryGetNodeIndex(string, out int)
+  href: api/ProCharts.ChartHierarchySnapshot.html#ProCharts_ChartHierarchySnapshot_TryGetNodeIndex_System_String_System_Int32__
+  commentId: M:ProCharts.ChartHierarchySnapshot.TryGetNodeIndex(System.String,System.Int32@)
+  name.vb: TryGetNodeIndex(String, Integer)
+  fullName: ProCharts.ChartHierarchySnapshot.TryGetNodeIndex(string, out int)
+  fullName.vb: ProCharts.ChartHierarchySnapshot.TryGetNodeIndex(String, Integer)
+  nameWithType: ChartHierarchySnapshot.TryGetNodeIndex(string, out int)
+  nameWithType.vb: ChartHierarchySnapshot.TryGetNodeIndex(String, Integer)
+- uid: ProCharts.ChartHierarchySnapshot.TryGetNodeIndex*
+  name: TryGetNodeIndex
+  href: api/ProCharts.ChartHierarchySnapshot.html#ProCharts_ChartHierarchySnapshot_TryGetNodeIndex_
+  commentId: Overload:ProCharts.ChartHierarchySnapshot.TryGetNodeIndex
+  isSpec: "True"
+  fullName: ProCharts.ChartHierarchySnapshot.TryGetNodeIndex
+  nameWithType: ChartHierarchySnapshot.TryGetNodeIndex
 - uid: ProCharts.ChartInteractionState
   name: ChartInteractionState
   href: api/ProCharts.ChartInteractionState.html
@@ -72134,6 +72496,125 @@ references:
   isSpec: "True"
   fullName: ProCharts.ChartInteractionState.SetCrosshair
   nameWithType: ChartInteractionState.SetCrosshair
+- uid: ProCharts.ChartLayoutRect
+  name: ChartLayoutRect
+  href: api/ProCharts.ChartLayoutRect.html
+  commentId: T:ProCharts.ChartLayoutRect
+  fullName: ProCharts.ChartLayoutRect
+  nameWithType: ChartLayoutRect
+- uid: ProCharts.ChartLayoutRect.#ctor(System.Double,System.Double,System.Double,System.Double)
+  name: ChartLayoutRect(double, double, double, double)
+  href: api/ProCharts.ChartLayoutRect.html#ProCharts_ChartLayoutRect__ctor_System_Double_System_Double_System_Double_System_Double_
+  commentId: M:ProCharts.ChartLayoutRect.#ctor(System.Double,System.Double,System.Double,System.Double)
+  name.vb: New(Double, Double, Double, Double)
+  fullName: ProCharts.ChartLayoutRect.ChartLayoutRect(double, double, double, double)
+  fullName.vb: ProCharts.ChartLayoutRect.New(Double, Double, Double, Double)
+  nameWithType: ChartLayoutRect.ChartLayoutRect(double, double, double, double)
+  nameWithType.vb: ChartLayoutRect.New(Double, Double, Double, Double)
+- uid: ProCharts.ChartLayoutRect.#ctor*
+  name: ChartLayoutRect
+  href: api/ProCharts.ChartLayoutRect.html#ProCharts_ChartLayoutRect__ctor_
+  commentId: Overload:ProCharts.ChartLayoutRect.#ctor
+  isSpec: "True"
+  name.vb: New
+  fullName: ProCharts.ChartLayoutRect.ChartLayoutRect
+  fullName.vb: ProCharts.ChartLayoutRect.New
+  nameWithType: ChartLayoutRect.ChartLayoutRect
+  nameWithType.vb: ChartLayoutRect.New
+- uid: ProCharts.ChartLayoutRect.Bottom
+  name: Bottom
+  href: api/ProCharts.ChartLayoutRect.html#ProCharts_ChartLayoutRect_Bottom
+  commentId: P:ProCharts.ChartLayoutRect.Bottom
+  fullName: ProCharts.ChartLayoutRect.Bottom
+  nameWithType: ChartLayoutRect.Bottom
+- uid: ProCharts.ChartLayoutRect.Bottom*
+  name: Bottom
+  href: api/ProCharts.ChartLayoutRect.html#ProCharts_ChartLayoutRect_Bottom_
+  commentId: Overload:ProCharts.ChartLayoutRect.Bottom
+  isSpec: "True"
+  fullName: ProCharts.ChartLayoutRect.Bottom
+  nameWithType: ChartLayoutRect.Bottom
+- uid: ProCharts.ChartLayoutRect.Contains(System.Double,System.Double)
+  name: Contains(double, double)
+  href: api/ProCharts.ChartLayoutRect.html#ProCharts_ChartLayoutRect_Contains_System_Double_System_Double_
+  commentId: M:ProCharts.ChartLayoutRect.Contains(System.Double,System.Double)
+  name.vb: Contains(Double, Double)
+  fullName: ProCharts.ChartLayoutRect.Contains(double, double)
+  fullName.vb: ProCharts.ChartLayoutRect.Contains(Double, Double)
+  nameWithType: ChartLayoutRect.Contains(double, double)
+  nameWithType.vb: ChartLayoutRect.Contains(Double, Double)
+- uid: ProCharts.ChartLayoutRect.Contains*
+  name: Contains
+  href: api/ProCharts.ChartLayoutRect.html#ProCharts_ChartLayoutRect_Contains_
+  commentId: Overload:ProCharts.ChartLayoutRect.Contains
+  isSpec: "True"
+  fullName: ProCharts.ChartLayoutRect.Contains
+  nameWithType: ChartLayoutRect.Contains
+- uid: ProCharts.ChartLayoutRect.Height
+  name: Height
+  href: api/ProCharts.ChartLayoutRect.html#ProCharts_ChartLayoutRect_Height
+  commentId: P:ProCharts.ChartLayoutRect.Height
+  fullName: ProCharts.ChartLayoutRect.Height
+  nameWithType: ChartLayoutRect.Height
+- uid: ProCharts.ChartLayoutRect.Height*
+  name: Height
+  href: api/ProCharts.ChartLayoutRect.html#ProCharts_ChartLayoutRect_Height_
+  commentId: Overload:ProCharts.ChartLayoutRect.Height
+  isSpec: "True"
+  fullName: ProCharts.ChartLayoutRect.Height
+  nameWithType: ChartLayoutRect.Height
+- uid: ProCharts.ChartLayoutRect.Left
+  name: Left
+  href: api/ProCharts.ChartLayoutRect.html#ProCharts_ChartLayoutRect_Left
+  commentId: P:ProCharts.ChartLayoutRect.Left
+  fullName: ProCharts.ChartLayoutRect.Left
+  nameWithType: ChartLayoutRect.Left
+- uid: ProCharts.ChartLayoutRect.Left*
+  name: Left
+  href: api/ProCharts.ChartLayoutRect.html#ProCharts_ChartLayoutRect_Left_
+  commentId: Overload:ProCharts.ChartLayoutRect.Left
+  isSpec: "True"
+  fullName: ProCharts.ChartLayoutRect.Left
+  nameWithType: ChartLayoutRect.Left
+- uid: ProCharts.ChartLayoutRect.Right
+  name: Right
+  href: api/ProCharts.ChartLayoutRect.html#ProCharts_ChartLayoutRect_Right
+  commentId: P:ProCharts.ChartLayoutRect.Right
+  fullName: ProCharts.ChartLayoutRect.Right
+  nameWithType: ChartLayoutRect.Right
+- uid: ProCharts.ChartLayoutRect.Right*
+  name: Right
+  href: api/ProCharts.ChartLayoutRect.html#ProCharts_ChartLayoutRect_Right_
+  commentId: Overload:ProCharts.ChartLayoutRect.Right
+  isSpec: "True"
+  fullName: ProCharts.ChartLayoutRect.Right
+  nameWithType: ChartLayoutRect.Right
+- uid: ProCharts.ChartLayoutRect.Top
+  name: Top
+  href: api/ProCharts.ChartLayoutRect.html#ProCharts_ChartLayoutRect_Top
+  commentId: P:ProCharts.ChartLayoutRect.Top
+  fullName: ProCharts.ChartLayoutRect.Top
+  nameWithType: ChartLayoutRect.Top
+- uid: ProCharts.ChartLayoutRect.Top*
+  name: Top
+  href: api/ProCharts.ChartLayoutRect.html#ProCharts_ChartLayoutRect_Top_
+  commentId: Overload:ProCharts.ChartLayoutRect.Top
+  isSpec: "True"
+  fullName: ProCharts.ChartLayoutRect.Top
+  nameWithType: ChartLayoutRect.Top
+- uid: ProCharts.ChartLayoutRect.Width
+  name: Width
+  href: api/ProCharts.ChartLayoutRect.html#ProCharts_ChartLayoutRect_Width
+  commentId: P:ProCharts.ChartLayoutRect.Width
+  fullName: ProCharts.ChartLayoutRect.Width
+  nameWithType: ChartLayoutRect.Width
+- uid: ProCharts.ChartLayoutRect.Width*
+  name: Width
+  href: api/ProCharts.ChartLayoutRect.html#ProCharts_ChartLayoutRect_Width_
+  commentId: Overload:ProCharts.ChartLayoutRect.Width
+  isSpec: "True"
+  fullName: ProCharts.ChartLayoutRect.Width
+  nameWithType: ChartLayoutRect.Width
 - uid: ProCharts.ChartLegendDefinition
   name: ChartLegendDefinition
   href: api/ProCharts.ChartLegendDefinition.html
@@ -72997,6 +73478,18 @@ references:
   commentId: F:ProCharts.ChartSeriesKind.Funnel
   fullName: ProCharts.ChartSeriesKind.Funnel
   nameWithType: ChartSeriesKind.Funnel
+- uid: ProCharts.ChartSeriesKind.Gauge
+  name: Gauge
+  href: api/ProCharts.ChartSeriesKind.html#ProCharts_ChartSeriesKind_Gauge
+  commentId: F:ProCharts.ChartSeriesKind.Gauge
+  fullName: ProCharts.ChartSeriesKind.Gauge
+  nameWithType: ChartSeriesKind.Gauge
+- uid: ProCharts.ChartSeriesKind.Heatmap
+  name: Heatmap
+  href: api/ProCharts.ChartSeriesKind.html#ProCharts_ChartSeriesKind_Heatmap
+  commentId: F:ProCharts.ChartSeriesKind.Heatmap
+  fullName: ProCharts.ChartSeriesKind.Heatmap
+  nameWithType: ChartSeriesKind.Heatmap
 - uid: ProCharts.ChartSeriesKind.HeikinAshi
   name: HeikinAshi
   href: api/ProCharts.ChartSeriesKind.html#ProCharts_ChartSeriesKind_HeikinAshi
@@ -73123,6 +73616,18 @@ references:
   commentId: F:ProCharts.ChartSeriesKind.StackedColumn100
   fullName: ProCharts.ChartSeriesKind.StackedColumn100
   nameWithType: ChartSeriesKind.StackedColumn100
+- uid: ProCharts.ChartSeriesKind.Sunburst
+  name: Sunburst
+  href: api/ProCharts.ChartSeriesKind.html#ProCharts_ChartSeriesKind_Sunburst
+  commentId: F:ProCharts.ChartSeriesKind.Sunburst
+  fullName: ProCharts.ChartSeriesKind.Sunburst
+  nameWithType: ChartSeriesKind.Sunburst
+- uid: ProCharts.ChartSeriesKind.Treemap
+  name: Treemap
+  href: api/ProCharts.ChartSeriesKind.html#ProCharts_ChartSeriesKind_Treemap
+  commentId: F:ProCharts.ChartSeriesKind.Treemap
+  fullName: ProCharts.ChartSeriesKind.Treemap
+  nameWithType: ChartSeriesKind.Treemap
 - uid: ProCharts.ChartSeriesKind.Waterfall
   name: Waterfall
   href: api/ProCharts.ChartSeriesKind.html#ProCharts_ChartSeriesKind_Waterfall
@@ -73511,6 +74016,96 @@ references:
   isSpec: "True"
   fullName: ProCharts.ChartSeriesStyle.StrokeWidth
   nameWithType: ChartSeriesStyle.StrokeWidth
+- uid: ProCharts.ChartSunburstSector
+  name: ChartSunburstSector
+  href: api/ProCharts.ChartSunburstSector.html
+  commentId: T:ProCharts.ChartSunburstSector
+  fullName: ProCharts.ChartSunburstSector
+  nameWithType: ChartSunburstSector
+- uid: ProCharts.ChartSunburstSector.#ctor(System.Int32,System.Double,System.Double,System.Double,System.Double)
+  name: ChartSunburstSector(int, double, double, double, double)
+  href: api/ProCharts.ChartSunburstSector.html#ProCharts_ChartSunburstSector__ctor_System_Int32_System_Double_System_Double_System_Double_System_Double_
+  commentId: M:ProCharts.ChartSunburstSector.#ctor(System.Int32,System.Double,System.Double,System.Double,System.Double)
+  name.vb: New(Integer, Double, Double, Double, Double)
+  fullName: ProCharts.ChartSunburstSector.ChartSunburstSector(int, double, double, double, double)
+  fullName.vb: ProCharts.ChartSunburstSector.New(Integer, Double, Double, Double, Double)
+  nameWithType: ChartSunburstSector.ChartSunburstSector(int, double, double, double, double)
+  nameWithType.vb: ChartSunburstSector.New(Integer, Double, Double, Double, Double)
+- uid: ProCharts.ChartSunburstSector.#ctor*
+  name: ChartSunburstSector
+  href: api/ProCharts.ChartSunburstSector.html#ProCharts_ChartSunburstSector__ctor_
+  commentId: Overload:ProCharts.ChartSunburstSector.#ctor
+  isSpec: "True"
+  name.vb: New
+  fullName: ProCharts.ChartSunburstSector.ChartSunburstSector
+  fullName.vb: ProCharts.ChartSunburstSector.New
+  nameWithType: ChartSunburstSector.ChartSunburstSector
+  nameWithType.vb: ChartSunburstSector.New
+- uid: ProCharts.ChartSunburstSector.InnerRadius
+  name: InnerRadius
+  href: api/ProCharts.ChartSunburstSector.html#ProCharts_ChartSunburstSector_InnerRadius
+  commentId: P:ProCharts.ChartSunburstSector.InnerRadius
+  fullName: ProCharts.ChartSunburstSector.InnerRadius
+  nameWithType: ChartSunburstSector.InnerRadius
+- uid: ProCharts.ChartSunburstSector.InnerRadius*
+  name: InnerRadius
+  href: api/ProCharts.ChartSunburstSector.html#ProCharts_ChartSunburstSector_InnerRadius_
+  commentId: Overload:ProCharts.ChartSunburstSector.InnerRadius
+  isSpec: "True"
+  fullName: ProCharts.ChartSunburstSector.InnerRadius
+  nameWithType: ChartSunburstSector.InnerRadius
+- uid: ProCharts.ChartSunburstSector.NodeIndex
+  name: NodeIndex
+  href: api/ProCharts.ChartSunburstSector.html#ProCharts_ChartSunburstSector_NodeIndex
+  commentId: P:ProCharts.ChartSunburstSector.NodeIndex
+  fullName: ProCharts.ChartSunburstSector.NodeIndex
+  nameWithType: ChartSunburstSector.NodeIndex
+- uid: ProCharts.ChartSunburstSector.NodeIndex*
+  name: NodeIndex
+  href: api/ProCharts.ChartSunburstSector.html#ProCharts_ChartSunburstSector_NodeIndex_
+  commentId: Overload:ProCharts.ChartSunburstSector.NodeIndex
+  isSpec: "True"
+  fullName: ProCharts.ChartSunburstSector.NodeIndex
+  nameWithType: ChartSunburstSector.NodeIndex
+- uid: ProCharts.ChartSunburstSector.OuterRadius
+  name: OuterRadius
+  href: api/ProCharts.ChartSunburstSector.html#ProCharts_ChartSunburstSector_OuterRadius
+  commentId: P:ProCharts.ChartSunburstSector.OuterRadius
+  fullName: ProCharts.ChartSunburstSector.OuterRadius
+  nameWithType: ChartSunburstSector.OuterRadius
+- uid: ProCharts.ChartSunburstSector.OuterRadius*
+  name: OuterRadius
+  href: api/ProCharts.ChartSunburstSector.html#ProCharts_ChartSunburstSector_OuterRadius_
+  commentId: Overload:ProCharts.ChartSunburstSector.OuterRadius
+  isSpec: "True"
+  fullName: ProCharts.ChartSunburstSector.OuterRadius
+  nameWithType: ChartSunburstSector.OuterRadius
+- uid: ProCharts.ChartSunburstSector.StartAngle
+  name: StartAngle
+  href: api/ProCharts.ChartSunburstSector.html#ProCharts_ChartSunburstSector_StartAngle
+  commentId: P:ProCharts.ChartSunburstSector.StartAngle
+  fullName: ProCharts.ChartSunburstSector.StartAngle
+  nameWithType: ChartSunburstSector.StartAngle
+- uid: ProCharts.ChartSunburstSector.StartAngle*
+  name: StartAngle
+  href: api/ProCharts.ChartSunburstSector.html#ProCharts_ChartSunburstSector_StartAngle_
+  commentId: Overload:ProCharts.ChartSunburstSector.StartAngle
+  isSpec: "True"
+  fullName: ProCharts.ChartSunburstSector.StartAngle
+  nameWithType: ChartSunburstSector.StartAngle
+- uid: ProCharts.ChartSunburstSector.SweepAngle
+  name: SweepAngle
+  href: api/ProCharts.ChartSunburstSector.html#ProCharts_ChartSunburstSector_SweepAngle
+  commentId: P:ProCharts.ChartSunburstSector.SweepAngle
+  fullName: ProCharts.ChartSunburstSector.SweepAngle
+  nameWithType: ChartSunburstSector.SweepAngle
+- uid: ProCharts.ChartSunburstSector.SweepAngle*
+  name: SweepAngle
+  href: api/ProCharts.ChartSunburstSector.html#ProCharts_ChartSunburstSector_SweepAngle_
+  commentId: Overload:ProCharts.ChartSunburstSector.SweepAngle
+  isSpec: "True"
+  fullName: ProCharts.ChartSunburstSector.SweepAngle
+  nameWithType: ChartSunburstSector.SweepAngle
 - uid: ProCharts.ChartTheme
   name: ChartTheme
   href: api/ProCharts.ChartTheme.html
@@ -73621,6 +74216,57 @@ references:
   isSpec: "True"
   fullName: ProCharts.ChartTheme.Text
   nameWithType: ChartTheme.Text
+- uid: ProCharts.ChartTreemapCell
+  name: ChartTreemapCell
+  href: api/ProCharts.ChartTreemapCell.html
+  commentId: T:ProCharts.ChartTreemapCell
+  fullName: ProCharts.ChartTreemapCell
+  nameWithType: ChartTreemapCell
+- uid: ProCharts.ChartTreemapCell.#ctor(System.Int32,ProCharts.ChartLayoutRect)
+  name: ChartTreemapCell(int, ChartLayoutRect)
+  href: api/ProCharts.ChartTreemapCell.html#ProCharts_ChartTreemapCell__ctor_System_Int32_ProCharts_ChartLayoutRect_
+  commentId: M:ProCharts.ChartTreemapCell.#ctor(System.Int32,ProCharts.ChartLayoutRect)
+  name.vb: New(Integer, ChartLayoutRect)
+  fullName: ProCharts.ChartTreemapCell.ChartTreemapCell(int, ProCharts.ChartLayoutRect)
+  fullName.vb: ProCharts.ChartTreemapCell.New(Integer, ProCharts.ChartLayoutRect)
+  nameWithType: ChartTreemapCell.ChartTreemapCell(int, ChartLayoutRect)
+  nameWithType.vb: ChartTreemapCell.New(Integer, ChartLayoutRect)
+- uid: ProCharts.ChartTreemapCell.#ctor*
+  name: ChartTreemapCell
+  href: api/ProCharts.ChartTreemapCell.html#ProCharts_ChartTreemapCell__ctor_
+  commentId: Overload:ProCharts.ChartTreemapCell.#ctor
+  isSpec: "True"
+  name.vb: New
+  fullName: ProCharts.ChartTreemapCell.ChartTreemapCell
+  fullName.vb: ProCharts.ChartTreemapCell.New
+  nameWithType: ChartTreemapCell.ChartTreemapCell
+  nameWithType.vb: ChartTreemapCell.New
+- uid: ProCharts.ChartTreemapCell.Bounds
+  name: Bounds
+  href: api/ProCharts.ChartTreemapCell.html#ProCharts_ChartTreemapCell_Bounds
+  commentId: P:ProCharts.ChartTreemapCell.Bounds
+  fullName: ProCharts.ChartTreemapCell.Bounds
+  nameWithType: ChartTreemapCell.Bounds
+- uid: ProCharts.ChartTreemapCell.Bounds*
+  name: Bounds
+  href: api/ProCharts.ChartTreemapCell.html#ProCharts_ChartTreemapCell_Bounds_
+  commentId: Overload:ProCharts.ChartTreemapCell.Bounds
+  isSpec: "True"
+  fullName: ProCharts.ChartTreemapCell.Bounds
+  nameWithType: ChartTreemapCell.Bounds
+- uid: ProCharts.ChartTreemapCell.NodeIndex
+  name: NodeIndex
+  href: api/ProCharts.ChartTreemapCell.html#ProCharts_ChartTreemapCell_NodeIndex
+  commentId: P:ProCharts.ChartTreemapCell.NodeIndex
+  fullName: ProCharts.ChartTreemapCell.NodeIndex
+  nameWithType: ChartTreemapCell.NodeIndex
+- uid: ProCharts.ChartTreemapCell.NodeIndex*
+  name: NodeIndex
+  href: api/ProCharts.ChartTreemapCell.html#ProCharts_ChartTreemapCell_NodeIndex_
+  commentId: Overload:ProCharts.ChartTreemapCell.NodeIndex
+  isSpec: "True"
+  fullName: ProCharts.ChartTreemapCell.NodeIndex
+  nameWithType: ChartTreemapCell.NodeIndex
 - uid: ProCharts.ChartTrendlineType
   name: ChartTrendlineType
   href: api/ProCharts.ChartTrendlineType.html
@@ -73863,6 +74509,179 @@ references:
   isSpec: "True"
   fullName: ProCharts.ChartValueFormatter.Format
   nameWithType: ChartValueFormatter.Format
+- uid: ProCharts.HierarchyChartDataSource
+  name: HierarchyChartDataSource
+  href: api/ProCharts.HierarchyChartDataSource.html
+  commentId: T:ProCharts.HierarchyChartDataSource
+  fullName: ProCharts.HierarchyChartDataSource
+  nameWithType: HierarchyChartDataSource
+- uid: ProCharts.HierarchyChartDataSource.#ctor(ProCharts.ChartHierarchyNode,ProCharts.ChartSeriesKind)
+  name: HierarchyChartDataSource(ChartHierarchyNode, ChartSeriesKind)
+  href: api/ProCharts.HierarchyChartDataSource.html#ProCharts_HierarchyChartDataSource__ctor_ProCharts_ChartHierarchyNode_ProCharts_ChartSeriesKind_
+  commentId: M:ProCharts.HierarchyChartDataSource.#ctor(ProCharts.ChartHierarchyNode,ProCharts.ChartSeriesKind)
+  name.vb: New(ChartHierarchyNode, ChartSeriesKind)
+  fullName: ProCharts.HierarchyChartDataSource.HierarchyChartDataSource(ProCharts.ChartHierarchyNode, ProCharts.ChartSeriesKind)
+  fullName.vb: ProCharts.HierarchyChartDataSource.New(ProCharts.ChartHierarchyNode, ProCharts.ChartSeriesKind)
+  nameWithType: HierarchyChartDataSource.HierarchyChartDataSource(ChartHierarchyNode, ChartSeriesKind)
+  nameWithType.vb: HierarchyChartDataSource.New(ChartHierarchyNode, ChartSeriesKind)
+- uid: ProCharts.HierarchyChartDataSource.#ctor*
+  name: HierarchyChartDataSource
+  href: api/ProCharts.HierarchyChartDataSource.html#ProCharts_HierarchyChartDataSource__ctor_
+  commentId: Overload:ProCharts.HierarchyChartDataSource.#ctor
+  isSpec: "True"
+  name.vb: New
+  fullName: ProCharts.HierarchyChartDataSource.HierarchyChartDataSource
+  fullName.vb: ProCharts.HierarchyChartDataSource.New
+  nameWithType: HierarchyChartDataSource.HierarchyChartDataSource
+  nameWithType.vb: HierarchyChartDataSource.New
+- uid: ProCharts.HierarchyChartDataSource.BuildSnapshot(ProCharts.ChartDataRequest)
+  name: BuildSnapshot(ChartDataRequest)
+  href: api/ProCharts.HierarchyChartDataSource.html#ProCharts_HierarchyChartDataSource_BuildSnapshot_ProCharts_ChartDataRequest_
+  commentId: M:ProCharts.HierarchyChartDataSource.BuildSnapshot(ProCharts.ChartDataRequest)
+  fullName: ProCharts.HierarchyChartDataSource.BuildSnapshot(ProCharts.ChartDataRequest)
+  nameWithType: HierarchyChartDataSource.BuildSnapshot(ChartDataRequest)
+- uid: ProCharts.HierarchyChartDataSource.BuildSnapshot*
+  name: BuildSnapshot
+  href: api/ProCharts.HierarchyChartDataSource.html#ProCharts_HierarchyChartDataSource_BuildSnapshot_
+  commentId: Overload:ProCharts.HierarchyChartDataSource.BuildSnapshot
+  isSpec: "True"
+  fullName: ProCharts.HierarchyChartDataSource.BuildSnapshot
+  nameWithType: HierarchyChartDataSource.BuildSnapshot
+- uid: ProCharts.HierarchyChartDataSource.CanDrillUp
+  name: CanDrillUp
+  href: api/ProCharts.HierarchyChartDataSource.html#ProCharts_HierarchyChartDataSource_CanDrillUp
+  commentId: P:ProCharts.HierarchyChartDataSource.CanDrillUp
+  fullName: ProCharts.HierarchyChartDataSource.CanDrillUp
+  nameWithType: HierarchyChartDataSource.CanDrillUp
+- uid: ProCharts.HierarchyChartDataSource.CanDrillUp*
+  name: CanDrillUp
+  href: api/ProCharts.HierarchyChartDataSource.html#ProCharts_HierarchyChartDataSource_CanDrillUp_
+  commentId: Overload:ProCharts.HierarchyChartDataSource.CanDrillUp
+  isSpec: "True"
+  fullName: ProCharts.HierarchyChartDataSource.CanDrillUp
+  nameWithType: HierarchyChartDataSource.CanDrillUp
+- uid: ProCharts.HierarchyChartDataSource.CurrentRoot
+  name: CurrentRoot
+  href: api/ProCharts.HierarchyChartDataSource.html#ProCharts_HierarchyChartDataSource_CurrentRoot
+  commentId: P:ProCharts.HierarchyChartDataSource.CurrentRoot
+  fullName: ProCharts.HierarchyChartDataSource.CurrentRoot
+  nameWithType: HierarchyChartDataSource.CurrentRoot
+- uid: ProCharts.HierarchyChartDataSource.CurrentRoot*
+  name: CurrentRoot
+  href: api/ProCharts.HierarchyChartDataSource.html#ProCharts_HierarchyChartDataSource_CurrentRoot_
+  commentId: Overload:ProCharts.HierarchyChartDataSource.CurrentRoot
+  isSpec: "True"
+  fullName: ProCharts.HierarchyChartDataSource.CurrentRoot
+  nameWithType: HierarchyChartDataSource.CurrentRoot
+- uid: ProCharts.HierarchyChartDataSource.DataInvalidated
+  name: DataInvalidated
+  href: api/ProCharts.HierarchyChartDataSource.html#ProCharts_HierarchyChartDataSource_DataInvalidated
+  commentId: E:ProCharts.HierarchyChartDataSource.DataInvalidated
+  fullName: ProCharts.HierarchyChartDataSource.DataInvalidated
+  nameWithType: HierarchyChartDataSource.DataInvalidated
+- uid: ProCharts.HierarchyChartDataSource.GetPath
+  name: GetPath()
+  href: api/ProCharts.HierarchyChartDataSource.html#ProCharts_HierarchyChartDataSource_GetPath
+  commentId: M:ProCharts.HierarchyChartDataSource.GetPath
+  fullName: ProCharts.HierarchyChartDataSource.GetPath()
+  nameWithType: HierarchyChartDataSource.GetPath()
+- uid: ProCharts.HierarchyChartDataSource.GetPath*
+  name: GetPath
+  href: api/ProCharts.HierarchyChartDataSource.html#ProCharts_HierarchyChartDataSource_GetPath_
+  commentId: Overload:ProCharts.HierarchyChartDataSource.GetPath
+  isSpec: "True"
+  fullName: ProCharts.HierarchyChartDataSource.GetPath
+  nameWithType: HierarchyChartDataSource.GetPath
+- uid: ProCharts.HierarchyChartDataSource.Kind
+  name: Kind
+  href: api/ProCharts.HierarchyChartDataSource.html#ProCharts_HierarchyChartDataSource_Kind
+  commentId: P:ProCharts.HierarchyChartDataSource.Kind
+  fullName: ProCharts.HierarchyChartDataSource.Kind
+  nameWithType: HierarchyChartDataSource.Kind
+- uid: ProCharts.HierarchyChartDataSource.Kind*
+  name: Kind
+  href: api/ProCharts.HierarchyChartDataSource.html#ProCharts_HierarchyChartDataSource_Kind_
+  commentId: Overload:ProCharts.HierarchyChartDataSource.Kind
+  isSpec: "True"
+  fullName: ProCharts.HierarchyChartDataSource.Kind
+  nameWithType: HierarchyChartDataSource.Kind
+- uid: ProCharts.HierarchyChartDataSource.ReplaceRoot(ProCharts.ChartHierarchyNode)
+  name: ReplaceRoot(ChartHierarchyNode)
+  href: api/ProCharts.HierarchyChartDataSource.html#ProCharts_HierarchyChartDataSource_ReplaceRoot_ProCharts_ChartHierarchyNode_
+  commentId: M:ProCharts.HierarchyChartDataSource.ReplaceRoot(ProCharts.ChartHierarchyNode)
+  fullName: ProCharts.HierarchyChartDataSource.ReplaceRoot(ProCharts.ChartHierarchyNode)
+  nameWithType: HierarchyChartDataSource.ReplaceRoot(ChartHierarchyNode)
+- uid: ProCharts.HierarchyChartDataSource.ReplaceRoot*
+  name: ReplaceRoot
+  href: api/ProCharts.HierarchyChartDataSource.html#ProCharts_HierarchyChartDataSource_ReplaceRoot_
+  commentId: Overload:ProCharts.HierarchyChartDataSource.ReplaceRoot
+  isSpec: "True"
+  fullName: ProCharts.HierarchyChartDataSource.ReplaceRoot
+  nameWithType: HierarchyChartDataSource.ReplaceRoot
+- uid: ProCharts.HierarchyChartDataSource.ResetNavigation
+  name: ResetNavigation()
+  href: api/ProCharts.HierarchyChartDataSource.html#ProCharts_HierarchyChartDataSource_ResetNavigation
+  commentId: M:ProCharts.HierarchyChartDataSource.ResetNavigation
+  fullName: ProCharts.HierarchyChartDataSource.ResetNavigation()
+  nameWithType: HierarchyChartDataSource.ResetNavigation()
+- uid: ProCharts.HierarchyChartDataSource.ResetNavigation*
+  name: ResetNavigation
+  href: api/ProCharts.HierarchyChartDataSource.html#ProCharts_HierarchyChartDataSource_ResetNavigation_
+  commentId: Overload:ProCharts.HierarchyChartDataSource.ResetNavigation
+  isSpec: "True"
+  fullName: ProCharts.HierarchyChartDataSource.ResetNavigation
+  nameWithType: HierarchyChartDataSource.ResetNavigation
+- uid: ProCharts.HierarchyChartDataSource.Root
+  name: Root
+  href: api/ProCharts.HierarchyChartDataSource.html#ProCharts_HierarchyChartDataSource_Root
+  commentId: P:ProCharts.HierarchyChartDataSource.Root
+  fullName: ProCharts.HierarchyChartDataSource.Root
+  nameWithType: HierarchyChartDataSource.Root
+- uid: ProCharts.HierarchyChartDataSource.Root*
+  name: Root
+  href: api/ProCharts.HierarchyChartDataSource.html#ProCharts_HierarchyChartDataSource_Root_
+  commentId: Overload:ProCharts.HierarchyChartDataSource.Root
+  isSpec: "True"
+  fullName: ProCharts.HierarchyChartDataSource.Root
+  nameWithType: HierarchyChartDataSource.Root
+- uid: ProCharts.HierarchyChartDataSource.TryDrillDown(System.Int32)
+  name: TryDrillDown(int)
+  href: api/ProCharts.HierarchyChartDataSource.html#ProCharts_HierarchyChartDataSource_TryDrillDown_System_Int32_
+  commentId: M:ProCharts.HierarchyChartDataSource.TryDrillDown(System.Int32)
+  name.vb: TryDrillDown(Integer)
+  fullName: ProCharts.HierarchyChartDataSource.TryDrillDown(int)
+  fullName.vb: ProCharts.HierarchyChartDataSource.TryDrillDown(Integer)
+  nameWithType: HierarchyChartDataSource.TryDrillDown(int)
+  nameWithType.vb: HierarchyChartDataSource.TryDrillDown(Integer)
+- uid: ProCharts.HierarchyChartDataSource.TryDrillDown(System.String)
+  name: TryDrillDown(string)
+  href: api/ProCharts.HierarchyChartDataSource.html#ProCharts_HierarchyChartDataSource_TryDrillDown_System_String_
+  commentId: M:ProCharts.HierarchyChartDataSource.TryDrillDown(System.String)
+  name.vb: TryDrillDown(String)
+  fullName: ProCharts.HierarchyChartDataSource.TryDrillDown(string)
+  fullName.vb: ProCharts.HierarchyChartDataSource.TryDrillDown(String)
+  nameWithType: HierarchyChartDataSource.TryDrillDown(string)
+  nameWithType.vb: HierarchyChartDataSource.TryDrillDown(String)
+- uid: ProCharts.HierarchyChartDataSource.TryDrillDown*
+  name: TryDrillDown
+  href: api/ProCharts.HierarchyChartDataSource.html#ProCharts_HierarchyChartDataSource_TryDrillDown_
+  commentId: Overload:ProCharts.HierarchyChartDataSource.TryDrillDown
+  isSpec: "True"
+  fullName: ProCharts.HierarchyChartDataSource.TryDrillDown
+  nameWithType: HierarchyChartDataSource.TryDrillDown
+- uid: ProCharts.HierarchyChartDataSource.TryDrillUp
+  name: TryDrillUp()
+  href: api/ProCharts.HierarchyChartDataSource.html#ProCharts_HierarchyChartDataSource_TryDrillUp
+  commentId: M:ProCharts.HierarchyChartDataSource.TryDrillUp
+  fullName: ProCharts.HierarchyChartDataSource.TryDrillUp()
+  nameWithType: HierarchyChartDataSource.TryDrillUp()
+- uid: ProCharts.HierarchyChartDataSource.TryDrillUp*
+  name: TryDrillUp
+  href: api/ProCharts.HierarchyChartDataSource.html#ProCharts_HierarchyChartDataSource_TryDrillUp_
+  commentId: Overload:ProCharts.HierarchyChartDataSource.TryDrillUp
+  isSpec: "True"
+  fullName: ProCharts.HierarchyChartDataSource.TryDrillUp
+  nameWithType: HierarchyChartDataSource.TryDrillUp
 - uid: ProCharts.IChartDataSource
   name: IChartDataSource
   href: api/ProCharts.IChartDataSource.html
@@ -73935,6 +74754,194 @@ references:
   commentId: N:ProCharts.Skia
   fullName: ProCharts.Skia
   nameWithType: ProCharts.Skia
+- uid: ProCharts.Skia.SkiaAdvancedChartStyle
+  name: SkiaAdvancedChartStyle
+  href: api/ProCharts.Skia.SkiaAdvancedChartStyle.html
+  commentId: T:ProCharts.Skia.SkiaAdvancedChartStyle
+  fullName: ProCharts.Skia.SkiaAdvancedChartStyle
+  nameWithType: SkiaAdvancedChartStyle
+- uid: ProCharts.Skia.SkiaAdvancedChartStyle.GaugeStartAngle
+  name: GaugeStartAngle
+  href: api/ProCharts.Skia.SkiaAdvancedChartStyle.html#ProCharts_Skia_SkiaAdvancedChartStyle_GaugeStartAngle
+  commentId: P:ProCharts.Skia.SkiaAdvancedChartStyle.GaugeStartAngle
+  fullName: ProCharts.Skia.SkiaAdvancedChartStyle.GaugeStartAngle
+  nameWithType: SkiaAdvancedChartStyle.GaugeStartAngle
+- uid: ProCharts.Skia.SkiaAdvancedChartStyle.GaugeStartAngle*
+  name: GaugeStartAngle
+  href: api/ProCharts.Skia.SkiaAdvancedChartStyle.html#ProCharts_Skia_SkiaAdvancedChartStyle_GaugeStartAngle_
+  commentId: Overload:ProCharts.Skia.SkiaAdvancedChartStyle.GaugeStartAngle
+  isSpec: "True"
+  fullName: ProCharts.Skia.SkiaAdvancedChartStyle.GaugeStartAngle
+  nameWithType: SkiaAdvancedChartStyle.GaugeStartAngle
+- uid: ProCharts.Skia.SkiaAdvancedChartStyle.GaugeSweepAngle
+  name: GaugeSweepAngle
+  href: api/ProCharts.Skia.SkiaAdvancedChartStyle.html#ProCharts_Skia_SkiaAdvancedChartStyle_GaugeSweepAngle
+  commentId: P:ProCharts.Skia.SkiaAdvancedChartStyle.GaugeSweepAngle
+  fullName: ProCharts.Skia.SkiaAdvancedChartStyle.GaugeSweepAngle
+  nameWithType: SkiaAdvancedChartStyle.GaugeSweepAngle
+- uid: ProCharts.Skia.SkiaAdvancedChartStyle.GaugeSweepAngle*
+  name: GaugeSweepAngle
+  href: api/ProCharts.Skia.SkiaAdvancedChartStyle.html#ProCharts_Skia_SkiaAdvancedChartStyle_GaugeSweepAngle_
+  commentId: Overload:ProCharts.Skia.SkiaAdvancedChartStyle.GaugeSweepAngle
+  isSpec: "True"
+  fullName: ProCharts.Skia.SkiaAdvancedChartStyle.GaugeSweepAngle
+  nameWithType: SkiaAdvancedChartStyle.GaugeSweepAngle
+- uid: ProCharts.Skia.SkiaAdvancedChartStyle.GaugeThickness
+  name: GaugeThickness
+  href: api/ProCharts.Skia.SkiaAdvancedChartStyle.html#ProCharts_Skia_SkiaAdvancedChartStyle_GaugeThickness
+  commentId: P:ProCharts.Skia.SkiaAdvancedChartStyle.GaugeThickness
+  fullName: ProCharts.Skia.SkiaAdvancedChartStyle.GaugeThickness
+  nameWithType: SkiaAdvancedChartStyle.GaugeThickness
+- uid: ProCharts.Skia.SkiaAdvancedChartStyle.GaugeThickness*
+  name: GaugeThickness
+  href: api/ProCharts.Skia.SkiaAdvancedChartStyle.html#ProCharts_Skia_SkiaAdvancedChartStyle_GaugeThickness_
+  commentId: Overload:ProCharts.Skia.SkiaAdvancedChartStyle.GaugeThickness
+  isSpec: "True"
+  fullName: ProCharts.Skia.SkiaAdvancedChartStyle.GaugeThickness
+  nameWithType: SkiaAdvancedChartStyle.GaugeThickness
+- uid: ProCharts.Skia.SkiaAdvancedChartStyle.HeatmapCellGap
+  name: HeatmapCellGap
+  href: api/ProCharts.Skia.SkiaAdvancedChartStyle.html#ProCharts_Skia_SkiaAdvancedChartStyle_HeatmapCellGap
+  commentId: P:ProCharts.Skia.SkiaAdvancedChartStyle.HeatmapCellGap
+  fullName: ProCharts.Skia.SkiaAdvancedChartStyle.HeatmapCellGap
+  nameWithType: SkiaAdvancedChartStyle.HeatmapCellGap
+- uid: ProCharts.Skia.SkiaAdvancedChartStyle.HeatmapCellGap*
+  name: HeatmapCellGap
+  href: api/ProCharts.Skia.SkiaAdvancedChartStyle.html#ProCharts_Skia_SkiaAdvancedChartStyle_HeatmapCellGap_
+  commentId: Overload:ProCharts.Skia.SkiaAdvancedChartStyle.HeatmapCellGap
+  isSpec: "True"
+  fullName: ProCharts.Skia.SkiaAdvancedChartStyle.HeatmapCellGap
+  nameWithType: SkiaAdvancedChartStyle.HeatmapCellGap
+- uid: ProCharts.Skia.SkiaAdvancedChartStyle.HeatmapCenterColor
+  name: HeatmapCenterColor
+  href: api/ProCharts.Skia.SkiaAdvancedChartStyle.html#ProCharts_Skia_SkiaAdvancedChartStyle_HeatmapCenterColor
+  commentId: P:ProCharts.Skia.SkiaAdvancedChartStyle.HeatmapCenterColor
+  fullName: ProCharts.Skia.SkiaAdvancedChartStyle.HeatmapCenterColor
+  nameWithType: SkiaAdvancedChartStyle.HeatmapCenterColor
+- uid: ProCharts.Skia.SkiaAdvancedChartStyle.HeatmapCenterColor*
+  name: HeatmapCenterColor
+  href: api/ProCharts.Skia.SkiaAdvancedChartStyle.html#ProCharts_Skia_SkiaAdvancedChartStyle_HeatmapCenterColor_
+  commentId: Overload:ProCharts.Skia.SkiaAdvancedChartStyle.HeatmapCenterColor
+  isSpec: "True"
+  fullName: ProCharts.Skia.SkiaAdvancedChartStyle.HeatmapCenterColor
+  nameWithType: SkiaAdvancedChartStyle.HeatmapCenterColor
+- uid: ProCharts.Skia.SkiaAdvancedChartStyle.HeatmapCenterValue
+  name: HeatmapCenterValue
+  href: api/ProCharts.Skia.SkiaAdvancedChartStyle.html#ProCharts_Skia_SkiaAdvancedChartStyle_HeatmapCenterValue
+  commentId: P:ProCharts.Skia.SkiaAdvancedChartStyle.HeatmapCenterValue
+  fullName: ProCharts.Skia.SkiaAdvancedChartStyle.HeatmapCenterValue
+  nameWithType: SkiaAdvancedChartStyle.HeatmapCenterValue
+- uid: ProCharts.Skia.SkiaAdvancedChartStyle.HeatmapCenterValue*
+  name: HeatmapCenterValue
+  href: api/ProCharts.Skia.SkiaAdvancedChartStyle.html#ProCharts_Skia_SkiaAdvancedChartStyle_HeatmapCenterValue_
+  commentId: Overload:ProCharts.Skia.SkiaAdvancedChartStyle.HeatmapCenterValue
+  isSpec: "True"
+  fullName: ProCharts.Skia.SkiaAdvancedChartStyle.HeatmapCenterValue
+  nameWithType: SkiaAdvancedChartStyle.HeatmapCenterValue
+- uid: ProCharts.Skia.SkiaAdvancedChartStyle.HeatmapHighColor
+  name: HeatmapHighColor
+  href: api/ProCharts.Skia.SkiaAdvancedChartStyle.html#ProCharts_Skia_SkiaAdvancedChartStyle_HeatmapHighColor
+  commentId: P:ProCharts.Skia.SkiaAdvancedChartStyle.HeatmapHighColor
+  fullName: ProCharts.Skia.SkiaAdvancedChartStyle.HeatmapHighColor
+  nameWithType: SkiaAdvancedChartStyle.HeatmapHighColor
+- uid: ProCharts.Skia.SkiaAdvancedChartStyle.HeatmapHighColor*
+  name: HeatmapHighColor
+  href: api/ProCharts.Skia.SkiaAdvancedChartStyle.html#ProCharts_Skia_SkiaAdvancedChartStyle_HeatmapHighColor_
+  commentId: Overload:ProCharts.Skia.SkiaAdvancedChartStyle.HeatmapHighColor
+  isSpec: "True"
+  fullName: ProCharts.Skia.SkiaAdvancedChartStyle.HeatmapHighColor
+  nameWithType: SkiaAdvancedChartStyle.HeatmapHighColor
+- uid: ProCharts.Skia.SkiaAdvancedChartStyle.HeatmapLowColor
+  name: HeatmapLowColor
+  href: api/ProCharts.Skia.SkiaAdvancedChartStyle.html#ProCharts_Skia_SkiaAdvancedChartStyle_HeatmapLowColor
+  commentId: P:ProCharts.Skia.SkiaAdvancedChartStyle.HeatmapLowColor
+  fullName: ProCharts.Skia.SkiaAdvancedChartStyle.HeatmapLowColor
+  nameWithType: SkiaAdvancedChartStyle.HeatmapLowColor
+- uid: ProCharts.Skia.SkiaAdvancedChartStyle.HeatmapLowColor*
+  name: HeatmapLowColor
+  href: api/ProCharts.Skia.SkiaAdvancedChartStyle.html#ProCharts_Skia_SkiaAdvancedChartStyle_HeatmapLowColor_
+  commentId: Overload:ProCharts.Skia.SkiaAdvancedChartStyle.HeatmapLowColor
+  isSpec: "True"
+  fullName: ProCharts.Skia.SkiaAdvancedChartStyle.HeatmapLowColor
+  nameWithType: SkiaAdvancedChartStyle.HeatmapLowColor
+- uid: ProCharts.Skia.SkiaAdvancedChartStyle.HeatmapMaximum
+  name: HeatmapMaximum
+  href: api/ProCharts.Skia.SkiaAdvancedChartStyle.html#ProCharts_Skia_SkiaAdvancedChartStyle_HeatmapMaximum
+  commentId: P:ProCharts.Skia.SkiaAdvancedChartStyle.HeatmapMaximum
+  fullName: ProCharts.Skia.SkiaAdvancedChartStyle.HeatmapMaximum
+  nameWithType: SkiaAdvancedChartStyle.HeatmapMaximum
+- uid: ProCharts.Skia.SkiaAdvancedChartStyle.HeatmapMaximum*
+  name: HeatmapMaximum
+  href: api/ProCharts.Skia.SkiaAdvancedChartStyle.html#ProCharts_Skia_SkiaAdvancedChartStyle_HeatmapMaximum_
+  commentId: Overload:ProCharts.Skia.SkiaAdvancedChartStyle.HeatmapMaximum
+  isSpec: "True"
+  fullName: ProCharts.Skia.SkiaAdvancedChartStyle.HeatmapMaximum
+  nameWithType: SkiaAdvancedChartStyle.HeatmapMaximum
+- uid: ProCharts.Skia.SkiaAdvancedChartStyle.HeatmapMinimum
+  name: HeatmapMinimum
+  href: api/ProCharts.Skia.SkiaAdvancedChartStyle.html#ProCharts_Skia_SkiaAdvancedChartStyle_HeatmapMinimum
+  commentId: P:ProCharts.Skia.SkiaAdvancedChartStyle.HeatmapMinimum
+  fullName: ProCharts.Skia.SkiaAdvancedChartStyle.HeatmapMinimum
+  nameWithType: SkiaAdvancedChartStyle.HeatmapMinimum
+- uid: ProCharts.Skia.SkiaAdvancedChartStyle.HeatmapMinimum*
+  name: HeatmapMinimum
+  href: api/ProCharts.Skia.SkiaAdvancedChartStyle.html#ProCharts_Skia_SkiaAdvancedChartStyle_HeatmapMinimum_
+  commentId: Overload:ProCharts.Skia.SkiaAdvancedChartStyle.HeatmapMinimum
+  isSpec: "True"
+  fullName: ProCharts.Skia.SkiaAdvancedChartStyle.HeatmapMinimum
+  nameWithType: SkiaAdvancedChartStyle.HeatmapMinimum
+- uid: ProCharts.Skia.SkiaAdvancedChartStyle.ShowHeatmapColorScale
+  name: ShowHeatmapColorScale
+  href: api/ProCharts.Skia.SkiaAdvancedChartStyle.html#ProCharts_Skia_SkiaAdvancedChartStyle_ShowHeatmapColorScale
+  commentId: P:ProCharts.Skia.SkiaAdvancedChartStyle.ShowHeatmapColorScale
+  fullName: ProCharts.Skia.SkiaAdvancedChartStyle.ShowHeatmapColorScale
+  nameWithType: SkiaAdvancedChartStyle.ShowHeatmapColorScale
+- uid: ProCharts.Skia.SkiaAdvancedChartStyle.ShowHeatmapColorScale*
+  name: ShowHeatmapColorScale
+  href: api/ProCharts.Skia.SkiaAdvancedChartStyle.html#ProCharts_Skia_SkiaAdvancedChartStyle_ShowHeatmapColorScale_
+  commentId: Overload:ProCharts.Skia.SkiaAdvancedChartStyle.ShowHeatmapColorScale
+  isSpec: "True"
+  fullName: ProCharts.Skia.SkiaAdvancedChartStyle.ShowHeatmapColorScale
+  nameWithType: SkiaAdvancedChartStyle.ShowHeatmapColorScale
+- uid: ProCharts.Skia.SkiaAdvancedChartStyle.SunburstInnerRadius
+  name: SunburstInnerRadius
+  href: api/ProCharts.Skia.SkiaAdvancedChartStyle.html#ProCharts_Skia_SkiaAdvancedChartStyle_SunburstInnerRadius
+  commentId: P:ProCharts.Skia.SkiaAdvancedChartStyle.SunburstInnerRadius
+  fullName: ProCharts.Skia.SkiaAdvancedChartStyle.SunburstInnerRadius
+  nameWithType: SkiaAdvancedChartStyle.SunburstInnerRadius
+- uid: ProCharts.Skia.SkiaAdvancedChartStyle.SunburstInnerRadius*
+  name: SunburstInnerRadius
+  href: api/ProCharts.Skia.SkiaAdvancedChartStyle.html#ProCharts_Skia_SkiaAdvancedChartStyle_SunburstInnerRadius_
+  commentId: Overload:ProCharts.Skia.SkiaAdvancedChartStyle.SunburstInnerRadius
+  isSpec: "True"
+  fullName: ProCharts.Skia.SkiaAdvancedChartStyle.SunburstInnerRadius
+  nameWithType: SkiaAdvancedChartStyle.SunburstInnerRadius
+- uid: ProCharts.Skia.SkiaAdvancedChartStyle.TreemapGap
+  name: TreemapGap
+  href: api/ProCharts.Skia.SkiaAdvancedChartStyle.html#ProCharts_Skia_SkiaAdvancedChartStyle_TreemapGap
+  commentId: P:ProCharts.Skia.SkiaAdvancedChartStyle.TreemapGap
+  fullName: ProCharts.Skia.SkiaAdvancedChartStyle.TreemapGap
+  nameWithType: SkiaAdvancedChartStyle.TreemapGap
+- uid: ProCharts.Skia.SkiaAdvancedChartStyle.TreemapGap*
+  name: TreemapGap
+  href: api/ProCharts.Skia.SkiaAdvancedChartStyle.html#ProCharts_Skia_SkiaAdvancedChartStyle_TreemapGap_
+  commentId: Overload:ProCharts.Skia.SkiaAdvancedChartStyle.TreemapGap
+  isSpec: "True"
+  fullName: ProCharts.Skia.SkiaAdvancedChartStyle.TreemapGap
+  nameWithType: SkiaAdvancedChartStyle.TreemapGap
+- uid: ProCharts.Skia.SkiaAdvancedChartStyle.TreemapHeaderHeight
+  name: TreemapHeaderHeight
+  href: api/ProCharts.Skia.SkiaAdvancedChartStyle.html#ProCharts_Skia_SkiaAdvancedChartStyle_TreemapHeaderHeight
+  commentId: P:ProCharts.Skia.SkiaAdvancedChartStyle.TreemapHeaderHeight
+  fullName: ProCharts.Skia.SkiaAdvancedChartStyle.TreemapHeaderHeight
+  nameWithType: SkiaAdvancedChartStyle.TreemapHeaderHeight
+- uid: ProCharts.Skia.SkiaAdvancedChartStyle.TreemapHeaderHeight*
+  name: TreemapHeaderHeight
+  href: api/ProCharts.Skia.SkiaAdvancedChartStyle.html#ProCharts_Skia_SkiaAdvancedChartStyle_TreemapHeaderHeight_
+  commentId: Overload:ProCharts.Skia.SkiaAdvancedChartStyle.TreemapHeaderHeight
+  isSpec: "True"
+  fullName: ProCharts.Skia.SkiaAdvancedChartStyle.TreemapHeaderHeight
+  nameWithType: SkiaAdvancedChartStyle.TreemapHeaderHeight
 - uid: ProCharts.Skia.SkiaChartExporter
   name: SkiaChartExporter
   href: api/ProCharts.Skia.SkiaChartExporter.html
@@ -74631,6 +75638,19 @@ references:
   fullName.vb: ProCharts.Skia.SkiaChartStyle.New
   nameWithType: SkiaChartStyle.SkiaChartStyle
   nameWithType.vb: SkiaChartStyle.New
+- uid: ProCharts.Skia.SkiaChartStyle.Advanced
+  name: Advanced
+  href: api/ProCharts.Skia.SkiaChartStyle.html#ProCharts_Skia_SkiaChartStyle_Advanced
+  commentId: P:ProCharts.Skia.SkiaChartStyle.Advanced
+  fullName: ProCharts.Skia.SkiaChartStyle.Advanced
+  nameWithType: SkiaChartStyle.Advanced
+- uid: ProCharts.Skia.SkiaChartStyle.Advanced*
+  name: Advanced
+  href: api/ProCharts.Skia.SkiaChartStyle.html#ProCharts_Skia_SkiaChartStyle_Advanced_
+  commentId: Overload:ProCharts.Skia.SkiaChartStyle.Advanced
+  isSpec: "True"
+  fullName: ProCharts.Skia.SkiaChartStyle.Advanced
+  nameWithType: SkiaChartStyle.Advanced
 - uid: ProCharts.Skia.SkiaChartStyle.AreaFillOpacity
   name: AreaFillOpacity
   href: api/ProCharts.Skia.SkiaChartStyle.html#ProCharts_Skia_SkiaChartStyle_AreaFillOpacity

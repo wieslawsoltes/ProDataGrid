@@ -1,0 +1,627 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+      <title>Class SkiaAdvancedChartStyle | ProDataGrid for Avalonia </title>
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <meta name="title" content="Class SkiaAdvancedChartStyle | ProDataGrid for Avalonia ">
+      
+      <meta name="description" content="Immutable presentation options for matrix, hierarchical, and radial-indicator charts.">
+      <link rel="icon" href="../favicon.ico">
+      <link rel="stylesheet" href="../public/docfx.min.css">
+      <link rel="stylesheet" href="../public/main.css">
+      <meta name="docfx:navrel" content="../toc.html">
+      <meta name="docfx:tocrel" content="toc.html">
+      
+      
+      
+      
+      <meta name="docfx:docurl" content="https://github.com/wieslawsoltes/ProDataGrid/new/master/apiSpec/new?filename=ProCharts_Skia_SkiaAdvancedChartStyle.md&amp;value=---%0Auid%3A%20ProCharts.Skia.SkiaAdvancedChartStyle%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">
+      <meta name="loc:inThisArticle" content="In this article">
+      <meta name="loc:searchResultsCount" content="{count} results for &quot;{query}&quot;">
+      <meta name="loc:searchNoResults" content="No results for &quot;{query}&quot;">
+      <meta name="loc:tocFilter" content="Filter by title">
+      <meta name="loc:nextArticle" content="Next">
+      <meta name="loc:prevArticle" content="Previous">
+      <meta name="loc:themeLight" content="Light">
+      <meta name="loc:themeDark" content="Dark">
+      <meta name="loc:themeAuto" content="Auto">
+      <meta name="loc:changeTheme" content="Change theme">
+      <meta name="loc:copy" content="Copy">
+      <meta name="loc:downloadPdf" content="Download PDF">
+
+      <script type="module" src="./../public/docfx.min.js"></script>
+
+      <script>
+        const theme = localStorage.getItem('theme') || 'auto'
+        document.documentElement.setAttribute('data-bs-theme', theme === 'auto' ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light') : theme)
+      </script>
+
+  </head>
+
+  <body class="tex2jax_ignore" data-layout="" data-yaml-mime="ManagedReference">
+    <header class="bg-body border-bottom">
+      <nav id="autocollapse" class="navbar navbar-expand-md" role="navigation">
+        <div class="container-xxl flex-nowrap">
+          <a class="navbar-brand" href="../index.html">
+            <img id="logo" class="svg" src="../images/logo.svg" alt="">
+            
+          </a>
+          <button class="btn btn-lg d-md-none border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navpanel" aria-controls="navpanel" aria-expanded="false" aria-label="Toggle navigation">
+            <i class="bi bi-three-dots"></i>
+          </button>
+          <div class="collapse navbar-collapse" id="navpanel">
+            <div id="navbar">
+            </div>
+          </div>
+        </div>
+      </nav>
+    </header>
+
+    <main class="container-xxl">
+      <div class="toc-offcanvas">
+        <div class="offcanvas-md offcanvas-start" tabindex="-1" id="tocOffcanvas" aria-labelledby="tocOffcanvasLabel">
+          <div class="offcanvas-header">
+            <h5 class="offcanvas-title" id="tocOffcanvasLabel">Table of Contents</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="offcanvas" data-bs-target="#tocOffcanvas" aria-label="Close"></button>
+          </div>
+          <div class="offcanvas-body">
+            <nav class="toc" id="toc"></nav>
+          </div>
+        </div>
+      </div>
+
+      <div class="content">
+        <div class="actionbar">
+          <button class="btn btn-lg border-0 d-md-none" type="button" data-bs-toggle="offcanvas" data-bs-target="#tocOffcanvas" aria-controls="tocOffcanvas" aria-expanded="false" aria-label="Show table of contents">
+            <i class="bi bi-list"></i>
+          </button>
+
+          <nav id="breadcrumb"></nav>
+        </div>
+
+        <article data-uid="ProCharts.Skia.SkiaAdvancedChartStyle">
+
+
+
+  <h1 id="ProCharts_Skia_SkiaAdvancedChartStyle" data-uid="ProCharts.Skia.SkiaAdvancedChartStyle" class="text-break">
+Class SkiaAdvancedChartStyle  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/ProCharts.Skia/SkiaAdvancedChartStyle.cs/#L12"><i class="bi bi-code-slash"></i></a>
+  </h1>
+
+  <div class="facts text-secondary">
+    <dl><dt>Namespace</dt><dd><a class="xref" href="ProCharts.html">ProCharts</a>.<a class="xref" href="ProCharts.Skia.html">Skia</a></dd></dl>
+  <dl><dt>Assembly</dt><dd>ProCharts.Skia.dll</dd></dl>
+  </div>
+
+  <div class="markdown summary"><p>Immutable presentation options for matrix, hierarchical, and radial-indicator charts.</p>
+</div>
+  <div class="markdown conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public sealed record SkiaAdvancedChartStyle : IEquatable&lt;SkiaAdvancedChartStyle&gt;</code></pre>
+  </div>
+
+
+
+
+  <dl class="typelist inheritance">
+    <dt>Inheritance</dt>
+    <dd>
+      <div><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object">object</a></div>
+      <div><span class="xref">SkiaAdvancedChartStyle</span></div>
+    </dd>
+  </dl>
+
+  <dl class="typelist implements">
+    <dt>Implements</dt>
+    <dd>
+      <div><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.iequatable-1">IEquatable</a>&lt;<a class="xref" href="ProCharts.Skia.SkiaAdvancedChartStyle.html">SkiaAdvancedChartStyle</a>&gt;</div>
+    </dd>
+  </dl>
+
+
+  <dl class="typelist inheritedMembers">
+    <dt>Inherited Members</dt>
+    <dd>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object)">object.Equals(object)</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object-system-object)">object.Equals(object, object)</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.gethashcode">object.GetHashCode()</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.gettype">object.GetType()</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.referenceequals">object.ReferenceEquals(object, object)</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.tostring">object.ToString()</a>
+    </div>
+  </dd></dl>
+
+
+
+
+
+
+  <h2 class="section" id="properties">Properties
+</h2>
+
+
+  <a id="ProCharts_Skia_SkiaAdvancedChartStyle_GaugeStartAngle_" data-uid="ProCharts.Skia.SkiaAdvancedChartStyle.GaugeStartAngle*"></a>
+
+  <h3 id="ProCharts_Skia_SkiaAdvancedChartStyle_GaugeStartAngle" data-uid="ProCharts.Skia.SkiaAdvancedChartStyle.GaugeStartAngle">
+  GaugeStartAngle
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/ProCharts.Skia/SkiaAdvancedChartStyle.cs/#L37"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Gets the gauge's clockwise starting angle in degrees, with zero pointing right.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public float GaugeStartAngle { get; init; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.single">float</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="ProCharts_Skia_SkiaAdvancedChartStyle_GaugeSweepAngle_" data-uid="ProCharts.Skia.SkiaAdvancedChartStyle.GaugeSweepAngle*"></a>
+
+  <h3 id="ProCharts_Skia_SkiaAdvancedChartStyle_GaugeSweepAngle" data-uid="ProCharts.Skia.SkiaAdvancedChartStyle.GaugeSweepAngle">
+  GaugeSweepAngle
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/ProCharts.Skia/SkiaAdvancedChartStyle.cs/#L39"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Gets the gauge's clockwise angular extent, greater than zero and at most 360 degrees.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public float GaugeSweepAngle { get; init; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.single">float</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="ProCharts_Skia_SkiaAdvancedChartStyle_GaugeThickness_" data-uid="ProCharts.Skia.SkiaAdvancedChartStyle.GaugeThickness*"></a>
+
+  <h3 id="ProCharts_Skia_SkiaAdvancedChartStyle_GaugeThickness" data-uid="ProCharts.Skia.SkiaAdvancedChartStyle.GaugeThickness">
+  GaugeThickness
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/ProCharts.Skia/SkiaAdvancedChartStyle.cs/#L41"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Gets the gauge ring thickness as a fraction of its outer radius.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public float GaugeThickness { get; init; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.single">float</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="ProCharts_Skia_SkiaAdvancedChartStyle_HeatmapCellGap_" data-uid="ProCharts.Skia.SkiaAdvancedChartStyle.HeatmapCellGap*"></a>
+
+  <h3 id="ProCharts_Skia_SkiaAdvancedChartStyle_HeatmapCellGap" data-uid="ProCharts.Skia.SkiaAdvancedChartStyle.HeatmapCellGap">
+  HeatmapCellGap
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/ProCharts.Skia/SkiaAdvancedChartStyle.cs/#L27"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Gets cell spacing in logical pixels, clamped for very small cells.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public float HeatmapCellGap { get; init; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.single">float</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="ProCharts_Skia_SkiaAdvancedChartStyle_HeatmapCenterColor_" data-uid="ProCharts.Skia.SkiaAdvancedChartStyle.HeatmapCenterColor*"></a>
+
+  <h3 id="ProCharts_Skia_SkiaAdvancedChartStyle_HeatmapCenterColor" data-uid="ProCharts.Skia.SkiaAdvancedChartStyle.HeatmapCenterColor">
+  HeatmapCenterColor
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/ProCharts.Skia/SkiaAdvancedChartStyle.cs/#L19"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Gets an optional center color for a diverging scale.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public SKColor? HeatmapCenterColor { get; init; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/skiasharp.skcolor">SKColor</a>?</dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="ProCharts_Skia_SkiaAdvancedChartStyle_HeatmapCenterValue_" data-uid="ProCharts.Skia.SkiaAdvancedChartStyle.HeatmapCenterValue*"></a>
+
+  <h3 id="ProCharts_Skia_SkiaAdvancedChartStyle_HeatmapCenterValue" data-uid="ProCharts.Skia.SkiaAdvancedChartStyle.HeatmapCenterValue">
+  HeatmapCenterValue
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/ProCharts.Skia/SkiaAdvancedChartStyle.cs/#L21"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Gets the center value for a diverging scale. Null uses the interval midpoint.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public double? HeatmapCenterValue { get; init; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.double">double</a>?</dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="ProCharts_Skia_SkiaAdvancedChartStyle_HeatmapHighColor_" data-uid="ProCharts.Skia.SkiaAdvancedChartStyle.HeatmapHighColor*"></a>
+
+  <h3 id="ProCharts_Skia_SkiaAdvancedChartStyle_HeatmapHighColor" data-uid="ProCharts.Skia.SkiaAdvancedChartStyle.HeatmapHighColor">
+  HeatmapHighColor
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/ProCharts.Skia/SkiaAdvancedChartStyle.cs/#L17"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Gets the heatmap color at the upper bound.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public SKColor HeatmapHighColor { get; init; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/skiasharp.skcolor">SKColor</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="ProCharts_Skia_SkiaAdvancedChartStyle_HeatmapLowColor_" data-uid="ProCharts.Skia.SkiaAdvancedChartStyle.HeatmapLowColor*"></a>
+
+  <h3 id="ProCharts_Skia_SkiaAdvancedChartStyle_HeatmapLowColor" data-uid="ProCharts.Skia.SkiaAdvancedChartStyle.HeatmapLowColor">
+  HeatmapLowColor
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/ProCharts.Skia/SkiaAdvancedChartStyle.cs/#L15"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Gets the heatmap color at the lower bound.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public SKColor HeatmapLowColor { get; init; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/skiasharp.skcolor">SKColor</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="ProCharts_Skia_SkiaAdvancedChartStyle_HeatmapMaximum_" data-uid="ProCharts.Skia.SkiaAdvancedChartStyle.HeatmapMaximum*"></a>
+
+  <h3 id="ProCharts_Skia_SkiaAdvancedChartStyle_HeatmapMaximum" data-uid="ProCharts.Skia.SkiaAdvancedChartStyle.HeatmapMaximum">
+  HeatmapMaximum
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/ProCharts.Skia/SkiaAdvancedChartStyle.cs/#L25"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Gets an optional fixed upper heatmap bound. Null derives it from finite cells.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public double? HeatmapMaximum { get; init; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.double">double</a>?</dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="ProCharts_Skia_SkiaAdvancedChartStyle_HeatmapMinimum_" data-uid="ProCharts.Skia.SkiaAdvancedChartStyle.HeatmapMinimum*"></a>
+
+  <h3 id="ProCharts_Skia_SkiaAdvancedChartStyle_HeatmapMinimum" data-uid="ProCharts.Skia.SkiaAdvancedChartStyle.HeatmapMinimum">
+  HeatmapMinimum
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/ProCharts.Skia/SkiaAdvancedChartStyle.cs/#L23"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Gets an optional fixed lower heatmap bound. Null derives it from finite cells.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public double? HeatmapMinimum { get; init; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.double">double</a>?</dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="ProCharts_Skia_SkiaAdvancedChartStyle_ShowHeatmapColorScale_" data-uid="ProCharts.Skia.SkiaAdvancedChartStyle.ShowHeatmapColorScale*"></a>
+
+  <h3 id="ProCharts_Skia_SkiaAdvancedChartStyle_ShowHeatmapColorScale" data-uid="ProCharts.Skia.SkiaAdvancedChartStyle.ShowHeatmapColorScale">
+  ShowHeatmapColorScale
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/ProCharts.Skia/SkiaAdvancedChartStyle.cs/#L29"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Gets whether to show a continuous color scale with numeric endpoints.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public bool ShowHeatmapColorScale { get; init; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="ProCharts_Skia_SkiaAdvancedChartStyle_SunburstInnerRadius_" data-uid="ProCharts.Skia.SkiaAdvancedChartStyle.SunburstInnerRadius*"></a>
+
+  <h3 id="ProCharts_Skia_SkiaAdvancedChartStyle_SunburstInnerRadius" data-uid="ProCharts.Skia.SkiaAdvancedChartStyle.SunburstInnerRadius">
+  SunburstInnerRadius
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/ProCharts.Skia/SkiaAdvancedChartStyle.cs/#L35"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Gets the sunburst hole radius as a fraction of the outer radius.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public double SunburstInnerRadius { get; init; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.double">double</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="ProCharts_Skia_SkiaAdvancedChartStyle_TreemapGap_" data-uid="ProCharts.Skia.SkiaAdvancedChartStyle.TreemapGap*"></a>
+
+  <h3 id="ProCharts_Skia_SkiaAdvancedChartStyle_TreemapGap" data-uid="ProCharts.Skia.SkiaAdvancedChartStyle.TreemapGap">
+  TreemapGap
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/ProCharts.Skia/SkiaAdvancedChartStyle.cs/#L31"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Gets the gap between treemap cells in logical pixels.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public float TreemapGap { get; init; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.single">float</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="ProCharts_Skia_SkiaAdvancedChartStyle_TreemapHeaderHeight_" data-uid="ProCharts.Skia.SkiaAdvancedChartStyle.TreemapHeaderHeight*"></a>
+
+  <h3 id="ProCharts_Skia_SkiaAdvancedChartStyle_TreemapHeaderHeight" data-uid="ProCharts.Skia.SkiaAdvancedChartStyle.TreemapHeaderHeight">
+  TreemapHeaderHeight
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/ProCharts.Skia/SkiaAdvancedChartStyle.cs/#L33"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Gets the height reserved for a treemap branch label and drill-down target.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public float TreemapHeaderHeight { get; init; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.single">float</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+</article>
+
+        <div class="contribution d-print-none">
+          <a href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/ProCharts.Skia/SkiaAdvancedChartStyle.cs/#L12" class="edit-link">Edit this page</a>
+        </div>
+
+
+      </div>
+
+      <div class="affix">
+        <nav id="affix"></nav>
+      </div>
+    </main>
+
+
+    <footer class="border-top text-secondary">
+      <div class="container-xxl">
+        <div class="flex-fill">
+          <span>Made with <a href="https://dotnet.github.io/docfx">docfx</a></span>
+        </div>
+      </div>
+    </footer>
+  </body>
+</html>

@@ -9426,6 +9426,48 @@
     },
     {
       "type": "ManagedReference",
+      "source_relative_path": "api/ProCharts.ChartHierarchyLayout.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/ProCharts.ChartHierarchyLayout.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "ProCharts.ChartHierarchyLayout",
+      "Summary": "<p sourcefile=\"api/ProCharts.ChartHierarchyLayout.yml\" sourcestartlinenumber=\"1\">Deterministic, renderer-independent squarified treemap and radial partition layout.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/ProCharts.ChartHierarchyNode.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/ProCharts.ChartHierarchyNode.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "ProCharts.ChartHierarchyNode",
+      "Summary": "<p sourcefile=\"api/ProCharts.ChartHierarchyNode.yml\" sourcestartlinenumber=\"1\">An immutable weighted hierarchy node. Branch totals are derived from their children.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/ProCharts.ChartHierarchySnapshot.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/ProCharts.ChartHierarchySnapshot.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "ProCharts.ChartHierarchySnapshot",
+      "Summary": "<p sourcefile=\"api/ProCharts.ChartHierarchySnapshot.yml\" sourcestartlinenumber=\"1\">An immutable preorder index of a hierarchy, shared by rendering, navigation and selection.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
       "source_relative_path": "api/ProCharts.ChartInteractionState.yml",
       "output": {
         ".html": {
@@ -9437,6 +9479,20 @@
       "IsMRef": true,
       "Title": "ProCharts.ChartInteractionState",
       "Summary": "<p sourcefile=\"api/ProCharts.ChartInteractionState.yml\" sourcestartlinenumber=\"1\">Represents transient chart interaction state such as visible crosshair position\nand whether the window should remain pinned to the latest categories.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/ProCharts.ChartLayoutRect.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/ProCharts.ChartLayoutRect.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "ProCharts.ChartLayoutRect",
+      "Summary": "<p sourcefile=\"api/ProCharts.ChartLayoutRect.yml\" sourcestartlinenumber=\"1\">A renderer-independent finite rectangle.</p>\n"
     },
     {
       "type": "ManagedReference",
@@ -9608,6 +9664,20 @@
     },
     {
       "type": "ManagedReference",
+      "source_relative_path": "api/ProCharts.ChartSunburstSector.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/ProCharts.ChartSunburstSector.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "ProCharts.ChartSunburstSector",
+      "Summary": "<p sourcefile=\"api/ProCharts.ChartSunburstSector.yml\" sourcestartlinenumber=\"1\">A sunburst sector in clockwise degrees, with radii normalized to the outer chart radius.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
       "source_relative_path": "api/ProCharts.ChartTheme.yml",
       "output": {
         ".html": {
@@ -9619,6 +9689,20 @@
       "IsMRef": true,
       "Title": "ProCharts.ChartTheme",
       "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/ProCharts.ChartTreemapCell.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/ProCharts.ChartTreemapCell.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "ProCharts.ChartTreemapCell",
+      "Summary": "<p sourcefile=\"api/ProCharts.ChartTreemapCell.yml\" sourcestartlinenumber=\"1\">A treemap rectangle whose node index is shared with ChartHierarchySnapshot.</p>\n"
     },
     {
       "type": "ManagedReference",
@@ -9678,6 +9762,20 @@
     },
     {
       "type": "ManagedReference",
+      "source_relative_path": "api/ProCharts.HierarchyChartDataSource.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/ProCharts.HierarchyChartDataSource.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "ProCharts.HierarchyChartDataSource",
+      "Summary": "<p sourcefile=\"api/ProCharts.HierarchyChartDataSource.yml\" sourcestartlinenumber=\"1\">A reusable hierarchical data source with stable-ID and hit-index drill-down navigation.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
       "source_relative_path": "api/ProCharts.IChartDataSource.yml",
       "output": {
         ".html": {
@@ -9717,6 +9815,20 @@
       "IsMRef": true,
       "Title": "ProCharts.IChartWindowInfoProvider",
       "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/ProCharts.Skia.SkiaAdvancedChartStyle.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/ProCharts.Skia.SkiaAdvancedChartStyle.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "ProCharts.Skia.SkiaAdvancedChartStyle",
+      "Summary": "<p sourcefile=\"api/ProCharts.Skia.SkiaAdvancedChartStyle.yml\" sourcestartlinenumber=\"1\">Immutable presentation options for matrix, hierarchical, and radial-indicator charts.</p>\n"
     },
     {
       "type": "ManagedReference",
@@ -12651,6 +12763,16 @@
       "output": {
         ".html": {
           "relative_path": "articles/pivot-tables.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "Conceptual",
+      "source_relative_path": "articles/procharts-advanced-charts.md",
+      "output": {
+        ".html": {
+          "relative_path": "articles/procharts-advanced-charts.html"
         }
       },
       "version": ""

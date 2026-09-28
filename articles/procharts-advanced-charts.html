@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+      <title>Heatmaps, treemaps, sunbursts, and gauges | ProDataGrid for Avalonia </title>
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <meta name="title" content="Heatmaps, treemaps, sunbursts, and gauges | ProDataGrid for Avalonia ">
+      
+      
+      <link rel="icon" href="../favicon.ico">
+      <link rel="stylesheet" href="../public/docfx.min.css">
+      <link rel="stylesheet" href="../public/main.css">
+      <meta name="docfx:navrel" content="../toc.html">
+      <meta name="docfx:tocrel" content="toc.html">
+      
+      
+      
+      
+      <meta name="docfx:docurl" content="https://github.com/wieslawsoltes/ProDataGrid/blob/master/docfx/articles/procharts-advanced-charts.md/#L1">
+      <meta name="loc:inThisArticle" content="In this article">
+      <meta name="loc:searchResultsCount" content="{count} results for &quot;{query}&quot;">
+      <meta name="loc:searchNoResults" content="No results for &quot;{query}&quot;">
+      <meta name="loc:tocFilter" content="Filter by title">
+      <meta name="loc:nextArticle" content="Next">
+      <meta name="loc:prevArticle" content="Previous">
+      <meta name="loc:themeLight" content="Light">
+      <meta name="loc:themeDark" content="Dark">
+      <meta name="loc:themeAuto" content="Auto">
+      <meta name="loc:changeTheme" content="Change theme">
+      <meta name="loc:copy" content="Copy">
+      <meta name="loc:downloadPdf" content="Download PDF">
+
+      <script type="module" src="./../public/docfx.min.js"></script>
+
+      <script>
+        const theme = localStorage.getItem('theme') || 'auto'
+        document.documentElement.setAttribute('data-bs-theme', theme === 'auto' ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light') : theme)
+      </script>
+
+  </head>
+
+  <body class="tex2jax_ignore" data-layout="" data-yaml-mime="">
+    <header class="bg-body border-bottom">
+      <nav id="autocollapse" class="navbar navbar-expand-md" role="navigation">
+        <div class="container-xxl flex-nowrap">
+          <a class="navbar-brand" href="../index.html">
+            <img id="logo" class="svg" src="../images/logo.svg" alt="">
+            
+          </a>
+          <button class="btn btn-lg d-md-none border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navpanel" aria-controls="navpanel" aria-expanded="false" aria-label="Toggle navigation">
+            <i class="bi bi-three-dots"></i>
+          </button>
+          <div class="collapse navbar-collapse" id="navpanel">
+            <div id="navbar">
+            </div>
+          </div>
+        </div>
+      </nav>
+    </header>
+
+    <main class="container-xxl">
+      <div class="toc-offcanvas">
+        <div class="offcanvas-md offcanvas-start" tabindex="-1" id="tocOffcanvas" aria-labelledby="tocOffcanvasLabel">
+          <div class="offcanvas-header">
+            <h5 class="offcanvas-title" id="tocOffcanvasLabel">Table of Contents</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="offcanvas" data-bs-target="#tocOffcanvas" aria-label="Close"></button>
+          </div>
+          <div class="offcanvas-body">
+            <nav class="toc" id="toc"></nav>
+          </div>
+        </div>
+      </div>
+
+      <div class="content">
+        <div class="actionbar">
+          <button class="btn btn-lg border-0 d-md-none" type="button" data-bs-toggle="offcanvas" data-bs-target="#tocOffcanvas" aria-controls="tocOffcanvas" aria-expanded="false" aria-label="Show table of contents">
+            <i class="bi bi-list"></i>
+          </button>
+
+          <nav id="breadcrumb"></nav>
+        </div>
+
+        <article data-uid="">
+<h1 id="heatmaps-treemaps-sunbursts-and-gauges">Heatmaps, treemaps, sunbursts, and gauges</h1>
+
+<p>The advanced chart families use the existing <code>ChartSeriesKind</code>, <code>ChartDataSnapshot</code>, <code>SkiaChartRenderer</code>, and <code>SkiaChartExporter</code> entry points. They are not a separate demo renderer. The chart model/grid adapters can supply ordinary matrix series; an independent <code>HierarchyChartDataSource</code> supplies typed, nested trees with drill-down navigation.</p>
+<h2 id="matrix-heatmap">Matrix heatmap</h2>
+<p>Each series is a row; each category/value index is a column. Rows may have different lengths. Missing and non-finite values leave holes and cannot be hit. Original X values, series indices, and point indices remain available in tooltips.</p>
+<pre><code class="lang-csharp">var snapshot = new ChartDataSnapshot(
+    new string?[] { &quot;Mon&quot;, &quot;Tue&quot;, &quot;Wed&quot; },
+    new[]
+    {
+        new ChartSeriesSnapshot(&quot;North&quot;, ChartSeriesKind.Heatmap, new double?[] { 12, 18, 25 }),
+        new ChartSeriesSnapshot(&quot;South&quot;, ChartSeriesKind.Heatmap, new double?[] { 8, null, 31 })
+    });
+var style = new SkiaChartStyle
+{
+    ShowLegend = false,
+    ShowDataLabels = true,
+    Advanced = new SkiaAdvancedChartStyle
+    {
+        HeatmapMinimum = 0,
+        HeatmapMaximum = 40,
+        HeatmapCellGap = 1,
+        ShowHeatmapColorScale = true
+    }
+};
+byte[] png = SkiaChartExporter.ExportPng(snapshot, 960, 540, style);
+string svg = SkiaChartExporter.ExportSvg(snapshot, 960, 540, style);
+</code></pre>
+<p>Heatmap bounds can be derived from the finite data or fixed for comparisons between charts. Constant data maps to the middle of the color interval. Set <code>HeatmapCenterColor</code> and optionally <code>HeatmapCenterValue</code> for a diverging scale. Non-finite or reversed configured bounds are rejected. Category and row labels are thinned according to the available space; labels that cannot fit are omitted rather than displaying truncated numbers.</p>
+<h2 id="typed-hierarchies-and-drill-down">Typed hierarchies and drill-down</h2>
+<pre><code class="lang-csharp">var root = new ChartHierarchyNode(&quot;portfolio&quot;, &quot;Portfolio&quot;, new[]
+{
+    new ChartHierarchyNode(&quot;hardware&quot;, &quot;Hardware&quot;, new[]
+    {
+        new ChartHierarchyNode(&quot;laptops&quot;, &quot;Laptops&quot;, 60),
+        new ChartHierarchyNode(&quot;desktops&quot;, &quot;Desktops&quot;, 40)
+    }),
+    new ChartHierarchyNode(&quot;services&quot;, &quot;Services&quot;, 80)
+});
+var source = new HierarchyChartDataSource(root, ChartSeriesKind.Treemap);
+var snapshot = source.BuildSnapshot(new ChartDataRequest());
+
+// A typed hierarchy hit's PointIndex is its preorder node index.
+source.TryDrillDown(&quot;hardware&quot;);
+var breadcrumbs = source.GetPath();
+source.TryDrillUp();
+source.Kind = ChartSeriesKind.Sunburst;
+</code></pre>
+<p>Leaf weights must be finite and nonnegative. Branch totals are calculated from descendant leaves; children are defensively copied. A <code>ChartHierarchySnapshot</code> builds an immutable preorder index and rejects duplicate stable IDs. The maximum tree depth is 64 edges and overflowing aggregate weights are rejected. Zero-weight nodes remain in the data model but do not consume visible area.</p>
+<p><code>ChartHierarchyLayout</code> is UI/rendering independent. It supplies squarified treemap rectangles, weighted sunburst sectors, and geometric hit testing. With zero gaps and branch-header height, treemap leaf areas partition the rectangle proportionally to their weights. Branch headers reserve a target for drill-down. Sunburst rings correspond to hierarchy depth and use the same weighted angles for painting and pointer selection.</p>
+<p><code>HierarchyChartDataSource</code> caches immutable snapshots, supports point-index or stable-ID drill-down, drill-up, reset, root replacement, and owned breadcrumb paths. Notifications are synchronous on the calling thread and raised outside the state lock. UI hosts must dispatch appropriately. Point budgets and numeric index windows deliberately do not sample a hierarchy: removing a parent or child would change the represented structure and totals. Wire <code>TryDrillDown(hit.PointIndex)</code> to the host's click/selection command; the library does not silently change the application's selection behavior.</p>
+<p>Ordinary chart snapshots also work with <code>Treemap</code> and <code>Sunburst</code>: each series is a branch and each category is a leaf. A single series projects directly to category leaves. Missing/non-finite values are omitted; negative weights are rejected. Leaf hit indices map back to the original matrix series/category. A matrix branch hit uses <code>PointIndex = -1</code> and exposes its total and label, so applications should not treat a branch header as a leaf index. Prefer typed hierarchy data for navigation. Avoid adapter downsampling for these structural chart types (<code>ChartDownsampleMode.None</code>).</p>
+<h2 id="gauges">Gauges</h2>
+<p>Use <code>ChartSeriesKind.Gauge</code>. Each value receives a stable slot in a responsive grid; missing values leave empty slots. Configure the shared interval using <code>ValueAxisMinimum</code> and <code>ValueAxisMaximum</code> (defaults: 0 and 100). Values outside the interval are clamped only for painting; hit-test results retain their actual value. Gauge intervals must be finite and strictly increasing.</p>
+<p><code>GaugeStartAngle</code>, <code>GaugeSweepAngle</code>, and <code>GaugeThickness</code> configure radial geometry. Angles run clockwise and zero points to the right. Hit testing uses the annular sector, excluding the center hole and the unused angular span. <code>ShowDataLabels</code> displays the value and existing series/global data-label formatters are honored. <code>ShowCategoryLabels</code> displays the category or series name.</p>
+<h2 id="rendering-exports-and-limits">Rendering, exports, and limits</h2>
+<p>A <code>SkiaChartStyle</code> copy retains its immutable <code>Advanced</code> options. Replace those options, for example with a record <code>with</code> expression, to change chart-family geometry. The renderer retains only managed layout data keyed by snapshot identity/version, bounds, and style; paint/path resources are scoped to a draw. Pointer heatmap lookup is constant-time after layout. Hierarchical rendering and hit testing share the same geometry. PNG and SVG exports use the same renderer.</p>
+<p>Snapshots must have stable contents for their lifetime/version, as with the existing render cache. Create a new snapshot or advance its version when data changes. These plot families cannot be mixed with incompatible Cartesian or other advanced families in one plot; use separate chart views for a dashboard. They do not add 3D surfaces, geographic maps, Sankey/network diagrams, automatic drill-down UI controls, or a certified accessibility tree. Hierarchical geometry is cached, but this work does not claim a measured GPU/frame-rate speedup or benchmark million-cell heatmap rendering.</p>
+<p>Regression coverage includes ownership, identifier/depth/overflow validation, seeded area partition tests, sector containment, navigation and snapshot stability, ragged/missing data, extreme bounds, original hit indices, style invalidation, and actual PNG/SVG rendering for all four families.</p>
+
+</article>
+
+        <div class="contribution d-print-none">
+          <a href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/docfx/articles/procharts-advanced-charts.md/#L1" class="edit-link">Edit this page</a>
+        </div>
+
+        <div class="next-article d-print-none border-top" id="nextArticle"></div>
+
+      </div>
+
+      <div class="affix">
+        <nav id="affix"></nav>
+      </div>
+    </main>
+
+
+    <footer class="border-top text-secondary">
+      <div class="container-xxl">
+        <div class="flex-fill">
+          <span>Made with <a href="https://dotnet.github.io/docfx">docfx</a></span>
+        </div>
+      </div>
+    </footer>
+  </body>
+</html>
