@@ -62,7 +62,7 @@ namespace ProCharts.Skia
                         break;
                 }
                 if (context.LegendRect is SKRect legend)
-                    DrawLegend(canvas, legend, snapshot, style);
+                    DrawLegend(canvas, legend, context.LegendSnapshot, style);
             }
             finally { canvas.Restore(); }
             return true;
@@ -87,15 +87,36 @@ namespace ProCharts.Skia
             int hash = ComputeStyleHash(style);
             if (_advancedChartContext is { } cached && ReferenceEquals(cached.Snapshot, snapshot) &&
                 cached.Version == snapshot.Version && cached.Bounds == bounds && cached.StyleHash == hash &&
-                cached.Options == style.Advanced)
+                cached.Options == style.Advanced &&
+                cached.GaugeMinimumOverride == style.ValueAxisMinimum && cached.GaugeMaximumOverride == style.ValueAxisMaximum)
                 return cached;
 
-            AdvancedChartContext result = new(snapshot, bounds, hash, style.Advanced, kind);
+            AdvancedChartContext result = new(snapshot, bounds, hash, style.Advanced, kind)
+            {
+                GaugeMinimumOverride = style.ValueAxisMinimum,
+                GaugeMaximumOverride = style.ValueAxisMaximum
+            };
             if (!float.IsFinite(bounds.Left) || !float.IsFinite(bounds.Top) || !float.IsFinite(bounds.Right) ||
                 !float.IsFinite(bounds.Bottom) || bounds.Width <= 0 || bounds.Height <= 0 ||
                 !float.IsFinite(bounds.Width) || !float.IsFinite(bounds.Height))
                 return _advancedChartContext = result;
-            result.Plot = CalculatePlotRect(bounds, snapshot, snapshot.Categories, style,
+            result.LegendSnapshot = snapshot;
+  if (kind is ChartSeriesKind.Treemap or ChartSeriesKind.Sunburst)
+  {
+      result.Hierarchy = snapshot.Hierarchy ?? ChartHierarchySnapshot.FromChartData(snapshot);
+      ChartHierarchyNode root = result.Hierarchy.Root;
+      int count = root.IsLeaf ? 1 : root.Children.Count;
+      ChartSeriesSnapshot[] entries = new ChartSeriesSnapshot[count];
+      for (int i = 0; i < count; i++)
+      {
+          ChartHierarchyNode node = root.IsLeaf ? root : root.Children[i];
+          entries[i] = new ChartSeriesSnapshot(node.Label ?? node.Id, kind, Array.Empty<double?>());
+      }
+      result.LegendSnapshot = new ChartDataSnapshot(Array.Empty<string?>(), Array.AsReadOnly(entries));
+  }
+  // Heatmaps use the continuous color scale, not unrelated per-row series colors.
+  SkiaChartStyle layoutStyle = kind == ChartSeriesKind.Heatmap ? new SkiaChartStyle(style) { ShowLegend = false } : style;
+  result.Plot = CalculatePlotRect(bounds, result.LegendSnapshot, snapshot.Categories, layoutStyle,
                 false, false, false, 0, 1, 0, 1, false, 0, 1, out SKRect? legend);
             result.LegendRect = legend;
             if (result.Plot.Width <= 0 || result.Plot.Height <= 0) return _advancedChartContext = result;
@@ -132,7 +153,6 @@ namespace ProCharts.Skia
             }
             else if (kind is ChartSeriesKind.Treemap or ChartSeriesKind.Sunburst)
             {
-                result.Hierarchy = snapshot.Hierarchy ?? ChartHierarchySnapshot.FromChartData(snapshot);
                 if (kind == ChartSeriesKind.Treemap)
                     result.Treemap = ChartHierarchyLayout.CreateTreemap(result.Hierarchy, result.Plot.Width,
                         result.Plot.Height, style.Advanced.TreemapGap, style.Advanced.TreemapHeaderHeight);
@@ -212,8 +232,10 @@ namespace ProCharts.Skia
                 }
                 DrawAdvancedLabel(canvas, new SKRect(context.Plot.Left, top + height,
                     context.Plot.MidX, top + height + font.Size + 6), context.Minimum.ToString("G5", CultureInfo.InvariantCulture), text, font, false);
-                DrawAdvancedLabel(canvas, new SKRect(context.Plot.MidX, top + height,
-                    context.Plot.Right, top + height + font.Size + 6), context.Maximum.ToString("G5", CultureInfo.InvariantCulture), text, font, false);
+                string maximumLabel = context.Maximum.ToString("G5", CultureInfo.InvariantCulture);
+                float maximumWidth = font.MeasureText(maximumLabel, text) + 6;
+                DrawAdvancedLabel(canvas, new SKRect(Math.Max(context.Plot.MidX, context.Plot.Right - maximumWidth), top + height,
+                    context.Plot.Right, top + height + font.Size + 6), maximumLabel, text, font, false);
                 paint.IsAntialias = true;
             }
         }
@@ -266,10 +288,15 @@ namespace ProCharts.Skia
                 if (!node.IsLeaf)
                     rect.Bottom = Math.Min(rect.Bottom, rect.Top + context.Options.TreemapHeaderHeight);
                 if (style.ShowCategoryLabels)
-                    DrawAdvancedLabel(canvas, rect, node.Label ?? node.Id, text, font, false);
+                {
+          SKRect labelRect = rect;
+          labelRect.Bottom = Math.Min(rect.Bottom, rect.Top + font.Size + 10);
+          DrawAdvancedLabel(canvas, labelRect, node.Label ?? node.Id, text, font, false);
+      }
                 if (node.IsLeaf && style.ShowDataLabels && rect.Height > font.Size * 3)
                 {
-                    rect.Top += font.Size + 8;
+                    rect.Top += style.ShowCategoryLabels ? font.Size + 10 : 0;
+                    rect.Bottom = Math.Min(rect.Bottom, rect.Top + font.Size + 10);
                     DrawAdvancedLabel(canvas, rect, node.TotalValue.ToString("G5", CultureInfo.InvariantCulture), text, font, false);
                 }
             }
@@ -468,6 +495,9 @@ namespace ProCharts.Skia
             public SKRect Plot { get; set; }
             public SKRect OuterPlot { get; set; }
             public SKRect? LegendRect { get; set; }
+            public double? GaugeMinimumOverride { get; init; }
+            public double? GaugeMaximumOverride { get; init; }
+            public ChartDataSnapshot LegendSnapshot { get; set; } = ChartDataSnapshot.Empty;
             public double Minimum { get; set; }
             public double Maximum { get; set; } = 1;
             public int Rows { get; set; }

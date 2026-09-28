@@ -203,7 +203,7 @@ namespace Avalonia.Controls.DataGridTests.Charting
             int hits = 0;
             for (int y = 3; y < 240; y += 9)
                 for (int x = 3; x < 320; x += 9)
-                    if (renderer.HitTest(new SKPoint(x, y), bounds, snapshot, style) is { } hit)
+                    if (renderer.HitTest(new SKPoint(x + 0.5f, y + 0.5f), bounds, snapshot, style) is { } hit)
                     {
                         Assert.Equal(kind, hit.SeriesKind);
                         Assert.InRange(hit.PointIndex, 0, snapshot.Series[hit.SeriesIndex].Values.Count - 1);
