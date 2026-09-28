@@ -297,9 +297,10 @@ namespace ProDataGrid.FormulaEngine
         }
     }
 
-    public sealed class FormulaEvaluator
+    public sealed partial class FormulaEvaluator
     {
         private readonly ConditionalWeakTable<FormulaExpression, FormulaCompiledExpression> _compiledCache = new();
+        private readonly object _compilationGate = new();
 
         public FormulaValue Evaluate(
             FormulaExpression expression,
@@ -390,26 +391,36 @@ namespace ProDataGrid.FormulaEngine
             IFormulaFunctionRegistry functionRegistry,
             IFormulaCalculationObserver? observer)
         {
-            if (_compiledCache.TryGetValue(expression, out var compiled))
+            FormulaCompiledExpression compiled;
+            var fromCache = false;
+            var duration = TimeSpan.Zero;
+            // Only cold compilation/publication is serialized. The common compatible
+            // cache-hit path in Evaluate remains lock-free and allocation-free.
+            lock (_compilationGate)
             {
-                if (compiled.IsCompatibleWith(functionRegistry))
+                if (_compiledCache.TryGetValue(expression, out var existing) && existing.IsCompatibleWith(functionRegistry))
                 {
-                    observer?.OnExpressionCompiled(expression, compiled.Instructions.Length, TimeSpan.Zero, fromCache: true);
-                    return compiled;
+                    compiled = existing;
+                    fromCache = true;
                 }
-
-                _compiledCache.Remove(expression);
+                else
+                {
+                    var compiler = new FormulaExpressionCompiler(functionRegistry);
+                    var watch = observer != null ? System.Diagnostics.Stopwatch.StartNew() : null;
+                    compiled = compiler.Compile(expression);
+                    if (watch != null)
+                    {
+                        watch.Stop();
+                        duration = watch.Elapsed;
+                    }
+                    _compiledCache.Remove(expression);
+                    _compiledCache.Add(expression, compiled);
+                }
             }
 
-            var compiler = new FormulaExpressionCompiler(functionRegistry);
-            var watch = observer != null ? System.Diagnostics.Stopwatch.StartNew() : null;
-            compiled = compiler.Compile(expression);
-            if (watch != null)
-            {
-                watch.Stop();
-                observer!.OnExpressionCompiled(expression, compiled.Instructions.Length, watch.Elapsed, fromCache: false);
-            }
-            _compiledCache.Add(expression, compiled);
+            // Publish before notifying host code; observers may reenter evaluation.
+            // Host callbacks must not run while holding the compilation gate.
+            observer?.OnExpressionCompiled(expression, compiled.Instructions.Length, duration, fromCache);
             return compiled;
         }
 
@@ -805,22 +816,7 @@ namespace ProDataGrid.FormulaEngine
                 return EvaluateBinaryArray(expression.Operator, left, right, context);
             }
 
-            return expression.Operator switch
-            {
-                FormulaBinaryOperator.Add => EvaluateNumericBinary(left, right, context, (a, b) => a + b),
-                FormulaBinaryOperator.Subtract => EvaluateNumericBinary(left, right, context, (a, b) => a - b),
-                FormulaBinaryOperator.Multiply => EvaluateNumericBinary(left, right, context, (a, b) => a * b),
-                FormulaBinaryOperator.Divide => EvaluateDivide(left, right, context),
-                FormulaBinaryOperator.Power => EvaluateNumericBinary(left, right, context, Math.Pow),
-                FormulaBinaryOperator.Concat => EvaluateConcat(left, right, context.Address),
-                FormulaBinaryOperator.Equal => EvaluateComparison(left, right, context, (c) => c == 0),
-                FormulaBinaryOperator.NotEqual => EvaluateComparison(left, right, context, (c) => c != 0),
-                FormulaBinaryOperator.Less => EvaluateComparison(left, right, context, (c) => c < 0),
-                FormulaBinaryOperator.LessOrEqual => (EvaluateComparison(left, right, context, (c) => c <= 0)),
-                FormulaBinaryOperator.Greater => EvaluateComparison(left, right, context, (c) => c > 0),
-                FormulaBinaryOperator.GreaterOrEqual => EvaluateComparison(left, right, context, (c) => c >= 0),
-                _ => FormulaValue.FromError(new FormulaError(FormulaErrorType.Calc))
-            };
+            return EvaluateBinaryScalar(expression.Operator, left, right, context);
         }
 
         private FormulaValue EvaluateReferenceOperator(
@@ -1322,8 +1318,8 @@ namespace ProDataGrid.FormulaEngine
 
         private static FormulaValue EvaluateBinaryScalar(
             FormulaBinaryOperator op,
-            FormulaValue left,
-            FormulaValue right,
+            in FormulaValue left,
+            in FormulaValue right,
             FormulaEvaluationContext context)
         {
             if (left.Kind == FormulaValueKind.Error)
@@ -1334,6 +1330,12 @@ namespace ProDataGrid.FormulaEngine
             if (right.Kind == FormulaValueKind.Error)
             {
                 return right;
+            }
+
+            if (left.Kind == FormulaValueKind.Number && right.Kind == FormulaValueKind.Number &&
+                op != FormulaBinaryOperator.Concat)
+            {
+                return EvaluateNumberBinary(op, left.AsNumber(), right.AsNumber(), context.Workbook.Settings);
             }
 
             return op switch
