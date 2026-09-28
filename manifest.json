@@ -11064,6 +11064,20 @@
     },
     {
       "type": "ManagedReference",
+      "source_relative_path": "api/ProDataGrid.FormulaEngine.IFormulaFunctionRegistryVersion.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/ProDataGrid.FormulaEngine.IFormulaFunctionRegistryVersion.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "ProDataGrid.FormulaEngine.IFormulaFunctionRegistryVersion",
+      "Summary": "<p sourcefile=\"api/ProDataGrid.FormulaEngine.IFormulaFunctionRegistryVersion.yml\" sourcestartlinenumber=\"1\">Optional revision contract for mutable function registries. Implement this alongside\n<xref href=\"ProDataGrid.FormulaEngine.IFormulaFunctionRegistry\" data-throw-if-not-resolved=\"false\"></xref> to invalidate cached eager/lazy compilation plans.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
       "source_relative_path": "api/ProDataGrid.FormulaEngine.IFormulaNameChangeNotifier.yml",
       "output": {
         ".html": {

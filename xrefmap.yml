@@ -78682,6 +78682,19 @@ references:
   isSpec: "True"
   fullName: ProDataGrid.FormulaEngine.Excel.ExcelFunctionRegistry.TryGetFunction
   nameWithType: ExcelFunctionRegistry.TryGetFunction
+- uid: ProDataGrid.FormulaEngine.Excel.ExcelFunctionRegistry.Version
+  name: Version
+  href: api/ProDataGrid.FormulaEngine.Excel.ExcelFunctionRegistry.html#ProDataGrid_FormulaEngine_Excel_ExcelFunctionRegistry_Version
+  commentId: P:ProDataGrid.FormulaEngine.Excel.ExcelFunctionRegistry.Version
+  fullName: ProDataGrid.FormulaEngine.Excel.ExcelFunctionRegistry.Version
+  nameWithType: ExcelFunctionRegistry.Version
+- uid: ProDataGrid.FormulaEngine.Excel.ExcelFunctionRegistry.Version*
+  name: Version
+  href: api/ProDataGrid.FormulaEngine.Excel.ExcelFunctionRegistry.html#ProDataGrid_FormulaEngine_Excel_ExcelFunctionRegistry_Version_
+  commentId: Overload:ProDataGrid.FormulaEngine.Excel.ExcelFunctionRegistry.Version
+  isSpec: "True"
+  fullName: ProDataGrid.FormulaEngine.Excel.ExcelFunctionRegistry.Version
+  nameWithType: ExcelFunctionRegistry.Version
 - uid: ProDataGrid.FormulaEngine.FormulaArray
   name: FormulaArray
   href: api/ProDataGrid.FormulaEngine.FormulaArray.html
@@ -83476,6 +83489,25 @@ references:
   isSpec: "True"
   fullName: ProDataGrid.FormulaEngine.IFormulaFunctionRegistry.TryGetFunction
   nameWithType: IFormulaFunctionRegistry.TryGetFunction
+- uid: ProDataGrid.FormulaEngine.IFormulaFunctionRegistryVersion
+  name: IFormulaFunctionRegistryVersion
+  href: api/ProDataGrid.FormulaEngine.IFormulaFunctionRegistryVersion.html
+  commentId: T:ProDataGrid.FormulaEngine.IFormulaFunctionRegistryVersion
+  fullName: ProDataGrid.FormulaEngine.IFormulaFunctionRegistryVersion
+  nameWithType: IFormulaFunctionRegistryVersion
+- uid: ProDataGrid.FormulaEngine.IFormulaFunctionRegistryVersion.Version
+  name: Version
+  href: api/ProDataGrid.FormulaEngine.IFormulaFunctionRegistryVersion.html#ProDataGrid_FormulaEngine_IFormulaFunctionRegistryVersion_Version
+  commentId: P:ProDataGrid.FormulaEngine.IFormulaFunctionRegistryVersion.Version
+  fullName: ProDataGrid.FormulaEngine.IFormulaFunctionRegistryVersion.Version
+  nameWithType: IFormulaFunctionRegistryVersion.Version
+- uid: ProDataGrid.FormulaEngine.IFormulaFunctionRegistryVersion.Version*
+  name: Version
+  href: api/ProDataGrid.FormulaEngine.IFormulaFunctionRegistryVersion.html#ProDataGrid_FormulaEngine_IFormulaFunctionRegistryVersion_Version_
+  commentId: Overload:ProDataGrid.FormulaEngine.IFormulaFunctionRegistryVersion.Version
+  isSpec: "True"
+  fullName: ProDataGrid.FormulaEngine.IFormulaFunctionRegistryVersion.Version
+  nameWithType: IFormulaFunctionRegistryVersion.Version
 - uid: ProDataGrid.FormulaEngine.IFormulaNameChangeNotifier
   name: IFormulaNameChangeNotifier
   href: api/ProDataGrid.FormulaEngine.IFormulaNameChangeNotifier.html

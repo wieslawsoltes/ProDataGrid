@@ -2,11 +2,11 @@
 <html>
   <head>
     <meta charset="utf-8">
-      <title>Interface IFormulaStructuredReferenceResolver | ProDataGrid for Avalonia </title>
+      <title>Interface IFormulaFunctionRegistryVersion | ProDataGrid for Avalonia </title>
       <meta name="viewport" content="width=device-width, initial-scale=1.0">
-      <meta name="title" content="Interface IFormulaStructuredReferenceResolver | ProDataGrid for Avalonia ">
+      <meta name="title" content="Interface IFormulaFunctionRegistryVersion | ProDataGrid for Avalonia ">
       
-      
+      <meta name="description" content="Optional revision contract for mutable function registries. Implement this alongside  to invalidate cached eager/lazy compilation plans.">
       <link rel="icon" href="../favicon.ico">
       <link rel="stylesheet" href="../public/docfx.min.css">
       <link rel="stylesheet" href="../public/main.css">
@@ -16,7 +16,7 @@
       
       
       
-      <meta name="docfx:docurl" content="https://github.com/wieslawsoltes/ProDataGrid/new/master/apiSpec/new?filename=ProDataGrid_FormulaEngine_IFormulaStructuredReferenceResolver.md&amp;value=---%0Auid%3A%20ProDataGrid.FormulaEngine.IFormulaStructuredReferenceResolver%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">
+      <meta name="docfx:docurl" content="https://github.com/wieslawsoltes/ProDataGrid/new/master/apiSpec/new?filename=ProDataGrid_FormulaEngine_IFormulaFunctionRegistryVersion.md&amp;value=---%0Auid%3A%20ProDataGrid.FormulaEngine.IFormulaFunctionRegistryVersion%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">
       <meta name="loc:inThisArticle" content="In this article">
       <meta name="loc:searchResultsCount" content="{count} results for &quot;{query}&quot;">
       <meta name="loc:searchNoResults" content="No results for &quot;{query}&quot;">
@@ -80,12 +80,12 @@
           <nav id="breadcrumb"></nav>
         </div>
 
-        <article data-uid="ProDataGrid.FormulaEngine.IFormulaStructuredReferenceResolver">
+        <article data-uid="ProDataGrid.FormulaEngine.IFormulaFunctionRegistryVersion">
 
 
 
-  <h1 id="ProDataGrid_FormulaEngine_IFormulaStructuredReferenceResolver" data-uid="ProDataGrid.FormulaEngine.IFormulaStructuredReferenceResolver" class="text-break">
-Interface IFormulaStructuredReferenceResolver  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/ProDataGrid.FormulaEngine/FormulaEvaluation.cs/#L27"><i class="bi bi-code-slash"></i></a>
+  <h1 id="ProDataGrid_FormulaEngine_IFormulaFunctionRegistryVersion" data-uid="ProDataGrid.FormulaEngine.IFormulaFunctionRegistryVersion" class="text-break">
+Interface IFormulaFunctionRegistryVersion  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/ProDataGrid.FormulaEngine/IFormulaFunctionRegistryVersion.cs/#L12"><i class="bi bi-code-slash"></i></a>
   </h1>
 
   <div class="facts text-secondary">
@@ -93,11 +93,13 @@ Interface IFormulaStructuredReferenceResolver  <a class="header-action link-seco
   <dl><dt>Assembly</dt><dd>ProDataGrid.FormulaEngine.dll</dd></dl>
   </div>
 
-  <div class="markdown summary"></div>
+  <div class="markdown summary"><p>Optional revision contract for mutable function registries. Implement this alongside
+<a class="xref" href="ProDataGrid.FormulaEngine.IFormulaFunctionRegistry.html">IFormulaFunctionRegistry</a> to invalidate cached eager/lazy compilation plans.</p>
+</div>
   <div class="markdown conceptual"></div>
 
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public interface IFormulaStructuredReferenceResolver</code></pre>
+    <pre><code class="lang-csharp hljs">public interface IFormulaFunctionRegistryVersion</code></pre>
   </div>
 
 
@@ -112,42 +114,35 @@ Interface IFormulaStructuredReferenceResolver  <a class="header-action link-seco
 
 
 
-  <h2 class="section" id="methods">Methods
+  <h2 class="section" id="properties">Properties
 </h2>
 
 
-  <a id="ProDataGrid_FormulaEngine_IFormulaStructuredReferenceResolver_TryResolveStructuredReference_" data-uid="ProDataGrid.FormulaEngine.IFormulaStructuredReferenceResolver.TryResolveStructuredReference*"></a>
+  <a id="ProDataGrid_FormulaEngine_IFormulaFunctionRegistryVersion_Version_" data-uid="ProDataGrid.FormulaEngine.IFormulaFunctionRegistryVersion.Version*"></a>
 
-  <h3 id="ProDataGrid_FormulaEngine_IFormulaStructuredReferenceResolver_TryResolveStructuredReference_ProDataGrid_FormulaEngine_FormulaEvaluationContext_ProDataGrid_FormulaEngine_FormulaStructuredReference_ProDataGrid_FormulaEngine_FormulaValue__" data-uid="ProDataGrid.FormulaEngine.IFormulaStructuredReferenceResolver.TryResolveStructuredReference(ProDataGrid.FormulaEngine.FormulaEvaluationContext,ProDataGrid.FormulaEngine.FormulaStructuredReference,ProDataGrid.FormulaEngine.FormulaValue@)">
-  TryResolveStructuredReference(FormulaEvaluationContext, FormulaStructuredReference, out FormulaValue)
-  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/ProDataGrid.FormulaEngine/FormulaEvaluation.cs/#L29"><i class="bi bi-code-slash"></i></a>
+  <h3 id="ProDataGrid_FormulaEngine_IFormulaFunctionRegistryVersion_Version" data-uid="ProDataGrid.FormulaEngine.IFormulaFunctionRegistryVersion.Version">
+  Version
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/ProDataGrid.FormulaEngine/IFormulaFunctionRegistryVersion.cs/#L18"><i class="bi bi-code-slash"></i></a>
   </h3>
 
-  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 summary"><p>Gets a revision that changes whenever a function is registered, replaced or removed.
+Registry mutation must be synchronized by the host with formula evaluation.</p>
+</div>
   <div class="markdown level1 conceptual"></div>
 
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">bool TryResolveStructuredReference(FormulaEvaluationContext context, FormulaStructuredReference reference, out FormulaValue value)</code></pre>
+    <pre><code class="lang-csharp hljs">long Version { get; }</code></pre>
   </div>
 
-  <h4 class="section">Parameters</h4>
+
+
+
+
+  <h4 class="section">Property Value</h4>
   <dl class="parameters">
-    <dt><code>context</code> <a class="xref" href="ProDataGrid.FormulaEngine.FormulaEvaluationContext.html">FormulaEvaluationContext</a></dt>
-    <dd></dd>
-    <dt><code>reference</code> <a class="xref" href="ProDataGrid.FormulaEngine.FormulaStructuredReference.html">FormulaStructuredReference</a></dt>
-    <dd></dd>
-    <dt><code>value</code> <a class="xref" href="ProDataGrid.FormulaEngine.FormulaValue.html">FormulaValue</a></dt>
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int64">long</a></dt>
     <dd></dd>
   </dl>
-
-  <h4 class="section">Returns</h4>
-  <dl class="parameters">
-    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></dt>
-    <dd></dd>
-  </dl>
-
-
-
 
 
 
@@ -160,7 +155,7 @@ Interface IFormulaStructuredReferenceResolver  <a class="header-action link-seco
 </article>
 
         <div class="contribution d-print-none">
-          <a href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/ProDataGrid.FormulaEngine/FormulaEvaluation.cs/#L27" class="edit-link">Edit this page</a>
+          <a href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/ProDataGrid.FormulaEngine/IFormulaFunctionRegistryVersion.cs/#L12" class="edit-link">Edit this page</a>
         </div>
 
 
