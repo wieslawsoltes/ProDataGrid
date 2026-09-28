@@ -475,7 +475,7 @@ namespace ProDataGrid.FormulaEngine.Excel
         }
     }
 
-    internal static class ExcelLookupUtilities
+    internal static partial class ExcelLookupUtilities
     {
         public static FormulaValue ApplyImplicitIntersection(FormulaValue value, FormulaCellAddress address)
         {
@@ -723,90 +723,6 @@ namespace ProDataGrid.FormulaEngine.Excel
             }
 
             return array[row, column];
-        }
-
-        public static bool TryFindXLookupIndex(
-            FormulaCalculationSettings settings,
-            FormulaValue lookupValue,
-            FormulaArray lookupArray,
-            bool isRowVector,
-            int matchMode,
-            int searchMode,
-            out int index,
-            out FormulaError error)
-        {
-            index = 0;
-            error = default;
-
-            var length = isRowVector ? lookupArray.ColumnCount : lookupArray.RowCount;
-            if (length == 0)
-            {
-                return true;
-            }
-
-            var direction = searchMode == -1 || searchMode == -2 ? -1 : 1;
-            var start = direction == 1 ? 0 : length - 1;
-            var end = direction == 1 ? length : -1;
-
-            if (matchMode == 0 || matchMode == 2)
-            {
-                var useWildcard = matchMode == 2;
-                for (var i = start; i != end; i += direction)
-                {
-                    var row = isRowVector ? 0 : i;
-                    var column = isRowVector ? i : 0;
-                    if (lookupArray.HasMask && !lookupArray.IsPresent(row, column))
-                    {
-                        continue;
-                    }
-
-                    var candidate = lookupArray[row, column];
-                    if (!TryExactMatch(settings, lookupValue, candidate, useWildcard, out var match, out error))
-                    {
-                        return false;
-                    }
-
-                    if (match)
-                    {
-                        index = i + 1;
-                        return true;
-                    }
-                }
-
-                return true;
-            }
-
-            var bestIndex = 0;
-            for (var i = start; i != end; i += direction)
-            {
-                var row = isRowVector ? 0 : i;
-                var column = isRowVector ? i : 0;
-                if (lookupArray.HasMask && !lookupArray.IsPresent(row, column))
-                {
-                    continue;
-                }
-
-                var candidate = lookupArray[row, column];
-                if (!TryCompare(settings, candidate, lookupValue, out var comparison, out error))
-                {
-                    return false;
-                }
-
-                if (matchMode == -1)
-                {
-                    if (comparison <= 0)
-                    {
-                        bestIndex = i + 1;
-                    }
-                }
-                else if (comparison >= 0)
-                {
-                    bestIndex = i + 1;
-                }
-            }
-
-            index = bestIndex;
-            return true;
         }
 
         public static FormulaValue GetReturnValue(FormulaArray returnArray, bool lookupIsRowVector, int index)
