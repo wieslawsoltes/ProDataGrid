@@ -17,12 +17,17 @@ jobs:
       - uses: actions/setup-dotnet@v4
         with:
           global-json-file: global.json
-      - name: Integrate master, strengthen lazy registry regression and remove scaffolding
+      - name: Integrate master and retain the extended benchmark scenarios
         run: |
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
           git fetch origin master
-          git merge --no-edit origin/master
+          if ! git merge --no-edit origin/master; then
+            python3 tools/resolve-formula-benchmark-merge.py
+            git commit --no-edit
+          fi
+      - name: Strengthen lazy registry regression and remove scaffolding
+        run: |
           python3 - <<'PY'
           from pathlib import Path
           file = Path('src/ProDataGrid.FormulaEngine.UnitTests/FormulaConcurrentCompilationTests.cs')
@@ -42,10 +47,10 @@ jobs:
                           FormulaEvaluator evaluator, IFormulaValueResolver resolver) => FormulaValue.FromNumber(31);
                   }
 
-          '''.replace('                  ', '        ').replace('                      ', '            ').replace('                          ', '                ') + marker)
+          ''' + marker)
           file.write_text(text, encoding='utf-8')
           PY
-          git rm tools/apply-formula-numeric.py .github/workflows/formula-numeric-implementation.yml
+          git rm tools/apply-formula-numeric.py tools/resolve-formula-benchmark-merge.py .github/workflows/formula-numeric-implementation.yml
           git add src/ProDataGrid.FormulaEngine.UnitTests/FormulaConcurrentCompilationTests.cs
           git commit -m 'Finalize numeric and concurrent compilation regressions without implementation scaffolding'
       - name: Validate integrated production source
