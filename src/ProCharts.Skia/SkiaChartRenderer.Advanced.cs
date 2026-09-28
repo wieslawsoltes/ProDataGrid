@@ -43,25 +43,26 @@ namespace ProCharts.Skia
                 using SKPaint paint = new() { IsAntialias = true, Color = style.Background };
                 canvas.DrawRect(bounds, paint);
                 if (context.Plot.Width <= 0 || context.Plot.Height <= 0) return true;
-                using SKPaint text = CreateTextPaint(style.Text, Math.Max(1, style.LabelSize));
+                using SKPaint text = new() { IsAntialias = true, Color = style.Text };
+                using SKFont font = new(SKTypeface.Default, Math.Max(1, style.LabelSize)) { Subpixel = true };
                 using SKPath path = new();
                 switch (context.Kind)
                 {
                     case ChartSeriesKind.Heatmap:
-                        DrawAdvancedHeatmap(canvas, context, style, paint, text);
+                        DrawAdvancedHeatmap(canvas, context, style, paint, text, font);
                         break;
                     case ChartSeriesKind.Treemap:
-                        DrawAdvancedTreemap(canvas, context, style, paint, text);
+                        DrawAdvancedTreemap(canvas, context, style, paint, text, font);
                         break;
                     case ChartSeriesKind.Sunburst:
-                        DrawAdvancedSunburst(canvas, context, style, paint, text, path);
+                        DrawAdvancedSunburst(canvas, context, style, paint, text, font, path);
                         break;
                     case ChartSeriesKind.Gauge:
-                        DrawAdvancedGauges(canvas, context, style, paint, text, path);
+                        DrawAdvancedGauges(canvas, context, style, paint, text, font, path);
                         break;
                 }
                 if (context.LegendRect is SKRect legend)
-                    DrawLegend(canvas, legend, snapshot, style, context.Kind);
+                    DrawLegend(canvas, legend, snapshot, style);
             }
             finally { canvas.Restore(); }
             return true;
@@ -158,7 +159,7 @@ namespace ProCharts.Skia
         }
 
         private static void DrawAdvancedHeatmap(SKCanvas canvas, AdvancedChartContext context,
-            SkiaChartStyle style, SKPaint paint, SKPaint text)
+            SkiaChartStyle style, SKPaint paint, SKPaint text, SKFont font)
         {
             if (context.Rows == 0 || context.Columns == 0) return;
             float cellWidth = context.Plot.Width / context.Columns;
@@ -173,18 +174,18 @@ namespace ProCharts.Skia
                     SKRect rect = AdvancedHeatmapCell(context, row, column);
                     paint.Color = AdvancedHeatColor(value, context);
                     canvas.DrawRect(rect, paint);
-                    if (style.ShowDataLabels && rect.Width >= 28 && rect.Height >= text.TextSize + 4)
-                        DrawAdvancedLabel(canvas, rect, FormatDataLabel(series, row, value, style), text, true);
+                    if (style.ShowDataLabels && rect.Width >= 28 && rect.Height >= font.Size + 4)
+                        DrawAdvancedLabel(canvas, rect, FormatDataLabel(series, row, value, style), text, font, true);
                 }
             }
             paint.IsAntialias = true;
-            int rowStride = Math.Max(1, (int)Math.Ceiling((text.TextSize + 6) / cellHeight));
+            int rowStride = Math.Max(1, (int)Math.Ceiling((font.Size + 6) / cellHeight));
             if (style.ShowAxisLabels)
                 for (int row = 0; row < context.Rows; row += rowStride)
                     DrawAdvancedLabel(canvas, new SKRect(context.OuterPlot.Left,
                         context.Plot.Top + row * cellHeight, context.Plot.Left - 4,
                         context.Plot.Top + (row + 1) * cellHeight),
-                        context.Snapshot.Series[row].Name ?? (row + 1).ToString(CultureInfo.InvariantCulture), text, false);
+                        context.Snapshot.Series[row].Name ?? (row + 1).ToString(CultureInfo.InvariantCulture), text, font, false);
             int columnStride = Math.Max(1, (int)Math.Ceiling(64 / cellWidth));
             if (style.ShowCategoryLabels)
                 for (int column = 0; column < context.Columns; column += columnStride)
@@ -193,11 +194,11 @@ namespace ProCharts.Skia
                     string label = column < context.Snapshot.Categories.Count
                         ? context.Snapshot.Categories[column] ?? string.Empty : (column + 1).ToString(CultureInfo.InvariantCulture);
                     DrawAdvancedLabel(canvas, new SKRect(x, context.Plot.Bottom + 2,
-                        Math.Min(context.Plot.Right, x + cellWidth * columnStride), context.Plot.Bottom + text.TextSize + 8), label, text, true);
+                        Math.Min(context.Plot.Right, x + cellWidth * columnStride), context.Plot.Bottom + font.Size + 8), label, text, font, true);
                 }
             if (context.Options.ShowHeatmapColorScale)
             {
-                float top = context.Plot.Bottom + (style.ShowCategoryLabels ? text.TextSize + 10 : 4);
+                float top = context.Plot.Bottom + (style.ShowCategoryLabels ? font.Size + 10 : 4);
                 float height = 8;
                 const int steps = 128;
                 paint.IsAntialias = false;
@@ -210,9 +211,9 @@ namespace ProCharts.Skia
                         context.Plot.Left + context.Plot.Width * (i + 1) / steps, top + height), paint);
                 }
                 DrawAdvancedLabel(canvas, new SKRect(context.Plot.Left, top + height,
-                    context.Plot.MidX, top + height + text.TextSize + 6), context.Minimum.ToString("G5", CultureInfo.InvariantCulture), text, false);
+                    context.Plot.MidX, top + height + font.Size + 6), context.Minimum.ToString("G5", CultureInfo.InvariantCulture), text, font, false);
                 DrawAdvancedLabel(canvas, new SKRect(context.Plot.MidX, top + height,
-                    context.Plot.Right, top + height + text.TextSize + 6), context.Maximum.ToString("G5", CultureInfo.InvariantCulture), text, false);
+                    context.Plot.Right, top + height + font.Size + 6), context.Maximum.ToString("G5", CultureInfo.InvariantCulture), text, font, false);
                 paint.IsAntialias = true;
             }
         }
@@ -253,7 +254,7 @@ namespace ProCharts.Skia
             (byte)Math.Round(a.Blue + (b.Blue - a.Blue) * t), (byte)Math.Round(a.Alpha + (b.Alpha - a.Alpha) * t));
 
         private static void DrawAdvancedTreemap(SKCanvas canvas, AdvancedChartContext context,
-            SkiaChartStyle style, SKPaint paint, SKPaint text)
+            SkiaChartStyle style, SKPaint paint, SKPaint text, SKFont font)
         {
             ChartHierarchySnapshot hierarchy = context.Hierarchy!;
             foreach (ChartTreemapCell cell in context.Treemap)
@@ -265,11 +266,11 @@ namespace ProCharts.Skia
                 if (!node.IsLeaf)
                     rect.Bottom = Math.Min(rect.Bottom, rect.Top + context.Options.TreemapHeaderHeight);
                 if (style.ShowCategoryLabels)
-                    DrawAdvancedLabel(canvas, rect, node.Label ?? node.Id, text, false);
-                if (node.IsLeaf && style.ShowDataLabels && rect.Height > text.TextSize * 3)
+                    DrawAdvancedLabel(canvas, rect, node.Label ?? node.Id, text, font, false);
+                if (node.IsLeaf && style.ShowDataLabels && rect.Height > font.Size * 3)
                 {
-                    rect.Top += text.TextSize + 8;
-                    DrawAdvancedLabel(canvas, rect, node.TotalValue.ToString("G5", CultureInfo.InvariantCulture), text, false);
+                    rect.Top += font.Size + 8;
+                    DrawAdvancedLabel(canvas, rect, node.TotalValue.ToString("G5", CultureInfo.InvariantCulture), text, font, false);
                 }
             }
         }
@@ -280,13 +281,13 @@ namespace ProCharts.Skia
 
         private static SKColor AdvancedHierarchyColor(ChartHierarchySnapshot hierarchy, int node, SkiaChartStyle style)
         {
-            SKColor basis = GetSeriesColor(hierarchy.BranchIndices[node], style);
+            SKColor basis = GetSeriesColor(style, hierarchy.BranchIndices[node]);
             double lightness = Math.Min(0.42, Math.Max(0, hierarchy.Depths[node] - 1) * 0.10);
             return AdvancedLerpColor(basis, SKColors.White.WithAlpha(basis.Alpha), lightness);
         }
 
         private static void DrawAdvancedSunburst(SKCanvas canvas, AdvancedChartContext context,
-            SkiaChartStyle style, SKPaint paint, SKPaint text, SKPath path)
+            SkiaChartStyle style, SKPaint paint, SKPaint text, SKFont font, SKPath path)
         {
             ChartHierarchySnapshot hierarchy = context.Hierarchy!;
             SKPoint center = new(context.Plot.MidX, context.Plot.MidY);
@@ -300,7 +301,7 @@ namespace ProCharts.Skia
                 double labelRadius = (sector.InnerRadius + sector.OuterRadius) * radius / 2;
                 double length = sector.SweepAngle * Math.PI / 180 * labelRadius;
                 double thickness = (sector.OuterRadius - sector.InnerRadius) * radius;
-                if (style.ShowCategoryLabels && length > 28 && thickness > text.TextSize + 6)
+                if (style.ShowCategoryLabels && length > 28 && thickness > font.Size + 6)
                 {
                     double radians = (sector.StartAngle + sector.SweepAngle / 2) * Math.PI / 180;
                     float x = center.X + (float)(Math.Cos(radians) * labelRadius);
@@ -310,8 +311,8 @@ namespace ProCharts.Skia
                     try
                     {
                         canvas.ClipPath(path, SKClipOperation.Intersect, true);
-                        DrawAdvancedLabel(canvas, new SKRect(x - width / 2, y - text.TextSize,
-                            x + width / 2, y + text.TextSize), hierarchy.Categories[sector.NodeIndex], text, true);
+                        DrawAdvancedLabel(canvas, new SKRect(x - width / 2, y - font.Size,
+                            x + width / 2, y + font.Size), hierarchy.Categories[sector.NodeIndex], text, font, true);
                     }
                     finally { canvas.Restore(); }
                 }
@@ -319,7 +320,7 @@ namespace ProCharts.Skia
         }
 
         private static void DrawAdvancedGauges(SKCanvas canvas, AdvancedChartContext context,
-            SkiaChartStyle style, SKPaint paint, SKPaint text, SKPath path)
+            SkiaChartStyle style, SKPaint paint, SKPaint text, SKFont font, SKPath path)
         {
             for (int i = 0; i < context.Gauges.Count; i++)
             {
@@ -338,19 +339,19 @@ namespace ProCharts.Skia
                 if (sweep > 0)
                 {
                     CreateAdvancedSector(path, center, inner, radius, context.Options.GaugeStartAngle, sweep);
-                    paint.Color = GetSeriesColor(item.Series, style);
+                    paint.Color = GetSeriesColor(style, item.Series);
                     canvas.DrawPath(path, paint);
                 }
                 float labelWidth = inner * 1.55f;
                 if (style.ShowDataLabels)
-                    DrawAdvancedLabel(canvas, new SKRect(center.X - labelWidth / 2, center.Y - text.TextSize - 3,
-                        center.X + labelWidth / 2, center.Y + text.TextSize + 3),
-                        FormatDataLabel(series, item.Series, value, style), text, true);
+                    DrawAdvancedLabel(canvas, new SKRect(center.X - labelWidth / 2, center.Y - font.Size - 3,
+                        center.X + labelWidth / 2, center.Y + font.Size + 3),
+                        FormatDataLabel(series, item.Series, value, style), text, font, true);
                 if (style.ShowCategoryLabels)
                 {
                     string? category = item.Point < context.Snapshot.Categories.Count ? context.Snapshot.Categories[item.Point] : null;
-                    DrawAdvancedLabel(canvas, new SKRect(center.X - labelWidth / 2, center.Y + text.TextSize + 5,
-                        center.X + labelWidth / 2, center.Y + text.TextSize * 3 + 5), category ?? series.Name, text, true);
+                    DrawAdvancedLabel(canvas, new SKRect(center.X - labelWidth / 2, center.Y + font.Size + 5,
+                        center.X + labelWidth / 2, center.Y + font.Size * 3 + 5), category ?? series.Name, text, font, true);
                 }
             }
         }
@@ -382,16 +383,16 @@ namespace ProCharts.Skia
             path.Close();
         }
 
-        private static void DrawAdvancedLabel(SKCanvas canvas, SKRect bounds, string? label, SKPaint text, bool centered)
+        private static void DrawAdvancedLabel(SKCanvas canvas, SKRect bounds, string? label, SKPaint text, SKFont font, bool centered)
         {
-            if (string.IsNullOrEmpty(label) || bounds.Width < 8 || bounds.Height < text.TextSize + 2) return;
+            if (string.IsNullOrEmpty(label) || bounds.Width < 8 || bounds.Height < font.Size + 2) return;
             // Reject labels that do not fit; clipping alone would display misleading partial numbers.
-            float width = text.MeasureText(label);
+            float width = font.MeasureText(label, text);
             if (width > bounds.Width - 6) return;
             float x = centered ? bounds.MidX - width / 2 : bounds.Left + 3;
-            float y = bounds.MidY - (text.FontMetrics.Ascent + text.FontMetrics.Descent) / 2;
+            float y = bounds.MidY - (font.Metrics.Ascent + font.Metrics.Descent) / 2;
             canvas.Save();
-            try { canvas.ClipRect(bounds); canvas.DrawText(label, x, y, text); }
+            try { canvas.ClipRect(bounds); canvas.DrawText(label, x, y, SKTextAlign.Left, font, text); }
             finally { canvas.Restore(); }
         }
 

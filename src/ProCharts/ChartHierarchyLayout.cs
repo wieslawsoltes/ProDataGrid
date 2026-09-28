@@ -9,7 +9,7 @@ using System.Collections.Generic;
 namespace ProCharts
 {
     /// <summary>A renderer-independent finite rectangle.</summary>
-    public readonly struct ChartLayoutRect
+    public readonly record struct ChartLayoutRect
     {
         /// <summary>Creates an ordered finite rectangle.</summary>
         public ChartLayoutRect(double left, double top, double right, double bottom)
@@ -37,7 +37,7 @@ namespace ProCharts
     }
 
     /// <summary>A treemap rectangle whose node index is shared with ChartHierarchySnapshot.</summary>
-    public readonly struct ChartTreemapCell
+    public readonly record struct ChartTreemapCell
     {
         /// <summary>Creates a cell.</summary>
         public ChartTreemapCell(int nodeIndex, ChartLayoutRect bounds) { NodeIndex = nodeIndex; Bounds = bounds; }
@@ -48,7 +48,7 @@ namespace ProCharts
     }
 
     /// <summary>A sunburst sector in clockwise degrees, with radii normalized to the outer chart radius.</summary>
-    public readonly struct ChartSunburstSector
+    public readonly record struct ChartSunburstSector
     {
         /// <summary>Creates a sector.</summary>
         public ChartSunburstSector(int nodeIndex, double startAngle, double sweepAngle, double innerRadius, double outerRadius)
