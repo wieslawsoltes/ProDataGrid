@@ -1,0 +1,36 @@
+name: Formula array implementation validation
+on:
+  push:
+    branches: [work/formula-modern-arrays]
+permissions:
+  contents: write
+jobs:
+  validate:
+    if: github.repository == 'wieslawsoltes/ProDataGrid'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: work/formula-modern-arrays
+      - uses: actions/setup-dotnet@v4
+        with:
+          global-json-file: global.json
+      - name: Apply guarded source edits
+        run: python3 tools/apply-formula-arrays.py
+      - name: Check patch and execute formula regressions
+        run: |
+          git diff --check
+          dotnet test src/ProDataGrid.FormulaEngine.UnitTests/ProDataGrid.FormulaEngine.UnitTests.csproj -c Release --logger trx --results-directory artifacts/formula
+      - name: Commit validated source edits
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add src/ProDataGrid.FormulaEngine/FormulaWorkbook.cs src/ProDataGrid.FormulaEngine.Excel/ExcelDynamicArrayFunctions.cs
+          git commit -m 'Enforce configured allocation bounds for generated formula arrays'
+          git push origin HEAD:work/formula-modern-arrays
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: formula-array-validation
+          path: artifacts/formula/*.trx
