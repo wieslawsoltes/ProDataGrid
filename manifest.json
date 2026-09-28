@@ -11102,7 +11102,7 @@
       "Uid": null,
       "IsMRef": true,
       "Title": "ProDataGrid.FormulaEngine.FormulaValue",
-      "Summary": null
+      "Summary": "<p sourcefile=\"api/ProDataGrid.FormulaEngine.FormulaValue.yml\" sourcestartlinenumber=\"1\">An immutable tagged value used by formula evaluation and array storage.</p>\n"
     },
     {
       "type": "ManagedReference",

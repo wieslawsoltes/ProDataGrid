@@ -6,7 +6,7 @@
       <meta name="viewport" content="width=device-width, initial-scale=1.0">
       <meta name="title" content="Struct FormulaValue | ProDataGrid for Avalonia ">
       
-      
+      <meta name="description" content="An immutable tagged value used by formula evaluation and array storage.">
       <link rel="icon" href="../favicon.ico">
       <link rel="stylesheet" href="../public/docfx.min.css">
       <link rel="stylesheet" href="../public/main.css">
@@ -85,7 +85,7 @@
 
 
   <h1 id="ProDataGrid_FormulaEngine_FormulaValue" data-uid="ProDataGrid.FormulaEngine.FormulaValue" class="text-break">
-Struct FormulaValue  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/ProDataGrid.FormulaEngine/FormulaValue.cs/#L93"><i class="bi bi-code-slash"></i></a>
+Struct FormulaValue  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/ProDataGrid.FormulaEngine/FormulaValue.cs/#L102"><i class="bi bi-code-slash"></i></a>
   </h1>
 
   <div class="facts text-secondary">
@@ -93,7 +93,8 @@ Struct FormulaValue  <a class="header-action link-secondary" title="View source"
   <dl><dt>Assembly</dt><dd>ProDataGrid.FormulaEngine.dll</dd></dl>
   </div>
 
-  <div class="markdown summary"></div>
+  <div class="markdown summary"><p>An immutable tagged value used by formula evaluation and array storage.</p>
+</div>
   <div class="markdown conceptual"></div>
 
   <div class="codewrapper">
@@ -129,6 +130,12 @@ Struct FormulaValue  <a class="header-action link-secondary" title="View source"
 
 
 
+  <h2 id="ProDataGrid_FormulaEngine_FormulaValue_remarks">Remarks</h2>
+  <div class="markdown level0 remarks"><p>Numeric, Boolean and error metadata share the numeric slot. Text, array and
+reference payloads share one managed-reference slot. Reference descriptors are
+boxed on construction; other factories do not allocate a payload wrapper.
+The private physical layout is not a serialization or interop contract.</p>
+</div>
 
 
   <h2 class="section" id="properties">Properties
@@ -139,7 +146,7 @@ Struct FormulaValue  <a class="header-action link-secondary" title="View source"
 
   <h3 id="ProDataGrid_FormulaEngine_FormulaValue_Blank" data-uid="ProDataGrid.FormulaEngine.FormulaValue.Blank">
   Blank
-  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/ProDataGrid.FormulaEngine/FormulaValue.cs/#L122"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/ProDataGrid.FormulaEngine/FormulaValue.cs/#L116"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"></div>
@@ -170,7 +177,7 @@ Struct FormulaValue  <a class="header-action link-secondary" title="View source"
 
   <h3 id="ProDataGrid_FormulaEngine_FormulaValue_Kind" data-uid="ProDataGrid.FormulaEngine.FormulaValue.Kind">
   Kind
-  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/ProDataGrid.FormulaEngine/FormulaValue.cs/#L120"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/ProDataGrid.FormulaEngine/FormulaValue.cs/#L114"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"></div>
@@ -205,7 +212,7 @@ Struct FormulaValue  <a class="header-action link-secondary" title="View source"
 
   <h3 id="ProDataGrid_FormulaEngine_FormulaValue_AsArray" data-uid="ProDataGrid.FormulaEngine.FormulaValue.AsArray">
   AsArray()
-  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/ProDataGrid.FormulaEngine/FormulaValue.cs/#L188"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/ProDataGrid.FormulaEngine/FormulaValue.cs/#L182"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"></div>
@@ -236,7 +243,7 @@ Struct FormulaValue  <a class="header-action link-secondary" title="View source"
 
   <h3 id="ProDataGrid_FormulaEngine_FormulaValue_AsBoolean" data-uid="ProDataGrid.FormulaEngine.FormulaValue.AsBoolean">
   AsBoolean()
-  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/ProDataGrid.FormulaEngine/FormulaValue.cs/#L161"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/ProDataGrid.FormulaEngine/FormulaValue.cs/#L155"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"></div>
@@ -267,7 +274,7 @@ Struct FormulaValue  <a class="header-action link-secondary" title="View source"
 
   <h3 id="ProDataGrid_FormulaEngine_FormulaValue_AsError" data-uid="ProDataGrid.FormulaEngine.FormulaValue.AsError">
   AsError()
-  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/ProDataGrid.FormulaEngine/FormulaValue.cs/#L179"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/ProDataGrid.FormulaEngine/FormulaValue.cs/#L173"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"></div>
@@ -298,7 +305,7 @@ Struct FormulaValue  <a class="header-action link-secondary" title="View source"
 
   <h3 id="ProDataGrid_FormulaEngine_FormulaValue_AsNumber" data-uid="ProDataGrid.FormulaEngine.FormulaValue.AsNumber">
   AsNumber()
-  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/ProDataGrid.FormulaEngine/FormulaValue.cs/#L152"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/ProDataGrid.FormulaEngine/FormulaValue.cs/#L146"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"></div>
@@ -329,7 +336,7 @@ Struct FormulaValue  <a class="header-action link-secondary" title="View source"
 
   <h3 id="ProDataGrid_FormulaEngine_FormulaValue_AsReference" data-uid="ProDataGrid.FormulaEngine.FormulaValue.AsReference">
   AsReference()
-  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/ProDataGrid.FormulaEngine/FormulaValue.cs/#L197"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/ProDataGrid.FormulaEngine/FormulaValue.cs/#L191"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"></div>
@@ -360,7 +367,7 @@ Struct FormulaValue  <a class="header-action link-secondary" title="View source"
 
   <h3 id="ProDataGrid_FormulaEngine_FormulaValue_AsText" data-uid="ProDataGrid.FormulaEngine.FormulaValue.AsText">
   AsText()
-  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/ProDataGrid.FormulaEngine/FormulaValue.cs/#L170"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/ProDataGrid.FormulaEngine/FormulaValue.cs/#L164"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"></div>
@@ -391,7 +398,7 @@ Struct FormulaValue  <a class="header-action link-secondary" title="View source"
 
   <h3 id="ProDataGrid_FormulaEngine_FormulaValue_Equals_ProDataGrid_FormulaEngine_FormulaValue_" data-uid="ProDataGrid.FormulaEngine.FormulaValue.Equals(ProDataGrid.FormulaEngine.FormulaValue)">
   Equals(FormulaValue)
-  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/ProDataGrid.FormulaEngine/FormulaValue.cs/#L206"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/ProDataGrid.FormulaEngine/FormulaValue.cs/#L200"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>Indicates whether the current object is equal to another object of the same type.</p>
@@ -430,7 +437,7 @@ Struct FormulaValue  <a class="header-action link-secondary" title="View source"
 
   <h3 id="ProDataGrid_FormulaEngine_FormulaValue_Equals_System_Object_" data-uid="ProDataGrid.FormulaEngine.FormulaValue.Equals(System.Object)">
   Equals(object?)
-  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/ProDataGrid.FormulaEngine/FormulaValue.cs/#L226"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/ProDataGrid.FormulaEngine/FormulaValue.cs/#L219"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>Indicates whether this instance and a specified object are equal.</p>
@@ -469,7 +476,7 @@ Struct FormulaValue  <a class="header-action link-secondary" title="View source"
 
   <h3 id="ProDataGrid_FormulaEngine_FormulaValue_FromArray_ProDataGrid_FormulaEngine_FormulaArray_" data-uid="ProDataGrid.FormulaEngine.FormulaValue.FromArray(ProDataGrid.FormulaEngine.FormulaArray)">
   FromArray(FormulaArray)
-  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/ProDataGrid.FormulaEngine/FormulaValue.cs/#L140"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/ProDataGrid.FormulaEngine/FormulaValue.cs/#L134"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"></div>
@@ -505,7 +512,7 @@ Struct FormulaValue  <a class="header-action link-secondary" title="View source"
 
   <h3 id="ProDataGrid_FormulaEngine_FormulaValue_FromBoolean_System_Boolean_" data-uid="ProDataGrid.FormulaEngine.FormulaValue.FromBoolean(System.Boolean)">
   FromBoolean(bool)
-  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/ProDataGrid.FormulaEngine/FormulaValue.cs/#L136"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/ProDataGrid.FormulaEngine/FormulaValue.cs/#L129"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"></div>
@@ -541,7 +548,7 @@ Struct FormulaValue  <a class="header-action link-secondary" title="View source"
 
   <h3 id="ProDataGrid_FormulaEngine_FormulaValue_FromError_ProDataGrid_FormulaEngine_FormulaError_" data-uid="ProDataGrid.FormulaEngine.FormulaValue.FromError(ProDataGrid.FormulaEngine.FormulaError)">
   FromError(FormulaError)
-  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/ProDataGrid.FormulaEngine/FormulaValue.cs/#L138"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/ProDataGrid.FormulaEngine/FormulaValue.cs/#L131"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"></div>
@@ -577,7 +584,7 @@ Struct FormulaValue  <a class="header-action link-secondary" title="View source"
 
   <h3 id="ProDataGrid_FormulaEngine_FormulaValue_FromNumber_System_Double_" data-uid="ProDataGrid.FormulaEngine.FormulaValue.FromNumber(System.Double)">
   FromNumber(double)
-  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/ProDataGrid.FormulaEngine/FormulaValue.cs/#L124"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/ProDataGrid.FormulaEngine/FormulaValue.cs/#L118"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"></div>
@@ -613,7 +620,7 @@ Struct FormulaValue  <a class="header-action link-secondary" title="View source"
 
   <h3 id="ProDataGrid_FormulaEngine_FormulaValue_FromReference_ProDataGrid_FormulaEngine_FormulaReference_" data-uid="ProDataGrid.FormulaEngine.FormulaValue.FromReference(ProDataGrid.FormulaEngine.FormulaReference)">
   FromReference(FormulaReference)
-  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/ProDataGrid.FormulaEngine/FormulaValue.cs/#L150"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/ProDataGrid.FormulaEngine/FormulaValue.cs/#L143"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"></div>
@@ -649,7 +656,7 @@ Struct FormulaValue  <a class="header-action link-secondary" title="View source"
 
   <h3 id="ProDataGrid_FormulaEngine_FormulaValue_FromText_System_String_" data-uid="ProDataGrid.FormulaEngine.FormulaValue.FromText(System.String)">
   FromText(string)
-  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/ProDataGrid.FormulaEngine/FormulaValue.cs/#L126"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/ProDataGrid.FormulaEngine/FormulaValue.cs/#L120"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"></div>
@@ -685,7 +692,7 @@ Struct FormulaValue  <a class="header-action link-secondary" title="View source"
 
   <h3 id="ProDataGrid_FormulaEngine_FormulaValue_GetHashCode" data-uid="ProDataGrid.FormulaEngine.FormulaValue.GetHashCode">
   GetHashCode()
-  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/ProDataGrid.FormulaEngine/FormulaValue.cs/#L231"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/ProDataGrid.FormulaEngine/FormulaValue.cs/#L221"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>Returns the hash code for this instance.</p>
@@ -718,7 +725,7 @@ Struct FormulaValue  <a class="header-action link-secondary" title="View source"
 
   <h3 id="ProDataGrid_FormulaEngine_FormulaValue_ToString" data-uid="ProDataGrid.FormulaEngine.FormulaValue.ToString">
   ToString()
-  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/ProDataGrid.FormulaEngine/FormulaValue.cs/#L263"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/ProDataGrid.FormulaEngine/FormulaValue.cs/#L252"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>Returns the fully qualified type name of this instance.</p>
@@ -755,7 +762,7 @@ Struct FormulaValue  <a class="header-action link-secondary" title="View source"
 
   <h3 id="ProDataGrid_FormulaEngine_FormulaValue_op_Equality_ProDataGrid_FormulaEngine_FormulaValue_ProDataGrid_FormulaEngine_FormulaValue_" data-uid="ProDataGrid.FormulaEngine.FormulaValue.op_Equality(ProDataGrid.FormulaEngine.FormulaValue,ProDataGrid.FormulaEngine.FormulaValue)">
   operator ==(FormulaValue, FormulaValue)
-  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/ProDataGrid.FormulaEngine/FormulaValue.cs/#L282"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/ProDataGrid.FormulaEngine/FormulaValue.cs/#L267"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"></div>
@@ -793,7 +800,7 @@ Struct FormulaValue  <a class="header-action link-secondary" title="View source"
 
   <h3 id="ProDataGrid_FormulaEngine_FormulaValue_op_Inequality_ProDataGrid_FormulaEngine_FormulaValue_ProDataGrid_FormulaEngine_FormulaValue_" data-uid="ProDataGrid.FormulaEngine.FormulaValue.op_Inequality(ProDataGrid.FormulaEngine.FormulaValue,ProDataGrid.FormulaEngine.FormulaValue)">
   operator !=(FormulaValue, FormulaValue)
-  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/ProDataGrid.FormulaEngine/FormulaValue.cs/#L287"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/ProDataGrid.FormulaEngine/FormulaValue.cs/#L269"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"></div>
@@ -831,7 +838,7 @@ Struct FormulaValue  <a class="header-action link-secondary" title="View source"
 </article>
 
         <div class="contribution d-print-none">
-          <a href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/ProDataGrid.FormulaEngine/FormulaValue.cs/#L93" class="edit-link">Edit this page</a>
+          <a href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/ProDataGrid.FormulaEngine/FormulaValue.cs/#L102" class="edit-link">Edit this page</a>
         </div>
 
 
