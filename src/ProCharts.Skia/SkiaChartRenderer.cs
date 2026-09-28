@@ -129,7 +129,7 @@ namespace ProCharts.Skia
         }
     }
 
-    public sealed class SkiaChartStyle
+    public sealed partial class SkiaChartStyle
     {
         public static readonly IReadOnlyList<SKColor> DefaultSeriesColors = new[]
         {
@@ -146,6 +146,7 @@ namespace ProCharts.Skia
 
         public SkiaChartStyle(SkiaChartStyle source)
         {
+            Advanced = source.Advanced;
             Background = source.Background;
             Axis = source.Axis;
             Text = source.Text;
@@ -696,6 +697,11 @@ namespace ProCharts.Skia
             style ??= new SkiaChartStyle();
             style = ResolveStyle(style);
 
+            if (IsAdvancedChart(snapshot))
+            {
+                return TryGetAdvancedViewport(bounds, snapshot, style, out info);
+            }
+
             if (!TryBuildRenderContext(bounds, snapshot, style, out var context))
             {
                 info = default;
@@ -721,6 +727,12 @@ namespace ProCharts.Skia
         {
             style ??= new SkiaChartStyle();
             style = ResolveStyle(style);
+
+            if (TryRenderAdvanced(canvas, bounds, snapshot, style, delta))
+            {
+                cache?.Invalidate();
+                return;
+            }
 
             if (cache != null)
             {
@@ -2607,6 +2619,10 @@ namespace ProCharts.Skia
         {
             style ??= new SkiaChartStyle();
             style = ResolveStyle(style);
+            if (IsAdvancedChart(snapshot))
+            {
+                return HitTestAdvanced(point, bounds, snapshot, style);
+            }
             if (snapshot.Series.Count == 0)
             {
                 return null;
