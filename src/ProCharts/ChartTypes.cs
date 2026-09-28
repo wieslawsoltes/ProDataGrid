@@ -36,7 +36,15 @@ namespace ProCharts
         StackedArea,
         StackedColumn100,
         StackedBar100,
-        StackedArea100
+        StackedArea100,
+        /// <summary>A categorical matrix colored by cell value.</summary>
+        Heatmap,
+        /// <summary>A weighted rectangular hierarchy.</summary>
+        Treemap,
+        /// <summary>A weighted radial hierarchy.</summary>
+        Sunburst,
+        /// <summary>A radial value indicator over a configured interval.</summary>
+        Gauge
     }
 
     public enum ChartAxisKind
