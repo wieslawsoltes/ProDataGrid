@@ -47,6 +47,14 @@ internal static class Program
             output.AppendLine("scenario,sample,iterations,microseconds_per_operation,bytes_per_operation");
             Measure(output, "cached_literal", 500000, () => evaluator.Evaluate(literal, context, resolver).AsNumber(), 42);
             Measure(output, "cached_128_additions", 5000, () => evaluator.Evaluate(arithmetic, context, resolver).AsNumber(), 129);
+            workbook.Settings.ApplyNumberPrecision = true;
+            Measure(output, "cached_128_additions_precision", 1000, () => evaluator.Evaluate(arithmetic, context, resolver).AsNumber(), 129);
+            workbook.Settings.ApplyNumberPrecision = false;
+            var numbers = new FormulaArray(10000, 1);
+            for (var i = 0; i < numbers.RowCount; i++) numbers[i, 0] = FormulaValue.FromNumber(i);
+            var arrayAddition = new FormulaBinaryExpression(FormulaBinaryOperator.Add,
+                new FormulaLiteralExpression(FormulaValue.FromArray(numbers)), new FormulaLiteralExpression(FormulaValue.FromNumber(3)));
+            Measure(output, "array_10000_additions", 5, () => evaluator.Evaluate(arrayAddition, context, resolver).AsArray()[9999, 0].AsNumber(), 10002);
             Measure(output, "xmatch_binary_100000", 32, () => xmatch.Invoke(functionContext, lookupArgs).AsNumber(), 100000);
             Measure(output, "unique_distinct_5000", 1, () => unique.Invoke(functionContext, uniqueArgs).AsArray().RowCount, 5000);
             Console.Write(output.ToString());

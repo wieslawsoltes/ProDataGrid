@@ -297,7 +297,7 @@ namespace ProDataGrid.FormulaEngine
         }
     }
 
-    public sealed class FormulaEvaluator
+    public sealed partial class FormulaEvaluator
     {
         private readonly ConditionalWeakTable<FormulaExpression, FormulaCompiledExpression> _compiledCache = new();
 
@@ -805,22 +805,7 @@ namespace ProDataGrid.FormulaEngine
                 return EvaluateBinaryArray(expression.Operator, left, right, context);
             }
 
-            return expression.Operator switch
-            {
-                FormulaBinaryOperator.Add => EvaluateNumericBinary(left, right, context, (a, b) => a + b),
-                FormulaBinaryOperator.Subtract => EvaluateNumericBinary(left, right, context, (a, b) => a - b),
-                FormulaBinaryOperator.Multiply => EvaluateNumericBinary(left, right, context, (a, b) => a * b),
-                FormulaBinaryOperator.Divide => EvaluateDivide(left, right, context),
-                FormulaBinaryOperator.Power => EvaluateNumericBinary(left, right, context, Math.Pow),
-                FormulaBinaryOperator.Concat => EvaluateConcat(left, right, context.Address),
-                FormulaBinaryOperator.Equal => EvaluateComparison(left, right, context, (c) => c == 0),
-                FormulaBinaryOperator.NotEqual => EvaluateComparison(left, right, context, (c) => c != 0),
-                FormulaBinaryOperator.Less => EvaluateComparison(left, right, context, (c) => c < 0),
-                FormulaBinaryOperator.LessOrEqual => (EvaluateComparison(left, right, context, (c) => c <= 0)),
-                FormulaBinaryOperator.Greater => EvaluateComparison(left, right, context, (c) => c > 0),
-                FormulaBinaryOperator.GreaterOrEqual => EvaluateComparison(left, right, context, (c) => c >= 0),
-                _ => FormulaValue.FromError(new FormulaError(FormulaErrorType.Calc))
-            };
+            return EvaluateBinaryScalar(expression.Operator, left, right, context);
         }
 
         private FormulaValue EvaluateReferenceOperator(
@@ -1322,8 +1307,8 @@ namespace ProDataGrid.FormulaEngine
 
         private static FormulaValue EvaluateBinaryScalar(
             FormulaBinaryOperator op,
-            FormulaValue left,
-            FormulaValue right,
+            in FormulaValue left,
+            in FormulaValue right,
             FormulaEvaluationContext context)
         {
             if (left.Kind == FormulaValueKind.Error)
@@ -1334,6 +1319,12 @@ namespace ProDataGrid.FormulaEngine
             if (right.Kind == FormulaValueKind.Error)
             {
                 return right;
+            }
+
+            if (left.Kind == FormulaValueKind.Number && right.Kind == FormulaValueKind.Number &&
+                op != FormulaBinaryOperator.Concat)
+            {
+                return EvaluateNumberBinary(op, left.AsNumber(), right.AsNumber(), context.Workbook.Settings);
             }
 
             return op switch
