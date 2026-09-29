@@ -1,7 +1,9 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net10.0</TargetFramework>
+    <!-- Dedicated CI can test the same sources on net8 without editing the project. -->
+    <FormulaTestFramework Condition="'$(FormulaTestFramework)' == ''">net10.0</FormulaTestFramework>
+    <TargetFramework>$(FormulaTestFramework)</TargetFramework>
     <OutputType>Library</OutputType>
     <IsTestProject>true</IsTestProject>
     <IsPackable>false</IsPackable>
@@ -28,7 +30,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Include="Compatibility\\ExcelCompatibilityCorpus.json" CopyToOutputDirectory="PreserveNewest" />
+    <None Include="Compatibility\ExcelCompatibilityCorpus.json" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
 
 </Project>

@@ -1,0 +1,83 @@
+name: Formula engine validation
+
+on:
+  pull_request:
+    paths:
+      - 'src/ProDataGrid.FormulaEngine*/**'
+      - 'tools/formula-*/**'
+      - 'build/**'
+      - 'Directory.*.props'
+      - 'global.json'
+      - '.github/workflows/formula.yml'
+  push:
+    branches: [master]
+    paths:
+      - 'src/ProDataGrid.FormulaEngine*/**'
+      - 'tools/formula-*/**'
+      - 'build/**'
+      - 'Directory.*.props'
+      - 'global.json'
+      - '.github/workflows/formula.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: formula-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  formula:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      DOTNET_TieredCompilation: '0'
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-dotnet@v4
+        with:
+          global-json-file: global.json
+          dotnet-version: '8.0.x'
+      - name: Validate identical test sources on net8 and net10
+        run: |
+          mkdir -p artifacts/formula
+          set -o pipefail
+          dotnet test src/ProDataGrid.FormulaEngine.UnitTests/ProDataGrid.FormulaEngine.UnitTests.csproj -c Release -p:FormulaTestFramework=net8.0 --logger trx --results-directory artifacts/formula/net8 2>&1 | tee artifacts/formula/net8.log
+          dotnet test src/ProDataGrid.FormulaEngine.UnitTests/ProDataGrid.FormulaEngine.UnitTests.csproj -c Release -p:FormulaTestFramework=net10.0 --logger trx --results-directory artifacts/formula/net10 2>&1 | tee artifacts/formula/net10.log
+          dotnet build src/ProDataGrid.FormulaEngine.Excel/ProDataGrid.FormulaEngine.Excel.csproj -c Release
+      - name: Build and execute reusable formula smoke and aggregate benchmarks
+        run: |
+          set -o pipefail
+          dotnet run -c Release --project tools/formula-function-benchmarks/FormulaFunctionBenchmarks.csproj -- artifacts/formula/functions smoke 2>&1 | tee artifacts/formula/functions.log
+          dotnet build tools/formula-aggregate-benchmarks/FormulaAggregateBenchmarks.csproj -c Release
+          dotnet run --no-build -c Release --project tools/formula-aggregate-benchmarks/FormulaAggregateBenchmarks.csproj -- artifacts/formula/run-1 2>&1 | tee artifacts/formula/run-1.log
+          dotnet run --no-build -c Release --project tools/formula-aggregate-benchmarks/FormulaAggregateBenchmarks.csproj -- artifacts/formula/run-2 reverse 2>&1 | tee artifacts/formula/run-2.log
+      - name: Publish and execute NativeAOT formula checks
+        run: |
+          set -o pipefail
+          dotnet publish tools/formula-function-benchmarks/FormulaFunctionBenchmarks.csproj -c Release -r linux-x64 -p:PublishAot=true -o artifacts/native-functions 2>&1 | tee artifacts/formula/native-functions-publish.log
+          dotnet publish tools/formula-aggregate-benchmarks/FormulaAggregateBenchmarks.csproj -c Release -r linux-x64 -p:PublishAot=true -o artifacts/native-aggregates 2>&1 | tee artifacts/formula/native-aggregates-publish.log
+          if grep -E 'warning IL[0-9]+' artifacts/formula/native-*-publish.log; then
+            echo 'NativeAOT/trimming warnings require review.'
+            exit 1
+          fi
+          ./artifacts/native-functions/FormulaFunctionBenchmarks artifacts/formula/native-functions smoke 2>&1 | tee artifacts/formula/native-functions.log
+          ./artifacts/native-aggregates/FormulaAggregateBenchmarks artifacts/formula/native-aggregates smoke 2>&1 | tee artifacts/formula/native-aggregates.log
+      - name: Record exact source and runtime evidence
+        if: always()
+        run: |
+          mkdir -p artifacts/formula
+          git rev-parse HEAD > artifacts/formula/revision.txt
+          git ls-tree -r HEAD src/ProDataGrid.FormulaEngine src/ProDataGrid.FormulaEngine.Excel src/ProDataGrid.FormulaEngine.UnitTests tools/formula-function-benchmarks tools/formula-aggregate-benchmarks > artifacts/formula/source-blobs.txt
+          dotnet --info > artifacts/formula/runtime.txt
+          dotnet --list-runtimes > artifacts/formula/installed-runtimes.txt
+          lscpu > artifacts/formula/cpu.txt
+          git diff --exit-code
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: formula-validation-${{ github.run_id }}
+          path: artifacts/formula
