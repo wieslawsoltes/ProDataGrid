@@ -3,6 +3,7 @@ using System.IO;
 using System.Linq;
 using Avalonia;
 using Avalonia.Controls;
+using Avalonia.Headless;
 using Avalonia.Headless.XUnit;
 using Avalonia.Input;
 using Avalonia.LogicalTree;
@@ -48,6 +49,8 @@ public sealed class ChartRangeSampleTests
             var model = Assert.IsType<ChartRangeViewModel>(page.DataContext);
             var view = Assert.Single(page.GetLogicalDescendants().OfType<ProChartView>());
             Assert.Same(model.Chart, view.ChartModel);
+            Assert.True(view.EnableHoverTracking);
+            Assert.True(view.ShowToolTips);
             byte[] png = view.ExportPng(); string svg = view.ExportSvg();
             Assert.NotEmpty(png); Assert.Contains("Bollinger envelope", svg);
             Point? target = null;
@@ -56,11 +59,24 @@ public sealed class ChartRangeSampleTests
                     if (view.HitTest(new Point(x, y)) is { SeriesKind: ChartSeriesKind.RangeArea })
                     { target = new Point(x, y); break; }
             Assert.NotNull(target);
+            // PointerEventArgs stores presentation-root coordinates, not the nested chart's local
+            // coordinates. Check the round trip before testing the control's routed handler.
+            Point? rootPoint = view.TranslatePoint(target!.Value, window);
+            Assert.NotNull(rootPoint);
             var pointer = new Pointer(Pointer.GetNextFreeId(), PointerType.Mouse, true);
-            view.RaiseEvent(new PointerEventArgs(InputElement.PointerMovedEvent, view, pointer, view,
-                target!.Value, 1, new PointerPointProperties(), KeyModifiers.None));
+            var moved = new PointerEventArgs(InputElement.PointerMovedEvent, view, pointer, window,
+                rootPoint!.Value, 1, new PointerPointProperties(), KeyModifiers.None);
+            Point local = moved.GetPosition(view);
+            Assert.InRange(Math.Abs(local.X - target.Value.X), 0, 1e-6);
+            Assert.InRange(Math.Abs(local.Y - target.Value.Y), 0, 1e-6);
+            view.RaiseEvent(moved);
             string tooltip = Assert.IsType<string>(ToolTip.GetTip(view));
             Assert.Contains("Low", tooltip); Assert.Contains("High", tooltip);
+            // Exercise the platform input route as well, with normal crosshair tracking enabled.
+            window.MouseMove(rootPoint.Value);
+            string routedTooltip = Assert.IsType<string>(ToolTip.GetTip(view));
+            Assert.Contains("Low", routedTooltip); Assert.Contains("High", routedTooltip);
+            Assert.True(model.Chart.Interaction.IsCrosshairVisible);
             string? workspace = Environment.GetEnvironmentVariable("GITHUB_WORKSPACE");
             if (Environment.GetEnvironmentVariable("GITHUB_ACTIONS") == "true" && !string.IsNullOrEmpty(workspace))
             {
