@@ -375,101 +375,14 @@ namespace ProDataGrid.FormulaEngine.Excel
         }
     }
 
-    internal sealed class WorkdayFunction : ExcelFunctionBase
+    internal sealed class WorkdayFunction : BusinessDayFunction
     {
-        public WorkdayFunction()
-            : base("WORKDAY", new FormulaFunctionInfo(2, 3))
-        {
-        }
-
-        public override FormulaValue Invoke(FormulaFunctionContext context, IReadOnlyList<FormulaValue> args)
-        {
-            var settings = context.EvaluationContext.Workbook.Settings;
-
-            if (!ExcelDateFunctionHelpers.TryGetDateSerial(args[0], settings, out var startSerial, out var error))
-            {
-                return FormulaValue.FromError(error);
-            }
-
-            if (!ExcelFunctionUtilities.TryCoerceToInteger(context, args[1], out var days, out error))
-            {
-                return FormulaValue.FromError(error);
-            }
-
-            var holidays = ExcelDateFunctionHelpers.GetHolidaySet(args.Count > 2 ? args[2] : null, settings, out error);
-            if (holidays == null)
-            {
-                return FormulaValue.FromError(error);
-            }
-
-            var step = days >= 0 ? 1 : -1;
-            var remaining = Math.Abs(days);
-            var current = startSerial;
-            while (remaining > 0)
-            {
-                current += step;
-                if (ExcelDateFunctionHelpers.IsWorkday(current, settings.DateSystem, holidays))
-                {
-                    remaining--;
-                }
-            }
-
-            return ExcelFunctionUtilities.CreateNumber(settings, current);
-        }
+        public WorkdayFunction() : base(networkDays: false, international: false) { }
     }
 
-    internal sealed class NetworkDaysFunction : ExcelFunctionBase
+    internal sealed class NetworkDaysFunction : BusinessDayFunction
     {
-        public NetworkDaysFunction()
-            : base("NETWORKDAYS", new FormulaFunctionInfo(2, 3))
-        {
-        }
-
-        public override FormulaValue Invoke(FormulaFunctionContext context, IReadOnlyList<FormulaValue> args)
-        {
-            var settings = context.EvaluationContext.Workbook.Settings;
-
-            if (!ExcelDateFunctionHelpers.TryGetDateSerial(args[0], settings, out var startSerial, out var error))
-            {
-                return FormulaValue.FromError(error);
-            }
-
-            if (!ExcelDateFunctionHelpers.TryGetDateSerial(args[1], settings, out var endSerial, out error))
-            {
-                return FormulaValue.FromError(error);
-            }
-
-            var holidays = ExcelDateFunctionHelpers.GetHolidaySet(args.Count > 2 ? args[2] : null, settings, out error);
-            if (holidays == null)
-            {
-                return FormulaValue.FromError(error);
-            }
-
-            var swapped = false;
-            if (startSerial > endSerial)
-            {
-                (startSerial, endSerial) = (endSerial, startSerial);
-                swapped = true;
-            }
-
-            var startDay = (int)Math.Floor(startSerial);
-            var endDay = (int)Math.Floor(endSerial);
-            var count = 0;
-            for (var day = startDay; day <= endDay; day++)
-            {
-                if (ExcelDateFunctionHelpers.IsWorkday(day, settings.DateSystem, holidays))
-                {
-                    count++;
-                }
-            }
-
-            if (swapped)
-            {
-                count = -count;
-            }
-
-            return ExcelFunctionUtilities.CreateNumber(settings, count);
-        }
+        public NetworkDaysFunction() : base(networkDays: true, international: false) { }
     }
 
     internal static class ExcelDateFunctionHelpers
@@ -537,99 +450,6 @@ namespace ProDataGrid.FormulaEngine.Excel
 
             serial -= Math.Floor(serial);
             return true;
-        }
-
-        public static HashSet<int>? GetHolidaySet(
-            FormulaValue? holidaysValue,
-            FormulaCalculationSettings settings,
-            out FormulaError error)
-        {
-            error = default;
-            var holidays = new HashSet<int>();
-            if (holidaysValue == null)
-            {
-                return holidays;
-            }
-
-            foreach (var value in ExcelFunctionUtilities.FlattenValues(holidaysValue.Value))
-            {
-                if (value.Kind == FormulaValueKind.Blank)
-                {
-                    continue;
-                }
-
-                if (!TryGetDateSerial(value, settings, out var serial, out error))
-                {
-                    return null;
-                }
-
-                holidays.Add((int)Math.Floor(serial));
-            }
-
-            return holidays;
-        }
-
-        public static bool IsWorkday(double serial, FormulaDateSystem dateSystem, HashSet<int> holidays)
-        {
-            var day = (int)Math.Floor(serial);
-            if (day < 0)
-            {
-                return false;
-            }
-
-            if (holidays.Contains(day))
-            {
-                return false;
-            }
-
-            var dayOfWeek = GetDayOfWeek(day, dateSystem);
-            return dayOfWeek != DayOfWeek.Saturday && dayOfWeek != DayOfWeek.Sunday;
-        }
-
-        private static DayOfWeek GetDayOfWeek(int daySerial, FormulaDateSystem dateSystem)
-        {
-            if (dateSystem == FormulaDateSystem.Windows1900)
-            {
-                if (daySerial == 0)
-                {
-                    return DayOfWeek.Sunday;
-                }
-
-                if (daySerial > 60)
-                {
-                    daySerial -= 1;
-                }
-
-                var index = (daySerial - 1) % 7;
-                if (index < 0)
-                {
-                    index += 7;
-                }
-
-                return IndexToDayOfWeek(index);
-            }
-
-            var offsetIndex = (daySerial + 4) % 7;
-            if (offsetIndex < 0)
-            {
-                offsetIndex += 7;
-            }
-
-            return IndexToDayOfWeek(offsetIndex);
-        }
-
-        private static DayOfWeek IndexToDayOfWeek(int index)
-        {
-            return index switch
-            {
-                0 => DayOfWeek.Monday,
-                1 => DayOfWeek.Tuesday,
-                2 => DayOfWeek.Wednesday,
-                3 => DayOfWeek.Thursday,
-                4 => DayOfWeek.Friday,
-                5 => DayOfWeek.Saturday,
-                _ => DayOfWeek.Sunday
-            };
         }
     }
 }
