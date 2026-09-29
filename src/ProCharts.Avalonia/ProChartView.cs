@@ -226,6 +226,7 @@ namespace ProCharts.Avalonia
 
             if (change.Property == ChartModelProperty)
             {
+                _renderer.ClearInteractionCache();
                 if (change.OldValue is ChartModel oldModel)
                 {
                     WeakEventHandlerManager.Unsubscribe<ChartDataUpdateEventArgs, ProChartView>(
@@ -798,6 +799,31 @@ namespace ProCharts.Avalonia
             return true;
         }
 
+        /// <summary>Finds chart data at a point in this control's local logical coordinates.</summary>
+        /// <remarks>Uses the displayed snapshot and effective axes/theme; category labels are optional.</remarks>
+        public SkiaChartHitTestResult? HitTest(Point point)
+        {
+            var snapshot = ChartModel?.Snapshot;
+            if (snapshot == null || snapshot.Series.Count == 0 ||
+                !double.IsFinite(point.X) || !double.IsFinite(point.Y)) return null;
+            return _renderer.HitTest(new SKPoint((float)point.X, (float)point.Y),
+                new SKRect(0, 0, (float)Bounds.Width, (float)Bounds.Height), snapshot, BuildEffectiveStyle());
+        }
+
+        /// <summary>Releases drawing and interaction buffers when the view leaves its visual tree.</summary>
+        protected override void OnDetachedFromVisualTree(VisualTreeAttachmentEventArgs e)
+        {
+            EndPan();
+            ClearSelectionOverlay(clearMeasurement: true);
+            ClearToolTip();
+            _renderer.ClearInteractionCache();
+            _renderCache.Invalidate();
+            _bitmap?.Dispose();
+            _bitmap = null;
+            _isDirty = true;
+            base.OnDetachedFromVisualTree(e);
+        }
+
         private void UpdateToolTip(Point point)
         {
             if (!ShowToolTips)
@@ -806,24 +832,7 @@ namespace ProCharts.Avalonia
                 return;
             }
 
-            var model = ChartModel;
-            if (model == null)
-            {
-                ClearToolTip();
-                return;
-            }
-
-            var snapshot = model.Snapshot;
-            if (snapshot.Series.Count == 0 || snapshot.Categories.Count == 0)
-            {
-                ClearToolTip();
-                return;
-            }
-
-            var hitPoint = new SKPoint((float)point.X, (float)point.Y);
-            var bounds = new SKRect(0, 0, (float)Bounds.Width, (float)Bounds.Height);
-            var style = BuildEffectiveStyle();
-            var hit = _renderer.HitTest(hitPoint, bounds, snapshot, style);
+            var hit = HitTest(point);
 
             if (hit.HasValue)
             {

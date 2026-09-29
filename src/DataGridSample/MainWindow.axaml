@@ -253,6 +253,9 @@
     <TabItem Header="Pivot Chart Model">
       <pages:PivotChartPage />
     </TabItem>
+    <TabItem Header="ProCharts Hierarchy Explorer">
+      <pages:ChartHierarchyPage />
+    </TabItem>
     <TabItem Header="ProCharts Combo">
       <pages:ChartingPage SampleKind="Combo" />
     </TabItem>

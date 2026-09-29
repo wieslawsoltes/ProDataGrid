@@ -14,7 +14,7 @@ namespace ProCharts
     /// A hierarchy is structural: numeric point budgets and index windows are intentionally not
     /// applied, since sampling away a parent or child would change the represented totals.
     /// </remarks>
-    public sealed class HierarchyChartDataSource : IChartDataSource
+    public sealed class HierarchyChartDataSource : IChartDataSource, IChartHierarchyNavigator
     {
         private readonly object _gate = new();
         private readonly Stack<ChartHierarchySnapshot> _history = new();
