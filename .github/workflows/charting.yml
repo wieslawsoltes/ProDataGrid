@@ -7,6 +7,9 @@ on:
       - 'src/ProCharts*/**'
       - 'src/ProDataGrid.Charting/**'
       - 'src/Avalonia.Controls.DataGrid.UnitTests/Charting/**'
+      - 'src/DataGridSample/**/Chart*'
+      - 'src/DataGridSample/MainWindow.axaml'
+      - 'src/DataGridSample.UnitTests/Chart*'
       - 'tests/ProCharts.Benchmarks/**'
       - 'tests/ProCharts.Interaction.Benchmarks/**'
       - 'tests/ProDataGrid.Charting.Benchmarks/**'
@@ -19,6 +22,9 @@ on:
       - 'src/ProCharts*/**'
       - 'src/ProDataGrid.Charting/**'
       - 'src/Avalonia.Controls.DataGrid.UnitTests/Charting/**'
+      - 'src/DataGridSample/**/Chart*'
+      - 'src/DataGridSample/MainWindow.axaml'
+      - 'src/DataGridSample.UnitTests/Chart*'
       - 'tests/ProCharts.Benchmarks/**'
       - 'tests/ProCharts.Interaction.Benchmarks/**'
       - 'tests/ProDataGrid.Charting.Benchmarks/**'
@@ -52,6 +58,8 @@ jobs:
         run: dotnet build src/ProCharts.Skia/ProCharts.Skia.csproj -c Release
       - name: Charting regressions
         run: dotnet test src/Avalonia.Controls.DataGrid.UnitTests/Avalonia.Controls.DataGrid.UnitTests.csproj -c Release -p:CollectCoverage=false --filter FullyQualifiedName~Charting --logger trx --results-directory artifacts/charting
+      - name: Chart sample integration
+        run: dotnet test src/DataGridSample.UnitTests/DataGridSample.UnitTests.csproj -c Release --filter FullyQualifiedName~Chart --logger trx --results-directory artifacts/charting/sample
       - name: Measure streaming and decimation
         shell: bash
         run: |
