@@ -220,8 +220,18 @@ and whether the window should remain pinned to the latest categories.</p>
 </dd>
     </dl>
     <dl class="jumplist">
+      <dt><a class="xref" href="ProCharts.StreamingBollingerBands.html">StreamingBollingerBands</a></dt>
+      <dd><p>Persistent rolling SMA and symmetric standard-deviation bands, including the current observation.</p>
+</dd>
+    </dl>
+    <dl class="jumplist">
       <dt><a class="xref" href="ProCharts.StreamingChartDataSource.html">StreamingChartDataSource</a></dt>
       <dd><p>A bounded, thread-safe, single-series data source for live numeric charts.</p>
+</dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="ProCharts.StreamingDonchianChannels.html">StreamingDonchianChannels</a></dt>
+      <dd><p>Rolling high/low extrema and midpoint, including the current aligned high/low/close observation.</p>
 </dd>
     </dl>
     <dl class="jumplist">
@@ -249,16 +259,41 @@ and whether the window should remain pinned to the latest categories.</p>
       <dd><p>Constant-space Wilder RSI requiring period price changes (period+1 prices) for warmup.</p>
 </dd>
     </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="ProCharts.StreamingRollingStandardDeviation.html">StreamingRollingStandardDeviation</a></dt>
+      <dd><p>Rolling population or sample standard deviation with gap restart and complete-window warmup.</p>
+</dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="ProCharts.StreamingRollingStatistics.html">StreamingRollingStatistics</a></dt>
+      <dd><p>Bounded rolling arithmetic/weighted means and population/sample deviations in one calculator.</p>
+</dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="ProCharts.StreamingSimpleMovingAverage.html">StreamingSimpleMovingAverage</a></dt>
+      <dd><p>Rolling SMA with complete-window warmup and gap restart.</p>
+</dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="ProCharts.StreamingWeightedMovingAverage.html">StreamingWeightedMovingAverage</a></dt>
+      <dd><p>Rolling linearly weighted mean with weights one through Period, oldest to newest.</p>
+</dd>
+    </dl>
     <h3 id="structs">
 Structs
 </h3>
+    <dl class="jumplist">
+      <dt><a class="xref" href="ProCharts.ChartBandValue.html">ChartBandValue</a></dt>
+      <dd><p>An aligned lower/middle/upper result for a streaming band or channel calculator.</p>
+</dd>
+    </dl>
     <dl class="jumplist">
       <dt><a class="xref" href="ProCharts.ChartColor.html">ChartColor</a></dt>
       <dd></dd>
     </dl>
     <dl class="jumplist">
       <dt><a class="xref" href="ProCharts.ChartHighLowClose.html">ChartHighLowClose</a></dt>
-      <dd><p>Aligned high, low and close channels for one observation. Open is not required by ATR.</p>
+      <dd><p>Aligned high, low and close channels for one observation. Open is not required by ATR or Donchian channels.</p>
 </dd>
     </dl>
     <dl class="jumplist">
@@ -274,6 +309,11 @@ Structs
     <dl class="jumplist">
       <dt><a class="xref" href="ProCharts.ChartRangeSample.html">ChartRangeSample</a></dt>
       <dd><p>One interval observation. Streaming sources validate X and normalize incomplete bounds to a gap.</p>
+</dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="ProCharts.ChartRollingStatisticsValue.html">ChartRollingStatisticsValue</a></dt>
+      <dd><p>Aligned statistics for one complete rolling window. Missing results are null, never infinity.</p>
 </dd>
     </dl>
     <dl class="jumplist">
@@ -313,7 +353,7 @@ Interfaces
     </dl>
     <dl class="jumplist">
       <dt><a class="xref" href="ProCharts.IStreamingChartIndicator-2.html">IStreamingChartIndicator&lt;TInput, TOutput&gt;</a></dt>
-      <dd><p>A reusable, single-writer indicator that consumes observations without retaining their history.</p>
+      <dd><p>A reusable, single-writer indicator retaining algorithm-specific recurrence or bounded-window state.</p>
 </dd>
     </dl>
     <h3 id="enums">
