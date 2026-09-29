@@ -152,10 +152,11 @@ Class FormulaNumberUtilities  <a class="header-action link-secondary" title="Vie
 
   <h3 id="ProDataGrid_FormulaEngine_FormulaNumberUtilities_ApplyPrecision_System_Double_System_Int32_" data-uid="ProDataGrid.FormulaEngine.FormulaNumberUtilities.ApplyPrecision(System.Double,System.Int32)">
   ApplyPrecision(double, int)
-  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/ProDataGrid.FormulaEngine/FormulaNumberUtilities.cs/#L49"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/ProDataGrid.FormulaEngine/FormulaNumberUtilities.cs/#L53"><i class="bi bi-code-slash"></i></a>
   </h3>
 
-  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 summary"><p>Rounds to the requested significant decimal digits without an absolute zero threshold.</p>
+</div>
   <div class="markdown level1 conceptual"></div>
 
   <div class="codewrapper">
@@ -182,6 +183,11 @@ Class FormulaNumberUtilities  <a class="header-action link-secondary" title="Vie
 
 
 
+  <h4 class="section" id="ProDataGrid_FormulaEngine_FormulaNumberUtilities_ApplyPrecision_System_Double_System_Int32__remarks">Remarks</h4>
+  <div class="markdown level1 remarks"><p>Nonpositive digits, 17 or more digits, zero and nonfinite values pass through.
+Midpoints round away from zero. A finite input is retained if its rounded value would overflow.
+This normalizes a binary64 value; it is not exact decimal arithmetic or Excel file serialization.</p>
+</div>
 
 
 
