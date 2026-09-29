@@ -356,6 +356,12 @@ public class DataGridDiagnosticsTests
 
         using (DataGridDiagnostics.BeginVirtualSurfaceRender())
         {
+            // An empty scope can begin and end in the same clock tick on Windows.
+            // Keep the positive-duration assertion; give the fixture measurable work.
+            var timestamp = Stopwatch.GetTimestamp();
+            Assert.True(System.Threading.SpinWait.SpinUntil(
+                () => Stopwatch.GetTimestamp() != timestamp, TimeSpan.FromSeconds(1)),
+                "The monotonic clock did not advance during the timed scope.");
         }
         DataGridDiagnostics.RecordVirtualSurfaceRender(
             rows: 20,
