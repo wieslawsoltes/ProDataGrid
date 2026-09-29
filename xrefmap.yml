@@ -81652,6 +81652,19 @@ references:
   isSpec: "True"
   fullName: ProDataGrid.FormulaEngine.FormulaCalculationSettings.ReferenceMode
   nameWithType: FormulaCalculationSettings.ReferenceMode
+- uid: ProDataGrid.FormulaEngine.FormulaCalculationSettings.TextCompatibilityVersion
+  name: TextCompatibilityVersion
+  href: api/ProDataGrid.FormulaEngine.FormulaCalculationSettings.html#ProDataGrid_FormulaEngine_FormulaCalculationSettings_TextCompatibilityVersion
+  commentId: P:ProDataGrid.FormulaEngine.FormulaCalculationSettings.TextCompatibilityVersion
+  fullName: ProDataGrid.FormulaEngine.FormulaCalculationSettings.TextCompatibilityVersion
+  nameWithType: FormulaCalculationSettings.TextCompatibilityVersion
+- uid: ProDataGrid.FormulaEngine.FormulaCalculationSettings.TextCompatibilityVersion*
+  name: TextCompatibilityVersion
+  href: api/ProDataGrid.FormulaEngine.FormulaCalculationSettings.html#ProDataGrid_FormulaEngine_FormulaCalculationSettings_TextCompatibilityVersion_
+  commentId: Overload:ProDataGrid.FormulaEngine.FormulaCalculationSettings.TextCompatibilityVersion
+  isSpec: "True"
+  fullName: ProDataGrid.FormulaEngine.FormulaCalculationSettings.TextCompatibilityVersion
+  nameWithType: FormulaCalculationSettings.TextCompatibilityVersion
 - uid: ProDataGrid.FormulaEngine.FormulaCalculationSettings.UseExcelNumberParsing
   name: UseExcelNumberParsing
   href: api/ProDataGrid.FormulaEngine.FormulaCalculationSettings.html#ProDataGrid_FormulaEngine_FormulaCalculationSettings_UseExcelNumberParsing
@@ -84872,6 +84885,24 @@ references:
   commentId: F:ProDataGrid.FormulaEngine.FormulaStructuredReferenceScope.Totals
   fullName: ProDataGrid.FormulaEngine.FormulaStructuredReferenceScope.Totals
   nameWithType: FormulaStructuredReferenceScope.Totals
+- uid: ProDataGrid.FormulaEngine.FormulaTextCompatibilityVersion
+  name: FormulaTextCompatibilityVersion
+  href: api/ProDataGrid.FormulaEngine.FormulaTextCompatibilityVersion.html
+  commentId: T:ProDataGrid.FormulaEngine.FormulaTextCompatibilityVersion
+  fullName: ProDataGrid.FormulaEngine.FormulaTextCompatibilityVersion
+  nameWithType: FormulaTextCompatibilityVersion
+- uid: ProDataGrid.FormulaEngine.FormulaTextCompatibilityVersion.Version1
+  name: Version1
+  href: api/ProDataGrid.FormulaEngine.FormulaTextCompatibilityVersion.html#ProDataGrid_FormulaEngine_FormulaTextCompatibilityVersion_Version1
+  commentId: F:ProDataGrid.FormulaEngine.FormulaTextCompatibilityVersion.Version1
+  fullName: ProDataGrid.FormulaEngine.FormulaTextCompatibilityVersion.Version1
+  nameWithType: FormulaTextCompatibilityVersion.Version1
+- uid: ProDataGrid.FormulaEngine.FormulaTextCompatibilityVersion.Version2
+  name: Version2
+  href: api/ProDataGrid.FormulaEngine.FormulaTextCompatibilityVersion.html#ProDataGrid_FormulaEngine_FormulaTextCompatibilityVersion_Version2
+  commentId: F:ProDataGrid.FormulaEngine.FormulaTextCompatibilityVersion.Version2
+  fullName: ProDataGrid.FormulaEngine.FormulaTextCompatibilityVersion.Version2
+  nameWithType: FormulaTextCompatibilityVersion.Version2
 - uid: ProDataGrid.FormulaEngine.FormulaToken
   name: FormulaToken
   href: api/ProDataGrid.FormulaEngine.FormulaToken.html

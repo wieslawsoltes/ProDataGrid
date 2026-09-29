@@ -11204,6 +11204,20 @@
     },
     {
       "type": "ManagedReference",
+      "source_relative_path": "api/ProDataGrid.FormulaEngine.FormulaTextCompatibilityVersion.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/ProDataGrid.FormulaEngine.FormulaTextCompatibilityVersion.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "ProDataGrid.FormulaEngine.FormulaTextCompatibilityVersion",
+      "Summary": "<p sourcefile=\"api/ProDataGrid.FormulaEngine.FormulaTextCompatibilityVersion.yml\" sourcestartlinenumber=\"1\">Controls character positions in the Excel text function family.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
       "source_relative_path": "api/ProDataGrid.FormulaEngine.FormulaToken.yml",
       "output": {
         ".html": {

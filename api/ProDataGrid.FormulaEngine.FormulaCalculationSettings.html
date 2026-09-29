@@ -658,6 +658,42 @@ Excel row/column limits still apply even when this value is increased.</p>
 
 
 
+  <a id="ProDataGrid_FormulaEngine_FormulaCalculationSettings_TextCompatibilityVersion_" data-uid="ProDataGrid.FormulaEngine.FormulaCalculationSettings.TextCompatibilityVersion*"></a>
+
+  <h3 id="ProDataGrid_FormulaEngine_FormulaCalculationSettings_TextCompatibilityVersion" data-uid="ProDataGrid.FormulaEngine.FormulaCalculationSettings.TextCompatibilityVersion">
+  TextCompatibilityVersion
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/ProDataGrid.FormulaEngine/FormulaCalculationSettings.Text.cs/#L26"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Gets or sets the text-index compatibility mode; defaults to Version1 for existing workbooks.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public FormulaTextCompatibilityVersion TextCompatibilityVersion { get; set; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="ProDataGrid.FormulaEngine.FormulaTextCompatibilityVersion.html">FormulaTextCompatibilityVersion</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+  <h4 class="section" id="ProDataGrid_FormulaEngine_FormulaCalculationSettings_TextCompatibilityVersion_remarks">Remarks</h4>
+  <div class="markdown level1 remarks"><p>Affects LEN, LEFT, RIGHT, MID, FIND, SEARCH and REPLACE. This is character indexing,
+not grapheme segmentation, locale collation or an overall workbook compatibility version.</p>
+</div>
+
+
+
+
   <a id="ProDataGrid_FormulaEngine_FormulaCalculationSettings_UseExcelNumberParsing_" data-uid="ProDataGrid.FormulaEngine.FormulaCalculationSettings.UseExcelNumberParsing*"></a>
 
   <h3 id="ProDataGrid_FormulaEngine_FormulaCalculationSettings_UseExcelNumberParsing" data-uid="ProDataGrid.FormulaEngine.FormulaCalculationSettings.UseExcelNumberParsing">
