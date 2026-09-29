@@ -1,0 +1,86 @@
+name: Formula order-statistic correctness and performance
+on:
+  push:
+    branches: [work/formula-order-statistics]
+permissions:
+  contents: write
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    env:
+      DOTNET_TieredCompilation: '0'
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: work/formula-order-statistics
+          fetch-depth: 0
+      - uses: actions/setup-dotnet@v4
+        with:
+          global-json-file: global.json
+          dotnet-version: '8.0.x'
+      - name: Integrate selection and extended percentile smoke
+        run: |
+          python3 tools/apply-order-statistics.py
+          python3 - <<'PY'
+          from pathlib import Path
+          p=Path('tools/formula-function-benchmarks/Program.cs');s=p.read_text()
+          marker='            ValidateNumerics(context, evaluator, resolver, parser);'
+          assert s.count(marker)==1
+          p.write_text(s.replace(marker,marker+'\n            ValidateOrderStatistics(context, evaluator, resolver, parser);'))
+          PY
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add src/ProDataGrid.FormulaEngine.Excel/ExcelStatisticalFunctions.cs src/ProDataGrid.FormulaEngine.Excel/ExcelFunctionRegistry.ArrayFunctions.cs tools/formula-function-benchmarks/Program.cs
+          git commit -m 'Use bounded selection for existing order statistics and register exclusive percentiles'
+      - name: Execute formula suite on net10 and net8
+        run: |
+          git diff HEAD^ --check
+          dotnet test src/ProDataGrid.FormulaEngine.UnitTests/ProDataGrid.FormulaEngine.UnitTests.csproj -c Release --logger trx --results-directory artifacts/net10-tests
+          python3 - <<'PY'
+          from pathlib import Path
+          p=Path('src/ProDataGrid.FormulaEngine.UnitTests/ProDataGrid.FormulaEngine.UnitTests.csproj');s=p.read_text()
+          old='<TargetFramework>net10.0</TargetFramework>';assert s.count(old)==1
+          p.write_text(s.replace(old,'<TargetFramework>net8.0</TargetFramework>'))
+          PY
+          dotnet test src/ProDataGrid.FormulaEngine.UnitTests/ProDataGrid.FormulaEngine.UnitTests.csproj -c Release --logger trx --results-directory artifacts/net8-tests
+          git restore src/ProDataGrid.FormulaEngine.UnitTests/ProDataGrid.FormulaEngine.UnitTests.csproj
+      - name: Build identical benchmark harness against the baseline and selection implementations
+        run: |
+          BASE="$RUNNER_TEMP/order-statistic-baseline"
+          git worktree add --detach "$BASE" 4a4894e66193a0fb797a11d47a07e1d751141ba0
+          cp tools/formula-function-benchmarks/*.cs "$BASE/tools/formula-function-benchmarks/"
+          dotnet build tools/formula-function-benchmarks/FormulaFunctionBenchmarks.csproj -c Release
+          dotnet build "$BASE/tools/formula-function-benchmarks/FormulaFunctionBenchmarks.csproj" -c Release
+          lscpu > artifacts/cpu.txt
+          dotnet --info > artifacts/runtime.txt
+      - name: Measure baseline-current-current-baseline on the same runner
+        run: |
+          ROOT="$PWD"
+          for item in baseline-1 current-1 current-2 baseline-2; do
+            SRC="$ROOT"
+            case "$item" in baseline-*) SRC="$RUNNER_TEMP/order-statistic-baseline" ;; esac
+            dotnet run --no-build -c Release --project "$SRC/tools/formula-function-benchmarks/FormulaFunctionBenchmarks.csproj" -- "$ROOT/artifacts/$item" > "$ROOT/artifacts/$item.log"
+          done
+          printf 'baseline=4a4894e66193a0fb797a11d47a07e1d751141ba0\ncurrent=%s\norder=baseline,current,current,baseline\nDOTNET_TieredCompilation=0\n' "$(git rev-parse HEAD)" > artifacts/measurement-context.txt
+      - name: Publish and execute formula NativeAOT smoke
+        run: |
+          set -o pipefail
+          dotnet publish tools/formula-function-benchmarks/FormulaFunctionBenchmarks.csproj -c Release -r linux-x64 -p:PublishAot=true -o artifacts/native 2>&1 | tee artifacts/native-publish.log
+          if grep -E 'warning IL[0-9]+' artifacts/native-publish.log; then exit 1; fi
+          ./artifacts/native/FormulaFunctionBenchmarks artifacts/native-smoke smoke | tee artifacts/native-run.log
+          rm -r artifacts/native
+      - name: Push validated integration
+        run: git push origin HEAD:work/formula-order-statistics
+      - name: Export exact validation sources
+        if: always()
+        run: |
+          mkdir -p artifacts
+          git archive HEAD > artifacts/source.tar
+          git rev-parse HEAD > artifacts/revision.txt
+          git ls-tree -r HEAD src/ProDataGrid.FormulaEngine src/ProDataGrid.FormulaEngine.Excel src/ProDataGrid.FormulaEngine.UnitTests tools/formula-function-benchmarks > artifacts/validated-source-blobs.txt
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: formula-order-statistic-validation
+          path: artifacts
