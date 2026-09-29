@@ -1,0 +1,59 @@
+name: Correct visible numeric axis ticks
+on:
+  push:
+    branches: [charting/range-area-bands]
+    paths: [.github/workflows/charting-range-axis-prepare.yml]
+permissions:
+  contents: write
+jobs:
+  fix:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: charting/range-area-bands
+      - uses: actions/setup-dotnet@v4
+        with:
+          global-json-file: global.json
+      - name: Apply exact reviewed axis integration hooks
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          p = Path('src/ProCharts.Skia/SkiaChartRenderer.Axes.cs')
+          t = p.read_text()
+          start = t.index('        private static void FillTicks(List<double> ticks, double min, double max, int desiredTicks)')
+          end = t.index('        private static double NiceNumber(', start)
+          t = t[:start] + '        private static void FillTicks(List<double> ticks, double min, double max, int desiredTicks)\n        {\n            FillVisibleNumericTicks(ticks, min, max, desiredTicks);\n        }\n\n' + t[end:]
+          old = '            var normalized = (transformedValue - transformedMin) / (transformedMax - transformedMin);'
+          if t.count(old) != 1: raise RuntimeError('Unexpected axis normalization anchor')
+          t = t.replace(old, '            var normalized = NormalizeFiniteAxisRatio(transformedValue, transformedMin, transformedMax);', 1)
+          p.write_text(t)
+          PY
+          git diff --check
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add src/ProCharts.Skia/SkiaChartRenderer.Axes.cs
+          git commit -m 'Bound numeric tick generation to visible values and preserve finite extreme axis normalization'
+          git push origin HEAD:refs/heads/charting/range-area-bands
+      - name: Build and test chart axes, ranges and bound sample
+        shell: bash
+        run: |
+          mkdir -p artifacts/charting
+          dotnet build src/ProCharts.Skia/ProCharts.Skia.csproj -c Release > artifacts/charting/build.log 2>&1
+          dotnet test src/Avalonia.Controls.DataGrid.UnitTests/Avalonia.Controls.DataGrid.UnitTests.csproj -c Release -p:CollectCoverage=false --filter FullyQualifiedName~Charting --logger trx --results-directory artifacts/charting > artifacts/charting/core-test.log 2>&1
+          dotnet test src/DataGridSample.UnitTests/DataGridSample.UnitTests.csproj -c Release --filter FullyQualifiedName~Chart --logger trx --results-directory artifacts/charting/sample > artifacts/charting/sample-test.log 2>&1
+      - name: Retain exact source and diagnostics
+        if: always()
+        shell: bash
+        run: |
+          mkdir -p artifacts/charting
+          git rev-parse HEAD > artifacts/charting/source-commit.txt
+          git archive --format=zip HEAD -o artifacts/charting/source.zip
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: range-area-axis-validation
+          path: artifacts/charting
+          retention-days: 14
