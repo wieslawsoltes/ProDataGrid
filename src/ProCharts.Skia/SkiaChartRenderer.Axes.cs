@@ -497,7 +497,7 @@ namespace ProCharts.Skia
                 transformedMax = transformedMin + 1d;
             }
 
-            var normalized = (transformedValue - transformedMin) / (transformedMax - transformedMin);
+            var normalized = NormalizeFiniteAxisRatio(transformedValue, transformedMin, transformedMax);
             return Clamp(normalized, 0d, 1d);
         }
 
@@ -2024,21 +2024,7 @@ namespace ProCharts.Skia
 
         private static void FillTicks(List<double> ticks, double min, double max, int desiredTicks)
         {
-            ticks.Clear();
-            if (desiredTicks < 2)
-            {
-                desiredTicks = 2;
-            }
-
-            var range = NiceNumber(max - min, false);
-            var step = NiceNumber(range / (desiredTicks - 1), true);
-            var tickMin = Math.Floor(min / step) * step;
-            var tickMax = Math.Ceiling(max / step) * step;
-
-            for (var value = tickMin; value <= tickMax + step * 0.5; value += step)
-            {
-                ticks.Add(value);
-            }
+            FillVisibleNumericTicks(ticks, min, max, desiredTicks);
         }
 
         private static double NiceNumber(double value, bool round)
