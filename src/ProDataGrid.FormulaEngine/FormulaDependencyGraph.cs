@@ -475,121 +475,58 @@ namespace ProDataGrid.FormulaEngine
         }
 
         private static void CollectReferences(
-            FormulaExpression expression,
-            List<FormulaReference> references,
-            List<FormulaStructuredReference> structuredReferences,
-            HashSet<string> nameDependencies,
-            IFormulaNameProvider? worksheetNames,
-            IFormulaNameProvider? workbookNames,
-            string? sheetName,
-            HashSet<string> nameStack)
+            FormulaExpression expression, List<FormulaReference> references,
+            List<FormulaStructuredReference> structuredReferences, HashSet<string> nameDependencies,
+            IFormulaNameProvider? worksheetNames, IFormulaNameProvider? workbookNames,
+            string? sheetName, HashSet<string> nameStack, HashSet<string>? locals = null)
         {
+            void Visit(FormulaExpression item, HashSet<string>? scope)
+                => CollectReferences(item, references, structuredReferences, nameDependencies,
+                    worksheetNames, workbookNames, sheetName, nameStack, scope);
             switch (expression.Kind)
             {
                 case FormulaExpressionKind.Reference:
                     references.Add(((FormulaReferenceExpression)expression).Reference);
                     return;
-                case FormulaExpressionKind.Unary:
-                    CollectReferences(
-                        ((FormulaUnaryExpression)expression).Operand,
-                        references,
-                        structuredReferences,
-                        nameDependencies,
-                        worksheetNames,
-                        workbookNames,
-                        sheetName,
-                        nameStack);
-                    return;
-                case FormulaExpressionKind.Binary:
-                    var binary = (FormulaBinaryExpression)expression;
-                    CollectReferences(
-                        binary.Left,
-                        references,
-                        structuredReferences,
-                        nameDependencies,
-                        worksheetNames,
-                        workbookNames,
-                        sheetName,
-                        nameStack);
-                    CollectReferences(
-                        binary.Right,
-                        references,
-                        structuredReferences,
-                        nameDependencies,
-                        worksheetNames,
-                        workbookNames,
-                        sheetName,
-                        nameStack);
-                    return;
-                case FormulaExpressionKind.FunctionCall:
-                    var call = (FormulaFunctionCallExpression)expression;
-                    foreach (var arg in call.Arguments)
-                    {
-                        CollectReferences(
-                            arg,
-                            references,
-                            structuredReferences,
-                            nameDependencies,
-                            worksheetNames,
-                            workbookNames,
-                            sheetName,
-                            nameStack);
-                    }
-                    return;
-                case FormulaExpressionKind.Name:
-                    var nameExpression = (FormulaNameExpression)expression;
-                    if (!TryGetNameExpression(worksheetNames, workbookNames, nameExpression.Name, sheetName, out var resolved, out var scopeKey))
-                    {
-                        RegisterUnresolvedName(nameDependencies, nameExpression.Name, sheetName, worksheetNames, workbookNames);
-                        return;
-                    }
-
-                    nameDependencies.Add(scopeKey);
-                    if (!nameStack.Add(scopeKey))
-                    {
-                        return;
-                    }
-
-                    try
-                    {
-                        CollectReferences(
-                            resolved,
-                            references,
-                            structuredReferences,
-                            nameDependencies,
-                            worksheetNames,
-                            workbookNames,
-                            sheetName,
-                            nameStack);
-                    }
-                    finally
-                    {
-                        nameStack.Remove(scopeKey);
-                    }
-                    return;
-                case FormulaExpressionKind.ArrayLiteral:
-                    var arrayLiteral = (FormulaArrayExpression)expression;
-                    for (var row = 0; row < arrayLiteral.RowCount; row++)
-                    {
-                        for (var column = 0; column < arrayLiteral.ColumnCount; column++)
-                        {
-                            CollectReferences(
-                                arrayLiteral[row, column],
-                                references,
-                                structuredReferences,
-                                nameDependencies,
-                                worksheetNames,
-                                workbookNames,
-                                sheetName,
-                                nameStack);
-                        }
-                    }
-                    return;
                 case FormulaExpressionKind.StructuredReference:
                     structuredReferences.Add(((FormulaStructuredReferenceExpression)expression).Reference);
                     return;
-                case FormulaExpressionKind.Literal:
-                default:
+                case FormulaExpressionKind.Unary:
+                    Visit(((FormulaUnaryExpression)expression).Operand, locals);
+                    return;
+                case FormulaExpressionKind.Binary:
+                    var binary = (FormulaBinaryExpression)expression;
+                    Visit(binary.Left, locals);
+                    Visit(binary.Right, locals);
+                    return;
+                case FormulaExpressionKind.Invocation:
+                    var invocation = (FormulaInvocationExpression)expression;
+                    Visit(invocation.Target, locals);
+                    foreach (var arg in invocation.Arguments) Visit(arg, locals);
+                    return;
+                case FormulaExpressionKind.FunctionCall:
+                    var call = (FormulaFunctionCallExpression)expression;
+                    // Also register unresolved callable names so later definitions invalidate dependencies.
+                    Visit(new FormulaNameExpression(call.Name), locals);
+                    FormulaBindingTraversal.VisitArguments(call, locals, (arg, scope) => { Visit(arg, scope); return false; });
+                    return;
+                case FormulaExpressionKind.Name:
+                    var name = ((FormulaNameExpression)expression).Name;
+                    if (locals != null && locals.Contains(name)) return;
+                    if (!TryGetNameExpression(worksheetNames, workbookNames, name, sheetName, out var resolved, out var scopeKey))
+                    {
+                        RegisterUnresolvedName(nameDependencies, name, sheetName, worksheetNames, workbookNames);
+                        return;
+                    }
+                    nameDependencies.Add(scopeKey);
+                    if (!nameStack.Add(scopeKey)) return;
+                    try { Visit(resolved, null); }
+                    finally { nameStack.Remove(scopeKey); }
+                    return;
+                case FormulaExpressionKind.ArrayLiteral:
+                    var array = (FormulaArrayExpression)expression;
+                    for (var row = 0; row < array.RowCount; row++)
+                        for (var column = 0; column < array.ColumnCount; column++) Visit(array[row, column], locals);
                     return;
             }
         }

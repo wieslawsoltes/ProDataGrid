@@ -36,8 +36,20 @@ namespace ProDataGrid.FormulaEngine.Excel
         {
             switch (expression.Kind)
             {
+                case FormulaExpressionKind.Invocation:
+                    var invocation = (FormulaInvocationExpression)expression;
+                    var target = FormatExpression(invocation.Target, options, 0, false);
+                    var invocationText = new StringBuilder();
+                    invocationText.Append('(').Append(target).Append(")(");
+                    for (var i = 0; i < invocation.Arguments.Count; i++)
+                    {
+                        if (i > 0) invocationText.Append(options.ArgumentSeparator);
+                        invocationText.Append(FormatExpression(invocation.Arguments[i], options, 0, false));
+                    }
+                    return invocationText.Append(')').ToString();
                 case FormulaExpressionKind.Literal:
-                    return FormatLiteral(((FormulaLiteralExpression)expression).Value, options);
+                    var literal = (FormulaLiteralExpression)expression;
+                    return literal.IsOmitted ? string.Empty : FormatLiteral(literal.Value, options);
                 case FormulaExpressionKind.Name:
                     return ((FormulaNameExpression)expression).Name;
                 case FormulaExpressionKind.Reference:

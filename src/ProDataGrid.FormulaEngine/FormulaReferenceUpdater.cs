@@ -127,6 +127,19 @@ namespace ProDataGrid.FormulaEngine
             {
                 switch (expression.Kind)
                 {
+                    case FormulaExpressionKind.Invocation:
+                        var invocation = (FormulaInvocationExpression)expression;
+                        var target = Rewrite(invocation.Target);
+                        var args = new FormulaExpression[invocation.Arguments.Count];
+                        var changed = !ReferenceEquals(target, invocation.Target);
+                        for (var i = 0; i < args.Length; i++)
+                        {
+                            args[i] = Rewrite(invocation.Arguments[i]);
+                            changed |= !ReferenceEquals(args[i], invocation.Arguments[i]);
+                        }
+                        if (!changed) return expression;
+                        _changed = true;
+                        return new FormulaInvocationExpression(target, args);
                     case FormulaExpressionKind.Reference:
                         return RewriteReference((FormulaReferenceExpression)expression);
                     case FormulaExpressionKind.StructuredReference:
@@ -173,41 +186,21 @@ namespace ProDataGrid.FormulaEngine
 
             private FormulaExpression RewriteFunctionCall(FormulaFunctionCallExpression expression)
             {
-                var args = expression.Arguments;
-                List<FormulaExpression>? updatedArgs = null;
-                for (var i = 0; i < args.Count; i++)
+                FormulaExpression[]? updated = null;
+                for (var i = 0; i < expression.Arguments.Count; i++)
                 {
-                    var arg = args[i];
-                    var updated = Rewrite(arg);
-                    if (ReferenceEquals(updated, arg))
+                    var argument = expression.Arguments[i];
+                    var next = Rewrite(argument);
+                    if (updated == null && !ReferenceEquals(next, argument))
                     {
-                        continue;
+                        updated = new FormulaExpression[expression.Arguments.Count];
+                        for (var j = 0; j < i; j++) updated[j] = expression.Arguments[j];
                     }
-
-                    updatedArgs ??= new List<FormulaExpression>(args.Count);
-                    if (updatedArgs.Count == 0)
-                    {
-                        for (var j = 0; j < i; j++)
-                        {
-                            updatedArgs.Add(args[j]);
-                        }
-                    }
-
-                    updatedArgs.Add(updated);
+                    if (updated != null) updated[i] = next;
                 }
-
-                if (updatedArgs == null)
-                {
-                    return expression;
-                }
-
+                if (updated == null) return expression;
                 _changed = true;
-                while (updatedArgs.Count < args.Count)
-                {
-                    updatedArgs.Add(args[updatedArgs.Count]);
-                }
-
-                return new FormulaFunctionCallExpression(expression.Name, updatedArgs);
+                return new FormulaFunctionCallExpression(expression.Name, updated);
             }
 
             private FormulaExpression RewriteArrayLiteral(FormulaArrayExpression expression)

@@ -18,7 +18,8 @@ namespace ProDataGrid.FormulaEngine
         Binary,
         FunctionCall,
         LazyFunctionCall,
-        ArrayLiteral
+        ArrayLiteral,
+        Invocation
     }
 
     internal readonly struct FormulaInstruction
@@ -34,7 +35,8 @@ namespace ProDataGrid.FormulaEngine
             int argCount = 0,
             int rowCount = 0,
             int columnCount = 0,
-            FormulaExpression[]? lazyArguments = null)
+            FormulaExpression[]? lazyArguments = null,
+            FormulaExpression? expression = null)
         {
             Kind = kind;
             Literal = literal;
@@ -47,6 +49,7 @@ namespace ProDataGrid.FormulaEngine
             RowCount = rowCount;
             ColumnCount = columnCount;
             LazyArguments = lazyArguments;
+            Expression = expression;
         }
 
         public FormulaInstructionKind Kind { get; }
@@ -70,6 +73,8 @@ namespace ProDataGrid.FormulaEngine
         public int ColumnCount { get; }
 
         public FormulaExpression[]? LazyArguments { get; }
+
+        public FormulaExpression? Expression { get; }
     }
 
     internal sealed class FormulaCompiledExpression
@@ -153,7 +158,7 @@ namespace ProDataGrid.FormulaEngine
                         case FormulaExpressionKind.FunctionCall:
                             var call = (FormulaFunctionCallExpression)current;
                             Emit(new FormulaInstruction(FormulaInstructionKind.FunctionCall,
-                                name: call.Name, argCount: call.Arguments.Count), pop: call.Arguments.Count, push: 1);
+                                name: call.Name, argCount: call.Arguments.Count, lazyArguments: new List<FormulaExpression>(call.Arguments).ToArray()), pop: call.Arguments.Count, push: 1);
                             break;
                         case FormulaExpressionKind.ArrayLiteral:
                             var array = (FormulaArrayExpression)current;
@@ -167,6 +172,9 @@ namespace ProDataGrid.FormulaEngine
 
                 switch (current.Kind)
                 {
+                    case FormulaExpressionKind.Invocation:
+                        Emit(new FormulaInstruction(FormulaInstructionKind.Invocation, expression: current), push: 1);
+                        break;
                     case FormulaExpressionKind.Literal:
                         Emit(new FormulaInstruction(FormulaInstructionKind.Literal,
                             literal: ((FormulaLiteralExpression)current).Value), push: 1);
@@ -195,7 +203,7 @@ namespace ProDataGrid.FormulaEngine
                         break;
                     case FormulaExpressionKind.FunctionCall:
                         var call = (FormulaFunctionCallExpression)current;
-                        if (_functionRegistry.TryGetFunction(call.Name, out var function) && function is ILazyFormulaFunction)
+                        if (!_functionRegistry.TryGetFunction(call.Name, out var function) || function is ILazyFormulaFunction)
                         {
                             var arguments = new FormulaExpression[call.Arguments.Count];
                             for (var i = 0; i < arguments.Length; i++)

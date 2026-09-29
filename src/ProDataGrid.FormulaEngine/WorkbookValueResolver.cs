@@ -39,7 +39,7 @@ namespace ProDataGrid.FormulaEngine
 
             try
             {
-                value = _evaluator.Evaluate(expression, context, this);
+                value = _evaluator.Evaluate(expression, context.WithoutLocals(), this);
                 return true;
             }
             finally
@@ -428,7 +428,7 @@ namespace ProDataGrid.FormulaEngine
                     worksheet,
                     address,
                     context.FunctionRegistry);
-                var value = _evaluator.Evaluate(cell.Expression, cellContext, this);
+                var value = _evaluator.Evaluate(cell.Expression, cellContext, this).ToCellResult();
                 cell.Value = value;
                 return value;
             }

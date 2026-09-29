@@ -30,11 +30,4 @@ namespace ProDataGrid.FormulaEngine
         public IReadOnlyList<FormulaExpression> Arguments { get; }
     }
 
-    /// <summary>A syntactically omitted argument, distinct from a reference to a blank cell.</summary>
-    /// <remarks>Ordinary functions still receive a blank value. Lambda calls retain omission metadata.</remarks>
-    public sealed class FormulaMissingExpression : FormulaExpression
-    {
-        /// <summary>Creates an omitted argument expression.</summary>
-        public FormulaMissingExpression() : base(FormulaExpressionKind.Missing) { }
-    }
 }

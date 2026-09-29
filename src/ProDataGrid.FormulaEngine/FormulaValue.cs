@@ -16,7 +16,8 @@ namespace ProDataGrid.FormulaEngine
         Boolean,
         Error,
         Array,
-        Reference
+        Reference,
+        Lambda
     }
 
     public sealed class FormulaArray
@@ -99,7 +100,7 @@ namespace ProDataGrid.FormulaEngine
     /// boxed on construction; other factories do not allocate a payload wrapper.
     /// The private physical layout is not a serialization or interop contract.
     /// </remarks>
-    public readonly struct FormulaValue : IEquatable<FormulaValue>
+    public readonly partial struct FormulaValue : IEquatable<FormulaValue>
     {
         private readonly double _number;
         private readonly object? _payload;
@@ -211,6 +212,7 @@ namespace ProDataGrid.FormulaEngine
                 FormulaValueKind.Boolean => _number.Equals(other._number),
                 FormulaValueKind.Error => AsError().Equals(other.AsError()),
                 FormulaValueKind.Array => ReferenceEquals(_payload, other._payload),
+                FormulaValueKind.Lambda => ReferenceEquals(_payload, other._payload),
                 FormulaValueKind.Reference => AsReference().Equals(other.AsReference()),
                 _ => false
             };
@@ -238,6 +240,7 @@ namespace ProDataGrid.FormulaEngine
                     case FormulaValueKind.Error:
                         hash = (hash * 31) + AsError().GetHashCode();
                         break;
+                    case FormulaValueKind.Lambda:
                     case FormulaValueKind.Array:
                         hash = (hash * 31) + (_payload?.GetHashCode() ?? 0);
                         break;
@@ -260,6 +263,7 @@ namespace ProDataGrid.FormulaEngine
                 FormulaValueKind.Error => AsError().ToString(),
                 FormulaValueKind.Array => $"Array({AsArray().RowCount}x{AsArray().ColumnCount})",
                 FormulaValueKind.Reference => AsReference().ToString(),
+                FormulaValueKind.Lambda => "#CALC!",
                 _ => string.Empty
             };
         }

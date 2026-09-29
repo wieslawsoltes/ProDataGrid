@@ -350,6 +350,11 @@ namespace ProDataGrid.FormulaEngine
                 var current = stack.Pop();
                 switch (current.Kind)
                 {
+                    case FormulaExpressionKind.Invocation:
+                        var invocation = (FormulaInvocationExpression)current;
+                        stack.Push(invocation.Target);
+                        foreach (var argument in invocation.Arguments) stack.Push(argument);
+                        break;
                     case FormulaExpressionKind.Binary:
                         var binary = (FormulaBinaryExpression)current;
                         if (binary.Operator is FormulaBinaryOperator.Union or FormulaBinaryOperator.Intersection)
@@ -441,6 +446,9 @@ namespace ProDataGrid.FormulaEngine
                 {
                     switch (instruction.Kind)
                     {
+                        case FormulaInstructionKind.Invocation:
+                            stack[sp++] = EvaluateInvocation((FormulaInvocationExpression)instruction.Expression!, context, resolver);
+                            break;
                         case FormulaInstructionKind.Literal:
                             var literal = instruction.Literal;
                             if (literal.Kind == FormulaValueKind.Number)
@@ -485,7 +493,7 @@ namespace ProDataGrid.FormulaEngine
                             {
                                 args[i] = stack[--sp];
                             }
-                            stack[sp++] = InvokeFunction(instruction.Name ?? string.Empty, args, context);
+                            stack[sp++] = InvokeFunction(instruction.Name ?? string.Empty, args, context, resolver, instruction.LazyArguments);
                             break;
                         case FormulaInstructionKind.LazyFunctionCall:
                             stack[sp++] = InvokeLazyFunction(
@@ -545,6 +553,8 @@ namespace ProDataGrid.FormulaEngine
         {
             switch (expression.Kind)
             {
+                case FormulaExpressionKind.Invocation:
+                    return EvaluateInvocation((FormulaInvocationExpression)expression, context, resolver);
                 case FormulaExpressionKind.Literal:
                     var literal = ((FormulaLiteralExpression)expression).Value;
                     if (literal.Kind == FormulaValueKind.Number)
@@ -584,6 +594,7 @@ namespace ProDataGrid.FormulaEngine
             FormulaEvaluationContext context,
             IFormulaValueResolver resolver)
         {
+            if (context.LocalScope != null && context.LocalScope.TryGet(name, out var local, out _)) return local;
             if (resolver.TryResolveName(context, name, out var value))
             {
                 return value;
@@ -1371,81 +1382,44 @@ namespace ProDataGrid.FormulaEngine
             FormulaFunctionCallExpression expression,
             FormulaEvaluationContext context,
             IFormulaValueResolver resolver)
+            => InvokeLazyFunction(expression.Name, expression.Arguments, context, resolver);
+
+        private FormulaValue InvokeFunction(string name, IReadOnlyList<FormulaValue> args,
+            FormulaEvaluationContext context, IFormulaValueResolver resolver,
+            IReadOnlyList<FormulaExpression>? expressions = null)
         {
-            if (!context.FunctionRegistry.TryGetFunction(expression.Name, out var function))
+            if (context.LocalScope != null && context.LocalScope.TryGet(name, out var local, out _))
             {
-                return FormulaValue.FromError(new FormulaError(FormulaErrorType.Name));
+                if (local.Kind == FormulaValueKind.Error) return local;
+                return local.Kind == FormulaValueKind.Lambda
+                    ? InvokeLambda(local.AsLambda(), args, context, resolver, GetOmissions(expressions, context))
+                    : FormulaValue.FromError(new FormulaError(FormulaErrorType.Value));
             }
-
-            if (!ValidateArguments(function.Info, expression.Arguments.Count))
-            {
-                return FormulaValue.FromError(new FormulaError(FormulaErrorType.Value));
-            }
-
-            var functionContext = new FormulaFunctionContext(context);
-            if (function is ILazyFormulaFunction lazyFunction)
-            {
-                return lazyFunction.InvokeLazy(functionContext, expression.Arguments, this, resolver);
-            }
-
-            var args = new List<FormulaValue>(expression.Arguments.Count);
-            foreach (var argument in expression.Arguments)
-            {
-                var value = EvaluateCore(argument, context, resolver);
-                args.Add(value);
-            }
-
-            return function.Invoke(functionContext, args);
-        }
-
-        private FormulaValue InvokeFunction(
-            string name,
-            IReadOnlyList<FormulaValue> args,
-            FormulaEvaluationContext context)
-        {
             if (!context.FunctionRegistry.TryGetFunction(name, out var function))
-            {
                 return FormulaValue.FromError(new FormulaError(FormulaErrorType.Name));
-            }
-
             if (!ValidateArguments(function.Info, args.Count))
-            {
                 return FormulaValue.FromError(new FormulaError(FormulaErrorType.Value));
-            }
-
-            var functionContext = new FormulaFunctionContext(context);
-            return function.Invoke(functionContext, args);
+            return function.Invoke(new FormulaFunctionContext(context), args);
         }
 
-        private FormulaValue InvokeLazyFunction(
-            string name,
-            IReadOnlyList<FormulaExpression> arguments,
-            FormulaEvaluationContext context,
-            IFormulaValueResolver resolver)
+        private FormulaValue InvokeLazyFunction(string name, IReadOnlyList<FormulaExpression> arguments,
+            FormulaEvaluationContext context, IFormulaValueResolver resolver)
         {
+            if (context.LocalScope != null && context.LocalScope.TryGet(name, out var local, out _))
+                return InvokeLambdaExpressions(local, arguments, context, resolver);
             if (!context.FunctionRegistry.TryGetFunction(name, out var function))
             {
-                return FormulaValue.FromError(new FormulaError(FormulaErrorType.Name));
+                return resolver.TryResolveName(context, name, out var named)
+                    ? InvokeLambdaExpressions(named, arguments, context, resolver)
+                    : FormulaValue.FromError(new FormulaError(FormulaErrorType.Name));
             }
-
             if (!ValidateArguments(function.Info, arguments.Count))
-            {
                 return FormulaValue.FromError(new FormulaError(FormulaErrorType.Value));
-            }
-
             if (function is ILazyFormulaFunction lazy)
-            {
-                var functionContext = new FormulaFunctionContext(context);
-                return lazy.InvokeLazy(functionContext, arguments, this, resolver);
-            }
-
-            var values = new FormulaValue[arguments.Count];
-            for (var i = 0; i < arguments.Count; i++)
-            {
-                values[i] = EvaluateCore(arguments[i], context, resolver);
-            }
-
-            return InvokeFunction(name, values, context);
+                return lazy.InvokeLazy(new FormulaFunctionContext(context), arguments, this, resolver);
+            var values = arguments.Count == 0 ? Array.Empty<FormulaValue>() : new FormulaValue[arguments.Count];
+            for (var i = 0; i < arguments.Count; i++) values[i] = EvaluateCore(arguments[i], context, resolver);
+            return InvokeFunction(name, values, context, resolver, arguments);
         }
 
         private static bool ValidateArguments(FormulaFunctionInfo info, int count)

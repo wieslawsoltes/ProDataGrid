@@ -29,7 +29,7 @@ namespace ProDataGrid.FormulaEngine
         public bool IsArgumentOmitted(FormulaExpression expression)
         {
             if (expression == null) throw new ArgumentNullException(nameof(expression));
-            return expression is FormulaMissingExpression ||
+            return expression is FormulaLiteralExpression { IsOmitted: true } ||
                 (expression is FormulaNameExpression name && LocalScope != null &&
                  LocalScope.TryGet(name.Name, out _, out var omitted) && omitted);
         }
