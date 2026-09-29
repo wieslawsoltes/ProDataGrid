@@ -1,0 +1,43 @@
+name: Formula text and Unicode validation
+on:
+  push:
+    branches: [work/formula-text-unicode]
+permissions:
+  contents: write
+jobs:
+  validate:
+    if: github.repository == 'wieslawsoltes/ProDataGrid'
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: work/formula-text-unicode
+      - uses: actions/setup-dotnet@v4
+        with:
+          global-json-file: global.json
+      - name: Apply guarded registration and existing text-function improvements
+        run: python3 tools/apply-text-integration.py
+      - name: Execute all formula regressions and both library targets
+        run: |
+          git diff --check
+          dotnet test src/ProDataGrid.FormulaEngine.UnitTests/ProDataGrid.FormulaEngine.UnitTests.csproj -c Release --logger trx --results-directory artifacts/tests
+          dotnet build src/ProDataGrid.FormulaEngine.Excel/ProDataGrid.FormulaEngine.Excel.csproj -c Release
+      - name: Commit and push the validated production edits
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add src/ProDataGrid.FormulaEngine.Excel/ExcelFunctionRegistry.cs src/ProDataGrid.FormulaEngine.Excel/ExcelFunctionRegistry.Extensions.cs
+          git commit -m 'Integrate vectorized text formulas and configurable Unicode character indexing'
+          git push origin HEAD:work/formula-text-unicode
+      - name: Export validation source
+        if: always()
+        run: |
+          mkdir -p artifacts
+          git archive HEAD > artifacts/source.tar
+          git rev-parse HEAD > artifacts/revision.txt
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: formula-text-validation
+          path: artifacts
