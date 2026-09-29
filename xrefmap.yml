@@ -70468,6 +70468,25 @@ references:
   isSpec: "True"
   fullName: ProCharts.Avalonia.ChartClipboardFormats.Svg
   nameWithType: ChartClipboardFormats.Svg
+- uid: ProCharts.Avalonia.ChartDataSourceDispatch
+  name: ChartDataSourceDispatch
+  href: api/ProCharts.Avalonia.ChartDataSourceDispatch.html
+  commentId: T:ProCharts.Avalonia.ChartDataSourceDispatch
+  fullName: ProCharts.Avalonia.ChartDataSourceDispatch
+  nameWithType: ChartDataSourceDispatch
+- uid: ProCharts.Avalonia.ChartDataSourceDispatch.Create(ProCharts.IChartDataSource,System.Nullable{Avalonia.Threading.DispatcherPriority})
+  name: Create(IChartDataSource, DispatcherPriority?)
+  href: api/ProCharts.Avalonia.ChartDataSourceDispatch.html#ProCharts_Avalonia_ChartDataSourceDispatch_Create_ProCharts_IChartDataSource_System_Nullable_Avalonia_Threading_DispatcherPriority__
+  commentId: M:ProCharts.Avalonia.ChartDataSourceDispatch.Create(ProCharts.IChartDataSource,System.Nullable{Avalonia.Threading.DispatcherPriority})
+  fullName: ProCharts.Avalonia.ChartDataSourceDispatch.Create(ProCharts.IChartDataSource, Avalonia.Threading.DispatcherPriority?)
+  nameWithType: ChartDataSourceDispatch.Create(IChartDataSource, DispatcherPriority?)
+- uid: ProCharts.Avalonia.ChartDataSourceDispatch.Create*
+  name: Create
+  href: api/ProCharts.Avalonia.ChartDataSourceDispatch.html#ProCharts_Avalonia_ChartDataSourceDispatch_Create_
+  commentId: Overload:ProCharts.Avalonia.ChartDataSourceDispatch.Create
+  isSpec: "True"
+  fullName: ProCharts.Avalonia.ChartDataSourceDispatch.Create
+  nameWithType: ChartDataSourceDispatch.Create
 - uid: ProCharts.Avalonia.ChartHierarchyNavigation
   name: ChartHierarchyNavigation
   href: api/ProCharts.Avalonia.ChartHierarchyNavigation.html
@@ -75338,6 +75357,131 @@ references:
   isSpec: "True"
   fullName: ProCharts.ChartValueFormatter.Format
   nameWithType: ChartValueFormatter.Format
+- uid: ProCharts.CoalescingChartDataSource
+  name: CoalescingChartDataSource
+  href: api/ProCharts.CoalescingChartDataSource.html
+  commentId: T:ProCharts.CoalescingChartDataSource
+  fullName: ProCharts.CoalescingChartDataSource
+  nameWithType: CoalescingChartDataSource
+- uid: ProCharts.CoalescingChartDataSource.#ctor(ProCharts.IChartDataSource,System.Threading.SynchronizationContext)
+  name: CoalescingChartDataSource(IChartDataSource, SynchronizationContext)
+  href: api/ProCharts.CoalescingChartDataSource.html#ProCharts_CoalescingChartDataSource__ctor_ProCharts_IChartDataSource_System_Threading_SynchronizationContext_
+  commentId: M:ProCharts.CoalescingChartDataSource.#ctor(ProCharts.IChartDataSource,System.Threading.SynchronizationContext)
+  name.vb: New(IChartDataSource, SynchronizationContext)
+  fullName: ProCharts.CoalescingChartDataSource.CoalescingChartDataSource(ProCharts.IChartDataSource, System.Threading.SynchronizationContext)
+  fullName.vb: ProCharts.CoalescingChartDataSource.New(ProCharts.IChartDataSource, System.Threading.SynchronizationContext)
+  nameWithType: CoalescingChartDataSource.CoalescingChartDataSource(IChartDataSource, SynchronizationContext)
+  nameWithType.vb: CoalescingChartDataSource.New(IChartDataSource, SynchronizationContext)
+- uid: ProCharts.CoalescingChartDataSource.#ctor*
+  name: CoalescingChartDataSource
+  href: api/ProCharts.CoalescingChartDataSource.html#ProCharts_CoalescingChartDataSource__ctor_
+  commentId: Overload:ProCharts.CoalescingChartDataSource.#ctor
+  isSpec: "True"
+  name.vb: New
+  fullName: ProCharts.CoalescingChartDataSource.CoalescingChartDataSource
+  fullName.vb: ProCharts.CoalescingChartDataSource.New
+  nameWithType: CoalescingChartDataSource.CoalescingChartDataSource
+  nameWithType.vb: CoalescingChartDataSource.New
+- uid: ProCharts.CoalescingChartDataSource.BuildSnapshot(ProCharts.ChartDataRequest)
+  name: BuildSnapshot(ChartDataRequest)
+  href: api/ProCharts.CoalescingChartDataSource.html#ProCharts_CoalescingChartDataSource_BuildSnapshot_ProCharts_ChartDataRequest_
+  commentId: M:ProCharts.CoalescingChartDataSource.BuildSnapshot(ProCharts.ChartDataRequest)
+  fullName: ProCharts.CoalescingChartDataSource.BuildSnapshot(ProCharts.ChartDataRequest)
+  nameWithType: CoalescingChartDataSource.BuildSnapshot(ChartDataRequest)
+- uid: ProCharts.CoalescingChartDataSource.BuildSnapshot*
+  name: BuildSnapshot
+  href: api/ProCharts.CoalescingChartDataSource.html#ProCharts_CoalescingChartDataSource_BuildSnapshot_
+  commentId: Overload:ProCharts.CoalescingChartDataSource.BuildSnapshot
+  isSpec: "True"
+  fullName: ProCharts.CoalescingChartDataSource.BuildSnapshot
+  nameWithType: CoalescingChartDataSource.BuildSnapshot
+- uid: ProCharts.CoalescingChartDataSource.DataInvalidated
+  name: DataInvalidated
+  href: api/ProCharts.CoalescingChartDataSource.html#ProCharts_CoalescingChartDataSource_DataInvalidated
+  commentId: E:ProCharts.CoalescingChartDataSource.DataInvalidated
+  fullName: ProCharts.CoalescingChartDataSource.DataInvalidated
+  nameWithType: CoalescingChartDataSource.DataInvalidated
+- uid: ProCharts.CoalescingChartDataSource.Dispose
+  name: Dispose()
+  href: api/ProCharts.CoalescingChartDataSource.html#ProCharts_CoalescingChartDataSource_Dispose
+  commentId: M:ProCharts.CoalescingChartDataSource.Dispose
+  fullName: ProCharts.CoalescingChartDataSource.Dispose()
+  nameWithType: CoalescingChartDataSource.Dispose()
+- uid: ProCharts.CoalescingChartDataSource.Dispose*
+  name: Dispose
+  href: api/ProCharts.CoalescingChartDataSource.html#ProCharts_CoalescingChartDataSource_Dispose_
+  commentId: Overload:ProCharts.CoalescingChartDataSource.Dispose
+  isSpec: "True"
+  fullName: ProCharts.CoalescingChartDataSource.Dispose
+  nameWithType: CoalescingChartDataSource.Dispose
+- uid: ProCharts.CoalescingChartDataSource.GetTotalCategoryCount
+  name: GetTotalCategoryCount()
+  href: api/ProCharts.CoalescingChartDataSource.html#ProCharts_CoalescingChartDataSource_GetTotalCategoryCount
+  commentId: M:ProCharts.CoalescingChartDataSource.GetTotalCategoryCount
+  fullName: ProCharts.CoalescingChartDataSource.GetTotalCategoryCount()
+  nameWithType: CoalescingChartDataSource.GetTotalCategoryCount()
+- uid: ProCharts.CoalescingChartDataSource.GetTotalCategoryCount*
+  name: GetTotalCategoryCount
+  href: api/ProCharts.CoalescingChartDataSource.html#ProCharts_CoalescingChartDataSource_GetTotalCategoryCount_
+  commentId: Overload:ProCharts.CoalescingChartDataSource.GetTotalCategoryCount
+  isSpec: "True"
+  fullName: ProCharts.CoalescingChartDataSource.GetTotalCategoryCount
+  nameWithType: CoalescingChartDataSource.GetTotalCategoryCount
+- uid: ProCharts.CoalescingChartDataSource.HasPendingUpdate
+  name: HasPendingUpdate
+  href: api/ProCharts.CoalescingChartDataSource.html#ProCharts_CoalescingChartDataSource_HasPendingUpdate
+  commentId: P:ProCharts.CoalescingChartDataSource.HasPendingUpdate
+  fullName: ProCharts.CoalescingChartDataSource.HasPendingUpdate
+  nameWithType: CoalescingChartDataSource.HasPendingUpdate
+- uid: ProCharts.CoalescingChartDataSource.HasPendingUpdate*
+  name: HasPendingUpdate
+  href: api/ProCharts.CoalescingChartDataSource.html#ProCharts_CoalescingChartDataSource_HasPendingUpdate_
+  commentId: Overload:ProCharts.CoalescingChartDataSource.HasPendingUpdate
+  isSpec: "True"
+  fullName: ProCharts.CoalescingChartDataSource.HasPendingUpdate
+  nameWithType: CoalescingChartDataSource.HasPendingUpdate
+- uid: ProCharts.CoalescingChartDataSource.IsDisposed
+  name: IsDisposed
+  href: api/ProCharts.CoalescingChartDataSource.html#ProCharts_CoalescingChartDataSource_IsDisposed
+  commentId: P:ProCharts.CoalescingChartDataSource.IsDisposed
+  fullName: ProCharts.CoalescingChartDataSource.IsDisposed
+  nameWithType: CoalescingChartDataSource.IsDisposed
+- uid: ProCharts.CoalescingChartDataSource.IsDisposed*
+  name: IsDisposed
+  href: api/ProCharts.CoalescingChartDataSource.html#ProCharts_CoalescingChartDataSource_IsDisposed_
+  commentId: Overload:ProCharts.CoalescingChartDataSource.IsDisposed
+  isSpec: "True"
+  fullName: ProCharts.CoalescingChartDataSource.IsDisposed
+  nameWithType: CoalescingChartDataSource.IsDisposed
+- uid: ProCharts.CoalescingChartDataSource.RequestRefresh
+  name: RequestRefresh()
+  href: api/ProCharts.CoalescingChartDataSource.html#ProCharts_CoalescingChartDataSource_RequestRefresh
+  commentId: M:ProCharts.CoalescingChartDataSource.RequestRefresh
+  fullName: ProCharts.CoalescingChartDataSource.RequestRefresh()
+  nameWithType: CoalescingChartDataSource.RequestRefresh()
+- uid: ProCharts.CoalescingChartDataSource.RequestRefresh*
+  name: RequestRefresh
+  href: api/ProCharts.CoalescingChartDataSource.html#ProCharts_CoalescingChartDataSource_RequestRefresh_
+  commentId: Overload:ProCharts.CoalescingChartDataSource.RequestRefresh
+  isSpec: "True"
+  fullName: ProCharts.CoalescingChartDataSource.RequestRefresh
+  nameWithType: CoalescingChartDataSource.RequestRefresh
+- uid: ProCharts.CoalescingChartDataSource.TryBuildUpdate(ProCharts.ChartDataRequest,ProCharts.ChartDataSnapshot,ProCharts.ChartDataUpdate@)
+  name: TryBuildUpdate(ChartDataRequest, ChartDataSnapshot, out ChartDataUpdate)
+  href: api/ProCharts.CoalescingChartDataSource.html#ProCharts_CoalescingChartDataSource_TryBuildUpdate_ProCharts_ChartDataRequest_ProCharts_ChartDataSnapshot_ProCharts_ChartDataUpdate__
+  commentId: M:ProCharts.CoalescingChartDataSource.TryBuildUpdate(ProCharts.ChartDataRequest,ProCharts.ChartDataSnapshot,ProCharts.ChartDataUpdate@)
+  name.vb: TryBuildUpdate(ChartDataRequest, ChartDataSnapshot, ChartDataUpdate)
+  fullName: ProCharts.CoalescingChartDataSource.TryBuildUpdate(ProCharts.ChartDataRequest, ProCharts.ChartDataSnapshot, out ProCharts.ChartDataUpdate)
+  fullName.vb: ProCharts.CoalescingChartDataSource.TryBuildUpdate(ProCharts.ChartDataRequest, ProCharts.ChartDataSnapshot, ProCharts.ChartDataUpdate)
+  nameWithType: CoalescingChartDataSource.TryBuildUpdate(ChartDataRequest, ChartDataSnapshot, out ChartDataUpdate)
+  nameWithType.vb: CoalescingChartDataSource.TryBuildUpdate(ChartDataRequest, ChartDataSnapshot, ChartDataUpdate)
+- uid: ProCharts.CoalescingChartDataSource.TryBuildUpdate*
+  name: TryBuildUpdate
+  href: api/ProCharts.CoalescingChartDataSource.html#ProCharts_CoalescingChartDataSource_TryBuildUpdate_
+  commentId: Overload:ProCharts.CoalescingChartDataSource.TryBuildUpdate
+  isSpec: "True"
+  fullName: ProCharts.CoalescingChartDataSource.TryBuildUpdate
+  nameWithType: CoalescingChartDataSource.TryBuildUpdate
 - uid: ProCharts.HierarchyChartDataSource
   name: HierarchyChartDataSource
   href: api/ProCharts.HierarchyChartDataSource.html

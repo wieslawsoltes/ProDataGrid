@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+      <title>Coalesced chart updates and worker-to-UI delivery | ProDataGrid for Avalonia </title>
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <meta name="title" content="Coalesced chart updates and worker-to-UI delivery | ProDataGrid for Avalonia ">
+      
+      
+      <link rel="icon" href="../favicon.ico">
+      <link rel="stylesheet" href="../public/docfx.min.css">
+      <link rel="stylesheet" href="../public/main.css">
+      <meta name="docfx:navrel" content="../toc.html">
+      <meta name="docfx:tocrel" content="toc.html">
+      
+      
+      
+      
+      <meta name="docfx:docurl" content="https://github.com/wieslawsoltes/ProDataGrid/blob/master/docfx/articles/procharts-update-delivery.md/#L1">
+      <meta name="loc:inThisArticle" content="In this article">
+      <meta name="loc:searchResultsCount" content="{count} results for &quot;{query}&quot;">
+      <meta name="loc:searchNoResults" content="No results for &quot;{query}&quot;">
+      <meta name="loc:tocFilter" content="Filter by title">
+      <meta name="loc:nextArticle" content="Next">
+      <meta name="loc:prevArticle" content="Previous">
+      <meta name="loc:themeLight" content="Light">
+      <meta name="loc:themeDark" content="Dark">
+      <meta name="loc:themeAuto" content="Auto">
+      <meta name="loc:changeTheme" content="Change theme">
+      <meta name="loc:copy" content="Copy">
+      <meta name="loc:downloadPdf" content="Download PDF">
+
+      <script type="module" src="./../public/docfx.min.js"></script>
+
+      <script>
+        const theme = localStorage.getItem('theme') || 'auto'
+        document.documentElement.setAttribute('data-bs-theme', theme === 'auto' ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light') : theme)
+      </script>
+
+  </head>
+
+  <body class="tex2jax_ignore" data-layout="" data-yaml-mime="">
+    <header class="bg-body border-bottom">
+      <nav id="autocollapse" class="navbar navbar-expand-md" role="navigation">
+        <div class="container-xxl flex-nowrap">
+          <a class="navbar-brand" href="../index.html">
+            <img id="logo" class="svg" src="../images/logo.svg" alt="">
+            
+          </a>
+          <button class="btn btn-lg d-md-none border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navpanel" aria-controls="navpanel" aria-expanded="false" aria-label="Toggle navigation">
+            <i class="bi bi-three-dots"></i>
+          </button>
+          <div class="collapse navbar-collapse" id="navpanel">
+            <div id="navbar">
+            </div>
+          </div>
+        </div>
+      </nav>
+    </header>
+
+    <main class="container-xxl">
+      <div class="toc-offcanvas">
+        <div class="offcanvas-md offcanvas-start" tabindex="-1" id="tocOffcanvas" aria-labelledby="tocOffcanvasLabel">
+          <div class="offcanvas-header">
+            <h5 class="offcanvas-title" id="tocOffcanvasLabel">Table of Contents</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="offcanvas" data-bs-target="#tocOffcanvas" aria-label="Close"></button>
+          </div>
+          <div class="offcanvas-body">
+            <nav class="toc" id="toc"></nav>
+          </div>
+        </div>
+      </div>
+
+      <div class="content">
+        <div class="actionbar">
+          <button class="btn btn-lg border-0 d-md-none" type="button" data-bs-toggle="offcanvas" data-bs-target="#tocOffcanvas" aria-controls="tocOffcanvas" aria-expanded="false" aria-label="Show table of contents">
+            <i class="bi bi-list"></i>
+          </button>
+
+          <nav id="breadcrumb"></nav>
+        </div>
+
+        <article data-uid="">
+<h1 id="coalesced-chart-updates-and-worker-to-ui-delivery">Coalesced chart updates and worker-to-UI delivery</h1>
+
+<p><code>CoalescingChartDataSource</code> combines source invalidations that arrive before a consumer callback is serviced. Accepted source observations are unchanged; intermediate presentation snapshots are intentionally skipped. This is useful when a producer emits many small updates and the consumer otherwise rebuilds its snapshot for every event.</p>
+<h2 id="avalonia-integration">Avalonia integration</h2>
+<p>Create and bind the adapter on the UI thread, and keep it alive for the consumer model's lifetime:</p>
+<pre><code class="lang-csharp">using ProCharts;
+using ProCharts.Avalonia;
+
+// Run this setup on the Avalonia UI thread. Keep these objects in the owning component.
+var source = new StreamingRangeChartDataSource(65_536, &quot;Live envelope&quot;);
+using var delivered = ChartDataSourceDispatch.Create(source);
+using var model = new ChartModel();
+using (model.DeferRefresh())
+{
+    model.CategoryAxis.Kind = ChartAxisKind.Value;
+    model.Request.DownsampleMode = ChartDownsampleMode.MinMax;
+    model.Request.MaxPoints = 2_000;
+    model.DataSource = delivered;
+}
+// Bind model to ProChartView.ChartModel while this owner is alive.
+// A producer may append to source; do not mutate model, its requests or the view on a worker.
+// At shutdown, stop/join the producer as appropriate, then dispose model followed by delivered.
+</code></pre>
+<p>The <code>using</code> declarations illustrate ownership/disposal order, not a factory that returns already disposed objects. In a long-lived application component, keep both as fields and dispose them when that component closes. The adapter does not own or dispose the underlying source. Independently dispose any source that implements its own disposal contract.</p>
+<p><code>ChartDataSourceDispatch.Create(source, priority)</code> uses the Avalonia UI dispatcher; the default priority is Background. It requires UI-thread construction and does not change a global synchronization context. A burst normally produces one queued delivery. The UI context decides when to service it: this is not a fixed-rate throttle, timer, debounce interval, vsync scheduler or guarantee of one redraw per frame. Actual UI scheduling and rendering may allocate resources independently of this adapter.</p>
+<h2 id="ui-independent-scheduling">UI-independent scheduling</h2>
+<p>The core adapter only depends on <code>IChartDataSource</code> and an explicit <code>System.Threading.SynchronizationContext</code>:</p>
+<pre><code class="lang-csharp">using var delivered = new CoalescingChartDataSource(source, consumerContext);
+</code></pre>
+<p>The context must implement <code>Post</code> asynchronously, invoke each successfully posted callback exactly once, and not enqueue a callback when <code>Post</code> throws. The adapter never silently chooses the thread pool or the current context. Pass the actual consumer's context; a generic thread-pool context does not provide UI affinity.</p>
+<p>There is at most one scheduled or delivering callback. An invalidation during delivery sets pending state and schedules a subsequent callback after subscriber invocation finishes, rather than recursively rebuilding the model. The adapter calls neither external scheduling code nor subscribers while holding its state lock. Concurrent producer invalidations are combined; input ordering and storage remain the wrapped source's responsibility.</p>
+<h2 id="data-incremental-updates-and-thread-safety">Data, incremental updates and thread safety</h2>
+<p><strong>Only notifications are dispatched.</strong> <code>BuildSnapshot</code>, <code>TryBuildUpdate</code> and the retained-count provider run synchronously on their caller's thread. The adapter does not copy data, virtualize storage, make a mutable collection thread-safe or serialize a non-thread-safe source's operations. Use a source that supports the real concurrent producer/consumer pattern, such as the bounded streaming sources, or provide an application-level data ownership boundary. Source request objects and model state still belong to the consumer thread.</p>
+<p>The adapter forwards <code>IChartIncrementalDataSource.TryBuildUpdate</code> with the consumer's actual previous snapshot. An incremental source must handle that snapshot/version gap correctly or return false, allowing a full rebuild. The adapter does not invent a delta for a skipped presentation state. <code>IChartWindowInfoProvider</code> is forwarded when supported, preserving follow-latest/window behavior.</p>
+<p>Reading a snapshot manually does not consume a queued invalidation: subscribers may still need that notification. <code>RequestRefresh()</code> explicitly schedules one, coalescing with pending work. No event is posted merely by constructing the adapter. <code>HasPendingUpdate</code> reports invalidations not yet consumed by delivery; a running callback has consumed its original invalidation, but additional producer work can set the property true again.</p>
+<p>The adapter does not drop accepted observations. Nevertheless, a bounded source may evict old observations according to its own capacity, and coalescing deliberately does not display every intermediate state. Persist/process observations at the producer when every transition matters; chart presentation is not an audit log. Stateful indicators should still consume every relevant observation before display notification reduction.</p>
+<h2 id="exceptions-and-lifecycle">Exceptions and lifecycle</h2>
+<p>A failed <code>Post</code> leaves the update pending and clears the scheduled flag. The exception propagates to the caller that attempted scheduling. A later source invalidation or <code>RequestRefresh()</code> retries; no automatic retry loop or background timer is created. Subscriber exceptions propagate on the consumer context. Cleanup in <code>finally</code> allows future updates to schedule and preserves invalidations received during the failing callback. Applications must handle/report exceptions at their normal dispatcher boundary.</p>
+<p><code>Dispose()</code> detaches the source handler, releases subscribers and suppresses queued callbacks that have not begun delivery. It is idempotent and does not wait for already delivering subscribers or in-flight source reads. A callback that already captured its subscribers may finish. Stop producers and coordinate consumer shutdown explicitly when the application requires stricter ordering. Public reads/new subscriptions/RequestRefresh after disposal fail; removing a subscription remains safe.</p>
+<p>Source and queued subscriptions contain only a weak adapter reference. Abandoning an adapter therefore does not let a never-serviced dispatcher callback retain the model/source object graph. Deterministic disposal is still recommended to detach immediately. Underlying data source ownership is never transferred.</p>
+<h2 id="performance-choices-and-verification">Performance choices and verification</h2>
+<p>Producer-side <code>AppendRange</code> is often the simpler solution when the feed can form batches itself. <code>ChartModel.DeferRefresh()</code> combines consumer-side configuration changes. Coalescing adds an explicit scheduling boundary when independent/small producer notifications would otherwise rebuild the model many times. These mechanisms can be composed, but fewer presentation callbacks do not make an individual snapshot scan or renderer faster.</p>
+<p>The core adapter performs no per-invalidation managed allocation after construction when used with a reusable test queue; real contexts can allocate scheduled jobs, and snapshot creation/subscribers can allocate independently. Steady-state tests distinguish adapter cost from source and scheduler cost.</p>
+<p>The existing range-streaming benchmark now includes immediate scalar delivery, coalesced scalar delivery and the existing producer-batch alternative. It processes identical observations through actual <code>ChartModel</code> instances, verifies final numerical arrays and counts, and reports intermediate snapshot counts explicitly. It uses a deterministic same-thread queue to isolate policy cost, not to time physical UI scheduling. Headless tests separately validate a worker producer's actual Avalonia UI-thread delivery, native export and hit mapping.</p>
+<pre><code class="lang-sh">dotnet run --project tests/ProCharts.RangeStreaming.Benchmarks/ProCharts.RangeStreaming.Benchmarks.csproj -c Release
+</code></pre>
+<p>The read-only charting workflow retains raw results in <code>range-streaming-performance.txt</code> beside its tests and <code>CoalescedWorkerRange</code> PNG/SVG preview. Two warmups and seven rotating-order runs are measured. No GPU throughput, screen presentation, peak memory, worst-case latency or FPS improvement is implied.</p>
+
+</article>
+
+        <div class="contribution d-print-none">
+          <a href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/docfx/articles/procharts-update-delivery.md/#L1" class="edit-link">Edit this page</a>
+        </div>
+
+        <div class="next-article d-print-none border-top" id="nextArticle"></div>
+
+      </div>
+
+      <div class="affix">
+        <nav id="affix"></nav>
+      </div>
+    </main>
+
+
+    <footer class="border-top text-secondary">
+      <div class="container-xxl">
+        <div class="flex-fill">
+          <span>Made with <a href="https://dotnet.github.io/docfx">docfx</a></span>
+        </div>
+      </div>
+    </footer>
+  </body>
+</html>

@@ -100,8 +100,13 @@ model.Request.WindowCount = 1000;
 <pre><code class="lang-csharp">model.Request.MaxPoints = 2000;
 model.Request.DownsampleMode = ChartDownsampleMode.Lttb;
 </code></pre>
+<p>Available modes and exact selection semantics depend on the data source. Range sources require coordinated lower/upper selection and reject Bucket/LTTB rather than independently sampling the boundaries; see <a href="procharts-range-area.html">range areas</a>. Reduction changes the represented geometry and is not a pixel-equivalent rendering optimization.</p>
 <h2 id="incremental-updates">Incremental updates</h2>
-<p>If your data source implements <code>IChartIncrementalDataSource</code>, it can return <code>ChartDataUpdate</code> with a <code>ChartDataDelta</code> so the renderer avoids full rebuilds.</p>
+<p>If your data source implements <code>IChartIncrementalDataSource</code>, it can return <code>ChartDataUpdate</code> with a <code>ChartDataDelta</code> so the renderer avoids full rebuilds when the delta is supported. Sources must describe changes relative to the supplied previous snapshot or return false for a full rebuild.</p>
+<h2 id="notification-delivery-and-producer-bursts">Notification delivery and producer bursts</h2>
+<p>Avoid rebuilding an owned snapshot for every scalar observation when only the latest presentation state is needed. Use source <code>AppendRange</code> batches where possible. The reusable <code>CoalescingChartDataSource</code> combines queued invalidations on an explicit consumer synchronization context, while <code>ChartDataSourceDispatch.Create</code> provides an Avalonia UI-dispatcher adapter. All accepted source observations remain in the source according to its retention policy; intermediate notifications/snapshots deliberately differ.</p>
+<p>This schedules events only, not data mutations or reads. The source must support the actual concurrent access pattern. It is not a timer, fixed-rate throttle or frame scheduler. Models and adapters have separate lifetimes; see <a href="procharts-update-delivery.html">coalesced updates and worker-to-UI delivery</a> for complete setup, ownership, error and scheduling contracts.</p>
+<p>The range-streaming benchmark compares immediate scalar model refreshes, coalesced scalar delivery and producer batching, including all resulting snapshots and identical final-data checks. Its deterministic pump isolates delivery policy; headless tests separately check actual UI-thread affinity. Neither throughput measurements nor reduced callback counts imply physical-GPU/FPS or UI-latency improvements.</p>
 <h2 id="datagrid-specific-tuning">DataGrid-specific tuning</h2>
 <p><code>DataGridChartModel</code> supports aggregation and group-aware series. For large datasets:</p>
 <ul>
