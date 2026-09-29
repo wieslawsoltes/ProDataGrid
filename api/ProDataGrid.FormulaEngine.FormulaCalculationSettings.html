@@ -596,6 +596,46 @@ Excel row/column limits still apply even when this value is increased.</p>
 
 
 
+  <a id="ProDataGrid_FormulaEngine_FormulaCalculationSettings_MaximumMatrixOperationCount_" data-uid="ProDataGrid.FormulaEngine.FormulaCalculationSettings.MaximumMatrixOperationCount*"></a>
+
+  <h3 id="ProDataGrid_FormulaEngine_FormulaCalculationSettings_MaximumMatrixOperationCount" data-uid="ProDataGrid.FormulaEngine.FormulaCalculationSettings.MaximumMatrixOperationCount">
+  MaximumMatrixOperationCount
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/ProDataGrid.FormulaEngine/FormulaCalculationSettings.Matrix.cs/#L21"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Gets or sets the positive per-call matrix work limit; the default is 100 million work units.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public long MaximumMatrixOperationCount { get; set; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int64">long</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+  <h4 class="section" id="ProDataGrid_FormulaEngine_FormulaCalculationSettings_MaximumMatrixOperationCount_remarks">Remarks</h4>
+  <div class="markdown level1 remarks"><p>MMULT estimates rows * inner dimension * columns, MDETERM estimates n cubed,
+MINVERSE estimates twice n cubed, and MUNIT estimates n squared. Exceeding this host
+resource policy returns #NUM! before allocating matrix workspace. The units are conservative
+loop-work estimates, not elapsed time, exact CPU instructions or an Excel compatibility limit.
+MaximumArrayCellCount also bounds each matrix input snapshot and result. Neither setting is
+a total-workbook memory or execution quota.</p>
+</div>
+
+
+
+
   <a id="ProDataGrid_FormulaEngine_FormulaCalculationSettings_NumberPrecisionDigits_" data-uid="ProDataGrid.FormulaEngine.FormulaCalculationSettings.NumberPrecisionDigits*"></a>
 
   <h3 id="ProDataGrid_FormulaEngine_FormulaCalculationSettings_NumberPrecisionDigits" data-uid="ProDataGrid.FormulaEngine.FormulaCalculationSettings.NumberPrecisionDigits">

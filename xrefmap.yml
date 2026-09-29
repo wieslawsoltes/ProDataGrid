@@ -82330,6 +82330,19 @@ references:
   isSpec: "True"
   fullName: ProDataGrid.FormulaEngine.FormulaCalculationSettings.MaximumLambdaDepth
   nameWithType: FormulaCalculationSettings.MaximumLambdaDepth
+- uid: ProDataGrid.FormulaEngine.FormulaCalculationSettings.MaximumMatrixOperationCount
+  name: MaximumMatrixOperationCount
+  href: api/ProDataGrid.FormulaEngine.FormulaCalculationSettings.html#ProDataGrid_FormulaEngine_FormulaCalculationSettings_MaximumMatrixOperationCount
+  commentId: P:ProDataGrid.FormulaEngine.FormulaCalculationSettings.MaximumMatrixOperationCount
+  fullName: ProDataGrid.FormulaEngine.FormulaCalculationSettings.MaximumMatrixOperationCount
+  nameWithType: FormulaCalculationSettings.MaximumMatrixOperationCount
+- uid: ProDataGrid.FormulaEngine.FormulaCalculationSettings.MaximumMatrixOperationCount*
+  name: MaximumMatrixOperationCount
+  href: api/ProDataGrid.FormulaEngine.FormulaCalculationSettings.html#ProDataGrid_FormulaEngine_FormulaCalculationSettings_MaximumMatrixOperationCount_
+  commentId: Overload:ProDataGrid.FormulaEngine.FormulaCalculationSettings.MaximumMatrixOperationCount
+  isSpec: "True"
+  fullName: ProDataGrid.FormulaEngine.FormulaCalculationSettings.MaximumMatrixOperationCount
+  nameWithType: FormulaCalculationSettings.MaximumMatrixOperationCount
 - uid: ProDataGrid.FormulaEngine.FormulaCalculationSettings.NumberPrecisionDigits
   name: NumberPrecisionDigits
   href: api/ProDataGrid.FormulaEngine.FormulaCalculationSettings.html#ProDataGrid_FormulaEngine_FormulaCalculationSettings_NumberPrecisionDigits
