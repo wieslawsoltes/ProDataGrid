@@ -69,56 +69,24 @@ namespace ProDataGrid.FormulaEngine.Excel
         }
     }
 
-    internal sealed class StdevSFunction : ExcelFunctionBase
+    internal sealed class StdevSFunction : ExcelDescriptiveFunction
     {
-        public StdevSFunction()
-            : base("STDEV.S", new FormulaFunctionInfo(1, -1))
-        {
-        }
-
-        public override FormulaValue Invoke(FormulaFunctionContext context, IReadOnlyList<FormulaValue> args)
-        {
-            return ExcelStatisticalUtilities.StandardDeviation(context.EvaluationContext.Workbook.Settings, args, sample: true);
-        }
+        public StdevSFunction() : base("STDEV.S", ExcelDescriptiveOperation.SampleDeviation) { }
     }
 
-    internal sealed class StdevPFunction : ExcelFunctionBase
+    internal sealed class StdevPFunction : ExcelDescriptiveFunction
     {
-        public StdevPFunction()
-            : base("STDEV.P", new FormulaFunctionInfo(1, -1))
-        {
-        }
-
-        public override FormulaValue Invoke(FormulaFunctionContext context, IReadOnlyList<FormulaValue> args)
-        {
-            return ExcelStatisticalUtilities.StandardDeviation(context.EvaluationContext.Workbook.Settings, args, sample: false);
-        }
+        public StdevPFunction() : base("STDEV.P", ExcelDescriptiveOperation.PopulationDeviation) { }
     }
 
-    internal sealed class VarSFunction : ExcelFunctionBase
+    internal sealed class VarSFunction : ExcelDescriptiveFunction
     {
-        public VarSFunction()
-            : base("VAR.S", new FormulaFunctionInfo(1, -1))
-        {
-        }
-
-        public override FormulaValue Invoke(FormulaFunctionContext context, IReadOnlyList<FormulaValue> args)
-        {
-            return ExcelStatisticalUtilities.Variance(context.EvaluationContext.Workbook.Settings, args, sample: true);
-        }
+        public VarSFunction() : base("VAR.S", ExcelDescriptiveOperation.SampleVariance) { }
     }
 
-    internal sealed class VarPFunction : ExcelFunctionBase
+    internal sealed class VarPFunction : ExcelDescriptiveFunction
     {
-        public VarPFunction()
-            : base("VAR.P", new FormulaFunctionInfo(1, -1))
-        {
-        }
-
-        public override FormulaValue Invoke(FormulaFunctionContext context, IReadOnlyList<FormulaValue> args)
-        {
-            return ExcelStatisticalUtilities.Variance(context.EvaluationContext.Workbook.Settings, args, sample: false);
-        }
+        public VarPFunction() : base("VAR.P", ExcelDescriptiveOperation.PopulationVariance) { }
     }
 
     internal sealed class LargeFunction : ExcelFunctionBase
@@ -709,52 +677,13 @@ namespace ProDataGrid.FormulaEngine.Excel
             return true;
         }
 
-        public static FormulaValue Variance(
-            FormulaCalculationSettings settings,
-            IReadOnlyList<FormulaValue> args,
-            bool sample)
-        {
-            if (!TryCollectNumbers(settings, args, out var numbers, out var error))
-            {
-                return FormulaValue.FromError(error);
-            }
+        public static FormulaValue Variance(FormulaCalculationSettings settings, IReadOnlyList<FormulaValue> args, bool sample)
+            => ExcelDescriptiveFunction.EvaluateValues(settings, args,
+                sample ? ExcelDescriptiveOperation.SampleVariance : ExcelDescriptiveOperation.PopulationVariance);
 
-            if (numbers.Count == 0 || (sample && numbers.Count < 2))
-            {
-                return FormulaValue.FromError(new FormulaError(FormulaErrorType.Div0));
-            }
-
-            var mean = 0d;
-            for (var i = 0; i < numbers.Count; i++)
-            {
-                mean += numbers[i];
-            }
-            mean /= numbers.Count;
-
-            var sumSq = 0d;
-            for (var i = 0; i < numbers.Count; i++)
-            {
-                var delta = numbers[i] - mean;
-                sumSq += delta * delta;
-            }
-
-            var variance = sample ? sumSq / (numbers.Count - 1) : sumSq / numbers.Count;
-            return ExcelFunctionUtilities.CreateNumber(settings, variance);
-        }
-
-        public static FormulaValue StandardDeviation(
-            FormulaCalculationSettings settings,
-            IReadOnlyList<FormulaValue> args,
-            bool sample)
-        {
-            var variance = Variance(settings, args, sample);
-            if (variance.Kind == FormulaValueKind.Error)
-            {
-                return variance;
-            }
-
-            return ExcelFunctionUtilities.CreateNumber(settings, Math.Sqrt(variance.AsNumber()));
-        }
+        public static FormulaValue StandardDeviation(FormulaCalculationSettings settings, IReadOnlyList<FormulaValue> args, bool sample)
+            => ExcelDescriptiveFunction.EvaluateValues(settings, args,
+                sample ? ExcelDescriptiveOperation.SampleDeviation : ExcelDescriptiveOperation.PopulationDeviation);
 
         public static FormulaValue OrderedStatistic(
             FormulaCalculationSettings settings, FormulaValue dataValue, FormulaValue kValue, bool largest)

@@ -28,6 +28,7 @@ internal static partial class Program
             var parser = new ExcelFormulaParser();
             Validate(context, evaluator, resolver, parser);
             ValidateAdditional(context, evaluator, resolver, parser);
+            ValidateDescriptive(context, evaluator, resolver, parser);
             var names = new List<string>();
             foreach (var function in registry.GetAll()) names.Add(function.Name);
             names.Sort(StringComparer.Ordinal);
@@ -75,6 +76,7 @@ internal static partial class Program
                     () => evaluator.Evaluate(expression, context, resolver).AsNumber(), dot);
             }
             MeasureAdditional(output, context, evaluator, resolver, parser);
+            MeasureDescriptive(output, context, reverse);
             File.WriteAllText(Path.Combine(destination, "measurements.csv"), output.ToString());
             Console.Write(output.ToString());
             return 0;
