@@ -9678,6 +9678,20 @@
     },
     {
       "type": "ManagedReference",
+      "source_relative_path": "api/ProCharts.ChartRangeDecimator.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/ProCharts.ChartRangeDecimator.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "ProCharts.ChartRangeDecimator",
+      "Summary": "<p sourcefile=\"api/ProCharts.ChartRangeDecimator.yml\" sourcestartlinenumber=\"1\">Selects one shared set of original indices for both boundaries of an interval chart.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
       "source_relative_path": "api/ProCharts.ChartRangeSeries.yml",
       "output": {
         ".html": {
@@ -9689,6 +9703,20 @@
       "IsMRef": true,
       "Title": "ProCharts.ChartRangeSeries",
       "Summary": "<p sourcefile=\"api/ProCharts.ChartRangeSeries.yml\" sourcestartlinenumber=\"1\">Creates owned interval series and converts analytical bands to filled range areas.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/ProCharts.ChartRangeView.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/ProCharts.ChartRangeView.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "ProCharts.ChartRangeView",
+      "Summary": "<p sourcefile=\"api/ProCharts.ChartRangeView.yml\" sourcestartlinenumber=\"1\">An owned display snapshot and its original source-point mapping.</p>\n"
     },
     {
       "type": "ManagedReference",
@@ -9941,6 +9969,20 @@
       "IsMRef": true,
       "Title": "ProCharts.IStreamingChartIndicator<TInput, TOutput>",
       "Summary": "<p sourcefile=\"api/ProCharts.IStreamingChartIndicator-2.yml\" sourcestartlinenumber=\"1\">A reusable, single-writer indicator that consumes observations without retaining their history.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/ProCharts.RangeChartDataSource.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/ProCharts.RangeChartDataSource.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "ProCharts.RangeChartDataSource",
+      "Summary": "<p sourcefile=\"api/ProCharts.RangeChartDataSource.yml\" sourcestartlinenumber=\"1\">An owned, windowable range-area source with coordinated boundary reduction.</p>\n"
     },
     {
       "type": "ManagedReference",

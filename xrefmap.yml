@@ -73812,6 +73812,28 @@ references:
   commentId: F:ProCharts.ChartPointerTool.Zoom
   fullName: ProCharts.ChartPointerTool.Zoom
   nameWithType: ChartPointerTool.Zoom
+- uid: ProCharts.ChartRangeDecimator
+  name: ChartRangeDecimator
+  href: api/ProCharts.ChartRangeDecimator.html
+  commentId: T:ProCharts.ChartRangeDecimator
+  fullName: ProCharts.ChartRangeDecimator
+  nameWithType: ChartRangeDecimator
+- uid: ProCharts.ChartRangeDecimator.SelectIndices(System.Collections.Generic.IReadOnlyList{System.Nullable{System.Double}},System.Collections.Generic.IReadOnlyList{System.Nullable{System.Double}},System.Int32,System.Int32,System.Nullable{System.Int32})
+  name: SelectIndices(IReadOnlyList<double?>, IReadOnlyList<double?>, int, int, int?)
+  href: api/ProCharts.ChartRangeDecimator.html#ProCharts_ChartRangeDecimator_SelectIndices_System_Collections_Generic_IReadOnlyList_System_Nullable_System_Double___System_Collections_Generic_IReadOnlyList_System_Nullable_System_Double___System_Int32_System_Int32_System_Nullable_System_Int32__
+  commentId: M:ProCharts.ChartRangeDecimator.SelectIndices(System.Collections.Generic.IReadOnlyList{System.Nullable{System.Double}},System.Collections.Generic.IReadOnlyList{System.Nullable{System.Double}},System.Int32,System.Int32,System.Nullable{System.Int32})
+  name.vb: SelectIndices(IReadOnlyList(Of Double?), IReadOnlyList(Of Double?), Integer, Integer, Integer?)
+  fullName: ProCharts.ChartRangeDecimator.SelectIndices(System.Collections.Generic.IReadOnlyList<double?>, System.Collections.Generic.IReadOnlyList<double?>, int, int, int?)
+  fullName.vb: ProCharts.ChartRangeDecimator.SelectIndices(System.Collections.Generic.IReadOnlyList(Of Double?), System.Collections.Generic.IReadOnlyList(Of Double?), Integer, Integer, Integer?)
+  nameWithType: ChartRangeDecimator.SelectIndices(IReadOnlyList<double?>, IReadOnlyList<double?>, int, int, int?)
+  nameWithType.vb: ChartRangeDecimator.SelectIndices(IReadOnlyList(Of Double?), IReadOnlyList(Of Double?), Integer, Integer, Integer?)
+- uid: ProCharts.ChartRangeDecimator.SelectIndices*
+  name: SelectIndices
+  href: api/ProCharts.ChartRangeDecimator.html#ProCharts_ChartRangeDecimator_SelectIndices_
+  commentId: Overload:ProCharts.ChartRangeDecimator.SelectIndices
+  isSpec: "True"
+  fullName: ProCharts.ChartRangeDecimator.SelectIndices
+  nameWithType: ChartRangeDecimator.SelectIndices
 - uid: ProCharts.ChartRangeSeries
   name: ChartRangeSeries
   href: api/ProCharts.ChartRangeSeries.html
@@ -73850,6 +73872,77 @@ references:
   isSpec: "True"
   fullName: ProCharts.ChartRangeSeries.ToRangeArea
   nameWithType: ChartRangeSeries.ToRangeArea
+- uid: ProCharts.ChartRangeView
+  name: ChartRangeView
+  href: api/ProCharts.ChartRangeView.html
+  commentId: T:ProCharts.ChartRangeView
+  fullName: ProCharts.ChartRangeView
+  nameWithType: ChartRangeView
+- uid: ProCharts.ChartRangeView.Snapshot
+  name: Snapshot
+  href: api/ProCharts.ChartRangeView.html#ProCharts_ChartRangeView_Snapshot
+  commentId: P:ProCharts.ChartRangeView.Snapshot
+  fullName: ProCharts.ChartRangeView.Snapshot
+  nameWithType: ChartRangeView.Snapshot
+- uid: ProCharts.ChartRangeView.Snapshot*
+  name: Snapshot
+  href: api/ProCharts.ChartRangeView.html#ProCharts_ChartRangeView_Snapshot_
+  commentId: Overload:ProCharts.ChartRangeView.Snapshot
+  isSpec: "True"
+  fullName: ProCharts.ChartRangeView.Snapshot
+  nameWithType: ChartRangeView.Snapshot
+- uid: ProCharts.ChartRangeView.SourceCount
+  name: SourceCount
+  href: api/ProCharts.ChartRangeView.html#ProCharts_ChartRangeView_SourceCount
+  commentId: P:ProCharts.ChartRangeView.SourceCount
+  fullName: ProCharts.ChartRangeView.SourceCount
+  nameWithType: ChartRangeView.SourceCount
+- uid: ProCharts.ChartRangeView.SourceCount*
+  name: SourceCount
+  href: api/ProCharts.ChartRangeView.html#ProCharts_ChartRangeView_SourceCount_
+  commentId: Overload:ProCharts.ChartRangeView.SourceCount
+  isSpec: "True"
+  fullName: ProCharts.ChartRangeView.SourceCount
+  nameWithType: ChartRangeView.SourceCount
+- uid: ProCharts.ChartRangeView.SourcePointIndices
+  name: SourcePointIndices
+  href: api/ProCharts.ChartRangeView.html#ProCharts_ChartRangeView_SourcePointIndices
+  commentId: P:ProCharts.ChartRangeView.SourcePointIndices
+  fullName: ProCharts.ChartRangeView.SourcePointIndices
+  nameWithType: ChartRangeView.SourcePointIndices
+- uid: ProCharts.ChartRangeView.SourcePointIndices*
+  name: SourcePointIndices
+  href: api/ProCharts.ChartRangeView.html#ProCharts_ChartRangeView_SourcePointIndices_
+  commentId: Overload:ProCharts.ChartRangeView.SourcePointIndices
+  isSpec: "True"
+  fullName: ProCharts.ChartRangeView.SourcePointIndices
+  nameWithType: ChartRangeView.SourcePointIndices
+- uid: ProCharts.ChartRangeView.WindowCount
+  name: WindowCount
+  href: api/ProCharts.ChartRangeView.html#ProCharts_ChartRangeView_WindowCount
+  commentId: P:ProCharts.ChartRangeView.WindowCount
+  fullName: ProCharts.ChartRangeView.WindowCount
+  nameWithType: ChartRangeView.WindowCount
+- uid: ProCharts.ChartRangeView.WindowCount*
+  name: WindowCount
+  href: api/ProCharts.ChartRangeView.html#ProCharts_ChartRangeView_WindowCount_
+  commentId: Overload:ProCharts.ChartRangeView.WindowCount
+  isSpec: "True"
+  fullName: ProCharts.ChartRangeView.WindowCount
+  nameWithType: ChartRangeView.WindowCount
+- uid: ProCharts.ChartRangeView.WindowStart
+  name: WindowStart
+  href: api/ProCharts.ChartRangeView.html#ProCharts_ChartRangeView_WindowStart
+  commentId: P:ProCharts.ChartRangeView.WindowStart
+  fullName: ProCharts.ChartRangeView.WindowStart
+  nameWithType: ChartRangeView.WindowStart
+- uid: ProCharts.ChartRangeView.WindowStart*
+  name: WindowStart
+  href: api/ProCharts.ChartRangeView.html#ProCharts_ChartRangeView_WindowStart_
+  commentId: Overload:ProCharts.ChartRangeView.WindowStart
+  isSpec: "True"
+  fullName: ProCharts.ChartRangeView.WindowStart
+  nameWithType: ChartRangeView.WindowStart
 - uid: ProCharts.ChartSample
   name: ChartSample
   href: api/ProCharts.ChartSample.html
@@ -75430,6 +75523,170 @@ references:
   fullName.vb: ProCharts.IStreamingChartIndicator(Of TInput, TOutput).SamplesProcessed
   nameWithType: IStreamingChartIndicator<TInput, TOutput>.SamplesProcessed
   nameWithType.vb: IStreamingChartIndicator(Of TInput, TOutput).SamplesProcessed
+- uid: ProCharts.RangeChartDataSource
+  name: RangeChartDataSource
+  href: api/ProCharts.RangeChartDataSource.html
+  commentId: T:ProCharts.RangeChartDataSource
+  fullName: ProCharts.RangeChartDataSource
+  nameWithType: RangeChartDataSource
+- uid: ProCharts.RangeChartDataSource.#ctor(System.String,System.Collections.Generic.IReadOnlyList{System.Nullable{System.Double}},System.Collections.Generic.IReadOnlyList{System.Nullable{System.Double}},System.Collections.Generic.IReadOnlyList{System.Double},System.Collections.Generic.IReadOnlyList{System.String},ProCharts.ChartValueAxisAssignment,ProCharts.ChartSeriesStyle,System.Func{System.Double,System.String},ProCharts.ChartAxisKind)
+  name: RangeChartDataSource(string?, IReadOnlyList<double?>, IReadOnlyList<double?>, IReadOnlyList<double>?, IReadOnlyList<string?>?, ChartValueAxisAssignment, ChartSeriesStyle?, Func<double, string>?, ChartAxisKind)
+  href: api/ProCharts.RangeChartDataSource.html#ProCharts_RangeChartDataSource__ctor_System_String_System_Collections_Generic_IReadOnlyList_System_Nullable_System_Double___System_Collections_Generic_IReadOnlyList_System_Nullable_System_Double___System_Collections_Generic_IReadOnlyList_System_Double__System_Collections_Generic_IReadOnlyList_System_String__ProCharts_ChartValueAxisAssignment_ProCharts_ChartSeriesStyle_System_Func_System_Double_System_String__ProCharts_ChartAxisKind_
+  commentId: M:ProCharts.RangeChartDataSource.#ctor(System.String,System.Collections.Generic.IReadOnlyList{System.Nullable{System.Double}},System.Collections.Generic.IReadOnlyList{System.Nullable{System.Double}},System.Collections.Generic.IReadOnlyList{System.Double},System.Collections.Generic.IReadOnlyList{System.String},ProCharts.ChartValueAxisAssignment,ProCharts.ChartSeriesStyle,System.Func{System.Double,System.String},ProCharts.ChartAxisKind)
+  name.vb: New(String, IReadOnlyList(Of Double?), IReadOnlyList(Of Double?), IReadOnlyList(Of Double), IReadOnlyList(Of String), ChartValueAxisAssignment, ChartSeriesStyle, Func(Of Double, String), ChartAxisKind)
+  fullName: ProCharts.RangeChartDataSource.RangeChartDataSource(string?, System.Collections.Generic.IReadOnlyList<double?>, System.Collections.Generic.IReadOnlyList<double?>, System.Collections.Generic.IReadOnlyList<double>?, System.Collections.Generic.IReadOnlyList<string?>?, ProCharts.ChartValueAxisAssignment, ProCharts.ChartSeriesStyle?, System.Func<double, string>?, ProCharts.ChartAxisKind)
+  fullName.vb: ProCharts.RangeChartDataSource.New(String, System.Collections.Generic.IReadOnlyList(Of Double?), System.Collections.Generic.IReadOnlyList(Of Double?), System.Collections.Generic.IReadOnlyList(Of Double), System.Collections.Generic.IReadOnlyList(Of String), ProCharts.ChartValueAxisAssignment, ProCharts.ChartSeriesStyle, System.Func(Of Double, String), ProCharts.ChartAxisKind)
+  nameWithType: RangeChartDataSource.RangeChartDataSource(string?, IReadOnlyList<double?>, IReadOnlyList<double?>, IReadOnlyList<double>?, IReadOnlyList<string?>?, ChartValueAxisAssignment, ChartSeriesStyle?, Func<double, string>?, ChartAxisKind)
+  nameWithType.vb: RangeChartDataSource.New(String, IReadOnlyList(Of Double?), IReadOnlyList(Of Double?), IReadOnlyList(Of Double), IReadOnlyList(Of String), ChartValueAxisAssignment, ChartSeriesStyle, Func(Of Double, String), ChartAxisKind)
+- uid: ProCharts.RangeChartDataSource.#ctor*
+  name: RangeChartDataSource
+  href: api/ProCharts.RangeChartDataSource.html#ProCharts_RangeChartDataSource__ctor_
+  commentId: Overload:ProCharts.RangeChartDataSource.#ctor
+  isSpec: "True"
+  name.vb: New
+  fullName: ProCharts.RangeChartDataSource.RangeChartDataSource
+  fullName.vb: ProCharts.RangeChartDataSource.New
+  nameWithType: RangeChartDataSource.RangeChartDataSource
+  nameWithType.vb: RangeChartDataSource.New
+- uid: ProCharts.RangeChartDataSource.BuildSnapshot(ProCharts.ChartDataRequest)
+  name: BuildSnapshot(ChartDataRequest)
+  href: api/ProCharts.RangeChartDataSource.html#ProCharts_RangeChartDataSource_BuildSnapshot_ProCharts_ChartDataRequest_
+  commentId: M:ProCharts.RangeChartDataSource.BuildSnapshot(ProCharts.ChartDataRequest)
+  fullName: ProCharts.RangeChartDataSource.BuildSnapshot(ProCharts.ChartDataRequest)
+  nameWithType: RangeChartDataSource.BuildSnapshot(ChartDataRequest)
+- uid: ProCharts.RangeChartDataSource.BuildSnapshot*
+  name: BuildSnapshot
+  href: api/ProCharts.RangeChartDataSource.html#ProCharts_RangeChartDataSource_BuildSnapshot_
+  commentId: Overload:ProCharts.RangeChartDataSource.BuildSnapshot
+  isSpec: "True"
+  fullName: ProCharts.RangeChartDataSource.BuildSnapshot
+  nameWithType: RangeChartDataSource.BuildSnapshot
+- uid: ProCharts.RangeChartDataSource.BuildView(ProCharts.ChartDataRequest)
+  name: BuildView(ChartDataRequest)
+  href: api/ProCharts.RangeChartDataSource.html#ProCharts_RangeChartDataSource_BuildView_ProCharts_ChartDataRequest_
+  commentId: M:ProCharts.RangeChartDataSource.BuildView(ProCharts.ChartDataRequest)
+  fullName: ProCharts.RangeChartDataSource.BuildView(ProCharts.ChartDataRequest)
+  nameWithType: RangeChartDataSource.BuildView(ChartDataRequest)
+- uid: ProCharts.RangeChartDataSource.BuildView*
+  name: BuildView
+  href: api/ProCharts.RangeChartDataSource.html#ProCharts_RangeChartDataSource_BuildView_
+  commentId: Overload:ProCharts.RangeChartDataSource.BuildView
+  isSpec: "True"
+  fullName: ProCharts.RangeChartDataSource.BuildView
+  nameWithType: RangeChartDataSource.BuildView
+- uid: ProCharts.RangeChartDataSource.Count
+  name: Count
+  href: api/ProCharts.RangeChartDataSource.html#ProCharts_RangeChartDataSource_Count
+  commentId: P:ProCharts.RangeChartDataSource.Count
+  fullName: ProCharts.RangeChartDataSource.Count
+  nameWithType: RangeChartDataSource.Count
+- uid: ProCharts.RangeChartDataSource.Count*
+  name: Count
+  href: api/ProCharts.RangeChartDataSource.html#ProCharts_RangeChartDataSource_Count_
+  commentId: Overload:ProCharts.RangeChartDataSource.Count
+  isSpec: "True"
+  fullName: ProCharts.RangeChartDataSource.Count
+  nameWithType: RangeChartDataSource.Count
+- uid: ProCharts.RangeChartDataSource.DataInvalidated
+  name: DataInvalidated
+  href: api/ProCharts.RangeChartDataSource.html#ProCharts_RangeChartDataSource_DataInvalidated
+  commentId: E:ProCharts.RangeChartDataSource.DataInvalidated
+  fullName: ProCharts.RangeChartDataSource.DataInvalidated
+  nameWithType: RangeChartDataSource.DataInvalidated
+- uid: ProCharts.RangeChartDataSource.DataLabelFormatter
+  name: DataLabelFormatter
+  href: api/ProCharts.RangeChartDataSource.html#ProCharts_RangeChartDataSource_DataLabelFormatter
+  commentId: P:ProCharts.RangeChartDataSource.DataLabelFormatter
+  fullName: ProCharts.RangeChartDataSource.DataLabelFormatter
+  nameWithType: RangeChartDataSource.DataLabelFormatter
+- uid: ProCharts.RangeChartDataSource.DataLabelFormatter*
+  name: DataLabelFormatter
+  href: api/ProCharts.RangeChartDataSource.html#ProCharts_RangeChartDataSource_DataLabelFormatter_
+  commentId: Overload:ProCharts.RangeChartDataSource.DataLabelFormatter
+  isSpec: "True"
+  fullName: ProCharts.RangeChartDataSource.DataLabelFormatter
+  nameWithType: RangeChartDataSource.DataLabelFormatter
+- uid: ProCharts.RangeChartDataSource.GetTotalCategoryCount
+  name: GetTotalCategoryCount()
+  href: api/ProCharts.RangeChartDataSource.html#ProCharts_RangeChartDataSource_GetTotalCategoryCount
+  commentId: M:ProCharts.RangeChartDataSource.GetTotalCategoryCount
+  fullName: ProCharts.RangeChartDataSource.GetTotalCategoryCount()
+  nameWithType: RangeChartDataSource.GetTotalCategoryCount()
+- uid: ProCharts.RangeChartDataSource.GetTotalCategoryCount*
+  name: GetTotalCategoryCount
+  href: api/ProCharts.RangeChartDataSource.html#ProCharts_RangeChartDataSource_GetTotalCategoryCount_
+  commentId: Overload:ProCharts.RangeChartDataSource.GetTotalCategoryCount
+  isSpec: "True"
+  fullName: ProCharts.RangeChartDataSource.GetTotalCategoryCount
+  nameWithType: RangeChartDataSource.GetTotalCategoryCount
+- uid: ProCharts.RangeChartDataSource.Name
+  name: Name
+  href: api/ProCharts.RangeChartDataSource.html#ProCharts_RangeChartDataSource_Name
+  commentId: P:ProCharts.RangeChartDataSource.Name
+  fullName: ProCharts.RangeChartDataSource.Name
+  nameWithType: RangeChartDataSource.Name
+- uid: ProCharts.RangeChartDataSource.Name*
+  name: Name
+  href: api/ProCharts.RangeChartDataSource.html#ProCharts_RangeChartDataSource_Name_
+  commentId: Overload:ProCharts.RangeChartDataSource.Name
+  isSpec: "True"
+  fullName: ProCharts.RangeChartDataSource.Name
+  nameWithType: RangeChartDataSource.Name
+- uid: ProCharts.RangeChartDataSource.ReplaceData(System.Collections.Generic.IReadOnlyList{System.Nullable{System.Double}},System.Collections.Generic.IReadOnlyList{System.Nullable{System.Double}},System.Collections.Generic.IReadOnlyList{System.Double},System.Collections.Generic.IReadOnlyList{System.String})
+  name: ReplaceData(IReadOnlyList<double?>, IReadOnlyList<double?>, IReadOnlyList<double>?, IReadOnlyList<string?>?)
+  href: api/ProCharts.RangeChartDataSource.html#ProCharts_RangeChartDataSource_ReplaceData_System_Collections_Generic_IReadOnlyList_System_Nullable_System_Double___System_Collections_Generic_IReadOnlyList_System_Nullable_System_Double___System_Collections_Generic_IReadOnlyList_System_Double__System_Collections_Generic_IReadOnlyList_System_String__
+  commentId: M:ProCharts.RangeChartDataSource.ReplaceData(System.Collections.Generic.IReadOnlyList{System.Nullable{System.Double}},System.Collections.Generic.IReadOnlyList{System.Nullable{System.Double}},System.Collections.Generic.IReadOnlyList{System.Double},System.Collections.Generic.IReadOnlyList{System.String})
+  name.vb: ReplaceData(IReadOnlyList(Of Double?), IReadOnlyList(Of Double?), IReadOnlyList(Of Double), IReadOnlyList(Of String))
+  fullName: ProCharts.RangeChartDataSource.ReplaceData(System.Collections.Generic.IReadOnlyList<double?>, System.Collections.Generic.IReadOnlyList<double?>, System.Collections.Generic.IReadOnlyList<double>?, System.Collections.Generic.IReadOnlyList<string?>?)
+  fullName.vb: ProCharts.RangeChartDataSource.ReplaceData(System.Collections.Generic.IReadOnlyList(Of Double?), System.Collections.Generic.IReadOnlyList(Of Double?), System.Collections.Generic.IReadOnlyList(Of Double), System.Collections.Generic.IReadOnlyList(Of String))
+  nameWithType: RangeChartDataSource.ReplaceData(IReadOnlyList<double?>, IReadOnlyList<double?>, IReadOnlyList<double>?, IReadOnlyList<string?>?)
+  nameWithType.vb: RangeChartDataSource.ReplaceData(IReadOnlyList(Of Double?), IReadOnlyList(Of Double?), IReadOnlyList(Of Double), IReadOnlyList(Of String))
+- uid: ProCharts.RangeChartDataSource.ReplaceData*
+  name: ReplaceData
+  href: api/ProCharts.RangeChartDataSource.html#ProCharts_RangeChartDataSource_ReplaceData_
+  commentId: Overload:ProCharts.RangeChartDataSource.ReplaceData
+  isSpec: "True"
+  fullName: ProCharts.RangeChartDataSource.ReplaceData
+  nameWithType: RangeChartDataSource.ReplaceData
+- uid: ProCharts.RangeChartDataSource.Style
+  name: Style
+  href: api/ProCharts.RangeChartDataSource.html#ProCharts_RangeChartDataSource_Style
+  commentId: P:ProCharts.RangeChartDataSource.Style
+  fullName: ProCharts.RangeChartDataSource.Style
+  nameWithType: RangeChartDataSource.Style
+- uid: ProCharts.RangeChartDataSource.Style*
+  name: Style
+  href: api/ProCharts.RangeChartDataSource.html#ProCharts_RangeChartDataSource_Style_
+  commentId: Overload:ProCharts.RangeChartDataSource.Style
+  isSpec: "True"
+  fullName: ProCharts.RangeChartDataSource.Style
+  nameWithType: RangeChartDataSource.Style
+- uid: ProCharts.RangeChartDataSource.ValueAxisAssignment
+  name: ValueAxisAssignment
+  href: api/ProCharts.RangeChartDataSource.html#ProCharts_RangeChartDataSource_ValueAxisAssignment
+  commentId: P:ProCharts.RangeChartDataSource.ValueAxisAssignment
+  fullName: ProCharts.RangeChartDataSource.ValueAxisAssignment
+  nameWithType: RangeChartDataSource.ValueAxisAssignment
+- uid: ProCharts.RangeChartDataSource.ValueAxisAssignment*
+  name: ValueAxisAssignment
+  href: api/ProCharts.RangeChartDataSource.html#ProCharts_RangeChartDataSource_ValueAxisAssignment_
+  commentId: Overload:ProCharts.RangeChartDataSource.ValueAxisAssignment
+  isSpec: "True"
+  fullName: ProCharts.RangeChartDataSource.ValueAxisAssignment
+  nameWithType: RangeChartDataSource.ValueAxisAssignment
+- uid: ProCharts.RangeChartDataSource.ValueAxisKind
+  name: ValueAxisKind
+  href: api/ProCharts.RangeChartDataSource.html#ProCharts_RangeChartDataSource_ValueAxisKind
+  commentId: P:ProCharts.RangeChartDataSource.ValueAxisKind
+  fullName: ProCharts.RangeChartDataSource.ValueAxisKind
+  nameWithType: RangeChartDataSource.ValueAxisKind
+- uid: ProCharts.RangeChartDataSource.ValueAxisKind*
+  name: ValueAxisKind
+  href: api/ProCharts.RangeChartDataSource.html#ProCharts_RangeChartDataSource_ValueAxisKind_
+  commentId: Overload:ProCharts.RangeChartDataSource.ValueAxisKind
+  isSpec: "True"
+  fullName: ProCharts.RangeChartDataSource.ValueAxisKind
+  nameWithType: RangeChartDataSource.ValueAxisKind
 - uid: ProCharts.Skia
   name: ProCharts.Skia
   href: api/ProCharts.Skia.html
