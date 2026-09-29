@@ -11,7 +11,7 @@ using System.Text;
 using ProDataGrid.FormulaEngine;
 using ProDataGrid.FormulaEngine.Excel;
 
-internal static class Program
+internal static partial class Program
 {
     private static int Main(string[] args)
     {
@@ -27,6 +27,7 @@ internal static class Program
             var resolver = new EmptyResolver();
             var parser = new ExcelFormulaParser();
             Validate(context, evaluator, resolver, parser);
+            ValidateNumerics(context, evaluator, resolver, parser);
             var names = new List<string>();
             foreach (var function in registry.GetAll()) names.Add(function.Name);
             names.Sort(StringComparer.Ordinal);
@@ -91,6 +92,7 @@ internal static class Program
             pattern.Append('b');
             var wildcardArgs = new[] { FormulaValue.FromText(pattern.ToString()), FormulaValue.FromText(new string('a', 10000) + "b") };
             Measure(output, "search_64_stars_10001_chars_direct", 100, () => search.Invoke(functionContext, wildcardArgs).AsNumber(), 1);
+            MeasureNumerics(output, context, evaluator, resolver, parser);
             File.WriteAllText(Path.Combine(destination, "measurements.csv"), output.ToString());
             Console.Write(output.ToString());
             return 0;
