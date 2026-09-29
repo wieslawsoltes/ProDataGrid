@@ -1,0 +1,49 @@
+name: Formula precision regression and performance validation
+on:
+  push:
+    branches: [work/formula-significant-precision]
+permissions:
+  contents: read
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      DOTNET_TieredCompilation: '0'
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-dotnet@v4
+        with:
+          global-json-file: global.json
+      - name: Test the precision fix and every existing formula regression
+        run: |
+          dotnet test src/ProDataGrid.FormulaEngine.UnitTests/ProDataGrid.FormulaEngine.UnitTests.csproj -c Release --logger trx --results-directory artifacts/tests
+          dotnet build src/ProDataGrid.FormulaEngine.Excel/ProDataGrid.FormulaEngine.Excel.csproj -c Release
+      - name: Prepare identical original and fixed core benchmark programs
+        run: |
+          git worktree add --detach "$RUNNER_TEMP/precision-baseline" c4c2e0646ea8863b44ed8889a75d42b6a5b2006f
+          dotnet build tools/formula-benchmarks/FormulaBenchmarks.csproj -c Release
+          dotnet build "$RUNNER_TEMP/precision-baseline/tools/formula-benchmarks/FormulaBenchmarks.csproj" -c Release
+          lscpu > artifacts/cpu.txt
+          dotnet --info > artifacts/runtime.txt
+      - name: Measure baseline-current-current-baseline
+        run: |
+          ROOT="$PWD"
+          for item in baseline-1 current-1 current-2 baseline-2; do
+            SRC="$ROOT"
+            case "$item" in baseline-*) SRC="$RUNNER_TEMP/precision-baseline" ;; esac
+            dotnet run --no-build -c Release --project "$SRC/tools/formula-benchmarks/FormulaBenchmarks.csproj" -- "$ROOT/artifacts/$item.csv" "$item" > "$ROOT/artifacts/$item.log"
+          done
+      - name: Record source evidence
+        if: always()
+        run: |
+          mkdir -p artifacts
+          git archive HEAD > artifacts/source.tar
+          git rev-parse HEAD > artifacts/revision.txt
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: formula-precision-validation
+          path: artifacts
