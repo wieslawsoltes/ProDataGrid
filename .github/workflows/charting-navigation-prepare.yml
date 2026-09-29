@@ -1,0 +1,72 @@
+name: Integrate chart navigation source
+on:
+  push:
+    branches: [charting/hierarchy-navigation]
+    paths: [.github/workflows/charting-navigation-prepare.yml]
+permissions:
+  contents: write
+jobs:
+  integrate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: charting/hierarchy-navigation
+      - name: Apply checked navigation and lifecycle hooks
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          def once(t, a, b):
+              if t.count(a) != 1: raise RuntimeError('Unexpected integration anchor: ' + a[:100])
+              return t.replace(a, b, 1)
+          p = Path('src/ProCharts.Avalonia/ProChartView.cs')
+          t = p.read_text()
+          anchor = '        private void UpdateToolTip(Point point)\n'
+          api = '\n'.join([
+              '        /// <summary>Finds chart data at a point in this control\'s local logical coordinates.</summary>',
+              '        /// <remarks>Uses the displayed snapshot and effective axes/theme; category labels are optional.</remarks>',
+              '        public SkiaChartHitTestResult? HitTest(Point point)',
+              '        {',
+              '            var snapshot = ChartModel?.Snapshot;',
+              '            if (snapshot == null || snapshot.Series.Count == 0 ||',
+              '                !double.IsFinite(point.X) || !double.IsFinite(point.Y)) return null;',
+              '            return _renderer.HitTest(new SKPoint((float)point.X, (float)point.Y),',
+              '                new SKRect(0, 0, (float)Bounds.Width, (float)Bounds.Height), snapshot, BuildEffectiveStyle());',
+              '        }', '',
+              '        /// <summary>Releases drawing and interaction buffers when the view leaves its visual tree.</summary>',
+              '        protected override void OnDetachedFromVisualTree(VisualTreeAttachmentEventArgs e)',
+              '        {',
+              '            EndPan();',
+              '            ClearSelectionOverlay(clearMeasurement: true);',
+              '            ClearToolTip();',
+              '            _renderer.ClearInteractionCache();',
+              '            _renderCache.Invalidate();',
+              '            _bitmap?.Dispose();',
+              '            _bitmap = null;',
+              '            _isDirty = true;',
+              '            base.OnDetachedFromVisualTree(e);',
+              '        }', '', ''
+          ])
+          t = once(t, anchor, api + anchor)
+          start = t.index('            var model = ChartModel;\n', t.index(anchor))
+          end = t.index('            if (hit.HasValue)', start)
+          if 'snapshot.Categories.Count == 0' not in t[start:end]: raise RuntimeError('Unexpected tooltip setup')
+          t = t[:start] + '            var hit = HitTest(point);\n\n' + t[end:]
+          anchor = '            if (change.Property == ChartModelProperty)\n            {\n'
+          t = once(t, anchor, anchor + '                _renderer.ClearInteractionCache();\n')
+          p.write_text(t)
+          p = Path('src/ProCharts/HierarchyChartDataSource.cs')
+          p.write_text(once(p.read_text(), 'public sealed class HierarchyChartDataSource : IChartDataSource', 'public sealed class HierarchyChartDataSource : IChartDataSource, IChartHierarchyNavigator'))
+          p = Path('src/DataGridSample/MainWindow.axaml')
+          t = p.read_text(encoding='utf-8-sig')
+          anchor = '    <TabItem Header="ProCharts Combo">'
+          t = once(t, anchor, '    <TabItem Header="ProCharts Hierarchy Explorer">\n      <pages:ChartHierarchyPage />\n    </TabItem>\n' + anchor)
+          p.write_text('\ufeff' + t)
+          PY
+          git diff --check
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add src/ProCharts.Avalonia/ProChartView.cs src/ProCharts/HierarchyChartDataSource.cs src/DataGridSample/MainWindow.axaml
+          git commit -m 'Expose live chart hit testing, enable typed navigation and release detached view buffers'
+          git push origin HEAD:refs/heads/charting/hierarchy-navigation
