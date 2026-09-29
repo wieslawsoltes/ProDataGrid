@@ -25,7 +25,7 @@
     </Grid>
     <charts:ProChartView Grid.Row="2" ChartModel="{Binding Chart}" ShowToolTips="True" MinHeight="280">
       <charts:ProChartView.ChartStyle>
-        <skia:SkiaChartStyle AreaFillOpacity="0.35" ShowCategoryGridlines="False" />
+        <skia:SkiaChartStyle AreaFillOpacity="0.35" ShowCategoryGridlines="False" PaddingRight="44" />
       </charts:ProChartView.ChartStyle>
     </charts:ProChartView>
   </Grid>
