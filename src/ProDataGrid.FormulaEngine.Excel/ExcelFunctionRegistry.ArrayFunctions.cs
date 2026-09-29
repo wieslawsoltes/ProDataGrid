@@ -32,6 +32,7 @@ namespace ProDataGrid.FormulaEngine.Excel
             RegisterBusinessCalendarFunctions();
             RegisterDescriptiveStatistics();
             RegisterBitwiseDefaults();
+            RegisterRadixDefaults();
         }
 
         partial void RegisterAdditionalDefaults();
