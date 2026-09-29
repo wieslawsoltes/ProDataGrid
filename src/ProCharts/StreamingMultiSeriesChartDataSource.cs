@@ -144,6 +144,7 @@ namespace ProCharts
         /// interpolated. More series/disjoint gaps can make the union approach the full window. None disables selection;
         /// null/nonpositive budgets disable it; one promotes to two. Adaptive normalizes to MinMax. Cache-equivalent
         /// requests reuse the view without allocation. Snapshot scanning/selection is O(window rows * series count).
+        /// Unreduced windows use at most two contiguous span copies per ring channel, including wrapped windows.
         /// </remarks>
         public StreamingMultiSeriesChartView BuildView(ChartDataRequest request)
         {
@@ -184,14 +185,24 @@ namespace ProCharts
                 double?[][] values = new double?[SeriesCount][];
                 for (int s = 0; s < SeriesCount; s++) values[s] = new double?[outputCount];
                 long firstRetained = _totalSamples - _count;
-                int output = 0;
-                for (int i = 0; i < count; i++)
+                if (budget == 0)
                 {
-                    if (budget != 0 && !_selected[i]) continue;
-                    int ring = RingIndex(start + i);
-                    x[output] = _x[ring]; labels[output] = _categories[ring]; identities[output] = firstRetained + start + i;
-                    for (int s = 0; s < SeriesCount; s++) values[s][output] = _values[s][ring];
-                    output++;
+                    CopyWindow(_x, start, x);
+                    CopyWindow(_categories, start, labels);
+                    for (int s = 0; s < SeriesCount; s++) CopyWindow(_values[s], start, values[s]);
+                    for (int i = 0; i < count; i++) identities[i] = firstRetained + start + i;
+                }
+                else
+                {
+                    int output = 0;
+                    for (int i = 0; i < count; i++)
+                    {
+                        if (!_selected[i]) continue;
+                        int ring = RingIndex(start + i);
+                        x[output] = _x[ring]; labels[output] = _categories[ring]; identities[output] = firstRetained + start + i;
+                        for (int s = 0; s < SeriesCount; s++) values[s][output] = _values[s][ring];
+                        output++;
+                    }
                 }
                 IReadOnlyList<double> sharedX = Array.AsReadOnly(x);
                 ChartSeriesSnapshot[] series = new ChartSeriesSnapshot[SeriesCount];
@@ -206,6 +217,16 @@ namespace ProCharts
                 _cachedKey = key;
                 return _cached = new StreamingMultiSeriesChartView(snapshot, Array.AsReadOnly(identities), firstRetained, _count, start, count);
             }
+        }
+
+        // The caller holds _gate, and normalized windows never exceed the retained ring suffix.
+        private void CopyWindow<T>(T[] ring, int logicalStart, T[] destination)
+        {
+            if (destination.Length == 0) return;
+            int start = RingIndex(logicalStart);
+            int tail = Math.Min(destination.Length, Capacity - start);
+            ring.AsSpan(start, tail).CopyTo(destination);
+            ring.AsSpan(0, destination.Length - tail).CopyTo(destination.AsSpan(tail));
         }
 
         private static void ValidateX(double x)
