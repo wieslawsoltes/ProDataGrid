@@ -83,7 +83,11 @@ namespace ProDataGrid.FormulaEngine.Excel
 
             // Keep common inputs entirely in UInt64. Promote to bounded stack limbs
             // only when that exact accumulator would overflow. 255 base-36 digits
-            // require fewer than 42 UInt32 limbs; the input length is checked first.
+            // fit in 42 UInt32 limbs; the input length is checked first. Computing
+            // the cutoff once avoids integer division at every parsed character.
+            var radixValue = (uint)radix;
+            var cutoff = ulong.MaxValue / radixValue;
+            var finalDigit = ulong.MaxValue % radixValue;
             ulong small = 0;
             var cursor = 0;
             for (; cursor < text.Length; cursor++)
@@ -94,8 +98,8 @@ namespace ProDataGrid.FormulaEngine.Excel
                     error = new FormulaError(FormulaErrorType.Num);
                     return false;
                 }
-                if (small > (ulong.MaxValue - (uint)digit) / (uint)radix) break;
-                small = small * (uint)radix + (uint)digit;
+                if (small > cutoff || (small == cutoff && (uint)digit > finalDigit)) break;
+                small = small * radixValue + (uint)digit;
             }
             if (cursor == text.Length)
             {
@@ -119,7 +123,7 @@ namespace ProDataGrid.FormulaEngine.Excel
                 ulong carry = (uint)digit;
                 for (var i = 0; i < used; i++)
                 {
-                    var product = (ulong)limbs[i] * (uint)radix + carry;
+                    var product = (ulong)limbs[i] * radixValue + carry;
                     limbs[i] = (uint)product;
                     carry = product >> 32;
                 }
