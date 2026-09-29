@@ -25,16 +25,22 @@ namespace ProDataGrid.FormulaEngine.Excel
                 double maximum = 0;
                 for (var column = 0; column < size; column++) maximum = Math.Max(maximum, Math.Abs(values[start + column]));
                 var exponent = maximum == 0 ? 0 : Math.ILogB(maximum);
+                // Equilibration is optional. If scaling would lose even a subnormal bit,
+                // keep the entire row unscaled rather than rejecting an otherwise valid
+                // matrix or silently changing a nonzero entry to zero.
+                if (exponent != 0)
+                {
+                    for (var column = 0; column < size; column++)
+                    {
+                        var original = values[start + column];
+                        var scaled = Math.ScaleB(original, -exponent);
+                        if (Math.ScaleB(scaled, exponent) != original) { exponent = 0; break; }
+                    }
+                }
                 rowExponents[row] = exponent;
                 hasZeroRow |= maximum == 0;
-                for (var column = 0; column < size; column++)
-                {
-                    var value = values[start + column];
-                    var scaled = Math.ScaleB(value, -exponent);
-                    // Never silently lose a nonzero entry when a row's dynamic range exceeds binary64.
-                    if (!double.IsFinite(scaled) || (value != 0 && scaled == 0)) return ExcelLuStatus.NumericalFailure;
-                    values[start + column] = scaled;
-                }
+                if (exponent != 0)
+                    for (var column = 0; column < size; column++) values[start + column] = Math.ScaleB(values[start + column], -exponent);
             }
             if (hasZeroRow) return ExcelLuStatus.Singular;
 
