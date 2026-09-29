@@ -7,6 +7,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using ProCharts;
 using ProCharts.Skia;
 using SkiaSharp;
@@ -179,15 +180,29 @@ namespace Avalonia.Controls.DataGridTests.Charting
             SkiaChartRenderer renderer = new();
             SkiaChartStyle style = Style();
             SKPoint point = new(Bounds.MidX, Bounds.MidY);
-            for (int i = 0; i < 1000; i++) renderer.HitTest(point, Bounds, snapshot, style);
+            // Warm the exact measurement entry point, not only its inner renderer method.
+            MeasureWarmQueryAllocations(renderer, point, snapshot, style, out _);
             low.Reads = high.Reads = x.Reads = 0;
-            long bytes = GC.GetAllocatedBytesForCurrentThread();
-            for (int i = 0; i < 1000; i++) renderer.HitTest(point, Bounds, snapshot, style);
-            Assert.Equal(0, GC.GetAllocatedBytesForCurrentThread() - bytes);
+            long allocated = MeasureWarmQueryAllocations(renderer, point, snapshot, style, out int hits);
+            Assert.Equal(0, allocated);
+            Assert.Equal(1000, hits);
             Assert.Equal(0, low.Reads + high.Reads + x.Reads);
             renderer.ClearInteractionCache();
             Assert.NotNull(renderer.HitTest(point, Bounds, snapshot, style));
             Assert.True(low.Reads > 0 && high.Reads > 0 && x.Reads > 0);
+        }
+
+        // Complete both counter reads before returning to assertion/framework code. Keep this
+        // boundary uninlined so assertion setup cannot become part of the measured call body.
+        [MethodImpl(MethodImplOptions.NoInlining)]
+        private static long MeasureWarmQueryAllocations(SkiaChartRenderer renderer, SKPoint point,
+            ChartDataSnapshot snapshot, SkiaChartStyle style, out int hits)
+        {
+            hits = 0;
+            long before = GC.GetAllocatedBytesForCurrentThread();
+            for (int i = 0; i < 1000; i++)
+                if (renderer.HitTest(point, Bounds, snapshot, style).HasValue) hits++;
+            return GC.GetAllocatedBytesForCurrentThread() - before;
         }
 
         [Fact]
