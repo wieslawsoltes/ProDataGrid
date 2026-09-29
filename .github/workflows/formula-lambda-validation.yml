@@ -1,4 +1,4 @@
-name: Formula lambda validation
+name: Formula lambda final validation
 on:
   push:
     branches: [work/formula-lambda-helpers]
@@ -14,20 +14,20 @@ jobs:
       - uses: actions/setup-dotnet@v4
         with:
           global-json-file: global.json
-      - name: Apply guarded formula integration
+      - name: Finalize dependency precedence and remove implementation scaffolding
         run: |
-          python3 tools/apply-formula-lambda.py
-          python3 tools/refine-formula-lambda.py
+          python3 tools/stabilize-formula-lambda.py
+          git rm tools/apply-formula-lambda.py tools/refine-formula-lambda.py tools/stabilize-formula-lambda.py .github/workflows/formula-lambda-validation.yml
       - name: Run all formula regressions
         run: |
           git diff --check
           dotnet test src/ProDataGrid.FormulaEngine.UnitTests/ProDataGrid.FormulaEngine.UnitTests.csproj -c Release --logger trx --results-directory artifacts/tests
-      - name: Commit validated integration
+      - name: Commit validated final source
         run: |
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
           git add src
-          git commit -m 'Integrate lexical closures while preserving blank-literal parser compatibility'
+          git commit -m 'Finalize lexical function integration with registry-aware dependency precedence'
           git push origin HEAD:work/formula-lambda-helpers
       - name: Export tested source
         if: always()
@@ -37,5 +37,5 @@ jobs:
       - uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: formula-lambda-validation
+          name: formula-lambda-final-validation
           path: artifacts
