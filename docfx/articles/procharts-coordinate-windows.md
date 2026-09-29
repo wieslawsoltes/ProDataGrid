@@ -28,17 +28,34 @@ With neighbors enabled, the immediately preceding and following retained rows ar
 
 Coordinates use the same units as `Append`. For data already encoded with `DateTime.ToOADate()`, encode query bounds the same way. The source itself does not convert timestamps, calendar intervals or timezones.
 
+## Latest elapsed coordinate span
+
+`BuildLatestViewByX` anchors a trailing span to the newest retained X coordinate **inside the same lock as window capture**. This avoids separately reading the latest coordinate and racing a producer append or eviction before querying the window. Irregularly spaced feeds are selected by X distance, not by a guessed row count.
+
+```csharp
+// When appended X coordinates are seconds, capture the latest inclusive 30 seconds.
+var latest = source.BuildLatestViewByX(
+    span: 30,
+    maxPoints: 256,
+    downsampleMode: ChartDownsampleMode.MinMax,
+    includeBoundaryNeighbors: true);
+```
+
+`BuildLatestSnapshotByX` returns only the snapshot. Spans must be finite and nonnegative. Zero selects the latest row; enabling neighbors additionally includes its predecessor when available. No future row exists, so trailing queries add at most the one preceding boundary neighbor. The latest row remains the anchor even when every channel there is missing. Empty sources produce empty views. Appending and Clear do not modify any previously captured view.
+
+Span units must match source X units. For OLE Automation date coordinates, a half-hour span is `TimeSpan.FromMinutes(30).TotalDays`, not 1,800. The source does not convert calendar/timezone intervals. Lower-bound subtraction uses double arithmetic: a span smaller than one representable coordinate step can round to zero width. Underflow below the finite domain includes all eligible finite retained coordinates. An explicit query and a trailing query resolving to the same ordinal window share the same cache.
+
 ## Atomic capture and presentation boundaries
 
 Lower/upper binary searches, optional expansion, selection, array copying and identity/history metadata capture all execute under the same source lock. Appending or evicting rows cannot shift the resolved window between lookup and capture. Returned views remain owned and unchanged after subsequent append or Clear; numbering still restarts after Clear.
 
-This is an explicit **source API**, not a new `ChartDataRequest` mode. It does not change `ChartModel.Request`, establish a live coordinate viewport, set axis limits, or supply numeric-X positioning for category Line/Area rendering. Use the existing numeric/date Scatter rendering for true X placement. A view's identity map must not be combined with the model's independently captured snapshot. See [synchronized streams](procharts-multi-series-streaming.md) for renderer, delivery and ownership contracts.
+These are explicit **source APIs**, not a new `ChartDataRequest` mode. They do not change `ChartModel.Request`, establish an automatic live coordinate viewport, set axis limits, or supply numeric-X positioning for category Line/Area rendering. Each trailing query re-anchors only when invoked. Use the existing numeric/date Scatter rendering for true X placement. A view's identity map must not be combined with the model's independently captured snapshot. See [synchronized streams](procharts-multi-series-streaming.md) for renderer, delivery and ownership contracts.
 
 ## Complexity and measured comparison
 
-Lookup takes O(log retained rows), uses the logical ring directly, and allocates no temporary coordinate array or request. An uncached capture still costs O(window rows × series count), including reduction when requested, and holds the lock for that work. Equivalent normalized coordinate and ordinal windows reuse the same single-entry cache; a warm equivalent query allocates no managed memory in the source. New windows allocate owned output and reduction scratch as before. Large windows can still delay producers; no worst-case latency guarantee is implied.
+Lookup takes O(log retained rows), uses the logical ring directly, and allocates no temporary coordinate array or request. An uncached capture still costs O(window rows × series count), including reduction when requested, and holds the lock for that work. Equivalent normalized coordinate, trailing and ordinal windows reuse the same single-entry cache; a warm equivalent query allocates no managed memory in the source. New windows allocate owned output and reduction scratch as before. Large windows can still delay producers; no worst-case latency guarantee is implied.
 
-The existing `ProCharts.Benchmarks` executable includes an **X-RANGE** section comparing 256 distinct 128-row captures, with three channels and wrapped retained capacities of 8,192, 65,536 and 262,144. Both paths capture the same static source with no reduction. The baseline linearly scans a previously captured, owned X array, then calls ordinal `BuildView`; the new path performs atomic binary ring lookup and capture. The baseline's initial full-X acquisition is deliberately excluded rather than charged to every query.
+The existing `ProCharts.Benchmarks` executable includes an **X-RANGE** section comparing 256 distinct 128-row captures, with three channels and wrapped retained capacities of 8,192, 65,536 and 262,144. Both paths capture the same static source with no reduction. The baseline linearly scans a previously captured, owned X array, then calls ordinal `BuildView`; the new path performs atomic binary ring lookup and capture. The baseline's initial full-X acquisition is deliberately excluded rather than charged to every query. This comparison measures explicit coordinate-window lookup; trailing-span semantics have separate regression coverage and no separate latency claim.
 
 Construction, seeding, query preparation and complete coordinate/value/gap/identity validation are outside timing. Two paired warmups precede seven alternating-order measured pairs. The harness checks identical normalized cached views and every original output value before measuring, then compares captured-identity checksums during measured rounds. It reports median elapsed time and managed allocations in the existing `performance.txt` artifact. Timings are diagnostics, not fixed CI thresholds or universal speedups; this does not benchmark concurrent producers, rendering, physical GPU work or frame rate.
 
