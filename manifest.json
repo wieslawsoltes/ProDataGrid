@@ -9692,6 +9692,20 @@
     },
     {
       "type": "ManagedReference",
+      "source_relative_path": "api/ProCharts.ChartRangeSample.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/ProCharts.ChartRangeSample.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "ProCharts.ChartRangeSample",
+      "Summary": "<p sourcefile=\"api/ProCharts.ChartRangeSample.yml\" sourcestartlinenumber=\"1\">One interval observation. Streaming sources validate X and normalize incomplete bounds to a gap.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
       "source_relative_path": "api/ProCharts.ChartRangeSeries.yml",
       "output": {
         ".html": {
@@ -10277,6 +10291,34 @@
       "IsMRef": true,
       "Title": "ProCharts.StreamingMacd",
       "Summary": "<p sourcefile=\"api/ProCharts.StreamingMacd.yml\" sourcestartlinenumber=\"1\">Constant-space MACD with SMA-seeded fast/slow EMAs, EMA signal and aligned histogram.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/ProCharts.StreamingRangeChartDataSource.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/ProCharts.StreamingRangeChartDataSource.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "ProCharts.StreamingRangeChartDataSource",
+      "Summary": "<p sourcefile=\"api/ProCharts.StreamingRangeChartDataSource.yml\" sourcestartlinenumber=\"1\">A bounded, thread-safe range-area stream with atomic batches and coordinated boundary reduction.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/ProCharts.StreamingRangeChartView.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/ProCharts.StreamingRangeChartView.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "ProCharts.StreamingRangeChartView",
+      "Summary": "<p sourcefile=\"api/ProCharts.StreamingRangeChartView.yml\" sourcestartlinenumber=\"1\">An owned range snapshot and its immutable stream-identity map, captured under one source lock.</p>\n"
     },
     {
       "type": "ManagedReference",
@@ -13237,6 +13279,16 @@
       "output": {
         ".html": {
           "relative_path": "articles/procharts-skia-style-reference.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "Conceptual",
+      "source_relative_path": "articles/procharts-streaming-ranges.md",
+      "output": {
+        ".html": {
+          "relative_path": "articles/procharts-streaming-ranges.html"
         }
       },
       "version": ""

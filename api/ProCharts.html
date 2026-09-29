@@ -235,6 +235,16 @@ and whether the window should remain pinned to the latest categories.</p>
 </dd>
     </dl>
     <dl class="jumplist">
+      <dt><a class="xref" href="ProCharts.StreamingRangeChartDataSource.html">StreamingRangeChartDataSource</a></dt>
+      <dd><p>A bounded, thread-safe range-area stream with atomic batches and coordinated boundary reduction.</p>
+</dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="ProCharts.StreamingRangeChartView.html">StreamingRangeChartView</a></dt>
+      <dd><p>An owned range snapshot and its immutable stream-identity map, captured under one source lock.</p>
+</dd>
+    </dl>
+    <dl class="jumplist">
       <dt><a class="xref" href="ProCharts.StreamingRelativeStrengthIndex.html">StreamingRelativeStrengthIndex</a></dt>
       <dd><p>Constant-space Wilder RSI requiring period price changes (period+1 prices) for warmup.</p>
 </dd>
@@ -259,6 +269,11 @@ Structs
     <dl class="jumplist">
       <dt><a class="xref" href="ProCharts.ChartMacdValue.html">ChartMacdValue</a></dt>
       <dd><p>An aligned MACD observation. Individual channels remain null until their warmup completes.</p>
+</dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="ProCharts.ChartRangeSample.html">ChartRangeSample</a></dt>
+      <dd><p>One interval observation. Streaming sources validate X and normalize incomplete bounds to a gap.</p>
 </dd>
     </dl>
     <dl class="jumplist">

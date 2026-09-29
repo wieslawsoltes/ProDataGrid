@@ -95,7 +95,7 @@
 <tbody>
 <tr>
 <td><code>ProCharts</code></td>
-<td>Models, snapshots, axes, formatting, bounded streaming, hierarchy data/layout, batch transforms, persistent incremental indicators and coordinated interval decimation.</td>
+<td>Models, snapshots, axes, formatting, bounded scalar/interval streaming, hierarchy data/layout, batch transforms, persistent incremental indicators and coordinated interval decimation.</td>
 </tr>
 <tr>
 <td><code>ProCharts.Skia</code></td>
@@ -132,6 +132,7 @@ model.Request.DownsampleMode = ChartDownsampleMode.MinMax;
 <p>Batch <code>ChartIndicators</code> methods analyze complete datasets. Persistent <code>StreamingExponentialMovingAverage</code>, <code>StreamingRelativeStrengthIndex</code>, <code>StreamingMacd</code> and <code>StreamingAverageTrueRange</code> instead consume one observation at a time, retaining constant-size recurrence state with no managed allocations in Push/Reset. These are single-writer append-only calculators; corrections require reset/replay, and display-ring eviction does not reset calculation history.</p>
 <p><code>ChartRangeSeries.CreateArea</code> owns aligned lower/upper channels, and <code>ChartBandSeries.ToRangeArea()</code> turns Bollinger or Donchian bands into a filled envelope. Missing pairs break the fill. Interior tooltips retain endpoint identity and display both bounds.</p>
 <p><code>RangeChartDataSource</code> adds owned input, window-before-decimation preparation, atomic replacement and cached display views with original source-index maps. Paired MinMax/Adaptive selection keeps both boundaries' extrema and gap separators at shared source indices. Use a numeric/date/log X axis to retain original spacing; configure the source's logarithmic value domain when applicable. The reduced polygon approximates omitted detail rather than certifying an enclosing envelope. <code>None</code> restores every supplied interval. The <strong>ProCharts Range Area</strong> sample has an optional 100,000-observation mode with an 800-point reduction toggle; its original small mode retains the independent mean line.</p>
+<p><code>StreamingRangeChartDataSource</code> extends bounded ingestion to interval pairs: append validated batches without replacing the full retained dataset, preserve original 64-bit observation maps, and reduce ring windows through the same paired selector. It enforces increasing X, commits batches atomically and publishes owned snapshots. The Range Area page's <strong>Open bounded live interval demo</strong> provides a command-driven synthetic feed, not an external live connection. See <a href="procharts-streaming-ranges.html">bounded streaming range areas</a> for threading, session identity, windowing and performance contracts.</p>
 <h2 id="data-and-interaction">Data and interaction</h2>
 <p>Grid adapters track sorting/filtering/grouping and formula results. Cached grid windows copy only the requested category/value/X/size slices; their initial source cache still needs to be built. Bounded streaming uses fixed-capacity history. Continuous-series decimation is not a substitute for hierarchy/matrix semantics, and interval boundaries must not be sampled independently.</p>
 <p>Repeated supported point and range-area queries can reuse indexed screen-space geometry. Index construction has an up-front time and memory cost, while warm queries avoid repeated data scans. <code>UseInteractionCache = false</code> retains the reference path, and <code>ClearInteractionCache</code> releases or invalidates managed state after in-place source changes. Ordered ranges use projected-interval binary search without bridging gaps or changing source-order selection; unordered raw ranges retain their scan. See the range-area guide for ownership, limits and separate interaction/full-versus-reduced CPU drawing diagnostics.</p>
@@ -140,7 +141,8 @@ model.Request.DownsampleMode = ChartDownsampleMode.MinMax;
 <ul>
 <li><a href="procharts-chart-model.html">Model and snapshots</a></li>
 <li><a href="procharts-data-sources.html">Data sources</a></li>
-<li><a href="procharts-streaming.html">Bounded streaming</a></li>
+<li><a href="procharts-streaming.html">Bounded scalar streaming</a></li>
+<li><a href="procharts-streaming-ranges.html">Bounded streaming range areas</a></li>
 <li><a href="procharts-incremental-indicators.html">Incremental EMA, RSI, MACD and ATR</a></li>
 <li><a href="procharts-windowing.html">Efficient grid windows</a></li>
 <li><a href="procharts-advanced-charts.html">Advanced chart families</a></li>
