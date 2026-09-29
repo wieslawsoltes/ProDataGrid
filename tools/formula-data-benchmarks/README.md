@@ -1,0 +1,7 @@
+# Data formula measurements
+
+Run `dotnet run -c Release --project tools/formula-data-benchmarks/FormulaDataBenchmarks.csproj -- artifacts/data` to execute parser assertions, export registered names and record all timing/allocation samples. Use a second process with `artifacts/data-reverse reverse` to reverse comparison order. `artifacts/smoke smoke` runs assertions only and also works after NativeAOT publishing.
+
+The text comparison uses a 1,000-row ragged input and identical owned FormulaArray outputs. The reference uses String.Split for row and field arrays; TEXTSPLIT counts first and materializes only final fields. Every field is compared before measurement. Timed runs include traversing all results for their text-length checksum. The separate 5,000-field multiple-delimiter case includes a frequent delimiter and an absent delimiter.
+
+Two warm batches and seven measured batches are recorded; input creation, parsing and oracle construction are excluded, while output strings/arrays, workspace and checksums are included. Allocation counts are synchronous thread-local managed allocations, not peak memory. Keep exact source revision, runtime/CPU metadata and all samples. This is a comparison with a straightforward same-runtime implementation, not old/new library revisions or native Excel. Extra validation and the second scan can cost time even when intermediate allocations are reduced. No timing thresholds are imposed on unit tests.

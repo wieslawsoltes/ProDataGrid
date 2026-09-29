@@ -49,6 +49,7 @@ namespace ProDataGrid.FormulaEngine.Excel
             Register(new SubstituteTextFunction());
             Register(new UnicodeTextFunction());
             Register(new UnicharTextFunction());
+            Register(new TextSplitFunction());
         }
     }
 }
