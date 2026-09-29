@@ -67,6 +67,7 @@ Measure("four_indicators_100000_observations", () =>
         throw new InvalidOperationException("An observation was dropped.");
 });
 Console.WriteLine("The baseline is the existing batch API invoked after each append, not a claim that a host previously used that schedule. One-off historical batch analysis remains appropriate. No UI/GPU/frame-rate claim or timing threshold is made.");
+RollingIndicatorBenchmarks.Run();
 
 static void Check(double? expected, double? actual)
 {

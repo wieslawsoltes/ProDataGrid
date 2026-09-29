@@ -97,10 +97,11 @@ namespace ProCharts
             double width = deviation * multiplier;
             if (double.IsFinite(width)) return new ChartBandValue(Decode(Mean - width), middle, Decode(Mean + width));
             // A huge multiplier can overflow normalized units even with a tiny physical scale.
-            // Change multiplication order before treating the result as unrepresentable.
+            // Change multiplication order before treating the result as unrepresentable. Never
+            // replace a missing center with an invented numeric zero.
             double physicalWidth = deviation * (multiplier * Scale);
-            return new ChartBandValue(Finite(middle.GetValueOrDefault() - physicalWidth), middle,
-                Finite(middle.GetValueOrDefault() + physicalWidth));
+            return middle.HasValue ? new ChartBandValue(Finite(middle.Value - physicalWidth), middle,
+                Finite(middle.Value + physicalWidth)) : default;
         }
 
         private static double? Finite(double value) => double.IsFinite(value) ? value : null;

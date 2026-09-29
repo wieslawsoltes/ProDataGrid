@@ -36,13 +36,13 @@ For headless use, build a `ChartDataSnapshot` through the source or construct ca
 
 ## Live calculations and filled intervals
 
-Batch `ChartIndicators` methods analyze complete datasets. Persistent `StreamingExponentialMovingAverage`, `StreamingRelativeStrengthIndex`, `StreamingMacd` and `StreamingAverageTrueRange` instead consume one observation at a time, retaining constant-size recurrence state with no managed allocations in Push/Reset. These are single-writer append-only calculators; corrections require reset/replay, and display-ring eviction does not reset calculation history.
+Batch `ChartIndicators` methods analyze complete datasets. Persistent EMA, RSI, MACD and ATR calculators retain constant-size recurrence state. `StreamingRollingStatistics` shares one bounded window for arithmetic/weighted means and population/sample deviations; scalar adapters, `StreamingBollingerBands` and `StreamingDonchianChannels` provide the corresponding live transforms. Rolling engines retain O(period) state with amortized O(1) updates and occasional O(period) transfer/deque bursts. All are single-writer append-only calculators with allocation-free Push/Reset; corrections require replay, and display-ring eviction does not reset calculation history. See the [incremental indicator guide](procharts-incremental-indicators.md) for warmup, numerical and latency contracts.
 
-`ChartRangeSeries.CreateArea` owns aligned lower/upper channels, and `ChartBandSeries.ToRangeArea()` turns Bollinger or Donchian bands into a filled envelope. Missing pairs break the fill. Interior tooltips retain endpoint identity and display both bounds.
+`ChartRangeSeries.CreateArea` owns aligned lower/upper channels, and `ChartBandSeries.ToRangeArea()` turns batch Bollinger or Donchian bands into a filled envelope. Streaming band/channel calculators emit `ChartBandValue` pairs that can be appended to a range source. Missing pairs break the fill. Interior tooltips retain endpoint identity and display both bounds.
 
 `RangeChartDataSource` adds owned input, window-before-decimation preparation, atomic replacement and cached display views with original source-index maps. Paired MinMax/Adaptive selection keeps both boundaries' extrema and gap separators at shared source indices. Use a numeric/date/log X axis to retain original spacing; configure the source's logarithmic value domain when applicable. The reduced polygon approximates omitted detail rather than certifying an enclosing envelope. `None` restores every supplied interval. The **ProCharts Range Area** sample has an optional 100,000-observation mode with an 800-point reduction toggle; its original small mode retains the independent mean line.
 
-`StreamingRangeChartDataSource` extends bounded ingestion to interval pairs: append validated batches without replacing the full retained dataset, preserve original 64-bit observation maps, and reduce ring windows through the same paired selector. It enforces increasing X, commits batches atomically and publishes owned snapshots. The Range Area page's **Open bounded live interval demo** provides a command-driven synthetic feed, not an external live connection. See [bounded streaming range areas](procharts-streaming-ranges.md) for threading, session identity, windowing and performance contracts.
+`StreamingRangeChartDataSource` extends bounded ingestion to interval pairs: append validated batches without replacing the full retained dataset, preserve original 64-bit observation maps, and reduce ring windows through the same paired selector. It enforces increasing X, commits batches atomically and publishes owned snapshots. The Range Area page's **Open bounded live interval demo** provides a command-driven synthetic feed, with an optional persistent 32-price Bollinger calculation before display reduction. It is not an external live connection. See [bounded streaming range areas](procharts-streaming-ranges.md) for threading, session identity, windowing and performance contracts.
 
 ## Data and interaction
 
@@ -58,7 +58,7 @@ Repeated supported point and range-area queries can reuse indexed screen-space g
 - [Data sources](procharts-data-sources.md)
 - [Bounded scalar streaming](procharts-streaming.md)
 - [Bounded streaming range areas](procharts-streaming-ranges.md)
-- [Incremental EMA, RSI, MACD and ATR](procharts-incremental-indicators.md)
+- [Incremental and rolling indicators](procharts-incremental-indicators.md)
 - [Efficient grid windows](procharts-windowing.md)
 - [Advanced chart families](procharts-advanced-charts.md)
 - [Statistical and technical indicators](procharts-indicators.md)
@@ -67,4 +67,4 @@ Repeated supported point and range-area queries can reuse indexed screen-space g
 - [Interaction](procharts-interaction.md)
 - [Export and clipboard](procharts-export-clipboard.md)
 
-Additional diagram families, comprehensive accessibility semantics, incremental versions of the remaining batch indicators, coordinated multi-series overlay selection and physical-GPU performance qualification remain separate work. Measured preparation, calculation or CPU bitmap improvements do not imply measured UI frame-rate or GPU gains.
+Additional diagram families, comprehensive accessibility semantics, late-data correction, coordinated multi-series overlay selection and physical-GPU performance qualification remain separate work. Measured preparation, calculation or CPU bitmap improvements do not imply measured UI frame-rate or GPU gains.
