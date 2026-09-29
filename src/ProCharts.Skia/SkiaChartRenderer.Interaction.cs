@@ -16,12 +16,14 @@ namespace ProCharts.Skia
         private InteractionKey _interactionKey;
         private RenderContext? _interactionContext;
         private SkiaChartPointIndex? _interactionIndex;
+        private RangeAreaInteractionIndex?[]? _interactionRanges;
 
-        /// <summary>Gets or sets whether line, area, scatter and bubble plots reuse layout and indexed point queries.</summary>
+        /// <summary>Gets or sets whether line, area, scatter, bubble and range-area plots reuse layout and indexed queries.</summary>
         /// <remarks>
         /// Enabled by default. Snapshots and their collections must remain stable. Replace the snapshot after data
         /// changes, or call ClearInteractionCache after in-place edits. The renderer is not thread-safe.
         /// Unsupported mixed plots and plots exceeding one million source points retain the reference path.
+        /// Range areas with decreasing projected X coordinates retain reference selection, with cached layout.
         /// </remarks>
         public bool UseInteractionCache
         {
@@ -34,13 +36,14 @@ namespace ProCharts.Skia
             }
         }
 
-        /// <summary>Releases managed point-index/layout data, including data retained by advanced chart layouts.</summary>
+        /// <summary>Releases managed point/range-index and layout data, including advanced chart layouts.</summary>
         /// <remarks>Call after in-place changes to source collections or state captured by formatter delegates.</remarks>
         public void ClearInteractionCache()
         {
             _interactionSnapshot = null;
             _interactionContext = null;
             _interactionIndex = null;
+            _interactionRanges = null;
             _advancedChartContext = null;
         }
 
@@ -52,7 +55,7 @@ namespace ProCharts.Skia
             {
                 ChartSeriesSnapshot series = snapshot.Series[i];
                 if (series.Kind is not (ChartSeriesKind.Line or ChartSeriesKind.Area or
-                    ChartSeriesKind.Scatter or ChartSeriesKind.Bubble)) return false;
+                    ChartSeriesKind.Scatter or ChartSeriesKind.Bubble or ChartSeriesKind.RangeArea)) return false;
                 count += series.Values.Count;
                 if (count > 1_000_000) return false;
             }
@@ -66,6 +69,7 @@ namespace ProCharts.Skia
             {
                 _interactionSnapshot = null;
                 _interactionIndex = null;
+                _interactionRanges = null;
                 _interactionContext = null;
                 return TryBuildRenderContext(bounds, snapshot, style, out context);
             }
@@ -84,6 +88,7 @@ namespace ProCharts.Skia
             _interactionKey = key;
             _interactionContext = valid ? context : null;
             _interactionIndex = null;
+            _interactionRanges = null;
             return valid;
         }
 
@@ -95,6 +100,12 @@ namespace ProCharts.Skia
                 !float.IsFinite(style.BubbleMinRadius) || !float.IsFinite(style.BubbleMaxRadius)) return false;
             if (!TryGetRenderContext(bounds, snapshot, style, out RenderContext context) ||
                 !context.Plot.Contains(point)) return true;
+
+            // The reference Cartesian loop returns the first filled interval hit, regardless of
+            // any closer point candidate accumulated earlier. Keep that precedence in mixed plots.
+            hit = HitTestIndexedRangeAreas(point, snapshot, style, context);
+            if (hit.HasValue) return true;
+
             _interactionIndex ??= BuildPointIndex(snapshot, style, context);
             if (!_interactionIndex.TryFind(point, out SkiaChartIndexedPoint found)) return true;
             ChartSeriesSnapshot series = snapshot.Series[found.SeriesIndex];
@@ -109,11 +120,14 @@ namespace ProCharts.Skia
             RenderContext context)
         {
             int capacity = 0;
-            for (int s = 0; s < snapshot.Series.Count; s++) capacity += snapshot.Series[s].Values.Count;
+            for (int s = 0; s < snapshot.Series.Count; s++)
+                if (snapshot.Series[s].Kind != ChartSeriesKind.RangeArea) capacity += snapshot.Series[s].Values.Count;
             SkiaChartPointIndex index = new(context.Plot, capacity);
             for (int s = 0; s < snapshot.Series.Count; s++)
             {
                 ChartSeriesSnapshot series = snapshot.Series[s];
+                // A range midpoint is not a separately painted marker or a selectable point.
+                if (series.Kind == ChartSeriesKind.RangeArea) continue;
                 bool secondary = series.ValueAxisAssignment == ChartValueAxisAssignment.Secondary;
                 ChartAxisKind axis = secondary ? style.SecondaryValueAxisKind : style.ValueAxisKind;
                 double min = secondary ? context.MinSecondaryValue : context.MinValue;
