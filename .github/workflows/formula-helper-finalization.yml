@@ -22,7 +22,21 @@ jobs:
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
           git fetch origin master
-          git merge --no-edit origin/master
+          if ! git merge --no-edit origin/master; then
+            python3 - <<'PY'
+          import subprocess, difflib
+          def git(*args): return subprocess.check_output(['git', *args], text=True)
+          path = 'src/ProDataGrid.FormulaEngine.UnitTests/FormulaLexicalBoundaryTests.cs'
+          assert git('diff', '--name-only', '--diff-filter=U').splitlines() == [path]
+          left, right = git('show', ':2:' + path), git('show', ':3:' + path)
+          if left != right:
+              print(''.join(difflib.unified_diff(right.splitlines(True), left.splitlines(True))))
+          assert left == right, 'Nontrivial test conflict requires review'
+          subprocess.run(['git', 'checkout', '--ours', '--', path], check=True)
+          subprocess.run(['git', 'add', path], check=True)
+          PY
+            git commit --no-edit
+          fi
           python3 tools/finalize-formula-helpers.py
           git rm tools/finalize-formula-helpers.py .github/workflows/formula-helper-finalization.yml
           git add src/ProDataGrid.FormulaEngine.Excel/ExcelLambdaHelperUtilities.cs src/ProDataGrid.FormulaEngine.UnitTests/ExcelLambdaHelperTests.cs
