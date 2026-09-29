@@ -1,23 +1,60 @@
-name: Formula scientific function validation
+name: Formula scientific measurements and native validation
 on:
   push:
     branches: [work/formula-scientific-math]
 permissions:
-  contents: read
+  contents: write
 jobs:
   validate:
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 20
+    env:
+      DOTNET_TieredCompilation: '0'
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: work/formula-scientific-math
       - uses: actions/setup-dotnet@v4
         with:
           global-json-file: global.json
-      - name: Execute all formula regressions and build both targets
+      - name: Integrate numeric scenarios into the retained benchmark harness
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          p=Path('tools/formula-function-benchmarks/Program.cs');s=p.read_text()
+          old='internal static class Program';assert s.count(old)==1
+          s=s.replace(old,'internal static partial class Program')
+          old='            Validate(context, evaluator, resolver, parser);';assert s.count(old)==1
+          s=s.replace(old,old+'\n            ValidateNumerics(context, evaluator, resolver, parser);')
+          old='            File.WriteAllText(Path.Combine(destination, "measurements.csv"), output.ToString());';assert s.count(old)==1
+          p.write_text(s.replace(old,'            MeasureNumerics(output, context, evaluator, resolver, parser);\n'+old))
+          PY
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add tools/formula-function-benchmarks/Program.cs
+          git commit -m 'Integrate reproducible numerical smoke and array-versus-callback measurements'
+      - name: Execute all regressions and both library target builds
         run: |
           dotnet test src/ProDataGrid.FormulaEngine.UnitTests/ProDataGrid.FormulaEngine.UnitTests.csproj -c Release --logger trx --results-directory artifacts/tests
           dotnet build src/ProDataGrid.FormulaEngine.Excel/ProDataGrid.FormulaEngine.Excel.csproj -c Release
-      - name: Record exact validation sources
+          dotnet build tools/formula-function-benchmarks/FormulaFunctionBenchmarks.csproj -c Release
+      - name: Measure science and order-statistic workloads twice
+        run: |
+          set -o pipefail
+          dotnet run --no-build -c Release --project tools/formula-function-benchmarks/FormulaFunctionBenchmarks.csproj -- artifacts/run-1 2>&1 | tee artifacts/run-1.log
+          dotnet run --no-build -c Release --project tools/formula-function-benchmarks/FormulaFunctionBenchmarks.csproj -- artifacts/run-2 2>&1 | tee artifacts/run-2.log
+          lscpu > artifacts/cpu.txt
+          dotnet --info > artifacts/runtime.txt
+      - name: Publish and execute numerical NativeAOT smoke
+        run: |
+          set -o pipefail
+          dotnet publish tools/formula-function-benchmarks/FormulaFunctionBenchmarks.csproj -c Release -r linux-x64 -p:PublishAot=true -o artifacts/native 2>&1 | tee artifacts/native-publish.log
+          if grep -E 'warning IL[0-9]+' artifacts/native-publish.log; then exit 1; fi
+          ./artifacts/native/FormulaFunctionBenchmarks artifacts/native-smoke smoke | tee artifacts/native-run.log
+          rm -r artifacts/native
+      - name: Push tested benchmark integration
+        run: git push origin HEAD:work/formula-scientific-math
+      - name: Record exact source evidence
         if: always()
         run: |
           mkdir -p artifacts
@@ -26,5 +63,5 @@ jobs:
       - uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: formula-scientific-validation
+          name: formula-scientific-measurements
           path: artifacts
