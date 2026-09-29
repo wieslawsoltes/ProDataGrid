@@ -18,9 +18,20 @@ jobs:
         with:
           global-json-file: global.json
           dotnet-version: '8.0.x'
-      - name: Execute the full formula regression suite on net8
+      - name: Execute the unchanged formula test sources against the net8 library targets
         run: |
-          dotnet test src/ProDataGrid.FormulaEngine.UnitTests/ProDataGrid.FormulaEngine.UnitTests.csproj -c Release -p:TargetFramework=net8.0 --logger trx --results-directory artifacts/net8-tests
+          mkdir -p artifacts
+          python3 - <<'PY'
+          from pathlib import Path
+          p=Path('src/ProDataGrid.FormulaEngine.UnitTests/ProDataGrid.FormulaEngine.UnitTests.csproj')
+          s=p.read_text()
+          old='<TargetFramework>net10.0</TargetFramework>'
+          assert s.count(old)==1
+          p.write_text(s.replace(old,'<TargetFramework>net8.0</TargetFramework>'))
+          PY
+          set -o pipefail
+          dotnet test src/ProDataGrid.FormulaEngine.UnitTests/ProDataGrid.FormulaEngine.UnitTests.csproj -c Release --logger trx --results-directory artifacts/net8-tests 2>&1 | tee artifacts/net8-test.log
+          git restore src/ProDataGrid.FormulaEngine.UnitTests/ProDataGrid.FormulaEngine.UnitTests.csproj
           dotnet --list-runtimes > artifacts/runtimes.txt
           dotnet --info > artifacts/sdk.txt
           lscpu > artifacts/cpu.txt
@@ -38,7 +49,7 @@ jobs:
             case "$item" in baseline-*) SRC="$BASE" ;; esac
             dotnet run --no-build -c Release --project "$SRC/tools/formula-benchmarks/FormulaBenchmarks.csproj" -- "$ROOT/artifacts/$item.csv" "$item" > "$ROOT/artifacts/$item.log"
           done
-          printf 'baseline=4cd6c6dbb002ec1fb25f0d04ed5a5e6b77374a1e\noptimized_library_source=d036d625be956942e76d05bb912221eb52fa8a24\nDOTNET_TieredCompilation=runtime-default\norder=baseline,current,current,baseline\n' > artifacts/measurement-context.txt
+          printf 'baseline=4cd6c6dbb002ec1fb25f0d04ed5a5e6b77374a1e\noptimized_library_source=d036d625be956942e76d05bb912221eb52fa8a24\nDOTNET_TieredCompilation=runtime-default\norder=baseline,current,current,baseline\nnet8_test_sources=unchanged;test_project_temporarily_retargeted_then_restored\n' > artifacts/measurement-context.txt
       - name: Record clean validation branch without temporary workflow
         run: |
           git config user.name 'github-actions[bot]'
