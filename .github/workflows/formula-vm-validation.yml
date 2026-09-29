@@ -1,0 +1,77 @@
+name: Formula VM instruction throughput comparison
+on:
+  push:
+    branches: [work/formula-vm-instruction-throughput]
+permissions:
+  contents: write
+jobs:
+  validate:
+    if: github.repository == 'wieslawsoltes/ProDataGrid'
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    env:
+      DOTNET_TieredCompilation: '0'
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: work/formula-vm-instruction-throughput
+          fetch-depth: 0
+      - uses: actions/setup-dotnet@v4
+        with:
+          global-json-file: global.json
+      - name: Apply the guarded instruction-loop optimization
+        run: python3 tools/apply-formula-vm-readonly.py
+      - name: Execute all formula regressions and build both library targets
+        run: |
+          git diff --check
+          dotnet test src/ProDataGrid.FormulaEngine.UnitTests/ProDataGrid.FormulaEngine.UnitTests.csproj -c Release --logger trx --results-directory artifacts/tests
+          dotnet build src/ProDataGrid.FormulaEngine.Excel/ProDataGrid.FormulaEngine.Excel.csproj -c Release
+      - name: Create clean tested commit and prepare baseline worktree
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add src/ProDataGrid.FormulaEngine/FormulaEvaluation.cs
+          git rm tools/apply-formula-vm-readonly.py .github/workflows/formula-vm-validation.yml
+          git commit -m 'Read immutable VM instructions by readonly reference instead of copying descriptors'
+          git worktree add --detach "$RUNNER_TEMP/formula-vm-baseline" 4cd6c6dbb002ec1fb25f0d04ed5a5e6b77374a1e
+      - name: Build identical benchmark harnesses for baseline and optimized code
+        run: |
+          BASE="$RUNNER_TEMP/formula-vm-baseline"
+          dotnet build tools/formula-function-benchmarks/FormulaFunctionBenchmarks.csproj -c Release
+          dotnet build "$BASE/tools/formula-function-benchmarks/FormulaFunctionBenchmarks.csproj" -c Release
+          dotnet build tools/formula-benchmarks/FormulaBenchmarks.csproj -c Release
+          dotnet build "$BASE/tools/formula-benchmarks/FormulaBenchmarks.csproj" -c Release
+          lscpu > artifacts/cpu.txt
+          dotnet --info > artifacts/runtime.txt
+      - name: Run baseline-current-current-baseline comparisons on one runner
+        run: |
+          BASE="$RUNNER_TEMP/formula-vm-baseline"
+          ROOT="$PWD"
+          for item in baseline-1 current-1 current-2 baseline-2; do
+            SRC="$ROOT"
+            case "$item" in baseline-*) SRC="$BASE" ;; esac
+            dotnet run --no-build -c Release --project "$SRC/tools/formula-function-benchmarks/FormulaFunctionBenchmarks.csproj" -- "$ROOT/artifacts/$item/functions" > "$ROOT/artifacts/$item.log"
+            dotnet run --no-build -c Release --project "$SRC/tools/formula-benchmarks/FormulaBenchmarks.csproj" -- "$ROOT/artifacts/$item/core.csv" "$item" > "$ROOT/artifacts/$item-core.log"
+          done
+          printf 'baseline=4cd6c6dbb002ec1fb25f0d04ed5a5e6b77374a1e\ncurrent=%s\norder=baseline,current,current,baseline\nDOTNET_TieredCompilation=0\n' "$(git rev-parse HEAD)" > artifacts/measurement-context.txt
+      - name: Publish and run optimized NativeAOT smoke
+        run: |
+          set -o pipefail
+          dotnet publish tools/formula-function-benchmarks/FormulaFunctionBenchmarks.csproj -c Release -r linux-x64 -p:PublishAot=true -o artifacts/native 2>&1 | tee artifacts/native-publish.log
+          if grep -E 'warning IL[0-9]+' artifacts/native-publish.log; then exit 1; fi
+          ./artifacts/native/FormulaFunctionBenchmarks artifacts/native-smoke smoke | tee artifacts/native-run.log
+          rm -r artifacts/native
+      - name: Push clean validated implementation
+        run: git push origin HEAD:work/formula-vm-instruction-throughput
+      - name: Export source evidence
+        if: always()
+        run: |
+          mkdir -p artifacts
+          git archive HEAD > artifacts/source.tar
+          git rev-parse HEAD > artifacts/revision.txt
+          git ls-tree -r HEAD src/ProDataGrid.FormulaEngine src/ProDataGrid.FormulaEngine.Excel src/ProDataGrid.FormulaEngine.UnitTests > artifacts/validated-source-blobs.txt
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: formula-vm-throughput-validation
+          path: artifacts
