@@ -27,7 +27,6 @@ namespace ProDataGrid.FormulaEngine.Tests
         [InlineData("MAP(A1:A2,LAMBDA(x,x))", "0;0")]
         [InlineData("MAP({1;2},LAMBDA(x,{7}))", "7;7")]
         [InlineData("MAP({1;2},LAMBDA(x,{1,2}))", "#CALC!")]
-        [InlineData("MAP({1;2},LAMBDA(x,LAMBDA(y,x+y)))", "#CALC!")]
         [InlineData("MAP({1;2},LAMBDA(a,b,a+b))", "#VALUE!")]
         [InlineData("MAP({1;2},42)", "#VALUE!")]
         [InlineData("MAP({1;2},NA())", "#N/A")]

@@ -37,19 +37,14 @@ namespace ProDataGrid.FormulaEngine.Excel
 
         public static bool TryArray(FormulaValue value, out FormulaArray array, out FormulaError error)
         {
-            if (value.Kind == FormulaValueKind.Lambda)
-            {
-                array = null!;
-                error = new FormulaError(FormulaErrorType.Value);
-                return false;
-            }
             return ExcelArrayShapeUtilities.TryGetArray(value, out array, out error);
         }
 
         public static bool TryScalar(FormulaValue value, out FormulaValue scalar)
         {
-            // A single-cell result can be materialized; multi-cell or callable results would
-            // create nested arrays, which the helper's rectangular result cannot represent.
+            // Single-cell arrays are materialized. A closure is a scalar callable payload,
+            // not a nested array: keep it for composition and defer worksheet rejection to
+            // ToCellResult(). Immutable invocation frames preserve each captured argument.
             if (value.Kind == FormulaValueKind.Array)
             {
                 var array = value.AsArray();
@@ -57,7 +52,7 @@ namespace ProDataGrid.FormulaEngine.Excel
                     value = ExcelDynamicArrayUtilities.GetArrayValue(array, 0, 0);
             }
             scalar = value.Kind == FormulaValueKind.Blank ? FormulaValue.FromNumber(0) : value;
-            return value.Kind != FormulaValueKind.Array && value.Kind != FormulaValueKind.Lambda && value.Kind != FormulaValueKind.Reference;
+            return value.Kind != FormulaValueKind.Array && value.Kind != FormulaValueKind.Reference;
         }
 
         public static FormulaValue NestedResult()
