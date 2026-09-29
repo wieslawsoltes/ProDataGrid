@@ -19,6 +19,9 @@ namespace DataGridSample.Pages
         public ChartingPage()
         {
             InitializeComponent();
+            // The feed is initialized only when its tab enters the visual tree and is stopped on detach.
+            if (Content is TabControl tabs)
+                tabs.Items.Add(new TabItem { Header = "Synchronized streams", Content = new ChartMultiSeriesStreamingDemo() });
         }
 
         public ChartSampleKind SampleKind
