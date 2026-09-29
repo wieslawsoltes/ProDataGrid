@@ -9496,6 +9496,20 @@
     },
     {
       "type": "ManagedReference",
+      "source_relative_path": "api/ProCharts.ChartHighLowClose.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/ProCharts.ChartHighLowClose.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "ProCharts.ChartHighLowClose",
+      "Summary": "<p sourcefile=\"api/ProCharts.ChartHighLowClose.yml\" sourcestartlinenumber=\"1\">Aligned high, low and close channels for one observation. Open is not required by ATR.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
       "source_relative_path": "api/ProCharts.ChartIndicators.yml",
       "output": {
         ".html": {
@@ -9605,6 +9619,20 @@
       "IsMRef": true,
       "Title": "ProCharts.ChartMacdSeries",
       "Summary": "<p sourcefile=\"api/ProCharts.ChartMacdSeries.yml\" sourcestartlinenumber=\"1\">Aligned moving-average convergence/divergence line, signal and histogram series.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/ProCharts.ChartMacdValue.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/ProCharts.ChartMacdValue.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "ProCharts.ChartMacdValue",
+      "Summary": "<p sourcefile=\"api/ProCharts.ChartMacdValue.yml\" sourcestartlinenumber=\"1\">An aligned MACD observation. Individual channels remain null until their warmup completes.</p>\n"
     },
     {
       "type": "ManagedReference",
@@ -9888,6 +9916,20 @@
     },
     {
       "type": "ManagedReference",
+      "source_relative_path": "api/ProCharts.IStreamingChartIndicator-2.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/ProCharts.IStreamingChartIndicator-2.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "ProCharts.IStreamingChartIndicator<TInput, TOutput>",
+      "Summary": "<p sourcefile=\"api/ProCharts.IStreamingChartIndicator-2.yml\" sourcestartlinenumber=\"1\">A reusable, single-writer indicator that consumes observations without retaining their history.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
       "source_relative_path": "api/ProCharts.Skia.SkiaAdvancedChartStyle.yml",
       "output": {
         ".html": {
@@ -10126,6 +10168,20 @@
     },
     {
       "type": "ManagedReference",
+      "source_relative_path": "api/ProCharts.StreamingAverageTrueRange.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/ProCharts.StreamingAverageTrueRange.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "ProCharts.StreamingAverageTrueRange",
+      "Summary": "<p sourcefile=\"api/ProCharts.StreamingAverageTrueRange.yml\" sourcestartlinenumber=\"1\">Constant-space Wilder ATR over aligned high/low/close observations.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
       "source_relative_path": "api/ProCharts.StreamingChartDataSource.yml",
       "output": {
         ".html": {
@@ -10137,6 +10193,48 @@
       "IsMRef": true,
       "Title": "ProCharts.StreamingChartDataSource",
       "Summary": "<p sourcefile=\"api/ProCharts.StreamingChartDataSource.yml\" sourcestartlinenumber=\"1\">A bounded, thread-safe, single-series data source for live numeric charts.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/ProCharts.StreamingExponentialMovingAverage.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/ProCharts.StreamingExponentialMovingAverage.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "ProCharts.StreamingExponentialMovingAverage",
+      "Summary": "<p sourcefile=\"api/ProCharts.StreamingExponentialMovingAverage.yml\" sourcestartlinenumber=\"1\">An allocation-free, constant-space EMA seeded with a complete-window arithmetic mean.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/ProCharts.StreamingMacd.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/ProCharts.StreamingMacd.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "ProCharts.StreamingMacd",
+      "Summary": "<p sourcefile=\"api/ProCharts.StreamingMacd.yml\" sourcestartlinenumber=\"1\">Constant-space MACD with SMA-seeded fast/slow EMAs, EMA signal and aligned histogram.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/ProCharts.StreamingRelativeStrengthIndex.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/ProCharts.StreamingRelativeStrengthIndex.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "ProCharts.StreamingRelativeStrengthIndex",
+      "Summary": "<p sourcefile=\"api/ProCharts.StreamingRelativeStrengthIndex.yml\" sourcestartlinenumber=\"1\">Constant-space Wilder RSI requiring period price changes (period+1 prices) for warmup.</p>\n"
     },
     {
       "type": "ManagedReference",
@@ -12969,6 +13067,16 @@
       "output": {
         ".html": {
           "relative_path": "articles/procharts-hierarchy-navigation.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "Conceptual",
+      "source_relative_path": "articles/procharts-incremental-indicators.md",
+      "output": {
+        ".html": {
+          "relative_path": "articles/procharts-incremental-indicators.html"
         }
       },
       "version": ""

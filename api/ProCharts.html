@@ -195,8 +195,28 @@ and whether the window should remain pinned to the latest categories.</p>
 </dd>
     </dl>
     <dl class="jumplist">
+      <dt><a class="xref" href="ProCharts.StreamingAverageTrueRange.html">StreamingAverageTrueRange</a></dt>
+      <dd><p>Constant-space Wilder ATR over aligned high/low/close observations.</p>
+</dd>
+    </dl>
+    <dl class="jumplist">
       <dt><a class="xref" href="ProCharts.StreamingChartDataSource.html">StreamingChartDataSource</a></dt>
       <dd><p>A bounded, thread-safe, single-series data source for live numeric charts.</p>
+</dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="ProCharts.StreamingExponentialMovingAverage.html">StreamingExponentialMovingAverage</a></dt>
+      <dd><p>An allocation-free, constant-space EMA seeded with a complete-window arithmetic mean.</p>
+</dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="ProCharts.StreamingMacd.html">StreamingMacd</a></dt>
+      <dd><p>Constant-space MACD with SMA-seeded fast/slow EMAs, EMA signal and aligned histogram.</p>
+</dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="ProCharts.StreamingRelativeStrengthIndex.html">StreamingRelativeStrengthIndex</a></dt>
+      <dd><p>Constant-space Wilder RSI requiring period price changes (period+1 prices) for warmup.</p>
 </dd>
     </dl>
     <h3 id="structs">
@@ -207,8 +227,18 @@ Structs
       <dd></dd>
     </dl>
     <dl class="jumplist">
+      <dt><a class="xref" href="ProCharts.ChartHighLowClose.html">ChartHighLowClose</a></dt>
+      <dd><p>Aligned high, low and close channels for one observation. Open is not required by ATR.</p>
+</dd>
+    </dl>
+    <dl class="jumplist">
       <dt><a class="xref" href="ProCharts.ChartLayoutRect.html">ChartLayoutRect</a></dt>
       <dd><p>A renderer-independent finite rectangle.</p>
+</dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="ProCharts.ChartMacdValue.html">ChartMacdValue</a></dt>
+      <dd><p>An aligned MACD observation. Individual channels remain null until their warmup completes.</p>
 </dd>
     </dl>
     <dl class="jumplist">
@@ -245,6 +275,11 @@ Interfaces
     <dl class="jumplist">
       <dt><a class="xref" href="ProCharts.IChartWindowInfoProvider.html">IChartWindowInfoProvider</a></dt>
       <dd></dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="ProCharts.IStreamingChartIndicator-2.html">IStreamingChartIndicator&lt;TInput, TOutput&gt;</a></dt>
+      <dd><p>A reusable, single-writer indicator that consumes observations without retaining their history.</p>
+</dd>
     </dl>
     <h3 id="enums">
 Enums

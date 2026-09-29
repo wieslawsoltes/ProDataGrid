@@ -72489,6 +72489,70 @@ references:
   isSpec: "True"
   fullName: ProCharts.ChartHierarchySnapshot.TryGetNodeIndex
   nameWithType: ChartHierarchySnapshot.TryGetNodeIndex
+- uid: ProCharts.ChartHighLowClose
+  name: ChartHighLowClose
+  href: api/ProCharts.ChartHighLowClose.html
+  commentId: T:ProCharts.ChartHighLowClose
+  fullName: ProCharts.ChartHighLowClose
+  nameWithType: ChartHighLowClose
+- uid: ProCharts.ChartHighLowClose.#ctor(System.Nullable{System.Double},System.Nullable{System.Double},System.Nullable{System.Double})
+  name: ChartHighLowClose(double?, double?, double?)
+  href: api/ProCharts.ChartHighLowClose.html#ProCharts_ChartHighLowClose__ctor_System_Nullable_System_Double__System_Nullable_System_Double__System_Nullable_System_Double__
+  commentId: M:ProCharts.ChartHighLowClose.#ctor(System.Nullable{System.Double},System.Nullable{System.Double},System.Nullable{System.Double})
+  name.vb: New(Double?, Double?, Double?)
+  fullName: ProCharts.ChartHighLowClose.ChartHighLowClose(double?, double?, double?)
+  fullName.vb: ProCharts.ChartHighLowClose.New(Double?, Double?, Double?)
+  nameWithType: ChartHighLowClose.ChartHighLowClose(double?, double?, double?)
+  nameWithType.vb: ChartHighLowClose.New(Double?, Double?, Double?)
+- uid: ProCharts.ChartHighLowClose.#ctor*
+  name: ChartHighLowClose
+  href: api/ProCharts.ChartHighLowClose.html#ProCharts_ChartHighLowClose__ctor_
+  commentId: Overload:ProCharts.ChartHighLowClose.#ctor
+  isSpec: "True"
+  name.vb: New
+  fullName: ProCharts.ChartHighLowClose.ChartHighLowClose
+  fullName.vb: ProCharts.ChartHighLowClose.New
+  nameWithType: ChartHighLowClose.ChartHighLowClose
+  nameWithType.vb: ChartHighLowClose.New
+- uid: ProCharts.ChartHighLowClose.Close
+  name: Close
+  href: api/ProCharts.ChartHighLowClose.html#ProCharts_ChartHighLowClose_Close
+  commentId: P:ProCharts.ChartHighLowClose.Close
+  fullName: ProCharts.ChartHighLowClose.Close
+  nameWithType: ChartHighLowClose.Close
+- uid: ProCharts.ChartHighLowClose.Close*
+  name: Close
+  href: api/ProCharts.ChartHighLowClose.html#ProCharts_ChartHighLowClose_Close_
+  commentId: Overload:ProCharts.ChartHighLowClose.Close
+  isSpec: "True"
+  fullName: ProCharts.ChartHighLowClose.Close
+  nameWithType: ChartHighLowClose.Close
+- uid: ProCharts.ChartHighLowClose.High
+  name: High
+  href: api/ProCharts.ChartHighLowClose.html#ProCharts_ChartHighLowClose_High
+  commentId: P:ProCharts.ChartHighLowClose.High
+  fullName: ProCharts.ChartHighLowClose.High
+  nameWithType: ChartHighLowClose.High
+- uid: ProCharts.ChartHighLowClose.High*
+  name: High
+  href: api/ProCharts.ChartHighLowClose.html#ProCharts_ChartHighLowClose_High_
+  commentId: Overload:ProCharts.ChartHighLowClose.High
+  isSpec: "True"
+  fullName: ProCharts.ChartHighLowClose.High
+  nameWithType: ChartHighLowClose.High
+- uid: ProCharts.ChartHighLowClose.Low
+  name: Low
+  href: api/ProCharts.ChartHighLowClose.html#ProCharts_ChartHighLowClose_Low
+  commentId: P:ProCharts.ChartHighLowClose.Low
+  fullName: ProCharts.ChartHighLowClose.Low
+  nameWithType: ChartHighLowClose.Low
+- uid: ProCharts.ChartHighLowClose.Low*
+  name: Low
+  href: api/ProCharts.ChartHighLowClose.html#ProCharts_ChartHighLowClose_Low_
+  commentId: Overload:ProCharts.ChartHighLowClose.Low
+  isSpec: "True"
+  fullName: ProCharts.ChartHighLowClose.Low
+  nameWithType: ChartHighLowClose.Low
 - uid: ProCharts.ChartIndicators
   name: ChartIndicators
   href: api/ProCharts.ChartIndicators.html
@@ -73095,6 +73159,70 @@ references:
   isSpec: "True"
   fullName: ProCharts.ChartMacdSeries.Signal
   nameWithType: ChartMacdSeries.Signal
+- uid: ProCharts.ChartMacdValue
+  name: ChartMacdValue
+  href: api/ProCharts.ChartMacdValue.html
+  commentId: T:ProCharts.ChartMacdValue
+  fullName: ProCharts.ChartMacdValue
+  nameWithType: ChartMacdValue
+- uid: ProCharts.ChartMacdValue.#ctor(System.Nullable{System.Double},System.Nullable{System.Double},System.Nullable{System.Double})
+  name: ChartMacdValue(double?, double?, double?)
+  href: api/ProCharts.ChartMacdValue.html#ProCharts_ChartMacdValue__ctor_System_Nullable_System_Double__System_Nullable_System_Double__System_Nullable_System_Double__
+  commentId: M:ProCharts.ChartMacdValue.#ctor(System.Nullable{System.Double},System.Nullable{System.Double},System.Nullable{System.Double})
+  name.vb: New(Double?, Double?, Double?)
+  fullName: ProCharts.ChartMacdValue.ChartMacdValue(double?, double?, double?)
+  fullName.vb: ProCharts.ChartMacdValue.New(Double?, Double?, Double?)
+  nameWithType: ChartMacdValue.ChartMacdValue(double?, double?, double?)
+  nameWithType.vb: ChartMacdValue.New(Double?, Double?, Double?)
+- uid: ProCharts.ChartMacdValue.#ctor*
+  name: ChartMacdValue
+  href: api/ProCharts.ChartMacdValue.html#ProCharts_ChartMacdValue__ctor_
+  commentId: Overload:ProCharts.ChartMacdValue.#ctor
+  isSpec: "True"
+  name.vb: New
+  fullName: ProCharts.ChartMacdValue.ChartMacdValue
+  fullName.vb: ProCharts.ChartMacdValue.New
+  nameWithType: ChartMacdValue.ChartMacdValue
+  nameWithType.vb: ChartMacdValue.New
+- uid: ProCharts.ChartMacdValue.Histogram
+  name: Histogram
+  href: api/ProCharts.ChartMacdValue.html#ProCharts_ChartMacdValue_Histogram
+  commentId: P:ProCharts.ChartMacdValue.Histogram
+  fullName: ProCharts.ChartMacdValue.Histogram
+  nameWithType: ChartMacdValue.Histogram
+- uid: ProCharts.ChartMacdValue.Histogram*
+  name: Histogram
+  href: api/ProCharts.ChartMacdValue.html#ProCharts_ChartMacdValue_Histogram_
+  commentId: Overload:ProCharts.ChartMacdValue.Histogram
+  isSpec: "True"
+  fullName: ProCharts.ChartMacdValue.Histogram
+  nameWithType: ChartMacdValue.Histogram
+- uid: ProCharts.ChartMacdValue.Line
+  name: Line
+  href: api/ProCharts.ChartMacdValue.html#ProCharts_ChartMacdValue_Line
+  commentId: P:ProCharts.ChartMacdValue.Line
+  fullName: ProCharts.ChartMacdValue.Line
+  nameWithType: ChartMacdValue.Line
+- uid: ProCharts.ChartMacdValue.Line*
+  name: Line
+  href: api/ProCharts.ChartMacdValue.html#ProCharts_ChartMacdValue_Line_
+  commentId: Overload:ProCharts.ChartMacdValue.Line
+  isSpec: "True"
+  fullName: ProCharts.ChartMacdValue.Line
+  nameWithType: ChartMacdValue.Line
+- uid: ProCharts.ChartMacdValue.Signal
+  name: Signal
+  href: api/ProCharts.ChartMacdValue.html#ProCharts_ChartMacdValue_Signal
+  commentId: P:ProCharts.ChartMacdValue.Signal
+  fullName: ProCharts.ChartMacdValue.Signal
+  nameWithType: ChartMacdValue.Signal
+- uid: ProCharts.ChartMacdValue.Signal*
+  name: Signal
+  href: api/ProCharts.ChartMacdValue.html#ProCharts_ChartMacdValue_Signal_
+  commentId: Overload:ProCharts.ChartMacdValue.Signal
+  isSpec: "True"
+  fullName: ProCharts.ChartMacdValue.Signal
+  nameWithType: ChartMacdValue.Signal
 - uid: ProCharts.ChartMarkerShape
   name: ChartMarkerShape
   href: api/ProCharts.ChartMarkerShape.html
@@ -75181,6 +75309,83 @@ references:
   isSpec: "True"
   fullName: ProCharts.IChartWindowInfoProvider.GetTotalCategoryCount
   nameWithType: IChartWindowInfoProvider.GetTotalCategoryCount
+- uid: ProCharts.IStreamingChartIndicator`2
+  name: IStreamingChartIndicator<TInput, TOutput>
+  href: api/ProCharts.IStreamingChartIndicator-2.html
+  commentId: T:ProCharts.IStreamingChartIndicator`2
+  name.vb: IStreamingChartIndicator(Of TInput, TOutput)
+  fullName: ProCharts.IStreamingChartIndicator<TInput, TOutput>
+  fullName.vb: ProCharts.IStreamingChartIndicator(Of TInput, TOutput)
+  nameWithType: IStreamingChartIndicator<TInput, TOutput>
+  nameWithType.vb: IStreamingChartIndicator(Of TInput, TOutput)
+- uid: ProCharts.IStreamingChartIndicator`2.Current
+  name: Current
+  href: api/ProCharts.IStreamingChartIndicator-2.html#ProCharts_IStreamingChartIndicator_2_Current
+  commentId: P:ProCharts.IStreamingChartIndicator`2.Current
+  fullName: ProCharts.IStreamingChartIndicator<TInput, TOutput>.Current
+  fullName.vb: ProCharts.IStreamingChartIndicator(Of TInput, TOutput).Current
+  nameWithType: IStreamingChartIndicator<TInput, TOutput>.Current
+  nameWithType.vb: IStreamingChartIndicator(Of TInput, TOutput).Current
+- uid: ProCharts.IStreamingChartIndicator`2.Current*
+  name: Current
+  href: api/ProCharts.IStreamingChartIndicator-2.html#ProCharts_IStreamingChartIndicator_2_Current_
+  commentId: Overload:ProCharts.IStreamingChartIndicator`2.Current
+  isSpec: "True"
+  fullName: ProCharts.IStreamingChartIndicator<TInput, TOutput>.Current
+  fullName.vb: ProCharts.IStreamingChartIndicator(Of TInput, TOutput).Current
+  nameWithType: IStreamingChartIndicator<TInput, TOutput>.Current
+  nameWithType.vb: IStreamingChartIndicator(Of TInput, TOutput).Current
+- uid: ProCharts.IStreamingChartIndicator`2.Push(`0)
+  name: Push(TInput)
+  href: api/ProCharts.IStreamingChartIndicator-2.html#ProCharts_IStreamingChartIndicator_2_Push__0_
+  commentId: M:ProCharts.IStreamingChartIndicator`2.Push(`0)
+  fullName: ProCharts.IStreamingChartIndicator<TInput, TOutput>.Push(TInput)
+  fullName.vb: ProCharts.IStreamingChartIndicator(Of TInput, TOutput).Push(TInput)
+  nameWithType: IStreamingChartIndicator<TInput, TOutput>.Push(TInput)
+  nameWithType.vb: IStreamingChartIndicator(Of TInput, TOutput).Push(TInput)
+- uid: ProCharts.IStreamingChartIndicator`2.Push*
+  name: Push
+  href: api/ProCharts.IStreamingChartIndicator-2.html#ProCharts_IStreamingChartIndicator_2_Push_
+  commentId: Overload:ProCharts.IStreamingChartIndicator`2.Push
+  isSpec: "True"
+  fullName: ProCharts.IStreamingChartIndicator<TInput, TOutput>.Push
+  fullName.vb: ProCharts.IStreamingChartIndicator(Of TInput, TOutput).Push
+  nameWithType: IStreamingChartIndicator<TInput, TOutput>.Push
+  nameWithType.vb: IStreamingChartIndicator(Of TInput, TOutput).Push
+- uid: ProCharts.IStreamingChartIndicator`2.Reset
+  name: Reset()
+  href: api/ProCharts.IStreamingChartIndicator-2.html#ProCharts_IStreamingChartIndicator_2_Reset
+  commentId: M:ProCharts.IStreamingChartIndicator`2.Reset
+  fullName: ProCharts.IStreamingChartIndicator<TInput, TOutput>.Reset()
+  fullName.vb: ProCharts.IStreamingChartIndicator(Of TInput, TOutput).Reset()
+  nameWithType: IStreamingChartIndicator<TInput, TOutput>.Reset()
+  nameWithType.vb: IStreamingChartIndicator(Of TInput, TOutput).Reset()
+- uid: ProCharts.IStreamingChartIndicator`2.Reset*
+  name: Reset
+  href: api/ProCharts.IStreamingChartIndicator-2.html#ProCharts_IStreamingChartIndicator_2_Reset_
+  commentId: Overload:ProCharts.IStreamingChartIndicator`2.Reset
+  isSpec: "True"
+  fullName: ProCharts.IStreamingChartIndicator<TInput, TOutput>.Reset
+  fullName.vb: ProCharts.IStreamingChartIndicator(Of TInput, TOutput).Reset
+  nameWithType: IStreamingChartIndicator<TInput, TOutput>.Reset
+  nameWithType.vb: IStreamingChartIndicator(Of TInput, TOutput).Reset
+- uid: ProCharts.IStreamingChartIndicator`2.SamplesProcessed
+  name: SamplesProcessed
+  href: api/ProCharts.IStreamingChartIndicator-2.html#ProCharts_IStreamingChartIndicator_2_SamplesProcessed
+  commentId: P:ProCharts.IStreamingChartIndicator`2.SamplesProcessed
+  fullName: ProCharts.IStreamingChartIndicator<TInput, TOutput>.SamplesProcessed
+  fullName.vb: ProCharts.IStreamingChartIndicator(Of TInput, TOutput).SamplesProcessed
+  nameWithType: IStreamingChartIndicator<TInput, TOutput>.SamplesProcessed
+  nameWithType.vb: IStreamingChartIndicator(Of TInput, TOutput).SamplesProcessed
+- uid: ProCharts.IStreamingChartIndicator`2.SamplesProcessed*
+  name: SamplesProcessed
+  href: api/ProCharts.IStreamingChartIndicator-2.html#ProCharts_IStreamingChartIndicator_2_SamplesProcessed_
+  commentId: Overload:ProCharts.IStreamingChartIndicator`2.SamplesProcessed
+  isSpec: "True"
+  fullName: ProCharts.IStreamingChartIndicator<TInput, TOutput>.SamplesProcessed
+  fullName.vb: ProCharts.IStreamingChartIndicator(Of TInput, TOutput).SamplesProcessed
+  nameWithType: IStreamingChartIndicator<TInput, TOutput>.SamplesProcessed
+  nameWithType.vb: IStreamingChartIndicator(Of TInput, TOutput).SamplesProcessed
 - uid: ProCharts.Skia
   name: ProCharts.Skia
   href: api/ProCharts.Skia.html
@@ -78362,6 +78567,105 @@ references:
   commentId: F:ProCharts.Skia.SkiaPieLabelPlacement.Outside
   fullName: ProCharts.Skia.SkiaPieLabelPlacement.Outside
   nameWithType: SkiaPieLabelPlacement.Outside
+- uid: ProCharts.StreamingAverageTrueRange
+  name: StreamingAverageTrueRange
+  href: api/ProCharts.StreamingAverageTrueRange.html
+  commentId: T:ProCharts.StreamingAverageTrueRange
+  fullName: ProCharts.StreamingAverageTrueRange
+  nameWithType: StreamingAverageTrueRange
+- uid: ProCharts.StreamingAverageTrueRange.#ctor(System.Int32)
+  name: StreamingAverageTrueRange(int)
+  href: api/ProCharts.StreamingAverageTrueRange.html#ProCharts_StreamingAverageTrueRange__ctor_System_Int32_
+  commentId: M:ProCharts.StreamingAverageTrueRange.#ctor(System.Int32)
+  name.vb: New(Integer)
+  fullName: ProCharts.StreamingAverageTrueRange.StreamingAverageTrueRange(int)
+  fullName.vb: ProCharts.StreamingAverageTrueRange.New(Integer)
+  nameWithType: StreamingAverageTrueRange.StreamingAverageTrueRange(int)
+  nameWithType.vb: StreamingAverageTrueRange.New(Integer)
+- uid: ProCharts.StreamingAverageTrueRange.#ctor*
+  name: StreamingAverageTrueRange
+  href: api/ProCharts.StreamingAverageTrueRange.html#ProCharts_StreamingAverageTrueRange__ctor_
+  commentId: Overload:ProCharts.StreamingAverageTrueRange.#ctor
+  isSpec: "True"
+  name.vb: New
+  fullName: ProCharts.StreamingAverageTrueRange.StreamingAverageTrueRange
+  fullName.vb: ProCharts.StreamingAverageTrueRange.New
+  nameWithType: StreamingAverageTrueRange.StreamingAverageTrueRange
+  nameWithType.vb: StreamingAverageTrueRange.New
+- uid: ProCharts.StreamingAverageTrueRange.Current
+  name: Current
+  href: api/ProCharts.StreamingAverageTrueRange.html#ProCharts_StreamingAverageTrueRange_Current
+  commentId: P:ProCharts.StreamingAverageTrueRange.Current
+  fullName: ProCharts.StreamingAverageTrueRange.Current
+  nameWithType: StreamingAverageTrueRange.Current
+- uid: ProCharts.StreamingAverageTrueRange.Current*
+  name: Current
+  href: api/ProCharts.StreamingAverageTrueRange.html#ProCharts_StreamingAverageTrueRange_Current_
+  commentId: Overload:ProCharts.StreamingAverageTrueRange.Current
+  isSpec: "True"
+  fullName: ProCharts.StreamingAverageTrueRange.Current
+  nameWithType: StreamingAverageTrueRange.Current
+- uid: ProCharts.StreamingAverageTrueRange.Period
+  name: Period
+  href: api/ProCharts.StreamingAverageTrueRange.html#ProCharts_StreamingAverageTrueRange_Period
+  commentId: P:ProCharts.StreamingAverageTrueRange.Period
+  fullName: ProCharts.StreamingAverageTrueRange.Period
+  nameWithType: StreamingAverageTrueRange.Period
+- uid: ProCharts.StreamingAverageTrueRange.Period*
+  name: Period
+  href: api/ProCharts.StreamingAverageTrueRange.html#ProCharts_StreamingAverageTrueRange_Period_
+  commentId: Overload:ProCharts.StreamingAverageTrueRange.Period
+  isSpec: "True"
+  fullName: ProCharts.StreamingAverageTrueRange.Period
+  nameWithType: StreamingAverageTrueRange.Period
+- uid: ProCharts.StreamingAverageTrueRange.Push(ProCharts.ChartHighLowClose)
+  name: Push(ChartHighLowClose)
+  href: api/ProCharts.StreamingAverageTrueRange.html#ProCharts_StreamingAverageTrueRange_Push_ProCharts_ChartHighLowClose_
+  commentId: M:ProCharts.StreamingAverageTrueRange.Push(ProCharts.ChartHighLowClose)
+  fullName: ProCharts.StreamingAverageTrueRange.Push(ProCharts.ChartHighLowClose)
+  nameWithType: StreamingAverageTrueRange.Push(ChartHighLowClose)
+- uid: ProCharts.StreamingAverageTrueRange.Push(System.Nullable{System.Double},System.Nullable{System.Double},System.Nullable{System.Double})
+  name: Push(double?, double?, double?)
+  href: api/ProCharts.StreamingAverageTrueRange.html#ProCharts_StreamingAverageTrueRange_Push_System_Nullable_System_Double__System_Nullable_System_Double__System_Nullable_System_Double__
+  commentId: M:ProCharts.StreamingAverageTrueRange.Push(System.Nullable{System.Double},System.Nullable{System.Double},System.Nullable{System.Double})
+  name.vb: Push(Double?, Double?, Double?)
+  fullName: ProCharts.StreamingAverageTrueRange.Push(double?, double?, double?)
+  fullName.vb: ProCharts.StreamingAverageTrueRange.Push(Double?, Double?, Double?)
+  nameWithType: StreamingAverageTrueRange.Push(double?, double?, double?)
+  nameWithType.vb: StreamingAverageTrueRange.Push(Double?, Double?, Double?)
+- uid: ProCharts.StreamingAverageTrueRange.Push*
+  name: Push
+  href: api/ProCharts.StreamingAverageTrueRange.html#ProCharts_StreamingAverageTrueRange_Push_
+  commentId: Overload:ProCharts.StreamingAverageTrueRange.Push
+  isSpec: "True"
+  fullName: ProCharts.StreamingAverageTrueRange.Push
+  nameWithType: StreamingAverageTrueRange.Push
+- uid: ProCharts.StreamingAverageTrueRange.Reset
+  name: Reset()
+  href: api/ProCharts.StreamingAverageTrueRange.html#ProCharts_StreamingAverageTrueRange_Reset
+  commentId: M:ProCharts.StreamingAverageTrueRange.Reset
+  fullName: ProCharts.StreamingAverageTrueRange.Reset()
+  nameWithType: StreamingAverageTrueRange.Reset()
+- uid: ProCharts.StreamingAverageTrueRange.Reset*
+  name: Reset
+  href: api/ProCharts.StreamingAverageTrueRange.html#ProCharts_StreamingAverageTrueRange_Reset_
+  commentId: Overload:ProCharts.StreamingAverageTrueRange.Reset
+  isSpec: "True"
+  fullName: ProCharts.StreamingAverageTrueRange.Reset
+  nameWithType: StreamingAverageTrueRange.Reset
+- uid: ProCharts.StreamingAverageTrueRange.SamplesProcessed
+  name: SamplesProcessed
+  href: api/ProCharts.StreamingAverageTrueRange.html#ProCharts_StreamingAverageTrueRange_SamplesProcessed
+  commentId: P:ProCharts.StreamingAverageTrueRange.SamplesProcessed
+  fullName: ProCharts.StreamingAverageTrueRange.SamplesProcessed
+  nameWithType: StreamingAverageTrueRange.SamplesProcessed
+- uid: ProCharts.StreamingAverageTrueRange.SamplesProcessed*
+  name: SamplesProcessed
+  href: api/ProCharts.StreamingAverageTrueRange.html#ProCharts_StreamingAverageTrueRange_SamplesProcessed_
+  commentId: Overload:ProCharts.StreamingAverageTrueRange.SamplesProcessed
+  isSpec: "True"
+  fullName: ProCharts.StreamingAverageTrueRange.SamplesProcessed
+  nameWithType: StreamingAverageTrueRange.SamplesProcessed
 - uid: ProCharts.StreamingChartDataSource
   name: StreamingChartDataSource
   href: api/ProCharts.StreamingChartDataSource.html
@@ -78526,6 +78830,311 @@ references:
   isSpec: "True"
   fullName: ProCharts.StreamingChartDataSource.TotalSamples
   nameWithType: StreamingChartDataSource.TotalSamples
+- uid: ProCharts.StreamingExponentialMovingAverage
+  name: StreamingExponentialMovingAverage
+  href: api/ProCharts.StreamingExponentialMovingAverage.html
+  commentId: T:ProCharts.StreamingExponentialMovingAverage
+  fullName: ProCharts.StreamingExponentialMovingAverage
+  nameWithType: StreamingExponentialMovingAverage
+- uid: ProCharts.StreamingExponentialMovingAverage.#ctor(System.Int32)
+  name: StreamingExponentialMovingAverage(int)
+  href: api/ProCharts.StreamingExponentialMovingAverage.html#ProCharts_StreamingExponentialMovingAverage__ctor_System_Int32_
+  commentId: M:ProCharts.StreamingExponentialMovingAverage.#ctor(System.Int32)
+  name.vb: New(Integer)
+  fullName: ProCharts.StreamingExponentialMovingAverage.StreamingExponentialMovingAverage(int)
+  fullName.vb: ProCharts.StreamingExponentialMovingAverage.New(Integer)
+  nameWithType: StreamingExponentialMovingAverage.StreamingExponentialMovingAverage(int)
+  nameWithType.vb: StreamingExponentialMovingAverage.New(Integer)
+- uid: ProCharts.StreamingExponentialMovingAverage.#ctor*
+  name: StreamingExponentialMovingAverage
+  href: api/ProCharts.StreamingExponentialMovingAverage.html#ProCharts_StreamingExponentialMovingAverage__ctor_
+  commentId: Overload:ProCharts.StreamingExponentialMovingAverage.#ctor
+  isSpec: "True"
+  name.vb: New
+  fullName: ProCharts.StreamingExponentialMovingAverage.StreamingExponentialMovingAverage
+  fullName.vb: ProCharts.StreamingExponentialMovingAverage.New
+  nameWithType: StreamingExponentialMovingAverage.StreamingExponentialMovingAverage
+  nameWithType.vb: StreamingExponentialMovingAverage.New
+- uid: ProCharts.StreamingExponentialMovingAverage.Current
+  name: Current
+  href: api/ProCharts.StreamingExponentialMovingAverage.html#ProCharts_StreamingExponentialMovingAverage_Current
+  commentId: P:ProCharts.StreamingExponentialMovingAverage.Current
+  fullName: ProCharts.StreamingExponentialMovingAverage.Current
+  nameWithType: StreamingExponentialMovingAverage.Current
+- uid: ProCharts.StreamingExponentialMovingAverage.Current*
+  name: Current
+  href: api/ProCharts.StreamingExponentialMovingAverage.html#ProCharts_StreamingExponentialMovingAverage_Current_
+  commentId: Overload:ProCharts.StreamingExponentialMovingAverage.Current
+  isSpec: "True"
+  fullName: ProCharts.StreamingExponentialMovingAverage.Current
+  nameWithType: StreamingExponentialMovingAverage.Current
+- uid: ProCharts.StreamingExponentialMovingAverage.Period
+  name: Period
+  href: api/ProCharts.StreamingExponentialMovingAverage.html#ProCharts_StreamingExponentialMovingAverage_Period
+  commentId: P:ProCharts.StreamingExponentialMovingAverage.Period
+  fullName: ProCharts.StreamingExponentialMovingAverage.Period
+  nameWithType: StreamingExponentialMovingAverage.Period
+- uid: ProCharts.StreamingExponentialMovingAverage.Period*
+  name: Period
+  href: api/ProCharts.StreamingExponentialMovingAverage.html#ProCharts_StreamingExponentialMovingAverage_Period_
+  commentId: Overload:ProCharts.StreamingExponentialMovingAverage.Period
+  isSpec: "True"
+  fullName: ProCharts.StreamingExponentialMovingAverage.Period
+  nameWithType: StreamingExponentialMovingAverage.Period
+- uid: ProCharts.StreamingExponentialMovingAverage.Push(System.Nullable{System.Double})
+  name: Push(double?)
+  href: api/ProCharts.StreamingExponentialMovingAverage.html#ProCharts_StreamingExponentialMovingAverage_Push_System_Nullable_System_Double__
+  commentId: M:ProCharts.StreamingExponentialMovingAverage.Push(System.Nullable{System.Double})
+  name.vb: Push(Double?)
+  fullName: ProCharts.StreamingExponentialMovingAverage.Push(double?)
+  fullName.vb: ProCharts.StreamingExponentialMovingAverage.Push(Double?)
+  nameWithType: StreamingExponentialMovingAverage.Push(double?)
+  nameWithType.vb: StreamingExponentialMovingAverage.Push(Double?)
+- uid: ProCharts.StreamingExponentialMovingAverage.Push*
+  name: Push
+  href: api/ProCharts.StreamingExponentialMovingAverage.html#ProCharts_StreamingExponentialMovingAverage_Push_
+  commentId: Overload:ProCharts.StreamingExponentialMovingAverage.Push
+  isSpec: "True"
+  fullName: ProCharts.StreamingExponentialMovingAverage.Push
+  nameWithType: StreamingExponentialMovingAverage.Push
+- uid: ProCharts.StreamingExponentialMovingAverage.Reset
+  name: Reset()
+  href: api/ProCharts.StreamingExponentialMovingAverage.html#ProCharts_StreamingExponentialMovingAverage_Reset
+  commentId: M:ProCharts.StreamingExponentialMovingAverage.Reset
+  fullName: ProCharts.StreamingExponentialMovingAverage.Reset()
+  nameWithType: StreamingExponentialMovingAverage.Reset()
+- uid: ProCharts.StreamingExponentialMovingAverage.Reset*
+  name: Reset
+  href: api/ProCharts.StreamingExponentialMovingAverage.html#ProCharts_StreamingExponentialMovingAverage_Reset_
+  commentId: Overload:ProCharts.StreamingExponentialMovingAverage.Reset
+  isSpec: "True"
+  fullName: ProCharts.StreamingExponentialMovingAverage.Reset
+  nameWithType: StreamingExponentialMovingAverage.Reset
+- uid: ProCharts.StreamingExponentialMovingAverage.SamplesProcessed
+  name: SamplesProcessed
+  href: api/ProCharts.StreamingExponentialMovingAverage.html#ProCharts_StreamingExponentialMovingAverage_SamplesProcessed
+  commentId: P:ProCharts.StreamingExponentialMovingAverage.SamplesProcessed
+  fullName: ProCharts.StreamingExponentialMovingAverage.SamplesProcessed
+  nameWithType: StreamingExponentialMovingAverage.SamplesProcessed
+- uid: ProCharts.StreamingExponentialMovingAverage.SamplesProcessed*
+  name: SamplesProcessed
+  href: api/ProCharts.StreamingExponentialMovingAverage.html#ProCharts_StreamingExponentialMovingAverage_SamplesProcessed_
+  commentId: Overload:ProCharts.StreamingExponentialMovingAverage.SamplesProcessed
+  isSpec: "True"
+  fullName: ProCharts.StreamingExponentialMovingAverage.SamplesProcessed
+  nameWithType: StreamingExponentialMovingAverage.SamplesProcessed
+- uid: ProCharts.StreamingMacd
+  name: StreamingMacd
+  href: api/ProCharts.StreamingMacd.html
+  commentId: T:ProCharts.StreamingMacd
+  fullName: ProCharts.StreamingMacd
+  nameWithType: StreamingMacd
+- uid: ProCharts.StreamingMacd.#ctor(System.Int32,System.Int32,System.Int32)
+  name: StreamingMacd(int, int, int)
+  href: api/ProCharts.StreamingMacd.html#ProCharts_StreamingMacd__ctor_System_Int32_System_Int32_System_Int32_
+  commentId: M:ProCharts.StreamingMacd.#ctor(System.Int32,System.Int32,System.Int32)
+  name.vb: New(Integer, Integer, Integer)
+  fullName: ProCharts.StreamingMacd.StreamingMacd(int, int, int)
+  fullName.vb: ProCharts.StreamingMacd.New(Integer, Integer, Integer)
+  nameWithType: StreamingMacd.StreamingMacd(int, int, int)
+  nameWithType.vb: StreamingMacd.New(Integer, Integer, Integer)
+- uid: ProCharts.StreamingMacd.#ctor*
+  name: StreamingMacd
+  href: api/ProCharts.StreamingMacd.html#ProCharts_StreamingMacd__ctor_
+  commentId: Overload:ProCharts.StreamingMacd.#ctor
+  isSpec: "True"
+  name.vb: New
+  fullName: ProCharts.StreamingMacd.StreamingMacd
+  fullName.vb: ProCharts.StreamingMacd.New
+  nameWithType: StreamingMacd.StreamingMacd
+  nameWithType.vb: StreamingMacd.New
+- uid: ProCharts.StreamingMacd.Current
+  name: Current
+  href: api/ProCharts.StreamingMacd.html#ProCharts_StreamingMacd_Current
+  commentId: P:ProCharts.StreamingMacd.Current
+  fullName: ProCharts.StreamingMacd.Current
+  nameWithType: StreamingMacd.Current
+- uid: ProCharts.StreamingMacd.Current*
+  name: Current
+  href: api/ProCharts.StreamingMacd.html#ProCharts_StreamingMacd_Current_
+  commentId: Overload:ProCharts.StreamingMacd.Current
+  isSpec: "True"
+  fullName: ProCharts.StreamingMacd.Current
+  nameWithType: StreamingMacd.Current
+- uid: ProCharts.StreamingMacd.FastPeriod
+  name: FastPeriod
+  href: api/ProCharts.StreamingMacd.html#ProCharts_StreamingMacd_FastPeriod
+  commentId: P:ProCharts.StreamingMacd.FastPeriod
+  fullName: ProCharts.StreamingMacd.FastPeriod
+  nameWithType: StreamingMacd.FastPeriod
+- uid: ProCharts.StreamingMacd.FastPeriod*
+  name: FastPeriod
+  href: api/ProCharts.StreamingMacd.html#ProCharts_StreamingMacd_FastPeriod_
+  commentId: Overload:ProCharts.StreamingMacd.FastPeriod
+  isSpec: "True"
+  fullName: ProCharts.StreamingMacd.FastPeriod
+  nameWithType: StreamingMacd.FastPeriod
+- uid: ProCharts.StreamingMacd.Push(System.Nullable{System.Double})
+  name: Push(double?)
+  href: api/ProCharts.StreamingMacd.html#ProCharts_StreamingMacd_Push_System_Nullable_System_Double__
+  commentId: M:ProCharts.StreamingMacd.Push(System.Nullable{System.Double})
+  name.vb: Push(Double?)
+  fullName: ProCharts.StreamingMacd.Push(double?)
+  fullName.vb: ProCharts.StreamingMacd.Push(Double?)
+  nameWithType: StreamingMacd.Push(double?)
+  nameWithType.vb: StreamingMacd.Push(Double?)
+- uid: ProCharts.StreamingMacd.Push*
+  name: Push
+  href: api/ProCharts.StreamingMacd.html#ProCharts_StreamingMacd_Push_
+  commentId: Overload:ProCharts.StreamingMacd.Push
+  isSpec: "True"
+  fullName: ProCharts.StreamingMacd.Push
+  nameWithType: StreamingMacd.Push
+- uid: ProCharts.StreamingMacd.Reset
+  name: Reset()
+  href: api/ProCharts.StreamingMacd.html#ProCharts_StreamingMacd_Reset
+  commentId: M:ProCharts.StreamingMacd.Reset
+  fullName: ProCharts.StreamingMacd.Reset()
+  nameWithType: StreamingMacd.Reset()
+- uid: ProCharts.StreamingMacd.Reset*
+  name: Reset
+  href: api/ProCharts.StreamingMacd.html#ProCharts_StreamingMacd_Reset_
+  commentId: Overload:ProCharts.StreamingMacd.Reset
+  isSpec: "True"
+  fullName: ProCharts.StreamingMacd.Reset
+  nameWithType: StreamingMacd.Reset
+- uid: ProCharts.StreamingMacd.SamplesProcessed
+  name: SamplesProcessed
+  href: api/ProCharts.StreamingMacd.html#ProCharts_StreamingMacd_SamplesProcessed
+  commentId: P:ProCharts.StreamingMacd.SamplesProcessed
+  fullName: ProCharts.StreamingMacd.SamplesProcessed
+  nameWithType: StreamingMacd.SamplesProcessed
+- uid: ProCharts.StreamingMacd.SamplesProcessed*
+  name: SamplesProcessed
+  href: api/ProCharts.StreamingMacd.html#ProCharts_StreamingMacd_SamplesProcessed_
+  commentId: Overload:ProCharts.StreamingMacd.SamplesProcessed
+  isSpec: "True"
+  fullName: ProCharts.StreamingMacd.SamplesProcessed
+  nameWithType: StreamingMacd.SamplesProcessed
+- uid: ProCharts.StreamingMacd.SignalPeriod
+  name: SignalPeriod
+  href: api/ProCharts.StreamingMacd.html#ProCharts_StreamingMacd_SignalPeriod
+  commentId: P:ProCharts.StreamingMacd.SignalPeriod
+  fullName: ProCharts.StreamingMacd.SignalPeriod
+  nameWithType: StreamingMacd.SignalPeriod
+- uid: ProCharts.StreamingMacd.SignalPeriod*
+  name: SignalPeriod
+  href: api/ProCharts.StreamingMacd.html#ProCharts_StreamingMacd_SignalPeriod_
+  commentId: Overload:ProCharts.StreamingMacd.SignalPeriod
+  isSpec: "True"
+  fullName: ProCharts.StreamingMacd.SignalPeriod
+  nameWithType: StreamingMacd.SignalPeriod
+- uid: ProCharts.StreamingMacd.SlowPeriod
+  name: SlowPeriod
+  href: api/ProCharts.StreamingMacd.html#ProCharts_StreamingMacd_SlowPeriod
+  commentId: P:ProCharts.StreamingMacd.SlowPeriod
+  fullName: ProCharts.StreamingMacd.SlowPeriod
+  nameWithType: StreamingMacd.SlowPeriod
+- uid: ProCharts.StreamingMacd.SlowPeriod*
+  name: SlowPeriod
+  href: api/ProCharts.StreamingMacd.html#ProCharts_StreamingMacd_SlowPeriod_
+  commentId: Overload:ProCharts.StreamingMacd.SlowPeriod
+  isSpec: "True"
+  fullName: ProCharts.StreamingMacd.SlowPeriod
+  nameWithType: StreamingMacd.SlowPeriod
+- uid: ProCharts.StreamingRelativeStrengthIndex
+  name: StreamingRelativeStrengthIndex
+  href: api/ProCharts.StreamingRelativeStrengthIndex.html
+  commentId: T:ProCharts.StreamingRelativeStrengthIndex
+  fullName: ProCharts.StreamingRelativeStrengthIndex
+  nameWithType: StreamingRelativeStrengthIndex
+- uid: ProCharts.StreamingRelativeStrengthIndex.#ctor(System.Int32)
+  name: StreamingRelativeStrengthIndex(int)
+  href: api/ProCharts.StreamingRelativeStrengthIndex.html#ProCharts_StreamingRelativeStrengthIndex__ctor_System_Int32_
+  commentId: M:ProCharts.StreamingRelativeStrengthIndex.#ctor(System.Int32)
+  name.vb: New(Integer)
+  fullName: ProCharts.StreamingRelativeStrengthIndex.StreamingRelativeStrengthIndex(int)
+  fullName.vb: ProCharts.StreamingRelativeStrengthIndex.New(Integer)
+  nameWithType: StreamingRelativeStrengthIndex.StreamingRelativeStrengthIndex(int)
+  nameWithType.vb: StreamingRelativeStrengthIndex.New(Integer)
+- uid: ProCharts.StreamingRelativeStrengthIndex.#ctor*
+  name: StreamingRelativeStrengthIndex
+  href: api/ProCharts.StreamingRelativeStrengthIndex.html#ProCharts_StreamingRelativeStrengthIndex__ctor_
+  commentId: Overload:ProCharts.StreamingRelativeStrengthIndex.#ctor
+  isSpec: "True"
+  name.vb: New
+  fullName: ProCharts.StreamingRelativeStrengthIndex.StreamingRelativeStrengthIndex
+  fullName.vb: ProCharts.StreamingRelativeStrengthIndex.New
+  nameWithType: StreamingRelativeStrengthIndex.StreamingRelativeStrengthIndex
+  nameWithType.vb: StreamingRelativeStrengthIndex.New
+- uid: ProCharts.StreamingRelativeStrengthIndex.Current
+  name: Current
+  href: api/ProCharts.StreamingRelativeStrengthIndex.html#ProCharts_StreamingRelativeStrengthIndex_Current
+  commentId: P:ProCharts.StreamingRelativeStrengthIndex.Current
+  fullName: ProCharts.StreamingRelativeStrengthIndex.Current
+  nameWithType: StreamingRelativeStrengthIndex.Current
+- uid: ProCharts.StreamingRelativeStrengthIndex.Current*
+  name: Current
+  href: api/ProCharts.StreamingRelativeStrengthIndex.html#ProCharts_StreamingRelativeStrengthIndex_Current_
+  commentId: Overload:ProCharts.StreamingRelativeStrengthIndex.Current
+  isSpec: "True"
+  fullName: ProCharts.StreamingRelativeStrengthIndex.Current
+  nameWithType: StreamingRelativeStrengthIndex.Current
+- uid: ProCharts.StreamingRelativeStrengthIndex.Period
+  name: Period
+  href: api/ProCharts.StreamingRelativeStrengthIndex.html#ProCharts_StreamingRelativeStrengthIndex_Period
+  commentId: P:ProCharts.StreamingRelativeStrengthIndex.Period
+  fullName: ProCharts.StreamingRelativeStrengthIndex.Period
+  nameWithType: StreamingRelativeStrengthIndex.Period
+- uid: ProCharts.StreamingRelativeStrengthIndex.Period*
+  name: Period
+  href: api/ProCharts.StreamingRelativeStrengthIndex.html#ProCharts_StreamingRelativeStrengthIndex_Period_
+  commentId: Overload:ProCharts.StreamingRelativeStrengthIndex.Period
+  isSpec: "True"
+  fullName: ProCharts.StreamingRelativeStrengthIndex.Period
+  nameWithType: StreamingRelativeStrengthIndex.Period
+- uid: ProCharts.StreamingRelativeStrengthIndex.Push(System.Nullable{System.Double})
+  name: Push(double?)
+  href: api/ProCharts.StreamingRelativeStrengthIndex.html#ProCharts_StreamingRelativeStrengthIndex_Push_System_Nullable_System_Double__
+  commentId: M:ProCharts.StreamingRelativeStrengthIndex.Push(System.Nullable{System.Double})
+  name.vb: Push(Double?)
+  fullName: ProCharts.StreamingRelativeStrengthIndex.Push(double?)
+  fullName.vb: ProCharts.StreamingRelativeStrengthIndex.Push(Double?)
+  nameWithType: StreamingRelativeStrengthIndex.Push(double?)
+  nameWithType.vb: StreamingRelativeStrengthIndex.Push(Double?)
+- uid: ProCharts.StreamingRelativeStrengthIndex.Push*
+  name: Push
+  href: api/ProCharts.StreamingRelativeStrengthIndex.html#ProCharts_StreamingRelativeStrengthIndex_Push_
+  commentId: Overload:ProCharts.StreamingRelativeStrengthIndex.Push
+  isSpec: "True"
+  fullName: ProCharts.StreamingRelativeStrengthIndex.Push
+  nameWithType: StreamingRelativeStrengthIndex.Push
+- uid: ProCharts.StreamingRelativeStrengthIndex.Reset
+  name: Reset()
+  href: api/ProCharts.StreamingRelativeStrengthIndex.html#ProCharts_StreamingRelativeStrengthIndex_Reset
+  commentId: M:ProCharts.StreamingRelativeStrengthIndex.Reset
+  fullName: ProCharts.StreamingRelativeStrengthIndex.Reset()
+  nameWithType: StreamingRelativeStrengthIndex.Reset()
+- uid: ProCharts.StreamingRelativeStrengthIndex.Reset*
+  name: Reset
+  href: api/ProCharts.StreamingRelativeStrengthIndex.html#ProCharts_StreamingRelativeStrengthIndex_Reset_
+  commentId: Overload:ProCharts.StreamingRelativeStrengthIndex.Reset
+  isSpec: "True"
+  fullName: ProCharts.StreamingRelativeStrengthIndex.Reset
+  nameWithType: StreamingRelativeStrengthIndex.Reset
+- uid: ProCharts.StreamingRelativeStrengthIndex.SamplesProcessed
+  name: SamplesProcessed
+  href: api/ProCharts.StreamingRelativeStrengthIndex.html#ProCharts_StreamingRelativeStrengthIndex_SamplesProcessed
+  commentId: P:ProCharts.StreamingRelativeStrengthIndex.SamplesProcessed
+  fullName: ProCharts.StreamingRelativeStrengthIndex.SamplesProcessed
+  nameWithType: StreamingRelativeStrengthIndex.SamplesProcessed
+- uid: ProCharts.StreamingRelativeStrengthIndex.SamplesProcessed*
+  name: SamplesProcessed
+  href: api/ProCharts.StreamingRelativeStrengthIndex.html#ProCharts_StreamingRelativeStrengthIndex_SamplesProcessed_
+  commentId: Overload:ProCharts.StreamingRelativeStrengthIndex.SamplesProcessed
+  isSpec: "True"
+  fullName: ProCharts.StreamingRelativeStrengthIndex.SamplesProcessed
+  nameWithType: StreamingRelativeStrengthIndex.SamplesProcessed
 - uid: ProDataGrid.Charting
   name: ProDataGrid.Charting
   href: api/ProDataGrid.Charting.html
