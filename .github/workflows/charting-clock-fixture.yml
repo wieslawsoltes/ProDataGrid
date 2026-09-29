@@ -1,0 +1,42 @@
+name: Correct diagnostic clock fixture
+on:
+  push:
+    branches: [charting/hierarchy-navigation]
+    paths: [.github/workflows/charting-clock-fixture.yml]
+permissions:
+  contents: write
+jobs:
+  correct:
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: charting/hierarchy-navigation
+      - name: Give the empty timed fixture a real monotonic-clock tick
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          p = Path('src/Avalonia.Controls.DataGrid.UnitTests/Diagnostics/DataGridDiagnosticsTests.cs')
+          text = p.read_text()
+          old = '        using (DataGridDiagnostics.BeginVirtualSurfaceRender())\n        {\n        }'
+          new = '\n'.join([
+              '        using (DataGridDiagnostics.BeginVirtualSurfaceRender())',
+              '        {',
+              '            // An empty scope can begin and end in the same clock tick on Windows.',
+              '            // Keep the positive-duration assertion; give the fixture measurable work.',
+              '            var timestamp = Stopwatch.GetTimestamp();',
+              '            Assert.True(System.Threading.SpinWait.SpinUntil(',
+              '                () => Stopwatch.GetTimestamp() != timestamp, TimeSpan.FromSeconds(1)),',
+              '                "The monotonic clock did not advance during the timed scope.");',
+              '        }'
+          ])
+          if text.count(old) != 1: raise RuntimeError('Unexpected diagnostic timing fixture; review required')
+          p.write_text(text.replace(old, new, 1))
+          PY
+          git diff --check
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add src/Avalonia.Controls.DataGrid.UnitTests/Diagnostics/DataGridDiagnosticsTests.cs
+          git commit -m 'Make the virtual-surface timing fixture robust to clock resolution without weakening assertions'
+          git push origin HEAD:refs/heads/charting/hierarchy-navigation
