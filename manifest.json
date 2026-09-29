@@ -10336,6 +10336,20 @@
     },
     {
       "type": "ManagedReference",
+      "source_relative_path": "api/ProCharts.StreamingChartSeries.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/ProCharts.StreamingChartSeries.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "ProCharts.StreamingChartSeries",
+      "Summary": "<p sourcefile=\"api/ProCharts.StreamingChartSeries.yml\" sourcestartlinenumber=\"1\">Fixed scalar-series metadata for a synchronized stream.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
       "source_relative_path": "api/ProCharts.StreamingDonchianChannels.yml",
       "output": {
         ".html": {
@@ -10375,6 +10389,34 @@
       "IsMRef": true,
       "Title": "ProCharts.StreamingMacd",
       "Summary": "<p sourcefile=\"api/ProCharts.StreamingMacd.yml\" sourcestartlinenumber=\"1\">Constant-space MACD with SMA-seeded fast/slow EMAs, EMA signal and aligned histogram.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/ProCharts.StreamingMultiSeriesChartDataSource.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/ProCharts.StreamingMultiSeriesChartDataSource.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "ProCharts.StreamingMultiSeriesChartDataSource",
+      "Summary": "<p sourcefile=\"api/ProCharts.StreamingMultiSeriesChartDataSource.yml\" sourcestartlinenumber=\"1\">A bounded scalar-series stream that commits all values at an X coordinate as one atomic row.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/ProCharts.StreamingMultiSeriesChartView.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/ProCharts.StreamingMultiSeriesChartView.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "ProCharts.StreamingMultiSeriesChartView",
+      "Summary": "<p sourcefile=\"api/ProCharts.StreamingMultiSeriesChartView.yml\" sourcestartlinenumber=\"1\">An owned, aligned multi-series snapshot and common observation identity map.</p>\n"
     },
     {
       "type": "ManagedReference",
@@ -13349,6 +13391,16 @@
       "output": {
         ".html": {
           "relative_path": "articles/procharts-interaction.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "Conceptual",
+      "source_relative_path": "articles/procharts-multi-series-streaming.md",
+      "output": {
+        ".html": {
+          "relative_path": "articles/procharts-multi-series-streaming.html"
         }
       },
       "version": ""

@@ -1,0 +1,677 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+      <title>Class StreamingMultiSeriesChartDataSource | ProDataGrid for Avalonia </title>
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <meta name="title" content="Class StreamingMultiSeriesChartDataSource | ProDataGrid for Avalonia ">
+      
+      <meta name="description" content="A bounded scalar-series stream that commits all values at an X coordinate as one atomic row.">
+      <link rel="icon" href="../favicon.ico">
+      <link rel="stylesheet" href="../public/docfx.min.css">
+      <link rel="stylesheet" href="../public/main.css">
+      <meta name="docfx:navrel" content="../toc.html">
+      <meta name="docfx:tocrel" content="toc.html">
+      
+      
+      
+      
+      <meta name="docfx:docurl" content="https://github.com/wieslawsoltes/ProDataGrid/new/master/apiSpec/new?filename=ProCharts_StreamingMultiSeriesChartDataSource.md&amp;value=---%0Auid%3A%20ProCharts.StreamingMultiSeriesChartDataSource%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">
+      <meta name="loc:inThisArticle" content="In this article">
+      <meta name="loc:searchResultsCount" content="{count} results for &quot;{query}&quot;">
+      <meta name="loc:searchNoResults" content="No results for &quot;{query}&quot;">
+      <meta name="loc:tocFilter" content="Filter by title">
+      <meta name="loc:nextArticle" content="Next">
+      <meta name="loc:prevArticle" content="Previous">
+      <meta name="loc:themeLight" content="Light">
+      <meta name="loc:themeDark" content="Dark">
+      <meta name="loc:themeAuto" content="Auto">
+      <meta name="loc:changeTheme" content="Change theme">
+      <meta name="loc:copy" content="Copy">
+      <meta name="loc:downloadPdf" content="Download PDF">
+
+      <script type="module" src="./../public/docfx.min.js"></script>
+
+      <script>
+        const theme = localStorage.getItem('theme') || 'auto'
+        document.documentElement.setAttribute('data-bs-theme', theme === 'auto' ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light') : theme)
+      </script>
+
+  </head>
+
+  <body class="tex2jax_ignore" data-layout="" data-yaml-mime="ManagedReference">
+    <header class="bg-body border-bottom">
+      <nav id="autocollapse" class="navbar navbar-expand-md" role="navigation">
+        <div class="container-xxl flex-nowrap">
+          <a class="navbar-brand" href="../index.html">
+            <img id="logo" class="svg" src="../images/logo.svg" alt="">
+            
+          </a>
+          <button class="btn btn-lg d-md-none border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navpanel" aria-controls="navpanel" aria-expanded="false" aria-label="Toggle navigation">
+            <i class="bi bi-three-dots"></i>
+          </button>
+          <div class="collapse navbar-collapse" id="navpanel">
+            <div id="navbar">
+            </div>
+          </div>
+        </div>
+      </nav>
+    </header>
+
+    <main class="container-xxl">
+      <div class="toc-offcanvas">
+        <div class="offcanvas-md offcanvas-start" tabindex="-1" id="tocOffcanvas" aria-labelledby="tocOffcanvasLabel">
+          <div class="offcanvas-header">
+            <h5 class="offcanvas-title" id="tocOffcanvasLabel">Table of Contents</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="offcanvas" data-bs-target="#tocOffcanvas" aria-label="Close"></button>
+          </div>
+          <div class="offcanvas-body">
+            <nav class="toc" id="toc"></nav>
+          </div>
+        </div>
+      </div>
+
+      <div class="content">
+        <div class="actionbar">
+          <button class="btn btn-lg border-0 d-md-none" type="button" data-bs-toggle="offcanvas" data-bs-target="#tocOffcanvas" aria-controls="tocOffcanvas" aria-expanded="false" aria-label="Show table of contents">
+            <i class="bi bi-list"></i>
+          </button>
+
+          <nav id="breadcrumb"></nav>
+        </div>
+
+        <article data-uid="ProCharts.StreamingMultiSeriesChartDataSource">
+
+
+
+  <h1 id="ProCharts_StreamingMultiSeriesChartDataSource" data-uid="ProCharts.StreamingMultiSeriesChartDataSource" class="text-break">
+Class StreamingMultiSeriesChartDataSource  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/ProCharts/StreamingMultiSeriesChartDataSource.cs/#L20"><i class="bi bi-code-slash"></i></a>
+  </h1>
+
+  <div class="facts text-secondary">
+    <dl><dt>Namespace</dt><dd><a class="xref" href="ProCharts.html">ProCharts</a></dd></dl>
+  <dl><dt>Assembly</dt><dd>ProCharts.dll</dd></dl>
+  </div>
+
+  <div class="markdown summary"><p>A bounded scalar-series stream that commits all values at an X coordinate as one atomic row.</p>
+</div>
+  <div class="markdown conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public sealed class StreamingMultiSeriesChartDataSource : IChartDataSource, IChartWindowInfoProvider</code></pre>
+  </div>
+
+
+
+
+  <dl class="typelist inheritance">
+    <dt>Inheritance</dt>
+    <dd>
+      <div><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object">object</a></div>
+      <div><span class="xref">StreamingMultiSeriesChartDataSource</span></div>
+    </dd>
+  </dl>
+
+  <dl class="typelist implements">
+    <dt>Implements</dt>
+    <dd>
+      <div><a class="xref" href="ProCharts.IChartDataSource.html">IChartDataSource</a></div>
+      <div><a class="xref" href="ProCharts.IChartWindowInfoProvider.html">IChartWindowInfoProvider</a></div>
+    </dd>
+  </dl>
+
+
+  <dl class="typelist inheritedMembers">
+    <dt>Inherited Members</dt>
+    <dd>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object)">object.Equals(object)</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object-system-object)">object.Equals(object, object)</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.gethashcode">object.GetHashCode()</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.gettype">object.GetType()</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.referenceequals">object.ReferenceEquals(object, object)</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.tostring">object.ToString()</a>
+    </div>
+  </dd></dl>
+
+
+
+
+  <h2 id="ProCharts_StreamingMultiSeriesChartDataSource_remarks">Remarks</h2>
+  <div class="markdown level0 remarks"><p>Series order is fixed. X is shared, finite and strictly increasing. Per-series missing values remain independent.
+Storage is O(Capacity * SeriesCount), with shared X/categories and O(Capacity) selection scratch. Append is O(series).
+BuildView scans under the state lock; callers must keep supplied spans, definitions and requests stable during a call.
+Events run outside the lock on the successful caller's thread. Use CoalescingChartDataSource for UI delivery.
+This is append-only, not a timestamp join, interpolation engine, indicator transaction or late-data correction store.</p>
+</div>
+
+
+  <h2 class="section" id="constructors">Constructors
+</h2>
+
+
+  <a id="ProCharts_StreamingMultiSeriesChartDataSource__ctor_" data-uid="ProCharts.StreamingMultiSeriesChartDataSource.#ctor*"></a>
+
+  <h3 id="ProCharts_StreamingMultiSeriesChartDataSource__ctor_System_Int32_System_Collections_Generic_IReadOnlyList_ProCharts_StreamingChartSeries__" data-uid="ProCharts.StreamingMultiSeriesChartDataSource.#ctor(System.Int32,System.Collections.Generic.IReadOnlyList{ProCharts.StreamingChartSeries})">
+  StreamingMultiSeriesChartDataSource(int, IReadOnlyList&lt;StreamingChartSeries&gt;)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/ProCharts/StreamingMultiSeriesChartDataSource.cs/#L35"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Copies a nonempty series schema and allocates fixed-capacity history; capacity must be at least two.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public StreamingMultiSeriesChartDataSource(int capacity, IReadOnlyList&lt;StreamingChartSeries&gt; series)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>capacity</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a></dt>
+    <dd></dd>
+    <dt><code>series</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.ireadonlylist-1">IReadOnlyList</a>&lt;<a class="xref" href="ProCharts.StreamingChartSeries.html">StreamingChartSeries</a>&gt;</dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+
+  <h2 class="section" id="properties">Properties
+</h2>
+
+
+  <a id="ProCharts_StreamingMultiSeriesChartDataSource_Capacity_" data-uid="ProCharts.StreamingMultiSeriesChartDataSource.Capacity*"></a>
+
+  <h3 id="ProCharts_StreamingMultiSeriesChartDataSource_Capacity" data-uid="ProCharts.StreamingMultiSeriesChartDataSource.Capacity">
+  Capacity
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/ProCharts/StreamingMultiSeriesChartDataSource.cs/#L57"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Gets the maximum retained row count.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public int Capacity { get; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="ProCharts_StreamingMultiSeriesChartDataSource_Count_" data-uid="ProCharts.StreamingMultiSeriesChartDataSource.Count*"></a>
+
+  <h3 id="ProCharts_StreamingMultiSeriesChartDataSource_Count" data-uid="ProCharts.StreamingMultiSeriesChartDataSource.Count">
+  Count
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/ProCharts/StreamingMultiSeriesChartDataSource.cs/#L59"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Gets retained rows, including rows where all series are missing.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public int Count { get; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="ProCharts_StreamingMultiSeriesChartDataSource_FirstRetainedSampleIndex_" data-uid="ProCharts.StreamingMultiSeriesChartDataSource.FirstRetainedSampleIndex*"></a>
+
+  <h3 id="ProCharts_StreamingMultiSeriesChartDataSource_FirstRetainedSampleIndex" data-uid="ProCharts.StreamingMultiSeriesChartDataSource.FirstRetainedSampleIndex">
+  FirstRetainedSampleIndex
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/ProCharts/StreamingMultiSeriesChartDataSource.cs/#L63"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Gets the zero-based first retained row number.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public long FirstRetainedSampleIndex { get; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int64">long</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="ProCharts_StreamingMultiSeriesChartDataSource_Series_" data-uid="ProCharts.StreamingMultiSeriesChartDataSource.Series*"></a>
+
+  <h3 id="ProCharts_StreamingMultiSeriesChartDataSource_Series" data-uid="ProCharts.StreamingMultiSeriesChartDataSource.Series">
+  Series
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/ProCharts/StreamingMultiSeriesChartDataSource.cs/#L53"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Gets the immutable ordered schema. Numerical values in Append use this order.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public IReadOnlyList&lt;StreamingChartSeries&gt; Series { get; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.ireadonlylist-1">IReadOnlyList</a>&lt;<a class="xref" href="ProCharts.StreamingChartSeries.html">StreamingChartSeries</a>&gt;</dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="ProCharts_StreamingMultiSeriesChartDataSource_SeriesCount_" data-uid="ProCharts.StreamingMultiSeriesChartDataSource.SeriesCount*"></a>
+
+  <h3 id="ProCharts_StreamingMultiSeriesChartDataSource_SeriesCount" data-uid="ProCharts.StreamingMultiSeriesChartDataSource.SeriesCount">
+  SeriesCount
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/ProCharts/StreamingMultiSeriesChartDataSource.cs/#L55"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Gets the fixed number of series in every row.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public int SeriesCount { get; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="ProCharts_StreamingMultiSeriesChartDataSource_TotalSamples_" data-uid="ProCharts.StreamingMultiSeriesChartDataSource.TotalSamples*"></a>
+
+  <h3 id="ProCharts_StreamingMultiSeriesChartDataSource_TotalSamples" data-uid="ProCharts.StreamingMultiSeriesChartDataSource.TotalSamples">
+  TotalSamples
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/ProCharts/StreamingMultiSeriesChartDataSource.cs/#L61"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Gets accepted rows since construction or Clear, including evicted rows.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public long TotalSamples { get; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int64">long</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <h2 class="section" id="methods">Methods
+</h2>
+
+
+  <a id="ProCharts_StreamingMultiSeriesChartDataSource_Append_" data-uid="ProCharts.StreamingMultiSeriesChartDataSource.Append*"></a>
+
+  <h3 id="ProCharts_StreamingMultiSeriesChartDataSource_Append_System_Double_System_ReadOnlySpan_System_Nullable_System_Double___System_String_" data-uid="ProCharts.StreamingMultiSeriesChartDataSource.Append(System.Double,System.ReadOnlySpan{System.Nullable{System.Double}},System.String)">
+  Append(double, ReadOnlySpan&lt;double?&gt;, string?)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/ProCharts/StreamingMultiSeriesChartDataSource.cs/#L72"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Commits exactly one value per series at a shared X coordinate, then raises one invalidation.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public void Append(double x, ReadOnlySpan&lt;double?&gt; values, string? category = null)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>x</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.double">double</a></dt>
+    <dd></dd>
+    <dt><code>values</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.readonlyspan-1">ReadOnlySpan</a>&lt;<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.double">double</a>?&gt;</dt>
+    <dd></dd>
+    <dt><code>category</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <h4 class="section" id="ProCharts_StreamingMultiSeriesChartDataSource_Append_System_Double_System_ReadOnlySpan_System_Nullable_System_Double___System_String__remarks">Remarks</h4>
+  <div class="markdown level1 remarks"><p>Missing/nonfinite values become gaps only in their series; nonpositive logarithmic values also become gaps.
+Invalid shape/X/order rejects the row without changing state. Subscriber exceptions occur after commit.</p>
+</div>
+
+
+
+
+  <a id="ProCharts_StreamingMultiSeriesChartDataSource_AppendRange_" data-uid="ProCharts.StreamingMultiSeriesChartDataSource.AppendRange*"></a>
+
+  <h3 id="ProCharts_StreamingMultiSeriesChartDataSource_AppendRange_System_ReadOnlySpan_System_Double__System_ReadOnlySpan_System_Nullable_System_Double___System_ReadOnlySpan_System_String__" data-uid="ProCharts.StreamingMultiSeriesChartDataSource.AppendRange(System.ReadOnlySpan{System.Double},System.ReadOnlySpan{System.Nullable{System.Double}},System.ReadOnlySpan{System.String})">
+  AppendRange(ReadOnlySpan&lt;double&gt;, ReadOnlySpan&lt;double?&gt;, ReadOnlySpan&lt;string?&gt;)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/ProCharts/StreamingMultiSeriesChartDataSource.cs/#L94"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Atomically appends rows from X coordinates and flattened row-major values, raising one invalidation.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public void AppendRange(ReadOnlySpan&lt;double&gt; xValues, ReadOnlySpan&lt;double?&gt; rowMajorValues, ReadOnlySpan&lt;string?&gt; categories = default)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>xValues</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.readonlyspan-1">ReadOnlySpan</a>&lt;<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.double">double</a>&gt;</dt>
+    <dd></dd>
+    <dt><code>rowMajorValues</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.readonlyspan-1">ReadOnlySpan</a>&lt;<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.double">double</a>?&gt;</dt>
+    <dd></dd>
+    <dt><code>categories</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.readonlyspan-1">ReadOnlySpan</a>&lt;<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a>&gt;</dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <h4 class="section" id="ProCharts_StreamingMultiSeriesChartDataSource_AppendRange_System_ReadOnlySpan_System_Double__System_ReadOnlySpan_System_Nullable_System_Double___System_ReadOnlySpan_System_String___remarks">Remarks</h4>
+  <div class="markdown level1 remarks"><p>rowMajorValues[row * SeriesCount + series] identifies each cell. Categories are empty or exactly one per row.
+All X coordinates are validated, including discarded prefixes of oversized batches. Only the last Capacity
+rows need copying. Invalid shape/X/order preserves rows, counters, cached views and events. Empty valid input
+is a no-op. Sources accept concurrent callers but do not reorder competing producers; serialize feed ordering.</p>
+</div>
+
+
+
+
+  <a id="ProCharts_StreamingMultiSeriesChartDataSource_BuildSnapshot_" data-uid="ProCharts.StreamingMultiSeriesChartDataSource.BuildSnapshot*"></a>
+
+  <h3 id="ProCharts_StreamingMultiSeriesChartDataSource_BuildSnapshot_ProCharts_ChartDataRequest_" data-uid="ProCharts.StreamingMultiSeriesChartDataSource.BuildSnapshot(ProCharts.ChartDataRequest)">
+  BuildSnapshot(ChartDataRequest)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/ProCharts/StreamingMultiSeriesChartDataSource.cs/#L137"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public ChartDataSnapshot BuildSnapshot(ChartDataRequest request)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>request</code> <a class="xref" href="ProCharts.ChartDataRequest.html">ChartDataRequest</a></dt>
+    <dd></dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="ProCharts.ChartDataSnapshot.html">ChartDataSnapshot</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="ProCharts_StreamingMultiSeriesChartDataSource_BuildView_" data-uid="ProCharts.StreamingMultiSeriesChartDataSource.BuildView*"></a>
+
+  <h3 id="ProCharts_StreamingMultiSeriesChartDataSource_BuildView_ProCharts_ChartDataRequest_" data-uid="ProCharts.StreamingMultiSeriesChartDataSource.BuildView(ProCharts.ChartDataRequest)">
+  BuildView(ChartDataRequest)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/ProCharts/StreamingMultiSeriesChartDataSource.cs/#L149"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Captures aligned owned values and a common original-row identity map.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public StreamingMultiSeriesChartView BuildView(ChartDataRequest request)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>request</code> <a class="xref" href="ProCharts.ChartDataRequest.html">ChartDataRequest</a></dt>
+    <dd></dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="ProCharts.StreamingMultiSeriesChartView.html">StreamingMultiSeriesChartView</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+  <h4 class="section" id="ProCharts_StreamingMultiSeriesChartDataSource_BuildView_ProCharts_ChartDataRequest__remarks">Remarks</h4>
+  <div class="markdown level1 remarks"><p>MaxPoints is a PER-SERIES soft selection budget, not a final common-point cap. The union of each series'
+original indices preserves its selected extrema, run endpoints and gaps; every series is copied at that union.
+First/last window rows are always retained, including all-missing terminal rows. No values are averaged or
+interpolated. More series/disjoint gaps can make the union approach the full window. None disables selection;
+null/nonpositive budgets disable it; one promotes to two. Adaptive normalizes to MinMax. Cache-equivalent
+requests reuse the view without allocation. Snapshot scanning/selection is O(window rows * series count).
+Unreduced windows use at most two contiguous span copies per ring channel, including wrapped windows.</p>
+</div>
+
+
+
+
+  <a id="ProCharts_StreamingMultiSeriesChartDataSource_Clear_" data-uid="ProCharts.StreamingMultiSeriesChartDataSource.Clear*"></a>
+
+  <h3 id="ProCharts_StreamingMultiSeriesChartDataSource_Clear" data-uid="ProCharts.StreamingMultiSeriesChartDataSource.Clear">
+  Clear()
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/ProCharts/StreamingMultiSeriesChartDataSource.cs/#L123"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Clears all retained cells/references and starts a new numbering and X-ordering session.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public void Clear()</code></pre>
+  </div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  <a id="ProCharts_StreamingMultiSeriesChartDataSource_GetTotalCategoryCount_" data-uid="ProCharts.StreamingMultiSeriesChartDataSource.GetTotalCategoryCount*"></a>
+
+  <h3 id="ProCharts_StreamingMultiSeriesChartDataSource_GetTotalCategoryCount" data-uid="ProCharts.StreamingMultiSeriesChartDataSource.GetTotalCategoryCount">
+  GetTotalCategoryCount()
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/ProCharts/StreamingMultiSeriesChartDataSource.cs/#L65"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public int? GetTotalCategoryCount()</code></pre>
+  </div>
+
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a>?</dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <h2 class="section" id="events">Events
+</h2>
+
+
+
+  <h3 id="ProCharts_StreamingMultiSeriesChartDataSource_DataInvalidated" data-uid="ProCharts.StreamingMultiSeriesChartDataSource.DataInvalidated">
+  DataInvalidated
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/ProCharts/StreamingMultiSeriesChartDataSource.cs/#L51"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public event EventHandler? DataInvalidated</code></pre>
+  </div>
+
+
+
+
+
+
+  <h4 class="section">Event Type</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.eventhandler">EventHandler</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+</article>
+
+        <div class="contribution d-print-none">
+          <a href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/ProCharts/StreamingMultiSeriesChartDataSource.cs/#L20" class="edit-link">Edit this page</a>
+        </div>
+
+
+      </div>
+
+      <div class="affix">
+        <nav id="affix"></nav>
+      </div>
+    </main>
+
+
+    <footer class="border-top text-secondary">
+      <div class="container-xxl">
+        <div class="flex-fill">
+          <span>Made with <a href="https://dotnet.github.io/docfx">docfx</a></span>
+        </div>
+      </div>
+    </footer>
+  </body>
+</html>
