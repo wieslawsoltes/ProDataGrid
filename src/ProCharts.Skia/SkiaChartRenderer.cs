@@ -702,7 +702,7 @@ namespace ProCharts.Skia
                 return TryGetAdvancedViewport(bounds, snapshot, style, out info);
             }
 
-            if (!TryBuildRenderContext(bounds, snapshot, style, out var context))
+            if (!TryGetRenderContext(bounds, snapshot, style, out var context))
             {
                 info = default;
                 return false;
@@ -751,7 +751,7 @@ namespace ProCharts.Skia
             SkiaChartStyle style,
             SkiaChartRenderCache cache)
         {
-            if (!TryBuildRenderContext(bounds, snapshot, style, out var context))
+            if (!TryGetRenderContext(bounds, snapshot, style, out var context))
             {
                 cache.Invalidate();
                 canvas.Save();
@@ -902,7 +902,7 @@ namespace ProCharts.Skia
 
         private void RenderCore(SKCanvas canvas, SKRect bounds, ChartDataSnapshot snapshot, SkiaChartStyle style)
         {
-            if (!TryBuildRenderContext(bounds, snapshot, style, out var context))
+            if (!TryGetRenderContext(bounds, snapshot, style, out var context))
             {
                 canvas.Save();
                 canvas.ClipRect(bounds);
@@ -2617,11 +2617,21 @@ namespace ProCharts.Skia
 
         public SkiaChartHitTestResult? HitTest(SKPoint point, SKRect bounds, ChartDataSnapshot snapshot, SkiaChartStyle? style = null)
         {
+            ArgumentNullException.ThrowIfNull(snapshot);
+            if (!float.IsFinite(point.X) || !float.IsFinite(point.Y) ||
+                !float.IsFinite(bounds.Left) || !float.IsFinite(bounds.Top) ||
+                !float.IsFinite(bounds.Right) || !float.IsFinite(bounds.Bottom) ||
+                !float.IsFinite(bounds.Width) || !float.IsFinite(bounds.Height) ||
+                bounds.Width <= 0 || bounds.Height <= 0) return null;
             style ??= new SkiaChartStyle();
             style = ResolveStyle(style);
             if (IsAdvancedChart(snapshot))
             {
                 return HitTestAdvanced(point, bounds, snapshot, style);
+            }
+            if (TryHitTestIndexed(point, bounds, snapshot, style, out var indexedHit))
+            {
+                return indexedHit;
             }
             if (snapshot.Series.Count == 0)
             {

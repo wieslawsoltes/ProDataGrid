@@ -310,6 +310,7 @@ namespace ProCharts.Skia
                             categoryAxisKind,
                             minBubbleSize,
                             maxBubbleSize,
+                            axisKind,
                             style,
                             ref best,
                             ref bestDistance);
@@ -478,6 +479,7 @@ namespace ProCharts.Skia
             ChartAxisKind categoryAxisKind,
             double minBubbleSize,
             double maxBubbleSize,
+            ChartAxisKind valueAxisKind,
             SkiaChartStyle style,
             ref SkiaChartHitTestResult? best,
             ref float bestDistance)
@@ -485,7 +487,6 @@ namespace ProCharts.Skia
             var count = series.Values.Count;
             var xValues = series.XValues;
             var hasValidX = false;
-            var valueAxisKind = style.ValueAxisKind;
             double minX = 0;
             double maxX = 1;
             if (xValues != null && xValues.Count == count)
