@@ -103,7 +103,7 @@ namespace ProDataGrid.FormulaEngine.Excel
             }
             if (cursor == text.Length)
             {
-                result = small;
+                result = RoundUnsigned(small);
                 return true;
             }
 
@@ -156,6 +156,20 @@ namespace ProDataGrid.FormulaEngine.Excel
                 return false;
             }
             return true;
+        }
+
+        private static double RoundUnsigned(ulong value)
+        {
+            if (value <= 9007199254740991UL) return value;
+            // Round the integer before conversion. An implicit high-bit UInt64 to
+            // double cast can have platform-dependent double-rounding behavior.
+            // The remaining significand is always exactly representable as double.
+            var discarded = 64 - BitOperations.LeadingZeroCount(value) - 53;
+            var significand = value >> discarded;
+            var remainder = value & ((1UL << discarded) - 1);
+            var halfway = 1UL << (discarded - 1);
+            if (remainder > halfway || (remainder == halfway && (significand & 1) != 0)) significand++;
+            return Math.ScaleB((double)significand, discarded);
         }
     }
 }
