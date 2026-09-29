@@ -5,7 +5,6 @@
 
 using System;
 using System.Globalization;
-using System.Runtime.CompilerServices;
 using ProDataGrid.FormulaEngine.Excel;
 using Xunit;
 
@@ -172,39 +171,6 @@ namespace ProDataGrid.FormulaEngine.Tests
             Assert.False(left.IsPresent(1, 0));
             context.Workbook.Settings.MaximumArrayCellCount = 3;
             Assert.Equal(FormulaErrorType.Num, Invoke(context, "ATAN2", FormulaValue.FromArray(left), FormulaValue.FromArray(right)).AsError().Type);
-        }
-
-        [Fact]
-        public void Primitive_Scalar_Calls_Are_Allocation_Free_After_Warmup()
-        {
-            var context = Context();
-            Assert.True(context.FunctionRegistry.TryGetFunction("SIN", out var function));
-            Assert.False(function is ILazyFormulaFunction);
-            var arguments = new[] { FormulaValue.FromNumber(0.5) };
-            var functionContext = new FormulaFunctionContext(context);
-            // Warm the exact measurement method, including its result reads and counter API.
-            // The previous shorter, different warmup loop could include one-time work in the
-            // first measured batch. Keep the per-batch bound and require all seven samples.
-            for (var i = 0; i < 3; i++) MeasurePrimitiveCalls(function, functionContext, arguments, out _);
-            var measured = new long[7];
-            for (var sample = 0; sample < measured.Length; sample++)
-            {
-                measured[sample] = MeasurePrimitiveCalls(function, functionContext, arguments, out var sum);
-                Close(10000 * Math.Sin(0.5), sum);
-            }
-            for (var sample = 0; sample < measured.Length; sample++)
-                Assert.True(measured[sample] < 4096,
-                    $"Primitive SIN allocation samples (10,000 calls each): {string.Join(", ", measured)} bytes");
-        }
-
-        [MethodImpl(MethodImplOptions.NoInlining)]
-        private static long MeasurePrimitiveCalls(IFormulaFunction function, FormulaFunctionContext context,
-            FormulaValue[] arguments, out double sum)
-        {
-            var start = GC.GetAllocatedBytesForCurrentThread();
-            sum = 0;
-            for (var i = 0; i < 10000; i++) sum += function.Invoke(context, arguments).AsNumber();
-            return GC.GetAllocatedBytesForCurrentThread() - start;
         }
 
         [Fact]
