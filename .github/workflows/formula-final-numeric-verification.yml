@@ -1,0 +1,58 @@
+name: Formula repeated runtime and native verification
+on:
+  push:
+    branches: [work/formula-final-numeric-verification]
+permissions:
+  contents: read
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          global-json-file: global.json
+          dotnet-version: '8.0.x'
+      - name: Repeat complete formula tests using normal runtime settings and the repository CI configuration
+        run: |
+          mkdir -p artifacts
+          dotnet build src/ProDataGrid.FormulaEngine.Excel/ProDataGrid.FormulaEngine.Excel.csproj -c Release
+          for iteration in 1 2 3; do
+            dotnet test src/ProDataGrid.FormulaEngine.UnitTests/ProDataGrid.FormulaEngine.UnitTests.csproj -c Release --settings build/ci.runsettings --logger trx --results-directory "artifacts/net10-$iteration"
+          done
+          python3 - <<'PY'
+          from pathlib import Path
+          p=Path('src/ProDataGrid.FormulaEngine.UnitTests/ProDataGrid.FormulaEngine.UnitTests.csproj')
+          s=p.read_text();old='<TargetFramework>net10.0</TargetFramework>';assert s.count(old)==1
+          p.write_text(s.replace(old,'<TargetFramework>net8.0</TargetFramework>'))
+          PY
+          for iteration in 1 2 3; do
+            dotnet test src/ProDataGrid.FormulaEngine.UnitTests/ProDataGrid.FormulaEngine.UnitTests.csproj -c Release --settings build/ci.runsettings --logger trx --results-directory "artifacts/net8-$iteration"
+          done
+          git restore src/ProDataGrid.FormulaEngine.UnitTests/ProDataGrid.FormulaEngine.UnitTests.csproj
+      - name: Publish and execute the final formula native smoke
+        run: |
+          set -o pipefail
+          dotnet publish tools/formula-function-benchmarks/FormulaFunctionBenchmarks.csproj -c Release -r linux-x64 -p:PublishAot=true -o artifacts/native 2>&1 | tee artifacts/native-publish.log
+          if grep -E 'warning IL[0-9]+' artifacts/native-publish.log; then exit 1; fi
+          ./artifacts/native/FormulaFunctionBenchmarks artifacts/native-smoke smoke | tee artifacts/native-run.log
+          file artifacts/native/FormulaFunctionBenchmarks > artifacts/native-binary-info.txt
+          rm -r artifacts/native
+      - name: Record exact source and runtime evidence
+        if: always()
+        run: |
+          mkdir -p artifacts
+          git status --short > artifacts/source-status.txt
+          git rev-parse HEAD > artifacts/verification-commit.txt
+          git ls-tree -r HEAD src/ProDataGrid.FormulaEngine src/ProDataGrid.FormulaEngine.Excel src/ProDataGrid.FormulaEngine.UnitTests tools/formula-function-benchmarks > artifacts/validated-source-blobs.txt
+          git archive HEAD src/ProDataGrid.FormulaEngine src/ProDataGrid.FormulaEngine.Excel src/ProDataGrid.FormulaEngine.UnitTests tools/formula-function-benchmarks > artifacts/formula-source.tar
+          dotnet --info > artifacts/runtime.txt
+          dotnet --list-runtimes >> artifacts/runtime.txt
+          lscpu > artifacts/cpu.txt
+          printf 'production_source=ef0c17558a169dd8c842b1e67a62698b34b980f1\nDOTNET_TieredCompilation=runtime-default\nfull_suite_repetitions=3_per_runtime\nallocation_probe=all_7_samples_below_unchanged_4096_byte_batch_allowance\n' > artifacts/verification-context.txt
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: formula-final-numeric-verification
+          path: artifacts
