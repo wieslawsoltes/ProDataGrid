@@ -65,15 +65,23 @@ namespace ProDataGrid.FormulaEngine.Excel
 
         private double PredictNormalized(double x, double slope)
         {
-            var first = Math.FusedMultiplyAdd(slope, x - _x.Origin, _y.Origin);
-            if (!double.IsFinite(first)) return first;
+            // Expanding the split mean with compensated products avoids losing the low
+            // part of x-origin before an FMA. This matters even for an identity fit when
+            // the extrapolation is 2^53 times the training scale.
             var sum = new ExcelCompensatedSum();
-            sum.Add(first);
+            sum.Add(_y.Origin);
             sum.Add(_y.Offset);
             sum.Add(_y.Correction);
-            sum.Add(-slope * _x.Offset);
-            sum.Add(-slope * _x.Correction);
-            return sum.Total;
+            return AddProduct(ref sum, slope, x) && AddProduct(ref sum, -slope, _x.Origin) &&
+                AddProduct(ref sum, -slope, _x.Offset) && AddProduct(ref sum, -slope, _x.Correction)
+                ? sum.Total : double.NaN;
+        }
+
+        private static bool AddProduct(ref ExcelCompensatedSum sum, double left, double right)
+        {
+            if (left == 0 || right == 0) return true;
+            var product = left * right;
+            return double.IsFinite(product) && sum.Add(product) && sum.Add(Math.FusedMultiplyAdd(left, right, -product));
         }
 
         public double StandardError(ReadOnlySpan<double> x, Span<double> y)
