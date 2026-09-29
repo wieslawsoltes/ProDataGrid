@@ -8,7 +8,11 @@ using System;
 namespace ProCharts
 {
     /// <summary>Fixed scalar-series metadata for a synchronized stream.</summary>
-    /// <remarks>Styles and formatter delegates keep their normal shared-reference semantics; numerical storage is owned by the source.</remarks>
+    /// <remarks>
+    /// Styles and formatter delegates keep their normal shared-reference semantics; numerical storage is owned by the source.
+    /// In the current Skia renderer, Line/Area are category-indexed and Scatter supports numeric X positioning. Storing shared
+    /// X values does not change that renderer contract. Map category hits through the captured view's original-row identities.
+    /// </remarks>
     public sealed class StreamingChartSeries
     {
         /// <summary>Defines a line, area or scatter series and its input validity domain.</summary>

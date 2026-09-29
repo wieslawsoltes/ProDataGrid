@@ -64,6 +64,7 @@ foreach (ChartDownsampleMode mode in new[] { ChartDownsampleMode.MinMax, ChartDo
 }
 Console.WriteLine("Append baseline is an intentionally shifting List<T>, not a measurement of the previous grid adapter. Timings exclude construction and do not measure GPU rendering or UI frame rate.");
 IndicatorBenchmarks.Run(Measure);
+MultiSeriesBenchmarks.Run();
 
 static void Measure(string name, Action operation)
 {

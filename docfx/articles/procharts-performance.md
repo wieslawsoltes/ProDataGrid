@@ -27,6 +27,12 @@ model.Request.DownsampleMode = ChartDownsampleMode.Lttb;
 
 Available modes and exact selection semantics depend on the data source. Range sources require coordinated lower/upper selection and reject Bucket/LTTB rather than independently sampling the boundaries; see [range areas](procharts-range-area.md). Reduction changes the represented geometry and is not a pixel-equivalent rendering optimization.
 
+## Synchronized multi-series streams
+
+`StreamingMultiSeriesChartDataSource` commits all scalar channels at each X coordinate as one atomic row. It stores X/categories once, emits one notification per row/batch and returns owned aligned snapshots. Reduction takes the union of each series' original selected indices, preserving independent gaps and a common row identity map. MaxPoints is a per-series soft budget; the common union can be larger. Snapshot preparation still scans under the source lock.
+
+The actual-source benchmark compares independent single-series streams with synchronized storage, including identical final numerical arrays and explicit notification/snapshot counts. It separately reports coordinated reduction output sizes rather than claiming independent and coordinated reduction do equivalent work. Current Skia Line/Area presentation is category-indexed; use Scatter for numeric X positioning. See [synchronized multi-series streaming](procharts-multi-series-streaming.md) for API examples, renderer boundaries, ownership and measurement details.
+
 ## Incremental updates
 
 If your data source implements `IChartIncrementalDataSource`, it can return `ChartDataUpdate` with a `ChartDataDelta` so the renderer avoids full rebuilds when the delta is supported. Sources must describe changes relative to the supplied previous snapshot or return false for a full rebuild.
