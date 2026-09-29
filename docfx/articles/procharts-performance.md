@@ -11,6 +11,8 @@ model.Request.WindowStart = 5000;
 model.Request.WindowCount = 1000;
 ```
 
+For numeric or encoded-date ranges in synchronized streams, `BuildViewByX` resolves inclusive X bounds directly over the logical ring using binary search, then captures the aligned snapshot and identity metadata under the same lock. It avoids a full-history lookup/copy, supports optional boundary neighbors and shares the ordinal window cache. This explicit source API does not change model requests or renderer positioning. See [coordinate windows](procharts-coordinate-windows.md) for examples, complexity, boundary rules and paired lookup-plus-capture benchmarks.
+
 ## Downsampling
 
 `ChartDataRequest.MaxPoints` and `DownsampleMode` control downsampling:

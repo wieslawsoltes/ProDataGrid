@@ -17,7 +17,7 @@ namespace ProCharts
     /// Events run outside the lock on the successful caller's thread. Use CoalescingChartDataSource for UI delivery.
     /// This is append-only, not a timestamp join, interpolation engine, indicator transaction or late-data correction store.
     /// </remarks>
-    public sealed class StreamingMultiSeriesChartDataSource : IChartDataSource, IChartWindowInfoProvider
+    public sealed partial class StreamingMultiSeriesChartDataSource : IChartDataSource, IChartWindowInfoProvider
     {
         private readonly object _gate = new();
         private readonly StreamingChartSeries[] _definitions;
@@ -157,66 +157,72 @@ namespace ProCharts
             {
                 int start = Math.Clamp(requestedStart ?? 0, 0, _count);
                 int count = Math.Clamp(requestedCount ?? (_count - start), 0, _count - start);
-                int budget = mode == ChartDownsampleMode.None || requestedBudget is null or <= 0 ? 0 : Math.Max(2, requestedBudget.Value);
-                if (budget >= count) budget = 0;
-                if (budget == 0) mode = ChartDownsampleMode.None;
-                else if (mode == ChartDownsampleMode.Adaptive) mode = ChartDownsampleMode.MinMax;
-                var key = (start, count, budget, mode);
-                if (_cached != null && _cachedKey == key) return _cached;
+                return BuildViewCore(start, count, requestedBudget, mode);
+            }
+        }
 
-                int outputCount = count;
-                if (budget != 0)
-                {
-                    Array.Clear(_selected, 0, count);
-                    _selected[0] = _selected[count - 1] = true;
-                    for (int s = 0; s < SeriesCount; s++)
-                    {
-                        _window.Set(s, start, count);
-                        int[] indices = ChartSampleDecimator.SelectIndices(_window, budget, mode);
-                        for (int i = 0; i < indices.Length; i++) _selected[indices[i]] = true;
-                    }
-                    outputCount = 0;
-                    for (int i = 0; i < count; i++) if (_selected[i]) outputCount++;
-                }
+        // Both ordinal and coordinate window capture call this while holding _gate.
+        private StreamingMultiSeriesChartView BuildViewCore(int start, int count, int? requestedBudget, ChartDownsampleMode mode)
+        {
+            int budget = mode == ChartDownsampleMode.None || requestedBudget is null or <= 0 ? 0 : Math.Max(2, requestedBudget.Value);
+            if (budget >= count) budget = 0;
+            if (budget == 0) mode = ChartDownsampleMode.None;
+            else if (mode == ChartDownsampleMode.Adaptive) mode = ChartDownsampleMode.MinMax;
+            var key = (start, count, budget, mode);
+            if (_cached != null && _cachedKey == key) return _cached;
 
-                double[] x = new double[outputCount];
-                string?[] labels = new string?[outputCount];
-                long[] identities = new long[outputCount];
-                double?[][] values = new double?[SeriesCount][];
-                for (int s = 0; s < SeriesCount; s++) values[s] = new double?[outputCount];
-                long firstRetained = _totalSamples - _count;
-                if (budget == 0)
-                {
-                    CopyWindow(_x, start, x);
-                    CopyWindow(_categories, start, labels);
-                    for (int s = 0; s < SeriesCount; s++) CopyWindow(_values[s], start, values[s]);
-                    for (int i = 0; i < count; i++) identities[i] = firstRetained + start + i;
-                }
-                else
-                {
-                    int output = 0;
-                    for (int i = 0; i < count; i++)
-                    {
-                        if (!_selected[i]) continue;
-                        int ring = RingIndex(start + i);
-                        x[output] = _x[ring]; labels[output] = _categories[ring]; identities[output] = firstRetained + start + i;
-                        for (int s = 0; s < SeriesCount; s++) values[s][output] = _values[s][ring];
-                        output++;
-                    }
-                }
-                IReadOnlyList<double> sharedX = Array.AsReadOnly(x);
-                ChartSeriesSnapshot[] series = new ChartSeriesSnapshot[SeriesCount];
+            int outputCount = count;
+            if (budget != 0)
+            {
+                Array.Clear(_selected, 0, count);
+                _selected[0] = _selected[count - 1] = true;
                 for (int s = 0; s < SeriesCount; s++)
                 {
-                    StreamingChartSeries definition = _definitions[s];
-                    series[s] = new ChartSeriesSnapshot(definition.Name, definition.Kind, Array.AsReadOnly(values[s]), sharedX,
-                        dataLabelFormatter: definition.DataLabelFormatter, valueAxisAssignment: definition.ValueAxisAssignment,
-                        style: definition.Style);
+                    _window.Set(s, start, count);
+                    int[] indices = ChartSampleDecimator.SelectIndices(_window, budget, mode);
+                    for (int i = 0; i < indices.Length; i++) _selected[indices[i]] = true;
                 }
-                ChartDataSnapshot snapshot = new(Array.AsReadOnly(labels), Array.AsReadOnly(series), _version);
-                _cachedKey = key;
-                return _cached = new StreamingMultiSeriesChartView(snapshot, Array.AsReadOnly(identities), firstRetained, _count, start, count);
+                outputCount = 0;
+                for (int i = 0; i < count; i++) if (_selected[i]) outputCount++;
             }
+
+            double[] x = new double[outputCount];
+            string?[] labels = new string?[outputCount];
+            long[] identities = new long[outputCount];
+            double?[][] values = new double?[SeriesCount][];
+            for (int s = 0; s < SeriesCount; s++) values[s] = new double?[outputCount];
+            long firstRetained = _totalSamples - _count;
+            if (budget == 0)
+            {
+                CopyWindow(_x, start, x);
+                CopyWindow(_categories, start, labels);
+                for (int s = 0; s < SeriesCount; s++) CopyWindow(_values[s], start, values[s]);
+                for (int i = 0; i < count; i++) identities[i] = firstRetained + start + i;
+            }
+            else
+            {
+                int output = 0;
+                for (int i = 0; i < count; i++)
+                {
+                    if (!_selected[i]) continue;
+                    int ring = RingIndex(start + i);
+                    x[output] = _x[ring]; labels[output] = _categories[ring]; identities[output] = firstRetained + start + i;
+                    for (int s = 0; s < SeriesCount; s++) values[s][output] = _values[s][ring];
+                    output++;
+                }
+            }
+            IReadOnlyList<double> sharedX = Array.AsReadOnly(x);
+            ChartSeriesSnapshot[] series = new ChartSeriesSnapshot[SeriesCount];
+            for (int s = 0; s < SeriesCount; s++)
+            {
+                StreamingChartSeries definition = _definitions[s];
+                series[s] = new ChartSeriesSnapshot(definition.Name, definition.Kind, Array.AsReadOnly(values[s]), sharedX,
+                    dataLabelFormatter: definition.DataLabelFormatter, valueAxisAssignment: definition.ValueAxisAssignment,
+                    style: definition.Style);
+            }
+            ChartDataSnapshot snapshot = new(Array.AsReadOnly(labels), Array.AsReadOnly(series), _version);
+            _cachedKey = key;
+            return _cached = new StreamingMultiSeriesChartView(snapshot, Array.AsReadOnly(identities), firstRetained, _count, start, count);
         }
 
         // The caller holds _gate, and normalized windows never exceed the retained ring suffix.
