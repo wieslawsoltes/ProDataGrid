@@ -1,0 +1,28 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:charts="clr-namespace:ProCharts.Avalonia;assembly=ProCharts.Avalonia"
+             xmlns:skia="clr-namespace:ProCharts.Skia;assembly=ProCharts.Skia"
+             xmlns:vm="clr-namespace:DataGridSample.ViewModels"
+             x:Class="DataGridSample.Pages.ChartStreamingRangePage"
+             x:DataType="vm:ChartStreamingRangeViewModel">
+  <UserControl.DataContext><vm:ChartStreamingRangeViewModel /></UserControl.DataContext>
+  <Grid Margin="16" RowDefinitions="Auto,Auto,Auto,*" RowSpacing="12">
+    <StackPanel Spacing="4">
+      <TextBlock Classes="h2" Text="Bounded live intervals" />
+      <TextBlock Text="Simulated feed: append a 64-observation batch. Only the latest 2,048 intervals are retained; gaps and original observation identities survive display reduction."
+                 TextWrapping="Wrap" />
+    </StackPanel>
+    <StackPanel Grid.Row="1" Orientation="Horizontal" Spacing="12">
+      <Button x:Name="AppendBatchButton" Content="Append 64 observations" Command="{Binding AppendCommand}" />
+      <Button Content="Reset stream" Command="{Binding ResetCommand}" />
+      <CheckBox Content="Insert gaps" IsChecked="{Binding IncludeGaps, Mode=TwoWay}" />
+      <CheckBox Content="Reduce to 256" IsChecked="{Binding ReduceData, Mode=TwoWay}" />
+    </StackPanel>
+    <TextBlock Grid.Row="2" Text="{Binding RenderingSummary}" TextWrapping="Wrap" />
+    <charts:ProChartView Grid.Row="3" ChartModel="{Binding Chart}" ShowToolTips="True" MinHeight="240">
+      <charts:ProChartView.ChartStyle>
+        <skia:SkiaChartStyle AreaFillOpacity="0.35" ShowCategoryGridlines="False" PaddingRight="44" />
+      </charts:ProChartView.ChartStyle>
+    </charts:ProChartView>
+  </Grid>
+</UserControl>

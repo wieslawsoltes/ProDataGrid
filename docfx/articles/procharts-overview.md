@@ -6,7 +6,7 @@ ProCharts separates chart data, rendering and UI integration into reusable libra
 
 | Library | Responsibility |
 | --- | --- |
-| `ProCharts` | Models, snapshots, axes, formatting, bounded streaming, hierarchy data/layout, batch transforms, persistent incremental indicators and coordinated interval decimation. |
+| `ProCharts` | Models, snapshots, axes, formatting, bounded scalar/interval streaming, hierarchy data/layout, batch transforms, persistent incremental indicators and coordinated interval decimation. |
 | `ProCharts.Skia` | Skia rendering, hit testing, interaction indexing and PNG/SVG export. |
 | `ProCharts.Avalonia` | `ProChartView`, tooltips, viewport gestures and opt-in hierarchy navigation. |
 | `ProDataGrid.Charting` | Grid, pivot, formula and generated-source adapters. |
@@ -42,6 +42,8 @@ Batch `ChartIndicators` methods analyze complete datasets. Persistent `Streaming
 
 `RangeChartDataSource` adds owned input, window-before-decimation preparation, atomic replacement and cached display views with original source-index maps. Paired MinMax/Adaptive selection keeps both boundaries' extrema and gap separators at shared source indices. Use a numeric/date/log X axis to retain original spacing; configure the source's logarithmic value domain when applicable. The reduced polygon approximates omitted detail rather than certifying an enclosing envelope. `None` restores every supplied interval. The **ProCharts Range Area** sample has an optional 100,000-observation mode with an 800-point reduction toggle; its original small mode retains the independent mean line.
 
+`StreamingRangeChartDataSource` extends bounded ingestion to interval pairs: append validated batches without replacing the full retained dataset, preserve original 64-bit observation maps, and reduce ring windows through the same paired selector. It enforces increasing X, commits batches atomically and publishes owned snapshots. The Range Area page's **Open bounded live interval demo** provides a command-driven synthetic feed, not an external live connection. See [bounded streaming range areas](procharts-streaming-ranges.md) for threading, session identity, windowing and performance contracts.
+
 ## Data and interaction
 
 Grid adapters track sorting/filtering/grouping and formula results. Cached grid windows copy only the requested category/value/X/size slices; their initial source cache still needs to be built. Bounded streaming uses fixed-capacity history. Continuous-series decimation is not a substitute for hierarchy/matrix semantics, and interval boundaries must not be sampled independently.
@@ -54,7 +56,8 @@ Repeated supported point and range-area queries can reuse indexed screen-space g
 
 - [Model and snapshots](procharts-chart-model.md)
 - [Data sources](procharts-data-sources.md)
-- [Bounded streaming](procharts-streaming.md)
+- [Bounded scalar streaming](procharts-streaming.md)
+- [Bounded streaming range areas](procharts-streaming-ranges.md)
 - [Incremental EMA, RSI, MACD and ATR](procharts-incremental-indicators.md)
 - [Efficient grid windows](procharts-windowing.md)
 - [Advanced chart families](procharts-advanced-charts.md)
