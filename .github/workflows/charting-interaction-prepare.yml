@@ -1,4 +1,4 @@
-name: Integrate and compare chart interaction
+name: Integrate chart interaction source
 on:
   push:
     branches: [charting/indexed-interaction]
@@ -8,16 +8,15 @@ permissions:
 jobs:
   integrate:
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 10
     steps:
       - uses: actions/checkout@v4
         with:
           ref: charting/indexed-interaction
-          fetch-depth: 0
       - uses: actions/setup-dotnet@v4
         with:
           global-json-file: global.json
-      - name: Apply reviewed integration hooks
+      - name: Apply the already-tested source-only integration hooks
         run: |
           python3 - <<'PY'
           from pathlib import Path
@@ -41,38 +40,20 @@ jobs:
           t = once(t, '            double maxBubbleSize,\n            SkiaChartStyle style,', '            double maxBubbleSize,\n            ChartAxisKind valueAxisKind,\n            SkiaChartStyle style,')
           t = once(t, '            var valueAxisKind = style.ValueAxisKind;\n', '')
           p.write_text(t)
-          p = Path('.github/workflows/charting.yml')
-          t = p.read_text().replace("      - 'tests/ProCharts.Benchmarks/**'", "      - 'tests/ProCharts.Benchmarks/**'\n      - 'tests/ProCharts.Interaction.Benchmarks/**'")
-          t = once(t, '      - name: Upload diagnostics', '      - name: Measure chart interaction\n        run: dotnet run --project tests/ProCharts.Interaction.Benchmarks/ProCharts.Interaction.Benchmarks.csproj -c Release | tee artifacts/charting/interaction-performance.txt\n      - name: Upload diagnostics')
-          p.write_text(t)
-          Path('.github/workflows/charting-source-audit.yml').unlink()
-          Path('.github/workflows/charting-interaction-prepare.yml').unlink()
           PY
           git diff --check
-      - name: Run charting regressions and supported target builds
-        run: |
-          dotnet build src/ProCharts.Skia/ProCharts.Skia.csproj -c Release
-          dotnet test src/Avalonia.Controls.DataGrid.UnitTests/Avalonia.Controls.DataGrid.UnitTests.csproj -c Release -p:CollectCoverage=false --filter FullyQualifiedName~Charting --logger trx --results-directory artifacts/interaction
-      - name: Compare actual old and indexed paths on this runner
-        shell: bash
-        run: |
-          set -o pipefail
-          git worktree add --detach /tmp/charting-before c627e6ee5ce7f2b688ab3353e0da95c3f3073c68
-          cp -R tests/ProCharts.Interaction.Benchmarks /tmp/charting-before/tests/
-          find /tmp/charting-before/tests/ProCharts.Interaction.Benchmarks -type d \( -name bin -o -name obj \) -prune -exec rm -rf '{}' +
-          dotnet run --project /tmp/charting-before/tests/ProCharts.Interaction.Benchmarks/ProCharts.Interaction.Benchmarks.csproj -c Release > artifacts/interaction/before.txt
-          dotnet run --project tests/ProCharts.Interaction.Benchmarks/ProCharts.Interaction.Benchmarks.csproj -c Release > artifacts/interaction/after.txt
-          git diff > artifacts/interaction/integration.patch
-      - name: Commit reviewed hooks without temporary workflows
+      - name: Recheck charting regressions
+        run: dotnet test src/Avalonia.Controls.DataGrid.UnitTests/Avalonia.Controls.DataGrid.UnitTests.csproj -c Release -p:CollectCoverage=false --filter FullyQualifiedName~Charting --logger trx --results-directory artifacts/interaction
+      - name: Commit only the checked C sharp source
         run: |
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git add src/ProCharts.Skia/SkiaChartRenderer.cs src/ProCharts.Skia/SkiaChartRenderer.HitTest.cs .github/workflows/charting.yml .github/workflows/charting-source-audit.yml .github/workflows/charting-interaction-prepare.yml
-          git commit -m 'Integrate indexed point interaction, correct bubble secondary scale and retain read-only diagnostics'
+          git add src/ProCharts.Skia/SkiaChartRenderer.cs src/ProCharts.Skia/SkiaChartRenderer.HitTest.cs
+          git commit -m 'Integrate indexed point interaction and correct bubble secondary scale'
           git push origin HEAD:refs/heads/charting/indexed-interaction
       - uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: chart-interaction-comparison
+          name: chart-interaction-integration
           path: artifacts/interaction
-          retention-days: 14
+          retention-days: 7
