@@ -62,7 +62,7 @@ namespace ProCharts.Skia
         private static double RangeMidpoint(double low, double high)
         {
             double difference = high - low;
-            return double.IsFinite(difference) ? low + difference / 2 : low / 2 + high / 2;
+            return double.IsFinite(difference) ? Math.FusedMultiplyAdd(difference, 0.5, low) : low / 2 + high / 2;
         }
 
         private static void DrawRangeAreaSeries(SKCanvas canvas, SKRect plot, ChartSeriesSnapshot series,
@@ -163,10 +163,10 @@ namespace ProCharts.Skia
             {
                 if (!TryProjectRangeAreaPoint(plot, series, i, minimum, maximum, axisKind, numericX, categoryKind, minX, maxX, out var point)) continue;
                 float y = (float)((double)point.LowerY / 2 + (double)point.UpperY / 2);
-                if (!plot.Contains(point.X, y)) continue;
+                if (point.X < plot.Left || point.X > plot.Right || y < plot.Top || y > plot.Bottom) continue;
                 string text = FormatDataLabel(series, seriesIndex, point.Low, style) + " – " + FormatDataLabel(series, seriesIndex, point.High, style);
                 TryDrawLabelWithFallback(canvas, plot, placed, textPaint, backgroundPaint, text, point.X, y,
-                    false, style.DataLabelPadding, style.DataLabelOffset);
+                    true, style.DataLabelPadding, style.DataLabelOffset);
             }
         }
 

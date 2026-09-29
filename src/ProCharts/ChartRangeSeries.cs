@@ -44,7 +44,7 @@ namespace ProCharts
                 lows[i] = low;
                 highs[i] = high;
                 double difference = high - low;
-                values[i] = double.IsFinite(difference) ? low + difference / 2 : low / 2 + high / 2;
+                values[i] = double.IsFinite(difference) ? Math.FusedMultiplyAdd(difference, 0.5, low) : low / 2 + high / 2;
             }
             return new ChartSeriesSnapshot(name, ChartSeriesKind.RangeArea, Array.AsReadOnly(values),
                 x == null ? null : Array.AsReadOnly(x), valueAxisAssignment: valueAxisAssignment,
