@@ -185,6 +185,55 @@ Class FormulaEvaluator  <a class="header-action link-secondary" title="View sour
 
 
 
+  <a id="ProDataGrid_FormulaEngine_FormulaEvaluator_InvokeLambda_" data-uid="ProDataGrid.FormulaEngine.FormulaEvaluator.InvokeLambda*"></a>
+
+  <h3 id="ProDataGrid_FormulaEngine_FormulaEvaluator_InvokeLambda_ProDataGrid_FormulaEngine_FormulaLambda_System_Collections_Generic_IReadOnlyList_ProDataGrid_FormulaEngine_FormulaValue__ProDataGrid_FormulaEngine_FormulaEvaluationContext_ProDataGrid_FormulaEngine_IFormulaValueResolver_System_Collections_Generic_IReadOnlyList_System_Boolean__" data-uid="ProDataGrid.FormulaEngine.FormulaEvaluator.InvokeLambda(ProDataGrid.FormulaEngine.FormulaLambda,System.Collections.Generic.IReadOnlyList{ProDataGrid.FormulaEngine.FormulaValue},ProDataGrid.FormulaEngine.FormulaEvaluationContext,ProDataGrid.FormulaEngine.IFormulaValueResolver,System.Collections.Generic.IReadOnlyList{System.Boolean})">
+  InvokeLambda(FormulaLambda, IReadOnlyList&lt;FormulaValue&gt;, FormulaEvaluationContext, IFormulaValueResolver, IReadOnlyList&lt;bool&gt;?)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/ProDataGrid.FormulaEngine/FormulaEvaluation.Lambda.cs/#L16"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Invokes a lambda with evaluated arguments and optional omission metadata.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public FormulaValue InvokeLambda(FormulaLambda lambda, IReadOnlyList&lt;FormulaValue&gt; arguments, FormulaEvaluationContext context, IFormulaValueResolver resolver, IReadOnlyList&lt;bool&gt;? omitted = null)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>lambda</code> <a class="xref" href="ProDataGrid.FormulaEngine.FormulaLambda.html">FormulaLambda</a></dt>
+    <dd></dd>
+    <dt><code>arguments</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.ireadonlylist-1">IReadOnlyList</a>&lt;<a class="xref" href="ProDataGrid.FormulaEngine.FormulaValue.html">FormulaValue</a>&gt;</dt>
+    <dd></dd>
+    <dt><code>context</code> <a class="xref" href="ProDataGrid.FormulaEngine.FormulaEvaluationContext.html">FormulaEvaluationContext</a></dt>
+    <dd></dd>
+    <dt><code>resolver</code> <a class="xref" href="ProDataGrid.FormulaEngine.IFormulaValueResolver.html">IFormulaValueResolver</a></dt>
+    <dd></dd>
+    <dt><code>omitted</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.ireadonlylist-1">IReadOnlyList</a>&lt;<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a>&gt;</dt>
+    <dd></dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="ProDataGrid.FormulaEngine.FormulaValue.html">FormulaValue</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+  <h4 class="section" id="ProDataGrid_FormulaEngine_FormulaEvaluator_InvokeLambda_ProDataGrid_FormulaEngine_FormulaLambda_System_Collections_Generic_IReadOnlyList_ProDataGrid_FormulaEngine_FormulaValue__ProDataGrid_FormulaEngine_FormulaEvaluationContext_ProDataGrid_FormulaEngine_IFormulaValueResolver_System_Collections_Generic_IReadOnlyList_System_Boolean___remarks">Remarks</h4>
+  <div class="markdown level1 remarks"><p>Parameter bindings are snapshotted. Arguments may be reused by the caller after this method
+returns, including when the result is another closure. Recursion is bounded by MaximumLambdaDepth.</p>
+</div>
+
+
+
+
 
 </article>
 

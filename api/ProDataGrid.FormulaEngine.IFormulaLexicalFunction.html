@@ -2,11 +2,11 @@
 <html>
   <head>
     <meta charset="utf-8">
-      <title>Enum FormulaUnaryOperator | ProDataGrid for Avalonia </title>
+      <title>Interface IFormulaLexicalFunction | ProDataGrid for Avalonia </title>
       <meta name="viewport" content="width=device-width, initial-scale=1.0">
-      <meta name="title" content="Enum FormulaUnaryOperator | ProDataGrid for Avalonia ">
+      <meta name="title" content="Interface IFormulaLexicalFunction | ProDataGrid for Avalonia ">
       
-      
+      <meta name="description" content="Optional metadata for functions whose argument syntax introduces lexical names.">
       <link rel="icon" href="../favicon.ico">
       <link rel="stylesheet" href="../public/docfx.min.css">
       <link rel="stylesheet" href="../public/main.css">
@@ -16,7 +16,7 @@
       
       
       
-      <meta name="docfx:docurl" content="https://github.com/wieslawsoltes/ProDataGrid/new/master/apiSpec/new?filename=ProDataGrid_FormulaEngine_FormulaUnaryOperator.md&amp;value=---%0Auid%3A%20ProDataGrid.FormulaEngine.FormulaUnaryOperator%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">
+      <meta name="docfx:docurl" content="https://github.com/wieslawsoltes/ProDataGrid/new/master/apiSpec/new?filename=ProDataGrid_FormulaEngine_IFormulaLexicalFunction.md&amp;value=---%0Auid%3A%20ProDataGrid.FormulaEngine.IFormulaLexicalFunction%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">
       <meta name="loc:inThisArticle" content="In this article">
       <meta name="loc:searchResultsCount" content="{count} results for &quot;{query}&quot;">
       <meta name="loc:searchNoResults" content="No results for &quot;{query}&quot;">
@@ -80,13 +80,12 @@
           <nav id="breadcrumb"></nav>
         </div>
 
-        <article data-uid="ProDataGrid.FormulaEngine.FormulaUnaryOperator">
+        <article data-uid="ProDataGrid.FormulaEngine.IFormulaLexicalFunction">
 
 
 
-
-  <h1 id="ProDataGrid_FormulaEngine_FormulaUnaryOperator" data-uid="ProDataGrid.FormulaEngine.FormulaUnaryOperator" class="text-break">
-Enum FormulaUnaryOperator  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/ProDataGrid.FormulaEngine/FormulaExpressions.cs/#L24"><i class="bi bi-code-slash"></i></a>
+  <h1 id="ProDataGrid_FormulaEngine_IFormulaLexicalFunction" data-uid="ProDataGrid.FormulaEngine.IFormulaLexicalFunction" class="text-break">
+Interface IFormulaLexicalFunction  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/ProDataGrid.FormulaEngine/IFormulaLexicalFunction.cs/#L23"><i class="bi bi-code-slash"></i></a>
   </h1>
 
   <div class="facts text-secondary">
@@ -94,11 +93,12 @@ Enum FormulaUnaryOperator  <a class="header-action link-secondary" title="View s
   <dl><dt>Assembly</dt><dd>ProDataGrid.FormulaEngine.dll</dd></dl>
   </div>
 
-  <div class="markdown summary"></div>
+  <div class="markdown summary"><p>Optional metadata for functions whose argument syntax introduces lexical names.</p>
+</div>
   <div class="markdown conceptual"></div>
 
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public enum FormulaUnaryOperator</code></pre>
+    <pre><code class="lang-csharp hljs">public interface IFormulaLexicalFunction</code></pre>
   </div>
 
 
@@ -109,26 +109,56 @@ Enum FormulaUnaryOperator  <a class="header-action link-secondary" title="View s
 
 
 
-  <h2 id="fields">Fields
+
+
+  <h2 id="ProDataGrid_FormulaEngine_IFormulaLexicalFunction_remarks">Remarks</h2>
+  <div class="markdown level0 remarks"><p>Implement alongside IFormulaFunction. Runtime evaluation remains the function's
+responsibility. Replacing a lexical function with an ordinary function removes its special
+dependency traversal when the graph is constructed with the same registry.</p>
+</div>
+
+
+  <h2 class="section" id="properties">Properties
 </h2>
+
+
+  <a id="ProDataGrid_FormulaEngine_IFormulaLexicalFunction_BindingKind_" data-uid="ProDataGrid.FormulaEngine.IFormulaLexicalFunction.BindingKind*"></a>
+
+  <h3 id="ProDataGrid_FormulaEngine_IFormulaLexicalFunction_BindingKind" data-uid="ProDataGrid.FormulaEngine.IFormulaLexicalFunction.BindingKind">
+  BindingKind
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/ProDataGrid.FormulaEngine/IFormulaLexicalFunction.cs/#L26"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Gets the binding semantics of the function's argument expressions.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">FormulaLexicalBindingKind BindingKind { get; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
   <dl class="parameters">
-    <dt id="ProDataGrid_FormulaEngine_FormulaUnaryOperator_Negate"><code>Negate = 1</code></dt>
-  
-  <dd></dd>
-    <dt id="ProDataGrid_FormulaEngine_FormulaUnaryOperator_Percent"><code>Percent = 2</code></dt>
-  
-  <dd></dd>
-    <dt id="ProDataGrid_FormulaEngine_FormulaUnaryOperator_Plus"><code>Plus = 0</code></dt>
-  
-  <dd></dd>
+    <dt><a class="xref" href="ProDataGrid.FormulaEngine.FormulaLexicalBindingKind.html">FormulaLexicalBindingKind</a></dt>
+    <dd></dd>
   </dl>
+
+
+
+
+
+
 
 
 
 </article>
 
         <div class="contribution d-print-none">
-          <a href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/ProDataGrid.FormulaEngine/FormulaExpressions.cs/#L24" class="edit-link">Edit this page</a>
+          <a href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/ProDataGrid.FormulaEngine/IFormulaLexicalFunction.cs/#L23" class="edit-link">Edit this page</a>
         </div>
 
 

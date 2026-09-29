@@ -10756,6 +10756,48 @@
     },
     {
       "type": "ManagedReference",
+      "source_relative_path": "api/ProDataGrid.FormulaEngine.FormulaInvocationExpression.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/ProDataGrid.FormulaEngine.FormulaInvocationExpression.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "ProDataGrid.FormulaEngine.FormulaInvocationExpression",
+      "Summary": "<p sourcefile=\"api/ProDataGrid.FormulaEngine.FormulaInvocationExpression.yml\" sourcestartlinenumber=\"1\">A call whose target is a formula value, including a returned lambda.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/ProDataGrid.FormulaEngine.FormulaLambda.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/ProDataGrid.FormulaEngine.FormulaLambda.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "ProDataGrid.FormulaEngine.FormulaLambda",
+      "Summary": "<p sourcefile=\"api/ProDataGrid.FormulaEngine.FormulaLambda.yml\" sourcestartlinenumber=\"1\">An immutable lambda definition and its captured lexical bindings.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/ProDataGrid.FormulaEngine.FormulaLexicalBindingKind.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/ProDataGrid.FormulaEngine.FormulaLexicalBindingKind.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "ProDataGrid.FormulaEngine.FormulaLexicalBindingKind",
+      "Summary": "<p sourcefile=\"api/ProDataGrid.FormulaEngine.FormulaLexicalBindingKind.yml\" sourcestartlinenumber=\"1\">Describes binding syntax to dependency and volatility analysis.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
       "source_relative_path": "api/ProDataGrid.FormulaEngine.FormulaLiteralExpression.yml",
       "output": {
         ".html": {
@@ -11257,6 +11299,20 @@
       "IsMRef": true,
       "Title": "ProDataGrid.FormulaEngine.IFormulaFunctionRegistryVersion",
       "Summary": "<p sourcefile=\"api/ProDataGrid.FormulaEngine.IFormulaFunctionRegistryVersion.yml\" sourcestartlinenumber=\"1\">Optional revision contract for mutable function registries. Implement this alongside\n<xref href=\"ProDataGrid.FormulaEngine.IFormulaFunctionRegistry\" data-throw-if-not-resolved=\"false\"></xref> to invalidate cached eager/lazy compilation plans.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/ProDataGrid.FormulaEngine.IFormulaLexicalFunction.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/ProDataGrid.FormulaEngine.IFormulaLexicalFunction.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "ProDataGrid.FormulaEngine.IFormulaLexicalFunction",
+      "Summary": "<p sourcefile=\"api/ProDataGrid.FormulaEngine.IFormulaLexicalFunction.yml\" sourcestartlinenumber=\"1\">Optional metadata for functions whose argument syntax introduces lexical names.</p>\n"
     },
     {
       "type": "ManagedReference",

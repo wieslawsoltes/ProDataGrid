@@ -310,6 +310,130 @@ Class FormulaEvaluationContext  <a class="header-action link-secondary" title="V
 
 
 
+  <h2 class="section" id="methods">Methods
+</h2>
+
+
+  <a id="ProDataGrid_FormulaEngine_FormulaEvaluationContext_CreateLambda_" data-uid="ProDataGrid.FormulaEngine.FormulaEvaluationContext.CreateLambda*"></a>
+
+  <h3 id="ProDataGrid_FormulaEngine_FormulaEvaluationContext_CreateLambda_System_Collections_Generic_IReadOnlyList_System_String__ProDataGrid_FormulaEngine_FormulaExpression_" data-uid="ProDataGrid.FormulaEngine.FormulaEvaluationContext.CreateLambda(System.Collections.Generic.IReadOnlyList{System.String},ProDataGrid.FormulaEngine.FormulaExpression)">
+  CreateLambda(IReadOnlyList&lt;string&gt;, FormulaExpression)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/ProDataGrid.FormulaEngine/FormulaEvaluationContext.Locals.cs/#L25"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Captures the current lexical bindings in a reusable lambda definition.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public FormulaLambda CreateLambda(IReadOnlyList&lt;string&gt; parameters, FormulaExpression body)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>parameters</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.ireadonlylist-1">IReadOnlyList</a>&lt;<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a>&gt;</dt>
+    <dd></dd>
+    <dt><code>body</code> <a class="xref" href="ProDataGrid.FormulaEngine.FormulaExpression.html">FormulaExpression</a></dt>
+    <dd></dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="ProDataGrid.FormulaEngine.FormulaLambda.html">FormulaLambda</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="ProDataGrid_FormulaEngine_FormulaEvaluationContext_IsArgumentOmitted_" data-uid="ProDataGrid.FormulaEngine.FormulaEvaluationContext.IsArgumentOmitted*"></a>
+
+  <h3 id="ProDataGrid_FormulaEngine_FormulaEvaluationContext_IsArgumentOmitted_ProDataGrid_FormulaEngine_FormulaExpression_" data-uid="ProDataGrid.FormulaEngine.FormulaEvaluationContext.IsArgumentOmitted(ProDataGrid.FormulaEngine.FormulaExpression)">
+  IsArgumentOmitted(FormulaExpression)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/ProDataGrid.FormulaEngine/FormulaEvaluationContext.Locals.cs/#L29"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Reports whether an expression refers to a syntactically omitted lambda argument.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public bool IsArgumentOmitted(FormulaExpression expression)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>expression</code> <a class="xref" href="ProDataGrid.FormulaEngine.FormulaExpression.html">FormulaExpression</a></dt>
+    <dd></dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="ProDataGrid_FormulaEngine_FormulaEvaluationContext_WithLocalValue_" data-uid="ProDataGrid.FormulaEngine.FormulaEvaluationContext.WithLocalValue*"></a>
+
+  <h3 id="ProDataGrid_FormulaEngine_FormulaEvaluationContext_WithLocalValue_System_String_ProDataGrid_FormulaEngine_FormulaValue_System_Boolean_" data-uid="ProDataGrid.FormulaEngine.FormulaEvaluationContext.WithLocalValue(System.String,ProDataGrid.FormulaEngine.FormulaValue,System.Boolean)">
+  WithLocalValue(string, FormulaValue, bool)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/ProDataGrid.FormulaEngine/FormulaEvaluationContext.Locals.cs/#L18"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Creates a child context with a local binding without modifying the current context.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public FormulaEvaluationContext WithLocalValue(string name, FormulaValue value, bool omitted = false)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>name</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></dt>
+    <dd></dd>
+    <dt><code>value</code> <a class="xref" href="ProDataGrid.FormulaEngine.FormulaValue.html">FormulaValue</a></dt>
+    <dd></dd>
+    <dt><code>omitted</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></dt>
+    <dd></dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="ProDataGrid.FormulaEngine.FormulaEvaluationContext.html">FormulaEvaluationContext</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+  <h4 class="section" id="ProDataGrid_FormulaEngine_FormulaEvaluationContext_WithLocalValue_System_String_ProDataGrid_FormulaEngine_FormulaValue_System_Boolean__remarks">Remarks</h4>
+  <div class="markdown level1 remarks"><p>Values are captured, not reevaluated when referenced. Names are case-insensitive.</p>
+</div>
+
+
+
+
 
 </article>
 

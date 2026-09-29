@@ -85,7 +85,7 @@
 
 
   <h1 id="ProDataGrid_FormulaEngine_FormulaLiteralExpression" data-uid="ProDataGrid.FormulaEngine.FormulaLiteralExpression" class="text-break">
-Class FormulaLiteralExpression  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/ProDataGrid.FormulaEngine/FormulaExpressions.cs/#L58"><i class="bi bi-code-slash"></i></a>
+Class FormulaLiteralExpression  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/ProDataGrid.FormulaEngine/FormulaExpressions.cs/#L59"><i class="bi bi-code-slash"></i></a>
   </h1>
 
   <div class="facts text-secondary">
@@ -153,7 +153,7 @@ Class FormulaLiteralExpression  <a class="header-action link-secondary" title="V
 
   <h3 id="ProDataGrid_FormulaEngine_FormulaLiteralExpression__ctor_ProDataGrid_FormulaEngine_FormulaValue_" data-uid="ProDataGrid.FormulaEngine.FormulaLiteralExpression.#ctor(ProDataGrid.FormulaEngine.FormulaValue)">
   FormulaLiteralExpression(FormulaValue)
-  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/ProDataGrid.FormulaEngine/FormulaExpressions.cs/#L60"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/ProDataGrid.FormulaEngine/FormulaExpressions.cs/#L61"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"></div>
@@ -180,15 +180,85 @@ Class FormulaLiteralExpression  <a class="header-action link-secondary" title="V
 
 
 
+  <a id="ProDataGrid_FormulaEngine_FormulaLiteralExpression__ctor_" data-uid="ProDataGrid.FormulaEngine.FormulaLiteralExpression.#ctor*"></a>
+
+  <h3 id="ProDataGrid_FormulaEngine_FormulaLiteralExpression__ctor_ProDataGrid_FormulaEngine_FormulaValue_System_Boolean_" data-uid="ProDataGrid.FormulaEngine.FormulaLiteralExpression.#ctor(ProDataGrid.FormulaEngine.FormulaValue,System.Boolean)">
+  FormulaLiteralExpression(FormulaValue, bool)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/ProDataGrid.FormulaEngine/FormulaExpressions.cs/#L69"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Creates a literal with optional syntactic argument-omission metadata.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public FormulaLiteralExpression(FormulaValue value, bool isOmitted)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>value</code> <a class="xref" href="ProDataGrid.FormulaEngine.FormulaValue.html">FormulaValue</a></dt>
+    <dd></dd>
+    <dt><code>isOmitted</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <h4 class="section" id="ProDataGrid_FormulaEngine_FormulaLiteralExpression__ctor_ProDataGrid_FormulaEngine_FormulaValue_System_Boolean__remarks">Remarks</h4>
+  <div class="markdown level1 remarks"><p>An omitted literal must contain a blank value. The original one-argument constructor
+continues to create ordinary literals, including ordinary blanks.</p>
+</div>
+
+
+
+
   <h2 class="section" id="properties">Properties
 </h2>
+
+
+  <a id="ProDataGrid_FormulaEngine_FormulaLiteralExpression_IsOmitted_" data-uid="ProDataGrid.FormulaEngine.FormulaLiteralExpression.IsOmitted*"></a>
+
+  <h3 id="ProDataGrid_FormulaEngine_FormulaLiteralExpression_IsOmitted" data-uid="ProDataGrid.FormulaEngine.FormulaLiteralExpression.IsOmitted">
+  IsOmitted
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/ProDataGrid.FormulaEngine/FormulaExpressions.cs/#L81"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Gets whether this blank literal represents a syntactically omitted argument.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public bool IsOmitted { get; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
 
 
   <a id="ProDataGrid_FormulaEngine_FormulaLiteralExpression_Value_" data-uid="ProDataGrid.FormulaEngine.FormulaLiteralExpression.Value*"></a>
 
   <h3 id="ProDataGrid_FormulaEngine_FormulaLiteralExpression_Value" data-uid="ProDataGrid.FormulaEngine.FormulaLiteralExpression.Value">
   Value
-  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/ProDataGrid.FormulaEngine/FormulaExpressions.cs/#L66"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/ProDataGrid.FormulaEngine/FormulaExpressions.cs/#L78"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"></div>
@@ -219,7 +289,7 @@ Class FormulaLiteralExpression  <a class="header-action link-secondary" title="V
 </article>
 
         <div class="contribution d-print-none">
-          <a href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/ProDataGrid.FormulaEngine/FormulaExpressions.cs/#L58" class="edit-link">Edit this page</a>
+          <a href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/ProDataGrid.FormulaEngine/FormulaExpressions.cs/#L59" class="edit-link">Edit this page</a>
         </div>
 
 

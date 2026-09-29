@@ -2,11 +2,11 @@
 <html>
   <head>
     <meta charset="utf-8">
-      <title>Class FormulaUnaryExpression | ProDataGrid for Avalonia </title>
+      <title>Class FormulaInvocationExpression | ProDataGrid for Avalonia </title>
       <meta name="viewport" content="width=device-width, initial-scale=1.0">
-      <meta name="title" content="Class FormulaUnaryExpression | ProDataGrid for Avalonia ">
+      <meta name="title" content="Class FormulaInvocationExpression | ProDataGrid for Avalonia ">
       
-      
+      <meta name="description" content="A call whose target is a formula value, including a returned lambda.">
       <link rel="icon" href="../favicon.ico">
       <link rel="stylesheet" href="../public/docfx.min.css">
       <link rel="stylesheet" href="../public/main.css">
@@ -16,7 +16,7 @@
       
       
       
-      <meta name="docfx:docurl" content="https://github.com/wieslawsoltes/ProDataGrid/new/master/apiSpec/new?filename=ProDataGrid_FormulaEngine_FormulaUnaryExpression.md&amp;value=---%0Auid%3A%20ProDataGrid.FormulaEngine.FormulaUnaryExpression%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">
+      <meta name="docfx:docurl" content="https://github.com/wieslawsoltes/ProDataGrid/new/master/apiSpec/new?filename=ProDataGrid_FormulaEngine_FormulaInvocationExpression.md&amp;value=---%0Auid%3A%20ProDataGrid.FormulaEngine.FormulaInvocationExpression%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">
       <meta name="loc:inThisArticle" content="In this article">
       <meta name="loc:searchResultsCount" content="{count} results for &quot;{query}&quot;">
       <meta name="loc:searchNoResults" content="No results for &quot;{query}&quot;">
@@ -80,12 +80,12 @@
           <nav id="breadcrumb"></nav>
         </div>
 
-        <article data-uid="ProDataGrid.FormulaEngine.FormulaUnaryExpression">
+        <article data-uid="ProDataGrid.FormulaEngine.FormulaInvocationExpression">
 
 
 
-  <h1 id="ProDataGrid_FormulaEngine_FormulaUnaryExpression" data-uid="ProDataGrid.FormulaEngine.FormulaUnaryExpression" class="text-break">
-Class FormulaUnaryExpression  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/ProDataGrid.FormulaEngine/FormulaExpressions.cs/#L84"><i class="bi bi-code-slash"></i></a>
+  <h1 id="ProDataGrid_FormulaEngine_FormulaInvocationExpression" data-uid="ProDataGrid.FormulaEngine.FormulaInvocationExpression" class="text-break">
+Class FormulaInvocationExpression  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/ProDataGrid.FormulaEngine/FormulaInvocationExpression.cs/#L12"><i class="bi bi-code-slash"></i></a>
   </h1>
 
   <div class="facts text-secondary">
@@ -93,11 +93,12 @@ Class FormulaUnaryExpression  <a class="header-action link-secondary" title="Vie
   <dl><dt>Assembly</dt><dd>ProDataGrid.FormulaEngine.dll</dd></dl>
   </div>
 
-  <div class="markdown summary"></div>
+  <div class="markdown summary"><p>A call whose target is a formula value, including a returned lambda.</p>
+</div>
   <div class="markdown conceptual"></div>
 
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public sealed class FormulaUnaryExpression : FormulaExpression</code></pre>
+    <pre><code class="lang-csharp hljs">public sealed class FormulaInvocationExpression : FormulaExpression</code></pre>
   </div>
 
 
@@ -108,7 +109,7 @@ Class FormulaUnaryExpression  <a class="header-action link-secondary" title="Vie
     <dd>
       <div><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object">object</a></div>
       <div><a class="xref" href="ProDataGrid.FormulaEngine.FormulaExpression.html">FormulaExpression</a></div>
-      <div><span class="xref">FormulaUnaryExpression</span></div>
+      <div><span class="xref">FormulaInvocationExpression</span></div>
     </dd>
   </dl>
 
@@ -149,25 +150,26 @@ Class FormulaUnaryExpression  <a class="header-action link-secondary" title="Vie
 </h2>
 
 
-  <a id="ProDataGrid_FormulaEngine_FormulaUnaryExpression__ctor_" data-uid="ProDataGrid.FormulaEngine.FormulaUnaryExpression.#ctor*"></a>
+  <a id="ProDataGrid_FormulaEngine_FormulaInvocationExpression__ctor_" data-uid="ProDataGrid.FormulaEngine.FormulaInvocationExpression.#ctor*"></a>
 
-  <h3 id="ProDataGrid_FormulaEngine_FormulaUnaryExpression__ctor_ProDataGrid_FormulaEngine_FormulaUnaryOperator_ProDataGrid_FormulaEngine_FormulaExpression_" data-uid="ProDataGrid.FormulaEngine.FormulaUnaryExpression.#ctor(ProDataGrid.FormulaEngine.FormulaUnaryOperator,ProDataGrid.FormulaEngine.FormulaExpression)">
-  FormulaUnaryExpression(FormulaUnaryOperator, FormulaExpression)
-  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/ProDataGrid.FormulaEngine/FormulaExpressions.cs/#L86"><i class="bi bi-code-slash"></i></a>
+  <h3 id="ProDataGrid_FormulaEngine_FormulaInvocationExpression__ctor_ProDataGrid_FormulaEngine_FormulaExpression_System_Collections_Generic_IReadOnlyList_ProDataGrid_FormulaEngine_FormulaExpression__" data-uid="ProDataGrid.FormulaEngine.FormulaInvocationExpression.#ctor(ProDataGrid.FormulaEngine.FormulaExpression,System.Collections.Generic.IReadOnlyList{ProDataGrid.FormulaEngine.FormulaExpression})">
+  FormulaInvocationExpression(FormulaExpression, IReadOnlyList&lt;FormulaExpression&gt;)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/ProDataGrid.FormulaEngine/FormulaInvocationExpression.cs/#L15"><i class="bi bi-code-slash"></i></a>
   </h3>
 
-  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 summary"><p>Creates an invocation and takes an immutable snapshot of its arguments.</p>
+</div>
   <div class="markdown level1 conceptual"></div>
 
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public FormulaUnaryExpression(FormulaUnaryOperator op, FormulaExpression operand)</code></pre>
+    <pre><code class="lang-csharp hljs">public FormulaInvocationExpression(FormulaExpression target, IReadOnlyList&lt;FormulaExpression&gt; arguments)</code></pre>
   </div>
 
   <h4 class="section">Parameters</h4>
   <dl class="parameters">
-    <dt><code>op</code> <a class="xref" href="ProDataGrid.FormulaEngine.FormulaUnaryOperator.html">FormulaUnaryOperator</a></dt>
+    <dt><code>target</code> <a class="xref" href="ProDataGrid.FormulaEngine.FormulaExpression.html">FormulaExpression</a></dt>
     <dd></dd>
-    <dt><code>operand</code> <a class="xref" href="ProDataGrid.FormulaEngine.FormulaExpression.html">FormulaExpression</a></dt>
+    <dt><code>arguments</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.ireadonlylist-1">IReadOnlyList</a>&lt;<a class="xref" href="ProDataGrid.FormulaEngine.FormulaExpression.html">FormulaExpression</a>&gt;</dt>
     <dd></dd>
   </dl>
 
@@ -186,18 +188,51 @@ Class FormulaUnaryExpression  <a class="header-action link-secondary" title="Vie
 </h2>
 
 
-  <a id="ProDataGrid_FormulaEngine_FormulaUnaryExpression_Operand_" data-uid="ProDataGrid.FormulaEngine.FormulaUnaryExpression.Operand*"></a>
+  <a id="ProDataGrid_FormulaEngine_FormulaInvocationExpression_Arguments_" data-uid="ProDataGrid.FormulaEngine.FormulaInvocationExpression.Arguments*"></a>
 
-  <h3 id="ProDataGrid_FormulaEngine_FormulaUnaryExpression_Operand" data-uid="ProDataGrid.FormulaEngine.FormulaUnaryExpression.Operand">
-  Operand
-  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/ProDataGrid.FormulaEngine/FormulaExpressions.cs/#L95"><i class="bi bi-code-slash"></i></a>
+  <h3 id="ProDataGrid_FormulaEngine_FormulaInvocationExpression_Arguments" data-uid="ProDataGrid.FormulaEngine.FormulaInvocationExpression.Arguments">
+  Arguments
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/ProDataGrid.FormulaEngine/FormulaInvocationExpression.cs/#L30"><i class="bi bi-code-slash"></i></a>
   </h3>
 
-  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 summary"><p>Gets the argument expressions, including explicit omissions.</p>
+</div>
   <div class="markdown level1 conceptual"></div>
 
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public FormulaExpression Operand { get; }</code></pre>
+    <pre><code class="lang-csharp hljs">public IReadOnlyList&lt;FormulaExpression&gt; Arguments { get; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.ireadonlylist-1">IReadOnlyList</a>&lt;<a class="xref" href="ProDataGrid.FormulaEngine.FormulaExpression.html">FormulaExpression</a>&gt;</dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="ProDataGrid_FormulaEngine_FormulaInvocationExpression_Target_" data-uid="ProDataGrid.FormulaEngine.FormulaInvocationExpression.Target*"></a>
+
+  <h3 id="ProDataGrid_FormulaEngine_FormulaInvocationExpression_Target" data-uid="ProDataGrid.FormulaEngine.FormulaInvocationExpression.Target">
+  Target
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/ProDataGrid.FormulaEngine/FormulaInvocationExpression.cs/#L27"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Gets the expression that produces the callable value.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public FormulaExpression Target { get; }</code></pre>
   </div>
 
 
@@ -217,42 +252,11 @@ Class FormulaUnaryExpression  <a class="header-action link-secondary" title="Vie
 
 
 
-  <a id="ProDataGrid_FormulaEngine_FormulaUnaryExpression_Operator_" data-uid="ProDataGrid.FormulaEngine.FormulaUnaryExpression.Operator*"></a>
-
-  <h3 id="ProDataGrid_FormulaEngine_FormulaUnaryExpression_Operator" data-uid="ProDataGrid.FormulaEngine.FormulaUnaryExpression.Operator">
-  Operator
-  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/ProDataGrid.FormulaEngine/FormulaExpressions.cs/#L93"><i class="bi bi-code-slash"></i></a>
-  </h3>
-
-  <div class="markdown level1 summary"></div>
-  <div class="markdown level1 conceptual"></div>
-
-  <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public FormulaUnaryOperator Operator { get; }</code></pre>
-  </div>
-
-
-
-
-
-  <h4 class="section">Property Value</h4>
-  <dl class="parameters">
-    <dt><a class="xref" href="ProDataGrid.FormulaEngine.FormulaUnaryOperator.html">FormulaUnaryOperator</a></dt>
-    <dd></dd>
-  </dl>
-
-
-
-
-
-
-
-
 
 </article>
 
         <div class="contribution d-print-none">
-          <a href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/ProDataGrid.FormulaEngine/FormulaExpressions.cs/#L84" class="edit-link">Edit this page</a>
+          <a href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/ProDataGrid.FormulaEngine/FormulaInvocationExpression.cs/#L12" class="edit-link">Edit this page</a>
         </div>
 
 

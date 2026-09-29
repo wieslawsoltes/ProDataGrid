@@ -141,6 +141,73 @@ Class FormulaDependencyGraph  <a class="header-action link-secondary" title="Vie
 
 
 
+  <h2 class="section" id="constructors">Constructors
+</h2>
+
+
+  <a id="ProDataGrid_FormulaEngine_FormulaDependencyGraph__ctor_" data-uid="ProDataGrid.FormulaEngine.FormulaDependencyGraph.#ctor*"></a>
+
+  <h3 id="ProDataGrid_FormulaEngine_FormulaDependencyGraph__ctor" data-uid="ProDataGrid.FormulaEngine.FormulaDependencyGraph.#ctor">
+  FormulaDependencyGraph()
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/ProDataGrid.FormulaEngine/FormulaDependencyGraph.cs/#L18"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Creates a graph with conventional LET/LAMBDA binding analysis.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public FormulaDependencyGraph()</code></pre>
+  </div>
+
+
+
+
+
+
+
+
+
+  <h4 class="section" id="ProDataGrid_FormulaEngine_FormulaDependencyGraph__ctor_remarks">Remarks</h4>
+  <div class="markdown level1 remarks"><p>Without a registry, callable names are conservatively treated as possible defined names.
+Use the registry constructor to match registered-function precedence and custom binding metadata.</p>
+</div>
+
+
+
+
+  <a id="ProDataGrid_FormulaEngine_FormulaDependencyGraph__ctor_" data-uid="ProDataGrid.FormulaEngine.FormulaDependencyGraph.#ctor*"></a>
+
+  <h3 id="ProDataGrid_FormulaEngine_FormulaDependencyGraph__ctor_ProDataGrid_FormulaEngine_IFormulaFunctionRegistry_" data-uid="ProDataGrid.FormulaEngine.FormulaDependencyGraph.#ctor(ProDataGrid.FormulaEngine.IFormulaFunctionRegistry)">
+  FormulaDependencyGraph(IFormulaFunctionRegistry)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/ProDataGrid.FormulaEngine/FormulaDependencyGraph.cs/#L21"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Creates a graph that uses the same function precedence and binding metadata as evaluation.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public FormulaDependencyGraph(IFormulaFunctionRegistry functionRegistry)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>functionRegistry</code> <a class="xref" href="ProDataGrid.FormulaEngine.IFormulaFunctionRegistry.html">IFormulaFunctionRegistry</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+
   <h2 class="section" id="methods">Methods
 </h2>
 
@@ -149,7 +216,7 @@ Class FormulaDependencyGraph  <a class="header-action link-secondary" title="Vie
 
   <h3 id="ProDataGrid_FormulaEngine_FormulaDependencyGraph_Clear" data-uid="ProDataGrid.FormulaEngine.FormulaDependencyGraph.Clear">
   Clear()
-  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/ProDataGrid.FormulaEngine/FormulaDependencyGraph.cs/#L147"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/ProDataGrid.FormulaEngine/FormulaDependencyGraph.cs/#L160"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"></div>
@@ -175,7 +242,7 @@ Class FormulaDependencyGraph  <a class="header-action link-secondary" title="Vie
 
   <h3 id="ProDataGrid_FormulaEngine_FormulaDependencyGraph_ClearCell_ProDataGrid_FormulaEngine_FormulaCellAddress_" data-uid="ProDataGrid.FormulaEngine.FormulaDependencyGraph.ClearCell(ProDataGrid.FormulaEngine.FormulaCellAddress)">
   ClearCell(FormulaCellAddress)
-  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/ProDataGrid.FormulaEngine/FormulaDependencyGraph.cs/#L88"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/ProDataGrid.FormulaEngine/FormulaDependencyGraph.cs/#L101"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"></div>
@@ -206,7 +273,7 @@ Class FormulaDependencyGraph  <a class="header-action link-secondary" title="Vie
 
   <h3 id="ProDataGrid_FormulaEngine_FormulaDependencyGraph_GetDependencies_ProDataGrid_FormulaEngine_FormulaCellAddress_" data-uid="ProDataGrid.FormulaEngine.FormulaDependencyGraph.GetDependencies(ProDataGrid.FormulaEngine.FormulaCellAddress)">
   GetDependencies(FormulaCellAddress)
-  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/ProDataGrid.FormulaEngine/FormulaDependencyGraph.cs/#L96"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/ProDataGrid.FormulaEngine/FormulaDependencyGraph.cs/#L109"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"></div>
@@ -242,7 +309,7 @@ Class FormulaDependencyGraph  <a class="header-action link-secondary" title="Vie
 
   <h3 id="ProDataGrid_FormulaEngine_FormulaDependencyGraph_GetDependents_ProDataGrid_FormulaEngine_FormulaCellAddress_" data-uid="ProDataGrid.FormulaEngine.FormulaDependencyGraph.GetDependents(ProDataGrid.FormulaEngine.FormulaCellAddress)">
   GetDependents(FormulaCellAddress)
-  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/ProDataGrid.FormulaEngine/FormulaDependencyGraph.cs/#L103"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/ProDataGrid.FormulaEngine/FormulaDependencyGraph.cs/#L116"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"></div>
@@ -278,7 +345,7 @@ Class FormulaDependencyGraph  <a class="header-action link-secondary" title="Vie
 
   <h3 id="ProDataGrid_FormulaEngine_FormulaDependencyGraph_GetFormulaCells" data-uid="ProDataGrid.FormulaEngine.FormulaDependencyGraph.GetFormulaCells">
   GetFormulaCells()
-  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/ProDataGrid.FormulaEngine/FormulaDependencyGraph.cs/#L142"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/ProDataGrid.FormulaEngine/FormulaDependencyGraph.cs/#L155"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"></div>
@@ -309,7 +376,7 @@ Class FormulaDependencyGraph  <a class="header-action link-secondary" title="Vie
 
   <h3 id="ProDataGrid_FormulaEngine_FormulaDependencyGraph_GetFormulaCellsForName_System_String_System_String_System_Boolean_" data-uid="ProDataGrid.FormulaEngine.FormulaDependencyGraph.GetFormulaCellsForName(System.String,System.String,System.Boolean)">
   GetFormulaCellsForName(string, string?, bool)
-  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/ProDataGrid.FormulaEngine/FormulaDependencyGraph.cs/#L110"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/ProDataGrid.FormulaEngine/FormulaDependencyGraph.cs/#L123"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"></div>
@@ -349,7 +416,7 @@ Class FormulaDependencyGraph  <a class="header-action link-secondary" title="Vie
 
   <h3 id="ProDataGrid_FormulaEngine_FormulaDependencyGraph_GetFormulaCellsForNameScope_System_String_System_Boolean_" data-uid="ProDataGrid.FormulaEngine.FormulaDependencyGraph.GetFormulaCellsForNameScope(System.String,System.Boolean)">
   GetFormulaCellsForNameScope(string?, bool)
-  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/ProDataGrid.FormulaEngine/FormulaDependencyGraph.cs/#L121"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/ProDataGrid.FormulaEngine/FormulaDependencyGraph.cs/#L134"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"></div>
@@ -387,7 +454,7 @@ Class FormulaDependencyGraph  <a class="header-action link-secondary" title="Vie
 
   <h3 id="ProDataGrid_FormulaEngine_FormulaDependencyGraph_SetFormula_ProDataGrid_FormulaEngine_FormulaCellAddress_ProDataGrid_FormulaEngine_FormulaExpression_" data-uid="ProDataGrid.FormulaEngine.FormulaDependencyGraph.SetFormula(ProDataGrid.FormulaEngine.FormulaCellAddress,ProDataGrid.FormulaEngine.FormulaExpression)">
   SetFormula(FormulaCellAddress, FormulaExpression?)
-  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/ProDataGrid.FormulaEngine/FormulaDependencyGraph.cs/#L19"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/ProDataGrid.FormulaEngine/FormulaDependencyGraph.cs/#L32"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"></div>
@@ -420,7 +487,7 @@ Class FormulaDependencyGraph  <a class="header-action link-secondary" title="Vie
 
   <h3 id="ProDataGrid_FormulaEngine_FormulaDependencyGraph_SetFormula_ProDataGrid_FormulaEngine_FormulaCellAddress_ProDataGrid_FormulaEngine_FormulaExpression_ProDataGrid_FormulaEngine_IFormulaNameProvider_ProDataGrid_FormulaEngine_IFormulaNameProvider_" data-uid="ProDataGrid.FormulaEngine.FormulaDependencyGraph.SetFormula(ProDataGrid.FormulaEngine.FormulaCellAddress,ProDataGrid.FormulaEngine.FormulaExpression,ProDataGrid.FormulaEngine.IFormulaNameProvider,ProDataGrid.FormulaEngine.IFormulaNameProvider)">
   SetFormula(FormulaCellAddress, FormulaExpression?, IFormulaNameProvider?, IFormulaNameProvider?)
-  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/ProDataGrid.FormulaEngine/FormulaDependencyGraph.cs/#L24"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/ProDataGrid.FormulaEngine/FormulaDependencyGraph.cs/#L37"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"></div>
@@ -457,7 +524,7 @@ Class FormulaDependencyGraph  <a class="header-action link-secondary" title="Vie
 
   <h3 id="ProDataGrid_FormulaEngine_FormulaDependencyGraph_SetFormula_ProDataGrid_FormulaEngine_FormulaCellAddress_ProDataGrid_FormulaEngine_FormulaExpression_ProDataGrid_FormulaEngine_IFormulaWorkbook_ProDataGrid_FormulaEngine_IFormulaNameProvider_ProDataGrid_FormulaEngine_IFormulaNameProvider_" data-uid="ProDataGrid.FormulaEngine.FormulaDependencyGraph.SetFormula(ProDataGrid.FormulaEngine.FormulaCellAddress,ProDataGrid.FormulaEngine.FormulaExpression,ProDataGrid.FormulaEngine.IFormulaWorkbook,ProDataGrid.FormulaEngine.IFormulaNameProvider,ProDataGrid.FormulaEngine.IFormulaNameProvider)">
   SetFormula(FormulaCellAddress, FormulaExpression?, IFormulaWorkbook?, IFormulaNameProvider?, IFormulaNameProvider?)
-  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/ProDataGrid.FormulaEngine/FormulaDependencyGraph.cs/#L33"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/ProDataGrid.FormulaEngine/FormulaDependencyGraph.cs/#L46"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"></div>
@@ -496,7 +563,7 @@ Class FormulaDependencyGraph  <a class="header-action link-secondary" title="Vie
 
   <h3 id="ProDataGrid_FormulaEngine_FormulaDependencyGraph_TryGetRecalculationLevels_System_Collections_Generic_IEnumerable_ProDataGrid_FormulaEngine_FormulaCellAddress__System_Collections_Generic_List_System_Collections_Generic_List_ProDataGrid_FormulaEngine_FormulaCellAddress____System_Collections_Generic_List_ProDataGrid_FormulaEngine_FormulaCellAddress___" data-uid="ProDataGrid.FormulaEngine.FormulaDependencyGraph.TryGetRecalculationLevels(System.Collections.Generic.IEnumerable{ProDataGrid.FormulaEngine.FormulaCellAddress},System.Collections.Generic.List{System.Collections.Generic.List{ProDataGrid.FormulaEngine.FormulaCellAddress}}@,System.Collections.Generic.List{ProDataGrid.FormulaEngine.FormulaCellAddress}@)">
   TryGetRecalculationLevels(IEnumerable&lt;FormulaCellAddress&gt;, out List&lt;List&lt;FormulaCellAddress&gt;&gt;, out List&lt;FormulaCellAddress&gt;)
-  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/ProDataGrid.FormulaEngine/FormulaDependencyGraph.cs/#L247"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/ProDataGrid.FormulaEngine/FormulaDependencyGraph.cs/#L260"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"></div>
@@ -536,7 +603,7 @@ Class FormulaDependencyGraph  <a class="header-action link-secondary" title="Vie
 
   <h3 id="ProDataGrid_FormulaEngine_FormulaDependencyGraph_TryGetRecalculationOrder_System_Collections_Generic_IEnumerable_ProDataGrid_FormulaEngine_FormulaCellAddress__System_Collections_Generic_List_ProDataGrid_FormulaEngine_FormulaCellAddress___System_Collections_Generic_List_ProDataGrid_FormulaEngine_FormulaCellAddress___" data-uid="ProDataGrid.FormulaEngine.FormulaDependencyGraph.TryGetRecalculationOrder(System.Collections.Generic.IEnumerable{ProDataGrid.FormulaEngine.FormulaCellAddress},System.Collections.Generic.List{ProDataGrid.FormulaEngine.FormulaCellAddress}@,System.Collections.Generic.List{ProDataGrid.FormulaEngine.FormulaCellAddress}@)">
   TryGetRecalculationOrder(IEnumerable&lt;FormulaCellAddress&gt;, out List&lt;FormulaCellAddress&gt;, out List&lt;FormulaCellAddress&gt;)
-  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/ProDataGrid.FormulaEngine/FormulaDependencyGraph.cs/#L155"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/ProDataGrid.FormulaEngine/FormulaDependencyGraph.cs/#L168"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"></div>

@@ -81004,6 +81004,19 @@ references:
   isSpec: "True"
   fullName: ProDataGrid.FormulaEngine.FormulaCalculationSettings.MaximumArrayCellCount
   nameWithType: FormulaCalculationSettings.MaximumArrayCellCount
+- uid: ProDataGrid.FormulaEngine.FormulaCalculationSettings.MaximumLambdaDepth
+  name: MaximumLambdaDepth
+  href: api/ProDataGrid.FormulaEngine.FormulaCalculationSettings.html#ProDataGrid_FormulaEngine_FormulaCalculationSettings_MaximumLambdaDepth
+  commentId: P:ProDataGrid.FormulaEngine.FormulaCalculationSettings.MaximumLambdaDepth
+  fullName: ProDataGrid.FormulaEngine.FormulaCalculationSettings.MaximumLambdaDepth
+  nameWithType: FormulaCalculationSettings.MaximumLambdaDepth
+- uid: ProDataGrid.FormulaEngine.FormulaCalculationSettings.MaximumLambdaDepth*
+  name: MaximumLambdaDepth
+  href: api/ProDataGrid.FormulaEngine.FormulaCalculationSettings.html#ProDataGrid_FormulaEngine_FormulaCalculationSettings_MaximumLambdaDepth_
+  commentId: Overload:ProDataGrid.FormulaEngine.FormulaCalculationSettings.MaximumLambdaDepth
+  isSpec: "True"
+  fullName: ProDataGrid.FormulaEngine.FormulaCalculationSettings.MaximumLambdaDepth
+  nameWithType: FormulaCalculationSettings.MaximumLambdaDepth
 - uid: ProDataGrid.FormulaEngine.FormulaCalculationSettings.NumberPrecisionDigits
   name: NumberPrecisionDigits
   href: api/ProDataGrid.FormulaEngine.FormulaCalculationSettings.html#ProDataGrid_FormulaEngine_FormulaCalculationSettings_NumberPrecisionDigits
@@ -81531,6 +81544,34 @@ references:
   commentId: T:ProDataGrid.FormulaEngine.FormulaDependencyGraph
   fullName: ProDataGrid.FormulaEngine.FormulaDependencyGraph
   nameWithType: FormulaDependencyGraph
+- uid: ProDataGrid.FormulaEngine.FormulaDependencyGraph.#ctor
+  name: FormulaDependencyGraph()
+  href: api/ProDataGrid.FormulaEngine.FormulaDependencyGraph.html#ProDataGrid_FormulaEngine_FormulaDependencyGraph__ctor
+  commentId: M:ProDataGrid.FormulaEngine.FormulaDependencyGraph.#ctor
+  name.vb: New()
+  fullName: ProDataGrid.FormulaEngine.FormulaDependencyGraph.FormulaDependencyGraph()
+  fullName.vb: ProDataGrid.FormulaEngine.FormulaDependencyGraph.New()
+  nameWithType: FormulaDependencyGraph.FormulaDependencyGraph()
+  nameWithType.vb: FormulaDependencyGraph.New()
+- uid: ProDataGrid.FormulaEngine.FormulaDependencyGraph.#ctor(ProDataGrid.FormulaEngine.IFormulaFunctionRegistry)
+  name: FormulaDependencyGraph(IFormulaFunctionRegistry)
+  href: api/ProDataGrid.FormulaEngine.FormulaDependencyGraph.html#ProDataGrid_FormulaEngine_FormulaDependencyGraph__ctor_ProDataGrid_FormulaEngine_IFormulaFunctionRegistry_
+  commentId: M:ProDataGrid.FormulaEngine.FormulaDependencyGraph.#ctor(ProDataGrid.FormulaEngine.IFormulaFunctionRegistry)
+  name.vb: New(IFormulaFunctionRegistry)
+  fullName: ProDataGrid.FormulaEngine.FormulaDependencyGraph.FormulaDependencyGraph(ProDataGrid.FormulaEngine.IFormulaFunctionRegistry)
+  fullName.vb: ProDataGrid.FormulaEngine.FormulaDependencyGraph.New(ProDataGrid.FormulaEngine.IFormulaFunctionRegistry)
+  nameWithType: FormulaDependencyGraph.FormulaDependencyGraph(IFormulaFunctionRegistry)
+  nameWithType.vb: FormulaDependencyGraph.New(IFormulaFunctionRegistry)
+- uid: ProDataGrid.FormulaEngine.FormulaDependencyGraph.#ctor*
+  name: FormulaDependencyGraph
+  href: api/ProDataGrid.FormulaEngine.FormulaDependencyGraph.html#ProDataGrid_FormulaEngine_FormulaDependencyGraph__ctor_
+  commentId: Overload:ProDataGrid.FormulaEngine.FormulaDependencyGraph.#ctor
+  isSpec: "True"
+  name.vb: New
+  fullName: ProDataGrid.FormulaEngine.FormulaDependencyGraph.FormulaDependencyGraph
+  fullName.vb: ProDataGrid.FormulaEngine.FormulaDependencyGraph.New
+  nameWithType: FormulaDependencyGraph.FormulaDependencyGraph
+  nameWithType.vb: FormulaDependencyGraph.New
 - uid: ProDataGrid.FormulaEngine.FormulaDependencyGraph.Clear
   name: Clear()
   href: api/ProDataGrid.FormulaEngine.FormulaDependencyGraph.html#ProDataGrid_FormulaEngine_FormulaDependencyGraph_Clear
@@ -81948,6 +81989,22 @@ references:
   isSpec: "True"
   fullName: ProDataGrid.FormulaEngine.FormulaEvaluationContext.Address
   nameWithType: FormulaEvaluationContext.Address
+- uid: ProDataGrid.FormulaEngine.FormulaEvaluationContext.CreateLambda(System.Collections.Generic.IReadOnlyList{System.String},ProDataGrid.FormulaEngine.FormulaExpression)
+  name: CreateLambda(IReadOnlyList<string>, FormulaExpression)
+  href: api/ProDataGrid.FormulaEngine.FormulaEvaluationContext.html#ProDataGrid_FormulaEngine_FormulaEvaluationContext_CreateLambda_System_Collections_Generic_IReadOnlyList_System_String__ProDataGrid_FormulaEngine_FormulaExpression_
+  commentId: M:ProDataGrid.FormulaEngine.FormulaEvaluationContext.CreateLambda(System.Collections.Generic.IReadOnlyList{System.String},ProDataGrid.FormulaEngine.FormulaExpression)
+  name.vb: CreateLambda(IReadOnlyList(Of String), FormulaExpression)
+  fullName: ProDataGrid.FormulaEngine.FormulaEvaluationContext.CreateLambda(System.Collections.Generic.IReadOnlyList<string>, ProDataGrid.FormulaEngine.FormulaExpression)
+  fullName.vb: ProDataGrid.FormulaEngine.FormulaEvaluationContext.CreateLambda(System.Collections.Generic.IReadOnlyList(Of String), ProDataGrid.FormulaEngine.FormulaExpression)
+  nameWithType: FormulaEvaluationContext.CreateLambda(IReadOnlyList<string>, FormulaExpression)
+  nameWithType.vb: FormulaEvaluationContext.CreateLambda(IReadOnlyList(Of String), FormulaExpression)
+- uid: ProDataGrid.FormulaEngine.FormulaEvaluationContext.CreateLambda*
+  name: CreateLambda
+  href: api/ProDataGrid.FormulaEngine.FormulaEvaluationContext.html#ProDataGrid_FormulaEngine_FormulaEvaluationContext_CreateLambda_
+  commentId: Overload:ProDataGrid.FormulaEngine.FormulaEvaluationContext.CreateLambda
+  isSpec: "True"
+  fullName: ProDataGrid.FormulaEngine.FormulaEvaluationContext.CreateLambda
+  nameWithType: FormulaEvaluationContext.CreateLambda
 - uid: ProDataGrid.FormulaEngine.FormulaEvaluationContext.FunctionRegistry
   name: FunctionRegistry
   href: api/ProDataGrid.FormulaEngine.FormulaEvaluationContext.html#ProDataGrid_FormulaEngine_FormulaEvaluationContext_FunctionRegistry
@@ -81961,6 +82018,35 @@ references:
   isSpec: "True"
   fullName: ProDataGrid.FormulaEngine.FormulaEvaluationContext.FunctionRegistry
   nameWithType: FormulaEvaluationContext.FunctionRegistry
+- uid: ProDataGrid.FormulaEngine.FormulaEvaluationContext.IsArgumentOmitted(ProDataGrid.FormulaEngine.FormulaExpression)
+  name: IsArgumentOmitted(FormulaExpression)
+  href: api/ProDataGrid.FormulaEngine.FormulaEvaluationContext.html#ProDataGrid_FormulaEngine_FormulaEvaluationContext_IsArgumentOmitted_ProDataGrid_FormulaEngine_FormulaExpression_
+  commentId: M:ProDataGrid.FormulaEngine.FormulaEvaluationContext.IsArgumentOmitted(ProDataGrid.FormulaEngine.FormulaExpression)
+  fullName: ProDataGrid.FormulaEngine.FormulaEvaluationContext.IsArgumentOmitted(ProDataGrid.FormulaEngine.FormulaExpression)
+  nameWithType: FormulaEvaluationContext.IsArgumentOmitted(FormulaExpression)
+- uid: ProDataGrid.FormulaEngine.FormulaEvaluationContext.IsArgumentOmitted*
+  name: IsArgumentOmitted
+  href: api/ProDataGrid.FormulaEngine.FormulaEvaluationContext.html#ProDataGrid_FormulaEngine_FormulaEvaluationContext_IsArgumentOmitted_
+  commentId: Overload:ProDataGrid.FormulaEngine.FormulaEvaluationContext.IsArgumentOmitted
+  isSpec: "True"
+  fullName: ProDataGrid.FormulaEngine.FormulaEvaluationContext.IsArgumentOmitted
+  nameWithType: FormulaEvaluationContext.IsArgumentOmitted
+- uid: ProDataGrid.FormulaEngine.FormulaEvaluationContext.WithLocalValue(System.String,ProDataGrid.FormulaEngine.FormulaValue,System.Boolean)
+  name: WithLocalValue(string, FormulaValue, bool)
+  href: api/ProDataGrid.FormulaEngine.FormulaEvaluationContext.html#ProDataGrid_FormulaEngine_FormulaEvaluationContext_WithLocalValue_System_String_ProDataGrid_FormulaEngine_FormulaValue_System_Boolean_
+  commentId: M:ProDataGrid.FormulaEngine.FormulaEvaluationContext.WithLocalValue(System.String,ProDataGrid.FormulaEngine.FormulaValue,System.Boolean)
+  name.vb: WithLocalValue(String, FormulaValue, Boolean)
+  fullName: ProDataGrid.FormulaEngine.FormulaEvaluationContext.WithLocalValue(string, ProDataGrid.FormulaEngine.FormulaValue, bool)
+  fullName.vb: ProDataGrid.FormulaEngine.FormulaEvaluationContext.WithLocalValue(String, ProDataGrid.FormulaEngine.FormulaValue, Boolean)
+  nameWithType: FormulaEvaluationContext.WithLocalValue(string, FormulaValue, bool)
+  nameWithType.vb: FormulaEvaluationContext.WithLocalValue(String, FormulaValue, Boolean)
+- uid: ProDataGrid.FormulaEngine.FormulaEvaluationContext.WithLocalValue*
+  name: WithLocalValue
+  href: api/ProDataGrid.FormulaEngine.FormulaEvaluationContext.html#ProDataGrid_FormulaEngine_FormulaEvaluationContext_WithLocalValue_
+  commentId: Overload:ProDataGrid.FormulaEngine.FormulaEvaluationContext.WithLocalValue
+  isSpec: "True"
+  fullName: ProDataGrid.FormulaEngine.FormulaEvaluationContext.WithLocalValue
+  nameWithType: FormulaEvaluationContext.WithLocalValue
 - uid: ProDataGrid.FormulaEngine.FormulaEvaluationContext.Workbook
   name: Workbook
   href: api/ProDataGrid.FormulaEngine.FormulaEvaluationContext.html#ProDataGrid_FormulaEngine_FormulaEvaluationContext_Workbook
@@ -82006,6 +82092,22 @@ references:
   isSpec: "True"
   fullName: ProDataGrid.FormulaEngine.FormulaEvaluator.Evaluate
   nameWithType: FormulaEvaluator.Evaluate
+- uid: ProDataGrid.FormulaEngine.FormulaEvaluator.InvokeLambda(ProDataGrid.FormulaEngine.FormulaLambda,System.Collections.Generic.IReadOnlyList{ProDataGrid.FormulaEngine.FormulaValue},ProDataGrid.FormulaEngine.FormulaEvaluationContext,ProDataGrid.FormulaEngine.IFormulaValueResolver,System.Collections.Generic.IReadOnlyList{System.Boolean})
+  name: InvokeLambda(FormulaLambda, IReadOnlyList<FormulaValue>, FormulaEvaluationContext, IFormulaValueResolver, IReadOnlyList<bool>?)
+  href: api/ProDataGrid.FormulaEngine.FormulaEvaluator.html#ProDataGrid_FormulaEngine_FormulaEvaluator_InvokeLambda_ProDataGrid_FormulaEngine_FormulaLambda_System_Collections_Generic_IReadOnlyList_ProDataGrid_FormulaEngine_FormulaValue__ProDataGrid_FormulaEngine_FormulaEvaluationContext_ProDataGrid_FormulaEngine_IFormulaValueResolver_System_Collections_Generic_IReadOnlyList_System_Boolean__
+  commentId: M:ProDataGrid.FormulaEngine.FormulaEvaluator.InvokeLambda(ProDataGrid.FormulaEngine.FormulaLambda,System.Collections.Generic.IReadOnlyList{ProDataGrid.FormulaEngine.FormulaValue},ProDataGrid.FormulaEngine.FormulaEvaluationContext,ProDataGrid.FormulaEngine.IFormulaValueResolver,System.Collections.Generic.IReadOnlyList{System.Boolean})
+  name.vb: InvokeLambda(FormulaLambda, IReadOnlyList(Of FormulaValue), FormulaEvaluationContext, IFormulaValueResolver, IReadOnlyList(Of Boolean))
+  fullName: ProDataGrid.FormulaEngine.FormulaEvaluator.InvokeLambda(ProDataGrid.FormulaEngine.FormulaLambda, System.Collections.Generic.IReadOnlyList<ProDataGrid.FormulaEngine.FormulaValue>, ProDataGrid.FormulaEngine.FormulaEvaluationContext, ProDataGrid.FormulaEngine.IFormulaValueResolver, System.Collections.Generic.IReadOnlyList<bool>?)
+  fullName.vb: ProDataGrid.FormulaEngine.FormulaEvaluator.InvokeLambda(ProDataGrid.FormulaEngine.FormulaLambda, System.Collections.Generic.IReadOnlyList(Of ProDataGrid.FormulaEngine.FormulaValue), ProDataGrid.FormulaEngine.FormulaEvaluationContext, ProDataGrid.FormulaEngine.IFormulaValueResolver, System.Collections.Generic.IReadOnlyList(Of Boolean))
+  nameWithType: FormulaEvaluator.InvokeLambda(FormulaLambda, IReadOnlyList<FormulaValue>, FormulaEvaluationContext, IFormulaValueResolver, IReadOnlyList<bool>?)
+  nameWithType.vb: FormulaEvaluator.InvokeLambda(FormulaLambda, IReadOnlyList(Of FormulaValue), FormulaEvaluationContext, IFormulaValueResolver, IReadOnlyList(Of Boolean))
+- uid: ProDataGrid.FormulaEngine.FormulaEvaluator.InvokeLambda*
+  name: InvokeLambda
+  href: api/ProDataGrid.FormulaEngine.FormulaEvaluator.html#ProDataGrid_FormulaEngine_FormulaEvaluator_InvokeLambda_
+  commentId: Overload:ProDataGrid.FormulaEngine.FormulaEvaluator.InvokeLambda
+  isSpec: "True"
+  fullName: ProDataGrid.FormulaEngine.FormulaEvaluator.InvokeLambda
+  nameWithType: FormulaEvaluator.InvokeLambda
 - uid: ProDataGrid.FormulaEngine.FormulaExpression
   name: FormulaExpression
   href: api/ProDataGrid.FormulaEngine.FormulaExpression.html
@@ -82068,6 +82170,12 @@ references:
   commentId: F:ProDataGrid.FormulaEngine.FormulaExpressionKind.FunctionCall
   fullName: ProDataGrid.FormulaEngine.FormulaExpressionKind.FunctionCall
   nameWithType: FormulaExpressionKind.FunctionCall
+- uid: ProDataGrid.FormulaEngine.FormulaExpressionKind.Invocation
+  name: Invocation
+  href: api/ProDataGrid.FormulaEngine.FormulaExpressionKind.html#ProDataGrid_FormulaEngine_FormulaExpressionKind_Invocation
+  commentId: F:ProDataGrid.FormulaEngine.FormulaExpressionKind.Invocation
+  fullName: ProDataGrid.FormulaEngine.FormulaExpressionKind.Invocation
+  nameWithType: FormulaExpressionKind.Invocation
 - uid: ProDataGrid.FormulaEngine.FormulaExpressionKind.Literal
   name: Literal
   href: api/ProDataGrid.FormulaEngine.FormulaExpressionKind.html#ProDataGrid_FormulaEngine_FormulaExpressionKind_Literal
@@ -82335,6 +82443,126 @@ references:
   isSpec: "True"
   fullName: ProDataGrid.FormulaEngine.FormulaFunctionInfo.MinArgs
   nameWithType: FormulaFunctionInfo.MinArgs
+- uid: ProDataGrid.FormulaEngine.FormulaInvocationExpression
+  name: FormulaInvocationExpression
+  href: api/ProDataGrid.FormulaEngine.FormulaInvocationExpression.html
+  commentId: T:ProDataGrid.FormulaEngine.FormulaInvocationExpression
+  fullName: ProDataGrid.FormulaEngine.FormulaInvocationExpression
+  nameWithType: FormulaInvocationExpression
+- uid: ProDataGrid.FormulaEngine.FormulaInvocationExpression.#ctor(ProDataGrid.FormulaEngine.FormulaExpression,System.Collections.Generic.IReadOnlyList{ProDataGrid.FormulaEngine.FormulaExpression})
+  name: FormulaInvocationExpression(FormulaExpression, IReadOnlyList<FormulaExpression>)
+  href: api/ProDataGrid.FormulaEngine.FormulaInvocationExpression.html#ProDataGrid_FormulaEngine_FormulaInvocationExpression__ctor_ProDataGrid_FormulaEngine_FormulaExpression_System_Collections_Generic_IReadOnlyList_ProDataGrid_FormulaEngine_FormulaExpression__
+  commentId: M:ProDataGrid.FormulaEngine.FormulaInvocationExpression.#ctor(ProDataGrid.FormulaEngine.FormulaExpression,System.Collections.Generic.IReadOnlyList{ProDataGrid.FormulaEngine.FormulaExpression})
+  name.vb: New(FormulaExpression, IReadOnlyList(Of FormulaExpression))
+  fullName: ProDataGrid.FormulaEngine.FormulaInvocationExpression.FormulaInvocationExpression(ProDataGrid.FormulaEngine.FormulaExpression, System.Collections.Generic.IReadOnlyList<ProDataGrid.FormulaEngine.FormulaExpression>)
+  fullName.vb: ProDataGrid.FormulaEngine.FormulaInvocationExpression.New(ProDataGrid.FormulaEngine.FormulaExpression, System.Collections.Generic.IReadOnlyList(Of ProDataGrid.FormulaEngine.FormulaExpression))
+  nameWithType: FormulaInvocationExpression.FormulaInvocationExpression(FormulaExpression, IReadOnlyList<FormulaExpression>)
+  nameWithType.vb: FormulaInvocationExpression.New(FormulaExpression, IReadOnlyList(Of FormulaExpression))
+- uid: ProDataGrid.FormulaEngine.FormulaInvocationExpression.#ctor*
+  name: FormulaInvocationExpression
+  href: api/ProDataGrid.FormulaEngine.FormulaInvocationExpression.html#ProDataGrid_FormulaEngine_FormulaInvocationExpression__ctor_
+  commentId: Overload:ProDataGrid.FormulaEngine.FormulaInvocationExpression.#ctor
+  isSpec: "True"
+  name.vb: New
+  fullName: ProDataGrid.FormulaEngine.FormulaInvocationExpression.FormulaInvocationExpression
+  fullName.vb: ProDataGrid.FormulaEngine.FormulaInvocationExpression.New
+  nameWithType: FormulaInvocationExpression.FormulaInvocationExpression
+  nameWithType.vb: FormulaInvocationExpression.New
+- uid: ProDataGrid.FormulaEngine.FormulaInvocationExpression.Arguments
+  name: Arguments
+  href: api/ProDataGrid.FormulaEngine.FormulaInvocationExpression.html#ProDataGrid_FormulaEngine_FormulaInvocationExpression_Arguments
+  commentId: P:ProDataGrid.FormulaEngine.FormulaInvocationExpression.Arguments
+  fullName: ProDataGrid.FormulaEngine.FormulaInvocationExpression.Arguments
+  nameWithType: FormulaInvocationExpression.Arguments
+- uid: ProDataGrid.FormulaEngine.FormulaInvocationExpression.Arguments*
+  name: Arguments
+  href: api/ProDataGrid.FormulaEngine.FormulaInvocationExpression.html#ProDataGrid_FormulaEngine_FormulaInvocationExpression_Arguments_
+  commentId: Overload:ProDataGrid.FormulaEngine.FormulaInvocationExpression.Arguments
+  isSpec: "True"
+  fullName: ProDataGrid.FormulaEngine.FormulaInvocationExpression.Arguments
+  nameWithType: FormulaInvocationExpression.Arguments
+- uid: ProDataGrid.FormulaEngine.FormulaInvocationExpression.Target
+  name: Target
+  href: api/ProDataGrid.FormulaEngine.FormulaInvocationExpression.html#ProDataGrid_FormulaEngine_FormulaInvocationExpression_Target
+  commentId: P:ProDataGrid.FormulaEngine.FormulaInvocationExpression.Target
+  fullName: ProDataGrid.FormulaEngine.FormulaInvocationExpression.Target
+  nameWithType: FormulaInvocationExpression.Target
+- uid: ProDataGrid.FormulaEngine.FormulaInvocationExpression.Target*
+  name: Target
+  href: api/ProDataGrid.FormulaEngine.FormulaInvocationExpression.html#ProDataGrid_FormulaEngine_FormulaInvocationExpression_Target_
+  commentId: Overload:ProDataGrid.FormulaEngine.FormulaInvocationExpression.Target
+  isSpec: "True"
+  fullName: ProDataGrid.FormulaEngine.FormulaInvocationExpression.Target
+  nameWithType: FormulaInvocationExpression.Target
+- uid: ProDataGrid.FormulaEngine.FormulaLambda
+  name: FormulaLambda
+  href: api/ProDataGrid.FormulaEngine.FormulaLambda.html
+  commentId: T:ProDataGrid.FormulaEngine.FormulaLambda
+  fullName: ProDataGrid.FormulaEngine.FormulaLambda
+  nameWithType: FormulaLambda
+- uid: ProDataGrid.FormulaEngine.FormulaLambda.Body
+  name: Body
+  href: api/ProDataGrid.FormulaEngine.FormulaLambda.html#ProDataGrid_FormulaEngine_FormulaLambda_Body
+  commentId: P:ProDataGrid.FormulaEngine.FormulaLambda.Body
+  fullName: ProDataGrid.FormulaEngine.FormulaLambda.Body
+  nameWithType: FormulaLambda.Body
+- uid: ProDataGrid.FormulaEngine.FormulaLambda.Body*
+  name: Body
+  href: api/ProDataGrid.FormulaEngine.FormulaLambda.html#ProDataGrid_FormulaEngine_FormulaLambda_Body_
+  commentId: Overload:ProDataGrid.FormulaEngine.FormulaLambda.Body
+  isSpec: "True"
+  fullName: ProDataGrid.FormulaEngine.FormulaLambda.Body
+  nameWithType: FormulaLambda.Body
+- uid: ProDataGrid.FormulaEngine.FormulaLambda.ParameterCount
+  name: ParameterCount
+  href: api/ProDataGrid.FormulaEngine.FormulaLambda.html#ProDataGrid_FormulaEngine_FormulaLambda_ParameterCount
+  commentId: P:ProDataGrid.FormulaEngine.FormulaLambda.ParameterCount
+  fullName: ProDataGrid.FormulaEngine.FormulaLambda.ParameterCount
+  nameWithType: FormulaLambda.ParameterCount
+- uid: ProDataGrid.FormulaEngine.FormulaLambda.ParameterCount*
+  name: ParameterCount
+  href: api/ProDataGrid.FormulaEngine.FormulaLambda.html#ProDataGrid_FormulaEngine_FormulaLambda_ParameterCount_
+  commentId: Overload:ProDataGrid.FormulaEngine.FormulaLambda.ParameterCount
+  isSpec: "True"
+  fullName: ProDataGrid.FormulaEngine.FormulaLambda.ParameterCount
+  nameWithType: FormulaLambda.ParameterCount
+- uid: ProDataGrid.FormulaEngine.FormulaLambda.Parameters
+  name: Parameters
+  href: api/ProDataGrid.FormulaEngine.FormulaLambda.html#ProDataGrid_FormulaEngine_FormulaLambda_Parameters
+  commentId: P:ProDataGrid.FormulaEngine.FormulaLambda.Parameters
+  fullName: ProDataGrid.FormulaEngine.FormulaLambda.Parameters
+  nameWithType: FormulaLambda.Parameters
+- uid: ProDataGrid.FormulaEngine.FormulaLambda.Parameters*
+  name: Parameters
+  href: api/ProDataGrid.FormulaEngine.FormulaLambda.html#ProDataGrid_FormulaEngine_FormulaLambda_Parameters_
+  commentId: Overload:ProDataGrid.FormulaEngine.FormulaLambda.Parameters
+  isSpec: "True"
+  fullName: ProDataGrid.FormulaEngine.FormulaLambda.Parameters
+  nameWithType: FormulaLambda.Parameters
+- uid: ProDataGrid.FormulaEngine.FormulaLexicalBindingKind
+  name: FormulaLexicalBindingKind
+  href: api/ProDataGrid.FormulaEngine.FormulaLexicalBindingKind.html
+  commentId: T:ProDataGrid.FormulaEngine.FormulaLexicalBindingKind
+  fullName: ProDataGrid.FormulaEngine.FormulaLexicalBindingKind
+  nameWithType: FormulaLexicalBindingKind
+- uid: ProDataGrid.FormulaEngine.FormulaLexicalBindingKind.Lambda
+  name: Lambda
+  href: api/ProDataGrid.FormulaEngine.FormulaLexicalBindingKind.html#ProDataGrid_FormulaEngine_FormulaLexicalBindingKind_Lambda
+  commentId: F:ProDataGrid.FormulaEngine.FormulaLexicalBindingKind.Lambda
+  fullName: ProDataGrid.FormulaEngine.FormulaLexicalBindingKind.Lambda
+  nameWithType: FormulaLexicalBindingKind.Lambda
+- uid: ProDataGrid.FormulaEngine.FormulaLexicalBindingKind.Let
+  name: Let
+  href: api/ProDataGrid.FormulaEngine.FormulaLexicalBindingKind.html#ProDataGrid_FormulaEngine_FormulaLexicalBindingKind_Let
+  commentId: F:ProDataGrid.FormulaEngine.FormulaLexicalBindingKind.Let
+  fullName: ProDataGrid.FormulaEngine.FormulaLexicalBindingKind.Let
+  nameWithType: FormulaLexicalBindingKind.Let
+- uid: ProDataGrid.FormulaEngine.FormulaLexicalBindingKind.None
+  name: None
+  href: api/ProDataGrid.FormulaEngine.FormulaLexicalBindingKind.html#ProDataGrid_FormulaEngine_FormulaLexicalBindingKind_None
+  commentId: F:ProDataGrid.FormulaEngine.FormulaLexicalBindingKind.None
+  fullName: ProDataGrid.FormulaEngine.FormulaLexicalBindingKind.None
+  nameWithType: FormulaLexicalBindingKind.None
 - uid: ProDataGrid.FormulaEngine.FormulaLiteralExpression
   name: FormulaLiteralExpression
   href: api/ProDataGrid.FormulaEngine.FormulaLiteralExpression.html
@@ -82350,6 +82578,15 @@ references:
   fullName.vb: ProDataGrid.FormulaEngine.FormulaLiteralExpression.New(ProDataGrid.FormulaEngine.FormulaValue)
   nameWithType: FormulaLiteralExpression.FormulaLiteralExpression(FormulaValue)
   nameWithType.vb: FormulaLiteralExpression.New(FormulaValue)
+- uid: ProDataGrid.FormulaEngine.FormulaLiteralExpression.#ctor(ProDataGrid.FormulaEngine.FormulaValue,System.Boolean)
+  name: FormulaLiteralExpression(FormulaValue, bool)
+  href: api/ProDataGrid.FormulaEngine.FormulaLiteralExpression.html#ProDataGrid_FormulaEngine_FormulaLiteralExpression__ctor_ProDataGrid_FormulaEngine_FormulaValue_System_Boolean_
+  commentId: M:ProDataGrid.FormulaEngine.FormulaLiteralExpression.#ctor(ProDataGrid.FormulaEngine.FormulaValue,System.Boolean)
+  name.vb: New(FormulaValue, Boolean)
+  fullName: ProDataGrid.FormulaEngine.FormulaLiteralExpression.FormulaLiteralExpression(ProDataGrid.FormulaEngine.FormulaValue, bool)
+  fullName.vb: ProDataGrid.FormulaEngine.FormulaLiteralExpression.New(ProDataGrid.FormulaEngine.FormulaValue, Boolean)
+  nameWithType: FormulaLiteralExpression.FormulaLiteralExpression(FormulaValue, bool)
+  nameWithType.vb: FormulaLiteralExpression.New(FormulaValue, Boolean)
 - uid: ProDataGrid.FormulaEngine.FormulaLiteralExpression.#ctor*
   name: FormulaLiteralExpression
   href: api/ProDataGrid.FormulaEngine.FormulaLiteralExpression.html#ProDataGrid_FormulaEngine_FormulaLiteralExpression__ctor_
@@ -82360,6 +82597,19 @@ references:
   fullName.vb: ProDataGrid.FormulaEngine.FormulaLiteralExpression.New
   nameWithType: FormulaLiteralExpression.FormulaLiteralExpression
   nameWithType.vb: FormulaLiteralExpression.New
+- uid: ProDataGrid.FormulaEngine.FormulaLiteralExpression.IsOmitted
+  name: IsOmitted
+  href: api/ProDataGrid.FormulaEngine.FormulaLiteralExpression.html#ProDataGrid_FormulaEngine_FormulaLiteralExpression_IsOmitted
+  commentId: P:ProDataGrid.FormulaEngine.FormulaLiteralExpression.IsOmitted
+  fullName: ProDataGrid.FormulaEngine.FormulaLiteralExpression.IsOmitted
+  nameWithType: FormulaLiteralExpression.IsOmitted
+- uid: ProDataGrid.FormulaEngine.FormulaLiteralExpression.IsOmitted*
+  name: IsOmitted
+  href: api/ProDataGrid.FormulaEngine.FormulaLiteralExpression.html#ProDataGrid_FormulaEngine_FormulaLiteralExpression_IsOmitted_
+  commentId: Overload:ProDataGrid.FormulaEngine.FormulaLiteralExpression.IsOmitted
+  isSpec: "True"
+  fullName: ProDataGrid.FormulaEngine.FormulaLiteralExpression.IsOmitted
+  nameWithType: FormulaLiteralExpression.IsOmitted
 - uid: ProDataGrid.FormulaEngine.FormulaLiteralExpression.Value
   name: Value
   href: api/ProDataGrid.FormulaEngine.FormulaLiteralExpression.html#ProDataGrid_FormulaEngine_FormulaLiteralExpression_Value
@@ -84411,6 +84661,19 @@ references:
   isSpec: "True"
   fullName: ProDataGrid.FormulaEngine.FormulaValue.AsError
   nameWithType: FormulaValue.AsError
+- uid: ProDataGrid.FormulaEngine.FormulaValue.AsLambda
+  name: AsLambda()
+  href: api/ProDataGrid.FormulaEngine.FormulaValue.html#ProDataGrid_FormulaEngine_FormulaValue_AsLambda
+  commentId: M:ProDataGrid.FormulaEngine.FormulaValue.AsLambda
+  fullName: ProDataGrid.FormulaEngine.FormulaValue.AsLambda()
+  nameWithType: FormulaValue.AsLambda()
+- uid: ProDataGrid.FormulaEngine.FormulaValue.AsLambda*
+  name: AsLambda
+  href: api/ProDataGrid.FormulaEngine.FormulaValue.html#ProDataGrid_FormulaEngine_FormulaValue_AsLambda_
+  commentId: Overload:ProDataGrid.FormulaEngine.FormulaValue.AsLambda
+  isSpec: "True"
+  fullName: ProDataGrid.FormulaEngine.FormulaValue.AsLambda
+  nameWithType: FormulaValue.AsLambda
 - uid: ProDataGrid.FormulaEngine.FormulaValue.AsNumber
   name: AsNumber()
   href: api/ProDataGrid.FormulaEngine.FormulaValue.html#ProDataGrid_FormulaEngine_FormulaValue_AsNumber
@@ -84527,6 +84790,19 @@ references:
   isSpec: "True"
   fullName: ProDataGrid.FormulaEngine.FormulaValue.FromError
   nameWithType: FormulaValue.FromError
+- uid: ProDataGrid.FormulaEngine.FormulaValue.FromLambda(ProDataGrid.FormulaEngine.FormulaLambda)
+  name: FromLambda(FormulaLambda)
+  href: api/ProDataGrid.FormulaEngine.FormulaValue.html#ProDataGrid_FormulaEngine_FormulaValue_FromLambda_ProDataGrid_FormulaEngine_FormulaLambda_
+  commentId: M:ProDataGrid.FormulaEngine.FormulaValue.FromLambda(ProDataGrid.FormulaEngine.FormulaLambda)
+  fullName: ProDataGrid.FormulaEngine.FormulaValue.FromLambda(ProDataGrid.FormulaEngine.FormulaLambda)
+  nameWithType: FormulaValue.FromLambda(FormulaLambda)
+- uid: ProDataGrid.FormulaEngine.FormulaValue.FromLambda*
+  name: FromLambda
+  href: api/ProDataGrid.FormulaEngine.FormulaValue.html#ProDataGrid_FormulaEngine_FormulaValue_FromLambda_
+  commentId: Overload:ProDataGrid.FormulaEngine.FormulaValue.FromLambda
+  isSpec: "True"
+  fullName: ProDataGrid.FormulaEngine.FormulaValue.FromLambda
+  nameWithType: FormulaValue.FromLambda
 - uid: ProDataGrid.FormulaEngine.FormulaValue.FromNumber(System.Double)
   name: FromNumber(double)
   href: api/ProDataGrid.FormulaEngine.FormulaValue.html#ProDataGrid_FormulaEngine_FormulaValue_FromNumber_System_Double_
@@ -84598,6 +84874,19 @@ references:
   isSpec: "True"
   fullName: ProDataGrid.FormulaEngine.FormulaValue.Kind
   nameWithType: FormulaValue.Kind
+- uid: ProDataGrid.FormulaEngine.FormulaValue.ToCellResult
+  name: ToCellResult()
+  href: api/ProDataGrid.FormulaEngine.FormulaValue.html#ProDataGrid_FormulaEngine_FormulaValue_ToCellResult
+  commentId: M:ProDataGrid.FormulaEngine.FormulaValue.ToCellResult
+  fullName: ProDataGrid.FormulaEngine.FormulaValue.ToCellResult()
+  nameWithType: FormulaValue.ToCellResult()
+- uid: ProDataGrid.FormulaEngine.FormulaValue.ToCellResult*
+  name: ToCellResult
+  href: api/ProDataGrid.FormulaEngine.FormulaValue.html#ProDataGrid_FormulaEngine_FormulaValue_ToCellResult_
+  commentId: Overload:ProDataGrid.FormulaEngine.FormulaValue.ToCellResult
+  isSpec: "True"
+  fullName: ProDataGrid.FormulaEngine.FormulaValue.ToCellResult
+  nameWithType: FormulaValue.ToCellResult
 - uid: ProDataGrid.FormulaEngine.FormulaValue.ToString
   name: ToString()
   href: api/ProDataGrid.FormulaEngine.FormulaValue.html#ProDataGrid_FormulaEngine_FormulaValue_ToString
@@ -84679,6 +84968,12 @@ references:
   commentId: F:ProDataGrid.FormulaEngine.FormulaValueKind.Error
   fullName: ProDataGrid.FormulaEngine.FormulaValueKind.Error
   nameWithType: FormulaValueKind.Error
+- uid: ProDataGrid.FormulaEngine.FormulaValueKind.Lambda
+  name: Lambda
+  href: api/ProDataGrid.FormulaEngine.FormulaValueKind.html#ProDataGrid_FormulaEngine_FormulaValueKind_Lambda
+  commentId: F:ProDataGrid.FormulaEngine.FormulaValueKind.Lambda
+  fullName: ProDataGrid.FormulaEngine.FormulaValueKind.Lambda
+  nameWithType: FormulaValueKind.Lambda
 - uid: ProDataGrid.FormulaEngine.FormulaValueKind.Number
   name: Number
   href: api/ProDataGrid.FormulaEngine.FormulaValueKind.html#ProDataGrid_FormulaEngine_FormulaValueKind_Number
@@ -85000,6 +85295,25 @@ references:
   isSpec: "True"
   fullName: ProDataGrid.FormulaEngine.IFormulaFunctionRegistryVersion.Version
   nameWithType: IFormulaFunctionRegistryVersion.Version
+- uid: ProDataGrid.FormulaEngine.IFormulaLexicalFunction
+  name: IFormulaLexicalFunction
+  href: api/ProDataGrid.FormulaEngine.IFormulaLexicalFunction.html
+  commentId: T:ProDataGrid.FormulaEngine.IFormulaLexicalFunction
+  fullName: ProDataGrid.FormulaEngine.IFormulaLexicalFunction
+  nameWithType: IFormulaLexicalFunction
+- uid: ProDataGrid.FormulaEngine.IFormulaLexicalFunction.BindingKind
+  name: BindingKind
+  href: api/ProDataGrid.FormulaEngine.IFormulaLexicalFunction.html#ProDataGrid_FormulaEngine_IFormulaLexicalFunction_BindingKind
+  commentId: P:ProDataGrid.FormulaEngine.IFormulaLexicalFunction.BindingKind
+  fullName: ProDataGrid.FormulaEngine.IFormulaLexicalFunction.BindingKind
+  nameWithType: IFormulaLexicalFunction.BindingKind
+- uid: ProDataGrid.FormulaEngine.IFormulaLexicalFunction.BindingKind*
+  name: BindingKind
+  href: api/ProDataGrid.FormulaEngine.IFormulaLexicalFunction.html#ProDataGrid_FormulaEngine_IFormulaLexicalFunction_BindingKind_
+  commentId: Overload:ProDataGrid.FormulaEngine.IFormulaLexicalFunction.BindingKind
+  isSpec: "True"
+  fullName: ProDataGrid.FormulaEngine.IFormulaLexicalFunction.BindingKind
+  nameWithType: IFormulaLexicalFunction.BindingKind
 - uid: ProDataGrid.FormulaEngine.IFormulaNameChangeNotifier
   name: IFormulaNameChangeNotifier
   href: api/ProDataGrid.FormulaEngine.IFormulaNameChangeNotifier.html
