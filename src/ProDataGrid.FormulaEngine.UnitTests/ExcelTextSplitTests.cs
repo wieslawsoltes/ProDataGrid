@@ -39,6 +39,8 @@ namespace ProDataGrid.FormulaEngine.Tests
         [InlineData("TEXTSPLIT(\"abc\",\",\")", 1, 1, "abc")]
         [InlineData("TEXTSPLIT(12345,3)", 1, 2, "12|45")]
         [InlineData("TEXTSPLIT({\"a,b\"},\",\")", 1, 2, "a|b")]
+        [InlineData("TEXTSPLIT({\"a,b\";\"c,d\"},\",\")", 1, 2, "a|b")]
+        [InlineData("TEXTSPLIT(\"a,b;c\",\",\",\";\",,,{1,2})", 2, 2, "a|b/c|1")]
         [InlineData("TEXTSPLIT(\"a,b\",{\"\",\",\",\",\"})", 1, 2, "a|b")]
         [InlineData("TEXTSPLIT(\"a--b\",{\"-\",\"--\"})", 1, 3, "a||b")]
         [InlineData("TEXTSPLIT(\"a--b\",{\"--\",\"-\"})", 1, 2, "a|b")]
@@ -79,8 +81,6 @@ namespace ProDataGrid.FormulaEngine.Tests
         [InlineData("TEXTSPLIT(\"x\",\",\",,,NA())", FormulaErrorType.NA)]
         [InlineData("TEXTSPLIT(\"x\",\",\",,,2)", FormulaErrorType.Value)]
         [InlineData("TEXTSPLIT(\"x\",\",\",,,-1)", FormulaErrorType.Value)]
-        [InlineData("TEXTSPLIT({\"a,b\";\"c,d\"},\",\")", FormulaErrorType.Value)]
-        [InlineData("TEXTSPLIT(\"a,b\",\",\",,,,{1,2})", FormulaErrorType.Value)]
         public void Invalid_Inputs_Return_Formula_Errors(string formula, FormulaErrorType expected)
         {
             var context = Context();

@@ -33,28 +33,26 @@ namespace ProDataGrid.FormulaEngine.Excel
         private static FormulaValue Split(FormulaFunctionContext context, IReadOnlyList<FormulaValue> args, uint omitted)
         {
             if (args.Count < 2 || args.Count > 6) return ExcelTextUtilities.ValueError();
-            if (!TryScalar(args[0], out var source, out var error) ||
-                !ExcelTextUtilities.TryText(source, out var text, out error)) return FormulaValue.FromError(error);
+            var address = context.EvaluationContext.Address;
+            // Preserve the existing scalar source/options intersection contract. Delimiter
+            // arrays, unlike scalar options, are consumed in full by the new matcher.
+            var source = FormulaCoercion.ApplyImplicitIntersection(args[0], address);
+            if (!ExcelTextUtilities.TryText(source, out var text, out var error)) return FormulaValue.FromError(error);
             var settings = context.EvaluationContext.Workbook.Settings;
             if (!ExcelSplitDelimiters.TryCreate(args[1], settings.MaximumArrayCellCount, out var columns, out error) ||
                 !ExcelSplitDelimiters.TryCreate(IsOmitted(args, omitted, 2) ? FormulaValue.Blank : args[2],
                     settings.MaximumArrayCellCount, out var rows, out error)) return FormulaValue.FromError(error);
             if (columns.IsEmpty && rows.IsEmpty) return ExcelTextUtilities.ValueError();
             var ignoreEmpty = false;
-            if (!IsOmitted(args, omitted, 3))
-            {
-                if (!TryScalar(args[3], out var option, out error) ||
-                    !FormulaCoercion.TryCoerceToBoolean(option, out ignoreEmpty, out error)) return FormulaValue.FromError(error);
-            }
+            if (!IsOmitted(args, omitted, 3) && !FormulaCoercion.TryCoerceToBoolean(
+                    FormulaCoercion.ApplyImplicitIntersection(args[3], address), out ignoreEmpty, out error)) return FormulaValue.FromError(error);
             var mode = 0;
-            if (!IsOmitted(args, omitted, 4))
-            {
-                if (!TryScalar(args[4], out var option, out error) ||
-                    !ExcelTextUtilities.TryInteger(context, option, out mode, out error)) return FormulaValue.FromError(error);
-            }
+            if (!IsOmitted(args, omitted, 4) && !ExcelTextUtilities.TryInteger(context,
+                    FormulaCoercion.ApplyImplicitIntersection(args[4], address), out mode, out error)) return FormulaValue.FromError(error);
             if (mode != 0 && mode != 1) return ExcelTextUtilities.ValueError();
-            var pad = FormulaValue.FromError(new FormulaError(FormulaErrorType.NA));
-            if (!IsOmitted(args, omitted, 5) && !TryScalar(args[5], out pad, out error)) return FormulaValue.FromError(error);
+            var pad = IsOmitted(args, omitted, 5) ? FormulaValue.FromError(new FormulaError(FormulaErrorType.NA))
+                : FormulaCoercion.ApplyImplicitIntersection(args[5], address);
+            if (pad.Kind is FormulaValueKind.Array or FormulaValueKind.Reference) return ExcelTextUtilities.ValueError();
             var comparison = mode == 0 ? StringComparison.Ordinal : StringComparison.OrdinalIgnoreCase;
             if (text.Length == 0) return ExcelArrayShapeUtilities.Error(FormulaErrorType.Calc);
 
@@ -70,7 +68,7 @@ namespace ProDataGrid.FormulaEngine.Excel
                 while (columnParts.MoveNext())
                 {
                     if (columnParts.Length > ExcelTextUtilities.MaximumLength) return ExcelTextUtilities.ValueError();
-                    if (++count > 16384) return ExcelNumericUtilities.NumError();
+                    if (++count > 16384 || count > settings.MaximumArrayCellCount) return ExcelNumericUtilities.NumError();
                 }
                 columnCount = Math.Max(columnCount, count);
                 if (++rowCount > 1048576 || (long)rowCount * columnCount > settings.MaximumArrayCellCount)
@@ -95,25 +93,5 @@ namespace ProDataGrid.FormulaEngine.Excel
 
         private static bool IsOmitted(IReadOnlyList<FormulaValue> args, uint omitted, int index)
             => index >= args.Count || (omitted & (1u << index)) != 0;
-
-        private static bool TryScalar(FormulaValue value, out FormulaValue scalar, out FormulaError error)
-        {
-            error = default;
-            if (value.Kind == FormulaValueKind.Array)
-            {
-                var array = value.AsArray();
-                if (array.RowCount != 1 || array.ColumnCount != 1)
-                {
-                    scalar = default;
-                    error = new FormulaError(FormulaErrorType.Value);
-                    return false;
-                }
-                value = ExcelDynamicArrayUtilities.GetArrayValue(array, 0, 0);
-            }
-            scalar = value;
-            if (value.Kind != FormulaValueKind.Reference && value.Kind != FormulaValueKind.Array) return true;
-            error = new FormulaError(FormulaErrorType.Value);
-            return false;
-        }
     }
 }
