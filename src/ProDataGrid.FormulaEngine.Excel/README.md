@@ -9,6 +9,7 @@
 - [Text and Unicode](TEXT-FUNCTIONS.md): text search/transforms, broadcasting and character-index compatibility modes.
 - [Scientific math](SCIENTIFIC-FUNCTIONS.md): trigonometry, hyperbolic functions, combinatorics and integral operations.
 - [Order statistics](ORDER-STATISTICS.md): inclusive/exclusive percentiles, bounded selection, numerical interpolation and workspace ownership.
+- [Product aggregates](PRODUCT-AGGREGATES.md): SUMPRODUCT and paired square sums, compensated accumulation, strict pairing and allocation costs.
 
 ## Modern arrays
 
@@ -33,7 +34,7 @@ WRAPROWS(TOROW(A1:C4),3)
 CHOOSECOLS(A1:D20,4,1,4)
 ```
 
-Value-producing transformations materialize blank cells and sparse holes as zero unless the flattening ignore mode removes them. They preserve element errors and return newly owned arrays without a source-range origin. No source array is modified.
+Value-producing transformations materialize blank reference cells and sparse holes as zero unless the flattening ignore mode removes them. They preserve element errors and return newly owned arrays without a source-range origin. No source array is modified.
 
 ## Allocation controls
 
@@ -44,6 +45,16 @@ workbook.Settings.MaximumArrayCellCount = 1_048_576;
 The default cap is 1,048,576 cells **per function result**. `SEQUENCE` and the modern functions above check this cap before allocating the output. Hosts can set another positive value. The row and column limits remain 1,048,576 and 16,384 respectively. Oversized results return `#NUM!`; empty results return `#CALC!` where applicable.
 
 This is not a workbook-wide memory quota: existing range materialization, operators, custom functions, nested expressions and retained spill results can allocate additional memory. Untrusted formula workloads still need host-level resource and execution controls.
+
+## Validation
+
+The read-only `Formula engine validation` workflow runs the same regression sources on net8 and net10, builds both library targets, runs the reusable function/aggregate smoke executables and records NativeAOT checks, raw benchmark samples and source hashes. Default repository tests still target net10; the optional `FormulaTestFramework` property selects the alternative runtime without source edits.
+
+```sh
+dotnet test src/ProDataGrid.FormulaEngine.UnitTests/ProDataGrid.FormulaEngine.UnitTests.csproj -c Release -p:FormulaTestFramework=net8.0
+dotnet test src/ProDataGrid.FormulaEngine.UnitTests/ProDataGrid.FormulaEngine.UnitTests.csproj -c Release -p:FormulaTestFramework=net10.0
+dotnet run -c Release --project tools/formula-aggregate-benchmarks/FormulaAggregateBenchmarks.csproj -- artifacts/aggregates
+```
 
 ## Compatibility boundaries
 
