@@ -2,9 +2,9 @@
 <html>
   <head>
     <meta charset="utf-8">
-      <title>ProCharts Overview | ProDataGrid for Avalonia </title>
+      <title>ProCharts overview | ProDataGrid for Avalonia </title>
       <meta name="viewport" content="width=device-width, initial-scale=1.0">
-      <meta name="title" content="ProCharts Overview | ProDataGrid for Avalonia ">
+      <meta name="title" content="ProCharts overview | ProDataGrid for Avalonia ">
       
       
       <link rel="icon" href="../favicon.ico">
@@ -81,69 +81,69 @@
         </div>
 
         <article data-uid="">
-<h1 id="procharts-overview">ProCharts Overview</h1>
+<h1 id="procharts-overview">ProCharts overview</h1>
 
-<p>ProCharts is an Excel-quality charting library built for ProDataGrid. It provides a renderer-agnostic chart model, a SkiaSharp renderer, and an Avalonia control for interactive charts. The core goal is fidelity to Excel chart behavior while keeping the data pipeline fast and incremental.</p>
-<h2 id="key-components">Key components</h2>
-<ul>
-<li><code>ProCharts</code> defines the chart model, series definitions, axes, legends, and snapshots.</li>
-<li><code>ProCharts.Skia</code> provides a SkiaSharp renderer and export helpers (PNG/SVG).</li>
-<li><code>ProCharts.Avalonia</code> provides <code>ProChartView</code> for interactive rendering in Avalonia.</li>
-<li><code>ProDataGrid.Charting</code> bridges DataGrid data, pivots, and formulas to chart series.</li>
-</ul>
-<h2 id="chart-model-basics">Chart model basics</h2>
-<p>A <code>ChartModel</code> describes the data and display options. A snapshot is built from that model, and renderers draw the snapshot.</p>
-<pre><code class="lang-csharp">var model = new ChartModel
+<p>ProCharts separates chart data, rendering and UI integration into reusable libraries. It supports Cartesian, financial, statistical, matrix and hierarchical charts. Broad charting compatibility is a development goal, not a claim of complete Excel or industry-wide parity.</p>
+<h2 id="libraries">Libraries</h2>
+<table>
+<thead>
+<tr>
+<th>Library</th>
+<th>Responsibility</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>ProCharts</code></td>
+<td>Models, snapshots, axes, formatting, bounded streaming, hierarchy data/layout and analytical transforms.</td>
+</tr>
+<tr>
+<td><code>ProCharts.Skia</code></td>
+<td>Skia rendering, hit testing, interaction indexing and PNG/SVG export.</td>
+</tr>
+<tr>
+<td><code>ProCharts.Avalonia</code></td>
+<td><code>ProChartView</code>, tooltips, viewport gestures and opt-in hierarchy navigation.</td>
+</tr>
+<tr>
+<td><code>ProDataGrid.Charting</code></td>
+<td>Grid, pivot, formula and generated-source adapters.</td>
+</tr>
+</tbody>
+</table>
+<h2 id="create-a-live-chart-model">Create a live chart model</h2>
+<pre><code class="lang-csharp">var source = new StreamingChartDataSource(10_000, &quot;Signal&quot;);
+source.AppendRange(new[]
 {
-    Title = &quot;Revenue by Quarter&quot;,
-    Series = new List&lt;ChartSeries&gt;
-    {
-        ChartSeries.Line(&quot;Q1&quot;, new[] { 120d, 140d, 110d, 180d }),
-        ChartSeries.Line(&quot;Q2&quot;, new[] { 160d, 130d, 150d, 210d })
-    },
-    XAxis = new ChartAxis { Title = &quot;Quarter&quot;, Kind = ChartAxisKind.Category },
-    YAxis = new ChartAxis { Title = &quot;Revenue&quot;, Kind = ChartAxisKind.Value }
-};
+    new ChartSample(0, 12),
+    new ChartSample(1, 18),
+    new ChartSample(2, null),
+    new ChartSample(3, 15)
+});
+using var model = new ChartModel { DataSource = source };
+model.CategoryAxis.Kind = ChartAxisKind.Value;
+model.Request.MaxPoints = 2_000;
+model.Request.DownsampleMode = ChartDownsampleMode.MinMax;
 </code></pre>
-<h2 id="rendering-pipeline">Rendering pipeline</h2>
+<p>Bind the model to <code>ProChartView.ChartModel</code>. Keep it alive while its view is in use and dispose it when the owning application/view-model is finished. Data-source notifications run on their caller's thread; marshal worker ingestion appropriately before updating UI-bound models.</p>
+<p>For headless use, build a <code>ChartDataSnapshot</code> through the source or construct categories and <code>ChartSeriesSnapshot</code> objects directly, then call <code>SkiaChartExporter.ExportPng</code> or <code>ExportSvg</code>. Snapshots should have stable contents; cached render/interaction state must not be fed silently mutated collections.</p>
+<h2 id="data-and-interaction">Data and interaction</h2>
+<p>Grid adapters track sorting/filtering/grouping and formula results. Cached grid windows copy only the requested category/value/X/size slices; their initial source cache still needs to be built. Bounded streaming uses fixed-capacity history. Point decimation is suitable for dense continuous series, not a substitute for hierarchy/matrix semantics.</p>
+<p>Repeated point queries can reuse indexed screen-space geometry. Index construction has an up-front time and memory cost, while warm queries avoid repeated data scans. <code>UseInteractionCache = false</code> retains the reference path, and <code>ClearInteractionCache</code> explicitly releases/invalidate managed state after in-place source changes.</p>
+<p><code>ProChartView.HitTest</code> accepts local logical coordinates and supports label-free numeric data. Typed treemap/sunburst sources can enable branch double-click and back/root keyboard navigation through <code>ChartHierarchyNavigation.IsEnabled</code>. The sample's Hierarchy Explorer also supplies command buttons and a branch selector.</p>
+<h2 id="guides">Guides</h2>
 <ul>
-<li>The model is evaluated into a <code>ChartSnapshot</code> with resolved series, axes, and labels.</li>
-<li>Snapshots can carry <code>ChartDataDelta</code> to enable incremental updates.</li>
-<li>The Skia renderer caches layers (axes, legend, data, labels) for performance.</li>
-<li>Downsampling can be applied (bucket, LTTB, or windowed) to keep large series interactive.</li>
+<li><a href="procharts-chart-model.html">Model and snapshots</a></li>
+<li><a href="procharts-data-sources.html">Data sources</a></li>
+<li><a href="procharts-streaming.html">Bounded streaming</a></li>
+<li><a href="procharts-windowing.html">Efficient grid windows</a></li>
+<li><a href="procharts-advanced-charts.html">Advanced chart families</a></li>
+<li><a href="procharts-indicators.html">Statistical and technical indicators</a></li>
+<li><a href="procharts-hierarchy-navigation.html">Hierarchy navigation and public hit testing</a></li>
+<li><a href="procharts-interaction.html">Interaction</a></li>
+<li><a href="procharts-export-clipboard.html">Export and clipboard</a></li>
 </ul>
-<h2 id="integration-with-prodatagrid">Integration with ProDataGrid</h2>
-<p><code>ProDataGrid.Charting</code> provides models that reflect DataGrid state:</p>
-<ul>
-<li><code>DataGridChartModel</code> builds series from DataGrid rows with sorting/filtering applied.</li>
-<li><code>PivotChartDataSource</code> uses pivot tables and calculated measures.</li>
-<li>Formula-driven measures flow from the formula engine into chart series.</li>
-</ul>
-<p>This makes charts update as the grid filters, sorts, groups, or recalculates formulas.</p>
-<h2 id="export-and-headless-rendering">Export and headless rendering</h2>
-<ul>
-<li><code>ProChartView</code> supports copy and export to PNG/SVG.</li>
-<li><code>SkiaChartExporter</code> supports headless export for servers and CI.</li>
-</ul>
-<pre><code class="lang-csharp">var png = chartView.ExportPng();
-var svg = chartView.ExportSvg();
-await chartView.CopyToClipboardAsync(ChartClipboardFormat.Png);
-</code></pre>
-<h2 id="performance-tips">Performance tips</h2>
-<ul>
-<li>Use windowing (<code>WindowStart</code>/<code>WindowCount</code>) for streaming or huge series.</li>
-<li>Prefer aggregation or downsampling for dense line series.</li>
-<li>Keep legend and label density reasonable for fast layouts.</li>
-</ul>
-<h2 id="see-also">See also</h2>
-<ul>
-<li><code>procharts-architecture.md</code></li>
-<li><code>procharts-chart-model.md</code></li>
-<li><code>procharts-series-types.md</code></li>
-<li><code>procharts-axes-and-scales.md</code></li>
-<li><code>procharts-data-sources.md</code></li>
-<li><code>procharts-interaction.md</code></li>
-</ul>
+<p>Additional diagram families, comprehensive accessibility semantics and physical-GPU performance qualification remain separate work. Batch indicators do not yet provide persistent incremental indicator state, and three-line bands are not a filled inter-series range renderer.</p>
 
 </article>
 

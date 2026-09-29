@@ -1794,7 +1794,7 @@ while rendering different data series in each pane.</p>
 
   <h3 id="ProCharts_Avalonia_ProChartView_CopyToClipboardAsync_ProCharts_Avalonia_ChartClipboardFormat_" data-uid="ProCharts.Avalonia.ProChartView.CopyToClipboardAsync(ProCharts.Avalonia.ChartClipboardFormat)">
   CopyToClipboardAsync(ChartClipboardFormat)
-  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/ProCharts.Avalonia/ProChartView.cs/#L726"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/ProCharts.Avalonia/ProChartView.cs/#L727"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"></div>
@@ -1830,7 +1830,7 @@ while rendering different data series in each pane.</p>
 
   <h3 id="ProCharts_Avalonia_ProChartView_ExportPng" data-uid="ProCharts.Avalonia.ProChartView.ExportPng">
   ExportPng()
-  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/ProCharts.Avalonia/ProChartView.cs/#L702"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/ProCharts.Avalonia/ProChartView.cs/#L703"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"></div>
@@ -1861,7 +1861,7 @@ while rendering different data series in each pane.</p>
 
   <h3 id="ProCharts_Avalonia_ProChartView_ExportSvg" data-uid="ProCharts.Avalonia.ProChartView.ExportSvg">
   ExportSvg()
-  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/ProCharts.Avalonia/ProChartView.cs/#L714"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/ProCharts.Avalonia/ProChartView.cs/#L715"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"></div>
@@ -1888,11 +1888,83 @@ while rendering different data series in each pane.</p>
 
 
 
+  <a id="ProCharts_Avalonia_ProChartView_HitTest_" data-uid="ProCharts.Avalonia.ProChartView.HitTest*"></a>
+
+  <h3 id="ProCharts_Avalonia_ProChartView_HitTest_Avalonia_Point_" data-uid="ProCharts.Avalonia.ProChartView.HitTest(Avalonia.Point)">
+  HitTest(Point)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/ProCharts.Avalonia/ProChartView.cs/#L804"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Finds chart data at a point in this control's local logical coordinates.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public SkiaChartHitTestResult? HitTest(Point point)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>point</code> <span class="xref">Point</span></dt>
+    <dd></dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="ProCharts.Skia.SkiaChartHitTestResult.html">SkiaChartHitTestResult</a>?</dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+  <h4 class="section" id="ProCharts_Avalonia_ProChartView_HitTest_Avalonia_Point__remarks">Remarks</h4>
+  <div class="markdown level1 remarks"><p>Uses the displayed snapshot and effective axes/theme; category labels are optional.</p>
+</div>
+
+
+
+
+  <a id="ProCharts_Avalonia_ProChartView_OnDetachedFromVisualTree_" data-uid="ProCharts.Avalonia.ProChartView.OnDetachedFromVisualTree*"></a>
+
+  <h3 id="ProCharts_Avalonia_ProChartView_OnDetachedFromVisualTree_Avalonia_VisualTreeAttachmentEventArgs_" data-uid="ProCharts.Avalonia.ProChartView.OnDetachedFromVisualTree(Avalonia.VisualTreeAttachmentEventArgs)">
+  OnDetachedFromVisualTree(VisualTreeAttachmentEventArgs)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/ProCharts.Avalonia/ProChartView.cs/#L814"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Releases drawing and interaction buffers when the view leaves its visual tree.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">protected override void OnDetachedFromVisualTree(VisualTreeAttachmentEventArgs e)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>e</code> <span class="xref">VisualTreeAttachmentEventArgs</span></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+
   <a id="ProCharts_Avalonia_ProChartView_OnKeyDown_" data-uid="ProCharts.Avalonia.ProChartView.OnKeyDown*"></a>
 
   <h3 id="ProCharts_Avalonia_ProChartView_OnKeyDown_Avalonia_Input_KeyEventArgs_" data-uid="ProCharts.Avalonia.ProChartView.OnKeyDown(Avalonia.Input.KeyEventArgs)">
   OnKeyDown(KeyEventArgs)
-  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/ProCharts.Avalonia/ProChartView.cs/#L515"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/ProCharts.Avalonia/ProChartView.cs/#L516"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>Invoked when an unhandled <span class="xref">Avalonia.Input.InputElement.KeyDownEvent</span> reaches an element in its
@@ -1927,7 +1999,7 @@ for this event.</p>
 
   <h3 id="ProCharts_Avalonia_ProChartView_OnPointerCaptureLost_Avalonia_Input_PointerCaptureLostEventArgs_" data-uid="ProCharts.Avalonia.ProChartView.OnPointerCaptureLost(Avalonia.Input.PointerCaptureLostEventArgs)">
   OnPointerCaptureLost(PointerCaptureLostEventArgs)
-  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/ProCharts.Avalonia/ProChartView.cs/#L471"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/ProCharts.Avalonia/ProChartView.cs/#L472"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>Invoked when an unhandled <span class="xref">Avalonia.Input.InputElement.PointerCaptureLostEvent</span> reaches an element in its
@@ -1962,7 +2034,7 @@ for this event.</p>
 
   <h3 id="ProCharts_Avalonia_ProChartView_OnPointerExited_Avalonia_Input_PointerEventArgs_" data-uid="ProCharts.Avalonia.ProChartView.OnPointerExited(Avalonia.Input.PointerEventArgs)">
   OnPointerExited(PointerEventArgs)
-  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/ProCharts.Avalonia/ProChartView.cs/#L379"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/ProCharts.Avalonia/ProChartView.cs/#L380"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>Invoked when an unhandled <span class="xref">Avalonia.Input.InputElement.PointerExitedEvent</span> reaches an element in its
@@ -1997,7 +2069,7 @@ for this event.</p>
 
   <h3 id="ProCharts_Avalonia_ProChartView_OnPointerMoved_Avalonia_Input_PointerEventArgs_" data-uid="ProCharts.Avalonia.ProChartView.OnPointerMoved(Avalonia.Input.PointerEventArgs)">
   OnPointerMoved(PointerEventArgs)
-  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/ProCharts.Avalonia/ProChartView.cs/#L358"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/ProCharts.Avalonia/ProChartView.cs/#L359"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>Invoked when an unhandled <span class="xref">Avalonia.Input.InputElement.PointerMovedEvent</span> reaches an element in its
@@ -2032,7 +2104,7 @@ for this event.</p>
 
   <h3 id="ProCharts_Avalonia_ProChartView_OnPointerPressed_Avalonia_Input_PointerPressedEventArgs_" data-uid="ProCharts.Avalonia.ProChartView.OnPointerPressed(Avalonia.Input.PointerPressedEventArgs)">
   OnPointerPressed(PointerPressedEventArgs)
-  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/ProCharts.Avalonia/ProChartView.cs/#L394"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/ProCharts.Avalonia/ProChartView.cs/#L395"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>Invoked when an unhandled <span class="xref">Avalonia.Input.InputElement.PointerPressedEvent</span> reaches an element in its
@@ -2067,7 +2139,7 @@ for this event.</p>
 
   <h3 id="ProCharts_Avalonia_ProChartView_OnPointerReleased_Avalonia_Input_PointerReleasedEventArgs_" data-uid="ProCharts.Avalonia.ProChartView.OnPointerReleased(Avalonia.Input.PointerReleasedEventArgs)">
   OnPointerReleased(PointerReleasedEventArgs)
-  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/ProCharts.Avalonia/ProChartView.cs/#L453"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/ProCharts.Avalonia/ProChartView.cs/#L454"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>Invoked when an unhandled <span class="xref">Avalonia.Input.InputElement.PointerReleasedEvent</span> reaches an element in its
@@ -2102,7 +2174,7 @@ for this event.</p>
 
   <h3 id="ProCharts_Avalonia_ProChartView_OnPointerWheelChanged_Avalonia_Input_PointerWheelEventArgs_" data-uid="ProCharts.Avalonia.ProChartView.OnPointerWheelChanged(Avalonia.Input.PointerWheelEventArgs)">
   OnPointerWheelChanged(PointerWheelEventArgs)
-  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/ProCharts.Avalonia/ProChartView.cs/#L478"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/ProCharts.Avalonia/ProChartView.cs/#L479"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>Invoked when an unhandled <span class="xref">Avalonia.Input.InputElement.PointerWheelChangedEvent</span> reaches an element in its
@@ -2170,7 +2242,7 @@ for this event.</p>
 
   <h3 id="ProCharts_Avalonia_ProChartView_Render_Avalonia_Media_DrawingContext_" data-uid="ProCharts.Avalonia.ProChartView.Render(Avalonia.Media.DrawingContext)">
   Render(DrawingContext)
-  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/ProCharts.Avalonia/ProChartView.cs/#L294"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/ProCharts.Avalonia/ProChartView.cs/#L295"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>Renders the visual to a <span class="xref">Avalonia.Media.DrawingContext</span>.</p>

@@ -70468,6 +70468,86 @@ references:
   isSpec: "True"
   fullName: ProCharts.Avalonia.ChartClipboardFormats.Svg
   nameWithType: ChartClipboardFormats.Svg
+- uid: ProCharts.Avalonia.ChartHierarchyNavigation
+  name: ChartHierarchyNavigation
+  href: api/ProCharts.Avalonia.ChartHierarchyNavigation.html
+  commentId: T:ProCharts.Avalonia.ChartHierarchyNavigation
+  fullName: ProCharts.Avalonia.ChartHierarchyNavigation
+  nameWithType: ChartHierarchyNavigation
+- uid: ProCharts.Avalonia.ChartHierarchyNavigation.GetIsEnabled(ProCharts.Avalonia.ProChartView)
+  name: GetIsEnabled(ProChartView)
+  href: api/ProCharts.Avalonia.ChartHierarchyNavigation.html#ProCharts_Avalonia_ChartHierarchyNavigation_GetIsEnabled_ProCharts_Avalonia_ProChartView_
+  commentId: M:ProCharts.Avalonia.ChartHierarchyNavigation.GetIsEnabled(ProCharts.Avalonia.ProChartView)
+  fullName: ProCharts.Avalonia.ChartHierarchyNavigation.GetIsEnabled(ProCharts.Avalonia.ProChartView)
+  nameWithType: ChartHierarchyNavigation.GetIsEnabled(ProChartView)
+- uid: ProCharts.Avalonia.ChartHierarchyNavigation.GetIsEnabled*
+  name: GetIsEnabled
+  href: api/ProCharts.Avalonia.ChartHierarchyNavigation.html#ProCharts_Avalonia_ChartHierarchyNavigation_GetIsEnabled_
+  commentId: Overload:ProCharts.Avalonia.ChartHierarchyNavigation.GetIsEnabled
+  isSpec: "True"
+  fullName: ProCharts.Avalonia.ChartHierarchyNavigation.GetIsEnabled
+  nameWithType: ChartHierarchyNavigation.GetIsEnabled
+- uid: ProCharts.Avalonia.ChartHierarchyNavigation.IsEnabledProperty
+  name: IsEnabledProperty
+  href: api/ProCharts.Avalonia.ChartHierarchyNavigation.html#ProCharts_Avalonia_ChartHierarchyNavigation_IsEnabledProperty
+  commentId: F:ProCharts.Avalonia.ChartHierarchyNavigation.IsEnabledProperty
+  fullName: ProCharts.Avalonia.ChartHierarchyNavigation.IsEnabledProperty
+  nameWithType: ChartHierarchyNavigation.IsEnabledProperty
+- uid: ProCharts.Avalonia.ChartHierarchyNavigation.Reset(ProCharts.Avalonia.ProChartView)
+  name: Reset(ProChartView)
+  href: api/ProCharts.Avalonia.ChartHierarchyNavigation.html#ProCharts_Avalonia_ChartHierarchyNavigation_Reset_ProCharts_Avalonia_ProChartView_
+  commentId: M:ProCharts.Avalonia.ChartHierarchyNavigation.Reset(ProCharts.Avalonia.ProChartView)
+  fullName: ProCharts.Avalonia.ChartHierarchyNavigation.Reset(ProCharts.Avalonia.ProChartView)
+  nameWithType: ChartHierarchyNavigation.Reset(ProChartView)
+- uid: ProCharts.Avalonia.ChartHierarchyNavigation.Reset*
+  name: Reset
+  href: api/ProCharts.Avalonia.ChartHierarchyNavigation.html#ProCharts_Avalonia_ChartHierarchyNavigation_Reset_
+  commentId: Overload:ProCharts.Avalonia.ChartHierarchyNavigation.Reset
+  isSpec: "True"
+  fullName: ProCharts.Avalonia.ChartHierarchyNavigation.Reset
+  nameWithType: ChartHierarchyNavigation.Reset
+- uid: ProCharts.Avalonia.ChartHierarchyNavigation.SetIsEnabled(ProCharts.Avalonia.ProChartView,System.Boolean)
+  name: SetIsEnabled(ProChartView, bool)
+  href: api/ProCharts.Avalonia.ChartHierarchyNavigation.html#ProCharts_Avalonia_ChartHierarchyNavigation_SetIsEnabled_ProCharts_Avalonia_ProChartView_System_Boolean_
+  commentId: M:ProCharts.Avalonia.ChartHierarchyNavigation.SetIsEnabled(ProCharts.Avalonia.ProChartView,System.Boolean)
+  name.vb: SetIsEnabled(ProChartView, Boolean)
+  fullName: ProCharts.Avalonia.ChartHierarchyNavigation.SetIsEnabled(ProCharts.Avalonia.ProChartView, bool)
+  fullName.vb: ProCharts.Avalonia.ChartHierarchyNavigation.SetIsEnabled(ProCharts.Avalonia.ProChartView, Boolean)
+  nameWithType: ChartHierarchyNavigation.SetIsEnabled(ProChartView, bool)
+  nameWithType.vb: ChartHierarchyNavigation.SetIsEnabled(ProChartView, Boolean)
+- uid: ProCharts.Avalonia.ChartHierarchyNavigation.SetIsEnabled*
+  name: SetIsEnabled
+  href: api/ProCharts.Avalonia.ChartHierarchyNavigation.html#ProCharts_Avalonia_ChartHierarchyNavigation_SetIsEnabled_
+  commentId: Overload:ProCharts.Avalonia.ChartHierarchyNavigation.SetIsEnabled
+  isSpec: "True"
+  fullName: ProCharts.Avalonia.ChartHierarchyNavigation.SetIsEnabled
+  nameWithType: ChartHierarchyNavigation.SetIsEnabled
+- uid: ProCharts.Avalonia.ChartHierarchyNavigation.TryDrillDown(ProCharts.Avalonia.ProChartView,Avalonia.Point)
+  name: TryDrillDown(ProChartView, Point)
+  href: api/ProCharts.Avalonia.ChartHierarchyNavigation.html#ProCharts_Avalonia_ChartHierarchyNavigation_TryDrillDown_ProCharts_Avalonia_ProChartView_Avalonia_Point_
+  commentId: M:ProCharts.Avalonia.ChartHierarchyNavigation.TryDrillDown(ProCharts.Avalonia.ProChartView,Avalonia.Point)
+  fullName: ProCharts.Avalonia.ChartHierarchyNavigation.TryDrillDown(ProCharts.Avalonia.ProChartView, Avalonia.Point)
+  nameWithType: ChartHierarchyNavigation.TryDrillDown(ProChartView, Point)
+- uid: ProCharts.Avalonia.ChartHierarchyNavigation.TryDrillDown*
+  name: TryDrillDown
+  href: api/ProCharts.Avalonia.ChartHierarchyNavigation.html#ProCharts_Avalonia_ChartHierarchyNavigation_TryDrillDown_
+  commentId: Overload:ProCharts.Avalonia.ChartHierarchyNavigation.TryDrillDown
+  isSpec: "True"
+  fullName: ProCharts.Avalonia.ChartHierarchyNavigation.TryDrillDown
+  nameWithType: ChartHierarchyNavigation.TryDrillDown
+- uid: ProCharts.Avalonia.ChartHierarchyNavigation.TryDrillUp(ProCharts.Avalonia.ProChartView)
+  name: TryDrillUp(ProChartView)
+  href: api/ProCharts.Avalonia.ChartHierarchyNavigation.html#ProCharts_Avalonia_ChartHierarchyNavigation_TryDrillUp_ProCharts_Avalonia_ProChartView_
+  commentId: M:ProCharts.Avalonia.ChartHierarchyNavigation.TryDrillUp(ProCharts.Avalonia.ProChartView)
+  fullName: ProCharts.Avalonia.ChartHierarchyNavigation.TryDrillUp(ProCharts.Avalonia.ProChartView)
+  nameWithType: ChartHierarchyNavigation.TryDrillUp(ProChartView)
+- uid: ProCharts.Avalonia.ChartHierarchyNavigation.TryDrillUp*
+  name: TryDrillUp
+  href: api/ProCharts.Avalonia.ChartHierarchyNavigation.html#ProCharts_Avalonia_ChartHierarchyNavigation_TryDrillUp_
+  commentId: Overload:ProCharts.Avalonia.ChartHierarchyNavigation.TryDrillUp
+  isSpec: "True"
+  fullName: ProCharts.Avalonia.ChartHierarchyNavigation.TryDrillUp
+  nameWithType: ChartHierarchyNavigation.TryDrillUp
 - uid: ProCharts.Avalonia.ProChartView
   name: ProChartView
   href: api/ProCharts.Avalonia.ProChartView.html
@@ -70627,6 +70707,19 @@ references:
   isSpec: "True"
   fullName: ProCharts.Avalonia.ProChartView.ExportSvg
   nameWithType: ProChartView.ExportSvg
+- uid: ProCharts.Avalonia.ProChartView.HitTest(Avalonia.Point)
+  name: HitTest(Point)
+  href: api/ProCharts.Avalonia.ProChartView.html#ProCharts_Avalonia_ProChartView_HitTest_Avalonia_Point_
+  commentId: M:ProCharts.Avalonia.ProChartView.HitTest(Avalonia.Point)
+  fullName: ProCharts.Avalonia.ProChartView.HitTest(Avalonia.Point)
+  nameWithType: ProChartView.HitTest(Point)
+- uid: ProCharts.Avalonia.ProChartView.HitTest*
+  name: HitTest
+  href: api/ProCharts.Avalonia.ProChartView.html#ProCharts_Avalonia_ProChartView_HitTest_
+  commentId: Overload:ProCharts.Avalonia.ProChartView.HitTest
+  isSpec: "True"
+  fullName: ProCharts.Avalonia.ProChartView.HitTest
+  nameWithType: ProChartView.HitTest
 - uid: ProCharts.Avalonia.ProChartView.MinWindowCount
   name: MinWindowCount
   href: api/ProCharts.Avalonia.ProChartView.html#ProCharts_Avalonia_ProChartView_MinWindowCount
@@ -70646,6 +70739,19 @@ references:
   commentId: F:ProCharts.Avalonia.ProChartView.MinWindowCountProperty
   fullName: ProCharts.Avalonia.ProChartView.MinWindowCountProperty
   nameWithType: ProChartView.MinWindowCountProperty
+- uid: ProCharts.Avalonia.ProChartView.OnDetachedFromVisualTree(Avalonia.VisualTreeAttachmentEventArgs)
+  name: OnDetachedFromVisualTree(VisualTreeAttachmentEventArgs)
+  href: api/ProCharts.Avalonia.ProChartView.html#ProCharts_Avalonia_ProChartView_OnDetachedFromVisualTree_Avalonia_VisualTreeAttachmentEventArgs_
+  commentId: M:ProCharts.Avalonia.ProChartView.OnDetachedFromVisualTree(Avalonia.VisualTreeAttachmentEventArgs)
+  fullName: ProCharts.Avalonia.ProChartView.OnDetachedFromVisualTree(Avalonia.VisualTreeAttachmentEventArgs)
+  nameWithType: ProChartView.OnDetachedFromVisualTree(VisualTreeAttachmentEventArgs)
+- uid: ProCharts.Avalonia.ProChartView.OnDetachedFromVisualTree*
+  name: OnDetachedFromVisualTree
+  href: api/ProCharts.Avalonia.ProChartView.html#ProCharts_Avalonia_ProChartView_OnDetachedFromVisualTree_
+  commentId: Overload:ProCharts.Avalonia.ProChartView.OnDetachedFromVisualTree
+  isSpec: "True"
+  fullName: ProCharts.Avalonia.ProChartView.OnDetachedFromVisualTree
+  nameWithType: ProChartView.OnDetachedFromVisualTree
 - uid: ProCharts.Avalonia.ProChartView.OnKeyDown(Avalonia.Input.KeyEventArgs)
   name: OnKeyDown(KeyEventArgs)
   href: api/ProCharts.Avalonia.ProChartView.html#ProCharts_Avalonia_ProChartView_OnKeyDown_Avalonia_Input_KeyEventArgs_
@@ -74947,6 +75053,93 @@ references:
   commentId: E:ProCharts.IChartDataSource.DataInvalidated
   fullName: ProCharts.IChartDataSource.DataInvalidated
   nameWithType: IChartDataSource.DataInvalidated
+- uid: ProCharts.IChartHierarchyNavigator
+  name: IChartHierarchyNavigator
+  href: api/ProCharts.IChartHierarchyNavigator.html
+  commentId: T:ProCharts.IChartHierarchyNavigator
+  fullName: ProCharts.IChartHierarchyNavigator
+  nameWithType: IChartHierarchyNavigator
+- uid: ProCharts.IChartHierarchyNavigator.CanDrillUp
+  name: CanDrillUp
+  href: api/ProCharts.IChartHierarchyNavigator.html#ProCharts_IChartHierarchyNavigator_CanDrillUp
+  commentId: P:ProCharts.IChartHierarchyNavigator.CanDrillUp
+  fullName: ProCharts.IChartHierarchyNavigator.CanDrillUp
+  nameWithType: IChartHierarchyNavigator.CanDrillUp
+- uid: ProCharts.IChartHierarchyNavigator.CanDrillUp*
+  name: CanDrillUp
+  href: api/ProCharts.IChartHierarchyNavigator.html#ProCharts_IChartHierarchyNavigator_CanDrillUp_
+  commentId: Overload:ProCharts.IChartHierarchyNavigator.CanDrillUp
+  isSpec: "True"
+  fullName: ProCharts.IChartHierarchyNavigator.CanDrillUp
+  nameWithType: IChartHierarchyNavigator.CanDrillUp
+- uid: ProCharts.IChartHierarchyNavigator.CurrentRoot
+  name: CurrentRoot
+  href: api/ProCharts.IChartHierarchyNavigator.html#ProCharts_IChartHierarchyNavigator_CurrentRoot
+  commentId: P:ProCharts.IChartHierarchyNavigator.CurrentRoot
+  fullName: ProCharts.IChartHierarchyNavigator.CurrentRoot
+  nameWithType: IChartHierarchyNavigator.CurrentRoot
+- uid: ProCharts.IChartHierarchyNavigator.CurrentRoot*
+  name: CurrentRoot
+  href: api/ProCharts.IChartHierarchyNavigator.html#ProCharts_IChartHierarchyNavigator_CurrentRoot_
+  commentId: Overload:ProCharts.IChartHierarchyNavigator.CurrentRoot
+  isSpec: "True"
+  fullName: ProCharts.IChartHierarchyNavigator.CurrentRoot
+  nameWithType: IChartHierarchyNavigator.CurrentRoot
+- uid: ProCharts.IChartHierarchyNavigator.GetPath
+  name: GetPath()
+  href: api/ProCharts.IChartHierarchyNavigator.html#ProCharts_IChartHierarchyNavigator_GetPath
+  commentId: M:ProCharts.IChartHierarchyNavigator.GetPath
+  fullName: ProCharts.IChartHierarchyNavigator.GetPath()
+  nameWithType: IChartHierarchyNavigator.GetPath()
+- uid: ProCharts.IChartHierarchyNavigator.GetPath*
+  name: GetPath
+  href: api/ProCharts.IChartHierarchyNavigator.html#ProCharts_IChartHierarchyNavigator_GetPath_
+  commentId: Overload:ProCharts.IChartHierarchyNavigator.GetPath
+  isSpec: "True"
+  fullName: ProCharts.IChartHierarchyNavigator.GetPath
+  nameWithType: IChartHierarchyNavigator.GetPath
+- uid: ProCharts.IChartHierarchyNavigator.ResetNavigation
+  name: ResetNavigation()
+  href: api/ProCharts.IChartHierarchyNavigator.html#ProCharts_IChartHierarchyNavigator_ResetNavigation
+  commentId: M:ProCharts.IChartHierarchyNavigator.ResetNavigation
+  fullName: ProCharts.IChartHierarchyNavigator.ResetNavigation()
+  nameWithType: IChartHierarchyNavigator.ResetNavigation()
+- uid: ProCharts.IChartHierarchyNavigator.ResetNavigation*
+  name: ResetNavigation
+  href: api/ProCharts.IChartHierarchyNavigator.html#ProCharts_IChartHierarchyNavigator_ResetNavigation_
+  commentId: Overload:ProCharts.IChartHierarchyNavigator.ResetNavigation
+  isSpec: "True"
+  fullName: ProCharts.IChartHierarchyNavigator.ResetNavigation
+  nameWithType: IChartHierarchyNavigator.ResetNavigation
+- uid: ProCharts.IChartHierarchyNavigator.TryDrillDown(System.String)
+  name: TryDrillDown(string)
+  href: api/ProCharts.IChartHierarchyNavigator.html#ProCharts_IChartHierarchyNavigator_TryDrillDown_System_String_
+  commentId: M:ProCharts.IChartHierarchyNavigator.TryDrillDown(System.String)
+  name.vb: TryDrillDown(String)
+  fullName: ProCharts.IChartHierarchyNavigator.TryDrillDown(string)
+  fullName.vb: ProCharts.IChartHierarchyNavigator.TryDrillDown(String)
+  nameWithType: IChartHierarchyNavigator.TryDrillDown(string)
+  nameWithType.vb: IChartHierarchyNavigator.TryDrillDown(String)
+- uid: ProCharts.IChartHierarchyNavigator.TryDrillDown*
+  name: TryDrillDown
+  href: api/ProCharts.IChartHierarchyNavigator.html#ProCharts_IChartHierarchyNavigator_TryDrillDown_
+  commentId: Overload:ProCharts.IChartHierarchyNavigator.TryDrillDown
+  isSpec: "True"
+  fullName: ProCharts.IChartHierarchyNavigator.TryDrillDown
+  nameWithType: IChartHierarchyNavigator.TryDrillDown
+- uid: ProCharts.IChartHierarchyNavigator.TryDrillUp
+  name: TryDrillUp()
+  href: api/ProCharts.IChartHierarchyNavigator.html#ProCharts_IChartHierarchyNavigator_TryDrillUp
+  commentId: M:ProCharts.IChartHierarchyNavigator.TryDrillUp
+  fullName: ProCharts.IChartHierarchyNavigator.TryDrillUp()
+  nameWithType: IChartHierarchyNavigator.TryDrillUp()
+- uid: ProCharts.IChartHierarchyNavigator.TryDrillUp*
+  name: TryDrillUp
+  href: api/ProCharts.IChartHierarchyNavigator.html#ProCharts_IChartHierarchyNavigator_TryDrillUp_
+  commentId: Overload:ProCharts.IChartHierarchyNavigator.TryDrillUp
+  isSpec: "True"
+  fullName: ProCharts.IChartHierarchyNavigator.TryDrillUp
+  nameWithType: IChartHierarchyNavigator.TryDrillUp
 - uid: ProCharts.IChartIncrementalDataSource
   name: IChartIncrementalDataSource
   href: api/ProCharts.IChartIncrementalDataSource.html

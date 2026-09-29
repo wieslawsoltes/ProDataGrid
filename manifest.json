@@ -9188,6 +9188,20 @@
     },
     {
       "type": "ManagedReference",
+      "source_relative_path": "api/ProCharts.Avalonia.ChartHierarchyNavigation.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/ProCharts.Avalonia.ChartHierarchyNavigation.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "ProCharts.Avalonia.ChartHierarchyNavigation",
+      "Summary": "<p sourcefile=\"api/ProCharts.Avalonia.ChartHierarchyNavigation.yml\" sourcestartlinenumber=\"1\">Opt-in pointer and keyboard navigation for a ProChartView displaying a typed hierarchy.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
       "source_relative_path": "api/ProCharts.Avalonia.ProChartView.yml",
       "output": {
         ".html": {
@@ -9829,6 +9843,20 @@
       "IsMRef": true,
       "Title": "ProCharts.IChartDataSource",
       "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/ProCharts.IChartHierarchyNavigator.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/ProCharts.IChartHierarchyNavigator.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "ProCharts.IChartHierarchyNavigator",
+      "Summary": "<p sourcefile=\"api/ProCharts.IChartHierarchyNavigator.yml\" sourcestartlinenumber=\"1\">Renderer-independent navigation contract for sources that display typed hierarchy snapshots.</p>\n"
     },
     {
       "type": "ManagedReference",
@@ -12875,6 +12903,16 @@
       "output": {
         ".html": {
           "relative_path": "articles/procharts-export-clipboard.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "Conceptual",
+      "source_relative_path": "articles/procharts-hierarchy-navigation.md",
+      "output": {
+        ".html": {
+          "relative_path": "articles/procharts-hierarchy-navigation.html"
         }
       },
       "version": ""
