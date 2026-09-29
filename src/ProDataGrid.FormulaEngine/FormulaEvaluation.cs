@@ -442,8 +442,11 @@ namespace ProDataGrid.FormulaEngine
             {
                 var sp = 0;
 
-                foreach (var instruction in instructions)
+                for (var instructionIndex = 0; instructionIndex < instructions.Length; instructionIndex++)
                 {
+                    // Instructions include large reference descriptors. Read the immutable entry
+                    // in place instead of copying its entire struct at every VM step.
+                    ref readonly var instruction = ref instructions[instructionIndex];
                     switch (instruction.Kind)
                     {
                         case FormulaInstructionKind.Invocation:
