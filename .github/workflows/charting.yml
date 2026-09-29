@@ -7,7 +7,11 @@ on:
       - 'src/ProCharts*/**'
       - 'src/ProDataGrid.Charting/**'
       - 'src/Avalonia.Controls.DataGrid.UnitTests/Charting/**'
+      - 'src/DataGridSample/**/Chart*'
+      - 'src/DataGridSample/MainWindow.axaml'
+      - 'src/DataGridSample.UnitTests/Chart*'
       - 'tests/ProCharts.Benchmarks/**'
+      - 'tests/ProCharts.Interaction.Benchmarks/**'
       - 'tests/ProDataGrid.Charting.Benchmarks/**'
       - '.github/workflows/charting.yml'
       - 'Directory.*.props'
@@ -18,7 +22,11 @@ on:
       - 'src/ProCharts*/**'
       - 'src/ProDataGrid.Charting/**'
       - 'src/Avalonia.Controls.DataGrid.UnitTests/Charting/**'
+      - 'src/DataGridSample/**/Chart*'
+      - 'src/DataGridSample/MainWindow.axaml'
+      - 'src/DataGridSample.UnitTests/Chart*'
       - 'tests/ProCharts.Benchmarks/**'
+      - 'tests/ProCharts.Interaction.Benchmarks/**'
       - 'tests/ProDataGrid.Charting.Benchmarks/**'
       - '.github/workflows/charting.yml'
       - 'Directory.*.props'
@@ -50,6 +58,8 @@ jobs:
         run: dotnet build src/ProCharts.Skia/ProCharts.Skia.csproj -c Release
       - name: Charting regressions
         run: dotnet test src/Avalonia.Controls.DataGrid.UnitTests/Avalonia.Controls.DataGrid.UnitTests.csproj -c Release -p:CollectCoverage=false --filter FullyQualifiedName~Charting --logger trx --results-directory artifacts/charting
+      - name: Chart sample integration
+        run: dotnet test src/DataGridSample.UnitTests/DataGridSample.UnitTests.csproj -c Release --filter FullyQualifiedName~Chart --logger trx --results-directory artifacts/charting/sample
       - name: Measure streaming and decimation
         shell: bash
         run: |
@@ -62,6 +72,11 @@ jobs:
           set -o pipefail
           mkdir -p artifacts/charting
           dotnet run --project tests/ProDataGrid.Charting.Benchmarks/ProDataGrid.Charting.Benchmarks.csproj -c Release | tee artifacts/charting/grid-window-performance.txt
+      - name: Measure chart interaction
+        shell: bash
+        run: |
+          set -o pipefail
+          dotnet run --project tests/ProCharts.Interaction.Benchmarks/ProCharts.Interaction.Benchmarks.csproj -c Release | tee artifacts/charting/interaction-performance.txt
       - name: Upload diagnostics
         if: always()
         uses: actions/upload-artifact@v4

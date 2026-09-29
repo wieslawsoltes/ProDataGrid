@@ -1,0 +1,35 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:charts="clr-namespace:ProCharts.Avalonia;assembly=ProCharts.Avalonia"
+             xmlns:core="clr-namespace:ProCharts;assembly=ProCharts"
+             xmlns:vm="clr-namespace:DataGridSample.ViewModels"
+             x:Class="DataGridSample.Pages.ChartHierarchyPage"
+             x:DataType="vm:ChartHierarchyViewModel">
+  <Grid Margin="16" RowDefinitions="Auto,Auto,*" RowSpacing="12">
+    <StackPanel Spacing="6">
+      <TextBlock Classes="h2" Text="Explore a hierarchy" />
+      <TextBlock Text="Double-click a branch to explore it. Backspace or Alt+Left returns; Home resets. Use the branch selector for keyboard-only navigation."
+                 TextWrapping="Wrap" />
+    </StackPanel>
+    <StackPanel Grid.Row="1" Spacing="8">
+      <TextBlock Text="{Binding Breadcrumb}" FontWeight="SemiBold" />
+      <WrapPanel>
+        <Button Margin="0,0,8,6" Content="Up" Command="{Binding UpCommand}" />
+        <Button Margin="0,0,8,6" Content="Root" Command="{Binding ResetCommand}" />
+        <ComboBox Margin="0,0,8,6" Width="145" ItemsSource="{Binding Kinds}" SelectedItem="{Binding Kind}" />
+        <ComboBox Margin="0,0,8,6" Width="170" ItemsSource="{Binding Branches}" SelectedItem="{Binding SelectedBranch}">
+          <ComboBox.ItemTemplate>
+            <DataTemplate x:DataType="core:ChartHierarchyNode">
+              <TextBlock Text="{Binding Label}" />
+            </DataTemplate>
+          </ComboBox.ItemTemplate>
+        </ComboBox>
+        <Button Margin="0,0,8,6" Content="Enter branch" Command="{Binding EnterCommand}" />
+      </WrapPanel>
+    </StackPanel>
+    <charts:ProChartView Grid.Row="2" MinHeight="200"
+                         ChartModel="{Binding Chart}" ChartStyle="{Binding Style}"
+                         ShowCrosshair="False" EnablePanZoom="False"
+                         charts:ChartHierarchyNavigation.IsEnabled="True" />
+  </Grid>
+</UserControl>
