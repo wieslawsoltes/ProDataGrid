@@ -104,7 +104,7 @@ namespace ProCharts
                     double low = lower[i]!.Value, high = upper[i]!.Value;
                     if (low < minLow) { minLow = low; lowMin = i; }
                     if (low > maxLow) { maxLow = low; lowMax = i; }
-                    if (high < minHigh) { minHigh = high; highMax = i; }
+                    if (high < minHigh) { minHigh = high; highMin = i; }
                     if (high > maxHigh) { maxHigh = high; highMax = i; }
                 }
                 extrema[0] = lowMin; extrema[1] = lowMax; extrema[2] = highMin; extrema[3] = highMax;
