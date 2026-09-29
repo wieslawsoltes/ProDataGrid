@@ -19,6 +19,7 @@ namespace ProDataGrid.FormulaEngine.Excel
             _functions = new Dictionary<string, IFormulaFunction>(StringComparer.OrdinalIgnoreCase);
             RegisterDefaults();
             RegisterExtendedDefaults();
+            RegisterTextExtensions();
         }
 
         public bool TryGetFunction(string name, out IFormulaFunction function)
@@ -1351,7 +1352,7 @@ namespace ProDataGrid.FormulaEngine.Excel
                     return FormulaValue.FromError(error);
                 }
 
-                return ExcelFunctionUtilities.CreateNumber(context, text.Length);
+                return ExcelFunctionUtilities.CreateNumber(context, ExcelTextIndexing.Length(text, context.EvaluationContext.Workbook.Settings));
             });
         }
     }
@@ -1410,7 +1411,7 @@ namespace ProDataGrid.FormulaEngine.Excel
                 return FormulaValue.FromText(text);
             }
 
-            return FormulaValue.FromText(text.Substring(0, count));
+            return FormulaValue.FromText(ExcelTextIndexing.Prefix(text, count, context.EvaluationContext.Workbook.Settings));
         }
     }
 
@@ -1468,7 +1469,7 @@ namespace ProDataGrid.FormulaEngine.Excel
                 return FormulaValue.FromText(text);
             }
 
-            return FormulaValue.FromText(text.Substring(text.Length - count, count));
+            return FormulaValue.FromText(ExcelTextIndexing.Suffix(text, count, context.EvaluationContext.Workbook.Settings));
         }
     }
 
@@ -1531,13 +1532,7 @@ namespace ProDataGrid.FormulaEngine.Excel
                 return FormulaValue.FromText(string.Empty);
             }
 
-            var startIndex = start - 1;
-            if (startIndex + length > text.Length)
-            {
-                length = text.Length - startIndex;
-            }
-
-            return FormulaValue.FromText(text.Substring(startIndex, length));
+            return FormulaValue.FromText(ExcelTextIndexing.Middle(text, start, length, context.EvaluationContext.Workbook.Settings));
         }
     }
 
