@@ -334,22 +334,12 @@ namespace ProDataGrid.FormulaEngine.Excel
                 {
                     foreach (var element in arg.AsArray().Flatten())
                     {
-                        if (element.Kind == FormulaValueKind.Error)
-                        {
-                            return element;
-                        }
-
                         if (element.Kind == FormulaValueKind.Number)
                         {
                             count++;
                         }
                     }
                     continue;
-                }
-
-                if (arg.Kind == FormulaValueKind.Error)
-                {
-                    return arg;
                 }
 
                 if (arg.Kind == FormulaValueKind.Blank)
@@ -376,11 +366,6 @@ namespace ProDataGrid.FormulaEngine.Excel
             foreach (var entry in ExcelFunctionUtilities.EnumerateArgumentValuesWithOrigin(arguments, context, evaluator, resolver))
             {
                 var value = entry.Value;
-                if (value.Kind == FormulaValueKind.Error)
-                {
-                    return value;
-                }
-
                 if (value.Kind == FormulaValueKind.Blank)
                 {
                     continue;
@@ -421,22 +406,12 @@ namespace ProDataGrid.FormulaEngine.Excel
                 {
                     foreach (var element in arg.AsArray().Flatten())
                     {
-                        if (element.Kind == FormulaValueKind.Error)
-                        {
-                            return element;
-                        }
-
                         if (element.Kind != FormulaValueKind.Blank)
                         {
                             count++;
                         }
                     }
                     continue;
-                }
-
-                if (arg.Kind == FormulaValueKind.Error)
-                {
-                    return arg;
                 }
 
                 if (arg.Kind != FormulaValueKind.Blank)
@@ -457,11 +432,6 @@ namespace ProDataGrid.FormulaEngine.Excel
             var count = 0;
             foreach (var value in ExcelFunctionUtilities.EnumerateArgumentValues(arguments, context, evaluator, resolver))
             {
-                if (value.Kind == FormulaValueKind.Error)
-                {
-                    return value;
-                }
-
                 if (value.Kind != FormulaValueKind.Blank)
                 {
                     count++;

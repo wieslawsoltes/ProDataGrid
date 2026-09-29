@@ -128,7 +128,7 @@ namespace ProDataGrid.FormulaEngine.Tests
             var evaluator = new FormulaEvaluator();
             var lambda = context.CreateLambda(new[] { "x" }, body);
             var result = evaluator.InvokeLambda(lambda, new[] { FormulaValue.Blank }, context,
-                new WorkbookValueResolver(), new bool[0]);
+                new WorkbookValueResolver(), Array.Empty<bool>());
             Assert.Equal(FormulaErrorType.Value, result.AsError().Type);
         }
 

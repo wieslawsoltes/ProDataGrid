@@ -405,7 +405,7 @@ namespace ProDataGrid.FormulaEngine
 
             if (cell.Expression == null)
             {
-                return cell.Value;
+                return ReadCellValue(cell.Value);
             }
 
             var resolvedAddress = address.SheetName == null
@@ -416,7 +416,7 @@ namespace ProDataGrid.FormulaEngine
             if (_evaluationStack.Contains(evaluationKey))
             {
                 return _allowCircularReferences
-                    ? cell.Value
+                    ? ReadCellValue(cell.Value)
                     : FormulaValue.FromError(new FormulaError(FormulaErrorType.Circ));
             }
 
@@ -430,12 +430,27 @@ namespace ProDataGrid.FormulaEngine
                     context.FunctionRegistry);
                 var value = _evaluator.Evaluate(cell.Expression, cellContext, this).ToCellResult();
                 cell.Value = value;
-                return value;
+                return ReadCellValue(value);
             }
             finally
             {
                 _evaluationStack.Remove(evaluationKey);
             }
+        }
+
+        private static FormulaValue ReadCellValue(FormulaValue value)
+        {
+            // A worksheet reference reads one cell, not the complete array retained by
+            // a spill anchor. Returning the whole array nests it in range results and
+            // causes streaming aggregates to omit the anchor or count it multiple times.
+            if (value.Kind == FormulaValueKind.Array)
+            {
+                var array = value.AsArray();
+                value = array.IsPresent(0, 0) ? array[0, 0] : FormulaValue.Blank;
+                if (value.Kind == FormulaValueKind.Array)
+                    return FormulaValue.FromError(new FormulaError(FormulaErrorType.Calc));
+            }
+            return value.Kind == FormulaValueKind.Lambda ? value.ToCellResult() : value;
         }
 
         private readonly struct FormulaEvaluationKey : IEquatable<FormulaEvaluationKey>
