@@ -78,6 +78,11 @@ namespace ProCharts.Skia
 
                 switch (series.Kind)
                 {
+                    case ChartSeriesKind.RangeArea:
+                        var rangeHit = HitTestRangeArea(point, plot, categories, series, seriesIndex, axisMin, axisMax, axisKind, style,
+                            useNumericCategoryAxis, categoryAxisKind, minCategory, maxCategory);
+                        if (rangeHit.HasValue) return rangeHit;
+                        break;
                     case ChartSeriesKind.Column:
                         if (TryHitColumn(point, plot, categories, series, seriesIndex, seriesCount, categoryCount, axisMin, axisMax, axisKind, out var columnHit))
                         {

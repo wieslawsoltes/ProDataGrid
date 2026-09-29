@@ -2183,6 +2183,10 @@ namespace ProCharts.Skia
                         context.MinBubbleSize,
                         context.MaxBubbleSize);
                     break;
+                case ChartSeriesKind.RangeArea:
+                    DrawRangeAreaSeries(canvas, context.Plot, series, seriesIndex, axisMin, axisMax, axisKind, style,
+                        context.UseNumericCategoryAxis, context.CategoryAxisKind, context.MinCategory, context.MaxCategory);
+                    break;
                 case ChartSeriesKind.Area:
                     DrawAreaSeries(canvas, context.Plot, series, seriesIndex, axisMin, axisMax, axisKind, style);
                     break;
@@ -2565,6 +2569,10 @@ namespace ProCharts.Skia
                             context.MaxCategory,
                             context.MinBubbleSize,
                             context.MaxBubbleSize);
+                        break;
+                    case ChartSeriesKind.RangeArea:
+                        DrawRangeAreaSeries(canvas, context.Plot, series, seriesIndex, axisMin, axisMax, axisKind, style,
+                            context.UseNumericCategoryAxis, context.CategoryAxisKind, context.MinCategory, context.MaxCategory);
                         break;
                     case ChartSeriesKind.Area:
                         DrawAreaSeries(canvas, context.Plot, series, seriesIndex, axisMin, axisMax, axisKind, style);
@@ -2993,6 +3001,18 @@ namespace ProCharts.Skia
                     continue;
                 }
 
+                if (series.Kind == ChartSeriesKind.RangeArea)
+                {
+                    for (int i = 0; i < series.Values.Count; i++)
+                    {
+                        if (!TryGetRangeAreaPoint(series, i, axisKind, out double low, out double high)) continue;
+                        minValue = Math.Min(minValue, low);
+                        maxValue = Math.Max(maxValue, high);
+                        hasValue = true;
+                    }
+                    continue;
+                }
+
                 if (IsFinancialSeriesKind(series.Kind))
                 {
                     var count = GetFinancialPointCount(series, series.Kind);
@@ -3284,7 +3304,7 @@ namespace ProCharts.Skia
                     continue;
                 }
 
-                if (series.Kind != ChartSeriesKind.Scatter && series.Kind != ChartSeriesKind.Bubble)
+                if (series.Kind != ChartSeriesKind.Scatter && series.Kind != ChartSeriesKind.Bubble && series.Kind != ChartSeriesKind.RangeArea)
                 {
                     return false;
                 }
@@ -3308,7 +3328,7 @@ namespace ProCharts.Skia
 
             foreach (var series in snapshot.Series)
             {
-                if ((series.Kind != ChartSeriesKind.Scatter && series.Kind != ChartSeriesKind.Bubble) || series.XValues == null)
+                if ((series.Kind != ChartSeriesKind.Scatter && series.Kind != ChartSeriesKind.Bubble && series.Kind != ChartSeriesKind.RangeArea) || series.XValues == null)
                 {
                     continue;
                 }

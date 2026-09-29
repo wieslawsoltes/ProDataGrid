@@ -882,6 +882,13 @@ namespace ProCharts.Avalonia
             var valueAxis = ResolveValueAxis(model, series);
             var categoryAxis = ResolveCategoryAxis(model, series);
 
+            if (hit.SeriesKind == ChartSeriesKind.RangeArea && hit.LowValue.HasValue && hit.HighValue.HasValue)
+            {
+                var position = hit.XValue.HasValue ? FormatAxisValue(categoryAxis, hit.XValue.Value) : hit.Category;
+                var header = string.IsNullOrWhiteSpace(position) ? seriesName : $"{seriesName} - {position}";
+                return $"{header}: Low {FormatAxisValue(valueAxis, hit.LowValue.Value)}, High {FormatAxisValue(valueAxis, hit.HighValue.Value)}";
+            }
+
             if (IsDefaultFinancialTooltip(hit) &&
                 hit.OpenValue.HasValue &&
                 hit.HighValue.HasValue &&

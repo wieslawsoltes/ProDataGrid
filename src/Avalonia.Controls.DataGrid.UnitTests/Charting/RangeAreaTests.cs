@@ -20,7 +20,7 @@ namespace Avalonia.Controls.DataGridTests.Charting
         private static SkiaChartStyle Plain() => new()
         {
             ShowLegend = false, ShowAxisLabels = false, ShowCategoryLabels = false, ShowDataLabels = false,
-            ShowGridlines = false, ShowCategoryGridlines = false, ShowCategoryAxis = false, ShowValueAxis = false,
+            ShowGridlines = false, ShowCategoryGridlines = false, ShowCategoryAxisLine = false, ShowValueAxisLine = false,
             PaddingLeft = 0, PaddingRight = 0, PaddingTop = 0, PaddingBottom = 0,
             Background = SKColors.White, SeriesColors = new[] { SKColors.CornflowerBlue }, AreaFillOpacity = 0.6f,
             HitTestRadius = 0

@@ -53,3 +53,7 @@ Repeated point queries can reuse indexed screen-space geometry. Index constructi
 - [Export and clipboard](procharts-export-clipboard.md)
 
 Additional diagram families, comprehensive accessibility semantics and physical-GPU performance qualification remain separate work. Batch indicators do not yet provide persistent incremental indicator state, and three-line bands are not a filled inter-series range renderer.
+
+## Filled intervals
+
+[Range areas and analytical bands](procharts-range-area.md) adds owned interval factories, filled envelopes, paired-bound tooltips and the ProCharts Range Area sample.
