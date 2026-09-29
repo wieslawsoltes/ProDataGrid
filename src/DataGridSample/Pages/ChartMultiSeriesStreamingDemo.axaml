@@ -1,0 +1,28 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="clr-namespace:DataGridSample.ViewModels"
+             xmlns:behaviors="clr-namespace:DataGridSample.Behaviors"
+             xmlns:charts="clr-namespace:ProCharts.Avalonia;assembly=ProCharts.Avalonia"
+             xmlns:skia="clr-namespace:ProCharts.Skia;assembly=ProCharts.Skia"
+             x:Class="DataGridSample.Pages.ChartMultiSeriesStreamingDemo"
+             x:DataType="vm:ChartMultiSeriesStreamingViewModel"
+             behaviors:ChartMultiSeriesLifecycle.IsEnabled="True">
+  <UserControl.DataContext><vm:ChartMultiSeriesStreamingViewModel /></UserControl.DataContext>
+  <Grid Margin="12" RowDefinitions="Auto,Auto,*,Auto" RowSpacing="10">
+    <TextBlock Text="Synchronized streams: all three channels commit together. Scatter uses the actual nonuniform X coordinates; gaps remain independent. The output count can exceed the per-channel selection budget."
+               TextWrapping="Wrap" />
+    <WrapPanel Grid.Row="1" Orientation="Horizontal" IsEnabled="{Binding IsActive}">
+      <Button Margin="0,0,8,8" Content="{Binding RunLabel}" Command="{Binding RunCommand}" />
+      <Button x:Name="AppendRowsButton" Margin="0,0,8,8" Content="Append 128 rows" Command="{Binding AppendCommand}" />
+      <Button x:Name="ResetRowsButton" Margin="0,0,8,8" Content="Reset" Command="{Binding ResetCommand}" />
+      <Button Margin="0,0,8,8" Content="Latest 512 rows" Command="{Binding LatestCommand}" />
+      <Button Margin="0,0,8,8" Content="128 / channel" Command="{Binding SmallBudgetCommand}" />
+      <Button Margin="0,0,8,8" Content="512 / channel" Command="{Binding LargeBudgetCommand}" />
+      <Button Margin="0,0,8,8" Content="Full window" Command="{Binding FullWindowCommand}" />
+    </WrapPanel>
+    <charts:ProChartView Grid.Row="2" ChartModel="{Binding Model}" MinHeight="240">
+      <charts:ProChartView.ChartStyle><skia:SkiaChartStyle ShowLegend="True" PaddingRight="60" /></charts:ProChartView.ChartStyle>
+    </charts:ProChartView>
+    <TextBlock Grid.Row="3" Text="{Binding StatusText}" TextWrapping="Wrap" />
+  </Grid>
+</UserControl>
