@@ -1,0 +1,28 @@
+name: Formula helper validation
+on:
+  push:
+    branches: [work/formula-higher-order-arrays]
+permissions:
+  contents: read
+jobs:
+  validate:
+    if: github.repository == 'wieslawsoltes/ProDataGrid'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          global-json-file: global.json
+      - name: Execute all formula tests
+        run: dotnet test src/ProDataGrid.FormulaEngine.UnitTests/ProDataGrid.FormulaEngine.UnitTests.csproj -c Release --logger trx --results-directory artifacts/tests
+      - name: Export source for integration review
+        if: always()
+        run: |
+          mkdir -p artifacts
+          git archive HEAD > artifacts/source.tar
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: formula-helper-validation
+          path: artifacts
