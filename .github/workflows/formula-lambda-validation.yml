@@ -3,7 +3,7 @@ on:
   push:
     branches: [work/formula-lambda-helpers]
 permissions:
-  contents: read
+  contents: write
 jobs:
   validate:
     if: github.repository == 'wieslawsoltes/ProDataGrid'
@@ -11,11 +11,29 @@ jobs:
     timeout-minutes: 15
     steps:
       - uses: actions/checkout@v4
-      - name: Export source for review
+      - uses: actions/setup-dotnet@v4
+        with:
+          global-json-file: global.json
+      - name: Apply guarded formula integration
+        run: python3 tools/apply-formula-lambda.py
+      - name: Run all formula regressions
+        run: |
+          git diff --check
+          dotnet test src/ProDataGrid.FormulaEngine.UnitTests/ProDataGrid.FormulaEngine.UnitTests.csproj -c Release --logger trx --results-directory artifacts/tests
+      - name: Commit validated integration
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add src
+          git commit -m 'Integrate lexical closures with parsing compilation dependency tracking and reference editing'
+          git push origin HEAD:work/formula-lambda-helpers
+      - name: Export tested source
+        if: always()
         run: |
           mkdir -p artifacts
-          git archive HEAD > artifacts/source.tar
+          tar --exclude=.git --exclude=artifacts --exclude=bin --exclude=obj -cf artifacts/source.tar .
       - uses: actions/upload-artifact@v4
+        if: always()
         with:
-          name: formula-source-workspace
-          path: artifacts/source.tar
+          name: formula-lambda-validation
+          path: artifacts
