@@ -27,6 +27,7 @@ namespace ProDataGrid.FormulaEngine.Excel
             RegisterScientificDefaults();
             Register(new ExclusivePercentileFunction(quartile: false));
             Register(new ExclusivePercentileFunction(quartile: true));
+            RegisterPairedStatistics();
             RegisterProductAggregates();
             RegisterMatrixFunctions();
             RegisterBusinessCalendarFunctions();
