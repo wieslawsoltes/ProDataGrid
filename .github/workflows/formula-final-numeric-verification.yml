@@ -3,18 +3,28 @@ on:
   push:
     branches: [work/formula-final-numeric-verification]
 permissions:
-  contents: read
+  contents: write
 jobs:
   validate:
     runs-on: ubuntu-latest
     timeout-minutes: 20
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: work/formula-final-numeric-verification
       - uses: actions/setup-dotnet@v4
         with:
           global-json-file: global.json
           dotnet-version: '8.0.x'
-      - name: Repeat complete formula tests using normal runtime settings and the repository CI configuration
+      - name: Isolate allocation measurement and remove one-time scaffolding
+        run: |
+          python3 tools/isolate-formula-allocation-probe.py
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add src/ProDataGrid.FormulaEngine.UnitTests/ExcelScientificFunctionTests.cs
+          git rm tools/isolate-formula-allocation-probe.py .github/workflows/formula-final-numeric-verification.yml
+          git commit -m 'Isolate steady-state allocation measurement and verify an allocating positive control'
+      - name: Repeat complete formula tests under default runtime settings and repository CI configuration
         run: |
           mkdir -p artifacts
           dotnet build src/ProDataGrid.FormulaEngine.Excel/ProDataGrid.FormulaEngine.Excel.csproj -c Release
@@ -31,7 +41,7 @@ jobs:
             dotnet test src/ProDataGrid.FormulaEngine.UnitTests/ProDataGrid.FormulaEngine.UnitTests.csproj -c Release --settings build/ci.runsettings --logger trx --results-directory "artifacts/net8-$iteration"
           done
           git restore src/ProDataGrid.FormulaEngine.UnitTests/ProDataGrid.FormulaEngine.UnitTests.csproj
-      - name: Publish and execute the final formula native smoke
+      - name: Publish and execute final formula NativeAOT smoke
         run: |
           set -o pipefail
           dotnet publish tools/formula-function-benchmarks/FormulaFunctionBenchmarks.csproj -c Release -r linux-x64 -p:PublishAot=true -o artifacts/native 2>&1 | tee artifacts/native-publish.log
@@ -39,6 +49,8 @@ jobs:
           ./artifacts/native/FormulaFunctionBenchmarks artifacts/native-smoke smoke | tee artifacts/native-run.log
           file artifacts/native/FormulaFunctionBenchmarks > artifacts/native-binary-info.txt
           rm -r artifacts/native
+      - name: Push clean validated test isolation
+        run: git push origin HEAD:work/formula-final-numeric-verification
       - name: Record exact source and runtime evidence
         if: always()
         run: |
@@ -50,7 +62,7 @@ jobs:
           dotnet --info > artifacts/runtime.txt
           dotnet --list-runtimes >> artifacts/runtime.txt
           lscpu > artifacts/cpu.txt
-          printf 'production_source=ef0c17558a169dd8c842b1e67a62698b34b980f1\nDOTNET_TieredCompilation=runtime-default\nfull_suite_repetitions=3_per_runtime\nallocation_probe=all_7_samples_below_unchanged_4096_byte_batch_allowance\n' > artifacts/verification-context.txt
+          printf 'DOTNET_TieredCompilation=runtime-default\nfull_suite_repetitions=3_per_runtime\nallocation_probe=isolated_thread_nonparallel_collection;all_7_samples_below_4096_bytes;escaped_allocating_positive_control\n' > artifacts/verification-context.txt
       - uses: actions/upload-artifact@v4
         if: always()
         with:
