@@ -295,6 +295,9 @@
     <TabItem Header="ProCharts Line">
       <pages:ChartingPage SampleKind="Line" />
     </TabItem>
+    <TabItem Header="ProCharts Range Area">
+      <pages:ChartRangePage />
+    </TabItem>
     <TabItem Header="ProCharts Area">
       <pages:ChartingPage SampleKind="Area" />
     </TabItem>
