@@ -105,13 +105,35 @@ namespace ProDataGrid.FormulaEngine.Excel
         {
             result = start;
             if (days == 0) return true;
+            if (weekend == 127) return false;
             var forward = days > 0;
             var wanted = Math.Abs(days);
+            var maximum = MaximumDate(system);
+            var direction = forward ? 1 : -1;
+            var workingPerWeek = 7 - BitOperations.PopCount((uint)weekend);
+            var weeks = (wanted - 1) / workingPerWeek;
+            var candidate = start + (long)direction * weeks * 7;
+            if (candidate < 0 || candidate > maximum) return false;
+            var remaining = wanted - weeks * workingPerWeek;
+            // Find the no-holiday answer in full weeks plus at most seven steps. This is
+            // the common short-offset path and also handles huge holiday-free offsets.
+            while (remaining > 0)
+            {
+                candidate += direction;
+                if (candidate < 0 || candidate > maximum) return false;
+                if ((weekend & (1 << Weekday((int)candidate, system))) == 0) remaining--;
+            }
+            result = (int)candidate;
+            if (holidays.CountWorkingHolidays(forward ? start + 1 : result, forward ? result : start - 1, weekend) == 0)
+                return true;
+
             var lower = forward ? start + 1 : 0;
-            var upper = forward ? MaximumDate(system) : start - 1;
+            var upper = forward ? maximum : start - 1;
             if (Count(lower, upper, weekend, system, holidays) < wanted) return false;
-            // At most 22 bisections across the entire supported date domain. Counting uses
-            // full weeks and a bounded remainder, with binary-search holiday ranks.
+            if (forward) lower = result;
+            else upper = result;
+            // At most 22 bisections when holidays actually affect the answer. Counting
+            // uses full weeks and a bounded remainder, with binary-search holiday ranks.
             while (lower < upper)
             {
                 if (forward)
