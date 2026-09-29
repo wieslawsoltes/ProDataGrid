@@ -1,4 +1,4 @@
-name: Formula text and Unicode validation
+name: Formula text integration and function measurements
 on:
   push:
     branches: [work/formula-text-unicode]
@@ -8,7 +8,9 @@ jobs:
   validate:
     if: github.repository == 'wieslawsoltes/ProDataGrid'
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    timeout-minutes: 25
+    env:
+      DOTNET_TieredCompilation: '0'
     steps:
       - uses: actions/checkout@v4
         with:
@@ -16,19 +18,37 @@ jobs:
       - uses: actions/setup-dotnet@v4
         with:
           global-json-file: global.json
-      - name: Apply guarded registration and existing text-function improvements
-        run: python3 tools/apply-text-integration.py
-      - name: Execute all formula regressions and both library targets
+      - name: Validate formula regressions and both library targets
         run: |
           git diff --check
           dotnet test src/ProDataGrid.FormulaEngine.UnitTests/ProDataGrid.FormulaEngine.UnitTests.csproj -c Release --logger trx --results-directory artifacts/tests
           dotnet build src/ProDataGrid.FormulaEngine.Excel/ProDataGrid.FormulaEngine.Excel.csproj -c Release
-      - name: Commit and push the validated production edits
+          dotnet build tools/formula-function-benchmarks/FormulaFunctionBenchmarks.csproj -c Release
+      - name: Measure repeated function workloads with allocation counters
+        run: |
+          set -o pipefail
+          dotnet run --no-build -c Release --project tools/formula-function-benchmarks/FormulaFunctionBenchmarks.csproj -- artifacts/run-1 2>&1 | tee artifacts/run-1.log
+          dotnet run --no-build -c Release --project tools/formula-function-benchmarks/FormulaFunctionBenchmarks.csproj -- artifacts/run-2 2>&1 | tee artifacts/run-2.log
+          lscpu > artifacts/cpu.txt
+          dotnet --info > artifacts/runtime.txt
+          git rev-parse HEAD > artifacts/measured-revision.txt
+      - name: Publish and execute formula NativeAOT smoke
+        run: |
+          set -o pipefail
+          dotnet publish tools/formula-function-benchmarks/FormulaFunctionBenchmarks.csproj -c Release -r linux-x64 -p:PublishAot=true -o artifacts/native 2>&1 | tee artifacts/native-publish.log
+          if grep -E 'warning IL[0-9]+' artifacts/native-publish.log; then
+            echo 'Native analysis warnings require review.'
+            exit 1
+          fi
+          ./artifacts/native/FormulaFunctionBenchmarks artifacts/native-smoke smoke 2>&1 | tee artifacts/native-run.log
+          file artifacts/native/FormulaFunctionBenchmarks > artifacts/native-binary-info.txt
+          rm -r artifacts/native
+      - name: Remove one-time implementation scaffolding and push clean tested source
         run: |
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git add src/ProDataGrid.FormulaEngine.Excel/ExcelFunctionRegistry.cs src/ProDataGrid.FormulaEngine.Excel/ExcelFunctionRegistry.Extensions.cs
-          git commit -m 'Integrate vectorized text formulas and configurable Unicode character indexing'
+          git rm tools/apply-text-integration.py .github/workflows/formula-text-validation.yml
+          git commit -m 'Complete measured text and helper validation without temporary scaffolding'
           git push origin HEAD:work/formula-text-unicode
       - name: Export validation source
         if: always()
@@ -36,8 +56,9 @@ jobs:
           mkdir -p artifacts
           git archive HEAD > artifacts/source.tar
           git rev-parse HEAD > artifacts/revision.txt
+          git ls-tree -r HEAD src/ProDataGrid.FormulaEngine src/ProDataGrid.FormulaEngine.Excel src/ProDataGrid.FormulaEngine.UnitTests tools/formula-function-benchmarks > artifacts/validated-source-blobs.txt
       - uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: formula-text-validation
+          name: formula-text-measurements-and-native-validation
           path: artifacts
