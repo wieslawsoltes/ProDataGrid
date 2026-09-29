@@ -30,24 +30,30 @@ namespace ProDataGrid.FormulaEngine.Excel
 
         public double Covariance(int divisor) => Math.ScaleB(XY / divisor, _x.Exponent + _y.Exponent);
         public double Slope => Math.ScaleB(ScaledSlope, _y.Exponent - _x.Exponent);
-        public double Correlation => Math.Clamp((XY / Math.Sqrt(XX)) / Math.Sqrt(YY), -1d, 1d);
+        // These are independently normalized centered sums, not physical variances.
+        // Their product stays in range for the bounded input count and represented spreads.
+        public double Correlation => Math.Clamp(XY / Math.Sqrt(XX * YY), -1d, 1d);
 
         public double Predict(double x)
         {
             var slope = ScaledSlope;
             if (slope == 0) return Math.ScaleB(_y.Origin + _y.Offset + _y.Correction, _y.Exponent);
             var scaled = Math.ScaleB(x, -_x.Exponent);
+            var product = slope * scaled;
             var normalized = PredictNormalized(scaled, slope);
-            if (double.IsFinite(normalized)) return Math.ScaleB(normalized, _y.Exponent);
+            var lostTargetBits = Math.ScaleB(scaled, _x.Exponent) != x;
+            var tinyProduct = double.IsSubnormal(product) || product == 0 && x != 0;
+            if (double.IsFinite(normalized) && !lostTargetBits && !tinyProduct)
+                return Math.ScaleB(normalized, _y.Exponent);
 
-            // Far extrapolation can overflow x's normalized scale even when the final
-            // prediction is finite. Combine a scaled product and intercept before restoring
-            // their common exponent, without constructing the actual slope or b*x.
+            // Extrapolation can overflow or underflow x's normalized scale even when
+            // the prediction is finite. Combine a scaled product and intercept before
+            // restoring their common exponent, without constructing the actual b or b*x.
             var intercept = PredictNormalized(0, slope);
             if (x == 0) return Math.ScaleB(intercept, _y.Exponent);
             var eb = Math.ILogB(Math.Abs(slope));
             var ev = Math.ILogB(Math.Abs(x));
-            var product = Math.ScaleB(slope, -eb) * Math.ScaleB(x, -ev);
+            product = Math.ScaleB(slope, -eb) * Math.ScaleB(x, -ev);
             var productExponent = eb + ev + _y.Exponent - _x.Exponent;
             if (intercept == 0) return Math.ScaleB(product, productExponent);
             var ea = Math.ILogB(Math.Abs(intercept));
