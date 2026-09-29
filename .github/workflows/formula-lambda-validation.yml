@@ -1,0 +1,21 @@
+name: Formula lambda validation
+on:
+  push:
+    branches: [work/formula-lambda-helpers]
+permissions:
+  contents: read
+jobs:
+  validate:
+    if: github.repository == 'wieslawsoltes/ProDataGrid'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - name: Export source for review
+        run: |
+          mkdir -p artifacts
+          git archive HEAD > artifacts/source.tar
+      - uses: actions/upload-artifact@v4
+        with:
+          name: formula-source-workspace
+          path: artifacts/source.tar
