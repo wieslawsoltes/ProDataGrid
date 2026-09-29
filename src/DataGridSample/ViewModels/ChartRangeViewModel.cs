@@ -58,10 +58,13 @@ namespace DataGridSample.ViewModels
             set
             {
                 if (_largeDataset == value) return;
-                this.RaiseAndSetIfChanged(ref _largeDataset, value);
-                Chart.Request.WindowStart = null;
-                Chart.Request.WindowCount = null;
-                Rebuild();
+                using (Chart.DeferRefresh())
+                {
+                    this.RaiseAndSetIfChanged(ref _largeDataset, value);
+                    Chart.Request.WindowStart = null;
+                    Chart.Request.WindowCount = null;
+                    Rebuild();
+                }
             }
         }
 
@@ -88,8 +91,11 @@ namespace DataGridSample.ViewModels
 
         private void ApplyDisplayPolicy()
         {
-            Chart.Request.MaxPoints = LargeDataset && ReduceData ? 800 : null;
-            Chart.Request.DownsampleMode = LargeDataset && ReduceData ? ChartDownsampleMode.MinMax : ChartDownsampleMode.None;
+            using (Chart.DeferRefresh())
+            {
+                Chart.Request.MaxPoints = LargeDataset && ReduceData ? 800 : null;
+                Chart.Request.DownsampleMode = LargeDataset && ReduceData ? ChartDownsampleMode.MinMax : ChartDownsampleMode.None;
+            }
             this.RaisePropertyChanged(nameof(RenderingSummary));
         }
 
@@ -101,19 +107,25 @@ namespace DataGridSample.ViewModels
             {
                 bool missing = LargeDataset ? (i >= 32000 && i < 33000) || (i >= 68000 && i < 68500) : i == 32 || i == 68;
                 double t = LargeDataset ? i * 0.001 : i;
-                values[i] = ShowGaps && missing ? null : 100 + Math.Sin(t * 0.14) * 12 + Math.Cos(t * 0.6) * 2 + t * 0.08;
+                double variation = LargeDataset ? Math.Sin(i * 0.73) * 1.8 : 0;
+                values[i] = ShowGaps && missing ? null : 100 + Math.Sin(t * 0.14) * 12 + Math.Cos(t * 0.6) * 2 + t * 0.08 + variation;
             }
             ChartBandSeries bands = ChartIndicators.BollingerBands(new ChartSeriesSnapshot("Signal", ChartSeriesKind.Line, values),
                 LargeDataset ? 64 : 8, BandWidth);
-            Chart.CategoryAxis.Kind = LargeDataset ? ChartAxisKind.Value : ChartAxisKind.Category;
-            ApplyDisplayPolicy();
-            if (LargeDataset)
+            // Publish only the final combination of data, axis and request. In particular, switching
+            // back to the small example must not first copy a full 100,000-point transient snapshot.
+            using (Chart.DeferRefresh())
             {
-                double[] x = new double[count];
-                for (int i = 0; i < count; i++) x[i] = i + 1;
-                Chart.DataSource = new RangeChartDataSource("Dense Bollinger envelope", bands.Lower.Values, bands.Upper.Values, x);
+                Chart.CategoryAxis.Kind = LargeDataset ? ChartAxisKind.Value : ChartAxisKind.Category;
+                ApplyDisplayPolicy();
+                if (LargeDataset)
+                {
+                    double[] x = new double[count];
+                    for (int i = 0; i < count; i++) x[i] = i + 1;
+                    Chart.DataSource = new RangeChartDataSource("Dense Bollinger envelope", bands.Lower.Values, bands.Upper.Values, x);
+                }
+                else Chart.DataSource = new BandSource(bands);
             }
-            else Chart.DataSource = new BandSource(bands);
         }
 
         // Small original example keeps its category-positioned independent mean line. Dense mode
