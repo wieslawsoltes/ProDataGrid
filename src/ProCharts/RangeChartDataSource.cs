@@ -88,9 +88,11 @@ namespace ProCharts
         /// <remarks>
         /// Windows apply before reduction. Positive point budgets are promoted to six; zero, negative
         /// or omitted budgets disable reduction. Run endpoints, both boundary extrema and gap separators
-        /// take precedence over the budget. An unchanged normalized request returns the same view with
-        /// no managed allocation. Changing the window scans only that window, not the full source.
-        /// A reduced fill approximates omitted detail; use None for exact full-resolution geometry.
+        /// take precedence over the budget. A missing final window endpoint is also retained to preserve
+        /// automatic X-axis extents; this can add one point beyond the selector's soft budget.
+        /// An unchanged normalized request returns the same view with no managed allocation. Changing
+        /// the window scans only that window. A reduced fill approximates omitted detail; use None
+        /// for exact full-resolution geometry. Styles/formatter delegates retain normal shared ownership.
         /// </remarks>
         public ChartRangeView BuildView(ChartDataRequest request)
         {
@@ -111,7 +113,17 @@ namespace ProCharts
                 if (_cached != null && _cachedKey == key) return _cached;
                 int[] indices;
                 if (budget > 0)
+                {
                     indices = ChartRangeDecimator.SelectIndices(source.LowValues!, source.HighValues!, budget, start, count);
+                    int last = start + count - 1;
+                    // A trailing invalid run has one separator, but the full X domain still ends at
+                    // its last observation. Keep that coordinate even though it paints no interval.
+                    if (indices.Length != 0 && indices[^1] != last)
+                    {
+                        Array.Resize(ref indices, indices.Length + 1);
+                        indices[^1] = last;
+                    }
+                }
                 else
                 {
                     indices = new int[count];
