@@ -82,6 +82,7 @@ foreach (int capacity in new[] { 4096, 65536 })
     }
 }
 Console.WriteLine("Final retained/reduced boundaries, X values and stream identities matched the replacement source in every workload. Display preparation still scans its window under a lock; cheaper ingestion does not make snapshot building constant-time.");
+DeliveryBenchmarks.Run();
 
 static void Compare(string name, Action setupA, Func<long> actionA, Action setupB, Func<long> actionB)
 {

@@ -194,18 +194,22 @@ namespace Avalonia.Controls.DataGridTests.Charting
         public void Latest_State_Delivery_Reduces_Model_Refreshes_But_Keeps_Final_Range_Data_And_Window_Follow()
         {
             StreamingRangeChartDataSource source = new(256);
-            source.Append(new ChartRangeSample(0, 1, 3));
+            // Follow-latest intentionally normalizes a full-history window to an unlimited one.
+            // Seed more than forty observations so this fixture establishes a genuinely bounded viewport.
+            for (int i = 0; i < 60; i++) source.Append(new ChartRangeSample(i, i, i + 2));
             QueuedContext context = new();
             using CoalescingChartDataSource adapter = new(source, context);
             using ChartModel model = new();
             using (model.DeferRefresh())
             {
-                model.Request.WindowCount = 40; model.Request.DownsampleMode = ChartDownsampleMode.None;
-                model.Interaction.FollowLatest = true; model.DataSource = adapter;
+                model.Request.DownsampleMode = ChartDownsampleMode.None;
+                model.DataSource = adapter;
             }
+            Assert.True(model.ShowLatest(40));
+            Assert.Equal(40, model.Snapshot.Categories.Count);
             int changes = 0; model.SnapshotChanged += (_, _) => changes++;
             ChartDataSnapshot initial = model.Snapshot;
-            for (int i = 1; i <= 600; i++) source.Append(new ChartRangeSample(i, i, i + 2));
+            for (int i = 60; i <= 600; i++) source.Append(new ChartRangeSample(i, i, i + 2));
             Assert.Equal(0, changes); Assert.Same(initial, model.Snapshot);
             context.PumpOne(); Assert.Equal(1, changes);
             Assert.Equal(40, model.Snapshot.Categories.Count);
