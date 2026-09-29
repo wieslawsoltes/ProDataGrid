@@ -157,30 +157,14 @@ namespace ProDataGrid.FormulaEngine.Excel
         }
     }
 
-    internal sealed class RankEqFunction : ExcelFunctionBase
+    internal sealed class RankEqFunction : ExcelRankingFunction
     {
-        public RankEqFunction()
-            : base("RANK.EQ", new FormulaFunctionInfo(2, 3))
-        {
-        }
-
-        public override FormulaValue Invoke(FormulaFunctionContext context, IReadOnlyList<FormulaValue> args)
-        {
-            return ExcelStatisticalUtilities.Rank(context, args, average: false);
-        }
+        public RankEqFunction() : base("RANK.EQ", ExcelRankingOperation.EqualRank) { }
     }
 
-    internal sealed class RankAvgFunction : ExcelFunctionBase
+    internal sealed class RankAvgFunction : ExcelRankingFunction
     {
-        public RankAvgFunction()
-            : base("RANK.AVG", new FormulaFunctionInfo(2, 3))
-        {
-        }
-
-        public override FormulaValue Invoke(FormulaFunctionContext context, IReadOnlyList<FormulaValue> args)
-        {
-            return ExcelStatisticalUtilities.Rank(context, args, average: true);
-        }
+        public RankAvgFunction() : base("RANK.AVG", ExcelRankingOperation.AverageRank) { }
     }
 
     internal sealed class CountBlankFunction : ExcelFunctionBase
@@ -692,65 +676,5 @@ namespace ProDataGrid.FormulaEngine.Excel
         public static FormulaValue PercentileInc(FormulaCalculationSettings settings, FormulaValue dataValue, double k)
             => ExcelOrderStatistics.Percentile(settings, dataValue, k, exclusive: false);
 
-        public static FormulaValue Rank(
-            FormulaFunctionContext context,
-            IReadOnlyList<FormulaValue> args,
-            bool average)
-        {
-            var address = context.EvaluationContext.Address;
-            var numberValue = ExcelLookupUtilities.ApplyImplicitIntersection(args[0], address);
-            if (!ExcelFunctionUtilities.TryCoerceToNumber(context, numberValue, out var number, out var error))
-            {
-                return FormulaValue.FromError(error);
-            }
-
-            if (!TryCollectNumbers(context.EvaluationContext.Workbook.Settings, new[] { args[1] }, out var numbers, out error))
-            {
-                return FormulaValue.FromError(error);
-            }
-
-            var order = 0;
-            if (args.Count > 2)
-            {
-                var orderValue = ExcelLookupUtilities.ApplyImplicitIntersection(args[2], address);
-                if (!ExcelFunctionUtilities.TryCoerceToInteger(context, orderValue, out order, out error))
-                {
-                    return FormulaValue.FromError(error);
-                }
-            }
-
-            if (order != 0 && order != 1)
-            {
-                return FormulaValue.FromError(new FormulaError(FormulaErrorType.Value));
-            }
-
-            var greater = 0;
-            var equal = 0;
-            for (var i = 0; i < numbers.Count; i++)
-            {
-                var candidate = numbers[i];
-                if (candidate == number)
-                {
-                    equal++;
-                }
-                else if (order == 0 && candidate > number)
-                {
-                    greater++;
-                }
-                else if (order == 1 && candidate < number)
-                {
-                    greater++;
-                }
-            }
-
-            var rankStart = greater + 1;
-            if (!average || equal <= 1)
-            {
-                return ExcelFunctionUtilities.CreateNumber(context, rankStart);
-            }
-
-            var rankEnd = greater + equal;
-            return ExcelFunctionUtilities.CreateNumber(context, (rankStart + rankEnd) / 2d);
-        }
     }
 }

@@ -34,6 +34,7 @@ namespace ProDataGrid.FormulaEngine.Excel
             RegisterDescriptiveStatistics();
             RegisterBitwiseDefaults();
             RegisterRadixDefaults();
+            RegisterRankingExtensions();
         }
 
         partial void RegisterAdditionalDefaults();
