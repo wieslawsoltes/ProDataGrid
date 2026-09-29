@@ -1,4 +1,5 @@
 using System;
+using System.IO;
 using System.Linq;
 using Avalonia.Controls;
 using Avalonia.Headless.XUnit;
@@ -49,6 +50,20 @@ public sealed class ChartHierarchySampleTests
             Assert.True(ChartHierarchyNavigation.GetIsEnabled(view));
             Assert.Same(first.Chart, view.ChartModel);
             Assert.NotEmpty(view.ExportPng());
+            Assert.Contains("Platform", view.ExportSvg(), StringComparison.Ordinal);
+            SavePreview(view, "RootTreemap");
+
+            Assert.True(first.Source.TryDrillDown("platform"));
+            Dispatcher.UIThread.RunJobs(); window.UpdateLayout();
+            Assert.Equal("Portfolio / Platform", first.Breadcrumb);
+            Assert.Contains("Compute", view.ExportSvg(), StringComparison.Ordinal);
+            Assert.DoesNotContain("Products", view.ExportSvg(), StringComparison.Ordinal);
+            SavePreview(view, "PlatformTreemap");
+            first.Kind = ChartSeriesKind.Sunburst;
+            Dispatcher.UIThread.RunJobs(); window.UpdateLayout();
+            Assert.Contains("Compute", view.ExportSvg(), StringComparison.Ordinal);
+            SavePreview(view, "PlatformSunburst");
+
             window.Content = null;
             Assert.Null(page.DataContext);
             Assert.False(first.EnterCommand.CanExecute(null));
@@ -58,5 +73,16 @@ public sealed class ChartHierarchySampleTests
             Assert.Equal("portfolio", next.Source.CurrentRoot.Id);
         }
         finally { window.Close(); }
+    }
+
+    private static void SavePreview(ProChartView view, string name)
+    {
+        // Diagnostics from the actual bound sample view, not a separate sample renderer.
+        string? workspace = Environment.GetEnvironmentVariable("GITHUB_WORKSPACE");
+        if (Environment.GetEnvironmentVariable("GITHUB_ACTIONS") != "true" || string.IsNullOrEmpty(workspace)) return;
+        string directory = Path.Combine(workspace, "artifacts", "charting", "sample", "gallery");
+        Directory.CreateDirectory(directory);
+        File.WriteAllBytes(Path.Combine(directory, name + ".png"), view.ExportPng());
+        File.WriteAllText(Path.Combine(directory, name + ".svg"), view.ExportSvg());
     }
 }
