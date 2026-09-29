@@ -25,14 +25,22 @@ namespace ProCharts
         private int _version;
 
         /// <summary>Creates a source by copying and validating aligned lower/upper/X/category channels.</summary>
-        /// <remarks>Finite inverted pairs are rejected. Partial/non-finite pairs normalize to gaps.</remarks>
+        /// <remarks>
+        /// Finite inverted pairs are rejected. Partial/non-finite pairs normalize to gaps.
+        /// Set valueAxisKind to Logarithmic when using a logarithmic value axis: nonpositive pairs
+        /// become gaps before reduction, so they cannot disappear and reconnect two visible runs.
+        /// </remarks>
         public RangeChartDataSource(string? name, IReadOnlyList<double?> lower, IReadOnlyList<double?> upper,
             IReadOnlyList<double>? xValues = null, IReadOnlyList<string?>? categories = null,
             ChartValueAxisAssignment valueAxisAssignment = ChartValueAxisAssignment.Primary,
-            ChartSeriesStyle? style = null, Func<double, string>? dataLabelFormatter = null)
+            ChartSeriesStyle? style = null, Func<double, string>? dataLabelFormatter = null,
+            ChartAxisKind valueAxisKind = ChartAxisKind.Value)
         {
+            if (valueAxisKind is not (ChartAxisKind.Value or ChartAxisKind.Logarithmic))
+                throw new ArgumentOutOfRangeException(nameof(valueAxisKind), "Range value axes must be linear or logarithmic.");
             Name = name;
             ValueAxisAssignment = valueAxisAssignment;
+            ValueAxisKind = valueAxisKind;
             Style = style;
             DataLabelFormatter = dataLabelFormatter;
             _data = CopyData(lower, upper, xValues, categories);
@@ -44,6 +52,8 @@ namespace ProCharts
         public string? Name { get; }
         /// <summary>Gets the range's primary or secondary value-axis assignment.</summary>
         public ChartValueAxisAssignment ValueAxisAssignment { get; }
+        /// <summary>Gets the input validity domain. Configure the renderer's assigned value axis to match.</summary>
+        public ChartAxisKind ValueAxisKind { get; }
         /// <summary>Gets the presentation options forwarded to each display series.</summary>
         public ChartSeriesStyle? Style { get; }
         /// <summary>Gets the formatter used for the two actual interval boundaries.</summary>
@@ -133,8 +143,22 @@ namespace ProCharts
         {
             ArgumentNullException.ThrowIfNull(lower);
             ArgumentNullException.ThrowIfNull(upper);
+            if (lower.Count != upper.Count) throw new ArgumentException("Boundary counts must match.", nameof(upper));
             if (categories != null && categories.Count != lower.Count)
                 throw new ArgumentException("Categories must align with every input interval.", nameof(categories));
+            if (ValueAxisKind == ChartAxisKind.Logarithmic)
+            {
+                double?[] positiveLower = new double?[lower.Count];
+                for (int i = 0; i < positiveLower.Length; i++)
+                {
+                    double? low = lower[i], high = upper[i];
+                    // Validate before masking so logarithmic filtering cannot hide an inverted pair.
+                    if (low is double l && high is double h && double.IsFinite(l) && double.IsFinite(h) && l > h)
+                        throw new ArgumentException("A finite lower boundary cannot exceed its upper boundary.", nameof(lower));
+                    if (low is > 0) positiveLower[i] = low;
+                }
+                lower = positiveLower;
+            }
             if (xValues == null)
             {
                 double[] positions = new double[lower.Count];

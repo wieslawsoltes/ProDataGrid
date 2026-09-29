@@ -11,6 +11,7 @@ on:
       - 'src/DataGridSample/MainWindow.axaml'
       - 'src/DataGridSample.UnitTests/Chart*'
       - 'tests/ProCharts.Benchmarks/**'
+      - 'tests/ProCharts.Decimation.Benchmarks/**'
       - 'tests/ProCharts.Interaction.Benchmarks/**'
       - 'tests/ProCharts.Range.Benchmarks/**'
       - 'tests/ProCharts.Streaming.Benchmarks/**'
@@ -28,6 +29,7 @@ on:
       - 'src/DataGridSample/MainWindow.axaml'
       - 'src/DataGridSample.UnitTests/Chart*'
       - 'tests/ProCharts.Benchmarks/**'
+      - 'tests/ProCharts.Decimation.Benchmarks/**'
       - 'tests/ProCharts.Interaction.Benchmarks/**'
       - 'tests/ProCharts.Range.Benchmarks/**'
       - 'tests/ProCharts.Streaming.Benchmarks/**'
@@ -85,6 +87,11 @@ jobs:
         run: |
           set -o pipefail
           dotnet run --project tests/ProCharts.Range.Benchmarks/ProCharts.Range.Benchmarks.csproj -c Release | tee artifacts/charting/range-interaction-performance.txt
+      - name: Compare full and reduced range drawing
+        shell: bash
+        run: |
+          set -o pipefail
+          dotnet run --project tests/ProCharts.Decimation.Benchmarks/ProCharts.Decimation.Benchmarks.csproj -c Release | tee artifacts/charting/range-decimation-performance.txt
       - name: Compare batch and incremental indicators
         shell: bash
         run: |
