@@ -15,7 +15,9 @@ jobs:
         with:
           global-json-file: global.json
       - name: Apply guarded formula integration
-        run: python3 tools/apply-formula-lambda.py
+        run: |
+          python3 tools/apply-formula-lambda.py
+          python3 tools/refine-formula-lambda.py
       - name: Run all formula regressions
         run: |
           git diff --check
@@ -25,7 +27,7 @@ jobs:
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
           git add src
-          git commit -m 'Integrate lexical closures with parsing compilation dependency tracking and reference editing'
+          git commit -m 'Integrate lexical closures while preserving blank-literal parser compatibility'
           git push origin HEAD:work/formula-lambda-helpers
       - name: Export tested source
         if: always()
