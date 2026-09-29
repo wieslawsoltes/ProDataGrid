@@ -156,7 +156,7 @@ namespace ProDataGrid.FormulaEngine.Tests
         }
 
         [Fact]
-        public void Warm_Common_Calls_Allocate_No_Product_Array_Or_Cell_Arguments()
+        public async Task Warm_Common_Calls_Allocate_No_Product_Array_Or_Cell_Arguments()
         {
             var context = Context();
             var data = new FormulaArray(10000, 1);
@@ -166,13 +166,12 @@ namespace ProDataGrid.FormulaEngine.Tests
             foreach (var name in new[] { "SUMPRODUCT", "SUMXMY2", "SUMX2PY2", "SUMX2MY2" })
             {
                 Assert.True(context.FunctionRegistry.TryGetFunction(name, out var function));
-                for (var i = 0; i < 20; i++) function.Invoke(call, arguments);
-                var before = GC.GetAllocatedBytesForCurrentThread();
-                double checksum = 0;
-                for (var i = 0; i < 50; i++) checksum += function.Invoke(call, arguments).AsNumber();
-                var allocated = GC.GetAllocatedBytesForCurrentThread() - before;
-                Assert.Equal(name == "SUMPRODUCT" ? 500000d : name == "SUMX2PY2" ? 1000000d : 0, checksum);
-                Assert.True(allocated < 4096, $"{name} allocated {allocated} bytes over 50 calls.");
+                var samples = await FormulaAllocationMeasurements.RunAsync(() => function.Invoke(call, arguments).AsNumber(), 50);
+                foreach (var sample in samples)
+                {
+                    Assert.Equal(name == "SUMPRODUCT" ? 500000d : name == "SUMX2PY2" ? 1000000d : 0, sample.Checksum);
+                    Assert.True(sample.Bytes < 4096, $"{name} allocated {sample.Bytes} bytes over 50 calls.");
+                }
             }
         }
 
