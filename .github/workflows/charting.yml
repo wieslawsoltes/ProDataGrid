@@ -12,6 +12,7 @@ on:
       - 'src/DataGridSample.UnitTests/Chart*'
       - 'tests/ProCharts.Benchmarks/**'
       - 'tests/ProCharts.Interaction.Benchmarks/**'
+      - 'tests/ProCharts.Streaming.Benchmarks/**'
       - 'tests/ProDataGrid.Charting.Benchmarks/**'
       - '.github/workflows/charting.yml'
       - 'Directory.*.props'
@@ -27,6 +28,7 @@ on:
       - 'src/DataGridSample.UnitTests/Chart*'
       - 'tests/ProCharts.Benchmarks/**'
       - 'tests/ProCharts.Interaction.Benchmarks/**'
+      - 'tests/ProCharts.Streaming.Benchmarks/**'
       - 'tests/ProDataGrid.Charting.Benchmarks/**'
       - '.github/workflows/charting.yml'
       - 'Directory.*.props'
@@ -70,13 +72,17 @@ jobs:
         shell: bash
         run: |
           set -o pipefail
-          mkdir -p artifacts/charting
           dotnet run --project tests/ProDataGrid.Charting.Benchmarks/ProDataGrid.Charting.Benchmarks.csproj -c Release | tee artifacts/charting/grid-window-performance.txt
       - name: Measure chart interaction
         shell: bash
         run: |
           set -o pipefail
           dotnet run --project tests/ProCharts.Interaction.Benchmarks/ProCharts.Interaction.Benchmarks.csproj -c Release | tee artifacts/charting/interaction-performance.txt
+      - name: Compare batch and incremental indicators
+        shell: bash
+        run: |
+          set -o pipefail
+          dotnet run --project tests/ProCharts.Streaming.Benchmarks/ProCharts.Streaming.Benchmarks.csproj -c Release | tee artifacts/charting/incremental-indicator-performance.txt
       - name: Upload diagnostics
         if: always()
         uses: actions/upload-artifact@v4
