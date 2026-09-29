@@ -16,7 +16,7 @@ namespace ProDataGrid.FormulaEngine
         private readonly IFormulaParser _parser;
         private readonly IFormulaFunctionRegistry _functionRegistry;
         private readonly FormulaEvaluator _evaluator = new FormulaEvaluator();
-        private readonly FormulaDependencyGraph _dependencyGraph = new FormulaDependencyGraph();
+        private readonly FormulaDependencyGraph _dependencyGraph;
         private readonly Dictionary<FormulaCellAddress, FormulaRangeAddress> _spillRanges = new();
         private readonly Dictionary<FormulaCellAddress, FormulaCellAddress> _spillOwners = new();
         private readonly HashSet<FormulaCellAddress> _volatileCells = new();
@@ -26,6 +26,7 @@ namespace ProDataGrid.FormulaEngine
         {
             _parser = parser ?? throw new ArgumentNullException(nameof(parser));
             _functionRegistry = functionRegistry ?? throw new ArgumentNullException(nameof(functionRegistry));
+            _dependencyGraph = new FormulaDependencyGraph(functionRegistry);
         }
 
         public FormulaDependencyGraph DependencyGraph => _dependencyGraph;
@@ -417,7 +418,7 @@ namespace ProDataGrid.FormulaEngine
             var evaluationWatch = evaluationObserver != null ? Stopwatch.StartNew() : null;
 
             var context = new FormulaEvaluationContext(workbook, worksheet, address, _functionRegistry);
-            var value = _evaluator.Evaluate(cell.Expression, context, resolver);
+            var value = _evaluator.Evaluate(cell.Expression, context, resolver).ToCellResult();
             if (value.Kind == FormulaValueKind.Array)
             {
                 if (workbook.Settings.EnableDynamicArrays)
@@ -1033,80 +1034,55 @@ namespace ProDataGrid.FormulaEngine
             }
         }
 
-        private bool IsVolatileExpression(
-            FormulaExpression expression,
-            IFormulaWorkbook workbook,
-            IFormulaNameProvider? worksheetNames,
-            IFormulaNameProvider? workbookNames,
-            string? sheetName,
-            HashSet<string> nameStack)
+        private bool IsVolatileExpression(FormulaExpression expression, IFormulaWorkbook workbook,
+            IFormulaNameProvider? worksheetNames, IFormulaNameProvider? workbookNames,
+            string? sheetName, HashSet<string> nameStack, HashSet<string>? locals = null)
         {
+            bool Visit(FormulaExpression item, HashSet<string>? scope)
+                => IsVolatileExpression(item, workbook, worksheetNames, workbookNames, sheetName, nameStack, scope);
             switch (expression.Kind)
             {
-                case FormulaExpressionKind.Literal:
-                case FormulaExpressionKind.Reference:
-                case FormulaExpressionKind.StructuredReference:
-                    return false;
                 case FormulaExpressionKind.Unary:
-                    return IsVolatileExpression(((FormulaUnaryExpression)expression).Operand, workbook, worksheetNames, workbookNames, sheetName, nameStack);
+                    return Visit(((FormulaUnaryExpression)expression).Operand, locals);
                 case FormulaExpressionKind.Binary:
                     var binary = (FormulaBinaryExpression)expression;
-                    return IsVolatileExpression(binary.Left, workbook, worksheetNames, workbookNames, sheetName, nameStack) ||
-                           IsVolatileExpression(binary.Right, workbook, worksheetNames, workbookNames, sheetName, nameStack);
+                    return Visit(binary.Left, locals) || Visit(binary.Right, locals);
+                case FormulaExpressionKind.Invocation:
+                    var invocation = (FormulaInvocationExpression)expression;
+                    if (Visit(invocation.Target, locals)) return true;
+                    foreach (var argument in invocation.Arguments) if (Visit(argument, locals)) return true;
+                    return false;
                 case FormulaExpressionKind.ArrayLiteral:
                     var array = (FormulaArrayExpression)expression;
                     for (var row = 0; row < array.RowCount; row++)
-                    {
                         for (var column = 0; column < array.ColumnCount; column++)
-                        {
-                            if (IsVolatileExpression(array[row, column], workbook, worksheetNames, workbookNames, sheetName, nameStack))
-                            {
-                                return true;
-                            }
-                        }
-                    }
+                            if (Visit(array[row, column], locals)) return true;
                     return false;
                 case FormulaExpressionKind.FunctionCall:
                     var call = (FormulaFunctionCallExpression)expression;
-                    if (_functionRegistry.TryGetFunction(call.Name, out var function) && function.Info.IsVolatile)
+                    if (locals == null || !locals.Contains(call.Name))
                     {
-                        return true;
-                    }
-
-                    foreach (var argument in call.Arguments)
-                    {
-                        if (IsVolatileExpression(argument, workbook, worksheetNames, workbookNames, sheetName, nameStack))
+                        if (_functionRegistry.TryGetFunction(call.Name, out var function))
                         {
-                            return true;
+                            if (function.Info.IsVolatile) return true;
                         }
+                        else if (Visit(new FormulaNameExpression(call.Name), locals)) return true;
                     }
-
-                    return false;
+                    return FormulaBindingTraversal.VisitArguments(call, locals,
+                        FormulaBindingTraversal.GetBindingKind(call, locals, _functionRegistry), Visit);
                 case FormulaExpressionKind.Name:
-                    var nameExpression = (FormulaNameExpression)expression;
-                    var scopeKey = CreateNameScopeKey(sheetName, nameExpression.Name);
-                    if (!nameStack.Add(scopeKey))
-                    {
-                        return false;
-                    }
-
+                    var name = ((FormulaNameExpression)expression).Name;
+                    if (locals != null && locals.Contains(name)) return false;
+                    var scopeKey = CreateNameScopeKey(sheetName, name);
+                    if (!nameStack.Add(scopeKey)) return false;
                     try
                     {
-                        if (worksheetNames != null && worksheetNames.TryGetName(nameExpression.Name, out var sheetExpression))
-                        {
-                            return IsVolatileExpression(sheetExpression, workbook, worksheetNames, workbookNames, sheetName, nameStack);
-                        }
-
-                        if (workbookNames != null && workbookNames.TryGetName(nameExpression.Name, out var workbookExpression))
-                        {
-                            return IsVolatileExpression(workbookExpression, workbook, worksheetNames, workbookNames, sheetName, nameStack);
-                        }
+                        if (worksheetNames != null && worksheetNames.TryGetName(name, out var sheetExpression))
+                            return Visit(sheetExpression, null);
+                        if (workbookNames != null && workbookNames.TryGetName(name, out var workbookExpression))
+                            return Visit(workbookExpression, null);
                     }
-                    finally
-                    {
-                        nameStack.Remove(scopeKey);
-                    }
-
+                    finally { nameStack.Remove(scopeKey); }
                     return false;
                 default:
                     return false;

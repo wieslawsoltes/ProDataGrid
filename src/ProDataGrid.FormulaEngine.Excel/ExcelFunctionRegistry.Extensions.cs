@@ -12,5 +12,7 @@ namespace ProDataGrid.FormulaEngine.Excel
 
         // Keep additional function families separate from the legacy implementation file.
         partial void RegisterExtendedDefaults();
+
+        partial void RegisterTextExtensions();
     }
 }

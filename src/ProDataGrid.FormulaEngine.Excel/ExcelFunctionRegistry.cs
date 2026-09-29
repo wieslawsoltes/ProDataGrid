@@ -19,6 +19,7 @@ namespace ProDataGrid.FormulaEngine.Excel
             _functions = new Dictionary<string, IFormulaFunction>(StringComparer.OrdinalIgnoreCase);
             RegisterDefaults();
             RegisterExtendedDefaults();
+            RegisterTextExtensions();
         }
 
         public bool TryGetFunction(string name, out IFormulaFunction function)
@@ -334,22 +335,12 @@ namespace ProDataGrid.FormulaEngine.Excel
                 {
                     foreach (var element in arg.AsArray().Flatten())
                     {
-                        if (element.Kind == FormulaValueKind.Error)
-                        {
-                            return element;
-                        }
-
                         if (element.Kind == FormulaValueKind.Number)
                         {
                             count++;
                         }
                     }
                     continue;
-                }
-
-                if (arg.Kind == FormulaValueKind.Error)
-                {
-                    return arg;
                 }
 
                 if (arg.Kind == FormulaValueKind.Blank)
@@ -376,11 +367,6 @@ namespace ProDataGrid.FormulaEngine.Excel
             foreach (var entry in ExcelFunctionUtilities.EnumerateArgumentValuesWithOrigin(arguments, context, evaluator, resolver))
             {
                 var value = entry.Value;
-                if (value.Kind == FormulaValueKind.Error)
-                {
-                    return value;
-                }
-
                 if (value.Kind == FormulaValueKind.Blank)
                 {
                     continue;
@@ -421,22 +407,12 @@ namespace ProDataGrid.FormulaEngine.Excel
                 {
                     foreach (var element in arg.AsArray().Flatten())
                     {
-                        if (element.Kind == FormulaValueKind.Error)
-                        {
-                            return element;
-                        }
-
                         if (element.Kind != FormulaValueKind.Blank)
                         {
                             count++;
                         }
                     }
                     continue;
-                }
-
-                if (arg.Kind == FormulaValueKind.Error)
-                {
-                    return arg;
                 }
 
                 if (arg.Kind != FormulaValueKind.Blank)
@@ -457,11 +433,6 @@ namespace ProDataGrid.FormulaEngine.Excel
             var count = 0;
             foreach (var value in ExcelFunctionUtilities.EnumerateArgumentValues(arguments, context, evaluator, resolver))
             {
-                if (value.Kind == FormulaValueKind.Error)
-                {
-                    return value;
-                }
-
                 if (value.Kind != FormulaValueKind.Blank)
                 {
                     count++;
@@ -1381,7 +1352,7 @@ namespace ProDataGrid.FormulaEngine.Excel
                     return FormulaValue.FromError(error);
                 }
 
-                return ExcelFunctionUtilities.CreateNumber(context, text.Length);
+                return ExcelFunctionUtilities.CreateNumber(context, ExcelTextIndexing.Length(text, context.EvaluationContext.Workbook.Settings));
             });
         }
     }
@@ -1440,7 +1411,7 @@ namespace ProDataGrid.FormulaEngine.Excel
                 return FormulaValue.FromText(text);
             }
 
-            return FormulaValue.FromText(text.Substring(0, count));
+            return FormulaValue.FromText(ExcelTextIndexing.Prefix(text, count, context.EvaluationContext.Workbook.Settings));
         }
     }
 
@@ -1498,7 +1469,7 @@ namespace ProDataGrid.FormulaEngine.Excel
                 return FormulaValue.FromText(text);
             }
 
-            return FormulaValue.FromText(text.Substring(text.Length - count, count));
+            return FormulaValue.FromText(ExcelTextIndexing.Suffix(text, count, context.EvaluationContext.Workbook.Settings));
         }
     }
 
@@ -1561,13 +1532,7 @@ namespace ProDataGrid.FormulaEngine.Excel
                 return FormulaValue.FromText(string.Empty);
             }
 
-            var startIndex = start - 1;
-            if (startIndex + length > text.Length)
-            {
-                length = text.Length - startIndex;
-            }
-
-            return FormulaValue.FromText(text.Substring(startIndex, length));
+            return FormulaValue.FromText(ExcelTextIndexing.Middle(text, start, length, context.EvaluationContext.Workbook.Settings));
         }
     }
 

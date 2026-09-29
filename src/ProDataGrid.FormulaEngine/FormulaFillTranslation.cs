@@ -66,6 +66,17 @@ namespace ProDataGrid.FormulaEngine
         {
             switch (expression.Kind)
             {
+                case FormulaExpressionKind.Invocation:
+                    var invocation = (FormulaInvocationExpression)expression;
+                    var target = Rewrite(invocation.Target, rowOffset, columnOffset);
+                    var args = new FormulaExpression[invocation.Arguments.Count];
+                    var changed = !ReferenceEquals(target, invocation.Target);
+                    for (var i = 0; i < args.Length; i++)
+                    {
+                        args[i] = Rewrite(invocation.Arguments[i], rowOffset, columnOffset);
+                        changed |= !ReferenceEquals(args[i], invocation.Arguments[i]);
+                    }
+                    return changed ? new FormulaInvocationExpression(target, args) : expression;
                 case FormulaExpressionKind.Reference:
                     return RewriteReference((FormulaReferenceExpression)expression, rowOffset, columnOffset);
                 case FormulaExpressionKind.Unary:

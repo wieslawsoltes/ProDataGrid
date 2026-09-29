@@ -114,7 +114,7 @@ namespace ProDataGrid.FormulaEngine
         FormulaValue Value { get; set; }
     }
 
-    public sealed class FormulaEvaluationContext
+    public sealed partial class FormulaEvaluationContext
     {
         public FormulaEvaluationContext(
             IFormulaWorkbook workbook,
