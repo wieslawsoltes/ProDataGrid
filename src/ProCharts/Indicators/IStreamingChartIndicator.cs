@@ -5,7 +5,7 @@
 
 namespace ProCharts
 {
-    /// <summary>A reusable, single-writer indicator that consumes observations without retaining their history.</summary>
+    /// <summary>A reusable, single-writer indicator retaining algorithm-specific recurrence or bounded-window state.</summary>
     /// <typeparam name="TInput">One observation, including any required channels.</typeparam>
     /// <typeparam name="TOutput">The aligned result for the most recently consumed observation.</typeparam>
     /// <remarks>
@@ -28,7 +28,7 @@ namespace ProCharts
         void Reset();
     }
 
-    /// <summary>Aligned high, low and close channels for one observation. Open is not required by ATR.</summary>
+    /// <summary>Aligned high, low and close channels for one observation. Open is not required by ATR or Donchian channels.</summary>
     /// <param name="High">The observation's high value, or a gap.</param>
     /// <param name="Low">The observation's low value, or a gap.</param>
     /// <param name="Close">The observation's closing value, or a gap.</param>
