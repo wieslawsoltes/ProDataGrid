@@ -1,0 +1,133 @@
+name: Integrate range-area chart pipeline
+on:
+  push:
+    branches: [charting/range-area-bands]
+    paths: [.github/workflows/charting-range-prepare.yml]
+permissions:
+  contents: write
+jobs:
+  integrate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: charting/range-area-bands
+      - uses: actions/setup-dotnet@v4
+        with:
+          global-json-file: global.json
+      - name: Apply exact reviewed source integration hooks
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          def once(text, old, new):
+              if text.count(old) != 1:
+                  raise RuntimeError('Unexpected integration anchor: ' + old[:160])
+              return text.replace(old, new, 1)
+          p = Path('src/ProCharts/ChartTypes.cs')
+          t = p.read_text()
+          t = once(t, '        Gauge\n', '        Gauge,\n        /// <summary>A filled Cartesian interval between aligned lower and upper boundaries.</summary>\n        RangeArea\n')
+          p.write_text(t)
+          p = Path('src/ProCharts.Skia/SkiaChartRenderer.cs')
+          t = p.read_text()
+          for indent in ['                ', '                    ']:
+              old = indent + 'case ChartSeriesKind.Area:\n' + indent + '    DrawAreaSeries(canvas, context.Plot, series, seriesIndex, axisMin, axisMax, axisKind, style);\n' + indent + '    break;'
+              new = indent + 'case ChartSeriesKind.RangeArea:\n' + indent + '    DrawRangeAreaSeries(canvas, context.Plot, series, seriesIndex, axisMin, axisMax, axisKind, style,\n' + indent + '        context.UseNumericCategoryAxis, context.CategoryAxisKind, context.MinCategory, context.MaxCategory);\n' + indent + '    break;\n' + old
+              t = once(t, old, new)
+          old = '                if (IsFinancialSeriesKind(series.Kind))'
+          lines = [
+              '                if (series.Kind == ChartSeriesKind.RangeArea)',
+              '                {',
+              '                    for (int i = 0; i < series.Values.Count; i++)',
+              '                    {',
+              '                        if (!TryGetRangeAreaPoint(series, i, axisKind, out double low, out double high)) continue;',
+              '                        minValue = Math.Min(minValue, low);',
+              '                        maxValue = Math.Max(maxValue, high);',
+              '                        hasValue = true;',
+              '                    }',
+              '                    continue;',
+              '                }', '', old]
+          t = once(t, old, '\n'.join(lines))
+          old = 'series.Kind != ChartSeriesKind.Scatter && series.Kind != ChartSeriesKind.Bubble'
+          if t.count(old) != 2: raise RuntimeError('Unexpected numeric-category eligibility sites')
+          t = t.replace(old, old + ' && series.Kind != ChartSeriesKind.RangeArea')
+          p.write_text(t)
+          p = Path('src/ProCharts.Skia/SkiaChartRenderer.HitTest.cs')
+          t = p.read_text()
+          old = '                    case ChartSeriesKind.Column:'
+          t = once(t, old, '\n'.join([
+              '                    case ChartSeriesKind.RangeArea:',
+              '                        var rangeHit = HitTestRangeArea(point, plot, categories, series, seriesIndex, axisMin, axisMax, axisKind, style,',
+              '                            useNumericCategoryAxis, categoryAxisKind, minCategory, maxCategory);',
+              '                        if (rangeHit.HasValue) return rangeHit;',
+              '                        break;', old]))
+          p.write_text(t)
+          p = Path('src/ProCharts.Skia/SkiaChartRenderer.DataLabels.cs')
+          t = p.read_text()
+          old = '                case ChartSeriesKind.Column:'
+          t = once(t, old, '\n'.join([
+              '                case ChartSeriesKind.RangeArea:',
+              '                    DrawRangeAreaDataLabels(canvas, plot, series, seriesIndex, minValue, maxValue, valueAxisKind, style,',
+              '                        useNumericCategoryAxis, categoryAxisKind, minCategory, maxCategory, textPaint, backgroundPaint, placed);',
+              '                    break;', old]))
+          p.write_text(t)
+          p = Path('src/ProCharts.Skia/SkiaChartRenderer.Legend.cs')
+          t = p.read_text()
+          old = 'series.Kind == ChartSeriesKind.Area ||'
+          if t.count(old) != 2: raise RuntimeError('Unexpected area legend style sites')
+          t = t.replace(old, 'series.Kind == ChartSeriesKind.RangeArea || ' + old)
+          t = once(t, '                case ChartSeriesKind.Area:', '                case ChartSeriesKind.RangeArea:\n                case ChartSeriesKind.Area:')
+          p.write_text(t)
+          p = Path('src/ProCharts.Avalonia/ProChartView.cs')
+          t = p.read_text()
+          old = '            if (IsDefaultFinancialTooltip(hit) &&'
+          t = once(t, old, '\n'.join([
+              '            if (hit.SeriesKind == ChartSeriesKind.RangeArea && hit.LowValue.HasValue && hit.HighValue.HasValue)',
+              '            {',
+              '                var position = hit.XValue.HasValue ? FormatAxisValue(categoryAxis, hit.XValue.Value) : hit.Category;',
+              '                var header = string.IsNullOrWhiteSpace(position) ? seriesName : $"{seriesName} - {position}";',
+              '                return $"{header}: Low {FormatAxisValue(valueAxis, hit.LowValue.Value)}, High {FormatAxisValue(valueAxis, hit.HighValue.Value)}";',
+              '            }', '', old]))
+          p.write_text(t)
+          p = Path('src/Avalonia.Controls.DataGrid.UnitTests/Charting/RangeAreaTests.cs')
+          t = once(p.read_text(), 'ShowCategoryAxis = false, ShowValueAxis = false', 'ShowCategoryAxisLine = false, ShowValueAxisLine = false')
+          p.write_text(t)
+          p = Path('src/DataGridSample/MainWindow.axaml')
+          t = p.read_text()
+          old = '    <TabItem Header="ProCharts Area">'
+          t = once(t, old, '    <TabItem Header="ProCharts Range Area">\n      <pages:ChartRangePage />\n    </TabItem>\n' + old)
+          p.write_text(t)
+          p = Path('docfx/articles/procharts-overview.md')
+          t = p.read_text()
+          t += '\n## Filled intervals\n\n[Range areas and analytical bands](procharts-range-area.md) adds owned interval factories, filled envelopes, paired-bound tooltips and the ProCharts Range Area sample.\n'
+          p.write_text(t)
+          PY
+          git diff --check
+      - name: Commit only the reviewed source hooks
+        shell: bash
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add src/ProCharts/ChartTypes.cs src/ProCharts.Skia/SkiaChartRenderer.cs src/ProCharts.Skia/SkiaChartRenderer.HitTest.cs src/ProCharts.Skia/SkiaChartRenderer.DataLabels.cs src/ProCharts.Skia/SkiaChartRenderer.Legend.cs src/ProCharts.Avalonia/ProChartView.cs src/Avalonia.Controls.DataGrid.UnitTests/Charting/RangeAreaTests.cs src/DataGridSample/MainWindow.axaml docfx/articles/procharts-overview.md
+          git commit -m 'Integrate filled intervals into Cartesian rendering, axes, labels, legends, selection and sample navigation'
+          git push origin HEAD:refs/heads/charting/range-area-bands
+      - name: Build and test range core, rendering and bound sample
+        shell: bash
+        run: |
+          dotnet build src/ProCharts.Skia/ProCharts.Skia.csproj -c Release
+          dotnet test src/Avalonia.Controls.DataGrid.UnitTests/Avalonia.Controls.DataGrid.UnitTests.csproj -c Release -p:CollectCoverage=false --filter FullyQualifiedName~Charting --logger trx --results-directory artifacts/charting
+          dotnet test src/DataGridSample.UnitTests/DataGridSample.UnitTests.csproj -c Release --filter FullyQualifiedName~Chart --logger trx --results-directory artifacts/charting/sample
+      - name: Retain audited source and diagnostics
+        if: always()
+        shell: bash
+        run: |
+          mkdir -p artifacts/charting
+          git rev-parse HEAD > artifacts/charting/source-commit.txt
+          git archive --format=zip HEAD -o artifacts/charting/source.zip
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: range-area-integration
+          path: artifacts/charting
+          retention-days: 14

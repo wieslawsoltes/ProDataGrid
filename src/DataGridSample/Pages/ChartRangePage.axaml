@@ -1,0 +1,26 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:charts="clr-namespace:ProCharts.Avalonia;assembly=ProCharts.Avalonia"
+             xmlns:skia="clr-namespace:ProCharts.Skia;assembly=ProCharts.Skia"
+             xmlns:vm="clr-namespace:DataGridSample.ViewModels"
+             x:Class="DataGridSample.Pages.ChartRangePage"
+             x:DataType="vm:ChartRangeViewModel">
+  <UserControl.DataContext><vm:ChartRangeViewModel /></UserControl.DataContext>
+  <Grid Margin="20" RowDefinitions="Auto,Auto,*" RowSpacing="14">
+    <StackPanel Spacing="4">
+      <TextBlock Classes="h2" Text="Range areas &amp; analytical bands" />
+      <TextBlock Text="A filled eight-observation Bollinger envelope with an independent mean line. Hover the band to inspect its original lower and upper bounds."
+                 TextWrapping="Wrap" />
+    </StackPanel>
+    <Grid Grid.Row="1" ColumnDefinitions="Auto,220,Auto" ColumnSpacing="16">
+      <TextBlock Text="Band width (standard deviations)" VerticalAlignment="Center" />
+      <Slider Grid.Column="1" Minimum="0" Maximum="5" SmallChange="0.25" LargeChange="1" Value="{Binding BandWidth, Mode=TwoWay}" />
+      <CheckBox Grid.Column="2" Content="Include missing observations" IsChecked="{Binding ShowGaps, Mode=TwoWay}" />
+    </Grid>
+    <charts:ProChartView Grid.Row="2" ChartModel="{Binding Chart}" ShowToolTips="True" MinHeight="280">
+      <charts:ProChartView.ChartStyle>
+        <skia:SkiaChartStyle AreaFillOpacity="0.35" ShowCategoryGridlines="False" />
+      </charts:ProChartView.ChartStyle>
+    </charts:ProChartView>
+  </Grid>
+</UserControl>
