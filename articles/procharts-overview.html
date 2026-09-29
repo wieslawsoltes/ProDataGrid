@@ -95,7 +95,7 @@
 <tbody>
 <tr>
 <td><code>ProCharts</code></td>
-<td>Models, snapshots, axes, formatting, bounded streaming, hierarchy data/layout and analytical transforms.</td>
+<td>Models, snapshots, axes, formatting, bounded streaming, hierarchy data/layout, batch transforms and persistent incremental indicators.</td>
 </tr>
 <tr>
 <td><code>ProCharts.Skia</code></td>
@@ -112,7 +112,7 @@
 </tbody>
 </table>
 <h2 id="create-a-live-chart-model">Create a live chart model</h2>
-<pre><code class="lang-csharp">var source = new StreamingChartDataSource(10_000, &quot;Signal&quot;);
+<pre><code class="lang-csharp">var source = new StreamingChartDataSource(10_000, &quot;Signal&quot;, ChartSeriesKind.Scatter);
 source.AppendRange(new[]
 {
     new ChartSample(0, 12),
@@ -126,24 +126,30 @@ model.Request.MaxPoints = 2_000;
 model.Request.DownsampleMode = ChartDownsampleMode.MinMax;
 </code></pre>
 <p>Bind the model to <code>ProChartView.ChartModel</code>. Keep it alive while its view is in use and dispose it when the owning application/view-model is finished. Data-source notifications run on their caller's thread; marshal worker ingestion appropriately before updating UI-bound models.</p>
+<p>The example uses Scatter with a numeric category axis for proportional X positioning. Existing Line/Area kinds use category-index positioning. RangeArea can use either category indices or aligned numeric/date/log X coordinates; mixing it with ordinary Line/Area uses category positioning for the plot.</p>
 <p>For headless use, build a <code>ChartDataSnapshot</code> through the source or construct categories and <code>ChartSeriesSnapshot</code> objects directly, then call <code>SkiaChartExporter.ExportPng</code> or <code>ExportSvg</code>. Snapshots should have stable contents; cached render/interaction state must not be fed silently mutated collections.</p>
+<h2 id="live-calculations-and-filled-intervals">Live calculations and filled intervals</h2>
+<p>Batch <code>ChartIndicators</code> methods analyze complete datasets. Persistent <code>StreamingExponentialMovingAverage</code>, <code>StreamingRelativeStrengthIndex</code>, <code>StreamingMacd</code> and <code>StreamingAverageTrueRange</code> instead consume one observation at a time, retaining constant-size recurrence state with no managed allocations in Push/Reset. These are single-writer append-only calculators; corrections require reset/replay, and display-ring eviction does not reset calculation history.</p>
+<p><code>ChartRangeSeries.CreateArea</code> owns aligned lower/upper channels, and <code>ChartBandSeries.ToRangeArea()</code> turns Bollinger or Donchian bands into a filled envelope. Missing pairs break the fill. Interior tooltips retain original endpoint identity and display both bounds. The <strong>ProCharts Range Area</strong> sample combines the filled envelope with its mean line, editable band width and a missing-observation toggle.</p>
 <h2 id="data-and-interaction">Data and interaction</h2>
-<p>Grid adapters track sorting/filtering/grouping and formula results. Cached grid windows copy only the requested category/value/X/size slices; their initial source cache still needs to be built. Bounded streaming uses fixed-capacity history. Point decimation is suitable for dense continuous series, not a substitute for hierarchy/matrix semantics.</p>
-<p>Repeated point queries can reuse indexed screen-space geometry. Index construction has an up-front time and memory cost, while warm queries avoid repeated data scans. <code>UseInteractionCache = false</code> retains the reference path, and <code>ClearInteractionCache</code> explicitly releases/invalidate managed state after in-place source changes.</p>
+<p>Grid adapters track sorting/filtering/grouping and formula results. Cached grid windows copy only the requested category/value/X/size slices; their initial source cache still needs to be built. Bounded streaming uses fixed-capacity history. Point decimation is suitable for dense continuous series, not a substitute for hierarchy/matrix semantics or coordinated interval-boundary selection.</p>
+<p>Repeated supported point queries can reuse indexed screen-space geometry. Index construction has an up-front time and memory cost, while warm queries avoid repeated data scans. <code>UseInteractionCache = false</code> retains the reference path, and <code>ClearInteractionCache</code> explicitly releases or invalidates managed state after in-place source changes. Range-area selection currently uses its geometry scan, not the point index.</p>
 <p><code>ProChartView.HitTest</code> accepts local logical coordinates and supports label-free numeric data. Typed treemap/sunburst sources can enable branch double-click and back/root keyboard navigation through <code>ChartHierarchyNavigation.IsEnabled</code>. The sample's Hierarchy Explorer also supplies command buttons and a branch selector.</p>
 <h2 id="guides">Guides</h2>
 <ul>
 <li><a href="procharts-chart-model.html">Model and snapshots</a></li>
 <li><a href="procharts-data-sources.html">Data sources</a></li>
 <li><a href="procharts-streaming.html">Bounded streaming</a></li>
+<li><a href="procharts-incremental-indicators.html">Incremental EMA, RSI, MACD and ATR</a></li>
 <li><a href="procharts-windowing.html">Efficient grid windows</a></li>
 <li><a href="procharts-advanced-charts.html">Advanced chart families</a></li>
 <li><a href="procharts-indicators.html">Statistical and technical indicators</a></li>
+<li><a href="procharts-range-area.html">Filled range areas and analytical bands</a></li>
 <li><a href="procharts-hierarchy-navigation.html">Hierarchy navigation and public hit testing</a></li>
 <li><a href="procharts-interaction.html">Interaction</a></li>
 <li><a href="procharts-export-clipboard.html">Export and clipboard</a></li>
 </ul>
-<p>Additional diagram families, comprehensive accessibility semantics and physical-GPU performance qualification remain separate work. Batch indicators do not yet provide persistent incremental indicator state, and three-line bands are not a filled inter-series range renderer.</p>
+<p>Additional diagram families, comprehensive accessibility semantics, incremental versions of the remaining batch indicators, coordinated range decimation and physical-GPU performance qualification remain separate work. Measured data-preparation and calculation improvements do not imply measured UI frame-rate or GPU gains.</p>
 
 </article>
 

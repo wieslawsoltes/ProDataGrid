@@ -73812,6 +73812,44 @@ references:
   commentId: F:ProCharts.ChartPointerTool.Zoom
   fullName: ProCharts.ChartPointerTool.Zoom
   nameWithType: ChartPointerTool.Zoom
+- uid: ProCharts.ChartRangeSeries
+  name: ChartRangeSeries
+  href: api/ProCharts.ChartRangeSeries.html
+  commentId: T:ProCharts.ChartRangeSeries
+  fullName: ProCharts.ChartRangeSeries
+  nameWithType: ChartRangeSeries
+- uid: ProCharts.ChartRangeSeries.CreateArea(System.String,System.Collections.Generic.IReadOnlyList{System.Nullable{System.Double}},System.Collections.Generic.IReadOnlyList{System.Nullable{System.Double}},System.Collections.Generic.IReadOnlyList{System.Double},ProCharts.ChartValueAxisAssignment,ProCharts.ChartSeriesStyle)
+  name: CreateArea(string?, IReadOnlyList<double?>, IReadOnlyList<double?>, IReadOnlyList<double>?, ChartValueAxisAssignment, ChartSeriesStyle?)
+  href: api/ProCharts.ChartRangeSeries.html#ProCharts_ChartRangeSeries_CreateArea_System_String_System_Collections_Generic_IReadOnlyList_System_Nullable_System_Double___System_Collections_Generic_IReadOnlyList_System_Nullable_System_Double___System_Collections_Generic_IReadOnlyList_System_Double__ProCharts_ChartValueAxisAssignment_ProCharts_ChartSeriesStyle_
+  commentId: M:ProCharts.ChartRangeSeries.CreateArea(System.String,System.Collections.Generic.IReadOnlyList{System.Nullable{System.Double}},System.Collections.Generic.IReadOnlyList{System.Nullable{System.Double}},System.Collections.Generic.IReadOnlyList{System.Double},ProCharts.ChartValueAxisAssignment,ProCharts.ChartSeriesStyle)
+  name.vb: CreateArea(String, IReadOnlyList(Of Double?), IReadOnlyList(Of Double?), IReadOnlyList(Of Double), ChartValueAxisAssignment, ChartSeriesStyle)
+  fullName: ProCharts.ChartRangeSeries.CreateArea(string?, System.Collections.Generic.IReadOnlyList<double?>, System.Collections.Generic.IReadOnlyList<double?>, System.Collections.Generic.IReadOnlyList<double>?, ProCharts.ChartValueAxisAssignment, ProCharts.ChartSeriesStyle?)
+  fullName.vb: ProCharts.ChartRangeSeries.CreateArea(String, System.Collections.Generic.IReadOnlyList(Of Double?), System.Collections.Generic.IReadOnlyList(Of Double?), System.Collections.Generic.IReadOnlyList(Of Double), ProCharts.ChartValueAxisAssignment, ProCharts.ChartSeriesStyle)
+  nameWithType: ChartRangeSeries.CreateArea(string?, IReadOnlyList<double?>, IReadOnlyList<double?>, IReadOnlyList<double>?, ChartValueAxisAssignment, ChartSeriesStyle?)
+  nameWithType.vb: ChartRangeSeries.CreateArea(String, IReadOnlyList(Of Double?), IReadOnlyList(Of Double?), IReadOnlyList(Of Double), ChartValueAxisAssignment, ChartSeriesStyle)
+- uid: ProCharts.ChartRangeSeries.CreateArea*
+  name: CreateArea
+  href: api/ProCharts.ChartRangeSeries.html#ProCharts_ChartRangeSeries_CreateArea_
+  commentId: Overload:ProCharts.ChartRangeSeries.CreateArea
+  isSpec: "True"
+  fullName: ProCharts.ChartRangeSeries.CreateArea
+  nameWithType: ChartRangeSeries.CreateArea
+- uid: ProCharts.ChartRangeSeries.ToRangeArea(ProCharts.ChartBandSeries,System.String,ProCharts.ChartSeriesStyle)
+  name: ToRangeArea(ChartBandSeries, string?, ChartSeriesStyle?)
+  href: api/ProCharts.ChartRangeSeries.html#ProCharts_ChartRangeSeries_ToRangeArea_ProCharts_ChartBandSeries_System_String_ProCharts_ChartSeriesStyle_
+  commentId: M:ProCharts.ChartRangeSeries.ToRangeArea(ProCharts.ChartBandSeries,System.String,ProCharts.ChartSeriesStyle)
+  name.vb: ToRangeArea(ChartBandSeries, String, ChartSeriesStyle)
+  fullName: ProCharts.ChartRangeSeries.ToRangeArea(ProCharts.ChartBandSeries, string?, ProCharts.ChartSeriesStyle?)
+  fullName.vb: ProCharts.ChartRangeSeries.ToRangeArea(ProCharts.ChartBandSeries, String, ProCharts.ChartSeriesStyle)
+  nameWithType: ChartRangeSeries.ToRangeArea(ChartBandSeries, string?, ChartSeriesStyle?)
+  nameWithType.vb: ChartRangeSeries.ToRangeArea(ChartBandSeries, String, ChartSeriesStyle)
+- uid: ProCharts.ChartRangeSeries.ToRangeArea*
+  name: ToRangeArea
+  href: api/ProCharts.ChartRangeSeries.html#ProCharts_ChartRangeSeries_ToRangeArea_
+  commentId: Overload:ProCharts.ChartRangeSeries.ToRangeArea
+  isSpec: "True"
+  fullName: ProCharts.ChartRangeSeries.ToRangeArea
+  nameWithType: ChartRangeSeries.ToRangeArea
 - uid: ProCharts.ChartSample
   name: ChartSample
   href: api/ProCharts.ChartSample.html
@@ -74042,6 +74080,12 @@ references:
   commentId: F:ProCharts.ChartSeriesKind.Range
   fullName: ProCharts.ChartSeriesKind.Range
   nameWithType: ChartSeriesKind.Range
+- uid: ProCharts.ChartSeriesKind.RangeArea
+  name: RangeArea
+  href: api/ProCharts.ChartSeriesKind.html#ProCharts_ChartSeriesKind_RangeArea
+  commentId: F:ProCharts.ChartSeriesKind.RangeArea
+  fullName: ProCharts.ChartSeriesKind.RangeArea
+  nameWithType: ChartSeriesKind.RangeArea
 - uid: ProCharts.ChartSeriesKind.Renko
   name: Renko
   href: api/ProCharts.ChartSeriesKind.html#ProCharts_ChartSeriesKind_Renko

@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+      <title>Filled range areas and analytical bands | ProDataGrid for Avalonia </title>
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <meta name="title" content="Filled range areas and analytical bands | ProDataGrid for Avalonia ">
+      
+      
+      <link rel="icon" href="../favicon.ico">
+      <link rel="stylesheet" href="../public/docfx.min.css">
+      <link rel="stylesheet" href="../public/main.css">
+      <meta name="docfx:navrel" content="../toc.html">
+      <meta name="docfx:tocrel" content="toc.html">
+      
+      
+      
+      
+      <meta name="docfx:docurl" content="https://github.com/wieslawsoltes/ProDataGrid/blob/master/docfx/articles/procharts-range-area.md/#L1">
+      <meta name="loc:inThisArticle" content="In this article">
+      <meta name="loc:searchResultsCount" content="{count} results for &quot;{query}&quot;">
+      <meta name="loc:searchNoResults" content="No results for &quot;{query}&quot;">
+      <meta name="loc:tocFilter" content="Filter by title">
+      <meta name="loc:nextArticle" content="Next">
+      <meta name="loc:prevArticle" content="Previous">
+      <meta name="loc:themeLight" content="Light">
+      <meta name="loc:themeDark" content="Dark">
+      <meta name="loc:themeAuto" content="Auto">
+      <meta name="loc:changeTheme" content="Change theme">
+      <meta name="loc:copy" content="Copy">
+      <meta name="loc:downloadPdf" content="Download PDF">
+
+      <script type="module" src="./../public/docfx.min.js"></script>
+
+      <script>
+        const theme = localStorage.getItem('theme') || 'auto'
+        document.documentElement.setAttribute('data-bs-theme', theme === 'auto' ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light') : theme)
+      </script>
+
+  </head>
+
+  <body class="tex2jax_ignore" data-layout="" data-yaml-mime="">
+    <header class="bg-body border-bottom">
+      <nav id="autocollapse" class="navbar navbar-expand-md" role="navigation">
+        <div class="container-xxl flex-nowrap">
+          <a class="navbar-brand" href="../index.html">
+            <img id="logo" class="svg" src="../images/logo.svg" alt="">
+            
+          </a>
+          <button class="btn btn-lg d-md-none border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navpanel" aria-controls="navpanel" aria-expanded="false" aria-label="Toggle navigation">
+            <i class="bi bi-three-dots"></i>
+          </button>
+          <div class="collapse navbar-collapse" id="navpanel">
+            <div id="navbar">
+            </div>
+          </div>
+        </div>
+      </nav>
+    </header>
+
+    <main class="container-xxl">
+      <div class="toc-offcanvas">
+        <div class="offcanvas-md offcanvas-start" tabindex="-1" id="tocOffcanvas" aria-labelledby="tocOffcanvasLabel">
+          <div class="offcanvas-header">
+            <h5 class="offcanvas-title" id="tocOffcanvasLabel">Table of Contents</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="offcanvas" data-bs-target="#tocOffcanvas" aria-label="Close"></button>
+          </div>
+          <div class="offcanvas-body">
+            <nav class="toc" id="toc"></nav>
+          </div>
+        </div>
+      </div>
+
+      <div class="content">
+        <div class="actionbar">
+          <button class="btn btn-lg border-0 d-md-none" type="button" data-bs-toggle="offcanvas" data-bs-target="#tocOffcanvas" aria-controls="tocOffcanvas" aria-expanded="false" aria-label="Show table of contents">
+            <i class="bi bi-list"></i>
+          </button>
+
+          <nav id="breadcrumb"></nav>
+        </div>
+
+        <article data-uid="">
+<h1 id="filled-range-areas-and-analytical-bands">Filled range areas and analytical bands</h1>
+
+<p><code>ChartSeriesKind.RangeArea</code> fills the interval between aligned lower and upper boundaries. It is a Cartesian series, so it uses the existing renderer, gridlines, axes, legends, per-series styles, render-cache layers, data labels, hit testing and PNG/SVG exports. It is distinct from the existing financial <code>Range</code> chart kind.</p>
+<pre><code class="lang-csharp">ChartSeriesSnapshot interval = ChartRangeSeries.CreateArea(
+    &quot;Forecast interval&quot;,
+    lower: new double?[] { 10, 15, null, 20, 25 },
+    upper: new double?[] { 30, 35, null, 40, 50 });
+var snapshot = new ChartDataSnapshot(
+    new string?[] { &quot;Mon&quot;, &quot;Tue&quot;, &quot;Wed&quot;, &quot;Thu&quot;, &quot;Fri&quot; },
+    new[] { interval });
+var style = new SkiaChartStyle { AreaFillOpacity = 0.35f, ShowDataLabels = true };
+byte[] image = SkiaChartExporter.ExportPng(snapshot, 960, 540, style);
+</code></pre>
+<p>The factory defensively copies boundaries and optional X coordinates. <code>Values</code> contains midpoints, while <code>LowValues</code> and <code>HighValues</code> retain actual interval boundaries. Incomplete or non-finite pairs become gaps in all three channels; finite inverted intervals are rejected. Optional X coordinates must be finite, strictly increasing and aligned with every interval. Use a numeric, date/time or logarithmic category axis for proportional X positioning. Date/time coordinates use the renderer's existing OLE Automation date convention.</p>
+<h2 id="analytical-and-grid-derived-data">Analytical and grid-derived data</h2>
+<pre><code class="lang-csharp">// Input can be a value series from an existing DataGridChartModel snapshot.
+ChartBandSeries bands = ChartIndicators.BollingerBands(price, period: 20, standardDeviations: 2);
+ChartSeriesSnapshot filled = bands.ToRangeArea(&quot;Bollinger envelope&quot;);
+var snapshot = new ChartDataSnapshot(categories, new[] { filled, bands.Middle });
+</code></pre>
+<p>Donchian channels use the same conversion. The original middle/boundary line series remain independently usable. Range factories do not implicitly add low/high selectors to the grid adapter: derive bands from its value series or provide aligned boundaries explicitly.</p>
+<p>A category-axis plot can combine filled ranges with ordinary lines/areas/columns. Numeric-X plots support range areas alongside scatter/bubble series whose X channels are aligned. The existing ordinary Line/Area renderers remain category-positioned; mixing those kinds makes the plot use category positioning. This work does not silently change existing Line/Area X semantics.</p>
+<h2 id="geometry-gaps-and-selection">Geometry, gaps and selection</h2>
+<p>Boundaries are linearly interpolated in projected axis coordinates. Missing/invalid intervals break the polygon; logarithmic value axes require both boundaries to be positive. Raw snapshots bypassing the factory are handled defensively: ragged, non-finite and inverted pairs are gaps. Non-increasing projected X begins a new run rather than producing a self-crossing fill. Values determines the point count, but complete low/high pairs determine visible geometry even when a raw midpoint is absent.</p>
+<p>Draw and hit testing share projection rules. Endpoints are not clamped to viewport edges before interpolation: the original sloping interval is clipped to the plot, avoiding a false bend at zoom boundaries. Non-finite projected coordinates cannot enter a native path. Very large values combined with extremely narrow explicit axes may exceed screen-coordinate precision and are omitted; this is not arbitrary-precision clipping.</p>
+<p>Pointer hits inside the filled interval return the nearest source endpoint in X, preserving original point/series/category identity and original <code>LowValue</code>, <code>HighValue</code> and midpoint <code>Value</code>. Ties choose the earlier endpoint; no interpolated observation is invented. <code>Location</code> anchors that source interval, not the exact pointer position. The host's default tooltip displays both bounds. Boundary-column tolerance uses <code>HitTestRadius</code>; a single interval can be selected there without inventing a finite-width filled rectangle. As with existing filled/column families, the first matching series takes precedence in overlapping plots.</p>
+<h2 id="styling-and-limits">Styling and limits</h2>
+<p>Fill color, gradient, stroke color/width/dashes, theme overrides and <code>AreaFillOpacity</code> use existing style APIs. The legend shows an area swatch. Data labels show both bounds and honor existing numeric formatters. No additional native resources are retained outside the existing render cache: paint/shader/effect resources are scoped per series and geometry lists/paths use existing pools.</p>
+<p>This adds linear range areas, not smoothed/step range interpolation, range columns/bars, stacking of intervals, indexed range-area interaction, or automatic range decimation. Preserve both aligned boundaries when preparing data; independently downsampling the two lines can misrepresent interval width. The standalone factory deliberately does not resample. No GPU/frame-rate speedup is claimed.</p>
+
+</article>
+
+        <div class="contribution d-print-none">
+          <a href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/docfx/articles/procharts-range-area.md/#L1" class="edit-link">Edit this page</a>
+        </div>
+
+        <div class="next-article d-print-none border-top" id="nextArticle"></div>
+
+      </div>
+
+      <div class="affix">
+        <nav id="affix"></nav>
+      </div>
+    </main>
+
+
+    <footer class="border-top text-secondary">
+      <div class="container-xxl">
+        <div class="flex-fill">
+          <span>Made with <a href="https://dotnet.github.io/docfx">docfx</a></span>
+        </div>
+      </div>
+    </footer>
+  </body>
+</html>
