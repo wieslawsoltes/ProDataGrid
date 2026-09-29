@@ -80,6 +80,8 @@ jobs:
           mkdir -p artifacts/formula
           git rev-parse HEAD > artifacts/formula/revision.txt
           git ls-tree -r HEAD src/ProDataGrid.FormulaEngine src/ProDataGrid.FormulaEngine.Excel src/ProDataGrid.FormulaEngine.UnitTests tools/formula-function-benchmarks tools/formula-aggregate-benchmarks tools/formula-data-benchmarks > artifacts/formula/source-blobs.txt
+          # Retain tracked source only, never generated files, credentials, or build outputs.
+          git archive --format=tar.gz -o artifacts/formula/source.tar.gz HEAD
           dotnet --info > artifacts/formula/runtime.txt
           dotnet --list-runtimes > artifacts/formula/installed-runtimes.txt
           lscpu > artifacts/formula/cpu.txt
