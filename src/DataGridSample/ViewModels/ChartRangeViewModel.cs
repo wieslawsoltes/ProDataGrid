@@ -4,11 +4,13 @@ using ReactiveUI;
 
 namespace DataGridSample.ViewModels
 {
-    /// <summary>Range-area example using generated observations, editable band width and real data gaps.</summary>
+    /// <summary>Editable analytical bands and a dense-data demonstration of coordinated interval reduction.</summary>
     public sealed class ChartRangeViewModel : ReactiveObject
     {
         private double _bandWidth = 2;
         private bool _showGaps = true;
+        private bool _largeDataset;
+        private bool _reduceData = true;
 
         public ChartRangeViewModel()
         {
@@ -21,6 +23,7 @@ namespace DataGridSample.ViewModels
                 new ChartSeriesStyle { StrokeWidth = 1 },
                 new ChartSeriesStyle { MarkerShape = ChartMarkerShape.None, StrokeWidth = 2 }
             };
+            Chart.SnapshotChanged += (_, _) => this.RaisePropertyChanged(nameof(RenderingSummary));
             Rebuild();
         }
 
@@ -49,17 +52,84 @@ namespace DataGridSample.ViewModels
             }
         }
 
-        private void Rebuild()
+        public bool LargeDataset
         {
-            double?[] values = new double?[96];
-            for (int i = 0; i < values.Length; i++)
-                values[i] = ShowGaps && (i == 32 || i == 68) ? null : 100 + Math.Sin(i * 0.14) * 12 + Math.Cos(i * 0.6) * 2 + i * 0.08;
-            ChartBandSeries bands = ChartIndicators.BollingerBands(new ChartSeriesSnapshot("Signal", ChartSeriesKind.Line, values), 8, BandWidth);
-            Chart.DataSource = new BandSource(bands);
+            get => _largeDataset;
+            set
+            {
+                if (_largeDataset == value) return;
+                using (Chart.DeferRefresh())
+                {
+                    this.RaiseAndSetIfChanged(ref _largeDataset, value);
+                    Chart.Request.WindowStart = null;
+                    Chart.Request.WindowCount = null;
+                    Rebuild();
+                }
+            }
         }
 
-        // All state is owned by the view model; no timer, global event or external source needs detaching.
-        // Source replacement is handled by ChartModel. Windowing occurs after calculating full-history bands.
+        public bool ReduceData
+        {
+            get => _reduceData;
+            set
+            {
+                if (_reduceData == value) return;
+                this.RaiseAndSetIfChanged(ref _reduceData, value);
+                ApplyDisplayPolicy();
+            }
+        }
+
+        public string RenderingSummary
+        {
+            get
+            {
+                int total = (Chart.DataSource as IChartWindowInfoProvider)?.GetTotalCategoryCount() ?? 0;
+                return $"{total:N0} source observations · {Chart.Snapshot.Categories.Count:N0} displayed intervals · " +
+                    (LargeDataset && ReduceData ? "paired extrema (approximate display; gaps retained)" : "full-resolution window");
+            }
+        }
+
+        private void ApplyDisplayPolicy()
+        {
+            using (Chart.DeferRefresh())
+            {
+                Chart.Request.MaxPoints = LargeDataset && ReduceData ? 800 : null;
+                Chart.Request.DownsampleMode = LargeDataset && ReduceData ? ChartDownsampleMode.MinMax : ChartDownsampleMode.None;
+            }
+            this.RaisePropertyChanged(nameof(RenderingSummary));
+        }
+
+        private void Rebuild()
+        {
+            int count = LargeDataset ? 100000 : 96;
+            double?[] values = new double?[count];
+            for (int i = 0; i < values.Length; i++)
+            {
+                bool missing = LargeDataset ? (i >= 32000 && i < 33000) || (i >= 68000 && i < 68500) : i == 32 || i == 68;
+                double t = LargeDataset ? i * 0.001 : i;
+                double variation = LargeDataset ? Math.Sin(i * 0.73) * 1.8 : 0;
+                values[i] = ShowGaps && missing ? null : 100 + Math.Sin(t * 0.14) * 12 + Math.Cos(t * 0.6) * 2 + t * 0.08 + variation;
+            }
+            ChartBandSeries bands = ChartIndicators.BollingerBands(new ChartSeriesSnapshot("Signal", ChartSeriesKind.Line, values),
+                LargeDataset ? 64 : 8, BandWidth);
+            // Publish only the final combination of data, axis and request. In particular, switching
+            // back to the small example must not first copy a full 100,000-point transient snapshot.
+            using (Chart.DeferRefresh())
+            {
+                Chart.CategoryAxis.Kind = LargeDataset ? ChartAxisKind.Value : ChartAxisKind.Category;
+                ApplyDisplayPolicy();
+                if (LargeDataset)
+                {
+                    double[] x = new double[count];
+                    for (int i = 0; i < count; i++) x[i] = i + 1;
+                    Chart.DataSource = new RangeChartDataSource("Dense Bollinger envelope", bands.Lower.Values, bands.Upper.Values, x);
+                }
+                else Chart.DataSource = new BandSource(bands);
+            }
+        }
+
+        // Small original example keeps its category-positioned independent mean line. Dense mode
+        // uses the reusable numeric-X range source; the reduction toggle reuses its owned input.
         private sealed class BandSource : IChartDataSource, IChartWindowInfoProvider
         {
             private readonly ChartBandSeries _bands;

@@ -9,17 +9,23 @@
   <Grid Margin="20" RowDefinitions="Auto,Auto,*" RowSpacing="14">
     <StackPanel Spacing="4">
       <TextBlock Classes="h2" Text="Range areas &amp; analytical bands" />
-      <TextBlock Text="A filled eight-observation Bollinger envelope with an independent mean line. Hover the band to inspect its original lower and upper bounds."
+      <TextBlock Text="Inspect original Low/High bounds. The small example includes a mean line; dense mode reduces both envelope boundaries together while retaining their original observation positions."
                  TextWrapping="Wrap" />
     </StackPanel>
-    <Grid Grid.Row="1" ColumnDefinitions="Auto,220,Auto" ColumnSpacing="16">
+    <Grid Grid.Row="1" RowDefinitions="Auto,Auto,Auto" ColumnDefinitions="Auto,220,Auto" ColumnSpacing="16" RowSpacing="8">
       <TextBlock Text="Band width (standard deviations)" VerticalAlignment="Center" />
       <Slider Grid.Column="1" Minimum="0" Maximum="5" SmallChange="0.25" LargeChange="1" Value="{Binding BandWidth, Mode=TwoWay}" />
       <CheckBox Grid.Column="2" Content="Include missing observations" IsChecked="{Binding ShowGaps, Mode=TwoWay}" />
+      <StackPanel Grid.Row="1" Grid.ColumnSpan="3" Orientation="Horizontal" Spacing="20">
+        <CheckBox Content="100,000 observations" IsChecked="{Binding LargeDataset, Mode=TwoWay}" />
+        <CheckBox Content="Reduce display (800-point budget)" IsEnabled="{Binding LargeDataset}"
+                  IsChecked="{Binding ReduceData, Mode=TwoWay}" />
+      </StackPanel>
+      <TextBlock Grid.Row="2" Grid.ColumnSpan="3" Text="{Binding RenderingSummary}" TextWrapping="Wrap" />
     </Grid>
     <charts:ProChartView Grid.Row="2" ChartModel="{Binding Chart}" ShowToolTips="True" MinHeight="280">
       <charts:ProChartView.ChartStyle>
-        <skia:SkiaChartStyle AreaFillOpacity="0.35" ShowCategoryGridlines="False" />
+        <skia:SkiaChartStyle AreaFillOpacity="0.35" ShowCategoryGridlines="False" PaddingRight="44" />
       </charts:ProChartView.ChartStyle>
     </charts:ProChartView>
   </Grid>
