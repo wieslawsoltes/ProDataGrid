@@ -149,10 +149,10 @@ Class SkiaChartRenderer  <a class="header-action link-secondary" title="View sou
 
   <h3 id="ProCharts_Skia_SkiaChartRenderer_UseInteractionCache" data-uid="ProCharts.Skia.SkiaChartRenderer.UseInteractionCache">
   UseInteractionCache
-  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/ProCharts.Skia/SkiaChartRenderer.Interaction.cs/#L26"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/ProCharts.Skia/SkiaChartRenderer.Interaction.cs/#L28"><i class="bi bi-code-slash"></i></a>
   </h3>
 
-  <div class="markdown level1 summary"><p>Gets or sets whether line, area, scatter and bubble plots reuse layout and indexed point queries.</p>
+  <div class="markdown level1 summary"><p>Gets or sets whether line, area, scatter, bubble and range-area plots reuse layout and indexed queries.</p>
 </div>
   <div class="markdown level1 conceptual"></div>
 
@@ -176,7 +176,8 @@ Class SkiaChartRenderer  <a class="header-action link-secondary" title="View sou
   <h4 class="section" id="ProCharts_Skia_SkiaChartRenderer_UseInteractionCache_remarks">Remarks</h4>
   <div class="markdown level1 remarks"><p>Enabled by default. Snapshots and their collections must remain stable. Replace the snapshot after data
 changes, or call ClearInteractionCache after in-place edits. The renderer is not thread-safe.
-Unsupported mixed plots and plots exceeding one million source points retain the reference path.</p>
+Unsupported mixed plots and plots exceeding one million source points retain the reference path.
+Range areas with decreasing projected X coordinates retain reference selection, with cached layout.</p>
 </div>
 
 
@@ -190,10 +191,10 @@ Unsupported mixed plots and plots exceeding one million source points retain the
 
   <h3 id="ProCharts_Skia_SkiaChartRenderer_ClearInteractionCache" data-uid="ProCharts.Skia.SkiaChartRenderer.ClearInteractionCache">
   ClearInteractionCache()
-  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/ProCharts.Skia/SkiaChartRenderer.Interaction.cs/#L39"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/ProCharts.Skia/SkiaChartRenderer.Interaction.cs/#L41"><i class="bi bi-code-slash"></i></a>
   </h3>
 
-  <div class="markdown level1 summary"><p>Releases managed point-index/layout data, including data retained by advanced chart layouts.</p>
+  <div class="markdown level1 summary"><p>Releases managed point/range-index and layout data, including advanced chart layouts.</p>
 </div>
   <div class="markdown level1 conceptual"></div>
 
