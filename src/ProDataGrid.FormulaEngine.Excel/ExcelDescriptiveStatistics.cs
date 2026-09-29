@@ -31,44 +31,20 @@ namespace ProDataGrid.FormulaEngine.Excel
             if (operation == ExcelDescriptiveOperation.GeometricMean || operation == ExcelDescriptiveOperation.HarmonicMean)
                 return PositiveMean(values, settings, operation == ExcelDescriptiveOperation.GeometricMean);
 
-            var maximum = 0d;
-            for (var i = 0; i < count; i++) maximum = Math.Max(maximum, Math.Abs(values[i]));
+            var maximum = ExcelMomentKernels.MaximumMagnitude(values);
             var exponent = maximum == 0 ? 0 : Math.ILogB(maximum);
-            var factor = Math.ScaleB(1d, -exponent);
-            // Multiplication is sufficient except when scaling subnormal inputs upward.
-            // The ScaleB fallback handles that case without an infinite scale factor.
-            var ordinaryScale = double.IsFinite(factor);
-            var origin = ordinaryScale ? values[0] * factor : Math.ScaleB(values[0], -exponent);
-            var sum = new ExcelCompensatedSum();
-            for (var i = 0; i < count; i++)
-            {
-                var scaled = ordinaryScale ? values[i] * factor : Math.ScaleB(values[i], -exponent);
-                values[i] = operation == ExcelDescriptiveOperation.SumSquares ? scaled : scaled - origin;
-                sum.Add(operation == ExcelDescriptiveOperation.SumSquares ? scaled * scaled : values[i]);
-            }
+            var origin = Math.ScaleB(values[0], -exponent);
+            var sum = ExcelMomentKernels.Normalize(values, exponent, origin, operation == ExcelDescriptiveOperation.SumSquares);
             if (operation == ExcelDescriptiveOperation.SumSquares)
-                return Number(settings, Math.ScaleB(sum.Total, 2 * exponent));
+                return Number(settings, Math.ScaleB(sum, 2 * exponent));
 
-            // Keep the origin and mean offset separate: forming origin+offset would lose
-            // small but representable variation on a large common offset.
-            var meanOffset = sum.Total / count;
-            var residual = new ExcelCompensatedSum();
-            for (var i = 0; i < count; i++)
-            {
-                values[i] -= meanOffset;
-                residual.Add(values[i]);
-            }
-            var correction = residual.Total / count;
-            var second = new ExcelCompensatedSum();
+            // Keep the origin and mean offset separate to retain small representable spreads.
+            var meanOffset = sum / count;
+            var correction = ExcelMomentKernels.SubtractAndSum(values, meanOffset) / count;
+            var m2 = ExcelMomentKernels.RecenterAndSquares(values, correction);
             var absolute = new ExcelCompensatedSum();
-            for (var i = 0; i < count; i++)
-            {
-                var delta = values[i] - correction;
-                values[i] = delta;
-                second.Add(delta * delta);
-                if (operation == ExcelDescriptiveOperation.AbsoluteDeviation) absolute.Add(Math.Abs(delta));
-            }
-            var m2 = second.Total;
+            if (operation == ExcelDescriptiveOperation.AbsoluteDeviation)
+                for (var i = 0; i < count; i++) absolute.Add(Math.Abs(values[i]));
             var n = (double)count;
             switch (operation)
             {

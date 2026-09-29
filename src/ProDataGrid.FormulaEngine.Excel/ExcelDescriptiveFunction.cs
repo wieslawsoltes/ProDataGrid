@@ -73,7 +73,13 @@ namespace ProDataGrid.FormulaEngine.Excel
                     for (var column = 0; column < array.ColumnCount; column++)
                     {
                         if (!array.IsPresent(row, column)) continue;
-                        if (!TryScalar(ref sample, array[row, column], true, includeLogical, settings, out error)) return false;
+                        var item = array[row, column];
+                        if (item.Kind == FormulaValueKind.Number)
+                        {
+                            if (sample.Count >= settings.MaximumArrayCellCount) { error = new FormulaError(FormulaErrorType.Num); return false; }
+                            if (!sample.TryAddNumber(item.AsNumber(), settings, out error)) return false;
+                        }
+                        else if (!TryScalar(ref sample, item, true, includeLogical, settings, out error)) return false;
                     }
                 return true;
             }
@@ -97,7 +103,8 @@ namespace ProDataGrid.FormulaEngine.Excel
                 return false;
             }
             if (sample.Count >= settings.MaximumArrayCellCount) { error = new FormulaError(FormulaErrorType.Num); return false; }
-            return sample.TryAdd(value, settings, out error);
+            return value.Kind == FormulaValueKind.Number
+                ? sample.TryAddNumber(value.AsNumber(), settings, out error) : sample.TryAdd(value, settings, out error);
         }
     }
 

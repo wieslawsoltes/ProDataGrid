@@ -48,6 +48,8 @@ jobs:
           dotnet test src/ProDataGrid.FormulaEngine.UnitTests/ProDataGrid.FormulaEngine.UnitTests.csproj -c Release -p:FormulaTestFramework=net8.0 --logger trx --results-directory artifacts/formula/net8 2>&1 | tee artifacts/formula/net8.log
           dotnet test src/ProDataGrid.FormulaEngine.UnitTests/ProDataGrid.FormulaEngine.UnitTests.csproj -c Release -p:FormulaTestFramework=net10.0 --logger trx --results-directory artifacts/formula/net10 2>&1 | tee artifacts/formula/net10.log
           dotnet build src/ProDataGrid.FormulaEngine.Excel/ProDataGrid.FormulaEngine.Excel.csproj -c Release
+          # Exercise the scalar numerical fallback as well as the host SIMD path.
+          DOTNET_EnableHWIntrinsic=0 dotnet test src/ProDataGrid.FormulaEngine.UnitTests/ProDataGrid.FormulaEngine.UnitTests.csproj -c Release -p:FormulaTestFramework=net10.0 --no-restore --logger trx --results-directory artifacts/formula/scalar
       - name: Build and execute reusable formula smoke and aggregate benchmarks
         run: |
           set -o pipefail

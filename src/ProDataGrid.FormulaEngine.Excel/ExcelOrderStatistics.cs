@@ -6,6 +6,7 @@
 using System;
 using System.Buffers;
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 using ProDataGrid.FormulaEngine;
 
 namespace ProDataGrid.FormulaEngine.Excel
@@ -41,22 +42,26 @@ namespace ProDataGrid.FormulaEngine.Excel
             return TryAddNumber(number, settings, out error);
         }
 
-        private bool TryAddNumber(double number, FormulaCalculationSettings settings, out FormulaError error)
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public bool TryAddNumber(double number, FormulaCalculationSettings settings, out FormulaError error)
         {
             error = default;
             if (!double.IsFinite(number)) { error = new FormulaError(FormulaErrorType.Num); return false; }
-            if (Count == _values.Length)
-            {
-                var capacity = (int)Math.Min(Array.MaxLength, Math.Max(16L, (long)_values.Length * 2));
-                if (capacity <= Count) { error = new FormulaError(FormulaErrorType.Num); return false; }
-                var next = ArrayPool<double>.Shared.Rent(capacity);
-                Values.CopyTo(next);
-                if (_rented != null) { Values.Clear(); ArrayPool<double>.Shared.Return(_rented); }
-                _rented = next;
-                _values = next;
-            }
+            if (Count == _values.Length && !Grow()) { error = new FormulaError(FormulaErrorType.Num); return false; }
             _values[Count++] = settings.ApplyNumberPrecision
                 ? FormulaNumberUtilities.ApplyPrecision(number, settings.NumberPrecisionDigits) : number;
+            return true;
+        }
+
+        private bool Grow()
+        {
+            var capacity = (int)Math.Min(Array.MaxLength, Math.Max(16L, (long)_values.Length * 2));
+            if (capacity <= Count) return false;
+            var next = ArrayPool<double>.Shared.Rent(capacity);
+            Values.CopyTo(next);
+            if (_rented != null) { Values.Clear(); ArrayPool<double>.Shared.Return(_rented); }
+            _rented = next;
+            _values = next;
             return true;
         }
 
