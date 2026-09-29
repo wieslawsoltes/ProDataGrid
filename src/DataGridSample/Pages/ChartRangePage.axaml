@@ -3,6 +3,7 @@
              xmlns:charts="clr-namespace:ProCharts.Avalonia;assembly=ProCharts.Avalonia"
              xmlns:skia="clr-namespace:ProCharts.Skia;assembly=ProCharts.Skia"
              xmlns:vm="clr-namespace:DataGridSample.ViewModels"
+             xmlns:pages="clr-namespace:DataGridSample.Pages"
              x:Class="DataGridSample.Pages.ChartRangePage"
              x:DataType="vm:ChartRangeViewModel">
   <UserControl.DataContext><vm:ChartRangeViewModel /></UserControl.DataContext>
@@ -11,6 +12,13 @@
       <TextBlock Classes="h2" Text="Range areas &amp; analytical bands" />
       <TextBlock Text="Inspect original Low/High bounds. The small example includes a mean line; dense mode reduces both envelope boundaries together while retaining their original observation positions."
                  TextWrapping="Wrap" />
+      <Button Content="Open bounded live interval demo" HorizontalAlignment="Left">
+        <Button.Flyout>
+          <Flyout Placement="Bottom">
+            <pages:ChartStreamingRangePage Width="840" Height="500" />
+          </Flyout>
+        </Button.Flyout>
+      </Button>
     </StackPanel>
     <Grid Grid.Row="1" RowDefinitions="Auto,Auto,Auto" ColumnDefinitions="Auto,220,Auto" ColumnSpacing="16" RowSpacing="8">
       <TextBlock Text="Band width (standard deviations)" VerticalAlignment="Center" />

@@ -14,6 +14,7 @@ on:
       - 'tests/ProCharts.Decimation.Benchmarks/**'
       - 'tests/ProCharts.Interaction.Benchmarks/**'
       - 'tests/ProCharts.Range.Benchmarks/**'
+      - 'tests/ProCharts.RangeStreaming.Benchmarks/**'
       - 'tests/ProCharts.Streaming.Benchmarks/**'
       - 'tests/ProDataGrid.Charting.Benchmarks/**'
       - '.github/workflows/charting.yml'
@@ -32,6 +33,7 @@ on:
       - 'tests/ProCharts.Decimation.Benchmarks/**'
       - 'tests/ProCharts.Interaction.Benchmarks/**'
       - 'tests/ProCharts.Range.Benchmarks/**'
+      - 'tests/ProCharts.RangeStreaming.Benchmarks/**'
       - 'tests/ProCharts.Streaming.Benchmarks/**'
       - 'tests/ProDataGrid.Charting.Benchmarks/**'
       - '.github/workflows/charting.yml'
@@ -92,6 +94,11 @@ jobs:
         run: |
           set -o pipefail
           dotnet run --project tests/ProCharts.Decimation.Benchmarks/ProCharts.Decimation.Benchmarks.csproj -c Release | tee artifacts/charting/range-decimation-performance.txt
+      - name: Compare replacement and streaming range ingestion
+        shell: bash
+        run: |
+          set -o pipefail
+          dotnet run --project tests/ProCharts.RangeStreaming.Benchmarks/ProCharts.RangeStreaming.Benchmarks.csproj -c Release | tee artifacts/charting/range-streaming-performance.txt
       - name: Compare batch and incremental indicators
         shell: bash
         run: |
