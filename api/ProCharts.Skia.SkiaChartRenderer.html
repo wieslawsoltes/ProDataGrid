@@ -141,8 +141,79 @@ Class SkiaChartRenderer  <a class="header-action link-secondary" title="View sou
 
 
 
+  <h2 class="section" id="properties">Properties
+</h2>
+
+
+  <a id="ProCharts_Skia_SkiaChartRenderer_UseInteractionCache_" data-uid="ProCharts.Skia.SkiaChartRenderer.UseInteractionCache*"></a>
+
+  <h3 id="ProCharts_Skia_SkiaChartRenderer_UseInteractionCache" data-uid="ProCharts.Skia.SkiaChartRenderer.UseInteractionCache">
+  UseInteractionCache
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/ProCharts.Skia/SkiaChartRenderer.Interaction.cs/#L26"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Gets or sets whether line, area, scatter and bubble plots reuse layout and indexed point queries.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public bool UseInteractionCache { get; set; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+  <h4 class="section" id="ProCharts_Skia_SkiaChartRenderer_UseInteractionCache_remarks">Remarks</h4>
+  <div class="markdown level1 remarks"><p>Enabled by default. Snapshots and their collections must remain stable. Replace the snapshot after data
+changes, or call ClearInteractionCache after in-place edits. The renderer is not thread-safe.
+Unsupported mixed plots and plots exceeding one million source points retain the reference path.</p>
+</div>
+
+
+
+
   <h2 class="section" id="methods">Methods
 </h2>
+
+
+  <a id="ProCharts_Skia_SkiaChartRenderer_ClearInteractionCache_" data-uid="ProCharts.Skia.SkiaChartRenderer.ClearInteractionCache*"></a>
+
+  <h3 id="ProCharts_Skia_SkiaChartRenderer_ClearInteractionCache" data-uid="ProCharts.Skia.SkiaChartRenderer.ClearInteractionCache">
+  ClearInteractionCache()
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/ProCharts.Skia/SkiaChartRenderer.Interaction.cs/#L39"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Releases managed point-index/layout data, including data retained by advanced chart layouts.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public void ClearInteractionCache()</code></pre>
+  </div>
+
+
+
+
+
+
+
+
+
+  <h4 class="section" id="ProCharts_Skia_SkiaChartRenderer_ClearInteractionCache_remarks">Remarks</h4>
+  <div class="markdown level1 remarks"><p>Call after in-place changes to source collections or state captured by formatter delegates.</p>
+</div>
+
+
 
 
   <a id="ProCharts_Skia_SkiaChartRenderer_HitTest_" data-uid="ProCharts.Skia.SkiaChartRenderer.HitTest*"></a>

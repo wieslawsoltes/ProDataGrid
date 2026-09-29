@@ -75607,6 +75607,19 @@ references:
   commentId: T:ProCharts.Skia.SkiaChartRenderer
   fullName: ProCharts.Skia.SkiaChartRenderer
   nameWithType: SkiaChartRenderer
+- uid: ProCharts.Skia.SkiaChartRenderer.ClearInteractionCache
+  name: ClearInteractionCache()
+  href: api/ProCharts.Skia.SkiaChartRenderer.html#ProCharts_Skia_SkiaChartRenderer_ClearInteractionCache
+  commentId: M:ProCharts.Skia.SkiaChartRenderer.ClearInteractionCache
+  fullName: ProCharts.Skia.SkiaChartRenderer.ClearInteractionCache()
+  nameWithType: SkiaChartRenderer.ClearInteractionCache()
+- uid: ProCharts.Skia.SkiaChartRenderer.ClearInteractionCache*
+  name: ClearInteractionCache
+  href: api/ProCharts.Skia.SkiaChartRenderer.html#ProCharts_Skia_SkiaChartRenderer_ClearInteractionCache_
+  commentId: Overload:ProCharts.Skia.SkiaChartRenderer.ClearInteractionCache
+  isSpec: "True"
+  fullName: ProCharts.Skia.SkiaChartRenderer.ClearInteractionCache
+  nameWithType: SkiaChartRenderer.ClearInteractionCache
 - uid: ProCharts.Skia.SkiaChartRenderer.HitTest(SkiaSharp.SKPoint,SkiaSharp.SKRect,ProCharts.ChartDataSnapshot,ProCharts.Skia.SkiaChartStyle)
   name: HitTest(SKPoint, SKRect, ChartDataSnapshot, SkiaChartStyle?)
   href: api/ProCharts.Skia.SkiaChartRenderer.html#ProCharts_Skia_SkiaChartRenderer_HitTest_SkiaSharp_SKPoint_SkiaSharp_SKRect_ProCharts_ChartDataSnapshot_ProCharts_Skia_SkiaChartStyle_
@@ -75682,6 +75695,19 @@ references:
   isSpec: "True"
   fullName: ProCharts.Skia.SkiaChartRenderer.TryGetViewportInfo
   nameWithType: SkiaChartRenderer.TryGetViewportInfo
+- uid: ProCharts.Skia.SkiaChartRenderer.UseInteractionCache
+  name: UseInteractionCache
+  href: api/ProCharts.Skia.SkiaChartRenderer.html#ProCharts_Skia_SkiaChartRenderer_UseInteractionCache
+  commentId: P:ProCharts.Skia.SkiaChartRenderer.UseInteractionCache
+  fullName: ProCharts.Skia.SkiaChartRenderer.UseInteractionCache
+  nameWithType: SkiaChartRenderer.UseInteractionCache
+- uid: ProCharts.Skia.SkiaChartRenderer.UseInteractionCache*
+  name: UseInteractionCache
+  href: api/ProCharts.Skia.SkiaChartRenderer.html#ProCharts_Skia_SkiaChartRenderer_UseInteractionCache_
+  commentId: Overload:ProCharts.Skia.SkiaChartRenderer.UseInteractionCache
+  isSpec: "True"
+  fullName: ProCharts.Skia.SkiaChartRenderer.UseInteractionCache
+  nameWithType: SkiaChartRenderer.UseInteractionCache
 - uid: ProCharts.Skia.SkiaChartSeriesStyle
   name: SkiaChartSeriesStyle
   href: api/ProCharts.Skia.SkiaChartSeriesStyle.html
