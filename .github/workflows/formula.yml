@@ -48,6 +48,8 @@ jobs:
           dotnet test src/ProDataGrid.FormulaEngine.UnitTests/ProDataGrid.FormulaEngine.UnitTests.csproj -c Release -p:FormulaTestFramework=net8.0 --logger trx --results-directory artifacts/formula/net8 2>&1 | tee artifacts/formula/net8.log
           dotnet test src/ProDataGrid.FormulaEngine.UnitTests/ProDataGrid.FormulaEngine.UnitTests.csproj -c Release -p:FormulaTestFramework=net10.0 --logger trx --results-directory artifacts/formula/net10 2>&1 | tee artifacts/formula/net10.log
           dotnet build src/ProDataGrid.FormulaEngine.Excel/ProDataGrid.FormulaEngine.Excel.csproj -c Release
+          # Exercise the scalar numerical fallback as well as the host SIMD path.
+          DOTNET_EnableHWIntrinsic=0 dotnet test src/ProDataGrid.FormulaEngine.UnitTests/ProDataGrid.FormulaEngine.UnitTests.csproj -c Release -p:FormulaTestFramework=net10.0 --no-restore --logger trx --results-directory artifacts/formula/scalar
       - name: Build and execute reusable formula smoke and aggregate benchmarks
         run: |
           set -o pipefail
@@ -61,12 +63,19 @@ jobs:
           dotnet build tools/formula-data-benchmarks/FormulaDataBenchmarks.csproj -c Release
           dotnet run --no-build -c Release --project tools/formula-data-benchmarks/FormulaDataBenchmarks.csproj -- artifacts/formula/data-1 2>&1 | tee artifacts/formula/data-1.log
           dotnet run --no-build -c Release --project tools/formula-data-benchmarks/FormulaDataBenchmarks.csproj -- artifacts/formula/data-2 reverse 2>&1 | tee artifacts/formula/data-2.log
+      - name: Validate engineering formulas and compare direct array evaluation
+        run: |
+          set -o pipefail
+          dotnet build tools/formula-engineering-benchmarks/FormulaEngineeringBenchmarks.csproj -c Release
+          dotnet run --no-build -c Release --project tools/formula-engineering-benchmarks/FormulaEngineeringBenchmarks.csproj -- artifacts/formula/engineering-1 2>&1 | tee artifacts/formula/engineering-1.log
+          dotnet run --no-build -c Release --project tools/formula-engineering-benchmarks/FormulaEngineeringBenchmarks.csproj -- artifacts/formula/engineering-2 reverse 2>&1 | tee artifacts/formula/engineering-2.log
       - name: Publish and execute NativeAOT formula checks
         run: |
           set -o pipefail
           dotnet publish tools/formula-function-benchmarks/FormulaFunctionBenchmarks.csproj -c Release -r linux-x64 -p:PublishAot=true -o artifacts/native-functions 2>&1 | tee artifacts/formula/native-functions-publish.log
           dotnet publish tools/formula-aggregate-benchmarks/FormulaAggregateBenchmarks.csproj -c Release -r linux-x64 -p:PublishAot=true -o artifacts/native-aggregates 2>&1 | tee artifacts/formula/native-aggregates-publish.log
           dotnet publish tools/formula-data-benchmarks/FormulaDataBenchmarks.csproj -c Release -r linux-x64 -p:PublishAot=true -o artifacts/native-data 2>&1 | tee artifacts/formula/native-data-publish.log
+          dotnet publish tools/formula-engineering-benchmarks/FormulaEngineeringBenchmarks.csproj -c Release -r linux-x64 -p:PublishAot=true -o artifacts/native-engineering 2>&1 | tee artifacts/formula/native-engineering-publish.log
           if grep -E 'warning IL[0-9]+' artifacts/formula/native-*-publish.log; then
             echo 'NativeAOT/trimming warnings require review.'
             exit 1
@@ -74,12 +83,15 @@ jobs:
           ./artifacts/native-functions/FormulaFunctionBenchmarks artifacts/formula/native-functions smoke 2>&1 | tee artifacts/formula/native-functions.log
           ./artifacts/native-aggregates/FormulaAggregateBenchmarks artifacts/formula/native-aggregates smoke 2>&1 | tee artifacts/formula/native-aggregates.log
           ./artifacts/native-data/FormulaDataBenchmarks artifacts/formula/native-data smoke 2>&1 | tee artifacts/formula/native-data.log
+          ./artifacts/native-engineering/FormulaEngineeringBenchmarks artifacts/formula/native-engineering smoke 2>&1 | tee artifacts/formula/native-engineering.log
       - name: Record exact source and runtime evidence
         if: always()
         run: |
           mkdir -p artifacts/formula
           git rev-parse HEAD > artifacts/formula/revision.txt
-          git ls-tree -r HEAD src/ProDataGrid.FormulaEngine src/ProDataGrid.FormulaEngine.Excel src/ProDataGrid.FormulaEngine.UnitTests tools/formula-function-benchmarks tools/formula-aggregate-benchmarks tools/formula-data-benchmarks > artifacts/formula/source-blobs.txt
+          git ls-tree -r HEAD src/ProDataGrid.FormulaEngine src/ProDataGrid.FormulaEngine.Excel src/ProDataGrid.FormulaEngine.UnitTests tools/formula-function-benchmarks tools/formula-aggregate-benchmarks tools/formula-data-benchmarks tools/formula-engineering-benchmarks > artifacts/formula/source-blobs.txt
+          # Retain tracked source only, never generated files, credentials, or build outputs.
+          git archive --format=tar.gz -o artifacts/formula/source.tar.gz HEAD
           dotnet --info > artifacts/formula/runtime.txt
           dotnet --list-runtimes > artifacts/formula/installed-runtimes.txt
           lscpu > artifacts/formula/cpu.txt

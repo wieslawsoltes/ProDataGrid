@@ -275,7 +275,10 @@ namespace ProDataGrid.FormulaEngine.Excel
 
         private static string FormatNumber(double value, char decimalSeparator)
         {
-            var text = value.ToString("G15", CultureInfo.InvariantCulture);
+            // Formula serialization must preserve the represented value. Rounding to
+            // 15 digits here can change domain checks after copy/edit/format/reparse.
+            // Calculation precision remains controlled separately by workbook settings.
+            var text = value.ToString("R", CultureInfo.InvariantCulture);
             return decimalSeparator == '.'
                 ? text
                 : text.Replace('.', decimalSeparator);
