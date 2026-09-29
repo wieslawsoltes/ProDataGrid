@@ -17,26 +17,7 @@ namespace ProDataGrid.FormulaEngine.Excel
         }
 
         public override FormulaValue Invoke(FormulaFunctionContext context, IReadOnlyList<FormulaValue> args)
-        {
-            if (!ExcelStatisticalUtilities.TryCollectNumbers(context.EvaluationContext.Workbook.Settings, args, out var numbers, out var error))
-            {
-                return FormulaValue.FromError(error);
-            }
-
-            if (numbers.Count == 0)
-            {
-                return FormulaValue.FromError(new FormulaError(FormulaErrorType.Num));
-            }
-
-            numbers.Sort();
-            var mid = numbers.Count / 2;
-            if (numbers.Count % 2 == 1)
-            {
-                return ExcelFunctionUtilities.CreateNumber(context, numbers[mid]);
-            }
-
-            return ExcelFunctionUtilities.CreateNumber(context, (numbers[mid - 1] + numbers[mid]) / 2d);
-        }
+            => ExcelOrderStatistics.Median(context, args);
     }
 
     internal sealed class ModeSingleFunction : ExcelFunctionBase
@@ -776,75 +757,11 @@ namespace ProDataGrid.FormulaEngine.Excel
         }
 
         public static FormulaValue OrderedStatistic(
-            FormulaCalculationSettings settings,
-            FormulaValue dataValue,
-            FormulaValue kValue,
-            bool largest)
-        {
-            if (!TryCollectNumbers(settings, new[] { dataValue }, out var numbers, out var error))
-            {
-                return FormulaValue.FromError(error);
-            }
+            FormulaCalculationSettings settings, FormulaValue dataValue, FormulaValue kValue, bool largest)
+            => ExcelOrderStatistics.Ordered(settings, dataValue, kValue, largest);
 
-            if (!ExcelFunctionUtilities.TryCoerceToInteger(settings, kValue, out var k, out error))
-            {
-                return FormulaValue.FromError(error);
-            }
-
-            if (k <= 0 || k > numbers.Count)
-            {
-                return FormulaValue.FromError(new FormulaError(FormulaErrorType.Num));
-            }
-
-            numbers.Sort();
-            var index = largest ? numbers.Count - k : k - 1;
-            return ExcelFunctionUtilities.CreateNumber(settings, numbers[index]);
-        }
-
-        public static FormulaValue PercentileInc(
-            FormulaCalculationSettings settings,
-            FormulaValue dataValue,
-            double k)
-        {
-            if (k < 0d || k > 1d)
-            {
-                return FormulaValue.FromError(new FormulaError(FormulaErrorType.Num));
-            }
-
-            if (!TryCollectNumbers(settings, new[] { dataValue }, out var numbers, out var error))
-            {
-                return FormulaValue.FromError(error);
-            }
-
-            if (numbers.Count == 0)
-            {
-                return FormulaValue.FromError(new FormulaError(FormulaErrorType.Num));
-            }
-
-            numbers.Sort();
-
-            if (k <= 0d)
-            {
-                return ExcelFunctionUtilities.CreateNumber(settings, numbers[0]);
-            }
-
-            if (k >= 1d)
-            {
-                return ExcelFunctionUtilities.CreateNumber(settings, numbers[numbers.Count - 1]);
-            }
-
-            var position = (numbers.Count - 1) * k;
-            var lower = (int)Math.Floor(position);
-            var upper = (int)Math.Ceiling(position);
-            if (lower == upper)
-            {
-                return ExcelFunctionUtilities.CreateNumber(settings, numbers[lower]);
-            }
-
-            var fraction = position - lower;
-            var value = numbers[lower] + ((numbers[upper] - numbers[lower]) * fraction);
-            return ExcelFunctionUtilities.CreateNumber(settings, value);
-        }
+        public static FormulaValue PercentileInc(FormulaCalculationSettings settings, FormulaValue dataValue, double k)
+            => ExcelOrderStatistics.Percentile(settings, dataValue, k, exclusive: false);
 
         public static FormulaValue Rank(
             FormulaFunctionContext context,

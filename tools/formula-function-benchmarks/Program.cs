@@ -28,6 +28,7 @@ internal static partial class Program
             var parser = new ExcelFormulaParser();
             Validate(context, evaluator, resolver, parser);
             ValidateNumerics(context, evaluator, resolver, parser);
+            ValidateOrderStatistics(context, evaluator, resolver, parser);
             var names = new List<string>();
             foreach (var function in registry.GetAll()) names.Add(function.Name);
             names.Sort(StringComparer.Ordinal);

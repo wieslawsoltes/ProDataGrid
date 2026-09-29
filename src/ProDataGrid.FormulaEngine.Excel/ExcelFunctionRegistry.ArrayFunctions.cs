@@ -25,6 +25,8 @@ namespace ProDataGrid.FormulaEngine.Excel
             Register(new RandArrayFunction());
             RegisterAdditionalDefaults();
             RegisterScientificDefaults();
+            Register(new ExclusivePercentileFunction(quartile: false));
+            Register(new ExclusivePercentileFunction(quartile: true));
         }
 
         partial void RegisterAdditionalDefaults();
