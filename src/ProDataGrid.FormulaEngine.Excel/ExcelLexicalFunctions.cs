@@ -9,9 +9,11 @@ using ProDataGrid.FormulaEngine;
 
 namespace ProDataGrid.FormulaEngine.Excel
 {
-    internal sealed class LetFunction : ExcelFunctionBase, ILazyFormulaFunction
+    internal sealed class LetFunction : ExcelFunctionBase, ILazyFormulaFunction, IFormulaLexicalFunction
     {
         public LetFunction() : base("LET", new FormulaFunctionInfo(3, 253)) { }
+
+        public FormulaLexicalBindingKind BindingKind => FormulaLexicalBindingKind.Let;
 
         public override FormulaValue Invoke(FormulaFunctionContext context, IReadOnlyList<FormulaValue> args)
             => ExcelLexicalUtilities.IncorrectParameters();
@@ -32,9 +34,11 @@ namespace ProDataGrid.FormulaEngine.Excel
         }
     }
 
-    internal sealed class LambdaFunction : ExcelFunctionBase, ILazyFormulaFunction
+    internal sealed class LambdaFunction : ExcelFunctionBase, ILazyFormulaFunction, IFormulaLexicalFunction
     {
         public LambdaFunction() : base("LAMBDA", new FormulaFunctionInfo(1, 254)) { }
+
+        public FormulaLexicalBindingKind BindingKind => FormulaLexicalBindingKind.Lambda;
 
         public override FormulaValue Invoke(FormulaFunctionContext context, IReadOnlyList<FormulaValue> args)
             => ExcelLexicalUtilities.IncorrectParameters();

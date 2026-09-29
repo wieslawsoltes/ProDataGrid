@@ -16,7 +16,7 @@ namespace ProDataGrid.FormulaEngine
         private readonly IFormulaParser _parser;
         private readonly IFormulaFunctionRegistry _functionRegistry;
         private readonly FormulaEvaluator _evaluator = new FormulaEvaluator();
-        private readonly FormulaDependencyGraph _dependencyGraph = new FormulaDependencyGraph();
+        private readonly FormulaDependencyGraph _dependencyGraph;
         private readonly Dictionary<FormulaCellAddress, FormulaRangeAddress> _spillRanges = new();
         private readonly Dictionary<FormulaCellAddress, FormulaCellAddress> _spillOwners = new();
         private readonly HashSet<FormulaCellAddress> _volatileCells = new();
@@ -26,6 +26,7 @@ namespace ProDataGrid.FormulaEngine
         {
             _parser = parser ?? throw new ArgumentNullException(nameof(parser));
             _functionRegistry = functionRegistry ?? throw new ArgumentNullException(nameof(functionRegistry));
+            _dependencyGraph = new FormulaDependencyGraph(functionRegistry);
         }
 
         public FormulaDependencyGraph DependencyGraph => _dependencyGraph;
@@ -1067,7 +1068,8 @@ namespace ProDataGrid.FormulaEngine
                         }
                         else if (Visit(new FormulaNameExpression(call.Name), locals)) return true;
                     }
-                    return FormulaBindingTraversal.VisitArguments(call, locals, Visit);
+                    return FormulaBindingTraversal.VisitArguments(call, locals,
+                        FormulaBindingTraversal.GetBindingKind(call, locals, _functionRegistry), Visit);
                 case FormulaExpressionKind.Name:
                     var name = ((FormulaNameExpression)expression).Name;
                     if (locals != null && locals.Contains(name)) return false;

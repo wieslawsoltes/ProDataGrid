@@ -13,10 +13,10 @@ namespace ProDataGrid.FormulaEngine
     internal static class FormulaBindingTraversal
     {
         public static bool VisitArguments(FormulaFunctionCallExpression call, HashSet<string>? locals,
-            Func<FormulaExpression, HashSet<string>?, bool> visit)
+            FormulaLexicalBindingKind bindingKind, Func<FormulaExpression, HashSet<string>?, bool> visit)
         {
             var args = call.Arguments;
-            if (string.Equals(call.Name, "LAMBDA", StringComparison.OrdinalIgnoreCase) && args.Count > 0)
+            if (bindingKind == FormulaLexicalBindingKind.Lambda && args.Count > 0)
             {
                 var scope = Copy(locals);
                 for (var i = 0; i < args.Count - 1; i++)
@@ -26,7 +26,7 @@ namespace ProDataGrid.FormulaEngine
                 }
                 return visit(args[args.Count - 1], scope);
             }
-            if (string.Equals(call.Name, "LET", StringComparison.OrdinalIgnoreCase) && args.Count >= 3 && (args.Count & 1) == 1)
+            if (bindingKind == FormulaLexicalBindingKind.Let && args.Count >= 3 && (args.Count & 1) == 1)
             {
                 var scope = Copy(locals);
                 for (var i = 0; i < args.Count - 1; i += 2)
@@ -40,6 +40,18 @@ namespace ProDataGrid.FormulaEngine
             foreach (var arg in args)
                 if (visit(arg, locals)) return true;
             return false;
+        }
+
+        public static FormulaLexicalBindingKind GetBindingKind(FormulaFunctionCallExpression call,
+            HashSet<string>? locals, IFormulaFunctionRegistry? registry)
+        {
+            if (locals != null && locals.Contains(call.Name)) return FormulaLexicalBindingKind.None;
+            if (registry != null)
+                return registry.TryGetFunction(call.Name, out var function) && function is IFormulaLexicalFunction lexical
+                    ? lexical.BindingKind : FormulaLexicalBindingKind.None;
+            if (string.Equals(call.Name, "LET", StringComparison.OrdinalIgnoreCase)) return FormulaLexicalBindingKind.Let;
+            if (string.Equals(call.Name, "LAMBDA", StringComparison.OrdinalIgnoreCase)) return FormulaLexicalBindingKind.Lambda;
+            return FormulaLexicalBindingKind.None;
         }
 
         private static HashSet<string> Copy(HashSet<string>? source)

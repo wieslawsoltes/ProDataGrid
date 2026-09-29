@@ -10,6 +10,19 @@ namespace ProDataGrid.FormulaEngine
 {
     public sealed class FormulaDependencyGraph
     {
+        private readonly IFormulaFunctionRegistry? _functionRegistry;
+
+        /// <summary>Creates a graph with conventional LET/LAMBDA binding analysis.</summary>
+        /// <remarks>Without a registry, callable names are conservatively treated as possible defined names.
+        /// Use the registry constructor to match registered-function precedence and custom binding metadata.</remarks>
+        public FormulaDependencyGraph() { }
+
+        /// <summary>Creates a graph that uses the same function precedence and binding metadata as evaluation.</summary>
+        public FormulaDependencyGraph(IFormulaFunctionRegistry functionRegistry)
+        {
+            _functionRegistry = functionRegistry ?? throw new ArgumentNullException(nameof(functionRegistry));
+        }
+
         private readonly Dictionary<FormulaCellAddress, HashSet<FormulaCellAddress>> _dependencies = new();
         private readonly Dictionary<FormulaCellAddress, HashSet<FormulaCellAddress>> _dependents = new();
         private readonly Dictionary<FormulaCellAddress, HashSet<string>> _nameDependencies = new();
@@ -385,7 +398,7 @@ namespace ProDataGrid.FormulaEngine
             }
         }
 
-        private static void CollectDependencies(
+        private void CollectDependencies(
             FormulaCellAddress origin,
             FormulaExpression expression,
             IFormulaWorkbook? workbook,
@@ -474,7 +487,7 @@ namespace ProDataGrid.FormulaEngine
             return affected;
         }
 
-        private static void CollectReferences(
+        private void CollectReferences(
             FormulaExpression expression, List<FormulaReference> references,
             List<FormulaStructuredReference> structuredReferences, HashSet<string> nameDependencies,
             IFormulaNameProvider? worksheetNames, IFormulaNameProvider? workbookNames,
@@ -507,8 +520,11 @@ namespace ProDataGrid.FormulaEngine
                 case FormulaExpressionKind.FunctionCall:
                     var call = (FormulaFunctionCallExpression)expression;
                     // Also register unresolved callable names so later definitions invalidate dependencies.
-                    Visit(new FormulaNameExpression(call.Name), locals);
-                    FormulaBindingTraversal.VisitArguments(call, locals, (arg, scope) => { Visit(arg, scope); return false; });
+                    if (_functionRegistry == null || !_functionRegistry.TryGetFunction(call.Name, out _))
+                        Visit(new FormulaNameExpression(call.Name), locals);
+                    FormulaBindingTraversal.VisitArguments(call, locals,
+                        FormulaBindingTraversal.GetBindingKind(call, locals, _functionRegistry),
+                        (arg, scope) => { Visit(arg, scope); return false; });
                     return;
                 case FormulaExpressionKind.Name:
                     var name = ((FormulaNameExpression)expression).Name;

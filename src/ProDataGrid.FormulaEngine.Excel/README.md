@@ -43,6 +43,6 @@ The regression suite checks compiled and interpreted execution, negative/repeate
 
 `SORTBY` uses deterministic ordinal, case-insensitive text ordering and keeps numbers, text, booleans, errors and blanks as distinct sort categories. Locale-specific Excel collation and detailed error ordering are not certified. Random integers are restricted to the exact-integer domain of a double. The engine does not currently distinguish a syntactically omitted argument from a scalar blank in every context.
 
-The complete Microsoft Excel function catalog, LET/LAMBDA closures and higher-order functions, and full application/format interoperability are not claimed by this implementation.
+LET, LAMBDA and ISOMITTED are described in [Lexical functions](LEXICAL-FUNCTIONS.md). The complete Microsoft Excel function catalog, native-Excel differential qualification, and full application/format interoperability are not claimed by this implementation.
 
 Function syntax references: [Microsoft array functions](https://support.microsoft.com/en-us/excel/functions/hstack-function), [TAKE](https://support.microsoft.com/en-us/excel/functions/take-function), [DROP](https://support.microsoft.com/en-us/excel/functions/drop-function), [SORTBY](https://support.microsoft.com/en-us/excel/functions/sortby-function), [RANDARRAY](https://support.microsoft.com/en-us/excel/functions/randarray-function).

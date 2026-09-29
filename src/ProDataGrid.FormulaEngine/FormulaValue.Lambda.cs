@@ -25,8 +25,18 @@ namespace ProDataGrid.FormulaEngine
         /// <remarks>The low-level evaluator retains callable values for composition. Worksheet hosts should
         /// use this method at their cell-result boundary, not inside function arguments.</remarks>
         public FormulaValue ToCellResult()
-            => Kind == FormulaValueKind.Lambda
-                ? FromError(new FormulaError(FormulaErrorType.Calc, "A lambda must be invoked to produce a cell result."))
-                : this;
+        {
+            if (Kind == FormulaValueKind.Lambda)
+                return FromError(new FormulaError(FormulaErrorType.Calc, "A lambda must be invoked to produce a cell result."));
+            if (Kind == FormulaValueKind.Array)
+            {
+                var array = AsArray();
+                for (var row = 0; row < array.RowCount; row++)
+                    for (var column = 0; column < array.ColumnCount; column++)
+                        if (array.IsPresent(row, column) && array[row, column].Kind == FormulaValueKind.Lambda)
+                            return FromError(new FormulaError(FormulaErrorType.Calc, "An array cannot spill callable values."));
+            }
+            return this;
+        }
     }
 }
