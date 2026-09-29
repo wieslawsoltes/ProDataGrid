@@ -1,0 +1,46 @@
+name: Formula helper final integration
+on:
+  push:
+    branches: [work/formula-higher-order-arrays]
+permissions:
+  contents: write
+jobs:
+  validate:
+    if: github.repository == 'wieslawsoltes/ProDataGrid'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: work/formula-higher-order-arrays
+          fetch-depth: 0
+      - uses: actions/setup-dotnet@v4
+        with:
+          global-json-file: global.json
+      - name: Integrate current master and callable-array composition
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git fetch origin master
+          git merge --no-edit origin/master
+          python3 tools/finalize-formula-helpers.py
+          git rm tools/finalize-formula-helpers.py .github/workflows/formula-helper-finalization.yml
+          git add src/ProDataGrid.FormulaEngine.Excel/ExcelLambdaHelperUtilities.cs src/ProDataGrid.FormulaEngine.UnitTests/ExcelLambdaHelperTests.cs
+          git commit -m 'Allow intermediate callable arrays while retaining worksheet publication guards'
+      - name: Validate all formula regressions
+        run: |
+          git diff HEAD^ --check
+          dotnet test src/ProDataGrid.FormulaEngine.UnitTests/ProDataGrid.FormulaEngine.UnitTests.csproj -c Release --logger trx --results-directory artifacts/tests
+      - name: Push clean validated branch
+        run: git push origin HEAD:work/formula-higher-order-arrays
+      - name: Export validation sources
+        if: always()
+        run: |
+          mkdir -p artifacts
+          git archive HEAD > artifacts/source.tar
+          git rev-parse HEAD > artifacts/revision.txt
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: formula-helper-final-validation
+          path: artifacts
