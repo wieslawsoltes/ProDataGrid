@@ -2,6 +2,14 @@
 
 `ExcelFunctionRegistry` supplies built-in functions to the reusable formula engine. Create one registry per function configuration and reuse it across evaluations; replacing a registration changes its `Version` and invalidates cached eager/lazy compilation plans. Synchronize registry changes with evaluation in the host.
 
+## Function-family guides
+
+- [Lexical functions](LEXICAL-FUNCTIONS.md): LET, LAMBDA, ISOMITTED, captured scopes and named recursion.
+- [Higher-order arrays](LAMBDA-HELPERS.md): MAP, REDUCE, SCAN, BYROW, BYCOL, MAKEARRAY and callable composition.
+- [Text and Unicode](TEXT-FUNCTIONS.md): text search/transforms, broadcasting and character-index compatibility modes.
+- [Scientific math](SCIENTIFIC-FUNCTIONS.md): trigonometry, hyperbolic functions, combinatorics and integral operations.
+- [Order statistics](ORDER-STATISTICS.md): inclusive/exclusive percentiles, bounded selection, numerical interpolation and workspace ownership.
+
 ## Modern arrays
 
 | Function family | Behavior |
