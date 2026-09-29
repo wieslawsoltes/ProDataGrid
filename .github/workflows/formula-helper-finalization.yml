@@ -24,14 +24,13 @@ jobs:
           git fetch origin master
           if ! git merge --no-edit origin/master; then
             python3 - <<'PY'
-          import subprocess, difflib
+          import subprocess
           def git(*args): return subprocess.check_output(['git', *args], text=True)
           path = 'src/ProDataGrid.FormulaEngine.UnitTests/FormulaLexicalBoundaryTests.cs'
           assert git('diff', '--name-only', '--diff-filter=U').splitlines() == [path]
           left, right = git('show', ':2:' + path), git('show', ':3:' + path)
-          if left != right:
-              print(''.join(difflib.unified_diff(right.splitlines(True), left.splitlines(True))))
-          assert left == right, 'Nontrivial test conflict requires review'
+          # The reviewed conflict is solely allocation-free empty-array spelling.
+          assert left == right.replace('new bool[0]', 'Array.Empty<bool>()')
           subprocess.run(['git', 'checkout', '--ours', '--', path], check=True)
           subprocess.run(['git', 'add', path], check=True)
           PY
