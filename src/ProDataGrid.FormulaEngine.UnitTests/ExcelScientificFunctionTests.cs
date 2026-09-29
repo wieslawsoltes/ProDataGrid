@@ -5,6 +5,7 @@
 
 using System;
 using System.Globalization;
+using System.Runtime.CompilerServices;
 using ProDataGrid.FormulaEngine.Excel;
 using Xunit;
 
@@ -181,13 +182,29 @@ namespace ProDataGrid.FormulaEngine.Tests
             Assert.False(function is ILazyFormulaFunction);
             var arguments = new[] { FormulaValue.FromNumber(0.5) };
             var functionContext = new FormulaFunctionContext(context);
-            for (var i = 0; i < 1000; i++) function.Invoke(functionContext, arguments);
+            // Warm the exact measurement method, including its result reads and counter API.
+            // The previous shorter, different warmup loop could include one-time work in the
+            // first measured batch. Keep the per-batch bound and require all seven samples.
+            for (var i = 0; i < 3; i++) MeasurePrimitiveCalls(function, functionContext, arguments, out _);
+            var measured = new long[7];
+            for (var sample = 0; sample < measured.Length; sample++)
+            {
+                measured[sample] = MeasurePrimitiveCalls(function, functionContext, arguments, out var sum);
+                Close(10000 * Math.Sin(0.5), sum);
+            }
+            for (var sample = 0; sample < measured.Length; sample++)
+                Assert.True(measured[sample] < 4096,
+                    $"Primitive SIN allocation samples (10,000 calls each): {string.Join(", ", measured)} bytes");
+        }
+
+        [MethodImpl(MethodImplOptions.NoInlining)]
+        private static long MeasurePrimitiveCalls(IFormulaFunction function, FormulaFunctionContext context,
+            FormulaValue[] arguments, out double sum)
+        {
             var start = GC.GetAllocatedBytesForCurrentThread();
-            var sum = 0d;
-            for (var i = 0; i < 10000; i++) sum += function.Invoke(functionContext, arguments).AsNumber();
-            var bytes = GC.GetAllocatedBytesForCurrentThread() - start;
-            Assert.True(sum > 0);
-            Assert.True(bytes < 4096, $"Allocated {bytes} bytes");
+            sum = 0;
+            for (var i = 0; i < 10000; i++) sum += function.Invoke(context, arguments).AsNumber();
+            return GC.GetAllocatedBytesForCurrentThread() - start;
         }
 
         [Fact]
