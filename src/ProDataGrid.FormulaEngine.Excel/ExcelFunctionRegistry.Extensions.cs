@@ -14,5 +14,7 @@ namespace ProDataGrid.FormulaEngine.Excel
         partial void RegisterExtendedDefaults();
 
         partial void RegisterTextExtensions();
+
+        partial void RegisterScientificDefaults();
     }
 }

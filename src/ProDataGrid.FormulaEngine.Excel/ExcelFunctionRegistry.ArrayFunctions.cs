@@ -24,6 +24,7 @@ namespace ProDataGrid.FormulaEngine.Excel
             Register(new SortByFunction());
             Register(new RandArrayFunction());
             RegisterAdditionalDefaults();
+            RegisterScientificDefaults();
         }
 
         partial void RegisterAdditionalDefaults();

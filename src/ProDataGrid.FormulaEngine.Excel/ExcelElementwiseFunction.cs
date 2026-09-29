@@ -38,30 +38,19 @@ namespace ProDataGrid.FormulaEngine.Excel
         }
     }
 
-    internal abstract class ExcelElementwiseFunction : ExcelFunctionBase, ILazyFormulaFunction
+    // Eager scalar functions share array projection with omission-aware text functions.
+    // They do not acquire the lazy-call ABI when they have no omission semantics.
+    internal abstract class ExcelScalarFunctionBase : ExcelFunctionBase
     {
-        protected ExcelElementwiseFunction(string name, int min, int max) : base(name, new FormulaFunctionInfo(min, max)) { }
+        protected ExcelScalarFunctionBase(string name, int min, int max)
+            : base(name, new FormulaFunctionInfo(min, max)) { }
 
         public override FormulaValue Invoke(FormulaFunctionContext context, IReadOnlyList<FormulaValue> args)
             => Apply(context, args, 0);
 
-        public FormulaValue InvokeLazy(FormulaFunctionContext context, IReadOnlyList<FormulaExpression> args,
-            FormulaEvaluator evaluator, IFormulaValueResolver resolver)
+        protected FormulaValue Apply(FormulaFunctionContext context, IReadOnlyList<FormulaValue> args, uint omitted)
         {
-            if (args.Count < Info.MinArgs || args.Count > Info.MaxArgs) return ExcelTextUtilities.ValueError();
-            var values = new FormulaValue[args.Count];
-            uint omitted = 0;
-            for (var i = 0; i < values.Length; i++)
-            {
-                if (context.EvaluationContext.IsArgumentOmitted(args[i])) omitted |= 1u << i;
-                values[i] = evaluator.Evaluate(args[i], context.EvaluationContext, resolver);
-            }
-            return Apply(context, values, omitted);
-        }
-
-        private FormulaValue Apply(FormulaFunctionContext context, IReadOnlyList<FormulaValue> args, uint omitted)
-        {
-            if (args.Count < Info.MinArgs || args.Count > Info.MaxArgs) return ExcelTextUtilities.ValueError();
+            if (args.Count < Info.MinArgs || args.Count > Info.MaxArgs) return FormulaValue.FromError(new FormulaError(FormulaErrorType.Value));
             var rows = 1;
             var columns = 1;
             var hasArray = false;
@@ -79,7 +68,7 @@ namespace ProDataGrid.FormulaEngine.Excel
                 if (args[i].Kind != FormulaValueKind.Array) continue;
                 var array = args[i].AsArray();
                 if ((array.RowCount != 1 && array.RowCount != rows) || (array.ColumnCount != 1 && array.ColumnCount != columns))
-                    return ExcelTextUtilities.ValueError();
+                    return FormulaValue.FromError(new FormulaError(FormulaErrorType.Value));
             }
             if (!ExcelArrayShapeUtilities.TryCreate(context, rows, columns, out var result, out var error))
                 return FormulaValue.FromError(error);
@@ -90,6 +79,26 @@ namespace ProDataGrid.FormulaEngine.Excel
         }
 
         protected abstract FormulaValue InvokeScalar(FormulaFunctionContext context, in ExcelScalarArguments args);
+    }
+
+    internal abstract class ExcelElementwiseFunction : ExcelScalarFunctionBase, ILazyFormulaFunction
+    {
+        protected ExcelElementwiseFunction(string name, int min, int max) : base(name, min, max) { }
+
+        public FormulaValue InvokeLazy(FormulaFunctionContext context, IReadOnlyList<FormulaExpression> args,
+            FormulaEvaluator evaluator, IFormulaValueResolver resolver)
+        {
+            if (args.Count < Info.MinArgs || args.Count > Info.MaxArgs) return ExcelTextUtilities.ValueError();
+            var values = new FormulaValue[args.Count];
+            uint omitted = 0;
+            for (var i = 0; i < values.Length; i++)
+            {
+                if (context.EvaluationContext.IsArgumentOmitted(args[i])) omitted |= 1u << i;
+                values[i] = evaluator.Evaluate(args[i], context.EvaluationContext, resolver);
+            }
+            return Apply(context, values, omitted);
+        }
+
     }
 
     internal static class ExcelTextUtilities

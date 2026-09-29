@@ -1,0 +1,30 @@
+name: Formula scientific function validation
+on:
+  push:
+    branches: [work/formula-scientific-math]
+permissions:
+  contents: read
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          global-json-file: global.json
+      - name: Execute all formula regressions and build both targets
+        run: |
+          dotnet test src/ProDataGrid.FormulaEngine.UnitTests/ProDataGrid.FormulaEngine.UnitTests.csproj -c Release --logger trx --results-directory artifacts/tests
+          dotnet build src/ProDataGrid.FormulaEngine.Excel/ProDataGrid.FormulaEngine.Excel.csproj -c Release
+      - name: Record exact validation sources
+        if: always()
+        run: |
+          mkdir -p artifacts
+          git archive HEAD > artifacts/source.tar
+          git rev-parse HEAD > artifacts/revision.txt
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: formula-scientific-validation
+          path: artifacts
