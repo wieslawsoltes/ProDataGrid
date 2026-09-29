@@ -31,11 +31,12 @@ public sealed class ChartHierarchyViewModel : INotifyPropertyChanged, IDisposabl
             new ChartHierarchyNode("support", "Support", 16)
         }));
         Chart = new ChartModel { DataSource = Source };
-        Chart.CategoryAxis.IsVisible = false;
+        // The host maps category-axis visibility to category labels, also for structural plots.
+        Chart.CategoryAxis.IsVisible = true;
         Chart.ValueAxis.IsVisible = false;
         Chart.Legend.IsVisible = true;
-        UpCommand = new RelayCommand(_ => Source.TryDrillUp(), _ => !_disposed && Source.CanDrillUp);
-        ResetCommand = new RelayCommand(_ => Source.ResetNavigation(), _ => !_disposed && Source.CanDrillUp);
+        UpCommand = new RelayCommand(_ => { if (!_disposed) Source.TryDrillUp(); }, _ => !_disposed && Source.CanDrillUp);
+        ResetCommand = new RelayCommand(_ => { if (!_disposed) Source.ResetNavigation(); }, _ => !_disposed && Source.CanDrillUp);
         EnterCommand = new RelayCommand(_ => Enter(), _ => !_disposed && SelectedBranch != null);
         Source.DataInvalidated += OnChanged;
         UpdateState();
