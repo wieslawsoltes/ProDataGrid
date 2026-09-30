@@ -9328,6 +9328,34 @@
     },
     {
       "type": "ManagedReference",
+      "source_relative_path": "api/ProCharts.ChartCoordinateWindow.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/ProCharts.ChartCoordinateWindow.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "ProCharts.ChartCoordinateWindow",
+      "Summary": "<p sourcefile=\"api/ProCharts.ChartCoordinateWindow.yml\" sourcestartlinenumber=\"1\">An immutable, validated coordinate-selection policy. The default value selects all retained rows.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/ProCharts.ChartCoordinateWindowKind.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/ProCharts.ChartCoordinateWindowKind.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "ProCharts.ChartCoordinateWindowKind",
+      "Summary": "<p sourcefile=\"api/ProCharts.ChartCoordinateWindowKind.yml\" sourcestartlinenumber=\"1\">How a coordinate window selects retained observations.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
       "source_relative_path": "api/ProCharts.ChartCrosshairMode.yml",
       "output": {
         ".html": {
@@ -9955,6 +9983,20 @@
       "IsMRef": true,
       "Title": "ProCharts.CoalescingChartDataSource",
       "Summary": "<p sourcefile=\"api/ProCharts.CoalescingChartDataSource.yml\" sourcestartlinenumber=\"1\">Coalesces source invalidations and delivers them asynchronously on an explicit synchronization context.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/ProCharts.CoordinateWindowChartDataSource.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/ProCharts.CoordinateWindowChartDataSource.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "ProCharts.CoordinateWindowChartDataSource",
+      "Summary": "<p sourcefile=\"api/ProCharts.CoordinateWindowChartDataSource.yml\" sourcestartlinenumber=\"1\">Binds a fixed or trailing coordinate window of a synchronized stream to the ordinary chart-model contract.</p>\n"
     },
     {
       "type": "ManagedReference",
@@ -13321,6 +13363,16 @@
       "output": {
         ".html": {
           "relative_path": "articles/procharts-chart-model.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "Conceptual",
+      "source_relative_path": "articles/procharts-coordinate-binding.md",
+      "output": {
+        ".html": {
+          "relative_path": "articles/procharts-coordinate-binding.html"
         }
       },
       "version": ""

@@ -71617,6 +71617,146 @@ references:
   fullName.vb: ProCharts.ChartColor.<>
   nameWithType: ChartColor.operator !=
   nameWithType.vb: ChartColor.<>
+- uid: ProCharts.ChartCoordinateWindow
+  name: ChartCoordinateWindow
+  href: api/ProCharts.ChartCoordinateWindow.html
+  commentId: T:ProCharts.ChartCoordinateWindow
+  fullName: ProCharts.ChartCoordinateWindow
+  nameWithType: ChartCoordinateWindow
+- uid: ProCharts.ChartCoordinateWindow.All
+  name: All
+  href: api/ProCharts.ChartCoordinateWindow.html#ProCharts_ChartCoordinateWindow_All
+  commentId: P:ProCharts.ChartCoordinateWindow.All
+  fullName: ProCharts.ChartCoordinateWindow.All
+  nameWithType: ChartCoordinateWindow.All
+- uid: ProCharts.ChartCoordinateWindow.All*
+  name: All
+  href: api/ProCharts.ChartCoordinateWindow.html#ProCharts_ChartCoordinateWindow_All_
+  commentId: Overload:ProCharts.ChartCoordinateWindow.All
+  isSpec: "True"
+  fullName: ProCharts.ChartCoordinateWindow.All
+  nameWithType: ChartCoordinateWindow.All
+- uid: ProCharts.ChartCoordinateWindow.Between(System.Double,System.Double,System.Boolean)
+  name: Between(double, double, bool)
+  href: api/ProCharts.ChartCoordinateWindow.html#ProCharts_ChartCoordinateWindow_Between_System_Double_System_Double_System_Boolean_
+  commentId: M:ProCharts.ChartCoordinateWindow.Between(System.Double,System.Double,System.Boolean)
+  name.vb: Between(Double, Double, Boolean)
+  fullName: ProCharts.ChartCoordinateWindow.Between(double, double, bool)
+  fullName.vb: ProCharts.ChartCoordinateWindow.Between(Double, Double, Boolean)
+  nameWithType: ChartCoordinateWindow.Between(double, double, bool)
+  nameWithType.vb: ChartCoordinateWindow.Between(Double, Double, Boolean)
+- uid: ProCharts.ChartCoordinateWindow.Between*
+  name: Between
+  href: api/ProCharts.ChartCoordinateWindow.html#ProCharts_ChartCoordinateWindow_Between_
+  commentId: Overload:ProCharts.ChartCoordinateWindow.Between
+  isSpec: "True"
+  fullName: ProCharts.ChartCoordinateWindow.Between
+  nameWithType: ChartCoordinateWindow.Between
+- uid: ProCharts.ChartCoordinateWindow.IncludeBoundaryNeighbors
+  name: IncludeBoundaryNeighbors
+  href: api/ProCharts.ChartCoordinateWindow.html#ProCharts_ChartCoordinateWindow_IncludeBoundaryNeighbors
+  commentId: P:ProCharts.ChartCoordinateWindow.IncludeBoundaryNeighbors
+  fullName: ProCharts.ChartCoordinateWindow.IncludeBoundaryNeighbors
+  nameWithType: ChartCoordinateWindow.IncludeBoundaryNeighbors
+- uid: ProCharts.ChartCoordinateWindow.IncludeBoundaryNeighbors*
+  name: IncludeBoundaryNeighbors
+  href: api/ProCharts.ChartCoordinateWindow.html#ProCharts_ChartCoordinateWindow_IncludeBoundaryNeighbors_
+  commentId: Overload:ProCharts.ChartCoordinateWindow.IncludeBoundaryNeighbors
+  isSpec: "True"
+  fullName: ProCharts.ChartCoordinateWindow.IncludeBoundaryNeighbors
+  nameWithType: ChartCoordinateWindow.IncludeBoundaryNeighbors
+- uid: ProCharts.ChartCoordinateWindow.Kind
+  name: Kind
+  href: api/ProCharts.ChartCoordinateWindow.html#ProCharts_ChartCoordinateWindow_Kind
+  commentId: P:ProCharts.ChartCoordinateWindow.Kind
+  fullName: ProCharts.ChartCoordinateWindow.Kind
+  nameWithType: ChartCoordinateWindow.Kind
+- uid: ProCharts.ChartCoordinateWindow.Kind*
+  name: Kind
+  href: api/ProCharts.ChartCoordinateWindow.html#ProCharts_ChartCoordinateWindow_Kind_
+  commentId: Overload:ProCharts.ChartCoordinateWindow.Kind
+  isSpec: "True"
+  fullName: ProCharts.ChartCoordinateWindow.Kind
+  nameWithType: ChartCoordinateWindow.Kind
+- uid: ProCharts.ChartCoordinateWindow.Latest(System.Double,System.Boolean)
+  name: Latest(double, bool)
+  href: api/ProCharts.ChartCoordinateWindow.html#ProCharts_ChartCoordinateWindow_Latest_System_Double_System_Boolean_
+  commentId: M:ProCharts.ChartCoordinateWindow.Latest(System.Double,System.Boolean)
+  name.vb: Latest(Double, Boolean)
+  fullName: ProCharts.ChartCoordinateWindow.Latest(double, bool)
+  fullName.vb: ProCharts.ChartCoordinateWindow.Latest(Double, Boolean)
+  nameWithType: ChartCoordinateWindow.Latest(double, bool)
+  nameWithType.vb: ChartCoordinateWindow.Latest(Double, Boolean)
+- uid: ProCharts.ChartCoordinateWindow.Latest*
+  name: Latest
+  href: api/ProCharts.ChartCoordinateWindow.html#ProCharts_ChartCoordinateWindow_Latest_
+  commentId: Overload:ProCharts.ChartCoordinateWindow.Latest
+  isSpec: "True"
+  fullName: ProCharts.ChartCoordinateWindow.Latest
+  nameWithType: ChartCoordinateWindow.Latest
+- uid: ProCharts.ChartCoordinateWindow.MaximumX
+  name: MaximumX
+  href: api/ProCharts.ChartCoordinateWindow.html#ProCharts_ChartCoordinateWindow_MaximumX
+  commentId: P:ProCharts.ChartCoordinateWindow.MaximumX
+  fullName: ProCharts.ChartCoordinateWindow.MaximumX
+  nameWithType: ChartCoordinateWindow.MaximumX
+- uid: ProCharts.ChartCoordinateWindow.MaximumX*
+  name: MaximumX
+  href: api/ProCharts.ChartCoordinateWindow.html#ProCharts_ChartCoordinateWindow_MaximumX_
+  commentId: Overload:ProCharts.ChartCoordinateWindow.MaximumX
+  isSpec: "True"
+  fullName: ProCharts.ChartCoordinateWindow.MaximumX
+  nameWithType: ChartCoordinateWindow.MaximumX
+- uid: ProCharts.ChartCoordinateWindow.MinimumX
+  name: MinimumX
+  href: api/ProCharts.ChartCoordinateWindow.html#ProCharts_ChartCoordinateWindow_MinimumX
+  commentId: P:ProCharts.ChartCoordinateWindow.MinimumX
+  fullName: ProCharts.ChartCoordinateWindow.MinimumX
+  nameWithType: ChartCoordinateWindow.MinimumX
+- uid: ProCharts.ChartCoordinateWindow.MinimumX*
+  name: MinimumX
+  href: api/ProCharts.ChartCoordinateWindow.html#ProCharts_ChartCoordinateWindow_MinimumX_
+  commentId: Overload:ProCharts.ChartCoordinateWindow.MinimumX
+  isSpec: "True"
+  fullName: ProCharts.ChartCoordinateWindow.MinimumX
+  nameWithType: ChartCoordinateWindow.MinimumX
+- uid: ProCharts.ChartCoordinateWindow.Span
+  name: Span
+  href: api/ProCharts.ChartCoordinateWindow.html#ProCharts_ChartCoordinateWindow_Span
+  commentId: P:ProCharts.ChartCoordinateWindow.Span
+  fullName: ProCharts.ChartCoordinateWindow.Span
+  nameWithType: ChartCoordinateWindow.Span
+- uid: ProCharts.ChartCoordinateWindow.Span*
+  name: Span
+  href: api/ProCharts.ChartCoordinateWindow.html#ProCharts_ChartCoordinateWindow_Span_
+  commentId: Overload:ProCharts.ChartCoordinateWindow.Span
+  isSpec: "True"
+  fullName: ProCharts.ChartCoordinateWindow.Span
+  nameWithType: ChartCoordinateWindow.Span
+- uid: ProCharts.ChartCoordinateWindowKind
+  name: ChartCoordinateWindowKind
+  href: api/ProCharts.ChartCoordinateWindowKind.html
+  commentId: T:ProCharts.ChartCoordinateWindowKind
+  fullName: ProCharts.ChartCoordinateWindowKind
+  nameWithType: ChartCoordinateWindowKind
+- uid: ProCharts.ChartCoordinateWindowKind.All
+  name: All
+  href: api/ProCharts.ChartCoordinateWindowKind.html#ProCharts_ChartCoordinateWindowKind_All
+  commentId: F:ProCharts.ChartCoordinateWindowKind.All
+  fullName: ProCharts.ChartCoordinateWindowKind.All
+  nameWithType: ChartCoordinateWindowKind.All
+- uid: ProCharts.ChartCoordinateWindowKind.Fixed
+  name: Fixed
+  href: api/ProCharts.ChartCoordinateWindowKind.html#ProCharts_ChartCoordinateWindowKind_Fixed
+  commentId: F:ProCharts.ChartCoordinateWindowKind.Fixed
+  fullName: ProCharts.ChartCoordinateWindowKind.Fixed
+  nameWithType: ChartCoordinateWindowKind.Fixed
+- uid: ProCharts.ChartCoordinateWindowKind.Latest
+  name: Latest
+  href: api/ProCharts.ChartCoordinateWindowKind.html#ProCharts_ChartCoordinateWindowKind_Latest
+  commentId: F:ProCharts.ChartCoordinateWindowKind.Latest
+  fullName: ProCharts.ChartCoordinateWindowKind.Latest
+  nameWithType: ChartCoordinateWindowKind.Latest
 - uid: ProCharts.ChartCrosshairMode
   name: ChartCrosshairMode
   href: api/ProCharts.ChartCrosshairMode.html
@@ -75482,6 +75622,115 @@ references:
   isSpec: "True"
   fullName: ProCharts.CoalescingChartDataSource.TryBuildUpdate
   nameWithType: CoalescingChartDataSource.TryBuildUpdate
+- uid: ProCharts.CoordinateWindowChartDataSource
+  name: CoordinateWindowChartDataSource
+  href: api/ProCharts.CoordinateWindowChartDataSource.html
+  commentId: T:ProCharts.CoordinateWindowChartDataSource
+  fullName: ProCharts.CoordinateWindowChartDataSource
+  nameWithType: CoordinateWindowChartDataSource
+- uid: ProCharts.CoordinateWindowChartDataSource.#ctor(ProCharts.StreamingMultiSeriesChartDataSource,ProCharts.ChartCoordinateWindow)
+  name: CoordinateWindowChartDataSource(StreamingMultiSeriesChartDataSource, ChartCoordinateWindow)
+  href: api/ProCharts.CoordinateWindowChartDataSource.html#ProCharts_CoordinateWindowChartDataSource__ctor_ProCharts_StreamingMultiSeriesChartDataSource_ProCharts_ChartCoordinateWindow_
+  commentId: M:ProCharts.CoordinateWindowChartDataSource.#ctor(ProCharts.StreamingMultiSeriesChartDataSource,ProCharts.ChartCoordinateWindow)
+  name.vb: New(StreamingMultiSeriesChartDataSource, ChartCoordinateWindow)
+  fullName: ProCharts.CoordinateWindowChartDataSource.CoordinateWindowChartDataSource(ProCharts.StreamingMultiSeriesChartDataSource, ProCharts.ChartCoordinateWindow)
+  fullName.vb: ProCharts.CoordinateWindowChartDataSource.New(ProCharts.StreamingMultiSeriesChartDataSource, ProCharts.ChartCoordinateWindow)
+  nameWithType: CoordinateWindowChartDataSource.CoordinateWindowChartDataSource(StreamingMultiSeriesChartDataSource, ChartCoordinateWindow)
+  nameWithType.vb: CoordinateWindowChartDataSource.New(StreamingMultiSeriesChartDataSource, ChartCoordinateWindow)
+- uid: ProCharts.CoordinateWindowChartDataSource.#ctor*
+  name: CoordinateWindowChartDataSource
+  href: api/ProCharts.CoordinateWindowChartDataSource.html#ProCharts_CoordinateWindowChartDataSource__ctor_
+  commentId: Overload:ProCharts.CoordinateWindowChartDataSource.#ctor
+  isSpec: "True"
+  name.vb: New
+  fullName: ProCharts.CoordinateWindowChartDataSource.CoordinateWindowChartDataSource
+  fullName.vb: ProCharts.CoordinateWindowChartDataSource.New
+  nameWithType: CoordinateWindowChartDataSource.CoordinateWindowChartDataSource
+  nameWithType.vb: CoordinateWindowChartDataSource.New
+- uid: ProCharts.CoordinateWindowChartDataSource.BuildSnapshot(ProCharts.ChartDataRequest)
+  name: BuildSnapshot(ChartDataRequest)
+  href: api/ProCharts.CoordinateWindowChartDataSource.html#ProCharts_CoordinateWindowChartDataSource_BuildSnapshot_ProCharts_ChartDataRequest_
+  commentId: M:ProCharts.CoordinateWindowChartDataSource.BuildSnapshot(ProCharts.ChartDataRequest)
+  fullName: ProCharts.CoordinateWindowChartDataSource.BuildSnapshot(ProCharts.ChartDataRequest)
+  nameWithType: CoordinateWindowChartDataSource.BuildSnapshot(ChartDataRequest)
+- uid: ProCharts.CoordinateWindowChartDataSource.BuildSnapshot*
+  name: BuildSnapshot
+  href: api/ProCharts.CoordinateWindowChartDataSource.html#ProCharts_CoordinateWindowChartDataSource_BuildSnapshot_
+  commentId: Overload:ProCharts.CoordinateWindowChartDataSource.BuildSnapshot
+  isSpec: "True"
+  fullName: ProCharts.CoordinateWindowChartDataSource.BuildSnapshot
+  nameWithType: CoordinateWindowChartDataSource.BuildSnapshot
+- uid: ProCharts.CoordinateWindowChartDataSource.BuildView(ProCharts.ChartDataRequest)
+  name: BuildView(ChartDataRequest)
+  href: api/ProCharts.CoordinateWindowChartDataSource.html#ProCharts_CoordinateWindowChartDataSource_BuildView_ProCharts_ChartDataRequest_
+  commentId: M:ProCharts.CoordinateWindowChartDataSource.BuildView(ProCharts.ChartDataRequest)
+  fullName: ProCharts.CoordinateWindowChartDataSource.BuildView(ProCharts.ChartDataRequest)
+  nameWithType: CoordinateWindowChartDataSource.BuildView(ChartDataRequest)
+- uid: ProCharts.CoordinateWindowChartDataSource.BuildView*
+  name: BuildView
+  href: api/ProCharts.CoordinateWindowChartDataSource.html#ProCharts_CoordinateWindowChartDataSource_BuildView_
+  commentId: Overload:ProCharts.CoordinateWindowChartDataSource.BuildView
+  isSpec: "True"
+  fullName: ProCharts.CoordinateWindowChartDataSource.BuildView
+  nameWithType: CoordinateWindowChartDataSource.BuildView
+- uid: ProCharts.CoordinateWindowChartDataSource.DataInvalidated
+  name: DataInvalidated
+  href: api/ProCharts.CoordinateWindowChartDataSource.html#ProCharts_CoordinateWindowChartDataSource_DataInvalidated
+  commentId: E:ProCharts.CoordinateWindowChartDataSource.DataInvalidated
+  fullName: ProCharts.CoordinateWindowChartDataSource.DataInvalidated
+  nameWithType: CoordinateWindowChartDataSource.DataInvalidated
+- uid: ProCharts.CoordinateWindowChartDataSource.Dispose
+  name: Dispose()
+  href: api/ProCharts.CoordinateWindowChartDataSource.html#ProCharts_CoordinateWindowChartDataSource_Dispose
+  commentId: M:ProCharts.CoordinateWindowChartDataSource.Dispose
+  fullName: ProCharts.CoordinateWindowChartDataSource.Dispose()
+  nameWithType: CoordinateWindowChartDataSource.Dispose()
+- uid: ProCharts.CoordinateWindowChartDataSource.Dispose*
+  name: Dispose
+  href: api/ProCharts.CoordinateWindowChartDataSource.html#ProCharts_CoordinateWindowChartDataSource_Dispose_
+  commentId: Overload:ProCharts.CoordinateWindowChartDataSource.Dispose
+  isSpec: "True"
+  fullName: ProCharts.CoordinateWindowChartDataSource.Dispose
+  nameWithType: CoordinateWindowChartDataSource.Dispose
+- uid: ProCharts.CoordinateWindowChartDataSource.GetTotalCategoryCount
+  name: GetTotalCategoryCount()
+  href: api/ProCharts.CoordinateWindowChartDataSource.html#ProCharts_CoordinateWindowChartDataSource_GetTotalCategoryCount
+  commentId: M:ProCharts.CoordinateWindowChartDataSource.GetTotalCategoryCount
+  fullName: ProCharts.CoordinateWindowChartDataSource.GetTotalCategoryCount()
+  nameWithType: CoordinateWindowChartDataSource.GetTotalCategoryCount()
+- uid: ProCharts.CoordinateWindowChartDataSource.GetTotalCategoryCount*
+  name: GetTotalCategoryCount
+  href: api/ProCharts.CoordinateWindowChartDataSource.html#ProCharts_CoordinateWindowChartDataSource_GetTotalCategoryCount_
+  commentId: Overload:ProCharts.CoordinateWindowChartDataSource.GetTotalCategoryCount
+  isSpec: "True"
+  fullName: ProCharts.CoordinateWindowChartDataSource.GetTotalCategoryCount
+  nameWithType: CoordinateWindowChartDataSource.GetTotalCategoryCount
+- uid: ProCharts.CoordinateWindowChartDataSource.IsDisposed
+  name: IsDisposed
+  href: api/ProCharts.CoordinateWindowChartDataSource.html#ProCharts_CoordinateWindowChartDataSource_IsDisposed
+  commentId: P:ProCharts.CoordinateWindowChartDataSource.IsDisposed
+  fullName: ProCharts.CoordinateWindowChartDataSource.IsDisposed
+  nameWithType: CoordinateWindowChartDataSource.IsDisposed
+- uid: ProCharts.CoordinateWindowChartDataSource.IsDisposed*
+  name: IsDisposed
+  href: api/ProCharts.CoordinateWindowChartDataSource.html#ProCharts_CoordinateWindowChartDataSource_IsDisposed_
+  commentId: Overload:ProCharts.CoordinateWindowChartDataSource.IsDisposed
+  isSpec: "True"
+  fullName: ProCharts.CoordinateWindowChartDataSource.IsDisposed
+  nameWithType: CoordinateWindowChartDataSource.IsDisposed
+- uid: ProCharts.CoordinateWindowChartDataSource.Window
+  name: Window
+  href: api/ProCharts.CoordinateWindowChartDataSource.html#ProCharts_CoordinateWindowChartDataSource_Window
+  commentId: P:ProCharts.CoordinateWindowChartDataSource.Window
+  fullName: ProCharts.CoordinateWindowChartDataSource.Window
+  nameWithType: CoordinateWindowChartDataSource.Window
+- uid: ProCharts.CoordinateWindowChartDataSource.Window*
+  name: Window
+  href: api/ProCharts.CoordinateWindowChartDataSource.html#ProCharts_CoordinateWindowChartDataSource_Window_
+  commentId: Overload:ProCharts.CoordinateWindowChartDataSource.Window
+  isSpec: "True"
+  fullName: ProCharts.CoordinateWindowChartDataSource.Window
+  nameWithType: CoordinateWindowChartDataSource.Window
 - uid: ProCharts.HierarchyChartDataSource
   name: HierarchyChartDataSource
   href: api/ProCharts.HierarchyChartDataSource.html

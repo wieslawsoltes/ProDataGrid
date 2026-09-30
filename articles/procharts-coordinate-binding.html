@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+      <title>Live coordinate windows in chart models | ProDataGrid for Avalonia </title>
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <meta name="title" content="Live coordinate windows in chart models | ProDataGrid for Avalonia ">
+      
+      
+      <link rel="icon" href="../favicon.ico">
+      <link rel="stylesheet" href="../public/docfx.min.css">
+      <link rel="stylesheet" href="../public/main.css">
+      <meta name="docfx:navrel" content="../toc.html">
+      <meta name="docfx:tocrel" content="toc.html">
+      
+      
+      
+      
+      <meta name="docfx:docurl" content="https://github.com/wieslawsoltes/ProDataGrid/blob/master/docfx/articles/procharts-coordinate-binding.md/#L1">
+      <meta name="loc:inThisArticle" content="In this article">
+      <meta name="loc:searchResultsCount" content="{count} results for &quot;{query}&quot;">
+      <meta name="loc:searchNoResults" content="No results for &quot;{query}&quot;">
+      <meta name="loc:tocFilter" content="Filter by title">
+      <meta name="loc:nextArticle" content="Next">
+      <meta name="loc:prevArticle" content="Previous">
+      <meta name="loc:themeLight" content="Light">
+      <meta name="loc:themeDark" content="Dark">
+      <meta name="loc:themeAuto" content="Auto">
+      <meta name="loc:changeTheme" content="Change theme">
+      <meta name="loc:copy" content="Copy">
+      <meta name="loc:downloadPdf" content="Download PDF">
+
+      <script type="module" src="./../public/docfx.min.js"></script>
+
+      <script>
+        const theme = localStorage.getItem('theme') || 'auto'
+        document.documentElement.setAttribute('data-bs-theme', theme === 'auto' ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light') : theme)
+      </script>
+
+  </head>
+
+  <body class="tex2jax_ignore" data-layout="" data-yaml-mime="">
+    <header class="bg-body border-bottom">
+      <nav id="autocollapse" class="navbar navbar-expand-md" role="navigation">
+        <div class="container-xxl flex-nowrap">
+          <a class="navbar-brand" href="../index.html">
+            <img id="logo" class="svg" src="../images/logo.svg" alt="">
+            
+          </a>
+          <button class="btn btn-lg d-md-none border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navpanel" aria-controls="navpanel" aria-expanded="false" aria-label="Toggle navigation">
+            <i class="bi bi-three-dots"></i>
+          </button>
+          <div class="collapse navbar-collapse" id="navpanel">
+            <div id="navbar">
+            </div>
+          </div>
+        </div>
+      </nav>
+    </header>
+
+    <main class="container-xxl">
+      <div class="toc-offcanvas">
+        <div class="offcanvas-md offcanvas-start" tabindex="-1" id="tocOffcanvas" aria-labelledby="tocOffcanvasLabel">
+          <div class="offcanvas-header">
+            <h5 class="offcanvas-title" id="tocOffcanvasLabel">Table of Contents</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="offcanvas" data-bs-target="#tocOffcanvas" aria-label="Close"></button>
+          </div>
+          <div class="offcanvas-body">
+            <nav class="toc" id="toc"></nav>
+          </div>
+        </div>
+      </div>
+
+      <div class="content">
+        <div class="actionbar">
+          <button class="btn btn-lg border-0 d-md-none" type="button" data-bs-toggle="offcanvas" data-bs-target="#tocOffcanvas" aria-controls="tocOffcanvas" aria-expanded="false" aria-label="Show table of contents">
+            <i class="bi bi-list"></i>
+          </button>
+
+          <nav id="breadcrumb"></nav>
+        </div>
+
+        <article data-uid="">
+<h1 id="live-coordinate-windows-in-chart-models">Live coordinate windows in chart models</h1>
+
+<p><code>CoordinateWindowChartDataSource</code> connects a synchronized stream's fixed or trailing X window to the ordinary <code>ChartModel</code> data-source contract. A model can now follow elapsed coordinates without an application rebuilding and publishing detached snapshots for every source event.</p>
+<h2 id="compose-source-coordinate-policy-and-ui-delivery">Compose source, coordinate policy and UI delivery</h2>
+<pre><code class="lang-csharp">using ProCharts;
+using ProCharts.Avalonia;
+
+// Create this consumer pipeline on the Avalonia UI thread and retain it in its owner.
+var source = new StreamingMultiSeriesChartDataSource(65_536, new[]
+{
+    new StreamingChartSeries(&quot;Reference&quot;, ChartSeriesKind.Scatter),
+    new StreamingChartSeries(&quot;Measured&quot;, ChartSeriesKind.Scatter)
+});
+using var coordinate = new CoordinateWindowChartDataSource(source, ChartCoordinateWindow.Latest(30));
+using var delivered = ChartDataSourceDispatch.Create(coordinate);
+using var model = new ChartModel();
+using (model.DeferRefresh())
+{
+    model.CategoryAxis.Kind = ChartAxisKind.Value;
+    model.Request.MaxPoints = 256;
+    model.Request.DownsampleMode = ChartDownsampleMode.MinMax;
+    model.DataSource = delivered;
+}
+// Bind model to the view while this owner remains alive.
+// Append ordered producer rows to source, not to the model or UI on a worker.
+</code></pre>
+<p>The declarations illustrate ownership and reverse disposal order; do not return these objects from a scope that has already disposed them. Keep long-lived models/adapters as owner fields. Neither adapter owns or clears the stream. Stop application producers as appropriate, then dispose the model, delivery adapter and coordinate adapter.</p>
+<p><code>ChartCoordinateWindow.Latest(30)</code> means thirty source X units. When X is seconds, that is thirty recorded seconds. OLE Automation dates use days; use <code>TimeSpan.FromMinutes(30).TotalDays</code> for thirty minutes of that encoding. The anchor is the newest accepted row, including missing values, not the current wall clock. No timer, timezone/calendar conversion or interpolation is introduced.</p>
+<h2 id="policies-and-ordinary-navigation">Policies and ordinary navigation</h2>
+<p>The default <code>ChartCoordinateWindow.All</code> uses all retained rows. <code>Between(minimumX, maximumX)</code> selects an inclusive fixed interval. <code>Latest(span)</code> re-anchors to the newest retained row on each capture. Factories reject invalid/nonfinite bounds and negative spans before any policy change. Zero spans select the latest row. Optional immediate neighbors follow the same rules as the direct coordinate-query APIs, including empty ranges outside retained history.</p>
+<p>Policies are immutable value objects, so both fixed endpoints change atomically:</p>
+<pre><code class="lang-csharp">using (model.DeferRefresh())
+{
+    model.Interaction.FollowLatest = false;
+    model.Request.WindowStart = null;
+    model.Request.WindowCount = null;
+    coordinate.Window = ChartCoordinateWindow.Between(1_000, 1_100);
+}
+</code></pre>
+<p>Changing a policy raises one source invalidation; assigning the same policy is a no-op. Existing request fields are not silently discarded. The order is:</p>
+<ol>
+<li>Resolve the coordinate policy and optional neighbors against retained source rows.</li>
+<li>Clamp request <code>WindowStart</code> / <code>WindowCount</code> <strong>within that resolved row domain</strong>.</li>
+<li>Apply the existing per-channel common-index reduction and capture owned values/identities.</li>
+</ol>
+<p>The adapter's count provider reports the coordinate-filtered row count before ordinal windowing or reduction. Existing model row pan, zoom, <code>ShowLatest(n)</code> and follow-latest therefore operate inside this domain. A source's current count and a subsequent snapshot can observe different producer versions; capture always reclamps under one source lock.</p>
+<p>The coordinate Latest policy is independent of the model's ordinal <code>Interaction.FollowLatest</code> flag. Latest keeps moving with the source even if an ordinal subwindow is manually panned. To inspect history without that movement, pin a fixed coordinate interval first. To return to all source rows, set <code>Window = ChartCoordinateWindow.All</code>; resetting only the model's ordinal request does not remove the coordinate policy. A pinned interval is not an archive: its data can eventually be evicted by source capacity.</p>
+<h2 id="snapshot-identity-axes-and-threading">Snapshot identity, axes and threading</h2>
+<p><code>coordinate.BuildView(model.Request)</code> returns the source's existing <code>StreamingMultiSeriesChartView</code>, including its original 64-bit identity map and retained-history metadata. It shares the source's single-entry cache with direct queries; there is no second numerical copy. Another reader may replace that cache but cannot mutate already returned views. Use an identity map only with hits on that exact snapshot. <code>WindowStart</code> in the result remains an absolute offset into captured retained history, not a coordinate-relative offset.</p>
+<p>The policy filters data; <strong>it does not set explicit renderer axis limits</strong>. Auto axes fit the selected observations, not necessarily the requested interval's nominal endpoints. Set explicit axis limits separately when empty margins or a precise fixed plot extent are required. Existing Line/Area series remain category-positioned; use the tested numeric/date Scatter path for proportional X placement. This work does not add numeric-line interpolation or change crosshair/gesture coordinate semantics.</p>
+<p>Policy changes and model/request/UI mutation belong to the consumer thread. Source producers may use the synchronized stream's documented thread-safety contract. The adapter forwards source events on the caller's thread; compose it before the coalescing dispatcher adapter as shown above for UI delivery. Policy state is captured at read entry, so a concurrent policy change can coexist with a finishing read using the previous policy. Events execute outside locks. Subscriber exceptions occur after committed source/policy changes and do not roll them back.</p>
+<p>Disposal detaches events and releases source/subscriber references. Already executing reads or captured event handlers may complete; disposal does not wait for them. New reads, subscriptions and policy accesses fail afterward; removing a handler stays safe. A weak source subscription prevents an abandoned view/model from being retained by a long-lived stream, but deterministic disposal is still recommended.</p>
+<h2 id="sample-and-diagnostics">Sample and diagnostics</h2>
+<p>The existing <strong>Synchronized streams</strong> sample now includes <strong>Latest 120 X units</strong>, <strong>Pin displayed interval</strong> and <strong>Latest 512 rows</strong>. Pinning reads the displayed snapshot's coordinate endpoints, not a separately read producer version. Changing policies/detail does not replay accepted input. Closing/switching the sample still stops its synthetic timer and disposes both adapters/model. Compiled bindings and view-model commands remain separate from the lifecycle behavior.</p>
+<p>The core differential suite compares every reduction mode and ordinal subwindow against existing direct source APIs. Additional tests cover gaps, neighbors, dates/extremes, empty/evicted windows, model navigation, ownership, callbacks, disposal/GC, concurrent capture and zero-allocation warm reads/counts. Real headless worker-to-UI tests exercise the full composition; sample tests route the actual buttons and export pinned/following native images.</p>
+<pre><code class="lang-sh">dotnet run --project tests/ProCharts.Benchmarks/ProCharts.Benchmarks.csproj -c Release
+</code></pre>
+<p>The COORDINATE-BINDING section compares sixteen append-and-capture frames using a manual full-history capture plus linear scan, the already available direct trailing query, and the bound adapter. All accept the same rows and check selected values/gaps/identities. Inputs, constructor/seeding and full validation are excluded from timing; ingestion and all capture work/allocations are included. Two warmups precede seven rotating-order rounds. The deliberately expensive manual pattern is not the previous production renderer; the direct API is shown to avoid suggesting the adapter invents binary lookup or is faster than calling it directly.</p>
+<p>Counting/lookup costs O(log retained rows); uncached selection/copying remains O(window rows × channels) under the source lock. Equivalent cached capture/count calls allocate nothing in the adapter/source, but new views, events, schedulers and rendering can allocate. Per-series budgets remain soft and disjoint features can retain the whole selected window. No physical-GPU, FPS, peak-memory or worst-case-latency improvement is implied.</p>
+
+</article>
+
+        <div class="contribution d-print-none">
+          <a href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/docfx/articles/procharts-coordinate-binding.md/#L1" class="edit-link">Edit this page</a>
+        </div>
+
+        <div class="next-article d-print-none border-top" id="nextArticle"></div>
+
+      </div>
+
+      <div class="affix">
+        <nav id="affix"></nav>
+      </div>
+    </main>
+
+
+    <footer class="border-top text-secondary">
+      <div class="container-xxl">
+        <div class="flex-fill">
+          <span>Made with <a href="https://dotnet.github.io/docfx">docfx</a></span>
+        </div>
+      </div>
+    </footer>
+  </body>
+</html>

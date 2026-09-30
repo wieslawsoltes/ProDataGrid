@@ -1,0 +1,485 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+      <title>Class CoordinateWindowChartDataSource | ProDataGrid for Avalonia </title>
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <meta name="title" content="Class CoordinateWindowChartDataSource | ProDataGrid for Avalonia ">
+      
+      <meta name="description" content="Binds a fixed or trailing coordinate window of a synchronized stream to the ordinary chart-model contract.">
+      <link rel="icon" href="../favicon.ico">
+      <link rel="stylesheet" href="../public/docfx.min.css">
+      <link rel="stylesheet" href="../public/main.css">
+      <meta name="docfx:navrel" content="../toc.html">
+      <meta name="docfx:tocrel" content="toc.html">
+      
+      
+      
+      
+      <meta name="docfx:docurl" content="https://github.com/wieslawsoltes/ProDataGrid/new/master/apiSpec/new?filename=ProCharts_CoordinateWindowChartDataSource.md&amp;value=---%0Auid%3A%20ProCharts.CoordinateWindowChartDataSource%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">
+      <meta name="loc:inThisArticle" content="In this article">
+      <meta name="loc:searchResultsCount" content="{count} results for &quot;{query}&quot;">
+      <meta name="loc:searchNoResults" content="No results for &quot;{query}&quot;">
+      <meta name="loc:tocFilter" content="Filter by title">
+      <meta name="loc:nextArticle" content="Next">
+      <meta name="loc:prevArticle" content="Previous">
+      <meta name="loc:themeLight" content="Light">
+      <meta name="loc:themeDark" content="Dark">
+      <meta name="loc:themeAuto" content="Auto">
+      <meta name="loc:changeTheme" content="Change theme">
+      <meta name="loc:copy" content="Copy">
+      <meta name="loc:downloadPdf" content="Download PDF">
+
+      <script type="module" src="./../public/docfx.min.js"></script>
+
+      <script>
+        const theme = localStorage.getItem('theme') || 'auto'
+        document.documentElement.setAttribute('data-bs-theme', theme === 'auto' ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light') : theme)
+      </script>
+
+  </head>
+
+  <body class="tex2jax_ignore" data-layout="" data-yaml-mime="ManagedReference">
+    <header class="bg-body border-bottom">
+      <nav id="autocollapse" class="navbar navbar-expand-md" role="navigation">
+        <div class="container-xxl flex-nowrap">
+          <a class="navbar-brand" href="../index.html">
+            <img id="logo" class="svg" src="../images/logo.svg" alt="">
+            
+          </a>
+          <button class="btn btn-lg d-md-none border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navpanel" aria-controls="navpanel" aria-expanded="false" aria-label="Toggle navigation">
+            <i class="bi bi-three-dots"></i>
+          </button>
+          <div class="collapse navbar-collapse" id="navpanel">
+            <div id="navbar">
+            </div>
+          </div>
+        </div>
+      </nav>
+    </header>
+
+    <main class="container-xxl">
+      <div class="toc-offcanvas">
+        <div class="offcanvas-md offcanvas-start" tabindex="-1" id="tocOffcanvas" aria-labelledby="tocOffcanvasLabel">
+          <div class="offcanvas-header">
+            <h5 class="offcanvas-title" id="tocOffcanvasLabel">Table of Contents</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="offcanvas" data-bs-target="#tocOffcanvas" aria-label="Close"></button>
+          </div>
+          <div class="offcanvas-body">
+            <nav class="toc" id="toc"></nav>
+          </div>
+        </div>
+      </div>
+
+      <div class="content">
+        <div class="actionbar">
+          <button class="btn btn-lg border-0 d-md-none" type="button" data-bs-toggle="offcanvas" data-bs-target="#tocOffcanvas" aria-controls="tocOffcanvas" aria-expanded="false" aria-label="Show table of contents">
+            <i class="bi bi-list"></i>
+          </button>
+
+          <nav id="breadcrumb"></nav>
+        </div>
+
+        <article data-uid="ProCharts.CoordinateWindowChartDataSource">
+
+
+
+  <h1 id="ProCharts_CoordinateWindowChartDataSource" data-uid="ProCharts.CoordinateWindowChartDataSource" class="text-break">
+Class CoordinateWindowChartDataSource  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/ProCharts/CoordinateWindowChartDataSource.cs/#L18"><i class="bi bi-code-slash"></i></a>
+  </h1>
+
+  <div class="facts text-secondary">
+    <dl><dt>Namespace</dt><dd><a class="xref" href="ProCharts.html">ProCharts</a></dd></dl>
+  <dl><dt>Assembly</dt><dd>ProCharts.dll</dd></dl>
+  </div>
+
+  <div class="markdown summary"><p>Binds a fixed or trailing coordinate window of a synchronized stream to the ordinary chart-model contract.</p>
+</div>
+  <div class="markdown conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public sealed class CoordinateWindowChartDataSource : IChartDataSource, IChartWindowInfoProvider, IDisposable</code></pre>
+  </div>
+
+
+
+
+  <dl class="typelist inheritance">
+    <dt>Inheritance</dt>
+    <dd>
+      <div><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object">object</a></div>
+      <div><span class="xref">CoordinateWindowChartDataSource</span></div>
+    </dd>
+  </dl>
+
+  <dl class="typelist implements">
+    <dt>Implements</dt>
+    <dd>
+      <div><a class="xref" href="ProCharts.IChartDataSource.html">IChartDataSource</a></div>
+      <div><a class="xref" href="ProCharts.IChartWindowInfoProvider.html">IChartWindowInfoProvider</a></div>
+      <div><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.idisposable">IDisposable</a></div>
+    </dd>
+  </dl>
+
+
+  <dl class="typelist inheritedMembers">
+    <dt>Inherited Members</dt>
+    <dd>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object)">object.Equals(object)</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object-system-object)">object.Equals(object, object)</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.gethashcode">object.GetHashCode()</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.gettype">object.GetType()</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.referenceequals">object.ReferenceEquals(object, object)</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.tostring">object.ToString()</a>
+    </div>
+  </dd></dl>
+
+
+
+
+  <h2 id="ProCharts_CoordinateWindowChartDataSource_remarks">Remarks</h2>
+  <div class="markdown level0 remarks"><p>Compose with CoalescingChartDataSource for worker-to-consumer delivery. This adapter does not own its source,
+create a scheduler or set renderer axes. Configure a numeric/date/log category axis for proportional Scatter X.
+Request WindowStart/WindowCount select an ordinal subwindow WITHIN the coordinate-filtered, neighbor-expanded
+rows; MaxPoints is then applied through the source's existing shared-index selector. The underlying source lock
+covers resolution and capture, with no temporary full-history snapshot, second data copy or request allocation.</p>
+</div>
+
+
+  <h2 class="section" id="constructors">Constructors
+</h2>
+
+
+  <a id="ProCharts_CoordinateWindowChartDataSource__ctor_" data-uid="ProCharts.CoordinateWindowChartDataSource.#ctor*"></a>
+
+  <h3 id="ProCharts_CoordinateWindowChartDataSource__ctor_ProCharts_StreamingMultiSeriesChartDataSource_ProCharts_ChartCoordinateWindow_" data-uid="ProCharts.CoordinateWindowChartDataSource.#ctor(ProCharts.StreamingMultiSeriesChartDataSource,ProCharts.ChartCoordinateWindow)">
+  CoordinateWindowChartDataSource(StreamingMultiSeriesChartDataSource, ChartCoordinateWindow)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/ProCharts/CoordinateWindowChartDataSource.cs/#L27"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Creates a non-owning live view. The default window selects all retained observations.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public CoordinateWindowChartDataSource(StreamingMultiSeriesChartDataSource source, ChartCoordinateWindow window = default)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>source</code> <a class="xref" href="ProCharts.StreamingMultiSeriesChartDataSource.html">StreamingMultiSeriesChartDataSource</a></dt>
+    <dd></dd>
+    <dt><code>window</code> <a class="xref" href="ProCharts.ChartCoordinateWindow.html">ChartCoordinateWindow</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+
+  <h2 class="section" id="properties">Properties
+</h2>
+
+
+  <a id="ProCharts_CoordinateWindowChartDataSource_IsDisposed_" data-uid="ProCharts.CoordinateWindowChartDataSource.IsDisposed*"></a>
+
+  <h3 id="ProCharts_CoordinateWindowChartDataSource_IsDisposed" data-uid="ProCharts.CoordinateWindowChartDataSource.IsDisposed">
+  IsDisposed
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/ProCharts/CoordinateWindowChartDataSource.cs/#L70"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Gets whether this adapter has released its source and subscribers.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public bool IsDisposed { get; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="ProCharts_CoordinateWindowChartDataSource_Window_" data-uid="ProCharts.CoordinateWindowChartDataSource.Window*"></a>
+
+  <h3 id="ProCharts_CoordinateWindowChartDataSource_Window" data-uid="ProCharts.CoordinateWindowChartDataSource.Window">
+  Window
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/ProCharts/CoordinateWindowChartDataSource.cs/#L52"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Gets or atomically replaces the selection policy. Equal policies do not raise another event.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public ChartCoordinateWindow Window { get; set; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="ProCharts.ChartCoordinateWindow.html">ChartCoordinateWindow</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+  <h4 class="section" id="ProCharts_CoordinateWindowChartDataSource_Window_remarks">Remarks</h4>
+  <div class="markdown level1 remarks"><p>Policy changes do not rewrite the consumer model's ordinal requests or axis limits. Configure the policy
+and model/request state on the consumer thread, using model deferral when resetting ordinal windows.
+A read concurrent with a policy change may complete using the policy captured at its entry.</p>
+</div>
+
+
+
+
+  <h2 class="section" id="methods">Methods
+</h2>
+
+
+  <a id="ProCharts_CoordinateWindowChartDataSource_BuildSnapshot_" data-uid="ProCharts.CoordinateWindowChartDataSource.BuildSnapshot*"></a>
+
+  <h3 id="ProCharts_CoordinateWindowChartDataSource_BuildSnapshot_ProCharts_ChartDataRequest_" data-uid="ProCharts.CoordinateWindowChartDataSource.BuildSnapshot(ProCharts.ChartDataRequest)">
+  BuildSnapshot(ChartDataRequest)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/ProCharts/CoordinateWindowChartDataSource.cs/#L86"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public ChartDataSnapshot BuildSnapshot(ChartDataRequest request)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>request</code> <a class="xref" href="ProCharts.ChartDataRequest.html">ChartDataRequest</a></dt>
+    <dd></dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="ProCharts.ChartDataSnapshot.html">ChartDataSnapshot</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="ProCharts_CoordinateWindowChartDataSource_BuildView_" data-uid="ProCharts.CoordinateWindowChartDataSource.BuildView*"></a>
+
+  <h3 id="ProCharts_CoordinateWindowChartDataSource_BuildView_ProCharts_ChartDataRequest_" data-uid="ProCharts.CoordinateWindowChartDataSource.BuildView(ProCharts.ChartDataRequest)">
+  BuildView(ChartDataRequest)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/ProCharts/CoordinateWindowChartDataSource.cs/#L78"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Captures source-owned immutable values, shared X and original identities for the configured window.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public StreamingMultiSeriesChartView BuildView(ChartDataRequest request)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>request</code> <a class="xref" href="ProCharts.ChartDataRequest.html">ChartDataRequest</a></dt>
+    <dd></dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="ProCharts.StreamingMultiSeriesChartView.html">StreamingMultiSeriesChartView</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+  <h4 class="section" id="ProCharts_CoordinateWindowChartDataSource_BuildView_ProCharts_ChartDataRequest__remarks">Remarks</h4>
+  <div class="markdown level1 remarks"><p>Returned WindowStart is relative to the source's retained history, not the coordinate view. Identities belong
+to this exact snapshot/session. Capture reuses the source's single-entry cache; another consumer can replace
+that cache without changing existing views. Source storage and per-series soft-budget conventions are unchanged.</p>
+</div>
+
+
+
+
+  <a id="ProCharts_CoordinateWindowChartDataSource_Dispose_" data-uid="ProCharts.CoordinateWindowChartDataSource.Dispose*"></a>
+
+  <h3 id="ProCharts_CoordinateWindowChartDataSource_Dispose" data-uid="ProCharts.CoordinateWindowChartDataSource.Dispose">
+  Dispose()
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/ProCharts/CoordinateWindowChartDataSource.cs/#L106"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Detaches notifications and releases references without clearing or disposing the underlying stream.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public void Dispose()</code></pre>
+  </div>
+
+
+
+
+
+
+
+
+
+  <h4 class="section" id="ProCharts_CoordinateWindowChartDataSource_Dispose_remarks">Remarks</h4>
+  <div class="markdown level1 remarks"><p>Idempotent. Reads/subscriptions/policy access after disposal fail; removing a handler is still safe.
+In-flight reads or already captured subscriber invocations may finish; Dispose does not wait for them.
+Deterministically dispose the model, outer delivery adapter and this adapter in that order.</p>
+</div>
+
+
+
+
+  <a id="ProCharts_CoordinateWindowChartDataSource_GetTotalCategoryCount_" data-uid="ProCharts.CoordinateWindowChartDataSource.GetTotalCategoryCount*"></a>
+
+  <h3 id="ProCharts_CoordinateWindowChartDataSource_GetTotalCategoryCount" data-uid="ProCharts.CoordinateWindowChartDataSource.GetTotalCategoryCount">
+  GetTotalCategoryCount()
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/ProCharts/CoordinateWindowChartDataSource.cs/#L94"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Counts coordinate-filtered rows, including neighbors, before ordinal windowing or reduction.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public int? GetTotalCategoryCount()</code></pre>
+  </div>
+
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a>?</dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+  <h4 class="section" id="ProCharts_CoordinateWindowChartDataSource_GetTotalCategoryCount_remarks">Remarks</h4>
+  <div class="markdown level1 remarks"><p>Uses binary bounds without allocating/copying the history. A separate count and subsequent capture can see
+different producer versions, as with other live providers; the capture itself always reclamps atomically.
+ChartModel ordinal pan/zoom/follow-latest applies within this filtered row domain, not the whole source.</p>
+</div>
+
+
+
+
+  <h2 class="section" id="events">Events
+</h2>
+
+
+
+  <h3 id="ProCharts_CoordinateWindowChartDataSource_DataInvalidated" data-uid="ProCharts.CoordinateWindowChartDataSource.DataInvalidated">
+  DataInvalidated
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/ProCharts/CoordinateWindowChartDataSource.cs/#L40"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Raised once for a changed policy or forwarded source event, outside adapter/source locks.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public event EventHandler? DataInvalidated</code></pre>
+  </div>
+
+
+
+
+
+
+  <h4 class="section">Event Type</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.eventhandler">EventHandler</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+  <h4 class="section" id="ProCharts_CoordinateWindowChartDataSource_DataInvalidated_remarks">Remarks</h4>
+  <div class="markdown level1 remarks"><p>Events run synchronously on the caller's thread. Subscriber exceptions occur after the source/policy change
+and do not roll it back. Concurrent producers may notify out of version order; UI models require dispatch.</p>
+</div>
+
+
+
+
+
+</article>
+
+        <div class="contribution d-print-none">
+          <a href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/ProCharts/CoordinateWindowChartDataSource.cs/#L18" class="edit-link">Edit this page</a>
+        </div>
+
+
+      </div>
+
+      <div class="affix">
+        <nav id="affix"></nav>
+      </div>
+    </main>
+
+
+    <footer class="border-top text-secondary">
+      <div class="container-xxl">
+        <div class="flex-fill">
+          <span>Made with <a href="https://dotnet.github.io/docfx">docfx</a></span>
+        </div>
+      </div>
+    </footer>
+  </body>
+</html>
