@@ -80122,6 +80122,38 @@ references:
   isSpec: "True"
   fullName: ProCharts.StreamingMultiSeriesChartDataSource.AppendRange
   nameWithType: StreamingMultiSeriesChartDataSource.AppendRange
+- uid: ProCharts.StreamingMultiSeriesChartDataSource.BuildLatestSnapshotByX(System.Double,System.Nullable{System.Int32},ProCharts.ChartDownsampleMode,System.Boolean)
+  name: BuildLatestSnapshotByX(double, int?, ChartDownsampleMode, bool)
+  href: api/ProCharts.StreamingMultiSeriesChartDataSource.html#ProCharts_StreamingMultiSeriesChartDataSource_BuildLatestSnapshotByX_System_Double_System_Nullable_System_Int32__ProCharts_ChartDownsampleMode_System_Boolean_
+  commentId: M:ProCharts.StreamingMultiSeriesChartDataSource.BuildLatestSnapshotByX(System.Double,System.Nullable{System.Int32},ProCharts.ChartDownsampleMode,System.Boolean)
+  name.vb: BuildLatestSnapshotByX(Double, Integer?, ChartDownsampleMode, Boolean)
+  fullName: ProCharts.StreamingMultiSeriesChartDataSource.BuildLatestSnapshotByX(double, int?, ProCharts.ChartDownsampleMode, bool)
+  fullName.vb: ProCharts.StreamingMultiSeriesChartDataSource.BuildLatestSnapshotByX(Double, Integer?, ProCharts.ChartDownsampleMode, Boolean)
+  nameWithType: StreamingMultiSeriesChartDataSource.BuildLatestSnapshotByX(double, int?, ChartDownsampleMode, bool)
+  nameWithType.vb: StreamingMultiSeriesChartDataSource.BuildLatestSnapshotByX(Double, Integer?, ChartDownsampleMode, Boolean)
+- uid: ProCharts.StreamingMultiSeriesChartDataSource.BuildLatestSnapshotByX*
+  name: BuildLatestSnapshotByX
+  href: api/ProCharts.StreamingMultiSeriesChartDataSource.html#ProCharts_StreamingMultiSeriesChartDataSource_BuildLatestSnapshotByX_
+  commentId: Overload:ProCharts.StreamingMultiSeriesChartDataSource.BuildLatestSnapshotByX
+  isSpec: "True"
+  fullName: ProCharts.StreamingMultiSeriesChartDataSource.BuildLatestSnapshotByX
+  nameWithType: StreamingMultiSeriesChartDataSource.BuildLatestSnapshotByX
+- uid: ProCharts.StreamingMultiSeriesChartDataSource.BuildLatestViewByX(System.Double,System.Nullable{System.Int32},ProCharts.ChartDownsampleMode,System.Boolean)
+  name: BuildLatestViewByX(double, int?, ChartDownsampleMode, bool)
+  href: api/ProCharts.StreamingMultiSeriesChartDataSource.html#ProCharts_StreamingMultiSeriesChartDataSource_BuildLatestViewByX_System_Double_System_Nullable_System_Int32__ProCharts_ChartDownsampleMode_System_Boolean_
+  commentId: M:ProCharts.StreamingMultiSeriesChartDataSource.BuildLatestViewByX(System.Double,System.Nullable{System.Int32},ProCharts.ChartDownsampleMode,System.Boolean)
+  name.vb: BuildLatestViewByX(Double, Integer?, ChartDownsampleMode, Boolean)
+  fullName: ProCharts.StreamingMultiSeriesChartDataSource.BuildLatestViewByX(double, int?, ProCharts.ChartDownsampleMode, bool)
+  fullName.vb: ProCharts.StreamingMultiSeriesChartDataSource.BuildLatestViewByX(Double, Integer?, ProCharts.ChartDownsampleMode, Boolean)
+  nameWithType: StreamingMultiSeriesChartDataSource.BuildLatestViewByX(double, int?, ChartDownsampleMode, bool)
+  nameWithType.vb: StreamingMultiSeriesChartDataSource.BuildLatestViewByX(Double, Integer?, ChartDownsampleMode, Boolean)
+- uid: ProCharts.StreamingMultiSeriesChartDataSource.BuildLatestViewByX*
+  name: BuildLatestViewByX
+  href: api/ProCharts.StreamingMultiSeriesChartDataSource.html#ProCharts_StreamingMultiSeriesChartDataSource_BuildLatestViewByX_
+  commentId: Overload:ProCharts.StreamingMultiSeriesChartDataSource.BuildLatestViewByX
+  isSpec: "True"
+  fullName: ProCharts.StreamingMultiSeriesChartDataSource.BuildLatestViewByX
+  nameWithType: StreamingMultiSeriesChartDataSource.BuildLatestViewByX
 - uid: ProCharts.StreamingMultiSeriesChartDataSource.BuildSnapshot(ProCharts.ChartDataRequest)
   name: BuildSnapshot(ChartDataRequest)
   href: api/ProCharts.StreamingMultiSeriesChartDataSource.html#ProCharts_StreamingMultiSeriesChartDataSource_BuildSnapshot_ProCharts_ChartDataRequest_
@@ -80135,6 +80167,22 @@ references:
   isSpec: "True"
   fullName: ProCharts.StreamingMultiSeriesChartDataSource.BuildSnapshot
   nameWithType: StreamingMultiSeriesChartDataSource.BuildSnapshot
+- uid: ProCharts.StreamingMultiSeriesChartDataSource.BuildSnapshotByX(System.Double,System.Double,System.Nullable{System.Int32},ProCharts.ChartDownsampleMode,System.Boolean)
+  name: BuildSnapshotByX(double, double, int?, ChartDownsampleMode, bool)
+  href: api/ProCharts.StreamingMultiSeriesChartDataSource.html#ProCharts_StreamingMultiSeriesChartDataSource_BuildSnapshotByX_System_Double_System_Double_System_Nullable_System_Int32__ProCharts_ChartDownsampleMode_System_Boolean_
+  commentId: M:ProCharts.StreamingMultiSeriesChartDataSource.BuildSnapshotByX(System.Double,System.Double,System.Nullable{System.Int32},ProCharts.ChartDownsampleMode,System.Boolean)
+  name.vb: BuildSnapshotByX(Double, Double, Integer?, ChartDownsampleMode, Boolean)
+  fullName: ProCharts.StreamingMultiSeriesChartDataSource.BuildSnapshotByX(double, double, int?, ProCharts.ChartDownsampleMode, bool)
+  fullName.vb: ProCharts.StreamingMultiSeriesChartDataSource.BuildSnapshotByX(Double, Double, Integer?, ProCharts.ChartDownsampleMode, Boolean)
+  nameWithType: StreamingMultiSeriesChartDataSource.BuildSnapshotByX(double, double, int?, ChartDownsampleMode, bool)
+  nameWithType.vb: StreamingMultiSeriesChartDataSource.BuildSnapshotByX(Double, Double, Integer?, ChartDownsampleMode, Boolean)
+- uid: ProCharts.StreamingMultiSeriesChartDataSource.BuildSnapshotByX*
+  name: BuildSnapshotByX
+  href: api/ProCharts.StreamingMultiSeriesChartDataSource.html#ProCharts_StreamingMultiSeriesChartDataSource_BuildSnapshotByX_
+  commentId: Overload:ProCharts.StreamingMultiSeriesChartDataSource.BuildSnapshotByX
+  isSpec: "True"
+  fullName: ProCharts.StreamingMultiSeriesChartDataSource.BuildSnapshotByX
+  nameWithType: StreamingMultiSeriesChartDataSource.BuildSnapshotByX
 - uid: ProCharts.StreamingMultiSeriesChartDataSource.BuildView(ProCharts.ChartDataRequest)
   name: BuildView(ChartDataRequest)
   href: api/ProCharts.StreamingMultiSeriesChartDataSource.html#ProCharts_StreamingMultiSeriesChartDataSource_BuildView_ProCharts_ChartDataRequest_
@@ -80148,6 +80196,22 @@ references:
   isSpec: "True"
   fullName: ProCharts.StreamingMultiSeriesChartDataSource.BuildView
   nameWithType: StreamingMultiSeriesChartDataSource.BuildView
+- uid: ProCharts.StreamingMultiSeriesChartDataSource.BuildViewByX(System.Double,System.Double,System.Nullable{System.Int32},ProCharts.ChartDownsampleMode,System.Boolean)
+  name: BuildViewByX(double, double, int?, ChartDownsampleMode, bool)
+  href: api/ProCharts.StreamingMultiSeriesChartDataSource.html#ProCharts_StreamingMultiSeriesChartDataSource_BuildViewByX_System_Double_System_Double_System_Nullable_System_Int32__ProCharts_ChartDownsampleMode_System_Boolean_
+  commentId: M:ProCharts.StreamingMultiSeriesChartDataSource.BuildViewByX(System.Double,System.Double,System.Nullable{System.Int32},ProCharts.ChartDownsampleMode,System.Boolean)
+  name.vb: BuildViewByX(Double, Double, Integer?, ChartDownsampleMode, Boolean)
+  fullName: ProCharts.StreamingMultiSeriesChartDataSource.BuildViewByX(double, double, int?, ProCharts.ChartDownsampleMode, bool)
+  fullName.vb: ProCharts.StreamingMultiSeriesChartDataSource.BuildViewByX(Double, Double, Integer?, ProCharts.ChartDownsampleMode, Boolean)
+  nameWithType: StreamingMultiSeriesChartDataSource.BuildViewByX(double, double, int?, ChartDownsampleMode, bool)
+  nameWithType.vb: StreamingMultiSeriesChartDataSource.BuildViewByX(Double, Double, Integer?, ChartDownsampleMode, Boolean)
+- uid: ProCharts.StreamingMultiSeriesChartDataSource.BuildViewByX*
+  name: BuildViewByX
+  href: api/ProCharts.StreamingMultiSeriesChartDataSource.html#ProCharts_StreamingMultiSeriesChartDataSource_BuildViewByX_
+  commentId: Overload:ProCharts.StreamingMultiSeriesChartDataSource.BuildViewByX
+  isSpec: "True"
+  fullName: ProCharts.StreamingMultiSeriesChartDataSource.BuildViewByX
+  nameWithType: StreamingMultiSeriesChartDataSource.BuildViewByX
 - uid: ProCharts.StreamingMultiSeriesChartDataSource.Capacity
   name: Capacity
   href: api/ProCharts.StreamingMultiSeriesChartDataSource.html#ProCharts_StreamingMultiSeriesChartDataSource_Capacity

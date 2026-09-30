@@ -85,7 +85,7 @@
 
 
   <h1 id="ProCharts_StreamingMultiSeriesChartDataSource" data-uid="ProCharts.StreamingMultiSeriesChartDataSource" class="text-break">
-Class StreamingMultiSeriesChartDataSource  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/ProCharts/StreamingMultiSeriesChartDataSource.cs/#L20"><i class="bi bi-code-slash"></i></a>
+Class StreamingMultiSeriesChartDataSource  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/ProCharts/StreamingMultiSeriesChartDataSource.XRange.cs/#L10"><i class="bi bi-code-slash"></i></a>
   </h1>
 
   <div class="facts text-secondary">
@@ -476,6 +476,116 @@ is a no-op. Sources accept concurrent callers but do not reorder competing produ
 
 
 
+  <a id="ProCharts_StreamingMultiSeriesChartDataSource_BuildLatestSnapshotByX_" data-uid="ProCharts.StreamingMultiSeriesChartDataSource.BuildLatestSnapshotByX*"></a>
+
+  <h3 id="ProCharts_StreamingMultiSeriesChartDataSource_BuildLatestSnapshotByX_System_Double_System_Nullable_System_Int32__ProCharts_ChartDownsampleMode_System_Boolean_" data-uid="ProCharts.StreamingMultiSeriesChartDataSource.BuildLatestSnapshotByX(System.Double,System.Nullable{System.Int32},ProCharts.ChartDownsampleMode,System.Boolean)">
+  BuildLatestSnapshotByX(double, int?, ChartDownsampleMode, bool)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/ProCharts/StreamingMultiSeriesChartDataSource.LatestXRange.cs/#L57"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Captures the snapshot portion of a trailing coordinate-span query.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public ChartDataSnapshot BuildLatestSnapshotByX(double span, int? maxPoints = null, ChartDownsampleMode downsampleMode = ChartDownsampleMode.Adaptive, bool includeBoundaryNeighbors = false)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>span</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.double">double</a></dt>
+    <dd><p>Finite nonnegative span in source X units, measured back from the newest retained row.</p>
+</dd>
+    <dt><code>maxPoints</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a>?</dt>
+    <dd><p>Per-series soft selection budget.</p>
+</dd>
+    <dt><code>downsampleMode</code> <a class="xref" href="ProCharts.ChartDownsampleMode.html">ChartDownsampleMode</a></dt>
+    <dd><p>Selection mode.</p>
+</dd>
+    <dt><code>includeBoundaryNeighbors</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></dt>
+    <dd><p>Whether to include the immediately preceding retained row.</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="ProCharts.ChartDataSnapshot.html">ChartDataSnapshot</a></dt>
+    <dd><p>The same cached snapshot that an equivalent BuildLatestViewByX call would return.</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+  <h4 class="section" id="ProCharts_StreamingMultiSeriesChartDataSource_BuildLatestSnapshotByX_System_Double_System_Nullable_System_Int32__ProCharts_ChartDownsampleMode_System_Boolean__remarks">Remarks</h4>
+  <div class="markdown level1 remarks"><p>Use BuildLatestViewByX when the snapshot's original row identities are needed.</p>
+</div>
+
+
+
+
+  <a id="ProCharts_StreamingMultiSeriesChartDataSource_BuildLatestViewByX_" data-uid="ProCharts.StreamingMultiSeriesChartDataSource.BuildLatestViewByX*"></a>
+
+  <h3 id="ProCharts_StreamingMultiSeriesChartDataSource_BuildLatestViewByX_System_Double_System_Nullable_System_Int32__ProCharts_ChartDownsampleMode_System_Boolean_" data-uid="ProCharts.StreamingMultiSeriesChartDataSource.BuildLatestViewByX(System.Double,System.Nullable{System.Int32},ProCharts.ChartDownsampleMode,System.Boolean)">
+  BuildLatestViewByX(double, int?, ChartDownsampleMode, bool)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/ProCharts/StreamingMultiSeriesChartDataSource.LatestXRange.cs/#L29"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Captures the latest inclusive coordinate span, anchoring its end to the newest retained row.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public StreamingMultiSeriesChartView BuildLatestViewByX(double span, int? maxPoints = null, ChartDownsampleMode downsampleMode = ChartDownsampleMode.Adaptive, bool includeBoundaryNeighbors = false)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>span</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.double">double</a></dt>
+    <dd><p>Finite nonnegative span in the source's X units. Zero selects the newest row.</p>
+</dd>
+    <dt><code>maxPoints</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a>?</dt>
+    <dd><p>Per-series soft selection budget, with the same semantics as BuildView.</p>
+</dd>
+    <dt><code>downsampleMode</code> <a class="xref" href="ProCharts.ChartDownsampleMode.html">ChartDownsampleMode</a></dt>
+    <dd><p>Selection mode, with the same semantics as BuildView.</p>
+</dd>
+    <dt><code>includeBoundaryNeighbors</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></dt>
+    <dd><p>Include the immediately preceding retained row when available.</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="ProCharts.StreamingMultiSeriesChartView.html">StreamingMultiSeriesChartView</a></dt>
+    <dd><p>An owned aligned view whose newest coordinate, window and identities belong to one capture.</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+  <h4 class="section" id="ProCharts_StreamingMultiSeriesChartDataSource_BuildLatestViewByX_System_Double_System_Nullable_System_Int32__ProCharts_ChartDownsampleMode_System_Boolean__remarks">Remarks</h4>
+  <div class="markdown level1 remarks"><p>Newest-coordinate lookup, lower-bound search, optional neighbor expansion and snapshot capture share the
+source lock. Callers do not need to read a latest X value separately and race an append or eviction before
+capture. Missing values in the newest row still advance the coordinate window; they are not skipped.
+A zero span with neighbors enabled includes the preceding row as well. Empty history produces an empty view.
+Coordinates have the units supplied to Append: for OLE Automation date coordinates, spans are measured in
+days, not seconds. No calendar/timezone conversion occurs. Subtracting the span uses double arithmetic;
+overflow below the finite domain includes all earlier retained rows, and sub-ULP spans can round to zero width.
+This is an explicit query, not an automatic model viewport or a timer. Each invocation re-anchors to its own
+captured latest row. Reduction, gaps, cache ownership and complexity follow BuildViewByX.</p>
+</div>
+
+
+
+
   <a id="ProCharts_StreamingMultiSeriesChartDataSource_BuildSnapshot_" data-uid="ProCharts.StreamingMultiSeriesChartDataSource.BuildSnapshot*"></a>
 
   <h3 id="ProCharts_StreamingMultiSeriesChartDataSource_BuildSnapshot_ProCharts_ChartDataRequest_" data-uid="ProCharts.StreamingMultiSeriesChartDataSource.BuildSnapshot(ProCharts.ChartDataRequest)">
@@ -508,6 +618,60 @@ is a no-op. Sources accept concurrent callers but do not reorder competing produ
 
 
 
+
+
+
+
+  <a id="ProCharts_StreamingMultiSeriesChartDataSource_BuildSnapshotByX_" data-uid="ProCharts.StreamingMultiSeriesChartDataSource.BuildSnapshotByX*"></a>
+
+  <h3 id="ProCharts_StreamingMultiSeriesChartDataSource_BuildSnapshotByX_System_Double_System_Double_System_Nullable_System_Int32__ProCharts_ChartDownsampleMode_System_Boolean_" data-uid="ProCharts.StreamingMultiSeriesChartDataSource.BuildSnapshotByX(System.Double,System.Double,System.Nullable{System.Int32},ProCharts.ChartDownsampleMode,System.Boolean)">
+  BuildSnapshotByX(double, double, int?, ChartDownsampleMode, bool)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/ProCharts/StreamingMultiSeriesChartDataSource.XRange.cs/#L67"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Captures the snapshot portion of an inclusive source-X query.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public ChartDataSnapshot BuildSnapshotByX(double minimumX, double maximumX, int? maxPoints = null, ChartDownsampleMode downsampleMode = ChartDownsampleMode.Adaptive, bool includeBoundaryNeighbors = false)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>minimumX</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.double">double</a></dt>
+    <dd><p>Finite inclusive lower bound in source coordinate units.</p>
+</dd>
+    <dt><code>maximumX</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.double">double</a></dt>
+    <dd><p>Finite inclusive upper bound, not less than minimumX.</p>
+</dd>
+    <dt><code>maxPoints</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a>?</dt>
+    <dd><p>Per-series soft selection budget.</p>
+</dd>
+    <dt><code>downsampleMode</code> <a class="xref" href="ProCharts.ChartDownsampleMode.html">ChartDownsampleMode</a></dt>
+    <dd><p>Selection mode.</p>
+</dd>
+    <dt><code>includeBoundaryNeighbors</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></dt>
+    <dd><p>Whether to include adjacent retained rows at intersecting boundaries.</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="ProCharts.ChartDataSnapshot.html">ChartDataSnapshot</a></dt>
+    <dd><p>The same cached snapshot that BuildViewByX would return for the equivalent query.</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+  <h4 class="section" id="ProCharts_StreamingMultiSeriesChartDataSource_BuildSnapshotByX_System_Double_System_Double_System_Nullable_System_Int32__ProCharts_ChartDownsampleMode_System_Boolean__remarks">Remarks</h4>
+  <div class="markdown level1 remarks"><p>Use BuildViewByX when original row identities or capture-consistent history metadata are needed.</p>
+</div>
 
 
 
@@ -553,6 +717,69 @@ interpolated. More series/disjoint gaps can make the union approach the full win
 null/nonpositive budgets disable it; one promotes to two. Adaptive normalizes to MinMax. Cache-equivalent
 requests reuse the view without allocation. Snapshot scanning/selection is O(window rows * series count).
 Unreduced windows use at most two contiguous span copies per ring channel, including wrapped windows.</p>
+</div>
+
+
+
+
+  <a id="ProCharts_StreamingMultiSeriesChartDataSource_BuildViewByX_" data-uid="ProCharts.StreamingMultiSeriesChartDataSource.BuildViewByX*"></a>
+
+  <h3 id="ProCharts_StreamingMultiSeriesChartDataSource_BuildViewByX_System_Double_System_Double_System_Nullable_System_Int32__ProCharts_ChartDownsampleMode_System_Boolean_" data-uid="ProCharts.StreamingMultiSeriesChartDataSource.BuildViewByX(System.Double,System.Double,System.Nullable{System.Int32},ProCharts.ChartDownsampleMode,System.Boolean)">
+  BuildViewByX(double, double, int?, ChartDownsampleMode, bool)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/ProCharts/StreamingMultiSeriesChartDataSource.XRange.cs/#L31"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Captures retained observations within inclusive source-X bounds without first copying or scanning the full history.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public StreamingMultiSeriesChartView BuildViewByX(double minimumX, double maximumX, int? maxPoints = null, ChartDownsampleMode downsampleMode = ChartDownsampleMode.Adaptive, bool includeBoundaryNeighbors = false)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>minimumX</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.double">double</a></dt>
+    <dd><p>Finite inclusive lower bound, in the same coordinate units as Append.</p>
+</dd>
+    <dt><code>maximumX</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.double">double</a></dt>
+    <dd><p>Finite inclusive upper bound, not less than minimumX.</p>
+</dd>
+    <dt><code>maxPoints</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a>?</dt>
+    <dd><p>Per-series soft selection budget, with the same semantics as BuildView.</p>
+</dd>
+    <dt><code>downsampleMode</code> <a class="xref" href="ProCharts.ChartDownsampleMode.html">ChartDownsampleMode</a></dt>
+    <dd><p>Selection mode, with the same semantics as BuildView.</p>
+</dd>
+    <dt><code>includeBoundaryNeighbors</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></dt>
+    <dd><p>Retain the immediately preceding and following rows when the interval intersects the retained X extent.</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="ProCharts.StreamingMultiSeriesChartView.html">StreamingMultiSeriesChartView</a></dt>
+    <dd><p>An owned aligned view; its window metadata and original identities belong to the same capture as its values.</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+  <h4 class="section" id="ProCharts_StreamingMultiSeriesChartDataSource_BuildViewByX_System_Double_System_Double_System_Nullable_System_Int32__ProCharts_ChartDownsampleMode_System_Boolean__remarks">Remarks</h4>
+  <div class="markdown level1 remarks"><p>Binary searches read the logical ring directly in O(log retained rows) time. Search, optional neighbor expansion,
+selection and snapshot capture share one lock, so eviction cannot invalidate the resolved window in between.
+Uncached capture still costs O(window rows * series count) and holds the source lock. Equivalent normalized ordinal
+and coordinate windows share the existing single-entry cache; warm equivalent queries allocate no managed memory.
+Bounds between adjacent observations produce an empty view unless neighbors are requested, in which case both
+adjacent rows are included. Intervals wholly outside retained history remain empty even with neighbors enabled.
+Missing values do not remove source-X rows, and neighbors never interpolate, replace missing data or reach evicted rows.
+Reduction preserves the common identity map and the existing per-channel gap/endpoint conventions.
+This API does not change model requests, axis limits or renderer positioning. Date coordinates must use the same
+encoding as the appended X values; no calendar or timezone conversion is performed by this source.</p>
 </div>
 
 
@@ -654,7 +881,7 @@ Unreduced windows use at most two contiguous span copies per ring channel, inclu
 </article>
 
         <div class="contribution d-print-none">
-          <a href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/ProCharts/StreamingMultiSeriesChartDataSource.cs/#L20" class="edit-link">Edit this page</a>
+          <a href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/ProCharts/StreamingMultiSeriesChartDataSource.XRange.cs/#L10" class="edit-link">Edit this page</a>
         </div>
 
 

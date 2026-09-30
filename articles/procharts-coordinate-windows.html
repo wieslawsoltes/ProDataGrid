@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+      <title>Coordinate windows for synchronized streams | ProDataGrid for Avalonia </title>
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <meta name="title" content="Coordinate windows for synchronized streams | ProDataGrid for Avalonia ">
+      
+      
+      <link rel="icon" href="../favicon.ico">
+      <link rel="stylesheet" href="../public/docfx.min.css">
+      <link rel="stylesheet" href="../public/main.css">
+      <meta name="docfx:navrel" content="../toc.html">
+      <meta name="docfx:tocrel" content="toc.html">
+      
+      
+      
+      
+      <meta name="docfx:docurl" content="https://github.com/wieslawsoltes/ProDataGrid/blob/master/docfx/articles/procharts-coordinate-windows.md/#L1">
+      <meta name="loc:inThisArticle" content="In this article">
+      <meta name="loc:searchResultsCount" content="{count} results for &quot;{query}&quot;">
+      <meta name="loc:searchNoResults" content="No results for &quot;{query}&quot;">
+      <meta name="loc:tocFilter" content="Filter by title">
+      <meta name="loc:nextArticle" content="Next">
+      <meta name="loc:prevArticle" content="Previous">
+      <meta name="loc:themeLight" content="Light">
+      <meta name="loc:themeDark" content="Dark">
+      <meta name="loc:themeAuto" content="Auto">
+      <meta name="loc:changeTheme" content="Change theme">
+      <meta name="loc:copy" content="Copy">
+      <meta name="loc:downloadPdf" content="Download PDF">
+
+      <script type="module" src="./../public/docfx.min.js"></script>
+
+      <script>
+        const theme = localStorage.getItem('theme') || 'auto'
+        document.documentElement.setAttribute('data-bs-theme', theme === 'auto' ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light') : theme)
+      </script>
+
+  </head>
+
+  <body class="tex2jax_ignore" data-layout="" data-yaml-mime="">
+    <header class="bg-body border-bottom">
+      <nav id="autocollapse" class="navbar navbar-expand-md" role="navigation">
+        <div class="container-xxl flex-nowrap">
+          <a class="navbar-brand" href="../index.html">
+            <img id="logo" class="svg" src="../images/logo.svg" alt="">
+            
+          </a>
+          <button class="btn btn-lg d-md-none border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navpanel" aria-controls="navpanel" aria-expanded="false" aria-label="Toggle navigation">
+            <i class="bi bi-three-dots"></i>
+          </button>
+          <div class="collapse navbar-collapse" id="navpanel">
+            <div id="navbar">
+            </div>
+          </div>
+        </div>
+      </nav>
+    </header>
+
+    <main class="container-xxl">
+      <div class="toc-offcanvas">
+        <div class="offcanvas-md offcanvas-start" tabindex="-1" id="tocOffcanvas" aria-labelledby="tocOffcanvasLabel">
+          <div class="offcanvas-header">
+            <h5 class="offcanvas-title" id="tocOffcanvasLabel">Table of Contents</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="offcanvas" data-bs-target="#tocOffcanvas" aria-label="Close"></button>
+          </div>
+          <div class="offcanvas-body">
+            <nav class="toc" id="toc"></nav>
+          </div>
+        </div>
+      </div>
+
+      <div class="content">
+        <div class="actionbar">
+          <button class="btn btn-lg border-0 d-md-none" type="button" data-bs-toggle="offcanvas" data-bs-target="#tocOffcanvas" aria-controls="tocOffcanvas" aria-expanded="false" aria-label="Show table of contents">
+            <i class="bi bi-list"></i>
+          </button>
+
+          <nav id="breadcrumb"></nav>
+        </div>
+
+        <article data-uid="">
+<h1 id="coordinate-windows-for-synchronized-streams">Coordinate windows for synchronized streams</h1>
+
+<p><code>StreamingMultiSeriesChartDataSource.BuildViewByX</code> captures a numeric or encoded-date interval directly from retained ring history. It does not require a full-history snapshot or a linear scan to discover ordinal row offsets.</p>
+<pre><code class="lang-csharp">StreamingMultiSeriesChartView view = source.BuildViewByX(
+    minimumX: 1_000,
+    maximumX: 1_500,
+    maxPoints: 256,
+    downsampleMode: ChartDownsampleMode.MinMax,
+    includeBoundaryNeighbors: true);
+
+ChartDataSnapshot snapshot = view.Snapshot;
+// Use only a hit obtained by rendering this exact snapshot:
+long originalRow = view.SourceSampleIndices[hit.PointIndex];
+double originalX = snapshot.Series[hit.SeriesIndex].XValues![hit.PointIndex];
+</code></pre>
+<p><code>BuildSnapshotByX</code> is the convenience form when only numerical/category data is needed. Both APIs use the same snapshot construction, common-index reduction and cache as ordinal <code>BuildView</code>. No request object or full-history copy is allocated to resolve a coordinate range.</p>
+<h2 id="bounds-and-missing-data">Bounds and missing data</h2>
+<p>Bounds are <strong>inclusive, finite and ordered</strong>. Equal bounds select an exactly matching observation; no match means an empty view unless neighbors are enabled. Invalid bounds or an unknown reduction mode throw before changing the source/cache or raising events. Nonpositive/null budgets and <code>None</code> disable reduction; other budget conventions match the synchronized-stream API.</p>
+<p>With neighbors enabled, the immediately preceding and following retained rows are added if the requested interval intersects the retained X extent. A range strictly between adjacent observations can therefore return those two rows. A range wholly before or after retained history stays empty: the API does not clamp a remote viewport onto an unrelated endpoint. Neighbors are chosen by row position, not by finding a nonmissing Y value. Independent gaps remain gaps, and nothing is interpolated or reconstructed from evicted history. The expanded window endpoints remain mandatory points during reduction.</p>
+<p><code>WindowStart</code> and <code>WindowCount</code> describe the resolved, neighbor-expanded ordinal window before reduction. <code>SourceSampleIndices</code> maps the selected output points to original accepted rows. The usual <strong>per-series soft budget</strong> still applies; the common union may exceed <code>maxPoints</code> to preserve each channel's selected features and gaps.</p>
+<p>Coordinates use the same units as <code>Append</code>. For data already encoded with <code>DateTime.ToOADate()</code>, encode query bounds the same way. The source itself does not convert timestamps, calendar intervals or timezones.</p>
+<h2 id="latest-elapsed-coordinate-span">Latest elapsed coordinate span</h2>
+<p><code>BuildLatestViewByX</code> anchors a trailing span to the newest retained X coordinate <strong>inside the same lock as window capture</strong>. This avoids separately reading the latest coordinate and racing a producer append or eviction before querying the window. Irregularly spaced feeds are selected by X distance, not by a guessed row count.</p>
+<pre><code class="lang-csharp">// When appended X coordinates are seconds, capture the latest inclusive 30 seconds.
+var latest = source.BuildLatestViewByX(
+    span: 30,
+    maxPoints: 256,
+    downsampleMode: ChartDownsampleMode.MinMax,
+    includeBoundaryNeighbors: true);
+</code></pre>
+<p><code>BuildLatestSnapshotByX</code> returns only the snapshot. Spans must be finite and nonnegative. Zero selects the latest row; enabling neighbors additionally includes its predecessor when available. No future row exists, so trailing queries add at most the one preceding boundary neighbor. The latest row remains the anchor even when every channel there is missing. Empty sources produce empty views. Appending and Clear do not modify any previously captured view.</p>
+<p>Span units must match source X units. For OLE Automation date coordinates, a half-hour span is <code>TimeSpan.FromMinutes(30).TotalDays</code>, not 1,800. The source does not convert calendar/timezone intervals. Lower-bound subtraction uses double arithmetic: a span smaller than one representable coordinate step can round to zero width. Underflow below the finite domain includes all eligible finite retained coordinates. An explicit query and a trailing query resolving to the same ordinal window share the same cache.</p>
+<h2 id="atomic-capture-and-presentation-boundaries">Atomic capture and presentation boundaries</h2>
+<p>Lower/upper binary searches, optional expansion, selection, array copying and identity/history metadata capture all execute under the same source lock. Appending or evicting rows cannot shift the resolved window between lookup and capture. Returned views remain owned and unchanged after subsequent append or Clear; numbering still restarts after Clear.</p>
+<p>These are explicit <strong>source APIs</strong>, not a new <code>ChartDataRequest</code> mode. They do not change <code>ChartModel.Request</code>, establish an automatic live coordinate viewport, set axis limits, or supply numeric-X positioning for category Line/Area rendering. Each trailing query re-anchors only when invoked. Use the existing numeric/date Scatter rendering for true X placement. A view's identity map must not be combined with the model's independently captured snapshot. See <a href="procharts-multi-series-streaming.html">synchronized streams</a> for renderer, delivery and ownership contracts.</p>
+<h2 id="complexity-and-measured-comparison">Complexity and measured comparison</h2>
+<p>Lookup takes O(log retained rows), uses the logical ring directly, and allocates no temporary coordinate array or request. An uncached capture still costs O(window rows × series count), including reduction when requested, and holds the lock for that work. Equivalent normalized coordinate, trailing and ordinal windows reuse the same single-entry cache; a warm equivalent query allocates no managed memory in the source. New windows allocate owned output and reduction scratch as before. Large windows can still delay producers; no worst-case latency guarantee is implied.</p>
+<p>The existing <code>ProCharts.Benchmarks</code> executable includes an <strong>X-RANGE</strong> section comparing 256 distinct 128-row captures, with three channels and wrapped retained capacities of 8,192, 65,536 and 262,144. Both paths capture the same static source with no reduction. The baseline linearly scans a previously captured, owned X array, then calls ordinal <code>BuildView</code>; the new path performs atomic binary ring lookup and capture. The baseline's initial full-X acquisition is deliberately excluded rather than charged to every query. This comparison measures explicit coordinate-window lookup; trailing-span semantics have separate regression coverage and no separate latency claim.</p>
+<p>Construction, seeding, query preparation and complete coordinate/value/gap/identity validation are outside timing. Two paired warmups precede seven alternating-order measured pairs. The harness checks identical normalized cached views and every original output value before measuring, then compares captured-identity checksums during measured rounds. It reports median elapsed time and managed allocations in the existing <code>performance.txt</code> artifact. Timings are diagnostics, not fixed CI thresholds or universal speedups; this does not benchmark concurrent producers, rendering, physical GPU work or frame rate.</p>
+<pre><code class="lang-sh">dotnet run --project tests/ProCharts.Benchmarks/ProCharts.Benchmarks.csproj -c Release
+</code></pre>
+
+</article>
+
+        <div class="contribution d-print-none">
+          <a href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/docfx/articles/procharts-coordinate-windows.md/#L1" class="edit-link">Edit this page</a>
+        </div>
+
+        <div class="next-article d-print-none border-top" id="nextArticle"></div>
+
+      </div>
+
+      <div class="affix">
+        <nav id="affix"></nav>
+      </div>
+    </main>
+
+
+    <footer class="border-top text-secondary">
+      <div class="container-xxl">
+        <div class="flex-fill">
+          <span>Made with <a href="https://dotnet.github.io/docfx">docfx</a></span>
+        </div>
+      </div>
+    </footer>
+  </body>
+</html>

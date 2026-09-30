@@ -13327,6 +13327,16 @@
     },
     {
       "type": "Conceptual",
+      "source_relative_path": "articles/procharts-coordinate-windows.md",
+      "output": {
+        ".html": {
+          "relative_path": "articles/procharts-coordinate-windows.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "Conceptual",
       "source_relative_path": "articles/procharts-data-sources.md",
       "output": {
         ".html": {
