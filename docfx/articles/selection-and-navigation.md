@@ -96,6 +96,15 @@ Turn on `AutoScrollToSelectedItem` to keep the current selection in view without
           AutoScrollToSelectedItem="True" />
 ```
 
+## Automatic Selection of a Collection View's Current Item
+
+When a new `DataGridCollectionView` is assigned to `ItemsSource`, the grid selects that view's current item by default. Set `AutoSelectCurrentItemOnItemsSourceChange` to `False` when replacing a view should leave the grid unselected:
+
+```xml
+<DataGrid ItemsSource="{Binding Items}"
+          AutoSelectCurrentItemOnItemsSourceChange="False" />
+```
+
 ## Selection Change Origin
 
 `SelectionChanged` now raises `DataGridSelectionChangedEventArgs`, which carries:

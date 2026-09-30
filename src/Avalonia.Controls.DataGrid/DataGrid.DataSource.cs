@@ -221,7 +221,9 @@ internal
                 if (!modelSelectionPending)
                 {
                     SelectedItem = null;
-                    if (DataConnection.CollectionView != null && setDefaultSelection)
+                    if (DataConnection.CollectionView != null &&
+                        setDefaultSelection &&
+                        AutoSelectCurrentItemOnItemsSourceChange)
                     {
                         SelectedItem = ProjectSelectionItem(DataConnection.CollectionView.CurrentItem);
                     }
