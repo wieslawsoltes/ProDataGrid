@@ -15,6 +15,7 @@ using Avalonia.Controls.Selection;
 using Avalonia.Data;
 using Avalonia.Headless.XUnit;
 using Avalonia.Input;
+using Avalonia.Styling;
 using Avalonia.Threading;
 using Avalonia.VisualTree;
 using Xunit;
@@ -348,6 +349,34 @@ public class DataGridItemsSourceChangeHeadlessTests
         window.Close();
     }
 
+    [AvaloniaFact]
+    public void ItemsSource_Swap_To_Empty_With_Open_Cell_ToolTip_Removes_All_Rows()
+    {
+        var items = CreateItems("A", 50);
+        var (window, grid) = CreateGrid(items, DataGridSelectionUnit.FullRow);
+        window.Styles.Add(CreateContentToolTipCellStyle());
+        PumpLayout(grid);
+
+        var cell = GetCell(grid, rowIndex: 2, columnIndex: 0);
+        ToolTip.SetIsOpen(cell, true);
+        Assert.True(ToolTip.GetIsOpen(cell));
+
+        grid.ItemsSource = new List<RowItem>();
+        PumpLayout(grid);
+
+        Assert.False(ToolTip.GetIsOpen(cell));
+        Assert.Equal(0, grid.SlotCount);
+        Assert.Empty(grid.DisplayData.GetScrollingElements());
+        Assert.DoesNotContain(grid.GetVisualDescendants().OfType<DataGridRow>(), row => row.IsVisible && row.DataContext != null);
+
+        var newItems = CreateItems("B", 2);
+        grid.ItemsSource = newItems;
+        PumpLayout(grid);
+
+        AssertRowsMatchItems(grid, newItems);
+        window.Close();
+    }
+
     private static (Window Window, DataGrid Grid) CreateGrid(IEnumerable? itemsSource, DataGridSelectionUnit selectionUnit)
     {
         var window = new Window
@@ -530,6 +559,21 @@ public class DataGridItemsSourceChangeHeadlessTests
             .GetField("_internalList", BindingFlags.Instance | BindingFlags.NonPublic);
         Assert.NotNull(field);
         return Assert.IsAssignableFrom<IList>(field!.GetValue(view));
+    }
+
+    // Mirrors a cell theme that shows the cell text as its tooltip.
+    private static Style CreateContentToolTipCellStyle()
+    {
+        return new Style(x => x.OfType<DataGridCell>())
+        {
+            Setters =
+            {
+                new Setter(ToolTip.TipProperty, new Binding("Content.Text")
+                {
+                    RelativeSource = new RelativeSource(RelativeSourceMode.Self)
+                })
+            }
+        };
     }
 
     private static DataGridRowGroupHeader[] GetGroupHeaders(DataGrid grid)
