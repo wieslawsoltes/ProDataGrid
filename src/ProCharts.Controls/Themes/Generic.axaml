@@ -160,7 +160,7 @@
                 Items="{Binding LegendItems, RelativeSource={RelativeSource TemplatedParent}}"
                 ItemTemplate="{TemplateBinding LegendItemTemplate}" Theme="{TemplateBinding LegendTheme}" />
             <c:ProChartNavigator Grid.Row="4" Name="PART_Navigator" Model="{TemplateBinding Model}"
-                IsVisible="{TemplateBinding ShowNavigator}" Theme="{TemplateBinding NavigatorTheme}" />
+                IsVisible="{TemplateBinding ShowNavigator}" IsEnabled="{TemplateBinding EnablePanZoom}" Theme="{TemplateBinding NavigatorTheme}" />
             <StackPanel Grid.Row="5" Spacing="4" Margin="0,8,0,0">
               <TextBlock Text="{TemplateBinding StatusText}" FontSize="11" Foreground="{DynamicResource ChartMutedBrush}" />
               <TextBlock Text="{TemplateBinding ExportError}" FontSize="12" TextWrapping="Wrap" Foreground="#EF6B73" />
@@ -170,6 +170,10 @@
         </Border>
       </ControlTemplate>
     </Setter>
+    <Style Selector="^:loading /template/ plot:ProChartView#PART_Plot"><Setter Property="IsEnabled" Value="False" /></Style>
+    <Style Selector="^:error /template/ plot:ProChartView#PART_Plot"><Setter Property="IsEnabled" Value="False" /></Style>
+    <Style Selector="^:loading /template/ c:ProChartNavigator#PART_Navigator"><Setter Property="IsEnabled" Value="False" /></Style>
+    <Style Selector="^:error /template/ c:ProChartNavigator#PART_Navigator"><Setter Property="IsEnabled" Value="False" /></Style>
   </ControlTheme>
   <!-- Demonstrates total replacement of chrome without changing model or interaction code. -->
   <ControlTheme x:Key="ProChartCompact" TargetType="c:ProChart" BasedOn="{StaticResource {x:Type c:ProChart}}">
@@ -179,13 +183,32 @@
           <Grid RowDefinitions="Auto,*,Auto">
             <DockPanel Margin="0,0,0,8">
               <TextBlock DockPanel.Dock="Left" Text="{TemplateBinding Title}" FontWeight="SemiBold" Margin="0,0,12,0" />
-              <c:ProChartToolbar Target="{Binding RelativeSource={RelativeSource TemplatedParent}}" />
+              <c:ProChartToolbar IsVisible="{TemplateBinding ShowToolbar}" Theme="{TemplateBinding ToolbarTheme}" Target="{Binding RelativeSource={RelativeSource TemplatedParent}}" />
             </DockPanel>
-            <plot:ProChartView Grid.Row="1" Name="PART_Plot" ChartModel="{TemplateBinding Model}"
-                ChartStyle="{TemplateBinding ChartStyle}" ShowLegend="False" ShowToolTips="True"
-                EnablePanZoom="{TemplateBinding EnablePanZoom}" EnableKeyboardNavigation="{TemplateBinding EnableKeyboardNavigation}" ZoomStep="{TemplateBinding ZoomStep}" ShowCrosshair="{TemplateBinding ShowCrosshair}" MinWindowCount="{TemplateBinding MinWindowCount}"
-                AutomationProperties.AutomationId="chart-plot" />
-            <c:ProChartLegend Grid.Row="2" Items="{Binding LegendItems, RelativeSource={RelativeSource TemplatedParent}}" ItemTemplate="{TemplateBinding LegendItemTemplate}" IsVisible="{TemplateBinding IsLegendVisible}" />
+            <Grid Grid.Row="1" ClipToBounds="True">
+              <plot:ProChartView Name="PART_Plot" ChartModel="{TemplateBinding Model}"
+                  ChartStyle="{TemplateBinding ChartStyle}" ShowLegend="False" ShowToolTips="False"
+                  EnablePanZoom="{TemplateBinding EnablePanZoom}" EnableKeyboardNavigation="{TemplateBinding EnableKeyboardNavigation}"
+                  ZoomStep="{TemplateBinding ZoomStep}" ShowCrosshair="{TemplateBinding ShowCrosshair}" MinWindowCount="{TemplateBinding MinWindowCount}"
+                  plot:ChartHierarchyNavigation.IsEnabled="True" AutomationProperties.AutomationId="chart-plot" />
+              <Canvas IsHitTestVisible="False">
+                <c:ProChartToolTip Name="PART_ToolTip" Point="{TemplateBinding HoverPoint}" PointTemplate="{TemplateBinding ToolTipTemplate}"
+                    IsVisible="{TemplateBinding IsToolTipVisible}" Canvas.Left="{TemplateBinding ToolTipX}" Canvas.Top="{TemplateBinding ToolTipY}" />
+              </Canvas>
+              <Border Background="{TemplateBinding Background}" IsVisible="{TemplateBinding IsEmpty}" Padding="16">
+                <ContentPresenter Content="{TemplateBinding EmptyContent}" ContentTemplate="{TemplateBinding EmptyTemplate}"
+                    HorizontalAlignment="Center" VerticalAlignment="Center" />
+              </Border>
+              <Border Background="{TemplateBinding Background}" IsVisible="{TemplateBinding IsLoading}" Padding="16">
+                <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Spacing="10">
+                  <ProgressBar IsIndeterminate="True" Width="160" /><TextBlock Text="Loading chart data…" />
+                </StackPanel>
+              </Border>
+              <Border Background="{TemplateBinding Background}" IsVisible="{TemplateBinding HasError}" Padding="16">
+                <TextBlock Text="{TemplateBinding ErrorMessage}" TextWrapping="Wrap" MaxWidth="460" VerticalAlignment="Center" HorizontalAlignment="Center" />
+              </Border>
+            </Grid>
+            <c:ProChartLegend Grid.Row="2" Items="{Binding LegendItems, RelativeSource={RelativeSource TemplatedParent}}" ItemTemplate="{TemplateBinding LegendItemTemplate}" Theme="{TemplateBinding LegendTheme}" IsVisible="{TemplateBinding IsLegendVisible}" />
           </Grid>
         </Border>
       </ControlTemplate>

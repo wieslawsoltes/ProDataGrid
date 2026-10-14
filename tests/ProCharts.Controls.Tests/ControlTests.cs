@@ -117,9 +117,13 @@ public sealed class ControlTests
         using ChartGalleryViewModel vm = ViewModel();
         ProChart chart = new() { Model = vm.Model };
         using Host host = new(chart);
-        chart.IsLoading = true; Assert.False(chart.ZoomInCommand.CanExecute(null)); Assert.False(chart.IsEmpty);
+        chart.IsLoading = true; host.Flush();
+        Assert.False(chart.ZoomInCommand.CanExecute(null)); Assert.False(chart.IsEmpty);
+        Assert.False(chart.GetVisualDescendants().OfType<ProChartView>().Single().IsEffectivelyEnabled);
         chart.IsLoading = false; chart.ErrorMessage = "Provider error";
+        host.Flush();
         Assert.True(chart.HasError); Assert.False(chart.ExportCsvCommand.CanExecute(null));
+        Assert.False(chart.GetVisualDescendants().OfType<ProChartView>().Single().IsEffectivelyEnabled);
         chart.ErrorMessage = null; Assert.True(chart.ZoomInCommand.CanExecute(null));
         chart.Model = null; Assert.True(chart.IsEmpty); Assert.False(chart.HasData);
     }
@@ -178,7 +182,7 @@ public sealed class ControlTests
         ((System.Windows.Input.ICommand)vm.AppendCommand).Execute(null);
         Assert.Equal(100032, vm.ReceivedRows);
         Assert.Equal(100000, ((IChartWindowInfoProvider)vm.Model.DataSource!).GetTotalCategoryCount());
-        Assert.All(vm.Model.Snapshot.Series, series => Assert.True(series.Values.Count <= 2400));
+        Assert.All(vm.Model.Snapshot.Series, series => Assert.True(series.Values.Count <= 1200));
     }
     private static ChartGalleryViewModel ViewModel() => new(action => action(), () => { });
     private sealed class FailingExport : IChartExportService

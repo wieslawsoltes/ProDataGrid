@@ -179,7 +179,9 @@ public sealed class ChartGalleryViewModel : ReactiveObject, IDisposable
         }
         stream.AppendRange(xs, ys);
         ChartModel model = new();
-        model.Request.MaxPoints = 1200;
+        // Each channel selects original extrema. The aligned union can contain up to
+        // 3 × 400 rows for these gap-free signals; all channels share that row map.
+        model.Request.MaxPoints = 400;
         model.Request.DownsampleMode = ChartDownsampleMode.MinMax;
         SeriesVisibilityChartDataSource filter = new(stream);
         model.DataSource = filter;

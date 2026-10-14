@@ -25,7 +25,7 @@ jobs:
           set -o pipefail
           mkdir -p artifacts
           dotnet build src/ProCharts.Controls/ProCharts.Controls.csproj -c Release 2>&1 | tee artifacts/controls-build.log
-          dotnet build samples/ProCharts.Sample.Desktop/ProCharts.Sample.Desktop.csproj -c Release 2>&1 | tee artifacts/desktop-build.log
+          dotnet publish samples/ProCharts.Sample.Desktop/ProCharts.Sample.Desktop.csproj -c Release -o artifacts/desktop 2>&1 | tee artifacts/desktop-build.log
       - name: Headless control and data tests
         shell: bash
         run: |
@@ -68,6 +68,15 @@ jobs:
           git rev-parse HEAD^{tree} > artifacts/source/tree.txt
           (cd artifacts/source && sha256sum source.zip > SHA256SUMS.txt)
           dotnet publish samples/ProCharts.Sample.Browser/ProCharts.Sample.Browser.csproj -c Release -o artifacts/browser 2>&1 | tee artifacts/browser-build.log
+      - name: Install browser test dependencies
+        run: |
+          python -m pip install playwright==1.55.0 Pillow==11.3.0
+          python -m playwright install --with-deps chromium
+      - name: Exercise the published WebAssembly application in Chromium
+        shell: bash
+        run: |
+          set -o pipefail
+          python tests/ProCharts.Browser/validate.py --root artifacts/browser/wwwroot --output artifacts/browser-tests 2>&1 | tee artifacts/browser-tests.log
       - uses: actions/upload-artifact@v4
         if: always()
         with:
