@@ -1,0 +1,24 @@
+name: ProCharts templated controls
+on:
+  push:
+    branches: [feat/procharts-templated-browser]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  source:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Capture source and build identity
+        run: |
+          mkdir -p /tmp/procharts-source
+          git archive HEAD -o /tmp/procharts-source/source.zip
+          git rev-parse HEAD > /tmp/procharts-source/commit.txt
+          git rev-parse HEAD^{tree} > /tmp/procharts-source/tree.txt
+          cd /tmp/procharts-source && sha256sum source.zip > SHA256SUMS.txt
+      - uses: actions/upload-artifact@v4
+        with:
+          name: procharts-source
+          path: /tmp/procharts-source
+          retention-days: 7
