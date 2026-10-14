@@ -5,14 +5,17 @@ using Avalonia.Controls;
 
 namespace ProCharts.Controls;
 
-/// <summary>Stacks chart chrome at its measured height and assigns remaining height to one plot child.</summary>
+/// <summary>Stacks chart chrome at its natural height and assigns remaining height to one plot child.</summary>
 /// <remarks>
-/// Unlike compressed auto/star rows, this panel never places the plot on top of a wrapped toolbar.
-/// When constrained below its intrinsic height, content remains in order and is clipped rather than
-/// overlapping. A host can use a vertical ScrollViewer to keep every part reachable in a small window.
+/// Children are measured without a vertical constraint so their minimum heights are not lost to
+/// DesiredSize clipping. A short host clips ordered content instead of overlapping toolbar hit targets.
+/// Use a vertical ScrollViewer when every part must remain reachable below the intrinsic height.
+/// This panel is intended for a small number of chart parts, not a virtualizing items layout.
 /// </remarks>
 public class ChartLayoutPanel : Panel
 {
+    private double _measuredWidth = double.NaN;
+
     /// <summary>Identifies the child that expands to fill unused vertical space; -1 disables expansion.</summary>
     public static readonly StyledProperty<int> FillIndexProperty =
         AvaloniaProperty.Register<ChartLayoutPanel, int>(nameof(FillIndex), -1, validate: value => value >= -1);
@@ -27,29 +30,20 @@ public class ChartLayoutPanel : Panel
     }
 
     /// <inheritdoc />
-    protected override Size MeasureOverride(Size availableSize)
+    protected override Size MeasureOverride(Size availableSize) => MeasureChildren(availableSize.Width);
+
+    private Size MeasureChildren(double availableWidth)
     {
+        _measuredWidth = availableWidth;
         double height = 0, width = 0;
-        // Measure natural chrome heights without letting a short host compress its row slots.
-        for (int i = 0; i < Children.Count; i++)
+        foreach (Control child in Children)
         {
-            if (i == FillIndex) continue;
-            Control child = Children[i];
-            child.Measure(new Size(availableSize.Width, double.PositiveInfinity));
+            // A finite remaining height below MinHeight would clip DesiredSize. Arranging that
+            // clipped slot makes Avalonia center the larger child over the preceding toolbar.
+            child.Measure(new Size(availableWidth, double.PositiveInfinity));
             if (!child.IsVisible) continue;
             height += child.DesiredSize.Height;
             width = Math.Max(width, child.DesiredSize.Width);
-        }
-        if ((uint)FillIndex < (uint)Children.Count)
-        {
-            Control fill = Children[FillIndex];
-            double remaining = double.IsFinite(availableSize.Height) ? Math.Max(0, availableSize.Height - height) : double.PositiveInfinity;
-            fill.Measure(new Size(availableSize.Width, remaining));
-            if (fill.IsVisible)
-            {
-                height += fill.DesiredSize.Height;
-                width = Math.Max(width, fill.DesiredSize.Width);
-            }
         }
         return new Size(width, height);
     }
@@ -57,6 +51,10 @@ public class ChartLayoutPanel : Panel
     /// <inheritdoc />
     protected override Size ArrangeOverride(Size finalSize)
     {
+        // Scrollbars and constrained hosts can allocate a narrower width than the measure offer.
+        // Reflow wrapped chrome against that actual width before assigning vertical slots.
+        if (_measuredWidth != finalSize.Width) MeasureChildren(finalSize.Width);
+
         double chrome = 0;
         for (int i = 0; i < Children.Count; i++)
             if (i != FillIndex && Children[i].IsVisible) chrome += Children[i].DesiredSize.Height;
