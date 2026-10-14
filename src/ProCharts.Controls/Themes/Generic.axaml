@@ -170,10 +170,10 @@
         </Border>
       </ControlTemplate>
     </Setter>
-    <Style Selector="^:loading /template/ plot:ProChartView#PART_Plot"><Setter Property="IsEnabled" Value="False" /></Style>
-    <Style Selector="^:error /template/ plot:ProChartView#PART_Plot"><Setter Property="IsEnabled" Value="False" /></Style>
-    <Style Selector="^:loading /template/ c:ProChartNavigator#PART_Navigator"><Setter Property="IsEnabled" Value="False" /></Style>
-    <Style Selector="^:error /template/ c:ProChartNavigator#PART_Navigator"><Setter Property="IsEnabled" Value="False" /></Style>
+    <Style Selector="^:loading /template/ plot|ProChartView#PART_Plot"><Setter Property="IsEnabled" Value="False" /></Style>
+    <Style Selector="^:error /template/ plot|ProChartView#PART_Plot"><Setter Property="IsEnabled" Value="False" /></Style>
+    <Style Selector="^:loading /template/ c|ProChartNavigator#PART_Navigator"><Setter Property="IsEnabled" Value="False" /></Style>
+    <Style Selector="^:error /template/ c|ProChartNavigator#PART_Navigator"><Setter Property="IsEnabled" Value="False" /></Style>
   </ControlTheme>
   <!-- Demonstrates total replacement of chrome without changing model or interaction code. -->
   <ControlTheme x:Key="ProChartCompact" TargetType="c:ProChart" BasedOn="{StaticResource {x:Type c:ProChart}}">
