@@ -1,0 +1,4 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup><TargetFramework>net10.0</TargetFramework><OutputType>WinExe</OutputType><Nullable>enable</Nullable><ImplicitUsings>enable</ImplicitUsings><IsPackable>false</IsPackable></PropertyGroup>
+  <ItemGroup><ProjectReference Include="../ProCharts.Sample/ProCharts.Sample.csproj" /><PackageReference Include="Avalonia.Desktop" /></ItemGroup>
+</Project>

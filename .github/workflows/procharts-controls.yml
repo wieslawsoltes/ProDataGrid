@@ -2,47 +2,75 @@ name: ProCharts templated controls
 on:
   push:
     branches: [feat/procharts-templated-browser]
+  pull_request:
+    paths: ['src/ProCharts*/**', 'samples/ProCharts.*/**', 'tests/ProCharts.Controls.Tests/**', '.github/workflows/procharts-controls.yml', 'Directory.*.props']
   workflow_dispatch:
 permissions:
-  contents: write
+  contents: read
+concurrency:
+  group: procharts-controls-${{ github.ref }}
+  cancel-in-progress: true
 jobs:
-  controls:
+  managed:
     runs-on: ubuntu-latest
     timeout-minutes: 20
     steps:
       - uses: actions/checkout@v4
-      - name: Integrate the exact surface legend patch once on the isolated feature branch
-        if: hashFiles('.github/procharts-surface.patch') != ''
+      - uses: actions/setup-dotnet@v4
+        with:
+          global-json-file: global.json
+      - name: Build both library targets and desktop sample
         shell: bash
         run: |
-          set -euo pipefail
-          test "$GITHUB_REF" = refs/heads/feat/procharts-templated-browser
-          test "$(git hash-object src/ProCharts.Avalonia/ProChartView.cs)" = 15b926f0b1e931697407e8ef7ff4a7cf25e82081
-          git apply --check .github/procharts-surface.patch
-          git apply .github/procharts-surface.patch
-          test "$(git hash-object src/ProCharts.Avalonia/ProChartView.cs)" = 8ebfb4ba3f4093dc6d0504ba883af31027405095
-          git rm .github/procharts-surface.patch
-          git add src/ProCharts.Avalonia/ProChartView.cs
-          git -c user.name='Wiesław Šoltés' -c user.email='wieslawsoltes@users.noreply.github.com' commit -m 'feat(charts): expose per-surface legend visibility without mutating models'
-          git push origin HEAD:refs/heads/feat/procharts-templated-browser
-      - name: Record exact source identity
+          set -o pipefail
+          mkdir -p artifacts
+          dotnet build src/ProCharts.Controls/ProCharts.Controls.csproj -c Release 2>&1 | tee artifacts/controls-build.log
+          dotnet build samples/ProCharts.Sample.Desktop/ProCharts.Sample.Desktop.csproj -c Release 2>&1 | tee artifacts/desktop-build.log
+      - name: Headless control and data tests
+        shell: bash
         run: |
+          set -o pipefail
+          dotnet test tests/ProCharts.Controls.Tests/ProCharts.Controls.Tests.csproj -c Release --logger trx --results-directory artifacts/tests 2>&1 | tee artifacts/control-tests.log
+      - name: Existing chart regression suite
+        shell: bash
+        run: |
+          set -o pipefail
+          dotnet test src/Avalonia.Controls.DataGrid.UnitTests/Avalonia.Controls.DataGrid.UnitTests.csproj -c Release -p:CollectCoverage=false --filter FullyQualifiedName~Charting --logger trx --results-directory artifacts/regressions 2>&1 | tee artifacts/regressions.log
+      - name: Pack reusable libraries
+        shell: bash
+        run: |
+          for project in ProCharts ProCharts.Skia ProCharts.Avalonia ProCharts.Controls; do
+            dotnet pack src/$project/$project.csproj -c Release -o artifacts/packages
+          done
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: procharts-managed
+          path: artifacts
+          retention-days: 14
+  browser:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          global-json-file: global.json
+      - name: Install WebAssembly toolchain
+        run: dotnet workload install wasm-tools
+      - name: Publish actual Avalonia browser application
+        shell: bash
+        run: |
+          set -o pipefail
           mkdir -p artifacts/source
           git archive HEAD -o artifacts/source/source.zip
           git rev-parse HEAD > artifacts/source/commit.txt
           git rev-parse HEAD^{tree} > artifacts/source/tree.txt
-          cd artifacts/source && sha256sum source.zip > SHA256SUMS.txt
-      - uses: actions/setup-dotnet@v4
-        with:
-          global-json-file: global.json
-      - name: Compile lookless controls
-        shell: bash
-        run: |
-          set -o pipefail
-          dotnet build src/ProCharts.Controls/ProCharts.Controls.csproj -c Release -f net10.0 2>&1 | tee artifacts/controls-build.log
+          (cd artifacts/source && sha256sum source.zip > SHA256SUMS.txt)
+          dotnet publish samples/ProCharts.Sample.Browser/ProCharts.Sample.Browser.csproj -c Release -o artifacts/browser 2>&1 | tee artifacts/browser-build.log
       - uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: procharts-controls-initial
+          name: procharts-browser
           path: artifacts
-          retention-days: 7
+          retention-days: 14

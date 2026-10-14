@@ -1,0 +1,14 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/ProCharts/ProCharts.csproj" />
+    <Project Path="src/ProCharts.Skia/ProCharts.Skia.csproj" />
+    <Project Path="src/ProCharts.Avalonia/ProCharts.Avalonia.csproj" />
+    <Project Path="src/ProCharts.Controls/ProCharts.Controls.csproj" />
+  </Folder>
+  <Folder Name="/samples/">
+    <Project Path="samples/ProCharts.Sample/ProCharts.Sample.csproj" />
+    <Project Path="samples/ProCharts.Sample.Desktop/ProCharts.Sample.Desktop.csproj" />
+    <Project Path="samples/ProCharts.Sample.Browser/ProCharts.Sample.Browser.csproj" />
+  </Folder>
+  <Folder Name="/tests/"><Project Path="tests/ProCharts.Controls.Tests/ProCharts.Controls.Tests.csproj" /></Folder>
+</Solution>
