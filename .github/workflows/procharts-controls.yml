@@ -3,7 +3,7 @@ on:
   push:
     branches: [feat/procharts-templated-browser]
   pull_request:
-    paths: ['src/ProCharts*/**', 'samples/ProCharts.*/**', 'tests/ProCharts.Controls.Tests/**', '.github/workflows/procharts-controls.yml', 'Directory.*.props']
+    paths: ['src/ProCharts*/**', 'samples/ProCharts.*/**', 'tests/ProCharts.*/**', 'tools/procharts-*.py', 'docs/procharts-*.md', '.github/workflows/procharts-controls.yml', 'Directory.*.props']
   workflow_dispatch:
 permissions:
   contents: read
@@ -19,29 +19,40 @@ jobs:
       - uses: actions/setup-dotnet@v4
         with:
           global-json-file: global.json
+      - name: Record source identity
+        run: |
+          mkdir -p artifacts/identity
+          git rev-parse HEAD > artifacts/identity/commit.txt
+          git rev-parse HEAD^{tree} > artifacts/identity/tree.txt
       - name: Build both library targets and desktop sample
         shell: bash
         run: |
-          set -o pipefail
-          mkdir -p artifacts
+          set -euo pipefail
           dotnet build src/ProCharts.Controls/ProCharts.Controls.csproj -c Release 2>&1 | tee artifacts/controls-build.log
           dotnet publish samples/ProCharts.Sample.Desktop/ProCharts.Sample.Desktop.csproj -c Release -o artifacts/desktop 2>&1 | tee artifacts/desktop-build.log
       - name: Headless control and data tests
         shell: bash
         run: |
-          set -o pipefail
+          set -euo pipefail
           dotnet test tests/ProCharts.Controls.Tests/ProCharts.Controls.Tests.csproj -c Release --logger trx --results-directory artifacts/tests 2>&1 | tee artifacts/control-tests.log
       - name: Existing chart regression suite
         shell: bash
         run: |
-          set -o pipefail
+          set -euo pipefail
           dotnet test src/Avalonia.Controls.DataGrid.UnitTests/Avalonia.Controls.DataGrid.UnitTests.csproj -c Release -p:CollectCoverage=false --filter FullyQualifiedName~Charting --logger trx --results-directory artifacts/regressions 2>&1 | tee artifacts/regressions.log
-      - name: Pack reusable libraries
+      - name: Pack reusable preview libraries
         shell: bash
         run: |
+          set -euo pipefail
           for project in ProCharts ProCharts.Skia ProCharts.Avalonia ProCharts.Controls; do
-            dotnet pack src/$project/$project.csproj -c Release -o artifacts/packages
+            dotnet pack src/$project/$project.csproj -c Release -p:Version=12.1.0.6-templated.1 -o artifacts/packages
           done
+      - name: Validate external XAML package consumer with a fresh cache
+        run: python tools/procharts-package-consumer.py --packages artifacts/packages --output artifacts/consumer
+      - name: Rebuild and test the extracted chart-only source ZIP
+        run: |
+          python tools/procharts-deliverables.py source --output artifacts/source
+          python tools/procharts-deliverables.py verify-source --input artifacts/source/source.zip --output artifacts/source-check
       - uses: actions/upload-artifact@v4
         if: always()
         with:
@@ -61,12 +72,8 @@ jobs:
       - name: Publish actual Avalonia browser application
         shell: bash
         run: |
-          set -o pipefail
-          mkdir -p artifacts/source
-          git archive HEAD -o artifacts/source/source.zip
-          git rev-parse HEAD > artifacts/source/commit.txt
-          git rev-parse HEAD^{tree} > artifacts/source/tree.txt
-          (cd artifacts/source && sha256sum source.zip > SHA256SUMS.txt)
+          set -euo pipefail
+          python tools/procharts-deliverables.py source --output artifacts/source
           dotnet publish samples/ProCharts.Sample.Browser/ProCharts.Sample.Browser.csproj -c Release -o artifacts/browser 2>&1 | tee artifacts/browser-build.log
       - name: Install browser test dependencies
         run: |
@@ -75,11 +82,54 @@ jobs:
       - name: Exercise the published WebAssembly application in Chromium
         shell: bash
         run: |
-          set -o pipefail
+          set -euo pipefail
           python tests/ProCharts.Browser/validate.py --root artifacts/browser/wwwroot --output artifacts/browser-tests 2>&1 | tee artifacts/browser-tests.log
+      - name: Validate fractional DPI, high DPI and emulated touch
+        shell: bash
+        run: |
+          set -euo pipefail
+          python tests/ProCharts.Browser/validate_devices.py --root artifacts/browser/wwwroot --output artifacts/device-tests 2>&1 | tee artifacts/device-tests.log
       - uses: actions/upload-artifact@v4
         if: always()
         with:
           name: procharts-browser
           path: artifacts
           retention-days: 14
+  deliverables:
+    needs: [managed, browser]
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: procharts-*
+          path: incoming
+      - name: Audit same-commit results and assemble deliverables
+        run: python tools/procharts-deliverables.py bundle --input incoming --output dist
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ProCharts-source
+          path: dist/source
+          include-hidden-files: true
+          retention-days: 30
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ProCharts-browser
+          path: dist/browser
+          retention-days: 30
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ProCharts-desktop
+          path: dist/desktop
+          retention-days: 30
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ProCharts-packages
+          path: dist/packages
+          retention-days: 30
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ProCharts-validation
+          path: dist/validation
+          retention-days: 30
