@@ -51,37 +51,40 @@
           </Border>
         </Grid>
       </Border>
-      <Grid Grid.Column="1" RowDefinitions="Auto,*,Auto" Margin="20,18,20,12">
-        <StackPanel Margin="0,0,0,16" Spacing="12">
-          <Grid ColumnDefinitions="*,Auto">
-            <StackPanel Spacing="3">
-              <TextBlock Text="Chart workspace" FontSize="25" FontWeight="SemiBold" />
-              <TextBlock Classes="wide" Text="Explore the data. Make the controls your own." FontSize="12" Foreground="{DynamicResource ChartMutedBrush}" />
-            </StackPanel>
-            <TextBlock Classes="wide" Grid.Column="1" Text="{Binding DataSummary}" FontSize="10" VerticalAlignment="Center" Foreground="{DynamicResource ChartMutedBrush}" />
-          </Grid>
-          <WrapPanel>
-            <ComboBox Width="184" Margin="0,0,16,6" ItemsSource="{Binding ChartKinds}" SelectedItem="{Binding SelectedKind, Mode=TwoWay}"
-                      AutomationProperties.AutomationId="sample-kind" AutomationProperties.Name="Chart type" />
-            <CheckBox Content="Legend" IsChecked="{Binding ShowLegend}" Margin="0,0,12,6" AutomationProperties.AutomationId="sample-legend" />
-            <CheckBox Content="Crosshair" IsChecked="{Binding ShowCrosshair}" Margin="0,0,12,6" AutomationProperties.AutomationId="sample-crosshair" />
-            <CheckBox Content="Navigator" IsChecked="{Binding ShowNavigator}" Margin="0,0,12,6" AutomationProperties.AutomationId="sample-navigator" />
-            <CheckBox Content="Labels" IsChecked="{Binding ShowLabels}" Margin="0,0,0,6" AutomationProperties.AutomationId="sample-labels" />
+      <ScrollViewer Grid.Column="1" Name="WorkspaceScroll" Padding="20,18,20,12"
+                    HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">
+        <c:ChartLayoutPanel FillIndex="1" MinHeight="{Binding Viewport.Height, ElementName=WorkspaceScroll}">
+          <StackPanel Margin="0,0,0,16" Spacing="12">
+            <Grid ColumnDefinitions="*,Auto">
+              <StackPanel Spacing="3">
+                <TextBlock Text="Chart workspace" FontSize="25" FontWeight="SemiBold" />
+                <TextBlock Classes="wide" Text="Explore the data. Make the controls your own." FontSize="12" Foreground="{DynamicResource ChartMutedBrush}" />
+              </StackPanel>
+              <TextBlock Classes="wide" Grid.Column="1" Text="{Binding DataSummary}" FontSize="10" VerticalAlignment="Center" Foreground="{DynamicResource ChartMutedBrush}" />
+            </Grid>
+            <WrapPanel>
+              <ComboBox Width="184" Margin="0,0,16,6" ItemsSource="{Binding ChartKinds}" SelectedItem="{Binding SelectedKind, Mode=TwoWay}"
+                        AutomationProperties.AutomationId="sample-kind" AutomationProperties.Name="Chart type" />
+              <CheckBox Content="Legend" IsChecked="{Binding ShowLegend}" Margin="0,0,12,6" AutomationProperties.AutomationId="sample-legend" />
+              <CheckBox Content="Crosshair" IsChecked="{Binding ShowCrosshair}" Margin="0,0,12,6" AutomationProperties.AutomationId="sample-crosshair" />
+              <CheckBox Content="Navigator" IsChecked="{Binding ShowNavigator}" Margin="0,0,12,6" AutomationProperties.AutomationId="sample-navigator" />
+              <CheckBox Content="Labels" IsChecked="{Binding ShowLabels}" Margin="0,0,0,6" AutomationProperties.AutomationId="sample-labels" />
+            </WrapPanel>
+          </StackPanel>
+          <c:ProChart Name="Chart" Model="{Binding Model}" Title="{Binding Title}" Subtitle="{Binding Subtitle}"
+                      ChartStyle="{Binding ChartStyle}" ShowLegend="{Binding ShowLegend}" ShowCrosshair="{Binding ShowCrosshair}"
+                      ShowNavigator="{Binding ShowNavigator}" IsLoading="{Binding IsLoading}" ErrorMessage="{Binding ErrorMessage}"
+                      vm:GalleryBehavior.Compact="{Binding IsCompact}" AutomationProperties.AutomationId="main-chart" />
+          <WrapPanel Margin="0,14,0,0">
+            <Button Content="{Binding StreamCaption}" Command="{Binding StreamCommand}" Margin="0,0,8,6" AutomationProperties.AutomationId="sample-stream" />
+            <Button Content="Append 32 rows" Command="{Binding AppendCommand}" Margin="0,0,18,6" AutomationProperties.AutomationId="sample-append" />
+            <Button Content="Empty" Command="{Binding EmptyCommand}" Margin="0,0,8,6" AutomationProperties.AutomationId="sample-empty" />
+            <Button Content="Loading" Command="{Binding LoadingCommand}" Margin="0,0,8,6" AutomationProperties.AutomationId="sample-loading" />
+            <Button Content="Reload" Command="{Binding ReloadCommand}" Margin="0,0,8,6" AutomationProperties.AutomationId="sample-reload" />
+            <Button Content="Error" Command="{Binding ErrorCommand}" Margin="0,0,0,6" AutomationProperties.AutomationId="sample-error" />
           </WrapPanel>
-        </StackPanel>
-        <c:ProChart Grid.Row="1" Name="Chart" Model="{Binding Model}" Title="{Binding Title}" Subtitle="{Binding Subtitle}"
-                    ChartStyle="{Binding ChartStyle}" ShowLegend="{Binding ShowLegend}" ShowCrosshair="{Binding ShowCrosshair}"
-                    ShowNavigator="{Binding ShowNavigator}" IsLoading="{Binding IsLoading}" ErrorMessage="{Binding ErrorMessage}"
-                    vm:GalleryBehavior.Compact="{Binding IsCompact}" AutomationProperties.AutomationId="main-chart" />
-        <WrapPanel Grid.Row="2" Margin="0,14,0,0">
-          <Button Content="{Binding StreamCaption}" Command="{Binding StreamCommand}" Margin="0,0,8,6" AutomationProperties.AutomationId="sample-stream" />
-          <Button Content="Append 32 rows" Command="{Binding AppendCommand}" Margin="0,0,18,6" AutomationProperties.AutomationId="sample-append" />
-          <Button Content="Empty" Command="{Binding EmptyCommand}" Margin="0,0,8,6" AutomationProperties.AutomationId="sample-empty" />
-          <Button Content="Loading" Command="{Binding LoadingCommand}" Margin="0,0,8,6" AutomationProperties.AutomationId="sample-loading" />
-          <Button Content="Reload" Command="{Binding ReloadCommand}" Margin="0,0,8,6" AutomationProperties.AutomationId="sample-reload" />
-          <Button Content="Error" Command="{Binding ErrorCommand}" Margin="0,0,0,6" AutomationProperties.AutomationId="sample-error" />
-        </WrapPanel>
-      </Grid>
+        </c:ChartLayoutPanel>
+      </ScrollViewer>
     </Grid>
     <Border Grid.Row="2" BorderBrush="{DynamicResource ChartBorderBrush}" BorderThickness="0,1,0,0" Padding="22,9">
       <TextBlock Text="Wheel: zoom   ·   Drag: pan   ·   + / −: zoom   ·   Home: fit   ·   Ctrl+Z / Y: history" FontSize="10" TextWrapping="Wrap" Foreground="{DynamicResource ChartMutedBrush}" />

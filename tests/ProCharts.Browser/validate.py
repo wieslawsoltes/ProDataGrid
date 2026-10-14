@@ -2,10 +2,11 @@
 """Exercise the published .NET/Avalonia app, not an HTML replacement.
 Usage: python validate.py --root path/to/publish/wwwroot --output artifacts/browser-tests
 Requires playwright and Pillow. CHROMIUM_PATH overrides the installed Playwright browser.
-The JS diagnostics are read-only except for explicit gallery selection in the all-kinds smoke test.
+Read-only native bounds locate controls. Reveal only scrolls targets into view; actions use real
+browser input. Explicit gallery selection is used in the exhaustive renderer smoke section.
 """
 from __future__ import annotations
-import argparse, csv, functools, io, json, math, os, threading, time, traceback
+import argparse, csv, functools, io, json, os, threading, time, traceback
 from http.server import SimpleHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 from typing import Any, Callable
@@ -56,6 +57,8 @@ def main() -> None:
                 page.wait_for_timeout(50)
             raise AssertionError(f'{message}; state={json.dumps(last)}')
         def element(id: str) -> dict[str, Any]:
+            page.evaluate('(id)=>proCharts.Reveal(id)', id)
+            page.wait_for_timeout(100)
             items = [e for e in state()['elements'] if e['id'] == id]
             if not items: raise AssertionError(f'Native Avalonia element missing: {id}')
             return items[0]

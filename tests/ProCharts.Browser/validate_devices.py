@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
-"""Validate actual Avalonia input and exports at fractional/high DPI and emulated tablet touch."""
+"""Validate actual Avalonia input and exports at fractional/high DPI and emulated tablet touch.
+Native Reveal() scrolls a target into view; it does not invoke commands or synthesize app input.
+"""
 from __future__ import annotations
 import argparse, functools, json, threading, time, traceback
 from http.server import SimpleHTTPRequestHandler, ThreadingHTTPServer
@@ -39,10 +41,14 @@ def main() -> None:
                         if predicate(s): return s
                         page.wait_for_timeout(50)
                     raise AssertionError('Device condition timed out: '+json.dumps(state()))
-                def element(id): return next(e for e in state()['elements'] if e['id']==id)
+                def element(id):
+                    page.evaluate('(id)=>proCharts.Reveal(id)',id)
+                    page.wait_for_timeout(100)
+                    return next(e for e in state()['elements'] if e['id']==id)
                 def activate(id):
                     wait(lambda s:any(e['id']==id and e['enabled'] for e in s['elements']))
                     e=element(id); x=e['x']+e['width']/2; y=e['y']+e['height']/2
+                    assert 0 <= x < width and 0 <= y < height,(id,e)
                     if touch: page.touchscreen.tap(x,y)
                     else: page.mouse.click(x,y)
                     page.wait_for_timeout(100)
@@ -50,11 +56,20 @@ def main() -> None:
                     assert condition,(name,details)
                     run['checks'].append({'name':name,'passed':True,**details})
                     print('PASS '+run['name']+' '+name,flush=True)
+                def chrome_does_not_overlap():
+                    items=state()['elements']; plot=next(e for e in items if e['id']=='chart-plot')
+                    collisions=[]
+                    for e in items:
+                        if not e['id'].startswith('chart-') or e['id'] in ('chart-plot','chart-navigator'): continue
+                        overlap=e['x'] < plot['x']+plot['width'] and e['x']+e['width'] > plot['x'] and e['y'] < plot['y']+plot['height'] and e['y']+e['height'] > plot['y']
+                        if overlap: collisions.append(e['id'])
+                    return collisions
                 page.goto(f'http://127.0.0.1:{server.server_port}/',wait_until='domcontentloaded')
                 page.wait_for_function('globalThis.chartBootError || (globalThis.proCharts && JSON.parse(proCharts.GetState()).ready)',timeout=180000)
                 assert page.evaluate('globalThis.chartBootError || null') is None
                 wait(lambda s:s['hasData'] and s['total']==48)
                 check('Avalonia canvas boot',page.locator('canvas').count()>0)
+                check('Wrapped toolbar does not overlap plot',not chrome_does_not_overlap(),collisions=chrome_does_not_overlap())
                 activate('chart-zoom-in'); wait(lambda s:s['count']<48)
                 check('Native zoom input')
                 initial=state()['start']; plot=element('chart-plot')
@@ -82,6 +97,7 @@ def main() -> None:
                     check('PNG uses actual render scaling',abs(image.width-expected[0])<=2 and abs(image.height-expected[1])<=2,
                         pngPixels=list(image.size),expectedPixels=list(expected))
                 activate('sample-template'); wait(lambda s:s['compact'])
+                check('Compact toolbar does not overlap plot',not chrome_does_not_overlap(),collisions=chrome_does_not_overlap())
                 activate('sample-template'); wait(lambda s:not s['compact'])
                 check('Retemplating retains usable plot',element('chart-plot')['width']>200)
                 page.screenshot(path=str(output/(name+'-screen.png')))
@@ -91,7 +107,10 @@ def main() -> None:
             report['passed']=True
         except Exception as error:
             report['failure']=str(error); report['traceback']=traceback.format_exc()
-            try: page.screenshot(path=str(output/'failure.png'))
+            try:
+                report['failureState']=state()
+                report['hostDownloads']=page.evaluate('globalThis.chartDownloads')
+                page.screenshot(path=str(output/'failure.png'))
             except Exception: pass
             print(report['traceback'],flush=True)
         finally:
