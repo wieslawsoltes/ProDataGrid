@@ -1,0 +1,15 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFrameworks>net8.0;net10.0</TargetFrameworks>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <AvaloniaUseCompiledBindingsByDefault>true</AvaloniaUseCompiledBindingsByDefault>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <IsPackable>true</IsPackable>
+    <PackageId>ProCharts.Controls</PackageId>
+    <PackageDescription>Lookless Avalonia chart, legend, toolbar, navigator and tooltip controls for ProCharts.</PackageDescription>
+    <PackageTags>avalonia;charts;templated;visualization;wasm</PackageTags>
+  </PropertyGroup>
+  <ItemGroup><ProjectReference Include="../ProCharts.Avalonia/ProCharts.Avalonia.csproj" /></ItemGroup>
+  <Import Project="../../build/SharedVersion.props" />
+</Project>

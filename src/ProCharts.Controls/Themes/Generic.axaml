@@ -1,0 +1,194 @@
+<ResourceDictionary xmlns="https://github.com/avaloniaui"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:c="using:ProCharts.Controls" xmlns:plot="using:ProCharts.Avalonia">
+  <ResourceDictionary.ThemeDictionaries>
+    <ResourceDictionary x:Key="Light">
+      <SolidColorBrush x:Key="ChartCardBrush" Color="#FFFFFF" />
+      <SolidColorBrush x:Key="ChartBorderBrush" Color="#DEE4ED" />
+      <SolidColorBrush x:Key="ChartTextBrush" Color="#19243A" />
+      <SolidColorBrush x:Key="ChartMutedBrush" Color="#65738B" />
+      <SolidColorBrush x:Key="ChartChromeBrush" Color="#F5F7FB" />
+      <SolidColorBrush x:Key="ChartTooltipBrush" Color="#FFFFFF" />
+    </ResourceDictionary>
+    <ResourceDictionary x:Key="Dark">
+      <SolidColorBrush x:Key="ChartCardBrush" Color="#121926" />
+      <SolidColorBrush x:Key="ChartBorderBrush" Color="#2C374B" />
+      <SolidColorBrush x:Key="ChartTextBrush" Color="#E6EDF7" />
+      <SolidColorBrush x:Key="ChartMutedBrush" Color="#98A8C0" />
+      <SolidColorBrush x:Key="ChartChromeBrush" Color="#172032" />
+      <SolidColorBrush x:Key="ChartTooltipBrush" Color="#202C43" />
+    </ResourceDictionary>
+  </ResourceDictionary.ThemeDictionaries>
+  <SolidColorBrush x:Key="ChartAccentBrush" Color="#6366F1" />
+
+  <DataTemplate x:Key="ChartLegendItemTemplate" x:DataType="c:ChartLegendItem">
+    <CheckBox IsChecked="{Binding IsVisible, Mode=TwoWay}" IsEnabled="{Binding CanToggle}"
+              Margin="0,0,20,0" MinHeight="32" FontSize="12" AutomationProperties.Name="{Binding Name}">
+      <StackPanel Orientation="Horizontal" Spacing="7">
+        <Border Width="10" Height="10" CornerRadius="3" Background="{Binding Swatch}" />
+        <TextBlock Text="{Binding Name}" VerticalAlignment="Center" />
+      </StackPanel>
+    </CheckBox>
+  </DataTemplate>
+  <DataTemplate x:Key="ChartPointTemplate" x:DataType="c:ChartPointInfo">
+    <StackPanel Spacing="4" MinWidth="175">
+      <TextBlock Text="{Binding SeriesName}" FontWeight="SemiBold" FontSize="12" />
+      <TextBlock Text="{Binding Category}" Foreground="{DynamicResource ChartMutedBrush}" FontSize="11" />
+      <TextBlock Text="{Binding ValueText}" FontSize="21" FontWeight="SemiBold" />
+      <TextBlock Text="{Binding Detail}" FontSize="11" TextWrapping="Wrap" />
+    </StackPanel>
+  </DataTemplate>
+  <ControlTheme x:Key="{x:Type c:ProChartLegend}" TargetType="c:ProChartLegend">
+    <Setter Property="Foreground" Value="{DynamicResource ChartTextBrush}" />
+    <Setter Property="ItemTemplate" Value="{StaticResource ChartLegendItemTemplate}" />
+    <Setter Property="Template">
+      <ControlTemplate>
+        <ItemsControl ItemsSource="{TemplateBinding Items}" ItemTemplate="{TemplateBinding ItemTemplate}">
+          <ItemsControl.ItemsPanel><ItemsPanelTemplate><WrapPanel /></ItemsPanelTemplate></ItemsControl.ItemsPanel>
+        </ItemsControl>
+      </ControlTemplate>
+    </Setter>
+  </ControlTheme>
+  <ControlTheme x:Key="{x:Type c:ProChartToolTip}" TargetType="c:ProChartToolTip">
+    <Setter Property="PointTemplate" Value="{StaticResource ChartPointTemplate}" />
+    <Setter Property="Foreground" Value="{DynamicResource ChartTextBrush}" />
+    <Setter Property="Template">
+      <ControlTemplate>
+        <Border Background="{DynamicResource ChartTooltipBrush}" BorderBrush="{DynamicResource ChartBorderBrush}"
+                BorderThickness="1" CornerRadius="8" Padding="14" MaxWidth="310">
+          <ContentPresenter Content="{TemplateBinding Point}" ContentTemplate="{TemplateBinding PointTemplate}" />
+        </Border>
+      </ControlTemplate>
+    </Setter>
+  </ControlTheme>
+  <ControlTheme x:Key="{x:Type c:ProChartToolbar}" TargetType="c:ProChartToolbar" x:DataType="c:ProChartToolbar">
+    <Setter Property="Template">
+      <ControlTemplate>
+        <WrapPanel Orientation="Horizontal">
+          <Button Name="ZoomInButton" Content="＋" Margin="0,0,5,4" MinWidth="34" ToolTip.Tip="Zoom in (+)"
+                  AutomationProperties.AutomationId="chart-zoom-in" AutomationProperties.Name="Zoom in"
+                  Command="{Binding Target.ZoomInCommand, RelativeSource={RelativeSource TemplatedParent}}" />
+          <Button Name="ZoomOutButton" Content="−" Margin="0,0,5,4" MinWidth="34" ToolTip.Tip="Zoom out (-)"
+                  AutomationProperties.AutomationId="chart-zoom-out" AutomationProperties.Name="Zoom out"
+                  Command="{Binding Target.ZoomOutCommand, RelativeSource={RelativeSource TemplatedParent}}" />
+          <Button Name="ResetButton" Content="Fit" Margin="0,0,5,4" ToolTip.Tip="Fit all data (Home)"
+                  AutomationProperties.AutomationId="chart-reset" Command="{Binding Target.ResetViewCommand, RelativeSource={RelativeSource TemplatedParent}}" />
+          <Button Content="↶" Margin="0,0,5,4" AutomationProperties.Name="Undo viewport" ToolTip.Tip="Undo viewport (Ctrl+Z)"
+                  AutomationProperties.AutomationId="chart-undo" Command="{Binding Target.UndoViewCommand, RelativeSource={RelativeSource TemplatedParent}}" />
+          <Button Content="↷" Margin="0,0,5,4" AutomationProperties.Name="Redo viewport" ToolTip.Tip="Redo viewport (Ctrl+Y)"
+                  AutomationProperties.AutomationId="chart-redo" Command="{Binding Target.RedoViewCommand, RelativeSource={RelativeSource TemplatedParent}}" />
+          <Button Content="Latest" Margin="0,0,10,4" ToolTip.Tip="Follow the most recent 256 rows"
+                  AutomationProperties.AutomationId="chart-latest" Command="{Binding Target.LatestCommand, RelativeSource={RelativeSource TemplatedParent}}" />
+          <ComboBox MinWidth="114" Margin="0,0,12,4" AutomationProperties.Name="Pointer tool"
+                    AutomationProperties.AutomationId="chart-tool"
+                    ItemsSource="{Binding Target.PointerTools, RelativeSource={RelativeSource TemplatedParent}}"
+                    SelectedItem="{Binding Target.PointerTool, RelativeSource={RelativeSource TemplatedParent}, Mode=TwoWay}" />
+          <Button Content="PNG" Margin="0,0,5,4" ToolTip.Tip="Export plot as PNG"
+                  AutomationProperties.AutomationId="chart-png" Command="{Binding Target.ExportPngCommand, RelativeSource={RelativeSource TemplatedParent}}" />
+          <Button Content="SVG" Margin="0,0,5,4" ToolTip.Tip="Export vector plot as SVG"
+                  AutomationProperties.AutomationId="chart-svg" Command="{Binding Target.ExportSvgCommand, RelativeSource={RelativeSource TemplatedParent}}" />
+          <Button Content="CSV" Margin="0,0,0,4" ToolTip.Tip="Export displayed data as CSV"
+                  AutomationProperties.AutomationId="chart-csv" Command="{Binding Target.ExportCsvCommand, RelativeSource={RelativeSource TemplatedParent}}" />
+        </WrapPanel>
+      </ControlTemplate>
+    </Setter>
+  </ControlTheme>
+  <ControlTheme x:Key="{x:Type c:ProChartNavigator}" TargetType="c:ProChartNavigator">
+    <Setter Property="Template">
+      <ControlTemplate>
+        <Grid ColumnDefinitions="*,Auto" ColumnSpacing="12">
+          <Slider Name="WindowSlider" Minimum="0" Maximum="{TemplateBinding Maximum}"
+                  Value="{TemplateBinding Position, Mode=TwoWay}" IsEnabled="{TemplateBinding CanNavigate}"
+                  AutomationProperties.Name="Visible window start" AutomationProperties.AutomationId="chart-navigator" />
+          <TextBlock Grid.Column="1" Text="{TemplateBinding Summary}" VerticalAlignment="Center"
+                     FontSize="11" Foreground="{DynamicResource ChartMutedBrush}" />
+        </Grid>
+      </ControlTemplate>
+    </Setter>
+  </ControlTheme>
+  <ControlTheme x:Key="{x:Type c:ProChart}" TargetType="c:ProChart" x:DataType="c:ProChart">
+    <Setter Property="Background" Value="{DynamicResource ChartCardBrush}" />
+    <Setter Property="Foreground" Value="{DynamicResource ChartTextBrush}" />
+    <Setter Property="BorderBrush" Value="{DynamicResource ChartBorderBrush}" />
+    <Setter Property="BorderThickness" Value="1" />
+    <Setter Property="Padding" Value="20" />
+    <Setter Property="MinHeight" Value="300" />
+    <Setter Property="LegendItemTemplate" Value="{StaticResource ChartLegendItemTemplate}" />
+    <Setter Property="ToolTipTemplate" Value="{StaticResource ChartPointTemplate}" />
+    <Setter Property="Template">
+      <ControlTemplate>
+        <Border Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}"
+                BorderThickness="{TemplateBinding BorderThickness}" CornerRadius="12">
+          <Grid RowDefinitions="Auto,Auto,*,Auto,Auto,Auto" Margin="{TemplateBinding Padding}">
+            <StackPanel Spacing="4" Margin="0,0,0,14">
+              <TextBlock Text="{TemplateBinding Title}" FontSize="19" FontWeight="SemiBold" />
+              <TextBlock Text="{TemplateBinding Subtitle}" FontSize="12" Foreground="{DynamicResource ChartMutedBrush}" TextWrapping="Wrap" />
+              <ContentPresenter Content="{TemplateBinding Header}" ContentTemplate="{TemplateBinding HeaderTemplate}" />
+            </StackPanel>
+            <c:ProChartToolbar Grid.Row="1" Name="PART_Toolbar" Margin="0,0,0,10"
+                IsVisible="{TemplateBinding ShowToolbar}" Theme="{TemplateBinding ToolbarTheme}"
+                Target="{Binding RelativeSource={RelativeSource TemplatedParent}}" />
+            <Grid Grid.Row="2" ClipToBounds="True" MinHeight="120">
+              <plot:ProChartView Name="PART_Plot" ChartModel="{TemplateBinding Model}" ChartStyle="{TemplateBinding ChartStyle}"
+                  ShowLegend="False" ShowToolTips="False" ShowCrosshair="{TemplateBinding ShowCrosshair}"
+                  EnablePanZoom="{TemplateBinding EnablePanZoom}" EnableKeyboardNavigation="{TemplateBinding EnableKeyboardNavigation}"
+                  ZoomStep="{TemplateBinding ZoomStep}" MinWindowCount="{TemplateBinding MinWindowCount}"
+                  plot:ChartHierarchyNavigation.IsEnabled="True"
+                  AutomationProperties.AutomationId="chart-plot" AutomationProperties.Name="Interactive chart plot" />
+              <Canvas IsHitTestVisible="False">
+                <c:ProChartToolTip Name="PART_ToolTip" Point="{TemplateBinding HoverPoint}" PointTemplate="{TemplateBinding ToolTipTemplate}"
+                    IsVisible="{TemplateBinding IsToolTipVisible}" Canvas.Left="{TemplateBinding ToolTipX}" Canvas.Top="{TemplateBinding ToolTipY}" />
+              </Canvas>
+              <Border Background="{TemplateBinding Background}" IsVisible="{TemplateBinding IsEmpty}" Padding="24">
+                <ContentPresenter Content="{TemplateBinding EmptyContent}" ContentTemplate="{TemplateBinding EmptyTemplate}"
+                    HorizontalAlignment="Center" VerticalAlignment="Center" />
+              </Border>
+              <Border Background="{TemplateBinding Background}" IsVisible="{TemplateBinding IsLoading}" Padding="24">
+                <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Spacing="12">
+                  <ProgressBar IsIndeterminate="True" Width="160" />
+                  <TextBlock Text="Loading chart data…" HorizontalAlignment="Center" />
+                </StackPanel>
+              </Border>
+              <Border Background="{TemplateBinding Background}" IsVisible="{TemplateBinding HasError}" Padding="24">
+                <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Spacing="8">
+                  <TextBlock Text="Unable to display chart" FontWeight="SemiBold" />
+                  <TextBlock Text="{TemplateBinding ErrorMessage}" TextWrapping="Wrap" MaxWidth="460" />
+                </StackPanel>
+              </Border>
+            </Grid>
+            <c:ProChartLegend Grid.Row="3" Name="PART_Legend" Margin="0,10,0,0" IsVisible="{TemplateBinding IsLegendVisible}"
+                Items="{Binding LegendItems, RelativeSource={RelativeSource TemplatedParent}}"
+                ItemTemplate="{TemplateBinding LegendItemTemplate}" Theme="{TemplateBinding LegendTheme}" />
+            <c:ProChartNavigator Grid.Row="4" Name="PART_Navigator" Model="{TemplateBinding Model}"
+                IsVisible="{TemplateBinding ShowNavigator}" Theme="{TemplateBinding NavigatorTheme}" />
+            <StackPanel Grid.Row="5" Spacing="4" Margin="0,8,0,0">
+              <TextBlock Text="{TemplateBinding StatusText}" FontSize="11" Foreground="{DynamicResource ChartMutedBrush}" />
+              <TextBlock Text="{TemplateBinding ExportError}" FontSize="12" TextWrapping="Wrap" Foreground="#EF6B73" />
+              <ContentPresenter Content="{TemplateBinding Footer}" ContentTemplate="{TemplateBinding FooterTemplate}" />
+            </StackPanel>
+          </Grid>
+        </Border>
+      </ControlTemplate>
+    </Setter>
+  </ControlTheme>
+  <!-- Demonstrates total replacement of chrome without changing model or interaction code. -->
+  <ControlTheme x:Key="ProChartCompact" TargetType="c:ProChart" BasedOn="{StaticResource {x:Type c:ProChart}}">
+    <Setter Property="Template">
+      <ControlTemplate>
+        <Border Background="{TemplateBinding Background}" BorderBrush="{DynamicResource ChartAccentBrush}" BorderThickness="2" CornerRadius="8" Padding="12">
+          <Grid RowDefinitions="Auto,*,Auto">
+            <DockPanel Margin="0,0,0,8">
+              <TextBlock DockPanel.Dock="Left" Text="{TemplateBinding Title}" FontWeight="SemiBold" Margin="0,0,12,0" />
+              <c:ProChartToolbar Target="{Binding RelativeSource={RelativeSource TemplatedParent}}" />
+            </DockPanel>
+            <plot:ProChartView Grid.Row="1" Name="PART_Plot" ChartModel="{TemplateBinding Model}"
+                ChartStyle="{TemplateBinding ChartStyle}" ShowLegend="False" ShowToolTips="True"
+                EnablePanZoom="{TemplateBinding EnablePanZoom}" EnableKeyboardNavigation="{TemplateBinding EnableKeyboardNavigation}" ZoomStep="{TemplateBinding ZoomStep}" ShowCrosshair="{TemplateBinding ShowCrosshair}" MinWindowCount="{TemplateBinding MinWindowCount}"
+                AutomationProperties.AutomationId="chart-plot" />
+            <c:ProChartLegend Grid.Row="2" Items="{Binding LegendItems, RelativeSource={RelativeSource TemplatedParent}}" ItemTemplate="{TemplateBinding LegendItemTemplate}" IsVisible="{TemplateBinding IsLegendVisible}" />
+          </Grid>
+        </Border>
+      </ControlTemplate>
+    </Setter>
+  </ControlTheme>
+</ResourceDictionary>

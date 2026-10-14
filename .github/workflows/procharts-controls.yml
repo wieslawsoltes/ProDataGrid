@@ -4,21 +4,45 @@ on:
     branches: [feat/procharts-templated-browser]
   workflow_dispatch:
 permissions:
-  contents: read
+  contents: write
 jobs:
-  source:
+  controls:
     runs-on: ubuntu-latest
+    timeout-minutes: 20
     steps:
       - uses: actions/checkout@v4
-      - name: Capture source and build identity
+      - name: Integrate the exact surface legend patch once on the isolated feature branch
+        if: hashFiles('.github/procharts-surface.patch') != ''
+        shell: bash
         run: |
-          mkdir -p /tmp/procharts-source
-          git archive HEAD -o /tmp/procharts-source/source.zip
-          git rev-parse HEAD > /tmp/procharts-source/commit.txt
-          git rev-parse HEAD^{tree} > /tmp/procharts-source/tree.txt
-          cd /tmp/procharts-source && sha256sum source.zip > SHA256SUMS.txt
-      - uses: actions/upload-artifact@v4
+          set -euo pipefail
+          test "$GITHUB_REF" = refs/heads/feat/procharts-templated-browser
+          test "$(git hash-object src/ProCharts.Avalonia/ProChartView.cs)" = 15b926f0b1e931697407e8ef7ff4a7cf25e82081
+          git apply --check .github/procharts-surface.patch
+          git apply .github/procharts-surface.patch
+          test "$(git hash-object src/ProCharts.Avalonia/ProChartView.cs)" = 8ebfb4ba3f4093dc6d0504ba883af31027405095
+          git rm .github/procharts-surface.patch
+          git add src/ProCharts.Avalonia/ProChartView.cs
+          git -c user.name='Wiesław Šoltés' -c user.email='wieslawsoltes@users.noreply.github.com' commit -m 'feat(charts): expose per-surface legend visibility without mutating models'
+          git push origin HEAD:refs/heads/feat/procharts-templated-browser
+      - name: Record exact source identity
+        run: |
+          mkdir -p artifacts/source
+          git archive HEAD -o artifacts/source/source.zip
+          git rev-parse HEAD > artifacts/source/commit.txt
+          git rev-parse HEAD^{tree} > artifacts/source/tree.txt
+          cd artifacts/source && sha256sum source.zip > SHA256SUMS.txt
+      - uses: actions/setup-dotnet@v4
         with:
-          name: procharts-source
-          path: /tmp/procharts-source
+          global-json-file: global.json
+      - name: Compile lookless controls
+        shell: bash
+        run: |
+          set -o pipefail
+          dotnet build src/ProCharts.Controls/ProCharts.Controls.csproj -c Release -f net10.0 2>&1 | tee artifacts/controls-build.log
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: procharts-controls-initial
+          path: artifacts
           retention-days: 7
