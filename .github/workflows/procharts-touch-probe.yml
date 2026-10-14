@@ -1,0 +1,67 @@
+name: ProCharts touch download diagnostic
+on:
+  push:
+    branches: [test/procharts-touch-download]
+permissions:
+  contents: read
+  actions: read
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          run-id: 38624594361
+          name: procharts-browser
+          path: captured
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+      - name: Retained device report
+        run: cat captured/device-tests/report.json
+      - name: Install diagnostic browser
+        run: |
+          python -m pip install playwright==1.55.0 Pillow==11.3.0
+          python -m playwright install --with-deps chromium
+      - name: Add diagnostic-only event observations
+        shell: bash
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          path=Path('tests/ProCharts.Browser/validate_devices.py')
+          text=path.read_text()
+          text=text.replace('[(1.25,False,1280,950),(2,False,1280,950),(2,True,800,1100)]','[(2,True,800,1100)]')
+          text=text.replace("page=context.new_page()", """page=context.new_page()
+                          page.add_init_script('''globalThis.pointerProbe=[];
+                          for(const type of ['pointerdown','pointerup','touchstart','touchend','click']) {
+                            document.addEventListener(type,e=>{
+                              globalThis.pointerProbe.push({type:e.type,x:e.clientX,y:e.clientY,pointer:e.pointerType,trusted:e.isTrusted,target:e.target.tagName,active:navigator.userActivation.isActive,download:e.target.download});
+                              if(globalThis.pointerProbe.length>100)globalThis.pointerProbe.shift();
+                            },true);
+                          }''')
+                          page.on('download',lambda download:print('DOWNLOAD_EVENT '+download.suggested_filename,flush=True))""")
+          text=text.replace("if touch: page.touchscreen.tap(x,y)", "print('ACTIVATE '+id+' '+json.dumps(e),flush=True)\n                    if touch: page.touchscreen.tap(x,y)")
+          text=text.replace("page.wait_for_timeout(100)\n                def check", "page.wait_for_timeout(100)\n                    print('AFTER '+id+' '+page.evaluate('JSON.stringify({downloads:globalThis.chartDownloads,saveProbe:globalThis.saveProbe,state:JSON.parse(proCharts.GetState())})'),flush=True)\n                def check")
+          text=text.replace("report['failure']=str(error); report['traceback']=traceback.format_exc()", """report['failure']=str(error); report['traceback']=traceback.format_exc()
+                      try:
+                          print('FAILURE_DIAGNOSTICS '+page.evaluate('JSON.stringify({downloads:globalThis.chartDownloads,saveProbe:globalThis.saveProbe,events:globalThis.pointerProbe,state:JSON.parse(proCharts.GetState())})'),flush=True)
+                          png=element('chart-png')
+                          with page.expect_download(timeout=5000) as probe:
+                              page.mouse.click(png['x']+png['width']/2,png['y']+png['height']/2)
+                          print('MOUSE_CONTROL_EXPERIMENT '+probe.value.suggested_filename,flush=True)
+                      except Exception as diagnostic_error:
+                          print('MOUSE_CONTROL_EXPERIMENT_FAILURE '+str(diagnostic_error),flush=True)""")
+          compile(text,'probe.py','exec')
+          Path('probe.py').write_text(text)
+          host=Path('captured/browser/wwwroot/main.js')
+          script=host.read_text().replace('save(name, mimeType, base64) {','save(name, mimeType, base64) { globalThis.saveProbe = {name, active:navigator.userActivation.isActive, ever:navigator.userActivation.hasBeenActive};')
+          host.write_text(script)
+          PY
+      - name: Reproduce touch case and retain observations
+        run: python probe.py --root captured/browser/wwwroot --output probe-results
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: procharts-touch-diagnostic
+          path: probe-results
+          retention-days: 7
