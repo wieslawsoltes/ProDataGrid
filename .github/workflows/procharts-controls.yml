@@ -12,19 +12,16 @@ jobs:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 2
-      - name: Apply the verified chart-only patch and restore read-only validation
+      - name: Apply the verified chart-only source patch
         shell: bash
         run: |
           set -euo pipefail
           test "$GITHUB_REF" = refs/heads/feat/procharts-templated-browser
-          test "$(git rev-parse HEAD^)" = a2035f4ffa1533386a783f2d8e46bff14b0b4396
+          test "$(git rev-parse HEAD^)" = 950136487d7b2fe7a7e46a9076c24f16ffdd6429
           echo '7ef5b56f52248afbb5dfe2df3a3f4c56da087ad34c4bd629441485d7752e1cd4  .github/procharts-controls.patch' | sha256sum -c
-          echo '3da18443e997f7c1021e8b2d6f279473d2bed9d2732de2d57fc752f74d841d61  .github/procharts-controls.workflow' | sha256sum -c
           git apply --index --check .github/procharts-controls.patch
           git apply --index .github/procharts-controls.patch
-          cp .github/procharts-controls.workflow .github/workflows/procharts-controls.yml
-          git rm .github/procharts-controls.patch .github/procharts-controls.workflow
-          git add .github/workflows/procharts-controls.yml
+          git rm .github/procharts-controls.patch
           git diff --cached --stat
           git -c user.name='ProCharts build' -c user.email='github-actions[bot]@users.noreply.github.com' commit -m 'fix(charts): align reactive scheduling, isolate headless lifecycle and preserve series presentation'
           git push origin HEAD:refs/heads/feat/procharts-templated-browser
