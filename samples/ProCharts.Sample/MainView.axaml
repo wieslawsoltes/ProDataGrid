@@ -3,9 +3,9 @@
              x:Class="ProCharts.Sample.MainView" x:DataType="vm:ChartGalleryViewModel"
              vm:GalleryBehavior.Responsive="True" Background="{DynamicResource ChartCardBrush}">
   <UserControl.Styles>
-    <Style Selector="UserControl.narrow Border#Sidebar"><Setter Property="IsVisible" Value="False" /></Style>
-    <Style Selector="UserControl.narrow TextBlock.wide"><Setter Property="IsVisible" Value="False" /></Style>
-    <Style Selector="UserControl.narrow WrapPanel#HeaderActions"><Setter Property="Orientation" Value="Vertical" /></Style>
+    <Style Selector=":is(UserControl).narrow Border#Sidebar"><Setter Property="IsVisible" Value="False" /></Style>
+    <Style Selector=":is(UserControl).narrow TextBlock.wide"><Setter Property="IsVisible" Value="False" /></Style>
+    <Style Selector=":is(UserControl).narrow WrapPanel#HeaderActions"><Setter Property="Orientation" Value="Vertical" /></Style>
     <Style Selector="Button"><Setter Property="CornerRadius" Value="6" /></Style>
     <Style Selector="CheckBox"><Setter Property="FontSize" Value="12" /></Style>
   </UserControl.Styles>
