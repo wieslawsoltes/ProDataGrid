@@ -44,6 +44,10 @@ namespace ProCharts.Avalonia
         public static readonly StyledProperty<SkiaChartStyle?> ChartStyleProperty =
             AvaloniaProperty.Register<ProChartView, SkiaChartStyle?>(nameof(ChartStyle));
 
+        /// <summary>Controls the rendered legend without changing the caller-owned model.</summary>
+        public static readonly StyledProperty<bool> ShowLegendProperty =
+            AvaloniaProperty.Register<ProChartView, bool>(nameof(ShowLegend), true);
+
         public static readonly StyledProperty<bool> ShowToolTipsProperty =
             AvaloniaProperty.Register<ProChartView, bool>(nameof(ShowToolTips), true);
 
@@ -117,7 +121,7 @@ namespace ProCharts.Avalonia
 
         static ProChartView()
         {
-            AffectsRender<ProChartView>(ChartModelProperty, ChartStyleProperty, ShowCrosshairProperty);
+            AffectsRender<ProChartView>(ChartModelProperty, ChartStyleProperty, ShowCrosshairProperty, ShowLegendProperty);
         }
 
         public ProChartView()
@@ -136,6 +140,13 @@ namespace ProCharts.Avalonia
         {
             get => GetValue(ChartStyleProperty);
             set => SetValue(ChartStyleProperty, value);
+        }
+
+        /// <summary>Gets or sets whether the raster surface draws its legend.</summary>
+        public bool ShowLegend
+        {
+            get => GetValue(ShowLegendProperty);
+            set => SetValue(ShowLegendProperty, value);
         }
 
         public bool ShowToolTips
@@ -283,7 +294,7 @@ namespace ProCharts.Avalonia
 
                 InvalidateVisual();
             }
-            else if (change.Property == ChartStyleProperty)
+            else if (change.Property == ChartStyleProperty || change.Property == ShowLegendProperty)
             {
                 _isDirty = true;
                 EndPan();
@@ -629,7 +640,7 @@ namespace ProCharts.Avalonia
 
             var legend = model.Legend;
             style.LegendPosition = legend.Position;
-            style.ShowLegend = legend.IsVisible && legend.Position != ChartLegendPosition.None;
+            style.ShowLegend = ShowLegend && legend.IsVisible && legend.Position != ChartLegendPosition.None;
 
             var categoryAxis = model.CategoryAxis;
             style.ShowCategoryLabels = categoryAxis.IsVisible;
