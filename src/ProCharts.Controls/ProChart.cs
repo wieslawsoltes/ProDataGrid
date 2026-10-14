@@ -9,11 +9,9 @@ using Avalonia.Automation.Peers;
 using Avalonia.Controls;
 using Avalonia.Controls.Metadata;
 using Avalonia.Controls.Primitives;
-using Avalonia.Controls.Templates;
 using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.Media;
-using Avalonia.Styling;
 using ProCharts.Avalonia;
 using ProCharts.Skia;
 using SkiaSharp;
@@ -36,6 +34,7 @@ public partial class ProChart : TemplatedControl
     private ProChartView? _plot;
     private ProChartToolTip? _toolTip;
     private bool _attached;
+    private bool _plotHandlersAttached;
     private Point? _pressPoint;
     private ChartPointerTool _pointerTool;
     private readonly ObservableCollection<ChartLegendItem> _legend = new();
@@ -45,27 +44,42 @@ public partial class ProChart : TemplatedControl
 
     /// <summary>Native legend entries, including disabled series so they can be restored.</summary>
     public ReadOnlyObservableCollection<ChartLegendItem> LegendItems { get; }
+    /// <summary>Pointer modes understood by the default plot surface.</summary>
     public IReadOnlyList<ChartPointerTool> PointerTools { get; } = Array.AsReadOnly(Enum.GetValues<ChartPointerTool>());
+    /// <summary>Zooms in around the center of the visible category window.</summary>
     public ICommand ZoomInCommand { get; }
+    /// <summary>Zooms out around the center of the visible category window.</summary>
     public ICommand ZoomOutCommand { get; }
+    /// <summary>Resets the category window and explicit primary value range.</summary>
     public ICommand ResetViewCommand { get; }
+    /// <summary>Restores the preceding category window.</summary>
     public ICommand UndoViewCommand { get; }
+    /// <summary>Reapplies an undone category-window change.</summary>
     public ICommand RedoViewCommand { get; }
+    /// <summary>Follows the most recent 256 source rows.</summary>
     public ICommand LatestCommand { get; }
+    /// <summary>Saves a PNG of the plot through the configured export service.</summary>
     public ICommand ExportPngCommand { get; }
+    /// <summary>Saves an SVG of the plot through the configured export service.</summary>
     public ICommand ExportSvgCommand { get; }
+    /// <summary>Saves the displayed snapshot as CSV.</summary>
     public ICommand ExportCsvCommand { get; }
-    /// <summary>The current save operation, available to deterministic host tests.</summary>
+    /// <summary>The current command-initiated save operation, available to deterministic host tests.</summary>
     public Task LastExportTask { get; private set; } = Task.CompletedTask;
+    /// <summary>Identifies the bubbling point-activation event.</summary>
     public static readonly RoutedEvent<ChartPointInvokedEventArgs> PointInvokedEvent =
         RoutedEvent.Register<ProChart, ChartPointInvokedEventArgs>(nameof(PointInvoked), RoutingStrategies.Bubble);
+    /// <summary>Raised when a click or tap activates a point rather than dragging.</summary>
     public event EventHandler<ChartPointInvokedEventArgs>? PointInvoked
     { add => AddHandler(PointInvokedEvent, value); remove => RemoveHandler(PointInvokedEvent, value); }
+    /// <summary>Identifies the bubbling viewport-change event.</summary>
     public static readonly RoutedEvent<RoutedEventArgs> ViewportChangedEvent =
         RoutedEvent.Register<ProChart, RoutedEventArgs>(nameof(ViewportChanged), RoutingStrategies.Bubble);
+    /// <summary>Raised when the model request or primary value axis changes.</summary>
     public event EventHandler<RoutedEventArgs>? ViewportChanged
     { add => AddHandler(ViewportChangedEvent, value); remove => RemoveHandler(ViewportChangedEvent, value); }
 
+    /// <summary>Creates a chart without taking ownership of its model or data source.</summary>
     public ProChart()
     {
         LegendItems = new ReadOnlyObservableCollection<ChartLegendItem>(_legend);
@@ -83,50 +97,63 @@ public partial class ProChart : TemplatedControl
     { ChartCommand command = new(execute, canExecute); _commands.Add(command); return command; }
     private bool CanNavigate() => Model != null && HasData && !IsLoading && !HasError && EnablePanZoom && IsEffectivelyEnabled;
     private bool CanExport() => _plot != null && HasData && !IsExporting && !IsLoading && !HasError && IsEffectivelyEnabled;
+    private bool CanInteractWithPlot(object? sender) => _attached && ReferenceEquals(sender, _plot) &&
+        _plot is { IsEffectivelyEnabled: true } && HasData && !IsLoading && !HasError && IsEffectivelyEnabled;
+    /// <inheritdoc />
     protected override AutomationPeer OnCreateAutomationPeer() => new ProChartAutomationPeer(this);
 
+    /// <inheritdoc />
     protected override void OnApplyTemplate(TemplateAppliedEventArgs e)
     {
-        DetachPlot();
+        DetachPlotHandlers();
         base.OnApplyTemplate(e);
         _plot = e.NameScope.Find<ProChartView>("PART_Plot");
         _toolTip = e.NameScope.Find<ProChartToolTip>("PART_ToolTip");
-        if (_plot != null)
-        {
-            _plot.AddHandler(PointerMovedEvent, OnPlotMoved, RoutingStrategies.Bubble, handledEventsToo: true);
-            _plot.AddHandler(PointerExitedEvent, OnPlotExited);
-            _plot.AddHandler(PointerPressedEvent, OnPlotPressed, RoutingStrategies.Tunnel, handledEventsToo: true);
-            _plot.AddHandler(PointerReleasedEvent, OnPlotReleased, RoutingStrategies.Tunnel, handledEventsToo: true);
-        }
+        AttachPlotHandlers();
         ClearHover();
         UpdateState(true);
     }
-    private void DetachPlot()
+    private void AttachPlotHandlers()
     {
-        if (_plot == null) return;
-        _plot.RemoveHandler(PointerMovedEvent, OnPlotMoved);
-        _plot.RemoveHandler(PointerExitedEvent, OnPlotExited);
-        _plot.RemoveHandler(PointerPressedEvent, OnPlotPressed);
-        _plot.RemoveHandler(PointerReleasedEvent, OnPlotReleased);
-        _plot = null;
-        _toolTip = null;
+        if (!_attached || _plot == null || _plotHandlersAttached) return;
+        _plot.AddHandler(PointerMovedEvent, OnPlotMoved, RoutingStrategies.Bubble, handledEventsToo: true);
+        _plot.AddHandler(PointerExitedEvent, OnPlotExited);
+        _plot.AddHandler(PointerPressedEvent, OnPlotPressed, RoutingStrategies.Tunnel, handledEventsToo: true);
+        _plot.AddHandler(PointerReleasedEvent, OnPlotReleased, RoutingStrategies.Tunnel, handledEventsToo: true);
+        _plotHandlersAttached = true;
+    }
+    private void DetachPlotHandlers()
+    {
+        if (_plot != null && _plotHandlersAttached)
+        {
+            _plot.RemoveHandler(PointerMovedEvent, OnPlotMoved);
+            _plot.RemoveHandler(PointerExitedEvent, OnPlotExited);
+            _plot.RemoveHandler(PointerPressedEvent, OnPlotPressed);
+            _plot.RemoveHandler(PointerReleasedEvent, OnPlotReleased);
+        }
+        _plotHandlersAttached = false;
         _pressPoint = null;
     }
+    /// <inheritdoc />
     protected override void OnAttachedToVisualTree(VisualTreeAttachmentEventArgs e)
     {
         base.OnAttachedToVisualTree(e);
         _attached = true;
         if (Model != null) Model.PropertyChanged += OnModelChanged;
+        AttachPlotHandlers();
         UpdateState(true);
     }
+    /// <inheritdoc />
     protected override void OnDetachedFromVisualTree(VisualTreeAttachmentEventArgs e)
     {
         _attached = false;
         if (Model != null) Model.PropertyChanged -= OnModelChanged;
+        DetachPlotHandlers();
         _exportCancellation?.Cancel();
         ClearHover();
         base.OnDetachedFromVisualTree(e);
     }
+    /// <inheritdoc />
     protected override void OnPropertyChanged(AvaloniaPropertyChangedEventArgs change)
     {
         base.OnPropertyChanged(change);
@@ -134,13 +161,18 @@ public partial class ProChart : TemplatedControl
         {
             if (_attached && change.OldValue is ChartModel oldModel) oldModel.PropertyChanged -= OnModelChanged;
             if (_attached && Model != null) Model.PropertyChanged += OnModelChanged;
+            _pressPoint = null;
             ClearHover();
             UpdateState(true);
         }
         else if (change.Property == ChartStyleProperty || change.Property == ShowLegendProperty ||
                  change.Property == IsLoadingProperty || change.Property == ErrorMessageProperty ||
                  change.Property == EnablePanZoomProperty || change.Property == IsEnabledProperty)
+        {
+            ClearHover();
+            if (IsLoading || !string.IsNullOrEmpty(ErrorMessage) || !IsEffectivelyEnabled) _pressPoint = null;
             UpdateState(change.Property == ChartStyleProperty);
+        }
         else if (change.Property == ShowToolTipsProperty && !ShowToolTips) ClearHover();
     }
     private void OnModelChanged(object? sender, PropertyChangedEventArgs e)
@@ -151,8 +183,12 @@ public partial class ProChart : TemplatedControl
             SetAndRaise(PointerToolProperty, ref _pointerTool, Model!.Interaction.PointerTool);
             return; // Crosshair movement must not rebuild the legend or scan the dataset.
         }
+        // A displayed hit belongs to a particular immutable snapshot and axis formatting.
+        // Never leave old values or removed-series identities in a stationary tooltip.
+        ClearHover();
+        if (e.PropertyName is nameof(ChartModel.Snapshot) or nameof(ChartModel.DataSource)) _pressPoint = null;
         if (e.PropertyName is nameof(ChartModel.Request) or nameof(ChartModel.ValueAxis))
-        { ClearHover(); RaiseEvent(new RoutedEventArgs(ViewportChangedEvent)); }
+            RaiseEvent(new RoutedEventArgs(ViewportChangedEvent));
         UpdateState(e.PropertyName is nameof(ChartModel.DataSource) or nameof(ChartModel.Theme) or nameof(ChartModel.SeriesStyles));
     }
     private void UpdateState(bool rebuildLegend = false)
@@ -170,7 +206,7 @@ public partial class ProChart : TemplatedControl
         HasData = data;
         HasError = !string.IsNullOrEmpty(ErrorMessage);
         IsEmpty = !data && !IsLoading && !HasError;
-        IsLegendVisible = ShowLegend && Model?.Legend.IsVisible != false;
+        IsLegendVisible = ShowLegend && Model != null && Model.Legend.IsVisible && Model.Legend.Position != ChartLegendPosition.None;
         if (!IsExporting) StatusText = $"{snapshot.Series.Count:N0} series · {points:N0} displayed points";
         if (Model != null) SetAndRaise(PointerToolProperty, ref _pointerTool, Model.Interaction.PointerTool);
         PseudoClasses.Set(":empty", IsEmpty);
@@ -212,10 +248,10 @@ public partial class ProChart : TemplatedControl
     }
     private void OnPlotMoved(object? sender, PointerEventArgs e)
     {
-        if (!ShowToolTips || IsLoading || HasError || _plot == null ||
-            e.GetCurrentPoint(_plot).Properties.IsLeftButtonPressed) { ClearHover(); return; }
-        Point position = e.GetPosition(_plot);
-        SkiaChartHitTestResult? hit = _plot.HitTest(position);
+        if (!CanInteractWithPlot(sender) || !ShowToolTips ||
+            e.GetCurrentPoint(_plot!).Properties.IsLeftButtonPressed) { ClearHover(); return; }
+        Point position = e.GetPosition(_plot!);
+        SkiaChartHitTestResult? hit = _plot!.HitTest(position);
         if (!hit.HasValue) { ClearHover(); return; }
         if (HoverPoint == null || HoverPoint.Hit != hit.Value) HoverPoint = new ChartPointInfo(hit.Value, Model);
         double width = _toolTip?.Bounds.Width ?? 0;
@@ -227,16 +263,19 @@ public partial class ProChart : TemplatedControl
     }
     private void OnPlotExited(object? sender, PointerEventArgs e) => ClearHover();
     private void OnPlotPressed(object? sender, PointerPressedEventArgs e)
-    { if (_plot != null && e.GetCurrentPoint(_plot).Properties.IsLeftButtonPressed) _pressPoint = e.GetPosition(_plot); }
+    {
+        _pressPoint = CanInteractWithPlot(sender) && e.GetCurrentPoint(_plot!).Properties.IsLeftButtonPressed
+            ? e.GetPosition(_plot!) : null;
+    }
     private void OnPlotReleased(object? sender, PointerReleasedEventArgs e)
     {
         Point? start = _pressPoint;
         _pressPoint = null;
-        if (_plot == null || start == null || e.InitialPressMouseButton != MouseButton.Left) return;
-        Point end = e.GetPosition(_plot);
+        if (!CanInteractWithPlot(sender) || start == null || e.InitialPressMouseButton != MouseButton.Left) return;
+        Point end = e.GetPosition(_plot!);
         double dx = end.X - start.Value.X, dy = end.Y - start.Value.Y;
         if (dx * dx + dy * dy > 25) return;
-        SkiaChartHitTestResult? hit = _plot.HitTest(end);
+        SkiaChartHitTestResult? hit = _plot!.HitTest(end);
         if (hit.HasValue) RaiseEvent(new ChartPointInvokedEventArgs(PointInvokedEvent, new ChartPointInfo(hit.Value, Model)));
     }
     private void ClearHover()
@@ -262,7 +301,8 @@ public partial class ProChart : TemplatedControl
     public async Task SaveAsync(ChartExportFormat format)
     {
         if (IsExporting) return;
-        _exportCancellation = new CancellationTokenSource();
+        using CancellationTokenSource cancellation = new();
+        _exportCancellation = cancellation;
         IsExporting = true;
         ExportError = null;
         PseudoClasses.Set(":exporting", true);
@@ -271,13 +311,12 @@ public partial class ProChart : TemplatedControl
         {
             StatusText = "Exporting chart…";
             ChartExportPayload payload = CreateExport(format);
-            await (ExportService ?? new StorageChartExportService(this)).SaveAsync(payload, _exportCancellation.Token);
+            await (ExportService ?? new StorageChartExportService(this)).SaveAsync(payload, cancellation.Token);
         }
         catch (OperationCanceledException) { }
         catch (Exception error) { ExportError = error.Message; }
         finally
         {
-            _exportCancellation.Dispose();
             _exportCancellation = null;
             IsExporting = false;
             PseudoClasses.Set(":exporting", false);
