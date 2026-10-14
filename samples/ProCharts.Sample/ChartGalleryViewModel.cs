@@ -1,6 +1,6 @@
 // Copyright (c) Wieslaw Soltes. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for details.
-using System.Reactive;
+using ReactiveUI.Primitives;
 using ReactiveUI;
 using ProCharts.Skia;
 
@@ -24,6 +24,7 @@ public sealed class ChartGalleryViewModel : ReactiveObject, IDisposable
     private string _title = "", _subtitle = "", _dataSummary = "";
     private SkiaChartStyle _style = CreateStyle(false);
     private long _nextX;
+    private int _tickPending;
     public IReadOnlyList<GalleryExample> Examples { get; } = Array.AsReadOnly(new[]
     {
         new GalleryExample("overview", "Overview", "Layered area, line and column series", ChartSeriesKind.Area),
@@ -40,31 +41,39 @@ public sealed class ChartGalleryViewModel : ReactiveObject, IDisposable
         new GalleryExample("states", "Control states", "Empty, loading and error templates", ChartSeriesKind.Line)
     });
     public IReadOnlyList<ChartSeriesKind> ChartKinds { get; } = Array.AsReadOnly(Enum.GetValues<ChartSeriesKind>());
-    public ReactiveCommand<Unit, Unit> ThemeCommand { get; }
-    public ReactiveCommand<Unit, Unit> TemplateCommand { get; }
-    public ReactiveCommand<Unit, Unit> StreamCommand { get; }
-    public ReactiveCommand<Unit, Unit> AppendCommand { get; }
-    public ReactiveCommand<Unit, Unit> EmptyCommand { get; }
-    public ReactiveCommand<Unit, Unit> ReloadCommand { get; }
-    public ReactiveCommand<Unit, Unit> LoadingCommand { get; }
-    public ReactiveCommand<Unit, Unit> ErrorCommand { get; }
+    public ReactiveCommand<RxVoid, RxVoid> ThemeCommand { get; }
+    public ReactiveCommand<RxVoid, RxVoid> TemplateCommand { get; }
+    public ReactiveCommand<RxVoid, RxVoid> StreamCommand { get; }
+    public ReactiveCommand<RxVoid, RxVoid> AppendCommand { get; }
+    public ReactiveCommand<RxVoid, RxVoid> EmptyCommand { get; }
+    public ReactiveCommand<RxVoid, RxVoid> ReloadCommand { get; }
+    public ReactiveCommand<RxVoid, RxVoid> LoadingCommand { get; }
+    public ReactiveCommand<RxVoid, RxVoid> ErrorCommand { get; }
     public ChartGalleryViewModel(Action<Action> dispatch, Action toggleTheme)
     {
         _dispatch = dispatch;
         _selectedExample = Examples[0];
         ThemeCommand = ReactiveCommand.Create(toggleTheme);
-        TemplateCommand = ReactiveCommand.Create(() => IsCompact = !IsCompact);
+        TemplateCommand = ReactiveCommand.Create(() => { IsCompact = !IsCompact; });
         StreamCommand = ReactiveCommand.Create(() =>
         {
-            if (_stream == null) { SelectedExample = Examples.First(x => x.Id == "stream"); }
+            EnsureStream();
             IsStreaming = !IsStreaming;
         });
-        AppendCommand = ReactiveCommand.Create(() => { if (_stream == null) SelectedExample = Examples.First(x => x.Id == "stream"); AppendBatch(); });
+        AppendCommand = ReactiveCommand.Create(() => { EnsureStream(); AppendBatch(); });
         EmptyCommand = ReactiveCommand.Create(() => { IsLoading = false; ErrorMessage = null; ReplaceModel(new ChartModel()); Title = "No observations yet"; });
         ReloadCommand = ReactiveCommand.Create(LoadExample);
         LoadingCommand = ReactiveCommand.Create(() => { ErrorMessage = null; IsLoading = !IsLoading; });
         ErrorCommand = ReactiveCommand.Create(() => { IsLoading = false; ErrorMessage = ErrorMessage == null ? "The data provider is unavailable. This is a simulated recoverable error." : null; });
-        _timer = new Timer(_ => _dispatch(() => { if (!_disposed && IsStreaming) AppendBatch(); }), null, 100, 100);
+        _timer = new Timer(_ =>
+        {
+            if (Interlocked.Exchange(ref _tickPending, 1) != 0) return;
+            _dispatch(() =>
+            {
+                try { if (!_disposed && IsStreaming) AppendBatch(); }
+                finally { Volatile.Write(ref _tickPending, 0); }
+            });
+        }, null, 100, 100);
         LoadExample();
     }
     public GalleryExample SelectedExample
@@ -142,6 +151,13 @@ public sealed class ChartGalleryViewModel : ReactiveObject, IDisposable
         Model.ValueAxis.Title = "Value";
         Model.ValueAxis.ValueFormat = new ChartValueFormat { MaximumFractionDigits = 2 };
         DataSummary = $"{Model.Snapshot.Series.Count} SERIES  /  {((source as IChartWindowInfoProvider)?.GetTotalCategoryCount() ?? Model.Snapshot.Categories.Count):N0} ROWS";
+    }
+    private void EnsureStream()
+    {
+        if (_stream != null) return;
+        GalleryExample example = Examples.First(x => x.Id == "stream");
+        if (ReferenceEquals(SelectedExample, example)) LoadStream();
+        else SelectedExample = example;
     }
     private void LoadStream()
     {
