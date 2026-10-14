@@ -3,6 +3,6 @@
   <ItemGroup>
     <ProjectReference Include="../../src/ProCharts.Controls/ProCharts.Controls.csproj" />
     <PackageReference Include="Avalonia.Themes.Fluent" /><PackageReference Include="Avalonia.Fonts.Inter" />
-    <PackageReference Include="ReactiveUI" />
+    <PackageReference Include="ReactiveUI" /><PackageReference Include="ReactiveUI.Avalonia" />
   </ItemGroup>
 </Project>

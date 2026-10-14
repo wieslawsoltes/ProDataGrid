@@ -14,7 +14,7 @@
       <Grid ColumnDefinitions="*,Auto" ColumnSpacing="18">
         <StackPanel Orientation="Horizontal" Spacing="12" VerticalAlignment="Center">
           <Border Background="{DynamicResource ChartAccentBrush}" CornerRadius="7" Padding="9,6">
-            <TextBlock Text="▥" FontSize="22" Foreground="White" />
+            <Path Data="M1,16 L1,9 M8,16 L8,2 M15,16 L15,6" Width="19" Height="20" Stroke="White" StrokeThickness="3" Stretch="Uniform" />
           </Border>
           <StackPanel Spacing="1">
             <TextBlock Text="ProCharts" FontSize="22" FontWeight="Bold" />
@@ -23,7 +23,7 @@
         </StackPanel>
         <WrapPanel Grid.Column="1" Name="HeaderActions" VerticalAlignment="Center">
           <Button Content="Switch template" Command="{Binding TemplateCommand}" Margin="0,0,8,4" AutomationProperties.AutomationId="sample-template" />
-          <Button Content="◐ Theme" Command="{Binding ThemeCommand}" AutomationProperties.AutomationId="sample-theme" />
+          <Button Content="Theme" Command="{Binding ThemeCommand}" AutomationProperties.AutomationId="sample-theme" />
         </WrapPanel>
       </Grid>
     </Border>

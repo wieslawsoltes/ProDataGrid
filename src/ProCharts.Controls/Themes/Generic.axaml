@@ -65,17 +65,17 @@
     <Setter Property="Template">
       <ControlTemplate>
         <WrapPanel Orientation="Horizontal">
-          <Button Name="ZoomInButton" Content="＋" Margin="0,0,5,4" MinWidth="34" ToolTip.Tip="Zoom in (+)"
+          <Button Name="ZoomInButton" Content="+" Margin="0,0,5,4" MinWidth="34" ToolTip.Tip="Zoom in (+)"
                   AutomationProperties.AutomationId="chart-zoom-in" AutomationProperties.Name="Zoom in"
                   Command="{Binding Target.ZoomInCommand, RelativeSource={RelativeSource TemplatedParent}}" />
-          <Button Name="ZoomOutButton" Content="−" Margin="0,0,5,4" MinWidth="34" ToolTip.Tip="Zoom out (-)"
+          <Button Name="ZoomOutButton" Content="-" Margin="0,0,5,4" MinWidth="34" ToolTip.Tip="Zoom out (-)"
                   AutomationProperties.AutomationId="chart-zoom-out" AutomationProperties.Name="Zoom out"
                   Command="{Binding Target.ZoomOutCommand, RelativeSource={RelativeSource TemplatedParent}}" />
           <Button Name="ResetButton" Content="Fit" Margin="0,0,5,4" ToolTip.Tip="Fit all data (Home)"
                   AutomationProperties.AutomationId="chart-reset" Command="{Binding Target.ResetViewCommand, RelativeSource={RelativeSource TemplatedParent}}" />
-          <Button Content="↶" Margin="0,0,5,4" AutomationProperties.Name="Undo viewport" ToolTip.Tip="Undo viewport (Ctrl+Z)"
+          <Button Content="Undo" Margin="0,0,5,4" AutomationProperties.Name="Undo viewport" ToolTip.Tip="Undo viewport (Ctrl+Z)"
                   AutomationProperties.AutomationId="chart-undo" Command="{Binding Target.UndoViewCommand, RelativeSource={RelativeSource TemplatedParent}}" />
-          <Button Content="↷" Margin="0,0,5,4" AutomationProperties.Name="Redo viewport" ToolTip.Tip="Redo viewport (Ctrl+Y)"
+          <Button Content="Redo" Margin="0,0,5,4" AutomationProperties.Name="Redo viewport" ToolTip.Tip="Redo viewport (Ctrl+Y)"
                   AutomationProperties.AutomationId="chart-redo" Command="{Binding Target.RedoViewCommand, RelativeSource={RelativeSource TemplatedParent}}" />
           <Button Content="Latest" Margin="0,0,10,4" ToolTip.Tip="Follow the most recent 256 rows"
                   AutomationProperties.AutomationId="chart-latest" Command="{Binding Target.LatestCommand, RelativeSource={RelativeSource TemplatedParent}}" />
@@ -129,7 +129,7 @@
                 IsVisible="{TemplateBinding ShowToolbar}" Theme="{TemplateBinding ToolbarTheme}"
                 Target="{Binding RelativeSource={RelativeSource TemplatedParent}}" />
             <Grid Grid.Row="2" ClipToBounds="True" MinHeight="120">
-              <plot:ProChartView Name="PART_Plot" ChartModel="{TemplateBinding Model}" ChartStyle="{TemplateBinding ChartStyle}"
+              <plot:ProChartView Name="PART_Plot" ChartModel="{TemplateBinding Model}" ChartStyle="{TemplateBinding EffectiveChartStyle}"
                   ShowLegend="False" ShowToolTips="False" ShowCrosshair="{TemplateBinding ShowCrosshair}"
                   EnablePanZoom="{TemplateBinding EnablePanZoom}" EnableKeyboardNavigation="{TemplateBinding EnableKeyboardNavigation}"
                   ZoomStep="{TemplateBinding ZoomStep}" MinWindowCount="{TemplateBinding MinWindowCount}"
@@ -187,7 +187,7 @@
             </DockPanel>
             <Grid Grid.Row="1" ClipToBounds="True">
               <plot:ProChartView Name="PART_Plot" ChartModel="{TemplateBinding Model}"
-                  ChartStyle="{TemplateBinding ChartStyle}" ShowLegend="False" ShowToolTips="False"
+                  ChartStyle="{TemplateBinding EffectiveChartStyle}" ShowLegend="False" ShowToolTips="False"
                   EnablePanZoom="{TemplateBinding EnablePanZoom}" EnableKeyboardNavigation="{TemplateBinding EnableKeyboardNavigation}"
                   ZoomStep="{TemplateBinding ZoomStep}" ShowCrosshair="{TemplateBinding ShowCrosshair}" MinWindowCount="{TemplateBinding MinWindowCount}"
                   plot:ChartHierarchyNavigation.IsEnabled="True" AutomationProperties.AutomationId="chart-plot" />

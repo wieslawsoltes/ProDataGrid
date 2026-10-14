@@ -1,4 +1,5 @@
 using Avalonia;
+using ReactiveUI.Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.Primitives;
 using Avalonia.Controls.Templates;
@@ -16,7 +17,7 @@ namespace ProCharts.Controls.Tests;
 
 public sealed class TestApplicationBuilder
 {
-    public static AppBuilder BuildAvaloniaApp() => AppBuilder.Configure<App>().UseSkia().WithInterFont()
+    public static AppBuilder BuildAvaloniaApp() => AppBuilder.Configure<ControlTestApp>().UseSkia().WithInterFont().UseReactiveUI(static _ => { })
         .UseHeadless(new AvaloniaHeadlessPlatformOptions { UseHeadlessDrawing = false });
 }
 

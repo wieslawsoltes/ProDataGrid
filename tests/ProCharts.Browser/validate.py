@@ -35,7 +35,7 @@ def main() -> None:
     with sync_playwright() as playwright:
         executable = os.getenv('CHROMIUM_PATH')
         browser = playwright.chromium.launch(executable_path=executable, headless=True,
-            args=['--no-sandbox', '--disable-dev-shm-usage', '--enable-unsafe-swiftshader'])
+            args=['--no-sandbox', '--disable-dev-shm-usage', '--enable-unsafe-swiftshader', '--use-angle=swiftshader', '--enable-webgl'])
         report['browserVersion'] = browser.version
         context = browser.new_context(viewport={'width': 1440, 'height': 1000}, device_scale_factor=1, accept_downloads=True)
         page = context.new_page()
@@ -61,7 +61,9 @@ def main() -> None:
             return items[0]
         def click(id: str, disabled: bool = False) -> None:
             e = element(id)
-            if not disabled: assert e['enabled'], f'{id} is disabled'
+            if not disabled:
+                wait(lambda s: any(x['id']==id and x['enabled'] for x in s['elements']), f'{id} remains disabled')
+                e = element(id)
             assert 0 <= e['x'] < page.viewport_size['width'] and 0 <= e['y'] < page.viewport_size['height'], (id, e)
             page.mouse.click(e['x'] + e['width']/2, e['y'] + e['height']/2)
             page.wait_for_timeout(100)

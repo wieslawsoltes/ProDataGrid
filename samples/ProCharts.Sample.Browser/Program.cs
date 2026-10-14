@@ -3,6 +3,7 @@ using System.Runtime.Versioning;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using Avalonia;
+using ReactiveUI.Avalonia;
 using Avalonia.Automation;
 using Avalonia.Browser;
 using Avalonia.Controls;
@@ -17,7 +18,7 @@ public static partial class Program
     private static bool _ready;
     public static async Task Main(string[] args)
     {
-        await AppBuilder.Configure<App>().WithInterFont().StartBrowserAppAsync("out", new BrowserPlatformOptions
+        await AppBuilder.Configure<App>().UseReactiveUI(static _ => { }).WithInterFont().StartBrowserAppAsync("out", new BrowserPlatformOptions
         { RenderingMode = new[] { BrowserRenderingMode.WebGL2, BrowserRenderingMode.Software2D } });
         App app = (App)Application.Current!;
         app.ExportService = new BrowserExportService();

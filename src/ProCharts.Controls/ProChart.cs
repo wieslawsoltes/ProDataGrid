@@ -176,6 +176,7 @@ public partial class ProChart : TemplatedControl
         PseudoClasses.Set(":empty", IsEmpty);
         PseudoClasses.Set(":loading", IsLoading);
         PseudoClasses.Set(":error", HasError);
+        UpdatePresentation(rebuildLegend);
         UpdateLegend(rebuildLegend);
         foreach (ChartCommand command in _commands) command.Refresh();
     }
@@ -188,7 +189,9 @@ public partial class ProChart : TemplatedControl
         {
             bool same = true;
             for (int i = 0; i < _legend.Count; i++)
-                if (_legend[i].Name != (snapshot.Series[i].Name ?? $"Series {i + 1}")) { same = false; break; }
+                if (_legend[i].Name != (snapshot.Series[i].Name ?? $"Series {i + 1}") ||
+                    _legend[i].Swatch is not ISolidColorBrush brush ||
+                    brush.Color.ToUInt32() != (uint)GetLegendColor(i, snapshot.Series[i])) { same = false; break; }
             if (same)
             {
                 for (int i = 0; i < _legend.Count; i++) _legend[i].UpdateVisibility(filter?.IsSeriesVisible(i) ?? true);
@@ -199,10 +202,7 @@ public partial class ProChart : TemplatedControl
         for (int i = 0; i < snapshot.Series.Count; i++)
         {
             ChartSeriesSnapshot series = snapshot.Series[i];
-            IReadOnlyList<SKColor> palette = ChartStyle?.SeriesColors ?? SkiaChartStyle.DefaultSeriesColors;
-            SKColor color = palette.Count > 0 ? palette[i % palette.Count] : SKColors.DodgerBlue;
-            ChartColor? pinned = series.Style?.StrokeColor ?? series.Style?.FillColor;
-            if (pinned is ChartColor core) color = new SKColor(core.Red, core.Green, core.Blue, core.Alpha);
+            SKColor color = GetLegendColor(i, series);
             int index = i;
             _legend.Add(new ChartLegendItem(index, series.Name ?? $"Series {i + 1}",
                 new SolidColorBrush(Color.FromArgb(color.Alpha, color.Red, color.Green, color.Blue)),
