@@ -40,6 +40,136 @@ namespace Avalonia.Controls.DataGridTests.Hierarchical;
 
 public class HierarchicalHeadlessTests
 {
+    /// <summary>
+    /// Verifies that moving a selected hierarchical item while scrolling keeps row indices and visuals aligned.
+    /// </summary>
+    [AvaloniaFact]
+    public void MovingSelectedHierarchicalRowWhileScrollingKeepsRowsAligned()
+    {
+        // Arrange
+        using IDisposable themeScope = UseApplicationTheme(DataGridTheme.SimpleV2);
+        var root = new Item("Root");
+        for (int index = 0; index < 30; index++)
+        {
+            root.Children.Add(new Item($"Item {index}"));
+        }
+
+        var model = new HierarchicalModel(new HierarchicalOptions
+        {
+            ChildrenSelector = item => ((Item)item).Children,
+            IsLeafSelector = item => ((Item)item).Children.Count == 0,
+            VirtualizeChildren = true
+        });
+        model.SetRoot(root);
+        model.Expand(model.Root!);
+
+        var grid = new DataGrid
+        {
+            AutoGenerateColumns = false,
+            HierarchicalRowsEnabled = true,
+            HierarchicalModel = model,
+            ItemsSource = model.Flattened,
+            UseLogicalScrollable = true,
+            RowHeight = 24
+        };
+        grid.ColumnsInternal.Add(new DataGridHierarchicalColumn
+        {
+            Header = "Name",
+            Binding = new Binding("Item.Name")
+        });
+
+        var window = new Window { Width = 420, Height = 250, Content = grid };
+        window.SetThemeStyles(DataGridTheme.SimpleV2);
+        window.Show();
+        PumpLayout(grid);
+
+        try
+        {
+            var selectedNode = model.FindNode(root.Children[10])!;
+            grid.ScrollIntoView(selectedNode, grid.ColumnsInternal[0]);
+            PumpLayout(grid);
+            grid.SelectedItem = selectedNode;
+            var selectedRow = Assert.IsType<DataGridRow>(FindVisibleRow(grid, selectedNode));
+            selectedRow.Focusable = true;
+            Assert.True(selectedRow.Focus());
+
+            // Act
+            for (int index = 0; index < 12; index++)
+            {
+                root.Children.Move(index % 2 == 0 ? 10 : 9, index % 2 == 0 ? 9 : 10);
+                grid.ScrollViewer!.Offset = new Vector(0, index % 3 == 0 ? 90 : 210);
+                PumpLayout(grid);
+
+                // Assert
+                ValidateDisplayedRows(grid, model);
+                foreach (DataGridRow row in grid.DisplayData.GetScrollingRows())
+                {
+                    Assert.Equal(grid.RowIndexFromSlot(row.Slot), row.Index);
+                }
+                AssertVisibleRowsAreContiguous(grid);
+                AssertNoVisibleRowsOutsideDisplayData(grid);
+            }
+        }
+        finally
+        {
+            window.Close();
+        }
+    }
+
+    /// <summary>
+    /// Verifies that inserting the same item reference does not place one focused row container in two slots.
+    /// </summary>
+    [AvaloniaFact]
+    public void InsertingDuplicateItemDoesNotReuseDisplayedFocusedRow()
+    {
+        // Arrange
+        using IDisposable themeScope = UseApplicationTheme(DataGridTheme.SimpleV2);
+        var items = new ObservableCollection<Item>();
+        for (int index = 0; index < 12; index++)
+        {
+            items.Add(new Item($"Item {index}"));
+        }
+
+        var grid = new DataGrid
+        {
+            AutoGenerateColumns = false,
+            ItemsSource = items,
+            UseLogicalScrollable = true,
+            RowHeight = 24
+        };
+        grid.ColumnsInternal.Add(new DataGridTextColumn
+        {
+            Header = "Name",
+            Binding = new Binding("Name")
+        });
+
+        var window = new Window { Width = 420, Height = 420, Content = grid };
+        window.SetThemeStyles(DataGridTheme.SimpleV2);
+        window.Show();
+        PumpLayout(grid);
+
+        try
+        {
+            Item duplicatedItem = items[5];
+            var focusedRow = Assert.IsType<DataGridRow>(FindVisibleRow(grid, duplicatedItem));
+            focusedRow.Focusable = true;
+            Assert.True(focusedRow.Focus());
+
+            // Act
+            items.Insert(3, duplicatedItem);
+            PumpLayout(grid);
+
+            // Assert
+            var displayedRows = grid.DisplayData.GetScrollingRows().Cast<DataGridRow>().ToList();
+            Assert.Equal(displayedRows.Count, displayedRows.Distinct().Count());
+            AssertVisibleRowsAreContiguous(grid);
+        }
+        finally
+        {
+            window.Close();
+        }
+    }
+
     private class Item
     {
         public Item(string name)
