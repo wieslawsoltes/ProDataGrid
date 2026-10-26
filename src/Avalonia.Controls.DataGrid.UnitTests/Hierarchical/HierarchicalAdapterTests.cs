@@ -134,4 +134,65 @@ public class HierarchicalAdapterTests
 
         Assert.Equal(1, calls);
     }
+
+    [Fact]
+    public void DataGrid_Uses_Typed_Adapter_Factory_For_Typed_Model()
+    {
+        var model = new HierarchicalModel<Item>(new HierarchicalOptions<Item>
+        {
+            ChildrenSelector = item => item.Children
+        });
+        var factory = new TypedAdapterFactory();
+        var grid = new AdapterTestGrid { HierarchicalAdapterFactory = factory };
+
+        var adapter = grid.CreateAdapter(model);
+
+        Assert.Same(model, factory.TypedModel);
+        Assert.Same(factory.CreatedAdapter!.InnerAdapter, adapter);
+        Assert.Equal(0, factory.UntypedCalls);
+    }
+
+    [Fact]
+    public void DataGrid_Falls_Back_To_Untyped_Factory_When_Item_Type_Differs()
+    {
+        var model = new HierarchicalModel<string>(new HierarchicalOptions<string>
+        {
+            ChildrenSelector = _ => null
+        });
+        var factory = new TypedAdapterFactory();
+        var grid = new AdapterTestGrid { HierarchicalAdapterFactory = factory };
+
+        var adapter = grid.CreateAdapter(model);
+
+        Assert.Null(factory.TypedModel);
+        Assert.Equal(1, factory.UntypedCalls);
+        Assert.NotNull(adapter);
+    }
+
+    private sealed class AdapterTestGrid : DataGrid
+    {
+        public DataGridHierarchicalAdapter CreateAdapter(IHierarchicalModel model) => CreateHierarchicalAdapter(model);
+    }
+
+    private sealed class TypedAdapterFactory : IDataGridHierarchicalAdapterFactory<Item>
+    {
+        public IHierarchicalModel<Item>? TypedModel { get; private set; }
+
+        public DataGridHierarchicalAdapter<Item>? CreatedAdapter { get; private set; }
+
+        public int UntypedCalls { get; private set; }
+
+        public DataGridHierarchicalAdapter<Item> Create(DataGrid grid, IHierarchicalModel<Item> model)
+        {
+            TypedModel = model;
+            CreatedAdapter = new DataGridHierarchicalAdapter<Item>(model);
+            return CreatedAdapter;
+        }
+
+        public DataGridHierarchicalAdapter Create(DataGrid grid, IHierarchicalModel model)
+        {
+            UntypedCalls++;
+            return new DataGridHierarchicalAdapter(model);
+        }
+    }
 }

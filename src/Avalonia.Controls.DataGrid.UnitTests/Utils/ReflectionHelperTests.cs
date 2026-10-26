@@ -579,5 +579,33 @@ namespace Avalonia.Controls.DataGridTests.Utils
             [Display(Name = "LongName", ShortName = "ShortLabel")]
             public string? Label { get; set; }
         }
+
+        [Fact]
+        public void GetNestedPropertyValue_Resolves_Explicit_Generic_ReadOnlyList_Indexer()
+        {
+            var list = new ExplicitReadOnlyList<string>(new[] { "a", "b" });
+
+            var value = TypeHelper.GetNestedPropertyValue(list, "[1]");
+
+            Assert.Equal("b", value);
+        }
+
+        private sealed class ExplicitReadOnlyList<T> : IReadOnlyList<T>
+        {
+            private readonly T[] _items;
+
+            public ExplicitReadOnlyList(T[] items)
+            {
+                _items = items;
+            }
+
+            T IReadOnlyList<T>.this[int index] => _items[index];
+
+            int IReadOnlyCollection<T>.Count => _items.Length;
+
+            IEnumerator<T> IEnumerable<T>.GetEnumerator() => ((IEnumerable<T>)_items).GetEnumerator();
+
+            IEnumerator IEnumerable.GetEnumerator() => _items.GetEnumerator();
+        }
     }
 }
