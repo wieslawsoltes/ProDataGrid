@@ -1334,6 +1334,14 @@ namespace Avalonia.Controls
                         }
                     }
 
+                    if (!DataGridReflectionFeature.IsEnabled)
+                    {
+                        context.Unsupported(
+                            $"Grouping.GroupDescriptions[{i}].PropertyPath",
+                            $"Path group descriptions cannot be restored. {DataGridReflectionFeature.DisabledMessage}");
+                        continue;
+                    }
+
                     var runtimeDescription = new DataGridPathGroupDescription(description.PropertyPath);
                     if (!context.TryResolveGroupingValueConverter(
                             description.ValueConverterToken,

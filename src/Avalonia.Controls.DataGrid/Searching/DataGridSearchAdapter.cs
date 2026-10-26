@@ -26,7 +26,6 @@ namespace Avalonia.Controls.DataGridSearching
     /// <summary>
     /// Computes search results from descriptors against the view.
     /// </summary>
-    [RequiresUnreferencedCode("DataGridSearchAdapter uses reflection to access item properties and is not compatible with trimming.")]
 #if !DATAGRID_INTERNAL
     public
 #else
@@ -523,7 +522,7 @@ namespace Avalonia.Controls.DataGridSearching
                     return cached(item);
                 }
 
-                var compiled = new Func<object, object>(o => TypeHelper.GetNestedPropertyValue(o, propertyPath));
+                var compiled = new Func<object, object>(o => ReflectionPropertyPath.GetValue(o, propertyPath));
                 _getterCache[(type, propertyPath)] = compiled;
                 return compiled(item);
             };

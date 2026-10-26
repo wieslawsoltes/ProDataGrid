@@ -504,7 +504,6 @@ namespace Avalonia.Controls.DataGridHierarchical
     /// <summary>
     /// Default hierarchical model implementation (initial scaffolding).
     /// </summary>
-    [RequiresUnreferencedCode("HierarchicalModel uses reflection to access property paths and is not compatible with trimming.")]
     #if !DATAGRID_INTERNAL
     public
     #else
@@ -4210,6 +4209,11 @@ namespace Avalonia.Controls.DataGridHierarchical
 
             if (!_propertyPathCache.TryGetValue(key, out var accessor))
             {
+                if (!DataGridReflectionFeature.IsEnabled)
+                {
+                    throw CreateReflectionDisabledException(propertyPath);
+                }
+
                 accessor = CreatePropertyPathAccessor(target.GetType(), propertyPath);
                 _propertyPathCache[key] = accessor;
             }
@@ -4223,6 +4227,11 @@ namespace Avalonia.Controls.DataGridHierarchical
 
             if (!_propertyPathSetterCache.TryGetValue(key, out var setter))
             {
+                if (!DataGridReflectionFeature.IsEnabled)
+                {
+                    throw CreateReflectionDisabledException(propertyPath);
+                }
+
                 setter = CreatePropertyPathSetter(target.GetType(), propertyPath);
                 _propertyPathSetterCache[key] = setter;
             }
@@ -4230,6 +4239,10 @@ namespace Avalonia.Controls.DataGridHierarchical
             setter(target, value);
         }
 
+        private static InvalidOperationException CreateReflectionDisabledException(string propertyPath)
+            => new($"Property path '{propertyPath}' cannot be resolved. {DataGridReflectionFeature.DisabledMessage}");
+
+        [RequiresUnreferencedCode("Resolving a hierarchical property path uses reflection on the item type.")]
         private static Func<object, object?> CreatePropertyPathAccessor(Type targetType, string propertyPath)
         {
             if (string.IsNullOrWhiteSpace(propertyPath))
@@ -4275,6 +4288,7 @@ namespace Avalonia.Controls.DataGridHierarchical
             };
         }
 
+        [RequiresUnreferencedCode("Resolving a hierarchical property path uses reflection on the item type.")]
         private static Action<object, object?> CreatePropertyPathSetter(Type targetType, string propertyPath)
         {
             if (string.IsNullOrWhiteSpace(propertyPath))

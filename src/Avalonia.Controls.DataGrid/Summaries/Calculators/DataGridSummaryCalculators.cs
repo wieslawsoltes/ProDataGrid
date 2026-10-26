@@ -53,7 +53,7 @@ namespace Avalonia.Controls
 
         private static object? GetPropertyValue(object? item, string? propertyName)
         {
-            return TypeHelper.GetNestedPropertyValue(item, propertyName);
+            return ReflectionPropertyPath.GetValue(item, propertyName);
         }
 
         private class SumState : IDataGridSummaryState
@@ -149,7 +149,7 @@ namespace Avalonia.Controls
 
         private static object? GetPropertyValue(object? item, string? propertyName)
         {
-            return TypeHelper.GetNestedPropertyValue(item, propertyName);
+            return ReflectionPropertyPath.GetValue(item, propertyName);
         }
 
         private class AverageState : IDataGridSummaryState
@@ -271,7 +271,7 @@ namespace Avalonia.Controls
 
         private static object? GetPropertyValue(object? item, string? propertyName)
         {
-            return TypeHelper.GetNestedPropertyValue(item, propertyName);
+            return ReflectionPropertyPath.GetValue(item, propertyName);
         }
     }
 
@@ -317,7 +317,7 @@ namespace Avalonia.Controls
 
         private static object? GetPropertyValue(object? item, string? propertyName)
         {
-            return TypeHelper.GetNestedPropertyValue(item, propertyName);
+            return ReflectionPropertyPath.GetValue(item, propertyName);
         }
     }
 
@@ -363,7 +363,7 @@ namespace Avalonia.Controls
 
         private static object? GetPropertyValue(object? item, string? propertyName)
         {
-            return TypeHelper.GetNestedPropertyValue(item, propertyName);
+            return ReflectionPropertyPath.GetValue(item, propertyName);
         }
     }
 
@@ -398,7 +398,7 @@ namespace Avalonia.Controls
 
         private static object? GetPropertyValue(object? item, string? propertyName)
         {
-            return TypeHelper.GetNestedPropertyValue(item, propertyName);
+            return ReflectionPropertyPath.GetValue(item, propertyName);
         }
     }
 
@@ -434,7 +434,7 @@ namespace Avalonia.Controls
 
         private static object? GetPropertyValue(object? item, string? propertyName)
         {
-            return TypeHelper.GetNestedPropertyValue(item, propertyName);
+            return ReflectionPropertyPath.GetValue(item, propertyName);
         }
     }
 }

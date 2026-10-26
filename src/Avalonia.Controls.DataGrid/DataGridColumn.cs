@@ -463,7 +463,7 @@ internal
                 }
 
                 string propertyPath = GetSortPropertyName();
-                Type propertyType = OwningGrid.DataConnection.DataType.GetNestedPropertyType(propertyPath);
+                Type propertyType = ReflectionPropertyPath.GetPropertyType(OwningGrid.DataConnection.DataType, propertyPath);
 
                 // If we can't resolve the property type (e.g. nested paths on object-typed nodes),
                 // fall back to the grid default instead of disabling sorting entirely.

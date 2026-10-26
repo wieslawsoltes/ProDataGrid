@@ -399,7 +399,10 @@ namespace Avalonia.Controls
                             return DataGridSortDescription.FromComparer(comparer, descriptor.Direction, descriptor.PropertyPath);
                         }
 
-                        return DataGridSortDescription.FromPath(descriptor.PropertyPath, descriptor.Direction, descriptor.Culture);
+                        if (DataGridReflectionFeature.IsEnabled)
+                        {
+                            return DataGridSortDescription.FromPath(descriptor.PropertyPath, descriptor.Direction, descriptor.Culture);
+                        }
                     }
                 }
 

@@ -596,7 +596,7 @@ internal
         {
             return binding switch
             {
-                Binding avaloniaBinding => new Binding
+                Binding avaloniaBinding when DataGridReflectionFeature.IsEnabled => new Binding
                 {
                     Path = avaloniaBinding.Path,
                     ElementName = avaloniaBinding.ElementName,

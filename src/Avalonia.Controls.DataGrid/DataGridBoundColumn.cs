@@ -152,7 +152,7 @@ internal
                 var path = BindingCloneHelper.GetPath(Binding);
                 if (!string.IsNullOrWhiteSpace(path))
                 {
-                    var header = OwningGrid.DataConnection.DataType.GetDisplayName(path);
+                    var header = ReflectionPropertyPath.GetDisplayName(OwningGrid.DataConnection.DataType, path);
                     if (header != null)
                     {
                         Header = header;

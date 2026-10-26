@@ -4,6 +4,7 @@
 // All other rights reserved.
 
 using Avalonia.Controls.Utils;
+using Avalonia.Data;
 using Avalonia.Data.Converters;
 using Avalonia.Utilities;
 using System;
@@ -19,7 +20,12 @@ namespace Avalonia.Controls
 
         public object? Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
         {
-            return DefaultValueConverter.Instance.Convert(value, targetType, parameter, culture);
+            if (DataGridReflectionFeature.IsEnabled)
+            {
+                return DefaultValueConverter.Instance.Convert(value, targetType, parameter, culture);
+            }
+
+            return ConvertWithoutReflection(value, targetType, culture);
         }
 
 
@@ -38,7 +44,93 @@ namespace Avalonia.Controls
                     return null;
                 }
             }
-            return DefaultValueConverter.Instance.ConvertBack(value, targetType, parameter, culture);
+            if (DataGridReflectionFeature.IsEnabled)
+            {
+                return DefaultValueConverter.Instance.ConvertBack(value, targetType, parameter, culture);
+            }
+
+            return ConvertWithoutReflection(value, targetType, culture);
+        }
+
+        private static object? ConvertWithoutReflection(object? value, Type targetType, CultureInfo culture)
+        {
+            if (value == null)
+            {
+                return targetType.IsValueType ? AvaloniaProperty.UnsetValue : null;
+            }
+
+            if (TryConvertWithoutReflection(targetType, value, culture, out var result))
+            {
+                return result;
+            }
+
+            var message = TypeUtilities.IsNumeric(targetType)
+                ? $"'{value}' is not a valid number."
+                : $"Could not convert '{value}' to '{targetType.Name}'.";
+            return new BindingNotification(new InvalidCastException(message), BindingErrorType.Error);
+        }
+
+        /// <summary>
+        /// Converts between primitives, enums and strings without TypeConverter lookups, for use when
+        /// reflection is disabled. Types that need a TypeConverter must use a compiled binding converter.
+        /// </summary>
+        internal static bool TryConvertWithoutReflection(Type targetType, object value, CultureInfo culture, out object? result)
+        {
+            if (targetType.IsInstanceOfType(value))
+            {
+                result = value;
+                return true;
+            }
+
+            var underlyingType = Nullable.GetUnderlyingType(targetType) ?? targetType;
+            if (underlyingType.IsInstanceOfType(value))
+            {
+                result = value;
+                return true;
+            }
+
+            try
+            {
+                if (underlyingType == typeof(string))
+                {
+                    result = value is IFormattable formattable
+                        ? formattable.ToString(null, culture)
+                        : value.ToString();
+                    return true;
+                }
+
+                if (underlyingType.IsEnum)
+                {
+                    if (value is string text)
+                    {
+                        result = Enum.Parse(underlyingType, text, ignoreCase: true);
+                        return true;
+                    }
+
+                    if (value is IConvertible)
+                    {
+                        result = Enum.ToObject(underlyingType, value);
+                        return true;
+                    }
+                }
+                else if (value is IConvertible && typeof(IConvertible).IsAssignableFrom(underlyingType))
+                {
+                    if (value is string text && string.IsNullOrWhiteSpace(text) && underlyingType != targetType)
+                    {
+                        result = null;
+                        return true;
+                    }
+
+                    result = System.Convert.ChangeType(value, underlyingType, culture);
+                    return true;
+                }
+            }
+            catch (Exception ex) when (ex is FormatException or InvalidCastException or OverflowException or ArgumentException)
+            {
+            }
+
+            result = null;
+            return false;
         }
     }
 }

@@ -322,7 +322,7 @@ internal
                 return false;
             }
 
-            var propertyType = item.GetType().GetNestedPropertyType(bindingPath);
+            var propertyType = ReflectionPropertyPath.GetPropertyType(item.GetType(), bindingPath);
             if (propertyType == null)
             {
                 return false;
@@ -339,7 +339,7 @@ internal
                 return false;
             }
 
-            return TypeHelper.TrySetNestedPropertyValue(item, bindingPath, converted, out _);
+            return ReflectionPropertyPath.TrySetValue(item, bindingPath, converted);
         }
 
         private bool TryConvertClipboardText(BindingBase binding, string text, Type propertyType, out object converted)

@@ -13,6 +13,7 @@ using System.Collections.Specialized;
 using System.Collections;
 using System.ComponentModel;
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Linq;
 using System.Reflection;
@@ -135,11 +136,17 @@ namespace Avalonia.Collections
                 Type itemType = ItemType;
                 if (itemType != null)
                 {
-                    _itemConstructor = itemType.GetConstructor(Type.EmptyTypes);
+                    _itemConstructor = _newItemFactory == null && DataGridReflectionFeature.IsEnabled
+                        ? GetItemConstructor(itemType)
+                        : null;
                     _itemConstructorIsValid = true;
                 }
             }
         }
+
+        [RequiresUnreferencedCode("Locating the item constructor uses reflection on the item type.")]
+        private static ConstructorInfo GetItemConstructor(Type itemType)
+            => itemType.GetConstructor(Type.EmptyTypes);
 
         /// <summary>
         ///  If the IEnumerable has changed, bring the collection up to date.
@@ -274,6 +281,8 @@ namespace Avalonia.Collections
         /// </summary>
         /// <param name="useRepresentativeItem">Whether we should use a representative item</param>
         /// <returns>The type of the items in the collection</returns>
+        [UnconditionalSuppressMessage("Trimming", "IL2075",
+            Justification = "Only IEnumerable<T> is inspected. If the trimmer removed it from the interface list, the item type falls back to a representative item.")]
         private Type GetItemType(bool useRepresentativeItem)
         {
             Type collectionType = SourceCollection.GetType();
@@ -591,13 +600,9 @@ namespace Avalonia.Collections
             {
                 properties = typedList.GetItemProperties(null);
             }
-            else if (ItemType != null)
+            else if (DataGridReflectionFeature.IsEnabled)
             {
-                properties = TypeDescriptor.GetProperties(ItemType);
-            }
-            else if (_bindingList.Count > 0)
-            {
-                properties = TypeDescriptor.GetProperties(_bindingList[0]!);
+                properties = GetBindingListItemProperties();
             }
 
             var descriptor = properties?.Find(NormalizeBindingListPropertyName(sort.PropertyPath), true);
@@ -608,6 +613,17 @@ namespace Avalonia.Collections
 
             _bindingList.ApplySort(descriptor, sort.Direction);
             return true;
+        }
+
+        [RequiresUnreferencedCode("TypeDescriptor inspects the item type of the binding list.")]
+        private PropertyDescriptorCollection GetBindingListItemProperties()
+        {
+            if (ItemType != null)
+            {
+                return TypeDescriptor.GetProperties(ItemType);
+            }
+
+            return _bindingList.Count > 0 ? TypeDescriptor.GetProperties(_bindingList[0]!) : null;
         }
 
         private static string NormalizeBindingListPropertyName(string propertyPath)
@@ -640,23 +656,6 @@ namespace Avalonia.Collections
             {
                 throw new InvalidOperationException("Cannot change or check the contents or current position of the CollectionView while Refresh is being deferred.");
             }
-        }
-
-        /// <summary>
-        /// Helper for SortList to handle nested properties (e.g. Address.Street)
-        /// </summary>
-        /// <param name="item">parent object</param>
-        /// <param name="propertyPath">property names path</param>
-        /// <param name="propertyType">property type that we want to check for</param>
-        /// <returns>child object</returns>
-        private static object InvokePath(object item, string propertyPath, Type propertyType)
-        {
-            object propertyValue = TypeHelper.GetNestedPropertyValue(item, propertyPath, propertyType, out Exception exception);
-            if (exception != null)
-            {
-                throw exception;
-            }
-            return propertyValue;
         }
 
     }
