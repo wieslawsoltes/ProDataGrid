@@ -327,6 +327,11 @@ internal
                 // Create a binding with format string
                 if (Binding is Binding binding)
                 {
+                    if (!DataGridReflectionOptions.IsEnabled)
+                    {
+                        throw DataGridReflectionOptions.CreateException("Reflection display bindings");
+                    }
+
                     var displayBinding = new Binding
                     {
                         Path = binding.Path,
@@ -484,6 +489,11 @@ internal
             if (binding is not Binding avaloniaBinding)
             {
                 return binding;
+            }
+
+            if (!DataGridReflectionOptions.IsEnabled)
+            {
+                throw DataGridReflectionOptions.CreateException("Reflection display bindings");
             }
 
             return new Binding

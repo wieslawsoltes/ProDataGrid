@@ -21,7 +21,6 @@ using Avalonia.Controls.Utils;
 
 namespace Avalonia.Controls
 {
-    [RequiresUnreferencedCode("DataGridDataConnection uses reflection to inspect item properties and is not compatible with trimming.")]
     internal class DataGridDataConnection
     {
 
@@ -1525,6 +1524,19 @@ namespace Avalonia.Controls
         }
 
         private void UpdateDataProperties()
+        {
+            if (!DataGridReflectionOptions.IsEnabled)
+            {
+                _dataDescriptors = null;
+                _dataProperties = null;
+                return;
+            }
+
+            UpdateDataPropertiesWithReflection();
+        }
+
+        [RequiresUnreferencedCode("Item metadata discovery requires public item properties and TypeDescriptor metadata.")]
+        private void UpdateDataPropertiesWithReflection()
         {
             Type dataType = DataType;
 

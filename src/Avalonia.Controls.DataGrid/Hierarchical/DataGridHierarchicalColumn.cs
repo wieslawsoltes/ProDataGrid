@@ -2,6 +2,9 @@
 // Licensed under the MIT license. See LICENSE file in the project root for details.
 
 using System;
+using Avalonia.Data.Core;
+using Avalonia.Markup.Xaml.MarkupExtensions;
+using Avalonia.Markup.Xaml.MarkupExtensions.CompiledBindings;
 using System.Globalization;
 using Avalonia.Collections;
 using Avalonia.Controls.DataGridHierarchical;
@@ -27,7 +30,7 @@ internal
     {
         private static readonly IValueConverter _isExpandableConverter =
             new FuncValueConverter<bool, bool>(value => !value);
-        private static readonly Binding _dataContextBinding = new Binding { Mode = BindingMode.OneWay };
+        private static readonly CompiledBindingExtension _dataContextBinding = new() { Path = new CompiledBindingPathBuilder().Build(), Mode = BindingMode.OneWay };
 
         private readonly Lazy<IDataTemplate?> _cellTemplate;
         private readonly Lazy<ControlTheme?> _directCellTheme;
@@ -302,20 +305,25 @@ internal
 
             presenter.Bind(
                 DataGridHierarchicalPresenter.LevelProperty,
-                new Binding(nameof(HierarchicalNode.Level)) { Mode = BindingMode.OneWay });
+                CreateNodeBinding(new ClrPropertyInfo(nameof(HierarchicalNode.Level), node => ((HierarchicalNode)node).Level, null, typeof(int))));
             presenter.Bind(
                 DataGridHierarchicalPresenter.IsExpandedProperty,
-                new Binding(nameof(HierarchicalNode.IsExpanded)) { Mode = BindingMode.OneWay });
+                CreateNodeBinding(new ClrPropertyInfo(nameof(HierarchicalNode.IsExpanded), node => ((HierarchicalNode)node).IsExpanded, null, typeof(bool))));
             presenter.Bind(
                 DataGridHierarchicalPresenter.IsExpandableProperty,
-                new Binding(nameof(HierarchicalNode.IsLeaf))
-                {
-                    Mode = BindingMode.OneWay,
-                    Converter = _isExpandableConverter
-                });
+                CreateNodeBinding(new ClrPropertyInfo(nameof(HierarchicalNode.IsLeaf), node => ((HierarchicalNode)node).IsLeaf, null, typeof(bool)), _isExpandableConverter));
 
             return presenter;
         }
+
+        private static CompiledBindingExtension CreateNodeBinding(IPropertyInfo property, IValueConverter? converter = null) => new()
+        {
+            Path = new CompiledBindingPathBuilder()
+                .Property(property, PropertyInfoAccessorFactory.CreateInpcPropertyAccessor)
+                .Build(),
+            Mode = BindingMode.OneWay,
+            Converter = converter
+        };
 
         internal override DataGridCell CreateCell()
         {

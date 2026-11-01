@@ -15,7 +15,6 @@ namespace Avalonia.Controls.DataGridHierarchical
     /// <summary>
     /// Sorting adapter that routes sorting descriptors into hierarchical sibling ordering.
     /// </summary>
-    [RequiresUnreferencedCode("HierarchicalSortingAdapter uses reflection to walk property paths and is not compatible with trimming.")]
 #if !DATAGRID_INTERNAL
     public
 #else
@@ -73,7 +72,6 @@ namespace Avalonia.Controls.DataGridHierarchical
         }
     }
 
-    [RequiresUnreferencedCode("Hierarchical sibling comparison uses reflection to walk property paths and is not compatible with trimming.")]
     internal static class HierarchicalSiblingComparerBuilder
     {
         public static IComparer<object>? Build(IReadOnlyList<SortingDescriptor> descriptors, IComparer<object>? defaultComparer)
@@ -255,6 +253,11 @@ namespace Avalonia.Controls.DataGridHierarchical
 
             private static PropertyInfo? GetProperty(Type targetType, string name)
             {
+                if (!DataGridReflectionOptions.IsEnabled)
+                {
+                    throw DataGridReflectionOptions.CreateException("Property-path hierarchy sorting");
+                }
+
                 return targetType.GetProperty(
                     name,
                     BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic,

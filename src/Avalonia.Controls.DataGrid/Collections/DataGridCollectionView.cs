@@ -86,7 +86,6 @@ internal
     /// <summary>
     /// DataGrid-readable view over an IEnumerable.
     /// </summary>
-    [RequiresUnreferencedCode("DataGridCollectionView uses reflection and TypeDescriptor to inspect data items and is not compatible with trimming.")]
 #if !DATAGRID_INTERNAL
 public
 #else

@@ -70,7 +70,6 @@ namespace Avalonia.Controls
     [TemplatePart(DATAGRID_elementTopRightCornerHeaderName,        typeof(ContentControl))]
     [TemplatePart(DATAGRID_elementVerticalScrollbarName,           typeof(ScrollBar))]
     [PseudoClasses(":invalid", ":empty-rows", ":empty-columns")]
-    [RequiresUnreferencedCode("DataGrid inspects data items via reflection and is not compatible with trimming.")]
 #if !DATAGRID_INTERNAL
 public
 #else
@@ -645,7 +644,10 @@ internal
 
             FocusableProperty.OverrideDefaultValue<DataGrid>(true);
 
-            DataGridTypeDescriptorPlugin.EnsureRegistered();
+            if (DataGridReflectionOptions.IsEnabled)
+            {
+                DataGridTypeDescriptorPlugin.EnsureRegistered();
+            }
         }
 
         /// <summary>
@@ -2812,7 +2814,7 @@ internal
 
         private Avalonia.Controls.DataGridHierarchical.DataGridHierarchicalAdapter? TryCreateTypedHierarchicalAdapter(Avalonia.Controls.DataGridHierarchical.IHierarchicalModel model)
         {
-            if (_hierarchicalAdapterFactory == null)
+            if (_hierarchicalAdapterFactory == null || !DataGridReflectionOptions.IsEnabled)
             {
                 return null;
             }

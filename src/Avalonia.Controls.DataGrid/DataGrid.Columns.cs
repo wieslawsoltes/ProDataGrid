@@ -225,6 +225,16 @@ internal
             if (dataGridColumn is DataGridBoundColumn dataGridBoundColumn &&
                 dataGridBoundColumn.Binding is BindingBase binding)
             {
+                if (!DataGridReflectionOptions.IsEnabled)
+                {
+                    var accessor = DataGridColumnMetadata.GetValueAccessor(dataGridColumn);
+                    if (accessor != null)
+                    {
+                        return isReadOnly || IsReadOnly || !DataConnection.AllowEdit ||
+                               !accessor.CanWrite || !DataGridDataConnection.CanEdit(accessor.ValueType);
+                    }
+                }
+
                 var path = BindingCloneHelper.GetPath(binding);
 
                 if (string.IsNullOrWhiteSpace(path))
