@@ -3273,7 +3273,9 @@ internal
                 return false;
             }
 
-            if (DataConnection?.CollectionView is IDataGridCollectionView view && view.IsGrouping)
+            // The change indexes refer to the unfiltered flattened list, so they only match the
+            // grid's slots when the view shows every flattened node.
+            if (DataConnection?.CollectionView is IDataGridCollectionView view && (view.IsGrouping || view.Filter != null))
             {
                 return false;
             }
