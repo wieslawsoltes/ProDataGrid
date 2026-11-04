@@ -13,26 +13,41 @@ internal
 #endif
     readonly struct DataGridCellInfo : IEquatable<DataGridCellInfo>
     {
+        private readonly int _rowIndex;
+        private readonly bool _tracksItem;
+
         public DataGridCellInfo(object? item, DataGridColumn column, int rowIndex, int columnIndex, bool isValid = true)
+            : this(item, column, rowIndex, columnIndex, isValid, tracksItem: false)
+        {
+        }
+
+        public DataGridCellInfo(object? item, DataGridColumn column, int rowIndex, int columnIndex, bool isValid, bool tracksItem)
         {
             Item = item;
             Column = column;
-            RowIndex = rowIndex;
+            _rowIndex = rowIndex;
             ColumnIndex = columnIndex;
             IsValid = isValid && column != null && rowIndex >= 0 && columnIndex >= 0;
+            _tracksItem = tracksItem && IsValid;
         }
 
         public object? Item { get; }
 
         public DataGridColumn Column { get; }
 
-        public int RowIndex { get; }
+        public int RowIndex => _tracksItem && Column.OwningGrid is { } grid ? grid.GetTrackedRowIndex(Item, _rowIndex) : _rowIndex;
 
         public int ColumnIndex { get; }
 
         public bool IsValid { get; }
 
         public static DataGridCellInfo Unset { get; } = default;
+
+        internal DataGridCellInfo TrackingItem() =>
+            _tracksItem || !IsValid ? this : new DataGridCellInfo(Item, Column, _rowIndex, ColumnIndex, true, true);
+
+        internal DataGridCellInfo AtCurrentRow() =>
+            _tracksItem ? new DataGridCellInfo(Item, Column, RowIndex, ColumnIndex, true) : this;
 
         public bool Equals(DataGridCellInfo other)
         {

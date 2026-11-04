@@ -135,6 +135,7 @@ namespace Avalonia.Controls
             {
                 _dataSource = value;
                 InvalidateReferenceIndexLookup();
+                _owner?.OnRowsChangedForSelectionOverlay(NotifyCollectionChangedAction.Reset);
                 // Because the DataSource is changing, we need to reset our cached values for DataType and DataProperties,
                 // which are dependent on the current DataSource
                 _dataType = null;
@@ -1029,7 +1030,13 @@ namespace Avalonia.Controls
 
             _owner.PrepareBuiltInCollectionViewMutationPreflight(
                 _owner.CaptureSelectionSnapshot(),
-                e.ProspectiveSource);
+                e.ProspectiveSource,
+                e.CollectionChange.Action switch
+                {
+                    NotifyCollectionChangedAction.Add => Array.Empty<object>(),
+                    NotifyCollectionChangedAction.Remove or NotifyCollectionChangedAction.Replace => e.CollectionChange.OldItems,
+                    _ => null
+                });
         }
 
         private void CollectionView_SourceMutationCompleted(
@@ -1226,6 +1233,7 @@ namespace Avalonia.Controls
         private void NotifyingDataSource_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
         {
             InvalidateReferenceIndexLookup();
+            _owner.OnRowsChangedForSelectionOverlay(e.Action);
             if (IsHierarchicalItemsSource())
             {
                 return;
@@ -1455,7 +1463,7 @@ namespace Avalonia.Controls
                         _owner.ApplyVisibleSelectionFromSelectionModel();
                         _owner.RestoreSelectionModelIndexes(pageSelectionIndexes);
                     }
-                    else
+                    else if (!_owner.SourceMutationKeepsRows)
                     {
                         _owner.RefreshSelectionFromModel();
                     }
@@ -1469,6 +1477,7 @@ namespace Avalonia.Controls
                 _owner.RequestSelectionOverlayRefresh();
 
                 _owner.CompleteItemsSourceSelectionTransaction(selectionTransaction);
+                _owner.RetargetSelectedCellColumns();
 
                 if (restoreSyncingSelectionModel)
                 {

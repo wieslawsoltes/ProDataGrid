@@ -262,6 +262,35 @@ public class DataGridSelectionPropertyTests
     }
 
     [AvaloniaFact]
+    public void SelectionModel_Attached_To_A_Shown_Grid_Keeps_Selected_Items_Through_Inserts_And_Removes()
+    {
+        var items = new ObservableCollection<string> { "A", "B", "C", "D" };
+        var grid = CreateGrid(items);
+        grid.UpdateLayout();
+        var selectionModel = new SelectionModel<string> { SingleSelect = false };
+        grid.Selection = selectionModel;
+        selectionModel.Select(1);
+        selectionModel.Select(3);
+        grid.UpdateLayout();
+
+        items.Insert(0, "Z");
+        grid.UpdateLayout();
+        Assert.Equal(new object[] { "B", "D" }, grid.SelectedItems.Cast<object>());
+        Assert.Equal(new[] { 2, 4 }, selectionModel.SelectedIndexes);
+
+        items.RemoveAt(1);
+        grid.UpdateLayout();
+        Assert.Equal(new object[] { "B", "D" }, grid.SelectedItems.Cast<object>());
+        Assert.Equal(new[] { 1, 3 }, selectionModel.SelectedIndexes);
+
+        items.Remove("B");
+        grid.UpdateLayout();
+        Assert.Equal(new object[] { "D" }, grid.SelectedItems.Cast<object>());
+        Assert.Equal(new[] { 2 }, selectionModel.SelectedIndexes);
+        Assert.Equal(new[] { "D" }, GetRows(grid).Where(row => row.IsSelected).Select(row => (string)row.DataContext));
+    }
+
+    [AvaloniaFact]
     public void SelectionModel_Reflects_Grid_Selection_Changes()
     {
         var items = new ObservableCollection<string> { "A", "B", "C" };

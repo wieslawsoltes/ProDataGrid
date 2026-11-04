@@ -28,6 +28,7 @@ namespace Avalonia.Controls
         private DataGridCellInfo _itemsSourceMutationOldCurrentCell;
         private bool _selectionModelSourceResetPreflightPending;
         private bool _builtInSourceMutationPreflightActive;
+        private bool _sourceMutationKeepsRows;
         private bool _builtInSourceMutationScopesActive;
         private SelectionCommitScope _builtInSourceSelectionCommitScope;
         private ItemsSourceMutationDeferralScope _builtInSourceMutationDeferralScope;
@@ -301,6 +302,14 @@ namespace Avalonia.Controls
 
             ThrowIfSelectionChangingReentrant();
 
+            if (!setAnchorSlot &&
+                (!isSelected || SelectionMode != DataGridSelectionMode.Single) &&
+                slot >= 0 && slot < SlotCount && !IsGroupSlot(slot) &&
+                _selectedItems.ContainsSlot(slot) == isSelected)
+            {
+                return true;
+            }
+
             var currentRows = CaptureSelectedRowIndexes();
             var proposedRows = new HashSet<int>(currentRows);
             int rowIndex = slot >= 0 && slot < SlotCount && !IsGroupSlot(slot)
@@ -375,7 +384,8 @@ namespace Avalonia.Controls
             IReadOnlyList<object> selectionSnapshot,
             IEnumerable prospectiveSource,
             bool preserveSelection,
-            bool requireSelectionChangingHandler = true)
+            bool requireSelectionChangingHandler = true,
+            IList leavingItems = null)
         {
             if ((requireSelectionChangingHandler && !HasSelectionChangingHandlers) ||
                 _selectionCommitDepth > 0)
@@ -394,14 +404,26 @@ namespace Avalonia.Controls
                 oldAnchorColumnIndex < ColumnsItemsInternal.Count
                     ? ColumnsItemsInternal[oldAnchorColumnIndex]
                     : CurrentCell.Column;
-            List<ItemsSourceSelectionCell> selectedCells = CaptureItemsSourceSelectionCells();
+            var selectedCellRows = new List<object>(_selectedCells.Keys);
             object oldCurrentItem = ProjectSelectionItem(CurrentCell.Item);
             object oldCurrencyItem = ProjectSelectionItem(DataConnection?.CollectionView?.CurrentItem);
+            bool keepsRows = preserveSelection &&
+                KeepsRowsThrough(leavingItems, selectionSnapshot, oldCurrentItem, oldAnchorItem, oldCurrencyItem);
+            if (leavingItems != null)
+            {
+                _sourceMutationKeepsRows = keepsRows;
+            }
+
+            if (keepsRows)
+            {
+                selectionSnapshot = null;
+                selectedCellRows.Clear();
+            }
 
             var selectedItems = selectionSnapshot ?? Array.Empty<object>();
             var projectedSelectedItems = new List<object>(selectedItems.Count);
             var requestedIdentities = new IdentityList(
-                selectedItems.Count + selectedCells.Count + 3);
+                selectedItems.Count + selectedCellRows.Count + 3);
             for (int i = 0; i < selectedItems.Count; i++)
             {
                 object selectedItem = ProjectSelectionItem(selectedItems[i]);
@@ -411,9 +433,9 @@ namespace Avalonia.Controls
             AddReferenceIdentity(requestedIdentities, oldCurrentItem);
             AddReferenceIdentity(requestedIdentities, oldAnchorItem);
             AddReferenceIdentity(requestedIdentities, oldCurrencyItem);
-            for (int i = 0; i < selectedCells.Count; i++)
+            for (int i = 0; i < selectedCellRows.Count; i++)
             {
-                AddReferenceIdentity(requestedIdentities, selectedCells[i].Item);
+                AddReferenceIdentity(requestedIdentities, ProjectSelectionItem(selectedCellRows[i]));
             }
 
             var prospectiveRows = new ProspectiveRows(prospectiveSource, requestedIdentities.Count);
@@ -438,7 +460,7 @@ namespace Avalonia.Controls
 
             var identityMap = new ProspectiveIdentityMap(prospectiveRows, requestedIdentities);
             var oldSelectedRowIndexes = new List<int>();
-            foreach (int selectedSlot in _selectedItems.GetIndexes())
+            foreach (int selectedSlot in keepsRows ? Array.Empty<int>() : _selectedItems.GetIndexes())
             {
                 if (selectedSlot >= 0 && selectedSlot < SlotCount && !IsGroupSlot(selectedSlot))
                 {
@@ -468,48 +490,49 @@ namespace Avalonia.Controls
                 }
             }
 
-            var removedCells = new List<DataGridCellInfo>();
-            var survivingSelectedCells = new List<ItemsSourceSelectionCell>(selectedCells.Count);
-            bool selectedCellsChanged = false;
-            object lastCellItem = null;
-            int lastCellIndex = -1;
-            for (int i = 0; i < selectedCells.Count; i++)
+            var lostCellRows = new HashSet<object>(SelectedRowComparer.Instance);
+            for (int i = 0; i < selectedCellRows.Count; i++)
             {
-                ItemsSourceSelectionCell selectedCell = selectedCells[i];
-                if (i == 0 || !ReferenceEquals(selectedCell.Item, lastCellItem))
+                if (identityMap.GetIndex(ProjectSelectionItem(selectedCellRows[i])) < 0)
                 {
-                    lastCellItem = selectedCell.Item;
-                    lastCellIndex = identityMap.GetIndex(lastCellItem);
-                }
-
-                int prospectiveIndex = lastCellIndex;
-                if (prospectiveIndex >= 0)
-                {
-                    selectedCellsChanged |= prospectiveIndex != selectedCell.RowIndex;
-                    survivingSelectedCells.Add(new ItemsSourceSelectionCell(
-                        selectedCell.Item,
-                        selectedCell.Column,
-                        selectedCell.ColumnIndex,
-                        prospectiveIndex));
+                    lostCellRows.Add(selectedCellRows[i]);
                 }
             }
-            if (SelectedCells != null)
-            {
-                object lastItem = null;
-                bool lastRemoved = false;
-                bool first = true;
-                foreach (DataGridCellInfo selectedCell in SelectedCells)
-                {
-                    if (first || !ReferenceEquals(selectedCell.Item, lastItem))
-                    {
-                        first = false;
-                        lastItem = selectedCell.Item;
-                        lastRemoved = !preserveSelection || identityMap.GetIndex(ProjectSelectionItem(lastItem)) < 0;
-                    }
 
-                    if (lastRemoved)
+            Dictionary<object, int> cellRowIndexes = null;
+            bool selectedCellsMoved = false;
+            if (!_trackSelectedCellsByItem)
+            {
+                cellRowIndexes = new Dictionary<object, int>(SelectedRowComparer.Instance);
+                for (int i = 0; i < selectedCellRows.Count; i++)
+                {
+                    int prospectiveIndex = identityMap.GetIndex(ProjectSelectionItem(selectedCellRows[i]));
+                    if (prospectiveIndex >= 0)
                     {
-                        removedCells.Add(selectedCell);
+                        cellRowIndexes[selectedCellRows[i]] = prospectiveIndex;
+                    }
+                }
+
+                foreach (DataGridCellInfo selectedCell in _selectedCellsView)
+                {
+                    if (preserveSelection &&
+                        cellRowIndexes.TryGetValue(SelectedRowKey(selectedCell.Item), out int prospectiveIndex) &&
+                        prospectiveIndex != selectedCell.RowIndex)
+                    {
+                        selectedCellsMoved = true;
+                        break;
+                    }
+                }
+            }
+
+            var removedCells = new List<DataGridCellInfo>();
+            if (!preserveSelection || lostCellRows.Count > 0)
+            {
+                foreach (DataGridCellInfo selectedCell in _selectedCellsView)
+                {
+                    if (!preserveSelection || lostCellRows.Contains(SelectedRowKey(selectedCell.Item)))
+                    {
+                        removedCells.Add(selectedCell.AtCurrentRow());
                     }
                 }
             }
@@ -565,7 +588,7 @@ namespace Avalonia.Controls
                 oldAnchor.ColumnIndex != proposedAnchor.ColumnIndex ||
                 !ReferenceEquals(oldAnchorItem, proposedAnchor.Item);
             if (removedItems.Count == 0 && removedCells.Count == 0 &&
-                !selectedCellsChanged &&
+                !selectedCellsMoved &&
                 !currentChanged && !anchorChanged)
             {
                 return null;
@@ -609,7 +632,7 @@ namespace Avalonia.Controls
 
             return new ItemsSourceSelectionTransaction(
                 accepted: !args.Cancel,
-                survivors,
+                keepsRows ? null : survivors,
                 identityMap.GetIndex(oldCurrentItem),
                 identityMap.GetIndex(oldAnchorItem),
                 oldAnchorColumnIndex,
@@ -621,9 +644,52 @@ namespace Avalonia.Controls
                 GetVerticalOffset(),
                 HorizontalOffset,
                 identityMap.GetIndex(oldCurrencyItem),
-                survivingSelectedCells,
+                lostCellRows,
+                removedCells,
+                cellRowIndexes,
                 preserveSelection);
         }
+
+        private bool KeepsRowsThrough(
+            IList leavingItems,
+            IReadOnlyList<object> selectionSnapshot,
+            object currentItem,
+            object anchorItem,
+            object currencyItem)
+        {
+            if (leavingItems == null ||
+                currentItem == null ||
+                (!_trackSelectedCellsByItem && _selectedCells.Count > 0) ||
+                DataConnection?.CollectionView is not { IsGrouping: false } view ||
+                view is Avalonia.Collections.DataGridCollectionView { PageSize: > 0 })
+            {
+                return false;
+            }
+
+            var rows = SelectedRowComparer.Instance;
+            foreach (object leaving in leavingItems)
+            {
+                if (rows.Equals(leaving, currentItem) ||
+                    rows.Equals(leaving, anchorItem) ||
+                    rows.Equals(leaving, currencyItem) ||
+                    _selectedCells.ContainsKey(SelectedRowKey(leaving)))
+                {
+                    return false;
+                }
+
+                for (int i = 0; selectionSnapshot != null && i < selectionSnapshot.Count; i++)
+                {
+                    if (rows.Equals(selectionSnapshot[i], leaving))
+                    {
+                        return false;
+                    }
+                }
+            }
+
+            return true;
+        }
+
+        internal bool SourceMutationKeepsRows => _sourceMutationKeepsRows;
 
         internal void PrepareSelectionModelSourceResetPreflight(
             IReadOnlyList<object> selectionSnapshot)
@@ -643,7 +709,8 @@ namespace Avalonia.Controls
 
         internal void PrepareBuiltInCollectionViewMutationPreflight(
             IReadOnlyList<object> selectionSnapshot,
-            IEnumerable prospectiveSource)
+            IEnumerable prospectiveSource,
+            IList leavingItems)
         {
             if (_builtInSourceMutationPreflightActive ||
                 _selectionCommitDepth > 0 ||
@@ -657,7 +724,8 @@ namespace Avalonia.Controls
             {
                 PrepareItemsSourceMutationPreflight(
                     selectionSnapshot,
-                    prospectiveSource);
+                    prospectiveSource,
+                    leavingItems);
                 if (_pendingItemsSourceSelectionTransaction != null)
                 {
                     // Keep grid-owned selection/current state silent until the built-in view has
@@ -674,6 +742,7 @@ namespace Avalonia.Controls
                 _pendingItemsSourceSelectionTransaction = null;
                 _selectionModelSourceResetPreflightPending = false;
                 _builtInSourceMutationPreflightActive = false;
+                _sourceMutationKeepsRows = false;
                 DisposeBuiltInSourceMutationScopes();
                 throw;
             }
@@ -681,7 +750,8 @@ namespace Avalonia.Controls
 
         private void PrepareItemsSourceMutationPreflight(
             IReadOnlyList<object> selectionSnapshot,
-            IEnumerable prospectiveSource)
+            IEnumerable prospectiveSource,
+            IList leavingItems = null)
         {
             using var origin = BeginSelectionChangeScope(
                 DataGridSelectionChangeSource.ItemsSourceChange,
@@ -690,7 +760,8 @@ namespace Avalonia.Controls
                 selectionSnapshot,
                 prospectiveSource,
                 preserveSelection: true,
-                requireSelectionChangingHandler: false);
+                requireSelectionChangingHandler: false,
+                leavingItems);
             if (transaction != null)
             {
                 _pendingItemsSourceSelectionTransaction = transaction;
@@ -718,6 +789,7 @@ namespace Avalonia.Controls
             finally
             {
                 _builtInSourceMutationPreflightActive = false;
+                _sourceMutationKeepsRows = false;
                 DisposeBuiltInSourceMutationScopes();
             }
         }
@@ -851,12 +923,74 @@ namespace Avalonia.Controls
             // Notify cell/column observers last. They can synchronously query row selection,
             // current cell, anchor, currency, and both observable selection views and see only
             // the reconciled transaction state.
-            IReadOnlyList<ItemsSourceSelectionCell> selectedCells =
-                transaction.PreserveSelection || !transaction.Accepted
-                ? transaction.SelectedCells
-                : Array.Empty<ItemsSourceSelectionCell>();
-            RestoreItemsSourceSelectionCells(selectedCells);
+            bool keepCells = transaction.PreserveSelection || !transaction.Accepted;
+            if (transaction.CellRowIndexes != null)
+            {
+                ReplaceSelectedCellsAfterItemsSourceMutation(
+                    keepCells
+                        ? SelectedCellsAtRows(transaction.CellRowIndexes)
+                        : Array.Empty<DataGridCellInfo>());
+            }
+            else
+            {
+                RemoveSelectedCellsAfterItemsSourceMutation(
+                    keepCells
+                        ? transaction.LostCellRows
+                        : new HashSet<object>(_selectedCells.Keys, SelectedRowComparer.Instance),
+                    transaction.RemovedCells);
+            }
 
+        }
+
+        private List<DataGridCellInfo> SelectedCellsAtRows(IReadOnlyDictionary<object, int> rowIndexes)
+        {
+            var remapped = new List<DataGridCellInfo>(_selectedCellsView.Count);
+            var seen = new HashSet<long>();
+            int rowCount = DataConnection?.Count ?? 0;
+            for (int i = 0; i < _selectedCellsView.Count; i++)
+            {
+                DataGridCellInfo selectedCell = _selectedCellsView[i];
+                if (!selectedCell.IsValid || selectedCell.Item == null || selectedCell.Column == null ||
+                    !rowIndexes.TryGetValue(SelectedRowKey(selectedCell.Item), out int rowIndex) ||
+                    rowIndex < 0 || rowIndex >= rowCount)
+                {
+                    continue;
+                }
+
+                int columnIndex = selectedCell.ColumnIndex;
+                int liveColumnIndex = selectedCell.Column.Index;
+                if (liveColumnIndex >= 0 &&
+                    liveColumnIndex < ColumnsItemsInternal.Count &&
+                    ReferenceEquals(ColumnsItemsInternal[liveColumnIndex], selectedCell.Column))
+                {
+                    columnIndex = liveColumnIndex;
+                }
+                else if (columnIndex < 0)
+                {
+                    columnIndex = liveColumnIndex;
+                }
+
+                if (columnIndex < 0 || columnIndex >= ColumnsItemsInternal.Count)
+                {
+                    continue;
+                }
+
+                DataGridColumn column = ColumnsItemsInternal[columnIndex];
+                if (column == null || !column.IsVisible || column is DataGridFillerColumn ||
+                    !seen.Add(GetCellCoordinateKey(rowIndex, columnIndex)))
+                {
+                    continue;
+                }
+
+                remapped.Add(new DataGridCellInfo(
+                    DataConnection.GetDataItem(rowIndex),
+                    column,
+                    rowIndex,
+                    columnIndex,
+                    isValid: true));
+            }
+
+            return remapped;
         }
 
         private void RestoreItemsSourceSelectionRows(
@@ -980,27 +1114,6 @@ namespace Avalonia.Controls
             }
         }
 
-        private List<ItemsSourceSelectionCell> CaptureItemsSourceSelectionCells()
-        {
-            var result = new List<ItemsSourceSelectionCell>(_selectedCellsView.Count);
-            for (int i = 0; i < _selectedCellsView.Count; i++)
-            {
-                DataGridCellInfo cell = _selectedCellsView[i];
-                if (!cell.IsValid || cell.Item == null || cell.Column == null)
-                {
-                    continue;
-                }
-
-                result.Add(new ItemsSourceSelectionCell(
-                    ProjectSelectionItem(cell.Item),
-                    cell.Column,
-                    cell.ColumnIndex,
-                    cell.RowIndex));
-            }
-
-            return result;
-        }
-
         private object CaptureSourceMutationAnchorItem(
             IReadOnlyList<object> selectionSnapshot,
             DataGridSelectionAnchorInfo fallback)
@@ -1022,14 +1135,10 @@ namespace Avalonia.Controls
                     return ProjectSelectionItem(_currentCell.Item);
                 }
 
-                for (int i = 0; i < _selectedCellsView.Count; i++)
+                if (_selectedCells.TryGetValue(SelectedRowKeyAt(anchorRowIndex), out HashSet<int> anchorColumns) &&
+                    (anchorColumnIndex < 0 || anchorColumns.Contains(anchorColumnIndex)))
                 {
-                    DataGridCellInfo cell = _selectedCellsView[i];
-                    if (cell.RowIndex == anchorRowIndex &&
-                        (anchorColumnIndex < 0 || cell.ColumnIndex == anchorColumnIndex))
-                    {
-                        return ProjectSelectionItem(cell.Item);
-                    }
+                    return ProjectSelectionItem(DataConnection.GetDataItem(anchorRowIndex));
                 }
 
                 if (selectionSnapshot != null)
@@ -1055,58 +1164,6 @@ namespace Avalonia.Controls
             }
 
             return ProjectSelectionItem(fallback.Item);
-        }
-
-        private void RestoreItemsSourceSelectionCells(
-            IReadOnlyList<ItemsSourceSelectionCell> selectedCells)
-        {
-            var remapped = new List<DataGridCellInfo>(selectedCells.Count);
-            var seen = new HashSet<long>();
-            for (int i = 0; i < selectedCells.Count; i++)
-            {
-                ItemsSourceSelectionCell selectedCell = selectedCells[i];
-                int rowIndex = selectedCell.RowIndex;
-                int columnIndex = selectedCell.ColumnIndex;
-                int liveColumnIndex = selectedCell.Column?.Index ?? -1;
-                if (liveColumnIndex >= 0 &&
-                    liveColumnIndex < ColumnsItemsInternal.Count &&
-                    ReferenceEquals(ColumnsItemsInternal[liveColumnIndex], selectedCell.Column))
-                {
-                    columnIndex = liveColumnIndex;
-                }
-                else if (columnIndex < 0)
-                {
-                    columnIndex = liveColumnIndex;
-                }
-                if (rowIndex < 0 ||
-                    columnIndex < 0 ||
-                    columnIndex >= ColumnsItemsInternal.Count)
-                {
-                    continue;
-                }
-
-                DataGridColumn column = ColumnsItemsInternal[columnIndex];
-                if (column == null || !column.IsVisible || column is DataGridFillerColumn)
-                {
-                    continue;
-                }
-
-                long key = GetCellCoordinateKey(rowIndex, columnIndex);
-                if (!seen.Add(key))
-                {
-                    continue;
-                }
-
-                object rowDataContext = DataConnection.GetDataItem(rowIndex);
-                remapped.Add(new DataGridCellInfo(
-                    rowDataContext,
-                    column,
-                    rowIndex,
-                    columnIndex,
-                    isValid: true));
-            }
-
-            ReplaceSelectedCellsAfterItemsSourceMutation(remapped);
         }
 
         private static void AddReferenceIdentity(List<object> identities, object item)
@@ -2234,7 +2291,9 @@ namespace Avalonia.Controls
                 double verticalOffset,
                 double horizontalOffset,
                 int currencyIndex,
-                IReadOnlyList<ItemsSourceSelectionCell> selectedCells,
+                HashSet<object> lostCellRows,
+                IReadOnlyList<DataGridCellInfo> removedCells,
+                IReadOnlyDictionary<object, int> cellRowIndexes,
                 bool preserveSelection)
             {
                 Accepted = accepted;
@@ -2250,7 +2309,9 @@ namespace Avalonia.Controls
                 VerticalOffset = verticalOffset;
                 HorizontalOffset = horizontalOffset;
                 CurrencyIndex = currencyIndex;
-                SelectedCells = selectedCells;
+                LostCellRows = lostCellRows;
+                RemovedCells = removedCells;
+                CellRowIndexes = cellRowIndexes;
                 PreserveSelection = preserveSelection;
             }
 
@@ -2280,7 +2341,11 @@ namespace Avalonia.Controls
 
             public int CurrencyIndex { get; }
 
-            public IReadOnlyList<ItemsSourceSelectionCell> SelectedCells { get; }
+            public HashSet<object> LostCellRows { get; }
+
+            public IReadOnlyList<DataGridCellInfo> RemovedCells { get; }
+
+            public IReadOnlyDictionary<object, int> CellRowIndexes { get; }
 
             public bool PreserveSelection { get; }
         }
@@ -2294,29 +2359,6 @@ namespace Avalonia.Controls
             }
 
             public object Item { get; }
-
-            public int RowIndex { get; }
-        }
-
-        internal sealed class ItemsSourceSelectionCell
-        {
-            public ItemsSourceSelectionCell(
-                object item,
-                DataGridColumn column,
-                int columnIndex,
-                int rowIndex)
-            {
-                Item = item;
-                Column = column;
-                ColumnIndex = columnIndex;
-                RowIndex = rowIndex;
-            }
-
-            public object Item { get; }
-
-            public DataGridColumn Column { get; }
-
-            public int ColumnIndex { get; }
 
             public int RowIndex { get; }
         }

@@ -28,6 +28,28 @@ internal
         private DataGridCellRange _displayRange;
         private List<int> _displayRangeIndexes;
         private bool _displayRangeLogical;
+        private int _displayRangeRowsVersion;
+        private int _displayRangeRowsOrderVersion;
+        private int _displayRangeRowsRemovedVersion;
+        private int _displayRangeRowCount;
+        private object _displayRangeFirstRow;
+        private object _displayRangeLastRow;
+        private int _rowsVersion;
+        private int _rowsOrderVersion;
+        private int _rowsRemovedVersion;
+
+        internal void OnRowsChangedForSelectionOverlay(System.Collections.Specialized.NotifyCollectionChangedAction action)
+        {
+            _rowsVersion++;
+            if (action != System.Collections.Specialized.NotifyCollectionChangedAction.Add)
+            {
+                _rowsRemovedVersion++;
+                if (action != System.Collections.Specialized.NotifyCollectionChangedAction.Remove)
+                {
+                    _rowsOrderVersion++;
+                }
+            }
+        }
 
         internal void RequestSelectionOverlayRefresh()
         {
@@ -214,17 +236,37 @@ internal
 
             if (_displayRangeVersion != _selectedCellsView.Version ||
                 _displayRangeColumns == null ||
-                !_displayRangeColumns.AsSpan().SequenceEqual(columns))
+                !_displayRangeColumns.AsSpan().SequenceEqual(columns) ||
+                _displayRangeRowsOrderVersion != _rowsOrderVersion ||
+                (_displayRangeRowsVersion != _rowsVersion &&
+                 (_displayRangeFound ? !TryMoveSelectedCellDisplayRange() : _displayRangeRowsRemovedVersion != _rowsRemovedVersion)))
             {
                 _displayRangeFound = ComputeSelectedCellDisplayRange(out _displayRange, out _displayRangeIndexes, out _displayRangeLogical);
                 _displayRangeVersion = _selectedCellsView.Version;
                 _displayRangeColumns = columns;
+                _displayRangeRowsOrderVersion = _rowsOrderVersion;
+                _displayRangeRowsRemovedVersion = _rowsRemovedVersion;
             }
+
+            _displayRangeRowsVersion = _rowsVersion;
 
             range = _displayRange;
             selectedDisplayIndexes = _displayRangeIndexes;
             isLogicalContiguousRange = _displayRangeLogical;
             return _displayRangeFound;
+        }
+
+        private bool TryMoveSelectedCellDisplayRange()
+        {
+            if (!TryGetRowIndexFromItem(_displayRangeFirstRow, out int first) ||
+                !TryGetRowIndexFromItem(_displayRangeLastRow, out int last) ||
+                last - first + 1 != _displayRangeRowCount)
+            {
+                return false;
+            }
+
+            _displayRange = new DataGridCellRange(first, last, _displayRange.StartColumn, _displayRange.EndColumn);
+            return true;
         }
 
         private bool ComputeSelectedCellDisplayRange(out DataGridCellRange range, out List<int> selectedDisplayIndexes, out bool isLogicalContiguousRange)
@@ -233,52 +275,45 @@ internal
             selectedDisplayIndexes = new List<int>();
             isLogicalContiguousRange = false;
 
-            if (_selectedCellsView.Count == 0 || ColumnsInternal == null || ColumnsItemsInternal == null)
+            if (_selectedCells.Count == 0 || ColumnsInternal == null || ColumnsItemsInternal == null)
             {
                 return false;
             }
 
-            var positions = new HashSet<(int RowIndex, int DisplayIndex)>();
-            var minRow = int.MaxValue;
-            var maxRow = int.MinValue;
             var minDisplay = int.MaxValue;
             var maxDisplay = int.MinValue;
             var minLogical = int.MaxValue;
             var maxLogical = int.MinValue;
+            long cellCount = 0;
 
-            foreach (var cell in _selectedCellsView)
+            foreach (var selectedColumn in _selectedColumnCounts)
             {
-                if (!cell.IsValid || cell.RowIndex < 0 || cell.ColumnIndex < 0 || cell.ColumnIndex >= ColumnsItemsInternal.Count)
+                var columnIndex = selectedColumn.Key;
+                if (columnIndex < 0 || columnIndex >= ColumnsItemsInternal.Count)
                 {
                     continue;
                 }
 
-                var column = ColumnsItemsInternal[cell.ColumnIndex];
+                var column = ColumnsItemsInternal[columnIndex];
                 if (column == null || !column.IsVisible)
                 {
                     return false;
                 }
 
-                var displayIndex = GetColumnDisplayIndex(cell.ColumnIndex);
+                var displayIndex = GetColumnDisplayIndex(columnIndex);
                 if (displayIndex < 0)
                 {
                     return false;
                 }
 
-                if (!positions.Add((cell.RowIndex, displayIndex)))
-                {
-                    return false;
-                }
-
-                minRow = Math.Min(minRow, cell.RowIndex);
-                maxRow = Math.Max(maxRow, cell.RowIndex);
                 minDisplay = Math.Min(minDisplay, displayIndex);
                 maxDisplay = Math.Max(maxDisplay, displayIndex);
-                minLogical = Math.Min(minLogical, cell.ColumnIndex);
-                maxLogical = Math.Max(maxLogical, cell.ColumnIndex);
+                minLogical = Math.Min(minLogical, columnIndex);
+                maxLogical = Math.Max(maxLogical, columnIndex);
+                cellCount += selectedColumn.Value;
             }
 
-            if (positions.Count == 0)
+            if (cellCount == 0)
             {
                 return false;
             }
@@ -297,23 +332,49 @@ internal
                 }
             }
 
-            if (selectedDisplayIndexes.Count == 0)
+            if (selectedDisplayIndexes.Count == 0 ||
+                cellCount != (long)_selectedCells.Count * selectedDisplayIndexes.Count)
             {
                 return false;
             }
 
-            var expectedCount = (long)(maxRow - minRow + 1) * selectedDisplayIndexes.Count;
-            if (expectedCount != positions.Count)
+            var minRow = int.MaxValue;
+            var maxRow = int.MinValue;
+            object firstRow = null;
+            object lastRow = null;
+            foreach (var row in _selectedCells.Keys)
+            {
+                if (!TryGetRowIndexFromItem(row, out int rowIndex))
+                {
+                    return false;
+                }
+
+                if (rowIndex < minRow)
+                {
+                    minRow = rowIndex;
+                    firstRow = row;
+                }
+
+                if (rowIndex > maxRow)
+                {
+                    maxRow = rowIndex;
+                    lastRow = row;
+                }
+            }
+
+            if (maxRow - minRow + 1 != _selectedCells.Count)
             {
                 return false;
             }
 
-            var logicalExpectedCount = (long)(maxRow - minRow + 1) * (maxLogical - minLogical + 1);
-            if (logicalExpectedCount == positions.Count)
+            if ((long)(maxRow - minRow + 1) * (maxLogical - minLogical + 1) == cellCount)
             {
                 isLogicalContiguousRange = true;
             }
 
+            _displayRangeFirstRow = firstRow;
+            _displayRangeLastRow = lastRow;
+            _displayRangeRowCount = _selectedCells.Count;
             range = new DataGridCellRange(minRow, maxRow, minDisplay, maxDisplay);
             return true;
         }

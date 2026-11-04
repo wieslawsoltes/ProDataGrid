@@ -286,7 +286,17 @@ internal
                         _pagedSelectionSourceView = null;
                     }
 
+                    bool sourceChanged = !ReferenceEquals(_selectionModelAdapter.Model.Source, source);
                     _selectionModelAdapter.Model.Source = source;
+
+                    // SelectionModel must observe source mutations before DataConnection (see
+                    // OnItemsSourcePropertyChanged). A model attached while DataConnection is
+                    // already wired subscribes after it, so re-wire DataConnection behind it.
+                    if (sourceChanged && source != null && DataConnection.EventsWired)
+                    {
+                        DataConnection.UnWireEvents(DataConnection.DataSource);
+                        DataConnection.WireEvents(DataConnection.DataSource);
+                    }
                 }
                 finally
                 {

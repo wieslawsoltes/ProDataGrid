@@ -480,14 +480,16 @@ internal
         internal bool IsSelectionUpdateFromRowSuppressed => _suppressSelectionUpdatesFromRows;
         private bool _syncingSelectedItems;
         private bool _syncingSelectedCells;
-        private readonly Dictionary<int, HashSet<int>> _selectedCells = new();
+        private readonly Dictionary<object, HashSet<int>> _selectedCells = new(SelectedRowComparer.Instance);
+        private bool _trackSelectedCellsByItem;
+        private bool _selectedCellColumnsStale;
         private readonly DataGridSelectedCellsCollection _selectedCellsView = new();
         private IList<DataGridColumn> _selectedColumnsBinding;
         private INotifyCollectionChanged _selectedColumnsBindingNotifications;
         private bool _syncingSelectedColumns;
         private readonly Dictionary<int, int> _selectedColumnCounts = new();
         private readonly HashSet<int> _selectedColumnIndices = new();
-        private readonly HashSet<int> _selectedRowHeaderIndices = new();
+        private readonly HashSet<object> _selectedRowHeaderIndices = new(SelectedRowComparer.Instance);
         private readonly HashSet<int> _selectedColumnHeaderIndices = new();
         private readonly DataGridSelectedColumnsCollection _selectedColumnsView = new();
         private DataGridCellCoordinates _cellAnchor = new DataGridCellCoordinates(-1, -1);
@@ -613,6 +615,7 @@ internal
             ShowRowNumbersProperty.Changed.AddClassHandler<DataGrid>((x, e) => x.OnShowRowNumbersChanged(e));
             SelectionModeProperty.Changed.AddClassHandler<DataGrid>((x, e) => x.OnSelectionModeChanged(e));
             SelectionUnitProperty.Changed.AddClassHandler<DataGrid>((x, e) => x.OnSelectionUnitChanged(e));
+            TrackSelectedCellsByItemProperty.Changed.AddClassHandler<DataGrid>((x, e) => x.OnTrackSelectedCellsByItemChanged(e));
             VerticalGridLinesBrushProperty.Changed.AddClassHandler<DataGrid>((x, e) => x.OnVerticalGridLinesBrushChanged(e));
             SelectedIndexProperty.Changed.AddClassHandler<DataGrid>((x, e) => x.OnSelectedIndexChanged(e));
             SelectedItemProperty.Changed.AddClassHandler<DataGrid>((x, e) => x.OnSelectedItemChanged(e));

@@ -175,6 +175,39 @@ namespace Avalonia.Controls
             return true;
         }
 
+        internal void ConvertAllSilently(Func<DataGridCellInfo, DataGridCellInfo> convert)
+        {
+            for (int i = 0; i < _items.Count; i++)
+            {
+                _items[i] = convert(_items[i]);
+            }
+
+            Version++;
+        }
+
+        internal void RemoveAllSilently(Predicate<DataGridCellInfo> match, List<DataGridCellInfo> removed)
+        {
+            int kept = 0;
+            for (int i = 0; i < _items.Count; i++)
+            {
+                DataGridCellInfo cell = _items[i];
+                if (match(cell))
+                {
+                    removed.Add(cell);
+                }
+                else
+                {
+                    _items[kept++] = cell;
+                }
+            }
+
+            if (kept < _items.Count)
+            {
+                _items.RemoveRange(kept, _items.Count - kept);
+                Version++;
+            }
+        }
+
         private static bool HaveSameItemIdentity(object first, object second)
         {
             if (ReferenceEquals(first, second))
