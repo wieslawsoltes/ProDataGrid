@@ -59,6 +59,11 @@ internal
         {
         }
 
+        internal void SetRecycledBounds(Rect bounds)
+        {
+            Bounds = bounds;
+        }
+
         /// <summary>
         /// Gets the owning DataGrid.
         /// </summary>

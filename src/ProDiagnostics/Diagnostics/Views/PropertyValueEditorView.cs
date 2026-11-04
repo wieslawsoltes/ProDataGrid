@@ -25,7 +25,15 @@ namespace Avalonia.Diagnostics.Views
                 return;
             }
 
-            Content = _editorService.GetOrCreateEditor(Property, propertyType);
+            var update = _editorService.PrepareEditor(Property, propertyType);
+            var content = update.Content;
+            if (!ReferenceEquals(Content, content))
+            {
+                Content = null;
+            }
+
+            update.Activate();
+            Content = content;
         }
     }
 }

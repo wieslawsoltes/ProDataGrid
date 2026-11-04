@@ -1,0 +1,64 @@
+<!-- Copyright (c) Wiesław Šoltés. All rights reserved. -->
+<!-- Licensed under the MIT license. See LICENSE file in the project root for details. -->
+<Styles xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+  <Styles.Resources>
+    <ResourceDictionary>
+      <!-- A row remains the semantic and automation container, but it no longer owns a
+           DataGridCellsPresenter. The single rows presenter owns every realized cell. -->
+      <ControlTheme x:Key="DataGridFlatRowTheme"
+                    TargetType="DataGridRow"
+                    x:DataType="DataGridRow"
+                    BasedOn="{StaticResource {x:Type DataGridRow}}">
+        <Setter Property="Background" Value="{CompiledBinding $parent[DataGrid].RowBackground}" />
+        <Setter Property="Template">
+          <ControlTemplate>
+            <Grid Name="PART_Root"
+                  Background="{TemplateBinding Background}" />
+          </ControlTemplate>
+        </Setter>
+
+        <Style Selector="^:invalid">
+          <Setter Property="Background" Value="{DynamicResource DataGridRowInvalidBrush}" />
+        </Style>
+        <Style Selector="^:warning">
+          <Setter Property="Background" Value="{DynamicResource DataGridRowWarningBrush}" />
+        </Style>
+        <Style Selector="^:info">
+          <Setter Property="Background" Value="{DynamicResource DataGridRowInfoBrush}" />
+        </Style>
+        <Style Selector="^:pointerover">
+          <Setter Property="Background" Value="{DynamicResource DataGridRowHoveredBackgroundBrush}" />
+        </Style>
+        <Style Selector="^:searchmatch">
+          <Setter Property="Background" Value="{DynamicResource DataGridSearchMatchBrush}" />
+        </Style>
+        <Style Selector="^:searchcurrent">
+          <Setter Property="Background" Value="{DynamicResource DataGridSearchCurrentBrush}" />
+        </Style>
+        <Style Selector="^:selected">
+          <Setter Property="Background" Value="{DynamicResource DataGridRowSelectedUnfocusedBackgroundBrush}" />
+        </Style>
+        <Style Selector="^:selected:pointerover">
+          <Setter Property="Background" Value="{DynamicResource DataGridRowSelectedHoveredUnfocusedBackgroundBrush}" />
+        </Style>
+        <Style Selector="^:selected:focus">
+          <Setter Property="Background" Value="{DynamicResource DataGridRowSelectedBackgroundBrush}" />
+        </Style>
+        <Style Selector="^:selected:pointerover:focus">
+          <Setter Property="Background" Value="{DynamicResource DataGridRowSelectedHoveredBackgroundBrush}" />
+        </Style>
+      </ControlTheme>
+
+      <!-- Keyed on purpose: including Flat.xaml does not change existing grids. -->
+      <ControlTheme x:Key="DataGridFlatTheme"
+                    TargetType="DataGrid"
+                    BasedOn="{StaticResource {x:Type DataGrid}}">
+        <Setter Property="VisualLayoutMode" Value="Flat" />
+        <Setter Property="RowTheme" Value="{StaticResource DataGridFlatRowTheme}" />
+        <Setter Property="RowHeight" Value="32" />
+        <Setter Property="UseLightweightFiller" Value="True" />
+      </ControlTheme>
+    </ResourceDictionary>
+  </Styles.Resources>
+</Styles>

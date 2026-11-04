@@ -424,6 +424,27 @@ internal
             else
                 return result;
         }
+
+        public override IOrderedEnumerable<object> OrderBy(IEnumerable<object> seq)
+        {
+            if (_innerComparer is IDataGridColumnValueAccessorSorter accessorSorter)
+            {
+                return accessorSorter.OrderBy(seq, Direction);
+            }
+
+            return base.OrderBy(seq);
+        }
+
+        public override IOrderedEnumerable<object> ThenBy(IOrderedEnumerable<object> seq)
+        {
+            if (_innerComparer is IDataGridColumnValueAccessorSorter accessorSorter)
+            {
+                return accessorSorter.ThenBy(seq, Direction);
+            }
+
+            return base.ThenBy(seq);
+        }
+
         public override DataGridSortDescription SwitchSortDirection()
         {
             var newDirection = _direction == ListSortDirection.Ascending ? ListSortDirection.Descending : ListSortDirection.Ascending;

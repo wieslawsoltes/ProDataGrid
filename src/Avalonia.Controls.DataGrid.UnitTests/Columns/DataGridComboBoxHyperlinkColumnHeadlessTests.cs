@@ -2,9 +2,11 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Data;
 using Avalonia.Headless.XUnit;
+using Avalonia.Input;
 using Avalonia.Markup.Xaml.Styling;
 using Avalonia.Styling;
 using Avalonia.VisualTree;
@@ -50,7 +52,115 @@ public class DataGridComboBoxHyperlinkColumnHeadlessTests
         Assert.Equal("_blank", hyperlink.Name);
     }
 
-    private static (Window window, DataGrid grid) CreateWindow(SampleViewModel vm)
+    [AvaloniaFact]
+    public void ComboBoxColumn_Editable_TextBinding_Displays_Text()
+    {
+        var vm = new SampleViewModel();
+        var column = new DataGridComboBoxColumn
+        {
+            Header = "Status",
+            IsEditable = true,
+            ItemsSource = vm.Statuses,
+            TextBinding = new Binding(nameof(SampleItem.Status)),
+        };
+        var (window, grid) = CreateWindow(vm, column);
+
+        window.Show();
+        grid.ApplyTemplate();
+        grid.UpdateLayout();
+
+        var comboBox = Assert.IsType<ComboBox>(GetCell(grid, "Status", 0).Content);
+        Assert.True(comboBox.IsEditable);
+        Assert.Equal(vm.Items[0].Status, comboBox.Text);
+    }
+
+    [AvaloniaFact]
+    public void ComboBoxColumn_Virtual_Text_Value_Uses_Typed_Accessor()
+    {
+        var column = new DataGridComboBoxColumn
+        {
+            IsEditable = true,
+            TextBinding = new Binding(nameof(SampleItem.Status))
+            {
+                StringFormat = "Status: {0}",
+            },
+        };
+        DataGridColumnMetadata.SetValueAccessor(
+            column,
+            new DataGridColumnValueAccessor<SampleItem, string>(item => item.Status));
+
+        Assert.True(column.SupportsVirtualCellSurface);
+        Assert.Equal(
+            "Status: Active",
+            ((IDataGridDrawnCellValueProvider)column).GetDrawnCellValue(
+                new SampleItem { Status = "Active" }));
+    }
+
+    [AvaloniaFact]
+    public void ComboBoxColumn_Virtual_Surface_Requires_Direct_TextBinding_Mode()
+    {
+        var column = new DataGridComboBoxColumn
+        {
+            TextBinding = new Binding(nameof(SampleItem.Status)),
+        };
+
+        Assert.False(column.SupportsVirtualCellSurface);
+
+        DataGridColumnMetadata.SetValueAccessor(
+            column,
+            new DataGridColumnValueAccessor<SampleItem, string>(item => item.Status));
+        Assert.False(column.SupportsVirtualCellSurface);
+
+        column.IsEditable = true;
+        Assert.True(column.SupportsVirtualCellSurface);
+
+        column.SelectedItemBinding = new Binding(nameof(SampleItem.Status));
+        Assert.False(column.SupportsVirtualCellSurface);
+
+        column.SelectedItemBinding = null;
+        column.TextBinding = new Binding(nameof(SampleItem.Status))
+        {
+            Source = new SampleItem(),
+        };
+        Assert.False(column.SupportsVirtualCellSurface);
+
+        var derived = new DerivedComboBoxColumn
+        {
+            IsEditable = true,
+            TextBinding = new Binding(nameof(SampleItem.Status)),
+        };
+        DataGridColumnMetadata.SetValueAccessor(
+            derived,
+            new DataGridColumnValueAccessor<SampleItem, string>(item => item.Status));
+        Assert.False(derived.SupportsVirtualCellSurface);
+    }
+
+    [AvaloniaFact]
+    public void ComboBoxColumn_Pointer_Edit_Opens_DropDown()
+    {
+        var column = new TestComboBoxColumn();
+        var comboBox = new ComboBox();
+        var pointer = new Pointer(Pointer.GetNextFreeId(), PointerType.Mouse, isPrimary: true);
+        var properties = new PointerPointProperties(
+            RawInputModifiers.LeftMouseButton,
+            PointerUpdateKind.LeftButtonPressed);
+        var args = new PointerPressedEventArgs(
+            comboBox,
+            pointer,
+            comboBox,
+            new Point(1, 1),
+            0,
+            properties,
+            KeyModifiers.None);
+
+        column.Prepare(comboBox, args);
+
+        Assert.True(comboBox.IsDropDownOpen);
+    }
+
+    private static (Window window, DataGrid grid) CreateWindow(
+        SampleViewModel vm,
+        DataGridComboBoxColumn? comboBoxColumn = null)
     {
         var window = new Window
         {
@@ -87,7 +197,7 @@ public class DataGridComboBoxHyperlinkColumnHeadlessTests
                     Header = "Title",
                     Binding = new Binding("Title")
                 },
-                new DataGridComboBoxColumn
+                comboBoxColumn ?? new DataGridComboBoxColumn
                 {
                     Header = "Status",
                     ItemsSource = vm.Statuses,
@@ -149,5 +259,15 @@ public class DataGridComboBoxHyperlinkColumnHeadlessTests
         public string Status { get; set; } = string.Empty;
 
         public Uri? Link { get; set; }
+    }
+
+    private sealed class DerivedComboBoxColumn : DataGridComboBoxColumn
+    {
+    }
+
+    private sealed class TestComboBoxColumn : DataGridComboBoxColumn
+    {
+        public object Prepare(Control editor, PointerPressedEventArgs args) =>
+            PrepareCellForEdit(editor, args);
     }
 }

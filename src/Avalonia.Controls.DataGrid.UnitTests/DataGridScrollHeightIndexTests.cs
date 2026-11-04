@@ -93,6 +93,10 @@ public class DataGridScrollHeightIndexTests
     public void RebuildReusesBuffersWhenCapacityIsUnchanged()
     {
         const int count = 100_000;
+        // Reallocating the five backing buffers for this count costs several
+        // megabytes. Keep the guard far below that while allowing small,
+        // runtime-specific bookkeeping allocations observed in test hosts.
+        const long maxRuntimeBookkeepingBytes = 16 * 1024;
         var index = new DataGridScrollHeightIndex();
         Func<int, double> getHeight = static slot => 20 + slot % 3;
         Func<int, bool> isVisible = static _ => true;
@@ -104,7 +108,7 @@ public class DataGridScrollHeightIndexTests
         index.Rebuild(count, getHeight, isVisible);
         long allocated = GC.GetAllocatedBytesForCurrentThread() - allocatedBefore;
 
-        Assert.InRange(allocated, 0, 4_096);
+        Assert.InRange(allocated, 0, maxRuntimeBookkeepingBytes);
         Assert.Equal(count, index.Count);
         Assert.True(index.TotalHeight > 0);
     }

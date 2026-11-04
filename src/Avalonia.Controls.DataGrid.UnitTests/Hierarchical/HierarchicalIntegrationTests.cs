@@ -19,6 +19,7 @@ using Avalonia.Controls.DataGridFiltering;
 using Avalonia.Controls.DataGridSelection;
 using Avalonia.Controls.Selection;
 using Avalonia.Threading;
+using Avalonia.Headless.XUnit;
 using Xunit;
 
 namespace Avalonia.Controls.DataGridTests.Hierarchical;
@@ -324,7 +325,7 @@ public class HierarchicalIntegrationTests
         return false;
     }
 
-    [Fact]
+    [AvaloniaFact]
     public void HeaderClick_SortsHierarchyAscending()
     {
         var root = new Item("root");
@@ -356,7 +357,7 @@ public class HierarchicalIntegrationTests
         Assert.Equal("b", ((Item)model.GetItem(2)!).Name);
     }
 
-    [Fact]
+    [AvaloniaFact]
     public void TreatGroupsAsNodes_ProjectsGroups()
     {
         var items = new[]
@@ -400,7 +401,7 @@ public class HierarchicalIntegrationTests
         Assert.Equal(2, model.GetNode(2).Level);
     }
 
-    [Fact]
+    [AvaloniaFact]
     public void TreatGroupsAsNodes_Selection_And_Expansion()
     {
         var items = new[]
@@ -444,7 +445,7 @@ public class HierarchicalIntegrationTests
         Assert.Same(items[1], selection.SelectedItem);
     }
 
-    [Fact]
+    [AvaloniaFact]
     public void TreatGroupsAsNodes_SiblingComparer_SortsGroups()
     {
         var items = new[]
@@ -479,7 +480,7 @@ public class HierarchicalIntegrationTests
         Assert.Equal("a", ((DataGridCollectionViewGroup)groupNodes[1].Item).Key);
     }
 
-    [Fact]
+    [AvaloniaFact]
     public void HeaderClick_TogglesDescendingOnSecondClick()
     {
         var root = new Item("root");
@@ -512,7 +513,7 @@ public class HierarchicalIntegrationTests
         Assert.Equal("a", ((Item)model.GetItem(2)!).Name);
     }
 
-    [Fact]
+    [AvaloniaFact]
     public void HierarchicalSortingAdapter_AppliesDescriptorsToModel()
     {
         var root = new Item("root");
@@ -543,7 +544,7 @@ public class HierarchicalIntegrationTests
         Assert.Equal("b", ((Item)model.GetItem(2)!).Name);
     }
 
-    [Fact]
+    [AvaloniaFact]
     public void HierarchicalSortingAdapter_Uses_Item_Prefixed_SortPath()
     {
         var root = new Item("root");
@@ -574,7 +575,7 @@ public class HierarchicalIntegrationTests
         Assert.Equal("b", ((Item)model.GetItem(2)!).Name);
     }
 
-    [Fact]
+    [AvaloniaFact]
     public void HierarchicalSortingAdapter_Uses_Item_Prefix_When_Item_Property_Exists()
     {
         var root = new WrapperItem("root", "root");
@@ -605,7 +606,7 @@ public class HierarchicalIntegrationTests
         Assert.Equal("b", ((WrapperItem)model.GetItem(2)!).Item.Name);
     }
 
-    [Fact]
+    [AvaloniaFact]
     public void HierarchicalSortingAdapter_Falls_Back_When_Item_Is_Indexer()
     {
         var root = new IndexerItem("root");
@@ -686,7 +687,7 @@ public class HierarchicalIntegrationTests
         Assert.True(comparer.Compare("b", "a") > 0);
     }
 
-    [Fact]
+    [AvaloniaFact]
     public void HierarchicalRowsEnabled_RecreatesSortingAdapter()
     {
         var root = new Item("root");
@@ -717,7 +718,7 @@ public class HierarchicalIntegrationTests
         Assert.IsType<Avalonia.Controls.DataGridHierarchical.HierarchicalSortingAdapter>(after);
     }
 
-    [Fact]
+    [AvaloniaFact]
     public void RecreateSortingAdapter_PreservesDescriptors_WhenViewSortsNotOwned()
     {
         var root = new Item("root");
@@ -757,7 +758,7 @@ public class HierarchicalIntegrationTests
         Assert.Equal("Name", grid.SortingModel.Descriptors[0].PropertyPath);
     }
 
-    [Fact]
+    [AvaloniaFact]
     public void HierarchicalModelChange_PreservesDescriptors_WhenViewSortsNotOwned()
     {
         var root = new Item("root");
@@ -800,7 +801,7 @@ public class HierarchicalIntegrationTests
         Assert.Equal("Name", grid.SortingModel.Descriptors[0].PropertyPath);
     }
 
-    [Fact]
+    [AvaloniaFact]
     public async Task Selection_Remaps_OnMove_List()
     {
         var root = new Item("root");
@@ -861,7 +862,7 @@ public class HierarchicalIntegrationTests
         Assert.Same(childB, grid.Selection.SelectedItem);
     }
 
-    [Fact]
+    [AvaloniaFact]
     public async Task Selection_Remaps_OnMove_DataGridCollectionView()
     {
         var root = new Item("root");
@@ -922,7 +923,7 @@ public class HierarchicalIntegrationTests
         Assert.Same(childB, grid.Selection.SelectedItem);
     }
 
-    [Fact]
+    [AvaloniaFact]
     public async Task Selection_Remaps_OnMove_DataGridCollectionView_Persists_After_Refresh()
     {
         var root = new Item("root");
@@ -973,7 +974,7 @@ public class HierarchicalIntegrationTests
         Assert.Same(childB, grid.Selection.SelectedItem);
     }
 
-    [Fact]
+    [AvaloniaFact]
     public async Task Selection_Remaps_OnReplace_List_IndexShift()
     {
         var root = new Item("root");
@@ -1025,7 +1026,7 @@ public class HierarchicalIntegrationTests
         Assert.Same(children[4], grid.Selection.SelectedItem); // "d" shifts down but stays selected
     }
 
-    [Fact]
+    [AvaloniaFact]
     public async Task Selection_Remaps_OnReplace_DataGridCollectionView()
     {
         var root = new Item("root");
@@ -1079,7 +1080,7 @@ public class HierarchicalIntegrationTests
         Assert.Same(children[4], grid.Selection.SelectedItem);
     }
 
-    [Fact]
+    [AvaloniaFact]
     public async Task Selection_Remaps_OnMove_DataGridCollectionView_Paged()
     {
         var root = new Item("root");
@@ -1135,7 +1136,7 @@ public class HierarchicalIntegrationTests
         Assert.Same(childB, grid.Selection.SelectedItem);
     }
 
-    [Fact]
+    [AvaloniaFact]
     public async Task Selection_Remaps_OnMove_DataGridCollectionView_Grouped()
     {
         var root = new Item("root");
@@ -1188,7 +1189,7 @@ public class HierarchicalIntegrationTests
         Assert.Same(childB, grid.Selection.SelectedItem);
     }
 
-    [Fact]
+    [AvaloniaFact]
     public async Task Selection_Remaps_OnReplace_DataGridCollectionView_Paged()
     {
         var root = new Item("root");
@@ -1253,7 +1254,7 @@ public class HierarchicalIntegrationTests
         Assert.InRange(indexesChangedCount, 0, 2);
     }
 
-    [Fact]
+    [AvaloniaFact]
     public async Task Selection_Remaps_OnReplace_DataGridCollectionView_Grouped()
     {
         var root = new Item("root");
@@ -1314,7 +1315,7 @@ public class HierarchicalIntegrationTests
         Assert.InRange(indexesChangedCount, 0, 2);
     }
 
-    [Fact]
+    [AvaloniaFact]
     public async Task Selection_Persists_OnRefresh_DataGridCollectionView_Paged()
     {
         var root = new Item("root");
@@ -1373,7 +1374,7 @@ public class HierarchicalIntegrationTests
         Assert.InRange(indexesChangedCount, 0, 1);
     }
 
-    [Fact]
+    [AvaloniaFact]
     public void Selection_CanBeRemappedAfterSort()
     {
         var root = new Item("root");
@@ -1414,7 +1415,7 @@ public class HierarchicalIntegrationTests
         Assert.True(selection.IsSelected(newIndex));
     }
 
-    [Fact]
+    [AvaloniaFact]
     public void Selection_Reapplies_AfterSortAndExpansion()
     {
         var root = new Item("root");
@@ -1493,7 +1494,7 @@ public class HierarchicalIntegrationTests
         Assert.Contains(filtered, x => x.Name == "alphabet");
     }
 
-    [Fact]
+    [AvaloniaFact]
     public void FilteringModel_Filters_Hierarchical_View_When_Predicate_Provided()
     {
         var root = new Item("root");
@@ -1554,7 +1555,7 @@ public class HierarchicalIntegrationTests
         Assert.Equal(new[] { "root", "alpha", "alphabet" }, items);
     }
 
-    [Fact]
+    [AvaloniaFact]
     public void SelectedItem_Maps_To_Underlying_Item_In_Hierarchical_Mode()
     {
         var root = new Item("root");
@@ -1592,7 +1593,7 @@ public class HierarchicalIntegrationTests
         Assert.Contains(childB, grid.SelectedItems.Cast<object>());
     }
 
-    [Fact]
+    [AvaloniaFact]
     public void SelectedItem_Expands_Ancestors_When_AutoExpandSelectedItem_Enabled()
     {
         var root = new Item("root");
@@ -1635,7 +1636,7 @@ public class HierarchicalIntegrationTests
         Assert.Equal(model.IndexOf(grand), grid.SelectedIndex);
     }
 
-    [Fact]
+    [AvaloniaFact]
     public void Selection_Persists_On_Rebuild_For_Child_Items()
     {
         var root = new Item("root");

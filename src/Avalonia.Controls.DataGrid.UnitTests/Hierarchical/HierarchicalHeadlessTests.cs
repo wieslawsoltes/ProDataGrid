@@ -7,6 +7,7 @@ using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
 using System.Threading;
@@ -963,7 +964,9 @@ public class HierarchicalHeadlessTests
         Assert.False(leafRelease.Handled);
         Assert.Equal(2, model.Count);
         Assert.Equal(-1, grid.SelectedIndex);
-        Assert.Null(new DataGridRowAutomationPeer(leafRow).GetProvider<IExpandCollapseProvider>());
+        IExpandCollapseProvider leafProvider = Assert.IsAssignableFrom<IExpandCollapseProvider>(
+            new DataGridRowAutomationPeer(leafRow).GetProvider<IExpandCollapseProvider>());
+        Assert.Equal(ExpandCollapseState.LeafNode, leafProvider.ExpandCollapseState);
         window.Close();
     }
 
@@ -1088,6 +1091,154 @@ public class HierarchicalHeadlessTests
             $"offset={collapsedPresenter.Offset}, extent={collapsedPresenter.Extent}, " +
             $"viewport={collapsedPresenter.Viewport}, slots={grid.SlotCount}.");
         Assert.Same(root, grid.SelectedItem);
+        ValidateDisplayedRows(grid, model);
+
+        window.Close();
+    }
+
+    [AvaloniaFact]
+    public void Attached_Large_Expand_Below_Viewport_Preserves_Realized_Root_Row()
+    {
+        var root = CreateTree("Root", childCount: 300, grandchildCount: 0);
+        using var themeScope = UseApplicationTheme(DataGridTheme.SimpleV2);
+        var model = new HierarchicalModel(new HierarchicalOptions
+        {
+            ChildrenSelector = value => ((Item)value).Children,
+            VirtualizeChildren = false
+        });
+        model.SetRoot(root);
+
+        var grid = new DataGrid
+        {
+            HierarchicalModel = model,
+            HierarchicalRowsEnabled = true,
+            AutoGenerateColumns = false,
+            ItemsSource = model.Flattened,
+            UseLogicalScrollable = true,
+            RowHeight = 24,
+            SummaryRecalculationDelayMs = 0
+        };
+        grid.ColumnsInternal.Add(new DataGridHierarchicalColumn
+        {
+            Header = "Name",
+            Binding = new Binding("Item.Name")
+        });
+
+        var window = new Window
+        {
+            Width = 420,
+            Height = 260,
+            Content = grid
+        };
+
+        window.SetThemeStyles(DataGridTheme.SimpleV2);
+        window.Show();
+        PumpLayout(grid);
+
+        var rootRow = Assert.Single(GetVisibleRows(grid));
+        var unloadedRows = 0;
+        var summaryRecalculations = 0;
+        grid.UnloadingRow += (_, _) => unloadedRows++;
+        grid.SummaryRecalculated += (_, _) => summaryRecalculations++;
+
+        model.ExpandAll();
+        PumpLayout(grid);
+
+        Assert.Equal(301, grid.SlotCount);
+        Assert.Equal(0, unloadedRows);
+        Assert.Equal(0, summaryRecalculations);
+        Assert.Same(rootRow, GetVisibleRows(grid).Single(row => row.Index == 0));
+        ValidateDisplayedRows(grid, model);
+
+        window.Close();
+    }
+
+    [AvaloniaFact]
+    public void Attached_Large_Whole_Range_Expand_And_Collapse_Use_Hierarchy_Bulk_Splice()
+    {
+        var roots = new ObservableCollection<Item>
+        {
+            CreateTree("Root A", childCount: 300, grandchildCount: 0),
+            CreateTree("Root B", childCount: 300, grandchildCount: 0)
+        };
+        using var themeScope = UseApplicationTheme(DataGridTheme.SimpleV2);
+        var model = new HierarchicalModel(new HierarchicalOptions
+        {
+            ChildrenSelector = value => ((Item)value).Children,
+            VirtualizeChildren = false
+        });
+        model.SetRoots(roots);
+
+        var grid = new DataGrid
+        {
+            HierarchicalModel = model,
+            HierarchicalRowsEnabled = true,
+            AutoGenerateColumns = false,
+            ItemsSource = model.Flattened,
+            UseLogicalScrollable = true,
+            RowHeight = 24
+        };
+        grid.ColumnsInternal.Add(new DataGridHierarchicalColumn
+        {
+            Header = "Name",
+            Binding = new Binding("Item.Name")
+        });
+
+        var window = new Window
+        {
+            Width = 420,
+            Height = 260,
+            Content = grid
+        };
+
+        window.SetThemeStyles(DataGridTheme.SimpleV2);
+        window.Show();
+        PumpLayout(grid);
+        var firstRootRow = Assert.IsType<DataGridRow>(grid.DisplayData.GetDisplayedElement(0));
+
+        var activities = new List<string>();
+        using var listener = new ActivityListener
+        {
+            ShouldListenTo = source => source.Name == DataGridDiagnostics.ActivitySourceName,
+            Sample = static (ref ActivityCreationOptions<ActivityContext> _) =>
+                ActivitySamplingResult.AllDataAndRecorded,
+            ActivityStopped = activity => activities.Add(activity.OperationName)
+        };
+        ActivitySource.AddActivityListener(listener);
+
+        model.ExpandAll();
+        PumpLayout(grid);
+
+        Assert.Equal(602, grid.SlotCount);
+        Assert.Contains("ProDataGrid.Hierarchy.ExpandAll", activities);
+        Assert.Contains("ProDataGrid.DataGrid.HierarchicalFlattenedChanged", activities);
+        Assert.Contains("ProDataGrid.DataGrid.HierarchicalBulkSplice", activities);
+        Assert.Contains("ProDataGrid.DataGrid.HierarchicalSelectionRemap", activities);
+        Assert.Contains("ProDataGrid.DataGrid.HierarchicalIndentationRefresh", activities);
+        Assert.Equal(
+            1,
+            activities.Count(x => x == "ProDataGrid.DataGrid.HierarchicalIndentationRefresh"));
+        Assert.Contains("ProDataGrid.DataGrid.HierarchicalDisplayedRowsRange", activities);
+        Assert.DoesNotContain("ProDataGrid.DataGrid.RefreshRowsAndColumns", activities);
+        Assert.Same(firstRootRow, grid.DisplayData.GetDisplayedElement(0));
+        ValidateDisplayedRows(grid, model);
+
+        activities.Clear();
+        model.CollapseAll();
+        PumpLayout(grid);
+
+        Assert.Equal(2, grid.SlotCount);
+        Assert.Contains("ProDataGrid.Hierarchy.CollapseAll", activities);
+        Assert.Contains("ProDataGrid.DataGrid.HierarchicalFlattenedChanged", activities);
+        Assert.Contains("ProDataGrid.DataGrid.HierarchicalBulkSplice", activities);
+        Assert.Contains("ProDataGrid.DataGrid.HierarchicalSelectionRemap", activities);
+        Assert.Contains("ProDataGrid.DataGrid.HierarchicalIndentationRefresh", activities);
+        Assert.Equal(
+            1,
+            activities.Count(x => x == "ProDataGrid.DataGrid.HierarchicalIndentationRefresh"));
+        Assert.Contains("ProDataGrid.DataGrid.HierarchicalDisplayedRowsRange", activities);
+        Assert.DoesNotContain("ProDataGrid.DataGrid.RefreshRowsAndColumns", activities);
+        Assert.Same(firstRootRow, grid.DisplayData.GetDisplayedElement(0));
         ValidateDisplayedRows(grid, model);
 
         window.Close();

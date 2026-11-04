@@ -62,7 +62,9 @@ namespace Avalonia.Controls.DataGridSearching
                 return;
             }
 
-            _incrementalSearchService.RecordCollectionChange(e);
+            bool canRemapReset = e.Action == NotifyCollectionChangedAction.Reset &&
+                View is DataGridCollectionView { IsReorderOnlyReset: true };
+            _incrementalSearchService.RecordCollectionChange(e, canRemapReset);
         }
 
         protected override void OnViewItemPropertyChanged(object sender, PropertyChangedEventArgs e)
@@ -98,6 +100,7 @@ namespace Avalonia.Controls.DataGridSearching
                     descriptors,
                     BuildRowResults,
                     TryGetUniqueRowIndex,
+                    TryRemapReorderedResults,
                     out results))
             {
                 return true;
@@ -118,6 +121,89 @@ namespace Avalonia.Controls.DataGridSearching
                 }
             }
 
+            return true;
+        }
+
+        private bool TryRemapReorderedResults(
+            IReadOnlyList<SearchResult> currentResults,
+            out IReadOnlyList<SearchResult> remappedResults)
+        {
+            remappedResults = null;
+            if (currentResults == null || currentResults.Count == 0)
+            {
+                remappedResults = Array.Empty<SearchResult>();
+                return true;
+            }
+
+            var requiredIndexes = new Dictionary<object, int>(ReferenceEqualityComparer.Instance);
+            for (int i = 0; i < currentResults.Count; i++)
+            {
+                object item = currentResults[i].Item;
+                if (item == null)
+                {
+                    return false;
+                }
+
+                requiredIndexes.TryAdd(item, -1);
+            }
+
+            int rowIndex = 0;
+            foreach (object item in View)
+            {
+                if (item != null && requiredIndexes.TryGetValue(item, out int existingIndex))
+                {
+                    if (existingIndex >= 0)
+                    {
+                        return false;
+                    }
+
+                    requiredIndexes[item] = rowIndex;
+                }
+
+                rowIndex++;
+            }
+
+            foreach (KeyValuePair<object, int> pair in requiredIndexes)
+            {
+                if (pair.Value < 0)
+                {
+                    return false;
+                }
+            }
+
+            var remapped = new List<SearchResult>(currentResults.Count);
+            for (int i = 0; i < currentResults.Count; i++)
+            {
+                SearchResult current = currentResults[i];
+                remapped.Add(new SearchResult(
+                    current.Item,
+                    requiredIndexes[current.Item],
+                    current.ColumnId,
+                    current.ColumnIndex,
+                    current.Text,
+                    current.Matches));
+            }
+
+            remapped.Sort(static (left, right) =>
+            {
+                int comparison = left.RowIndex.CompareTo(right.RowIndex);
+                if (comparison != 0)
+                {
+                    return comparison;
+                }
+
+                comparison = left.ColumnIndex.CompareTo(right.ColumnIndex);
+                if (comparison != 0)
+                {
+                    return comparison;
+                }
+
+                int leftStart = left.Matches.Count > 0 ? left.Matches[0].Start : 0;
+                int rightStart = right.Matches.Count > 0 ? right.Matches[0].Start : 0;
+                return leftStart.CompareTo(rightStart);
+            });
+
+            remappedResults = remapped;
             return true;
         }
 

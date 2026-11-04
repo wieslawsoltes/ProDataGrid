@@ -198,6 +198,9 @@ namespace Avalonia.Controls
 
     partial class DataGrid
     {
+        private EventHandler<DataGridCellLifecycleEventArgs> _cellPrepared;
+        private EventHandler<DataGridCellLifecycleEventArgs> _cellClearing;
+
         /// <summary>
         /// Occurs once after a cell container is assigned to a realized row item, including
         /// when an existing container is recycled for another item.
@@ -207,7 +210,19 @@ namespace Avalonia.Controls
 #else
         internal
 #endif
-        event EventHandler<DataGridCellLifecycleEventArgs> CellPrepared;
+        event EventHandler<DataGridCellLifecycleEventArgs> CellPrepared
+        {
+            add
+            {
+                _cellPrepared += value;
+                RefreshVirtualCellBackendAfterColumnsChanged();
+            }
+            remove
+            {
+                _cellPrepared -= value;
+                RefreshVirtualCellBackendAfterColumnsChanged();
+            }
+        }
 
         /// <summary>
         /// Occurs once before a realized cell loses its row data context and ownership
@@ -218,7 +233,19 @@ namespace Avalonia.Controls
 #else
         internal
 #endif
-        event EventHandler<DataGridCellLifecycleEventArgs> CellClearing;
+        event EventHandler<DataGridCellLifecycleEventArgs> CellClearing
+        {
+            add
+            {
+                _cellClearing += value;
+                RefreshVirtualCellBackendAfterColumnsChanged();
+            }
+            remove
+            {
+                _cellClearing -= value;
+                RefreshVirtualCellBackendAfterColumnsChanged();
+            }
+        }
 
         /// <summary>
         /// Occurs after a changed value is successfully committed through a DataGrid editor.
@@ -247,7 +274,7 @@ namespace Avalonia.Controls
 
             foreach (DataGridCell cell in row.Cells)
             {
-                CellPrepared?.Invoke(this, new DataGridCellLifecycleEventArgs(
+                _cellPrepared?.Invoke(this, new DataGridCellLifecycleEventArgs(
                     cell, row, row.DataContext, item, node, path));
             }
         }
@@ -267,7 +294,7 @@ namespace Avalonia.Controls
 
             foreach (DataGridCell cell in row.Cells)
             {
-                CellClearing?.Invoke(this, new DataGridCellLifecycleEventArgs(
+                _cellClearing?.Invoke(this, new DataGridCellLifecycleEventArgs(
                     cell, row, row.DataContext, item, node, path));
             }
         }
@@ -284,7 +311,7 @@ namespace Avalonia.Controls
                 out object item,
                 out HierarchicalNode node,
                 out IReadOnlyList<HierarchicalNode> path);
-            CellPrepared?.Invoke(this, new DataGridCellLifecycleEventArgs(
+            _cellPrepared?.Invoke(this, new DataGridCellLifecycleEventArgs(
                 cell, row, row.DataContext, item, node, path));
         }
 
@@ -300,7 +327,7 @@ namespace Avalonia.Controls
                 out object item,
                 out HierarchicalNode node,
                 out IReadOnlyList<HierarchicalNode> path);
-            CellClearing?.Invoke(this, new DataGridCellLifecycleEventArgs(
+            _cellClearing?.Invoke(this, new DataGridCellLifecycleEventArgs(
                 cell, row, row.DataContext, item, node, path));
         }
 
@@ -375,9 +402,9 @@ namespace Avalonia.Controls
                 path));
         }
 
-        private bool HasCellPreparedHandlers => CellPrepared != null;
+        private bool HasCellPreparedHandlers => _cellPrepared != null;
 
-        private bool HasCellClearingHandlers => CellClearing != null;
+        private bool HasCellClearingHandlers => _cellClearing != null;
 
         private bool HasCellValueChangedHandlers => CellValueChanged != null;
     }

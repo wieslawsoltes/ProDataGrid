@@ -593,6 +593,12 @@ public sealed class DataGridOptimizedCellTests
         Assert.Null(column.GenerateDisplay(cell, item));
         Assert.Null(cell.Content);
         Assert.Equal("First", cell.Value);
+        Assert.Equal(DataGridCustomDrawingTextLayoutCacheMode.Shared, cell.TextLayoutCacheMode);
+
+        var secondCell = Assert.IsType<DataGridCustomDrawingCell>(column.CreateCell());
+        secondCell.DataContext = item;
+        Assert.Null(column.GenerateDisplay(secondCell, item));
+        Assert.Same(cell.SharedTextLayoutCache, secondCell.SharedTextLayoutCache);
 
         var window = AttachCell(cell);
         try

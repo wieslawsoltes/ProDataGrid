@@ -18,7 +18,11 @@ public enum DataGridTheme
     /// <summary>Fluent theme (v1) - uses Fluent.xaml</summary>
     Fluent,
     /// <summary>Fluent theme v2 - uses Fluent.v2.xaml with ScrollViewer-based template (same as sample app)</summary>
-    FluentV2
+    FluentV2,
+    /// <summary>Simple theme v2 with the optional flat row/cell surface resources.</summary>
+    SimpleFlat,
+    /// <summary>Fluent theme v2 with the optional flat row/cell surface resources.</summary>
+    FluentFlat
 }
 
 public static class ThemeHelper
@@ -57,6 +61,20 @@ public static class ThemeHelper
                 styles.Add(new StyleInclude(baseUri)
                 {
                     Source = new Uri("avares://Avalonia.Controls.DataGrid/Themes/Fluent.v2.xaml")
+                });
+                break;
+            case DataGridTheme.SimpleFlat:
+                styles.Add(new SimpleTheme());
+                styles.Add(new StyleInclude(baseUri)
+                {
+                    Source = new Uri("avares://Avalonia.Controls.DataGrid/Themes/Simple.Flat.xaml")
+                });
+                break;
+            case DataGridTheme.FluentFlat:
+                styles.Add(new FluentTheme());
+                styles.Add(new StyleInclude(baseUri)
+                {
+                    Source = new Uri("avares://Avalonia.Controls.DataGrid/Themes/Fluent.Flat.xaml")
                 });
                 break;
             default:

@@ -14,13 +14,13 @@ This reference summarizes the built-in column types shipped with ProDataGrid and
 | --- | --- | --- |
 | `DataGridTextColumn` | `TextBox` / `TextBlock` | `Binding` to text; text styling and watermark support. |
 | `DataGridCheckBoxColumn` | `CheckBox` | `Binding` to `bool?`; `IsThreeState`. |
-| `DataGridComboBoxColumn` | `ComboBox` | `ItemsSource` plus `SelectedItemBinding`/`SelectedValueBinding`/`TextBinding`. |
-| `DataGridAutoCompleteColumn` | `AutoCompleteBox` | `ItemsSource`, `FilterMode`, `MinimumPrefixLength`, `Binding` to text. |
-| `DataGridMaskedTextColumn` | `MaskedTextBox` | `Mask`, `PromptChar`, and other mask options. |
+| `DataGridComboBoxColumn` | `ComboBox` | `ItemsSource` plus `SelectedItemBinding`/`SelectedValueBinding`/`TextBinding`; compatible typed editable `TextBinding` display can use the virtual surface. |
+| `DataGridAutoCompleteColumn` | `AutoCompleteBox` / `TextBlock` | `ItemsSource`, `FilterMode`, `MinimumPrefixLength`, and text binding; compatible typed raw text can use the virtual surface. |
+| `DataGridMaskedTextColumn` | `MaskedTextBox` / `TextBlock` | `Mask`, `PromptChar`, and other editor options; compatible typed raw text can use the virtual surface. |
 | `DataGridDatePickerColumn` | `CalendarDatePicker` | `Binding` to `SelectedDate`, date range and format options. |
 | `DataGridTimePickerColumn` | `TimePicker` | `Binding` to `SelectedTime`. |
 | `DataGridNumericColumn` | `NumericUpDown` | `Binding` to value; `Minimum`/`Maximum`/`Increment` and format options. |
-| `DataGridSliderColumn` | `Slider` | `Binding` to value; `Minimum`/`Maximum`/`SmallChange`/`LargeChange`. |
+| `DataGridSliderColumn` | `Slider` / optional `TextBlock` | `Binding` to value; `Minimum`/`Maximum`/`SmallChange`/`LargeChange`; compatible typed `ShowValueText` display can use the virtual surface. |
 | `DataGridProgressBarColumn` | `ProgressBar` | `Binding` to value; `Minimum`/`Maximum`, `ShowProgressText`. |
 | `DataGridToggleSwitchColumn` | `ToggleSwitch` | `Binding` to `IsChecked`; on/off content and templates. |
 | `DataGridToggleButtonColumn` | `ToggleButton` | `Binding` to `IsChecked`; checked/unchecked content, `IsThreeState`. |

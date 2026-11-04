@@ -6,6 +6,7 @@
 #nullable disable
 
 using Avalonia.Controls.Metadata;
+using Avalonia.Controls.DataGridDragDrop;
 using Avalonia.Controls.Primitives;
 using Avalonia.Controls.Shapes;
 using Avalonia.Controls.Templates;
@@ -59,6 +60,9 @@ internal
         private Size _lastArrangeResult;
         private bool _hasValidArrange;
         private int? _mouseOverColumnIndex;
+        private bool _isDragging;
+        private bool _isApplyingRetargetedSelectionState;
+        private DataGridRowDropPosition? _dropPosition;
         private DataGrid _owningGrid;
         private bool _isValid = true;
         private DataGridValidationSeverity _validationSeverity = DataGridValidationSeverity.None;
@@ -604,10 +608,18 @@ internal
         {
             // Walk up the tree to find the DataGridRow that contains the element
             Visual parent = element;
+            if (parent is DataGridCell flatCell && flatCell.OwningRow != null)
+            {
+                return flatCell.OwningRow;
+            }
             DataGridRow row = parent as DataGridRow;
             while ((parent != null) && (row == null))
             {
                 parent = parent.GetVisualParent();
+                if (parent is DataGridCell cell && cell.OwningRow != null)
+                {
+                    return cell.OwningRow;
+                }
                 row = parent as DataGridRow;
             }
             return row;
@@ -647,7 +659,7 @@ internal
                 _cellsElement.OwningRow = this;
                 // Cells that were already added before the Template was applied need to
                 // be added to the Canvas
-                if (Cells.Count > 0)
+                if (Cells.Count > 0 && OwningGrid?.UsesFlatVisualLayout != true)
                 {
                     foreach (DataGridCell cell in Cells)
                     {
@@ -712,13 +724,21 @@ internal
 
         private void DataGridCellCollection_CellAdded(object sender, DataGridCellEventArgs e)
         {
-            _cellsElement?.Children.Add(e.Cell);
+            if (OwningGrid?.UsesFlatVisualLayout != true)
+            {
+                _cellsElement?.Children.Add(e.Cell);
+            }
+            else
+            {
+                OwningGrid.InvalidateMeasure();
+            }
         }
 
         private void DataGridCellCollection_CellRemoved(object sender, DataGridCellEventArgs e)
         {
             OwningGrid?.OnCellRemovedForValidation(e.Cell);
             _cellsElement?.Children.Remove(e.Cell);
+            OwningGrid?.InvalidateMeasure();
         }
 
         private void DataGridRow_PointerPressed(PointerPressedEventArgs e)
@@ -796,14 +816,17 @@ internal
             }
             else if (change.Property == IsSelectedProperty)
             {
-                var value = change.GetNewValue<bool>();
-
-                if (OwningGrid != null && Slot != -1)
+                if (!_isApplyingRetargetedSelectionState)
                 {
-                    OwningGrid.SetRowSelection(Slot, value, false);
-                }
+                    var value = change.GetNewValue<bool>();
 
-                UpdateSelectionPseudoClasses();
+                    if (OwningGrid != null && Slot != -1)
+                    {
+                        OwningGrid.SetRowSelection(Slot, value, false);
+                    }
+
+                    UpdateSelectionPseudoClasses();
+                }
             }
 
             base.OnPropertyChanged(change);
@@ -822,6 +845,27 @@ internal
             }
 
             PseudoClassesHelper.Set(PseudoClasses, ":selected", isSelected);
+        }
+
+        internal void ApplyRetargetedSelectionState(bool isSelected, bool isFullySelected)
+        {
+            if (_isSelected != isSelected)
+            {
+                _isApplyingRetargetedSelectionState = true;
+                try
+                {
+                    SetAndRaise(IsSelectedProperty, ref _isSelected, isSelected);
+                }
+                finally
+                {
+                    _isApplyingRetargetedSelectionState = false;
+                }
+            }
+
+            if (PseudoClasses.Contains(":selected") != isFullySelected)
+            {
+                PseudoClassesHelper.Set(PseudoClasses, ":selected", isFullySelected);
+            }
         }
 
         internal void UpdateSearchPseudoClasses(bool isSearchMatch, bool isSearchCurrent)

@@ -1,71 +1,70 @@
-# ProCharts Overview
+# ProCharts overview
 
-ProCharts is an Excel-quality charting library built for ProDataGrid. It provides a renderer-agnostic chart model, a SkiaSharp renderer, and an Avalonia control for interactive charts. The core goal is fidelity to Excel chart behavior while keeping the data pipeline fast and incremental.
+ProCharts separates chart data, rendering and UI integration into reusable libraries. It supports Cartesian, financial, statistical, matrix and hierarchical charts. Broad charting compatibility is a development goal, not a claim of complete Excel or industry-wide parity.
 
-## Key components
+## Libraries
 
-- `ProCharts` defines the chart model, series definitions, axes, legends, and snapshots.
-- `ProCharts.Skia` provides a SkiaSharp renderer and export helpers (PNG/SVG).
-- `ProCharts.Avalonia` provides `ProChartView` for interactive rendering in Avalonia.
-- `ProDataGrid.Charting` bridges DataGrid data, pivots, and formulas to chart series.
+| Library | Responsibility |
+| --- | --- |
+| `ProCharts` | Models, snapshots, axes, formatting, bounded scalar/interval streaming, hierarchy data/layout, batch transforms, persistent incremental indicators and coordinated interval decimation. |
+| `ProCharts.Skia` | Skia rendering, hit testing, interaction indexing and PNG/SVG export. |
+| `ProCharts.Avalonia` | `ProChartView`, tooltips, viewport gestures and opt-in hierarchy navigation. |
+| `ProDataGrid.Charting` | Grid, pivot, formula and generated-source adapters. |
 
-## Chart model basics
-
-A `ChartModel` describes the data and display options. A snapshot is built from that model, and renderers draw the snapshot.
+## Create a live chart model
 
 ```csharp
-var model = new ChartModel
+var source = new StreamingChartDataSource(10_000, "Signal", ChartSeriesKind.Scatter);
+source.AppendRange(new[]
 {
-    Title = "Revenue by Quarter",
-    Series = new List<ChartSeries>
-    {
-        ChartSeries.Line("Q1", new[] { 120d, 140d, 110d, 180d }),
-        ChartSeries.Line("Q2", new[] { 160d, 130d, 150d, 210d })
-    },
-    XAxis = new ChartAxis { Title = "Quarter", Kind = ChartAxisKind.Category },
-    YAxis = new ChartAxis { Title = "Revenue", Kind = ChartAxisKind.Value }
-};
+    new ChartSample(0, 12),
+    new ChartSample(1, 18),
+    new ChartSample(2, null),
+    new ChartSample(3, 15)
+});
+using var model = new ChartModel { DataSource = source };
+model.CategoryAxis.Kind = ChartAxisKind.Value;
+model.Request.MaxPoints = 2_000;
+model.Request.DownsampleMode = ChartDownsampleMode.MinMax;
 ```
 
-## Rendering pipeline
+Bind the model to `ProChartView.ChartModel`. Keep it alive while its view is in use and dispose it when the owning application/view-model is finished. Data-source notifications run on their caller's thread; marshal worker ingestion appropriately before updating UI-bound models.
 
-- The model is evaluated into a `ChartSnapshot` with resolved series, axes, and labels.
-- Snapshots can carry `ChartDataDelta` to enable incremental updates.
-- The Skia renderer caches layers (axes, legend, data, labels) for performance.
-- Downsampling can be applied (bucket, LTTB, or windowed) to keep large series interactive.
+The example uses Scatter with a numeric category axis for proportional X positioning. Existing Line/Area kinds use category-index positioning. RangeArea can use either category indices or aligned numeric/date/log X coordinates; mixing it with ordinary Line/Area uses category positioning for the plot.
 
-## Integration with ProDataGrid
+For headless use, build a `ChartDataSnapshot` through the source or construct categories and `ChartSeriesSnapshot` objects directly, then call `SkiaChartExporter.ExportPng` or `ExportSvg`. Snapshots should have stable contents; cached render/interaction state must not be fed silently mutated collections.
 
-`ProDataGrid.Charting` provides models that reflect DataGrid state:
+## Live calculations and filled intervals
 
-- `DataGridChartModel` builds series from DataGrid rows with sorting/filtering applied.
-- `PivotChartDataSource` uses pivot tables and calculated measures.
-- Formula-driven measures flow from the formula engine into chart series.
+Batch `ChartIndicators` methods analyze complete datasets. Persistent EMA, RSI, MACD and ATR calculators retain constant-size recurrence state. `StreamingRollingStatistics` shares one bounded window for arithmetic/weighted means and population/sample deviations; scalar adapters, `StreamingBollingerBands` and `StreamingDonchianChannels` provide the corresponding live transforms. Rolling engines retain O(period) state with amortized O(1) updates and occasional O(period) transfer/deque bursts. All are single-writer append-only calculators with allocation-free Push/Reset; corrections require replay, and display-ring eviction does not reset calculation history. See the [incremental indicator guide](procharts-incremental-indicators.md) for warmup, numerical and latency contracts.
 
-This makes charts update as the grid filters, sorts, groups, or recalculates formulas.
+`ChartRangeSeries.CreateArea` owns aligned lower/upper channels, and `ChartBandSeries.ToRangeArea()` turns batch Bollinger or Donchian bands into a filled envelope. Streaming band/channel calculators emit `ChartBandValue` pairs that can be appended to a range source. Missing pairs break the fill. Interior tooltips retain endpoint identity and display both bounds.
 
-## Export and headless rendering
+`RangeChartDataSource` adds owned input, window-before-decimation preparation, atomic replacement and cached display views with original source-index maps. Paired MinMax/Adaptive selection keeps both boundaries' extrema and gap separators at shared source indices. Use a numeric/date/log X axis to retain original spacing; configure the source's logarithmic value domain when applicable. The reduced polygon approximates omitted detail rather than certifying an enclosing envelope. `None` restores every supplied interval. The **ProCharts Range Area** sample has an optional 100,000-observation mode with an 800-point reduction toggle; its original small mode retains the independent mean line.
 
-- `ProChartView` supports copy and export to PNG/SVG.
-- `SkiaChartExporter` supports headless export for servers and CI.
+`StreamingRangeChartDataSource` extends bounded ingestion to interval pairs: append validated batches without replacing the full retained dataset, preserve original 64-bit observation maps, and reduce ring windows through the same paired selector. It enforces increasing X, commits batches atomically and publishes owned snapshots. The Range Area page's **Open bounded live interval demo** provides a command-driven synthetic feed, with an optional persistent 32-price Bollinger calculation before display reduction. It is not an external live connection. See [bounded streaming range areas](procharts-streaming-ranges.md) for threading, session identity, windowing and performance contracts.
 
-```csharp
-var png = chartView.ExportPng();
-var svg = chartView.ExportSvg();
-await chartView.CopyToClipboardAsync(ChartClipboardFormat.Png);
-```
+## Data and interaction
 
-## Performance tips
+Grid adapters track sorting/filtering/grouping and formula results. Cached grid windows copy only the requested category/value/X/size slices; their initial source cache still needs to be built. Bounded streaming uses fixed-capacity history. Continuous-series decimation is not a substitute for hierarchy/matrix semantics, and interval boundaries must not be sampled independently.
 
-- Use windowing (`WindowStart`/`WindowCount`) for streaming or huge series.
-- Prefer aggregation or downsampling for dense line series.
-- Keep legend and label density reasonable for fast layouts.
+Repeated supported point and range-area queries can reuse indexed screen-space geometry. Index construction has an up-front time and memory cost, while warm queries avoid repeated data scans. `UseInteractionCache = false` retains the reference path, and `ClearInteractionCache` releases or invalidates managed state after in-place source changes. Ordered ranges use projected-interval binary search without bridging gaps or changing source-order selection; unordered raw ranges retain their scan. See the range-area guide for ownership, limits and separate interaction/full-versus-reduced CPU drawing diagnostics.
 
-## See also
+`ProChartView.HitTest` accepts local logical coordinates and supports label-free numeric data. Typed treemap/sunburst sources can enable branch double-click and back/root keyboard navigation through `ChartHierarchyNavigation.IsEnabled`. The sample's Hierarchy Explorer also supplies command buttons and a branch selector.
 
-- `procharts-architecture.md`
-- `procharts-chart-model.md`
-- `procharts-series-types.md`
-- `procharts-axes-and-scales.md`
-- `procharts-data-sources.md`
-- `procharts-interaction.md`
+## Guides
+
+- [Model and snapshots](procharts-chart-model.md)
+- [Data sources](procharts-data-sources.md)
+- [Bounded scalar streaming](procharts-streaming.md)
+- [Bounded streaming range areas](procharts-streaming-ranges.md)
+- [Incremental and rolling indicators](procharts-incremental-indicators.md)
+- [Efficient grid windows](procharts-windowing.md)
+- [Advanced chart families](procharts-advanced-charts.md)
+- [Statistical and technical indicators](procharts-indicators.md)
+- [Filled range areas, coordinated decimation and analytical bands](procharts-range-area.md)
+- [Hierarchy navigation and public hit testing](procharts-hierarchy-navigation.md)
+- [Interaction](procharts-interaction.md)
+- [Export and clipboard](procharts-export-clipboard.md)
+
+Additional diagram families, comprehensive accessibility semantics, late-data correction, coordinated multi-series overlay selection and physical-GPU performance qualification remain separate work. Measured preparation, calculation or CPU bitmap improvements do not imply measured UI frame-rate or GPU gains.

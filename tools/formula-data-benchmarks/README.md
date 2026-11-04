@@ -1,0 +1,9 @@
+# Data formula measurements
+
+Run `dotnet run -c Release --project tools/formula-data-benchmarks/FormulaDataBenchmarks.csproj -- artifacts/data` to execute parser assertions, export registered names and record all timing/allocation samples. Use a second process with `artifacts/data-reverse reverse` to reverse comparison order. `artifacts/smoke smoke` runs assertions only and also works after NativeAOT publishing.
+
+The text comparison uses a 1,000-row ragged input and identical owned FormulaArray outputs. Its reference uses String.Split for row and field arrays; TEXTSPLIT counts first and materializes only final fields. Every field is compared before measurement. Timed runs include traversing all results for their text-length checksum. A separate 5,000-field multiple-delimiter case includes a frequent delimiter and an absent delimiter.
+
+The calendar comparisons use modern Windows1900 serials: a 1,400,000-day interval and a 1,000,000-workday offset, with 128 holiday entries. The reference uses prior-style day iteration and builds a HashSet inside each call. Optimized results are checked against the reference before measurement; both strategies include their holiday-workspace construction. Short one-week counting and one-day offsets are measured as controls. These are algorithm comparisons on one runtime, not linked old/new library assemblies or native Excel timings. Control validation and small-input overhead can offset gains on short intervals.
+
+Two warm batches and seven measured batches are recorded; input creation and parsing are excluded, while outputs, private workspaces and checksums are included. Allocation counts are synchronous thread-local managed allocations, not peak memory. Keep exact source revision, runtime/CPU metadata and all samples. No timing thresholds are imposed on unit tests, and no universal end-to-end speedup is implied.

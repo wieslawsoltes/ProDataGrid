@@ -325,6 +325,11 @@ internal
 
         internal override bool SupportsDrawnDisplay => !ShowProgressText;
 
+        internal override bool SupportsVirtualCellSurface =>
+            SupportsDrawnDisplay &&
+            BindingCloneHelper.SupportsDirectRawDataContextRead(Binding) &&
+            DataGridColumnMetadata.GetValueAccessor(this) is not null;
+
         object IDataGridDrawnCellValueProvider.GetDrawnCellValue(object item) =>
             DataGridColumnMetadata.GetValueAccessor(this)?.GetValue(item);
 

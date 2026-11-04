@@ -1,4 +1,4 @@
-// This source is subject to the Microsoft Public License (Ms-PL).
+﻿// This source is subject to the Microsoft Public License (Ms-PL).
 // Please see http://go.microsoft.com/fwlink/?LinkID=131993 for details.
 // All other rights reserved.
 
@@ -156,7 +156,7 @@ internal
                         if (!SetCurrentCellCore(
                                 columnIndex, slot,
                                 commitEdit: true,
-                                endRowEdit: SlotFromRowIndex(SelectedIndex) != slot))
+                                endRowEdit: CurrentSlot != slot))
                         {
                             return;
                         }
@@ -460,6 +460,12 @@ internal
         {
             if (DisplayData == null)
             {
+                return;
+            }
+
+            if (DisplayData.HasVirtualScrollingElements)
+            {
+                _rowsPresenter?.InvalidateVirtualCellSurface();
                 return;
             }
 
@@ -2200,6 +2206,11 @@ internal
 
         private void UpdateSelectionVisuals(IReadOnlyList<DataGridCellInfo> cells)
         {
+            if (UsesVirtualCellSurface)
+            {
+                _rowsPresenter?.InvalidateVirtualCellSurface();
+            }
+
             if (cells.Count == 0 || DisplayData == null)
             {
                 return;
@@ -2292,6 +2303,8 @@ internal
             }
         }
 
+        internal bool HasSelectedCells => _selectedCells.Count != 0;
+
         internal bool IsCellSelected(int rowIndex, int columnIndex)
         {
             return _selectedCells.TryGetValue(rowIndex, out var columns) && columns.Contains(columnIndex);
@@ -2299,9 +2312,14 @@ internal
 
         internal bool IsRowFullySelected(int slot)
         {
+            return IsRowFullySelected(slot, GetRowSelection(slot));
+        }
+
+        internal bool IsRowFullySelected(int slot, bool isRowSelected)
+        {
             if (SelectionUnit == DataGridSelectionUnit.FullRow)
             {
-                return GetRowSelection(slot);
+                return isRowSelected;
             }
 
             if (slot < 0 || ColumnsItemsInternal == null || ColumnsItemsInternal.Count == 0)
@@ -2309,7 +2327,7 @@ internal
                 return false;
             }
 
-            if (!GetRowSelection(slot))
+            if (!isRowSelected)
             {
                 return false;
             }

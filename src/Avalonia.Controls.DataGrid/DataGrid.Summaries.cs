@@ -760,6 +760,11 @@ internal
         /// </summary>
         internal void OnCollectionChangedForSummaries(NotifyCollectionChangedEventArgs e)
         {
+            if (!HasAnySummaries())
+            {
+                return;
+            }
+
             _summaryService?.OnCollectionChanged(e);
         }
 
@@ -768,7 +773,15 @@ internal
         /// </summary>
         internal bool HasAnySummaries()
         {
-            return Columns.Any(c => c.HasSummaries);
+            foreach (DataGridColumn column in ColumnsItemsInternal)
+            {
+                if (column.HasSummaries)
+                {
+                    return true;
+                }
+            }
+
+            return false;
         }
     }
 }

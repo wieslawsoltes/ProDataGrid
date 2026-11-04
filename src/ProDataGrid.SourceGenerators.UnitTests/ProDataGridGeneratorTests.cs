@@ -34,6 +34,27 @@ public sealed class ProDataGridGeneratorTests
     }
 
     [Fact]
+    public void Column_width_emits_all_intrinsic_sizing_modes()
+    {
+        GeneratorTestResult result = GeneratorTestHelper.Run("""
+            using ProDataGrid.SourceGeneration;
+            namespace Demo;
+            [GenerateDataGridColumns(Discovery = DataGridColumnDiscovery.AttributedOnly)]
+            public sealed class Row
+            {
+                [DataGridColumn(Width = "Auto")] public string Auto { get; set; } = "";
+                [DataGridColumn(Width = "SizeToCells")] public string Cells { get; set; } = "";
+                [DataGridColumn(Width = "SizeToHeader")] public string Header { get; set; } = "";
+            }
+            """);
+
+        AssertNoErrors(result);
+        Assert.Contains("column.Width = global::Avalonia.Controls.DataGridLength.Auto;", result.CombinedSource);
+        Assert.Contains("column.Width = global::Avalonia.Controls.DataGridLength.SizeToCells;", result.CombinedSource);
+        Assert.Contains("column.Width = global::Avalonia.Controls.DataGridLength.SizeToHeader;", result.CombinedSource);
+    }
+
+    [Fact]
     public void Type_attribute_discovers_public_properties_and_default_kinds()
     {
         GeneratorTestResult result = GeneratorTestHelper.Run("""

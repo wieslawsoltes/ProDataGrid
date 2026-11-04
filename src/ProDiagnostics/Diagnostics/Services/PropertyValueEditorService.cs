@@ -39,7 +39,7 @@ namespace Avalonia.Diagnostics.Services
         private readonly Dictionary<PropertyValueEditorKind, EditorEntry> _editorCache = new();
         private readonly ResourceReferenceSuggestionService _resourceReferenceSuggestions = new();
 
-        public Control GetOrCreateEditor(PropertyViewModel viewModel, Type propertyType)
+        public EditorUpdate PrepareEditor(PropertyViewModel viewModel, Type propertyType)
         {
             var kind = PropertyValueEditorTypeHelper.GetEditorKind(propertyType);
             if (!_editorCache.TryGetValue(kind, out var entry))
@@ -49,73 +49,131 @@ namespace Avalonia.Diagnostics.Services
             }
 
             entry.Update(viewModel, propertyType);
-            return CreateResourceReferenceHost(viewModel, entry.Control);
-        }
-
-        private Control CreateResourceReferenceHost(PropertyViewModel viewModel, Control editor)
-        {
             var candidates = _resourceReferenceSuggestions.GetCandidates(viewModel);
-            DetachFromResourceReferenceHost(editor);
-
-            if (candidates.Count == 0)
+            if (candidates.Count > 0)
             {
-                return editor;
+                entry.UpdateResourceReferenceHost(viewModel, candidates);
             }
 
-            var resourceButton = CreateResourceReferenceButton(viewModel, candidates);
-
-            var host = new DockPanel
-            {
-                LastChildFill = true
-            };
-
-            DockPanel.SetDock(resourceButton, Dock.Right);
-            host.Children.Add(resourceButton);
-            host.Children.Add(editor);
-            return host;
+            return new EditorUpdate(
+                entry.Control,
+                entry.ResourceReferenceHost?.Control,
+                candidates.Count > 0);
         }
 
-        private static Button CreateResourceReferenceButton(
-            PropertyViewModel viewModel,
-            IReadOnlyList<ResourceReferenceCandidate> candidates)
+        internal readonly struct EditorUpdate
         {
-            var button = new Button
-            {
-                Width = 24,
-                MinWidth = 24,
-                Padding = new Thickness(0),
-                HorizontalContentAlignment = HorizontalAlignment.Center,
-                VerticalContentAlignment = VerticalAlignment.Center,
-                IsEnabled = !viewModel.IsReadonly,
-                Content = new Path
-                {
-                    Data = ResourceIcon,
-                    Width = 12,
-                    Height = 12,
-                    Fill = Brushes.Gray,
-                    Stretch = Stretch.Uniform
-                }
-            };
-            ToolTip.SetTip(button, "Select resource");
+            private readonly Control _editor;
+            private readonly DockPanel? _resourceReferenceHost;
+            private readonly bool _usesResourceReferenceHost;
 
-            button.Click += async (_, _) =>
+            internal EditorUpdate(
+                Control editor,
+                DockPanel? resourceReferenceHost,
+                bool usesResourceReferenceHost)
             {
-                var candidate = await ShowResourceReferencePickerAsync(button, viewModel, candidates);
+                _editor = editor;
+                _resourceReferenceHost = resourceReferenceHost;
+                _usesResourceReferenceHost = usesResourceReferenceHost;
+            }
+
+            public Control Content => _usesResourceReferenceHost
+                ? _resourceReferenceHost!
+                : _editor;
+
+            public void Activate()
+            {
+                if (_usesResourceReferenceHost)
+                {
+                    if (!_resourceReferenceHost!.Children.Contains(_editor))
+                    {
+                        _resourceReferenceHost.Children.Add(_editor);
+                    }
+                }
+                else
+                {
+                    _resourceReferenceHost?.Children.Remove(_editor);
+                }
+            }
+        }
+
+        private sealed class ResourceReferenceEditorHost
+        {
+            private readonly Button _resourceButton;
+            private PropertyViewModel? _viewModel;
+            private IReadOnlyList<ResourceReferenceCandidate> _candidates = Array.Empty<ResourceReferenceCandidate>();
+
+            public ResourceReferenceEditorHost()
+            {
+                Control = new DockPanel
+                {
+                    LastChildFill = true
+                };
+                _resourceButton = new Button
+                {
+                    Width = 24,
+                    MinWidth = 24,
+                    Padding = new Thickness(0),
+                    HorizontalContentAlignment = HorizontalAlignment.Center,
+                    VerticalContentAlignment = VerticalAlignment.Center,
+                    Content = new Path
+                    {
+                        Data = ResourceIcon,
+                        Width = 12,
+                        Height = 12,
+                        Fill = Brushes.Gray,
+                        Stretch = Stretch.Uniform
+                    }
+                };
+                ToolTip.SetTip(_resourceButton, "Select resource");
+                DockPanel.SetDock(_resourceButton, Dock.Right);
+                Control.Children.Add(_resourceButton);
+                _resourceButton.Click += OnResourceButtonClick;
+            }
+
+            public DockPanel Control { get; }
+
+            public void Update(
+                PropertyViewModel viewModel,
+                IReadOnlyList<ResourceReferenceCandidate> candidates)
+            {
+                _viewModel = viewModel;
+                _candidates = candidates;
+                _resourceButton.IsEnabled = !viewModel.IsReadonly;
+                DataValidationErrors.ClearErrors(_resourceButton);
+            }
+
+            private async void OnResourceButtonClick(object? sender, RoutedEventArgs e)
+            {
+                var viewModel = _viewModel;
+                var candidates = _candidates;
+                if (viewModel is null)
+                {
+                    return;
+                }
+
+                var candidate = await ShowResourceReferencePickerAsync(_resourceButton, viewModel, candidates);
                 if (candidate is null)
+                {
+                    return;
+                }
+
+                if (!ReferenceEquals(viewModel, _viewModel) ||
+                    !ReferenceEquals(candidates, _candidates))
                 {
                     return;
                 }
 
                 if (!viewModel.TrySetResourceReference(candidate, out var error))
                 {
-                    DataValidationErrors.SetError(button, new InvalidOperationException(error ?? "Could not apply resource reference."));
+                    DataValidationErrors.SetError(
+                        _resourceButton,
+                        new InvalidOperationException(error ?? "Could not apply resource reference."));
                     return;
                 }
 
-                DataValidationErrors.ClearErrors(button);
-            };
-
-            return button;
+                DataValidationErrors.ClearErrors(_resourceButton);
+            }
         }
 
         private static async Task<ResourceReferenceCandidate?> ShowResourceReferencePickerAsync(
@@ -127,14 +185,6 @@ namespace Avalonia.Diagnostics.Services
             return await ResourceReferencePickerHost.ShowAsync(
                 ownerControl,
                 new ResourceReferencePickerViewModel(viewModel, candidates, formatter));
-        }
-
-        private static void DetachFromResourceReferenceHost(Control editor)
-        {
-            if (editor.Parent is DockPanel parent)
-            {
-                parent.Children.Remove(editor);
-            }
         }
 
         private EditorEntry CreateEditorEntry(PropertyValueEditorKind kind)
@@ -433,6 +483,7 @@ namespace Avalonia.Diagnostics.Services
         private sealed class EditorEntry
         {
             private readonly Action<PropertyViewModel, Type> _update;
+            private ResourceReferenceEditorHost? _resourceReferenceHost;
 
             public EditorEntry(Control control, Action<PropertyViewModel, Type> update)
             {
@@ -442,9 +493,19 @@ namespace Avalonia.Diagnostics.Services
 
             public Control Control { get; }
 
+            public ResourceReferenceEditorHost? ResourceReferenceHost => _resourceReferenceHost;
+
             public void Update(PropertyViewModel viewModel, Type propertyType)
             {
                 _update(viewModel, propertyType);
+            }
+
+            public void UpdateResourceReferenceHost(
+                PropertyViewModel viewModel,
+                IReadOnlyList<ResourceReferenceCandidate> candidates)
+            {
+                _resourceReferenceHost ??= new ResourceReferenceEditorHost();
+                _resourceReferenceHost.Update(viewModel, candidates);
             }
         }
 

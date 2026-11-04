@@ -828,6 +828,9 @@ namespace Avalonia.Controls.DataGridHierarchical
             NodeCollapsedTyped?.Invoke(this, new HierarchicalNodeEventArgs<T>(new HierarchicalNode<T>(node)));
         }
 
+        protected override bool HasNodeCollapsedObservers =>
+            base.HasNodeCollapsedObservers || NodeCollapsedTyped != null;
+
         protected override void OnNodeLoading(HierarchicalNode node)
         {
             base.OnNodeLoading(node);

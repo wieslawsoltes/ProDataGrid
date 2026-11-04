@@ -61,6 +61,14 @@ internal
             {
                 return ProcessTabKey(e, allowCtrl: AllowsCtrlModifier(tabGesture));
             }
+            else if (UsesVirtualCellSurface &&
+                     e.Key == Key.Space &&
+                     CurrentColumn is DataGridCheckBoxColumn)
+            {
+                // A retained checkbox normally owns this gesture. The virtual surface has
+                // no display control, so enter the existing editor pipeline directly.
+                return BeginEdit();
+            }
 
             bool focusDataGrid = false;
 

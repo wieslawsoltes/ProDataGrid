@@ -442,7 +442,11 @@ internal
             // then we will resize all the columns to fit the available space.
             if (OwningGrid.UsesStarSizing && !OwningGrid.AutoSizingColumns)
             {
-                double adjustment = Double.IsPositiveInfinity(availableSize.Width) ? OwningGrid.CellsWidth : availableSize.Width - totalDisplayWidth;
+                // With the ScrollViewer template, headers and cells must share the same width excluding the scroll bar.
+                var availableCellsWidth = OwningGrid.UseLogicalScrollable && OwningGrid.RowsPresenterAvailableSize.HasValue
+                    ? OwningGrid.CellsWidth
+                    : availableSize.Width;
+                double adjustment = Double.IsPositiveInfinity(availableCellsWidth) ? OwningGrid.CellsWidth : availableCellsWidth - totalDisplayWidth;
                 totalDisplayWidth += adjustment - OwningGrid.AdjustColumnWidths(0, adjustment, false);
 
                 // Since we didn't know the final widths of the columns until we resized,

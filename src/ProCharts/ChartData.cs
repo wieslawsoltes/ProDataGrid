@@ -651,7 +651,7 @@ namespace ProCharts
         public ChartSeriesStyle? Style { get; }
     }
 
-    public sealed class ChartDataSnapshot
+    public sealed partial class ChartDataSnapshot
     {
         public ChartDataSnapshot(
             IReadOnlyList<string?> categories,

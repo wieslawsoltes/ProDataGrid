@@ -15,7 +15,7 @@
   <Import Project="../../build/SharedVersion.props" />
 
   <ItemGroup>
-    <ProjectReference Include="../ProDiagnostics/ProDiagnostics.csproj" />
+    <ProjectReference Include="../ProDiagnostics/ProDiagnostics.csproj" Aliases="global,Diagnostics" />
     <ProjectReference Include="../ProDiagnostics.Transport/ProDiagnostics.Transport.csproj" />
     <ProjectReference Include="../ProDiagnostics.Viewer/ProDiagnostics.Viewer.csproj" />
   </ItemGroup>

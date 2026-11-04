@@ -5,11 +5,13 @@ using System.Linq;
 using System.Reflection;
 using Avalonia;
 using Avalonia.Controls;
+using Avalonia.Controls.Presenters;
 using Avalonia.Controls.Primitives;
 using Avalonia.Diagnostics.Controls;
 using Avalonia.Diagnostics.Services;
 using Avalonia.Diagnostics.Views;
 using Avalonia.Headless.XUnit;
+using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.Layout;
 using Avalonia.Media;
@@ -465,13 +467,78 @@ public class PropertyValueEditorViewTests
 
         view.DataContext = backgroundProperty;
         var firstHost = Assert.IsType<DockPanel>(view.Content);
+        var resourceButton = firstHost.Children[0];
         var editor = firstHost.Children[1];
 
         view.DataContext = borderBrushProperty;
 
         var secondHost = Assert.IsType<DockPanel>(view.Content);
+        Assert.Same(firstHost, secondHost);
+        Assert.Same(resourceButton, secondHost.Children[0]);
         Assert.Same(editor, secondHost.Children[1]);
-        Assert.DoesNotContain(editor, firstHost.Children);
+    }
+
+    [AvaloniaFact]
+    public void Attached_editor_can_be_recycled_between_direct_and_resource_wrapped_content()
+    {
+        var target = new Button();
+        var focusableProperty = new Avalonia.Diagnostics.ViewModels.AvaloniaPropertyViewModel(
+            target,
+            InputElement.FocusableProperty);
+        var directProperty = new Avalonia.Diagnostics.ViewModels.AvaloniaPropertyViewModel(
+            target,
+            InputElement.FocusableProperty);
+        var resourceBackedProperty = new Avalonia.Diagnostics.ViewModels.AvaloniaPropertyViewModel(
+            target,
+            InputElement.FocusableProperty);
+        focusableProperty.InspectedObject = target;
+        directProperty.InspectedObject = target;
+        resourceBackedProperty.InspectedObject = target;
+        var view = CreateView();
+        var window = new Window
+        {
+            Content = view,
+            Width = 320,
+            Height = 120
+        };
+
+        try
+        {
+            view.DataContext = focusableProperty;
+            window.Show();
+            Dispatcher.UIThread.RunJobs();
+
+            var editor = Assert.IsType<CheckBox>(view.Content);
+            var contentPresenter = Assert.IsType<ContentPresenter>(editor.GetVisualParent());
+
+            view.DataContext = directProperty;
+
+            Assert.Same(editor, view.Content);
+            Assert.Same(contentPresenter, editor.GetVisualParent());
+
+            target.Resources["BooleanResource"] = true;
+            view.DataContext = resourceBackedProperty;
+
+            var resourceHost = Assert.IsType<DockPanel>(view.Content);
+            var resourceButton = Assert.IsType<Button>(resourceHost.Children[0]);
+            Assert.Same(editor, resourceHost.Children[1]);
+
+            target.Resources.Remove("BooleanResource");
+            view.DataContext = focusableProperty;
+
+            Assert.Same(editor, view.Content);
+
+            target.Resources["BooleanResource"] = true;
+            view.DataContext = resourceBackedProperty;
+
+            Assert.Same(resourceHost, view.Content);
+            Assert.Same(resourceButton, resourceHost.Children[0]);
+            Assert.Same(editor, resourceHost.Children[1]);
+        }
+        finally
+        {
+            window.Close();
+        }
     }
 
     [AvaloniaFact]

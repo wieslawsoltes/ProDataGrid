@@ -22,7 +22,10 @@ namespace Avalonia.Controls
             if (element is DataGridRow row)
             {
                 Debug.Assert(row.OwningGrid == this);
-                Debug.Assert(row.Cells.Count == ColumnsItemsInternal.Count);
+                int expectedCellCount = UsesVirtualCellSurface && !IsVirtualCompatibilityRow(row)
+                    ? 0
+                    : ColumnsItemsInternal.Count;
+                Debug.Assert(row.Cells.Count == expectedCellCount);
 
                 int columnIndex = 0;
                 foreach (DataGridCell dataGridCell in row.Cells)
@@ -48,6 +51,21 @@ namespace Avalonia.Controls
         {
             SlotCount = 0;
             VisibleSlotCount = 0;
+            if (UsesLightweightVirtualRows)
+            {
+                SlotCount = totalSlots;
+                VisibleSlotCount = totalSlots;
+                if (totalSlots > 0)
+                {
+                    OnAddedElement_Phase2(
+                        0,
+                        updateVerticalScrollBarOnly: !HasLegacyVerticalScrollBar || IsLegacyVerticalScrollBarVisible);
+                    OnElementsChanged(grew: true);
+                }
+
+                return;
+            }
+
             IEnumerator<int> headerSlots = null;
             IEnumerator<int> footerSlots = null;
             int nextHeaderSlot = -1;

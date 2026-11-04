@@ -6,6 +6,7 @@
 #nullable disable
 
 using Avalonia.Collections;
+using Avalonia.Controls.Utils;
 using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.Layout;
@@ -24,7 +25,7 @@ public
 #else
 internal
 #endif
-    class DataGridCheckBoxColumn : DataGridBoundColumn
+    class DataGridCheckBoxColumn : DataGridBoundColumn, IDataGridDrawnCellValueProvider
     {
         private CheckBox _currentCheckBox;
         private DataGrid _owningGrid;
@@ -263,6 +264,14 @@ internal
             }
         }
 
+        internal override bool SupportsVirtualCellSurface =>
+            GetType() == typeof(DataGridCheckBoxColumn) &&
+            BindingCloneHelper.SupportsDirectRawDataContextRead(Binding) &&
+            DataGridColumnMetadata.GetValueAccessor(this) is not null;
+
+        object IDataGridDrawnCellValueProvider.GetDrawnCellValue(object item) =>
+            DataGridColumnMetadata.GetValueAccessor(this)?.GetValue(item);
+
         private void Columns_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
         {
             if (e.Action == NotifyCollectionChangedAction.Remove && e.OldItems.Contains(this) && _owningGrid != null)
@@ -315,6 +324,11 @@ internal
 
         private void OwningGrid_CurrentCellChanged(object sender, DataGridCurrentCellChangedEventArgs e)
         {
+            if (OwningGrid?.UsesVirtualCellSurface == true)
+            {
+                return;
+            }
+
             if (_currentCheckBox != null)
             {
                 _currentCheckBox.IsEnabled = false;
@@ -336,6 +350,11 @@ internal
 
         private void OwningGrid_KeyDown(object sender, KeyEventArgs e)
         {
+            if (OwningGrid?.UsesVirtualCellSurface == true)
+            {
+                return;
+            }
+
             if (e.Key == Key.Space && OwningGrid != null &&
                 OwningGrid.CurrentColumn == this)
             {
@@ -352,6 +371,11 @@ internal
 
         private void OwningGrid_LoadingRow(object sender, DataGridRowEventArgs e)
         {
+            if (OwningGrid?.UsesVirtualCellSurface == true)
+            {
+                return;
+            }
+
             if (OwningGrid != null)
             {
                 if (GetCellContent(e.Row) is CheckBox checkBox)

@@ -17,7 +17,8 @@ namespace ProDataGrid.FormulaEngine
         Name,
         Reference,
         ArrayLiteral,
-        StructuredReference
+        StructuredReference,
+        Invocation
     }
 
     public enum FormulaUnaryOperator
@@ -58,12 +59,26 @@ namespace ProDataGrid.FormulaEngine
     public sealed class FormulaLiteralExpression : FormulaExpression
     {
         public FormulaLiteralExpression(FormulaValue value)
+            : this(value, false)
+        {
+        }
+
+        /// <summary>Creates a literal with optional syntactic argument-omission metadata.</summary>
+        /// <remarks>An omitted literal must contain a blank value. The original one-argument constructor
+        /// continues to create ordinary literals, including ordinary blanks.</remarks>
+        public FormulaLiteralExpression(FormulaValue value, bool isOmitted)
             : base(FormulaExpressionKind.Literal)
         {
+            if (isOmitted && value.Kind != FormulaValueKind.Blank)
+                throw new ArgumentException("Only a blank literal may mark an omitted argument.", nameof(value));
             Value = value;
+            IsOmitted = isOmitted;
         }
 
         public FormulaValue Value { get; }
+
+        /// <summary>Gets whether this blank literal represents a syntactically omitted argument.</summary>
+        public bool IsOmitted { get; }
     }
 
     public sealed class FormulaUnaryExpression : FormulaExpression

@@ -253,6 +253,9 @@
     <TabItem Header="Pivot Chart Model">
       <pages:PivotChartPage />
     </TabItem>
+    <TabItem Header="ProCharts Hierarchy Explorer">
+      <pages:ChartHierarchyPage />
+    </TabItem>
     <TabItem Header="ProCharts Combo">
       <pages:ChartingPage SampleKind="Combo" />
     </TabItem>
@@ -291,6 +294,9 @@
     </TabItem>
     <TabItem Header="ProCharts Line">
       <pages:ChartingPage SampleKind="Line" />
+    </TabItem>
+    <TabItem Header="ProCharts Range Area">
+      <pages:ChartRangePage />
     </TabItem>
     <TabItem Header="ProCharts Area">
       <pages:ChartingPage SampleKind="Area" />
@@ -447,6 +453,24 @@
     </TabItem>
     <TabItem Header="Optimized Cell Paths (Hierarchy)">
       <pages:OptimizedHierarchyCellPathsPage />
+    </TabItem>
+    <TabItem Header="Virtual Cell Surface (Flat Data)">
+      <pages:VirtualSurfaceFlatDataPage />
+    </TabItem>
+    <TabItem Header="Flat Surface (Flat Data)">
+      <pages:FlatSurfaceFlatDataPage />
+    </TabItem>
+    <TabItem Header="Nested Surface Baseline (Flat Data)">
+      <pages:NestedSurfaceFlatDataPage />
+    </TabItem>
+    <TabItem Header="Virtual Cell Surface (Hierarchy)">
+      <pages:VirtualSurfaceHierarchyPage />
+    </TabItem>
+    <TabItem Header="Flat Surface (Hierarchy)">
+      <pages:FlatSurfaceHierarchyPage />
+    </TabItem>
+    <TabItem Header="Nested Surface Baseline (Hierarchy)">
+      <pages:NestedSurfaceHierarchyPage />
     </TabItem>
     <TabItem Header="Resize Recycling">
       <pages:RecycleDiagnosticsPage />

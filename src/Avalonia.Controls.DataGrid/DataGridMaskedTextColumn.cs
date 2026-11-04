@@ -6,6 +6,7 @@
 using System;
 using System.Globalization;
 using Avalonia.Collections;
+using Avalonia.Controls.Utils;
 using Avalonia.Data;
 using Avalonia.Input;
 using Avalonia.Interactivity;
@@ -23,7 +24,9 @@ public
 #else
 internal
 #endif
-    class DataGridMaskedTextColumn : DataGridBoundColumn
+    class DataGridMaskedTextColumn : DataGridBoundColumn,
+        IDataGridDrawnCellValueProvider,
+        IDataGridDrawnCellValueChangeTracking
     {
         private readonly Lazy<ControlTheme> _cellMaskedTextBoxTheme;
         private readonly Lazy<ControlTheme> _cellTextBlockTheme;
@@ -295,6 +298,34 @@ internal
                 base.RefreshCellContent(element, propertyName);
             }
         }
+
+        internal override bool SupportsVirtualCellSurface =>
+            GetType() == typeof(DataGridMaskedTextColumn) &&
+            BindingCloneHelper.SupportsDirectTextDataContextRead(Binding) &&
+            DataGridColumnMetadata.GetValueAccessor(this) is IDataGridColumnTextAccessor;
+
+        object IDataGridDrawnCellValueProvider.GetDrawnCellValue(object item)
+        {
+            var accessor = DataGridColumnMetadata.GetValueAccessor(this) as IDataGridColumnTextAccessor;
+            if (accessor == null || item == null)
+            {
+                return null;
+            }
+
+            var culture = BindingCloneHelper.GetConverterCulture(Binding) ?? CultureInfo.CurrentCulture;
+            return accessor.TryGetText(
+                item,
+                BindingCloneHelper.GetConverter(Binding),
+                BindingCloneHelper.GetConverterParameter(Binding),
+                BindingCloneHelper.GetStringFormat(Binding),
+                culture,
+                culture,
+                out var text)
+                ? text
+                : null;
+        }
+
+        bool IDataGridDrawnCellValueChangeTracking.TrackDrawnCellValueChanges => true;
 
         private void SyncEditProperties(MaskedTextBox maskedTextBox)
         {

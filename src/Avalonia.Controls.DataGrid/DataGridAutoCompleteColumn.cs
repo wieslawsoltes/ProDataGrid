@@ -5,9 +5,11 @@
 
 using System;
 using System.Collections;
+using System.Globalization;
 using Avalonia.Collections;
 using Avalonia.Controls.Templates;
 using Avalonia.Controls.DataGridEditing;
+using Avalonia.Controls.Utils;
 using Avalonia.Data;
 using Avalonia.Input;
 using Avalonia.Interactivity;
@@ -25,7 +27,9 @@ public
 #else
 internal
 #endif
-    class DataGridAutoCompleteColumn : DataGridBoundColumn
+    class DataGridAutoCompleteColumn : DataGridBoundColumn,
+        IDataGridDrawnCellValueProvider,
+        IDataGridDrawnCellValueChangeTracking
     {
         private readonly Lazy<ControlTheme> _cellAutoCompleteTheme;
         private readonly Lazy<ControlTheme> _cellTextBlockTheme;
@@ -294,6 +298,34 @@ internal
                 base.RefreshCellContent(element, propertyName);
             }
         }
+
+        internal override bool SupportsVirtualCellSurface =>
+            GetType() == typeof(DataGridAutoCompleteColumn) &&
+            BindingCloneHelper.SupportsDirectTextDataContextRead(Binding) &&
+            DataGridColumnMetadata.GetValueAccessor(this) is IDataGridColumnTextAccessor;
+
+        object IDataGridDrawnCellValueProvider.GetDrawnCellValue(object item)
+        {
+            var accessor = DataGridColumnMetadata.GetValueAccessor(this) as IDataGridColumnTextAccessor;
+            if (accessor == null || item == null)
+            {
+                return null;
+            }
+
+            var culture = BindingCloneHelper.GetConverterCulture(Binding) ?? CultureInfo.CurrentCulture;
+            return accessor.TryGetText(
+                item,
+                BindingCloneHelper.GetConverter(Binding),
+                BindingCloneHelper.GetConverterParameter(Binding),
+                BindingCloneHelper.GetStringFormat(Binding),
+                culture,
+                culture,
+                out var text)
+                ? text
+                : null;
+        }
+
+        bool IDataGridDrawnCellValueChangeTracking.TrackDrawnCellValueChanges => true;
 
         private void SyncEditProperties(AutoCompleteBox autoComplete)
         {

@@ -1,4 +1,4 @@
-// This source is subject to the Microsoft Public License (Ms-PL).
+﻿// This source is subject to the Microsoft Public License (Ms-PL).
 // Please see http://go.microsoft.com/fwlink/?LinkID=131993 for details.
 // All other rights reserved.
 
@@ -117,18 +117,18 @@ internal
 
             return slot >= DisplayData.FirstScrollingSlot &&
                    slot <= DisplayData.LastScrollingSlot &&
+                   !DisplayData.HasVirtualScrollingElements &&
                    DisplayData.GetDisplayedElement(slot) is DataGridRow { IsPlaceholder: true };
         }
 
         /// <summary>
-        /// Checks if the specified slot can be edited. Returns true if the row is selected
-        /// or if it's the placeholder row (for adding new items).
+        /// Checks whether the slot identifies a data row that can enter editing.
         /// </summary>
         /// <param name="slot">The slot to check.</param>
         /// <returns>True if the slot can be edited; otherwise, false.</returns>
         private bool CanEditSlot(int slot)
         {
-            return GetRowSelection(slot) || IsSlotPlaceholderRow(slot);
+            return slot >= 0 && slot < SlotCount && !IsGroupSlot(slot);
         }
 
         /// <summary>
@@ -290,6 +290,8 @@ internal
                 return true;
             }
 
+            RequireRetainedVirtualRowsForEditing();
+
             // Get or generate the editing row if it doesn't exist
             DataGridRow dataGridRow = EditingRow;
             if (dataGridRow == null)
@@ -305,6 +307,8 @@ internal
                 }
             }
             Debug.Assert(dataGridRow != null);
+
+            EnsureVirtualCompatibilityRow(dataGridRow);
 
             // Cache these to see if they change later
             int currentRowIndex = CurrentSlot;
@@ -1129,6 +1133,7 @@ internal
 
         private void ResetEditingRow()
         {
+            DataGridRow previousEditingRow = EditingRow;
             if (EditingRow != null
                 && EditingRow != _focusedRow
                 && !IsSlotVisible(EditingRow.Slot))
@@ -1138,6 +1143,11 @@ internal
                 UnloadRow(EditingRow);
             }
             EditingRow = null;
+            if (UsesVirtualCellSurface && ReferenceEquals(_virtualCompatibilityRow, previousEditingRow))
+            {
+                ReleaseVirtualCompatibilityRow();
+            }
+            ReleaseRetainedVirtualRowsForEditing();
             _editingRowValidationSnapshot = null;
             _editingCellValidationSnapshot = null;
             _editingCellHadNotifyDataErrorInfoValidation = false;

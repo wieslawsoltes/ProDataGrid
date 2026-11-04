@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.ObjectModel;
+using System.Globalization;
 using Avalonia.Controls;
 using Avalonia.Data;
 using Avalonia.Headless.XUnit;
@@ -30,7 +31,7 @@ public class DataGridTimePickerColumnHeadlessTests
         var cell = GetCell(grid, "Time", 0);
         var textBlock = Assert.IsType<TextBlock>(cell.Content);
 
-        Assert.NotNull(textBlock.Text);
+        Assert.Equal(new TimeSpan(9, 0, 0).ToString(), textBlock.Text);
     }
 
     [AvaloniaFact]
@@ -75,6 +76,82 @@ public class DataGridTimePickerColumnHeadlessTests
         var column = new DataGridTimePickerColumn();
 
         Assert.Equal("12HourClock", column.ClockIdentifier);
+    }
+
+    [AvaloniaFact]
+    public void TimePickerColumn_Virtual_Value_Uses_Configured_Format()
+    {
+        var column = new DataGridTimePickerColumn
+        {
+            Binding = new Binding(nameof(TimeItem.Time)),
+            FormatString = @"hh\:mm\:ss",
+        };
+        DataGridColumnMetadata.SetValueAccessor(
+            column,
+            new DataGridColumnValueAccessor<TimeItem, TimeSpan?>(item => item.Time));
+        var item = new TimeItem { Time = new TimeSpan(14, 5, 9) };
+
+        Assert.True(column.SupportsVirtualCellSurface);
+        var provider = (IDataGridDrawnCellValueProvider)column;
+        Assert.Equal("14:05:09", provider.GetDrawnCellValue(item));
+
+        column.FormatString = null;
+        column.ClockIdentifier = "24HourClock";
+        column.UseSeconds = false;
+        Assert.Equal("14:05", provider.GetDrawnCellValue(item));
+
+        column.UseSeconds = true;
+        Assert.Equal("14:05:09", provider.GetDrawnCellValue(item));
+
+        column.ClockIdentifier = "12HourClock";
+        column.UseSeconds = false;
+        Assert.Equal(
+            new DateTime(1, 1, 1, 14, 5, 9).ToString("h:mm tt", CultureInfo.CurrentCulture),
+            provider.GetDrawnCellValue(item));
+
+        column.UseSeconds = true;
+        Assert.Equal(
+            new DateTime(1, 1, 1, 14, 5, 9).ToString("h:mm:ss tt", CultureInfo.CurrentCulture),
+            provider.GetDrawnCellValue(item));
+
+        item.Time = null;
+        Assert.Null(provider.GetDrawnCellValue(item));
+    }
+
+    [AvaloniaFact]
+    public void TimePickerColumn_Virtual_Surface_Requires_Direct_Typed_Time_Access()
+    {
+        var column = new DataGridTimePickerColumn
+        {
+            Binding = new Binding(nameof(TimeItem.Time)),
+        };
+
+        Assert.False(column.SupportsVirtualCellSurface);
+
+        DataGridColumnMetadata.SetValueAccessor(
+            column,
+            new DataGridColumnValueAccessor<TimeItem, string>(_ => "not a time"));
+        Assert.False(column.SupportsVirtualCellSurface);
+
+        DataGridColumnMetadata.SetValueAccessor(
+            column,
+            new DataGridColumnValueAccessor<TimeItem, TimeSpan?>(item => item.Time));
+        Assert.True(column.SupportsVirtualCellSurface);
+
+        column.Binding = new Binding(nameof(TimeItem.Time))
+        {
+            StringFormat = "{0:c}",
+        };
+        Assert.False(column.SupportsVirtualCellSurface);
+
+        var derived = new DerivedTimePickerColumn
+        {
+            Binding = new Binding(nameof(TimeItem.Time)),
+        };
+        DataGridColumnMetadata.SetValueAccessor(
+            derived,
+            new DataGridColumnValueAccessor<TimeItem, TimeSpan?>(item => item.Time));
+        Assert.False(derived.SupportsVirtualCellSurface);
     }
 
     private static (Window window, DataGrid grid) CreateWindow(TimePickerTestViewModel vm)
@@ -138,5 +215,9 @@ public class DataGridTimePickerColumnHeadlessTests
     {
         public string Name { get; set; } = string.Empty;
         public TimeSpan? Time { get; set; }
+    }
+
+    private sealed class DerivedTimePickerColumn : DataGridTimePickerColumn
+    {
     }
 }

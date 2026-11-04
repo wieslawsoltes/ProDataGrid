@@ -33,7 +33,7 @@ public
 #else
 internal
 #endif
-    class DataGridCell : ContentControl
+    partial class DataGridCell : ContentControl
     {
         private const string DATAGRIDCELL_elementRightGridLine = "PART_RightGridLine";
 

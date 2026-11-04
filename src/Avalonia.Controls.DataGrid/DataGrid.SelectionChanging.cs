@@ -398,7 +398,12 @@ namespace Avalonia.Controls
             object oldCurrentItem = ProjectSelectionItem(CurrentCell.Item);
             object oldCurrencyItem = ProjectSelectionItem(DataConnection?.CollectionView?.CurrentItem);
 
-            var prospectiveRows = new List<ProspectiveSelectionRow>();
+            int prospectiveCapacity = prospectiveSource is ICollection collection
+                ? collection.Count
+                : 0;
+            var prospectiveRows = prospectiveCapacity > 0
+                ? new List<ProspectiveSelectionRow>(prospectiveCapacity)
+                : new List<ProspectiveSelectionRow>();
             if (prospectiveSource != null)
             {
                 foreach (object rowDataContext in prospectiveSource)

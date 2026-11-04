@@ -33,7 +33,7 @@ internal
             {
                 ContainsFocus = true;
                 ApplyDisplayedRowsState(DisplayData.FirstScrollingSlot, DisplayData.LastScrollingSlot);
-                if (CurrentColumnIndex != -1 && IsSlotVisible(CurrentSlot))
+                if (!UsesVirtualCellSurface && CurrentColumnIndex != -1 && IsSlotVisible(CurrentSlot))
                 {
                     if (DisplayData.GetDisplayedElement(CurrentSlot) is DataGridRow row)
                     {
@@ -103,7 +103,7 @@ internal
                     }
                     ResetFocusedRow();
                     ApplyDisplayedRowsState(DisplayData.FirstScrollingSlot, DisplayData.LastScrollingSlot);
-                    if (CurrentColumnIndex != -1 && IsSlotVisible(CurrentSlot))
+                    if (!UsesVirtualCellSurface && CurrentColumnIndex != -1 && IsSlotVisible(CurrentSlot))
                     {
                         if (DisplayData.GetDisplayedElement(CurrentSlot) is DataGridRow row)
                         {

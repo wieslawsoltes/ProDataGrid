@@ -78,6 +78,11 @@ namespace ProCharts.Skia
 
                 switch (series.Kind)
                 {
+                    case ChartSeriesKind.RangeArea:
+                        var rangeHit = HitTestRangeArea(point, plot, categories, series, seriesIndex, axisMin, axisMax, axisKind, style,
+                            useNumericCategoryAxis, categoryAxisKind, minCategory, maxCategory);
+                        if (rangeHit.HasValue) return rangeHit;
+                        break;
                     case ChartSeriesKind.Column:
                         if (TryHitColumn(point, plot, categories, series, seriesIndex, seriesCount, categoryCount, axisMin, axisMax, axisKind, out var columnHit))
                         {
@@ -310,6 +315,7 @@ namespace ProCharts.Skia
                             categoryAxisKind,
                             minBubbleSize,
                             maxBubbleSize,
+                            axisKind,
                             style,
                             ref best,
                             ref bestDistance);
@@ -478,6 +484,7 @@ namespace ProCharts.Skia
             ChartAxisKind categoryAxisKind,
             double minBubbleSize,
             double maxBubbleSize,
+            ChartAxisKind valueAxisKind,
             SkiaChartStyle style,
             ref SkiaChartHitTestResult? best,
             ref float bestDistance)
@@ -485,7 +492,6 @@ namespace ProCharts.Skia
             var count = series.Values.Count;
             var xValues = series.XValues;
             var hasValidX = false;
-            var valueAxisKind = style.ValueAxisKind;
             double minX = 0;
             double maxX = 1;
             if (xValues != null && xValues.Count == count)

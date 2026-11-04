@@ -1,4 +1,4 @@
-// This source is subject to the Microsoft Public License (Ms-PL).
+﻿// This source is subject to the Microsoft Public License (Ms-PL).
 // Please see http://go.microsoft.com/fwlink/?LinkID=131993 for details.
 // All other rights reserved.
 
@@ -479,6 +479,29 @@ internal
         {
             get { return GetValue(ColumnWidthSharingScopeProperty); }
             set { SetValue(ColumnWidthSharingScopeProperty, value); }
+        }
+
+        /// <summary>
+        /// Identifies the <see cref="VisualLayoutMode"/> dependency property.
+        /// </summary>
+        public static readonly StyledProperty<DataGridVisualLayoutMode> VisualLayoutModeProperty =
+            AvaloniaProperty.Register<DataGrid, DataGridVisualLayoutMode>(
+                nameof(VisualLayoutMode),
+                defaultValue: DataGridVisualLayoutMode.Nested);
+
+        /// <summary>
+        /// Gets or sets how realized rows and cells are attached to the visual tree.
+        /// </summary>
+        /// <remarks>
+        /// <see cref="DataGridVisualLayoutMode.Nested"/> is the compatibility default.
+        /// <see cref="DataGridVisualLayoutMode.Flat"/> and
+        /// <see cref="DataGridVisualLayoutMode.Virtualized"/> require a matching flat row
+        /// theme, a finite <see cref="RowHeight"/>, and non-auto column widths.
+        /// </remarks>
+        public DataGridVisualLayoutMode VisualLayoutMode
+        {
+            get { return GetValue(VisualLayoutModeProperty); }
+            set { SetValue(VisualLayoutModeProperty, value); }
         }
 
         /// <summary>
@@ -1268,7 +1291,7 @@ internal
         DataGridCellInfo CurrentCell
         {
             get => _currentCell;
-            set => SetCurrentCell(value);
+            set => TrySetCurrentCell(value);
         }
 
         /// <summary>

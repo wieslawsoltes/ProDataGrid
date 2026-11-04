@@ -1,10 +1,15 @@
 using System;
+using System.Collections;
 using System.Linq;
+using System.Reflection;
+using Avalonia;
 using Avalonia.Controls;
+using Avalonia.Controls.Primitives;
 using Avalonia.Diagnostics.Generated;
 using Avalonia.Diagnostics.ViewModels;
 using Avalonia.Diagnostics.Views;
 using Avalonia.Headless.XUnit;
+using Avalonia.Layout;
 using Avalonia.VisualTree;
 using Xunit;
 
@@ -108,4 +113,68 @@ public sealed class SourceGenerationMigrationTests
             window.Close();
         }
     }
+
+    [AvaloniaFact]
+    public void Tree_column_grows_and_exposes_horizontal_scroll_after_descendants_expand()
+    {
+        var root = new StackPanel { Name = "Root" };
+        root.Children.Add(new DiagnosticTreeElementWithAnIntentionallyLongTypeNameForHorizontalOverflow());
+
+        var mainViewModel = new MainViewModel(root);
+        var treeViewModel = Assert.IsType<TreePageViewModel>(
+            mainViewModel.GetContent(DevToolsViewKind.CombinedTree));
+        var view = new TreePageTreeView { DataContext = treeViewModel };
+        var window = new MainWindow
+        {
+            DataContext = mainViewModel,
+            Content = view,
+            // Keep the long descendant wider than the viewport with real font metrics.
+            Width = 320,
+            Height = 600
+        };
+
+        try
+        {
+            window.Show();
+            window.UpdateLayout();
+
+            Control grid = view.FindControl<Control>("tree")!;
+            object column = Assert.Single(
+                ((IEnumerable)GetRuntimeProperty(grid, "Columns")).Cast<object>());
+            object width = GetRuntimeProperty(column, "Width");
+            Assert.True((bool)GetRuntimeProperty(width, "IsSizeToCells"));
+            double collapsedWidth = (double)GetRuntimeProperty(column, "ActualWidth");
+
+            treeViewModel.Nodes[0].IsExpanded = true;
+            window.UpdateLayout();
+
+            object presenter = Assert.Single(
+                view.GetVisualDescendants(),
+                static visual => visual.GetType().FullName == "Avalonia.Controls.Primitives.DataGridRowsPresenter");
+            double expandedWidth = (double)GetRuntimeProperty(column, "ActualWidth");
+            var scrollable = Assert.IsAssignableFrom<Avalonia.Controls.Primitives.ILogicalScrollable>(presenter);
+            Size viewport = scrollable.Viewport;
+            Size extent = scrollable.Extent;
+
+            Assert.True(
+                expandedWidth > collapsedWidth,
+                $"Expected the column to grow from {collapsedWidth}, but it remained {expandedWidth}; viewport={viewport.Width}, extent={extent.Width}.");
+            Assert.True(expandedWidth > viewport.Width);
+            Assert.True(extent.Width > viewport.Width);
+            Assert.Contains(
+                view.GetVisualDescendants().OfType<ScrollBar>(),
+                static scrollBar => scrollBar.Orientation == Orientation.Horizontal && scrollBar.IsVisible);
+        }
+        finally
+        {
+            window.Close();
+        }
+    }
+
+    private static object GetRuntimeProperty(object instance, string propertyName) =>
+        instance.GetType()
+            .GetProperty(propertyName, BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic)!
+            .GetValue(instance)!;
+
+    private sealed class DiagnosticTreeElementWithAnIntentionallyLongTypeNameForHorizontalOverflow : Control;
 }

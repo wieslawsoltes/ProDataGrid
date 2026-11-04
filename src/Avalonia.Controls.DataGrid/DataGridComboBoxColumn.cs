@@ -6,6 +6,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Globalization;
 using Avalonia.Collections;
 using Avalonia.Controls.Primitives;
 using Avalonia.Controls.DataGridEditing;
@@ -31,7 +32,9 @@ public
 #else
 internal
 #endif
-    class DataGridComboBoxColumn : DataGridColumn
+    class DataGridComboBoxColumn : DataGridColumn,
+        IDataGridDrawnCellValueProvider,
+        IDataGridDrawnCellValueChangeTracking
     {
         private BindingBase _selectedItemBinding;
         private BindingBase _selectedValueBinding;
@@ -431,6 +434,44 @@ internal
                 base.RefreshCellContent(element, propertyName);
             }
         }
+
+        internal override bool SupportsVirtualCellSurface =>
+            GetType() == typeof(DataGridComboBoxColumn) &&
+            IsEditable &&
+            SelectedItemBinding == null &&
+            SelectedValueBinding == null &&
+            BindingCloneHelper.SupportsDirectTextDataContextRead(TextBinding) &&
+            DataGridColumnMetadata.GetValueAccessor(this) is IDataGridColumnTextAccessor;
+
+        object IDataGridDrawnCellValueProvider.GetDrawnCellValue(object item)
+        {
+            var accessor = DataGridColumnMetadata.GetValueAccessor(this) as IDataGridColumnTextAccessor;
+            if (accessor == null || item == null)
+            {
+                return null;
+            }
+
+            var culture = BindingCloneHelper.GetConverterCulture(TextBinding) ?? CultureInfo.CurrentCulture;
+            return accessor.TryGetText(
+                item,
+                BindingCloneHelper.GetConverter(TextBinding),
+                BindingCloneHelper.GetConverterParameter(TextBinding),
+                BindingCloneHelper.GetStringFormat(TextBinding),
+                culture,
+                culture,
+                out var text)
+                ? text
+                : null;
+        }
+
+        bool IDataGridDrawnCellValueChangeTracking.TrackDrawnCellValueChanges => true;
+
+        internal TextAlignment GetTextAlignment() => HorizontalContentAlignment switch
+        {
+            HorizontalAlignment.Center => TextAlignment.Center,
+            HorizontalAlignment.Right => TextAlignment.Right,
+            _ => TextAlignment.Left,
+        };
 
         /// <inheritdoc />
         protected override void OnPropertyChanged(AvaloniaPropertyChangedEventArgs change)

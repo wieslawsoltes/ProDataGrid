@@ -40,33 +40,48 @@ namespace Avalonia.Controls
             activity?.SetTag(DataGridDiagnostics.Tags.RowIndex, rowIndex);
             activity?.SetTag(DataGridDiagnostics.Tags.Slot, slot);
             string source = null;
-            DataGridRow dataGridRow = GetGeneratedRow(dataContext);
+            DataGridRow dataGridRow;
             bool isOwnContainer = false;
-            if (dataGridRow != null)
+            using (DataGridDiagnostics.BeginRowGenerateAcquire())
             {
-                source = DataGridDiagnostics.Sources.Existing;
-            }
-
-            if (dataGridRow == null && IsItemItsOwnContainerOverride(dataContext))
-            {
-                dataGridRow = dataContext as DataGridRow;
-                isOwnContainer = dataGridRow != null;
-                if (isOwnContainer)
+                dataGridRow = GetGeneratedRow(dataContext);
+                if (dataGridRow != null)
                 {
-                    source = DataGridDiagnostics.Sources.OwnContainer;
+                    source = DataGridDiagnostics.Sources.Existing;
+                }
+
+                if (dataGridRow == null && IsItemItsOwnContainerOverride(dataContext))
+                {
+                    dataGridRow = dataContext as DataGridRow;
+                    isOwnContainer = dataGridRow != null;
+                    if (isOwnContainer)
+                    {
+                        source = DataGridDiagnostics.Sources.OwnContainer;
+                    }
+                }
+
+                if (dataGridRow == null)
+                {
+                    var recycledRow = DisplayData.GetRecycledRow(dataContext, rowIndex, slot);
+                    source = recycledRow != null
+                        ? DataGridDiagnostics.Sources.Recycled
+                        : DataGridDiagnostics.Sources.New;
+                    dataGridRow = recycledRow ?? CreateRowContainer(dataContext, rowIndex, slot);
                 }
             }
 
-            if (dataGridRow == null)
+            if (dataGridRow != null && !isOwnContainer && source != DataGridDiagnostics.Sources.Existing)
             {
-                var recycledRow = DisplayData.GetRecycledRow();
-                source = recycledRow != null
-                    ? DataGridDiagnostics.Sources.Recycled
-                    : DataGridDiagnostics.Sources.New;
-                dataGridRow = recycledRow ?? new DataGridRow();
+                bool usesDefaultVirtualRowPipeline =
+                    UsesDefaultVirtualRowPipeline &&
+                    dataGridRow.GetType() == typeof(DataGridRow);
+                bool hasLoadingRowHandlers =
+                    usesDefaultVirtualRowPipeline &&
+                    HasLoadingRowHandlers();
                 var previousDataContext = (dataGridRow.RecycledDataContext ?? dataGridRow.DataContext);
+                bool wasRecycled = source == DataGridDiagnostics.Sources.Recycled;
                 var hasPlaceholderTransition =
-                    recycledRow != null &&
+                    wasRecycled &&
                     !ReferenceEquals(previousDataContext, dataContext) &&
                     (ReferenceEquals(dataContext, DataGridCollectionView.NewItemPlaceholder) ||
                      ReferenceEquals(previousDataContext, DataGridCollectionView.NewItemPlaceholder));
@@ -81,55 +96,83 @@ namespace Avalonia.Controls
                     }
                 }
 
-                dataGridRow.Index = rowIndex;
-                dataGridRow.Slot = slot;
-                dataGridRow.OwningGrid = this;
-                dataGridRow.DataContext = dataContext;
-                dataGridRow.IsPlaceholder = ReferenceEquals(dataContext, DataGridCollectionView.NewItemPlaceholder);
-                UpdateRowHeader(dataGridRow);
-                if (RowTheme is {} rowTheme)
+                using (DataGridDiagnostics.BeginRowGenerateBind())
                 {
-                    dataGridRow.SetValue(ThemeProperty, rowTheme, BindingPriority.Template);
-                }
-                CompleteCellsCollection(dataGridRow);
-                PrepareRowForItem(dataGridRow, dataContext);
-
-                // Placeholder transitions clear every cell's Content before DataContext change,
-                // so regenerate all columns (including templates). On a normal recycle, only the
-                // exact built-in columns whose retained content is data-context safe are reused.
-                // Derived/custom columns regenerate because their element generation may depend on
-                // the row item. Direct-provider cells also regenerate when the new item is not
-                // compatible with the provider, allowing the binding fallback to take over.
-                // Reused descendants can retain valid measure state after their DataContext changes;
-                // height-based scrolling may consume the row's DesiredSize before the next layout pass.
-                if (hasPlaceholderTransition)
-                {
-                    foreach (DataGridCell cell in dataGridRow.Cells)
+                    bool needsExplicitHeaderUpdate = dataGridRow.OwningGrid is null;
+                    dataGridRow.Index = rowIndex;
+                    dataGridRow.Slot = slot;
+                    dataGridRow.OwningGrid = this;
+                    dataGridRow.DataContext = dataContext;
+                    dataGridRow.IsPlaceholder = ReferenceEquals(dataContext, DataGridCollectionView.NewItemPlaceholder);
+                    if (!usesDefaultVirtualRowPipeline || needsExplicitHeaderUpdate)
                     {
-                        cell.Content = cell.OwningColumn.GenerateElementInternal(cell, dataContext);
-                        cell.InvalidateMeasureForContentChange();
+                        UpdateRowHeader(dataGridRow);
+                    }
+                    if (RowTheme is {} rowTheme)
+                    {
+                        dataGridRow.SetValue(ThemeProperty, rowTheme, BindingPriority.Template);
                     }
                 }
-                else if (recycledRow != null)
+
+                using (DataGridDiagnostics.BeginRowGeneratePrepare())
                 {
-                    foreach (DataGridCell cell in dataGridRow.Cells)
+                    if (usesDefaultVirtualRowPipeline && !hasLoadingRowHandlers)
                     {
-                        if (ShouldRegenerateRecycledCell(cell, dataContext))
+                        PrepareDefaultVirtualSurfaceRow(dataGridRow, dataContext);
+                    }
+                    else
+                    {
+                        CompleteCellsCollection(dataGridRow);
+                        PrepareRowForItem(dataGridRow, dataContext);
+                    }
+
+                    // Placeholder transitions clear every cell's Content before DataContext change,
+                    // so regenerate all columns (including templates). On a normal recycle, only the
+                    // exact built-in columns whose retained content is data-context safe are reused.
+                    // Derived/custom columns regenerate because their element generation may depend on
+                    // the row item. Direct-provider cells also regenerate when the new item is not
+                    // compatible with the provider, allowing the binding fallback to take over.
+                    // Reused descendants can retain valid measure state after their DataContext changes;
+                    // height-based scrolling may consume the row's DesiredSize before the next layout pass.
+                    if (!usesDefaultVirtualRowPipeline && hasPlaceholderTransition)
+                    {
+                        foreach (DataGridCell cell in dataGridRow.Cells)
                         {
                             cell.Content = cell.OwningColumn.GenerateElementInternal(cell, dataContext);
                             cell.InvalidateMeasureForContentChange();
                         }
-                        else if (double.IsNaN(RowHeight))
+                    }
+                    else if (!usesDefaultVirtualRowPipeline && wasRecycled)
+                    {
+                        foreach (DataGridCell cell in dataGridRow.Cells)
                         {
-                            // Reused descendants can retain the previous item's desired size.
-                            cell.InvalidateMeasureForContentChange();
+                            if (ShouldRegenerateRecycledCell(cell, dataContext))
+                            {
+                                cell.Content = cell.OwningColumn.GenerateElementInternal(cell, dataContext);
+                                cell.InvalidateMeasureForContentChange();
+                            }
+                            else if (double.IsNaN(RowHeight))
+                            {
+                                // Reused descendants can retain the previous item's desired size.
+                                cell.InvalidateMeasureForContentChange();
+                            }
                         }
                     }
+
+                    if (!usesDefaultVirtualRowPipeline)
+                    {
+                        ApplyConditionalFormattingForRow(dataGridRow);
+                    }
+                    dataGridRow.ClearRecyclingState();
+                    if (!usesDefaultVirtualRowPipeline)
+                    {
+                        NotifyPreparedRowCells(dataGridRow);
+                    }
+                    if (!usesDefaultVirtualRowPipeline || hasLoadingRowHandlers)
+                    {
+                        OnLoadingRow(new DataGridRowEventArgs(dataGridRow));
+                    }
                 }
-                ApplyConditionalFormattingForRow(dataGridRow);
-                dataGridRow.ClearRecyclingState();
-                NotifyPreparedRowCells(dataGridRow);
-                OnLoadingRow(new DataGridRowEventArgs(dataGridRow));
             }
             else if (isOwnContainer)
             {
@@ -370,7 +413,13 @@ namespace Avalonia.Controls
 
                 using (DataGridDiagnostics.BeginRowsDisplayElementMeasure())
                 {
-                    row?.InvalidateMeasure();
+                    // Virtual surface rows have a finite, item-independent height and no display
+                    // cells. Preserve a valid recycled-row measurement; any measure-affecting row
+                    // property change still invalidates it through Avalonia's property metadata.
+                    if (row != null && !UsesVirtualCellSurface)
+                    {
+                        row.InvalidateMeasure();
+                    }
                     if (measureDeferred)
                     {
                         AvailableSlotElementRoom -= elementHeight;

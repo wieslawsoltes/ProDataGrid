@@ -319,6 +319,20 @@ internal
                 return false;
             }
 
+            if (DisplayData.HasVirtualScrollingElements &&
+                UsesVirtualCellSurface &&
+                _rowsPresenter != null)
+            {
+                return TryGetLightweightVirtualSelectionBounds(
+                    displayRange,
+                    firstSlot,
+                    lastSlot,
+                    startColumn,
+                    endColumn,
+                    out bounds,
+                    out isFullyVisible);
+            }
+
             int? topSlot = null;
             int? bottomSlot = null;
             for (var slot = firstSlot; slot <= lastSlot; slot++)
@@ -362,6 +376,28 @@ internal
 
             var startCol = startColumn.Index;
             var endCol = endColumn.Index;
+            if (UsesVirtualCellSurface && _rowsPresenter != null &&
+                _rowsPresenter.TryGetVirtualCellBounds(topRow, startColumn, out Rect topLeftBounds) &&
+                _rowsPresenter.TryGetVirtualCellBounds(bottomRow, endColumn, out Rect bottomRightBounds))
+            {
+                Point? topLeftPoint = _rowsPresenter.TranslatePoint(topLeftBounds.TopLeft, _selectionOverlay);
+                Point? bottomRightPoint = _rowsPresenter.TranslatePoint(bottomRightBounds.BottomRight, _selectionOverlay);
+                if (topLeftPoint == null || bottomRightPoint == null)
+                {
+                    return false;
+                }
+
+                bounds = new Rect(topLeftPoint.Value, bottomRightPoint.Value);
+                const double virtualTolerance = 0.5;
+                Rect virtualOverlayBounds = _selectionOverlay.Bounds;
+                isFullyVisible = isVerticallyVisible &&
+                    bounds.Left >= -virtualTolerance &&
+                    bounds.Top >= -virtualTolerance &&
+                    bounds.Right <= virtualOverlayBounds.Width + virtualTolerance &&
+                    bounds.Bottom <= virtualOverlayBounds.Height + virtualTolerance;
+                return bounds.Width > 0d && bounds.Height > 0d;
+            }
+
             if (startCol < 0 || startCol >= topRow.Cells.Count || endCol < 0 || endCol >= bottomRow.Cells.Count)
             {
                 return false;
@@ -393,6 +429,73 @@ internal
 
             isFullyVisible = isVerticallyVisible && isWithinOverlay;
             return bounds.Width > 0 && bounds.Height > 0;
+        }
+
+        private bool TryGetLightweightVirtualSelectionBounds(
+            DataGridCellRange displayRange,
+            int firstSlot,
+            int lastSlot,
+            DataGridColumn startColumn,
+            DataGridColumn endColumn,
+            out Rect bounds,
+            out bool isFullyVisible)
+        {
+            bounds = default;
+            isFullyVisible = false;
+
+            int topSlot = -1;
+            int bottomSlot = -1;
+            int topRowIndex = -1;
+            int bottomRowIndex = -1;
+            for (int slot = firstSlot; slot <= lastSlot; slot++)
+            {
+                if (IsGroupSlot(slot))
+                {
+                    continue;
+                }
+
+                int rowIndex = RowIndexFromSlot(slot);
+                if (rowIndex < displayRange.StartRow || rowIndex > displayRange.EndRow)
+                {
+                    continue;
+                }
+
+                if (topSlot == -1)
+                {
+                    topSlot = slot;
+                    topRowIndex = rowIndex;
+                }
+
+                bottomSlot = slot;
+                bottomRowIndex = rowIndex;
+            }
+
+            if (topSlot == -1 || bottomSlot == -1 ||
+                !_rowsPresenter.TryGetVirtualCellBounds(topSlot, startColumn, out Rect topLeftBounds) ||
+                !_rowsPresenter.TryGetVirtualCellBounds(bottomSlot, endColumn, out Rect bottomRightBounds))
+            {
+                return false;
+            }
+
+            Point? topLeftPoint = _rowsPresenter.TranslatePoint(topLeftBounds.TopLeft, _selectionOverlay);
+            Point? bottomRightPoint = _rowsPresenter.TranslatePoint(bottomRightBounds.BottomRight, _selectionOverlay);
+            if (topLeftPoint == null || bottomRightPoint == null)
+            {
+                return false;
+            }
+
+            bounds = new Rect(topLeftPoint.Value, bottomRightPoint.Value);
+            const double tolerance = 0.5d;
+            Rect overlayBounds = _selectionOverlay.Bounds;
+            bool isVerticallyVisible =
+                topRowIndex == displayRange.StartRow &&
+                bottomRowIndex == displayRange.EndRow;
+            isFullyVisible = isVerticallyVisible &&
+                bounds.Left >= -tolerance &&
+                bounds.Top >= -tolerance &&
+                bounds.Right <= overlayBounds.Width + tolerance &&
+                bounds.Bottom <= overlayBounds.Height + tolerance;
+            return bounds.Width > 0d && bounds.Height > 0d;
         }
     }
 }

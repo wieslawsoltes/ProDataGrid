@@ -11,6 +11,11 @@ internal static partial class DataGridDiagnostics
         public const string MillisecondsUnit = "ms";
         public const string RowsUnit = "{row}";
         public const string ColumnsUnit = "{column}";
+        public const string CellsUnit = "{cell}";
+        public const string ClipsUnit = "{clip}";
+        public const string LinesUnit = "{line}";
+        public const string LayoutsUnit = "{layout}";
+        public const string OperationsUnit = "{operation}";
         public const string SelectionUnit = "{selection}";
 
         public const string DataGridRefreshTimeName = "prodatagrid.refresh.time";
@@ -21,6 +26,30 @@ internal static partial class DataGridDiagnostics
 
         public const string RowsDisplayUpdateTimeName = "prodatagrid.rows.display.update.time";
         public const string RowsDisplayUpdateTimeDescription = "Duration of updating displayed rows during scrolling/virtualization.";
+
+        public const string RowsRetargetEligibilityTimeName = "prodatagrid.rows.retarget.eligibility.time";
+        public const string RowsRetargetEligibilityTimeDescription = "Duration of validating the default virtual-row retarget pipeline and calculating its target range.";
+
+        public const string RowsRetargetValidationTimeName = "prodatagrid.rows.retarget.validation.time";
+        public const string RowsRetargetValidationTimeDescription = "Duration of validating realized rows before an in-place virtual-row retarget.";
+
+        public const string RowsRetargetBindTimeName = "prodatagrid.rows.retarget.bind.time";
+        public const string RowsRetargetBindTimeDescription = "Duration of rebinding and applying state to an in-place virtual-row retarget batch.";
+
+        public const string RowsRetargetApplyTimeName = "prodatagrid.rows.retarget.apply.time";
+        public const string RowsRetargetApplyTimeDescription = "Duration of applying item, index, slot, validation, and selection state to a validated virtual-row retarget batch.";
+
+        public const string RowsRetargetChildIndexTimeName = "prodatagrid.rows.retarget.child-index.time";
+        public const string RowsRetargetChildIndexTimeDescription = "Duration of invalidating logical child indexes after a virtual-row retarget batch.";
+
+        public const string RowsRetargetLayoutValidityTimeName = "prodatagrid.rows.retarget.layout-validity.time";
+        public const string RowsRetargetLayoutValidityTimeDescription = "Duration of validating measure and arrange state after a virtual-row retarget batch.";
+
+        public const string RowsRetargetMeasureReusedCountName = "prodatagrid.rows.retarget.measure.reused.count";
+        public const string RowsRetargetMeasureReusedCountDescription = "Number of retargeted rows whose validated fixed-height measure geometry was reused.";
+
+        public const string RowsRetargetArrangeReusedCountName = "prodatagrid.rows.retarget.arrange.reused.count";
+        public const string RowsRetargetArrangeReusedCountDescription = "Number of retargeted rows whose unchanged arrangement geometry was reused.";
 
         public const string RowsPresenterViewportChangedTimeName = "prodatagrid.rows.presenter.viewport.changed.time";
         public const string RowsPresenterViewportChangedTimeDescription = "Duration of handling a rows presenter viewport change notification.";
@@ -55,8 +84,65 @@ internal static partial class DataGridDiagnostics
         public const string RowArrangeTimeName = "prodatagrid.row.arrange.time";
         public const string RowArrangeTimeDescription = "Duration of arranging a DataGrid row.";
 
+        public const string VirtualSurfaceRenderTimeName = "prodatagrid.virtual.surface.render.time";
+        public const string VirtualSurfaceRenderTimeDescription = "Duration of recording one virtual cell surface render pass.";
+
+        public const string VirtualSurfaceRenderedRowsCountName = "prodatagrid.virtual.surface.rendered.rows.count";
+        public const string VirtualSurfaceRenderedRowsCountDescription = "Number of visible rows recorded by the virtual cell surface.";
+
+        public const string VirtualSurfaceRenderedCellsCountName = "prodatagrid.virtual.surface.rendered.cells.count";
+        public const string VirtualSurfaceRenderedCellsCountDescription = "Number of visible cells recorded by the virtual cell surface.";
+
+        public const string VirtualSurfaceClipCountName = "prodatagrid.virtual.surface.clip.count";
+        public const string VirtualSurfaceClipCountDescription = "Number of partial-cell clip scopes recorded by the virtual cell surface.";
+
+        public const string VirtualSurfaceVerticalGridLineCountName = "prodatagrid.virtual.surface.vertical-grid-line.count";
+        public const string VirtualSurfaceVerticalGridLineCountDescription = "Number of vertical grid-line draw operations recorded by the virtual cell surface.";
+
+        public const string VirtualSurfaceTextLayoutCacheHitCountName = "prodatagrid.virtual.surface.text-layout.cache-hit.count";
+        public const string VirtualSurfaceTextLayoutCacheHitCountDescription = "Number of virtual cell text layouts reused from the cache.";
+
+        public const string VirtualSurfaceTextLayoutCacheMissCountName = "prodatagrid.virtual.surface.text-layout.cache-miss.count";
+        public const string VirtualSurfaceTextLayoutCacheMissCountDescription = "Number of virtual cell text layouts created after a cache miss.";
+
+        public const string VirtualSurfaceTextDrawOperationCountName = "prodatagrid.virtual.surface.text.draw-operation.count";
+        public const string VirtualSurfaceTextDrawOperationCountDescription = "Number of text scene operations recorded by the virtual cell surface.";
+
+        public const string VirtualSurfaceTextGlyphRunCountName = "prodatagrid.virtual.surface.text.glyph-run.count";
+        public const string VirtualSurfaceTextGlyphRunCountDescription = "Number of immutable text glyph runs referenced by the virtual cell surface.";
+
+        public const string VirtualSurfaceExpanderDrawOperationCountName = "prodatagrid.virtual.surface.expander.draw-operation.count";
+        public const string VirtualSurfaceExpanderDrawOperationCountDescription = "Number of expander drawing operations recorded by the virtual cell surface.";
+
+        public const string VirtualSurfaceValueCacheHitCountName = "prodatagrid.virtual.surface.value-cache.hit.count";
+        public const string VirtualSurfaceValueCacheHitCountDescription = "Number of visible cell values reused from overlapping lightweight virtual rows.";
+
+        public const string VirtualSurfaceValueCacheMissCountName = "prodatagrid.virtual.surface.value-cache.miss.count";
+        public const string VirtualSurfaceValueCacheMissCountDescription = "Number of visible cell values resolved or formatted for new or invalidated lightweight virtual rows.";
+
         public const string RowGenerateTimeName = "prodatagrid.rows.generate.time";
         public const string RowGenerateTimeDescription = "Duration of row generation and preparation.";
+
+        public const string RowGenerateAcquireTimeName = "prodatagrid.rows.generate.acquire.time";
+        public const string RowGenerateAcquireTimeDescription = "Duration of locating, recycling, or creating a row container.";
+
+        public const string RowGenerateBindTimeName = "prodatagrid.rows.generate.bind.time";
+        public const string RowGenerateBindTimeDescription = "Duration of assigning a row container to its item and display slot.";
+
+        public const string RowGeneratePrepareTimeName = "prodatagrid.rows.generate.prepare.time";
+        public const string RowGeneratePrepareTimeDescription = "Duration of preparing row cells, state, and lifecycle notifications.";
+
+        public const string RowRecycleTimeName = "prodatagrid.rows.recycle.time";
+        public const string RowRecycleTimeDescription = "Duration of cleaning, detaching, hiding, and pooling a row container.";
+
+        public const string RowRecycleCleanupTimeName = "prodatagrid.rows.recycle.cleanup.time";
+        public const string RowRecycleCleanupTimeDescription = "Duration of row cleanup notifications and state reset before recycling.";
+
+        public const string RowRecycleDetachTimeName = "prodatagrid.rows.recycle.detach.time";
+        public const string RowRecycleDetachTimeDescription = "Duration of detaching and hiding a recycled row container.";
+
+        public const string RowRecyclePoolTimeName = "prodatagrid.rows.recycle.pool.time";
+        public const string RowRecyclePoolTimeDescription = "Duration of selecting and updating the row recycle pool.";
 
         public const string RowsDisplayElementInsertTimeName = "prodatagrid.rows.display.element.insert.time";
         public const string RowsDisplayElementInsertTimeDescription = "Duration of inserting one element into the displayed-row window.";
@@ -102,6 +188,9 @@ internal static partial class DataGridDiagnostics
 
         public const string RowsRecycledCountName = "prodatagrid.rows.recycled.count";
         public const string RowsRecycledCountDescription = "Number of row containers recycled by the DataGrid.";
+
+        public const string RowsRetargetedCountName = "prodatagrid.rows.retargeted.count";
+        public const string RowsRetargetedCountDescription = "Number of default virtual-surface rows rebound in place without pool recycling.";
 
         public const string RowsPreparedCountName = "prodatagrid.rows.prepared.count";
         public const string RowsPreparedCountDescription = "Number of row containers prepared by the DataGrid.";
@@ -196,5 +285,6 @@ internal static partial class DataGridDiagnostics
         public const string New = "new";
         public const string Recycled = "recycled";
         public const string OwnContainer = "own-container";
+        public const string Retargeted = "retargeted";
     }
 }

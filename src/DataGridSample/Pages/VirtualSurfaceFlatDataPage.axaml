@@ -1,0 +1,117 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:behaviors="clr-namespace:DataGridSample.Behaviors"
+             xmlns:models="clr-namespace:DataGridSample.Models"
+             xmlns:viewModels="clr-namespace:DataGridSample.ViewModels"
+             x:Class="DataGridSample.Pages.VirtualSurfaceFlatDataPage"
+             x:DataType="viewModels:OptimizedFlatCellPathsViewModel"
+             behaviors:DataContextFactoryBehavior.Factory="{StaticResource ViewModelFactory}">
+  <UserControl.Resources>
+    <viewModels:OptimizedFlatCellPathsViewModelFactory x:Key="ViewModelFactory" />
+  </UserControl.Resources>
+
+  <Grid Margin="12" RowDefinitions="Auto,Auto,Auto,Auto,*" RowSpacing="8">
+    <StackPanel Spacing="3">
+      <TextBlock Classes="h2" Text="Virtual Cell Surface — Flat Data" />
+      <TextBlock TextWrapping="Wrap"
+                 Text="The fastest fixed-height architecture with model-driven selection, editing, sorting, filtering, and search. Click a header to sort, click a cell or press F2 to edit, and use the explicit apply buttons for large workloads." />
+    </StackPanel>
+
+    <StackPanel Grid.Row="1" Spacing="6">
+      <WrapPanel Orientation="Horizontal">
+        <TextBlock Margin="0,0,6,0" VerticalAlignment="Center" Text="Surface mode" />
+        <ComboBox Width="270" Margin="0,0,14,0"
+                  ItemsSource="{CompiledBinding VirtualModes}"
+                  SelectedItem="{CompiledBinding SelectedVirtualMode, Mode=TwoWay}">
+          <ComboBox.ItemTemplate>
+            <DataTemplate x:DataType="models:VirtualSurfaceModeOption">
+              <TextBlock Text="{CompiledBinding Name}" />
+            </DataTemplate>
+          </ComboBox.ItemTemplate>
+        </ComboBox>
+        <TextBlock Margin="0,0,6,0" VerticalAlignment="Center" Text="Rows" />
+        <NumericUpDown Width="125" Margin="0,0,8,0" Minimum="1000" Maximum="1000000"
+                       Increment="25000" Value="{CompiledBinding TargetRowCount, Mode=TwoWay}" />
+        <Button Margin="0,0,8,0" Content="Load workload"
+                Command="{CompiledBinding LoadRepresentativeWorkloadCommand}" />
+      </WrapPanel>
+      <WrapPanel Orientation="Horizontal">
+        <Button Margin="0,0,6,0" Content="First" Command="{CompiledBinding JumpToFirstCommand}" />
+        <Button Margin="0,0,6,0" Content="Middle" Command="{CompiledBinding JumpToMiddleCommand}" />
+        <Button Margin="0,0,14,0" Content="Last" Command="{CompiledBinding JumpToLastCommand}" />
+        <Button Margin="0,0,8,0" Content="Refresh heap"
+                Command="{CompiledBinding RefreshManagedMemoryCommand}" />
+      </WrapPanel>
+    </StackPanel>
+
+    <StackPanel Grid.Row="2" Spacing="6">
+      <WrapPanel Orientation="Horizontal">
+        <TextBlock Margin="0,0,6,0" VerticalAlignment="Center" Text="Search" />
+        <TextBox Width="190" Margin="0,0,6,0"
+                 PlaceholderText="Visible columns"
+                 Text="{CompiledBinding Operations.SearchQuery, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+        <Button Margin="0,0,6,0" Content="Apply" Command="{CompiledBinding Operations.ApplySearchCommand}" />
+        <Button Margin="0,0,6,0" Content="Clear" Command="{CompiledBinding Operations.ClearSearchCommand}" />
+        <Button Margin="0,0,6,0" Content="Previous" Command="{CompiledBinding Operations.PreviousSearchResultCommand}" />
+        <Button Margin="0,0,14,0" Content="Next" Command="{CompiledBinding Operations.NextSearchResultCommand}" />
+        <CheckBox Margin="0,0,8,0" VerticalAlignment="Center"
+                  Content="Highlight matches (retained fallback)"
+                  IsChecked="{CompiledBinding Operations.SearchHighlightingEnabled, Mode=TwoWay}" />
+      </WrapPanel>
+      <WrapPanel Orientation="Horizontal">
+        <TextBlock Margin="0,0,6,0" VerticalAlignment="Center" Text="Owner contains" />
+        <TextBox Width="120" Margin="0,0,6,0"
+                 PlaceholderText="Atlas"
+                 Text="{CompiledBinding Operations.OwnerFilterText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+        <Button Margin="0,0,6,0" Content="Filter" Command="{CompiledBinding Operations.ApplyOwnerFilterCommand}" />
+        <Button Margin="0,0,14,0" Content="Clear filter" Command="{CompiledBinding Operations.ClearOwnerFilterCommand}" />
+        <Button Margin="0,0,8,0" Content="Clear sorting" Command="{CompiledBinding Operations.ClearSortingCommand}" />
+      </WrapPanel>
+    </StackPanel>
+
+    <Border Name="StatusPanel" Grid.Row="3" Padding="10,8" Background="#08000000" CornerRadius="5">
+      <Grid ColumnDefinitions="Auto,*" RowDefinitions="Auto,Auto,Auto" ColumnSpacing="14">
+        <TextBlock FontWeight="SemiBold" Text="Visual layout: rowless virtual cell surface" />
+        <TextBlock Grid.Column="1" Text="{CompiledBinding SelectedVirtualMode.ExpectedBackend}" />
+        <TextBlock Grid.Row="1" Grid.ColumnSpan="2" Margin="0,4,0,0" TextWrapping="Wrap"
+                   Text="{CompiledBinding SelectedVirtualMode.Description}" />
+        <TextBlock Grid.Row="2" Grid.ColumnSpan="2" Margin="0,4,0,0" TextWrapping="Wrap"
+                   Text="{CompiledBinding Operations.RenderingSummary}" />
+      </Grid>
+    </Border>
+
+    <Grid Grid.Row="4" RowDefinitions="Auto,*" RowSpacing="8">
+      <WrapPanel Name="SummaryPanel" Orientation="Horizontal">
+        <TextBlock Text="{CompiledBinding Summary}" />
+        <TextBlock Margin="14,0,0,0" Text="{CompiledBinding ManagedMemorySummary}" />
+        <TextBlock Margin="14,0,0,0" Text="{CompiledBinding Operations.OperationSummary}" />
+      </WrapPanel>
+
+      <DataGrid Name="VirtualSurfaceGrid"
+                Grid.Row="1"
+                AutomationProperties.Name="Virtual cell surface flat-data workload grid"
+                Theme="{StaticResource DataGridFlatTheme}"
+                VisualLayoutMode="Virtualized"
+                AutoGenerateColumns="False"
+                AutoScrollToSelectedItem="True"
+                CanUserReorderColumns="False"
+                CanUserResizeColumns="False"
+                CanUserSortColumns="True"
+                ColumnDefinitionsSource="{CompiledBinding ActiveVirtualColumns}"
+                FastPathOptions="{CompiledBinding Operations.FastPathOptions}"
+                FilteringModel="{CompiledBinding Operations.FilteringModel}"
+                GridLinesVisibility="Horizontal"
+                HeadersVisibility="Column"
+                IsReadOnly="False"
+                ItemsSource="{CompiledBinding Items}"
+                RowHeight="32"
+                SearchModel="{CompiledBinding Operations.SearchModel}"
+                Selection="{CompiledBinding SelectionModel}"
+                SelectedItem="{CompiledBinding SelectedItem, Mode=TwoWay}"
+                SelectionMode="Single"
+                SelectionUnit="FullRow"
+                SortingModel="{CompiledBinding Operations.SortingModel}"
+                UseLogicalScrollable="True" />
+    </Grid>
+  </Grid>
+</UserControl>

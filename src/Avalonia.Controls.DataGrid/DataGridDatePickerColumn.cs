@@ -4,7 +4,9 @@
 #nullable disable
 
 using System;
+using System.Globalization;
 using Avalonia.Collections;
+using Avalonia.Controls.Utils;
 using Avalonia.Controls.DataGridEditing;
 using Avalonia.Data;
 using Avalonia.Input;
@@ -24,7 +26,7 @@ public
 #else
 internal
 #endif
-    class DataGridDatePickerColumn : DataGridBoundColumn
+    class DataGridDatePickerColumn : DataGridBoundColumn, IDataGridDrawnCellValueProvider
     {
         private readonly Lazy<ControlTheme> _cellDatePickerTheme;
         private readonly Lazy<ControlTheme> _cellTextBlockTheme;
@@ -385,13 +387,7 @@ internal
         {
             if (IsSet(HorizontalContentAlignmentProperty))
             {
-                textBlock.TextAlignment = HorizontalContentAlignment switch
-                {
-                    HorizontalAlignment.Left => TextAlignment.Left,
-                    HorizontalAlignment.Center => TextAlignment.Center,
-                    HorizontalAlignment.Right => TextAlignment.Right,
-                    _ => TextAlignment.Left
-                };
+                textBlock.TextAlignment = GetTextAlignment();
             }
             else
             {
@@ -402,6 +398,43 @@ internal
                 ? VerticalContentAlignment
                 : VerticalAlignment.Center;
         }
+
+        internal override bool SupportsVirtualCellSurface
+        {
+            get
+            {
+                if (GetType() != typeof(DataGridDatePickerColumn) ||
+                    !BindingCloneHelper.SupportsDirectRawDataContextRead(Binding))
+                {
+                    return false;
+                }
+
+                IDataGridColumnValueAccessor accessor = DataGridColumnMetadata.GetValueAccessor(this);
+                if (accessor is null)
+                {
+                    return false;
+                }
+
+                Type valueType = Nullable.GetUnderlyingType(accessor.ValueType) ?? accessor.ValueType;
+                return valueType == typeof(DateTime);
+            }
+        }
+
+        object IDataGridDrawnCellValueProvider.GetDrawnCellValue(object item)
+        {
+            object value = DataGridColumnMetadata.GetValueAccessor(this)?.GetValue(item);
+            return value is DateTime date
+                ? date.ToString(GetDateFormatString(), CultureInfo.CurrentCulture)
+                : null;
+        }
+
+        internal TextAlignment GetTextAlignment() => HorizontalContentAlignment switch
+        {
+            HorizontalAlignment.Left => TextAlignment.Left,
+            HorizontalAlignment.Center => TextAlignment.Center,
+            HorizontalAlignment.Right => TextAlignment.Right,
+            _ => TextAlignment.Left
+        };
 
         private ControlTheme GetThemeValue(Lazy<ControlTheme> themeCache)
         {

@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.ObjectModel;
+using System.Globalization;
 using Avalonia.Controls;
 using Avalonia.Controls.Primitives;
 using Avalonia.Data;
@@ -87,6 +88,69 @@ public class DataGridSliderColumnHeadlessTests
         Assert.Equal(100, column.Maximum);
     }
 
+    [AvaloniaFact]
+    public void SliderColumn_Virtual_Value_Uses_ValueTextFormat()
+    {
+        var column = new DataGridSliderColumn
+        {
+            ShowValueText = true,
+            ValueTextFormat = "{0:0.0}",
+            Binding = new Binding(nameof(SliderItem.Rating))
+            {
+                StringFormat = "ignored: {0}",
+            },
+        };
+        DataGridColumnMetadata.SetValueAccessor(
+            column,
+            new DataGridColumnValueAccessor<SliderItem, double>(item => item.Rating));
+
+        Assert.True(column.SupportsVirtualCellSurface);
+        Assert.Equal(
+            4.5.ToString("0.0", CultureInfo.CurrentCulture),
+            ((IDataGridDrawnCellValueProvider)column).GetDrawnCellValue(
+                new SliderItem { Rating = 4.5 }));
+    }
+
+    [AvaloniaFact]
+    public void SliderColumn_Virtual_Surface_Requires_Text_Display_And_Direct_Typed_Access()
+    {
+        var column = new DataGridSliderColumn
+        {
+            Binding = new Binding(nameof(SliderItem.Rating)),
+        };
+
+        Assert.False(column.SupportsVirtualCellSurface);
+
+        column.ShowValueText = true;
+        Assert.False(column.SupportsVirtualCellSurface);
+
+        DataGridColumnMetadata.SetValueAccessor(
+            column,
+            new DataGridColumnValueAccessor<SliderItem, double>(item => item.Rating));
+        Assert.True(column.SupportsVirtualCellSurface);
+
+        column.Binding = DataGridBindingDefinition
+            .Create<SliderItem, double>(item => item.Rating)
+            .CreateBinding();
+        Assert.True(column.SupportsVirtualCellSurface);
+
+        column.Binding = new Binding(nameof(SliderItem.Rating))
+        {
+            Source = new SliderItem(),
+        };
+        Assert.False(column.SupportsVirtualCellSurface);
+
+        var derived = new DerivedSliderColumn
+        {
+            ShowValueText = true,
+            Binding = new Binding(nameof(SliderItem.Rating)),
+        };
+        DataGridColumnMetadata.SetValueAccessor(
+            derived,
+            new DataGridColumnValueAccessor<SliderItem, double>(item => item.Rating));
+        Assert.False(derived.SupportsVirtualCellSurface);
+    }
+
     private static (Window window, DataGrid grid) CreateWindow(SliderTestViewModel vm, bool showValueText = false)
     {
         var window = new Window
@@ -151,5 +215,9 @@ public class DataGridSliderColumnHeadlessTests
     {
         public string Name { get; set; } = string.Empty;
         public double Rating { get; set; }
+    }
+
+    private sealed class DerivedSliderColumn : DataGridSliderColumn
+    {
     }
 }

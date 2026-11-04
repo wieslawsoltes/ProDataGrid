@@ -1,4 +1,4 @@
-// This source is subject to the Microsoft Public License (Ms-PL).
+﻿// This source is subject to the Microsoft Public License (Ms-PL).
 // Please see http://go.microsoft.com/fwlink/?LinkID=131993 for details.
 // All other rights reserved.
 
@@ -89,7 +89,8 @@ internal
                 Debug.Assert(CurrentSlot < SlotCount);
 
                 if (!IsInnerCellOutOfBounds(oldCurrentCell.ColumnIndex, oldCurrentCell.Slot) &&
-                    IsSlotVisible(oldCurrentCell.Slot))
+                    IsSlotVisible(oldCurrentCell.Slot) &&
+                    !DisplayData.HasVirtualScrollingElements)
                 {
                     oldDisplayedElement = DisplayData.GetDisplayedElement(oldCurrentCell.Slot);
                 }
@@ -166,7 +167,14 @@ internal
                 Debug.Assert(CurrentSlot < SlotCount);
                 if (IsSlotVisible(CurrentSlot))
                 {
-                    UpdateCurrentState(DisplayData.GetDisplayedElement(CurrentSlot), CurrentColumnIndex, applyCellState: true);
+                    if (DisplayData.HasVirtualScrollingElements)
+                    {
+                        _rowsPresenter?.InvalidateVirtualCellSurface();
+                    }
+                    else
+                    {
+                        UpdateCurrentState(DisplayData.GetDisplayedElement(CurrentSlot), CurrentColumnIndex, applyCellState: true);
+                    }
                 }
             }
 
@@ -242,11 +250,12 @@ internal
                 {
                     row.ApplyHeaderStatus();
                 }
-                DataGridCell cell = row.Cells[columnIndex];
-                if (applyCellState)
+                if (!UsesVirtualCellSurface && applyCellState)
                 {
-                    cell.UpdatePseudoClasses();
+                    row.Cells[columnIndex].UpdatePseudoClasses();
                 }
+
+                _rowsPresenter?.InvalidateVirtualCellSurface();
             }
             else if (displayedElement is DataGridRowGroupHeader groupHeader)
             {
@@ -303,14 +312,23 @@ internal
             remove => RemoveHandler(CurrentCellChangedEvent, value);
         }
 
-        private void SetCurrentCell(DataGridCellInfo cellInfo)
+        /// <summary>
+        /// Moves the current cell, optionally preserving the existing selection.
+        /// </summary>
+        /// <param name="cellInfo">The target cell, or <see cref="DataGridCellInfo.Unset"/> to clear the current cell.</param>
+        /// <param name="updateSelection">Whether the target cell also becomes selected.</param>
+        /// <returns>True if the current cell was accepted; otherwise, false.</returns>
+        /// <exception cref="ArgumentException">The target column belongs to another grid.</exception>
+        /// <exception cref="InvalidOperationException">The target column is hidden.</exception>
+        public bool TrySetCurrentCell(DataGridCellInfo cellInfo, bool updateSelection = true)
         {
             if (_currentCell.Equals(cellInfo) &&
                 _currentCell.RowIndex == cellInfo.RowIndex &&
                 _currentCell.ColumnIndex == cellInfo.ColumnIndex &&
-                _currentCell.IsValid == cellInfo.IsValid)
+                _currentCell.IsValid == cellInfo.IsValid &&
+                (!updateSelection || !cellInfo.IsValid || GetRowSelection(CurrentSlot)))
             {
-                return;
+                return true;
             }
 
             if (!cellInfo.IsValid)
@@ -318,27 +336,29 @@ internal
                 using var origin = BeginSelectionChangeScope(DataGridSelectionChangeSource.Programmatic);
                 if (!TryPreviewCurrentCell(DataGridCellInfo.Unset))
                 {
-                    return;
+                    return false;
                 }
 
                 using var commit = BeginSelectionCommit();
                 NoCurrentCellChangeCount++;
                 try
                 {
-                    ResetCurrentCellCore();
+                    return ResetCurrentCellCore();
                 }
                 finally
                 {
                     NoCurrentCellChangeCount--;
                 }
 
-                return;
             }
 
             if (TryResolveCurrentCellCoordinates(cellInfo, out var columnIndex, out var slot))
             {
-                UpdateSelectionAndCurrency(columnIndex, slot, DataGridSelectionAction.SelectCurrent, scrollIntoView: true);
+                var action = updateSelection ? DataGridSelectionAction.SelectCurrent : DataGridSelectionAction.None;
+                return UpdateSelectionAndCurrency(columnIndex, slot, action, scrollIntoView: true);
             }
+
+            return false;
         }
 
         private bool TryResolveCurrentCellCoordinates(DataGridCellInfo cellInfo, out int columnIndex, out int slot)

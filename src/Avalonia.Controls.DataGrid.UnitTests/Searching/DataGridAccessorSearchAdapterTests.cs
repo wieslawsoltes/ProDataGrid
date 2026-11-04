@@ -373,6 +373,73 @@ public class DataGridAccessorSearchAdapterTests
     }
 
     [AvaloniaFact]
+    public void AccessorAdapter_HighPerformanceSearch_Remaps_Results_For_Sort_Without_Rescanning_Text()
+    {
+        var items = new[]
+        {
+            new Person("Beta"),
+            new Person("Alpha"),
+            new Person("Beta")
+        };
+        var view = new DataGridCollectionView(items);
+        var model = new SearchModel();
+        var column = new DataGridTextColumn();
+        var textAccessor = new TextAccessor();
+        DataGridColumnMetadata.SetValueAccessor(column, textAccessor);
+        var options = new DataGridFastPathOptions
+        {
+            EnableHighPerformanceSearching = true,
+            HighPerformanceSearchTrackItemChanges = false
+        };
+        var adapter = new DataGridAccessorSearchAdapter(model, () => new[] { column }, options);
+        adapter.AttachView(view);
+
+        model.SetOrUpdate(new SearchDescriptor("Beta", comparison: StringComparison.OrdinalIgnoreCase));
+        int initialTextCalls = textAccessor.TextCalls;
+
+        view.SortDescriptions.Add(DataGridSortDescription.FromAccessor(
+            new DataGridColumnValueAccessor<Person, string>(person => person.Name),
+            ListSortDirection.Ascending));
+        Dispatcher.UIThread.RunJobs();
+
+        Assert.Equal(initialTextCalls, textAccessor.TextCalls);
+        Assert.Equal(new[] { 1, 2 }, model.Results.Select(result => result.RowIndex).ToArray());
+        Assert.All(model.Results, result => Assert.Equal("Beta", result.Text));
+    }
+
+    [AvaloniaFact]
+    public void AccessorAdapter_HighPerformanceSearch_Rescans_For_Filter_Reset()
+    {
+        var items = new[]
+        {
+            new Person("Beta"),
+            new Person("Alpha"),
+            new Person("Beta")
+        };
+        var view = new DataGridCollectionView(items);
+        var model = new SearchModel();
+        var column = new DataGridTextColumn();
+        var textAccessor = new TextAccessor();
+        DataGridColumnMetadata.SetValueAccessor(column, textAccessor);
+        var options = new DataGridFastPathOptions
+        {
+            EnableHighPerformanceSearching = true,
+            HighPerformanceSearchTrackItemChanges = false
+        };
+        var adapter = new DataGridAccessorSearchAdapter(model, () => new[] { column }, options);
+        adapter.AttachView(view);
+
+        model.SetOrUpdate(new SearchDescriptor("Beta", comparison: StringComparison.OrdinalIgnoreCase));
+        int initialTextCalls = textAccessor.TextCalls;
+
+        view.Filter = item => ((Person)item).Name == "Alpha";
+        Dispatcher.UIThread.RunJobs();
+
+        Assert.True(textAccessor.TextCalls > initialTextCalls);
+        Assert.Empty(model.Results);
+    }
+
+    [AvaloniaFact]
     public void AccessorAdapter_HighPerformanceSearch_Tracks_Item_Changes_When_Enabled()
     {
         var items = new ObservableCollection<MutablePerson>

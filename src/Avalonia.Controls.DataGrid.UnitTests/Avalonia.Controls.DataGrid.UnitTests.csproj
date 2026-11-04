@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>net10.0</TargetFramework>
@@ -56,7 +56,8 @@
 
   <UsingTask TaskName="CoverageReporter.CoverageReportTask" AssemblyFile="$(CoverageReporterTaskPath)" />
 
-  <Target Name="BuildCoverageReporterTask" BeforeTargets="ReportCoverageByFile">
+  <Target Name="BuildCoverageReporterTask" BeforeTargets="ReportCoverageByFile"
+          Condition="'$(CollectCoverage)' == 'true'">
     <MSBuild
       Projects="$(MSBuildProjectDirectory)/../../tools/CoverageReporter/CoverageReporter.csproj"
       Targets="Restore;Build"

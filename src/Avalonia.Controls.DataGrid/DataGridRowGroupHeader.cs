@@ -299,6 +299,11 @@ internal
             }
         }
 
+        internal void SetRecycledBounds(Rect bounds)
+        {
+            Bounds = bounds;
+        }
+
         internal void ApplyHeaderStatus()
         {
             if (_headerElement != null && OwningGrid.AreRowHeadersVisible)

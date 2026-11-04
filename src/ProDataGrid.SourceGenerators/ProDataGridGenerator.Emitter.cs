@@ -4785,6 +4785,16 @@ internal static class Emitter
             return "global::Avalonia.Controls.DataGridLength.Auto";
         }
 
+        if (string.Equals(trimmed, "SizeToCells", StringComparison.OrdinalIgnoreCase))
+        {
+            return "global::Avalonia.Controls.DataGridLength.SizeToCells";
+        }
+
+        if (string.Equals(trimmed, "SizeToHeader", StringComparison.OrdinalIgnoreCase))
+        {
+            return "global::Avalonia.Controls.DataGridLength.SizeToHeader";
+        }
+
         if (trimmed.EndsWith("*", StringComparison.Ordinal))
         {
             string factorText = trimmed.Substring(0, trimmed.Length - 1);

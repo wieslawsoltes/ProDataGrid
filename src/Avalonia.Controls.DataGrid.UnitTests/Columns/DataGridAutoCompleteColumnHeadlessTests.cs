@@ -161,6 +161,66 @@ public class DataGridAutoCompleteColumnHeadlessTests
         Assert.Equal(KeyboardNavigationMode.None, KeyboardNavigation.GetTabNavigation(autoComplete));
     }
 
+    [AvaloniaFact]
+    public void AutoCompleteColumn_Virtual_Value_Uses_Typed_Text_Accessor()
+    {
+        var column = new DataGridAutoCompleteColumn
+        {
+            Binding = new Binding(nameof(AutoCompleteItem.Category))
+            {
+                StringFormat = "Category: {0}",
+            },
+        };
+        DataGridColumnMetadata.SetValueAccessor(
+            column,
+            new DataGridColumnValueAccessor<AutoCompleteItem, string>(item => item.Category));
+        var item = new AutoCompleteItem { Category = "Electronics" };
+
+        Assert.True(column.SupportsVirtualCellSurface);
+        Assert.Equal(
+            "Category: Electronics",
+            ((IDataGridDrawnCellValueProvider)column).GetDrawnCellValue(item));
+
+        item.Category = null!;
+        Assert.Equal(
+            "Category: ",
+            ((IDataGridDrawnCellValueProvider)column).GetDrawnCellValue(item));
+
+        column.Binding = new Binding(nameof(AutoCompleteItem.Category));
+        Assert.Null(((IDataGridDrawnCellValueProvider)column).GetDrawnCellValue(item));
+    }
+
+    [AvaloniaFact]
+    public void AutoCompleteColumn_Virtual_Surface_Requires_Direct_Typed_Text_Access()
+    {
+        var column = new DataGridAutoCompleteColumn
+        {
+            Binding = new Binding(nameof(AutoCompleteItem.Category)),
+        };
+
+        Assert.False(column.SupportsVirtualCellSurface);
+
+        DataGridColumnMetadata.SetValueAccessor(
+            column,
+            new DataGridColumnValueAccessor<AutoCompleteItem, string>(item => item.Category));
+        Assert.True(column.SupportsVirtualCellSurface);
+
+        column.Binding = new Binding(nameof(AutoCompleteItem.Category))
+        {
+            Source = new AutoCompleteItem(),
+        };
+        Assert.False(column.SupportsVirtualCellSurface);
+
+        var derived = new DerivedAutoCompleteColumn
+        {
+            Binding = new Binding(nameof(AutoCompleteItem.Category)),
+        };
+        DataGridColumnMetadata.SetValueAccessor(
+            derived,
+            new DataGridColumnValueAccessor<AutoCompleteItem, string>(item => item.Category));
+        Assert.False(derived.SupportsVirtualCellSurface);
+    }
+
     private static (Window window, DataGrid grid) CreateWindow(AutoCompleteTestViewModel vm)
     {
         var window = new Window
@@ -238,5 +298,9 @@ public class DataGridAutoCompleteColumnHeadlessTests
     {
         public AutoCompleteBox CreateEditingElement(DataGridCell cell, object dataItem) =>
             (AutoCompleteBox)GenerateEditingElementDirect(cell, dataItem);
+    }
+
+    private sealed class DerivedAutoCompleteColumn : DataGridAutoCompleteColumn
+    {
     }
 }

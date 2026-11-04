@@ -27,12 +27,13 @@ namespace ProCharts.Skia
 
         public static void ReturnList<T>(List<T> list)
         {
-            list.Clear();
+            // Do not allocate a replacement backing array on the return path.
             if (list.Capacity > MaxListCapacity)
             {
-                list.Capacity = MaxListCapacity;
+                return;
             }
 
+            list.Clear();
             ListPool<T>.Return(list, MaxListPoolSize);
         }
 

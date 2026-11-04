@@ -673,7 +673,7 @@ internal
 
             // Get a recycled row, but always return it to the pool to avoid
             // leaving visible containers outside DisplayData.
-            var row = OwningGrid.DisplayData.GetRecycledRow();
+            var row = OwningGrid.DisplayData.GetRecycledRow(dataItem, dataIndex, slot);
             if (row == null)
             {
                 return;

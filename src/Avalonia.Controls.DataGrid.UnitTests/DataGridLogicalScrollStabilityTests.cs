@@ -213,6 +213,49 @@ public class DataGridLogicalScrollStabilityTests
         }
     }
 
+    [AvaloniaFact]
+    public void LogicalScrollable_TopLevelWidthChange_KeepsRowsViewportOfEmbeddedGrid()
+    {
+        var root = new Window
+        {
+            Width = 700,
+            Height = 1000,
+        };
+        root.SetThemeStyles();
+        var target = CreateGrid(itemCount: 400, useLogicalScrollable: true);
+        target.Height = 160;
+        target.VerticalAlignment = VerticalAlignment.Top;
+        root.Content = target;
+
+        try
+        {
+            root.Show();
+            root.UpdateLayout();
+            var presenter = GetRowsPresenter(target);
+            var viewportBefore = presenter.Viewport.Height;
+            var lastSlotBefore = target.DisplayData.LastScrollingSlot;
+            Assert.True(
+                viewportBefore > 0 && viewportBefore < 200,
+                $"Expected the rows viewport of a 160 px grid to stay below 200 px. Actual: {viewportBefore}.");
+
+            // Raises the top-level property change the presenter observes; the window height (1000)
+            // must not become the rows viewport of a grid that occupies 160 px of it.
+            root.Width = 900;
+
+            Assert.InRange(Math.Abs(presenter.Viewport.Height - viewportBefore), 0, 0.5);
+            Assert.Equal(lastSlotBefore, target.DisplayData.LastScrollingSlot);
+
+            root.UpdateLayout();
+            presenter = GetRowsPresenter(target);
+            Assert.InRange(Math.Abs(presenter.Viewport.Height - viewportBefore), 0, 0.5);
+            Assert.Equal(lastSlotBefore, target.DisplayData.LastScrollingSlot);
+        }
+        finally
+        {
+            root.Close();
+        }
+    }
+
     private static DataGrid CreateStandaloneTarget(int itemCount, int height, bool useLogicalScrollable)
     {
         var root = new Window

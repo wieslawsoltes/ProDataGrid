@@ -555,6 +555,10 @@ namespace ProCharts.Skia
         {
             switch (series.Kind)
             {
+                case ChartSeriesKind.RangeArea:
+                    DrawRangeAreaDataLabels(canvas, plot, series, seriesIndex, minValue, maxValue, valueAxisKind, style,
+                        useNumericCategoryAxis, categoryAxisKind, minCategory, maxCategory, textPaint, backgroundPaint, placed);
+                    break;
                 case ChartSeriesKind.Column:
                     DrawColumnDataLabels(canvas, plot, series, seriesIndex, seriesCount, categories.Count, minValue, maxValue, valueAxisKind, style, textPaint, backgroundPaint, placed);
                     break;

@@ -4,8 +4,10 @@
 #nullable disable
 
 using System;
+using System.Globalization;
 using Avalonia.Collections;
 using Avalonia.Controls.Primitives;
+using Avalonia.Controls.Utils;
 using Avalonia.Data;
 using Avalonia.Input;
 using Avalonia.Interactivity;
@@ -23,7 +25,9 @@ public
 #else
 internal
 #endif
-    class DataGridSliderColumn : DataGridBoundColumn
+    class DataGridSliderColumn : DataGridBoundColumn,
+        IDataGridDrawnCellValueProvider,
+        IDataGridDrawnCellValueChangeTracking
     {
         private readonly Lazy<ControlTheme> _cellSliderTheme;
         private readonly Lazy<ControlTheme> _cellSliderDisplayTheme;
@@ -342,6 +346,35 @@ internal
                 base.RefreshCellContent(element, propertyName);
             }
         }
+
+        internal override bool SupportsVirtualCellSurface =>
+            GetType() == typeof(DataGridSliderColumn) &&
+            ShowValueText &&
+            BindingCloneHelper.SupportsDirectTextDataContextRead(Binding) &&
+            DataGridColumnMetadata.GetValueAccessor(this) is IDataGridColumnTextAccessor;
+
+        object IDataGridDrawnCellValueProvider.GetDrawnCellValue(object item)
+        {
+            var accessor = DataGridColumnMetadata.GetValueAccessor(this) as IDataGridColumnTextAccessor;
+            if (accessor == null || item == null)
+            {
+                return null;
+            }
+
+            var culture = CultureInfo.CurrentCulture;
+            return accessor.TryGetText(
+                item,
+                BindingCloneHelper.GetConverter(Binding),
+                BindingCloneHelper.GetConverterParameter(Binding),
+                ValueTextFormat,
+                culture,
+                culture,
+                out var text)
+                ? text
+                : null;
+        }
+
+        bool IDataGridDrawnCellValueChangeTracking.TrackDrawnCellValueChanges => true;
 
         private void SyncSliderProperties(Slider slider)
         {

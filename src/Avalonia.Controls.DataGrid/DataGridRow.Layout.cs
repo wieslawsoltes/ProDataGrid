@@ -28,6 +28,11 @@ namespace Avalonia.Controls
         private bool _hasDeferredHeight;
         private double _deferredHeight;
 
+        internal void SetRecycledBounds(Rect bounds)
+        {
+            Bounds = bounds;
+        }
+
         internal bool HasDeferredHeight => _hasDeferredHeight;
 
         internal double DeferredHeight => _deferredHeight;
@@ -183,6 +188,10 @@ namespace Avalonia.Controls
             }
 
             Size desiredSize = base.MeasureOverride(availableSize);
+            if (OwningGrid.UsesFlatVisualLayout)
+            {
+                desiredSize = desiredSize.WithHeight(GetFlatDesiredHeight(OwningGrid, desiredSize.Height));
+            }
             return desiredSize.WithWidth(Math.Max(desiredSize.Width, OwningGrid.CellsWidth));
         }
 
@@ -227,8 +236,40 @@ namespace Avalonia.Controls
             }
         }
 
+        internal void ApplyRetargetedVirtualSurfaceState(
+            bool wasCurrent,
+            DataGridValidationSeverity previousValidationSeverity,
+            bool isSelected,
+            bool isFullySelected)
+        {
+            if (RootElement == null || OwningGrid == null || !IsVisible)
+            {
+                return;
+            }
+
+            ApplyRetargetedSelectionState(isSelected, isFullySelected);
+
+            if (previousValidationSeverity != ValidationSeverity)
+            {
+                PseudoClassesHelper.Set(PseudoClasses, ":invalid", ValidationSeverity == DataGridValidationSeverity.Error);
+                PseudoClassesHelper.Set(PseudoClasses, ":warning", ValidationSeverity == DataGridValidationSeverity.Warning);
+                PseudoClassesHelper.Set(PseudoClasses, ":info", ValidationSeverity == DataGridValidationSeverity.Info);
+            }
+
+            bool isCurrent = Slot != -1 && OwningGrid.CurrentSlot == Slot;
+            if (wasCurrent != isCurrent)
+            {
+                PseudoClassesHelper.Set(PseudoClasses, ":current", isCurrent);
+            }
+        }
+
         internal void ClearPointerOverState()
         {
+            if (!IsMouseOver && MouseOverColumnIndex is null)
+            {
+                return;
+            }
+
             OwningGrid?.ClearPointerOverRowForRecycle(this);
             MouseOverColumnIndex = null;
             PseudoClassesHelper.Set(PseudoClasses, ":pointerover", false);
@@ -236,6 +277,13 @@ namespace Avalonia.Controls
 
         internal void ClearDragDropState()
         {
+            if (!_isDragging && _dropPosition is null)
+            {
+                return;
+            }
+
+            _isDragging = false;
+            _dropPosition = null;
             PseudoClassesHelper.Set(PseudoClasses, ":dragging", false);
             PseudoClassesHelper.Set(PseudoClasses, ":drag-over-before", false);
             PseudoClassesHelper.Set(PseudoClasses, ":drag-over-after", false);
@@ -244,11 +292,23 @@ namespace Avalonia.Controls
 
         internal void SetDragging(bool dragging)
         {
+            if (_isDragging == dragging)
+            {
+                return;
+            }
+
+            _isDragging = dragging;
             PseudoClassesHelper.Set(PseudoClasses, ":dragging", dragging);
         }
 
         internal void SetDropPosition(DataGridRowDropPosition? position)
         {
+            if (_dropPosition == position)
+            {
+                return;
+            }
+
+            _dropPosition = position;
             PseudoClassesHelper.Set(PseudoClasses, ":drag-over-before", position == DataGridRowDropPosition.Before);
             PseudoClassesHelper.Set(PseudoClasses, ":drag-over-after", position == DataGridRowDropPosition.After);
             PseudoClassesHelper.Set(PseudoClasses, ":drag-over-inside", position == DataGridRowDropPosition.Inside);
@@ -303,6 +363,11 @@ namespace Avalonia.Controls
         {
             if (OwningGrid != null)
             {
+                if (OwningGrid.UsesFlatVisualLayout)
+                {
+                    InvalidateFlatGridLine();
+                }
+
                 if (_bottomGridLine != null)
                 {
                     // It looks like setting Visibility sometimes has side effects so make sure the value is actually

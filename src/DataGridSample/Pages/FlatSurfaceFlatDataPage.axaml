@@ -1,0 +1,77 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:behaviors="clr-namespace:DataGridSample.Behaviors"
+             xmlns:models="clr-namespace:DataGridSample.Models"
+             xmlns:viewModels="clr-namespace:DataGridSample.ViewModels"
+             x:Class="DataGridSample.Pages.FlatSurfaceFlatDataPage"
+             x:DataType="viewModels:OptimizedFlatCellPathsViewModel"
+             behaviors:DataContextFactoryBehavior.Factory="{StaticResource ViewModelFactory}">
+  <UserControl.Resources>
+    <viewModels:OptimizedFlatCellPathsViewModelFactory x:Key="ViewModelFactory" />
+  </UserControl.Resources>
+  <UserControl.Styles>
+    <Style Selector="DataGrid.optimized-cell-path">
+      <Setter Property="CellTheme" Value="{StaticResource DataGridOptimizedCellTheme}" />
+      <Setter Property="ColumnHeaderTheme" Value="{StaticResource DataGridOptimizedFeatureColumnHeaderTheme}" />
+      <Setter Property="UseLightweightFiller" Value="True" />
+    </Style>
+  </UserControl.Styles>
+
+  <Grid Margin="12" RowDefinitions="Auto,Auto,Auto,*" RowSpacing="8">
+    <StackPanel Spacing="3">
+      <TextBlock Classes="h2" Text="Flat Surface — Flat Data" />
+      <TextBlock TextWrapping="Wrap"
+                 Text="CDP-style sibling layout: every realized row and cell is a direct child of one rows presenter. The workload and cell-path selector match the nested baseline page." />
+    </StackPanel>
+
+    <WrapPanel Grid.Row="1" Orientation="Horizontal">
+      <TextBlock Margin="0,0,6,8" VerticalAlignment="Center" Text="Cell path" />
+      <ComboBox Width="245" Margin="0,0,14,8"
+                ItemsSource="{CompiledBinding Paths}"
+                SelectedItem="{CompiledBinding SelectedPath, Mode=TwoWay}">
+        <ComboBox.ItemTemplate>
+          <DataTemplate x:DataType="models:OptimizedCellPathOption">
+            <TextBlock Text="{CompiledBinding Name}" />
+          </DataTemplate>
+        </ComboBox.ItemTemplate>
+      </ComboBox>
+      <TextBlock Margin="0,0,6,8" VerticalAlignment="Center" Text="Rows" />
+      <NumericUpDown Width="125" Margin="0,0,8,8" Minimum="1000" Maximum="1000000"
+                     Increment="25000" Value="{CompiledBinding TargetRowCount, Mode=TwoWay}" />
+      <Button Margin="0,0,14,8" Content="Load workload"
+              Command="{CompiledBinding LoadRepresentativeWorkloadCommand}" />
+      <Button Margin="0,0,6,8" Content="First" Command="{CompiledBinding JumpToFirstCommand}" />
+      <Button Margin="0,0,6,8" Content="Middle" Command="{CompiledBinding JumpToMiddleCommand}" />
+      <Button Margin="0,0,14,8" Content="Last" Command="{CompiledBinding JumpToLastCommand}" />
+      <Button Margin="0,0,8,8" Content="Refresh heap"
+              Command="{CompiledBinding RefreshManagedMemoryCommand}" />
+    </WrapPanel>
+
+    <Border Grid.Row="2" Padding="10,8" Background="#08000000" CornerRadius="5">
+      <StackPanel Orientation="Horizontal" Spacing="14">
+        <TextBlock FontWeight="SemiBold" Text="Visual layout: flat sibling surface" />
+        <TextBlock Text="{CompiledBinding Summary}" />
+        <TextBlock Text="{CompiledBinding ManagedMemorySummary}" />
+      </StackPanel>
+    </Border>
+
+    <DataGrid Grid.Row="3"
+              Height="520"
+              AutomationProperties.Name="Flat sibling surface flat-data workload grid"
+              Theme="{StaticResource DataGridFlatTheme}"
+              AutoGenerateColumns="False"
+              AutoScrollToSelectedItem="True"
+              CanUserSortColumns="False"
+              Classes.optimized-cell-path="{CompiledBinding UseOptimizedTheme}"
+              ColumnDefinitionsSource="{CompiledBinding ActiveColumns}"
+              GridLinesVisibility="Horizontal"
+              HeadersVisibility="Column"
+              IsReadOnly="True"
+              ItemsSource="{CompiledBinding Items}"
+              RowHeight="32"
+              SelectedItem="{CompiledBinding SelectedItem, Mode=TwoWay}"
+              SelectionMode="Single"
+              SelectionUnit="FullRow"
+              UseLogicalScrollable="True" />
+  </Grid>
+</UserControl>

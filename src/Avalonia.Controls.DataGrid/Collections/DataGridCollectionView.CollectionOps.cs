@@ -26,6 +26,10 @@ namespace Avalonia.Collections
         private int _sourceMutationDepth;
         private DataGridCollectionViewSourceMutationEventArgs _sourceMutationEventArgs;
         private NotifyCollectionChangedEventArgs _pendingSourceReset;
+        private bool _pendingSortOnlyRefresh;
+        private bool _isReorderOnlyReset;
+
+        internal bool IsReorderOnlyReset => _isReorderOnlyReset;
 
         private SourceMutationScope BeginSourceMutation(NotifyCollectionChangedEventArgs change)
         {
@@ -1008,6 +1012,7 @@ namespace Avalonia.Collections
             finally
             {
                 viewProjectionMutation.Dispose();
+                _pendingSortOnlyRefresh = false;
             }
         }
 
@@ -1016,12 +1021,31 @@ namespace Avalonia.Collections
         /// </summary>
         private void RefreshOrDefer()
         {
+            _pendingSortOnlyRefresh = false;
             if (IsRefreshDeferred)
             {
                 SetFlag(CollectionViewFlags.NeedsRefresh, true);
             }
             else
             {
+                RefreshInternal();
+            }
+        }
+
+        private void RefreshOrDeferForSort()
+        {
+            if (IsRefreshDeferred)
+            {
+                if (!CheckFlag(CollectionViewFlags.NeedsRefresh))
+                {
+                    _pendingSortOnlyRefresh = true;
+                }
+
+                SetFlag(CollectionViewFlags.NeedsRefresh, true);
+            }
+            else
+            {
+                _pendingSortOnlyRefresh = true;
                 RefreshInternal();
             }
         }
@@ -1116,6 +1140,7 @@ namespace Avalonia.Collections
                 ? BeginViewProjectionMutation()
                 : default;
 
+            _isReorderOnlyReset = _pendingSortOnlyRefresh;
             try
             {
                 // reset currency values
@@ -1135,6 +1160,10 @@ namespace Avalonia.Collections
             {
                 viewProjectionMutation.Dispose();
                 throw;
+            }
+            finally
+            {
+                _isReorderOnlyReset = false;
             }
         }
 

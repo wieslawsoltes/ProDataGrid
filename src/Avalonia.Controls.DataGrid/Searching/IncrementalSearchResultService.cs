@@ -18,6 +18,9 @@ namespace Avalonia.Controls.DataGridSearching
     internal sealed class IncrementalSearchResultService
     {
         internal delegate bool TryResolveRowIndexDelegate(object item, out int rowIndex);
+        internal delegate bool TryRemapResetDelegate(
+            IReadOnlyList<SearchResult> currentResults,
+            out IReadOnlyList<SearchResult> remappedResults);
 
         private readonly bool _trackItemChanges;
         private readonly List<PendingCollectionChange> _pendingCollectionChanges = new();
@@ -31,14 +34,20 @@ namespace Avalonia.Controls.DataGridSearching
             _trackItemChanges = trackItemChanges;
         }
 
-        public void RecordCollectionChange(NotifyCollectionChangedEventArgs e)
+        public void RecordCollectionChange(
+            NotifyCollectionChangedEventArgs e,
+            bool canRemapReset = false)
         {
             if (e == null || _activeResults == null)
             {
                 return;
             }
 
-            _pendingCollectionChanges.Add(PendingCollectionChange.From(e));
+            _pendingCollectionChanges.Add(PendingCollectionChange.From(e, canRemapReset));
+            if (e.Action == NotifyCollectionChangedAction.Reset)
+            {
+                _hasPendingReset = true;
+            }
         }
 
         public void RecordItemChange(object item)
@@ -75,6 +84,7 @@ namespace Avalonia.Controls.DataGridSearching
             IReadOnlyList<SearchDescriptor> descriptors,
             Func<object, int, IReadOnlyList<SearchResult>> buildRowResults,
             TryResolveRowIndexDelegate tryResolveRowIndex,
+            TryRemapResetDelegate tryRemapReset,
             out IReadOnlyList<SearchResult> results)
         {
             if (buildRowResults == null)
@@ -85,6 +95,11 @@ namespace Avalonia.Controls.DataGridSearching
             if (tryResolveRowIndex == null)
             {
                 throw new ArgumentNullException(nameof(tryResolveRowIndex));
+            }
+
+            if (tryRemapReset == null)
+            {
+                throw new ArgumentNullException(nameof(tryRemapReset));
             }
 
             results = null;
@@ -110,6 +125,16 @@ namespace Avalonia.Controls.DataGridSearching
 
             if (_hasPendingReset)
             {
+                if (_pendingCollectionChanges.Count == 1 &&
+                    _pendingCollectionChanges[0].CanRemapReset &&
+                    tryRemapReset(_activeResults, out IReadOnlyList<SearchResult> remappedResults))
+                {
+                    _activeResults = remappedResults as List<SearchResult> ?? remappedResults.ToList();
+                    ClearPendingChanges();
+                    results = _activeResults;
+                    return true;
+                }
+
                 ClearPendingChanges();
                 return false;
             }
@@ -413,13 +438,15 @@ namespace Avalonia.Controls.DataGridSearching
                 int newStartingIndex,
                 int oldStartingIndex,
                 object[] newItems,
-                object[] oldItems)
+                object[] oldItems,
+                bool canRemapReset)
             {
                 Action = action;
                 NewStartingIndex = newStartingIndex;
                 OldStartingIndex = oldStartingIndex;
                 NewItems = newItems;
                 OldItems = oldItems;
+                CanRemapReset = canRemapReset;
             }
 
             public NotifyCollectionChangedAction Action { get; }
@@ -432,14 +459,19 @@ namespace Avalonia.Controls.DataGridSearching
 
             public object[] OldItems { get; }
 
-            public static PendingCollectionChange From(NotifyCollectionChangedEventArgs e)
+            public bool CanRemapReset { get; }
+
+            public static PendingCollectionChange From(
+                NotifyCollectionChangedEventArgs e,
+                bool canRemapReset)
             {
                 return new PendingCollectionChange(
                     e.Action,
                     e.NewStartingIndex,
                     e.OldStartingIndex,
                     ToArray(e.NewItems),
-                    ToArray(e.OldItems));
+                    ToArray(e.OldItems),
+                    canRemapReset);
             }
 
             private static object[] ToArray(IList items)

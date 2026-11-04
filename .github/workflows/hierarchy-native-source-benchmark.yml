@@ -1,0 +1,362 @@
+name: Hierarchy native source benchmark
+
+on:
+  workflow_dispatch:
+  pull_request:
+    branches:
+      - master
+
+env:
+  DOTNET_NOLOGO: true
+  DOTNET_CLI_TELEMETRY_OPTOUT: true
+  DOTNET_SKIP_FIRST_TIME_EXPERIENCE: true
+
+jobs:
+  windows-native:
+    name: Windows native source comparison
+    runs-on: windows-latest
+    timeout-minutes: 30
+
+    steps:
+      - name: Checkout ProDataGrid
+        uses: actions/checkout@v4
+        with:
+          path: prodatagrid
+
+      - name: Checkout open-source TreeDataGrid
+        uses: actions/checkout@v4
+        with:
+          repository: wieslawsoltes/TreeDataGrid
+          ref: 7628bd18e29dad315fd36ead57a1d5339bfaf944
+          path: tree-datagrid
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: |
+            8.0.x
+            10.0.x
+
+      - name: Build source-only benchmark applications
+        shell: pwsh
+        run: |
+          $harness = Join-Path $env:GITHUB_WORKSPACE "prodatagrid/tests/ProDataGrid.Hierarchy.NativeBenchmarks"
+          $treeRoot = Join-Path $env:GITHUB_WORKSPACE "tree-datagrid"
+          dotnet build "$harness/Native.Pro/Native.Pro.csproj" -c Release
+          dotnet build "$harness/Native.Tree/Native.Tree.csproj" -c Release -p:TreeDataGridSourceRoot="$treeRoot"
+
+      - name: Run independent native processes
+        shell: pwsh
+        run: |
+          $harness = Join-Path $env:GITHUB_WORKSPACE "prodatagrid/tests/ProDataGrid.Hierarchy.NativeBenchmarks"
+          $results = Join-Path $env:GITHUB_WORKSPACE "artifacts/hierarchy-native-source"
+          New-Item -ItemType Directory -Force -Path $results | Out-Null
+
+          foreach ($process in 1..4) {
+            $modes = if (($process % 2) -eq 1) {
+              @("standard", "optimized", "direct", "direct-cell", "drawn", "flat-direct-cell", "flat-drawn", "virtual", "tree")
+            } else {
+              @("tree", "virtual", "flat-drawn", "flat-direct-cell", "drawn", "direct-cell", "direct", "optimized", "standard")
+            }
+
+            foreach ($mode in $modes) {
+              $stopwatch = [System.Diagnostics.Stopwatch]::StartNew()
+              Write-Host "Starting native benchmark process=$process mode=$mode"
+              if ($mode -eq "tree") {
+                dotnet "$harness/Native.Tree/bin/Release/net8.0/Native.Tree.dll" `
+                  --warmup 2 --iterations 10 --output "$results/tree-$process.json" |
+                  Out-Null
+                if ($LASTEXITCODE -ne 0) { throw "TreeDataGrid process $process failed." }
+                $stopwatch.Stop()
+                Write-Host "Completed native benchmark process=$process mode=$mode elapsed=$($stopwatch.Elapsed)"
+                continue
+              }
+
+              $env:GRID_BENCH_PRO_MODE = $mode
+              dotnet "$harness/Native.Pro/bin/Release/net8.0/Native.Pro.dll" `
+                --warmup 2 --iterations 10 --output "$results/pro-$mode-$process.json" |
+                Out-Null
+              if ($LASTEXITCODE -ne 0) { throw "ProDataGrid $mode process $process failed." }
+              $stopwatch.Stop()
+              Write-Host "Completed native benchmark process=$process mode=$mode elapsed=$($stopwatch.Elapsed)"
+            }
+          }
+          Remove-Item Env:GRID_BENCH_PRO_MODE -ErrorAction SilentlyContinue
+
+      - name: Diagnose collapse frame stages
+        shell: pwsh
+        run: |
+          $harness = Join-Path $env:GITHUB_WORKSPACE "prodatagrid/tests/ProDataGrid.Hierarchy.NativeBenchmarks"
+          $diagnostics = Join-Path $env:GITHUB_WORKSPACE "artifacts/hierarchy-native-source/frame-diagnostics"
+          New-Item -ItemType Directory -Force -Path $diagnostics | Out-Null
+
+          $env:GRID_BENCH_PRO_MODE = "drawn"
+          dotnet "$harness/Native.Pro/bin/Release/net8.0/Native.Pro.dll" `
+            --collapse-only --avalonia-diagnostics --warmup 2 --iterations 10 `
+            --output "$diagnostics/pro-drawn.json"
+          if ($LASTEXITCODE -ne 0) { throw "ProDataGrid frame diagnostics failed." }
+          Remove-Item Env:GRID_BENCH_PRO_MODE -ErrorAction SilentlyContinue
+
+          dotnet "$harness/Native.Tree/bin/Release/net8.0/Native.Tree.dll" `
+            --collapse-only --avalonia-diagnostics --warmup 2 --iterations 10 `
+            --output "$diagnostics/tree.json"
+          if ($LASTEXITCODE -ne 0) { throw "TreeDataGrid frame diagnostics failed." }
+
+      - name: Diagnose pre-sample frame alignment
+        shell: pwsh
+        run: |
+          $harness = Join-Path $env:GITHUB_WORKSPACE "prodatagrid/tests/ProDataGrid.Hierarchy.NativeBenchmarks"
+          $diagnostics = Join-Path $env:GITHUB_WORKSPACE "artifacts/hierarchy-native-source/alignment-diagnostics"
+          New-Item -ItemType Directory -Force -Path $diagnostics | Out-Null
+
+          foreach ($callbacks in @(2, 3)) {
+            $env:GRID_BENCH_PRO_MODE = "drawn"
+            dotnet "$harness/Native.Pro/bin/Release/net8.0/Native.Pro.dll" `
+              --collapse-only --alignment-callbacks $callbacks --warmup 6 --iterations 10 `
+              --output "$diagnostics/pro-drawn-$callbacks.json"
+            if ($LASTEXITCODE -ne 0) { throw "ProDataGrid $callbacks-callback alignment diagnostics failed." }
+            Remove-Item Env:GRID_BENCH_PRO_MODE -ErrorAction SilentlyContinue
+
+            dotnet "$harness/Native.Tree/bin/Release/net8.0/Native.Tree.dll" `
+              --collapse-only --alignment-callbacks $callbacks --warmup 6 --iterations 10 `
+              --output "$diagnostics/tree-$callbacks.json"
+            if ($LASTEXITCODE -ne 0) { throw "TreeDataGrid $callbacks-callback alignment diagnostics failed." }
+          }
+
+      - name: Capture sampled collapse traces
+        shell: pwsh
+        run: |
+          dotnet tool install --global dotnet-trace --version 9.0.661903
+          $harness = Join-Path $env:GITHUB_WORKSPACE "prodatagrid/tests/ProDataGrid.Hierarchy.NativeBenchmarks"
+          $traces = Join-Path $env:GITHUB_WORKSPACE "artifacts/hierarchy-native-source/traces"
+          New-Item -ItemType Directory -Force -Path $traces | Out-Null
+
+          $env:GRID_BENCH_PRO_MODE = "drawn"
+          dotnet-trace collect --profile dotnet-sampled-thread-time `
+            --output "$traces/pro-drawn.nettrace" --show-child-io -- `
+            dotnet "$harness/Native.Pro/bin/Release/net8.0/Native.Pro.dll" `
+              --collapse-only --warmup 6 --iterations 20 --output "$traces/pro-drawn.json"
+          if ($LASTEXITCODE -ne 0) { throw "ProDataGrid sampled trace failed." }
+          Remove-Item Env:GRID_BENCH_PRO_MODE -ErrorAction SilentlyContinue
+          dotnet-trace report "$traces/pro-drawn.nettrace" topN -n 100 --inclusive |
+            Out-File "$traces/pro-drawn-topn-inclusive.txt" -Encoding utf8
+          dotnet-trace report "$traces/pro-drawn.nettrace" topN -n 100 |
+            Out-File "$traces/pro-drawn-topn-exclusive.txt" -Encoding utf8
+
+          dotnet-trace collect --profile dotnet-sampled-thread-time `
+            --output "$traces/tree.nettrace" --show-child-io -- `
+            dotnet "$harness/Native.Tree/bin/Release/net8.0/Native.Tree.dll" `
+              --collapse-only --warmup 6 --iterations 20 --output "$traces/tree.json"
+          if ($LASTEXITCODE -ne 0) { throw "TreeDataGrid sampled trace failed." }
+          dotnet-trace report "$traces/tree.nettrace" topN -n 100 --inclusive |
+            Out-File "$traces/tree-topn-inclusive.txt" -Encoding utf8
+          dotnet-trace report "$traces/tree.nettrace" topN -n 100 |
+            Out-File "$traces/tree-topn-exclusive.txt" -Encoding utf8
+
+      - name: Summarize hierarchy latency and allocation
+        shell: pwsh
+        run: |
+          function Get-Ci95Margin([double[]]$values) {
+            if ($values.Count -lt 2) { return 0.0 }
+            $mean = ($values | Measure-Object -Average).Average
+            $sumSquares = 0.0
+            foreach ($value in $values) {
+              $sumSquares += [Math]::Pow($value - $mean, 2)
+            }
+            $sampleStdDev = [Math]::Sqrt($sumSquares / ($values.Count - 1))
+            $critical = switch ($values.Count) {
+              2 { 12.706 }
+              3 { 4.303 }
+              4 { 3.182 }
+              default { 1.96 }
+            }
+            return $critical * $sampleStdDev / [Math]::Sqrt($values.Count)
+          }
+
+          $results = Join-Path $env:GITHUB_WORKSPACE "artifacts/hierarchy-native-source"
+          $rows = foreach ($file in Get-ChildItem $results -Filter *.json) {
+            $result = Get-Content $file.FullName -Raw | ConvertFrom-Json
+            [pscustomobject]@{
+              File = $file.Name
+              Implementation = $result.Implementation
+              Mode = if ($result.Mode) { $result.Mode } else { "source" }
+              ExpandAllMeanMs = [double]$result.ExpandAllAndRender.MeanMilliseconds
+              ExpandAllAllocatedBytes = [double]$result.ExpandAllAndRender.MeanAllocatedBytes
+              CollapseAllMeanMs = [double]$result.CollapseAllAndRender.MeanMilliseconds
+              CollapseAllAllocatedBytes = [double]$result.CollapseAllAndRender.MeanAllocatedBytes
+              CollapseAllMutationMs = [double]$result.CollapseAllAndRender.MeanMutationMilliseconds
+              CollapseAllLayoutMs = [double]$result.CollapseAllAndRender.MeanLayoutMilliseconds
+              CollapseAllFrameMs = [double]$result.CollapseAllAndRender.MeanFrameMilliseconds
+              CollapseAllFirstFrameCallbackMs = [double]$result.CollapseAllAndRender.MeanFirstFrameCallbackMilliseconds
+              CollapseAllSecondFrameCallbackMs = [double]$result.CollapseAllAndRender.MeanSecondFrameCallbackMilliseconds
+              CollapseAllAnimationTickIntervalMs = [double]$result.CollapseAllAndRender.MeanAnimationTickIntervalMilliseconds
+              CollapseAllLayoutUpdatedCount = [double]$result.CollapseAllAndRender.MeanLayoutUpdatedCount
+              ScrollMeanMs = [double]$result.ScrollAndRender.MeanMilliseconds
+              ScrollP95Ms = [double]$result.ScrollAndRender.P95Milliseconds
+              ScrollAllocatedBytes = [double]$result.ScrollAndRender.MeanAllocatedBytes
+              ScrollMutationMs = [double]$result.ScrollAndRender.MeanMutationMilliseconds
+              ScrollLayoutMs = [double]$result.ScrollAndRender.MeanLayoutMilliseconds
+              ScrollFrameMs = [double]$result.ScrollAndRender.MeanFrameMilliseconds
+              ScrollFirstFrameCallbackMs = [double]$result.ScrollAndRender.MeanFirstFrameCallbackMilliseconds
+              ScrollSecondFrameCallbackMs = [double]$result.ScrollAndRender.MeanSecondFrameCallbackMilliseconds
+              ScrollAnimationTickIntervalMs = [double]$result.ScrollAndRender.MeanAnimationTickIntervalMilliseconds
+              Runtime = $result.Runtime
+              OS = $result.OS
+            }
+          }
+
+          $aggregates = $rows |
+            Group-Object Implementation, Mode |
+            ForEach-Object {
+              $expandMeans = @($_.Group | ForEach-Object { [double]$_.ExpandAllMeanMs })
+              $collapseMeans = @($_.Group | ForEach-Object { [double]$_.CollapseAllMeanMs })
+              [pscustomobject]@{
+                Implementation = $_.Group[0].Implementation
+                Mode = $_.Group[0].Mode
+                ProcessMeans = $_.Count
+                ExpandAllMeanMs = ($expandMeans | Measure-Object -Average).Average
+                ExpandAllCi95MarginMs = Get-Ci95Margin $expandMeans
+                ExpandAllAllocatedBytes = ($_.Group.ExpandAllAllocatedBytes | Measure-Object -Average).Average
+                CollapseAllMeanMs = ($collapseMeans | Measure-Object -Average).Average
+                CollapseAllCi95MarginMs = Get-Ci95Margin $collapseMeans
+                CollapseAllAllocatedBytes = ($_.Group.CollapseAllAllocatedBytes | Measure-Object -Average).Average
+                CollapseAllMutationMs = ($_.Group.CollapseAllMutationMs | Measure-Object -Average).Average
+                CollapseAllLayoutMs = ($_.Group.CollapseAllLayoutMs | Measure-Object -Average).Average
+                CollapseAllFrameMs = ($_.Group.CollapseAllFrameMs | Measure-Object -Average).Average
+                CollapseAllFirstFrameCallbackMs = ($_.Group.CollapseAllFirstFrameCallbackMs | Measure-Object -Average).Average
+                CollapseAllSecondFrameCallbackMs = ($_.Group.CollapseAllSecondFrameCallbackMs | Measure-Object -Average).Average
+                CollapseAllAnimationTickIntervalMs = ($_.Group.CollapseAllAnimationTickIntervalMs | Measure-Object -Average).Average
+                CollapseAllLayoutUpdatedCount = ($_.Group.CollapseAllLayoutUpdatedCount | Measure-Object -Average).Average
+                CollapseAllPathMs = ($_.Group.CollapseAllMutationMs | Measure-Object -Average).Average + ($_.Group.CollapseAllLayoutMs | Measure-Object -Average).Average
+                ScrollMeanMs = ($_.Group.ScrollMeanMs | Measure-Object -Average).Average
+                ScrollP95Ms = ($_.Group.ScrollP95Ms | Measure-Object -Average).Average
+                ScrollAllocatedBytes = ($_.Group.ScrollAllocatedBytes | Measure-Object -Average).Average
+                ScrollMutationMs = ($_.Group.ScrollMutationMs | Measure-Object -Average).Average
+                ScrollLayoutMs = ($_.Group.ScrollLayoutMs | Measure-Object -Average).Average
+                ScrollFrameMs = ($_.Group.ScrollFrameMs | Measure-Object -Average).Average
+                ScrollFirstFrameCallbackMs = ($_.Group.ScrollFirstFrameCallbackMs | Measure-Object -Average).Average
+                ScrollSecondFrameCallbackMs = ($_.Group.ScrollSecondFrameCallbackMs | Measure-Object -Average).Average
+                ScrollAnimationTickIntervalMs = ($_.Group.ScrollAnimationTickIntervalMs | Measure-Object -Average).Average
+              }
+            } |
+            Sort-Object ExpandAllMeanMs
+
+          $table = @(
+            "## Native expand all + render (source only)",
+            "",
+            "| Implementation | Mode | Process means | Mean (ms) | 95% CI (ms) | Allocated (bytes) |",
+            "|---|---:|---:|---:|---:|---:|"
+          )
+          foreach ($aggregate in $aggregates) {
+            $low = $aggregate.ExpandAllMeanMs - $aggregate.ExpandAllCi95MarginMs
+            $high = $aggregate.ExpandAllMeanMs + $aggregate.ExpandAllCi95MarginMs
+            $table += "| $($aggregate.Implementation) | $($aggregate.Mode) | $($aggregate.ProcessMeans) | $($aggregate.ExpandAllMeanMs.ToString('F2')) | $($low.ToString('F2'))-$($high.ToString('F2')) | $([Math]::Round($aggregate.ExpandAllAllocatedBytes).ToString('N0')) |"
+          }
+
+          $table += @(
+            "",
+            "## Native collapse all + render (source only, 149,792 rows to 32 roots)",
+            "",
+            "| Implementation | Mode | Process means | Mean (ms) | 95% CI (ms) | Mutation + layout (ms) | Mutation (ms) | Layout (ms) | Frame wait (ms) | Callback 1 (ms) | Callback 2 interval (ms) | LayoutUpdated | Allocated (bytes) |",
+            "|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|"
+          )
+          foreach ($aggregate in ($aggregates | Sort-Object CollapseAllMeanMs)) {
+            $low = $aggregate.CollapseAllMeanMs - $aggregate.CollapseAllCi95MarginMs
+            $high = $aggregate.CollapseAllMeanMs + $aggregate.CollapseAllCi95MarginMs
+            $table += "| $($aggregate.Implementation) | $($aggregate.Mode) | $($aggregate.ProcessMeans) | $($aggregate.CollapseAllMeanMs.ToString('F2')) | $($low.ToString('F2'))-$($high.ToString('F2')) | $($aggregate.CollapseAllPathMs.ToString('F2')) | $($aggregate.CollapseAllMutationMs.ToString('F2')) | $($aggregate.CollapseAllLayoutMs.ToString('F2')) | $($aggregate.CollapseAllFrameMs.ToString('F2')) | $($aggregate.CollapseAllFirstFrameCallbackMs.ToString('F2')) | $($aggregate.CollapseAllSecondFrameCallbackMs.ToString('F2')) | $($aggregate.CollapseAllLayoutUpdatedCount.ToString('F2')) | $([Math]::Round($aggregate.CollapseAllAllocatedBytes).ToString('N0')) |"
+          }
+          $table += @(
+            "",
+            "The collapse optimization gate compares mutation + layout and managed allocation. The complete two-callback frame-wait total remains reported as a platform rendering/scheduling diagnostic."
+          )
+
+          $table += @(
+            "",
+            "## Native scroll + render phase split (source only)",
+            "",
+            "| Implementation | Mode | Mean (ms) | P95 (ms) | Mutation (ms) | Layout (ms) | Frame wait (ms) | Frame pickup (ms) | Callback interval (ms) | Animation tick (ms) | Allocated (bytes) |",
+            "|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|"
+          )
+          foreach ($aggregate in ($aggregates | Sort-Object ScrollMeanMs)) {
+            $table += "| $($aggregate.Implementation) | $($aggregate.Mode) | $($aggregate.ScrollMeanMs.ToString('F2')) | $($aggregate.ScrollP95Ms.ToString('F2')) | $($aggregate.ScrollMutationMs.ToString('F2')) | $($aggregate.ScrollLayoutMs.ToString('F2')) | $($aggregate.ScrollFrameMs.ToString('F2')) | $($aggregate.ScrollFirstFrameCallbackMs.ToString('F2')) | $($aggregate.ScrollSecondFrameCallbackMs.ToString('F2')) | $($aggregate.ScrollAnimationTickIntervalMs.ToString('F2')) | $([Math]::Round($aggregate.ScrollAllocatedBytes).ToString('N0')) |"
+          }
+          $table += @(
+            "",
+            "Frame pickup is layout completion to callback 1. The callback interval is the conservative completion barrier and should track the platform animation tick; it is reported separately because it is refresh pacing rather than DataGrid execution."
+          )
+
+          $diagnosticRows = foreach ($file in Get-ChildItem (Join-Path $results "frame-diagnostics") -Filter *.json) {
+            $result = Get-Content $file.FullName -Raw | ConvertFrom-Json
+            [pscustomobject]@{
+              Implementation = $result.Implementation
+              UiRenderMs = [double]$result.CollapseAllAndRender.MeanUiRenderMilliseconds
+              CompositorUpdateMs = [double]$result.CollapseAllAndRender.MeanCompositorUpdateMilliseconds
+              CompositorRenderMs = [double]$result.CollapseAllAndRender.MeanCompositorRenderMilliseconds
+            }
+          }
+          $table += @(
+            "",
+            "## Instrumented collapse render passes (single diagnostic process)",
+            "",
+            "| Implementation | UI render recording max/pass mean (ms) | Compositor update max/pass mean (ms) | Compositor render max/pass mean (ms) |",
+            "|---|---:|---:|---:|"
+          )
+          foreach ($row in $diagnosticRows) {
+            $table += "| $($row.Implementation) | $($row.UiRenderMs.ToString('F2')) | $($row.CompositorUpdateMs.ToString('F2')) | $($row.CompositorRenderMs.ToString('F2')) |"
+          }
+
+          $alignmentRows = foreach ($file in Get-ChildItem (Join-Path $results "alignment-diagnostics") -Filter *.json) {
+            $result = Get-Content $file.FullName -Raw | ConvertFrom-Json
+            [pscustomobject]@{
+              Implementation = $result.Implementation
+              AlignmentCallbacks = [int]$result.AlignmentCallbacks
+              PathMs = [double]$result.CollapseAllAndRender.MeanMutationMilliseconds + [double]$result.CollapseAllAndRender.MeanLayoutMilliseconds
+              Callback1Ms = [double]$result.CollapseAllAndRender.MeanFirstFrameCallbackMilliseconds
+              Callback2Ms = [double]$result.CollapseAllAndRender.MeanSecondFrameCallbackMilliseconds
+              FrameMs = [double]$result.CollapseAllAndRender.MeanFrameMilliseconds
+              RenderingSubsystem = $result.RenderingSubsystem
+              RuntimePlatformServices = $result.RuntimePlatformServices
+            }
+          }
+          $table += @(
+            "",
+            "## Pre-sample alignment diagnostic (single uninstrumented process)",
+            "",
+            "| Implementation | Alignment callbacks | Mutation + layout (ms) | Callback 1 (ms) | Callback 2 interval (ms) | Frame wait (ms) | Avalonia backend |",
+            "|---|---:|---:|---:|---:|---:|---|"
+          )
+          foreach ($row in ($alignmentRows | Sort-Object AlignmentCallbacks, Implementation)) {
+            $backend = "$($row.RuntimePlatformServices) / $($row.RenderingSubsystem)"
+            $table += "| $($row.Implementation) | $($row.AlignmentCallbacks) | $($row.PathMs.ToString('F2')) | $($row.Callback1Ms.ToString('F2')) | $($row.Callback2Ms.ToString('F2')) | $($row.FrameMs.ToString('F2')) | $backend |"
+          }
+          $table | Add-Content $env:GITHUB_STEP_SUMMARY
+          $aggregates | ConvertTo-Json | Set-Content "$results/aggregate.json"
+
+          $bestPro = $aggregates | Where-Object Implementation -Like "ProDataGrid*" | Select-Object -First 1
+          $tree = $aggregates | Where-Object Implementation -Like "Wieslaw*" | Select-Object -First 1
+          if ($null -eq $bestPro -or $null -eq $tree) {
+            throw "Missing ProDataGrid or TreeDataGrid aggregate."
+          }
+          if ($bestPro.ExpandAllMeanMs -ge $tree.ExpandAllMeanMs) {
+            throw "Best ProDataGrid mean ($($bestPro.ExpandAllMeanMs) ms) is not faster than TreeDataGrid ($($tree.ExpandAllMeanMs) ms)."
+          }
+          $proCollapse = @($aggregates | Where-Object Implementation -Like "ProDataGrid*")
+          $bestProCollapse = $proCollapse | Sort-Object CollapseAllPathMs | Select-Object -First 1
+          if ($null -eq $bestProCollapse) {
+            throw "Missing ProDataGrid collapse aggregate."
+          }
+          if ($bestProCollapse.CollapseAllPathMs -ge $tree.CollapseAllPathMs) {
+            throw "Best ProDataGrid collapse mutation + layout mean ($($bestProCollapse.CollapseAllPathMs) ms) is not faster than TreeDataGrid ($($tree.CollapseAllPathMs) ms)."
+          }
+          if ($bestProCollapse.CollapseAllAllocatedBytes -ge $tree.CollapseAllAllocatedBytes) {
+            throw "Best ProDataGrid collapse allocation ($($bestProCollapse.CollapseAllAllocatedBytes) bytes) is not lower than TreeDataGrid ($($tree.CollapseAllAllocatedBytes) bytes)."
+          }
+
+      - name: Upload raw benchmark results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: hierarchy-native-source-windows
+          path: artifacts/hierarchy-native-source
+          if-no-files-found: error
+          retention-days: 30

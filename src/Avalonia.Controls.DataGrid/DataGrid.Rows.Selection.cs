@@ -21,6 +21,12 @@ namespace Avalonia.Controls
         private void SelectDisplayedElement(int slot, bool? isSelectedOverride = null)
         {
             Debug.Assert(IsSlotVisible(slot));
+            if (DisplayData.HasVirtualScrollingElements)
+            {
+                _rowsPresenter?.InvalidateVirtualCellSurface();
+                return;
+            }
+
             Control element = DisplayData.GetDisplayedElement(slot);
             if (element is DataGridRow row)
             {
@@ -121,6 +127,7 @@ namespace Avalonia.Controls
                 {
                     // Individually deselecting displayed rows to view potential transitions
                     for (int slot = DisplayData.FirstScrollingSlot;
+                    !DisplayData.HasVirtualScrollingElements &&
                     slot > -1 && slot <= DisplayData.LastScrollingSlot;
                     slot++)
                     {
@@ -139,6 +146,11 @@ namespace Avalonia.Controls
                 {
                     NoSelectionChangeCount--;
                 }
+            }
+
+            if (DisplayData.HasVirtualScrollingElements)
+            {
+                _rowsPresenter?.InvalidateVirtualCellSurface();
             }
         }
 

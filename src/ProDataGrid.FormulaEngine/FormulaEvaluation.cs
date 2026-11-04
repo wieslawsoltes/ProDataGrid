@@ -4,6 +4,7 @@
 #nullable enable
 
 using System;
+using System.Buffers;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 
@@ -296,9 +297,10 @@ namespace ProDataGrid.FormulaEngine
         }
     }
 
-    public sealed class FormulaEvaluator
+    public sealed partial class FormulaEvaluator
     {
         private readonly ConditionalWeakTable<FormulaExpression, FormulaCompiledExpression> _compiledCache = new();
+        private readonly object _compilationGate = new();
 
         public FormulaValue Evaluate(
             FormulaExpression expression,
@@ -319,10 +321,21 @@ namespace ProDataGrid.FormulaEngine
             }
 
             var observer = context.Workbook.Settings.CalculationObserver;
-            if (context.Workbook.Settings.EnableCompiledExpressions && !ContainsReferenceOperators(expression))
+            if (context.Workbook.Settings.EnableCompiledExpressions)
             {
-                var compiled = GetCompiledExpression(expression, context.FunctionRegistry, observer);
-                return EvaluateCompiled(compiled, context, resolver);
+                // The cached plan already passed the reference-operator eligibility check.
+                // Do not walk the AST (or allocate a traversal stack) on every cache hit.
+                if (_compiledCache.TryGetValue(expression, out var cached) && cached.IsCompatibleWith(context.FunctionRegistry))
+                {
+                    observer?.OnExpressionCompiled(expression, cached.Instructions.Length, TimeSpan.Zero, fromCache: true);
+                    return EvaluateCompiled(cached, context, resolver);
+                }
+
+                if (!ContainsReferenceOperators(expression))
+                {
+                    var compiled = GetCompiledExpression(expression, context.FunctionRegistry, observer);
+                    return EvaluateCompiled(compiled, context, resolver);
+                }
             }
 
             return EvaluateCore(expression, context, resolver);
@@ -337,6 +350,11 @@ namespace ProDataGrid.FormulaEngine
                 var current = stack.Pop();
                 switch (current.Kind)
                 {
+                    case FormulaExpressionKind.Invocation:
+                        var invocation = (FormulaInvocationExpression)current;
+                        stack.Push(invocation.Target);
+                        foreach (var argument in invocation.Arguments) stack.Push(argument);
+                        break;
                     case FormulaExpressionKind.Binary:
                         var binary = (FormulaBinaryExpression)current;
                         if (binary.Operator is FormulaBinaryOperator.Union or FormulaBinaryOperator.Intersection)
@@ -378,26 +396,36 @@ namespace ProDataGrid.FormulaEngine
             IFormulaFunctionRegistry functionRegistry,
             IFormulaCalculationObserver? observer)
         {
-            if (_compiledCache.TryGetValue(expression, out var compiled))
+            FormulaCompiledExpression compiled;
+            var fromCache = false;
+            var duration = TimeSpan.Zero;
+            // Only cold compilation/publication is serialized. The common compatible
+            // cache-hit path in Evaluate remains lock-free and allocation-free.
+            lock (_compilationGate)
             {
-                if (ReferenceEquals(compiled.FunctionRegistry, functionRegistry))
+                if (_compiledCache.TryGetValue(expression, out var existing) && existing.IsCompatibleWith(functionRegistry))
                 {
-                    observer?.OnExpressionCompiled(expression, compiled.Instructions.Length, TimeSpan.Zero, fromCache: true);
-                    return compiled;
+                    compiled = existing;
+                    fromCache = true;
                 }
-
-                _compiledCache.Remove(expression);
+                else
+                {
+                    var compiler = new FormulaExpressionCompiler(functionRegistry);
+                    var watch = observer != null ? System.Diagnostics.Stopwatch.StartNew() : null;
+                    compiled = compiler.Compile(expression);
+                    if (watch != null)
+                    {
+                        watch.Stop();
+                        duration = watch.Elapsed;
+                    }
+                    _compiledCache.Remove(expression);
+                    _compiledCache.Add(expression, compiled);
+                }
             }
 
-            var compiler = new FormulaExpressionCompiler(functionRegistry);
-            var watch = observer != null ? System.Diagnostics.Stopwatch.StartNew() : null;
-            compiled = compiler.Compile(expression);
-            if (watch != null)
-            {
-                watch.Stop();
-                observer!.OnExpressionCompiled(expression, compiled.Instructions.Length, watch.Elapsed, fromCache: false);
-            }
-            _compiledCache.Add(expression, compiled);
+            // Publish before notifying host code; observers may reenter evaluation.
+            // Host callbacks must not run while holding the compilation gate.
+            observer?.OnExpressionCompiled(expression, compiled.Instructions.Length, duration, fromCache);
             return compiled;
         }
 
@@ -408,99 +436,117 @@ namespace ProDataGrid.FormulaEngine
         {
             var instructions = compiled.Instructions;
             var stack = compiled.MaxStackDepth > 0
-                ? new FormulaValue[compiled.MaxStackDepth]
+                ? ArrayPool<FormulaValue>.Shared.Rent(compiled.MaxStackDepth)
                 : Array.Empty<FormulaValue>();
-            var sp = 0;
-
-            foreach (var instruction in instructions)
+            try
             {
-                switch (instruction.Kind)
+                var sp = 0;
+
+                for (var instructionIndex = 0; instructionIndex < instructions.Length; instructionIndex++)
                 {
-                    case FormulaInstructionKind.Literal:
-                        var literal = instruction.Literal;
-                        if (literal.Kind == FormulaValueKind.Number)
-                        {
-                            literal = CreateNumber(context, literal.AsNumber());
-                        }
-                        stack[sp++] = literal;
-                        break;
-                    case FormulaInstructionKind.Name:
-                        stack[sp++] = EvaluateName(instruction.Name ?? string.Empty, context, resolver);
-                        break;
-                    case FormulaInstructionKind.Reference:
-                        stack[sp++] = EvaluateReference(instruction.Reference, context, resolver);
-                        break;
-                    case FormulaInstructionKind.StructuredReference:
-                        stack[sp++] = EvaluateStructuredReference(instruction.StructuredReference, context, resolver);
-                        break;
-                    case FormulaInstructionKind.Unary:
-                        if (sp == 0)
-                        {
-                            return FormulaValue.FromError(new FormulaError(FormulaErrorType.Calc));
-                        }
-                        var operand = stack[--sp];
-                        stack[sp++] = ApplyUnaryOperator(instruction.UnaryOperator, operand, context);
-                        break;
-                    case FormulaInstructionKind.Binary:
-                        if (sp < 2)
-                        {
-                            return FormulaValue.FromError(new FormulaError(FormulaErrorType.Calc));
-                        }
-                        var right = stack[--sp];
-                        var left = stack[--sp];
-                        stack[sp++] = EvaluateBinaryOperator(instruction.BinaryOperator, left, right, context, resolver);
-                        break;
-                    case FormulaInstructionKind.FunctionCall:
-                        if (sp < instruction.ArgCount)
-                        {
-                            return FormulaValue.FromError(new FormulaError(FormulaErrorType.Calc));
-                        }
-                        var args = new FormulaValue[instruction.ArgCount];
-                        for (var i = instruction.ArgCount - 1; i >= 0; i--)
-                        {
-                            args[i] = stack[--sp];
-                        }
-                        stack[sp++] = InvokeFunction(instruction.Name ?? string.Empty, args, context);
-                        break;
-                    case FormulaInstructionKind.LazyFunctionCall:
-                        stack[sp++] = InvokeLazyFunction(
-                            instruction.Name ?? string.Empty,
-                            instruction.LazyArguments ?? Array.Empty<FormulaExpression>(),
-                            context,
-                            resolver);
-                        break;
-                    case FormulaInstructionKind.ArrayLiteral:
-                        if (sp < instruction.RowCount * instruction.ColumnCount)
-                        {
-                            return FormulaValue.FromError(new FormulaError(FormulaErrorType.Calc));
-                        }
-                        var array = new FormulaArray(instruction.RowCount, instruction.ColumnCount);
-                        for (var row = instruction.RowCount - 1; row >= 0; row--)
-                        {
-                            for (var column = instruction.ColumnCount - 1; column >= 0; column--)
+                    // Instructions include large reference descriptors. Read the immutable entry
+                    // in place instead of copying its entire struct at every VM step.
+                    ref readonly var instruction = ref instructions[instructionIndex];
+                    switch (instruction.Kind)
+                    {
+                        case FormulaInstructionKind.Invocation:
+                            stack[sp++] = EvaluateInvocation((FormulaInvocationExpression)instruction.Expression!, context, resolver);
+                            break;
+                        case FormulaInstructionKind.Literal:
+                            var literal = instruction.Literal;
+                            if (literal.Kind == FormulaValueKind.Number)
                             {
-                                var value = stack[--sp];
-                                if (value.Kind == FormulaValueKind.Array)
-                                {
-                                    value = FormulaValue.FromError(new FormulaError(FormulaErrorType.Value));
-                                }
-                                array[row, column] = value;
+                                literal = CreateNumber(context, literal.AsNumber());
                             }
-                        }
-                        stack[sp++] = FormulaValue.FromArray(array);
-                        break;
-                    default:
-                        stack[sp++] = FormulaValue.FromError(new FormulaError(FormulaErrorType.Calc));
-                        break;
+                            stack[sp++] = literal;
+                            break;
+                        case FormulaInstructionKind.Name:
+                            stack[sp++] = EvaluateName(instruction.Name ?? string.Empty, context, resolver);
+                            break;
+                        case FormulaInstructionKind.Reference:
+                            stack[sp++] = EvaluateReference(instruction.Reference, context, resolver);
+                            break;
+                        case FormulaInstructionKind.StructuredReference:
+                            stack[sp++] = EvaluateStructuredReference(instruction.StructuredReference, context, resolver);
+                            break;
+                        case FormulaInstructionKind.Unary:
+                            if (sp == 0)
+                            {
+                                return FormulaValue.FromError(new FormulaError(FormulaErrorType.Calc));
+                            }
+                            var operand = stack[--sp];
+                            stack[sp++] = ApplyUnaryOperator(instruction.UnaryOperator, operand, context);
+                            break;
+                        case FormulaInstructionKind.Binary:
+                            if (sp < 2)
+                            {
+                                return FormulaValue.FromError(new FormulaError(FormulaErrorType.Calc));
+                            }
+                            var right = stack[--sp];
+                            var left = stack[--sp];
+                            stack[sp++] = EvaluateBinaryOperator(instruction.BinaryOperator, left, right, context, resolver);
+                            break;
+                        case FormulaInstructionKind.FunctionCall:
+                            if (sp < instruction.ArgCount)
+                            {
+                                return FormulaValue.FromError(new FormulaError(FormulaErrorType.Calc));
+                            }
+                            var args = instruction.ArgCount == 0 ? Array.Empty<FormulaValue>() : new FormulaValue[instruction.ArgCount];
+                            for (var i = instruction.ArgCount - 1; i >= 0; i--)
+                            {
+                                args[i] = stack[--sp];
+                            }
+                            stack[sp++] = InvokeFunction(instruction.Name ?? string.Empty, args, context, resolver, instruction.LazyArguments);
+                            break;
+                        case FormulaInstructionKind.LazyFunctionCall:
+                            stack[sp++] = InvokeLazyFunction(
+                                instruction.Name ?? string.Empty,
+                                instruction.LazyArguments ?? Array.Empty<FormulaExpression>(),
+                                context,
+                                resolver);
+                            break;
+                        case FormulaInstructionKind.ArrayLiteral:
+                            if (sp < instruction.RowCount * instruction.ColumnCount)
+                            {
+                                return FormulaValue.FromError(new FormulaError(FormulaErrorType.Calc));
+                            }
+                            var array = new FormulaArray(instruction.RowCount, instruction.ColumnCount);
+                            for (var row = instruction.RowCount - 1; row >= 0; row--)
+                            {
+                                for (var column = instruction.ColumnCount - 1; column >= 0; column--)
+                                {
+                                    var value = stack[--sp];
+                                    if (value.Kind == FormulaValueKind.Array)
+                                    {
+                                        value = FormulaValue.FromError(new FormulaError(FormulaErrorType.Value));
+                                    }
+                                    array[row, column] = value;
+                                }
+                            }
+                            stack[sp++] = FormulaValue.FromArray(array);
+                            break;
+                        default:
+                            stack[sp++] = FormulaValue.FromError(new FormulaError(FormulaErrorType.Calc));
+                            break;
+                    }
+                }
+
+                if (sp != 1)
+                {
+                    return FormulaValue.FromError(new FormulaError(FormulaErrorType.Calc));
+                }
+
+                return stack[0];
+            }
+            finally
+            {
+                if (stack.Length > 0)
+                {
+                    // FormulaValue can retain strings, arrays and workbook references.
+                    // Each invocation rents independently, including reentrant UDF calls.
+                    ArrayPool<FormulaValue>.Shared.Return(stack, clearArray: true);
                 }
             }
-
-            if (sp != 1)
-            {
-                return FormulaValue.FromError(new FormulaError(FormulaErrorType.Calc));
-            }
-
-            return stack[0];
         }
 
         private FormulaValue EvaluateCore(
@@ -510,6 +556,8 @@ namespace ProDataGrid.FormulaEngine
         {
             switch (expression.Kind)
             {
+                case FormulaExpressionKind.Invocation:
+                    return EvaluateInvocation((FormulaInvocationExpression)expression, context, resolver);
                 case FormulaExpressionKind.Literal:
                     var literal = ((FormulaLiteralExpression)expression).Value;
                     if (literal.Kind == FormulaValueKind.Number)
@@ -549,6 +597,7 @@ namespace ProDataGrid.FormulaEngine
             FormulaEvaluationContext context,
             IFormulaValueResolver resolver)
         {
+            if (context.LocalScope != null && context.LocalScope.TryGet(name, out var local, out _)) return local;
             if (resolver.TryResolveName(context, name, out var value))
             {
                 return value;
@@ -781,22 +830,7 @@ namespace ProDataGrid.FormulaEngine
                 return EvaluateBinaryArray(expression.Operator, left, right, context);
             }
 
-            return expression.Operator switch
-            {
-                FormulaBinaryOperator.Add => EvaluateNumericBinary(left, right, context, (a, b) => a + b),
-                FormulaBinaryOperator.Subtract => EvaluateNumericBinary(left, right, context, (a, b) => a - b),
-                FormulaBinaryOperator.Multiply => EvaluateNumericBinary(left, right, context, (a, b) => a * b),
-                FormulaBinaryOperator.Divide => EvaluateDivide(left, right, context),
-                FormulaBinaryOperator.Power => EvaluateNumericBinary(left, right, context, Math.Pow),
-                FormulaBinaryOperator.Concat => EvaluateConcat(left, right, context.Address),
-                FormulaBinaryOperator.Equal => EvaluateComparison(left, right, context, (c) => c == 0),
-                FormulaBinaryOperator.NotEqual => EvaluateComparison(left, right, context, (c) => c != 0),
-                FormulaBinaryOperator.Less => EvaluateComparison(left, right, context, (c) => c < 0),
-                FormulaBinaryOperator.LessOrEqual => (EvaluateComparison(left, right, context, (c) => c <= 0)),
-                FormulaBinaryOperator.Greater => EvaluateComparison(left, right, context, (c) => c > 0),
-                FormulaBinaryOperator.GreaterOrEqual => EvaluateComparison(left, right, context, (c) => c >= 0),
-                _ => FormulaValue.FromError(new FormulaError(FormulaErrorType.Calc))
-            };
+            return EvaluateBinaryScalar(expression.Operator, left, right, context);
         }
 
         private FormulaValue EvaluateReferenceOperator(
@@ -1298,8 +1332,8 @@ namespace ProDataGrid.FormulaEngine
 
         private static FormulaValue EvaluateBinaryScalar(
             FormulaBinaryOperator op,
-            FormulaValue left,
-            FormulaValue right,
+            in FormulaValue left,
+            in FormulaValue right,
             FormulaEvaluationContext context)
         {
             if (left.Kind == FormulaValueKind.Error)
@@ -1310,6 +1344,12 @@ namespace ProDataGrid.FormulaEngine
             if (right.Kind == FormulaValueKind.Error)
             {
                 return right;
+            }
+
+            if (left.Kind == FormulaValueKind.Number && right.Kind == FormulaValueKind.Number &&
+                op != FormulaBinaryOperator.Concat)
+            {
+                return EvaluateNumberBinary(op, left.AsNumber(), right.AsNumber(), context.Workbook.Settings);
             }
 
             return op switch
@@ -1345,81 +1385,44 @@ namespace ProDataGrid.FormulaEngine
             FormulaFunctionCallExpression expression,
             FormulaEvaluationContext context,
             IFormulaValueResolver resolver)
+            => InvokeLazyFunction(expression.Name, expression.Arguments, context, resolver);
+
+        private FormulaValue InvokeFunction(string name, IReadOnlyList<FormulaValue> args,
+            FormulaEvaluationContext context, IFormulaValueResolver resolver,
+            IReadOnlyList<FormulaExpression>? expressions = null)
         {
-            if (!context.FunctionRegistry.TryGetFunction(expression.Name, out var function))
+            if (context.LocalScope != null && context.LocalScope.TryGet(name, out var local, out _))
             {
-                return FormulaValue.FromError(new FormulaError(FormulaErrorType.Name));
+                if (local.Kind == FormulaValueKind.Error) return local;
+                return local.Kind == FormulaValueKind.Lambda
+                    ? InvokeLambda(local.AsLambda(), args, context, resolver, GetOmissions(expressions, context))
+                    : FormulaValue.FromError(new FormulaError(FormulaErrorType.Value));
             }
-
-            if (!ValidateArguments(function.Info, expression.Arguments.Count))
-            {
-                return FormulaValue.FromError(new FormulaError(FormulaErrorType.Value));
-            }
-
-            var functionContext = new FormulaFunctionContext(context);
-            if (function is ILazyFormulaFunction lazyFunction)
-            {
-                return lazyFunction.InvokeLazy(functionContext, expression.Arguments, this, resolver);
-            }
-
-            var args = new List<FormulaValue>(expression.Arguments.Count);
-            foreach (var argument in expression.Arguments)
-            {
-                var value = EvaluateCore(argument, context, resolver);
-                args.Add(value);
-            }
-
-            return function.Invoke(functionContext, args);
-        }
-
-        private FormulaValue InvokeFunction(
-            string name,
-            IReadOnlyList<FormulaValue> args,
-            FormulaEvaluationContext context)
-        {
             if (!context.FunctionRegistry.TryGetFunction(name, out var function))
-            {
                 return FormulaValue.FromError(new FormulaError(FormulaErrorType.Name));
-            }
-
             if (!ValidateArguments(function.Info, args.Count))
-            {
                 return FormulaValue.FromError(new FormulaError(FormulaErrorType.Value));
-            }
-
-            var functionContext = new FormulaFunctionContext(context);
-            return function.Invoke(functionContext, args);
+            return function.Invoke(new FormulaFunctionContext(context), args);
         }
 
-        private FormulaValue InvokeLazyFunction(
-            string name,
-            IReadOnlyList<FormulaExpression> arguments,
-            FormulaEvaluationContext context,
-            IFormulaValueResolver resolver)
+        private FormulaValue InvokeLazyFunction(string name, IReadOnlyList<FormulaExpression> arguments,
+            FormulaEvaluationContext context, IFormulaValueResolver resolver)
         {
+            if (context.LocalScope != null && context.LocalScope.TryGet(name, out var local, out _))
+                return InvokeLambdaExpressions(local, arguments, context, resolver);
             if (!context.FunctionRegistry.TryGetFunction(name, out var function))
             {
-                return FormulaValue.FromError(new FormulaError(FormulaErrorType.Name));
+                return resolver.TryResolveName(context, name, out var named)
+                    ? InvokeLambdaExpressions(named, arguments, context, resolver)
+                    : FormulaValue.FromError(new FormulaError(FormulaErrorType.Name));
             }
-
             if (!ValidateArguments(function.Info, arguments.Count))
-            {
                 return FormulaValue.FromError(new FormulaError(FormulaErrorType.Value));
-            }
-
             if (function is ILazyFormulaFunction lazy)
-            {
-                var functionContext = new FormulaFunctionContext(context);
-                return lazy.InvokeLazy(functionContext, arguments, this, resolver);
-            }
-
-            var values = new FormulaValue[arguments.Count];
-            for (var i = 0; i < arguments.Count; i++)
-            {
-                values[i] = EvaluateCore(arguments[i], context, resolver);
-            }
-
-            return InvokeFunction(name, values, context);
+                return lazy.InvokeLazy(new FormulaFunctionContext(context), arguments, this, resolver);
+            var values = arguments.Count == 0 ? Array.Empty<FormulaValue>() : new FormulaValue[arguments.Count];
+            for (var i = 0; i < arguments.Count; i++) values[i] = EvaluateCore(arguments[i], context, resolver);
+            return InvokeFunction(name, values, context, resolver, arguments);
         }
 
         private static bool ValidateArguments(FormulaFunctionInfo info, int count)

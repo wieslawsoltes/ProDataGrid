@@ -32,6 +32,7 @@
         <Project Path="tests/ProDataGrid.FormulaEngine.Benchmarks/ProDataGrid.FormulaEngine.Benchmarks.csproj" />
         <Project Path="tests/ProDataGrid.SourceGeneration.Benchmarks/ProDataGrid.SourceGeneration.Benchmarks.csproj" />
         <Project Path="tests/ProDataGrid.Hierarchy.Benchmarks/ProDataGrid.Hierarchy.Benchmarks.csproj" />
+        <Project Path="tests/ProDataGrid.FlatLayout.Benchmarks/ProDataGrid.FlatLayout.Benchmarks.csproj" />
         <Project Path="src/ProDiagnostics.UnitTests/ProDiagnostics.UnitTests.csproj" />
     </Folder>
     <Folder Name="/samples/">

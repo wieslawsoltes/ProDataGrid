@@ -4,7 +4,9 @@
 #nullable disable
 
 using System;
+using System.Globalization;
 using Avalonia.Collections;
+using Avalonia.Controls.Utils;
 using Avalonia.Data;
 using Avalonia.Input;
 using Avalonia.Interactivity;
@@ -22,7 +24,7 @@ public
 #else
 internal
 #endif
-    class DataGridTimePickerColumn : DataGridBoundColumn
+    class DataGridTimePickerColumn : DataGridBoundColumn, IDataGridDrawnCellValueProvider
     {
         private readonly Lazy<ControlTheme> _cellTimePickerTheme;
         private readonly Lazy<ControlTheme> _cellTextBlockTheme;
@@ -280,6 +282,56 @@ internal
             {
                 return is24Hour ? @"hh\:mm" : "h:mm tt";
             }
+        }
+
+        internal override bool SupportsVirtualCellSurface
+        {
+            get
+            {
+                if (GetType() != typeof(DataGridTimePickerColumn) ||
+                    !BindingCloneHelper.SupportsDirectRawDataContextRead(Binding))
+                {
+                    return false;
+                }
+
+                IDataGridColumnValueAccessor accessor = DataGridColumnMetadata.GetValueAccessor(this);
+                if (accessor is null)
+                {
+                    return false;
+                }
+
+                Type valueType = Nullable.GetUnderlyingType(accessor.ValueType) ?? accessor.ValueType;
+                return valueType == typeof(TimeSpan);
+            }
+        }
+
+        object IDataGridDrawnCellValueProvider.GetDrawnCellValue(object item)
+        {
+            object value = DataGridColumnMetadata.GetValueAccessor(this)?.GetValue(item);
+            return value is TimeSpan time ? FormatTime(time) : null;
+        }
+
+        private string FormatTime(TimeSpan time)
+        {
+            if (!string.IsNullOrEmpty(FormatString))
+            {
+                return time.ToString(FormatString, CultureInfo.CurrentCulture);
+            }
+
+            bool is24Hour = ClockIdentifier == "24HourClock";
+            if (is24Hour)
+            {
+                return time.ToString(UseSeconds ? @"hh\:mm\:ss" : @"hh\:mm", CultureInfo.CurrentCulture);
+            }
+
+            long ticks = time.Ticks % TimeSpan.TicksPerDay;
+            if (ticks < 0)
+            {
+                ticks += TimeSpan.TicksPerDay;
+            }
+
+            DateTime displayTime = DateTime.MinValue.AddTicks(ticks);
+            return displayTime.ToString(UseSeconds ? "h:mm:ss tt" : "h:mm tt", CultureInfo.CurrentCulture);
         }
 
         private void SyncEditProperties(TimePicker timePicker)

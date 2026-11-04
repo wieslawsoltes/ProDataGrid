@@ -43,6 +43,8 @@ namespace Avalonia.Controls
             return CellTheme ?? grid?.CellTheme;
         }
 
+        internal virtual bool SupportsVirtualCellSurface => false;
+
         /// <summary>
         /// Gets the value of a cell according to the specified binding.
         /// </summary>
@@ -73,6 +75,7 @@ namespace Avalonia.Controls
             }
             if (dataGridRow.OwningGrid == OwningGrid)
             {
+                OwningGrid.EnsureVirtualCompatibilityRow(dataGridRow);
                 DataGridCell dataGridCell = dataGridRow.Cells[Index];
                 if (dataGridCell != null)
                 {
@@ -170,10 +173,12 @@ namespace Avalonia.Controls
 
         internal virtual DataGridColumnHeader CreateHeader()
         {
-            var result = new DataGridColumnHeader
-            {
-                OwningColumn = this
-            };
+            return PrepareHeaderContainer(new DataGridColumnHeader());
+        }
+
+        internal DataGridColumnHeader PrepareHeaderContainer(DataGridColumnHeader result)
+        {
+            result.OwningColumn = this;
             _headerContentBinding?.Dispose();
             _headerTemplateBinding?.Dispose();
             _headerContentBinding = result.Bind(ContentControl.ContentProperty, this.GetObservable(HeaderProperty));
@@ -325,6 +330,11 @@ namespace Avalonia.Controls
         internal virtual void ClearElementCache()
         {
             RemoveEditingElement();
+            ClearHeaderCache();
+        }
+
+        internal void ClearHeaderCache()
+        {
             if (_headerContentBinding != null)
             {
                 _headerContentBinding.Dispose();

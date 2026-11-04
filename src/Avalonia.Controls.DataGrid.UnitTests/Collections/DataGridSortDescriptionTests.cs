@@ -138,6 +138,56 @@ namespace Avalonia.Controls.DataGridTests.Collections
         }
 
         [Theory]
+        [InlineData(ListSortDirection.Ascending, "a", "b", "c")]
+        [InlineData(ListSortDirection.Descending, "c", "b", "a")]
+        public void FromAccessor_Extracts_Each_Sort_Key_Once(
+            ListSortDirection direction,
+            params string[] expected)
+        {
+            var items = new[]
+            {
+                new Item("b", "1"),
+                new Item("a", "2"),
+                new Item("c", "3"),
+            };
+            int getterCalls = 0;
+            var accessor = new DataGridColumnValueAccessor<Item, string>(item =>
+            {
+                getterCalls++;
+                return item.Prop1;
+            });
+            var sortDescription = DataGridSortDescription.FromAccessor(accessor, direction);
+
+            string?[] result = sortDescription.OrderBy(items).Cast<Item>().Select(item => item.Prop1).ToArray();
+
+            Assert.Equal(expected, result);
+            Assert.Equal(items.Length, getterCalls);
+        }
+
+        [Fact]
+        public void FromAccessor_ThenBy_Extracts_Each_Secondary_Key_Once()
+        {
+            var items = new[]
+            {
+                (object)new Item("a", "b"),
+                new Item("a", "a"),
+                new Item("a", "c"),
+            }.OrderBy(item => ((Item)item).Prop1);
+            int getterCalls = 0;
+            var accessor = new DataGridColumnValueAccessor<Item, string>(item =>
+            {
+                getterCalls++;
+                return item.Prop2;
+            });
+            var sortDescription = DataGridSortDescription.FromAccessor(accessor);
+
+            string?[] result = sortDescription.ThenBy(items).Cast<Item>().Select(item => item.Prop2).ToArray();
+
+            Assert.Equal(new[] { "a", "b", "c" }, result);
+            Assert.Equal(3, getterCalls);
+        }
+
+        [Theory]
         [InlineData(ListSortDirection.Ascending, "Alice", "Bob", "Charlie")]
         [InlineData(ListSortDirection.Descending, "Charlie", "Bob", "Alice")]
         public void FromPath_Orders_Explicit_Interface_Property(

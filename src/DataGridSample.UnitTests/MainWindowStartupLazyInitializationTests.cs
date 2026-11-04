@@ -41,7 +41,9 @@ public sealed class MainWindowStartupLazyInitializationTests
             }
 
             if (control is PixelColumnsPage or FrozenColumnsPage or RightFrozenColumnsPage or LargeUniformPage or
-                RecycleDiagnosticsPage or OptimizedFlatCellPathsPage or OptimizedHierarchyCellPathsPage)
+                RecycleDiagnosticsPage or OptimizedFlatCellPathsPage or OptimizedHierarchyCellPathsPage or
+                VirtualSurfaceFlatDataPage or FlatSurfaceFlatDataPage or NestedSurfaceFlatDataPage or
+                VirtualSurfaceHierarchyPage or FlatSurfaceHierarchyPage or NestedSurfaceHierarchyPage)
             {
                 yield return control;
             }

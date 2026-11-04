@@ -10,6 +10,7 @@ using System.Collections.ObjectModel;
 using Avalonia.Controls.DataGridSelection;
 using Avalonia.Controls;
 using Avalonia.Controls.Selection;
+using Avalonia.Headless.XUnit;
 using Xunit;
 
 namespace Avalonia.Controls.DataGridTests.Selection;
@@ -110,9 +111,12 @@ public class SelectedItemsViewTests
         Assert.Empty(view);
     }
 
-    [Fact]
+    [AvaloniaFact]
     public void SelectionModel_Shifts_On_Insert_Before_Selected()
     {
+        // Observable sources subscribe through Avalonia's dispatcher-bound collection
+        // listener manager. Execute this test on its owner thread, not an xUnit worker.
+        Avalonia.Threading.Dispatcher.UIThread.VerifyAccess();
         var source = new ObservableCollection<string> { "A", "B", "C" };
         var model = new SelectionModel<string>
         {

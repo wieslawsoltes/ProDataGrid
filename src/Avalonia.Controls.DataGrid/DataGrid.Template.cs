@@ -388,6 +388,7 @@ internal
 
         protected override AutomationPeer OnCreateAutomationPeer()
         {
+            RequireRetainedVirtualRowsForAutomation();
             return new DataGridAutomationPeer(this);
         }
 

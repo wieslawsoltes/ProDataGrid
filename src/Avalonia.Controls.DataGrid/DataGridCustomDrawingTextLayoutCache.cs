@@ -42,16 +42,22 @@ namespace Avalonia.Controls
             _lru.Clear();
         }
 
-        public FormattedText GetOrCreate(in CacheKey key, Func<FormattedText> factory)
+        public bool TryGet(in CacheKey key, out FormattedText text)
         {
             if (_entries.TryGetValue(key, out LinkedListNode<CacheEntry> node))
             {
                 _lru.Remove(node);
                 _lru.AddFirst(node);
-                return node.Value.Text;
+                text = node.Value.Text;
+                return true;
             }
 
-            var text = factory();
+            text = null;
+            return false;
+        }
+
+        public FormattedText Add(in CacheKey key, FormattedText text)
+        {
             var entry = new CacheEntry(key, text);
             var newNode = new LinkedListNode<CacheEntry>(entry);
             _lru.AddFirst(newNode);

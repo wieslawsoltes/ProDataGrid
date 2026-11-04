@@ -171,6 +171,66 @@ public class DataGridMaskedTextColumnHeadlessTests
         Assert.Equal("Enter phone...", column.Watermark);
     }
 
+    [AvaloniaFact]
+    public void MaskedTextColumn_Virtual_Value_Uses_Typed_Text_Accessor()
+    {
+        var column = new DataGridMaskedTextColumn
+        {
+            Binding = new Binding(nameof(MaskedTextItem.Phone))
+            {
+                StringFormat = "Phone: {0}",
+            },
+        };
+        DataGridColumnMetadata.SetValueAccessor(
+            column,
+            new DataGridColumnValueAccessor<MaskedTextItem, string>(item => item.Phone));
+        var item = new MaskedTextItem { Phone = "(555) 123-4567" };
+
+        Assert.True(column.SupportsVirtualCellSurface);
+        Assert.Equal(
+            "Phone: (555) 123-4567",
+            ((IDataGridDrawnCellValueProvider)column).GetDrawnCellValue(item));
+
+        item.Phone = null!;
+        Assert.Equal(
+            "Phone: ",
+            ((IDataGridDrawnCellValueProvider)column).GetDrawnCellValue(item));
+
+        column.Binding = new Binding(nameof(MaskedTextItem.Phone));
+        Assert.Null(((IDataGridDrawnCellValueProvider)column).GetDrawnCellValue(item));
+    }
+
+    [AvaloniaFact]
+    public void MaskedTextColumn_Virtual_Surface_Requires_Direct_Typed_Text_Access()
+    {
+        var column = new DataGridMaskedTextColumn
+        {
+            Binding = new Binding(nameof(MaskedTextItem.Phone)),
+        };
+
+        Assert.False(column.SupportsVirtualCellSurface);
+
+        DataGridColumnMetadata.SetValueAccessor(
+            column,
+            new DataGridColumnValueAccessor<MaskedTextItem, string>(item => item.Phone));
+        Assert.True(column.SupportsVirtualCellSurface);
+
+        column.Binding = new Binding(nameof(MaskedTextItem.Phone))
+        {
+            Source = new MaskedTextItem(),
+        };
+        Assert.False(column.SupportsVirtualCellSurface);
+
+        var derived = new DerivedMaskedTextColumn
+        {
+            Binding = new Binding(nameof(MaskedTextItem.Phone)),
+        };
+        DataGridColumnMetadata.SetValueAccessor(
+            derived,
+            new DataGridColumnValueAccessor<MaskedTextItem, string>(item => item.Phone));
+        Assert.False(derived.SupportsVirtualCellSurface);
+    }
+
     private static (Window window, DataGrid grid) CreateWindow(MaskedTextTestViewModel vm)
     {
         var window = new Window
@@ -233,5 +293,9 @@ public class DataGridMaskedTextColumnHeadlessTests
     {
         public string Name { get; set; } = string.Empty;
         public string Phone { get; set; } = string.Empty;
+    }
+
+    private sealed class DerivedMaskedTextColumn : DataGridMaskedTextColumn
+    {
     }
 }

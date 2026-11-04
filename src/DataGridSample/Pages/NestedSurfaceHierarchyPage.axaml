@@ -1,0 +1,86 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:behaviors="clr-namespace:DataGridSample.Behaviors"
+             xmlns:models="clr-namespace:DataGridSample.Models"
+             xmlns:viewModels="clr-namespace:DataGridSample.ViewModels"
+             x:Class="DataGridSample.Pages.NestedSurfaceHierarchyPage"
+             x:DataType="viewModels:OptimizedHierarchyCellPathsViewModel"
+             behaviors:DataContextFactoryBehavior.Factory="{StaticResource ViewModelFactory}">
+  <UserControl.Resources>
+    <viewModels:OptimizedHierarchyCellPathsViewModelFactory x:Key="ViewModelFactory" />
+  </UserControl.Resources>
+  <UserControl.Styles>
+    <Style Selector="DataGrid.optimized-cell-path">
+      <Setter Property="RowTheme" Value="{StaticResource DataGridOptimizedFeatureUnfrozenRowTheme}" />
+      <Setter Property="CellTheme" Value="{StaticResource DataGridOptimizedCellTheme}" />
+      <Setter Property="ColumnHeaderTheme" Value="{StaticResource DataGridOptimizedFeatureColumnHeaderTheme}" />
+      <Setter Property="UseLightweightFiller" Value="True" />
+    </Style>
+  </UserControl.Styles>
+
+  <Grid Margin="12" RowDefinitions="Auto,Auto,Auto,*" RowSpacing="8">
+    <StackPanel Spacing="3">
+      <TextBlock Classes="h2" Text="Nested Surface Baseline — Hierarchical Model" />
+      <TextBlock TextWrapping="Wrap"
+                 Text="Current architecture baseline for the same hierarchy generator and cell paths. Each realized hierarchical row owns its cells presenter." />
+    </StackPanel>
+
+    <WrapPanel Grid.Row="1" Orientation="Horizontal">
+      <TextBlock Margin="0,0,6,8" VerticalAlignment="Center" Text="Cell path" />
+      <ComboBox Width="255" Margin="0,0,14,8"
+                ItemsSource="{CompiledBinding Paths}"
+                SelectedItem="{CompiledBinding SelectedPath, Mode=TwoWay}">
+        <ComboBox.ItemTemplate>
+          <DataTemplate x:DataType="models:OptimizedCellPathOption">
+            <TextBlock Text="{CompiledBinding Name}" />
+          </DataTemplate>
+        </ComboBox.ItemTemplate>
+      </ComboBox>
+      <TextBlock Margin="0,0,4,8" VerticalAlignment="Center" Text="Roots" />
+      <NumericUpDown Width="75" Margin="0,0,8,8" Minimum="1" Maximum="128"
+                     Value="{CompiledBinding RootCount, Mode=TwoWay}" />
+      <TextBlock Margin="0,0,4,8" VerticalAlignment="Center" Text="Branching" />
+      <NumericUpDown Width="70" Margin="0,0,8,8" Minimum="2" Maximum="12"
+                     Value="{CompiledBinding BranchingFactor, Mode=TwoWay}" />
+      <TextBlock Margin="0,0,4,8" VerticalAlignment="Center" Text="Depth" />
+      <NumericUpDown Width="65" Margin="0,0,8,8" Minimum="1" Maximum="5"
+                     Value="{CompiledBinding Depth, Mode=TwoWay}" />
+      <Button Margin="0,0,12,8" Content="Load workload"
+              Command="{CompiledBinding LoadRepresentativeWorkloadCommand}" />
+      <Button Margin="0,0,6,8" Content="Expand all" Command="{CompiledBinding ExpandAllCommand}" />
+      <Button Margin="0,0,12,8" Content="Collapse all" Command="{CompiledBinding CollapseAllCommand}" />
+      <Button Margin="0,0,6,8" Content="First" Command="{CompiledBinding JumpToFirstCommand}" />
+      <Button Margin="0,0,6,8" Content="Middle" Command="{CompiledBinding JumpToMiddleCommand}" />
+      <Button Margin="0,0,8,8" Content="Last" Command="{CompiledBinding JumpToLastCommand}" />
+    </WrapPanel>
+
+    <Border Grid.Row="2" Padding="10,8" Background="#08000000" CornerRadius="5">
+      <StackPanel Orientation="Horizontal" Spacing="14">
+        <TextBlock FontWeight="SemiBold" Text="Visual layout: nested baseline" />
+        <TextBlock Text="{CompiledBinding TargetNodeSummary}" />
+        <TextBlock Text="{CompiledBinding VisibleNodeSummary}" />
+        <TextBlock Text="{CompiledBinding Summary}" />
+      </StackPanel>
+    </Border>
+
+    <DataGrid Grid.Row="3"
+              AutomationProperties.Name="Nested surface hierarchical baseline grid"
+              Height="520"
+              AutoGenerateColumns="False"
+              AutoScrollToSelectedItem="True"
+              CanUserSortColumns="False"
+              Classes.hierarchical="True"
+              Classes.optimized-cell-path="{CompiledBinding UseOptimizedTheme}"
+              ColumnDefinitionsSource="{CompiledBinding ActiveColumns}"
+              GridLinesVisibility="Horizontal"
+              HeadersVisibility="Column"
+              HierarchicalModel="{CompiledBinding Model}"
+              HierarchicalRowsEnabled="True"
+              IsReadOnly="True"
+              RowHeight="32"
+              SelectedItem="{CompiledBinding SelectedItem, Mode=TwoWay}"
+              SelectionMode="Single"
+              SelectionUnit="FullRow"
+              UseLogicalScrollable="True" />
+  </Grid>
+</UserControl>

@@ -1,6 +1,22 @@
 # ProDataGrid hierarchy benchmarks
 
-This project owns the repeatable ProDataGrid-side hierarchy model benchmarks used by the TreeDataGrid comparison campaign. It deliberately measures `ExpandAll` separately from control creation, layout, scrolling, and rendering.
+This project owns the repeatable ProDataGrid-side hierarchy model benchmarks used by the TreeDataGrid comparison campaign. It deliberately measures hierarchy model operations separately from control creation, layout, scrolling, and rendering.
+
+The collapse lane mirrors the **Optimized Cell Paths (Hierarchy)** sample's default
+workload: 32 roots, branching factor 8, depth 4, and 149,792 materialized nodes.
+Iteration setup expands the hierarchy; the measured operation contains only the
+coherent `CollapseAll` dispatch.
+
+```sh
+dotnet run -c Release --project tests/ProDataGrid.Hierarchy.Benchmarks -- \
+  --filter '*HierarchyCollapseBenchmarks*' \
+  --job Short \
+  --warmupCount 2 \
+  --iterationCount 5 \
+  --invocationCount 1 \
+  --unrollFactor 1 \
+  --allStats
+```
 
 Run a clean Release timing pass:
 

@@ -129,7 +129,7 @@ namespace ProCharts.Skia
         }
     }
 
-    public sealed class SkiaChartStyle
+    public sealed partial class SkiaChartStyle
     {
         public static readonly IReadOnlyList<SKColor> DefaultSeriesColors = new[]
         {
@@ -146,6 +146,7 @@ namespace ProCharts.Skia
 
         public SkiaChartStyle(SkiaChartStyle source)
         {
+            Advanced = source.Advanced;
             Background = source.Background;
             Axis = source.Axis;
             Text = source.Text;
@@ -696,7 +697,12 @@ namespace ProCharts.Skia
             style ??= new SkiaChartStyle();
             style = ResolveStyle(style);
 
-            if (!TryBuildRenderContext(bounds, snapshot, style, out var context))
+            if (IsAdvancedChart(snapshot))
+            {
+                return TryGetAdvancedViewport(bounds, snapshot, style, out info);
+            }
+
+            if (!TryGetRenderContext(bounds, snapshot, style, out var context))
             {
                 info = default;
                 return false;
@@ -722,6 +728,12 @@ namespace ProCharts.Skia
             style ??= new SkiaChartStyle();
             style = ResolveStyle(style);
 
+            if (TryRenderAdvanced(canvas, bounds, snapshot, style, delta))
+            {
+                cache?.Invalidate();
+                return;
+            }
+
             if (cache != null)
             {
                 RenderWithCache(canvas, bounds, snapshot, delta, style, cache);
@@ -739,7 +751,7 @@ namespace ProCharts.Skia
             SkiaChartStyle style,
             SkiaChartRenderCache cache)
         {
-            if (!TryBuildRenderContext(bounds, snapshot, style, out var context))
+            if (!TryGetRenderContext(bounds, snapshot, style, out var context))
             {
                 cache.Invalidate();
                 canvas.Save();
@@ -890,7 +902,7 @@ namespace ProCharts.Skia
 
         private void RenderCore(SKCanvas canvas, SKRect bounds, ChartDataSnapshot snapshot, SkiaChartStyle style)
         {
-            if (!TryBuildRenderContext(bounds, snapshot, style, out var context))
+            if (!TryGetRenderContext(bounds, snapshot, style, out var context))
             {
                 canvas.Save();
                 canvas.ClipRect(bounds);
@@ -2171,6 +2183,10 @@ namespace ProCharts.Skia
                         context.MinBubbleSize,
                         context.MaxBubbleSize);
                     break;
+                case ChartSeriesKind.RangeArea:
+                    DrawRangeAreaSeries(canvas, context.Plot, series, seriesIndex, axisMin, axisMax, axisKind, style,
+                        context.UseNumericCategoryAxis, context.CategoryAxisKind, context.MinCategory, context.MaxCategory);
+                    break;
                 case ChartSeriesKind.Area:
                     DrawAreaSeries(canvas, context.Plot, series, seriesIndex, axisMin, axisMax, axisKind, style);
                     break;
@@ -2554,6 +2570,10 @@ namespace ProCharts.Skia
                             context.MinBubbleSize,
                             context.MaxBubbleSize);
                         break;
+                    case ChartSeriesKind.RangeArea:
+                        DrawRangeAreaSeries(canvas, context.Plot, series, seriesIndex, axisMin, axisMax, axisKind, style,
+                            context.UseNumericCategoryAxis, context.CategoryAxisKind, context.MinCategory, context.MaxCategory);
+                        break;
                     case ChartSeriesKind.Area:
                         DrawAreaSeries(canvas, context.Plot, series, seriesIndex, axisMin, axisMax, axisKind, style);
                         break;
@@ -2605,8 +2625,22 @@ namespace ProCharts.Skia
 
         public SkiaChartHitTestResult? HitTest(SKPoint point, SKRect bounds, ChartDataSnapshot snapshot, SkiaChartStyle? style = null)
         {
+            ArgumentNullException.ThrowIfNull(snapshot);
+            if (!float.IsFinite(point.X) || !float.IsFinite(point.Y) ||
+                !float.IsFinite(bounds.Left) || !float.IsFinite(bounds.Top) ||
+                !float.IsFinite(bounds.Right) || !float.IsFinite(bounds.Bottom) ||
+                !float.IsFinite(bounds.Width) || !float.IsFinite(bounds.Height) ||
+                bounds.Width <= 0 || bounds.Height <= 0) return null;
             style ??= new SkiaChartStyle();
             style = ResolveStyle(style);
+            if (IsAdvancedChart(snapshot))
+            {
+                return HitTestAdvanced(point, bounds, snapshot, style);
+            }
+            if (TryHitTestIndexed(point, bounds, snapshot, style, out var indexedHit))
+            {
+                return indexedHit;
+            }
             if (snapshot.Series.Count == 0)
             {
                 return null;
@@ -2967,6 +3001,18 @@ namespace ProCharts.Skia
                     continue;
                 }
 
+                if (series.Kind == ChartSeriesKind.RangeArea)
+                {
+                    for (int i = 0; i < series.Values.Count; i++)
+                    {
+                        if (!TryGetRangeAreaPoint(series, i, axisKind, out double low, out double high)) continue;
+                        minValue = Math.Min(minValue, low);
+                        maxValue = Math.Max(maxValue, high);
+                        hasValue = true;
+                    }
+                    continue;
+                }
+
                 if (IsFinancialSeriesKind(series.Kind))
                 {
                     var count = GetFinancialPointCount(series, series.Kind);
@@ -3258,7 +3304,7 @@ namespace ProCharts.Skia
                     continue;
                 }
 
-                if (series.Kind != ChartSeriesKind.Scatter && series.Kind != ChartSeriesKind.Bubble)
+                if (series.Kind != ChartSeriesKind.Scatter && series.Kind != ChartSeriesKind.Bubble && series.Kind != ChartSeriesKind.RangeArea)
                 {
                     return false;
                 }
@@ -3282,7 +3328,7 @@ namespace ProCharts.Skia
 
             foreach (var series in snapshot.Series)
             {
-                if ((series.Kind != ChartSeriesKind.Scatter && series.Kind != ChartSeriesKind.Bubble) || series.XValues == null)
+                if ((series.Kind != ChartSeriesKind.Scatter && series.Kind != ChartSeriesKind.Bubble && series.Kind != ChartSeriesKind.RangeArea) || series.XValues == null)
                 {
                     continue;
                 }

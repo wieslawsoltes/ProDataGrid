@@ -17,127 +17,32 @@ namespace ProDataGrid.FormulaEngine.Excel
         }
 
         public override FormulaValue Invoke(FormulaFunctionContext context, IReadOnlyList<FormulaValue> args)
-        {
-            if (!ExcelStatisticalUtilities.TryCollectNumbers(context.EvaluationContext.Workbook.Settings, args, out var numbers, out var error))
-            {
-                return FormulaValue.FromError(error);
-            }
-
-            if (numbers.Count == 0)
-            {
-                return FormulaValue.FromError(new FormulaError(FormulaErrorType.Num));
-            }
-
-            numbers.Sort();
-            var mid = numbers.Count / 2;
-            if (numbers.Count % 2 == 1)
-            {
-                return ExcelFunctionUtilities.CreateNumber(context, numbers[mid]);
-            }
-
-            return ExcelFunctionUtilities.CreateNumber(context, (numbers[mid - 1] + numbers[mid]) / 2d);
-        }
+            => ExcelOrderStatistics.Median(context, args);
     }
 
-    internal sealed class ModeSingleFunction : ExcelFunctionBase
+    internal sealed class ModeSingleFunction : ExcelModeFunction
     {
-        public ModeSingleFunction()
-            : base("MODE.SNGL", new FormulaFunctionInfo(1, -1))
-        {
-        }
-
-        public override FormulaValue Invoke(FormulaFunctionContext context, IReadOnlyList<FormulaValue> args)
-        {
-            if (!ExcelStatisticalUtilities.TryCollectNumbers(context.EvaluationContext.Workbook.Settings, args, out var numbers, out var error))
-            {
-                return FormulaValue.FromError(error);
-            }
-
-            if (numbers.Count == 0)
-            {
-                return FormulaValue.FromError(new FormulaError(FormulaErrorType.NA));
-            }
-
-            var counts = new Dictionary<double, int>();
-            for (var i = 0; i < numbers.Count; i++)
-            {
-                var value = numbers[i];
-                counts.TryGetValue(value, out var count);
-                counts[value] = count + 1;
-            }
-
-            var bestCount = 1;
-            var bestValue = 0d;
-            var found = false;
-            foreach (var pair in counts)
-            {
-                if (pair.Value > bestCount)
-                {
-                    bestCount = pair.Value;
-                    bestValue = pair.Key;
-                    found = true;
-                }
-            }
-
-            if (!found)
-            {
-                return FormulaValue.FromError(new FormulaError(FormulaErrorType.NA));
-            }
-
-            return ExcelFunctionUtilities.CreateNumber(context, bestValue);
-        }
+        public ModeSingleFunction() : base("MODE.SNGL", multiple: false) { }
     }
 
-    internal sealed class StdevSFunction : ExcelFunctionBase
+    internal sealed class StdevSFunction : ExcelDescriptiveFunction
     {
-        public StdevSFunction()
-            : base("STDEV.S", new FormulaFunctionInfo(1, -1))
-        {
-        }
-
-        public override FormulaValue Invoke(FormulaFunctionContext context, IReadOnlyList<FormulaValue> args)
-        {
-            return ExcelStatisticalUtilities.StandardDeviation(context.EvaluationContext.Workbook.Settings, args, sample: true);
-        }
+        public StdevSFunction() : base("STDEV.S", ExcelDescriptiveOperation.SampleDeviation) { }
     }
 
-    internal sealed class StdevPFunction : ExcelFunctionBase
+    internal sealed class StdevPFunction : ExcelDescriptiveFunction
     {
-        public StdevPFunction()
-            : base("STDEV.P", new FormulaFunctionInfo(1, -1))
-        {
-        }
-
-        public override FormulaValue Invoke(FormulaFunctionContext context, IReadOnlyList<FormulaValue> args)
-        {
-            return ExcelStatisticalUtilities.StandardDeviation(context.EvaluationContext.Workbook.Settings, args, sample: false);
-        }
+        public StdevPFunction() : base("STDEV.P", ExcelDescriptiveOperation.PopulationDeviation) { }
     }
 
-    internal sealed class VarSFunction : ExcelFunctionBase
+    internal sealed class VarSFunction : ExcelDescriptiveFunction
     {
-        public VarSFunction()
-            : base("VAR.S", new FormulaFunctionInfo(1, -1))
-        {
-        }
-
-        public override FormulaValue Invoke(FormulaFunctionContext context, IReadOnlyList<FormulaValue> args)
-        {
-            return ExcelStatisticalUtilities.Variance(context.EvaluationContext.Workbook.Settings, args, sample: true);
-        }
+        public VarSFunction() : base("VAR.S", ExcelDescriptiveOperation.SampleVariance) { }
     }
 
-    internal sealed class VarPFunction : ExcelFunctionBase
+    internal sealed class VarPFunction : ExcelDescriptiveFunction
     {
-        public VarPFunction()
-            : base("VAR.P", new FormulaFunctionInfo(1, -1))
-        {
-        }
-
-        public override FormulaValue Invoke(FormulaFunctionContext context, IReadOnlyList<FormulaValue> args)
-        {
-            return ExcelStatisticalUtilities.Variance(context.EvaluationContext.Workbook.Settings, args, sample: false);
-        }
+        public VarPFunction() : base("VAR.P", ExcelDescriptiveOperation.PopulationVariance) { }
     }
 
     internal sealed class LargeFunction : ExcelFunctionBase
@@ -208,30 +113,14 @@ namespace ProDataGrid.FormulaEngine.Excel
         }
     }
 
-    internal sealed class RankEqFunction : ExcelFunctionBase
+    internal sealed class RankEqFunction : ExcelRankingFunction
     {
-        public RankEqFunction()
-            : base("RANK.EQ", new FormulaFunctionInfo(2, 3))
-        {
-        }
-
-        public override FormulaValue Invoke(FormulaFunctionContext context, IReadOnlyList<FormulaValue> args)
-        {
-            return ExcelStatisticalUtilities.Rank(context, args, average: false);
-        }
+        public RankEqFunction() : base("RANK.EQ", ExcelRankingOperation.EqualRank) { }
     }
 
-    internal sealed class RankAvgFunction : ExcelFunctionBase
+    internal sealed class RankAvgFunction : ExcelRankingFunction
     {
-        public RankAvgFunction()
-            : base("RANK.AVG", new FormulaFunctionInfo(2, 3))
-        {
-        }
-
-        public override FormulaValue Invoke(FormulaFunctionContext context, IReadOnlyList<FormulaValue> args)
-        {
-            return ExcelStatisticalUtilities.Rank(context, args, average: true);
-        }
+        public RankAvgFunction() : base("RANK.AVG", ExcelRankingOperation.AverageRank) { }
     }
 
     internal sealed class CountBlankFunction : ExcelFunctionBase
@@ -728,183 +617,20 @@ namespace ProDataGrid.FormulaEngine.Excel
             return true;
         }
 
-        public static FormulaValue Variance(
-            FormulaCalculationSettings settings,
-            IReadOnlyList<FormulaValue> args,
-            bool sample)
-        {
-            if (!TryCollectNumbers(settings, args, out var numbers, out var error))
-            {
-                return FormulaValue.FromError(error);
-            }
+        public static FormulaValue Variance(FormulaCalculationSettings settings, IReadOnlyList<FormulaValue> args, bool sample)
+            => ExcelDescriptiveFunction.EvaluateValues(settings, args,
+                sample ? ExcelDescriptiveOperation.SampleVariance : ExcelDescriptiveOperation.PopulationVariance);
 
-            if (numbers.Count == 0 || (sample && numbers.Count < 2))
-            {
-                return FormulaValue.FromError(new FormulaError(FormulaErrorType.Div0));
-            }
-
-            var mean = 0d;
-            for (var i = 0; i < numbers.Count; i++)
-            {
-                mean += numbers[i];
-            }
-            mean /= numbers.Count;
-
-            var sumSq = 0d;
-            for (var i = 0; i < numbers.Count; i++)
-            {
-                var delta = numbers[i] - mean;
-                sumSq += delta * delta;
-            }
-
-            var variance = sample ? sumSq / (numbers.Count - 1) : sumSq / numbers.Count;
-            return ExcelFunctionUtilities.CreateNumber(settings, variance);
-        }
-
-        public static FormulaValue StandardDeviation(
-            FormulaCalculationSettings settings,
-            IReadOnlyList<FormulaValue> args,
-            bool sample)
-        {
-            var variance = Variance(settings, args, sample);
-            if (variance.Kind == FormulaValueKind.Error)
-            {
-                return variance;
-            }
-
-            return ExcelFunctionUtilities.CreateNumber(settings, Math.Sqrt(variance.AsNumber()));
-        }
+        public static FormulaValue StandardDeviation(FormulaCalculationSettings settings, IReadOnlyList<FormulaValue> args, bool sample)
+            => ExcelDescriptiveFunction.EvaluateValues(settings, args,
+                sample ? ExcelDescriptiveOperation.SampleDeviation : ExcelDescriptiveOperation.PopulationDeviation);
 
         public static FormulaValue OrderedStatistic(
-            FormulaCalculationSettings settings,
-            FormulaValue dataValue,
-            FormulaValue kValue,
-            bool largest)
-        {
-            if (!TryCollectNumbers(settings, new[] { dataValue }, out var numbers, out var error))
-            {
-                return FormulaValue.FromError(error);
-            }
+            FormulaCalculationSettings settings, FormulaValue dataValue, FormulaValue kValue, bool largest)
+            => ExcelOrderStatistics.Ordered(settings, dataValue, kValue, largest);
 
-            if (!ExcelFunctionUtilities.TryCoerceToInteger(settings, kValue, out var k, out error))
-            {
-                return FormulaValue.FromError(error);
-            }
+        public static FormulaValue PercentileInc(FormulaCalculationSettings settings, FormulaValue dataValue, double k)
+            => ExcelOrderStatistics.Percentile(settings, dataValue, k, exclusive: false);
 
-            if (k <= 0 || k > numbers.Count)
-            {
-                return FormulaValue.FromError(new FormulaError(FormulaErrorType.Num));
-            }
-
-            numbers.Sort();
-            var index = largest ? numbers.Count - k : k - 1;
-            return ExcelFunctionUtilities.CreateNumber(settings, numbers[index]);
-        }
-
-        public static FormulaValue PercentileInc(
-            FormulaCalculationSettings settings,
-            FormulaValue dataValue,
-            double k)
-        {
-            if (k < 0d || k > 1d)
-            {
-                return FormulaValue.FromError(new FormulaError(FormulaErrorType.Num));
-            }
-
-            if (!TryCollectNumbers(settings, new[] { dataValue }, out var numbers, out var error))
-            {
-                return FormulaValue.FromError(error);
-            }
-
-            if (numbers.Count == 0)
-            {
-                return FormulaValue.FromError(new FormulaError(FormulaErrorType.Num));
-            }
-
-            numbers.Sort();
-
-            if (k <= 0d)
-            {
-                return ExcelFunctionUtilities.CreateNumber(settings, numbers[0]);
-            }
-
-            if (k >= 1d)
-            {
-                return ExcelFunctionUtilities.CreateNumber(settings, numbers[numbers.Count - 1]);
-            }
-
-            var position = (numbers.Count - 1) * k;
-            var lower = (int)Math.Floor(position);
-            var upper = (int)Math.Ceiling(position);
-            if (lower == upper)
-            {
-                return ExcelFunctionUtilities.CreateNumber(settings, numbers[lower]);
-            }
-
-            var fraction = position - lower;
-            var value = numbers[lower] + ((numbers[upper] - numbers[lower]) * fraction);
-            return ExcelFunctionUtilities.CreateNumber(settings, value);
-        }
-
-        public static FormulaValue Rank(
-            FormulaFunctionContext context,
-            IReadOnlyList<FormulaValue> args,
-            bool average)
-        {
-            var address = context.EvaluationContext.Address;
-            var numberValue = ExcelLookupUtilities.ApplyImplicitIntersection(args[0], address);
-            if (!ExcelFunctionUtilities.TryCoerceToNumber(context, numberValue, out var number, out var error))
-            {
-                return FormulaValue.FromError(error);
-            }
-
-            if (!TryCollectNumbers(context.EvaluationContext.Workbook.Settings, new[] { args[1] }, out var numbers, out error))
-            {
-                return FormulaValue.FromError(error);
-            }
-
-            var order = 0;
-            if (args.Count > 2)
-            {
-                var orderValue = ExcelLookupUtilities.ApplyImplicitIntersection(args[2], address);
-                if (!ExcelFunctionUtilities.TryCoerceToInteger(context, orderValue, out order, out error))
-                {
-                    return FormulaValue.FromError(error);
-                }
-            }
-
-            if (order != 0 && order != 1)
-            {
-                return FormulaValue.FromError(new FormulaError(FormulaErrorType.Value));
-            }
-
-            var greater = 0;
-            var equal = 0;
-            for (var i = 0; i < numbers.Count; i++)
-            {
-                var candidate = numbers[i];
-                if (candidate == number)
-                {
-                    equal++;
-                }
-                else if (order == 0 && candidate > number)
-                {
-                    greater++;
-                }
-                else if (order == 1 && candidate < number)
-                {
-                    greater++;
-                }
-            }
-
-            var rankStart = greater + 1;
-            if (!average || equal <= 1)
-            {
-                return ExcelFunctionUtilities.CreateNumber(context, rankStart);
-            }
-
-            var rankEnd = greater + equal;
-            return ExcelFunctionUtilities.CreateNumber(context, (rankStart + rankEnd) / 2d);
-        }
     }
 }

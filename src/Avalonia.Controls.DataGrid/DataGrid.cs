@@ -147,6 +147,11 @@ internal
 #endif
         virtual void ClearContainerForItemOverride(DataGridRow element, object item)
         {
+            ClearContainerState(element, clearDataContext: true);
+        }
+
+        private void ClearContainerState(DataGridRow element, bool clearDataContext)
+        {
             var previousSuppress = _suppressSelectionUpdatesFromRows;
             _suppressSelectionUpdatesFromRows = true;
             try
@@ -155,7 +160,10 @@ internal
                 element.IsPlaceholder = false;
                 element.ClearDragDropState();
                 ClearRowValidation(element);
-                element.DataContext = null;
+                if (clearDataContext)
+                {
+                    element.DataContext = null;
+                }
                 element.ClearPointerOverState();
             }
             finally
@@ -186,6 +194,23 @@ internal
             DataGridDiagnostics.RecordRowRecycled();
             row.RecycledDataContext ??= row.DataContext;
             row.RecycledIsPlaceholder = row.IsPlaceholder;
+
+            // The default virtual surface has no retained display cells and its base cleanup hook
+            // is empty. Keep the old item assigned until the recycled row receives its next item,
+            // avoiding an otherwise redundant item -> null -> item binding transition. Derived grids
+            // and custom containers retain the complete virtual cleanup contract below.
+            if (UsesDefaultVirtualRowPipeline &&
+                row.GetType() == typeof(DataGridRow))
+            {
+                // A LoadingRow observer must see freshly prepared row state. Handler-free
+                // surface rows can defer these assignments until LoadRowVisualsForDisplay.
+                if (HasLoadingRowHandlers())
+                {
+                    ClearContainerState(row, clearDataContext: false);
+                }
+                return;
+            }
+
             row.PreserveRecycledRootDataContext();
             OnCleanUpVirtualizedItem(row);
             ClearContainerForItemOverride(row, row.DataContext);
@@ -203,8 +228,39 @@ internal
             PrepareContainerForItemOverride(row, item);
         }
 
+        private void PrepareDefaultVirtualSurfaceRow(
+            DataGridRow row,
+            object item,
+            bool recordDiagnostics = true)
+        {
+            if (recordDiagnostics)
+            {
+                DataGridDiagnostics.RecordRowPrepared();
+            }
+
+            // Default surface rows have no cell containers. Recycling retains their previous
+            // item until this bind, so only reset row-level validation here; selection and other
+            // visual state are overwritten by LoadRowVisualsForDisplay before the row is shown.
+            if (!row.IsValid)
+            {
+                row.IsValid = true;
+            }
+            if (row.ValidationSeverity != DataGridValidationSeverity.None)
+            {
+                row.ValidationSeverity = DataGridValidationSeverity.None;
+            }
+            if (item is INotifyDataErrorInfo)
+            {
+                RestoreRowValidationState(row, item);
+            }
+        }
+
         private void NotifyPreparedRowCells(DataGridRow row)
         {
+            if (UsesFlatVisualLayout)
+            {
+                row.UpdateFlatCellDataContexts();
+            }
             NotifyCellsPrepared(row);
         }
 
@@ -540,6 +596,8 @@ internal
             CanUserResizeColumnsProperty.Changed.AddClassHandler<DataGrid>((x, e) => x.OnCanUserResizeColumnsChanged(e));
             ColumnWidthProperty.Changed.AddClassHandler<DataGrid>((x, e) => x.OnColumnWidthChanged(e));
             ColumnWidthSharingScopeProperty.Changed.AddClassHandler<DataGrid>((x, e) => x.OnColumnWidthSharingScopeChanged(e));
+            VisualLayoutModeProperty.Changed.AddClassHandler<DataGrid>((x, e) => x.OnVisualLayoutModeChanged(e));
+            CellThemeProperty.Changed.AddClassHandler<DataGrid>((x, e) => x.RefreshVirtualCellBackendIfEligibilityChanged());
             FrozenColumnCountProperty.Changed.AddClassHandler<DataGrid>((x, e) => x.OnFrozenColumnCountChanged(e));
             FrozenColumnCountRightProperty.Changed.AddClassHandler<DataGrid>((x, e) => x.OnFrozenColumnCountRightChanged(e));
             GridLinesVisibilityProperty.Changed.AddClassHandler<DataGrid>((x, e) => x.OnGridLinesVisibilityChanged(e));
@@ -2914,6 +2972,7 @@ internal
 
         private void SearchModel_ResultsChanged(object sender, SearchResultsChangedEventArgs e)
         {
+            RefreshVirtualCellBackendAfterColumnsChanged();
             UpdateSearchResults(e.NewResults);
             TryRestorePendingSearchCurrent();
         }
@@ -2928,6 +2987,7 @@ internal
             if (e.PropertyName == nameof(ISearchModel.HighlightMode)
                 || e.PropertyName == nameof(ISearchModel.HighlightCurrent))
             {
+                RefreshVirtualCellBackendAfterColumnsChanged();
                 RefreshSearchStates();
             }
         }
@@ -3035,6 +3095,7 @@ internal
 
         private void HandleHierarchicalFlattenedChanged(FlattenedChangedEventArgs e)
         {
+            using var activity = DataGridDiagnostics.HierarchicalFlattenedChanged();
             if (!_hierarchicalRowsEnabled)
             {
                 return;
@@ -3056,8 +3117,10 @@ internal
                 _pendingHierarchicalAnchorHint = null;
             }
 
-            var canApplyChanges = CanApplyHierarchicalFlattenedChanges(e) &&
-                                  !RequiresHierarchicalBulkRefresh(e.Changes);
+            var canApplyChanges = CanApplyHierarchicalFlattenedChanges(e);
+            var requiresBulkRefresh = canApplyChanges && RequiresHierarchicalBulkRefresh(e.Changes);
+            var canApplyBulkSplice = requiresBulkRefresh && CanApplyHierarchicalBulkSplice(e.Changes, e.IndexMap);
+            canApplyChanges = canApplyChanges && !requiresBulkRefresh;
             var hasAnchor = false;
             HierarchicalAnchor anchor = default;
 
@@ -3087,8 +3150,11 @@ internal
             using (_hierarchicalModel?.BeginVirtualizationGuard())
             using (_rowsPresenter?.BeginVirtualizationGuard())
             {
-                RemapSelectionForHierarchyChange(indexMap);
-                if (canApplyChanges)
+                using (DataGridDiagnostics.HierarchicalSelectionRemap())
+                {
+                    RemapSelectionForHierarchyChange(indexMap);
+                }
+                if (canApplyChanges || canApplyBulkSplice)
                 {
                     var suppressOffsetAdjustments = hasAnchor;
                     if (suppressOffsetAdjustments)
@@ -3097,7 +3163,14 @@ internal
                     }
                     try
                     {
-                        ApplyHierarchicalFlattenedChanges(e.Changes);
+                        if (canApplyBulkSplice)
+                        {
+                            ApplyHierarchicalBulkSplice(e.Changes[0], e.IndexMap);
+                        }
+                        else
+                        {
+                            ApplyHierarchicalFlattenedChanges(e.Changes);
+                        }
                     }
                     finally
                     {
@@ -3125,7 +3198,13 @@ internal
                     CurrentSlot = -1;
                 }
                 RefreshSelectionFromModel();
-                RequestHierarchicalIndentationRefresh();
+                if (!canApplyBulkSplice)
+                {
+                    // Bulk splice realizes and rebinds the final displayed range synchronously,
+                    // and RefreshHierarchicalIndentation above has already updated those rows.
+                    // Repeating it from LayoutUpdated can schedule another render interval.
+                    RequestHierarchicalIndentationRefresh();
+                }
             }
 
             OnCollectionChangedForSummaries(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset));
@@ -3271,11 +3350,183 @@ internal
             return false;
         }
 
+        private bool CanApplyHierarchicalBulkSplice(
+            IReadOnlyList<FlattenedChange> changes,
+            Avalonia.Controls.DataGridHierarchical.FlattenedIndexMap indexMap)
+        {
+            if (changes == null ||
+                changes.Count != 1 ||
+                DisplayData == null ||
+                DisplayData.LastScrollingSlot < 0 ||
+                EditingRow != null)
+            {
+                return false;
+            }
+
+            var change = changes[0];
+            if (change.NewCount <= 0)
+            {
+                return false;
+            }
+
+            if (CanApplyHierarchicalWholeRangeReplacement(change, indexMap))
+            {
+                return true;
+            }
+
+            if (change.OldCount != 0)
+            {
+                return false;
+            }
+
+            var insertionSlot = SlotFromRowIndex(change.Index);
+            if (insertionSlot <= DisplayData.LastScrollingSlot || insertionSlot > SlotCount)
+            {
+                return false;
+            }
+
+            if (CurrentSlot >= insertionSlot ||
+                (_focusedRow != null && _focusedRow.Slot >= insertionSlot))
+            {
+                return false;
+            }
+
+            foreach (var row in _loadedRows)
+            {
+                if (row.Slot >= insertionSlot)
+                {
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
+        private bool CanApplyHierarchicalWholeRangeReplacement(
+            FlattenedChange change,
+            Avalonia.Controls.DataGridHierarchical.FlattenedIndexMap indexMap)
+        {
+            if (indexMap == null ||
+                change.Index != 0 ||
+                change.OldCount != SlotCount ||
+                change.NewCount != DataConnection.Count ||
+                DisplayData.FirstScrollingSlot != 0 ||
+                CurrentSlot > 0 ||
+                (_focusedRow != null && _focusedRow.Slot > 0) ||
+                RowGroupHeadersTable.RangeCount != 0 ||
+                RowGroupFootersTable.RangeCount != 0 ||
+                !_showDetailsTable.IsEmpty ||
+                !_collapsedSlotsTable.IsEmpty)
+            {
+                return false;
+            }
+
+            // A retained first row gives the existing current-cell and viewport anchor logic a
+            // stable target while the remainder of the flattened hierarchy is replaced.
+            return indexMap.MapOldIndexToNew(0) == 0;
+        }
+
+        private void ApplyHierarchicalBulkSplice(
+            FlattenedChange change,
+            Avalonia.Controls.DataGridHierarchical.FlattenedIndexMap indexMap)
+        {
+            using var activity = DataGridDiagnostics.HierarchicalBulkSplice();
+            if (CanApplyHierarchicalWholeRangeReplacement(change, indexMap))
+            {
+                ApplyHierarchicalWholeRangeReplacement(change, activity);
+                return;
+            }
+
+            var insertionSlot = SlotFromRowIndex(change.Index);
+            var insertedCount = change.NewCount;
+            activity?.SetTag(DataGridDiagnostics.Tags.Rows, insertedCount);
+            activity?.SetTag(DataGridDiagnostics.Tags.SlotCount, SlotCount);
+
+            _scrollHeightIndexDirty = true;
+            _showDetailsTable.InsertIndexes(insertionSlot, insertedCount);
+            RowGroupHeadersTable.InsertIndexes(insertionSlot, insertedCount);
+            RowGroupFootersTable.InsertIndexes(insertionSlot, insertedCount);
+            _collapsedSlotsTable.InsertIndexes(insertionSlot, insertedCount);
+
+            SlotCount += insertedCount;
+            VisibleSlotCount += insertedCount;
+            if (_lastEstimatedRow >= insertionSlot)
+            {
+                _lastEstimatedRow += insertedCount;
+            }
+
+            ComputeScrollBarsLayout();
+            InvalidateRowsArrange();
+            OnElementsChanged(grew: true);
+            RequestPointerOverRefresh();
+        }
+
+        private void ApplyHierarchicalWholeRangeReplacement(FlattenedChange change, Activity activity)
+        {
+            activity?.SetTag(DataGridDiagnostics.Tags.Rows, change.NewCount);
+            activity?.SetTag(DataGridDiagnostics.Tags.SlotCount, SlotCount);
+
+            _scrollHeightIndexDirty = true;
+            bool replacedLightweightVirtualRange = DisplayData.HasVirtualScrollingElements;
+            using (DisplayData.BeginDeferredRecycleScope())
+            {
+                if (replacedLightweightVirtualRange)
+                {
+                    // A lightweight virtual range has no retained controls to remove.
+                    // Clear the projection before publishing the replacement range.
+                    ResetDisplayedRows();
+                }
+                else
+                {
+                    // The first flattened row is identity-mapped to slot zero. Keep its realized
+                    // container and recycle only the rows whose item mapping changed.
+                    while (DisplayData.LastScrollingSlot > 0)
+                    {
+                        RemoveDisplayedElement(
+                            DisplayData.LastScrollingSlot,
+                            wasDeleted: false,
+                            updateSlotInformation: true);
+                    }
+                }
+
+                SlotCount = change.NewCount;
+                VisibleSlotCount = change.NewCount;
+                _lastEstimatedRow = Math.Min(_lastEstimatedRow, SlotCount - 1);
+
+                var displayHeight = CellsEstimatedHeight;
+                if (ColumnsItemsInternal.Count > 0 && MathUtilities.GreaterThan(displayHeight, 0))
+                {
+                    NegVerticalOffset = 0;
+                    UpdateDisplayedRows(0, displayHeight);
+                }
+            }
+
+            ComputeScrollBarsLayout();
+            InvalidateRowsArrange();
+            OnElementsChanged(grew: change.NewCount > change.OldCount);
+            if (replacedLightweightVirtualRange && DisplayData.HasVirtualScrollingElements)
+            {
+                _rowsPresenter?.RequestRetainedRowsCleanupForLightweightLayout();
+            }
+            RequestPointerOverRefresh();
+        }
+
         private void ApplyHierarchicalFlattenedChanges(IReadOnlyList<FlattenedChange> changes)
         {
             if (changes == null || changes.Count == 0)
             {
                 return;
+            }
+
+            int lightweightFirstSlot = -1;
+            if (UsesLightweightVirtualRows && DisplayData.HasVirtualScrollingElements)
+            {
+                // Lightweight ranges intentionally have no Control for GetDisplayedElement.
+                // RemoveRowAt follows the retained-container lifecycle, so clear the projected
+                // visible range before applying incremental hierarchy mutations and rebuild it
+                // once from the updated flattened model.
+                lightweightFirstSlot = DisplayData.FirstScrollingSlot;
+                ResetDisplayedRows();
             }
 
             foreach (var change in changes)
@@ -3290,10 +3541,20 @@ internal
                     InsertRowsAt(change.Index, change.NewCount);
                 }
             }
+
+            if (lightweightFirstSlot >= 0 &&
+                SlotCount > 0 &&
+                ColumnsItemsInternal.Count > 0 &&
+                MathUtilities.GreaterThan(CellsEstimatedHeight, 0))
+            {
+                int firstSlot = Math.Min(lightweightFirstSlot, LastVisibleSlot);
+                UpdateDisplayedRows(firstSlot, CellsEstimatedHeight);
+            }
         }
 
         private void EnsureDisplayedRowsInRange()
         {
+            using var activity = DataGridDiagnostics.HierarchicalDisplayedRowsRange();
             if (DisplayData == null || DisplayData.FirstScrollingSlot < 0)
             {
                 return;
@@ -5492,6 +5753,7 @@ internal
 
         private void ConditionalFormattingAdapter_FormattingChanged(object sender, EventArgs e)
         {
+            RefreshVirtualCellBackendAfterColumnsChanged();
             RefreshConditionalFormatting();
         }
 

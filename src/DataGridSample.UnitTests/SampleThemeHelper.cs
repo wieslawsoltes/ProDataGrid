@@ -10,6 +10,7 @@ internal static class SampleThemeHelper
     private static readonly Uri DataGridThemeBaseUri = new("avares://Avalonia.Controls.DataGrid/Themes/");
     private static readonly Uri DataGridFluentThemeUri = new("avares://Avalonia.Controls.DataGrid/Themes/Fluent.v2.xaml");
     private static readonly Uri DataGridOptimizedThemeUri = new("avares://Avalonia.Controls.DataGrid/Themes/Optimized.xaml");
+    private static readonly Uri DataGridFlatThemeUri = new("avares://Avalonia.Controls.DataGrid/Themes/Flat.xaml");
     private static readonly Uri MarketDashboardThemeBaseUri = new("avares://ProDataGrid.MarketDashboardSample/Styles/");
     private static readonly Uri MarketDashboardThemeUri = new("avares://ProDataGrid.MarketDashboardSample/Styles/MarketDashboardStyles.axaml");
 
@@ -23,6 +24,10 @@ internal static class SampleThemeHelper
         window.Styles.Add(new StyleInclude(DataGridThemeBaseUri)
         {
             Source = DataGridOptimizedThemeUri
+        });
+        window.Styles.Add(new StyleInclude(DataGridThemeBaseUri)
+        {
+            Source = DataGridFlatThemeUri
         });
     }
 

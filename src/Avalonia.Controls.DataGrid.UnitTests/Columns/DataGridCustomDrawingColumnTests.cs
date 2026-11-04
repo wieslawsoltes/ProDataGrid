@@ -2,6 +2,9 @@
 // Licensed under the MIT license. See LICENSE file in the project root for details.
 
 using System;
+using System.Collections.Generic;
+using System.Globalization;
+using System.IO;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Data;
@@ -9,9 +12,12 @@ using Avalonia.Headless.XUnit;
 using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.Media;
+using Avalonia.Media.Imaging;
+using Avalonia.Media.TextFormatting;
 using Avalonia.Rendering.SceneGraph;
 using Avalonia.Styling;
 using Avalonia.Threading;
+using SkiaSharp;
 using System.Reflection;
 using System.Threading.Tasks;
 using Xunit;
@@ -32,6 +38,67 @@ public class DataGridCustomDrawingColumnTests
 
         Assert.True(cell.DesiredSize.Width > 0);
         Assert.True(cell.DesiredSize.Height > 0);
+    }
+
+    [AvaloniaFact]
+    public void CustomDrawingCell_Content_Change_Keeps_Measure_Valid_For_Fixed_Geometry()
+    {
+        AssertContentChangeMeasureValidity(new DataGridLength(120), expectedMeasureValid: true);
+    }
+
+    [AvaloniaFact]
+    public void CustomDrawingCell_Content_Change_Invalidates_Measure_For_Auto_Width()
+    {
+        AssertContentChangeMeasureValidity(DataGridLength.Auto, expectedMeasureValid: false);
+    }
+
+    private static void AssertContentChangeMeasureValidity(DataGridLength width, bool expectedMeasureValid)
+    {
+        var item = new Person { Name = "before" };
+        var column = new DataGridTextColumn
+        {
+            Width = width,
+            Binding = new Binding(nameof(Person.Name)),
+            DisplayMode = DataGridColumnDisplayMode.Drawn,
+        };
+        var grid = new DataGrid
+        {
+            Width = 240,
+            Height = 120,
+            RowHeight = 24,
+            AutoGenerateColumns = false,
+            ItemsSource = new[] { item },
+            UseLogicalScrollable = true,
+        };
+        grid.ColumnsInternal.Add(column);
+        var window = new Window
+        {
+            Width = 280,
+            Height = 160,
+        };
+        window.SetThemeStyles(DataGridTheme.FluentV2);
+        window.Content = grid;
+
+        try
+        {
+            window.Show();
+            grid.ApplyTemplate();
+            Dispatcher.UIThread.RunJobs();
+            window.UpdateLayout();
+            grid.UpdateLayout();
+
+            DataGridRow row = Assert.IsType<DataGridRow>(Assert.Single(grid.DisplayData.GetScrollingRows()));
+            DataGridCustomDrawingCell cell = Assert.IsType<DataGridCustomDrawingCell>(row.Cells[0]);
+            Assert.True(cell.IsMeasureValid);
+
+            cell.Value = "after";
+
+            Assert.Equal(expectedMeasureValid, cell.IsMeasureValid);
+        }
+        finally
+        {
+            window.Close();
+        }
     }
 
     [AvaloniaFact]
@@ -168,6 +235,176 @@ public class DataGridCustomDrawingColumnTests
 
         Assert.NotNull(firstFormattedText);
         Assert.Same(firstFormattedText, secondFormattedText);
+    }
+
+    [AvaloniaFact]
+    public void CustomDrawingTextLayoutCache_TryGet_And_Add_Reuses_Entry()
+    {
+        var cache = new DataGridCustomDrawingTextLayoutCache(capacity: 2);
+        var key = new DataGridCustomDrawingTextLayoutCache.CacheKey(
+            "Ada",
+            FontFamily.Default.Name,
+            FontStyle.Normal,
+            FontWeight.Normal,
+            FontStretch.Normal,
+            14,
+            TextAlignment.Left,
+            TextTrimming.CharacterEllipsis,
+            FlowDirection.LeftToRight,
+            CultureInfo.InvariantCulture.LCID,
+            180,
+            24,
+            foregroundKind: 1,
+            foregroundColor: Colors.Black,
+            foregroundOpacity: 1,
+            foregroundIdentityHash: 0);
+        var text = new FormattedText(
+            "Ada",
+            CultureInfo.InvariantCulture,
+            FlowDirection.LeftToRight,
+            Typeface.Default,
+            14,
+            Brushes.Black);
+
+        Assert.False(cache.TryGet(key, out _));
+        Assert.Same(text, cache.Add(key, text));
+        Assert.True(cache.TryGet(key, out FormattedText cached));
+        Assert.Same(text, cached);
+    }
+
+    [AvaloniaFact]
+    public void VirtualTextLayoutCache_Reuses_Entry_And_Evicts_Least_Recently_Used()
+    {
+        var cache = new DataGridVirtualTextLayoutCache(capacity: 1);
+        DataGridCustomDrawingTextLayoutCache.CacheKey firstKey = CreateTextLayoutCacheKey("first");
+        DataGridCustomDrawingTextLayoutCache.CacheKey secondKey = CreateTextLayoutCacheKey("second");
+        var firstLayout = new TextLayout("first", Typeface.Default, 14, Brushes.Black);
+        var secondLayout = new TextLayout("second", Typeface.Default, 14, Brushes.Black);
+
+        Assert.False(cache.TryGet(firstKey, out _));
+        DataGridVirtualTextLayout firstCached = cache.Add(firstKey, firstLayout);
+        Assert.Same(firstLayout, firstCached.Layout);
+        Assert.True(cache.TryGet(firstKey, out DataGridVirtualTextLayout? cached));
+        Assert.Same(firstCached, cached);
+
+        DataGridVirtualTextLayout secondCached = cache.Add(secondKey, secondLayout);
+        Assert.Same(secondLayout, secondCached.Layout);
+        Assert.False(cache.TryGet(firstKey, out _));
+        Assert.True(cache.TryGet(secondKey, out cached));
+        Assert.Same(secondCached, cached);
+
+        cache.Clear();
+        Assert.False(cache.TryGet(secondKey, out _));
+    }
+
+    [AvaloniaFact]
+    public void VirtualTextDrawOperation_Holds_Render_Data_After_Cache_Clear()
+    {
+        var cache = new DataGridVirtualTextLayoutCache(capacity: 1);
+        DataGridCustomDrawingTextLayoutCache.CacheKey key = CreateTextLayoutCacheKey("rendered");
+        var layout = new TextLayout("rendered", Typeface.Default, 14, Brushes.Black);
+        DataGridVirtualTextLayout cached = cache.Add(key, layout);
+        DataGridVirtualTextRenderData renderData = Assert.IsType<DataGridVirtualTextRenderData>(cached.RenderData);
+        var commands = new List<DataGridVirtualTextDrawCommand>
+        {
+            new(renderData, new Point(2, 3), null),
+        };
+        var operation = new DataGridVirtualTextDrawOperation(new Rect(new Size(100, 24)), commands);
+
+        Assert.Equal(2, renderData.ReferenceCount);
+        cache.Clear();
+        Assert.Equal(1, renderData.ReferenceCount);
+
+        operation.Dispose();
+        Assert.Equal(0, renderData.ReferenceCount);
+        operation.Dispose();
+    }
+
+    [AvaloniaFact]
+    public void VirtualTextDrawOperation_Renders_The_Same_Glyph_Pixels_As_TextLayout()
+    {
+        if (string.IsNullOrWhiteSpace(Environment.GetEnvironmentVariable("AVALONIA_SCREENSHOT_DIR")))
+        {
+            return;
+        }
+
+        using var control = new VirtualTextParityControl();
+        var size = new Size(240, 80);
+        control.Measure(size);
+        control.Arrange(new Rect(size));
+        using var frame = new RenderTargetBitmap(new PixelSize(240, 80), new Vector(96, 96));
+        frame.Render(control);
+        using var stream = new MemoryStream();
+        frame.Save(stream);
+        stream.Position = 0;
+        using SKBitmap bitmap = SKBitmap.Decode(stream);
+        Assert.NotNull(bitmap);
+
+        const int halfHeight = 40;
+        int mismatches = 0;
+        for (int y = 0; y < halfHeight; y++)
+        {
+            for (int x = 0; x < bitmap.Width; x++)
+            {
+                if (bitmap.GetPixel(x, y) != bitmap.GetPixel(x, y + halfHeight))
+                {
+                    mismatches++;
+                }
+            }
+        }
+
+        Assert.Equal(0, mismatches);
+    }
+
+    private static DataGridCustomDrawingTextLayoutCache.CacheKey CreateTextLayoutCacheKey(string text) =>
+        new(
+            text,
+            FontFamily.Default.Name,
+            FontStyle.Normal,
+            FontWeight.Normal,
+            FontStretch.Normal,
+            14,
+            TextAlignment.Left,
+            TextTrimming.CharacterEllipsis,
+            FlowDirection.LeftToRight,
+            CultureInfo.InvariantCulture.LCID,
+            180,
+            24,
+            foregroundKind: 1,
+            foregroundColor: Colors.Black,
+            foregroundOpacity: 1,
+            foregroundIdentityHash: 0);
+
+    private sealed class VirtualTextParityControl : Control, IDisposable
+    {
+        private readonly DataGridVirtualTextLayout _layout = new(new TextLayout(
+            "Long virtual text that trims",
+            Typeface.Default,
+            14,
+            Brushes.Black,
+            TextAlignment.Center,
+            TextWrapping.NoWrap,
+            TextTrimming.CharacterEllipsis,
+            maxWidth: 150,
+            maxHeight: 28,
+            maxLines: 1));
+
+        public override void Render(DrawingContext context)
+        {
+            context.DrawRectangle(Brushes.White, null, new Rect(Bounds.Size));
+            using (context.PushClip(new Rect(30, 0, 80, 40)))
+            {
+                _layout.Layout.Draw(context, new Point(12, 6));
+            }
+            DataGridVirtualTextRenderData renderData = _layout.RenderData!;
+            var commands = new List<DataGridVirtualTextDrawCommand>
+            {
+                new(renderData, new Point(12, 46), new Rect(30, 40, 80, 40)),
+            };
+            context.Custom(new DataGridVirtualTextDrawOperation(new Rect(Bounds.Size), commands));
+        }
+
+        public void Dispose() => _layout.Dispose();
     }
 
     [AvaloniaFact]

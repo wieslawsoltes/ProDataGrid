@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.ObjectModel;
+using System.Globalization;
 using Avalonia.Controls;
 using Avalonia.Data;
 using Avalonia.Headless.XUnit;
@@ -104,6 +105,74 @@ public class DataGridDatePickerColumnHeadlessTests
         Assert.Equal(KeyboardNavigationMode.None, KeyboardNavigation.GetTabNavigation(editingElement));
     }
 
+    [AvaloniaFact]
+    public void DatePickerColumn_Virtual_Value_Uses_Configured_Format()
+    {
+        var column = new DataGridDatePickerColumn
+        {
+            Binding = new Binding(nameof(DateItem.Date)),
+            SelectedDateFormat = CalendarDatePickerFormat.Custom,
+            CustomDateFormatString = "yyyy-MM-dd",
+        };
+        DataGridColumnMetadata.SetValueAccessor(
+            column,
+            new DataGridColumnValueAccessor<DateItem, DateTime?>(item => item.Date));
+        var item = new DateItem { Date = new DateTime(2024, 6, 15) };
+
+        Assert.True(column.SupportsVirtualCellSurface);
+        var provider = (IDataGridDrawnCellValueProvider)column;
+        Assert.Equal("2024-06-15", provider.GetDrawnCellValue(item));
+
+        column.SelectedDateFormat = CalendarDatePickerFormat.Short;
+        Assert.Equal(
+            item.Date.Value.ToString("d", CultureInfo.CurrentCulture),
+            provider.GetDrawnCellValue(item));
+
+        column.SelectedDateFormat = CalendarDatePickerFormat.Long;
+        Assert.Equal(
+            item.Date.Value.ToString("D", CultureInfo.CurrentCulture),
+            provider.GetDrawnCellValue(item));
+
+        item.Date = null;
+        Assert.Null(provider.GetDrawnCellValue(item));
+    }
+
+    [AvaloniaFact]
+    public void DatePickerColumn_Virtual_Surface_Requires_Direct_Typed_Date_Access()
+    {
+        var column = new DataGridDatePickerColumn
+        {
+            Binding = new Binding(nameof(DateItem.Date)),
+        };
+
+        Assert.False(column.SupportsVirtualCellSurface);
+
+        DataGridColumnMetadata.SetValueAccessor(
+            column,
+            new DataGridColumnValueAccessor<DateItem, string>(_ => "not a date"));
+        Assert.False(column.SupportsVirtualCellSurface);
+
+        DataGridColumnMetadata.SetValueAccessor(
+            column,
+            new DataGridColumnValueAccessor<DateItem, DateTime?>(item => item.Date));
+        Assert.True(column.SupportsVirtualCellSurface);
+
+        column.Binding = new Binding(nameof(DateItem.Date))
+        {
+            StringFormat = "d",
+        };
+        Assert.False(column.SupportsVirtualCellSurface);
+
+        var derived = new DerivedDatePickerColumn
+        {
+            Binding = new Binding(nameof(DateItem.Date)),
+        };
+        DataGridColumnMetadata.SetValueAccessor(
+            derived,
+            new DataGridColumnValueAccessor<DateItem, DateTime?>(item => item.Date));
+        Assert.False(derived.SupportsVirtualCellSurface);
+    }
+
     private static (Window window, DataGrid grid) CreateWindow(DatePickerTestViewModel vm)
     {
         var window = new Window
@@ -174,5 +243,9 @@ public class DataGridDatePickerColumnHeadlessTests
 
         public CalendarDatePicker CreateEditingElement(DataGridCell cell, object dataItem) =>
             (CalendarDatePicker)GenerateEditingElementDirect(cell, dataItem);
+    }
+
+    private sealed class DerivedDatePickerColumn : DataGridDatePickerColumn
+    {
     }
 }

@@ -120,7 +120,10 @@ namespace Avalonia.Controls
                 #if DEBUG
                 if (element is DataGridRow dataGridRow)
                 {
-                    Debug.Assert(dataGridRow.Cells.Count == ColumnsItemsInternal.Count);
+                    int expectedCellCount = UsesVirtualCellSurface && !IsVirtualCompatibilityRow(dataGridRow)
+                        ? 0
+                        : ColumnsItemsInternal.Count;
+                    Debug.Assert(dataGridRow.Cells.Count == expectedCellCount);
 
                     int columnIndex = 0;
                     foreach (DataGridCell dataGridCell in dataGridRow.Cells)

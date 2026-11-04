@@ -1,0 +1,39 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:charts="clr-namespace:ProCharts.Avalonia;assembly=ProCharts.Avalonia"
+             xmlns:skia="clr-namespace:ProCharts.Skia;assembly=ProCharts.Skia"
+             xmlns:vm="clr-namespace:DataGridSample.ViewModels"
+             x:Class="DataGridSample.Pages.ChartStreamingRangePage"
+             x:DataType="vm:ChartStreamingRangeViewModel">
+  <UserControl.DataContext><vm:ChartStreamingRangeViewModel /></UserControl.DataContext>
+  <Grid Margin="16" RowDefinitions="Auto,Auto,Auto,*" RowSpacing="10">
+    <StackPanel Spacing="4">
+      <TextBlock Classes="h2" Text="Bounded live intervals &amp; rolling bands" />
+      <TextBlock Text="Simulated feed: append 64 observations; retain 2,048. Calculated mode runs Bollinger once per price, before display reduction. Changing mode or band width resets the demonstration."
+                 TextWrapping="Wrap" />
+    </StackPanel>
+    <StackPanel Grid.Row="1" Spacing="6">
+      <StackPanel Orientation="Horizontal" Spacing="12">
+        <Button x:Name="AppendBatchButton" Content="Append 64 observations" Command="{Binding AppendCommand}" />
+        <Button Content="Reset stream" Command="{Binding ResetCommand}" />
+        <CheckBox Content="Insert gaps" IsChecked="{Binding IncludeGaps, Mode=TwoWay}" />
+        <CheckBox Content="Reduce to 256" IsChecked="{Binding ReduceData, Mode=TwoWay}" />
+      </StackPanel>
+      <StackPanel Orientation="Horizontal" Spacing="12">
+        <CheckBox x:Name="CalculatedBandsToggle" Content="Calculate rolling Bollinger bands" IsChecked="{Binding UseCalculatedBands, Mode=TwoWay}" />
+        <TextBlock Text="Deviations" VerticalAlignment="Center" />
+        <Slider x:Name="DeviationSlider" Width="150" Minimum="0" Maximum="4" SmallChange="0.25"
+                IsEnabled="{Binding UseCalculatedBands}" Value="{Binding StandardDeviations, Mode=TwoWay}" />
+      </StackPanel>
+    </StackPanel>
+    <StackPanel Grid.Row="2" Spacing="3">
+      <TextBlock Text="{Binding RenderingSummary}" TextWrapping="Wrap" />
+      <TextBlock Text="{Binding IndicatorSummary}" TextWrapping="Wrap" />
+    </StackPanel>
+    <charts:ProChartView Grid.Row="3" ChartModel="{Binding Chart}" ShowToolTips="True" MinHeight="200">
+      <charts:ProChartView.ChartStyle>
+        <skia:SkiaChartStyle AreaFillOpacity="0.35" ShowCategoryGridlines="False" PaddingRight="44" />
+      </charts:ProChartView.ChartStyle>
+    </charts:ProChartView>
+  </Grid>
+</UserControl>

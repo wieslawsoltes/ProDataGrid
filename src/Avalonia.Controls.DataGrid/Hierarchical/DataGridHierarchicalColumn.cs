@@ -132,6 +132,11 @@ internal
                    accessor.ItemType.IsInstanceOfType(item);
         }
 
+        internal override bool SupportsVirtualCellSurface =>
+            CellTemplate is null &&
+            BindingCloneHelper.SupportsDirectTextDataContextRead(Binding) &&
+            DataGridColumnMetadata.GetValueAccessor(this) is IDataGridColumnTextAccessor;
+
         /// <summary>
         /// Identifies the <see cref="Indent"/> property.
         /// </summary>
@@ -383,6 +388,11 @@ internal
         internal string? GetDirectText(object? item)
         {
             var accessor = DataGridColumnMetadata.GetValueAccessor(this) as IDataGridColumnTextAccessor;
+            return GetDirectText(item, accessor);
+        }
+
+        internal string? GetDirectText(object? item, IDataGridColumnTextAccessor? accessor)
+        {
             if (accessor == null || item == null)
             {
                 return null;
@@ -401,7 +411,7 @@ internal
                 : null;
         }
 
-        private void PresenterOnToggleRequested(object? sender, EventArgs e)
+        private async void PresenterOnToggleRequested(object? sender, EventArgs e)
         {
             if (OwningGrid?.HierarchicalModel == null)
             {
@@ -427,7 +437,14 @@ internal
                     OwningGrid.PrepareHierarchicalAnchor(row.Slot);
                 }
 
-                OwningGrid.HierarchicalModel.Toggle(node);
+                try
+                {
+                    await OwningGrid.HierarchicalModel.ToggleAsync(node);
+                }
+                catch (OperationCanceledException)
+                {
+                    // A later collapse or root replacement cancels pending child loading.
+                }
             }
         }
 

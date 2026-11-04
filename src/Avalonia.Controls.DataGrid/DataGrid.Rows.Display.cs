@@ -54,8 +54,45 @@ namespace Avalonia.Controls
                 return;
             }
 
+            if (TryUpdateLightweightVirtualRows(
+                firstDisplayedScrollingSlot,
+                displayHeight,
+                activity))
+            {
+                return;
+            }
+
+            if (DisplayData.HasVirtualScrollingElements)
+            {
+                ResetDisplayedRows();
+            }
+
             if (!CanRetainDisplayedRowsForScrollTarget(firstDisplayedScrollingSlot))
             {
+                if (TryRetargetDefaultVirtualRows(
+                    firstDisplayedScrollingSlot,
+                    displayHeight,
+                    out int retargetedLastSlot,
+                    out int retargetedRows,
+                    out double retargetedHeight))
+                {
+                    bool clipsLastRow =
+                        MathUtilities.GreaterThan(retargetedHeight, displayHeight) ||
+                        (MathUtilities.AreClose(retargetedHeight, displayHeight) &&
+                         MathUtilities.GreaterThan(NegVerticalOffset, 0));
+                    DisplayData.NumTotallyDisplayedScrollingElements =
+                        clipsLastRow ? retargetedRows - 1 : retargetedRows;
+                    AvailableSlotElementRoom = displayHeight - retargetedHeight;
+                    _rowsPresenter.InvalidateArrange();
+                    _rowsPresenter.InvalidateVirtualCellSurface();
+                    RequestPointerOverRefresh();
+
+                    activity?.SetTag(DataGridDiagnostics.Tags.FirstDisplayedSlot, firstDisplayedScrollingSlot);
+                    activity?.SetTag(DataGridDiagnostics.Tags.LastDisplayedSlot, retargetedLastSlot);
+                    activity?.SetTag(DataGridDiagnostics.Tags.DisplayedSlots, retargetedRows);
+                    return;
+                }
+
                 ResetDisplayedRows();
             }
 
@@ -113,6 +150,164 @@ namespace Avalonia.Controls
             activity?.SetTag(DataGridDiagnostics.Tags.FirstDisplayedSlot, DisplayData.FirstScrollingSlot);
             activity?.SetTag(DataGridDiagnostics.Tags.LastDisplayedSlot, DisplayData.LastScrollingSlot);
             activity?.SetTag(DataGridDiagnostics.Tags.DisplayedSlots, DisplayData.NumDisplayedScrollingElements);
+        }
+
+        private bool TryUpdateLightweightVirtualRows(
+            int firstSlot,
+            double displayHeight,
+            Activity? activity)
+        {
+            if (_rowsPresenter is null ||
+                !TryGetLightweightVirtualRowHeight(out double rowHeight))
+            {
+                return false;
+            }
+
+            return UpdateLightweightVirtualRows(
+                firstSlot,
+                displayHeight,
+                rowHeight,
+                activity,
+                reuseExistingItems: false);
+        }
+
+        private bool TryUpdateLightweightVirtualRowsForScroll(
+            int firstSlot,
+            double displayHeight,
+            double rowHeight)
+        {
+            using var activity = DataGridDiagnostics.UpdateDisplayedRows();
+            using var _ = DataGridDiagnostics.BeginRowsDisplayUpdate();
+            activity?.SetTag(DataGridDiagnostics.Tags.DisplayHeight, displayHeight);
+            activity?.SetTag(DataGridDiagnostics.Tags.SlotCount, SlotCount);
+            activity?.SetTag(DataGridDiagnostics.Tags.Columns, ColumnsItemsInternal.Count);
+
+            return UpdateLightweightVirtualRows(
+                firstSlot,
+                displayHeight,
+                rowHeight,
+                activity,
+                reuseExistingItems: true);
+        }
+
+        private bool UpdateLightweightVirtualRows(
+            int firstSlot,
+            double displayHeight,
+            double rowHeight,
+            Activity? activity,
+            bool reuseExistingItems)
+        {
+            Debug.Assert(_rowsPresenter is not null);
+
+            if (!DisplayData.HasVirtualScrollingElements &&
+                DisplayData.NumDisplayedScrollingElements != 0)
+            {
+                ResetDisplayedRows();
+            }
+
+            int requestedCount = Math.Max(
+                1,
+                (int)Math.Ceiling((displayHeight + NegVerticalOffset) / rowHeight));
+            int lastSlot = Math.Min(SlotCount - 1, firstSlot + requestedCount - 1);
+            int count = lastSlot - firstSlot + 1;
+
+            if (count < requestedCount && firstSlot > 0)
+            {
+                firstSlot = Math.Max(0, firstSlot - (requestedCount - count));
+                count = lastSlot - firstSlot + 1;
+            }
+
+            double realizedHeight = (count * rowHeight) - NegVerticalOffset;
+            bool clipsLastRow =
+                MathUtilities.GreaterThan(realizedHeight, displayHeight) ||
+                (MathUtilities.AreClose(realizedHeight, displayHeight) &&
+                 MathUtilities.GreaterThan(NegVerticalOffset, 0));
+
+            bool updated = reuseExistingItems
+                ? _rowsPresenter.TryScrollLightweightVirtualRows(
+                    firstSlot,
+                    lastSlot,
+                    count,
+                    rowHeight)
+                : _rowsPresenter.TryUpdateLightweightVirtualRows(
+                    firstSlot,
+                    lastSlot,
+                    count,
+                    rowHeight);
+            if (!updated)
+            {
+                if (DisplayData.HasVirtualScrollingElements)
+                {
+                    ResetDisplayedRows();
+                }
+
+                return false;
+            }
+
+            DisplayData.SetVirtualScrollingSlots(firstSlot, lastSlot, count);
+            DisplayData.NumTotallyDisplayedScrollingElements =
+                clipsLastRow ? Math.Max(0, count - 1) : count;
+            AvailableSlotElementRoom = displayHeight - realizedHeight;
+            _rowsPresenter.InvalidateArrange();
+            _rowsPresenter.InvalidateVirtualCellSurface();
+            RequestPointerOverRefresh();
+
+            activity?.SetTag(DataGridDiagnostics.Tags.FirstDisplayedSlot, firstSlot);
+            activity?.SetTag(DataGridDiagnostics.Tags.LastDisplayedSlot, lastSlot);
+            activity?.SetTag(DataGridDiagnostics.Tags.DisplayedSlots, count);
+            return true;
+        }
+
+        private bool TryRetargetDefaultVirtualRows(
+            int firstSlot,
+            double displayHeight,
+            out int lastSlot,
+            out int rowCount,
+            out double realizedHeight)
+        {
+            lastSlot = -1;
+            rowCount = 0;
+            realizedHeight = -NegVerticalOffset;
+            double rowHeight;
+
+            using (DataGridDiagnostics.BeginRowsRetargetEligibility())
+            {
+                if (!CanRetargetDefaultVirtualRowsNow() ||
+                    DisplayData.NumDisplayedScrollingElements == 0)
+                {
+                    return false;
+                }
+
+                rowHeight = DataGridRow.GetFlatDesiredHeight(this, RowHeight);
+                if (!double.IsFinite(rowHeight) || !MathUtilities.GreaterThan(rowHeight, 0))
+                {
+                    return false;
+                }
+
+                int slot = firstSlot;
+                while (slot >= 0 && slot < SlotCount &&
+                       !MathUtilities.GreaterThanOrClose(realizedHeight, displayHeight))
+                {
+                    if (IsGroupSlot(slot))
+                    {
+                        return false;
+                    }
+
+                    realizedHeight += rowHeight;
+                    rowCount++;
+                    lastSlot = slot;
+                    slot = GetNextVisibleSlot(slot);
+                }
+            }
+
+            return DisplayData.TryRetargetDefaultVirtualRows(
+                firstSlot,
+                lastSlot,
+                rowCount,
+                rowHeight,
+                RowGroupHeadersTable.RangeCount == 0 &&
+                RowGroupFootersTable.RangeCount == 0 &&
+                _collapsedSlotsTable.IsEmpty);
         }
 
         private int NormalizeDisplayedFirstSlot(int slot)
@@ -181,6 +376,22 @@ namespace Avalonia.Controls
                 lastDisplayedScrollingRow = 0;
             }
 
+            if (TryGetLightweightVirtualRowHeight(out double lightweightRowHeight))
+            {
+                int requestedCount = Math.Max(1, (int)Math.Ceiling(displayHeight / lightweightRowHeight));
+                int firstSlot = Math.Max(0, lastDisplayedScrollingRow - requestedCount + 1);
+                NegVerticalOffset = Math.Max(
+                    0,
+                    ((lastDisplayedScrollingRow - firstSlot + 1) * lightweightRowHeight) - displayHeight);
+                TryUpdateLightweightVirtualRows(firstSlot, displayHeight, activity);
+                return;
+            }
+
+            if (DisplayData.HasVirtualScrollingElements)
+            {
+                ResetDisplayedRows(DataGridRecycleReuseOrder.BottomUp);
+            }
+
             if (!CanRetainDisplayedRowsForScrollTarget(lastDisplayedScrollingRow))
             {
                 ResetDisplayedRows(DataGridRecycleReuseOrder.BottomUp);
@@ -233,7 +444,7 @@ namespace Avalonia.Controls
 
         private void ResetDisplayedRows(DataGridRecycleReuseOrder reuseOrder = DataGridRecycleReuseOrder.TopDown)
         {
-            if (UnloadingRowEvent.HasRaisedSubscriptions ||
+            if (HasUnloadingRowHandlers() ||
                 UnloadingRowGroupEvent.HasRaisedSubscriptions ||
                 HasCellClearingHandlers)
             {
@@ -257,6 +468,7 @@ namespace Avalonia.Controls
 
             DisplayData.ActivateDeferredRecycleHiding(reuseOrder);
             DisplayData.ClearElements(recycle: true);
+            _rowsPresenter?.ClearLightweightVirtualRows();
 
             if (_rowsPresenter != null && !KeepRecycledContainersInVisualTree)
             {
@@ -305,6 +517,8 @@ namespace Avalonia.Controls
 
         private void LoadRowVisualsForDisplay(DataGridRow row)
         {
+            bool usesVirtualCellSurface = UsesVirtualCellSurface;
+
             // Restore visibility for rows that were hidden during recycling
             row.ClearValue(Visual.IsVisibleProperty);
             row.ClearValue(Visual.ClipProperty);
@@ -326,9 +540,10 @@ namespace Avalonia.Controls
             row.EnsureHeaderStyleAndVisibility(null);
 
             // Check to see if the row contains the CurrentCell, apply its state.
-            if (CurrentColumnIndex != -1 &&
-            CurrentSlot != -1 &&
-            row.Index == CurrentSlot)
+            if (!usesVirtualCellSurface &&
+                CurrentColumnIndex != -1 &&
+                CurrentSlot != -1 &&
+                row.Index == CurrentSlot)
             {
                 row.Cells[CurrentColumnIndex].UpdatePseudoClasses();
             }
@@ -474,9 +689,21 @@ namespace Avalonia.Controls
                         size = element.DesiredSize;
                     }
 
-                    // Move hidden elements off-screen immediately to avoid stale bounds being picked up
-                    // by layout-sensitive logic (e.g., tests that inspect all rows).
-                    element.Arrange(new Rect(recycledElementPosition, recycledElementPosition, size.Width, size.Height));
+                    // Hiding must not arrange children: auto-sized cells can recompute the viewport
+                    // and recycle this same container before its removal has completed.
+                    var recycledBounds = new Rect(recycledElementPosition, recycledElementPosition, size.Width, size.Height);
+                    switch (element)
+                    {
+                        case DataGridRow recycledRow:
+                            recycledRow.SetRecycledBounds(recycledBounds);
+                            break;
+                        case DataGridRowGroupHeader groupHeader:
+                            groupHeader.SetRecycledBounds(recycledBounds);
+                            break;
+                        case DataGridRowGroupFooter groupFooter:
+                            groupFooter.SetRecycledBounds(recycledBounds);
+                            break;
+                    }
                 }
             }
 
@@ -484,7 +711,6 @@ namespace Avalonia.Controls
             {
                 element.SetCurrentValue(Visual.IsVisibleProperty, false);
             }
-
         }
 
         internal bool RecycleOrphanedElement(Control element)

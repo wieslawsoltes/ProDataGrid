@@ -131,8 +131,13 @@ namespace Avalonia.Controls.DataGridHierarchical
 
             CheckReentrancy();
 
-            List<T>? removed = count > 0 ? new List<T>(count) : null;
-            for (var i = 0; i < count; i++)
+            // A differing-size replacement raises Reset, whose event payload contains no old
+            // items. Avoid snapshotting a potentially huge removed range that no observer can
+            // consume. Remove and equal-size replace still require the old items in their event.
+            var captureRemovedItems = count > 0 &&
+                (materialized.Count == 0 || count == materialized.Count);
+            List<T>? removed = captureRemovedItems ? new List<T>(count) : null;
+            for (var i = 0; i < count && captureRemovedItems; i++)
             {
                 removed!.Add(Items[index + i]);
             }

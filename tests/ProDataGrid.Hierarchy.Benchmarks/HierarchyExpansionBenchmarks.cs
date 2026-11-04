@@ -9,6 +9,7 @@ public enum HierarchyShape
     Wide2555Depth3,
     Binary4094Depth11,
     VeryDeep512Depth128,
+    OptimizedSample149792Depth5,
 }
 
 [MemoryDiagnoser(displayGenColumns: false)]
@@ -68,6 +69,64 @@ public class HierarchyExpansionBenchmarks
         });
         model.SetRoots(roots);
         return model;
+    }
+}
+
+[MemoryDiagnoser(displayGenColumns: false)]
+[RankColumn]
+public class HierarchyCollapseBenchmarks
+{
+    private IReadOnlyList<BenchmarkNode> _roots = null!;
+    private HierarchicalModel<BenchmarkNode> _model = null!;
+    private int _expectedExpandedCount;
+
+    [GlobalSetup]
+    public void GlobalSetup()
+    {
+        _roots = BenchmarkTreeFactory.Create(HierarchyShape.OptimizedSample149792Depth5);
+        _expectedExpandedCount =
+            BenchmarkTreeFactory.ExpectedCount(HierarchyShape.OptimizedSample149792Depth5);
+
+        if (BenchmarkTreeFactory.CountNodes(_roots) != _expectedExpandedCount)
+        {
+            throw new InvalidOperationException("The generated hierarchy has an unexpected node count.");
+        }
+    }
+
+    [IterationSetup]
+    public void IterationSetup()
+    {
+        BenchmarkTreeFactory.ResetExpandedState(_roots);
+        _model = new HierarchicalModel<BenchmarkNode>(new HierarchicalOptions<BenchmarkNode>
+        {
+            ChildrenSelector = static node => node.Children,
+            IsLeafSelector = static node => node.Children.Count == 0,
+            IsExpandedSelector = static node => node.IsExpanded,
+            IsExpandedSetter = static (node, value) => node.IsExpanded = value,
+            VirtualizeChildren = false,
+        });
+        _model.SetRoots(_roots);
+        _model.ExpandAll();
+
+        if (_model.Count != _expectedExpandedCount)
+        {
+            throw new InvalidOperationException(
+                $"Expanded row count mismatch: expected {_expectedExpandedCount}, got {_model.Count}.");
+        }
+    }
+
+    [Benchmark]
+    public int CollapseAll()
+    {
+        _model.CollapseAll();
+        int count = _model.Count;
+        if (count != _roots.Count)
+        {
+            throw new InvalidOperationException(
+                $"Collapsed row count mismatch: expected {_roots.Count}, got {count}.");
+        }
+
+        return count;
     }
 }
 
@@ -219,6 +278,8 @@ public sealed class BenchmarkNode
 
     public int Depth { get; }
 
+    public bool IsExpanded { get; set; }
+
     public List<BenchmarkNode> Children { get; } = new();
 }
 
@@ -231,6 +292,7 @@ public static class BenchmarkTreeFactory
             HierarchyShape.Wide2555Depth3 => BuildWide(rootCount: 5, branchCount: 10, leafCount: 50),
             HierarchyShape.Binary4094Depth11 => BuildUniform(rootCount: 2, branching: 2, levelCount: 11),
             HierarchyShape.VeryDeep512Depth128 => BuildUniform(rootCount: 4, branching: 1, levelCount: 128),
+            HierarchyShape.OptimizedSample149792Depth5 => BuildUniform(rootCount: 32, branching: 8, levelCount: 5),
             _ => throw new ArgumentOutOfRangeException(nameof(shape)),
         };
     }
@@ -242,6 +304,7 @@ public static class BenchmarkTreeFactory
             HierarchyShape.Wide2555Depth3 => 2_555,
             HierarchyShape.Binary4094Depth11 => 4_094,
             HierarchyShape.VeryDeep512Depth128 => 512,
+            HierarchyShape.OptimizedSample149792Depth5 => 149_792,
             _ => throw new ArgumentOutOfRangeException(nameof(shape)),
         };
     }
@@ -268,6 +331,25 @@ public static class BenchmarkTreeFactory
         }
 
         return count;
+    }
+
+    public static void ResetExpandedState(IReadOnlyList<BenchmarkNode> roots)
+    {
+        var stack = new Stack<BenchmarkNode>(roots.Count);
+        for (int i = roots.Count - 1; i >= 0; i--)
+        {
+            stack.Push(roots[i]);
+        }
+
+        while (stack.Count > 0)
+        {
+            BenchmarkNode node = stack.Pop();
+            node.IsExpanded = false;
+            for (int i = node.Children.Count - 1; i >= 0; i--)
+            {
+                stack.Push(node.Children[i]);
+            }
+        }
     }
 
     public static IReadOnlyList<BenchmarkNode> CreateBinary(int levelCount)

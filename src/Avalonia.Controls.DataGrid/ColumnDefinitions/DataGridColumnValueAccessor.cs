@@ -6,7 +6,9 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Globalization;
+using System.Linq;
 using System.Runtime.CompilerServices;
 using Avalonia.Controls.DataGridFiltering;
 using Avalonia.Data.Converters;
@@ -78,6 +80,17 @@ namespace Avalonia.Controls
     internal interface IDataGridColumnValueAccessorComparer
     {
         IDataGridColumnValueAccessor Accessor { get; }
+    }
+
+    internal interface IDataGridColumnValueAccessorSorter
+    {
+        IOrderedEnumerable<object> OrderBy(
+            IEnumerable<object> source,
+            ListSortDirection direction);
+
+        IOrderedEnumerable<object> ThenBy(
+            IOrderedEnumerable<object> source,
+            ListSortDirection direction);
     }
 
 #if !DATAGRID_INTERNAL
@@ -413,7 +426,7 @@ namespace Avalonia.Controls
 #else
     internal
 #endif
-    sealed class DataGridColumnValueAccessorComparer : IComparer, IDataGridColumnValueAccessorComparer
+    sealed class DataGridColumnValueAccessorComparer : IComparer, IDataGridColumnValueAccessorComparer, IDataGridColumnValueAccessorSorter
     {
         private static readonly ConditionalWeakTable<IDataGridColumnValueAccessor, AccessorComparerCache> s_comparerCache = new();
 
@@ -522,6 +535,24 @@ namespace Avalonia.Controls
 
         public IDataGridColumnValueAccessor Accessor => _accessor;
 
+        IOrderedEnumerable<object> IDataGridColumnValueAccessorSorter.OrderBy(
+            IEnumerable<object> source,
+            ListSortDirection direction)
+        {
+            return direction == ListSortDirection.Descending
+                ? source.OrderByDescending(GetSortValue, AccessorValueComparer.Instance(this))
+                : source.OrderBy(GetSortValue, AccessorValueComparer.Instance(this));
+        }
+
+        IOrderedEnumerable<object> IDataGridColumnValueAccessorSorter.ThenBy(
+            IOrderedEnumerable<object> source,
+            ListSortDirection direction)
+        {
+            return direction == ListSortDirection.Descending
+                ? source.ThenByDescending(GetSortValue, AccessorValueComparer.Instance(this))
+                : source.ThenBy(GetSortValue, AccessorValueComparer.Instance(this));
+        }
+
         public int Compare(object x, object y)
         {
             var left = _accessor.GetValue(x);
@@ -559,6 +590,54 @@ namespace Avalonia.Controls
 
             return Comparer.Default.Compare(left, right);
         }
+
+        private object GetSortValue(object item) => _accessor.GetValue(item);
+
+        private int CompareValues(object left, object right)
+        {
+            if (ReferenceEquals(left, right))
+            {
+                return 0;
+            }
+
+            if (left == null)
+            {
+                return -1;
+            }
+
+            if (right == null)
+            {
+                return 1;
+            }
+
+            if (_valueComparer != null)
+            {
+                return _valueComparer.Compare(left, right);
+            }
+
+            if (left is string leftString && right is string rightString)
+            {
+                return _culture.CompareInfo.Compare(leftString, rightString);
+            }
+
+            if (left is IComparable comparable)
+            {
+                return comparable.CompareTo(right);
+            }
+
+            return Comparer.Default.Compare(left, right);
+        }
+
+        private sealed class AccessorValueComparer : IComparer<object>
+        {
+            private readonly DataGridColumnValueAccessorComparer _owner;
+
+            private AccessorValueComparer(DataGridColumnValueAccessorComparer owner) => _owner = owner;
+
+            public static AccessorValueComparer Instance(DataGridColumnValueAccessorComparer owner) => new(owner);
+
+            public int Compare(object x, object y) => _owner.CompareValues(x, y);
+        }
     }
 
 #if !DATAGRID_INTERNAL
@@ -566,7 +645,7 @@ namespace Avalonia.Controls
 #else
     internal
 #endif
-    sealed class DataGridColumnValueAccessorComparer<TItem, TValue> : IComparer, IDataGridColumnValueAccessorComparer
+    sealed class DataGridColumnValueAccessorComparer<TItem, TValue> : IComparer, IDataGridColumnValueAccessorComparer, IDataGridColumnValueAccessorSorter
     {
         private static readonly ConditionalWeakTable<IDataGridColumnValueAccessor<TItem, TValue>, TypedComparerCache> s_comparerCache = new();
 
@@ -668,6 +747,26 @@ namespace Avalonia.Controls
 
         public IDataGridColumnValueAccessor Accessor => _accessor;
 
+        IOrderedEnumerable<object> IDataGridColumnValueAccessorSorter.OrderBy(
+            IEnumerable<object> source,
+            ListSortDirection direction)
+        {
+            var comparer = new AccessorSortKeyComparer(_comparer);
+            return direction == ListSortDirection.Descending
+                ? source.OrderByDescending(GetSortKey, comparer)
+                : source.OrderBy(GetSortKey, comparer);
+        }
+
+        IOrderedEnumerable<object> IDataGridColumnValueAccessorSorter.ThenBy(
+            IOrderedEnumerable<object> source,
+            ListSortDirection direction)
+        {
+            var comparer = new AccessorSortKeyComparer(_comparer);
+            return direction == ListSortDirection.Descending
+                ? source.ThenByDescending(GetSortKey, comparer)
+                : source.ThenBy(GetSortKey, comparer);
+        }
+
         public int Compare(object x, object y)
         {
             if (ReferenceEquals(x, y))
@@ -724,6 +823,59 @@ namespace Avalonia.Controls
 
             value = default;
             return false;
+        }
+
+        private AccessorSortKey GetSortKey(object item)
+        {
+            bool hasValue = TryGetValue(item, out TValue value);
+            return new AccessorSortKey(hasValue, value);
+        }
+
+        private readonly struct AccessorSortKey
+        {
+            public AccessorSortKey(bool hasValue, TValue value)
+            {
+                HasValue = hasValue;
+                Value = value;
+            }
+
+            public bool HasValue { get; }
+
+            public TValue Value { get; }
+        }
+
+        private sealed class AccessorSortKeyComparer : IComparer<AccessorSortKey>
+        {
+            private readonly IComparer<TValue> _valueComparer;
+
+            public AccessorSortKeyComparer(IComparer<TValue> valueComparer) => _valueComparer = valueComparer;
+
+            public int Compare(AccessorSortKey left, AccessorSortKey right)
+            {
+                if (!left.HasValue)
+                {
+                    return right.HasValue ? -1 : 0;
+                }
+
+                if (!right.HasValue)
+                {
+                    return 1;
+                }
+
+                bool leftNull = left.Value is null;
+                bool rightNull = right.Value is null;
+                if (leftNull)
+                {
+                    return rightNull ? 0 : -1;
+                }
+
+                if (rightNull)
+                {
+                    return 1;
+                }
+
+                return _valueComparer.Compare(left.Value, right.Value);
+            }
         }
 
         private static IComparer<TValue> CreateComparer(CultureInfo culture)

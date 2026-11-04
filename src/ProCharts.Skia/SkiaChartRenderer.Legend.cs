@@ -591,7 +591,7 @@ namespace ProCharts.Skia
             var lineStyle = ResolveSeriesLineStyle(overrides, themeStyle);
             var dashPattern = ResolveSeriesDashPattern(overrides, themeStyle);
             var defaultMarkerSize = Math.Max(2f, rect.Height * 0.25f);
-            var markerFallback = series.Kind == ChartSeriesKind.Area ||
+            var markerFallback = series.Kind == ChartSeriesKind.RangeArea || series.Kind == ChartSeriesKind.Area ||
                                  series.Kind == ChartSeriesKind.StackedArea ||
                                  series.Kind == ChartSeriesKind.StackedArea100
                 ? SkiaMarkerShape.None
@@ -611,7 +611,7 @@ namespace ProCharts.Skia
             var lineRight = rect.Right - (rect.Width * 0.1f);
 
             var fillOpacity = 1f;
-            if (series.Kind == ChartSeriesKind.Area ||
+            if (series.Kind == ChartSeriesKind.RangeArea || series.Kind == ChartSeriesKind.Area ||
                 series.Kind == ChartSeriesKind.StackedArea ||
                 series.Kind == ChartSeriesKind.StackedArea100)
             {
@@ -676,6 +676,7 @@ namespace ProCharts.Skia
                     canvas.DrawLine(lineLeft, lineY, lineRight, lineY, linePaint);
                     DrawMarker(canvas, center, markerSize, markerShape, markerPaint, markerStrokePaint);
                     break;
+                case ChartSeriesKind.RangeArea:
                 case ChartSeriesKind.Area:
                 case ChartSeriesKind.StackedArea:
                 case ChartSeriesKind.StackedArea100:

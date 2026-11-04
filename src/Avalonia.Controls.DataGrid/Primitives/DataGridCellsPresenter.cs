@@ -340,8 +340,11 @@ internal
                         OwningGrid.AutoSizeColumn(column, cell.DesiredSize.Width);
                         column.ComputeLayoutRoundedWidth(totalDisplayWidth);
                     }
-                    else if (!OwningGrid.UsesStarSizing)
+                    else if (!OwningGrid.UsesStarSizing || OwningGrid.AutoSizingColumns)
                     {
+                        // Until auto widths settle, visible fixed/star cells still need a provisional
+                        // measure. Otherwise rows with only offscreen auto cells report zero height,
+                        // causing viewport realization to walk the entire source before the first arrange.
                         column.ComputeLayoutRoundedWidth(scrollingLeftEdge);
                         cell.Measure(new Size(column.LayoutRoundedWidth, measureHeight));
                     }

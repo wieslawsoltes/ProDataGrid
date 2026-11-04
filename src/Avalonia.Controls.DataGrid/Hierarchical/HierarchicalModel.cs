@@ -2,6 +2,7 @@
 // Licensed under the MIT license. See LICENSE file in the project root for details.
 
 using System;
+using System.Buffers;
 using System.Collections;
 using System.Collections.Generic;
 using System.Collections.Specialized;
@@ -1012,15 +1013,32 @@ namespace Avalonia.Controls.DataGridHierarchical
 
         public void Expand(HierarchicalNode node)
         {
-            ExpandAsync(node, CancellationToken.None).GetAwaiter().GetResult();
+            ExpandAsyncCore(
+                node,
+                CancellationToken.None,
+                continueOnCapturedContext: false).GetAwaiter().GetResult();
         }
 
         public void Expand(IEnumerable items)
         {
-            ExpandAsync(items, CancellationToken.None).GetAwaiter().GetResult();
+            ExpandAsyncCore(
+                items,
+                CancellationToken.None,
+                continueOnCapturedContext: false).GetAwaiter().GetResult();
         }
 
-        public async Task ExpandAsync(HierarchicalNode node, CancellationToken cancellationToken = default)
+        public Task ExpandAsync(
+            HierarchicalNode node,
+            CancellationToken cancellationToken = default) =>
+            ExpandAsyncCore(
+                node,
+                cancellationToken,
+                SynchronizationContext.Current != null);
+
+        private async Task ExpandAsyncCore(
+            HierarchicalNode node,
+            CancellationToken cancellationToken,
+            bool continueOnCapturedContext)
         {
             if (node == null)
             {
@@ -1028,7 +1046,8 @@ namespace Avalonia.Controls.DataGridHierarchical
             }
 
             var loadState = GetLoadState(node);
-            await loadState.ExpandGate.WaitAsync(cancellationToken).ConfigureAwait(false);
+            await loadState.ExpandGate.WaitAsync(cancellationToken)
+                .ConfigureAwait(continueOnCapturedContext);
             try
             {
                 var parentIndex = GetFlattenedIndex(node);
@@ -1061,7 +1080,12 @@ namespace Avalonia.Controls.DataGridHierarchical
 
                 try
                 {
-                    await EnsureChildrenMaterializedAsync(node, forceReload: false, cancellationToken).ConfigureAwait(false);
+                    await EnsureChildrenMaterializedAsync(
+                            node,
+                            forceReload: false,
+                            cancellationToken,
+                            continueOnCapturedContext: continueOnCapturedContext)
+                        .ConfigureAwait(continueOnCapturedContext);
                 }
                 catch
                 {
@@ -1107,7 +1131,18 @@ namespace Avalonia.Controls.DataGridHierarchical
             }
         }
 
-        public async Task ExpandAsync(IEnumerable items, CancellationToken cancellationToken = default)
+        public Task ExpandAsync(
+            IEnumerable items,
+            CancellationToken cancellationToken = default) =>
+            ExpandAsyncCore(
+                items,
+                cancellationToken,
+                SynchronizationContext.Current != null);
+
+        private async Task ExpandAsyncCore(
+            IEnumerable items,
+            CancellationToken cancellationToken,
+            bool continueOnCapturedContext)
         {
             if (items == null)
             {
@@ -1129,7 +1164,9 @@ namespace Avalonia.Controls.DataGridHierarchical
                     continue;
                 }
 
-                await ExpandAsync(node, cancellationToken).ConfigureAwait(false);
+                await ExpandAsyncCore(
+                        node, cancellationToken, continueOnCapturedContext)
+                    .ConfigureAwait(continueOnCapturedContext);
             }
         }
 
@@ -1893,6 +1930,7 @@ namespace Avalonia.Controls.DataGridHierarchical
             int limit,
             bool resolveAsyncChildrenOffContext = false)
         {
+            using var activity = Avalonia.Controls.DataGridDiagnostics.HierarchicalExpandAll();
             List<HierarchicalNode>? expandedNodes = null;
             var materializationCommitGeneration = GetNextBulkMaterializationCommitGeneration();
             const int hashedCycleDepth = 32;
@@ -2225,8 +2263,31 @@ namespace Avalonia.Controls.DataGridHierarchical
             return true;
         }
 
+        private static bool ReferenceSequenceEqual(
+            IList<HierarchicalNode> oldNodes,
+            int oldStartIndex,
+            int oldCount,
+            IList<HierarchicalNode> newNodes)
+        {
+            if (oldCount != newNodes.Count)
+            {
+                return false;
+            }
+
+            for (int i = 0; i < oldCount; i++)
+            {
+                if (!ReferenceEquals(oldNodes[oldStartIndex + i], newNodes[i]))
+                {
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
         public void CollapseAll(HierarchicalNode? node = null, int? minDepth = null)
         {
+            using var activity = Avalonia.Controls.DataGridDiagnostics.HierarchicalCollapseAll();
             var start = node ?? Root;
             if (start == null)
             {
@@ -2239,32 +2300,186 @@ namespace Avalonia.Controls.DataGridHierarchical
             {
                 targetDepth++;
             }
-            var stack = new Stack<(HierarchicalNode Node, int Depth, bool Visited)>();
-            stack.Push((start, 0, false));
+            HierarchicalNode[]? collapsedNodes = null;
+            var collapsedCount = 0;
+            var stack = new Stack<(HierarchicalNode Node, int Depth)>();
+            stack.Push((start, 0));
 
-            while (stack.Count > 0)
+            try
             {
-                var (current, depth, visited) = stack.Pop();
-
-                if (!visited)
+                while (stack.Count > 0)
                 {
+                    var (current, depth) = stack.Pop();
                     if (current.IsExpanded || (hasVirtualRoot && ReferenceEquals(current, Root)))
                     {
                         EnsureChildrenMaterialized(current);
                         var children = current.Children;
+                        // Preserve the former left-to-right, parent-before-child lifecycle order
+                        // while avoiding the second visit that the old entered/visited stack used.
                         for (int i = children.Count - 1; i >= 0; i--)
                         {
-                            stack.Push((children[i], depth + 1, false));
+                            stack.Push((children[i], depth + 1));
                         }
                     }
 
-                    stack.Push((current, depth, true));
+                    if (depth < targetDepth || !current.IsExpanded || current.IsLeaf)
+                    {
+                        continue;
+                    }
+
+                    if (collapsedNodes == null)
+                    {
+                        collapsedNodes = ArrayPool<HierarchicalNode>.Shared.Rent(256);
+                    }
+                    else if (collapsedCount == collapsedNodes.Length)
+                    {
+                        var expandedBuffer = ArrayPool<HierarchicalNode>.Shared.Rent(
+                            checked(collapsedNodes.Length * 2));
+                        Array.Copy(collapsedNodes, expandedBuffer, collapsedCount);
+                        ArrayPool<HierarchicalNode>.Shared.Return(collapsedNodes, clearArray: true);
+                        collapsedNodes = expandedBuffer;
+                    }
+
+                    collapsedNodes[collapsedCount++] = current;
+                }
+
+                if (collapsedNodes == null)
+                {
+                    return;
+                }
+
+                CommitBulkCollapse(start, collapsedNodes, collapsedCount);
+            }
+            finally
+            {
+                if (collapsedNodes != null)
+                {
+                    ArrayPool<HierarchicalNode>.Shared.Return(collapsedNodes, clearArray: true);
+                }
+            }
+        }
+
+        private void CommitBulkCollapse(
+            HierarchicalNode start,
+            HierarchicalNode[] collapsedNodes,
+            int collapsedCount)
+        {
+            var isVirtualRoot = IsVirtualRootNode(start);
+            var startIndex = isVirtualRoot ? -1 : GetFlattenedIndex(start);
+            var isVisible = isVirtualRoot || startIndex >= 0;
+            var rangeStart = isVirtualRoot ? 0 : startIndex + 1;
+            var oldVisibleCount = isVisible
+                ? CountVisibleDescendantsInFlattened(start, startIndex)
+                : 0;
+            var oldExpandedCount = start.ExpandedCount;
+
+            for (int i = 0; i < collapsedCount; i++)
+            {
+                var collapsedNode = collapsedNodes[i];
+                CancelPendingLoad(collapsedNode);
+                collapsedNode.SetExpandedFromOwnerSilently(false);
+                collapsedNode.ExpandedCount = 0;
+            }
+
+            var visibleNodes = new List<HierarchicalNode>();
+            if (isVirtualRoot || start.IsExpanded)
+            {
+                CollectVisibleChildrenAndUpdateCounts(
+                    start,
+                    visibleNodes,
+                    materializeMissingChildren: false);
+            }
+            else
+            {
+                start.ExpandedCount = 0;
+            }
+
+            var expandedCountDelta = start.ExpandedCount - oldExpandedCount;
+            if (start.Parent != null && expandedCountDelta != 0)
+            {
+                ApplyExpandedCountDelta(start.Parent, expandedCountDelta);
+            }
+
+            var flattenedChanged = isVisible && !ReferenceSequenceEqual(
+                _flattened,
+                rangeStart,
+                oldVisibleCount,
+                visibleNodes);
+            if (flattenedChanged)
+            {
+                IReadOnlyDictionary<int, int>? indexMap = null;
+                if (oldVisibleCount > 0 && visibleNodes.Count > 0)
+                {
+                    indexMap = TryBuildOrderedRetainedIdentityMap(
+                        _flattened,
+                        oldCollectionStart: rangeStart,
+                        oldCount: oldVisibleCount,
+                        oldMapStartIndex: rangeStart,
+                        visibleNodes,
+                        newStartIndex: rangeStart);
+                    if (indexMap == null)
+                    {
+                        // Collapse normally retains an ordered subsequence, but preserve the
+                        // general item-equality mapping contract for custom or unusual models.
+                        var oldVisibleNodes = _flattened.GetRange(rangeStart, oldVisibleCount);
+                        indexMap = BuildIndexMap(
+                            oldVisibleNodes,
+                            rangeStart,
+                            visibleNodes,
+                            rangeStart);
+                    }
+                }
+
+                _flattened.ReplaceRange(rangeStart, oldVisibleCount, visibleNodes);
+                OnFlattenedChanged(
+                    new[] { new FlattenedChange(rangeStart, oldVisibleCount, visibleNodes.Count) },
+                    indexMap);
+            }
+
+            var raiseNodeCollapsed = HasNodeCollapsedObservers;
+            for (int i = 0; i < collapsedCount; i++)
+            {
+                var collapsedNode = collapsedNodes[i];
+                if (collapsedNode.HasPropertyChangedObservers)
+                {
+                    collapsedNode.RaiseExpandedChanged();
+                }
+
+                if (raiseNodeCollapsed)
+                {
+                    OnNodeCollapsed(collapsedNode);
+                }
+            }
+
+            if (!Options.VirtualizeChildren && !IsVirtualizationGuardActive)
+            {
+                return;
+            }
+
+            // Only the outermost collapsed nodes need culling; each cull owns its complete
+            // descendant subtree. Retaining every collapsed descendant would repeat the same
+            // traversal and dominate large collapse operations.
+            var collapsedSet = new HashSet<HierarchicalNode>(collapsedCount);
+            for (int i = 0; i < collapsedCount; i++)
+            {
+                collapsedSet.Add(collapsedNodes[i]);
+            }
+
+            for (int i = 0; i < collapsedCount; i++)
+            {
+                var collapsedNode = collapsedNodes[i];
+                if (collapsedNode.Parent != null && collapsedSet.Contains(collapsedNode.Parent))
+                {
                     continue;
                 }
 
-                if (depth >= targetDepth && current.IsExpanded)
+                if (Options.VirtualizeChildren)
                 {
-                    Collapse(current);
+                    DematerializeDescendants(collapsedNode);
+                }
+                else
+                {
+                    _pendingCullNodes.Add(collapsedNode);
                 }
             }
         }
@@ -2297,6 +2512,8 @@ namespace Avalonia.Controls.DataGridHierarchical
             SyncItemExpandedState(node, isExpanded: false);
             NodeCollapsed?.Invoke(this, new HierarchicalNodeEventArgs(node));
         }
+
+        protected virtual bool HasNodeCollapsedObservers => HasExpandedStateSetter || NodeCollapsed != null;
 
         protected virtual void OnNodeLoading(HierarchicalNode node)
         {
@@ -4304,11 +4521,17 @@ namespace Avalonia.Controls.DataGridHierarchical
             // one linear reference-identity pass. Besides avoiding the general-purpose identity
             // and item-equality dictionaries, this guarantees that an inserted equal item cannot
             // steal a retained node's mapping.
-            var orderedIdentityMap = TryBuildOrderedIdentityMap(
-                oldNodes,
-                oldStartIndex,
-                newNodes,
-                newStartIndex);
+            var orderedIdentityMap = oldNodes.Count <= newNodes.Count
+                ? TryBuildOrderedIdentityMap(
+                    oldNodes,
+                    oldStartIndex,
+                    newNodes,
+                    newStartIndex)
+                : TryBuildOrderedRetainedIdentityMap(
+                    oldNodes,
+                    oldStartIndex,
+                    newNodes,
+                    newStartIndex);
             if (orderedIdentityMap != null)
             {
                 return orderedIdentityMap;
@@ -4380,6 +4603,49 @@ namespace Avalonia.Controls.DataGridHierarchical
                 map.Add(oldStartIndex + oldIndex, newStartIndex + newIndex);
                 oldIndex++;
                 if (oldIndex == oldNodes.Count)
+                {
+                    return map;
+                }
+            }
+
+            return null;
+        }
+
+        private static IReadOnlyDictionary<int, int>? TryBuildOrderedRetainedIdentityMap(
+            IList<HierarchicalNode> oldNodes,
+            int oldStartIndex,
+            IList<HierarchicalNode> newNodes,
+            int newStartIndex)
+        {
+            return TryBuildOrderedRetainedIdentityMap(
+                oldNodes,
+                oldCollectionStart: 0,
+                oldCount: oldNodes.Count,
+                oldMapStartIndex: oldStartIndex,
+                newNodes,
+                newStartIndex);
+        }
+
+        private static IReadOnlyDictionary<int, int>? TryBuildOrderedRetainedIdentityMap(
+            IList<HierarchicalNode> oldNodes,
+            int oldCollectionStart,
+            int oldCount,
+            int oldMapStartIndex,
+            IList<HierarchicalNode> newNodes,
+            int newStartIndex)
+        {
+            var map = new Dictionary<int, int>(newNodes.Count);
+            var newIndex = 0;
+            for (int oldIndex = 0; oldIndex < oldCount; oldIndex++)
+            {
+                if (!ReferenceEquals(oldNodes[oldCollectionStart + oldIndex], newNodes[newIndex]))
+                {
+                    continue;
+                }
+
+                map.Add(oldMapStartIndex + oldIndex, newStartIndex + newIndex);
+                newIndex++;
+                if (newIndex == newNodes.Count)
                 {
                     return map;
                 }

@@ -22,6 +22,7 @@ internal
         private HierarchicalNode? _node;
         private ExpandCollapseState _lastExpandCollapseState;
         private bool _lastIsSelected;
+        private bool _isExpandCollapseProviderExposed;
 
         public DataGridRowAutomationPeer(DataGridRow owner)
             : base(owner)
@@ -121,10 +122,15 @@ internal
 
         protected override object? GetProviderCore(Type providerType)
         {
-            if (providerType == typeof(IExpandCollapseProvider) &&
-                !TryGetActiveNode(out _, out _))
+            if (providerType == typeof(IExpandCollapseProvider))
             {
-                return null;
+                if (!_isExpandCollapseProviderExposed &&
+                    !TryGetOwnedNode(out _, out _))
+                {
+                    return null;
+                }
+
+                _isExpandCollapseProviderExposed = true;
             }
 
             if (providerType == typeof(ISelectionItemProvider) &&
@@ -288,7 +294,7 @@ internal
 
         private void RaiseExpandCollapseChanges(ExpandCollapseState oldState, ExpandCollapseState newState)
         {
-            if (oldState == newState)
+            if (!_isExpandCollapseProviderExposed || oldState == newState)
             {
                 return;
             }

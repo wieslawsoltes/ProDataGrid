@@ -4,9 +4,15 @@ using System.ComponentModel;
 using System.Diagnostics;
 using System.Diagnostics.Metrics;
 using System.Linq;
+using Avalonia.Automation.Peers;
 using Avalonia.Collections;
 using Avalonia.Controls;
+using Avalonia.Controls.Automation.Peers;
+using Avalonia.Controls.Primitives;
+using Avalonia.Data;
 using Avalonia.Headless.XUnit;
+using Avalonia.Styling;
+using Avalonia.VisualTree;
 using Xunit;
 
 namespace Avalonia.Controls.DataGridTests;
@@ -54,6 +60,7 @@ public class DataGridDiagnosticsTests
         AssertHasDoubleMeasurement(listener, DataGridDiagnostics.Meters.DataGridRefreshTimeName);
         AssertHasDoubleMeasurement(listener, DataGridDiagnostics.Meters.RowsRefreshTimeName);
         AssertHasDoubleMeasurement(listener, DataGridDiagnostics.Meters.RowsDisplayUpdateTimeName);
+        AssertHasDoubleMeasurement(listener, DataGridDiagnostics.Meters.RowsRetargetEligibilityTimeName);
         AssertHasDoubleMeasurement(listener, DataGridDiagnostics.Meters.RowsPresenterViewportChangedTimeName);
         AssertHasDoubleMeasurement(listener, DataGridDiagnostics.Meters.RowsMeasureTimeName);
         AssertHasDoubleMeasurement(listener, DataGridDiagnostics.Meters.RowsArrangeTimeName);
@@ -61,6 +68,13 @@ public class DataGridDiagnosticsTests
         AssertHasDoubleMeasurement(listener, DataGridDiagnostics.Meters.RowsScrollExtentDeltaName);
         AssertHasDoubleMeasurement(listener, DataGridDiagnostics.Meters.RowsLogicalOffsetSynchronizedDeltaName);
         AssertHasDoubleMeasurement(listener, DataGridDiagnostics.Meters.RowGenerateTimeName);
+        AssertHasDoubleMeasurement(listener, DataGridDiagnostics.Meters.RowGenerateAcquireTimeName);
+        AssertHasDoubleMeasurement(listener, DataGridDiagnostics.Meters.RowGenerateBindTimeName);
+        AssertHasDoubleMeasurement(listener, DataGridDiagnostics.Meters.RowGeneratePrepareTimeName);
+        AssertHasDoubleMeasurement(listener, DataGridDiagnostics.Meters.RowRecycleTimeName);
+        AssertHasDoubleMeasurement(listener, DataGridDiagnostics.Meters.RowRecycleCleanupTimeName);
+        AssertHasDoubleMeasurement(listener, DataGridDiagnostics.Meters.RowRecycleDetachTimeName);
+        AssertHasDoubleMeasurement(listener, DataGridDiagnostics.Meters.RowRecyclePoolTimeName);
         AssertHasDoubleMeasurement(listener, DataGridDiagnostics.Meters.ColumnsAutoGenerateTimeName);
         AssertHasDoubleMeasurement(listener, DataGridDiagnostics.Meters.SelectionChangedTimeName);
 
@@ -233,8 +247,168 @@ public class DataGridDiagnosticsTests
         AssertValidDoubleMeasurements(listener, DataGridDiagnostics.Meters.RowsRefreshTimeName);
         AssertValidDoubleMeasurements(listener, DataGridDiagnostics.Meters.RowsDisplayUpdateTimeName);
         AssertValidDoubleMeasurements(listener, DataGridDiagnostics.Meters.RowGenerateTimeName);
+        AssertValidDoubleMeasurements(listener, DataGridDiagnostics.Meters.RowGenerateAcquireTimeName);
+        AssertValidDoubleMeasurements(listener, DataGridDiagnostics.Meters.RowGenerateBindTimeName);
+        AssertValidDoubleMeasurements(listener, DataGridDiagnostics.Meters.RowGeneratePrepareTimeName);
+        AssertValidDoubleMeasurements(listener, DataGridDiagnostics.Meters.RowRecycleTimeName);
+        AssertValidDoubleMeasurements(listener, DataGridDiagnostics.Meters.RowRecycleCleanupTimeName);
+        AssertValidDoubleMeasurements(listener, DataGridDiagnostics.Meters.RowRecycleDetachTimeName);
+        AssertValidDoubleMeasurements(listener, DataGridDiagnostics.Meters.RowRecyclePoolTimeName);
         AssertValidDoubleMeasurements(listener, DataGridDiagnostics.Meters.ColumnsAutoGenerateTimeName);
         AssertValidDoubleMeasurements(listener, DataGridDiagnostics.Meters.SelectionChangedTimeName);
+    }
+
+    [AvaloniaFact]
+    public void Virtual_Row_Retarget_Reports_Component_Durations()
+    {
+        var items = CreateItems(500);
+        using var listener = new DiagnosticsListener();
+        var root = new Window
+        {
+            Width = 320,
+            Height = 200,
+        };
+        root.SetThemeStyles(DataGridTheme.SimpleFlat);
+
+        var grid = new DataGrid
+        {
+            AutoGenerateColumns = false,
+            ItemsSource = items,
+            HeadersVisibility = DataGridHeadersVisibility.Column,
+            RowHeight = 24,
+            UseLogicalScrollable = true,
+            VisualLayoutMode = DataGridVisualLayoutMode.Virtualized,
+        };
+        var column = new DataGridTextColumn
+        {
+            Header = "Name",
+            Width = new DataGridLength(220),
+            Binding = new Binding(nameof(TestItem.Name)),
+        };
+        DataGridColumnMetadata.SetValueAccessor(
+            column,
+            new DataGridColumnValueAccessor<TestItem, string>(item => item.Name));
+        grid.Columns.Add(column);
+        root.Content = grid;
+        Assert.True(grid.TryFindResource("DataGridFlatTheme", out object? resource));
+        grid.Theme = Assert.IsType<ControlTheme>(resource);
+
+        try
+        {
+            root.Show();
+            grid.UpdateLayout();
+            Assert.True(grid.UsesVirtualCellSurface);
+            Assert.IsType<DataGridAutomationPeer>(
+                ControlAutomationPeer.CreatePeerForElement(grid));
+            grid.UpdateLayout();
+
+            DataGridRowsPresenter presenter = grid
+                .GetVisualDescendants()
+                .OfType<DataGridRowsPresenter>()
+                .Single();
+            long retargetedBefore = GetLongMeasurementTotal(
+                listener,
+                DataGridDiagnostics.Meters.RowsRetargetedCountName);
+            long preparedBefore = GetLongMeasurementTotal(
+                listener,
+                DataGridDiagnostics.Meters.RowsPreparedCountName);
+            long realizedBefore = GetLongMeasurementTotal(
+                listener,
+                DataGridDiagnostics.Meters.RowsRealizedCountName);
+            presenter.Offset = new Vector(0, 400 * grid.RowHeight);
+            grid.UpdateLayout();
+
+            AssertValidDoubleMeasurements(listener, DataGridDiagnostics.Meters.RowsRetargetEligibilityTimeName);
+            AssertValidDoubleMeasurements(listener, DataGridDiagnostics.Meters.RowsRetargetValidationTimeName);
+            AssertValidDoubleMeasurements(listener, DataGridDiagnostics.Meters.RowsRetargetBindTimeName);
+            AssertValidDoubleMeasurements(listener, DataGridDiagnostics.Meters.RowsRetargetApplyTimeName);
+            AssertValidDoubleMeasurements(listener, DataGridDiagnostics.Meters.RowsRetargetChildIndexTimeName);
+            AssertValidDoubleMeasurements(listener, DataGridDiagnostics.Meters.RowsRetargetLayoutValidityTimeName);
+            long retargeted = GetLongMeasurementTotal(
+                listener,
+                DataGridDiagnostics.Meters.RowsRetargetedCountName) - retargetedBefore;
+            long prepared = GetLongMeasurementTotal(
+                listener,
+                DataGridDiagnostics.Meters.RowsPreparedCountName) - preparedBefore;
+            long realized = GetLongMeasurementTotal(
+                listener,
+                DataGridDiagnostics.Meters.RowsRealizedCountName) - realizedBefore;
+            Assert.True(retargeted > 0);
+            Assert.Equal(retargeted, prepared);
+            Assert.Equal(retargeted, realized);
+            Assert.True(GetLongMeasurementTotal(
+                listener,
+                DataGridDiagnostics.Meters.RowsRetargetMeasureReusedCountName) > 0);
+            Assert.True(GetLongMeasurementTotal(
+                listener,
+                DataGridDiagnostics.Meters.RowsRetargetArrangeReusedCountName) > 0);
+        }
+        finally
+        {
+            root.Close();
+        }
+    }
+
+    [Fact]
+    public void Virtual_Surface_Metrics_Report_Render_Work()
+    {
+        using var listener = new DiagnosticsListener();
+
+        using (DataGridDiagnostics.BeginVirtualSurfaceRender())
+        {
+            // An empty scope can begin and end in the same clock tick on Windows.
+            // Keep the positive-duration assertion; give the fixture measurable work.
+            var timestamp = Stopwatch.GetTimestamp();
+            Assert.True(System.Threading.SpinWait.SpinUntil(
+                () => Stopwatch.GetTimestamp() != timestamp, TimeSpan.FromSeconds(1)),
+                "The monotonic clock did not advance during the timed scope.");
+        }
+        DataGridDiagnostics.RecordVirtualSurfaceRender(
+            rows: 20,
+            cells: 100,
+            clips: 2,
+            verticalGridLines: 0,
+            textLayoutCacheHits: 96,
+            textLayoutCacheMisses: 4,
+            textDrawOperations: 1,
+            textGlyphRuns: 100,
+            expanderDrawOperations: 20,
+            valueCacheHits: 95,
+            valueCacheMisses: 5);
+
+        AssertValidDoubleMeasurements(
+            listener,
+            DataGridDiagnostics.Meters.VirtualSurfaceRenderTimeName);
+        Assert.Equal(20, GetLongMeasurementTotal(
+            listener,
+            DataGridDiagnostics.Meters.VirtualSurfaceRenderedRowsCountName));
+        Assert.Equal(100, GetLongMeasurementTotal(
+            listener,
+            DataGridDiagnostics.Meters.VirtualSurfaceRenderedCellsCountName));
+        Assert.Equal(2, GetLongMeasurementTotal(
+            listener,
+            DataGridDiagnostics.Meters.VirtualSurfaceClipCountName));
+        Assert.Equal(96, GetLongMeasurementTotal(
+            listener,
+            DataGridDiagnostics.Meters.VirtualSurfaceTextLayoutCacheHitCountName));
+        Assert.Equal(4, GetLongMeasurementTotal(
+            listener,
+            DataGridDiagnostics.Meters.VirtualSurfaceTextLayoutCacheMissCountName));
+        Assert.Equal(1, GetLongMeasurementTotal(
+            listener,
+            DataGridDiagnostics.Meters.VirtualSurfaceTextDrawOperationCountName));
+        Assert.Equal(100, GetLongMeasurementTotal(
+            listener,
+            DataGridDiagnostics.Meters.VirtualSurfaceTextGlyphRunCountName));
+        Assert.Equal(20, GetLongMeasurementTotal(
+            listener,
+            DataGridDiagnostics.Meters.VirtualSurfaceExpanderDrawOperationCountName));
+        Assert.Equal(95, GetLongMeasurementTotal(
+            listener,
+            DataGridDiagnostics.Meters.VirtualSurfaceValueCacheHitCountName));
+        Assert.Equal(5, GetLongMeasurementTotal(
+            listener,
+            DataGridDiagnostics.Meters.VirtualSurfaceValueCacheMissCountName));
     }
 
     [AvaloniaFact]

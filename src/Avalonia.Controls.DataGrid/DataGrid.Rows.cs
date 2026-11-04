@@ -245,6 +245,20 @@ internal
                 Debug.Assert(_verticalOffset >= 0);
                 Debug.Assert(NegVerticalOffset >= 0);
 
+                // The virtual cell surface requires a finite row height. Without collection-view
+                // group headers every visible slot therefore has identical geometry, so the extent
+                // does not need to rebuild a displayed-height list or update an estimator on every
+                // measure pass.
+                if (UsesVirtualCellSurface &&
+                    (RowGroupHeadersTable?.RangeCount ?? 0) == 0 &&
+                    (RowGroupFootersTable?.RangeCount ?? 0) == 0)
+                {
+                    int virtualCollapsedSlotCount = _collapsedSlotsTable.GetIndexCount(0, SlotCount - 1);
+                    int visibleSlotCount = Math.Max(0, SlotCount - virtualCollapsedSlotCount);
+                    double fixedRowHeight = DataGridRow.GetFlatDesiredHeight(this, RowHeight);
+                    return fixedRowHeight * visibleSlotCount;
+                }
+
                 var estimator = RowHeightEstimator;
                 double previousRowEstimate = estimator?.RowHeightEstimate ?? 0;
                 double previousDetailsEstimate = estimator?.RowDetailsHeightEstimate ?? 0;
@@ -543,7 +557,7 @@ internal
                     isRow: isRow,
                     deferLayout: deferLayout);
             }
-            else if (SlotIsDisplayed(slot))
+            else if (SlotIsDisplayed(slot) && !UsesLightweightVirtualRows)
             {
                 // Row at that index needs to be displayed
                 if (isRow)
@@ -1060,6 +1074,12 @@ internal
 
         private void ApplyDisplayedRowsState(int startSlot, int endSlot)
         {
+            if (DisplayData.HasVirtualScrollingElements)
+            {
+                _rowsPresenter?.InvalidateVirtualCellSurface();
+                return;
+            }
+
             int firstSlot = Math.Max(DisplayData.FirstScrollingSlot, startSlot);
             int lastSlot = Math.Min(DisplayData.LastScrollingSlot, endSlot);
 
@@ -1430,6 +1450,12 @@ internal
             bool isDisplayed = IsSlotVisible(slot);
             if (isDisplayed)
             {
+                if (DisplayData.HasVirtualScrollingElements &&
+                    TryGetLightweightVirtualRowHeight(out double virtualRowHeight))
+                {
+                    return virtualRowHeight;
+                }
+
                 Control element = DisplayData.GetDisplayedElement(slot);
                 Debug.Assert(element != null);
                 return element is DataGridRow row && row.HasDeferredHeight
@@ -1450,6 +1476,12 @@ internal
 
             if (IsSlotVisible(slot))
             {
+                if (DisplayData.HasVirtualScrollingElements &&
+                    TryGetLightweightVirtualRowHeight(out double virtualRowHeight))
+                {
+                    return virtualRowHeight;
+                }
+
                 Control element = DisplayData.GetDisplayedElement(slot);
                 return element is DataGridRow row && row.HasDeferredHeight
                     ? row.DeferredHeight
@@ -1523,6 +1555,12 @@ internal
         {
             if (IsSlotVisible(slot))
             {
+                if (DisplayData.HasVirtualScrollingElements &&
+                    TryGetLightweightVirtualRowHeight(out double virtualRowHeight))
+                {
+                    return virtualRowHeight;
+                }
+
                 Control element = DisplayData.GetDisplayedElement(slot);
                 return element is DataGridRow row && row.HasDeferredHeight
                     ? row.DeferredHeight
@@ -1585,6 +1623,12 @@ internal
             Debug.Assert(slot >= 0 && slot < SlotCount);
             if (IsSlotVisible(slot))
             {
+                if (DisplayData.HasVirtualScrollingElements &&
+                    TryGetLightweightVirtualRowHeight(out double virtualRowHeight))
+                {
+                    return virtualRowHeight;
+                }
+
                 Debug.Assert(DisplayData.GetDisplayedElement(slot) != null);
                 return DisplayData.GetDisplayedElement(slot).DesiredSize.Height;
             }
@@ -1774,6 +1818,7 @@ internal
                 InvalidateRowsMeasure(invalidateIndividualElements: true);
                 // DataGrid needs to update the layout information and the ScrollBars
                 InvalidateMeasure();
+                RefreshVirtualCellBackendIfEligibilityChanged();
             }
         }
 

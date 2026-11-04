@@ -211,9 +211,22 @@ internal
         {
             get
             {
+                DataGridColumnHeader replacedHeader = null;
+                if (_headerCell != null &&
+                    OwningGrid != null &&
+                    !OwningGrid.CanReuseColumnHeaderContainer(this, _headerCell))
+                {
+                    replacedHeader = _headerCell;
+                    ClearHeaderCache();
+                }
                 if (_headerCell == null)
                 {
-                    _headerCell = CreateHeader();
+                    _headerCell = OwningGrid?.CreateColumnHeaderContainer(this) ?? CreateHeader();
+                }
+                if (replacedHeader != null)
+                {
+                    _headerCell.IsVisible = IsVisible;
+                    OwningGrid?.ReplaceDisplayedColumnHeader(replacedHeader, _headerCell);
                 }
                 return _headerCell;
             }
@@ -301,6 +314,10 @@ internal
             else if (change.Property == DisplayModeProperty)
             {
                 OwningGrid?.OnColumnDisplayModeChanged(this);
+            }
+            else if (change.Property == CellThemeProperty)
+            {
+                OwningGrid?.RefreshVirtualCellBackendIfEligibilityChanged();
             }
             else if (change.Property == WidthProperty)
             {

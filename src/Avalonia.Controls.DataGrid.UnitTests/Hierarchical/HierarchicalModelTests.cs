@@ -19,8 +19,8 @@ namespace Avalonia.Controls.DataGridTests.Hierarchical;
 
     public class HierarchicalModelTests
     {
-        private class Item
-        {
+    private class Item
+    {
             public Item(string name)
         {
             Name = name;
@@ -30,6 +30,32 @@ namespace Avalonia.Controls.DataGridTests.Hierarchical;
         public string Name { get; }
 
         public ObservableCollection<Item> Children { get; set; }
+    }
+
+    private sealed class TrackingSynchronizationContext : SynchronizationContext
+    {
+        private int _postCount;
+
+        public int PostCount => Volatile.Read(ref _postCount);
+
+        public override void Post(SendOrPostCallback callback, object? state)
+        {
+            ArgumentNullException.ThrowIfNull(callback);
+            Interlocked.Increment(ref _postCount);
+            ThreadPool.QueueUserWorkItem(_ =>
+            {
+                var previousContext = Current;
+                SetSynchronizationContext(this);
+                try
+                {
+                    callback(state);
+                }
+                finally
+                {
+                    SetSynchronizationContext(previousContext);
+                }
+            });
+        }
     }
 
     private sealed class DuplicateItem
@@ -1568,6 +1594,27 @@ namespace Avalonia.Controls.DataGridTests.Hierarchical;
     }
 
     [Fact]
+    public void BuildIndexMap_MapsOrderedRetainedNodesAcrossRemovals()
+    {
+        var retainedA = (HierarchicalNode)RuntimeHelpers.GetUninitializedObject(typeof(HierarchicalNode));
+        var removedA = (HierarchicalNode)RuntimeHelpers.GetUninitializedObject(typeof(HierarchicalNode));
+        var removedB = (HierarchicalNode)RuntimeHelpers.GetUninitializedObject(typeof(HierarchicalNode));
+        var retainedB = (HierarchicalNode)RuntimeHelpers.GetUninitializedObject(typeof(HierarchicalNode));
+
+        var map = HierarchicalModel.BuildIndexMap(
+            new[] { retainedA, removedA, removedB, retainedB },
+            oldStartIndex: 4,
+            new[] { retainedA, retainedB },
+            newStartIndex: 7);
+
+        Assert.NotNull(map);
+        Assert.Equal(7, map![4]);
+        Assert.Equal(8, map[7]);
+        Assert.False(map.ContainsKey(5));
+        Assert.False(map.ContainsKey(6));
+    }
+
+    [Fact]
     public void ExpandAll_PublishesFinalFlattenedStateBeforeExpandedStateEvents()
     {
         var root = new Item("root");
@@ -2551,6 +2598,175 @@ namespace Avalonia.Controls.DataGridTests.Hierarchical;
     }
 
     [Fact]
+    public void CollapseAll_RaisesTypedLifecycleEventsWithoutBaseSubscriptions()
+    {
+        var root = new Item("root");
+        var child = new Item("child");
+        child.Children.Add(new Item("grand"));
+        root.Children.Add(child);
+        var model = new HierarchicalModel<Item>(new HierarchicalOptions<Item>
+        {
+            ChildrenSelector = item => item.Children
+        });
+        model.SetRoot(root);
+        model.ExpandAll();
+        var collapsed = new List<string>();
+        model.NodeCollapsedTyped += (_, args) => collapsed.Add(args.Node.Item.Name);
+
+        model.CollapseAll();
+
+        Assert.Equal(new[] { "root", "child" }, collapsed);
+    }
+
+    [Fact]
+    public void CollapseAll_CommitsOneCoherentFlattenedChangeBeforeLifecycleEvents()
+    {
+        var root = new Item("root");
+        var child = new Item("child");
+        child.Children.Add(new Item("grand"));
+        root.Children.Add(child);
+
+        var model = CreateModel();
+        model.SetRoot(root);
+        model.ExpandAll();
+        var rootNode = model.Root!;
+        var childNode = model.GetNode(1);
+        var events = new List<string>();
+        var collectionChanges = new List<NotifyCollectionChangedEventArgs>();
+        model.FlattenedChanged += (_, args) =>
+        {
+            Assert.Single(model.Flattened);
+            Assert.False(rootNode.IsExpanded);
+            Assert.False(childNode.IsExpanded);
+            FlattenedChange change = Assert.Single(args.Changes);
+            Assert.Equal(1, change.Index);
+            Assert.Equal(2, change.OldCount);
+            Assert.Equal(0, change.NewCount);
+            events.Add("flattened");
+        };
+        ((INotifyCollectionChanged)model.ObservableFlattened).CollectionChanged +=
+            (_, args) => collectionChanges.Add(args);
+        rootNode.PropertyChanged += (_, args) =>
+        {
+            if (args.PropertyName == nameof(HierarchicalNode.IsExpanded))
+            {
+                events.Add("root-property");
+            }
+        };
+        childNode.PropertyChanged += (_, args) =>
+        {
+            if (args.PropertyName == nameof(HierarchicalNode.IsExpanded))
+            {
+                events.Add("child-property");
+            }
+        };
+        model.NodeCollapsed += (_, args) =>
+            events.Add($"collapsed:{((Item)args.Node.Item).Name}");
+
+        model.CollapseAll();
+
+        Assert.Single(collectionChanges);
+        Assert.Equal(NotifyCollectionChangedAction.Remove, collectionChanges[0].Action);
+        Assert.Equal(
+            new[]
+            {
+                "flattened",
+                "root-property",
+                "collapsed:root",
+                "child-property",
+                "collapsed:child"
+            },
+            events);
+    }
+
+    [Fact]
+    public void CollapseAll_VirtualRootRetainsRootIdentityMapInSingleCommit()
+    {
+        var first = new Item("first");
+        var second = new Item("second");
+        first.Children.Add(new Item("first-child"));
+        second.Children.Add(new Item("second-child"));
+        var model = CreateModel();
+        model.SetRoots(new[] { first, second });
+        model.ExpandAll();
+        FlattenedChangedEventArgs? flattenedChanged = null;
+        var collectionChanges = 0;
+        model.FlattenedChanged += (_, args) => flattenedChanged = args;
+        ((INotifyCollectionChanged)model.ObservableFlattened).CollectionChanged +=
+            (_, _) => collectionChanges++;
+
+        model.CollapseAll();
+
+        Assert.NotNull(flattenedChanged);
+        FlattenedChange change = Assert.Single(flattenedChanged!.Changes);
+        Assert.Equal(0, change.Index);
+        Assert.Equal(4, change.OldCount);
+        Assert.Equal(2, change.NewCount);
+        Assert.Equal(0, flattenedChanged.IndexMap.MapOldIndexToNew(0));
+        Assert.Equal(1, flattenedChanged.IndexMap.MapOldIndexToNew(2));
+        Assert.Equal(1, collectionChanges);
+        Assert.Equal(new[] { first, second }, model.Flattened.Select(node => node.Item));
+    }
+
+    [Fact]
+    public void CollapseAll_VirtualizesOnlyAfterPublishingCollapsedLifecycleEvents()
+    {
+        var root = new Item("root");
+        var child = new Item("child");
+        child.Children.Add(new Item("grand"));
+        root.Children.Add(child);
+        var model = new HierarchicalModel(new HierarchicalOptions
+        {
+            ChildrenSelector = item => ((Item)item).Children,
+            VirtualizeChildren = true
+        });
+        model.SetRoot(root);
+        model.ExpandAll();
+        var rootNode = model.Root!;
+        var childNode = model.GetNode(1);
+        model.NodeCollapsed += (_, args) =>
+        {
+            Assert.NotEmpty(rootNode.Children);
+            if (ReferenceEquals(args.Node, childNode))
+            {
+                Assert.NotEmpty(childNode.Children);
+            }
+        };
+
+        model.CollapseAll();
+
+        Assert.Single(model.Flattened);
+        Assert.Empty(rootNode.Children);
+        Assert.False(rootNode.HasMaterializedChildren);
+    }
+
+    [Fact]
+    public void CollapseAll_VirtualizationGuardDefersOneOutermostSubtreeCull()
+    {
+        var root = new Item("root");
+        var child = new Item("child");
+        child.Children.Add(new Item("grand"));
+        root.Children.Add(child);
+        var model = new HierarchicalModel(new HierarchicalOptions
+        {
+            ChildrenSelector = item => ((Item)item).Children,
+            VirtualizeChildren = false
+        });
+        model.SetRoot(root);
+        model.ExpandAll();
+        var rootNode = model.Root!;
+
+        using (model.BeginVirtualizationGuard())
+        {
+            model.CollapseAll();
+            Assert.NotEmpty(rootNode.Children);
+        }
+
+        Assert.Empty(rootNode.Children);
+        Assert.False(rootNode.HasMaterializedChildren);
+    }
+
+    [Fact]
     public void CollapseAll_FromDepth_CollapsesDescendantsOnly()
     {
         var root = new Item("root");
@@ -2592,6 +2808,44 @@ namespace Avalonia.Controls.DataGridTests.Hierarchical;
         Assert.Equal(2, model.Count);
         Assert.False(model.Root!.IsLoading);
         Assert.True(model.Root!.IsExpanded);
+    }
+
+    [Fact]
+    public async Task ChildrenSelectorAsync_PreservesCallerSynchronizationContext()
+    {
+        var root = new Item("root");
+        root.Children.Add(new Item("child"));
+        var model = new HierarchicalModel(new HierarchicalOptions
+        {
+            ChildrenSelectorAsync = async (item, ct) =>
+            {
+                await Task.Delay(10, ct).ConfigureAwait(false);
+                return ((Item)item).Children;
+            }
+        });
+        var context = new TrackingSynchronizationContext();
+        var previousContext = SynchronizationContext.Current;
+        var notificationContexts = new List<SynchronizationContext?>();
+
+        model.SetRoot(root);
+        model.Root!.PropertyChanged += (_, _) => notificationContexts.Add(SynchronizationContext.Current);
+        model.NodeLoading += (_, _) => notificationContexts.Add(SynchronizationContext.Current);
+        model.NodeLoaded += (_, _) => notificationContexts.Add(SynchronizationContext.Current);
+        model.NodeExpanded += (_, _) => notificationContexts.Add(SynchronizationContext.Current);
+        model.FlattenedChanged += (_, _) => notificationContexts.Add(SynchronizationContext.Current);
+
+        SynchronizationContext.SetSynchronizationContext(context);
+        try
+        {
+            await model.ExpandAsync(model.Root!);
+            Assert.NotEmpty(notificationContexts);
+            Assert.All(notificationContexts, notificationContext => Assert.Same(context, notificationContext));
+            Assert.True(context.PostCount > 0);
+        }
+        finally
+        {
+            SynchronizationContext.SetSynchronizationContext(previousContext);
+        }
     }
 
     [Fact]

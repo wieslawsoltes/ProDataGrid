@@ -444,6 +444,10 @@ internal
 
         internal override bool SupportsDrawnDisplay => true;
 
+        internal override bool SupportsVirtualCellSurface =>
+            BindingCloneHelper.SupportsDirectRawDataContextRead(Binding) &&
+            DataGridColumnMetadata.GetValueAccessor(this) is not null;
+
         object IDataGridDrawnCellValueProvider.GetDrawnCellValue(object item)
         {
             var accessor = DataGridColumnMetadata.GetValueAccessor(this);

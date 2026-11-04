@@ -43,6 +43,8 @@ internal
         private int _dragHeaderAnchorRowIndex = -1;
         private int _dragHeaderAnchorColumnIndex = -1;
 
+        internal bool IsSelectionDragActive => _isDraggingSelection;
+
         private enum HeaderSelectionDragMode
         {
             None,
@@ -657,6 +659,16 @@ internal
         private bool TryGetDragRowTarget(Point point, out int slot)
         {
             slot = -1;
+
+            if (_rowsPresenter != null &&
+                DisplayData?.HasVirtualScrollingElements == true)
+            {
+                Point virtualPresenterPoint = this.TranslatePoint(point, _rowsPresenter) ?? point;
+                return _rowsPresenter.TryGetLightweightVirtualRowSlot(virtualPresenterPoint.Y, out slot) &&
+                    slot >= 0 &&
+                    slot < SlotCount &&
+                    !IsGroupSlot(slot);
+            }
 
             if (TryGetRowFromPoint(point, out var row))
             {

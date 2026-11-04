@@ -6,6 +6,7 @@ using System.Drawing;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using Avalonia.Controls.Shapes;
+using Avalonia.Controls.DataGridDragDrop;
 using Avalonia.Data;
 using Avalonia.Headless.XUnit;
 using Avalonia.Markup.Xaml.Styling;
@@ -18,6 +19,27 @@ namespace Avalonia.Controls.DataGridTests;
 
 public class DataGridRowTests
 {
+    [Fact]
+    public void ClearDragDropState_Clears_Tracked_PseudoClasses_And_Is_Idempotent()
+    {
+        var row = new DataGridRow();
+        var pseudoClasses = (IPseudoClasses)row.Classes;
+
+        row.SetDragging(true);
+        row.SetDropPosition(DataGridRowDropPosition.Before);
+
+        Assert.True(pseudoClasses.Contains(":dragging"));
+        Assert.True(pseudoClasses.Contains(":drag-over-before"));
+
+        row.ClearDragDropState();
+        row.ClearDragDropState();
+
+        Assert.False(pseudoClasses.Contains(":dragging"));
+        Assert.False(pseudoClasses.Contains(":drag-over-before"));
+        Assert.False(pseudoClasses.Contains(":drag-over-after"));
+        Assert.False(pseudoClasses.Contains(":drag-over-inside"));
+    }
+
     [AvaloniaFact]
     public void IsSelected_Binding_Works_For_Initial_Rows()
     {

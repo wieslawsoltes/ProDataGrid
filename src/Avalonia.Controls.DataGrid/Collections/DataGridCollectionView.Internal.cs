@@ -388,7 +388,12 @@ namespace Avalonia.Collections
             activity?.SetTag(DataGridDiagnostics.Tags.SortDescriptions, SortDescriptions?.Count ?? 0);
 
             // filter the collection's array into the local array
-            List<object> localList = new List<object>();
+            int capacity = Filter == null && enumerable is ICollection collection
+                ? collection.Count
+                : 0;
+            List<object> localList = capacity > 0
+                ? new List<object>(capacity)
+                : new List<object>();
 
             foreach (object item in enumerable)
             {
@@ -500,7 +505,7 @@ namespace Avalonia.Collections
 
             // we want to make sure that the data is refreshed before we try to move to a page
             // since the refresh would take care of the filtering, sorting, and grouping.
-            RefreshOrDefer();
+            RefreshOrDeferForSort();
 
             if (PageSize > 0)
             {

@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 
 namespace DataGridSample.Models;
@@ -5,6 +6,7 @@ namespace DataGridSample.Models;
 public sealed class OptimizedHierarchyCellSampleNode
 {
     public OptimizedHierarchyCellSampleNode(
+        int id,
         string name,
         string kind,
         string owner,
@@ -14,6 +16,7 @@ public sealed class OptimizedHierarchyCellSampleNode
         IReadOnlyList<OptimizedHierarchyCellSampleNode> children,
         bool isExpanded)
     {
+        Id = id;
         Name = name;
         Kind = kind;
         Owner = owner;
@@ -22,19 +25,41 @@ public sealed class OptimizedHierarchyCellSampleNode
         Detail = detail;
         Children = children;
         IsExpanded = isExpanded;
+        Date = new DateTime(2020, 1, 1).AddDays(id % 3_650);
+        Time = TimeSpan.FromSeconds(id % 86_400);
+        Phone = $"(555) {id % 1_000:D3}-{id % 10_000:D4}";
+        Category = $"Category-{id % 997:D3}";
+        SliderValue = (id % 1_000) / 10d;
+        IsActive = id % 2 == 0;
     }
 
-    public string Name { get; }
+    public int Id { get; }
 
-    public string Kind { get; }
+    public string Name { get; set; }
 
-    public string Owner { get; }
+    public string Kind { get; set; }
 
-    public string Region { get; }
+    public string Owner { get; set; }
 
-    public string State { get; }
+    public string Region { get; set; }
 
-    public string Detail { get; }
+    public string State { get; set; }
+
+    public string Detail { get; set; }
+
+    public bool HasChildren => Children.Count != 0;
+
+    public bool IsActive { get; set; }
+
+    public DateTime Date { get; set; }
+
+    public TimeSpan Time { get; set; }
+
+    public string Phone { get; set; }
+
+    public string Category { get; set; }
+
+    public double SliderValue { get; set; }
 
     public IReadOnlyList<OptimizedHierarchyCellSampleNode> Children { get; }
 

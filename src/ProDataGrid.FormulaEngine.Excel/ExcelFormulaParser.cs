@@ -113,10 +113,18 @@ namespace ProDataGrid.FormulaEngine.Excel
                 }
 
                 var expression = ParsePrimary();
-                while (Peek().Type == FormulaTokenType.Operator && Peek().Text == "%")
+                while (true)
                 {
-                    Next();
-                    expression = new FormulaUnaryExpression(FormulaUnaryOperator.Percent, expression);
+                    if (Match(FormulaTokenType.OpenParen))
+                    {
+                        expression = new FormulaInvocationExpression(expression, ParseArguments());
+                    }
+                    else if (Peek().Type == FormulaTokenType.Operator && Peek().Text == "%")
+                    {
+                        Next();
+                        expression = new FormulaUnaryExpression(FormulaUnaryOperator.Percent, expression);
+                    }
+                    else break;
                 }
 
                 return expression;
@@ -218,14 +226,14 @@ namespace ProDataGrid.FormulaEngine.Excel
                         Next();
                         if (expectValue && args.Count > 0)
                         {
-                            args.Add(new FormulaLiteralExpression(FormulaValue.Blank));
+                            args.Add(new FormulaLiteralExpression(FormulaValue.Blank, isOmitted: true));
                         }
                         return args;
                     }
 
                     if (token.Type == FormulaTokenType.Comma || token.Type == FormulaTokenType.Semicolon)
                     {
-                        args.Add(new FormulaLiteralExpression(FormulaValue.Blank));
+                        args.Add(new FormulaLiteralExpression(FormulaValue.Blank, isOmitted: true));
                         Next();
                         expectValue = true;
                         continue;

@@ -176,6 +176,7 @@ namespace Avalonia.Controls
 
         private void RefreshHierarchicalIndentation()
         {
+            using var activity = DataGridDiagnostics.HierarchicalIndentationRefresh();
             if (!_hierarchicalRowsEnabled || DisplayData == null)
             {
                 return;

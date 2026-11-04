@@ -19,6 +19,12 @@ namespace Avalonia.Controls
         private const int IndexedScrollMinimumSlotCount = 100_000;
         private const int IndexedScrollMinimumEstimatedRows = 1_024;
 
+        internal long UniformScrollTargetCount { get; private set; }
+
+        internal long LightweightVirtualScrollCount { get; private set; }
+
+        internal long FlatRowRetargetScrollCount { get; private set; }
+
         private bool CanUseEstimatedScrollFastPath()
         {
             return RowDetailsVisibilityMode != DataGridRowDetailsVisibilityMode.VisibleWhenSelected || RowDetailsTemplate == null;
@@ -84,6 +90,52 @@ namespace Avalonia.Controls
             return true;
         }
 
+        private bool TryGetUniformScrollTarget(
+            double verticalOffset,
+            int lastVisibleSlot,
+            out int targetSlot,
+            out double rowHeight)
+        {
+            targetSlot = -1;
+            rowHeight = 0;
+
+            if (!UsesDefaultVirtualRowPipeline ||
+                !double.IsFinite(RowHeight) ||
+                RowDetailsTemplate is not null ||
+                RowGroupHeadersTable.RangeCount != 0 ||
+                RowGroupFootersTable.RangeCount != 0 ||
+                !_collapsedSlotsTable.IsEmpty ||
+                !_showDetailsTable.IsEmpty)
+            {
+                return false;
+            }
+
+            rowHeight = DataGridRow.GetFlatDesiredHeight(this, RowHeight);
+            if (!double.IsFinite(rowHeight) || !MathUtilities.GreaterThan(rowHeight, 0))
+            {
+                return false;
+            }
+
+            double boundedOffset = Math.Max(0, verticalOffset);
+            double target = Math.Floor(boundedOffset / rowHeight);
+            if (target > int.MaxValue)
+            {
+                targetSlot = lastVisibleSlot;
+            }
+            else
+            {
+                targetSlot = Math.Min((int)target, lastVisibleSlot);
+            }
+
+            if (targetSlot < 0)
+            {
+                return false;
+            }
+
+            UniformScrollTargetCount++;
+            return true;
+        }
+
         private bool ShouldBuildScrollHeightIndex(double verticalOffset)
         {
             double singleRowHeightEstimate = GetCurrentSingleRowHeightEstimate();
@@ -137,11 +189,29 @@ namespace Avalonia.Controls
             }
         }
 
+        private void TrimRetainedDisplayedRowsBefore(int targetSlot)
+        {
+            if (CanRetainDisplayedRowsForScrollTarget(targetSlot))
+            {
+                TrimDisplayedRowsBefore(targetSlot);
+            }
+        }
+
         private void ScrollSlotsByHeight(double height)
         {
             using var _ = DataGridDiagnostics.BeginRowsScrollSlotsByHeight();
 
             if (SlotCount == 0)
+            {
+                return;
+            }
+
+            if (TryScrollLightweightVirtualRows(height))
+            {
+                return;
+            }
+
+            if (TryScrollDefaultFlatRows(height))
             {
                 return;
             }
@@ -168,6 +238,8 @@ namespace Avalonia.Controls
                 double newVerticalOffset = _verticalOffset + height;
                 int lastVisibleSlot = GetPreviousVisibleSlot(SlotCount);
                 bool useIndexedScrollGeometry = false;
+                bool useUniformScrollGeometry = false;
+                double uniformRowHeight = 0;
                 if (height > 0)
                 {
                     // Scrolling Down
@@ -211,7 +283,29 @@ namespace Avalonia.Controls
                             {
                                 // Very large scroll occurred. Instead of determining the exact number of scrolled off rows,
                                 // let's estimate the number based on RowHeight.
-                                if (TryGetIndexedScrollTarget(newVerticalOffset, lastVisibleSlot, out int indexedTargetSlot))
+                                if (TryGetUniformScrollTarget(
+                                    newVerticalOffset,
+                                    lastVisibleSlot,
+                                    out int uniformTargetSlot,
+                                    out uniformRowHeight))
+                                {
+                                    useUniformScrollGeometry = true;
+                                    if (uniformTargetSlot == lastVisibleSlot)
+                                    {
+                                        ResetDisplayedRows(DataGridRecycleReuseOrder.BottomUp);
+                                        UpdateDisplayedRowsFromBottom(lastVisibleSlot);
+                                        newFirstScrollingSlot = DisplayData.FirstScrollingSlot;
+                                        newVerticalOffset = Math.Max(
+                                            0,
+                                            (uniformRowHeight * SlotCount) - CellsEstimatedHeight);
+                                    }
+                                    else
+                                    {
+                                        newFirstScrollingSlot = uniformTargetSlot;
+                                        TrimRetainedDisplayedRowsBefore(newFirstScrollingSlot);
+                                    }
+                                }
+                                else if (TryGetIndexedScrollTarget(newVerticalOffset, lastVisibleSlot, out int indexedTargetSlot))
                                 {
                                     useIndexedScrollGeometry = true;
                                     if (indexedTargetSlot == lastVisibleSlot)
@@ -229,14 +323,10 @@ namespace Avalonia.Controls
                                     else
                                     {
                                         newFirstScrollingSlot = indexedTargetSlot;
-                                        if (CanRetainDisplayedRowsForScrollTarget(newFirstScrollingSlot))
-                                        {
-                                            TrimDisplayedRowsBefore(newFirstScrollingSlot);
-                                        }
-                                        else
-                                        {
-                                            ResetDisplayedRows();
-                                        }
+                                        TrimRetainedDisplayedRowsBefore(newFirstScrollingSlot);
+                                        // Keep a discontinuous window intact until UpdateDisplayedRows.
+                                        // The default virtual surface can retarget those rows in place;
+                                        // every other path performs the same reset there.
                                     }
                                 }
                                 else
@@ -317,25 +407,26 @@ namespace Avalonia.Controls
                             if (newVerticalOffset == 0)
                             {
                                 newFirstScrollingSlot = 0;
-                                if (!CanRetainDisplayedRowsForScrollTarget(newFirstScrollingSlot))
-                                {
-                                    ResetDisplayedRows();
-                                }
                             }
                             else
                             {
-                                if (TryGetIndexedScrollTarget(newVerticalOffset, lastVisibleSlot, out int indexedTargetSlot))
+                                if (TryGetUniformScrollTarget(
+                                    newVerticalOffset,
+                                    lastVisibleSlot,
+                                    out int uniformTargetSlot,
+                                    out uniformRowHeight))
+                                {
+                                    useUniformScrollGeometry = true;
+                                    newFirstScrollingSlot = uniformTargetSlot;
+                                    TrimRetainedDisplayedRowsBefore(newFirstScrollingSlot);
+                                }
+                                else if (TryGetIndexedScrollTarget(newVerticalOffset, lastVisibleSlot, out int indexedTargetSlot))
                                 {
                                     useIndexedScrollGeometry = true;
                                     newFirstScrollingSlot = indexedTargetSlot;
-                                    if (CanRetainDisplayedRowsForScrollTarget(newFirstScrollingSlot))
-                                    {
-                                        TrimDisplayedRowsBefore(newFirstScrollingSlot);
-                                    }
-                                    else
-                                    {
-                                        ResetDisplayedRows();
-                                    }
+                                    TrimRetainedDisplayedRowsBefore(newFirstScrollingSlot);
+                                    // Defer discontinuous-window reset to UpdateDisplayedRows so
+                                    // an eligible virtual surface can retarget rows in place.
                                 }
                                 else
                                 {
@@ -428,12 +519,16 @@ namespace Avalonia.Controls
                 bool atVisualTail = DisplayData.LastScrollingSlot >= 0 &&
                                     DisplayData.LastScrollingSlot >= LastVisibleSlot;
                 var firstRowEstimator = RowHeightEstimator;
-                if (firstRowEstimator != null && !atVisualTail && useIndexedScrollGeometry)
+                if (!atVisualTail &&
+                    (useUniformScrollGeometry ||
+                     (firstRowEstimator != null && useIndexedScrollGeometry)))
                 {
-                    double baseOffset = EstimateOffsetToVisibleSlot(
-                        DisplayData.FirstScrollingSlot,
-                        firstRowEstimator,
-                        useIndexedScrollGeometry);
+                    double baseOffset = useUniformScrollGeometry
+                        ? DisplayData.FirstScrollingSlot * uniformRowHeight
+                        : EstimateOffsetToVisibleSlot(
+                            DisplayData.FirstScrollingSlot,
+                            firstRowEstimator!,
+                            useIndexedScrollGeometry);
                     if (!double.IsNaN(baseOffset) && !double.IsInfinity(baseOffset))
                     {
                         double desiredNeg = Math.Max(0, newVerticalOffset - baseOffset);
@@ -557,6 +652,105 @@ namespace Avalonia.Controls
             {
                 _scrollingByHeight = false;
             }
+        }
+
+        private bool TryScrollLightweightVirtualRows(double height)
+        {
+            if (!DisplayData.HasVirtualScrollingElements ||
+                !TryGetLightweightVirtualRowHeight(out double rowHeight) ||
+                _rowsPresenter is null)
+            {
+                return false;
+            }
+
+            double viewportHeight = Math.Max(0, CellsEstimatedHeight);
+            double maximumOffset = Math.Max(0, (SlotCount * rowHeight) - viewportHeight);
+            double newVerticalOffset = Math.Clamp(_verticalOffset + height, 0, maximumOffset);
+            int firstSlot = Math.Min(
+                SlotCount - 1,
+                (int)Math.Floor(newVerticalOffset / rowHeight));
+            double negVerticalOffset = newVerticalOffset - (firstSlot * rowHeight);
+            if (MathUtilities.GreaterThanOrClose(negVerticalOffset, rowHeight))
+            {
+                firstSlot = Math.Min(SlotCount - 1, firstSlot + 1);
+                negVerticalOffset = 0;
+            }
+
+            NegVerticalOffset = Math.Max(0, negVerticalOffset);
+            _verticalOffset = newVerticalOffset;
+            if (!TryUpdateLightweightVirtualRowsForScroll(
+                    firstSlot,
+                    viewportHeight,
+                    rowHeight))
+            {
+                // An item-owned row can invalidate lightweight eligibility while
+                // entering the viewport. Complete the same scroll through the
+                // retained compatibility pipeline in that uncommon case.
+                UpdateDisplayedRows(firstSlot, viewportHeight);
+            }
+            SetVerticalOffset(_verticalOffset);
+            SyncLogicalScrollableOffset();
+            LightweightVirtualScrollCount++;
+            return true;
+        }
+
+        private bool TryScrollDefaultFlatRows(double height)
+        {
+            if (!CanRetargetDefaultFlatRowsNow(out double rowHeight) ||
+                DisplayData.HasVirtualScrollingElements ||
+                DisplayData.NumDisplayedScrollingElements <= 0 ||
+                _rowsPresenter is null)
+            {
+                return false;
+            }
+
+            double viewportHeight = Math.Max(0, CellsEstimatedHeight);
+            double maximumOffset = Math.Max(0, (SlotCount * rowHeight) - viewportHeight);
+            double newVerticalOffset = Math.Clamp(_verticalOffset + height, 0, maximumOffset);
+            int firstSlot = Math.Min(
+                SlotCount - 1,
+                (int)Math.Floor(newVerticalOffset / rowHeight));
+            double negVerticalOffset = newVerticalOffset - (firstSlot * rowHeight);
+            if (MathUtilities.GreaterThanOrClose(negVerticalOffset, rowHeight))
+            {
+                firstSlot = Math.Min(SlotCount - 1, firstSlot + 1);
+                negVerticalOffset = 0;
+            }
+
+            int rowCount = DisplayData.NumDisplayedScrollingElements;
+            int requiredRows = Math.Max(
+                1,
+                (int)Math.Ceiling((viewportHeight + negVerticalOffset) / rowHeight));
+            if (rowCount < requiredRows || firstSlot + rowCount > SlotCount)
+            {
+                return false;
+            }
+
+            int lastSlot = firstSlot + rowCount - 1;
+            if (firstSlot != DisplayData.FirstScrollingSlot &&
+                !DisplayData.TryRetargetDefaultFlatRows(firstSlot, lastSlot, rowHeight))
+            {
+                return false;
+            }
+
+            NegVerticalOffset = Math.Max(0, negVerticalOffset);
+            _verticalOffset = newVerticalOffset;
+            double realizedHeight = (rowCount * rowHeight) - NegVerticalOffset;
+            bool clipsLastRow =
+                MathUtilities.GreaterThan(realizedHeight, viewportHeight) ||
+                (MathUtilities.AreClose(realizedHeight, viewportHeight) &&
+                 MathUtilities.GreaterThan(NegVerticalOffset, 0));
+            DisplayData.NumTotallyDisplayedScrollingElements =
+                clipsLastRow ? Math.Max(0, rowCount - 1) : rowCount;
+            AvailableSlotElementRoom = viewportHeight - realizedHeight;
+
+            _rowsPresenter.InvalidateChildIndexes();
+            _rowsPresenter.InvalidateArrange();
+            RequestPointerOverRefresh();
+            SetVerticalOffset(_verticalOffset);
+            SyncLogicalScrollableOffset();
+            FlatRowRetargetScrollCount++;
+            return true;
         }
 
         private double EstimateOffsetToVisibleSlot(

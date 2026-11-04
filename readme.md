@@ -79,6 +79,50 @@ See [Optimized retained and drawn cell paths](docfx/articles/optimized-cell-path
 for the retained-layout, direct-content, hierarchy, binding-fallback, and drawn-display
 options and their compatibility trade-offs.
 
+### Source generators
+
+The optional `ProDataGrid.SourceGenerators` incremental analyzer produces reflection-free,
+AOT-ready schemas, typed columns and fast-path accessors. It can also augment partial
+ViewModels and generate operation controllers, registries, and code-only Avalonia or
+ReactiveUI views, with invalid configurations reported as compile-time diagnostics.
+
+```xml
+<PackageReference Include="ProDataGrid.SourceGenerators" PrivateAssets="all" />
+```
+
+Annotate a row model and, optionally, a partial ViewModel:
+
+```csharp
+using ProDataGrid.SourceGeneration;
+
+[GenerateDataGridColumns(ProviderName = "TradeGridSchema", Strict = true)]
+public sealed class TradeRow
+{
+    [DataGridKey]
+    public int Id { get; init; }
+
+    [DataGridColumn(Header = "Symbol", Order = 0)]
+    public string Symbol { get; init; } = string.Empty;
+
+    [DataGridColumn(DataGridColumnKind.Numeric, Header = "Price", Order = 1)]
+    public decimal Price { get; init; }
+}
+
+[GenerateDataGridViewModel(typeof(TradeRow), ProviderName = "TradeGridSchema")]
+public sealed partial class TradesViewModel : ReactiveObject { }
+```
+
+The generated `ColumnDefinitions` and `FastPathOptions` properties bind directly to the grid:
+
+```xml
+<DataGrid ColumnDefinitionsSource="{Binding ColumnDefinitions}"
+          FastPathOptions="{Binding FastPathOptions}"
+          AutoGenerateColumns="False" />
+```
+
+See the [source-generator guide](docfx/articles/source-generators-feature-spec.md) for
+schema discovery, data operations, generated views, customization, and diagnostics.
+
 ### More than DataGrid
 
 ProDataGrid ships as a family of packages beyond the grid itself. Quick starts below cover the most common add-ons.

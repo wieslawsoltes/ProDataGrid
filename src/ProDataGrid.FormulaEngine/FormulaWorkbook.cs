@@ -21,7 +21,7 @@ namespace ProDataGrid.FormulaEngine
         Manual
     }
 
-    public sealed class FormulaCalculationSettings
+    public sealed partial class FormulaCalculationSettings
     {
         public FormulaReferenceMode ReferenceMode { get; set; } = FormulaReferenceMode.A1;
 
@@ -114,7 +114,7 @@ namespace ProDataGrid.FormulaEngine
         FormulaValue Value { get; set; }
     }
 
-    public sealed class FormulaEvaluationContext
+    public sealed partial class FormulaEvaluationContext
     {
         public FormulaEvaluationContext(
             IFormulaWorkbook workbook,
