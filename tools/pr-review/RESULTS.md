@@ -89,7 +89,7 @@ Every original exact PR head passed its existing DataGrid suite. #419 also fails
 
 #399 additionally passed a fresh strict osx-arm64 NativeAOT publish and native execution; the enabled-reflection negative control failed with real IL2075 diagnostics as expected.
 
-#385 was updated to current master to replace an expired, non-rerunnable historical CI run. Its DataGrid source tree is identical before/after (`c7e4e51d87ee32c4ab5387c67063d6b5505a58bd`); the old/current baseline DataGrid trees are identical as well (`3174a758706aff11efa35d69ddef306f52145f05`). Original-head timing results therefore cover the unchanged DataGrid implementation. A fresh final-head functional run is recorded in the final status.
+#385 was updated to current master to replace an expired, non-rerunnable historical CI run. Its DataGrid source tree is identical before/after (`c7e4e51d87ee32c4ab5387c67063d6b5505a58bd`); the old/current baseline DataGrid trees are identical as well (`3174a758706aff11efa35d69ddef306f52145f05`). Original-head timing results therefore cover the unchanged DataGrid implementation. The updated #385 head passed all 3,250 DataGrid tests.
 
 ## Revisions
 
@@ -119,3 +119,30 @@ Every original exact PR head passed its existing DataGrid suite. #419 also fails
 - #391 baseline: `a3f142f42dd4`.
 - Diagnostic #338 before fix: `57bd5922`.
 - #417 measured against #415; #419 against #417.
+
+## Review decisions and issue triage
+
+The original PR review verdicts and performance costs have been posted to the authors. The following are code/validation recommendations; current CI is checked separately before final approval.
+
+| PR | DataGrid tests passing | Recommendation |
+|---|---:|---|
+| #338 | 3,275 at fixed head | Applicable after CI; virtual-surface regression fixed directly. |
+| #385 | 3,250 at updated head | Applicable after CI; retain its deferred-hide test alongside #398's two tests. |
+| #391 | 3,179 | Applicable. |
+| #395 | 3,250 | Applicable; fixes the open-tooltip reproduction of #390. |
+| #398 | 3,149 | Applicable; complementary to #385. |
+| #399 | 3,265 | Applicable; strict NativeAOT smoke also passed. |
+| #401 | 3,251 | Applicable; accepted capture/release overhead reported. |
+| #403 | 3,253 | Applicable. |
+| #405 | 3,252 | Applicable; accepted per-grid estimator allocation reported. |
+| #407 | 3,252 | Applicable. |
+| #409 | 3,251 | Applicable; accepted filtered-refresh cost reported. |
+| #411 | 3,253 | Applicable. |
+| #413 | 3,255 | Applicable. |
+| #415 | 3,250 | Applicable; modest selection allocation increase reported. |
+| #417 | 3,251 | Applicable after #415; lower selection latency/allocation. |
+| #419 | 3,259 existing tests; added reproduction fails | Do not merge. Default-mode duplicate-object cell selection aliases distinct rows. |
+
+All 18 original open issues were triaged and commented: #337, #344, #347, #390, #396, #400, #402, #404, #406, #408, #410, #412, #414, #416, #418, #420, #421 and #422. Bug/enhancement/missing-reproduction labels were added where needed. Issues remain open pending merge/release; #337/#422 remain scoped enhancement proposals, #344 needs a third-party-theme minimal reproduction, and #418 remains blocked by #419's semantics.
+
+New fixes: #423 for #420 (clipboard quoting), #424 for #421 (sparse reference-index allocation). #425 adds five existing nonparallel-collection annotations to formula allocation tests after the unchanged product test intermittently failed in macOS CI for #338 and #417. All 2,000 formula tests pass locally with the isolation change. It does not change production code or allocation budgets, and its PR explicitly does not claim the exact runtime allocation source is proven.
