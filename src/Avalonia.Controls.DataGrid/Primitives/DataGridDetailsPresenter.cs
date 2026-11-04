@@ -144,9 +144,11 @@ internal
 
             desiredWidth -= OwningGrid.ColumnsInternal.RowGroupSpacerColumn.Width.Value;
 
+            double availableHeight = OwningRow?.AreDetailsVisible == true ? double.PositiveInfinity : 0;
+
             foreach (Control child in Children)
             {
-                child.Measure(new Size(desiredWidth, double.PositiveInfinity));
+                child.Measure(new Size(desiredWidth, availableHeight));
             }
 
             double desiredHeight = Math.Max(0, double.IsNaN(ContentHeight) ? 0 : ContentHeight);
