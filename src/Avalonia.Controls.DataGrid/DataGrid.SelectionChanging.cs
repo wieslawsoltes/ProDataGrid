@@ -416,7 +416,7 @@ namespace Avalonia.Controls
                 AddReferenceIdentity(requestedIdentities, selectedCells[i].Item);
             }
 
-            var prospectiveRows = new ProspectiveRows(prospectiveSource);
+            var prospectiveRows = new ProspectiveRows(prospectiveSource, requestedIdentities.Count);
             if (prospectiveSource != null)
             {
                 foreach (object rowDataContext in prospectiveSource)
@@ -471,10 +471,18 @@ namespace Avalonia.Controls
             var removedCells = new List<DataGridCellInfo>();
             var survivingSelectedCells = new List<ItemsSourceSelectionCell>(selectedCells.Count);
             bool selectedCellsChanged = false;
+            object lastCellItem = null;
+            int lastCellIndex = -1;
             for (int i = 0; i < selectedCells.Count; i++)
             {
                 ItemsSourceSelectionCell selectedCell = selectedCells[i];
-                int prospectiveIndex = identityMap.GetIndex(selectedCell.Item);
+                if (i == 0 || !ReferenceEquals(selectedCell.Item, lastCellItem))
+                {
+                    lastCellItem = selectedCell.Item;
+                    lastCellIndex = identityMap.GetIndex(lastCellItem);
+                }
+
+                int prospectiveIndex = lastCellIndex;
                 if (prospectiveIndex >= 0)
                 {
                     selectedCellsChanged |= prospectiveIndex != selectedCell.RowIndex;
@@ -487,11 +495,19 @@ namespace Avalonia.Controls
             }
             if (SelectedCells != null)
             {
+                object lastItem = null;
+                bool lastRemoved = false;
+                bool first = true;
                 foreach (DataGridCellInfo selectedCell in SelectedCells)
                 {
-                    object selectedCellItem = ProjectSelectionItem(selectedCell.Item);
-                    if (!preserveSelection ||
-                        identityMap.GetIndex(selectedCellItem) < 0)
+                    if (first || !ReferenceEquals(selectedCell.Item, lastItem))
+                    {
+                        first = false;
+                        lastItem = selectedCell.Item;
+                        lastRemoved = !preserveSelection || identityMap.GetIndex(ProjectSelectionItem(lastItem)) < 0;
+                    }
+
+                    if (lastRemoved)
                     {
                         removedCells.Add(selectedCell);
                     }
@@ -860,17 +876,71 @@ namespace Avalonia.Controls
                 IEnumerable selectionSource = selectionModel.Source;
                 bool detachGroupedSource =
                     DataConnection?.CollectionView?.IsGrouping == true && selectionSource != null;
-                if (detachGroupedSource)
+                var selectionOrder = new List<int>(selectedRows.Count);
+                for (int i = 0; i < selectedRows.Count; i++)
                 {
-                    selectionModel.Source = null;
+                    int rowIndex = selectedRows[i].RowIndex;
+                    int selectionIndex = rowIndex >= 0 && rowIndex < (DataConnection?.Count ?? 0)
+                        ? GetSelectionIndexFromRowIndex(rowIndex)
+                        : -1;
+                    if (selectionIndex >= 0)
+                    {
+                        selectionOrder.Add(selectionIndex);
+                    }
                 }
 
-                try
+                if (!detachGroupedSource && SelectionModelHolds(selectionOrder))
                 {
-                    using (_selectionModelAdapter.SelectedItemsView.SuppressNotifications())
-                    using (selectionModel.BatchUpdate())
+                    firstSelectionIndex = selectionOrder[0];
+                }
+                else
+                {
+                    if (detachGroupedSource)
                     {
-                        selectionModel.Clear();
+                        selectionModel.Source = null;
+                    }
+
+                    try
+                    {
+                        using (_selectionModelAdapter.SelectedItemsView.SuppressNotifications())
+                        using (selectionModel.BatchUpdate())
+                        {
+                            selectionModel.Clear();
+                            for (int i = 0; i < selectedRows.Count; i++)
+                            {
+                                int rowIndex = selectedRows[i].RowIndex;
+                                if (rowIndex < 0 || rowIndex >= (DataConnection?.Count ?? 0))
+                                {
+                                    continue;
+                                }
+
+                                int selectionIndex = GetSelectionIndexFromRowIndex(rowIndex);
+                                if (selectionIndex < 0)
+                                {
+                                    continue;
+                                }
+
+                                if (firstSelectionIndex < 0)
+                                {
+                                    firstSelectionIndex = selectionIndex;
+                                }
+                                _selectionModelAdapter.Select(selectionIndex);
+                            }
+                        }
+                    }
+                    finally
+                    {
+                        if (detachGroupedSource)
+                        {
+                            selectionModel.Source = selectionSource;
+                        }
+                    }
+
+                    // Some SelectionModel implementations publish the final source Reset as their
+                    // outer batch closes. Reassert any missing final indexes after that boundary,
+                    // while grid callbacks and SelectedItems notifications remain suppressed.
+                    using (_selectionModelAdapter.SelectedItemsView.SuppressNotifications())
+                    {
                         for (int i = 0; i < selectedRows.Count; i++)
                         {
                             int rowIndex = selectedRows[i].RowIndex;
@@ -880,44 +950,10 @@ namespace Avalonia.Controls
                             }
 
                             int selectionIndex = GetSelectionIndexFromRowIndex(rowIndex);
-                            if (selectionIndex < 0)
+                            if (selectionIndex >= 0 && !_selectionModelAdapter.IsSelected(selectionIndex))
                             {
-                                continue;
+                                _selectionModelAdapter.Select(selectionIndex);
                             }
-
-                            if (firstSelectionIndex < 0)
-                            {
-                                firstSelectionIndex = selectionIndex;
-                            }
-                            _selectionModelAdapter.Select(selectionIndex);
-                        }
-                    }
-                }
-                finally
-                {
-                    if (detachGroupedSource)
-                    {
-                        selectionModel.Source = selectionSource;
-                    }
-                }
-
-                // Some SelectionModel implementations publish the final source Reset as their
-                // outer batch closes. Reassert any missing final indexes after that boundary,
-                // while grid callbacks and SelectedItems notifications remain suppressed.
-                using (_selectionModelAdapter.SelectedItemsView.SuppressNotifications())
-                {
-                    for (int i = 0; i < selectedRows.Count; i++)
-                    {
-                        int rowIndex = selectedRows[i].RowIndex;
-                        if (rowIndex < 0 || rowIndex >= (DataConnection?.Count ?? 0))
-                        {
-                            continue;
-                        }
-
-                        int selectionIndex = GetSelectionIndexFromRowIndex(rowIndex);
-                        if (selectionIndex >= 0 && !_selectionModelAdapter.IsSelected(selectionIndex))
-                        {
-                            _selectionModelAdapter.Select(selectionIndex);
                         }
                     }
                 }
@@ -2064,16 +2100,17 @@ namespace Avalonia.Controls
         /// </summary>
         private sealed class ProspectiveRows
         {
-            public ProspectiveRows(IEnumerable source)
+            public ProspectiveRows(IEnumerable source, int capacity)
             {
                 Source = source;
+                Kept = new Dictionary<int, ProspectiveSelectionRow>(capacity);
             }
 
             public IEnumerable Source { get; }
 
             public int Count;
 
-            public readonly Dictionary<int, ProspectiveSelectionRow> Kept = new Dictionary<int, ProspectiveSelectionRow>();
+            public readonly Dictionary<int, ProspectiveSelectionRow> Kept;
 
             public ProspectiveSelectionRow this[int index]
             {
