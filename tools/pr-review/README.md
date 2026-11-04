@@ -18,3 +18,12 @@ Each process performs six warmups and 24 measured operations. We ran eight indep
 `ReviewDuplicateCellSelectionTests.cs` is an intentional failing regression reproduction for #419. Copy it into the test project separately to reproduce the reported default-mode duplicate-object selection bug. It passes on master and fails on the reviewed #419 head. It is not part of the performance harness.
 
 The hierarchy async supplement reuses the repository's `AsyncHierarchyExpansionBenchmarks` workloads through a small custom driver, with eight warmups and 32 samples. Its results are not BenchmarkDotNet reports. It measures total-process allocation because work may cross async continuations.
+
+Build the async supplement in each isolated revision with the same artifact files:
+
+```sh
+dotnet build tools/pr-review/async-probe/AsyncHierarchyProbe.csproj -c Release
+DOTNET_TieredCompilation=0 dotnet tools/pr-review/async-probe/bin/Release/net10.0/AsyncHierarchyProbe.dll > /absolute/path/async-results.jsonl
+```
+
+See [RESULTS.md](RESULTS.md) for the measured revisions, balanced comparisons and limitations. Raw per-process samples are under `results/`.
