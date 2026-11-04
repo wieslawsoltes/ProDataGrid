@@ -36,7 +36,7 @@ public class DataGridClipboardExportTests
             Assert.NotNull(data);
 
             var text = await data!.TryGetTextAsync();
-            Assert.Equal("\"Name\"\t\"Value\"\r\n\"Alpha\"\t\"1\"\r\n\"Beta\"\t\"2\"\r\n", text);
+            Assert.Equal("Name\tValue\r\nAlpha\t1\r\nBeta\t2\r\n", text);
             Assert.Contains(DataFormat.Text, data.Formats);
             Assert.Contains(DataGridClipboardExporter.PlainTextFormat, data.Formats);
             Assert.DoesNotContain(DataGridClipboardExporter.HtmlFormat, data.Formats);
@@ -351,7 +351,7 @@ public class DataGridClipboardExportTests
             Assert.NotNull(data);
 
             var text = await data!.TryGetTextAsync();
-            Assert.Equal("\"Name\"\t\"Value\"\r\n\"Alpha\"\t\"\"\r\n\"\"\t\"2\"\r\n", text);
+            Assert.Equal("Name\tValue\r\nAlpha\t\r\n\t2\r\n", text);
         }
         finally
         {
@@ -385,7 +385,7 @@ public class DataGridClipboardExportTests
             Assert.NotNull(data);
 
             var text = await data!.TryGetTextAsync();
-            Assert.Equal("\"Value\"\t\"Name\"\r\n\"1\"\t\"Alpha\"\r\n", text);
+            Assert.Equal("Value\tName\r\n1\tAlpha\r\n", text);
         }
         finally
         {

@@ -48,7 +48,7 @@ namespace Avalonia.Controls
             var item = new DataTransferItem();
             var added = false;
 
-            var plainText = DataGridClipboardFormatting.BuildDelimitedText(context.Rows, '\t', quoteAlways: true);
+            var plainText = DataGridClipboardFormatting.BuildDelimitedText(context.Rows, '\t', quoteAlways: false);
             var hasPlainText = !string.IsNullOrEmpty(plainText);
 
             foreach (var exporter in _exporters)
