@@ -58,7 +58,7 @@ namespace Avalonia.Controls
                 return string.Empty;
             }
 
-            var needsQuotes = content.IndexOfAny(new[] { '"', '\r', '\n', delimiter }) >= 0;
+            var needsQuotes = content.AsSpan().IndexOfAny('"', '\r', '\n') >= 0 || content.Contains(delimiter);
             var escaped = needsQuotes ? content.Replace("\"", "\"\"") : content;
             return needsQuotes ? $"\"{escaped}\"" : escaped;
         }

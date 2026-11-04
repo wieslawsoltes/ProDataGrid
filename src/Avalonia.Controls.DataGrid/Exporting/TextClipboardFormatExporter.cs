@@ -16,7 +16,7 @@ namespace Avalonia.Controls
                 return false;
             }
 
-            var text = DataGridClipboardFormatting.BuildDelimitedText(context.Rows, '\t', quoteAlways: true);
+            var text = DataGridClipboardFormatting.BuildDelimitedText(context.Rows, '\t', quoteAlways: false);
             if (string.IsNullOrEmpty(text))
             {
                 return false;
