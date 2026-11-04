@@ -847,6 +847,12 @@ namespace Avalonia.Controls
 
         private void ProcessScrollCorrection(double verticalOffset, double negVerticalOffset, int firstDisplayedSlot)
         {
+            // EstimateOffsetToSlot counts the rows of collapsed groups, which take no space in the viewport.
+            if (_lastCollapsedSlotCount > 0)
+            {
+                return;
+            }
+
             // Calculate expected offset based on our estimates
             double expectedOffset = EstimateOffsetToSlot(firstDisplayedSlot) + negVerticalOffset;
             double actualOffset = verticalOffset;

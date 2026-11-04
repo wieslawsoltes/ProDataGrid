@@ -695,6 +695,8 @@ internal
             _rowDragDropOptions = new DataGridRowDragDropOptions();
             _rowDropHandler = new DataGridRowReorderHandler();
             _scrollStateManager = new ScrollStateManager(this);
+            // The property's default value is a single instance that every grid would share, and estimators keep per-grid state.
+            SetCurrentValue(RowHeightEstimatorProperty, new AdvancedRowHeightEstimator());
 
             SetSortingModel(CreateSortingModel(), initializing: true);
             SetFilteringModel(CreateFilteringModel(), initializing: true);

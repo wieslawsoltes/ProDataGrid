@@ -1178,4 +1178,43 @@ public class AdvancedRowHeightEstimatorTests : RowHeightEstimatorTestBase
     }
 
     #endregion
+
+    #region Collapsed Slots
+
+    [Fact]
+    public void ScrollCorrection_Ignores_Rows_Of_Collapsed_Groups_Above_The_Viewport()
+    {
+        const int groups = 60;
+        const int rowsPerGroup = 50;
+        const int slotsPerGroup = rowsPerGroup + 1;
+        const int totalSlots = groups * slotsPerGroup;
+        const int collapsedSlots = (groups - 1) * rowsPerGroup;
+
+        var estimator = CreateEstimator();
+        estimator.DefaultRowHeight = SmallRowHeight;
+        estimator.OnDataSourceChanged(totalSlots);
+        RecordUniformHeights(estimator, 1, rowsPerGroup, SmallRowHeight);
+        var headerCounts = new[] { groups };
+        var expected = groups * GroupHeaderHeight + rowsPerGroup * SmallRowHeight;
+
+        for (var firstGroup = 1; firstGroup < groups - 10; firstGroup++)
+        {
+            var firstSlot = firstGroup * slotsPerGroup;
+            var verticalOffset = GroupHeaderHeight + rowsPerGroup * SmallRowHeight + (firstGroup - 1) * GroupHeaderHeight;
+            var displayed = new double[10];
+            for (var i = 0; i < displayed.Length; i++)
+            {
+                estimator.RecordRowGroupHeaderHeight(firstSlot + i * slotsPerGroup, 0, GroupHeaderHeight);
+                displayed[i] = GroupHeaderHeight;
+            }
+
+            SimulateScroll(estimator, firstSlot, firstSlot + 9 * slotsPerGroup, displayed, verticalOffset,
+                collapsedSlotCount: collapsedSlots);
+
+            var total = estimator.CalculateTotalHeight(totalSlots, collapsedSlots, headerCounts, 0);
+            Assert.True(total > expected * 0.9, $"Extent fell to {total:F0} (expected about {expected:F0}) after scrolling to group {firstGroup}.");
+        }
+    }
+
+    #endregion
 }
