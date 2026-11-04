@@ -909,7 +909,7 @@ namespace Avalonia.Controls
 
             var baseIndent = RowGroupSublevelIndents.Length > 0
                 ? RowGroupSublevelIndents[0]
-                : DATAGRID_defaultRowGroupSublevelIndent;
+                : RowGroupSublevelIndent;
 
             int slot = DisplayData.FirstScrollingSlot;
             int lastSlot = DisplayData.LastScrollingSlot;
