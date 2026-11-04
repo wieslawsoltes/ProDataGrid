@@ -148,7 +148,11 @@ namespace Avalonia.Controls.DataGridSearching
 
             if (descriptors == null || descriptors.Count == 0)
             {
-                _model.UpdateResults(Array.Empty<SearchResult>());
+                if (_model.Results.Count > 0)
+                {
+                    _model.UpdateResults(Array.Empty<SearchResult>());
+                }
+
                 ClearItemSubscriptions();
                 return;
             }
