@@ -189,6 +189,11 @@ namespace Avalonia.Controls.DataGridConditionalFormatting
 
         private void View_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
         {
+            if (_model.Descriptors == null || _model.Descriptors.Count == 0)
+            {
+                return;
+            }
+
             if (e.Action == NotifyCollectionChangedAction.Move)
             {
                 RaiseFormattingChanged();
