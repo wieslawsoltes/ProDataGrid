@@ -159,7 +159,7 @@ namespace ProDataGrid.FormulaEngine.Excel
             return value;
         }
 
-        private static double Select(Span<double> values, int target)
+        internal static double Select(Span<double> values, int target)
         {
             if (target == 0 || target == values.Length - 1)
             {
