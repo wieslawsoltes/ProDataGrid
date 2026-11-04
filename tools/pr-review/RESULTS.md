@@ -146,3 +146,33 @@ The original PR review verdicts and performance costs have been posted to the au
 All 18 original open issues were triaged and commented: #337, #344, #347, #390, #396, #400, #402, #404, #406, #408, #410, #412, #414, #416, #418, #420, #421 and #422. Bug/enhancement/missing-reproduction labels were added where needed. Issues remain open pending merge/release; #337/#422 remain scoped enhancement proposals, #344 needs a third-party-theme minimal reproduction, and #418 remains blocked by #419's semantics.
 
 New fixes: #423 for #420 (clipboard quoting), #424 for #421 (sparse reference-index allocation). #425 adds five existing nonparallel-collection annotations to formula allocation tests after the unchanged product test intermittently failed in macOS CI for #338 and #417. All 2,000 formula tests pass locally with the isolation change. It does not change production code or allocation budgets, and its PR explicitly does not claim the exact runtime allocation source is proven.
+
+## Final status — 2026-11-04 23:17 UTC
+
+All 19 expected current heads were rechecked: all 155 GitHub checks are completed successfully, all PRs remain open and individually mergeable, and no external head change occurred. The 15 applicable original PRs have formal approvals; #419 retains a changes-requested review despite green existing CI. All three new fixes have final validation comments. No PR was merged, and master remains `f92035975ac5ab6c0cdede8228952bcd8f618a2e`.
+
+| PR | Current head | Successful checks | Final recommendation |
+|---|---|---:|---|
+| [#338](https://github.com/wieslawsoltes/ProDataGrid/pull/338) | `77e77d02a8a0` | 8 | Approved, applicable to merge |
+| [#385](https://github.com/wieslawsoltes/ProDataGrid/pull/385) | `9ca78eb8636e` | 8 | Approved, applicable to merge |
+| [#391](https://github.com/wieslawsoltes/ProDataGrid/pull/391) | `4ffbf55c73e4` | 8 | Approved, applicable to merge |
+| [#395](https://github.com/wieslawsoltes/ProDataGrid/pull/395) | `a69051c9efba` | 8 | Approved, applicable to merge |
+| [#398](https://github.com/wieslawsoltes/ProDataGrid/pull/398) | `a324e94f3ffb` | 8 | Approved, applicable to merge |
+| [#399](https://github.com/wieslawsoltes/ProDataGrid/pull/399) | `596db0a6e401` | 10 | Approved, applicable to merge |
+| [#401](https://github.com/wieslawsoltes/ProDataGrid/pull/401) | `ca7e40247fe7` | 8 | Approved, applicable to merge |
+| [#403](https://github.com/wieslawsoltes/ProDataGrid/pull/403) | `6641290e2e83` | 8 | Approved, applicable to merge |
+| [#405](https://github.com/wieslawsoltes/ProDataGrid/pull/405) | `81b27cc5a3b0` | 8 | Approved, applicable to merge |
+| [#407](https://github.com/wieslawsoltes/ProDataGrid/pull/407) | `8a8538b6d1a2` | 8 | Approved, applicable to merge |
+| [#409](https://github.com/wieslawsoltes/ProDataGrid/pull/409) | `397e1c63a396` | 8 | Approved, applicable to merge |
+| [#411](https://github.com/wieslawsoltes/ProDataGrid/pull/411) | `bee617454da8` | 8 | Approved, applicable to merge |
+| [#413](https://github.com/wieslawsoltes/ProDataGrid/pull/413) | `b94fa25e34f2` | 8 | Approved, applicable to merge |
+| [#415](https://github.com/wieslawsoltes/ProDataGrid/pull/415) | `fc391733e904` | 8 | Approved, applicable to merge |
+| [#417](https://github.com/wieslawsoltes/ProDataGrid/pull/417) | `c37798864403` | 8 | Approved, applicable to merge after #415 |
+| [#419](https://github.com/wieslawsoltes/ProDataGrid/pull/419) | `642d0d163965` | 8 | Do not merge: default-mode duplicate-object selection regression |
+| [#423](https://github.com/wieslawsoltes/ProDataGrid/pull/423) | `1fcb6906699a` | 8 | Validated, applicable to merge |
+| [#424](https://github.com/wieslawsoltes/ProDataGrid/pull/424) | `9da7c14e994b` | 8 | Validated, applicable to merge |
+| [#425](https://github.com/wieslawsoltes/ProDataGrid/pull/425) | `f66f933cbc37` | 9 | Validated, applicable to merge |
+
+The initial macOS CI attempts for #338 and #417 failed unchanged formula allocation tests (7,912 bytes over 50 calls in different paired-square operations). Their targeted job reruns passed without product changes. #425 separately places the five allocation-helper test classes in the existing nonparallel collection; its own complete CI also passed, including macOS, with all budgets and positive controls unchanged. This is documented test isolation hardening, not proof of the precise runtime allocation source. The earlier transient local leak failure and its successful repeats remain documented above.
+
+The full final CI snapshot, check URLs, exact heads and GitHub review decisions are in [results/final-pr-status.json](results/final-pr-status.json). Existing CI passing on #419 does not override the additional failing review reproduction.
