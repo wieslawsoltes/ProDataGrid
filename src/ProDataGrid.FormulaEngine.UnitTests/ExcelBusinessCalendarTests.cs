@@ -12,6 +12,7 @@ using Xunit;
 
 namespace ProDataGrid.FormulaEngine.Tests
 {
+    [Collection(FormulaAllocationCollection.Name)]
     public sealed class ExcelBusinessCalendarTests
     {
         [Theory]
