@@ -134,7 +134,8 @@ internal
 
         internal override bool SupportsVirtualCellSurface =>
             CellTemplate is null &&
-            BindingCloneHelper.SupportsDirectTextDataContextRead(Binding) &&
+            // The virtual surface observes both the hierarchy node and its wrapped item.
+            BindingCloneHelper.SupportsDirectTextDataContextRead(Binding, observesWrappedHierarchyItem: true) &&
             DataGridColumnMetadata.GetValueAccessor(this) is IDataGridColumnTextAccessor;
 
         /// <summary>
