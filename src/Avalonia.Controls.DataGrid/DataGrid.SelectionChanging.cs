@@ -398,28 +398,9 @@ namespace Avalonia.Controls
             object oldCurrentItem = ProjectSelectionItem(CurrentCell.Item);
             object oldCurrencyItem = ProjectSelectionItem(DataConnection?.CollectionView?.CurrentItem);
 
-            int prospectiveCapacity = prospectiveSource is ICollection collection
-                ? collection.Count
-                : 0;
-            var prospectiveRows = prospectiveCapacity > 0
-                ? new List<ProspectiveSelectionRow>(prospectiveCapacity)
-                : new List<ProspectiveSelectionRow>();
-            if (prospectiveSource != null)
-            {
-                foreach (object rowDataContext in prospectiveSource)
-                {
-                    CreateSelectionItemContext(
-                        rowDataContext,
-                        out object item,
-                        out HierarchicalNode node,
-                        out IReadOnlyList<HierarchicalNode> path);
-                    prospectiveRows.Add(new ProspectiveSelectionRow(rowDataContext, item, node, path));
-                }
-            }
-
             var selectedItems = selectionSnapshot ?? Array.Empty<object>();
             var projectedSelectedItems = new List<object>(selectedItems.Count);
-            var requestedIdentities = new List<object>(
+            var requestedIdentities = new IdentityList(
                 selectedItems.Count + selectedCells.Count + 3);
             for (int i = 0; i < selectedItems.Count; i++)
             {
@@ -433,6 +414,26 @@ namespace Avalonia.Controls
             for (int i = 0; i < selectedCells.Count; i++)
             {
                 AddReferenceIdentity(requestedIdentities, selectedCells[i].Item);
+            }
+
+            var prospectiveRows = new ProspectiveRows(prospectiveSource);
+            if (prospectiveSource != null)
+            {
+                foreach (object rowDataContext in prospectiveSource)
+                {
+                    object candidate = rowDataContext is HierarchicalNode candidateNode ? candidateNode.Item ?? rowDataContext : rowDataContext;
+                    if (candidate != null && requestedIdentities.Seen.Contains(candidate))
+                    {
+                        CreateSelectionItemContext(
+                            rowDataContext,
+                            out object item,
+                            out HierarchicalNode node,
+                            out IReadOnlyList<HierarchicalNode> path);
+                        prospectiveRows.Kept[prospectiveRows.Count] = new ProspectiveSelectionRow(rowDataContext, item, node, path);
+                    }
+
+                    prospectiveRows.Count++;
+                }
             }
 
             var identityMap = new ProspectiveIdentityMap(prospectiveRows, requestedIdentities);
@@ -1079,12 +1080,9 @@ namespace Avalonia.Controls
                 return;
             }
 
-            for (int i = 0; i < identities.Count; i++)
+            if (identities is IdentityList set && !set.Seen.Add(item))
             {
-                if (ReferenceEquals(identities[i], item))
-                {
-                    return;
-                }
+                return;
             }
 
             identities.Add(item);
@@ -1122,7 +1120,7 @@ namespace Avalonia.Controls
         }
 
         private DataGridCellInfo CreateProspectiveCellInfo(
-            List<ProspectiveSelectionRow> rows,
+            ProspectiveRows rows,
             int rowIndex,
             int columnIndex)
         {
@@ -1147,7 +1145,7 @@ namespace Avalonia.Controls
         }
 
         private static DataGridSelectionAnchorInfo CreateProspectiveAnchorInfo(
-            List<ProspectiveSelectionRow> rows,
+            ProspectiveRows rows,
             int rowIndex,
             int columnIndex)
         {
@@ -2064,32 +2062,81 @@ namespace Avalonia.Controls
         /// Repeated uses of the same reference (selection, current cell, anchor, currency, and
         /// selected cells) intentionally share one resolved row.
         /// </summary>
+        private sealed class ProspectiveRows
+        {
+            public ProspectiveRows(IEnumerable source)
+            {
+                Source = source;
+            }
+
+            public IEnumerable Source { get; }
+
+            public int Count;
+
+            public readonly Dictionary<int, ProspectiveSelectionRow> Kept = new Dictionary<int, ProspectiveSelectionRow>();
+
+            public ProspectiveSelectionRow this[int index]
+            {
+                get
+                {
+                    if (Kept.TryGetValue(index, out var row))
+                    {
+                        return row;
+                    }
+
+                    int i = 0;
+                    foreach (object rowDataContext in Source)
+                    {
+                        if (i++ == index)
+                        {
+                            CreateSelectionItemContext(rowDataContext, out object item, out HierarchicalNode node, out IReadOnlyList<HierarchicalNode> path);
+                            row = new ProspectiveSelectionRow(rowDataContext, item, node, path);
+                            Kept[index] = row;
+                            return row;
+                        }
+                    }
+
+                    throw new ArgumentOutOfRangeException(nameof(index));
+                }
+            }
+        }
+
+        private sealed class IdentityList : List<object>
+        {
+            public IdentityList(int capacity) : base(capacity) { }
+            public readonly HashSet<object> Seen = new HashSet<object>(ReferenceEqualityComparer.Instance);
+        }
+
         private sealed class ProspectiveIdentityMap
         {
             private readonly IReadOnlyList<object> _identities;
             private readonly int[] _indexes;
+            private readonly Dictionary<object, int> _positions = new Dictionary<object, int>(ReferenceEqualityComparer.Instance);
 
             public ProspectiveIdentityMap(
-                List<ProspectiveSelectionRow> rows,
+                ProspectiveRows rows,
                 IReadOnlyList<object> identities)
             {
                 _identities = identities;
                 _indexes = new int[identities.Count];
                 Array.Fill(_indexes, -1);
-                var consumedRows = new bool[rows.Count];
+                var consumedRows = new HashSet<int>();
 
                 for (int identityIndex = 0; identityIndex < identities.Count; identityIndex++)
                 {
-                    object identity = identities[identityIndex];
-                    for (int rowIndex = 0; rowIndex < rows.Count; rowIndex++)
+                    if (identities[identityIndex] != null)
                     {
-                        if (!consumedRows[rowIndex] &&
-                            ReferenceEquals(rows[rowIndex].Item, identity))
-                        {
-                            _indexes[identityIndex] = rowIndex;
-                            consumedRows[rowIndex] = true;
-                            break;
-                        }
+                        _positions.TryAdd(identities[identityIndex], identityIndex);
+                    }
+                }
+
+                foreach (int rowIndex in System.Linq.Enumerable.ToList(System.Linq.Enumerable.OrderBy(rows.Kept.Keys, k => k)))
+                {
+                    object rowItem = rows.Kept[rowIndex].Item;
+                    if (rowItem != null && _positions.TryGetValue(rowItem, out int identityIndex) && _indexes[identityIndex] < 0)
+                    {
+                        _indexes[identityIndex] = rowIndex;
+                        consumedRows.Add(rowIndex);
                     }
                 }
 
@@ -2101,15 +2148,24 @@ namespace Avalonia.Controls
                     }
 
                     object identity = identities[identityIndex];
-                    for (int rowIndex = 0; rowIndex < rows.Count; rowIndex++)
+                    if (identity == null || rows.Source == null)
                     {
-                        if (!consumedRows[rowIndex] &&
-                            Equals(rows[rowIndex].Item, identity))
+                        continue;
+                    }
+
+                    int rowIndex = 0;
+                    foreach (object rowDataContext in rows.Source)
+                    {
+                        object candidate = rowDataContext is HierarchicalNode candidateNode ? candidateNode.Item ?? rowDataContext : rowDataContext;
+                        if (!consumedRows.Contains(rowIndex) && Equals(candidate, identity))
                         {
                             _indexes[identityIndex] = rowIndex;
-                            consumedRows[rowIndex] = true;
+                            consumedRows.Add(rowIndex);
+                            _ = rows[rowIndex];
                             break;
                         }
+
+                        rowIndex++;
                     }
                 }
             }
@@ -2121,15 +2177,7 @@ namespace Avalonia.Controls
                     return -1;
                 }
 
-                for (int i = 0; i < _identities.Count; i++)
-                {
-                    if (ReferenceEquals(_identities[i], item))
-                    {
-                        return _indexes[i];
-                    }
-                }
-
-                return -1;
+                return _positions.TryGetValue(item, out int i) ? _indexes[i] : -1;
             }
         }
 
