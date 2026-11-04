@@ -327,8 +327,14 @@ public class DataGridFlatVisualLayoutTests
         }
     }
 
-    [AvaloniaFact]
-    public void Virtualized_Layout_Rebuilds_Lightweight_Rows_After_Hierarchical_Toggles()
+    [AvaloniaTheory]
+    [InlineData("hierarchy")]
+    [InlineData("text")]
+    [InlineData("autocomplete")]
+    [InlineData("masked")]
+    [InlineData("slider")]
+    [InlineData("combobox")]
+    public void Virtualized_Layout_Rebuilds_Lightweight_Rows_After_Hierarchical_Toggles(string columnKind)
     {
         var rootItem = new HierarchyItem("Root");
         for (int index = 0; index < 40; index++)
@@ -355,12 +361,26 @@ public class DataGridFlatVisualLayoutTests
             UseLogicalScrollable = true,
             VisualLayoutMode = DataGridVisualLayoutMode.Virtualized,
         };
-        var column = new DataGridHierarchicalColumn
+        DataGridColumn column = columnKind switch
         {
-            Header = "Name",
-            Width = new DataGridLength(260),
-            Binding = new Binding("Item.Name"),
+            "hierarchy" => new DataGridHierarchicalColumn(),
+            "autocomplete" => new DataGridAutoCompleteColumn(),
+            "masked" => new DataGridMaskedTextColumn(),
+            "slider" => new DataGridSliderColumn { ShowValueText = true },
+            "combobox" => new DataGridComboBoxColumn { IsEditable = true },
+            _ => new DataGridTextColumn(),
         };
+        column.Header = "Name";
+        column.Width = new DataGridLength(260);
+        var binding = new Binding("Item.Name");
+        if (column is DataGridComboBoxColumn comboBoxColumn)
+        {
+            comboBoxColumn.TextBinding = binding;
+        }
+        else
+        {
+            ((DataGridBoundColumn)column).Binding = binding;
+        }
         DataGridColumnMetadata.SetValueAccessor(
             column,
             new DataGridColumnValueAccessor<HierarchicalNode, string>(

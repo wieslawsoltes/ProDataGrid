@@ -521,7 +521,11 @@ internal
 
         internal override bool SupportsDrawnDisplay => true;
 
-        internal override bool SupportsVirtualCellSurface => CanUseDirectValueAccessor;
+        internal override bool SupportsVirtualCellSurface =>
+            BindingCloneHelper.SupportsDirectTextDataContextRead(
+                Binding,
+                observesWrappedHierarchyItem: OwningGrid?.HierarchicalRowsEnabled == true && OwningGrid.HierarchicalModel != null) &&
+            DataGridColumnMetadata.GetValueAccessor(this) is IDataGridColumnTextAccessor;
 
         object IDataGridDrawnCellValueProvider.GetDrawnCellValue(object item) => GetDirectCellText(item);
 
