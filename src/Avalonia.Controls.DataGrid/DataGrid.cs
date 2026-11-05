@@ -695,8 +695,6 @@ internal
             _rowDragDropOptions = new DataGridRowDragDropOptions();
             _rowDropHandler = new DataGridRowReorderHandler();
             _scrollStateManager = new ScrollStateManager(this);
-            // The property's default value is a single instance that every grid would share, and estimators keep per-grid state.
-            SetCurrentValue(RowHeightEstimatorProperty, new AdvancedRowHeightEstimator());
 
             SetSortingModel(CreateSortingModel(), initializing: true);
             SetFilteringModel(CreateFilteringModel(), initializing: true);
@@ -1743,20 +1741,22 @@ internal
         }
 
         /// <summary>
-        /// Gets the effective row height estimator, creating a default one if none is set.
+        /// Gets the effective row height estimator, creating the grid's own default one on first use.
         /// </summary>
         internal IDataGridRowHeightEstimator EffectiveRowHeightEstimator
         {
             get
             {
                 var estimator = RowHeightEstimator;
-                if (estimator == null)
-                {
-                    // Use the internal estimates directly when no custom estimator is set
-                    return null;
-                }
-                return estimator;
+                return ReferenceEquals(estimator, SharedDefaultRowHeightEstimator) ? CreateOwnRowHeightEstimator() : estimator;
             }
+        }
+
+        private IDataGridRowHeightEstimator CreateOwnRowHeightEstimator()
+        {
+            var estimator = new AdvancedRowHeightEstimator();
+            SetCurrentValue(RowHeightEstimatorProperty, estimator);
+            return estimator;
         }
 
         /// <summary>
@@ -1768,7 +1768,7 @@ internal
             var oldEstimator = e.OldValue as IDataGridRowHeightEstimator;
             var newEstimator = e.NewValue as IDataGridRowHeightEstimator;
 
-            if (newEstimator != null)
+            if (newEstimator != null && !ReferenceEquals(newEstimator, SharedDefaultRowHeightEstimator))
             {
                 // Initialize the new estimator with current state
                 newEstimator.DefaultRowHeight = DATAGRID_defaultRowHeight;
@@ -1781,7 +1781,10 @@ internal
                 }
             }
 
-            if (!ReferenceEquals(oldEstimator, newEstimator) && _scrollStateManager.PendingRestore)
+            // No grid uses the shared default, so replacing it changes nothing a pending restore depends on.
+            if (!ReferenceEquals(oldEstimator, newEstimator) &&
+                !ReferenceEquals(oldEstimator, SharedDefaultRowHeightEstimator) &&
+                _scrollStateManager.PendingRestore)
             {
                 _scrollStateManager.Clear();
             }
@@ -3631,7 +3634,7 @@ internal
                 return false;
             }
 
-            var estimator = RowHeightEstimator;
+            var estimator = EffectiveRowHeightEstimator;
             var estimatedNewBaseOffset = estimator != null
                 ? EstimateOffsetToVisibleSlot(newSlot, estimator)
                 : newSlot * RowHeightEstimate;
@@ -3703,7 +3706,7 @@ internal
                 return false;
             }
 
-            var estimator = RowHeightEstimator;
+            var estimator = EffectiveRowHeightEstimator;
             var estimatedOldBaseOffset = estimator != null
                 ? EstimateOffsetToVisibleSlot(oldSlot, estimator)
                 : oldSlot * RowHeightEstimate;
@@ -3760,7 +3763,7 @@ internal
                 viewportOffset = -NegVerticalOffset;
             }
 
-            var estimator = RowHeightEstimator;
+            var estimator = EffectiveRowHeightEstimator;
             var estimatedOldBaseOffset = estimator != null
                 ? EstimateOffsetToVisibleSlot(slot, estimator)
                 : slot * RowHeightEstimate;
@@ -4060,7 +4063,7 @@ internal
 
         private void UpdateRowHeightEstimatorForHierarchicalChange(IReadOnlyList<FlattenedChange> changes)
         {
-            if (RowHeightEstimator == null || changes == null || changes.Count == 0)
+            if (EffectiveRowHeightEstimator == null || changes == null || changes.Count == 0)
             {
                 return;
             }
@@ -4080,12 +4083,12 @@ internal
 
                 if (change.OldCount > 0)
                 {
-                    RowHeightEstimator.OnItemsRemoved(slot, change.OldCount);
+                    EffectiveRowHeightEstimator.OnItemsRemoved(slot, change.OldCount);
                 }
 
                 if (change.NewCount > 0)
                 {
-                    RowHeightEstimator.OnItemsInserted(slot, change.NewCount);
+                    EffectiveRowHeightEstimator.OnItemsInserted(slot, change.NewCount);
                 }
             }
         }

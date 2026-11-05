@@ -588,6 +588,22 @@ public class AdvancedRowHeightEstimatorTests : RowHeightEstimatorTestBase
         Assert.Equal(DefaultRowHeight, estimator.RowHeightEstimate, Tolerance);
     }
 
+    [Theory]
+    [InlineData(500)]
+    [InlineData(5000)]
+    public void OnDataSourceChanged_Drops_Earlier_Heights_From_The_Offsets(int newItemCount)
+    {
+        var estimator = CreateEstimator();
+        estimator.OnDataSourceChanged(500);
+        RecordUniformHeights(estimator, 0, 50, LargeRowHeight);
+
+        estimator.OnDataSourceChanged(newItemCount);
+        estimator.RecordMeasuredHeight(0, DefaultRowHeight);
+
+        Assert.Equal(50 * DefaultRowHeight, estimator.EstimateOffsetToSlot(50), Tolerance);
+        Assert.Equal(50, estimator.EstimateSlotAtOffset(50 * DefaultRowHeight, newItemCount));
+    }
+
     [Fact]
     public void OnItemsInserted_ShiftsDataAndRebuildsFenwick()
     {
