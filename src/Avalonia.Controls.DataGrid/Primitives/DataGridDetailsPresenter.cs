@@ -144,7 +144,7 @@ internal
 
             desiredWidth -= OwningGrid.ColumnsInternal.RowGroupSpacerColumn.Width.Value;
 
-            double availableHeight = OwningRow?.AreDetailsVisible == true ? double.PositiveInfinity : 0;
+            double availableHeight = OwningRow!.AppliedDetailsVisibility ? double.PositiveInfinity : 0;
 
             foreach (Control child in Children)
             {

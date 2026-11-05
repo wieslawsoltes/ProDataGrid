@@ -564,6 +564,8 @@ internal
             set;
         }
 
+        internal bool AppliedDetailsVisibility => _appliedDetailsVisibility == true;
+
         // Height that the row will eventually end up at after a possible details animation has completed
         internal double TargetHeight
         {
