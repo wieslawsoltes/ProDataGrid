@@ -73,6 +73,87 @@ public class DataGridColumnHeaderCaptureLostTests
         }
     }
 
+    [AvaloniaFact]
+    public void A_Header_Resize_That_Loses_Capture_Stops_Resizing()
+    {
+        var (grid, root, columns) = CreateGrid();
+        try
+        {
+            IPointer? pointer = null;
+            root.AddHandler(InputElement.PointerPressedEvent, (_, e) => pointer = e.Pointer, RoutingStrategies.Tunnel, handledEventsToo: true);
+            var start = PointInHeader(grid, root, columns[0], 118);
+
+            root.MouseMove(start);
+            root.MouseDown(start, MouseButton.Left);
+            root.MouseMove(start + new Vector(30, 0), RawInputModifiers.LeftMouseButton);
+            Dispatcher.UIThread.RunJobs();
+            var widthWhenLost = columns[0].ActualWidth;
+            Assert.True(widthWhenLost > 120);
+
+            pointer!.Capture(null);
+            Dispatcher.UIThread.RunJobs();
+            root.MouseMove(start + new Vector(60, 0), RawInputModifiers.LeftMouseButton);
+            root.MouseUp(start + new Vector(60, 0), MouseButton.Left);
+            Dispatcher.UIThread.RunJobs();
+
+            Assert.Equal(widthWhenLost, columns[0].ActualWidth);
+            Assert.False(HeaderFor(grid, columns[0]).IsResizing);
+        }
+        finally
+        {
+            root.Close();
+        }
+    }
+
+    [AvaloniaFact]
+    public void A_Header_Click_That_Loses_Capture_Does_Not_Sort()
+    {
+        var (grid, root, columns) = CreateGrid();
+        try
+        {
+            IPointer? pointer = null;
+            root.AddHandler(InputElement.PointerPressedEvent, (_, e) => pointer = e.Pointer, RoutingStrategies.Tunnel, handledEventsToo: true);
+            var point = PointInHeader(grid, root, columns[1], 60);
+
+            root.MouseMove(point);
+            root.MouseDown(point, MouseButton.Left);
+            pointer!.Capture(null);
+            root.MouseUp(point, MouseButton.Left);
+            Dispatcher.UIThread.RunJobs();
+
+            var header = HeaderFor(grid, columns[1]);
+            Assert.DoesNotContain(":sortascending", header.Classes);
+            Assert.DoesNotContain(":pressed", header.Classes);
+
+            root.MouseDown(point, MouseButton.Left);
+            root.MouseUp(point, MouseButton.Left);
+            Dispatcher.UIThread.RunJobs();
+
+            Assert.Contains(":sortascending", header.Classes);
+        }
+        finally
+        {
+            root.Close();
+        }
+    }
+
+    [AvaloniaFact]
+    public void A_Completed_Header_Drag_Still_Reorders()
+    {
+        var (grid, root, columns) = CreateGrid();
+        try
+        {
+            Drag(root, PointInHeader(grid, root, columns[2], 30), PointInHeader(grid, root, columns[0], 5));
+
+            Assert.Equal(0, columns[2].DisplayIndex);
+            Assert.Null(grid.ColumnHeaders.DragIndicator);
+        }
+        finally
+        {
+            root.Close();
+        }
+    }
+
     private static void Drag(Window root, Point from, Point to)
     {
         root.MouseMove(from);

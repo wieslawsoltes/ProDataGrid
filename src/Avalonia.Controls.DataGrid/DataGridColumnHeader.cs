@@ -189,7 +189,6 @@ internal
             PointerMoved += DataGridColumnHeader_PointerMoved;
             PointerEntered += DataGridColumnHeader_PointerEntered;
             PointerExited += DataGridColumnHeader_PointerExited;
-            PointerCaptureLost += DataGridColumnHeader_PointerCaptureLost;
         }
 
         private Button _filterButton;
@@ -604,9 +603,6 @@ internal
                 }
 
                 _dragMode = DragMode.MouseDown;
-                _dragColumn = null;
-                _dragStart = null;
-                args.Pointer.Capture(this);
                 _frozenColumnsWidth = OwningGrid.GetVisibleFrozenColumnsWidthLeft();
                 _frozenColumnsRightWidth = OwningGrid.GetVisibleFrozenColumnsWidthRight();
                 _lastMousePositionHeaders = this.Translate(OwningGrid.ColumnHeaders, mousePosition);
@@ -861,9 +857,11 @@ internal
             UpdatePseudoClasses();
         }
 
-        private void DataGridColumnHeader_PointerCaptureLost(object sender, PointerCaptureLostEventArgs e)
+        protected override void OnPointerCaptureLost(PointerCaptureLostEventArgs e)
         {
-            if (_dragMode == DragMode.None)
+            base.OnPointerCaptureLost(e);
+
+            if (_dragMode == DragMode.None || !IsPressed)
             {
                 return;
             }
