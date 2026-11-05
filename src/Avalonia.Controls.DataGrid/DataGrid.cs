@@ -3040,6 +3040,7 @@ internal
             if (DataConnection?.CollectionView != null)
             {
                 RefreshRowsAndColumns(clearRows: false);
+                _hierarchicalAdapter?.FilteredViewChanges?.Clear();
                 List<object> snapshot = _filteringSelectionSnapshot;
                 _filteringSelectionSnapshot = null;
                 if (snapshot != null)
@@ -3117,7 +3118,12 @@ internal
                 _pendingHierarchicalAnchorHint = null;
             }
 
-            var canApplyChanges = CanApplyHierarchicalFlattenedChanges(e);
+            // The flattened indexes count the nodes a filter hides, so a filtered view applies the
+            // row changes it reported itself instead.
+            var isFilteredView = DataConnection?.CollectionView is IDataGridCollectionView { Filter: not null, IsGrouping: false };
+            var canApplyChanges = isFilteredView
+                ? TryGetFilteredHierarchicalViewChanges(ref e) && (e.Changes.Count == 0 || CanApplyHierarchicalFlattenedChanges(e))
+                : CanApplyHierarchicalFlattenedChanges(e);
             var requiresBulkRefresh = canApplyChanges && RequiresHierarchicalBulkRefresh(e.Changes);
             var canApplyBulkSplice = requiresBulkRefresh && CanApplyHierarchicalBulkSplice(e.Changes, e.IndexMap);
             canApplyChanges = canApplyChanges && !requiresBulkRefresh;
@@ -3207,8 +3213,66 @@ internal
                 }
             }
 
+            if (isFilteredView)
+            {
+                _hierarchicalAdapter?.FilteredViewChanges?.Clear();
+            }
+
             OnCollectionChangedForSummaries(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset));
             RaiseAutomationStructureChanged();
+        }
+
+        internal void RecordFilteredHierarchicalViewChange(NotifyCollectionChangedEventArgs e)
+        {
+            var adapter = _hierarchicalAdapter;
+            if (adapter == null)
+            {
+                return;
+            }
+
+            var viewChanges = adapter.FilteredViewChanges ??= new DataGridHierarchicalViewChanges();
+            if (HasModelCallbackThreadAccess())
+            {
+                viewChanges.Record(e);
+            }
+            else
+            {
+                viewChanges.MarkRefreshRequired();
+            }
+        }
+
+        private bool TryGetFilteredHierarchicalViewChanges(ref FlattenedChangedEventArgs e)
+        {
+            if (_hierarchicalAdapter == null || e?.Changes == null || e.IndexMap == null)
+            {
+                return false;
+            }
+
+            var rowCount = DataConnection.Count;
+            var viewChanges = _hierarchicalAdapter.FilteredViewChanges;
+            // While the view shows every flattened node, flattened indexes are row indexes.
+            var showsEveryNode = SlotCount == e.IndexMap.OldCount && rowCount == e.IndexMap.NewCount;
+            if (viewChanges?.RequiresRefresh == true)
+            {
+                return showsEveryNode;
+            }
+
+            if (showsEveryNode && viewChanges?.Matches(e.Changes) == true)
+            {
+                return true;
+            }
+
+            var rowChanges = new FlattenedChangedEventArgs(
+                viewChanges?.ToChanges() ?? Array.Empty<FlattenedChange>(),
+                e.Version,
+                rowCount);
+            if (rowChanges.IndexMap.OldCount != SlotCount)
+            {
+                return false;
+            }
+
+            e = rowChanges;
+            return true;
         }
 
         private bool FlushPendingScrollForHierarchyChange()
@@ -3273,9 +3337,7 @@ internal
                 return false;
             }
 
-            // The change indexes refer to the unfiltered flattened list, so they only match the
-            // grid's slots when the view shows every flattened node.
-            if (DataConnection?.CollectionView is IDataGridCollectionView view && (view.IsGrouping || view.Filter != null))
+            if (DataConnection?.CollectionView is IDataGridCollectionView view && view.IsGrouping)
             {
                 return false;
             }
@@ -4147,6 +4209,7 @@ internal
                     if (_hierarchicalRowsEnabled)
                     {
                         RefreshRowsAndColumns(clearRows: false);
+                        _hierarchicalAdapter?.FilteredViewChanges?.Clear();
                         RefreshSelectionFromModel();
                         RequestHierarchicalIndentationRefresh();
                     }
