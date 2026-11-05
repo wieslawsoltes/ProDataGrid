@@ -422,8 +422,7 @@ namespace Avalonia.Controls
 
             var selectedItems = selectionSnapshot ?? Array.Empty<object>();
             var projectedSelectedItems = new List<object>(selectedItems.Count);
-            var requestedIdentities = new IdentityList(
-                selectedItems.Count + selectedCellRows.Count + 3);
+            var requestedIdentities = new IdentityList(selectedItems.Count + 3);
             for (int i = 0; i < selectedItems.Count; i++)
             {
                 object selectedItem = ProjectSelectionItem(selectedItems[i]);
@@ -438,26 +437,7 @@ namespace Avalonia.Controls
                 AddReferenceIdentity(requestedIdentities, ProjectSelectionItem(selectedCellRows[i]));
             }
 
-            var prospectiveRows = new ProspectiveRows(prospectiveSource, requestedIdentities.Count);
-            if (prospectiveSource != null)
-            {
-                foreach (object rowDataContext in prospectiveSource)
-                {
-                    object candidate = rowDataContext is HierarchicalNode candidateNode ? candidateNode.Item ?? rowDataContext : rowDataContext;
-                    if (candidate != null && requestedIdentities.Seen.Contains(candidate))
-                    {
-                        CreateSelectionItemContext(
-                            rowDataContext,
-                            out object item,
-                            out HierarchicalNode node,
-                            out IReadOnlyList<HierarchicalNode> path);
-                        prospectiveRows.Kept[prospectiveRows.Count] = new ProspectiveSelectionRow(rowDataContext, item, node, path);
-                    }
-
-                    prospectiveRows.Count++;
-                }
-            }
-
+            var prospectiveRows = new ProspectiveRows(prospectiveSource);
             var identityMap = new ProspectiveIdentityMap(prospectiveRows, requestedIdentities);
             var oldSelectedRowIndexes = new List<int>();
             foreach (int selectedSlot in keepsRows ? Array.Empty<int>() : _selectedItems.GetIndexes())
@@ -1173,7 +1153,7 @@ namespace Avalonia.Controls
                 return;
             }
 
-            if (identities is IdentityList set && !set.Seen.Add(item))
+            if (identities is IdentityList set && !set.Positions.TryAdd(item, set.Count))
             {
                 return;
             }
@@ -2149,113 +2129,153 @@ namespace Avalonia.Controls
         }
 
         /// <summary>
-        /// Resolves every captured identity as one occurrence-aware set. Exact references are
-        /// assigned before equality fallback, so a removed item cannot steal the surviving row
-        /// that belongs to a different equal-but-distinct selected/current/cell identity.
-        /// Repeated uses of the same reference (selection, current cell, anchor, currency, and
-        /// selected cells) intentionally share one resolved row.
+        /// The rows of the prospective source. Only the rows that are asked for (the current and
+        /// anchor rows) get a selection record, so a source change does not allocate one per row.
         /// </summary>
         private sealed class ProspectiveRows
         {
-            public ProspectiveRows(IEnumerable source, int capacity)
+            private int _lastIndex = -1;
+            private ProspectiveSelectionRow _lastRow;
+
+            public ProspectiveRows(IEnumerable source)
             {
                 Source = source;
-                Kept = new Dictionary<int, ProspectiveSelectionRow>(capacity);
             }
 
             public IEnumerable Source { get; }
 
             public int Count;
 
-            public readonly Dictionary<int, ProspectiveSelectionRow> Kept;
-
             public ProspectiveSelectionRow this[int index]
             {
                 get
                 {
-                    if (Kept.TryGetValue(index, out var row))
+                    if (index == _lastIndex)
                     {
-                        return row;
+                        return _lastRow;
                     }
 
-                    int i = 0;
-                    foreach (object rowDataContext in Source)
+                    if (index < 0 || index >= Count)
                     {
-                        if (i++ == index)
+                        throw new ArgumentOutOfRangeException(nameof(index));
+                    }
+
+                    object rowDataContext = null;
+                    if (Source is IList list)
+                    {
+                        rowDataContext = list[index];
+                    }
+                    else
+                    {
+                        int i = 0;
+                        foreach (object candidate in Source)
                         {
-                            CreateSelectionItemContext(rowDataContext, out object item, out HierarchicalNode node, out IReadOnlyList<HierarchicalNode> path);
-                            row = new ProspectiveSelectionRow(rowDataContext, item, node, path);
-                            Kept[index] = row;
-                            return row;
+                            if (i++ == index)
+                            {
+                                rowDataContext = candidate;
+                                break;
+                            }
                         }
                     }
 
-                    throw new ArgumentOutOfRangeException(nameof(index));
+                    CreateSelectionItemContext(rowDataContext, out object item, out HierarchicalNode node, out IReadOnlyList<HierarchicalNode> path);
+                    _lastRow = new ProspectiveSelectionRow(rowDataContext, item, node, path);
+                    _lastIndex = index;
+                    return _lastRow;
                 }
             }
         }
 
         private sealed class IdentityList : List<object>
         {
-            public IdentityList(int capacity) : base(capacity) { }
-            public readonly HashSet<object> Seen = new HashSet<object>(ReferenceEqualityComparer.Instance);
+            public IdentityList(int capacity) : base(capacity)
+            {
+                Positions = new Dictionary<object, int>(capacity, ReferenceEqualityComparer.Instance);
+            }
+
+            public Dictionary<object, int> Positions { get; }
         }
 
+        /// <summary>
+        /// Resolves every captured identity as one occurrence-aware set. Exact references are
+        /// assigned before equality fallback, so a removed item cannot steal the surviving row
+        /// that belongs to a different equal-but-distinct selected/current/cell identity.
+        /// Repeated uses of the same reference (selection, current cell, anchor, currency, and
+        /// selected cells) intentionally share one resolved row.
+        /// </summary>
         private sealed class ProspectiveIdentityMap
         {
-            private readonly IReadOnlyList<object> _identities;
             private readonly int[] _indexes;
-            private readonly Dictionary<object, int> _positions = new Dictionary<object, int>(ReferenceEqualityComparer.Instance);
+            private readonly Dictionary<object, int> _positions;
 
             public ProspectiveIdentityMap(
                 ProspectiveRows rows,
-                IReadOnlyList<object> identities)
+                IdentityList identities)
             {
-                _identities = identities;
+                _positions = identities.Positions;
                 _indexes = new int[identities.Count];
                 Array.Fill(_indexes, -1);
-                var consumedRows = new HashSet<int>();
 
-                for (int identityIndex = 0; identityIndex < identities.Count; identityIndex++)
+                int unresolved = _positions.Count;
+                int rowCount = 0;
+                if (rows.Source != null)
                 {
-                    if (identities[identityIndex] != null)
+                    foreach (object rowDataContext in rows.Source)
                     {
-                        _positions.TryAdd(identities[identityIndex], identityIndex);
+                        object candidate = rowDataContext is HierarchicalNode candidateNode ? candidateNode.Item ?? rowDataContext : rowDataContext;
+                        if (unresolved > 0 &&
+                            candidate != null &&
+                            _positions.TryGetValue(candidate, out int identityIndex) &&
+                            _indexes[identityIndex] < 0)
+                        {
+                            _indexes[identityIndex] = rowCount;
+                            unresolved--;
+                        }
+
+                        rowCount++;
+                        if (unresolved == 0 && rows.Source is ICollection collection)
+                        {
+                            rowCount = collection.Count;
+                            break;
+                        }
                     }
                 }
 
-                foreach (int rowIndex in System.Linq.Enumerable.ToList(System.Linq.Enumerable.OrderBy(rows.Kept.Keys, k => k)))
+                rows.Count = rowCount;
+                if (unresolved == 0 || rows.Source == null)
                 {
-                    object rowItem = rows.Kept[rowIndex].Item;
-                    if (rowItem != null && _positions.TryGetValue(rowItem, out int identityIndex) && _indexes[identityIndex] < 0)
-                    {
-                        _indexes[identityIndex] = rowIndex;
-                        consumedRows.Add(rowIndex);
-                    }
+                    return;
                 }
 
+                bool[] consumedRows = null;
                 for (int identityIndex = 0; identityIndex < identities.Count; identityIndex++)
                 {
-                    if (_indexes[identityIndex] >= 0)
-                    {
-                        continue;
-                    }
-
                     object identity = identities[identityIndex];
-                    if (identity == null || rows.Source == null)
+                    if (_indexes[identityIndex] >= 0 || identity == null)
                     {
                         continue;
+                    }
+
+                    if (consumedRows == null)
+                    {
+                        consumedRows = new bool[rowCount];
+                        foreach (int resolved in _indexes)
+                        {
+                            if (resolved >= 0)
+                            {
+                                consumedRows[resolved] = true;
+                            }
+                        }
                     }
 
                     int rowIndex = 0;
                     foreach (object rowDataContext in rows.Source)
                     {
                         object candidate = rowDataContext is HierarchicalNode candidateNode ? candidateNode.Item ?? rowDataContext : rowDataContext;
-                        if (!consumedRows.Contains(rowIndex) && Equals(candidate, identity))
+                        if (rowIndex < rowCount && !consumedRows[rowIndex] && Equals(candidate, identity))
                         {
                             _indexes[identityIndex] = rowIndex;
-                            consumedRows.Add(rowIndex);
-                            _ = rows[rowIndex];
+                            consumedRows[rowIndex] = true;
                             break;
                         }
 
