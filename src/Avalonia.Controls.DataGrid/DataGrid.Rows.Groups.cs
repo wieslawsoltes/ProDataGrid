@@ -406,7 +406,7 @@ namespace Avalonia.Controls
 
 
 
-        private void RefreshRowGroupHeaders()
+        private bool RefreshRowGroupHeaders()
         {
             if (DataConnection.CollectionView != null
             && DataConnection.CollectionView.CanGroup
@@ -430,10 +430,9 @@ namespace Avalonia.Controls
                 if (RowGroupSublevelIndents == null || RowGroupSublevelIndents.Length != groupLevelCount)
                 {
                     RowGroupSublevelIndents = new double[groupLevelCount];
-                    double indent;
+                    double indent = RowGroupSublevelIndent;
                     for (int i = 0; i < groupLevelCount; i++)
                     {
-                        indent = RowGroupSublevelIndent;
                         RowGroupSublevelIndents[i] = indent;
                         if (i > 0)
                         {
@@ -443,15 +442,17 @@ namespace Avalonia.Controls
                 }
                 EnsureRowGroupSpacerColumnWidth(groupLevelCount);
                 UpdateGroupingIndentation();
+                return true;
             }
+
+            return false;
         }
 
 
 
-        private void EnsureRowGroupSpacerColumn()
+        private void EnsureRowGroupSpacerColumn(bool isGrouping)
         {
             // A grouped view keeps its indent while a filter or a reset leaves it without group rows.
-            bool isGrouping = DataConnection?.CollectionView is IDataGridCollectionView { IsGrouping: true, GroupingDepth: > 0 };
             bool spacerColumnChanged = ColumnsInternal.EnsureRowGrouping(isGrouping || !RowGroupHeadersTable.IsEmpty);
             if (spacerColumnChanged)
             {

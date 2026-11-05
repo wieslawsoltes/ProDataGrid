@@ -866,8 +866,8 @@ namespace Avalonia.Controls
 
         private void RefreshGroupingLayout()
         {
-            RefreshRowGroupHeaders();
-            EnsureRowGroupSpacerColumn();
+            bool isGrouping = RefreshRowGroupHeaders();
+            EnsureRowGroupSpacerColumn(isGrouping);
 
             if (DataConnection?.CollectionView is IDataGridCollectionView view && view.IsGrouping)
             {
