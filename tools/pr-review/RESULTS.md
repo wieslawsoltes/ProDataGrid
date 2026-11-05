@@ -1,4 +1,41 @@
-# Review validation results
+# Revised acceptance gate — 2026-11-05 (Europe/Warsaw)
+
+**This section supersedes every earlier approval, merge recommendation and accepted-tradeoff statement below. No introduced performance or memory increase is acceptable.** Correctness improvements, faster results in other workloads, small absolute costs and green CI do not waive this requirement. Raw measurements are retained unchanged.
+
+Fourteen prior approvals have been replaced with changes-requested reviews. #419 remains changes requested. Small positive estimates are explicitly unresolved, not automatically diagnosed as real regressions and not accepted as harmless noise. No new measurements were performed for this policy revision.
+
+| PR | Revised status | Evidence / outstanding requirement |
+|---|---|---|
+| [#338](https://github.com/wieslawsoltes/ProDataGrid/pull/338) | Blocked: measured increase | Hierarchy allocation rises 531,176 → 535,341 bytes/operation (+4,165). Repeat timing rises 0.5199 → 0.5333 ms (+2.6%). The earlier large fallback fix does not excuse the remaining increase. |
+| [#385](https://github.com/wieslawsoltes/ProDataGrid/pull/385) | Hold: unresolved positive measurements | Focused scrolling has a positive allocation estimate (1,458,215 → 1,458,258 bytes/operation). This small difference may be measurement noise; it is not a proven regression, but it is unresolved and therefore cannot support acceptance under the strict gate. |
+| [#391](https://github.com/wieslawsoltes/ProDataGrid/pull/391) | Hold: unresolved positive measurements | Source swaps measured +1.6% time; collection-view swaps +1.2% time and a small positive allocation estimate. No tolerance is accepted. Resolve these increases with better-controlled comparisons or remove the overhead. |
+| [#395](https://github.com/wieslawsoltes/ProDataGrid/pull/395) | Hold: unresolved positive measurements | Source swaps have a positive allocation estimate (36,882,531 → 36,882,863 bytes/operation). Causality is unresolved; approval is withheld rather than dismissing the difference as negligible. |
+| [#398](https://github.com/wieslawsoltes/ProDataGrid/pull/398) | Hold: unresolved positive measurements | Focused scrolling measured +4.2% time and +4,464 bytes/operation; ordinary scrolling also has positive time/allocation estimates. Timing block directions disagree, so this is unresolved evidence rather than a confirmed timing regression. It does not pass the strict gate. |
+| [#399](https://github.com/wieslawsoltes/ProDataGrid/pull/399) | Hold: unresolved positive measurements | Source swaps have positive time (+0.5%) and allocation estimates (+578 bytes/operation). These may be noise, but no acceptance is granted until they are resolved. NativeAOT correctness success does not waive the performance requirement. |
+| [#401](https://github.com/wieslawsoltes/ProDataGrid/pull/401) | Blocked: measured increase | Repeated header gesture cost rises 0.0887 → 0.1122 ms (+26.5%) and 18,834 → 25,898 bytes (+7,064). Correct pointer capture is required, but its measured cost is no longer accepted as a tradeoff. |
+| [#403](https://github.com/wieslawsoltes/ProDataGrid/pull/403) | Hold: unresolved positive measurements | Group operations measured 303.1143 → 306.2139 ms (+1.0%), with both balanced blocks positive. The timing increase needs resolution; it cannot be waived because it is small. |
+| [#405](https://github.com/wieslawsoltes/ProDataGrid/pull/405) | Blocked: measured increase | Repeated construction of 100 grids rises 4.0218 → 4.2434 ms (+5.5%) and 7,551,978 → 10,059,205 bytes (+2,507,227; about 25 KB/grid). Mutable-state isolation must be preserved, but this cost is a blocker under the revised policy. |
+| [#407](https://github.com/wieslawsoltes/ProDataGrid/pull/407) | Pass in measured workloads; no universal memory claim | No time/allocation increase in the measured workloads; broader memory metrics were not measured. |
+| [#409](https://github.com/wieslawsoltes/ProDataGrid/pull/409) | Blocked: measured increase | Repeated filtered hierarchy operations rise 0.1890 → 0.4818 ms (+154.9%) and 259,360 → 263,003 bytes (+3,643). Correct filtered behavior must remain, but falling back to the slower refresh cannot be accepted under this policy. |
+| [#411](https://github.com/wieslawsoltes/ProDataGrid/pull/411) | Hold: unresolved positive measurements | Details scrolling measured 1.2605 → 1.2826 ms (+1.7%), with a tiny positive allocation estimate. Causality remains unresolved; no small-increase exemption applies. |
+| [#413](https://github.com/wieslawsoltes/ProDataGrid/pull/413) | Blocked: measured increase | Details scrolling allocates approximately 352,762 → 353,529 bytes/operation (+768); the increase is consistent across the four processes on each side. A faster average does not offset increased allocation. |
+| [#415](https://github.com/wieslawsoltes/ProDataGrid/pull/415) | Blocked: measured increase | Repeated selected-row mutation allocates 1,126,073 → 1,185,415 bytes/operation (+59,342; +5.3%). Faster timing does not offset increased allocation. This must be removed before acceptance. |
+| [#417](https://github.com/wieslawsoltes/ProDataGrid/pull/417) | Hold: complete-stack validation required | The measured incremental change improves time and allocation against #415, but this PR includes #415, which fails the allocation gate. A complete-stack comparison against current master is required across all affected workloads, including source changes. Incremental gains cannot establish that the submitted stack has no increases. |
+| [#419](https://github.com/wieslawsoltes/ProDataGrid/pull/419) | Blocked: correctness regression | The default-mode duplicate-object selection regression remains a correctness blocker. Performance gains cannot compensate for it; any revision must also satisfy the strict performance/allocation gate. |
+| [#423](https://github.com/wieslawsoltes/ProDataGrid/pull/423) | Pass in measured workloads; no universal memory claim | No time/allocation increase in the measured workloads; broader memory metrics were not measured. |
+| [#424](https://github.com/wieslawsoltes/ProDataGrid/pull/424) | Pass in measured workloads; no universal memory claim | No time/allocation increase in the measured workloads; broader memory metrics were not measured. |
+| [#425](https://github.com/wieslawsoltes/ProDataGrid/pull/425) | Product-neutral: test isolation only | Production code unchanged; this is not a CI-throughput guarantee. |
+
+## Scope of the evidence
+
+The existing measurements record operation time and managed allocation. They do **not** establish peak working-set, retained-memory, native/GPU memory or all-input non-regression. No universal zero-memory-increase claim is made. #407, #423 and #424 remain acceptable within the tested workloads only; #425 is product-neutral test isolation. Any newly demonstrated increase blocks acceptance. #417 must be assessed as the entire submitted stack against master, not only as an increment over the now-blocked #415.
+
+Restoring acceptance requires removing introduced costs while retaining correctness, and resolving inconclusive positive observations through controlled comparisons. Do not relax allocation limits, select only favorable samples, substitute a weaker baseline, or offset a regression in one workload with gains in another. The current blockers have not been remediated by this decision revision. No PR has been merged.
+
+---
+
+# Historical validation record — recommendations superseded above
+
 
 Original inventory: 16 open PRs and 18 open issues. No GitHub PR was merged.
 
@@ -147,7 +184,7 @@ All 18 original open issues were triaged and commented: #337, #344, #347, #390, 
 
 New fixes: #423 for #420 (clipboard quoting), #424 for #421 (sparse reference-index allocation). #425 adds five existing nonparallel-collection annotations to formula allocation tests after the unchanged product test intermittently failed in macOS CI for #338 and #417. All 2,000 formula tests pass locally with the isolation change. It does not change production code or allocation budgets, and its PR explicitly does not claim the exact runtime allocation source is proven.
 
-## Final status — 2026-11-04 23:17 UTC
+## Historical status — 2026-11-04 23:17 UTC (superseded)
 
 All 19 expected current heads were rechecked: all 155 GitHub checks are completed successfully, all PRs remain open and individually mergeable, and no external head change occurred. The 15 applicable original PRs have formal approvals; #419 retains a changes-requested review despite green existing CI. All three new fixes have final validation comments. No PR was merged, and master remains `f92035975ac5ab6c0cdede8228952bcd8f618a2e`.
 
