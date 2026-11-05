@@ -30,8 +30,6 @@ namespace Avalonia.Controls
 
         public int Count => _items.Count;
 
-        internal int Version { get; private set; }
-
         public bool IsReadOnly => false;
 
         public DataGridCellInfo this[int index]
@@ -41,7 +39,6 @@ namespace Avalonia.Controls
             {
                 DataGridCellInfo oldItem = _items[index];
                 _items[index] = value;
-                Version++;
                 PropertyChanged?.Invoke(this, s_indexerPropertyChanged);
                 CollectionChanged?.Invoke(
                     this,
@@ -57,7 +54,6 @@ namespace Avalonia.Controls
         {
             int index = _items.Count;
             _items.Add(item);
-            Version++;
             RaiseCountAndIndexerChanged();
             CollectionChanged?.Invoke(
                 this,
@@ -72,7 +68,6 @@ namespace Avalonia.Controls
             }
 
             _items.Clear();
-            Version++;
             RaiseCountAndIndexerChanged();
             CollectionChanged?.Invoke(
                 this,
@@ -91,7 +86,6 @@ namespace Avalonia.Controls
         public void Insert(int index, DataGridCellInfo item)
         {
             _items.Insert(index, item);
-            Version++;
             RaiseCountAndIndexerChanged();
             CollectionChanged?.Invoke(
                 this,
@@ -114,7 +108,6 @@ namespace Avalonia.Controls
         {
             DataGridCellInfo item = _items[index];
             _items.RemoveAt(index);
-            Version++;
             RaiseCountAndIndexerChanged();
             CollectionChanged?.Invoke(
                 this,
@@ -166,7 +159,6 @@ namespace Avalonia.Controls
             }
 
             _items.Clear();
-            Version++;
             for (int i = 0; i < items.Count; i++)
             {
                 _items.Add(items[i]);

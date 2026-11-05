@@ -22,12 +22,6 @@ internal
         private bool _pendingSelectionOverlayRefresh;
         private bool _selectionOverlayLayoutHooked;
         private bool _selectionOverlayVisible;
-        private int _displayRangeVersion = -1;
-        private int[] _displayRangeColumns;
-        private bool _displayRangeFound;
-        private DataGridCellRange _displayRange;
-        private List<int> _displayRangeIndexes;
-        private bool _displayRangeLogical;
 
         internal void RequestSelectionOverlayRefresh()
         {
@@ -204,30 +198,6 @@ internal
         }
 
         private bool TryGetSelectedCellDisplayRange(out DataGridCellRange range, out List<int> selectedDisplayIndexes, out bool isLogicalContiguousRange)
-        {
-            var columns = new int[ColumnsItemsInternal?.Count ?? 0];
-            for (int i = 0; i < columns.Length; i++)
-            {
-                var column = ColumnsItemsInternal[i];
-                columns[i] = column == null ? int.MinValue : !column.IsVisible ? -1 : column is DataGridFillerColumn ? -2 : column.DisplayIndex;
-            }
-
-            if (_displayRangeVersion != _selectedCellsView.Version ||
-                _displayRangeColumns == null ||
-                !_displayRangeColumns.AsSpan().SequenceEqual(columns))
-            {
-                _displayRangeFound = ComputeSelectedCellDisplayRange(out _displayRange, out _displayRangeIndexes, out _displayRangeLogical);
-                _displayRangeVersion = _selectedCellsView.Version;
-                _displayRangeColumns = columns;
-            }
-
-            range = _displayRange;
-            selectedDisplayIndexes = _displayRangeIndexes;
-            isLogicalContiguousRange = _displayRangeLogical;
-            return _displayRangeFound;
-        }
-
-        private bool ComputeSelectedCellDisplayRange(out DataGridCellRange range, out List<int> selectedDisplayIndexes, out bool isLogicalContiguousRange)
         {
             range = default;
             selectedDisplayIndexes = new List<int>();
