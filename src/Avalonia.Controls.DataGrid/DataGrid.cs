@@ -480,7 +480,7 @@ internal
         internal bool IsSelectionUpdateFromRowSuppressed => _suppressSelectionUpdatesFromRows;
         private bool _syncingSelectedItems;
         private bool _syncingSelectedCells;
-        private readonly Dictionary<object, HashSet<int>> _selectedCells = new(SelectedRowComparer.Instance);
+        private readonly Dictionary<CellRowKey, HashSet<int>> _selectedCells = new();
         private bool _trackSelectedCellsByItem;
         private bool _selectedCellColumnsStale;
         private readonly DataGridSelectedCellsCollection _selectedCellsView = new();
@@ -489,7 +489,7 @@ internal
         private bool _syncingSelectedColumns;
         private readonly Dictionary<int, int> _selectedColumnCounts = new();
         private readonly HashSet<int> _selectedColumnIndices = new();
-        private readonly HashSet<object> _selectedRowHeaderIndices = new(SelectedRowComparer.Instance);
+        private readonly HashSet<CellRowKey> _selectedRowHeaderIndices = new();
         private readonly HashSet<int> _selectedColumnHeaderIndices = new();
         private readonly DataGridSelectedColumnsCollection _selectedColumnsView = new();
         private DataGridCellCoordinates _cellAnchor = new DataGridCellCoordinates(-1, -1);

@@ -9,6 +9,7 @@ using Avalonia.Threading;
 using Avalonia.VisualTree;
 using System;
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 
 namespace Avalonia.Controls
 {
@@ -22,32 +23,51 @@ internal
         private bool _pendingSelectionOverlayRefresh;
         private bool _selectionOverlayLayoutHooked;
         private bool _selectionOverlayVisible;
-        private int _displayRangeVersion = -1;
-        private int[] _displayRangeColumns;
-        private bool _displayRangeFound;
-        private DataGridCellRange _displayRange;
-        private List<int> _displayRangeIndexes;
-        private bool _displayRangeLogical;
-        private int _displayRangeRowsVersion;
-        private int _displayRangeRowsOrderVersion;
-        private int _displayRangeRowsRemovedVersion;
-        private int _displayRangeRowCount;
-        private object _displayRangeFirstRow;
-        private object _displayRangeLastRow;
-        private int _rowsVersion;
-        private int _rowsOrderVersion;
-        private int _rowsRemovedVersion;
+
+        // Kept outside DataGrid so that grids which never select cells do not carry it.
+        private static readonly ConditionalWeakTable<DataGrid, SelectedCellsLayout> s_selectedCellsLayouts = new();
+
+        private sealed class SelectedCellsLayout
+        {
+            public bool RangeValid;
+            public int[] Columns;
+            public bool Found;
+            public DataGridCellRange Range;
+            public List<int> Indexes;
+            public bool Logical;
+            public bool RowsChanged;
+            public bool RowsRemoved;
+            public bool RowsReordered;
+            public int RowCount;
+            public object FirstRow;
+            public object LastRow;
+            public HashSet<object> RepeatedRowItems;
+        }
 
         internal void OnRowsChangedForSelectionOverlay(System.Collections.Specialized.NotifyCollectionChangedAction action)
         {
-            _rowsVersion++;
+            if (!s_selectedCellsLayouts.TryGetValue(this, out SelectedCellsLayout layout))
+            {
+                return;
+            }
+
+            layout.RowsChanged = true;
+            layout.RepeatedRowItems = null;
             if (action != System.Collections.Specialized.NotifyCollectionChangedAction.Add)
             {
-                _rowsRemovedVersion++;
+                layout.RowsRemoved = true;
                 if (action != System.Collections.Specialized.NotifyCollectionChangedAction.Remove)
                 {
-                    _rowsOrderVersion++;
+                    layout.RowsReordered = true;
                 }
+            }
+        }
+
+        private void InvalidateSelectedCellDisplayRange()
+        {
+            if (s_selectedCellsLayouts.TryGetValue(this, out SelectedCellsLayout layout))
+            {
+                layout.RangeValid = false;
             }
         }
 
@@ -234,42 +254,44 @@ internal
                 columns[i] = column == null ? int.MinValue : !column.IsVisible ? -1 : column is DataGridFillerColumn ? -2 : column.DisplayIndex;
             }
 
-            if (_displayRangeVersion != _selectedCellsView.Version ||
-                _displayRangeColumns == null ||
-                !_displayRangeColumns.AsSpan().SequenceEqual(columns) ||
-                _displayRangeRowsOrderVersion != _rowsOrderVersion ||
-                (_displayRangeRowsVersion != _rowsVersion &&
-                 (_displayRangeFound ? !TryMoveSelectedCellDisplayRange() : _displayRangeRowsRemovedVersion != _rowsRemovedVersion)))
+            SelectedCellsLayout layout = s_selectedCellsLayouts.GetOrCreateValue(this);
+            if (!layout.RangeValid ||
+                layout.Columns == null ||
+                !layout.Columns.AsSpan().SequenceEqual(columns) ||
+                (_trackSelectedCellsByItem &&
+                 (layout.RowsReordered ||
+                  (layout.RowsChanged &&
+                   (layout.Found ? !TryMoveSelectedCellDisplayRange(layout) : layout.RowsRemoved)))))
             {
-                _displayRangeFound = ComputeSelectedCellDisplayRange(out _displayRange, out _displayRangeIndexes, out _displayRangeLogical);
-                _displayRangeVersion = _selectedCellsView.Version;
-                _displayRangeColumns = columns;
-                _displayRangeRowsOrderVersion = _rowsOrderVersion;
-                _displayRangeRowsRemovedVersion = _rowsRemovedVersion;
+                layout.Found = ComputeSelectedCellDisplayRange(layout, out layout.Range, out layout.Indexes, out layout.Logical);
+                layout.RangeValid = true;
+                layout.Columns = columns;
+                layout.RowsRemoved = false;
+                layout.RowsReordered = false;
             }
 
-            _displayRangeRowsVersion = _rowsVersion;
+            layout.RowsChanged = false;
 
-            range = _displayRange;
-            selectedDisplayIndexes = _displayRangeIndexes;
-            isLogicalContiguousRange = _displayRangeLogical;
-            return _displayRangeFound;
+            range = layout.Range;
+            selectedDisplayIndexes = layout.Indexes;
+            isLogicalContiguousRange = layout.Logical;
+            return layout.Found;
         }
 
-        private bool TryMoveSelectedCellDisplayRange()
+        private bool TryMoveSelectedCellDisplayRange(SelectedCellsLayout layout)
         {
-            if (!TryGetRowIndexFromItem(_displayRangeFirstRow, out int first) ||
-                !TryGetRowIndexFromItem(_displayRangeLastRow, out int last) ||
-                last - first + 1 != _displayRangeRowCount)
+            if (!TryGetRowIndexFromItem(layout.FirstRow, out int first) ||
+                !TryGetRowIndexFromItem(layout.LastRow, out int last) ||
+                last - first + 1 != layout.RowCount)
             {
                 return false;
             }
 
-            _displayRange = new DataGridCellRange(first, last, _displayRange.StartColumn, _displayRange.EndColumn);
+            layout.Range = new DataGridCellRange(first, last, layout.Range.StartColumn, layout.Range.EndColumn);
             return true;
         }
 
-        private bool ComputeSelectedCellDisplayRange(out DataGridCellRange range, out List<int> selectedDisplayIndexes, out bool isLogicalContiguousRange)
+        private bool ComputeSelectedCellDisplayRange(SelectedCellsLayout layout, out DataGridCellRange range, out List<int> selectedDisplayIndexes, out bool isLogicalContiguousRange)
         {
             range = default;
             selectedDisplayIndexes = new List<int>();
@@ -344,7 +366,8 @@ internal
             object lastRow = null;
             foreach (var row in _selectedCells.Keys)
             {
-                if (!TryGetRowIndexFromItem(row, out int rowIndex))
+                int rowIndex = RowIndexOf(row);
+                if (rowIndex < 0)
                 {
                     return false;
                 }
@@ -352,13 +375,13 @@ internal
                 if (rowIndex < minRow)
                 {
                     minRow = rowIndex;
-                    firstRow = row;
+                    firstRow = row.Item;
                 }
 
                 if (rowIndex > maxRow)
                 {
                     maxRow = rowIndex;
-                    lastRow = row;
+                    lastRow = row.Item;
                 }
             }
 
@@ -372,9 +395,9 @@ internal
                 isLogicalContiguousRange = true;
             }
 
-            _displayRangeFirstRow = firstRow;
-            _displayRangeLastRow = lastRow;
-            _displayRangeRowCount = _selectedCells.Count;
+            layout.FirstRow = firstRow;
+            layout.LastRow = lastRow;
+            layout.RowCount = _selectedCells.Count;
             range = new DataGridCellRange(minRow, maxRow, minDisplay, maxDisplay);
             return true;
         }

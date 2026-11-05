@@ -1036,7 +1036,8 @@ namespace Avalonia.Controls
                     NotifyCollectionChangedAction.Add => Array.Empty<object>(),
                     NotifyCollectionChangedAction.Remove or NotifyCollectionChangedAction.Replace => e.CollectionChange.OldItems,
                     _ => null
-                });
+                },
+                e.CollectionChange);
         }
 
         private void CollectionView_SourceMutationCompleted(
@@ -1268,7 +1269,8 @@ namespace Avalonia.Controls
                         ? null
                         : _owner.TakeItemsSourceSelectionTransaction(
                             selectionSnapshot,
-                            CollectionView);
+                            CollectionView,
+                            e);
                 using var selectionCommit = selectionTransaction != null
                     ? _owner.BeginSelectionCommit()
                     : default;
@@ -1472,7 +1474,7 @@ namespace Avalonia.Controls
                 if (selectionTransaction == null &&
                     !_owner.IsSelectionModelSourceResetPreflightPending)
                 {
-                    _owner.RemapSelectedCellsToCurrentRows();
+                    _owner.RemapSelectedCellsToCurrentRows(e);
                 }
                 _owner.RequestSelectionOverlayRefresh();
 

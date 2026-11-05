@@ -6,6 +6,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Collections.Specialized;
 using Avalonia.Controls.DataGridHierarchical;
 using Avalonia.Controls.Selection;
 using Avalonia.Controls.Utils;
@@ -385,7 +386,8 @@ namespace Avalonia.Controls
             IEnumerable prospectiveSource,
             bool preserveSelection,
             bool requireSelectionChangingHandler = true,
-            IList leavingItems = null)
+            IList leavingItems = null,
+            NotifyCollectionChangedEventArgs sourceChange = null)
         {
             if ((requireSelectionChangingHandler && !HasSelectionChangingHandlers) ||
                 _selectionCommitDepth > 0)
@@ -394,6 +396,10 @@ namespace Avalonia.Controls
             }
 
             ThrowIfSelectionChangingReentrant();
+            if (preserveSelection)
+            {
+                StopTrackingIfRowsRepeatSelectedCellItem(prospectiveSource, sourceChange);
+            }
 
             DataGridSelectionAnchorInfo oldAnchor = GetCurrentSelectionAnchorInfo();
             object oldAnchorItem = CaptureSourceMutationAnchorItem(selectionSnapshot, oldAnchor);
@@ -404,7 +410,7 @@ namespace Avalonia.Controls
                 oldAnchorColumnIndex < ColumnsItemsInternal.Count
                     ? ColumnsItemsInternal[oldAnchorColumnIndex]
                     : CurrentCell.Column;
-            var selectedCellRows = new List<object>(_selectedCells.Keys);
+            List<object> selectedCellRows = SelectedCellItems();
             object oldCurrentItem = ProjectSelectionItem(CurrentCell.Item);
             object oldCurrencyItem = ProjectSelectionItem(DataConnection?.CollectionView?.CurrentItem);
             bool keepsRows = preserveSelection &&
@@ -652,7 +658,7 @@ namespace Avalonia.Controls
                 if (rows.Equals(leaving, currentItem) ||
                     rows.Equals(leaving, anchorItem) ||
                     rows.Equals(leaving, currencyItem) ||
-                    _selectedCells.ContainsKey(SelectedRowKey(leaving)))
+                    _selectedCells.ContainsKey(CellRowKey.ForItem(SelectedRowKey(leaving))))
                 {
                     return false;
                 }
@@ -690,7 +696,8 @@ namespace Avalonia.Controls
         internal void PrepareBuiltInCollectionViewMutationPreflight(
             IReadOnlyList<object> selectionSnapshot,
             IEnumerable prospectiveSource,
-            IList leavingItems)
+            IList leavingItems,
+            NotifyCollectionChangedEventArgs sourceChange)
         {
             if (_builtInSourceMutationPreflightActive ||
                 _selectionCommitDepth > 0 ||
@@ -705,7 +712,8 @@ namespace Avalonia.Controls
                 PrepareItemsSourceMutationPreflight(
                     selectionSnapshot,
                     prospectiveSource,
-                    leavingItems);
+                    leavingItems,
+                    sourceChange);
                 if (_pendingItemsSourceSelectionTransaction != null)
                 {
                     // Keep grid-owned selection/current state silent until the built-in view has
@@ -731,7 +739,8 @@ namespace Avalonia.Controls
         private void PrepareItemsSourceMutationPreflight(
             IReadOnlyList<object> selectionSnapshot,
             IEnumerable prospectiveSource,
-            IList leavingItems = null)
+            IList leavingItems = null,
+            NotifyCollectionChangedEventArgs sourceChange = null)
         {
             using var origin = BeginSelectionChangeScope(
                 DataGridSelectionChangeSource.ItemsSourceChange,
@@ -741,7 +750,8 @@ namespace Avalonia.Controls
                 prospectiveSource,
                 preserveSelection: true,
                 requireSelectionChangingHandler: false,
-                leavingItems);
+                leavingItems,
+                sourceChange);
             if (transaction != null)
             {
                 _pendingItemsSourceSelectionTransaction = transaction;
@@ -790,7 +800,8 @@ namespace Avalonia.Controls
 
         internal ItemsSourceSelectionTransaction TakeItemsSourceSelectionTransaction(
             IReadOnlyList<object> selectionSnapshot,
-            IEnumerable prospectiveSource)
+            IEnumerable prospectiveSource,
+            NotifyCollectionChangedEventArgs sourceChange)
         {
             // The built-in view completion boundary runs after all CollectionChanged listeners.
             // Retain its transaction until then so a SelectionModel subscribed after the grid
@@ -813,7 +824,8 @@ namespace Avalonia.Controls
                 selectionSnapshot,
                 prospectiveSource,
                 preserveSelection: true,
-                requireSelectionChangingHandler: false);
+                requireSelectionChangingHandler: false,
+                sourceChange: sourceChange);
         }
 
         internal bool IsSelectionModelSourceResetPreflightPending =>
@@ -916,7 +928,7 @@ namespace Avalonia.Controls
                 RemoveSelectedCellsAfterItemsSourceMutation(
                     keepCells
                         ? transaction.LostCellRows
-                        : new HashSet<object>(_selectedCells.Keys, SelectedRowComparer.Instance),
+                        : new HashSet<object>(SelectedCellItems(), SelectedRowComparer.Instance),
                     transaction.RemovedCells);
             }
 
