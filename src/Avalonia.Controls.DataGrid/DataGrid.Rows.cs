@@ -816,7 +816,7 @@ internal
                     ResetDisplayedRows();
                 }
 
-                RefreshRowGroupHeaders();
+                bool isGrouping = RefreshRowGroupHeaders();
 
                 // Update the CurrentSlot because it might have changed
                 if (recycleRows && DataConnection.CollectionView != null)
@@ -852,7 +852,7 @@ internal
                     }
                 }
 
-                EnsureRowGroupSpacerColumn();
+                EnsureRowGroupSpacerColumn(isGrouping);
 
                 var suppressPendingScrollHeight = IsScrollStateRestoreActive ||
                                                  (_restoredScrollSlot.HasValue && _restoredScrollSlot.Value == DisplayData.FirstScrollingSlot);

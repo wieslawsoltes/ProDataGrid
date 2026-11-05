@@ -621,6 +621,7 @@ internal
             IsEnabledProperty.Changed.AddClassHandler<DataGrid>((x, e) => x.DataGrid_IsEnabledChanged(e));
             Visual.IsVisibleProperty.Changed.AddClassHandler<DataGrid>((x, e) => x.OnIsVisibleChanged(e));
             AreRowGroupHeadersFrozenProperty.Changed.AddClassHandler<DataGrid>((x, e) => x.OnAreRowGroupHeadersFrozenChanged(e));
+            RowGroupSublevelIndentProperty.Changed.AddClassHandler<DataGrid>((x, e) => x.OnRowGroupSublevelIndentChanged(e));
             RowDetailsTemplateProperty.Changed.AddClassHandler<DataGrid>((x, e) => x.OnRowDetailsTemplateChanged(e));
             RowDetailsVisibilityModeProperty.Changed.AddClassHandler<DataGrid>((x, e) => x.OnRowDetailsVisibilityModeChanged(e));
             AutoGenerateColumnsProperty.Changed.AddClassHandler<DataGrid>((x, e) => x.OnAutoGenerateColumnsChanged(e));

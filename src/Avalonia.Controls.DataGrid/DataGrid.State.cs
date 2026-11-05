@@ -866,8 +866,8 @@ namespace Avalonia.Controls
 
         private void RefreshGroupingLayout()
         {
-            RefreshRowGroupHeaders();
-            EnsureRowGroupSpacerColumn();
+            bool isGrouping = RefreshRowGroupHeaders();
+            EnsureRowGroupSpacerColumn(isGrouping);
 
             if (DataConnection?.CollectionView is IDataGridCollectionView view && view.IsGrouping)
             {
@@ -909,7 +909,7 @@ namespace Avalonia.Controls
 
             var baseIndent = RowGroupSublevelIndents.Length > 0
                 ? RowGroupSublevelIndents[0]
-                : DATAGRID_defaultRowGroupSublevelIndent;
+                : RowGroupSublevelIndent;
 
             int slot = DisplayData.FirstScrollingSlot;
             int lastSlot = DisplayData.LastScrollingSlot;
