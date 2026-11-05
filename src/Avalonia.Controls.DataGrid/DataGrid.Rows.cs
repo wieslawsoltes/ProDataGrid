@@ -1741,6 +1741,10 @@ internal
                 {
                     _selectedItems.DeleteSlot(slotDeleted);
                 }
+                else
+                {
+                    _selectedItems.RemoveIndex(slotDeleted, null);
+                }
             }
             else if (IsGroupFooterSlot(slotDeleted))
             {
@@ -1751,6 +1755,10 @@ internal
                 if (_selectionModelAdapter == null)
                 {
                     _selectedItems.DeleteSlot(slotDeleted);
+                }
+                else
+                {
+                    _selectedItems.RemoveIndex(slotDeleted, null);
                 }
             }
             else
@@ -1763,6 +1771,10 @@ internal
                 if (_selectionModelAdapter == null)
                 {
                     _selectedItems.Delete(slotDeleted, itemDeleted);
+                }
+                else
+                {
+                    _selectedItems.RemoveIndex(slotDeleted, itemDeleted);
                 }
                 RowGroupHeadersTable.RemoveIndex(slotDeleted);
                 RowGroupFootersTable.RemoveIndex(slotDeleted);

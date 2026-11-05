@@ -398,29 +398,9 @@ namespace Avalonia.Controls
             object oldCurrentItem = ProjectSelectionItem(CurrentCell.Item);
             object oldCurrencyItem = ProjectSelectionItem(DataConnection?.CollectionView?.CurrentItem);
 
-            int prospectiveCapacity = prospectiveSource is ICollection collection
-                ? collection.Count
-                : 0;
-            var prospectiveRows = prospectiveCapacity > 0
-                ? new List<ProspectiveSelectionRow>(prospectiveCapacity)
-                : new List<ProspectiveSelectionRow>();
-            if (prospectiveSource != null)
-            {
-                foreach (object rowDataContext in prospectiveSource)
-                {
-                    CreateSelectionItemContext(
-                        rowDataContext,
-                        out object item,
-                        out HierarchicalNode node,
-                        out IReadOnlyList<HierarchicalNode> path);
-                    prospectiveRows.Add(new ProspectiveSelectionRow(rowDataContext, item, node, path));
-                }
-            }
-
             var selectedItems = selectionSnapshot ?? Array.Empty<object>();
             var projectedSelectedItems = new List<object>(selectedItems.Count);
-            var requestedIdentities = new List<object>(
-                selectedItems.Count + selectedCells.Count + 3);
+            var requestedIdentities = new IdentityList(selectedItems.Count + 3);
             for (int i = 0; i < selectedItems.Count; i++)
             {
                 object selectedItem = ProjectSelectionItem(selectedItems[i]);
@@ -435,6 +415,7 @@ namespace Avalonia.Controls
                 AddReferenceIdentity(requestedIdentities, selectedCells[i].Item);
             }
 
+            var prospectiveRows = new ProspectiveRows(prospectiveSource);
             var identityMap = new ProspectiveIdentityMap(prospectiveRows, requestedIdentities);
             var oldSelectedRowIndexes = new List<int>();
             foreach (int selectedSlot in _selectedItems.GetIndexes())
@@ -470,10 +451,18 @@ namespace Avalonia.Controls
             var removedCells = new List<DataGridCellInfo>();
             var survivingSelectedCells = new List<ItemsSourceSelectionCell>(selectedCells.Count);
             bool selectedCellsChanged = false;
+            object lastCellItem = null;
+            int lastCellIndex = -1;
             for (int i = 0; i < selectedCells.Count; i++)
             {
                 ItemsSourceSelectionCell selectedCell = selectedCells[i];
-                int prospectiveIndex = identityMap.GetIndex(selectedCell.Item);
+                if (i == 0 || !ReferenceEquals(selectedCell.Item, lastCellItem))
+                {
+                    lastCellItem = selectedCell.Item;
+                    lastCellIndex = identityMap.GetIndex(lastCellItem);
+                }
+
+                int prospectiveIndex = lastCellIndex;
                 if (prospectiveIndex >= 0)
                 {
                     selectedCellsChanged |= prospectiveIndex != selectedCell.RowIndex;
@@ -486,11 +475,19 @@ namespace Avalonia.Controls
             }
             if (SelectedCells != null)
             {
+                object lastItem = null;
+                bool lastRemoved = false;
+                bool first = true;
                 foreach (DataGridCellInfo selectedCell in SelectedCells)
                 {
-                    object selectedCellItem = ProjectSelectionItem(selectedCell.Item);
-                    if (!preserveSelection ||
-                        identityMap.GetIndex(selectedCellItem) < 0)
+                    if (first || !ReferenceEquals(selectedCell.Item, lastItem))
+                    {
+                        first = false;
+                        lastItem = selectedCell.Item;
+                        lastRemoved = !preserveSelection || identityMap.GetIndex(ProjectSelectionItem(lastItem)) < 0;
+                    }
+
+                    if (lastRemoved)
                     {
                         removedCells.Add(selectedCell);
                     }
@@ -859,17 +856,71 @@ namespace Avalonia.Controls
                 IEnumerable selectionSource = selectionModel.Source;
                 bool detachGroupedSource =
                     DataConnection?.CollectionView?.IsGrouping == true && selectionSource != null;
-                if (detachGroupedSource)
+                var selectionOrder = new List<int>(selectedRows.Count);
+                for (int i = 0; i < selectedRows.Count; i++)
                 {
-                    selectionModel.Source = null;
+                    int rowIndex = selectedRows[i].RowIndex;
+                    int selectionIndex = rowIndex >= 0 && rowIndex < (DataConnection?.Count ?? 0)
+                        ? GetSelectionIndexFromRowIndex(rowIndex)
+                        : -1;
+                    if (selectionIndex >= 0)
+                    {
+                        selectionOrder.Add(selectionIndex);
+                    }
                 }
 
-                try
+                if (!detachGroupedSource && SelectionModelHolds(selectionOrder))
                 {
-                    using (_selectionModelAdapter.SelectedItemsView.SuppressNotifications())
-                    using (selectionModel.BatchUpdate())
+                    firstSelectionIndex = selectionOrder[0];
+                }
+                else
+                {
+                    if (detachGroupedSource)
                     {
-                        selectionModel.Clear();
+                        selectionModel.Source = null;
+                    }
+
+                    try
+                    {
+                        using (_selectionModelAdapter.SelectedItemsView.SuppressNotifications())
+                        using (selectionModel.BatchUpdate())
+                        {
+                            selectionModel.Clear();
+                            for (int i = 0; i < selectedRows.Count; i++)
+                            {
+                                int rowIndex = selectedRows[i].RowIndex;
+                                if (rowIndex < 0 || rowIndex >= (DataConnection?.Count ?? 0))
+                                {
+                                    continue;
+                                }
+
+                                int selectionIndex = GetSelectionIndexFromRowIndex(rowIndex);
+                                if (selectionIndex < 0)
+                                {
+                                    continue;
+                                }
+
+                                if (firstSelectionIndex < 0)
+                                {
+                                    firstSelectionIndex = selectionIndex;
+                                }
+                                _selectionModelAdapter.Select(selectionIndex);
+                            }
+                        }
+                    }
+                    finally
+                    {
+                        if (detachGroupedSource)
+                        {
+                            selectionModel.Source = selectionSource;
+                        }
+                    }
+
+                    // Some SelectionModel implementations publish the final source Reset as their
+                    // outer batch closes. Reassert any missing final indexes after that boundary,
+                    // while grid callbacks and SelectedItems notifications remain suppressed.
+                    using (_selectionModelAdapter.SelectedItemsView.SuppressNotifications())
+                    {
                         for (int i = 0; i < selectedRows.Count; i++)
                         {
                             int rowIndex = selectedRows[i].RowIndex;
@@ -879,44 +930,10 @@ namespace Avalonia.Controls
                             }
 
                             int selectionIndex = GetSelectionIndexFromRowIndex(rowIndex);
-                            if (selectionIndex < 0)
+                            if (selectionIndex >= 0 && !_selectionModelAdapter.IsSelected(selectionIndex))
                             {
-                                continue;
+                                _selectionModelAdapter.Select(selectionIndex);
                             }
-
-                            if (firstSelectionIndex < 0)
-                            {
-                                firstSelectionIndex = selectionIndex;
-                            }
-                            _selectionModelAdapter.Select(selectionIndex);
-                        }
-                    }
-                }
-                finally
-                {
-                    if (detachGroupedSource)
-                    {
-                        selectionModel.Source = selectionSource;
-                    }
-                }
-
-                // Some SelectionModel implementations publish the final source Reset as their
-                // outer batch closes. Reassert any missing final indexes after that boundary,
-                // while grid callbacks and SelectedItems notifications remain suppressed.
-                using (_selectionModelAdapter.SelectedItemsView.SuppressNotifications())
-                {
-                    for (int i = 0; i < selectedRows.Count; i++)
-                    {
-                        int rowIndex = selectedRows[i].RowIndex;
-                        if (rowIndex < 0 || rowIndex >= (DataConnection?.Count ?? 0))
-                        {
-                            continue;
-                        }
-
-                        int selectionIndex = GetSelectionIndexFromRowIndex(rowIndex);
-                        if (selectionIndex >= 0 && !_selectionModelAdapter.IsSelected(selectionIndex))
-                        {
-                            _selectionModelAdapter.Select(selectionIndex);
                         }
                     }
                 }
@@ -1079,12 +1096,9 @@ namespace Avalonia.Controls
                 return;
             }
 
-            for (int i = 0; i < identities.Count; i++)
+            if (identities is IdentityList set && !set.Positions.TryAdd(item, set.Count))
             {
-                if (ReferenceEquals(identities[i], item))
-                {
-                    return;
-                }
+                return;
             }
 
             identities.Add(item);
@@ -1122,7 +1136,7 @@ namespace Avalonia.Controls
         }
 
         private DataGridCellInfo CreateProspectiveCellInfo(
-            List<ProspectiveSelectionRow> rows,
+            ProspectiveRows rows,
             int rowIndex,
             int columnIndex)
         {
@@ -1147,7 +1161,7 @@ namespace Avalonia.Controls
         }
 
         private static DataGridSelectionAnchorInfo CreateProspectiveAnchorInfo(
-            List<ProspectiveSelectionRow> rows,
+            ProspectiveRows rows,
             int rowIndex,
             int columnIndex)
         {
@@ -2058,6 +2072,74 @@ namespace Avalonia.Controls
         }
 
         /// <summary>
+        /// The rows of the prospective source. Only the rows that are asked for (the current and
+        /// anchor rows) get a selection record, so a source change does not allocate one per row.
+        /// </summary>
+        private sealed class ProspectiveRows
+        {
+            private int _lastIndex = -1;
+            private ProspectiveSelectionRow _lastRow;
+
+            public ProspectiveRows(IEnumerable source)
+            {
+                Source = source;
+            }
+
+            public IEnumerable Source { get; }
+
+            public int Count;
+
+            public ProspectiveSelectionRow this[int index]
+            {
+                get
+                {
+                    if (index == _lastIndex)
+                    {
+                        return _lastRow;
+                    }
+
+                    if (index < 0 || index >= Count)
+                    {
+                        throw new ArgumentOutOfRangeException(nameof(index));
+                    }
+
+                    object rowDataContext = null;
+                    if (Source is IList list)
+                    {
+                        rowDataContext = list[index];
+                    }
+                    else
+                    {
+                        int i = 0;
+                        foreach (object candidate in Source)
+                        {
+                            if (i++ == index)
+                            {
+                                rowDataContext = candidate;
+                                break;
+                            }
+                        }
+                    }
+
+                    CreateSelectionItemContext(rowDataContext, out object item, out HierarchicalNode node, out IReadOnlyList<HierarchicalNode> path);
+                    _lastRow = new ProspectiveSelectionRow(rowDataContext, item, node, path);
+                    _lastIndex = index;
+                    return _lastRow;
+                }
+            }
+        }
+
+        private sealed class IdentityList : List<object>
+        {
+            public IdentityList(int capacity) : base(capacity)
+            {
+                Positions = new Dictionary<object, int>(capacity, ReferenceEqualityComparer.Instance);
+            }
+
+            public Dictionary<object, int> Positions { get; }
+        }
+
+        /// <summary>
         /// Resolves every captured identity as one occurrence-aware set. Exact references are
         /// assigned before equality fallback, so a removed item cannot steal the surviving row
         /// that belongs to a different equal-but-distinct selected/current/cell identity.
@@ -2066,50 +2148,81 @@ namespace Avalonia.Controls
         /// </summary>
         private sealed class ProspectiveIdentityMap
         {
-            private readonly IReadOnlyList<object> _identities;
             private readonly int[] _indexes;
+            private readonly Dictionary<object, int> _positions;
 
             public ProspectiveIdentityMap(
-                List<ProspectiveSelectionRow> rows,
-                IReadOnlyList<object> identities)
+                ProspectiveRows rows,
+                IdentityList identities)
             {
-                _identities = identities;
+                _positions = identities.Positions;
                 _indexes = new int[identities.Count];
                 Array.Fill(_indexes, -1);
-                var consumedRows = new bool[rows.Count];
 
-                for (int identityIndex = 0; identityIndex < identities.Count; identityIndex++)
+                int unresolved = _positions.Count;
+                int rowCount = 0;
+                if (rows.Source != null)
                 {
-                    object identity = identities[identityIndex];
-                    for (int rowIndex = 0; rowIndex < rows.Count; rowIndex++)
+                    foreach (object rowDataContext in rows.Source)
                     {
-                        if (!consumedRows[rowIndex] &&
-                            ReferenceEquals(rows[rowIndex].Item, identity))
+                        object candidate = rowDataContext is HierarchicalNode candidateNode ? candidateNode.Item ?? rowDataContext : rowDataContext;
+                        if (unresolved > 0 &&
+                            candidate != null &&
+                            _positions.TryGetValue(candidate, out int identityIndex) &&
+                            _indexes[identityIndex] < 0)
                         {
-                            _indexes[identityIndex] = rowIndex;
-                            consumedRows[rowIndex] = true;
+                            _indexes[identityIndex] = rowCount;
+                            unresolved--;
+                        }
+
+                        rowCount++;
+                        if (unresolved == 0 && rows.Source is ICollection collection)
+                        {
+                            rowCount = collection.Count;
                             break;
                         }
                     }
                 }
 
+                rows.Count = rowCount;
+                if (unresolved == 0 || rows.Source == null)
+                {
+                    return;
+                }
+
+                bool[] consumedRows = null;
                 for (int identityIndex = 0; identityIndex < identities.Count; identityIndex++)
                 {
-                    if (_indexes[identityIndex] >= 0)
+                    object identity = identities[identityIndex];
+                    if (_indexes[identityIndex] >= 0 || identity == null)
                     {
                         continue;
                     }
 
-                    object identity = identities[identityIndex];
-                    for (int rowIndex = 0; rowIndex < rows.Count; rowIndex++)
+                    if (consumedRows == null)
                     {
-                        if (!consumedRows[rowIndex] &&
-                            Equals(rows[rowIndex].Item, identity))
+                        consumedRows = new bool[rowCount];
+                        foreach (int resolved in _indexes)
+                        {
+                            if (resolved >= 0)
+                            {
+                                consumedRows[resolved] = true;
+                            }
+                        }
+                    }
+
+                    int rowIndex = 0;
+                    foreach (object rowDataContext in rows.Source)
+                    {
+                        object candidate = rowDataContext is HierarchicalNode candidateNode ? candidateNode.Item ?? rowDataContext : rowDataContext;
+                        if (rowIndex < rowCount && !consumedRows[rowIndex] && Equals(candidate, identity))
                         {
                             _indexes[identityIndex] = rowIndex;
                             consumedRows[rowIndex] = true;
                             break;
                         }
+
+                        rowIndex++;
                     }
                 }
             }
@@ -2121,15 +2234,7 @@ namespace Avalonia.Controls
                     return -1;
                 }
 
-                for (int i = 0; i < _identities.Count; i++)
-                {
-                    if (ReferenceEquals(_identities[i], item))
-                    {
-                        return _indexes[i];
-                    }
-                }
-
-                return -1;
+                return _positions.TryGetValue(item, out int i) ? _indexes[i] : -1;
             }
         }
 
