@@ -132,6 +132,19 @@ public sealed class DataGridReflectionTests
         Assert.Null(DataGridValueConverter.Instance.ConvertBack("", typeof(decimal?), null, CultureInfo.InvariantCulture));
     }
 
+    [Theory]
+    [InlineData(false)]
+    [InlineData(true)]
+    public void String_conversion_preserves_null_and_the_original_reference(bool reflectionEnabled)
+    {
+        using var settings = new ReflectionSetting(reflectionEnabled);
+        var culture = CultureInfo.GetCultureInfo("tr-TR");
+        foreach (string? value in new string?[] { null, string.Empty, new string('x', 32), "I\u0130" })
+        {
+            Assert.Same(value, DataGridValueConverter.Instance.Convert(value, typeof(string), new object(), culture));
+        }
+    }
+
     [Fact]
     public void Disabled_reflection_requires_an_explicit_converter_for_custom_target_types()
     {

@@ -40,6 +40,12 @@ namespace Avalonia.Controls
 
         public object? Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
         {
+            // Null and string identity need neither compatibility reflection nor conversion.
+            if (targetType == typeof(string) && (value == null || value is string))
+            {
+                return value;
+            }
+
             return DataGridReflectionOptions.IsEnabled
                 ? DefaultValueConverter.Instance.Convert(value, targetType, parameter, culture)
                 : ConvertWithoutReflection(value, targetType, culture);
