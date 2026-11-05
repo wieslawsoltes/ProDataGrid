@@ -1740,13 +1740,16 @@ internal
         IDataGridCollectionView CollectionView =>
             DataConnection.CollectionView;
 
+        // Estimators keep per-grid state, so no grid uses this instance: EffectiveRowHeightEstimator replaces it with the grid's own.
+        private static readonly AdvancedRowHeightEstimator SharedDefaultRowHeightEstimator = new AdvancedRowHeightEstimator();
+
         /// <summary>
         /// Identifies the RowHeightEstimator dependency property.
         /// </summary>
         public static readonly StyledProperty<IDataGridRowHeightEstimator> RowHeightEstimatorProperty =
             AvaloniaProperty.Register<DataGrid, IDataGridRowHeightEstimator>(
                 nameof(RowHeightEstimator),
-                defaultValue: new AdvancedRowHeightEstimator());
+                defaultValue: SharedDefaultRowHeightEstimator);
 
         /// <summary>
         /// Gets or sets the row height estimator used for scroll calculations.
