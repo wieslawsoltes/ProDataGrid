@@ -680,6 +680,28 @@ public class AdvancedRowHeightEstimatorTests : RowHeightEstimatorTestBase
         Assert.True(totalWithDetails > totalWithoutDetails);
     }
 
+    [Fact]
+    public void RowDetails_Above_The_Viewport_Do_Not_Feed_The_Scroll_Correction()
+    {
+        const int totalRows = 1000;
+        const double rowWithDetails = SmallRowHeight + DetailsHeight;
+        var estimator = CreateEstimator();
+        estimator.OnDataSourceChanged(totalRows);
+
+        for (int firstSlot = 0; firstSlot < 500; firstSlot += 10)
+        {
+            for (int slot = firstSlot; slot < firstSlot + 10; slot++)
+            {
+                estimator.RecordMeasuredHeight(slot, SmallRowHeight, true, DetailsHeight);
+            }
+
+            SimulateScroll(estimator, firstSlot, firstSlot + 9, CreateUniformHeights(10, rowWithDetails),
+                firstSlot * rowWithDetails, detailsCount: firstSlot + 10);
+
+            Assert.Equal(totalRows * rowWithDetails, estimator.CalculateTotalHeight(totalRows, 0, Array.Empty<int>(), totalRows), 3);
+        }
+    }
+
     #endregion
 
     #region Smooth Scroll Correction
