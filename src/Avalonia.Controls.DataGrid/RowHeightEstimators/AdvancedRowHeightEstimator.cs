@@ -315,7 +315,11 @@ namespace Avalonia.Controls
             _lastCollapsedSlotCount = collapsedSlotCount;
             _lastDetailsCount = detailsCount;
 
-            ProcessScrollCorrection(verticalOffset, negVerticalOffset, firstDisplayedSlot);
+            // EstimateOffsetToSlot leaves out row details, which are recorded apart from the rows' own heights.
+            if (detailsCount == 0)
+            {
+                ProcessScrollCorrection(verticalOffset, negVerticalOffset, firstDisplayedSlot);
+            }
         }
 
         /// <inheritdoc/>
