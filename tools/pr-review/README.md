@@ -27,3 +27,13 @@ DOTNET_TieredCompilation=0 dotnet tools/pr-review/async-probe/bin/Release/net10.
 ```
 
 See [RESULTS.md](RESULTS.md) for the measured revisions, balanced comparisons and limitations. Raw per-process samples are under `results/`.
+
+## Automated exact-revision comparison
+
+`run-comparison.py` (Python 3 standard library, Git and the .NET SDK required by each revision) creates two detached worktrees, copies the identical harness into each, builds both before timing, then runs eight independent processes in balanced order. Run from a repository clone with both commit objects available. Use a fresh output directory for every run. It fails on build/test errors and preserves raw samples and logs. Example:
+
+```sh
+python3 tools/pr-review/run-comparison.py --repo "$PWD" --output /absolute/new/output-directory --base BASE_SHA --candidate PR_SHA --scenario scroll
+```
+
+Repeat `--scenario` to run multiple workloads. Use `--supplemental` for `view-source` or `hierarchy-filtered`. Use `--order BAABABBA` with a new output directory for the reverse-order repeat. For #419, `--tracked-candidate` enables its opt-in workload; comparing that revision to itself with `--baseline-scenario cells --scenario cells-tracked` reproduces the mode comparison. Do not run other builds/tests during measurements. The script reports each process mean; it does not automatically approve a PR or treat small increases as acceptable.
