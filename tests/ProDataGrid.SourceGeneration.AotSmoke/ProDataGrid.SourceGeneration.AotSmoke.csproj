@@ -7,12 +7,18 @@
     <PublishAot>true</PublishAot>
     <PublishTrimmed>true</PublishTrimmed>
     <TrimMode>full</TrimMode>
+    <TrimmerSingleWarn>false</TrimmerSingleWarn>
+    <ProDataGridReflectionEnabled Condition="'$(ProDataGridReflectionEnabled)' == ''">false</ProDataGridReflectionEnabled>
     <IlcOptimizationPreference>Speed</IlcOptimizationPreference>
     <IlcGenerateStackTraceData>false</IlcGenerateStackTraceData>
     <ILLinkTreatWarningsAsErrors>true</ILLinkTreatWarningsAsErrors>
     <WarningsAsErrors>$(WarningsAsErrors);IL2026;IL2070;IL2075;IL3050</WarningsAsErrors>
     <IsPackable>false</IsPackable>
   </PropertyGroup>
+
+  <ItemGroup>
+    <RuntimeHostConfigurationOption Include="ProDataGrid.Reflection.IsEnabled" Value="$(ProDataGridReflectionEnabled)" Trim="true" />
+  </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="ReactiveUI" />

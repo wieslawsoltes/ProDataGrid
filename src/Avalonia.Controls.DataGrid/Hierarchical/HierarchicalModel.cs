@@ -504,7 +504,6 @@ namespace Avalonia.Controls.DataGridHierarchical
     /// <summary>
     /// Default hierarchical model implementation (initial scaffolding).
     /// </summary>
-    [RequiresUnreferencedCode("HierarchicalModel uses reflection to access property paths and is not compatible with trimming.")]
     #if !DATAGRID_INTERNAL
     public
     #else
@@ -4244,6 +4243,11 @@ namespace Avalonia.Controls.DataGridHierarchical
             for (int i = 0; i < parts.Length; i++)
             {
                 var propertyName = parts[i].Trim();
+                if (!DataGridReflectionOptions.IsEnabled)
+                {
+                    throw DataGridReflectionOptions.CreateException("Property-path hierarchy access");
+                }
+
                 var property = currentType.GetProperty(
                     propertyName,
                     BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
@@ -4289,6 +4293,11 @@ namespace Avalonia.Controls.DataGridHierarchical
             for (int i = 0; i < parts.Length; i++)
             {
                 var propertyName = parts[i].Trim();
+                if (!DataGridReflectionOptions.IsEnabled)
+                {
+                    throw DataGridReflectionOptions.CreateException("Property-path hierarchy access");
+                }
+
                 var property = currentType.GetProperty(
                     propertyName,
                     BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);

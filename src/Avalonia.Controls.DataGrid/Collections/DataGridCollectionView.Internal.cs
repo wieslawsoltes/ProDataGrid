@@ -130,6 +130,13 @@ namespace Avalonia.Collections
         /// </summary>
         private void EnsureItemConstructor()
         {
+            if (!DataGridReflectionOptions.IsEnabled)
+            {
+                _itemConstructor = null;
+                _itemConstructorIsValid = true;
+                return;
+            }
+
             if (!_itemConstructorIsValid)
             {
                 Type itemType = ItemType;
@@ -276,6 +283,11 @@ namespace Avalonia.Collections
         /// <returns>The type of the items in the collection</returns>
         private Type GetItemType(bool useRepresentativeItem)
         {
+            if (!DataGridReflectionOptions.IsEnabled)
+            {
+                return useRepresentativeItem ? GetRepresentativeItem()?.GetType() : null;
+            }
+
             Type collectionType = SourceCollection.GetType();
             Type[] interfaces = collectionType.GetInterfaces();
 
@@ -560,6 +572,11 @@ namespace Avalonia.Collections
 
         private bool TryApplyBindingListSort()
         {
+            if (!DataGridReflectionOptions.IsEnabled)
+            {
+                return false;
+            }
+
             if (_bindingList == null || !_bindingList.SupportsSorting)
             {
                 return false;

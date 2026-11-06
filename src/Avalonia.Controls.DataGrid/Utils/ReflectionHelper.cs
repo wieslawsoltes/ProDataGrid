@@ -15,7 +15,6 @@ using System.Reflection;
 
 namespace Avalonia.Controls.Utils
 {
-    [RequiresUnreferencedCode("TypeHelper uses reflection to walk property paths and is not compatible with trimming.")]
     internal static class TypeHelper
     {
         internal const char LeftIndexerToken = '[';
@@ -98,6 +97,7 @@ namespace Avalonia.Controls.Utils
             return stringIndexer;
         }
 
+        [RequiresUnreferencedCode("Property metadata discovery requires the runtime item members to be preserved.")]
         private static PropertyInfo? FindIndexerInInterfaces(Type type, string stringIndex, out object[]? index)
         {
             PropertyInfo? candidate = null;
@@ -169,6 +169,7 @@ namespace Avalonia.Controls.Utils
             return candidate;
         }
 
+        [RequiresUnreferencedCode("Property metadata discovery requires the runtime item members to be preserved.")]
         private static PropertyInfo? FindPropertyInInterfaces(Type type, string propertyName)
         {
             PropertyInfo? candidate = null;
@@ -229,6 +230,7 @@ namespace Avalonia.Controls.Utils
         /// </summary>
         /// <param name="type">Type to check.</param>
         /// <returns>Default member name.</returns>
+        [RequiresUnreferencedCode("Property metadata discovery requires the runtime item members to be preserved.")]
         private static string? GetDefaultMemberName(this Type type)
         {
             object[] attributes = type.GetCustomAttributes(typeof(DefaultMemberAttribute), true);
@@ -253,6 +255,17 @@ namespace Avalonia.Controls.Utils
         /// <returns>DisplayAttribute.ShortName if it exists, null otherwise</returns>
         internal static string? GetDisplayName(this Type type, string propertyPath)
         {
+            if (!DataGridReflectionOptions.IsEnabled)
+            {
+                return null;
+            }
+
+            return GetDisplayNameWithReflection(type, propertyPath);
+        }
+
+        [RequiresUnreferencedCode("Property-path compatibility requires item members and metadata that trimming cannot infer.")]
+        private static string? GetDisplayNameWithReflection(Type type, string propertyPath)
+        {
             PropertyInfo? propertyInfo = type.GetNestedProperty(propertyPath);
             if (propertyInfo != null)
             {
@@ -271,6 +284,11 @@ namespace Avalonia.Controls.Utils
 
         internal static Type GetEnumerableItemType(this Type enumerableType)
         {
+            if (!DataGridReflectionOptions.IsEnabled)
+            {
+                return enumerableType.IsArray ? enumerableType.GetElementType()! : typeof(object);
+            }
+
             Type? type = FindGenericType(typeof(IEnumerable<>), enumerableType);
             if (type != null)
             {
@@ -289,6 +307,17 @@ namespace Avalonia.Controls.Utils
         /// <param name="item">Parent item which will be set to the property value if non-null.</param>
         /// <returns></returns>
         private static PropertyInfo? GetNestedProperty(this Type? parentType, string? propertyPath, out Exception? exception, ref object? item)
+        {
+            if (!DataGridReflectionOptions.IsEnabled)
+            {
+                throw DataGridReflectionOptions.CreateException("Property-path access");
+            }
+
+            return GetNestedPropertyWithReflection(parentType, propertyPath, out exception, ref item);
+        }
+
+        [RequiresUnreferencedCode("Property-path compatibility requires item members and metadata that trimming cannot infer.")]
+        private static PropertyInfo? GetNestedPropertyWithReflection(Type? parentType, string? propertyPath, out Exception? exception, ref object? item)
         {
             exception = null;
             if (parentType == null || String.IsNullOrEmpty(propertyPath))
@@ -554,6 +583,18 @@ namespace Avalonia.Controls.Utils
         /// <returns>PropertyInfo for either a property or an indexer.</returns>
         internal static PropertyInfo? GetPropertyOrIndexer(this Type type, string? propertyPath, out object[]? index)
         {
+            if (!DataGridReflectionOptions.IsEnabled)
+            {
+                throw DataGridReflectionOptions.CreateException("Property-path access");
+            }
+
+            return GetPropertyOrIndexerWithReflection(type, propertyPath, out index);
+        }
+
+        [RequiresUnreferencedCode("Property-path compatibility requires item members and metadata that trimming cannot infer.")]
+        [RequiresDynamicCode("Property-path compatibility may construct generic indexer types at runtime.")]
+        private static PropertyInfo? GetPropertyOrIndexerWithReflection(Type type, string? propertyPath, out object[]? index)
+        {
             index = null;
 
             if (string.IsNullOrEmpty(propertyPath))
@@ -632,7 +673,9 @@ namespace Avalonia.Controls.Utils
 
         internal static bool IsEnumerableType(this Type enumerableType)
         {
-            return (FindGenericType(typeof(IEnumerable<>), enumerableType) != null);
+            return DataGridReflectionOptions.IsEnabled
+                ? FindGenericType(typeof(IEnumerable<>), enumerableType) != null
+                : typeof(IEnumerable).IsAssignableFrom(enumerableType);
         }
 
         internal static bool IsNullableType(this Type type)
@@ -656,7 +699,7 @@ namespace Avalonia.Controls.Utils
         /// <returns>Property with default member name prepended, or property if unchanged.</returns>
         internal static string? PrependDefaultMemberName(object? item, string? property)
         {
-            if (item != null && !string.IsNullOrEmpty(property) && property![0] == TypeHelper.LeftIndexerToken)
+            if (DataGridReflectionOptions.IsEnabled && item != null && !string.IsNullOrEmpty(property) && property![0] == TypeHelper.LeftIndexerToken)
             {
                 // The leaf property name is an indexer, so add the default member name.
                 Type? declaringType = item.GetType();

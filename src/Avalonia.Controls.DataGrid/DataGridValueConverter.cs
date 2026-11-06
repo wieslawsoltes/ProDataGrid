@@ -15,11 +15,40 @@ namespace Avalonia.Controls
 {
     internal class DataGridValueConverter : IValueConverter
     {
+        private static object? ConvertWithoutReflection(object? value, Type targetType, CultureInfo culture)
+        {
+            if (value == null || targetType.IsInstanceOfType(value))
+            {
+                return value;
+            }
+
+            targetType = Nullable.GetUnderlyingType(targetType) ?? targetType;
+            if (targetType == typeof(string))
+            {
+                return System.Convert.ToString(value, culture);
+            }
+
+            if (!targetType.IsEnum && value is IConvertible && Type.GetTypeCode(targetType) != TypeCode.Object)
+            {
+                return System.Convert.ChangeType(value, targetType, culture);
+            }
+
+            throw DataGridReflectionOptions.CreateException("Custom value conversion; supply an explicit converter");
+        }
+
         public static DataGridValueConverter Instance = new DataGridValueConverter();
 
         public object? Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
         {
-            return DefaultValueConverter.Instance.Convert(value, targetType, parameter, culture);
+            // Null and string identity need neither compatibility reflection nor conversion.
+            if (targetType == typeof(string) && (value == null || value is string))
+            {
+                return value;
+            }
+
+            return DataGridReflectionOptions.IsEnabled
+                ? DefaultValueConverter.Instance.Convert(value, targetType, parameter, culture)
+                : ConvertWithoutReflection(value, targetType, culture);
         }
 
 
@@ -38,7 +67,9 @@ namespace Avalonia.Controls
                     return null;
                 }
             }
-            return DefaultValueConverter.Instance.ConvertBack(value, targetType, parameter, culture);
+            return DataGridReflectionOptions.IsEnabled
+                ? DefaultValueConverter.Instance.ConvertBack(value, targetType, parameter, culture)
+                : ConvertWithoutReflection(value, targetType, culture);
         }
     }
 }

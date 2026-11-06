@@ -396,6 +396,11 @@ namespace Avalonia.Controls
                     return collection.Count;
                 }
 
+                if (!DataGridReflectionOptions.IsEnabled)
+                {
+                    return null;
+                }
+
                 var interfaces = dataSource.GetType().GetInterfaces();
                 foreach (var candidate in interfaces)
                 {

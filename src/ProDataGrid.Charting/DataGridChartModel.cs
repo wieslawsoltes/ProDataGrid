@@ -3975,6 +3975,11 @@ namespace ProDataGrid.Charting
 
             private static AccessorEntry CreateAccessor(string path)
             {
+                if (!Avalonia.Controls.DataGridReflectionOptions.IsEnabled)
+                {
+                    throw new NotSupportedException("Chart property paths require reflection. Supply typed chart field accessors instead.");
+                }
+
                 var parts = path.Split(new[] { '.' }, StringSplitOptions.RemoveEmptyEntries);
                 return new AccessorEntry(target =>
                 {

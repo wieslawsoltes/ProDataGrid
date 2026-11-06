@@ -517,6 +517,11 @@ namespace Avalonia.Controls.DataGridSorting
                     return null;
                 }
 
+                if (!DataGridReflectionOptions.IsEnabled)
+                {
+                    throw DataGridReflectionOptions.CreateException("Property-path sorting");
+                }
+
                 return DataGridSortDescription.FromPath(descriptor.PropertyPath, descriptor.Direction, descriptor.Culture);
             }
 

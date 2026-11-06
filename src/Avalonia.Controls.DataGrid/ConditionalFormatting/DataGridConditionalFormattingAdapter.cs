@@ -21,7 +21,6 @@ namespace Avalonia.Controls.DataGridConditionalFormatting
     /// <summary>
     /// Evaluates conditional formatting descriptors against the view and current items.
     /// </summary>
-    [RequiresUnreferencedCode("DataGridConditionalFormattingAdapter uses reflection to access item properties and is not compatible with trimming.")]
 #if !DATAGRID_INTERNAL
     public
 #else

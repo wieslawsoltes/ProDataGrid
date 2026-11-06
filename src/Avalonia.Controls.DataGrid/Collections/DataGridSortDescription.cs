@@ -336,12 +336,22 @@ internal
         [RequiresUnreferencedCode("Path-based sorting uses reflection and is not compatible with trimming.")]
         public static DataGridSortDescription FromPath(string propertyPath, ListSortDirection direction = ListSortDirection.Ascending, CultureInfo culture = null)
         {
+            if (!DataGridReflectionOptions.IsEnabled)
+            {
+                throw DataGridReflectionOptions.CreateException("Property-path sorting");
+            }
+
             return new DataGridPathSortDescription(propertyPath, direction, null, culture);
         }
 
         [RequiresUnreferencedCode("Path-based sorting uses reflection and is not compatible with trimming.")]
         public static DataGridSortDescription FromPath(string propertyPath, ListSortDirection direction, IComparer comparer)
         {
+            if (!DataGridReflectionOptions.IsEnabled)
+            {
+                throw DataGridReflectionOptions.CreateException("Property-path sorting");
+            }
+
             return new DataGridPathSortDescription(propertyPath, direction, comparer, null);
         }
 
