@@ -997,6 +997,44 @@ internal
         }
 
         /// <summary>
+        /// Identifies the <see cref="TrackSelectedCellsByItem"/> property.
+        /// </summary>
+#if !DATAGRID_INTERNAL
+        public
+#else
+        internal
+#endif
+        static readonly StyledProperty<bool> TrackSelectedCellsByItemProperty =
+            AvaloniaProperty.Register<DataGrid, bool>(nameof(TrackSelectedCellsByItem));
+
+        /// <summary>
+        /// Gets or sets whether selected cells follow their row item instead of their row index.
+        /// When <c>true</c>, the <see cref="DataGridCellInfo.RowIndex"/> of a selected cell reports
+        /// the current row of its item, and inserting, removing, moving or sorting rows no longer
+        /// rewrites the selected cells or raises <see cref="SelectedCellsChanged"/> for cells that only
+        /// moved; cells only leave the selection when their row leaves the view. When <c>false</c>
+        /// (the default), selected cells are kept by row index and every row change that moves a selected
+        /// cell reports it with its new row index.
+        /// </summary>
+        /// <remarks>
+        /// Rows are identified by item reference (value-type items by value). A selected cell whose item is
+        /// shown by more than one row cannot follow its item, so as soon as the cell selection includes such
+        /// an item (a cell is selected in one of those rows, or a row change shows a selected item again),
+        /// the selected cells are kept by row index, exactly as when this property is <c>false</c>, until
+        /// the cell selection is cleared. Each of those rows then has its own cells.
+        /// </remarks>
+#if !DATAGRID_INTERNAL
+        public
+#else
+        internal
+#endif
+        bool TrackSelectedCellsByItem
+        {
+            get { return GetValue(TrackSelectedCellsByItemProperty); }
+            set { SetValue(TrackSelectedCellsByItemProperty, value); }
+        }
+
+        /// <summary>
         /// Gets or sets whether drag selection is allowed for touch or pen input.
         /// </summary>
 #if !DATAGRID_INTERNAL

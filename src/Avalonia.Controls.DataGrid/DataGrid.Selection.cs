@@ -365,7 +365,11 @@ internal
                     return;
                 }
 
-                ClearRowSelection(resetAnchorSlot: true);
+                bool unchanged = _selectedItems.HasSlotsInOrder(mapped);
+                if (!unchanged)
+                {
+                    ClearRowSelection(resetAnchorSlot: true);
+                }
 
                 int? firstSlot = null;
                 foreach (var entry in mapped)
@@ -376,7 +380,16 @@ internal
                     {
                         firstSlot = slot;
                     }
-                    SetRowSelection(slot, isSelected: true, setAnchorSlot: firstSlot == slot);
+                    if (!unchanged)
+                    {
+                        SetRowSelection(slot, isSelected: true, setAnchorSlot: firstSlot == slot);
+                    }
+                }
+
+                if (unchanged)
+                {
+                    AnchorSlot = firstSlot ?? -1;
+                    SelectionHasChanged = true;
                 }
 
                 if (firstSlot.HasValue)
@@ -1240,6 +1253,7 @@ internal
 
         private void OnSelectedCellsCollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
         {
+            InvalidateSelectedCellDisplayRange();
             if (_syncingSelectedCells || _selectedCellsBinding == null)
             {
                 return;
@@ -1622,13 +1636,42 @@ internal
             return true;
         }
 
-        internal void RemapSelectedCellsToCurrentRows()
+        internal void RemapSelectedCellsToCurrentRows(NotifyCollectionChangedEventArgs sourceChange = null)
         {
-            if (_selectedCellsView.Count == 0 || DataConnection == null)
+            if (_selectedCells.Count == 0 || DataConnection == null)
             {
                 return;
             }
 
+            StopTrackingIfRowsRepeatSelectedCellItem(GetRowItems(), sourceChange);
+            if (!_trackSelectedCellsByItem)
+            {
+                RemapSelectedCellsToCurrentRowIndexes();
+                return;
+            }
+
+            var lostRows = new HashSet<object>(SelectedRowComparer.Instance);
+            foreach (CellRowKey row in _selectedCells.Keys)
+            {
+                if (!TryGetRowIndexFromItem(row.Item, out _))
+                {
+                    lostRows.Add(row.Item);
+                }
+            }
+
+            if (lostRows.Count == 0)
+            {
+                return;
+            }
+
+            RemoveSelectedCells(cell => lostRows.Contains(SelectedRowKey(cell.Item)), out List<DataGridCellInfo> removed);
+            RefreshSelectedColumnsFromCounts();
+            ApplySelectedCellsChangeToBinding(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset));
+            RaiseSelectedCellsChanged(Array.Empty<DataGridCellInfo>(), removed);
+        }
+
+        private void RemapSelectedCellsToCurrentRowIndexes()
+        {
             var remapped = new List<DataGridCellInfo>(_selectedCellsView.Count);
             var seen = new HashSet<(int RowIndex, int ColumnIndex)>();
             var resolvedRows = new Dictionary<object, int>(ReferenceEqualityComparer.Instance);
@@ -1728,11 +1771,11 @@ internal
                     }
                 }
 
-                foreach (var rowIndex in _selectedCells.Keys)
+                foreach (var rowIndex in rowsToSelect)
                 {
                     if (IsRowFullySelectedByCells(rowIndex))
                     {
-                        _selectedRowHeaderIndices.Add(rowIndex);
+                        _selectedRowHeaderIndices.Add(SelectedRowKeyAt(rowIndex));
                     }
                 }
 
@@ -1767,15 +1810,18 @@ internal
                 _selectedColumnCounts.Clear();
                 ClearHeaderSelectionTracking();
 
+                var rowIndexes = new HashSet<int>();
                 for (int i = 0; i < remapped.Count; i++)
                 {
                     DataGridCellInfo cell = remapped[i];
-                    if (!_selectedCells.TryGetValue(cell.RowIndex, out HashSet<int> columns))
+                    CellRowKey row = SelectedRowKeyOf(cell);
+                    if (!_selectedCells.TryGetValue(row, out HashSet<int> columns))
                     {
                         columns = new HashSet<int>();
-                        _selectedCells[cell.RowIndex] = columns;
+                        _selectedCells[row] = columns;
                     }
                     columns.Add(cell.ColumnIndex);
+                    rowIndexes.Add(cell.RowIndex);
 
                     if (_selectedColumnCounts.TryGetValue(cell.ColumnIndex, out int count))
                     {
@@ -1814,13 +1860,14 @@ internal
                 // are emitted below only after cells, columns, row headers, and column headers
                 // all represent the same final transaction state.
                 cellsChanged = _selectedCellsView.ReplaceAllSilently(remapped);
+                InvalidateSelectedCellDisplayRange();
                 columnsChanged = _selectedColumnsView.ReplaceAllSilently(newSelectedColumns);
 
-                foreach (int rowIndex in _selectedCells.Keys)
+                foreach (int rowIndex in rowIndexes)
                 {
                     if (IsRowFullySelectedByCells(rowIndex))
                     {
-                        _selectedRowHeaderIndices.Add(rowIndex);
+                        _selectedRowHeaderIndices.Add(SelectedRowKeyAt(rowIndex));
                     }
                 }
 
@@ -1888,6 +1935,163 @@ internal
             }
         }
 
+        internal void RetargetSelectedCellColumns()
+        {
+            if (!_selectedCellColumnsStale)
+            {
+                return;
+            }
+
+            _selectedCellColumnsStale = false;
+            var added = new List<DataGridCellInfo>();
+            var removed = new List<DataGridCellInfo>();
+            _selectedCellsView.ConvertAllSilently(cell =>
+            {
+                DataGridColumn column = GetColumnForIndex(cell.ColumnIndex);
+                if (column == null || ReferenceEquals(column, cell.Column))
+                {
+                    return cell;
+                }
+
+                var retargeted = new DataGridCellInfo(cell.Item, column, cell.RowIndex, cell.ColumnIndex, isValid: true, tracksItem: _trackSelectedCellsByItem);
+                removed.Add(cell.AtCurrentRow());
+                added.Add(retargeted.AtCurrentRow());
+                return retargeted;
+            });
+            InvalidateSelectedCellDisplayRange();
+
+            if (removed.Count == 0)
+            {
+                return;
+            }
+
+            bool previousSync = _syncingSelectedCells;
+            _syncingSelectedCells = true;
+            try
+            {
+                _selectedCellsView.RaiseResetNotification();
+            }
+            finally
+            {
+                _syncingSelectedCells = previousSync;
+            }
+
+            ApplySelectedCellsChangeToBinding(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset));
+            RaiseSelectedCellsChanged(added, removed);
+        }
+
+        private void OnTrackSelectedCellsByItemChanged(AvaloniaPropertyChangedEventArgs e)
+        {
+            SetSelectedCellsTracking(e.GetNewValue<bool>());
+        }
+
+        internal void RemoveSelectedCellsAfterItemsSourceMutation(
+            HashSet<object> lostRows,
+            IReadOnlyList<DataGridCellInfo> lostCells)
+        {
+            var hiddenColumns = new HashSet<int>();
+            foreach (int columnIndex in _selectedColumnCounts.Keys)
+            {
+                DataGridColumn column = GetColumnForIndex(columnIndex);
+                if (column == null || !column.IsVisible || column is DataGridFillerColumn)
+                {
+                    hiddenColumns.Add(columnIndex);
+                }
+            }
+
+            var reported = new List<DataGridCellInfo>();
+            if (lostRows.Count > 0 || hiddenColumns.Count > 0)
+            {
+                foreach (DataGridCellInfo cell in lostCells)
+                {
+                    if (lostRows.Contains(SelectedRowKey(cell.Item)))
+                    {
+                        reported.Add(cell);
+                    }
+                }
+
+                RemoveSelectedCells(cell => lostRows.Contains(SelectedRowKey(cell.Item)) || hiddenColumns.Contains(cell.ColumnIndex), out List<DataGridCellInfo> removed);
+                foreach (DataGridCellInfo cell in removed)
+                {
+                    if (!lostRows.Contains(SelectedRowKey(cell.Item)))
+                    {
+                        reported.Add(cell);
+                    }
+                }
+            }
+
+            bool previousColumnSync = _syncingSelectedColumns;
+            _syncingSelectedColumns = true;
+            var oldSelectedColumns = _selectedColumnsView.ToList();
+            try
+            {
+                RefreshSelectedColumnsFromCounts();
+            }
+            finally
+            {
+                _syncingSelectedColumns = previousColumnSync;
+            }
+
+            if (reported.Count > 0)
+            {
+                ApplySelectedCellsChangeToBinding(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset));
+                RaiseSelectedCellsChanged(Array.Empty<DataGridCellInfo>(), reported);
+            }
+
+            var newSelectedColumns = _selectedColumnsView.ToList();
+            var addedColumns = newSelectedColumns.Where(column => !oldSelectedColumns.Contains(column)).ToList();
+            var removedColumns = oldSelectedColumns.Where(column => !newSelectedColumns.Contains(column)).ToList();
+            if (addedColumns.Count > 0 || removedColumns.Count > 0)
+            {
+                RaiseSelectedColumnsChanged(addedColumns, removedColumns);
+                ApplySelectedColumnsChangeToBinding(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset));
+            }
+        }
+
+        private void RemoveSelectedCells(Predicate<DataGridCellInfo> match, out List<DataGridCellInfo> removed)
+        {
+            removed = new List<DataGridCellInfo>();
+            bool previousSync = _syncingSelectedCells;
+            _syncingSelectedCells = true;
+            try
+            {
+                _selectedCellsView.RemoveAllSilently(match, removed);
+                InvalidateSelectedCellDisplayRange();
+                for (int i = 0; i < removed.Count; i++)
+                {
+                    DataGridCellInfo cell = removed[i];
+                    removed[i] = cell.AtCurrentRow();
+                    CellRowKey row = SelectedRowKeyOf(cell);
+                    if (_selectedCells.TryGetValue(row, out HashSet<int> columns) && columns.Remove(cell.ColumnIndex) && columns.Count == 0)
+                    {
+                        _selectedCells.Remove(row);
+                        _selectedRowHeaderIndices.Remove(row);
+                    }
+
+                    if (_selectedColumnCounts.TryGetValue(cell.ColumnIndex, out int count))
+                    {
+                        if (count > 1)
+                        {
+                            _selectedColumnCounts[cell.ColumnIndex] = count - 1;
+                        }
+                        else
+                        {
+                            _selectedColumnCounts.Remove(cell.ColumnIndex);
+                        }
+                    }
+                }
+
+                if (removed.Count > 0)
+                {
+                    _selectedCellsView.RaiseResetNotification();
+                }
+            }
+            finally
+            {
+                _syncingSelectedCells = previousSync;
+            }
+        }
+
         private void ClearCellSelectionInternal(bool clearRows, bool raiseEvent = true)
         {
             if (_selectedCells.Count == 0 &&
@@ -1895,6 +2099,7 @@ internal
                 _selectedColumnCounts.Count == 0 &&
                 _selectedColumnsView.Count == 0)
             {
+                _trackSelectedCellsByItem = TrackSelectedCellsByItem;
                 return;
             }
 
@@ -1903,6 +2108,7 @@ internal
             _selectedCells.Clear();
             _selectedCellsView.Clear();
             ClearHeaderSelectionTracking();
+            _trackSelectedCellsByItem = TrackSelectedCellsByItem;
             ClearSelectedColumnsInternal(raiseEvent);
 
             if (clearRows && SelectionUnit != DataGridSelectionUnit.FullRow)
@@ -1925,10 +2131,17 @@ internal
 
         private bool AddCellSelectionInternal(DataGridCellInfo cell, List<DataGridCellInfo>? addedCollector = null)
         {
-            if (!_selectedCells.TryGetValue(cell.RowIndex, out var columns))
+            CellRowKey row = SelectedRowKeyOf(cell);
+            if (_trackSelectedCellsByItem && !_selectedCells.ContainsKey(row) && IsRepeatedRowItem(cell.Item))
+            {
+                SetSelectedCellsTracking(false);
+                row = SelectedRowKeyOf(cell);
+            }
+
+            if (!_selectedCells.TryGetValue(row, out var columns))
             {
                 columns = new HashSet<int>();
-                _selectedCells[cell.RowIndex] = columns;
+                _selectedCells[row] = columns;
             }
 
             if (!columns.Add(cell.ColumnIndex))
@@ -1936,6 +2149,7 @@ internal
                 return false;
             }
 
+            cell = _trackSelectedCellsByItem ? cell.TrackingItem() : cell.AtCurrentRow();
             _selectedCellsView.Add(cell);
             UpdateSelectedColumnCount(cell.ColumnIndex, delta: 1);
 
@@ -1945,17 +2159,18 @@ internal
 
         private bool RemoveCellSelectionInternal(int rowIndex, int columnIndex, List<DataGridCellInfo>? removedCollector = null)
         {
-            if (!_selectedCells.TryGetValue(rowIndex, out var columns) || !columns.Remove(columnIndex))
+            CellRowKey row = SelectedRowKeyAt(rowIndex);
+            if (!_selectedCells.TryGetValue(row, out var columns) || !columns.Remove(columnIndex))
             {
                 return false;
             }
 
             if (columns.Count == 0)
             {
-                _selectedCells.Remove(rowIndex);
+                _selectedCells.Remove(row);
             }
 
-            var existing = _selectedCellsView.FirstOrDefault(x => x.RowIndex == rowIndex && x.ColumnIndex == columnIndex);
+            var existing = _selectedCellsView.FirstOrDefault(x => x.ColumnIndex == columnIndex && SelectedRowKeyOf(x).Equals(row));
             if (existing.IsValid)
             {
                 _selectedCellsView.Remove(existing);
@@ -1964,9 +2179,9 @@ internal
 
             UpdateSelectedColumnCount(columnIndex, delta: -1);
 
-            if (_selectedRowHeaderIndices.Contains(rowIndex) && !IsRowFullySelectedByCells(rowIndex))
+            if (_selectedRowHeaderIndices.Contains(row) && !IsRowFullySelectedByCells(rowIndex))
             {
-                _selectedRowHeaderIndices.Remove(rowIndex);
+                _selectedRowHeaderIndices.Remove(row);
             }
 
             if (_selectedColumnHeaderIndices.Contains(columnIndex) && !IsColumnFullySelectedByCells(columnIndex))
@@ -2307,7 +2522,240 @@ internal
 
         internal bool IsCellSelected(int rowIndex, int columnIndex)
         {
-            return _selectedCells.TryGetValue(rowIndex, out var columns) && columns.Contains(columnIndex);
+            return _selectedCells.Count != 0 && _selectedCells.TryGetValue(SelectedRowKeyAt(rowIndex), out var columns) && columns.Contains(columnIndex);
+        }
+
+        internal int GetTrackedRowIndex(object? item, int rowIndex)
+        {
+            if (DataConnection == null)
+            {
+                return rowIndex;
+            }
+
+            if (rowIndex < DataConnection.Count && ReferenceEquals(DataConnection.GetDataItem(rowIndex), item))
+            {
+                return rowIndex;
+            }
+
+            return TryGetRowIndexFromItem(item, out int current) ? current : -1;
+        }
+
+        private CellRowKey SelectedRowKeyAt(int rowIndex)
+        {
+            if (!_trackSelectedCellsByItem)
+            {
+                return CellRowKey.AtIndex(rowIndex);
+            }
+
+            return CellRowKey.ForItem(rowIndex >= 0 && DataConnection != null && rowIndex < DataConnection.Count
+                ? SelectedRowKey(DataConnection.GetDataItem(rowIndex))
+                : SelectedRowComparer.OutOfRange);
+        }
+
+        private CellRowKey SelectedRowKeyOf(DataGridCellInfo cell) =>
+            _trackSelectedCellsByItem ? CellRowKey.ForItem(SelectedRowKey(cell.Item)) : CellRowKey.AtIndex(cell.RowIndex);
+
+        private int RowIndexOf(CellRowKey row) =>
+            row.Item == null ? row.RowIndex : TryGetRowIndexFromItem(row.Item, out int rowIndex) ? rowIndex : -1;
+
+        private static object SelectedRowKey(object? item) => item ?? SelectedRowComparer.NoRow;
+
+        private List<object> SelectedCellItems()
+        {
+            var items = new List<object>(_selectedCells.Count);
+            if (_trackSelectedCellsByItem)
+            {
+                foreach (CellRowKey row in _selectedCells.Keys)
+                {
+                    items.Add(row.Item);
+                }
+
+                return items;
+            }
+
+            object last = null;
+            for (int i = 0; i < _selectedCellsView.Count; i++)
+            {
+                object row = SelectedRowKey(_selectedCellsView[i].Item);
+                if (items.Count == 0 || !SelectedRowComparer.Instance.Equals(row, last))
+                {
+                    items.Add(row);
+                    last = row;
+                }
+            }
+
+            return items;
+        }
+
+        private IEnumerable<object> GetRowItems()
+        {
+            for (int i = 0; DataConnection != null && i < DataConnection.Count; i++)
+            {
+                yield return DataConnection.GetDataItem(i);
+            }
+        }
+
+        private bool IsRepeatedRowItem(object item)
+        {
+            SelectedCellsLayout layout = s_selectedCellsLayouts.GetOrCreateValue(this);
+            if (layout.RepeatedRowItems == null)
+            {
+                var rows = new HashSet<object>(SelectedRowComparer.Instance);
+                var repeated = new HashSet<object>(SelectedRowComparer.Instance);
+                foreach (object rowItem in GetRowItems())
+                {
+                    object row = SelectedRowKey(rowItem);
+                    if (!rows.Add(row))
+                    {
+                        repeated.Add(row);
+                    }
+                }
+
+                layout.RepeatedRowItems = repeated;
+            }
+
+            return layout.RepeatedRowItems.Count != 0 && layout.RepeatedRowItems.Contains(SelectedRowKey(item));
+        }
+
+        private bool RowsRepeatSelectedCellItem(IEnumerable rows, NotifyCollectionChangedEventArgs sourceChange)
+        {
+            switch (sourceChange?.Action)
+            {
+                case NotifyCollectionChangedAction.Remove:
+                case NotifyCollectionChangedAction.Move:
+                    return false;
+                case NotifyCollectionChangedAction.Add:
+                case NotifyCollectionChangedAction.Replace:
+                    foreach (object item in sourceChange.NewItems ?? Array.Empty<object>())
+                    {
+                        object row = SelectedRowKey(item);
+                        if (_selectedCells.ContainsKey(CellRowKey.ForItem(row)) &&
+                            sourceChange.OldItems?.Cast<object>().Any(old => SelectedRowComparer.Instance.Equals(SelectedRowKey(old), row)) != true)
+                        {
+                            return true;
+                        }
+                    }
+
+                    return false;
+            }
+
+            var seen = new HashSet<object>(SelectedRowComparer.Instance);
+            foreach (object item in rows ?? Array.Empty<object>())
+            {
+                object row = SelectedRowKey(item);
+                if (_selectedCells.ContainsKey(CellRowKey.ForItem(row)) && !seen.Add(row))
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        internal void StopTrackingIfRowsRepeatSelectedCellItem(IEnumerable rows, NotifyCollectionChangedEventArgs sourceChange)
+        {
+            if (_trackSelectedCellsByItem && _selectedCells.Count > 0 && RowsRepeatSelectedCellItem(rows, sourceChange))
+            {
+                SetSelectedCellsTracking(false);
+            }
+        }
+
+        // Selected cells are keyed by row item while tracked and by row index otherwise. A cell whose
+        // item is shown by more than one row cannot be keyed by item, so the selection is kept by
+        // index until it is cleared (see TrackSelectedCellsByItem).
+        private void SetSelectedCellsTracking(bool track)
+        {
+            if (track == _trackSelectedCellsByItem || (track && SelectedCellRowIsRepeated()))
+            {
+                return;
+            }
+
+            var headerRows = new List<int>(_selectedRowHeaderIndices.Count);
+            foreach (CellRowKey row in _selectedRowHeaderIndices)
+            {
+                int rowIndex = RowIndexOf(row);
+                if (rowIndex >= 0)
+                {
+                    headerRows.Add(rowIndex);
+                }
+            }
+
+            _trackSelectedCellsByItem = track;
+            _selectedCellsView.ConvertAllSilently(cell => track ? cell.TrackingItem() : cell.AtCurrentRow());
+            InvalidateSelectedCellDisplayRange();
+            _selectedCells.Clear();
+            foreach (DataGridCellInfo cell in _selectedCellsView)
+            {
+                CellRowKey row = SelectedRowKeyOf(cell);
+                if (!_selectedCells.TryGetValue(row, out HashSet<int> columns))
+                {
+                    columns = new HashSet<int>();
+                    _selectedCells[row] = columns;
+                }
+
+                columns.Add(cell.ColumnIndex);
+            }
+
+            _selectedRowHeaderIndices.Clear();
+            foreach (int rowIndex in headerRows)
+            {
+                _selectedRowHeaderIndices.Add(SelectedRowKeyAt(rowIndex));
+            }
+        }
+
+        private bool SelectedCellRowIsRepeated()
+        {
+            foreach (CellRowKey row in _selectedCells.Keys.Concat(_selectedRowHeaderIndices))
+            {
+                if (row.RowIndex >= 0 && row.RowIndex < (DataConnection?.Count ?? 0) &&
+                    IsRepeatedRowItem(DataConnection.GetDataItem(row.RowIndex)))
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        // Tracked rows are keyed by item (Item is never null, see SelectedRowKey), other rows by index.
+        private readonly struct CellRowKey : IEquatable<CellRowKey>
+        {
+            private CellRowKey(object item, int rowIndex)
+            {
+                Item = item;
+                RowIndex = rowIndex;
+            }
+
+            public object Item { get; }
+
+            public int RowIndex { get; }
+
+            public static CellRowKey AtIndex(int rowIndex) => new(null, rowIndex);
+
+            public static CellRowKey ForItem(object item) => new(item, -1);
+
+            public bool Equals(CellRowKey other) =>
+                RowIndex == other.RowIndex && SelectedRowComparer.Instance.Equals(Item, other.Item);
+
+            public override bool Equals(object obj) => obj is CellRowKey other && Equals(other);
+
+            public override int GetHashCode() =>
+                Item == null ? RowIndex : SelectedRowComparer.Instance.GetHashCode(Item);
+        }
+
+        private sealed class SelectedRowComparer : IEqualityComparer<object>
+        {
+            public static readonly SelectedRowComparer Instance = new();
+
+            public static readonly object NoRow = new();
+
+            public static readonly object OutOfRange = new();
+
+            public new bool Equals(object? x, object? y) =>
+                ReferenceEquals(x, y) || (x is ValueType && x.Equals(y));
+
+            public int GetHashCode(object obj) =>
+                obj is ValueType ? obj.GetHashCode() : System.Runtime.CompilerServices.RuntimeHelpers.GetHashCode(obj);
         }
 
         internal bool IsRowFullySelected(int slot)
@@ -2338,7 +2786,7 @@ internal
                 return false;
             }
 
-            if (!_selectedCells.TryGetValue(rowIndex, out var columns) || columns.Count == 0)
+            if (!_selectedCells.TryGetValue(SelectedRowKeyAt(rowIndex), out var columns) || columns.Count == 0)
             {
                 return SelectionUnit == DataGridSelectionUnit.CellOrRowHeader ||
                        SelectionUnit == DataGridSelectionUnit.CellOrRowOrColumnHeader;
@@ -2390,7 +2838,7 @@ internal
             var last = Math.Min(endRow, DataConnection.Count - 1);
             for (var rowIndex = first; rowIndex <= last; rowIndex++)
             {
-                _selectedRowHeaderIndices.Add(rowIndex);
+                _selectedRowHeaderIndices.Add(SelectedRowKeyAt(rowIndex));
             }
         }
 
@@ -2420,7 +2868,7 @@ internal
             }
         }
 
-        private bool IsRowHeaderSelectionActive(int rowIndex) => _selectedRowHeaderIndices.Contains(rowIndex);
+        private bool IsRowHeaderSelectionActive(int rowIndex) => _selectedRowHeaderIndices.Contains(SelectedRowKeyAt(rowIndex));
 
         private bool IsColumnHeaderSelectionActive(int columnIndex) => _selectedColumnHeaderIndices.Contains(columnIndex);
 
@@ -2530,7 +2978,7 @@ internal
 
         private bool IsRowFullySelectedByCells(int rowIndex)
         {
-            if (!_selectedCells.TryGetValue(rowIndex, out var columns) || columns.Count == 0)
+            if (!_selectedCells.TryGetValue(SelectedRowKeyAt(rowIndex), out var columns) || columns.Count == 0)
             {
                 return false;
             }
@@ -2678,7 +3126,7 @@ internal
 
             if (RemoveCellSelectionInternal(rowIndex, columnIndex, removedCollector))
             {
-                if (!_selectedCells.TryGetValue(rowIndex, out var remaining) || remaining.Count == 0)
+                if (!_selectedCells.TryGetValue(SelectedRowKeyAt(rowIndex), out var remaining) || remaining.Count == 0)
                 {
                     SetRowSelection(slot, isSelected: false, setAnchorSlot: false);
                 }

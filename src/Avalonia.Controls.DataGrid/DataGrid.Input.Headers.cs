@@ -269,7 +269,7 @@ internal
                 using var commit = BeginSelectionCommit();
                 var removed = new List<DataGridCellInfo>();
 
-                _selectedRowHeaderIndices.Remove(rowIndex);
+                _selectedRowHeaderIndices.Remove(SelectedRowKeyAt(rowIndex));
 
                 for (var columnIndex = 0; columnIndex < ColumnsItemsInternal.Count; columnIndex++)
                 {
