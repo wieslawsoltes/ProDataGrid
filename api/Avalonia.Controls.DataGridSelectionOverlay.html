@@ -1171,7 +1171,8 @@ Class DataGridSelectionOverlay  <a class="header-action link-secondary" title="V
   <a class="header-action link-secondary" title="View source" href="https://github.com/wieslawsoltes/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/DataGridSelectionOverlay.cs/#L20"><i class="bi bi-code-slash"></i></a>
   </h3>
 
-  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 summary"><p>Determines whether a point is within the hit-test area.</p>
+</div>
   <div class="markdown level1 conceptual"></div>
 
   <div class="codewrapper">
@@ -1181,7 +1182,8 @@ Class DataGridSelectionOverlay  <a class="header-action link-secondary" title="V
   <h4 class="section">Parameters</h4>
   <dl class="parameters">
     <dt><code>point</code> <span class="xref">Point</span></dt>
-    <dd><p>The point to hit test in global coordinate space.</p>
+    <dd><p>The point to hit test in local coordinate space, i.e., (0, 0)
+is the top-left corner of the visual element, not the top-left corner of the window.</p>
 </dd>
   </dl>
 
