@@ -99,6 +99,7 @@ public class DataGridSelectionIndexResolutionTests
         var grid = CreateGrid(items);
         var connection = grid.DataConnection;
 
+        ForceDenseLookups(connection, items);
         var firstIndex = grid.DataConnection.IndexOf(target);
         var firstLookup = GetReferenceLookup(connection);
 
@@ -111,6 +112,8 @@ public class DataGridSelectionIndexResolutionTests
         Assert.Same(firstLookup, secondLookup);
 
         items.Insert(0, new object());
+        Assert.Null(GetReferenceLookup(connection));
+        ForceDenseLookups(connection, items);
         var lookupAfterMutation = GetReferenceLookup(connection);
         Assert.NotNull(lookupAfterMutation);
         Assert.NotSame(firstLookup, lookupAfterMutation);
@@ -207,11 +210,13 @@ public class DataGridSelectionIndexResolutionTests
         var grid = CreateGrid(items);
         var connection = grid.DataConnection;
 
+        ForceDenseLookups(connection, items);
         _ = connection.IndexOf(target);
         var firstLookup = GetReferenceLookup(connection);
         Assert.NotNull(firstLookup);
 
         items.Insert(0, new object());
+        ForceDenseLookups(connection, items);
         _ = connection.IndexOf(target);
 
         var secondLookup = GetReferenceLookup(connection);
@@ -219,6 +224,14 @@ public class DataGridSelectionIndexResolutionTests
         Assert.NotSame(firstLookup, secondLookup);
 
         return (grid, new WeakReference<IDictionary>(firstLookup!));
+    }
+
+    private static void ForceDenseLookups(DataGridDataConnection connection, TrackingObservableList items)
+    {
+        for (int i = 0; i < 32; i++)
+        {
+            _ = connection.IndexOf(items[i % items.Count]);
+        }
     }
 
     private static void ForceGc()
