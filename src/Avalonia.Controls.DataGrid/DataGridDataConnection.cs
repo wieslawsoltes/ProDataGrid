@@ -1228,6 +1228,11 @@ namespace Avalonia.Controls
             InvalidateReferenceIndexLookup();
             if (IsHierarchicalItemsSource())
             {
+                if (CollectionView?.Filter != null)
+                {
+                    _owner.RecordFilteredHierarchicalViewChange(e);
+                }
+
                 return;
             }
 
