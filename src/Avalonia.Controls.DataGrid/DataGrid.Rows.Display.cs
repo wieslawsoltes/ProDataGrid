@@ -519,7 +519,10 @@ namespace Avalonia.Controls
         {
             bool usesVirtualCellSurface = UsesVirtualCellSurface;
 
-            // Restore visibility for rows that were hidden during recycling
+            // A focused row can be reused directly without passing through a recycle pool.
+            // Cancel any hide queued earlier in this scroll before showing it again.
+            DisplayData.RestoreElementForReuse(row);
+
             row.ClearValue(Visual.IsVisibleProperty);
             row.ClearValue(Visual.ClipProperty);
 
