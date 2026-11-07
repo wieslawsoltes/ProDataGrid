@@ -9,7 +9,9 @@ using Avalonia.Controls.Primitives;
 using Avalonia.Data;
 using Avalonia.Headless.XUnit;
 using Avalonia.Markup.Xaml.Styling;
+using Avalonia.Media;
 using Avalonia.Styling;
+using Avalonia.Threading;
 using Avalonia.VisualTree;
 using Xunit;
 
@@ -31,6 +33,44 @@ public class DataGridRowStylingTests
         {
             var row = grid.GetVisualDescendants().OfType<DataGridRow>().First();
             Assert.Same(rowTheme, row.GetValue(StyledElement.ThemeProperty));
+        }
+        finally
+        {
+            root.Close();
+        }
+    }
+
+    [AvaloniaFact]
+    public void OptimizedRowTheme_Propagates_RowBackground_Initially_And_After_Change()
+    {
+        var initialBackground = new SolidColorBrush(Colors.Crimson);
+        var updatedBackground = new SolidColorBrush(Colors.CornflowerBlue);
+        var (grid, root, items) = CreateGrid();
+
+        try
+        {
+            Assert.True(grid.TryFindResource("DataGridOptimizedRowTheme", out var rowTheme));
+            grid.RowBackground = initialBackground;
+            grid.RowTheme = Assert.IsType<ControlTheme>(rowTheme);
+            grid.ItemsSource = null;
+            grid.ItemsSource = items;
+            Dispatcher.UIThread.RunJobs();
+            root.UpdateLayout();
+            grid.UpdateLayout();
+
+            var row = Assert.IsType<DataGridRow>(grid.GetRowFromItem(items[0]));
+            var rowRoot = Assert.Single(row.GetVisualDescendants().OfType<DataGridFrozenGrid>());
+            Assert.Same(initialBackground, row.Background);
+            Assert.Same(initialBackground, rowRoot.Background);
+
+            grid.RowBackground = updatedBackground;
+            Dispatcher.UIThread.RunJobs();
+            root.UpdateLayout();
+            grid.UpdateLayout();
+
+            Assert.Same(row, grid.GetRowFromItem(items[0]));
+            Assert.Same(updatedBackground, row.Background);
+            Assert.Same(updatedBackground, rowRoot.Background);
         }
         finally
         {

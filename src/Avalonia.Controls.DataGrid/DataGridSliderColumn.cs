@@ -350,7 +350,8 @@ internal
         internal override bool SupportsVirtualCellSurface =>
             GetType() == typeof(DataGridSliderColumn) &&
             ShowValueText &&
-            BindingCloneHelper.SupportsDirectTextDataContextRead(Binding) &&
+            BindingCloneHelper.SupportsDirectTextDataContextRead(Binding,
+                observesWrappedHierarchyItem: OwningGrid?.HierarchicalRowsEnabled == true && OwningGrid.HierarchicalModel != null) &&
             DataGridColumnMetadata.GetValueAccessor(this) is IDataGridColumnTextAccessor;
 
         object IDataGridDrawnCellValueProvider.GetDrawnCellValue(object item)

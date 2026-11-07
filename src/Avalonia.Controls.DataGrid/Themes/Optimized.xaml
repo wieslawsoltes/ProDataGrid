@@ -240,7 +240,7 @@
       </ControlTheme>
 
       <ControlTheme x:Key="DataGridOptimizedRowTheme" TargetType="DataGridRow">
-        <Setter Property="Background" Value="{Binding $parent[DataGrid].RowBackground}" />
+        <Setter Property="Background" Value="{CompiledBinding $parent[DataGrid].RowBackground}" />
         <Setter Property="Template">
           <ControlTemplate>
             <DataGridFrozenGrid Name="PART_Root"

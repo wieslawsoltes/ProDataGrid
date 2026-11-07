@@ -440,7 +440,8 @@ internal
             IsEditable &&
             SelectedItemBinding == null &&
             SelectedValueBinding == null &&
-            BindingCloneHelper.SupportsDirectTextDataContextRead(TextBinding) &&
+            BindingCloneHelper.SupportsDirectTextDataContextRead(TextBinding,
+                observesWrappedHierarchyItem: OwningGrid?.HierarchicalRowsEnabled == true && OwningGrid.HierarchicalModel != null) &&
             DataGridColumnMetadata.GetValueAccessor(this) is IDataGridColumnTextAccessor;
 
         object IDataGridDrawnCellValueProvider.GetDrawnCellValue(object item)

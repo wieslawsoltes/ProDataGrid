@@ -28,6 +28,7 @@ namespace Avalonia.Controls.DataGridHierarchical
         private bool _isLeaf;
         private int _level;
         private bool _isLoading;
+        private int _pendingBulkMaterializationCommitGeneration;
         private NodeLoadInfo? _loadInfo;
         // Collection and item notification state is absent for most nodes. Keeping it in a
         // sidecar avoids four unused references on every immutable hierarchy node.
@@ -294,6 +295,32 @@ namespace Avalonia.Controls.DataGridHierarchical
         /// Tracks whether children were materialized.
         /// </summary>
         internal bool HasMaterializedChildren { get; set; }
+
+        /// <summary>
+        /// Tracks materialization completed by a transactional bulk expansion that has not yet
+        /// committed its flattened snapshot.
+        /// </summary>
+        internal bool HasPendingBulkMaterializationCommit
+        {
+            get => _pendingBulkMaterializationCommitGeneration != 0;
+            set
+            {
+                if (!value)
+                {
+                    _pendingBulkMaterializationCommitGeneration = 0;
+                }
+                else if (_pendingBulkMaterializationCommitGeneration == 0)
+                {
+                    _pendingBulkMaterializationCommitGeneration = -1;
+                }
+            }
+        }
+
+        internal int PendingBulkMaterializationCommitGeneration
+        {
+            get => _pendingBulkMaterializationCommitGeneration;
+            set => _pendingBulkMaterializationCommitGeneration = value;
+        }
 
         public event PropertyChangedEventHandler? PropertyChanged;
 
