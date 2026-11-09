@@ -273,10 +273,10 @@ internal
                     {
                         height = row.TargetHeight;
                         bool hasDetails = GetRowDetailsVisibility(displayedSlot);
-                        // Record with estimator - details height is already included in TargetHeight
                         if (estimator != null)
                         {
-                            estimator.RecordMeasuredHeight(displayedSlot, height, hasDetails, detailsHeight: 0);
+                            double rowHeight = hasDetails ? row.HeightWithoutDetails : height;
+                            estimator.RecordMeasuredHeight(displayedSlot, rowHeight, hasDetails, height - rowHeight);
                         }
                     }
                     else if (element is DataGridRowGroupHeader groupHeader)
@@ -1523,12 +1523,13 @@ internal
             IDataGridRowHeightEstimator estimator,
             int slot,
             double measuredHeight,
-            bool hasDetails)
+            bool hasDetails,
+            double detailsHeight)
         {
             double previousRowEstimate = estimator.RowHeightEstimate;
             double previousDetailsEstimate = estimator.RowDetailsHeightEstimate;
 
-            estimator.RecordMeasuredHeight(slot, measuredHeight, hasDetails, detailsHeight: 0);
+            estimator.RecordMeasuredHeight(slot, measuredHeight, hasDetails, detailsHeight);
 
             if (!MathUtilities.AreClose(previousRowEstimate, estimator.RowHeightEstimate) ||
                 !MathUtilities.AreClose(previousDetailsEstimate, estimator.RowDetailsHeightEstimate))

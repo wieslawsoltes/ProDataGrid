@@ -460,10 +460,10 @@ namespace Avalonia.Controls
                     {
                         // Record the measured row height with the estimator
                         bool hasDetails = GetRowDetailsVisibility(slot);
-                        // Details height is already included in element.DesiredSize.Height
                         if (estimator != null)
                         {
-                            RecordMeasuredRowHeight(estimator, slot, elementHeight, hasDetails);
+                            double rowHeight = hasDetails ? row.HeightWithoutDetails : elementHeight;
+                            RecordMeasuredRowHeight(estimator, slot, rowHeight, hasDetails, elementHeight - rowHeight);
                         }
 
                         // Update the legacy estimate for backward compatibility
