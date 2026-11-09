@@ -257,6 +257,11 @@ namespace Avalonia.Controls
                 UpdateTablesForRemoval(slotDeleted, itemDeleted);
             }
 
+            if (itemDeleted != null)
+            {
+                DisplayData.ReleaseRecycledRowDetails(itemDeleted);
+            }
+
             // If a row was removed before the currently selected row, update its index
             if (slotDeleted < SelectedIndex)
             {
@@ -484,7 +489,8 @@ namespace Avalonia.Controls
 
             // Raise UnloadingRow regardless of whether the row will be recycled
             OnUnloadingRow(new DataGridRowEventArgs(dataGridRow));
-            bool recycleRow = CurrentSlot != dataGridRow.Index;
+            // The current row is not recycled, unless recycling keeps its loaded details for its item
+            bool recycleRow = CurrentSlot != dataGridRow.Index || dataGridRow.HasLoadedDetails;
 
             if (recycleRow)
             {

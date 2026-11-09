@@ -81,6 +81,7 @@ internal
         private double _detailsDesiredHeight;
 
         private bool _detailsLoaded;
+        private bool _hasRecycledDetailsContent;
         private bool _detailsVisibilityNotificationPending;
         private Control _detailsContent;
         private IDisposable _detailsContentSizeSubscription;
@@ -88,6 +89,7 @@ internal
         private bool _isSelected;
         internal object RecycledDataContext;
         internal bool RecycledIsPlaceholder;
+        internal bool RecycledWithViewport;
 
         // Locally cache whether or not details are visible so we don't run redundant storyboards
         // The Details Template that is actually applied to the Row
@@ -225,6 +227,17 @@ internal
         internal void ClearRecyclingState()
         {
             _recycledRootDataContextChanged = ClearRecycledRootDataContext();
+            if (_hasRecycledDetailsContent)
+            {
+                if (ReferenceEquals(RecycledDataContext, DataContext))
+                {
+                    _hasRecycledDetailsContent = false;
+                }
+                else
+                {
+                    ReleaseRecycledDetailsContent();
+                }
+            }
             RecycledDataContext = null;
             RecycledIsPlaceholder = false;
             IsRecycled = false;

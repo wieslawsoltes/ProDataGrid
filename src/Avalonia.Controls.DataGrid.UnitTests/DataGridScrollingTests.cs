@@ -2433,7 +2433,7 @@ public class DataGridScrollingTests
     {
         var displayData = target.DisplayData;
         var field = typeof(DataGridDisplayData).GetField("_recycledRows", BindingFlags.NonPublic | BindingFlags.Instance);
-        var recycledRows = (Stack<DataGridRow>)field!.GetValue(displayData)!;
+        var recycledRows = (IReadOnlyCollection<DataGridRow>)field!.GetValue(displayData)!;
         return recycledRows.Count;
     }
 
@@ -2441,7 +2441,7 @@ public class DataGridScrollingTests
     {
         var displayData = target.DisplayData;
         var field = typeof(DataGridDisplayData).GetField("_recycledRows", BindingFlags.NonPublic | BindingFlags.Instance);
-        var recycledRows = (Stack<DataGridRow>)field!.GetValue(displayData)!;
+        var recycledRows = (IReadOnlyCollection<DataGridRow>)field!.GetValue(displayData)!;
         return recycledRows.ToArray();
     }
 

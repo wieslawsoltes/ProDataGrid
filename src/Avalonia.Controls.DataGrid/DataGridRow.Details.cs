@@ -40,7 +40,14 @@ namespace Avalonia.Controls
                     {
                         OwningGrid.OnUnloadingRowDetails(this, _detailsContent);
                     }
-                    _detailsContent.DataContext = null;
+                    // A recycled row keeps its loaded details bound to their item, so reusing the row
+                    // for the same item does not rebuild them. ClearRecyclingState releases them when
+                    // the row is reused for another item.
+                    _hasRecycledDetailsContent = recycle && _detailsLoaded;
+                    if (!_hasRecycledDetailsContent)
+                    {
+                        _detailsContent.DataContext = null;
+                    }
                     ClearDetailsContentSizeSubscription();
                     if (!recycle)
                     {
@@ -63,6 +70,19 @@ namespace Avalonia.Controls
             _detailsLoaded = false;
             _appliedDetailsVisibility = null;
             SetValueNoCallback(AreDetailsVisibleProperty, false);
+        }
+
+        internal bool HasLoadedDetails => _detailsLoaded;
+
+        internal bool HasRecycledDetailsContent => _hasRecycledDetailsContent;
+
+        internal void ReleaseRecycledDetailsContent()
+        {
+            if (_hasRecycledDetailsContent)
+            {
+                _hasRecycledDetailsContent = false;
+                _detailsContent.DataContext = null;
+            }
         }
 
         //TODO Animation

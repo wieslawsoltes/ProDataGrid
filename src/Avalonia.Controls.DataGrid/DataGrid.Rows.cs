@@ -1104,6 +1104,10 @@ internal
             SetCurrentCellCore(-1, -1, commitEdit: false, endRowEdit: false);
             ClearRowSelection(resetAnchorSlot: true);
             UnloadElements(recycle);
+            if (recycle)
+            {
+                DisplayData.ReleaseRecycledRowDetailsOfRemovedItems(DataConnection);
+            }
 
             _showDetailsTable.Clear();
             SlotCount = 0;
