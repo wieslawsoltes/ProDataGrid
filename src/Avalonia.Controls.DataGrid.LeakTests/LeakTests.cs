@@ -1648,6 +1648,66 @@ public class LeakTests
     }
 
     [ReleaseFact]
+    public void DataGrid_RecycledRowDetails_DoNotLeak()
+    {
+        var items = new ObservableCollection<DetailsRowItem>(
+            Enumerable.Range(0, 100).Select(i => new DetailsRowItem("Item " + i)));
+        (WeakReference GridRef, WeakReference DetailsRef) Run()
+        {
+            var grid = new DataGrid
+            {
+                AutoGenerateColumns = false,
+                ItemsSource = items,
+                RowDetailsVisibilityMode = DataGridRowDetailsVisibilityMode.Visible,
+                RowDetailsTemplate = new FuncDataTemplate<DetailsRowItem>((_, _) =>
+                {
+                    var details = new ItemsControl { Height = 40 };
+                    details.Bind(ItemsControl.ItemsSourceProperty, new Binding(nameof(DetailsRowItem.Children)));
+                    return details;
+                })
+            };
+
+            grid.Columns.Add(new DataGridTextColumn
+            {
+                Header = "Name",
+                Binding = new Binding(nameof(DetailsRowItem.Name))
+            });
+            Control? details = null;
+            grid.LoadingRowDetails += (_, e) => details ??= e.DetailsElement;
+
+            var window = new Window
+            {
+                Width = 400,
+                Height = 300
+            };
+
+            window.SetThemeStyles();
+            window.Content = grid;
+            ShowWindow(window);
+            Assert.NotNull(details);
+            Assert.NotNull(details!.DataContext);
+
+            // The rows scrolled out keep their details bound to their items.
+            grid.ScrollIntoView(items[60], grid.Columns[0]);
+            PumpLayout(grid);
+            Assert.NotNull(details.DataContext);
+
+            var gridRef = new WeakReference(grid);
+            var detailsRef = new WeakReference(details);
+
+            CleanupWindow(window);
+
+            return (gridRef, detailsRef);
+        }
+
+        var (gridRef, detailsRef) = RunInSession(Run);
+
+        AssertCollected(gridRef, detailsRef);
+
+        GC.KeepAlive(items);
+    }
+
+    [ReleaseFact]
     public void DataGrid_RowDetailsTemplateSwap_DoesNotLeak()
     {
         var items = new ObservableCollection<RowItem>
@@ -2163,6 +2223,19 @@ public class LeakTests
         }
 
         public ObservableCollection<RowItem> Rows { get; }
+    }
+
+    private sealed class DetailsRowItem
+    {
+        public DetailsRowItem(string name)
+        {
+            Name = name;
+            Children = new ObservableCollection<string> { name + ".0", name + ".1" };
+        }
+
+        public string Name { get; }
+
+        public ObservableCollection<string> Children { get; }
     }
 
     private sealed class RowItem
