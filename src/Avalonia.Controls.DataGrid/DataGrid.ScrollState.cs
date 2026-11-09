@@ -242,7 +242,7 @@ namespace Avalonia.Controls
 
             private RowHeightEstimatorState CaptureEstimatorState()
             {
-                if (_owner.RowHeightEstimator is IDataGridRowHeightEstimatorStateful stateful)
+                if (_owner.EffectiveRowHeightEstimator is IDataGridRowHeightEstimatorStateful stateful)
                 {
                     return stateful.CaptureState();
                 }
@@ -257,7 +257,7 @@ namespace Avalonia.Controls
                     return true;
                 }
 
-                if (_owner.RowHeightEstimator is not IDataGridRowHeightEstimatorStateful stateful)
+                if (_owner.EffectiveRowHeightEstimator is not IDataGridRowHeightEstimatorStateful stateful)
                 {
                     return false;
                 }
@@ -283,7 +283,7 @@ namespace Avalonia.Controls
                     return false;
                 }
 
-                if (_rowHeightEstimatorState != null && _owner.RowHeightEstimator is not IDataGridRowHeightEstimatorStateful)
+                if (_rowHeightEstimatorState != null && _owner.EffectiveRowHeightEstimator is not IDataGridRowHeightEstimatorStateful)
                 {
                     return false;
                 }

@@ -259,7 +259,7 @@ internal
                     return fixedRowHeight * visibleSlotCount;
                 }
 
-                var estimator = RowHeightEstimator;
+                var estimator = EffectiveRowHeightEstimator;
                 double previousRowEstimate = estimator?.RowHeightEstimate ?? 0;
                 double previousDetailsEstimate = estimator?.RowDetailsHeightEstimate ?? 0;
 
@@ -599,7 +599,7 @@ internal
             object item = DataConnection.GetDataItem(rowIndex);
 
             // Notify the estimator about the insertion
-            RowHeightEstimator?.OnItemsInserted(slot, 1);
+            EffectiveRowHeightEstimator?.OnItemsInserted(slot, 1);
 
             // isCollapsed below is always false because we only use the method if we're not grouping
             InsertElementAt(slot, rowIndex, item, null/*DataGridRowGroupInfo*/, false /*isCollapsed*/);
@@ -612,7 +612,7 @@ internal
             Debug.Assert(count > 0);
 
             var slot = SlotFromRowIndex(rowIndex);
-            RowHeightEstimator?.OnItemsInserted(slot, count);
+            EffectiveRowHeightEstimator?.OnItemsInserted(slot, count);
 
             for (var offset = 0; offset < count; offset++)
             {
@@ -902,7 +902,7 @@ internal
             int slot = SlotFromRowIndex(rowIndex);
             
             // Notify the estimator about the removal
-            RowHeightEstimator?.OnItemsRemoved(slot, 1);
+            EffectiveRowHeightEstimator?.OnItemsRemoved(slot, 1);
             
             RemoveElementAt(slot, item, true);
             RequestPointerOverRefresh();
@@ -1377,7 +1377,7 @@ internal
                     if (!isDisplayed)
                     {
                         // Estimate the height change if the slots aren't displayed.  If they are displayed, we can add real values
-                        var estimator = RowHeightEstimator;
+                        var estimator = EffectiveRowHeightEstimator;
                         if (estimator != null)
                         {
                             // Use the estimator for per-slot height estimation
@@ -1589,7 +1589,7 @@ internal
         // Returns an estimate for the height of the slots between fromSlot and toSlot
         private double GetHeightEstimate(int fromSlot, int toSlot)
         {
-            var estimator = RowHeightEstimator;
+            var estimator = EffectiveRowHeightEstimator;
             if (estimator != null)
             {
                 double totalHeight = 0;
@@ -1634,7 +1634,7 @@ internal
             }
             else
             {
-                var estimator = RowHeightEstimator;
+                var estimator = EffectiveRowHeightEstimator;
                 DataGridRowGroupInfo rowGroupInfo = GetGroupInfoForSlot(slot);
                 
                 if (estimator != null)

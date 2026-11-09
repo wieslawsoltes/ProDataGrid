@@ -58,7 +58,7 @@ namespace Avalonia.Controls
             if (_suppressVerticalOffsetAdjustments == 0 && slot < DisplayData.FirstScrollingSlot - 1)
             {
                 // The element was added above our viewport so it pushes the VerticalOffset down
-                var estimator = RowHeightEstimator;
+                var estimator = EffectiveRowHeightEstimator;
                 double elementHeight;
                 
                 if (estimator != null)
