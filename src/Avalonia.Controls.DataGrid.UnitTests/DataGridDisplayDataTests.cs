@@ -84,6 +84,25 @@ public class DataGridDisplayDataTests
         Assert.False(display.ContainsScrollingElement(second));
     }
 
+    [AvaloniaFact]
+    public void EmptyRecyclePoolLookup_DoesNotAllocateRestoreDelegates()
+    {
+        var display = new DataGrid().DisplayData;
+        object item = new object();
+        for (int index = 0; index < 100; index++)
+        {
+            Assert.Null(display.GetRecycledRow(item, 0, 0));
+        }
+
+        long before = GC.GetAllocatedBytesForCurrentThread();
+        for (int index = 0; index < 1000; index++)
+        {
+            display.GetRecycledRow(item, 0, 0);
+        }
+        long allocated = GC.GetAllocatedBytesForCurrentThread() - before;
+        Assert.Equal(0, allocated);
+    }
+
     #region Row Recycling Tests
 
     [AvaloniaFact]
