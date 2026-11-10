@@ -50,13 +50,9 @@ namespace Avalonia.Controls
                     // Focused and editing rows may also still occupy a displayed slot.
                     // A container cannot represent two slots at once, even when the
                     // newly inserted item has the same DataContext instance.
-                    foreach (Control displayedElement in DisplayData.GetScrollingElements())
+                    if (DisplayData.ContainsScrollingElement(dataGridRow))
                     {
-                        if (ReferenceEquals(displayedElement, dataGridRow))
-                        {
-                            dataGridRow = null;
-                            break;
-                        }
+                        dataGridRow = null;
                     }
 
                     if (dataGridRow != null)

@@ -347,6 +347,21 @@ namespace Avalonia.Controls
             return GetDisplayedElement(_owner.SlotFromRowIndex(rowIndex)) as DataGridRow;
         }
 
+        internal bool ContainsScrollingElement(Control element)
+        {
+            // Membership does not depend on circular display order. Avoid allocating
+            // an iterator each time a focused or editing row is considered for reuse.
+            for (int index = 0; index < _scrollingElements.Count; index++)
+            {
+                if (ReferenceEquals(_scrollingElements[index], element))
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
         internal IEnumerable<Control> GetScrollingElements(Predicate<object>? filter = null)
         {
             for (int i = 0; i < _scrollingElements.Count; i++)
