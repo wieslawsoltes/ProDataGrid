@@ -12,6 +12,7 @@ internal static partial class Program
     private static void ValidateDescriptive(FormulaEvaluationContext context, FormulaEvaluator evaluator,
         IFormulaValueResolver resolver, ExcelFormulaParser parser)
     {
+        ValidatePairedStatistics(context, evaluator, resolver, parser);
         var cases = new (string Formula, double Expected)[]
         {
             ("VAR.S(1,2,3)", 1), ("VAR.P(1,2,3)", 2d / 3),
@@ -61,6 +62,7 @@ internal static partial class Program
 
     private static void MeasureDescriptive(StringBuilder output, FormulaEvaluationContext context, bool reverse)
     {
+        MeasurePairedStatistics(output, context, reverse);
         var input = new FormulaArray(100000, 1);
         for (var i = 0; i < input.RowCount; i++) input[i, 0] = FormulaValue.FromNumber((i & 1) == 0 ? 999900 : 1000100);
         var registry = (ExcelFunctionRegistry)context.FunctionRegistry;

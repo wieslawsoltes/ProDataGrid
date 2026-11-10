@@ -10,6 +10,13 @@
 - [Scientific math](SCIENTIFIC-FUNCTIONS.md): trigonometry, hyperbolic functions, combinatorics and integral operations.
 - [Order statistics](ORDER-STATISTICS.md): inclusive/exclusive percentiles, bounded selection, numerical interpolation and workspace ownership.
 - [Product aggregates](PRODUCT-AGGREGATES.md): SUMPRODUCT and paired square sums, compensated accumulation, strict pairing and allocation costs.
+- [Descriptive statistics](DESCRIPTIVE-STATISTICS.md): scaled variance/deviation, central moments, positive means and compatibility aliases.
+- [Paired statistics](PAIRED-STATISTICS.md): covariance, correlation, least-squares diagnostics and single-fit array forecasting.
+- [Ranking](RANKING-FUNCTIONS.md): scalar scans, shared-distribution batch ranks, inclusive/exclusive percentile ranks and tie handling.
+- [Matrices](MATRIX-FUNCTIONS.md): multiplication, determinants, inversion and bounded private numerical workspaces.
+- [Business calendars](BUSINESS-CALENDARS.md): international weekends, indexed holidays and bounded workday arithmetic.
+- [Text splitting](TEXTSPLIT.md): delimiter arrays and bounded two-pass output materialization.
+- [Bitwise functions](BITWISE-FUNCTIONS.md) and [radix conversions](RADIX-FUNCTIONS.md): checked integer domains, array evaluation and exact internal integer parsing.
 
 ## Modern arrays
 

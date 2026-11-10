@@ -3,7 +3,7 @@
 
   <PropertyGroup>
     <Product>ProDataGrid</Product>
-    <VersionPrefix>12.1.0.6</VersionPrefix>
+    <VersionPrefix>12.1.5</VersionPrefix>
     <VersionSuffix></VersionSuffix>
     <Authors>Wiesław Šoltés</Authors>
     <Copyright>Copyright $([System.DateTime]::Now.ToString(`yyyy`)) &#169; Wiesław Šoltés</Copyright>
