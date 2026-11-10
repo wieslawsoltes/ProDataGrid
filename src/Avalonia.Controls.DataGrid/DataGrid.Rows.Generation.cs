@@ -47,7 +47,18 @@ namespace Avalonia.Controls
                 dataGridRow = GetGeneratedRow(dataContext);
                 if (dataGridRow != null)
                 {
-                    source = DataGridDiagnostics.Sources.Existing;
+                    // Focused and editing rows may also still occupy a displayed slot.
+                    // A container cannot represent two slots at once, even when the
+                    // newly inserted item has the same DataContext instance.
+                    if (DisplayData.ContainsScrollingElement(dataGridRow))
+                    {
+                        dataGridRow = null;
+                    }
+
+                    if (dataGridRow != null)
+                    {
+                        source = DataGridDiagnostics.Sources.Existing;
+                    }
                 }
 
                 if (dataGridRow == null && IsItemItsOwnContainerOverride(dataContext))
@@ -347,6 +358,19 @@ namespace Avalonia.Controls
                 {
                     if (row != null)
                     {
+                        // An existing focused or editing row can survive a collection move.
+                        // Correct its address after insertion has shifted the other rows,
+                        // before row state and child-index layout are evaluated.
+                        int rowIndex = RowIndexFromSlot(slot);
+
+                        if (row.Index != rowIndex || row.Slot != slot)
+                        {
+                            row.Index = rowIndex;
+                            row.Slot = slot;
+
+                            _rowsPresenter.InvalidateChildIndex(row);
+                        }
+
                         LoadRowVisualsForDisplay(row);
 
                         if (!ReferenceEquals(row.Parent, _rowsPresenter))

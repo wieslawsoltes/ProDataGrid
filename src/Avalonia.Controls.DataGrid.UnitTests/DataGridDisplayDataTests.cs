@@ -47,6 +47,43 @@ public class DataGridDisplayDataTests
         Assert.True(row.IsVisible);
     }
 
+    [AvaloniaFact]
+    public void ScrollingElementMembership_DoesNotAllocate_AndTracksRemoval()
+    {
+        var grid = new DataGrid();
+        var display = grid.DisplayData;
+        var first = new DataGridRow();
+        var second = new DataGridRow();
+        var absent = new DataGridRow();
+        Assert.False(display.ContainsScrollingElement(first));
+        display.LoadScrollingSlot(0, first, updateSlotInformation: true);
+        display.LoadScrollingSlot(1, second, updateSlotInformation: true);
+        Assert.True(display.ContainsScrollingElement(first));
+        Assert.True(display.ContainsScrollingElement(second));
+        Assert.False(display.ContainsScrollingElement(absent));
+
+        // Warm both present and missing lookups before measuring the hot path.
+        for (int index = 0; index < 100; index++)
+        {
+            display.ContainsScrollingElement(second);
+            display.ContainsScrollingElement(absent);
+        }
+        int found = 0;
+        long before = GC.GetAllocatedBytesForCurrentThread();
+        for (int index = 0; index < 1000; index++)
+        {
+            if (display.ContainsScrollingElement(second)) found++;
+            if (display.ContainsScrollingElement(absent)) found++;
+        }
+        long allocated = GC.GetAllocatedBytesForCurrentThread() - before;
+        Assert.Equal(1000, found);
+        Assert.Equal(0, allocated);
+
+        display.ClearElements(recycle: false);
+        Assert.False(display.ContainsScrollingElement(first));
+        Assert.False(display.ContainsScrollingElement(second));
+    }
+
     #region Row Recycling Tests
 
     [AvaloniaFact]
