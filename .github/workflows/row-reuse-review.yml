@@ -19,11 +19,13 @@ jobs:
         run: |
           git fetch origin pull/385/head:refs/review/385 pull/398/head:refs/review/398
       - name: Benchmark PR 385
-        run: python3 tools/run-comparison.py --repo . --output "$RUNNER_TEMP/perf385" --base 4e869f197e304d618d6649b3b7e2078be2098ebf --candidate e5b31c60e9927339f2e09cb77129dd59b468f821 --scenario focused --scenario scroll
+        run: python3 tools/run-comparison.py --repo . --output "$RUNNER_TEMP/perf385" --base 4e869f197e304d618d6649b3b7e2078be2098ebf --candidate e5b31c60e9927339f2e09cb77129dd59b468f821 --scenario focused --scenario scroll --order BAABABBA
       - name: Benchmark PR 398
-        run: python3 tools/run-comparison.py --repo . --output "$RUNNER_TEMP/perf398" --base 4e869f197e304d618d6649b3b7e2078be2098ebf --candidate e261cf70 --scenario focused --scenario scroll
+        run: python3 tools/run-comparison.py --repo . --output "$RUNNER_TEMP/perf398" --base 4e869f197e304d618d6649b3b7e2078be2098ebf --candidate e261cf70 --scenario focused --scenario scroll --order BAABABBA
       - name: Benchmark combined fixes
-        run: python3 tools/run-comparison.py --repo . --output "$RUNNER_TEMP/combined" --base 4e869f197e304d618d6649b3b7e2078be2098ebf --candidate f636fd2c --scenario focused --scenario scroll
+        run: python3 tools/run-comparison.py --repo . --output "$RUNNER_TEMP/combined" --base 4e869f197e304d618d6649b3b7e2078be2098ebf --candidate f636fd2c --scenario focused --scenario scroll --order BAABABBA
+      - name: Unchanged baseline control
+        run: python3 tools/run-comparison.py --repo . --output "$RUNNER_TEMP/control" --base 4e869f197e304d618d6649b3b7e2078be2098ebf --candidate 4e869f197e304d618d6649b3b7e2078be2098ebf --scenario focused --scenario scroll --order BAABABBA
       - name: Test combined fixes
         run: dotnet test src/Avalonia.Controls.DataGrid.UnitTests -c Release -p:CollectCoverage=false --logger trx --results-directory artifacts/tests
       - name: Upload evidence
@@ -41,4 +43,7 @@ jobs:
             ${{ runner.temp }}/combined/*.log
             ${{ runner.temp }}/combined/*.json*
             ${{ runner.temp }}/combined/*.txt
+            ${{ runner.temp }}/control/*.log
+            ${{ runner.temp }}/control/*.json*
+            ${{ runner.temp }}/control/*.txt
             artifacts/tests
