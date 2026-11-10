@@ -37,7 +37,7 @@ public class ReviewPerformanceTests
             grid.Columns.Add(new DataGridTextColumn { Header = "C" + i, Width = new DataGridLength(100),
                 Binding = new CompiledBindingExtension(new CompiledBindingPathBuilder().Build()) });
         HierarchicalModel? hierarchy = null;
-        if (scenario == "hierarchy")
+        if (scenario.StartsWith("hierarchy"))
         {
             var roots = new List<ReviewNode>();
             for (int i = 0; i < 100; i++)
@@ -60,6 +60,12 @@ public class ReviewPerformanceTests
             grid.ItemsSource = hierarchy.ObservableFlattened;
             grid.VisualLayoutMode = DataGridVisualLayoutMode.Virtualized;
         }
+        if (scenario.StartsWith("recycling")) grid.VisualLayoutMode = DataGridVisualLayoutMode.Nested;
+        if (scenario == "hierarchy-scroll")
+        {
+            grid.VisualLayoutMode = DataGridVisualLayoutMode.Nested;
+            hierarchy!.ExpandAll();
+        }
         if (scenario == "details")
         {
             grid.RowDetailsTemplate = new FuncDataTemplate<string>((_, _) => new Border { Height = 80 });
@@ -72,8 +78,8 @@ public class ReviewPerformanceTests
             grid.ItemsSource = view;
         }
         var window = new Window { Width = 900, Height = 500, Content = grid };
-        window.SetThemeStyles(scenario == "hierarchy" ? DataGridTheme.SimpleFlat : DataGridTheme.SimpleV2);
-        Assert.True(grid.TryFindResource(scenario == "hierarchy" ? "DataGridFlatTheme" : typeof(DataGrid), out object? resource));
+        window.SetThemeStyles(scenario.StartsWith("hierarchy") ? DataGridTheme.SimpleFlat : DataGridTheme.SimpleV2);
+        Assert.True(grid.TryFindResource(scenario.StartsWith("hierarchy") ? "DataGridFlatTheme" : typeof(DataGrid), out object? resource));
         grid.Theme = Assert.IsType<Avalonia.Styling.ControlTheme>(resource);
         try
         {
@@ -97,6 +103,19 @@ public class ReviewPerformanceTests
             Point headerPoint = header.TranslatePoint(new Point(30, 10), window)!.Value;
             Action<int> operation = scenario switch
             {
+                "recycling-focused" => i =>
+                {
+                    var row = Assert.IsType<DataGridRow>(grid.DisplayData.GetDisplayedElement(grid.DisplayData.FirstScrollingSlot));
+                    row.Focusable = true;
+                    Assert.True(row.Focus());
+                    grid.ScrollIntoView(items[i % 2 == 0 ? 5000 : 0], grid.Columns[0]);
+                    Pump(window);
+                },
+                "hierarchy-scroll" => i =>
+                {
+                    grid.ScrollIntoView(hierarchy!.ObservableFlattened[i % 2 == 0 ? 1000 : 0], grid.Columns[0]);
+                    Pump(window);
+                },
                 "selection" or "idle" or "cells" or "cells-tracked" => i => { items.Insert(0, "inserted"); items.RemoveAt(0); Pump(window); },
                 "hierarchy" => i => { hierarchy!.ExpandAll(); Pump(window); Assert.Equal(1100, hierarchy.Count); hierarchy.CollapseAll(); Pump(window); Assert.Equal(100, hierarchy.Count); },
                 "header" => i => { window.MouseMove(headerPoint); window.MouseDown(headerPoint, MouseButton.Left); window.MouseMove(headerPoint + new Vector(35, 0), RawInputModifiers.LeftMouseButton); window.MouseUp(headerPoint + new Vector(35, 0), MouseButton.Left); Pump(window); },
@@ -115,10 +134,13 @@ public class ReviewPerformanceTests
                 bytes[i] = GC.GetAllocatedBytesForCurrentThread() - before;
             }
             Assert.Equal(count, items.Count);
-            if (scenario != "groups" && scenario != "hierarchy") Assert.Equal(count, grid.SlotCount);
+            if (scenario != "groups" && !scenario.StartsWith("hierarchy")) Assert.Equal(count, grid.SlotCount);
             if (scenario.StartsWith("cells")) Assert.Equal(selectedCells, grid.SelectedCells.Count);
             if (scenario == "selection") Assert.Equal(selected, grid.SelectedItems.Count);
             Assert.True(grid.DisplayData.NumDisplayedScrollingElements > 0);
+            if (scenario.StartsWith("recycling") || scenario == "hierarchy-scroll")
+                Assert.Equal(0, grid.DisplayData.RetargetedRowCount);
+            if (scenario == "hierarchy-scroll") Assert.Equal(1100, hierarchy!.Count);
             string output = Environment.GetEnvironmentVariable("REVIEW_OUTPUT")!;
             File.AppendAllText(output, JsonSerializer.Serialize(new { scenario, times, bytes, count, selected, selectedCells, virtualSurface = grid.DisplayData.HasVirtualScrollingElements }) + Environment.NewLine);
         }

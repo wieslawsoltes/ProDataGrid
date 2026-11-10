@@ -1,0 +1,85 @@
+.NET SDK:
+ Version:           10.0.201
+ Commit:            4d3023de60
+ Workload version:  10.0.203.1
+ MSBuild version:   18.3.0-release-26153-122+4d3023de6
+
+Runtime Environment:
+ OS Name:     Mac OS X
+ OS Version:  26.6
+ OS Platform: Darwin
+ RID:         osx-arm64
+ Base Path:   /Users/wieslawsoltes/.dotnet/sdk/10.0.201/
+
+.NET workloads installed:
+ [wasm-tools]
+   Installation Source: SDK 10.0.200
+   Manifest Version:    10.0.107/10.0.100
+   Manifest Path:       /Users/wieslawsoltes/.dotnet/sdk-manifests/10.0.100/microsoft.net.workload.mono.toolchain.current/10.0.107/WorkloadManifest.json
+   Install Type:        FileBased
+
+ [macos]
+   Installation Source: SDK 10.0.200
+   Manifest Version:    26.4.10259/10.0.100
+   Manifest Path:       /Users/wieslawsoltes/.dotnet/sdk-manifests/10.0.100/microsoft.net.sdk.macos/26.4.10259/WorkloadManifest.json
+   Install Type:        FileBased
+
+ [maui-android]
+   Installation Source: SDK 10.0.200
+   Manifest Version:    10.0.20/10.0.100
+   Manifest Path:       /Users/wieslawsoltes/.dotnet/sdk-manifests/10.0.100/microsoft.net.sdk.maui/10.0.20/WorkloadManifest.json
+   Install Type:        FileBased
+
+ [ios]
+   Installation Source: SDK 10.0.200
+   Manifest Version:    26.4.10259/10.0.100
+   Manifest Path:       /Users/wieslawsoltes/.dotnet/sdk-manifests/10.0.100/microsoft.net.sdk.ios/26.4.10259/WorkloadManifest.json
+   Install Type:        FileBased
+
+ [maccatalyst]
+   Installation Source: SDK 10.0.200
+   Manifest Version:    26.4.10259/10.0.100
+   Manifest Path:       /Users/wieslawsoltes/.dotnet/sdk-manifests/10.0.100/microsoft.net.sdk.maccatalyst/26.4.10259/WorkloadManifest.json
+   Install Type:        FileBased
+
+ [android]
+   Installation Source: SDK 10.0.200
+   Manifest Version:    36.1.53/10.0.100
+   Manifest Path:       /Users/wieslawsoltes/.dotnet/sdk-manifests/10.0.100/microsoft.net.sdk.android/36.1.53/WorkloadManifest.json
+   Install Type:        FileBased
+
+ [wasm-tools-net8]
+   Installation Source: SDK 10.0.200
+   Manifest Version:    10.0.107/10.0.100
+   Manifest Path:       /Users/wieslawsoltes/.dotnet/sdk-manifests/10.0.100/microsoft.net.workload.mono.toolchain.net8/10.0.107/WorkloadManifest.json
+   Install Type:        FileBased
+
+Configured to use workload sets when installing new manifests.
+
+Host:
+  Version:      10.0.5
+  Architecture: arm64
+  Commit:       a612c2a105
+
+.NET SDKs installed:
+  10.0.201 [/Users/wieslawsoltes/.dotnet/sdk]
+
+.NET runtimes installed:
+  Microsoft.AspNetCore.App 10.0.5 [/Users/wieslawsoltes/.dotnet/shared/Microsoft.AspNetCore.App]
+  Microsoft.NETCore.App 8.0.33 [/Users/wieslawsoltes/.dotnet/shared/Microsoft.NETCore.App]
+  Microsoft.NETCore.App 10.0.5 [/Users/wieslawsoltes/.dotnet/shared/Microsoft.NETCore.App]
+
+Other architectures found:
+  None
+
+Environment variables:
+  Not set
+
+global.json file:
+  /Users/wieslawsoltes/.codex/pr-row-review-20261110/pr398/global.json
+
+Learn more:
+  https://aka.ms/dotnet/info
+
+Download .NET:
+  https://aka.ms/dotnet/download
