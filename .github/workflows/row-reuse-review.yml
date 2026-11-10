@@ -19,13 +19,13 @@ jobs:
         run: |
           git fetch origin pull/385/head:refs/review/385 pull/398/head:refs/review/398
       - name: Benchmark PR 385
-        run: python3 tools/run-comparison.py --repo . --output "$RUNNER_TEMP/perf385" --base 4e869f197e304d618d6649b3b7e2078be2098ebf --candidate fd9af0b3 --scenario recycling-focused --scenario recycling-scroll --scenario hierarchy-scroll --order ABBABAAB
+        run: python3 tools/run-comparison.py --repo . --output "$RUNNER_TEMP/perf385" --base 4e869f197e304d618d6649b3b7e2078be2098ebf --candidate fd9af0b3 --scenario hierarchy-scroll --order ABBABAAB
       - name: Benchmark PR 398 incrementally after PR 385
-        run: python3 tools/run-comparison.py --repo . --output "$RUNNER_TEMP/perf398" --base fd9af0b3 --candidate d3b9fcb9 --scenario recycling-focused --scenario recycling-scroll --scenario hierarchy-scroll --order ABBABAAB
+        run: python3 tools/run-comparison.py --repo . --output "$RUNNER_TEMP/perf398" --base fd9af0b3 --candidate d3b9fcb9 --scenario hierarchy-scroll --order ABBABAAB
       - name: Benchmark combined fixes
-        run: python3 tools/run-comparison.py --repo . --output "$RUNNER_TEMP/combined" --base 4e869f197e304d618d6649b3b7e2078be2098ebf --candidate d3b9fcb9 --scenario recycling-focused --scenario recycling-scroll --scenario hierarchy-scroll --order ABBABAAB
+        run: python3 tools/run-comparison.py --repo . --output "$RUNNER_TEMP/combined" --base 4e869f197e304d618d6649b3b7e2078be2098ebf --candidate d3b9fcb9 --scenario hierarchy-scroll --order ABBABAAB
       - name: Unchanged baseline control
-        run: python3 tools/run-comparison.py --repo . --output "$RUNNER_TEMP/control" --base 4e869f197e304d618d6649b3b7e2078be2098ebf --candidate 4e869f197e304d618d6649b3b7e2078be2098ebf --scenario recycling-focused --scenario recycling-scroll --scenario hierarchy-scroll --order ABBABAAB
+        run: python3 tools/run-comparison.py --repo . --output "$RUNNER_TEMP/control" --base 4e869f197e304d618d6649b3b7e2078be2098ebf --candidate 4e869f197e304d618d6649b3b7e2078be2098ebf --scenario hierarchy-scroll --order ABBABAAB
       - name: Test combined fixes
         run: dotnet test src/Avalonia.Controls.DataGrid.UnitTests -c Release -p:CollectCoverage=false --logger trx --results-directory artifacts/tests
       - name: Upload evidence

@@ -57,7 +57,7 @@ public class ReviewPerformanceTests
             DataGridColumnMetadata.SetValueAccessor(column, new DataGridColumnValueAccessor<HierarchicalNode, string>(node => ((ReviewNode)node.Item).Name));
             grid.Columns.Add(column);
             grid.HierarchicalModel = hierarchy; grid.HierarchicalRowsEnabled = true;
-            grid.ItemsSource = hierarchy.ObservableFlattened;
+            grid.ItemsSource = hierarchy.Flattened;
             grid.VisualLayoutMode = DataGridVisualLayoutMode.Virtualized;
         }
         if (scenario.StartsWith("recycling")) grid.VisualLayoutMode = DataGridVisualLayoutMode.Nested;
@@ -78,8 +78,8 @@ public class ReviewPerformanceTests
             grid.ItemsSource = view;
         }
         var window = new Window { Width = 900, Height = 500, Content = grid };
-        window.SetThemeStyles(scenario.StartsWith("hierarchy") ? DataGridTheme.SimpleFlat : DataGridTheme.SimpleV2);
-        Assert.True(grid.TryFindResource(scenario.StartsWith("hierarchy") ? "DataGridFlatTheme" : typeof(DataGrid), out object? resource));
+        window.SetThemeStyles(DataGridTheme.SimpleV2);
+        Assert.True(grid.TryFindResource(typeof(DataGrid), out object? resource));
         grid.Theme = Assert.IsType<Avalonia.Styling.ControlTheme>(resource);
         try
         {
@@ -113,8 +113,11 @@ public class ReviewPerformanceTests
                 },
                 "hierarchy-scroll" => i =>
                 {
-                    grid.ScrollIntoView(hierarchy!.ObservableFlattened[i % 2 == 0 ? 1000 : 0], grid.Columns[0]);
+                    Assert.Equal(1100, grid.SlotCount);
+                    grid.ScrollViewer!.Offset = new Vector(0, i % 2 == 0 ? 24000 : 0);
                     Pump(window);
+                    if (i % 2 == 0) Assert.InRange(grid.DisplayData.FirstScrollingSlot, 900, 1099);
+                    else Assert.Equal(0, grid.DisplayData.FirstScrollingSlot);
                 },
                 "selection" or "idle" or "cells" or "cells-tracked" => i => { items.Insert(0, "inserted"); items.RemoveAt(0); Pump(window); },
                 "hierarchy" => i => { hierarchy!.ExpandAll(); Pump(window); Assert.Equal(1100, hierarchy.Count); hierarchy.CollapseAll(); Pump(window); Assert.Equal(100, hierarchy.Count); },

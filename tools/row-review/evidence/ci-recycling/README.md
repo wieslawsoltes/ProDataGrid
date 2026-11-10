@@ -1,0 +1,2 @@
+The recycling-focused and recycling-scroll measurements are valid matched workloads.
+The hierarchy-scroll samples from run42846185398 are INVALID: viewport motion was not asserted and the workload did not move it. Do not interpret its sub-microsecond timings or percentage ratios. The corrected harness uses the same Simple v2 theme as the regression tests, model.Flattened, drives ScrollViewer.Offset, and asserts slotcount1100 and actualviewport displacement aftereveryoperation.
