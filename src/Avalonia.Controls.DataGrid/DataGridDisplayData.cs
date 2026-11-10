@@ -119,7 +119,7 @@ namespace Avalonia.Controls
         {
             if (_owner.UsesDefaultRealizationFactory)
             {
-                return PopFromRecyclePool(_recycledRows, RestoreElementForReuse);
+                return PopFromRecyclePool(_recycledRows);
             }
 
             object? key = _owner.GetRowRecyclingKey(dataContext, rowIndex, slot);
@@ -128,7 +128,7 @@ namespace Avalonia.Controls
                 return null;
             }
 
-            DataGridRow? row = PopFromRecyclePool(pool, RestoreElementForReuse);
+            DataGridRow? row = PopFromRecyclePool(pool);
             if (pool.Count == 0)
             {
                 _keyedRecycledRows.Remove(key);
@@ -212,7 +212,7 @@ namespace Avalonia.Controls
 
         internal DataGridRowGroupHeader? GetRecycledGroupHeader()
         {
-            return PopFromRecyclePool(_recycledGroupHeaders, RestoreElementForReuse);
+            return PopFromRecyclePool(_recycledGroupHeaders);
         }
 
         internal void RecycleGroupFooter(DataGridRowGroupFooter groupFooter)
@@ -225,7 +225,7 @@ namespace Avalonia.Controls
 
         internal DataGridRowGroupFooter? GetRecycledGroupFooter()
         {
-            return PopFromRecyclePool(_recycledGroupFooters, RestoreElementForReuse);
+            return PopFromRecyclePool(_recycledGroupFooters);
         }
 
         #endregion
@@ -800,9 +800,14 @@ namespace Avalonia.Controls
             _owner?.HideRecycledElement(element);
         }
 
-        private void RestoreElementForReuse(Control element)
+        internal void CancelDeferredHide(Control element)
         {
             _deferredHideElements?.Remove(element);
+        }
+
+        private void RestoreElementForReuse(Control element)
+        {
+            CancelDeferredHide(element);
             if (!element.IsVisible)
             {
                 element.ClearValue(Visual.IsVisibleProperty);
@@ -815,12 +820,12 @@ namespace Avalonia.Controls
             pool.Push(element);
         }
 
-        private static T? PopFromRecyclePool<T>(Stack<T> pool, Action<T>? onPop = null) where T : Control
+        private T? PopFromRecyclePool<T>(Stack<T> pool) where T : Control
         {
             if (pool.Count > 0)
             {
                 T element = pool.Pop();
-                onPop?.Invoke(element);
+                RestoreElementForReuse(element);
                 return element;
             }
             return null;

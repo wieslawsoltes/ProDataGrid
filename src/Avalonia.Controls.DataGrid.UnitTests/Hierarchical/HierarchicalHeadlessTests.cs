@@ -3,34 +3,28 @@
 
 using System;
 using System.Collections;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.ComponentModel;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
-using System.Threading;
 using System.Threading.Tasks;
-using Avalonia;
 using Avalonia.Automation;
 using Avalonia.Automation.Peers;
 using Avalonia.Automation.Provider;
 using Avalonia.Collections;
-using Avalonia.Controls;
-using Avalonia.Controls.Automation.Peers;
-using Avalonia.Controls.Presenters;
-using Avalonia.Controls.Primitives;
 using Avalonia.Controls.DataGridHierarchical;
 using Avalonia.Controls.DataGridSorting;
+using Avalonia.Controls.Presenters;
+using Avalonia.Controls.Primitives;
 using Avalonia.Controls.Selection;
 using Avalonia.Controls.Templates;
 using Avalonia.Data;
 using Avalonia.Data.Core;
 using Avalonia.Headless.XUnit;
 using Avalonia.Input;
-using Avalonia.Interactivity;
-using Avalonia.Markup.Xaml.Styling;
 using Avalonia.Styling;
 using Avalonia.Threading;
 using Avalonia.VisualTree;
@@ -40,6 +34,102 @@ namespace Avalonia.Controls.DataGridTests.Hierarchical;
 
 public class HierarchicalHeadlessTests
 {
+    [AvaloniaFact]
+    public void DeferredRecycle_DoesNotHideRowReusedDuringScroll()
+    {
+        using IDisposable themeScope = UseApplicationTheme(DataGridTheme.SimpleV2);
+        var roots = new ObservableCollection<Item>();
+
+        for (int index = 0; index < 5; index++)
+        {
+            roots.Add(new Item($"Root {index + 1}"));
+        }
+
+        var expandedRoot = new Item("Root 6");
+        var firstGroup = new Item("Group 1");
+
+        firstGroup.Children.Add(new Item("Child 1"));
+
+        var secondGroup = new Item("Group 2");
+        var selectedChild = new Item("Child 2");
+
+        secondGroup.Children.Add(selectedChild);
+        secondGroup.Children.Add(new Item("Child 3"));
+
+        expandedRoot.Children.Add(firstGroup);
+        expandedRoot.Children.Add(secondGroup);
+
+        roots.Add(expandedRoot);
+
+        for (int index = 0; index < 8; ++index)
+        {
+            roots.Add(new Item($"Root {index + 7}"));
+        }
+
+        var model = new HierarchicalModel(new HierarchicalOptions
+        {
+            ChildrenSelector = item => ((Item)item).Children,
+            IsLeafSelector = item => ((Item)item).Children.Count == 0,
+            VirtualizeChildren = true
+        });
+
+        model.SetRoots(roots);
+        model.Expand(model.FindNode(expandedRoot)!);
+        model.Expand(model.FindNode(secondGroup)!);
+
+        var grid = new DataGrid
+        {
+            AutoGenerateColumns = false,
+            HierarchicalRowsEnabled = true,
+            HierarchicalModel = model,
+            ItemsSource = model.Flattened,
+            SelectionMode = DataGridSelectionMode.Single,
+            UseLogicalScrollable = true,
+            RowHeight = 30
+        };
+
+        grid.ColumnsInternal.Add(new DataGridHierarchicalColumn
+        {
+            Header = "Name",
+            Binding = new Binding("Item.Name")
+        });
+
+        var window = new Window { Width = 800, Height = 440, Content = grid };
+        window.SetThemeStyles(DataGridTheme.SimpleV2);
+        window.Show();
+
+        PumpLayout(grid);
+
+        try
+        {
+            var selectedNode = model.FindNode(selectedChild)!;
+            var selectedRow = Assert.IsType<DataGridRow>(FindVisibleRow(grid, selectedNode));
+            grid.SelectedItem = selectedNode;
+
+            PumpLayout(grid);
+
+            // A focused row is reused directly instead of being popped from a recycle pool.
+            // It must be removed from the deferred-hide queue when loaded again.
+            using (grid.DisplayData.BeginDeferredRecycleScope())
+            {
+                grid.DisplayData.ActivateDeferredRecycleHiding(DataGridRecycleReuseOrder.TopDown);
+                Assert.True(grid.DisplayData.TryDeferElementHide(selectedRow));
+
+                var loadRow = typeof(DataGrid).GetMethod("LoadRowVisualsForDisplay", BindingFlags.Instance | BindingFlags.NonPublic);
+                Assert.NotNull(loadRow);
+
+                loadRow.Invoke(grid, new object[] { selectedRow });
+            }
+
+            Assert.True(selectedRow.IsVisible);
+            Assert.Same(selectedRow, FindVisibleRow(grid, selectedNode));
+        }
+        finally
+        {
+            window.Close();
+        }
+    }
+
     private class Item
     {
         public Item(string name)
