@@ -1,0 +1,44 @@
+name: Row reuse review
+on:
+  push:
+    branches: [codex/row-review-report-nov10]
+permissions:
+  contents: read
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.201'
+      - name: Fetch review heads
+        run: |
+          git fetch origin pull/385/head:refs/review/385 pull/398/head:refs/review/398
+      - name: Benchmark PR 385
+        run: python3 tools/run-comparison.py --repo . --output "$RUNNER_TEMP/perf385" --base 4e869f197e304d618d6649b3b7e2078be2098ebf --candidate e5b31c60e9927339f2e09cb77129dd59b468f821 --scenario focused --scenario scroll
+      - name: Benchmark PR 398
+        run: python3 tools/run-comparison.py --repo . --output "$RUNNER_TEMP/perf398" --base 4e869f197e304d618d6649b3b7e2078be2098ebf --candidate e261cf70 --scenario focused --scenario scroll
+      - name: Benchmark combined fixes
+        run: python3 tools/run-comparison.py --repo . --output "$RUNNER_TEMP/combined" --base 4e869f197e304d618d6649b3b7e2078be2098ebf --candidate f636fd2c --scenario focused --scenario scroll
+      - name: Test combined fixes
+        run: dotnet test src/Avalonia.Controls.DataGrid.UnitTests -c Release -p:CollectCoverage=false --logger trx --results-directory artifacts/tests
+      - name: Upload evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: row-review-evidence
+          path: |
+            ${{ runner.temp }}/perf385/*.log
+            ${{ runner.temp }}/perf385/*.json*
+            ${{ runner.temp }}/perf385/*.txt
+            ${{ runner.temp }}/perf398/*.log
+            ${{ runner.temp }}/perf398/*.json*
+            ${{ runner.temp }}/perf398/*.txt
+            ${{ runner.temp }}/combined/*.log
+            ${{ runner.temp }}/combined/*.json*
+            ${{ runner.temp }}/combined/*.txt
+            artifacts/tests
