@@ -21,6 +21,32 @@ namespace Avalonia.Controls.DataGridTests;
 /// </summary>
 public class DataGridDisplayDataTests
 {
+    [AvaloniaFact]
+    public void CancellingDeferredHide_DoesNotAllocate_OrHideReusedRow()
+    {
+        var grid = new DataGrid();
+        var display = grid.DisplayData;
+        var row = new DataGridRow();
+        using (display.BeginDeferredRecycleScope())
+        {
+            display.ActivateDeferredRecycleHiding(DataGridRecycleReuseOrder.TopDown);
+            for (int index = 0; index < 100; index++)
+            {
+                Assert.True(display.TryDeferElementHide(row));
+                display.CancelDeferredHide(row);
+            }
+            long before = GC.GetAllocatedBytesForCurrentThread();
+            for (int index = 0; index < 1000; index++)
+            {
+                display.TryDeferElementHide(row);
+                display.CancelDeferredHide(row);
+            }
+            long allocated = GC.GetAllocatedBytesForCurrentThread() - before;
+            Assert.Equal(0, allocated);
+        }
+        Assert.True(row.IsVisible);
+    }
+
     #region Row Recycling Tests
 
     [AvaloniaFact]

@@ -800,9 +800,14 @@ namespace Avalonia.Controls
             _owner?.HideRecycledElement(element);
         }
 
-        internal void RestoreElementForReuse(Control element)
+        internal void CancelDeferredHide(Control element)
         {
             _deferredHideElements?.Remove(element);
+        }
+
+        private void RestoreElementForReuse(Control element)
+        {
+            CancelDeferredHide(element);
             if (!element.IsVisible)
             {
                 element.ClearValue(Visual.IsVisibleProperty);
