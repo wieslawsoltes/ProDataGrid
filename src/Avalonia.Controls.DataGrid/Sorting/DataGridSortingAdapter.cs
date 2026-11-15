@@ -517,6 +517,12 @@ namespace Avalonia.Controls.DataGridSorting
                     return null;
                 }
 
+                if (!DataGridReflectionFeature.IsEnabled)
+                {
+                    LogInvalidSort($"Cannot sort by '{descriptor.PropertyPath}' without a value accessor. {DataGridReflectionFeature.DisabledMessage}");
+                    return null;
+                }
+
                 return DataGridSortDescription.FromPath(descriptor.PropertyPath, descriptor.Direction, descriptor.Culture);
             }
 

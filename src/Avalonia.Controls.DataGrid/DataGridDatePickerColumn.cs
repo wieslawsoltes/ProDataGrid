@@ -249,7 +249,7 @@ internal
                 // Create a binding with format string based on SelectedDateFormat
                 string formatString = GetDateFormatString();
                 
-                if (Binding is Binding binding)
+                if (DataGridReflectionFeature.IsEnabled && Binding is Binding binding)
                 {
                     var displayBinding = new Binding
                     {

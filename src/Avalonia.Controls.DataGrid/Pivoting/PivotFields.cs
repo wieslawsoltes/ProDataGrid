@@ -133,7 +133,7 @@ namespace Avalonia.Controls.DataGridPivoting
 
             if (!string.IsNullOrWhiteSpace(PropertyPath))
             {
-                return TypeHelper.GetNestedPropertyValue(item, PropertyPath);
+                return ReflectionPropertyPath.GetValue(item, PropertyPath);
             }
 
             return null;

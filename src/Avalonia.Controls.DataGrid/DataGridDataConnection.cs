@@ -21,7 +21,6 @@ using Avalonia.Controls.Utils;
 
 namespace Avalonia.Controls
 {
-    [RequiresUnreferencedCode("DataGridDataConnection uses reflection to inspect item properties and is not compatible with trimming.")]
     internal class DataGridDataConnection
     {
 
@@ -555,40 +554,47 @@ namespace Avalonia.Controls
                 }
             }
 
-            if (DataType != null)
+            if (DataType != null && DataGridReflectionFeature.IsEnabled)
             {
-                if (!String.IsNullOrEmpty(propertyName))
+                return GetReflectedPropertyIsReadOnly(propertyName);
+            }
+            return !AllowEdit;
+        }
+
+        [RequiresUnreferencedCode(TypeHelper.UnreferencedCodeMessage)]
+        private bool GetReflectedPropertyIsReadOnly(string propertyName)
+        {
+            if (!String.IsNullOrEmpty(propertyName))
+            {
+                Type propertyType = DataType;
+                PropertyInfo propertyInfo = null;
+                List<string> propertyNames = TypeHelper.SplitPropertyPath(propertyName);
+                for (int i = 0; i < propertyNames.Count; i++)
                 {
-                    Type propertyType = DataType;
-                    PropertyInfo propertyInfo = null;
-                    List<string> propertyNames = TypeHelper.SplitPropertyPath(propertyName);
-                    for (int i = 0; i < propertyNames.Count; i++)
+                    propertyInfo = propertyType.GetPropertyOrIndexer(propertyNames[i], out _);
+                    if (propertyInfo == null || propertyType.GetIsReadOnly() || propertyInfo.GetIsReadOnly())
                     {
-                        propertyInfo = propertyType.GetPropertyOrIndexer(propertyNames[i], out _);
-                        if (propertyInfo == null || propertyType.GetIsReadOnly() || propertyInfo.GetIsReadOnly())
+                        // Either the data type is read-only, the property doesn't exist, or it does exist but is read-only
+                        return true;
+                    }
+
+                    // Check if EditableAttribute is defined on the property and if it indicates uneditable
+                    var attributes = propertyInfo.GetCustomAttributes(typeof(EditableAttribute), true);
+                    if (attributes != null && attributes.Length > 0)
+                    {
+                        var editableAttribute = (EditableAttribute)attributes[0];
+                        if (!editableAttribute.AllowEdit)
                         {
-                            // Either the data type is read-only, the property doesn't exist, or it does exist but is read-only
                             return true;
                         }
-
-                        // Check if EditableAttribute is defined on the property and if it indicates uneditable
-                        var attributes = propertyInfo.GetCustomAttributes(typeof(EditableAttribute), true);
-                        if (attributes != null && attributes.Length > 0)
-                        {
-                            var editableAttribute = (EditableAttribute)attributes[0];
-                            if (!editableAttribute.AllowEdit)
-                            {
-                                return true;
-                            }
-                        }
-                        propertyType = propertyInfo.PropertyType.GetNonNullableType();
                     }
-                    return propertyInfo == null || !propertyInfo.CanWrite || !AllowEdit || !CanEdit(propertyType);
+                    propertyType = propertyInfo.PropertyType.GetNonNullableType();
                 }
-                else if (DataType.GetIsReadOnly())
-                {
-                    return true;
-                }
+                return propertyInfo == null || !propertyInfo.CanWrite || !AllowEdit || !CanEdit(propertyType);
+            }
+            else if (DataType.GetIsReadOnly())
+            {
+                return true;
             }
             return !AllowEdit;
         }
@@ -1526,8 +1532,19 @@ namespace Avalonia.Controls
 
         private void UpdateDataProperties()
         {
-            Type dataType = DataType;
+            if (!DataGridReflectionFeature.IsEnabled)
+            {
+                _dataDescriptors = null;
+                _dataProperties = null;
+                return;
+            }
 
+            UpdateReflectedDataProperties(DataType);
+        }
+
+        [RequiresUnreferencedCode("Discovering item properties uses reflection and TypeDescriptor.")]
+        private void UpdateReflectedDataProperties(Type dataType)
+        {
             _dataDescriptors = DataGridItemPropertyDescriptor.CreateDescriptors(_owner?.ItemsSource as IEnumerable, dataType);
 
             if (DataSource != null && dataType != null && !DataTypeIsPrimitive(dataType))

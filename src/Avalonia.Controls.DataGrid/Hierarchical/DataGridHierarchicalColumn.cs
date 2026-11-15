@@ -9,6 +9,9 @@ using Avalonia.Controls.Utils;
 using Avalonia.Controls.Templates;
 using Avalonia.Data;
 using Avalonia.Data.Converters;
+using Avalonia.Data.Core;
+using Avalonia.Data.Core.Plugins;
+using Avalonia.Markup.Xaml.MarkupExtensions.CompiledBindings;
 using Avalonia.Interactivity;
 using Avalonia.VisualTree;
 using Avalonia.Styling;
@@ -27,7 +30,26 @@ internal
     {
         private static readonly IValueConverter _isExpandableConverter =
             new FuncValueConverter<bool, bool>(value => !value);
-        private static readonly Binding _dataContextBinding = new Binding { Mode = BindingMode.OneWay };
+        private static readonly CompiledBinding _dataContextBinding = new CompiledBinding
+        {
+            Path = new CompiledBindingPathBuilder().Build(),
+            Mode = BindingMode.OneWay
+        };
+
+        private static readonly CompiledBindingPath _levelPath = CreateNodePath(
+            nameof(HierarchicalNode.Level),
+            typeof(int),
+            node => node.Level);
+
+        private static readonly CompiledBindingPath _isExpandedPath = CreateNodePath(
+            nameof(HierarchicalNode.IsExpanded),
+            typeof(bool),
+            node => node.IsExpanded);
+
+        private static readonly CompiledBindingPath _isLeafPath = CreateNodePath(
+            nameof(HierarchicalNode.IsLeaf),
+            typeof(bool),
+            node => node.IsLeaf);
 
         private readonly Lazy<IDataTemplate?> _cellTemplate;
         private readonly Lazy<ControlTheme?> _directCellTheme;
@@ -302,19 +324,33 @@ internal
 
             presenter.Bind(
                 DataGridHierarchicalPresenter.LevelProperty,
-                new Binding(nameof(HierarchicalNode.Level)) { Mode = BindingMode.OneWay });
+                new CompiledBinding { Path = _levelPath, Mode = BindingMode.OneWay });
             presenter.Bind(
                 DataGridHierarchicalPresenter.IsExpandedProperty,
-                new Binding(nameof(HierarchicalNode.IsExpanded)) { Mode = BindingMode.OneWay });
+                new CompiledBinding { Path = _isExpandedPath, Mode = BindingMode.OneWay });
             presenter.Bind(
                 DataGridHierarchicalPresenter.IsExpandableProperty,
-                new Binding(nameof(HierarchicalNode.IsLeaf))
+                new CompiledBinding
                 {
+                    Path = _isLeafPath,
                     Mode = BindingMode.OneWay,
                     Converter = _isExpandableConverter
                 });
 
             return presenter;
+        }
+
+        private static CompiledBindingPath CreateNodePath(string name, Type propertyType, Func<HierarchicalNode, object> getter)
+        {
+            var property = new ClrPropertyInfo(
+                name,
+                target => target is HierarchicalNode node ? getter(node) : AvaloniaProperty.UnsetValue,
+                null,
+                propertyType);
+
+            return new CompiledBindingPathBuilder()
+                .Property(property, PropertyInfoAccessorFactory.CreateInpcPropertyAccessor)
+                .Build();
         }
 
         internal override DataGridCell CreateCell()

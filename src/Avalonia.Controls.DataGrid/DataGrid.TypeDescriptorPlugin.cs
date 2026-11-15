@@ -54,6 +54,8 @@ namespace Avalonia.Controls
                 return new Accessor(reference, descriptor);
             }
 
+            [UnconditionalSuppressMessage("Trimming", "IL2026",
+                Justification = "The plugin is only registered through EnsureRegistered, which requires unreferenced code and is guarded by DataGridReflectionFeature.")]
             private static bool TryGetDescriptor(object instance, string propertyName, out PropertyDescriptor? descriptor)
             {
                 descriptor = null;

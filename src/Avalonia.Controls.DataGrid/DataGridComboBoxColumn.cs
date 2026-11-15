@@ -563,7 +563,7 @@ internal
 
         private BindingBase CreateDisplayMemberBinding()
         {
-            if (!string.IsNullOrWhiteSpace(DisplayMemberPath))
+            if (DataGridReflectionFeature.IsEnabled && !string.IsNullOrWhiteSpace(DisplayMemberPath))
             {
                 return new Binding(DisplayMemberPath);
             }
@@ -573,7 +573,7 @@ internal
 
         private BindingBase CreateSelectedValuePathBinding()
         {
-            if (!string.IsNullOrWhiteSpace(SelectedValuePath))
+            if (DataGridReflectionFeature.IsEnabled && !string.IsNullOrWhiteSpace(SelectedValuePath))
             {
                 return new Binding(SelectedValuePath);
             }

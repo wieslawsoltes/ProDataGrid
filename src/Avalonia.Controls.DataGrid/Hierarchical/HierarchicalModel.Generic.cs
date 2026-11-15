@@ -760,9 +760,18 @@ namespace Avalonia.Controls.DataGridHierarchical
     #else
     internal
     #endif
-    class HierarchicalModel<T> : HierarchicalModel, IHierarchicalModel<T>
+    class HierarchicalModel<T> : HierarchicalModel, IHierarchicalModel<T>, IDataGridTypedHierarchicalAdapterSource
     {
         private ProjectedObservableNodes<T>? _observableFlattened;
+
+        DataGridHierarchicalAdapter? IDataGridTypedHierarchicalAdapterSource.TryCreateTypedAdapter(
+            DataGrid grid,
+            IDataGridHierarchicalAdapterFactory factory)
+        {
+            return factory is IDataGridHierarchicalAdapterFactory<T> typedFactory
+                ? typedFactory.Create(grid, this)?.InnerAdapter
+                : null;
+        }
 
         public HierarchicalModel(HierarchicalOptions<T>? options = null)
             : base(PrepareOptions(options ??= new HierarchicalOptions<T>()))

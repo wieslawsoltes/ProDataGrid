@@ -73,6 +73,9 @@ namespace Avalonia.Controls
             "Expression-based column bindings require dynamic code generation. " +
             "Use DataGridBindingDefinition.Create with a prebuilt CompiledBindingPath or property info for AOT.")]
 #endif
+        [RequiresUnreferencedCode(
+            "Expression-based column bindings inspect the expression with reflection. " +
+            "Use DataGridBindingDefinition.Create with a prebuilt CompiledBindingPath or property info for trimmed apps.")]
         public static DataGridBindingDefinition Create<TItem, TValue>(
             Expression<Func<TItem, TValue>> expression,
             Action<TItem, TValue> setter = null)

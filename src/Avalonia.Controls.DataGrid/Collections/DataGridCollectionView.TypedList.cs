@@ -6,6 +6,8 @@
 #nullable disable
 
 using System.ComponentModel;
+using System.Diagnostics.CodeAnalysis;
+using Avalonia.Controls;
 
 namespace Avalonia.Collections
 {
@@ -24,6 +26,17 @@ namespace Avalonia.Collections
                 return sourceTypedList.GetItemProperties(listAccessors);
             }
 
+            if (!DataGridReflectionFeature.IsEnabled)
+            {
+                return new PropertyDescriptorCollection(null);
+            }
+
+            return GetReflectedItemProperties();
+        }
+
+        [RequiresUnreferencedCode("TypeDescriptor inspects the item type of the source collection.")]
+        private PropertyDescriptorCollection GetReflectedItemProperties()
+        {
             // Fall back to descriptors from a representative item or the item type.
             var representative = GetRepresentativeItem();
             if (representative != null)

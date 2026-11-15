@@ -10,6 +10,12 @@
     <AvaloniaUseCompiledXaml>true</AvaloniaUseCompiledXaml>
   </PropertyGroup>
 
+  <!-- The trim analyzer only honors FeatureGuard/FeatureSwitchDefinition from .NET 9, so the
+       reflection guards are only provable (and the assembly only marked trimmable) on net9.0+. -->
+  <PropertyGroup Condition="$([MSBuild]::IsTargetFrameworkCompatible('$(TargetFramework)', 'net9.0'))">
+    <IsAotCompatible>true</IsAotCompatible>
+  </PropertyGroup>
+
   <PropertyGroup>
     <PackageDescription>ProDataGrid is a high-performance DataGrid control for Avalonia, a cross-platform UI framework for .NET.</PackageDescription>
     <PackageTags>avalonia;avaloniaui;datagrid;prodatagrid;mvvm;net;netstandard</PackageTags>
@@ -17,6 +23,10 @@
 
   <ItemGroup>
     <AvaloniaXaml Include="Themes/**/*.xaml" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="build/ProDataGrid.targets" Pack="true" PackagePath="build/;buildTransitive/" />
   </ItemGroup>
 
   <ItemGroup>
@@ -32,6 +42,7 @@
   <ItemGroup Label="InternalsVisibleTo">
     <InternalsVisibleTo Include="Avalonia.Controls.DataGrid.UnitTests, PublicKey=$(AvaloniaPublicKey)" />
     <InternalsVisibleTo Include="Avalonia.Controls.DataGrid.LeakTests, PublicKey=$(AvaloniaPublicKey)" />
+    <InternalsVisibleTo Include="Avalonia.Controls.DataGrid.ReflectionDisabledTests, PublicKey=$(AvaloniaPublicKey)" />
   </ItemGroup>
 
   <Import Project="../../build/SharedVersion.props" />

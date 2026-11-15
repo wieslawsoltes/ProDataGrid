@@ -15,7 +15,6 @@ namespace Avalonia.Controls.DataGridHierarchical
     /// <summary>
     /// Sorting adapter that routes sorting descriptors into hierarchical sibling ordering.
     /// </summary>
-    [RequiresUnreferencedCode("HierarchicalSortingAdapter uses reflection to walk property paths and is not compatible with trimming.")]
 #if !DATAGRID_INTERNAL
     public
 #else
@@ -73,7 +72,6 @@ namespace Avalonia.Controls.DataGridHierarchical
         }
     }
 
-    [RequiresUnreferencedCode("Hierarchical sibling comparison uses reflection to walk property paths and is not compatible with trimming.")]
     internal static class HierarchicalSiblingComparerBuilder
     {
         public static IComparer<object>? Build(IReadOnlyList<SortingDescriptor> descriptors, IComparer<object>? defaultComparer)
@@ -166,6 +164,8 @@ namespace Avalonia.Controls.DataGridHierarchical
 
             public static Accessor Identity { get; } = new Accessor(x => x);
 
+            private static Accessor Unresolved { get; } = new Accessor(_ => null);
+
             public object? GetValue(object? target) => _getter(target);
 
             public static Accessor Create(string? propertyPath)
@@ -189,7 +189,19 @@ namespace Avalonia.Controls.DataGridHierarchical
                     fallbackParts = strippedPath.Split('.');
                 }
 
-                var parts = propertyPath.Split('.');
+                if (!DataGridReflectionFeature.IsEnabled)
+                {
+                    // Without reflection only descriptors that carry a comparer (built from column
+                    // value accessors) can order siblings; a bare path leaves the order unchanged.
+                    return Unresolved;
+                }
+
+                return CreateReflectionAccessor(propertyPath.Split('.'), fallbackParts);
+            }
+
+            [RequiresUnreferencedCode("Resolving a sort property path uses reflection on the item type.")]
+            private static Accessor CreateReflectionAccessor(string[] parts, string[]? fallbackParts)
+            {
                 var cache = new Dictionary<Type, PropertyInfo[]>();
 
                 return new Accessor(target =>
@@ -227,6 +239,7 @@ namespace Avalonia.Controls.DataGridHierarchical
                 });
             }
 
+            [RequiresUnreferencedCode("Resolving a sort property path uses reflection on the item type.")]
             private static PropertyInfo[]? ResolveParts(Type targetType, string[] parts)
             {
                 var properties = new PropertyInfo[parts.Length];
@@ -253,6 +266,7 @@ namespace Avalonia.Controls.DataGridHierarchical
                 return properties;
             }
 
+            [RequiresUnreferencedCode("Resolving a sort property path uses reflection on the item type.")]
             private static PropertyInfo? GetProperty(Type targetType, string name)
             {
                 return targetType.GetProperty(

@@ -2,6 +2,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Reflection;
 using Avalonia.Controls;
@@ -317,6 +318,11 @@ internal
                 return false;
             }
 
+            if (!DataGridReflectionFeature.IsEnabled)
+            {
+                return false;
+            }
+
             object current = control.DataContext;
             var segments = _bindingPath.Split('.');
 
@@ -331,6 +337,7 @@ internal
             return TrySetMemberValue(current, segments[^1], targetValue, out error);
         }
 
+        [RequiresUnreferencedCode("Writing a cell value back by member name uses reflection on the data item.")]
         private static bool TryGetMemberValue(object instance, string memberName, out object? value)
         {
             value = null;
@@ -353,6 +360,7 @@ internal
             return false;
         }
 
+        [RequiresUnreferencedCode("Writing a cell value back by member name uses reflection on the data item.")]
         private static bool TrySetMemberValue(object instance, string memberName, object? value, out Exception? error)
         {
             error = null;

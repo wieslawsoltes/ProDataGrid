@@ -68,6 +68,10 @@ namespace Avalonia.Collections
             {
                 throw new InvalidOperationException(GetOperationNotAllowedText(nameof(AddNew)));
             }
+            else if (_newItemFactory != null)
+            {
+                newItem = _newItemFactory();
+            }
             else if (_itemConstructor != null)
             {
                 newItem = _itemConstructor.Invoke(null);
