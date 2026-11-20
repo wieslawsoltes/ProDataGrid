@@ -305,7 +305,14 @@ internal
                     !AreScrollInfoSizeClose(measuredHeight, effectiveRowsHeight);
                 if (widthChanged || heightChanged)
                 {
-                    OwningGrid.RowsPresenterAvailableSize = viewport;
+                    var contentSizedShorterThanMeasured = heightChanged && !widthChanged &&
+                        !double.IsInfinity(measuredHeight) &&
+                        effectiveRowsHeight + threshold < measuredHeight;
+                    if (!contentSizedShorterThanMeasured)
+                    {
+                        OwningGrid.RowsPresenterAvailableSize = viewport;
+                    }
+
                     DataGridDiagnostics.RecordRowsArrangeMeasureInvalidated();
                     InvalidateMeasure();
                 }
