@@ -19,6 +19,10 @@ on:
         description: 'Build, test, and pack only'
         type: boolean
         default: false
+      release_from_tag:
+        description: 'Use the existing version tag as the source'
+        type: boolean
+        default: false
 
 permissions:
   contents: read
@@ -39,11 +43,13 @@ jobs:
     outputs:
       version: ${{ steps.version.outputs.version }}
       is-prerelease: ${{ steps.version.outputs.is-prerelease }}
+      source-sha: ${{ steps.version.outputs.source-sha }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
+          ref: ${{ inputs.release_from_tag && format('refs/tags/v{0}', inputs.version) || '' }}
 
       - name: Setup .NET
         uses: actions/setup-dotnet@v4
@@ -56,6 +62,7 @@ jobs:
           REQUESTED_VERSION: ${{ inputs.version }}
           REQUESTED_PRERELEASE: ${{ inputs.prerelease }}
         run: |
+          source_sha=$(git rev-parse HEAD)
           version=$(dotnet msbuild src/Avalonia.Controls.DataGrid/Avalonia.Controls.DataGrid.csproj \
             -nologo -getProperty:PackageVersion -p:Configuration=Release)
           if [[ "$GITHUB_EVENT_NAME" == "workflow_dispatch" ]]; then
@@ -74,12 +81,12 @@ jobs:
             echo "::error::The release version must match $version in build/SharedVersion.props. Use tag $tag for a tag release."
             exit 1
           fi
-          if tagged_commit=$(git rev-parse --verify --quiet "refs/tags/$tag^{commit}") && [[ "$tagged_commit" != "$GITHUB_SHA" ]]; then
+          if tagged_commit=$(git rev-parse --verify --quiet "refs/tags/$tag^{commit}") && [[ "$tagged_commit" != "$source_sha" ]]; then
             echo "::error::Tag $tag already points to a different commit."
             exit 1
           fi
 
-          printf 'version=%s\nis-prerelease=%s\n' "$version" "$is_prerelease" >> "$GITHUB_OUTPUT"
+          printf 'version=%s\nis-prerelease=%s\nsource-sha=%s\n' "$version" "$is_prerelease" "$source_sha" >> "$GITHUB_OUTPUT"
 
       - name: Restore
         run: dotnet restore
@@ -97,6 +104,8 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          ref: ${{ needs.build.outputs.source-sha }}
 
       - name: Setup .NET
         uses: actions/setup-dotnet@v4
@@ -110,7 +119,11 @@ jobs:
         run: dotnet build -c Release --no-restore
 
       - name: Test
-        run: dotnet test -c Release --no-build --settings build/ci.runsettings --logger trx --results-directory artifacts/test --filter FullyQualifiedName!~LeakTests -p:TestTfmsInParallel=false
+        # Compact XAML identifiers can contain characters that Cobertura XML cannot represent.
+        run: >-
+          dotnet test -c Release --no-build --settings build/ci.runsettings --logger trx
+          --results-directory artifacts/test --filter 'FullyQualifiedName!~LeakTests'
+          -p:TestTfmsInParallel=false -p:CollectCoverage=false
 
       - name: Upload test results
         uses: actions/upload-artifact@v4
@@ -137,6 +150,8 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          ref: ${{ needs.build.outputs.source-sha }}
 
       - name: Setup .NET
         uses: actions/setup-dotnet@v4
@@ -176,6 +191,7 @@ jobs:
         uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
         with:
           persist-credentials: false
+          ref: ${{ needs.build.outputs.source-sha }}
 
       - name: Setup .NET
         uses: actions/setup-dotnet@67a3573c9a986a3f9c594539f4ab511d57bb3ce9 # v4
@@ -213,6 +229,8 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          ref: ${{ needs.build.outputs.source-sha }}
 
       - name: Download NuGet packages
         uses: actions/download-artifact@v4
@@ -225,7 +243,7 @@ jobs:
         with:
           name: ProDataGrid v${{ needs.build.outputs.version }}
           tag_name: v${{ needs.build.outputs.version }}
-          target_commitish: ${{ github.sha }}
+          target_commitish: ${{ needs.build.outputs.source-sha }}
           draft: false
           prerelease: ${{ needs.build.outputs.is-prerelease == 'true' }}
           generate_release_notes: true
