@@ -33,8 +33,7 @@ public class DataGridRowHeaderNumberTests
             .Build();
         var binding = new CompiledBinding(path) { StringFormat = useTypedBinding ? null : "{0}" };
         var grid = CreateGrid(items, binding);
-        var root = new Window { Content = grid, Width = 320, Height = 240 };
-        root.SetThemeStyles();
+        var root = CreateWindow(grid);
 
         try
         {
@@ -73,8 +72,7 @@ public class DataGridRowHeaderNumberTests
     {
         var items = new ObservableCollection<RowItem> { new("Alpha") };
         var grid = CreateGrid(items, "Styled header");
-        var root = new Window { Content = grid, Width = 320, Height = 240 };
-        root.SetThemeStyles();
+        var root = CreateWindow(grid);
 
         try
         {
@@ -108,14 +106,26 @@ public class DataGridRowHeaderNumberTests
             ItemsSource = items,
             AutoGenerateColumns = false,
             CanUserAddRows = false,
-            HeadersVisibility = DataGridHeadersVisibility.All,
-            RowTheme = new ControlTheme(typeof(DataGridRow))
-            {
-                Setters = { new Setter(DataGridRow.HeaderProperty, header) }
-            }
+            HeadersVisibility = DataGridHeadersVisibility.All
         };
-        grid.Columns.Add(new DataGridTextColumn { Header = "Name" });
+        grid.Styles.Add(new Style(selector => selector.OfType<DataGridRow>())
+        {
+            Setters = { new Setter(DataGridRow.HeaderProperty, header) }
+        });
+        grid.Columns.Add(new DataGridTextColumn
+        {
+            Header = "Name",
+            Binding = CompiledBinding.Create<RowItem, string>(item => item.Name)
+        });
         return grid;
+    }
+
+    private static Window CreateWindow(DataGrid grid)
+    {
+        var root = new Window { Width = 320, Height = 240 };
+        root.SetThemeStyles(DataGridTheme.SimpleV2);
+        root.Content = grid;
+        return root;
     }
 
     private static void AssertHeader(object expected, DataGridRow row)
