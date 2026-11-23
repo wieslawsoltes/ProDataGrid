@@ -232,6 +232,9 @@ namespace Avalonia.Controls
                     if (row.Index != rowIndex)
                     {
                         row.Index = rowIndex;
+
+                        _rowsPresenter?.InvalidateChildIndex(row);
+
                         requestPointerOverRefresh = true;
                         stateChanged = true;
                     }

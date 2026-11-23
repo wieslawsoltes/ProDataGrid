@@ -21,6 +21,88 @@ namespace Avalonia.Controls.DataGridTests;
 /// </summary>
 public class DataGridDisplayDataTests
 {
+    [AvaloniaFact]
+    public void CancellingDeferredHide_DoesNotAllocate_OrHideReusedRow()
+    {
+        var grid = new DataGrid();
+        var display = grid.DisplayData;
+        var row = new DataGridRow();
+        using (display.BeginDeferredRecycleScope())
+        {
+            display.ActivateDeferredRecycleHiding(DataGridRecycleReuseOrder.TopDown);
+            for (int index = 0; index < 100; index++)
+            {
+                Assert.True(display.TryDeferElementHide(row));
+                display.CancelDeferredHide(row);
+            }
+            long before = GC.GetAllocatedBytesForCurrentThread();
+            for (int index = 0; index < 1000; index++)
+            {
+                display.TryDeferElementHide(row);
+                display.CancelDeferredHide(row);
+            }
+            long allocated = GC.GetAllocatedBytesForCurrentThread() - before;
+            Assert.Equal(0, allocated);
+        }
+        Assert.True(row.IsVisible);
+    }
+
+    [AvaloniaFact]
+    public void ScrollingElementMembership_DoesNotAllocate_AndTracksRemoval()
+    {
+        var grid = new DataGrid();
+        var display = grid.DisplayData;
+        var first = new DataGridRow();
+        var second = new DataGridRow();
+        var absent = new DataGridRow();
+        Assert.False(display.ContainsScrollingElement(first));
+        display.LoadScrollingSlot(0, first, updateSlotInformation: true);
+        display.LoadScrollingSlot(1, second, updateSlotInformation: true);
+        Assert.True(display.ContainsScrollingElement(first));
+        Assert.True(display.ContainsScrollingElement(second));
+        Assert.False(display.ContainsScrollingElement(absent));
+
+        // Warm both present and missing lookups before measuring the hot path.
+        for (int index = 0; index < 100; index++)
+        {
+            display.ContainsScrollingElement(second);
+            display.ContainsScrollingElement(absent);
+        }
+        int found = 0;
+        long before = GC.GetAllocatedBytesForCurrentThread();
+        for (int index = 0; index < 1000; index++)
+        {
+            if (display.ContainsScrollingElement(second)) found++;
+            if (display.ContainsScrollingElement(absent)) found++;
+        }
+        long allocated = GC.GetAllocatedBytesForCurrentThread() - before;
+        Assert.Equal(1000, found);
+        Assert.Equal(0, allocated);
+
+        display.ClearElements(recycle: false);
+        Assert.False(display.ContainsScrollingElement(first));
+        Assert.False(display.ContainsScrollingElement(second));
+    }
+
+    [AvaloniaFact]
+    public void EmptyRecyclePoolLookup_DoesNotAllocateRestoreDelegates()
+    {
+        var display = new DataGrid().DisplayData;
+        object item = new object();
+        for (int index = 0; index < 100; index++)
+        {
+            Assert.Null(display.GetRecycledRow(item, 0, 0));
+        }
+
+        long before = GC.GetAllocatedBytesForCurrentThread();
+        for (int index = 0; index < 1000; index++)
+        {
+            display.GetRecycledRow(item, 0, 0);
+        }
+        long allocated = GC.GetAllocatedBytesForCurrentThread() - before;
+        Assert.Equal(0, allocated);
+    }
+
     #region Row Recycling Tests
 
     [AvaloniaFact]
