@@ -6,12 +6,25 @@
 #nullable disable
 
 using System.ComponentModel;
+using System.Diagnostics.CodeAnalysis;
+using Avalonia.Controls;
 
 namespace Avalonia.Collections
 {
     sealed partial class DataGridCollectionView
     {
         PropertyDescriptorCollection ITypedList.GetItemProperties(PropertyDescriptor[] listAccessors)
+        {
+            if (!DataGridReflectionOptions.IsEnabled)
+            {
+                throw DataGridReflectionOptions.CreateException("TypeDescriptor item discovery");
+            }
+
+            return GetItemPropertiesWithReflection(listAccessors);
+        }
+
+        [RequiresUnreferencedCode("TypeDescriptor item discovery requires item members and metadata to be preserved.")]
+        private PropertyDescriptorCollection GetItemPropertiesWithReflection(PropertyDescriptor[] listAccessors)
         {
             // Prefer the binding list if it exposes ITypedList (e.g. DataView for DataTable).
             if (_bindingList is ITypedList bindingTypedList)

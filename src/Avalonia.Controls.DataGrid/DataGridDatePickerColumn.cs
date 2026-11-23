@@ -251,6 +251,11 @@ internal
                 
                 if (Binding is Binding binding)
                 {
+                    if (!DataGridReflectionOptions.IsEnabled)
+                    {
+                        throw DataGridReflectionOptions.CreateException("Reflection display bindings");
+                    }
+
                     var displayBinding = new Binding
                     {
                         Path = binding.Path,

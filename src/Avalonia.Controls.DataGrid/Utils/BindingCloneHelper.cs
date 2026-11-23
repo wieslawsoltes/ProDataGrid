@@ -299,6 +299,12 @@ namespace Avalonia.Controls.Utils
 
         private static Binding CloneBinding(Binding source)
         {
+            if (!DataGridReflectionOptions.IsEnabled)
+            {
+                throw DataGridReflectionOptions.CreateException("Reflection edit bindings");
+            }
+
+
             return new Binding
             {
                 Path = source.Path,
@@ -323,6 +329,12 @@ namespace Avalonia.Controls.Utils
 
         private static ReflectionBinding CloneBinding(ReflectionBinding source)
         {
+            if (!DataGridReflectionOptions.IsEnabled)
+            {
+                throw DataGridReflectionOptions.CreateException("Reflection edit bindings");
+            }
+
+
             return new ReflectionBinding(source.Path)
             {
                 ElementName = source.ElementName,

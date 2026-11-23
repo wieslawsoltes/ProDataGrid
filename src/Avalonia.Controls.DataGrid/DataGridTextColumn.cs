@@ -596,7 +596,7 @@ internal
         {
             return binding switch
             {
-                Binding avaloniaBinding => new Binding
+                Binding avaloniaBinding when DataGridReflectionOptions.IsEnabled => new Binding
                 {
                     Path = avaloniaBinding.Path,
                     ElementName = avaloniaBinding.ElementName,
@@ -616,6 +616,7 @@ internal
                     UpdateSourceTrigger = avaloniaBinding.UpdateSourceTrigger,
                     Mode = GetDisplayMode(avaloniaBinding.Mode)
                 },
+                Binding _ => throw DataGridReflectionOptions.CreateException("Reflection bindings"),
                 CompiledBindingExtension compiledBinding => new CompiledBindingExtension
                 {
                     Path = compiledBinding.Path,

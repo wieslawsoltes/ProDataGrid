@@ -100,3 +100,5 @@ var totalColumn = new DataGridTextColumnDefinition
 
 For model integration details, see [Column Definitions: Model Integration and Fast Path](column-definitions-models.md).
 For an end-to-end fast path guide, see [Column Definitions: Fast Path Overview](column-definitions-fast-path-overview.md).
+
+For the application-level reflection switch, supported targets, and compatibility limits, see [Trimming and NativeAOT](trimming-native-aot.md).

@@ -317,6 +317,11 @@ internal
                 return false;
             }
 
+            if (!DataGridReflectionOptions.IsEnabled)
+            {
+                throw DataGridReflectionOptions.CreateException("Property-path edit fallback");
+            }
+
             object current = control.DataContext;
             var segments = _bindingPath.Split('.');
 

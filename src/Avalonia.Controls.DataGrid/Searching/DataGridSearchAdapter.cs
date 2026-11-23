@@ -26,7 +26,6 @@ namespace Avalonia.Controls.DataGridSearching
     /// <summary>
     /// Computes search results from descriptors against the view.
     /// </summary>
-    [RequiresUnreferencedCode("DataGridSearchAdapter uses reflection to access item properties and is not compatible with trimming.")]
 #if !DATAGRID_INTERNAL
     public
 #else

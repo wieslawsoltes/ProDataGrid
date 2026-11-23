@@ -58,6 +58,10 @@ internal sealed class AotTradeRow
     [DataGridColumn(DataGridColumnKind.DatePicker, Header = "Timestamp", ColumnKey = "timestamp", Order = 4, FormatString = "HH:mm:ss")]
     public DateTimeOffset Timestamp { get; init; }
 
+    public double Volume { get; set; }
+
+    public TimeSpan? Time { get; set; }
+
     public static void ConfigureOutlineGroup(OutlineGroupField field) => field.ShowSubtotals = false;
 
     public static void ConfigureOutlineValue(OutlineValueField field) => field.NullLabel = "AOT empty";

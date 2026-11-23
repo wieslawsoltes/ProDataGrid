@@ -3,7 +3,10 @@
 
 using System;
 using System.Globalization;
+using System.Collections.Generic;
+using Avalonia.Data.Core;
 using Avalonia.Controls;
+using Avalonia.Collections;
 using ProDataGrid.SourceGeneration.AotSmoke;
 using ProDataGrid.SourceGeneration.AotSmoke.Generated;
 using ProDataGrid.SourceGeneration.AotSmoke.Views;
@@ -112,6 +115,74 @@ if (AotGeneratedGridView.GeneratedViewThemeKey != "AotGeneratedViewTheme" ||
     return 3;
 }
 
+if (DataGridReflectionOptions.IsEnabled)
+{
+    return 4;
+}
+
+var beta = new AotTradeRow { Id = 8, Symbol = "Beta" };
+var alpha = new AotTradeRow { Id = 3, Symbol = "Alpha" };
+var typedView = new DataGridCollectionView(new List<AotTradeRow> { beta, alpha });
+var symbolAccessor = new DataGridColumnValueAccessor<AotTradeRow, string>(
+    row => row.Symbol, (row, symbol) => row.Symbol = symbol);
+typedView.SortDescriptions.Add(DataGridSortDescription.FromAccessor(symbolAccessor));
+if (!ReferenceEquals(typedView[0], alpha))
+{
+    return 5;
+}
+
+symbolAccessor.SetValue(beta, "Aardvark");
+typedView.Refresh();
+var typedGrid = new DataGrid
+{
+    AutoGenerateColumns = false,
+    FastPathOptions = viewModel.FastPathOptions,
+    ColumnDefinitionsSource = viewModel.ColumnDefinitions,
+    ItemsSource = typedView,
+    SelectedItem = beta
+};
+if (!ReferenceEquals(typedView[0], beta) ||
+    beta.Symbol != "Aardvark" ||
+    !ReferenceEquals(typedGrid.SelectedItem, beta) ||
+    typedGrid.SelectedItems.Count != 1)
+{
+    return 6;
+}
+
+if (typedGrid.Columns[1].IsReadOnly || !typedGrid.Columns[0].IsReadOnly)
+{
+    return 7;
+}
+
+var volumeProperty = new ClrPropertyInfo(nameof(AotTradeRow.Volume), row => ((AotTradeRow)row).Volume,
+    (row, value) => ((AotTradeRow)row).Volume = (double)value!, typeof(double));
+var timeProperty = new ClrPropertyInfo(nameof(AotTradeRow.Time), row => ((AotTradeRow)row).Time,
+    (row, value) => ((AotTradeRow)row).Time = (TimeSpan?)value, typeof(TimeSpan?));
+var additionalGrid = new DataGrid
+{
+    AutoGenerateColumns = false,
+    ColumnDefinitionsSource = new DataGridColumnDefinition[]
+    {
+        new DataGridSliderColumnDefinition
+        {
+            Header = "Volume",
+            ShowValueText = true,
+            Binding = DataGridBindingDefinition.Create<AotTradeRow, double>(volumeProperty,
+                row => row.Volume, (row, value) => row.Volume = value)
+        },
+        new DataGridTimePickerColumnDefinition
+        {
+            Header = "Time",
+            Binding = DataGridBindingDefinition.Create<AotTradeRow, TimeSpan?>(timeProperty,
+                row => row.Time, (row, value) => row.Time = value)
+        },
+        new DataGridFormulaColumnDefinition { Header = "Formula", Formula = "1+2" }
+    },
+    ItemsSource = new List<AotTradeRow> { beta, alpha }
+};
+GC.KeepAlive(additionalGrid);
+Console.WriteLine("NativeAOT smoke passed: reflection disabled; typed sorting, setters, selection, writable/readonly capabilities, Slider/TimePicker/formula columns, generated editing and views.");
+GC.KeepAlive(typedGrid);
 GC.KeepAlive(registeredView);
 GC.KeepAlive(avaloniaView);
 GC.KeepAlive(reactiveView);

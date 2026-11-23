@@ -565,6 +565,11 @@ internal
         {
             if (!string.IsNullOrWhiteSpace(DisplayMemberPath))
             {
+                if (!DataGridReflectionOptions.IsEnabled)
+                {
+                    throw DataGridReflectionOptions.CreateException("ComboBox property paths");
+                }
+
                 return new Binding(DisplayMemberPath);
             }
 
@@ -575,6 +580,11 @@ internal
         {
             if (!string.IsNullOrWhiteSpace(SelectedValuePath))
             {
+                if (!DataGridReflectionOptions.IsEnabled)
+                {
+                    throw DataGridReflectionOptions.CreateException("ComboBox property paths");
+                }
+
                 return new Binding(SelectedValuePath);
             }
 

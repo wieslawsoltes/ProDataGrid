@@ -21,7 +21,6 @@ namespace Avalonia.Controls.DataGridFiltering
     /// <summary>
     /// Bridges filtering descriptors to the view's Filter predicate.
     /// </summary>
-    [RequiresUnreferencedCode("DataGridFilteringAdapter uses reflection to access item properties and is not compatible with trimming.")]
 #if !DATAGRID_INTERNAL
     public
 #else
@@ -539,6 +538,11 @@ namespace Avalonia.Controls.DataGridFiltering
                 if (cached != null)
                 {
                     return cached(item);
+                }
+
+                if (!DataGridReflectionOptions.IsEnabled)
+                {
+                    throw DataGridReflectionOptions.CreateException("Property-path filtering");
                 }
 
                 var prop = type.GetProperty(propertyPath);

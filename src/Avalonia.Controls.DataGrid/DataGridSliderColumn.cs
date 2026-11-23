@@ -249,7 +249,12 @@ internal
                 {
                     if (Binding is Binding binding)
                     {
-                        var displayBinding = new Binding
+                        if (!DataGridReflectionOptions.IsEnabled)
+                    {
+                        throw DataGridReflectionOptions.CreateException("Reflection display bindings");
+                    }
+
+                    var displayBinding = new Binding
                         {
                             Path = binding.Path,
                             Mode = BindingMode.OneWay,

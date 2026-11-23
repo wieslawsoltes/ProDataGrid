@@ -16,7 +16,6 @@ namespace Avalonia.Controls
     /// <summary>
     /// Abstraction over a property, supporting both reflection and component model descriptors.
     /// </summary>
-    [RequiresUnreferencedCode("DataGridItemPropertyDescriptor uses reflection and TypeDescriptor to inspect data items and is not compatible with trimming.")]
     internal sealed class DataGridItemPropertyDescriptor
     {
         private DataGridItemPropertyDescriptor(
@@ -48,6 +47,12 @@ namespace Avalonia.Controls
         public PropertyDescriptor? PropertyDescriptor { get; }
 
         public static DataGridItemPropertyDescriptor[]? CreateDescriptors(IEnumerable? items, Type? dataType)
+        {
+            return DataGridReflectionOptions.IsEnabled ? CreateDescriptorsWithReflection(items, dataType) : null;
+        }
+
+        [RequiresUnreferencedCode("Item descriptor discovery requires public item properties and TypeDescriptor metadata.")]
+        private static DataGridItemPropertyDescriptor[]? CreateDescriptorsWithReflection(IEnumerable? items, Type? dataType)
         {
             // Prefer ITypedList (e.g. DataView) when available.
             if (items is ITypedList typedList)
@@ -189,6 +194,7 @@ namespace Avalonia.Controls
 #endif
         }
 
+        [RequiresUnreferencedCode("TypeDescriptor requires item metadata that trimming cannot infer.")]
         private static PropertyDescriptorCollection? GetTypeDescriptorPropertiesSafe(object target)
         {
             try
