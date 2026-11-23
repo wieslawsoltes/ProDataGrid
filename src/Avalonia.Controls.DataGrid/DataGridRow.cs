@@ -12,7 +12,6 @@ using Avalonia.Controls.Shapes;
 using Avalonia.Controls.Templates;
 using Avalonia.Controls.Utils;
 using Avalonia.Data;
-using Avalonia.Data.Core;
 using Avalonia.Input;
 using Avalonia.Media;
 using Avalonia.Utilities;
@@ -260,7 +259,7 @@ internal
 
         static DataGridRow()
         {
-            HeaderProperty.Changed.AddClassHandler<DataGridRow>((x, e) => x.OnHeaderChanged(e));
+            HeaderProperty.Changed.AddClassHandler<DataGridRow>((x, _) => x.UpdateHeaderContent());
             IndexProperty.Changed.AddClassHandler<DataGridRow>((x, e) => x.OnIndexChanged(e));
             DetailsTemplateProperty.Changed.AddClassHandler<DataGridRow>((x, e) => x.OnDetailsTemplateChanged(e));
             AreDetailsVisibleProperty.Changed.AddClassHandler<DataGridRow>((x, e) => x.OnAreDetailsVisibleChanged(e));
@@ -307,26 +306,8 @@ internal
             }
         }
 
-        private void OnHeaderChanged(AvaloniaPropertyChangedEventArgs e)
+        private void UpdateHeaderContent()
         {
-            UpdateHeaderContent(forceBindingUpdate: true);
-        }
-
-        private void UpdateHeaderContent(bool forceBindingUpdate)
-        {
-            var binding = BindingOperations.GetBindingExpressionBase(this, HeaderProperty) as UntypedBindingExpressionBase;
-            if (binding != null)
-            {
-                if (!binding.IsRunning)
-                {
-                    binding.Start();
-                }
-                if (forceBindingUpdate)
-                {
-                    binding.UpdateTarget();
-                }
-            }
-
             if (_headerElement != null)
             {
                 _headerElement.Content = Header;
@@ -688,7 +669,7 @@ internal
             if (_headerElement != null)
             {
                 _headerElement.Owner = this;
-                UpdateHeaderContent(forceBindingUpdate: true);
+                UpdateHeaderContent();
                 EnsureHeaderStyleAndVisibility(null);
             }
 
