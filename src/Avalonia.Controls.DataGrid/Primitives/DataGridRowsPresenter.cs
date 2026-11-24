@@ -286,7 +286,7 @@ internal
             {
                 var arrangedConstraint = new Size(
                     double.IsInfinity(originalConstraint.Width) ? originalConstraint.Width : viewport.Width,
-                    double.IsInfinity(originalConstraint.Height) && MatchesDesiredHeight(viewport.Height)
+                    !AreScrollInfoSizeClose(originalConstraint.Height, viewport.Height) && MatchesDesiredHeight(viewport.Height)
                         ? originalConstraint.Height
                         : viewport.Height);
                 _arrangedMeasureSize = AreClose(originalConstraint, arrangedConstraint) ? null : arrangedConstraint;
@@ -305,7 +305,14 @@ internal
                     !AreScrollInfoSizeClose(measuredHeight, effectiveRowsHeight);
                 if (widthChanged || heightChanged)
                 {
-                    OwningGrid.RowsPresenterAvailableSize = viewport;
+                    var contentSizedShorterThanMeasured = heightChanged && !widthChanged &&
+                        !double.IsInfinity(measuredHeight) &&
+                        effectiveRowsHeight + threshold < measuredHeight;
+                    if (!contentSizedShorterThanMeasured)
+                    {
+                        OwningGrid.RowsPresenterAvailableSize = viewport;
+                    }
+
                     DataGridDiagnostics.RecordRowsArrangeMeasureInvalidated();
                     InvalidateMeasure();
                 }
