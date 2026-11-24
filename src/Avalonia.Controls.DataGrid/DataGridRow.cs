@@ -567,6 +567,8 @@ internal
             }
         }
 
+        internal double HeightWithoutDetails => DesiredSize.Height - (_detailsElement?.DesiredSize.Height ?? 0);
+
         /// <summary>
         /// Returns the index of the current row.
         /// </summary>
