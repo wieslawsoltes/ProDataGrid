@@ -322,7 +322,13 @@ internal
                 return false;
             }
 
-            var propertyType = ReflectionPropertyPath.GetPropertyType(item.GetType(), bindingPath);
+            // Without reflection the value type and the setter come from the value accessor of the column.
+            var accessor = DataGridReflectionFeature.IsEnabled
+                ? null
+                : DataGridColumnMetadata.ResolveValueAccessor(column, bindingPath);
+            var propertyType = accessor != null
+                ? accessor.CanWrite ? accessor.ValueType : null
+                : ReflectionPropertyPath.GetPropertyType(item.GetType(), bindingPath);
             if (propertyType == null)
             {
                 return false;
@@ -337,6 +343,12 @@ internal
             if (converted == AvaloniaProperty.UnsetValue || converted == BindingOperations.DoNothing)
             {
                 return false;
+            }
+
+            if (accessor != null)
+            {
+                accessor.SetValue(item, converted);
+                return true;
             }
 
             return ReflectionPropertyPath.TrySetValue(item, bindingPath, converted);

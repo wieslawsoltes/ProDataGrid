@@ -841,7 +841,7 @@ namespace Avalonia.Controls.DataGridFormulas
                 var definition = DataGridColumnMetadata.GetDefinition(column);
                 var name = ResolveColumnName(column, definition);
                 var formulaDefinition = definition as DataGridFormulaColumnDefinition;
-                var accessor = formulaDefinition == null ? DataGridColumnMetadata.GetValueAccessor(column) : null;
+                var accessor = formulaDefinition == null ? DataGridColumnMetadata.ResolveValueAccessor(column) : null;
 
                 if (formulaDefinition == null && accessor == null)
                 {

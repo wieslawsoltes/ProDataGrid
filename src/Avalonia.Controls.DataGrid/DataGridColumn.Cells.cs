@@ -391,7 +391,7 @@ namespace Avalonia.Controls
 
                     if (descriptor.HasPropertyPath)
                     {
-                        var accessor = DataGridColumnMetadata.GetValueAccessor(this);
+                        var accessor = DataGridColumnMetadata.ResolveValueAccessor(this, descriptor.PropertyPath);
                         if (accessor != null)
                         {
                             var culture = descriptor.Culture ?? CultureInfo.InvariantCulture;
@@ -416,7 +416,7 @@ namespace Avalonia.Controls
                             .FirstOrDefault(s => s.SourceComparer == CustomSortComparer);
                     }
 
-                    var accessor = DataGridColumnMetadata.GetValueAccessor(this);
+                    var accessor = DataGridColumnMetadata.ResolveValueAccessor(this);
                     if (accessor != null)
                     {
                         var match = OwningGrid.DataConnection.SortDescriptions

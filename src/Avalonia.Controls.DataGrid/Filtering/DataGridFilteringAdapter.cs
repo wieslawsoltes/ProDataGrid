@@ -361,7 +361,7 @@ namespace Avalonia.Controls.DataGridFiltering
             if (column != null)
             {
                 var filterAccessor = DataGridColumnFilter.GetValueAccessor(column);
-                var accessor = filterAccessor ?? DataGridColumnMetadata.GetValueAccessor(column);
+                var accessor = filterAccessor ?? DataGridColumnMetadata.ResolveValueAccessor(column, descriptor.PropertyPath);
                 if (accessor != null)
                 {
                     var key = new PredicateCacheKey(descriptor, accessor, null);

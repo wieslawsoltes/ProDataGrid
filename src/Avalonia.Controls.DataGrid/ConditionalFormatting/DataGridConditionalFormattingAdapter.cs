@@ -404,7 +404,7 @@ namespace Avalonia.Controls.DataGridConditionalFormatting
                 return null;
             }
 
-            var accessor = DataGridColumnMetadata.GetValueAccessor(column);
+            var accessor = DataGridColumnMetadata.ResolveValueAccessor(column);
             if (accessor != null)
             {
                 return accessor.GetValue(item);

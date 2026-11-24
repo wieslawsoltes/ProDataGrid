@@ -6046,7 +6046,7 @@ internal
             var sortAccessor = DataGridColumnSort.GetValueAccessor(column);
             if (sortAccessor != null || sortValueComparer != null)
             {
-                var resolvedAccessor = sortAccessor ?? DataGridColumnMetadata.GetValueAccessor(column);
+                var resolvedAccessor = sortAccessor ?? DataGridColumnMetadata.ResolveValueAccessor(column, propertyPath);
                 if (resolvedAccessor != null)
                 {
                     var resolvedComparer = DataGridColumnValueAccessorComparer.Create(resolvedAccessor, culture, sortValueComparer);
@@ -6057,7 +6057,7 @@ internal
             var comparer = existing?.Comparer;
             if (comparer == null)
             {
-                var accessor = DataGridColumnMetadata.GetValueAccessor(column);
+                var accessor = DataGridColumnMetadata.ResolveValueAccessor(column, propertyPath);
                 if (accessor != null)
                 {
                     comparer = DataGridColumnValueAccessorComparer.Create(accessor, culture);
