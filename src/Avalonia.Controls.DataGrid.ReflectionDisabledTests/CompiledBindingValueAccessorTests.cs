@@ -192,6 +192,42 @@ public class CompiledBindingValueAccessorTests
         Assert.Equal(new[] { 29, 35, 41 }, view.Cast<Person>().Select(p => p.Age));
     }
 
+    [AvaloniaFact]
+    public void ComboBox_Column_Applies_Member_Bindings_To_Its_Combo_Box()
+    {
+        var displayMemberBinding = CompiledBinding.Create<Option, string>(o => o.Label);
+        var selectedValueMemberBinding = CompiledBinding.Create<Option, int>(o => o.Id);
+        var column = new DataGridComboBoxColumn
+        {
+            ItemsSource = new[] { new Option(1, "One"), new Option(2, "Two") },
+            DisplayMemberPath = nameof(Option.Id),
+            DisplayMemberBinding = displayMemberBinding,
+            SelectedValueMemberBinding = selectedValueMemberBinding,
+            SelectedValueBinding = CompiledBinding.Create<Person, int>(p => p.Age)
+        };
+
+        var comboBox = Assert.IsType<ComboBox>(column.GenerateElementInternal(new DataGridCell(), new Person("Alice", 1)));
+
+        Assert.Same(displayMemberBinding, comboBox.DisplayMemberBinding);
+        Assert.Same(selectedValueMemberBinding, comboBox.SelectedValueBinding);
+    }
+
+    [AvaloniaFact]
+    public void ComboBox_Column_Ignores_Member_Paths_Without_Reflection()
+    {
+        var column = new DataGridComboBoxColumn
+        {
+            ItemsSource = new[] { new Option(1, "One") },
+            DisplayMemberPath = nameof(Option.Label),
+            SelectedValuePath = nameof(Option.Id)
+        };
+
+        var comboBox = Assert.IsType<ComboBox>(column.GenerateElementInternal(new DataGridCell(), new Person("Alice", 1)));
+
+        Assert.Null(comboBox.DisplayMemberBinding);
+        Assert.Null(comboBox.SelectedValueBinding);
+    }
+
     private static List<Person> CreatePeople() =>
     [
         new("Carol", 41),
@@ -212,6 +248,19 @@ public class CompiledBindingValueAccessorTests
         public int Age { get; set; }
 
         public Address Address { get; set; } = new(string.Empty);
+    }
+
+    public sealed class Option
+    {
+        public Option(int id, string label)
+        {
+            Id = id;
+            Label = label;
+        }
+
+        public int Id { get; }
+
+        public string Label { get; }
     }
 
     public sealed class Address
