@@ -6,6 +6,8 @@
     href: getting-started.md
   - name: Migration
     href: migration.md
+  - name: Trimming and Native AOT
+    href: trimming-and-native-aot.md
   - name: API Comparison (WPF)
     href: api-comparison.md
   - name: License

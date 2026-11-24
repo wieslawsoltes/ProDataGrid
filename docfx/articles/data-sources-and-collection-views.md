@@ -54,4 +54,4 @@ When binding to `DataTable.DefaultView`, the grid uses `TypeDescriptor` to resol
 
 ## Trimming Notes
 
-`DataGridCollectionView` uses reflection and `TypeDescriptor` to access properties. For trimming or AOT scenarios, prefer explicit columns or a custom collection view that does not rely on reflection.
+`DataGridCollectionView` uses reflection and `TypeDescriptor` only while reflection is enabled. In a trimmed or Native AOT application it reads values through column accessors and compiled bindings, and `AddNew` requires `NewItemFactory`. See [Trimming and Native AOT](trimming-and-native-aot.md).
