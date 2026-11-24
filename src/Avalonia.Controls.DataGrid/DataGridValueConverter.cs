@@ -20,6 +20,12 @@ namespace Avalonia.Controls
 
         public object? Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
         {
+            // Text cells convert strings to strings; both conversion paths return the value unchanged.
+            if (targetType == typeof(string) && (value == null || value is string))
+            {
+                return value;
+            }
+
             if (DataGridReflectionFeature.IsEnabled)
             {
                 return DefaultValueConverter.Instance.Convert(value, targetType, parameter, culture);

@@ -109,6 +109,7 @@ public class ReflectionDisabledTests
     {
         var converter = DataGridValueConverter.Instance;
 
+        Assert.Same("text", converter.Convert("text", typeof(string), null, CultureInfo.InvariantCulture));
         Assert.Equal(12, converter.Convert("12", typeof(int), null, CultureInfo.InvariantCulture));
         Assert.Equal("12.5", converter.Convert(12.5m, typeof(string), null, CultureInfo.InvariantCulture));
         Assert.Equal(DayOfWeek.Friday, converter.Convert("friday", typeof(DayOfWeek), null, CultureInfo.InvariantCulture));

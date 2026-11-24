@@ -22,6 +22,16 @@ public class DataGridValueConverterTests
         Assert.Equal(expected, result);
     }
 
+    [Theory]
+    [InlineData(null)]
+    [InlineData("text")]
+    public void Convert_Returns_Null_And_Strings_Unchanged_For_String_Targets(string? value)
+    {
+        var result = DataGridValueConverter.Instance.Convert(value, typeof(string), null, CultureInfo.InvariantCulture);
+
+        Assert.Same(value, result);
+    }
+
     [Fact]
     public void TryConvertWithoutReflection_Formats_Strings_With_Culture()
     {
