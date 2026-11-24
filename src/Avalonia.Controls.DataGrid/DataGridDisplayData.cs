@@ -19,7 +19,7 @@ namespace Avalonia.Controls
 
     internal class DataGridDisplayData
     {
-        private readonly Stack<DataGridRow> _recycledRows;
+        private readonly List<DataGridRow> _recycledRows;
         private readonly Dictionary<object, Stack<DataGridRow>> _keyedRecycledRows;
         private readonly Stack<DataGridRowGroupHeader> _recycledGroupHeaders;
         private readonly Stack<DataGridRowGroupFooter> _recycledGroupFooters;
@@ -29,6 +29,7 @@ namespace Avalonia.Controls
         private RetargetEntry[] _retargetEntries = Array.Empty<RetargetEntry>();
         private Control[] _retargetElementOrder = Array.Empty<Control>();
         private bool _deferRecycledElementHiding;
+        private bool _hasRecycledRowsWithDetails;
         private DataGridRecycleReuseOrder _deferredReuseOrder;
         private int _deferredRecycleScopeDepth;
         private int _headScrollingElements;
@@ -38,7 +39,7 @@ namespace Avalonia.Controls
         {
             _owner = owner;
             _scrollingElements = new List<Control>();
-            _recycledRows = new Stack<DataGridRow>();
+            _recycledRows = new List<DataGridRow>();
             _keyedRecycledRows = new Dictionary<object, Stack<DataGridRow>>();
             _recycledGroupHeaders = new Stack<DataGridRowGroupHeader>();
             _recycledGroupFooters = new Stack<DataGridRowGroupFooter>();
@@ -95,10 +96,18 @@ namespace Avalonia.Controls
             {
                 if (_owner.UsesDefaultRealizationFactory)
                 {
-                    PushToRecyclePool(_recycledRows, row);
+                    Debug.Assert(!_recycledRows.Contains(row));
+                    _recycledRows.Add(row);
+                    if (row.HasRecycledDetailsContent)
+                    {
+                        row.RecycledWithViewport = false;
+                        _hasRecycledRowsWithDetails = true;
+                    }
                     return;
                 }
 
+                // Keyed pools are not matched by item, so their rows don't keep their details.
+                row.ReleaseRecycledDetailsContent();
                 object? key = _owner.GetRowRecyclingKey(row);
                 if (key is null)
                 {
@@ -119,7 +128,18 @@ namespace Avalonia.Controls
         {
             if (_owner.UsesDefaultRealizationFactory)
             {
-                return PopFromRecyclePool(_recycledRows, RestoreElementForReuse);
+                int index = _hasRecycledRowsWithDetails
+                    ? FindRecycledRow(dataContext)
+                    : _recycledRows.Count - 1;
+                if (index < 0)
+                {
+                    return null;
+                }
+
+                DataGridRow recycledRow = _recycledRows[index];
+                _recycledRows.RemoveAt(index);
+                RestoreElementForReuse(recycledRow);
+                return recycledRow;
             }
 
             object? key = _owner.GetRowRecyclingKey(dataContext, rowIndex, slot);
@@ -136,11 +156,101 @@ namespace Avalonia.Controls
             return row;
         }
 
+        // Prefers the row that kept this item's details, then the newest row without kept details.
+        // A row that kept its details is only reused for another item while the pool holds more of
+        // them than the grid displays, and never when it was recycled with the last viewport (a reset
+        // or a jump regenerates the rows before the viewport is restored, so its item is likely to be
+        // shown again); otherwise a new row is created. A row reused for another item releases its
+        // details in ClearRecyclingState.
+        private int FindRecycledRow(object dataContext)
+        {
+            int plainIndex = -1;
+            int releasableIndex = -1;
+            int rowsWithDetails = 0;
+            for (int index = _recycledRows.Count - 1; index >= 0; index--)
+            {
+                DataGridRow row = _recycledRows[index];
+                if (!row.HasRecycledDetailsContent)
+                {
+                    if (plainIndex < 0)
+                    {
+                        plainIndex = index;
+                    }
+                    continue;
+                }
+
+                if (ReferenceEquals(row.RecycledDataContext, dataContext))
+                {
+                    return index;
+                }
+
+                rowsWithDetails++;
+                if (releasableIndex < 0 && !row.RecycledWithViewport)
+                {
+                    releasableIndex = index;
+                }
+            }
+
+            _hasRecycledRowsWithDetails = rowsWithDetails > 0;
+            if (plainIndex >= 0)
+            {
+                return plainIndex;
+            }
+            return rowsWithDetails > _scrollingElements.Count ? releasableIndex : -1;
+        }
+
+        internal void ReleaseRecycledRowDetails(object item)
+        {
+            if (!_hasRecycledRowsWithDetails)
+            {
+                return;
+            }
+
+            foreach (DataGridRow row in _recycledRows)
+            {
+                if (ReferenceEquals(row.RecycledDataContext, item))
+                {
+                    row.ReleaseRecycledDetailsContent();
+                }
+            }
+        }
+
+        internal void ReleaseRecycledRowDetailsOfRemovedItems(DataGridDataConnection dataConnection)
+        {
+            if (!_hasRecycledRowsWithDetails)
+            {
+                return;
+            }
+
+            foreach (DataGridRow row in _recycledRows)
+            {
+                if (row.HasRecycledDetailsContent && dataConnection.IndexOf(row.RecycledDataContext) < 0)
+                {
+                    row.ReleaseRecycledDetailsContent();
+                }
+            }
+        }
+
+        private void ClearRecycledRows()
+        {
+            if (_hasRecycledRowsWithDetails)
+            {
+                foreach (DataGridRow row in _recycledRows)
+                {
+                    row.ReleaseRecycledDetailsContent();
+                }
+                _hasRecycledRowsWithDetails = false;
+            }
+            _recycledRows.Clear();
+        }
+
         internal void TrimRecycledPools(DataGridRowsPresenter owner, int maxRecycledRows, int maxRecycledGroupHeaders, int maxRecycledGroupFooters)
         {
             while (_recycledRows.Count > maxRecycledRows)
             {
-                var row = _recycledRows.Pop();
+                var row = _recycledRows[_recycledRows.Count - 1];
+                _recycledRows.RemoveAt(_recycledRows.Count - 1);
+                row.ReleaseRecycledDetailsContent();
                 owner.UnregisterAnchorCandidate(row);
                 owner.RemoveTrackedChild(row);
             }
@@ -239,11 +349,28 @@ namespace Avalonia.Controls
             
             if (recycle)
             {
+                if (_hasRecycledRowsWithDetails && _scrollingElements.Count > 0)
+                {
+                    foreach (DataGridRow row in _recycledRows)
+                    {
+                        row.RecycledWithViewport = false;
+                    }
+                }
                 RecycleAllScrollingElements();
+                if (_hasRecycledRowsWithDetails)
+                {
+                    foreach (Control element in _scrollingElements)
+                    {
+                        if (element is DataGridRow { HasRecycledDetailsContent: true } row)
+                        {
+                            row.RecycledWithViewport = true;
+                        }
+                    }
+                }
             }
             else
             {
-                _recycledRows.Clear();
+                ClearRecycledRows();
                 _keyedRecycledRows.Clear();
                 _recycledGroupHeaders.Clear();
                 _recycledGroupFooters.Clear();
@@ -730,7 +857,7 @@ namespace Avalonia.Controls
 
         internal void ClearRecyclePools()
         {
-            _recycledRows.Clear();
+            ClearRecycledRows();
             _keyedRecycledRows.Clear();
             _recycledGroupHeaders.Clear();
             _recycledGroupFooters.Clear();
