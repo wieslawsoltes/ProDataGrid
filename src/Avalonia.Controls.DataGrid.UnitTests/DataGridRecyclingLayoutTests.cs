@@ -2,10 +2,14 @@
 // Licensed under the MIT license. See LICENSE file in the project root for details.
 
 using System;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using Avalonia.Controls.Primitives;
 using Avalonia.Controls.Templates;
+using Avalonia.Data;
 using Avalonia.Layout;
+using Avalonia.Threading;
 using Avalonia.Headless.XUnit;
 using Avalonia.VisualTree;
 using Xunit;
@@ -171,6 +175,75 @@ public class DataGridRecyclingLayoutTests
         Assert.Equal(originalBounds, child.Bounds);
         Assert.True(child.MeasureCount > measureCount);
         Assert.True(child.ArrangeCount > arrangeCount);
+    }
+
+    [AvaloniaTheory]
+    [InlineData(DataGridTheme.Simple)]
+    [InlineData(DataGridTheme.SimpleV2)]
+    [InlineData(DataGridTheme.Fluent)]
+    [InlineData(DataGridTheme.FluentV2)]
+    public void Nested_Details_Grid_Reused_By_A_Collapsed_Row_Does_Not_Realize_All_Rows_When_Shown_Again(DataGridTheme theme)
+    {
+        var expanded = new DetailsItem(1000, isExpanded: true);
+        var items = new ObservableCollection<DetailsItem>(Enumerable.Range(0, 5).Select(_ => new DetailsItem(3, isExpanded: false)));
+        items.Insert(2, expanded);
+        var detailRows = 0;
+        var grid = new DataGrid
+        {
+            AutoGenerateColumns = false,
+            ItemsSource = items,
+            RowDetailsVisibilityMode = DataGridRowDetailsVisibilityMode.Collapsed,
+            RowDetailsTemplate = new FuncDataTemplate<DetailsItem>((_, _) =>
+            {
+                var details = new DataGrid { AutoGenerateColumns = false };
+                details.Columns.Add(new DataGridTextColumn { Header = "Child", Binding = new Binding(".") });
+                details.Bind(DataGrid.ItemsSourceProperty, new Binding(nameof(DetailsItem.Children)));
+                details.Bind(Layoutable.HeightProperty, new Binding(nameof(DetailsItem.DetailsHeight)));
+                details.LoadingRow += (_, _) => detailRows++;
+                return details;
+            }),
+        };
+        grid.Columns.Add(new DataGridTextColumn { Header = "Item", Binding = new Binding(nameof(DetailsItem.IsExpanded)) });
+        grid.LoadingRow += (_, e) => e.Row.AreDetailsVisible = e.Row.DataContext is DetailsItem { IsExpanded: true };
+        var window = new Window { Width = 600, Height = 500 };
+        window.SetThemeStyles(theme);
+        window.Content = grid;
+        try
+        {
+            window.Show();
+            Dispatcher.UIThread.RunJobs();
+            window.UpdateLayout();
+            Assert.InRange(detailRows, 1, 40);
+
+            items[2] = new DetailsItem(3, isExpanded: false);
+            Dispatcher.UIThread.RunJobs();
+            window.UpdateLayout();
+            detailRows = 0;
+            items[2] = expanded;
+            Dispatcher.UIThread.RunJobs();
+            window.UpdateLayout();
+
+            Assert.InRange(detailRows, 1, 40);
+        }
+        finally
+        {
+            window.Close();
+        }
+    }
+
+    private sealed class DetailsItem
+    {
+        public DetailsItem(int children, bool isExpanded)
+        {
+            Children = Enumerable.Range(0, children).ToList();
+            IsExpanded = isExpanded;
+        }
+
+        public IReadOnlyList<int> Children { get; }
+
+        public bool IsExpanded { get; }
+
+        public double DetailsHeight => 200;
     }
 
     private sealed class LayoutTrackingControl : Control
