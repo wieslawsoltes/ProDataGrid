@@ -588,6 +588,22 @@ public class AdvancedRowHeightEstimatorTests : RowHeightEstimatorTestBase
         Assert.Equal(DefaultRowHeight, estimator.RowHeightEstimate, Tolerance);
     }
 
+    [Theory]
+    [InlineData(500)]
+    [InlineData(5000)]
+    public void OnDataSourceChanged_Drops_Earlier_Heights_From_The_Offsets(int newItemCount)
+    {
+        var estimator = CreateEstimator();
+        estimator.OnDataSourceChanged(500);
+        RecordUniformHeights(estimator, 0, 50, LargeRowHeight);
+
+        estimator.OnDataSourceChanged(newItemCount);
+        estimator.RecordMeasuredHeight(0, DefaultRowHeight);
+
+        Assert.Equal(50 * DefaultRowHeight, estimator.EstimateOffsetToSlot(50), Tolerance);
+        Assert.Equal(50, estimator.EstimateSlotAtOffset(50 * DefaultRowHeight, newItemCount));
+    }
+
     [Fact]
     public void OnItemsInserted_ShiftsDataAndRebuildsFenwick()
     {
@@ -1175,6 +1191,45 @@ public class AdvancedRowHeightEstimatorTests : RowHeightEstimatorTestBase
         Assert.True(offset100 > offset50, "Offset to slot 100 should be > offset to slot 50");
         Assert.True(offset200 > offset100, "Offset to slot 200 should be > offset to slot 100");
         Assert.True(offset300 > offset200, "Offset to slot 300 should be > offset to slot 200");
+    }
+
+    #endregion
+
+    #region Collapsed Slots
+
+    [Fact]
+    public void ScrollCorrection_Ignores_Rows_Of_Collapsed_Groups_Above_The_Viewport()
+    {
+        const int groups = 60;
+        const int rowsPerGroup = 50;
+        const int slotsPerGroup = rowsPerGroup + 1;
+        const int totalSlots = groups * slotsPerGroup;
+        const int collapsedSlots = (groups - 1) * rowsPerGroup;
+
+        var estimator = CreateEstimator();
+        estimator.DefaultRowHeight = SmallRowHeight;
+        estimator.OnDataSourceChanged(totalSlots);
+        RecordUniformHeights(estimator, 1, rowsPerGroup, SmallRowHeight);
+        var headerCounts = new[] { groups };
+        var expected = groups * GroupHeaderHeight + rowsPerGroup * SmallRowHeight;
+
+        for (var firstGroup = 1; firstGroup < groups - 10; firstGroup++)
+        {
+            var firstSlot = firstGroup * slotsPerGroup;
+            var verticalOffset = GroupHeaderHeight + rowsPerGroup * SmallRowHeight + (firstGroup - 1) * GroupHeaderHeight;
+            var displayed = new double[10];
+            for (var i = 0; i < displayed.Length; i++)
+            {
+                estimator.RecordRowGroupHeaderHeight(firstSlot + i * slotsPerGroup, 0, GroupHeaderHeight);
+                displayed[i] = GroupHeaderHeight;
+            }
+
+            SimulateScroll(estimator, firstSlot, firstSlot + 9 * slotsPerGroup, displayed, verticalOffset,
+                collapsedSlotCount: collapsedSlots);
+
+            var total = estimator.CalculateTotalHeight(totalSlots, collapsedSlots, headerCounts, 0);
+            Assert.True(total > expected * 0.9, $"Extent fell to {total:F0} (expected about {expected:F0}) after scrolling to group {firstGroup}.");
+        }
     }
 
     #endregion

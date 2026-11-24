@@ -940,7 +940,7 @@ namespace Avalonia.Controls
                 NegVerticalOffset = 0;
             }
 
-            var estimator = RowHeightEstimator;
+            var estimator = EffectiveRowHeightEstimator;
             double baseOffset;
             if (estimator != null)
             {

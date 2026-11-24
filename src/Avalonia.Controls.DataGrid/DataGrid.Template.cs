@@ -420,7 +420,7 @@ internal
                     DisplayData.PendingVerticalScrollHeight = 0;
                     _verticalOffset = 0;
                     NegVerticalOffset = 0;
-                    RowHeightEstimator?.Reset();
+                    EffectiveRowHeightEstimator?.Reset();
                     _scrollHeightIndexDirty = true;
                 }
 

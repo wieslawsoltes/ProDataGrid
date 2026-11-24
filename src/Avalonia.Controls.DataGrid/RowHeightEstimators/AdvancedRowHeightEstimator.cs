@@ -847,6 +847,12 @@ namespace Avalonia.Controls
 
         private void ProcessScrollCorrection(double verticalOffset, double negVerticalOffset, int firstDisplayedSlot)
         {
+            // EstimateOffsetToSlot counts the rows of collapsed groups, which take no space in the viewport.
+            if (_lastCollapsedSlotCount > 0)
+            {
+                return;
+            }
+
             // Calculate expected offset based on our estimates
             double expectedOffset = EstimateOffsetToSlot(firstDisplayedSlot) + negVerticalOffset;
             double actualOffset = verticalOffset;
@@ -867,17 +873,27 @@ namespace Avalonia.Controls
 
         private void InitializeFenwickTree(int size)
         {
+            // Runs for every new estimator and data source change: reuse a tree of the same size,
+            // otherwise let UpdateFenwickTree allocate one when the first height is recorded.
             _fenwickSize = size;
-            _fenwickSumTree = new double[size + 1];
-            _fenwickCountTree = new int[size + 1];
+            if (_fenwickSumTree.Length == size + 1 && _fenwickCountTree.Length == size + 1)
+            {
+                Array.Clear(_fenwickSumTree, 0, _fenwickSumTree.Length);
+                Array.Clear(_fenwickCountTree, 0, _fenwickCountTree.Length);
+            }
+            else
+            {
+                _fenwickSumTree = Array.Empty<double>();
+                _fenwickCountTree = Array.Empty<int>();
+            }
         }
 
         private void UpdateFenwickTree(int slot, double newHeight, double oldHeight, bool isNew)
         {
-            if (slot >= _fenwickSize)
+            if (slot >= _fenwickSumTree.Length - 1)
             {
-                // Resize if needed
-                int newSize = Math.Max(_fenwickSize * 2, slot + 1);
+                // Allocate the tree, or resize it if needed
+                int newSize = slot < _fenwickSize ? _fenwickSize : Math.Max(_fenwickSize * 2, slot + 1);
                 ResizeFenwickTree(newSize);
             }
 

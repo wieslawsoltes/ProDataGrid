@@ -434,7 +434,7 @@ namespace Avalonia.Controls
 
                 using (DataGridDiagnostics.BeginRowsDisplayElementHeightRecord())
                 {
-                    var estimator = RowHeightEstimator;
+                    var estimator = EffectiveRowHeightEstimator;
 
                     if (groupHeader != null)
                     {

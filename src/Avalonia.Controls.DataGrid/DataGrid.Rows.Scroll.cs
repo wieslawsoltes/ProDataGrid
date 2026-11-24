@@ -157,7 +157,7 @@ namespace Avalonia.Controls
 
         private double GetCurrentSingleRowHeightEstimate()
         {
-            var estimator = RowHeightEstimator;
+            var estimator = EffectiveRowHeightEstimator;
             double rowHeight = estimator?.RowHeightEstimate ?? RowHeightEstimate;
             double detailsHeight = RowDetailsVisibilityMode == DataGridRowDetailsVisibilityMode.Visible
                 ? estimator?.RowDetailsHeightEstimate ?? RowDetailsHeightEstimate
@@ -332,7 +332,7 @@ namespace Avalonia.Controls
                                 else
                                 {
                                     ResetDisplayedRows();
-                                    var estimator = RowHeightEstimator;
+                                    var estimator = EffectiveRowHeightEstimator;
                                     if (estimator != null)
                                     {
                                         // Use the estimator's slot-at-offset calculation for better accuracy
@@ -431,7 +431,7 @@ namespace Avalonia.Controls
                                 else
                                 {
                                     ResetDisplayedRows();
-                                    var estimator = RowHeightEstimator;
+                                    var estimator = EffectiveRowHeightEstimator;
                                     if (estimator != null)
                                     {
                                         // Use the estimator's slot-at-offset calculation for better accuracy
@@ -518,7 +518,7 @@ namespace Avalonia.Controls
                 double firstElementHeight = GetScrollSlotHeight(DisplayData.FirstScrollingSlot);
                 bool atVisualTail = DisplayData.LastScrollingSlot >= 0 &&
                                     DisplayData.LastScrollingSlot >= LastVisibleSlot;
-                var firstRowEstimator = RowHeightEstimator;
+                var firstRowEstimator = EffectiveRowHeightEstimator;
                 if (!atVisualTail &&
                     (useUniformScrollGeometry ||
                      (firstRowEstimator != null && useIndexedScrollGeometry)))
