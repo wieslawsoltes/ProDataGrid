@@ -147,6 +147,13 @@ namespace Avalonia.Controls.DataGridHierarchical
 
         public event EventHandler<FlattenedChangedEventArgs>? FlattenedChanged;
 
+        /// <summary>
+        /// Gets or sets the row changes the grid's filtered collection view reported since the grid
+        /// last brought its rows in step with the view. It lives here rather than on the grid so
+        /// that grids without a hierarchy carry no extra state.
+        /// </summary>
+        internal DataGridHierarchicalViewChanges? FilteredViewChanges { get; set; }
+
         public void Dispose()
         {
             WeakEventHandlerManager.Unsubscribe<FlattenedChangedEventArgs, DataGridHierarchicalAdapter>(
