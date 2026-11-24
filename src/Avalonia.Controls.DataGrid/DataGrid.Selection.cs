@@ -365,7 +365,11 @@ internal
                     return;
                 }
 
-                ClearRowSelection(resetAnchorSlot: true);
+                bool unchanged = _selectedItems.HasSlotsInOrder(mapped);
+                if (!unchanged)
+                {
+                    ClearRowSelection(resetAnchorSlot: true);
+                }
 
                 int? firstSlot = null;
                 foreach (var entry in mapped)
@@ -376,7 +380,16 @@ internal
                     {
                         firstSlot = slot;
                     }
-                    SetRowSelection(slot, isSelected: true, setAnchorSlot: firstSlot == slot);
+                    if (!unchanged)
+                    {
+                        SetRowSelection(slot, isSelected: true, setAnchorSlot: firstSlot == slot);
+                    }
+                }
+
+                if (unchanged)
+                {
+                    AnchorSlot = firstSlot ?? -1;
+                    SelectionHasChanged = true;
                 }
 
                 if (firstSlot.HasValue)
@@ -1816,11 +1829,12 @@ internal
                 cellsChanged = _selectedCellsView.ReplaceAllSilently(remapped);
                 columnsChanged = _selectedColumnsView.ReplaceAllSilently(newSelectedColumns);
 
-                foreach (int rowIndex in _selectedCells.Keys)
+                int visibleColumnCount = GetVisibleSelectableColumnCount();
+                foreach (var row in _selectedCells)
                 {
-                    if (IsRowFullySelectedByCells(rowIndex))
+                    if (visibleColumnCount > 0 && row.Value.Count >= visibleColumnCount)
                     {
-                        _selectedRowHeaderIndices.Add(rowIndex);
+                        _selectedRowHeaderIndices.Add(row.Key);
                     }
                 }
 

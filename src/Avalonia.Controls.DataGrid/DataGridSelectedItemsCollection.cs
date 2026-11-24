@@ -24,7 +24,7 @@ namespace Avalonia.Controls
             new("Item[]");
         private List<object> _oldSelectedItemsCache;
         private List<object> _selectedItemsCache;
-        private readonly SortedSet<int> _selectedSlots;
+        private SortedSet<int> _selectedSlots;
 
         public DataGridSelectedItemsCollection(DataGrid owningGrid)
         {
@@ -389,22 +389,18 @@ namespace Avalonia.Controls
             List<object> addedSelectedItems = new List<object>();
             List<object> removedSelectedItems = new List<object>();
             int previousCount = _oldSelectedItemsCache.Count;
+            var oldItems = new OldItemsMatcher(_oldSelectedItemsCache);
 
             foreach (int newSlot in _selectedSlots)
             {
                 object newItem = OwningGrid.DataConnection.GetDataItem(OwningGrid.RowIndexFromSlot(newSlot));
-                int oldItemIndex = IndexOfMatchingItem(_oldSelectedItemsCache, newItem);
-                if (oldItemIndex >= 0)
-                {
-                    _oldSelectedItemsCache.RemoveAt(oldItemIndex);
-                }
-                else
+                if (!oldItems.TryConsume(newItem))
                 {
                     addedSelectedItems.Add(newItem);
                 }
             }
 
-            removedSelectedItems.AddRange(_oldSelectedItemsCache);
+            oldItems.AddRemaining(removedSelectedItems);
 
             _oldSelectedItemsCache = new List<object>(_selectedItemsCache);
 
@@ -419,6 +415,70 @@ namespace Avalonia.Controls
 
             ((RoutedEventArgs)args).Source = OwningGrid;
             return args;
+        }
+
+        private sealed class OldItemsMatcher
+        {
+            private static readonly object NullKey = new object();
+            private readonly List<object> _items;
+            private readonly bool[] _consumed;
+            private readonly int[] _nextOccurrence;
+            private readonly Dictionary<object, int> _firstOccurrence;
+
+            public OldItemsMatcher(List<object> items)
+            {
+                _items = items;
+                _consumed = new bool[items.Count];
+                _nextOccurrence = new int[items.Count];
+                _firstOccurrence = new Dictionary<object, int>(items.Count, ReferenceEqualityComparer.Instance);
+                for (int i = items.Count - 1; i >= 0; i--)
+                {
+                    object key = items[i] ?? NullKey;
+                    _nextOccurrence[i] = _firstOccurrence.TryGetValue(key, out int following) ? following : -1;
+                    _firstOccurrence[key] = i;
+                }
+            }
+
+            public bool TryConsume(object item)
+            {
+                object key = item ?? NullKey;
+                if (_firstOccurrence.TryGetValue(key, out int index))
+                {
+                    while (index >= 0 && _consumed[index])
+                    {
+                        index = _nextOccurrence[index];
+                    }
+
+                    if (index >= 0)
+                    {
+                        _consumed[index] = true;
+                        _firstOccurrence[key] = _nextOccurrence[index];
+                        return true;
+                    }
+                }
+
+                for (int i = 0; i < _items.Count; i++)
+                {
+                    if (!_consumed[i] && Equals(_items[i], item))
+                    {
+                        _consumed[i] = true;
+                        return true;
+                    }
+                }
+
+                return false;
+            }
+
+            public void AddRemaining(List<object> removed)
+            {
+                for (int i = 0; i < _items.Count; i++)
+                {
+                    if (!_consumed[i])
+                    {
+                        removed.Add(_items[i]);
+                    }
+                }
+            }
         }
 
         private static int IndexOfMatchingItem(List<object> items, object item)
@@ -483,22 +543,64 @@ namespace Avalonia.Controls
 
         internal void InsertIndex(int slot)
         {
-            if (_selectedSlots.Count == 0)
+            if (_selectedSlots.Count == 0 || _selectedSlots.Max < slot)
             {
                 return;
             }
 
-            var updated = new SortedSet<int>();
+            var updated = new List<int>(_selectedSlots.Count);
             foreach (var existing in _selectedSlots)
             {
                 updated.Add(existing >= slot ? existing + 1 : existing);
             }
 
-            _selectedSlots.Clear();
-            foreach (var adjusted in updated)
+            _selectedSlots = new SortedSet<int>(updated);
+        }
+
+        internal void RemoveIndex(int slot, object item)
+        {
+            if (_selectedSlots.Count == 0 || _selectedSlots.Max < slot)
             {
-                _selectedSlots.Add(adjusted);
+                return;
             }
+
+            if (_selectedSlots.Contains(slot) && item != null)
+            {
+                RemoveMatchingItem(_selectedItemsCache, item);
+            }
+
+            var updated = new List<int>(_selectedSlots.Count);
+            foreach (var existing in _selectedSlots)
+            {
+                if (existing != slot)
+                {
+                    updated.Add(existing > slot ? existing - 1 : existing);
+                }
+            }
+
+            _selectedSlots = new SortedSet<int>(updated);
+        }
+
+        internal bool HasSlotsInOrder(List<(int RowIndex, int Slot)> slots)
+        {
+            if (_selectedSlots.Count != slots.Count || _selectedItemsCache.Count != slots.Count)
+            {
+                return false;
+            }
+
+            int i = 0;
+            foreach (int slot in _selectedSlots)
+            {
+                if (slots[i].Slot != slot ||
+                    !ReferenceEquals(_selectedItemsCache[i], OwningGrid.DataConnection.GetDataItem(OwningGrid.RowIndexFromSlot(slot))))
+                {
+                    return false;
+                }
+
+                i++;
+            }
+
+            return true;
         }
 
         internal void SelectSlot(int slot, bool select)

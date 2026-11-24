@@ -439,27 +439,61 @@ internal
                 return;
             }
 
-            _selectionModelAdapter.Model.BeginBatchUpdate();
-            _syncingSelectionModel = true;
-            try
+            var indexes = new List<int>();
+            foreach (object item in _selectedItems)
             {
-                _selectionModelAdapter.Model.Clear();
-                foreach (object item in _selectedItems)
+                int index = GetSelectionModelIndexOfItem(item);
+                if (index >= 0)
                 {
-                    int index = GetSelectionModelIndexOfItem(item);
-                    if (index >= 0)
+                    indexes.Add(index);
+                }
+            }
+
+            if (!SelectionModelHolds(indexes))
+            {
+                _selectionModelAdapter.Model.BeginBatchUpdate();
+                _syncingSelectionModel = true;
+                try
+                {
+                    _selectionModelAdapter.Model.Clear();
+                    foreach (int index in indexes)
                     {
                         _selectionModelAdapter.Model.Select(index);
                     }
                 }
-            }
-            finally
-            {
-                _selectionModelAdapter.Model.EndBatchUpdate();
-                _syncingSelectionModel = false;
+                finally
+                {
+                    _selectionModelAdapter.Model.EndBatchUpdate();
+                    _syncingSelectionModel = false;
+                }
             }
 
             UpdateSelectionSnapshot();
+        }
+
+        private bool SelectionModelHolds(List<int> selectionOrder)
+        {
+            var model = _selectionModelAdapter.Model;
+            if (selectionOrder.Count == 0 ||
+                model.SelectedIndex != selectionOrder[0] ||
+                model.AnchorIndex != selectionOrder[selectionOrder.Count - 1] ||
+                model.SelectedIndexes.Count != selectionOrder.Count)
+            {
+                return false;
+            }
+
+            var sorted = new List<int>(selectionOrder);
+            sorted.Sort();
+            int i = 0;
+            foreach (int index in model.SelectedIndexes)
+            {
+                if (index != sorted[i++])
+                {
+                    return false;
+                }
+            }
+
+            return true;
         }
 
         internal void ResyncSelectionModelFromGridSelection()
