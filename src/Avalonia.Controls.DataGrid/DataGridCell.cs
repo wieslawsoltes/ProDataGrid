@@ -326,6 +326,21 @@ internal
             }
         }
 
+        /// <inheritdoc />
+        protected override void OnDataContextBeginUpdate()
+        {
+            base.OnDataContextBeginUpdate();
+
+            // An open tooltip shows the previous item. Close it before the new DataContext reaches
+            // the cell content: a tip bound to the content (e.g. $self.Content.Text) would otherwise
+            // close the popup while Avalonia is still iterating this cell's children, and the
+            // resulting exception aborts the row teardown halfway, leaving stale rows behind.
+            if (ToolTip.GetIsOpen(this))
+            {
+                ToolTip.SetIsOpen(this, false);
+            }
+        }
+
         /// <summary>
         /// Builds the visual tree for the cell control when a new template is applied.
         /// </summary>
