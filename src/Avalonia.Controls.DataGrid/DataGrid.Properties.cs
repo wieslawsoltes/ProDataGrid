@@ -815,6 +815,25 @@ internal
         }
 
         /// <summary>
+        /// Identifies the <see cref="RowGroupSublevelIndent"/> property.
+        /// </summary>
+        public static readonly StyledProperty<double> RowGroupSublevelIndentProperty =
+            AvaloniaProperty.Register<DataGrid, double>(
+                nameof(RowGroupSublevelIndent),
+                defaultValue: DATAGRID_defaultRowGroupSublevelIndent,
+                validate: value => !double.IsNaN(value) && !double.IsInfinity(value) && value >= 0);
+
+        /// <summary>
+        /// Gets or sets the indent of each grouping level: the width the row group spacer column
+        /// adds per level, before any row group header has been shown.
+        /// </summary>
+        public double RowGroupSublevelIndent
+        {
+            get { return GetValue(RowGroupSublevelIndentProperty); }
+            set { SetValue(RowGroupSublevelIndentProperty, value); }
+        }
+
+        /// <summary>
         /// Defines the <see cref="IsScrollInertiaEnabled"/> property.
         /// </summary>
         public static readonly AttachedProperty<bool> IsScrollInertiaEnabledProperty =

@@ -406,7 +406,7 @@ namespace Avalonia.Controls
 
 
 
-        private void RefreshRowGroupHeaders()
+        private bool RefreshRowGroupHeaders()
         {
             if (DataConnection.CollectionView != null
             && DataConnection.CollectionView.CanGroup
@@ -430,10 +430,9 @@ namespace Avalonia.Controls
                 if (RowGroupSublevelIndents == null || RowGroupSublevelIndents.Length != groupLevelCount)
                 {
                     RowGroupSublevelIndents = new double[groupLevelCount];
-                    double indent;
+                    double indent = RowGroupSublevelIndent;
                     for (int i = 0; i < groupLevelCount; i++)
                     {
-                        indent = DATAGRID_defaultRowGroupSublevelIndent;
                         RowGroupSublevelIndents[i] = indent;
                         if (i > 0)
                         {
@@ -443,14 +442,18 @@ namespace Avalonia.Controls
                 }
                 EnsureRowGroupSpacerColumnWidth(groupLevelCount);
                 UpdateGroupingIndentation();
+                return true;
             }
+
+            return false;
         }
 
 
 
-        private void EnsureRowGroupSpacerColumn()
+        private void EnsureRowGroupSpacerColumn(bool isGrouping)
         {
-            bool spacerColumnChanged = ColumnsInternal.EnsureRowGrouping(!RowGroupHeadersTable.IsEmpty);
+            // A grouped view keeps its indent while a filter or a reset leaves it without group rows.
+            bool spacerColumnChanged = ColumnsInternal.EnsureRowGrouping(isGrouping || !RowGroupHeadersTable.IsEmpty);
             if (spacerColumnChanged)
             {
                 if (ColumnsInternal.RowGroupSpacerColumn.IsRepresented && CurrentColumnIndex == 0)
@@ -1029,7 +1032,7 @@ namespace Avalonia.Controls
 
             if (RowGroupSublevelIndents == null || RowGroupSublevelIndents.Length == 0)
             {
-                groupHeader.TotalIndent = DATAGRID_defaultRowGroupSublevelIndent * groupHeader.Level;
+                groupHeader.TotalIndent = RowGroupSublevelIndent * groupHeader.Level;
                 return;
             }
 
@@ -1059,6 +1062,23 @@ namespace Avalonia.Controls
         }
 
 
+
+        private void OnRowGroupSublevelIndentChanged(AvaloniaPropertyChangedEventArgs e)
+        {
+            if (RowGroupSublevelIndents == null || RowGroupSublevelIndents.Length == 0)
+            {
+                return;
+            }
+
+            double indent = e.GetNewValue<double>();
+            for (int i = 0; i < RowGroupSublevelIndents.Length; i++)
+            {
+                RowGroupSublevelIndents[i] = indent * (i + 1);
+            }
+
+            EnsureRowGroupSpacerColumnWidth(RowGroupSublevelIndents.Length);
+            UpdateGroupingIndentation();
+        }
 
         internal void OnSublevelIndentUpdated(DataGridRowGroupHeader groupHeader, double newValue)
         {
