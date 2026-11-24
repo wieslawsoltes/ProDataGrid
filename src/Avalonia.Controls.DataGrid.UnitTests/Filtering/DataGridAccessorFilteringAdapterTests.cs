@@ -327,6 +327,56 @@ public class DataGridAccessorFilteringAdapterTests
         Assert.Empty(view.Cast<LongPerson>());
     }
 
+    [AvaloniaFact]
+    public void AccessorAdapter_Invokes_Refresh_Lifecycle_Once_Per_Effective_Filter_Change()
+    {
+        var items = new[]
+        {
+            new Person("A", 1),
+            new Person("B", 2)
+        };
+        var view = new DataGridCollectionView(items);
+        var model = new FilteringModel();
+        var column = new DataGridTextColumn();
+        DataGridColumnMetadata.SetValueAccessor(
+            column,
+            new DataGridColumnValueAccessor<Person, int>(static person => person.Score));
+        int beforeRefreshCount = 0;
+        int afterRefreshCount = 0;
+
+        using var adapter = new DataGridAccessorFilteringAdapter(
+            model,
+            () => new[] { column },
+            beforeViewRefresh: () => beforeRefreshCount++,
+            afterViewRefresh: () => afterRefreshCount++);
+        adapter.AttachView(view);
+        beforeRefreshCount = 0;
+        afterRefreshCount = 0;
+
+        model.SetOrUpdate(new FilteringDescriptor(
+            columnId: column,
+            @operator: FilteringOperator.Equals,
+            value: 2));
+
+        Assert.Equal(1, beforeRefreshCount);
+        Assert.Equal(1, afterRefreshCount);
+        Assert.Equal(new[] { 2 }, view.Cast<Person>().Select(static person => person.Score));
+
+        model.SetOrUpdate(new FilteringDescriptor(
+            columnId: column,
+            @operator: FilteringOperator.Equals,
+            value: 2));
+
+        Assert.Equal(1, beforeRefreshCount);
+        Assert.Equal(1, afterRefreshCount);
+
+        model.Clear();
+
+        Assert.Equal(2, beforeRefreshCount);
+        Assert.Equal(2, afterRefreshCount);
+        Assert.Equal(new[] { 1, 2 }, view.Cast<Person>().Select(static person => person.Score));
+    }
+
     private sealed class Person
     {
         public Person(string name, int score)

@@ -2,6 +2,7 @@
 // Licensed under the MIT license. See LICENSE file in the project root for details.
 
 using System;
+using System.ComponentModel;
 using System.Globalization;
 using Avalonia.Controls;
 using Avalonia.Data;
@@ -159,6 +160,44 @@ public sealed class DataGridDirectBindingSemanticsTests
         Assert.Equal("Value: ", cell.Value);
     }
 
+    [AvaloniaFact]
+    public void Nested_Path_Falls_Back_To_Binding_And_Observes_Leaf_Notifications()
+    {
+        var address = new Address("Warsaw");
+        var item = new PersonWithAddress(address);
+        var column = new TestTextColumn
+        {
+            Binding = new Binding("Address.City"),
+            UseDirectTextCell = true,
+        };
+        DataGridColumnMetadata.SetValueAccessor(
+            column,
+            new DataGridColumnValueAccessor<PersonWithAddress, string>(
+                static person => person.Address.City));
+        var cell = Assert.IsType<DataGridDirectTextCell>(column.CreateCell());
+        cell.DataContext = item;
+
+        Assert.Null(column.GenerateDisplay(cell, item));
+        var window = new Window { Width = 180, Height = 60, Content = cell };
+        try
+        {
+            window.Show();
+            Dispatcher.UIThread.RunJobs();
+
+            Assert.False(cell.UsesValueAccessor);
+            Assert.Equal("Warsaw", cell.Value);
+
+            address.City = "Krakow";
+            Dispatcher.UIThread.RunJobs();
+
+            Assert.Equal("Krakow", cell.Value);
+        }
+        finally
+        {
+            window.Close();
+        }
+    }
+
     private static TestTextColumn CreateColumn(BindingMode mode)
     {
         var column = new TestTextColumn
@@ -181,6 +220,35 @@ public sealed class DataGridDirectBindingSemanticsTests
     private sealed record Item(string Name);
 
     private sealed record NullableItem(string? Name);
+
+    private sealed record PersonWithAddress(Address Address);
+
+    private sealed class Address : INotifyPropertyChanged
+    {
+        private string _city;
+
+        public Address(string city)
+        {
+            _city = city;
+        }
+
+        public event PropertyChangedEventHandler? PropertyChanged;
+
+        public string City
+        {
+            get => _city;
+            set
+            {
+                if (_city == value)
+                {
+                    return;
+                }
+
+                _city = value;
+                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(City)));
+            }
+        }
+    }
 
     private sealed class RecordingConverter : IValueConverter
     {

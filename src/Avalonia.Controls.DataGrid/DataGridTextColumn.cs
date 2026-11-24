@@ -15,6 +15,7 @@ using Avalonia.Data;
 using Avalonia.Layout;
 using Avalonia.Markup.Xaml.MarkupExtensions;
 using Avalonia.Controls.Documents;
+using Avalonia.Controls.DataGridHierarchical;
 using Avalonia.Controls.Utils;
 using Avalonia.Styling;
 using System.Globalization;
@@ -122,9 +123,10 @@ internal
         internal bool CanUseDirectValueAccessorFor(object item)
         {
             var accessor = DataGridColumnMetadata.GetValueAccessor(this);
-            return CanUseDirectValueAccessor &&
+            return BindingCloneHelper.SupportsDirectTextDataContextRead(Binding, item is IHierarchicalNodeItem) &&
                    item != null &&
                    accessor != null &&
+                   accessor is IDataGridColumnTextAccessor &&
                    accessor.ItemType.IsInstanceOfType(item);
         }
 
@@ -326,9 +328,9 @@ internal
                     drawingCell.ClearValue(DataGridCustomDrawingCell.ValueProperty);
 
                     var accessor = DataGridColumnMetadata.GetValueAccessor(this);
-                    if (CanUseDrawnValueAccessor(accessor, dataItem))
+                    if (CanUseDrawnValueAccessor(accessor, dataItem, out bool observeWrappedItemValueChanges))
                     {
-                        drawingCell.ConfigureBuiltInRenderer(this, renderer: null);
+                        drawingCell.ConfigureBuiltInRenderer(this, renderer: null, observeWrappedItemValueChanges: observeWrappedItemValueChanges);
                     }
                     else
                     {
@@ -519,7 +521,11 @@ internal
 
         internal override bool SupportsDrawnDisplay => true;
 
-        internal override bool SupportsVirtualCellSurface => CanUseDirectValueAccessor;
+        internal override bool SupportsVirtualCellSurface =>
+            BindingCloneHelper.SupportsDirectTextDataContextRead(
+                Binding,
+                observesWrappedHierarchyItem: OwningGrid?.HierarchicalRowsEnabled == true && OwningGrid.HierarchicalModel != null) &&
+            DataGridColumnMetadata.GetValueAccessor(this) is IDataGridColumnTextAccessor;
 
         object IDataGridDrawnCellValueProvider.GetDrawnCellValue(object item) => GetDirectCellText(item);
 
@@ -551,12 +557,13 @@ internal
                 : null;
         }
 
-        private bool CanUseDrawnValueAccessor(IDataGridColumnValueAccessor accessor, object dataItem)
+        private bool CanUseDrawnValueAccessor(IDataGridColumnValueAccessor accessor, object dataItem, out bool observeWrappedItemValueChanges)
         {
+            observeWrappedItemValueChanges = false;
             return accessor is IDataGridColumnTextAccessor &&
                    dataItem != null &&
                    accessor.ItemType.IsInstanceOfType(dataItem) &&
-                   BindingCloneHelper.SupportsDirectTextDataContextRead(Binding);
+                   BindingCloneHelper.SupportsDirectTextDataContextRead(Binding, dataItem is IHierarchicalNodeItem, out observeWrappedItemValueChanges);
         }
 
         private void SyncProperties(AvaloniaObject content)
