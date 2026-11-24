@@ -95,6 +95,30 @@ public class DataGridItemsSourceChangeHeadlessTests
     }
 
     [AvaloniaFact]
+    public void ItemsSource_Swap_To_View_Can_Keep_Selection_Empty()
+    {
+        var items = CreateItems("A", 2);
+        var (window, grid) = CreateGrid(items, DataGridSelectionUnit.FullRow);
+        var newItems = CreateItems("B", 3);
+        var view = new DataGridCollectionView(newItems);
+        var selectionState = new SelectedIndexModel();
+
+        grid.AutoSelectCurrentItemOnItemsSourceChange = false;
+        grid.DataContext = selectionState;
+        grid.Bind(
+            DataGrid.SelectedIndexProperty,
+            new Binding(nameof(SelectedIndexModel.SelectedIndex)) { Mode = BindingMode.TwoWay });
+        grid.ItemsSource = view;
+        PumpLayout(grid);
+
+        Assert.Same(newItems[0], view.CurrentItem);
+        Assert.Equal(-1, selectionState.SelectedIndex);
+        Assert.Equal(-1, grid.SelectedIndex);
+        Assert.Null(grid.SelectedItem);
+        window.Close();
+    }
+
+    [AvaloniaFact]
     public void ItemsSource_Swap_Grouped_View_To_List_Removes_Group_Headers_And_Allows_Click()
     {
         var groupedItems = CreateGroupedItems();
@@ -556,5 +580,10 @@ public class DataGridItemsSourceChangeHeadlessTests
 
         public string Name { get; }
         public ObservableCollection<TreeNode> Children { get; }
+    }
+
+    private class SelectedIndexModel
+    {
+        public int SelectedIndex { get; set; } = -1;
     }
 }

@@ -1198,6 +1198,25 @@ internal
             set { SetValue(AutoExpandSelectedItemProperty, value); }
         }
 
+        /// <summary>
+        /// Gets or sets whether the grid selects the current item when a new
+        /// <see cref="IDataGridCollectionView"/> is assigned to <see cref="ItemsSource"/>.
+        /// </summary>
+        public static readonly StyledProperty<bool> AutoSelectCurrentItemOnItemsSourceChangeProperty =
+            AvaloniaProperty.Register<DataGrid, bool>(
+                nameof(AutoSelectCurrentItemOnItemsSourceChange),
+                defaultValue: true);
+
+        /// <summary>
+        /// Gets or sets whether the grid selects the current item when a new
+        /// <see cref="IDataGridCollectionView"/> is assigned to <see cref="ItemsSource"/>.
+        /// </summary>
+        public bool AutoSelectCurrentItemOnItemsSourceChange
+        {
+            get { return GetValue(AutoSelectCurrentItemOnItemsSourceChangeProperty); }
+            set { SetValue(AutoSelectCurrentItemOnItemsSourceChangeProperty, value); }
+        }
+
         private int _selectedIndex = -1;
         private object _selectedItem;
         private DataGridCellInfo _currentCell = DataGridCellInfo.Unset;
