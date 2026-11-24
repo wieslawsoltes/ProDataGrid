@@ -857,6 +857,20 @@ internal
             UpdatePseudoClasses();
         }
 
+        protected override void OnPointerCaptureLost(PointerCaptureLostEventArgs e)
+        {
+            base.OnPointerCaptureLost(e);
+
+            if (_dragMode == DragMode.None || !IsPressed)
+            {
+                return;
+            }
+
+            IsPressed = false;
+            OnLostMouseCapture();
+            UpdatePseudoClasses();
+        }
+
         private void DataGridColumnHeader_PointerReleased(object sender, PointerReleasedEventArgs e)
         {
             if (OwningColumn == null || e.Handled || !IsEnabled || e.InitialPressMouseButton != MouseButton.Left)
