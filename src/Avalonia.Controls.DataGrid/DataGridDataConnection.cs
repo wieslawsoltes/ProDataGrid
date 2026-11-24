@@ -44,6 +44,9 @@ namespace Avalonia.Controls
         private IList _referenceIndexLookupList;
         private Dictionary<object, int> _referenceIndexLookup;
         private int _referenceIndexNullIndex = -1;
+        private int _referenceIndexLinearLookups;
+        private object _lastReferenceItem;
+        private int _lastReferenceIndex = -1;
 
         public DataGridDataConnection(DataGrid owner)
         {
@@ -735,8 +738,8 @@ namespace Avalonia.Controls
                 return fastIndex;
             }
 
-            var cachedIndex = FindReferenceIndexWithCache(list, dataItem);
-            if (cachedIndex >= 0)
+            var cachedIndex = FindReferenceIndexWithCache(list, dataItem, out bool scanned);
+            if (cachedIndex >= 0 || scanned)
             {
                 return cachedIndex;
             }
@@ -788,8 +791,31 @@ namespace Avalonia.Controls
             return true;
         }
 
-        private int FindReferenceIndexWithCache(IList list, object dataItem)
+        private int FindReferenceIndexWithCache(IList list, object dataItem, out bool scanned)
         {
+            scanned = false;
+            if (!ReferenceEquals(_referenceIndexLookupList, list))
+            {
+                InvalidateReferenceIndexLookup();
+                _referenceIndexLookupList = list;
+            }
+
+            // Most live-source mutations are followed by only a handful of lookups.
+            // Delay the full table until repeated distinct queries justify its allocation.
+            if (_referenceIndexLookup == null && _referenceIndexLinearLookups < 16)
+            {
+                scanned = true;
+                if (_lastReferenceIndex >= 0 && ReferenceEquals(_lastReferenceItem, dataItem))
+                {
+                    return _lastReferenceIndex;
+                }
+
+                _referenceIndexLinearLookups++;
+                _lastReferenceItem = dataItem;
+                _lastReferenceIndex = FindReferenceIndexLinear(list, dataItem);
+                return _lastReferenceIndex;
+            }
+
             EnsureReferenceIndexLookup(list);
             if (dataItem == null)
             {
@@ -810,7 +836,7 @@ namespace Avalonia.Controls
                 return;
             }
 
-            var lookup = new Dictionary<object, int>(ReferenceEqualityComparer.Instance);
+            var lookup = new Dictionary<object, int>(list.Count, ReferenceEqualityComparer.Instance);
             var nullIndex = -1;
             for (var i = 0; i < list.Count; i++)
             {
@@ -860,6 +886,9 @@ namespace Avalonia.Controls
             _referenceIndexLookupList = null;
             _referenceIndexLookup = null;
             _referenceIndexNullIndex = -1;
+            _referenceIndexLinearLookups = 0;
+            _lastReferenceItem = null;
+            _lastReferenceIndex = -1;
         }
 
         /// <summary>
