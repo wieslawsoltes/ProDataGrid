@@ -4,6 +4,7 @@
 using System;
 using System.Collections.ObjectModel;
 using System.Linq;
+using Avalonia.Collections;
 using Avalonia.Controls;
 using Avalonia.Controls.Templates;
 using Avalonia.Data;
@@ -243,6 +244,80 @@ public class DataGridAutoHeightHeadlessTests
             $"Expected nested grid to shrink. Expanded={expandedHeight}, Shrunk={shrunkHeight}, Attached={grid.IsAttachedToVisualTree()}, Visible={grid.IsVisible}, Desired={grid.DesiredSize}, Bounds={grid.Bounds}");
     }
 
+    [AvaloniaTheory]
+    [InlineData(false)]
+    [InlineData(true)]
+    public void DataGrid_AutoHeight_Grows_When_Collapsed_Group_Expands_In_ScrollViewer(bool useLogicalScrollable)
+    {
+        using var themeScope = UseApplicationTheme(DataGridTheme.FluentV2);
+        var items = new ObservableCollection<GroupedAutoHeightItem>();
+        for (var i = 1; i <= 12; i++)
+        {
+            items.Add(new GroupedAutoHeightItem(i <= 6 ? "A" : "B", $"Item {i}"));
+        }
+
+        var view = new DataGridCollectionView(items);
+        view.GroupDescriptions.Add(new DataGridPathGroupDescription(nameof(GroupedAutoHeightItem.Category)));
+
+        var grid = new DataGrid
+        {
+            ItemsSource = view,
+            HeadersVisibility = DataGridHeadersVisibility.Column,
+            AutoGenerateColumns = false,
+            CanUserAddRows = false,
+            UseLogicalScrollable = useLogicalScrollable,
+            MaxHeight = 300,
+        };
+        grid.ColumnsInternal.Add(new DataGridTextColumn
+        {
+            Header = "Name",
+            Binding = new Binding(nameof(GroupedAutoHeightItem.Name)),
+        });
+
+        var root = new Window
+        {
+            Width = 600,
+            Height = 800,
+            Content = new ScrollViewer
+            {
+                Content = new StackPanel
+                {
+                    Children =
+                    {
+                        grid
+                    }
+                }
+            }
+        };
+
+        root.SetThemeStyles(DataGridTheme.FluentV2);
+        root.Show();
+        PumpLayout(grid);
+
+        var firstGroup = (DataGridCollectionViewGroup)view.Groups![0];
+        var secondGroup = (DataGridCollectionViewGroup)view.Groups![1];
+        grid.CollapseRowGroup(firstGroup, collapseAllSubgroups: false);
+        grid.CollapseRowGroup(secondGroup, collapseAllSubgroups: false);
+        PumpLayout(grid);
+        var collapsedHeight = grid.Bounds.Height;
+
+        grid.ExpandRowGroup(firstGroup, expandAllSubgroups: false);
+        PumpLayout(grid);
+        var expandedHeight = grid.Bounds.Height;
+
+        var realizedItems = grid.GetVisualDescendants()
+            .OfType<DataGridRow>()
+            .Where(row => row.IsVisible && row.Bounds.Height > 0)
+            .Select(row => row.DataContext)
+            .OfType<GroupedAutoHeightItem>()
+            .Distinct()
+            .Count();
+
+        Assert.True(expandedHeight > collapsedHeight,
+            $"Expected grid to grow after expanding. Collapsed={collapsedHeight}, Expanded={expandedHeight}, Desired={grid.DesiredSize}, Bounds={grid.Bounds}");
+        Assert.Equal(firstGroup.ItemCount, realizedItems);
+    }
+
     private static ObservableCollection<AutoHeightItem> CreateItems(int count)
     {
         var items = new ObservableCollection<AutoHeightItem>();
@@ -333,6 +408,18 @@ public class DataGridAutoHeightHeadlessTests
 
         public int Id { get; set; }
         public string Name { get; set; }
+    }
+
+    private sealed class GroupedAutoHeightItem
+    {
+        public GroupedAutoHeightItem(string category, string name)
+        {
+            Category = category;
+            Name = name;
+        }
+
+        public string Category { get; }
+        public string Name { get; }
     }
 
     private sealed class AutoHeightGroup

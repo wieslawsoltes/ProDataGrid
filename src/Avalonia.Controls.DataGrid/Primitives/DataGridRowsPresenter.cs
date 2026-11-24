@@ -286,7 +286,7 @@ internal
             {
                 var arrangedConstraint = new Size(
                     double.IsInfinity(originalConstraint.Width) ? originalConstraint.Width : viewport.Width,
-                    double.IsInfinity(originalConstraint.Height) && MatchesDesiredHeight(viewport.Height)
+                    !AreScrollInfoSizeClose(originalConstraint.Height, viewport.Height) && MatchesDesiredHeight(viewport.Height)
                         ? originalConstraint.Height
                         : viewport.Height);
                 _arrangedMeasureSize = AreClose(originalConstraint, arrangedConstraint) ? null : arrangedConstraint;
