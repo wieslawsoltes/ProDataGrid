@@ -1108,7 +1108,7 @@ internal
                     RemoveCellSelectionInternal(rowIndex, columnIndex, removedCollector);
                 }
 
-                if (!_selectedCells.TryGetValue(rowIndex, out var remaining) || remaining.Count == 0)
+                if (!_selectedCells.TryGetValue(SelectedRowKeyAt(rowIndex), out var remaining) || remaining.Count == 0)
                 {
                     SetRowSelection(slot, isSelected: false, setAnchorSlot: false);
                 }

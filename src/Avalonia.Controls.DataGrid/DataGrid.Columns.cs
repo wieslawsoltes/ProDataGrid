@@ -749,6 +749,7 @@ internal
 
             // Intentionally keep the DisplayIndex intact after detaching the column.
             CorrectColumnIndexesAfterDeletion(removedColumn);
+            _selectedCellColumnsStale |= _trackSelectedCellsByItem && _selectedCellsView.Count > 0;
 
             CorrectColumnDisplayIndexesAfterDeletion(removedColumn);
 
