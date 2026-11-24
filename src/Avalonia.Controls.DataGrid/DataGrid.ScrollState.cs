@@ -7,6 +7,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using Avalonia.Utilities;
 
 namespace Avalonia.Controls
@@ -396,6 +397,17 @@ namespace Avalonia.Controls
                     return collection.Count;
                 }
 
+                if (dataSource is IReadOnlyCollection<object> readOnlyCollection)
+                {
+                    return readOnlyCollection.Count;
+                }
+
+                return DataGridReflectionFeature.IsEnabled ? TryGetGenericCollectionCount(dataSource) : null;
+            }
+
+            [RequiresUnreferencedCode("Reading Count from a generic collection interface uses reflection.")]
+            private static int? TryGetGenericCollectionCount(IEnumerable dataSource)
+            {
                 var interfaces = dataSource.GetType().GetInterfaces();
                 foreach (var candidate in interfaces)
                 {

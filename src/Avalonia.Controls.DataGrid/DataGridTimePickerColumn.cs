@@ -183,7 +183,7 @@ internal
                 // Create a binding with format string
                 string formatString = GetTimeFormatString();
                 
-                if (Binding is Binding binding)
+                if (DataGridReflectionFeature.IsEnabled && Binding is Binding binding)
                 {
                     var displayBinding = new Binding
                     {

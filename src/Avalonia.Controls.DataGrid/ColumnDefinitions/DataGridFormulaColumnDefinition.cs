@@ -6,6 +6,9 @@
 using System;
 using Avalonia.Controls.DataGridFormulas;
 using Avalonia.Data;
+using Avalonia.Data.Core;
+using Avalonia.Data.Core.Plugins;
+using Avalonia.Markup.Xaml.MarkupExtensions.CompiledBindings;
 
 namespace Avalonia.Controls
 {
@@ -128,9 +131,22 @@ namespace Avalonia.Controls
                 Converter = new DataGridFormulaMultiValueConverter(grid, definition)
             };
 
-            binding.Bindings.Add(new Binding { Path = ".", Mode = BindingMode.OneWay });
-            binding.Bindings.Add(new Binding { Source = grid, Path = "FormulaModel.FormulaVersion", Mode = BindingMode.OneWay });
+            binding.Bindings.Add(new CompiledBinding { Path = DataContextPath, Mode = BindingMode.OneWay });
+            binding.Bindings.Add(new CompiledBinding { Source = grid, Path = FormulaVersionPath, Mode = BindingMode.OneWay });
             return binding;
         }
+
+        private static readonly CompiledBindingPath DataContextPath = new CompiledBindingPathBuilder().Build();
+
+        private static readonly CompiledBindingPath FormulaVersionPath = new CompiledBindingPathBuilder()
+            .Property(DataGrid.FormulaModelProperty, PropertyInfoAccessorFactory.CreateAvaloniaPropertyAccessor)
+            .Property(
+                new ClrPropertyInfo(
+                    nameof(IDataGridFormulaModel.FormulaVersion),
+                    target => ((IDataGridFormulaModel)target).FormulaVersion,
+                    null,
+                    typeof(int)),
+                PropertyInfoAccessorFactory.CreateInpcPropertyAccessor)
+            .Build();
     }
 }

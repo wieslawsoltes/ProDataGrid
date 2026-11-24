@@ -42,6 +42,7 @@ internal
         internal virtual void Initialize(Type itemType)
         { }
 
+        [RequiresUnreferencedCode(TypeHelper.UnreferencedCodeMessage)]
         private static object InvokePath(object item, string propertyPath, Type propertyType, Type itemType)
         {
             object propertyValue = TypeHelper.GetNestedPropertyValue(

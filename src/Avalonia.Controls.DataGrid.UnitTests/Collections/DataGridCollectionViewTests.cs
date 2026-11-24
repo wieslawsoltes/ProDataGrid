@@ -280,9 +280,78 @@ public class DataGridCollectionViewTests
         public int Value { get; set; }
     }
 
+    [Fact]
+    public void AddNew_Prefers_NewItemFactory_Over_Parameterless_Constructor()
+    {
+        var items = new ObservableCollection<SimpleItem>();
+        var view = new DataGridCollectionView(items)
+        {
+            NewItemFactory = () => new SimpleItem { Value = 7 }
+        };
+
+        var newItem = Assert.IsType<SimpleItem>(view.AddNew());
+        view.CommitNew();
+
+        Assert.Equal(7, newItem.Value);
+        Assert.Same(newItem, Assert.Single(items));
+    }
+
+    [Fact]
+    public void NewItemFactory_Enables_AddNew_For_Items_Without_Parameterless_Constructor()
+    {
+        var items = new ObservableCollection<ItemWithoutDefaultConstructor>();
+        var view = new DataGridCollectionView(items);
+        Assert.False(view.CanAddNew);
+
+        var changedProperties = new List<string>();
+        ((INotifyPropertyChanged)view).PropertyChanged += (_, e) => changedProperties.Add(e.PropertyName ?? string.Empty);
+
+        view.NewItemFactory = () => new ItemWithoutDefaultConstructor(3);
+
+        Assert.True(view.CanAddNew);
+        Assert.Contains(nameof(DataGridCollectionView.CanAddNew), changedProperties);
+        var newItem = Assert.IsType<ItemWithoutDefaultConstructor>(view.AddNew());
+        Assert.Equal(3, newItem.Value);
+
+        view.CancelNew();
+        view.NewItemFactory = null;
+
+        Assert.False(view.CanAddNew);
+        Assert.Empty(items);
+    }
+
+    [Fact]
+    public void Clearing_NewItemFactory_Falls_Back_To_Parameterless_Constructor()
+    {
+        var items = new ObservableCollection<SimpleItem>();
+        var view = new DataGridCollectionView(items)
+        {
+            NewItemFactory = () => new SimpleItem { Value = 7 }
+        };
+        Assert.True(view.CanAddNew);
+
+        view.NewItemFactory = null;
+
+        Assert.Null(view.NewItemFactory);
+        Assert.True(view.CanAddNew);
+        var newItem = Assert.IsType<SimpleItem>(view.AddNew());
+        view.CommitNew();
+        Assert.Equal(0, newItem.Value);
+    }
+
     private class SimpleItem
     {
         public int Value { get; set; }
+    }
+
+    private class ItemWithoutDefaultConstructor
+    {
+        public ItemWithoutDefaultConstructor(int value)
+        {
+            Value = value;
+        }
+
+        public int Value { get; }
     }
 
     private static IList GetInternalList(DataGridCollectionView view)

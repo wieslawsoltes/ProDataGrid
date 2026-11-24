@@ -322,7 +322,13 @@ internal
                 return false;
             }
 
-            var propertyType = item.GetType().GetNestedPropertyType(bindingPath);
+            // Without reflection the value type and the setter come from the value accessor of the column.
+            var accessor = DataGridReflectionFeature.IsEnabled
+                ? null
+                : DataGridColumnMetadata.ResolveValueAccessor(column, bindingPath);
+            var propertyType = accessor != null
+                ? accessor.CanWrite ? accessor.ValueType : null
+                : ReflectionPropertyPath.GetPropertyType(item.GetType(), bindingPath);
             if (propertyType == null)
             {
                 return false;
@@ -339,7 +345,13 @@ internal
                 return false;
             }
 
-            return TypeHelper.TrySetNestedPropertyValue(item, bindingPath, converted, out _);
+            if (accessor != null)
+            {
+                accessor.SetValue(item, converted);
+                return true;
+            }
+
+            return ReflectionPropertyPath.TrySetValue(item, bindingPath, converted);
         }
 
         private bool TryConvertClipboardText(BindingBase binding, string text, Type propertyType, out object converted)

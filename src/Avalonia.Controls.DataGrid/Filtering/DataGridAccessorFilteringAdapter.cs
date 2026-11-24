@@ -176,7 +176,7 @@ namespace Avalonia.Controls.DataGridFiltering
             }
 
             var columnFilterAccessor = DataGridColumnFilter.GetValueAccessor(column);
-            var accessor = columnFilterAccessor ?? DataGridColumnMetadata.GetValueAccessor(column);
+            var accessor = columnFilterAccessor ?? DataGridColumnMetadata.ResolveValueAccessor(column, descriptor.PropertyPath);
             if (accessor == null)
             {
                 if (_throwOnMissingAccessor)

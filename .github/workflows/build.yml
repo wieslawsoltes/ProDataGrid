@@ -136,10 +136,32 @@ jobs:
       - name: Run NativeAOT smoke application
         run: ./artifacts/nativeaot-smoke/ProDataGrid.SourceGeneration.AotSmoke
 
+  native-aot-datagrid-smoke:
+    name: NativeAOT DataGrid Smoke
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          global-json-file: global.json
+
+      - name: Restore NativeAOT DataGrid smoke application
+        run: dotnet restore tests/Avalonia.Controls.DataGrid.AotSmoke/Avalonia.Controls.DataGrid.AotSmoke.csproj -r linux-x64
+
+      - name: Publish NativeAOT DataGrid smoke application with trimming warnings as errors
+        run: dotnet publish tests/Avalonia.Controls.DataGrid.AotSmoke/Avalonia.Controls.DataGrid.AotSmoke.csproj -c Release -r linux-x64 --self-contained true --no-restore -p:VersionSuffix="${{ needs.build.outputs.version-suffix }}" -o artifacts/nativeaot-datagrid-smoke
+
+      - name: Run NativeAOT DataGrid smoke application
+        run: ./artifacts/nativeaot-datagrid-smoke/Avalonia.Controls.DataGrid.AotSmoke
+
   pack:
     name: Pack
     runs-on: ubuntu-latest
-    needs: [build, test, native-aot-smoke]
+    needs: [build, test, native-aot-smoke, native-aot-datagrid-smoke]
     steps:
       - name: Checkout
         uses: actions/checkout@v4

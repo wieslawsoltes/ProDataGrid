@@ -68,9 +68,13 @@ namespace Avalonia.Collections
             {
                 throw new InvalidOperationException(GetOperationNotAllowedText(nameof(AddNew)));
             }
-            else if (_itemConstructor != null)
+            else if (_newItemSource is Func<object> newItemFactory)
             {
-                newItem = _itemConstructor.Invoke(null);
+                newItem = newItemFactory();
+            }
+            else if (_newItemSource is ConstructorInfo itemConstructor)
+            {
+                newItem = itemConstructor.Invoke(null);
             }
 
             var countBeforeAdd = Count;

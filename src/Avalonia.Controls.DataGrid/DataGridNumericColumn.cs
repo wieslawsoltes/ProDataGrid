@@ -325,7 +325,7 @@ internal
             if (Binding != null && dataItem != DataGridCollectionView.NewItemPlaceholder)
             {
                 // Create a binding with format string
-                if (Binding is Binding binding)
+                if (DataGridReflectionFeature.IsEnabled && Binding is Binding binding)
                 {
                     var displayBinding = new Binding
                     {
@@ -481,7 +481,7 @@ internal
 
         private BindingBase CreateNumericDisplayBinding(BindingBase binding)
         {
-            if (binding is not Binding avaloniaBinding)
+            if (!DataGridReflectionFeature.IsEnabled || binding is not Binding avaloniaBinding)
             {
                 return binding;
             }

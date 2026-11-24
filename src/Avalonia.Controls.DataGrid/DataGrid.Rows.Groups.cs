@@ -788,7 +788,7 @@ namespace Avalonia.Controls
             }
             else
             {
-                groupHeader.PropertyName = DataConnection.DataType?.GetDisplayName(propertyName) ?? propertyName;
+                groupHeader.PropertyName = ReflectionPropertyPath.GetDisplayName(DataConnection.DataType, propertyName) ?? propertyName;
             }
 
             if (rowGroupInfo.CollectionViewGroup is INotifyPropertyChanged inpc)
@@ -1054,7 +1054,7 @@ namespace Avalonia.Controls
             }
             else
             {
-                groupHeader.PropertyName = DataConnection.DataType?.GetDisplayName(propertyName) ?? propertyName;
+                groupHeader.PropertyName = ReflectionPropertyPath.GetDisplayName(DataConnection.DataType, propertyName) ?? propertyName;
             }
         }
 

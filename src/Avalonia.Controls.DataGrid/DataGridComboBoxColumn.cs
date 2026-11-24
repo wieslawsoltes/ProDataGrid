@@ -170,6 +170,49 @@ internal
         }
 
         /// <summary>
+        /// Defines the <see cref="DisplayMemberBinding"/> property.
+        /// </summary>
+        public static readonly StyledProperty<BindingBase> DisplayMemberBindingProperty =
+            AvaloniaProperty.Register<DataGridComboBoxColumn, BindingBase>(nameof(DisplayMemberBinding));
+
+        /// <summary>
+        /// Gets or sets the binding that reads the displayed value from each combo box item.
+        /// </summary>
+        /// <remarks>
+        /// The binding takes precedence over <see cref="DisplayMemberPath"/>. A compiled binding reads the
+        /// value without reflection, so it keeps working in trimmed and Native AOT applications.
+        /// </remarks>
+        [AssignBinding]
+        [InheritDataTypeFromItems(nameof(ItemsSource))]
+        public BindingBase DisplayMemberBinding
+        {
+            get => GetValue(DisplayMemberBindingProperty);
+            set => SetValue(DisplayMemberBindingProperty, value);
+        }
+
+        /// <summary>
+        /// Defines the <see cref="SelectedValueMemberBinding"/> property.
+        /// </summary>
+        public static readonly StyledProperty<BindingBase> SelectedValueMemberBindingProperty =
+            AvaloniaProperty.Register<DataGridComboBoxColumn, BindingBase>(nameof(SelectedValueMemberBinding));
+
+        /// <summary>
+        /// Gets or sets the binding that reads
+        /// <see cref="Avalonia.Controls.Primitives.SelectingItemsControl.SelectedValue"/> from each combo box item.
+        /// </summary>
+        /// <remarks>
+        /// The binding takes precedence over <see cref="SelectedValuePath"/>. A compiled binding reads the
+        /// value without reflection, so it keeps working in trimmed and Native AOT applications.
+        /// </remarks>
+        [AssignBinding]
+        [InheritDataTypeFromItems(nameof(ItemsSource))]
+        public BindingBase SelectedValueMemberBinding
+        {
+            get => GetValue(SelectedValueMemberBindingProperty);
+            set => SetValue(SelectedValueMemberBindingProperty, value);
+        }
+
+        /// <summary>
         /// The binding applied to <see cref="Avalonia.Controls.Primitives.SelectingItemsControl.SelectedItem"/>.
         /// </summary>
         [AssignBinding]
@@ -410,9 +453,11 @@ internal
                         DataGridHelper.SyncColumnProperty(this, comboBox, VerticalContentAlignmentProperty);
                         break;
                     case nameof(DisplayMemberPath):
+                    case nameof(DisplayMemberBinding):
                         comboBox.DisplayMemberBinding = CreateDisplayMemberBinding();
                         break;
                     case nameof(SelectedValuePath):
+                    case nameof(SelectedValueMemberBinding):
                         comboBox.SelectedValueBinding = CreateSelectedValuePathBinding();
                         break;
                     case nameof(SelectedItemBinding):
@@ -484,7 +529,9 @@ internal
                 change.Property == HorizontalContentAlignmentProperty ||
                 change.Property == VerticalContentAlignmentProperty ||
                 change.Property == DisplayMemberPathProperty ||
-                change.Property == SelectedValuePathProperty)
+                change.Property == SelectedValuePathProperty ||
+                change.Property == DisplayMemberBindingProperty ||
+                change.Property == SelectedValueMemberBindingProperty)
             {
                 NotifyPropertyChanged(change.Property.Name);
             }
@@ -563,7 +610,12 @@ internal
 
         private BindingBase CreateDisplayMemberBinding()
         {
-            if (!string.IsNullOrWhiteSpace(DisplayMemberPath))
+            if (DisplayMemberBinding is { } displayMemberBinding)
+            {
+                return displayMemberBinding;
+            }
+
+            if (DataGridReflectionFeature.IsEnabled && !string.IsNullOrWhiteSpace(DisplayMemberPath))
             {
                 return new Binding(DisplayMemberPath);
             }
@@ -573,7 +625,12 @@ internal
 
         private BindingBase CreateSelectedValuePathBinding()
         {
-            if (!string.IsNullOrWhiteSpace(SelectedValuePath))
+            if (SelectedValueMemberBinding is { } selectedValueMemberBinding)
+            {
+                return selectedValueMemberBinding;
+            }
+
+            if (DataGridReflectionFeature.IsEnabled && !string.IsNullOrWhiteSpace(SelectedValuePath))
             {
                 return new Binding(SelectedValuePath);
             }

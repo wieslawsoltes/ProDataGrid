@@ -16,6 +16,8 @@ using Avalonia.Markup.Xaml.MarkupExtensions.CompiledBindings;
 
 namespace Avalonia.Controls
 {
+    [RequiresUnreferencedCode("Building a compiled binding path from an expression uses reflection.")]
+    [RequiresDynamicCode("Building a compiled binding path from an expression may construct generic types.")]
     internal sealed class DataGridCompiledBindingPathBuilder : ExpressionVisitor
     {
         private const string IndexerGetterName = "get_Item";

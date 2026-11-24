@@ -50,6 +50,14 @@ namespace Avalonia.Controls.DataGridHierarchical
         new IHierarchicalModel<T> Create();
     }
 
+    /// <summary>
+    /// Lets a strongly-typed model pick its typed adapter factory without reflection.
+    /// </summary>
+    internal interface IDataGridTypedHierarchicalAdapterSource
+    {
+        DataGridHierarchicalAdapter? TryCreateTypedAdapter(DataGrid grid, IDataGridHierarchicalAdapterFactory factory);
+    }
+
     internal static class DataGridHierarchicalAdapterFactoryExtensions
     {
         public static DataGridHierarchicalAdapter CreateFromUntyped<T>(

@@ -386,7 +386,7 @@ namespace Avalonia.Controls.DataGridSorting
             var sortAccessor = DataGridColumnSort.GetValueAccessor(column);
             if (sortAccessor != null || sortValueComparer != null)
             {
-                var resolvedAccessor = sortAccessor ?? DataGridColumnMetadata.GetValueAccessor(column);
+                var resolvedAccessor = sortAccessor ?? DataGridColumnMetadata.ResolveValueAccessor(column);
                 if (resolvedAccessor != null)
                 {
                     return new SortingDescriptor(
@@ -398,7 +398,7 @@ namespace Avalonia.Controls.DataGridSorting
                 }
             }
 
-            var accessor = DataGridColumnMetadata.GetValueAccessor(column);
+            var accessor = DataGridColumnMetadata.ResolveValueAccessor(column);
             if (accessor != null)
             {
                 return new SortingDescriptor(
@@ -472,7 +472,7 @@ namespace Avalonia.Controls.DataGridSorting
                 var sortAccessor = DataGridColumnSort.GetValueAccessor(column);
                 if (sortAccessor != null || sortValueComparer != null)
                 {
-                    var resolvedAccessor = sortAccessor ?? DataGridColumnMetadata.GetValueAccessor(column);
+                    var resolvedAccessor = sortAccessor ?? DataGridColumnMetadata.ResolveValueAccessor(column, descriptor.PropertyPath);
                     if (resolvedAccessor != null)
                     {
                         var culture = descriptor.Culture ?? _view?.Culture ?? CultureInfo.InvariantCulture;
@@ -489,7 +489,7 @@ namespace Avalonia.Controls.DataGridSorting
                     }
                 }
 
-                var accessor = DataGridColumnMetadata.GetValueAccessor(column);
+                var accessor = DataGridColumnMetadata.ResolveValueAccessor(column, descriptor.PropertyPath);
                 if (accessor != null)
                 {
                     var culture = descriptor.Culture ?? _view?.Culture ?? CultureInfo.InvariantCulture;
@@ -514,6 +514,12 @@ namespace Avalonia.Controls.DataGridSorting
                         column,
                         descriptor.ColumnId,
                         "Sorting requires a value accessor but no column could be resolved.");
+                    return null;
+                }
+
+                if (!DataGridReflectionFeature.IsEnabled)
+                {
+                    LogInvalidSort($"Cannot sort by '{descriptor.PropertyPath}' without a value accessor. {DataGridReflectionFeature.DisabledMessage}");
                     return null;
                 }
 
@@ -663,7 +669,7 @@ namespace Avalonia.Controls.DataGridSorting
             var sortAccessor = DataGridColumnSort.GetValueAccessor(column);
             if (sortAccessor != null || sortValueComparer != null)
             {
-                var resolvedAccessor = sortAccessor ?? DataGridColumnMetadata.GetValueAccessor(column);
+                var resolvedAccessor = sortAccessor ?? DataGridColumnMetadata.ResolveValueAccessor(column);
                 if (resolvedAccessor != null)
                 {
                     comparer = DataGridColumnValueAccessorComparer.Create(resolvedAccessor, culture, sortValueComparer);
@@ -671,7 +677,7 @@ namespace Avalonia.Controls.DataGridSorting
                 }
             }
 
-            var accessor = DataGridColumnMetadata.GetValueAccessor(column);
+            var accessor = DataGridColumnMetadata.ResolveValueAccessor(column);
             if (accessor != null)
             {
                 comparer = DataGridColumnValueAccessorComparer.Create(accessor, culture);
@@ -730,7 +736,7 @@ namespace Avalonia.Controls.DataGridSorting
                     if (sourceComparer is IDataGridColumnValueAccessorComparer accessorComparer)
                     {
                         var sortAccessor = DataGridColumnSort.GetValueAccessor(column);
-                        var accessor = sortAccessor ?? DataGridColumnMetadata.GetValueAccessor(column);
+                        var accessor = sortAccessor ?? DataGridColumnMetadata.ResolveValueAccessor(column);
                         if (ReferenceEquals(accessor, accessorComparer.Accessor))
                         {
                             return column;

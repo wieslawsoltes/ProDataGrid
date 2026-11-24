@@ -1,0 +1,36 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <OutputType>Exe</OutputType>
+    <UseAppHost>true</UseAppHost>
+    <IsTestProject>true</IsTestProject>
+    <IsPackable>false</IsPackable>
+    <Nullable>enable</Nullable>
+    <RootNamespace>Avalonia.Controls.DataGridReflectionDisabledTests</RootNamespace>
+    <SignAssembly>true</SignAssembly>
+    <AssemblyOriginatorKeyFile>$(MSBuildThisFileDirectory)/../../build/avalonia.snk</AssemblyOriginatorKeyFile>
+    <!-- Runs the grid the way a trimmed or Native AOT app does: with the reflection feature switch off. -->
+    <ProDataGridIsReflectionEnabledByDefault>false</ProDataGridIsReflectionEnabledByDefault>
+  </PropertyGroup>
+
+  <Import Project="../../build/SharedVersion.props" />
+  <Import Project="../Avalonia.Controls.DataGrid/build/ProDataGrid.targets" />
+
+  <ItemGroup>
+    <ProjectReference Include="../Avalonia.Controls.DataGrid/Avalonia.Controls.DataGrid.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Avalonia" />
+    <PackageReference Include="Avalonia.Headless.XUnit" />
+    <PackageReference Include="Avalonia.Themes.Fluent" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" />
+    <PackageReference Include="xunit.v3" />
+    <PackageReference Include="xunit.runner.visualstudio">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+  </ItemGroup>
+
+</Project>

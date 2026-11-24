@@ -75,7 +75,7 @@ class DataGridDistinctValueFilterFlyout : Flyout
 
         IDataGridColumnValueAccessor? accessor = ValueAccessor ??
             DataGridColumnFilter.GetValueAccessor(column) ??
-            DataGridColumnMetadata.GetValueAccessor(column);
+            DataGridColumnMetadata.ResolveValueAccessor(column);
         if (accessor == null)
         {
             LastError = "The column must provide an IDataGridColumnValueAccessor for reflection-free distinct-value filtering.";

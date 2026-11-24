@@ -1,0 +1,20 @@
+<Project>
+
+  <!--
+    ProDataGrid reaches reflection (TypeDescriptor, property-path walking, reflection bindings,
+    column auto-generation) only behind the ProDataGrid.IsReflectionEnabledByDefault feature switch.
+    Trimmed and Native AOT publishes turn it off so the trimmer removes those code paths; set
+    ProDataGridIsReflectionEnabledByDefault to true to keep them (the app then owns any trimming breaks).
+  -->
+  <PropertyGroup>
+    <ProDataGridIsReflectionEnabledByDefault Condition="'$(ProDataGridIsReflectionEnabledByDefault)' == '' and ('$(PublishTrimmed)' == 'true' or '$(PublishAot)' == 'true')">false</ProDataGridIsReflectionEnabledByDefault>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <RuntimeHostConfigurationOption Include="ProDataGrid.IsReflectionEnabledByDefault"
+                                    Condition="'$(ProDataGridIsReflectionEnabledByDefault)' != ''"
+                                    Value="$(ProDataGridIsReflectionEnabledByDefault)"
+                                    Trim="true" />
+  </ItemGroup>
+
+</Project>

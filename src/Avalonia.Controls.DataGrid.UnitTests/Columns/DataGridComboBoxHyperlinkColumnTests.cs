@@ -34,6 +34,38 @@ public class DataGridComboBoxHyperlinkColumnTests
     }
 
     [AvaloniaFact]
+    public void ComboBox_Member_Bindings_Take_Precedence_Over_Member_Paths()
+    {
+        var displayMemberBinding = new Binding("Label");
+        var selectedValueMemberBinding = new Binding("Id");
+        var column = new DataGridComboBoxColumn
+        {
+            DisplayMemberPath = "Name",
+            SelectedValuePath = "Key",
+            DisplayMemberBinding = displayMemberBinding,
+            SelectedValueMemberBinding = selectedValueMemberBinding
+        };
+
+        var combo = Assert.IsType<ComboBox>(column.GenerateElementInternal(new DataGridCell(), new object()));
+
+        Assert.Same(displayMemberBinding, combo.DisplayMemberBinding);
+        Assert.Same(selectedValueMemberBinding, combo.SelectedValueBinding);
+    }
+
+    [AvaloniaFact]
+    public void ComboBox_Member_Binding_Change_Refreshes_Element()
+    {
+        var column = new DataGridComboBoxColumn { DisplayMemberPath = "Name" };
+        var combo = Assert.IsType<ComboBox>(column.GenerateElementInternal(new DataGridCell(), new object()));
+        var displayMemberBinding = new Binding("Label");
+
+        column.DisplayMemberBinding = displayMemberBinding;
+        column.RefreshCellContent(combo, nameof(DataGridComboBoxColumn.DisplayMemberBinding));
+
+        Assert.Same(displayMemberBinding, combo.DisplayMemberBinding);
+    }
+
+    [AvaloniaFact]
     public void ComboBox_IsReadOnly_When_Binding_Is_OneWay()
     {
         var column = new DataGridComboBoxColumn

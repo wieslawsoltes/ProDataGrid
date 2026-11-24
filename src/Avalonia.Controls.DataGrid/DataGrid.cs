@@ -70,7 +70,6 @@ namespace Avalonia.Controls
     [TemplatePart(DATAGRID_elementTopRightCornerHeaderName,        typeof(ContentControl))]
     [TemplatePart(DATAGRID_elementVerticalScrollbarName,           typeof(ScrollBar))]
     [PseudoClasses(":invalid", ":empty-rows", ":empty-columns")]
-    [RequiresUnreferencedCode("DataGrid inspects data items via reflection and is not compatible with trimming.")]
 #if !DATAGRID_INTERNAL
 public
 #else
@@ -645,7 +644,10 @@ internal
 
             FocusableProperty.OverrideDefaultValue<DataGrid>(true);
 
-            DataGridTypeDescriptorPlugin.EnsureRegistered();
+            if (DataGridReflectionFeature.IsEnabled)
+            {
+                DataGridTypeDescriptorPlugin.EnsureRegistered();
+            }
         }
 
         /// <summary>
@@ -2817,6 +2819,19 @@ internal
                 return null;
             }
 
+            if (model is Avalonia.Controls.DataGridHierarchical.IDataGridTypedHierarchicalAdapterSource typedSource)
+            {
+                return typedSource.TryCreateTypedAdapter(this, _hierarchicalAdapterFactory);
+            }
+
+            return DataGridReflectionFeature.IsEnabled
+                ? TryCreateTypedHierarchicalAdapterWithReflection(model)
+                : null;
+        }
+
+        [RequiresUnreferencedCode("Matching a custom typed hierarchical model to its adapter factory uses reflection.")]
+        private Avalonia.Controls.DataGridHierarchical.DataGridHierarchicalAdapter? TryCreateTypedHierarchicalAdapterWithReflection(Avalonia.Controls.DataGridHierarchical.IHierarchicalModel model)
+        {
             var modelType = model.GetType();
             var typedModelInterface = modelType.GetInterfaces()
                 .FirstOrDefault(i => i.IsGenericType && i.GetGenericTypeDefinition() == typeof(Avalonia.Controls.DataGridHierarchical.IHierarchicalModel<>));
@@ -6031,7 +6046,7 @@ internal
             var sortAccessor = DataGridColumnSort.GetValueAccessor(column);
             if (sortAccessor != null || sortValueComparer != null)
             {
-                var resolvedAccessor = sortAccessor ?? DataGridColumnMetadata.GetValueAccessor(column);
+                var resolvedAccessor = sortAccessor ?? DataGridColumnMetadata.ResolveValueAccessor(column, propertyPath);
                 if (resolvedAccessor != null)
                 {
                     var resolvedComparer = DataGridColumnValueAccessorComparer.Create(resolvedAccessor, culture, sortValueComparer);
@@ -6042,7 +6057,7 @@ internal
             var comparer = existing?.Comparer;
             if (comparer == null)
             {
-                var accessor = DataGridColumnMetadata.GetValueAccessor(column);
+                var accessor = DataGridColumnMetadata.ResolveValueAccessor(column, propertyPath);
                 if (accessor != null)
                 {
                     comparer = DataGridColumnValueAccessorComparer.Create(accessor, culture);

@@ -391,7 +391,7 @@ namespace Avalonia.Controls
 
                     if (descriptor.HasPropertyPath)
                     {
-                        var accessor = DataGridColumnMetadata.GetValueAccessor(this);
+                        var accessor = DataGridColumnMetadata.ResolveValueAccessor(this, descriptor.PropertyPath);
                         if (accessor != null)
                         {
                             var culture = descriptor.Culture ?? CultureInfo.InvariantCulture;
@@ -399,7 +399,10 @@ namespace Avalonia.Controls
                             return DataGridSortDescription.FromComparer(comparer, descriptor.Direction, descriptor.PropertyPath);
                         }
 
-                        return DataGridSortDescription.FromPath(descriptor.PropertyPath, descriptor.Direction, descriptor.Culture);
+                        if (DataGridReflectionFeature.IsEnabled)
+                        {
+                            return DataGridSortDescription.FromPath(descriptor.PropertyPath, descriptor.Direction, descriptor.Culture);
+                        }
                     }
                 }
 
@@ -413,7 +416,7 @@ namespace Avalonia.Controls
                             .FirstOrDefault(s => s.SourceComparer == CustomSortComparer);
                     }
 
-                    var accessor = DataGridColumnMetadata.GetValueAccessor(this);
+                    var accessor = DataGridColumnMetadata.ResolveValueAccessor(this);
                     if (accessor != null)
                     {
                         var match = OwningGrid.DataConnection.SortDescriptions

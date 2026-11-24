@@ -15,7 +15,6 @@ using System.Reflection;
 
 namespace Avalonia.Controls.Utils
 {
-    [RequiresUnreferencedCode("TypeHelper uses reflection to walk property paths and is not compatible with trimming.")]
     internal static class TypeHelper
     {
         internal const char LeftIndexerToken = '[';
@@ -24,6 +23,13 @@ namespace Avalonia.Controls.Utils
         internal const char LeftParenthesisToken  = '(';
         internal const char RightParenthesisToken = ')';
 
+        internal const string UnreferencedCodeMessage = "TypeHelper uses reflection to walk property paths and is not compatible with trimming.";
+
+        private const string GenericInterfaceJustification =
+            "Only the generic IEnumerable<T> interface is inspected. If the trimmer removed it from the interface list, the lookup falls back to the runtime type of an item.";
+
+        [UnconditionalSuppressMessage("Trimming", "IL2070", Justification = GenericInterfaceJustification)]
+        [UnconditionalSuppressMessage("Trimming", "IL2075", Justification = GenericInterfaceJustification)]
         private static Type? FindGenericType(Type definition, Type? type)
         {
             while ((type != null) && (type != typeof(object)))
@@ -57,6 +63,7 @@ namespace Avalonia.Controls.Utils
         /// <param name="stringIndex">String value of indexer argument.</param>
         /// <param name="index">Resultant index value.</param>
         /// <returns>Indexer PropertyInfo if found, null otherwise.</returns>
+        [RequiresUnreferencedCode(UnreferencedCodeMessage)]
         private static PropertyInfo? FindIndexerInMembers(MemberInfo?[] members, string stringIndex, out object[]? index)
         {
             index = null;
@@ -98,6 +105,7 @@ namespace Avalonia.Controls.Utils
             return stringIndexer;
         }
 
+        [RequiresUnreferencedCode(UnreferencedCodeMessage)]
         private static PropertyInfo? FindIndexerInInterfaces(Type type, string stringIndex, out object[]? index)
         {
             PropertyInfo? candidate = null;
@@ -169,6 +177,7 @@ namespace Avalonia.Controls.Utils
             return candidate;
         }
 
+        [RequiresUnreferencedCode(UnreferencedCodeMessage)]
         private static PropertyInfo? FindPropertyInInterfaces(Type type, string propertyName)
         {
             PropertyInfo? candidate = null;
@@ -229,6 +238,7 @@ namespace Avalonia.Controls.Utils
         /// </summary>
         /// <param name="type">Type to check.</param>
         /// <returns>Default member name.</returns>
+        [RequiresUnreferencedCode(UnreferencedCodeMessage)]
         private static string? GetDefaultMemberName(this Type type)
         {
             object[] attributes = type.GetCustomAttributes(typeof(DefaultMemberAttribute), true);
@@ -251,6 +261,7 @@ namespace Avalonia.Controls.Utils
         /// <param name="type">Type to search</param>
         /// <param name="propertyPath">property path</param>
         /// <returns>DisplayAttribute.ShortName if it exists, null otherwise</returns>
+        [RequiresUnreferencedCode(UnreferencedCodeMessage)]
         internal static string? GetDisplayName(this Type type, string propertyPath)
         {
             PropertyInfo? propertyInfo = type.GetNestedProperty(propertyPath);
@@ -288,6 +299,7 @@ namespace Avalonia.Controls.Utils
         /// <param name="exception">Potential exception</param>
         /// <param name="item">Parent item which will be set to the property value if non-null.</param>
         /// <returns></returns>
+        [RequiresUnreferencedCode(UnreferencedCodeMessage)]
         private static PropertyInfo? GetNestedProperty(this Type? parentType, string? propertyPath, out Exception? exception, ref object? item)
         {
             exception = null;
@@ -345,11 +357,13 @@ namespace Avalonia.Controls.Utils
         /// <param name="propertyPath">Property path.</param>
         /// <param name="item">Parent item which will be set to the property value if non-null.</param>
         /// <returns>The PropertyInfo.</returns>
+        [RequiresUnreferencedCode(UnreferencedCodeMessage)]
         internal static PropertyInfo? GetNestedProperty(this Type parentType, string? propertyPath, ref object? item)
         {
             return parentType.GetNestedProperty(propertyPath, out Exception? ex, ref item);
         }
 
+        [RequiresUnreferencedCode(UnreferencedCodeMessage)]
         internal static PropertyInfo? GetNestedProperty(this Type? parentType, string? propertyPath)
         {
             if (parentType != null)
@@ -376,6 +390,7 @@ namespace Avalonia.Controls.Utils
             return s;
         }
 
+        [RequiresUnreferencedCode(UnreferencedCodeMessage)]
         internal static Type? GetNestedPropertyType(this Type? parentType, string? propertyPath)
         {
             if (parentType == null || String.IsNullOrEmpty(propertyPath))
@@ -401,11 +416,13 @@ namespace Avalonia.Controls.Utils
         /// <param name="propertyType">Property type</param>
         /// <param name="exception">Potential exception</param>
         /// <returns>Property value</returns>
+        [RequiresUnreferencedCode(UnreferencedCodeMessage)]
         internal static object? GetNestedPropertyValue(object? item, string? propertyPath, Type propertyType, out Exception? exception)
         {
             return GetNestedPropertyValue(item, propertyPath, propertyType, null, out exception);
         }
 
+        [RequiresUnreferencedCode(UnreferencedCodeMessage)]
         internal static object? GetNestedPropertyValue(
             object? item,
             string? propertyPath,
@@ -446,6 +463,7 @@ namespace Avalonia.Controls.Utils
         /// <param name="item">Parent data item.</param>
         /// <param name="propertyPath">Property path.</param>
         /// <returns>Value.</returns>
+        [RequiresUnreferencedCode(UnreferencedCodeMessage)]
         internal static object? GetNestedPropertyValue(object? item, string? propertyPath)
         {
             if (item != null)
@@ -465,6 +483,7 @@ namespace Avalonia.Controls.Utils
             return null;
         }
 
+        [RequiresUnreferencedCode(UnreferencedCodeMessage)]
         internal static bool TrySetNestedPropertyValue(object? item, string? propertyPath, object? value, out Exception? exception)
         {
             exception = null;
@@ -552,6 +571,7 @@ namespace Avalonia.Controls.Utils
         /// <param name="propertyPath">Property path.</param>
         /// <param name="index">Set to the index if return value is an indexer, otherwise null.</param>
         /// <returns>PropertyInfo for either a property or an indexer.</returns>
+        [RequiresUnreferencedCode(UnreferencedCodeMessage)]
         internal static PropertyInfo? GetPropertyOrIndexer(this Type type, string? propertyPath, out object[]? index)
         {
             index = null;
@@ -615,19 +635,45 @@ namespace Avalonia.Controls.Utils
             if (elementType != null)
             {
                 // If the object is of type IList, try to use its default indexer.
-                if (typeof(IList<>).MakeGenericType(elementType) is Type genericList
-                    && genericList.IsAssignableFrom(type))
+                if (FindConstructedInterface(type, typeof(IList<>), elementType) is Type genericList)
                 {
                     indexer = FindIndexerInMembers(genericList.GetDefaultMembers(), stringIndex, out index);
                 }
-                if (typeof(IReadOnlyList<>).MakeGenericType(elementType) is Type genericReadOnlyList
-                   && genericReadOnlyList.IsAssignableFrom(type))
+                if (FindConstructedInterface(type, typeof(IReadOnlyList<>), elementType) is Type genericReadOnlyList)
                 {
                     indexer = FindIndexerInMembers(genericReadOnlyList.GetDefaultMembers(), stringIndex, out index);
                 }
             }
 
             return indexer;
+        }
+
+        /// <summary>
+        /// Finds <paramref name="definition"/> constructed over <paramref name="elementType"/> among the
+        /// interfaces of <paramref name="type"/> without constructing the generic type at runtime.
+        /// </summary>
+        [RequiresUnreferencedCode(UnreferencedCodeMessage)]
+        private static Type? FindConstructedInterface(Type type, Type definition, Type elementType)
+        {
+            static bool Matches(Type candidate, Type definition, Type elementType)
+                => candidate.IsGenericType
+                    && candidate.GetGenericTypeDefinition() == definition
+                    && candidate.GetGenericArguments()[0] == elementType;
+
+            if (type.IsInterface && Matches(type, definition, elementType))
+            {
+                return type;
+            }
+
+            foreach (var candidate in type.GetInterfaces())
+            {
+                if (Matches(candidate, definition, elementType))
+                {
+                    return candidate;
+                }
+            }
+
+            return null;
         }
 
         internal static bool IsEnumerableType(this Type enumerableType)
@@ -654,6 +700,7 @@ namespace Avalonia.Controls.Utils
         /// <param name="item">Declaring data item.</param>
         /// <param name="property">Property name.</param>
         /// <returns>Property with default member name prepended, or property if unchanged.</returns>
+        [RequiresUnreferencedCode(UnreferencedCodeMessage)]
         internal static string? PrependDefaultMemberName(object? item, string? property)
         {
             if (item != null && !string.IsNullOrEmpty(property) && property![0] == TypeHelper.LeftIndexerToken)
@@ -770,6 +817,8 @@ namespace Avalonia.Controls.Utils
             return false;
         }
 
+        [UnconditionalSuppressMessage("Trimming", "IL2070", Justification = GenericInterfaceJustification)]
+        [UnconditionalSuppressMessage("Trimming", "IL2075", Justification = GenericInterfaceJustification)]
         internal static Type? GetItemType(this IEnumerable list)
         {
             Type listType = list.GetType();

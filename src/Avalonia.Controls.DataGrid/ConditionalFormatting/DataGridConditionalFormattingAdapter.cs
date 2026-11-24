@@ -21,7 +21,6 @@ namespace Avalonia.Controls.DataGridConditionalFormatting
     /// <summary>
     /// Evaluates conditional formatting descriptors against the view and current items.
     /// </summary>
-    [RequiresUnreferencedCode("DataGridConditionalFormattingAdapter uses reflection to access item properties and is not compatible with trimming.")]
 #if !DATAGRID_INTERNAL
     public
 #else
@@ -405,7 +404,7 @@ namespace Avalonia.Controls.DataGridConditionalFormatting
                 return null;
             }
 
-            var accessor = DataGridColumnMetadata.GetValueAccessor(column);
+            var accessor = DataGridColumnMetadata.ResolveValueAccessor(column);
             if (accessor != null)
             {
                 return accessor.GetValue(item);
@@ -463,7 +462,7 @@ namespace Avalonia.Controls.DataGridConditionalFormatting
                     return cached(item);
                 }
 
-                var compiled = new Func<object, object>(o => TypeHelper.GetNestedPropertyValue(o, propertyPath));
+                var compiled = new Func<object, object>(o => ReflectionPropertyPath.GetValue(o, propertyPath));
                 _getterCache[(type, propertyPath)] = compiled;
                 return compiled(item);
             };

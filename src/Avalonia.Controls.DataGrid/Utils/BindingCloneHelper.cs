@@ -3,6 +3,7 @@
 
 #nullable disable
 
+using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using Avalonia;
 using Avalonia.Controls;
@@ -14,17 +15,19 @@ namespace Avalonia.Controls.Utils
 {
     internal static class BindingCloneHelper
     {
+        private const string ReflectionBindingMessage = "Cloning a reflection binding creates a new reflection binding.";
+
         public static bool TryCreateExplicitBinding(BindingBase binding, out BindingBase explicitBinding)
         {
             switch (binding)
             {
-                case Binding avaloniaBinding:
+                case Binding avaloniaBinding when DataGridReflectionFeature.IsEnabled:
                     explicitBinding = CloneBinding(avaloniaBinding);
                     return true;
                 case CompiledBindingExtension compiledBinding:
                     explicitBinding = CloneBinding(compiledBinding);
                     return true;
-                case ReflectionBinding reflectionBinding:
+                case ReflectionBinding reflectionBinding when DataGridReflectionFeature.IsEnabled:
                     explicitBinding = CloneBinding(reflectionBinding);
                     return true;
                 case CompiledBinding compiledBinding:
@@ -297,6 +300,8 @@ namespace Avalonia.Controls.Utils
             };
         }
 
+        [RequiresUnreferencedCode(ReflectionBindingMessage)]
+        [RequiresDynamicCode(ReflectionBindingMessage)]
         private static Binding CloneBinding(Binding source)
         {
             return new Binding
@@ -321,6 +326,8 @@ namespace Avalonia.Controls.Utils
             };
         }
 
+        [RequiresUnreferencedCode(ReflectionBindingMessage)]
+        [RequiresDynamicCode(ReflectionBindingMessage)]
         private static ReflectionBinding CloneBinding(ReflectionBinding source)
         {
             return new ReflectionBinding(source.Path)

@@ -1,0 +1,14 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:local="using:Avalonia.Controls.DataGridAotSmoke"
+             x:Class="Avalonia.Controls.DataGridAotSmoke.PeopleGridView">
+  <DataGrid x:Name="PeopleGrid" AutoGenerateColumns="False" CanUserAddRows="False">
+    <DataGrid.Columns>
+      <DataGridTextColumn Header="Name" x:DataType="local:Person" Binding="{Binding Name}" />
+      <DataGridTextColumn Header="Age" x:DataType="local:Person" Binding="{Binding Age}" />
+      <DataGridComboBoxColumn Header="Department"
+                              SelectedItemBinding="{Binding Department, x:DataType=local:Person}"
+                              DisplayMemberBinding="{Binding Name, x:DataType=local:Department}" />
+    </DataGrid.Columns>
+  </DataGrid>
+</UserControl>

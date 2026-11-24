@@ -247,7 +247,7 @@ internal
 
                 if (Binding != null && dataItem != DataGridCollectionView.NewItemPlaceholder)
                 {
-                    if (Binding is Binding binding)
+                    if (DataGridReflectionFeature.IsEnabled && Binding is Binding binding)
                     {
                         var displayBinding = new Binding
                         {

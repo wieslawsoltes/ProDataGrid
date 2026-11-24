@@ -86,7 +86,6 @@ internal
     /// <summary>
     /// DataGrid-readable view over an IEnumerable.
     /// </summary>
-    [RequiresUnreferencedCode("DataGridCollectionView uses reflection and TypeDescriptor to inspect data items and is not compatible with trimming.")]
 #if !DATAGRID_INTERNAL
 public
 #else
@@ -190,14 +189,15 @@ internal
         private bool _isUsingTemporaryGroup;
 
         /// <summary>
-        /// ConstructorInfo obtained from reflection for generating new items
+        /// The source of new items: the <see cref="NewItemFactory"/> the application sets, or the
+        /// parameterless <see cref="ConstructorInfo"/> of the item type obtained from reflection.
         /// </summary>
         /// <remarks>
-        /// For trimmed apps, ensure the item type preserves a public parameterless constructor and its public properties,
-        /// e.g. decorate the model with
-        /// [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicParameterlessConstructor | DynamicallyAccessedMemberTypes.PublicProperties)].
+        /// One field holds both sources, so the factory adds nothing to the size of the view.
+        /// The constructor is only resolved while reflection is enabled; trimmed and Native AOT apps
+        /// supply <see cref="NewItemFactory"/> instead.
         /// </remarks>
-        private ConstructorInfo _itemConstructor;
+        private object _newItemSource;
 
         /// <summary>
         /// Whether we have the correct ConstructorInfo information for the ItemConstructor
@@ -471,6 +471,28 @@ internal
                     _itemType = GetItemType(true);
 
                 return _itemType;
+            }
+        }
+
+        /// <summary>
+        /// Gets or sets the factory used by <see cref="AddNew"/> to create new items.
+        /// </summary>
+        /// <remarks>
+        /// When no factory is set the view falls back to the item type's public parameterless constructor,
+        /// which it can only discover through reflection. Trimmed and Native AOT applications, where reflection
+        /// is disabled, must set a factory to support adding new items.
+        /// </remarks>
+        public Func<object> NewItemFactory
+        {
+            get => _newItemSource as Func<object>;
+            set
+            {
+                if (NewItemFactory != value)
+                {
+                    _newItemSource = value;
+                    _itemConstructorIsValid = false;
+                    OnPropertyChanged(nameof(CanAddNew));
+                }
             }
         }
 
@@ -1094,7 +1116,7 @@ internal
                     EnsureItemConstructor();
                 }
 
-                return _itemConstructor != null;
+                return _newItemSource != null;
             }
         }
 
