@@ -189,14 +189,15 @@ internal
         private bool _isUsingTemporaryGroup;
 
         /// <summary>
-        /// ConstructorInfo obtained from reflection for generating new items
+        /// The source of new items: the <see cref="NewItemFactory"/> the application sets, or the
+        /// parameterless <see cref="ConstructorInfo"/> of the item type obtained from reflection.
         /// </summary>
         /// <remarks>
-        /// Only resolved while reflection is enabled; trimmed and Native AOT apps supply <see cref="NewItemFactory"/> instead.
+        /// One field holds both sources, so the factory adds nothing to the size of the view.
+        /// The constructor is only resolved while reflection is enabled; trimmed and Native AOT apps
+        /// supply <see cref="NewItemFactory"/> instead.
         /// </remarks>
-        private ConstructorInfo _itemConstructor;
-
-        private Func<object> _newItemFactory;
+        private object _newItemSource;
 
         /// <summary>
         /// Whether we have the correct ConstructorInfo information for the ItemConstructor
@@ -483,12 +484,12 @@ internal
         /// </remarks>
         public Func<object> NewItemFactory
         {
-            get => _newItemFactory;
+            get => _newItemSource as Func<object>;
             set
             {
-                if (_newItemFactory != value)
+                if (NewItemFactory != value)
                 {
-                    _newItemFactory = value;
+                    _newItemSource = value;
                     _itemConstructorIsValid = false;
                     OnPropertyChanged(nameof(CanAddNew));
                 }
@@ -1115,7 +1116,7 @@ internal
                     EnsureItemConstructor();
                 }
 
-                return _newItemFactory != null || _itemConstructor != null;
+                return _newItemSource != null;
             }
         }
 

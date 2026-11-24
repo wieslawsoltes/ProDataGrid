@@ -133,10 +133,16 @@ namespace Avalonia.Collections
         {
             if (!_itemConstructorIsValid)
             {
+                if (_newItemSource is Func<object>)
+                {
+                    _itemConstructorIsValid = true;
+                    return;
+                }
+
                 Type itemType = ItemType;
                 if (itemType != null)
                 {
-                    _itemConstructor = _newItemFactory == null && DataGridReflectionFeature.IsEnabled
+                    _newItemSource = DataGridReflectionFeature.IsEnabled
                         ? GetItemConstructor(itemType)
                         : null;
                     _itemConstructorIsValid = true;

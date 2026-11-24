@@ -320,6 +320,25 @@ public class DataGridCollectionViewTests
         Assert.Empty(items);
     }
 
+    [Fact]
+    public void Clearing_NewItemFactory_Falls_Back_To_Parameterless_Constructor()
+    {
+        var items = new ObservableCollection<SimpleItem>();
+        var view = new DataGridCollectionView(items)
+        {
+            NewItemFactory = () => new SimpleItem { Value = 7 }
+        };
+        Assert.True(view.CanAddNew);
+
+        view.NewItemFactory = null;
+
+        Assert.Null(view.NewItemFactory);
+        Assert.True(view.CanAddNew);
+        var newItem = Assert.IsType<SimpleItem>(view.AddNew());
+        view.CommitNew();
+        Assert.Equal(0, newItem.Value);
+    }
+
     private class SimpleItem
     {
         public int Value { get; set; }
