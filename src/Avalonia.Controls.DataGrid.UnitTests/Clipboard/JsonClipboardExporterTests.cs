@@ -32,7 +32,7 @@ public class JsonClipboardExporterTests
         Assert.Contains(customFormat, data.Formats);
 
         var text = await data.TryGetValueAsync(DataFormat.Text);
-        Assert.Equal("\"Name\"\t\"Value\"\r\n\"Alpha\"\t\"1\"\r\n", text);
+        Assert.Equal("Name\tValue\r\nAlpha\t1\r\n", text);
 
         var json = await data.TryGetValueAsync(customFormat) as string;
         Assert.NotNull(json);

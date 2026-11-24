@@ -23,7 +23,7 @@ Set `ClipboardCopyMode` and choose a selection unit. Plain text is always includ
 
 `ClipboardExportFormat` controls the optional extra format added alongside plain text:
 
-- `Text` (tab-separated)
+- `Text` (tab-separated; values are quoted only when they contain tabs, line breaks, or double quotes)
 - `Csv`
 - `Html`
 - `Markdown`
