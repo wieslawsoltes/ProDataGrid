@@ -212,10 +212,6 @@ namespace Avalonia.Controls
                 dataGridColumn.OwningGrid = _owningGrid;
                 _owningGrid.OnColumnWidthSharingColumnAttached(dataGridColumn);
                 dataGridColumn.RemoveEditingElement();
-                if (dataGridColumn != RowGroupSpacerColumn && dataGridColumn != FillerColumn)
-                {
-                    _owningGrid.InitializeColumnSortDirection(dataGridColumn);
-                }
                 if (dataGridColumn.IsVisible)
                 {
                     VisibleEdgedColumnsWidth += dataGridColumn.ActualWidth;
@@ -231,6 +227,12 @@ namespace Avalonia.Controls
                 }
                 _owningGrid.OnInsertedColumn_PostNotification(newCurrentCellCoordinates, dataGridColumn.DisplayIndex);
                 _owningGrid.OnColumnCollectionChanged_PostNotification(true /*columnsGrew*/);
+
+                // Sort only after the column has a display index: applying the sort refreshes the view, which reads the columns by display index.
+                if (dataGridColumn != RowGroupSpacerColumn && dataGridColumn != FillerColumn)
+                {
+                    _owningGrid.InitializeColumnSortDirection(dataGridColumn);
+                }
             }
             finally
             {

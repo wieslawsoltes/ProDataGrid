@@ -330,6 +330,51 @@ public class DataGridSortDirectionSyncTests
         Assert.Equal(nameof(Item.Name), descriptor.PropertyPath);
     }
 
+    [AvaloniaTheory]
+    [InlineData(0)]
+    [InlineData(1)]
+    public void Column_Added_With_SortDirection_Sorts_After_Display_Index_Is_Assigned(int precedingColumns)
+    {
+        var items = new ObservableCollection<Item>
+        {
+            new("B"),
+            new("A"),
+        };
+
+        var view = new DataGridCollectionView(items);
+        var grid = CreateGridWithoutColumns(view);
+        for (var i = 0; i < precedingColumns; i++)
+        {
+            grid.ColumnsInternal.Add(new DataGridTextColumn
+            {
+                Header = "Other",
+                Binding = new Binding(nameof(Item.Name))
+            });
+        }
+
+        var countsWhileSorting = new List<(int Columns, int DisplayIndexes)>();
+        view.CollectionChanged += (_, _) =>
+            countsWhileSorting.Add((grid.ColumnsInternal.ItemsInternal.Count, grid.ColumnsInternal.DisplayIndexMap.Count));
+
+        var column = new DataGridTextColumn
+        {
+            Header = "Name",
+            Binding = new Binding(nameof(Item.Name)),
+            SortMemberPath = nameof(Item.Name),
+            SortDirection = ListSortDirection.Ascending
+        };
+
+        grid.ColumnsInternal.Add(column);
+        grid.UpdateLayout();
+
+        Assert.Equal(new[] { "A", "B" }, view.Cast<Item>().Select(item => item.Name));
+        Assert.Equal(ListSortDirection.Ascending, column.SortDirection);
+        var descriptor = Assert.Single(grid.SortingModel.Descriptors);
+        Assert.Equal(nameof(Item.Name), descriptor.PropertyPath);
+        Assert.NotEmpty(countsWhileSorting);
+        Assert.All(countsWhileSorting, counts => Assert.Equal(counts.Columns, counts.DisplayIndexes));
+    }
+
     [AvaloniaFact]
     public void Clearing_SortDirection_Removes_Descriptor_With_External_ColumnId()
     {
